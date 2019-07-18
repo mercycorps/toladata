@@ -38,14 +38,16 @@ const IndicatorChangeset = ({data, name, pretty_name}) => {
         </div>
     } else {
         return <div className="change__field">
-            <strong>{pretty_name}:</strong> {(data !== null && data !== undefined)?data.toString():gettext('N/A')}
+            { name !== 'name' ? <strong>{pretty_name}: </strong>  : '' }
+            {(data !== null && data !== undefined)?data.toString():gettext('N/A')}
         </div>
     }
 }
 
 const ResultLevelChangeset = ({data, name, pretty_name}) => {
     return <div className="change__field">
-        <strong>{pretty_name}:</strong> {(data !== null && data !== undefined)?data.toString():gettext('N/A')}
+        { name !== 'name' ? <strong>{pretty_name}: </strong>  : '' }
+        {(data !== null && data !== undefined)?data.toString():gettext('N/A')}
     </div>
 }
 
