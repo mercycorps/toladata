@@ -6,7 +6,7 @@ import { trimOntology } from '../../../level_utils'
 
 const LevelNameCell = ({ name, rowCount }) => {
     return (
-        <td className="logframe__cell--level" rowSpan={ rowCount }>
+        <td className="logframe__cell--level" rowSpan={ rowCount < 1 ? 1 : rowCount }>
             { name }
         </td>
     )
