@@ -1,4 +1,5 @@
 import { observable, computed, action } from "mobx";
+import { indicatorManualNumberSort } from '../../general_utilities';
 
 // Types of filters available on the program page
 export const IndicatorFilterType = Object.freeze({
@@ -88,11 +89,7 @@ export class IndicatorStore {
     sortIndicators(oldStyleLevels, sortByChain, indicators) {
         if (oldStyleLevels) {
             return indicators.slice().sort(
-                (a, b) => {
-                    return (a.old_level_pk < b.old_level_pk) ? -1
-                            : (a.old_level_pk < b.old_level_pk) ? 1
-                                : 0
-                }
+                indicatorManualNumberSort(indicator => indicator.old_level_pk, indicator => indicator.number_if_numbering)
             );
         } else if (!sortByChain) {
             return indicators.slice().sort(

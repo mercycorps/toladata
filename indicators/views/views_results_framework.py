@@ -23,6 +23,7 @@ from rest_framework.response import Response
 
 from indicators.serializers import (
     LevelTierSerializer, LevelSerializer, IndicatorSerializerMinimal, ProgramObjectiveSerializer)
+from workflow.serializers import ResultsFrameworkProgramSerializer
 from indicators.models import Level, LevelTier, Indicator
 from tola_management.models import ProgramAuditLog
 from workflow.models import Program
@@ -59,7 +60,7 @@ class ResultsFrameworkBuilder(ListView):
         translation.activate(old_lang)
 
         js_context = {
-            'program_id': program.id,
+            'program': ResultsFrameworkProgramSerializer(program).data,
             'levels': LevelSerializer(levels, many=True).data,
             'indicators': IndicatorSerializerMinimal(indicators, many=True).data,
             'levelTiers': LevelTierSerializer(tiers, many=True).data,
@@ -129,7 +130,6 @@ class LevelViewSet (viewsets.ModelViewSet):
                 )
 
         # DRF stuff
-
         if getattr(instance, '_prefetched_objects_cache', None):
             # If 'prefetch_related' has been applied to a queryset, we need to
             # forcibly invalidate the prefetch cache on the instance.

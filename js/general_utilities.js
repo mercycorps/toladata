@@ -45,4 +45,42 @@ function reloadPageIfCached() {
     });
 }
 
-export { flattenArray, ensureNumericArray, reloadPageIfCached };
+const indicatorManualNumberSort = (levelFunc, numberFunc) => {
+    return (indicatorA, indicatorB) => {
+        let levelA = levelFunc(indicatorA);
+        let levelB = levelFunc(indicatorB);
+        if (levelA && !levelB) {
+            return 1;
+        }
+        if (levelB && !levelA) {
+            return -1;
+        }
+        if (levelA != levelB) {
+            return parseInt(levelA) - parseInt(levelB);
+        }
+        let numberA = (numberFunc(indicatorA) || '').split('.');
+        let numberB = (numberFunc(indicatorB) || '').split('.');
+        for (let i=0; i < Math.max(numberA.length, numberB.length); i++) {
+            if (numberA[i] && numberB[i]) {
+                for (let j=0; j < Math.max(numberA[i].length, numberB[i].length); j++) {
+                    if (numberA[i][j] && numberB[i][j]) {
+                        if (numberA[i].charCodeAt(j) != numberB[i].charCodeAt(j)) {
+                            return numberA[i].charCodeAt(j) - numberB[i].charCodeAt(j);
+                        }
+                    } else if (numberA[i][j]) {
+                        return 1;
+                    } else if (numberB[i][j]) {
+                        return -1;
+                    }
+                }
+            } else if (numberA[i]) {
+                return 1;
+            } else if (numberB[i]) {
+                return -1;
+            }
+        }
+        return 0;
+    }
+}
+
+export { flattenArray, ensureNumericArray, reloadPageIfCached, indicatorManualNumberSort };

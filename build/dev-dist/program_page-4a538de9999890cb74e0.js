@@ -514,7 +514,7 @@ function mediumDateFormatStr(date) {
 /*!*********************************!*\
   !*** ./js/general_utilities.js ***!
   \*********************************/
-/*! exports provided: flattenArray, ensureNumericArray, reloadPageIfCached */
+/*! exports provided: flattenArray, ensureNumericArray, reloadPageIfCached, indicatorManualNumberSort */
 /***/ (function(module, __webpack_exports__, __webpack_require__) {
 
 "use strict";
@@ -522,6 +522,7 @@ __webpack_require__.r(__webpack_exports__);
 /* harmony export (binding) */ __webpack_require__.d(__webpack_exports__, "flattenArray", function() { return flattenArray; });
 /* harmony export (binding) */ __webpack_require__.d(__webpack_exports__, "ensureNumericArray", function() { return ensureNumericArray; });
 /* harmony export (binding) */ __webpack_require__.d(__webpack_exports__, "reloadPageIfCached", function() { return reloadPageIfCached; });
+/* harmony export (binding) */ __webpack_require__.d(__webpack_exports__, "indicatorManualNumberSort", function() { return indicatorManualNumberSort; });
 function flattenArray(arr) {
   var depth = arguments.length > 1 && arguments[1] !== undefined ? arguments[1] : 1;
 
@@ -583,6 +584,50 @@ function reloadPageIfCached() {
   });
 }
 
+var indicatorManualNumberSort = function indicatorManualNumberSort(levelFunc, numberFunc) {
+  return function (indicatorA, indicatorB) {
+    var levelA = levelFunc(indicatorA);
+    var levelB = levelFunc(indicatorB);
+
+    if (levelA && !levelB) {
+      return 1;
+    }
+
+    if (levelB && !levelA) {
+      return -1;
+    }
+
+    if (levelA != levelB) {
+      return parseInt(levelA) - parseInt(levelB);
+    }
+
+    var numberA = (numberFunc(indicatorA) || '').split('.');
+    var numberB = (numberFunc(indicatorB) || '').split('.');
+
+    for (var i = 0; i < Math.max(numberA.length, numberB.length); i++) {
+      if (numberA[i] && numberB[i]) {
+        for (var j = 0; j < Math.max(numberA[i].length, numberB[i].length); j++) {
+          if (numberA[i][j] && numberB[i][j]) {
+            if (numberA[i].charCodeAt(j) != numberB[i].charCodeAt(j)) {
+              return numberA[i].charCodeAt(j) - numberB[i].charCodeAt(j);
+            }
+          } else if (numberA[i][j]) {
+            return 1;
+          } else if (numberB[i][j]) {
+            return -1;
+          }
+        }
+      } else if (numberA[i]) {
+        return 1;
+      } else if (numberB[i]) {
+        return -1;
+      }
+    }
+
+    return 0;
+  };
+};
+
 
 
 /***/ }),
@@ -601,6 +646,7 @@ __webpack_require__.r(__webpack_exports__);
 /* harmony export (binding) */ __webpack_require__.d(__webpack_exports__, "ProgramPageStore", function() { return ProgramPageStore; });
 /* harmony export (binding) */ __webpack_require__.d(__webpack_exports__, "ProgramPageUIStore", function() { return ProgramPageUIStore; });
 /* harmony import */ var mobx__WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(/*! mobx */ "2vnA");
+/* harmony import */ var _general_utilities__WEBPACK_IMPORTED_MODULE_1__ = __webpack_require__(/*! ../../general_utilities */ "WtQ/");
 var _class, _descriptor, _temp, _class3, _descriptor2, _descriptor3, _temp2, _class5, _descriptor4, _descriptor5, _descriptor6, _temp3;
 
 function _initializerDefineProperty(target, property, descriptor, context) { if (!descriptor) return; Object.defineProperty(target, property, { enumerable: descriptor.enumerable, configurable: descriptor.configurable, writable: descriptor.writable, value: descriptor.initializer ? descriptor.initializer.call(context) : void 0 }); }
@@ -614,6 +660,7 @@ function _createClass(Constructor, protoProps, staticProps) { if (protoProps) _d
 function _applyDecoratedDescriptor(target, property, decorators, descriptor, context) { var desc = {}; Object['ke' + 'ys'](descriptor).forEach(function (key) { desc[key] = descriptor[key]; }); desc.enumerable = !!desc.enumerable; desc.configurable = !!desc.configurable; if ('value' in desc || desc.initializer) { desc.writable = true; } desc = decorators.slice().reverse().reduce(function (desc, decorator) { return decorator(target, property, desc) || desc; }, desc); if (context && desc.initializer !== void 0) { desc.value = desc.initializer ? desc.initializer.call(context) : void 0; desc.initializer = undefined; } if (desc.initializer === void 0) { Object['define' + 'Property'](target, property, desc); desc = null; } return desc; }
 
 function _initializerWarningHelper(descriptor, context) { throw new Error('Decorating class property failed. Please ensure that ' + 'proposal-class-properties is enabled and set to use loose mode. ' + 'To use proposal-class-properties in spec mode with decorators, wait for ' + 'the next major version of decorators in stage 2.'); }
+
 
  // Types of filters available on the program page
 
@@ -670,9 +717,11 @@ function () {
     key: "sortIndicators",
     value: function sortIndicators(oldStyleLevels, sortByChain, indicators) {
       if (oldStyleLevels) {
-        return indicators.slice().sort(function (a, b) {
-          return a.old_level_pk < b.old_level_pk ? -1 : a.old_level_pk < b.old_level_pk ? 1 : 0;
-        });
+        return indicators.slice().sort(Object(_general_utilities__WEBPACK_IMPORTED_MODULE_1__["indicatorManualNumberSort"])(function (indicator) {
+          return indicator.old_level_pk;
+        }, function (indicator) {
+          return indicator.number_if_numbering;
+        }));
       } else if (!sortByChain) {
         return indicators.slice().sort(function (a, b) {
           if (a.level && a.level.level_depth) {
@@ -1776,4 +1825,4 @@ var ProgramMetrics = Object(mobx_react__WEBPACK_IMPORTED_MODULE_2__["observer"])
 /***/ })
 
 },[["aJgA","runtime","vendors"]]]);
-//# sourceMappingURL=program_page-5a59d0abdc2f8658a57a.js.map
+//# sourceMappingURL=program_page-4a538de9999890cb74e0.js.map

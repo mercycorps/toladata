@@ -145,8 +145,14 @@ export class LevelCardCollapsed extends React.Component {
         let individualLinks = this.props.levelProps.indicators
             .sort( (a, b) => a.level_order - b.level_order)
             .map( (indicator, index) => {
-                const ontologyLabel = this.props.levelProps.ontologyLabel + String.fromCharCode(97 + index) + ": ";
-                return `<li class="nav-item level-card--iptt-links"><a href=${this.buildIPTTUrl([indicator.id])}>${ontologyLabel}${indicator.name}</a></li>`;
+                let indicatorNumber = "";
+                if (!this.props.rootStore.levelStore.manual_numbering) {
+                    indicatorNumber = this.props.levelProps.ontologyLabel + String.fromCharCode(97 + index) + ": ";
+                }
+                else if (this.props.rootStore.levelStore.manual_numbering && indicator.number) {
+                    indicatorNumber = indicator.number + ": ";
+                }
+                return `<li class="nav-item level-card--iptt-links"><a href=${this.buildIPTTUrl([indicator.id])}>${indicatorNumber}${indicator.name}</a></li>`;
             });
 
         allIndicatorLinks = allIndicatorLinks.concat(individualLinks);

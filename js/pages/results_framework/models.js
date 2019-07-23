@@ -2,8 +2,8 @@ import { observable, computed, action, toJS, runInAction, autorun } from "mobx";
 import { api } from "../../api.js"
 
 export class RootStore {
-    constructor (program_id, levels, indicators, levelTiers, tierTemplates, englishTemplates, programObjectives, accessLevel, usingResultsFramework) {
-        this.levelStore =  new LevelStore(program_id, levels, indicators, levelTiers, tierTemplates, englishTemplates, programObjectives, accessLevel, usingResultsFramework, this);
+    constructor (program, levels, indicators, levelTiers, tierTemplates, englishTemplates, programObjectives, accessLevel, usingResultsFramework) {
+        this.levelStore =  new LevelStore(program, levels, indicators, levelTiers, tierTemplates, englishTemplates, programObjectives, accessLevel, usingResultsFramework, this);
         this.uiStore = new UIStore(this);
     }
 }
@@ -21,7 +21,7 @@ export class LevelStore {
     accessLevel = false;
     usingResultsFramework;
 
-    constructor(program_id, levels, indicators, levelTiers, tierTemplates, englishTemplates, programObjectives, accessLevel, usingResultsFramework, rootStore) {
+    constructor(program, levels, indicators, levelTiers, tierTemplates, englishTemplates, programObjectives, accessLevel, usingResultsFramework, rootStore) {
         this.rootStore = rootStore;
         this.levels = levels;
         this.indicators = indicators;
@@ -29,7 +29,8 @@ export class LevelStore {
         this.englishTierTemlates = JSON.parse(englishTemplates);
         this.defaultTemplateKey = "mc_standard";
         this.customTierSetKey = "custom";
-        this.program_id = program_id;
+        this.program_id = program.id;
+        this.manual_numbering = program.manual_numbering;
         this.programObjectives = programObjectives;
         this.accessLevel = accessLevel;
 

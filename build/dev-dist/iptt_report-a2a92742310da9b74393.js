@@ -3918,7 +3918,7 @@ var IPTTFilterForm = Object(mobx_react__WEBPACK_IMPORTED_MODULE_1__["inject"])('
 /*!*********************************!*\
   !*** ./js/general_utilities.js ***!
   \*********************************/
-/*! exports provided: flattenArray, ensureNumericArray, reloadPageIfCached */
+/*! exports provided: flattenArray, ensureNumericArray, reloadPageIfCached, indicatorManualNumberSort */
 /***/ (function(module, __webpack_exports__, __webpack_require__) {
 
 "use strict";
@@ -3926,6 +3926,7 @@ __webpack_require__.r(__webpack_exports__);
 /* harmony export (binding) */ __webpack_require__.d(__webpack_exports__, "flattenArray", function() { return flattenArray; });
 /* harmony export (binding) */ __webpack_require__.d(__webpack_exports__, "ensureNumericArray", function() { return ensureNumericArray; });
 /* harmony export (binding) */ __webpack_require__.d(__webpack_exports__, "reloadPageIfCached", function() { return reloadPageIfCached; });
+/* harmony export (binding) */ __webpack_require__.d(__webpack_exports__, "indicatorManualNumberSort", function() { return indicatorManualNumberSort; });
 function flattenArray(arr) {
   var depth = arguments.length > 1 && arguments[1] !== undefined ? arguments[1] : 1;
 
@@ -3986,6 +3987,50 @@ function reloadPageIfCached() {
     }
   });
 }
+
+var indicatorManualNumberSort = function indicatorManualNumberSort(levelFunc, numberFunc) {
+  return function (indicatorA, indicatorB) {
+    var levelA = levelFunc(indicatorA);
+    var levelB = levelFunc(indicatorB);
+
+    if (levelA && !levelB) {
+      return 1;
+    }
+
+    if (levelB && !levelA) {
+      return -1;
+    }
+
+    if (levelA != levelB) {
+      return parseInt(levelA) - parseInt(levelB);
+    }
+
+    var numberA = (numberFunc(indicatorA) || '').split('.');
+    var numberB = (numberFunc(indicatorB) || '').split('.');
+
+    for (var i = 0; i < Math.max(numberA.length, numberB.length); i++) {
+      if (numberA[i] && numberB[i]) {
+        for (var j = 0; j < Math.max(numberA[i].length, numberB[i].length); j++) {
+          if (numberA[i][j] && numberB[i][j]) {
+            if (numberA[i].charCodeAt(j) != numberB[i].charCodeAt(j)) {
+              return numberA[i].charCodeAt(j) - numberB[i].charCodeAt(j);
+            }
+          } else if (numberA[i][j]) {
+            return 1;
+          } else if (numberB[i][j]) {
+            return -1;
+          }
+        }
+      } else if (numberA[i]) {
+        return 1;
+      } else if (numberB[i]) {
+        return -1;
+      }
+    }
+
+    return 0;
+  };
+};
 
 
 
@@ -5125,4 +5170,4 @@ function () {
 /***/ })
 
 },[["mYfJ","runtime","vendors"]]]);
-//# sourceMappingURL=iptt_report-80fe8016ecd9d507c2ec.js.map
+//# sourceMappingURL=iptt_report-a2a92742310da9b74393.js.map
