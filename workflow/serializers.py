@@ -148,6 +148,14 @@ class LogframeLevelSerializer(serializers.ModelSerializer):
         return u'{}{}'.format(label, obj.name)
 
 
+class ResultsFrameworkProgramSerializer(serializers.ModelSerializer):
+    manual_numbering = serializers.BooleanField(read_only=True)
+
+    class Meta:
+        model = Program
+        fields = ['id', 'manual_numbering']
+
+
 class LogframeProgramSerializer(serializers.ModelSerializer):
     results_framework_url = serializers.SerializerMethodField()
     program_page_url = serializers.CharField()

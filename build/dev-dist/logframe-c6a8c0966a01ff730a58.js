@@ -891,7 +891,7 @@ var LevelNameCell = function LevelNameCell(_ref) {
       rowCount = _ref.rowCount;
   return react__WEBPACK_IMPORTED_MODULE_0___default.a.createElement("td", {
     className: "logframe__cell--level",
-    rowSpan: rowCount
+    rowSpan: rowCount < 1 ? 1 : rowCount
   }, name);
 };
 
@@ -1037,4 +1037,4 @@ function (_React$Component) {
 /***/ })
 
 },[["+uhY","runtime","vendors"]]]);
-//# sourceMappingURL=logframe-d72d7bf27e391fff5b4a.js.map
+//# sourceMappingURL=logframe-c6a8c0966a01ff730a58.js.map

@@ -615,8 +615,15 @@ function (_React$Component3) {
       var individualLinks = this.props.levelProps.indicators.sort(function (a, b) {
         return a.level_order - b.level_order;
       }).map(function (indicator, index) {
-        var ontologyLabel = _this3.props.levelProps.ontologyLabel + String.fromCharCode(97 + index) + ": ";
-        return "<li class=\"nav-item level-card--iptt-links\"><a href=".concat(_this3.buildIPTTUrl([indicator.id]), ">").concat(ontologyLabel).concat(indicator.name, "</a></li>");
+        var indicatorNumber = "";
+
+        if (!_this3.props.rootStore.levelStore.manual_numbering) {
+          indicatorNumber = _this3.props.levelProps.ontologyLabel + String.fromCharCode(97 + index) + ": ";
+        } else if (_this3.props.rootStore.levelStore.manual_numbering && indicator.number) {
+          indicatorNumber = indicator.number + ": ";
+        }
+
+        return "<li class=\"nav-item level-card--iptt-links\"><a href=".concat(_this3.buildIPTTUrl([indicator.id]), ">").concat(indicatorNumber).concat(indicator.name, "</a></li>");
       });
       allIndicatorLinks = allIndicatorLinks.concat(individualLinks);
       var indicatorMarkup = "<ul class=\"nav flex-column\">".concat(allIndicatorLinks.join(""), "</ul>");
@@ -1549,16 +1556,16 @@ function _classCallCheck(instance, Constructor) { if (!(instance instanceof Cons
 
 
 
-var RootStore = function RootStore(program_id, levels, indicators, levelTiers, tierTemplates, englishTemplates, programObjectives, accessLevel, usingResultsFramework) {
+var RootStore = function RootStore(program, levels, indicators, levelTiers, tierTemplates, englishTemplates, programObjectives, accessLevel, usingResultsFramework) {
   _classCallCheck(this, RootStore);
 
-  this.levelStore = new LevelStore(program_id, levels, indicators, levelTiers, tierTemplates, englishTemplates, programObjectives, accessLevel, usingResultsFramework, this);
+  this.levelStore = new LevelStore(program, levels, indicators, levelTiers, tierTemplates, englishTemplates, programObjectives, accessLevel, usingResultsFramework, this);
   this.uiStore = new UIStore(this);
 };
 var LevelStore = (_class = (_temp =
 /*#__PURE__*/
 function () {
-  function LevelStore(program_id, levels, _indicators, levelTiers, tierTemplates, englishTemplates, programObjectives, accessLevel, usingResultsFramework, rootStore) {
+  function LevelStore(program, levels, _indicators, levelTiers, tierTemplates, englishTemplates, programObjectives, accessLevel, usingResultsFramework, rootStore) {
     var _this = this;
 
     _classCallCheck(this, LevelStore);
@@ -1848,7 +1855,8 @@ function () {
     this.englishTierTemlates = JSON.parse(englishTemplates);
     this.defaultTemplateKey = "mc_standard";
     this.customTierSetKey = "custom";
-    this.program_id = program_id;
+    this.program_id = program.id;
+    this.manual_numbering = program.manual_numbering;
     this.programObjectives = programObjectives;
     this.accessLevel = accessLevel; // Set the stored tier set key and the values, if they exist.  Use the default if they don't.
 
@@ -2422,7 +2430,7 @@ __webpack_require__.r(__webpack_exports__);
  */
 
 var _jsContext = jsContext,
-    program_id = _jsContext.program_id,
+    program = _jsContext.program,
     levels = _jsContext.levels,
     indicators = _jsContext.indicators,
     levelTiers = _jsContext.levelTiers,
@@ -2431,7 +2439,7 @@ var _jsContext = jsContext,
     programObjectives = _jsContext.programObjectives,
     accessLevel = _jsContext.accessLevel,
     usingResultsFramework = _jsContext.usingResultsFramework;
-var rootStore = new _models__WEBPACK_IMPORTED_MODULE_9__["RootStore"](program_id, levels, indicators, levelTiers, tierTemplates, englishTemplates, programObjectives, accessLevel, usingResultsFramework);
+var rootStore = new _models__WEBPACK_IMPORTED_MODULE_9__["RootStore"](program, levels, indicators, levelTiers, tierTemplates, englishTemplates, programObjectives, accessLevel, usingResultsFramework);
 /*
  * React components on page
  */
@@ -2447,7 +2455,7 @@ Object(_general_utilities__WEBPACK_IMPORTED_MODULE_6__["reloadPageIfCached"])();
 /*!*********************************!*\
   !*** ./js/general_utilities.js ***!
   \*********************************/
-/*! exports provided: flattenArray, ensureNumericArray, reloadPageIfCached */
+/*! exports provided: flattenArray, ensureNumericArray, reloadPageIfCached, indicatorManualNumberSort */
 /***/ (function(module, __webpack_exports__, __webpack_require__) {
 
 "use strict";
@@ -2455,6 +2463,7 @@ __webpack_require__.r(__webpack_exports__);
 /* harmony export (binding) */ __webpack_require__.d(__webpack_exports__, "flattenArray", function() { return flattenArray; });
 /* harmony export (binding) */ __webpack_require__.d(__webpack_exports__, "ensureNumericArray", function() { return ensureNumericArray; });
 /* harmony export (binding) */ __webpack_require__.d(__webpack_exports__, "reloadPageIfCached", function() { return reloadPageIfCached; });
+/* harmony export (binding) */ __webpack_require__.d(__webpack_exports__, "indicatorManualNumberSort", function() { return indicatorManualNumberSort; });
 function flattenArray(arr) {
   var depth = arguments.length > 1 && arguments[1] !== undefined ? arguments[1] : 1;
 
@@ -2515,6 +2524,50 @@ function reloadPageIfCached() {
     }
   });
 }
+
+var indicatorManualNumberSort = function indicatorManualNumberSort(levelFunc, numberFunc) {
+  return function (indicatorA, indicatorB) {
+    var levelA = levelFunc(indicatorA);
+    var levelB = levelFunc(indicatorB);
+
+    if (levelA && !levelB) {
+      return 1;
+    }
+
+    if (levelB && !levelA) {
+      return -1;
+    }
+
+    if (levelA != levelB) {
+      return parseInt(levelA) - parseInt(levelB);
+    }
+
+    var numberA = (numberFunc(indicatorA) || '').split('.');
+    var numberB = (numberFunc(indicatorB) || '').split('.');
+
+    for (var i = 0; i < Math.max(numberA.length, numberB.length); i++) {
+      if (numberA[i] && numberB[i]) {
+        for (var j = 0; j < Math.max(numberA[i].length, numberB[i].length); j++) {
+          if (numberA[i][j] && numberB[i][j]) {
+            if (numberA[i].charCodeAt(j) != numberB[i].charCodeAt(j)) {
+              return numberA[i].charCodeAt(j) - numberB[i].charCodeAt(j);
+            }
+          } else if (numberA[i][j]) {
+            return 1;
+          } else if (numberB[i][j]) {
+            return -1;
+          }
+        }
+      } else if (numberA[i]) {
+        return 1;
+      } else if (numberB[i]) {
+        return -1;
+      }
+    }
+
+    return 0;
+  };
+};
 
 
 
@@ -2856,4 +2909,4 @@ var STATUS_CODES = {
 /***/ })
 
 },[["QTZG","runtime","vendors"]]]);
-//# sourceMappingURL=results_framework-c57f0d2fb83506dbf573.js.map
+//# sourceMappingURL=results_framework-dd3261692d5dc54004dd.js.map

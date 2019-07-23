@@ -116,7 +116,7 @@ var IndicatorChangeset = function IndicatorChangeset(_ref5) {
   } else {
     return react__WEBPACK_IMPORTED_MODULE_0___default.a.createElement("div", {
       className: "change__field"
-    }, react__WEBPACK_IMPORTED_MODULE_0___default.a.createElement("strong", null, pretty_name, ":"), " ", data !== null && data !== undefined ? data.toString() : gettext('N/A'));
+    }, name !== 'name' ? react__WEBPACK_IMPORTED_MODULE_0___default.a.createElement("strong", null, pretty_name, ": ") : '', data !== null && data !== undefined ? data.toString() : gettext('N/A'));
   }
 };
 
@@ -126,7 +126,7 @@ var ResultLevelChangeset = function ResultLevelChangeset(_ref8) {
       pretty_name = _ref8.pretty_name;
   return react__WEBPACK_IMPORTED_MODULE_0___default.a.createElement("div", {
     className: "change__field"
-  }, react__WEBPACK_IMPORTED_MODULE_0___default.a.createElement("strong", null, pretty_name, ":"), " ", data !== null && data !== undefined ? data.toString() : gettext('N/A'));
+  }, name !== 'name' ? react__WEBPACK_IMPORTED_MODULE_0___default.a.createElement("strong", null, pretty_name, ": ") : '', data !== null && data !== undefined ? data.toString() : gettext('N/A'));
 };
 
 var ChangesetEntry =
@@ -727,4 +727,4 @@ function () {
 /***/ })
 
 },[["6bbB","runtime","vendors"]]]);
-//# sourceMappingURL=audit_log-481c23a7620a6111262a.js.map
+//# sourceMappingURL=audit_log-7c654dccdd4a6ccd0ba2.js.map
