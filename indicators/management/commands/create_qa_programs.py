@@ -8,11 +8,12 @@ from dateutil.relativedelta import relativedelta
 from copy import deepcopy
 
 from django.core.management.base import BaseCommand
+from django.contrib.auth.models import User
 from django.utils import timezone, translation
 from django.conf import settings
 
 from indicators.models import Indicator, Result, PeriodicTarget, Level, LevelTier
-from workflow.models import Program, Country, Organization, TolaUser, CountryAccess
+from workflow.models import Program, Country, Organization, TolaUser, CountryAccess, ProgramAccess
 from indicators.views.views_indicators import generate_periodic_targets
 
 
@@ -22,8 +23,10 @@ class Command(BaseCommand):
         """
 
     def add_arguments(self, parser):
-        parser.add_argument('--clean', action='store_true')
+        parser.add_argument('--clean_programs', action='store_true')
         parser.add_argument('--clean_tolaland', action='store_true')
+        parser.add_argument('--clean_test_users', action='store_true')
+        parser.add_argument('--clean_all', action='store_true')
         parser.add_argument('--names')
         parser.add_argument('--named_only', action='store_true')
 
@@ -31,9 +34,27 @@ class Command(BaseCommand):
         # ***********
         # Creates programs, indicators and results for qa testing
         # ***********
+        if options['clean_tolaland']:
+            self.clean_tolaland()
+            sys.exit()
+
+        if options['clean_programs']:
+            self.clean_programs()
+            sys.exit()
+
+        if options['clean_test_users']:
+            self.clean_test_users()
+            sys.exit()
+
+        if options['clean_all']:
+            self.clean_programs()
+            self.clean_tolaland()
+            self.clean_test_users()
+            sys.exit()
 
         translation.activate(settings.LANGUAGE_CODE)
-        sample_levels = []
+
+        # Load the levels fixture and get the levels by filtering out the Tiers that are also in that file
         with open(os.path.join(settings.SITE_ROOT, 'fixtures/sample_levels.json'), 'r') as fh:
             sample_levels = json.loads(fh.read())
 
@@ -47,31 +68,17 @@ class Command(BaseCommand):
         country, created = Country.objects.get_or_create(
             country='Tolaland', defaults={
                 'latitude': 21.4, 'longitude': -158, 'zoom': 6, 'organization': org, 'code': 'TO'})
+
+        # Create test users and assign broad permissions to superusers.
+        self.create_test_users()
+
         for super_user in TolaUser.objects.filter(user__is_superuser=True):
             ca, created = CountryAccess.objects.get_or_create(country=country, tolauser=super_user)
             ca.role = 'basic_admin'
             ca.save()
 
 
-        if options['clean_tolaland']:
-            country = Country.objects.get(country='Tolaland')
-            country.delete()
-            sys.exit()
-        if options['clean']:
-            programs = Program.objects.filter(name__contains='QA Program -')
-            print "Delete these programs?\n{}".format('\n'.join(p.name for p in programs))
-            confirm = raw_input('[yes/no]: ')
-            # confirm = 'yes'
-            if confirm == 'yes':
-                for program in programs:
-                    print 'Deleting program:', program
-                    for indicator in program.indicator_set.all():
-                        indicator.delete()
-                    program.delete()
-                sys.exit()
-            else:
-                print '\nPrograms not deleted'
-                sys.exit()
+
 
         main_start_date = (date.today() + relativedelta(months=-18)).replace(day=1)
         main_end_date = (main_start_date + relativedelta(months=+32)).replace(day=1) - timedelta(days=1)
@@ -137,7 +144,7 @@ class Command(BaseCommand):
         if options['names']:
             tester_names = options['names'].split(',')
         else:
-            tester_names = ['Emily', 'Hanna', 'Marie', 'Jenny', 'Sanjuro', 'Ken', 'Cameron']
+            tester_names = ['Emily', 'Marie', 'Jenny', 'Sanjuro', 'Cameron', 'Ken']
 
         for t_name in tester_names:
             program_name = 'QA Program - {}'.format(t_name)
@@ -515,3 +522,186 @@ class Command(BaseCommand):
             level.program = Program.objects.get(id=program_id)
             level.save()
             level_map[level_fix['pk']] = level
+
+    def clean_test_users(self):
+        for username, profile in self.user_profiles.iteritems():
+            try:
+                tola_user_name = ' '.join(profile['first_last'])
+                tola_user = TolaUser.objects.get(name=tola_user_name)
+                auth_user = tola_user.user
+                tola_user.delete()
+                auth_user.delete()
+                print 'Deleted user {}'.format(tola_user)
+            except TolaUser.DoesNotExist:
+                pass
+
+    def clean_tolaland(self):
+        try:
+            country = Country.objects.get(country='Tolaland')
+            country.delete()
+        except Country.DoesNotExist:
+            pass
+
+    def clean_programs(self):
+        programs = Program.objects.filter(name__contains='QA Program -')
+        if programs.count() > 0:
+            print "Delete these programs?\n{}".format('\n'.join(p.name for p in programs))
+            confirm = raw_input('[yes/no]: ')
+            # confirm = 'yes'
+            if confirm == 'yes':
+                for program in programs:
+                    print 'Deleting program:', program
+                    for indicator in program.indicator_set.all():
+                        indicator.delete()
+                    program.delete()
+            else:
+                print '\nPrograms not deleted'
+
+
+    def create_test_users(self):
+        for username, profile in self.user_profiles.iteritems():
+            home_country = None
+            if profile['home_country']:
+                home_country = Country.objects.get(country=profile['home_country'])
+            accessible_countries = []
+
+            for country_name in profile['accessible_countries']:
+                accessible_countries.append(Country.objects.get(country=country_name))
+
+            user, created = User.objects.get_or_create(
+                username=username, first_name=profile['first_last'][0], last_name=profile['first_last'][1], email=profile['email'])
+            user.save()
+            tola_user, created = TolaUser.objects.get_or_create(
+                name=' '.join(profile['first_last']),
+                country=home_country,
+                user=user,
+                organization=profile['org']
+            )
+            tola_user.save()
+
+
+            for accessible_country in accessible_countries:
+                if tola_user.organization.name == 'Mercy Corps':
+                    ca, created = CountryAccess.objects.get_or_create(tolauser=tola_user, country=accessible_country, role=profile['permission_level'])
+                    ca.save()
+                else:
+                    for program in accessible_country.program_set.all():
+                        ProgramAccess.objects.get_or_create(
+                            country=accessible_country, program=program,
+                              tolauser=tola_user, role=profile['permission_level'])
+
+
+
+            for access_profile in profile.get('program_access', []):
+                country = Country.objects.get(country=access_profile[0])
+                try:
+                    prog = Program.objects.get(name__contains=access_profile[1], country=country)
+                    ProgramAccess.objects.get_or_create(country=country, program=prog, tolauser=tola_user, role=access_profile[2])
+
+                except Program.DoesNotExist:
+                    print "Couldn't create program access to {} for {}.  The program '{}' doesn't exist".format(tola_user, access_profile[1], access_profile[1])
+
+    standard_countries = ['Afghanistan', 'Haiti', 'Jordan', 'Tolaland', 'United States']
+    TEST_ORG, created = Organization.objects.get_or_create(name='Test')
+    MC_ORG = Organization.objects.get(name='Mercy Corps')
+    user_profiles = {
+        'tolatestone': {
+            'first_last': ['tola', 'testone'],
+            'email': 'tolatestone@mercycorps.org',
+            'accessible_countries': standard_countries,
+            'permission_level': 'low',
+            'home_country': 'United States',
+            'org': MC_ORG,
+        },
+        'tolatesttwo': {
+            'first_last': ['tola', 'testtwo'],
+            'email': 'tolatesttwo@mercycorps.org',
+            'accessible_countries': standard_countries,
+            'permission_level': 'medium',
+            'home_country': 'United States',
+            'org': MC_ORG,
+        },
+        'tolatestthree': {
+            'first_last': ['tola', 'testthree'],
+            'email': 'tolatestthree@mercycorps.org',
+            'accessible_countries': standard_countries,
+            'permission_level': 'high',
+            'home_country': 'United States',
+            'org': MC_ORG,
+        },
+        'mctest.low': {
+            'first_last': ['mctest', 'low'],
+            'email': 'mctest.low@gmail.com',
+            'accessible_countries': standard_countries,
+            'permission_level': 'low',
+            'home_country': None,
+            'org': TEST_ORG,
+        },
+        'mctest.medium': {
+            'first_last': ['mctest', 'medium'],
+            'email': 'mctest.medium@gmail.com',
+            'accessible_countries': standard_countries,
+            'permission_level': 'medium',
+            'home_country': None,
+            'org': TEST_ORG,
+        },
+        'mctest.high': {
+            'first_last': ['mctest', 'high'],
+            'email': 'mctest.high@gmail.com',
+            'accessible_countries': standard_countries,
+            'permission_level': 'high',
+            'home_country': None,
+            'org': TEST_ORG,
+        },
+        'external-low': {
+            'first_last': ['external', 'low'],
+            'email': 'external-low@example.com',
+            'accessible_countries': standard_countries,
+            'permission_level': 'low',
+            'home_country': None,
+            'org': TEST_ORG,
+        },
+        'external-medium': {
+            'first_last': ['external', 'medium'],
+            'email': 'external-medium@example.com',
+            'accessible_countries': standard_countries,
+            'permission_level': 'medium',
+            'home_country': None,
+            'org': TEST_ORG,
+        },
+        'external-high': {
+            'first_last': ['external', 'high'],
+            'email': 'external-high@example.com',
+            'accessible_countries': standard_countries,
+            'permission_level': 'high',
+            'home_country': None,
+            'org': TEST_ORG,
+        },
+        'demo1': {
+            'first_last': ['demo', 'one'],
+            'email': 'demo1@example.com',
+            'accessible_countries': ['Ethiopia'],
+            'permission_level': 'low',
+            'home_country': 'Ethiopia',
+            'org': MC_ORG,
+        },
+        'demo2': {
+            'first_last': ['demo', 'two'],
+            'email': 'demo2@example.com',
+            'accessible_countries': [],
+            'permission_level': 'low',
+            'home_country': None,
+            'org': TEST_ORG,
+            'program_access': [('Ethiopia', 'Collaboration in Cross-Border Areas', 'medium')]
+        },
+        'demo3': {
+            'first_last': ['demo', 'three'],
+            'email': 'demo3@example.com',
+            'accessible_countries': [],
+            'permission_level': 'high',
+            'home_country': None,
+            'org': TEST_ORG,
+            'program_access': [('Ethiopia', 'Collaboration in Cross-Border Areas', 'high')]
+        },
+
+    }
