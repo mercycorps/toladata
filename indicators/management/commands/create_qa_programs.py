@@ -70,7 +70,11 @@ class Command(BaseCommand):
                 'latitude': 21.4, 'longitude': -158, 'zoom': 6, 'organization': org, 'code': 'TO'})
 
         # Create test users and assign broad permissions to superusers.
-        self.create_test_users()
+        created_users, existing_users = self.create_test_users()
+        if len(created_users) > 0:
+            print 'Created the following test users:', ', '.join(sorted(created_users))
+        if len(existing_users) > 0:
+            print 'The following test users already existed:', ', '.join(sorted(created_users))
 
         for super_user in TolaUser.objects.filter(user__is_superuser=True):
             ca, created = CountryAccess.objects.get_or_create(country=country, tolauser=super_user)
@@ -559,6 +563,8 @@ class Command(BaseCommand):
 
 
     def create_test_users(self):
+        created_users = []
+        existing_users = []
         for username, profile in self.user_profiles.iteritems():
             home_country = None
             if profile['home_country']:
@@ -571,6 +577,11 @@ class Command(BaseCommand):
             user, created = User.objects.get_or_create(
                 username=username, first_name=profile['first_last'][0], last_name=profile['first_last'][1], email=profile['email'])
             user.save()
+            if created:
+                created_users.append(username)
+            else:
+                existing_users.append(username)
+
             tola_user, created = TolaUser.objects.get_or_create(
                 name=' '.join(profile['first_last']),
                 country=home_country,
@@ -578,7 +589,6 @@ class Command(BaseCommand):
                 organization=profile['org']
             )
             tola_user.save()
-
 
             for accessible_country in accessible_countries:
                 if tola_user.organization.name == 'Mercy Corps':
@@ -600,6 +610,8 @@ class Command(BaseCommand):
 
                 except Program.DoesNotExist:
                     print "Couldn't create program access to {} for {}.  The program '{}' doesn't exist".format(tola_user, access_profile[1], access_profile[1])
+
+        return (created_users, existing_users)
 
     standard_countries = ['Afghanistan', 'Haiti', 'Jordan', 'Tolaland', 'United States']
     TEST_ORG, created = Organization.objects.get_or_create(name='Test')
