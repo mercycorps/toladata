@@ -16,6 +16,7 @@ def create_tolaland():
     return country
 
 def create_program(country, name, count=0):
+    print "Creating program {}".format(name)
     program = Program.objects.create(**{
         'name': name,
         'reporting_period_start': datetime.date(2016, 1, 1),
@@ -30,7 +31,7 @@ def create_program(country, name, count=0):
 
 def create_mercycorps_leveltiers(program):
     tiers = []
-    for depth, tier_name in enumerate(LevelTier.TEMPLATES['mc_standard']['tiers']):
+    for depth, tier_name in enumerate(LevelTier.get_templates()['mc_standard']['tiers']):
         tiers.append(
             LevelTier.objects.create(
                 name=tier_name,
@@ -195,4 +196,3 @@ class Command(BaseCommand):
             customsort=4
         )
         add_indicators(levels, program)
-        

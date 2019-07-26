@@ -6,11 +6,15 @@ import json
 from datetime import date, timedelta
 from dateutil.relativedelta import relativedelta
 from copy import deepcopy
+from itertools import cycle
 
+from django.core import management
 from django.core.management.base import BaseCommand
 from django.contrib.auth.models import User
 from django.utils import timezone, translation
 from django.conf import settings
+from django.db.models import Q
+from django.db.utils import IntegrityError
 
 from indicators.models import Indicator, Result, PeriodicTarget, Level, LevelTier
 from workflow.models import Program, Country, Organization, TolaUser, CountryAccess, ProgramAccess
@@ -69,12 +73,14 @@ class Command(BaseCommand):
             country='Tolaland', defaults={
                 'latitude': 21.4, 'longitude': -158, 'zoom': 6, 'organization': org, 'code': 'TO'})
 
+        management.call_command('create_rf_program')
+
         # Create test users and assign broad permissions to superusers.
         created_users, existing_users = self.create_test_users()
         if len(created_users) > 0:
             print 'Created the following test users:', ', '.join(sorted(created_users))
         if len(existing_users) > 0:
-            print 'The following test users already existed:', ', '.join(sorted(created_users))
+            print 'The following test users already existed:', ', '.join(sorted(existing_users))
 
         for super_user in TolaUser.objects.filter(user__is_superuser=True):
             ca, created = CountryAccess.objects.get_or_create(country=country, tolauser=super_user)
@@ -154,9 +160,9 @@ class Command(BaseCommand):
             program_name = 'QA Program - {}'.format(t_name)
             program = self.create_program(main_start_date, main_end_date, country, program_name)
             print 'Creating Indicators for {}'.format(Program.objects.get(id=program.id))
+            self.create_levels(program.id, filtered_levels)
             self.create_indicators(program.id, all_params_base)
             self.create_indicators(program.id, null_supplements_params, apply_skips=False)
-            self.create_levels(program.id, filtered_levels)
 
         if options['named_only']:
             sys.exit()
@@ -355,6 +361,14 @@ class Command(BaseCommand):
         evidence_count = 0
         evidence_skip_mod = 7
 
+        old_levels = list(Indicator.objects.filter(old_level__isnull=False).order_by('old_level').distinct().values_list('old_level', flat=True))
+        old_levels.append(None)
+        old_level_cycle = cycle(old_levels)
+
+        rf_levels = list(Level.objects.filter(program__id=program.id))
+        rf_levels.append(None)
+        rf_level_cycle = cycle(rf_levels)
+
         for n, params in enumerate(param_sets):
             if params['is_cumulative']:
                 cumulative_text = 'Cumulative'
@@ -385,6 +399,8 @@ class Command(BaseCommand):
                 unit_of_measure_type=params['uom_type'],
                 direction_of_change=params['direction'],
                 program=program,
+                old_level=next(old_level_cycle),
+                level=next(rf_level_cycle),
             )
             indicator.save()
             indicator_ids.append(indicator.id)
@@ -547,7 +563,7 @@ class Command(BaseCommand):
             pass
 
     def clean_programs(self):
-        programs = Program.objects.filter(name__contains='QA Program -')
+        programs = Program.objects.filter(Q(name__contains='QA Program -') | Q(name__contains='RF Program -'))
         if programs.count() > 0:
             print "Delete these programs?\n{}".format('\n'.join(p.name for p in programs))
             confirm = raw_input('[yes/no]: ')
@@ -563,6 +579,7 @@ class Command(BaseCommand):
 
 
     def create_test_users(self):
+        password = raw_input("Enter the password to use for the test users: ")
         created_users = []
         existing_users = []
         for username, profile in self.user_profiles.iteritems():
@@ -576,6 +593,7 @@ class Command(BaseCommand):
 
             user, created = User.objects.get_or_create(
                 username=username, first_name=profile['first_last'][0], last_name=profile['first_last'][1], email=profile['email'])
+            user.set_password(password)
             user.save()
             if created:
                 created_users.append(username)
@@ -607,9 +625,10 @@ class Command(BaseCommand):
                 try:
                     prog = Program.objects.get(name__contains=access_profile[1], country=country)
                     ProgramAccess.objects.get_or_create(country=country, program=prog, tolauser=tola_user, role=access_profile[2])
-
                 except Program.DoesNotExist:
                     print "Couldn't create program access to {} for {}.  The program '{}' doesn't exist".format(tola_user, access_profile[1], access_profile[1])
+                except IntegrityError:
+                    pass
 
         return (created_users, existing_users)
 
@@ -704,7 +723,7 @@ class Command(BaseCommand):
             'permission_level': 'low',
             'home_country': None,
             'org': TEST_ORG,
-            'program_access': [('Ethiopia', 'Collaboration in Cross-Border Areas', 'medium')]
+            'program_access': [('Ethiopia', 'Collaboration in Cross-Border Areas', 'low')]
         },
         'demo3': {
             'first_last': ['demo', 'three'],
