@@ -608,18 +608,22 @@ class Command(BaseCommand):
             )
             tola_user.save()
 
+            # Add accessible country links between tola_users and countries.  The profile setup
+            # is overloaded a bit.  If the user belongs to the MC org, treat the accessible
+            # country as such.  If the user isn't part of MC org, you have to do it on a program by program basis.
             for accessible_country in accessible_countries:
                 if tola_user.organization.name == 'Mercy Corps':
-                    ca, created = CountryAccess.objects.get_or_create(tolauser=tola_user, country=accessible_country, role=profile['permission_level'])
+                    ca, created = CountryAccess.objects.get_or_create(tolauser=tola_user, country=accessible_country, role='user')
                     ca.save()
-                else:
+
+                # Need to also do program by program for MC members if the permission level is high because default with country access is low.
+                if tola_user.organization.name != 'Mercy Corps' or profile['permission_level'] != 'low':
                     for program in accessible_country.program_set.all():
                         ProgramAccess.objects.get_or_create(
                             country=accessible_country, program=program,
                               tolauser=tola_user, role=profile['permission_level'])
 
-
-
+            # Add ProgramAccess links between tola_users and programs
             for access_profile in profile.get('program_access', []):
                 country = Country.objects.get(country=access_profile[0])
                 try:
@@ -630,54 +634,64 @@ class Command(BaseCommand):
                 except IntegrityError:
                     pass
 
+            # Create/upgrade admin levels for each country listed in the profile
+            for country_name in profile.get('admin', []):
+                ca, created = CountryAccess.objects.get_or_create(
+                    country=Country.objects.get(country=country_name),
+                    tolauser=tola_user
+                )
+                ca.role = 'basic_admin'
+                ca.save()
+
         return (created_users, existing_users)
 
     standard_countries = ['Afghanistan', 'Haiti', 'Jordan', 'Tolaland', 'United States']
     TEST_ORG, created = Organization.objects.get_or_create(name='Test')
     MC_ORG = Organization.objects.get(name='Mercy Corps')
     user_profiles = {
-        'tolatestone': {
-            'first_last': ['tola', 'testone'],
+        'mc-low': {
+            'first_last': ['mc-low-first', 'mc-low-last'],
             'email': 'tolatestone@mercycorps.org',
             'accessible_countries': standard_countries,
             'permission_level': 'low',
             'home_country': 'United States',
             'org': MC_ORG,
         },
-        'tolatesttwo': {
-            'first_last': ['tola', 'testtwo'],
+        'mc-medium': {
+            'first_last': ['mc-med-first', 'mc-med-last'],
             'email': 'tolatesttwo@mercycorps.org',
             'accessible_countries': standard_countries,
             'permission_level': 'medium',
             'home_country': 'United States',
             'org': MC_ORG,
         },
-        'tolatestthree': {
-            'first_last': ['tola', 'testthree'],
+        'mc-high': {
+            'first_last': ['mc-high-first', 'mc-high-last'],
             'email': 'tolatestthree@mercycorps.org',
             'accessible_countries': standard_countries,
             'permission_level': 'high',
             'home_country': 'United States',
             'org': MC_ORG,
+            'admin': ['Tolaland']
         },
-        'mctest.low': {
-            'first_last': ['mctest', 'low'],
+        'gmail-low': {
+            'first_last': ['gm-low-first', 'gm-low-last'],
             'email': 'mctest.low@gmail.com',
             'accessible_countries': standard_countries,
             'permission_level': 'low',
             'home_country': None,
             'org': TEST_ORG,
         },
-        'mctest.medium': {
-            'first_last': ['mctest', 'medium'],
+        'gmail-medium': {
+            'first_last': ['gm-med-first', 'gm-med-last'],
             'email': 'mctest.medium@gmail.com',
             'accessible_countries': standard_countries,
             'permission_level': 'medium',
             'home_country': None,
             'org': TEST_ORG,
         },
-        'mctest.high': {
-            'first_last': ['mctest', 'high'],
+        'gmail-high': {
+            'first_last': ['gm-high-first', 'gm-high-last'],
             'email': 'mctest.high@gmail.com',
             'accessible_countries': standard_countries,
             'permission_level': 'high',
@@ -685,7 +699,7 @@ class Command(BaseCommand):
             'org': TEST_ORG,
         },
         'external-low': {
-            'first_last': ['external', 'low'],
+            'first_last': ['ex-low-first', 'ex-low-last'],
             'email': 'external-low@example.com',
             'accessible_countries': standard_countries,
             'permission_level': 'low',
@@ -693,7 +707,7 @@ class Command(BaseCommand):
             'org': TEST_ORG,
         },
         'external-medium': {
-            'first_last': ['external', 'medium'],
+            'first_last': ['ex-med-first', 'ex-med-last'],
             'email': 'external-medium@example.com',
             'accessible_countries': standard_countries,
             'permission_level': 'medium',
@@ -701,7 +715,7 @@ class Command(BaseCommand):
             'org': TEST_ORG,
         },
         'external-high': {
-            'first_last': ['external', 'high'],
+            'first_last': ['ex-high-first', 'ex-high-last'],
             'email': 'external-high@example.com',
             'accessible_countries': standard_countries,
             'permission_level': 'high',
@@ -720,10 +734,10 @@ class Command(BaseCommand):
             'first_last': ['demo', 'two'],
             'email': 'demo2@example.com',
             'accessible_countries': [],
-            'permission_level': 'low',
+            'permission_level': 'medium',
             'home_country': None,
             'org': TEST_ORG,
-            'program_access': [('Ethiopia', 'Collaboration in Cross-Border Areas', 'low')]
+            'program_access': [('Ethiopia', 'Collaboration in Cross-Border Areas', 'medium')]
         },
         'demo3': {
             'first_last': ['demo', 'three'],
