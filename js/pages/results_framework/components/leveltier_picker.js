@@ -3,6 +3,7 @@ import { observer, inject } from "mobx-react";
 import { toJS } from "mobx";
 
 import Select from 'react-select';
+import HelpPopover from "../../../components/helpPopover";
 
 @inject('rootStore')
 @observer
@@ -22,24 +23,19 @@ class Picker extends React.Component {
         let helpIcon = null;
         if (this.props.rootStore.uiStore.tierLockStatus == "locked"){
 
-            helpIcon = <a href="#"
-                tabIndex="0"
-                data-toggle="popover"
-                data-trigger="focus"
-                data-html="true"
-                data-content={gettext('<span class="text-danger"><strong>The results framework template cannot be changed after levels are saved.</strong></span> To change templates, all saved levels first must be deleted.  A level can be deleted when it has no sub-levels and no linked indicators.')}>
-                <i className="far fa-question-circle"></i></a>
+            helpIcon = <HelpPopover
+                key={1}
+                content={gettext('<span class="text-danger"><strong>The results framework template cannot be changed after levels are saved.</strong></span> To change templates, all saved levels first must be deleted.  A level can be deleted when it has no sub-levels and no linked indicators.')}
+            />
+
         }
         else if (this.props.rootStore.uiStore.tierLockStatus == "primed"){
-            helpIcon = <a href="#"
-                tabIndex="0"
-                data-toggle="popover"
-                data-trigger="focus"
-                data-html="true"
-                data-content={gettext('<span class="text-danger"><strong>Choose your results framework template carefully!</strong></span> Once you begin building your framework, it will not be possible to change templates without first deleting all saved levels.')}>
-                <i className="far fa-question-circle"></i></a>
-        }
 
+            helpIcon = <HelpPopover
+                key={2}
+                content={gettext('<span class="text-danger"><strong>Choose your results framework template carefully!</strong></span> Once you begin building your framework, it will not be possible to change templates without first deleting all saved levels.')}
+            />
+        }
 
         const tierTemplates = this.props.rootStore.levelStore.tierTemplates;
 
