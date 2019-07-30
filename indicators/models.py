@@ -396,6 +396,33 @@ class LevelTier(models.Model):
         super(LevelTier, self).save(*args, **kwargs)
 
 
+# Right now, these are only being used to store custom templates across sessions.  However, they could also
+# be used to store regular templates (i.e. instead of using an attribute of the LevelTier model).
+class LevelTierTemplate(models.Model):
+    # Translators:  A user can select from multiple templates for a particular piece of funtionality.  This is a label for the name of the template.
+    name = models.CharField(_("Template name"), max_length=135)
+    program = models.ForeignKey(Program, on_delete=models.CASCADE, related_name='level_tier_templates')
+    # Translators: This is depth of the selected object (a level tier) in a hierarchy of level tier objects
+    tier_depth = models.IntegerField(_("Level tier depth"))
+    create_date = models.DateTimeField(_("Create date"), null=True, blank=True)
+    edit_date = models.DateTimeField(_("Edit date"), null=True, blank=True)
+
+    class Meta:
+        ordering = ('tier_depth',)
+        # Translators: Indicators are assigned to Levels.  Levels are organized in a hierarchy of Tiers.  There are several templates that users can choose from with different names for the Tiers.
+        verbose_name = _("Level tier template")
+        unique_together = (('name', 'program'), ('program', 'tier_depth'))
+
+    def __unicode__(self):
+        return self.name
+
+    def save(self, *args, **kwargs):
+        if self.create_date is None:
+            self.create_date = timezone.now()
+        self.edit_date = timezone.now()
+        super(LevelTierTemplate, self).save(*args, **kwargs)
+
+
 class DisaggregationType(models.Model):
     disaggregation_type = models.CharField(_("Disaggregation type"), max_length=135, blank=True)
     description = models.CharField(_("Description"), max_length=765, blank=True)
