@@ -22,9 +22,10 @@ from rest_framework.decorators import api_view
 from rest_framework.response import Response
 
 from indicators.serializers import (
-    LevelTierSerializer, LevelSerializer, IndicatorSerializerMinimal, ProgramObjectiveSerializer)
+    LevelTierSerializer, LevelTierTemplateSerializer, LevelSerializer, IndicatorSerializerMinimal,
+    ProgramObjectiveSerializer)
 from workflow.serializers import ResultsFrameworkProgramSerializer
-from indicators.models import Level, LevelTier, Indicator
+from indicators.models import Level, LevelTier, LevelTierTemplate, Indicator
 from tola_management.models import ProgramAuditLog
 from workflow.models import Program
 
@@ -47,6 +48,7 @@ class ResultsFrameworkBuilder(ListView):
             return HttpResponseRedirect('/')
 
         tiers = LevelTier.objects.filter(program=program)
+        custom_tiers = LevelTierTemplate.objects.filter(program=program)
         levels = Level.objects.filter(program=program)
         # All indicators associated with the program should be passed to the front-end, not just the ones
         # associated with the rf levels.  The front-end uses the overall count to determine whether
@@ -66,6 +68,7 @@ class ResultsFrameworkBuilder(ListView):
             'levelTiers': LevelTierSerializer(tiers, many=True).data,
             'tierTemplates': translated_templates,
             'englishTemplates': untranslated_templates,
+            'customTemplates': LevelTierTemplateSerializer(custom_tiers, many=True).data,
             'programObjectives': ProgramObjectiveSerializer(program.objective_set.all(), many=True).data,
             'accessLevel': role,
             'usingResultsFramework': program.results_framework,
