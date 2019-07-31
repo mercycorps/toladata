@@ -123,14 +123,18 @@ export class LevelStore {
 
     @action
     updateCustomTier = (event) => {
-        console.log()
+
         console.log('cchanging event', this.chosenTierSet[event.target.dataset.tierorder]);
         this.chosenTierSet[event.target.dataset.tierorder] = event.target.value;
         this.tierTemplates[this.customTierSetKey]['tiers'] = this.chosenTierSet;
         console.log('newcustom', toJS(this.tierTemplates[this.customTierSetKey]));
+    };
 
+    @action
+    addCustomTier = () => {
+        this.chosenTierSet.push("")
+    };
 
-    }
 
     @action
     cancelEdit = levelId => {

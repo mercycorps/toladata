@@ -3,6 +3,8 @@ import { observer, inject } from "mobx-react";
 import { toJS } from "mobx";
 
 import Select from 'react-select';
+import {FontAwesomeIcon} from "@fortawesome/react-fontawesome"
+
 import { DeleteButton } from "../../../components/actionButtons";
 
 
@@ -59,26 +61,40 @@ class EditableLevelTier extends React.Component {
     render() {
         const divStyle = {
             display: 'flex',
-            justifyContent: 'space-between'
+            justifyContent: 'space-between',
+            marginBottom: ".5rem"
         };
         const labelStyle = {
-            flexGrow: "3",
-            paddingLeft: "29px"
+            marginBottom: ".25rem"
         };
+
         let deleteButton = null;
         if (this.props.tierOrder == 0){
-            deleteButton = <DeleteButton action={function(){console.log('exectured')}}/>
+            deleteButton =
+                <DeleteButton
+                    buttonClasses='pr-0'
+                    iconClasses='mr-0'
+                    type="button"
+                    action={function(){console.log('exectured')}}/>
         }
 
         return (
-            <div style={divStyle} >
-                <input
-                    type="text"
-                    data-tierorder={this.props.tierOrder}
-                    value={this.props.tierName}
-                    onChange={this.props.updateAction} />
-                {deleteButton}
-            </div>
+            <React.Fragment>
+                <div>
+                    <label style={labelStyle}>
+                        Level {this.props.tierOrder + 1}
+                    </label>
+                </div>
+                <div style={divStyle}>
+                    <input
+                        style={{width: "85%"}}
+                        type="text"
+                        data-tierorder={this.props.tierOrder}
+                        value={this.props.tierName}
+                        onChange={this.props.updateAction} />
+                    {deleteButton}
+                </div>
+            </React.Fragment>
     )}
 }
 
@@ -96,6 +112,13 @@ export class EditableLevelTierList extends React.Component{
                 updateAction={this.props.rootStore.levelStore.updateCustomTier}/>
         }) || null;
 
+        const addTierButton = savedTiers.length > 5 ? null :
+            <button
+                type="button"
+                className="btn btn-link btn-add"
+                onClick={this.props.rootStore.levelStore.addCustomTier}>
+                <FontAwesomeIcon icon={'plus-circle'} />Add level
+            </button>;
         // const newTier = savedTiers.length > 5 ? null :
         //     <EditableLevelTier
         //         key={savedTiers.length}
@@ -118,8 +141,10 @@ export class EditableLevelTierList extends React.Component{
             <form>
                 <div id="leveltier-list" className="leveltier-list">
                     {savedTiers}
+                    {addTierButton}
                     {/*{newTier}*/}
                 </div>
+
                 {
                     apply_button ?
                         <div className="leveltier-list__actions">
