@@ -25,7 +25,6 @@ export class LevelStore {
         this.rootStore = rootStore;
         this.levels = levels;
         this.indicators = indicators;
-        this.tierTemplates = JSON.parse(tierTemplates);
         this.englishTierTemlates = JSON.parse(englishTemplates);
         this.defaultTemplateKey = "mc_standard";
         this.customTierSetKey = "custom";
@@ -33,6 +32,12 @@ export class LevelStore {
         this.manual_numbering = program.manual_numbering;
         this.programObjectives = programObjectives;
         this.accessLevel = accessLevel;
+
+        this.tierTemplates = JSON.parse(tierTemplates);
+        this.tierTemplates[this.customTierSetKey] = {name: "Custom"};
+        this.tierTemplates[this.customTierSetKey]['tiers'] = customTemplates.map( ct => ct.name);
+        console.log('tt', this.tierTemplates);
+
 
         // Set the stored tier set key and the values, if they exist.  Use the default if they don't.
         if (levelTiers.length > 0) {
@@ -84,14 +89,9 @@ export class LevelStore {
     }
 
     @computed get chosenTierSetName () {
-        if (this.chosenTierSetKey == this.customTierSetKey){
-            {/* # Translators: This signifies that the user has build their own level hierarchy instead of using one of the pre-defined ones */}
-            return gettext("Custom")
-        }
-        else {
-            return this.tierTemplates[this.chosenTierSetKey]['name']
-        }
-    };
+        console.log('template is', this.chosenTierSetKey, this.tierTemplates[this.chosenTierSetKey]);
+        return this.tierTemplates[this.chosenTierSetKey]['name'];
+    }
 
     // This monitors the number of indicators attached to the program and adds/removes the header link depending on
     // whether there are indicators.  It relies on all indicators being passed up from the server each time
@@ -112,8 +112,24 @@ export class LevelStore {
 
     @action
     changeTierSet(newTierSetKey) {
+        console.log('cchanging ', newTierSetKey);
         this.chosenTierSetKey = newTierSetKey;
-        this.chosenTierSet = this.tierTemplates[newTierSetKey]['tiers']
+        this.chosenTierSet = this.tierTemplates[newTierSetKey]['tiers'];
+        if (this.chosenTierSetKey === this.customTierSetKey && this.chosenTierSet.length === 0) {
+            this.chosenTierSet = ['']
+        }
+        console.log('chosentierset is', toJS(this.chosenTierSet));
+    }
+
+    @action
+    updateCustomTier = (event) => {
+        console.log()
+        console.log('cchanging event', this.chosenTierSet[event.target.dataset.tierorder]);
+        this.chosenTierSet[event.target.dataset.tierorder] = event.target.value;
+        this.tierTemplates[this.customTierSetKey]['tiers'] = this.chosenTierSet;
+        console.log('newcustom', toJS(this.tierTemplates[this.customTierSetKey]));
+
+
     }
 
     @action

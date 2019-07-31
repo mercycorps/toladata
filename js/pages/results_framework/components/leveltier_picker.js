@@ -4,6 +4,7 @@ import { toJS } from "mobx";
 
 import Select from 'react-select';
 import HelpPopover from "../../../components/helpPopover";
+import { EditableLevelTierList, StaticLevelTierList } from './level_tier_lists'
 
 @inject('rootStore')
 @observer
@@ -39,8 +40,17 @@ class Picker extends React.Component {
 
         const tierTemplates = this.props.rootStore.levelStore.tierTemplates;
 
-        const options = Object.keys(tierTemplates).sort().map(key => {
+        const { custom, ...templateVals } = tierTemplates;
+        let options = Object.keys(templateVals).sort().map(key => {
             return {value:key, label:tierTemplates[key]['name']};
+        });
+
+        options.push({
+            label: "--------------------------",
+            options: [{
+                value: this.props.rootStore.levelStore.customTierSetKey,
+                label: custom['name']
+            }]
         });
 
         const selectedOption = {value:this.props.rootStore.levelStore.chosenTierSetKey, label: this.props.rootStore.levelStore.chosenTierSetName};
@@ -64,55 +74,6 @@ class Picker extends React.Component {
     }
 }
 
-class LevelTier extends React.Component {
-
-    render() {
-        return (
-            <div className={'leveltier leveltier--level-' + this.props.tierLevel}>{this.props.tierName} </div>
-    )}
-}
-
-@inject('rootStore')
-@observer
-class LevelTierList extends React.Component{
-
-    render() {
-        let apply_button = null
-        if (this.props.rootStore.levelStore.levels.length == 0) {
-            apply_button =
-                <button
-                    className="leveltier-button btn btn-primary btn-block"
-                    onClick={this.props.rootStore.levelStore.createFirstLevel}>
-                    {/* #Translators: this refers to an imperative verb on a button ("Apply filters")*/}
-                    {gettext("Apply")}
-                </button>
-        }
-
-        return (
-            <React.Fragment>
-                <div id="leveltier-list" className="leveltier-list">
-                    {
-                        this.props.rootStore.levelStore.chosenTierSet.length > 0 ?
-                            this.props.rootStore.levelStore.chosenTierSet.map((tier, index) => {
-                                return <LevelTier key={index} tierLevel={index} tierName={tier}/>
-                            })
-                            : null
-                    }
-
-
-                </div>
-                {
-                    apply_button ?
-                        <div className="leveltier-list__actions">
-                            {apply_button}
-                        </div>
-                    : null
-                }
-            </React.Fragment>
-        )
-    }
-}
-
 const ChangeLogLink = ({programId}) => {
     const url = `/tola_management/audit_log/${programId}/`;
 
@@ -124,12 +85,16 @@ const ChangeLogLink = ({programId}) => {
 }
 
 export const LevelTierPicker = inject("rootStore")(observer(function (props) {
+    let tierListType = <StaticLevelTierList />;
+    if (this.props.rootStore.levelStore.chosenTierSetKey == this.props.rootStore.levelStore.customTierSetKey){
+        tierListType = <EditableLevelTierList />;
+    }
 
     return (
         <div id="leveltier-picker" className="leveltier-picker">
             <div className="leveltier-picker__panel">
                 <Picker />
-                <LevelTierList />
+                {tierListType}
             </div>
 
             <ChangeLogLink programId={props.rootStore.levelStore.program_id} />
