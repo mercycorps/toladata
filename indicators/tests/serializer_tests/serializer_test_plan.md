@@ -28,3 +28,4 @@ Program Page:
  - resultChainFilterLabel (string - translated)
  - reporting_period_start (ISO date string - for JS Date)
  - reporting_period_end (ISO date string - for JS Date)
+
