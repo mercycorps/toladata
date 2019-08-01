@@ -79,13 +79,13 @@ class ProgramObjectiveImport extends React.Component {
 export class LevelCardCollapsed extends React.Component {
 
     deleteLevel = () => {
-        this.props.rootStore.uiStore.setDisableForPrompt(true);
+        this.props.rootStore.uiStore.setDisableCardActions(true);
         const levelTitle = this.props.levelProps.tierName + " " + this.props.levelProps.ontologyLabel;
         create_no_rationale_changeset_notice({
             /* # Translators:  This is a confirmation prompt that is triggered by clicking on a delete button. The code is a reference to the name of the specific item being deleted.  Only one item can be deleted at a time. */
             message_text: interpolate(gettext("Are you sure you want to delete %s?"), [levelTitle]),
             on_submit: () => this.props.rootStore.levelStore.deleteLevelFromDB(this.props.level.id),
-            on_cancel: () => this.props.rootStore.uiStore.setDisableForPrompt(false)
+            on_cancel: () => this.props.rootStore.uiStore.setDisableCardActions(false)
         })
     };
 
@@ -172,7 +172,7 @@ export class LevelCardCollapsed extends React.Component {
             expando = <FontAwesomeIcon className="text-action" icon={this.props.rootStore.uiStore.hasVisibleChildren.indexOf(this.props.level.id) >= 0 ? 'caret-down' : 'caret-right'} />
         }
 
-        let isDisabled = allIndicatorLinks.length == 0 || this.props.rootStore.uiStore.disableForPrompt;
+        let isDisabled = allIndicatorLinks.length == 0 || this.props.rootStore.uiStore.disableCardActions;
         return (
             <div className="level-card level-card--collapsed" id={`level-card-${this.props.level.id}`}>
                 <div
@@ -192,7 +192,7 @@ export class LevelCardCollapsed extends React.Component {
                     <div className="actions__top btn-row">
                         { this.props.levelProps.canDelete &&
                             <button
-                                disabled={this.props.rootStore.uiStore.disableForPrompt || this.props.rootStore.uiStore.activeCard}
+                                disabled={this.props.rootStore.uiStore.disableCardActions || this.props.rootStore.uiStore.activeCard}
                                 className="btn btn-sm btn-link btn-danger"
                                 onClick={this.deleteLevel}>
                                 <i className="fas fa-trash-alt"></i>{gettext("Delete")}
@@ -200,7 +200,7 @@ export class LevelCardCollapsed extends React.Component {
                         }
                         {this.props.levelProps.canEdit &&
                             <button
-                                disabled={this.props.rootStore.uiStore.disableForPrompt}
+                                disabled={this.props.rootStore.uiStore.disableCardActions}
                                 className="btn btn-sm btn-link btn-text edit-button"
                                 onClick={this.editLevel}>
                                 <i className="fas fa-edit"/>{gettext("Edit")}
@@ -384,7 +384,7 @@ export class LevelCardExpanded extends React.Component {
         if ( hasIndicators && (hasUpdatedAssumptions || hasUpdatedName)){
             create_nondestructive_changeset_notice({
                 on_submit: saveFunc,
-                on_cancel: () => this.props.rootStore.uiStore.setDisableForPrompt(false),
+                on_cancel: () => this.props.rootStore.uiStore.setDisableCardActions(false),
             });
         }
         else {
@@ -438,7 +438,7 @@ export class LevelCardExpanded extends React.Component {
         // Simply passing the observables through to a child component or injecting them in
         // the child component doesn't work.  No doubt that there's a better way to do this.
         const tempIndicators = toJS(this.indicators);
-        const disabledTrigger = this.props.rootStore.uiStore.disableForPrompt;
+        const disabledTrigger = this.props.rootStore.uiStore.disableCardActions;
         const programObjectives = this.props.rootStore.levelStore.programObjectives;
 
         let indicatorSection = "";
@@ -446,7 +446,7 @@ export class LevelCardExpanded extends React.Component {
             indicatorSection = <div className="form-group">
                 <button
                     type="submit"
-                    disabled={this.name.length > 0 ? false : true}
+                    disabled={this.name.length == 0 || disabledTrigger}
                     className="btn btn-link btn-lg "
                     onClick={e => {this.updateSubmitType("saveAndEnableIndicators")}}>
                         { /* # Translators: This is button text that allows users to save their work and unlock the ability to add indicators */ }
@@ -460,8 +460,8 @@ export class LevelCardExpanded extends React.Component {
                 level={this.props.level}
                 tierName={this.props.levelProps.tierName}
                 indicators={this.indicators}
-                disabled={!this.name || this.props.level.id == "new" || this.props.rootStore.uiStore.disableForPrompt}
-                reorderDisabled={this.indicators.length < 2 || this.props.rootStore.uiStore.disableForPrompt}
+                disabled={!this.name || this.props.level.id == "new" || this.props.rootStore.uiStore.disableCardActions}
+                reorderDisabled={this.indicators.length < 2 || this.props.rootStore.uiStore.disableCardActions}
                 changeFunc={this.changeIndicatorOrder}
                 dragEndFunc={this.onDragEnd}/>
         }
@@ -478,7 +478,7 @@ export class LevelCardExpanded extends React.Component {
                     />
 
                     <ProgramObjectiveImport
-                        isDisabled = {this.props.rootStore.uiStore.disableForPrompt}
+                        isDisabled = {this.props.rootStore.uiStore.disableCardActions}
                         programObjectives={programObjectives}
                         onProgramObjectiveImport={this.onProgramObjectiveImport} />
                 </div>
@@ -489,7 +489,7 @@ export class LevelCardExpanded extends React.Component {
                             id={`level-name-${this.props.level.id}`}
                             name="name"
                             value={this.name || ""}
-                            disabled={this.props.rootStore.uiStore.disableForPrompt}
+                            disabled={this.props.rootStore.uiStore.disableCardActions}
                             autoComplete="off"
                             rows={3}
                             onChange={this.onFormChange}
@@ -501,7 +501,7 @@ export class LevelCardExpanded extends React.Component {
                         <TextareaAutosize
                             className="form-control"
                             id="level-assumptions"
-                            disabled={!this.name || this.props.rootStore.uiStore.disableForPrompt}
+                            disabled={!this.name || this.props.rootStore.uiStore.disableCardActions}
                             name="assumptions"
                             autoComplete="off"
                             value={this.assumptions || ""}
@@ -528,7 +528,7 @@ export class LevelCardExpanded extends React.Component {
 @inject('rootStore')
 class ButtonBar extends React.Component {
     render() {
-        let isDisabled = !this.props.nameVal || this.props.rootStore.uiStore.disableForPrompt;
+        let isDisabled = !this.props.nameVal || this.props.rootStore.uiStore.disableCardActions;
 
         // Build the button text with the right sibling level name, then build the button.
         let addAnotherButton = null;
@@ -551,7 +551,7 @@ class ButtonBar extends React.Component {
                 <LevelButton disabled={isDisabled} classes="btn-primary" text={gettext("Save and close")} icon='save' submitType="saveOnly" submitFunc={this.props.submitFunc} />
                 {addAnotherButton}
                 {addAndLinkButton}
-                <LevelButton disabled={this.props.rootStore.uiStore.disableForPrompt} classes="btn btn-reset" text={gettext("Cancel")} submitType="cancel" submitFunc={this.props.cancelFunc} />
+                <LevelButton disabled={this.props.rootStore.uiStore.disableCardActions} classes="btn btn-reset" text={gettext("Cancel")} submitType="cancel" submitFunc={this.props.cancelFunc} />
             </div>
         )
 
@@ -620,7 +620,7 @@ class IndicatorList extends React.Component {
                     <div className="sortable-list__item__actions">
                         { /* # Translators: A label for a button that allows the user to modify the settings of an object */}
                         <UpdateIndicatorButton
-                            readonly={this.props.disabled || this.props.rootStore.uiStore.disableForPrompt}
+                            readonly={this.props.disabled || this.props.rootStore.uiStore.disableCardActions}
                             label={gettext("Settings")}
                             indicatorId={indicator.id}/>
                     </div>
@@ -680,7 +680,7 @@ class IndicatorList extends React.Component {
                     </SortableContainer>
                     <div className="sortable-list-actions">
                         <AddIndicatorButton
-                            readonly={ !this.props.level.id || this.props.level.id == 'new' || this.props.disabled || this.props.rootStore.uiStore.disableForPrompt }
+                            readonly={ !this.props.level.id || this.props.level.id == 'new' || this.props.disabled || this.props.rootStore.uiStore.disableCardActions }
                             programId={ this.props.rootStore.levelStore.program_id }
                             levelId={ this.props.level.id }/>
                     </div>

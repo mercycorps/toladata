@@ -186,10 +186,14 @@ export class LevelStore {
         if (this.levels.length === 0) {
             this.createFirstLevel();
         }
+        this.rootStore.uiStore.setDisableCardActions(false)
     };
 
     @action
-    editTierSet = () => this.useStaticTierList = false;
+    editTierSet = () => {
+        this.useStaticTierList = false;
+        this.rootStore.uiStore.setDisableCardActions(true)
+    };
 
     saveCustomTemplateToDB = () => {
         const data = {program_id: this.program_id, tiers: this.tierTemplates[this.customTierSetKey]['tiers']}
@@ -198,38 +202,6 @@ export class LevelStore {
             .then(response => {
                 console.log('responsedata', response.data)
             })
-            //     runInAction(() => {
-            //         this.levels.replace(response.data['all_data'])
-            //     });
-            //
-            //     success_notice({
-            //         // # Translators: This is a confirmation message that confirms that change has been successfully saved to the DB.
-            //         message_text: interpolate(gettext("%s saved."), [level_label]),
-            //         addClass: 'program-page__rationale-form',
-            //         stack: {
-            //             dir1: 'up',
-            //             dir2: 'right',
-            //             firstpos1: 20,
-            //             firstpos2: 20,
-            //         }
-            //     });
-            //
-            //     const newId = response.data["new_level"]["id"];
-            //     this.rootStore.uiStore.activeCard = null;
-            //     if (submitType == "saveAndEnableIndicators") {
-            //         runInAction( () => {
-            //            this.rootStore.uiStore.activeCard = newId;
-            //         });
-            //     }
-            //     else if (submitType == "saveAndAddSibling"){
-            //         this.createNewLevelFromSibling(newId);
-            //
-            //     }
-            //     else if (submitType == "saveAndAddChild"){
-            //         this.createNewLevelFromParent(newId);
-            //
-            //     }
-            // })
             .catch(error => console.log('error', error))
 
 
@@ -359,7 +331,7 @@ export class LevelStore {
             })
             .catch(error => console.log('error', error))
 
-        this.rootStore.uiStore.setDisableForPrompt(false);
+        this.rootStore.uiStore.setdisableCardActions(false);
     };
 
 
@@ -571,7 +543,7 @@ export class UIStore {
 
     @observable activeCard;
     @observable hasVisibleChildren = [];
-    @observable disableForPrompt;
+    @observable disableCardActions;
     activeCardNeedsConfirm = "";
 
     constructor (rootStore) {
@@ -579,7 +551,7 @@ export class UIStore {
         this.hasVisibleChildren = this.rootStore.levelStore.levels.map(l => l.id)
         this.activeCardNeedsConfirm = false;
         this.activeCard = null;
-        this.disableForPrompt = false;
+        this.disableCardActions = false;
     }
 
     @computed get tierLockStatus () {
@@ -600,7 +572,7 @@ export class UIStore {
     editCard = (levelId) => {
         const cancelledLevelId = this.activeCard;
         if (this.activeCardNeedsConfirm) {
-            this.setDisableForPrompt(true);
+            this.setDisableCardActions(true);
             $(`#level-card-${this.activeCard}`)[0].scrollIntoView({behavior:"smooth"});
             const oldTierName = this.rootStore.levelStore.levelProperties[this.activeCard].tierName;
             create_no_rationale_changeset_notice({
@@ -610,7 +582,7 @@ export class UIStore {
                 preamble: interpolate(gettext("Changes to this %s will not be saved"), [oldTierName]),
                 type: "notice",
                 on_submit: () => this.onLeaveConfirm(levelId, cancelledLevelId),
-                on_cancel: () => this.setDisableForPrompt(false),
+                on_cancel: () => this.setDisableCardActions(false),
             })
         }
         else {
@@ -621,7 +593,7 @@ export class UIStore {
 
     @action
     onLeaveConfirm = (levelId, cancelledLevelId) => {
-        this.setDisableForPrompt(false);
+        this.setDisableCardActions(false);
         this.rootStore.levelStore.cancelEdit(cancelledLevelId);
         this.activeCardNeedsConfirm = false;
         this.activeCard = levelId;
@@ -633,8 +605,8 @@ export class UIStore {
     };
 
     @action
-    setDisableForPrompt = (value) => {
-        this.disableForPrompt = value;
+    setDisableCardActions = (value) => {
+        this.disableCardActions = value;
     };
 
     @action
