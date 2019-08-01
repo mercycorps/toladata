@@ -62,20 +62,20 @@ class EditableLevelTier extends React.Component {
         const divStyle = {
             display: 'flex',
             justifyContent: 'space-between',
-            marginBottom: ".5rem"
+            marginBottom: ".75rem"
         };
         const labelStyle = {
             marginBottom: ".25rem"
         };
 
         let deleteButton = null;
-        if (this.props.tierOrder == 0){
+        if (this.props.showDeleteButton){
             deleteButton =
                 <DeleteButton
                     buttonClasses='pr-0'
                     iconClasses='mr-0'
                     type="button"
-                    action={function(){console.log('exectured')}}/>
+                    action={this.props.deleteFunc}/>
         }
 
         return (
@@ -105,36 +105,38 @@ export class EditableLevelTierList extends React.Component{
     render() {
 
         const savedTiers  = this.props.rootStore.levelStore.chosenTierSet.map((tier, index) => {
+            const showDeleteButton = index === this.props.rootStore.levelStore.chosenTierSet.length - 1;
             return <EditableLevelTier
                 key={index}
                 tierName={tier}
+                showDeleteButton={showDeleteButton}
+                deleteFunc={this.props.rootStore.levelStore.deleteCustomTier}
                 tierOrder={index}
                 updateAction={this.props.rootStore.levelStore.updateCustomTier}/>
         }) || null;
 
+        let isAddTierButtonDisabled = this.props.rootStore.levelStore.chosenTierSet.slice(-1)[0].length === 0;
         const addTierButton = savedTiers.length > 5 ? null :
             <button
                 type="button"
                 className="btn btn-link btn-add"
+                disabled={isAddTierButtonDisabled}
                 onClick={this.props.rootStore.levelStore.addCustomTier}>
-                <FontAwesomeIcon icon={'plus-circle'} />Add level
+                <i className="fa fa-plus-circle" />Add level
             </button>;
-        // const newTier = savedTiers.length > 5 ? null :
-        //     <EditableLevelTier
-        //         key={savedTiers.length}
-        //         tierName={''}
-        //         tierOrder={savedTiers.length}
-        //         updateAction={this.props.rootStore.levelStore.updateCustomTier}/>;
+
 
         let apply_button = null;
-        if (this.props.rootStore.levelStore.levels.length == 0) {
+        if (this.props.rootStore.levelStore.levels.length === 0) {
             apply_button =
-                <button
-                    className="leveltier-button btn btn-primary btn-block"
-                    onClick={this.props.rootStore.levelStore.createFirstLevel}>
-                    {/* #Translators: this refers to an imperative verb on a button ("Apply filters")*/}
-                    {gettext("Apply")}
-                </button>
+                <div className="leveltier-list__actions">
+                    <button
+                        className="leveltier-button btn btn-primary btn-block"
+                        onClick={this.props.rootStore.levelStore.applyTierSet}>
+                        {/* #Translators: this refers to an imperative verb on a button ("Apply filters")*/}
+                        {gettext("Apply")}
+                    </button>
+                </div>
         }
 
         return (
@@ -144,14 +146,8 @@ export class EditableLevelTierList extends React.Component{
                     {addTierButton}
                     {/*{newTier}*/}
                 </div>
+                {apply_button}
 
-                {
-                    apply_button ?
-                        <div className="leveltier-list__actions">
-                            {apply_button}
-                        </div>
-                    : null
-                }
             </form>
         )
     }

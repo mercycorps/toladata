@@ -28,7 +28,7 @@ from django.contrib.auth import views as authviews
 from tola import views as tolaviews
 from indicators.views.views_indicators import ProgramPage, old_program_page
 from indicators.views.views_results_framework import (
-    LevelViewSet, insert_new_level, save_leveltiers, reorder_indicators, indicator_list)
+    LevelViewSet, insert_new_level, save_leveltiers, reorder_indicators, save_custom_tiers_template, indicator_list)
 from indicators.views import views_program
 
 # Uncomment the next two lines to enable the admin:
@@ -130,6 +130,7 @@ urlpatterns = [
                 url(r'^api/save_leveltiers', save_leveltiers, name='save_leveltiers'),
                 url(r'^api/reorder_indicators', reorder_indicators, name='reorder_indicators'),
                 url(r'^api/indicator_list/(?P<program_id>\d+)/$', indicator_list, name='indicator_list'),
+                url(r'^api/save_custom_tiers_template', save_custom_tiers_template, name='reorder_indicators'),
 
                 # url redirect for people with old bookmarks
                 url(r'^program/(?P<program_id>\d+)/(?P<indicator_id>\d+)/(?P<indicator_type_id>\d+)/$',

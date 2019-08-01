@@ -57,7 +57,7 @@ class LevelTierSerializer(serializers.ModelSerializer):
 
 class LevelTierTemplateSerializer(serializers.ModelSerializer):
     """
-    LevelTierTemplate serializer for Program Page
+    LevelTierTemplate serializer for RF builder
     """
     class Meta:
         model = LevelTier

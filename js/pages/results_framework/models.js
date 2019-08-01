@@ -127,7 +127,7 @@ export class LevelStore {
         console.log('cchanging event', this.chosenTierSet[event.target.dataset.tierorder]);
         this.chosenTierSet[event.target.dataset.tierorder] = event.target.value;
         this.tierTemplates[this.customTierSetKey]['tiers'] = this.chosenTierSet;
-        console.log('newcustom', toJS(this.tierTemplates[this.customTierSetKey]));
+        console.log('newcustom', toJS(this.tierTemplates[this.customTierSetKey]['tiers']));
     };
 
     @action
@@ -135,6 +135,64 @@ export class LevelStore {
         this.chosenTierSet.push("")
     };
 
+    @action
+    deleteCustomTier = () => {
+        this.chosenTierSet.pop()
+    };
+
+    @action
+    applyTierSet = () => {
+        if (this.chosenTierSetKey === this.customTierSetKey){
+            this.saveCustomTemplateToDB();
+            // this.saveLevelTiersToDB();
+        }
+        this.createFirstLevel()
+    };
+
+    saveCustomTemplateToDB = () => {
+        const data = {program_id: this.program_id, tiers: this.tierTemplates[this.customTierSetKey]['tiers']}
+        console.log('datais', data);
+        api.post(`/save_custom_tiers_template/`, data)
+            .then(response => {
+                console.log('responsedata', response.data)
+            })
+            //     runInAction(() => {
+            //         this.levels.replace(response.data['all_data'])
+            //     });
+            //
+            //     success_notice({
+            //         // # Translators: This is a confirmation message that confirms that change has been successfully saved to the DB.
+            //         message_text: interpolate(gettext("%s saved."), [level_label]),
+            //         addClass: 'program-page__rationale-form',
+            //         stack: {
+            //             dir1: 'up',
+            //             dir2: 'right',
+            //             firstpos1: 20,
+            //             firstpos2: 20,
+            //         }
+            //     });
+            //
+            //     const newId = response.data["new_level"]["id"];
+            //     this.rootStore.uiStore.activeCard = null;
+            //     if (submitType == "saveAndEnableIndicators") {
+            //         runInAction( () => {
+            //            this.rootStore.uiStore.activeCard = newId;
+            //         });
+            //     }
+            //     else if (submitType == "saveAndAddSibling"){
+            //         this.createNewLevelFromSibling(newId);
+            //
+            //     }
+            //     else if (submitType == "saveAndAddChild"){
+            //         this.createNewLevelFromParent(newId);
+            //
+            //     }
+            // })
+            .catch(error => console.log('error', error))
+
+
+
+    };
 
     @action
     cancelEdit = levelId => {
