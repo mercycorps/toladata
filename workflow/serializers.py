@@ -1,12 +1,218 @@
+# -*- coding: utf-8 -*-
+"""Serializers for workflow model data, specific to view use cases."""
+import json
+import operator
 from rest_framework import serializers
 from django.shortcuts import reverse
 from django.db import models
-from django.utils.translation import ugettext_lazy as _
+from django.utils.translation import ugettext_lazy as _, ugettext
 
 
 from workflow.models import Program, Documentation, ProjectAgreement
 
-from indicators.models import Level, Indicator
+from indicators.models import LevelTier, Level, Indicator, PeriodicTarget
+
+class ProgramPagePeriodicTargetSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = PeriodicTarget
+        fields = [
+            'pk',
+            'target',
+            'start_date',
+            'end_date',
+            'customsort'
+        ]
+
+    @classmethod
+    def get_queryset(cls):
+        return PeriodicTarget.objects.only(
+            'indicator_id', 'target', 'start_date', 'end_date', 'customsort'
+        )
+
+class BaseIndicatorSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = Indicator
+        fields = [
+            'pk',
+            'name'
+        ]
+
+class ProgramPageIndicatorSerializer(BaseIndicatorSerializer):
+    periodictargets = ProgramPagePeriodicTargetSerializer
+    level = serializers.SerializerMethodField()
+    logsort_type = serializers.IntegerField(read_only=True)
+    logsort_a = serializers.CharField(read_only=True)
+    logsort_b = serializers.CharField(read_only=True)
+    logsort_c = serializers.CharField(read_only=True)
+
+    class Meta(BaseIndicatorSerializer.Meta):
+        fields = BaseIndicatorSerializer.Meta.fields + [
+            'level',
+            'logsort_type',
+            'logsort_a',
+            'logsort_b',
+            'logsort_c',
+            'number'
+        ]
+
+    @classmethod
+    def get_queryset(cls):
+        targets_prefetch = models.Prefetch(
+            'periodictargets',
+            ProgramPagePeriodicTargetSerializer.get_queryset(),
+        )
+        newest_end_date_annotation = models.Subquery(
+            PeriodicTarget.objects.filter(
+                indicator=models.OuterRef('pk')
+            ).order_by('-end_date').values('end_date')[:1]
+        )
+        return Indicator.objects.select_related('program').annotate(
+            using_results_framework=models.Case(
+                models.When(
+                    program___using_results_framework=Program.NOT_MIGRATED,
+                    then=models.Value(False)
+                    ),
+                default=models.Value(True),
+                output_field=models.BooleanField()
+                )
+        ).with_logframe_sorting().select_related(None).only(
+            'pk', 'name', 'program_id', 'target_frequency', 'level_id', 'number'
+        ).annotate(
+            newest_end_date=newest_end_date_annotation
+        ).prefetch_related(
+            targets_prefetch
+        )
+
+    def get_level(self, indicator):
+        if indicator.using_results_framework:
+            return indicator.level_id or None
+        else:
+            return indicator.old_level_pk
+
+
+class BaseLevelTierSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = LevelTier
+        fields = [
+            'name',
+            'tier_depth'
+        ]
+
+
+class BaseProgramOptimizedSerializer(serializers.ModelSerializer):
+    results_framework = serializers.BooleanField()
+    levels = serializers.SerializerMethodField()
+
+    class Meta:
+        model = Program
+        fields = [
+            'pk',
+            'name',
+            'results_framework',
+        ]
+
+    @classmethod
+    def get_program_fields(cls):
+        return [
+            'pk', 'name', '_using_results_framework', 'auto_number_indicators',
+        ]
+
+    @classmethod
+    def get_prefetches(cls):
+        return []
+
+    @classmethod
+    def load(cls, pk):
+        program = Program.active_programs.only(
+            *cls.get_program_fields()
+        ).prefetch_related(
+            *cls.get_prefetches()
+        ).get(pk=pk)
+        return cls(program)
+
+
+    def get_rf_chain_sort_label(self, program):
+        second_tier = [lt for lt in program.level_tiers.all() if lt.tier_depth == 2]
+        if second_tier:
+            # Translators: see note for %(tier)s chain, this is the same thing
+            return _('by %(level_name)s chain') % {'level_name': _(second_tier[0].name)}
+        return None
+
+    def get_levels(self, program):
+        if not program.results_framework:
+            return [{'pk': depth, 'depth': depth, 'label': ugettext(label)} for (depth, label) in Indicator.OLD_LEVELS]
+        return []
+
+    @property
+    def json(self):
+        return json.dumps(self.data)
+
+
+class ProgramPageProgramSerializer(BaseProgramOptimizedSerializer):
+    id = serializers.IntegerField(read_only=True, source='pk')
+    rf_chain_sort_label = serializers.SerializerMethodField()
+    does_it_need_additional_target_periods = serializers.SerializerMethodField()
+    indicators = serializers.SerializerMethodField()
+
+    class Meta(BaseProgramOptimizedSerializer.Meta):
+        fields = BaseProgramOptimizedSerializer.Meta.fields + [
+            'id',
+            'reporting_period_start',
+            'reporting_period_end',
+            'rf_chain_sort_label',
+            'does_it_need_additional_target_periods',
+            'indicators',
+            'levels',
+        ]
+
+    @classmethod
+    def get_program_fields(cls):
+        return super(ProgramPageProgramSerializer, cls).get_program_fields() + [
+            'reporting_period_start', 'reporting_period_end'
+        ]
+
+    @classmethod
+    def get_prefetches(cls):
+        prefetches = super(ProgramPageProgramSerializer, cls).get_prefetches()
+        levels_prefetch = models.Prefetch(
+            'levels',
+            queryset=Level.objects.select_related(None).only(
+                'pk', 'name', 'parent', 'customsort', 'program'
+            )
+        )
+        indicators_prefetch = models.Prefetch(
+            'indicator_set',
+            queryset=ProgramPageIndicatorSerializer.get_queryset(),
+            to_attr='annotated_indicators'
+        )
+        return prefetches + [
+            levels_prefetch,
+            'level_tiers',
+            indicators_prefetch,
+        ]
+
+    def get_indicators(self, program):
+        indicators_data = ProgramPageIndicatorSerializer(program.annotated_indicators, many=True).data
+        if program.results_framework:
+            return indicators_data
+        formatted_data = []
+        for depth, label in Indicator.OLD_LEVELS + [(None, '')]:
+            level_indicators = [dict(data, **{'level_order': count}) for count, data in enumerate([d for d in indicators_data if d['level'] == depth])]
+            formatted_data += level_indicators
+        return {data['pk']: data for data in formatted_data}
+
+    def get_does_it_need_additional_target_periods(self, program):
+        if program.reporting_period_end is None:
+            return False
+        end_dates = [i.newest_end_date for i in program.annotated_indicators if i.newest_end_date]
+        if not end_dates:
+            return False
+        min_end_date_across_all_indicators = min(end_dates)
+        if not min_end_date_across_all_indicators:
+            return False
+        if program.reporting_period_end > min_end_date_across_all_indicators:
+            return True
+        return False
 
 
 class DocumentListProgramSerializer(serializers.ModelSerializer):
