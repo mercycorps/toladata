@@ -400,7 +400,7 @@ class LevelTier(models.Model):
 # be used to store regular templates (i.e. instead of using an attribute of the LevelTier model).
 class LevelTierTemplate(models.Model):
     # Translators:  A user can select from multiple templates for a particular piece of funtionality.  This is a label for the name of the template.
-    name = models.CharField(_("Template name"), max_length=135)
+    name = models.CharField(_("Template name"), max_length=75)
     program = models.ForeignKey(Program, on_delete=models.CASCADE, related_name='level_tier_templates')
     # Translators: This is depth of the selected object (a level tier) in a hierarchy of level tier objects
     tier_depth = models.IntegerField(_("Level tier depth"))

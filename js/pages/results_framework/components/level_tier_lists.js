@@ -77,6 +77,7 @@ class EditableLevelTier extends React.Component {
                     type="button"
                     action={this.props.deleteFunc}/>
         }
+        console.log('here');
 
         return (
             <React.Fragment>
@@ -89,6 +90,7 @@ class EditableLevelTier extends React.Component {
                     <input
                         style={{width: "85%"}}
                         type="text"
+                        maxLength={75}
                         data-tierorder={this.props.tierOrder}
                         value={this.props.tierName}
                         onChange={this.props.updateAction} />
@@ -115,7 +117,9 @@ export class EditableLevelTierList extends React.Component{
                 updateAction={this.props.rootStore.levelStore.updateCustomTier}/>
         }) || null;
 
-        let isAddTierButtonDisabled = this.props.rootStore.levelStore.chosenTierSet.slice(-1)[0].length === 0;
+        let isAddTierButtonDisabled =
+            this.props.rootStore.levelStore.chosenTierSet.slice(-1)[0].length === 0 ||
+            !this.props.rootStore.levelStore.templateIsSavable;
         const addTierButton = savedTiers.length > 5 ? null :
             <button
                 type="button"
@@ -132,6 +136,7 @@ export class EditableLevelTierList extends React.Component{
                 <div className="leveltier-list__actions">
                     <button
                         className="leveltier-button btn btn-primary btn-block"
+                        disabled={!this.props.rootStore.levelStore.templateIsSavable}
                         onClick={this.props.rootStore.levelStore.applyTierSet}>
                         {/* #Translators: this refers to an imperative verb on a button ("Apply filters")*/}
                         {gettext("Apply")}

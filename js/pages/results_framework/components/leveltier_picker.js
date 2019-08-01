@@ -46,7 +46,7 @@ class Picker extends React.Component {
         });
 
         options.push({
-            label: "--------------------------",
+            label: "-----------------------------------------------------------",
             options: [{
                 value: this.props.rootStore.levelStore.customTierSetKey,
                 label: custom['name']

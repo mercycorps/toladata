@@ -32,12 +32,12 @@ export class LevelStore {
         this.manual_numbering = program.manual_numbering;
         this.programObjectives = programObjectives;
         this.accessLevel = accessLevel;
+        this.usingResultsFramework = usingResultsFramework;
 
         this.tierTemplates = JSON.parse(tierTemplates);
         this.tierTemplates[this.customTierSetKey] = {name: "Custom"};
         this.tierTemplates[this.customTierSetKey]['tiers'] = customTemplates.map( ct => ct.name);
         console.log('tt', this.tierTemplates);
-
 
         // Set the stored tier set key and the values, if they exist.  Use the default if they don't.
         if (levelTiers.length > 0) {
@@ -55,7 +55,9 @@ export class LevelStore {
             this.chosenTierSet = this.tierTemplates[this.chosenTierSetKey]['tiers'];
         }
 
-        this.usingResultsFramework = usingResultsFramework;
+
+
+
 
     }
 
@@ -109,6 +111,23 @@ export class LevelStore {
         }
     // delay is needed to prevent undefined value from being used for program_id that isn't set yet on first load.
     }, {delay: 50});
+
+    // Used to check if any names are blank or if there are duplicated names in the list
+    @computed get templateIsSavable () {
+        let savable = true;
+        this.chosenTierSet.forEach( tierName => {
+            console.log('tiernamee', tierName)
+            if (tierName.length === 0){
+                savable = false;
+            }
+        });
+        const tierSetSet = new Set(this.chosenTierSet);
+        if (tierSetSet.size !== this.chosenTierSet.length){
+            savable = false;
+        }
+        console.log('is it savable', savable);
+        return savable;
+    }
 
     @action
     changeTierSet(newTierSetKey) {
