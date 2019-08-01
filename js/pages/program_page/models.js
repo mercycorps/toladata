@@ -1,5 +1,7 @@
 import { observable, computed, action } from "mobx";
+import BaseProgram from '../../models/program';
 import { indicatorManualNumberSort } from '../../general_utilities';
+
 
 // Types of filters available on the program page
 export const IndicatorFilterType = Object.freeze({
@@ -176,14 +178,26 @@ export class IndicatorStore {
     }
 }
 
+export class ProgramPageProgram extends BaseProgram {
+    @observable needsAdditionalTargetPeriods = null;
+    constructor(programJSON) {
+        super(programJSON);
+        this.needsAdditionalTargetPeriods = programJSON.does_it_need_additional_target_periods;
+    }
+    
+    @computed get resultChainFilterLabel() {
+        return this.resultsFramework ? this.byOutcomeChain : false;;
+    }
+}
+
 export class ProgramPageStore {
     indicatorStore;
-    @observable program = {};
+    @observable program = null;
     @observable resultsMap = new Map(); // indicator id -> results HTML str
 
-    constructor(indicators, program) {
-        this.indicatorStore = new IndicatorStore(indicators);
-        this.program = program;
+    constructor(programJSON) {
+        //this.indicatorStore = new IndicatorStore(indicators);
+        this.program = new ProgramPageProgram(programJSON);
         this.addResultsHTML = this.addResultsHTML.bind(this);
         this.deleteResultsHTML = this.deleteResultsHTML.bind(this);
     }
@@ -205,7 +219,7 @@ export class ProgramPageStore {
     
     @computed
     get oldStyleLevels() {
-        return !this.program.results_framework;
+        return !this.program.resultsFramework;
     }
 
 }
