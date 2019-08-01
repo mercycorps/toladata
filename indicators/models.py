@@ -17,6 +17,7 @@ from django.urls import reverse
 from django.utils import formats, timezone, functional
 from django.utils.translation import ugettext_lazy as _
 from tola.l10n_utils import l10n_date_year_month, l10n_date_medium
+from tola.model_utils import generate_safedelete_queryset
 from django.contrib import admin
 from django.utils.functional import cached_property
 import django.template.defaultfilters
@@ -585,6 +586,7 @@ class DoubleDecimalSplit(models.Func):
         expressions = models.F(string), models.Value('.'), count
         super(DoubleDecimalSplit, self).__init__(*expressions)
 
+
 class IndicatorSortingQSMixin(object):
     """This provides a temporary relief to indicator number sorting issues in advance of Satsuma -
     uses regex matches to determine if the number is of the format "1.1" or "1.1.1" etc. and sorts it then by
@@ -734,6 +736,84 @@ class IndicatorManager(SafeDeleteManager, IndicatorSortingManagerMixin):
         return queryset.select_related('program', 'sector')
 
 
+class IndicatorRFMixin(object):
+    qs_name = 'RFAware'
+    annotate_methods = ['is_program_using_results_framework', 'is_using_manual_numbering']
+
+    def is_program_using_results_framework(self):
+        return self.annotate(
+            using_results_framework=models.Case(
+                models.When(
+                    program___using_results_framework=Program.NOT_MIGRATED,
+                    then=models.Value(False)
+                ),
+                default=models.Value(True),
+                output_field=models.BooleanField()
+            )
+        )
+
+    def is_using_manual_numbering(self):
+        return self.annotate(
+            manual_number_display=models.Case(
+                models.When(
+                    using_results_framework=False,
+                    then=models.Value(True)
+                ),
+                models.When(
+                    program__auto_number_indicators=False,
+                    then=models.Value(True)
+                ),
+                default=models.Value(False),
+                output_field=models.BooleanField()
+            )
+        )
+
+class IndicatorRFSortMixin(object):
+    qs_name = 'SortingAware'
+    annotate_methods = ['sort_a']
+
+    # def sort_a(self):
+    #     return self.annotate(
+    #         sort_a_chars=
+    #     )
+
+
+class IndicatorLevelsMixin(object):
+    qs_name = 'LevelAware'
+    annotate_methods = ['annotate_old_level']
+    ordering_methods = ['order_by_old_level']
+
+    def annotate_old_level(self):
+        old_level_whens = [
+            models.When(
+                models.Q(
+                    models.Q(using_results_framework=True) &
+                    models.Q(level_id__isnull=False)
+                ),
+                then=models.Value(0)
+            )
+        ] + [
+            models.When(
+                old_level=level_name,
+                then=level_pk
+            ) for (level_pk, level_name) in Indicator.OLD_LEVELS
+        ] + [
+            models.When(
+                old_level__isnull=True,
+                then=None
+            ),
+        ]
+        return self.annotate(
+            old_level_pk=models.Case(
+                *old_level_whens,
+                default=None,
+                output_field=models.IntegerField()
+            )
+        )
+
+    def order_by_old_level(self):
+        return self.order_by(models.F('old_level_pk').asc(nulls_last=True))
+
 class Indicator(SafeDeleteModel):
     LOP = 1
     MID_END = 2
@@ -762,7 +842,7 @@ class Indicator(SafeDeleteModel):
         MONTHLY,
     )
 
-    IRREGULAR_TARGET_REQUENCIES = (
+    IRREGULAR_TARGET_FREQUENCIES = (
         LOP,
         MID_END,
         EVENT,
@@ -1020,6 +1100,7 @@ class Indicator(SafeDeleteModel):
     notes = models.TextField(_("Notes"), max_length=500, null=True, blank=True)
     # optimize query for class based views etc.
     objects = IndicatorManager()
+    rf_aware_objects = generate_safedelete_queryset(IndicatorRFMixin, IndicatorLevelsMixin).as_manager()
 
     class Meta:
         ordering = ('create_date',)
@@ -1051,7 +1132,7 @@ class Indicator(SafeDeleteModel):
 
     @property
     def is_target_frequency_not_time_aware(self):
-        return self.target_frequency in self.IRREGULAR_TARGET_REQUENCIES
+        return self.target_frequency in self.IRREGULAR_TARGET_FREQUENCIES
 
     @property
     def is_target_frequency_lop(self):

@@ -15,6 +15,7 @@ from django.db.models import Count, Min, Subquery, OuterRef, Q
 from django.db.models.signals import post_save
 from django.dispatch import receiver
 from rest_framework.authtoken.models import Token
+from tola.model_utils import generate_queryset
 from simple_history.models import HistoricalRecords
 from django.contrib.sessions.models import Session
 from django.urls import reverse
@@ -516,6 +517,49 @@ class ActiveProgramsManager(models.Manager):
         return super(ActiveProgramsManager, self).get_queryset().filter(
             funding_status__iexact=self.ACTIVE_FUNDING_STATUS)
 
+class ActiveProgramsMixin(object):
+    """eliminates all non active programs"""
+    qs_name = 'ActivePrograms'
+    filter_methods = ['hide_inactive']
+
+    def hide_inactive(self):
+        """Only programs with funding status Funded or funded"""
+        return self.filter(
+            funding_status__iexact='Funded'
+        )
+
+class RFProgramMixin(object):
+    """annotates for a simple boolean indicating whether program is using the results framework"""
+    qs_name = 'RFAware'
+    annotate_methods = ['is_using_results_framework', 'is_manual_numbering']
+
+    def is_using_results_framework(self):
+        return self.annotate(
+            using_results_framework=models.Case(
+                models.When(
+                    _using_results_framework=Program.NOT_MIGRATED,
+                    then=models.Value(False)
+                ),
+                default=models.Value(True),
+                output_field=models.BooleanField()
+            )
+        )
+
+    def is_manual_numbering(self):
+        return self.annotate(
+            manual_numbering=models.Case(
+                models.When(
+                    models.Q(
+                        models.Q(using_results_framework=False) |
+                        models.Q(auto_number_indicators=False)
+                    ),
+                    then=models.Value(True)
+                ),
+                default=models.Value(False),
+                output_field=models.BooleanField()
+            )
+        )
+
 class Program(models.Model):
     NOT_MIGRATED = 1 # programs created before satsuma release which have not switched over yet
     MIGRATED = 2 # programs created before satsuma which have switched to new RF levels
@@ -554,7 +598,8 @@ class Program(models.Model):
         default=RF_ALWAYS, blank=False
     )
 
-    objects = models.Manager()
+    old_objects = models.Manager()
+    objects = generate_queryset(ActiveProgramsMixin, RFProgramMixin).as_manager()
     active_programs = ActiveProgramsManager()
 
     class Meta:
@@ -569,6 +614,10 @@ class Program(models.Model):
             self.create_date = timezone.now()
         self.edit_date = timezone.now()
         super(Program, self).save()
+
+    @property
+    def rf_aware_indicators(self):
+        return self.indicator_set(manager='rf_aware_objects')
 
     @property
     def countries(self):
@@ -743,9 +792,6 @@ class Program(models.Model):
             return self.using_results_framework
         return self._using_results_framework != self.NOT_MIGRATED
 
-    @property
-    def manual_numbering(self):
-        return self.results_framework and not self.auto_number_indicators
 
 
 PROGRAM_ROLE_CHOICES = (
