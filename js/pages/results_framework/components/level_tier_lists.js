@@ -22,16 +22,36 @@ class StaticLevelTier extends React.Component {
 export class StaticLevelTierList extends React.Component{
 
     render() {
-        let apply_button = null
+        let apply_button = null;
         if (this.props.rootStore.levelStore.levels.length == 0) {
             apply_button =
-                <button
-                    className="leveltier-button btn btn-primary btn-block"
-                    onClick={this.props.rootStore.levelStore.createFirstLevel}>
-                    {/* #Translators: this refers to an imperative verb on a button ("Apply filters")*/}
-                    {gettext("Apply")}
-                </button>
+                <div className="leveltier-list__actions">
+                    <button
+                        className="leveltier-button btn btn-primary btn-block"
+                        onClick={this.props.rootStore.levelStore.createFirstLevel}>
+                        {/* #Translators: this refers to an imperative verb on a button ("Apply filters")*/}
+                        {gettext("Apply")}
+                    </button>
+                </div>
         }
+
+        let settings_button = null;
+        if (this.props.rootStore.levelStore.chosenTierSetKey == this.props.rootStore.levelStore.customTierSetKey &&
+            this.props.rootStore.levelStore.useStaticTierList) {
+            const style = {backgroundColor: "white", width: "100%", alignItems: "flex-end", textAlign: "right"}
+            settings_button =
+                <button
+                        style={style}
+                        className="btn btn-link"
+                        onClick={this.props.rootStore.levelStore.editTierSet}>
+                        {/* #Translators: this refers to an imperative verb on a button ("Apply filters")*/}
+                        <i className="fa fa-cog" />
+                    {gettext("Settings")}
+                </button>
+
+        }
+        console.log('after settings use static', settings_button)
+
 
         return (
             <React.Fragment>
@@ -43,14 +63,13 @@ export class StaticLevelTierList extends React.Component{
                             })
                             : null
                     }
+
                 </div>
-                {
-                    apply_button ?
-                        <div className="leveltier-list__actions">
-                            {apply_button}
-                        </div>
-                    : null
-                }
+                {settings_button}
+                {apply_button}
+
+
+
             </React.Fragment>
         )
     }
@@ -72,12 +91,15 @@ class EditableLevelTier extends React.Component {
         if (this.props.showDeleteButton){
             deleteButton =
                 <DeleteButton
-                    buttonClasses='pr-0'
-                    iconClasses='mr-0'
+                    buttonClasses='p-0'
                     type="button"
                     action={this.props.deleteFunc}/>
         }
-        console.log('here');
+
+        let lockIcon = null;
+        if (this.props.showLockIcon){
+            lockIcon = <button type="button" className='btn btn-small p-0'><i className='fa fa-lock' /></button>
+        }
 
         return (
             <React.Fragment>
@@ -95,6 +117,7 @@ class EditableLevelTier extends React.Component {
                         value={this.props.tierName}
                         onChange={this.props.updateAction} />
                     {deleteButton}
+                    {lockIcon}
                 </div>
             </React.Fragment>
     )}
@@ -107,11 +130,15 @@ export class EditableLevelTierList extends React.Component{
     render() {
 
         const savedTiers  = this.props.rootStore.levelStore.chosenTierSet.map((tier, index) => {
-            const showDeleteButton = index === this.props.rootStore.levelStore.chosenTierSet.length - 1;
+            const showLockIcon = !this.props.rootStore.levelStore.tierIsDeletable(index+1)
+            const showDeleteButton =
+                index === this.props.rootStore.levelStore.chosenTierSet.length - 1 &&
+                !showLockIcon;
             return <EditableLevelTier
                 key={index}
                 tierName={tier}
                 showDeleteButton={showDeleteButton}
+                showLockIcon={showLockIcon}
                 deleteFunc={this.props.rootStore.levelStore.deleteCustomTier}
                 tierOrder={index}
                 updateAction={this.props.rootStore.levelStore.updateCustomTier}/>
@@ -130,19 +157,18 @@ export class EditableLevelTierList extends React.Component{
             </button>;
 
 
-        let apply_button = null;
-        if (this.props.rootStore.levelStore.levels.length === 0) {
-            apply_button =
-                <div className="leveltier-list__actions">
-                    <button
-                        className="leveltier-button btn btn-primary btn-block"
-                        disabled={!this.props.rootStore.levelStore.templateIsSavable}
-                        onClick={this.props.rootStore.levelStore.applyTierSet}>
-                        {/* #Translators: this refers to an imperative verb on a button ("Apply filters")*/}
-                        {gettext("Apply")}
-                    </button>
-                </div>
-        }
+
+        const apply_button =
+            <div className="leveltier-list__actions">
+                <button
+                    className="leveltier-button btn btn-primary btn-block"
+                    disabled={!this.props.rootStore.levelStore.templateIsSavable}
+                    onClick={this.props.rootStore.levelStore.applyTierSet}>
+                    {/* #Translators: this refers to an imperative verb on a button ("Apply filters")*/}
+                    {gettext("Apply")}
+                </button>
+            </div>
+
 
         return (
             <form>

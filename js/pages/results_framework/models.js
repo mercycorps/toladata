@@ -13,6 +13,7 @@ export class LevelStore {
     @observable indicators = [];
     @observable chosenTierSetKey = "";
     @observable chosenTierSet = [];
+    @observable useStaticTierList = "";
     program_id;
     tierTemplates;
     programObjectives;
@@ -55,7 +56,13 @@ export class LevelStore {
             this.chosenTierSet = this.tierTemplates[this.chosenTierSetKey]['tiers'];
         }
 
-
+        if (this.chosenTierSetKey === this.customTierSetKey && this.levels.length === 0){
+            this.useStaticTierList = false;
+        }
+        else {
+            this.useStaticTierList = true;
+        }
+        console.log('usestatic', this.useStaticTierList)
 
 
 
@@ -134,8 +141,12 @@ export class LevelStore {
         console.log('cchanging ', newTierSetKey);
         this.chosenTierSetKey = newTierSetKey;
         this.chosenTierSet = this.tierTemplates[newTierSetKey]['tiers'];
-        if (this.chosenTierSetKey === this.customTierSetKey && this.chosenTierSet.length === 0) {
-            this.chosenTierSet = ['']
+        if (this.chosenTierSetKey === this.customTierSetKey)
+            if (this.chosenTierSet.length === 0) {
+                this.chosenTierSet = ['']
+            }
+            if (this.levels.length === 0){
+                this.useStaticTierList = false;
         }
         console.log('chosentierset is', toJS(this.chosenTierSet));
     }
@@ -156,17 +167,29 @@ export class LevelStore {
 
     @action
     deleteCustomTier = () => {
-        this.chosenTierSet.pop()
+        if (this.chosenTierSet.length === 1){
+            this.chosenTierSet = [""]
+        }
+        else{
+            this.chosenTierSet.pop()
+        }
+
     };
 
     @action
     applyTierSet = () => {
         if (this.chosenTierSetKey === this.customTierSetKey){
             this.saveCustomTemplateToDB();
+            this.useStaticTierList = true;
             // this.saveLevelTiersToDB();
         }
-        this.createFirstLevel()
+        if (this.levels.length === 0) {
+            this.createFirstLevel();
+        }
     };
+
+    @action
+    editTierSet = () => this.useStaticTierList = false;
 
     saveCustomTemplateToDB = () => {
         const data = {program_id: this.program_id, tiers: this.tierTemplates[this.customTierSetKey]['tiers']}
@@ -530,7 +553,16 @@ export class LevelStore {
             newIndicatorIds = newIndicatorIds.concat(this.getDescendantIndicatorIds(grandChildIds, newIndicatorIds));
         });
         return newIndicatorIds
-    }
+    };
+
+    tierIsDeletable = (tierLevel) => {
+        for (let level of this.levels) {
+            if (level.level_depth === tierLevel){
+                return false;
+            }
+        }
+        return true;
+    };
 
 }
 

@@ -86,7 +86,8 @@ const ChangeLogLink = ({programId}) => {
 
 export const LevelTierPicker = inject("rootStore")(observer(function (props) {
     let tierListType = <StaticLevelTierList />;
-    if (this.props.rootStore.levelStore.chosenTierSetKey == this.props.rootStore.levelStore.customTierSetKey){
+    if (this.props.rootStore.levelStore.chosenTierSetKey == this.props.rootStore.levelStore.customTierSetKey &&
+        this.props.rootStore.levelStore.useStaticTierList === false){
         tierListType = <EditableLevelTierList />;
     }
 
