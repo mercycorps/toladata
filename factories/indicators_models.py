@@ -1,8 +1,10 @@
 from random import randint
 
+import datetime
 import faker
 from django.utils import timezone
 from factory import (
+    Faker,
     DjangoModelFactory,
     post_generation,
     SubFactory,
@@ -89,6 +91,48 @@ class DefinedIndicatorFactory(IndicatorFactory):
     data_collection_method = "some method of collecting data"
     data_collection_frequency = SubFactory('factories.indicators_models.DataCollectionFrequencyFactory')
 
+
+class RFIndicatorFactory(DjangoModelFactory):
+    class Meta:
+        model = IndicatorM
+
+    class Params:
+        asftargets = False
+    
+    name = Faker('company')
+    target_frequency = IndicatorM.ANNUAL
+    lop_target = 1400
+
+    @post_generation
+    def targets(self, create, extracted, **kwargs):
+        if extracted and self.target_frequency:
+            period_generator = PeriodicTargetM.generate_for_frequency(self.target_frequency)
+            if self.program:
+                periods = period_generator(
+                    self.program.reporting_period_start, self.program.reporting_period_end
+                )
+            else:
+                periods = period_generator(
+                    datetime.date(2016, 1, 1), datetime.date(2018, 12, 31)
+                )
+            periods = list(periods)
+            if extracted == "incomplete":
+                periods = periods[0:-1]
+            if self.lop_target:
+                target_values = [self.lop_target/len(periods)]*len(periods)
+                if len(target_values) > 1:
+                    target_values[-1] = self.lop_target - sum(target_values[0:-1])
+            else:
+                target_values = [None]*len(periods)
+            for period, target_value in zip(periods, target_values):
+                PeriodicTargetFactory(
+                    indicator=self,
+                    customsort=period['customsort'],
+                    target=target_value,
+                    start_date=period['start'],
+                    end_date=period['end']
+                )
+
 class Objective(DjangoModelFactory):
     class Meta:
         model = ObjectiveM
@@ -110,16 +154,19 @@ class LevelTierFactory(DjangoModelFactory):
     class Params:
         mc_template = Trait(
             name=Sequence(
-                lambda n: LevelTierM.TEMPLATES['mc_standard']['tiers'][n]
+                lambda n: LevelTierM.get_templates()['mc_standard']['tiers'][n]
             )
         )
 
     name = Sequence(lambda n: 'LevelTier: {0}'.format(n))
-    tier_depth = Sequence(lambda n: n)
+    tier_depth = Sequence(lambda n: n+1)
 
     @classmethod
     def build_mc_template(cls, program):
-        return cls.create_batch(4, program=program, mc_template=True)
+        return [
+            cls(program=program, name=name, tier_depth=count+1)
+            for count, name in enumerate(LevelTierM.get_templates()['mc_standard']['tiers'])
+            ]
 
 
 class ResultFactory(DjangoModelFactory):

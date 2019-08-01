@@ -1,8 +1,12 @@
+import itertools
+import datetime
 from django.template.defaultfilters import slugify
 from factory import (
     DjangoModelFactory,
     lazy_attribute,
+    SelfAttribute,
     LazyAttribute,
+    lazy_attribute,
     SubFactory,
     PostGeneration,
     post_generation,
@@ -35,6 +39,12 @@ from workflow.models import (
 def generate_mc_levels(obj, create, extracted, **kwargs):
     from factories.indicators_models import LevelTierFactory
     tiers = LevelTierFactory.build_mc_template(program=obj)
+
+def custom_level_generator(tier_set):
+    def generate_custom_levels(obj, create, extracted, **kwargs):
+        from factories.indicators_models import LevelTierFactory
+        tiers = LevelTierFactory.build_custom_template(program=obj,tiers=tier_set)
+    return generate_custom_levels
 
 class CountryFactory(DjangoModelFactory):
     class Meta:
@@ -126,6 +136,113 @@ class ProgramFactory(DjangoModelFactory):
         if type(extracted) is list:
             # Use the list of provided countries
             self.country.add(*extracted)
+
+class RFProgramFactory(DjangoModelFactory):
+    class Meta:
+        model = ProgramM
+
+    class Params:
+        active = True
+        migrated = None
+        months = 12
+        closed = True
+        age = False
+
+    funding_status = LazyAttribute(lambda o: "Funded" if o.active else "Inactive")
+    _using_results_framework = LazyAttribute(
+        lambda o: ProgramM.RF_ALWAYS if o.migrated is None else ProgramM.MIGRATED if o.migrated else ProgramM.NOT_MIGRATED
+    )
+
+    @lazy_attribute
+    def reporting_period_start(self):
+        year = datetime.date.today().year
+        month = datetime.date.today().month
+        if self.closed:
+            month = month - self.months
+        elif self.age:
+            month = month - self.age
+        else:
+            month = month - (self.months/2)
+        while month <= 0:
+            month = month + 12
+            year = year - 1
+        return datetime.date(year, month, 1)
+
+    @lazy_attribute
+    def reporting_period_end(self):
+        today = datetime.date.today()
+        if self.closed:
+            return datetime.date(today.year, today.month, 1) - datetime.timedelta(days=1)
+        elif self.age:
+            month = today.month + (self.months - self.age)
+        else:
+            month = today.month + (self.months - (self.months/2))
+        year = today.year
+        while month > 12:
+            month = month - 12
+            year = year + 1
+        return datetime.date(year, month, 1) - datetime.timedelta(days=1)
+
+
+    @post_generation
+    def tiers(self, create, extracted, **kwargs):
+        """generate tiers - can take True to generate MC tiers, or a list of tier names"""
+        from factories.indicators_models import LevelTierFactory
+        if extracted is True:
+            tiers = LevelTierFactory.build_mc_template(program=self)
+        elif isinstance(extracted, list):
+            tiers = [
+                LevelTierFactory(name=name, tier_depth=depth+1, program=self)
+                for depth, name in enumerate(extracted)
+                ]
+
+    @post_generation
+    def levels(self, create, extracted, **kwargs):
+        """post-gen hooks are called in declaration order, so this can depend upon tiers method"""
+        tiers = self.level_tiers.all()
+        from factories.indicators_models import LevelFactory
+        if isinstance(extracted, int):
+            parents = [None,]
+            newparents = []
+            for tier in tiers:
+                for parent in parents:
+                    for count in range(extracted if parent is not None else 1):
+                        newparents.append(
+                            LevelFactory(
+                                program=self,
+                                name=u"Tier: {} parent {}: {}".format(tier.name, parent.pk if parent else u"-", count+1),
+                                customsort=count+1,
+                                parent=parent
+                                )
+                            )
+                parents = newparents
+                newparents = []
+
+    @post_generation
+    def indicators(self, create, extracted, **kwargs):
+        if extracted:
+            from factories.indicators_models import RFIndicatorFactory
+            if kwargs and kwargs.get('levels'):
+                if not self.results_framework:
+                    levels = itertools.cycle([
+                        ('old_level', level_name) for (pk, level_name) in RFIndicatorFactory._meta.model.OLD_LEVELS]
+                        )
+                else:
+                    levels = itertools.cycle([('level', level) for level in self.levels.all()])
+            else:
+                levels = False
+            indicator_data = kwargs.get('all', {})
+            indicator_data.update({
+                'program': self
+            })
+            for count in range(extracted):
+                this_indicator_data = {}
+                this_indicator_data.update(indicator_data)
+                this_indicator_data.update(kwargs.get(str(count), {}))
+                if levels:
+                    (level_field, level_value) = next(levels)
+                    this_indicator_data.update({level_field: level_value})
+                RFIndicatorFactory(**this_indicator_data)
 
 
 class DocumentationFactory(DjangoModelFactory):
