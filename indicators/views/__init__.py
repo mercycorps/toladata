@@ -31,3 +31,7 @@ from views_reports import (
 from views_results_framework import (
     ResultsFrameworkBuilder,
 )
+
+from views_program import (
+    programs_rollup_export
+)

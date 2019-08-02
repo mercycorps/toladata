@@ -384,8 +384,8 @@ COUNTRY_ROLE_CHOICES = (
 )
 
 class CountryAccess(models.Model):
-    tolauser = models.ForeignKey(TolaUser)
-    country = models.ForeignKey(Country)
+    tolauser = models.ForeignKey(TolaUser, on_delete=models.CASCADE)
+    country = models.ForeignKey(Country, on_delete=models.CASCADE)
     role = models.CharField(max_length=100, choices=COUNTRY_ROLE_CHOICES, default='user')
 
     def save(self, *args, **kwargs):
@@ -765,9 +765,9 @@ PROGRAM_ROLE_INT_MAP = {
 }
 
 class ProgramAccess(models.Model):
-    program = models.ForeignKey(Program)
-    tolauser = models.ForeignKey(TolaUser)
-    country = models.ForeignKey(Country)
+    program = models.ForeignKey(Program, on_delete=models.CASCADE)
+    tolauser = models.ForeignKey(TolaUser, on_delete=models.CASCADE)
+    country = models.ForeignKey(Country, on_delete=models.CASCADE)
     role = models.CharField(max_length=100, choices=PROGRAM_ROLE_CHOICES, default='low')
 
     class Meta:

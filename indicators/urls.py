@@ -42,7 +42,9 @@ urlpatterns = [
     url(r'^iptt_report/(?P<program>\d+)/(?P<reporttype>\w+)/$', views.IPTTReport.as_view(), name='iptt_report'),
     url(r'^iptt_report_data/$', views.IPTTReportData.as_view(), name='iptt_ajax'),
     url(r'iptt_api/iptt_excel/$', views.IPTTExcelReport.as_view(), name='iptt_excel'),
-    # Deprecated:
+
+    # CSV endpoint (still in Alpha) GH ticket: #1854
+    url(r'^programs_rollup_export', views.programs_rollup_export, name='programs_rollup_export'),
 
     url(r'^pinned_report/$', views.create_pinned_report, name='create_pinned_report'),
     url(r'^pinned_report/delete/$', views.delete_pinned_report, name='delete_pinned_report'),

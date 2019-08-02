@@ -2,9 +2,10 @@ from operator import itemgetter
 import openpyxl
 from django.contrib.auth.decorators import login_required
 from django.utils.translation import ugettext
-from django.http import HttpResponse
+from django.http import HttpResponse, JsonResponse
 from django.shortcuts import render
 
+from indicators.queries import ProgramWithMetrics
 from indicators.xls_export_utils import TAN, apply_title_styling, apply_label_styling, update_borders
 from workflow.serializers import LogframeProgramSerializer
 from tola_management.permissions import has_program_read_access
@@ -180,3 +181,25 @@ def logframe_excel_view(request, program):
     )
     wb.save(response)
     return response
+
+
+@login_required
+def programs_rollup_export(request):
+    program_pks = [p.pk for p in request.user.tola_user.available_programs]
+    annotated_programs = ProgramWithMetrics.home_page.filter(pk__in=program_pks).with_annotations()
+    data = {
+        p.gaitid if p.gaitid else "no gait id {}".format(count): {
+            'gaitid': p.gaitid,
+            'name': p.name,
+            'indicator_count': p.metrics['indicator_count'],
+            'indicators_with_targets': p.metrics['targets_defined'],
+            'indicators_with_results': p.metrics['reported_results'],
+            'results_count': p.metrics['results_count'],
+            'results_with_evidence': p.metrics['results_evidence'],
+            'indicators_reporting_scope': p.scope_counts['reporting_count'],
+            'indicators_reporting_on_target': p.scope_counts['on_scope'],
+            'indicators_reporting_below_target': p.scope_counts['low'],
+            'indicators_reporting_above_target': p.scope_counts['high'],
+            } for count, p in enumerate(annotated_programs)
+        }
+    return JsonResponse(data)
