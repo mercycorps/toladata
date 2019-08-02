@@ -1,4 +1,5 @@
 # -*- coding: utf-8 -*-
+import re
 import collections
 import string
 import uuid
@@ -6,7 +7,6 @@ from datetime import timedelta, date
 from decimal import Decimal
 
 import dateparser
-from dateutil.relativedelta import relativedelta
 from django.core.validators import MinValueValidator
 from django.core.exceptions import ValidationError
 from django.db import models
@@ -14,9 +14,9 @@ from django.db.models import signals
 from django.dispatch import receiver
 from django.http import QueryDict
 from django.urls import reverse
-from django.utils import formats, timezone, functional
+from django.utils import formats, timezone
 from django.utils.translation import ugettext_lazy as _
-from tola.l10n_utils import l10n_date_year_month, l10n_date_medium
+from tola.l10n_utils import l10n_date_medium
 from tola.model_utils import generate_safedelete_queryset
 from django.contrib import admin
 from django.utils.functional import cached_property
@@ -770,12 +770,10 @@ class IndicatorRFMixin(object):
 
 class IndicatorRFSortMixin(object):
     qs_name = 'SortingAware'
-    annotate_methods = ['sort_a']
+    #ordering_methods = ['number_sort']
 
-    # def sort_a(self):
-    #     return self.annotate(
-    #         sort_a_chars=
-    #     )
+    def in_order(self):
+        return sorted(self, key=lambda i: i.sort_number)
 
 
 class IndicatorLevelsMixin(object):
@@ -1100,7 +1098,11 @@ class Indicator(SafeDeleteModel):
     notes = models.TextField(_("Notes"), max_length=500, null=True, blank=True)
     # optimize query for class based views etc.
     objects = IndicatorManager()
-    rf_aware_objects = generate_safedelete_queryset(IndicatorRFMixin, IndicatorLevelsMixin).as_manager()
+    rf_aware_objects = generate_safedelete_queryset(
+        IndicatorRFMixin,
+        IndicatorLevelsMixin,
+        IndicatorRFSortMixin,
+        ).as_manager()
 
     class Meta:
         ordering = ('create_date',)
@@ -1382,6 +1384,30 @@ class Indicator(SafeDeleteModel):
         if hasattr(self, '_auto_number_indicators'):
             return self._auto_number_indicators
         return not self.program.manual_numbering
+
+    @property
+    def sort_number(self):
+        if self.using_results_framework:
+            return self.level_order
+        number = getattr(self, 'number')
+        if number is None:
+            return (None, None, None)
+        search_pattern = r'([^\d]+)?(\d+)?(.*)?'
+        number_search = re.compile(search_pattern)
+        split = number.split('.')
+        processed = []
+        for element in split:
+            matches = number_search.search(element)
+            if matches is None:
+                processed.append((None, None, None))
+            else:
+                groups = matches.groups()
+                processed.append((
+                    groups[0] if groups[0] else None,
+                    int(groups[1]) if groups[1] else None,
+                    groups[2] if groups[2] else None
+                    ))
+        return processed
 
 
 @receiver(signals.pre_save, sender=Indicator)
