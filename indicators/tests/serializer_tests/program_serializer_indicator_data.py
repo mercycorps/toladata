@@ -25,37 +25,41 @@ from django.utils import translation
 today = datetime.date.today()
 
 scenarios = [
-    # {
-    #     'id': 1452,
-    #     'name': 'Unmigrated, One indicator per level',
-    #     'migrated': False,
-    #     'indicators': 4,
-    #     'indicators__0': {'id': 14521, 'old_level': 'Activity'},
-    #     'indicators__1': {'id': 14524, 'old_level': 'Goal'},
-    #     'indicators__2': {'id': 14523, 'old_level': 'Outcome'},
-    #     'indicators__3': {'id': 14522, 'old_level': 'Output'},
-    #     'output': {
-    #         'levels': [{'pk': depth, 'depth': depth, 'label': label} for (depth, label) in Indicator.OLD_LEVELS],
-    #         'indicators': {
-    #             '14521': {
-    #                 'pk': 14521,
-    #                 'level': 6
-    #             },
-    #             '14522': {
-    #                 'pk': 14522,
-    #                 'level': 5
-    #             },
-    #             '14523': {
-    #                 'pk': 14523,
-    #                 'level': 3
-    #             },
-    #             '14524': {
-    #                 'pk': 14524,
-    #                 'level': 1
-    #             },
-    #         }
-    #     },
-    # },
+    {
+        'id': 1452,
+        'name': 'Unmigrated, One indicator per level',
+        'migrated': False,
+        'indicators': 4,
+        'indicators__0': {'id': 14521, 'old_level': 'Activity'},
+        'indicators__1': {'id': 14524, 'old_level': 'Goal'},
+        'indicators__2': {'id': 14523, 'old_level': 'Outcome'},
+        'indicators__3': {'id': 14522, 'old_level': 'Output'},
+        'output': {
+            'levels': [{'pk': depth, 'depth': depth, 'label': label} for (depth, label) in Indicator.OLD_LEVELS],
+            'indicators': {
+                '14521': {
+                    'pk': 14521,
+                    'level': 6,
+                    'level_order': 0,
+                },
+                '14522': {
+                    'pk': 14522,
+                    'level': 5,
+                    'level_order': 0,
+                },
+                '14523': {
+                    'pk': 14523,
+                    'level': 3,
+                    'level_order': 0,
+                },
+                '14524': {
+                    'pk': 14524,
+                    'level': 1,
+                    'level_order': 0,
+                },
+            }
+        },
+    },
     {
         'id': 1453,
         'name': 'Unmigrated, Numbered indicators, one level',
@@ -109,21 +113,21 @@ scenarios = [
             }
         },
     },
-    # {
-    #     'id': 99999,
-    #     'name': 'Migrated, Reporting period 1.5 years, open, MC Tiers',
-    #     'closed': False,
-    #     'months': 18,
-    #     'migrated': True,
-    #     'tiers': True,
-    #     'output': {
-    #         'results_framework': True,
-    #         'rf_chain_sort_label': 'by Outcome chain',
-    #     },
-    #     'translation': {
-    #         'rf_chain_sort_label': u'par chaîne Résultat'
-    #     },
-    # },
+    {
+        'id': 99999,
+        'name': 'Migrated, Reporting period 1.5 years, open, MC Tiers',
+        'closed': False,
+        'months': 18,
+        'migrated': True,
+        'tiers': True,
+        'output': {
+            'results_framework': True,
+            'rf_chain_sort_label': 'by Outcome chain',
+        },
+        'translation': {
+            'rf_chain_sort_label': u'par chaîne Résultat'
+        },
+    },
     # {
     #     'id': 999991,
     #     'name': 'Migrated Program, Reporting period 4 years, one month open, custom tiers',
@@ -208,8 +212,6 @@ class TestProgramSerializerIndicatorData(test.TestCase):
                     for field, value in expected_level.items():
                         self.assertEqual(serialized_level[field], value)
             if 'indicators' in program_data:
-                for pk, data in serialized_data['indicators'].items():
-                    print "level {} sort {} number {} type {} a {} b {} c {}".format(data['level'], data['level_order'], data['number'], data['logsort_type'], data['logsort_a'], data['logsort_b'], data['logsort_c'])
                 for indicator_pk, indicator_data in program_data['indicators'].items():
                     self.assertIn(indicator_pk, serialized_data['indicators'])
                     for field, value in indicator_data.items():

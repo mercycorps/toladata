@@ -40,18 +40,10 @@ class BaseIndicatorSerializer(serializers.ModelSerializer):
 class ProgramPageIndicatorSerializer(BaseIndicatorSerializer):
     periodictargets = ProgramPagePeriodicTargetSerializer
     level = serializers.SerializerMethodField()
-    logsort_type = serializers.IntegerField(read_only=True)
-    logsort_a = serializers.CharField(read_only=True)
-    logsort_b = serializers.CharField(read_only=True)
-    logsort_c = serializers.CharField(read_only=True)
 
     class Meta(BaseIndicatorSerializer.Meta):
         fields = BaseIndicatorSerializer.Meta.fields + [
             'level',
-            'logsort_type',
-            'logsort_a',
-            'logsort_b',
-            'logsort_c',
             'number'
         ]
 
@@ -66,7 +58,7 @@ class ProgramPageIndicatorSerializer(BaseIndicatorSerializer):
                 indicator=models.OuterRef('pk')
             ).order_by('-end_date').values('end_date')[:1]
         )
-        return Indicator.objects.select_related('program').annotate(
+        return Indicator.rf_aware_objects.select_related('program').annotate(
             using_results_framework=models.Case(
                 models.When(
                     program___using_results_framework=Program.NOT_MIGRATED,
@@ -75,8 +67,8 @@ class ProgramPageIndicatorSerializer(BaseIndicatorSerializer):
                 default=models.Value(True),
                 output_field=models.BooleanField()
                 )
-        ).with_logframe_sorting().select_related(None).only(
-            'pk', 'name', 'program_id', 'target_frequency', 'level_id', 'number'
+        ).select_related(None).only(
+            'pk', 'name', 'program_id', 'target_frequency', 'level_id', 'number', 'level_order'
         ).annotate(
             newest_end_date=newest_end_date_annotation
         ).prefetch_related(
@@ -192,7 +184,8 @@ class ProgramPageProgramSerializer(BaseProgramOptimizedSerializer):
         ]
 
     def get_indicators(self, program):
-        indicators_data = ProgramPageIndicatorSerializer(program.annotated_indicators, many=True).data
+        annotated_indicators = sorted(program.annotated_indicators, key=lambda i: (i.sort_number is None, i.sort_number))
+        indicators_data = ProgramPageIndicatorSerializer(annotated_indicators, many=True).data
         if program.results_framework:
             return indicators_data
         formatted_data = []

@@ -773,7 +773,7 @@ class IndicatorRFSortMixin(object):
     #ordering_methods = ['number_sort']
 
     def in_order(self):
-        return sorted(self, key=lambda i: i.sort_number)
+        return sorted(self, key=lambda i: (i.sort_number is None, i.sort_number))
 
 
 class IndicatorLevelsMixin(object):
@@ -1390,8 +1390,8 @@ class Indicator(SafeDeleteModel):
         if self.using_results_framework:
             return self.level_order
         number = getattr(self, 'number')
-        if number is None:
-            return (None, None, None)
+        if number is None or number == '':
+            return None
         search_pattern = r'([^\d]+)?(\d+)?(.*)?'
         number_search = re.compile(search_pattern)
         split = number.split('.')
