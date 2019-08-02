@@ -29,8 +29,7 @@ from indicators.models import Level, LevelTier, LevelTierTemplate, Indicator
 from tola_management.models import ProgramAuditLog
 from workflow.models import Program
 
-
-logger = logging.getLogger('__name__')
+logger = logging.getLogger(__name__)
 
 # TODO: add security
 @method_decorator(login_required, name='dispatch')
@@ -279,32 +278,38 @@ def indicator_list(request, program_id):
     return JsonResponse(IndicatorSerializerMinimal(indicators, many=True).data, safe=False, status=200)
 
 @api_view(http_method_names=['POST'])
-def save_custom_tiers_template(request):
+def save_custom_tiers(request):
     program = Program.objects.get(id=request.data['program_id'])
     role = request.user.tola_user.program_role(program.id)
     if request.user.is_anonymous or role != 'high':
         return HttpResponseRedirect('/')
     print 'requestdata', request.data
     try:
+        # Replace both the template and the program-associated level tiers, since there is only
+        # one form and it does both.  May need to split this later if custom template creation and
+        # tierset saving is split.
         with transaction.atomic():
-            for template_tier in LevelTierTemplate.objects.filter(program=program):
-                template_tier.delete()
+            LevelTierTemplate.objects.filter(program=program).delete()
+            LevelTier.objects.filter(program=program).delete()
 
             for n, template_tier in enumerate(request.data['tiers']):
-                tier_obj = LevelTierTemplate.objects.create(
+
+                LevelTier.objects.create(
                     program=program,
                     tier_depth=n+1,
                     name=template_tier
                 )
 
-            tier_obj.save()
+                LevelTierTemplate.objects.create(
+                    program=program,
+                    tier_depth=n+1,
+                    name=template_tier
+                )
+
     except Exception as e:
-        logger.error(e)
+        logger.exception("Trouble in RF paradise")
         return JsonResponse({'message': _('Your request could not be processed.')}, status=400)
-    for t in LevelTierTemplate.objects.filter(program=program):
-        print 'template tier =', t.tier_depth, t.name, t.program
-    custom_templates = LevelTierTemplate.objects.filter(program=program)
-    datas = LevelTierTemplateSerializer(custom_templates, many=True)
-    print 'datas is ', datas.data
-    return JsonResponse(datas.data, safe=False)
+
+    new_template = LevelTierTemplateSerializer(LevelTierTemplate.objects.filter(program=program), many=True)
+    return JsonResponse(new_template.data, safe=False)
 

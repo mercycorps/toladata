@@ -141,13 +141,20 @@ export class LevelStore {
         console.log('cchanging ', newTierSetKey);
         this.chosenTierSetKey = newTierSetKey;
         this.chosenTierSet = this.tierTemplates[newTierSetKey]['tiers'];
-        if (this.chosenTierSetKey === this.customTierSetKey)
+        console.log('ctskey, usestatic', this.chosenTierSetKey, this.useStaticTierList);
+        if (this.chosenTierSetKey === this.customTierSetKey) {
             if (this.chosenTierSet.length === 0) {
                 this.chosenTierSet = ['']
             }
-            if (this.levels.length === 0){
-                this.useStaticTierList = false;
+            // The tier editor should load if there are no levels or if the only level is a new level and
+            // the first tier has not been created yet.  Otherwise load the static tier display.
+            this.useStaticTierList =  !((this.levels.length === 0 ||
+                (this.levels.length === 1 && this.levels[0].id === "new" && this.chosenTierSet[0].length === 0)))
+
+
+
         }
+        console.log('ctskey, usestatic', this.chosenTierSetKey, this.useStaticTierList);
         console.log('chosentierset is', toJS(this.chosenTierSet));
     }
 
@@ -167,17 +174,20 @@ export class LevelStore {
 
     @action
     deleteCustomTier = () => {
+
         if (this.chosenTierSet.length === 1){
             this.chosenTierSet = [""]
         }
         else{
             this.chosenTierSet.pop()
+
         }
 
     };
 
     @action
-    applyTierSet = () => {
+    applyTierSet = (event) => {
+        event.preventDefault();
         if (this.chosenTierSetKey === this.customTierSetKey){
             this.saveCustomTemplateToDB();
             this.useStaticTierList = true;
@@ -196,11 +206,22 @@ export class LevelStore {
     };
 
     saveCustomTemplateToDB = () => {
-        const data = {program_id: this.program_id, tiers: this.tierTemplates[this.customTierSetKey]['tiers']}
+        const data = {program_id: this.program_id, tiers: this.chosenTierSet};
         console.log('datais', data);
-        api.post(`/save_custom_tiers_template/`, data)
+        api.post(`/save_custom_tiers/`, data)
             .then(response => {
-                console.log('responsedata', response.data)
+                success_notice({
+                    /* # Translators: Notification to user that the update they initiated was successful */
+                    message_text: gettext("Changes to the results framework template were saved."),
+                    addClass: 'program-page__rationale-form',
+                    stack: {
+                        dir1: 'up',
+                        dir2: 'right',
+                        firstpos1: 20,
+                        firstpos2: 20,
+                    }
+                })
+
             })
             .catch(error => console.log('error', error))
 
@@ -315,8 +336,6 @@ export class LevelStore {
                 if (this.levels.length == 0){
                     this.createFirstLevel()
                 }
-
-
                 success_notice({
                     /* # Translators: Notification to user that the deletion command that they issued was successful */
                     message_text: interpolate(gettext("%s was deleted."), [level_label]),
@@ -331,7 +350,7 @@ export class LevelStore {
             })
             .catch(error => console.log('error', error))
 
-        this.rootStore.uiStore.setdisableCardActions(false);
+        this.rootStore.uiStore.setDisableCardActions(false);
     };
 
 
@@ -529,7 +548,7 @@ export class LevelStore {
 
     tierIsDeletable = (tierLevel) => {
         for (let level of this.levels) {
-            if (level.level_depth === tierLevel){
+            if (level.level_depth === tierLevel && level.name.length > 0){
                 return false;
             }
         }

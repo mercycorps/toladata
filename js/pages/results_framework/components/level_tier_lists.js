@@ -93,12 +93,25 @@ class EditableLevelTier extends React.Component {
                 <DeleteButton
                     buttonClasses='p-0'
                     type="button"
-                    action={this.props.deleteFunc}/>
+                    action={(event) => this.props.deleteFunc(event)}/>
         }
 
-        let lockIcon = null;
-        if (this.props.showLockIcon){
-            lockIcon = <button type="button" className='btn btn-small p-0'><i className='fa fa-lock' /></button>
+        let lockButton = null;
+        const lockStyle = {color: "gray"};
+        if (this.props.showLockButton){
+            lockButton =
+                <button
+                    type="button"
+                    className="btn btn-small p-0"
+                    data-toggle="popover"
+                    data-trigger="focus"
+                    data-placement="bottom"
+                    // data-html="true"
+                    /* # Translators: This is the help text of an icon that indicates that this element can't be deleted */
+                    data-content="This level is being used in the results framework"
+                >
+                    <i style={lockStyle} className='fa fa-lock' />
+                </button>
         }
 
         return (
@@ -110,14 +123,14 @@ class EditableLevelTier extends React.Component {
                 </div>
                 <div style={divStyle}>
                     <input
-                        style={{width: "85%"}}
+                        style={{width: "85%", paddingLeft: "5px", paddingRight: "5px"}}
                         type="text"
                         maxLength={75}
                         data-tierorder={this.props.tierOrder}
                         value={this.props.tierName}
                         onChange={this.props.updateAction} />
                     {deleteButton}
-                    {lockIcon}
+                    {lockButton}
                 </div>
             </React.Fragment>
     )}
@@ -127,18 +140,24 @@ class EditableLevelTier extends React.Component {
 @observer
 export class EditableLevelTierList extends React.Component{
 
+    componentDidMount() {
+        // Enable popovers after update (they break otherwise)
+        $('*[data-toggle="popover"]').popover({
+            html: true
+        });
+    }
     render() {
 
         const savedTiers  = this.props.rootStore.levelStore.chosenTierSet.map((tier, index) => {
-            const showLockIcon = !this.props.rootStore.levelStore.tierIsDeletable(index+1)
+            const showLockButton = !this.props.rootStore.levelStore.tierIsDeletable(index+1)
             const showDeleteButton =
                 index === this.props.rootStore.levelStore.chosenTierSet.length - 1 &&
-                !showLockIcon;
+                !showLockButton;
             return <EditableLevelTier
                 key={index}
                 tierName={tier}
                 showDeleteButton={showDeleteButton}
-                showLockIcon={showLockIcon}
+                showLockButton={showLockButton}
                 deleteFunc={this.props.rootStore.levelStore.deleteCustomTier}
                 tierOrder={index}
                 updateAction={this.props.rootStore.levelStore.updateCustomTier}/>

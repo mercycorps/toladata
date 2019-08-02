@@ -86,7 +86,7 @@ export class LevelCardCollapsed extends React.Component {
             message_text: interpolate(gettext("Are you sure you want to delete %s?"), [levelTitle]),
             on_submit: () => this.props.rootStore.levelStore.deleteLevelFromDB(this.props.level.id),
             on_cancel: () => this.props.rootStore.uiStore.setDisableCardActions(false)
-        })
+        });
     };
 
     editLevel = () => {
