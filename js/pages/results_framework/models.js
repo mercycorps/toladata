@@ -37,8 +37,8 @@ export class LevelStore {
 
         this.tierTemplates = JSON.parse(tierTemplates);
         this.tierTemplates[this.customTierSetKey] = {name: "Custom"};
-        this.tierTemplates[this.customTierSetKey]['tiers'] = customTemplates.map( ct => ct.name);
-        console.log('tt', this.tierTemplates);
+        this.tierTemplates[this.customTierSetKey]['tiers'] = customTemplates.names || [];
+        console.log('tt', this.tierTemplates['custom']);
 
         // Set the stored tier set key and the values, if they exist.  Use the default if they don't.
         if (levelTiers.length > 0) {
@@ -62,10 +62,6 @@ export class LevelStore {
         else {
             this.useStaticTierList = true;
         }
-        console.log('usestatic', this.useStaticTierList)
-
-
-
     }
 
     @computed get sortedLevels () {
@@ -148,6 +144,7 @@ export class LevelStore {
             }
             // The tier editor should load if there are no levels or if the only level is a new level and
             // the first tier has not been created yet.  Otherwise load the static tier display.
+            console.log('levels in switch', this.levels);
             this.useStaticTierList =  !((this.levels.length === 0 ||
                 (this.levels.length === 1 && this.levels[0].id === "new" && this.chosenTierSet[0].length === 0)))
 

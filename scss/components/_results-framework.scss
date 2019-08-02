@@ -25,6 +25,7 @@
 
 // component LevelTier
 .leveltier {
+    min-height: 2em;
     background-color: $gray-150;
     color: $gray-550;
     padding: $grid-gutter-width/4;

@@ -192,7 +192,9 @@ export class EditableLevelTierList extends React.Component{
         return (
             <form>
                 <div id="leveltier-list" className="leveltier-list">
-                    {savedTiers}
+                    <div className="form-group">
+                        {savedTiers}
+                    </div>
                     {addTierButton}
                     {/*{newTier}*/}
                 </div>

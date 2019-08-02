@@ -14,7 +14,6 @@ export class DeleteButton extends React.Component {
                     onClick={this.props.action}
                     className={buttonClasses}>
                 <i className={iconClasses}/>
-                {/*<FontAwesomeIcon icon={'times'} className={this.props.iconClasses || ''} />*/}
             </button>
         )
     }

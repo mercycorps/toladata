@@ -6,7 +6,7 @@ from operator import attrgetter
 from tola.l10n_utils import l10n_date_medium
 
 from workflow.models import Program
-from indicators.models import Indicator, Level, LevelTier, PeriodicTarget, Objective
+from indicators.models import Indicator, Level, LevelTier, LevelTierTemplate, PeriodicTarget, Objective
 from indicators.queries import IPTTIndicator
 from indicators.export_renderers import (
     FullReportExcelRenderer,
@@ -59,13 +59,16 @@ class LevelTierTemplateSerializer(serializers.ModelSerializer):
     """
     LevelTierTemplate serializer for RF builder
     """
+    names = serializers.SerializerMethodField()
     class Meta:
-        model = LevelTier
+        model = LevelTierTemplate
         fields = [
             'id',
-            'name',
-            'tier_depth'
+            'names',
         ]
+
+    def get_names(self, obj):
+        return list(obj.names)
 
 
 class IndicatorSerializerMinimal(serializers.ModelSerializer):
