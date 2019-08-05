@@ -147,9 +147,9 @@ export class EditableLevelTierList extends React.Component{
         });
     }
     render() {
-
+        const customKey = this.props.rootStore.levelStore.customTierSetKey;
         const savedTiers  = this.props.rootStore.levelStore.chosenTierSet.map((tier, index) => {
-            const showLockButton = !this.props.rootStore.levelStore.tierIsDeletable(index+1)
+            const showLockButton = !this.props.rootStore.levelStore.tierIsDeletable(index+1);
             const showDeleteButton =
                 index === this.props.rootStore.levelStore.chosenTierSet.length - 1 &&
                 !showLockButton;
@@ -162,7 +162,9 @@ export class EditableLevelTierList extends React.Component{
                 tierOrder={index}
                 updateAction={this.props.rootStore.levelStore.updateCustomTier}/>
         }) || null;
-
+        console.log('slick slice1', this.props.rootStore.levelStore.chosenTierSet.slice(-1))
+        console.log('slick slice2', this.props.rootStore.levelStore.chosenTierSet.slice(-1)[0])
+        // console.log('slick slice1', this.props.rootStore.levelStore.chosenTierSet.slice(-1))
         let isAddTierButtonDisabled =
             this.props.rootStore.levelStore.chosenTierSet.slice(-1)[0].length === 0 ||
             !this.props.rootStore.levelStore.templateIsSavable;

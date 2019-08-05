@@ -26,7 +26,7 @@ class Migration(migrations.Migration):
         ),
         migrations.AlterUniqueTogether(
             name='leveltiertemplate',
-            unique_together=set([('names', 'program')]),
+            unique_together=set([]),
         ),
         migrations.RemoveField(
             model_name='leveltiertemplate',

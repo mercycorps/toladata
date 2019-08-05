@@ -282,6 +282,32 @@ def indicator_list(request, program_id):
     return JsonResponse(IndicatorSerializerMinimal(indicators, many=True).data, safe=False, status=200)
 
 @api_view(http_method_names=['POST'])
+def save_custom_template(request):
+    program = Program.objects.get(id=request.data['program_id'])
+    role = request.user.tola_user.program_role(program.id)
+    if request.user.is_anonymous or role != 'high':
+        return HttpResponseRedirect('/')
+    print 'requestdata', request.data
+    try:
+        # Replace both the template and the program-associated level tiers, since there is only
+        # one form and it does both.  May need to split this later if custom template creation and
+        # tierset saving is split.
+        with transaction.atomic():
+            LevelTierTemplate.objects.filter(program=program).delete()
+            LevelTierTemplate.objects.create(
+                program=program,
+                names=request.data['tiers']
+            )
+
+    except Exception as e:
+        print 'exception ', e
+        logger.exception("Trouble in RF template paradise")
+        return JsonResponse({'message': _('Your request could not be processed.')}, status=400)
+
+    new_template = LevelTierTemplateSerializer(LevelTierTemplate.objects.filter(program=program), many=True)
+    return JsonResponse(new_template.data, safe=False)
+
+@api_view(http_method_names=['POST'])
 def save_custom_tiers(request):
     program = Program.objects.get(id=request.data['program_id'])
     role = request.user.tola_user.program_role(program.id)
@@ -309,9 +335,8 @@ def save_custom_tiers(request):
             )
 
     except Exception as e:
-        logger.exception("Trouble in RF paradise")
+        logger.exception("Trouble in RF Tier saving paradise")
         return JsonResponse({'message': _('Your request could not be processed.')}, status=400)
 
     new_template = LevelTierTemplateSerializer(LevelTierTemplate.objects.filter(program=program), many=True)
     return JsonResponse(new_template.data, safe=False)
-

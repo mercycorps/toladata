@@ -138,9 +138,11 @@ export class LevelStore {
         this.chosenTierSetKey = newTierSetKey;
         this.chosenTierSet = this.tierTemplates[newTierSetKey]['tiers'];
         console.log('ctskey, usestatic', this.chosenTierSetKey, this.useStaticTierList);
+        console.log('template, chosenset val in change', this.tierTemplates['custom']['tiers'], this.chosenTierSet.length)
         if (this.chosenTierSetKey === this.customTierSetKey) {
             if (this.chosenTierSet.length === 0) {
-                this.chosenTierSet = ['']
+                console.log('here')
+                this.chosenTierSet = [""]
             }
             // The tier editor should load if there are no levels or if the only level is a new level and
             // the first tier has not been created yet.  Otherwise load the static tier display.
@@ -157,7 +159,6 @@ export class LevelStore {
 
     @action
     updateCustomTier = (event) => {
-
         console.log('cchanging event', this.chosenTierSet[event.target.dataset.tierorder]);
         this.chosenTierSet[event.target.dataset.tierorder] = event.target.value;
         this.tierTemplates[this.customTierSetKey]['tiers'] = this.chosenTierSet;
@@ -166,20 +167,26 @@ export class LevelStore {
 
     @action
     addCustomTier = () => {
-        this.chosenTierSet.push("")
+        this.saveCustomTemplateToDB(true);
     };
 
     @action
     deleteCustomTier = () => {
-
+        console.log('template and chosen', toJS(this.chosenTierSet), toJS(this.tierTemplates[this.customTierSetKey]['tiers']));
         if (this.chosenTierSet.length === 1){
-            this.chosenTierSet = [""]
+            console.log('resetting single tier')
+            this.chosenTierSet = [""];
+            this.tierTemplates[this.customTierSetKey]['tiers'] = [];
         }
         else{
-            this.chosenTierSet.pop()
-
+            console.log('lenchosen', toJS(this.chosenTierSet));
+            // this.chosenTierSet.pop();
+            console.log('lenchosen after', toJS(this.chosenTierSet));
+            this.tierTemplates[this.customTierSetKey]['tiers'].pop();
+            console.log('lenchosen after after ', toJS(this.chosenTierSet));
         }
-
+        console.log('template and chosen after', toJS(this.chosenTierSet), toJS(this.tierTemplates[this.customTierSetKey]['tiers']));
+        this.saveCustomTemplateToDB();
     };
 
     @action
@@ -202,10 +209,10 @@ export class LevelStore {
         this.rootStore.uiStore.setDisableCardActions(true)
     };
 
-    saveCustomTemplateToDB = () => {
-        const data = {program_id: this.program_id, tiers: this.chosenTierSet};
+    saveCustomTemplateToDB = (addTier=false) => {
+        const data = {program_id: this.program_id, tiers: this.tierTemplates[this.customTierSetKey]['tiers']};
         console.log('datais', data);
-        api.post(`/save_custom_tiers/`, data)
+        api.post(`/save_custom_template/`, data)
             .then(response => {
                 success_notice({
                     /* # Translators: Notification to user that the update they initiated was successful */
@@ -217,13 +224,13 @@ export class LevelStore {
                         firstpos1: 20,
                         firstpos2: 20,
                     }
-                })
+                });
+                if (addTier) {
+                    this.chosenTierSet.push("");
+                }
 
             })
             .catch(error => console.log('error', error))
-
-
-
     };
 
     @action
