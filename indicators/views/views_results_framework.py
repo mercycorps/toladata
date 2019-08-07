@@ -288,6 +288,10 @@ def save_custom_template(request):
     if request.user.is_anonymous or role != 'high':
         return HttpResponseRedirect('/')
     print 'requestdata', request.data
+    if not request.data['tiers']:
+        LevelTierTemplate.objects.filter(program=program).delete()
+        return JsonResponse({'message': 'update successful'}, status=200)
+
     try:
         # Replace both the template and the program-associated level tiers, since there is only
         # one form and it does both.  May need to split this later if custom template creation and
