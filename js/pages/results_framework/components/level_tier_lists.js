@@ -128,7 +128,8 @@ class EditableLevelTier extends React.Component {
                         maxLength={75}
                         data-tierorder={this.props.tierOrder}
                         value={this.props.tierName}
-                        onChange={this.props.updateAction} />
+                        onChange={this.props.updateAction}
+                        onBlur={this.props.blurAction} />
                     {deleteButton}
                     {lockButton}
                 </div>
@@ -164,12 +165,12 @@ export class EditableLevelTierList extends React.Component{
                 showLockButton={showLockButton}
                 deleteFunc={this.props.rootStore.levelStore.deleteCustomTier}
                 tierOrder={index}
-                updateAction={this.props.rootStore.levelStore.updateCustomTier}/>
+                updateAction={this.props.rootStore.levelStore.updateCustomTier}
+                blurAction={this.props.rootStore.uiStore.validateCustomTiers}/>
         }) || null;
         // console.log('slick slice1', this.props.rootStore.levelStore.chosenTierSet.slice(-1))
         let isAddTierButtonDisabled =
-            this.props.rootStore.levelStore.chosenTierSet.slice(-1)[0].length === 0 ||
-            !this.props.rootStore.levelStore.templateIsSavable;
+            this.props.rootStore.levelStore.chosenTierSet.slice(-1)[0].length === 0;
         const addTierButton = savedTiers.length > 5 ? null :
             <button
                 type="button"
@@ -179,13 +180,11 @@ export class EditableLevelTierList extends React.Component{
                 <i className="fa fa-plus-circle" />Add level
             </button>;
 
-
-
         const apply_button =
             <div className="leveltier-list__actions">
                 <button
                     className="leveltier-button btn btn-primary btn-block"
-                    disabled={!this.props.rootStore.levelStore.templateIsSavable}
+                    // disabled={!this.props.rootStore.levelStore.templateIsSavable}
                     onClick={this.props.rootStore.levelStore.applyTierSet}>
                     {/* #Translators: this refers to an imperative verb on a button ("Apply filters")*/}
                     {gettext("Apply")}

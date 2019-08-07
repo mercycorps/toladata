@@ -13,6 +13,7 @@ export class LevelStore {
     @observable indicators = [];
     @observable chosenTierSetKey = "";
     @observable useStaticTierList = "";
+    @observable formErrors;
     @observable tierTemplates = "";
     program_id;
     tierTemplates;
@@ -35,6 +36,7 @@ export class LevelStore {
         this.accessLevel = accessLevel;
         this.usingResultsFramework = usingResultsFramework;
         this.origCustomTemplate = '';
+        this.formErrors = {hasError: false};
 
         this.tierTemplates = JSON.parse(tierTemplates);
         this.tierTemplates[this.customTierSetKey] = {name: "Custom"};
@@ -119,22 +121,22 @@ export class LevelStore {
     }, {delay: 50});
 
     // Used to check if any names are blank or if there are duplicated names in the list
-    @computed get templateIsSavable () {
-        let savable = true;
-        this.chosenTierSet.forEach( tierName => {
-            console.log('tiernamee', tierName);
-            const regex = /^\s*$/;
-            if (tierName.length === 0 || regex.test(tierName)){
-                savable = false;
-            }
-        });
-        const tierSetSet = new Set(this.chosenTierSet);
-        if (tierSetSet.size !== this.chosenTierSet.length){
-            savable = false;
-        }
-        console.log('is it savable', savable);
-        return savable;
-    }
+    // @computed get templateIsSavable () {
+    //     let savable = true;
+    //     this.chosenTierSet.forEach( tierName => {
+    //         console.log('tiernamee', tierName);
+    //         const re = /^\s*$/;
+    //         if (tierName.length === 0 || re.test(tierName)){
+    //             savable = false;
+    //         }
+    //     });
+    //     const tierSetSet = new Set(this.chosenTierSet);
+    //     if (tierSetSet.size !== this.chosenTierSet.length){
+    //         savable = false;
+    //     }
+    //     console.log('is it savable', savable);
+    //     return savable;
+    // }
 
     @action
     changeTierSet(newTierSetKey) {
@@ -578,6 +580,7 @@ export class UIStore {
     @observable activeCard;
     @observable hasVisibleChildren = [];
     @observable disableCardActions;
+    @observable customFormErrors;
     activeCardNeedsConfirm = "";
 
     constructor (rootStore) {
@@ -586,6 +589,7 @@ export class UIStore {
         this.activeCardNeedsConfirm = false;
         this.activeCard = null;
         this.disableCardActions = false;
+        this.customFormErrors = {hasErrors: false, errors: []}
     }
 
     @computed get tierLockStatus () {
@@ -660,5 +664,45 @@ export class UIStore {
         else {
             this.hasVisibleChildren.push(levelId);
         }
-    }
+    };
+
+    @action
+    validateCustomTiers = (tiers) => {
+        let hasErrors = false;
+        const customKey = this.rootStore.levelStore.customTierSetKey;
+        const tiersToTest = this.rootStore.levelStore.tierTemplates[customKey]['tiers'];
+        let errors = tiersToTest.map( (tierName) => {
+            console.log('tiernamee', tierName);
+            let whitespaceError = false;
+            let duplicates = 0;
+            const regex = /^\s*$/;
+            if (regex.test(tierName)){
+                whitespaceError = true;
+            }
+            tiersToTest.forEach( otherTierName => {
+                console.log('other, tier,', otherTierName, tierName)
+                if (otherTierName == tierName){
+                    duplicates += 1;
+                }
+            });
+            console.log('duplicates', duplicates)
+            if (whitespaceError && duplicates > 1){
+                hasErrors = true;
+                return {hasError: true, msg: "Duplicate names and whitespace-only names not allowed."}
+            }
+            else if (whitespaceError && duplicates === 1){
+                hasErrors = true;
+                return {hasError: true, msg: "Whitespace-only names not allowed."}
+            }
+            else if (!whitespaceError && duplicates > 1){
+                hasErrors = true;
+                return {hasError: true, msg: "Duplicate names not allowed."}
+            }
+            else{
+                return {hasError: false, msg: ""}
+            }
+        });
+        this.customFormErrors = {hasErrors: hasErrors, errors: errors}
+        console.log('custom error set', toJS(this.customFormErrors));
+    };
 }
