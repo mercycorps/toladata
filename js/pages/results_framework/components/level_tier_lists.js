@@ -42,7 +42,7 @@ export class StaticLevelTierList extends React.Component{
             settings_button =
                 <button
                         style={style}
-                        className="btn btn-link"
+                        className="btn btn-link leveltier-list"
                         onClick={this.props.rootStore.levelStore.editTierSet}>
                         {/* #Translators: this refers to an imperative verb on a button ("Apply filters")*/}
                         <i className="fa fa-cog" />
@@ -50,8 +50,6 @@ export class StaticLevelTierList extends React.Component{
                 </button>
 
         }
-        console.log('after settings use static', settings_button)
-
 
         return (
             <React.Fragment>
@@ -81,7 +79,7 @@ class EditableLevelTier extends React.Component {
         const divStyle = {
             display: 'flex',
             justifyContent: 'space-between',
-            marginBottom: ".75rem"
+            marginBottom: ".5rem"
         };
         const labelStyle = {
             marginBottom: ".25rem"
@@ -108,7 +106,7 @@ class EditableLevelTier extends React.Component {
                     data-placement="bottom"
                     // data-html="true"
                     /* # Translators: This is the help text of an icon that indicates that this element can't be deleted */
-                    data-content="This level is being used in the results framework"
+                    data-content={gettext("This level is being used in the results framework")}
                 >
                     <i style={lockStyle} className='fa fa-lock' />
                 </button>
@@ -118,7 +116,10 @@ class EditableLevelTier extends React.Component {
             <React.Fragment>
                 <div>
                     <label style={labelStyle}>
-                        Level {this.props.tierOrder + 1}
+                        {
+                            /* # Translators: This is one of several user modifiable fields, e.g. "Level 1", "Level 2", etc... Level 1 is the top of the hierarch, Level six is the bottom.*/
+                             interpolate(gettext("Level %s"), [this.props.tierOrder + 1])
+                        }
                     </label>
                 </div>
                 <div style={divStyle}>
@@ -133,9 +134,11 @@ class EditableLevelTier extends React.Component {
                     {deleteButton}
                     {lockButton}
                 </div>
+                <span style={{display:"block", marginBottom: ".75rem"}} className='has-error'>{this.props.errorMsg}</span>
             </React.Fragment>
     )}
 }
+
 
 @inject('rootStore')
 @observer
@@ -152,6 +155,9 @@ export class EditableLevelTierList extends React.Component{
         const customKey = this.props.rootStore.levelStore.customTierSetKey;
         console.log('custom iin rdner', this.props.rootStore.levelStore.tierTemplates[customKey]['tiers'])
         const savedTiers  = this.props.rootStore.levelStore.chosenTierSet.map((tier, index) => {
+            console.log('errors', this.props.rootStore.uiStore.customFormErrors.errors[index])
+            const errorObj = this.props.rootStore.uiStore.customFormErrors.errors[index];
+            const errorMsg = errorObj && errorObj.hasError ? errorObj.msg : null;
             const showLockButton = !this.props.rootStore.levelStore.tierIsDeletable(index+1);
             // console.log('dleetthis.props.rootStore.levelStore.chosenTierSet.length === 1 && tier.length === 0)
             const showDeleteButton =
@@ -165,12 +171,13 @@ export class EditableLevelTierList extends React.Component{
                 showLockButton={showLockButton}
                 deleteFunc={this.props.rootStore.levelStore.deleteCustomTier}
                 tierOrder={index}
+                errorMsg={errorMsg}
                 updateAction={this.props.rootStore.levelStore.updateCustomTier}
                 blurAction={this.props.rootStore.uiStore.validateCustomTiers}/>
         }) || null;
         // console.log('slick slice1', this.props.rootStore.levelStore.chosenTierSet.slice(-1))
         let isAddTierButtonDisabled =
-            this.props.rootStore.levelStore.chosenTierSet.slice(-1)[0].length === 0;
+            !this.props.rootStore.levelStore.tierTemplates[customKey]['tiers'].every( tierName => tierName.length > 0);
         const addTierButton = savedTiers.length > 5 ? null :
             <button
                 type="button"
@@ -184,7 +191,7 @@ export class EditableLevelTierList extends React.Component{
             <div className="leveltier-list__actions">
                 <button
                     className="leveltier-button btn btn-primary btn-block"
-                    // disabled={!this.props.rootStore.levelStore.templateIsSavable}
+                    disabled={isAddTierButtonDisabled}
                     onClick={this.props.rootStore.levelStore.applyTierSet}>
                     {/* #Translators: this refers to an imperative verb on a button ("Apply filters")*/}
                     {gettext("Apply")}

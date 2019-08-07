@@ -120,24 +120,6 @@ export class LevelStore {
     // delay is needed to prevent undefined value from being used for program_id that isn't set yet on first load.
     }, {delay: 50});
 
-    // Used to check if any names are blank or if there are duplicated names in the list
-    // @computed get templateIsSavable () {
-    //     let savable = true;
-    //     this.chosenTierSet.forEach( tierName => {
-    //         console.log('tiernamee', tierName);
-    //         const re = /^\s*$/;
-    //         if (tierName.length === 0 || re.test(tierName)){
-    //             savable = false;
-    //         }
-    //     });
-    //     const tierSetSet = new Set(this.chosenTierSet);
-    //     if (tierSetSet.size !== this.chosenTierSet.length){
-    //         savable = false;
-    //     }
-    //     console.log('is it savable', savable);
-    //     return savable;
-    // }
-
     @action
     changeTierSet(newTierSetKey) {
         console.log('cchanging ', newTierSetKey);
@@ -196,6 +178,9 @@ export class LevelStore {
     @action
     applyTierSet = (event) => {
         event.preventDefault();
+        this.rootStore.uiStore.validateCustomTiers();
+        if (this.rootStore.uiStore.customFormErrors.hasErrors) return;
+
         if (this.chosenTierSetKey === this.customTierSetKey){
             this.saveCustomTemplateToDB();
             this.useStaticTierList = true;
@@ -214,6 +199,8 @@ export class LevelStore {
     };
 
     saveCustomTemplateToDB = (addTier=false) => {
+        this.rootStore.uiStore.validateCustomTiers();
+        if (this.rootStore.uiStore.customFormErrors.hasErrors) return;
         let tiersToSave = [...this.tierTemplates[this.customTierSetKey]['tiers']];
         if (tiersToSave[0].length === 0) {
             tiersToSave = null
@@ -667,7 +654,7 @@ export class UIStore {
     };
 
     @action
-    validateCustomTiers = (tiers) => {
+    validateCustomTiers = () => {
         let hasErrors = false;
         const customKey = this.rootStore.levelStore.customTierSetKey;
         const tiersToTest = this.rootStore.levelStore.tierTemplates[customKey]['tiers'];
@@ -676,7 +663,7 @@ export class UIStore {
             let whitespaceError = false;
             let duplicates = 0;
             const regex = /^\s*$/;
-            if (regex.test(tierName)){
+            if (regex.test(tierName) && tierName.length > 0){
                 whitespaceError = true;
             }
             tiersToTest.forEach( otherTierName => {
@@ -688,15 +675,18 @@ export class UIStore {
             console.log('duplicates', duplicates)
             if (whitespaceError && duplicates > 1){
                 hasErrors = true;
-                return {hasError: true, msg: "Duplicate names and whitespace-only names not allowed."}
+                /* # Translators: This is a warning messages when a user has entered duplicate names for two different objects and those names contain only white spaces, both of which are not permitted. */
+                return {hasError: true, msg: gettext("Result levels must have unique names and contain at least one letter.")}
             }
             else if (whitespaceError && duplicates === 1){
                 hasErrors = true;
-                return {hasError: true, msg: "Whitespace-only names not allowed."}
+                /* # Translators: This is a warning messages when a user has entered a name that contains only white space. */
+                return {hasError: true, msg: gettext("Result levels must contain at least one letter.")}
             }
             else if (!whitespaceError && duplicates > 1){
                 hasErrors = true;
-                return {hasError: true, msg: "Duplicate names not allowed."}
+                /* # Translators: This is a warning messages when a user has entered duplicate names for two different objects */
+                return {hasError: true, msg: gettext("Result levels must have unique names.")}
             }
             else{
                 return {hasError: false, msg: ""}
