@@ -12,8 +12,8 @@ export class LevelStore {
     @observable levels = [];
     @observable indicators = [];
     @observable chosenTierSetKey = "";
-    @observable chosenTierSet = [];
     @observable useStaticTierList = "";
+    @observable tierTemplates = "";
     program_id;
     tierTemplates;
     programObjectives;
@@ -34,10 +34,11 @@ export class LevelStore {
         this.programObjectives = programObjectives;
         this.accessLevel = accessLevel;
         this.usingResultsFramework = usingResultsFramework;
+        this.origCustomTemplate = '';
 
         this.tierTemplates = JSON.parse(tierTemplates);
         this.tierTemplates[this.customTierSetKey] = {name: "Custom"};
-        this.tierTemplates[this.customTierSetKey]['tiers'] = customTemplates.names || [];
+        this.tierTemplates[this.customTierSetKey]['tiers'] = customTemplates.names || [""];
         console.log('tt', this.tierTemplates['custom']);
 
         // Set the stored tier set key and the values, if they exist.  Use the default if they don't.
@@ -45,28 +46,30 @@ export class LevelStore {
             const origLevelTiers = levelTiers.map( t => t.name)
             this.chosenTierSetKey = this.deriveTemplateKey(origLevelTiers);
             if (this.chosenTierSetKey == this.customTierSetKey) {
-                this.chosenTierSet = levelTiers.map(t => t.name);
-            }
-            else{
-                this.chosenTierSet = this.tierTemplates[this.chosenTierSetKey]['tiers']
+                this.origCustomTemplate = [...this.tierTemplates[this.customTierSetKey]['tiers']];
             }
         }
         else {
             this.chosenTierSetKey = this.defaultTemplateKey;
-            this.chosenTierSet = this.tierTemplates[this.chosenTierSetKey]['tiers'];
         }
 
-        if (this.chosenTierSetKey === this.customTierSetKey && this.levels.length === 0){
-            this.useStaticTierList = false;
-        }
-        else {
-            this.useStaticTierList = true;
-        }
+        this.useStaticTierList  =  !(this.chosenTierSetKey === this.customTierSetKey && this.levels.length === 0)
     }
 
     @computed get sortedLevels () {
         return this.levels.slice().sort((a, b) => {a.level_depth - b.level_depth || a.customsort - b.customsort})
     }
+
+    @computed get chosenTierSet () {
+        // if (this.chosenTierSetKey == this.customTierSetKey && this.tierTemplates[this.chosenTierSetKey]['tiers'].length === 0) {
+        //     return [""]
+        // }
+        // else {
+        //     return this.tierTemplates[this.chosenTierSetKey]['tiers'];
+        // }
+        return this.tierTemplates[this.chosenTierSetKey]['tiers'];
+    }
+
 
     @computed get levelProperties () {
         let levelProperties = {};
@@ -119,8 +122,9 @@ export class LevelStore {
     @computed get templateIsSavable () {
         let savable = true;
         this.chosenTierSet.forEach( tierName => {
-            console.log('tiernamee', tierName)
-            if (tierName.length === 0){
+            console.log('tiernamee', tierName);
+            const regex = /^\s*$/;
+            if (tierName.length === 0 || regex.test(tierName)){
                 savable = false;
             }
         });
@@ -136,50 +140,55 @@ export class LevelStore {
     changeTierSet(newTierSetKey) {
         console.log('cchanging ', newTierSetKey);
         this.chosenTierSetKey = newTierSetKey;
-        this.chosenTierSet = this.tierTemplates[newTierSetKey]['tiers'];
         console.log('ctskey, usestatic', this.chosenTierSetKey, this.useStaticTierList);
+        console.log('template, chosenset val in change', this.tierTemplates['custom']['tiers'], this.chosenTierSet.length)
         if (this.chosenTierSetKey === this.customTierSetKey) {
-            if (this.chosenTierSet.length === 0) {
-                this.chosenTierSet = ['']
-            }
             // The tier editor should load if there are no levels or if the only level is a new level and
             // the first tier has not been created yet.  Otherwise load the static tier display.
             console.log('levels in switch', this.levels);
-            this.useStaticTierList =  !((this.levels.length === 0 ||
+            this.useStaticTierList = !((this.levels.length === 0 ||
                 (this.levels.length === 1 && this.levels[0].id === "new" && this.chosenTierSet[0].length === 0)))
-
-
-
+            this.origCustomTemplate = [...this.tierTemplates[this.customTierSetKey]['tiers']]
         }
+        else {
+            this.rootStore.uiStore.setDisableCardActions(false);
+        }
+
         console.log('ctskey, usestatic', this.chosenTierSetKey, this.useStaticTierList);
         console.log('chosentierset is', toJS(this.chosenTierSet));
     }
 
     @action
     updateCustomTier = (event) => {
-
         console.log('cchanging event', this.chosenTierSet[event.target.dataset.tierorder]);
-        this.chosenTierSet[event.target.dataset.tierorder] = event.target.value;
-        this.tierTemplates[this.customTierSetKey]['tiers'] = this.chosenTierSet;
+        console.log('event val', event.target.value)
+        // this.chosenTierSet[event.target.dataset.tierorder] = event.target.value;
+        this.tierTemplates[this.customTierSetKey]['tiers'][event.target.dataset.tierorder] = event.target.value;
         console.log('newcustom', toJS(this.tierTemplates[this.customTierSetKey]['tiers']));
     };
 
     @action
     addCustomTier = () => {
-        this.chosenTierSet.push("")
+        this.saveCustomTemplateToDB(true);
     };
 
     @action
     deleteCustomTier = () => {
-
+        console.log('template and chosen', toJS(this.chosenTierSet), toJS(this.tierTemplates[this.customTierSetKey]['tiers']));
         if (this.chosenTierSet.length === 1){
-            this.chosenTierSet = [""]
+            console.log('resetting single tier')
+            // this.chosenTierSet = [""];
+            this.tierTemplates[this.customTierSetKey]['tiers'] = [""];
         }
         else{
-            this.chosenTierSet.pop()
-
+            console.log('lenchosen', toJS(this.chosenTierSet));
+            // this.chosenTierSet.pop();
+            console.log('lenchosen after', toJS(this.chosenTierSet));
+            this.tierTemplates[this.customTierSetKey]['tiers'].pop();
+            console.log('lenchosen after after ', toJS(this.chosenTierSet));
         }
-
+        console.log('template and chosen after', toJS(this.chosenTierSet), toJS(this.tierTemplates[this.customTierSetKey]['tiers']));
+        this.saveCustomTemplateToDB();
     };
 
     @action
@@ -202,28 +211,37 @@ export class LevelStore {
         this.rootStore.uiStore.setDisableCardActions(true)
     };
 
-    saveCustomTemplateToDB = () => {
-        const data = {program_id: this.program_id, tiers: this.chosenTierSet};
+    saveCustomTemplateToDB = (addTier=false) => {
+        let tiersToSave = [...this.tierTemplates[this.customTierSetKey]['tiers']];
+        if (tiersToSave[0].length === 0) {
+            tiersToSave = null
+        }
+
+        const data = {program_id: this.program_id, tiers: tiersToSave};
         console.log('datais', data);
-        api.post(`/save_custom_tiers/`, data)
+        api.post(`/save_custom_template/`, data)
             .then(response => {
-                success_notice({
-                    /* # Translators: Notification to user that the update they initiated was successful */
-                    message_text: gettext("Changes to the results framework template were saved."),
-                    addClass: 'program-page__rationale-form',
-                    stack: {
-                        dir1: 'up',
-                        dir2: 'right',
-                        firstpos1: 20,
-                        firstpos2: 20,
-                    }
-                })
+                console.log('should alert data,', data.tiers, 'orig', JSON.stringify(this.origCustomTemplate), JSON.stringify(data.tiers == this.origCustomTemplate))
+                if (JSON.stringify(data.tiers) != JSON.stringify(this.origCustomTemplate)) {
+                    success_notice({
+                        /* # Translators: Notification to user that the update they initiated was successful */
+                        message_text: gettext("Changes to the results framework template were saved."),
+                        addClass: 'program-page__rationale-form',
+                        stack: {
+                            dir1: 'up',
+                            dir2: 'right',
+                            firstpos1: 20,
+                            firstpos2: 20,
+                        }
+                    });
+                }
+                this.origCustomTemplate = data.tiers;
+                if (addTier) {
+                    this.chosenTierSet.push("");
+                }
 
             })
             .catch(error => console.log('error', error))
-
-
-
     };
 
     @action
