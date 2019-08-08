@@ -41,7 +41,6 @@ export class LevelStore {
         this.tierTemplates = JSON.parse(tierTemplates);
         this.tierTemplates[this.customTierSetKey] = {name: "Custom"};
         this.tierTemplates[this.customTierSetKey]['tiers'] = customTemplates.names || [""];
-        console.log('tt', this.tierTemplates['custom']);
 
         // Set the stored tier set key and the values, if they exist.  Use the default if they don't.
         if (levelTiers.length > 0) {
@@ -99,7 +98,6 @@ export class LevelStore {
     }
 
     @computed get chosenTierSetName () {
-        console.log('template is', this.chosenTierSetKey, this.tierTemplates[this.chosenTierSetKey]);
         return this.tierTemplates[this.chosenTierSetKey]['name'];
     }
 
@@ -122,14 +120,10 @@ export class LevelStore {
 
     @action
     changeTierSet(newTierSetKey) {
-        console.log('cchanging ', newTierSetKey);
         this.chosenTierSetKey = newTierSetKey;
-        console.log('ctskey, usestatic', this.chosenTierSetKey, this.useStaticTierList);
-        console.log('template, chosenset val in change', this.tierTemplates['custom']['tiers'], this.chosenTierSet.length)
         if (this.chosenTierSetKey === this.customTierSetKey) {
             // The tier editor should load if there are no levels or if the only level is a new level and
             // the first tier has not been created yet.  Otherwise load the static tier display.
-            console.log('levels in switch', this.levels);
             this.useStaticTierList = !((this.levels.length === 0 ||
                 (this.levels.length === 1 && this.levels[0].id === "new" && this.chosenTierSet[0].length === 0)))
             this.origCustomTemplate = [...this.tierTemplates[this.customTierSetKey]['tiers']]
@@ -137,18 +131,11 @@ export class LevelStore {
         else {
             this.rootStore.uiStore.setDisableCardActions(false);
         }
-
-        console.log('ctskey, usestatic', this.chosenTierSetKey, this.useStaticTierList);
-        console.log('chosentierset is', toJS(this.chosenTierSet));
     }
 
     @action
     updateCustomTier = (event) => {
-        console.log('cchanging event', this.chosenTierSet[event.target.dataset.tierorder]);
-        console.log('event val', event.target.value)
-        // this.chosenTierSet[event.target.dataset.tierorder] = event.target.value;
         this.tierTemplates[this.customTierSetKey]['tiers'][event.target.dataset.tierorder] = event.target.value;
-        console.log('newcustom', toJS(this.tierTemplates[this.customTierSetKey]['tiers']));
     };
 
     @action
@@ -158,33 +145,25 @@ export class LevelStore {
 
     @action
     deleteCustomTier = () => {
-        console.log('template and chosen', toJS(this.chosenTierSet), toJS(this.tierTemplates[this.customTierSetKey]['tiers']));
+
         if (this.chosenTierSet.length === 1){
-            console.log('resetting single tier')
-            // this.chosenTierSet = [""];
             this.tierTemplates[this.customTierSetKey]['tiers'] = [""];
         }
         else{
-            console.log('lenchosen', toJS(this.chosenTierSet));
-            // this.chosenTierSet.pop();
-            console.log('lenchosen after', toJS(this.chosenTierSet));
             this.tierTemplates[this.customTierSetKey]['tiers'].pop();
-            console.log('lenchosen after after ', toJS(this.chosenTierSet));
         }
-        console.log('template and chosen after', toJS(this.chosenTierSet), toJS(this.tierTemplates[this.customTierSetKey]['tiers']));
         this.saveCustomTemplateToDB();
     };
 
     @action
-    applyTierSet = (event) => {
-        event.preventDefault();
+    applyTierSet = (event=null) => {
+        if (event) event.preventDefault();
         this.rootStore.uiStore.validateCustomTiers();
         if (this.rootStore.uiStore.customFormErrors.hasErrors) return;
 
         if (this.chosenTierSetKey === this.customTierSetKey){
             this.saveCustomTemplateToDB();
             this.useStaticTierList = true;
-            // this.saveLevelTiersToDB();
         }
         if (this.levels.length === 0) {
             this.createFirstLevel();
@@ -207,10 +186,8 @@ export class LevelStore {
         }
 
         const data = {program_id: this.program_id, tiers: tiersToSave};
-        console.log('datais', data);
         api.post(`/save_custom_template/`, data)
             .then(response => {
-                console.log('should alert data,', data.tiers, 'orig', JSON.stringify(this.origCustomTemplate), JSON.stringify(data.tiers == this.origCustomTemplate))
                 if (JSON.stringify(data.tiers) != JSON.stringify(this.origCustomTemplate)) {
                     success_notice({
                         /* # Translators: Notification to user that the update they initiated was successful */
@@ -659,7 +636,6 @@ export class UIStore {
         const customKey = this.rootStore.levelStore.customTierSetKey;
         const tiersToTest = this.rootStore.levelStore.tierTemplates[customKey]['tiers'];
         let errors = tiersToTest.map( (tierName) => {
-            console.log('tiernamee', tierName);
             let whitespaceError = false;
             let duplicates = 0;
             const regex = /^\s*$/;
@@ -667,23 +643,16 @@ export class UIStore {
                 whitespaceError = true;
             }
             tiersToTest.forEach( otherTierName => {
-                console.log('other, tier,', otherTierName, tierName)
                 if (otherTierName == tierName){
                     duplicates += 1;
                 }
             });
-            console.log('duplicates', duplicates)
-            if (whitespaceError && duplicates > 1){
+            if (whitespaceError){
                 hasErrors = true;
                 /* # Translators: This is a warning messages when a user has entered duplicate names for two different objects and those names contain only white spaces, both of which are not permitted. */
-                return {hasError: true, msg: gettext("Result levels must have unique names and contain at least one letter.")}
+                return {hasError: true, msg: gettext("Please complete this field.")}
             }
-            else if (whitespaceError && duplicates === 1){
-                hasErrors = true;
-                /* # Translators: This is a warning messages when a user has entered a name that contains only white space. */
-                return {hasError: true, msg: gettext("Result levels must contain at least one letter.")}
-            }
-            else if (!whitespaceError && duplicates > 1){
+            else if (duplicates > 1){
                 hasErrors = true;
                 /* # Translators: This is a warning messages when a user has entered duplicate names for two different objects */
                 return {hasError: true, msg: gettext("Result levels must have unique names.")}
@@ -693,6 +662,5 @@ export class UIStore {
             }
         });
         this.customFormErrors = {hasErrors: hasErrors, errors: errors}
-        console.log('custom error set', toJS(this.customFormErrors));
     };
 }

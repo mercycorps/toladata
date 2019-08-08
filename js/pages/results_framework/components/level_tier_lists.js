@@ -73,7 +73,18 @@ export class StaticLevelTierList extends React.Component{
     }
 }
 
+@inject('rootStore')
 class EditableLevelTier extends React.Component {
+
+    onBlur = (event) => {
+        this.props.rootStore.uiStore.validateCustomTiers();
+        if (event.relatedTarget && event.relatedTarget.id == "applyButton"){
+            this.props.rootStore.levelStore.applyTierSet();
+        }
+        if (event.relatedTarget && event.relatedTarget.id == "addLevelButton"){
+            this.props.rootStore.levelStore.addCustomTier();
+        }
+    };
 
     render() {
         const divStyle = {
@@ -129,8 +140,8 @@ class EditableLevelTier extends React.Component {
                         maxLength={75}
                         data-tierorder={this.props.tierOrder}
                         value={this.props.tierName}
-                        onChange={this.props.updateAction}
-                        onBlur={this.props.blurAction} />
+                        onChange={this.props.rootStore.levelStore.updateCustomTier}
+                        onBlur={this.onBlur} />
                     {deleteButton}
                     {lockButton}
                 </div>
@@ -150,16 +161,18 @@ export class EditableLevelTierList extends React.Component{
             html: true
         });
     }
+
+
+
     render() {
 
         const customKey = this.props.rootStore.levelStore.customTierSetKey;
-        console.log('custom iin rdner', this.props.rootStore.levelStore.tierTemplates[customKey]['tiers'])
         const savedTiers  = this.props.rootStore.levelStore.chosenTierSet.map((tier, index) => {
-            console.log('errors', this.props.rootStore.uiStore.customFormErrors.errors[index])
-            const errorObj = this.props.rootStore.uiStore.customFormErrors.errors[index];
+
+            const errorObj = this.props.rootStore.uiStore.customFormErrors.errors.length > index ?
+                this.props.rootStore.uiStore.customFormErrors.errors[index] : null;
             const errorMsg = errorObj && errorObj.hasError ? errorObj.msg : null;
             const showLockButton = !this.props.rootStore.levelStore.tierIsDeletable(index+1);
-            // console.log('dleetthis.props.rootStore.levelStore.chosenTierSet.length === 1 && tier.length === 0)
             const showDeleteButton =
                 index === this.props.rootStore.levelStore.chosenTierSet.length - 1 &&
                 !showLockButton &&
@@ -171,15 +184,15 @@ export class EditableLevelTierList extends React.Component{
                 showLockButton={showLockButton}
                 deleteFunc={this.props.rootStore.levelStore.deleteCustomTier}
                 tierOrder={index}
-                errorMsg={errorMsg}
-                updateAction={this.props.rootStore.levelStore.updateCustomTier}
-                blurAction={this.props.rootStore.uiStore.validateCustomTiers}/>
+                errorMsg={errorMsg} />
         }) || null;
-        // console.log('slick slice1', this.props.rootStore.levelStore.chosenTierSet.slice(-1))
+
         let isAddTierButtonDisabled =
             !this.props.rootStore.levelStore.tierTemplates[customKey]['tiers'].every( tierName => tierName.length > 0);
+
         const addTierButton = savedTiers.length > 5 ? null :
             <button
+                id="addLevelButton"
                 type="button"
                 className="btn btn-link btn-add"
                 disabled={isAddTierButtonDisabled}
@@ -190,14 +203,14 @@ export class EditableLevelTierList extends React.Component{
         const apply_button =
             <div className="leveltier-list__actions">
                 <button
+                    id="applyButton"
                     className="leveltier-button btn btn-primary btn-block"
                     disabled={isAddTierButtonDisabled}
                     onClick={this.props.rootStore.levelStore.applyTierSet}>
                     {/* #Translators: this refers to an imperative verb on a button ("Apply filters")*/}
                     {gettext("Apply")}
                 </button>
-            </div>
-
+            </div>;
 
         return (
             <form>
@@ -223,24 +236,4 @@ const ChangeLogLink = ({programId}) => {
             <i className="fas fa-history" /> {gettext('Change log')}
         </a>
     </div>
-}
-
-export const LevelTierPicker = inject("rootStore")(observer(function (props) {
-    let tierListType = <StaticLevelTierList />;
-    if (this.props.rootStore.levelStore.chosenTierSetKey == this.props.rootStore.levelStore.customTierSetKey){
-        tierListType = <EditableLevelTierList />;
-    }
-
-    return (
-        <div id="leveltier-picker" className="leveltier-picker">
-            <div className="leveltier-picker__panel">
-                <Picker />
-                <StaticLevelTierList />
-            </div>
-
-            <ChangeLogLink programId={props.rootStore.levelStore.program_id} />
-        </div>
-        /*<div id="alerts2" style={{minHeight:"50px", minWidth:"50px", backgroundColor:"red"}}></div>*/
-
-    )
-}));
+};

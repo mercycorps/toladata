@@ -62,8 +62,6 @@ class ResultsFrameworkBuilder(ListView):
         translation.activate('en')
         untranslated_templates = json.dumps(LevelTier.get_templates(), cls=LazyEncoder)
         translation.activate(old_lang)
-        print 'custom_tiers', custom_tiers
-        print 'custom templates',  LevelTierTemplateSerializer(custom_tiers).data
         js_context = {
             'program': ResultsFrameworkProgramSerializer(program).data,
             'levels': LevelSerializer(levels, many=True).data,
@@ -287,7 +285,6 @@ def save_custom_template(request):
     role = request.user.tola_user.program_role(program.id)
     if request.user.is_anonymous or role != 'high':
         return HttpResponseRedirect('/')
-    print 'requestdata', request.data
     if not request.data['tiers']:
         LevelTierTemplate.objects.filter(program=program).delete()
         return JsonResponse({'message': 'update successful'}, status=200)
@@ -304,7 +301,6 @@ def save_custom_template(request):
             )
 
     except Exception as e:
-        print 'exception ', e
         logger.exception("Trouble in RF template paradise")
         return JsonResponse({'message': _('Your request could not be processed.')}, status=400)
 
@@ -317,7 +313,6 @@ def save_custom_tiers(request):
     role = request.user.tola_user.program_role(program.id)
     if request.user.is_anonymous or role != 'high':
         return HttpResponseRedirect('/')
-    print 'requestdata', request.data
     try:
         # Replace both the template and the program-associated level tiers, since there is only
         # one form and it does both.  May need to split this later if custom template creation and
@@ -332,7 +327,6 @@ def save_custom_tiers(request):
                     tier_depth=n+1,
                     name=template_tier
                 )
-            print 'json tier names ', type(request.data['tiers'])
             LevelTierTemplate.objects.create(
                 program=program,
                 names=request.data['tiers']
