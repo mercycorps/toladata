@@ -145,7 +145,8 @@ export class LevelStore {
 
     @action
     deleteCustomTier = () => {
-
+        this.rootStore.uiStore.validateCustomTiers();
+        if (this.rootStore.uiStore.customFormErrors.hasErrors) return;
         if (this.chosenTierSet.length === 1){
             this.tierTemplates[this.customTierSetKey]['tiers'] = [""];
         }

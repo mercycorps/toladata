@@ -38,14 +38,12 @@ export class StaticLevelTierList extends React.Component{
         let settings_button = null;
         if (this.props.rootStore.levelStore.chosenTierSetKey == this.props.rootStore.levelStore.customTierSetKey &&
             this.props.rootStore.levelStore.useStaticTierList) {
-            const style = {backgroundColor: "white", width: "100%", alignItems: "flex-end", textAlign: "right"}
             settings_button =
                 <button
-                        style={style}
-                        className="btn btn-link leveltier-list"
+                        className="btn btn-link leveltier-list leveltier--editable__settings"
                         onClick={this.props.rootStore.levelStore.editTierSet}>
                         {/* #Translators: this refers to an imperative verb on a button ("Apply filters")*/}
-                        <i className="fa fa-cog" />
+                    <i className="fa fa-cog" />
                     {gettext("Settings")}
                 </button>
 
@@ -87,26 +85,17 @@ class EditableLevelTier extends React.Component {
     };
 
     render() {
-        const divStyle = {
-            display: 'flex',
-            justifyContent: 'space-between',
-            marginBottom: ".5rem"
-        };
-        const labelStyle = {
-            marginBottom: ".25rem"
-        };
-
         let deleteButton = null;
         if (this.props.showDeleteButton){
             deleteButton =
                 <DeleteButton
                     buttonClasses='p-0'
                     type="button"
+                    disabled={this.props.rootStore.uiStore.customFormErrors.hasErrors}
                     action={(event) => this.props.deleteFunc(event)}/>
         }
 
         let lockButton = null;
-        const lockStyle = {color: "gray"};
         if (this.props.showLockButton){
             lockButton =
                 <button
@@ -119,23 +108,23 @@ class EditableLevelTier extends React.Component {
                     /* # Translators: This is the help text of an icon that indicates that this element can't be deleted */
                     data-content={gettext("This level is being used in the results framework")}
                 >
-                    <i style={lockStyle} className='fa fa-lock' />
+                    <i className='fa fa-lock text-muted' />
                 </button>
         }
 
         return (
             <React.Fragment>
                 <div>
-                    <label style={labelStyle}>
+                    <label className="leveltier--editable__label">
                         {
                             /* # Translators: This is one of several user modifiable fields, e.g. "Level 1", "Level 2", etc... Level 1 is the top of the hierarch, Level six is the bottom.*/
                              interpolate(gettext("Level %s"), [this.props.tierOrder + 1])
                         }
                     </label>
                 </div>
-                <div style={divStyle}>
+                <div className="leveltier--editable">
                     <input
-                        style={{width: "85%", paddingLeft: "5px", paddingRight: "5px"}}
+                        className="leveltier--editable__input"
                         type="text"
                         maxLength={75}
                         data-tierorder={this.props.tierOrder}
@@ -145,7 +134,7 @@ class EditableLevelTier extends React.Component {
                     {deleteButton}
                     {lockButton}
                 </div>
-                <span style={{display:"block", marginBottom: ".75rem"}} className='has-error'>{this.props.errorMsg}</span>
+                <span className='has-error'>{this.props.errorMsg}</span>
             </React.Fragment>
     )}
 }
@@ -189,7 +178,6 @@ export class EditableLevelTierList extends React.Component{
 
         let isAddTierButtonDisabled =
             !this.props.rootStore.levelStore.tierTemplates[customKey]['tiers'].every( tierName => tierName.length > 0);
-
         const addTierButton = savedTiers.length > 5 ? null :
             <button
                 id="addLevelButton"

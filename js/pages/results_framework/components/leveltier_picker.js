@@ -100,7 +100,5 @@ export const LevelTierPicker = inject("rootStore")(observer(function (props) {
 
             <ChangeLogLink programId={props.rootStore.levelStore.program_id} />
         </div>
-        /*<div id="alerts2" style={{minHeight:"50px", minWidth:"50px", backgroundColor:"red"}}></div>*/
-
     )
 }));
