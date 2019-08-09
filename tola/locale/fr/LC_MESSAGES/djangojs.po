@@ -116,7 +116,7 @@ msgstr "Aucun élément sélectionné"
 #. Translators: refers to grouping the report by the level of the indicator */
 #: js/components/selectWidgets.js:194 js/pages/program_page/models.js:252
 msgid "by Level"
-msgstr "par niveau"
+msgstr "par Niveau"
 
 #. Translators: menu for selecting how rows are grouped in a report */
 #: js/components/selectWidgets.js:200
