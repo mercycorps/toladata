@@ -2,11 +2,12 @@ import React from 'react';
 import { observer, inject } from "mobx-react"
 import { toJS } from 'mobx';
 import { library } from '@fortawesome/fontawesome-svg-core'
+import { faCaretDown, faCaretRight, faSitemap } from '@fortawesome/free-solid-svg-icons'
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome'
-import { faCaretDown, faCaretRight } from '@fortawesome/free-solid-svg-icons'
 import {LevelCardCollapsed, LevelCardExpanded} from "./level_cards";
+import {ExpandAllButton, CollapseAllButton} from "../../../components/actionButtons";
 
-library.add(faCaretDown, faCaretRight);
+library.add(faCaretDown, faCaretRight, faSitemap);
 
 @inject('rootStore')
 @observer
@@ -64,23 +65,32 @@ export class LevelListPanel  extends React.Component {
     };
 
     render() {
+        let expandoDiv = null;
+        if (this.props.rootStore.levelStore.levels.filter( l => l.id !== "new").length > 1){
+            expandoDiv =
+                <div className="level-list--expandos">
+                    <ExpandAllButton isDisabled={false} expandFunc={this.props.rootStore.uiStore.expandAllLevels} />
+                    <CollapseAllButton isDisabled={false} collapseFunc={this.props.rootStore.uiStore.collapseAllLevels} />
+                </div>
+        }
+        let panel = '';
         if (this.props.rootStore.levelStore.levels.length == 0) {
-            return (
+            panel =
                 <div className="level-list-panel">
                     <div className="level-list-panel__dingbat">
-                        <i className="fas fa-sitemap"></i>
+                        <FontAwesomeIcon icon='sitemap'/>
                     </div>
                     <div className="level-list-panel__text text-large"
-                        dangerouslySetInnerHTML={this.getWarningText()}/>
-
+                         dangerouslySetInnerHTML={this.getWarningText()}/>
                 </div>
-            )
+        } else {
+            panel =
+                <div id="level-list" style={{flexGrow: "2"}}>
+                    {expandoDiv}
+                    <LevelList renderList='initial'/>
+                </div>
         }
-        else {
-            return (
-                <div id="level-list" style={{flexGrow: "2"}}><LevelList renderList='initial'/></div>
-            )
-        }
+        return panel
     }
 }
 
