@@ -21,11 +21,11 @@ from django.contrib import admin
 from django.utils.functional import cached_property
 import django.template.defaultfilters
 
-
 from simple_history.models import HistoricalRecords
 from safedelete.models import SafeDeleteModel
 from safedelete.managers import SafeDeleteManager
 from safedelete.queryset import SafeDeleteQueryset
+from django_mysql.models import ListCharField
 
 from workflow.models import (
     Program, Sector, SiteProfile, ProjectAgreement, ProjectComplete, Country,
@@ -394,6 +394,29 @@ class LevelTier(models.Model):
             self.create_date = timezone.now()
         self.edit_date = timezone.now()
         super(LevelTier, self).save(*args, **kwargs)
+
+
+# Right now, these are only being used to store custom templates across sessions.  However, they could also
+# be used to store regular templates (i.e. instead of using an attribute of the LevelTier model).
+class LevelTierTemplate(models.Model):
+    # Translators:  A user can select from multiple templates for a particular piece of funtionality.  This is a label for the name of the template.
+    names = ListCharField(base_field=models.CharField(max_length=75), size=6, max_length=(7 * 70))
+    program = models.ForeignKey(Program, on_delete=models.CASCADE, related_name='level_tier_templates')
+    create_date = models.DateTimeField(_("Create date"), null=True, blank=True)
+    edit_date = models.DateTimeField(_("Edit date"), null=True, blank=True)
+
+    class Meta:
+        # Translators: Indicators are assigned to Levels.  Levels are organized in a hierarchy of Tiers.  There are several templates that users can choose from with different names for the Tiers.
+        verbose_name = _("Level tier templates")
+
+    def __unicode__(self):
+        return ",".join(self.names)
+
+    def save(self, *args, **kwargs):
+        if self.create_date is None:
+            self.create_date = timezone.now()
+        self.edit_date = timezone.now()
+        super(LevelTierTemplate, self).save(*args, **kwargs)
 
 
 class DisaggregationType(models.Model):

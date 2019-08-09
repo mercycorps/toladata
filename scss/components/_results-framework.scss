@@ -23,8 +23,16 @@
     padding: $grid-gutter-width/2;
 }
 
+.leveltier-list__apply-button {
+    background-color: white;
+    width: 100%;
+    align-items: flex-end;
+    text-align: right;
+}
+
 // component LevelTier
 .leveltier {
+    min-height: 2em;
     background-color: $gray-150;
     color: $gray-550;
     padding: $grid-gutter-width/4;
@@ -36,6 +44,31 @@
     .leveltier--level-#{$i} {
         margin-left: #{$grid-gutter-width/2 * $i}
     }
+}
+
+//editable custom tiers
+.leveltier--editable {
+    display: flex;
+    justify-content: space-between;
+    margin-bottom: .5rem;
+}
+
+.leveltier--editable__input {
+    width: 85%;
+    padding-left: 5px;
+    padding-right: 5px;
+}
+
+.leveltier--editable__label {
+    margin-bottom: .25rem;
+    margin-top: 1rem;
+}
+
+.leveltier--editable__settings {
+    backgroundColor: white;
+    width: 100%;
+    align-items: flex-end;
+    text-align: right;
 }
 
 // component LevelTierPicker

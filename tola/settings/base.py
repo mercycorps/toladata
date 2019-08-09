@@ -266,7 +266,8 @@ THIRD_PARTY_APPS = (
     #'user_language_middleware',
     'widget_tweaks',
     'webpack_loader',
-    'safedelete'
+    'safedelete',
+    'django_mysql'
 )
 
 # Apps specific for this project go here.

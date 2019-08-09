@@ -22,14 +22,14 @@ from rest_framework.decorators import api_view
 from rest_framework.response import Response
 
 from indicators.serializers import (
-    LevelTierSerializer, LevelSerializer, IndicatorSerializerMinimal, ProgramObjectiveSerializer)
+    LevelTierSerializer, LevelTierTemplateSerializer, LevelSerializer, IndicatorSerializerMinimal,
+    ProgramObjectiveSerializer)
 from workflow.serializers import ResultsFrameworkProgramSerializer
-from indicators.models import Level, LevelTier, Indicator
+from indicators.models import Level, LevelTier, LevelTierTemplate, Indicator
 from tola_management.models import ProgramAuditLog
 from workflow.models import Program
 
-
-logger = logging.getLogger('__name__')
+logger = logging.getLogger(__name__)
 
 # TODO: add security
 @method_decorator(login_required, name='dispatch')
@@ -47,6 +47,10 @@ class ResultsFrameworkBuilder(ListView):
             return HttpResponseRedirect('/')
 
         tiers = LevelTier.objects.filter(program=program)
+        try:
+            custom_tiers = LevelTierTemplate.objects.get(program=program)
+        except LevelTierTemplate.DoesNotExist:
+            custom_tiers = None
         levels = Level.objects.filter(program=program)
         # All indicators associated with the program should be passed to the front-end, not just the ones
         # associated with the rf levels.  The front-end uses the overall count to determine whether
@@ -58,7 +62,6 @@ class ResultsFrameworkBuilder(ListView):
         translation.activate('en')
         untranslated_templates = json.dumps(LevelTier.get_templates(), cls=LazyEncoder)
         translation.activate(old_lang)
-
         js_context = {
             'program': ResultsFrameworkProgramSerializer(program).data,
             'levels': LevelSerializer(levels, many=True).data,
@@ -66,6 +69,7 @@ class ResultsFrameworkBuilder(ListView):
             'levelTiers': LevelTierSerializer(tiers, many=True).data,
             'tierTemplates': translated_templates,
             'englishTemplates': untranslated_templates,
+            'customTemplates': LevelTierTemplateSerializer(custom_tiers).data,
             'programObjectives': ProgramObjectiveSerializer(program.objective_set.all(), many=True).data,
             'accessLevel': role,
             'usingResultsFramework': program.results_framework,
@@ -274,3 +278,77 @@ def indicator_list(request, program_id):
     indicators = Indicator.objects.filter(program=program, **filters)
 
     return JsonResponse(IndicatorSerializerMinimal(indicators, many=True).data, safe=False, status=200)
+
+@api_view(http_method_names=['POST'])
+def save_custom_template(request):
+    program = Program.objects.get(id=request.data['program_id'])
+    role = request.user.tola_user.program_role(program.id)
+    if request.user.is_anonymous or role != 'high':
+        return HttpResponseRedirect('/')
+    if not request.data['tiers']:
+        LevelTierTemplate.objects.filter(program=program).delete()
+        return JsonResponse({'message': 'update successful'}, status=200)
+
+    try:
+        # Replace both the template and the program-associated level tiers, since there is only
+        # one form and it does both.  May need to split this later if custom template creation and
+        # tierset saving is split.
+        with transaction.atomic():
+            LevelTierTemplate.objects.filter(program=program).delete()
+            LevelTierTemplate.objects.create(
+                program=program,
+                names=request.data['tiers']
+            )
+
+    except Exception as e:
+        logger.exception("Trouble in RF template paradise")
+        return JsonResponse({'message': _('Your request could not be processed.')}, status=400)
+
+    new_template = LevelTierTemplateSerializer(LevelTierTemplate.objects.filter(program=program), many=True)
+    return JsonResponse(new_template.data, safe=False)
+
+@api_view(http_method_names=['POST'])
+def save_custom_tiers(request):
+    program = Program.objects.get(id=request.data['program_id'])
+    role = request.user.tola_user.program_role(program.id)
+    if request.user.is_anonymous or role != 'high':
+        return HttpResponseRedirect('/')
+    try:
+        # Replace both the template and the program-associated level tiers, since there is only
+        # one form and it does both.  May need to split this later if custom template creation and
+        # tierset saving is split.
+        with transaction.atomic():
+            LevelTierTemplate.objects.filter(program=program).delete()
+            LevelTier.objects.filter(program=program).delete()
+
+            tier_count = len(request.data['tiers'])
+            if tier_count != len(set(request.data['tiers'])):
+                raise NotImplementedError(_("Result levels must have unique names."))
+
+            if Level.objects.filter(level_depth=tier_count) > 0:
+                raise NotImplementedError(_("This level is being used in the results framework."))
+
+            for n, template_tier in enumerate(request.data['tiers']):
+                if len(template_tier) == 0:
+                    # Translators:  This is a warning message when users have left an input field blank.
+                    raise NotImplementedError(_("Level names should not be blank"))
+
+                LevelTier.objects.create(
+                    program=program,
+                    tier_depth=n+1,
+                    name=template_tier
+                )
+            LevelTierTemplate.objects.create(
+                program=program,
+                names=request.data['tiers']
+            )
+
+    except NotImplementedError as e:
+        logger.exception("Trouble in RF Tier saving paradise")
+        return JsonResponse({'message': e.message}, status=400)
+    except Exception as e:
+        logger.exception("Trouble in RF Tier saving paradise")
+        return JsonResponse({'message': _('Your request could not be processed.')}, status=400)
+
+    new_template = LevelTierTemplateSerializer(LevelTierTemplate.objects.filter(program=program), many=True)
+    return JsonResponse(new_template.data, safe=False)
