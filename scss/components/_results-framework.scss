@@ -124,8 +124,12 @@
         margin-top: $grid-gutter-width;
     }
 }
-
-
+.level-list--expandos {
+    margin-bottom: 1rem;
+    button {
+        margin-right: 5px;
+    }
+}
 // # from level_cards.js
 .level-card {
     margin-bottom: $grid-gutter-width/2;

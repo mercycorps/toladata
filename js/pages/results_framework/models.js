@@ -353,13 +353,11 @@ export class LevelStore {
             // Don't need id, since it will be "new", and don't need rationale, since it's a new level.
             delete levelToSave.id;
             delete levelToSave.rationale;
-
             api.post(`/insert_new_level/`, levelToSave)
                 .then(response => {
                     runInAction(() => {
                         this.levels.replace(response.data['all_data'])
                     });
-
                     success_notice({
                         // # Translators: This is a confirmation message that confirms that change has been successfully saved to the DB.
                         message_text: interpolate(gettext("%s saved."), [level_label]),
@@ -624,6 +622,16 @@ export class UIStore {
         else {
             this.hasVisibleChildren.push(levelId);
         }
+    };
+
+    @action
+    expandAllLevels = () =>{
+        this.hasVisibleChildren = this.rootStore.levelStore.levels.map( level => level.id);
+    };
+
+    @action
+    collapseAllLevels = () =>{
+        this.hasVisibleChildren = [];
     };
 
     @action
