@@ -62,12 +62,6 @@ export class LevelStore {
     }
 
     @computed get chosenTierSet () {
-        // if (this.chosenTierSetKey == this.customTierSetKey && this.tierTemplates[this.chosenTierSetKey]['tiers'].length === 0) {
-        //     return [""]
-        // }
-        // else {
-        //     return this.tierTemplates[this.chosenTierSetKey]['tiers'];
-        // }
         return this.tierTemplates[this.chosenTierSetKey]['tiers'];
     }
 
@@ -189,6 +183,7 @@ export class LevelStore {
         const data = {program_id: this.program_id, tiers: tiersToSave};
         api.post(`/save_custom_template/`, data)
             .then(response => {
+                // Only notify of success if the tiers have changed.
                 if (JSON.stringify(data.tiers) != JSON.stringify(this.origCustomTemplate)) {
                     success_notice({
                         /* # Translators: Notification to user that the update they initiated was successful */
@@ -570,7 +565,7 @@ export class UIStore {
 
         return null;
     }
-    // TODO: Make sure old editing data is not preserved when an edit is cancelled
+
     @action
     editCard = (levelId) => {
         const cancelledLevelId = this.activeCard;
@@ -619,8 +614,8 @@ export class UIStore {
     };
 
     @action
-    updateVisibleChildren = (levelId, forceHide=false, forceShow=false) => {
-        // forceHide is to ensure that descendant levels are also made hidden, even if they are not actually visible.
+    updateVisibleChildren = (levelId, forceHide=false) => {
+        // forceHide is to ensure that descendant levels are also hidden.
         if (this.hasVisibleChildren.indexOf(levelId) >= 0 || forceHide) {
             this.hasVisibleChildren = this.hasVisibleChildren.filter( level_id => level_id != levelId );
             const childLevels = this.rootStore.levelStore.levels.filter( l => l.parent == levelId);
@@ -638,7 +633,7 @@ export class UIStore {
         const tiersToTest = this.rootStore.levelStore.tierTemplates[customKey]['tiers'];
         let errors = tiersToTest.map( (tierName) => {
             let whitespaceError = false;
-            let duplicates = 0;
+            let duplicates = 0; // There will be at least 1 for the self-match.
             const regex = /^\s*$/;
             if (regex.test(tierName) && tierName.length > 0){
                 whitespaceError = true;

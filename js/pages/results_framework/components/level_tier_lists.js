@@ -2,9 +2,6 @@ import React from 'react';
 import { observer, inject } from "mobx-react";
 import { toJS } from "mobx";
 
-import Select from 'react-select';
-import {FontAwesomeIcon} from "@fortawesome/react-fontawesome"
-
 import { DeleteButton } from "../../../components/actionButtons";
 
 
@@ -23,7 +20,8 @@ export class StaticLevelTierList extends React.Component{
 
     render() {
         let apply_button = null;
-        if (this.props.rootStore.levelStore.levels.length == 0) {
+        // Only show the Apply button if you haven't saved a level yet.
+        if (this.props.rootStore.levelStore.levels.length === 0) {
             apply_button =
                 <div className="leveltier-list__actions">
                     <button
@@ -36,13 +34,13 @@ export class StaticLevelTierList extends React.Component{
         }
 
         let settings_button = null;
+        // Only show the settings button if you've selected to customize the tiers and you are not actively editing the tiers.
         if (this.props.rootStore.levelStore.chosenTierSetKey == this.props.rootStore.levelStore.customTierSetKey &&
             this.props.rootStore.levelStore.useStaticTierList) {
             settings_button =
                 <button
                         className="btn btn-link leveltier-list leveltier--editable__settings"
                         onClick={this.props.rootStore.levelStore.editTierSet}>
-                        {/* #Translators: this refers to an imperative verb on a button ("Apply filters")*/}
                     <i className="fa fa-cog" />
                     {gettext("Settings")}
                 </button>
@@ -63,9 +61,6 @@ export class StaticLevelTierList extends React.Component{
                 </div>
                 {settings_button}
                 {apply_button}
-
-
-
             </React.Fragment>
         )
     }
@@ -75,12 +70,20 @@ export class StaticLevelTierList extends React.Component{
 class EditableLevelTier extends React.Component {
 
     onBlur = (event) => {
+        /*
+        When the onBlur event is triggered, if the user has fixed errors in the level tiers, React/MobX will redraw the elements
+        on the page.  When that onBlur event happens to be a button click (e.g. the Apply button), the onDraw redraw prevents the button's
+        onClick from firing.  This code is required to make sure buttons don't need to be clicked twice.
+         */
         this.props.rootStore.uiStore.validateCustomTiers();
-        if (event.relatedTarget && event.relatedTarget.id == "applyButton"){
+        if (event.relatedTarget && event.relatedTarget.id == "applyButton") {
             this.props.rootStore.levelStore.applyTierSet();
         }
-        if (event.relatedTarget && event.relatedTarget.id == "addLevelButton"){
+        if (event.relatedTarget && event.relatedTarget.id == "addLevelButton") {
             this.props.rootStore.levelStore.addCustomTier();
+        }
+        if (event.relatedTarget && event.relatedTarget.classList.contains("deletebtn")) {
+            this.props.rootStore.levelStore.deleteCustomTier(event);
         }
     };
 
@@ -92,7 +95,7 @@ class EditableLevelTier extends React.Component {
                     buttonClasses='p-0'
                     type="button"
                     disabled={this.props.rootStore.uiStore.customFormErrors.hasErrors}
-                    action={(event) => this.props.deleteFunc(event)}/>
+                    action={(event) => this.props.rootStore.levelStore.deleteCustomTier(event)}/>
         }
 
         let lockButton = null;
@@ -151,13 +154,12 @@ export class EditableLevelTierList extends React.Component{
         });
     }
 
-
-
     render() {
 
         const customKey = this.props.rootStore.levelStore.customTierSetKey;
-        const savedTiers  = this.props.rootStore.levelStore.chosenTierSet.map((tier, index) => {
 
+        // Loop through each custom tier and build the input field, error message, and delete/lock icon
+        const savedTiers  = this.props.rootStore.levelStore.chosenTierSet.map((tier, index) => {
             const errorObj = this.props.rootStore.uiStore.customFormErrors.errors.length > index ?
                 this.props.rootStore.uiStore.customFormErrors.errors[index] : null;
             const errorMsg = errorObj && errorObj.hasError ? errorObj.msg : null;
@@ -171,11 +173,11 @@ export class EditableLevelTierList extends React.Component{
                 tierName={tier}
                 showDeleteButton={showDeleteButton}
                 showLockButton={showLockButton}
-                deleteFunc={this.props.rootStore.levelStore.deleteCustomTier}
                 tierOrder={index}
                 errorMsg={errorMsg} />
         }) || null;
 
+        // At the bottom of the tier list, show the add level and apply buttons, if appropriate
         let isAddTierButtonDisabled =
             !this.props.rootStore.levelStore.tierTemplates[customKey]['tiers'].every( tierName => tierName.length > 0);
         const addTierButton = savedTiers.length > 5 ? null :
@@ -207,7 +209,6 @@ export class EditableLevelTierList extends React.Component{
                         {savedTiers}
                     </div>
                     {addTierButton}
-                    {/*{newTier}*/}
                 </div>
                 {apply_button}
 
@@ -215,13 +216,3 @@ export class EditableLevelTierList extends React.Component{
         )
     }
 }
-
-const ChangeLogLink = ({programId}) => {
-    const url = `/tola_management/audit_log/${programId}/`;
-
-    return <div className="leveltier-picker__change-log-link-box">
-        <a href={url} className="btn-link">
-            <i className="fas fa-history" /> {gettext('Change log')}
-        </a>
-    </div>
-};
