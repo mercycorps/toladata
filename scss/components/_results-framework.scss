@@ -18,17 +18,11 @@
     padding: $grid-gutter-width/2;
 }
 .leveltier-list__actions {
-    background: $gray-400;
+    background: $white;
     display: flex;
     padding: $grid-gutter-width/2;
 }
 
-.leveltier-list__apply-button {
-    background-color: white;
-    width: 100%;
-    align-items: flex-end;
-    text-align: right;
-}
 
 // component LevelTier
 .leveltier {
@@ -50,22 +44,17 @@
 .leveltier--editable {
     display: flex;
     justify-content: space-between;
-    margin-bottom: .5rem;
 }
 
 .leveltier--editable__input {
     width: 85%;
-    padding-left: 5px;
-    padding-right: 5px;
 }
 
 .leveltier--editable__label {
-    margin-bottom: .25rem;
-    margin-top: 1rem;
 }
 
 .leveltier--editable__settings {
-    backgroundColor: white;
+    background-color: $white;
     width: 100%;
     align-items: flex-end;
     text-align: right;
@@ -125,10 +114,7 @@
     }
 }
 .level-list--expandos {
-    margin-bottom: 1rem;
-    button {
-        margin-right: 5px;
-    }
+    margin-bottom: $grid-gutter-width;
 }
 // # from level_cards.js
 .level-card {

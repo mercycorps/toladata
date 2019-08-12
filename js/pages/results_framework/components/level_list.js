@@ -69,8 +69,10 @@ export class LevelListPanel  extends React.Component {
         if (this.props.rootStore.levelStore.levels.filter( l => l.id !== "new").length > 1){
             expandoDiv =
                 <div className="level-list--expandos">
-                    <ExpandAllButton isDisabled={false} expandFunc={this.props.rootStore.uiStore.expandAllLevels} />
-                    <CollapseAllButton isDisabled={false} collapseFunc={this.props.rootStore.uiStore.collapseAllLevels} />
+                    <div class="btn-group">
+                        <ExpandAllButton isDisabled={false} expandFunc={this.props.rootStore.uiStore.expandAllLevels} />
+                        <CollapseAllButton isDisabled={false} collapseFunc={this.props.rootStore.uiStore.collapseAllLevels} />
+                    </div>
                 </div>
         }
         let panel = '';
