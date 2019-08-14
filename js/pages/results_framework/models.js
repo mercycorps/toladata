@@ -134,6 +134,9 @@ export class LevelStore {
 
     @action
     addCustomTier = () => {
+        //jQuery used to prevent creating two new levels by smashing the Add Level button
+        $("#addLevelButton").prop("disabled", true);
+        this.rootStore.uiStore.setAddLevelButtonLockedStatus(true);
         this.saveCustomTemplateToDB(true);
     };
 
@@ -145,8 +148,6 @@ export class LevelStore {
             return false;
         }
 
-        this.rootStore.uiStore.validateCustomTiers();
-        if (this.rootStore.uiStore.customFormErrors.hasErrors) return;
         if (this.chosenTierSet.length === 1){
             this.tierTemplates[this.customTierSetKey]['tiers'] = [""];
         }
@@ -207,9 +208,15 @@ export class LevelStore {
                 if (addTier) {
                     this.chosenTierSet.push("");
                 }
+                $("#addLevelButton").removeProp("disabled")
+                this.rootStore.uiStore.setAddLevelButtonLockedStatus(false);
 
             })
-            .catch(error => console.log('error', error))
+            .catch(error => {
+                $("#addLevelButton").removeProp("disabled")
+                this.rootStore.uiStore.setAddLevelButtonLockedStatus(false);
+                console.log('error', error);
+            })
     };
 
     @action
@@ -545,6 +552,7 @@ export class UIStore {
     @observable hasVisibleChildren = [];
     @observable disableCardActions;
     @observable customFormErrors;
+    @observable addLevelButtonIsLocked;
     activeCardNeedsConfirm = "";
 
     constructor (rootStore) {
@@ -553,7 +561,8 @@ export class UIStore {
         this.activeCardNeedsConfirm = false;
         this.activeCard = null;
         this.disableCardActions = false;
-        this.customFormErrors = {hasErrors: false, errors: []}
+        this.customFormErrors = {hasErrors: false, errors: []};
+        this.addLevelButtonIsLocked = false;  //used to prevent creating two new levels by smashing the Add Level button
     }
 
     @computed get tierLockStatus () {
@@ -636,20 +645,22 @@ export class UIStore {
     };
 
     @action
-    collapseAllLevels = () =>{
-        this.hasVisibleChildren = [];
-    };
+    collapseAllLevels = () => this.hasVisibleChildren = [];
+
+    @action
+    setAddLevelButtonLockedStatus = (status) => this.addLevelButtonIsLocked = status;
 
     @action
     validateCustomTiers = () => {
         let hasErrors = false;
         const customKey = this.rootStore.levelStore.customTierSetKey;
         const tiersToTest = this.rootStore.levelStore.tierTemplates[customKey]['tiers'];
+        this.setAddLevelButtonLockedStatus(false);
         let errors = tiersToTest.map( (tierName) => {
             let whitespaceError = false;
             let duplicates = 0; // There will be at least 1 for the self-match.
             const regex = /^\s*$/;
-            if (regex.test(tierName) && tierName.length > 0){
+            if (tierName.length === 0 || (regex.test(tierName) && tierName.length > 0)){
                 whitespaceError = true;
             }
             tiersToTest.forEach( otherTierName => {
@@ -657,6 +668,7 @@ export class UIStore {
                     duplicates += 1;
                 }
             });
+            console.log('whitespace error val', whitespaceError)
             if (whitespaceError){
                 hasErrors = true;
                 /* # Translators: This is a warning messages when a user has entered duplicate names for two different objects and those names contain only white spaces, both of which are not permitted. */
@@ -668,7 +680,7 @@ export class UIStore {
                 return {hasError: true, msg: gettext("Result levels must have unique names.")}
             }
             else{
-                return {hasError: false, msg: ""}
+                return {hasError: false, msg: ""};
             }
         });
         this.customFormErrors = {hasErrors: hasErrors, errors: errors}

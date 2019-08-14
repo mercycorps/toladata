@@ -66,6 +66,7 @@ class Picker extends React.Component {
                         options={options}
                         value={selectedOption}
                         isDisabled={this.props.rootStore.uiStore.tierLockStatus == "locked" ? true : false}
+                        isSearchable={false}
                         onChange={this.handleChange}
                     />
                 </div>

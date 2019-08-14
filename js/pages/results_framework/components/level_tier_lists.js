@@ -74,16 +74,19 @@ class EditableLevelTier extends React.Component {
         When the onBlur event is triggered, if the user has fixed errors in the level tiers, React/MobX will redraw the elements
         on the page.  When that onBlur event happens to be a button click (e.g. the Apply button), the onDraw redraw prevents the button's
         onClick from firing.  This code is required to make sure buttons don't need to be clicked twice.
+        There is no need the delete call needs to be before the validate.
          */
-        this.props.rootStore.uiStore.validateCustomTiers();
-        if (event.relatedTarget && event.relatedTarget.id == "applyButton") {
-            this.props.rootStore.levelStore.applyTierSet();
-        }
-        if (event.relatedTarget && event.relatedTarget.id == "addLevelButton") {
-            this.props.rootStore.levelStore.addCustomTier();
-        }
         if (event.relatedTarget && event.relatedTarget.classList.contains("deletebtn")) {
             this.props.rootStore.levelStore.deleteCustomTier(event);
+        }
+        else {
+            this.props.rootStore.uiStore.validateCustomTiers();
+            if (event.relatedTarget && event.relatedTarget.id == "applyButton") {
+                this.props.rootStore.levelStore.applyTierSet();
+            }
+            if (event.relatedTarget && event.relatedTarget.id == "addLevelButton") {
+                this.props.rootStore.levelStore.addCustomTier();
+            }
         }
     };
 
@@ -179,7 +182,8 @@ export class EditableLevelTierList extends React.Component{
 
         // At the bottom of the tier list, show the add level and apply buttons, if appropriate
         let isAddTierButtonDisabled =
-            !this.props.rootStore.levelStore.tierTemplates[customKey]['tiers'].every( tierName => tierName.length > 0);
+            !this.props.rootStore.levelStore.tierTemplates[customKey]['tiers'].every( tierName => tierName.length > 0) ||
+            this.props.rootStore.uiStore.addLevelButtonIsLocked;
         const addTierButton = savedTiers.length > 5 ? null :
             <button
                 id="addLevelButton"
@@ -195,7 +199,6 @@ export class EditableLevelTierList extends React.Component{
                 <button
                     id="applyButton"
                     className="leveltier-button btn btn-primary btn-block"
-                    disabled={isAddTierButtonDisabled}
                     onClick={this.props.rootStore.levelStore.applyTierSet}>
                     {/* #Translators: this refers to an imperative verb on a button ("Apply filters")*/}
                     {gettext("Apply")}
