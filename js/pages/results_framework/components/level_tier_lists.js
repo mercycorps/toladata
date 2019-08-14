@@ -95,7 +95,7 @@ class EditableLevelTier extends React.Component {
                     buttonClasses='p-0'
                     type="button"
                     disabled={this.props.rootStore.uiStore.customFormErrors.hasErrors}
-                    action={(event) => this.props.rootStore.levelStore.deleteCustomTier(event)}/>
+                    action={this.props.rootStore.levelStore.deleteCustomTier}/>
         }
 
         let lockButton = null;

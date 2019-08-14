@@ -138,7 +138,13 @@ export class LevelStore {
     };
 
     @action
-    deleteCustomTier = () => {
+    deleteCustomTier = (event) => {
+        // This prevents the delete button getting triggered when the user tabs out of the text area
+        // Need to check if a) there was an interaction other than tab and b) if the action was a key press, was it an 'Enter' key?
+        if ((event.detail === 0 && !event.key) || (event.key && event.key != "Enter")) {
+            return false;
+        }
+
         this.rootStore.uiStore.validateCustomTiers();
         if (this.rootStore.uiStore.customFormErrors.hasErrors) return;
         if (this.chosenTierSet.length === 1){
