@@ -160,10 +160,12 @@ export class LevelStore {
     @action
     applyTierSet = (event=null) => {
         if (event) event.preventDefault();
-        this.rootStore.uiStore.validateCustomTiers();
-        if (this.rootStore.uiStore.customFormErrors.hasErrors) return;
+
+        this.saveLevelTiersToDB();
 
         if (this.chosenTierSetKey === this.customTierSetKey){
+            this.rootStore.uiStore.validateCustomTiers();
+            if (this.rootStore.uiStore.customFormErrors.hasErrors) return;
             this.saveCustomTemplateToDB({shouldAlert: true});
             this.useStaticTierList = true;
         }
@@ -365,7 +367,6 @@ export class LevelStore {
         const levelDataWasUpdated = this.rootStore.uiStore.activeCardNeedsConfirm;
         if (levelId == "new") {
             if (levelToSave.parent == "root") {
-                this.saveLevelTiersToDB();
                 $('#logframe_link').show();
             }
 
@@ -674,7 +675,6 @@ export class UIStore {
                     duplicates += 1;
                 }
             });
-            console.log('whitespace error val', whitespaceError)
             if (whitespaceError){
                 hasErrors = true;
                 /* # Translators: This is a warning messages when a user has entered duplicate names for two different objects and those names contain only white spaces, both of which are not permitted. */

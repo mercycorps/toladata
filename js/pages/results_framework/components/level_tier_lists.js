@@ -26,7 +26,7 @@ export class StaticLevelTierList extends React.Component{
                 <div className="leveltier-list__actions">
                     <button
                         className="leveltier-button btn btn-primary btn-block"
-                        onClick={this.props.rootStore.levelStore.createFirstLevel}>
+                        onClick={this.props.rootStore.levelStore.applyTierSet}>
                         {/* #Translators: this refers to an imperative verb on a button ("Apply filters")*/}
                         {gettext("Apply")}
                     </button>
