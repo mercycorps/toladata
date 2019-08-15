@@ -137,7 +137,7 @@ export class LevelStore {
         //jQuery used to prevent creating two new levels by smashing the Add Level button
         $("#addLevelButton").prop("disabled", true);
         this.rootStore.uiStore.setAddLevelButtonLockedStatus(true);
-        this.saveCustomTemplateToDB(true);
+        this.saveCustomTemplateToDB({addTier: true});
     };
 
     @action
@@ -154,7 +154,7 @@ export class LevelStore {
         else{
             this.tierTemplates[this.customTierSetKey]['tiers'].pop();
         }
-        this.saveCustomTemplateToDB();
+        this.saveCustomTemplateToDB({isDeleting: true});
     };
 
     @action
@@ -179,9 +179,13 @@ export class LevelStore {
         this.rootStore.uiStore.setDisableCardActions(true)
     };
 
-    saveCustomTemplateToDB = (addTier=false) => {
-        this.rootStore.uiStore.validateCustomTiers();
-        if (this.rootStore.uiStore.customFormErrors.hasErrors) return;
+    saveCustomTemplateToDB = (options) => {
+        var {addTier, isDeleting} = options;
+        if (!isDeleting) {
+            this.rootStore.uiStore.validateCustomTiers();
+            if (this.rootStore.uiStore.customFormErrors.hasErrors) return;
+        }
+
         let tiersToSave = [...this.tierTemplates[this.customTierSetKey]['tiers']];
         if (tiersToSave[0].length === 0) {
             tiersToSave = null
