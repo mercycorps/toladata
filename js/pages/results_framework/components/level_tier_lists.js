@@ -158,7 +158,8 @@ export class EditableLevelTierList extends React.Component{
     }
 
     render() {
-
+        // Need to undo the key smash protection we may have put on it during last submitl.
+        $("#addLevelButton").prop("disabled", false);
         const customKey = this.props.rootStore.levelStore.customTierSetKey;
 
         // Loop through each custom tier and build the input field, error message, and delete/lock icon
@@ -199,6 +200,7 @@ export class EditableLevelTierList extends React.Component{
                 <button
                     id="applyButton"
                     className="leveltier-button btn btn-primary btn-block"
+                    type="button"
                     onClick={this.props.rootStore.levelStore.applyTierSet}>
                     {/* #Translators: this refers to an imperative verb on a button ("Apply filters")*/}
                     {gettext("Apply")}

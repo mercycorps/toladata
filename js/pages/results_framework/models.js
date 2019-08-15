@@ -164,7 +164,7 @@ export class LevelStore {
         if (this.rootStore.uiStore.customFormErrors.hasErrors) return;
 
         if (this.chosenTierSetKey === this.customTierSetKey){
-            this.saveCustomTemplateToDB();
+            this.saveCustomTemplateToDB({shouldAlert: true});
             this.useStaticTierList = true;
         }
         if (this.levels.length === 0) {
@@ -179,8 +179,9 @@ export class LevelStore {
         this.rootStore.uiStore.setDisableCardActions(true)
     };
 
-    saveCustomTemplateToDB = (options) => {
-        var {addTier, isDeleting} = options;
+    saveCustomTemplateToDB = (options={}) => {
+        // TODO: Find a better way to handle options.  e.g. return a promise to the applyTierSet function and force it to do the alerting.
+        var {addTier, isDeleting, shouldAlert} = options;
         if (!isDeleting) {
             this.rootStore.uiStore.validateCustomTiers();
             if (this.rootStore.uiStore.customFormErrors.hasErrors) return;
@@ -195,7 +196,7 @@ export class LevelStore {
         api.post(`/save_custom_template/`, data)
             .then(response => {
                 // Only notify of success if the tiers have changed.
-                if (JSON.stringify(data.tiers) != JSON.stringify(this.origCustomTemplate)) {
+                if (JSON.stringify(data.tiers) != JSON.stringify(this.origCustomTemplate) && shouldAlert) {
                     success_notice({
                         /* # Translators: Notification to user that the update they initiated was successful */
                         message_text: gettext("Changes to the results framework template were saved."),
@@ -208,16 +209,17 @@ export class LevelStore {
                         }
                     });
                 }
-                this.origCustomTemplate = data.tiers;
+
+                if (shouldAlert) {
+                    this.origCustomTemplate = data.tiers;
+                }
                 if (addTier) {
                     this.chosenTierSet.push("");
                 }
-                $("#addLevelButton").removeProp("disabled")
                 this.rootStore.uiStore.setAddLevelButtonLockedStatus(false);
 
             })
             .catch(error => {
-                $("#addLevelButton").removeProp("disabled")
                 this.rootStore.uiStore.setAddLevelButtonLockedStatus(false);
                 console.log('error', error);
             })
