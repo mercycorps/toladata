@@ -664,15 +664,14 @@ export class UIStore {
         const tiersToTest = this.rootStore.levelStore.tierTemplates[customKey]['tiers'];
         this.setAddLevelButtonLockedStatus(false);
         let errors = tiersToTest.map( (tierName) => {
-            let whitespaceError = false;
-            let duplicates = 0; // There will be at least 1 for the self-match.
             const regex = /^\s*$/;
-            if (tierName.length === 0 || (regex.test(tierName) && tierName.length > 0)){
-                whitespaceError = true;
-            }
+            let whitespaceError = tierName.length === 0 || (regex.test(tierName) && tierName.length > 0)
+            let duplicateErrors = 0; // There will be at least 1 for the self-match.
+            let commaError = tierName.indexOf(",") !== -1;
+
             tiersToTest.forEach( otherTierName => {
                 if (otherTierName == tierName){
-                    duplicates += 1;
+                    duplicateErrors += 1;
                 }
             });
             if (whitespaceError){
@@ -680,9 +679,14 @@ export class UIStore {
                 /* # Translators: This is a warning messages when a user has entered duplicate names for two different objects and those names contain only white spaces, both of which are not permitted. */
                 return {hasError: true, msg: gettext("Please complete this field.")}
             }
-            else if (duplicates > 1){
+            else if (commaError){
                 hasErrors = true;
                 /* # Translators: This is a warning messages when a user has entered duplicate names for two different objects */
+                return {hasError: true, msg: gettext("Result levels should not contain commas.")}
+            }
+            else if (duplicateErrors > 1){
+                hasErrors = true;
+                /* # Translators: This is a warning messages when a user has a comma in a name that shouldn't contain commas */
                 return {hasError: true, msg: gettext("Result levels must have unique names.")}
             }
             else{
