@@ -163,10 +163,6 @@ class LevelViewSet (viewsets.ModelViewSet):
 
                 all_levels = Level.objects.filter(program=instance.program)
 
-                # Need to delete the leveltiers associated with the program when the last level is deleted.
-                if len(all_levels) == 0:
-                    for tier in LevelTier.objects.filter(program=program):
-                        tier.delete()
         except Exception as e:
             logger.error(e)
             return JsonResponse({'message': _('Your request could not be processed.')}, status=400)
@@ -222,12 +218,14 @@ def insert_new_level(request):
 
 @api_view(http_method_names=['POST'])
 def save_leveltiers(request):
+    print 'post data', request.data['tiers']
     program = Program.objects.get(id=request.data['program_id'])
     role = request.user.tola_user.program_role(program.id)
     if request.user.is_anonymous or role != 'high':
         return HttpResponseRedirect('/')
     try:
         with transaction.atomic():
+            LevelTier.objects.filter(program=program).delete()
             for n, tier in enumerate(request.data['tiers']):
                 tier_obj = LevelTier.objects.create(
                     program=program,
@@ -237,6 +235,7 @@ def save_leveltiers(request):
 
             tier_obj.save()
     except Exception as e:
+        print 'error is ', e
         logger.error(e)
         return JsonResponse({'message': _('Your request could not be processed.')}, status=400)
 
