@@ -120,27 +120,27 @@ class EditableLevelTier extends React.Component {
 
         return (
             <React.Fragment>
-                <div>
+                <div className="form-group">
                     <label className="leveltier--editable__label">
                         {
                             /* # Translators: This is one of several user modifiable fields, e.g. "Level 1", "Level 2", etc... Level 1 is the top of the hierarch, Level six is the bottom.*/
                              interpolate(gettext("Level %s"), [this.props.tierOrder + 1])
                         }
                     </label>
+                    <div className="leveltier--editable">
+                        <input
+                            className="leveltier--editable__input form-control"
+                            type="text"
+                            maxLength={75}
+                            data-tierorder={this.props.tierOrder}
+                            value={this.props.tierName}
+                            onChange={this.props.rootStore.levelStore.updateCustomTier}
+                            onBlur={this.onBlur} />
+                        {deleteButton}
+                        {lockButton}
+                    </div>
+                    <span className='has-error'>{this.props.errorMsg}</span>
                 </div>
-                <div className="leveltier--editable">
-                    <input
-                        className="leveltier--editable__input"
-                        type="text"
-                        maxLength={75}
-                        data-tierorder={this.props.tierOrder}
-                        value={this.props.tierName}
-                        onChange={this.props.rootStore.levelStore.updateCustomTier}
-                        onBlur={this.onBlur} />
-                    {deleteButton}
-                    {lockButton}
-                </div>
-                <span className='has-error'>{this.props.errorMsg}</span>
             </React.Fragment>
     )}
 }
@@ -210,7 +210,7 @@ export class EditableLevelTierList extends React.Component{
         return (
             <form>
                 <div id="leveltier-list" className="leveltier-list">
-                    <div className="form-group">
+                    <div className="">
                         {savedTiers}
                     </div>
                     {addTierButton}
