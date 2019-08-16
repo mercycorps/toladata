@@ -564,7 +564,7 @@ export class UIStore {
 
     constructor (rootStore) {
         this.rootStore = rootStore;
-        this.hasVisibleChildren = this.rootStore.levelStore.levels.map(l => l.id)
+        this.hasVisibleChildren = this.rootStore.levelStore.levels.map(l => l.id);
         this.activeCardNeedsConfirm = false;
         this.activeCard = null;
         this.disableCardActions = false;
@@ -584,6 +584,27 @@ export class UIStore {
         }
 
         return null;
+    }
+
+    // This calculation is used in to decide if the Expand All button on in the level list should be disabled or not.
+    // Need count all nodes excluding leaf nodes, which is the how many id's will be in the
+    // hasVisibleChildren count if a user manually expands all of the level cards.
+    @computed get isExpandAllDisabled () {
+        if (this.rootStore.levelStore.levels.length == 0){
+            return 0
+        }
+        else {
+            let parents = new Set(this.rootStore.levelStore.levels.map(level => level.parent));
+            parents = Array.from(parents).filter( p => p != null);
+            const sortedHasVisibleChildren = new Set([...this.hasVisibleChildren]);
+
+            for (var elem of parents) {
+                if (!sortedHasVisibleChildren.has(elem)) {
+                    return false;
+                }
+            }
+            return true;
+        }
     }
 
     @action
