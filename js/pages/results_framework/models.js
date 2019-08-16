@@ -134,30 +134,39 @@ export class LevelStore {
 
     @action
     addCustomTier = () => {
-        this.saveCustomTemplateToDB(true);
+        //jQuery used to prevent creating two new levels by smashing the Add Level button
+        $("#addLevelButton").prop("disabled", true);
+        this.rootStore.uiStore.setAddLevelButtonLockedStatus(true);
+        this.saveCustomTemplateToDB({addTier: true});
     };
 
     @action
-    deleteCustomTier = () => {
-        this.rootStore.uiStore.validateCustomTiers();
-        if (this.rootStore.uiStore.customFormErrors.hasErrors) return;
+    deleteCustomTier = (event) => {
+        // This prevents the delete button getting triggered when the user tabs out of the text area
+        // Need to check if a) there was an interaction other than tab and b) if the action was a key press, was it an 'Enter' key?
+        if ((event.detail === 0 && !event.key) || (event.key && event.key != "Enter")) {
+            return false;
+        }
+
         if (this.chosenTierSet.length === 1){
             this.tierTemplates[this.customTierSetKey]['tiers'] = [""];
         }
         else{
             this.tierTemplates[this.customTierSetKey]['tiers'].pop();
         }
-        this.saveCustomTemplateToDB();
+        this.saveCustomTemplateToDB({isDeleting: true});
     };
 
     @action
     applyTierSet = (event=null) => {
         if (event) event.preventDefault();
-        this.rootStore.uiStore.validateCustomTiers();
-        if (this.rootStore.uiStore.customFormErrors.hasErrors) return;
+
+        this.saveLevelTiersToDB();
 
         if (this.chosenTierSetKey === this.customTierSetKey){
-            this.saveCustomTemplateToDB();
+            this.rootStore.uiStore.validateCustomTiers();
+            if (this.rootStore.uiStore.customFormErrors.hasErrors) return;
+            this.saveCustomTemplateToDB({shouldAlert: true});
             this.useStaticTierList = true;
         }
         if (this.levels.length === 0) {
@@ -172,9 +181,14 @@ export class LevelStore {
         this.rootStore.uiStore.setDisableCardActions(true)
     };
 
-    saveCustomTemplateToDB = (addTier=false) => {
-        this.rootStore.uiStore.validateCustomTiers();
-        if (this.rootStore.uiStore.customFormErrors.hasErrors) return;
+    saveCustomTemplateToDB = (options={}) => {
+        // TODO: Find a better way to handle options.  e.g. return a promise to the applyTierSet function and force it to do the alerting.
+        var {addTier, isDeleting, shouldAlert} = options;
+        if (!isDeleting) {
+            this.rootStore.uiStore.validateCustomTiers();
+            if (this.rootStore.uiStore.customFormErrors.hasErrors) return;
+        }
+
         let tiersToSave = [...this.tierTemplates[this.customTierSetKey]['tiers']];
         if (tiersToSave[0].length === 0) {
             tiersToSave = null
@@ -184,7 +198,7 @@ export class LevelStore {
         api.post(`/save_custom_template/`, data)
             .then(response => {
                 // Only notify of success if the tiers have changed.
-                if (JSON.stringify(data.tiers) != JSON.stringify(this.origCustomTemplate)) {
+                if (JSON.stringify(data.tiers) != JSON.stringify(this.origCustomTemplate) && shouldAlert) {
                     success_notice({
                         /* # Translators: Notification to user that the update they initiated was successful */
                         message_text: gettext("Changes to the results framework template were saved."),
@@ -197,13 +211,20 @@ export class LevelStore {
                         }
                     });
                 }
-                this.origCustomTemplate = data.tiers;
+
+                if (shouldAlert) {
+                    this.origCustomTemplate = data.tiers;
+                }
                 if (addTier) {
                     this.chosenTierSet.push("");
                 }
+                this.rootStore.uiStore.setAddLevelButtonLockedStatus(false);
 
             })
-            .catch(error => console.log('error', error))
+            .catch(error => {
+                this.rootStore.uiStore.setAddLevelButtonLockedStatus(false);
+                console.log('error', error);
+            })
     };
 
     @action
@@ -346,7 +367,6 @@ export class LevelStore {
         const levelDataWasUpdated = this.rootStore.uiStore.activeCardNeedsConfirm;
         if (levelId == "new") {
             if (levelToSave.parent == "root") {
-                this.saveLevelTiersToDB();
                 $('#logframe_link').show();
             }
 
@@ -539,15 +559,17 @@ export class UIStore {
     @observable hasVisibleChildren = [];
     @observable disableCardActions;
     @observable customFormErrors;
+    @observable addLevelButtonIsLocked;
     activeCardNeedsConfirm = "";
 
     constructor (rootStore) {
         this.rootStore = rootStore;
-        this.hasVisibleChildren = this.rootStore.levelStore.levels.map(l => l.id)
+        this.hasVisibleChildren = this.rootStore.levelStore.levels.map(l => l.id);
         this.activeCardNeedsConfirm = false;
         this.activeCard = null;
         this.disableCardActions = false;
-        this.customFormErrors = {hasErrors: false, errors: []}
+        this.customFormErrors = {hasErrors: false, errors: []};
+        this.addLevelButtonIsLocked = false;  //used to prevent creating two new levels by smashing the Add Level button
     }
 
     @computed get tierLockStatus () {
@@ -562,6 +584,27 @@ export class UIStore {
         }
 
         return null;
+    }
+
+    // This calculation is used in to decide if the Expand All button on in the level list should be disabled or not.
+    // Need count all nodes excluding leaf nodes, which is the how many id's will be in the
+    // hasVisibleChildren count if a user manually expands all of the level cards.
+    @computed get isExpandAllDisabled () {
+        if (this.rootStore.levelStore.levels.length == 0){
+            return 0
+        }
+        else {
+            let parents = new Set(this.rootStore.levelStore.levels.map(level => level.parent));
+            parents = Array.from(parents).filter( p => p != null);
+            const sortedHasVisibleChildren = new Set([...this.hasVisibleChildren]);
+
+            for (var elem of parents) {
+                if (!sortedHasVisibleChildren.has(elem)) {
+                    return false;
+                }
+            }
+            return true;
+        }
     }
 
     @action
@@ -630,25 +673,26 @@ export class UIStore {
     };
 
     @action
-    collapseAllLevels = () =>{
-        this.hasVisibleChildren = [];
-    };
+    collapseAllLevels = () => this.hasVisibleChildren = [];
+
+    @action
+    setAddLevelButtonLockedStatus = (status) => this.addLevelButtonIsLocked = status;
 
     @action
     validateCustomTiers = () => {
         let hasErrors = false;
         const customKey = this.rootStore.levelStore.customTierSetKey;
         const tiersToTest = this.rootStore.levelStore.tierTemplates[customKey]['tiers'];
+        this.setAddLevelButtonLockedStatus(false);
         let errors = tiersToTest.map( (tierName) => {
-            let whitespaceError = false;
-            let duplicates = 0; // There will be at least 1 for the self-match.
             const regex = /^\s*$/;
-            if (regex.test(tierName) && tierName.length > 0){
-                whitespaceError = true;
-            }
+            let whitespaceError = tierName.length === 0 || (regex.test(tierName) && tierName.length > 0)
+            let duplicateErrors = 0; // There will be at least 1 for the self-match.
+            let commaError = tierName.indexOf(",") !== -1;
+
             tiersToTest.forEach( otherTierName => {
                 if (otherTierName == tierName){
-                    duplicates += 1;
+                    duplicateErrors += 1;
                 }
             });
             if (whitespaceError){
@@ -656,13 +700,18 @@ export class UIStore {
                 /* # Translators: This is a warning messages when a user has entered duplicate names for two different objects and those names contain only white spaces, both of which are not permitted. */
                 return {hasError: true, msg: gettext("Please complete this field.")}
             }
-            else if (duplicates > 1){
+            else if (commaError){
                 hasErrors = true;
                 /* # Translators: This is a warning messages when a user has entered duplicate names for two different objects */
+                return {hasError: true, msg: gettext("Result levels should not contain commas.")}
+            }
+            else if (duplicateErrors > 1){
+                hasErrors = true;
+                /* # Translators: This is a warning messages when a user has a comma in a name that shouldn't contain commas */
                 return {hasError: true, msg: gettext("Result levels must have unique names.")}
             }
             else{
-                return {hasError: false, msg: ""}
+                return {hasError: false, msg: ""};
             }
         });
         this.customFormErrors = {hasErrors: hasErrors, errors: errors}

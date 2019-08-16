@@ -65,13 +65,18 @@ export class LevelListPanel  extends React.Component {
     };
 
     render() {
+        const isCollapseAllDisabled = this.props.rootStore.uiStore.hasVisibleChildren.length === 0;
         let expandoDiv = null;
         if (this.props.rootStore.levelStore.levels.filter( l => l.id !== "new").length > 1){
             expandoDiv =
                 <div className="level-list--expandos">
                     <div class="btn-group">
-                        <ExpandAllButton isDisabled={false} expandFunc={this.props.rootStore.uiStore.expandAllLevels} />
-                        <CollapseAllButton isDisabled={false} collapseFunc={this.props.rootStore.uiStore.collapseAllLevels} />
+                        <ExpandAllButton
+                        isDisabled={this.props.rootStore.uiStore.isExpandAllDisabled}
+                        expandFunc={this.props.rootStore.uiStore.expandAllLevels} />
+                        <CollapseAllButton
+                        isDisabled={isCollapseAllDisabled}
+                        collapseFunc={this.props.rootStore.uiStore.collapseAllLevels} />
                     </div>
                 </div>
         }
