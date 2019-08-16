@@ -125,6 +125,9 @@ export class LevelStore {
         else {
             this.rootStore.uiStore.setDisableCardActions(false);
         }
+        if (this.levels.length > 0) {
+            this.saveLevelTiersToDB()
+        }
     }
 
     @action
