@@ -200,6 +200,7 @@ export class EditableLevelTierList extends React.Component{
                 <button
                     id="applyButton"
                     className="leveltier-button btn btn-primary btn-block"
+                    disabled={isAddTierButtonDisabled}
                     type="button"
                     onClick={this.props.rootStore.levelStore.applyTierSet}>
                     {/* #Translators: this refers to an imperative verb on a button ("Apply filters")*/}
