@@ -35,7 +35,6 @@ export class LevelStore {
         this.programObjectives = programObjectives;
         this.accessLevel = accessLevel;
         this.usingResultsFramework = usingResultsFramework;
-        this.origCustomTemplate = '';
         this.formErrors = {hasError: false};
 
         this.tierTemplates = JSON.parse(tierTemplates);
@@ -44,17 +43,14 @@ export class LevelStore {
 
         // Set the stored tier set key and the values, if they exist.  Use the default if they don't.
         if (levelTiers.length > 0) {
-            const origLevelTiers = levelTiers.map( t => t.name)
+            const origLevelTiers = levelTiers.map( t => t.name);
             this.chosenTierSetKey = this.deriveTemplateKey(origLevelTiers);
-            if (this.chosenTierSetKey == this.customTierSetKey) {
-                this.origCustomTemplate = [...this.tierTemplates[this.customTierSetKey]['tiers']];
-            }
         }
         else {
             this.chosenTierSetKey = this.defaultTemplateKey;
         }
 
-        this.useStaticTierList  =  !(this.chosenTierSetKey === this.customTierSetKey && this.levels.length === 0)
+        this.useStaticTierList  =  !(this.chosenTierSetKey === this.customTierSetKey && this.levels.length === 0);
     }
 
     @computed get sortedLevels () {
@@ -118,9 +114,11 @@ export class LevelStore {
         if (this.chosenTierSetKey === this.customTierSetKey) {
             // The tier editor should load if there are no levels or if the only level is a new level and
             // the first tier has not been created yet.  Otherwise load the static tier display.
-            this.useStaticTierList = !((this.levels.length === 0 ||
-                (this.levels.length === 1 && this.levels[0].id === "new" && this.chosenTierSet[0].length === 0)))
-            this.origCustomTemplate = [...this.tierTemplates[this.customTierSetKey]['tiers']]
+            this.useStaticTierList = !(this.levels.length === 0 ||
+                (this.levels.length === 1 && this.levels[0].id === "new" && this.chosenTierSet.length > 0 && this.chosenTierSet[0].length === 0));
+            if (this.tierTemplates[this.customTierSetKey]['tiers'].length === 0) {
+                this.tierTemplates[this.customTierSetKey]['tiers'] = [""]
+            }
         }
         else {
             this.rootStore.uiStore.setDisableCardActions(false);
@@ -162,6 +160,10 @@ export class LevelStore {
 
     @action
     applyTierSet = (event=null) => {
+        if (event) {
+            console.log('in apply related target, target, action', event.relatedTarget, event.target, event.action)
+        }
+        else console.log('in apply related target - no event')
         if (event) event.preventDefault();
 
         this.saveLevelTiersToDB();
@@ -191,7 +193,6 @@ export class LevelStore {
             this.rootStore.uiStore.validateCustomTiers();
             if (this.rootStore.uiStore.customFormErrors.hasErrors) return;
         }
-
         let tiersToSave = [...this.tierTemplates[this.customTierSetKey]['tiers']];
         if (tiersToSave[0].length === 0) {
             tiersToSave = null
@@ -201,7 +202,7 @@ export class LevelStore {
         api.post(`/save_custom_template/`, data)
             .then(response => {
                 // Only notify of success if the tiers have changed.
-                if (JSON.stringify(data.tiers) != JSON.stringify(this.origCustomTemplate) && shouldAlert) {
+                if (shouldAlert) {
                     success_notice({
                         /* # Translators: Notification to user that the update they initiated was successful */
                         message_text: gettext("Changes to the results framework template were saved."),
@@ -213,10 +214,6 @@ export class LevelStore {
                             firstpos2: 20,
                         }
                     });
-                }
-
-                if (shouldAlert) {
-                    this.origCustomTemplate = data.tiers;
                 }
                 if (addTier) {
                     this.chosenTierSet.push("");

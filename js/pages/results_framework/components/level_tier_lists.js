@@ -74,8 +74,10 @@ class EditableLevelTier extends React.Component {
         When the onBlur event is triggered, if the user has fixed errors in the level tiers, React/MobX will redraw the elements
         on the page.  When that onBlur event happens to be a button click (e.g. the Apply button), the onDraw redraw prevents the button's
         onClick from firing.  This code is required to make sure buttons don't need to be clicked twice.
-        There is no need the delete call needs to be before the validate.
+        If the user is deleting a level, that should be called before the validation is called.
          */
+        console.log('in blur, event.relatedTarget', event.relatedTarget)
+        console.log('in blur, event.action', event.action)
         if (event.relatedTarget && event.relatedTarget.classList.contains("deletebtn")) {
             this.props.rootStore.levelStore.deleteCustomTier(event);
         }
@@ -155,6 +157,7 @@ export class EditableLevelTierList extends React.Component{
         $('*[data-toggle="popover"]').popover({
             html: true
         });
+        $(".leveltier--editable__input:last-of-type").focus()
     }
 
     render() {
@@ -200,7 +203,8 @@ export class EditableLevelTierList extends React.Component{
                 <button
                     id="applyButton"
                     className="leveltier-button btn btn-primary btn-block"
-                    type="button"
+                    disabled={isAddTierButtonDisabled}
+                    // type="button"
                     onClick={this.props.rootStore.levelStore.applyTierSet}>
                     {/* #Translators: this refers to an imperative verb on a button ("Apply filters")*/}
                     {gettext("Apply")}
