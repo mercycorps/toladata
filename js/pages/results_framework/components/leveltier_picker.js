@@ -63,6 +63,7 @@ class Picker extends React.Component {
                   <div className="form-group">
                     <label>{gettext('Results framework template')}</label>&nbsp;<small>{helpIcon}</small>
                     <Select
+                        maxMenuHeight={350}
                         options={options}
                         value={selectedOption}
                         isDisabled={this.props.rootStore.uiStore.tierLockStatus == "locked" ? true : false}
