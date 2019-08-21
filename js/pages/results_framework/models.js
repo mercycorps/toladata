@@ -135,10 +135,9 @@ export class LevelStore {
 
     @action
     addCustomTier = () => {
-        //jQuery used to prevent creating two new levels by smashing the Add Level button
-        $("#addLevelButton").prop("disabled", true);
         this.rootStore.uiStore.setAddLevelButtonLockedStatus(true);
         this.saveCustomTemplateToDB({addTier: true});
+
     };
 
     @action
@@ -162,6 +161,9 @@ export class LevelStore {
     applyTierSet = (event=null) => {
         if (event) {
             event.preventDefault();
+        }
+        if (this.rootStore.uiStore.customFormErrors.hasErrors){
+            return false;
         }
 
         this.saveLevelTiersToDB();
@@ -214,7 +216,14 @@ export class LevelStore {
                     });
                 }
                 if (addTier) {
-                    this.chosenTierSet.push("");
+                    // Protect against "Add level" button smashing by checking if the last value of the tier set is an empty string.
+                    if (this.chosenTierSet.slice(-1) != "") {
+                        this.chosenTierSet.push("");
+                    }
+                    else{
+                        // TODO: remove else statement once QA is finished
+                        console.log('Avoided a problem.')
+                    }
                 }
                 this.rootStore.uiStore.setAddLevelButtonLockedStatus(false);
 

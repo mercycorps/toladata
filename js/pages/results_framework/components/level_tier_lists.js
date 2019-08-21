@@ -162,8 +162,6 @@ export class EditableLevelTierList extends React.Component{
     customTemplateFormSubmit = (event) => event.preventDefault();
 
     render() {
-        // Need to undo the key smash protection we may have put on it during last submitl.
-        $("#addLevelButton").prop("disabled", false);
         const customKey = this.props.rootStore.levelStore.customTierSetKey;
 
         // Loop through each custom tier and build the input field, error message, and delete/lock icon
