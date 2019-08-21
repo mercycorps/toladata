@@ -161,10 +161,8 @@ export class LevelStore {
     @action
     applyTierSet = (event=null) => {
         if (event) {
-            console.log('in apply related target, target, action', event.relatedTarget, event.target, event.action)
+            event.preventDefault();
         }
-        else console.log('in apply related target - no event')
-        if (event) event.preventDefault();
 
         this.saveLevelTiersToDB();
 

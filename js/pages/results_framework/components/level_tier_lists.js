@@ -76,8 +76,6 @@ class EditableLevelTier extends React.Component {
         onClick from firing.  This code is required to make sure buttons don't need to be clicked twice.
         If the user is deleting a level, that should be called before the validation is called.
          */
-        console.log('in blur, event.relatedTarget', event.relatedTarget)
-        console.log('in blur, event.action', event.action)
         if (event.relatedTarget && event.relatedTarget.classList.contains("deletebtn")) {
             this.props.rootStore.levelStore.deleteCustomTier(event);
         }
@@ -160,6 +158,9 @@ export class EditableLevelTierList extends React.Component{
         $(".leveltier--editable__input:last-of-type").focus()
     }
 
+    // Need this just to ensure that the implicit submit that takes place for single input forms is blocked
+    customTemplateFormSubmit = (event) => event.preventDefault();
+
     render() {
         // Need to undo the key smash protection we may have put on it during last submitl.
         $("#addLevelButton").prop("disabled", false);
@@ -204,7 +205,7 @@ export class EditableLevelTierList extends React.Component{
                     id="applyButton"
                     className="leveltier-button btn btn-primary btn-block"
                     disabled={isAddTierButtonDisabled}
-                    // type="button"
+                    type="button"
                     onClick={this.props.rootStore.levelStore.applyTierSet}>
                     {/* #Translators: this refers to an imperative verb on a button ("Apply filters")*/}
                     {gettext("Apply")}
@@ -212,7 +213,7 @@ export class EditableLevelTierList extends React.Component{
             </div>;
 
         return (
-            <form>
+            <form onSubmit={this.customTemplateFormSubmit}>
                 <div id="leveltier-list" className="leveltier-list">
                     <div className="">
                         {savedTiers}
