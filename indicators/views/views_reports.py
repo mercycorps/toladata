@@ -4,6 +4,7 @@
 import openpyxl
 from openpyxl import styles
 from workflow.models import Program
+from workflow.serializers_new import IPTTQSProgramSerializer
 from indicators.models import Indicator, PeriodicTarget, PinnedReport, Level, LevelTier
 from indicators.forms import PinnedReportForm
 from indicators.queries import IPTTIndicator
@@ -327,8 +328,10 @@ class IPTTQuickstart(LoginRequiredMixin, TemplateView):
     template_name = 'indicators/iptt_quickstart.html'
 
     def get(self, request, *args, **kwargs):
+        programs_data = IPTTQSProgramSerializer.load_for_user(request.user)
         js_context = {
-            'programs': get_program_filter_data(request),
+            #'programs': get_program_filter_data(request),
+            'programs': programs_data.data,
             'iptt_url': '/indicators/iptt_report/',
             'initial_selected_program_id': request.GET.get('program_id'),
         }
