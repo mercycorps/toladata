@@ -28,9 +28,10 @@ class MetricsIndicatorQuerySet(SafeDeleteQueryset, IndicatorSortingQSMixin):
         if 'months' in annotations or 'targets' in annotations:
             # 'months' is for unit testing,
             # 'targets' because program_months is a prerequisite for measuring all_targets_defined
-            qs = qs.annotate(program_months=indicator_get_program_months_annotation())
-        if 'targets' in annotations:
+            qs = qs.annotate(program_months=utils.indicator_get_program_months_annotation())
+        if 'targets' in annotations or 'reporting' in annotations or 'scope' in annotations:
             qs = qs.annotate(lop_target_calculated=utils.indicator_lop_target_calculated_annotation())
+        if 'targets' in annotations:
             # sets all_targets_defined to True/False based on business rules
             qs = qs.annotate(defined_targets=models.Count('periodictargets'))
             defined_targets_filter = indicator_get_defined_targets_filter()
@@ -46,10 +47,10 @@ class MetricsIndicatorQuerySet(SafeDeleteQueryset, IndicatorSortingQSMixin):
             )
         if 'results' in annotations:
             # result count = count of results associated with indicator:
-            qs = qs.annotate(results_count=indicator_results_count_annotation())
+            qs = qs.annotate(results_count=utils.indicator_results_count_annotation())
         if 'evidence' in annotations:
             # results with evidence count = count of results that have evidence associated
-            qs = qs.annotate(results_with_evidence_count=indicator_results_evidence_annotation())
+            qs = qs.annotate(results_with_evidence_count=utils.indicator_results_evidence_annotation())
         if 'reporting' in annotations or 'scope' in annotations:
             # reporting indicates whether indicator should be counted towards on-scope reporting
             # note: "reporting" alone is for testing, scope relies on these annotations as a prerequisite
@@ -152,13 +153,6 @@ class ResultsIndicator(Indicator):
     def results_without_targets(self):
         return self.result_set.filter(periodic_target=None)
 
-# utils:
-
-def indicator_get_program_months_annotation():
-    """annotates an indicator with the number of months in the associated program
-        this annotation is used by the defined_targets_filter"""
-    return utils.MonthsCount('program__reporting_period_end', 'program__reporting_period_start')
-
 
 def indicator_get_defined_targets_filter():
     """returns a set of filters that filter out indicators that do not have all defined targets
@@ -187,34 +181,6 @@ def indicator_get_defined_targets_filter():
         combined_filter |= filt
     return combined_filter
 
-
-def indicator_results_count_annotation():
-    """annotates an indicator queryset with the number of results associated with each indicator"""
-    return models.functions.Coalesce(
-        models.Subquery(
-            Result.objects.filter(
-                indicator=models.OuterRef('pk')
-                ).order_by().values('indicator').annotate(
-                    total_results=models.Count('id')
-                ).values('total_results')[:1],
-            output_field=models.IntegerField()
-        ), 0)
-
-
-def indicator_results_evidence_annotation():
-    """annotates an indicator queryset with the number of results associated with each indicator that have
-        either a Documentation or TolaTable as evidence"""
-    return models.functions.Coalesce(
-        models.Subquery(
-            Result.objects.filter(
-                indicator=models.OuterRef('pk')
-                ).exclude(
-                    evidence_url=''
-                ).order_by().values('indicator').annotate(
-                    total_results=models.Count('id')
-                ).values('total_results')[:1],
-            output_field=models.IntegerField()
-        ), 0)
 
 def indicator_is_complete_annotation():
     """annotates an indicator with a boolean is_complete:
