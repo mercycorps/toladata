@@ -13,4 +13,7 @@ from indicators.tests.serializer_tests import (
     TestProgramPageProgramSerializer,
     # endpoint tests (queries / related models):
     TestProgramPageEndpoint,
+    # IPTT QS tests:
+    TestIPTTQSProgramSerializer,
+    TestIPTTQSProgramSerializerTransactions
 )
