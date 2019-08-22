@@ -1,8 +1,8 @@
 import { observable, action, computed } from 'mobx';
 import React from 'react';
 import ReactDOM from 'react-dom';
-import getProgramStore from './ProgramPageProgram';
-import ProgramPageUIStore from './ProgramPageUIStore';
+import getProgramStore from './programPageProgram';
+import ProgramPageUIStore from './programPageUIStore';
 import { IndicatorFilterType } from '../../../constants';
 
 export default class ProgramPageRootStore {
