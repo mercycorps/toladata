@@ -483,7 +483,7 @@ class IndicatorUpdate(IndicatorFormMixin, UpdateView):
     def get_form_kwargs(self):
         kwargs = super(IndicatorUpdate, self).get_form_kwargs()
         kwargs['request'] = self.request
-        program = self.object.program
+        program = Program.rf_aware_objects.get(pk=self.object.program_id)
         kwargs['program'] = program
         return kwargs
 
@@ -1112,86 +1112,6 @@ def indicator_plan(request, program):
         'rows': rows,
         'ordering': ordering
     })
-
-
-
-@login_required
-def old_program_page(request, program_id, indicator_id, indicator_type_id):
-    """ redirect for old /program/<program_id>/<indicator_id>/<indicator_type_id>/ urls to new program page url"""
-    program = get_object_or_404(Program, pk=program_id)
-    if indicator_id != 0 or indicator_type_id != 0:
-        logger.warn('attempt to access program page with filters indicator id {0} and indicator type id {1}'.format(
-            indicator_id, indicator_type_id))
-    return redirect(program.program_page_url, permanent=True)
-
-
-@method_decorator(login_required, name='dispatch')
-@method_decorator(has_program_read_access, name='dispatch')
-class ProgramPage(ListView):
-    model = Indicator
-    template_name = 'indicators/program_page.html'
-
-    def get(self, request, *args, **kwargs):
-        # countries = request.user.tola_user.countries.all()
-        program_id = int(self.kwargs['program'])
-        if request.user.is_anonymous:
-            return HttpResponseRedirect('/')
-        unannotated_program = Program.objects.only(
-            'reporting_period_start', 'reporting_period_end',
-            'start_date', 'end_date', '_using_results_framework'
-            ).get(pk=program_id)
-        if unannotated_program.reporting_period_start is None or unannotated_program.reporting_period_end is None:
-            context = {
-                'program': unannotated_program,
-                'redirect_url': request.path
-            }
-            return render(
-                request, 'indicators/program_setup_incomplete.html', context
-                )
-        if unannotated_program.results_framework:
-            level_count = Level.objects.filter(program_id=program_id).count()
-            second_leveltier = LevelTier.objects.filter(program_id=program_id, tier_depth=2)
-            if level_count > 1 and second_leveltier.exists():
-                second_tier_name = second_leveltier.first().name
-            elif level_count > 1:
-                second_tier_name = _('Outcome')
-            else:
-                second_tier_name = None
-        else:
-            second_tier_name = None
-        program = ProgramWithMetrics.program_page.get(pk=program_id)
-        program.indicator_filters = {}
-
-        indicators = program.annotated_indicators\
-            .annotate(target_period_last_end_date=Max('periodictargets__end_date')).select_related('level')
-
-        site_count = len(program.get_sites())
-
-        pinned_reports = list(program.pinned_reports.filter(tola_user=request.user.tola_user)) + \
-                         [PinnedReport.default_report(program.id)]
-
-        readonly = not request.has_write_access
-
-        js_context = {
-            'delete_pinned_report_url': str(reverse_lazy('delete_pinned_report')),
-            'program': ProgramSerializer(program).data,
-            # Translators: This is a filtering option that allows users to select which Level Tier (hierarchy of levels) they want to look at
-            'result_chain_filter': _('by %(tier)s chain') % {'tier': _(second_tier_name)} if second_tier_name else False,
-            'indicators': IndicatorSerializer(indicators, many=True).data,
-            'indicator_on_scope_margin': Indicator.ONSCOPE_MARGIN,
-            'readonly': readonly,  # controls "Add indicator" link
-        }
-
-        #program.set_metrics(indicators)
-        c_data = {
-            'program': program,
-            'site_count': site_count,
-            'percent_complete': program.percent_complete,
-            'pinned_reports': pinned_reports,
-            'js_context': js_context,
-            "readonly": readonly  # controls "Add sites" link, and Program period modal
-        }
-        return render(request, self.template_name, c_data)
 
 
 class DisaggregationReportMixin(object):
