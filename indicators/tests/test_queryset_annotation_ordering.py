@@ -1,3 +1,4 @@
+import operator
 from factories.indicators_models import IndicatorFactory, LevelFactory
 from factories.workflow_models import RFProgramFactory
 from workflow.models import Program
@@ -5,6 +6,28 @@ from indicators.models import Indicator
 
 from django import test
 
+def unassigned_sort_func(indicator_set):
+    indicators = []
+    levels = sorted(
+        sorted(
+            list(set([indicator.level for indicator in [i for i in indicator_set if i.level_id is not None]])),
+            key=operator.attrgetter('customsort')
+            ),
+        key=operator.attrgetter('level_depth')
+    )
+    for level in levels:
+        indicators += sorted(
+            [i for i in indicator_set if i.level_id == level.id],
+            key=operator.attrgetter('level_order')
+        )
+    indicators += sorted(
+        sorted(
+            [i for i in indicator_set if i.level_id is None],
+            key=lambda i: (i.sort_number is None, i.sort_number)
+            ),
+        key=lambda i: (i.old_level_pk is None, i.old_level_pk)
+    )
+    return indicators
 
 class TestSoftDelete(test.TestCase):
     def test_soft_deleted_indicators_hidden(self):
@@ -25,12 +48,12 @@ class TestActivePrograms(test.TestCase):
         RFProgramFactory(pk=204, funding_status='Completed')
         RFProgramFactory(pk=205, funding_status='Approved')
         RFProgramFactory(pk=206, funding_status='Inactive')
-        programs = Program.objects.filter(pk__in=[200, 201, 202, 203, 204, 205, 206])
+        programs = Program.rf_aware_objects.filter(pk__in=[200, 201, 202, 203, 204, 205, 206])
         self.assertEqual(len(programs), 2)
 
 class TestRFLabeling(test.TestCase):
     def test_unmigrated_program(self):
-        program = Program.objects.get(pk=RFProgramFactory(migrated=False).pk)
+        program = Program.rf_aware_objects.get(pk=RFProgramFactory(migrated=False).pk)
         self.assertEqual(program.using_results_framework, False)
         indicator = Indicator.rf_aware_objects.get(pk=IndicatorFactory(program=program).pk)
         self.assertEqual(indicator.using_results_framework, False)
@@ -38,7 +61,7 @@ class TestRFLabeling(test.TestCase):
         self.assertEqual(program_indicator.using_results_framework, False)
 
     def test_migrated_program(self):
-        program = Program.objects.get(pk=RFProgramFactory(migrated=True).pk)
+        program = Program.rf_aware_objects.get(pk=RFProgramFactory(migrated=True).pk)
         self.assertEqual(program.using_results_framework, True)
         indicator = Indicator.rf_aware_objects.get(pk=IndicatorFactory(program=program).pk)
         self.assertEqual(indicator.using_results_framework, True)
@@ -46,86 +69,13 @@ class TestRFLabeling(test.TestCase):
         self.assertEqual(program_indicator.using_results_framework, True)
 
     def test_satsuma_program(self):
-        program = Program.objects.get(pk=RFProgramFactory(migrated=None).pk)
+        program = Program.rf_aware_objects.get(pk=RFProgramFactory(migrated=None).pk)
         self.assertEqual(program.using_results_framework, True)
         indicator = Indicator.rf_aware_objects.get(pk=IndicatorFactory(program=program).pk)
         self.assertEqual(indicator.using_results_framework, True)
         program_indicator = program.rf_aware_indicators.first()
         self.assertEqual(program_indicator.using_results_framework, True)
 
-class TestIndicatorOrdering(test.TestCase):
-    numbers = [
-        [
-            '1.1.1',
-            '1.1.1.1',
-            '1.1.1.2',
-            '1.1.2',
-            '2',
-            '2.1'
-        ]
-    ]
-
-    def test_unmigrated_program_levels_sort(self):
-        program = RFProgramFactory(migrated=False)
-        IndicatorFactory(
-            pk=300,
-            program=program,
-            old_level='Activity',
-            number='1'
-        )
-        IndicatorFactory(
-            pk=301,
-            program=program,
-            old_level='Outcome',
-            number='2'
-        )
-        IndicatorFactory(
-            pk=302,
-            program=program,
-            old_level=None,
-            number='2.1'
-        )
-        IndicatorFactory(
-            pk=303,
-            program=program,
-            old_level='Output',
-            number='3'
-        )
-
-        self.assertEqual(Indicator.rf_aware_objects.get(pk=300).old_level_pk, 6)
-        self.assertEqual(Indicator.rf_aware_objects.get(pk=302).old_level_pk, None)
-        indicators = Indicator.rf_aware_objects.filter(program=program)
-        self.assertEqual([i.pk for i in indicators], [301, 303, 300, 302])
-
-    def test_migrated_program_old_levels_sort(self):
-        program = RFProgramFactory(migrated=True, tiers=['Tier1', 'Tier2'], levels=1)
-        levels = program.levels.all()
-        IndicatorFactory(
-            pk=400,
-            program=program,
-            old_level='Activity'
-        )
-        IndicatorFactory(
-            pk=401,
-            program=program,
-            level=levels[1],
-            old_level='Impact'
-        )
-        IndicatorFactory(
-            pk=402,
-            program=program,
-            level=levels[1]
-        )
-        IndicatorFactory(
-            pk=403,
-            program=program,
-            old_level='Goal'
-        )
-        self.assertEqual(Indicator.rf_aware_objects.get(pk=400).old_level_pk, 6)
-        self.assertEqual(Indicator.rf_aware_objects.get(pk=401).old_level_pk, 0)
-        self.assertEqual(Indicator.rf_aware_objects.get(pk=402).old_level_pk, 0)
-        self.assertEqual(Indicator.rf_aware_objects.get(pk=403).old_level_pk, 1)
-        self.assertEqual([i.pk for i in Indicator.rf_aware_objects.filter(pk__in=[400, 403])], [403, 400])
 
 
 class TestIndicatorNumberLabeling(test.TestCase):
@@ -209,13 +159,13 @@ class TestIndicatorNumberSorting(test.TestCase):
         self.assertEqual(program.manual_numbering, True)
 
     def test_sorting_by_numbers_unmigrated(self):
-        program = Program.objects.get(pk=RFProgramFactory(migrated=False).pk)
+        program = Program.rf_aware_objects.get(pk=RFProgramFactory(migrated=False).pk)
         these_numbers = self.numbers[0]
         to_assign = these_numbers[0:]
         to_assign.reverse()
         for number in to_assign:
             IndicatorFactory(program=program, number=number)
-        indicators = Indicator.rf_aware_objects.filter(program=program).in_order()
+        indicators = unassigned_sort_func(Indicator.rf_aware_objects.filter(program=program))
         self.assertEqual([i.number for i in indicators], these_numbers)
 
     def test_sorting_by_level_order_migrated(self):
@@ -226,5 +176,5 @@ class TestIndicatorNumberSorting(test.TestCase):
         to_assign.reverse()
         for count, number in enumerate(to_assign):
             IndicatorFactory(program=program, number=number, level=level, level_order=count)
-        indicators = Indicator.rf_aware_objects.filter(program=program).in_order()
+        indicators = unassigned_sort_func(Indicator.rf_aware_objects.filter(program=program))
         self.assertEqual([i.number for i in indicators], to_assign)
