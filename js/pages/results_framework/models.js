@@ -150,10 +150,13 @@ export class LevelStore {
 
         if (this.chosenTierSet.length === 1){
             this.tierTemplates[this.customTierSetKey]['tiers'] = [""];
+            this.rootStore.uiStore.clearValidationMessages()
         }
         else{
             this.tierTemplates[this.customTierSetKey]['tiers'].pop();
+            this.rootStore.uiStore.validateCustomTiers()
         }
+
         this.saveCustomTemplateToDB({isDeleting: true});
     };
 
@@ -723,4 +726,9 @@ export class UIStore {
         });
         this.customFormErrors = {hasErrors: hasErrors, errors: errors}
     };
+
+    @action
+    clearValidationMessages = () => {
+        this.customFormErrors = {hasErrors: false, errors: []}
+    }
 }
