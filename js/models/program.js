@@ -1,24 +1,149 @@
-import { observable, computed } from "mobx";
-import { localDateFromISOString } from '../date_utils';
+import { observable, action, runInAction, extendObservable } from 'mobx';
+import api from '../apiv2';
+const _gettext = (typeof gettext !== 'undefined') ?  gettext : (s) => s;
 
-export default class BaseProgram {
-    @observable pk = null;
-    @observable name = null;
-    @observable start = null;
-    @observable end = null;
-    @observable resultsFramework = null;
-    @observable byOutcomeChain = null;
+/**
+ *  Base program constructor
+ *  JSON params:
+ *      pk (string|number)
+ *      name (string)
+ *      results_framework (boolean)
+ *      by_result_chain (string)
+ *  @return {Object}
+ */
 
-    constructor(programJSON) {
-        this.pk = parseInt(programJSON.pk);
-        this.name = programJSON.name;
-        this.start = localDateFromISOString(programJSON.reporting_period_start);
-        this.end = localDateFromISOString(programJSON.reporting_period_end);
-        this.resultsFramework = programJSON.results_framework;
-        this.byOutcomeChain = programJSON.rf_chain_sort_label || 'by Outcome chain';
+const bareProgram = (
+    programJSON = {}
+) => ({
+    pk: parseInt(programJSON.pk),
+    name: programJSON.name,
+    resultsFramework: Boolean(programJSON.results_framework),
+    _resultChainFilterLabel: programJSON.by_result_chain || _gettext("by Outcome chain"),
+    get resultChainFilterLabel() {
+        return this.resultsFramework ? this._resultChainFilterLabel : null
     }
-    
-    @computed get id() {
-        return this.pk;
-    }
+});
+
+export const getProgram = (
+    ...programConstructors
+) => ( programJSON = {} ) => [bareProgram, ...programConstructors].reduce(
+        (acc, fn) => extendObservable(acc, fn(programJSON)), {});
+
+/**
+ * Extends program with reporting date start/end processing
+ * JSON params:
+ *      reporting_period_start_iso (string - ISO date format e.g. "2018-01-14")
+ *      reporting_period_end_iso (string - ISO date format e.g. "2018-12-02")
+ */
+
+export const withReportingPeriod = (
+    programJSON = {}
+) => ({
+        reportingPeriodStart: new Date(programJSON.reporting_period_start_iso),
+        reportingPeriodEnd: new Date(programJSON.reporting_period_end_iso)
+    });
+
+/**
+ *  Extends program with program-wide indicator ordering (rf-aware)
+ *  JSON params:
+ *      indicator_pks_level_order ([int])
+ *      indicator_pks_chain_order ([int])
+ */
+
+export const withProgramLevelOrdering = (
+    programJSON = {}
+) => {
+    return {
+        _indicatorsLevelOrder: observable((programJSON.indicator_pks_level_order || [])),
+        _indicatorsChainOrder: observable((programJSON.indicator_pks_chain_order || [])),
+        _applyOrderUpdate(results) {
+            runInAction(() => {
+                this._indicatorsLevelOrder = results.indicator_pks_level_order || [];
+                this._indicatorsChainOrder = results.indicator_pks_chain_order || [];
+                Object.entries(results.indicators || {}).forEach(([pk, indicatorJSON]) => {
+                    if (!isNaN(parseInt(pk)) && this.indicators.has(parseInt(pk))) {
+                        this.indicators.get(parseInt(pk)).updateData(indicatorJSON);
+                    }
+                });
+                return results;
+            });
+        },
+        updateOrder() {
+            return api.programLevelOrdering(this.pk).then(this._applyOrderUpdate.bind(this));
+        },
+        get indicatorsInLevelOrder() {
+            return this._indicatorsLevelOrder.map(pk => this.indicators.get(pk));
+        },
+        get indicatorsInChainOrder() {
+            if (this.hasOwnProperty('resultsFramework') && this.resultsFramework === false) {
+                return this.indicatorsInLevelOrder;   
+            }
+            return this._indicatorsChainOrder.map(pk => this.indicators.get(pk));
+        }
+    };
+}
+
+
+/**
+ *  Extends program with level-by-level indicator ordering (rf-aware)
+ *  JSON params:
+ *      level_pks_level_order ([int])
+ *      level_pks_chain_order ([int])
+ *      indicator_pks_for_level ([{pk: int, indicator_pks; [int]}])
+ *      unassigned_indicator_pks ([int])
+ */
+
+export const withRFLevelOrdering = (
+    programJSON = {}
+) => {
+    return {
+        _levelsLevelOrder: observable((programJSON.level_pks_level_order || [])),
+        _levelsChainOrder: observable((programJSON.level_pks_chain_order || [])),
+        _unassignedIndicators: observable((programJSON.unassigned_indicator_pks || [])),
+        updateOrder() {
+            return api.rfLevelOrdering(this.pk).then(results => {
+                runInAction(() => {
+                    this._levelsLevelOrder = results.level_pks_level_order || [];
+                    this._levelsChainOrder = results.level_pks_chain_order || [];
+                    this._unassignedIndicators = results.unassigned_indicator_pks || [];
+                    this._updateLevelIndicatorsOrder(results.indicator_pks_for_level);
+                    return true;
+                });
+            });
+        },
+        get levelsInLevelOrder() {
+            return this._levelsLevelOrder.map(pk => this.levels.get(pk)) || [];
+        },
+        get levelsInChainOrder() {
+            if (this.hasOwnProperty('resultsFramework') && this.resultsFramework === false) {
+                return this.levelsInLevelOrder;   
+            }
+            return this._levelsChainOrder.map(pk => this.levels.get(pk)) || [];
+        },
+        get unassignedIndicators() {
+            return this._unassignedIndicators.map(pk => this.indicators.get(pk)) || [];
+        },
+        get indicatorsInLevelOrder() {
+            return Array.prototype.concat
+                .apply([], this.levelsInLevelOrder
+                                .map(level => level.indicatorOrder.map(pk => this.indicators.get(pk))))
+                .concat(this.unassignedIndicators);
+        },
+        get indicatorsInChainOrder() {
+            return Array.prototype.concat
+                .apply([], this.levelsInChainOrder
+                                .map(level => level.indicatorOrder.filter(pk => this.indicators.has(pk))
+                                                            .map(pk => this.indicators.get(pk))))
+                .concat(this.unassignedIndicators);
+        },
+        _updateLevelIndicatorsOrder(orderByLevel=[]) {
+            runInAction(() => {
+                orderByLevel.forEach(({pk, indicator_pks}) => {
+                    if (this.levels.get(pk)) {
+                        this.levels.get(pk).indicatorOrder = indicator_pks;
+                    }
+                });
+            });
+        }
+    };
 }
