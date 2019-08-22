@@ -510,13 +510,6 @@ class FundCodeAdmin(admin.ModelAdmin):
     display = 'Fund Code'
 
 
-class ActiveProgramsManager(models.Manager):
-    """manager to return only active programs - those with a status of 'funded' or 'Funded'"""
-    ACTIVE_FUNDING_STATUS = 'funded'
-    def get_queryset(self):
-        return super(ActiveProgramsManager, self).get_queryset().filter(
-            funding_status__iexact=self.ACTIVE_FUNDING_STATUS)
-
 class ActiveProgramsMixin(object):
     """eliminates all non active programs"""
     qs_name = 'ActivePrograms'
@@ -528,8 +521,8 @@ class ActiveProgramsMixin(object):
             funding_status__iexact='Funded'
         )
 
-class RFProgramMixin(object):
-    """annotates for a simple boolean indicating whether program is using the results framework"""
+class RFProgramsMixin(object):
+    """annotates for a simple boolean indicating whether program is using the results framework/auto-numbering"""
     qs_name = 'RFAware'
     annotate_methods = ['is_using_results_framework', 'is_manual_numbering']
 
@@ -547,11 +540,38 @@ class RFProgramMixin(object):
 
     def is_manual_numbering(self):
         return self.annotate(
-            manual_numbering=models.Case(
+            using_manual_numbering=models.Case(
                 models.When(
                     models.Q(
                         models.Q(using_results_framework=False) |
                         models.Q(auto_number_indicators=False)
+                    ),
+                    then=models.Value(True)
+                ),
+                default=models.Value(False),
+                output_field=models.BooleanField()
+            )
+        )
+
+class ProgramPageProgramsMixin(object):
+    """annotates a program for whether additional target periods are needed"""
+    qs_name = 'ProgramPage'
+    annotate_methods = ['needs_additional_target_periods']
+
+    def needs_additional_target_periods(self):
+        return self.annotate(
+            needs_additional_target_periods=models.Case(
+                models.When(
+                    reporting_period_end__gt=models.Subquery(
+                        Indicator.program_page_objects.filter(
+                            program=models.OuterRef('pk')
+                        ).annotate(
+                            newest_end_date=models.Subquery(
+                                PeriodicTarget.objects.filter(
+                                    indicator=models.OuterRef('pk')
+                                ).order_by('-end_date').values('end_date')[:1])
+                        ).order_by('newest_end_date').values('newest_end_date')[:1],
+                        output_field=models.DateField()
                     ),
                     then=models.Value(True)
                 ),
@@ -598,9 +618,13 @@ class Program(models.Model):
         default=RF_ALWAYS, blank=False
     )
 
-    old_objects = models.Manager()
-    objects = generate_queryset(ActiveProgramsMixin, RFProgramMixin).as_manager()
-    active_programs = ActiveProgramsManager()
+    objects = models.Manager()
+    rf_aware_objects = generate_queryset(ActiveProgramsMixin, RFProgramsMixin).as_manager()
+    program_page_objects = generate_queryset(
+        ActiveProgramsMixin,
+        RFProgramsMixin,
+        ProgramPageProgramsMixin
+    ).as_manager()
 
     class Meta:
         verbose_name = _("Program")
@@ -791,6 +815,12 @@ class Program(models.Model):
         if hasattr(self, 'using_results_framework'):
             return self.using_results_framework
         return self._using_results_framework != self.NOT_MIGRATED
+
+    @property
+    def manual_numbering(self):
+        if hasattr(self, 'using_manual_numbering'):
+            return self.using_manual_numbering
+        return not self.results_framework or not self.auto_number_indicators
 
 
 
