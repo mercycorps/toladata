@@ -2,10 +2,12 @@
 import datetime
 import operator
 from rest_framework import serializers
+from tola.l10n_utils import l10n_date_medium, l10n_date_long, l10n_monthname
 from workflow.models import Program, SiteProfile
 from indicators.models import Indicator, LevelTier, Level, Result
 from indicators.serializers_new import ProgramPageIndicatorSerializer, ProgramPageIndicatorUpdateSerializer
 from django.db import models
+from django.utils import timezone
 from django.utils.translation import ugettext as _
 
 
@@ -381,3 +383,67 @@ class ProgramPageUpdateSerializer(ProgramLevelOrderingProgramSerializer):
                     ),
                 many=True).data
             }
+
+class PeriodDateRangeSerializer(serializers.Serializer):
+    start_label = serializers.SerializerMethodField()
+    end_label = serializers.SerializerMethodField()
+    past = serializers.SerializerMethodField()
+
+    def get_start_label(self, period):
+        return l10n_date_medium(period['start'])
+
+    def get_end_label(self, period):
+        return l10n_date_medium(period['end'])
+
+    def get_past(self, period):
+        return period['start'] < timezone.now().date()
+
+
+class IPTTQSProgramSerializer(ProgramReportingPeriodSerializer):
+    frequencies = serializers.SerializerMethodField()
+    period_date_ranges = serializers.SerializerMethodField()
+
+    class Meta(ProgramReportingPeriodSerializer.Meta):
+        fields = [
+            'pk',
+            'name',
+            'start_date',
+            'end_date',
+            'reporting_period_start_iso',
+            'reporting_period_end_iso',
+            'has_started',
+            'frequencies',
+            'period_date_ranges'
+        ]
+
+    @classmethod
+    def load_for_user(cls, user):
+        return cls.load_for_pks(user.tola_user.available_programs.filter(
+            funding_status="Funded",
+            reporting_period_start__isnull=False, reporting_period_end__isnull=False
+        ).values_list('id', flat=True))
+
+    @classmethod
+    def load_for_pks(cls, pks):
+        programs = Program.rf_aware_objects.only(
+            'pk', 'name', 'reporting_period_start', 'reporting_period_end', 'start_date', 'end_date'
+        ).prefetch_related(
+            models.Prefetch(
+                'indicator_set',
+                queryset=Indicator.objects.order_by().select_related(None).prefetch_related(None).only(
+                    'pk', 'program_id', 'target_frequency'
+                ).filter(program_id__in=pks),
+                to_attr='prefetch_indicators'
+            )
+        ).filter(pk__in=pks)
+        return cls(programs, many=True)
+
+    def get_frequencies(self, program):
+        indicators = getattr(program, 'prefetch_indicators', program.indicator_set.all())
+        return sorted(set([i.target_frequency for i in indicators if i.target_frequency is not None]))
+
+    def get_period_date_ranges(self, program):
+        return {
+            frequency: PeriodDateRangeSerializer(list(program.get_periods_for_frequency(frequency)), many=True).data
+            for frequency, _ in Indicator.TARGET_FREQUENCIES if frequency != Indicator.EVENT
+        }
