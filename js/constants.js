@@ -50,3 +50,14 @@ export {getPeriodLabels};
 export const STATUS_CODES = {
     NO_INDICATOR_IN_UPDATE: 1
 };
+
+export const IndicatorFilterType = Object.freeze({
+    noFilter: 0,
+    missingTarget: 1,
+    missingResults: 2,
+    missingEvidence: 3,
+
+    aboveTarget: 5,
+    belowTarget: 6,
+    onTarget: 7,
+});

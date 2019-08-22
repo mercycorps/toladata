@@ -68,6 +68,7 @@ def get_next_date_monthly(_, date):
         return datetime.date(date.year + 1, date.month - 11, 1)
     return datetime.date(date.year, date.month + 1, 1)
 
+
 class TestAnnualNoncumulativeNumeric(test.TestCase):
     is_cumulative = False
     lop_target = 1500
@@ -139,6 +140,7 @@ class TestAnnualNoncumulativeNumeric(test.TestCase):
         for target, expected in zip(self.results_indicator.annotated_targets, self.complete):
             self.assertEqual(target.is_complete, expected)
 
+
 class TestAnnualCumulativeNumeric(TestAnnualNoncumulativeNumeric):
     is_cumulative = True
     lop_target = 200
@@ -154,6 +156,7 @@ class TestAnnualCumulativeNumeric(TestAnnualNoncumulativeNumeric):
     expected_results_values = [8, 33, 78, None]
     expected_percent_mets = [0.8, 1.65, 1.56, None]
     complete = [True, True, False, False, False]
+
 
 class TestMidEndPercent(test.TestCase):
     lop_target = 60
@@ -254,6 +257,7 @@ class TestMidEndPercent(test.TestCase):
         for target, expected in zip(self.results_indicator.annotated_targets, self.complete):
             self.assertEqual(target.is_complete, expected)
 
+
 class ScenarioBuilderMixin:
     program_dates = [datetime.date(2017, 6, 1), datetime.date(2020, 1, 31)]
     unit_of_measure_type = Indicator.NUMBER
@@ -262,7 +266,7 @@ class ScenarioBuilderMixin:
     is_cumulative = False
     target_values = []
     result_values = []
-    
+
     def do_setup(self):
         self.program = self.get_program()
         self.indicator = self.get_indicator()
@@ -340,9 +344,9 @@ class ResultsTestBase:
 
     def test_lop_values(self):
         self.assertEqual(self.expected_lop_target, self.results_indicator.lop_target_active)
-        self.assertEqual(self.expected_lop_target, self.results_indicator.lop_target_active)
         self.assertEqual(self.expected_lop_actual, self.results_indicator.lop_actual)
         self.assertAlmostEqual(self.expected_lop_percent_met, self.results_indicator.lop_percent_met, 2)
+
 
 class TestMonthlyDecreaseCumulative(test.TestCase, ResultsTestBase, ScenarioBuilderMixin):
     """built to deal with a weird failing edge case"""

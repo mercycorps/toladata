@@ -1,4 +1,4 @@
-{% load i18n %}
+{% load i18n l10n %}
 {% load widget_tweaks %}
 {% load mytags %}
 
@@ -67,7 +67,7 @@
                                     type="number"
                                     id="pt-{{ pt.id }}"
                                     name="{{ pt.period }}"
-                                    value="{{ pt.target|floatformat:"-2"}}"
+                                    value="{{ pt.target|trailingzero }}"
                                     {% if readonly %}disabled="disabled"{% endif %}
                                     data-periodictarget="pt"
                                     data-start-date="{{pt.start_date|convert2dateobject|date:"MEDIUM_DATE_FORMAT"|default:''}}"

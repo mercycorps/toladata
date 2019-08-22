@@ -4,7 +4,7 @@
 {% block title %}{{ program.name }} | {% endblock %}
 {% block page_title %}{{ program.name }}{% endblock %}
 {% block header_extras %}
-    {% program_complete readonly %}
+    {% program_complete_program_page readonly %}
 {% endblock %}
 
 {% block content %}
@@ -22,19 +22,19 @@
         <section class="sidebar__detail">
             <h3>{% trans "Program details" %}</h3>
             <ul class="list-unstyled">
-                {% if program.levels.first %}{# show RF link for all users, if RF is already built #}
+                {% if program.has_levels %}{# show RF link for all users, if RF is already built #}
                 {# Translators: a link to the results framework #}
-                <li><a href="{% url 'results_framework_builder' program.id %}"><i class="fas fa-sitemap"></i> {% trans "Results framework" %}</a></li>
+                <li><a href="{% url 'results_framework_builder' program.pk %}"><i class="fas fa-sitemap"></i> {% trans "Results framework" %}</a></li>
                     {% if program.results_framework %} {# Only show Logframe if they have also switched to RF level indicator grouping #}
                         {# Translators: a link to the logistical framework model #}
-                        <li><a href="{% url 'logframe' program.id %}"><i class="fas fa-table"></i> {% trans "Logframe" %}</a></li>
+                        <li><a href="{% url 'logframe' program.pk %}"><i class="fas fa-table"></i> {% trans "Logframe" %}</a></li>
                     {% endif %}
                 {% elif not readonly %}{# otherwise prompt high-level users to create RF #}
                 {# Translators: a prompt to create the results framework #}
-                <li><a href="{% url 'results_framework_builder' program.id %}"><i class="fas fa-sitemap"></i> {% trans "Create results framework" %}</a></li>
+                <li><a href="{% url 'results_framework_builder' program.pk %}"><i class="fas fa-sitemap"></i> {% trans "Create results framework" %}</a></li>
                 {% endif %}
-                <li><a href="{% url 'tola_management_audit_log' program_id=program.id %}"><i class="fas fa-history"></i> {% trans "Change log" %}</a> </li>
-                <li><a href="{% url 'indicator_plan' program.id %}"><i class="fas fa-th"></i> {% trans "Indicator plan" %}</a></li>
+                <li><a href="{% url 'tola_management_audit_log' program_id=program.pk %}"><i class="fas fa-history"></i> {% trans "Change log" %}</a> </li>
+                <li><a href="{% url 'indicator_plan' program.pk %}"><i class="fas fa-th"></i> {% trans "Indicator plan" %}</a></li>
             {% if program.gait_url %}
                 {% comment %}Translators: GAIT is the Grant and Award Information Tracker system used by MercyCorps {% endcomment %}
                 <li><a href="{{ program.gait_url }}">{% trans "View program in GAIT" %}</a></li>
@@ -44,8 +44,8 @@
         <section class="sidebar__detail">
             <h3>{% trans "Sites" %}</h3>
             <ul class="list-unstyled">
-                {% if site_count > 0 %}
-                    <li><a href="{% url 'siteprofile_list' program.id 0 %}">{% trans "View program sites" %}</a></li>
+                {% if program.site_count > 0 %}
+                    <li><a href="{% url 'siteprofile_list' program.pk 0 %}">{% trans "View program sites" %}</a></li>
                 {% else %}
                     <li class="text-muted">{% trans "There are no program sites." %}</li>
                 {% endif %}
@@ -74,7 +74,7 @@
                     </li>
                     {% endfor %}
                     <li class="pt-2">
-                        <a href="{% url 'iptt_quickstart' %}?program_id={{ program.id }}" class="btn-link text-success"><i class="fas fa-plus-circle"></i> {% trans "Create an IPTT report" %}</a>
+                        <a href="{% url 'iptt_quickstart' %}?program_id={{ program.pk }}" class="btn-link text-success"><i class="fas fa-plus-circle"></i> {% trans "Create an IPTT report" %}</a>
                     </li>
                 </ul>
             {% else %}
@@ -94,7 +94,12 @@
 
 {% block extra_js_in_body %}
     <script>
-        let jsContext = {{ js_context|js }};
+        const reactContext = {
+            programJSON: {{ program|js }},
+            deletePinnedReportURL: {{ delete_pinned_report_url|js }},
+            onScopeMargin: {{ indicator_on_scope_margin|js }},
+            readOnly: {{ readOnly|js }}
+        };
     </script>
 
     {% render_bundle 'program_page' %}

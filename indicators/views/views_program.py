@@ -1,15 +1,26 @@
 from operator import itemgetter
+import logging
 import openpyxl
 from django.contrib.auth.decorators import login_required
 from django.utils.translation import ugettext
 from django.http import HttpResponse, JsonResponse
-from django.shortcuts import render
+from django.shortcuts import render, reverse, redirect, get_object_or_404
 
 from indicators.queries import ProgramWithMetrics
-from indicators.xls_export_utils import TAN, apply_title_styling, apply_label_styling, update_borders
+from indicators.xls_export_utils import TAN, apply_title_styling, apply_label_styling
+from indicators.models import Indicator, PinnedReport
+from workflow.models import Program
 from workflow.serializers import LogframeProgramSerializer
-from tola_management.permissions import has_program_read_access
+from workflow.serializers_new import ProgramPageProgramSerializer, ProgramPageUpdateSerializer
 
+from tola_management.permissions import (
+    has_program_read_access,
+    indicator_pk_adapter,
+    has_indicator_read_access
+)
+
+
+logger = logging.getLogger(__name__)
 
 TITLE_FONT = openpyxl.styles.Font(size=18)
 HEADER_FONT = openpyxl.styles.Font(bold=True)
@@ -202,4 +213,81 @@ def programs_rollup_export(request):
             'indicators_reporting_above_target': p.scope_counts['high'],
             } for count, p in enumerate(annotated_programs)
         }
+    return JsonResponse(data)
+
+
+# API views:
+
+@login_required
+@has_program_read_access
+def program_page(request, program):
+    """Program Page Template view - returns the program page template with JSON populated for React logic"""
+    # redirect to home if program isn't active or doesn't exist:
+    try:
+        program = Program.rf_aware_objects.only(
+            'reporting_period_start', 'reporting_period_end'
+        ).get(pk=int(program))
+    except (Program.DoesNotExist, ValueError):
+        return redirect('/')
+    # redirect to setup page if reporting period isn't complete:
+    if any([program.reporting_period_start is None, program.reporting_period_end is None]):
+        return render(
+            request,
+            'indicators/program_setup_incomplete.html',
+            {'program': program, 'redirect_url': request.path}
+        )
+    context = {
+        'program': ProgramPageProgramSerializer.get_for_pk(program.pk).data,
+        'pinned_reports': list(PinnedReport.objects.filter(
+            program_id=program.pk, tola_user=request.user.tola_user
+            )) + [PinnedReport.default_report(program.pk)],
+        'delete_pinned_report_url': reverse('delete_pinned_report'),
+        'indicator_on_scope_margin': Indicator.ONSCOPE_MARGIN,
+        'readonly': not request.has_write_access,
+    }
+    return render(request, 'indicators/program_page.html', context)
+
+
+@login_required
+def old_program_page(request, program_id, indicator_id, indicator_type_id):
+    """Redirects old /program/<program_id>/<indicator_id>/<indicator_type_id>/ urls to new program page url"""
+    program = get_object_or_404(Program, pk=program_id)
+    if indicator_id != 0 or indicator_type_id != 0:
+        logger.warn('attempt to access program page with filters indicator id {0} and indicator type id {1}'.format(
+            indicator_id, indicator_type_id))
+    return redirect(program.program_page_url, permanent=True)
+
+
+@login_required
+@has_program_read_access
+def api_program_ordering(request, program):
+    """Returns program-wide RF-aware ordering (used after indicator deletion on program page)"""
+    try:
+        data = ProgramPageUpdateSerializer.update_ordering(program).data
+    except Program.DoesNotExist:
+        logger.warn('attempt to access program page ordering for bad pk {}'.format(program))
+        return JsonResponse({'success': False, 'msg': 'bad Program PK'})
+    return JsonResponse(data)
+
+
+@login_required
+@indicator_pk_adapter(has_indicator_read_access)
+def api_program_page_indicator(request, pk, program):
+    """Returns single indicator updated JSON and ordering information for program page)"""
+    try:
+        data = ProgramPageUpdateSerializer.update_indicator_pk(program, pk).data
+    except Program.DoesNotExist, Indicator.DoesNotExist:
+        logger.warn('attempt to access indicator update for bad pk {}'.format(pk))
+        return JsonResponse({'success': False, 'msg': 'bad Indicator PK'})
+    return JsonResponse(data)
+
+@login_required
+@has_program_read_access
+def api_program_page(request, program):
+    """Returns program JSON to hydrate Program Page react models"""
+    try:
+        data = ProgramPageProgramSerializer.get_for_pk(program).data
+    except Program.DoesNotExist:
+        logger.warn('attempt to access program page ordering for bad pk {}'.format(program))
+        return JsonResponse({'success': False, 'msg': 'bad Program PK'})
     return JsonResponse(data)

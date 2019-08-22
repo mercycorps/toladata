@@ -1,4 +1,5 @@
 # -*- coding: utf-8 -*-
+import re
 import collections
 import string
 import uuid
@@ -6,7 +7,6 @@ from datetime import timedelta, date
 from decimal import Decimal
 
 import dateparser
-from dateutil.relativedelta import relativedelta
 from django.core.validators import MinValueValidator
 from django.core.exceptions import ValidationError
 from django.db import models
@@ -14,9 +14,10 @@ from django.db.models import signals
 from django.dispatch import receiver
 from django.http import QueryDict
 from django.urls import reverse
-from django.utils import formats, timezone, functional
+from django.utils import formats, timezone
 from django.utils.translation import ugettext_lazy as _
-from tola.l10n_utils import l10n_date_year_month, l10n_date_medium
+from tola.l10n_utils import l10n_date_medium
+from tola.model_utils import generate_safedelete_queryset
 from django.contrib import admin
 from django.utils.functional import cached_property
 import django.template.defaultfilters
@@ -585,6 +586,7 @@ class DoubleDecimalSplit(models.Func):
         expressions = models.F(string), models.Value('.'), count
         super(DoubleDecimalSplit, self).__init__(*expressions)
 
+
 class IndicatorSortingQSMixin(object):
     """This provides a temporary relief to indicator number sorting issues in advance of Satsuma -
     uses regex matches to determine if the number is of the format "1.1" or "1.1.1" etc. and sorts it then by
@@ -734,6 +736,136 @@ class IndicatorManager(SafeDeleteManager, IndicatorSortingManagerMixin):
         return queryset.select_related('program', 'sector')
 
 
+class IndicatorRFMixin(object):
+    qs_name = 'RFAware'
+    annotate_methods = ['is_program_using_results_framework', 'is_using_manual_numbering']
+
+    def is_program_using_results_framework(self):
+        return self.annotate(
+            using_results_framework=models.Case(
+                models.When(
+                    program___using_results_framework=Program.NOT_MIGRATED,
+                    then=models.Value(False)
+                ),
+                default=models.Value(True),
+                output_field=models.BooleanField()
+            )
+        )
+
+    def is_using_manual_numbering(self):
+        return self.annotate(
+            manual_number_display=models.Case(
+                models.When(
+                    using_results_framework=False,
+                    then=models.Value(True)
+                ),
+                models.When(
+                    program__auto_number_indicators=False,
+                    then=models.Value(True)
+                ),
+                default=models.Value(False),
+                output_field=models.BooleanField()
+            )
+        )
+
+class IndicatorLevelsMixin(object):
+    qs_name = 'LevelAware'
+    annotate_methods = ['annotate_old_level']
+    ordering_methods = ['order_by_old_level']
+
+    def annotate_old_level(self):
+        old_level_whens = [
+            models.When(
+                models.Q(
+                    models.Q(using_results_framework=True) &
+                    models.Q(level_id__isnull=False)
+                ),
+                then=models.Value(0)
+            )
+        ] + [
+            models.When(
+                old_level=level_name,
+                then=level_pk
+            ) for (level_pk, level_name) in Indicator.OLD_LEVELS
+        ] + [
+            models.When(
+                old_level__isnull=True,
+                then=None
+            ),
+        ]
+        return self.annotate(
+            old_level_pk=models.Case(
+                *old_level_whens,
+                default=None,
+                output_field=models.IntegerField()
+            )
+        )
+
+    def order_by_old_level(self):
+        return self.order_by(models.F('old_level_pk').asc(nulls_last=True))
+
+
+class IndicatorTargetsMixin(object):
+    qs_name = 'TargetAware'
+    annotate_methods = ['annotate_lop_target', 'annotate_most_recent_complete']
+
+    def annotate_lop_target(self):
+        from indicators.queries import utils as query_utils
+        return self.annotate(
+            lop_target_calculated=query_utils.indicator_lop_target_calculated_annotation()
+        )
+
+    def annotate_most_recent_complete(self):
+        return self.annotate(
+            most_recent_completed_target_end_date=models.Subquery(
+                PeriodicTarget.objects.filter(
+                    indicator=models.OuterRef('pk'),
+                    end_date__lte=date.today()
+                ).order_by('-end_date').values('end_date')[:1],
+                output_field=models.DateField()
+            ),
+            target_period_last_end_date=models.Subquery(
+                PeriodicTarget.objects.filter(
+                    indicator=models.OuterRef('pk')
+                ).order_by('-end_date').values('end_date')[:1],
+                output_field=models.DateField()
+            ),
+        )
+
+class IndicatorMetricsMixin(object):
+    qs_name = 'MetricsAnnotated'
+    annotate_methods = ['annotate_reporting', 'annotate_scope', 'annotate_counts', 'annotate_metrics']
+
+    def annotate_reporting(self):
+        from indicators.queries import utils as query_utils
+        return self.annotate(
+            lop_actual_progress=query_utils.indicator_lop_actual_progress_annotation(),
+            lop_target_progress=query_utils.indicator_lop_target_progress_annotation(),
+            reporting=query_utils.indicator_reporting_annotation()
+        )
+
+    def annotate_scope(self):
+        from indicators.queries import utils as query_utils
+        return self.annotate(
+            lop_percent_met_progress=query_utils.indicator_lop_percent_met_progress_annotation(),
+            over_under=query_utils.indicator_over_under_annotation()
+        )
+
+    def annotate_counts(self):
+        from indicators.queries import utils as query_utils
+        return self.annotate(
+            program_months=query_utils.indicator_get_program_months_annotation(),
+            defined_targets=models.Count('periodictargets'),
+            results_count=query_utils.indicator_results_count_annotation(),
+            results_with_evidence_count=query_utils.indicator_results_evidence_annotation(),
+        )
+
+    def annotate_metrics(self):
+        from indicators.queries import utils as query_utils
+        return self.annotate(
+            has_all_targets_defined=query_utils.indicator_all_targets_defined_annotation()
+        )
+
 class Indicator(SafeDeleteModel):
     LOP = 1
     MID_END = 2
@@ -762,7 +894,7 @@ class Indicator(SafeDeleteModel):
         MONTHLY,
     )
 
-    IRREGULAR_TARGET_REQUENCIES = (
+    IRREGULAR_TARGET_FREQUENCIES = (
         LOP,
         MID_END,
         EVENT,
@@ -1020,6 +1152,18 @@ class Indicator(SafeDeleteModel):
     notes = models.TextField(_("Notes"), max_length=500, null=True, blank=True)
     # optimize query for class based views etc.
     objects = IndicatorManager()
+    rf_aware_objects = generate_safedelete_queryset(
+        IndicatorRFMixin,
+        IndicatorLevelsMixin,
+        IndicatorTargetsMixin,
+        ).as_manager()
+
+    program_page_objects = generate_safedelete_queryset(
+        IndicatorRFMixin,
+        IndicatorLevelsMixin,
+        IndicatorTargetsMixin,
+        IndicatorMetricsMixin,
+        ).as_manager()
 
     class Meta:
         ordering = ('create_date',)
@@ -1051,7 +1195,7 @@ class Indicator(SafeDeleteModel):
 
     @property
     def is_target_frequency_not_time_aware(self):
-        return self.target_frequency in self.IRREGULAR_TARGET_REQUENCIES
+        return self.target_frequency in self.IRREGULAR_TARGET_FREQUENCIES
 
     @property
     def is_target_frequency_lop(self):
@@ -1300,7 +1444,29 @@ class Indicator(SafeDeleteModel):
     def auto_number_indicators(self):
         if hasattr(self, '_auto_number_indicators'):
             return self._auto_number_indicators
-        return not self.program.manual_numbering
+        return self.program.auto_number_indicators
+
+    @property
+    def sort_number(self):
+        number = getattr(self, 'number')
+        if number is None or number == '':
+            return None
+        search_pattern = r'([^\d]+)?(\d+)?(.*)?'
+        number_search = re.compile(search_pattern)
+        split = number.split('.')
+        processed = []
+        for element in split:
+            matches = number_search.search(element)
+            if matches is None:
+                processed.append((None, None, None))
+            else:
+                groups = matches.groups()
+                processed.append((
+                    groups[0] if groups[0] else None,
+                    int(groups[1]) if groups[1] else None,
+                    groups[2] if groups[2] else None
+                    ))
+        return processed
 
 
 @receiver(signals.pre_save, sender=Indicator)
@@ -1671,8 +1837,8 @@ class Result(models.Model):
         verbose_name=_("Would you like to update the achieved total with the \
         row count from TolaTables?"), default=False, help_text=" ")
 
-    record_name = models.CharField(max_length=135, blank=True, verbose_name=_("Record name"))
-    evidence_url = models.CharField(max_length=255, blank=True, verbose_name=_("Evidence URL"))
+    record_name = models.CharField(max_length=135, null=True, blank=True, verbose_name=_("Record name"))
+    evidence_url = models.CharField(max_length=255, null=True, blank=True, verbose_name=_("Evidence URL"))
 
     create_date = models.DateTimeField(null=True, blank=True, help_text=" ", verbose_name=_("Create date"))
     edit_date = models.DateTimeField(null=True, blank=True, help_text=" ", verbose_name=_("Edit date"))
