@@ -1,7 +1,24 @@
 """URLS for the Indicators app in the Tola project"""
 from indicators import views
-from django.conf.urls import url
+from django.conf.urls import url, include
 
+apipatterns = [
+    # results table html string for one indicator (Program Page and IPTT):
+    url(r'^result_table/(?P<indicator>\d+)/', views.result_view, name='result_view'),
+    # program-wide ordering update (program page):
+    url(r'^program/ordering/(?P<program>\d+)/', views.api_program_ordering, name='program_ordering'),
+    # program by-level ordering update (IPTT):
+    # url(r'^program/level_ordering/(?P<program>\d+)/', views.api_program_level_ordering, name='level_ordering'),
+    # program page indicator update (with included orderin update):
+    url(r'^program_page/indicator/(?P<pk>\d+)/',
+        views.api_program_page_indicator, name='program_page_indicator'),
+    # program page all indicators update:
+    url(r'^program_page/(?P<program>\d+)/', views.api_program_page, name='api_program_page'),
+    # indicator update (program page):
+    url(r'^indicator/(?P<indicator>\d+)', views.api_indicator_view, name='api_indicator_view'),
+    # all indicators update (program page):
+    url(r'^indicators/(?P<program>\d+)', views.api_indicators_list, name='api_indicators_list'),
+]
 
 urlpatterns = [
     url(r'^periodic_targets_form/(?P<program>\d+)/$', views.periodic_targets_form, name='periodic_targets_form'),
@@ -35,9 +52,6 @@ urlpatterns = [
 
     url(r'^service/(?P<service>[-\w]+)/service_json/', views.service_json, name='service_json'),
 
-    url(r'^result_table/(?P<indicator>\d+)/',
-        views.result_view, name='result_view'),
-
     url(r'^iptt_quickstart/', views.IPTTQuickstart.as_view(), name='iptt_quickstart'),
     url(r'^iptt_report/(?P<program>\d+)/(?P<reporttype>\w+)/$', views.IPTTReport.as_view(), name='iptt_report'),
     url(r'^iptt_report_data/$', views.IPTTReportData.as_view(), name='iptt_ajax'),
@@ -52,8 +66,9 @@ urlpatterns = [
     # Results framework builder
     url(r'^results_framework_builder/(?P<program_id>\d+)', views.ResultsFrameworkBuilder.as_view(),
         name='results_framework_builder'),
-
+    url(r'^api/', include(apipatterns)),
     # API call for program page
-    url(r'^api/indicator/(?P<indicator>\d+)', views.api_indicator_view, name='api_indicator_view'),
-    url(r'^api/indicators/(?P<program>\d+)', views.api_indicators_list, name='api_indicators_list'),
+    #url(r'^api/indicator/(?P<indicator>\d+)', views.api_indicator_view, name='api_indicator_view'),
+    #url(r'^api/indicators/(?P<program>\d+)', views.api_indicators_list, name='api_indicators_list'),
+    # url(r'^api/program.ordering/(?P<program>\d+)', views.)
 ]

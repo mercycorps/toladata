@@ -768,14 +768,6 @@ class IndicatorRFMixin(object):
             )
         )
 
-class IndicatorRFSortMixin(object):
-    qs_name = 'SortingAware'
-    #ordering_methods = ['number_sort']
-
-    def in_order(self):
-        return sorted(self, key=lambda i: (i.sort_number is None, i.sort_number))
-
-
 class IndicatorLevelsMixin(object):
     qs_name = 'LevelAware'
     annotate_methods = ['annotate_old_level']
@@ -811,6 +803,68 @@ class IndicatorLevelsMixin(object):
 
     def order_by_old_level(self):
         return self.order_by(models.F('old_level_pk').asc(nulls_last=True))
+
+
+class IndicatorTargetsMixin(object):
+    qs_name = 'TargetAware'
+    annotate_methods = ['annotate_lop_target', 'annotate_most_recent_complete']
+
+    def annotate_lop_target(self):
+        from indicators.queries import utils as query_utils
+        return self.annotate(
+            lop_target_calculated=query_utils.indicator_lop_target_calculated_annotation()
+        )
+
+    def annotate_most_recent_complete(self):
+        return self.annotate(
+            most_recent_completed_target_end_date=models.Subquery(
+                PeriodicTarget.objects.filter(
+                    indicator=models.OuterRef('pk'),
+                    end_date__lte=date.today()
+                ).order_by('-end_date').values('end_date')[:1],
+                output_field=models.DateField()
+            ),
+            target_period_last_end_date=models.Subquery(
+                PeriodicTarget.objects.filter(
+                    indicator=models.OuterRef('pk')
+                ).order_by('-end_date').values('end_date')[:1],
+                output_field=models.DateField()
+            ),
+        )
+
+class IndicatorMetricsMixin(object):
+    qs_name = 'MetricsAnnotated'
+    annotate_methods = ['annotate_reporting', 'annotate_scope', 'annotate_counts', 'annotate_metrics']
+
+    def annotate_reporting(self):
+        from indicators.queries import utils as query_utils
+        return self.annotate(
+            lop_actual_progress=query_utils.indicator_lop_actual_progress_annotation(),
+            lop_target_progress=query_utils.indicator_lop_target_progress_annotation(),
+            reporting=query_utils.indicator_reporting_annotation()
+        )
+
+    def annotate_scope(self):
+        from indicators.queries import utils as query_utils
+        return self.annotate(
+            lop_percent_met_progress=query_utils.indicator_lop_percent_met_progress_annotation(),
+            over_under=query_utils.indicator_over_under_annotation()
+        )
+
+    def annotate_counts(self):
+        from indicators.queries import utils as query_utils
+        return self.annotate(
+            program_months=query_utils.indicator_get_program_months_annotation(),
+            defined_targets=models.Count('periodictargets'),
+            results_count=query_utils.indicator_results_count_annotation(),
+            results_with_evidence_count=query_utils.indicator_results_evidence_annotation(),
+        )
+
+    def annotate_metrics(self):
+        from indicators.queries import utils as query_utils
+        return self.annotate(
+            has_all_targets_defined=query_utils.indicator_all_targets_defined_annotation()
+        )
 
 class Indicator(SafeDeleteModel):
     LOP = 1
@@ -1101,7 +1155,14 @@ class Indicator(SafeDeleteModel):
     rf_aware_objects = generate_safedelete_queryset(
         IndicatorRFMixin,
         IndicatorLevelsMixin,
-        IndicatorRFSortMixin,
+        IndicatorTargetsMixin,
+        ).as_manager()
+
+    program_page_objects = generate_safedelete_queryset(
+        IndicatorRFMixin,
+        IndicatorLevelsMixin,
+        IndicatorTargetsMixin,
+        IndicatorMetricsMixin,
         ).as_manager()
 
     class Meta:
@@ -1383,12 +1444,10 @@ class Indicator(SafeDeleteModel):
     def auto_number_indicators(self):
         if hasattr(self, '_auto_number_indicators'):
             return self._auto_number_indicators
-        return not self.program.manual_numbering
+        return self.program.auto_number_indicators
 
     @property
     def sort_number(self):
-        if self.using_results_framework:
-            return self.level_order
         number = getattr(self, 'number')
         if number is None or number == '':
             return None
@@ -1778,8 +1837,8 @@ class Result(models.Model):
         verbose_name=_("Would you like to update the achieved total with the \
         row count from TolaTables?"), default=False, help_text=" ")
 
-    record_name = models.CharField(max_length=135, blank=True, verbose_name=_("Record name"))
-    evidence_url = models.CharField(max_length=255, blank=True, verbose_name=_("Evidence URL"))
+    record_name = models.CharField(max_length=135, null=True, blank=True, verbose_name=_("Record name"))
+    evidence_url = models.CharField(max_length=255, null=True, blank=True, verbose_name=_("Evidence URL"))
 
     create_date = models.DateTimeField(null=True, blank=True, help_text=" ", verbose_name=_("Create date"))
     edit_date = models.DateTimeField(null=True, blank=True, help_text=" ", verbose_name=_("Edit date"))
