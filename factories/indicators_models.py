@@ -1,4 +1,5 @@
 from random import randint
+import itertools
 
 import datetime
 import faker
@@ -98,7 +99,7 @@ class RFIndicatorFactory(DjangoModelFactory):
 
     class Params:
         asftargets = False
-    
+
     name = Faker('company')
     target_frequency = IndicatorM.ANNUAL
     lop_target = 1400
@@ -117,8 +118,17 @@ class RFIndicatorFactory(DjangoModelFactory):
                 )
             periods = list(periods)
             if extracted == "incomplete":
-                periods = periods[0:-1]
-            if self.lop_target:
+                if len(periods) > 1:
+                    periods = periods[0:-1]
+                    target_values = [self.lop_target/len(periods)]*len(periods)
+                else:
+                    periods = []
+                    target_values = []
+            elif isinstance(extracted, (int, float)):
+                target_values = [extracted/len(periods)]*len(periods)
+                if len(target_values) > 1:
+                    target_values[-1] = extracted - sum(target_values[0:-1])
+            elif self.lop_target:
                 target_values = [self.lop_target/len(periods)]*len(periods)
                 if len(target_values) > 1:
                     target_values[-1] = self.lop_target - sum(target_values[0:-1])
@@ -131,6 +141,33 @@ class RFIndicatorFactory(DjangoModelFactory):
                     target=target_value,
                     start_date=period['start'],
                     end_date=period['end']
+                )
+
+    @post_generation
+    def results(self, create, extracted, **kwargs):
+        if extracted:
+            targets = self.periodictargets.all()
+            count = kwargs.get('count', len(targets))
+            if kwargs.get('evidence', None) is True:
+                evidence = ["http://evidence.url"]*count
+            elif isinstance(kwargs.get('evidence', None), int):
+                evidence = ["http://evidence.url"]*kwargs.get('evidence') + [None]*(count - kwargs.get('evidence'))
+            else:
+                evidence = [None]*count
+            targets = itertools.islice(itertools.cycle(targets), 0, count)
+            if extracted is True:
+                achieveds = [10]*count
+            elif isinstance(extracted, (int, float)):
+                achieveds = [extracted/count]*count
+                achieveds[-1] = extracted - sum(achieveds[0:-1])
+            for target, achieved, evidence in zip(targets, achieveds, evidence):
+                ResultFactory(
+                    periodic_target=target,
+                    achieved=achieved,
+                    indicator=self,
+                    program=self.program,
+                    evidence_url=evidence,
+                    date_collected=target.start_date + datetime.timedelta(days=1)
                 )
 
 class Objective(DjangoModelFactory):

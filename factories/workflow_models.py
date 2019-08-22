@@ -201,22 +201,63 @@ class RFProgramFactory(DjangoModelFactory):
         """post-gen hooks are called in declaration order, so this can depend upon tiers method"""
         tiers = self.level_tiers.all()
         from factories.indicators_models import LevelFactory
+        def get_children(parents, count):
+            return tuple([
+                get_children(parent, count) if isinstance(parent, tuple) else tuple([count]*parent)
+                for parent in parents
+            ])
+        def convert_to_data(counts_for_tier, parents=None, count=0):
+            this_tier_counts = counts_for_tier.pop(0)
+            lower_tier_levels = []
+            level_sets = []
+            for c, level_count in enumerate(this_tier_counts):
+                level_sets.append((
+                    [row[c] for row in counts_for_tier],
+                    [{
+                        'count': count+x,
+                        'parent': parents[c]['count'] if parents is not None else None,
+                        'depth': parents[c]['depth'] +  1 if parents is not None else 0
+                        }
+                        for x in range(level_count)]
+                ))
+                count += level_count
+            for lower_tier_counts, parents in level_sets:
+                if lower_tier_counts:
+                    new_lower_tiers, count = convert_to_data(lower_tier_counts, parents, count)
+                    lower_tier_levels += new_lower_tiers
+            return [level_data for data_set in level_sets for level_data in data_set[1]] + lower_tier_levels, count
         if isinstance(extracted, int):
-            parents = [None,]
-            newparents = []
+            levels_per_tier = []
+            parents = (1,)
             for tier in tiers:
-                for parent in parents:
-                    for count in range(extracted if parent is not None else 1):
-                        newparents.append(
-                            LevelFactory(
-                                program=self,
-                                name=u"Tier: {} parent {}: {}".format(tier.name, parent.pk if parent else u"-", count+1),
-                                customsort=count+1,
-                                parent=parent
-                                )
-                            )
-                parents = newparents
-                newparents = []
+                levels_per_tier.append(parents)
+                parents = get_children(parents, extracted)
+            levels_data, _ = convert_to_data(levels_per_tier)
+        elif isinstance(extracted, list):
+            levels_data, _ = convert_to_data(extracted)
+        else:
+            return
+        levels = []
+        universal_level_data = kwargs.get('all', {})
+        universal_level_data.update({'program': self})
+        level_pks = kwargs.get('pks', [])
+        tier = None
+        for count, level_data in enumerate(levels_data):
+            new_tier = tiers[level_data['depth']]
+            if new_tier != tier:
+                depth_count = 1
+                tier = new_tier
+            this_level_data = {
+                'name': u"Tier: {} Order: {}".format(tier.name, depth_count),
+                'customsort': depth_count,
+                'parent': levels[level_data['parent']] if level_data['parent'] is not None else None
+            }
+            depth_count += 1
+            if level_pks and len(level_pks) > count:
+                this_level_data.update({'pk': level_pks[count]})
+            this_level_data.update(universal_level_data)
+            this_level_data.update(kwargs.get(str(level_data['count']), {}))
+            levels.append(LevelFactory(**this_level_data))
 
     @post_generation
     def indicators(self, create, extracted, **kwargs):
@@ -228,7 +269,7 @@ class RFProgramFactory(DjangoModelFactory):
                         ('old_level', level_name) for (pk, level_name) in RFIndicatorFactory._meta.model.OLD_LEVELS]
                         )
                 else:
-                    levels = itertools.cycle([('level', level) for level in self.levels.all()])
+                    levels = itertools.cycle([('level', level) for level in self.levels.all().order_by('pk')])
             else:
                 levels = False
             indicator_data = kwargs.get('all', {})
