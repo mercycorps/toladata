@@ -675,7 +675,7 @@ class Command(BaseCommand):
             'admin': ['Tolaland']
         },
         'gmail-low': {
-            'first_last': ['gm-low-first', 'gm-low-last'],
+            'first_last': ['gmail-low-first', 'gmail-low-last'],
             'email': 'mctest.low@gmail.com',
             'accessible_countries': standard_countries,
             'permission_level': 'low',
@@ -683,7 +683,7 @@ class Command(BaseCommand):
             'org': TEST_ORG,
         },
         'gmail-medium': {
-            'first_last': ['gm-med-first', 'gm-med-last'],
+            'first_last': ['gmail-med-first', 'gmail-med-last'],
             'email': 'mctest.medium@gmail.com',
             'accessible_countries': standard_countries,
             'permission_level': 'medium',
@@ -691,7 +691,7 @@ class Command(BaseCommand):
             'org': TEST_ORG,
         },
         'gmail-high': {
-            'first_last': ['gm-high-first', 'gm-high-last'],
+            'first_last': ['gmail-high-first', 'gmail-high-last'],
             'email': 'mctest.high@gmail.com',
             'accessible_countries': standard_countries,
             'permission_level': 'high',
@@ -699,7 +699,7 @@ class Command(BaseCommand):
             'org': TEST_ORG,
         },
         'external-low': {
-            'first_last': ['ex-low-first', 'ex-low-last'],
+            'first_last': ['external-low-first', 'external-low-last'],
             'email': 'external-low@example.com',
             'accessible_countries': standard_countries,
             'permission_level': 'low',
@@ -707,7 +707,7 @@ class Command(BaseCommand):
             'org': TEST_ORG,
         },
         'external-medium': {
-            'first_last': ['ex-med-first', 'ex-med-last'],
+            'first_last': ['external-med-first', 'external-med-last'],
             'email': 'external-medium@example.com',
             'accessible_countries': standard_countries,
             'permission_level': 'medium',
@@ -715,7 +715,7 @@ class Command(BaseCommand):
             'org': TEST_ORG,
         },
         'external-high': {
-            'first_last': ['ex-high-first', 'ex-high-last'],
+            'first_last': ['external-high-first', 'external-high-last'],
             'email': 'external-high@example.com',
             'accessible_countries': standard_countries,
             'permission_level': 'high',
