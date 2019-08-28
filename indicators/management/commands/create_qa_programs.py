@@ -7,13 +7,13 @@ from datetime import date, timedelta
 from dateutil.relativedelta import relativedelta
 from copy import deepcopy
 from itertools import cycle
+import six
+from six.moves import input
 
-from django.core import management
 from django.core.management.base import BaseCommand
 from django.contrib.auth.models import User
 from django.utils import timezone, translation
 from django.conf import settings
-from django.db.models import Q
 from django.db.utils import IntegrityError
 
 from indicators.models import Indicator, Result, PeriodicTarget, Level, LevelTier
@@ -73,22 +73,17 @@ class Command(BaseCommand):
             country='Tolaland', defaults={
                 'latitude': 21.4, 'longitude': -158, 'zoom': 6, 'organization': org, 'code': 'TO'})
 
-        management.call_command('create_rf_program')
-
         # Create test users and assign broad permissions to superusers.
         created_users, existing_users = self.create_test_users()
         if len(created_users) > 0:
-            print 'Created the following test users:', ', '.join(sorted(created_users))
+            print('Created the following test users: {}'.format(', '.join(sorted(created_users))))
         if len(existing_users) > 0:
-            print 'The following test users already existed:', ', '.join(sorted(existing_users))
+            print('The following test users already existed:'.format(', '.join(sorted(existing_users))))
 
         for super_user in TolaUser.objects.filter(user__is_superuser=True):
             ca, created = CountryAccess.objects.get_or_create(country=country, tolauser=super_user)
             ca.role = 'basic_admin'
             ca.save()
-
-
-
 
         main_start_date = (date.today() + relativedelta(months=-18)).replace(day=1)
         main_end_date = (main_start_date + relativedelta(months=+32)).replace(day=1) - timedelta(days=1)
@@ -154,12 +149,12 @@ class Command(BaseCommand):
         if options['names']:
             tester_names = options['names'].split(',')
         else:
-            tester_names = ['Emily', 'Marie', 'Jenny', 'Sanjuro', 'Cameron', 'Ken']
+            tester_names = ['Kelly', 'Marie', 'Jenny', 'Sanjuro', 'Cameron', 'Ken']
 
         for t_name in tester_names:
             program_name = 'QA Program - {}'.format(t_name)
             program = self.create_program(main_start_date, main_end_date, country, program_name)
-            print 'Creating Indicators for {}'.format(Program.objects.get(id=program.id))
+            print('Creating Indicators for {}'.format(Program.objects.get(id=program.id)))
             self.create_levels(program.id, filtered_levels)
             self.create_indicators(program.id, all_params_base)
             self.create_indicators(program.id, null_supplements_params, apply_skips=False)
@@ -167,12 +162,13 @@ class Command(BaseCommand):
         if options['named_only']:
             sys.exit()
 
-        print 'Creating ghost of programs past'
+        print('Creating ghost of programs past')
         program = self.create_program(
             passed_start_date, passed_end_date, country, 'QA Program -- Ghost of Programs Past')
+        self.create_levels(program.id, filtered_levels)
         self.create_indicators(program.id, all_params_base)
 
-        print 'Creating ghost of programs future'
+        print('Creating ghost of programs future')
         future_program_params = [
             {'freq': Indicator.ANNUAL, 'uom_type': Indicator.NUMBER, 'is_cumulative': True,
              'direction': Indicator.DIRECTION_OF_CHANGE_POSITIVE, 'null_level': 'targets'},
@@ -188,57 +184,69 @@ class Command(BaseCommand):
 
         program = self.create_program(
             future_start_date, future_end_date, country, 'QA Program --- Ghost of Programs Future')
+        self.create_levels(program.id, filtered_levels)
         self.create_indicators(program.id, future_program_params)
 
         # Create program with lots of indicators
         program = self.create_program(
             main_start_date, main_end_date, country, 'QA Program -- I Love Indicators So Much')
-        print 'Creating program with many indicators'
+        print('Creating program with many indicators')
+        self.create_levels(program.id, filtered_levels)
         self.create_indicators(program.id, all_params_base)
-        print 'Creating moar indicators'
+        print('Creating moar indicators')
         self.create_indicators(program.id, all_params_base, indicator_suffix='moar1')
         self.create_indicators(program.id, all_params_base, indicator_suffix='moar2')
         self.create_indicators(program.id, all_params_base, indicator_suffix='moar3')
 
-        print 'Creating program with all the things'
+        print('Creating pre-satsuma program')
         program = self.create_program(
-            main_start_date, main_end_date, country, 'QA Program --- All the things!')
+            main_start_date, main_end_date, country, 'QA Program --- Pre-Satsuma', post_satsuma=False)
+        self.create_levels(program.id, filtered_levels)
+        self.create_indicators(program.id, all_params_base, apply_skips=False)
+
+        print('Creating program with no skips')
+        program = self.create_program(
+            main_start_date, main_end_date, country, 'QA Program --- All the things! (no Skipped values)')
+        self.create_levels(program.id, filtered_levels)
         self.create_indicators(program.id, all_params_base, apply_skips=False)
 
         # Create programs with various levels of no data indicators
-        print 'Creating null program with no indicators'
+        print('Creating null program with no indicators')
         self.create_program(
             main_start_date, main_end_date, country, 'QA Program --- No Indicators Here')
 
-        print 'Creating null program with no targets'
+        print('Creating null program with no targets')
         long_null_levels = ['targets'] * len(all_params_base)
         program = self.create_program(
             main_start_date, main_end_date, country, 'QA Program --- No Targets Here')
         fail_message = self.set_null_levels(all_params_base, long_null_levels, program.name)
         if fail_message:
-            print fail_message
+            print(fail_message)
             program.delete()
         else:
+            self.create_levels(program.id, filtered_levels)
             self.create_indicators(program.id, all_params_base)
 
-        print 'Creating null program with no results'
+        print('Creating null program with no results')
         long_null_levels = ['results'] * len(all_params_base)
         program = self.create_program(main_start_date, main_end_date, country, 'QA Program --- No Results Here')
         fail_message = self.set_null_levels(all_params_base, long_null_levels, program.name)
         if fail_message:
-            print fail_message
+            print(fail_message)
             program.delete()
         else:
+            self.create_levels(program.id, filtered_levels)
             self.create_indicators(program.id, all_params_base)
 
-        print 'Creating null program with no evidence'
+        print('Creating null program with no evidence')
         long_null_levels = ['evidence'] * len(all_params_base)
         program = self.create_program(main_start_date, main_end_date, country, 'QA Program --- No Evidence Here')
         fail_message = self.set_null_levels(all_params_base, long_null_levels, program.name)
         if fail_message:
-            print fail_message
+            print(fail_message)
             program.delete()
         else:
+            self.create_levels(program.id, filtered_levels)
             self.create_indicators(program.id, all_params_base)
 
         short_null_levels = [
@@ -250,24 +258,26 @@ class Command(BaseCommand):
             ('QA Program -- Multi-country Program', True)
         ]
         for program_tuple in short_programs:
-            print 'Creating {}'.format(program_tuple[0])
-            program = self.create_program(main_start_date, main_end_date, country, program_tuple[0], program_tuple[1])
+            print('Creating {}'.format(program_tuple[0]))
+            program = self.create_program(
+                main_start_date, main_end_date, country, program_tuple[0], multi_country=program_tuple[1])
             fail_message = self.set_null_levels(short_param_base, short_null_levels, program.name)
             if fail_message:
-                print fail_message
+                print(fail_message)
                 program.delete()
             else:
+                self.create_levels(program.id, filtered_levels)
                 self.create_indicators(program.id, short_param_base)
 
     @staticmethod
-    def create_program(start_date, end_date, country, name, multi_country=False):
+    def create_program(start_date, end_date, country, name, post_satsuma=True, multi_country=False):
         program = Program.objects.create(**{
             'name': name,
             'reporting_period_start': start_date,
             'reporting_period_end': end_date,
             'funding_status': 'Funded',
             'gaitid': 'fake_gait_id_{}'.format(random.randint(1, 9999)),
-            '_using_results_framework': Program.NOT_MIGRATED,
+            '_using_results_framework': Program.RF_ALWAYS if post_satsuma else Program.NOT_MIGRATED,
         })
         program.country.add(country)
         if multi_country:
@@ -306,8 +316,6 @@ class Command(BaseCommand):
         target_generator = PeriodicTarget.generate_for_frequency(indicator.target_frequency)
         num_periods = len([p for p in target_generator(program.reporting_period_start, program.reporting_period_end)])
 
-        if indicator.target_frequency == Indicator.LOP:
-            print 'lop num_periods'
         targets_json = generate_periodic_targets(
             tf=indicator.target_frequency, start_date=program.reporting_period_start, numTargets=num_periods)
         for i, pt in enumerate(targets_json):
@@ -361,12 +369,14 @@ class Command(BaseCommand):
         evidence_count = 0
         evidence_skip_mod = 7
 
-        old_levels = list(Indicator.objects.filter(old_level__isnull=False).order_by('old_level').distinct().values_list('old_level', flat=True))
+        old_levels = list(Indicator.objects.filter(old_level__isnull=False).order_by('old_level')
+                          .distinct().values_list('old_level', flat=True))
         old_levels.append(None)
         old_level_cycle = cycle(old_levels)
 
         rf_levels = list(Level.objects.filter(program__id=program.id))
-        rf_levels.append(None)
+        if apply_skips:
+            rf_levels.append(None)
         rf_level_cycle = cycle(rf_levels)
 
         for n, params in enumerate(param_sets):
@@ -399,7 +409,7 @@ class Command(BaseCommand):
                 unit_of_measure_type=params['uom_type'],
                 direction_of_change=params['direction'],
                 program=program,
-                old_level=next(old_level_cycle),
+                old_level=None if program.results_framework else next(old_level_cycle),
                 level=next(rf_level_cycle),
             )
             indicator.save()
@@ -524,7 +534,8 @@ class Command(BaseCommand):
 
         return indicator_ids
 
-    def create_levels(self, program_id, level_data):
+    @staticmethod
+    def create_levels(program_id, level_data):
         fixture_data = deepcopy(level_data)
         tier_labels = LevelTier.get_templates()['mc_standard']['tiers']
         for i, tier in enumerate(tier_labels):
@@ -544,45 +555,45 @@ class Command(BaseCommand):
             level_map[level_fix['pk']] = level
 
     def clean_test_users(self):
-        for username, profile in self.user_profiles.iteritems():
+        for username, profile in six.iteritems(self.user_profiles):
             try:
                 tola_user_name = ' '.join(profile['first_last'])
                 tola_user = TolaUser.objects.get(name=tola_user_name)
                 auth_user = tola_user.user
                 tola_user.delete()
                 auth_user.delete()
-                print 'Deleted user {}'.format(tola_user)
+                print('Deleted user {}'.format(tola_user))
             except TolaUser.DoesNotExist:
                 pass
 
-    def clean_tolaland(self):
+    @staticmethod
+    def clean_tolaland():
         try:
             country = Country.objects.get(country='Tolaland')
             country.delete()
         except Country.DoesNotExist:
             pass
 
-    def clean_programs(self):
-        programs = Program.objects.filter(Q(name__contains='QA Program -') | Q(name__contains='RF Program -'))
+    @staticmethod
+    def clean_programs():
+        programs = Program.objects.filter(name__contains='QA Program -')
         if programs.count() > 0:
-            print "Delete these programs?\n{}".format('\n'.join(p.name for p in programs))
-            confirm = raw_input('[yes/no]: ')
-            # confirm = 'yes'
+            print("Delete these programs?\n{}".format('\n'.join(p.name for p in programs)))
+            confirm = input('[yes/no]: ')
             if confirm == 'yes':
                 for program in programs:
-                    print 'Deleting program:', program
+                    print('Deleting program: {}'.format(program))
                     for indicator in program.indicator_set.all():
                         indicator.delete()
                     program.delete()
             else:
-                print '\nPrograms not deleted'
-
+                print('\nPrograms not deleted')
 
     def create_test_users(self):
-        password = raw_input("Enter the password to use for the test users: ")
+        password = input("Enter the password to use for the test users: ")
         created_users = []
         existing_users = []
-        for username, profile in self.user_profiles.iteritems():
+        for username, profile in six.iteritems(self.user_profiles):
             home_country = None
             if profile['home_country']:
                 home_country = Country.objects.get(country=profile['home_country'])
@@ -592,7 +603,8 @@ class Command(BaseCommand):
                 accessible_countries.append(Country.objects.get(country=country_name))
 
             user, created = User.objects.get_or_create(
-                username=username, first_name=profile['first_last'][0], last_name=profile['first_last'][1], email=profile['email'])
+                username=username, first_name=profile['first_last'][0], last_name=profile['first_last'][1],
+                email=profile['email'])
             user.set_password(password)
             user.save()
             if created:
@@ -613,24 +625,28 @@ class Command(BaseCommand):
             # country as such.  If the user isn't part of MC org, you have to do it on a program by program basis.
             for accessible_country in accessible_countries:
                 if tola_user.organization.name == 'Mercy Corps':
-                    ca, created = CountryAccess.objects.get_or_create(tolauser=tola_user, country=accessible_country, role='user')
+                    ca, created = CountryAccess.objects.get_or_create(
+                        tolauser=tola_user, country=accessible_country, role='user')
                     ca.save()
 
-                # Need to also do program by program for MC members if the permission level is high because default with country access is low.
+                # Need to also do program by program for MC members if the permission level is high because
+                # default with country access is low.
                 if tola_user.organization.name != 'Mercy Corps' or profile['permission_level'] != 'low':
                     for program in accessible_country.program_set.all():
                         ProgramAccess.objects.get_or_create(
-                            country=accessible_country, program=program,
-                              tolauser=tola_user, role=profile['permission_level'])
+                            country=accessible_country, program=program, tolauser=tola_user,
+                            role=profile['permission_level'])
 
             # Add ProgramAccess links between tola_users and programs
             for access_profile in profile.get('program_access', []):
                 country = Country.objects.get(country=access_profile[0])
                 try:
                     prog = Program.objects.get(name__contains=access_profile[1], country=country)
-                    ProgramAccess.objects.get_or_create(country=country, program=prog, tolauser=tola_user, role=access_profile[2])
+                    ProgramAccess.objects.get_or_create(
+                        country=country, program=prog, tolauser=tola_user, role=access_profile[2])
                 except Program.DoesNotExist:
-                    print "Couldn't create program access to {} for {}.  The program '{}' doesn't exist".format(tola_user, access_profile[1], access_profile[1])
+                    print("Couldn't create program access to {} for {}.  The program '{}' doesn't exist".format(
+                        tola_user, access_profile[1], access_profile[1]))
                 except IntegrityError:
                     pass
 
@@ -643,7 +659,7 @@ class Command(BaseCommand):
                 ca.role = 'basic_admin'
                 ca.save()
 
-        return (created_users, existing_users)
+        return created_users, existing_users
 
     standard_countries = ['Afghanistan', 'Haiti', 'Jordan', 'Tolaland', 'United States']
     TEST_ORG, created = Organization.objects.get_or_create(name='Test')
@@ -675,7 +691,7 @@ class Command(BaseCommand):
             'admin': ['Tolaland']
         },
         'gmail-low': {
-            'first_last': ['gm-low-first', 'gm-low-last'],
+            'first_last': ['gmail-low-first', 'gmail-low-last'],
             'email': 'mctest.low@gmail.com',
             'accessible_countries': standard_countries,
             'permission_level': 'low',
@@ -683,7 +699,7 @@ class Command(BaseCommand):
             'org': TEST_ORG,
         },
         'gmail-medium': {
-            'first_last': ['gm-med-first', 'gm-med-last'],
+            'first_last': ['gmail-med-first', 'gmail-med-last'],
             'email': 'mctest.medium@gmail.com',
             'accessible_countries': standard_countries,
             'permission_level': 'medium',
@@ -691,7 +707,7 @@ class Command(BaseCommand):
             'org': TEST_ORG,
         },
         'gmail-high': {
-            'first_last': ['gm-high-first', 'gm-high-last'],
+            'first_last': ['gmail-high-first', 'gmail-high-last'],
             'email': 'mctest.high@gmail.com',
             'accessible_countries': standard_countries,
             'permission_level': 'high',
@@ -699,7 +715,7 @@ class Command(BaseCommand):
             'org': TEST_ORG,
         },
         'external-low': {
-            'first_last': ['ex-low-first', 'ex-low-last'],
+            'first_last': ['external-low-first', 'external-low-last'],
             'email': 'external-low@example.com',
             'accessible_countries': standard_countries,
             'permission_level': 'low',
@@ -707,7 +723,7 @@ class Command(BaseCommand):
             'org': TEST_ORG,
         },
         'external-medium': {
-            'first_last': ['ex-med-first', 'ex-med-last'],
+            'first_last': ['external-med-first', 'external-med-last'],
             'email': 'external-medium@example.com',
             'accessible_countries': standard_countries,
             'permission_level': 'medium',
@@ -715,7 +731,7 @@ class Command(BaseCommand):
             'org': TEST_ORG,
         },
         'external-high': {
-            'first_last': ['ex-high-first', 'ex-high-last'],
+            'first_last': ['external-high-first', 'external-high-last'],
             'email': 'external-high@example.com',
             'accessible_countries': standard_countries,
             'permission_level': 'high',
