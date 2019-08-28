@@ -10,12 +10,10 @@ from itertools import cycle
 import six
 from six.moves import input
 
-from django.core import management
 from django.core.management.base import BaseCommand
 from django.contrib.auth.models import User
 from django.utils import timezone, translation
 from django.conf import settings
-from django.db.models import Q
 from django.db.utils import IntegrityError
 
 from indicators.models import Indicator, Result, PeriodicTarget, Level, LevelTier
@@ -74,8 +72,6 @@ class Command(BaseCommand):
         country, created = Country.objects.get_or_create(
             country='Tolaland', defaults={
                 'latitude': 21.4, 'longitude': -158, 'zoom': 6, 'organization': org, 'code': 'TO'})
-
-        management.call_command('create_rf_program')
 
         # Create test users and assign broad permissions to superusers.
         created_users, existing_users = self.create_test_users()
@@ -153,7 +149,7 @@ class Command(BaseCommand):
         if options['names']:
             tester_names = options['names'].split(',')
         else:
-            tester_names = ['Emily', 'Marie', 'Jenny', 'Sanjuro', 'Cameron', 'Ken']
+            tester_names = ['Kelly', 'Marie', 'Jenny', 'Sanjuro', 'Cameron', 'Ken']
 
         for t_name in tester_names:
             program_name = 'QA Program - {}'.format(t_name)
@@ -169,6 +165,7 @@ class Command(BaseCommand):
         print('Creating ghost of programs past')
         program = self.create_program(
             passed_start_date, passed_end_date, country, 'QA Program -- Ghost of Programs Past')
+        self.create_levels(program.id, filtered_levels)
         self.create_indicators(program.id, all_params_base)
 
         print('Creating ghost of programs future')
@@ -187,21 +184,30 @@ class Command(BaseCommand):
 
         program = self.create_program(
             future_start_date, future_end_date, country, 'QA Program --- Ghost of Programs Future')
+        self.create_levels(program.id, filtered_levels)
         self.create_indicators(program.id, future_program_params)
 
         # Create program with lots of indicators
         program = self.create_program(
             main_start_date, main_end_date, country, 'QA Program -- I Love Indicators So Much')
         print('Creating program with many indicators')
+        self.create_levels(program.id, filtered_levels)
         self.create_indicators(program.id, all_params_base)
         print('Creating moar indicators')
         self.create_indicators(program.id, all_params_base, indicator_suffix='moar1')
         self.create_indicators(program.id, all_params_base, indicator_suffix='moar2')
         self.create_indicators(program.id, all_params_base, indicator_suffix='moar3')
 
-        print('Creating program with all the things')
+        print('Creating pre-satsuma program')
         program = self.create_program(
-            main_start_date, main_end_date, country, 'QA Program --- All the things!')
+            main_start_date, main_end_date, country, 'QA Program --- Pre-Satsuma', post_satsuma=False)
+        self.create_levels(program.id, filtered_levels)
+        self.create_indicators(program.id, all_params_base, apply_skips=False)
+
+        print('Creating program with no skips')
+        program = self.create_program(
+            main_start_date, main_end_date, country, 'QA Program --- All the things! (no Skipped values)')
+        self.create_levels(program.id, filtered_levels)
         self.create_indicators(program.id, all_params_base, apply_skips=False)
 
         # Create programs with various levels of no data indicators
@@ -218,6 +224,7 @@ class Command(BaseCommand):
             print(fail_message)
             program.delete()
         else:
+            self.create_levels(program.id, filtered_levels)
             self.create_indicators(program.id, all_params_base)
 
         print('Creating null program with no results')
@@ -228,6 +235,7 @@ class Command(BaseCommand):
             print(fail_message)
             program.delete()
         else:
+            self.create_levels(program.id, filtered_levels)
             self.create_indicators(program.id, all_params_base)
 
         print('Creating null program with no evidence')
@@ -238,6 +246,7 @@ class Command(BaseCommand):
             print(fail_message)
             program.delete()
         else:
+            self.create_levels(program.id, filtered_levels)
             self.create_indicators(program.id, all_params_base)
 
         short_null_levels = [
@@ -250,23 +259,25 @@ class Command(BaseCommand):
         ]
         for program_tuple in short_programs:
             print('Creating {}'.format(program_tuple[0]))
-            program = self.create_program(main_start_date, main_end_date, country, program_tuple[0], program_tuple[1])
+            program = self.create_program(
+                main_start_date, main_end_date, country, program_tuple[0], multi_country=program_tuple[1])
             fail_message = self.set_null_levels(short_param_base, short_null_levels, program.name)
             if fail_message:
                 print(fail_message)
                 program.delete()
             else:
+                self.create_levels(program.id, filtered_levels)
                 self.create_indicators(program.id, short_param_base)
 
     @staticmethod
-    def create_program(start_date, end_date, country, name, multi_country=False):
+    def create_program(start_date, end_date, country, name, post_satsuma=True, multi_country=False):
         program = Program.objects.create(**{
             'name': name,
             'reporting_period_start': start_date,
             'reporting_period_end': end_date,
             'funding_status': 'Funded',
             'gaitid': 'fake_gait_id_{}'.format(random.randint(1, 9999)),
-            '_using_results_framework': Program.NOT_MIGRATED,
+            '_using_results_framework': Program.RF_ALWAYS if post_satsuma else Program.NOT_MIGRATED,
         })
         program.country.add(country)
         if multi_country:
@@ -305,8 +316,6 @@ class Command(BaseCommand):
         target_generator = PeriodicTarget.generate_for_frequency(indicator.target_frequency)
         num_periods = len([p for p in target_generator(program.reporting_period_start, program.reporting_period_end)])
 
-        if indicator.target_frequency == Indicator.LOP:
-            print('lop num_periods')
         targets_json = generate_periodic_targets(
             tf=indicator.target_frequency, start_date=program.reporting_period_start, numTargets=num_periods)
         for i, pt in enumerate(targets_json):
@@ -366,7 +375,8 @@ class Command(BaseCommand):
         old_level_cycle = cycle(old_levels)
 
         rf_levels = list(Level.objects.filter(program__id=program.id))
-        rf_levels.append(None)
+        if apply_skips:
+            rf_levels.append(None)
         rf_level_cycle = cycle(rf_levels)
 
         for n, params in enumerate(param_sets):
@@ -399,7 +409,7 @@ class Command(BaseCommand):
                 unit_of_measure_type=params['uom_type'],
                 direction_of_change=params['direction'],
                 program=program,
-                old_level=next(old_level_cycle),
+                old_level=None if program.results_framework else next(old_level_cycle),
                 level=next(rf_level_cycle),
             )
             indicator.save()
@@ -566,11 +576,10 @@ class Command(BaseCommand):
 
     @staticmethod
     def clean_programs():
-        programs = Program.objects.filter(Q(name__contains='QA Program -') | Q(name__contains='RF Program -'))
+        programs = Program.objects.filter(name__contains='QA Program -')
         if programs.count() > 0:
             print("Delete these programs?\n{}".format('\n'.join(p.name for p in programs)))
             confirm = input('[yes/no]: ')
-            # confirm = 'yes'
             if confirm == 'yes':
                 for program in programs:
                     print('Deleting program: {}'.format(program))
@@ -579,7 +588,6 @@ class Command(BaseCommand):
                     program.delete()
             else:
                 print('\nPrograms not deleted')
-
 
     def create_test_users(self):
         password = input("Enter the password to use for the test users: ")
