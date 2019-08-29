@@ -600,8 +600,10 @@ export class UIStore {
     // Need count all nodes excluding leaf nodes, which is the how many id's will be in the
     // hasVisibleChildren count if a user manually expands all of the level cards.
     @computed get isExpandAllDisabled () {
-        if (this.rootStore.levelStore.levels.length == 0){
-            return 0
+        if (this.rootStore.levelStore.levels.length == 0 ||
+            this.disableCardActions||
+            this.activeCard) {
+            return true;
         }
         else {
             let parents = new Set(this.rootStore.levelStore.levels.map(level => level.parent));
