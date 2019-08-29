@@ -227,10 +227,6 @@ export class LevelStore {
                     if (this.chosenTierSet.slice(-1) != "") {
                         this.chosenTierSet.push("");
                     }
-                    else{
-                        // TODO: remove else statement once QA is finished
-                        console.log('Avoided a problem.')
-                    }
                 }
                 this.rootStore.uiStore.setAddLevelButtonLockedStatus(false);
 
