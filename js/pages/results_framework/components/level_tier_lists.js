@@ -71,6 +71,10 @@ export class StaticLevelTierList extends React.Component{
 
 @inject('rootStore')
 class EditableLevelTier extends React.Component {
+    constructor(props) {
+        super(props);
+        this.inputRef = React.createRef()
+    }
 
     onBlur = (event) => {
         /*
@@ -92,6 +96,10 @@ class EditableLevelTier extends React.Component {
             }
         }
     };
+
+    componentDidMount() {
+        this.inputRef.current.focus()
+    }
 
     render() {
         let deleteButton = null;
@@ -131,6 +139,7 @@ class EditableLevelTier extends React.Component {
                     </label>
                     <div className="leveltier--editable">
                         <input
+                            ref={this.inputRef}
                             className="leveltier--editable__input form-control"
                             type="text"
                             maxLength={75}
@@ -157,7 +166,6 @@ export class EditableLevelTierList extends React.Component{
         $('*[data-toggle="popover"]').popover({
             html: true
         });
-        $(".leveltier--editable__input:last-of-type").focus()
     }
 
     // Need this just to ensure that the implicit submit that takes place for single input forms is blocked
