@@ -34,9 +34,11 @@ export class StaticLevelTierList extends React.Component{
         }
 
         let settings_button = null;
-        // Only show the settings button if you've selected to customize the tiers and you are not actively editing the tiers.
+        // Only show the settings button if you've selected to customize the tiers, you are not actively editing
+        // the tiers, and you are a high level user.
         if (this.props.rootStore.levelStore.chosenTierSetKey == this.props.rootStore.levelStore.customTierSetKey &&
-            this.props.rootStore.levelStore.useStaticTierList) {
+            this.props.rootStore.levelStore.useStaticTierList &&
+            this.props.rootStore.levelStore.accessLevel === 'high') {
             settings_button =
                 <button
                         className="btn btn-link leveltier-list leveltier--editable__settings"
