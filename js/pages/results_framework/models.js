@@ -79,8 +79,8 @@ export class LevelStore {
                 properties['childTierName'] = this.chosenTierSet[level.level_depth];
             }
 
-            properties['canDelete'] = childrenIds.length==0 && indicatorCount==0 && this.accessLevel=='high';
-            properties['canEdit'] = this.accessLevel == 'high';
+            properties['canDelete'] = childrenIds.length==0 && indicatorCount==0 && this.hasEditPermissions;
+            properties['canEdit'] = this.hasEditPermissions;  // TODO: is this really necessary?
             levelProperties[level.id] = properties;
         }
 
@@ -89,6 +89,10 @@ export class LevelStore {
 
     @computed get chosenTierSetName () {
         return this.tierTemplates[this.chosenTierSetKey]['name'];
+    }
+
+    @computed get hasEditPermissions () {
+        return this.accessLevel === 'high';
     }
 
     // This monitors the number of indicators attached to the program and adds/removes the header link depending on
@@ -583,9 +587,10 @@ export class UIStore {
     }
 
     @computed get tierLockStatus () {
-        // The leveltier picker should be disabled if there is at least one saved level in the DB.
+        // The leveltier picker should be disabled if there is at least one saved level in the DB or if the user is
+        // doesn't have 'high' permissions.
         let notNewLevels = this.rootStore.levelStore.levels.filter( l => l.id != "new");
-        if  (notNewLevels.length > 0) {
+        if  (notNewLevels.length > 0 || !this.rootStore.levelStore.hasEditPermissions) {
             return "locked"
         }
         // The apply button should not be visible if there is only one level visible (i.e. saved to the db or not)

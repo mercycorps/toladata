@@ -20,8 +20,9 @@ export class StaticLevelTierList extends React.Component{
 
     render() {
         let apply_button = null;
-        // Only show the Apply button if you haven't saved a level yet.
-        if (this.props.rootStore.levelStore.levels.length === 0) {
+        // Only show the Apply button if you haven't saved a level yet and if you're a 'high' level user.
+        if (this.props.rootStore.levelStore.levels.length === 0 &&
+            this.props.rootStore.levelStore.hasEditPermissions) {
             apply_button =
                 <div className="leveltier-list__actions">
                     <button
@@ -38,7 +39,7 @@ export class StaticLevelTierList extends React.Component{
         // the tiers, and you are a high level user.
         if (this.props.rootStore.levelStore.chosenTierSetKey == this.props.rootStore.levelStore.customTierSetKey &&
             this.props.rootStore.levelStore.useStaticTierList &&
-            this.props.rootStore.levelStore.accessLevel === 'high') {
+            this.props.rootStore.levelStore.hasEditPermissions) {
             settings_button =
                 <button
                         className="btn btn-link leveltier-list leveltier--editable__settings"
@@ -199,7 +200,7 @@ export class EditableLevelTierList extends React.Component{
                 <i className="fa fa-plus-circle" />Add level
             </button>;
 
-        const apply_button =
+        const applyButton =
             <div className="leveltier-list__actions">
                 <button
                     id="applyButton"
@@ -220,7 +221,7 @@ export class EditableLevelTierList extends React.Component{
                     </div>
                     {addTierButton}
                 </div>
-                {apply_button}
+                {applyButton}
 
             </form>
         )

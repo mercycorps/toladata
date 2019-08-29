@@ -66,7 +66,7 @@ class Picker extends React.Component {
                         maxMenuHeight={350}
                         options={options}
                         value={selectedOption}
-                        isDisabled={this.props.rootStore.uiStore.tierLockStatus == "locked" ? true : false}
+                        isDisabled={this.props.rootStore.uiStore.tierLockStatus == "locked"}
                         isSearchable={false}
                         onChange={this.handleChange}
                     />
@@ -84,12 +84,13 @@ const ChangeLogLink = ({programId}) => {
             <i className="fas fa-history" /> {gettext('Change log')}
         </a>
     </div>
-}
+};
 
 export const LevelTierPicker = inject("rootStore")(observer(function (props) {
     let tierListType = <StaticLevelTierList />;
     if (this.props.rootStore.levelStore.chosenTierSetKey == this.props.rootStore.levelStore.customTierSetKey &&
-        this.props.rootStore.levelStore.useStaticTierList === false){
+        !this.props.rootStore.levelStore.useStaticTierList &&
+        this.props.rootStore.levelStore.hasEditPermissions){
         tierListType = <EditableLevelTierList />;
     }
 
