@@ -651,7 +651,14 @@ class Command(BaseCommand):
                     pass
 
             # Create/upgrade admin levels for each country listed in the profile
-            for country_name in profile.get('admin', []):
+            try:
+                country_names = profile['admin']
+                if country_names == 'all':
+                    country_names = list(Country.objects.all().values_list('country', flat=True))
+            except KeyError:
+                country_names = []
+
+            for country_name in country_names:
                 ca, created = CountryAccess.objects.get_or_create(
                     country=Country.objects.get(country=country_name),
                     tolauser=tola_user
@@ -688,7 +695,15 @@ class Command(BaseCommand):
             'permission_level': 'high',
             'home_country': 'United States',
             'org': MC_ORG,
-            'admin': ['Tolaland']
+        },
+        'mc-basicadmin': {
+            'first_last': ['mc-basicadmin-first', 'mc-basicadmin-last'],
+            'email': 'mcbasicadmin@example.com',
+            'accessible_countries': standard_countries,
+            'permission_level': 'high',
+            'home_country': 'United States',
+            'org': MC_ORG,
+            'admin': 'all'
         },
         'gmail-low': {
             'first_last': ['gmail-low-first', 'gmail-low-last'],
