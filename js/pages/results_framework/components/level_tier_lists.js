@@ -104,18 +104,17 @@ class EditableLevelTier extends React.Component {
         let lockButton = null;
         if (this.props.showLockButton){
             lockButton =
-                <button
-                    type="button"
-                    className="btn btn-small p-0"
+                <a
+                    tabIndex="0"
+                    className="btn btn-sm btn-link"
                     data-toggle="popover"
                     data-trigger="focus"
                     data-placement="bottom"
-                    // data-html="true"
                     /* # Translators: This is the help text of an icon that indicates that this element can't be deleted */
                     data-content={gettext("This level is being used in the results framework")}
                 >
                     <i className='fa fa-lock text-muted' />
-                </button>
+                </a>
         }
 
         return (

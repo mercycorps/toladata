@@ -56,6 +56,9 @@ body > .container {
     font-weight: bold;
     padding-left: 0;
     padding-right: 0;
+    &:focus {
+        @include form-control-focus();
+    }
 }
 
 .btn-danger.btn-link {
