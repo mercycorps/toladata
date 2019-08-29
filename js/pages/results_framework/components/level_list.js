@@ -65,7 +65,9 @@ export class LevelListPanel  extends React.Component {
     };
 
     render() {
-        const isCollapseAllDisabled = this.props.rootStore.uiStore.hasVisibleChildren.length === 0;
+        const isCollapseAllDisabled = this.props.rootStore.uiStore.hasVisibleChildren.length === 0 ||
+            this.props.rootStore.uiStore.disableCardActions ||
+            this.props.rootStore.uiStore.activeCard;
         let expandoDiv = null;
         if (this.props.rootStore.levelStore.levels.filter( l => l.id !== "new").length > 1){
             expandoDiv =
