@@ -695,7 +695,6 @@ class Command(BaseCommand):
             'permission_level': 'high',
             'home_country': 'United States',
             'org': MC_ORG,
-            'admin': ['Tolaland']
         },
         'mc-basicadmin': {
             'first_last': ['mc-basicadmin-first', 'mc-basicadmin-last'],
