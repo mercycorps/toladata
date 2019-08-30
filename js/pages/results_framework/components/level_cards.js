@@ -166,18 +166,24 @@ export class LevelCardCollapsed extends React.Component {
         // The expando caret is only applied to levels that:
         // 1. Aren't at the end of the leveltier hierarchy
         // 2. Actually have children
+        // The expando click should be disabled when there is a card being edited
         let expando = null;
         if (this.props.levelProps.tierName != toJS(this.props.rootStore.levelStore.chosenTierSet.slice(-1)[0]) &&
             this.props.rootStore.levelStore.levels.filter( l => l.parent == this.props.level.id).length > 0){
-            expando = <FontAwesomeIcon className="text-action" icon={this.props.rootStore.uiStore.hasVisibleChildren.indexOf(this.props.level.id) >= 0 ? 'caret-down' : 'caret-right'} />
+            expando = <FontAwesomeIcon
+                className={this.props.rootStore.uiStore.disabledActionsOrActiveCard ? "" : "text-action"}
+                icon={this.props.rootStore.uiStore.hasVisibleChildren.indexOf(this.props.level.id) >= 0 ? 'caret-down' : 'caret-right'} />
         }
+        const expandoClasses = expando && !this.props.rootStore.uiStore.disabledActionsOrActiveCard ? "level-card__toggle" : null;
+        const expandoFunc = this.props.rootStore.uiStore.disabledActionsOrActiveCard ? null :
+            (e) => this.props.rootStore.uiStore.updateVisibleChildren(this.props.level.id);
 
-        let isDisabled = allIndicatorLinks.length == 0 || this.props.rootStore.uiStore.disableCardActions;
+        let isIndicatorDropdownDisabled = allIndicatorLinks.length === 0 || this.props.rootStore.uiStore.disableCardActions;
         return (
             <div className="level-card level-card--collapsed" id={`level-card-${this.props.level.id}`}>
                 <div
-                    className={expando ? "level-card__toggle": ""}
-                    onClick={(e) => this.props.rootStore.uiStore.updateVisibleChildren(this.props.level.id)}>
+                    className={expandoClasses}
+                    onClick={expandoFunc}>
                     {expando}
                     <span className="level-card--collapsed__name">
                         <LevelTitle
@@ -210,7 +216,7 @@ export class LevelCardCollapsed extends React.Component {
                     <div className="actions__bottom">
                         <a
                             tabIndex="0"
-                            className={classNames("btn btn-sm btn-link no-bold", {disabled: isDisabled})}
+                            className={classNames("btn btn-sm btn-link no-bold", {disabled: isIndicatorDropdownDisabled})}
                             data-toggle="popover"
                             data-trigger="focus"
                             data-placement="bottom"
