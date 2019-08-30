@@ -620,6 +620,10 @@ export class UIStore {
         }
     }
 
+    @computed get disabledActionsOrActiveCard() {
+        return this.disableCardActions || this.activeCard;
+    }
+
     @action
     editCard = (levelId) => {
         const cancelledLevelId = this.activeCard;
