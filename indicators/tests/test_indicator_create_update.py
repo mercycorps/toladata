@@ -1,5 +1,6 @@
 import datetime
 import json
+import uuid
 
 from django.test import RequestFactory, TestCase
 from django.urls import reverse_lazy
@@ -32,6 +33,7 @@ class TestIndcatorCreateUpdateBase(TestBase):
             'direction_of_change': Indicator.DIRECTION_OF_CHANGE_NONE,
             'periodic_targets': json.dumps(periodic_targets),
             'rationale': 'foo',
+            'indicator_key': uuid.uuid4()
         }
 
 
