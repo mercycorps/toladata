@@ -1,4 +1,4 @@
-import { observable, reaction } from 'mobx';
+import { observable, runInAction, reaction } from 'mobx';
 import IPTTProgram from './ipttProgram';
 import IPTTRouter from '../router';
 import api from '../../../apiv2';
