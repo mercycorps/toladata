@@ -45,15 +45,20 @@ export const getIndicator = (
 export const withMeasurement = (
     indicatorJSON = {}
 ) => ({
+        _formatDecimal(value) {
+            if (isNaN(parseFloat(value))) { return false; }
+            value = parseFloat(value);
+            if (Number.isInteger(value)) { return parseInt(value); }
+            return value;
+        },
+        frequency: parseInt(indicatorJSON.target_frequency),
         unitOfMeasure: indicatorJSON.unit_of_measure || false,
         isPercent: Boolean(indicatorJSON.is_percent),
         isCumulative: Boolean(indicatorJSON.is_cumulative),
         directionOfChange: indicatorJSON.direction_of_change || false,
         baseline: indicatorJSON.baseline || null,
-        _lopTarget: !isNaN(parseFloat(indicatorJSON.lop_target)) ? parseFloat(indicatorJSON.lop_target) : false,
+        _lopTarget: indicatorJSON.lop_target,
         get lopTarget() {
-            if (this._lopTarget === false) { return false; }
-            if (Number.isInteger(this._lopTarget)) { return parseInt(this._lopTarget); }
-            return this._lopTarget;
+            return this._formatDecimal(this._lopTarget);
         }
     });

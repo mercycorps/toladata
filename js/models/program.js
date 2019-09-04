@@ -100,6 +100,10 @@ export const withRFLevelOrdering = (
         _levelsLevelOrder: observable((programJSON.level_pks_level_order || [])),
         _levelsChainOrder: observable((programJSON.level_pks_chain_order || [])),
         _unassignedIndicators: observable((programJSON.unassigned_indicator_pks || [])),
+        levelIndicators: observable(new Map(
+            (programJSON.indicator_pks_for_level || []).map(
+                levelMapJSON => [levelMapJSON.pk, levelMapJSON.indicator_pks]
+            ))),
         updateOrder() {
             return api.rfLevelOrdering(this.pk).then(results => {
                 runInAction(() => {
@@ -124,24 +128,30 @@ export const withRFLevelOrdering = (
             return this._unassignedIndicators.map(pk => this.indicators.get(pk)) || [];
         },
         get indicatorsInLevelOrder() {
+            if (!this.resultsFramework) {
+                return this.unassignedIndicators;
+            }
             return Array.prototype.concat
                 .apply([], this.levelsInLevelOrder
-                                .map(level => level.indicatorOrder.map(pk => this.indicators.get(pk))))
+                                .map(level => this.levelIndicators.get(level.pk).filter(pk => this.indicators.has(pk))
+                                                            .map(pk => this.indicators.get(pk))))
                 .concat(this.unassignedIndicators);
         },
         get indicatorsInChainOrder() {
+            if (!this.resultsFramework) {
+                return this.unassignedIndicators;
+            }
             return Array.prototype.concat
                 .apply([], this.levelsInChainOrder
-                                .map(level => level.indicatorOrder.filter(pk => this.indicators.has(pk))
+                                .map(level => this.levelIndicators.get(level.pk).filter(pk => this.indicators.has(pk))
                                                             .map(pk => this.indicators.get(pk))))
                 .concat(this.unassignedIndicators);
         },
         _updateLevelIndicatorsOrder(orderByLevel=[]) {
             runInAction(() => {
+                this.levelIndicators.clear();
                 orderByLevel.forEach(({pk, indicator_pks}) => {
-                    if (this.levels.get(pk)) {
-                        this.levels.get(pk).indicatorOrder = indicator_pks;
-                    }
+                    this.levelIndicators.set(pk, indicator_pks);
                 });
             });
         }
