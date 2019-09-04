@@ -116,7 +116,7 @@ $("#indicator-list-react-component").on("click", ".indicator-link[data-tab]", fu
 
 // when indicator creation modal form completes a save
 $('#indicator_modal_div').on('created.tola.indicator.save', (e, params) => {
-    rootStore.program.updateIndicator(indicatorPk);
+    rootStore.program.updateIndicator(params.indicatorId);
 });
 
 // when indicator update modal form completes a save or change to periodic targets

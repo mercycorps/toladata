@@ -18,8 +18,8 @@ function ipttRound(value, percent) {
     return null;
 }
 
-const IndicatorEditModalCell = inject('filterStore')(
-    observer(({ filterStore, indicator }) => {
+const IndicatorEditModalCell = inject('rootStore')(
+    observer(({ rootStore, indicator }) => {
         const loadModal = (e) => {
             e.preventDefault();
             let url = `/indicators/indicator_update/${indicator.pk}/?modal=true`;
@@ -27,8 +27,8 @@ const IndicatorEditModalCell = inject('filterStore')(
             $("#modalmessages").empty();
             $("#indicator_modal_content").load(url);
             $("#indicator_modal_div").modal('show')
-                .on('updated.tola.indicator.save', filterStore.indicatorUpdate.bind(filterStore))
-                .on('deleted.tola.indicator.save', filterStore.indicatorDelete.bind(filterStore))
+                .on('updated.tola.indicator.save', rootStore.indicatorUpdate.bind(rootStore))
+                .on('deleted.tola.indicator.save', rootStore.indicatorDelete.bind(rootStore))
                 .one('hidden.bs.modal', (ev) => {
                     $(ev.target).off('.tola.save');
                 });
