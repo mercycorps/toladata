@@ -2,6 +2,7 @@ import copy
 import json
 import logging
 from datetime import datetime, timedelta
+import uuid
 import dateparser
 import requests
 from django.template.defaultfilters import truncatechars
@@ -289,6 +290,7 @@ class IndicatorCreate(IndicatorFormMixin, CreateView):
             'program': self.program,
             'periodic_targets': [],
             'initial_level_id': self.level_pk,
+            'idempotency_key': uuid.uuid4()
         })
         return context
 
@@ -303,7 +305,7 @@ class IndicatorCreate(IndicatorFormMixin, CreateView):
         kwargs.update({
             'request': self.request,
             'program': self.program,
-            'level': self.level_pk
+            'level': self.level_pk,
         })
         return kwargs
 
