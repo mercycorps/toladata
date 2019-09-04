@@ -1507,6 +1507,7 @@ def reorder_former_level_on_update(sender, update_fields, created, instance, **k
 
 class PeriodicTarget(models.Model):
     LOP_PERIOD = _('Life of Program (LoP) only')
+    LOP_LABEL = _('Life of Program')
     MIDLINE = _('Midline')
     ENDLINE = _('Endline')
     ANNUAL_PERIOD = _('Year')
@@ -1694,7 +1695,7 @@ class PeriodicTarget(models.Model):
         }
         if frequency == Indicator.ANNUAL:
             next_date_func = lambda x: date(x.year + 1, x.month, 1)
-            name_func = lambda start, count: '{period_name} {count}'.format(
+            name_func = lambda start, count: u'{period_name} {count}'.format(
                 period_name=_(cls.ANNUAL_PERIOD), count=count)
         elif frequency in months_per_period:
             next_date_func = lambda x: date(
@@ -1709,7 +1710,7 @@ class PeriodicTarget(models.Model):
                 # UPDATE: Turns out the below still translates... strftime() still returns an english
                 # month name, but since month names are translated elsewhere in the app, the _() turns it into
                 # the correct language
-                name_func = lambda start, count: '{month_name} {year}'.format(
+                name_func = lambda start, count: u'{month_name} {year}'.format(
                     month_name=_(start.strftime('%B')),
                     year=start.strftime('%Y')
                     )
@@ -1719,13 +1720,13 @@ class PeriodicTarget(models.Model):
                     Indicator.TRI_ANNUAL: cls.TRI_ANNUAL_PERIOD,
                     Indicator.QUARTERLY: cls.QUARTERLY_PERIOD
                 }[frequency]
-                name_func = lambda start, count: '{period_name} {count}'.format(
+                name_func = lambda start, count: u'{period_name} {count}'.format(
                     period_name=_(period_name), count=count)
         elif frequency == Indicator.LOP:
             return lambda start, end: [{
-                'name': _(cls.LOP_PERIOD),
+                'name': _(cls.LOP_LABEL),
                 'start': start,
-                'label': '{0} - {1}'.format(l10n_date_medium(start), l10n_date_medium(end)),
+                'label': None,
                 'end': end,
                 'customsort': 0
                 }]
@@ -1752,8 +1753,9 @@ class PeriodicTarget(models.Model):
                 yield {
                     'name': name_func(start, count+1),
                     'start': start,
-                    'label': '{0} - {1}'.format(
-                        l10n_date_medium(start), l10n_date_medium(next_start - timedelta(days=1))
+                    'label': u'{0} - {1}'.format(
+                        l10n_date_medium(start).decode('UTF-8'),
+                        l10n_date_medium(next_start - timedelta(days=1)).decode('UTF-8')
                         ) if frequency != Indicator.MONTHLY else None,
                     'end': next_start - timedelta(days=1),
                     'customsort': count
