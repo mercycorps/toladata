@@ -90,12 +90,6 @@ export default (
         updateProgramFilterData() {
             return this._programFilterDataStore.loadProgramFilterData(this.selectedProgramId);
         },
-        indicatorUpdate(e, {indicatorId, ...data}) {
-            this.updateProgramFilterData();
-        },
-        indicatorDelete(e, {indicatorId, ...data}) {
-            this.programFilterData.deleteIndicator(indicatorId);
-        },
         get _frequencyLabels() {
             return this.isTVA ? TVA_FREQUENCY_LABELS : TIMEPERIODS_FREQUENCY_LABELS;
         },

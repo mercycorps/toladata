@@ -104,7 +104,15 @@ export default (
                     $('#indicator_modal_div').modal('show');
                 }
             );
-        }
+        },
+        indicatorUpdate(e, {indicatorId, ...data}) {
+            return this.filterStore.updateProgramFilterData().then(
+                () => {this.loadReportData({update: true});}
+            );
+        },
+        indicatorDelete(e, {indicatorId, ...data}) {
+            this.filterStore.programFilterData.deleteIndicator(indicatorId);
+        },
     });
     const _updateReportData = reaction(
         () => [rootStore.filterStore.selectedProgramId, rootStore.filterStore.selectedFrequency],
