@@ -1,7 +1,5 @@
-import api from '../../../apiv2';
 import ProgramPageIndicator, { forProgramPage } from '../models/programPageIndicator';
 
-jest.mock('../../../apiv2');
 
 describe("bare program page indicator", () => {
     const Indicator = forProgramPage;

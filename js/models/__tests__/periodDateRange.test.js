@@ -1,8 +1,14 @@
 import { getPeriodDateRange } from '../periodDateRange';
 
 
+const forTesting = (
+    rangeJSON = {}
+) => ({
+    periods: rangeJSON.periods
+});
+
 describe('bare period date range', () => {
-    const Range = getPeriodDateRange();
+    const Range = getPeriodDateRange(forTesting);
     it("handles a lop target frequency", () => {
         let data = {
             frequency: 1,

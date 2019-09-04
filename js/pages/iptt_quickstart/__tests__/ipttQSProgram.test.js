@@ -25,4 +25,4 @@ describe("bare iptt qs program", () => {
         expect(program.periodCount(4)).toBe(5);
         expect(program.currentPeriod(4)).toBe(2);
     });
-})
+});

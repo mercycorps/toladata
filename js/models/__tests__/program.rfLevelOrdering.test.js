@@ -12,14 +12,17 @@ const levelsTesting = (programJSON) => ({
     levels: new Map([...new Set(
         (programJSON.level_pks_level_order || [])
             .concat(programJSON.level_pks_chain_order || [])
-    )].map(pk => [pk, {pk: pk}]))
+    )].map(pk => [pk, {pk: pk}])),
 });
 
+const rfTesting = (programJSON) => ({resultsFramework: programJSON.results_framework});
+
 const bareLevelTest = (fn) => (programJSON) => {
-    let program = extendObservable(extendObservable({}, levelsTesting(programJSON)), fn(programJSON));
-    if (programJSON.indicator_pks_for_level) {
-        program._updateLevelIndicatorsOrder(programJSON.indicator_pks_for_level);
-    }
+    let program = extendObservable(
+        extendObservable(
+            extendObservable({}, rfTesting(programJSON)),
+            levelsTesting(programJSON)),
+        fn(programJSON));
     return program;
 }
 
@@ -34,7 +37,8 @@ describe("bare rf level ordering program", () => {
     it("handles having two levels", () => {
         let program = Program({
             level_pks_level_order: [41, 12],
-            level_pks_chain_order: [12, 41]
+            level_pks_chain_order: [12, 41],
+            results_framework: true
         });
         expect(program.levelsInLevelOrder.length).toBe(2);
         expect(program.levelsInLevelOrder[0].pk).toBe(41);
@@ -85,19 +89,20 @@ describe("program levels have correct indicator order", () => {
             level_pks_level_order: [41, 12, 13],
             level_pks_chain_order: [13, 12, 41],
             unassigned_indicator_pks: [431, 237],
-            indicator_pks_for_level: indicator_pks_for_level
+            indicator_pks_for_level: indicator_pks_for_level,
+            results_framework: true
         });
     });
     it("handles having level indicator orders", () => {
-        expect(program.levels.get(13).indicatorOrder).toEqual([122, 18, 2]);
-        expect(program.levels.get(41).indicatorOrder.length).toEqual(0);
+        expect(program.levelIndicators.get(13)).toEqual([122, 18, 2]);
+        expect(program.levelIndicators.get(41).length).toEqual(0);
         program._updateLevelIndicatorsOrder([
                 indicator_pks_for_level[0],
                 {pk: 41, indicator_pks: [422, 12]},
                 {pk: 12, indicator_pks: []}
         ]);
-        expect(program.levels.get(12).indicatorOrder.length).toEqual(0);
-        expect(program.levels.get(41).indicatorOrder).toEqual([422, 12]);
+        expect(program.levelIndicators.get(12).length).toEqual(0);
+        expect(program.levelIndicators.get(41)).toEqual([422, 12]);
     });
     it("lists all indicators in order", () => {
         expect(program.indicatorsInLevelOrder.map(indicator => indicator.pk)).toEqual([10, 122, 18, 2, 431, 237]);
