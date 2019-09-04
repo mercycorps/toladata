@@ -11,7 +11,13 @@ import { getPeriodDateRange } from '../../../models/periodDateRange';
  * @return {Object}
  */
 
-const QSDateRange = getPeriodDateRange();
+const forIPTTQSDateRange = (
+    rangeJSON = {}
+) => ({
+    periods: rangeJSON.periods
+});
+
+const QSDateRange = getPeriodDateRange(forIPTTQSDateRange);
 
 export const forIpttQs = (
     programJSON = {}
