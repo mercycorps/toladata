@@ -1,7 +1,7 @@
 import React from 'react';
 import IPTTFilterForm from './filterForm';
 
-const IPTTSidebar = () => {
+export default () => {
     return (
         <div className="sidebar_wrapper">
             <div className="collapse width show" id="sidebar">
@@ -18,5 +18,3 @@ const IPTTSidebar = () => {
         </div>
     );
 }
-
-export default IPTTSidebar;
