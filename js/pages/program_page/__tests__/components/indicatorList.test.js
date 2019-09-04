@@ -1,9 +1,10 @@
+import '../../../../test_helpers/django_i18n_stubs';
 import React from 'react';
 import renderer from 'react-test-renderer';
 import { shallow } from 'enzyme';
 import IndicatorList, { StatusHeader, IndicatorFilter, IndicatorListTable } from '../../components/indicator_list';
 import { IndicatorFilterType } from '../../../../constants';
-import '../../../../test_helpers/django_i18n_stubs';
+
 
 import eventBus from '../../../../eventbus';
 

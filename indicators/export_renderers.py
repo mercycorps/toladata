@@ -190,9 +190,7 @@ class ExcelRendererBase(object):
         return get_percent_met
 
     def get_number(self, indicator):
-        if indicator.number_display:
-            return indicator.number_display
-        return indicator.number
+        return indicator.number_display
 
     def add_indicator_row(self, row, sheet, indicator):
         if indicator.unit_of_measure_type == Indicator.PERCENTAGE:
@@ -264,7 +262,7 @@ class ExcelRendererBase(object):
         widths = [10, 10, 17, 100]
         if self.serializer.level_column:
             widths.append(12)
-        widths += [30, 8, 15, 8, 12]
+        widths += [30, 12, 15, 8, 20]
         for period in self.all_periods:
             widths += [12]*3 if period.tva else [12,]
         for col_no, width in enumerate(widths):
@@ -329,7 +327,7 @@ class FullReportExcelRenderer(ExcelRendererBase):
                 self.add_headers(sheet)
                 self.add_data(sheet)
                 self.set_column_widths(sheet)
-        sheet = self.add_sheet('Change log')
+        sheet = self.add_sheet(ugettext('Change log'))
         program = Program.objects.get(pk=self.serializer.program_data['pk'])
         get_audit_log_workbook(sheet, program)
 

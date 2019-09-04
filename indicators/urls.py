@@ -8,16 +8,19 @@ apipatterns = [
     # program-wide ordering update (program page):
     url(r'^program/ordering/(?P<program>\d+)/', views.api_program_ordering, name='program_ordering'),
     # program by-level ordering update (IPTT):
-    # url(r'^program/level_ordering/(?P<program>\d+)/', views.api_program_level_ordering, name='level_ordering'),
+    url(r'^program/level_ordering/(?P<program>\d+)/', views.api_program_level_ordering, name='level_ordering'),
     # program page indicator update (with included orderin update):
     url(r'^program_page/indicator/(?P<pk>\d+)/',
         views.api_program_page_indicator, name='program_page_indicator'),
     # program page all indicators update:
     url(r'^program_page/(?P<program>\d+)/', views.api_program_page, name='api_program_page'),
+    url(r'^iptt/(?P<program>\d+)/filter_data/', views.api_iptt_filter_data, name='api_iptt_filter_data'),
+    url(r'^iptt/(?P<program>\d+)/report_data/', views.api_iptt_report_data, name='api_iptt_report_data'),
     # indicator update (program page):
     url(r'^indicator/(?P<indicator>\d+)', views.api_indicator_view, name='api_indicator_view'),
     # all indicators update (program page):
     url(r'^indicators/(?P<program>\d+)', views.api_indicators_list, name='api_indicators_list'),
+    url(r'^pinned_report/$', views.create_pinned_report, name='create_pinned_report')
 ]
 
 urlpatterns = [
@@ -54,13 +57,13 @@ urlpatterns = [
 
     url(r'^iptt_quickstart/', views.IPTTQuickstart.as_view(), name='iptt_quickstart'),
     url(r'^iptt_report/(?P<program>\d+)/(?P<reporttype>\w+)/$', views.IPTTReport.as_view(), name='iptt_report'),
-    url(r'^iptt_report_data/$', views.IPTTReportData.as_view(), name='iptt_ajax'),
+    #url(r'^iptt_report_data/$', views.IPTTReportData.as_view(), name='iptt_ajax'),
     url(r'iptt_api/iptt_excel/$', views.IPTTExcelReport.as_view(), name='iptt_excel'),
 
     # CSV endpoint (still in Alpha) GH ticket: #1854
     url(r'^programs_rollup_export', views.programs_rollup_export, name='programs_rollup_export'),
 
-    url(r'^pinned_report/$', views.create_pinned_report, name='create_pinned_report'),
+    #url(r'^pinned_report/$', views.create_pinned_report, name='create_pinned_report'),
     url(r'^pinned_report/delete/$', views.delete_pinned_report, name='delete_pinned_report'),
 
     # Results framework builder

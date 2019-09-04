@@ -19,7 +19,7 @@ function ipttRound(value, percent) {
 }
 
 const IndicatorEditModalCell = inject('filterStore')(
-    ({ filterStore, indicator }) => {
+    observer(({ filterStore, indicator }) => {
         const loadModal = (e) => {
             e.preventDefault();
             let url = `/indicators/indicator_update/${indicator.pk}/?modal=true`;
@@ -27,8 +27,8 @@ const IndicatorEditModalCell = inject('filterStore')(
             $("#modalmessages").empty();
             $("#indicator_modal_content").load(url);
             $("#indicator_modal_div").modal('show')
-                .on('updated.tola.indicator.save', filterStore.indicatorUpdate)
-                .on('deleted.tola.indicator.save', filterStore.indicatorDelete)
+                .on('updated.tola.indicator.save', filterStore.indicatorUpdate.bind(filterStore))
+                .on('deleted.tola.indicator.save', filterStore.indicatorDelete.bind(filterStore))
                 .one('hidden.bs.modal', (ev) => {
                     $(ev.target).off('.tola.save');
                 });
@@ -41,28 +41,27 @@ const IndicatorEditModalCell = inject('filterStore')(
                 </button>
             </td>
         );
-    }
-    );
+    })
+);
 
-const IndicatorResultModalCell = ({ indicator }) => {
-    const loadModal = (e) => {
-        e.preventDefault();
-        let url = `/indicators/result_table/${indicator.pk}/0/?edit=false`;
-        $("#indicator_modal_content").empty();
-        $("#modalmessages").empty();
-        $("#indicator_modal_content").load(url);
-        $("#indicator_modal_div").modal('show');
-    }
-    return (
-        <td className="td-no-side-borders">
-            <button type="button" className="btn btn-link p-1 indicator-ajax-popup indicator-data"
-                    onClick={ loadModal }>
-                <i className="fas fa-table"></i>
-            </button>
-            { indicator.name }
-        </td>
-    )
-}
+
+const IndicatorResultModalCell = inject("rootStore")(
+    observer(({ indicator, rootStore }) => {
+        const loadModal = (e) => {
+            e.preventDefault();
+            rootStore.loadResultsModal(indicator.pk);
+        }
+        return (
+            <td className="td-no-side-borders">
+                <button type="button" className="btn btn-link p-1 indicator-ajax-popup indicator-data"
+                        onClick={ loadModal }>
+                    <i className="fas fa-table"></i>
+                </button>
+                { indicator.name }
+            </td>
+        )
+    })
+);
 
 const IndicatorCell = ({ value, resultCell, ...props }) => {
     const displayValue = (value || value === 0) ? value : BLANK_TABLE_CELL;
@@ -76,12 +75,11 @@ const IndicatorCell = ({ value, resultCell, ...props }) => {
 
 
 const PercentCell = ({ value, ...props }) => {
-    value = ipttRound(value, true);
+    value = (value !== undefined && value !== null) ? `${value}%` : null;
     return <IndicatorCell value={ value } align="right" { ...props } />;
 }
 
 const NumberCell = ({ value, ...props }) => {
-    value = ipttRound(value, false);
     return <IndicatorCell value={ value } align="right" { ...props } />;
 }
 
@@ -90,7 +88,7 @@ const TVAResultsGroup = ({ value, resultCell, ...props }) => {
         <React.Fragment>
             <NumberCell value={ value.target } />
             <NumberCell value={ value.actual } />
-            <PercentCell value={ value.met }/>
+            <PercentCell value={ value.percent_met }/>
         </React.Fragment>
     );
 }
@@ -100,59 +98,64 @@ const TVAResultsGroupPercent = ({ value, resultCell, ...props }) => {
         <React.Fragment>
             <PercentCell value={ value.target } />
             <PercentCell value={ value.actual } />
-            <PercentCell value={ value.met }/>
+            <PercentCell value={ value.percent_met }/>
         </React.Fragment>
     );
 }
 
-const IndicatorRow = inject('reportStore')(
-    observer(({ reportStore, indicator, levelCol }) => {
+const IndicatorRow = inject('rootStore', 'reportStore')(
+    observer(({ rootStore, reportStore, indicator }) => {
         var ValueCell;
         var PeriodCell;
-        if (indicator.unitType == '%') {
+        if (indicator.isPercent) {
             ValueCell = PercentCell;
-            PeriodCell = reportStore.isTVA ? TVAResultsGroupPercent : PercentCell;
+            PeriodCell = rootStore.isTVA ? TVAResultsGroupPercent : PercentCell;
         } else {
             ValueCell = NumberCell;
-            PeriodCell = reportStore.isTVA ? TVAResultsGroup : NumberCell;
+            PeriodCell = rootStore.isTVA ? TVAResultsGroup : NumberCell;
         }
-        let cumulative = indicator.cumulative === null ? null
-                : indicator.cumulative ? gettext('Cumulative')
+        let cumulative = indicator.isCumulative === null ? null
+                : indicator.isCumulative ? gettext('Cumulative')
                             : gettext('Non-cumulative');
         let displayNumber = indicator.number;
         if (displayNumber && displayNumber.length > 0 && displayNumber.slice(-1) == ":") {
             displayNumber = displayNumber.slice(0, -1);
         }
+        let reportData = rootStore.getReportData(indicator.pk);
         return (
             <tr>
                 <IndicatorCell value={ displayNumber } />
                 <IndicatorResultModalCell indicator={ indicator } />
                 <IndicatorEditModalCell indicator={ indicator } />
-                { levelCol && <IndicatorCell value={ indicator.levelName } /> }
+                { !rootStore.resultsFramework && <IndicatorCell value={ indicator.oldLevelDisplay } /> }
                 <IndicatorCell value={ indicator.unitOfMeasure } />
                 <IndicatorCell value={ indicator.directionOfChange || gettext('N/A') } align="center" />
                 <IndicatorCell value={ cumulative || gettext('N/A') } />
-                <IndicatorCell value={ indicator.unitType } align="center" />
-                { indicator.baseline_na ? <IndicatorCell value={ gettext('N/A') } align="right"/> : <ValueCell value={ indicator.baseline } /> }
-                <ValueCell value={ indicator.lopTarget } />
-                <ValueCell value={ indicator.lopActual } />
-                <PercentCell value={ indicator.lopMet } />
-                {
-                    reportStore.periodValues(indicator).map(
+                <IndicatorCell value={ indicator.isPercent ? '%' : '#' } align="center" />
+                { indicator.baseline === null ? <IndicatorCell value={ gettext('N/A') } align="right"/> : <ValueCell value={ indicator.baseline } /> }
+                { reportData && (
+                <React.Fragment>
+                <ValueCell value={ reportData.lopTarget } />
+                <ValueCell value={ reportData.lopActual } />
+                <PercentCell value={ reportData.lopMet } />
+                {reportData.periodValues &&
+                    (rootStore.periodValues(indicator.pk).map(
                         (value, index) => <PeriodCell value={ value } key={ index } resultCell={ true }/>
-                    )
+                    ))
                 }
+                </React.Fragment>
+                )}
 
             </tr>
         );
     })
 );
 
-const LevelTitleRow = inject('reportStore')(
-    observer(({ reportStore, children }) => {
+const LevelTitleRow = inject('rootStore')(
+    observer(({ rootStore, children }) => {
         return (
             <tr>
-            <td colSpan={ reportStore.reportWidth }
+            <td colSpan={ rootStore.reportColumnWidth }
                 className="iptt-level-row"
             >
                { children }
@@ -165,7 +168,7 @@ const LevelTitleRow = inject('reportStore')(
 const LevelRow = ({ level }) => {
     return (
         <LevelTitleRow>
-             { level.tier.name }{ level.ontology ? ` ${level.ontology}` : '' }: { level.name }
+             { level.tierNumber }: { level.name }
         </LevelTitleRow>
     )
 }

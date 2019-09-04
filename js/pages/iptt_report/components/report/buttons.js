@@ -3,6 +3,8 @@ import ReactDOM from 'react-dom';
 import { inject, observer } from 'mobx-react';
 import { BootstrapPopoverButton } from '../../../../components/helpPopover';
 
+
+@observer
 class PinPopover extends React.Component {
     NOT_SENT = 0;
     SENDING = 1;
@@ -19,22 +21,19 @@ class PinPopover extends React.Component {
         this.setState({reportName: e.target.value});
     }
     isDisabled = () => {
-        return !this.props.routeStore.pinData || !this.state.reportName;
+        return !this.props.rootStore.pinAPI.pinReady || !this.state.reportName;
     }
     handleClick = () => {
         this.setState({status: this.SENDING});
-        $.ajax({
-            type: "POST",
-            url: this.props.routeStore.pinUrl,
-            data: {name: this.state.reportName, ...this.props.routeStore.pinData },
-            success: () => {
-                this.setState({status: this.SENT});
-                this.props.updatePosition();
-            },
-            error: (ev) => {
-                this.setState({status: this.FAILED});
-                console.log("ajax error:", ev);
-                }
+        this.props.rootStore.pinAPI.savePin({
+            name: this.state.reportName,
+            ...this.props.rootStore.pinParams
+        }).then( () => {
+            this.setState({status: this.SENT});
+            this.props.updatePosition();
+        }).catch( () => {
+            this.setState({status: this.FAILED});
+            console.log("ajax error:", ev);
         });
     }
     render() {
@@ -51,7 +50,7 @@ class PinPopover extends React.Component {
                                 {gettext('Success!  This report is now pinned to the program page')}
 
                             </span></p>
-                            <p><a href={ this.props.filterStore.programPageUrl }>
+                            <p><a href={ this.props.rootStore.pinAPI.programPageUrl }>
 
                                     {/* # Translators: This is not really an imperative, it's an option that is available once you have pinned a report to a certain web page */}
                                     {gettext('Visit the program page now.')}
@@ -109,15 +108,15 @@ class PinPopover extends React.Component {
 }
 
 
-@inject('filterStore', 'routeStore')
+@inject('rootStore')
+@observer
 export class PinButton extends BootstrapPopoverButton {
     popoverName = 'pin';
 
     getPopoverContent = () => {
         return (
             <PinPopover
-                filterStore={this.props.filterStore}
-                routeStore={this.props.routeStore}
+                rootStore={ this.props.rootStore }
                 updatePosition={() => {$(this.refs.target).popover('update');}}
             />
             );
@@ -145,14 +144,14 @@ export class PinButton extends BootstrapPopoverButton {
 @observer
 class ExcelPopover extends React.Component {
     getCurrent = () => {
-        if (this.props.routeStore.excelUrl) {
-            window.open(this.props.routeStore.excelUrl, '_blank');
+        if (this.props.excelUrl) {
+            window.open(this.props.excelUrl, '_blank');
         }
     }
 
     getAll = () => {
-        if (this.props.routeStore.fullExcelUrl) {
-            window.open(this.props.routeStore.fullExcelUrl, '_blank');
+        if (this.props.fullExcelUrl) {
+            window.open(this.props.fullExcelUrl, '_blank');
         }
     }
     render() {
@@ -175,16 +174,13 @@ class ExcelPopover extends React.Component {
     }
 }
 
-@inject('filterStore', 'routeStore')
 @observer
 export class ExcelPopoverButton extends BootstrapPopoverButton {
     popoverName = 'excel';
 
     getPopoverContent = () => {
         return (
-            <ExcelPopover
-                filterStore={this.props.filterStore}
-                routeStore={this.props.routeStore} />
+            <ExcelPopover { ...this.props } />
             );
     }
 
@@ -202,12 +198,11 @@ export class ExcelPopoverButton extends BootstrapPopoverButton {
 }
 
 
-@inject('routeStore')
 @observer
 export class ExcelButton extends React.Component {
      handleClick = () => {
-        if (this.props.routeStore.excelUrl) {
-            window.open(this.props.routeStore.excelUrl, '_blank');
+        if (this.props.excelUrl) {
+            window.open(this.props.excelUrl, '_blank');
         }
     }
 

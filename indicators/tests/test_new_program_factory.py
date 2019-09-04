@@ -60,7 +60,7 @@ class TestProgramGeneration(test.TestCase):
         # is open:
         self.assertLess(p.reporting_period_start, datetime.date.today())
         first_of_this_month = datetime.date(datetime.date.today().year, datetime.date.today().month, 1)
-        self.assertLessEqual(first_of_this_month - p.reporting_period_start, datetime.timedelta(days=61))
+        self.assertLessEqual(first_of_this_month - p.reporting_period_start, datetime.timedelta(days=63))
         self.assertGreaterEqual(first_of_this_month - p.reporting_period_start, datetime.timedelta(days=58))
         self.assertGreater(p.reporting_period_end, datetime.date.today())
         # is one year (less/greater for leap years)
