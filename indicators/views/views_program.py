@@ -11,7 +11,11 @@ from indicators.xls_export_utils import TAN, apply_title_styling, apply_label_st
 from indicators.models import Indicator, PinnedReport
 from workflow.models import Program
 from workflow.serializers import LogframeProgramSerializer
-from workflow.serializers_new import ProgramPageProgramSerializer, ProgramPageUpdateSerializer
+from workflow.serializers_new import (
+    ProgramPageProgramSerializer,
+    ProgramPageUpdateSerializer,
+    ProgramLevelUpdateSerializer,
+)
 
 from tola_management.permissions import (
     has_program_read_access,
@@ -269,6 +273,18 @@ def api_program_ordering(request, program):
         return JsonResponse({'success': False, 'msg': 'bad Program PK'})
     return JsonResponse(data)
 
+@login_required
+@has_program_read_access
+def api_program_level_ordering(request, program):
+    """Returns program-wide RF-aware ordering (used after indicator deletion on program page)"""
+    try:
+        data = ProgramLevelUpdateSerializer.update_ordering(program).data
+    except Program.DoesNotExist:
+        logger.warn('attempt to access program page ordering for bad pk {}'.format(program))
+        return JsonResponse({'success': False, 'msg': 'bad Program PK'})
+    return JsonResponse(data)
+
+
 
 @login_required
 @indicator_pk_adapter(has_indicator_read_access)
@@ -280,6 +296,7 @@ def api_program_page_indicator(request, pk, program):
         logger.warn('attempt to access indicator update for bad pk {}'.format(pk))
         return JsonResponse({'success': False, 'msg': 'bad Indicator PK'})
     return JsonResponse(data)
+
 
 @login_required
 @has_program_read_access
