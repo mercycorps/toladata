@@ -930,7 +930,7 @@ class Indicator(SafeDeleteModel):
 
 
     indicator_key = models.UUIDField(
-        default=uuid.uuid4, unique=True, help_text=" ", verbose_name=_("Indicator key")),
+        default=uuid.uuid4, help_text=" ", verbose_name=_("Indicator key"))
 
     # i.e. Alpha, Donor, Standard
     # TODO: make this a foreign key
@@ -1150,6 +1150,7 @@ class Indicator(SafeDeleteModel):
     )
 
     notes = models.TextField(_("Notes"), max_length=500, null=True, blank=True)
+
     # optimize query for class based views etc.
     objects = IndicatorManager()
     rf_aware_objects = generate_safedelete_queryset(

@@ -56,6 +56,13 @@
             novalidate>
 
         <div class="indicator-setup tab-set--vertical" id="indicator_modal_body">
+            <input type="hidden" id="indicator_key" name="indicator_key"
+                   {% if indicator %}
+                   value="{{ indicator.indicator_key }}"
+                   {% else %}
+                   value="{{ idempotency_key }}"
+                   {% endif %}
+                   >
 
             {% csrf_token %}
 
