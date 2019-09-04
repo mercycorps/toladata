@@ -6,7 +6,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: \n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2019-08-21 20:18-0700\n"
+"POT-Creation-Date: 2019-09-03 21:10-0700\n"
 "PO-Revision-Date: 2019-07-12 15:38-0700\n"
 "Last-Translator: \n"
 "Language-Team: \n"
@@ -110,7 +110,7 @@ msgid "New Entry"
 msgstr "Nuevo Valor"
 
 #: js/components/checkboxed-multi-select.js:55
-#: js/components/selectWidgets.js:149
+#: js/components/selectWidgets.js:152
 msgid "selected"
 msgstr "seleccionado"
 
@@ -122,24 +122,72 @@ msgstr "Buscar"
 msgid "Add indicator"
 msgstr "Agregar indicador"
 
-#: js/components/selectWidgets.js:130
+#: js/components/selectWidgets.js:133
 msgid "None available"
 msgstr "Ninguno disponible"
 
-#: js/components/selectWidgets.js:140 js/components/selectWidgets.js:144
+#: js/components/selectWidgets.js:143 js/components/selectWidgets.js:147
 msgid "None selected"
 msgstr "Ninguno/a Seleccionado"
 
 #. Translators: refers to grouping the report by the level of the indicator */
-#: js/components/selectWidgets.js:194
+#: js/components/selectWidgets.js:195
 #: js/pages/program_page/models/programPageUIStore.js:52
 msgid "by Level"
 msgstr "por Nivel"
 
 #. Translators: menu for selecting how rows are grouped in a report */
-#: js/components/selectWidgets.js:200
+#: js/components/selectWidgets.js:201
 msgid "Group indicators"
 msgstr "Agrupar indicadores"
+
+#: js/constants.js:21 js/pages/iptt_quickstart/models/root_store.js:30
+msgid "Life of Program (LoP) only"
+msgstr "Vida del programa (LoP) solamente"
+
+#: js/constants.js:22 js/pages/iptt_quickstart/models/root_store.js:31
+msgid "Midline and endline"
+msgstr "Línea media y línea final"
+
+#: js/constants.js:23 js/pages/iptt_quickstart/models/root_store.js:32
+msgid "Annual"
+msgstr "Anual"
+
+#: js/constants.js:24 js/pages/iptt_quickstart/models/root_store.js:33
+msgid "Semi-annual"
+msgstr "Semestral"
+
+#: js/constants.js:25 js/pages/iptt_quickstart/models/root_store.js:34
+msgid "Tri-annual"
+msgstr "Trienal"
+
+#: js/constants.js:26 js/pages/iptt_quickstart/models/root_store.js:35
+msgid "Quarterly"
+msgstr "Trimestral"
+
+#: js/constants.js:27 js/pages/iptt_quickstart/models/root_store.js:36
+msgid "Monthly"
+msgstr "Mensual"
+
+#: js/constants.js:33
+msgid "Years"
+msgstr "Años"
+
+#: js/constants.js:34
+msgid "Semi-annual periods"
+msgstr "Períodos semestrales"
+
+#: js/constants.js:35
+msgid "Tri-annual periods"
+msgstr "Períodos trienales"
+
+#: js/constants.js:36
+msgid "Quarters"
+msgstr "Trimestres"
+
+#: js/constants.js:37
+msgid "Months"
+msgstr "Meses"
 
 #: js/level_utils.js:17
 msgid "Mercy Corps"
@@ -302,14 +350,14 @@ msgstr ""
 
 #. Translators: option to show all periods for the report */
 #: js/pages/iptt_quickstart/components/radios.js:26
-#: js/pages/iptt_report/components/sidebar/reportSelect.js:148
+#: js/pages/iptt_report/components/sidebar/reportSelect.js:117
 #: js/pages/program_page/components/indicator_list.js:80
 msgid "Show all"
 msgstr "Ver todo"
 
 #. Translators: option to show a number of recent periods for the report */
 #: js/pages/iptt_quickstart/components/radios.js:42
-#: js/pages/iptt_report/components/sidebar/reportSelect.js:166
+#: js/pages/iptt_report/components/sidebar/reportSelect.js:135
 msgid "Most recent"
 msgstr "Más reciente"
 
@@ -329,73 +377,45 @@ msgstr "Programa"
 msgid "Target periods"
 msgstr "Periodos objetivo"
 
-#: js/pages/iptt_quickstart/models/root_store.js:31
-msgid "Life of Program (LoP) only"
-msgstr "Vida del programa (LoP) solamente"
-
-#: js/pages/iptt_quickstart/models/root_store.js:32
-msgid "Annual"
-msgstr "Anual"
-
-#: js/pages/iptt_quickstart/models/root_store.js:33
-msgid "Midline and endline"
-msgstr "Línea media y línea final"
-
-#: js/pages/iptt_quickstart/models/root_store.js:34
-msgid "Tri-annual"
-msgstr "Trienal"
-
-#: js/pages/iptt_quickstart/models/root_store.js:35
-msgid "Semi-annual"
-msgstr "Semestral"
-
-#: js/pages/iptt_quickstart/models/root_store.js:36
-msgid "Quarterly"
-msgstr "Trimestral"
-
-#: js/pages/iptt_quickstart/models/root_store.js:37
-msgid "Monthly"
-msgstr "Mensual"
-
 #. Translators: The user has successfully "pinned" a report link to a program page for quick access to the report */}
-#: js/pages/iptt_report/components/report/buttons.js:51
+#: js/pages/iptt_report/components/report/buttons.js:50
 msgid "Success!  This report is now pinned to the program page"
 msgstr "¡Éxito! Este informe ahora está anclado en la página del programa"
 
 #. Translators: This is not really an imperative, it's an option that is available once you have pinned a report to a certain web page */}
-#: js/pages/iptt_report/components/report/buttons.js:57
+#: js/pages/iptt_report/components/report/buttons.js:56
 msgid "Visit the program page now."
 msgstr "Visitar la página del programa ahora."
 
-#: js/pages/iptt_report/components/report/buttons.js:67
+#: js/pages/iptt_report/components/report/buttons.js:66
 msgid "Something went wrong when attempting to pin this report"
 msgstr "Algo salió mal al intentar anclar este informe"
 
 #. Translators: a field where users can name their newly created report */
-#: js/pages/iptt_report/components/report/buttons.js:79
+#: js/pages/iptt_report/components/report/buttons.js:78
 msgid "Report name"
 msgstr "Nombre del informe"
 
-#: js/pages/iptt_report/components/report/buttons.js:92
+#: js/pages/iptt_report/components/report/buttons.js:91
 msgid "Pin to program page"
 msgstr "Anclar a la página del programa"
 
-#: js/pages/iptt_report/components/report/buttons.js:101
+#: js/pages/iptt_report/components/report/buttons.js:100
 msgid "Sending"
 msgstr "Enviando"
 
 #. Translators: a button that lets a user "pin" (verb) a report to their home page */
-#: js/pages/iptt_report/components/report/buttons.js:136
+#: js/pages/iptt_report/components/report/buttons.js:135
 msgid "Pin"
 msgstr "Fijar"
 
 #. Translators: a download button for a report containing just the data currently displayed */
-#: js/pages/iptt_report/components/report/buttons.js:164
+#: js/pages/iptt_report/components/report/buttons.js:163
 msgid "Current view"
 msgstr "Vista actual"
 
 #. Translators: a download button for a report containing all available data */
-#: js/pages/iptt_report/components/report/buttons.js:170
+#: js/pages/iptt_report/components/report/buttons.js:169
 msgid "All program data"
 msgstr "Todos los datos del programa"
 
@@ -420,17 +440,17 @@ msgid "% met"
 msgstr "% cumplido"
 
 #. Translators: header for a group of columns showing totals over the life of the program */
-#: js/pages/iptt_report/components/report/tableHeader.js:20
+#: js/pages/iptt_report/components/report/tableHeader.js:24
 msgid "Life of program"
 msgstr "Vida del programa"
 
 #. Translators: Abbreviation as column header for "number" column */
-#: js/pages/iptt_report/components/report/tableHeader.js:45
+#: js/pages/iptt_report/components/report/tableHeader.js:49
 msgid "No."
 msgstr "No."
 
 #. Translators: Column header for indicator Name column */
-#: js/pages/iptt_report/components/report/tableHeader.js:51
+#: js/pages/iptt_report/components/report/tableHeader.js:55
 #: js/pages/logframe/components/table.js:30
 #: js/pages/program_page/components/indicator_list.js:192
 #: js/pages/tola_management_pages/audit_log/views.js:115
@@ -440,42 +460,42 @@ msgid "Indicator"
 msgstr "Indicador"
 
 #. Translators: Column header for indicator Level name column */
-#: js/pages/iptt_report/components/report/tableHeader.js:58
+#: js/pages/iptt_report/components/report/tableHeader.js:62
 #: js/pages/program_page/components/indicator_list.js:194
 msgid "Level"
 msgstr "Nivel"
 
 #. Translators: Column header */
-#: js/pages/iptt_report/components/report/tableHeader.js:65
+#: js/pages/iptt_report/components/report/tableHeader.js:69
 #: js/pages/program_page/components/indicator_list.js:195
 msgid "Unit of measure"
 msgstr "Unidad de medida"
 
 #. Translators: Column header for "direction of change" column (increasing/decreasing) */
-#: js/pages/iptt_report/components/report/tableHeader.js:70
+#: js/pages/iptt_report/components/report/tableHeader.js:74
 msgid "Change"
 msgstr "Cambio"
 
 #. Translators: Column header, stands for "Cumulative"/"Non-cumulative" */
-#: js/pages/iptt_report/components/report/tableHeader.js:76
+#: js/pages/iptt_report/components/report/tableHeader.js:80
 msgid "C / NC"
 msgstr "C / NC"
 
 #. Translators: Column header, numeric or percentage type indicator */
-#: js/pages/iptt_report/components/report/tableHeader.js:82
+#: js/pages/iptt_report/components/report/tableHeader.js:86
 msgid "# / %"
 msgstr "# / %"
 
 #. Translators: Column header */
-#: js/pages/iptt_report/components/report/tableHeader.js:87
+#: js/pages/iptt_report/components/report/tableHeader.js:91
 #: js/pages/program_page/components/indicator_list.js:196
 msgid "Baseline"
 msgstr "Base"
 
 #: js/pages/iptt_report/components/report/tableRows.js:6
+#: js/pages/iptt_report/components/report/tableRows.js:132
 #: js/pages/iptt_report/components/report/tableRows.js:133
-#: js/pages/iptt_report/components/report/tableRows.js:134
-#: js/pages/iptt_report/components/report/tableRows.js:136
+#: js/pages/iptt_report/components/report/tableRows.js:135
 #: js/pages/program_page/components/indicator_list.js:259
 #: js/pages/tola_management_pages/audit_log/views.js:42
 #: js/pages/tola_management_pages/audit_log/views.js:50
@@ -484,26 +504,26 @@ msgstr "Base"
 msgid "N/A"
 msgstr "N/A"
 
-#: js/pages/iptt_report/components/report/tableRows.js:120
+#: js/pages/iptt_report/components/report/tableRows.js:118
 msgid "Cumulative"
 msgstr "Acumulativo"
 
-#: js/pages/iptt_report/components/report/tableRows.js:121
+#: js/pages/iptt_report/components/report/tableRows.js:119
 msgid "Non-cumulative"
 msgstr "No acumulativo"
 
-#: js/pages/iptt_report/components/report/tableRows.js:177
+#: js/pages/iptt_report/components/report/tableRows.js:180
 #: js/pages/iptt_report/models/filterStore.js:699
 msgid "Indicators unassigned to a results framework level"
 msgstr "Indicadores sin asignar a un nivel del sistema de resultados"
 
 #. Translators: Labels a set of filters to select which data to show */
-#: js/pages/iptt_report/components/sidebar/filterForm.js:46
+#: js/pages/iptt_report/components/sidebar/filterForm.js:45
 msgid "Report Options"
 msgstr "Opciones del Informe"
 
 #. Translators: clears all filters set on a report */
-#: js/pages/iptt_report/components/sidebar/filterForm.js:57
+#: js/pages/iptt_report/components/sidebar/filterForm.js:56
 msgid "Clear filters"
 msgstr "Limpiar filtros"
 
@@ -512,22 +532,22 @@ msgstr "Limpiar filtros"
 msgid "Change log"
 msgstr "Registro de cambios"
 
-#: js/pages/iptt_report/components/sidebar/reportFilter.js:32
+#: js/pages/iptt_report/components/sidebar/reportFilter.js:21
 msgid "Levels"
 msgstr "Niveles"
 
 #. Translators: labels sites that a data could be collected at */
-#: js/pages/iptt_report/components/sidebar/reportFilter.js:53
+#: js/pages/iptt_report/components/sidebar/reportFilter.js:40
 msgid "Sites"
 msgstr "Sitios"
 
 #. Translators: labels types of indicators to filter by */
-#: js/pages/iptt_report/components/sidebar/reportFilter.js:70
+#: js/pages/iptt_report/components/sidebar/reportFilter.js:57
 msgid "Types"
 msgstr "Tipos"
 
 #. Translators: labels sectors (i.e. 'Food Security') that an indicator can be categorized as */
-#: js/pages/iptt_report/components/sidebar/reportFilter.js:87
+#: js/pages/iptt_report/components/sidebar/reportFilter.js:74
 #: js/pages/tola_management_pages/organization/views.js:54
 #: js/pages/tola_management_pages/program/components/edit_program_profile.js:129
 #: js/pages/tola_management_pages/program/views.js:53
@@ -535,7 +555,7 @@ msgid "Sectors"
 msgstr "Sectores"
 
 #. Translators: labels a filter to select which indicators to display */
-#: js/pages/iptt_report/components/sidebar/reportFilter.js:104
+#: js/pages/iptt_report/components/sidebar/reportFilter.js:91
 #: js/pages/logframe/models/filterStore.js:34
 msgid "Indicators"
 msgstr "Indicadores"
@@ -545,12 +565,12 @@ msgid "Time periods"
 msgstr "Períodos de tiempo"
 
 #. Translators: menu for selecting the start date for a report */
-#: js/pages/iptt_report/components/sidebar/reportSelect.js:196
+#: js/pages/iptt_report/components/sidebar/reportSelect.js:165
 msgid "Start"
 msgstr "Inicio"
 
 #. Translators: menu for selecting the end date for a report */
-#: js/pages/iptt_report/components/sidebar/reportSelect.js:215
+#: js/pages/iptt_report/components/sidebar/reportSelect.js:184
 msgid "End"
 msgstr "Fin"
 
@@ -559,6 +579,18 @@ msgstr "Fin"
 msgid "Show/Hide Filters"
 msgstr "Mostrar/Ocultar filtros"
 
+#. Translators: this labels a filter option for a label as including subordinate levels */
+#: js/pages/iptt_report/models/ipttLevel.js:33
+#, fuzzy, python-format
+#| msgid "and sub-levels:"
+msgid "%s and sub-levels: %s"
+msgstr "y subniveles:"
+
+#: js/pages/iptt_report/models/ipttRootStore.js:486
+#: js/pages/logframe/components/table.js:110
+msgid "Indicators unassigned to  a results framework level"
+msgstr "Indicadores sin asignar a un nivel del sistema de resultados"
+
 #: js/pages/iptt_report/models/programStore.js:149
 msgid "and sub-levels:"
 msgstr "y subniveles:"
@@ -566,10 +598,6 @@ msgstr "y subniveles:"
 #: js/pages/logframe/components/subtitle.js:14
 msgid "View results framework"
 msgstr "Ver sistema de resultados"
-
-#: js/pages/logframe/components/table.js:110
-msgid "Indicators unassigned to  a results framework level"
-msgstr "Indicadores sin asignar a un nivel del sistema de resultados"
 
 #. Translators: short for "Logistical Framework"
 #: js/pages/logframe/components/title.js:31
@@ -2056,18 +2084,6 @@ msgstr "Super Administrador"
 #~ msgid "Endline"
 #~ msgstr "Línea final"
 
-#~ msgid "Year"
-#~ msgstr "Año"
-
-#~ msgid "Semi-annual period"
-#~ msgstr "Períodos semestrales"
-
-#~ msgid "Tri-annual period"
-#~ msgstr "Períodos trienales"
-
-#~ msgid "Quarter"
-#~ msgstr "Trimestre"
-
 #~ msgid "Period"
 #~ msgstr "Período"
 
@@ -2156,9 +2172,6 @@ msgstr "Super Administrador"
 
 #~ msgid "Success, Data Updated!"
 #~ msgstr "¡Éxito, datos actualizados!"
-
-#~ msgid "Month"
-#~ msgstr "Mes"
 
 #~ msgid "Please select a valid program."
 #~ msgstr "Por favor seleccione un programa válido."
