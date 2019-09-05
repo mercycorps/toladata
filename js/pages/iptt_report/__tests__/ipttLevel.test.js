@@ -31,11 +31,6 @@ describe("bare iptt level", () => {
         expect(level2.chainPk).toBeNull();
         expect(level2.showForChain(5)).toBeFalsy();
     });
-    it("handles an 'all' chain pk", () => {
-        let level = Level({chain_pk: 'all'});
-        expect(level.showForChain(5)).toBeTruthy();
-        expect(level.showForChain(2)).toBeTruthy();
-    });
 });
 
 describe("full iptt level", () => {

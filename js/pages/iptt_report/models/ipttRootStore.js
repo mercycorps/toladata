@@ -61,7 +61,8 @@ export default (
             return this.filterStore.resultsFramework && this.filterStore.allLevels.length > 0 ?
                 this.filterStore.getLevelIndicatorGroups().filter(
                     levelGroup => ((levelGroup.indicators.length > 0) ||
-                                  ((levelGroup.level !== null) &&
+                                  (!this.filterStore.filtersActive &&
+                                   (levelGroup.level !== null) &&
                                    (levelGroup.level.tierDepth === 1)))
                 ) :
                 false;

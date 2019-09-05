@@ -18,7 +18,7 @@ export const forIPTT = (
         return !isNaN(parseInt(tierPk)) && parseInt(tierPk) === this.tierPk;
     },
     chainPk: !isNaN(parseInt(levelJSON.chain_pk)) ? parseInt(levelJSON.chain_pk) : null,
-    _alwaysShowChain: levelJSON.chain_pk === 'all',
+    _alwaysShowChain: false, // && levelJSON.chain_pk === 'all',
     showForChain(chainPk) {
         return this._alwaysShowChain || (!isNaN(parseInt(chainPk)) && parseInt(chainPk) === this.chainPk);
     },
