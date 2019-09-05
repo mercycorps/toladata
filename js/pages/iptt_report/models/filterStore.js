@@ -101,7 +101,7 @@ export default (
             } return [BLANK_OPTION];
         },
         get selectedFrequency() {
-            return this.selectedProgramId ? parseInt(this._selectedFrequency) : null;
+            return (this.selectedProgramId && !isNaN(parseInt(this._selectedFrequency))) ? parseInt(this._selectedFrequency) : null;
         },
         get selectedFrequencyOption() {
             return (this.programFilterData && this.selectedFrequency !== null) ?
@@ -228,6 +228,14 @@ export default (
             endPeriod = !isNaN(parseInt(endPeriod)) ? parseInt(endPeriod) : this._lastPeriod;
             if (this._lastPeriod !== null) {
                 this._end = Math.max((this.startPeriodValue || 0), Math.min(this._lastPeriod, endPeriod));
+            }
+        },
+        setTimeframe({mostRecent = null, showAll = null} = {}) {
+            if (mostRecent) {
+                this.mostRecentValue = mostRecent;
+            }
+            if (showAll) {
+                this.showAll = true;
             }
         },
         get resultsFramework() {
@@ -605,8 +613,12 @@ export default (
     filterStore._reportType = filterStore._router.isTVA ? TVA : TIMEPERIODS;
     filterStore._selectedProgramId = filterStore._router.programId;
     filterStore._selectedFrequency = filterStore._router.frequency;
-    filterStore.startPeriodValue = filterStore._router.start;
-    filterStore.endPeriodValue = filterStore._router.end;
+    if (filterStore._router.timeframe) {
+        filterStore.setTimeframe(filterStore._router.timeframe);
+    } else {
+        filterStore.startPeriodValue = filterStore._router.start;
+        filterStore.endPeriodValue = filterStore._router.end;
+    }
     filterStore._mostRecentForce = filterStore._router.mr;
     filterStore.groupBy = filterStore._router.groupBy;
     filterStore.sectorFilters = filterStore._router.sectors;

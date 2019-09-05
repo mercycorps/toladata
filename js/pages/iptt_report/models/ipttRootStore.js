@@ -78,7 +78,7 @@ export default (
                 [];
         },
         getReportData(indicatorPk) {
-            return this.currentReport.has(parseInt(indicatorPk)) ?
+            return (this.currentReport && this.currentReport.has(parseInt(indicatorPk))) ?
                     this.currentReport.get(parseInt(indicatorPk)) : {};
         },
         periodValues(indicatorPk) {

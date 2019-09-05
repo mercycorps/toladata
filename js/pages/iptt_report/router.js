@@ -57,13 +57,25 @@ export default () => {
             return this._router.getState().params.programId;
         },
         get frequency() {
-            return this._router.getState().params.frequency;
+            let {frequency, timeperiods, targetperiods, ...params} = this._router.getState().params;
+            if (!isNaN(parseInt(frequency))) { return parseInt(frequency); }
+            if (!isNaN(parseInt(timeperiods))) { return parseInt(timeperiods); }
+            if (!isNaN(parseInt(targetperiods))) { return parseInt(targetperiods); }
+            return null;
         },
         get start() {
             return this._router.getState().params.start;
         },
         get end() {
             return this._router.getState().params.end;
+        },
+        get timeframe() {
+            if (this._router.getState().params.timeframe == 2) {
+                return {mostRecent: this._router.getState().params.numrecentperiods};
+            } else if (this._router.getState().params.timeframe == 1) {
+                return {showAll: true};
+            }
+            return false;
         },
         get mr() {
             return this._router.getState().params.mr == 1;
