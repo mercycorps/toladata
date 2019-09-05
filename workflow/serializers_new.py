@@ -540,6 +540,13 @@ ProgramPageUpdateSerializer = get_serializer(
     ProgramBase
 )
 
+class QSPeriodDateRangeSerializer(serializers.Serializer):
+    past = serializers.SerializerMethodField()
+
+    def get_past(self, period):
+        return period['start'] < self.context.get('now', timezone.now().date())
+
+
 class PeriodDateRangeSerializer(serializers.Serializer):
     start = serializers.DateField()
     end = serializers.DateField()
@@ -567,6 +574,7 @@ class PeriodDateRangeSerializer(serializers.Serializer):
     def get_year(self, period):
         return period['start'].year
 
+
 class ProgramPeriodsMixin(object):
     frequencies = serializers.SerializerMethodField()
     period_date_ranges = serializers.SerializerMethodField()
@@ -587,14 +595,13 @@ class ProgramPeriodsMixin(object):
         return {
             frequency: PeriodDateRangeSerializer(
                 list(program.get_periods_for_frequency(frequency)),
-                many=True, context={'frequency': frequency}
+                many=True, context={'frequency': frequency, 'now': self.context.get('now', timezone.now().date())}
             ).data
             for frequency, _ in Indicator.TARGET_FREQUENCIES if frequency != Indicator.EVENT
         }
 
 
 class IPTTQSMixin(object):
-
     class Meta:
         override_fields = True
         fields = [
@@ -622,6 +629,7 @@ class IPTTQSMixin(object):
 
     @classmethod
     def load_for_pks(cls, pks):
+        now = timezone.now().date()
         programs = Program.rf_aware_objects.only(
             *cls._get_query_fields()
         ).prefetch_related(
@@ -633,12 +641,16 @@ class IPTTQSMixin(object):
                 to_attr='prefetch_indicators'
             )
         ).filter(pk__in=pks)
-        return cls(programs, many=True)
+        return cls(programs, many=True, context={'now': now})
 
     def get_period_date_ranges(self, program):
         return {
-            frequency: PeriodDateRangeSerializer(list(program.get_periods_for_frequency(frequency)), many=True).data
-            for frequency, _ in Indicator.TARGET_FREQUENCIES if frequency != Indicator.EVENT
+            frequency: QSPeriodDateRangeSerializer(
+                list(program.get_short_form_periods_for_frequency(frequency)), many=True,
+                context={'frequency': frequency, 'now': self.context.get('now', timezone.now().date())}).data
+            for frequency, _ in Indicator.TARGET_FREQUENCIES if frequency not in [
+                Indicator.EVENT, Indicator.LOP, Indicator.MID_END
+            ]
         }
 
 
@@ -789,7 +801,8 @@ class IPTTMixin(object):
             ).order_by('name').values('pk', 'name', 'result__indicator__pk'),
             'sectors': Sector.objects.select_related(None).prefetch_related(None).filter(
                 indicator__program_id=program_pk
-            ).order_by('sector').values('pk', 'sector', 'indicator__pk')
+            ).order_by('sector').values('pk', 'sector', 'indicator__pk'),
+            'now': timezone.now().date()
         }
         return cls(program, context=context)
 

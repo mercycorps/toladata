@@ -756,6 +756,10 @@ class Program(models.Model):
         period_generator = PeriodicTarget.generate_for_frequency(frequency)
         return period_generator(self.reporting_period_start, self.reporting_period_end)
 
+    def get_short_form_periods_for_frequency(self, frequency):
+        period_generator = PeriodicTarget.generate_for_frequency(frequency, short_form=True)
+        return period_generator(self.reporting_period_start, self.reporting_period_end)
+
     @property
     def target_frequencies(self):
         return self.indicator_set.all().order_by().values('target_frequency').distinct().values_list('target_frequency', flat=True)
