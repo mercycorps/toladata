@@ -1659,7 +1659,7 @@ class PeriodicTarget(models.Model):
         return self.period
 
     @classmethod
-    def generate_for_frequency(cls, frequency):
+    def generate_for_frequency(cls, frequency, short_form=False):
         """
         Returns a generator function to yield periods based on start and end dates for a given frequency
 
@@ -1747,6 +1747,19 @@ class PeriodicTarget(models.Model):
         else:
             next_date_func = None
             name_func = None
+        def short_form_generator(start, end):
+            count = 0
+            while start < end:
+                next_start = next_date_func(start)
+                yield {
+                    'start': start,
+                    'end': end,
+                    'customsort': count
+                }
+                count += 1
+                start = next_start
+        if short_form:
+            return short_form_generator
         def period_generator(start, end):
             count = 0
             while start < end:
