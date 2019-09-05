@@ -1,5 +1,5 @@
-Django>=2.2,<3
-# Django>=1.11.23,<2
+
+Django>=1.11.23,<2
 dateparser
 beautifulsoup4<4.7
 bs4
