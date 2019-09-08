@@ -63,26 +63,54 @@ export default (
         _start: null,
         _end: null,
         _mostRecentForce: null,
-        _oldMostRecent: null,
         _groupBy: GROUP_BY_CHAIN,
         _indicatorFilters: {},
         get isTVA() {
             return this._reportType === TVA;
         },
+        get selectedProgramId() {
+            return this._selectedProgramId;
+        },
+        /**
+         * Method instead of setter because there are side effects (updating frequency/timeframe)
+         */
+        setProgramId(programId) {
+            programId = parseInt(programId);
+            if (isNaN(programId)) {
+                this._selectedProgramId = null;
+            }
+            else if (programId !== this._selectedProgramId) {
+                this.clearFilters();
+                const frequency = this.selectedFrequency;
+                const periods = {
+                    mostRecent: this.mostRecentValue != '' ? this.mostRecentValue : null,
+                    showAll: this.showAll,
+                    start: this.startPeriodValue,
+                    end: this.endPeriodValue
+                };
+                this._selectedProgramId = programId;
+                return this.updateProgramFilterData().then(
+                    () => {
+                        this.setFrequency(frequency);
+                        this.setPeriods(periods);
+                    }
+                );
+            }
+        },
+        /**
+         * Options throughout returns a [{value, label}] array to supply select options
+         */
         get programOptions() {
             return (this.isTVA ? this._programsListStore.listTvaPrograms() :
                                 this._programsListStore.listPrograms())
                         .map(program => ({value: program.pk, label: program.name}));
-        },
-        get selectedProgramId() {
-            return this._selectedProgramId;
         },
         get selectedProgramOption() {
             let program = this._programsListStore.getProgram(this.selectedProgramId);
             return program !== null ? {value: program.pk, label: program.name} : BLANK_OPTION;
         },
         set selectedProgramOption(option) {
-            this._selectedProgramId = !isNaN(parseInt(option.value)) ? parseInt(option.value) : null;
+            this.setProgramId(option.value);
         },
         get programFilterData() {
             return this._programFilterDataStore.getProgramFilterData(this.selectedProgramId);
@@ -103,13 +131,40 @@ export default (
         get selectedFrequency() {
             return (this.selectedProgramId && !isNaN(parseInt(this._selectedFrequency))) ? parseInt(this._selectedFrequency) : null;
         },
+        /**
+         * method instead of setter because of side effects (updating timeframe)
+         */
+        setFrequency(frequency) {
+            frequency = parseInt(frequency);
+            if (isNaN(frequency)) {
+                this._selectedFrequency = null;
+                return false;
+            }
+            if (this.isTVA && !this.programFilterData.frequencies.has(frequency)) {
+                frequency = parseInt(Array.from(this.programFilterData.frequencies).sort()[0]);
+            } else if (!this.isTVA && !TIME_AWARE_FREQUENCIES.includes(frequency)) {
+                frequency = parseInt(TIME_AWARE_FREQUENCIES[0]);
+            }
+            if (frequency !== this._selectedFrequency) {
+                const periods = {
+                    mostRecent: this.mostRecentValue != '' ? this.mostRecentValue : null,
+                    showAll: this.showAll,
+                    start: this.startPeriodValue,
+                    end: this.endPeriodValue
+                };
+                
+                this._selectedFrequency = frequency;
+                this.setPeriods(periods);
+                return true;
+            }
+        },
         get selectedFrequencyOption() {
             return (this.programFilterData && this.selectedFrequency !== null) ?
                 {value: this.selectedFrequency, label: this._frequencyLabels[this.selectedFrequency]} :
                 BLANK_OPTION;
         },
         set selectedFrequencyOption(option) {
-            this._selectedFrequency = !isNaN(parseInt(option.value)) ? parseInt(option.value) : null;
+            this.setFrequency(option.value);
         },
         get periodsDisabled() {
             return !this.programFilterData || !TIME_AWARE_FREQUENCIES.includes(this.selectedFrequency);
@@ -121,6 +176,7 @@ export default (
         },
         get startOptions() {
             if (IRREGULAR_FREQUENCIES.includes(this.selectedFrequency)) {
+                // select is disabled for irregular frequencies, display blank in disabled box
                 return [BLANK_OPTION];
             }
             if (this.selectedFrequency == 3) {
@@ -139,6 +195,7 @@ export default (
         },
         get endOptions() {
             if (IRREGULAR_FREQUENCIES.includes(this.selectedFrequency)) {
+                // select is disabled for irregular frequencies, display blank in disabled box
                 return [BLANK_OPTION];
             }
             let options = this.periodRange.options.filter(periodOption => (!this.startPeriodValue || (periodOption.value >= this.startPeriodValue)));
@@ -170,8 +227,11 @@ export default (
                     this.endPeriodValue - this.startPeriodValue + 1;
         },
         get showAll() {
-            return this.periodsDisabled ? false :
-                !this._mostRecentForce && this.startPeriodValue === 0 && this._lastPeriod && this.endPeriodValue == this._lastPeriod;
+            /* _mostRecentForce - for when the selected # of most recent periods is the same as
+             * all periods, but the checkbox should say "most recent"
+             */
+            return (this.periodsDisabled || this._mostRecentForce) ? false :
+                this.startPeriodValue === 0 && this._lastPeriod && this.endPeriodValue == this._lastPeriod;
         },
         set showAll(value) {
             this._mostRecentForce = false;
@@ -179,13 +239,14 @@ export default (
             this.endPeriodValue = this._lastPeriod;
         },
         set mostRecentValue(value) {
+            this.startPeriodValue = 0;
             this.endPeriodValue = this._currentPeriod;
             this.startPeriodValue = this.endPeriodValue - value + 1;
             if (this.showAll) {
                 this._mostRecentForce = true;
                 var self = this;
                 const unForce = reaction(
-                    () => self.mostRecentChecked,
+                    () => [self.mostRecentChecked, self.startPeriodValue, self.endPeriodValue],
                     (checked, reaction) => {
                         self._mostRecentForce = false;
                         reaction.dispose();
@@ -236,6 +297,18 @@ export default (
             }
             if (showAll) {
                 this.showAll = true;
+            }
+        },
+        setPeriods({mostRecent = null, showAll = null, start = null, end = null}) {
+            if (mostRecent) {
+                this.mostRecentValue = mostRecent;
+            }
+            else if (showAll) {
+                this.showAll = true;
+            }
+            else {
+                this.startPeriodValue = start;
+                this.endPeriodValue = end;
             }
         },
         get resultsFramework() {
@@ -577,39 +650,6 @@ export default (
             return this.selectedProgramId ? this._router.getFullExcelUrl(this.pathParams) : false;
         },
     });
-    const _updateProgramId = reaction(
-        () => filterStore._selectedProgramId,
-        programId => {
-            filterStore.clearFilters();
-            return (filterStore.programFilterData ?
-                            Promise.resolve(filterStore.programFilterData) :
-                            filterStore.updateProgramFilterData()).then(program => {
-                                filterStore.selectedFrequencyOption = filterStore.selectedFrequencyOption;
-            });
-        }
-    );
-    const _updateFrequency = reaction(
-        () => filterStore._selectedFrequency,
-        frequency => {
-            frequency = !isNaN(parseInt(frequency)) ? parseInt(frequency) : null;
-            if (frequency !== null && filterStore.isTVA && !filterStore.programFilterData.frequencies.has(frequency)) {
-                filterStore._selectedFrequency = parseInt(Array.from(filterStore.programFilterData.frequencies).sort()[0]);
-            }
-            if (frequency !== null && !filterStore.isTVA && !TIME_AWARE_FREQUENCIES.includes(frequency)) {
-                filterStore._selectedFrequency = parseInt(TIME_AWARE_FREQUENCIES[0]);
-            }
-            filterStore.startPeriodValue = filterStore.startPeriodValue;
-            filterStore.endPeriodValue = filterStore.endPeriodValue;
-        }
-    );
-    const _updateEndPeriod = reaction(
-        () => filterStore.endPeriod,
-        end => {
-            if (filterStore._mostRecentForce && end != filterStore._currentPeriod) {
-                filterStore._mostRecentForce = false;
-            }
-        }
-    );
     filterStore._reportType = filterStore._router.isTVA ? TVA : TIMEPERIODS;
     filterStore._selectedProgramId = filterStore._router.programId;
     filterStore._selectedFrequency = filterStore._router.frequency;

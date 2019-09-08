@@ -111,8 +111,8 @@ class TimeframeRadio extends React.Component {
                         </label>
                     </div>
                 </div>
-                <div className="col-sm-4 p-0">
-                    <div className="form-check form-check-inline pt-1">
+                <div className="col-sm-5 p-0">
+                    <div className="form-check form-check-inline mr-1 pt-1 float-right">
                         <span className="form-check-input">
                             <input type="radio"
                                    checked={ this.state.focus || this.props.filterStore.mostRecentChecked }
@@ -129,7 +129,7 @@ class TimeframeRadio extends React.Component {
                         </label>
                     </div>
                 </div>
-                <div className="col-sm-4">
+                <div className="col-sm-3">
                     <input type="number" className="form-control"
                            value={ this.state.focus ? this.state.mostRecentValue : this.props.filterStore.mostRecentValue }
                            ref={ this.mostRecentInputRef }
