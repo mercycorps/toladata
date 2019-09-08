@@ -80,6 +80,7 @@ export default (
                 this._selectedProgramId = null;
             }
             else if (programId !== this._selectedProgramId) {
+                this.clearFilters();
                 const frequency = this.selectedFrequency;
                 const periods = {
                     mostRecent: this.mostRecentValue != '' ? this.mostRecentValue : null,
