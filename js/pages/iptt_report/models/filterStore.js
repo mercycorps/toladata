@@ -68,14 +68,12 @@ export default (
         get isTVA() {
             return this._reportType === TVA;
         },
-        get programOptions() {
-            return (this.isTVA ? this._programsListStore.listTvaPrograms() :
-                                this._programsListStore.listPrograms())
-                        .map(program => ({value: program.pk, label: program.name}));
-        },
         get selectedProgramId() {
             return this._selectedProgramId;
         },
+        /**
+         * Method instead of setter because there are side effects (updating frequency/timeframe)
+         */
         setProgramId(programId) {
             programId = parseInt(programId);
             if (isNaN(programId)) {
@@ -90,13 +88,21 @@ export default (
                     end: this.endPeriodValue
                 };
                 this._selectedProgramId = programId;
-                this.updateProgramFilterData().then(
+                return this.updateProgramFilterData().then(
                     () => {
                         this.setFrequency(frequency);
                         this.setPeriods(periods);
                     }
                 );
             }
+        },
+        /**
+         * Options throughout returns a [{value, label}] array to supply select options
+         */
+        get programOptions() {
+            return (this.isTVA ? this._programsListStore.listTvaPrograms() :
+                                this._programsListStore.listPrograms())
+                        .map(program => ({value: program.pk, label: program.name}));
         },
         get selectedProgramOption() {
             let program = this._programsListStore.getProgram(this.selectedProgramId);
@@ -124,6 +130,9 @@ export default (
         get selectedFrequency() {
             return (this.selectedProgramId && !isNaN(parseInt(this._selectedFrequency))) ? parseInt(this._selectedFrequency) : null;
         },
+        /**
+         * method instead of setter because of side effects (updating timeframe)
+         */
         setFrequency(frequency) {
             frequency = parseInt(frequency);
             if (isNaN(frequency)) {
@@ -166,6 +175,7 @@ export default (
         },
         get startOptions() {
             if (IRREGULAR_FREQUENCIES.includes(this.selectedFrequency)) {
+                // select is disabled for irregular frequencies, display blank in disabled box
                 return [BLANK_OPTION];
             }
             if (this.selectedFrequency == 3) {
@@ -184,6 +194,7 @@ export default (
         },
         get endOptions() {
             if (IRREGULAR_FREQUENCIES.includes(this.selectedFrequency)) {
+                // select is disabled for irregular frequencies, display blank in disabled box
                 return [BLANK_OPTION];
             }
             let options = this.periodRange.options.filter(periodOption => (!this.startPeriodValue || (periodOption.value >= this.startPeriodValue)));
@@ -215,6 +226,9 @@ export default (
                     this.endPeriodValue - this.startPeriodValue + 1;
         },
         get showAll() {
+            /* _mostRecentForce - for when the selected # of most recent periods is the same as
+             * all periods, but the checkbox should say "most recent"
+             */
             return (this.periodsDisabled || this._mostRecentForce) ? false :
                 this.startPeriodValue === 0 && this._lastPeriod && this.endPeriodValue == this._lastPeriod;
         },
