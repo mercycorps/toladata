@@ -96,7 +96,7 @@ class IPTTReport(LoginRequiredMixin, TemplateView):
             tva_indicators_count=models.Subquery(
                 Indicator.rf_aware_objects.filter(
                     program=models.OuterRef('pk'),
-                    target_frequency__in=Indicator.REGULAR_TARGET_FREQUENCIES
+                    target_frequency__in=Indicator.REGULAR_TARGET_FREQUENCIES + (Indicator.LOP, Indicator.MID_END)
                 ).order_by().values('program').annotate(tva_count=models.Count('pk')).values('tva_count')[:1],
                 output_field=models.IntegerField()
             )
