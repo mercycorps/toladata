@@ -20,6 +20,9 @@ const getProgramsList = (
     },
     getProgram(programId) {
         return !isNaN(parseInt(programId)) ? this._allPrograms.get(parseInt(programId)) : null;
+    },
+    hasProgram(programId) {
+        return !isNaN(parseInt(programId)) ? this._allPrograms.has(parseInt(programId)) : false;
     }
 });
 
@@ -69,7 +72,7 @@ export default (
             return this._reportType === TVA;
         },
         get selectedProgramId() {
-            return this._selectedProgramId;
+            return this._programsListStore.hasProgram(this._selectedProgramId) ? this._selectedProgramId : null;
         },
         /**
          * Method instead of setter because there are side effects (updating frequency/timeframe)
@@ -107,7 +110,7 @@ export default (
         },
         get selectedProgramOption() {
             let program = this._programsListStore.getProgram(this.selectedProgramId);
-            return program !== null ? {value: program.pk, label: program.name} : BLANK_OPTION;
+            return (program && program !== null) ? {value: program.pk, label: program.name} : BLANK_OPTION;
         },
         set selectedProgramOption(option) {
             this.setProgramId(option.value);
@@ -120,6 +123,9 @@ export default (
         },
         get _frequencyLabels() {
             return this.isTVA ? TVA_FREQUENCY_LABELS : TIMEPERIODS_FREQUENCY_LABELS;
+        },
+        get frequencyDisabled() {
+            return this.selectedProgramId === null;
         },
         get frequencyOptions() {
             if (this.programFilterData) {
@@ -631,7 +637,9 @@ export default (
             return params;
         },
         updateParams(params) {
-            this._router.updateParams(params);
+            if (params.programId) {
+                this._router.updateParams(params);
+            }
         },
         get queryString() {
             let {tva, programId, ...params} = this.pathParams;
