@@ -23,6 +23,6 @@ describe("bare iptt qs program", () => {
         };
         let program = Program(data);
         expect(program.periodCount(4)).toBe(5);
-        expect(program.currentPeriod(4)).toBe(2);
+        expect(program.currentPeriod(4)).toBe(3);
     });
 });
