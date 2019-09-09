@@ -134,7 +134,7 @@ class TimeframeRadio extends React.Component {
                     </div>
                 </div>
                 <div className="col-sm-3">
-                    <input className="form-control"
+                    <input className="form-control pl-3"
                            value={ this.state.focus ? this.state.mostRecentValue : this.props.filterStore.mostRecentValue }
                            ref={ this.mostRecentInputRef }
                            disabled={ this.props.filterStore.periodsDisabled }
