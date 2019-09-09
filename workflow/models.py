@@ -40,7 +40,7 @@ class TolaSites(models.Model):
     tola_tables_url = models.CharField(_("Tola tables url"), blank=True, null=True, max_length=255)
     tola_tables_user = models.CharField(_("Tola tables user"), blank=True, null=True, max_length=255)
     tola_tables_token = models.CharField(_("Tola tables token"), blank=True, null=True, max_length=255)
-    site = models.ForeignKey(Site, verbose_name=_("Site"))
+    site = models.ForeignKey(Site, on_delete=models.SET_NULL, verbose_name=_("Site"))
     privacy_disclaimer = models.TextField(_("Privacy disclaimer"), blank=True, null=True)
     created = models.DateTimeField(_("Created"), auto_now=False, blank=True, null=True)
     updated = models.DateTimeField(_("Updated"), auto_now=False, blank=True, null=True)
@@ -144,7 +144,8 @@ class OrganizationAdmin(admin.ModelAdmin):
 
 class Country(models.Model):
     country = models.CharField(_("Country Name"), max_length=255, blank=True)
-    organization = models.ForeignKey(Organization, blank=True, null=True, verbose_name=_("organization"))
+    organization = models.ForeignKey(Organization, on_delete=models.SET_NULL,
+                                     blank=True, null=True, verbose_name=_("organization"))
     code = models.CharField(_("2 Letter Country Code"), max_length=4, blank=True)
     description = models.TextField(_("Description/Notes"), max_length=765,blank=True)
     latitude = models.CharField(_("Latitude"), max_length=255, null=True, blank=True)
@@ -177,10 +178,11 @@ class TolaUser(models.Model):
     user = models.OneToOneField(User, unique=True, null=True, related_name='tola_user', verbose_name=_("User"),
                                 on_delete=models.SET_NULL)
     organization = models.ForeignKey(
-        Organization, verbose_name=_("Organization"))
+        Organization, on_delete=models.SET_NULL, verbose_name=_("Organization"))
     language = models.CharField(max_length=2, choices=settings.LANGUAGES, default='en')
     country = models.ForeignKey(Country, blank=True, null=True, on_delete=models.SET_NULL, verbose_name=_("Country"))
-    active_country = models.ForeignKey( Country, blank=True, null=True, on_delete=models.SET_NULL,\
+    active_country = models.ForeignKey(
+        Country, blank=True, null=True, on_delete=models.SET_NULL,
         related_name='active_country', verbose_name=_("Active Country"))
     countries = models.ManyToManyField(
         Country,
@@ -283,7 +285,9 @@ class TolaUser(models.Model):
         elif self.organization_id != 1:
             return Country.objects.none()
         else:
-            return Country.objects.filter(id__in=self.countryaccess_set.filter(role='basic_admin').values('country_id'))
+            return Country.objects.filter(
+                id__in=self.countryaccess_set.filter(role='basic_admin').values('country_id')
+            )
 
     @property
     def managed_programs(self):
@@ -349,7 +353,11 @@ class TolaUser(models.Model):
         })
 
         program_access = {
-            (str(access.country_id)+'_'+str(access.program_id)): {"role": access.role, "program": access.program.name, "country": access.country.country}
+            (str(access.country_id)+'_'+str(access.program_id)): {
+                "role": access.role,
+                "program": access.program.name,
+                "country": access.country.country
+                }
             for access in self.programaccess_set.all()
         }
 
@@ -436,7 +444,7 @@ class FormGuidance(models.Model):
         super(FormGuidance, self).save()
 
     def __unicode__(self):
-        return unicode(self.form)
+        return str(self.form)
 
 
 class FormGuidanceAdmin(admin.ModelAdmin):
@@ -456,12 +464,12 @@ class Contact(models.Model):
     address = models.TextField(_("Address"), max_length=255, blank=True, null=True)
     email = models.CharField(_("Email"), max_length=255, blank=True, null=True)
     phone = models.CharField(_("Phone"), max_length=255, blank=True, null=True)
-    country = models.ForeignKey(Country, verbose_name=_("Country"))
+    country = models.ForeignKey(Country, on_delete=models.CASCADE, verbose_name=_("Country"))
     create_date = models.DateTimeField(null=True, blank=True)
     edit_date = models.DateTimeField(null=True, blank=True)
 
     class Meta:
-        ordering = ('name', 'country','title')
+        ordering = ('name', 'country', 'title')
         verbose_name_plural = _("Contact")
 
     # onsave add create date or update edit date
@@ -510,7 +518,7 @@ class FundCodeAdmin(admin.ModelAdmin):
     display = 'Fund Code'
 
 
-class ActiveProgramsMixin(object):
+class ActiveProgramsMixin:
     """eliminates all non active programs"""
     qs_name = 'ActivePrograms'
     filter_methods = ['hide_inactive']
@@ -521,7 +529,7 @@ class ActiveProgramsMixin(object):
             funding_status__iexact='Funded'
         )
 
-class RFProgramsMixin(object):
+class RFProgramsMixin:
     """annotates for a simple boolean indicating whether program is using the results framework/auto-numbering"""
     qs_name = 'RFAware'
     annotate_methods = ['is_using_results_framework', 'is_manual_numbering']
@@ -553,7 +561,7 @@ class RFProgramsMixin(object):
             )
         )
 
-class ProgramPageProgramsMixin(object):
+class ProgramPageProgramsMixin:
     """annotates a program for whether additional target periods are needed"""
     qs_name = 'ProgramPage'
     annotate_methods = ['needs_additional_target_periods']
@@ -856,10 +864,13 @@ class ProgramAccess(models.Model):
 
 
 class ApprovalAuthority(models.Model):
-    approval_user = models.ForeignKey(TolaUser,help_text=_('User with Approval Authority'), blank=True, null=True, related_name="auth_approving", verbose_name=_("Tola User"))
+    approval_user = models.ForeignKey(
+        TolaUser, help_text=_('User with Approval Authority'), blank=True, null=True, on_delete=models.SET_NULL,
+        related_name="auth_approving", verbose_name=_("Tola User")
+        )
     budget_limit = models.IntegerField(null=True, blank=True)
     fund = models.CharField(_("Fund"),max_length=255,null=True, blank=True)
-    country = models.ForeignKey("Country", null=True, blank=True, verbose_name=_("Country"))
+    country = models.ForeignKey("Country", on_delete=models.SET_NULL, null=True, blank=True, verbose_name=_("Country"))
     create_date = models.DateTimeField(null=True, blank=True)
     edit_date = models.DateTimeField(null=True, blank=True)
 
@@ -881,7 +892,7 @@ class ApprovalAuthority(models.Model):
 
 class Province(models.Model):
     name = models.CharField(_("Admin Level 1"), max_length=255, blank=True)
-    country = models.ForeignKey(Country, verbose_name=_("Country"))
+    country = models.ForeignKey(Country, on_delete=models.CASCADE, verbose_name=_("Country"))
     create_date = models.DateTimeField(null=True, blank=True)
     edit_date = models.DateTimeField(null=True, blank=True)
 
@@ -911,7 +922,7 @@ class ProvinceAdmin(admin.ModelAdmin):
 
 class District(models.Model):
     name = models.CharField(_("Admin Level 2"), max_length=255, blank=True)
-    province = models.ForeignKey(Province,verbose_name=_("Admin Level 1"))
+    province = models.ForeignKey(Province, on_delete=models.CASCADE, verbose_name=_("Admin Level 1"))
     create_date = models.DateTimeField(null=True, blank=True)
     edit_date = models.DateTimeField(null=True, blank=True)
 
@@ -941,7 +952,7 @@ class DistrictAdmin(admin.ModelAdmin):
 
 class AdminLevelThree(models.Model):
     name = models.CharField(_("Admin Level 3"), max_length=255, blank=True)
-    district = models.ForeignKey(District,verbose_name=_("Admin Level 2"))
+    district = models.ForeignKey(District, on_delete=models.CASCADE, verbose_name=_("Admin Level 2"))
     create_date = models.DateTimeField(null=True, blank=True)
     edit_date = models.DateTimeField(null=True, blank=True)
 
@@ -971,8 +982,9 @@ class AdminLevelThreeAdmin(admin.ModelAdmin):
 
 class Village(models.Model):
     name = models.CharField(_("Admin Level 4"), max_length=255, blank=True)
-    district = models.ForeignKey(District,null=True,blank=True, verbose_name=_("District"))
-    admin_3 = models.ForeignKey(AdminLevelThree,verbose_name=_("Admin Level 3"),null=True,blank=True)
+    district = models.ForeignKey(District, on_delete=models.CASCADE, null=True, blank=True, verbose_name=_("District"))
+    admin_3 = models.ForeignKey(AdminLevelThree, on_delete=models.CASCADE,
+                                verbose_name=_("Admin Level 3"), null=True, blank=True)
     create_date = models.DateTimeField(null=True, blank=True)
     edit_date = models.DateTimeField(null=True, blank=True)
 
@@ -1003,7 +1015,7 @@ class VillageAdmin(admin.ModelAdmin):
 class Office(models.Model):
     name = models.CharField(_("Office Name"), max_length=255, blank=True)
     code = models.CharField(_("Office Code"), max_length=255, blank=True)
-    province = models.ForeignKey(Province,verbose_name=_("Admin Level 1"))
+    province = models.ForeignKey(Province, on_delete=models.CASCADE, verbose_name=_("Admin Level 1"))
     create_date = models.DateTimeField(null=True, blank=True)
     edit_date = models.DateTimeField(null=True, blank=True)
 
@@ -1020,7 +1032,7 @@ class Office(models.Model):
 
     # displayed in admin templates
     def __unicode__(self):
-        new_name = unicode(self.name) + unicode(" - ") + unicode(self.code)
+        new_name = str(self.name) + str(" - ") + str(self.code)
         return new_name
 
 
@@ -1134,7 +1146,7 @@ class SiteProfile(models.Model):
         _("Households Owning Livestock"), help_text="(%)", null=True, blank=True)
     animal_type = models.CharField(
         _("Animal Types"), help_text=_("List Animal Types"), max_length=255, null=True, blank=True)
-    country = models.ForeignKey(Country, verbose_name=_("Country"))
+    country = models.ForeignKey(Country, on_delete=models.SET_NULL, verbose_name=_("Country"))
     province = models.ForeignKey(
         Province, verbose_name=_("Administrative Level 1"), null=True, blank=True, on_delete=models.SET_NULL)
     district = models.ForeignKey(
@@ -1334,7 +1346,7 @@ class Stakeholder(models.Model):
     name = models.CharField(_("Stakeholder/Organization Name"), max_length=255, blank=True, null=True)
     type = models.ForeignKey(StakeholderType, blank=True, null=True, on_delete=models.SET_NULL, verbose_name=_("Type"))
     contact = models.ManyToManyField(Contact, max_length=255, blank=True, verbose_name=_("Contact"))
-    country = models.ForeignKey(Country, verbose_name=_("Country"))
+    country = models.ForeignKey(Country, on_delete=models.CASCADE, verbose_name=_("Country"))
     sectors = models.ManyToManyField(Sector, blank=True, verbose_name=_("Sectors"))
     stakeholder_register = models.BooleanField(_("Has this partner been added to stakeholder register?"))
     formal_relationship_document = models.ForeignKey(
@@ -1368,7 +1380,7 @@ class Stakeholder(models.Model):
 
     # displayed in admin templates
     def __unicode__(self):
-        return unicode(self.name)
+        return str(self.name)
 
 
 class StakeholderAdmin(admin.ModelAdmin):
@@ -1416,7 +1428,7 @@ class Migration(migrations.Migration):
 class ProjectAgreement(models.Model):
     agreement_key = models.UUIDField(default=uuid.uuid4, unique=True),
     short = models.BooleanField(default=True,verbose_name=_("Short Form (recommended)"))
-    program = models.ForeignKey(Program, verbose_name=_("Program"), related_name="agreement")
+    program = models.ForeignKey(Program, on_delete=models.CASCADE, verbose_name=_("Program"), related_name="agreement")
     date_of_request = models.DateTimeField(_("Date of Request"), blank=True, null=True)
     # Rename to more generic "nonproject" names
     project_name = models.CharField(
@@ -1603,7 +1615,7 @@ class ProjectAgreement(models.Model):
 
     # displayed in admin templates
     def __unicode__(self):
-        new_name = unicode(self.office) + unicode(" - ") + unicode(self.project_name)
+        new_name = str(self.office) + str(" - ") + str(self.project_name)
         return new_name
 
 # Project Tracking, admin is handled in the admin.py
@@ -1623,8 +1635,10 @@ class Migration(migrations.Migration):
 """
 class ProjectComplete(models.Model):
     short = models.BooleanField(default=True,verbose_name="Short Form (recommended)")
-    program = models.ForeignKey(Program, null=True, blank=True, related_name="complete", verbose_name=_("Program"))
-    project_agreement = models.OneToOneField(ProjectAgreement, verbose_name=_("Project Initiation"))
+    program = models.ForeignKey(Program, on_delete=models.SET_NULL, null=True, blank=True,
+                                related_name="complete", verbose_name=_("Program"))
+    project_agreement = models.OneToOneField(ProjectAgreement, on_delete=models.CASCADE,
+                                             verbose_name=_("Project Initiation"))
     # Rename to more generic "nonproject" names
     activity_code = models.CharField(_("Project Code"), max_length=255, blank=True, null=True)
     project_name = models.CharField(_("Project Name"), max_length=255, blank=True, null=True)
@@ -1752,7 +1766,7 @@ class ProjectComplete(models.Model):
 
     # displayed in admin templates
     def __unicode__(self):
-        new_name = unicode(self.office) + unicode(" - ") + unicode(self.project_name)
+        new_name = str(self.office) + str(" - ") + str(self.project_name)
         return new_name
 
     @property
@@ -1763,13 +1777,15 @@ class ProjectComplete(models.Model):
 # Project Documents, admin is handled in the admin.py
 class Documentation(models.Model):
     name = models.CharField(_("Name of Document"), max_length=135, blank=True, null=True)
-    url = models.CharField(_("Link to document, document repository, or document URL"), blank=True, null=True, max_length=135)
+    url = models.CharField(_("Link to document, document repository, or document URL"),
+                           blank=True, null=True, max_length=135)
     description = models.CharField(_("Description"), max_length=255, blank=True, null=True)
     template = models.ForeignKey(
         Template, blank=True, null=True, on_delete=models.SET_NULL, verbose_name=_("Template"))
     file_field = models.FileField(upload_to="uploads", blank=True, null=True)
-    project = models.ForeignKey(ProjectAgreement, blank=True, null=True, verbose_name=_("Project"))
-    program = models.ForeignKey(Program, verbose_name=_("Program"))
+    project = models.ForeignKey(ProjectAgreement, on_delete=models.SET_NULL,
+                                blank=True, null=True, verbose_name=_("Project"))
+    program = models.ForeignKey(Program, on_delete=models.CASCADE, verbose_name=_("Program"))
     create_date = models.DateTimeField(null=True, blank=True)
     edit_date = models.DateTimeField(null=True, blank=True)
 
@@ -1817,8 +1833,10 @@ class Benchmarks(models.Model):
     budget = models.IntegerField(_("Estimated Budget"), blank=True, null=True)
     cost = models.IntegerField(_("Actual Cost"), blank=True, null=True)
     description = models.CharField(_("Description"), max_length=255, blank=True)
-    agreement = models.ForeignKey(ProjectAgreement,blank=True, null=True, verbose_name=_("Project Initiation"))
-    complete = models.ForeignKey(ProjectComplete,blank=True, null=True, verbose_name=_("Complete"))
+    agreement = models.ForeignKey(ProjectAgreement, on_delete=models.SET_NULL,
+                                  blank=True, null=True, verbose_name=_("Project Initiation"))
+    complete = models.ForeignKey(ProjectComplete, on_delete=models.SET_NULL,
+                                 blank=True, null=True, verbose_name=_("Complete"))
     create_date = models.DateTimeField(null=True, blank=True)
     edit_date = models.DateTimeField(null=True, blank=True)
 
@@ -1848,8 +1866,10 @@ class Monitor(models.Model):
     responsible_person = models.CharField(_("Person Responsible"), max_length=25, blank=True, null=True)
     frequency = models.CharField(_("Frequency"), max_length=25, blank=True, null=True)
     type = models.TextField(_("Type"), null=True, blank=True)
-    agreement = models.ForeignKey(ProjectAgreement,blank=True, null=True, verbose_name=_("Project Initiation"))
-    complete = models.ForeignKey(ProjectComplete,blank=True, null=True, verbose_name=_("complete"))
+    agreement = models.ForeignKey(ProjectAgreement, on_delete=models.SET_NULL,
+                                  blank=True, null=True, verbose_name=_("Project Initiation"))
+    complete = models.ForeignKey(ProjectComplete, on_delete=models.SET_NULL,
+                                 blank=True, null=True, verbose_name=_("complete"))
     create_date = models.DateTimeField(null=True, blank=True)
     edit_date = models.DateTimeField(null=True, blank=True)
 
@@ -1876,10 +1896,13 @@ class MonitorAdmin(admin.ModelAdmin):
 
 class Budget(models.Model):
     contributor = models.CharField(_("Contributor"), max_length=135, blank=True, null=True)
-    description_of_contribution = models.CharField(_("Description of contribution"), max_length=255, blank=True, null=True)
+    description_of_contribution = models.CharField(_("Description of contribution"),
+                                                   max_length=255, blank=True, null=True)
     proposed_value = models.IntegerField(_("Value"),default=0, blank=True, null=True)
-    agreement = models.ForeignKey(ProjectAgreement, blank=True, null=True, verbose_name=_("Project Initiation"))
-    complete = models.ForeignKey(ProjectComplete, blank=True, null=True, on_delete=models.SET_NULL, verbose_name=_("Complete"))
+    agreement = models.ForeignKey(ProjectAgreement, on_delete=models.SET_NULL,
+                                  blank=True, null=True, verbose_name=_("Project Initiation"))
+    complete = models.ForeignKey(ProjectComplete, blank=True, null=True,
+                                 on_delete=models.SET_NULL, verbose_name=_("Complete"))
     create_date = models.DateTimeField(null=True, blank=True)
     edit_date = models.DateTimeField(null=True, blank=True)
     history = HistoricalRecords()
@@ -1904,8 +1927,9 @@ class BudgetAdmin(admin.ModelAdmin):
 
 class Checklist(models.Model):
     name = models.CharField(_("Name"), max_length=255, null=True, blank=True,default="Checklist")
-    agreement = models.ForeignKey(ProjectAgreement, null=True, blank=True, verbose_name=_("Project Initiation"))
-    country = models.ForeignKey(Country,null=True, blank=True, on_delete=models.SET_NULL, verbose_name=_("Country"))
+    agreement = models.ForeignKey(ProjectAgreement, null=True, blank=True, on_delete=models.SET_NULL,
+                                  verbose_name=_("Project Initiation"))
+    country = models.ForeignKey(Country, null=True, blank=True, on_delete=models.SET_NULL, verbose_name=_("Country"))
     create_date = models.DateTimeField(null=True, blank=True)
     edit_date = models.DateTimeField(null=True, blank=True)
 
@@ -1921,7 +1945,7 @@ class Checklist(models.Model):
 
     # displayed in admin templates
     def __unicode__(self):
-        return unicode(self.agreement)
+        return str(self.agreement)
 
 
 class ChecklistAdmin(admin.ModelAdmin):
@@ -1931,7 +1955,7 @@ class ChecklistAdmin(admin.ModelAdmin):
 
 class ChecklistItem(models.Model):
     item = models.CharField(_("Item"), max_length=255)
-    checklist = models.ForeignKey(Checklist, verbose_name=_("Checklist"))
+    checklist = models.ForeignKey(Checklist, on_delete=models.CASCADE, verbose_name=_("Checklist"))
     in_file = models.BooleanField(default=False)
     not_applicable = models.BooleanField(default=False)
     global_item = models.BooleanField(default=False)
@@ -1952,7 +1976,7 @@ class ChecklistItem(models.Model):
 
     # displayed in admin templates
     def __unicode__(self):
-        return unicode(self.item)
+        return str(self.item)
 
 
 class ChecklistItemAdmin(admin.ModelAdmin):
@@ -1962,7 +1986,7 @@ class ChecklistItemAdmin(admin.ModelAdmin):
 
 #Logged users
 from django.contrib.auth.signals import user_logged_in, user_logged_out
-from urllib2 import urlopen
+from urllib.request import urlopen
 import json
 
 
@@ -1995,7 +2019,7 @@ class LoggedUser(models.Model):
                 if data.get('google-oauth2_state'):
                     LoggedUser(username=user.username, country=country, email=user.email).save()
 
-        except Exception, e:
+        except Exception:
             pass
 
 
@@ -2022,7 +2046,7 @@ def get_user_country(request):
         response = json.loads(response)
         return response['country'].lower()
 
-    except Exception, e:
+    except Exception:
         response = "undefined"
         return response
 
