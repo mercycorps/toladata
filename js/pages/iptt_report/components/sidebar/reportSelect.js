@@ -35,6 +35,7 @@ const FrequencySelect = inject('filterStore')(
                         gettext('Time periods')
                 }
                 options={ filterStore.frequencyOptions }
+                disabled={ filterStore.frequencyDisabled }
                 value={ filterStore.selectedFrequencyOption }
                 update={ selected => { filterStore.selectedFrequencyOption = selected; } }
             />
