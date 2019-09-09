@@ -60,15 +60,18 @@ class TimeframeRadio extends React.Component {
             mostRecentValue: this.props.filterStore.mostRecentValue
         };
     }
-    
+
     checkMostRecent = (e) => {
         let mostRecentCount = isNaN(parseInt(this.state.mostRecentValue)) ? 2 : parseInt(this.state.mostRecentValue);
         this.setState({mostRecentValue: mostRecentCount});
         this.mostRecentInputRef.current.focus();
     }
-    
+
     handleChange = (e) => {
-        this.setState({mostRecentValue: e.target.value});
+        const pattern = /^[0-9]+$/;
+        if (pattern.exec(e.target.value) || !e.target.value) {
+            this.setState({mostRecentValue: e.target.value});
+        }
     }
 
     handleBlur = (e) => {
@@ -77,7 +80,7 @@ class TimeframeRadio extends React.Component {
         }
         this.setState({focus: false, revert: false, mostRecentValue: this.props.filterStore.mostRecentValue});
     }
-    
+
     handleKeyDown = (e) => {
         if (e.keyCode === 13) {
             e.target.blur();
@@ -103,7 +106,7 @@ class TimeframeRadio extends React.Component {
                                    onChange={ e => { this.props.filterStore.showAll = true } }
                                    />
                         </span>
-                        <label onClick={ e => {this.props.filterStore.showAll = true} } 
+                        <label onClick={ e => {this.props.filterStore.showAll = true} }
                                className="form-check-label text-nowrap">
                             {
                                 /* # Translators: option to show all periods for the report */
@@ -131,7 +134,7 @@ class TimeframeRadio extends React.Component {
                     </div>
                 </div>
                 <div className="col-sm-3">
-                    <input type="number" className="form-control"
+                    <input className="form-control"
                            value={ this.state.focus ? this.state.mostRecentValue : this.props.filterStore.mostRecentValue }
                            ref={ this.mostRecentInputRef }
                            disabled={ this.props.filterStore.periodsDisabled }
