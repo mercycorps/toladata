@@ -229,7 +229,7 @@ export default (
             return this.mostRecentValue !== '';
         },
         get mostRecentValue() {
-            return (this.periodsDisabled || this.showAll | !this.endPeriodValue || this.endPeriodValue !== this._currentPeriod) ? '' :
+            return (this.periodsDisabled || this.showAll || this.endPeriodValue !== this._currentPeriod) ? '' :
                     this.endPeriodValue - this.startPeriodValue + 1;
         },
         get showAll() {
