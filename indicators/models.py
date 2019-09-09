@@ -5,8 +5,11 @@ import string
 import uuid
 from datetime import timedelta, date
 from decimal import Decimal
-
 import dateparser
+
+from tola.l10n_utils import l10n_date_medium
+from tola.model_utils import generate_safedelete_queryset
+
 from django.core.validators import MinValueValidator
 from django.core.exceptions import ValidationError
 from django.db import models
@@ -16,8 +19,6 @@ from django.http import QueryDict
 from django.urls import reverse
 from django.utils import formats, timezone
 from django.utils.translation import ugettext_lazy as _
-from tola.l10n_utils import l10n_date_medium
-from tola.model_utils import generate_safedelete_queryset
 from django.contrib import admin
 from django.utils.functional import cached_property
 import django.template.defaultfilters
@@ -32,37 +33,6 @@ from workflow.models import (
     Program, Sector, SiteProfile, ProjectAgreement, ProjectComplete, Country,
     Documentation, TolaUser
 )
-
-
-class TolaTable(models.Model):
-    name = models.CharField(_("Name"), max_length=255, blank=True)
-    table_id = models.IntegerField(_("Table id"), blank=True, null=True)
-    owner = models.ForeignKey('auth.User', verbose_name=_("Owner"))
-    remote_owner = models.CharField(_("Remote owner"), max_length=255, blank=True)
-    country = models.ManyToManyField(Country, blank=True, verbose_name=_("Country"))
-    url = models.CharField(_("URL"), max_length=255, blank=True)
-    unique_count = models.IntegerField(_("Unique count"), blank=True, null=True)
-    create_date = models.DateTimeField(_("Create date"), null=True, blank=True)
-    edit_date = models.DateTimeField(_("Edit date"), null=True, blank=True)
-
-    def __unicode__(self):
-        return self.name
-
-    @property
-    def table_view_url(self):
-        """
-        The `url` field actually stores the URL used to pull data from the API
-        This `tola_table_url` is the URL users can view
-        """
-        return u'https://tola-tables.mercycorps.org/silo_detail/{}/'.format(self.table_id) if self.table_id else None
-
-
-class TolaTableAdmin(admin.ModelAdmin):
-    list_display = ('name', 'country', 'owner', 'url', 'create_date',
-                    'edit_date')
-    search_fields = ('country', 'name')
-    list_filter = ('country__country',)
-    display = 'Tola Table'
 
 
 class IndicatorType(models.Model):
@@ -86,7 +56,7 @@ class IndicatorTypeAdmin(admin.ModelAdmin):
 
 class StrategicObjective(SafeDeleteModel):
     name = models.CharField(_("Name"), max_length=135, blank=True)
-    country = models.ForeignKey(Country, null=True, blank=True, verbose_name=_("Country"))
+    country = models.ForeignKey(Country, on_delete=models.CASCADE, null=True, blank=True, verbose_name=_("Country"))
     description = models.TextField(_("Description"), max_length=765, blank=True)
     status = models.CharField(_("Status"), max_length=255, blank=True)
     create_date = models.DateTimeField(_("Create date"), null=True, blank=True)
@@ -107,7 +77,7 @@ class StrategicObjective(SafeDeleteModel):
 
 class Objective(models.Model):
     name = models.CharField(_("Name"), max_length=135, blank=True)
-    program = models.ForeignKey(Program, null=True, blank=True, verbose_name=_("Program"))
+    program = models.ForeignKey(Program, on_delete=models.CASCADE, null=True, blank=True, verbose_name=_("Program"))
     description = models.TextField(_("Description"), max_length=765, blank=True)
     create_date = models.DateTimeField(_("Create date"), null=True, blank=True)
     edit_date = models.DateTimeField(_("Edit date"), null=True, blank=True)
@@ -423,7 +393,7 @@ class LevelTierTemplate(models.Model):
 class DisaggregationType(models.Model):
     disaggregation_type = models.CharField(_("Disaggregation type"), max_length=135, blank=True)
     description = models.CharField(_("Description"), max_length=765, blank=True)
-    country = models.ForeignKey(Country, null=True, blank=True, verbose_name="Country")
+    country = models.ForeignKey(Country, on_delete=models.SET_NULL, null=True, blank=True, verbose_name="Country")
     standard = models.BooleanField(default=False, verbose_name=_("Standard (TolaData Admins Only)"))
     create_date = models.DateTimeField(_("Create date"), null=True, blank=True)
     edit_date = models.DateTimeField(_("Edit date"), null=True, blank=True)
@@ -433,7 +403,8 @@ class DisaggregationType(models.Model):
 
 
 class DisaggregationLabel(models.Model):
-    disaggregation_type = models.ForeignKey(DisaggregationType, verbose_name=_("Disaggregation type"))
+    disaggregation_type = models.ForeignKey(DisaggregationType, on_delete=models.CASCADE,
+                                            verbose_name=_("Disaggregation type"))
     label = models.CharField(_("Label"), max_length=765, blank=True)
     customsort = models.IntegerField(_("Customsort"), blank=True, null=True)
     create_date = models.DateTimeField(_("Create date"), null=True, blank=True)
@@ -448,8 +419,8 @@ class DisaggregationLabel(models.Model):
 
 
 class DisaggregationValue(models.Model):
-    disaggregation_label = models.ForeignKey(
-        DisaggregationLabel, verbose_name=_("Disaggregation label"))
+    disaggregation_label = models.ForeignKey(DisaggregationLabel, on_delete=models.CASCADE,
+                                             verbose_name=_("Disaggregation label"))
     value = models.CharField(_("Value"), max_length=765, blank=True)
     create_date = models.DateTimeField(_("Create date"), null=True, blank=True)
     edit_date = models.DateTimeField(_("Edit date"), null=True, blank=True)
@@ -507,27 +478,6 @@ class DataCollectionFrequencyAdmin(admin.ModelAdmin):
     display = 'Data Collection Frequency'
 
 
-# TODO: Delete ReportingPeriod and ReportingPeriodAdmin? Not linked to other models and doesn't seem to be
-# utilized in views
-class ReportingPeriod(models.Model):
-    frequency = models.ForeignKey(
-        ReportingFrequency, verbose_name=_("Frequency")
-    )
-    create_date = models.DateTimeField(_("Create date"), null=True, blank=True)
-    edit_date = models.DateTimeField(_("Edit date"), null=True, blank=True)
-
-    class Meta:
-        verbose_name = _("Reporting Period")
-
-    def __unicode__(self):
-        return self.frequency
-
-
-class ReportingPeriodAdmin(admin.ModelAdmin):
-    list_display = ('frequency', 'create_date', 'edit_date')
-    display = 'Reporting Frequency'
-
-
 class ExternalService(models.Model):
     name = models.CharField(_("Name"), max_length=255, blank=True)
     url = models.CharField(_("URL"), max_length=765, blank=True)
@@ -573,8 +523,8 @@ class DecimalSplit(models.Func):
     function = 'SUBSTRING_INDEX'
     template = '%(function)s(%(expressions)s)'
 
-    def __init__(self, string, count, **extra):
-        expressions = models.F(string), models.Value('.'), count
+    def __init__(self, string_value, count, **extra):
+        expressions = models.F(string_value), models.Value('.'), count
         super(DecimalSplit, self).__init__(*expressions)
 
 # pylint: disable=W0223
@@ -582,12 +532,12 @@ class DoubleDecimalSplit(models.Func):
     function = 'SUBSTRING_INDEX'
     template = 'SUBSTRING_INDEX(%(function)s(%(expressions)s), \'.\', -1)'
 
-    def __init__(self, string, count, **extra):
-        expressions = models.F(string), models.Value('.'), count
+    def __init__(self, string_value, count, **extra):
+        expressions = models.F(string_value), models.Value('.'), count
         super(DoubleDecimalSplit, self).__init__(*expressions)
 
 
-class IndicatorSortingQSMixin(object):
+class IndicatorSortingQSMixin:
     """This provides a temporary relief to indicator number sorting issues in advance of Satsuma -
     uses regex matches to determine if the number is of the format "1.1" or "1.1.1" etc. and sorts it then by
     version number sorting, otherwise numeric, and falls back to alphabetical.  Written as a mixin so it can be
@@ -717,7 +667,7 @@ class IndicatorSortingQSMixin(object):
             'number'
             )
 
-class IndicatorSortingManagerMixin(object):
+class IndicatorSortingManagerMixin:
     """This provides a temporary relief to indicator number sorting issues in advance of Satsuma -
     provides a logframe sorting method that utilizes the above QS mixin to sort as though a logframe model existed"""
     def with_logframe_sorting(self):
@@ -736,7 +686,7 @@ class IndicatorManager(SafeDeleteManager, IndicatorSortingManagerMixin):
         return queryset.select_related('program', 'sector')
 
 
-class IndicatorRFMixin(object):
+class IndicatorRFMixin:
     qs_name = 'RFAware'
     annotate_methods = ['is_program_using_results_framework', 'is_using_manual_numbering']
 
@@ -768,7 +718,7 @@ class IndicatorRFMixin(object):
             )
         )
 
-class IndicatorLevelsMixin(object):
+class IndicatorLevelsMixin:
     qs_name = 'LevelAware'
     annotate_methods = ['annotate_old_level']
     ordering_methods = ['order_by_old_level']
@@ -805,7 +755,7 @@ class IndicatorLevelsMixin(object):
         return self.order_by(models.F('old_level_pk').asc(nulls_last=True))
 
 
-class IndicatorTargetsMixin(object):
+class IndicatorTargetsMixin:
     qs_name = 'TargetAware'
     annotate_methods = ['annotate_lop_target', 'annotate_most_recent_complete']
 
@@ -832,7 +782,7 @@ class IndicatorTargetsMixin(object):
             ),
         )
 
-class IndicatorMetricsMixin(object):
+class IndicatorMetricsMixin:
     qs_name = 'MetricsAnnotated'
     annotate_methods = ['annotate_reporting', 'annotate_scope', 'annotate_counts', 'annotate_metrics']
 
@@ -1401,7 +1351,7 @@ class Indicator(SafeDeleteModel):
     def number_display(self):
         if self.results_framework and self.auto_number_indicators and self.level and self.level.leveltier:
             return u'{0} {1}{2}'.format(
-                unicode(self.leveltier_name), self.level.display_ontology, self.level_order_display
+                str(self.leveltier_name), self.level.display_ontology, self.level_order_display
             )
         elif self.results_framework and not self.program.auto_number_indicators:
             return self.number
@@ -1413,17 +1363,17 @@ class Indicator(SafeDeleteModel):
     @property
     def form_title_level(self):
         if self.results_framework:
-            return unicode(
+            return str(
                 u'{} {}{}'.format(
-                    unicode(self.leveltier_name) if self.leveltier_name else u'',
-                    unicode(_('indicator')),
+                    str(self.leveltier_name) if self.leveltier_name else u'',
+                    str(_('indicator')),
                     (u' {}'.format(self.results_aware_number) if self.results_aware_number else u'')
                 )
             )
         else:
             return u'{} {}'.format(
-                (unicode(_(self.old_level)) if self.old_level else u''),
-                unicode(_('indicator'))
+                (str(_(self.old_level)) if self.old_level else u''),
+                str(_('indicator'))
             )
 
     @property
@@ -1517,7 +1467,8 @@ class PeriodicTarget(models.Model):
     QUARTERLY_PERIOD = _('Quarter')
 
     indicator = models.ForeignKey(
-        Indicator, null=False, blank=False, verbose_name=_("Indicator"), related_name="periodictargets"
+        Indicator, null=False, blank=False, on_delete=models.CASCADE,
+        verbose_name=_("Indicator"), related_name="periodictargets"
     )
 
     # This field should never be referenced directly in the UI! See period_name below.
@@ -1654,7 +1605,7 @@ class PeriodicTarget(models.Model):
             )
         elif period_name:
             # if no date for some reason but time-based frequency:
-            return unicode(period_name)
+            return str(period_name)
 
         return self.period
 
@@ -1814,7 +1765,7 @@ class Result(models.Model):
     comments = models.TextField(_("Comments"), blank=True, default='')
 
     indicator = models.ForeignKey(
-        Indicator, help_text=" ", verbose_name=_("Indicator"),
+        Indicator, help_text=" ", on_delete=models.CASCADE, verbose_name=_("Indicator"),
         db_index=True
     )
 
@@ -1828,8 +1779,9 @@ class Result(models.Model):
         verbose_name=_("Project Complete")
     )
 
+    # TODO: this should be deprecated as it duplicates the indicator__program link (with potentially conflicting data)
     program = models.ForeignKey(
-        Program, blank=True, null=True, related_name="i_program",
+        Program, blank=True, null=True, on_delete=models.SET_NULL, related_name="i_program",
         help_text=" ", verbose_name=_("Program"))
 
     date_collected = models.DateField(
@@ -1843,15 +1795,6 @@ class Result(models.Model):
     approved_by = models.ForeignKey(
         TolaUser, blank=True, null=True, on_delete=models.SET_NULL, verbose_name=_("Originated By"),
         related_name="approving_data", help_text=" ")
-
-    # Deprecated
-    tola_table = models.ForeignKey(
-        TolaTable, blank=True, null=True, on_delete=models.SET_NULL, verbose_name=_("TolaTable"), help_text=" ")
-
-    # Deprecated
-    update_count_tola_table = models.BooleanField(
-        verbose_name=_("Would you like to update the achieved total with the \
-        row count from TolaTables?"), default=False, help_text=" ")
 
     record_name = models.CharField(max_length=135, null=True, blank=True, verbose_name=_("Record name"))
     evidence_url = models.CharField(max_length=255, null=True, blank=True, verbose_name=_("Evidence URL"))
