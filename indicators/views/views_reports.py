@@ -6,7 +6,7 @@ from workflow.serializers_new import (
     IPTTQSProgramSerializer,
     IPTTProgramSerializer
 )
-from indicators.models import Indicator, PinnedReport
+from indicators.models import Indicator, PinnedReport, PeriodicTarget
 from indicators.forms import PinnedReportForm
 from indicators.serializers import (
     IPTTSerializer,
@@ -88,6 +88,11 @@ class IPTTReport(LoginRequiredMixin, TemplateView):
         program_id = kwargs.get('program')
         programs = request.user.tola_user.available_programs.annotate(
             indicators_count=models.Count('indicator'),
+            targets_exist=models.Exists(
+                PeriodicTarget.objects.filter(
+                    indicator__program=models.OuterRef('pk')
+                )
+            ),
             tva_indicators_count=models.Subquery(
                 Indicator.rf_aware_objects.filter(
                     program=models.OuterRef('pk'),
@@ -97,6 +102,7 @@ class IPTTReport(LoginRequiredMixin, TemplateView):
             )
         ).filter(
             funding_status="Funded",
+            targets_exist=True,
             reporting_period_start__isnull=False,
             reporting_period_end__isnull=False,
             indicators_count__gt=0

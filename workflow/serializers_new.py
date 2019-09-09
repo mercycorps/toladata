@@ -2,10 +2,17 @@
 import datetime
 import operator
 from rest_framework import serializers
-from tola.l10n_utils import l10n_date_medium, l10n_date_long, l10n_monthname
+from tola.l10n_utils import l10n_date_medium, l10n_monthname
 from tola.model_utils import get_serializer
 from workflow.models import Program, SiteProfile
-from indicators.models import Indicator, LevelTier, Level, Result, IndicatorType, Sector
+from indicators.models import (
+    Indicator,
+    LevelTier,
+    Level,
+    IndicatorType,
+    Sector,
+    PeriodicTarget
+)
 from indicators.serializers_new import (
     ProgramPageIndicatorSerializer,
     ProgramPageIndicatorUpdateSerializer,
@@ -622,8 +629,15 @@ class IPTTQSMixin(object):
 
     @classmethod
     def load_for_user(cls, user):
-        return cls.load_for_pks(user.tola_user.available_programs.filter(
+        return cls.load_for_pks(user.tola_user.available_programs.annotate(
+            targets_exist=models.Exists(
+                PeriodicTarget.objects.filter(
+                    indicator__program=models.OuterRef('pk')
+                )
+            )
+        ).filter(
             funding_status="Funded",
+            targets_exist=True,
             reporting_period_start__isnull=False, reporting_period_end__isnull=False
         ).values_list('id', flat=True))
 
@@ -732,7 +746,7 @@ class IPTTProgramFilterItemsMixin(object):
     def get_sectors(self, program):
         return sorted({
             v['pk']: v for v in [{'pk': sector['pk'], 'name': sector['sector']}
-                for sector in self._get_program_sectors(program)]
+                                 for sector in self._get_program_sectors(program)]
             }.values(), key=operator.itemgetter('name'))
 
     def get_indicator_types(self, program):
