@@ -243,7 +243,7 @@ class TolaUser(models.Model):
         try:
             access_level = ProgramAccess.objects.get(tolauser=self, program=program).role
         except Exception as e:
-            print e
+            print(e)
         return access_level
 
     @property

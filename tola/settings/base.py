@@ -211,7 +211,6 @@ MIDDLEWARE = (
 # Add Pagination to Rest Framework lists
 REST_FRAMEWORK = {
     'PAGINATE_BY': 10,
-    'DEFAULT_FILTER_BACKENDS': ('django_filters.rest_framework.DjangoFilterBackend',),
     'DEFAULT_AUTHENTICATION_CLASSES': (
         'rest_framework.authentication.SessionAuthentication',
         'rest_framework.authentication.TokenAuthentication',
@@ -252,7 +251,6 @@ DJANGO_APPS = (
 THIRD_PARTY_APPS = (
     'rest_framework',
     'rest_framework.authtoken',
-    'django_filters',
     'django_tables2',
     'crispy_forms',
     'django_extensions',

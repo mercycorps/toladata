@@ -1,6 +1,8 @@
-from base import *
+from tola.settings.base import *
 import sys
+
 TESTING = len(sys.argv) > 1 and sys.argv[1] == 'test'
+
 if TESTING:
     print('===================================')
     print('In TEST Mode - Disabling Migrations')
@@ -89,6 +91,6 @@ CACHES = {
 ########## END CACHE CONFIGURATION
 
 try:
-    from .test_local import *
+    from tola.settings.test_local import *
 except ImportError:
     pass

@@ -1,17 +1,13 @@
 # -*- coding: utf-8 -*-
-import json
-import csv
-from StringIO import StringIO
 
 from collections import OrderedDict
 from django.db import transaction
 from django.db.models import Q
 from django.http import HttpResponse, JsonResponse
 from django.utils import timezone
-from rest_framework import viewsets, permissions
+from rest_framework import viewsets, permissions, pagination
 from rest_framework.response import Response
 from rest_framework import status as httpstatus
-from rest_framework.validators import UniqueValidator
 from rest_framework.decorators import list_route, detail_route
 from rest_framework.serializers import (
     ModelSerializer,
@@ -32,8 +28,6 @@ from openpyxl import Workbook, utils
 from openpyxl.cell import Cell
 from openpyxl.styles import Alignment, Font, PatternFill
 
-from feed.views import SmallResultsSetPagination
-
 from workflow.models import (
     Program,
     TolaUser,
@@ -47,7 +41,7 @@ from indicators.models import (
     Indicator,
     Level)
 
-from .models import (
+from tola_management.models import (
     ProgramAdminAuditLog,
     ProgramAuditLog
 )
@@ -175,7 +169,11 @@ def get_audit_log_workbook(ws, program):
         ws.column_dimensions[utils.get_column_letter(col_no + 1)].width = width
     return ws
 
-class Paginator(SmallResultsSetPagination):
+class Paginator(pagination.PageNumberPagination):
+    page_size = 20
+    page_size_query_param = 'page_size'
+    max_page_size = 50
+
     def get_paginated_response(self , data):
         response = Response(OrderedDict([
             ('count', self.page.paginator.count),

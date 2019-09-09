@@ -39,10 +39,6 @@ from rest_framework import viewsets, mixins, pagination, status, permissions
 
 from django.contrib.auth.models import User,Group
 
-from feed.views import (
-    SmallResultsSetPagination
-)
-
 from workflow.models import (
     TolaUser,
     Organization,
@@ -67,7 +63,11 @@ from .permissions import (
     HasOrganizationAdminAccess
 )
 
-class Paginator(SmallResultsSetPagination):
+class Paginator(pagination.PageNumberPagination):
+    page_size = 20
+    page_size_query_param = 'page_size'
+    max_page_size = 50
+
     def get_paginated_response(self , data):
         response = Response(OrderedDict([
             ('count', self.page.paginator.count),
