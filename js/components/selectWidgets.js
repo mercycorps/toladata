@@ -127,7 +127,7 @@ export const MultiSelectCheckbox = ( props ) => {
     const selectId = uniqueId('multiselect');
     const blankOptions = (!props.options ||
                           props.options.length == 0 ||
-                         (props.options.length == 1 && (!props.value || props.value.length == 0)));
+                         (props.options.length == 1 && !props.options[0].value && !props.value));
     const multiSelectProps = blankOptions ?
             {
                 getDropdownButtonLabel: () => gettext('None available'),

@@ -50,7 +50,7 @@ export const forIpttQs = (
     currentPeriod(frequency) {
         let range = this._getPeriods(frequency);
         if (range) {
-            return range.currentPeriod;
+            return range.currentPeriod + 1;
         }
         return false;
     }
