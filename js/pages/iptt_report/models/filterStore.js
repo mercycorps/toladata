@@ -370,14 +370,20 @@ export default (
             [BLANK_OPTION];
         },
         get levelTierOptions() {
-            return this.programFilterData ?
-                (this.programFilterData.resultsFramework ?
-                    [
-                        {label: '', options: this._tierOptions},
-                        {label: this.programFilterData.resultChainLabel, options: this._levelOptions}
-                    ] :
-                    this._oldLevelOptions) :
-                [BLANK_OPTION]
+            if (!this.programFilterData) {
+                return [BLANK_OPTION];
+            }
+            if (this.programFilterData.resultsFramework) {
+                let optGroups = [
+                    {label: '', options: this._tierOptions},
+                    {label: this.programFilterData.resultChainLabel, options: this._levelOptions}
+                ].filter(optGroup => (optGroup.options && optGroup.options.length > 0));
+                if (optGroups && optGroups.length > 0) {
+                    return optGroups;
+                }
+                return [BLANK_OPTION];
+            }
+            return (this._oldLevelOptions && this._oldLevelOptions.length > 0) ? this._oldLevelOptions : [BLANK_OPTION];
         },
         get levelTierFilters() {
             return [
