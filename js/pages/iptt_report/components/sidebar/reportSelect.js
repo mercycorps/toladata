@@ -115,7 +115,7 @@ class TimeframeRadio extends React.Component {
                         </label>
                     </div>
                 </div>
-                <div className="col-sm-5 p-0">
+                <div className="col-sm-4 p-0">
                     <div className="form-check form-check-inline mr-1 pt-1 float-right">
                         <span className="form-check-input">
                             <input type="radio"
