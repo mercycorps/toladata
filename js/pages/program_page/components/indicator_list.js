@@ -201,7 +201,7 @@ export class IndicatorListTable extends React.Component {
             <tbody>
             {indicators.map(indicator => {
                 const resultsExist = resultsMap.has(indicator.pk);
-                const resultsStr = resultsExist ? resultsMap.get(indicator.pk) : "";                
+                const resultsStr = resultsExist ? resultsMap.get(indicator.pk) : "";
                 const targetPeriodLastEndDate = indicator.targetPeriodLastEndDate;
                 const displayFunc = indicator.isPercent ?
                         (val) => val ? `${val}%` : '' :
@@ -225,7 +225,8 @@ export class IndicatorListTable extends React.Component {
                     })}>
                         <td>
                             <a href="#"
-                               className="indicator_results_toggle btn btn-link text-left"
+                               className="indicator_results_toggle btn text-action text-left"
+                               tabIndex="0"
                                onClick={(e) => this.onIndicatorResultsToggleClick(e, indicator.pk)}
                             >
                                 <FontAwesomeIcon icon={resultsExist ? 'caret-down' : 'caret-right'} />
