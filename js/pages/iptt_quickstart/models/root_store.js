@@ -179,7 +179,7 @@ export default class QSRootStore {
     
     @computed get timeperiodsURL() {
         if (this.timeperiodsProgramId !== null) {
-            let current = this.programStore.getProgram(this.timeperiodsProgramId).currentPeriod(7);
+            let current = this.programStore.getProgram(this.timeperiodsProgramId).currentPeriod(7)-1;
             return `${this.iptt_url}${this.timeperiodsProgramId}/timeperiods/` +
                     `?frequency=7&start=${current-1}&end=${current}`;
         }
