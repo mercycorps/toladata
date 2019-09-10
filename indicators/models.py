@@ -6,6 +6,7 @@ import uuid
 from datetime import timedelta, date
 from decimal import Decimal
 import dateparser
+from functools import total_ordering
 
 from tola.l10n_utils import l10n_date_medium
 from tola.model_utils import generate_safedelete_queryset
@@ -33,6 +34,27 @@ from workflow.models import (
     Program, Sector, SiteProfile, ProjectAgreement, ProjectComplete, Country,
     Documentation, TolaUser
 )
+
+
+@total_ordering
+class MaxType:
+    def __le__(self, other):
+        return False
+
+    def __eq__(self, other):
+        return (self is other)
+
+Max = MaxType()
+
+@total_ordering
+class MinType:
+    def __le__(self, other):
+        return True
+
+    def __eq__(self, other):
+        return (self is other)
+
+Min = MinType()
 
 
 class IndicatorType(models.Model):
@@ -1342,9 +1364,9 @@ class Indicator(SafeDeleteModel):
     def level_order_display(self):
         """returns a-z for 0-25, then aa - zz for 26-676"""
         if self.level and self.level_order is not None and self.level_order < 26:
-            return string.lowercase[self.level_order]
+            return string.ascii_lowercase[self.level_order]
         elif self.level and self.level_order and self.level_order >= 26:
-            return string.lowercase[self.level_order/26 - 1] + string.lowercase[self.level_order % 26]
+            return string.ascii_lowercase[self.level_order/26 - 1] + string.lowercase[self.level_order % 26]
         return ''
 
     @cached_property
@@ -1401,7 +1423,7 @@ class Indicator(SafeDeleteModel):
     def sort_number(self):
         number = getattr(self, 'number')
         if number is None or number == '':
-            return None
+            return Max
         search_pattern = r'([^\d]+)?(\d+)?(.*)?'
         number_search = re.compile(search_pattern)
         split = number.split('.')
@@ -1409,13 +1431,13 @@ class Indicator(SafeDeleteModel):
         for element in split:
             matches = number_search.search(element)
             if matches is None:
-                processed.append((None, None, None))
+                processed.append((Max, Max, Max))
             else:
                 groups = matches.groups()
                 processed.append((
-                    groups[0] if groups[0] else None,
-                    int(groups[1]) if groups[1] else None,
-                    groups[2] if groups[2] else None
+                    groups[0] if groups[0] else Max,
+                    int(groups[1]) if groups[1] else Max,
+                    groups[2] if groups[2] else Min
                     ))
         return processed
 
@@ -1741,7 +1763,7 @@ class ResultManager(models.Manager):
         return super(ResultManager, self).get_queryset()\
             .prefetch_related('site', 'disaggregation_value')\
             .select_related('program', 'indicator', 'agreement', 'complete',
-                            'evidence', 'tola_table')
+                            'evidence')
 
 
 class Result(models.Model):
