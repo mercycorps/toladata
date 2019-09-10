@@ -1,19 +1,16 @@
 from __future__ import unicode_literals
-from django.db import models
-from django.contrib import admin
-from datetime import datetime
 from workflow.models import Program, SiteProfile, ProjectAgreement, Office, Province
 
-try:
-    from django.utils import timezone
-except ImportError:
-    from datetime import datetime as timezone
+from django.db import models
+from django.contrib import admin
+from django.utils import timezone
 
 
 class TrainingAttendance(models.Model):
     training_name = models.CharField(max_length=255)
-    program = models.ForeignKey(Program, null=True, blank=True)
-    project_agreement = models.ForeignKey(ProjectAgreement, null=True, blank=True, verbose_name="Project Initiation")
+    program = models.ForeignKey(Program, on_delete=models.CASCADE, null=True, blank=True)
+    project_agreement = models.ForeignKey(ProjectAgreement, on_delete=models.SET_NULL,
+                                          null=True, blank=True, verbose_name="Project Initiation")
     implementer = models.CharField(max_length=255, null=True, blank=True)
     reporting_period = models.CharField(max_length=255, null=True, blank=True)
     total_participants = models.IntegerField(null=True, blank=True)
@@ -42,31 +39,32 @@ class TrainingAttendance(models.Model):
 
     # on save add create date or update edit date
     def save(self, *args, **kwargs):
-        if self.create_date == None:
+        if self.create_date is None:
             self.create_date = timezone.now()
         self.edit_date = timezone.now()
-        super(TrainingAttendance, self).save()
+        super(TrainingAttendance, self).save(*args, **kwargs)
 
     # displayed in admin templates
     def __unicode__(self):
-        return unicode(self.training_name)
+        return str(self.training_name)
 
 
 class TrainingAttendanceAdmin(admin.ModelAdmin):
     list_display = ('training_name', 'program', 'project_agreement', 'create_date', 'edit_date')
     display = 'Training Attendance'
-    list_filter = ('program__country','program')
+    list_filter = ('program__country', 'program')
 
 
 class Distribution(models.Model):
     distribution_name = models.CharField(max_length=255)
-    program = models.ForeignKey(Program, null=True, blank=True)
-    initiation = models.ForeignKey(ProjectAgreement, null=True, blank=True, verbose_name="Project Initiation")
-    office_code = models.ForeignKey(Office, null=True, blank=True)
+    program = models.ForeignKey(Program, on_delete=models.SET_NULL, null=True, blank=True)
+    initiation = models.ForeignKey(ProjectAgreement, on_delete=models.SET_NULL,
+                                   null=True, blank=True, verbose_name="Project Initiation")
+    office_code = models.ForeignKey(Office, on_delete=models.SET_NULL, null=True, blank=True)
     distribution_indicator = models.CharField(max_length=255)
     distribution_implementer = models.CharField(max_length=255, null=True, blank=True)
     reporting_period = models.CharField(max_length=255, null=True, blank=True)
-    province = models.ForeignKey(Province, null=True, blank=True)
+    province = models.ForeignKey(Province, on_delete=models.SET_NULL, null=True, blank=True)
     total_beneficiaries_received_input = models.IntegerField(null=True, blank=True)
     distribution_location = models.CharField(max_length=255, null=True, blank=True)
     input_type_distributed = models.CharField(max_length=255, null=True, blank=True)
@@ -98,14 +96,14 @@ class Distribution(models.Model):
         ordering = ('distribution_name',)
 
     def save(self, *args, **kwargs):
-        if self.create_date == None:
+        if self.create_date is None:
             self.create_date = timezone.now()
         self.edit_date = timezone.now()
-        super(Distribution, self).save()
+        super(Distribution, self).save(*args, **kwargs)
 
     # displayed in admin templates
     def __unicode__(self):
-        return unicode(self.distribution_name)
+        return str(self.distribution_name)
 
 
 class DistributionAdmin(admin.ModelAdmin):
@@ -120,7 +118,7 @@ class Beneficiary(models.Model):
     father_name = models.CharField(max_length=255, null=True, blank=True)
     age = models.IntegerField(null=True, blank=True)
     gender = models.CharField(max_length=255, null=True, blank=True)
-    site = models.ForeignKey(SiteProfile, null=True, blank=True)
+    site = models.ForeignKey(SiteProfile, on_delete=models.SET_NULL, null=True, blank=True)
     signature = models.BooleanField(default=True)
     remarks = models.CharField(max_length=255, null=True, blank=True)
     program = models.ManyToManyField(Program, blank=True)
@@ -132,17 +130,17 @@ class Beneficiary(models.Model):
 
     # on save add create date or update edit date
     def save(self, *args, **kwargs):
-        if self.create_date == None:
+        if self.create_date is None:
             self.create_date = timezone.now()
         self.edit_date = timezone.now()
-        super(Beneficiary, self).save()
+        super(Beneficiary, self).save(*args, **kwargs)
 
     # displayed in admin templates
     def __unicode__(self):
-        return unicode(self.beneficiary_name)
+        return str(self.beneficiary_name)
 
 
 class BeneficiaryAdmin(admin.ModelAdmin):
-    list_display = ('site','beneficiary_name',)
+    list_display = ('site', 'beneficiary_name',)
     display = 'Beneficiary'
-    list_filter = ('site','beneficiary_name')
+    list_filter = ('site', 'beneficiary_name')
