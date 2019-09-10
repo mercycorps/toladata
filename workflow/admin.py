@@ -1,4 +1,3 @@
-from admin_report.mixins import ChartReportAdmin
 from django.contrib import admin, messages
 from django.contrib.auth.models import User
 
@@ -227,40 +226,6 @@ class StakeholderAdmin(ImportExportModelAdmin):
     list_filter = ('country', 'type')
 
 
-class TolaUserProxyResource(resources.ModelResource):
-    country = fields.Field(column_name='country', attribute='country', widget=ForeignKeyWidget(Country, 'country'))
-    user = fields.Field(column_name='user', attribute='user', widget=ForeignKeyWidget(User, 'username'))
-    email = fields.Field()
-
-    def dehydrate_email(self, user):
-            return '%s' % (user.user.email)
-
-    class Meta:
-        model = TolaUserProxy
-        fields = ('title', 'name', 'user', 'country','create_date', 'email')
-        export_order = ('title', 'name', 'user', 'country', 'email', 'create_date')
-
-
-class ReportTolaUserProxyAdmin(ChartReportAdmin, ExportMixin, admin.ModelAdmin):
-
-    resource_class = TolaUserProxyResource
-
-    def get_queryset(self, request):
-
-        qs = super(ReportTolaUserProxyAdmin, self).get_queryset(request)
-        return qs.filter(user__is_active=True)
-
-    list_display = ('title', 'name', 'user', 'email', 'country', 'create_date')
-    list_filter = ('country', 'create_date', 'user__is_staff')
-
-    def email(self, data):
-        auth_users = User.objects.all()
-        for a_user in auth_users:
-            if data.user == a_user:
-                email = a_user.email
-        return email
-
-
 admin.site.register(Organization, OrganizationAdmin)
 admin.site.register(Country, CountryAdmin)
 admin.site.register(Province, ProvinceAdmin)
@@ -291,4 +256,3 @@ admin.site.register(StakeholderType)
 admin.site.register(TolaUser,TolaUserAdmin)
 admin.site.register(TolaSites,TolaSitesAdmin)
 admin.site.register(FormGuidance,FormGuidanceAdmin)
-admin.site.register(TolaUserProxy, ReportTolaUserProxyAdmin)
