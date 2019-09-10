@@ -1,14 +1,13 @@
+# -*- coding: utf-8 -*-
 """
 Utility functions for formatting cells to conform to a MC theme
 """
 
-import openpyxl
-
 from openpyxl.styles import Font, PatternFill, Alignment, Side, Border
 
-# MC theme colors
-from openpyxl.utils import coordinate_from_string, column_index_from_string
+from openpyxl.utils.cell import coordinate_from_string, column_index_from_string
 
+# MC theme colors
 DARK_RED = '9e1b32'
 TAN = 'dad6cb'
 WHITE = 'ffffff'
@@ -29,9 +28,6 @@ def apply_label_styling(cell):
     bd = Side(style='thin', color=BLACK)
     cell.border = Border(left=bd, top=bd, right=bd, bottom=bd)
     return cell
-
-
-
 
 
 # openpyxl fix

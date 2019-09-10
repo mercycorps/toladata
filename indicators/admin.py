@@ -1,7 +1,7 @@
 from django.contrib import admin
 from .models import (
     Indicator, IndicatorType, Result, StrategicObjective, Objective, Level,
-    TolaTable, ExternalService, ExternalServiceRecord, DataCollectionFrequency,
+    ExternalService, ExternalServiceRecord, DataCollectionFrequency,
     DisaggregationType, PeriodicTarget, DisaggregationLabel, ReportingFrequency,
     ExternalServiceAdmin,
     ExternalServiceRecordAdmin,
@@ -172,21 +172,6 @@ class StrategicObjectiveAdmin(admin.ModelAdmin):
         return queryset
 
 
-class TolaTableResource(resources.ModelResource):
-
-    class Meta:
-        model = TolaTable
-        fields = ('id', 'name', 'table_id', 'owner', 'remote_owner', 'url')
-        # import_id_fields = ['id']
-
-
-class TolaTableAdmin(ImportExportModelAdmin):
-    list_display = ('name', 'owner', 'url', 'create_date', 'edit_date')
-    search_fields = ('country__country', 'name')
-    list_filter = ('country__country',)
-    display = 'Tola Table'
-
-
 class ResultResource(resources.ModelResource):
     class Meta:
         model = Result
@@ -217,6 +202,5 @@ admin.site.register(StrategicObjective, StrategicObjectiveAdmin)
 admin.site.register(Level)
 admin.site.register(ExternalService, ExternalServiceAdmin)
 admin.site.register(ExternalServiceRecord, ExternalServiceRecordAdmin)
-admin.site.register(TolaTable, TolaTableAdmin)
 admin.site.register(DataCollectionFrequency)
 admin.site.register(PeriodicTarget, PeriodicTargetAdmin)

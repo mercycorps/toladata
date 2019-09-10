@@ -14,7 +14,7 @@ class DataAttributesSelect(Select):
     def create_option(self, name, value, label, selected, index, subindex=None, attrs=None):
         option = super(DataAttributesSelect, self).create_option(
             name, value, label, selected, index, subindex=None, attrs=None)
-        for data_attr, values in self.data.iteritems():
+        for data_attr, values in self.data.items():
             option['attrs'][data_attr] = values[option['value']]
         return option
 

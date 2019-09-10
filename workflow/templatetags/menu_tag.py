@@ -13,7 +13,7 @@ register = template.Library()
 @register.inclusion_tag('workflow/tags/program_menu.html', takes_context=True)
 def program_menu(context):
     request = context['request']
-    if request.user.is_authenticated():
+    if request.user.is_authenticated:
         countries = request.user.tola_user.available_countries
         indicator_query = Indicator.objects.filter(
             deleted__isnull=True,
@@ -31,7 +31,7 @@ def program_menu(context):
 
     programs_by_country = OrderedDict((country.country, []) for country in countries)
 
-    if request.user.is_authenticated():
+    if request.user.is_authenticated:
         for program in programs:
             for country in program.country.all():
                 # a program can be in multiple countries, including a country a user is not privy to

@@ -1,5 +1,5 @@
 import django_tables2 as tables
-from models import ProjectAgreement
+from workflow.models import ProjectAgreement
 
 TEMPLATE = '''
 <div class="btn-group btn-group-xs">

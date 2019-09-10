@@ -142,7 +142,7 @@ class LogframeLevelSerializer(serializers.ModelSerializer):
         parts = []
         leveltier = self.get_leveltier(obj)
         if leveltier is not None:
-            parts.append(unicode(_(leveltier.name)))
+            parts.append(str(_(leveltier.name)))
         display_ontology = self.get_display_ontology(obj)
         if display_ontology:
             parts.append(display_ontology)

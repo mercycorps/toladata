@@ -1,12 +1,24 @@
 # -*- coding: utf-8 -*-
+"""
+    Indicator serializers - note that indicators.serializers_new directly supercedes these where they conflict
+    currently - replacing without regressions is a longer term project
+"""
+from operator import attrgetter
 from rest_framework import serializers
 from django.utils import timezone, formats
 from django.utils.translation import ugettext, ugettext_lazy
-from operator import attrgetter
+
 from tola.l10n_utils import l10n_date_medium
 
 from workflow.models import Program
-from indicators.models import Indicator, Level, LevelTier, LevelTierTemplate, PeriodicTarget, Objective
+from indicators.models import (
+    Indicator,
+    Level,
+    LevelTier,
+    LevelTierTemplate,
+    PeriodicTarget,
+    Objective
+)
 from indicators.queries import IPTTIndicator
 from indicators.export_renderers import (
     FullReportExcelRenderer,
@@ -251,7 +263,7 @@ class IndicatorPlanIndicatorSerializerBase(serializers.ModelSerializer):
         return data
 
 
-class IndicatorFormatsMixin(object):
+class IndicatorFormatsMixin:
     translateable_fields = (
         'tier_name_only',
         'get_direction_of_change_display',
@@ -396,7 +408,7 @@ class IndicatorExcelMixin(IndicatorFormatsMixin):
             }
         else:
             value = {
-                'value': unicode(value),
+                'value': str(value),
                 'number_format': 'General'
             }
         value.update({
@@ -431,7 +443,7 @@ class IndicatorPlanLevelSerializerBase(serializers.ModelSerializer):
     def get_display_name(self, obj):
         tier = ugettext(obj.leveltier.name) if obj.leveltier else u''
         ontology = obj.display_ontology if obj.display_ontology else u''
-        name = unicode(obj.name)
+        name = str(obj.name)
         #return u' '.join([w for w in [tier, ontology, name] if w is not None])
         return u'{tier}{tier_space}{ontology}{colon}{name}'.format(
             tier=tier,
@@ -696,7 +708,7 @@ class IPTTJSONRendererMixin:
         return self.indicator_qs.filter(program_id=self.program_data['pk'])
 
 
-class IPTTExcelRendererBase(object):
+class IPTTExcelRendererBase:
 
     @property
     def filename(self):
@@ -806,7 +818,7 @@ class IPTTSingleExcelRendererMixin(IPTTExcelRendererBase):
         return self._level_rows
 
 
-class IPTTSerializer(object):
+class IPTTSerializer:
     TIMEPERIODS_JSON = 1
     TVA_JSON = 2
     TIMEPERIODS_EXCEL = 3

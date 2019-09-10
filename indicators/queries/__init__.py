@@ -1,6 +1,6 @@
-from program_queries import ProgramWithMetrics
-from iptt_queries import IPTTIndicator
-from indicators_queries import (
+from indicators.queries.program_queries import ProgramWithMetrics
+from indicators.queries.iptt_queries import IPTTIndicator
+from indicators.queries.indicators_queries import (
     ResultsIndicator,
     MetricsIndicator
 )

@@ -78,14 +78,14 @@ def indicator_adapter(inner):
     return outer
 
 def user_has_program_access(user, program):
-    return user.is_authenticated() and (
+    return user.is_authenticated and (
         Program.objects.filter(pk=program, user_access=user.tola_user)
         | Program.objects.filter(pk=program, country__in=user.tola_user.countries.all())
         | Program.objects.filter(pk=program, country=user.tola_user.country)
     ).exists()
 
 def user_has_program_roles(user, programs, roles):
-    return user.is_authenticated() and user.tola_user.programaccess_set.filter(program_id__in=programs, role__in=roles).exists()
+    return user.is_authenticated and user.tola_user.programaccess_set.filter(program_id__in=programs, role__in=roles).exists()
 
 def has_iptt_read_access(func):
     def wrapper(request, *args, **kwargs):
@@ -98,7 +98,7 @@ def has_iptt_read_access(func):
     return wrapper
 
 def user_has_site_access(user, site):
-    return user.is_authenticated() and (SiteProfile.objects.filter(
+    return user.is_authenticated and (SiteProfile.objects.filter(
         country__in=user.tola_user.available_countries,
         pk=site
     ).exists() or user.is_superuser())
@@ -267,7 +267,7 @@ def verify_program_access_level_of_any_program(request, level, country_id=None, 
     assert level in [l[0] for l in PROGRAM_ROLE_CHOICES]
 
     # none of this makes sense if not logged in
-    if not request.user.is_authenticated():
+    if not request.user.is_authenticated:
         raise PermissionDenied
 
     # Let super admins do all the things
@@ -320,7 +320,7 @@ def verify_program_access_level(request, program_id, level, super_admin_override
     assert level in [l[0] for l in PROGRAM_ROLE_CHOICES]
 
     # none of this makes sense if not logged in
-    if not request.user.is_authenticated():
+    if not request.user.is_authenticated:
         raise PermissionDenied
 
     # Let super admins do all the things
