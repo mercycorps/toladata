@@ -35,7 +35,7 @@ class TestIPTTQSProgramSerializer(test.TestCase):
         RFIndicatorFactory(program=p, target_frequency=Indicator.LOP, targets=200)
         data = self.get_serialized_data([p.pk])[0]
         self.assertEqual(data['pk'], p.pk)
-        for frequency, count in [(1, 1), (2, 2), (3, 1), (4, 2), (5, 3), (6, 4), (7, 12)]:
+        for frequency, count in [(3, 1), (4, 2), (5, 3), (6, 4), (7, 12)]:
             self.assertEqual(len(data['period_date_ranges'][frequency]), count)
         self.assertEqual(len([f for f in data['period_date_ranges'][7] if f['past']]), 5)
 

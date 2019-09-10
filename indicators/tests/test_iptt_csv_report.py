@@ -5,7 +5,7 @@ url: /indicators/iptt_csv/<program_id>/<reporttype>
 
 import unittest
 from datetime import datetime, timedelta
-from StringIO import StringIO
+from io import StringIO
 import csv
 from factories.workflow_models import ProgramFactory, SectorFactory
 from factories.indicators_models import (
