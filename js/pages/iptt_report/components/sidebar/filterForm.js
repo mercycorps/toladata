@@ -14,8 +14,7 @@ const FilterTop = inject('filterStore')(
                 <Selectors.TimeframeRadio />
                 <Selectors.StartDateSelect />
                 <Selectors.EndDateSelect />
-                { (filterStore.oldLevels === false &&
-                   filterStore.resultChainFilterLabel !== false) &&
+                { filterStore.resultsFramework &&
                     <Selectors.GroupingSelect />
                 }
             </React.Fragment>
@@ -56,16 +55,18 @@ const IPTTFilterForm = inject('filterStore')(
                             /* # Translators: clears all filters set on a report */
                             gettext('Clear filters')
                         }
-                        action={ filterStore.clearFilters }
-                        isDisabled={ filterStore.noFilters }
+                        action={ filterStore.clearFilters.bind(filterStore) }
+                        isDisabled={ !filterStore.filtersActive }
                     />
               </div>
+              { filterStore.programFilterData && (
               <div id="filter-extra" className=" d-flex justify-content-between no-gutters p-3">
-                  <a href={"/tola_management/audit_log/" + filterStore.programId}
+                  <a href={ `/tola_management/audit_log/${filterStore.selectedProgramId}/` }
                       className="btn-link">
                       <i className="fas fa-history"></i> {gettext("Change log")}
                   </a>
               </div>
+              )}
             </nav>
         );
     })

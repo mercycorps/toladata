@@ -125,7 +125,10 @@ const GroupHeading = (props) => {
  */
 export const MultiSelectCheckbox = ( props ) => {
     const selectId = uniqueId('multiselect');
-    const multiSelectProps = (!props.options || props.options.length == 0) ?
+    const blankOptions = (!props.options ||
+                          props.options.length == 0 ||
+                         (props.options.length == 1 && props.options[0].value === null));
+    const multiSelectProps = blankOptions ?
             {
                 getDropdownButtonLabel: () => gettext('None available'),
                 isDisabled: true,
@@ -152,9 +155,7 @@ export const MultiSelectCheckbox = ( props ) => {
                 }
             };
     const baseStyles = {
-        dropdownButton: base => (!props.options || props.options.length == 0)
-                            ? { ...base, backgroundColor: '#E5E6E8', background: '' }
-                            : base,
+        dropdownButton: base => blankOptions ? { ...base, backgroundColor: '#E5E6E8', background: '' } : base,
         option: (provided, state) => ({
                 ...provided,
                 padding: '1px 12px',

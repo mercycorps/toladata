@@ -1,15 +1,7 @@
 import React from 'react';
-import { observer, inject, computed } from 'mobx-react';
-import { when } from 'mobx';
-import { SingleReactSelect, SingleSelect, DateSelect, GroupBySelect } from '../../../../components/selectWidgets';
+import { observer, inject } from 'mobx-react';
+import { SingleReactSelect, DateSelect, GroupBySelect } from '../../../../components/selectWidgets';
 
-
-/**  false && <Selectors.PeriodSelect />}
-                { false && <Selectors.TimeFrameRadio />}
-                { false && <Selectors.StartDateSelect />}
-                { false && <Selectors.EndDateSelect />}
-                { false && filterStore.oldLevels === false &&
-                    <Selectors.GroupingSelect />*/
 /**
  * input-ready filtering single-select for Programs available to user in IPTT Report
  * uses SingleSelect in js/components/selectWidgets
@@ -22,7 +14,7 @@ const ProgramSelect = inject('filterStore')(
                 label={ gettext('Program') }
                 options={ filterStore.programOptions }
                 value={ filterStore.selectedProgramOption }
-                update={ selected => { filterStore.programId = selected.value } }
+                update={ selected => { filterStore.selectedProgramOption = selected } }
             />
         );
     })
@@ -43,8 +35,9 @@ const FrequencySelect = inject('filterStore')(
                         gettext('Time periods')
                 }
                 options={ filterStore.frequencyOptions }
+                disabled={ filterStore.frequencyDisabled }
                 value={ filterStore.selectedFrequencyOption }
-                update={ selected => { filterStore.frequencyId = selected.value } }
+                update={ selected => { filterStore.selectedFrequencyOption = selected; } }
             />
         );
     })
@@ -63,70 +56,42 @@ class TimeframeRadio extends React.Component {
         this.mostRecentInputRef = React.createRef();
         this.state = {
             focus: false,
-            mostRecentValue: props.filterStore.mostRecent || '',
             revert: false,
+            mostRecentValue: this.props.filterStore.mostRecentValue
         };
     }
 
-    setShowAll = () => {
-        this.setState({
-            focus: false,
-            revert: false,
-            });
-        this.props.filterStore.showAll = true;
-    }
-
-    checkMostRecent = () => {
+    checkMostRecent = (e) => {
+        let mostRecentCount = isNaN(parseInt(this.state.mostRecentValue)) ? 2 : parseInt(this.state.mostRecentValue);
+        this.setState({mostRecentValue: mostRecentCount});
         this.mostRecentInputRef.current.focus();
     }
 
     handleChange = (e) => {
-        this.setState({mostRecentValue: e.target.value});
+        const pattern = /^[0-9]+$/;
+        if (pattern.exec(e.target.value) || !e.target.value) {
+            this.setState({mostRecentValue: e.target.value});
+        }
     }
 
     handleBlur = (e) => {
-        if (!this.state.revert && this.state.mostRecentValue !== '') {
-            this.props.filterStore.mostRecent = this.state.mostRecentValue;
-            this.setState({
-                focus: false,
-                revert: false,
-                mostRecentValue: this.props.filterStore._mostRecentValue,
-            });
-        } else if (this.state.revert) {
-            this.setShowAll();
-        } else {
-            this.setState({
-                focus: false
-            });
+        if (!this.state.revert) {
+            this.props.filterStore.mostRecentValue = this.state.mostRecentValue;
         }
+        this.setState({focus: false, revert: false, mostRecentValue: this.props.filterStore.mostRecentValue});
     }
 
     handleKeyDown = (e) => {
         if (e.keyCode === 13) {
             e.target.blur();
         } else if (e.keyCode === 27) {
-            this.setState({revert: true}, 
-            () => {this.mostRecentInputRef.current.blur();});
+            this.setState({revert: true},
+                () => {this.mostRecentInputRef.current.blur();});
         }
     }
 
     handleFocus = (e) => {
-        let newState = {
-            focus: true,
-            mostRecentValue: (this.props.filterStore._mostRecentValue || '')
-            };
-        if (!this.mostRecentValue) {
-            newState.mostRecentValue = '';
-        }
-        this.setState(newState);
-    }
-
-    get mostRecentValue() {
-        if (this.state.focus) {
-            return this.state.mostRecentValue;
-        } else {
-            return this.props.filterStore.mostRecent || '';
-        }
+        this.setState({focus: true, revert: false, mostRecentValue: this.props.filterStore.mostRecentValue});
     }
 
     render() {
@@ -136,13 +101,13 @@ class TimeframeRadio extends React.Component {
                     <div className="form-check form-check-inline pt-1">
                         <span className="form-check-input">
                             <input type="radio"
-                                   checked={ !this.props.filterStore.periodsDisabled && !this.state.focus && this.props.filterStore.showAll }
+                                   checked={ !this.state.focus && this.props.filterStore.showAll }
                                    disabled={ this.props.filterStore.periodsDisabled }
-                                   onChange={ this.setShowAll }
+                                   onChange={ e => { this.props.filterStore.showAll = true } }
                                    />
                         </span>
-                        <label onClick={ this.setShowAll } 
-                               className="form-check-label">
+                        <label onClick={ e => {this.props.filterStore.showAll = true} }
+                               className="form-check-label text-nowrap">
                             {
                                 /* # Translators: option to show all periods for the report */
                                 gettext('Show all')
@@ -151,16 +116,16 @@ class TimeframeRadio extends React.Component {
                     </div>
                 </div>
                 <div className="col-sm-4 p-0">
-                    <div className="form-check form-check-inline pt-1">
+                    <div className="form-check form-check-inline mr-1 pt-1 float-right">
                         <span className="form-check-input">
                             <input type="radio"
-                                   checked={ !this.props.filterStore.periodsDisabled && (this.state.focus || this.props.filterStore.mostRecent) }
+                                   checked={ this.state.focus || this.props.filterStore.mostRecentChecked }
                                    disabled={ this.props.filterStore.periodsDisabled }
                                    onChange={ this.checkMostRecent }
                                    />
                         </span>
                         <label onClick={ this.checkMostRecent }
-                               className="form-check-label">
+                               className="form-check-label text-nowrap">
                             {
                                 /* # Translators: option to show a number of recent periods for the report */
                                 gettext('Most recent')
@@ -168,9 +133,9 @@ class TimeframeRadio extends React.Component {
                         </label>
                     </div>
                 </div>
-                <div className="col-sm-4">
-                    <input type="number" className="form-control"
-                           value={ !this.props.filterStore.periodsDisabled && this.mostRecentValue }
+                <div className="col-sm-3">
+                    <input className="form-control pl-3"
+                           value={ this.state.focus ? this.state.mostRecentValue : this.props.filterStore.mostRecentValue }
                            ref={ this.mostRecentInputRef }
                            disabled={ this.props.filterStore.periodsDisabled }
                            onChange={ this.handleChange }
@@ -196,8 +161,8 @@ const StartDateSelect = inject('filterStore')(
                         gettext('Start')
                     }
                     disabled={ filterStore.periodsDisabled }
-                    value={ filterStore.startPeriod || '' }
-                    update={ e => {filterStore.startPeriod = e.target.value;} }
+                    value={ filterStore.startPeriodValue || '' }
+                    update={ e => {filterStore.startPeriodValue = e.target.value;} }
                     options={ filterStore.startOptions }
                 />
     })
@@ -215,8 +180,8 @@ const EndDateSelect = inject('filterStore')(
                         gettext('End')
                     }
                     disabled={ filterStore.periodsDisabled }
-                    value={ filterStore.endPeriod || '' }
-                    update={ e => {filterStore.endPeriod = e.target.value;} }
+                    value={ filterStore.endPeriodValue || '' }
+                    update={ e => {filterStore.endPeriodValue = e.target.value;} }
                     options={ filterStore.endOptions }
                 />
     })
@@ -230,7 +195,6 @@ const GroupingSelect = inject('filterStore')(
     observer(({ filterStore }) => {
         return <GroupBySelect
                     chainLabel={ filterStore.resultChainFilterLabel }
-                    disabled={ filterStore.groupByDisabled }
                     value={ filterStore.groupBy }
                     update={ e => { filterStore.groupBy = e.target.value;} }
                 />

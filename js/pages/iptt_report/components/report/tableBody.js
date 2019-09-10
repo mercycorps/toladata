@@ -3,11 +3,29 @@ import { observer, inject } from 'mobx-react';
 
 import { LevelGroup, IndicatorRow } from './tableRows';
 
-const ReportTableBody = inject('reportStore')(
-    observer(({ reportStore }) => {
+const ReportTableBody = inject('rootStore', 'filterStore')(
+    observer(({ rootStore, filterStore }) => {
         return (
         <tbody>
             {
+                rootStore.levelRows ?
+                    rootStore.levelRows.map(
+                        (levelRow, index) => (
+                            <LevelGroup
+                                level={ levelRow.level }
+                                indicators={ levelRow.indicators }
+                                key={ index } />
+                        )
+                    )
+                :
+                    rootStore.indicatorRows.map(
+                        (indicator, index) => (
+                            <IndicatorRow indicator={ indicator } key={ index } />
+                                            
+                        )
+                    )
+            }
+            {/*
                 reportStore.levelRows ?
                     reportStore.groupedIndicatorRows.map(
                         ({level, indicators}, index) => (
@@ -22,7 +40,7 @@ const ReportTableBody = inject('reportStore')(
                                           key={ index } />
                         )
                     )
-            }
+            */}
         </tbody>
         );
     })

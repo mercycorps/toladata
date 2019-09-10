@@ -15,6 +15,8 @@ from tola.test.endpoint_permissions_test_utils import EndpointTestBase
 from factories import django_models as d_factories
 import unittest
 
+
+@test.tag('slow')
 class TestIndicatorCreateEndpoint(EndpointTestBase, test.TestCase):
     url = 'indicator_create'
     url_kwargs = {'program': None}
@@ -32,6 +34,8 @@ class TestIndicatorCreateEndpoint(EndpointTestBase, test.TestCase):
         self.access_level = 'high'
         self.run_post_tests()
 
+
+@test.tag('slow')
 class TestIndicatorUpdateEndpoint(EndpointTestBase, test.TestCase):
     url = 'indicator_update'
     url_kwargs = {'pk': 'indicator'}
@@ -49,6 +53,8 @@ class TestIndicatorUpdateEndpoint(EndpointTestBase, test.TestCase):
         self.access_level = 'high'
         self.run_post_tests()
 
+
+@test.tag('slow')
 class TestIndicatorDeleteEndpoint(EndpointTestBase, test.TestCase):
     url = 'indicator_delete'
     url_kwargs = {'pk': 'indicator'}
@@ -64,6 +70,8 @@ class TestIndicatorDeleteEndpoint(EndpointTestBase, test.TestCase):
     def test_http_methods(self):
         self.run_post_tests()
 
+
+@test.tag('slow')
 class TestPeriodTargetDeleteEndpoint(EndpointTestBase, test.TestCase):
     url = 'pt_delete'
     url_kwargs = {'pk': 'periodic_target'}
@@ -76,6 +84,8 @@ class TestPeriodTargetDeleteEndpoint(EndpointTestBase, test.TestCase):
     def test_http_methods(self):
         self.run_post_tests()
 
+
+@test.tag('slow')
 class TestPeriodicTargetDeleteAllEndpoint(EndpointTestBase, test.TestCase):
     url = 'pt_deleteall'
     url_kwargs = {'indicator': None}
@@ -88,6 +98,8 @@ class TestPeriodicTargetDeleteAllEndpoint(EndpointTestBase, test.TestCase):
     def test_http_methods(self):
         self.run_post_tests()
 
+
+@test.tag('slow')
 class TestResultCreateEndpoint(EndpointTestBase, test.TestCase):
     url = 'result_add'
     url_kwargs = {'indicator': None}
@@ -103,6 +115,8 @@ class TestResultCreateEndpoint(EndpointTestBase, test.TestCase):
         self.run_get_tests()
         self.run_post_tests()
 
+
+@test.tag('slow')
 class TestResultUpdateEndpoint(EndpointTestBase, test.TestCase):
     url = 'result_update'
     url_kwargs = {'pk': 'result'}
@@ -120,6 +134,8 @@ class TestResultUpdateEndpoint(EndpointTestBase, test.TestCase):
         self.access_level = 'medium'
         self.run_post_tests()
 
+
+@test.tag('slow')
 class TestResultDeleteEndpoint(EndpointTestBase, test.TestCase):
     url = 'result_delete'
     url_kwargs = {'pk': 'result'}
@@ -132,6 +148,8 @@ class TestResultDeleteEndpoint(EndpointTestBase, test.TestCase):
     def test_http_methods(self):
         self.run_post_tests()
 
+
+@test.tag('slow')
 class TestDisaggregationReportEndpoint(EndpointTestBase, test.TestCase):
     url = 'disrep'
     url_kwargs = {'program': None}
@@ -144,6 +162,8 @@ class TestDisaggregationReportEndpoint(EndpointTestBase, test.TestCase):
         self.run_get_tests()
         self.run_post_tests()
 
+
+@test.tag('slow')
 class TestDisaggregationPrintReportEndpoint(EndpointTestBase, test.TestCase):
     url = 'disrepprint'
     url_kwargs = {'program': None}
@@ -156,6 +176,8 @@ class TestDisaggregationPrintReportEndpoint(EndpointTestBase, test.TestCase):
         self.run_get_tests()
         self.run_post_tests()
 
+
+@test.tag('slow')
 class TestIndicatorPlanEndpoint(EndpointTestBase, test.TestCase):
     url = 'indicator_plan'
     url_kwargs = {'program': None}
@@ -168,6 +190,8 @@ class TestIndicatorPlanEndpoint(EndpointTestBase, test.TestCase):
         self.run_get_tests()
         self.run_post_tests()
 
+
+@test.tag('slow')
 class TestIndicatorPlanExportEndpoint(EndpointTestBase, test.TestCase):
     url = 'indicator_export'
     url_kwargs  = {'program': None}
@@ -180,6 +204,8 @@ class TestIndicatorPlanExportEndpoint(EndpointTestBase, test.TestCase):
         self.run_get_tests()
         self.run_post_tests()
 
+
+@test.tag('slow')
 class TestServiceJsonEndpoint(EndpointTestBase, test.TestCase):
     url = 'service_json'
     url_kwargs = {'service': None}
@@ -191,6 +217,8 @@ class TestServiceJsonEndpoint(EndpointTestBase, test.TestCase):
     def test_http_methods(self):
         self.run_get_tests(skip_out_country=True)
 
+
+@test.tag('slow')
 class TestResultTableEndpoint(EndpointTestBase, test.TestCase):
     url = 'result_view'
     url_kwargs = {'indicator': None}
@@ -203,6 +231,8 @@ class TestResultTableEndpoint(EndpointTestBase, test.TestCase):
         self.run_get_tests()
         self.run_post_tests()
 
+
+@test.tag('slow')
 class TestIPTTQuickstartEndpoint(test.TestCase):
     def setUp(self):
         self.user = d_factories.UserFactory(
@@ -223,6 +253,7 @@ class TestIPTTQuickstartEndpoint(test.TestCase):
         response = self.client.get(reverse('iptt_quickstart'))
         self.assertEqual(response.status_code, 200, 'logged in user should not be redirected')
 
+
 @unittest.skip('endpoint being reworked')
 class TestIPTTReportEndpoint(EndpointTestBase, test.TestCase):
     url = 'iptt_report'
@@ -241,6 +272,7 @@ class TestIPTTReportEndpoint(EndpointTestBase, test.TestCase):
         self.run_get_tests()
         self.run_post_tests()
 
+
 @unittest.skip('endpoint being reworked')
 class TestIPTTExcelEndpoint(EndpointTestBase, test.TestCase):
     url = 'iptt_excel'
@@ -258,6 +290,8 @@ class TestIPTTExcelEndpoint(EndpointTestBase, test.TestCase):
         self.run_get_tests()
         self.run_post_tests()
 
+
+@test.tag('slow')
 class TestPinnedReportEndpoint(EndpointTestBase, test.TestCase):
     url = 'create_pinned_report'
     url_kwargs = {}
@@ -276,6 +310,7 @@ class TestPinnedReportEndpoint(EndpointTestBase, test.TestCase):
         self.run_post_tests()
 
 
+@test.tag('slow')
 class TestPinnedReportDeleteEndpoint(EndpointTestBase, test.TestCase):
     url = 'delete_pinned_report'
     url_kwargs = {}
@@ -291,6 +326,8 @@ class TestPinnedReportDeleteEndpoint(EndpointTestBase, test.TestCase):
     def test_http_methods(self):
         self.run_post_tests()
 
+
+@test.tag('slow')
 class TestAPIIndicatorViewEndpoint(EndpointTestBase, test.TestCase):
     url = 'api_indicator_view'
     url_kwargs = {'indicator': None}
@@ -303,6 +340,8 @@ class TestAPIIndicatorViewEndpoint(EndpointTestBase, test.TestCase):
         self.run_get_tests()
         self.run_post_tests()
 
+
+@test.tag('slow')
 class TestProgramTargetFrequenciesFeedEndpoint(EndpointTestBase, test.TestCase):
     url = 'programtargetfrequencies-list'
     url_kwargs = {}

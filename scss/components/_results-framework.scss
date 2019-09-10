@@ -18,13 +18,15 @@
     padding: $grid-gutter-width/2;
 }
 .leveltier-list__actions {
-    background: $gray-400;
+    background: $white;
     display: flex;
     padding: $grid-gutter-width/2;
 }
 
+
 // component LevelTier
 .leveltier {
+    min-height: 2em;
     background-color: $gray-150;
     color: $gray-550;
     padding: $grid-gutter-width/4;
@@ -38,8 +40,31 @@
     }
 }
 
+//editable custom tiers
+.leveltier--editable {
+    display: flex;
+    justify-content: space-between;
+}
+
+.leveltier--editable__input {
+    width: 85%;
+}
+
+.leveltier--editable__label {
+}
+
+.leveltier--editable__settings {
+    background-color: $white;
+    width: 100%;
+    align-items: flex-end;
+    text-align: right;
+}
+
 // component LevelTierPicker
 .leveltier-picker {
+    flex-basis: 1%;
+    flex-grow: 0;
+    flex-shrink: 1;
     margin-right: $grid-gutter-width;
     min-width: 20rem;
 }
@@ -91,8 +116,9 @@
         margin-top: $grid-gutter-width;
     }
 }
-
-
+.level-list--expandos {
+    margin-bottom: $grid-gutter-width/2;
+}
 // # from level_cards.js
 .level-card {
     margin-bottom: $grid-gutter-width/2;

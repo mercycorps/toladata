@@ -70,7 +70,7 @@ def indicator_lop_actual_progress_annotation():
                 models.Q(unit_of_measure_type=Indicator.PERCENTAGE)
                 ),
             then=models.Subquery(
-                Result.objects.filter(
+                Result.objects.select_related(None).prefetch_related(None).filter(
                     periodic_target__isnull=False,
                     indicator=models.OuterRef('pk')
                 ).order_by('-date_collected').values('achieved')[:1]
@@ -86,7 +86,7 @@ def indicator_lop_actual_progress_annotation():
                 models.Q(target_frequency__in=[Indicator.MID_END, Indicator.EVENT])
             ),
             then=models.Subquery(
-                Result.objects.filter(
+                Result.objects.select_related(None).prefetch_related(None).filter(
                     periodic_target__isnull=False,
                     indicator=models.OuterRef('pk')
                 ).order_by().values('indicator').annotate(
@@ -100,7 +100,7 @@ def indicator_lop_actual_progress_annotation():
                 models.Q(unit_of_measure_type=Indicator.PERCENTAGE)
                 ),
             then=models.Subquery(
-                Result.objects.filter(
+                Result.objects.select_related(None).prefetch_related(None).filter(
                     models.Q(periodic_target__isnull=False) &
                     models.Q(indicator=models.OuterRef('pk')) &
                     models.Q(periodic_target__end_date__lt=UTCNow())
@@ -110,7 +110,7 @@ def indicator_lop_actual_progress_annotation():
         models.When(
             target_frequency__in=[f[0] for f in TIME_AWARE_FREQUENCIES],
             then=models.Subquery(
-                Result.objects.filter(
+                Result.objects.select_related(None).prefetch_related(None).filter(
                     models.Q(periodic_target__isnull=False) &
                     models.Q(indicator=models.OuterRef('pk')) &
                     # models.Q(periodic_target__end_date__lt=models.functions.Now())
@@ -138,7 +138,7 @@ def indicator_lop_target_progress_annotation():
                     models.Q(program__reporting_period_end__lt=UTCNow())
                 )
             ),
-            then=models.F('lop_target')
+            then=models.F('lop_target_calculated')
         ),
         models.When(
             models.Q(
@@ -180,7 +180,11 @@ def indicator_lop_target_progress_annotation():
                 PeriodicTarget.objects.filter(
                     indicator=models.OuterRef('pk')
                 ).annotate(
-                    has_data=models.Exists(Result.objects.filter(periodic_target=models.OuterRef('pk')))
+                    has_data=models.Exists(
+                        Result.objects.select_related(None).prefetch_related(None).filter(
+                            periodic_target=models.OuterRef('pk')
+                        )
+                    )
                 ).filter(
                     has_data=True
                 ).order_by('-customsort').values('target')[:1]
@@ -192,7 +196,11 @@ def indicator_lop_target_progress_annotation():
                 PeriodicTarget.objects.filter(
                     indicator=models.OuterRef('pk')
                 ).annotate(
-                    has_data=models.Exists(Result.objects.filter(periodic_target=models.OuterRef('pk')))
+                    has_data=models.Exists(
+                        Result.objects.select_related(None).prefetch_related(None).filter(
+                            periodic_target=models.OuterRef('pk')
+                        )
+                    )
                 ).filter(
                     has_data=True
                 ).order_by().values('indicator').annotate(
@@ -212,7 +220,8 @@ def indicator_lop_percent_met_progress_annotation():
         models.When(
             models.Q(
                 models.Q(lop_actual_progress__isnull=False) &
-                models.Q(lop_target_progress__isnull=False)
+                models.Q(lop_target_progress__isnull=False) &
+                ~models.Q(lop_target_progress=0)
             ),
             then=models.ExpressionWrapper(
                 models.F('lop_actual_progress') / models.F('lop_target_progress'),
@@ -344,14 +353,14 @@ def indicator_lop_actual_annotation():
         models.When(
             unit_of_measure_type=Indicator.PERCENTAGE,
             then=models.Subquery(
-                Result.objects.filter(
+                Result.objects.select_related(None).prefetch_related(None).filter(
                     periodic_target__isnull=False,
                     indicator=models.OuterRef('pk')
                 ).order_by('-date_collected').values('achieved')[:1]
                 )
             ),
         default=models.Subquery(
-            Result.objects.filter(
+            Result.objects.select_related(None).prefetch_related(None).filter(
                 periodic_target__isnull=False,
                 indicator=models.OuterRef('pk')
             ).order_by().values('indicator').annotate(
@@ -369,7 +378,8 @@ def indicator_lop_percent_met_annotation():
     return models.Case(
         models.When(
             models.Q(lop_target_calculated__isnull=True) |
-            models.Q(lop_actual__isnull=True),
+            models.Q(lop_actual__isnull=True) |
+            models.Q(lop_target_calculated=0),
             then=models.Value(None)
             ),
         default=models.ExpressionWrapper(
@@ -380,7 +390,7 @@ def indicator_lop_percent_met_annotation():
 
 
 def timeaware_value_annotation(period):
-    values_subquery = Result.objects.filter(
+    values_subquery = Result.objects.select_related(None).prefetch_related(None).filter(
         periodic_target__isnull=False,
         indicator=models.OuterRef('pk'),
         date_collected__lte=period['end']
@@ -446,7 +456,7 @@ def mid_end_target_annotation(count):
     )
 
 def mid_end_value_annotation(count):
-    values_subquery = Result.objects.filter(
+    values_subquery = Result.objects.select_related(None).prefetch_related(None).filter(
         periodic_target__isnull=False,
         indicator=models.OuterRef('pk'),
         periodic_target__customsort__lte=count
@@ -486,3 +496,74 @@ def mid_end_value_annotation(count):
         ),
         output_field=models.DecimalField(decimal_places=2)
     )
+
+def indicator_get_program_months_annotation():
+    """annotates an indicator with the number of months in the associated program
+        this annotation is used by the defined_targets_filter"""
+    return MonthsCount('program__reporting_period_end', 'program__reporting_period_start')
+
+
+def indicator_all_targets_defined_annotation():
+    """uses a set of filters that filter out indicators that do not have all defined targets
+        this version is used for an indicator_set that has been annotated with program_months
+        then returns a boolean indicating whether all targets have been defined"""
+    filters = []
+    # LOP indicators require a defined lop_target:
+    filters.append(models.Q(target_frequency=Indicator.LOP) & models.Q(lop_target__isnull=False))
+    # MID_END indicators require 2 defined targets (mid and end):
+    filters.append(models.Q(target_frequency=Indicator.MID_END) &
+                   models.Q(defined_targets__isnull=False) &
+                   models.Q(defined_targets__gte=2))
+    # EVENT indicators require at least 1 defined target:
+    filters.append(models.Q(target_frequency=Indicator.EVENT) &
+                   models.Q(defined_targets__isnull=False) &
+                   models.Q(defined_targets__gte=1))
+    # TIME_AWARE indicators need a number of indicators defined by the annotation on the program:
+    # note the program_months field annotation is required for this annotation to succeed
+    for frequency, month_count in TIME_AWARE_FREQUENCIES:
+        period_count_filter = models.Q(defined_targets__gte=models.F('program_months') / month_count)
+        filters.append(models.Q(target_frequency=frequency) &
+                       models.Q(defined_targets__isnull=False) &
+                       period_count_filter)
+    combined_filter = filters.pop()
+    for filt in filters:
+        combined_filter |= filt
+    return models.Case(
+        models.When(
+            combined_filter,
+            then=models.Value(True)
+        ),
+        default=models.Value(False),
+        output_field=models.BooleanField()
+    )
+
+
+def indicator_results_count_annotation():
+    """annotates an indicator queryset with the number of results associated with each indicator"""
+    return models.functions.Coalesce(
+        models.Subquery(
+            Result.objects.select_related(None).prefetch_related(None).filter(
+                indicator=models.OuterRef('pk')
+                ).order_by().values('indicator').annotate(
+                    total_results=models.Count('id')
+                ).values('total_results')[:1],
+            output_field=models.IntegerField()
+        ), 0)
+
+
+def indicator_results_evidence_annotation():
+    """annotates an indicator queryset with the number of results associated with each indicator that have
+        either a Documentation or TolaTable as evidence"""
+    return models.functions.Coalesce(
+        models.Subquery(
+            Result.objects.select_related(None).prefetch_related(None).filter(
+                indicator=models.OuterRef('pk')
+                ).exclude(
+                    evidence_url=''
+                ).exclude(
+                    evidence_url=None
+                ).order_by().values('indicator').annotate(
+                    total_results=models.Count('id')
+                ).values('total_results')[:1],
+            output_field=models.IntegerField()
+        ), 0)

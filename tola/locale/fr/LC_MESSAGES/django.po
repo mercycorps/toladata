@@ -2039,7 +2039,7 @@ msgstr "Regrouper les indicateurs"
 
 #: templates/indicators/indicator_plan.html:35
 msgid "by Level"
-msgstr "par niveau"
+msgstr "par Niveau"
 
 #: templates/indicators/indicator_reportingperiod_modal.html:16
 msgid "Program period"

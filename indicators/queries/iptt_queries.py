@@ -11,6 +11,7 @@ from indicators.models import (
     IndicatorSortingQSMixin
 )
 from indicators.queries import utils
+from workflow.models import Program
 from django.db import models
 from django.db.models.functions import Concat
 from django.utils.functional import cached_property
@@ -28,14 +29,51 @@ class IPTTIndicatorQueryset(models.QuerySet, IndicatorSortingQSMixin):
         )
         return qs
 
+    def annotate_old_level(self, qs):
+        old_level_whens = [
+            models.When(
+                models.Q(
+                    models.Q(using_results_framework=True) &
+                    models.Q(level_id__isnull=False)
+                ),
+                then=models.Value(0)
+            )
+        ] + [
+            models.When(
+                old_level=level_name,
+                then=level_pk
+            ) for (level_pk, level_name) in Indicator.OLD_LEVELS
+        ] + [
+            models.When(
+                old_level__isnull=True,
+                then=None
+            ),
+        ]
+        return qs.annotate(
+            old_level_pk=models.Case(
+                *old_level_whens,
+                default=None,
+                output_field=models.IntegerField()
+            )
+        )
+
     def with_annotations(self):
         qs = self.with_prefetch()
+        qs = qs.annotate(using_results_framework=models.Case(
+            models.When(
+                program___using_results_framework=Program.NOT_MIGRATED,
+                then=models.Value(False)
+            ),
+            default=models.Value(True),
+            output_field=models.BooleanField()
+        ))
         # add lop_target_calculated annotation (not used yet, but will replace deprecated lop_target value):
         qs = qs.annotate(lop_target_calculated=utils.indicator_lop_target_calculated_annotation())
         # add lop_actual annotation
         qs = qs.annotate(lop_actual=utils.indicator_lop_actual_annotation())
         # add lop_met_real annotation (this is a float, formatting delivered on front end): 
         qs = qs.annotate(lop_percent_met=utils.indicator_lop_percent_met_annotation())
+        qs = self.annotate_old_level(qs).order_by(models.F('old_level_pk').asc(nulls_last=True))
         return qs
 
     def apply_filters(self, levels=None, sites=None, types=None,
@@ -107,7 +145,6 @@ class TimeperiodsIPTTQueryset(IPTTIndicatorQueryset):
         if frequency in [Indicator.LOP, Indicator.MID_END, Indicator.EVENT]:
             # LOP target timeperiods require no annotations
             return qs
-        #periods = [{'start': p['start'], 'end': p['end']} for p in PeriodicTarget.generate_for_frequency(frequency)(start, end)]
         periods = self.get_periods(frequency, start, end)
         qs = qs.annotate(
             **{'frequency_{0}_count'.format(frequency): models.Value(len(periods), output_field=models.IntegerField())})
@@ -120,12 +157,12 @@ class TimeperiodsIPTTQueryset(IPTTIndicatorQueryset):
 
 class TVAManager(models.Manager):
     def get_queryset(self):
-        return TVAIPTTQueryset(self.model, using=self._db).filter(deleted__isnull=True).with_logframe_sorting().with_annotations()
+        return TVAIPTTQueryset(self.model, using=self._db).filter(deleted__isnull=True).with_annotations()
 
 
 class TimeperiodsManager(models.Manager):
     def get_queryset(self):
-        return TimeperiodsIPTTQueryset(self.model, using=self._db).filter(deleted__isnull=True).with_logframe_sorting().with_annotations()
+        return TimeperiodsIPTTQueryset(self.model, using=self._db).filter(deleted__isnull=True).with_annotations()
 
 
 class IPTTIndicator(Indicator):

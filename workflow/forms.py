@@ -1476,7 +1476,7 @@ class DocumentationForm(forms.ModelForm):
             Q(program_id__in=self.request.user.tola_user.programaccess_set.filter(role='high').values('program_id'))
             | Q(program_id__in=self.request.user.tola_user.programaccess_set.filter(role='medium').values('program_id'))
         )
-        self.fields['program'].queryset = Program.active_programs.filter(
+        self.fields['program'].queryset = Program.rf_aware_objects.filter(
             Q(id__in=self.request.user.tola_user.programaccess_set.filter(role='high').values('program_id'))
             | Q(id__in=self.request.user.tola_user.programaccess_set.filter(role='medium').values('program_id'))
         ).distinct()
