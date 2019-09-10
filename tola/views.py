@@ -1,24 +1,23 @@
 import urllib
-from tola.forms import ProfileUpdateForm, NewUserRegistrationForm, NewTolaUserRegistrationForm
-from django.contrib import messages
-from django.contrib.auth import logout
-from django.http import HttpResponseRedirect, HttpResponse
-from django.shortcuts import render
-from django.urls import reverse_lazy, reverse
-from workflow.models import SiteProfile, Country, TolaUser,TolaSites
+
 from social_django.utils import load_strategy, load_backend
 
-from django.shortcuts import get_object_or_404
-from django.db.models import Q
-from django.contrib.auth.models import Group
-from django.utils.translation import gettext as _
+from django.contrib import messages
+from django.contrib.auth import logout
 from django.contrib.auth import views as authviews
+from django.contrib.auth.decorators import login_required
+from django.http import HttpResponseRedirect, HttpResponse
+from django.shortcuts import render, get_object_or_404
+from django.urls import reverse_lazy, reverse
+from django.db.models import Q
+from django.utils.translation import gettext as _
+from django.core.exceptions import PermissionDenied
+from django.contrib.admin.views.decorators import staff_member_required
+
+from workflow.models import SiteProfile, Country, TolaUser
+from tola.forms import ProfileUpdateForm
 from indicators.queries import ProgramWithMetrics
 
-from django.contrib.auth.decorators import login_required
-from django.core.exceptions import PermissionDenied
-
-from django.contrib.admin.views.decorators import staff_member_required
 
 @login_required(login_url='/accounts/login/')
 def index(request, selected_country=None):
@@ -49,7 +48,9 @@ def index(request, selected_country=None):
     if active_country:
         active_country_id = active_country.id
         programs_with_metrics = ProgramWithMetrics.home_page.with_annotations().filter(
-            Q(country__in=user.countries.filter(id=active_country_id)) | Q(programaccess__tolauser=user, programaccess__country=active_country) | Q(country=user.country),
+            Q(country__in=user.countries.filter(id=active_country_id)) |
+            Q(programaccess__tolauser=user, programaccess__country=active_country) |
+            Q(country=user.country),
             country=active_country,
             funding_status="Funded"
         ).distinct()
@@ -95,7 +96,7 @@ class TolaLoginView(authviews.LoginView):
         context = super(TolaLoginView, self).get_context_data(*args, **kwargs)
         context['okta_url'] = u"{base}?{params}".format(
             base=reverse('social:begin', kwargs={'backend': 'saml'}),
-            params=urllib.urlencode({'next': '/', 'idp': 'okta'})
+            params=urllib.parse.urlencode({'next': '/', 'idp': 'okta'})
         )
         return context
 
