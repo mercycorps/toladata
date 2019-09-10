@@ -1,3 +1,4 @@
+import uuid
 from datetime import timedelta
 
 from workflow.models import (
@@ -62,13 +63,14 @@ class IndicatorForm(forms.ModelForm):
 
     def __init__(self, *args, **kwargs):
         indicator = kwargs.get('instance', None)
+        self.request = kwargs.pop('request')
         if indicator and not indicator.unit_of_measure_type:
             kwargs['initial']['unit_of_measure_type'] = Indicator.UNIT_OF_MEASURE_TYPES[0][0]
         if indicator and indicator.lop_target:
             lop_stripped = str(indicator.lop_target)
             lop_stripped = lop_stripped.rstrip('0').rstrip('.') if '.' in lop_stripped else lop_stripped
             kwargs['initial']['lop_target'] = lop_stripped
-        self.request = kwargs.pop('request')
+        
         self.programval = kwargs.pop('program')
         self.prefilled_level = kwargs.pop('level') if 'level' in kwargs else False
 
@@ -142,6 +144,20 @@ class IndicatorForm(forms.ModelForm):
         # self.fields['is_cumulative'].widget = forms.RadioSelect()
         if self.instance.target_frequency and self.instance.target_frequency != Indicator.LOP:
             self.fields['target_frequency'].widget.attrs['readonly'] = True
+
+    def clean_indicator_key(self):
+        data = self.cleaned_data.get('indicator_key', uuid.uuid4())
+        if not self.instance.pk:
+            previous_creates = Indicator.rf_aware_objects.filter(
+                indicator_key=data,
+                create_date__gte=timezone.now()-timedelta(minutes=10)
+            )
+            if previous_creates.count() > 0:
+                raise forms.ValidationError(
+                    _('Multiple submissions detected'),
+                    code="rate_limit"
+                )
+        return data
 
     def clean_lop_target(self):
         data = self.cleaned_data['lop_target']

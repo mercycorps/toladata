@@ -93,9 +93,9 @@ sleep 0.5
 if [ ! -z "$resetdb" ]
 then
     echo "dropping db $db_name at localhost"
-    mysql -h localhost -u $user -p mysql --password <<< "drop database $db_name"
+    mysql -h localhost -u $user -p <<< "drop database $db_name"
     echo "creating db $db_name at localhost"
-    mysql -h localhost -u $user -p mysql --password <<< "create database $db_name CHARACTER SET utf8 COLLATE utf8_general_ci"
+    mysql -h localhost -u $user -p <<< "create database $db_name CHARACTER SET utf8 COLLATE utf8_general_ci"
 fi
 
 sleep 1

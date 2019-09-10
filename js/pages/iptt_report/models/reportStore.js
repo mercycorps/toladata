@@ -1,93 +1,85 @@
-import { observable, action, computed, reaction } from 'mobx';
-import { TVA, TIMEPERIODS, GROUP_BY_CHAIN, GROUP_BY_LEVEL, BLANK_OPTION, TIME_AWARE_FREQUENCIES } from '../../../constants';
+import { observable, runInAction } from 'mobx';
 
-const _gettext = (typeof gettext !== 'undefined') ?  gettext : (s) => s;
+import { TIME_AWARE_FREQUENCIES, IRREGULAR_FREQUENCIES } from '../../../constants';
+import api from '../../../apiv2';
 
 
-export default class ReportStore {
-    constructor(filterStore) {
-        this.filterStore = filterStore;
+const getIndicatorReport = (
+    frequency,
+    indicatorReportJSON = {}
+) => observable({
+    pk: parseInt(indicatorReportJSON.pk),
+    frequency: parseInt(frequency),
+    _lopTarget: indicatorReportJSON.lop_target,
+    get lopTarget() {
+        return this._lopTarget;
+    },
+    _lopActual: indicatorReportJSON.lop_actual,
+    get lopActual() {
+        return this._lopActual;
+    },
+    _lopMet: indicatorReportJSON.lop_percent_met,
+    get lopMet() {
+        return this._lopMet;
+    },
+    _reportData: observable(new Map((indicatorReportJSON.report_data || [])
+                                    .map(periodJSON => [parseInt(periodJSON.index), periodJSON]
+        ))),
+    get periodValues() {
+        return Array.from(this._reportData.values());
     }
+});
+
+
+export default (
+    reportJSON = {}
+) => {
+    const LOADING = 1;
+    const LOADED = 2;
     
-    @computed get isTVA() {
-        return this.filterStore.reportType === TVA;
-    }
-    
-    @computed get programName() {
-        if (this.filterStore.program) {
-            return this.filterStore.program.name;
-        }
-        return null;
-    }
-    
-    @computed get levelColumn() {
-        return this.filterStore.oldLevels === true;
-    }
-    
-    @computed get levelRows() {
-        return this.filterStore.oldLevels === false;
-    }
-    
-    @computed get reportPeriods() {
-        if (this.filterStore.periods) {
-            if (this.filterStore.frequencyId == 2) {
-                return this.filterStore.periods.periods;
+    let reportStore = observable({
+        _reportMap: observable.map([...TIME_AWARE_FREQUENCIES, ...IRREGULAR_FREQUENCIES].sort()
+                                    .map(frequency => [frequency, observable.map()])),
+        getReport(frequency) {
+            return this._reportMap.get(frequency);
+        },
+        programStatus: observable.map([...TIME_AWARE_FREQUENCIES, ...IRREGULAR_FREQUENCIES].sort()
+                                      .map(frequency => [frequency, observable.map()])),
+        callForReportData({update, ...params}) {
+            let programPk = parseInt(params.programPk);
+            let frequency = parseInt(params.frequency);
+            if (this.programStatus.get(frequency).get(programPk) === LOADING) {
+                return Promise.resolve(false);
             }
-            return this.filterStore.periods.periodRange(this.filterStore.startPeriod, this.filterStore.endPeriod) || [];
-        }
-        return [];
-    }
-    
-    @computed get indicatorRows() {
-        if (this.levelRows) {
-            return [];
-        }
-        if (this.filterStore.frequencyId && this.filterStore.programIsLoaded) {
-            return this.filterStore.filteredIndicators || [];
-        }
-        return [];
-    }
-    
-    @computed get groupedIndicatorRows() {
-        if (!this.levelRows) {
-            return [];
-        }
-        if (this.filterStore.frequencyId && this.filterStore.programIsLoaded) {
-            return this.filterStore.filteredLevels.map(
-                level => ({
-                    level: level,
-                    indicators: this.filterStore.filterIndicators(level.indicators)
-                })).concat([{
-                    level: null,
-                    indicators: this.filterStore.filteredIndicators.filter(indicator => !indicator.levelpk)
-                }]);
-        }
-        return [];
-    }
-    
-    periodValues(indicator) {
-        if (this.filterStore.frequencyId == 1) {
-            return [];
-        }
-        if (this.filterStore.frequencyId && this.filterStore.programIsLoaded) {
-            let reportData = indicator.reportData[this.filterStore.reportType][this.filterStore.frequencyId];
-            if (reportData && reportData !== undefined) {
-                return this.filterStore.frequencyId == 2 ? reportData :
-                    reportData.slice(this.filterStore.startPeriod, this.filterStore.endPeriod + 1) || [];
-            } else {
-                let reportData = indicator.program.getIndicator(indicator.pk)
-                                    .reportData[this.filterStore.reportType][this.filterStore.frequencyId];
-                if (reportData && reportData !== undefined) {
-                    return this.filterstore.frequencyId == 2 ? reportData :
-                        reportData.slice(this.filterStore.startPeriod, this.filterStore.endPeriod + 1);
-                }
+            if (!update && this.programStatus.get(frequency).get(programPk) === LOADED) {
+                return Promise.resolve(false);
             }
+            this.programStatus.get(frequency).set(programPk, LOADING);
+            return api.getIPTTReportData(params)
+                    .then(data => {
+                        runInAction(() => {
+                            this.updateReportData(data);
+                        });
+                    });
+        },
+        updateReportData(reportData) {
+            var frequency = parseInt(reportData.report_frequency);
+            (reportData.report_data || [])
+                .forEach(indicatorReportJSON => {
+                    let indicatorReport = getIndicatorReport(frequency, indicatorReportJSON);
+                    this._reportMap.get(frequency).set(indicatorReport.pk, indicatorReport)
+                });
+            this.programStatus.get(frequency).set(parseInt(reportData.program_pk), LOADED);
+            return reportData;
         }
-        return [];
+    });
+    if (reportJSON && reportJSON.report_data) {
+        let frequency = parseInt(reportJSON.report_frequency);
+        let initialReportData = reportStore.getReport(frequency);
+        (reportJSON.report_data || [])
+            .map(indicatorReportJSON => getIndicatorReport(frequency, indicatorReportJSON))
+            .forEach(indicatorReport => initialReportData.set(indicatorReport.pk, indicatorReport))
+        reportStore.programStatus.get(frequency).set(parseInt(reportJSON.program_pk), LOADED);
     }
-    
-    @computed get reportWidth() {
-        return 8 + (this.levelColumn && 1) + 3 + (this.reportPeriods.length * (1 + (this.filterStore.isTVA && 2)));
-    }
-    
-};
+    return reportStore;
+}

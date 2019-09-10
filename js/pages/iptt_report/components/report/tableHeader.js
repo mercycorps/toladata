@@ -4,13 +4,17 @@ import { observer, inject } from 'mobx-react';
 import * as HeaderCells from './headerCells';
 
 
-const ProgramNameRow = inject('reportStore')(
-    observer(({ reportStore }) => {
+const ProgramNameRow = inject('rootStore')(
+    observer(({ rootStore }) => {
+        const program = rootStore.currentProgram;
+        if (!program) {
+            return (<tr><td>Loading</td></tr>);
+        }
         return (
             <tr className="title-row">
-                <td colSpan={ reportStore.levelColumn ? 9 : 8 } id="id_td_iptt_program_name" className="align-bottom pt-2">
+                <td colSpan={ rootStore.resultsFramework ? 8 : 9 } id="id_td_iptt_program_name" className="align-bottom pt-2">
                     <h5 className="m-0">
-                       { reportStore.programName }
+                       { program.name }
                     </h5>
                 </td>
                 <td scope="colgroup" colSpan="3"
@@ -21,9 +25,9 @@ const ProgramNameRow = inject('reportStore')(
                     }
                 </td>
                 {
-                    reportStore.reportPeriods.map(
+                    rootStore.reportPeriods.map(
                         (period, index) => (
-                            <HeaderCells.PeriodHeader isTVA={ reportStore.isTVA} key={ index }
+                            <HeaderCells.PeriodHeader isTVA={ rootStore.isTVA} key={ index }
                                                       period={ period } />
                         )
                     )
@@ -33,8 +37,8 @@ const ProgramNameRow = inject('reportStore')(
     })
 );
 
-const ColumnHeaderRow = inject('reportStore')(
-    observer(({ reportStore }) => {
+const ColumnHeaderRow = inject('rootStore')(
+    observer(({ rootStore }) => {
         return (
             <tr>
                 <HeaderCells.BorderedHeader
@@ -51,7 +55,7 @@ const ColumnHeaderRow = inject('reportStore')(
                         gettext('Indicator')
                     } />
                 <HeaderCells.UnBorderedHeader />
-                { reportStore.levelColumn && <HeaderCells.BorderedHeader
+                { !rootStore.filterStore.resultsFramework && <HeaderCells.BorderedHeader
                     styleWidth={90}
                     label={
                         /* # Translators: Column header for indicator Level name column */
@@ -87,8 +91,8 @@ const ColumnHeaderRow = inject('reportStore')(
                         gettext('Baseline')
                     } />
                 <HeaderCells.TVAHeader />
-                { reportStore.reportPeriods.map(
-                    (period, index) => (reportStore.isTVA ?
+                { rootStore.reportPeriods.map(
+                    (period, index) => (rootStore.isTVA ?
                                 <HeaderCells.TVAHeader key={ index } /> :
                                 <HeaderCells.ActualHeader key={ index } />
                               )

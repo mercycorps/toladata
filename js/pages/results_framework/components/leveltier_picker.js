@@ -3,6 +3,8 @@ import { observer, inject } from "mobx-react";
 import { toJS } from "mobx";
 
 import Select from 'react-select';
+import HelpPopover from "../../../components/helpPopover";
+import { EditableLevelTierList, StaticLevelTierList } from './level_tier_lists'
 
 @inject('rootStore')
 @observer
@@ -22,29 +24,33 @@ class Picker extends React.Component {
         let helpIcon = null;
         if (this.props.rootStore.uiStore.tierLockStatus == "locked"){
 
-            helpIcon = <a href="#"
-                tabIndex="0"
-                data-toggle="popover"
-                data-trigger="focus"
-                data-html="true"
-                data-content={gettext('<span class="text-danger"><strong>The results framework template cannot be changed after levels are saved.</strong></span> To change templates, all saved levels first must be deleted.  A level can be deleted when it has no sub-levels and no linked indicators.')}>
-                <i className="far fa-question-circle"></i></a>
+            helpIcon = <HelpPopover
+                key={1}
+                content={gettext('<span class="text-danger"><strong>The results framework template cannot be changed after levels are saved.</strong></span> To change templates, all saved levels first must be deleted.  A level can be deleted when it has no sub-levels and no linked indicators.')}
+            />
+
         }
         else if (this.props.rootStore.uiStore.tierLockStatus == "primed"){
-            helpIcon = <a href="#"
-                tabIndex="0"
-                data-toggle="popover"
-                data-trigger="focus"
-                data-html="true"
-                data-content={gettext('<span class="text-danger"><strong>Choose your results framework template carefully!</strong></span> Once you begin building your framework, it will not be possible to change templates without first deleting all saved levels.')}>
-                <i className="far fa-question-circle"></i></a>
-        }
 
+            helpIcon = <HelpPopover
+                key={2}
+                content={gettext('<span class="text-danger"><strong>Choose your results framework template carefully!</strong></span> Once you begin building your framework, it will not be possible to change templates without first deleting all saved levels.')}
+            />
+        }
 
         const tierTemplates = this.props.rootStore.levelStore.tierTemplates;
 
-        const options = Object.keys(tierTemplates).sort().map(key => {
+        const { custom, ...templateVals } = tierTemplates;
+        let options = Object.keys(templateVals).sort().map(key => {
             return {value:key, label:tierTemplates[key]['name']};
+        });
+
+        options.push({
+            label: "-----------------------------------------------------------",
+            options: [{
+                value: this.props.rootStore.levelStore.customTierSetKey,
+                label: custom['name']
+            }]
         });
 
         const selectedOption = {value:this.props.rootStore.levelStore.chosenTierSetKey, label: this.props.rootStore.levelStore.chosenTierSetName};
@@ -57,62 +63,15 @@ class Picker extends React.Component {
                   <div className="form-group">
                     <label>{gettext('Results framework template')}</label>&nbsp;<small>{helpIcon}</small>
                     <Select
+                        maxMenuHeight={350}
                         options={options}
                         value={selectedOption}
-                        isDisabled={this.props.rootStore.uiStore.tierLockStatus == "locked" ? true : false}
+                        isDisabled={this.props.rootStore.uiStore.tierLockStatus == "locked"}
+                        isSearchable={false}
                         onChange={this.handleChange}
                     />
                 </div>
             </div>
-        )
-    }
-}
-
-class LevelTier extends React.Component {
-
-    render() {
-        return (
-            <div className={'leveltier leveltier--level-' + this.props.tierLevel}>{this.props.tierName} </div>
-    )}
-}
-
-@inject('rootStore')
-@observer
-class LevelTierList extends React.Component{
-
-    render() {
-        let apply_button = null
-        if (this.props.rootStore.levelStore.levels.length == 0) {
-            apply_button =
-                <button
-                    className="leveltier-button btn btn-primary btn-block"
-                    onClick={this.props.rootStore.levelStore.createFirstLevel}>
-                    {/* #Translators: this refers to an imperative verb on a button ("Apply filters")*/}
-                    {gettext("Apply")}
-                </button>
-        }
-
-        return (
-            <React.Fragment>
-                <div id="leveltier-list" className="leveltier-list">
-                    {
-                        this.props.rootStore.levelStore.chosenTierSet.length > 0 ?
-                            this.props.rootStore.levelStore.chosenTierSet.map((tier, index) => {
-                                return <LevelTier key={index} tierLevel={index} tierName={tier}/>
-                            })
-                            : null
-                    }
-
-
-                </div>
-                {
-                    apply_button ?
-                        <div className="leveltier-list__actions">
-                            {apply_button}
-                        </div>
-                    : null
-                }
-            </React.Fragment>
         )
     }
 }
@@ -125,20 +84,24 @@ const ChangeLogLink = ({programId}) => {
             <i className="fas fa-history" /> {gettext('Change log')}
         </a>
     </div>
-}
+};
 
 export const LevelTierPicker = inject("rootStore")(observer(function (props) {
+    let tierListType = <StaticLevelTierList />;
+    if (this.props.rootStore.levelStore.chosenTierSetKey == this.props.rootStore.levelStore.customTierSetKey &&
+        !this.props.rootStore.levelStore.useStaticTierList &&
+        this.props.rootStore.levelStore.hasEditPermissions){
+        tierListType = <EditableLevelTierList />;
+    }
 
     return (
         <div id="leveltier-picker" className="leveltier-picker">
             <div className="leveltier-picker__panel">
                 <Picker />
-                <LevelTierList />
+                {tierListType}
             </div>
 
             <ChangeLogLink programId={props.rootStore.levelStore.program_id} />
         </div>
-        /*<div id="alerts2" style={{minHeight:"50px", minWidth:"50px", backgroundColor:"red"}}></div>*/
-
     )
 }));

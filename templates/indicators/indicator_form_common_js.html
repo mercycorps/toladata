@@ -164,6 +164,10 @@
     function indicatorId() {
         return $('#indicatorId').text() ? parseInt($('#indicatorId').text()) : undefined;
     }
+    
+    function isResultsForm() {
+        return $('.results-table__wrapper').length > 0;
+    }
 
     function programId() {
         return $('#programId').text() ? parseInt($('#programId').text()) : undefined;
@@ -188,7 +192,7 @@
 
     // differentiate between create and update form
     function isCreateForm() {
-        return !indicatorId();
+        return !indicatorId() && !isResultsForm();
     }
 
     // delete indicator helper

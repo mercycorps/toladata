@@ -11,34 +11,21 @@ import { MultiSelectCheckbox } from '../../../../components/selectWidgets';
 const LevelSelect = inject('filterStore')(
     observer(({ filterStore }) => {
         const updateSelected = (selected) => {
-            let levelSelects = selected.filter(option => option.filterType == 'level').map(option => option.value);
-            let tierSelects = selected.filter(option => option.filterType == 'tier').map(option => option.value);
-            if (levelSelects && levelSelects.length > 0 && tierSelects && tierSelects.length > 0) {
-                if (filterStore.levels.length == levelSelects.length) {
-                    filterStore.tiers = tierSelects;
-                } else {
-                    filterStore.levels = levelSelects;
-                }
-            } else if (levelSelects && levelSelects.length > 0) {
-                filterStore.levels = levelSelects;
-            } else if (tierSelects && tierSelects.length > 0) {
-                filterStore.tiers = tierSelects;
-            } else {
-                filterStore.levels = [];
-                filterStore.tiers = [];
-            }
+            filterStore.levelTierFilters = {
+                levels: selected.filter(s => s.category === "level").map(s => s.value),
+                tiers: selected.filter(s => s.category === "tier").map(s => s.value),
+                oldLevels: selected.filter(s => s.category === "oldLevel").map(s => s.value),
+            };
         };
         return <MultiSelectCheckbox
                     label={ gettext('Levels') }
-                    options={ filterStore.levelOptions }
-                    value={
-                        filterStore.levels && filterStore.levels.length > 0 ?
-                            filterStore.levelsSelected :
-                        filterStore.tiers && filterStore.tiers.length > 0 ?
-                            filterStore.tiersSelected :
-                            []
-                    }
-                    update={ updateSelected }
+                    options={ filterStore.levelTierOptions }
+                    value={ filterStore.levelTierFilters }
+                    update={ selected => {filterStore.levelTierFilters = {
+                                levels: selected.filter(s => s.category === "level").map(s => s.value),
+                                tiers: selected.filter(s => s.category === "tier").map(s => s.value),
+                                oldLevels: selected.filter(s => s.category === "oldLevel").map(s => s.value),
+                             };} }
                 />;
     })
 );
@@ -53,8 +40,8 @@ const SiteSelect = inject('filterStore')(
                         gettext('Sites')
                     }
                     options={ filterStore.siteOptions }
-                    value={ filterStore.sitesSelected }
-                    update={ selected => {filterStore.sites = selected.map(s => s.value);} }
+                    value={ filterStore.siteFilters }
+                    update={ selected => {filterStore.siteFilters = selected.map(s => s.value);} }
                 />;
     })
 );
@@ -69,9 +56,9 @@ const TypeSelect = inject('filterStore')(
                         /* # Translators: labels types of indicators to filter by */
                         gettext('Types')
                     }
-                    options={ filterStore.typeOptions }
-                    value={ filterStore.typesSelected }
-                    update={ selected => {filterStore.types = selected.map(s => s.value);} }
+                    options={ filterStore.indicatorTypeOptions }
+                    value={ filterStore.indicatorTypeFilters }
+                    update={ selected => {filterStore.indicatorTypeFilters = selected.map(s => s.value);} }
                 />;
     })
 );
@@ -87,8 +74,8 @@ const SectorSelect = inject('filterStore')(
                         gettext('Sectors')
                     }
                     options={ filterStore.sectorOptions }
-                    value={ filterStore.sectorsSelected }
-                    update={ selected => {filterStore.sectors = selected.map(s => s.value);} }
+                    value={ filterStore.sectorFilters }
+                    update={ selected => {filterStore.sectorFilters = selected.map(s => s.value);} }
                 />;
     })
 );
@@ -104,8 +91,8 @@ const IndicatorSelect = inject('filterStore')(
                         gettext('Indicators')
                     }
                     options={ filterStore.indicatorOptions }
-                    value={ filterStore.indicatorsSelected }
-                    update={ selected => {filterStore.indicators = selected.map(s => s.value);} }
+                    value={ filterStore.indicatorFilters }
+                    update={ selected => {filterStore.indicatorFilters = selected.map(s => s.value);} }
                 />;
     })
 );

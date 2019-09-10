@@ -6,7 +6,7 @@ from operator import attrgetter
 from tola.l10n_utils import l10n_date_medium
 
 from workflow.models import Program
-from indicators.models import Indicator, Level, LevelTier, PeriodicTarget, Objective
+from indicators.models import Indicator, Level, LevelTier, LevelTierTemplate, PeriodicTarget, Objective
 from indicators.queries import IPTTIndicator
 from indicators.export_renderers import (
     FullReportExcelRenderer,
@@ -44,7 +44,7 @@ class LevelSerializer(serializers.ModelSerializer):
 
 class LevelTierSerializer(serializers.ModelSerializer):
     """
-    Level serializer for Program Page
+    LevelTier serializer for Program Page
     """
     class Meta:
         model = LevelTier
@@ -53,6 +53,22 @@ class LevelTierSerializer(serializers.ModelSerializer):
             'name',
             'tier_depth'
         ]
+
+
+class LevelTierTemplateSerializer(serializers.ModelSerializer):
+    """
+    LevelTierTemplate serializer for RF builder
+    """
+    names = serializers.SerializerMethodField()
+    class Meta:
+        model = LevelTierTemplate
+        fields = [
+            'id',
+            'names',
+        ]
+
+    def get_names(self, obj):
+        return list(obj.names)
 
 
 class IndicatorSerializerMinimal(serializers.ModelSerializer):
@@ -112,7 +128,7 @@ class IndicatorSerializer(serializers.ModelSerializer):
             'results_with_evidence_count',
             'target_period_last_end_date', # last end date of last target period, for time-aware indicators
             'over_under',  # indicator progress towards targets (1: over, 0: within 15% of target, -1: under, "None": non reporting
-            'number_if_numbering', # only a number if the program is on manual numbers 
+            'number_if_numbering', # only a number if the program is on manual numbers
         ]
 
     def get_number_if_numbering(self, obj):
@@ -452,7 +468,7 @@ class Period:
     @classmethod
     def lop_period(cls):
         return cls(1, {
-            'name': ugettext('Life of Program') 
+            'name': ugettext('Life of Program')
         }, True)
 
     def __init__(self, frequency, period, tva=False):

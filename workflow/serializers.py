@@ -1,12 +1,13 @@
+# -*- coding: utf-8 -*-
+"""Serializers for workflow model data, specific to view use cases."""
 from rest_framework import serializers
+
+from workflow.models import Program, Documentation, ProjectAgreement
+from indicators.models import Level, Indicator
+
 from django.shortcuts import reverse
 from django.db import models
 from django.utils.translation import ugettext_lazy as _
-
-
-from workflow.models import Program, Documentation, ProjectAgreement
-
-from indicators.models import Level, Indicator
 
 
 class DocumentListProgramSerializer(serializers.ModelSerializer):
@@ -100,6 +101,7 @@ class LogframeLevelSerializer(serializers.ModelSerializer):
     def get_parent(self, obj):
         if obj.parent_id is not None:
             return [lvl for lvl in obj.program.levels.all() if lvl.pk == obj.parent_id][0]
+        return None
 
     def get_level_depth(self, obj):
         depth = 1
@@ -189,7 +191,7 @@ class LogframeProgramSerializer(serializers.ModelSerializer):
             ),
             to_attr='unassigned_indicators'
         )
-        program = Program.active_programs.only(
+        program = Program.rf_aware_objects.only(
             'pk', 'name', '_using_results_framework', 'auto_number_indicators'
         ).prefetch_related(
             'level_tiers',

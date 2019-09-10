@@ -17,7 +17,7 @@ from factories import (
 )
 from indicators.models import Indicator
 
-
+@test.tag('slow')
 class TestResultUnassignedUIDateFallsOutsideProgramPeriod(test.TestCase):
     """
     A result is unassigned because its "date collected" falls outside of the program period AND targets are time-aware

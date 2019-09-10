@@ -15,6 +15,7 @@ from django.db.models import Count, Min, Subquery, OuterRef, Q
 from django.db.models.signals import post_save
 from django.dispatch import receiver
 from rest_framework.authtoken.models import Token
+from tola.model_utils import generate_queryset
 from simple_history.models import HistoricalRecords
 from django.contrib.sessions.models import Session
 from django.urls import reverse
@@ -384,8 +385,8 @@ COUNTRY_ROLE_CHOICES = (
 )
 
 class CountryAccess(models.Model):
-    tolauser = models.ForeignKey(TolaUser)
-    country = models.ForeignKey(Country)
+    tolauser = models.ForeignKey(TolaUser, on_delete=models.CASCADE)
+    country = models.ForeignKey(Country, on_delete=models.CASCADE)
     role = models.CharField(max_length=100, choices=COUNTRY_ROLE_CHOICES, default='user')
 
     def save(self, *args, **kwargs):
@@ -509,12 +510,75 @@ class FundCodeAdmin(admin.ModelAdmin):
     display = 'Fund Code'
 
 
-class ActiveProgramsManager(models.Manager):
-    """manager to return only active programs - those with a status of 'funded' or 'Funded'"""
-    ACTIVE_FUNDING_STATUS = 'funded'
-    def get_queryset(self):
-        return super(ActiveProgramsManager, self).get_queryset().filter(
-            funding_status__iexact=self.ACTIVE_FUNDING_STATUS)
+class ActiveProgramsMixin(object):
+    """eliminates all non active programs"""
+    qs_name = 'ActivePrograms'
+    filter_methods = ['hide_inactive']
+
+    def hide_inactive(self):
+        """Only programs with funding status Funded or funded"""
+        return self.filter(
+            funding_status__iexact='Funded'
+        )
+
+class RFProgramsMixin(object):
+    """annotates for a simple boolean indicating whether program is using the results framework/auto-numbering"""
+    qs_name = 'RFAware'
+    annotate_methods = ['is_using_results_framework', 'is_manual_numbering']
+
+    def is_using_results_framework(self):
+        return self.annotate(
+            using_results_framework=models.Case(
+                models.When(
+                    _using_results_framework=Program.NOT_MIGRATED,
+                    then=models.Value(False)
+                ),
+                default=models.Value(True),
+                output_field=models.BooleanField()
+            )
+        )
+
+    def is_manual_numbering(self):
+        return self.annotate(
+            using_manual_numbering=models.Case(
+                models.When(
+                    models.Q(
+                        models.Q(using_results_framework=False) |
+                        models.Q(auto_number_indicators=False)
+                    ),
+                    then=models.Value(True)
+                ),
+                default=models.Value(False),
+                output_field=models.BooleanField()
+            )
+        )
+
+class ProgramPageProgramsMixin(object):
+    """annotates a program for whether additional target periods are needed"""
+    qs_name = 'ProgramPage'
+    annotate_methods = ['needs_additional_target_periods']
+
+    def needs_additional_target_periods(self):
+        return self.annotate(
+            needs_additional_target_periods=models.Case(
+                models.When(
+                    reporting_period_end__gt=models.Subquery(
+                        Indicator.program_page_objects.filter(
+                            program=models.OuterRef('pk')
+                        ).annotate(
+                            newest_end_date=models.Subquery(
+                                PeriodicTarget.objects.filter(
+                                    indicator=models.OuterRef('pk')
+                                ).order_by('-end_date').values('end_date')[:1])
+                        ).order_by('newest_end_date').values('newest_end_date')[:1],
+                        output_field=models.DateField()
+                    ),
+                    then=models.Value(True)
+                ),
+                default=models.Value(False),
+                output_field=models.BooleanField()
+            )
+        )
 
 class Program(models.Model):
     NOT_MIGRATED = 1 # programs created before satsuma release which have not switched over yet
@@ -555,7 +619,12 @@ class Program(models.Model):
     )
 
     objects = models.Manager()
-    active_programs = ActiveProgramsManager()
+    rf_aware_objects = generate_queryset(ActiveProgramsMixin, RFProgramsMixin).as_manager()
+    program_page_objects = generate_queryset(
+        ActiveProgramsMixin,
+        RFProgramsMixin,
+        ProgramPageProgramsMixin
+    ).as_manager()
 
     class Meta:
         verbose_name = _("Program")
@@ -569,6 +638,10 @@ class Program(models.Model):
             self.create_date = timezone.now()
         self.edit_date = timezone.now()
         super(Program, self).save()
+
+    @property
+    def rf_aware_indicators(self):
+        return self.indicator_set(manager='rf_aware_objects')
 
     @property
     def countries(self):
@@ -683,6 +756,10 @@ class Program(models.Model):
         period_generator = PeriodicTarget.generate_for_frequency(frequency)
         return period_generator(self.reporting_period_start, self.reporting_period_end)
 
+    def get_short_form_periods_for_frequency(self, frequency):
+        period_generator = PeriodicTarget.generate_for_frequency(frequency, short_form=True)
+        return period_generator(self.reporting_period_start, self.reporting_period_end)
+
     @property
     def target_frequencies(self):
         return self.indicator_set.all().order_by().values('target_frequency').distinct().values_list('target_frequency', flat=True)
@@ -745,7 +822,10 @@ class Program(models.Model):
 
     @property
     def manual_numbering(self):
-        return self.results_framework and not self.auto_number_indicators
+        if hasattr(self, 'using_manual_numbering'):
+            return self.using_manual_numbering
+        return not self.results_framework or not self.auto_number_indicators
+
 
 
 PROGRAM_ROLE_CHOICES = (
@@ -765,9 +845,9 @@ PROGRAM_ROLE_INT_MAP = {
 }
 
 class ProgramAccess(models.Model):
-    program = models.ForeignKey(Program)
-    tolauser = models.ForeignKey(TolaUser)
-    country = models.ForeignKey(Country)
+    program = models.ForeignKey(Program, on_delete=models.CASCADE)
+    tolauser = models.ForeignKey(TolaUser, on_delete=models.CASCADE)
+    country = models.ForeignKey(Country, on_delete=models.CASCADE)
     role = models.CharField(max_length=100, choices=PROGRAM_ROLE_CHOICES, default='low')
 
     class Meta:

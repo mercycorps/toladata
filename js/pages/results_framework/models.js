@@ -2,8 +2,8 @@ import { observable, computed, action, toJS, runInAction, autorun } from "mobx";
 import { api } from "../../api.js"
 
 export class RootStore {
-    constructor (program, levels, indicators, levelTiers, tierTemplates, englishTemplates, programObjectives, accessLevel, usingResultsFramework) {
-        this.levelStore =  new LevelStore(program, levels, indicators, levelTiers, tierTemplates, englishTemplates, programObjectives, accessLevel, usingResultsFramework, this);
+    constructor (program, levels, indicators, levelTiers, tierTemplates, englishTemplates, customTemplates, programObjectives, accessLevel, usingResultsFramework) {
+        this.levelStore =  new LevelStore(program, levels, indicators, levelTiers, tierTemplates, englishTemplates, customTemplates, programObjectives, accessLevel, usingResultsFramework, this);
         this.uiStore = new UIStore(this);
     }
 }
@@ -12,7 +12,9 @@ export class LevelStore {
     @observable levels = [];
     @observable indicators = [];
     @observable chosenTierSetKey = "";
-    @observable chosenTierSet = [];
+    @observable useStaticTierList = "";
+    @observable formErrors;
+    @observable tierTemplates = "";
     program_id;
     tierTemplates;
     programObjectives;
@@ -21,11 +23,10 @@ export class LevelStore {
     accessLevel = false;
     usingResultsFramework;
 
-    constructor(program, levels, indicators, levelTiers, tierTemplates, englishTemplates, programObjectives, accessLevel, usingResultsFramework, rootStore) {
+    constructor(program, levels, indicators, levelTiers, tierTemplates, englishTemplates, customTemplates, programObjectives, accessLevel, usingResultsFramework, rootStore) {
         this.rootStore = rootStore;
         this.levels = levels;
         this.indicators = indicators;
-        this.tierTemplates = JSON.parse(tierTemplates);
         this.englishTierTemlates = JSON.parse(englishTemplates);
         this.defaultTemplateKey = "mc_standard";
         this.customTierSetKey = "custom";
@@ -33,30 +34,33 @@ export class LevelStore {
         this.manual_numbering = program.manual_numbering;
         this.programObjectives = programObjectives;
         this.accessLevel = accessLevel;
+        this.usingResultsFramework = usingResultsFramework;
+        this.formErrors = {hasError: false};
+
+        this.tierTemplates = JSON.parse(tierTemplates);
+        this.tierTemplates[this.customTierSetKey] = {name: "Custom"};
+        this.tierTemplates[this.customTierSetKey]['tiers'] = customTemplates.names || [""];
 
         // Set the stored tier set key and the values, if they exist.  Use the default if they don't.
         if (levelTiers.length > 0) {
-            const origLevelTiers = levelTiers.map( t => t.name)
+            const origLevelTiers = levelTiers.map( t => t.name);
             this.chosenTierSetKey = this.deriveTemplateKey(origLevelTiers);
-            if (this.chosenTierSetKey == this.customTierSetKey) {
-                this.chosenTierSet = levelTiers.map(t => t.name);
-            }
-            else{
-                this.chosenTierSet = this.tierTemplates[this.chosenTierSetKey]['tiers']
-            }
         }
         else {
             this.chosenTierSetKey = this.defaultTemplateKey;
-            this.chosenTierSet = this.tierTemplates[this.chosenTierSetKey]['tiers'];
         }
 
-        this.usingResultsFramework = usingResultsFramework;
-
+        this.useStaticTierList  =  !(this.chosenTierSetKey === this.customTierSetKey && this.levels.length === 0);
     }
 
     @computed get sortedLevels () {
         return this.levels.slice().sort((a, b) => {a.level_depth - b.level_depth || a.customsort - b.customsort})
     }
+
+    @computed get chosenTierSet () {
+        return this.tierTemplates[this.chosenTierSetKey]['tiers'];
+    }
+
 
     @computed get levelProperties () {
         let levelProperties = {};
@@ -75,8 +79,8 @@ export class LevelStore {
                 properties['childTierName'] = this.chosenTierSet[level.level_depth];
             }
 
-            properties['canDelete'] = childrenIds.length==0 && indicatorCount==0 && this.accessLevel=='high';
-            properties['canEdit'] = this.accessLevel == 'high';
+            properties['canDelete'] = childrenIds.length==0 && indicatorCount==0 && this.hasEditPermissions;
+            properties['canEdit'] = this.hasEditPermissions;  // TODO: is this really necessary?
             levelProperties[level.id] = properties;
         }
 
@@ -84,14 +88,12 @@ export class LevelStore {
     }
 
     @computed get chosenTierSetName () {
-        if (this.chosenTierSetKey == this.customTierSetKey){
-            {/* # Translators: This signifies that the user has build their own level hierarchy instead of using one of the pre-defined ones */}
-            return gettext("Custom")
-        }
-        else {
-            return this.tierTemplates[this.chosenTierSetKey]['name']
-        }
-    };
+        return this.tierTemplates[this.chosenTierSetKey]['name'];
+    }
+
+    @computed get hasEditPermissions () {
+        return this.accessLevel === 'high';
+    }
 
     // This monitors the number of indicators attached to the program and adds/removes the header link depending on
     // whether there are indicators.  It relies on all indicators being passed up from the server each time
@@ -113,8 +115,127 @@ export class LevelStore {
     @action
     changeTierSet(newTierSetKey) {
         this.chosenTierSetKey = newTierSetKey;
-        this.chosenTierSet = this.tierTemplates[newTierSetKey]['tiers']
+        if (this.chosenTierSetKey === this.customTierSetKey) {
+            // The tier editor should load if there are no levels or if the only level is a new level and
+            // the first tier has not been created yet.  Otherwise load the static tier display.
+            this.useStaticTierList = !(this.levels.length === 0 ||
+                (this.levels.length === 1 && this.levels[0].id === "new" && this.chosenTierSet.length > 0 && this.chosenTierSet[0].length === 0));
+            if (this.tierTemplates[this.customTierSetKey]['tiers'].length === 0) {
+                this.tierTemplates[this.customTierSetKey]['tiers'] = [""]
+            }
+        }
+        else {
+            this.rootStore.uiStore.setDisableCardActions(false);
+        }
+        if (this.levels.length > 0) {
+            this.saveLevelTiersToDB()
+        }
     }
+
+    @action
+    updateCustomTier = (event) => {
+        this.tierTemplates[this.customTierSetKey]['tiers'][event.target.dataset.tierorder] = event.target.value;
+    };
+
+    @action
+    addCustomTier = () => {
+        this.rootStore.uiStore.setAddLevelButtonLockedStatus(true);
+        this.saveCustomTemplateToDB({addTier: true});
+
+    };
+
+    @action
+    deleteCustomTier = (event) => {
+        // This prevents the delete button getting triggered when the user tabs out of the text area
+        // Need to check if a) there was an interaction other than tab and b) if the action was a key press, was it an 'Enter' key?
+        if ((event.detail === 0 && !event.key) || (event.key && event.key != "Enter")) {
+            return false;
+        }
+
+        if (this.chosenTierSet.length === 1){
+            this.tierTemplates[this.customTierSetKey]['tiers'] = [""];
+            this.rootStore.uiStore.clearValidationMessages()
+        }
+        else{
+            this.tierTemplates[this.customTierSetKey]['tiers'].pop();
+            this.rootStore.uiStore.validateCustomTiers()
+        }
+
+        this.saveCustomTemplateToDB({isDeleting: true});
+    };
+
+    @action
+    applyTierSet = (event=null) => {
+        if (event) {
+            event.preventDefault();
+        }
+        if (this.rootStore.uiStore.customFormErrors.hasErrors){
+            return false;
+        }
+
+        this.saveLevelTiersToDB();
+
+        if (this.chosenTierSetKey === this.customTierSetKey){
+            this.rootStore.uiStore.validateCustomTiers();
+            if (this.rootStore.uiStore.customFormErrors.hasErrors) return;
+            this.saveCustomTemplateToDB({shouldAlert: true});
+            this.useStaticTierList = true;
+        }
+        if (this.levels.length === 0) {
+            this.createFirstLevel();
+        }
+        this.rootStore.uiStore.setDisableCardActions(false)
+    };
+
+    @action
+    editTierSet = () => {
+        this.useStaticTierList = false;
+        this.rootStore.uiStore.setDisableCardActions(true)
+    };
+
+    saveCustomTemplateToDB = (options={}) => {
+        // TODO: Find a better way to handle options.  e.g. return a promise to the applyTierSet function and force it to do the alerting.
+        var {addTier, isDeleting, shouldAlert} = options;
+        if (!isDeleting) {
+            this.rootStore.uiStore.validateCustomTiers();
+            if (this.rootStore.uiStore.customFormErrors.hasErrors) return;
+        }
+        let tiersToSave = [...this.tierTemplates[this.customTierSetKey]['tiers']];
+        if (tiersToSave[0].length === 0) {
+            tiersToSave = null
+        }
+
+        const data = {program_id: this.program_id, tiers: tiersToSave};
+        api.post(`/save_custom_template/`, data)
+            .then(response => {
+                // Only notify of success if the tiers have changed.
+                if (shouldAlert) {
+                    success_notice({
+                        /* # Translators: Notification to user that the update they initiated was successful */
+                        message_text: gettext("Changes to the results framework template were saved."),
+                        addClass: 'program-page__rationale-form',
+                        stack: {
+                            dir1: 'up',
+                            dir2: 'right',
+                            firstpos1: 20,
+                            firstpos2: 20,
+                        }
+                    });
+                }
+                if (addTier) {
+                    // Protect against "Add level" button smashing by checking if the last value of the tier set is an empty string.
+                    if (this.chosenTierSet.slice(-1) != "") {
+                        this.chosenTierSet.push("");
+                    }
+                }
+                this.rootStore.uiStore.setAddLevelButtonLockedStatus(false);
+
+            })
+            .catch(error => {
+                this.rootStore.uiStore.setAddLevelButtonLockedStatus(false);
+                console.log('error', error);
+            })
+    };
 
     @action
     cancelEdit = levelId => {
@@ -223,8 +344,6 @@ export class LevelStore {
                 if (this.levels.length == 0){
                     this.createFirstLevel()
                 }
-
-
                 success_notice({
                     /* # Translators: Notification to user that the deletion command that they issued was successful */
                     message_text: interpolate(gettext("%s was deleted."), [level_label]),
@@ -239,7 +358,7 @@ export class LevelStore {
             })
             .catch(error => console.log('error', error))
 
-        this.rootStore.uiStore.setDisableForPrompt(false);
+        this.rootStore.uiStore.setDisableCardActions(false);
     };
 
 
@@ -258,20 +377,17 @@ export class LevelStore {
         const levelDataWasUpdated = this.rootStore.uiStore.activeCardNeedsConfirm;
         if (levelId == "new") {
             if (levelToSave.parent == "root") {
-                this.saveLevelTiersToDB();
                 $('#logframe_link').show();
             }
 
             // Don't need id, since it will be "new", and don't need rationale, since it's a new level.
             delete levelToSave.id;
             delete levelToSave.rationale;
-
             api.post(`/insert_new_level/`, levelToSave)
                 .then(response => {
                     runInAction(() => {
                         this.levels.replace(response.data['all_data'])
                     });
-
                     success_notice({
                         // # Translators: This is a confirmation message that confirms that change has been successfully saved to the DB.
                         message_text: interpolate(gettext("%s saved."), [level_label]),
@@ -433,7 +549,16 @@ export class LevelStore {
             newIndicatorIds = newIndicatorIds.concat(this.getDescendantIndicatorIds(grandChildIds, newIndicatorIds));
         });
         return newIndicatorIds
-    }
+    };
+
+    tierIsDeletable = (tierLevel) => {
+        for (let level of this.levels) {
+            if (level.level_depth === tierLevel && level.name.length > 0){
+                return false;
+            }
+        }
+        return true;
+    };
 
 }
 
@@ -442,21 +567,26 @@ export class UIStore {
 
     @observable activeCard;
     @observable hasVisibleChildren = [];
-    @observable disableForPrompt;
+    @observable disableCardActions;
+    @observable customFormErrors;
+    @observable addLevelButtonIsLocked;
     activeCardNeedsConfirm = "";
 
     constructor (rootStore) {
         this.rootStore = rootStore;
-        this.hasVisibleChildren = this.rootStore.levelStore.levels.map(l => l.id)
+        this.hasVisibleChildren = this.rootStore.levelStore.levels.map(l => l.id);
         this.activeCardNeedsConfirm = false;
         this.activeCard = null;
-        this.disableForPrompt = false;
+        this.disableCardActions = false;
+        this.customFormErrors = {hasErrors: false, errors: []};
+        this.addLevelButtonIsLocked = false;  //used to prevent creating two new levels by smashing the Add Level button
     }
 
     @computed get tierLockStatus () {
-        // The leveltier picker should be disabled if there is at least one saved level in the DB.
+        // The leveltier picker should be disabled if there is at least one saved level in the DB or if the user is
+        // doesn't have 'high' permissions.
         let notNewLevels = this.rootStore.levelStore.levels.filter( l => l.id != "new");
-        if  (notNewLevels.length > 0) {
+        if  (notNewLevels.length > 0 || !this.rootStore.levelStore.hasEditPermissions) {
             return "locked"
         }
         // The apply button should not be visible if there is only one level visible (i.e. saved to the db or not)
@@ -466,12 +596,39 @@ export class UIStore {
 
         return null;
     }
-    // TODO: Make sure old editing data is not preserved when an edit is cancelled
+
+    // This calculation is used in to decide if the Expand All button on in the level list should be disabled or not.
+    // Need count all nodes excluding leaf nodes, which is the how many id's will be in the
+    // hasVisibleChildren count if a user manually expands all of the level cards.
+    @computed get isExpandAllDisabled () {
+        if (this.rootStore.levelStore.levels.length == 0 ||
+            this.disableCardActions||
+            this.activeCard) {
+            return true;
+        }
+        else {
+            let parents = new Set(this.rootStore.levelStore.levels.map(level => level.parent));
+            parents = Array.from(parents).filter( p => p != null);
+            const sortedHasVisibleChildren = new Set([...this.hasVisibleChildren]);
+
+            for (var elem of parents) {
+                if (!sortedHasVisibleChildren.has(elem)) {
+                    return false;
+                }
+            }
+            return true;
+        }
+    }
+
+    @computed get disabledActionsOrActiveCard() {
+        return this.disableCardActions || this.activeCard;
+    }
+
     @action
     editCard = (levelId) => {
         const cancelledLevelId = this.activeCard;
         if (this.activeCardNeedsConfirm) {
-            this.setDisableForPrompt(true);
+            this.setDisableCardActions(true);
             $(`#level-card-${this.activeCard}`)[0].scrollIntoView({behavior:"smooth"});
             const oldTierName = this.rootStore.levelStore.levelProperties[this.activeCard].tierName;
             create_no_rationale_changeset_notice({
@@ -481,7 +638,7 @@ export class UIStore {
                 preamble: interpolate(gettext("Changes to this %s will not be saved"), [oldTierName]),
                 type: "notice",
                 on_submit: () => this.onLeaveConfirm(levelId, cancelledLevelId),
-                on_cancel: () => this.setDisableForPrompt(false),
+                on_cancel: () => this.setDisableCardActions(false),
             })
         }
         else {
@@ -492,7 +649,7 @@ export class UIStore {
 
     @action
     onLeaveConfirm = (levelId, cancelledLevelId) => {
-        this.setDisableForPrompt(false);
+        this.setDisableCardActions(false);
         this.rootStore.levelStore.cancelEdit(cancelledLevelId);
         this.activeCardNeedsConfirm = false;
         this.activeCard = levelId;
@@ -504,8 +661,8 @@ export class UIStore {
     };
 
     @action
-    setDisableForPrompt = (value) => {
-        this.disableForPrompt = value;
+    setDisableCardActions = (value) => {
+        this.disableCardActions = value;
     };
 
     @action
@@ -515,8 +672,8 @@ export class UIStore {
     };
 
     @action
-    updateVisibleChildren = (levelId, forceHide=false, forceShow=false) => {
-        // forceHide is to ensure that descendant levels are also made hidden, even if they are not actually visible.
+    updateVisibleChildren = (levelId, forceHide=false) => {
+        // forceHide is to ensure that descendant levels are also hidden.
         if (this.hasVisibleChildren.indexOf(levelId) >= 0 || forceHide) {
             this.hasVisibleChildren = this.hasVisibleChildren.filter( level_id => level_id != levelId );
             const childLevels = this.rootStore.levelStore.levels.filter( l => l.parent == levelId);
@@ -525,5 +682,60 @@ export class UIStore {
         else {
             this.hasVisibleChildren.push(levelId);
         }
+    };
+
+    @action
+    expandAllLevels = () =>{
+        this.hasVisibleChildren = this.rootStore.levelStore.levels.map( level => level.id);
+    };
+
+    @action
+    collapseAllLevels = () => this.hasVisibleChildren = [];
+
+    @action
+    setAddLevelButtonLockedStatus = (status) => this.addLevelButtonIsLocked = status;
+
+    @action
+    validateCustomTiers = () => {
+        let hasErrors = false;
+        const customKey = this.rootStore.levelStore.customTierSetKey;
+        const tiersToTest = this.rootStore.levelStore.tierTemplates[customKey]['tiers'];
+        this.setAddLevelButtonLockedStatus(false);
+        let errors = tiersToTest.map( (tierName) => {
+            const regex = /^\s*$/;
+            let whitespaceError = tierName.length === 0 || (regex.test(tierName) && tierName.length > 0)
+            let duplicateErrors = 0; // There will be at least 1 for the self-match.
+            let commaError = tierName.indexOf(",") !== -1;
+
+            tiersToTest.forEach( otherTierName => {
+                if (otherTierName == tierName){
+                    duplicateErrors += 1;
+                }
+            });
+            if (whitespaceError){
+                hasErrors = true;
+                /* # Translators: This is a warning messages when a user has entered duplicate names for two different objects and those names contain only white spaces, both of which are not permitted. */
+                return {hasError: true, msg: gettext("Please complete this field.")}
+            }
+            else if (commaError){
+                hasErrors = true;
+                /* # Translators: This is a warning messages when a user has entered duplicate names for two different objects */
+                return {hasError: true, msg: gettext("Result levels should not contain commas.")}
+            }
+            else if (duplicateErrors > 1){
+                hasErrors = true;
+                /* # Translators: This is a warning messages when a user has a comma in a name that shouldn't contain commas */
+                return {hasError: true, msg: gettext("Result levels must have unique names.")}
+            }
+            else{
+                return {hasError: false, msg: ""};
+            }
+        });
+        this.customFormErrors = {hasErrors: hasErrors, errors: errors}
+    };
+
+    @action
+    clearValidationMessages = () => {
+        this.customFormErrors = {hasErrors: false, errors: []}
     }
 }
