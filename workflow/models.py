@@ -40,7 +40,7 @@ class TolaSites(models.Model):
     tola_tables_url = models.CharField(_("Tola tables url"), blank=True, null=True, max_length=255)
     tola_tables_user = models.CharField(_("Tola tables user"), blank=True, null=True, max_length=255)
     tola_tables_token = models.CharField(_("Tola tables token"), blank=True, null=True, max_length=255)
-    site = models.ForeignKey(Site, on_delete=models.SET_NULL, verbose_name=_("Site"))
+    site = models.ForeignKey(Site, null=True, on_delete=models.SET_NULL, verbose_name=_("Site"))
     privacy_disclaimer = models.TextField(_("Privacy disclaimer"), blank=True, null=True)
     created = models.DateTimeField(_("Created"), auto_now=False, blank=True, null=True)
     updated = models.DateTimeField(_("Updated"), auto_now=False, blank=True, null=True)
@@ -48,7 +48,7 @@ class TolaSites(models.Model):
     class Meta:
         verbose_name_plural = _("Tola Sites")
 
-    def __unicode__(self):
+    def __str__(self):
         return self.name
 
     def save(self, *args, **kwargs):
@@ -84,7 +84,7 @@ class Sector(models.Model):
         super(Sector, self).save()
 
     # displayed in admin templates
-    def __unicode__(self):
+    def __str__(self):
         return self.sector
 
 
@@ -130,7 +130,7 @@ class Organization(models.Model):
         }
 
     # displayed in admin templates
-    def __unicode__(self):
+    def __str__(self):
         return self.name
 
     @classmethod
@@ -167,7 +167,7 @@ class Country(models.Model):
         super(Country, self).save()
 
     # displayed in admin templates
-    def __unicode__(self):
+    def __str__(self):
         return self.country
 
 
@@ -175,10 +175,12 @@ class TolaUser(models.Model):
     title = models.CharField(_("Title"), blank=True, null=True, max_length=50)
     name = models.CharField(_("Given Name"), blank=True, null=True, max_length=100)
     employee_number = models.IntegerField(_("Employee Number"), blank=True, null=True)
-    user = models.OneToOneField(User, unique=True, null=True, related_name='tola_user', verbose_name=_("User"),
-                                on_delete=models.SET_NULL)
+    user = models.OneToOneField(
+        User, unique=True, null=True, related_name='tola_user', verbose_name=_("User"), on_delete=models.SET_NULL
+    )
     organization = models.ForeignKey(
-        Organization, on_delete=models.SET_NULL, verbose_name=_("Organization"))
+        Organization, null=True, on_delete=models.SET_NULL, verbose_name=_("Organization")
+    )
     language = models.CharField(max_length=2, choices=settings.LANGUAGES, default='en')
     country = models.ForeignKey(Country, blank=True, null=True, on_delete=models.SET_NULL, verbose_name=_("Country"))
     active_country = models.ForeignKey(
@@ -204,7 +206,7 @@ class TolaUser(models.Model):
         verbose_name = _("Tola User")
         ordering = ('name',)
 
-    def __unicode__(self):
+    def __str__(self):
         # Returning None breaks the Django Admin on models with a FK to TolaUser
         return self.name or u''
 
@@ -443,7 +445,7 @@ class FormGuidance(models.Model):
             self.create_date = timezone.now()
         super(FormGuidance, self).save()
 
-    def __unicode__(self):
+    def __str__(self):
         return str(self.form)
 
 
@@ -480,7 +482,7 @@ class Contact(models.Model):
         super(Contact, self).save()
 
     # displayed in admin templates
-    def __unicode__(self):
+    def __str__(self):
         return u'%s, %s' % (self.name, self.title)
 
 
@@ -509,7 +511,7 @@ class FundCode(models.Model):
         super(FundCode, self).save()
 
     # displayed in admin templates
-    def __unicode__(self):
+    def __str__(self):
         return self.name
 
 
@@ -667,7 +669,7 @@ class Program(models.Model):
             return False
 
     # displayed in admin templates
-    def __unicode__(self):
+    def __str__(self):
         return self.name
 
     @property
@@ -886,7 +888,7 @@ class ApprovalAuthority(models.Model):
         super(ApprovalAuthority, self).save()
 
     # displayed in admin templates
-    def __unicode__(self):
+    def __str__(self):
         return self.approval_user.user.first_name + " " + self.approval_user.user.last_name
 
 
@@ -909,7 +911,7 @@ class Province(models.Model):
         super(Province, self).save()
 
     # displayed in admin templates
-    def __unicode__(self):
+    def __str__(self):
         return self.name
 
 
@@ -939,7 +941,7 @@ class District(models.Model):
         super(District, self).save()
 
     # displayed in admin templates
-    def __unicode__(self):
+    def __str__(self):
         return self.name
 
 
@@ -969,7 +971,7 @@ class AdminLevelThree(models.Model):
         super(AdminLevelThree, self).save()
 
     # displayed in admin templates
-    def __unicode__(self):
+    def __str__(self):
         return self.name
 
 
@@ -1001,7 +1003,7 @@ class Village(models.Model):
         super(Village, self).save()
 
     # displayed in admin templates
-    def __unicode__(self):
+    def __str__(self):
         return self.name
 
 
@@ -1031,7 +1033,7 @@ class Office(models.Model):
         super(Office, self).save()
 
     # displayed in admin templates
-    def __unicode__(self):
+    def __str__(self):
         new_name = str(self.name) + str(" - ") + str(self.code)
         return new_name
 
@@ -1053,7 +1055,7 @@ class ProfileType(models.Model):
         super(ProfileType, self).save()
 
     # displayed in admin templates
-    def __unicode__(self):
+    def __str__(self):
         return self.profile
 
 
@@ -1080,7 +1082,7 @@ class LandType(models.Model):
         super(LandType, self).save()
 
     # displayed in admin templates
-    def __unicode__(self):
+    def __str__(self):
         return self.classify_land
 
 
@@ -1146,7 +1148,7 @@ class SiteProfile(models.Model):
         _("Households Owning Livestock"), help_text="(%)", null=True, blank=True)
     animal_type = models.CharField(
         _("Animal Types"), help_text=_("List Animal Types"), max_length=255, null=True, blank=True)
-    country = models.ForeignKey(Country, on_delete=models.SET_NULL, verbose_name=_("Country"))
+    country = models.ForeignKey(Country, null=True, on_delete=models.SET_NULL, verbose_name=_("Country"))
     province = models.ForeignKey(
         Province, verbose_name=_("Administrative Level 1"), null=True, blank=True, on_delete=models.SET_NULL)
     district = models.ForeignKey(
@@ -1191,7 +1193,7 @@ class SiteProfile(models.Model):
         super(SiteProfile, self).save()
 
     # displayed in admin templates
-    def __unicode__(self):
+    def __str__(self):
         new_name = self.name
         return new_name
 
@@ -1220,7 +1222,7 @@ class Capacity(models.Model):
         super(Capacity, self).save()
 
     # displayed in admin templates
-    def __unicode__(self):
+    def __str__(self):
         return self.capacity
 
 
@@ -1246,7 +1248,7 @@ class StakeholderType(models.Model):
         super(StakeholderType, self).save()
 
     # displayed in admin templates
-    def __unicode__(self):
+    def __str__(self):
         return self.name
 
 
@@ -1274,7 +1276,7 @@ class Evaluate(models.Model):
         super(Evaluate, self).save()
 
     # displayed in admin templates
-    def __unicode__(self):
+    def __str__(self):
         return self.evaluate
 
 
@@ -1296,7 +1298,7 @@ class ProjectType(models.Model):
         self.edit_date = timezone.now()
         super(ProjectType, self).save()
 
-    def __unicode__(self):
+    def __str__(self):
         return self.name
 
     class Meta:
@@ -1324,7 +1326,7 @@ class Template(models.Model):
         self.edit_date = timezone.now()
         super(Template, self).save()
 
-    def __unicode__(self):
+    def __str__(self):
         return self.name
 
     class Meta:
@@ -1379,7 +1381,7 @@ class Stakeholder(models.Model):
         super(Stakeholder, self).save()
 
     # displayed in admin templates
-    def __unicode__(self):
+    def __str__(self):
         return str(self.name)
 
 
@@ -1614,7 +1616,7 @@ class ProjectAgreement(models.Model):
         return ', '.join([x.evaluate for x in self.evaluate.all()])
 
     # displayed in admin templates
-    def __unicode__(self):
+    def __str__(self):
         new_name = str(self.office) + str(" - ") + str(self.project_name)
         return new_name
 
@@ -1765,7 +1767,7 @@ class ProjectComplete(models.Model):
         super(ProjectComplete, self).save()
 
     # displayed in admin templates
-    def __unicode__(self):
+    def __str__(self):
         new_name = str(self.office) + str(" - ") + str(self.project_name)
         return new_name
 
@@ -1796,7 +1798,7 @@ class Documentation(models.Model):
         self.edit_date = timezone.now()
         super(Documentation, self).save()
 
-    def __unicode__(self):
+    def __str__(self):
         return self.name
 
     @property
@@ -1852,7 +1854,7 @@ class Benchmarks(models.Model):
         super(Benchmarks, self).save()
 
     # displayed in admin templates
-    def __unicode__(self):
+    def __str__(self):
         return self.description
 
 
@@ -1885,7 +1887,7 @@ class Monitor(models.Model):
         super(Monitor, self).save()
 
     # displayed in admin templates
-    def __unicode__(self):
+    def __str__(self):
         return self.responsible_person
 
 
@@ -1913,7 +1915,7 @@ class Budget(models.Model):
         self.edit_date = timezone.now()
         super(Budget, self).save()
 
-    def __unicode__(self):
+    def __str__(self):
         return self.contributor
 
     class Meta:
@@ -1944,7 +1946,7 @@ class Checklist(models.Model):
         super(Checklist, self).save()
 
     # displayed in admin templates
-    def __unicode__(self):
+    def __str__(self):
         return str(self.agreement)
 
 
@@ -1975,7 +1977,7 @@ class ChecklistItem(models.Model):
         super(ChecklistItem, self).save()
 
     # displayed in admin templates
-    def __unicode__(self):
+    def __str__(self):
         return str(self.item)
 
 
@@ -1996,7 +1998,7 @@ class LoggedUser(models.Model):
     country = models.CharField(_("Country"), max_length=100, blank=False)
     email = models.CharField(_("Email"), max_length=100, blank=False, default='user@mercycorps.com')
 
-    def __unicode__(self):
+    def __str__(self):
         return self.username
 
     def login_user(sender, request, user, **kwargs):
