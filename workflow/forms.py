@@ -1,27 +1,29 @@
-from crispy_forms.helper import FormHelper
-from crispy_forms.layout import *
-from crispy_forms.bootstrap import *
-from crispy_forms.layout import Layout, Submit, Reset, Field
-from django.forms import HiddenInput, URLInput
-from django.utils.translation import ugettext_lazy as _
+
 from functools import partial
-from widgets import GoogleMapsWidget
+
+from crispy_forms.helper import FormHelper
+from crispy_forms.bootstrap import *
+from crispy_forms.layout import Layout, Submit, Reset, Field, LayoutObject, TEMPLATE_PACK, Fieldset, Div, HTML
+
+from django.forms import HiddenInput
+from django.utils.translation import ugettext_lazy as _
 from django import forms
 from django.db.models import Q
-from .models import (
+from django.template import Context
+
+from workflow.widgets import GoogleMapsWidget
+from workflow.models import (
     ProjectAgreement, ProjectComplete, Program, SiteProfile, Documentation, Benchmarks,
-    Monitor, Budget, Capacity, Evaluate, Office, Checklist, ChecklistItem, Province, Stakeholder,
+    Monitor, Budget, Office, ChecklistItem, Province, Stakeholder,
     TolaUser, Contact, Sector, Country
 )
-from indicators.models import Result, Indicator, PeriodicTarget
-from crispy_forms.layout import LayoutObject, TEMPLATE_PACK
+
 from tola.util import getCountry
-import ast
-import collections
+
 
 
 #Global for approvals
-APPROVALS=(
+APPROVALS = (
         ('in progress', 'in progress'),
         ('awaiting approval', 'awaiting approval'),
         ('approved', 'approved'),
@@ -30,7 +32,7 @@ APPROVALS=(
 
 
 #Global for Budget Variance
-BUDGET_VARIANCE=(
+BUDGET_VARIANCE = (
         ("Over Budget", "Over Budget"),
         ("Under Budget", "Under Budget"),
         ("No Variance", "No Variance"),
@@ -61,7 +63,9 @@ class Formset(LayoutObject):
 
         form_class = 'form-horizontal'
 
-        return render_to_string(self.template, Context({'wrapper': self, 'formset': self.formset_name_in_context, 'form_class': form_class}))
+        return render_to_string(
+            self.template,
+            Context({'wrapper': self, 'formset': self.formset_name_in_context, 'form_class': form_class}))
 
 
 class DatePicker(forms.DateInput):
@@ -93,7 +97,8 @@ class BudgetForm(forms.ModelForm):
         self.helper.html5_required = True
         self.helper.form_tag = False
         self.helper.layout = Layout(
-            Field('contributor', required=False), Field('description_of_contribution', required=False), PrependedAppendedText('proposed_value','$', '.00'), 'agreement', 'complete',
+            Field('contributor', required=False), Field('description_of_contribution', required=False),
+            PrependedAppendedText('proposed_value','$', '.00'), 'agreement', 'complete',
         )
 
 
@@ -191,8 +196,9 @@ class ProjectAgreementForm(forms.ModelForm):
 
             TabHolder(
                 Tab('Executive Summary',
-                    Fieldset('Project Details', 'program', 'program2', 'activity_code','account_code','lin_code','office', 'sector', 'project_name', 'project_activity',
-                             'project_type', 'site','stakeholder','mc_staff_responsible','expected_start_date','expected_end_date',
+                    Fieldset('Project Details', 'program', 'program2', 'activity_code', 'account_code', 'lin_code',
+                             'office', 'sector', 'project_name', 'project_activity', 'project_type', 'site',
+                             'stakeholder', 'mc_staff_responsible', 'expected_start_date', 'expected_end_date',
                         ),
                     ),
                 Tab('Components',
@@ -236,8 +242,10 @@ class ProjectAgreementForm(forms.ModelForm):
                 Tab('Budget',
                     Fieldset(
                         'Budget',
-                        PrependedAppendedText('total_estimated_budget','$', '.00'), PrependedAppendedText('mc_estimated_budget','$', '.00'),
-                        AppendedText('local_total_estimated_budget', '.00'), AppendedText('local_mc_estimated_budget', '.00'),
+                        PrependedAppendedText('total_estimated_budget','$', '.00'),
+                        PrependedAppendedText('mc_estimated_budget','$', '.00'),
+                        AppendedText('local_total_estimated_budget', '.00'),
+                        AppendedText('local_mc_estimated_budget', '.00'),
                         'exchange_rate','exchange_rate_date','estimation_date','other_budget',
                     ),
                     Fieldset("Other Budget Contributions:",
@@ -285,8 +293,10 @@ class ProjectAgreementForm(forms.ModelForm):
                         ),
                     Fieldset(
                         'Justification',
-                        Field('effect_or_impact',rows="4", css_class='input-xlarge', label="Anticipated Outcome and Goal"),
-                        Field('risks_assumptions',rows="4", css_class='input-xlarge', label="Risks and Assumptions"),
+                        Field('effect_or_impact', rows="4",
+                              css_class='input-xlarge', label="Anticipated Outcome and Goal"),
+                        Field('risks_assumptions', rows="4",
+                              css_class='input-xlarge', label="Risks and Assumptions"),
                         ),
                     ),
                 Tab('M&E',
@@ -355,7 +365,8 @@ class ProjectAgreementForm(forms.ModelForm):
                 Tab('Approval',
                     Fieldset('Approval',
                              'approval', 'estimated_by', 'reviewed_by',
-                             'finance_reviewed_by','finance_reviewed_by_date','me_reviewed_by','me_reviewed_by_date','approved_by', 'approved_by_date',
+                             'finance_reviewed_by', 'finance_reviewed_by_date', 'me_reviewed_by',
+                             'me_reviewed_by_date', 'approved_by', 'approved_by_date',
                              Field('approval_remarks', rows="3", css_class='input-xlarge')
                         ),
                     ),
@@ -414,7 +425,6 @@ class ProjectAgreementForm(forms.ModelForm):
 
         #override the program queryset to use request.user for country
         countries = getCountry(self.request.user)
-        #self.fields['program'].queryset = Program.objects.filter(funding_status="Funded", country__in=countries).distinct()
 
         self.fields['program'].widget = forms.HiddenInput()
         self.fields['program2'].initial = self.instance.program
@@ -437,12 +447,12 @@ class ProjectAgreementForm(forms.ModelForm):
         self.fields['stakeholder'].queryset = Stakeholder.objects.filter(country__in=countries)
 
         if not 'Approver' in self.request.user.groups.values_list('name', flat=True):
-            APPROVALS = (
+            _approvals = (
                 ('in progress', 'in progress'),
                 ('awaiting approval', 'awaiting approval'),
                 ('rejected', 'rejected'),
             )
-            self.fields['approval'].choices = APPROVALS
+            self.fields['approval'].choices = _approvals
             #self.fields['approved_by'].widget.attrs['disabled'] = "disabled"
             self.fields['approval_remarks'].widget.attrs['disabled'] = "disabled"
             self.fields['approval'].help_text = "Approval level permissions required"
@@ -453,8 +463,10 @@ class ProjectAgreementSimpleForm(forms.ModelForm):
     class Meta:
         model = ProjectAgreement
         fields = '__all__'
-        exclude = ['create_date', 'edit_date','account_code','lin_code','mc_estimated_budget','local_total_estimated_budget','local_estimated_budget'
-                   ,'approval_submitted_by','finance_reviewed_by','me_reviewed_by','exchange_rate','exchange_rate_date','estimation_date','other_budget','short']
+        exclude = ['create_date', 'edit_date', 'account_code', 'lin_code', 'mc_estimated_budget',
+                   'local_total_estimated_budget', 'local_estimated_budget', 'approval_submitted_by',
+                   'finance_reviewed_by', 'me_reviewed_by', 'exchange_rate',
+                   'exchange_rate_date', 'estimation_date', 'other_budget', 'short']
 
     map = forms.CharField(widget=GoogleMapsWidget(
         attrs={'width': 700, 'height': 400, 'longitude': 'longitude', 'latitude': 'latitude'}), required=False)
@@ -509,13 +521,14 @@ class ProjectAgreementSimpleForm(forms.ModelForm):
             HTML("""<br/>"""),
             TabHolder(
                 Tab('Executive Summary',
-                    Fieldset('Project Details', 'program', 'program2', 'activity_code','office', 'sector', 'project_name',
-                             'site','stakeholder','expected_start_date','expected_end_date',
+                    Fieldset('Project Details', 'program', 'program2', 'activity_code', 'office', 'sector',
+                             'project_name', 'site', 'stakeholder', 'expected_start_date', 'expected_end_date',
                         ),
 
                     ),
                 Tab('Components',
-                    Fieldset("Project Components",
+                    Fieldset(
+                        "Project Components",
                         HTML("""
 
                             <div class='panel panel-default'>
@@ -552,13 +565,15 @@ class ProjectAgreementSimpleForm(forms.ModelForm):
                             """),
                         ),
                     ),
-                Tab('Budget',
+                Tab(
+                    'Budget',
                     Fieldset(
                         'Budget',
                         PrependedAppendedText('total_estimated_budget','$', '.00'),
                         'estimation_date',
                     ),
-                    Fieldset("Other Budget Contributions:",
+                    Fieldset(
+                        "Other Budget Contributions:",
                         Div(
                             "",
                             HTML("""
@@ -597,7 +612,8 @@ class ProjectAgreementSimpleForm(forms.ModelForm):
 
                     ),
 
-                Tab('Justification and Description',
+                Tab(
+                    'Justification and Description',
                     Fieldset(
                         'Description',
                         Field('description_of_project_activities', rows="4", css_class='input-xlarge'),
@@ -605,12 +621,15 @@ class ProjectAgreementSimpleForm(forms.ModelForm):
                         ),
                     Fieldset(
                         'Justification',
-                        Field('effect_or_impact',rows="4", css_class='input-xlarge', label="Anticipated Outcome and Goal"),
-                        Field('risks_assumptions',rows="4", css_class='input-xlarge', label="Risks and Assumptions"),
+                        Field('effect_or_impact', rows="4",
+                              css_class='input-xlarge', label="Anticipated Outcome and Goal"),
+                        Field('risks_assumptions', rows="4",
+                              css_class='input-xlarge', label="Risks and Assumptions"),
                         ),
                     ),
 
-                Tab('Approval',
+                Tab(
+                    'Approval',
                     Fieldset('Approval',
                              'approval', 'estimated_by',
                              'approved_by', 'approved_by_date',
@@ -626,8 +645,6 @@ class ProjectAgreementSimpleForm(forms.ModelForm):
                     ),
                     css_class='form-actions',
                 ),
-
-
             Fieldset(
                 '',
                 Div(
@@ -665,7 +682,6 @@ class ProjectAgreementSimpleForm(forms.ModelForm):
                 ),
                 css_class="card mt-3",
             ),
-
         )
         super(ProjectAgreementSimpleForm, self).__init__(*args, **kwargs)
 
@@ -690,12 +706,12 @@ class ProjectAgreementSimpleForm(forms.ModelForm):
         self.fields['stakeholder'].queryset = Stakeholder.objects.filter(country__in=countries)
 
         if not 'Approver' in self.request.user.groups.values_list('name', flat=True):
-            APPROVALS = (
+            _approvals = (
                 ('in progress', 'in progress'),
                 ('awaiting approval', 'awaiting approval'),
                 ('rejected', 'rejected'),
             )
-            self.fields['approval'].choices = APPROVALS
+            self.fields['approval'].choices = _approvals
             #self.fields['approved_by'].widget.attrs['disabled'] = "disabled"
             self.fields['approval_remarks'].widget.attrs['disabled'] = "disabled"
             self.fields['approval'].help_text = "Approval level permissions required"
@@ -733,11 +749,15 @@ class ProjectCompleteCreateForm(forms.ModelForm):
         self.helper.help_text_inline = True
         self.helper.html5_required = True
         if kwargs['initial'].get('short'):
-            fieldset = Fieldset('Program', 'program2', 'program', 'project_agreement2', 'project_agreement', 'activity_code', 'office', 'sector', 'project_name', 'estimated_budget', 'site','stakeholder',
+            fieldset = Fieldset(
+                'Program', 'program2', 'program', 'project_agreement2', 'project_agreement', 'activity_code',
+                'office', 'sector', 'project_name', 'estimated_budget', 'site', 'stakeholder',
                     )
         else:
-            fieldset = Fieldset('Program', 'program2', 'program', 'project_agreement', 'project_agreement2', 'activity_code','account_code','lin_code',\
-                             'office', 'sector','project_name', 'project_activity', 'site', 'stakeholder'
+            fieldset = Fieldset(
+                'Program', 'program2', 'program', 'project_agreement', 'project_agreement2', 'activity_code',
+                'account_code', 'lin_code', 'office', 'sector','project_name', 'project_activity', 'site',
+                'stakeholder'
                     )
         self.helper.layout = Layout(
             HTML("""<br/>"""),
@@ -821,8 +841,10 @@ class ProjectCompleteForm(forms.ModelForm):
             HTML("""<br/>"""),
             TabHolder(
                 Tab('Executive Summary',
-                    Fieldset('', 'program', 'program2', 'project_agreement', 'project_agreement2', 'activity_code','account_code','lin_code',\
-                             'office', 'sector','project_name', 'project_activity', 'site', 'stakeholder',
+                    Fieldset(
+                        '', 'program', 'program2', 'project_agreement', 'project_agreement2', 'activity_code',
+                        'account_code', 'lin_code', 'office', 'sector','project_name', 'project_activity', 'site',
+                        'stakeholder',
                         ),
                     Fieldset(
                         'Dates',
@@ -885,40 +907,41 @@ class ProjectCompleteForm(forms.ModelForm):
 
                 ),
                 Tab('Budget Other',
-                    Fieldset("Other Budget Contributions:",
+                    Fieldset(
+                        "Other Budget Contributions:",
                         Div(
-                                "",
-                                HTML("""
+                            "",
+                            HTML("""
 
-                                    <div class='panel panel-default'>
-                                      <!-- Default panel contents -->
-                                      <div class='panel-heading'>Budget Contributions</div>
-                                      <!-- Table -->
-                                      <table class="table" id="budget_contributions_table">
-                                      <tbody>
-                                      {% if getBudget %}
-                                            <tr>
-                                            <th>Contributor</th>
-                                            <th>Description</th>
-                                            <th>Value</th>
-                                            <th>View</th>
-                                            </tr>
-                                            {% for item in getBudget %}
-                                            <tr>
-                                                <td>{{ item.contributor}}</td>
-                                                <td>{{ item.contributor_description}}</td>
-                                                <td>{{ item.proposed_value}}</td>
-                                                <td><a class="output" data-toggle="modal" data-target="#myModal" href='/workflow/budget_update/{{ item.id }}/'>View</a> | <a class="output" href='/workflow/budget_delete/{{ item.id }}/' data-toggle="modal" data-target="#myModal" >Delete</a>
-                                            </tr>
-                                            {% endfor %}
-                                      {% endif %}
-                                      </tbody>
-                                      </table>
-                                      <div class="panel-footer">
-                                        <a class="output btn btn-link btn-add" data-toggle="modal" data-target="#myModal" href="/workflow/budget_add/{{ id }}/?is_it_project_complete_form=true"><i class="fas fa-plus-circle"></i> Add Budget Contribution</a>
-                                      </div>
-                                    </div>
-                                """),
+                                <div class='panel panel-default'>
+                                  <!-- Default panel contents -->
+                                  <div class='panel-heading'>Budget Contributions</div>
+                                  <!-- Table -->
+                                  <table class="table" id="budget_contributions_table">
+                                  <tbody>
+                                  {% if getBudget %}
+                                        <tr>
+                                        <th>Contributor</th>
+                                        <th>Description</th>
+                                        <th>Value</th>
+                                        <th>View</th>
+                                        </tr>
+                                        {% for item in getBudget %}
+                                        <tr>
+                                            <td>{{ item.contributor}}</td>
+                                            <td>{{ item.contributor_description}}</td>
+                                            <td>{{ item.proposed_value}}</td>
+                                            <td><a class="output" data-toggle="modal" data-target="#myModal" href='/workflow/budget_update/{{ item.id }}/'>View</a> | <a class="output" href='/workflow/budget_delete/{{ item.id }}/' data-toggle="modal" data-target="#myModal" >Delete</a>
+                                        </tr>
+                                        {% endfor %}
+                                  {% endif %}
+                                  </tbody>
+                                  </table>
+                                  <div class="panel-footer">
+                                    <a class="output btn btn-link btn-add" data-toggle="modal" data-target="#myModal" href="/workflow/budget_add/{{ id }}/?is_it_project_complete_form=true"><i class="fas fa-plus-circle"></i> Add Budget Contribution</a>
+                                  </div>
+                                </div>
+                            """),
                         ),
                     ),
 

@@ -1,29 +1,38 @@
+# -*- coding: utf-8 -*-
+"""
+Workflow views - TODO: cut out intercision-invalidated views
+"""
+
 import operator
 import unicodedata
-
-from django.views.generic.edit import CreateView, UpdateView, DeleteView, FormView
-from django.utils.translation import gettext as _
-from django.views.generic.list import ListView
-from django.views.generic.detail import DetailView
+import json
+import logging
+from datetime import timedelta
+from dateutil.relativedelta import relativedelta
+from dateutil import parser
 
 from workflow.serializers import DocumentListProgramSerializer, DocumentListDocumentSerializer
-from .models import Program, Country, Province, AdminLevelThree, District, ProjectAgreement, ProjectComplete, SiteProfile, \
-    Documentation, Monitor, Benchmarks, Budget, ApprovalAuthority, Checklist, ChecklistItem, Contact, Stakeholder, FormGuidance, \
-    TolaUser
-from formlibrary.models import TrainingAttendance, Distribution
-from indicators.models import Result, ExternalService, Indicator
-from django.utils import timezone
-from django.utils.datastructures import MultiValueDictKeyError
-from django.urls import reverse
-from django.contrib.auth import get_user_model
-from django.contrib.auth.tokens import default_token_generator
-from django.contrib.auth.decorators import login_required
-from django.contrib.auth.mixins import LoginRequiredMixin
-from django.utils.http import urlsafe_base64_decode
-from django.core.exceptions import PermissionDenied
-from django.shortcuts import get_object_or_404
-
-from .forms import (
+from workflow.models import (
+    Program,
+    Country,
+    Province,
+    AdminLevelThree,
+    District,
+    ProjectAgreement,
+    ProjectComplete,
+    SiteProfile,
+    Documentation,
+    Monitor,
+    Benchmarks,
+    Budget,
+    ApprovalAuthority,
+    Checklist,
+    ChecklistItem,
+    Contact,
+    Stakeholder,
+    FormGuidance,
+)
+from workflow.forms import (
     ProjectAgreementForm,
     ProjectAgreementSimpleForm,
     ProjectAgreementCreateForm,
@@ -39,34 +48,35 @@ from .forms import (
     ChecklistItemForm,
     StakeholderForm,
     ContactForm,
-    OneTimeRegistrationForm
 )
+from workflow.mixins import AjaxableResponseMixin
+from workflow.export import ProjectAgreementResource, StakeholderResource
+from workflow.tables import ProjectAgreementTable
 
-import pytz # TODO: not used, keeping this import for potential regressions
+from formlibrary.models import TrainingAttendance, Distribution
+from indicators.models import Result, ExternalService
 
-from django.shortcuts import render
-from django.contrib import messages
+from django.utils.translation import gettext as _
+from django.views.generic.list import ListView
+from django.views.generic.detail import DetailView, View
+from django.views.generic.edit import CreateView, UpdateView, DeleteView
+from django.utils import timezone
+from django.utils.datastructures import MultiValueDictKeyError
+from django.urls import reverse
 from django.contrib.auth.models import User
-from django.db.models import Count, Q, Max
-from tables import ProjectAgreementTable
-from filters import ProjectAgreementFilter
-import json
-import logging
-
+from django.contrib.auth.decorators import login_required
+from django.contrib.auth.mixins import LoginRequiredMixin
+from django.core.exceptions import PermissionDenied
 from django.core import serializers
+from django.core.serializers.json import DjangoJSONEncoder
 from django.core.paginator import Paginator, EmptyPage, PageNotAnInteger
 from django.http import HttpResponse, HttpResponseRedirect, JsonResponse
-from django.views.generic.detail import View
-
-from django.contrib.sites.shortcuts import get_current_site
-
-# Get an instance of a logger
-logger = logging.getLogger(__name__)
-
 from django.utils.decorators import method_decorator
+from django.shortcuts import get_object_or_404, render
+from django.contrib import messages
+from django.db.models import Count, Q, Max
+
 from tola.util import getCountry, emailGroup, group_excluded, group_required
-from mixins import AjaxableResponseMixin
-from export import ProjectAgreementResource, StakeholderResource
 
 from rest_framework.decorators import api_view
 from rest_framework.response import Response
@@ -84,17 +94,17 @@ from tola_management.permissions import (
     verify_program_access_level_of_any_program
 )
 
+# Get an instance of a logger
+logger = logging.getLogger(__name__)
+
+
 APPROVALS = (
-    ('in_progress',('in progress')),
+    ('in_progress', ('in progress')),
     ('awaiting_approval', 'awaiting approval'),
     ('approved', 'approved'),
     ('rejected', 'rejected'),
 )
 
-from datetime import datetime, date, timedelta
-from dateutil.relativedelta import relativedelta
-from dateutil import parser
-from django.core.serializers.json import DjangoJSONEncoder
 
 
 def date_handler(obj):
@@ -140,14 +150,16 @@ class ProjectDash(LoginRequiredMixin, ListView):
             getChecklist = ChecklistItem.objects.all().filter(checklist__agreement_id=self.kwargs['pk'], checklist__agreement__program__in=getPrograms)
 
         if int(self.kwargs['pk']) == 0:
-            getProgram =getPrograms.filter(funding_status="Funded").distinct()
+            getProgram = getPrograms.filter(funding_status="Funded").distinct()
         else:
             getProgram = get_object_or_404(Program, agreement__id=self.kwargs['pk'], id__in=getPrograms.values('id'))
 
-        return render(request, self.template_name, {'getProgram': getProgram, 'getAgreement': getAgreement,'getComplete': getComplete,
-                                                    'getPrograms':getPrograms, 'getDocumentCount':getDocumentCount,'getChecklistCount': getChecklistCount,
-                                                    'getCommunityCount':getCommunityCount, 'getTrainingCount':getTrainingCount, 'project_id': project_id,
-                                                    'getChecklist': getChecklist, 'getDistributionCount': getDistributionCount})
+        return render(request, self.template_name, {
+            'getProgram': getProgram, 'getAgreement': getAgreement, 'getComplete': getComplete,
+            'getPrograms':getPrograms, 'getDocumentCount':getDocumentCount, 'getChecklistCount': getChecklistCount,
+            'getCommunityCount':getCommunityCount, 'getTrainingCount':getTrainingCount, 'project_id': project_id,
+            'getChecklist': getChecklist, 'getDistributionCount': getDistributionCount
+        })
 
 
 @method_decorator(has_projects_access, name='dispatch')
@@ -301,7 +313,7 @@ class ProjectAgreementCreate(LoginRequiredMixin, CreateView):
         get_checklist = Checklist.objects.get(id=create_checklist.id)
         get_globals = ChecklistItem.objects.all().filter(global_item=True)
         for item in get_globals:
-            ChecklistItem.objects.create(checklist=get_checklist,item=item.item)
+            ChecklistItem.objects.create(checklist=get_checklist, item=item.item)
 
 
         messages.success(self.request, 'Success, Initiation Created!')
@@ -1647,7 +1659,7 @@ class ContactList(LoginRequiredMixin, ListView):
         try:
             getStakeholder = Stakeholder.objects.get(id=stakeholder_id)
 
-        except Exception, e:
+        except Exception as e:
             pass
 
         if int(self.kwargs['pk']) == 0:
@@ -2247,7 +2259,7 @@ class Report(LoginRequiredMixin, View, AjaxableResponseMixin):
             getAgreements = ProjectAgreement.objects.select_related().filter(program__country__in=countries)
 
         getPrograms = Program.objects.filter(funding_status="Funded", country__in=countries).distinct()
-        filtered = ProjectAgreementFilter(request.GET, queryset=getAgreements)
+        filtered = getAgreements
         table = ProjectAgreementTable(filtered.queryset)
         table.paginate(page=request.GET.get('page', 1), per_page=20)
 
