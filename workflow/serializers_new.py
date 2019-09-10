@@ -105,7 +105,7 @@ class ProgramBase(object):
         return sorted(
             sorted(
                 [i for i in indicator_set if i.level_id is None or i.results_framework is False],
-                key=lambda i: (i.sort_number is None, i.sort_number)
+                 key=lambda i: i.sort_number
                 ),
             key=lambda i: (i.old_level_pk is None, i.old_level_pk)
         )
