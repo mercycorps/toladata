@@ -27,6 +27,9 @@ DATABASES = {
     "default": {
         "ENGINE": "django.db.backends.mysql",
         "NAME": "tola_activity",
+        "OPTIONS": {
+            'charset': 'utf8mb4',
+        },
         "HOST": "localhost",
         "PORT": "",
     },
