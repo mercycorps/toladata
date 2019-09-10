@@ -1,3 +1,8 @@
+# -*- coding: utf-8 -*-
+"""
+    Program views: logframe, program page api, etc.
+"""
+
 from operator import itemgetter
 import logging
 import openpyxl
@@ -57,7 +62,7 @@ def get_child_levels(level, levels_by_pk):
 def clean_unicode(value):
     if value is None or value is False:
         return u''
-    if type(value) == str:
+    if isinstance(value, str):
         return value.encode('utf-8')
     return value
 
@@ -95,10 +100,10 @@ def logframe_excel_view(request, program):
         start_column=1, end_column=4
     )
     for col, name in enumerate([
-        ugettext('Result level'),
-        ugettext('Indicators'),
-        ugettext('Means of verification'),
-        ugettext('Assumptions')
+            ugettext('Result level'),
+            ugettext('Indicators'),
+            ugettext('Means of verification'),
+            ugettext('Assumptions')
         ]):
         add_header_cell(ws, 3, col+1, name)
         ws.column_dimensions[openpyxl.utils.get_column_letter(col + 1)].width = 50
@@ -257,7 +262,7 @@ def old_program_page(request, program_id, indicator_id, indicator_type_id):
     """Redirects old /program/<program_id>/<indicator_id>/<indicator_type_id>/ urls to new program page url"""
     program = get_object_or_404(Program, pk=program_id)
     if indicator_id != 0 or indicator_type_id != 0:
-        logger.warn('attempt to access program page with filters indicator id {0} and indicator type id {1}'.format(
+        logger.warning('attempt to access program page with filters indicator id {0} and indicator type id {1}'.format(
             indicator_id, indicator_type_id))
     return redirect(program.program_page_url, permanent=True)
 
@@ -269,7 +274,7 @@ def api_program_ordering(request, program):
     try:
         data = ProgramPageUpdateSerializer.update_ordering(program).data
     except Program.DoesNotExist:
-        logger.warn('attempt to access program page ordering for bad pk {}'.format(program))
+        logger.warning('attempt to access program page ordering for bad pk {}'.format(program))
         return JsonResponse({'success': False, 'msg': 'bad Program PK'})
     return JsonResponse(data)
 
@@ -280,7 +285,7 @@ def api_program_level_ordering(request, program):
     try:
         data = ProgramLevelUpdateSerializer.update_ordering(program).data
     except Program.DoesNotExist:
-        logger.warn('attempt to access program page ordering for bad pk {}'.format(program))
+        logger.warning('attempt to access program page ordering for bad pk {}'.format(program))
         return JsonResponse({'success': False, 'msg': 'bad Program PK'})
     return JsonResponse(data)
 
@@ -292,8 +297,8 @@ def api_program_page_indicator(request, pk, program):
     """Returns single indicator updated JSON and ordering information for program page)"""
     try:
         data = ProgramPageUpdateSerializer.update_indicator_pk(program, pk).data
-    except Program.DoesNotExist, Indicator.DoesNotExist:
-        logger.warn('attempt to access indicator update for bad pk {}'.format(pk))
+    except (Program.DoesNotExist, Indicator.DoesNotExist):
+        logger.warning('attempt to access indicator update for bad pk {}'.format(pk))
         return JsonResponse({'success': False, 'msg': 'bad Indicator PK'})
     return JsonResponse(data)
 
@@ -305,6 +310,6 @@ def api_program_page(request, program):
     try:
         data = ProgramPageProgramSerializer.get_for_pk(program).data
     except Program.DoesNotExist:
-        logger.warn('attempt to access program page ordering for bad pk {}'.format(program))
+        logger.warning('attempt to access program page ordering for bad pk {}'.format(program))
         return JsonResponse({'success': False, 'msg': 'bad Program PK'})
     return JsonResponse(data)
