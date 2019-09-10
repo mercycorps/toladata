@@ -18,7 +18,6 @@ from factory import (
 from factory.fuzzy import FuzzyChoice
 
 from indicators.models import (
-    TolaTable as TolaTableM,
     Result as ResultM,
     ExternalService as ExternalServiceM,
     ReportingFrequency as ReportingFrequencyM,
@@ -33,7 +32,8 @@ from indicators.models import (
     DisaggregationType as DisaggregationTypeM,
     DataCollectionFrequency as DataCollectionFrequencyM
 )
-from workflow_models import OrganizationFactory, ProgramFactory, CountryFactory, UserFactory
+from factories.workflow_models import OrganizationFactory, ProgramFactory, CountryFactory
+
 
 FAKER = faker.Faker(locale='en_US')
 
@@ -125,11 +125,11 @@ class RFIndicatorFactory(DjangoModelFactory):
                     periods = []
                     target_values = []
             elif isinstance(extracted, (int, float)):
-                target_values = [extracted/len(periods)]*len(periods)
+                target_values = [round(extracted/len(periods), 2)]*len(periods)
                 if len(target_values) > 1:
                     target_values[-1] = extracted - sum(target_values[0:-1])
             elif self.lop_target:
-                target_values = [self.lop_target/len(periods)]*len(periods)
+                target_values = [round(self.lop_target / len(periods))]*len(periods)
                 if len(target_values) > 1:
                     target_values[-1] = self.lop_target - sum(target_values[0:-1])
             else:
@@ -221,7 +221,7 @@ class ResultFactory(DjangoModelFactory):
             # Simple build, do nothing.
             return
 
-        if type(extracted) is list:
+        if isinstance(extracted, list):
             # A list of program were passed in, use them
             for site in extracted:
                 self.site.add(site)
@@ -280,9 +280,3 @@ class DataCollectionFrequencyFactory(DjangoModelFactory):
     frequency = "some reasonable frequency"
     description = "a description of how frequent this is"
     numdays = 10
-
-class TolaTableFactory(DjangoModelFactory):
-    class Meta:
-        model = TolaTableM
-    name = Sequence(lambda n: 'Tola Table {0}'.format(n))
-    owner = SubFactory(UserFactory)

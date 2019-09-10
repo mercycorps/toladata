@@ -4,9 +4,7 @@ from django.template.defaultfilters import slugify
 from factory import (
     DjangoModelFactory,
     lazy_attribute,
-    SelfAttribute,
     LazyAttribute,
-    lazy_attribute,
     SubFactory,
     PostGeneration,
     post_generation,
@@ -14,7 +12,7 @@ from factory import (
     RelatedFactory,
     Trait
 )
-from .django_models import UserFactory, Site
+from factories.django_models import UserFactory, Site
 from workflow.models import (
     Contact as ContactM,
     Country as CountryM,
@@ -38,12 +36,12 @@ from workflow.models import (
 
 def generate_mc_levels(obj, create, extracted, **kwargs):
     from factories.indicators_models import LevelTierFactory
-    tiers = LevelTierFactory.build_mc_template(program=obj)
+    LevelTierFactory.build_mc_template(program=obj)
 
 def custom_level_generator(tier_set):
     def generate_custom_levels(obj, create, extracted, **kwargs):
         from factories.indicators_models import LevelTierFactory
-        tiers = LevelTierFactory.build_custom_template(program=obj,tiers=tier_set)
+        tiers = LevelTierFactory.build_custom_template(program=obj, tiers=tier_set)
     return generate_custom_levels
 
 class CountryFactory(DjangoModelFactory):
@@ -123,7 +121,7 @@ class ProgramFactory(DjangoModelFactory):
             # Simple build, do nothing.
             return
 
-        if type(extracted) is list:
+        if isinstance(extracted, list):
             # Use the list of provided indicators
             self.indicator_set.add(*extracted)
 
@@ -133,7 +131,7 @@ class ProgramFactory(DjangoModelFactory):
             # Simple build, do nothing.
             return
 
-        if type(extracted) is list:
+        if isinstance(extracted, list):
             # Use the list of provided countries
             self.country.add(*extracted)
 
@@ -162,7 +160,7 @@ class RFProgramFactory(DjangoModelFactory):
         elif self.age:
             month = month - self.age
         else:
-            month = month - (self.months/2)
+            month = month - (self.months//2)
         while month <= 0:
             month = month + 12
             year = year - 1
@@ -176,7 +174,7 @@ class RFProgramFactory(DjangoModelFactory):
         elif self.age:
             month = today.month + (self.months - self.age)
         else:
-            month = today.month + (self.months - (self.months/2))
+            month = today.month + (self.months - (self.months//2))
         year = today.year
         while month > 12:
             month = month - 12
@@ -189,7 +187,7 @@ class RFProgramFactory(DjangoModelFactory):
         """generate tiers - can take True to generate MC tiers, or a list of tier names"""
         from factories.indicators_models import LevelTierFactory
         if extracted is True:
-            tiers = LevelTierFactory.build_mc_template(program=self)
+            LevelTierFactory.build_mc_template(program=self)
         elif isinstance(extracted, list):
             tiers = [
                 LevelTierFactory(name=name, tier_depth=depth+1, program=self)
@@ -217,13 +215,12 @@ class RFProgramFactory(DjangoModelFactory):
                         'count': count+x,
                         'parent': parents[c]['count'] if parents is not None else None,
                         'depth': parents[c]['depth'] +  1 if parents is not None else 0
-                        }
-                        for x in range(level_count)]
+                        } for x in range(level_count)]
                 ))
                 count += level_count
-            for lower_tier_counts, parents in level_sets:
+            for lower_tier_counts, level_parents in level_sets:
                 if lower_tier_counts:
-                    new_lower_tiers, count = convert_to_data(lower_tier_counts, parents, count)
+                    new_lower_tiers, count = convert_to_data(lower_tier_counts, level_parents, count)
                     lower_tier_levels += new_lower_tiers
             return [level_data for data_set in level_sets for level_data in data_set[1]] + lower_tier_levels, count
         if isinstance(extracted, int):
@@ -314,7 +311,7 @@ class Stakeholder(DjangoModelFactory):
             # Simple build, do nothing.
             return
 
-        if type(extracted) is list:
+        if isinstance(extracted, list):
             # A list of program were passed in, use them
             for program in extracted:
                 self.program.add(program)
@@ -364,7 +361,7 @@ def grant_program_access(tolauser, program, country, role=PROGRAM_ROLE_CHOICES[0
         tolauser=tolauser,
         country=country
     )
-    access_object.role=role
+    access_object.role = role
     access_object.save()
 
 def grant_country_access(tolauser, country, role=COUNTRY_ROLE_CHOICES[0][0]):
