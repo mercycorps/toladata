@@ -822,6 +822,7 @@ class IPTTMixin(object):
 
     def get_indicators(self, program):
         indicators = self._get_program_indicators(program)
+        # TODO: json dump to string: ?
         return IPTTIndicatorSerializer(indicators, context=self.context, many=True).data
 
 
