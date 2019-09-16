@@ -139,9 +139,9 @@ $('#indicator_modal_div').on('deleted.tola.indicator.save', (e, params) => {
 $('#indicator_results_div').on('hidden.bs.modal', function (e) {
     let recordchanged = $(this).find('form').data('recordchanged');
     if (recordchanged === true) {
-        let indicator_id = $(this).find('form #id_indicator').val();
+        let indicatorPk = $(this).find('form #id_indicator').val();
         rootStore.program.updateIndicator(indicatorPk);
-        rootStore.program.updateResultsHTML(indicator_id);
+        rootStore.program.updateResultsHTML(indicatorPk);
     }
 });
 
