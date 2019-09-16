@@ -1,0 +1,96 @@
+// Component for sortable lists with drag-n-drop
+// uses grids to get nice headings and gridlike layout
+// the list itself is .sortable-list. It might have several adjacent elements, such as a header and additional actions, in which case it should be contained in a group wrapper
+// The layout of the header is SUPER JANKY. We will want to move css subgrid when it becomes widely available
+
+.sortable-list-group {
+    // optional wrapper container for .sortable-list, .sortable-list-header, and sortable-list-actions
+}
+@mixin _drag-handle-wrapper() {
+    flex-basis: 0;
+    flex-grow: 0;
+    flex-shrink: 1;
+    padding-right: 1em;
+}
+@mixin _label-wrapper() {
+    flex-basis: 100%;
+    flex-grow: 1;
+    flex-shrink: 1;
+}
+@mixin _action-wrapper() {
+    white-space: nowrap;
+}
+
+.sortable-list-header {
+    display: flex;
+    justify-content: space-between;
+    margin-bottom: $grid-gutter-width/8;
+    padding: $grid-gutter-width/8 $grid-gutter-width/4;
+}
+.sortable-list-header--empty {
+    color: $text-muted;
+}
+.sortable-list-header__drag-handle {
+    opacity: 0;
+    @include _drag-handle-wrapper();
+}
+.sortable-list-header__label {
+    padding-right: 4em;
+    text-align: right;
+    @include _label-wrapper();
+}
+.sortable-list-header__actions {
+    opacity: 0;
+    @include _action-wrapper();
+}
+.sortable-list-actions {
+}
+.sortable-list {
+    // contains sortable-list__item s
+    // unstyled list
+    list-style: none;
+    margin-bottom: 0;
+    padding-left: 0;
+}
+.sortable-list__item {
+    align-items: center;
+    background: $gray-150;
+    display: flex;
+    justify-content: space-between;
+    margin-bottom: $grid-gutter-width/8;
+    padding: $grid-gutter-width/8 $grid-gutter-width/4;
+}
+.sortable-list__item__drag-handle {
+    color: $text-muted;
+    @include _drag-handle-wrapper();
+}
+.sortable-list__item__label {
+    align-items: center;
+    display: flex;
+    justify-content: space-between;
+    padding-right: 1em;
+    @include _label-wrapper();
+    label { // todo
+        margin-bottom: 0;
+        margin-right: 1em;
+    }
+}
+.sortable-list__item__actions {
+    @include _action-wrapper();
+}
+.sortable-list__item__select {
+    width: $grid-gutter-width * 3;
+    flex-grow: 0;
+    flex-shrink: 0;
+}
+
+.sortable-list__item__tooltip > .tooltip-inner {
+    color: $white;
+    background-color: $gray-600;
+}
+
+.sortable-list__item__tooltip > .arrow::before,
+.sortable-list__item__tooltip > .arrow{
+    color: $gray-600;
+    border-top-color: $gray-600;
+}

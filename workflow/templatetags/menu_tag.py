@@ -4,6 +4,7 @@ from django import template
 from django.db import models
 from django.db.models import Q
 from tola.util import getCountry
+from indicators.models import Indicator
 from workflow.models import Program, Country
 
 register = template.Library()
@@ -14,8 +15,12 @@ def program_menu(context):
     request = context['request']
     if request.user.is_authenticated():
         countries = request.user.tola_user.available_countries
+        indicator_query = Indicator.objects.filter(
+            deleted__isnull=True,
+            program=models.OuterRef('pk')
+        ).order_by().values('program').annotate(i_count=models.Count('pk')).values('i_count')
         programs = request.user.tola_user.available_programs.annotate(
-            indicator_count=models.Count('indicator', distinct=True)
+            indicator_count=models.Subquery(indicator_query[:1], output_field=models.IntegerField())
         ).filter(
             funding_status="Funded",
             indicator_count__gt=0

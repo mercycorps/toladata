@@ -1,9 +1,45 @@
 from views_indicators import (
-    indicator_create,
+    IndicatorCreate,
     IndicatorUpdate,
     IndicatorDelete,
-    PeriodicTargetView,
+    PeriodicTargetDeleteAllView,
     PeriodicTargetDeleteView,
     ResultCreate,
-    ResultUpdate
+    ResultUpdate,
+    ResultDelete,
+    service_json,
+    result_view,
+    indicator_plan,
+    DisaggregationReportQuickstart,
+    DisaggregationReport,
+    DisaggregationPrint,
+    IndicatorExport,
+    api_indicator_view,
+    api_indicators_list,
+    periodic_targets_form,
+)
+
+from views_reports import (
+    create_pinned_report,
+    delete_pinned_report,
+    IPTTQuickstart,
+    IPTTReport,
+    api_iptt_filter_data,
+    api_iptt_report_data,
+    #IPTTReportData,
+    IPTTExcelReport
+)
+
+from views_results_framework import (
+    ResultsFrameworkBuilder,
+)
+
+from views_program import (
+    programs_rollup_export,
+    program_page,
+    old_program_page,
+    api_program_page,
+    api_program_ordering,
+    api_program_level_ordering,
+    api_program_page_indicator,
 )

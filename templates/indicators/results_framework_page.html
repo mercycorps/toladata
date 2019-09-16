@@ -1,0 +1,59 @@
+{% extends "base.html" %}
+{% load i18n mathfilters mytags static %}
+{% load render_bundle from webpack_loader %}
+{# Translators: title of the Results framework page #}
+{% block title %}{{ program.name }}: {% trans "Results framework" %} |{% endblock %}
+
+{% block extra_page_title_classes %}h2{% endblock %}
+{% block page_title %}
+    {%  if indicator_count > 0 %}
+        <span id="rf_builder_header"><a href='{% url "program_page" program.id %}'>{{ program.name }}:</a></span>
+    {%  else %}
+        <span id="rf_builder_header">{{ program.name }}:</span>
+    {% endif %}
+    <span class="font-weight-normal text-muted text-nowrap">{% trans "Results framework" %}&nbsp;<small><i class="fas fa-sitemap"></i></small></span>
+{% endblock %}
+
+{% block header_extras %}
+
+<div id="logframe_link" style="{% if program.levels.count == 0 %}display:none;{% endif %}">
+    <a href="{% url 'logframe' program=program.pk %}" class="btn btn-link text-nowrap{% if not program.results_framework %} disabled{% endif %}">
+        {# Translators: "Logframe" is the Mercy Corps term for a "Logical Framework," a hierarchical system that makes explicit the results framework and ties it to indicators and results #}
+        <i class="fas fa-table"></i>{% trans "View logframe" %}
+    </a>
+    {% if not program.results_framework %}
+        <a
+            tabIndex="0"
+            data-toggle="popover"
+            data-trigger="focus"
+            data-html="true"
+            data-placement="bottom"
+            {# Translators: This is help text to explain why a link to the Logframe page is disabled. #}
+            data-content="{% trans "Indicators are currently grouped by an older version of indicator levels. To group indicators according to the results framework and view the Logframe, an admin will need to adjust program settings." %}">
+            <i class="far fa-question-circle"></i></a>
+    {% endif %}
+</div>
+{% endblock %}
+
+{% block content %}
+    <div id="level-builder-react-component" class="rf-page"></div>
+{% endblock content %}
+
+
+{% block extra_js_in_body %}
+
+    <div id="indicator_modal_div" class="modal fade" role="dialog" aria-labelledby="myLargeModalLabel">
+      <div class="modal-dialog modal-lg" role="document">
+        <div class="modal-content" id="indicator_modal_content" iptt-modal="true">
+    
+        </div> <!-- modal content -->
+      </div>
+    </div>
+
+    {% include 'indicators/indicator_form_common_js.html' %}
+    <script>
+        let jsContext = {{ js_context|js }};
+    </script>
+
+    {% render_bundle 'results_framework' %}
+{% endblock %}

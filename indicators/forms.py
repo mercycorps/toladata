@@ -1,5 +1,5 @@
-from datetime import datetime, timedelta
-from functools import partial
+import uuid
+from datetime import timedelta
 
 from workflow.models import (
     Program, SiteProfile, Documentation, ProjectComplete, TolaUser, Sector
@@ -7,9 +7,9 @@ from workflow.models import (
 from tola.util import getCountry
 from indicators.models import (
     Indicator, PeriodicTarget, Result, Objective, StrategicObjective,
-    TolaTable, DisaggregationType, Level, IndicatorType,
-    PinnedReport)
-from indicators.widgets import DataAttributesSelect
+    DisaggregationType, Level, IndicatorType, PinnedReport
+)
+from indicators.widgets import DataAttributesSelect, DatePicker
 
 import dateparser
 
@@ -21,27 +21,18 @@ from django.utils.translation import ugettext_lazy as _
 from django.utils import formats, translation, timezone
 
 
-locale_format = formats.get_format('DATE_INPUT_FORMATS', lang=translation.get_language())[-1]
 
-class DatePicker(forms.DateInput):
+class PTFormInputsForm(forms.ModelForm):
     """
-    Use in form to create a Jquery datepicker element
-    Usage:
-        self.fields['some_date_field'].widget = DatePicker.DateInput()
+    Partial IndicatorForm submit for use in generating periodic target form
+    sub-section of the full Indicator form
     """
-    template_name = 'datepicker.html'
-    DateInput = partial(forms.DateInput, {'class': 'datepicker'})
-
-
-class LocaleDateField(DateField):
-    def to_python(self, value):
-        if value in self.empty_values:
-            return None
-        try:
-            return dateparser.parse(value).date()
-        except AttributeError:
-            raise ValidationError(
-                self.error_messages['invalid'], code='invalid')
+    class Meta:
+        model = Indicator
+        fields = (
+            'target_frequency',
+            'unit_of_measure_type',
+        )
 
 
 class IndicatorForm(forms.ModelForm):
@@ -49,12 +40,16 @@ class IndicatorForm(forms.ModelForm):
         choices=Indicator.UNIT_OF_MEASURE_TYPES,
         widget=forms.RadioSelect(),
     )
+    old_level = forms.ChoiceField(
+        choices=[('', '------')] + [(name, name) for (pk, name) in Indicator.OLD_LEVELS],
+        initial=None
+    )
 
     rationale = forms.CharField(required=False)
 
     class Meta:
         model = Indicator
-        exclude = ['create_date', 'edit_date']
+        exclude = ['create_date', 'edit_date', 'level_order', 'program']
         widgets = {
             'definition': forms.Textarea(attrs={'rows': 4}),
             'justification': forms.Textarea(attrs={'rows': 4}),
@@ -68,58 +63,129 @@ class IndicatorForm(forms.ModelForm):
 
     def __init__(self, *args, **kwargs):
         indicator = kwargs.get('instance', None)
-        if not indicator.unit_of_measure_type:
+        self.request = kwargs.pop('request')
+        if indicator and not indicator.unit_of_measure_type:
             kwargs['initial']['unit_of_measure_type'] = Indicator.UNIT_OF_MEASURE_TYPES[0][0]
-        if indicator.lop_target:
+        if indicator and indicator.lop_target:
             lop_stripped = str(indicator.lop_target)
             lop_stripped = lop_stripped.rstrip('0').rstrip('.') if '.' in lop_stripped else lop_stripped
             kwargs['initial']['lop_target'] = lop_stripped
-        self.request = kwargs.pop('request')
+        
         self.programval = kwargs.pop('program')
+        self.prefilled_level = kwargs.pop('level') if 'level' in kwargs else False
 
         super(IndicatorForm, self).__init__(*args, **kwargs)
+
+        # program_display here is to display the program without interfering in the logic that
+        # assigns a program to an indicator (and doesn't update it) - but it looks like other fields
+        self.fields['program_display'] = forms.ChoiceField(
+            choices=[('', self.programval.name),],
+            required=False,
+        )
+        self.fields['program_display'].disabled = True
+        self.fields['program_display'].label = _('Program')
+
+        # level is here the new "result level" (RF) level option (FK to model Level)
+        # Translators: This is a form field label that allows users to select which Level object to associate with the Result that's being entered into the form
+        self.fields['level'].label = _('Result level')
+        self.fields['level'].label_from_instance = lambda obj: obj.display_name
+        # in cases where the user was sent here via CREATE from the RF BUILDER screen:
+        if self.prefilled_level:
+            # prefill level with only the level they clicked "add indicator" from:
+            self.fields['level'].queryset = Level.objects.filter(pk=self.prefilled_level)
+            self.fields['level'].initial = self.prefilled_level
+            # do not allow the user to update (it is being "added to" that level)
+            self.fields['level'].disabled = True
+        else:
+            # populate with all levels for the indicator's program:
+            # self.fields['level'].queryset = Level.objects.filter(program_id=self.programval)
+            self.fields['level'].choices = [('', '------')] + \
+                                           [(l.id, l.display_name) for l in Level.sort_by_ontology(Level.objects.filter(program_id=self.programval))]
+
+
+        if self.programval.results_framework and not self.programval.manual_numbering:
+            # in this (the default) case, the number field is removed (values not updated):
+            self.fields.pop('number')
+        elif self.programval.results_framework:
+            # in this case the number field gets this special help text (added as a popover):
+            self.fields['number'].label = _('Display number')
+            # Translators: a "number" in this context is a kind of label.  This is help text to explain why a user is seeing customized numbers instead of auto-generated ones that can derived from the indicator's place in the hierarchy
+            self.fields['number'].help_text = _("This number is displayed in place of the indicator number automatically generated through the results framework.  An admin can turn on auto-numbering in program settings")
+        if self.programval.results_framework:
+            # no need to update the old_level field if they are using the results framework:
+            self.fields.pop('old_level')
+            self.fields['level'].required = True
+        else:
+            # pre-migration to RF, all fields remain unchanged in this regard (still required):
+            self.fields['old_level'].required = True
+            # Translators:  Indicator objects are assigned to Levels, which are in a hierarchy.  We recently changed how we organize Levels. This is a field label for the indicator-associated Level in the old level system
+            self.fields['old_level'].label = _('Old indicator level')
+            # Translators:  We recently changed how we organize Levels. The new system is called the "results framework". This is help text for users to let them know that they can use the new system now.
+            self.fields['old_level'].help_text = _("Indicators are currently grouped by an older version of indicator levels. To group indicators according to the results framework, an admin will need to adjust program settings.")
 
         if not self.request.has_write_access:
             for name, field in self.fields.items():
                 field.disabled = True
-
         countries = getCountry(self.request.user)
         self.fields['disaggregation'].queryset = DisaggregationType.objects\
             .filter(country__in=countries, standard=False)
-        self.fields['program'].queryset = Program.objects.filter(
-            Q(country__in=countries) | Q(user_access=self.request.user.tola_user),
-            funding_status="Funded"
-        ).distinct()
-        self.fields['program'].disabled = True
-        self.fields['objectives'].queryset = Objective.objects.filter(program__id__in=[self.programval.id])
+        if self.programval._using_results_framework == Program.NOT_MIGRATED and Objective.objects.filter(program_id=self.programval.id).exists():
+            self.fields['objectives'].queryset = Objective.objects.filter(program__id__in=[self.programval.id])
+        else:
+            self.fields.pop('objectives')
         self.fields['strategic_objectives'].queryset = StrategicObjective.objects.filter(country__in=countries)
         self.fields['approved_by'].queryset = TolaUser.objects.filter(country__in=countries).distinct()
         self.fields['approval_submitted_by'].queryset = TolaUser.objects.filter(country__in=countries).distinct()
-        self.fields['name'].label = _('Indicator Name')
-        self.fields['level'].required = True
+        self.fields['name'].label = _('Indicator')
         self.fields['name'].required = True
         self.fields['name'].widget = forms.Textarea(attrs={'rows': 3})
         self.fields['unit_of_measure'].required = True
         self.fields['target_frequency'].required = True
-        self.fields['target_frequency_start'].widget.attrs['class'] = 'monthPicker'
         # self.fields['is_cumulative'].widget = forms.RadioSelect()
         if self.instance.target_frequency and self.instance.target_frequency != Indicator.LOP:
             self.fields['target_frequency'].widget.attrs['readonly'] = True
 
+    def clean_indicator_key(self):
+        data = self.cleaned_data.get('indicator_key', uuid.uuid4())
+        if not self.instance.pk:
+            previous_creates = Indicator.rf_aware_objects.filter(
+                indicator_key=data,
+                create_date__gte=timezone.now()-timedelta(minutes=10)
+            )
+            if previous_creates.count() > 0:
+                raise forms.ValidationError(
+                    _('Multiple submissions detected'),
+                    code="rate_limit"
+                )
+        return data
+
     def clean_lop_target(self):
         data = self.cleaned_data['lop_target']
-        if data < 0:
+        if data <= 0:
             # Translators: Input form error message
             raise forms.ValidationError(_('Please enter a number larger than zero.'))
         return data
 
-    # def clean_rationale(self):
-    #     data = self.cleaned_data.get('rationale')
-    #     periodic_targets = self.request.POST.get('periodic_targets')
-    #     if not periodic_targets == 'generateTargets' and len(self.instance.result_set.all()) > 0 and (not data or len(data) <= 0):
-    #         # Translators: Input form error message that the "reason for change" form field is empty when results have already been saved
-    #         raise forms.ValidationError(_('Results have been recorded, reason for change is required.'))
-    #     return data
+    def clean_level(self):
+        level = self.cleaned_data['level']
+        if level and level.program_id != self.programval.pk:
+            raise forms.ValidationError(
+                # Translators: This is an error message that is returned when a user is trying to assign an indicator to the wrong hierarch of levels.
+                _('Level program ID %(l_p_id)d and indicator program ID (%i_p_id)d mismatched'),
+                code='foreign_key_mismatch',
+                params={
+                    'l_p_id': level.program_id,
+                    'i_p_id': self.programval.pk
+                }
+            )
+        return level
+
+
+    def save(self, commit=True):
+        # set the program on the indicator on create (it's already set on update)
+        if self.instance.program_id is None:
+            self.instance.program_id = self.programval.id
+        return super(IndicatorForm, self).save(commit)
 
 
 class ResultForm(forms.ModelForm):
@@ -136,7 +202,9 @@ class ResultForm(forms.ModelForm):
         }
         labels = {
             'site': _('Site'),
+            # Translators: This is a result that was actually achieved, versus one that was planned.
             'achieved': _('Actual value'),
+            # Translators: field label that 
             'periodic_target': _('Measure against target'),
             'complete': _('Project'),
             'evidence_url': _('Link to file or folder'),
@@ -147,7 +215,8 @@ class ResultForm(forms.ModelForm):
         required=False
     )
     date_collected = forms.DateField(
-        widget=DatePicker.DateInput(format=locale_format),
+        widget=DatePicker.DateInput(
+            format=formats.get_format('DATE_INPUT_FORMATS', lang=translation.get_language())[-1]),
         # TODO: this field outputs dates in non-ISO formats in Spanish & French
         localize=True,
         required=True,
@@ -203,8 +272,8 @@ class ResultForm(forms.ModelForm):
         data = {'data-start': {'': ''}, 'data-end': {'': ''}}
         choices = [('', '---------')]
         for pt in periodic_targets:
-            data['data-start'].update({str(pt.id): pt.start_date})
-            data['data-end'].update({str(pt.id): pt.end_date})
+            data['data-start'].update({pt.id: pt.start_date})
+            data['data-end'].update({pt.id: pt.end_date})
             choices.append((pt.id, str(pt)))
         self.fields['periodic_target'].widget = DataAttributesSelect(data=data, choices=choices)
 

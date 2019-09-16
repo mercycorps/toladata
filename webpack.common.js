@@ -16,6 +16,10 @@ module.exports = {
         tola_management_country: './js/pages/tola_management_pages/country/index.js',
         audit_log: './js/pages/tola_management_pages/audit_log/index.js',
         document_list: './js/pages/document_list/index.js' ,
+        iptt_quickstart: './js/pages/iptt_quickstart/index.js',
+        iptt_report: './js/pages/iptt_report/index.js',
+        logframe: './js/pages/logframe/index.js',
+        results_framework: './js/pages/results_framework/index.js'
     },
 
     output: {

@@ -7,14 +7,14 @@ from django.urls import reverse_lazy
 from django.core.exceptions import ImproperlyConfigured
 
 from factories.django_models import UserFactory
-from factories.indicators_models import IndicatorFactory
+from factories.indicators_models import IndicatorFactory, LevelFactory
 from factories.workflow_models import ProgramFactory, TolaUserFactory
 from indicators.models import Indicator, Program
 from tola.test.utils import instantiate_scenario, decimalize
 
 
 class TestBase(object):
-    fixtures = ['indicatortype.json', 'levels.json']
+    fixtures = ['indicatortype.json']
 
     def setUp(self):
         self.user = UserFactory(first_name="Indicator", last_name="CreateTest", username="IC", is_superuser=True)
@@ -32,6 +32,8 @@ class TestBase(object):
         self.indicator = IndicatorFactory(
             program=self.program, unit_of_measure_type=Indicator.NUMBER, is_cumulative=False,
             direction_of_change=Indicator.DIRECTION_OF_CHANGE_NONE, target_frequency=Indicator.ANNUAL)
+
+        self.level = LevelFactory(program=self.program)
 
         self.request_factory = RequestFactory()
         self.client = Client()

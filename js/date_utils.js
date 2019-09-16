@@ -38,6 +38,7 @@ export function localDateFromISOString(dateStr) {
 }
 
 
+
 // Date() -> "Oct 2, 2018" (localized)
 // JS equiv of the Django template filter:   |date:"MEDIUM_DATE_FORMAT"
 export function mediumDateFormatStr(date) {

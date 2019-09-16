@@ -294,7 +294,13 @@ class TestSingleReportingIndicator(ReportingIndicatorBase):
         self.indicator.target_frequency = Indicator.LOP
         self.indicator.lop_target = 1400
         self.indicator.save()
-        self.load_data()
+        target = i_factories.PeriodicTargetFactory(
+            indicator=self.indicator,
+            target=self.indicator.lop_target,
+            start_date=self.indicator.program.reporting_period_start,
+            end_date=self.indicator.program.reporting_period_end
+        )
+        self.load_data(target=target)
         program = self.get_annotated_program()
         self.assertEqual(program.scope_counts['nonreporting_count'], 0)
         self.assertEqual(program.scope_counts['indicator_count'], 1)
@@ -369,8 +375,15 @@ class TestMixedReportingAndNonIndicators(ReportingIndicatorBase):
             lop_target=1000,
             program=self.program
         )
+        i_lop_target = i_factories.PeriodicTargetFactory(
+            indicator=indicator_lop,
+            target=indicator_lop.lop_target,
+            start_date=self.program.reporting_period_start,
+            end_date=self.program.reporting_period_end
+        )
         lop_data = i_factories.ResultFactory(
             indicator=indicator_lop,
+            periodic_target=i_lop_target,
             achieved=400,
             date_collected=self.program.reporting_period_end - datetime.timedelta(days=10)
         )
@@ -461,7 +474,7 @@ class TestProgramHasTimeAwareIndicators(test.TestCase):
             self.assertFalse(program.has_time_aware_targets)
 
     def test_program_with_time_aware_indicators_returns_true(self):
-        for frequency in Indicator.TIME_AWARE_TARGET_FREQUENCIES:
+        for frequency in Indicator.REGULAR_TARGET_FREQUENCIES:
             program = w_factories.ProgramFactory(
                 reporting_period_start=datetime.date(2015, 1, 1),
                 reporting_period_end=datetime.date(2017, 12, 31)
@@ -477,7 +490,7 @@ class TestProgramHasTimeAwareIndicators(test.TestCase):
             reporting_period_start=datetime.date(2015, 1, 1),
             reporting_period_end=datetime.date(2017, 12, 31)
         )
-        for frequency in Indicator.TIME_AWARE_TARGET_FREQUENCIES:
+        for frequency in Indicator.REGULAR_TARGET_FREQUENCIES:
             i_factories.IndicatorFactory(
                 target_frequency=frequency,
                 program=program

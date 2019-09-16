@@ -18,7 +18,7 @@ import isEqual from 'react-fast-compare';
 export class Select extends React.Component {
     constructor(props) {
         super(props);
-        
+
         this.onChange = this.onChange.bind(this);
         this.clearInternalSelection = this.clearInternalSelection.bind(this);
     }
@@ -49,7 +49,7 @@ export class Select extends React.Component {
             enableCaseInsensitiveFiltering: true,
             numberDisplayed: 1,
             maxHeight: 320,
-            buttonClass: 'btn form-control',
+            buttonClass: 'btn btn-light form-control',
             templates: {
                 filter: '<li class="multiselect-item filter"><div class="input-group"><input class="form-control multiselect-search" type="text"></div></li>',
                 filterClearBtn: '<span class="input-group-btn"><button class="btn btn-default multiselect-clear-filter" type="button"><i class="fas fa-times-circle"></i></button></span>',

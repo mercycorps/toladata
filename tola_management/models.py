@@ -15,8 +15,8 @@ from workflow.models import (
 )
 
 from indicators.models import (
-    Indicator
-)
+    Indicator,
+    Level)
 
 def diff(previous, new, mapping):
     diff_list = []
@@ -196,6 +196,7 @@ class ProgramAuditLog(models.Model, DiffableLog):
     user = models.ForeignKey(TolaUser, related_name="+")
     organization = models.ForeignKey(Organization, related_name="+")
     indicator = models.ForeignKey(Indicator, related_name="+", null=True)
+    level = models.ForeignKey(Level, related_query_name="+", null=True)
     change_type = models.CharField(_('Modification Type'), max_length=255)
     previous_entry = models.TextField(null=True, blank=True)
     new_entry = models.TextField(null=True, blank=True)
@@ -219,7 +220,8 @@ class ProgramAuditLog(models.Model, DiffableLog):
             "target": _('Target'),
             "value": _('Value'),
             "start_date": _('Start Date'),
-            "end_date": _('End Date')
+            "end_date": _('End Date'),
+            "assumptions": _('Assumptions'),
         }
 
     @property
@@ -231,7 +233,8 @@ class ProgramAuditLog(models.Model, DiffableLog):
             "result_changed": _('Result Changed'),
             "result_created": _('Result Created'),
             "result_deleted": _('Result Deleted'),
-            "program_dates_changed": _('Program Dates Changed')
+            "program_dates_changed": _('Program Dates Changed'),
+            "level_changed": _('Result Level Changed'),
         }
 
     @property
@@ -368,6 +371,12 @@ class ProgramAuditLog(models.Model, DiffableLog):
         previous_entry_json = json.dumps(old_indicator_values, cls=DjangoJSONEncoder)
         new_entry_json = json.dumps(new_indicator_values, cls=DjangoJSONEncoder)
         if new_entry_json != previous_entry_json:
+            # Don't prevent user from saving if the UI is out of sync with the DB,
+            # or dummy PT LoP only value != indicator LoP target
+            if rationale == '':
+                # raise Exception('rationale string missing when saving change to indicator audit log')
+                rationale = _('No reason for change required.')
+
             new_program_log_entry = ProgramAuditLog(
                 program=indicator.program,
                 user=user.tola_user,
@@ -436,6 +445,26 @@ class ProgramAuditLog(models.Model, DiffableLog):
                 organization=user.tola_user.organization,
                 indicator=None,
                 change_type="program_dates_changed",
+                rationale=rationale,
+                previous_entry=previous_entry_json,
+                new_entry=new_entry_json
+            )
+            new_program_log_entry.save()
+
+    @staticmethod
+    def log_result_level_updated(user, level, old_level_values, new_level_values, rationale):
+        previous_entry_json = json.dumps(old_level_values, cls=DjangoJSONEncoder)
+        new_entry_json = json.dumps(new_level_values, cls=DjangoJSONEncoder)
+        if new_entry_json != previous_entry_json:
+            if rationale == '':
+                rationale = _('No reason for change required.')
+
+            new_program_log_entry = ProgramAuditLog(
+                program=level.program,
+                user=user.tola_user,
+                organization=user.tola_user.organization,
+                level=level,
+                change_type="level_changed",
                 rationale=rationale,
                 previous_entry=previous_entry_json,
                 new_entry=new_entry_json

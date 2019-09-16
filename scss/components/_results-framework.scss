@@ -1,0 +1,252 @@
+// # from results_framework_page.html
+.rf-page {
+    align-items: flex-start;
+    display: flex;
+    flex-direction: column;
+    margin-top: $grid-gutter-width/2;
+    @include media-breakpoint-up(md) {
+        flex-direction: row;
+    }
+}
+
+
+// # from leveltier_picker.js
+
+// component LevelTierList
+.leveltier-list {
+    background-color: $white;
+    padding: $grid-gutter-width/2;
+}
+.leveltier-list__actions {
+    background: $white;
+    display: flex;
+    padding: $grid-gutter-width/2;
+}
+
+
+// component LevelTier
+.leveltier {
+    min-height: 2em;
+    background-color: $gray-150;
+    color: $gray-550;
+    padding: $grid-gutter-width/4;
+    & + & {
+        margin-top: $grid-gutter-width/4;
+    }
+}
+@for $i from 1 through 6 { // TODO: what is our max depth?
+    .leveltier--level-#{$i} {
+        margin-left: #{$grid-gutter-width/2 * $i}
+    }
+}
+
+//editable custom tiers
+.leveltier--editable {
+    display: flex;
+    justify-content: space-between;
+}
+
+.leveltier--editable__input {
+    width: 85%;
+}
+
+.leveltier--editable__label {
+}
+
+.leveltier--editable__settings {
+    background-color: $white;
+    width: 100%;
+    align-items: flex-end;
+    text-align: right;
+}
+
+// component LevelTierPicker
+.leveltier-picker {
+    flex-basis: 1%;
+    flex-grow: 0;
+    flex-shrink: 1;
+    margin-right: $grid-gutter-width;
+    min-width: 20rem;
+}
+.leveltier-picker__panel {
+    border: 1px solid $gray-400;
+}
+.leveltier-picker__change-log-link-box {
+    margin-top: 1rem;
+}
+
+// component Picker
+.leveltier-picker__selectbox {
+    background-color: $teal-100;
+    padding: $grid-gutter-width/2;
+}
+
+
+// # from level_list.js
+.leveltier--new { // why is this "new"
+        & > & {
+        margin-left: $grid-gutter-width;
+    }
+}
+
+// component LevelListPanel
+.level-list-panel {
+    align-items: top;
+    display: flex;
+    @include media-breakpoint-only(md) {
+        align-items: center;
+        flex-direction: column;
+    }
+}
+.level-list-panel__dingbat {
+    color: $gray-300;
+    font-size: 200px;
+    line-height: 0;
+    margin-bottom: $grid-gutter-width;
+    margin-right: $grid-gutter-width;
+    @include media-breakpoint-up(md) {
+        margin-top: $grid-gutter-width;
+    }
+    @include media-breakpoint-down(sm) {
+        display: none;
+    }
+}
+.level-list-panel__text {
+    @include media-breakpoint-up(md) {
+        margin-top: $grid-gutter-width;
+    }
+}
+.level-list--expandos {
+    margin-bottom: $grid-gutter-width/2;
+}
+// # from level_cards.js
+.level-card {
+    margin-bottom: $grid-gutter-width/2;
+    padding: $card-spacer-x * .75;
+}
+
+// component LevelCardCollapsed
+.level-card--collapsed {
+    background-color: white;
+    border: 1px solid $gray-250;
+    display: flex;
+    flex-direction: row;
+    justify-content: space-between;
+}
+.level-card__toggle {
+    &:hover {
+        cursor: pointer;
+        text-decoration: underline;
+    }
+}
+.level-card--collapsed__name {
+    display: inline;
+    color: $gray-700;
+    margin-left: $grid-gutter-width/4;
+}
+.level-card--collapsed__title {} // unused?
+.level-card--collapsed__actions {
+    // contains: actions__*
+    min-width: 150px;
+    display: flex;
+    flex-direction: column;
+    justify-content: space-between;
+}
+.actions__top, .actions__bottom {
+    display: flex;
+    justify-content: flex-end;
+}
+// popover links to iptt on collapsed cards
+.level-card--iptt-links {
+    margin-bottom: 10px;
+}
+// component LevelCardExpanded
+.level-card--expanded {
+    background-color: $teal-100;
+    border: 1px solid $teal-150;
+    display: flex;
+    flex-direction: column;
+}
+.level-card--expanded__form {
+    display: flex;
+    flex-direction: column;
+}
+.level-card--indicator-links {
+    background: $white;
+    padding: $grid-gutter-width/2;
+}
+.level-card--indicator-links.disabled{
+    opacity: 0.5;
+}
+.indicator-links__header {
+    display: flex;
+    justify-content: space-between;
+}
+
+// component LevelTitle
+.level-title {
+}
+.level-title--collapsed {
+    display: inline;
+    font-size: inherit;
+    line-height: inherit;
+    margin-bottom: 0;
+    text-transform: uppercase;
+    &:after {
+        content: ":";
+    }
+}
+.level-title--expanded {
+    font-weight: normal;
+}
+
+// component ProgramObjectiveImport
+.program-objective-import {
+    width: 55%;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+}
+.program-objective-import__icon {
+    margin-left: 15px;
+}
+.program-objective-import__popover-strong-text {
+    color: $danger;
+}
+
+// component ButtonBar
+.button-bar {
+    //align-items: center;
+    //background: $teal-200;
+    display: flex;
+    margin-top: $grid-gutter-width/2;
+}
+.button-bar__label {
+    margin-bottom: 0;
+    white-space: nowrap;
+}
+.button-bar__save {
+    margin: 0 $grid-gutter-width/4;
+}
+.button-bar__close {
+    flex-grow: 1;
+    text-align: right;
+}
+
+// component LevelButton
+.level-button {
+    & + & {
+        margin-left: $grid-gutter-width/4;
+    }
+}
+
+#logframe_link {
+    min-width: 220px;
+    display: flex;
+    justify-content: flex-end;
+    align-items: center
+}
+
+#logframe_link a {
+    margin-left: 5px;
+}

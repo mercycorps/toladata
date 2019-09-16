@@ -11,7 +11,6 @@ from unittest import runner as ut_runner
 
 from factories.indicators_models import IndicatorFactory, PeriodicTargetFactory, ResultFactory
 from factories.workflow_models import ProgramFactory, CountryFactory, DocumentationFactory
-from indicators.views.views_reports import IPTT_ReportView
 from indicators.views.views_indicators import generate_periodic_targets
 from indicators.models import Indicator, PeriodicTarget
 from workflow.models import Program
@@ -197,8 +196,7 @@ def generate_core_indicator_data(c_params=None, p_count=3, i_count=4):
 
 
 def make_targets(program, indicator):
-    num_periods = IPTT_ReportView._get_num_periods(
-        program.reporting_period_start, program.reporting_period_end, indicator.target_frequency)
+    num_periods = len([x for x in program.get_periods_for_frequency(indicator.target_frequency)])
     targets_json = generate_periodic_targets(
         tf=indicator.target_frequency, start_date=program.reporting_period_start, numTargets=num_periods)
     for i, pt in enumerate(targets_json):

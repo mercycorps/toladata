@@ -99,9 +99,9 @@
                             <input type="submit" name="submit" value="{% trans 'Save changes' %}" class="btn btn-primary" id="submit-id-submit">
                             {% if close_only %}
                                 {# when the modal is required in order to view the program page #}
-                                <input type="exit" id="reportingperiod_update_form_exit_btn" class="btn btn-inverse" value="{% trans 'Back to Homepage' %}">
+                                <input type="exit" id="reportingperiod_update_form_exit_btn" class="btn btn-reset" value="{% trans 'Back to Homepage' %}">
                             {% else %}
-                                <input type="reset" class="btn btn-inverse" value="{% trans 'Reset' %}">
+                                <input type="reset" class="btn btn-reset" value="{% trans 'Reset' %}">
                             {% endif %}
                         </div>
                         <div class="text-muted">{% include "form_guidance.html" %}</div>
@@ -431,7 +431,8 @@
                         },
                     suppressErrors: true
                 }).done(() => {
-                    PNotify.success('Reporting period updated')
+                    {# Translators: This is the text of an alert that is triggered upon a successful change to the the start and end dates of the reporting period #}
+                    PNotify.success("{% trans 'Reporting period updated' %}")
                 }).fail(function(data) {
                     let msg = "{% trans 'There was a problem saving your changes.'|escapejs %}";
                     if (data.responseJSON) {

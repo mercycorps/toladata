@@ -185,6 +185,16 @@ class EndpointTestContext(object):
             target_frequency=Indicator.LOP
         )
 
+        self.indicator_in_country_target_frequency_type_event = i_factories.IndicatorFactory(
+            program=self.program_in_country,
+            target_frequency=Indicator.EVENT
+        )
+
+        self.indicator_out_of_country_target_frequency_type_event = i_factories.IndicatorFactory(
+            program=self.program_out_of_country,
+            target_frequency=Indicator.EVENT
+        )
+
     def add_periodic_targets(self):
         self.pt_out_of_country = i_factories.PeriodicTargetFactory(
             indicator=self.indicator_out_of_country,
@@ -301,7 +311,10 @@ class EndpointTestBase(object):
         if 'program' in self.url_kwargs:
             kwargs['program'] = self.context.program_out_of_country.pk
         if 'indicator' in self.url_kwargs:
-            kwargs['indicator'] = self.context.indicator_out_of_country.pk
+            if self.url_kwargs['indicator'] == 'event':
+                kwargs['indicator'] = self.context.indicator_out_of_country_target_frequency_type_event.pk
+            else:
+                kwargs['indicator'] = self.context.indicator_out_of_country.pk
         if 'pk' in self.url_kwargs and self.url_kwargs['pk'] == 'indicator':
             kwargs['pk'] = self.context.indicator_out_of_country.pk
         if 'pk' in self.url_kwargs and self.url_kwargs['pk'] == 'periodic_target':
@@ -323,7 +336,10 @@ class EndpointTestBase(object):
         if 'program' in self.url_kwargs:
             kwargs['program'] = self.context.program_in_country.pk
         if 'indicator' in self.url_kwargs:
-            kwargs['indicator'] = self.context.indicator_in_country.pk
+            if self.url_kwargs['indicator'] == 'event':
+                kwargs['indicator'] = self.context.indicator_in_country_target_frequency_type_event.pk
+            else:
+                kwargs['indicator'] = self.context.indicator_in_country.pk
         if 'pk' in self.url_kwargs and self.url_kwargs['pk'] == 'indicator':
             kwargs['pk'] = self.context.indicator_in_country.pk
         if 'pk' in self.url_kwargs and self.url_kwargs['pk'] == 'periodic_target':

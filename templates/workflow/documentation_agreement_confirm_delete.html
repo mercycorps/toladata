@@ -39,7 +39,7 @@
         <form action="/workflow/documentation_agreement_delete/{{ id }}/" method="post" id="monitorDelete">{% csrf_token %}
             <p>{% trans "Are you sure you want to delete" %}?</p>
             <input type="submit" value="Delete" class="btn btn-danger" />
-            <button type="button" class="btn btn-inverse" data-dismiss="modal" aria-label="Close">{% trans "Cancel" %}</button>
+            <button type="button" class="btn btn-reset" data-dismiss="modal" aria-label="Close">{% trans "Cancel" %}</button>
         </form>
     </div>
 

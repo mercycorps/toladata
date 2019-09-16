@@ -1,19 +1,32 @@
-language: python
+matrix:
+    include:
+        -   language: python
 
-python:
-  - 2.7
+            python:
+              - 2.7
 
-services: mysql
+            services: mysql
 
-before_install:
-  - sudo apt-get install -y libxml2-dev libxmlsec1-dev
-  - export DJANGO_SETTINGS_MODULE=tola.settings.travis-ci
-  - export PYTHONPATH=$HOME/builds/mercycorps/TolaActivity
-  - export PIP_USE_MIRRORS=true
-  - mysql -e 'CREATE DATABASE tola_activity;'
+            before_install:
+              - sudo apt-get install -y libxml2-dev libxmlsec1-dev
+              - export DJANGO_SETTINGS_MODULE=tola.settings.travis-ci
+              - export PYTHONPATH=$HOME/builds/mercycorps/TolaActivity
+              - export PIP_USE_MIRRORS=true
+              - mysql -e 'CREATE DATABASE tola_activity;'
 
-install:
-  - pip install -r requirements.txt
+            install:
+              - pip install -r requirements.txt
 
-script:
-  - python manage.py test --exclude-tag=functional
+            script:
+              - python manage.py test --exclude-tag=functional
+
+        -   language: node_js
+            sudo: false
+            node_js:
+                - '11.10.1'
+            before_install:
+            - npm update
+            install:
+            - npm install
+            script:
+            - npm test

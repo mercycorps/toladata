@@ -36,9 +36,8 @@ td.periodic-targets__sum { // td needed for extra specificity
     }
 }
 
-// Don't define border property here.  Assigning here prevents red border from
-// being applied when there is no value
-.periodic-target .input-value {
+// .periodic-target .input-value - needed as you can't @extend nested selectors
+%pt-input {
     padding-right: 10px;
     text-align: right;
     width: 150px;
@@ -54,3 +53,14 @@ td.periodic-targets__sum { // td needed for extra specificity
     }
 }
 
+// Don't define border property here.  Assigning here prevents red border from
+// being applied when there is no value
+.periodic-target .input-value {
+    @extend %pt-input;
+}
+
+// This exists as .periodic-target is used for selection in JS
+// but the LoP only target should not be included in the JS selections
+.lop-only-target .input-value {
+    @extend %pt-input;
+}

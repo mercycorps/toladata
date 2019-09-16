@@ -545,7 +545,7 @@ class ProjectCompleteList(LoginRequiredMixin, ListView):
             return render(request, self.template_name, {'getDashboard':getDashboard,'getPrograms':getPrograms})
         else:
             getDashboard = ProjectComplete.objects.all().filter(program__id=self.kwargs['pk'], program__in=getPrograms)
-            getProgram =get_object_or_404(id=self.kwargs['pk'], id__in=getPrograms.values('id'))
+            getProgram = get_object_or_404(id=self.kwargs['pk'], id__in=getPrograms.values('id'))
 
             return render(request, self.template_name, {'getProgram': getProgram, 'getDashboard':getDashboard,'getPrograms':getPrograms})
 

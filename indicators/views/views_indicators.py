@@ -1,19 +1,20 @@
+import copy
 import json
 import logging
-import re
 from datetime import datetime, timedelta
+import uuid
 import dateparser
 import requests
+from django.template.defaultfilters import truncatechars
 from weasyprint import HTML, CSS
 
 from django.contrib import messages
 from django.core import serializers
-from django.core.serializers.json import DjangoJSONEncoder
 from django.core.urlresolvers import reverse_lazy
 from django.core.exceptions import PermissionDenied
 from django.db import connection, transaction
 from django.db.models import (
-    Count, Q, Sum, Avg, Max
+    Count, Q, Max
 )
 from django.contrib.auth.decorators import login_required
 from django.http import HttpResponse, HttpResponseRedirect, JsonResponse
@@ -21,34 +22,40 @@ from django.shortcuts import render, render_to_response, get_object_or_404, redi
 from django.template.loader import render_to_string
 from django.utils import timezone
 from django.utils.decorators import method_decorator
-from django.utils.translation import gettext as _
+from django.utils.translation import gettext as _, ugettext
 from django.views.generic import TemplateView
 from django.views.generic.detail import View
 from django.views.generic.edit import CreateView, DeleteView, UpdateView
 from django.views.generic.list import ListView
 
-from feed.serializers import FlatJsonSerializer
-from tola.util import getCountry, group_excluded
-
-from indicators.serializers import IndicatorSerializer, ProgramSerializer
+from tola.util import group_excluded
+from indicators.serializers import (
+    IndicatorSerializer,
+    ProgramSerializer
+)
 from indicators.views.view_utils import (
-    handleDataCollectedRecords,
     import_indicator,
     generate_periodic_targets,
-    generate_periodic_target_single,
     dictfetchall
 )
 from workflow.models import (
-    Program, Sector, TolaSites, FormGuidance
+    Program, TolaSites, FormGuidance
 )
-from ..forms import IndicatorForm, ResultForm
-from ..models import (
-    Indicator, PeriodicTarget, DisaggregationLabel, DisaggregationValue,
-    Result, IndicatorType, Level, ExternalServiceRecord,
-    ExternalService, TolaTable, PinnedReport
+from ..forms import IndicatorForm, ResultForm, PTFormInputsForm
+from indicators.models import (
+    Indicator,
+    PeriodicTarget,
+    DisaggregationLabel,
+    DisaggregationValue,
+    Result,
+    LevelTier,
+    Level,
+    TolaTable,
+    PinnedReport
 )
 from indicators.queries import ProgramWithMetrics, ResultsIndicator
-from .views_reports import IPTT_ReportView
+
+logger = logging.getLogger(__name__)
 
 from tola_management.models import (
     ProgramAuditLog
@@ -58,7 +65,6 @@ from tola_management.permissions import (
     indicator_pk_adapter,
     indicator_adapter,
     periodic_target_pk_adapter,
-    has_indicator_read_access,
     has_indicator_write_access,
     result_pk_adapter,
     has_result_read_access,
@@ -77,127 +83,345 @@ logger = logging.getLogger(__name__)
 
 @login_required
 @has_indicator_write_access
-def indicator_create(request, program=0):
+def periodic_targets_form(request, program):
     """
-    url: indicator_create/<program>
-    Step one in Indicator creation.
-    Passed on to IndicatorCreate to do the creation [or  not]
+    Returns a form for the periodic targets sub-section,
+    used by the Indicator Form
+
+    For historical reasons, the input is a POST of the whole indicator form sent via ajax
+    from which a subset of fields are used to generate the returned template
     """
     if not request.has_write_access:
         raise PermissionDenied
-    get_indicator_types = IndicatorType.objects.all()
-    program = Program.objects.get(pk=program)
-    countries = ', '.join(program.country.all().order_by('country').values_list('country', flat=True))
-    get_services = ExternalService.objects.all()
 
-    if request.method == 'POST':
-        indicator_type, created = IndicatorType.objects.get_or_create(indicator_type="custom")
-        program = Program.objects.get(id=request.POST['program'])
-        service = request.POST['services']
-        level = None
-        node_id = request.POST.get('service_indicator')
-        sector = None
-        # add a temp name for custom indicators
-        name = request.POST.get('name', _("Temporary"))
-        source = None
-        definition = None
-        external_service_record = None
+    program = get_object_or_404(Program, pk=program)
 
-        # check for service indicator and update based on values
-        if node_id is not None and node_id != "" and int(node_id) != 0:
-            get_imported_indicators = import_indicator(service)
-            for item in get_imported_indicators:
-                if item['nid'] == node_id:
-                    sector, created = Sector.objects.get_or_create(sector=item['sector']) if item['sector'] is not None else (None, False)
-                    level, created = Level.objects.get_or_create(name=item['level'].title()) if item['level'] is not None else (None, False)
-                    name = item['title']
-                    source = item['source']
-                    definition = item['definition']
-                    # replace HTML tags if they are in the string
-                    definition = re.sub("<.*?>", "", definition)
-                    getService = ExternalService.objects.get(id=service)
-                    full_url = getService.url + "/" + item['nid']
-                    external_service_record = ExternalServiceRecord(
-                        record_id=item['nid'], external_service=getService, full_url=full_url
-                    )
-                    external_service_record.save()
-                    indicator_type, created = IndicatorType.objects.get_or_create(indicator_type=item['type'].title())
-        # save form
-        new_indicator = Indicator(
-            sector=sector, name=name, source=source, definition=definition,
-            external_service_record=external_service_record,
-            program=program,
-            level=level
-        )
-        new_indicator.save()
-        new_indicator.indicator_type.add(indicator_type)
+    form = PTFormInputsForm(data=request.POST)
 
+    if not form.is_valid():
+        return JsonResponse(form.errors)
+
+    event_name = ''
+    start_date = ''
+    target_frequency_num_periods = 1
+    target_frequency_type = form.cleaned_data.get('target_frequency')
+
+    if target_frequency_type in Indicator.REGULAR_TARGET_FREQUENCIES:
+        start_date = program.reporting_period_start
+        # target_frequency_num_periods = IPTT_ReportView._get_num_periods(
+        #     start_date, program.reporting_period_end, target_frequency_type)
+        target_frequency_num_periods = len(
+            [p for p in PeriodicTarget.generate_for_frequency(
+                target_frequency_type)(start_date, program.reporting_period_end)])
+
+    generated_targets = generate_periodic_targets(
+        target_frequency_type, start_date, target_frequency_num_periods, event_name)
+
+    dummy_indicator = Indicator(
+        target_frequency=target_frequency_type,
+        unit_of_measure_type=form.cleaned_data.get('unit_of_measure_type'),
+        is_cumulative=False,
+    )
+
+    content = render_to_string('indicators/indicatortargets.html', {
+        'indicator': dummy_indicator,
+        'periodic_targets': generated_targets
+    })
+
+    return JsonResponse({
+        'content': content,
+    })
+
+
+class PeriodicTargetJsonValidationError(Exception): pass
+
+
+class IndicatorFormMixin(object):
+    model = Indicator
+    form_class = IndicatorForm
+
+    def __init__(self):
+        self.guidance = None
+
+    def set_form_guidance(self):
+        self.guidance = FormGuidance.objects.filter(form="Indicator").first()
+
+    def get_template_names(self):
+        return 'indicators/indicator_form_modal.html'
+
+    def form_invalid(self, form):
+        return JsonResponse(form.errors, status=400)
+
+    def noramlize_periodic_target_client_json_dates(self, pt_json):
+        """
+        The JSON containing periodic targets sent by the client contains dates as: 'Dec 31, 2018'
+        The rest of the code expects them to be: '2018-12-31'
+        Also changes all pkids of 0 to None
+        """
+        pt_json = copy.deepcopy(pt_json)
+
+        for pt in pt_json:
+            pk = int(pt.get('id'))
+            if pk == 0:
+                pk = None
+
+            try:
+                start_date = dateparser.parse(pt.get('start_date', None))
+                start_date = datetime.strftime(start_date, '%Y-%m-%d')
+            except (ValueError, TypeError):
+                # raise ValueError("Incorrect data value")
+                start_date = None
+
+            try:
+                end_date = dateparser.parse(pt.get('end_date', None))
+                end_date = datetime.strftime(end_date, '%Y-%m-%d')
+            except (ValueError, TypeError):
+                # raise ValueError("Incorrect data value")
+                end_date = None
+
+            pt['id'] = pk
+            pt['start_date'] = start_date
+            pt['end_date'] = end_date
+
+        return pt_json
+
+    def validate_periodic_target_json_from_client(self, normalized_pt_json, program, target_frequency):
+        """
+        The client sends the full definition of all periodic targets in JSON
+        In the past, the server has just accepted it as gospel
+        Instead, do some basic validation to confirm what the client is telling the server is sane
+
+        Takes the client JSON, already deserialized and having the dates and pkid normalized as input.
+        """
+        # Clients send nothing on LOP only
+        if target_frequency == Indicator.LOP:
+            return
+
+        # Are all target values >= 0?
+        for pt in normalized_pt_json:
+            if pt['target'] < 0:
+                raise PeriodicTargetJsonValidationError('Target value must be >= 0, found %d' % pt.target)
+
+        # check that event names exist in the future?
+        if target_frequency == Indicator.EVENT:
+            return
+
+        if target_frequency == Indicator.MID_END:
+            if len(normalized_pt_json) != 2:
+                raise PeriodicTargetJsonValidationError(
+                    'Midline/Endline periodic target count is not 2 and is instead %d' % len(normalized_pt_json))
+            return
+
+        # target_frequency_num_periods = IPTT_ReportView._get_num_periods(program.reporting_period_start,
+        #                                                                 program.reporting_period_end,
+        #                                                                 target_frequency)
+
+        target_frequency_num_periods = len(
+            [p for p in PeriodicTarget.generate_for_frequency(
+                target_frequency)(program.reporting_period_start, program.reporting_period_end)])
+
+        generated_targets = generate_periodic_targets(target_frequency,
+                                                      program.reporting_period_start,
+                                                      target_frequency_num_periods)
+
+        if len(generated_targets) != len(normalized_pt_json):
+            raise PeriodicTargetJsonValidationError(
+                'Number of periodic targets sent by client does not match excepected number of targets on the server (%d vs %d)' % (
+                len(generated_targets), len(normalized_pt_json)))
+
+        server_period_dates = [(pt['start_date'], pt['end_date']) for pt in generated_targets]
+        client_period_dates = [(pt['start_date'], pt['end_date']) for pt in normalized_pt_json]
+
+        if server_period_dates != client_period_dates:
+            raise PeriodicTargetJsonValidationError(
+                'Periodic Target start/end dates expected by server do not match what was sent by the client: %s vs %s' % (
+                server_period_dates, client_period_dates))
+
+    def _save_success_msg(self, indicator, created=True, level_changed=False):
+        """
+        Returns the growl of success string for display on the client
+
+        Message can vary depending on
+          * Create or update save
+          * If new RF levels are in use or not
+          * If the new RF level was modified during the save or not
+        """
+        using_rf = indicator.results_framework
+
+        if not using_rf:
+            if created:
+                # Translators: success message when an indicator was created
+                return _('Success! Indicator created.')
+            else:
+                # Translators: success message when an indicator was updated
+                return _('Success! Indicator updated.')
+
+        # success msg strings
+        indicator_number = '{}{}'.format(indicator.level_display_ontology,
+                                         indicator.level_order_display) if using_rf else ''
+        result_level_display_ontology = '{} {}'.format(indicator.leveltier_name,
+                                                       indicator.level_display_ontology) if using_rf else ''
+
+        if created or level_changed:
+            # Translators: success message when an indicator was created, ex. "Indicator 2a was saved and linked to Outcome 2.2"
+            return _('Indicator {indicator_number} was saved and linked to {result_level_display_ontology}').format(
+                indicator_number=indicator_number,
+                result_level_display_ontology=result_level_display_ontology
+            )
+        else:
+            # Translators: success message when indicator was updated ex. "Indicator 2a updated"
+            return _('Indicator {indicator_number} updated.').format(indicator_number=indicator_number)
+
+
+class IndicatorCreate(IndicatorFormMixin, CreateView):
+
+    @method_decorator(login_required)
+    @method_decorator(has_indicator_write_access)
+    @transaction.atomic
+    def dispatch(self, request, *args, **kwargs):
+        self.set_form_guidance()
+        self.program = Program.objects.get(pk=kwargs['program'])
+        self.level_pk = self.request.GET.get('levelId')
+        return super(IndicatorCreate, self).dispatch(request, *args, **kwargs)
+
+    def get_context_data(self, **kwargs):
+        context = super(IndicatorCreate, self).get_context_data(**kwargs)
+        context.update({
+            'program': self.program,
+            'periodic_targets': [],
+            'initial_level_id': self.level_pk,
+            'idempotency_key': uuid.uuid4()
+        })
+        return context
+
+    def get_initial(self):
+        return {
+            'unit_of_measure_type': Indicator.NUMBER,
+            'program': self.program,
+        }
+
+    def get_form_kwargs(self):
+        kwargs = super(IndicatorCreate, self).get_form_kwargs()
+        kwargs.update({
+            'request': self.request,
+            'program': self.program,
+            'level': self.level_pk,
+        })
+        return kwargs
+
+    def form_valid(self, form, **kwargs):
+        indicator = form.save()
+
+        periodic_targets = self.request.POST.get('periodic_targets')
+
+        # Save completed PeriodicTargets to the DB (will be empty u'[]' for LoP)
+        if indicator.target_frequency == Indicator.LOP:
+            PeriodicTarget.objects.create(
+                indicator=indicator,
+                period=PeriodicTarget.LOP_PERIOD,
+                target=indicator.lop_target,
+                create_date=timezone.now(),
+            )
+        else:
+            # now create/update periodic targets
+            pt_json = json.loads(periodic_targets)
+
+            normalized_pt_json = self.noramlize_periodic_target_client_json_dates(pt_json)
+
+            self.validate_periodic_target_json_from_client(normalized_pt_json, indicator.program, indicator.target_frequency)
+
+            for i, pt in enumerate(normalized_pt_json):
+                values = dict(
+                    period=pt.get('period', ''),
+                    target=pt.get('target', 0),
+                    start_date=pt['start_date'],
+                    end_date=pt['end_date'],
+                )
+
+                PeriodicTarget.objects.create(
+                    indicator=indicator,
+                    customsort=i,
+                    create_date=timezone.now(),
+                    **values
+                )
 
         ProgramAuditLog.log_indicator_created(
-            request.user,
-            new_indicator,
+            self.request.user,
+            indicator,
             'N/A'
         )
 
-        latest = new_indicator.id
+        return JsonResponse({
+            'success': True,
+            'id': indicator.id,
+            'save_success_msg': self._save_success_msg(indicator, created=True)
+        })
 
-        # redirect to update page
-        messages.success(request, _('Success, Basic Indicator Created!'))
-        redirect_url = reverse_lazy('indicator_update', kwargs={'pk': latest})
-        return HttpResponseRedirect(redirect_url)
 
-    # send the keys and vars from the json data to the template along with
-    # submitted feed info and silos for new form
-    return render(request, "indicators/indicator_create.html",
-                  {'country': countries, 'program': program,
-                   'getIndicatorTypes': get_indicator_types,
-                   'getServices': get_services,
-                   'result_count': 0})
-
-class IndicatorUpdate(UpdateView):
+class IndicatorUpdate(IndicatorFormMixin, UpdateView):
     """
     Update and Edit Indicators.
     url: indicator_update/<pk>
     """
-    model = Indicator
-    form_class = IndicatorForm
-
-    def get_template_names(self):
-        if self.request.GET.get('modal'):
-            return 'indicators/indicator_form_modal.html'
-        return 'indicators/indicator_form.html'
 
     @method_decorator(login_required)
     @method_decorator(group_excluded('ViewOnly', url='workflow/permission'))
     @method_decorator(indicator_pk_adapter(has_indicator_write_access))
     @transaction.atomic
     def dispatch(self, request, *args, **kwargs):
-
         if request.method == 'GET':
             # If target_frequency is set but not targets are saved then
             # unset target_frequency too.
             indicator = self.get_object()
             reset_indicator_target_frequency(indicator)
-        try:
-            self.guidance = FormGuidance.objects.get(form="Indicator")
-        except FormGuidance.DoesNotExist:
-            self.guidance = None
+
+        self.set_form_guidance()
+
         return super(IndicatorUpdate, self).dispatch(request, *args, **kwargs)
+
+    @property
+    def _form_title_display_str(self):
+        """
+        The header of the form when updating - composed here instead of in the template
+        such that it can also be used via AJAX
+        """
+        if self.object.results_framework and self.object.auto_number_indicators:
+            if self.object.level_display_ontology:
+                return u'{} {} {}{}'.format(
+                    self.object.leveltier_name,
+                    _('indicator'),
+                    self.object.level_display_ontology,
+                    self.object.level_order_display,
+                )
+            else:
+                return _('Indicator setup')
+        elif self.object.results_framework and self.object.number:
+            return u'{} {}'.format(_('indicator'), self.object.number)
+        elif self.object.results_framework:
+            return _('Indicator setup')
+        elif self.object.old_level:
+            return u'{} {}'.format(
+                unicode(ugettext(self.object.old_level)),
+                unicode(_('indicator')),
+            )
+        else:
+            return _('Indicator setup')
+
+    @property
+    def _form_subtitle_display_str(self):
+        return truncatechars(self.object.name, 300)
 
     def get_context_data(self, **kwargs):
         context = super(IndicatorUpdate, self).get_context_data(**kwargs)
-        context.update({'id': self.kwargs['pk']})
-        getIndicator = Indicator.objects.get(id=self.kwargs['pk'])
-        program = getIndicator.program
+        indicator = self.object
+        program = indicator.program
 
-        context.update({'i_name': getIndicator.name})
-        context['programId'] = program.id
+        context['program'] = program
 
-        pts = PeriodicTarget.objects.filter(indicator=getIndicator) \
+        pts = PeriodicTarget.objects.filter(indicator=indicator) \
             .annotate(num_data=Count('result')).order_by('customsort', 'create_date', 'period')
 
         ptargets = []
-        # context['periodic_targets']
         for pt in pts:
             ptargets.append({
                 'id': pt.pk,
@@ -210,50 +434,40 @@ class IndicatorUpdate(UpdateView):
             })
 
         # if the modal is loaded (not submitted) and the indicator frequency is a periodic
-        if self.request.method == 'GET' and getIndicator.target_frequency in [
-                Indicator.ANNUAL, Indicator.SEMI_ANNUAL, Indicator.TRI_ANNUAL,
-                Indicator.QUARTERLY, Indicator.MONTHLY]:
+        if self.request.method == 'GET' and indicator.target_frequency in Indicator.REGULAR_TARGET_FREQUENCIES:
+            latest_pt_end_date = indicator.periodictargets.aggregate(lastpt=Max('end_date'))['lastpt']
 
-            latest_pt_end_date = getIndicator.periodictargets.aggregate(lastpt=Max('end_date'))['lastpt']
             if latest_pt_end_date is None or latest_pt_end_date == 'None':
                 latest_pt_end_date = program.reporting_period_start
             else:
                 latest_pt_end_date += timedelta(days=1)
 
-            target_frequency_num_periods = IPTT_ReportView._get_num_periods(
-                latest_pt_end_date, program.reporting_period_end, getIndicator.target_frequency)
+            target_frequency_num_periods = len(
+                [p for p in PeriodicTarget.generate_for_frequency(
+                    indicator.target_frequency)(latest_pt_end_date, program.reporting_period_end)])
+            # target_frequency_num_periods = IPTT_ReportView._get_num_periods(
+            #     latest_pt_end_date, program.reporting_period_end, indicator.target_frequency)
 
             num_existing_targets = pts.count()
             event_name = ''
 
-            generatedTargets = generate_periodic_targets(
-                getIndicator.target_frequency, latest_pt_end_date, target_frequency_num_periods, event_name,
+            generated_targets = generate_periodic_targets(
+                indicator.target_frequency, latest_pt_end_date, target_frequency_num_periods, event_name,
                 num_existing_targets)
 
             # combine the list of existing periodic_targets with the newly generated placeholder for missing targets
-            ptargets += generatedTargets
+            ptargets += generated_targets
 
         context['periodic_targets'] = ptargets
-        context['targets_sum'] = PeriodicTarget.objects \
-            .filter(indicator=getIndicator).aggregate(Sum('target'))['target__sum']
 
-        context['targets_avg'] = PeriodicTarget.objects \
-            .filter(indicator=getIndicator).aggregate(Avg('target'))['target__avg']
-
-        # get external service data if any
-        try:
-            getExternalServiceRecord = ExternalServiceRecord.objects \
-                .filter(indicator__id=self.kwargs['pk'])
-        except ExternalServiceRecord.DoesNotExist:
-            getExternalServiceRecord = None
-
-        context.update({'getExternalServiceRecord': getExternalServiceRecord})
-        if self.request.GET.get('targetsonly') == 'true':
-            context['targetsonly'] = True
-        elif self.request.GET.get('targetsactive') == 'true':
+        # redirect user to certain tabs of the form given GET params
+        if self.request.GET.get('targetsactive') == 'true':
             context['targetsactive'] = True
 
         context['readonly'] = not self.request.has_write_access
+
+        context['title_str'] = self._form_title_display_str
+        context['subtitle_str'] = self._form_subtitle_display_str
 
         return context
 
@@ -271,171 +485,114 @@ class IndicatorUpdate(UpdateView):
     def get_form_kwargs(self):
         kwargs = super(IndicatorUpdate, self).get_form_kwargs()
         kwargs['request'] = self.request
-        program = self.object.program
+        program = Program.rf_aware_objects.get(pk=self.object.program_id)
         kwargs['program'] = program
         return kwargs
 
-    def form_invalid(self, form):
-        if self.request.is_ajax():
-            # print("...............%s.........................." % form.errors)
-            return JsonResponse(form.errors, status=400)
-        else:
-            messages.error(self.request, _('Invalid Form'), fail_silently=False)
-            # print("...............%s.........................." % form.errors)
-            return self.render_to_response(self.get_context_data(form=form))
-
     def form_valid(self, form, **kwargs):
-        periodic_targets = self.request.POST.get('periodic_targets', None)
-        indicatr = Indicator.objects.get(pk=self.kwargs.get('pk'))
-        generatedTargets = []
-        existing_target_frequency = indicatr.target_frequency
-        new_target_frequency = form.cleaned_data.get('target_frequency', None)
-        lop = form.cleaned_data.get('lop_target', None)
-        program = pk=form.cleaned_data.get('program')
+        periodic_targets = self.request.POST.get('periodic_targets')
+        old_indicator = Indicator.objects.get(pk=self.kwargs.get('pk'))
+        existing_target_frequency = old_indicator.target_frequency
+        new_target_frequency = form.cleaned_data.get('target_frequency')
+        lop = form.cleaned_data.get('lop_target')
         rationale = form.cleaned_data.get('rationale')
-        old_indicator_values = indicatr.logged_fields
+        old_indicator_values = old_indicator.logged_fields
+        prev_level = old_indicator.level  # previous value of "new" level (not to be confused with Indicator.old_level)
 
-        if periodic_targets == 'generateTargets':
-            # handle (delete) association of colelctedData records if necessary
-            handleDataCollectedRecords(indicatr, lop, existing_target_frequency, new_target_frequency)
+        # if existing_target_frequency != new_target_frequency
+        # then either existing_target_frequency is None or LoP
+        # It shouldn't be anything else as the user should have to delete all targets first
 
-            event_name = form.cleaned_data.get('target_frequency_custom', '')
-            start_date = ''
-            target_frequency_num_periods = 1
-            target_frequency_type = form.cleaned_data.get('target_frequency', 1)
+        # Disassociate existing records and delete old PeriodicTargets
+        if existing_target_frequency != new_target_frequency:
+            PeriodicTarget.objects.filter(indicator=old_indicator).delete()
 
-            if target_frequency_type in [
-                    Indicator.ANNUAL, Indicator.SEMI_ANNUAL, Indicator.TRI_ANNUAL,
-                    Indicator.QUARTERLY, Indicator.MONTHLY]:
-                start_date = program.reporting_period_start
-                target_frequency_num_periods = IPTT_ReportView._get_num_periods(
-                    start_date, program.reporting_period_end, target_frequency_type)
-            elif target_frequency_type == Indicator.EVENT:
-                # This is only case in which target fequency comes from the form
-                target_frequency_num_periods = form.cleaned_data.get('target_frequency_num_periods', 1)
+        # Save completed PeriodicTargets to the DB)
+        if new_target_frequency == Indicator.LOP:
+            # assume only 1 PT at this point
+            lop_pt, created = PeriodicTarget.objects.update_or_create(
+                indicator=old_indicator,
+                defaults={
+                    'target': lop,
+                    'period': PeriodicTarget.LOP_PERIOD,
+                }
+            )
 
-            generatedTargets = generate_periodic_targets(
-                new_target_frequency, start_date, target_frequency_num_periods, event_name)
+            if created:
+                lop_pt.create_date = timezone.now()
+                lop_pt.save()
 
-        if periodic_targets and periodic_targets != 'generateTargets':
-            # now create/update periodic targets
+                # Redirect results to new LoP target
+                Result.objects.filter(indicator=old_indicator).update(periodic_target=lop_pt)
+        else:
+            # now create/update periodic targets (will be empty u'[]' for LoP)
             pt_json = json.loads(periodic_targets)
+
+            normalized_pt_json = self.noramlize_periodic_target_client_json_dates(pt_json)
+
+            self.validate_periodic_target_json_from_client(normalized_pt_json, old_indicator.program, new_target_frequency)
+
             generated_pt_ids = []
-            for i, pt in enumerate(pt_json):
-                pk = int(pt.get('id'))
-                if pk == 0:
-                    pk = None
-
-                try:
-                    start_date = dateparser.parse(pt.get('start_date', None))
-                    start_date = datetime.strftime(start_date, '%Y-%m-%d')
-                except (ValueError, TypeError):
-                    # raise ValueError("Incorrect data value")
-                    start_date = None
-
-                try:
-                    end_date = dateparser.parse(pt.get('end_date', None))
-                    end_date = datetime.strftime(end_date, '%Y-%m-%d')
-                except (ValueError, TypeError):
-                    # raise ValueError("Incorrect data value")
-                    end_date = None
-
+            for i, pt in enumerate(normalized_pt_json):
                 defaults = {
                     'period': pt.get('period', ''),
-                    'target': pt.get('target', 0), 'customsort': i,
-                    'start_date': start_date, 'end_date': end_date,
+                    'target': pt.get('target', 0),
+                    'customsort': i,
+                    'start_date': pt['start_date'],
+                    'end_date': pt['end_date'],
                     'edit_date': timezone.now()
                 }
 
-                # Validate PeriodicTarget target field is > 0... throws with ValidationError
-                # Needed to be done here since the form itself does not check
-                # Front-end validation exists which is why we are not bothering with UI feedback
-                PeriodicTarget(indicator=indicatr, **defaults).clean_fields()
-
                 periodic_target, created = PeriodicTarget.objects \
-                    .update_or_create(indicator=indicatr, id=pk, defaults=defaults)
+                    .update_or_create(indicator=old_indicator, id=pt['id'], defaults=defaults)
 
                 if created:
                     periodic_target.create_date = timezone.now()
                     periodic_target.save()
                     generated_pt_ids.append(periodic_target.id)
 
-            # handle related result objects for new periodic targets
-            handleDataCollectedRecords(indicatr, lop, existing_target_frequency, new_target_frequency,
-                                       generated_pt_ids)
+            # Reassign results to newly created PTs
+            if generated_pt_ids:
+                pts = PeriodicTarget.objects.filter(indicator=old_indicator, pk__in=generated_pt_ids)
+                for pt in pts:
+                    Result.objects.filter(
+                        indicator=old_indicator,
+                        date_collected__range=[pt.start_date, pt.end_date]
+                    ).update(periodic_target=pt)
+
 
         # save the indicator form
-        self.object = form.save()
+        form.save()
         self.object.refresh_from_db()
 
+        # Write to audit log if results attached or special case of RF level reassignment
         results_count = Result.objects.filter(indicator=self.object).count()
+        if results_count > 0 or old_indicator.level_id != self.object.level_id:
+            ProgramAuditLog.log_indicator_updated(
+                self.request.user,
+                self.object,
+                old_indicator_values,
+                self.object.logged_fields,
+                rationale
+            )
 
-        # Logging now happens when either when the "save changes" or "create targets" is pressed
-        # this is done since other form changes could have happened when the create targets button was pressed
-        # Conditions for logging:
-        # * Results are attached
-        # * tracked fields have changed
-        if results_count > 0:
-            previous_entry_json = json.dumps(old_indicator_values, cls=DjangoJSONEncoder)
-            new_entry_json = json.dumps(self.object.logged_fields, cls=DjangoJSONEncoder)
-            if new_entry_json != previous_entry_json:
-                if rationale == '':
-                    # front end validation was bypassed?
-                    # raise exception here instead of returning an HttpResponse to rollback DB transaction
-                    raise Exception('rationale string missing on indicator form')
+        # refresh the periodic targets form such that pkids of new PeriodicTargets are submitted in the future
+        content = render_to_string('indicators/indicatortargets.html', {
+            'indicator': self.object,
+            'periodic_targets': PeriodicTarget.objects.filter(indicator=self.object).annotate(num_data=Count('result'))
+        })
 
-                ProgramAuditLog.log_indicator_updated(
-                    self.request.user,
-                    self.object,
-                    old_indicator_values,
-                    self.object.logged_fields,
-                    rationale
-                )
+        return JsonResponse({
+            'content': content,
+            'title_str': self._form_title_display_str,
+            'subtitle_str': self._form_subtitle_display_str,
+            'save_success_msg': self._save_success_msg(
+                self.object,
+                created=False,
+                level_changed=(self.object.level != prev_level)
+            ),
+        })
 
-        # fetch all existing periodic_targets for this indicator
-        periodic_targets = PeriodicTarget.objects.filter(indicator=indicatr) \
-            .annotate(num_data=Count('result')) \
-            .order_by('customsort', 'create_date', 'period')
-
-        if self.request.is_ajax():
-            indicatorjson = serializers.serialize('json', [self.object])
-            # pts = FlatJsonSerializer().serialize(periodic_targets)
-
-            try:
-                last_targetperiod_enddate = indicatr.periodictargets.aggregate(lastpt=Max('end_date'))['lastpt']
-                if program.reporting_period_end > last_targetperiod_enddate:
-                    remove_missing_targts_link = False
-                else:
-                    remove_missing_targts_link = True
-            except TypeError:
-                remove_missing_targts_link = True
-
-            if generatedTargets:
-                params = {'indicator': self.object, 'periodic_targets': generatedTargets}
-                content = render_to_string('indicators/indicatortargets.html', params)
-            else:
-                params = {'indicator': self.object, 'periodic_targets': periodic_targets}
-                content = render_to_string('indicators/indicatortargets.html', params)
-
-            targets_sum = self.get_context_data().get('targets_sum')
-            if targets_sum is None:
-                targets_sum = "0"
-
-            targets_avg = self.get_context_data().get('targets_avg')
-            if targets_avg is None:
-                targets_avg = "0"
-
-            data = {
-                "indicatorjson": str(indicatorjson),
-                "targets_sum": str(targets_sum),
-                "targets_avg": str(targets_avg),
-                "content": content,
-                "remove_missing_targts_link": remove_missing_targts_link
-            }
-            return HttpResponse(json.dumps(data))
-        else:
-            messages.success(self.request, _('Success, Indicator Updated!'))
-        return self.render_to_response(self.get_context_data(form=form))
 
 class IndicatorDelete(DeleteView):
     model = Indicator
@@ -468,7 +625,7 @@ class IndicatorDelete(DeleteView):
                     )
                 # otherwise the rationale is this default:
                 else:
-                    rationale = "Reason for change is not required when deleting an indicator with no linked results."
+                    rationale = _("Reason for change is not required when deleting an indicator with no linked results.")
             else:
                 rationale = request.POST.get('rationale')
             indicator_values = indicator.logged_fields
@@ -495,35 +652,11 @@ class IndicatorDelete(DeleteView):
 
 @method_decorator(login_required, name='dispatch')
 @method_decorator(indicator_adapter(has_indicator_write_access), name='dispatch')
-class PeriodicTargetView(View):
+class PeriodicTargetDeleteAllView(View):
     """
-    This view generates periodic targets or deleting them (via POST)
+    Delete all targets view
     """
     model = PeriodicTarget
-
-    def get(self, request, *args, **kwargs):
-        indicator = Indicator.objects.get(
-            pk=self.kwargs.get('indicator', None))
-
-        if request.GET.get('existingTargetsOnly'):
-            pts = FlatJsonSerializer().serialize(
-                indicator.periodictargets.all()
-                .order_by('customsort', 'create_date', 'period'))
-
-            return HttpResponse(pts)
-        try:
-            numTargets = int(request.GET.get('numTargets', None))
-        except Exception:
-            numTargets = PeriodicTarget.objects.filter(
-                indicator=indicator).count() + 1
-
-        pt_generated = generate_periodic_target_single(
-            indicator.target_frequency, indicator.target_frequency_start,
-            (numTargets - 1), ''
-        )
-
-        pt_generated_json = json.dumps(pt_generated, cls=DjangoJSONEncoder)
-        return HttpResponse(pt_generated_json)
 
     def post(self, request, *args, **kwargs):
         indicator = Indicator.objects.get(
@@ -537,37 +670,41 @@ class PeriodicTargetView(View):
                     status=400
                 )
             else:
-                rationale = 'No reason for change required.'
+                rationale = _('No reason for change required.')
 
-        deleteall = self.kwargs.get('deleteall', None)
-        if deleteall == 'true':
-            periodic_targets = PeriodicTarget.objects.filter(
-                indicator=indicator)
+        periodic_targets = PeriodicTarget.objects.filter(
+            indicator=indicator)
 
-            old = indicator.logged_fields
+        old = indicator.logged_fields
 
-            for pt in periodic_targets:
-                pt.result_set.all().update(periodic_target=None)
-                pt.delete()
-            indicator.target_frequency = None
-            indicator.target_frequency_num_periods = 1
-            indicator.target_frequency_start = None
-            indicator.target_frequency_custom = None
-            indicator.save()
-            ProgramAuditLog.log_indicator_updated(self.request.user, indicator, old, indicator.logged_fields, rationale)
+        for pt in periodic_targets:
+            pt.result_set.all().update(periodic_target=None)
+            pt.delete()
 
-        return HttpResponse('{"status": "success", \
-                            "message": "Request processed successfully!"}')
+        indicator.target_frequency = None
+        indicator.target_frequency_num_periods = 1
+        indicator.target_frequency_start = None
+        indicator.target_frequency_custom = None
+        indicator.lop_target = None  # since lop target is auto-calculated, unset it when PTs are destroyed
+        indicator.save()
+
+        ProgramAuditLog.log_indicator_updated(self.request.user, indicator, old, indicator.logged_fields, rationale)
+
+        return JsonResponse({"status": "success"})
 
 
 def reset_indicator_target_frequency(ind):
-    if ind.target_frequency and ind.target_frequency != 1 and not ind.periodictargets.count():
+    """
+    This thing exists due to how the indicator form used to work, which was way more
+    permissive in letting you save the target frequency without generating targets.
+    It mostly exists now to clean up indicators in a bad state whre the target frequency
+    is set but PT count is 0.
+    """
+    if ind.target_frequency is not None and ind.periodictargets.count() == 0:
         ind.target_frequency = None
         ind.target_frequency_start = None
         ind.target_frequency_num_periods = 1
         ind.save()
-        return True
-    return False
 
 
 @method_decorator(login_required, name='dispatch')
@@ -575,6 +712,8 @@ def reset_indicator_target_frequency(ind):
 class PeriodicTargetDeleteView(DeleteView):
     """
     url periodic_target_delete/<pk>
+
+    Deletes a single target - used only for deleting individual events currently
     """
     model = PeriodicTarget
 
@@ -593,14 +732,17 @@ class PeriodicTargetDeleteView(DeleteView):
                 self.get_object().result_set.all().update(
                     periodic_target=None)
         if not rationale and result_count == 0:
-            rationale = 'No reason for change required.'
+            rationale = _('No reason for change required.')
         self.get_object().delete()
         if indicator.periodictargets.count() == 0:
             indicator.target_frequency = None
             indicator.target_frequency_num_periods = 1
             indicator.target_frequency_start = None
             indicator.target_frequency_custom = None
-            indicator.save()
+
+        indicator.lop_target = indicator.calculated_lop_target
+        indicator.save()
+
         ProgramAuditLog.log_indicator_updated(
                 request.user,
                 indicator,
@@ -609,7 +751,6 @@ class PeriodicTargetDeleteView(DeleteView):
                 rationale
             )
 
-        indicator = None
         return JsonResponse({"status": "success"})
 
 
@@ -647,6 +788,10 @@ class ResultCreate(ResultFormMixin, CreateView):
         context['indicator'] = self.indicator
         context['custom_disaggregation_labels'] = custom_disaggregation_labels
         context['standard_disaggregation_labels'] = standard_disaggregation_labels
+        context['title_str'] = u'{}: {}'.format(
+            unicode(self.indicator.form_title_level),
+            unicode(self.indicator.name)
+        )
         return context
 
     def get_form_kwargs(self):
@@ -747,6 +892,10 @@ class ResultUpdate(ResultFormMixin, UpdateView):
         context['custom_disaggregation_values'] = custom_disaggregation_values
         context['standard_disaggregation_labels'] = standard_disaggregation_labels
         context['standard_disaggregation_values'] = standard_disaggregation_values
+        context['title_str'] = u'{}: {}'.format(
+            unicode(self.indicator.form_title_level),
+            unicode(self.indicator.name)
+        )
         return context
 
     def get_form_kwargs(self):
@@ -946,80 +1095,25 @@ def indicator_plan(request, program):
     program = get_object_or_404(Program, id=program)
 
     verify_program_access_level(request, program.id, 'low')
+    if program.results_framework and request.GET.get('orderby') == '2':
+        rows = ip.get_rf_rows(ip.tier_sorted_indicator_queryset(program.pk), program.pk)
+        ordering = 2
+    elif program.results_framework:
+        rows = ip.get_rf_rows(ip.chain_sorted_indicator_queryset(program.pk), program.pk)
+        ordering = 1
+    else:
+        rows = ip.get_non_rf_rows(ip.non_rf_indicator_queryset(program.pk))
+        ordering = False
 
-    indicators = ip.indicator_queryset(program.pk)
-
+    table_width = 4000 #pixels
     return render(request, "indicators/indicator_plan.html", {
         'program': program,
         'column_names': ip.column_names(),
-        'rows': [ip.row(i) for i in indicators]
+        'column_widths': ip.column_widths(1200),
+        'table_width': table_width,
+        'rows': rows,
+        'ordering': ordering
     })
-
-
-
-@login_required
-def old_program_page(request, program_id, indicator_id, indicator_type_id):
-    """ redirect for old /program/<program_id>/<indicator_id>/<indicator_type_id>/ urls to new program page url"""
-    program = get_object_or_404(Program, pk=program_id)
-    if indicator_id != 0 or indicator_type_id != 0:
-        logger.warn('attempt to access program page with filters indicator id {0} and indicator type id {1}'.format(
-            indicator_id, indicator_type_id))
-    return redirect(program.program_page_url, permanent=True)
-
-
-@method_decorator(login_required, name='dispatch')
-@method_decorator(has_program_read_access, name='dispatch')
-class ProgramPage(ListView):
-    model = Indicator
-    template_name = 'indicators/program_page.html'
-
-    def get(self, request, *args, **kwargs):
-        # countries = request.user.tola_user.countries.all()
-        program_id = int(self.kwargs['program'])
-        if request.user.is_anonymous:
-            return HttpResponseRedirect('/')
-        unannotated_program = Program.objects.only(
-            'reporting_period_start', 'reporting_period_end',
-            'start_date', 'end_date'
-            ).get(pk=program_id)
-        if unannotated_program.reporting_period_start is None or unannotated_program.reporting_period_end is None:
-            context = {
-                'program': unannotated_program,
-                'redirect_url': request.path
-            }
-            return render(
-                request, 'indicators/program_setup_incomplete.html', context
-                )
-        program = ProgramWithMetrics.program_page.get(pk=program_id)
-        program.indicator_filters = {}
-
-        indicators = program.annotated_indicators\
-            .annotate(target_period_last_end_date=Max('periodictargets__end_date')).select_related('level')
-        site_count = len(program.get_sites())
-
-        pinned_reports = list(program.pinned_reports.filter(tola_user=request.user.tola_user)) + \
-                         [PinnedReport.default_report(program.id)]
-
-        readonly = not request.has_write_access
-
-        js_context = {
-            'delete_pinned_report_url': str(reverse_lazy('delete_pinned_report')),
-            'program': ProgramSerializer(program).data,
-            'indicators': IndicatorSerializer(indicators, many=True).data,
-            'indicator_on_scope_margin': Indicator.ONSCOPE_MARGIN,
-            'readonly': readonly,  # controls "Add indicator" link
-        }
-
-        #program.set_metrics(indicators)
-        c_data = {
-            'program': program,
-            'site_count': site_count,
-            'percent_complete': program.percent_complete,
-            'pinned_reports': pinned_reports,
-            'js_context': js_context,
-            "readonly": readonly  # controls "Add sites" link, and Program period modal
-        }
-        return render(request, self.template_name, c_data)
 
 
 class DisaggregationReportMixin(object):
@@ -1159,8 +1253,13 @@ class IndicatorExport(View):
     Export all indicators to an XLS file
     """
     def get(self, request, *args, **kwargs):
-        queryset = ip.indicator_queryset(kwargs['program'])
-        wb = ip.create_workbook(queryset)
+        program = get_object_or_404(Program, pk=kwargs.get('program'))
+        if program.results_framework and request.GET.get('orderby') == '2':
+            wb = ip.create_rf_workbook(ip.tier_sorted_indicator_queryset(program.pk), program.pk)
+        elif program.results_framework:
+            wb = ip.create_rf_workbook(ip.chain_sorted_indicator_queryset(program.pk), program.pk)
+        else:
+            wb = ip.create_non_rf_workbook(ip.non_rf_indicator_queryset(program.pk))
 
         response = HttpResponse(content_type='application/ms-excel')
         response['Content-Disposition'] = 'attachment; filename="{}"'.format('indicator_plan.xlsx')
@@ -1182,3 +1281,21 @@ def api_indicator_view(request, indicator, program):
         .annotate(target_period_last_end_date=Max('periodictargets__end_date')).get(pk=indicator.pk)
 
     return JsonResponse(IndicatorSerializer(indicator).data)
+
+
+@login_required
+@has_program_read_access
+def api_indicators_list(request, program):
+    """
+    API call for refreshing a list of indicators on the program page
+    """
+    program = ProgramWithMetrics.program_page.get(pk=program)
+    program.indicator_filters = {}
+
+    indicators = program.annotated_indicators \
+        .annotate(target_period_last_end_date=Max('periodictargets__end_date')).select_related('level')
+
+    return JsonResponse({
+        # 'program': ProgramSerializer(program).data,
+        'indicators': IndicatorSerializer(indicators, many=True).data,
+    })

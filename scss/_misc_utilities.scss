@@ -18,6 +18,10 @@
     // ~20pt from a 16pt reference
     font-size: $font-size-lg;
 }
+.text-title-case {
+    //title case text (capitalize first letter of each word)
+    text-transform: capitalize;
+}
 
 
 // Color
@@ -77,4 +81,8 @@
 .float-right {
     // there MUST be a BS selector like this
     float: right;
+}
+
+.text-append-colon::after {
+    content: ":";
 }

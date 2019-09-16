@@ -414,7 +414,7 @@ export default class EditUserPrograms extends React.Component {
         return (
             <div className="tab-pane--react edit-user-programs">
                 <h2 className="no-bold">{user.name?user.name+': ':''}{gettext("Programs and Roles")}
-                <sup>   <a target="_blank" href="https://learn.mercycorps.org/site/tola/index.php/TOLA:Section_05/en#5.4_User_Roles_Matrix_.28Program_Permissions.29">
+                <sup>   <a target="_blank" href="https://learn.mercycorps.org/index.php/TOLA:Section_05/en#5.4_User_Roles_Matrix_.28Program_Permissions.29">
                         <i aria-label={gettext('More information on Program Roles')} className="far fa-question-circle" />
                 </a></sup></h2>
 

@@ -170,22 +170,12 @@
         const program_reporting_end = formatDate($(`#id_link_reporting_period_${programId}`).data("rptend"));
 
         if (setPeriodicTargetValue() == false) {
-            // $("#id_periodic_target").val('');
-            if ($("#id_periodic_target option").length <= 1) {
-                $("#hint_id_periodic_target").html("<small>{% trans 'Targets are not set up for this indicator.'|escapejs %} <a id='targetsTabLink' href='/indicators/indicator_update/" + $("#id_indicator").val() + "/'><strong>{% trans 'Start by selecting a target frequency.'|escapejs %}</strong></a></small>");
-            } else if ($("#id_date_collected").val().length > 0) {
-                $("#hint_id_periodic_target").html(`<small>{% trans 'This date falls outside the range of your target periods. Please select a date between '|escapejs %} ${ program_reporting_start } and ${ program_reporting_end } </small>`);
-            }
-
             $("#div_id_periodic_target").addClass('has-error');
         } else if ($("#id_periodic_target").val() == '' && onlyPeriodic == false) {
-            {# Translators: This is error message is triggered with midline/endline or event target frequencies when user tries to submit data without selecting a target period. #}
-            $("#hint_id_periodic_target").html("<small>{% trans 'Please select a target.'|escapejs %}</small>");
             $("#div_id_periodic_target").addClass('has-error');
             $("#id_periodic_target").addClass('is-invalid');
             return false;
         } else {
-            $("#hint_id_periodic_target").html("");
             $("#div_id_periodic_target").removeClass('has-error');
             $("#id_periodic_target").removeClass('is-invalid');
             return true;

@@ -257,10 +257,11 @@ a:hover {
 
 // reset button
 // use with .btn as per usual
-.btn-reset {
+// .btn-inverse is DEPRECATED in favor of .btn-reset
+.btn-reset, .btn-inverse {
     background-color: $white;
     color: $text-muted;
-    text-transform: uppercase;
+    //text-transform: uppercase;
     &:hover {
         color: darken($text-muted, 20%);
         background-color: $gray-300;
@@ -301,8 +302,20 @@ a:hover {
 }
 .indicator_results_toggle {
     display: block;
-    text-indent: -15px;
-    margin-left: 15px;
+    font-weight: normal;
+    margin-bottom: 0 !important;
+    margin-left: 22.5px;
+    margin-right: 0 !important;
+    margin-top: 0 !important;
+    padding: 0 !important;
+    text-indent: -22.5px;
+}
+
+.indicator_name {
+    word-break: break-word;
+    &:first-letter {
+        text-transform: uppercase;
+    }
 }
 
 // conditional styling to hide modal titles in nonmodal contexts.
@@ -349,3 +362,6 @@ a:hover {
     z-index: 20001 !important;
 }
 
+.pnotify--header svg {
+    margin-right: 5px;
+}

@@ -1,7 +1,7 @@
 import datetime
 
 from indicators.models import Indicator
-from indicators.views.views_indicators import (
+from indicators.views.view_utils import (
     generate_periodic_target_single,
     generate_periodic_targets
 )

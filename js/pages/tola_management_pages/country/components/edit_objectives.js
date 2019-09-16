@@ -69,7 +69,8 @@ class StrategicObjectiveForm extends React.Component {
             <div className="accordion-row__content">
                 <a onClick={expandAction} className="btn accordion-row__btn btn-link" tabIndex="0">
                     <FontAwesomeIcon icon={expanded ? 'caret-down' : 'caret-right'} />
-                    {(objective.id == 'new')? "New Strategic Objective" : objective.name}
+                    { /* # Translators: This is a section header for when a user is creating a new strategic objective for a country */ }
+                    {(objective.id == 'new')? gettext("New Strategic Objective") : objective.name}
                 </a>
                 { expanded && (
                     <form className="form card card-body bg-white">

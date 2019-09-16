@@ -33,11 +33,12 @@ class SortingTestsMixin(object):
         for c, pk in enumerate(self.expected):
             self.assertEqual(
                 metricsindicators[c].pk, pk,
-                "number {0} logframe type {1} logsort_a {2} logsort_b {3}".format(
+                "number {0} logframe type {1} logsort_a {2} logsort_b {3} sorted numbers {4}".format(
                     metricsindicators[c].number,
                     metricsindicators[c].logsort_type,
                     metricsindicators[c].logsort_a,
                     metricsindicators[c].logsort_b,
+                    [i.number for i in metricsindicators]
                 ))
 
     def test_metrics_indicator_queryset(self):
@@ -106,11 +107,19 @@ class TestLogframeSorting(test.TestCase, SortingTestsMixin):
     def setUp(self):
         program = w_factory.ProgramFactory()
         self.expected = []
-        for x in reversed(['1', '1.1', '1.1.1', '1.2', '2.1.2', '3', '3.2.1.1', '10.1']):
+        for x in reversed(['1', '1.1', '1.1.1', '1.2', '1.2.a', '1.2.b.', '1.4', '2.1.2', '3', '3.2.1.1', '10.1']):
             self.expected.append(get_indicator(x, program).id)
         self.expected = reversed(self.expected)
         self.program_id = program.id
 
+class TestMixedSorting(test.TestCase, SortingTestsMixin):
+    def setUp(self):
+        program = w_factory.ProgramFactory()
+        self.expected = []
+        for x in reversed(['1', '1.1.1', '2.1.2', '3', '3.2.1.1', '10.1', '1.1a', '1.1b', '1.2a']):
+            self.expected.append(get_indicator(x, program).id)
+        self.expected = reversed(self.expected)
+        self.program_id = program.id
 
 class TestQueryCounts(test.TestCase):
     def setUp(self):

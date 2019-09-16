@@ -1,29 +1,31 @@
-{% load i18n %}
+{% load i18n mytags %}
 {% if percent_met is not None %}
-    {% if has_ended %}
-        <span
-            tabindex="0"
-            aria-describedby="{% if on_track %}success{% else %}warning{% endif %}"
-            class="badge badge-{% if on_track %}success{% else %}warning{% endif %}-light"
-            data-toggle="popover"
-            data-placement="right"
-            data-trigger="focus"
-            data-content="
-            {% if on_track %}
-            <h4 class='badge badge-success-light'>On track</h4>
-            {% else %}
-            <h4 class='badge badge-warning-light'>Not on track</h4>
-            {% endif %}
-            {# Translators: Explains how performance is categorized as close to the target or not close to the target #}
-            {% blocktrans with percent_met=percent_met|floatformat:"1" %}
-            <p><strong>The actual value is {{ percent_met }}% of the target value.</strong> An indicator is on track if the result is no less than 85% of the target and no more than 115% of the target.</p>
-            <p><em>Remember to consider your direction of change when thinking about whether the indicator is on track.</em></p>
-            {% endblocktrans %}
-            "
-            >{{ percent_met|floatformat:'1' }}%</span>
-    {% else %}
-            <span class="badge">{{ percent_met|floatformat:'1' }}%</span>
-    {% endif %}
+    {% with percent_float=percent_met|floatformat:"-2" %}
+        {% if has_ended %}
+            <span
+                tabindex="0"
+                aria-describedby="{% if on_track %}success{% else %}warning{% endif %}"
+                class="badge badge-{% if on_track %}success{% else %}warning{% endif %}-light"
+                data-toggle="popover"
+                data-placement="right"
+                data-trigger="focus"
+                data-content="
+                {% if on_track %}
+                <h4 class='badge badge-success-light'>On track</h4>
+                {% else %}
+                <h4 class='badge badge-warning-light'>Not on track</h4>
+                {% endif %}
+                {# Translators: Explains how performance is categorized as close to the target or not close to the target #}
+                {% blocktrans with percent_met=percent_float|trailingzero %}
+                <p><strong>The actual value is {{ percent_met }}% of the target value.</strong> An indicator is on track if the result is no less than 85% of the target and no more than 115% of the target.</p>
+                <p><em>Remember to consider your direction of change when thinking about whether the indicator is on track.</em></p>
+                {% endblocktrans %}
+                "
+                >{{ percent_float|trailingzero }}%</span>
+        {% else %}
+                <span class="badge">{{ percent_float|trailingzero }}%</span>
+        {% endif %}
+    {% endwith %}
 {% else %}
     <span class="badge">N/A</span>
 {% endif %}

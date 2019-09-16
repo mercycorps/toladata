@@ -113,15 +113,36 @@
                             {% endblocktrans %}
                         </p>
                     {% else %}
-                        {# Translators: This message appears if users are trying to edit a program that isn't ready for viewing/editing. #}
-                        <p>{% trans "Your program administrator must initialize this program before you will be able to view or edit it" %}</p>
+                        {# Translators: A message telling the user why they can not access it due to the start and end date not being set. #}
+                        <p>{% trans "Before you can view this program, an administrator needs to set the program's start and end dates." %}</p>
                     {% endif %}
                 {% elif program.metrics.indicator_count == 0 %}
                     {% if has_high_role %}
-                        <h4>{% trans "No indicators have been entered for this program." %}</h4>
-                        <a href="{% url 'indicator_create' program.id %}" role="button" class="btn-link btn-add"><i class="fas fa-plus-circle"></i> {% trans "Add indicator" %}</a>
+
+                        {% if program.results_framework %}
+                            {# Using new RF levels, so need to create framework first #}
+
+                            <a href="{% url 'results_framework_builder' program.id %}">
+                            {% if program.levels.exists %}
+                                {# Translators: link users to the new results framework builder page when a level already exists #}
+                                {% trans 'Start adding indicators to your results framework.' %}
+                            {% else %}
+                                {# Translators: link users to the new results framework builder page - no levels currently exist #}
+                                {% trans 'Start building your results framework and adding indicators.' %}
+                            {% endif %}
+                            </a>
+
+                        {% else %}
+                            {# Using old style levels, so just allow indicator creation right away #}
+                            <h4>{% trans "No indicators have been entered for this program." %}</h4>
+                            <a href="#" role="button" data-add-indicator="{{ program.id }}" class="btn-link btn-add">
+                                <i class="fas fa-plus-circle"></i> {% trans "Add indicator" %}
+                            </a>
+                        {% endif %}
+
                     {% else %}
-                        <p>{% trans "Your program administrator must initialize this program before you will be able to view or edit it" %}</p>
+                        {# Translators: A message telling the user a program can not yet be accessed because indicators have not been created on it. #}
+                        <p>{% trans "No indicators have been entered for this program." %}</p>
                     {% endif %}
                 {% else %}
                     {% if program.metrics.targets_defined %}
@@ -165,5 +186,33 @@
 {% endif %}
 
 {% include "indicators/indicator_list_modals.html" %}
+{% include "indicators/indicator_form_common_js.html" %}
 
 {% endblock content %}
+
+
+
+{% block extra_js_in_body %}
+<script>
+    let reloadPage = false;
+
+    // Open indicator form modal if no RF and no indicators present on program
+    $("a[data-add-indicator]").click((e) => {
+        e.preventDefault();
+        let programId = $(e.target).data('addIndicator');
+        openCreateIndicatorFormModal({programId});
+    });
+
+    // when indicator creation modal form completes a save
+    $('#indicator_modal_div').on('created.tola.indicator.save', (e, params) => {
+        // Only set a bool instead of reloading to support "create and add another..." functionality
+        reloadPage = true;
+    });
+
+    $('#indicator_modal_div').on('hidden.bs.modal', (e) => {
+        if (reloadPage) {
+            location.reload(true);
+        }
+    });
+</script>
+{% endblock %}

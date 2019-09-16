@@ -6,7 +6,7 @@
 </script>
 
 <div class="results-table__wrapper">
-    <h3 class="is-shown-in-modals">
+    <h3 class="is-shown-in-modals indicator_name">
         {{ indicator.name }}
         <button
             type="button"
@@ -45,7 +45,9 @@
                 <td class="text-right">
                     <strong>
                         {% if indicator.lop_target_progress %}
-                            {{ indicator.lop_target_progress }}{% if indicator.unit_of_measure_type == 2 %}%{% endif %}
+                            {% with target_progress=indicator.lop_target_progress|floatformat:'-2' %}
+                                {{ target_progress|trailingzero }}{% if indicator.unit_of_measure_type == 2 %}%{% endif %}
+                            {% endwith %}
                         {% else %}
                             —
                         {% endif %}
@@ -54,7 +56,9 @@
                 <td class="text-right">
                     <strong>
                         {% if indicator.lop_actual_progress %}
-                            {{ indicator.lop_actual_progress }}{% if indicator.unit_of_measure_type == 2 %}%{% endif %}
+                            {% with actual_progress=indicator.lop_actual_progress|floatformat:'-2' %}
+                                {{ actual_progress |trailingzero }}{% if indicator.unit_of_measure_type == 2 %}%{% endif %}
+                            {% endwith %}
                         {% else %}
                             —
                         {% endif %}
@@ -156,16 +160,8 @@
         <tr>
             <td></td>
             <td></td>
-            <td class="text-right">
-                {% with achieved=result.achieved|floatformat:"-2" %}
-                    {% if indicator.unit_of_measure_type == 1 %}
-                        {{ achieved|trailingzero }}
-                    {% else %}
-                        {{ achieved|trailingzero }}%
-                    {% endif %}
-                {% endwith %}
-            </td>
-            <td class="text-right"></td>
+            <td></td>
+            <td></td>
             <td class="results__result--date bg-danger-lighter">
                 {% if is_editable is False %}
                     {{ result.date_collected|date:"MEDIUM_DATE_FORMAT"|default_if_none:"" }}
@@ -181,10 +177,15 @@
                     {% endwith %}
             </td>
             <td class="td--stretch">
-                {% if result.evidence %}
-                    {% if result.evidence.url %}<a href="{{result.evidence.url}}" target="_blank">{% endif %}
-                    {{ result.evidence|default_if_none:"" }}
-                    {% if result.evidence.url %}</a>{% endif %}
+                {% if result.evidence_url %}
+                    <a href="{{ result.evidence_url }}" target="_blank">
+                        {# this condition *should* test for strings that are all nonprinting i.e spaces or returns, as well as None or '' #}
+                        {% if result.record_name %}
+                            {{ result.record_name }}
+                        {% else %}
+                            {{ result.evidence_url }}
+                        {% endif %}
+                    </a>
                 {% endif %}
                 <div class="float-right">
                     {% if result.complete %}
@@ -219,17 +220,21 @@
             <td><strong>{% trans "Life of Program" %}</strong></td>
             <td class="text-right">
                 <strong>
-                    {% with lop=indicator.lop_target|floatformat:"-2" %}
+                    {% with lop=indicator.lop_target_active|floatformat:"-2" %}
                         {{ lop|trailingzero }}{% if indicator.unit_of_measure_type == 2 %}%{% endif %}
                     {% endwith %}
                 </strong>
             </td>
             <td class="text-right">
-                <strong>
-                    {% with actual=indicator.lop_actual|floatformat:"-2"  %}
+                {% with actual=indicator.lop_actual|floatformat:"-2"  %}
+                    {% if actual %}
+                        <strong>
                         {{ actual|trailingzero }}{% if indicator.unit_of_measure_type == 2 %}%{% endif %}
-                    {% endwith %}
-                </strong>
+                        </strong>
+                    {% else %}
+                        &mdash;
+                    {% endif %}
+                {% endwith %}
             </td>
             <td class="text-right">
                 {% target_percent_met indicator.lop_percent_met indicator.is_complete %}
@@ -261,7 +266,7 @@
             <span id="id_span_date_collected_error_msg" class="text-danger">
                 <small>
                     {% ifequal err 'Error_1' %}
-                        {% trans "Targets are not set up for this indicator." %} <strong><a href="{% url 'indicator_update' indicator.id %}" data-tab="#targets" class="indicator-link"> {% trans "Start by selecting a target frequency." %}</a></strong>
+                        {% trans "Targets are not set up for this indicator." %} <strong>
                     {% endifequal %}
 
                     {% ifequal err 'Error_2' %}

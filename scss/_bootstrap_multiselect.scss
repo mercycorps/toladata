@@ -146,6 +146,8 @@ span.multiselect-native-select select{
 }
 .multiselect.btn { // custom for Tola
     align-items: center;
+    background: $white;
+    border: 1px solid $gray-500;
     color: $gray-700;
     display: flex;
     font-weight: $font-weight-normal;
@@ -174,6 +176,7 @@ span.multiselect-native-select select{
     padding-right: 0.75rem;
 }
 .multiselect-selected-text {
+    height: 1.5rem; // ??
     overflow: hidden;
     white-space: normal;
 }

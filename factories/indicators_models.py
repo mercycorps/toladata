@@ -1,8 +1,20 @@
 from random import randint
+import itertools
 
+import datetime
 import faker
 from django.utils import timezone
-from factory import DjangoModelFactory, post_generation, SubFactory, lazy_attribute, Sequence
+from factory import (
+    Faker,
+    DjangoModelFactory,
+    post_generation,
+    SubFactory,
+    RelatedFactory,
+    SelfAttribute,
+    lazy_attribute,
+    Sequence,
+    Trait,
+)
 from factory.fuzzy import FuzzyChoice
 
 from indicators.models import (
@@ -13,6 +25,7 @@ from indicators.models import (
     Indicator as IndicatorM,
     IndicatorType as IndicatorTypeM,
     Level as LevelM,
+    LevelTier as LevelTierM,
     Objective as ObjectiveM,
     PeriodicTarget as PeriodicTargetM,
     StrategicObjective as StrategicObjectiveM,
@@ -49,6 +62,19 @@ class IndicatorFactory(DjangoModelFactory):
         model = IndicatorM
         django_get_or_create = ('name',)
 
+    class Params:
+        lop_indicator = Trait(
+            lop_target=1000,
+            target_frequency=IndicatorM.LOP,
+            periodic_target=RelatedFactory(
+                'factories.indicators_models.PeriodicTargetFactory',
+                'indicator',
+                target=1000,
+                start_date=SelfAttribute('indicator.program.reporting_period_start'),
+                end_date=SelfAttribute('indicator.program.reporting_period_end'),
+            )
+        )
+
     name = Sequence(lambda n: 'Indicator {0}'.format(n))
 
 
@@ -66,6 +92,84 @@ class DefinedIndicatorFactory(IndicatorFactory):
     data_collection_method = "some method of collecting data"
     data_collection_frequency = SubFactory('factories.indicators_models.DataCollectionFrequencyFactory')
 
+
+class RFIndicatorFactory(DjangoModelFactory):
+    class Meta:
+        model = IndicatorM
+
+    class Params:
+        asftargets = False
+
+    name = Faker('company')
+    target_frequency = IndicatorM.ANNUAL
+    lop_target = 1400
+
+    @post_generation
+    def targets(self, create, extracted, **kwargs):
+        if extracted and self.target_frequency:
+            period_generator = PeriodicTargetM.generate_for_frequency(self.target_frequency)
+            if self.program:
+                periods = period_generator(
+                    self.program.reporting_period_start, self.program.reporting_period_end
+                )
+            else:
+                periods = period_generator(
+                    datetime.date(2016, 1, 1), datetime.date(2018, 12, 31)
+                )
+            periods = list(periods)
+            if extracted == "incomplete":
+                if len(periods) > 1:
+                    periods = periods[0:-1]
+                    target_values = [self.lop_target/len(periods)]*len(periods)
+                else:
+                    periods = []
+                    target_values = []
+            elif isinstance(extracted, (int, float)):
+                target_values = [extracted/len(periods)]*len(periods)
+                if len(target_values) > 1:
+                    target_values[-1] = extracted - sum(target_values[0:-1])
+            elif self.lop_target:
+                target_values = [self.lop_target/len(periods)]*len(periods)
+                if len(target_values) > 1:
+                    target_values[-1] = self.lop_target - sum(target_values[0:-1])
+            else:
+                target_values = [None]*len(periods)
+            for period, target_value in zip(periods, target_values):
+                PeriodicTargetFactory(
+                    indicator=self,
+                    customsort=period['customsort'],
+                    target=target_value,
+                    start_date=period['start'],
+                    end_date=period['end']
+                )
+
+    @post_generation
+    def results(self, create, extracted, **kwargs):
+        if extracted:
+            targets = self.periodictargets.all()
+            count = kwargs.get('count', len(targets))
+            if kwargs.get('evidence', None) is True:
+                evidence = ["http://evidence.url"]*count
+            elif isinstance(kwargs.get('evidence', None), int):
+                evidence = ["http://evidence.url"]*kwargs.get('evidence') + [None]*(count - kwargs.get('evidence'))
+            else:
+                evidence = [None]*count
+            targets = itertools.islice(itertools.cycle(targets), 0, count)
+            if extracted is True:
+                achieveds = [10]*count
+            elif isinstance(extracted, (int, float)):
+                achieveds = [extracted/count]*count
+                achieveds[-1] = extracted - sum(achieveds[0:-1])
+            for target, achieved, evidence in zip(targets, achieveds, evidence):
+                ResultFactory(
+                    periodic_target=target,
+                    achieved=achieved,
+                    indicator=self,
+                    program=self.program,
+                    evidence_url=evidence,
+                    date_collected=target.start_date + datetime.timedelta(days=1)
+                )
+
 class Objective(DjangoModelFactory):
     class Meta:
         model = ObjectiveM
@@ -78,6 +182,28 @@ class LevelFactory(DjangoModelFactory):
         model = LevelM
 
     name = Sequence(lambda n: 'Level: {0}'.format(n))
+
+
+class LevelTierFactory(DjangoModelFactory):
+    class Meta:
+        model = LevelTierM
+
+    class Params:
+        mc_template = Trait(
+            name=Sequence(
+                lambda n: LevelTierM.get_templates()['mc_standard']['tiers'][n]
+            )
+        )
+
+    name = Sequence(lambda n: 'LevelTier: {0}'.format(n))
+    tier_depth = Sequence(lambda n: n+1)
+
+    @classmethod
+    def build_mc_template(cls, program):
+        return [
+            cls(program=program, name=name, tier_depth=count+1)
+            for count, name in enumerate(LevelTierM.get_templates()['mc_standard']['tiers'])
+            ]
 
 
 class ResultFactory(DjangoModelFactory):

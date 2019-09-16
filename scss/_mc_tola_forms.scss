@@ -83,3 +83,22 @@ input[type=number]::-webkit-outer-spin-button {
         margin-bottom: 0;
     }
 }
+
+//reskin react-select modals to match bootstrap selects
+.tola-react-select {
+    width: 100%;
+    color: $black;
+}
+
+
+.tola-react-multiselect-row > div {
+    width: 100%;
+    color: $black;
+    button {
+        width: 100%;
+    }
+    > div {
+        width: 100%;
+    }
+}
+

@@ -130,7 +130,7 @@
         </button>
       </div>
       <div class="col pl-2">
-        <button type="reset" class="btn btn-block btn-inverse">
+        <button type="reset" class="btn btn-block btn-reset">
           {% trans "Reset" %}
         </button>
       </div>
@@ -138,7 +138,7 @@
     <div id="filter-extra" class=" d-flex justify-content-between no-gutters p-3">
         <a href="{% url 'tola_management_audit_log' program_id=program.id %}"
            class="btn-link">
-              <i class="fas fa-history"></i> {% trans "Change log" %} 
+              <i class="fas fa-history"></i> {% trans "Change log" %}
         </a>
     </div>
   </form>
@@ -163,7 +163,7 @@
     const start_period = $(`#${start_period_id}`);
     const end_period_id = `{{ form.end_period.auto_id }}`;
     const end_period = $(`#${end_period_id}`);
-    
+
     // this string is translated in title case but should be sentence case, doing so manually:
     var noneSelected = gettext('None Selected').toLowerCase();
     noneSelected = noneSelected.charAt(0).toUpperCase() + noneSelected.slice(1);
@@ -174,7 +174,7 @@
       enableCaseInsensitiveFiltering: true,
       numberDisplayed: 1,
       maxHeight: 320,
-      buttonClass: 'btn form-control',
+      buttonClass: 'btn btn-light form-control',
       templates: {
         filter: '<li class="multiselect-item filter"><div class="input-group"><input class="form-control multiselect-search" type="text"></div></li>',
         filterClearBtn: '<span class="input-group-btn"><button class="btn btn-default multiselect-clear-filter" type="button"><i class="fas fa-times-circle"></i></button></span>',

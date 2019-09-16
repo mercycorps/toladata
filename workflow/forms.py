@@ -302,7 +302,7 @@ class ProjectAgreementForm(forms.ModelForm):
                                             {% for item in getQuantitative %}
                                                 {% ifchanged item.indicator.id %}
                                                     <tr>
-                                                        <td><a href="/indicators/indicator_update/{{ item.indicator_id }}">{{ item.indicator}}<a/></td>
+                                                        <td><a href="/program/{{ item.indicator.program_id }}/#/indicator/{{ item.indicator_id }}/" target="_blank">{{ item.indicator}}<a/></td>
                                                     </tr>
                                                 {% endifchanged %}
                                             {% endfor %}
@@ -936,7 +936,7 @@ class ProjectCompleteForm(forms.ModelForm):
                                         {% for item in getQuantitative %}
                                             {% ifchanged item.indicator.id %}
                                                 <tr>
-                                                    <td><a href="/indicators/indicator_update/{{ item.indicator_id }}">{{ item.indicator}}<a/></td>
+                                                    <td><a href="/program/{{ item.indicator.program_id }}/#/indicator/{{ item.indicator_id }}/" target="_blank">{{ item.indicator}}<a/></td>
                                                 </tr>
                                             {% endifchanged %}
                                         {% endfor %}
@@ -1190,7 +1190,7 @@ class ProjectCompleteSimpleForm(forms.ModelForm):
                                             {% for item in getQuantitative %}
                                                 {% ifchanged item.indicator.id %}
                                                     <tr>
-                                                        <td><a href="/indicators/indicator_update/{{ item.indicator_id }}">{{ item.indicator}}<a/></td>
+                                                        <td><a href="/program/{{ item.indicator.program_id }}/#/indicator/{{ item.indicator_id }}/" target="_blank">{{ item.indicator}}<a/></td>
                                                     </tr>
                                                 {% endifchanged %}
                                             {% endfor %}
@@ -1463,7 +1463,7 @@ class DocumentationForm(forms.ModelForm):
 
             FormActions(
                 Submit('submit', 'Save', css_class='btn-primary'),
-                Reset('reset', 'Reset', css_class='btn-inverse')
+                Reset('reset', 'Reset', css_class='btn-reset')
             )
         )
 
@@ -1476,7 +1476,7 @@ class DocumentationForm(forms.ModelForm):
             Q(program_id__in=self.request.user.tola_user.programaccess_set.filter(role='high').values('program_id'))
             | Q(program_id__in=self.request.user.tola_user.programaccess_set.filter(role='medium').values('program_id'))
         )
-        self.fields['program'].queryset = Program.active_programs.filter(
+        self.fields['program'].queryset = Program.rf_aware_objects.filter(
             Q(id__in=self.request.user.tola_user.programaccess_set.filter(role='high').values('program_id'))
             | Q(id__in=self.request.user.tola_user.programaccess_set.filter(role='medium').values('program_id'))
         ).distinct()

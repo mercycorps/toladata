@@ -1,0 +1,35 @@
+$logframe-table-padding: 3px;
+
+.logframe__header {
+}
+.logframe__subheader {
+    display: flex;
+    justify-content: space-between;
+    align-items: flex-end;
+}
+.inline-select {
+    display: flex;
+    flex-wrap: nowrap;
+    label {
+        flex-shrink: 0;
+    }
+}
+.logframe__table {
+    margin-top: 10px;
+}
+.logframe__table__header {
+    // background-color: $table-head-bg;
+}
+.logframe__cell--level {
+    background-color: $gray-200;
+    font-weight: bold;
+}
+.logframe__level-set {
+    border-bottom: 2px solid $gray-400;
+    &:last-child {
+        border-bottom: none;
+    }
+}
+.logframe__cell--indicator {}
+.logframe__cell--means {}
+.logframe__cell--assumptions {}

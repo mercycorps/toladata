@@ -4,6 +4,18 @@
     margin-bottom: $grid-gutter-width/2;
     margin-top: $grid-gutter-width/2;
 }
+.list__filters--block-label {
+    align-items: flex-start;
+    display: flex;
+    flex-direction: row;
+    .form-group { // overloads a BS class
+        flex-basis: 100%;
+        margin-left: $grid-gutter-width/4;
+        &:first-child {
+            margin-left: 0;
+        }
+    }
+}
 .list__filters--inline-label {
     align-items: center;
     display: flex;

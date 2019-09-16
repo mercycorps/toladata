@@ -18,7 +18,7 @@ db_name="tola_activity"
 
 
 backup_path="$HOME/sqlbackups"
-date=$(date +"%d-%b-%Y")
+date=$(date +"%Y-%m-%d")
 
 restore=0
 backup=0
@@ -82,6 +82,7 @@ if [ $backup -eq 1 ]
 then
     echo "backing db $backup"
     #mysqldump --user=$user --password=$password --host=$host $db_name > $backup_path/$db_name-$date.sql
+    #mysqldump --user=$user --password --host=$host $db_name > $backup_path/$host-$db_name-$date.sql
     mysqldump --user=$user --password --host=$host $db_name > $backup_path/$host-$db_name-$date.sql
 else
     echo "NOT backingup db at $host"
@@ -91,10 +92,10 @@ sleep 0.5
 # if resetdb variable is not empty
 if [ ! -z "$resetdb" ]
 then
-    echo "dropping db at localhost"
-    mysql -h localhost -u $user -p mysql --password <<< "drop database $db_name"
-    echo "creating db at localhost"
-    mysql -h localhost -u $user -p mysql --password <<< "create database $db_name CHARACTER SET utf8 COLLATE utf8_general_ci"
+    echo "dropping db $db_name at localhost"
+    mysql -h localhost -u $user -p <<< "drop database $db_name"
+    echo "creating db $db_name at localhost"
+    mysql -h localhost -u $user -p <<< "create database $db_name CHARACTER SET utf8 COLLATE utf8_general_ci"
 fi
 
 sleep 1
@@ -102,9 +103,23 @@ sleep 1
 # if file2restore variable is not empty
 if [ ! -z "$file2restore" ]
 then
-    echo "Restoring $file2restore"
+
+    # uncompress the file if needed
+    import_file=$file2restore
+    if [[ $backup_path/$file2restore =~ \.gz$ ]]; then
+        gunzip $backup_path/$file2restore
+        import_file=${file2restore:0:(${#file2restore}-3)}
+    fi
+
     # restore the database
-    mysql -h localhost -u $user -p "$db_name" < "$backup_path/$file2restore"
+    echo "Restoring $file2restore"
+    mysql -h localhost -u $user -p "$db_name" < "$backup_path/$import_file"
+
+    # recompress the file if needed
+    if [ ${import_file} != $file2restore ]; then
+        gzip $backup_path/$import_file
+    fi
+
 fi
 
 sleep 0.5

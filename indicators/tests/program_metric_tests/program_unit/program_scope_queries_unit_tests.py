@@ -65,8 +65,15 @@ class TestProgramReportingingCounts (test.TransactionTestCase):
         lop_indicator.is_cumulative = False
         lop_indicator.unit_of_measure_type = Indicator.NUMBER
         lop_indicator.save()
+        lop_pt = i_factories.PeriodicTargetFactory(
+            indicator=lop_indicator,
+            target=lop_indicator.lop_target,
+            start_date=lop_indicator.program.reporting_period_start,
+            end_date=lop_indicator.program.reporting_period_end
+        )
         lop_data = self.get_base_data(lop_indicator)
         lop_data.achieved = 10000
+        lop_data.periodic_target = lop_pt
         lop_data.save()
         self.data.append(lop_data)
         # semi annual indicator with target and valid data
@@ -135,8 +142,15 @@ class TestProgramReportingingCounts (test.TransactionTestCase):
         lop_indicator.is_cumulative = False
         lop_indicator.lop_target = 100
         lop_indicator.save()
+        lop_pt = i_factories.PeriodicTargetFactory(
+            indicator=lop_indicator,
+            target=lop_indicator.lop_target,
+            start_date=lop_indicator.program.reporting_period_start,
+            end_date=lop_indicator.program.reporting_period_end
+        )
         lop_data = self.get_base_data(lop_indicator)
-        lop_data.achieved = 120
+        lop_data.achieved = 125
+        lop_data.periodic_target = lop_pt
         lop_data.save()
         self.data.append(lop_data)
         # negative direction of change so under data should show as over target
@@ -145,8 +159,15 @@ class TestProgramReportingingCounts (test.TransactionTestCase):
         neg_indicator.direction_of_change = Indicator.DIRECTION_OF_CHANGE_NEGATIVE
         neg_indicator.lop_target = 800
         neg_indicator.save()
+        neg_pt = i_factories.PeriodicTargetFactory(
+            indicator=neg_indicator,
+            target=neg_indicator.lop_target,
+            start_date=neg_indicator.program.reporting_period_start,
+            end_date=neg_indicator.program.reporting_period_end
+        )
         neg_data = self.get_base_data(neg_indicator)
         neg_data.achieved = 600
+        neg_data.periodic_target = neg_pt
         neg_data.save()
         self.data.append(neg_data)
         # mid end indicator _cumulative_ should check against end target only

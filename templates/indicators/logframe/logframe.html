@@ -1,0 +1,20 @@
+{% extends "base.html" %}
+{% load i18n %}
+{% load mytags %}
+{% load render_bundle from webpack_loader %}
+{% block title %}{% trans "Logframe" %}{% endblock %}
+{% block mainclasses %}region--full-width{% endblock %}
+
+{% block content %}
+
+{% endblock content %}
+
+
+{% block extra_js_in_body %}
+
+  <script>
+    let jsContext = {{ js_context|js }};
+  </script>
+  {% render_bundle 'logframe' %}
+
+{% endblock %}

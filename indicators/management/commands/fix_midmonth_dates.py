@@ -65,7 +65,7 @@ class Command(BaseCommand):
         periodic_targets = PeriodicTarget.objects \
             .filter(
                 indicator__program__id__in=affected_program_ids,
-                indicator__target_frequency__in=Indicator.TIME_AWARE_TARGET_FREQUENCIES,
+                indicator__target_frequency__in=Indicator.REGULAR_TARGET_FREQUENCIES,
             )\
             .order_by('end_date')
 

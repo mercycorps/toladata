@@ -4,7 +4,7 @@
 
 #sidebar {
     flex-basis: 1;
-    overflow: hidden;
+    // (commenting out while working on react)overflow: hidden;
     z-index: 3;
     .list-group {
         min-width: 400px;
@@ -192,10 +192,18 @@
 }
 
 #filter-bottom {
-    background-color: $gray-600 !important; // was: #808080!important;
+    //background-color: $gray-600 !important; // was: #808080!important;
+    background-color: $gray-300; //moved from above per github-1302
     color: $white;
     font-size: smaller;
-    padding-top: 10px;
+    padding-top: 0rem;
+    padding-left: 0.6rem;
+    padding-right: 0.6rem;
+    padding-bottom: 1rem;
+    .btn-reset {
+        text-transform: uppercase;
+        padding: 0.5rem;
+    }
 }
 
 #id_iptt_report_filter {

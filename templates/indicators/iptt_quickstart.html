@@ -1,257 +1,66 @@
 {% extends "base.html" %}
-{% load widget_tweaks %}
-{% load i18n %}
+{% load render_bundle from webpack_loader %}
+{% load i18n mytags %}
 {% block title %}{% trans "Indicator Performance Tracking Table" %} | {% endblock %}
 {% block page_title %}{% trans "Indicator Performance Tracking Table" %}{% endblock %}
 
 {% block content %}
-    <div id="id_div_top_quickstart_iptt" >
-        <div class="row">
-            <div class="col-sm-6">
-              <div class="card">
-                    <div class="card-body">
-                        <h5 class="card-title">{% trans "Periodic targets vs. actuals" %}</h5>
-                        <p class="card-subtitle text-muted mb-2">{% trans "View results organized by target period for indicators that share the same target frequency." %}</p>
-                        <form
-                            action="{% url 'iptt_quickstart' %}"
-                            id="id_form_program_target_overview"
-                            method="post"
-                            novalidate>
-                            {% csrf_token %}
-                            {% for hidden_field in form2.hidden_fields %}
-                                {{ hidden_field }}
-                            {% endfor %}
-
-                            <div class="form-group" id="div_id_targets_program">
-                                <label for="{{ form2.program.id_for_label }}" class="col-form-label text-uppercase">
-                                    {{ form2.program.label }}
-                                </label>
-                                {% render_field form2.program class+="form-control" %}
-                            </div>
-
-                            <div class="form-group pt-4" id="div_id_targetperiods">
-                                <label for="{{ form2.targetperiods.id_for_label }}" class="col-form-label text-uppercase">
-                                    {{ form2.targetperiods.label }}
-                                </label>
-                                {% render_field form2.targetperiods class+="form-control" %}
-                            </div>
-
-                            <div class="form-group d-lg-flex pb-4">
-                                {% for item in form2.timeframe %}
-                                    {% with id=form2.timeframe.auto_id %}
-                                        <div class="form-check form-check-inline py-1
-                                            {% if forloop.counter0 == 0 %}pr-2{% endif %}
-                                            "
-                                             id="div_{{ id }}_{{ forloop.counter0 }}">
-                                            <span class="form-check-input ">
-                                                {{ item.tag }}
-                                            </span>
-                                            <label class="form-check-label"
-                                                   for="{{ item.id_for_label }}">
-                                               {{ item.choice_label }}
-                                           </label>
-                                        </div>
-                                    {% endwith %}
-                                {% endfor %}
-                                <div id="id_div_target_numrecentperiods">
-                                    {% render_field form2.numrecentperiods class+="form-control" %}
-                                    <div id="id_validation_numrecent_targets" class="has-error"></div>
-                                </div>
-                            </div>
-                            <div class="d-flex justify-content-center mb-1">
-                                <button
-                                    type="submit"
-                                    id="id_submit_targetperiods_button"
-                                    class="btn btn-primary"
-                                    disabled
-                                    style="width:100%;">{% trans "View Report" %}</button>
-                            </div>
-                        </form>
+<div id="id_div_top_quickstart_iptt" >
+    
+</div>
+        {% comment %}
+        <div class="col-sm-6">
+            <div class="card">
+                <div class="card-body">
+                    <h5 class="card-title">{% trans "Periodic targets vs. actuals" %}</h5>
+                    <p class="card-subtitle text-muted mb-2">{% trans "View results organized by target period for indicators that share the same target frequency." %}</p>
+                    <div class="form-group">
+                        <label for="tva-form-program-select" class="col-form-label text-uppercase">
+                            {% trans "Program" %}
+                        </label>
+                        <div id="quickstart-tva-form-program-select-react"></div>
                     </div>
-                </div>
-
-
-            </div> <!-- end of col-sm-6 -->
-            <div class="col-sm-6">
-                <div class="card">
-                    <div class="card-body">
-                        <h5 class="card-title">{% trans "Recent progress for all indicators" %}</h5>
-                        <p class="card-subtitle text-muted mb-2">{% trans "View the most recent two months of results. (You can customize your time periods.) This report does not include periodic targets." %}</p>
-                        <form
-                            action="{% url 'iptt_quickstart' %}"
-                            id="id_form_program_indicator_overview"
-                            method="post"
-                            novalidate>
-                            {% csrf_token %}
-                            {% for hidden_field in form.hidden_fields %}
-                                {{ hidden_field }}
-                            {% endfor %}
-                            <div class="form-group" id="divid_timeperiods_program">
-                                <label for="id_program" class="col-form-label text-uppercase">
-                                    {{ form.program.label }}
-                                </label>
-                                {% render_field form.program class+="form-control" %}
-                            </div>
-
-                            <div class="d-flex justify-content-center mb-1">
-                                <button
-                                    type="submit"
-                                    id="id_submit_timeperiods_button"
-                                    class="btn btn-primary"
-                                    disabled
-                                    style="width:100%;">{% trans "View Report" %}</button>
-                            </div>
-
-                            <div class="form-group invisible" id="div_id_timeperiods">
-                                <label for="id_timeperiods" class="col-form-label">
-                                    {{ form.timeperiods.label }}
-                                </label>
-                                {% render_field form.timeperiods class+="form-control" %}
-                            </div>
-
-                            <div class="form-group d-flex invisible">
-                              {% for item in form.timeframe %}
-                                  {% with id=form.timeframe.auto_id %}
-                                      <div class="form-check form-check-inline pt-1"
-                                            id="div_{{ id }}_{{ forloop.counter0 }}">
-                                          <span class="form-check-input ">
-                                              {{ item.tag }}
-                                          </span>
-                                          <label class="form-check-label"
-                                                  for="{{ item.id_for_label }}">
-                                              {{ item.choice_label }}
-                                          </label>
-                                      </div>
-                                  {% endwith %}
-                                {% endfor %}
-                                <div id="id_div_timeperiods_numrecentperiods">
-                                    {% render_field form.numrecentperiods class+="form-control" %}
-                                    <div id="id_validation_numrecent_timeperiods" class="has-error"></div>
-                                </div>
-                            </div>
-
-                        </form>
+                    <div class="form-group pt-4">
+                        <label for="tva-form-targetperiod-select" class="col-form-label text-uppercase">
+                            {% trans "Target periods" %}
+                        </label>
+                        <div id="quickstart-tva-form-period-select-react"></div>
                     </div>
+                    <div class="form-group d-lg-flex pb-4">
+                        <div id="quickstart-tva-form-show-all-react"></div>
+                        <div id="quickstart-tva-most-recent-check-react"></div>
+                        <div id="quickstart-tva-most-recent-count-react"></div>
+                    </div>
+                    <div class="d-flex justify-content-center mb-1" id="quickstart-tva-submit-button-react"></div>
                 </div>
-            </div> <!-- end of col-sm-6-->
+            </div>
+        </div>
+        <div class="col-sm-6">
+            <div class="card">
+                <div class="card-body">
+                    <h5 class="card-title">{% trans "Recent progress for all indicators" %}</h5>
+                    <p class="card-subtitle text-muted mb-2">{% trans "View the most recent two months of results. (You can customize your time periods.) This report does not include periodic targets." %}</p>
+                    <div class="form-group">
+                        <label for="tva-form-program-select" class="col-form-label text-uppercase">
+                            {% trans "Program" %}
+                        </label>
+                        <div id="quickstart-timeperiods-form-program-select-react"></div>
+                    </div>
+                    <div class="d-flex justify-content-center mb-1" id="quickstart-timeperiods-submit-button-react"></div>
+                </div>
+            </div>
         </div>
     </div>
-
-    <script type="text/javascript">
-        $(document).ready(function() {
-            const submitBtnTimeperiods = $("#id_submit_timeperiods_button");
-            const programTimeperiods = $("#id_timeperiods-program");
-            const timeperiods = $("#id_timeperiods-timeperiods");
-            const mostRecentTimeperiods = $("#id_timeperiods-timeframe_1");
-            const numRecentPeriods = $("#id_timeperiods-numrecentperiods");
-            programTimeperiods.select2();
-
-            // when form is first loaded disable the submit btn
-            submitBtnTimeperiods.attr("disabled", true);
-
-            // when form is first loaded, initialize controls on the form
-            mostRecentTimeperiods.attr("checked", true);
-
-            // every time a select input changes, lock / unlock fields
-            function updateSubmitBtnTimeperiodsState() {
-                if (programTimeperiods.val() > 0 ) {
-                    submitBtnTimeperiods.attr("disabled", false);
-                } else {
-                    submitBtnTimeperiods.attr("disabled", true);
-                }
-            }
-
-            updateSubmitBtnTimeperiodsState(); // handle initial load state
-
-            $("#id_form_program_indicator_overview").on("change", "select", updateSubmitBtnTimeperiodsState);
-
-            //// ........................................................
-            const submitBtnTargets = $("#id_submit_targetperiods_button");
-            const programTargets = $("#id_targetperiods-program");
-            const targetperiods = $("#id_targetperiods-targetperiods");
-            const allTargets = $("#id_targetperiods-timeframe_0");
-            const allTargetsDiv = $('#div_id_targetperiods-timeframe_0');
-            const mostRecentTargets = $("#id_targetperiods-timeframe_1");
-            const mostRecentTargetsDiv = $('#div_id_targetperiods-timeframe_1');
-            const numRecentPeriodsTargets = $("#id_targetperiods-numrecentperiods");
-            programTargets.select2();
-
-            function updateSubmitBtnTargetperiodsState() {
-                if (programTargets.val() > 0 && targetperiods.val() > 0) {
-                    submitBtnTargets.attr("disabled", false);
-                    allTargets.attr("disabled", false);
-                    allTargetsDiv.removeClass('form-check-inline--is-disabled');
-                    mostRecentTargets.attr("disabled", false);
-                    mostRecentTargetsDiv.removeClass('form-check-inline--is-disabled');
-                    numRecentPeriodsTargets.attr("disabled", false);
-                } else {
-                    submitBtnTargets.attr("disabled", true);
-                    allTargets.attr("disabled", true);
-                    allTargetsDiv.addClass('form-check-inline--is-disabled');
-                    mostRecentTargets.attr("disabled", true);
-                    mostRecentTargetsDiv.addClass('form-check-inline--is-disabled');
-                    numRecentPeriodsTargets.attr("disabled", true);
-                }
-            }
-
-            updateSubmitBtnTargetperiodsState(); // handle initial load state
-
-            // every time a select input changes, lock / unlock fields
-            $("#id_form_program_target_overview").on("change", "select", function(e) {
-                updateSubmitBtnTargetperiodsState();
-            });
-
-            // Clicking on the text box selects the associated radio button
-            // TODO: this only works once
-            numRecentPeriodsTargets.on('focus', function(e){
-                mostRecentTargets.prop('checked', true);
-                $("#id_validation_numrecent_targets").text("");
-            });
-
-            // everytime the radio buttons value changes, lock or unlock
-            allTargets.on("click", function(e) {
-                numRecentPeriodsTargets.val('');
-                $("#id_validation_numrecent_targets").text(""); // click on "show all" resets any error message on number of recent target periods text box
-            });
-
-            // when the program dropdown in the TvA form changes, update its periods options
-            function updateTargetPeriodDropdownOptions() {
-                const program_id = programTargets.val();
-
-                if (program_id) {
-                    $.getJSON(`/api/programtargetfrequencies/?program_id=${program_id}`, function (data) {
-                        targetperiods.empty();
-                        targetperiods.append($("<option></option>").attr("value", 0).text('---------'));
-                        $.each(data, function (index, option) {
-                            targetperiods.append($("<option></option>").attr("value", option.target_frequency).text(option.frequency_name));
-                        });
-
-                        targetperiods.attr("disabled", false);
-                    });
-                } else {
-                    targetperiods.attr("disabled", true);
-                }
-            }
-
-            updateTargetPeriodDropdownOptions(); // handle initial load state
-
-            $("#id_div_top_quickstart_iptt").on("change", "#id_targetperiods-program", updateTargetPeriodDropdownOptions);
-
-            $("#id_div_top_quickstart_iptt").on("submit", "#id_form_program_indicator_overview, #id_form_program_target_overview", function(e){
-                if (this.id == 'id_form_program_target_overview') {
-                    if (mostRecentTargets.prop('checked') == true && numRecentPeriodsTargets.val() == ''){
-                        e.preventDefault();
-                        $("#id_validation_numrecent_targets").text("{% trans 'Please complete this field.' %}");
-                        return;
-                    }
-                } else {
-                    if (numRecentPeriods.attr('disabled') == null && !numRecentPeriods.val()){
-                        e.preventDefault();
-                        $("#id_validation_numrecent_timeperiods").text("{% trans 'Please complete this field.' %}");
-                        return;
-                    }
-                }
-            });
-        });
-    </script>
+</div>
+{% endcomment %}
 {% endblock content %}
+
+
+
+{% block extra_js_in_body %}
+    <script>
+        let jsContext = {{ js_context|js }};
+    </script>
+
+    {% render_bundle 'iptt_quickstart' %}
+{% endblock %}

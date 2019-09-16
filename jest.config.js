@@ -141,7 +141,9 @@ module.exports = {
   // An array of regexp pattern strings that are matched against all test paths, matched tests are skipped
   testPathIgnorePatterns: [
     "/node_modules/",
-    "/test_helpers/"
+    "/test_helpers/",
+    "/bower_components/",
+    "/old__tests__/"
   ],
 
   // The regexp pattern Jest uses to detect test files

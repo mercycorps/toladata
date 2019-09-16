@@ -48,7 +48,7 @@
             const programField = $(`#${programFieldId}`);
             if (!programField.val()) {
                 programField.addClass('is-invalid');
-                $(`#validation_${programFieldId}`).text('{% trans "Please complete this field"|escapejs %}');
+                $(`#validation_${programFieldId}`).text('{% trans "Please complete this field."|escapejs %}');
                 return false;
             }
             programField.removeClass('is-invalid');
@@ -181,7 +181,7 @@
                     class="btn btn-primary"
                     id="id-submit">
             <input type="reset"
-                    class="btn btn-inverse"
+                    class="btn btn-reset"
                     value="{% trans "Reset" %}">
         </div>
     </form>

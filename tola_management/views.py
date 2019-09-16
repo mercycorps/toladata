@@ -295,7 +295,7 @@ def audit_log_host_page(request, program_id):
     json_context = json.dumps(js_context, cls=DjangoJSONEncoder)
     if not request.user.tola_user.available_programs.filter(id=program.id).exists():
         raise PermissionDenied
-    return render(request, 'react_app_base.html', {"bundle_name": "audit_log", "js_context": json_context, "report_wide": True, "page_title": program.name+" Audit Log | "})
+    return render(request, 'react_app_base.html', {"bundle_name": "audit_log", "js_context": json_context, "report_wide": True, "page_title": program.name+" audit log | "})
 
 
 class AuthUserSerializer(ModelSerializer):

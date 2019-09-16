@@ -307,7 +307,11 @@ window.notifyError = notifyError;
 
 $(document).ready(function() {
     $(document).on('hidden.bs.modal', '.modal', function () {
-        $('.modal:visible').length && $(document.body).addClass('modal-open');
+        if ($('.modal:visible').length) {
+            $(document.body).addClass('modal-open');
+        } else {
+            $(document.body).removeClass('modal-open');
+        }
     });
 });
 
@@ -339,17 +343,8 @@ const target_with_results_text = (numResults) => {
 }
 window.target_with_results_text = target_with_results_text;
 
-const lop_to_non_lop_with_results_text = (numResults) => {
-    return interpolate(
-        ngettext('If we make these changes, %s data record will no longer be associated with the Life of Program target, and will need to be reassigned to a new target.\n\n Proceed anyway?',
-                 'If we make these changes, %s data records will no longer be associated with the Life of Program target, and will need to be reassigned to new targets.\n\n Proceed anyway?',
-                 numResults),
-        [numResults]);
-}
-window.lop_to_non_lop_with_results_text = lop_to_non_lop_with_results_text;
 
 const create_changeset_notice = ({
-    message_text = DEFAULT_NONDESTRUCTIVE_MESSAGE,
     on_submit = () => {},
     on_cancel = () => {},
     // # Translators: Button to approve a form
@@ -374,8 +369,8 @@ const create_changeset_notice = ({
             'overlayClose': true,
             'dir1': 'right',
             'dir2': 'up',
-            'firstpos1': 0,
-            'firstpos2': 0,
+            'firstpos1': 20,
+            'firstpos2': 20,
             'context': context
         },
         modules: {
@@ -450,7 +445,6 @@ window.create_destructive_changeset_notice = ({
     message_text = DEFAULT_DESTRUCTIVE_MESSAGE,
     on_submit = () => {},
     on_cancel = () => {},
-    is_indicator = false,
     // # Translators: Button to approve a form
     confirm_text = gettext('Ok'),
     // # Translators: Button to cancel a form submission
@@ -486,7 +480,6 @@ window.create_destructive_changeset_notice = ({
         message_text: message_text,
         on_submit: on_submit,
         on_cancel: on_cancel,
-        is_indicator: is_indicator,
         confirm_text: confirm_text,
         cancel_text: cancel_text,
         type: 'error',
@@ -500,7 +493,6 @@ window.create_nondestructive_changeset_notice = ({
     message_text = DEFAULT_NONDESTRUCTIVE_MESSAGE,
     on_submit = () => {},
     on_cancel = () => {},
-    is_indicator = false,
     // # Translators: Button to approve a form
     confirm_text = gettext('Ok'),
     // # Translators: Button to cancel a form submission
@@ -531,7 +523,6 @@ window.create_nondestructive_changeset_notice = ({
         message_text: message_text,
         on_submit: on_submit,
         on_cancel: on_cancel,
-        is_indicator: is_indicator,
         confirm_text: confirm_text,
         cancel_text: cancel_text,
         type: 'notice',
@@ -544,20 +535,20 @@ window.create_no_rationale_changeset_notice = ({
     message_text = DEFAULT_NO_RATIONALE_TEXT,
     on_submit = () => {},
     on_cancel = () => {},
-    is_indicator = false,
     // # Translators: Button to approve a form
     confirm_text = gettext('Ok'),
     // # Translators: Button to cancel a form submission
     cancel_text = gettext('Cancel'),
     context = null,
-    preamble = false
+    type = 'error',
+    preamble = false,
 } = {}) => {
     if (!message_text) {message_text = DEFAULT_NO_RATIONALE_TEXT}
     if (!preamble) {preamble = gettext("This action cannot be undone.")};
     const inner = `
         <div class="row">
             <div class="col">
-                <h2><i class="fas fa-exclamation-triangle"></i>${gettext("Warning")}</h2>
+                <h2 class="pnotify--header"><i class="fas fa-exclamation-triangle"></i>${gettext("Warning")}</h2>
             </div>
         </div>
         <div class="row">
@@ -579,16 +570,70 @@ window.create_no_rationale_changeset_notice = ({
         message_text: message_text,
         on_submit: on_submit,
         on_cancel: on_cancel,
-        is_indicator: is_indicator,
         confirm_text: confirm_text,
         cancel_text: cancel_text,
-        type: 'error',
+        type: type,
         inner: inner,
         context: context,
         rationale_required: false,
         showCloser: true
         });
 }
+
+
+const createPnotifyAlert = (passedInConfig) => {
+    let config = {
+        textTrusted: true,
+        icon: false,
+        width: '350px',
+        hide: true,
+        delay: 2000,
+        type: 'alert',
+    };
+    Object.assign(config, passedInConfig);
+
+    let faClass = "fa-exclamation-triangle";
+    if (config.type == "success"){
+        faClass = "fa-check-circle";
+    }
+
+    const inner = `
+        <div class="row">
+            <div class="col">
+                <h2 class="pnotify--header"><i class="fas ${faClass}"></i>${gettext("Success!")}</h2>
+            </div>
+        </div>
+        <div class="row">
+            <div class="col">
+                <span class='text-success'>
+                    ${config.preamble}
+                </span>
+            </div>
+        </div>
+        <div class="row">
+            <div class="col">
+                <span>
+                    ${config.message_text}
+                </span>
+            </div>
+        </div>
+    `;
+
+    config.text = $(`<div><form action="" method="post" class="form container">${inner}</form></div>`).html();
+    PNotify.alert(config);
+};
+
+window.success_notice = (userConfig) =>{
+    let config = {
+        message_text: "Update successful.",
+        preamble: "",
+        animation: "fade",
+        type: "success",
+    }
+    Object.assign(config, userConfig);
+
+    createPnotifyAlert(config);
+};
 
 
 /*

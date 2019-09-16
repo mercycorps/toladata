@@ -42,8 +42,15 @@ class HomePageQueryStressTest(test.TestCase):
                     lop_target=100,
                     program=program
                 )
+                target = i_factories.PeriodicTargetFactory(
+                    indicator=indicator,
+                    target=indicator.lop_target,
+                    start_date=indicator.program.reporting_period_start,
+                    end_date=indicator.program.reporting_period_end
+                )
                 i_factories.ResultFactory(
                     indicator=indicator,
+                    periodic_target=target,
                     achieved=105
                 )
             for _ in range(5):
@@ -52,8 +59,15 @@ class HomePageQueryStressTest(test.TestCase):
                     lop_target=100,
                     program=program
                 )
+                target = i_factories.PeriodicTargetFactory(
+                    indicator=indicator,
+                    target=indicator.lop_target,
+                    start_date=indicator.program.reporting_period_start,
+                    end_date=indicator.program.reporting_period_end
+                )
                 i_factories.ResultFactory(
                     indicator=indicator,
+                    periodic_target=target,
                     achieved=50,
                     evidence_url='http://test_evidence_url'
                 )

@@ -412,8 +412,10 @@ def program_evidence_annotation():
     rs = Result.objects.filter(
         indicator__deleted__isnull=True,
         indicator__program_id=models.OuterRef('pk')
-    ).exclude(
-        evidence_url=''
+    ).filter(
+        models.Q(
+            models.Q(evidence_url__isnull=False) & ~models.Q(evidence_url='')
+            ) | models.Q(evidence_id__isnull=False)
     ).order_by().values('indicator__program').annotate(evidence_count=models.Count('pk')).values('evidence_count')[:1]
     return models.functions.Coalesce(
         models.Subquery(

@@ -36,6 +36,8 @@ DATABASES = app_settings['DATABASES']
 DEBUG = app_settings['DEBUG']
 # See: https://docs.djangoproject.com/en/dev/ref/settings/#template-debug
 
+TEMPLATES[0]['OPTIONS']['debug'] = app_settings['TEMPLATE_DEBUG']
+
 # EMAIL CONFIGURATION
 # See: https://docs.djangoproject.com/en/dev/ref/settings/#email-backend
 EMAIL_USE_TLS = app_settings['EMAIL_USE_TLS']
@@ -70,16 +72,24 @@ SOCIAL_AUTH_GOOGLE_OAUTH2_OKTA_DOMAINS = ["mercycorps.org"]
 # REPORT BUILDER FOR REPORT SERVER
 DEV_APPS = app_settings.get('DEV_APPS', None)
 
-LOCAL_APPS = (
-    # 'silk',
-)
+# silk only for testing locally:
+# LOCAL_APPS = (
+#    'silk',
+# )
+LOCAL_APPS = ()
 
 #INSTALLED_APPS = INSTALLED_APPS #+ tuple(DEV_APPS)
 INSTALLED_APPS = INSTALLED_APPS + LOCAL_APPS
 
-LOCAL_MIDDLEWARE = (
-    # 'silk.middleware.SilkyMiddleware',
-)
+# silk only for testing:
+# LOCAL_MIDDLEWARE = (
+#     'silk.middleware.SilkyMiddleware',
+# )
+LOCAL_MIDDLEWARE = ()
+
+MIDDLEWARE =  LOCAL_MIDDLEWARE + MIDDLEWARE
+# SILK_ENABLED = True
+# SILKY_PYTHON_PROFILER = True
 
 MIDDLEWARE =  LOCAL_MIDDLEWARE + MIDDLEWARE
 SILK_ENABLED = True

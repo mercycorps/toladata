@@ -4,18 +4,23 @@ import eventBus from '../../eventbus';
 import createRouter from 'router5';
 import browserPlugin from 'router5-plugin-browser';
 
-import {IndicatorList} from './components/indicator_list';
-import {ProgramMetrics} from './components/program_metrics';
-import {ProgramPageStore, ProgramPageUIStore, IndicatorFilterType} from './models';
+import IndicatorList from './components/indicator_list';
+import { ProgramMetrics } from './components/program_metrics';
+import ProgramPageRootStore from './models/programPageRootStore';
+import { reloadPageIfCached } from '../../general_utilities';
+import { IndicatorFilterType } from '../../constants';
 
-import './pinned_reports';
+import setupPinningDelete from './pinned_reports';
 
+if (reactContext.deletePinnedReportURL) {
+    setupPinningDelete(reactContext.deletePinnedReportURL);
+}
 
 /*
  * Model/Store setup
  */
-const rootStore = new ProgramPageStore(jsContext.indicators, jsContext.program);
-const uiStore = new ProgramPageUIStore();
+const rootStore = new ProgramPageRootStore(reactContext);
+const uiStore = rootStore.uiStore;
 
 
 /*
@@ -26,42 +31,13 @@ const uiStore = new ProgramPageUIStore();
 eventBus.on('open-indicator-update-modal', (indicatorId) => {
     // Note: depends on indicator_list_modals.html
 
-    let url = `/indicators/indicator_update/${indicatorId}/?modal=1`;
+    let url = `/indicators/indicator_update/${indicatorId}/`;
 
     $("#indicator_modal_content").empty();
     $("#modalmessages").empty();
 
     $("#indicator_modal_content").load(url);
     $("#indicator_modal_div").modal('show');
-});
-
-// get results html blob for indicator
-eventBus.on('load-indicator-results', (indicatorId) => {
-    if (!indicatorId) return;
-
-    let url = `/indicators/result_table/${indicatorId}/${rootStore.program.id}/`;
-
-    $.get(url, function (data) {
-        rootStore.addResultsHTML(indicatorId, data);
-    });
-});
-
-// delete (hide) results html blob for indicator
-eventBus.on('delete-indicator-results', (indicatorId) => {
-    rootStore.deleteResultsHTML(indicatorId);
-});
-
-// reload singular indicator json obj
-eventBus.on('reload-indicator', indicatorId => {
-    $.get(`/indicators/api/indicator/${indicatorId}`, rootStore.indicatorStore.updateIndicator);
-});
-
-// remove an indicator from the list
-eventBus.on('indicator-deleted', rootStore.indicatorStore.removeIndicator);
-
-// close all expanded indicators in the table
-eventBus.on('close-all-indicators', () => {
-    rootStore.deleteAllResultsHTML();
 });
 
 // Indicator filters are controlled through routes
@@ -78,19 +54,18 @@ eventBus.on('apply-gauge-tank-filter', indicatorFilter => {
 // clear all gas tank and indicator select filters
 eventBus.on('clear-all-indicator-filters', () => {
     uiStore.clearIndicatorFilter();
-    eventBus.emit('select-indicator-to-filter', null);
-    eventBus.emit('close-all-indicators');
+    rootStore.program.deleteAllResultsHTML();
 });
 
 // filter down by selecting individual indicator
-eventBus.on('select-indicator-to-filter', (selectedIndicatorId) => {
+eventBus.on('select-indicator-to-filter', (selectedIndicatorPk) => {
+    console.log("select indicator filter");
     // clear gauge tank filters
     uiStore.clearIndicatorFilter();
 
-    uiStore.setSelectedIndicatorId(selectedIndicatorId);
-
+    uiStore.setSelectedIndicatorId(selectedIndicatorPk);
     // Open up results pane as well
-    eventBus.emit('load-indicator-results', selectedIndicatorId);
+    rootStore.program.updateResultsHTML(selectedIndicatorPk);    
 });
 
 
@@ -98,12 +73,10 @@ eventBus.on('select-indicator-to-filter', (selectedIndicatorId) => {
  * React components on page
  */
 
-ReactDOM.render(<IndicatorList rootStore={rootStore} uiStore={uiStore} readonly={jsContext.readonly} />,
+ReactDOM.render(<IndicatorList rootStore={rootStore} uiStore={uiStore} />,
     document.querySelector('#indicator-list-react-component'));
 
-ReactDOM.render(<ProgramMetrics rootStore={rootStore}
-                                uiStore={uiStore}
-                                indicatorOnScopeMargin={jsContext.indicator_on_scope_margin} />,
+ReactDOM.render(<ProgramMetrics rootStore={rootStore} uiStore={uiStore} />,
     document.querySelector('#program-metrics-react-component'));
 
 
@@ -141,31 +114,34 @@ $("#indicator-list-react-component").on("click", ".indicator-link[data-tab]", fu
 
 });
 
-// when indicator update modal is closed, update targets
-$('#indicator_modal_div').on('hide.bs.modal', function (e) {
-    let form = $(this).find('form');
-    let form_action = form.attr('action').split('/');
-    let indicator_id = parseInt(form_action[form_action.length -2]);
-    // if this form has just successfully deleted this indicator, don't update it, remove it
-    if (form.attr('deleted') === 'true') {
-        eventBus.emit('indicator-deleted', indicator_id);
-    } else {
-        eventBus.emit('reload-indicator', indicator_id);
-        
-        if (rootStore.resultsMap.has(indicator_id)) {
-            eventBus.emit('load-indicator-results', indicator_id);
-        }
+// when indicator creation modal form completes a save
+$('#indicator_modal_div').on('created.tola.indicator.save', (e, params) => {
+    rootStore.program.updateIndicator(params.indicatorId);
+});
+
+// when indicator update modal form completes a save or change to periodic targets
+$('#indicator_modal_div').on('updated.tola.indicator.save', (e, params) => {
+    let indicatorId = params.indicatorId;
+
+    rootStore.program.updateIndicator(indicatorId);
+    if (rootStore.program.resultsMap.has(indicatorId)) {
+        rootStore.program.updateResultsHTML(indicatorId);
     }
+});
+
+// when indicator is deleted from modal
+$('#indicator_modal_div').on('deleted.tola.indicator.save', (e, params) => {
+    rootStore.program.deleteIndicator(params.indicatorId);
 });
 
 // When "add results" modal is closed, the targets data needs refreshing
 // the indicator itself also needs refreshing for the gas tank gauge
-$('#indicator_results_div').on('hide.bs.modal', function (e) {
+$('#indicator_results_div').on('hidden.bs.modal', function (e) {
     let recordchanged = $(this).find('form').data('recordchanged');
     if (recordchanged === true) {
         let indicator_id = $(this).find('form #id_indicator').val();
-        eventBus.emit('load-indicator-results', indicator_id);
-        eventBus.emit('reload-indicator', indicator_id);
+        rootStore.program.updateIndicator(indicatorPk);
+        rootStore.program.updateResultsHTML(indicator_id);
     }
 });
 
@@ -204,7 +180,7 @@ const onNavigation = (navRoutes) => {
     let routeObj = routes.find(r => r.name === routeName);
     eventBus.emit('apply-gauge-tank-filter', routeObj.filterType);
 };
-router.usePlugin(browserPlugin({useHash: true, base:'/program/'+jsContext.program.id+'/'}));
+router.usePlugin(browserPlugin({useHash: true, base:'/program/'+rootStore.program.pk+'/'}));
 router.subscribe(onNavigation);
 router.start();
 
@@ -226,17 +202,5 @@ eventBus.on('nav-select-indicator-to-filter', (selectedIndicatorId) => {
 });
 
 
-/*
- * Are we loading a cached page? If so, reload to avoid displaying stale indicator data
- * See ticket #1423
- */
-// moving the cache check to after page load as firefox calculates transfer size at the end
-$(function() {
-    let isCached = window.performance.getEntriesByType("navigation")[0].transferSize === 0;
-    //adding a second check to ensure that if for whatever reason teh transfersize reads wrong, we don't reload on
-    //a reload:
-    let isReload = window.performance.getEntriesByType("navigation")[0].type === "reload";
-    if (isCached && !isReload) {        
-        window.location.reload();
-    }
-});
+
+reloadPageIfCached();

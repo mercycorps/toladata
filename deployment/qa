@@ -1,8 +1,0 @@
-[localhost]
-localhost ansible_connection=local
-
-[app-servers]
-tola-qa
-
-[qa:children]
-app-servers

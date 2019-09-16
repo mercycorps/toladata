@@ -1,27 +1,32 @@
 # -*- coding: utf-8 -*-
+import re
+import collections
+import string
 import uuid
 from datetime import timedelta, date
 from decimal import Decimal
 
 import dateparser
-from dateutil.relativedelta import relativedelta
 from django.core.validators import MinValueValidator
+from django.core.exceptions import ValidationError
 from django.db import models
-from django.db.models import Avg
+from django.db.models import signals
+from django.dispatch import receiver
 from django.http import QueryDict
 from django.urls import reverse
-from django.utils import formats, timezone, functional
+from django.utils import formats, timezone
 from django.utils.translation import ugettext_lazy as _
-from tola.l10n_utils import l10n_date_year_month, l10n_date_medium
+from tola.l10n_utils import l10n_date_medium
+from tola.model_utils import generate_safedelete_queryset
 from django.contrib import admin
 from django.utils.functional import cached_property
 import django.template.defaultfilters
-
 
 from simple_history.models import HistoricalRecords
 from safedelete.models import SafeDeleteModel
 from safedelete.managers import SafeDeleteManager
 from safedelete.queryset import SafeDeleteQueryset
+from django_mysql.models import ListCharField
 
 from workflow.models import (
     Program, Sector, SiteProfile, ProjectAgreement, ProjectComplete, Country,
@@ -117,20 +122,23 @@ class Objective(models.Model):
     def save(self):
         if self.create_date is None:
             self.create_date = timezone.now()
+        self.edit_date = timezone.now()
         super(Objective, self).save()
 
 
 class Level(models.Model):
-    name = models.CharField(_("Name"), max_length=135, blank=True)
-    description = models.TextField(
-        _("Description"), max_length=765, blank=True)
-    customsort = models.IntegerField(_("Customsort"), blank=True, null=True)
+    name = models.CharField(_("Name"), max_length=500)
+    assumptions = models.TextField(_("Assumptions"), blank=True)
+    parent = models.ForeignKey('self', blank=True, null=True, on_delete=models.CASCADE, related_name='child_levels')
+    program = models.ForeignKey(Program, blank=True, null=True, on_delete=models.CASCADE, related_name='levels')
+    customsort = models.IntegerField(_("Sort order"), blank=True, null=True)
     create_date = models.DateTimeField(_("Create date"), null=True, blank=True)
     edit_date = models.DateTimeField(_("Edit date"), null=True, blank=True)
 
     class Meta:
         ordering = ('customsort', )
         verbose_name = _("Level")
+        unique_together = ('parent', 'customsort')
 
     def __unicode__(self):
         return self.name
@@ -140,10 +148,276 @@ class Level(models.Model):
             self.create_date = timezone.now()
         super(Level, self).save(*args, **kwargs)
 
+    def get_level_depth(self, depth=1):
+        if self.parent is None:
+            return depth
+        else:
+            depth += 1
+            depth = self.parent.get_level_depth(depth)
+        return depth
+
+    @cached_property
+    def level_depth(self):
+        return self.get_level_depth()
+
+    @property
+    def ontology(self):
+        target = self
+        ontology = []
+        while True:
+            ontology = [str(target.customsort)] + ontology
+            if target.parent is None:
+                break
+            else:
+                target = target.parent
+
+        tier_count = LevelTier.objects.filter(program=self.program_id).count()
+        missing_tiers = tier_count - self.get_level_depth()
+        ontology += missing_tiers * ['0']
+        return '.'.join(ontology)
+
+    @property
+    def display_ontology(self):
+        target = self
+        display_ontology = []
+        while target.parent is not None:
+            display_ontology = [str(target.customsort),] + display_ontology
+            target = target.parent
+        return '.'.join(display_ontology)
+
+    @property
+    def leveltier(self):
+        # TODO: What if their level hierarchy is deeper than the leveltier set that they pick
+        tiers = self.program.level_tiers.order_by('tier_depth')
+        try:
+            tier = tiers[self.level_depth-1]
+        except IndexError:
+            tier = None
+        return tier
+
+    @cached_property
+    def display_name(self):
+        """ this returns the level's "name" as displayed on IPTT i.e. Goal: name or Output 1.1: Name"""
+        return u'{tier}{ontology}: {name}'.format(
+            tier=_(self.leveltier.name) if self.leveltier else '',
+            ontology=' {}'.format(self.display_ontology) if self.display_ontology else '',
+            name=self.name
+        )
+
+    def get_children(self):
+        """ Used in group-by-outcome-chain reports, recursively gets children in tree order"""
+        child_levels = []
+        for child_level in self.child_levels.all():
+            child_levels.append(child_level)
+            child_levels += child_level.get_children()
+        return child_levels
+
+    @property
+    def next_sort_order(self):
+        current_max = None
+        if self.indicator_set.exists():
+            current_max = self.indicator_set.filter(deleted__isnull=True).aggregate(
+                models.Max('level_order')
+            ).get('level_order__max', None)
+        return 0 if current_max is None else current_max + 1
+
+    def update_level_order(self):
+        if self.indicator_set.filter(deleted__isnull=True).exists():
+            for c, indicator in enumerate(self.indicator_set.filter(deleted__isnull=True).order_by('level_order')):
+                if c != indicator.level_order:
+                    indicator.level_order = c
+                    indicator.save()
+
+    @staticmethod
+    def sort_by_ontology(levels):
+        """
+        Take a sequence of Level objects, and order them by their ontology hierarchy (DFS traversal)
+        Assume one root node - assert if multiple roots found
+        Levels not part of the tree will not be returned
+        """
+        if not levels:
+            return levels
+
+        # A root node has parent_id is None, or a parent_id not present in the list (sub-tree)
+        level_ids = set(l.id for l in levels)
+        root_nodes = [l for l in levels if l.parent_id is None or l.parent_id not in level_ids]
+        assert len(root_nodes) == 1
+        root_node = root_nodes[0]
+
+        # ensure levels are ordered by customsort at their given tier
+        sorted_levels = sorted(levels, key=lambda level_obj: (level_obj.parent_id, level_obj.customsort))
+
+        # parent_id -> [] of child Levels
+        tree_map = collections.defaultdict(list)
+
+        for level in sorted_levels:
+            tree_map[level.parent_id].append(level)
+
+        return_levels = []
+        dfs_stack = [root_node]
+
+        while dfs_stack:
+            level = dfs_stack.pop()
+            children = tree_map.get(level.id, [])
+            children.reverse()  # does not return a list!
+            dfs_stack.extend(children)
+            return_levels.append(level)
+
+        return return_levels
+
+    @property
+    def logged_fields(self):
+        """Fields logged by program audit log"""
+        return {
+            "name": self.name.strip(),
+            "assumptions": self.assumptions.strip(),
+        }
+
 
 class LevelAdmin(admin.ModelAdmin):
     list_display = ('name')
     display = 'Levels'
+
+
+class LevelTier(models.Model):
+
+    @property
+    def TEMPLATES(self):
+        return self.get_templates()
+
+    #####!!!!!!!!!!! IMPORTANT!!    !!!!!!!!!!!#####
+    # If you update these templates, make sure you update the template in /js/level_utils.js.  They need to be in
+    # some .js file so that the translation strings get picked up in the djangojs.po/mo file and provided to the
+    # front-end.
+    @classmethod
+    def get_templates(cls):
+        return {
+            'mc_standard': {
+                # Translators: Name of the most commonly used organizational hierarchy of KPIs at Mercy Corps.
+                'name': _('Mercy Corps'),
+                'tiers': [
+                    # Translators: Highest level objective of a project.  High level KPIs can be attached here.
+                    _('Goal'),
+                    # Translators: Below Goals, the 2nd highest organizing level to attach KPIs to.
+                    _('Outcome'),
+                    # Translators: Below Outcome, the 3rd highest organizing level to attach KPIs to. Noun.
+                    _('Output'),
+                    # Translators: Below Output, the lowest organizing level to attach KPIs to.
+                    _('Activity')]},
+            'dfid': {
+                # Translators: Name of the most commonly used organizational hierarchy of KPIs at Mercy Corps.
+                'name': _('Department for International Development (DFID)'),
+                'tiers': [
+                    # Translators: Highest level objective of a project.  High level KPIs can be attached here.
+                    _('Impact'),
+                    # Translators: Below Goals, the 2nd highest organizing level to attach KPIs to.
+                    _('Outcome'),
+                    # Translators: Below Outcome, the 3rd highest organizing level to attach KPIs to. Noun.
+                    _('Output'),
+                    # Translators: Below Output, the lowest organizing level to attach KPIs to.
+                    _('Input')]},
+            'ec': {
+                # Translators: The KPI organizational hierarchy used when we work on EC projects.
+                'name': _('European Commission (EC)'),
+                'tiers': [
+                    # Translators: Highest level goal of a project.  High level KPIs can be attached here.
+                    _('Overall Objective'),
+                    # Translators: Below Overall Objective, the 2nd highest organizing level to attach KPIs to.
+                    _('Specific Objective'),
+                    # Translators: Below Specific Objective, the 3rd highest organizing level to attach KPIs to.
+                    _('Purpose'),
+                    # Translators: Below Purpose, the 4th highest organizing level to attach KPIs to.
+                    _('Result'),
+                    # Translators: Below Result, the lowest organizing level to attach KPIs to.
+                    _('Activity')]},
+            'usaid1': {
+                # Translators: The KPI organizational hierarchy used when we work on certain USAID projects.
+                'name': _('USAID 1'),
+                'tiers': [
+                    # Translators: Highest level objective of a project.  High level KPIs can be attached here.
+                    _('Goal'),
+                    # Translators: Below Goal, the 2nd highest organizing level to attach KPIs to.
+                    _('Purpose'),
+                    # Translators: Below Purpose, the 3rd highest organizing level to attach KPIs to.
+                    _('Sub-Purpose'),
+                    # Translators: Below Sub-Purpose, the 4th highest organizing level to attach KPIs to. Noun.
+                    _('Output'),
+                    # Translators: Below Output, the lowest organizing level to attach KPIs to. Noun.
+                    _('Input')]},
+            'usaid2': {
+                # Translators: The KPI organizational hierarchy used when we work on certain USAID projects.
+                'name': _('USAID 2'),
+                'tiers': [
+                    # Translators: Highest level goal of a project.  High level KPIs can be attached here.
+                    _('Strategic Objective'),
+                    # Translators: Below Strategic Objective, the 2nd highest organizing level to attach KPIs to.
+                    _('Intermediate Result'),
+                    # Translators: Below Intermediate Result, the 3rd highest organizing level to attach KPIs to.
+                    _('Sub-Intermediate Result'),
+                    # Translators: Below Sub-Intermediate Result, the 4th highest organizing level to attach KPIs to. Noun.
+                    _('Output'),
+                    # Translators: Below Output, the lowest organizing level to attach KPIs to. Noun.
+                    _('Input')]},
+            'usaid_ffp': {
+                # Translators: The KPI organizational hierarchy used when we work on USAID Food for Peace projects.
+                'name': _('USAID FFP'),
+                'tiers': [
+                    # Translators: Highest level objective of a project.  High level KPIs can be attached here.
+                    _('Goal'),
+                    # Translators: Below Goal, the 2nd highest organizing level to attach KPIs to.
+                    _('Purpose'),
+                    # Translators: Below Purpose, the 3rd highest organizing level to attach KPIs to.
+                    _('Sub-Purpose'),
+                    # Translators: Below Sub-Purpose, the 4th highest organizing level to attach KPIs to.
+                    _('Intermediate Outcome'),
+                    # Translators: Below Intermediate Outcome, the lowest organizing level to attach KPIs to. Noun.
+                    _('Output')]},
+        }
+
+    name = models.CharField(_("Name"), max_length=135, blank=True)
+    program = models.ForeignKey(Program, on_delete=models.CASCADE, related_name='level_tiers')
+    # Translators: This is depth of the selected object (a level tier) in a hierarchy of level tier objects
+    tier_depth = models.IntegerField(_("Level Tier depth"))
+    create_date = models.DateTimeField(_("Create date"), null=True, blank=True)
+    edit_date = models.DateTimeField(_("Edit date"), null=True, blank=True)
+
+    class Meta:
+        ordering = ('tier_depth', )
+        # Translators: Indicators are assigned to Levels.  Levels are organized in a hierarchy of Tiers.
+        verbose_name = _("Level Tier")
+        unique_together = (('name', 'program'), ('program', 'tier_depth'))
+
+    def __unicode__(self):
+        return self.name
+
+    def save(self, *args, **kwargs):
+        if self.create_date is None:
+            self.create_date = timezone.now()
+        self.edit_date = timezone.now()
+        super(LevelTier, self).save(*args, **kwargs)
+
+
+# Right now, these are only being used to store custom templates across sessions.  However, they could also
+# be used to store regular templates (i.e. instead of using an attribute of the LevelTier model).
+class LevelTierTemplate(models.Model):
+    # Translators:  A user can select from multiple templates for a particular piece of funtionality.  This is a label for the name of the template.
+    names = ListCharField(base_field=models.CharField(max_length=75), size=6, max_length=(7 * 70))
+    program = models.ForeignKey(Program, on_delete=models.CASCADE, related_name='level_tier_templates')
+    create_date = models.DateTimeField(_("Create date"), null=True, blank=True)
+    edit_date = models.DateTimeField(_("Edit date"), null=True, blank=True)
+
+    class Meta:
+        # Translators: Indicators are assigned to Levels.  Levels are organized in a hierarchy of Tiers.  There are several templates that users can choose from with different names for the Tiers.
+        verbose_name = _("Level tier templates")
+
+    def __unicode__(self):
+        return ",".join(self.names)
+
+    def save(self, *args, **kwargs):
+        if self.create_date is None:
+            self.create_date = timezone.now()
+        self.edit_date = timezone.now()
+        super(LevelTierTemplate, self).save(*args, **kwargs)
 
 
 class DisaggregationType(models.Model):
@@ -312,6 +586,7 @@ class DoubleDecimalSplit(models.Func):
         expressions = models.F(string), models.Value('.'), count
         super(DoubleDecimalSplit, self).__init__(*expressions)
 
+
 class IndicatorSortingQSMixin(object):
     """This provides a temporary relief to indicator number sorting issues in advance of Satsuma -
     uses regex matches to determine if the number is of the format "1.1" or "1.1.1" etc. and sorts it then by
@@ -319,14 +594,40 @@ class IndicatorSortingQSMixin(object):
     replaced with log frame sorting on release of Satsuma"""
     def with_logframe_sorting(self):
         numeric_re = r'^[[:space:]]*[0-9]+[[:space:]]*$'
-        logframe_re = r'^[[:space:]]*[0-9]+([[.period.]][0-9]+)?'\
-                      '([[.period.]][0-9]+)?([[.period.]][0-9]+)?[[:space:]]*$'
-        logframe_re2 = r'^[[:space:]]*[0-9]+[[.period.]][0-9]+([[.period.]][0-9]+)?([[.period.]][0-9]+)?[[:space:]]*$'
-        logframe_re3 = r'^[[:space:]]*[0-9]+[[.period.]][0-9]+[[.period.]][0-9]+([[.period.]][0-9]+)?[[:space:]]*$'
-        logframe_re4 = r'^[[:space:]]*[0-9]+[[.period.]][0-9]+[[.period.]][0-9]+[[.period.]][0-9]+[[:space:]]*$'
-
+        castable_to_int_re = r'[0-9]+'
+        logframe_re = r'^[[:space:]]*(([0-9]+)|([a-z]+))([[.period.]](([0-9]+)|([a-z]+)))?'\
+                      '([[.period.]](([0-9]+)|([a-z]+)))?([[.period.]](([0-9]+)|([a-z]+)))?([[.period.]])?[[:space:]]*$'
+        logframe_re2 = r'^[[:space:]]*(([0-9]+)|([a-z]+))[[.period.]](([0-9]+)|([a-z]+))([[.period.]](([0-9]+)|([a-z]+)))?([[.period.]](([0-9]+)|([a-z]+)))?([[.period.]])?[[:space:]]*$'
+        logframe_re3 = r'^[[:space:]]*(([0-9]+)|([a-z]+))[[.period.]](([0-9]+)|([a-z]+))[[.period.]](([0-9]+)|([a-z]+))([[.period.]](([0-9]+)|([a-z]+)))?([[.period.]])?[[:space:]]*$'
+        logframe_re4 = r'^[[:space:]]*(([0-9]+)|([a-z]+))[[.period.]](([0-9]+)|([a-z]+))[[.period.]](([0-9]+)|([a-z]+))[[.period.]](([0-9]+)|([a-z]+))([[.period.]])?[[:space:]]*$'
+        old_level_whens = [
+            models.When(
+                old_level=level_name,
+                then=level_pk
+            ) for (level_pk, level_name) in Indicator.OLD_LEVELS
+        ] + [
+            models.When(
+                old_level__isnull=True,
+                then=99
+            ),
+        ]
         qs = self.annotate(
+            old_level_pk=models.Case(
+                *old_level_whens,
+                default=99,
+                output_field=models.IntegerField()
+            ),
             logsort_type=models.Case(
+                models.When(
+                    models.Q(
+                        models.Q(
+                            models.Q(program___using_results_framework=Program.MIGRATED) |
+                            models.Q(program___using_results_framework=Program.RF_ALWAYS)
+                        ) &
+                        models.Q(level_id__isnull=False)
+                    ),
+                    then=0
+                ),
                 models.When(
                     number__regex=logframe_re,
                     then=1
@@ -341,6 +642,10 @@ class IndicatorSortingQSMixin(object):
         ).annotate(
             logsort_a=models.Case(
                 models.When(
+                    logsort_type=0,
+                    then=models.F('level_order')
+                ),
+                models.When(
                     logsort_type=1,
                     then=DecimalSplit('number', 1)
                 ),
@@ -349,7 +654,7 @@ class IndicatorSortingQSMixin(object):
                     then=models.F('number'),
                 ),
                 default=models.Value(0),
-                output_field=models.IntegerField()
+                output_field=models.CharField()
             ),
             logsort_b=models.Case(
                 models.When(
@@ -357,7 +662,7 @@ class IndicatorSortingQSMixin(object):
                     then=DoubleDecimalSplit('number', 2)
                 ),
                 default=models.Value(0),
-                output_field=models.IntegerField()
+                output_field=models.CharField()
             ),
             logsort_c=models.Case(
                 models.When(
@@ -365,7 +670,7 @@ class IndicatorSortingQSMixin(object):
                     then=DoubleDecimalSplit('number', 3)
                 ),
                 default=models.Value(0),
-                output_field=models.IntegerField()
+                output_field=models.CharField()
             ),
             logsort_d=models.Case(
                 models.When(
@@ -373,14 +678,42 @@ class IndicatorSortingQSMixin(object):
                     then=DoubleDecimalSplit('number', 4)
                 ),
                 default=models.Value(0),
-                output_field=models.IntegerField()
+                output_field=models.CharField()
             )
+        ).annotate(
+            logsort_a_int=models.Case(
+                models.When(
+                    logsort_a__regex=castable_to_int_re,
+                    then=models.F('logsort_a')
+                ),
+                default=models.Value(0),
+                output_field=models.IntegerField()
+            ),
+            logsort_b_int=models.Case(
+                models.When(
+                    logsort_b__regex=castable_to_int_re,
+                    then=models.F('logsort_b')
+                ),
+                default=models.Value(0),
+                output_field=models.IntegerField()
+            ),
+            logsort_c_int=models.Case(
+                models.When(
+                    logsort_c__regex=castable_to_int_re,
+                    then=models.F('logsort_c')
+                ),
+                default=models.Value(0),
+                output_field=models.IntegerField()
+            ),
         )
         return qs.order_by(
             'logsort_type',
-            models.functions.Cast('logsort_a', models.IntegerField()),
-            models.functions.Cast('logsort_b', models.IntegerField()),
-            models.functions.Cast('logsort_c', models.IntegerField()),
+            models.functions.Cast('logsort_a_int', models.IntegerField()),
+            models.functions.Cast('logsort_a', models.CharField()),
+            models.functions.Cast('logsort_b_int', models.IntegerField()),
+            models.functions.Cast('logsort_b', models.CharField()),
+            models.functions.Cast('logsort_c_int', models.IntegerField()),
+            models.functions.Cast('logsort_c', models.CharField()),
             'number'
             )
 
@@ -403,6 +736,136 @@ class IndicatorManager(SafeDeleteManager, IndicatorSortingManagerMixin):
         return queryset.select_related('program', 'sector')
 
 
+class IndicatorRFMixin(object):
+    qs_name = 'RFAware'
+    annotate_methods = ['is_program_using_results_framework', 'is_using_manual_numbering']
+
+    def is_program_using_results_framework(self):
+        return self.annotate(
+            using_results_framework=models.Case(
+                models.When(
+                    program___using_results_framework=Program.NOT_MIGRATED,
+                    then=models.Value(False)
+                ),
+                default=models.Value(True),
+                output_field=models.BooleanField()
+            )
+        )
+
+    def is_using_manual_numbering(self):
+        return self.annotate(
+            manual_number_display=models.Case(
+                models.When(
+                    using_results_framework=False,
+                    then=models.Value(True)
+                ),
+                models.When(
+                    program__auto_number_indicators=False,
+                    then=models.Value(True)
+                ),
+                default=models.Value(False),
+                output_field=models.BooleanField()
+            )
+        )
+
+class IndicatorLevelsMixin(object):
+    qs_name = 'LevelAware'
+    annotate_methods = ['annotate_old_level']
+    ordering_methods = ['order_by_old_level']
+
+    def annotate_old_level(self):
+        old_level_whens = [
+            models.When(
+                models.Q(
+                    models.Q(using_results_framework=True) &
+                    models.Q(level_id__isnull=False)
+                ),
+                then=models.Value(0)
+            )
+        ] + [
+            models.When(
+                old_level=level_name,
+                then=level_pk
+            ) for (level_pk, level_name) in Indicator.OLD_LEVELS
+        ] + [
+            models.When(
+                old_level__isnull=True,
+                then=None
+            ),
+        ]
+        return self.annotate(
+            old_level_pk=models.Case(
+                *old_level_whens,
+                default=None,
+                output_field=models.IntegerField()
+            )
+        )
+
+    def order_by_old_level(self):
+        return self.order_by(models.F('old_level_pk').asc(nulls_last=True))
+
+
+class IndicatorTargetsMixin(object):
+    qs_name = 'TargetAware'
+    annotate_methods = ['annotate_lop_target', 'annotate_most_recent_complete']
+
+    def annotate_lop_target(self):
+        from indicators.queries import utils as query_utils
+        return self.annotate(
+            lop_target_calculated=query_utils.indicator_lop_target_calculated_annotation()
+        )
+
+    def annotate_most_recent_complete(self):
+        return self.annotate(
+            most_recent_completed_target_end_date=models.Subquery(
+                PeriodicTarget.objects.filter(
+                    indicator=models.OuterRef('pk'),
+                    end_date__lte=date.today()
+                ).order_by('-end_date').values('end_date')[:1],
+                output_field=models.DateField()
+            ),
+            target_period_last_end_date=models.Subquery(
+                PeriodicTarget.objects.filter(
+                    indicator=models.OuterRef('pk')
+                ).order_by('-end_date').values('end_date')[:1],
+                output_field=models.DateField()
+            ),
+        )
+
+class IndicatorMetricsMixin(object):
+    qs_name = 'MetricsAnnotated'
+    annotate_methods = ['annotate_reporting', 'annotate_scope', 'annotate_counts', 'annotate_metrics']
+
+    def annotate_reporting(self):
+        from indicators.queries import utils as query_utils
+        return self.annotate(
+            lop_actual_progress=query_utils.indicator_lop_actual_progress_annotation(),
+            lop_target_progress=query_utils.indicator_lop_target_progress_annotation(),
+            reporting=query_utils.indicator_reporting_annotation()
+        )
+
+    def annotate_scope(self):
+        from indicators.queries import utils as query_utils
+        return self.annotate(
+            lop_percent_met_progress=query_utils.indicator_lop_percent_met_progress_annotation(),
+            over_under=query_utils.indicator_over_under_annotation()
+        )
+
+    def annotate_counts(self):
+        from indicators.queries import utils as query_utils
+        return self.annotate(
+            program_months=query_utils.indicator_get_program_months_annotation(),
+            defined_targets=models.Count('periodictargets'),
+            results_count=query_utils.indicator_results_count_annotation(),
+            results_with_evidence_count=query_utils.indicator_results_evidence_annotation(),
+        )
+
+    def annotate_metrics(self):
+        from indicators.queries import utils as query_utils
+        return self.annotate(
+            has_all_targets_defined=query_utils.indicator_all_targets_defined_annotation()
+        )
+
 class Indicator(SafeDeleteModel):
     LOP = 1
     MID_END = 2
@@ -422,9 +885,6 @@ class Indicator(SafeDeleteModel):
         (MONTHLY, _('Monthly')),
         (EVENT, _('Event'))
     )
-    TIME_AWARE_TARGET_FREQUENCIES = (
-        ANNUAL, SEMI_ANNUAL, TRI_ANNUAL, QUARTERLY, MONTHLY
-    )
 
     REGULAR_TARGET_FREQUENCIES = (
         ANNUAL,
@@ -434,7 +894,7 @@ class Indicator(SafeDeleteModel):
         MONTHLY,
     )
 
-    IRREGULAR_TARGET_REQUENCIES = (
+    IRREGULAR_TARGET_FREQUENCIES = (
         LOP,
         MID_END,
         EVENT,
@@ -459,9 +919,18 @@ class Indicator(SafeDeleteModel):
 
     ONSCOPE_MARGIN = .15
 
+    OLD_LEVELS = [
+        (1, 'Goal'),
+        (2, 'Impact'),
+        (3, 'Outcome'),
+        (4, 'Intermediate Outcome'),
+        (5, 'Output'),
+        (6, 'Activity')
+    ]
+
 
     indicator_key = models.UUIDField(
-        default=uuid.uuid4, unique=True, help_text=" ", verbose_name=_("Indicator key")),
+        default=uuid.uuid4, help_text=" ", verbose_name=_("Indicator key"))
 
     # i.e. Alpha, Donor, Standard
     # TODO: make this a foreign key
@@ -476,6 +945,9 @@ class Indicator(SafeDeleteModel):
         on_delete=models.SET_NULL
     )
 
+    # ordering with respect to level (determines whether indicator is 1.1a 1.1b or 1.1c)
+    level_order = models.IntegerField(default=0)
+
     # this includes a relationship to a program
     objectives = models.ManyToManyField(
         Objective, blank=True, verbose_name=_("Program Objective"),
@@ -488,7 +960,7 @@ class Indicator(SafeDeleteModel):
         blank=True, related_name="strat_indicator", help_text=" "
     )
 
-    name = models.CharField(verbose_name=_("Name"), max_length=255,
+    name = models.CharField(verbose_name=_("Name"), max_length=500,
                             null=False, help_text=" ")
 
     number = models.CharField(
@@ -558,11 +1030,13 @@ class Indicator(SafeDeleteModel):
         verbose_name=_("Target frequency"), help_text=" "
     )
 
+    # Deprecated - redundant to the event name of the first PeriodicTarget saved by the form
     target_frequency_custom = models.CharField(
         null=True, blank=True, max_length=100,
         verbose_name=_("First event name"), help_text=" "
     )
 
+    # Deprecated - can probably be safely deleted
     target_frequency_start = models.DateField(
         blank=True, null=True, auto_now=False, auto_now_add=False,
         verbose_name=_("First target period begins*"), help_text=" "
@@ -661,6 +1135,12 @@ class Indicator(SafeDeleteModel):
         blank=True, null=True, on_delete=models.SET_NULL, help_text=" "
     )
 
+    old_level = models.CharField(
+        max_length=80, null=True, blank=True,
+        # Translators: This is the name of the Level object in the old system of organising levels
+        verbose_name=_("Old Level"), help_text=" "
+    )
+
     create_date = models.DateTimeField(
         _("Create date"), null=True, blank=True, help_text=" "
     )
@@ -670,12 +1150,26 @@ class Indicator(SafeDeleteModel):
     )
 
     notes = models.TextField(_("Notes"), max_length=500, null=True, blank=True)
+
     # optimize query for class based views etc.
     objects = IndicatorManager()
+    rf_aware_objects = generate_safedelete_queryset(
+        IndicatorRFMixin,
+        IndicatorLevelsMixin,
+        IndicatorTargetsMixin,
+        ).as_manager()
+
+    program_page_objects = generate_safedelete_queryset(
+        IndicatorRFMixin,
+        IndicatorLevelsMixin,
+        IndicatorTargetsMixin,
+        IndicatorMetricsMixin,
+        ).as_manager()
 
     class Meta:
         ordering = ('create_date',)
         verbose_name = _("Indicator")
+        unique_together = ['level', 'level_order', 'deleted']
 
     def __unicode__(self):
         return self.name
@@ -684,6 +1178,16 @@ class Indicator(SafeDeleteModel):
         if self.create_date is None:
             self.create_date = timezone.now()
         self.edit_date = timezone.now()
+        if self.level and self.level.program_id != self.program_id:
+            raise ValidationError(
+                # Translators: This is an error message that is returned when a user is trying to assign an indicator to the wrong hierarch of levels.
+                _('Level/Indicator mismatched program IDs ' +
+                  '(level %(level_program_id)d and indicator %(indicator_program_id)d)'),
+                code='foreign_key_constraint',
+                params={
+                    'level_program_id': self.level.program_id,
+                    'indicator_program_id': self.program_id
+                })
         super(Indicator, self).save(*args, **kwargs)
 
     @property
@@ -692,7 +1196,7 @@ class Indicator(SafeDeleteModel):
 
     @property
     def is_target_frequency_not_time_aware(self):
-        return self.target_frequency in self.IRREGULAR_TARGET_REQUENCIES
+        return self.target_frequency in self.IRREGULAR_TARGET_FREQUENCIES
 
     @property
     def is_target_frequency_lop(self):
@@ -748,7 +1252,8 @@ class Indicator(SafeDeleteModel):
                     "name": t.period_name.strip(),
                 }
                 for t in s.periodictargets.all()
-            }
+            },
+            "level": str(s.level) if s.level is not None else '',
         }
 
     @property
@@ -766,16 +1271,27 @@ class Indicator(SafeDeleteModel):
         return ""
 
     @property
+    def is_cumulative_display(self):
+        if self.is_cumulative:
+            # Translators: referring to an indicator whose results accumulate over time
+            return _("Cumulative")
+        elif self.is_cumulative is None:
+            return None
+        else:
+            # Translators: referring to an indicator whose results do not accumulate over time
+            return _("Not cumulative")
+
+    @property
     def get_direction_of_change(self):
         if self.direction_of_change == self.DIRECTION_OF_CHANGE_NEGATIVE:
             return _("-")
         elif self.direction_of_change == self.DIRECTION_OF_CHANGE_POSITIVE:
             return _("+")
-        return "N/A"
+        return None
 
     @property
     def get_result_average(self):
-        avg = self.result_set.aggregate(Avg('achieved'))['achieved__avg']
+        avg = self.result_set.aggregate(models.Avg('achieved'))['achieved__avg']
         return avg
 
     @property
@@ -785,11 +1301,39 @@ class Indicator(SafeDeleteModel):
         return self.baseline
 
     @property
-    def lop_target_display(self):
+    def calculated_lop_target(self):
+        """
+        We have always manually set the LoP target of an indicator manually via form input
+        but now we are starting to compute it based on the PeriodicTarget values.
+
+        This property returns the calculated value, which may be different than the stored value in the DB
+        """
+        periodic_targets = self.periodictargets.all()
+
+        if not periodic_targets.exists():
+            return None
+
+        if self.is_cumulative:
+            # return the last value in the sequence
+            return periodic_targets.last().target
+        else:
+            # sum the values
+            return sum(pt.target for pt in periodic_targets)
+
+    @property
+    def lop_target_stripped(self):
         """adding logic to strip trailing zeros in case of a decimal with superfluous zeros to the right of the ."""
         if self.lop_target:
             lop_stripped = str(self.lop_target)
             lop_stripped = lop_stripped.rstrip('0').rstrip('.') if '.' in lop_stripped else lop_stripped
+            return lop_stripped
+        return self.lop_target
+
+    @property
+    def lop_target_display(self):
+        """Same as lop_target_stripped but with a trailing % if applicable"""
+        if self.lop_target:
+            lop_stripped = self.lop_target_stripped
             if self.unit_of_measure_type == self.PERCENTAGE:
                 return u"{0}%".format(lop_stripped)
             return lop_stripped
@@ -818,9 +1362,153 @@ class Indicator(SafeDeleteModel):
     def cached_data_count(self):
         return self.result_set.count()
 
+    @cached_property
+    def leveltier_name(self):
+        if self.level and self.level.leveltier:
+            return _(self.level.leveltier.name)
+        elif self.old_level and not self.results_framework:
+            return _(self.old_level)
+        return None
+
+    @property
+    def level_display_ontology(self):
+        if self.level:
+            return self.level.display_ontology
+        return None
+
+    @cached_property
+    def leveltier_depth(self):
+        if self.level:
+            return self.level.level_depth
+        return None
+
+    @property
+    def level_pk(self):
+        if self.level:
+            return self.level_id
+        return None
+
+    @property
+    def level_order_display(self):
+        """returns a-z for 0-25, then aa - zz for 26-676"""
+        if self.level and self.level_order is not None and self.level_order < 26:
+            return string.lowercase[self.level_order]
+        elif self.level and self.level_order and self.level_order >= 26:
+            return string.lowercase[self.level_order/26 - 1] + string.lowercase[self.level_order % 26]
+        return ''
+
+    @cached_property
+    def number_display(self):
+        if self.results_framework and self.auto_number_indicators and self.level and self.level.leveltier:
+            return u'{0} {1}{2}'.format(
+                unicode(self.leveltier_name), self.level.display_ontology, self.level_order_display
+            )
+        elif self.results_framework and not self.program.auto_number_indicators:
+            return self.number
+        elif self.results_framework:
+            return None
+        else:
+            return self.number
+
+    @property
+    def form_title_level(self):
+        if self.results_framework:
+            return unicode(
+                u'{} {}{}'.format(
+                    unicode(self.leveltier_name) if self.leveltier_name else u'',
+                    unicode(_('indicator')),
+                    (u' {}'.format(self.results_aware_number) if self.results_aware_number else u'')
+                )
+            )
+        else:
+            return u'{} {}'.format(
+                (unicode(_(self.old_level)) if self.old_level else u''),
+                unicode(_('indicator'))
+            )
+
+    @property
+    def results_aware_number(self):
+        if self.results_framework and self.program.auto_number_indicators:
+            return '{}{}'.format(self.level_display_ontology or '', self.level_order_display or '')
+        else:
+            return self.number
+
+    @property
+    def results_framework(self):
+        if hasattr(self, 'using_results_framework'):
+            return self.using_results_framework
+        elif hasattr(self.program, 'using_results_framework'):
+            return self.program.using_results_framework
+        return self.program._using_results_framework != Program.NOT_MIGRATED
+
+    @property
+    def auto_number_indicators(self):
+        if hasattr(self, '_auto_number_indicators'):
+            return self._auto_number_indicators
+        return self.program.auto_number_indicators
+
+    @property
+    def sort_number(self):
+        number = getattr(self, 'number')
+        if number is None or number == '':
+            return None
+        search_pattern = r'([^\d]+)?(\d+)?(.*)?'
+        number_search = re.compile(search_pattern)
+        split = number.split('.')
+        processed = []
+        for element in split:
+            matches = number_search.search(element)
+            if matches is None:
+                processed.append((None, None, None))
+            else:
+                groups = matches.groups()
+                processed.append((
+                    groups[0] if groups[0] else None,
+                    int(groups[1]) if groups[1] else None,
+                    groups[2] if groups[2] else None
+                    ))
+        return processed
+
+
+@receiver(signals.pre_save, sender=Indicator)
+def new_level_order(sender, instance, *args, **kwargs):
+    try:
+        original = sender.objects.get(pk=instance.pk)
+    except sender.DoesNotExist:
+        # new indicator being created:
+        if instance.level:
+            # if the new indicator is being created with a level, give it a new sort order:
+            instance.level_order = instance.level.next_sort_order
+    else:
+        # if the level didn't change, do nothing:
+        if instance.level and original.level and instance.level.pk == original.level.pk:
+            pass
+        else:
+            if instance.level:
+                instance.level_order = instance.level.next_sort_order
+            if original.level:
+                # hang the original level pk on the instance for catching in the post save signal below:
+                instance.old_level_pk = original.level.pk
+
+
+@receiver(signals.post_save, sender=Indicator)
+def reorder_former_level_on_update(sender, update_fields, created, instance, **kwargs):
+    old_level_pk = getattr(instance, 'old_level_pk', None)
+    if old_level_pk:
+        try:
+            level = Level.objects.get(pk=old_level_pk)
+        except Level.DoesNotExist:
+            pass
+        else:
+            level.update_level_order()
+    elif instance.deleted and instance.level:
+        # indicator is being deleted, reorder it's levels
+        instance.level.update_level_order()
+
 
 class PeriodicTarget(models.Model):
     LOP_PERIOD = _('Life of Program (LoP) only')
+    LOP_LABEL = _('Life of Program')
     MIDLINE = _('Midline')
     ENDLINE = _('Endline')
     ANNUAL_PERIOD = _('Year')
@@ -971,7 +1659,7 @@ class PeriodicTarget(models.Model):
         return self.period
 
     @classmethod
-    def generate_for_frequency(cls, frequency):
+    def generate_for_frequency(cls, frequency, short_form=False):
         """
         Returns a generator function to yield periods based on start and end dates for a given frequency
 
@@ -1007,15 +1695,15 @@ class PeriodicTarget(models.Model):
             Indicator.MONTHLY: 1
         }
         if frequency == Indicator.ANNUAL:
-            next_date_func = lambda x: date(x.year + 1, x.month, x.day)
-            name_func = lambda start, count: '{period_name} {count}'.format(
+            next_date_func = lambda x: date(x.year + 1, x.month, 1)
+            name_func = lambda start, count: u'{period_name} {count}'.format(
                 period_name=_(cls.ANNUAL_PERIOD), count=count)
         elif frequency in months_per_period:
             next_date_func = lambda x: date(
                 x.year if x.month <= 12-months_per_period[frequency] else x.year + 1,
                 x.month + months_per_period[frequency] if x.month <= 12 - months_per_period[frequency] \
                 else x.month + months_per_period[frequency] - 12,
-                x.day)
+                1)
             if frequency == Indicator.MONTHLY:
                 # TODO: strftime() does not work with Django i18n and will not give you localized month names
                 # Could be: name_func = lambda start, count: cls.generate_monthly_period_name(start)
@@ -1023,7 +1711,7 @@ class PeriodicTarget(models.Model):
                 # UPDATE: Turns out the below still translates... strftime() still returns an english
                 # month name, but since month names are translated elsewhere in the app, the _() turns it into
                 # the correct language
-                name_func = lambda start, count: '{month_name} {year}'.format(
+                name_func = lambda start, count: u'{month_name} {year}'.format(
                     month_name=_(start.strftime('%B')),
                     year=start.strftime('%Y')
                     )
@@ -1033,13 +1721,13 @@ class PeriodicTarget(models.Model):
                     Indicator.TRI_ANNUAL: cls.TRI_ANNUAL_PERIOD,
                     Indicator.QUARTERLY: cls.QUARTERLY_PERIOD
                 }[frequency]
-                name_func = lambda start, count: '{period_name} {count}'.format(
+                name_func = lambda start, count: u'{period_name} {count}'.format(
                     period_name=_(period_name), count=count)
         elif frequency == Indicator.LOP:
             return lambda start, end: [{
-                'name': _(cls.LOP_PERIOD),
+                'name': _(cls.LOP_LABEL),
                 'start': start,
-                'label': '{0} - {1}'.format(l10n_date_medium(start), l10n_date_medium(end)),
+                'label': None,
                 'end': end,
                 'customsort': 0
                 }]
@@ -1059,6 +1747,19 @@ class PeriodicTarget(models.Model):
         else:
             next_date_func = None
             name_func = None
+        def short_form_generator(start, end):
+            count = 0
+            while start < end:
+                next_start = next_date_func(start)
+                yield {
+                    'start': start,
+                    'end': end,
+                    'customsort': count
+                }
+                count += 1
+                start = next_start
+        if short_form:
+            return short_form_generator
         def period_generator(start, end):
             count = 0
             while start < end:
@@ -1066,8 +1767,9 @@ class PeriodicTarget(models.Model):
                 yield {
                     'name': name_func(start, count+1),
                     'start': start,
-                    'label': '{0} - {1}'.format(
-                        l10n_date_medium(start), l10n_date_medium(next_start - timedelta(days=1))
+                    'label': u'{0} - {1}'.format(
+                        l10n_date_medium(start).decode('UTF-8'),
+                        l10n_date_medium(next_start - timedelta(days=1)).decode('UTF-8')
                         ) if frequency != Indicator.MONTHLY else None,
                     'end': next_start - timedelta(days=1),
                     'customsort': count
@@ -1151,8 +1853,8 @@ class Result(models.Model):
         verbose_name=_("Would you like to update the achieved total with the \
         row count from TolaTables?"), default=False, help_text=" ")
 
-    record_name = models.CharField(max_length=135, blank=True, verbose_name=_("Record name"))
-    evidence_url = models.CharField(max_length=255, blank=True, verbose_name=_("Evidence URL"))
+    record_name = models.CharField(max_length=135, null=True, blank=True, verbose_name=_("Record name"))
+    evidence_url = models.CharField(max_length=255, null=True, blank=True, verbose_name=_("Evidence URL"))
 
     create_date = models.DateTimeField(null=True, blank=True, help_text=" ", verbose_name=_("Create date"))
     edit_date = models.DateTimeField(null=True, blank=True, help_text=" ", verbose_name=_("Edit date"))

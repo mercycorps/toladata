@@ -1,6 +1,6 @@
 import math
 import simplejson
-from datetime import datetime
+from datetime import datetime, date
 from django.core.serializers import serialize
 from django import template
 from django.db.models import QuerySet
@@ -385,5 +385,22 @@ def program_complete(context, read_only=False):
         'program.reporting_period_start': program.reporting_period_start,
         'program.reporting_period_end': program.reporting_period_end,
         'program.percent_complete': program.percent_complete,
+        'read_only': 'true' if read_only else 'false',
+    }
+
+@register.inclusion_tag('indicators/tags/program-complete.html', takes_context=True)
+def program_complete_program_page(context, read_only=False):
+    """
+    Renders percentage complete with a graphic icon.
+    Takes percent_complete as an integer percentage value
+    """
+    program = context['program']
+    return {
+        'program.id': program['pk'],
+        'program.start_date': program['start_date'],
+        'program.end_date': program['end_date'],
+        'program.reporting_period_start': program['reporting_period_start_iso'],
+        'program.reporting_period_end': program['reporting_period_end_iso'],
+        'program.percent_complete': program['percent_complete'],
         'read_only': 'true' if read_only else 'false',
     }

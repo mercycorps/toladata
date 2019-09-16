@@ -47,36 +47,18 @@ body > .container {
 
 // extensions to BS buttons
 //--------------------------------------------------
-.btn-primary, .btn-secondary {
-    text-transform: uppercase;
-}
-.btn-secondary { // TODO
-    &, &:link, &:visited {
-        background-color: $white;
-        border-color: $teal-500;
-        color: $teal-500;
-    }
-    &.focus, &:focus, &:hover {
-        background-color: $gray-300;
-        border-color: $teal-600;
-        color: $teal-600;
-    }
-}
-.btn-inverse {
-    // not a standard BS button style
-    // mostly used for RESET and CLEAR buttons
-    color: $text-muted;
-    font-weight: normal;
-    text-transform: uppercase;
-    @include transition($btn-transition);
-    &:hover, &:focus {
-        color: $danger;
+.btn-group {
+    > .btn {
+        // flex: 0 0 auto; // overrides new behavior in 4.3(?)
     }
 }
 .btn-link {
     font-weight: bold;
     padding-left: 0;
     padding-right: 0;
+    &:focus {
+        @include form-control-focus();
+    }
 }
 
 .btn-danger.btn-link {
@@ -191,6 +173,7 @@ body > .container {
 
 // Overrides for form elements
 .form-check-input {
+    height: auto !important; // fixes height bug after BS 4.3
     width: auto !important; // fixes bug in latest Chrome + pre-Mojave macs ?
 }
 

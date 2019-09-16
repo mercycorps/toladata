@@ -95,8 +95,8 @@ class TestUpdateFormInitialValues(test.TestCase):
         self.assertEqual(form['achieved'].value(), self.result.achieved)
         self.assertEqual(form['target_frequency'].value(), Indicator.ANNUAL)
         self.assertEqual(form['indicator'].value(), self.indicator.id)
-        self.assertEqual(form['record_name'].value(), '')
-        self.assertEqual(form['evidence_url'].value(), '')
+        self.assertEqual(form['record_name'].value(), None)
+        self.assertEqual(form['evidence_url'].value(), None)
 
     def test_create_form_initial_values(self):
         form = ResultForm(user=self.user, indicator=self.indicator, program=self.program, request=self.request)
@@ -179,6 +179,8 @@ class TestCreateValidation(test.TestCase):
         self.assertEqual(db_result.record_name, 'existing record')
         self.assertEqual(db_result.evidence_url, 'http://google.com')
 
+
+    @test.tag('slow')
     def test_adding_record_without_name_passes_validation(self):
         bad_data = {
             'date_collected': '2016-03-31',

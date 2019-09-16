@@ -2,11 +2,12 @@ import React from 'react';
 import classNames from 'classnames';
 import { observer } from "mobx-react"
 import eventBus from '../../../eventbus';
+import { AddIndicatorButton } from '../../../components/indicatorModalComponents';
 
 import { library } from '@fortawesome/fontawesome-svg-core'
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome'
 import { faCaretDown, faCaretRight } from '@fortawesome/free-solid-svg-icons'
-import {IndicatorFilterType} from "../models";
+import {IndicatorFilterType} from "../../../constants";
 import Select from 'react-select';
 
 
@@ -51,7 +52,7 @@ function getStatusIndicatorString(filterType, indicatorCount) {
 
 
 @observer
-class StatusHeader extends React.Component {
+export class StatusHeader extends React.Component {
     constructor(props) {
         super(props);
         this.onShowAllClick = (e) => {
@@ -71,20 +72,19 @@ class StatusHeader extends React.Component {
 
         return <div className="indicators-list__header">
             <h3 className="no-bold">
-                <span id="indicators-list-title">{getStatusIndicatorString(currentIndicatorFilter, indicatorCount)} </span>
-
+                <span id="indicators-list-title">
+                    {getStatusIndicatorString(currentIndicatorFilter, indicatorCount)}
+                </span>
                 {filterApplied &&
-                <a href="#" id="show-all-indicators" onClick={this.onShowAllClick}>
+                <a className="ml-2" href="#" id="show-all-indicators" onClick={this.onShowAllClick}>
                     <small>{gettext('Show all')}</small>
                 </a>
                 }
             </h3>
             <div>
-            {!readonly &&
-            <a href={`/indicators/indicator_create/${programId}`} role="button" className="btn-link btn-add">
-                <i className="fas fa-plus-circle"/> {gettext("Add indicator")}
-            </a>
-            }
+                {!readonly &&
+                <AddIndicatorButton readonly={readonly} programId={programId}/>
+                }
             </div>
         </div>
     }
@@ -92,51 +92,72 @@ class StatusHeader extends React.Component {
 
 
 @observer
-class IndicatorFilter extends React.Component{
-    onSelection = (selectedObject) => {
-        let selectedIndicatorId = selectedObject ? selectedObject.value : null;
+export class IndicatorFilter extends React.Component{
+    onIndicatorSelection = (selected) => {
+        let selectedIndicatorId = selected ? selected.value : null;
 
         if (selectedIndicatorId) {
             eventBus.emit('nav-select-indicator-to-filter', selectedIndicatorId);
         }
     };
 
-    render() {
-        const indicators = this.props.rootStore.indicatorStore.indicators;
-        const selectedIndicatorId = this.props.uiStore.selectedIndicatorId;
+    onGroupingSelection = (selected) => {
+        this.props.uiStore.setGroupBy(selected.value);
+    }
 
-        const indicatorSelectOptions = indicators.map(i => {
+    render() {
+
+        const indicatorSelectOptions = this.props.rootStore.allIndicators.map(i => {
             return {
-                value: i.id,
+                value: i.pk,
                 label: i.name,
             }
         });
 
-        let selectedValue = null;
-        if (selectedIndicatorId) {
-            selectedValue = indicatorSelectOptions.find(i => i.value === selectedIndicatorId);
-        }
+        const indicatorSelectValue = this.props.uiStore.selectedIndicatorId ? indicatorSelectOptions.find(i => i.value === this.props.uiStore.selectedIndicatorId) : null;
 
-        return <nav className="list__filters list__filters--inline-label" id="id_div_indicators">
-            <label className="filters__label">
-                {gettext("Find an indicator:")}
-            </label>
-            <div className="filters__control">
-                <Select
-                    options={indicatorSelectOptions}
-                    value={selectedValue}
-                    isClearable={false}
-                    placeholder={gettext('None')}
-                    onChange={this.onSelection}
-                />
+        const indicatorGroupingOptions = this.props.uiStore.groupByOptions;
+        const groupingValue = this.props.uiStore.selectedGroupByOption;
+
+        return <nav className="list__filters list__filters--block-label" id="id_div_indicators">
+            <div className="form-group">
+                <label className="">
+                    {gettext("Find an indicator:")}
+                </label>
+                <div className="">
+                    <Select
+                        options={indicatorSelectOptions}
+                        value={indicatorSelectValue}
+                        isClearable={false}
+                        placeholder={gettext('None')}
+                        onChange={this.onIndicatorSelection}
+                    />
+                </div>
             </div>
+            {// show Group By only if program is on results framework AND has two levels (filter label is not false)
+                (this.props.uiStore.resultChainFilterLabel) &&
+            <React.Fragment>
+                <div className="form-group">
+                    <label className="">
+                        {gettext("Group indicators:")}
+                    </label>
+                    <div className="">
+                        <Select
+                               options={indicatorGroupingOptions}
+                               value={groupingValue}
+                               isClearable={false}
+                               onChange={this.onGroupingSelection}
+                        />
+                    </div>
+                </div>
+            </React.Fragment>}
         </nav>;
     }
 }
 
 
 @observer
-class IndicatorListTable extends React.Component {
+export class IndicatorListTable extends React.Component {
     constructor(props) {
         super(props);
 
@@ -153,27 +174,24 @@ class IndicatorListTable extends React.Component {
     onIndicatorResultsToggleClick(e, indicatorId) {
         e.preventDefault();
 
-        const resultsMap = this.props.resultsMap;
-
-        if (resultsMap.has(indicatorId)) {
-            eventBus.emit('delete-indicator-results', indicatorId);
+        if (this.props.program.resultsMap.has(indicatorId)) {
+            this.props.program.deleteResultsHTML(indicatorId);
         } else {
-            eventBus.emit('load-indicator-results', indicatorId);
+            this.props.program.updateResultsHTML(indicatorId);
         }
     }
 
     render() {
         const indicators = this.props.indicators;
         const program = this.props.program;
-        const programReportingPeriodEndDate = new Date(program.reporting_period_end);
-        const resultsMap = this.props.resultsMap;
+        const resultsMap = this.props.program.resultsMap;
 
         return <table className="table indicators-list">
             <thead>
             <tr className="table-header">
                 <th className="" id="id_indicator_name_col_header">{gettext("Indicator")}</th>
                 <th className="" id="id_indicator_buttons_col_header">&nbsp;</th>
-                <th className="" id="id_indicator_level_col_header">{gettext("Level")}</th>
+                {!program.resultsFramework && <th className="" id="id_indicator_level_col_header">{gettext("Level")}</th>}
                 <th className="" id="id_indicator_unit_col_header">{gettext("Unit of measure")}</th>
                 <th className="text-right" id="id_indicator_baseline_col_header">{gettext("Baseline")}</th>
                 <th className="text-right" id="id_indicator_target_col_header">{gettext("Target")}</th>
@@ -182,48 +200,65 @@ class IndicatorListTable extends React.Component {
 
             <tbody>
             {indicators.map(indicator => {
-                const resultsExist = resultsMap.has(indicator.id);
-                const resultsStr = resultsMap.get(indicator.id);
-                const targetPeriodLastEndDate = indicator.target_period_last_end_date ? new Date(indicator.target_period_last_end_date) : null;
-                // ^^^ Because calling Date() on null returns the current date, and we actually need null!
-
-                return <React.Fragment key={indicator.id}>
+                const resultsExist = resultsMap.has(indicator.pk);
+                const resultsStr = resultsExist ? resultsMap.get(indicator.pk) : "";
+                const targetPeriodLastEndDate = indicator.targetPeriodLastEndDate;
+                const displayFunc = indicator.isPercent ?
+                        (val) => val ? `${val}%` : '' :
+                        (val) => val ? `${val}` : '';
+                const numberCellFunc = (val) => {
+                    if (val == '' || isNaN(parseFloat(val))) {
+                        return '';
+                    }
+                    val = parseFloat(val).toFixed(2);
+                    if (val.slice(-2) == "00") {
+                        return displayFunc(val.slice(0, -3));
+                    } else if (val.slice(-1) == "0") {
+                        return displayFunc(val.slice(0, -1));
+                    }
+                    return displayFunc(val);
+                }
+                return <React.Fragment key={indicator.pk}>
                     <tr className={classNames("indicators-list__row", "indicators-list__indicator-header", {
-                        "is-highlighted": indicator.just_created,
+                        "is-highlighted": indicator.wasJustCreated,
                         "is-expanded": resultsExist
                     })}>
                         <td>
                             <a href="#"
-                               className="indicator_results_toggle"
-                               onClick={(e) => this.onIndicatorResultsToggleClick(e, indicator.id)}
+                               className="indicator_results_toggle btn text-action text-left"
+                               tabIndex="0"
+                               onClick={(e) => this.onIndicatorResultsToggleClick(e, indicator.pk)}
                             >
                                 <FontAwesomeIcon icon={resultsExist ? 'caret-down' : 'caret-right'} />
-                                <strong>{indicator.number}</strong>&nbsp;
-                                <span className="indicator_name">{indicator.name}</span>
+                                <strong>{ indicator.number ? indicator.number + ':' : '' }</strong>&nbsp;
+                                <span className="indicator_name">{ indicator.name }</span>
                             </a>
 
-                            {indicator.key_performance_indicator &&
+                            {indicator.isKeyPerformanceIndicator &&
                             <span className="badge">KPI</span>
                             }
 
-                            {targetPeriodLastEndDate && programReportingPeriodEndDate > targetPeriodLastEndDate &&
-                            <a href={`/indicators/indicator_update/${indicator.id}/`}
+                            {targetPeriodLastEndDate && program.reportingPeriodEnd > targetPeriodLastEndDate &&
+                            <a href={`/indicators/indicator_update/${indicator.pk}/`}
                                className="indicator-link color-red missing_targets"
                                data-toggle="modal" data-target="#indicator_modal_div"
                                data-tab="targets">
-                                <i className="fas fa-bullseye"/> Missing targets
+                                <i className="fas fa-bullseye"/> {
+                                    /* # Translators: Adj: labels this indicator as one which is missing one or more targets */
+                                    gettext('Missing targets')
+                                }
                             </a>
                             }
                         </td>
                         <td>
                             <a href="#" className="indicator-link"
-                               onClick={(e) => this.onIndicatorUpdateClick(e, indicator.id)}><i
+                               onClick={(e) => this.onIndicatorUpdateClick(e, indicator.pk)}><i
                                 className="fas fa-cog"/></a>
                         </td>
-                        <td>{indicator.level ? indicator.level.name : ''}</td>
-                        <td>{indicator.unit_of_measure}</td>
-                        <td className="text-right">{indicator.baseline_display}</td>
-                        <td className="text-right">{indicator.lop_target_display}</td>
+                        { !program.resultsFramework && <td>{ indicator.oldLevelDisplay }</td> }
+                        <td>{indicator.unitOfMeasure}</td>
+                        <td className="text-right">{ indicator.baseline === null ? gettext('N/A') : numberCellFunc(indicator.baseline) }</td>
+                        <td className="text-right">{ numberCellFunc(indicator.lopTarget) }</td>
                     </tr>
 
                     {resultsExist &&
@@ -243,38 +278,27 @@ class IndicatorListTable extends React.Component {
 }
 
 
-export const IndicatorList = observer(function (props) {
+const IndicatorList = observer(function (props) {
     const program = props.rootStore.program;
-    const indicatorStore = props.rootStore.indicatorStore;
-    // const indicators = props.rootStore.indicatorStore.indicators;
-    const resultsMap = props.rootStore.resultsMap;
-    const currentIndicatorFilter = props.uiStore.currentIndicatorFilter;
-    const selectedIndicatorId = props.uiStore.selectedIndicatorId;
-    // Either a gas gauge filter is applied, or an indicator has been selected, but not both
-
-    // apply gas gauge filter
-    let filteredIndicators = indicatorStore.filterIndicators(currentIndicatorFilter);
-
-    if (selectedIndicatorId) {
-        filteredIndicators = filteredIndicators.filter((i) => i.id == selectedIndicatorId);
-    }
 
     return <React.Fragment>
-        <StatusHeader indicatorCount={filteredIndicators.length}
-                      programId={program.id}
-                      currentIndicatorFilter={currentIndicatorFilter}
-                      filterApplied={currentIndicatorFilter || selectedIndicatorId}
-                      readonly={props.readonly}/>
+        <StatusHeader indicatorCount={props.rootStore.indicators.length }
+                      programId={program.pk}
+                      currentIndicatorFilter={ props.uiStore.currentIndicatorFilter }
+                      filterApplied={ props.uiStore.filterApplied }
+                      readonly={props.rootStore.readOnly}/>
 
         <IndicatorFilter uiStore={props.uiStore} rootStore={props.rootStore} />
 
-        {program.does_it_need_additional_target_periods &&
+        {program.needsAdditionalTargetPeriods &&
             <div id="id_missing_targets_msg" className="color-red">
                 <i className="fas fa-bullseye"/>&nbsp;
                 {gettext('Some indicators have missing targets. To enter these values, click the target icon near the indicator name.')}
             </div>
         }
 
-        <IndicatorListTable indicators={filteredIndicators} resultsMap={resultsMap} program={program} />
+        <IndicatorListTable indicators={props.rootStore.indicators} program={program} />
     </React.Fragment>
 });
+
+export default IndicatorList;

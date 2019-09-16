@@ -15,6 +15,7 @@ from django.db.models import Count, Min, Subquery, OuterRef, Q
 from django.db.models.signals import post_save
 from django.dispatch import receiver
 from rest_framework.authtoken.models import Token
+from tola.model_utils import generate_queryset
 from simple_history.models import HistoricalRecords
 from django.contrib.sessions.models import Session
 from django.urls import reverse
@@ -227,6 +228,24 @@ class TolaUser(models.Model):
             user_country_codes.add(self.country.code)
         return bool(user_country_codes & settings.PROJECTS_ACCESS_WHITELIST_SET)
 
+
+    def program_role(self, program_id):
+        if self.user.is_superuser:
+            return 'high'
+
+        program = Program.objects.get(id=program_id)
+        access_level = None
+
+        for p_country in program.country.all():
+            if p_country in self.countries.all():
+                access_level = 'low'
+
+        try:
+            access_level = ProgramAccess.objects.get(tolauser=self, program=program).role
+        except Exception as e:
+            print e
+        return access_level
+
     @property
     def has_admin_management_access(self):
         #circular import avoidance
@@ -366,8 +385,8 @@ COUNTRY_ROLE_CHOICES = (
 )
 
 class CountryAccess(models.Model):
-    tolauser = models.ForeignKey(TolaUser)
-    country = models.ForeignKey(Country)
+    tolauser = models.ForeignKey(TolaUser, on_delete=models.CASCADE)
+    country = models.ForeignKey(Country, on_delete=models.CASCADE)
     role = models.CharField(max_length=100, choices=COUNTRY_ROLE_CHOICES, default='user')
 
     def save(self, *args, **kwargs):
@@ -491,14 +510,81 @@ class FundCodeAdmin(admin.ModelAdmin):
     display = 'Fund Code'
 
 
-class ActiveProgramsManager(models.Manager):
-    """manager to return only active programs - those with a status of 'funded' or 'Funded'"""
-    ACTIVE_FUNDING_STATUS = 'funded'
-    def get_queryset(self):
-        return super(ActiveProgramsManager, self).get_queryset().filter(
-            funding_status__iexact=self.ACTIVE_FUNDING_STATUS)
+class ActiveProgramsMixin(object):
+    """eliminates all non active programs"""
+    qs_name = 'ActivePrograms'
+    filter_methods = ['hide_inactive']
+
+    def hide_inactive(self):
+        """Only programs with funding status Funded or funded"""
+        return self.filter(
+            funding_status__iexact='Funded'
+        )
+
+class RFProgramsMixin(object):
+    """annotates for a simple boolean indicating whether program is using the results framework/auto-numbering"""
+    qs_name = 'RFAware'
+    annotate_methods = ['is_using_results_framework', 'is_manual_numbering']
+
+    def is_using_results_framework(self):
+        return self.annotate(
+            using_results_framework=models.Case(
+                models.When(
+                    _using_results_framework=Program.NOT_MIGRATED,
+                    then=models.Value(False)
+                ),
+                default=models.Value(True),
+                output_field=models.BooleanField()
+            )
+        )
+
+    def is_manual_numbering(self):
+        return self.annotate(
+            using_manual_numbering=models.Case(
+                models.When(
+                    models.Q(
+                        models.Q(using_results_framework=False) |
+                        models.Q(auto_number_indicators=False)
+                    ),
+                    then=models.Value(True)
+                ),
+                default=models.Value(False),
+                output_field=models.BooleanField()
+            )
+        )
+
+class ProgramPageProgramsMixin(object):
+    """annotates a program for whether additional target periods are needed"""
+    qs_name = 'ProgramPage'
+    annotate_methods = ['needs_additional_target_periods']
+
+    def needs_additional_target_periods(self):
+        return self.annotate(
+            needs_additional_target_periods=models.Case(
+                models.When(
+                    reporting_period_end__gt=models.Subquery(
+                        Indicator.program_page_objects.filter(
+                            program=models.OuterRef('pk')
+                        ).annotate(
+                            newest_end_date=models.Subquery(
+                                PeriodicTarget.objects.filter(
+                                    indicator=models.OuterRef('pk')
+                                ).order_by('-end_date').values('end_date')[:1])
+                        ).order_by('newest_end_date').values('newest_end_date')[:1],
+                        output_field=models.DateField()
+                    ),
+                    then=models.Value(True)
+                ),
+                default=models.Value(False),
+                output_field=models.BooleanField()
+            )
+        )
 
 class Program(models.Model):
+    NOT_MIGRATED = 1 # programs created before satsuma release which have not switched over yet
+    MIGRATED = 2 # programs created before satsuma which have switched to new RF levels
+    RF_ALWAYS = 3 # programs created after satsuma release - on new RF levels with no option
+
     gaitid = models.CharField(_("ID"), max_length=255, null=True, blank=True)
     name = models.CharField(_("Program Name"), max_length=255, blank=True)
     funding_status = models.CharField(_("Funding Status"), max_length=255, blank=True)
@@ -522,9 +608,23 @@ class Program(models.Model):
     end_date = models.DateField(_("Program End Date"), null=True, blank=True)
     reporting_period_start = models.DateField(_("Reporting Period Start Date"), null=True, blank=True)
     reporting_period_end = models.DateField(_("Reporting Period End Date"), null=True, blank=True)
+    auto_number_indicators = models.BooleanField(
+        # Translators: This is an option that users can select to use the new "results framework" option to organize their indicators.
+        _("Auto-number indicators according to the results framework"),
+        default=True, blank=False
+    )
+    _using_results_framework = models.IntegerField(
+        _("Group indicators according to the results framework"),
+        default=RF_ALWAYS, blank=False
+    )
 
     objects = models.Manager()
-    active_programs = ActiveProgramsManager()
+    rf_aware_objects = generate_queryset(ActiveProgramsMixin, RFProgramsMixin).as_manager()
+    program_page_objects = generate_queryset(
+        ActiveProgramsMixin,
+        RFProgramsMixin,
+        ProgramPageProgramsMixin
+    ).as_manager()
 
     class Meta:
         verbose_name = _("Program")
@@ -538,6 +638,10 @@ class Program(models.Model):
             self.create_date = timezone.now()
         self.edit_date = timezone.now()
         super(Program, self).save()
+
+    @property
+    def rf_aware_indicators(self):
+        return self.indicator_set(manager='rf_aware_objects')
 
     @property
     def countries(self):
@@ -634,7 +738,7 @@ class Program(models.Model):
         """returns true if this program has any indicators which have a time-aware target frequency - used in program
         reporting period date validation"""
         return self.indicator_set.filter(
-            target_frequency__in=Indicator.TIME_AWARE_TARGET_FREQUENCIES
+            target_frequency__in=Indicator.REGULAR_TARGET_FREQUENCIES
             ).exists()
 
     @property
@@ -643,7 +747,7 @@ class Program(models.Model):
         indicators with a time-aware frequency - used in program reporting period date validation"""
         most_recent = PeriodicTarget.objects.filter(
             indicator__program=self,
-            indicator__target_frequency__in=Indicator.TIME_AWARE_TARGET_FREQUENCIES
+            indicator__target_frequency__in=Indicator.REGULAR_TARGET_FREQUENCIES
         ).order_by('-start_date').first()
         return most_recent if most_recent is None else most_recent.start_date
 
@@ -651,6 +755,14 @@ class Program(models.Model):
     def get_periods_for_frequency(self, frequency):
         period_generator = PeriodicTarget.generate_for_frequency(frequency)
         return period_generator(self.reporting_period_start, self.reporting_period_end)
+
+    def get_short_form_periods_for_frequency(self, frequency):
+        period_generator = PeriodicTarget.generate_for_frequency(frequency, short_form=True)
+        return period_generator(self.reporting_period_start, self.reporting_period_end)
+
+    @property
+    def target_frequencies(self):
+        return self.indicator_set.all().order_by().values('target_frequency').distinct().values_list('target_frequency', flat=True)
 
     @property
     def admin_logged_fields(self):
@@ -679,6 +791,42 @@ class Program(models.Model):
             "end_date": end_date
         }
 
+    @property
+    def rf_chain_sort_label(self):
+        """Many pages ask whether you sort indicators "by Level" or "by <second tier name> chain"
+
+            This helper method provides the second option label"""
+        tier = self.level_tiers.filter(tier_depth=2).first() if self.results_framework else None
+        if tier:
+            # Translators: this labels a filter to sort indicators, for example, "by Outcome chain":
+            tier_name = _(tier.name)
+            return _('by %(level_name)s chain') % {'level_name': tier_name}
+        return None
+
+    @property
+    def rf_chain_group_label(self):
+        """IPTT labels filter options as "<second tier name> chains"
+        """
+        tier = self.level_tiers.filter(tier_depth=2).first() if self.results_framework else None
+        if tier:
+            # Translators: this labels a filter to sort indicators, for example, "by Outcome chain":
+            tier_name = _(tier.name)
+            return _('%(level_name)s chains') % {'level_name': tier_name}
+        return None
+
+    @property
+    def results_framework(self):
+        if hasattr(self, 'using_results_framework'):
+            return self.using_results_framework
+        return self._using_results_framework != self.NOT_MIGRATED
+
+    @property
+    def manual_numbering(self):
+        if hasattr(self, 'using_manual_numbering'):
+            return self.using_manual_numbering
+        return not self.results_framework or not self.auto_number_indicators
+
+
 
 PROGRAM_ROLE_CHOICES = (
     # Translators: Refers to a user permission role with limited access to view data only
@@ -697,9 +845,9 @@ PROGRAM_ROLE_INT_MAP = {
 }
 
 class ProgramAccess(models.Model):
-    program = models.ForeignKey(Program)
-    tolauser = models.ForeignKey(TolaUser)
-    country = models.ForeignKey(Country)
+    program = models.ForeignKey(Program, on_delete=models.CASCADE)
+    tolauser = models.ForeignKey(TolaUser, on_delete=models.CASCADE)
+    country = models.ForeignKey(Country, on_delete=models.CASCADE)
     role = models.CharField(max_length=100, choices=PROGRAM_ROLE_CHOICES, default='low')
 
     class Meta:

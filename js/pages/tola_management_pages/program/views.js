@@ -6,6 +6,7 @@ import ManagementTable from 'components/management-table'
 import Pagination from 'components/pagination'
 import ProgramEditor from './components/program_editor'
 import EditProgramProfile from './components/edit_program_profile'
+import ProgramSettings from './components/program_settings'
 import ProgramHistory from './components/program_history'
 import LoadingSpinner from 'components/loading-spinner'
 import FoldingSidebar from 'components/folding-sidebar'
@@ -197,7 +198,7 @@ export const IndexView = observer(
                 </div>
                 <div className="filter-section filter-buttons">
                     <button className="btn btn-primary" onClick={() => store.applyFilters()}>{gettext("Apply")}</button>
-                    <button className="btn btn-inverse" onClick={() => store.clearFilters()}>{gettext("Reset")}</button>
+                    <button className="btn btn-reset" onClick={() => store.clearFilters()}>{gettext("Reset")}</button>
                 </div>
             </FoldingSidebar>
             <div className="col admin-list">
@@ -249,6 +250,14 @@ export const IndexView = observer(
                                                             sectorOptions={sectorFilterOptions}
                                                             countryOptions={allCountryOptions}
                                                             errors={store.editing_errors} />
+                                                </LoadingSpinner>
+                                            )}
+                                            SettingsSection={observer(() =>
+                                                <LoadingSpinner isLoading={store.saving}>
+                                                    <ProgramSettings
+                                                        program_data={data}
+                                                        store={store}
+                                                        onSave={ (id, data) => store.updateProgram(id, data) } />
                                                 </LoadingSpinner>
                                             )}
                                             HistorySection={observer(() =>

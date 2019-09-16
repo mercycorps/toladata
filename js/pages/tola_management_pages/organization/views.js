@@ -82,7 +82,7 @@ export const IndexView = observer(
                 </div>
                 <div className="filter-section filter-buttons">
                     <button className="btn btn-primary" onClick={() => store.applyFilters()}>{gettext("Apply")}</button>
-                    <button className="btn btn-inverse" onClick={() => store.clearFilters()}>{gettext("Reset")}</button>
+                    <button className="btn btn-reset" onClick={() => store.clearFilters()}>{gettext("Reset")}</button>
                 </div>
             </FoldingSidebar>
             <div className="col admin-list">

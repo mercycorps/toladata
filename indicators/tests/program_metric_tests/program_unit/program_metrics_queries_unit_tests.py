@@ -12,7 +12,7 @@ import datetime
 from indicators.queries import ProgramWithMetrics
 from indicators.models import Indicator, PeriodicTarget
 from indicators.views.views_indicators import generate_periodic_targets
-from indicators.views.views_reports import IPTT_ReportView
+from indicators.views.views_reports import IPTTReport
 from factories import (
     indicators_models as i_factories,
     workflow_models as w_factories
@@ -243,11 +243,11 @@ class TimeAwareTargetsMixin:
 
     def generate_targets(self, indicator, skip=None):
         #pylint: disable=W0212
-        target_frequency_num_periods = IPTT_ReportView._get_num_periods(
-            self.program.reporting_period_start,
-            self.program.reporting_period_end,
-            self.frequency
-        )
+        target_frequency_num_periods = len(
+            [p for p in PeriodicTarget.generate_for_frequency(self.frequency)(
+                self.program.reporting_period_start,
+                self.program.reporting_period_end,
+            )])
         if skip is not None:
             target_frequency_num_periods -= 1
         if target_frequency_num_periods == 0:

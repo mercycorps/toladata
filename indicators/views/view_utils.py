@@ -12,43 +12,6 @@ from django.utils import timezone
 
 logger = logging.getLogger(__name__)
 
-def handleDataCollectedRecords(indicatr, lop, existing_target_frequency,
-                               new_target_frequency, generated_pt_ids=None):
-    """
-    If the target_frequency is changed from LOP to something else then
-    disassociate all results from the LOP periodic_target and then
-    delete the LOP periodic_target
-    if existing_target_frequency == Indicator.LOP
-    and new_target_frequency != Indicator.LOP:
-    """
-    if existing_target_frequency != new_target_frequency:
-        Result.objects.filter(indicator=indicatr) \
-            .update(periodic_target=None)
-
-        PeriodicTarget.objects.filter(indicator=indicatr).delete()
-
-    # If the user sets target_frequency to LOP then create a LOP
-    # periodic_target and associate all results for this indicator with
-    # this single LOP periodic_target
-    if existing_target_frequency != Indicator.LOP and \
-            new_target_frequency == Indicator.LOP:
-
-        lop_pt = PeriodicTarget.objects.create(
-            indicator=indicatr, period=PeriodicTarget.LOP_PERIOD,
-            target=lop, create_date=timezone.now()
-        )
-        Result.objects.filter(indicator=indicatr) \
-            .update(periodic_target=lop_pt)
-
-    if generated_pt_ids:
-        pts = PeriodicTarget.objects.filter(indicator=indicatr,
-                                            pk__in=generated_pt_ids)
-        for pt in pts:
-            Result.objects.filter(
-                indicator=indicatr,
-                date_collected__range=[pt.start_date, pt.end_date]) \
-                .update(periodic_target=pt)
-
 
 def import_indicator(service=1):
     """

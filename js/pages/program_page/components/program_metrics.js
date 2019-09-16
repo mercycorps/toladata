@@ -2,7 +2,7 @@ import React from 'react';
 import classNames from 'classnames';
 import { observer } from "mobx-react"
 import eventBus from '../../../eventbus';
-import {IndicatorFilterType} from "../models";
+import {IndicatorFilterType} from "../../../constants";
 import {localDateFromISOString} from "../../../date_utils";
 
 
@@ -105,17 +105,15 @@ class GaugeBand extends React.Component {
     render() {
         const tickCount = 10;
 
-        const {indicatorStore, program} = this.props;
-
-        const currentIndicatorFilter = this.props.currentIndicatorFilter;
+        const { rootStore, currentIndicatorFilter, program } = this.props;
 
         const isHighlighted = this.handledFilterTypes.has(currentIndicatorFilter);
 
-        const totalIndicatorCount = indicatorStore.indicators.length;
-        const nonReportingCount = indicatorStore.getIndicatorsNotReporting.length;
-        const highCount = indicatorStore.getIndicatorsAboveTarget.length;
-        const lowCount = indicatorStore.getIndicatorsBelowTarget.length;
-        const onTargetCount = indicatorStore.getIndicatorsOnTarget.length;
+        const totalIndicatorCount = rootStore.allIndicators.length;
+        const nonReportingCount = rootStore.getIndicatorsNotReporting.length;
+        const highCount = rootStore.getIndicatorsAboveTarget.length;
+        const lowCount = rootStore.getIndicatorsBelowTarget.length;
+        const onTargetCount = rootStore.getIndicatorsOnTarget.length;
 
         //100 and 0 should only represent absolute "all" and "none" values respectively (no round to 100 or to 0)
         const makePercent = totalIndicatorCount > 0 ?
@@ -127,12 +125,11 @@ class GaugeBand extends React.Component {
         const percentBelow = makePercent(lowCount);
         const percentNonReporting = makePercent(nonReportingCount);
 
-        const marginPercent = this.props.indicatorOnScopeMargin * 100;
+        const marginPercent = this.props.rootStore.onScopeMargin * 100;
 
-        let programPeriodStartDate = localDateFromISOString(program.reporting_period_start);
+        let programPeriodStartDate = program.reportingPeriodStart;
 
-        let gaugeHasErrors = (indicatorStore.getIndicatorsReporting.length === 0) || (indicatorStore.getTotalResultsCount === 0);
-
+        let gaugeHasErrors = (rootStore.getIndicatorsReporting.length === 0) || (rootStore.getTotalResultsCount === 0);
 
         // Top level wrapper of component
         let Gauge = (props) => {
@@ -249,12 +246,11 @@ class GaugeBand extends React.Component {
 
 export const ProgramMetrics = observer(function (props) {
     const program = props.rootStore.program;
-    const indicatorStore = props.rootStore.indicatorStore;
-    const indicators = indicatorStore.indicators;
+    const indicators = props.rootStore.allIndicators;
 
     const currentIndicatorFilter = props.uiStore.currentIndicatorFilter;
 
-    const indicatorOnScopeMargin = this.props.indicatorOnScopeMargin;
+    const indicatorOnScopeMargin = props.rootStore.indicatorOnScopeMargin;
 
     // Use objs for labels below to allow for translator notes to be added
 
@@ -307,12 +303,9 @@ export const ProgramMetrics = observer(function (props) {
     };
 
     // Are some targets defined on any indicators?
-    // all_targets_defined is an int (1,0) instead of bool
-    const someTargetsDefined = indicators.map(i => i.all_targets_defined === 1).some(b => b);
-
+    const someTargetsDefined = indicators.map(i => i.hasAllTargetsDefined).some(b => b);
     // Do any indicators have results?
-    const someResults = indicators.map(i => i.results_count).some(count => count > 0);
-
+    const someResults = indicators.map(i => i.resultsCount).some(count => count > 0);
     // Do not display on pages with no indicators
     if (indicators.length === 0) return null;
 
@@ -320,15 +313,14 @@ export const ProgramMetrics = observer(function (props) {
 
             <GaugeBand currentIndicatorFilter={currentIndicatorFilter}
                        indicatorOnScopeMargin={indicatorOnScopeMargin}
-                       indicatorStore={indicatorStore}
+                       rootStore={props.rootStore}
                        program={program}
             />
 
             <GaugeTank filterType={IndicatorFilterType.missingTarget}
                        currentIndicatorFilter={currentIndicatorFilter}
-
                        allIndicatorsLength={indicators.length}
-                       filteredIndicatorsLength={indicatorStore.getIndicatorsNeedingTargets.length}
+                       filteredIndicatorsLength={props.rootStore.getIndicatorsNeedingTargets.length}
                        {...targetLabels}
 
                        />
@@ -337,7 +329,7 @@ export const ProgramMetrics = observer(function (props) {
                        currentIndicatorFilter={currentIndicatorFilter}
 
                        allIndicatorsLength={indicators.length}
-                       filteredIndicatorsLength={indicatorStore.getIndicatorsNeedingResults.length}
+                       filteredIndicatorsLength={props.rootStore.getIndicatorsNeedingResults.length}
 
                        disabled={! someTargetsDefined}
 
@@ -348,8 +340,8 @@ export const ProgramMetrics = observer(function (props) {
             <GaugeTank filterType={IndicatorFilterType.missingEvidence}
                        currentIndicatorFilter={currentIndicatorFilter}
                        // The names below are misleading as this gauge is measuring *results*, not indicators
-                       allIndicatorsLength={indicatorStore.getTotalResultsCount}
-                       filteredIndicatorsLength={indicatorStore.getTotalResultsCount - indicatorStore.getTotalResultsWithEvidenceCount}
+                       allIndicatorsLength={props.rootStore.getTotalResultsCount}
+                       filteredIndicatorsLength={props.rootStore.getTotalResultsCount - props.rootStore.getTotalResultsWithEvidenceCount}
 
                        disabled={! someTargetsDefined || ! someResults}
 

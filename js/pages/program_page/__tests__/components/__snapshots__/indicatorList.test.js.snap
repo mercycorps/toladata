@@ -1,0 +1,178 @@
+// Jest Snapshot v1, https://goo.gl/fbAQLP
+
+exports[`Indicator List elements Indicator List Table component renders without crashing 1`] = `
+<table
+  className="table indicators-list"
+>
+  <thead>
+    <tr
+      className="table-header"
+    >
+      <th
+        className=""
+        id="id_indicator_name_col_header"
+      >
+        Indicator
+      </th>
+      <th
+        className=""
+        id="id_indicator_buttons_col_header"
+      >
+         
+      </th>
+      <th
+        className=""
+        id="id_indicator_level_col_header"
+      >
+        Level
+      </th>
+      <th
+        className=""
+        id="id_indicator_unit_col_header"
+      >
+        Unit of measure
+      </th>
+      <th
+        className="text-right"
+        id="id_indicator_baseline_col_header"
+      >
+        Baseline
+      </th>
+      <th
+        className="text-right"
+        id="id_indicator_target_col_header"
+      >
+        Target
+      </th>
+    </tr>
+  </thead>
+  <tbody />
+</table>
+`;
+
+exports[`Indicator List elements Status Header component calls for filter title 1`] = `
+<div
+  className="indicators-list__header"
+>
+  <h3
+    className="no-bold"
+  >
+    <span
+      id="indicators-list-title"
+    >
+      %s indicator is &gt;15% above target
+    </span>
+    <a
+      className="ml-2"
+      href="#"
+      id="show-all-indicators"
+      onClick={[Function]}
+    >
+      <small>
+        Show all
+      </small>
+    </a>
+  </h3>
+  <div>
+    <button
+      className="btn btn-link btn-add"
+      disabled={false}
+      onClick={[Function]}
+      type="button"
+    >
+      <i
+        className="fas fa-plus-circle"
+      />
+       
+      Add indicator
+    </button>
+  </div>
+</div>
+`;
+
+exports[`Indicator List elements Status Header component renders filter applied 1`] = `
+<div
+  className="indicators-list__header"
+>
+  <h3
+    className="no-bold"
+  >
+    <span
+      id="indicators-list-title"
+    >
+      %s indicator
+    </span>
+    <a
+      className="ml-2"
+      href="#"
+      id="show-all-indicators"
+      onClick={[Function]}
+    >
+      <small>
+        Show all
+      </small>
+    </a>
+  </h3>
+  <div>
+    <button
+      className="btn btn-link btn-add"
+      disabled={false}
+      onClick={[Function]}
+      type="button"
+    >
+      <i
+        className="fas fa-plus-circle"
+      />
+       
+      Add indicator
+    </button>
+  </div>
+</div>
+`;
+
+exports[`Indicator List elements Status Header component renders read only 1`] = `
+<div
+  className="indicators-list__header"
+>
+  <h3
+    className="no-bold"
+  >
+    <span
+      id="indicators-list-title"
+    >
+      %s indicator
+    </span>
+  </h3>
+  <div />
+</div>
+`;
+
+exports[`Indicator List elements Status Header component renders without crashing 1`] = `
+<div
+  className="indicators-list__header"
+>
+  <h3
+    className="no-bold"
+  >
+    <span
+      id="indicators-list-title"
+    >
+      %s indicator
+    </span>
+  </h3>
+  <div>
+    <button
+      className="btn btn-link btn-add"
+      disabled={false}
+      onClick={[Function]}
+      type="button"
+    >
+      <i
+        className="fas fa-plus-circle"
+      />
+       
+      Add indicator
+    </button>
+  </div>
+</div>
+`;

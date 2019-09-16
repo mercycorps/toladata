@@ -107,7 +107,7 @@ export default class EditProgramProfile extends React.Component {
                     <div className="form-group">
                         <label htmlFor="program-description-input">{gettext("Description")}</label>
                         <textarea
-                            value={formdata.description}
+                            value={formdata.description || ''}
                             onChange={(e) => this.updateFormField('description', e.target.value) }
                             className={classNames('form-control', { 'is-invalid': this.formErrors('description') })}
                             id="program-description-input"

@@ -1,8 +1,0 @@
-[localhost]
-localhost ansible_connection=local
-
-[app-servers]
-default
-
-[dev:children]
-app-servers

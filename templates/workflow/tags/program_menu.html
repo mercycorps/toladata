@@ -1,6 +1,7 @@
 {% load i18n %}
 
 {% if countries %}
+<div class="select-placeholder" id="goto-country-program-placeholder" style="width: 300px"></div>
 <select class="" id="goto-country-program" style="display: none">
     <option value=""></option>
     {% if countries %}
@@ -98,6 +99,7 @@
         });
 
         // Only show after select2 init
+        $('#goto-country-program-placeholder').hide();
         $('#goto-country-program').show();
     });
 </script>

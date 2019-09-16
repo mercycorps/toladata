@@ -68,13 +68,15 @@ def get_next_date_monthly(_, date):
         return datetime.date(date.year + 1, date.month - 11, 1)
     return datetime.date(date.year, date.month + 1, 1)
 
+
 class TestAnnualNoncumulativeNumeric(test.TestCase):
     is_cumulative = False
     lop_target = 1500
     calculated_lop_target = 1200
     progress_lop_target = 300
     lop_actual = 520
-    lop_percent_met = 0.35
+    lop_percent_met = 0.43 # - the new (based on caluclated_target) version
+    # lop_percent_met = 0.35 - the old (based on lop_target) version
     lop_actual_progress = 170
     lop_percent_met_progress = 0.57
     target_values = [100, 200, 400, 500]
@@ -97,7 +99,7 @@ class TestAnnualNoncumulativeNumeric(test.TestCase):
         # lop_target_calculated is the sum of all targets entered for the program for noncumulative number
         self.assertEqual(self.results_indicator.lop_target_calculated, self.calculated_lop_target)
         # lop_target_active is currently the lop_target field (this alias is to assist in deprecating):
-        self.assertEqual(self.results_indicator.lop_target_active, self.results_indicator.lop_target)
+        self.assertEqual(self.results_indicator.lop_target_active, self.results_indicator.lop_target_calculated)
         # lop_target_progress is for metrics only, sum of targets for ACTIVE target periods
         # (active target period = completed for time-aware, with-data for event/mid-end, lop_target_active for lop)
         self.assertEqual(self.metrics_indicator.lop_target_progress, self.progress_lop_target)
@@ -109,7 +111,7 @@ class TestAnnualNoncumulativeNumeric(test.TestCase):
         self.assertEqual(self.metrics_indicator.lop_actual_progress, self.lop_actual_progress)
 
     def test_lop_percent_met(self):
-        # lop_percent_met is the sum of all results divided by the arbitrary lop target
+        # lop_percent_met is the sum of all results divided by the calculated lop_target
         self.assertEqual(round(self.results_indicator.lop_percent_met, 2), self.lop_percent_met)
         # lop_percent_met_progress is the sum of all results in active targets divided by the sum of all active
         # targets:
@@ -138,13 +140,15 @@ class TestAnnualNoncumulativeNumeric(test.TestCase):
         for target, expected in zip(self.results_indicator.annotated_targets, self.complete):
             self.assertEqual(target.is_complete, expected)
 
+
 class TestAnnualCumulativeNumeric(TestAnnualNoncumulativeNumeric):
     is_cumulative = True
     lop_target = 200
     calculated_lop_target = 90
     progress_lop_target = 20
     lop_actual = 78
-    lop_percent_met = 0.39
+    #lop_percent_met = 0.39
+    lop_percent_met = 0.87 # new version based on calculated lop target
     lop_actual_progress = 33
     lop_percent_met_progress = 1.65
     target_values = [10, 20, 50, 90]
@@ -153,12 +157,14 @@ class TestAnnualCumulativeNumeric(TestAnnualNoncumulativeNumeric):
     expected_percent_mets = [0.8, 1.65, 1.56, None]
     complete = [True, True, False, False, False]
 
+
 class TestMidEndPercent(test.TestCase):
     lop_target = 60
     calculated_lop_target = 65
     progress_lop_target = 80
     lop_actual = 70
-    lop_percent_met = 1.17
+    lop_percent_met = 1.08 # new version based on calculated lop target
+    # lop_percent_met = 1.17
     lop_actual_progress = 70
     lop_percent_met_progress = 0.88
     target_values = [80, 65]
@@ -213,7 +219,7 @@ class TestMidEndPercent(test.TestCase):
         # lop_target_calculated is the sum of all targets entered for the program for noncumulative number
         self.assertEqual(self.results_indicator.lop_target_calculated, self.calculated_lop_target)
         # lop_target_active is currently the lop_target field (this alias is to assist in deprecating):
-        self.assertEqual(self.results_indicator.lop_target_active, self.results_indicator.lop_target)
+        self.assertEqual(self.results_indicator.lop_target_active, self.results_indicator.lop_target_calculated)
         # lop_target_progress is for metrics only, sum of targets for ACTIVE target periods
         # (active target period = completed for time-aware, with-data for event/mid-end, lop_target_active for lop)
         self.assertEqual(self.metrics_indicator.lop_target_progress, self.progress_lop_target)
@@ -251,6 +257,7 @@ class TestMidEndPercent(test.TestCase):
         for target, expected in zip(self.results_indicator.annotated_targets, self.complete):
             self.assertEqual(target.is_complete, expected)
 
+
 class ScenarioBuilderMixin:
     program_dates = [datetime.date(2017, 6, 1), datetime.date(2020, 1, 31)]
     unit_of_measure_type = Indicator.NUMBER
@@ -259,7 +266,7 @@ class ScenarioBuilderMixin:
     is_cumulative = False
     target_values = []
     result_values = []
-    
+
     def do_setup(self):
         self.program = self.get_program()
         self.indicator = self.get_indicator()
@@ -340,6 +347,7 @@ class ResultsTestBase:
         self.assertEqual(self.expected_lop_actual, self.results_indicator.lop_actual)
         self.assertAlmostEqual(self.expected_lop_percent_met, self.results_indicator.lop_percent_met, 2)
 
+
 class TestMonthlyDecreaseCumulative(test.TestCase, ResultsTestBase, ScenarioBuilderMixin):
     """built to deal with a weird failing edge case"""
     program_dates = [datetime.date(2017, 6, 1), datetime.date(2020, 1, 31)]
@@ -348,12 +356,15 @@ class TestMonthlyDecreaseCumulative(test.TestCase, ResultsTestBase, ScenarioBuil
     target_frequency = Indicator.MONTHLY
     is_cumulative = True
     lop_target = 12000
+    calculated_lop_target = 100
     target_values = range(500, 180, -10)
     result_values = range(400, 628, 12)
     expected_result_values = []
-    expected_lop_target = 12000
+    # expected_lop_target = 12000
+    expected_lop_target = 190 # new value based on calculated lop target
     expected_lop_actual = 9652
-    expected_lop_percent_met = 0.80
+    #expected_lop_percent_met = 0.80
+    expected_lop_percent_met = 50.8 # new value based on calculated lop target
     next_date_func = get_next_date_monthly
 
     def setUp(self):
@@ -368,7 +379,8 @@ class TestAnnualIncreasePercentage(test.TestCase, ResultsTestBase, ScenarioBuild
     target_values = [50, 0, 90, 20]
     result_values = [45, 5, 0]
     expected_result_values = [45, 5, 0]
-    expected_lop_target = 30
+    # expected_lop_target = 30 
+    expected_lop_target = 20 # new value based on calculated lop target
     expected_lop_actual = 0
     expected_lop_percent_met = 0
     next_date_func = get_next_date_yearly

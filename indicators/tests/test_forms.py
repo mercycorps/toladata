@@ -12,7 +12,7 @@ from factories import (
 from indicators.forms import IPTTReportFilterForm
 from django.test import TestCase, RequestFactory
 
-@unittest.skip('no')
+@unittest.skip('TODO: rewrite this test to match current filter form')
 class TestFilterForm(TestCase):
 
     def test_form_populates(self):

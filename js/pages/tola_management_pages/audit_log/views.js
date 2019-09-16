@@ -38,9 +38,17 @@ const IndicatorChangeset = ({data, name, pretty_name}) => {
         </div>
     } else {
         return <div className="change__field">
-            <strong>{pretty_name}:</strong> {(data !== null && data !== undefined)?data.toString():gettext('N/A')}
+            { name !== 'name' ? <strong>{pretty_name}: </strong>  : '' }
+            {(data !== null && data !== undefined)?data.toString():gettext('N/A')}
         </div>
     }
+}
+
+const ResultLevelChangeset = ({data, name, pretty_name}) => {
+    return <div className="change__field">
+        { name !== 'name' ? <strong>{pretty_name}: </strong>  : '' }
+        {(data !== null && data !== undefined)?data.toString():gettext('N/A')}
+    </div>
 }
 
 class ChangesetEntry extends React.Component {
@@ -58,6 +66,9 @@ class ChangesetEntry extends React.Component {
                 break
             case 'program_dates_changed':
                 return <ProgramDatesChangeset data={data} name={name} pretty_name={pretty_name} />
+                break
+            case 'level_changed':
+                return <ResultLevelChangeset data={data} name={name} pretty_name={pretty_name} />
                 break
         }
     }
@@ -94,6 +105,38 @@ const CollapseAllButton = observer(
     }
 );
 
+const IndicatorNameSpan = ({indicator}) => {
+    if (! indicator) {
+        return <span>{gettext('N/A')}</span>
+    }
+
+    if (indicator.results_aware_number) {
+        return <span>
+            <strong>{gettext('Indicator')} {indicator.results_aware_number}:</strong> {indicator.name}
+        </span>
+    } else {
+        return <span>
+            <strong>{gettext('Indicator')}:</strong> {indicator.name}
+        </span>
+    }
+};
+
+const ResultLevel = ({indicator, level}) => {
+    if (indicator) {
+
+        if (indicator.leveltier_name && indicator.level_display_ontology)
+            return `${indicator.leveltier_name} ${indicator.level_display_ontology}`;
+        else if (indicator.leveltier_name)
+            return indicator.leveltier_name;
+    }
+
+    if (level) {
+        return `${level.name} ${level.display_ontology}`;
+    }
+
+    return <span>{gettext('N/A')}</span>
+};
+
 export const IndexView = observer(
     ({store}) => {
         return <div id="audit-log-index-view">
@@ -110,7 +153,7 @@ export const IndexView = observer(
                 </div>
                 <div className="controls__buttons">
                     <a className="btn btn-secondary btn-sm" href={`/api/tola_management/program/${store.program_id}/export_audit_log`}>
-                        <i className="fas fa-download"></i>
+                        <i className="fas fa-download" />
                         {gettext("Excel")}
                     </a>
                 </div>
@@ -122,7 +165,7 @@ export const IndexView = observer(
                         <thead>
                             <tr>
                                 <th className="text-nowrap">{gettext("Date and time")}</th>
-                                <th className="text-nowrap">{gettext("No.")}</th>
+                                <th className="text-nowrap">{gettext("Result Level")}</th>
                                 <th className="text-nowrap">{gettext("Indicator")}</th>
                                 <th className="text-nowrap">{gettext("User")}</th>
                                 <th className="text-nowrap">{gettext("Organization")}</th>
@@ -139,8 +182,8 @@ export const IndexView = observer(
                                     <td className="text-action">
                                         <FontAwesomeIcon icon={is_expanded ? 'caret-down' : 'caret-right'} />&nbsp;{data.date}
                                     </td>
-                                    <td>{(data.indicator) ? data.indicator.number : gettext('N/A')}</td>
-                                    <td>{(data.indicator) ? data.indicator.name : gettext('N/A')}</td>
+                                    <td><ResultLevel indicator={data.indicator} level={data.level} /></td>
+                                    <td>{<IndicatorNameSpan indicator={data.indicator} />}</td>
                                     <td>{data.user}</td>
                                     <td>{data.organization}</td>
                                     <td className="text-nowrap">{data.pretty_change_type}</td>

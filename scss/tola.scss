@@ -103,6 +103,9 @@
 @import 'components/login'; // login page
 @import 'components/react-select'; // overrides and extensions to react-select
 @import 'components/react-multiselect'; // overrides and extensions to react-multiselect
+@import 'components/results-framework'; // Results Framework and Framelog
+@import 'components/sortable-list'; // Sortable list widget
+@import 'components/logframe'; // styling for logframe web view
 
 /* Local custom CSS and overloads for non-BS libraries */
 @import 'mc_tola_forms'; // extremely custom!
