@@ -28,6 +28,7 @@ google-auth-httplib2
 mysqlclient
 pbr
 pip-tools
+python3-saml
 simplejson
 social-auth-app-django
 WeasyPrint

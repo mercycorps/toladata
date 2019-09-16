@@ -16,7 +16,7 @@ click==7.0                # via pip-tools
 confusable-homoglyphs==3.2.0  # via django-registration
 cssselect2==0.2.2         # via cairosvg, weasyprint
 dateparser==0.7.1
-defusedxml==0.6.0         # via cairosvg, odfpy, python3-openid, social-auth-core
+defusedxml==0.6.0         # via cairosvg, odfpy, python3-openid, python3-saml, social-auth-core
 diff-match-patch==20181111  # via django-import-export
 django-ckeditor==5.7.1
 django-crispy-forms==1.7.2
@@ -49,7 +49,9 @@ google-auth==1.6.3
 html5lib==1.0.1           # via weasyprint
 httplib2==0.13.1          # via google-api-python-client, google-auth-httplib2
 idna==2.8                 # via requests
+isodate==0.6.0            # via python3-saml
 jdcal==1.4.1              # via openpyxl
+lxml==4.4.1               # via xmlsec
 mysqlclient==1.4.4
 oauthlib==3.1.0           # via requests-oauthlib, social-auth-core
 odfpy==1.4.0              # via tablib
@@ -57,6 +59,7 @@ openpyxl==2.6.3           # via tablib
 pbr==5.4.3
 pillow==6.1.0             # via cairosvg
 pip-tools==4.1.0
+pkgconfig==1.5.1          # via xmlsec
 pyasn1-modules==0.2.6     # via google-auth
 pyasn1==0.4.7             # via pyasn1-modules, rsa
 pycparser==2.19           # via cffi
@@ -65,6 +68,7 @@ pyphen==0.9.5             # via weasyprint
 python-dateutil==2.8.0    # via dateparser, faker
 python-stdnum==1.11       # via django-localflavor
 python3-openid==3.1.0     # via social-auth-core
+python3-saml==1.8.0
 pytz==2019.2              # via dateparser, django, tzlocal
 pyyaml==5.1.2             # via tablib
 regex==2019.8.19          # via dateparser
@@ -72,7 +76,7 @@ requests-oauthlib==1.2.0  # via social-auth-core
 requests==2.22.0          # via requests-oauthlib, social-auth-core
 rsa==4.0                  # via google-auth
 simplejson==3.16.0
-six==1.12.0               # via django-extensions, django-report-utils, django-simple-history, faker, google-api-python-client, google-auth, html5lib, pip-tools, python-dateutil, social-auth-app-django, social-auth-core
+six==1.12.0               # via django-extensions, django-report-utils, django-simple-history, faker, google-api-python-client, google-auth, html5lib, isodate, pip-tools, python-dateutil, social-auth-app-django, social-auth-core
 social-auth-app-django==3.1.0
 social-auth-core==3.2.0   # via social-auth-app-django
 soupsieve==1.9.3          # via beautifulsoup4
@@ -87,6 +91,7 @@ weasyprint==48
 webencodings==0.5.1
 xlrd==1.2.0               # via tablib
 xlwt==1.3.0               # via tablib
+xmlsec==1.3.3             # via python3-saml
 
 # The following packages are considered to be unsafe in a requirements file:
 # setuptools==41.2.0        # via cairocffi, tinycss2, weasyprint
