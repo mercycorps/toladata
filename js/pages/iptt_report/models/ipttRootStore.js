@@ -51,6 +51,9 @@ export default (
         get currentProgram() {
             return this.filterStore.programFilterData;
         },
+        get currentProgramPageUrl() {
+            return api.getProgramPageUrl(this.currentProgram.pk);
+        },
         get isTVA() {
             return this.filterStore.isTVA;
         },
