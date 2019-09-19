@@ -113,7 +113,6 @@ class LevelViewSet (viewsets.ModelViewSet):
 
             serializer = self.get_serializer(instance, data=request.data, partial=False)
             serializer.is_valid(raise_exception=True)
-
             serializer.save()
 
             # log changes
