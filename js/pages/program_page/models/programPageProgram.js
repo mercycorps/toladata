@@ -20,12 +20,14 @@ export const forProgramPage = (
         resultsMap: observable(new Map()),
         needsAdditionalTargetPeriods: Boolean(programJSON.needs_additional_target_periods),
         getResultsHTML(indicatorPk) {
-            return this.resultsMap.get(indicatorPk) || false;
+            return this.resultsMap.get(parseInt(indicatorPk)) || false;
         },
-        updateResultsHTML(indicatorPk) {
-            if (indicatorPk) {
+        updateResultsHTML(rawIndicatorPk) {
+            let indicatorPk = parseInt(rawIndicatorPk);
+            if (indicatorPk && !isNaN(indicatorPk)) {
                 api.indicatorResultsTable(indicatorPk).then(resultsHTML => {
                     runInAction(() => {
+                        this.deleteResultsHTML(indicatorPk);
                         this.resultsMap.set(indicatorPk, resultsHTML);
                         return true;
                     });
@@ -33,8 +35,8 @@ export const forProgramPage = (
             }
         },
         deleteResultsHTML: action(function(indicatorPk) {
-            if (this.resultsMap.get(indicatorPk)) {
-                this.resultsMap.delete(indicatorPk);
+            if (!isNaN(parseInt(indicatorPk)) && this.resultsMap.get(parseInt(indicatorPk))) {
+                this.resultsMap.delete(parseInt(indicatorPk));
                 return true;
             }
             return false;
@@ -42,7 +44,8 @@ export const forProgramPage = (
         deleteAllResultsHTML: action(function() {
             this.resultsMap.clear();
         }),
-        updateIndicator: action(function(indicatorPk) {
+        updateIndicator: action(function(rawIndicatorPk) {
+            let indicatorPk = parseInt(rawIndicatorPk);
             return api.updateProgramPageIndicator(indicatorPk)
                    .then(results => {
                         if (results.indicator) {
@@ -60,7 +63,7 @@ export const forProgramPage = (
             }).then(this._applyOrderUpdate.bind(this));
         }),
         deleteIndicator: action(function(indicatorPk) {
-            return this.updateOrder().then(success => this.indicators.delete(indicatorPk));
+            return this.updateOrder().then(success => this.indicators.delete(parseInt(indicatorPk)));
         }),
         
     });
