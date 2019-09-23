@@ -784,7 +784,7 @@ class IPTTSingleExcelRendererMixin(IPTTExcelRendererBase):
         if not self.program_data['results_framework'] or not self.program_data['auto_number_indicators']:
             indicators = indicators.with_logframe_sorting()
         filter_params = ['sites', 'types', 'sectors', 'indicators']
-        filters = {param: self.request.getlist(param) for param in self.request.viewkeys() & filter_params}
+        filters = {param: self.request.getlist(param) for param in self.request.keys() & filter_params}
         if self.request.getlist('levels'):
             if self.program_data['results_framework']:
                 filters['levels'] = [level.pk for levels in [
