@@ -69,9 +69,7 @@ urlpatterns = [
     # Results framework builder
     url(r'^results_framework_builder/(?P<program_id>\d+)', views.ResultsFrameworkBuilder.as_view(),
         name='results_framework_builder'),
+
+    # API (serializer-based) calls for program page / IPTT
     url(r'^api/', include(apipatterns)),
-    # API call for program page
-    #url(r'^api/indicator/(?P<indicator>\d+)', views.api_indicator_view, name='api_indicator_view'),
-    #url(r'^api/indicators/(?P<program>\d+)', views.api_indicators_list, name='api_indicators_list'),
-    # url(r'^api/program.ordering/(?P<program>\d+)', views.)
 ]
