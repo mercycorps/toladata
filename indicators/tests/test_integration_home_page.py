@@ -43,6 +43,7 @@ def get_programs_for_country(country):
     )
     return two_indicator_program.id, one_indicator_program.id, zero_indicator_program.id
 
+
 class TestHomepageViewContext(test.TestCase):
     def setUp(self):
         self.tola_user = w_factories.TolaUserFactory()

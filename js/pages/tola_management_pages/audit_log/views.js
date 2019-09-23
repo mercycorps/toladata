@@ -141,7 +141,9 @@ export const IndexView = observer(
     ({store}) => {
         return <div id="audit-log-index-view">
             <header className="page-title">
-                <h1><small>{gettext("Indicator change log:")}</small> {store.program_name}</h1>
+                <h1><small>{gettext("Indicator change log:")}</small>
+                    <a href={`/program/${store.program_id}/`}>{store.program_name}</a>
+                </h1>
             </header>
 
             <div className="admin-list__controls">

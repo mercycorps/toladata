@@ -86,9 +86,3 @@ class TestTransactions(test.TestCase):
         self.assertEqual(len(serialized['unassigned_indicators']), 1)
         self.assertEqual(serialized['rf_chain_sort_label'], "by Test Tier 2 chain")
 
-    # def test_transactions(self):
-    #     with self.settings(DEBUG=True):
-    #         with self.assertNumQueries(3):
-    #             p = w_factories.ProgramFactory()
-    #             print "pk {}".format(p.pk)
-

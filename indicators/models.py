@@ -237,7 +237,12 @@ class Level(models.Model):
         root_node = root_nodes[0]
 
         # ensure levels are ordered by customsort at their given tier
-        sorted_levels = sorted(levels, key=lambda level_obj: (level_obj.parent_id, level_obj.customsort))
+        # Note: "is None" in the tuple required to avoid comparing "None" with int (python3)
+        sorted_levels = sorted(
+            levels,
+            key=lambda level_obj: ((level_obj.parent_id is None, level_obj.parent_id),
+                (level_obj.customsort is None, level_obj.customsort))
+            )
 
         # parent_id -> [] of child Levels
         tree_map = collections.defaultdict(list)
