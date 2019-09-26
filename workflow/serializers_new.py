@@ -565,10 +565,10 @@ class PeriodDateRangeSerializer(serializers.Serializer):
     year = serializers.SerializerMethodField()
 
     def get_start_label(self, period):
-        return l10n_date_medium(period['start'])
+        return l10n_date_medium(period['start'], decode=True)
 
     def get_end_label(self, period):
-        return l10n_date_medium(period['end'])
+        return l10n_date_medium(period['end'], decode=True)
 
     def get_past(self, period):
         return period['start'] < timezone.now().date()
