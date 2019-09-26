@@ -120,20 +120,20 @@ export default class QSRootStore {
     }
     
     /* SET tva program to the designated ID, and make the report type TVA */
-    @action setTVAProgram(id) {
-        if (id === null) {
+    @action setTVAProgram(programId) {
+        if (isNaN(parseInt(programId))) {
             this.tvaProgramId = null;
         } else {
-            this.tvaProgramId = id;
+            this.tvaProgramId = parseInt(programId);
         }
     }
     
     /* SET tva program to the designated ID, and make the report type Timeperiods */
-    @action setTimeperiodsProgram(id) {
-        if (id === null) {
+    @action setTimeperiodsProgram(programId) {
+        if (isNaN(parseInt(programId))) {
             this.timeperiodsProgramId = null;
         } else {
-            this.timeperiodsProgramId = id;
+            this.timeperiodsProgramId = parseInt(programId);
         }
     }
     
