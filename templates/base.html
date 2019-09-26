@@ -79,19 +79,6 @@
                                 {% program_menu %}
                             </li>
                             <li class="nav-item dropdown">
-                                <a class="nav-link dropdown-toggle" href="#" id="navbarBrowse" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">{% trans "Browse" %}</a>
-                                <div class="dropdown-menu" aria-labelledby="navbarBrowse">
-                                    <a class="dropdown-item" href="/workflow/documentation_list/">{% trans "Documents" %}</a>
-                                    {% if user.tola_user.allow_projects_access %}
-                                    <a class="dropdown-item" href="/workflow/dashboard/0/">{% trans "Projects" %}</a>
-                                    {% endif %}
-                                    <a class="dropdown-item" href="/workflow/siteprofile_list/0/0/">{% trans "Sites" %}</a>
-                                    {% if user.tola_user.allow_projects_access %}
-                                    <a class="dropdown-item" href="/workflow/stakeholder_list/0/0">{% trans "Stakeholders" %}</a>
-                                    {% endif %}
-                                </div>
-                            </li>
-                            <li class="nav-item dropdown">
                                 <a class="nav-link dropdown-toggle" href="#" id="navbarReportsDropdown" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">{% trans "Reports" %}</a>
                                 <div class="dropdown-menu" aria-labelledby="navbarReportsDropdown">
                                     <a class="dropdown-item" href="{% url 'iptt_quickstart' %}">{% trans "Indicator Performance Tracking Table" %}</a>
