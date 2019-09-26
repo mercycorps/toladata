@@ -7,19 +7,10 @@
 {% block bodyclasses %}home{% endblock %}
 
 {% block header_extras %}
-{% if user_countries.count > 1 %}
-<nav class="country-selector">
-    <button class="btn btn-sm btn-link text-muted dropdown-toggle" type="button" id="dropdownMenu1" data-toggle="dropdown" aria-haspopup="true" aria-expanded="true">
-        {% trans "change country" %}
-        <span class="caret"></span>
-    </button>
-    <ul class="dropdown-menu" role="menu">
-        {% for country in user_countries  %}
-        <li><a href="/{{ country.id }}/" class="dropdown-item">{{ country.country }}</a></li>
-        {% endfor %}
-    </ul>
-</nav>
-{% endif %}
+<div style="flex-grow:1;">{# spacer #}</div>
+<div style="margin-top:1rem;"><a href="{% url 'siteprofile_list' program_id=0 activity_id=0 %}">{% trans "Browse all sites" %}</a></div>
+<div style="flex-basis:39%;">{# spacer - yes 39% is awkward but that best matches the spacing below #}</div>
+
 {% endblock %}
 
 {% block content %}
