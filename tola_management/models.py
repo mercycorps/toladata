@@ -22,7 +22,7 @@ def diff(previous, new, mapping):
     diff_list = []
     p = previous
     n = new
-    for (p_field, n_field) in itertools.izip_longest(p.keys(), n.keys()):
+    for (p_field, n_field) in itertools.zip_longest(p.keys(), n.keys()):
         if p_field and p_field not in n:
             diff_list.append({
                 "name": p_field,
@@ -116,7 +116,7 @@ class UserManagementAuditLog(models.Model, DiffableLog):
 
             def access_diff(p, n):
                 diff_list = []
-                for (p_field, n_field) in itertools.izip_longest(p.keys(), n.keys()):
+                for (p_field, n_field) in itertools.zip_longest(p.keys(), n.keys()):
                     if p_field and p_field not in n:
                         diff_list.append({
                             "name": p_field,
@@ -283,7 +283,7 @@ class ProgramAuditLog(models.Model, DiffableLog):
 
                 prev = {}
                 new = {}
-                for (prev_id, new_id) in itertools.izip_longest(diff["prev"].keys(), diff["new"].keys()):
+                for (prev_id, new_id) in itertools.zip_longest(diff["prev"].keys(), diff["new"].keys()):
                     if prev_id and prev_id not in diff["new"]:
                         new[prev_id] = {
                             "name": diff["prev"][prev_id].get('name'),
