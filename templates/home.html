@@ -7,9 +7,7 @@
 {% block bodyclasses %}home{% endblock %}
 
 {% block header_extras %}
-<div style="flex-grow:1;">{# spacer #}</div>
-<div style="margin-top:1rem;"><a href="{% url 'siteprofile_list' program_id=0 activity_id=0 %}">{% trans "Browse all sites" %}</a></div>
-<div style="flex-basis:39%;">{# spacer - yes 39% is awkward but that best matches the spacing below #}</div>
+<a class="text-muted" href="{% url 'siteprofile_list' program_id=0 activity_id=0 %}"><small>{% trans "Browse all sites" %}</small></a>
 
 {% endblock %}
 
