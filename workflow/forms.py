@@ -356,7 +356,6 @@ class ProjectAgreementForm(forms.ModelForm):
                                     </div>
                                      """),
 
-                            'evaluate',
                             ),
                         ),
                     ),

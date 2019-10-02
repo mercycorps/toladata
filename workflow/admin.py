@@ -10,7 +10,7 @@ from tola import util
 from .models import (
     Documentation, ProjectAgreement, ProjectComplete, ProjectType, Country, SiteProfile,
     Program, TolaUser, ProfileType, TolaUserProxy,
-    Organization, Sector, Evaluate, Benchmarks, Budget, Template, Monitor,
+    Organization, Sector, Benchmarks, Budget, Template, Monitor,
     Checklist, ChecklistItem, Stakeholder, StakeholderType,
     OrganizationAdmin,
     ProgramAccess,
@@ -58,7 +58,7 @@ class ProjectAgreementAdmin(ImportExportModelAdmin):
     resource_class = ProjectAgreementResource
     list_display = ('program', 'project_name', 'short', 'create_date')
     list_filter = ('program__country', 'short')
-    filter_horizontal = ('evaluate', 'site', 'stakeholder')
+    filter_horizontal = ('site', 'stakeholder')
 
     def queryset(self, request, queryset):
         """
@@ -192,7 +192,6 @@ admin.site.register(Template)
 admin.site.register(SiteProfile, SiteProfileAdmin)
 admin.site.register(Monitor)
 admin.site.register(Benchmarks)
-admin.site.register(Evaluate)
 admin.site.register(ProjectType, ProjectTypeAdmin)
 admin.site.register(Budget)
 admin.site.register(ProfileType)
