@@ -70,12 +70,6 @@ class Command(BaseCommand):
                     profile_type = None
 
                 try:
-                    district = District.objects.get(name=district_name)
-                except District.DoesNotExist:
-                    self.stdout.write(self.style.ERROR('%s, district not found (%s)' % (site_name, district_name) ))
-                    continue
-
-                try:
                     lat = float(latitude)
                 except ValueError as e:
                     lat = None
@@ -92,7 +86,7 @@ class Command(BaseCommand):
                         defaults = {\
                             'type': profile_type, 'office': office, 'contact_leader': contact,\
                             'latitude': lat, 'longitude': lon, 'country': country,\
-                            'district': district, 'create_date': timezone.now()\
+                            'create_date': timezone.now()\
                             })
                     self.stdout.write(self.style.SUCCESS('%s site_profile created(%s) successfully!' % (site_name, created)))
                 except Exception as e:

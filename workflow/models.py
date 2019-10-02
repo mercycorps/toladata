@@ -917,7 +917,6 @@ class DistrictAdmin(admin.ModelAdmin):
 
 class AdminLevelThree(models.Model):
     name = models.CharField(_("Admin Level 3"), max_length=255, blank=True)
-    district = models.ForeignKey(District, on_delete=models.CASCADE, verbose_name=_("Admin Level 2"))
     create_date = models.DateTimeField(null=True, blank=True)
     edit_date = models.DateTimeField(null=True, blank=True)
 
@@ -939,17 +938,13 @@ class AdminLevelThree(models.Model):
 
 
 class AdminLevelThreeAdmin(admin.ModelAdmin):
-    list_display = ('name', 'district', 'create_date')
-    search_fields = ('name','district__name')
-    list_filter = ('district__province__country__country','district')
+    list_display = ('name', 'create_date')
+    search_fields = ('name')
     display = 'Admin Level 3'
 
 
 class Village(models.Model):
     name = models.CharField(_("Admin Level 4"), max_length=255, blank=True)
-    district = models.ForeignKey(District, on_delete=models.CASCADE, null=True, blank=True, verbose_name=_("District"))
-    admin_3 = models.ForeignKey(AdminLevelThree, on_delete=models.CASCADE,
-                                verbose_name=_("Admin Level 3"), null=True, blank=True)
     create_date = models.DateTimeField(null=True, blank=True)
     edit_date = models.DateTimeField(null=True, blank=True)
 
@@ -971,9 +966,8 @@ class Village(models.Model):
 
 
 class VillageAdmin(admin.ModelAdmin):
-    list_display = ('name', 'district', 'create_date', 'edit_date')
+    list_display = ('name', 'create_date', 'edit_date')
     search_fields = ('name', 'admin_3__name')
-    list_filter = ('admin_3__district__province__country__country',)
     display = 'Admin Level 4'
 
 
@@ -1056,7 +1050,7 @@ class LandTypeAdmin(admin.ModelAdmin):
 
 class SiteProfileManager(models.Manager):
     def get_queryset(self):
-        return super(SiteProfileManager, self).get_queryset().prefetch_related().select_related('country', 'district','admin_level_three','type')
+        return super(SiteProfileManager, self).get_queryset().prefetch_related().select_related('country','type')
 
 
 class SiteProfile(models.Model):
@@ -1112,8 +1106,6 @@ class SiteProfile(models.Model):
     animal_type = models.CharField(
         _("Animal Types"), help_text=_("List Animal Types"), max_length=255, null=True, blank=True)
     country = models.ForeignKey(Country, null=True, on_delete=models.SET_NULL, verbose_name=_("Country"))
-    district = models.ForeignKey(
-        District, verbose_name=_("Administrative Level 2"), null=True, blank=True, on_delete=models.SET_NULL)
     latitude = models.DecimalField(
         _("Latitude (Decimal Coordinates)"), decimal_places=16,max_digits=25, default=Decimal("0.00"))
     longitude = models.DecimalField(
@@ -1156,7 +1148,7 @@ class SiteProfile(models.Model):
 
 
 class SiteProfileAdmin(admin.ModelAdmin):
-    list_display = ('name', 'code','office', 'country', 'district', 'cluster', 'longitude', 'latitude', 'create_date', 'edit_date')
+    list_display = ('name', 'code','office', 'country', 'cluster', 'longitude', 'latitude', 'create_date', 'edit_date')
     list_filter = ('country__country')
     search_fields = ('code','office__code','country__country')
     display = 'SiteProfile'

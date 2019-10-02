@@ -84,7 +84,6 @@ urlpatterns = [
     url(r'^export_stakeholders_list/', export_stakeholders_list, name='export_stakeholders_list'),
 
     url(r'^country/(?P<country>[-\w]+)/country_json/', country_json, name='country_json'),
-    url(r'^district/(?P<district>[-\w]+)/district_json/', district_json, name='district_json'),
 
     #ajax calls
     url(r'^reportingperiod_update/(?P<pk>\w+)$', reportingperiod_update, name='reportingperiod_update'),

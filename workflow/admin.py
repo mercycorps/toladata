@@ -9,12 +9,12 @@ from import_export.admin import ImportExportModelAdmin, ExportMixin
 from tola import util
 from .models import (
     Documentation, ProjectAgreement, ProjectComplete, ProjectType, Country, SiteProfile,
-    Office, Program, TolaUser, District, ProfileType, TolaUserProxy,
+    Office, Program, TolaUser, ProfileType, TolaUserProxy,
     Organization, Sector, Capacity, Evaluate, Benchmarks, Budget, Template, Monitor,
     Checklist, ChecklistItem, Stakeholder, StakeholderType,
     OrganizationAdmin,
     ProgramAccess,
-    DistrictAdmin, ProjectTypeAdmin,
+    ProjectTypeAdmin,
     ChecklistAdmin,
     ChecklistItemAdmin, TolaUserAdmin
 )
@@ -157,8 +157,6 @@ class SiteProfileResource(resources.ModelResource):
     country = fields.Field(column_name='country', attribute='country', widget=ForeignKeyWidget(Country, 'country'))
     type = fields.Field(column_name='type', attribute='type', widget=ForeignKeyWidget(ProfileType, 'profile'))
     office = fields.Field(column_name='office', attribute='office', widget=ForeignKeyWidget(Office, 'code'))
-    district = fields.Field(column_name='admin level 2', attribute='district',
-                            widget=ForeignKeyWidget(District, 'name'))
 
     class Meta:
         model = SiteProfile
@@ -169,7 +167,7 @@ class SiteProfileResource(resources.ModelResource):
 
 class SiteProfileAdmin(ImportExportModelAdmin):
     resource_class = SiteProfileResource
-    list_display = ('name', 'office', 'country', 'district', 'admin_level_three')
+    list_display = ('name', 'office', 'country')
     list_filter = ('country__country',)
     search_fields = ('office__code', 'country__country')
 
@@ -219,7 +217,6 @@ class StakeholderAdmin(ImportExportModelAdmin):
 admin.site.register(Organization, OrganizationAdmin)
 admin.site.register(Country, CountryAdmin)
 admin.site.register(Office, OfficeAdmin)
-admin.site.register(District, DistrictAdmin)
 admin.site.register(Program, ProgramAdmin)
 admin.site.register(Sector)
 admin.site.register(ProjectAgreement, ProjectAgreementAdmin)

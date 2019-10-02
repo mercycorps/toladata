@@ -1382,7 +1382,7 @@ class SiteProfileForm(forms.ModelForm):
                 ),
                 Tab(_('Location'),
                     Fieldset(_('Places'),
-                        'country','district','admin_level_three', Field('latitude', step="any"), Field('longitude', step="any"),
+                        'country', Field('latitude', step="any"), Field('longitude', step="any"),
                     ),
                     Fieldset(_('Map'),
                         'map',
