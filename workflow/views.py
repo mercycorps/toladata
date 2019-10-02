@@ -15,7 +15,6 @@ from workflow.serializers import DocumentListProgramSerializer, DocumentListDocu
 from workflow.models import (
     Program,
     Country,
-    ProjectAgreement,
     ProjectComplete,
     SiteProfile,
     Documentation,
@@ -26,9 +25,6 @@ from workflow.models import (
     ChecklistItem,
 )
 from workflow.forms import (
-    ProjectAgreementForm,
-    ProjectAgreementSimpleForm,
-    ProjectAgreementCreateForm,
     ProjectCompleteForm,
     ProjectCompleteSimpleForm,
     ProjectCompleteCreateForm,
@@ -41,8 +37,6 @@ from workflow.forms import (
     ChecklistItemForm,
 )
 from workflow.mixins import AjaxableResponseMixin
-from workflow.export import ProjectAgreementResource
-from workflow.tables import ProjectAgreementTable
 
 from formlibrary.models import TrainingAttendance, Distribution
 from indicators.models import Result, ExternalService
@@ -103,57 +97,6 @@ def date_handler(obj):
 
 
 @method_decorator(has_projects_access, name='dispatch')
-class ProjectDash(LoginRequiredMixin, ListView):
-
-    template_name = 'workflow/projectdashboard_list.html'
-
-    def get(self, request, *args, **kwargs):
-
-        countries = getCountry(request.user)
-        getPrograms = self.request.user.tola_user.available_programs.filter(funding_status="Funded")
-        project_id = int(self.kwargs['pk'])
-
-        if project_id == 0:
-            getAgreement = None
-            getComplete = None
-            getChecklist = None
-            getDocumentCount = 0
-            getCommunityCount = 0
-            getTrainingCount = 0
-            getDistributionCount = 0
-            getChecklistCount = 0
-        else:
-
-            try:
-                getAgreement = ProjectAgreement.objects.get(id=project_id, program__in=getPrograms)
-            except ProjectAgreement.DoesNotExist:
-                getAgreement = None
-
-            try:
-                getComplete = ProjectComplete.objects.get(project_agreement__id=self.kwargs['pk'], program__in=getPrograms)
-            except ProjectComplete.DoesNotExist:
-                getComplete = None
-            getDocumentCount = Documentation.objects.all().filter(project_id=self.kwargs['pk'], program__in=getPrograms).count()
-            getCommunityCount = SiteProfile.objects.all().filter(projectagreement__id=self.kwargs['pk'], projectagreement__program__in=getPrograms).count()
-            getTrainingCount = TrainingAttendance.objects.all().filter(project_agreement_id=self.kwargs['pk'], program__in=getPrograms).count()
-            getDistributionCount = Distribution.objects.all().filter(initiation_id=self.kwargs['pk'], program__in=getPrograms).count()
-            getChecklistCount = ChecklistItem.objects.all().filter(checklist__agreement_id=self.kwargs['pk'], checklist__agreement__program__in=getPrograms).count()
-            getChecklist = ChecklistItem.objects.all().filter(checklist__agreement_id=self.kwargs['pk'], checklist__agreement__program__in=getPrograms)
-
-        if int(self.kwargs['pk']) == 0:
-            getProgram = getPrograms.filter(funding_status="Funded").distinct()
-        else:
-            getProgram = get_object_or_404(Program, agreement__id=self.kwargs['pk'], id__in=getPrograms.values('id'))
-
-        return render(request, self.template_name, {
-            'getProgram': getProgram, 'getAgreement': getAgreement, 'getComplete': getComplete,
-            'getPrograms':getPrograms, 'getDocumentCount':getDocumentCount, 'getChecklistCount': getChecklistCount,
-            'getCommunityCount':getCommunityCount, 'getTrainingCount':getTrainingCount, 'project_id': project_id,
-            'getChecklist': getChecklist, 'getDistributionCount': getDistributionCount
-        })
-
-
-@method_decorator(has_projects_access, name='dispatch')
 class ProgramDash(LoginRequiredMixin, ListView):
     """
     Dashboard links for and status for each program with number of projects
@@ -189,336 +132,6 @@ class ProgramDash(LoginRequiredMixin, ListView):
             status = None
 
         return render(request, self.template_name, {'getDashboard': getDashboard, 'getPrograms': getPrograms, 'APPROVALS': APPROVALS, 'program_id':  self.kwargs['pk'], 'status': status, 'filtered_program': filtered_program})
-
-
-@method_decorator(has_projects_access, name='dispatch')
-class ProjectAgreementList(LoginRequiredMixin, ListView):
-    """
-    Project Agreement
-    :param request:
-    """
-    model = ProjectAgreement
-    template_name = 'workflow/projectagreement_list.html'
-
-    def get(self, request, *args, **kwargs):
-        getPrograms = request.user.tola_user.available_programs.filter(funding_status="Funded").distinct()
-
-        if int(self.kwargs['pk']) != 0:
-            getDashboard = ProjectAgreement.objects.all().filter(program__id=self.kwargs['pk'], program__in=getPrograms)
-            getProgram =get_object_or_404(Program, id=self.kwargs['pk'], id__in=getPrograms.values('id'))
-            return render(request, self.template_name, {'form': FilterForm(),'getProgram': getProgram, 'getDashboard':getDashboard,'getPrograms':getPrograms,'APPROVALS': APPROVALS})
-
-        elif self.kwargs['status'] != 'none':
-            getDashboard = ProjectAgreement.objects.all().filter(approval=self.kwargs['status'], program__in=getPrograms)
-            return render(request, self.template_name, {'form': FilterForm(), 'getDashboard':getDashboard,'getPrograms':getPrograms,'APPROVALS': APPROVALS})
-
-        else:
-            getDashboard = ProjectAgreement.objects.all().filter(program__in=getPrograms)
-
-            return render(request, self.template_name, {'form': FilterForm(),'getDashboard':getDashboard,'getPrograms':getPrograms,'APPROVALS': APPROVALS})
-
-
-@method_decorator(has_projects_access, name='dispatch')
-class ProjectAgreementImport(LoginRequiredMixin, ListView):
-    """
-    Import a project agreement from TolaData or other third party service
-    """
-
-    template_name = 'workflow/projectagreement_import.html'
-
-    def get(self, request, *args, **kwargs):
-        countries = getCountry(request.user)
-        getPrograms = Program.objects.all().filter(funding_status="Funded", country__in=countries)
-        getServices = ExternalService.objects.all()
-        getCountries = Country.objects.all().filter(country__in=countries)
-
-        return render(request, self.template_name, {'getPrograms': getPrograms, 'getServices': getServices , 'getCountries': getCountries})
-
-
-@method_decorator(has_projects_access, name='dispatch')
-class ProjectAgreementCreate(LoginRequiredMixin, CreateView):
-    """
-    Project Agreement Form
-    :param request:
-    :param id:
-    This is only used in case of an error incomplete form submission from the simple form
-    in the project dashboard
-    """
-
-    model = ProjectAgreement
-    template_name = 'workflow/projectagreement_form.html'
-
-    @method_decorator(group_excluded('ViewOnly', url='workflow/permission'))
-    def dispatch(self, request, *args, **kwargs):
-        self.guidance = None
-        return super(ProjectAgreementCreate, self).dispatch(request, *args, **kwargs)
-
-     # add the request to the kwargs
-    def get_form_kwargs(self):
-        kwargs = super(ProjectAgreementCreate, self).get_form_kwargs()
-        kwargs['request'] = self.request
-        return kwargs
-
-    #get shared data from project agreement and pre-populate form with it
-    def get_initial(self):
-
-        initial = {
-            'approved_by': self.request.user,
-            'estimated_by': self.request.user,
-            'checked_by': self.request.user,
-            'reviewed_by': self.request.user,
-            'approval_submitted_by': self.request.user,
-            }
-
-        return initial
-
-    def get_context_data(self, **kwargs):
-        context = super(ProjectAgreementCreate, self).get_context_data(**kwargs)
-        return context
-
-    def form_invalid(self, form):
-
-        messages.error(self.request, 'Invalid Form', fail_silently=False)
-
-        return self.render_to_response(self.get_context_data(form=form))
-
-    def form_valid(self, form):
-
-        form.save()
-
-        #save formset from context
-        context = self.get_context_data()
-
-        latest = ProjectAgreement.objects.latest('id')
-        getAgreement = ProjectAgreement.objects.get(id=latest.id)
-
-        #create a new dashbaord entry for the project
-        getProgram = Program.objects.get(id=latest.program_id)
-
-        create_checklist = Checklist(agreement=getAgreement)
-        create_checklist.save()
-
-        get_checklist = Checklist.objects.get(id=create_checklist.id)
-        get_globals = ChecklistItem.objects.all().filter(global_item=True)
-        for item in get_globals:
-            ChecklistItem.objects.create(checklist=get_checklist, item=item.item)
-
-
-        messages.success(self.request, 'Success, Initiation Created!')
-
-        redirect_url = '/workflow/dashboard/project/' + str(latest.id)
-        return HttpResponseRedirect(redirect_url)
-
-    form_class = ProjectAgreementCreateForm
-
-
-@method_decorator(has_projects_access, name='dispatch')
-class ProjectAgreementUpdate(LoginRequiredMixin, UpdateView):
-    """
-    Project Initiation Form
-    :param request:
-    :param id: project_agreement_id
-    """
-    model = ProjectAgreement
-    form_class = ProjectAgreementForm
-
-    @method_decorator(group_excluded('ViewOnly', url='workflow/permission'))
-    def dispatch(self, request, *args, **kwargs):
-        self.guidance = None
-        return super(ProjectAgreementUpdate, self).dispatch(request, *args, **kwargs)
-
-    def get_form(self, form_class=None):
-        check_form_type = ProjectAgreement.objects.get(id=self.kwargs['pk'])
-
-        if check_form_type.short == True:
-            form_class = ProjectAgreementSimpleForm
-        else:
-            form_class = ProjectAgreementForm
-
-        return form_class(**self.get_form_kwargs())
-
-
-    def get_context_data(self, **kwargs):
-        context = super(ProjectAgreementUpdate, self).get_context_data(**kwargs)
-        pk = self.kwargs['pk']
-        context.update({'pk': pk})
-        context.update({'program': pk})
-        getAgreement = ProjectAgreement.objects.get(id=self.kwargs['pk'])
-        context.update({'p_agreement': getAgreement.project_name})
-        context.update({'p_agreement_program': getAgreement.program})
-
-
-        try:
-            getQuantitative = Result.objects.all().filter(agreement__id=self.kwargs['pk']).order_by('indicator')
-        except Result.DoesNotExist:
-            getQuantitative = None
-        context.update({'getQuantitative': getQuantitative})
-
-        try:
-            getMonitor = Monitor.objects.all().filter(agreement__id=self.kwargs['pk']).order_by('type')
-        except Monitor.DoesNotExist:
-            getMonitor = None
-        context.update({'getMonitor': getMonitor})
-
-        try:
-            getBenchmark = Benchmarks.objects.all().filter(agreement__id=self.kwargs['pk']).order_by('description')
-        except Benchmarks.DoesNotExist:
-            getBenchmark = None
-        context.update({'getBenchmark': getBenchmark})
-
-        try:
-            getBudget = Budget.objects.all().filter(agreement__id=self.kwargs['pk']).order_by('description_of_contribution')
-        except Budget.DoesNotExist:
-            getBudget = None
-        context.update({'getBudget': getBudget})
-
-        try:
-            getDocuments = Documentation.objects.all().filter(project__id=self.kwargs['pk']).order_by('name')
-        except Documentation.DoesNotExist:
-            getDocuments = None
-        context.update({'getDocuments': getDocuments})
-
-        return context
-
-    # add the request to the kwargs
-    def get_form_kwargs(self):
-        kwargs = super(ProjectAgreementUpdate, self).get_form_kwargs()
-        kwargs['request'] = self.request
-        return kwargs
-
-    def form_invalid(self, form):
-
-        messages.error(self.request, 'Invalid Form', fail_silently=False)
-
-        return self.render_to_response(self.get_context_data(form=form))
-
-    def form_valid(self, form):
-
-        #get the approval status of the form before it was submitted and set vars for use in condtions
-        check_agreement_status = ProjectAgreement.objects.get(id=str(self.kwargs['pk']))
-        is_approved = str(form.instance.approval)
-        getProgram = Program.objects.get(agreement__id=check_agreement_status.id)
-        country = getProgram.country
-
-        #convert form field unicode project name to ascii safe string for email content
-
-        project_name = unicodedata.normalize('NFKD', form.instance.project_name).encode('ascii','ignore')
-        #check to see if the approval status has changed
-        if str(is_approved) == "approved" and check_agreement_status.approval != "approved":
-            budget = form.instance.total_estimated_budget
-            if getProgram.budget_check == True:
-                user_budget_approval = None
-            #compare budget amount to users approval amounts
-
-            if getProgram.budget_check:
-                if not user_budget_approval or int(budget) > int(user_budget_approval.budget_limit):
-                    messages.success(self.request, 'You do not appear to have permissions to approve this initiation')
-                    form.instance.approval = 'awaiting approval'
-                else:
-                    messages.success(self.request, 'Success, Initiation and Budget Approved')
-                    form.instance.approval = 'approved'
-            else:
-                messages.success(self.request, 'Success, Initiation Approved')
-                form.instance.approval = 'approved'
-
-            if form.instance.approval == 'approved':
-                #email the approver group so they know this was approved
-                link = "Link: " + "https://" + self.request.get_host() + "/workflow/projectagreement_detail/" + str(self.kwargs['pk']) + "/"
-                subject = "Project Initiation Approved: " + project_name
-                message = "A new initiation was approved by " + str(self.request.user) + "\n" + "Budget Amount: " + str(form.instance.total_estimated_budget) + "\n"
-                getSubmiter = User.objects.get(username=self.request.user)
-                emailGroup(submiter=getSubmiter.email, country=country,group=form.instance.approved_by,link=link,subject=subject,message=message)
-        elif str(is_approved) == "awaiting approval" and check_agreement_status.approval != "awaiting approval":
-            messages.success(self.request, 'Success, Initiation has been saved and is now Awaiting Approval (Notifications have been Sent)')
-            #email the approver group so they know this needs approval
-            link = "Link: " + "https://%s%s/" % (
-                self.request.get_host(), reverse("project_dashboard", args=[self.kwargs['pk']]))
-            subject = "Project Initiation Waiting for Approval: " + project_name
-            message = "A new initiation was submitted for approval by %s\nBudget Amount: %s\n" % (
-                str(self.request.user), str(form.instance.total_estimated_budget))
-            emailGroup(country=country,group=form.instance.approved_by,link=link,subject=subject,message=message)
-        else:
-            messages.success(self.request, 'Success, form updated!')
-        form.save()
-        # Not in Use
-        # save formset from context
-        # context = self.get_context_data()
-        self.object = form.save()
-
-        return self.render_to_response(self.get_context_data(form=form))
-
-
-@method_decorator(has_projects_access, name='dispatch')
-class ProjectAgreementDetail(LoginRequiredMixin, DetailView):
-
-    model = ProjectAgreement
-    context_object_name = 'agreement'
-    queryset = ProjectAgreement.objects.all()
-
-    def get_context_data(self, **kwargs):
-        context = super(ProjectAgreementDetail, self).get_context_data(**kwargs)
-        context['now'] = timezone.now()
-        context.update({'id': self.kwargs['pk']})
-
-        try:
-            getMonitor = Monitor.objects.all().filter(agreement__id=self.kwargs['pk'])
-        except Monitor.DoesNotExist:
-            getMonitor = None
-        context.update({'getMonitor': getMonitor})
-
-        try:
-            getBenchmark = Benchmarks.objects.all().filter(agreement__id=self.kwargs['pk'])
-        except Benchmarks.DoesNotExist:
-            getBenchmark = None
-        context.update({'getBenchmarks': getBenchmark})
-
-        try:
-            getBudget = Budget.objects.all().filter(agreement__id=self.kwargs['pk'])
-        except Budget.DoesNotExist:
-            getBudget = None
-        context.update({'getBudget': getBudget})
-
-        try:
-            getDocuments = Documentation.objects.all().filter(project__id=self.kwargs['pk']).order_by('name')
-        except Documentation.DoesNotExist:
-            getDocuments = None
-        context.update({'getDocuments': getDocuments})
-
-        try:
-            getQuantitativeOutputs = Result.objects.all().filter(agreement__id=self.kwargs['pk'])
-
-        except Result.DoesNotExist:
-            getQuantitativeOutputs = None
-        context.update({'getQuantitativeOutputs': getQuantitativeOutputs})
-
-        return context
-
-
-@method_decorator(has_projects_access, name='dispatch')
-class ProjectAgreementDelete(LoginRequiredMixin, DeleteView):
-    """
-    Project Agreement Delete
-    """
-    model = ProjectAgreement
-    success_url = '/workflow/dashboard/0/'
-
-    @method_decorator(group_required('Country',url='workflow/permission'))
-    def dispatch(self, request, *args, **kwargs):
-        return super(ProjectAgreementDelete, self).dispatch(request, *args, **kwargs)
-
-    def form_invalid(self, form):
-
-        messages.error(self.request, 'Invalid Form', fail_silently=False)
-
-        return self.render_to_response(self.get_context_data(form=form))
-
-    def form_valid(self, form):
-
-        form.save()
-
-        return HttpResponseRedirect('/workflow/success')
-
-    form_class = ProjectAgreementForm
 
 
 @method_decorator(has_projects_access, name='dispatch')
@@ -564,7 +177,7 @@ class ProjectCompleteCreate(LoginRequiredMixin, CreateView):
 
     #get shared data from project agreement and pre-populate form with it
     def get_initial(self):
-        getProjectAgreement = ProjectAgreement.objects.get(id=self.kwargs['pk'])
+        getProjectAgreement = None
         initial = {
             'approved_by': self.request.user,
             'approval_submitted_by': self.request.user,
@@ -595,7 +208,7 @@ class ProjectCompleteCreate(LoginRequiredMixin, CreateView):
     def get_context_data(self, **kwargs):
         context = super(ProjectCompleteCreate, self).get_context_data(**kwargs)
 
-        project_agreement = ProjectAgreement.objects.get(id=self.kwargs['pk'])
+        project_agreement = None
         pk = self.kwargs['pk']
         context.update({'pk': pk})
         context.update({'p_name': self.get_initial()['project_name']})
@@ -616,7 +229,7 @@ class ProjectCompleteCreate(LoginRequiredMixin, CreateView):
 
         latest = ProjectComplete.objects.latest('id')
         getComplete = ProjectComplete.objects.get(id=latest.id)
-        getAgreement = ProjectAgreement.objects.get(id=self.request.POST['project_agreement'])
+        getAgreement = None
 
         #update the quantitative data fields to include the newly created complete
         Result.objects.filter(agreement__id=getComplete.project_agreement_id).update(complete=getComplete)
@@ -884,17 +497,15 @@ class DocumentationAgreementCreate(LoginRequiredMixin, AjaxableResponseMixin, Cr
 
     def get_context_data(self, **kwargs):
         context = super(DocumentationAgreementCreate, self).get_context_data(**kwargs)
-        getProject = ProjectAgreement.objects.get(id=self.kwargs['id'])
-        context.update({'program': getProject.program})
-        context.update({'project': getProject})
+        context.update({'program': None})
+        context.update({'project': None})
         context.update({'id': self.kwargs['id']})
         return context
 
     def get_initial(self):
-        getProject = ProjectAgreement.objects.get(id=self.kwargs['id'])
         initial = {
             'project': self.kwargs['id'],
-            'program': getProject.program,
+            'program': None
             }
 
         return initial
@@ -936,7 +547,7 @@ class DocumentationAgreementUpdate(LoginRequiredMixin, AjaxableResponseMixin, Up
 
     def get_context_data(self, **kwargs):
         context = super(DocumentationAgreementUpdate, self).get_context_data(**kwargs)
-        getProject = ProjectAgreement.objects.get(id=self.kwargs['id'])
+        getProject = None
         context.update({'project': getProject})
         context.update({'id': self.kwargs['id']})
         context.update({'pk': self.kwargs['pk']})
@@ -1157,13 +768,11 @@ class SiteProfileList(ListView):
         if activity_id != 0:
             getSiteProfile = SiteProfile.objects.prefetch_related(\
                     'country')\
-                .filter(projectagreement__id=activity_id)\
                 .distinct()
         elif program_id != 0:
             getSiteProfile = SiteProfile.objects.prefetch_related(\
                     'country')\
-                .filter(Q(projectagreement__program__id=program_id)\
-                        | Q(result__program__id=program_id))\
+                .filter(result__program__id=program_id)\
                 .distinct()
         else:
             getSiteProfile = SiteProfile.objects.prefetch_related(\
@@ -1175,7 +784,6 @@ class SiteProfileList(ListView):
                     Q(country__in=countries),\
                     Q(name__contains=request.GET["search"])\
                     | Q(type__profile__contains=request.GET['search'])\
-                    | Q(projectagreement__project_name__contains=request.GET["search"])\
                     | Q(projectcomplete__project_name__contains=request.GET['search']))\
                 .select_related()\
                 .distinct()
@@ -1228,7 +836,7 @@ class SiteProfileReport(ListView):
             getSiteProfile = SiteProfile.objects.all().prefetch_related('country').filter(country__in=countries).filter(status=1)
             getSiteProfileIndicator = SiteProfile.objects.all().prefetch_related('country').filter(Q(result__program__country__in=countries)).filter(status=1)
         else:
-            getSiteProfile = SiteProfile.objects.all().prefetch_related('country').filter(projectagreement__id=self.kwargs['pk']).filter(status=1)
+            getSiteProfile = SiteProfile.objects.all().prefetch_related('country').filter(status=1)
             getSiteProfileIndicator = None
 
         id=self.kwargs['pk']
@@ -1311,7 +919,7 @@ class SiteProfileUpdate(UpdateView):
 
     def get_context_data(self, **kwargs):
         context = super(SiteProfileUpdate, self).get_context_data(**kwargs)
-        getProjects = ProjectAgreement.objects.all().filter(site__id=self.kwargs['pk'])
+        getProjects = []
         context.update({'getProjects': getProjects})
         return context
 
@@ -1896,30 +1504,12 @@ class Report(LoginRequiredMixin, View, AjaxableResponseMixin):
     """
     def get(self, request, *args, **kwargs):
         countries=getCountry(request.user)
-        if int(self.kwargs['pk']) != 0:
-            getAgreements = ProjectAgreement.objects.filter(program__id=self.kwargs['pk'])
-
-        elif self.kwargs['status'] != 'none':
-            getAgreements = ProjectAgreement.objects.filter(approval=self.kwargs['status'])
-        else:
-            getAgreements = ProjectAgreement.objects.select_related().filter(program__country__in=countries)
+        getAgreements = []
 
         getPrograms = Program.objects.filter(funding_status="Funded", country__in=countries).distinct()
         filtered = getAgreements
-        table = ProjectAgreementTable(filtered.queryset)
+        table = None
         table.paginate(page=request.GET.get('page', 1), per_page=20)
-
-        if request.method == "GET" and "search" in request.GET:
-            getAgreements = ProjectAgreement.objects.filter(\
-                      Q(project_name__contains=request.GET["search"])\
-                    | Q(activity_code__contains=request.GET["search"]))
-
-
-        if request.GET.get('export'):
-            dataset = ProjectAgreementResource().export(getAgreements)
-            response = HttpResponse(dataset.csv, content_type='application/ms-excel')
-            response['Content-Disposition'] = 'attachment; filename=activity_report.csv'
-            return response
 
 
         # send the keys and vars
@@ -1949,11 +1539,7 @@ class ReportData(LoginRequiredMixin, View, AjaxableResponseMixin):
         else:
             filters['program__country__in'] = countries
 
-        getAgreements = ProjectAgreement.objects.prefetch_related('sectors').select_related('program', 'project_type', 'estimated_by').filter(**filters).values('id', 'program__id', 'approval', \
-                'program__name', 'project_name','site', 'activity_code', \
-                'project_name', 'sector__sector', 'project_activity', 'project_type__name', \
-                'account_code', 'lin_code','estimated_by__name','total_estimated_budget',\
-                'mc_estimated_budget','total_estimated_budget')
+        getAgreements = []
 
         getAgreements = json.dumps(list(getAgreements), cls=DjangoJSONEncoder)
 

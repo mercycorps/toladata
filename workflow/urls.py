@@ -11,13 +11,6 @@ urlpatterns = [
     url(r'^dashboard/(?P<pk>\w+)/(?P<status>[\w ]+)/$', ProgramDash.as_view(), name='dashboard'),
     url(r'^dashboard/(?P<pk>\w+)/$', ProgramDash.as_view(), name='dashboard'),
 
-    url(r'^projectagreement_list/(?P<pk>\w+)/(?P<status>[\w ]+)/$', ProjectAgreementList.as_view(), name='projectagreement_list'),
-    url(r'^projectagreement_add/$', ProjectAgreementCreate.as_view(), name='projectagreement_add'),
-    url(r'^projectagreement_update/(?P<pk>\w+)/$', ProjectAgreementUpdate.as_view(), name='projectagreement_update'),
-    url(r'^projectagreement_delete/(?P<pk>\w+)/$', ProjectAgreementDelete.as_view(), name='projectagreement_delete'),
-    url(r'^projectagreement_import', ProjectAgreementImport.as_view(), name='projectagreement_import'),
-    url(r'^projectagreement_detail/(?P<pk>\w+)/$', ProjectAgreementDetail.as_view(), name='projectagreement_detail'),
-
     url(r'^projectcomplete_list/(?P<pk>\w+)/$', ProjectCompleteList.as_view(), name='projectcomplete_list'),
     url(r'^projectcomplete_add/(?P<pk>\w+)/$', ProjectCompleteCreate.as_view(), name='projectcomplete_add'),
     url(r'^projectcomplete_update/(?P<pk>\w+)/$', ProjectCompleteUpdate.as_view(), name='projectcomplete_update'),

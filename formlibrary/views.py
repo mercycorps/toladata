@@ -15,7 +15,7 @@ from formlibrary.models import TrainingAttendance, Beneficiary, Distribution
 from formlibrary.mixins import AjaxableResponseMixin
 from formlibrary.forms import TrainingAttendanceForm, BeneficiaryForm, DistributionForm
 
-from workflow.models import Program, ProjectAgreement
+from workflow.models import Program
 from tola_management.permissions import has_projects_access
 from tola.util import getCountry, group_excluded
 
@@ -481,18 +481,4 @@ class GetAgreements(View, AjaxableResponseMixin):
 
     def get(self, request, *args, **kwargs):
 
-        program_id = self.kwargs['program']
-        countries = getCountry(request.user)
-        if program_id != 0:
-            getAgreements = ProjectAgreement.objects.all().filter(program=program_id).values('id', 'project_name')
-        else:
-            pass
-
-        final_dict = {}
-        if getAgreements:
-
-            getAgreements = json.dumps(list(getAgreements), cls=DjangoJSONEncoder)
-
-            final_dict = {'getAgreements': getAgreements}
-
-        return JsonResponse(final_dict, safe=False)
+        return JsonResponse({}, safe=False)

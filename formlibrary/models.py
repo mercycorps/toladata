@@ -1,5 +1,5 @@
 from __future__ import unicode_literals
-from workflow.models import Program, SiteProfile, ProjectAgreement
+from workflow.models import Program, SiteProfile
 
 from django.db import models
 from django.contrib import admin
@@ -9,8 +9,6 @@ from django.utils import timezone
 class TrainingAttendance(models.Model):
     training_name = models.CharField(max_length=255)
     program = models.ForeignKey(Program, on_delete=models.CASCADE, null=True, blank=True)
-    project_agreement = models.ForeignKey(ProjectAgreement, on_delete=models.SET_NULL,
-                                          null=True, blank=True, verbose_name="Project Initiation")
     implementer = models.CharField(max_length=255, null=True, blank=True)
     reporting_period = models.CharField(max_length=255, null=True, blank=True)
     total_participants = models.IntegerField(null=True, blank=True)
@@ -58,8 +56,6 @@ class TrainingAttendanceAdmin(admin.ModelAdmin):
 class Distribution(models.Model):
     distribution_name = models.CharField(max_length=255)
     program = models.ForeignKey(Program, on_delete=models.SET_NULL, null=True, blank=True)
-    initiation = models.ForeignKey(ProjectAgreement, on_delete=models.SET_NULL,
-                                   null=True, blank=True, verbose_name="Project Initiation")
     distribution_indicator = models.CharField(max_length=255)
     distribution_implementer = models.CharField(max_length=255, null=True, blank=True)
     reporting_period = models.CharField(max_length=255, null=True, blank=True)

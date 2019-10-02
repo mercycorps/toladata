@@ -2,7 +2,7 @@
 """Serializers for workflow model data, specific to view use cases."""
 from rest_framework import serializers
 
-from workflow.models import Program, Documentation, ProjectAgreement
+from workflow.models import Program, Documentation
 from indicators.models import Level, Indicator
 
 from django.shortcuts import reverse
@@ -20,17 +20,7 @@ class DocumentListProgramSerializer(serializers.ModelSerializer):
         ]
 
 
-class DocumentListProjectSerializer(serializers.ModelSerializer):
-    class Meta:
-        model = ProjectAgreement
-        fields = [
-            'id',
-            'project_name',
-        ]
-
-
 class DocumentListDocumentSerializer(serializers.ModelSerializer):
-    project = DocumentListProjectSerializer(read_only=True)
 
     class Meta:
         model = Documentation
@@ -39,7 +29,6 @@ class DocumentListDocumentSerializer(serializers.ModelSerializer):
             'name',
             'create_date',
             'program',
-            'project',
             'url',
         ]
 

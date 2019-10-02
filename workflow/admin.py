@@ -8,7 +8,7 @@ from import_export.admin import ImportExportModelAdmin, ExportMixin
 #from tola.util import getCountry, get_GAIT_data
 from tola import util
 from .models import (
-    Documentation, ProjectAgreement, ProjectComplete, Country, SiteProfile,
+    Documentation, ProjectComplete, Country, SiteProfile,
     Program, TolaUser, ProfileType, TolaUserProxy,
     Organization, Sector, Benchmarks, Budget, Monitor,
     Checklist, ChecklistItem,
@@ -23,7 +23,6 @@ from .models import (
 class DocumentationResource(resources.ModelResource):
     country = fields.Field(column_name='country', attribute='country', widget=ForeignKeyWidget(Country, 'country'))
     program = fields.Field(column_name='program', attribute='program', widget=ForeignKeyWidget(Program, 'name'))
-    project = fields.Field(column_name='project', attribute='project', widget=ForeignKeyWidget(ProjectAgreement, 'project_name'))
 
     class Meta:
         model = Documentation
@@ -39,38 +38,6 @@ class DocumentationAdmin(ImportExportModelAdmin):
     list_display = ('program', 'project')
     list_filter = ('program__country',)
 
-
-# Resource for CSV export
-class ProjectAgreementResource(resources.ModelResource):
-
-    class Meta:
-        model = ProjectAgreement
-        widgets = {
-                'create_date': {'format': '%d/%m/%Y'},
-                'edit_date': {'format': '%d/%m/%Y'},
-                'expected_start_date': {'format': '%d/%m/%Y'},
-                'expected_end_date': {'format': '%d/%m/%Y'},
-                }
-
-
-class ProjectAgreementAdmin(ImportExportModelAdmin):
-    resource_class = ProjectAgreementResource
-    list_display = ('program', 'project_name', 'short', 'create_date')
-    list_filter = ('program__country', 'short')
-    filter_horizontal = ('site')
-
-    def queryset(self, request, queryset):
-        """
-        Returns the filtered queryset based on the value
-        provided in the query string and retrievable via
-        `self.value()`.
-        """
-        # Filter by logged in users allowable countries
-        user_countries = util.getCountry(request.user)
-        # if not request.user.user.is_superuser:
-        return queryset.filter(country__in=user_countries)
-
-    pass
 
 
 # Resource for CSV export
@@ -178,7 +145,6 @@ admin.site.register(Organization, OrganizationAdmin)
 admin.site.register(Country, CountryAdmin)
 admin.site.register(Program, ProgramAdmin)
 admin.site.register(Sector)
-admin.site.register(ProjectAgreement, ProjectAgreementAdmin)
 admin.site.register(ProjectComplete, ProjectCompleteAdmin)
 admin.site.register(Documentation,DocumentationAdmin)
 admin.site.register(SiteProfile, SiteProfileAdmin)

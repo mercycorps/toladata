@@ -1562,8 +1562,6 @@ class ProjectComplete(models.Model):
     short = models.BooleanField(default=True,verbose_name="Short Form (recommended)")
     program = models.ForeignKey(Program, on_delete=models.SET_NULL, null=True, blank=True,
                                 related_name="complete", verbose_name=_("Program"))
-    project_agreement = models.OneToOneField(ProjectAgreement, on_delete=models.CASCADE,
-                                             verbose_name=_("Project Initiation"))
     # Rename to more generic "nonproject" names
     activity_code = models.CharField(_("Project Code"), max_length=255, blank=True, null=True)
     project_name = models.CharField(_("Project Name"), max_length=255, blank=True, null=True)
@@ -1698,8 +1696,6 @@ class Documentation(models.Model):
                            blank=True, null=True, max_length=135)
     description = models.CharField(_("Description"), max_length=255, blank=True, null=True)
     file_field = models.FileField(upload_to="uploads", blank=True, null=True)
-    project = models.ForeignKey(ProjectAgreement, on_delete=models.SET_NULL,
-                                blank=True, null=True, verbose_name=_("Project"))
     program = models.ForeignKey(Program, on_delete=models.CASCADE, verbose_name=_("Program"))
     create_date = models.DateTimeField(null=True, blank=True)
     edit_date = models.DateTimeField(null=True, blank=True)
@@ -1748,8 +1744,6 @@ class Benchmarks(models.Model):
     budget = models.IntegerField(_("Estimated Budget"), blank=True, null=True)
     cost = models.IntegerField(_("Actual Cost"), blank=True, null=True)
     description = models.CharField(_("Description"), max_length=255, blank=True)
-    agreement = models.ForeignKey(ProjectAgreement, on_delete=models.SET_NULL,
-                                  blank=True, null=True, verbose_name=_("Project Initiation"))
     complete = models.ForeignKey(ProjectComplete, on_delete=models.SET_NULL,
                                  blank=True, null=True, verbose_name=_("Complete"))
     create_date = models.DateTimeField(null=True, blank=True)
@@ -1781,8 +1775,6 @@ class Monitor(models.Model):
     responsible_person = models.CharField(_("Person Responsible"), max_length=25, blank=True, null=True)
     frequency = models.CharField(_("Frequency"), max_length=25, blank=True, null=True)
     type = models.TextField(_("Type"), null=True, blank=True)
-    agreement = models.ForeignKey(ProjectAgreement, on_delete=models.SET_NULL,
-                                  blank=True, null=True, verbose_name=_("Project Initiation"))
     complete = models.ForeignKey(ProjectComplete, on_delete=models.SET_NULL,
                                  blank=True, null=True, verbose_name=_("complete"))
     create_date = models.DateTimeField(null=True, blank=True)
@@ -1814,8 +1806,6 @@ class Budget(models.Model):
     description_of_contribution = models.CharField(_("Description of contribution"),
                                                    max_length=255, blank=True, null=True)
     proposed_value = models.IntegerField(_("Value"),default=0, blank=True, null=True)
-    agreement = models.ForeignKey(ProjectAgreement, on_delete=models.SET_NULL,
-                                  blank=True, null=True, verbose_name=_("Project Initiation"))
     complete = models.ForeignKey(ProjectComplete, blank=True, null=True,
                                  on_delete=models.SET_NULL, verbose_name=_("Complete"))
     create_date = models.DateTimeField(null=True, blank=True)
@@ -1842,8 +1832,6 @@ class BudgetAdmin(admin.ModelAdmin):
 
 class Checklist(models.Model):
     name = models.CharField(_("Name"), max_length=255, null=True, blank=True,default="Checklist")
-    agreement = models.ForeignKey(ProjectAgreement, null=True, blank=True, on_delete=models.SET_NULL,
-                                  verbose_name=_("Project Initiation"))
     country = models.ForeignKey(Country, null=True, blank=True, on_delete=models.SET_NULL, verbose_name=_("Country"))
     create_date = models.DateTimeField(null=True, blank=True)
     edit_date = models.DateTimeField(null=True, blank=True)

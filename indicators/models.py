@@ -31,7 +31,7 @@ from safedelete.queryset import SafeDeleteQueryset
 from django_mysql.models import ListCharField
 
 from workflow.models import (
-    Program, Sector, SiteProfile, ProjectAgreement, ProjectComplete, Country,
+    Program, Sector, SiteProfile, ProjectComplete, Country,
     Documentation, TolaUser
 )
 
@@ -1796,9 +1796,6 @@ class Result(models.Model):
         db_index=True
     )
 
-    agreement = models.ForeignKey(
-        ProjectAgreement, blank=True, null=True, on_delete=models.SET_NULL, related_name="q_agreement2",
-        verbose_name=_("Project Initiation"), help_text=" ")
 
     complete = models.ForeignKey(
         ProjectComplete, blank=True, null=True, related_name="q_complete2",

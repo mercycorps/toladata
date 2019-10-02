@@ -1,6 +1,6 @@
 from import_export import resources
 from .models import Indicator, Result, Country, Program, Sector, DisaggregationValue, ReportingFrequency
-from workflow.models import ProjectAgreement, ProjectComplete, TolaUser
+from workflow.models import ProjectComplete, TolaUser
 from import_export.admin import ImportExportModelAdmin
 from import_export.widgets import ForeignKeyWidget, ManyToManyWidget
 from import_export import fields
@@ -34,7 +34,6 @@ class ResultResource(resources.ModelResource):
     indicator = fields.Field(column_name='indicator', attribute='indicator',  widget=ForeignKeyWidget(Indicator, 'name_clean'))
     indicator_number = fields.Field(column_name='indicator_number', attribute='indicator', widget=ForeignKeyWidget(Indicator, 'number'))
     indicator_level = fields.Field(column_name='indicator_level', attribute='indicator',widget=ForeignKeyWidget(Indicator, 'levels'))
-    agreement = fields.Field(column_name='agreement', attribute='agreement',  widget=ForeignKeyWidget(ProjectAgreement, 'project_name_clean'))
     complete = fields.Field(column_name='complete', attribute='complete',  widget=ForeignKeyWidget(ProjectComplete, 'project_name_clean'))
     program = fields.Field(column_name='program', attribute='program', widget=ForeignKeyWidget(Program, 'name'))
     disaggregations = fields.Field(column_name='dissaggregations', attribute='disaggregations')
