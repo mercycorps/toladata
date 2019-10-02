@@ -1767,8 +1767,7 @@ class ResultManager(models.Manager):
     def get_queryset(self):
         return super(ResultManager, self).get_queryset()\
             .prefetch_related('site', 'disaggregation_value')\
-            .select_related('program', 'indicator', 'agreement', 'complete',
-                            'evidence')
+            .select_related('program', 'indicator')
 
 
 class Result(models.Model):
