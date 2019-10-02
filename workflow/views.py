@@ -25,7 +25,6 @@ from workflow.models import (
     Monitor,
     Benchmarks,
     Budget,
-    ApprovalAuthority,
     Checklist,
     ChecklistItem,
     Stakeholder,
@@ -413,10 +412,7 @@ class ProjectAgreementUpdate(LoginRequiredMixin, UpdateView):
         if str(is_approved) == "approved" and check_agreement_status.approval != "approved":
             budget = form.instance.total_estimated_budget
             if getProgram.budget_check == True:
-                try:
-                    user_budget_approval = ApprovalAuthority.objects.get(approval_user__user=self.request.user)
-                except ApprovalAuthority.DoesNotExist:
-                    user_budget_approval = None
+                user_budget_approval = None
             #compare budget amount to users approval amounts
 
             if getProgram.budget_check:

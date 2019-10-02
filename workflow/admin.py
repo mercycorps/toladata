@@ -11,7 +11,7 @@ from .models import (
     Documentation, ProjectAgreement, ProjectComplete, ProjectType, Country, SiteProfile,
     Office, Program, TolaUser, District, Province, ProfileType, AdminLevelThree, TolaUserProxy,
     Organization, Village, VillageAdmin, Sector, Capacity, Evaluate, Benchmarks, Budget, Template, Monitor,
-    ApprovalAuthority, Checklist, ChecklistItem, Stakeholder, StakeholderType,
+    Checklist, ChecklistItem, Stakeholder, StakeholderType,
     OrganizationAdmin, ProvinceAdmin, AdminLevelThreeAdmin,
     ProgramAccess,
     DistrictAdmin, ProjectTypeAdmin,
@@ -213,12 +213,6 @@ class ProgramAdmin(admin.ModelAdmin):
 
         super(ProgramAdmin, self).save_model(request, obj, form, change)
 
-class ApprovalAuthorityAdmin(admin.ModelAdmin):
-    list_display = ('approval_user','budget_limit','fund','country')
-    display = 'Approval Authority'
-    search_fields = ('approval_user__user__first_name', 'approval_user__user__last_name', 'country__country')
-    list_filter = ('create_date','country')
-
 
 class StakeholderAdmin(ImportExportModelAdmin):
     list_display = ('name', 'type', 'country', 'approval', 'approved_by', 'filled_by', 'create_date')
@@ -247,7 +241,6 @@ admin.site.register(Evaluate)
 admin.site.register(ProjectType, ProjectTypeAdmin)
 admin.site.register(Budget)
 admin.site.register(ProfileType)
-admin.site.register(ApprovalAuthority, ApprovalAuthorityAdmin)
 admin.site.register(ChecklistItem, ChecklistItemAdmin)
 admin.site.register(Checklist, ChecklistAdmin)
 admin.site.register(Stakeholder, StakeholderAdmin)
