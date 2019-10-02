@@ -2,12 +2,11 @@ from import_export import resources
 from import_export.widgets import ForeignKeyWidget, ManyToManyWidget
 from import_export import fields
 from .models import ProjectAgreement, Program, SiteProfile, Documentation,\
-    Stakeholder, Sector, TolaUser, ProjectComplete, Country, TolaUserProxy
+    Sector, TolaUser, ProjectComplete, Country, TolaUserProxy
 
 
 class ProjectAgreementResource(resources.ModelResource):
     site = fields.Field(column_name='site', attribute='site', widget=ManyToManyWidget(SiteProfile, 'name'))
-    stakeholder = fields.Field(column_name='stakeholder', attribute='stakeholder', widget=ManyToManyWidget(Stakeholder, 'name'))
     program = fields.Field(column_name='program', attribute='program', widget=ForeignKeyWidget(Program, 'name'))
     sector = fields.Field(column_name='sector', attribute='sector', widget=ForeignKeyWidget(Sector, 'sector'))
     estimated_by = fields.Field(column_name='estimated_by', attribute='estimated_by', widget=ForeignKeyWidget(TolaUser, 'name'))
@@ -19,7 +18,6 @@ class ProjectAgreementResource(resources.ModelResource):
 
 class ProjectCompleteResource(resources.ModelResource):
     site = fields.Field(column_name='site', attribute='site', widget=ManyToManyWidget(SiteProfile, 'name'))
-    stakeholder = fields.Field(column_name='stakeholder', attribute='stakeholder', widget=ManyToManyWidget(Stakeholder, 'name'))
     program = fields.Field(column_name='program', attribute='program', widget=ForeignKeyWidget(Program, 'name'))
     sector = fields.Field(column_name='sector', attribute='sector', widget=ForeignKeyWidget(Sector, 'sector'))
     estimated_by = fields.Field(column_name='estimated_by', attribute='estimated_by', widget=ForeignKeyWidget(TolaUser, 'name'))
@@ -33,26 +31,4 @@ class ProgramResource(resources.ModelResource):
 
     class Meta:
         model = Program
-
-class StakeholderResource(resources.ModelResource):
-    country = fields.Field(column_name='country', attribute='country', widget=ForeignKeyWidget(Country, 'country'))
-    sectors = fields.Field(column_name='sectors', attribute='sectors', widget=ManyToManyWidget(Sector, field='sector'))
-    approved_by = fields.Field(column_name='approved_by', attribute='approved_by', widget=ForeignKeyWidget(TolaUser, 'name'))
-    filled_by = fields.Field(column_name='filled_by', attribute='filled_by', widget=ForeignKeyWidget(TolaUser, 'name'))
-    stakeholder_register = fields.Field(column_name='stakeholder_register', attribute='stakeholder_register')
-    formal_relationship_document = fields.Field(column_name='formal_relationship_document', attribute='formal_relationship_document', widget=ForeignKeyWidget(Documentation, 'name_n_url'))
-    vetting_document = fields.Field(column_name='vetting_document', attribute='vetting_document', widget=ForeignKeyWidget(Documentation, 'name_n_url'))
-
-    class Meta:
-        model = Stakeholder
-
-    def dehydrate_stakeholder_register(self, stakeholder):
-        if stakeholder.stakeholder_register == 1:
-
-            return 'True'
-
-        if stakeholder.stakeholder_register == 0:
-
-            return 'False'
-
 

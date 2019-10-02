@@ -14,7 +14,7 @@ from django.template import Context
 from workflow.widgets import GoogleMapsWidget
 from workflow.models import (
     ProjectAgreement, ProjectComplete, Program, SiteProfile, Documentation, Benchmarks,
-    Monitor, Budget, ChecklistItem, Stakeholder,
+    Monitor, Budget, ChecklistItem,
     TolaUser, Sector, Country
 )
 
@@ -198,7 +198,7 @@ class ProjectAgreementForm(forms.ModelForm):
                 Tab('Executive Summary',
                     Fieldset('Project Details', 'program', 'program2', 'activity_code', 'account_code', 'lin_code',
                             'sector', 'project_name', 'project_activity', 'project_type', 'site',
-                             'stakeholder', 'mc_staff_responsible', 'expected_start_date', 'expected_end_date',
+                             'mc_staff_responsible', 'expected_start_date', 'expected_end_date',
                         ),
                     ),
                 Tab('Components',
@@ -439,8 +439,6 @@ class ProjectAgreementForm(forms.ModelForm):
         #override the site queryset to use request.user for country
         self.fields['site'].queryset = SiteProfile.objects.filter(country__in=countries)
 
-        #override the stakeholder queryset to use request.user for country
-        self.fields['stakeholder'].queryset = Stakeholder.objects.filter(country__in=countries)
 
         if not 'Approver' in self.request.user.groups.values_list('name', flat=True):
             _approvals = (
@@ -518,7 +516,7 @@ class ProjectAgreementSimpleForm(forms.ModelForm):
             TabHolder(
                 Tab('Executive Summary',
                     Fieldset('Project Details', 'program', 'program2', 'activity_code', 'sector',
-                             'project_name', 'site', 'stakeholder', 'expected_start_date', 'expected_end_date',
+                             'project_name', 'site', 'expected_start_date', 'expected_end_date',
                         ),
 
                     ),
@@ -696,8 +694,6 @@ class ProjectAgreementSimpleForm(forms.ModelForm):
         #override the site queryset to use request.user for country
         self.fields['site'].queryset = SiteProfile.objects.filter(country__in=countries)
 
-        #override the stakeholder queryset to use request.user for country
-        self.fields['stakeholder'].queryset = Stakeholder.objects.filter(country__in=countries)
 
         if not 'Approver' in self.request.user.groups.values_list('name', flat=True):
             _approvals = (
@@ -745,13 +741,12 @@ class ProjectCompleteCreateForm(forms.ModelForm):
         if kwargs['initial'].get('short'):
             fieldset = Fieldset(
                 'Program', 'program2', 'program', 'project_agreement2', 'project_agreement', 'activity_code',
-                'sector', 'project_name', 'estimated_budget', 'site', 'stakeholder',
+                'sector', 'project_name', 'estimated_budget', 'site',
                     )
         else:
             fieldset = Fieldset(
                 'Program', 'program2', 'program', 'project_agreement', 'project_agreement2', 'activity_code',
                 'account_code', 'lin_code', 'sector','project_name', 'project_activity', 'site',
-                'stakeholder'
                     )
         self.helper.layout = Layout(
             HTML("""<br/>"""),
@@ -776,7 +771,6 @@ class ProjectCompleteCreateForm(forms.ModelForm):
         countries = getCountry(self.request.user)
         self.fields['program'].queryset = Program.objects.filter(funding_status="Funded", country__in=countries)
         self.fields['site'].queryset = SiteProfile.objects.filter(country__in=countries)
-        self.fields['stakeholder'].queryset = Stakeholder.objects.filter(country__in=countries)
         self.fields['program2'].initial = kwargs['initial'].get('program')
         self.fields['program'].widget = forms.HiddenInput()
         self.fields['program2'].label = "Program"
@@ -836,7 +830,6 @@ class ProjectCompleteForm(forms.ModelForm):
                     Fieldset(
                         '', 'program', 'program2', 'project_agreement', 'project_agreement2', 'activity_code',
                         'account_code', 'lin_code', 'sector','project_name', 'project_activity', 'site',
-                        'stakeholder',
                         ),
                     Fieldset(
                         'Dates',
@@ -1040,8 +1033,6 @@ class ProjectCompleteForm(forms.ModelForm):
         # override the community queryset to use request.user for country
         self.fields['site'].queryset = SiteProfile.objects.filter(country__in=countries)
 
-        # override the stakeholder queryset to use request.user for country
-        self.fields['stakeholder'].queryset = Stakeholder.objects.filter(country__in=countries)
 
         if not 'Approver' in self.request.user.groups.values_list('name', flat=True):
             APPROVALS = (
@@ -1107,7 +1098,7 @@ class ProjectCompleteSimpleForm(forms.ModelForm):
             TabHolder(
                 Tab('Executive Summary',
                     Fieldset('Program',
-                        'program', 'program2', 'project_agreement', 'project_agreement2', 'activity_code', 'sector','project_name','site','stakeholder'
+                        'program', 'program2', 'project_agreement', 'project_agreement2', 'activity_code', 'sector','project_name','site',
                     ),
                     Fieldset('Dates',
                         'expected_start_date','expected_end_date', 'actual_start_date', 'actual_end_date',
@@ -1288,8 +1279,6 @@ class ProjectCompleteSimpleForm(forms.ModelForm):
         # override the community queryset to use request.user for country
         self.fields['site'].queryset = SiteProfile.objects.filter(country__in=countries)
 
-        # override the stakeholder queryset to use request.user for country
-        self.fields['stakeholder'].queryset = Stakeholder.objects.filter(country__in=countries)
 
         if not 'Approver' in self.request.user.groups.values_list('name', flat=True):
             APPROVALS = (
@@ -1589,66 +1578,6 @@ class ChecklistItemForm(forms.ModelForm):
         #countries = getCountry(self.request.user)
         #override the community queryset to use request.user for country
         #self.fields['item'].queryset = ChecklistItem.objects.filter(checklist__country__in=countries)
-
-
-class StakeholderForm(forms.ModelForm):
-
-    class Meta:
-        model = Stakeholder
-        #fields = ['contact', 'country', 'approved_by', 'filled_by', 'sectors', 'formal_relationship_document', 'vetting_document', ]
-        exclude = ['create_date', 'edit_date']
-
-    approval = forms.ChoiceField(
-        choices=APPROVALS,
-        initial='in progress',
-        required=False,
-    )
-
-    def __init__(self, *args, **kwargs):
-        self.helper = FormHelper()
-        self.request = kwargs.pop('request')
-        self.helper.form_method = 'post'
-        self.helper.form_class = ''
-        self.helper.label_class = ''
-        self.helper.field_class = ''
-        self.helper.form_error_title = 'Form Errors'
-        self.helper.error_text_inline = True
-        self.helper.help_text_inline = True
-        self.helper.html5_required = True
-        #self.helper.add_input(Submit('submit', 'Save'))
-        pkval = kwargs['instance'].pk if kwargs['instance'] else 0
-        self.helper.layout = Layout(
-            TabHolder(
-                Tab('Details',
-                    Fieldset('Details',
-                        'name', 'type', 'contact', HTML("""<a class="btn btn-link btn-add" onclick="window.open('/workflow/contact_add/%s/0/').focus();"><i class="fas fa-plus-circle"></i> Add New Contact</a>""" % pkval ), 'country', 'sectors', 'stakeholder_register', 'formal_relationship_document', 'vetting_document', 'notes',
-                    ),
-                ),
-
-                Tab('Approvals',
-                    Fieldset('Approval',
-                        'approval','approved_by','filled_by',
-                    ),
-                ),
-            ),
-            Div(
-                FormActions(
-                    Submit('submit', 'Save changes', css_class=''),
-                    Reset('reset', 'Reset', css_class='')
-                ),
-                css_class='form-actions',
-            ),
-        )
-        super(StakeholderForm, self).__init__(*args, **kwargs)
-
-        countries = getCountry(self.request.user)
-        users = TolaUser.objects.filter(country__in=countries)
-        self.fields['sectors'].queryset = Sector.objects.all()
-        self.fields['country'].queryset = countries
-        self.fields['approved_by'].queryset = users
-        self.fields['filled_by'].queryset = users
-        self.fields['formal_relationship_document'].queryset = Documentation.objects.filter(program__country__in=countries)
-        self.fields['vetting_document'].queryset = Documentation.objects.filter(program__country__in=countries)
 
 
 class FilterForm(forms.Form):

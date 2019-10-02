@@ -1399,7 +1399,6 @@ class ProjectAgreement(models.Model):
     staff_responsible = models.CharField(_("Staff Responsible"), max_length=255, blank=True, null=True)
     partners = models.BooleanField(_("Are there partners involved?"), default=0)
     name_of_partners = models.CharField(_("Name of Partners"), max_length=255, blank=True, null=True)
-    stakeholder = models.ManyToManyField(Stakeholder,verbose_name=_("Stakeholders"), blank=True)
     effect_or_impact = models.TextField(_("What is the anticipated Outcome or Goal?"), blank=True, null=True)
     expected_start_date = models.DateTimeField(_("Expected starting date"), blank=True, null=True)
     expected_end_date = models.DateTimeField(_("Expected ending date"),blank=True, null=True)
@@ -1543,10 +1542,6 @@ class ProjectAgreement(models.Model):
     def sites(self):
         return ', '.join([x.name for x in self.site.all()])
 
-    @property
-    def stakeholders(self):
-        return ', '.join([x.name for x in self.stakeholder.all()])
-
 
 # Project Tracking, admin is handled in the admin.py
 # TODO: Clean up unused fields and rename model with manual migration file
@@ -1585,7 +1580,6 @@ class ProjectComplete(models.Model):
     actual_end_date = models.DateTimeField(_("Actual end date"), blank=True, null=True)
     actual_duration = models.CharField(_("Actual duaration"), max_length=255, blank=True, null=True)
     on_time = models.BooleanField(default=None)
-    stakeholder = models.ManyToManyField(Stakeholder, blank=True, verbose_name=_("Stakeholder"))
     no_explanation = models.TextField(_("If not on time explain delay"), blank=True, null=True)
     account_code = models.CharField(_("Fund Code"), help_text='', max_length=255, blank=True, null=True)
     lin_code = models.CharField(_("LIN Code"), help_text='', max_length=255, blank=True, null=True)

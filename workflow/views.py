@@ -24,7 +24,6 @@ from workflow.models import (
     Budget,
     Checklist,
     ChecklistItem,
-    Stakeholder,
 )
 from workflow.forms import (
     ProjectAgreementForm,
@@ -40,10 +39,9 @@ from workflow.forms import (
     BudgetForm,
     FilterForm,
     ChecklistItemForm,
-    StakeholderForm,
 )
 from workflow.mixins import AjaxableResponseMixin
-from workflow.export import ProjectAgreementResource, StakeholderResource
+from workflow.export import ProjectAgreementResource
 from workflow.tables import ProjectAgreementTable
 
 from formlibrary.models import TrainingAttendance, Distribution
@@ -590,12 +588,7 @@ class ProjectCompleteCreate(LoginRequiredMixin, CreateView):
         except SiteProfile.DoesNotExist:
             getSites = None
 
-        try:
-            getStakeholder = Stakeholder.objects.filter(projectagreement__id=getProjectAgreement.id).values_list('id',flat=True)
-            stakeholder = {'stakeholder': [o for o in getStakeholder], }
-            initial['stakeholder'] = stakeholder
-        except Stakeholder.DoesNotExist:
-            getStakeholder = None
+        getStakeholder = None
 
         return initial
 
@@ -1603,152 +1596,6 @@ class BenchmarkDelete(LoginRequiredMixin, AjaxableResponseMixin, DeleteView):
 
 
 @method_decorator(has_projects_access, name='dispatch')
-class StakeholderList(LoginRequiredMixin, ListView):
-    """
-    getStakeholders
-    """
-    model = Stakeholder
-    template_name = 'workflow/stakeholder_list.html'
-
-    def get(self, request, *args, **kwargs):
-        # Check for project filter
-        project_agreement_id = self.kwargs['pk']
-        # Check for program filter
-        if self.kwargs['program_id']:
-            program_id = int(self.kwargs['program_id'])
-        else:
-            program_id = 0
-
-        getPrograms = request.user.tola_user.available_programs.filter(funding_status="Funded")
-
-        if program_id != 0:
-            getStakeholders = Stakeholder.objects.all().filter(projectagreement__program__id=program_id, projectagreement__program__in=getPrograms).distinct()
-
-        elif int(self.kwargs['pk']) != 0:
-            getStakeholders = Stakeholder.objects.all().filter(projectagreement=self.kwargs['pk'], projectagreement__program__in=getPrograms).distinct()
-
-        else:
-            getStakeholders = Stakeholder.objects.all().filter(projectagreement__program__in=getPrograms).distinct()
-
-        return render(request, self.template_name, {'getStakeholders': getStakeholders, 'project_agreement_id': project_agreement_id,'program_id':program_id, 'getPrograms': getPrograms})
-
-
-@method_decorator(has_projects_access, name='dispatch')
-class StakeholderCreate(LoginRequiredMixin, CreateView):
-    """
-    Stakeholder Form
-    """
-    model = Stakeholder
-
-    @method_decorator(group_excluded('ViewOnly', url='workflow/permission'))
-    def dispatch(self, request, *args, **kwargs):
-        self.guidance = None
-        return super(StakeholderCreate, self).dispatch(request, *args, **kwargs)
-
-    # add the request to the kwargs
-    def get_form_kwargs(self):
-        kwargs = super(StakeholderCreate, self).get_form_kwargs()
-        kwargs['request'] = self.request
-        return kwargs
-
-    def get_context_data(self, **kwargs):
-        context = super(StakeholderCreate, self).get_context_data(**kwargs)
-        context.update({'id': self.kwargs['id']})
-        return context
-
-    def get_initial(self):
-
-        country = getCountry(self.request.user)[0]
-
-        initial = {
-            'agreement': self.kwargs['id'],
-            'country': country,
-            }
-
-        return initial
-
-    def form_invalid(self, form):
-
-        messages.error(self.request, 'Invalid Form', fail_silently=False)
-
-        return self.render_to_response(self.get_context_data(form=form))
-
-    def form_valid(self, form):
-        form.save()
-        messages.success(self.request, 'Success, Stakeholder Created!')
-        latest = Stakeholder.objects.latest('id')
-        redirect_url = '/workflow/stakeholder_update/' + str(latest.id)
-        return HttpResponseRedirect(redirect_url)
-
-    form_class = StakeholderForm
-
-
-@method_decorator(has_projects_access, name='dispatch')
-class StakeholderUpdate(LoginRequiredMixin, UpdateView):
-    """
-    Stakeholder Form
-    """
-    model = Stakeholder
-
-    @method_decorator(group_excluded('ViewOnly', url='workflow/permission'))
-    def dispatch(self, request, *args, **kwargs):
-        self.guidance = None
-        return super(StakeholderUpdate, self).dispatch(request, *args, **kwargs)
-
-    # add the request to the kwargs
-    def get_form_kwargs(self):
-        kwargs = super(StakeholderUpdate, self).get_form_kwargs()
-        kwargs['request'] = self.request
-        return kwargs
-
-    def get_context_data(self, **kwargs):
-        context = super(StakeholderUpdate, self).get_context_data(**kwargs)
-        context.update({'id': self.kwargs['pk']})
-        return context
-
-    def form_invalid(self, form):
-        messages.error(self.request, 'Invalid Form', fail_silently=False)
-        return self.render_to_response(self.get_context_data(form=form))
-
-    def form_valid(self, form):
-        form.save()
-        messages.success(self.request, 'Success, Stakeholder Updated!')
-
-        return self.render_to_response(self.get_context_data(form=form))
-
-    form_class = StakeholderForm
-
-
-@method_decorator(has_projects_access, name='dispatch')
-class StakeholderDelete(LoginRequiredMixin, DeleteView):
-    """
-    Benchmark Form
-    """
-    model = Stakeholder
-    success_url = '/workflow/stakeholder_list/0/0/'
-
-    def get_context_data(self, **kwargs):
-        context = super(StakeholderDelete, self).get_context_data(**kwargs)
-        context.update({'id': self.kwargs['pk']})
-        return context
-
-    def form_invalid(self, form):
-
-        messages.error(self.request, 'Invalid Form', fail_silently=False)
-
-        return self.render_to_response(self.get_context_data(form=form))
-
-    def form_valid(self, form):
-
-        form.save()
-
-        messages.success(self.request, 'Success, Stakeholder Deleted!')
-        return self.render_to_response(self.get_context_data(form=form))
-
-    form_class = StakeholderForm
-
-
-@method_decorator(has_projects_access, name='dispatch')
 class BudgetList(LoginRequiredMixin, ListView):
     """
     Budget List
@@ -2121,63 +1968,6 @@ def country_json(request, country):
     For populating the province dropdown based  country dropdown value
     """
     return HttpResponse('', content_type="application/json")
-
-
-@login_required
-@has_projects_access
-def export_stakeholders_list(request, **kwargs):
-
-    program_id = int(kwargs['program_id'])
-    programs = request.user.tola_user.available_programs
-
-    if program_id != 0:
-        getStakeholders = Stakeholder.objects.prefetch_related('sector').filter(projectagreement__program__id=program_id, projectagreement__program__in=programs).distinct()
-    else:
-        getStakeholders = Stakeholder.objects.prefetch_related('sector').filter(projectagreement__program__in=programs).distinct()
-
-    dataset = StakeholderResource().export(getStakeholders)
-    response = HttpResponse(dataset.csv, content_type='application/ms-excel')
-    response['Content-Disposition'] = 'attachment; filename=stakeholders.csv'
-
-    return response
-
-
-#Ajax views for single page filtering
-@method_decorator(has_projects_access, name='dispatch')
-class StakeholderObjects(LoginRequiredMixin, View, AjaxableResponseMixin):
-    """
-    Render Agreements json object response to the report ajax call
-    """
-
-    def get(self, request, *args, **kwargs):
-
-        # Check for project filter
-        project_agreement_id = self.kwargs['pk']
-        # Check for program filter
-
-        if self.kwargs['program_id']:
-            program_id = int(self.kwargs['program_id'])
-        else:
-            program_id = 0
-
-        programs = request.user.tola_user.available_programs
-
-        if program_id != 0:
-            getStakeholders = Stakeholder.objects.all().filter(projectagreement__program__id=program_id, projectagreement__program__in=programs).distinct().values('id', 'create_date', 'type__name', 'name', 'sectors__sector')
-
-        elif int(self.kwargs['pk']) != 0:
-            getStakeholders = Stakeholder.objects.all().filter(projectagreement=self.kwargs['pk'], projectagreement__program__in=programs).distinct().values('id', 'create_date', 'type__name', 'name', 'sectors__sector')
-
-
-        else:
-            getStakeholders = Stakeholder.objects.all().filter(projectagreement__program__in=programs).values('id', 'create_date', 'type__name', 'name', 'sectors__sector').distinct()
-
-
-        getStakeholders = json.dumps(list(getStakeholders), cls=DjangoJSONEncoder)
-
-        final_dict = {'getStakeholders': getStakeholders}
-
-        return JsonResponse(final_dict, safe=False)
 
 
 @login_required

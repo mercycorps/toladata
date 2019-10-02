@@ -11,7 +11,7 @@ from .models import (
     Documentation, ProjectAgreement, ProjectComplete, Country, SiteProfile,
     Program, TolaUser, ProfileType, TolaUserProxy,
     Organization, Sector, Benchmarks, Budget, Monitor,
-    Checklist, ChecklistItem, Stakeholder,
+    Checklist, ChecklistItem,
     OrganizationAdmin,
     ProgramAccess,
     ChecklistAdmin,
@@ -57,7 +57,7 @@ class ProjectAgreementAdmin(ImportExportModelAdmin):
     resource_class = ProjectAgreementResource
     list_display = ('program', 'project_name', 'short', 'create_date')
     list_filter = ('program__country', 'short')
-    filter_horizontal = ('site', 'stakeholder')
+    filter_horizontal = ('site')
 
     def queryset(self, request, queryset):
         """
@@ -174,12 +174,6 @@ class ProgramAdmin(admin.ModelAdmin):
         super(ProgramAdmin, self).save_model(request, obj, form, change)
 
 
-class StakeholderAdmin(ImportExportModelAdmin):
-    list_display = ('name', 'type', 'country', 'approval', 'approved_by', 'filled_by', 'create_date')
-    display = 'Stakeholder List'
-    list_filter = ('country', 'type')
-
-
 admin.site.register(Organization, OrganizationAdmin)
 admin.site.register(Country, CountryAdmin)
 admin.site.register(Program, ProgramAdmin)
@@ -194,5 +188,4 @@ admin.site.register(Budget)
 admin.site.register(ProfileType)
 admin.site.register(ChecklistItem, ChecklistItemAdmin)
 admin.site.register(Checklist, ChecklistAdmin)
-admin.site.register(Stakeholder, StakeholderAdmin)
 admin.site.register(TolaUser,TolaUserAdmin)

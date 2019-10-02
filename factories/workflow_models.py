@@ -20,7 +20,6 @@ from workflow.models import (
     ProfileType as ProfileTypeM,
     Sector as SectorM,
     SiteProfile as SiteProfileM,
-    Stakeholder as StakeholderM,
     TolaUser as TolaUserM,
     Program as ProgramM,
     CountryAccess as CountryAccessM,
@@ -281,25 +280,6 @@ class SectorFactory(DjangoModelFactory):
         model = SectorM
 
     sector = Sequence(lambda n: 'Sector {0}'.format(n))
-
-
-class Stakeholder(DjangoModelFactory):
-    class Meta:
-        model = StakeholderM
-
-    name = 'Stakeholder A'
-    organization = SubFactory(OrganizationFactory)
-
-    @post_generation
-    def program(self, create, extracted, **kwargs):
-        if not create:
-            # Simple build, do nothing.
-            return
-
-        if isinstance(extracted, list):
-            # A list of program were passed in, use them
-            for program in extracted:
-                self.program.add(program)
 
 
 class ProfileType(DjangoModelFactory):

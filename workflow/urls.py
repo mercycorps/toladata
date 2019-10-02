@@ -58,15 +58,6 @@ urlpatterns = [
     url(r'^benchmark_complete_update/(?P<pk>\w+)/$', BenchmarkUpdate.as_view(), name='benchmark_update'),
     url(r'^benchmark_complete_delete/(?P<pk>\w+)/$', BenchmarkDelete.as_view(), name='benchmark_delete'),
 
-    url(r'^stakeholder_list/(?P<program_id>\w+)/(?P<pk>\w+)/$', StakeholderList.as_view(), name='stakeholder_list'),
-
-    url(r'^stakeholder_table/(?P<program_id>\w+)/(?P<pk>\w+)/$', StakeholderObjects.as_view(), name='stakeholder_table'),
-
-    url(r'^stakeholder_add/(?P<id>\w+)/$', StakeholderCreate.as_view(), name='stakeholder_add'),
-    url(r'^stakeholder_update/(?P<pk>\w+)/$', StakeholderUpdate.as_view(), name='stakeholder_update'),
-    url(r'^stakeholder_delete/(?P<pk>\w+)/$', StakeholderDelete.as_view(), name='stakeholder_delete'),
-    url(r'^export_stakeholders_list/(?P<program_id>\w+)/$', export_stakeholders_list, name='export_stakeholders_list'),
-
     url(r'^checklistitem_list/(?P<pk>\w+)/$', ChecklistItemList.as_view(), name='checklistitem_list'),
     url(r'^checklistitem_add/(?P<id>\w+)/$', ChecklistItemCreate.as_view(), name='checklistitem_add'),
     url(r'^checklistitem_update/(?P<pk>\w+)/$', ChecklistItemUpdate.as_view(), name='checklistitem_update'),
@@ -81,7 +72,6 @@ urlpatterns = [
     url(r'^report/export/$', Report.as_view(), name='report'),
     url(r'^report/(?P<pk>\w+)/(?P<status>[\w ]+)/$', Report.as_view(), name='report'),
     url(r'^report_table/(?P<pk>\w+)/(?P<status>[\w ]+)/$', ReportData.as_view(), name='report_data'),
-    url(r'^export_stakeholders_list/', export_stakeholders_list, name='export_stakeholders_list'),
 
     url(r'^country/(?P<country>[-\w]+)/country_json/', country_json, name='country_json'),
 
