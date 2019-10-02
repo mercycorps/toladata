@@ -32,41 +32,6 @@ def create_auth_token(sender, instance=None, created=False, **kwargs):
         Token.objects.create(user=instance)
 
 
-class TolaSites(models.Model):
-    name = models.CharField(_("Name"), blank=True, null=True, max_length=255)
-    agency_name = models.CharField(_("Agency name"), blank=True, null=True, max_length=255)
-    agency_url = models.CharField(_("Agency url"), blank=True, null=True, max_length=255)
-    tola_report_url = models.CharField(_("Tola report url"), blank=True, null=True, max_length=255)
-    tola_tables_url = models.CharField(_("Tola tables url"), blank=True, null=True, max_length=255)
-    tola_tables_user = models.CharField(_("Tola tables user"), blank=True, null=True, max_length=255)
-    tola_tables_token = models.CharField(_("Tola tables token"), blank=True, null=True, max_length=255)
-    site = models.ForeignKey(Site, null=True, on_delete=models.SET_NULL, verbose_name=_("Site"))
-    privacy_disclaimer = models.TextField(_("Privacy disclaimer"), blank=True, null=True)
-    created = models.DateTimeField(_("Created"), auto_now=False, blank=True, null=True)
-    updated = models.DateTimeField(_("Updated"), auto_now=False, blank=True, null=True)
-
-    class Meta:
-        verbose_name_plural = _("Tola Sites")
-
-    def __str__(self):
-        return self.name
-
-    def save(self, *args, **kwargs):
-        ''' On save, update timestamps as appropriate '''
-        if kwargs.pop('new_entry', True):
-            self.created = timezone.now()
-        else:
-            self.updated = timezone.now()
-        return super(TolaSites, self).save(*args, **kwargs)
-
-
-class TolaSitesAdmin(admin.ModelAdmin):
-    list_display = ('name', 'agency_name')
-    display = 'Tola Site'
-    list_filter = ('name',)
-    search_fields = ('name','agency_name')
-
-
 class Sector(models.Model):
     sector = models.CharField(_("Sector Name"), max_length=255, blank=True)
     create_date = models.DateTimeField(null=True, blank=True)
