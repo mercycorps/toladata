@@ -1369,9 +1369,9 @@ class Indicator(SafeDeleteModel):
     def level_order_display(self):
         """returns a-z for 0-25, then aa - zz for 26-676"""
         if self.level and self.level_order is not None and self.level_order < 26:
-            return string.ascii_lowercase[self.level_order]
+            return string.ascii_lowercase[int(self.level_order)]
         elif self.level and self.level_order and self.level_order >= 26:
-            return string.ascii_lowercase[self.level_order/26 - 1] + string.lowercase[self.level_order % 26]
+            return string.ascii_lowercase[self.level_order // 26 - 1] + string.lowercase[self.level_order % 26]
         return ''
 
     @cached_property
