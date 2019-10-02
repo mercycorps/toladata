@@ -11,7 +11,7 @@ from .models import (
     Documentation, ProjectAgreement, ProjectComplete, ProjectType, Country, SiteProfile,
     Program, TolaUser, ProfileType, TolaUserProxy,
     Organization, Sector, Benchmarks, Budget, Template, Monitor,
-    Checklist, ChecklistItem, Stakeholder, StakeholderType,
+    Checklist, ChecklistItem, Stakeholder,
     OrganizationAdmin,
     ProgramAccess,
     ProjectTypeAdmin,
@@ -198,5 +198,4 @@ admin.site.register(ProfileType)
 admin.site.register(ChecklistItem, ChecklistItemAdmin)
 admin.site.register(Checklist, ChecklistAdmin)
 admin.site.register(Stakeholder, StakeholderAdmin)
-admin.site.register(StakeholderType)
 admin.site.register(TolaUser,TolaUserAdmin)

@@ -1294,7 +1294,6 @@ class StakeholderManager(models.Manager):
 
 class Stakeholder(models.Model):
     name = models.CharField(_("Stakeholder/Organization Name"), max_length=255, blank=True, null=True)
-    type = models.ForeignKey(StakeholderType, blank=True, null=True, on_delete=models.SET_NULL, verbose_name=_("Type"))
     country = models.ForeignKey(Country, on_delete=models.CASCADE, verbose_name=_("Country"))
     sectors = models.ManyToManyField(Sector, blank=True, verbose_name=_("Sectors"))
     stakeholder_register = models.BooleanField(_("Has this partner been added to stakeholder register?"))

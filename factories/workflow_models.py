@@ -22,7 +22,6 @@ from workflow.models import (
     Sector as SectorM,
     SiteProfile as SiteProfileM,
     Stakeholder as StakeholderM,
-    StakeholderType as StakeholderTypeM,
     TolaUser as TolaUserM,
     Program as ProgramM,
     CountryAccess as CountryAccessM,
@@ -310,13 +309,6 @@ class ProjectType(DjangoModelFactory):
 
     name = 'Adaptive Management'
     description = 'Adaptive Management'
-
-
-class StakeholderType(DjangoModelFactory):
-    class Meta:
-        model = StakeholderTypeM
-
-    name = 'Association'
 
 
 class ProfileType(DjangoModelFactory):
