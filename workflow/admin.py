@@ -9,10 +9,10 @@ from import_export.admin import ImportExportModelAdmin, ExportMixin
 from tola import util
 from .models import (
     Documentation, ProjectAgreement, ProjectComplete, ProjectType, Country, SiteProfile,
-    Office, Program, TolaUser, District, ProfileType, AdminLevelThree, TolaUserProxy,
+    Office, Program, TolaUser, District, ProfileType, TolaUserProxy,
     Organization, Sector, Capacity, Evaluate, Benchmarks, Budget, Template, Monitor,
     Checklist, ChecklistItem, Stakeholder, StakeholderType,
-    OrganizationAdmin, AdminLevelThreeAdmin,
+    OrganizationAdmin,
     ProgramAccess,
     DistrictAdmin, ProjectTypeAdmin,
     ChecklistAdmin,
@@ -159,8 +159,6 @@ class SiteProfileResource(resources.ModelResource):
     office = fields.Field(column_name='office', attribute='office', widget=ForeignKeyWidget(Office, 'code'))
     district = fields.Field(column_name='admin level 2', attribute='district',
                             widget=ForeignKeyWidget(District, 'name'))
-    admin_level_three = fields.Field(column_name='admin level 3', attribute='admin_level_three',
-                                     widget=ForeignKeyWidget(AdminLevelThree, 'name'))
 
     class Meta:
         model = SiteProfile
@@ -222,7 +220,6 @@ admin.site.register(Organization, OrganizationAdmin)
 admin.site.register(Country, CountryAdmin)
 admin.site.register(Office, OfficeAdmin)
 admin.site.register(District, DistrictAdmin)
-admin.site.register(AdminLevelThree, AdminLevelThreeAdmin)
 admin.site.register(Program, ProgramAdmin)
 admin.site.register(Sector)
 admin.site.register(ProjectAgreement, ProjectAgreementAdmin)

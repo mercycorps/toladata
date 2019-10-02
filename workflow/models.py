@@ -1114,8 +1114,6 @@ class SiteProfile(models.Model):
     country = models.ForeignKey(Country, null=True, on_delete=models.SET_NULL, verbose_name=_("Country"))
     district = models.ForeignKey(
         District, verbose_name=_("Administrative Level 2"), null=True, blank=True, on_delete=models.SET_NULL)
-    admin_level_three = models.ForeignKey(
-        AdminLevelThree, verbose_name=_("Administrative Level 3"), null=True, blank=True, on_delete=models.SET_NULL)
     latitude = models.DecimalField(
         _("Latitude (Decimal Coordinates)"), decimal_places=16,max_digits=25, default=Decimal("0.00"))
     longitude = models.DecimalField(

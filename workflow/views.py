@@ -15,7 +15,6 @@ from workflow.serializers import DocumentListProgramSerializer, DocumentListDocu
 from workflow.models import (
     Program,
     Country,
-    AdminLevelThree,
     District,
     ProjectAgreement,
     ProjectComplete,
@@ -2133,10 +2132,7 @@ def district_json(request, district):
     """
     For populating the office dropdown based  country dropdown value
     """
-    selected_district = District.objects.get(id=district)
-    adminthree = AdminLevelThree.objects.all().filter(district=selected_district)
-    adminthree_json = serializers.serialize("json", adminthree)
-    return HttpResponse(adminthree_json, content_type="application/json")
+    return HttpResponse('', content_type="application/json")
 
 
 @login_required
