@@ -988,7 +988,7 @@
         // If all the inputs exist and are legit, try validating the LoP target now
 
         let computedLop = computeLopTarget();
-        if (allValid && computedLop != null && computedLop < 1) {
+        if (allValid && computedLop != null && computedLop < 0.01) {
             let msg = "{% trans 'The LoP target cannot be zero.'|escapejs %}";
             showTargetErrors(msg);
             return false;

@@ -7,6 +7,7 @@ import copy
 import json
 import logging
 from datetime import datetime, timedelta
+from decimal import Decimal
 import uuid
 import dateparser
 from weasyprint import HTML, CSS
@@ -150,7 +151,7 @@ class IndicatorFormMixin:
     def form_invalid(self, form):
         return JsonResponse(form.errors, status=400)
 
-    def noramlize_periodic_target_client_json_dates(self, pt_json):
+    def normalize_periodic_target_client_json_dates(self, pt_json):
         """
         The JSON containing periodic targets sent by the client contains dates as: 'Dec 31, 2018'
         The rest of the code expects them to be: '2018-12-31'
@@ -198,7 +199,7 @@ class IndicatorFormMixin:
         # Are all target values >= 0?
         for pt in normalized_pt_json:
             try:
-                if int(pt['target']) < 0:
+                if Decimal(pt['target']).as_tuple()[0] == 1:
                     raise PeriodicTargetJsonValidationError('Target value must be >= 0, found %d' % pt['target'])    
             except TypeError:
                 pass
@@ -330,7 +331,7 @@ class IndicatorCreate(IndicatorFormMixin, CreateView):
             # now create/update periodic targets
             pt_json = json.loads(periodic_targets)
 
-            normalized_pt_json = self.noramlize_periodic_target_client_json_dates(pt_json)
+            normalized_pt_json = self.normalize_periodic_target_client_json_dates(pt_json)
 
             self.validate_periodic_target_json_from_client(
                 normalized_pt_json, indicator.program, indicator.target_frequency
@@ -534,7 +535,7 @@ class IndicatorUpdate(IndicatorFormMixin, UpdateView):
             # now create/update periodic targets (will be empty u'[]' for LoP)
             pt_json = json.loads(periodic_targets)
 
-            normalized_pt_json = self.noramlize_periodic_target_client_json_dates(pt_json)
+            normalized_pt_json = self.normalize_periodic_target_client_json_dates(pt_json)
 
             self.validate_periodic_target_json_from_client(
                 normalized_pt_json, old_indicator.program, new_target_frequency
