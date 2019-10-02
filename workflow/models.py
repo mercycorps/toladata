@@ -1830,9 +1830,6 @@ class Checklist(models.Model):
     create_date = models.DateTimeField(null=True, blank=True)
     edit_date = models.DateTimeField(null=True, blank=True)
 
-    class Meta:
-        ordering = ('agreement',)
-
     # on save add create date or update edit date
     def save(self, *args, **kwargs):
         if self.create_date == None:
@@ -1846,8 +1843,8 @@ class Checklist(models.Model):
 
 
 class ChecklistAdmin(admin.ModelAdmin):
-    list_display = ('name','country')
-    list_filter = ('country','agreement')
+    list_display = ('name', 'country')
+    list_filter = ('country',)
 
 
 class ChecklistItem(models.Model):

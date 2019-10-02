@@ -48,7 +48,7 @@ class TrainingAttendance(models.Model):
 
 
 class TrainingAttendanceAdmin(admin.ModelAdmin):
-    list_display = ('training_name', 'program', 'project_agreement', 'create_date', 'edit_date')
+    list_display = ('training_name', 'program', 'create_date', 'edit_date')
     display = 'Training Attendance'
     list_filter = ('program__country', 'program')
 
@@ -101,7 +101,7 @@ class Distribution(models.Model):
 
 
 class DistributionAdmin(admin.ModelAdmin):
-    list_display = ('distribution_name', 'program', 'initiation', 'create_date', 'edit_date')
+    list_display = ('distribution_name', 'program', 'create_date', 'edit_date')
     display = 'Program Dashboard'
 
 

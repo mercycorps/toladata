@@ -35,7 +35,7 @@ class DocumentationResource(resources.ModelResource):
 
 class DocumentationAdmin(ImportExportModelAdmin):
     resource_class = DocumentationResource
-    list_display = ('program')
+    list_display = ('program',)
     list_filter = ('program__country',)
 
 
@@ -68,7 +68,7 @@ class SiteProfileAdmin(ImportExportModelAdmin):
     resource_class = SiteProfileResource
     list_display = ('name', 'country')
     list_filter = ('country__country',)
-    search_fields = ('country__country')
+    search_fields = ('country__country',)
 
 class ProgramAccessInline(admin.TabularInline):
     model = ProgramAccess
