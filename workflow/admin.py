@@ -10,7 +10,7 @@ from tola import util
 from .models import (
     Documentation, ProjectAgreement, ProjectComplete, ProjectType, Country, SiteProfile,
     Office, Program, TolaUser, District, ProfileType, AdminLevelThree, TolaUserProxy,
-    Organization, Village, VillageAdmin, Sector, Capacity, Evaluate, Benchmarks, Budget, Template, Monitor,
+    Organization, Sector, Capacity, Evaluate, Benchmarks, Budget, Template, Monitor,
     Checklist, ChecklistItem, Stakeholder, StakeholderType,
     OrganizationAdmin, AdminLevelThreeAdmin,
     ProgramAccess,
@@ -171,7 +171,7 @@ class SiteProfileResource(resources.ModelResource):
 
 class SiteProfileAdmin(ImportExportModelAdmin):
     resource_class = SiteProfileResource
-    list_display = ('name', 'office', 'country', 'district', 'admin_level_three', 'village')
+    list_display = ('name', 'office', 'country', 'district', 'admin_level_three')
     list_filter = ('country__country',)
     search_fields = ('office__code', 'country__country')
 
@@ -223,7 +223,6 @@ admin.site.register(Country, CountryAdmin)
 admin.site.register(Office, OfficeAdmin)
 admin.site.register(District, DistrictAdmin)
 admin.site.register(AdminLevelThree, AdminLevelThreeAdmin)
-admin.site.register(Village, VillageAdmin)
 admin.site.register(Program, ProgramAdmin)
 admin.site.register(Sector)
 admin.site.register(ProjectAgreement, ProjectAgreementAdmin)

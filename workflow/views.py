@@ -1187,7 +1187,6 @@ class SiteProfileList(ListView):
                     | Q(office__name__contains=request.GET["search"])\
                     | Q(type__profile__contains=request.GET['search'])\
                     | Q(district__name__contains=request.GET["search"])\
-                    | Q(village__contains=request.GET['search'])
                     | Q(projectagreement__project_name__contains=request.GET["search"])\
                     | Q(projectcomplete__project_name__contains=request.GET['search']))\
                 .select_related()\

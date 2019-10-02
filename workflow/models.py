@@ -1116,8 +1116,6 @@ class SiteProfile(models.Model):
         District, verbose_name=_("Administrative Level 2"), null=True, blank=True, on_delete=models.SET_NULL)
     admin_level_three = models.ForeignKey(
         AdminLevelThree, verbose_name=_("Administrative Level 3"), null=True, blank=True, on_delete=models.SET_NULL)
-    village = models.CharField(
-        _("Administrative Level 4"), help_text="", max_length=255, null=True, blank=True)
     latitude = models.DecimalField(
         _("Latitude (Decimal Coordinates)"), decimal_places=16,max_digits=25, default=Decimal("0.00"))
     longitude = models.DecimalField(
@@ -1160,7 +1158,7 @@ class SiteProfile(models.Model):
 
 
 class SiteProfileAdmin(admin.ModelAdmin):
-    list_display = ('name', 'code','office', 'country', 'district', 'village', 'cluster', 'longitude', 'latitude', 'create_date', 'edit_date')
+    list_display = ('name', 'code','office', 'country', 'district', 'cluster', 'longitude', 'latitude', 'create_date', 'edit_date')
     list_filter = ('country__country')
     search_fields = ('code','office__code','country__country')
     display = 'SiteProfile'
