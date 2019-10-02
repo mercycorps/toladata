@@ -428,7 +428,7 @@ class SiteProfileList(ListView):
             getSiteProfile = SiteProfile.objects.filter(\
                     Q(country__in=countries),\
                     Q(name__contains=request.GET["search"])\
-                    | Q(type__profile__contains=request.GET['search'])\
+                    | Q(type__profile__contains=request.GET['search']))\
                 .select_related()\
                 .distinct()
 
