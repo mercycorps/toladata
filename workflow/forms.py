@@ -14,7 +14,7 @@ from django.template import Context
 from workflow.widgets import GoogleMapsWidget
 from workflow.models import (
     ProjectAgreement, ProjectComplete, Program, SiteProfile, Documentation, Benchmarks,
-    Monitor, Budget, Office, ChecklistItem, Province, Stakeholder,
+    Monitor, Budget, Office, ChecklistItem, Stakeholder,
     TolaUser, Sector, Country
 )
 
@@ -1382,7 +1382,7 @@ class SiteProfileForm(forms.ModelForm):
                 ),
                 Tab(_('Location'),
                     Fieldset(_('Places'),
-                        'country','province','district','admin_level_three','village', Field('latitude', step="any"), Field('longitude', step="any"),
+                        'country','district','admin_level_three','village', Field('latitude', step="any"), Field('longitude', step="any"),
                     ),
                     Fieldset(_('Map'),
                         'map',
@@ -1451,7 +1451,6 @@ class SiteProfileForm(forms.ModelForm):
         ).distinct()
         self.fields['date_of_firstcontact'].label = _("Date of First Contact")
         self.fields['office'].queryset = Office.objects.filter(province__country__in=countries)
-        self.fields['province'].queryset = Province.objects.filter(country__in=countries)
         self.fields['approved_by'].queryset = TolaUser.objects.filter(country__in=countries).distinct()
         self.fields['filled_by'].queryset = TolaUser.objects.filter(country__in=countries).distinct()
         self.fields['country'].queryset = countries

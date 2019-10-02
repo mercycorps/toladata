@@ -1,5 +1,5 @@
 from __future__ import unicode_literals
-from workflow.models import Program, SiteProfile, ProjectAgreement, Office, Province
+from workflow.models import Program, SiteProfile, ProjectAgreement, Office
 
 from django.db import models
 from django.contrib import admin
@@ -64,7 +64,6 @@ class Distribution(models.Model):
     distribution_indicator = models.CharField(max_length=255)
     distribution_implementer = models.CharField(max_length=255, null=True, blank=True)
     reporting_period = models.CharField(max_length=255, null=True, blank=True)
-    province = models.ForeignKey(Province, on_delete=models.SET_NULL, null=True, blank=True)
     total_beneficiaries_received_input = models.IntegerField(null=True, blank=True)
     distribution_location = models.CharField(max_length=255, null=True, blank=True)
     input_type_distributed = models.CharField(max_length=255, null=True, blank=True)

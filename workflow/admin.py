@@ -9,10 +9,10 @@ from import_export.admin import ImportExportModelAdmin, ExportMixin
 from tola import util
 from .models import (
     Documentation, ProjectAgreement, ProjectComplete, ProjectType, Country, SiteProfile,
-    Office, Program, TolaUser, District, Province, ProfileType, AdminLevelThree, TolaUserProxy,
+    Office, Program, TolaUser, District, ProfileType, AdminLevelThree, TolaUserProxy,
     Organization, Village, VillageAdmin, Sector, Capacity, Evaluate, Benchmarks, Budget, Template, Monitor,
     Checklist, ChecklistItem, Stakeholder, StakeholderType,
-    OrganizationAdmin, ProvinceAdmin, AdminLevelThreeAdmin,
+    OrganizationAdmin, AdminLevelThreeAdmin,
     ProgramAccess,
     DistrictAdmin, ProjectTypeAdmin,
     ChecklistAdmin,
@@ -39,8 +39,8 @@ class OfficeFilter(admin.SimpleListFilter):
 
 
 class OfficeAdmin(admin.ModelAdmin):
-    list_display = ('name', 'code', 'province', 'create_date', 'edit_date')
-    search_fields = ('name', 'province__name', 'code')
+    list_display = ('name', 'code', 'create_date', 'edit_date')
+    search_fields = ('name', 'code')
     list_filter = ('create_date', OfficeFilter,)  # ('province__country__country')
     display = 'Office'
 
@@ -159,8 +159,6 @@ class SiteProfileResource(resources.ModelResource):
     office = fields.Field(column_name='office', attribute='office', widget=ForeignKeyWidget(Office, 'code'))
     district = fields.Field(column_name='admin level 2', attribute='district',
                             widget=ForeignKeyWidget(District, 'name'))
-    province = fields.Field(column_name='admin level 1', attribute='province',
-                            widget=ForeignKeyWidget(Province, 'name'))
     admin_level_three = fields.Field(column_name='admin level 3', attribute='admin_level_three',
                                      widget=ForeignKeyWidget(AdminLevelThree, 'name'))
 
@@ -173,7 +171,7 @@ class SiteProfileResource(resources.ModelResource):
 
 class SiteProfileAdmin(ImportExportModelAdmin):
     resource_class = SiteProfileResource
-    list_display = ('name', 'office', 'country', 'province', 'district', 'admin_level_three', 'village')
+    list_display = ('name', 'office', 'country', 'district', 'admin_level_three', 'village')
     list_filter = ('country__country',)
     search_fields = ('office__code', 'country__country')
 
@@ -222,7 +220,6 @@ class StakeholderAdmin(ImportExportModelAdmin):
 
 admin.site.register(Organization, OrganizationAdmin)
 admin.site.register(Country, CountryAdmin)
-admin.site.register(Province, ProvinceAdmin)
 admin.site.register(Office, OfficeAdmin)
 admin.site.register(District, DistrictAdmin)
 admin.site.register(AdminLevelThree, AdminLevelThreeAdmin)

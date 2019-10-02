@@ -888,7 +888,6 @@ class ProvinceAdmin(admin.ModelAdmin):
 
 class District(models.Model):
     name = models.CharField(_("Admin Level 2"), max_length=255, blank=True)
-    province = models.ForeignKey(Province, on_delete=models.CASCADE, verbose_name=_("Admin Level 1"))
     create_date = models.DateTimeField(null=True, blank=True)
     edit_date = models.DateTimeField(null=True, blank=True)
 
@@ -910,7 +909,7 @@ class District(models.Model):
 
 
 class DistrictAdmin(admin.ModelAdmin):
-    list_display = ('name', 'province', 'create_date')
+    list_display = ('name', 'create_date')
     search_fields = ('create_date','province')
     list_filter = ('province__country__country','province')
     display = 'Admin Level 2'
@@ -1057,7 +1056,7 @@ class LandTypeAdmin(admin.ModelAdmin):
 
 class SiteProfileManager(models.Manager):
     def get_queryset(self):
-        return super(SiteProfileManager, self).get_queryset().prefetch_related().select_related('country','province','district','admin_level_three','type')
+        return super(SiteProfileManager, self).get_queryset().prefetch_related().select_related('country', 'district','admin_level_three','type')
 
 
 class SiteProfile(models.Model):
@@ -1113,8 +1112,6 @@ class SiteProfile(models.Model):
     animal_type = models.CharField(
         _("Animal Types"), help_text=_("List Animal Types"), max_length=255, null=True, blank=True)
     country = models.ForeignKey(Country, null=True, on_delete=models.SET_NULL, verbose_name=_("Country"))
-    province = models.ForeignKey(
-        Province, verbose_name=_("Administrative Level 1"), null=True, blank=True, on_delete=models.SET_NULL)
     district = models.ForeignKey(
         District, verbose_name=_("Administrative Level 2"), null=True, blank=True, on_delete=models.SET_NULL)
     admin_level_three = models.ForeignKey(
@@ -1163,7 +1160,7 @@ class SiteProfile(models.Model):
 
 
 class SiteProfileAdmin(admin.ModelAdmin):
-    list_display = ('name', 'code','office', 'country', 'district', 'province', 'village', 'cluster', 'longitude', 'latitude', 'create_date', 'edit_date')
+    list_display = ('name', 'code','office', 'country', 'district', 'village', 'cluster', 'longitude', 'latitude', 'create_date', 'edit_date')
     list_filter = ('country__country')
     search_fields = ('code','office__code','country__country')
     display = 'SiteProfile'

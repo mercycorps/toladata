@@ -83,7 +83,6 @@ urlpatterns = [
     url(r'^report_table/(?P<pk>\w+)/(?P<status>[\w ]+)/$', ReportData.as_view(), name='report_data'),
     url(r'^export_stakeholders_list/', export_stakeholders_list, name='export_stakeholders_list'),
 
-    url(r'^province/(?P<province>[-\w]+)/province_json/', province_json, name='province_json'),
     url(r'^country/(?P<country>[-\w]+)/country_json/', country_json, name='country_json'),
     url(r'^district/(?P<district>[-\w]+)/district_json/', district_json, name='district_json'),
 

@@ -15,7 +15,6 @@ from workflow.serializers import DocumentListProgramSerializer, DocumentListDocu
 from workflow.models import (
     Program,
     Country,
-    Province,
     AdminLevelThree,
     District,
     ProjectAgreement,
@@ -1167,18 +1166,18 @@ class SiteProfileList(ListView):
         #Filter SiteProfile list and map by activity or program
         if activity_id != 0:
             getSiteProfile = SiteProfile.objects.prefetch_related(\
-                    'country','district','province')\
+                    'country','district')\
                 .filter(projectagreement__id=activity_id)\
                 .distinct()
         elif program_id != 0:
             getSiteProfile = SiteProfile.objects.prefetch_related(\
-                    'country','district','province')\
+                    'country','district')\
                 .filter(Q(projectagreement__program__id=program_id)\
                         | Q(result__program__id=program_id))\
                 .distinct()
         else:
             getSiteProfile = SiteProfile.objects.prefetch_related(\
-                    'country','district','province')\
+                    'country','district')\
                 .filter(country__in=countries)\
                 .distinct()
         if request.method == "GET" and "search" in request.GET:
@@ -1187,7 +1186,6 @@ class SiteProfileList(ListView):
                     Q(name__contains=request.GET["search"])\
                     | Q(office__name__contains=request.GET["search"])\
                     | Q(type__profile__contains=request.GET['search'])\
-                    | Q(province__name__contains=request.GET["search"])\
                     | Q(district__name__contains=request.GET["search"])\
                     | Q(village__contains=request.GET['search'])
                     | Q(projectagreement__project_name__contains=request.GET["search"])\
@@ -1240,10 +1238,10 @@ class SiteProfileReport(ListView):
         project_agreement_id = self.kwargs['pk']
 
         if int(self.kwargs['pk']) == 0:
-            getSiteProfile = SiteProfile.objects.all().prefetch_related('country','district','province').filter(country__in=countries).filter(status=1)
-            getSiteProfileIndicator = SiteProfile.objects.all().prefetch_related('country','district','province').filter(Q(result__program__country__in=countries)).filter(status=1)
+            getSiteProfile = SiteProfile.objects.all().prefetch_related('country','district').filter(country__in=countries).filter(status=1)
+            getSiteProfileIndicator = SiteProfile.objects.all().prefetch_related('country','district').filter(Q(result__program__country__in=countries)).filter(status=1)
         else:
-            getSiteProfile = SiteProfile.objects.all().prefetch_related('country','district','province').filter(projectagreement__id=self.kwargs['pk']).filter(status=1)
+            getSiteProfile = SiteProfile.objects.all().prefetch_related('country','district').filter(projectagreement__id=self.kwargs['pk']).filter(status=1)
             getSiteProfileIndicator = None
 
         id=self.kwargs['pk']
@@ -2128,21 +2126,7 @@ def country_json(request, country):
     """
     For populating the province dropdown based  country dropdown value
     """
-    selected_country = Country.objects.get(id=country)
-    province = Province.objects.all().filter(country=selected_country)
-    provinces_json = serializers.serialize("json", province)
-    return HttpResponse(provinces_json, content_type="application/json")
-
-
-@login_required
-def province_json(request, province):
-    """
-    For populating the office district based  country province value
-    """
-    selected_province = Province.objects.get(id=province)
-    district = District.objects.all().filter(province=selected_province)
-    districts_json = serializers.serialize("json", district)
-    return HttpResponse(districts_json, content_type="application/json")
+    return HttpResponse('', content_type="application/json")
 
 
 @login_required
