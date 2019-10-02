@@ -1487,7 +1487,6 @@ class ProjectAgreement(models.Model):
         TolaUser, blank=True, null=True, on_delete=models.SET_NULL,
         verbose_name=_("M&E Reviewed by"), related_name="reviewing_me")
     me_reviewed_by_date = models.DateTimeField(_("Date Reviewed by M&E"), null=True, blank=True)
-    capacity = models.ManyToManyField(Capacity,verbose_name=_("Sustainability Plan"), blank=True)
     evaluate = models.ManyToManyField(Evaluate, blank=True, verbose_name=_("Evaluate"))
     approval = models.CharField(_("Approval Status"), default="in progress", max_length=255, blank=True, null=True)
     approved_by = models.ForeignKey(
@@ -1552,10 +1551,6 @@ class ProjectAgreement(models.Model):
     @property
     def stakeholders(self):
         return ', '.join([x.name for x in self.stakeholder.all()])
-
-    @property
-    def capacities(self):
-        return ', '.join([x.capacity for x in self.capacity.all()])
 
     @property
     def evaluations(self):

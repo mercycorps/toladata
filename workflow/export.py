@@ -1,13 +1,12 @@
 from import_export import resources
 from import_export.widgets import ForeignKeyWidget, ManyToManyWidget
 from import_export import fields
-from .models import ProjectAgreement, Program, SiteProfile, Capacity, Evaluate, Documentation,\
+from .models import ProjectAgreement, Program, SiteProfile, Evaluate, Documentation,\
     Stakeholder, Sector, ProjectType, TolaUser, ProjectComplete, Country, StakeholderType, TolaUserProxy
 
 
 class ProjectAgreementResource(resources.ModelResource):
     site = fields.Field(column_name='site', attribute='site', widget=ManyToManyWidget(SiteProfile, 'name'))
-    capacity = fields.Field(column_name='capacity', attribute='capacity', widget=ManyToManyWidget(Capacity, 'capacity'))
     evaluate = fields.Field(column_name='evaluate', attribute='evaluate', widget=ManyToManyWidget(Evaluate, 'evaluate'))
     stakeholder = fields.Field(column_name='stakeholder', attribute='stakeholder', widget=ManyToManyWidget(Stakeholder, 'name'))
     program = fields.Field(column_name='program', attribute='program', widget=ForeignKeyWidget(Program, 'name'))
@@ -22,7 +21,6 @@ class ProjectAgreementResource(resources.ModelResource):
 
 class ProjectCompleteResource(resources.ModelResource):
     site = fields.Field(column_name='site', attribute='site', widget=ManyToManyWidget(SiteProfile, 'name'))
-    capacity = fields.Field(column_name='capacity', attribute='capacity', widget=ManyToManyWidget(Capacity, 'capacity'))
     evaluate = fields.Field(column_name='evaluate', attribute='evaluate', widget=ManyToManyWidget(Evaluate, 'evaluate'))
     stakeholder = fields.Field(column_name='stakeholder', attribute='stakeholder', widget=ManyToManyWidget(Stakeholder, 'name'))
     program = fields.Field(column_name='program', attribute='program', widget=ForeignKeyWidget(Program, 'name'))

@@ -320,7 +320,6 @@ class ProjectAgreementForm(forms.ModelForm):
                                     {% endif %}
                                 </div>
                             """),
-                            'capacity',
                         ),
                     ),
                     Fieldset(
