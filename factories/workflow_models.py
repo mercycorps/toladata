@@ -18,7 +18,6 @@ from workflow.models import (
     Documentation as DocumentationM,
     Organization as OrganizationM,
     ProfileType as ProfileTypeM,
-    ProjectType as ProjectTypeM,
     Sector as SectorM,
     SiteProfile as SiteProfileM,
     Stakeholder as StakeholderM,
@@ -301,14 +300,6 @@ class Stakeholder(DjangoModelFactory):
             # A list of program were passed in, use them
             for program in extracted:
                 self.program.add(program)
-
-
-class ProjectType(DjangoModelFactory):
-    class Meta:
-        model = ProjectTypeM
-
-    name = 'Adaptive Management'
-    description = 'Adaptive Management'
 
 
 class ProfileType(DjangoModelFactory):

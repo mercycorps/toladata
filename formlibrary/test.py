@@ -1,7 +1,7 @@
 import unittest
 from django.test import TestCase
 from django.utils import timezone
-from workflow.models import Program, Country, ProjectAgreement, Sector, ProjectType, SiteProfile
+from workflow.models import Program, Country, ProjectAgreement, Sector, SiteProfile
 from formlibrary.models import TrainingAttendance, Distribution, Beneficiary
 from datetime import datetime
 

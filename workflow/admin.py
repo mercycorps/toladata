@@ -8,13 +8,12 @@ from import_export.admin import ImportExportModelAdmin, ExportMixin
 #from tola.util import getCountry, get_GAIT_data
 from tola import util
 from .models import (
-    Documentation, ProjectAgreement, ProjectComplete, ProjectType, Country, SiteProfile,
+    Documentation, ProjectAgreement, ProjectComplete, Country, SiteProfile,
     Program, TolaUser, ProfileType, TolaUserProxy,
     Organization, Sector, Benchmarks, Budget, Template, Monitor,
     Checklist, ChecklistItem, Stakeholder,
     OrganizationAdmin,
     ProgramAccess,
-    ProjectTypeAdmin,
     ChecklistAdmin,
     ChecklistItemAdmin, TolaUserAdmin
 )
@@ -192,7 +191,6 @@ admin.site.register(Template)
 admin.site.register(SiteProfile, SiteProfileAdmin)
 admin.site.register(Monitor)
 admin.site.register(Benchmarks)
-admin.site.register(ProjectType, ProjectTypeAdmin)
 admin.site.register(Budget)
 admin.site.register(ProfileType)
 admin.site.register(ChecklistItem, ChecklistItemAdmin)

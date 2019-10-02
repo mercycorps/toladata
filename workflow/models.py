@@ -1383,9 +1383,6 @@ class ProjectAgreement(models.Model):
         _("Project Name"),
         help_text=_('Please be specific in your name.  Consider that your Project Name includes WHO, WHAT, WHERE, HOW'),
         max_length=255)
-    project_type = models.ForeignKey(
-        ProjectType, verbose_name=_("Project Type"), help_text='', max_length=255,
-        blank=True, null=True, on_delete=models.SET_NULL)
     project_activity = models.CharField(
         _("Project Activity"), help_text=_('This should come directly from the activities listed in the Logframe'),
         max_length=255, blank=True, null=True)
@@ -1576,8 +1573,6 @@ class ProjectComplete(models.Model):
     activity_code = models.CharField(_("Project Code"), max_length=255, blank=True, null=True)
     project_name = models.CharField(_("Project Name"), max_length=255, blank=True, null=True)
     project_activity = models.CharField(_("Project Activity"), max_length=255, blank=True, null=True)
-    project_type = models.ForeignKey(
-        ProjectType, max_length=255, blank=True, null=True, on_delete=models.SET_NULL, verbose_name=_("Project Type"))
     sector = models.ForeignKey("Sector", blank=True, null=True, on_delete=models.SET_NULL, verbose_name=_("Sector"))
     expected_start_date = models.DateTimeField(
         _("Expected start date"), help_text=_("Imported from Project Initiation"), blank=True, null=True)
