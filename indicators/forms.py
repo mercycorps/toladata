@@ -5,7 +5,6 @@ from workflow.models import (
     Program,
     SiteProfile,
     Documentation,
-    ProjectComplete,
     TolaUser,
     Sector,
 )
@@ -215,7 +214,6 @@ class ResultForm(forms.ModelForm):
             'achieved': _('Actual value'),
             # Translators: field label that
             'periodic_target': _('Measure against target'),
-            'complete': _('Project'),
             'evidence_url': _('Link to file or folder'),
         }
 
@@ -266,12 +264,6 @@ class ResultForm(forms.ModelForm):
 
         self.fields['evidence'].queryset = Documentation.objects\
             .filter(program=self.indicator.program)
-        # only display Project field to existing users
-        if not self.user.tola_user.allow_projects_access:
-            self.fields.pop('complete')
-        else:
-            # provide only in-program projects for the complete queryset:
-            self.fields['complete'].queryset = ProjectComplete.objects.filter(program=self.program)
 
     def set_periodic_target_widget(self):
         # Django will deliver localized strings to the template but the form needs to be able to compare the date

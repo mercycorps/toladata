@@ -1744,8 +1744,6 @@ class Benchmarks(models.Model):
     budget = models.IntegerField(_("Estimated Budget"), blank=True, null=True)
     cost = models.IntegerField(_("Actual Cost"), blank=True, null=True)
     description = models.CharField(_("Description"), max_length=255, blank=True)
-    complete = models.ForeignKey(ProjectComplete, on_delete=models.SET_NULL,
-                                 blank=True, null=True, verbose_name=_("Complete"))
     create_date = models.DateTimeField(null=True, blank=True)
     edit_date = models.DateTimeField(null=True, blank=True)
 
@@ -1775,8 +1773,6 @@ class Monitor(models.Model):
     responsible_person = models.CharField(_("Person Responsible"), max_length=25, blank=True, null=True)
     frequency = models.CharField(_("Frequency"), max_length=25, blank=True, null=True)
     type = models.TextField(_("Type"), null=True, blank=True)
-    complete = models.ForeignKey(ProjectComplete, on_delete=models.SET_NULL,
-                                 blank=True, null=True, verbose_name=_("complete"))
     create_date = models.DateTimeField(null=True, blank=True)
     edit_date = models.DateTimeField(null=True, blank=True)
 
@@ -1806,8 +1802,6 @@ class Budget(models.Model):
     description_of_contribution = models.CharField(_("Description of contribution"),
                                                    max_length=255, blank=True, null=True)
     proposed_value = models.IntegerField(_("Value"),default=0, blank=True, null=True)
-    complete = models.ForeignKey(ProjectComplete, blank=True, null=True,
-                                 on_delete=models.SET_NULL, verbose_name=_("Complete"))
     create_date = models.DateTimeField(null=True, blank=True)
     edit_date = models.DateTimeField(null=True, blank=True)
     history = HistoricalRecords()

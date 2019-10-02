@@ -31,7 +31,7 @@ from safedelete.queryset import SafeDeleteQueryset
 from django_mysql.models import ListCharField
 
 from workflow.models import (
-    Program, Sector, SiteProfile, ProjectComplete, Country,
+    Program, Sector, SiteProfile, Country,
     Documentation, TolaUser
 )
 
@@ -1794,13 +1794,6 @@ class Result(models.Model):
     indicator = models.ForeignKey(
         Indicator, help_text=" ", on_delete=models.CASCADE, verbose_name=_("Indicator"),
         db_index=True
-    )
-
-
-    complete = models.ForeignKey(
-        ProjectComplete, blank=True, null=True, related_name="q_complete2",
-        on_delete=models.SET_NULL, help_text=" ",
-        verbose_name=_("Project Complete")
     )
 
     # TODO: this should be deprecated as it duplicates the indicator__program link (with potentially conflicting data)

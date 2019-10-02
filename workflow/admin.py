@@ -8,7 +8,7 @@ from import_export.admin import ImportExportModelAdmin, ExportMixin
 #from tola.util import getCountry, get_GAIT_data
 from tola import util
 from .models import (
-    Documentation, ProjectComplete, Country, SiteProfile,
+    Documentation, Country, SiteProfile,
     Program, TolaUser, ProfileType, TolaUserProxy,
     Organization, Sector, Benchmarks, Budget, Monitor,
     Checklist, ChecklistItem,
@@ -35,42 +35,8 @@ class DocumentationResource(resources.ModelResource):
 
 class DocumentationAdmin(ImportExportModelAdmin):
     resource_class = DocumentationResource
-    list_display = ('program', 'project')
+    list_display = ('program')
     list_filter = ('program__country',)
-
-
-
-# Resource for CSV export
-class ProjectCompleteResource(resources.ModelResource):
-
-    class Meta:
-        model = ProjectComplete
-        widgets = {
-                'create_date': {'format': '%d/%m/%Y'},
-                'edit_date': {'format': '%d/%m/%Y'},
-                'expected_start_date': {'format': '%d/%m/%Y'},
-                'expected_end_date': {'format': '%d/%m/%Y'},
-                'actual_start_date': {'format': '%d/%m/%Y'},
-                'actual_end_date': {'format': '%d/%m/%Y'},
-                }
-
-
-class ProjectCompleteAdmin(ImportExportModelAdmin):
-    resource_class = ProjectCompleteResource
-    list_display = ('program', 'project_name', 'activity_code','short','create_date')
-    list_filter = ('program__country', 'short')
-    display = 'project_name'
-
-    def queryset(self, request, queryset):
-        """
-        Returns the filtered queryset based on the value
-        provided in the query string and retrievable via
-        `self.value()`.
-        """
-        # Filter by logged in users allowable countries
-        user_countries = util.getCountry(request.user)
-        # if not request.user.user.is_superuser:
-        return queryset.filter(country__in=user_countries)
 
 
 # Resource for CSV export
@@ -117,6 +83,7 @@ class ProgramAccessInline(admin.TabularInline):
 
         return field
 
+
 class ProgramAdmin(admin.ModelAdmin):
     list_display = ('countries', 'name', 'gaitid', 'description', 'budget_check', 'funding_status')
     search_fields = ('name', 'gaitid')
@@ -145,7 +112,6 @@ admin.site.register(Organization, OrganizationAdmin)
 admin.site.register(Country, CountryAdmin)
 admin.site.register(Program, ProgramAdmin)
 admin.site.register(Sector)
-admin.site.register(ProjectComplete, ProjectCompleteAdmin)
 admin.site.register(Documentation,DocumentationAdmin)
 admin.site.register(SiteProfile, SiteProfileAdmin)
 admin.site.register(Monitor)
