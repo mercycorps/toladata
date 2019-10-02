@@ -15,7 +15,7 @@ from formlibrary.models import TrainingAttendance, Beneficiary, Distribution
 from formlibrary.mixins import AjaxableResponseMixin
 from formlibrary.forms import TrainingAttendanceForm, BeneficiaryForm, DistributionForm
 
-from workflow.models import FormGuidance, Program, ProjectAgreement
+from workflow.models import Program, ProjectAgreement
 from tola_management.permissions import has_projects_access
 from tola.util import getCountry, group_excluded
 
@@ -52,10 +52,7 @@ class TrainingCreate(CreateView):
 
     @method_decorator(group_excluded('ViewOnly', url='workflow/permission'))
     def dispatch(self, request, *args, **kwargs):
-        try:
-            self.guidance = FormGuidance.objects.get(form="Training")
-        except FormGuidance.DoesNotExist:
-            self.guidance = None
+        self.guidance = None
         return super(TrainingCreate, self).dispatch(request, *args, **kwargs)
 
     # add the request to the kwargs
@@ -96,10 +93,7 @@ class TrainingUpdate(UpdateView):
 
     @method_decorator(group_excluded('ViewOnly', url='workflow/permission'))
     def dispatch(self, request, *args, **kwargs):
-        try:
-            self.guidance = FormGuidance.objects.get(form="Training")
-        except FormGuidance.DoesNotExist:
-            self.guidance = None
+        self.guidance = None
         return super(TrainingUpdate, self).dispatch(request, *args, **kwargs)
 
     # add the request to the kwargs
@@ -182,10 +176,7 @@ class BeneficiaryCreate(CreateView):
 
     @method_decorator(group_excluded('ViewOnly', url='workflow/permission'))
     def dispatch(self, request, *args, **kwargs):
-        try:
-            self.guidance = FormGuidance.objects.get(form="Beneficiary")
-        except FormGuidance.DoesNotExist:
-            self.guidance = None
+        self.guidance = None
         return super(BeneficiaryCreate, self).dispatch(request, *args, **kwargs)
 
     def get_initial(self):
@@ -226,10 +217,7 @@ class BeneficiaryUpdate(UpdateView):
 
     @method_decorator(group_excluded('ViewOnly', url='workflow/permission'))
     def dispatch(self, request, *args, **kwargs):
-        try:
-            self.guidance = FormGuidance.objects.get(form="Beneficiary")
-        except FormGuidance.DoesNotExist:
-            self.guidance = None
+        self.guidance = None
         return super(BeneficiaryUpdate, self).dispatch(request, *args, **kwargs)
 
     # add the request to the kwargs
@@ -311,10 +299,7 @@ class DistributionCreate(CreateView):
 
     @method_decorator(group_excluded('ViewOnly', url='workflow/permission'))
     def dispatch(self, request, *args, **kwargs):
-        try:
-            self.guidance = FormGuidance.objects.get(form="Distribution")
-        except FormGuidance.DoesNotExist:
-            self.guidance = None
+        self.guidance = None
         return super(DistributionCreate, self).dispatch(request, *args, **kwargs)
 
     # add the request to the kwargs
@@ -355,10 +340,7 @@ class DistributionUpdate(UpdateView):
 
     @method_decorator(group_excluded('ViewOnly', url='workflow/permission'))
     def dispatch(self, request, *args, **kwargs):
-        try:
-            self.guidance = FormGuidance.objects.get(form="Distribution")
-        except FormGuidance.DoesNotExist:
-            self.guidance = None
+        self.guidance = None
         return super(DistributionUpdate, self).dispatch(request, *args, **kwargs)
 
     # add the request to the kwargs

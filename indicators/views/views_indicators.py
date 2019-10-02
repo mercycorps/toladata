@@ -34,7 +34,7 @@ from django.views.generic.edit import CreateView, DeleteView, UpdateView
 from tola.util import group_excluded
 
 from workflow.models import (
-    Program, FormGuidance
+    Program
 )
 
 from indicators.serializers import (
@@ -143,7 +143,7 @@ class IndicatorFormMixin:
         self.guidance = None
 
     def set_form_guidance(self):
-        self.guidance = FormGuidance.objects.filter(form="Indicator").first()
+        self.guidance = None
 
     def get_template_names(self):
         return 'indicators/indicator_form_modal.html'

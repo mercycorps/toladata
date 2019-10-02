@@ -30,7 +30,6 @@ from workflow.models import (
     ChecklistItem,
     Contact,
     Stakeholder,
-    FormGuidance,
 )
 from workflow.forms import (
     ProjectAgreementForm,
@@ -259,10 +258,7 @@ class ProjectAgreementCreate(LoginRequiredMixin, CreateView):
 
     @method_decorator(group_excluded('ViewOnly', url='workflow/permission'))
     def dispatch(self, request, *args, **kwargs):
-        try:
-            self.guidance = FormGuidance.objects.get(form="Agreement")
-        except FormGuidance.DoesNotExist:
-            self.guidance = None
+        self.guidance = None
         return super(ProjectAgreementCreate, self).dispatch(request, *args, **kwargs)
 
      # add the request to the kwargs
@@ -336,10 +332,7 @@ class ProjectAgreementUpdate(LoginRequiredMixin, UpdateView):
 
     @method_decorator(group_excluded('ViewOnly', url='workflow/permission'))
     def dispatch(self, request, *args, **kwargs):
-        try:
-            self.guidance = FormGuidance.objects.get(form="Agreement")
-        except FormGuidance.DoesNotExist:
-            self.guidance = None
+        self.guidance = None
         return super(ProjectAgreementUpdate, self).dispatch(request, *args, **kwargs)
 
     def get_form(self, form_class=None):
@@ -571,10 +564,7 @@ class ProjectCompleteCreate(LoginRequiredMixin, CreateView):
     template_name = 'workflow/projectcomplete_form.html'
 
     def dispatch(self, request, *args, **kwargs):
-        try:
-            self.guidance = FormGuidance.objects.get(form="Complete")
-        except FormGuidance.DoesNotExist:
-            self.guidance = None
+        self.guidance = None
         return super(ProjectCompleteCreate, self).dispatch(request, *args, **kwargs)
 
     # add the request to the kwargs
@@ -673,10 +663,7 @@ class ProjectCompleteUpdate(LoginRequiredMixin, UpdateView):
     template_name = 'workflow/projectcomplete_form.html'
 
     def dispatch(self, request, *args, **kwargs):
-        try:
-            self.guidance = FormGuidance.objects.get(form="Complete")
-        except FormGuidance.DoesNotExist:
-            self.guidance = None
+        self.guidance = None
         return super(ProjectCompleteUpdate, self).dispatch(request, *args, **kwargs)
 
     def get_form(self, form_class=None):
@@ -903,10 +890,7 @@ class DocumentationAgreementCreate(LoginRequiredMixin, AjaxableResponseMixin, Cr
 
     @method_decorator(group_excluded('ViewOnly', url='workflow/permission'))
     def dispatch(self, request, *args, **kwargs):
-        try:
-            self.guidance = FormGuidance.objects.get(form="Documentation")
-        except FormGuidance.DoesNotExist:
-            self.guidance = None
+        self.guidance = None
         return super(DocumentationAgreementCreate, self).dispatch(request, *args, **kwargs)
 
     # add the request to the kwargs
@@ -958,10 +942,7 @@ class DocumentationAgreementUpdate(LoginRequiredMixin, AjaxableResponseMixin, Up
 
     @method_decorator(group_excluded('ViewOnly', url='workflow/permission'))
     def dispatch(self, request, *args, **kwargs):
-        try:
-            self.guidance = FormGuidance.objects.get(form="Documentation")
-        except FormGuidance.DoesNotExist:
-            self.guidance = None
+        self.guidance = None
         return super(DocumentationAgreementUpdate, self).dispatch(request, *args, **kwargs)
 
     # add the request to the kwargs
@@ -1036,10 +1017,7 @@ class DocumentationCreate(CreateView):
         if not user_has_program_roles(request.user, request.user.tola_user.available_programs, ['medium', 'high']):
             raise PermissionDenied
 
-        try:
-            self.guidance = FormGuidance.objects.get(form="Documentation")
-        except FormGuidance.DoesNotExist:
-            self.guidance = None
+        self.guidance = None
         return super(DocumentationCreate, self).dispatch(request, *args, **kwargs)
 
     # add the request to the kwargs
@@ -1084,10 +1062,7 @@ class DocumentationUpdate(UpdateView):
         if not user_has_program_roles(request.user, Program.objects.filter(id=Documentation.objects.get(id=kwargs['pk']).program.id), ['medium', 'high']):
             raise PermissionDenied
 
-        try:
-            self.guidance = FormGuidance.objects.get(form="Documentation")
-        except FormGuidance.DoesNotExist:
-            self.guidance = None
+        self.guidance = None
         return super(DocumentationUpdate, self).dispatch(request, *args, **kwargs)
 
     # add the request to the kwargs
@@ -1292,10 +1267,7 @@ class SiteProfileCreate(CreateView):
 
     @method_decorator(group_excluded('ViewOnly', url='workflow/permission'))
     def dispatch(self, request, *args, **kwargs):
-        try:
-            self.guidance = FormGuidance.objects.get(form="SiteProfile")
-        except FormGuidance.DoesNotExist:
-            self.guidance = None
+        self.guidance = None
         return super(SiteProfileCreate, self).dispatch(request, *args, **kwargs)
 
     def post(self, request, *args, **kwargs):
@@ -1349,10 +1321,7 @@ class SiteProfileUpdate(UpdateView):
 
     @method_decorator(group_excluded('ViewOnly', url='workflow/permission'))
     def dispatch(self, request, *args, **kwargs):
-        try:
-            self.guidance = FormGuidance.objects.get(form="SiteProfile")
-        except FormGuidance.DoesNotExist:
-            self.guidance = None
+        self.guidance = None
         return super(SiteProfileUpdate, self).dispatch(request, *args, **kwargs)
 
     # add the request to the kwargs
@@ -1683,10 +1652,7 @@ class ContactCreate(LoginRequiredMixin, CreateView):
 
     @method_decorator(group_excluded('ViewOnly', url='workflow/permission'))
     def dispatch(self, request, *args, **kwargs):
-        try:
-            self.guidance = FormGuidance.objects.get(form="Contact")
-        except FormGuidance.DoesNotExist:
-            self.guidance = None
+        self.guidance = None
         return super(ContactCreate, self).dispatch(request, *args, **kwargs)
 
     def get_context_data(self, **kwargs):
@@ -1729,10 +1695,7 @@ class ContactUpdate(LoginRequiredMixin, UpdateView):
 
     @method_decorator(group_excluded('ViewOnly', url='workflow/permission'))
     def dispatch(self, request, *args, **kwargs):
-        try:
-            self.guidance = FormGuidance.objects.get(form="Contact")
-        except FormGuidance.DoesNotExist:
-            self.guidance = None
+        self.guidance = None
         return super(ContactUpdate, self).dispatch(request, *args, **kwargs)
 
     def get_context_data(self, **kwargs):
@@ -1827,10 +1790,7 @@ class StakeholderCreate(LoginRequiredMixin, CreateView):
 
     @method_decorator(group_excluded('ViewOnly', url='workflow/permission'))
     def dispatch(self, request, *args, **kwargs):
-        try:
-            self.guidance = FormGuidance.objects.get(form="Stakeholder")
-        except FormGuidance.DoesNotExist:
-            self.guidance = None
+        self.guidance = None
         return super(StakeholderCreate, self).dispatch(request, *args, **kwargs)
 
     # add the request to the kwargs
@@ -1880,10 +1840,7 @@ class StakeholderUpdate(LoginRequiredMixin, UpdateView):
 
     @method_decorator(group_excluded('ViewOnly', url='workflow/permission'))
     def dispatch(self, request, *args, **kwargs):
-        try:
-            self.guidance = FormGuidance.objects.get(form="Stakeholder")
-        except FormGuidance.DoesNotExist:
-            self.guidance = None
+        self.guidance = None
         return super(StakeholderUpdate, self).dispatch(request, *args, **kwargs)
 
     # add the request to the kwargs
@@ -2109,10 +2066,7 @@ class ChecklistItemCreate(LoginRequiredMixin, CreateView):
 
     @method_decorator(group_excluded('ViewOnly', url='workflow/permission'))
     def dispatch(self, request, *args, **kwargs):
-        try:
-            self.guidance = FormGuidance.objects.get(form="ChecklistItem")
-        except FormGuidance.DoesNotExist:
-            self.guidance = None
+        self.guidance = None
         return super(ChecklistItemCreate, self).dispatch(request, *args, **kwargs)
 
     def get_context_data(self, **kwargs):
@@ -2125,10 +2079,6 @@ class ChecklistItemCreate(LoginRequiredMixin, CreateView):
         kwargs = super(ChecklistItemCreate, self).get_form_kwargs()
         kwargs['request'] = self.request
         return kwargs
-
-    @method_decorator(group_excluded('ViewOnly', url='workflow/permission'))
-    def dispatch(self, request, *args, **kwargs):
-        return super(ChecklistItemCreate, self).dispatch(request, *args, **kwargs)
 
     def get_initial(self):
         checklist = Checklist.objects.get(agreement=self.kwargs['id'])
@@ -2164,10 +2114,7 @@ class ChecklistItemUpdate(LoginRequiredMixin, UpdateView):
 
     @method_decorator(group_excluded('ViewOnly', url='workflow/permission'))
     def dispatch(self, request, *args, **kwargs):
-        try:
-            self.guidance = FormGuidance.objects.get(form="ChecklistItem")
-        except FormGuidance.DoesNotExist:
-            self.guidance = None
+        self.guidance = None
         return super(ChecklistItemUpdate, self).dispatch(request, *args, **kwargs)
 
     def get_context_data(self, **kwargs):
