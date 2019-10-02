@@ -67,11 +67,6 @@ urlpatterns = [
     url(r'^stakeholder_delete/(?P<pk>\w+)/$', StakeholderDelete.as_view(), name='stakeholder_delete'),
     url(r'^export_stakeholders_list/(?P<program_id>\w+)/$', export_stakeholders_list, name='export_stakeholders_list'),
 
-    url(r'^contact_list/(?P<pk>\w+)/$', ContactList.as_view(), name='contact_list'),
-    url(r'^contact_add/(?P<stakeholder_id>\w+)/(?P<id>\w+)/$', ContactCreate.as_view(), name='contact_add'),
-    url(r'^contact_update/(?P<stakeholder_id>\w+)/(?P<pk>\w+)/$', ContactUpdate.as_view(), name='contact_update'),
-    url(r'^contact_delete/(?P<pk>\w+)/$', ContactDelete.as_view(), name='contact_delete'),
-
     url(r'^checklistitem_list/(?P<pk>\w+)/$', ChecklistItemList.as_view(), name='checklistitem_list'),
     url(r'^checklistitem_add/(?P<id>\w+)/$', ChecklistItemCreate.as_view(), name='checklistitem_add'),
     url(r'^checklistitem_update/(?P<pk>\w+)/$', ChecklistItemUpdate.as_view(), name='checklistitem_update'),

@@ -14,10 +14,8 @@ from factory import (
 )
 from factories.django_models import UserFactory, Site
 from workflow.models import (
-    Contact as ContactM,
     Country as CountryM,
     Documentation as DocumentationM,
-    FundCode as FundCodeM,
     Organization as OrganizationM,
     ProfileType as ProfileTypeM,
     ProjectType as ProjectTypeM,
@@ -55,16 +53,6 @@ class CountryAccessFactory(DjangoModelFactory):
     class Meta:
         model = CountryAccessM
 
-
-class Contact(DjangoModelFactory):
-    class Meta:
-        model = ContactM
-
-    name = 'Aryana Sayeed'
-    city = 'Kabul'
-    email = lazy_attribute(lambda o: slugify(o.name) + "@external-contact.com")
-    phone = '+93 555444333'
-    country = SubFactory(CountryFactory)
 
 
 class OrganizationFactory(DjangoModelFactory):
@@ -314,14 +302,6 @@ class Stakeholder(DjangoModelFactory):
             # A list of program were passed in, use them
             for program in extracted:
                 self.program.add(program)
-
-
-class FundCode(DjangoModelFactory):
-    class Meta:
-        model = FundCodeM
-
-    name = 'Fund Code A'
-    organization = SubFactory(OrganizationFactory)
 
 
 class ProjectType(DjangoModelFactory):

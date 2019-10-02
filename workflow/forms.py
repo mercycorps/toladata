@@ -15,7 +15,7 @@ from workflow.widgets import GoogleMapsWidget
 from workflow.models import (
     ProjectAgreement, ProjectComplete, Program, SiteProfile, Documentation, Benchmarks,
     Monitor, Budget, Office, ChecklistItem, Province, Stakeholder,
-    TolaUser, Contact, Sector, Country
+    TolaUser, Sector, Country
 )
 
 from tola.util import getCountry
@@ -1605,27 +1605,6 @@ class ChecklistItemForm(forms.ModelForm):
         #self.fields['item'].queryset = ChecklistItem.objects.filter(checklist__country__in=countries)
 
 
-class ContactForm(forms.ModelForm):
-
-    class Meta:
-        model = Contact
-        exclude = ['create_date', 'edit_date']
-
-    def __init__(self, *args, **kwargs):
-        self.helper = FormHelper()
-        self.helper.form_method = 'post'
-        self.helper.form_class = 'form-horizontal'
-        self.helper.label_class = 'col-sm-2'
-        self.helper.field_class = 'col-sm-6'
-        self.helper.form_error_title = 'Form Errors'
-        self.helper.error_text_inline = True
-        self.helper.help_text_inline = True
-        self.helper.html5_required = True
-        self.helper.add_input(Submit('submit', 'Save'))
-
-        super(ContactForm, self).__init__(*args, **kwargs)
-
-
 class StakeholderForm(forms.ModelForm):
 
     class Meta:
@@ -1678,7 +1657,6 @@ class StakeholderForm(forms.ModelForm):
 
         countries = getCountry(self.request.user)
         users = TolaUser.objects.filter(country__in=countries)
-        self.fields['contact'].queryset = Contact.objects.filter(country__in=countries)
         self.fields['sectors'].queryset = Sector.objects.all()
         self.fields['country'].queryset = countries
         self.fields['approved_by'].queryset = users

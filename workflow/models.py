@@ -564,7 +564,6 @@ class Program(models.Model):
     name = models.CharField(_("Program Name"), max_length=255, blank=True)
     funding_status = models.CharField(_("Funding Status"), max_length=255, blank=True)
     cost_center = models.CharField(_("Fund Code"), max_length=255, blank=True, null=True)
-    fund_code = models.ManyToManyField(FundCode, blank=True, verbose_name=_("Fund code"))
     description = models.TextField(_("Program Description"), max_length=765, null=True, blank=True)
     sector = models.ManyToManyField(Sector, blank=True, verbose_name=_("Sector"))
     create_date = models.DateTimeField(null=True, blank=True)
@@ -1312,7 +1311,6 @@ class StakeholderManager(models.Manager):
 class Stakeholder(models.Model):
     name = models.CharField(_("Stakeholder/Organization Name"), max_length=255, blank=True, null=True)
     type = models.ForeignKey(StakeholderType, blank=True, null=True, on_delete=models.SET_NULL, verbose_name=_("Type"))
-    contact = models.ManyToManyField(Contact, max_length=255, blank=True, verbose_name=_("Contact"))
     country = models.ForeignKey(Country, on_delete=models.CASCADE, verbose_name=_("Country"))
     sectors = models.ManyToManyField(Sector, blank=True, verbose_name=_("Sectors"))
     stakeholder_register = models.BooleanField(_("Has this partner been added to stakeholder register?"))

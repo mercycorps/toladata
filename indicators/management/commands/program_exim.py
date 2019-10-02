@@ -9,7 +9,7 @@ from django.core.exceptions import ObjectDoesNotExist, MultipleObjectsReturned
 
 from rest_framework import serializers
 
-from workflow.models import Program, Sector, FundCode, Country, SiteProfile, TolaUser, ProfileType, Office
+from workflow.models import Program, Sector, Country, SiteProfile, TolaUser, ProfileType, Office
 from indicators.models import PeriodicTarget, Indicator, Result, IndicatorType, Level, Objective, \
     DataCollectionFrequency, StrategicObjective, ReportingFrequency, ExternalService
 
@@ -25,7 +25,7 @@ class Command(BaseCommand):
 
     def handle(self, *args, **options):
         if not options['program_id'] and not options['json_filepath']:
-            print "You need to provide either --program_id or --filepath parameters.  Exiting"
+            print("You need to provide either --program_id or --filepath parameters.  Exiting")
             sys.exit()
 
         if options['program_id']:
@@ -62,10 +62,6 @@ class Command(BaseCommand):
         program_json['sector'] = self.replace_names_with_values(program_json['sector'], Sector, 'sector', ['sector'])
         program_json['country'] = self.replace_names_with_values(
             program_json['country'], Country, 'country', ['country'])
-        program_json['fund_code'] = self.replace_names_with_values(
-            program_json['fund_code'], FundCode, 'name', ['name'])
-
-        fund_codes = program_json.pop('fund_code')
         sectors = program_json.pop('sector')
         countries = program_json.pop('country')
         program = Program(**program_json)
@@ -315,7 +311,6 @@ class IndicatorNameSerializer(serializers.ModelSerializer):
 class ProgramSerializer(serializers.ModelSerializer):
     sector = SectorNameSerializer(queryset=Sector.objects.all, many=True)
     country = CountryNameSerializer(queryset=Country.objects.all, many=True)
-    fund_code = NameSerializer(queryset=FundCode.objects.all, many=True)
     indicator_set = IndicatorNameSerializer(many=True)
     objective_set = ObjectiveSerializer(many=True)
 

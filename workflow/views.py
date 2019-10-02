@@ -28,7 +28,6 @@ from workflow.models import (
     ApprovalAuthority,
     Checklist,
     ChecklistItem,
-    Contact,
     Stakeholder,
 )
 from workflow.forms import (
@@ -46,7 +45,6 @@ from workflow.forms import (
     FilterForm,
     ChecklistItemForm,
     StakeholderForm,
-    ContactForm,
 )
 from workflow.mixins import AjaxableResponseMixin
 from workflow.export import ProjectAgreementResource, StakeholderResource
@@ -1614,140 +1612,6 @@ class BenchmarkDelete(LoginRequiredMixin, AjaxableResponseMixin, DeleteView):
 
     form_class = BenchmarkForm
 
-
-@method_decorator(has_projects_access, name='dispatch')
-class ContactList(LoginRequiredMixin, ListView):
-    model = Contact
-    template_name = 'workflow/contact_list.html'
-
-    def get(self, request, *args, **kwargs):
-
-        stakeholder_id = self.kwargs['pk']
-        getStakeholder = None
-
-        try:
-            getStakeholder = Stakeholder.objects.get(id=stakeholder_id)
-
-        except Exception as e:
-            pass
-
-        if int(self.kwargs['pk']) == 0:
-            countries=getCountry(request.user)
-            getContacts = Contact.objects.all().filter(country__in=countries)
-
-        else:
-            #getContacts = Contact.objects.all().filter(stakeholder__projectagreement=project_agreement_id)
-            getContacts = Stakeholder.contact.through.objects.filter(stakeholder_id = stakeholder_id)
-
-        return render(request, self.template_name, {'getContacts': getContacts, 'getStakeholder': getStakeholder})
-
-
-@method_decorator(has_projects_access, name='dispatch')
-class ContactCreate(LoginRequiredMixin, CreateView):
-    """
-    Contact Form
-    """
-    model = Contact
-    stakeholder_id = None
-
-    @method_decorator(group_excluded('ViewOnly', url='workflow/permission'))
-    def dispatch(self, request, *args, **kwargs):
-        self.guidance = None
-        return super(ContactCreate, self).dispatch(request, *args, **kwargs)
-
-    def get_context_data(self, **kwargs):
-        context = super(ContactCreate, self).get_context_data(**kwargs)
-        context.update({'id': self.kwargs['id']})
-        context.update({'stakeholder_id': self.kwargs['stakeholder_id']})
-        return context
-
-    def get_initial(self):
-        country = getCountry(self.request.user)[0]
-        initial = {
-            'agreement': self.kwargs['id'],
-            'country': country,
-            }
-
-        return initial
-
-    def form_invalid(self, form):
-
-        messages.error(self.request, 'Invalid Form', fail_silently=False)
-
-        return self.render_to_response(self.get_context_data(form=form))
-
-    def form_valid(self, form):
-        form.save()
-        messages.success(self.request, 'Success, Contact Created!')
-        latest = Contact.objects.latest('id')
-        redirect_url = '/workflow/contact_update/' + self.kwargs['stakeholder_id'] + '/' + str(latest.id)
-        return HttpResponseRedirect(redirect_url)
-
-    form_class = ContactForm
-
-
-@method_decorator(has_projects_access, name='dispatch')
-class ContactUpdate(LoginRequiredMixin, UpdateView):
-    """
-    Contact Form
-    """
-    model = Contact
-
-    @method_decorator(group_excluded('ViewOnly', url='workflow/permission'))
-    def dispatch(self, request, *args, **kwargs):
-        self.guidance = None
-        return super(ContactUpdate, self).dispatch(request, *args, **kwargs)
-
-    def get_context_data(self, **kwargs):
-        context = super(ContactUpdate, self).get_context_data(**kwargs)
-        context.update({'id': self.kwargs['pk']})
-        context.update({'stakeholder_id': self.kwargs['stakeholder_id']})
-        return context
-
-    def form_invalid(self, form):
-        messages.error(self.request, 'Invalid Form', fail_silently=False)
-        return self.render_to_response(self.get_context_data(form=form))
-
-    def form_valid(self, form):
-        form.save()
-        messages.success(self.request, 'Success, Contact Updated!')
-
-        return self.render_to_response(self.get_context_data(form=form))
-
-    form_class = ContactForm
-
-
-@method_decorator(has_projects_access, name='dispatch')
-class ContactDelete(LoginRequiredMixin, DeleteView):
-    """
-    Benchmark Form
-    """
-    model = Contact
-    success_url = '/workflow/contact_list/0/'
-
-    @method_decorator(group_excluded('ViewOnly', url='workflow/permission'))
-    def dispatch(self, request, *args, **kwargs):
-        return super(ContactDelete, self).dispatch(request, *args, **kwargs)
-
-    def get_context_data(self, **kwargs):
-        context = super(ContactDelete, self).get_context_data(**kwargs)
-        context.update({'id': self.kwargs['pk']})
-        return context
-
-    def form_invalid(self, form):
-
-        messages.error(self.request, 'Invalid Form', fail_silently=False)
-
-        return self.render_to_response(self.get_context_data(form=form))
-
-    def form_valid(self, form):
-
-        form.save()
-
-        messages.success(self.request, 'Success, Contact Deleted!')
-        return self.render_to_response(self.get_context_data(form=form))
-
-    form_class = ContactForm
 
 
 @method_decorator(has_projects_access, name='dispatch')

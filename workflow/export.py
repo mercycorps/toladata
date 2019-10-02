@@ -2,7 +2,7 @@ from import_export import resources
 from import_export.widgets import ForeignKeyWidget, ManyToManyWidget
 from import_export import fields
 from .models import ProjectAgreement, Program, SiteProfile, Capacity, Evaluate, Documentation,\
-    Stakeholder, Sector, ProjectType, Office, TolaUser, ProjectComplete, Country, Contact, StakeholderType, TolaUserProxy
+    Stakeholder, Sector, ProjectType, Office, TolaUser, ProjectComplete, Country, StakeholderType, TolaUserProxy
 
 
 class ProjectAgreementResource(resources.ModelResource):
@@ -44,7 +44,6 @@ class ProgramResource(resources.ModelResource):
 
 class StakeholderResource(resources.ModelResource):
     type = fields.Field(column_name='type', attribute='type', widget=ForeignKeyWidget(StakeholderType, 'name'))
-    contact = fields.Field(column_name='contact', attribute='contact', widget=ManyToManyWidget(Contact, field='name'))
     country = fields.Field(column_name='country', attribute='country', widget=ForeignKeyWidget(Country, 'country'))
     sectors = fields.Field(column_name='sectors', attribute='sectors', widget=ManyToManyWidget(Sector, field='sector'))
     approved_by = fields.Field(column_name='approved_by', attribute='approved_by', widget=ForeignKeyWidget(TolaUser, 'name'))
