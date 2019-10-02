@@ -9,7 +9,7 @@ from import_export.admin import ImportExportModelAdmin, ExportMixin
 from tola import util
 from .models import (
     Documentation, ProjectAgreement, ProjectComplete, ProjectType, Country, SiteProfile,
-    Office, Program, TolaUser, ProfileType, TolaUserProxy,
+    Program, TolaUser, ProfileType, TolaUserProxy,
     Organization, Sector, Capacity, Evaluate, Benchmarks, Budget, Template, Monitor,
     Checklist, ChecklistItem, Stakeholder, StakeholderType,
     OrganizationAdmin,
@@ -18,38 +18,6 @@ from .models import (
     ChecklistAdmin,
     ChecklistItemAdmin, TolaUserAdmin
 )
-
-
-class OfficeFilter(admin.SimpleListFilter):
-    title = "office"
-    parameter_name = 'office'
-
-    def lookups(self, request, model_admin):
-        user_country = request.user.tola_user.country
-        countries = Country.objects.filter(country=user_country).values('id', 'country')
-        countries_tuple = ()
-        for p in countries:
-            countries_tuple = [(c['id'], c['country']) for c in countries]
-        return countries_tuple
-
-    def queryset(self, request, queryset):
-        if self.value():
-            queryset = queryset.filter(province__country=self.value())
-        return queryset
-
-
-class OfficeAdmin(admin.ModelAdmin):
-    list_display = ('name', 'code', 'create_date', 'edit_date')
-    search_fields = ('name', 'code')
-    list_filter = ('create_date', OfficeFilter,)  # ('province__country__country')
-    display = 'Office'
-
-    def get_queryset(self, request):
-        queryset = super(OfficeAdmin, self).get_queryset(request)
-        if request.user.is_superuser is False:
-            user_country = request.user.tola_user.country
-            queryset = queryset.filter(province__country=user_country)
-        return queryset
 
 
 # Resource for CSV export
@@ -124,7 +92,7 @@ class ProjectCompleteResource(resources.ModelResource):
 class ProjectCompleteAdmin(ImportExportModelAdmin):
     resource_class = ProjectCompleteResource
     list_display = ('program', 'project_name', 'activity_code','short','create_date')
-    list_filter = ('program__country', 'office', 'short')
+    list_filter = ('program__country', 'short')
     display = 'project_name'
 
     def queryset(self, request, queryset):
@@ -156,7 +124,6 @@ class CountryAdmin(ImportExportModelAdmin):
 class SiteProfileResource(resources.ModelResource):
     country = fields.Field(column_name='country', attribute='country', widget=ForeignKeyWidget(Country, 'country'))
     type = fields.Field(column_name='type', attribute='type', widget=ForeignKeyWidget(ProfileType, 'profile'))
-    office = fields.Field(column_name='office', attribute='office', widget=ForeignKeyWidget(Office, 'code'))
 
     class Meta:
         model = SiteProfile
@@ -167,9 +134,9 @@ class SiteProfileResource(resources.ModelResource):
 
 class SiteProfileAdmin(ImportExportModelAdmin):
     resource_class = SiteProfileResource
-    list_display = ('name', 'office', 'country')
+    list_display = ('name', 'country')
     list_filter = ('country__country',)
-    search_fields = ('office__code', 'country__country')
+    search_fields = ('country__country')
 
 class ProgramAccessInline(admin.TabularInline):
     model = ProgramAccess
@@ -216,7 +183,6 @@ class StakeholderAdmin(ImportExportModelAdmin):
 
 admin.site.register(Organization, OrganizationAdmin)
 admin.site.register(Country, CountryAdmin)
-admin.site.register(Office, OfficeAdmin)
 admin.site.register(Program, ProgramAdmin)
 admin.site.register(Sector)
 admin.site.register(ProjectAgreement, ProjectAgreementAdmin)

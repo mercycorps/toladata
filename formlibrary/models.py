@@ -1,5 +1,5 @@
 from __future__ import unicode_literals
-from workflow.models import Program, SiteProfile, ProjectAgreement, Office
+from workflow.models import Program, SiteProfile, ProjectAgreement
 
 from django.db import models
 from django.contrib import admin
@@ -60,7 +60,6 @@ class Distribution(models.Model):
     program = models.ForeignKey(Program, on_delete=models.SET_NULL, null=True, blank=True)
     initiation = models.ForeignKey(ProjectAgreement, on_delete=models.SET_NULL,
                                    null=True, blank=True, verbose_name="Project Initiation")
-    office_code = models.ForeignKey(Office, on_delete=models.SET_NULL, null=True, blank=True)
     distribution_indicator = models.CharField(max_length=255)
     distribution_implementer = models.CharField(max_length=255, null=True, blank=True)
     reporting_period = models.CharField(max_length=255, null=True, blank=True)

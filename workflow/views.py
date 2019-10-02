@@ -171,9 +171,9 @@ class ProgramDash(LoginRequiredMixin, ListView):
         getPrograms = self.request.user.tola_user.available_programs.filter(Q(agreement__isnull=False) | Q(complete__isnull=False), funding_status="Funded").distinct()
         filtered_program = None
         if int(self.kwargs['pk']) == 0:
-            getDashboard = getPrograms.prefetch_related('agreement','agreement__projectcomplete','agreement__office').filter(funding_status="Funded").order_by('name').annotate(has_agreement=Count('agreement'),has_complete=Count('complete'))
+            getDashboard = getPrograms.prefetch_related('agreement','agreement__projectcomplete').filter(funding_status="Funded").order_by('name').annotate(has_agreement=Count('agreement'),has_complete=Count('complete'))
         else:
-            getDashboard = getPrograms.prefetch_related('agreement','agreement__projectcomplete','agreement__office').filter(id=self.kwargs['pk'], funding_status="Funded").order_by('name')
+            getDashboard = getPrograms.prefetch_related('agreement','agreement__projectcomplete').filter(id=self.kwargs['pk'], funding_status="Funded").order_by('name')
             filtered_program = getPrograms.only('name').get(pk=self.kwargs['pk']).name
 
         if self.kwargs.get('status', None):
@@ -571,7 +571,6 @@ class ProjectCompleteCreate(LoginRequiredMixin, CreateView):
             'approved_by': self.request.user,
             'approval_submitted_by': self.request.user,
             'program': getProjectAgreement.program,
-            'office': getProjectAgreement.office,
             'sector': getProjectAgreement.sector,
             'project_agreement': getProjectAgreement.id,
             'project_name': getProjectAgreement.project_name,
@@ -1182,7 +1181,6 @@ class SiteProfileList(ListView):
             getSiteProfile = SiteProfile.objects.filter(\
                     Q(country__in=countries),\
                     Q(name__contains=request.GET["search"])\
-                    | Q(office__name__contains=request.GET["search"])\
                     | Q(type__profile__contains=request.GET['search'])\
                     | Q(projectagreement__project_name__contains=request.GET["search"])\
                     | Q(projectcomplete__project_name__contains=request.GET['search']))\
@@ -2104,8 +2102,8 @@ class ReportData(LoginRequiredMixin, View, AjaxableResponseMixin):
         else:
             filters['program__country__in'] = countries
 
-        getAgreements = ProjectAgreement.objects.prefetch_related('sectors').select_related('program', 'project_type', 'office', 'estimated_by').filter(**filters).values('id', 'program__id', 'approval', \
-                'program__name', 'project_name','site', 'activity_code', 'office__name', \
+        getAgreements = ProjectAgreement.objects.prefetch_related('sectors').select_related('program', 'project_type', 'estimated_by').filter(**filters).values('id', 'program__id', 'approval', \
+                'program__name', 'project_name','site', 'activity_code', \
                 'project_name', 'sector__sector', 'project_activity', 'project_type__name', \
                 'account_code', 'lin_code','estimated_by__name','total_estimated_budget',\
                 'mc_estimated_budget','total_estimated_budget')

@@ -55,14 +55,7 @@ class Command(BaseCommand):
                     self.stdout.write(self.style.ERROR('%s, country not found (%s)' % (site_name, country_name) ))
                     continue
 
-                try:
-                    office = Office.objects.get(name=office_name)
-                except Office.DoesNotExist:
-                    self.stdout.write(self.style.WARNING('%s, invalid office_name = %s' % (site_name, office_name) ))
-                    office = None
-                except Office.MultipleObjectsReturned:
-                    self.stdout.write(self.style.WARNING('%s, multiple offices with the same name = %s' % (site_name, office_name) ))
-                    office = None
+                office = None
 
                 try:
                     profile_type = ProfileType.objects.get(profile=type_of_site)

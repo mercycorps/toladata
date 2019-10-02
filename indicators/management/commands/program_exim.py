@@ -9,7 +9,7 @@ from django.core.exceptions import ObjectDoesNotExist, MultipleObjectsReturned
 
 from rest_framework import serializers
 
-from workflow.models import Program, Sector, Country, SiteProfile, TolaUser, ProfileType, Office
+from workflow.models import Program, Sector, Country, SiteProfile, TolaUser, ProfileType
 from indicators.models import PeriodicTarget, Indicator, Result, IndicatorType, Level, Objective, \
     DataCollectionFrequency, StrategicObjective, ReportingFrequency, ExternalService
 
@@ -156,8 +156,6 @@ class Command(BaseCommand):
         for site_data in sites_json:
             site_data['type'] = self.replace_names_with_values(
                 site_data['type'], ProfileType, 'profile', ['profile', 'siteprofile'])
-            site_data['office'] = self.replace_names_with_values(
-                site_data['office'], ProfileType, 'name', ['name', 'province_id'])
             site_data['country'] = self.replace_names_with_values(
                 site_data['country'], Country, 'country', ['country'])
 
@@ -236,7 +234,6 @@ class ProfileNameSerializer(serializers.RelatedField):
 
 class SiteSerializer(serializers.ModelSerializer):
     type = ProfileNameSerializer(queryset=ProfileType.objects.all)
-    office = NameSerializer(queryset=Office.objects.all)
     country = CountryNameSerializer(queryset=Country.objects.all)
 
     class Meta:

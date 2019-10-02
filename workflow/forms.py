@@ -14,7 +14,7 @@ from django.template import Context
 from workflow.widgets import GoogleMapsWidget
 from workflow.models import (
     ProjectAgreement, ProjectComplete, Program, SiteProfile, Documentation, Benchmarks,
-    Monitor, Budget, Office, ChecklistItem, Stakeholder,
+    Monitor, Budget, ChecklistItem, Stakeholder,
     TolaUser, Sector, Country
 )
 
@@ -197,7 +197,7 @@ class ProjectAgreementForm(forms.ModelForm):
             TabHolder(
                 Tab('Executive Summary',
                     Fieldset('Project Details', 'program', 'program2', 'activity_code', 'account_code', 'lin_code',
-                             'office', 'sector', 'project_name', 'project_activity', 'project_type', 'site',
+                            'sector', 'project_name', 'project_activity', 'project_type', 'site',
                              'stakeholder', 'mc_staff_responsible', 'expected_start_date', 'expected_end_date',
                         ),
                     ),
@@ -437,8 +437,6 @@ class ProjectAgreementForm(forms.ModelForm):
         self.fields['me_reviewed_by'].queryset = TolaUser.objects.filter(country__in=countries).distinct()
         self.fields['approval_submitted_by'].queryset = TolaUser.objects.filter(country__in=countries).distinct()
 
-        #override the office queryset to use request.user for country
-        self.fields['office'].queryset = Office.objects.filter(province__country__in=countries)
 
         #override the site queryset to use request.user for country
         self.fields['site'].queryset = SiteProfile.objects.filter(country__in=countries)
@@ -521,7 +519,7 @@ class ProjectAgreementSimpleForm(forms.ModelForm):
             HTML("""<br/>"""),
             TabHolder(
                 Tab('Executive Summary',
-                    Fieldset('Project Details', 'program', 'program2', 'activity_code', 'office', 'sector',
+                    Fieldset('Project Details', 'program', 'program2', 'activity_code', 'sector',
                              'project_name', 'site', 'stakeholder', 'expected_start_date', 'expected_end_date',
                         ),
 
@@ -696,8 +694,6 @@ class ProjectAgreementSimpleForm(forms.ModelForm):
         self.fields['reviewed_by'].queryset = TolaUser.objects.filter(country__in=countries).distinct()
         self.fields['estimated_by'].queryset = TolaUser.objects.filter(country__in=countries).distinct()
 
-        #override the office queryset to use request.user for country
-        self.fields['office'].queryset = Office.objects.filter(province__country__in=countries)
 
         #override the site queryset to use request.user for country
         self.fields['site'].queryset = SiteProfile.objects.filter(country__in=countries)
@@ -751,12 +747,12 @@ class ProjectCompleteCreateForm(forms.ModelForm):
         if kwargs['initial'].get('short'):
             fieldset = Fieldset(
                 'Program', 'program2', 'program', 'project_agreement2', 'project_agreement', 'activity_code',
-                'office', 'sector', 'project_name', 'estimated_budget', 'site', 'stakeholder',
+                'sector', 'project_name', 'estimated_budget', 'site', 'stakeholder',
                     )
         else:
             fieldset = Fieldset(
                 'Program', 'program2', 'program', 'project_agreement', 'project_agreement2', 'activity_code',
-                'account_code', 'lin_code', 'office', 'sector','project_name', 'project_activity', 'site',
+                'account_code', 'lin_code', 'sector','project_name', 'project_activity', 'site',
                 'stakeholder'
                     )
         self.helper.layout = Layout(
@@ -789,8 +785,6 @@ class ProjectCompleteCreateForm(forms.ModelForm):
         self.fields['project_agreement2'].initial = "%s - %s" % (kwargs['initial'].get('office'),  kwargs['initial'].get('project_name', 'No project name') )
         self.fields['project_agreement2'].label = "Project Initiation"
         self.fields['project_agreement'].widget = forms.HiddenInput()
-        #override the office queryset to use request.user for country
-        self.fields['office'].queryset = Office.objects.filter(province__country__in=countries)
 
 
 class ProjectCompleteForm(forms.ModelForm):
@@ -843,7 +837,7 @@ class ProjectCompleteForm(forms.ModelForm):
                 Tab('Executive Summary',
                     Fieldset(
                         '', 'program', 'program2', 'project_agreement', 'project_agreement2', 'activity_code',
-                        'account_code', 'lin_code', 'office', 'sector','project_name', 'project_activity', 'site',
+                        'account_code', 'lin_code', 'sector','project_name', 'project_activity', 'site',
                         'stakeholder',
                         ),
                     Fieldset(
@@ -1044,8 +1038,6 @@ class ProjectCompleteForm(forms.ModelForm):
 
         self.fields['approved_by'].queryset = TolaUser.objects.filter(country__in=countries).distinct()
 
-        # override the office queryset to use request.user for country
-        self.fields['office'].queryset = Office.objects.filter(province__country__in=countries)
 
         # override the community queryset to use request.user for country
         self.fields['site'].queryset = SiteProfile.objects.filter(country__in=countries)
@@ -1117,7 +1109,7 @@ class ProjectCompleteSimpleForm(forms.ModelForm):
             TabHolder(
                 Tab('Executive Summary',
                     Fieldset('Program',
-                        'program', 'program2', 'project_agreement', 'project_agreement2', 'activity_code', 'office', 'sector','project_name','site','stakeholder'
+                        'program', 'program2', 'project_agreement', 'project_agreement2', 'activity_code', 'sector','project_name','site','stakeholder'
                     ),
                     Fieldset('Dates',
                         'expected_start_date','expected_end_date', 'actual_start_date', 'actual_end_date',
@@ -1294,8 +1286,6 @@ class ProjectCompleteSimpleForm(forms.ModelForm):
 
         self.fields['approved_by'].queryset = TolaUser.objects.filter(country__in=countries).distinct()
 
-        # override the office queryset to use request.user for country
-        self.fields['office'].queryset = Office.objects.filter(province__country__in=countries)
 
         # override the community queryset to use request.user for country
         self.fields['site'].queryset = SiteProfile.objects.filter(country__in=countries)
@@ -1374,7 +1364,7 @@ class SiteProfileForm(forms.ModelForm):
             TabHolder(
                 Tab(_('Profile'),
                     Fieldset(_('Description'),
-                        'name', 'type', 'office','status',
+                        'name', 'type','status',
                     ),
                     Fieldset(_('Contact Info'),
                         'contact_leader', 'date_of_firstcontact', 'contact_number', 'num_members',
@@ -1450,7 +1440,6 @@ class SiteProfileForm(forms.ModelForm):
             | Country.objects.filter(id__in=self.request.user.tola_user.programaccess_set.filter(role='high').values('country_id'))
         ).distinct()
         self.fields['date_of_firstcontact'].label = _("Date of First Contact")
-        self.fields['office'].queryset = Office.objects.filter(province__country__in=countries)
         self.fields['approved_by'].queryset = TolaUser.objects.filter(country__in=countries).distinct()
         self.fields['filled_by'].queryset = TolaUser.objects.filter(country__in=countries).distinct()
         self.fields['country'].queryset = countries

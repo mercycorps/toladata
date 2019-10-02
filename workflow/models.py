@@ -1057,7 +1057,6 @@ class SiteProfile(models.Model):
     profile_key = models.UUIDField(default=uuid.uuid4, unique=True),
     name = models.CharField(_("Site Name"), max_length=255, blank=False)
     type = models.ForeignKey(ProfileType, blank=True, null=True, on_delete=models.SET_NULL, verbose_name=_("Type"))
-    office = models.ForeignKey(Office, blank=True, null=True, on_delete=models.SET_NULL, verbose_name=_("Office"))
     contact_leader = models.CharField(_("Contact Name"), max_length=255, blank=True, null=True)
     date_of_firstcontact = models.DateTimeField(_("Date of First Contact"), null=True, blank=True)
     contact_number = models.CharField(_("Contact Number"), max_length=255, blank=True, null=True)
@@ -1148,9 +1147,9 @@ class SiteProfile(models.Model):
 
 
 class SiteProfileAdmin(admin.ModelAdmin):
-    list_display = ('name', 'code','office', 'country', 'cluster', 'longitude', 'latitude', 'create_date', 'edit_date')
+    list_display = ('name', 'code', 'country', 'cluster', 'longitude', 'latitude', 'create_date', 'edit_date')
     list_filter = ('country__country')
-    search_fields = ('code','office__code','country__country')
+    search_fields = ('code', 'country__country')
     display = 'SiteProfile'
 
 
@@ -1358,7 +1357,7 @@ class ProjectAgreementManager(models.Manager):
         return self.filter(Q(approval=None) | Q(approval=""))
 
     def get_queryset(self):
-        return super(ProjectAgreementManager, self).get_queryset().select_related('office','approved_by','approval_submitted_by')
+        return super(ProjectAgreementManager, self).get_queryset().select_related('approved_by','approval_submitted_by')
 
 # Project Initiation, admin is handled in the admin.py
 # TODO: Clean up unused fields and rename model with manual migration file
@@ -1396,7 +1395,6 @@ class ProjectAgreement(models.Model):
     has_rej_letter = models.BooleanField(
         _("If Rejected: Rejection Letter Sent?"), help_text=_('If yes attach copy'), default=False)
     activity_code = models.CharField(_("Project Code"), help_text='', max_length=255, blank=True, null=True)
-    office = models.ForeignKey(Office, verbose_name=_("Office"), null=True, blank=True, on_delete=models.SET_NULL)
     cod_num = models.CharField(_("Project COD #"), max_length=255, blank=True, null=True)
     sector = models.ForeignKey("Sector", verbose_name=_("Sector"), blank=True, null=True, on_delete=models.SET_NULL)
     project_design = models.CharField(_("Activity design for"), max_length=255, blank=True, null=True)
@@ -1563,11 +1561,6 @@ class ProjectAgreement(models.Model):
     def evaluations(self):
         return ', '.join([x.evaluate for x in self.evaluate.all()])
 
-    # displayed in admin templates
-    def __str__(self):
-        new_name = str(self.office) + str(" - ") + str(self.project_name)
-        return new_name
-
 # Project Tracking, admin is handled in the admin.py
 # TODO: Clean up unused fields and rename model with manual migration file
 """
@@ -1595,7 +1588,6 @@ class ProjectComplete(models.Model):
     project_activity = models.CharField(_("Project Activity"), max_length=255, blank=True, null=True)
     project_type = models.ForeignKey(
         ProjectType, max_length=255, blank=True, null=True, on_delete=models.SET_NULL, verbose_name=_("Project Type"))
-    office = models.ForeignKey(Office, null=True, blank=True, on_delete=models.SET_NULL, verbose_name=_("Office"))
     sector = models.ForeignKey("Sector", blank=True, null=True, on_delete=models.SET_NULL, verbose_name=_("Sector"))
     expected_start_date = models.DateTimeField(
         _("Expected start date"), help_text=_("Imported from Project Initiation"), blank=True, null=True)
@@ -1714,10 +1706,6 @@ class ProjectComplete(models.Model):
         self.edit_date = timezone.now()
         super(ProjectComplete, self).save()
 
-    # displayed in admin templates
-    def __str__(self):
-        new_name = str(self.office) + str(" - ") + str(self.project_name)
-        return new_name
 
     @property
     def project_name_clean(self):
