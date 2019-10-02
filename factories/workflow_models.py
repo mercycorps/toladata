@@ -25,7 +25,6 @@ from workflow.models import (
     SiteProfile as SiteProfileM,
     Stakeholder as StakeholderM,
     StakeholderType as StakeholderTypeM,
-    TolaSites as TolaSitesM,
     TolaUser as TolaUserM,
     Program as ProgramM,
     CountryAccess as CountryAccessM,
@@ -346,14 +345,6 @@ class ProfileType(DjangoModelFactory):
 
     profile = 'Distribution Center'
 
-
-class TolaSites(DjangoModelFactory):
-    class Meta:
-        model = TolaSitesM
-        django_get_or_create = ('name',)
-
-    name = 'MercyCorps'
-    site = SubFactory(Site)
 
 def grant_program_access(tolauser, program, country, role=PROGRAM_ROLE_CHOICES[0][0]):
     access_object, _ = ProgramAccessM.objects.get_or_create(

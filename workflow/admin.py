@@ -11,12 +11,12 @@ from .models import (
     Documentation, ProjectAgreement, ProjectComplete, ProjectType, Country, SiteProfile,
     Office, Program, TolaUser, District, Province, ProfileType, AdminLevelThree, TolaUserProxy,
     Organization, Village, VillageAdmin, Sector, Capacity, Evaluate, Benchmarks, Budget, Template, Monitor,
-    ApprovalAuthority, Checklist, ChecklistItem, Stakeholder, Contact, StakeholderType, TolaSites, FormGuidance,
+    ApprovalAuthority, Checklist, ChecklistItem, Stakeholder, Contact, StakeholderType, FormGuidance,
     OrganizationAdmin, ProvinceAdmin, AdminLevelThreeAdmin,
     ProgramAccess,
     DistrictAdmin, ProjectTypeAdmin,
     ChecklistAdmin, ContactAdmin,
-    ChecklistItemAdmin, TolaUserAdmin, TolaSitesAdmin, FormGuidanceAdmin
+    ChecklistItemAdmin, TolaUserAdmin, FormGuidanceAdmin
 )
 
 
@@ -254,5 +254,4 @@ admin.site.register(Stakeholder, StakeholderAdmin)
 admin.site.register(Contact, ContactAdmin)
 admin.site.register(StakeholderType)
 admin.site.register(TolaUser,TolaUserAdmin)
-admin.site.register(TolaSites,TolaSitesAdmin)
 admin.site.register(FormGuidance,FormGuidanceAdmin)
