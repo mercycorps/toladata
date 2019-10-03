@@ -103,8 +103,6 @@ urlpatterns = [
     # app include of indicator urls
     url(r'^indicators/', include('indicators.urls')),
 
-    # app include of customdashboard urls
-    url(r'^customdashboard/', include('customdashboard.urls')),
 
     # app include of workflow urls
     url(r'^formlibrary/', include('formlibrary.urls')),

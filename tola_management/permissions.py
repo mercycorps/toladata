@@ -117,8 +117,7 @@ def has_site_delete_access(func):
         site = SiteProfile.objects.get(pk=kwargs['pk'])
         high_role_programs = request.user.tola_user.programaccess_set.filter(role='high', country=site.country)
         request.has_write_access = Program.objects.filter(
-            Q(agreement__in=site.projectagreement_set.all())
-            | Q(i_program__in=site.result_set.all())
+            Q(i_program__in=site.result_set.all())
             | Q(country=site.country),
             id__in=high_role_programs.values('program_id')
         ).exists() or request.user.is_superuser
@@ -142,8 +141,7 @@ def has_site_write_access(func):
             site = SiteProfile.objects.get(pk=kwargs['pk'])
             high_role_programs = request.user.tola_user.programaccess_set.filter(role='high', country=site.country)
             request.has_write_access = Program.objects.filter(
-                Q(agreement__in=site.projectagreement_set.all())
-                | Q(i_program__in=site.result_set.all())
+                Q(i_program__in=site.result_set.all())
                 | Q(country=site.country),
                 id__in=high_role_programs.values('program_id')
             ).exists() or request.user.is_superuser

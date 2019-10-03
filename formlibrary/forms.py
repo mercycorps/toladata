@@ -2,7 +2,7 @@ from crispy_forms.helper import FormHelper
 from crispy_forms.layout import Submit
 from django import forms
 from .models import TrainingAttendance, Distribution, Beneficiary
-from workflow.models import Program, ProjectAgreement, Office, Province, SiteProfile
+from workflow.models import Program, SiteProfile
 from functools import partial
 from tola.util import getCountry
 
@@ -38,7 +38,6 @@ class TrainingAttendanceForm(forms.ModelForm):
         super(TrainingAttendanceForm, self).__init__(*args, **kwargs)
 
         countries = getCountry(self.request.user)
-        self.fields['project_agreement'].queryset = ProjectAgreement.objects.filter(program__country__in=countries)
         self.fields['program'].queryset = Program.objects.filter(country__in=countries)
 
 
@@ -67,10 +66,7 @@ class DistributionForm(forms.ModelForm):
         super(DistributionForm, self).__init__(*args, **kwargs)
 
         countries = getCountry(self.request.user)
-        self.fields['initiation'].queryset = ProjectAgreement.objects.filter(program__country__in=countries)
         self.fields['program'].queryset = Program.objects.filter(country__in=countries)
-        self.fields['office_code'].queryset = Office.objects.filter(province__country__in=countries)
-        self.fields['province'].queryset = Province.objects.filter(country__in=countries)
 
 
 class BeneficiaryForm(forms.ModelForm):

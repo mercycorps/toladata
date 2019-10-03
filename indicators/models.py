@@ -31,8 +31,7 @@ from safedelete.queryset import SafeDeleteQueryset
 from django_mysql.models import ListCharField
 
 from workflow.models import (
-    Program, Sector, SiteProfile, ProjectAgreement, ProjectComplete, Country,
-    Documentation, TolaUser
+    Program, Sector, SiteProfile, Country, TolaUser
 )
 
 
@@ -1369,9 +1368,9 @@ class Indicator(SafeDeleteModel):
     def level_order_display(self):
         """returns a-z for 0-25, then aa - zz for 26-676"""
         if self.level and self.level_order is not None and self.level_order < 26:
-            return string.ascii_lowercase[self.level_order]
+            return string.ascii_lowercase[int(self.level_order)]
         elif self.level and self.level_order and self.level_order >= 26:
-            return string.ascii_lowercase[self.level_order/26 - 1] + string.lowercase[self.level_order % 26]
+            return string.ascii_lowercase[self.level_order // 26 - 1] + string.lowercase[self.level_order % 26]
         return ''
 
     @cached_property
@@ -1767,8 +1766,7 @@ class ResultManager(models.Manager):
     def get_queryset(self):
         return super(ResultManager, self).get_queryset()\
             .prefetch_related('site', 'disaggregation_value')\
-            .select_related('program', 'indicator', 'agreement', 'complete',
-                            'evidence')
+            .select_related('program', 'indicator')
 
 
 class Result(models.Model):
@@ -1796,16 +1794,6 @@ class Result(models.Model):
         db_index=True
     )
 
-    agreement = models.ForeignKey(
-        ProjectAgreement, blank=True, null=True, on_delete=models.SET_NULL, related_name="q_agreement2",
-        verbose_name=_("Project Initiation"), help_text=" ")
-
-    complete = models.ForeignKey(
-        ProjectComplete, blank=True, null=True, related_name="q_complete2",
-        on_delete=models.SET_NULL, help_text=" ",
-        verbose_name=_("Project Complete")
-    )
-
     # TODO: this should be deprecated as it duplicates the indicator__program link (with potentially conflicting data)
     program = models.ForeignKey(
         Program, blank=True, null=True, on_delete=models.SET_NULL, related_name="i_program",
@@ -1813,11 +1801,6 @@ class Result(models.Model):
 
     date_collected = models.DateField(
         null=True, blank=True, help_text=" ", verbose_name=_("Date collected"))
-
-    # Deprecated - see evidence_name/evidence_url
-    evidence = models.ForeignKey(
-        Documentation, null=True, blank=True, on_delete=models.SET_NULL,
-        verbose_name=_("Evidence Document or Link"), help_text=" ")
 
     approved_by = models.ForeignKey(
         TolaUser, blank=True, null=True, on_delete=models.SET_NULL, verbose_name=_("Originated By"),

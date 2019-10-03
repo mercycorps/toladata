@@ -1,5 +1,5 @@
 from __future__ import unicode_literals
-from workflow.models import Program, SiteProfile, ProjectAgreement, Office, Province
+from workflow.models import Program, SiteProfile
 
 from django.db import models
 from django.contrib import admin
@@ -9,8 +9,6 @@ from django.utils import timezone
 class TrainingAttendance(models.Model):
     training_name = models.CharField(max_length=255)
     program = models.ForeignKey(Program, on_delete=models.CASCADE, null=True, blank=True)
-    project_agreement = models.ForeignKey(ProjectAgreement, on_delete=models.SET_NULL,
-                                          null=True, blank=True, verbose_name="Project Initiation")
     implementer = models.CharField(max_length=255, null=True, blank=True)
     reporting_period = models.CharField(max_length=255, null=True, blank=True)
     total_participants = models.IntegerField(null=True, blank=True)
@@ -50,7 +48,7 @@ class TrainingAttendance(models.Model):
 
 
 class TrainingAttendanceAdmin(admin.ModelAdmin):
-    list_display = ('training_name', 'program', 'project_agreement', 'create_date', 'edit_date')
+    list_display = ('training_name', 'program', 'create_date', 'edit_date')
     display = 'Training Attendance'
     list_filter = ('program__country', 'program')
 
@@ -58,13 +56,9 @@ class TrainingAttendanceAdmin(admin.ModelAdmin):
 class Distribution(models.Model):
     distribution_name = models.CharField(max_length=255)
     program = models.ForeignKey(Program, on_delete=models.SET_NULL, null=True, blank=True)
-    initiation = models.ForeignKey(ProjectAgreement, on_delete=models.SET_NULL,
-                                   null=True, blank=True, verbose_name="Project Initiation")
-    office_code = models.ForeignKey(Office, on_delete=models.SET_NULL, null=True, blank=True)
     distribution_indicator = models.CharField(max_length=255)
     distribution_implementer = models.CharField(max_length=255, null=True, blank=True)
     reporting_period = models.CharField(max_length=255, null=True, blank=True)
-    province = models.ForeignKey(Province, on_delete=models.SET_NULL, null=True, blank=True)
     total_beneficiaries_received_input = models.IntegerField(null=True, blank=True)
     distribution_location = models.CharField(max_length=255, null=True, blank=True)
     input_type_distributed = models.CharField(max_length=255, null=True, blank=True)
@@ -107,7 +101,7 @@ class Distribution(models.Model):
 
 
 class DistributionAdmin(admin.ModelAdmin):
-    list_display = ('distribution_name', 'program', 'initiation', 'create_date', 'edit_date')
+    list_display = ('distribution_name', 'program', 'create_date', 'edit_date')
     display = 'Program Dashboard'
 
 

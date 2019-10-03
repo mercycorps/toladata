@@ -59,12 +59,12 @@ def index(request, selected_country=None):
 
 
     sites_with_results = SiteProfile.objects.all()\
-        .prefetch_related('country', 'district', 'province') \
+        .prefetch_related('country') \
         .filter(Q(result__program__country=active_country))\
         .filter(status=1)
 
     sites_without_results = SiteProfile.objects.all() \
-        .prefetch_related('country', 'district', 'province') \
+        .prefetch_related('country') \
         .filter(Q(country=active_country) & ~Q(result__program__country=active_country)) \
         .filter(status=1)
 

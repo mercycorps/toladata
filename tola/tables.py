@@ -11,12 +11,11 @@ class AchievedColumn(tables.Column):
 
 class ResultTable(tables.Table):
 
-    agreement = tables.LinkColumn('projectagreement_update', args=[A('agreement_id')])
 
     class Meta:
         model = Result
         attrs = {"class": "paleblue"}
         fields = ('targeted', 'achieved', 'description', 'logframe_indicator',
-                  'sector', 'community', 'agreement', 'complete')
+                  'sector', 'community', 'complete')
         sequence = ('targeted', 'achieved', 'description',
                     'logframe_indicator', 'sector', 'community', 'agreement', 'complete')

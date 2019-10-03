@@ -10,7 +10,7 @@ from django.test import runner
 from unittest import runner as ut_runner
 
 from factories.indicators_models import IndicatorFactory, PeriodicTargetFactory, ResultFactory
-from factories.workflow_models import ProgramFactory, CountryFactory, DocumentationFactory
+from factories.workflow_models import ProgramFactory, CountryFactory
 from indicators.views.views_indicators import generate_periodic_targets
 from indicators.models import Indicator, PeriodicTarget
 from workflow.models import Program
@@ -158,7 +158,8 @@ def instantiate_scenario(program_id, scenario, existing_indicator_ids=None):
                 res = ResultFactory(
                     periodic_target=pt, indicator=indicator, program=program, achieved=res_value, date_collected=dc)
                 if evidence_values and evidence_values[j]:
-                    res.evidence = DocumentationFactory()
+                    res.evidence_url = 'http://www.example.com'
+                    res.record_name = 'evidence name'
                     res.save()
 
     return indicator_ids

@@ -22,7 +22,6 @@ DIRECTORIES_TO_IGNORE = [
     'build',
     'venv',
     'configurabledashboard',
-    'customdashboard',
     'jest.config.js',
     'webpack.prod.js',
     'webpack.common.js',

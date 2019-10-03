@@ -5,7 +5,7 @@ import requests
 import dateutil
 import datetime
 
-from workflow.models import Country, TolaUser, TolaSites
+from workflow.models import Country, TolaUser
 from django.db.models import Q
 from django.contrib.auth.models import User
 from django.core.mail import mail_admins, EmailMessage
@@ -67,29 +67,6 @@ def emailGroup(country, group, link, subject, message, submitter=None):
         email.send()
 
     mail_admins(subject, message, fail_silently=False)
-
-
-def get_table(url, data=None):
-    """
-    Get table data from a Silo.  First get the Data url from the silo details
-    then get data and return it
-    :param url: URL to silo meta detail info
-    :return: json dump of table data
-    """
-    token = TolaSites.objects.get(site_id=1)
-    if token.tola_tables_token:
-        headers = {'content-type': 'application/json',
-                   'Authorization': 'Token ' + token.tola_tables_token}
-    else:
-        headers = {'content-type': 'application/json'}
-        print("Token Not Found")
-
-    response = requests.get(url, headers=headers, verify=True)
-    if data:
-        data = json.loads(response.content['data'])
-    else:
-        data = json.loads(response.content)
-    return data
 
 
 def user_to_tola(backend, user, response, *args, **kwargs):
