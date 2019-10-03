@@ -4,20 +4,18 @@ from django.db import models
 from django.contrib import admin
 from django.core.exceptions import SuspiciousOperation
 from django.contrib.auth.models import User
-from django.contrib.sites.models import Site
 from decimal import Decimal
 import uuid
 
 from django.utils.translation import ugettext_lazy as _
 
 from django.conf import settings
-from django.db.models import Count, Min, Subquery, OuterRef, Q
+from django.db.models import Count, Min, Subquery, OuterRef
 from django.db.models.signals import post_save
 from django.dispatch import receiver
 from rest_framework.authtoken.models import Token
 from tola.model_utils import generate_queryset
 from simple_history.models import HistoricalRecords
-from django.contrib.sessions.models import Session
 from django.urls import reverse
 
 try:
@@ -38,12 +36,12 @@ class Sector(models.Model):
     edit_date = models.DateTimeField(null=True, blank=True)
 
     class Meta:
-        verbose_name=_("Sector")
+        verbose_name = _("Sector")
         ordering = ('sector',)
 
     # on save add create date or update edit date
     def save(self, *args, **kwargs):
-        if self.create_date == None:
+        if self.create_date is None:
             self.create_date = timezone.now()
         self.edit_date = timezone.now()
         super(Sector, self).save()
@@ -75,7 +73,7 @@ class Organization(models.Model):
 
     # on save add create date or update edit date
     def save(self, *args, **kwargs):
-        if self.create_date == None:
+        if self.create_date is None:
             self.create_date = timezone.now()
         self.edit_date = timezone.now()
         super(Organization, self).save()
@@ -126,7 +124,7 @@ class Country(models.Model):
 
     # on save add create date or update edit date
     def save(self, *args, **kwargs):
-        if self.create_date == None:
+        if self.create_date is None:
             self.create_date = timezone.now()
         self.edit_date = timezone.now()
         super(Country, self).save()
@@ -226,7 +224,7 @@ class TolaUser(models.Model):
 
     # on save add create date or update edit date
     def save(self, *args, **kwargs):
-        if self.create_date == None:
+        if self.create_date is None:
             self.create_date = timezone.now()
         self.edit_date = timezone.now()
         self.name = self.user.first_name + u' ' + self.user.last_name
@@ -390,7 +388,7 @@ class TolaUserAdmin(admin.ModelAdmin):
     list_display = ('name', 'country')
     display = 'Tola User'
     list_filter = ('country', 'user__is_staff',)
-    search_fields = ('name','country__country','title')
+    search_fields = ('name', 'country__country', 'title')
     inlines = (CountryAccessInline, )
 
 
@@ -749,12 +747,12 @@ class ProfileType(models.Model):
     edit_date = models.DateTimeField(null=True, blank=True)
 
     class Meta:
-        verbose_name=_("Profile Type")
+        verbose_name = _("Profile Type")
         ordering = ('profile',)
 
     # on save add create date or update edit date
     def save(self, *args, **kwargs):
-        if self.create_date == None:
+        if self.create_date is None:
             self.create_date = timezone.now()
         self.edit_date = timezone.now()
         super(ProfileType, self).save()
@@ -781,7 +779,7 @@ class LandType(models.Model):
 
     # on save add create date or update edit date
     def save(self, *args, **kwargs):
-        if self.create_date == None:
+        if self.create_date is None:
             self.create_date = timezone.now()
         self.edit_date = timezone.now()
         super(LandType, self).save()
@@ -882,7 +880,7 @@ class SiteProfile(models.Model):
     def save(self, *args, **kwargs):
 
         # Check if a create date has been specified. If not, display today's date in create_date and edit_date
-        if self.create_date == None:
+        if self.create_date is None:
             self.create_date = timezone.now()
             self.edit_date = timezone.now()
 
@@ -901,71 +899,6 @@ class SiteProfileAdmin(admin.ModelAdmin):
     display = 'SiteProfile'
 
 
-#Logged users
-from django.contrib.auth.signals import user_logged_in, user_logged_out
-from urllib.request import urlopen
-import json
-
-
-class LoggedUser(models.Model):
-    # TODO: Tis does not seem to be used anywhere; perhaps it should be deelted
-    username = models.CharField(_("Username"), max_length=30, primary_key=True)
-    country = models.CharField(_("Country"), max_length=100, blank=False)
-    email = models.CharField(_("Email"), max_length=100, blank=False, default='user@mercycorps.com')
-
-    def __str__(self):
-        return self.username
-
-    def login_user(sender, request, user, **kwargs):
-        print("login_user...........%s............................" % user )
-        country = get_user_country(request)
-        active_sessions = Session.objects.filter(expire_date__gte=timezone.now())
-
-        user_id_list = []
-        logged_user_id = request.user.id
-
-        try:
-            for session in active_sessions:
-                data = session.get_decoded()
-
-                user_id_list.append(data.get('_auth_user_id', None))
-
-                if logged_user_id in user_id_list:
-                    LoggedUser(username=user.username, country=country, email=user.email).save()
-
-                if data.get('google-oauth2_state'):
-                    LoggedUser(username=user.username, country=country, email=user.email).save()
-
-        except Exception:
-            pass
-
-
-
-    def logout_user(sender, request, user, **kwargs):
-        # print("logout_user...........%s............................" % user )
-        try:
-            user = LoggedUser.objects.get(pk=user.username)
-            user.delete()
-
-        except LoggedUser.DoesNotExist:
-            pass
-
-    # user_logged_in.connect(login_user)
-    # user_logged_out.connect(logout_user)
-
-
-def get_user_country(request):
-
-    # Automatically geolocate the connecting IP
-    ip = request.META.get('REMOTE_ADDR')
-    try:
-        response = urlopen('http://ipinfo.io/'+ip+'/json').read()
-        response = json.loads(response)
-        return response['country'].lower()
-
-    except Exception:
-        response = "undefined"
-        return response
 
 # importing at the bottom of the file so that there is not circular imports
 from indicators.models import Indicator, PeriodicTarget, Result
