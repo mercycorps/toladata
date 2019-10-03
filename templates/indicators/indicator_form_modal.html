@@ -441,7 +441,6 @@
                     <button type="button" id="id_update_indicator_btn" class="btn btn-primary">{% trans 'Save and close' %}</button>
                     <button type="button" id="id_cancel_btn" class="btn btn-reset">{% trans 'Cancel' %}</button>
                 </div>
-                <div class="text-muted">{% include "form_guidance.html" %}</div>
             </div>
             {% else %}
             <div class="form-actions">
@@ -457,7 +456,6 @@
                     {# Translators: close a modal throwing away any changes to the form #}
                     <button type="button" id="id_cancel_btn" class="btn btn-reset">{% trans 'Cancel' %}</button>
                 </div>
-                <div class="text-muted">{% include "form_guidance.html" %}</div>
             </div>
             {% endif %}
         {% endif %}
