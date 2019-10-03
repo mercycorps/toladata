@@ -13,8 +13,8 @@ from django.template import Context
 
 from workflow.widgets import GoogleMapsWidget
 from workflow.models import (
-    Program, SiteProfile, Benchmarks,
-    Monitor, Budget, ChecklistItem,
+    Program, SiteProfile,
+    Budget, ChecklistItem,
     TolaUser, Sector, Country
 )
 
@@ -253,77 +253,6 @@ class SiteProfileForm(forms.ModelForm):
         self.fields['approved_by'].queryset = TolaUser.objects.filter(country__in=countries).distinct()
         self.fields['filled_by'].queryset = TolaUser.objects.filter(country__in=countries).distinct()
         self.fields['country'].queryset = countries
-
-
-class BenchmarkForm(forms.ModelForm):
-
-    class Meta:
-        model = Benchmarks
-        exclude = ['create_date', 'edit_date']
-
-    def __init__(self, *args, **kwargs):
-        self.helper = FormHelper()
-        self.request = kwargs.pop('request')
-        self.agreement = kwargs.pop('agreement')
-        self.complete = kwargs.pop('complete')
-        self.helper.form_method = 'post'
-        self.helper.form_class = 'form-horizontal'
-        self.helper.label_class = ''
-        self.helper.field_class = ''
-        self.helper.form_error_title = 'Form Errors'
-        self.helper.error_text_inline = True
-        self.helper.help_text_inline = True
-        self.helper.html5_required = True
-        self.helper.form_tag = False
-
-        if "benchmark_complete" in self.request.path:
-            self.helper.layout = Layout(
-                Field('description', rows="3", css_class='input-xlarge'),'site','est_start_date','est_end_date',
-                Field('actual_start_date', css_class="act_datepicker", id="actual_start_date_id"),
-                 Field('actual_end_date', css_class="act_datepicker", id="actual_end_date_id"),'budget','cost','agreement','complete',
-            )
-        else:
-            self.helper.layout = Layout(
-                Field('description', rows="3", css_class='input-xlarge'),'site','est_start_date','est_end_date','budget','agreement',
-            )
-        super(BenchmarkForm, self).__init__(*args, **kwargs)
-
-        countries = getCountry(self.request.user)
-        # override the site queryset to use request.user for country
-        self.fields['site'].queryset = SiteProfile.objects.filter(country__in=countries)
-
-        self.fields['agreement'].widget = HiddenInput()
-        self.fields['complete'].widget = HiddenInput()
-
-
-class MonitorForm(forms.ModelForm):
-
-    class Meta:
-        model = Monitor
-        exclude = ['create_date', 'edit_date']
-
-
-    def __init__(self, *args, **kwargs):
-        self.helper = FormHelper()
-        self.helper.form_method = 'post'
-        self.helper.form_class = 'form-horizontal'
-        self.helper.label_class = 'col-sm-2'
-        self.helper.field_class = 'col-sm-6'
-        self.helper.form_error_title = 'Form Errors'
-        self.helper.error_text_inline = True
-        self.helper.help_text_inline = True
-        self.helper.html5_required = True
-        self.helper.form_tag = False
-        self.helper.layout = Layout(
-
-            HTML("""<br/>"""),
-
-                'responsible_person', 'frequency', Field('type', rows="3", css_class='input-xlarge'), 'agreement',
-
-        )
-
-        super(MonitorForm, self).__init__(*args, **kwargs)
-
 
 class ChecklistItemForm(forms.ModelForm):
 

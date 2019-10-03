@@ -10,7 +10,7 @@ from tola import util
 from .models import (
     Country, SiteProfile,
     Program, TolaUser, ProfileType, TolaUserProxy,
-    Organization, Sector, Benchmarks, Budget, Monitor,
+    Organization, Sector, Budget,
     Checklist, ChecklistItem,
     OrganizationAdmin,
     ProgramAccess,
@@ -93,8 +93,6 @@ admin.site.register(Country, CountryAdmin)
 admin.site.register(Program, ProgramAdmin)
 admin.site.register(Sector)
 admin.site.register(SiteProfile, SiteProfileAdmin)
-admin.site.register(Monitor)
-admin.site.register(Benchmarks)
 admin.site.register(Budget)
 admin.site.register(ProfileType)
 admin.site.register(ChecklistItem, ChecklistItemAdmin)
