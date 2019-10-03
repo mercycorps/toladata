@@ -8,7 +8,7 @@ from import_export.admin import ImportExportModelAdmin, ExportMixin
 #from tola.util import getCountry, get_GAIT_data
 from tola import util
 from .models import (
-    Documentation, Country, SiteProfile,
+    Country, SiteProfile,
     Program, TolaUser, ProfileType, TolaUserProxy,
     Organization, Sector, Benchmarks, Budget, Monitor,
     Checklist, ChecklistItem,
@@ -17,26 +17,6 @@ from .models import (
     ChecklistAdmin,
     ChecklistItemAdmin, TolaUserAdmin
 )
-
-
-# Resource for CSV export
-class DocumentationResource(resources.ModelResource):
-    country = fields.Field(column_name='country', attribute='country', widget=ForeignKeyWidget(Country, 'country'))
-    program = fields.Field(column_name='program', attribute='program', widget=ForeignKeyWidget(Program, 'name'))
-
-    class Meta:
-        model = Documentation
-        widgets = {
-                'create_date': {'format': '%d/%m/%Y'},
-                'edit_date': {'format': '%d/%m/%Y'},
-                'expected_start_date': {'format': '%d/%m/%Y'},
-                }
-
-
-class DocumentationAdmin(ImportExportModelAdmin):
-    resource_class = DocumentationResource
-    list_display = ('program',)
-    list_filter = ('program__country',)
 
 
 # Resource for CSV export
@@ -112,7 +92,6 @@ admin.site.register(Organization, OrganizationAdmin)
 admin.site.register(Country, CountryAdmin)
 admin.site.register(Program, ProgramAdmin)
 admin.site.register(Sector)
-admin.site.register(Documentation,DocumentationAdmin)
 admin.site.register(SiteProfile, SiteProfileAdmin)
 admin.site.register(Monitor)
 admin.site.register(Benchmarks)

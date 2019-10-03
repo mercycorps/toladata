@@ -901,37 +901,6 @@ class SiteProfileAdmin(admin.ModelAdmin):
     display = 'SiteProfile'
 
 
-
-# Project Documents, admin is handled in the admin.py
-class Documentation(models.Model):
-    name = models.CharField(_("Name of Document"), max_length=135, blank=True, null=True)
-    url = models.CharField(_("Link to document, document repository, or document URL"),
-                           blank=True, null=True, max_length=135)
-    description = models.CharField(_("Description"), max_length=255, blank=True, null=True)
-    file_field = models.FileField(upload_to="uploads", blank=True, null=True)
-    program = models.ForeignKey(Program, on_delete=models.CASCADE, verbose_name=_("Program"))
-    create_date = models.DateTimeField(null=True, blank=True)
-    edit_date = models.DateTimeField(null=True, blank=True)
-
-     # on save add create date or update edit date
-    def save(self, *args, **kwargs):
-        if self.create_date == None:
-            self.create_date = timezone.now()
-        self.edit_date = timezone.now()
-        super(Documentation, self).save()
-
-    def __str__(self):
-        return self.name
-
-    @property
-    def name_n_url(self):
-        return "%s %s" % (self.name, self.url)
-
-    class Meta:
-        ordering = ('name',)
-        verbose_name_plural = _("Documentation")
-
-
 # TODO: Rename model with manual migration file
 """
 https://docs.djangoproject.com/en/dev/ref/migration-operations/#renamemodel

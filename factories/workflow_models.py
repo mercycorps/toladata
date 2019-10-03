@@ -15,7 +15,6 @@ from factory import (
 from factories.django_models import UserFactory, Site
 from workflow.models import (
     Country as CountryM,
-    Documentation as DocumentationM,
     Organization as OrganizationM,
     ProfileType as ProfileTypeM,
     Sector as SectorM,
@@ -265,14 +264,6 @@ class RFProgramFactory(DjangoModelFactory):
                     (level_field, level_value) = next(levels)
                     this_indicator_data.update({level_field: level_value})
                 RFIndicatorFactory(**this_indicator_data)
-
-
-class DocumentationFactory(DjangoModelFactory):
-    class Meta:
-        model = DocumentationM
-
-    name = Sequence(lambda n: 'Document {0}'.format(n))
-    program = SubFactory(ProgramFactory)
 
 
 class SectorFactory(DjangoModelFactory):

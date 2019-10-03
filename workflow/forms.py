@@ -13,7 +13,7 @@ from django.template import Context
 
 from workflow.widgets import GoogleMapsWidget
 from workflow.models import (
-    Program, SiteProfile, Documentation, Benchmarks,
+    Program, SiteProfile, Benchmarks,
     Monitor, Budget, ChecklistItem,
     TolaUser, Sector, Country
 )
@@ -253,54 +253,6 @@ class SiteProfileForm(forms.ModelForm):
         self.fields['approved_by'].queryset = TolaUser.objects.filter(country__in=countries).distinct()
         self.fields['filled_by'].queryset = TolaUser.objects.filter(country__in=countries).distinct()
         self.fields['country'].queryset = countries
-
-
-class DocumentationForm(forms.ModelForm):
-
-    class Meta:
-        model = Documentation
-        exclude = ['create_date', 'edit_date']
-
-
-    def __init__(self, *args, **kwargs):
-        self.helper = FormHelper()
-        self.helper.form_method = 'post'
-        self.request = kwargs.pop('request')
-        self.helper.form_class = ''
-        self.helper.label_class = ''
-        self.helper.field_class = ''
-        self.helper.form_error_title = 'Form Errors'
-        self.helper.error_text_inline = True
-        self.helper.help_text_inline = True
-        self.helper.html5_required = True
-        self.helper.layout = Layout(
-
-            HTML("""<br/>"""),
-
-                'name',
-                FieldWithButtons('url', StrictButton("gdrive", onclick="onApiLoad();")),
-                Field('description', rows="3", css_class='input-xlarge'),
-                'project','program',
-
-            FormActions(
-                Submit('submit', 'Save', css_class='btn-primary'),
-                Reset('reset', 'Reset', css_class='btn-reset')
-            )
-        )
-
-        super(DocumentationForm, self).__init__(*args, **kwargs)
-
-        #override the program queryset to use request.user for country
-        self.fields['name'].required = True
-        self.fields['url'].required = True
-        self.fields['program'].queryset = Program.rf_aware_objects.filter(
-            Q(id__in=self.request.user.tola_user.programaccess_set.filter(role='high').values('program_id'))
-            | Q(id__in=self.request.user.tola_user.programaccess_set.filter(role='medium').values('program_id'))
-        ).distinct()
-
-        # only display Project field to existing users
-        if not self.request.user.tola_user.allow_projects_access:
-            self.fields.pop('project')
 
 
 class BenchmarkForm(forms.ModelForm):

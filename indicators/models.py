@@ -31,8 +31,7 @@ from safedelete.queryset import SafeDeleteQueryset
 from django_mysql.models import ListCharField
 
 from workflow.models import (
-    Program, Sector, SiteProfile, Country,
-    Documentation, TolaUser
+    Program, Sector, SiteProfile, Country, TolaUser
 )
 
 
@@ -1802,11 +1801,6 @@ class Result(models.Model):
 
     date_collected = models.DateField(
         null=True, blank=True, help_text=" ", verbose_name=_("Date collected"))
-
-    # Deprecated - see evidence_name/evidence_url
-    evidence = models.ForeignKey(
-        Documentation, null=True, blank=True, on_delete=models.SET_NULL,
-        verbose_name=_("Evidence Document or Link"), help_text=" ")
 
     approved_by = models.ForeignKey(
         TolaUser, blank=True, null=True, on_delete=models.SET_NULL, verbose_name=_("Originated By"),

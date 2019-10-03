@@ -4,7 +4,6 @@ from datetime import timedelta
 from workflow.models import (
     Program,
     SiteProfile,
-    Documentation,
     TolaUser,
     Sector,
 )
@@ -206,7 +205,6 @@ class ResultForm(forms.ModelForm):
             'comments': forms.Textarea(attrs={'rows': 4}),
             'program': forms.HiddenInput(),
             'indicator': forms.HiddenInput(),
-            'evidence': forms.HiddenInput()
         }
         labels = {
             'site': _('Site'),
@@ -251,7 +249,7 @@ class ResultForm(forms.ModelForm):
 
     def set_initial_querysets(self):
         """populate foreign key fields with limited quersets based on user / country / program"""
-        # provide only in-program Documentation objects for the evidence queryset
+        # provide only in-program / in-country Site objects for the evidence queryset
 
         self.fields['site'].queryset = SiteProfile.objects.filter(
             country__in=self.indicator.program.country.filter(
@@ -261,9 +259,6 @@ class ResultForm(forms.ModelForm):
                 ).values('country_id'))
             )
         )
-
-        self.fields['evidence'].queryset = Documentation.objects\
-            .filter(program=self.indicator.program)
 
     def set_periodic_target_widget(self):
         # Django will deliver localized strings to the template but the form needs to be able to compare the date
