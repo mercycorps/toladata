@@ -30,32 +30,6 @@ $(document).ready(function() {
         load(url, data, loadComplete);
     });
 
-     /*
-     * Handle change in the indicator services drop-down; updates the indicator drop-down accordingly.
-     */
-    $("#services").change(function() {
-        // this maybe was made obsolete by a change to radio buttons?
-        var selected_service = $(this).val();
-        if (selected_service == undefined || selected_service == -1 || selected_service == '') {
-            $("#serivce").html("<option>--Service--</option>");
-        } else {
-            var url = "/indicators/service/" + selected_service + "/service_json/";
-            $.getJSON(url, function(service) {
-
-                var options = '<option value="0">--Indicator--</option>';
-                for (var i = 0; i < service.length; i++) {
-                    options += '<option value="' + service[i].nid + '">' + service[i].type + ' - ' + service[i].level + ' - ' + service[i].title + '</option>';
-                }
-
-                $("#service_indicator").html(options);
-                $("#service_indicator_option:first").attr('selected', 'selected');
-            });
-        }
-
-        // page-specific-action call if a page has implemented the 'country_dropdwon_has_changed' function
-        if(typeof services_dropdwon_has_changed != 'undefined') services_dropdwon_has_changed(selected_service);
-    });
-
     /*
      * Handle change in the country drop-down; updates the province drop-down accordingly.
      */
