@@ -39,10 +39,6 @@
     indicator: 1
     target: 500
     customsort: 0
-- model: workflow.documentation
-  pk: 1
-  fields:
-    program: 1
 - model: indicators.result
   pk: 1
   fields:
@@ -67,10 +63,6 @@
     indicator: 2
     target: 1000
     customsort: 0
-- model: workflow.documentation
-  pk: 2
-  fields:
-    program: 1
 - model: indicators.result
   pk: 2
   fields:
