@@ -14,7 +14,6 @@ from django.template import Context
 from workflow.widgets import GoogleMapsWidget
 from workflow.models import (
     Program, SiteProfile,
-    Budget, ChecklistItem,
     TolaUser, Sector, Country
 )
 
@@ -28,14 +27,6 @@ APPROVALS = (
         ('awaiting approval', 'awaiting approval'),
         ('approved', 'approved'),
         ('rejected', 'rejected'),
-    )
-
-
-#Global for Budget Variance
-BUDGET_VARIANCE = (
-        ("Over Budget", "Over Budget"),
-        ("Under Budget", "Under Budget"),
-        ("No Variance", "No Variance"),
     )
 
 
@@ -75,46 +66,6 @@ class DatePicker(forms.DateInput):
     template_name = 'datepicker.html'
 
     DateInput = partial(forms.DateInput, {'class': 'datepicker', 'autocomplete': 'off'})
-
-
-class BudgetForm(forms.ModelForm):
-
-    class Meta:
-        model = Budget
-        exclude = ['create_date', 'edit_date']
-
-
-    def __init__(self, *args, **kwargs):
-
-        self.request = kwargs.pop('request')
-        self.helper = FormHelper()
-        self.helper.form_class = 'form-horizontal'
-        self.helper.label_class = ''
-        self.helper.field_class = ''
-        self.helper.form_error_title = 'Form Errors'
-        self.helper.error_text_inline = True
-        self.helper.help_text_inline = True
-        self.helper.html5_required = True
-        self.helper.form_tag = False
-        self.helper.layout = Layout(
-            Field('contributor', required=False), Field('description_of_contribution', required=False),
-            PrependedAppendedText('proposed_value','$', '.00'), 'agreement', 'complete',
-        )
-
-
-        super(BudgetForm, self).__init__(*args, **kwargs)
-        self.fields['agreement'].widget = forms.HiddenInput()#TextInput()
-        self.fields['complete'].widget = forms.HiddenInput()#TextInput()
-        #countries = getCountry(self.request.user)
-
-        #self.fields['agreement'].queryset = ProjectAgreement.objects.filter(program__country__in = countries)
-
-    def save(self, *args, **kwargs):
-        # Commit is already set to false
-        obj = super(BudgetForm, self).save(*args, **kwargs)
-        return obj
-
-
 
 class SiteProfileForm(forms.ModelForm):
 
@@ -253,31 +204,6 @@ class SiteProfileForm(forms.ModelForm):
         self.fields['approved_by'].queryset = TolaUser.objects.filter(country__in=countries).distinct()
         self.fields['filled_by'].queryset = TolaUser.objects.filter(country__in=countries).distinct()
         self.fields['country'].queryset = countries
-
-class ChecklistItemForm(forms.ModelForm):
-
-    class Meta:
-        model = ChecklistItem
-        exclude = ['create_date', 'edit_date','global_item']
-
-    def __init__(self, *args, **kwargs):
-        self.request = kwargs.pop('request')
-        self.helper = FormHelper()
-        self.helper.form_method = 'post'
-        self.helper.form_class = 'form-horizontal'
-        self.helper.label_class = 'col-sm-2'
-        self.helper.field_class = 'col-sm-6'
-        self.helper.form_error_title = 'Form Errors'
-        self.helper.error_text_inline = True
-        self.helper.help_text_inline = True
-        self.helper.html5_required = True
-        self.helper.add_input(Submit('submit', 'Save'))
-
-        super(ChecklistItemForm, self).__init__(*args, **kwargs)
-
-        #countries = getCountry(self.request.user)
-        #override the community queryset to use request.user for country
-        #self.fields['item'].queryset = ChecklistItem.objects.filter(checklist__country__in=countries)
 
 
 class FilterForm(forms.Form):
