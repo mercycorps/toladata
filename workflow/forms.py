@@ -74,7 +74,14 @@ class SiteProfileForm(forms.ModelForm):
         exclude = ['create_date', 'edit_date']
 
     map = forms.CharField(widget=GoogleMapsWidget(
-        attrs={'width': 700, 'height': 400, 'longitude': 'longitude', 'latitude': 'latitude','country': _('Find a city or village')}), required=False)
+        attrs = {
+            'width': 700,
+            'height': 400,
+            'longitude': 'longitude',
+            'latitude': 'latitude',
+            'country': _('Find a city or village')
+            }
+        ), required=False)
 
     date_of_firstcontact = forms.DateField(widget=DatePicker.DateInput(), required=False)
 
@@ -156,37 +163,8 @@ class SiteProfileForm(forms.ModelForm):
                     ),
                 ),
 
-            ), submit_section,
-
-             HTML(u"""
-                  <div class='card mt-4'>
-
-                  <!-- Default panel contents -->
-                  <div class='card-header'><strong>{projects_in_this_site}</strong></div>
-                  <div class='card-body'>
-                    {{% if getProjects %}}
-                      <!-- Table -->
-                      <table class="table">
-                       <tr>
-                         <th>{project_name}</th>
-                         <th>{program}</th>
-                         <th>{activity_code}</th>
-                         <th>{view}</th>
-                       </tr>
-
-                    {{% for item in getProjects %}}
-                       <tr>
-                        <td>{{{{ item.project_name }}}}</td>
-                        <td>{{{{ item.program.name }}}}</td>
-                        <td>{{{{ item.activity_code }}}}</td>
-                        <td><a target="_new" href='/workflow/projectagreement_detail/{{{{ item.id }}}}/'>{view}</a>
-                       </tr>
-                    {{% endfor %}}
-                     </table>
-                    {{% endif %}}
-                    </div>
-                  </div>
-             """.format(**translations)),
+            ),
+            submit_section,
         )
 
         super(SiteProfileForm, self).__init__(*args, **kwargs)
