@@ -104,8 +104,6 @@ urlpatterns = [
     url(r'^indicators/', include('indicators.urls')),
 
 
-    # app include of workflow urls
-    url(r'^formlibrary/', include('formlibrary.urls')),
 
     # local login
     url(r'^login/$', tolaviews.TolaLoginView.as_view(), name='login'),

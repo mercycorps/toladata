@@ -270,7 +270,6 @@ THIRD_PARTY_APPS = (
 # Apps specific for this project go here.
 LOCAL_APPS = (
     'workflow',
-    'formlibrary',
     'tola',
     'feed',
     'indicators',
@@ -370,9 +369,6 @@ WEBPACK_LOADER = {
     }
 }
 
-# Projects whitelist (https://github.com/mercycorps/TolaActivity/issues/132)
-# Limit access to projects to existing users while hiding it from all others
-PROJECTS_ACCESS_WHITELIST_SET = {'AF', 'PK', 'TL'}  # country code in `workflow_country`
 
 ########## LOGGING CONFIGURATION
 LOGGING = {

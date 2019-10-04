@@ -3,9 +3,6 @@
 Workflow views - TODO: cut out intercision-invalidated views
 """
 
-import operator
-import unicodedata
-import json
 import logging
 from datetime import timedelta
 from dateutil.relativedelta import relativedelta
@@ -13,52 +10,41 @@ from dateutil import parser
 
 from workflow.models import (
     Program,
-    Country,
     SiteProfile,
 )
 from workflow.forms import (
     SiteProfileForm,
     FilterForm,
 )
-from workflow.mixins import AjaxableResponseMixin
 
-from formlibrary.models import TrainingAttendance, Distribution
-from indicators.models import Result, ExternalService
+from indicators.models import Result
 
 from django.utils.translation import gettext as _
 from django.views.generic.list import ListView
-from django.views.generic.detail import DetailView, View
 from django.views.generic.edit import CreateView, UpdateView, DeleteView
 from django.utils import timezone
 from django.utils.datastructures import MultiValueDictKeyError
-from django.urls import reverse
-from django.contrib.auth.models import User
 from django.contrib.auth.decorators import login_required
 from django.contrib.auth.mixins import LoginRequiredMixin
-from django.core.exceptions import PermissionDenied
-from django.core import serializers
-from django.core.serializers.json import DjangoJSONEncoder
 from django.core.paginator import Paginator, EmptyPage, PageNotAnInteger
-from django.http import HttpResponse, HttpResponseRedirect, JsonResponse
+from django.http import HttpResponseRedirect, JsonResponse
 from django.utils.decorators import method_decorator
-from django.shortcuts import get_object_or_404, render
+from django.shortcuts import render
 from django.contrib import messages
-from django.db.models import Count, Q, Max
+from django.db.models import Q, Max
 
-from tola.util import getCountry, emailGroup, group_excluded, group_required
+from tola.util import getCountry, group_excluded
 
 from rest_framework.decorators import api_view
 from rest_framework.response import Response
 
 from tola_management.models import ProgramAuditLog
 from tola_management.permissions import (
-    user_has_program_roles,
     has_site_read_access,
     has_site_create_access,
     has_site_delete_access,
     has_site_write_access,
     has_program_write_access,
-    has_projects_access,
     verify_program_access_level,
     verify_program_access_level_of_any_program
 )
@@ -90,7 +76,10 @@ class IndicatorDataBySite(LoginRequiredMixin, ListView):
         return context
 
     def get_queryset(self):
-        q = Result.objects.filter(site__id=self.kwargs.get('site_id'), program__in=self.request.user.tola_user.available_programs).order_by('program', 'indicator')
+        q = Result.objects.filter(
+            site__id=self.kwargs.get('site_id'),
+            program__in=self.request.user.tola_user.available_programs
+        ).order_by('program', 'indicator')
         return q
 
 
@@ -162,15 +151,15 @@ class SiteProfileList(ListView):
         except EmptyPage:
             getSiteProfile = paginator.page(paginator.num_pages)
         return render(request, self.template_name, {
-                'inactiveSite': inactiveSite,
-                'default_list': default_list,
-                'getSiteProfile':getSiteProfile,
-                'project_agreement_id': activity_id,
-                'country': countries,
-                'getPrograms':getPrograms,
-                'form': FilterForm(),
-                'helper': FilterForm.helper,
-                'user_list': user_list})
+            'inactiveSite': inactiveSite,
+            'default_list': default_list,
+            'getSiteProfile':getSiteProfile,
+            'project_agreement_id': activity_id,
+            'country': countries,
+            'getPrograms':getPrograms,
+            'form': FilterForm(),
+            'helper': FilterForm.helper,
+            'user_list': user_list})
 
 
 @method_decorator(login_required, name='dispatch')
@@ -187,15 +176,22 @@ class SiteProfileReport(ListView):
         project_agreement_id = self.kwargs['pk']
 
         if int(self.kwargs['pk']) == 0:
-            getSiteProfile = SiteProfile.objects.all().prefetch_related('country').filter(country__in=countries).filter(status=1)
-            getSiteProfileIndicator = SiteProfile.objects.all().prefetch_related('country').filter(Q(result__program__country__in=countries)).filter(status=1)
+            getSiteProfile = SiteProfile.objects.all().prefetch_related(
+                'country'
+            ).filter(country__in=countries).filter(status=1)
+            getSiteProfileIndicator = SiteProfile.objects.all().prefetch_related(
+                'country'
+            ).filter(Q(result__program__country__in=countries)).filter(status=1)
         else:
             getSiteProfile = SiteProfile.objects.all().prefetch_related('country').filter(status=1)
             getSiteProfileIndicator = None
 
-        id=self.kwargs['pk']
+        site_id=self.kwargs['pk']
 
-        return render(request, self.template_name, {'getSiteProfile':getSiteProfile, 'getSiteProfileIndicator':getSiteProfileIndicator,'project_agreement_id': project_agreement_id,'id':id,'country': countries})
+        return render(request, self.template_name,
+                      {'getSiteProfile':getSiteProfile, 'getSiteProfileIndicator' : getSiteProfileIndicator,
+                       'project_agreement_id' : project_agreement_id,
+                       'id' : site_id, 'country': countries})
 
 
 @method_decorator(login_required, name='dispatch')
@@ -318,65 +314,6 @@ class SiteProfileDelete(DeleteView):
     form_class = SiteProfileForm
 
 
-@method_decorator(has_projects_access, name='dispatch')
-class Report(LoginRequiredMixin, View, AjaxableResponseMixin):
-    """
-    project agreement list report
-    """
-    def get(self, request, *args, **kwargs):
-        countries=getCountry(request.user)
-        getAgreements = []
-
-        getPrograms = Program.objects.filter(funding_status="Funded", country__in=countries).distinct()
-        filtered = getAgreements
-        table = None
-        table.paginate(page=request.GET.get('page', 1), per_page=20)
-
-
-        # send the keys and vars
-        return render(request, "workflow/report.html", {
-                      'country': countries,
-                      'form': FilterForm(),
-                      'filter': filtered,
-                      'helper': FilterForm.helper,
-                      'APPROVALS': APPROVALS,
-                      'getPrograms': getPrograms})
-
-
-@method_decorator(has_projects_access, name='dispatch')
-class ReportData(LoginRequiredMixin, View, AjaxableResponseMixin):
-    """
-    Render Agreements json object response to the report ajax call
-    """
-
-    def get(self, request, *args, **kwargs):
-
-        countries=getCountry(request.user)
-        filters = {}
-        if int(self.kwargs['pk']) != 0:
-            filters['program__id'] = self.kwargs['pk']
-        elif self.kwargs['status'] != 'none':
-            filters['approval'] = self.kwargs['status']
-        else:
-            filters['program__country__in'] = countries
-
-        getAgreements = []
-
-        getAgreements = json.dumps(list(getAgreements), cls=DjangoJSONEncoder)
-
-        final_dict = { 'get_agreements': getAgreements }
-
-        return JsonResponse(final_dict, safe=False)
-
-
-@login_required
-def country_json(request, country):
-    """
-    For populating the province dropdown based  country dropdown value
-    """
-    return HttpResponse('', content_type="application/json")
-
-
 @login_required
 @has_program_write_access
 def reportingperiod_update(request, pk):
@@ -440,7 +377,9 @@ def reportingperiod_update(request, pk):
         failfields.append('reporting_period_end')
     if success:
         program.save()
-        ProgramAuditLog.log_program_dates_updated(request.user, program, old_dates, program.dates_for_logging, request.POST.get('rationale'))
+        ProgramAuditLog.log_program_dates_updated(
+            request.user, program, old_dates, program.dates_for_logging, request.POST.get('rationale')
+        )
 
     return JsonResponse({
         'msg': 'success' if success else 'fail',

@@ -6,7 +6,6 @@ from django.db import migrations
 class Migration(migrations.Migration):
 
     dependencies = [
-        ('formlibrary', '0003_auto_20191001_2329'),
         ('workflow', '0052_delete_tolasites'),
     ]
 

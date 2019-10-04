@@ -1,4 +1,3 @@
-from django.contrib.auth.decorators import login_required
 from rest_framework import permissions
 from django.core.exceptions import PermissionDenied
 from django.db.models import Q
@@ -6,12 +5,10 @@ from django.shortcuts import get_object_or_404
 
 from workflow.models import (
     Program,
-    TolaUser,
     Country,
     SiteProfile,
     PROGRAM_ROLE_CHOICES,
     PROGRAM_ROLE_INT_MAP,
-    Organization
 )
 
 from indicators.models import (
@@ -85,7 +82,8 @@ def user_has_program_access(user, program):
     ).exists()
 
 def user_has_program_roles(user, programs, roles):
-    return user.is_authenticated and user.tola_user.programaccess_set.filter(program_id__in=programs, role__in=roles).exists()
+    return (user.is_authenticated and
+            user.tola_user.programaccess_set.filter(program_id__in=programs, role__in=roles).exists())
 
 def has_iptt_read_access(func):
     def wrapper(request, *args, **kwargs):
@@ -105,7 +103,8 @@ def user_has_site_access(user, site):
 
 def has_site_create_access(func):
     def wrapper(request, *args, **kwargs):
-        request.has_write_access = request.user.tola_user.programaccess_set.filter(role='high').exists() or request.user.is_superuser
+        request.has_write_access = (request.user.tola_user.programaccess_set.filter(role='high').exists() or
+                                    request.user.is_superuser)
         if request.has_write_access:
             return func(request, *args, **kwargs)
         else:
@@ -158,7 +157,8 @@ def has_site_write_access(func):
 def has_result_read_access(func):
     def wrapper(request, *args, **kwargs):
         if user_has_program_access(request.user, kwargs['program']) or request.user.is_superuser:
-            write_access = (user_has_program_roles(request.user, [kwargs['program']], ['medium', 'high']) or request.user.is_superuser)
+            write_access = (user_has_program_roles(request.user, [kwargs['program']], ['medium', 'high']) or
+                            request.user.is_superuser)
             request.has_write_access = write_access
             return func(request, *args, **kwargs)
         else:
@@ -168,7 +168,8 @@ def has_result_read_access(func):
 def has_result_write_access(func):
     def wrapper(request, *args, **kwargs):
         if user_has_program_access(request.user, kwargs['program']) or request.user.is_superuser:
-            write_access = (user_has_program_roles(request.user, [kwargs['program']], ['medium', 'high']) or request.user.is_superuser)
+            write_access = (user_has_program_roles(request.user, [kwargs['program']], ['medium', 'high']) or
+                            request.user.is_superuser)
             request.has_write_access = write_access
             if request.method == 'GET':
                 return func(request, *args, **kwargs)
@@ -191,7 +192,8 @@ def has_indicator_read_access(func):
 def has_indicator_write_access(func):
     def wrapper(request, *args, **kwargs):
         if user_has_program_access(request.user, kwargs['program']) or request.user.is_superuser:
-            write_access = (user_has_program_roles(request.user, [kwargs['program']], ['high']) or request.user.is_superuser)
+            write_access = (user_has_program_roles(request.user, [kwargs['program']], ['high']) or
+                            request.user.is_superuser)
             request.has_write_access = write_access
             if request.method == 'GET':
                 return func(request, *args, **kwargs)
@@ -206,7 +208,8 @@ def has_indicator_write_access(func):
 def has_program_write_access(func):
     def wrapper(request, *args, **kwargs):
         if user_has_program_access(request.user, kwargs['pk']) or request.user.is_superuser:
-            write_access = (user_has_program_roles(request.user, [kwargs['pk']], ['high']) or request.user.is_superuser)
+            write_access = (user_has_program_roles(request.user, [kwargs['pk']], ['high']) or
+                            request.user.is_superuser)
             request.has_write_access = write_access
             if request.method == 'GET':
                 return func(request, *args, **kwargs)
@@ -221,27 +224,13 @@ def has_program_write_access(func):
 def has_program_read_access(func):
     def wrapper(request, *args, **kwargs):
         if user_has_program_access(request.user, kwargs['program']) or request.user.is_superuser:
-            write_access = (user_has_program_roles(request.user, [kwargs['program']], ['high']) or request.user.is_superuser)
+            write_access = (user_has_program_roles(request.user, [kwargs['program']], ['high']) or
+                            request.user.is_superuser)
             request.has_write_access = write_access
             return func(request, *args, **kwargs)
         else:
             raise PermissionDenied
     return wrapper
-
-
-def has_projects_access(func):
-    """
-    The "Projects" app exists along side Tola indicator tracking but is being deprecated
-    This limits access to existing users based on their country
-    and is unrelated to all other business logic level permissions
-    """
-    def wrapper(request, *args, **kwargs):
-        if request.user.tola_user.allow_projects_access:
-            return func(request, *args, **kwargs)
-        else:
-            raise PermissionDenied
-    # instead of adding @login_required to all project URLs, just do it here
-    return login_required(wrapper)
 
 
 #
@@ -290,7 +279,9 @@ def verify_program_access_level_of_any_program(request, level, country_id=None, 
     else:
         # Has implicit low level access via country association?
         if country_id:
-            implicit_low = tola_user.country_id == country_id or tola_user.countries.filter(country_id=country_id).exists()
+            implicit_low = (
+                tola_user.country_id == country_id or tola_user.countries.filter(country_id=country_id).exists()
+                )
         else:
             implicit_low = (Program.objects.filter(country__in=tola_user.countries.all()) |
                             Program.objects.filter(country=tola_user.country)).exists()
@@ -368,7 +359,7 @@ class HasOrganizationAdminAccess(permissions.BasePermission):
 
 class HasProgramAdminAccess(permissions.BasePermission):
     def has_permission(self, request, view):
-        if view.action == 'audit_log' or view.action=='export_audit_log':
+        if view.action == 'audit_log' or view.action == 'export_audit_log':
             return request.user.tola_user.available_programs.filter(id=view.kwargs["pk"]).exists()
 
         return user_has_basic_or_super_admin(request.user)
@@ -394,8 +385,7 @@ class HasRelatedCountryAdminAccess(permissions.BasePermission):
         if view.action == 'create':
             country_id = request.data.get('country')
             return (request.user.is_superuser or
-                Country.objects.get(pk=country_id) in tola_user.managed_countries
-            )
+                    Country.objects.get(pk=country_id) in tola_user.managed_countries)
         return user_has_basic_or_super_admin(request.user)
 
     def has_object_permission(self, request, view, obj):
