@@ -229,21 +229,6 @@ def has_program_read_access(func):
     return wrapper
 
 
-def has_projects_access(func):
-    """
-    The "Projects" app exists along side Tola indicator tracking but is being deprecated
-    This limits access to existing users based on their country
-    and is unrelated to all other business logic level permissions
-    """
-    def wrapper(request, *args, **kwargs):
-        if request.user.tola_user.allow_projects_access:
-            return func(request, *args, **kwargs)
-        else:
-            raise PermissionDenied
-    # instead of adding @login_required to all project URLs, just do it here
-    return login_required(wrapper)
-
-
 #
 # Program level permission
 #

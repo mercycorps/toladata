@@ -13,12 +13,6 @@ urlpatterns = [
 
     url(r'^site_indicatordata/(?P<site_id>\w+)/$', IndicatorDataBySite.as_view(), name='site_indicatordata'),
 
-    url(r'^report/export/$', Report.as_view(), name='report'),
-    url(r'^report/(?P<pk>\w+)/(?P<status>[\w ]+)/$', Report.as_view(), name='report'),
-    url(r'^report_table/(?P<pk>\w+)/(?P<status>[\w ]+)/$', ReportData.as_view(), name='report_data'),
-
-    url(r'^country/(?P<country>[-\w]+)/country_json/', country_json, name='country_json'),
-
     #ajax calls
     url(r'^reportingperiod_update/(?P<pk>\w+)$', reportingperiod_update, name='reportingperiod_update'),
 ]

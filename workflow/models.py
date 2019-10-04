@@ -185,16 +185,6 @@ class TolaUser(models.Model):
             return Country.objects.none()
         return ', '.join([x.code for x in self.countries.all()])
 
-    @property
-    def allow_projects_access(self):
-        """
-        Only allow existing users to access the Projects/workflow functionality
-        """
-        user_country_codes = set(self.available_countries.values_list('code', flat=True))
-        if self.country:
-            user_country_codes.add(self.country.code)
-        return bool(user_country_codes & settings.PROJECTS_ACCESS_WHITELIST_SET)
-
 
     def program_role(self, program_id):
         if self.user.is_superuser:
