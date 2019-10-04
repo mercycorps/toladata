@@ -22,7 +22,6 @@ from workflow.forms import (
 )
 from workflow.mixins import AjaxableResponseMixin
 
-from formlibrary.models import TrainingAttendance, Distribution
 from indicators.models import Result, ExternalService
 
 from django.utils.translation import gettext as _
