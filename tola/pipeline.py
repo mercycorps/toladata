@@ -20,12 +20,6 @@ def domains_allowed(backend, details, response, *args, **kwargs):
             return HttpResponseRedirect('/login/saml/?idp=okta')
 
 def create_user_okta(backend, details, user, response, *args, **kwargs):
-    login_logger.info(
-        'creating user for backend %s and idp %s with user attributes: %s',
-        backend.name,
-        response.get('idp_name', 'No idp_name in response'),
-        str(list(response.get('attributes', [])))
-        )
     if backend.name == 'saml' and response.get('idp_name') == 'okta':
         #annoyingly the attributes are coming back as arrays, so let's flatten them
         attributes = {k: v[0] if len(v) > 0 else None for k,v in response['attributes'].iteritems()}
@@ -58,6 +52,10 @@ def create_user_okta(backend, details, user, response, *args, **kwargs):
 
         if hasattr(user, 'tola_user'):
             tola_user = user.tola_user
+            login_logger.info(
+                "found user id %s for email %s with tola_user id %s",
+                user.id, email, tola_user.id
+            )
         else:
             try:
                 tola_user = TolaUser(user=user, organization=Organization.mercy_corps())
@@ -88,7 +86,11 @@ def create_user_okta(backend, details, user, response, *args, **kwargs):
             transaction.savepoint_rollback(savepoint)
             logger.error("Exception while saving the TolaUser country of {}".format(email), e)
             return HttpResponseRedirect(reverse("invalid_user_okta"))
-
+        
+        login_logger.info(
+            "updated user id %s with first name %s and last name %s, returning from create_user_okta",
+            user.id, first_name, last_name
+        )
         return None
     else:
         return None
@@ -124,14 +126,11 @@ def social_user_tola(backend, uid, user=None, *args, **kwargs):
             # we found a match, but the emails are different, delete the bad data:
             social.delete()
             user = None
-    login_logger.info(
-        'calling social user for provider %s for uid %s and user %s',
-        provider, uid, user
-    )
     # call the original social_user now that we know bad data has been expunged:
     social = social_user(backend, uid, user, *args, **kwargs)
     login_logger.info(
-        'social_user returned %s',
+        '%s social_user for uid %s returned %s',
+        provider, uid,
         str(list(social.items()))
     )
     return social
