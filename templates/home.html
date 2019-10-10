@@ -1,5 +1,6 @@
 {% extends "base.html" %}
 {% load i18n mytags has_program_role %}
+{% load render_bundle from webpack_loader %}
 {# Translators: Page title if the user has not selected country #}
 {% block title %}{{ active_country|default:_("No available programs") }} | {% endblock %}
 {% block page_title %}{{ active_country|default:_("No available programs") }}{% endblock %}
@@ -16,7 +17,8 @@
 {% if active_country %}
 <section class="home__featured-country">
     <div class="featured-country__map">
-        {% include "home_country_map.html" %}
+        {% comment %} {% include "home_country_map.html" %} {% endcomment %}
+        <div id="home_country_map"></div>
         <div class="featured-country__map-key">
             <div class="featured-country__map-key-results-color-box"></div>
             <span>{% trans 'Sites with results' %}</span>
@@ -180,28 +182,79 @@
 {% endblock content %}
 
 
-
 {% block extra_js_in_body %}
-<script>
-    let reloadPage = false;
-
-    // Open indicator form modal if no RF and no indicators present on program
-    $("a[data-add-indicator]").click((e) => {
-        e.preventDefault();
-        let programId = $(e.target).data('addIndicator');
-        openCreateIndicatorFormModal({programId});
-    });
-
-    // when indicator creation modal form completes a save
-    $('#indicator_modal_div').on('created.tola.indicator.save', (e, params) => {
-        // Only set a bool instead of reloading to support "create and add another..." functionality
-        reloadPage = true;
-    });
-
-    $('#indicator_modal_div').on('hidden.bs.modal', (e) => {
-        if (reloadPage) {
-            location.reload(true);
-        }
-    });
-</script>
+    <script>
+        {% if active_country %}
+            const latitude = "{{ active_country.latitude }}";
+            const longitude = "{{ active_country.longitude }}";
+            const zoom = "{{ active_country.zoom }}";
+            const markers = [
+                {
+                    label: "{% trans 'Sites with results' %}",
+                    icon: {
+                        className: 'map-marker indicator',
+                        iconSize: [20, 20]
+                    },
+                    items: [
+                        {% for item in sites_with_results %}
+                            {
+                                popup: "<b>{{ item.country }}</b><br/>{% trans 'Site with result' %}<br> <a href='{% url 'siteprofile_update' item.id %}'>{{ item.name }}</a>",
+                                latitude: "{{ item.latitude }}",
+                                longitude: "{{ item.longitude }}"
+                            },
+                        {% endfor %}
+                    ]
+                },
+                {
+                    label: "{% trans 'Sites without results' %}",
+                    icon: {
+                        className: 'map-marker',
+                        iconSize: [20, 20]
+                    },
+                    items: [
+                        {% for item in sites_without_results %}
+                            {
+                                popup: "<b>{{ item.country }}</b><br/>{% trans 'Site without result' %}<br> <a href='{% url 'siteprofile_update' item.id %}'>{{ item.name }}</a>",
+                                latitude: "{{ item.latitude }}",
+                                longitude: "{{ item.longitude }}"
+                            },
+                        {% endfor %}
+                    ]
+                },
+            ];
+        {% else %}
+            //defaults - England, but we can override - also, shouldn't this never happen?
+            const latitude = "51.505";
+            const longitude = "-0.09";
+            const zoom = "13";
+            const markers = [];
+        {% endif %}
+        const mapContext = {
+            latitude: latitude,
+            longitude: longitude,
+            zoom: zoom,
+            markers: markers
+        };
+        let reloadPage = false;
+    
+        // Open indicator form modal if no RF and no indicators present on program
+        $("a[data-add-indicator]").click((e) => {
+            e.preventDefault();
+            let programId = $(e.target).data('addIndicator');
+            openCreateIndicatorFormModal({programId});
+        });
+    
+        // when indicator creation modal form completes a save
+        $('#indicator_modal_div').on('created.tola.indicator.save', (e, params) => {
+            // Only set a bool instead of reloading to support "create and add another..." functionality
+            reloadPage = true;
+        });
+    
+        $('#indicator_modal_div').on('hidden.bs.modal', (e) => {
+            if (reloadPage) {
+                location.reload(true);
+            }
+        });
+    </script>
+    {% render_bundle 'home_country_map' %}
 {% endblock %}
