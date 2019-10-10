@@ -9,6 +9,7 @@ from social_core.pipeline.social_auth import associate_by_email, social_user, as
 from workflow.models import TolaUser, Organization, Country
 
 logger = logging.getLogger('django')
+login_logger = logging.getLogger('login')
 
 def domains_allowed(backend, details, response, *args, **kwargs):
     if 'email' in details and details['email'] and len(details['email'].split('@')) > 1 and \
@@ -19,7 +20,12 @@ def domains_allowed(backend, details, response, *args, **kwargs):
             return HttpResponseRedirect('/login/saml/?idp=okta')
 
 def create_user_okta(backend, details, user, response, *args, **kwargs):
-
+    login_logger.info(
+        'creating user for backend %s and idp %s with user attributes: %s',
+        backend.name,
+        response.get('idp_name', 'No idp_name in response'),
+        str(list(response.get('attributes', [])))
+        )
     if backend.name == 'saml' and response.get('idp_name') == 'okta':
         #annoyingly the attributes are coming back as arrays, so let's flatten them
         attributes = {k: v[0] if len(v) > 0 else None for k,v in response['attributes'].iteritems()}
@@ -94,9 +100,17 @@ def associate_email_or_redirect(backend, details, user=None, *args, **kwargs):
         return None
     else:
         associated_user = associate_by_email(backend, details, user, *args, **kwargs)
+        login_logger.info(
+            "associate by email for details %s for user %s returned %s",
+            details, user, associated_user
+        )
         if associated_user is not None:
             return associated_user
         else:
+            login_logger.info(
+                'backend %s failed to find user %s with details %s',
+                backend.name, user, details
+            )
             return HttpResponseRedirect(reverse("invalid_user"))
 
 
@@ -110,8 +124,16 @@ def social_user_tola(backend, uid, user=None, *args, **kwargs):
             # we found a match, but the emails are different, delete the bad data:
             social.delete()
             user = None
+    login_logger.info(
+        'calling social user for provider %s for uid %s and user %s',
+        provider, uid, user
+    )
     # call the original social_user now that we know bad data has been expunged:
     social = social_user(backend, uid, user, *args, **kwargs)
+    login_logger.info(
+        'social_user returned %s',
+        str(list(social.items()))
+    )
     return social
 
 
