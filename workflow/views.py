@@ -130,7 +130,6 @@ class SiteProfileList(ListView):
                     | Q(type__profile__contains=request.GET['search']))\
                 .select_related()\
                 .distinct()
-
         #paginate site profile list
         default_list = 10 # default number of site profiles per page
         user_list = request.GET.get('user_list') # user defined number of site profiles per page, 10, 20, 30
@@ -141,7 +140,6 @@ class SiteProfileList(ListView):
             # add a value (the default) if there was no "user_list" parameter, to avoid "None" being
             # treated as string by JS
             user_list = default_list
-
         paginator = Paginator(getSiteProfile, default_list)
         page = request.GET.get('page')
         try:
@@ -153,7 +151,7 @@ class SiteProfileList(ListView):
         return render(request, self.template_name, {
             'inactiveSite': inactiveSite,
             'default_list': default_list,
-            'getSiteProfile':getSiteProfile,
+            'getSiteProfile': getSiteProfile,
             'project_agreement_id': activity_id,
             'country': countries,
             'getPrograms':getPrograms,
