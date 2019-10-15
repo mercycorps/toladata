@@ -1,5 +1,5 @@
 {% extends "base.html" %}
-{% load i18n mytags has_program_role %}
+{% load l10n i18n mytags has_program_role %}
 {% load render_bundle from webpack_loader %}
 {# Translators: Page title if the user has not selected country #}
 {% block title %}{{ active_country|default:_("No available programs") }} | {% endblock %}
@@ -186,6 +186,7 @@
     <script>
         const userCountryCodes = {{ user_country_codes|safe }};
         {% if active_country %}
+            {% localize off %}
             const latitude = "{{ active_country.latitude|default_if_none:"51.505" }}";
             const longitude = "{{ active_country.longitude|default_if_none:"-0.09" }}";
             const zoom = "{{ active_country.zoom|default_if_none:"13" }}";
@@ -224,6 +225,7 @@
                     ]
                 },
             ];
+            {% endlocalize %}
         {% else %}
             //defaults - England, but we can override - also, shouldn't this never happen?
             const latitude = "51.505";
