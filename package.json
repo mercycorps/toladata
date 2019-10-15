@@ -18,8 +18,6 @@
         "cpx-bootstrap-multiselect-css": "cpx node_modules/bootstrap-multiselect/dist/css/bootstrap-multiselect.css $npm_package_config_css",
         "cpx-select2-js": "cpx node_modules/select2/dist/js/select2.min.js $npm_package_config_js",
         "cpx-select2-css": "cpx node_modules/select2/dist/css/select2.min.css $npm_package_config_css",
-        "cpx-leaflet-css": "cpx node_modules/leaflet/dist/leaflet.css $npm_package_config_css",
-        "cpx-leaflet-js": "cpx node_modules/leaflet/dist/leaflet.js $npm_package_config_js",
         "cpx-pnotify-core-js": "cpx \"node_modules/pnotify/dist/iife/PNotify.{js,js.map}\" $npm_package_config_js",
         "cpx-pnotify-buttons-js": "cpx \"node_modules/pnotify/dist/iife/PNotifyButtons.{js,js.map}\" $npm_package_config_js",
         "cpx-pnotify-confirm-js": "cpx \"node_modules/pnotify/dist/iife/PNotifyConfirm.{js,js.map}\" $npm_package_config_js",
