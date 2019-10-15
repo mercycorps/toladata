@@ -13,7 +13,6 @@ django-registration
 django-report-utils
 django-safedelete
 django-simple-history
-django-tables2
 django-uuidfield
 django-widget-tweaks
 django-wysiwyg

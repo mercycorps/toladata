@@ -133,6 +133,9 @@ class Country(models.Model):
     def __str__(self):
         return self.country
 
+    @property
+    def country_page(self):
+        return reverse('index', kwargs={'selected_country': self.pk})
 
 class TolaUser(models.Model):
     title = models.CharField(_("Title"), blank=True, null=True, max_length=50)

@@ -250,7 +250,6 @@ DJANGO_APPS = (
 THIRD_PARTY_APPS = (
     'rest_framework',
     'rest_framework.authtoken',
-    'django_tables2',
     'crispy_forms',
     'django_extensions',
     'mathfilters',
