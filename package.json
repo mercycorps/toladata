@@ -83,6 +83,7 @@
         "sass-loader": "^7.1.0",
         "select2": "4.0.0",
         "style-loader": "^0.23.1",
+        "topojson-client": "3.0.0",
         "uglifyjs-webpack-plugin": "^2.0.1",
         "webpack": "^4.23.1",
         "webpack-bundle-tracker": "^0.4.2-beta",
