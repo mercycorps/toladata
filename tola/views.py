@@ -1,3 +1,4 @@
+import json
 import urllib
 
 from social_django.utils import load_strategy, load_backend
@@ -28,7 +29,8 @@ def index(request, selected_country=None):
     # Find the active country
     user = request.user.tola_user
     user_countries = user.available_countries # all countries whose programs are available to the user
-
+    user_country_codes = json.dumps(
+        {country.code: country.country_page for country in user_countries})
     if selected_country:  # from URL
         if not user.available_countries.filter(id=selected_country).exists():
             raise PermissionDenied
@@ -70,6 +72,7 @@ def index(request, selected_country=None):
 
     return render(request, 'home.html', {
         'user_countries': user_countries,
+        'user_country_codes': user_country_codes,
         'active_country': active_country,
         'programs': programs_with_metrics,
         'no_programs': programs_with_metrics.count(),

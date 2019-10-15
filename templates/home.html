@@ -184,10 +184,12 @@
 
 {% block extra_js_in_body %}
     <script>
+        const userCountryCodes = {{ user_country_codes|safe }};
         {% if active_country %}
-            const latitude = "{{ active_country.latitude }}";
-            const longitude = "{{ active_country.longitude }}";
-            const zoom = "{{ active_country.zoom }}";
+            const latitude = "{{ active_country.latitude|default_if_none:"51.505" }}";
+            const longitude = "{{ active_country.longitude|default_if_none:"-0.09" }}";
+            const zoom = "{{ active_country.zoom|default_if_none:"13" }}";
+            const code = "{{ active_country.code }}";
             const markers = [
                 {
                     label: "{% trans 'Sites with results' %}",
@@ -233,7 +235,9 @@
             latitude: latitude,
             longitude: longitude,
             zoom: zoom,
-            markers: markers
+            code: code,
+            markers: markers,
+            userCountryCodes: userCountryCodes
         };
         let reloadPage = false;
     
