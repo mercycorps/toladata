@@ -92,12 +92,6 @@ class SiteProfileList(ListView):
     model = SiteProfile
     template_name = 'workflow/site_profile_list.html'
 
-    def dispatch(self, request, *args, **kwargs):
-        if 'report' in request.GET:
-            template_name = 'workflow/site_profile_report.html'
-
-        return super(SiteProfileList, self).dispatch(request, *args, **kwargs)
-
     def get(self, request, *args, **kwargs):
         activity_id = int(self.kwargs['activity_id'])
         program_id = int(self.kwargs['program_id'])
@@ -130,7 +124,6 @@ class SiteProfileList(ListView):
                     | Q(type__profile__contains=request.GET['search']))\
                 .select_related()\
                 .distinct()
-
         #paginate site profile list
         default_list = 10 # default number of site profiles per page
         user_list = request.GET.get('user_list') # user defined number of site profiles per page, 10, 20, 30
@@ -141,7 +134,6 @@ class SiteProfileList(ListView):
             # add a value (the default) if there was no "user_list" parameter, to avoid "None" being
             # treated as string by JS
             user_list = default_list
-
         paginator = Paginator(getSiteProfile, default_list)
         page = request.GET.get('page')
         try:
@@ -153,45 +145,13 @@ class SiteProfileList(ListView):
         return render(request, self.template_name, {
             'inactiveSite': inactiveSite,
             'default_list': default_list,
-            'getSiteProfile':getSiteProfile,
+            'getSiteProfile': getSiteProfile,
             'project_agreement_id': activity_id,
             'country': countries,
             'getPrograms':getPrograms,
             'form': FilterForm(),
             'helper': FilterForm.helper,
             'user_list': user_list})
-
-
-@method_decorator(login_required, name='dispatch')
-@method_decorator(has_site_read_access, name='dispatch')
-class SiteProfileReport(ListView):
-    """
-    SiteProfile Report filtered by project
-    """
-    model = SiteProfile
-    template_name = 'workflow/site_profile_report.html'
-
-    def get(self, request, *args, **kwargs):
-        countries = getCountry(request.user)
-        project_agreement_id = self.kwargs['pk']
-
-        if int(self.kwargs['pk']) == 0:
-            getSiteProfile = SiteProfile.objects.all().prefetch_related(
-                'country'
-            ).filter(country__in=countries).filter(status=1)
-            getSiteProfileIndicator = SiteProfile.objects.all().prefetch_related(
-                'country'
-            ).filter(Q(result__program__country__in=countries)).filter(status=1)
-        else:
-            getSiteProfile = SiteProfile.objects.all().prefetch_related('country').filter(status=1)
-            getSiteProfileIndicator = None
-
-        site_id=self.kwargs['pk']
-
-        return render(request, self.template_name,
-                      {'getSiteProfile':getSiteProfile, 'getSiteProfileIndicator' : getSiteProfileIndicator,
-                       'project_agreement_id' : project_agreement_id,
-                       'id' : site_id, 'country': countries})
 
 
 @method_decorator(login_required, name='dispatch')

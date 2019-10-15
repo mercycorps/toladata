@@ -20,7 +20,7 @@ var baseLayers = {
 };
 
 
-let map = L.map('home_country_map',  {
+let map = L.map('country_map',  {
     touchZoom: false,
     scrollWheelZoom: false,
     attributionControl: false
