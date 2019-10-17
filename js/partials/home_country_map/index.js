@@ -39,18 +39,18 @@ function style(feat, i) {
         styling.fillColor = '#E3E3E3';
         styling.fillOpacity = .4;
     }
-    //console.log(feat.properties.ISO2);
-    //console.log(mapContext.userCountryCodes);
     styling.weight = 1;
     return styling;
 }
 
 function highlightFeature(e) {
     let layer = e.target;
-    let styling = style(layer.feature);
-    styling.fillOpacity = styling.fillOpacity * 2;
-    styling.opacity = 1;
-    layer.setStyle(styling);
+    if (layer.feature.properties.ISO2 == mapContext.code || mapContext.userCountryCodes[layer.feature.properties.ISO2]) {
+        let styling = style(layer.feature);
+        styling.fillOpacity = styling.fillOpacity * 2;
+        styling.opacity = 1;
+        layer.setStyle(styling);
+    }
 }
 
 function resetHighlight(e) {
@@ -98,5 +98,9 @@ mapContext.markers.forEach(
         overlayMaps[markerSet.label] = L.layerGroup(markers).addTo(map);
     }
 );
-L.control.layers({}, overlayMaps).addTo(map);
+let layerControl = L.control.layers({}, overlayMaps, {collapsed: false}).addTo(map).collapse();
+map.on('click', function(e) {
+    layerControl.collapse();
+});
+
 positron.addTo(map);
