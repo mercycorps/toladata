@@ -344,7 +344,7 @@ export class CountryStore {
         const new_disaggregation_data = {
             id: 'new',
             disaggregation_type: "",
-            labels: [],
+            labels: [{id: 'new', label: ''}],
         }
         if (this.editing_disaggregations_data.find(disaggregation => disaggregation.id=='new')) {
             return
