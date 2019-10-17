@@ -112,13 +112,13 @@ class DisaggregationType extends React.Component {
                 <div className="accordion-row__content">
                     <a onClick={expandAction} className="btn accordion-row__btn btn-link" tabIndex='0'>
                         <FontAwesomeIcon icon={expanded ? 'caret-down' : 'caret-right'} />
-                        {(disaggregation.id == 'new') ? "New Disaggregation type" : disaggregation.disaggregation_type}
+                        {(disaggregation.id == 'new') ? "New disaggregation" : disaggregation.disaggregation_type}
                     </a>
                     {expanded && (
                         <form className="form card card-body bg-white">
                             <div className="form-group">
                                 <label className="label--required" htmlFor="disaggregation-type-input">
-                                    {gettext('Disaggregation Type')}
+                                    {gettext('Disaggregation')}
                                 </label>
                                 <input
                                     id="disaggregation-type-input"
@@ -133,7 +133,7 @@ class DisaggregationType extends React.Component {
 
                             <div className="form-group">
                                 <label>
-                                    Labels
+                                    {gettext('Categories')}
                                 </label>
                                 {managed_data.labels.map((label, labelIndex) =>
                                     <div key={labelIndex} className="form-group disaggregation-label-group">
@@ -154,7 +154,7 @@ class DisaggregationType extends React.Component {
                                 )}
                                 <div>
                                     <a tabIndex="0" onClick={() => this.appendLabel()} className="btn btn-link btn-add">
-                                        <i className="fas fa-plus-circle"/>{gettext('Add another option')}
+                                        <i className="fas fa-plus-circle"/>{gettext('Add a category')}
                                     </a>
                                 </div>
                                 <div className="disaggregation-form-buttons">
@@ -242,7 +242,16 @@ export default class EditDisaggregations extends React.Component {
         const {expanded_id} = this.state
         return (
             <div className="tab-pane--react">
+            <div className="d-flex justify-content-between">
                 <h3>{gettext('Country Disaggregations')}</h3>
+                <div>
+                    {!disaggregations.find(d=> d.id=='new') && (
+                        <a tabIndex="0" className="btn btn-link btn-add" onClick={() => this.addDisaggregation()}>
+                            <i className="fas fa-plus-circle"/>{gettext("Add country disaggregation")}
+                        </a>
+                    )}
+                </div>
+            </div>
                 {disaggregations.map(disaggregation =>
                     <DisaggregationType
                         key={disaggregation.id}
@@ -257,13 +266,6 @@ export default class EditDisaggregations extends React.Component {
                         onIsDirtyChange={(is_dirty) => this.handleDirtyUpdate(is_dirty)}
                     />
                 )}
-                <div>
-                    {!disaggregations.find(d=> d.id=='new') && (
-                        <a tabIndex="0" className="btn btn-link btn-add" onClick={() => this.addDisaggregation()}>
-                            <i className="fas fa-plus-circle"/>{gettext("Add country disaggregation")}
-                        </a>
-                    )}
-                </div>
             </div>
         )
     }
