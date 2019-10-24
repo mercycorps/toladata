@@ -13,6 +13,8 @@
         "url": "git://github.com/mercycorps/TolaActivity.git"
     },
     "scripts": {
+        "install:prod": "npm install --no-optional --only=production",
+        "install:dev": "PATH=\"$(python -c $'import sys, os.path\nprint(os.path.dirname(os.path.realpath(sys.argv[1])))' `which python2`):$PATH\" npm install",
         "cpx-bootstrap-css": "cpx \"node_modules/bootstrap/dist/css/bootstrap.min.{css,css.map}\" $npm_package_config_css",
         "cpx-bootstrap-js": "cpx \"node_modules/bootstrap/dist/js/bootstrap.min.{js,js.map}\" $npm_package_config_js",
         "cpx-jquery-js": "cpx node_modules/jquery/dist/jquery.min.js $npm_package_config_js",
