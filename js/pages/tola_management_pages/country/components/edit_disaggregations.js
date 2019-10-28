@@ -159,19 +159,20 @@ class DisaggregationType extends React.Component {
                                 </div>
                                 <div className="disaggregation-form-buttons">
                                     <div className="form-row btn-row">
-                                        {disaggregation.id=='new' ? (
-                                            <button className="btn btn-primary" onClick={(e) => this.save()} type="button">{gettext('Save Changes')}</button>
-                                        ) : (
-                                            <button className="btn btn-primary" onClick={(e) => this.save()} type="button">{gettext('Save Changes')}</button>
-                                        )}
+                                        <button className="btn btn-primary" onClick={(e) => this.save()} type="button">{gettext('Save Changes')}</button>
                                         <button className="btn btn-reset" type="button" onClick={() => this.resetForm()}>{gettext('Reset')}</button>
                                     </div>
                                     <div className="right-buttons">
-                                        {disaggregation.id=='new' && (
-                                            <a tabIndex="0" onClick={deleteAction} className="btn btn-link btn-danger">
+                                        <a tabIndex="0" onClick={deleteAction} className="btn btn-link btn-danger">
+                                        {(disaggregation.id == 'new' || !disaggregation.has_indicators) ? <React.Fragment>
                                                 <i className="fas fa-trash"/>{gettext('Delete')}
-                                            </a>
-                                        )}
+                                            </React.Fragment> : <React.Fragment>
+                                                <i className="fas fa-archive"/>{
+                                                    // # Translators: this refers to the verb (a button that archives the selected item)
+                                                    gettext('Archive')
+                                                    }
+                                        </React.Fragment>}
+                                        </a>
                                     </div>
                                 </div>
                             </div>

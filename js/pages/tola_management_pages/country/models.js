@@ -355,16 +355,16 @@ export class CountryStore {
     @action deleteDisaggregation(id) {
         if (id=='new') {
             this.editing_disaggregations_data = this.editing_disaggregations_data.filter(disagg=>disagg.id!='new')
+            this.active_pane_is_dirty = false;
             return
         }
-        /*
         this.api.deleteDisaggregation(id).then(response => {
             runInAction(() => {
                 this.editing_disaggregations_data = this.editing_disaggregations_data.filter(disagg => disagg.id!=id)
+                this.active_pane_is_dirty = false;
                 this.onDeleteSuccessHandler()
             })
-        }
-        */
+        })
     }
 
     @action updateDisaggregation(id, data) {

@@ -1,4 +1,3 @@
-import json
 from collections import OrderedDict
 from django.db import transaction
 from django.db.models import Q
@@ -188,6 +187,7 @@ class CountryDisaggregationSerializer(serializers.ModelSerializer):
         required=False,
         many=True,
     )
+    has_indicators = serializers.BooleanField(read_only=True)
 
     class Meta:
         model = DisaggregationType
@@ -196,6 +196,7 @@ class CountryDisaggregationSerializer(serializers.ModelSerializer):
             'country',
             'disaggregation_type',
             'labels',
+            'has_indicators'
         )
 
     @transaction.atomic
