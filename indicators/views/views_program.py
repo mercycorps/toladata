@@ -206,6 +206,8 @@ def programs_rollup_export(request):
         p.gaitid if p.gaitid else "no gait id {}".format(count): {
             'gaitid': p.gaitid,
             'name': p.name,
+            'tola_creation_date': p.create_date.date().isoformat(),
+            'is_active': p.funding_status.lower().strip() == 'funded',
             'indicator_count': p.metrics['indicator_count'],
             'indicators_with_targets': p.metrics['targets_defined'],
             'indicators_with_results': p.metrics['reported_results'],
