@@ -105,7 +105,7 @@ class DisaggregationType extends React.Component {
     */
 
     render() {
-        const {disaggregation, expanded, expandAction, deleteAction, errors} = this.props
+        const {disaggregation, expanded, expandAction, deleteAction, archiveAction, errors} = this.props
         const {managed_data} = this.state
         return (
             <div className="accordion-row">
@@ -163,16 +163,18 @@ class DisaggregationType extends React.Component {
                                         <button className="btn btn-reset" type="button" onClick={() => this.resetForm()}>{gettext('Reset')}</button>
                                     </div>
                                     <div className="right-buttons">
-                                        <a tabIndex="0" onClick={deleteAction} className="btn btn-link btn-danger">
-                                        {(disaggregation.id == 'new' || !disaggregation.has_indicators) ? <React.Fragment>
-                                                <i className="fas fa-trash"/>{gettext('Delete')}
-                                            </React.Fragment> : <React.Fragment>
+                                        {(disaggregation.id == 'new' || !disaggregation.has_indicators) ? (
+                                            <a tabIndex="0" onClick={deleteAction} className="btn btn-link btn-danger">
+                                                <i className="fas fa-trash"/>{gettext('Delete disaggregation')}
+                                            </a>
+                                            ) : (
+                                            <a tabIndex="0" onClick={archiveAction} className="btn btn-link">
                                                 <i className="fas fa-archive"/>{
-                                                    // # Translators: this refers to the verb (a button that archives the selected item)
-                                                    gettext('Archive')
+                                                    // # Translators: this is a verb (on a button that archives the selected item)
+                                                    gettext('Archive disaggregation')
                                                     }
-                                        </React.Fragment>}
-                                        </a>
+                                            </a>
+                                        )}
                                     </div>
                                 </div>
                             </div>
@@ -261,6 +263,7 @@ export default class EditDisaggregations extends React.Component {
                         expandAction={() => this.toggleExpand(disaggregation.id)}
                         updateLabel={(labelIndex, value) => this.updateLabel(disaggregation.id, labelIndex, value)}
                         deleteAction={() => this.props.onDelete(disaggregation.id)}
+                        archiveAction={() => this.props.onArchive(disaggregation.id)}
                         saveDisaggregation={(data) => this.saveDisaggregation(data)}
                         errors={this.props.errors}
                         clearErrors={this.props.clearErrors}

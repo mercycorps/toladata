@@ -353,18 +353,47 @@ export class CountryStore {
     }
 
     @action deleteDisaggregation(id) {
-        if (id=='new') {
-            this.editing_disaggregations_data = this.editing_disaggregations_data.filter(disagg=>disagg.id!='new')
-            this.active_pane_is_dirty = false;
-            return
-        }
-        this.api.deleteDisaggregation(id).then(response => {
-            runInAction(() => {
-                this.editing_disaggregations_data = this.editing_disaggregations_data.filter(disagg => disagg.id!=id)
-                this.active_pane_is_dirty = false;
-                this.onDeleteSuccessHandler()
-            })
-        })
+        create_no_rationale_changeset_notice({
+            preamble: gettext("This action cannot be undone."),
+            // # Translators: This is a confirmation prompt to confirm a user wants to delete an item
+            message_text: gettext("Are you sure you want to delete this disaggregation?"),
+            on_submit: () => {
+                if (id=='new') {
+                    this.editing_disaggregations_data = this.editing_disaggregations_data.filter(disagg=>disagg.id!='new')
+                    this.active_pane_is_dirty = false;
+                    return
+                } else {
+                    this.api.deleteDisaggregation(id).then(response => {
+                        runInAction(() => {
+                            this.editing_disaggregations_data = this.editing_disaggregations_data.filter(disagg => disagg.id!=id)
+                            this.active_pane_is_dirty = false;
+                            this.onDeleteSuccessHandler()
+                        });
+                    });
+                }
+            },
+            on_cancel: () => {}
+        });
+    }
+    
+    @action archiveDisaggregation(id) {
+        create_no_rationale_changeset_notice({
+            // # Translators: This is part of a confirmation prompt to archive a type of disaggregation (e.g. "gender" or "age")
+            preamble: gettext("New programs will be unable to use this disaggregation. (Programs already using the disaggregation will be unaffected.)"),
+            // # Translators: This is a confirmation prompt to confirm a user wants to archive an item
+            message_text: gettext("Are you sure you want to continue?"),
+            type: 'notice',
+            on_submit: () => {
+                this.api.deleteDisaggregation(id).then(response => {
+                    runInAction(() => {
+                        this.editing_disaggregations_data = this.editing_disaggregations_data.filter(disagg => disagg.id!=id)
+                        this.active_pane_is_dirty = false;
+                        this.onDeleteSuccessHandler()
+                    });
+                });
+            },
+            on_cancel: () => {}
+        });
     }
 
     @action updateDisaggregation(id, data) {

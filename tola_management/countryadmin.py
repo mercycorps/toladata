@@ -235,3 +235,12 @@ class CountryDisaggregationViewSet(viewsets.ModelViewSet):
             queryset = queryset.filter(country__pk=countryFilter)
 
         return queryset
+
+    def destroy(self, request, pk=None):
+        print("destroy pk {}\nrequest: {}".format(pk, request))
+        disaggregation = DisaggregationType.objects.get(pk=pk)
+        if disaggregation.has_indicators:
+            print("has indicators: archive it")
+        else:
+            print("no indicators: delete it")
+        #return super().destroy(request, pk)
