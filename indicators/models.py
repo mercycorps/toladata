@@ -428,6 +428,15 @@ class DisaggregationType(models.Model):
     def __str__(self):
         return self.disaggregation_type
 
+    @classmethod
+    def program_disaggregations(cls, program_pk):
+        program = Program.rf_aware_objects.get(pk=program_pk)
+        return cls.objects.filter(
+            models.Q(standard=True) | models.Q(country__in=program.country.all())
+            ).filter(
+            models.Q(is_archived=False) | models.Q(indicator__program=program)
+            )
+
     @property
     def has_indicators(self):
         return self.indicator_set.exists()
