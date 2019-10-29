@@ -38,6 +38,7 @@ export const deleteObjective = (id) => api.delete(`/tola_management/countryobjec
 
 export const createDisaggregation = (data) => api.post('/tola_management/countrydisaggregation/', data)
 export const updateDisaggregation = (id, data) => api.put(`/tola_management/countrydisaggregation/${id}/`, data)
+export const partialUpdateDisaggregation = (id, data) => api.patch(`/tola_management/countrydisaggregation/${id}/`, data)
 export const deleteDisaggregation = (id) => api.delete(`/tola_management/countrydisaggregation/${id}`)
 
 
@@ -52,5 +53,6 @@ export default {
     deleteObjective,
     createDisaggregation,
     updateDisaggregation,
+    partialUpdateDisaggregation,
     deleteDisaggregation,
 }

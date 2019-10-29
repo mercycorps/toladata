@@ -139,6 +139,7 @@ export const IndexView = observer(
                                                         addDisaggregation={() => store.addDisaggregation()}
                                                         onDelete={(id) => store.deleteDisaggregation(id)}
                                                         onArchive={(id) => store.archiveDisaggregation(id)}
+                                                        onUnarchive={(id) => store.unarchiveDisaggregation(id)}
                                                         onUpdate={(id, data) => store.updateDisaggregation(id, data)}
                                                         onCreate={(data) => store.createDisaggregation(data)}
                                                         errors={store.editing_disaggregations_errors}

@@ -31,7 +31,7 @@ class DisaggregationType extends React.Component {
     }
 
     hasUnsavedDataAction() {
-        const labels = this.props.disaggregation.labels.map(x => ({...x}))
+        const labels = this.props.disaggregation.labels.map(x => ({...x}));
         this.props.onIsDirtyChange(JSON.stringify(this.state.managed_data) != JSON.stringify({...this.props.disaggregation, labels: [...labels]}))
     }
 
@@ -105,7 +105,7 @@ class DisaggregationType extends React.Component {
     */
 
     render() {
-        const {disaggregation, expanded, expandAction, deleteAction, archiveAction, errors} = this.props
+        const {disaggregation, expanded, expandAction, deleteAction, archiveAction, unarchiveAction, errors} = this.props
         const {managed_data} = this.state
         return (
             <div className="accordion-row">
@@ -114,6 +114,7 @@ class DisaggregationType extends React.Component {
                         <FontAwesomeIcon icon={expanded ? 'caret-down' : 'caret-right'} />
                         {(disaggregation.id == 'new') ? "New disaggregation" : disaggregation.disaggregation_type}
                     </a>
+                    {disaggregation.is_archived && <span className="text-muted font-weight-bold ml-2">(Archived)</span>}
                     {expanded && (
                         <form className="form card card-body bg-white">
                             <div className="form-group">
@@ -127,6 +128,7 @@ class DisaggregationType extends React.Component {
                                     onChange={(e) => this.updateDisaggregationTypeField(e.target.value)}
                                     type="text"
                                     required
+                                    disabled={disaggregation.is_archived}
                                 />
                                 <ErrorFeedback errorMessages={this.formErrors('disaggregation_type')} />
                             </div>
@@ -141,29 +143,40 @@ class DisaggregationType extends React.Component {
                                             value={label.label}
                                             onChange={(e) => this.updateLabel(labelIndex, e.target.value)}
                                             className={classNames("form-control", {"is-invalid": (errors.labels ? Object.keys(errors.labels[labelIndex]).length : false)})}
+                                            disabled={disaggregation.is_archived}
                                         />
+                                        {!disaggregation.is_archived &&
                                         <a
                                             tabIndex="0"
                                             onClick={() => this.deleteLabel(labelIndex)}
                                             className={classNames("btn btn-link btn-danger", {'disabled': label.in_use})}
-                                            disabled={label.in_use}
+                                            disabled={label.in_use || disaggregation.is_archived}
                                         >
                                             <i className="fas fa-trash"/>{gettext('Remove')}
-                                        </a>
+                                        </a>}
                                     </div>
                                 )}
-                                <div>
+                                {!disaggregation.is_archived && <div>
                                     <a tabIndex="0" onClick={() => this.appendLabel()} className="btn btn-link btn-add">
                                         <i className="fas fa-plus-circle"/>{gettext('Add a category')}
                                     </a>
-                                </div>
+                                </div>}
                                 <div className="disaggregation-form-buttons">
                                     <div className="form-row btn-row">
-                                        <button className="btn btn-primary" onClick={(e) => this.save()} type="button">{gettext('Save Changes')}</button>
-                                        <button className="btn btn-reset" type="button" onClick={() => this.resetForm()}>{gettext('Reset')}</button>
+                                        <button className="btn btn-primary" onClick={(e) => this.save()}
+                                            disabled={disaggregation.is_archived} type="button">{gettext('Save Changes')}</button>
+                                        <button className="btn btn-reset" type="button" onClick={() => this.resetForm()}
+                                            disabled={disaggregation.is_archived}>{gettext('Reset')}</button>
                                     </div>
                                     <div className="right-buttons">
-                                        {(disaggregation.id == 'new' || !disaggregation.has_indicators) ? (
+                                    {(disaggregation.is_archived) ? (
+                                        <a tabIndex="0" onClick={unarchiveAction} className="btn btn-link">
+                                            <i className="fas fa-archive"/>{
+                                                // # Translators: this is a verb (on a button that archives the selected item)
+                                                gettext('Unarchive disaggregation')
+                                                }
+                                        </a>
+                                    ) : ((disaggregation.id == 'new' || !disaggregation.has_indicators) ? (
                                             <a tabIndex="0" onClick={deleteAction} className="btn btn-link btn-danger">
                                                 <i className="fas fa-trash"/>{gettext('Delete disaggregation')}
                                             </a>
@@ -174,7 +187,8 @@ class DisaggregationType extends React.Component {
                                                     gettext('Archive disaggregation')
                                                     }
                                             </a>
-                                        )}
+                                        )
+                                    )}
                                     </div>
                                 </div>
                             </div>
@@ -233,7 +247,9 @@ export default class EditDisaggregations extends React.Component {
     saveDisaggregation(data) {
         const withCountry = Object.assign(data, {country: this.props.country_id})
         if (data.id == 'new') {
-            this.props.onCreate(withCountry)
+            this.props.onCreate(withCountry).then(
+                (success) => {if(success) {this.setState({expanded_id: null})}}
+            );
         } else {
             this.props.onUpdate(data.id, withCountry)
         }
@@ -264,6 +280,7 @@ export default class EditDisaggregations extends React.Component {
                         updateLabel={(labelIndex, value) => this.updateLabel(disaggregation.id, labelIndex, value)}
                         deleteAction={() => this.props.onDelete(disaggregation.id)}
                         archiveAction={() => this.props.onArchive(disaggregation.id)}
+                        unarchiveAction={() => this.props.onUnarchive(disaggregation.id)}
                         saveDisaggregation={(data) => this.saveDisaggregation(data)}
                         errors={this.props.errors}
                         clearErrors={this.props.clearErrors}

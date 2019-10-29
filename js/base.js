@@ -409,6 +409,7 @@ const create_changeset_notice = ({
                                 }
                             }
                             if(close) {
+                                document.getElementById('notification_blocking_div').style.display='none';
                                 notice.close();
                             }
                         }
@@ -422,6 +423,7 @@ const create_changeset_notice = ({
                             }
 
                             if(close) {
+                                document.getElementById('notification_blocking_div').style.display='none';
                                 notice.close();
                             }
                         }
@@ -435,6 +437,7 @@ const create_changeset_notice = ({
             if ($(e.target).is('.ui-pnotify-closer *')) {
                 let close = on_cancel();
                 if (close || close === undefined) {
+                    document.getElementById('notification_blocking_div').style.display='none';
                     notice.close();
                 }
         }});
@@ -542,7 +545,11 @@ window.create_no_rationale_changeset_notice = ({
     context = null,
     type = 'error',
     preamble = false,
+    blocking = false
 } = {}) => {
+    if (blocking) {
+        document.getElementById('notification_blocking_div').style.display='block';
+    }
     if (!message_text) {message_text = DEFAULT_NO_RATIONALE_TEXT}
     if (!preamble) {preamble = gettext("This action cannot be undone.")};
     const inner = `
