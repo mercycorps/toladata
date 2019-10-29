@@ -102,3 +102,19 @@ input[type=number]::-webkit-outer-spin-button {
     }
 }
 
+//div for preventing interaction with background while popup is active
+#notification_blocking_div {
+    /* Don't display on entry */
+    display:none;
+    /* 1001 _should_ be the highest z-index item on the page */
+    z-index: 1001;
+    /* cover whole content area */
+    position: absolute;
+    top: 0%;
+    left: 0%;
+    width: 100%;
+    height: 100%;
+    /* semi-transparent gray (visual feedback that div is hidden) */
+    background-color: gray;
+    opacity: .3;
+}
