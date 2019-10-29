@@ -119,6 +119,11 @@ class DisaggregationTypeAdmin(admin.ModelAdmin):
     list_filter = (DisaggregationTypeFilter, CountryFilter, 'standard')
     display = 'Disaggregation Type'
 
+    class Media:
+        js = (
+            'js/admin/disaggregation_admin.js',
+        )
+
     def get_queryset(self, request):
         queryset = super(DisaggregationTypeAdmin, self).get_queryset(request)
         if request.user.is_superuser is False:
