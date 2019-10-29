@@ -26,7 +26,7 @@ export const forProgramPage = (
             if (indicatorPk) {
                 api.indicatorResultsTable(indicatorPk).then(resultsHTML => {
                     runInAction(() => {
-                        this.resultsMap.set(indicatorPk, resultsHTML);
+                        this.resultsMap.set(parseInt(indicatorPk), resultsHTML);
                         return true;
                     });
                 });
