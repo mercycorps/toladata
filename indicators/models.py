@@ -421,6 +421,7 @@ class DisaggregationType(models.Model):
     description = models.CharField(_("Description"), max_length=765, blank=True)
     country = models.ForeignKey(Country, on_delete=models.SET_NULL, null=True, blank=True, verbose_name="Country")
     standard = models.BooleanField(default=False, verbose_name=_("Standard (TolaData Admins Only)"))
+    is_archived = models.BooleanField(default=False, verbose_name=_("Archived"))
     create_date = models.DateTimeField(_("Create date"), null=True, blank=True)
     edit_date = models.DateTimeField(_("Edit date"), null=True, blank=True)
 
