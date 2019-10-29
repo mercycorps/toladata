@@ -29,9 +29,15 @@ class TestDisaggregationIndicatorCounts(test.TestCase):
 
     def test_disaggregation_five_indicators(self):
         disagg = i_factories.DisaggregationTypeFactory(country=self.country)
-        for x in range(5):
+        for _ in range(5):
             indicator = i_factories.RFIndicatorFactory(program=self.program)
             indicator.disaggregation.add(disagg)
             indicator.save()
         disagg_from_db = DisaggregationType.objects.get(pk=disagg.pk)
         self.assertTrue(disagg_from_db.has_indicators)
+
+
+class TestArchivedDisaggregationQueryset(test.TestCase):
+    def setUp(self):
+        self.country = w_factories.CountryFactory()
+        country_b = w_factories.CountryFactory()
