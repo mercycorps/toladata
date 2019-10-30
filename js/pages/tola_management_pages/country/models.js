@@ -171,15 +171,23 @@ export class CountryStore {
     }
 
     onSaveSuccessHandler() {
-        PNotify.success({text: gettext("Successfully Saved"), delay: 5000})
+        PNotify.success({text: gettext("Successfully saved"), delay: 5000})
     }
 
     onSaveErrorHandler(message) {
-        PNotify.error({text: message || gettext("Saving Failed"), delay: 5000})
+        PNotify.error({text: message || gettext("Saving failed"), delay: 5000})
     }
 
     onDeleteSuccessHandler() {
-        PNotify.success({text: gettext("Successfully Deleted"), delay: 5000})
+        PNotify.success({text: gettext("Successfully deleted"), delay: 5000})
+    }
+    
+    onArchiveSuccessHandler() {
+        PNotify.success({text: gettext("Successfully archived"), delay: 5000})
+    }
+    
+    onUnarchiveSuccessHandler() {
+        PNotify.success({text: gettext("Successfully unarchived"), delay: 5000})
     }
 
     @observable active_editor_pane = 'profile'
@@ -353,22 +361,81 @@ export class CountryStore {
     }
 
     @action deleteDisaggregation(id) {
-        if (id=='new') {
-            this.editing_disaggregations_data = this.editing_disaggregations_data.filter(disagg=>disagg.id!='new')
-            return
-        }
-        /*
-        this.api.deleteDisaggregation(id).then(response => {
-            runInAction(() => {
-                this.editing_disaggregations_data = this.editing_disaggregations_data.filter(disagg => disagg.id!=id)
-                this.onDeleteSuccessHandler()
-            })
-        }
-        */
+        create_no_rationale_changeset_notice({
+            preamble: gettext("This action cannot be undone."),
+            // # Translators: This is a confirmation prompt to confirm a user wants to delete an item
+            message_text: gettext("Are you sure you want to delete this disaggregation?"),
+            on_submit: () => {
+                if (id=='new') {
+                    this.editing_disaggregations_data = this.editing_disaggregations_data.filter(disagg=>disagg.id!='new')
+                    this.active_pane_is_dirty = false;
+                    return
+                } else {
+                    this.api.deleteDisaggregation(id).then(response => {
+                        runInAction(() => {
+                            this.editing_disaggregations_data = this.editing_disaggregations_data.filter(disagg => disagg.id!=id)
+                            this.active_pane_is_dirty = false;
+                            this.onDeleteSuccessHandler()
+                        });
+                    });
+                }
+            },
+            on_cancel: () => {},
+            blocking: true
+        });
+    }
+    
+    @action archiveDisaggregation(id) {
+        create_no_rationale_changeset_notice({
+            // # Translators: This is part of a confirmation prompt to archive a type of disaggregation (e.g. "gender" or "age")
+            preamble: gettext("New programs will be unable to use this disaggregation. (Programs already using the disaggregation will be unaffected.)"),
+            // # Translators: This is a confirmation prompt to confirm a user wants to archive an item
+            message_text: gettext("Are you sure you want to continue?"),
+            type: 'notice',
+            on_submit: () => {
+                this.api.deleteDisaggregation(id).then(response => {
+                    runInAction(() => {
+                        this.editing_disaggregations_data.filter(disagg => disagg.id==id).forEach(
+                            disagg => {disagg.is_archived = true;}
+                        );
+                        this.active_pane_is_dirty = false;
+                        this.onArchiveSuccessHandler()
+                    });
+                });
+            },
+            on_cancel: () => {},
+            blocking: true
+        });
+    }
+    
+    @action unarchiveDisaggregation(id) {
+        let countryData = this.countries.find(country => country.id == this.editing_target);
+        let countryName = countryData ? countryData.country : "this country";
+        create_no_rationale_changeset_notice({
+            // # Translators: This is part of a confirmation prompt to unarchive a type of disaggregation (e.g. "gender" or "age")
+            preamble: interpolate(gettext("All programs in %s will be able to use this disaggregation."), [countryName]),
+            // # Translators: This is a confirmation prompt to confirm a user wants to unarchive an item
+            message_text: gettext("Are you sure you want to continue?"),
+            type: 'notice',
+            on_submit: () => {
+                this.api.partialUpdateDisaggregation(id, {is_archived: false}).then(response => {
+                    runInAction(() => {
+                        this.editing_disaggregations_data.filter(disagg => disagg.id==id).forEach(
+                            disagg => {disagg.is_archived = false;}
+                        );
+                        this.active_pane_is_dirty = false;
+                        this.onUnarchiveSuccessHandler()
+                    });
+                });
+            },
+            on_cancel: () => {},
+            blocking: true
+        });
     }
 
     @action updateDisaggregation(id, data) {
         this.editing_disaggregations_errors = {}
+        delete data.is_archived;
         this.api.updateDisaggregation(id, data).then(response => {
             runInAction(() => {
                 this.onSaveSuccessHandler()
@@ -390,19 +457,21 @@ export class CountryStore {
 
     @action createDisaggregation(data) {
         this.editing_disaggregations_errors = {}
-        this.api.createDisaggregation(data).then(response => {
+        return this.api.createDisaggregation(data).then(response => {
             runInAction(() => {
                 this.onSaveSuccessHandler()
                 const newDisaggregation = response.data
                 this.active_pane_is_dirty = false
                 this.editing_disaggregations_data = [...this.editing_disaggregations_data.filter(disaggregation => disaggregation.id!='new'), newDisaggregation]
-            })
+            });
+            return true;
         }).catch((errors) => {
             runInAction(() => {
                 this.saving = false
                 this.editing_disaggregations_errors = errors.response.data
                 this.onSaveErrorHandler()
-            })
+            });
+            return false;
         })
     }
 

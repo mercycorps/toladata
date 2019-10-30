@@ -65,7 +65,7 @@ class IndicatorType(models.Model):
     class Meta:
         verbose_name = _("Indicator Type")
 
-    def __unicode__(self):
+    def __str__(self):
         return self.indicator_type
 
 
@@ -87,7 +87,7 @@ class StrategicObjective(SafeDeleteModel):
         verbose_name = _("Country Strategic Objectives")
         ordering = ('country', 'name')
 
-    def __unicode__(self):
+    def __str__(self):
         return self.name
 
     def save(self, *args, **kwargs):
@@ -107,7 +107,7 @@ class Objective(models.Model):
         verbose_name = _("Program Objective")
         ordering = ('program', 'name')
 
-    def __unicode__(self):
+    def __str__(self):
         return self.name
 
     def save(self):
@@ -131,7 +131,7 @@ class Level(models.Model):
         verbose_name = _("Level")
         unique_together = ('parent', 'customsort')
 
-    def __unicode__(self):
+    def __str__(self):
         return self.name
 
     def save(self, *args, **kwargs):
@@ -383,7 +383,7 @@ class LevelTier(models.Model):
         verbose_name = _("Level Tier")
         unique_together = (('name', 'program'), ('program', 'tier_depth'))
 
-    def __unicode__(self):
+    def __str__(self):
         return self.name
 
     def save(self, *args, **kwargs):
@@ -406,7 +406,7 @@ class LevelTierTemplate(models.Model):
         # Translators: Indicators are assigned to Levels.  Levels are organized in a hierarchy of Tiers.  There are several templates that users can choose from with different names for the Tiers.
         verbose_name = _("Level tier templates")
 
-    def __unicode__(self):
+    def __str__(self):
         return ",".join(self.names)
 
     def save(self, *args, **kwargs):
@@ -421,11 +421,25 @@ class DisaggregationType(models.Model):
     description = models.CharField(_("Description"), max_length=765, blank=True)
     country = models.ForeignKey(Country, on_delete=models.SET_NULL, null=True, blank=True, verbose_name="Country")
     standard = models.BooleanField(default=False, verbose_name=_("Standard (TolaData Admins Only)"))
+    is_archived = models.BooleanField(default=False, verbose_name=_("Archived"))
     create_date = models.DateTimeField(_("Create date"), null=True, blank=True)
     edit_date = models.DateTimeField(_("Edit date"), null=True, blank=True)
 
-    def __unicode__(self):
+    def __str__(self):
         return self.disaggregation_type
+
+    @classmethod
+    def program_disaggregations(cls, program_pk):
+        program = Program.rf_aware_objects.get(pk=program_pk)
+        return cls.objects.filter(
+            models.Q(standard=True) | models.Q(country__in=program.country.all())
+            ).filter(
+            models.Q(is_archived=False) | models.Q(indicator__program=program)
+            )
+
+    @property
+    def has_indicators(self):
+        return self.indicator_set.exists()
 
 
 class DisaggregationLabel(models.Model):
@@ -436,7 +450,7 @@ class DisaggregationLabel(models.Model):
     create_date = models.DateTimeField(_("Create date"), null=True, blank=True)
     edit_date = models.DateTimeField(_("Edit date"), null=True, blank=True)
 
-    def __unicode__(self):
+    def __str__(self):
         return self.label
 
     @classmethod
@@ -451,7 +465,7 @@ class DisaggregationValue(models.Model):
     create_date = models.DateTimeField(_("Create date"), null=True, blank=True)
     edit_date = models.DateTimeField(_("Edit date"), null=True, blank=True)
 
-    def __unicode__(self):
+    def __str__(self):
         return self.value
 
 
@@ -476,7 +490,7 @@ class ReportingFrequency(models.Model):
     class Meta:
         verbose_name = _("Reporting Frequency")
 
-    def __unicode__(self):
+    def __str__(self):
         return self.frequency
 
 
@@ -495,7 +509,7 @@ class DataCollectionFrequency(models.Model):
     class Meta:
         verbose_name = _("Data Collection Frequency")
 
-    def __unicode__(self):
+    def __str__(self):
         return self.frequency
 
 
@@ -514,7 +528,7 @@ class ExternalService(models.Model):
     class Meta:
         verbose_name = _("External Service")
 
-    def __unicode__(self):
+    def __str__(self):
         return self.name
 
 
@@ -535,7 +549,7 @@ class ExternalServiceRecord(models.Model):
     class Meta:
         verbose_name = _("External Service Record")
 
-    def __unicode__(self):
+    def __str__(self):
         return self.full_url
 
 
@@ -1147,7 +1161,7 @@ class Indicator(SafeDeleteModel):
         verbose_name = _("Indicator")
         unique_together = ['level', 'level_order', 'deleted']
 
-    def __unicode__(self):
+    def __str__(self):
         return self.name
 
     def save(self, *args, **kwargs):
@@ -1616,7 +1630,7 @@ class PeriodicTarget(models.Model):
         # for time-based frequencies get translated name of period:
         return self.generate_annual_quarterly_period_name(target_frequency, self.customsort + 1)
 
-    def __unicode__(self):
+    def __str__(self):
         """outputs the period name (see period_name docstring) followed by start and end dates
 
         used in result form"""
@@ -1820,7 +1834,7 @@ class Result(models.Model):
         ordering = ('indicator', 'date_collected')
         verbose_name_plural = "Indicator Output/Outcome Result"
 
-    def __unicode__(self):
+    def __str__(self):
         return u'{}: {}'.format(self.indicator, self.periodic_target)
 
     def save(self, *args, **kwargs):

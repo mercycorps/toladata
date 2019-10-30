@@ -1,9 +1,9 @@
-import json
 from collections import OrderedDict
 from django.db import transaction
 from django.db.models import Q
 from rest_framework import viewsets
 from rest_framework.response import Response
+from rest_framework import status
 
 from rest_framework import serializers
 from rest_framework import permissions
@@ -188,6 +188,8 @@ class CountryDisaggregationSerializer(serializers.ModelSerializer):
         required=False,
         many=True,
     )
+    has_indicators = serializers.BooleanField(read_only=True)
+    is_archived = serializers.BooleanField(required=False)
 
     class Meta:
         model = DisaggregationType
@@ -196,19 +198,22 @@ class CountryDisaggregationSerializer(serializers.ModelSerializer):
             'country',
             'disaggregation_type',
             'labels',
+            'has_indicators',
+            'is_archived'
         )
 
     @transaction.atomic
     def update(self, instance, validated_data):
-        updated_label_data = validated_data.pop('disaggregationlabel_set')
-        current_labels = [label for label in instance.disaggregationlabel_set.all()]
-        removed_labels = [label for label in current_labels if label not in updated_label_data]
-        new_labels = [label for label in updated_label_data if label not in current_labels]
-        for label in new_labels:
-            label.disaggregation_type = instance
-            label.save()
-        for label in removed_labels:
-            label.delete()
+        updated_label_data = validated_data.pop('disaggregationlabel_set', None)
+        if not self.partial or updated_label_data is not None:
+            current_labels = [label for label in instance.disaggregationlabel_set.all()]
+            removed_labels = [label for label in current_labels if label not in updated_label_data]
+            new_labels = [label for label in updated_label_data if label not in current_labels]
+            for label in new_labels:
+                label.disaggregation_type = instance
+                label.save()
+            for label in removed_labels:
+                label.delete()
         updated_instance = super(CountryDisaggregationSerializer, self).update(instance, validated_data)
         return updated_instance
 
@@ -234,3 +239,13 @@ class CountryDisaggregationViewSet(viewsets.ModelViewSet):
             queryset = queryset.filter(country__pk=countryFilter)
 
         return queryset
+
+    def destroy(self, request, pk=None):
+        disaggregation = DisaggregationType.objects.get(pk=pk)
+        if disaggregation.has_indicators:
+            disaggregation.is_archived = True
+            disaggregation.save()
+            # TODO: try catch here in case of bad model / unarchivable?  Test whether archive is the right action?
+            return Response(status=status.HTTP_204_NO_CONTENT)
+        else:
+            return super().destroy(request, pk)

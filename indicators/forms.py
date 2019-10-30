@@ -134,8 +134,9 @@ class IndicatorForm(forms.ModelForm):
             for name, field in self.fields.items():
                 field.disabled = True
         countries = getCountry(self.request.user)
-        self.fields['disaggregation'].queryset = DisaggregationType.objects\
-            .filter(country__in=countries, standard=False)
+        self.fields['disaggregation'].queryset = DisaggregationType.program_disaggregations(
+            self.programval.pk
+        ).filter(standard=False)
         if self.programval._using_results_framework == Program.NOT_MIGRATED and Objective.objects.filter(program_id=self.programval.id).exists():
             self.fields['objectives'].queryset = Objective.objects.filter(program__id__in=[self.programval.id])
         else:
