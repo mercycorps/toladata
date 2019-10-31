@@ -4,8 +4,8 @@ import ReactDOM from 'react-dom';
 export default class HelpPopover extends React.Component {
     constructor(props) {
         super(props)
-        this.content = props.content;
         this.placement = props.placement || null;
+        this.popoverRef = props.innerRef || React.createRef();
     }
 
     render() {
@@ -16,12 +16,13 @@ export default class HelpPopover extends React.Component {
                 data-trigger="focus"
                 data-html="true"
                 data-placement={this.placement}
-                data-content={this.content}>
-            <i className="far fa-question-circle"></i></a>
+                data-content={this.props.content}
+                ref={this.popoverRef}
+                >
+            <i aria-label={ this.props.ariaText } className="far fa-question-circle"></i></a>
         )
     }
 }
-
 
 export class BootstrapPopoverButton extends React.Component {
     popoverName = 'base';
