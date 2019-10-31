@@ -73,18 +73,6 @@ class Command(BaseCommand):
             country='Tolaland', defaults={
                 'latitude': 21.4, 'longitude': -158, 'zoom': 6, 'organization': org, 'code': 'TO'})
 
-        # Create test users and assign broad permissions to superusers.
-        created_users, existing_users = self.create_test_users()
-        if len(created_users) > 0:
-            print('Created the following test users: {}'.format(', '.join(sorted(created_users))))
-        if len(existing_users) > 0:
-            print('The following test users already existed:'.format(', '.join(sorted(existing_users))))
-
-        for super_user in TolaUser.objects.filter(user__is_superuser=True):
-            ca, created = CountryAccess.objects.get_or_create(country=country, tolauser=super_user)
-            ca.role = 'basic_admin'
-            ca.save()
-
         main_start_date = (date.today() + relativedelta(months=-18)).replace(day=1)
         main_end_date = (main_start_date + relativedelta(months=+32)).replace(day=1) - timedelta(days=1)
 
@@ -268,6 +256,18 @@ class Command(BaseCommand):
             else:
                 self.create_levels(program.id, filtered_levels)
                 self.create_indicators(program.id, short_param_base)
+
+        # Create test users and assign broad permissions to superusers.
+        created_users, existing_users = self.create_test_users()
+        if len(created_users) > 0:
+            print('Created the following test users: {}'.format(', '.join(sorted(created_users))))
+        if len(existing_users) > 0:
+            print('The following test users already existed: {}'.format(', '.join(sorted(existing_users))))
+
+        for super_user in TolaUser.objects.filter(user__is_superuser=True):
+            ca, created = CountryAccess.objects.get_or_create(country=country, tolauser=super_user)
+            ca.role = 'basic_admin'
+            ca.save()
 
     @staticmethod
     def create_program(start_date, end_date, country, name, post_satsuma=True, multi_country=False):

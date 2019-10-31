@@ -810,7 +810,7 @@ class IndicatorTargetsMixin:
             most_recent_completed_target_end_date=models.Subquery(
                 PeriodicTarget.objects.filter(
                     indicator=models.OuterRef('pk'),
-                    end_date__lte=date.today()
+                    end_date__lt=date.today()
                 ).order_by('-end_date').values('end_date')[:1],
                 output_field=models.DateField()
             ),

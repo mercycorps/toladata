@@ -44,8 +44,8 @@ const api = {
         .then(response => response.data)
         .catch(this.logFailure);
     },
-    indicatorResultsTable(indicatorPk) {
-        return this.documentInstance.get(`/result_table/${indicatorPk}/`, {params: {raw: true}})
+    indicatorResultsTable(indicatorPk, editable) {
+        return this.documentInstance.get(`/result_table/${indicatorPk}/`, {params: {raw: true, edit: editable}})
             .then(response => response.data)
             .catch(this.logFailure);
     },
