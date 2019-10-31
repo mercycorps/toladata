@@ -73,7 +73,6 @@
                                 <a class="nav-link dropdown-toggle" href="#" id="navbarReportsDropdown" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">{% trans "Reports" %}</a>
                                 <div class="dropdown-menu" aria-labelledby="navbarReportsDropdown">
                                     <a class="dropdown-item" href="{% url 'iptt_quickstart' %}">{% trans "Indicator Performance Tracking Table" %}</a>
-                                    <a class="dropdown-item" href="{% url 'disrep_quickstart' %}">{% trans "Indicator Disaggregation Report" %}</a>
                                     {% if user.tola_user.allow_projects_access %}
                                     <a class="dropdown-item" href="/workflow/report/0/none">{% trans "Project Report" %}</a>
                                     {% endif %}
