@@ -422,6 +422,7 @@ class DisaggregationType(models.Model):
     country = models.ForeignKey(Country, on_delete=models.SET_NULL, null=True, blank=True, verbose_name="Country")
     standard = models.BooleanField(default=False, verbose_name=_("Standard (TolaData Admins Only)"))
     is_archived = models.BooleanField(default=False, verbose_name=_("Archived"))
+    selected_by_default = models.BooleanField(default=False)
     create_date = models.DateTimeField(_("Create date"), null=True, blank=True)
     edit_date = models.DateTimeField(_("Edit date"), null=True, blank=True)
 
@@ -433,9 +434,9 @@ class DisaggregationType(models.Model):
         program = Program.rf_aware_objects.get(pk=program_pk)
         return cls.objects.filter(
             models.Q(standard=True) | models.Q(country__in=program.country.all())
-            ).filter(
-            models.Q(is_archived=False) | models.Q(indicator__program=program)
-            )
+                ).filter(
+                    models.Q(is_archived=False) | models.Q(indicator__program=program)
+                )
 
     @property
     def has_indicators(self):
