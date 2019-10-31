@@ -199,7 +199,8 @@ class CountryDisaggregationSerializer(serializers.ModelSerializer):
             'disaggregation_type',
             'labels',
             'has_indicators',
-            'is_archived'
+            'is_archived',
+            'selected_by_default'
         )
 
     @transaction.atomic
