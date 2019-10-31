@@ -2,6 +2,7 @@ import React from 'react'
 import { observer } from "mobx-react"
 import classNames from 'classnames'
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome'
+import HelpPopover from "../../../../components/helpPopover";
 
 
 const ErrorFeedback = observer(({errorMessages}) => {
@@ -28,11 +29,20 @@ class DisaggregationType extends React.Component {
         this.state = {
             managed_data: {...disaggregation, labels: [...labels]},
         }
+        this.selectedByDefaultPopup = React.createRef();
     }
 
     hasUnsavedDataAction() {
         const labels = this.props.disaggregation.labels.map(x => ({...x}));
         this.props.onIsDirtyChange(JSON.stringify(this.state.managed_data) != JSON.stringify({...this.props.disaggregation, labels: [...labels]}))
+    }
+    
+    componentDidUpdate = () => {
+        if (this.selectedByDefaultPopup.current) {
+            $(this.selectedByDefaultPopup.current).popover({
+                html: true
+            });
+        }
     }
 
     resetForm() {
@@ -55,6 +65,15 @@ class DisaggregationType extends React.Component {
                 disaggregation_type: value,
             },
         }, () => this.hasUnsavedDataAction())
+    }
+    
+    updateSelectedByDefault(checked) {
+        this.setState({
+            managed_data: {
+                ...this.state.managed_data,
+                selected_by_default: checked == true
+            }
+        }, () => this.hasUnsavedDataAction());
     }
 
     updateLabel(labelIndex, value) {
@@ -94,16 +113,6 @@ class DisaggregationType extends React.Component {
         this.props.saveDisaggregation(managed_data)
     }
 
-    /* could be used to add deletion, but this is not currently spec'd
-    canDelete(disaggregation) {
-        const labels_inuse = disaggregation.labels.some(label=>label.in_use)
-        if ((disaggregation.id == 'new') || !labels_inuse ) {
-            return true
-        }
-        return false
-    }
-    */
-
     render() {
         const {disaggregation, expanded, expandAction, deleteAction, archiveAction, unarchiveAction, errors} = this.props
         const {managed_data} = this.state
@@ -131,6 +140,25 @@ class DisaggregationType extends React.Component {
                                     disabled={disaggregation.is_archived}
                                 />
                                 <ErrorFeedback errorMessages={this.formErrors('disaggregation_type')} />
+                            </div>
+                            <div className="form-check">
+                                <input className="form-check-input" type="checkbox" checked={managed_data.selected_by_default}
+                                       onChange={(e) => {this.updateSelectedByDefault(e.target.checked)}} id="selected-by-default-checkbox"
+                                        disabled={disaggregation.is_archived} />
+                                <label className="form-check-label" htmlFor="selected-by-default-checkbox">
+                                {
+                                    // # Translators: This labels a checkbox, when checked, it will make the associated item "on" (selected) for all new indicators
+                                    gettext('Selected by default')
+                                }
+                                </label>
+                                <HelpPopover
+                                    key={1}
+                                    content={`<p>${gettext('When adding a program indicator, this disaggregation will be selected by default.  (It can be unselected for specific indicators)')}</p>
+                                              <p>${gettext('This option is recommended for disaggregations that are required for all programs in a country, regardless of sector.')}</p>`}
+                                    placement="right"
+                                    innerRef={this.selectedByDefaultPopup}
+                                    ariaText={gettext('More information on "selected by default"')}
+                                />
                             </div>
 
                             <div className="form-group">
