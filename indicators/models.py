@@ -417,10 +417,10 @@ class LevelTierTemplate(models.Model):
 
 
 class DisaggregationType(models.Model):
-    disaggregation_type = models.CharField(_("Disaggregation type"), max_length=135, blank=True)
-    description = models.CharField(_("Description"), max_length=765, blank=True)
+    """Business logic name: Disaggregation - e.g. `Gender` or `SADD`"""
+    disaggregation_type = models.CharField(_("Disaggregation"), max_length=135)
     country = models.ForeignKey(Country, on_delete=models.SET_NULL, null=True, blank=True, verbose_name="Country")
-    standard = models.BooleanField(default=False, verbose_name=_("Standard (TolaData Admins Only)"))
+    standard = models.BooleanField(default=False, verbose_name=_("Global (all programs, all countries)"))
     is_archived = models.BooleanField(default=False, verbose_name=_("Archived"))
     selected_by_default = models.BooleanField(default=False)
     create_date = models.DateTimeField(_("Create date"), null=True, blank=True)
@@ -443,13 +443,18 @@ class DisaggregationType(models.Model):
         return self.indicator_set.exists()
 
 
+
 class DisaggregationLabel(models.Model):
+    """Business logic name: Category - e.g. `Male` or `Females aged 16-24`"""
     disaggregation_type = models.ForeignKey(DisaggregationType, on_delete=models.CASCADE,
-                                            verbose_name=_("Disaggregation type"))
-    label = models.CharField(_("Label"), max_length=765, blank=True)
-    customsort = models.IntegerField(_("Customsort"), blank=True, null=True)
+                                            verbose_name=_("Disaggregation"))
+    label = models.CharField(_("Label"), max_length=765)
+    customsort = models.PositiveSmallIntegerField(_("Sort order"), default=0, blank=False, null=False)
     create_date = models.DateTimeField(_("Create date"), null=True, blank=True)
     edit_date = models.DateTimeField(_("Edit date"), null=True, blank=True)
+
+    class Meta:
+        ordering = ['customsort']
 
     def __str__(self):
         return self.label
@@ -461,7 +466,7 @@ class DisaggregationLabel(models.Model):
 
 class DisaggregationValue(models.Model):
     disaggregation_label = models.ForeignKey(DisaggregationLabel, on_delete=models.CASCADE,
-                                             verbose_name=_("Disaggregation label"))
+                                             verbose_name=_("Disaggregation category"))
     value = models.CharField(_("Value"), max_length=765, blank=True)
     create_date = models.DateTimeField(_("Create date"), null=True, blank=True)
     edit_date = models.DateTimeField(_("Edit date"), null=True, blank=True)

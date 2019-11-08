@@ -270,7 +270,6 @@ class DisaggregationTypeFactory(DjangoModelFactory):
     class Meta:
         model = DisaggregationTypeM
     disaggregation_type = Sequence(lambda n: "disagg type {0}".format(n))
-    description = "disaggregation description"
     country = SubFactory(CountryFactory)
 
 class DataCollectionFrequencyFactory(DjangoModelFactory):
