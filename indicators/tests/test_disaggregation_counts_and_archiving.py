@@ -5,7 +5,7 @@ from factories import (
     indicators_models as i_factories,
     workflow_models as w_factories
 )
-from indicators.models import DisaggregationType
+from indicators.models import DisaggregationType, DisaggregationLabel
 from django import test
 
 
@@ -96,7 +96,8 @@ class TestArchivedDisaggregationQueryset(test.TestCase):
 
     def test_full_scenario(self):
         standard = i_factories.DisaggregationTypeFactory(country=None, standard=True)
-        standard_archived = i_factories.DisaggregationTypeFactory(country=None, standard=True, is_archived=True)
+        # standard, archived:
+        i_factories.DisaggregationTypeFactory(country=None, standard=True, is_archived=True)
         standard_archived_in_use_a = i_factories.DisaggregationTypeFactory(
             country=None, standard=True, is_archived=True
         )
@@ -110,13 +111,16 @@ class TestArchivedDisaggregationQueryset(test.TestCase):
         indicator_b.disaggregation.add(standard_archived_in_use_b)
         indicator_b.save()
         in_country = i_factories.DisaggregationTypeFactory(country=self.country)
-        in_country_archived = i_factories.DisaggregationTypeFactory(country=self.country, is_archived=True)
+        # in-country, archived:
+        i_factories.DisaggregationTypeFactory(country=self.country, is_archived=True)
         in_country_archived_in_use = i_factories.DisaggregationTypeFactory(country=self.country, is_archived=True)
         indicator_c = i_factories.RFIndicatorFactory(program=self.program)
         indicator_c.disaggregation.add(in_country_archived_in_use)
         indicator_c.save()
-        out_of_country = i_factories.DisaggregationTypeFactory(country=self.country_b)
-        out_of_country_archived = i_factories.DisaggregationTypeFactory(country=self.country_b, is_archived=True)
+        # out-of-country:
+        i_factories.DisaggregationTypeFactory(country=self.country_b)
+        # out-of-country, archived:
+        i_factories.DisaggregationTypeFactory(country=self.country_b, is_archived=True)
         out_of_country_archived_in_use = i_factories.DisaggregationTypeFactory(
             country=self.country_b, is_archived=True
         )
