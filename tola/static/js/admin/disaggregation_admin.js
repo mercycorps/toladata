@@ -13,5 +13,5 @@ document.addEventListener("DOMContentLoaded", function() {
                 this.checked = true;
             }
         }
-    })
-})
+    });
+});

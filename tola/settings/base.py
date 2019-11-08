@@ -263,7 +263,8 @@ THIRD_PARTY_APPS = (
     'widget_tweaks',
     'webpack_loader',
     'safedelete',
-    'django_mysql'
+    'django_mysql',
+    'adminsortable2',
 )
 
 # Apps specific for this project go here.
