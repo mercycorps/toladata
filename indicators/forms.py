@@ -129,7 +129,7 @@ class IndicatorForm(forms.ModelForm):
 
     class Meta:
         model = Indicator
-        exclude = ['create_date', 'edit_date', 'level_order', 'program']
+        exclude = ['create_date', 'edit_date', 'level_order', 'program', 'disaggregation']
         widgets = {
             'definition': forms.Textarea(attrs={'rows': 4}),
             'justification': forms.Textarea(attrs={'rows': 4}),
@@ -207,10 +207,27 @@ class IndicatorForm(forms.ModelForm):
         if not self.request.has_write_access:
             for name, field in self.fields.items():
                 field.disabled = True
-        countries = getCountry(self.request.user)
-        self.fields['disaggregation'].queryset = DisaggregationType.program_disaggregations(
-            self.programval.pk
-        ).filter(standard=False)
+
+        countries = self.request.user.tola_user.available_countries
+        global_disaggs, countries_disaggs = DisaggregationType.program_disaggregations(
+            self.programval.pk, countries=countries
+        )
+        self.fields['grouped_disaggregations'] = GroupedMultipleChoiceField(
+            [(_('Global disaggregations'), [(disagg.pk, str(disagg)) for disagg in global_disaggs])] +
+            [(_('%(country_name)s disaggregations') % {'country_name': country_name},
+              [(disagg.pk, str(disagg)) for disagg in country_disaggs])
+                for country_name, country_disaggs in countries_disaggs]
+        )
+        if indicator:
+            self.fields['grouped_disaggregations'].initial = [
+                disagg.pk for disagg in indicator.disaggregation.all()
+                ]
+        else:
+            self.fields['grouped_disaggregations'].initial = (
+                [disagg.pk for disagg in global_disaggs if disagg.selected_by_default] +
+                [disagg.pk for country_name, country_disaggs in countries_disaggs
+                 for disagg in country_disaggs if disagg.selected_by_default]
+            )
         if self.programval._using_results_framework == Program.NOT_MIGRATED and Objective.objects.filter(program_id=self.programval.id).exists():
             self.fields['objectives'].queryset = Objective.objects.filter(program__id__in=[self.programval.id])
         else:
@@ -262,12 +279,29 @@ class IndicatorForm(forms.ModelForm):
             )
         return level
 
+    def update_disaggregations(self, instance):
+        # collect disaggs that this user doesn't have access to and don't touch them:
+        existing_disaggregations = instance.disaggregation.exclude(
+            pk__in=self.fields['grouped_disaggregations'].values_list
+        )
+        instance.disaggregation.set(
+            DisaggregationType.objects.filter(
+                Q(pk__in=self.cleaned_data.get('grouped_disaggregations', [])) |
+                Q(pk__in=existing_disaggregations)
+            )
+        )
+        return instance
 
     def save(self, commit=True):
         # set the program on the indicator on create (it's already set on update)
         if self.instance.program_id is None:
             self.instance.program_id = self.programval.id
-        return super(IndicatorForm, self).save(commit)
+        instance = super().save(commit=False)
+        if commit:
+            instance.save()
+            instance = self.update_disaggregations(instance)
+            self.save_m2m()
+        return instance
 
 
 class ResultForm(forms.ModelForm):

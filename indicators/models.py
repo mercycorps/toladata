@@ -430,18 +430,35 @@ class DisaggregationType(models.Model):
         return self.disaggregation_type
 
     @classmethod
-    def program_disaggregations(cls, program_pk):
+    def program_disaggregations(cls, program_pk, countries=None):
+        """Takes a program or program_pk and returns all disaggregations available to that program
+
+            - returns (list of global disaggs, list of tuples (country name, list of country disaggs))
+            - filters for not-archived, or in use by program (even after archiving, actively in-use disaggs
+                are still available to a program
+        """
         program = Program.rf_aware_objects.get(pk=program_pk)
-        return cls.objects.filter(
-            models.Q(standard=True) | models.Q(country__in=program.country.all())
+        country_set = program.country.all()
+        if countries is not None:
+            country_set = country_set.filter(pk__in=[c.pk for c in countries])
+        disaggs = cls.objects.filter(
+            models.Q(standard=True) | models.Q(country__in=country_set)
                 ).filter(
                     models.Q(is_archived=False) | models.Q(indicator__program=program)
                 )
+        return (
+            disaggs.filter(standard=True),
+            [
+                (country_name, disaggs.filter(country=country_pk))
+                for country_pk, country_name in disaggs.filter(
+                    standard=False
+                ).values_list('country', 'country__country').distinct()
+            ]
+        )
 
     @property
     def has_indicators(self):
         return self.indicator_set.exists()
-
 
 
 class DisaggregationLabel(models.Model):
