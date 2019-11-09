@@ -1,0 +1,14 @@
+{% with id=widget.attrs.id %}
+    <div{% if widget.attrs.class %} class="{{ widget.attrs.class }}"{% endif %}{% if id %} id="{{ id }}"{% endif %}>
+    {% for group, options, index in widget.optgroups %}
+        {% if group %}
+            <fieldset{% if id %} id="{{ id }}_{{ index }}"{% endif %}>
+                <legend class="col-form-label">{{ group }}</legend>
+        {% endif %}
+        {% for option in options %}
+            {% include option.template_name with widget=option %}
+        {% endfor %}
+        {% if group %}</fieldset>{% endif %}
+    {% endfor %}
+    </div>
+{% endwith %}

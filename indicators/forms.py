@@ -1,3 +1,4 @@
+# -*- coding: utf-8 -*-
 import uuid
 from datetime import timedelta
 
@@ -26,6 +27,79 @@ from django.db.models import Q
 from django import forms
 from django.utils.translation import ugettext_lazy as _
 from django.utils import formats, translation, timezone
+
+
+class GroupCheckboxSelectMultipleWidget(forms.CheckboxSelectMultiple):
+    template_name = 'forms/widgets/groupcheckbox_select.html'
+    option_template_name = 'forms/widgets/groupcheckbox_option.html'
+
+    def __init__(self, attrs=None, title=None, order=0, choices=()):
+        self.title = title
+        self.order = order
+        super().__init__(attrs, choices)
+
+    def get_context(self, *args):
+        context = super().get_context(*args)
+        context['widget'].update(
+            {'title': self.title}
+            )
+        return context
+
+    def value_from_datadict(self, data, files, name):
+        value = super().value_from_datadict(data, files, name)
+        if isinstance(value, list):
+            return value
+        if value is None:
+            return []
+        return [value]
+
+
+class GroupedMultipleChoiceWidget(forms.MultiWidget):
+    template_name = 'forms/widgets/collapsed_groups.html'
+
+    def __init__(self, groups, **kwargs):
+        groups = [group for group in groups if group[1]]
+        self.values_map = [[option[0] for option in group[1]] for group in groups]
+        widgets = [
+            GroupCheckboxSelectMultipleWidget(title=group[0], choices=group[1], order=c)
+            for c, group in enumerate(groups)
+        ]
+        super().__init__(widgets, **kwargs)
+
+    def get_context(self, name, value, attrs):
+        value = self.decompress(value)
+        context = super().get_context(name, value, attrs)
+        return context
+
+    def decompress(self, value):
+        if value is None:
+            return [[] for subwidget in self.values_map]
+        return [
+            [v for v in value if v in option_list]
+            for option_list in self.values_map
+        ]
+
+    def value_from_datadict(self, data, files, name):
+        return [value for values_list in super().value_from_datadict(data, files, name) for value in values_list]
+
+class GroupedMultipleChoiceField(forms.Field):
+    def __init__(self, groups, **kwargs):
+        self.groups = groups
+        kwargs = {
+            'required': False,
+            **kwargs,
+            'widget': GroupedMultipleChoiceWidget(groups)
+        }
+        super().__init__(**kwargs)
+
+    @property
+    def values_list(self):
+        return [option[0] for group in self.groups for option in group[1]]
+
+    def clean(self, value):
+        value = super().clean(value)
+        value = [v for v in value if v in self.values_list]
+        return value
 
 
 class PTFormInputsForm(forms.ModelForm):
