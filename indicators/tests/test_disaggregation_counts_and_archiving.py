@@ -49,33 +49,38 @@ class TestArchivedDisaggregationQueryset(test.TestCase):
 
     def test_all_country_disaggregations_in_program(self):
         created_disaggs = [i_factories.DisaggregationTypeFactory(country=self.country) for _ in range(5)]
-        disaggs = DisaggregationType.program_disaggregations(self.program.pk)
-        self.assertEqual(sorted([d.pk for d in created_disaggs]), sorted([d.pk for d in disaggs]))
+        _, disaggs = DisaggregationType.program_disaggregations(self.program.pk)
+        self.assertEqual(len(disaggs), 1)
+        self.assertEqual(disaggs[0][0], "TolaLand IN")
+        self.assertEqual(sorted([d.pk for d in created_disaggs]), sorted([d.pk for d in disaggs[0][1]]))
 
     def test_out_of_country_disaggregations_not_in_program(self):
         created_disagg = i_factories.DisaggregationTypeFactory(country=self.country)
         i_factories.DisaggregationTypeFactory(country=self.country_b)
-        disaggs = DisaggregationType.program_disaggregations(self.program.pk)
-        self.assertEqual(len(disaggs), 1)
-        self.assertEqual(disaggs[0].pk, created_disagg.pk)
+        _, disaggs = DisaggregationType.program_disaggregations(self.program.pk)
+        self.assertEqual(len(disaggs[0][1]), 1)
+        self.assertEqual(disaggs[0][1][0].pk, created_disagg.pk)
 
     def test_standard_disaggregations_in_program(self):
         standard_disagg = i_factories.DisaggregationTypeFactory(country=None, standard=True)
         created_disagg = i_factories.DisaggregationTypeFactory(country=self.country)
-        disaggs = DisaggregationType.program_disaggregations(self.program.pk)
-        self.assertEqual(len(disaggs), 2)
-        self.assertEqual(sorted([d.pk for d in disaggs]), sorted([standard_disagg.pk, created_disagg.pk]))
+        global_disaggs, country_disaggs = DisaggregationType.program_disaggregations(self.program.pk)
+        self.assertEqual(len(global_disaggs), 1)
+        self.assertEqual(global_disaggs[0].pk, standard_disagg.pk)
+        self.assertEqual(len(country_disaggs), 1)
+        self.assertEqual(country_disaggs[0][0], "TolaLand IN")
+        self.assertEqual(country_disaggs[0][1][0].pk, created_disagg.pk)
 
     def test_archived_in_country_disaggregations_not_in_program(self):
         not_archived = i_factories.DisaggregationTypeFactory(country=self.country)
         i_factories.DisaggregationTypeFactory(country=self.country, is_archived=True)
-        disaggs = DisaggregationType.program_disaggregations(self.program.pk)
-        self.assertEqual([d.pk for d in disaggs], [not_archived.pk])
+        _, disaggs = DisaggregationType.program_disaggregations(self.program.pk)
+        self.assertEqual([d.pk for d in disaggs[0][1]], [not_archived.pk])
 
     def test_archived_standard_disaggregations_not_in_program(self):
         not_archived = i_factories.DisaggregationTypeFactory(country=None, standard=True)
         i_factories.DisaggregationTypeFactory(country=None, standard=True, is_archived=True)
-        disaggs = DisaggregationType.program_disaggregations(self.program.pk)
+        disaggs, _ = DisaggregationType.program_disaggregations(self.program.pk)
         self.assertEqual([d.pk for d in disaggs], [not_archived.pk])
 
     def test_archived_disagg_in_use_in_program(self):
@@ -83,15 +88,15 @@ class TestArchivedDisaggregationQueryset(test.TestCase):
         indicator = i_factories.RFIndicatorFactory(program=self.program)
         indicator.disaggregation.add(archived_in_use)
         indicator.save()
-        disaggs = DisaggregationType.program_disaggregations(self.program.pk)
-        self.assertEqual([d.pk for d in disaggs], [archived_in_use.pk])
+        _, disaggs = DisaggregationType.program_disaggregations(self.program.pk)
+        self.assertEqual([d.pk for d in disaggs[0][1]], [archived_in_use.pk])
 
     def test_archived_standard_disagg_in_use_in_program(self):
         archived_in_use = i_factories.DisaggregationTypeFactory(country=None, standard=True, is_archived=True)
         indicator = i_factories.RFIndicatorFactory(program=self.program)
         indicator.disaggregation.add(archived_in_use)
         indicator.save()
-        disaggs = DisaggregationType.program_disaggregations(self.program.pk)
+        disaggs, _ = DisaggregationType.program_disaggregations(self.program.pk)
         self.assertEqual([d.pk for d in disaggs], [archived_in_use.pk])
 
     def test_full_scenario(self):
@@ -127,12 +132,18 @@ class TestArchivedDisaggregationQueryset(test.TestCase):
         indicator_d = i_factories.RFIndicatorFactory(program=self.program_b)
         indicator_d.disaggregation.add(out_of_country_archived_in_use)
         indicator_d.save()
-        disaggs = DisaggregationType.program_disaggregations(self.program.pk)
+        global_disaggs, country_disaggs = DisaggregationType.program_disaggregations(self.program.pk)
         self.assertEqual(
-            sorted([d.pk for d in disaggs]),
+            sorted([d.pk for d in global_disaggs]),
             sorted([
                 standard.pk,
-                standard_archived_in_use_a.pk,
+                standard_archived_in_use_a.pk
+                ])
+        )
+        self.assertEqual(len(country_disaggs), 1)
+        self.assertEqual(
+            sorted([d.pk for d in country_disaggs[0][1]]),
+            sorted([
                 in_country.pk,
                 in_country_archived_in_use.pk
             ])

@@ -103,6 +103,7 @@ class RFIndicatorFactory(DjangoModelFactory):
     name = Faker('company')
     target_frequency = IndicatorM.ANNUAL
     lop_target = 1400
+    unit_of_measure = FuzzyChoice(['cats', 'bananas', 'tennis rackets', 'dollars'])
 
     @post_generation
     def targets(self, create, extracted, **kwargs):
