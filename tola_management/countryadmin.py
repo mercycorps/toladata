@@ -156,11 +156,13 @@ class CountryObjectiveViewset(viewsets.ModelViewSet):
 class NestedDisaggregationLabelSerializer(serializers.ModelSerializer):
     id = serializers.IntegerField(required=False, allow_null=True)
     label = serializers.CharField(required=True)
+    customsort = serializers.IntegerField(required=True)
     class Meta:
         model = DisaggregationLabel
         fields = (
             'id',
             'label',
+            'customsort'
         )
 
     def to_representation(self, disaggregation_label):
@@ -173,9 +175,10 @@ class NestedDisaggregationLabelSerializer(serializers.ModelSerializer):
             data.pop('id')
         validated_data = super(NestedDisaggregationLabelSerializer, self).to_internal_value(data)
         instance = None
-        if validated_data.get(id):
-            instance = DisaggregationLabel.objects.get(pk=validated_data.id)
-            instance.update(**validated_data)
+        if validated_data.get('id'):
+            instance = DisaggregationLabel.objects.get(pk=validated_data.pop('id'))
+            for field, value in validated_data.items():
+                setattr(instance, field, value)
         else:
             instance = DisaggregationLabel(**validated_data)
         return instance
@@ -212,6 +215,8 @@ class CountryDisaggregationSerializer(serializers.ModelSerializer):
             new_labels = [label for label in updated_label_data if label not in current_labels]
             for label in new_labels:
                 label.disaggregation_type = instance
+                label.save()
+            for label in updated_label_data:
                 label.save()
             for label in removed_labels:
                 label.delete()

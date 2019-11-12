@@ -1,5 +1,6 @@
 import React from 'react'
 import { observer } from "mobx-react"
+import { DragDropContext, Droppable, Draggable } from 'react-beautiful-dnd';
 import classNames from 'classnames'
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome'
 import HelpPopover from "../../../../components/helpPopover";
@@ -17,6 +18,91 @@ const ErrorFeedback = observer(({errorMessages}) => {
         </div>
     )
 })
+
+
+class CategoryItem extends React.Component {
+    render() {
+        let errors = this.props.errors;
+        let label = this.props.label;
+        let labelIndex = this.props.labelIndex;
+        return (
+            <Draggable draggableId={`category-${this.props.labelIndex}`} index={this.props.labelIndex}>
+                {(provided, snapshot) => (
+                    <div className="form-group disaggregation-label-group"
+                        ref={ provided.innerRef }
+                        {...provided.draggableProps}   
+                    >
+                    <span className="draggable-arrow" {...provided.dragHandleProps}>
+                        <i className="fas fa-arrows-alt fa-lg"></i>
+                    </span>
+                    <div className="form-group col-md-8">
+                        <input
+                            value={label.label}
+                            onChange={(e) => this.props.updateLabel(labelIndex, {label: e.target.value})}
+                            className={classNames("form-control", {"is-invalid": (errors.labels ? Object.keys(errors.labels[labelIndex]).length : false)})}
+                            disabled={this.props.disabled}
+                        />
+                    </div>
+                    <div className="form-group col-md-2">
+                        <input
+                            value={label.customsort}
+                            onChange={(e) => this.props.updateLabel(labelIndex, {customsort: e.target.value})}
+                                className="form-control" disabled={this.props.disabled}
+                        />
+                    </div>
+                    {!this.props.disabled &&
+                    <a
+                        tabIndex="0"
+                        onClick={() => this.props.deleteLabel(labelIndex)}
+                        className={classNames("btn btn-link btn-danger", {'disabled': label.in_use})}
+                        disabled={label.in_use || this.props.disabled}
+                    >
+                        <i className="fas fa-trash"/>{gettext('Remove')}
+                    </a>}
+                    </div>
+                )}
+            </Draggable>
+        )
+    }
+}
+
+class CategoryList extends React.Component {
+    onBeforeDragStart = () => {
+        /* ... */
+    }
+    
+    onDragStart = () => {
+        /* ... */
+    }
+    
+    onDragUpdate = () => {
+        /* ... */
+    }
+    
+    onDragEnd = () => {
+        /* ... */
+    }
+    
+    render() {
+        return (
+            <DragDropContext
+                onBeforeDragStart={this.onBeforeDragStart}
+                onDragStart={this.onDragStart}
+                onDragUpdate={this.onDragUpdate}
+                onDragEnd={this.onDragEnd}
+              >
+                <Droppable droppableId="categoryList">
+                    {(provided, snapshot) => (
+                        <div ref={provided.innerRef} {...provided.droppableProps}>
+                            { this.props.children }
+                            { provided.placeholder }
+                        </div>
+                    )}
+                </Droppable>
+            </DragDropContext>
+        )
+    }
+}
 
 
 @observer
@@ -80,7 +166,7 @@ class DisaggregationType extends React.Component {
         const {managed_data} = this.state
         const updatedLabels = this.state.managed_data.labels.map((label, idx) => {
             if (idx==labelIndex) {
-                return Object.assign(label, {label: value})
+                return Object.assign(label, value)
             }
             return label
         })
@@ -110,6 +196,7 @@ class DisaggregationType extends React.Component {
 
     save() {
         const {managed_data} = this.state
+        console.log("state", this.state);
         this.props.saveDisaggregation(managed_data)
     }
 
@@ -145,7 +232,8 @@ class DisaggregationType extends React.Component {
                                 <input className="form-check-input" type="checkbox" checked={managed_data.selected_by_default}
                                        onChange={(e) => {this.updateSelectedByDefault(e.target.checked)}} id="selected-by-default-checkbox"
                                         disabled={disaggregation.is_archived} />
-                                <label className="form-check-label" htmlFor="selected-by-default-checkbox">
+                                <nobr>
+                                <label className="form-check-label mr-2" htmlFor="selected-by-default-checkbox">
                                 {
                                     // # Translators: This labels a checkbox, when checked, it will make the associated item "on" (selected) for all new indicators
                                     gettext('Selected by default')
@@ -159,31 +247,22 @@ class DisaggregationType extends React.Component {
                                     innerRef={this.selectedByDefaultPopup}
                                     ariaText={gettext('More information on "selected by default"')}
                                 />
+                                </nobr>
                             </div>
-
                             <div className="form-group">
                                 <label>
                                     {gettext('Categories')}
                                 </label>
-                                {managed_data.labels.map((label, labelIndex) =>
-                                    <div key={labelIndex} className="form-group disaggregation-label-group">
-                                        <input
-                                            value={label.label}
-                                            onChange={(e) => this.updateLabel(labelIndex, e.target.value)}
-                                            className={classNames("form-control", {"is-invalid": (errors.labels ? Object.keys(errors.labels[labelIndex]).length : false)})}
-                                            disabled={disaggregation.is_archived}
-                                        />
-                                        {!disaggregation.is_archived &&
-                                        <a
-                                            tabIndex="0"
-                                            onClick={() => this.deleteLabel(labelIndex)}
-                                            className={classNames("btn btn-link btn-danger", {'disabled': label.in_use})}
-                                            disabled={label.in_use || disaggregation.is_archived}
-                                        >
-                                            <i className="fas fa-trash"/>{gettext('Remove')}
-                                        </a>}
-                                    </div>
-                                )}
+                                <CategoryList>
+                                {managed_data.labels.map((label, labelIndex) => (
+                                    <CategoryItem key={labelIndex}
+                                        labelIndex={labelIndex} label={label}
+                                        disabled={disaggregation.is_archived}
+                                        updateLabel={this.updateLabel.bind(this)}
+                                        deleteLabel={this.deleteLabel.bind(this)}
+                                        errors={errors} />
+                                ))}
+                                </CategoryList>
                                 {!disaggregation.is_archived && <div>
                                     <a tabIndex="0" onClick={() => this.appendLabel()} className="btn btn-link btn-add">
                                         <i className="fas fa-plus-circle"/>{gettext('Add a category')}
