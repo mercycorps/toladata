@@ -33,17 +33,28 @@ class GroupCheckboxSelectMultipleWidget(forms.CheckboxSelectMultiple):
     template_name = 'forms/widgets/groupcheckbox_select.html'
     option_template_name = 'forms/widgets/groupcheckbox_option.html'
 
-    def __init__(self, attrs=None, title=None, order=0, choices=()):
+    def __init__(self, attrs=None, title=None, order=0, choices=(), helptext=None, individual_disabled=None):
         self.title = title
         self.order = order
+        self.helptext = helptext
+        self.individual_disabled = individual_disabled
         super().__init__(attrs, choices)
 
     def get_context(self, *args):
         context = super().get_context(*args)
         context['widget'].update(
-            {'title': self.title}
+            {'title': self.title, 'helptext': self.helptext}
             )
         return context
+
+    def create_option(self, name, value, label, selected, index, subindex=None, attrs=None):
+        return {
+            'helptext': self.helptext[index] if (self.helptext and len(self.helptext) > index) else False,
+            'disabled': self.individual_disabled[index] if (
+                self.individual_disabled and len(self.individual_disabled) > index
+                ) else False,
+            **super().create_option(name, value, label, selected, index, subindex=subindex, attrs=attrs)
+        }
 
     def value_from_datadict(self, data, files, name):
         value = super().value_from_datadict(data, files, name)
@@ -61,8 +72,11 @@ class GroupedMultipleChoiceWidget(forms.MultiWidget):
         groups = [group for group in groups if group[1]]
         self.values_map = [[option[0] for option in group[1]] for group in groups]
         widgets = [
-            GroupCheckboxSelectMultipleWidget(title=group[0], choices=group[1], order=c)
-            for c, group in enumerate(groups)
+            GroupCheckboxSelectMultipleWidget(
+                title=group[0], choices=group[1], order=c,
+                helptext=(group[2] if (len(group) > 2 and group[2]) else None),
+                individual_disabled=(group[3] if (len(group) > 3 and group[3]) else None)
+            ) for c, group in enumerate(groups)
         ]
         super().__init__(widgets, **kwargs)
 
@@ -96,9 +110,20 @@ class GroupedMultipleChoiceField(forms.Field):
     def values_list(self):
         return [option[0] for group in self.groups for option in group[1]]
 
+    @property
+    def active_values(self):
+        values = []
+        for group in self.groups:
+            for c, option in enumerate(group[1]):
+                if len(group) > 3 and group[3] and len(group[3]) > c and group[3][c]:
+                    pass
+                else:
+                    values.append(option[0])
+        return values
+
     def clean(self, value):
         value = super().clean(value)
-        value = [v for v in value if v in self.values_list]
+        value = [int(v) for v in value if int(v) in self.values_list]
         return value
 
 
@@ -113,6 +138,23 @@ class PTFormInputsForm(forms.ModelForm):
             'target_frequency',
             'unit_of_measure_type',
         )
+
+class ShowOnDisabledMultiSelect(forms.SelectMultiple):
+    option_template_name = 'forms/widgets/select_option_disable.html'
+    def get_context(self, name, value, attrs):
+        if 'disabled' in attrs:
+            self.is_disabled = attrs.pop('disabled')
+            classes = attrs.get('class', '')
+            classes += ' disabled-select'
+            attrs['class'] = classes
+        context = super().get_context(name, value, attrs)
+        return context
+
+    def create_option(self, *args, **kwargs):
+        option = super().create_option(*args, **kwargs)
+        if getattr(self, 'is_disabled', False):
+            option['disabled'] = self.is_disabled
+        return option
 
 
 class IndicatorForm(forms.ModelForm):
@@ -139,6 +181,9 @@ class IndicatorForm(forms.ModelForm):
             'comments': forms.Textarea(attrs={'rows': 4}),
             'notes': forms.Textarea(attrs={'rows': 4}),
             'rationale_for_target': forms.Textarea(attrs={'rows': 4}),
+            'objectives': ShowOnDisabledMultiSelect,
+            'strategic_objectives': ShowOnDisabledMultiSelect,
+            'indicator_type': ShowOnDisabledMultiSelect
         }
 
     def __init__(self, *args, **kwargs):
@@ -204,18 +249,39 @@ class IndicatorForm(forms.ModelForm):
             # Translators:  We recently changed how we organize Levels. The new system is called the "results framework". This is help text for users to let them know that they can use the new system now.
             self.fields['old_level'].help_text = _("Indicators are currently grouped by an older version of indicator levels. To group indicators according to the results framework, an admin will need to adjust program settings.")
 
-        if not self.request.has_write_access:
-            for name, field in self.fields.items():
-                field.disabled = True
-
-        countries = self.request.user.tola_user.available_countries
-        global_disaggs, countries_disaggs = DisaggregationType.program_disaggregations(
-            self.programval.pk, countries=countries
+        #countries = self.request.user.tola_user.available_countries
+        allowed_countries = [
+            *self.request.user.tola_user.access_data.get('countries', {}).keys(),
+            *[programaccess['country'] for programaccess in self.request.user.tola_user.access_data.get('programs', [])
+              if programaccess['program'] == self.programval.pk]
+        ]
+        countries = self.programval.country.filter(
+            pk__in=allowed_countries
         )
+        global_disaggs, countries_disaggs = DisaggregationType.program_disaggregations(
+            self.programval.pk, countries=countries,
+            indicator_pk=(indicator.pk if indicator else None)
+        )
+        def get_helptext(disagg):
+            if not disagg.categories:
+                return ''
+            helptext = '<ul class=&quot;popover-list&quot;>{}</ul>'.format(
+                ''.join(['<li>{}</li>'.format(category.label) for category in disagg.categories])
+                )
+            if getattr(disagg, 'has_results'):
+                helptext += '<br /><i>{}</i>'.format(
+                    _('This disaggregation cannot be unselected, because it was already used in submitted program results.')
+                )
+            return helptext
         self.fields['grouped_disaggregations'] = GroupedMultipleChoiceField(
-            [(_('Global disaggregations'), [(disagg.pk, str(disagg)) for disagg in global_disaggs])] +
+            [(_('Global disaggregations'),
+              [(disagg.pk, str(disagg)) for disagg in global_disaggs],
+              [get_helptext(disagg) for disagg in global_disaggs],
+              [getattr(disagg, 'has_results') for disagg in global_disaggs])] +
             [(_('%(country_name)s disaggregations') % {'country_name': country_name},
-              [(disagg.pk, str(disagg)) for disagg in country_disaggs])
+              [(disagg.pk, str(disagg)) for disagg in country_disaggs],
+              [get_helptext(disagg) for disagg in country_disaggs],
+              [getattr(disagg, 'has_results') for disagg in country_disaggs])
                 for country_name, country_disaggs in countries_disaggs]
         )
         if indicator:
@@ -243,6 +309,9 @@ class IndicatorForm(forms.ModelForm):
         # self.fields['is_cumulative'].widget = forms.RadioSelect()
         if self.instance.target_frequency and self.instance.target_frequency != Indicator.LOP:
             self.fields['target_frequency'].widget.attrs['readonly'] = True
+        if not self.request.has_write_access:
+            for name, field in self.fields.items():
+                field.disabled = True
 
     def clean_indicator_key(self):
         data = self.cleaned_data.get('indicator_key', uuid.uuid4())
@@ -282,7 +351,7 @@ class IndicatorForm(forms.ModelForm):
     def update_disaggregations(self, instance):
         # collect disaggs that this user doesn't have access to and don't touch them:
         existing_disaggregations = instance.disaggregation.exclude(
-            pk__in=self.fields['grouped_disaggregations'].values_list
+            pk__in=self.fields['grouped_disaggregations'].active_values
         )
         instance.disaggregation.set(
             DisaggregationType.objects.filter(

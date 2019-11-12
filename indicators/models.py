@@ -415,6 +415,52 @@ class LevelTierTemplate(models.Model):
         self.edit_date = timezone.now()
         super(LevelTierTemplate, self).save(*args, **kwargs)
 
+class DisaggregationIndicatorFormManager(models.Manager):
+    def get_queryset(self):
+        qs = super().get_queryset().order_by('disaggregation_type').annotate(
+            _in_use=models.Exists(
+                Indicator.rf_aware_objects.filter(
+                    disaggregation__in=models.OuterRef('pk')
+                )
+            )
+        ).prefetch_related(
+            models.Prefetch(
+                'disaggregationlabel_set',
+                queryset=DisaggregationLabel.objects.annotate(
+                    in_use=models.Exists(
+                        DisaggregationValue.objects.filter(
+                            disaggregation_label=models.OuterRef('pk')
+                        ).annotate(
+                            has_results=models.Exists(
+                                Result.objects.select_related(None).prefetch_related(None).order_by().filter(
+                                    disaggregation_value__in=models.OuterRef('pk')
+                                )
+                            )
+                        ).filter(has_results=True)
+                    )
+                ),
+                to_attr='categories'
+                )
+            )
+        return qs
+
+    def for_indicator(self, indicator_pk):
+        qs = self.get_queryset()
+        qs = qs.annotate(
+            has_results=models.Exists(
+                DisaggregationValue.objects.filter(
+                    disaggregation_label__disaggregation_type=models.OuterRef('pk')
+                ).annotate(
+                    has_results=models.Exists(
+                        Result.objects.select_related(None).prefetch_related(None).order_by().filter(
+                            indicator__pk=indicator_pk,
+                            disaggregation_value__in=models.OuterRef('pk')
+                        )
+                    )
+                ).filter(has_results=True)
+            )
+        )
+        return qs
 
 class DisaggregationType(models.Model):
     """Business logic name: Disaggregation - e.g. `Gender` or `SADD`"""
@@ -425,12 +471,14 @@ class DisaggregationType(models.Model):
     selected_by_default = models.BooleanField(default=False)
     create_date = models.DateTimeField(_("Create date"), null=True, blank=True)
     edit_date = models.DateTimeField(_("Edit date"), null=True, blank=True)
+    objects = models.Manager()
+    form_objects = DisaggregationIndicatorFormManager()
 
     def __str__(self):
         return self.disaggregation_type
 
     @classmethod
-    def program_disaggregations(cls, program_pk, countries=None):
+    def program_disaggregations(cls, program_pk, countries=None, indicator_pk=None):
         """Takes a program or program_pk and returns all disaggregations available to that program
 
             - returns (list of global disaggs, list of tuples (country name, list of country disaggs))
@@ -441,20 +489,28 @@ class DisaggregationType(models.Model):
         country_set = program.country.all()
         if countries is not None:
             country_set = country_set.filter(pk__in=[c.pk for c in countries])
-        disaggs = cls.objects.filter(
-            models.Q(standard=True) | models.Q(country__in=country_set)
-                ).filter(
-                    models.Q(is_archived=False) | models.Q(indicator__program=program)
-                )
+        disaggs = cls.form_objects
+        if indicator_pk is not None:
+            disaggs = disaggs.for_indicator(indicator_pk)
+        else:
+            disaggs = disaggs.annotate(has_results=models.Value(False, output_field=models.BooleanField()))
+        disaggs = disaggs.filter(
+            models.Q(standard=True) | models.Q(country__in=country_set),
+            models.Q(is_archived=False) | models.Q(indicator__program=program)
+        ).distinct()
         return (
             disaggs.filter(standard=True),
             [
                 (country_name, disaggs.filter(country=country_pk))
                 for country_pk, country_name in disaggs.filter(
                     standard=False
-                ).values_list('country', 'country__country').distinct()
+                ).values_list('country', 'country__country').distinct().order_by('country__country')
             ]
         )
+
+    @property
+    def in_use(self):
+        return getattr(self, '_in_use', self.has_indicators)
 
     @property
     def has_indicators(self):
@@ -990,7 +1046,7 @@ class Indicator(SafeDeleteModel):
 
     justification = models.TextField(
         max_length=500, null=True, blank=True,
-        verbose_name=_("Rationale or Justification for Indicator"),
+        verbose_name=_("Rationale or justification for indicator"),
         help_text=" "
     )
 
