@@ -228,8 +228,8 @@ def programs_rollup_export(request):
 def programs_rollup_export_csv(request):
     # TODO: after LevelUp please remove unicode calls:
     CSV_HEADERS = [
-        'program_name', 'gait_id', 'countries', 'sectors', 'status', 'start_date', 'end_date', 'program_period',
-        'indicator_count', 'indicators_reporting_above_target', 'indicators_reporting_on_target', 
+        'program_name', 'gait_id', 'countries', 'sectors', 'status', 'funding_status', 'start_date', 'end_date',
+        'program_period', 'indicator_count', 'indicators_reporting_above_target', 'indicators_reporting_on_target', 
         'indicators_reporting_below_target', 'indicators_with_targets',
         'indicators_with_results', 'results_count', 'results_with_evidence'
     ]
@@ -241,16 +241,17 @@ def programs_rollup_export_csv(request):
     writer.writerow(CSV_HEADERS)
     program_pks = [p.pk for p in request.user.tola_user.available_programs]
     annotated_programs = ProgramWithMetrics.home_page.filter(pk__in=program_pks).with_annotations()
-    for program in annotated_programs:
+    for program in sorted([p for p in annotated_programs], key=lambda p: p.name):
         row = [
             program.name,
             program.gaitid if program.gaitid else "no gait_id, program id {}".format(program.id),
             " / ".join([c.country for c in program.country.all()]),
             " / ".join(set([i.sector.sector for i in program.indicator_set.all() if i.sector and i.sector.sector])),
+            "active" if program.funding_status.lower().strip() == 'funded' else "inactive",
             program.funding_status,
             program.reporting_period_start.isoformat() if program.reporting_period_start else '',
             program.reporting_period_end.isoformat() if program.reporting_period_end else '',
-            program.percent_complete,
+            '{}%'.format(program.percent_complete) if program.percent_complete >= 0 else '',
             program.metrics['indicator_count'],
             program.scope_counts['high'],
             program.scope_counts['on_scope'],
