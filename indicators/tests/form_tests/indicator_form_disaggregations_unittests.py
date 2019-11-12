@@ -38,7 +38,7 @@ from factories import (
     indicators_models as i_factories
 )
 from indicators.forms import IndicatorForm
-from indicators.models import Indicator
+from indicators.models import Indicator, DisaggregationLabel, DisaggregationValue
 
 class TestIndicatorCreateFormDisaggregations(test.TestCase):
 
@@ -92,7 +92,7 @@ class TestIndicatorCreateFormDisaggregations(test.TestCase):
             <a href="#" id="grouped_disaggregations_toggle_0" class="is-accordion-toggle btn btn-link"
              data-toggle="collapse" data-target="#grouped_disaggregations_inputs_0" aria-expanded="false"
              aria-controls="grouped_disaggregations_inputs_0"><i class="fas fa-caret-right"></i>
-             <legend>Global disaggregations</legend></a>
+             Global disaggregations</a>
              <div class="collapse" id="grouped_disaggregations_inputs_0"><div>
                 <div class="form-check"><input class="form-check-input" type="checkbox"
                  name="grouped_disaggregations_0" value="{}" id="grouped_disaggregations_0_check_0">
@@ -115,7 +115,7 @@ class TestIndicatorCreateFormDisaggregations(test.TestCase):
             <a href="#" id="grouped_disaggregations_toggle_0" class="is-accordion-toggle btn btn-link"
              data-toggle="collapse" data-target="#grouped_disaggregations_inputs_0" aria-expanded="false"
              aria-controls="grouped_disaggregations_inputs_0"><i class="fas fa-caret-right"></i>
-             <legend>Global disaggregations</legend></a>
+             Global disaggregations</a>
              <div class="collapse" id="grouped_disaggregations_inputs_0"><div>
                 <div class="form-check"><input class="form-check-input" type="checkbox"
                  name="grouped_disaggregations_0" value="{}" id="grouped_disaggregations_0_check_0" checked>
@@ -136,11 +136,47 @@ class TestIndicatorCreateFormDisaggregations(test.TestCase):
             <a href="#" id="grouped_disaggregations_toggle_0" class="is-accordion-toggle btn btn-link"
              data-toggle="collapse" data-target="#grouped_disaggregations_inputs_0" aria-expanded="false"
              aria-controls="grouped_disaggregations_inputs_0"><i class="fas fa-caret-right"></i>
-             <legend>Testland disaggregations</legend></a>
+             Testland disaggregations</a>
              <div class="collapse" id="grouped_disaggregations_inputs_0"><div>
                 <div class="form-check"><input class="form-check-input" type="checkbox"
                  name="grouped_disaggregations_0" value="{}" id="grouped_disaggregations_0_check_0">
                  <label class="form-check-label" for="grouped_disaggregations_0_check_0">Test1</label></div>
+                </div></div>
+            </fieldset>""".format(country_disagg.pk)
+        )
+
+    def test_country_disaggregations_form_helptext(self):
+        country_disagg = i_factories.DisaggregationTypeFactory(
+            disaggregation_type="Test1",
+            country=self.country
+        )
+        for x in range(2):
+            label = DisaggregationLabel(
+                disaggregation_type=country_disagg,
+                label="Test1 Label {}".format(x+1),
+                customsort=x+1
+            )
+            label.save()
+        form = self.get_create_form()
+        self.maxDiff=None
+        self.assertHTMLEqual(
+            str(form['grouped_disaggregations']),
+            """<fieldset>
+            <a href="#" id="grouped_disaggregations_toggle_0" class="is-accordion-toggle btn btn-link"
+             data-toggle="collapse" data-target="#grouped_disaggregations_inputs_0" aria-expanded="false"
+             aria-controls="grouped_disaggregations_inputs_0"><i class="fas fa-caret-right"></i>
+             Testland disaggregations</a>
+             <div class="collapse" id="grouped_disaggregations_inputs_0"><div>
+                <div class="form-check"><input class="form-check-input" type="checkbox"
+                 name="grouped_disaggregations_0" value="{}" id="grouped_disaggregations_0_check_0">
+                 <label class="form-check-label" for="grouped_disaggregations_0_check_0">Test1</label>
+                 <a class="ml-2" tabindex="0" data-toggle="popover" data-trigger="focus"
+                    data-html="true" data-placement="right"
+                    data-content="<ul><li>Test1 Label 1</li><li>Test1 Label 2</li></ul>">
+                      <i aria-label="Categories for disaggregation Test1"
+                         class="far fa-question-circle"></i>
+                   </a>
+                 </div>
                 </div></div>
             </fieldset>""".format(country_disagg.pk)
         )
@@ -163,7 +199,7 @@ class TestIndicatorCreateFormDisaggregations(test.TestCase):
             <a href="#" id="grouped_disaggregations_toggle_0" class="is-accordion-toggle btn btn-link"
              data-toggle="collapse" data-target="#grouped_disaggregations_inputs_0" aria-expanded="false"
              aria-controls="grouped_disaggregations_inputs_0"><i class="fas fa-caret-right"></i>
-             <legend>Testland disaggregations</legend></a>
+             Testland disaggregations</a>
              <div class="collapse" id="grouped_disaggregations_inputs_0"><div>
                 <div class="form-check"><input class="form-check-input" type="checkbox"
                  name="grouped_disaggregations_0" value="{}" id="grouped_disaggregations_0_check_0">
@@ -421,6 +457,119 @@ class TestIndicatorUpdateFormDisaggregations(test.TestCase):
         i = Indicator.rf_aware_objects.get(pk=instance.pk)
         self.assertEqual(i.disaggregation.count(), 1)
         self.assertEqual(i.disaggregation.first().disaggregation_type, "Test1")
+
+    def test_indicator_with_disaggregations_and_values_disabled(self):
+        sd1 = i_factories.DisaggregationTypeFactory(
+            disaggregation_type="Test1",
+            standard=True
+        )
+        sd1_labels = []
+        for x in range(2):
+            label = DisaggregationLabel(
+                disaggregation_type=sd1,
+                label="Test1 Label {}".format(x+1),
+                customsort=x+1
+            )
+            label.save()
+            sd1_labels.append(label)
+        sd2 = i_factories.DisaggregationTypeFactory(
+            disaggregation_type="Test2",
+            standard=True
+        )
+        sd2_labels = []
+        for x in range(2):
+            label = DisaggregationLabel(
+                disaggregation_type=sd2,
+                label="Test2 Label {}".format(x+1),
+                customsort=x+1
+            )
+            label.save()
+            sd2_labels.append(label)
+        sd3 = i_factories.DisaggregationTypeFactory(
+            disaggregation_type="Test3",
+            standard=True
+        )
+        for x in range(2):
+            label = DisaggregationLabel(
+                disaggregation_type=sd3,
+                label="Test3 Label {}".format(x+1),
+                customsort=x+1
+            )
+            label.save()
+        indicator = self.get_indicator()
+        indicator.disaggregation.set([sd1, sd2, sd3])
+        result = i_factories.ResultFactory(
+            indicator=indicator,
+            periodic_target=indicator.periodictargets.first(),
+            achieved=100
+        )
+        d_value1 = DisaggregationValue(
+            disaggregation_label=sd1_labels[0],
+            value=45
+        )
+        d_value1.save()
+        d_value2 = DisaggregationValue(
+            disaggregation_label=sd1_labels[1],
+            value=55
+        )
+        d_value2.save()
+        result.disaggregation_value.set([d_value1, d_value2])
+        other_indicator = self.get_indicator()
+        other_indicator.disaggregation.set([sd2, sd3])
+        other_result = i_factories.ResultFactory(
+            indicator=other_indicator,
+            periodic_target=other_indicator.periodictargets.first(),
+            achieved=100
+        )
+        d_value3 = DisaggregationValue(
+            disaggregation_label=sd2_labels[0],
+            value=45
+        )
+        d_value3.save()
+        other_result.disaggregation_value.add(d_value3)
+        self.maxDiff = None
+        form = self.get_update_form(instance=indicator)
+        self.assertHTMLEqual(
+            str(form['grouped_disaggregations']),
+            """<fieldset>
+            <a href="#" id="grouped_disaggregations_toggle_0" class="is-accordion-toggle btn btn-link"
+             data-toggle="collapse" data-target="#grouped_disaggregations_inputs_0" aria-expanded="false"
+             aria-controls="grouped_disaggregations_inputs_0"><i class="fas fa-caret-right"></i>
+             Global disaggregations</a>
+             <div class="collapse" id="grouped_disaggregations_inputs_0"><div>
+                <div class="form-check"><input class="form-check-input" type="checkbox" checked disabled
+                 name="grouped_disaggregations_0" value="{}" id="grouped_disaggregations_0_check_0">
+                 <label class="form-check-label" for="grouped_disaggregations_0_check_0">Test1</label>
+                 <a class="ml-2" tabindex="0" data-toggle="popover" data-trigger="focus"
+                    data-html="true" data-placement="right"
+                    data-content="<ul><li>Test1 Label 1</li><li>Test1 Label 2</li></ul><br /><i>This disaggregation cannot be unselected, because it was already used in submitted program results.</i>">
+                      <i aria-label="Categories for disaggregation Test1"
+                         class="far fa-question-circle"></i>
+                   </a>
+                </div>
+                <div class="form-check"><input class="form-check-input" type="checkbox" checked
+                 name="grouped_disaggregations_0" value="{}" id="grouped_disaggregations_0_check_1">
+                 <label class="form-check-label" for="grouped_disaggregations_0_check_1">Test2</label>
+                 <a class="ml-2" tabindex="0" data-toggle="popover" data-trigger="focus"
+                    data-html="true" data-placement="right"
+                    data-content="<ul><li>Test2 Label 1</li><li>Test2 Label 2</li></ul>">
+                      <i aria-label="Categories for disaggregation Test2"
+                         class="far fa-question-circle"></i>
+                   </a>
+                </div>
+                <div class="form-check"><input class="form-check-input" type="checkbox" checked
+                 name="grouped_disaggregations_0" value="{}" id="grouped_disaggregations_0_check_2">
+                 <label class="form-check-label" for="grouped_disaggregations_0_check_2">Test3</label>
+                 <a class="ml-2" tabindex="0" data-toggle="popover" data-trigger="focus"
+                    data-html="true" data-placement="right"
+                    data-content="<ul><li>Test3 Label 1</li><li>Test3 Label 2</li></ul>">
+                      <i aria-label="Categories for disaggregation Test3"
+                         class="far fa-question-circle"></i>
+                   </a>
+                 </div>
+                </div></div>
+            </fieldset>""".format(sd1.pk, sd2.pk, sd3.pk)
+        )
 
     def test_indicator_with_disaggregations_switched(self):
         sd1 = i_factories.DisaggregationTypeFactory(
