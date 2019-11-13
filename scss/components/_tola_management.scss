@@ -160,3 +160,13 @@
 // TODO: this needs a parent class
 
 .admin-edit-pane {}
+
+table.mgmt-table__fixed {
+    table-layout: fixed;
+    .mgmt-table__col__width-1 {
+        width: 1%;
+    }
+    .mgmt-table__col__width-60 {
+        width: 60%;
+    }
+}
