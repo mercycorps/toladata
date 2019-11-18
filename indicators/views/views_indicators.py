@@ -775,6 +775,12 @@ class ResultFormMixin(object):
         messages.error(self.request, 'Invalid Form', fail_silently=False)
         return self.render_to_response(self.get_context_data(form=form))
 
+from django import forms
+
+class DisaggregatedResultForm(forms.Form):
+    disaggregation_label = forms.CharField()
+    disaggregation_label_pk = forms.IntegerField(widget=forms.HiddenInput())
+    value = forms.IntegerField(required=False, min_value=0)
 
 class ResultCreate(ResultFormMixin, CreateView):
     """Create new Result called by result_add as modal"""
@@ -792,19 +798,20 @@ class ResultCreate(ResultFormMixin, CreateView):
         return super(ResultCreate, self).dispatch(request, *args, **kwargs)
 
     def get_context_data(self, **kwargs):
-        custom_disaggregation_labels = DisaggregationLabel.objects.filter(
-            disaggregation_type__indicator=self.indicator.id
-        )
-        standard_disaggregation_labels = DisaggregationLabel.get_standard_labels()
-
         context = super(ResultCreate, self).get_context_data(**kwargs)
         context['indicator'] = self.indicator
-        context['custom_disaggregation_labels'] = custom_disaggregation_labels
-        context['standard_disaggregation_labels'] = standard_disaggregation_labels
         context['title_str'] = u'{}: {}'.format(
             str(self.indicator.form_title_level),
             str(self.indicator.name)
         )
+        DisaggregatedValueFormSet = forms.formset_factory(DisaggregatedResultForm, extra=0)
+        global_disaggregations = self.indicator.disaggregation.filter(standard=True)
+        context['global_disaggregation_formset'] = DisaggregatedValueFormSet(
+            initial=[
+                {'disaggregation_label': label.label,
+                 'disaggregation_label_pk': label.pk}
+                for label in global_disaggregations.first().disaggregationlabel_set.all()])
+        country_disaggregations = self.indicator.disaggregation.filter(standard=False)
         return context
 
     def get_form_kwargs(self):
@@ -817,42 +824,20 @@ class ResultCreate(ResultFormMixin, CreateView):
 
     def form_valid(self, form):
         indicator = self.request.POST['indicator']
-        disaggregation_labels = DisaggregationLabel.objects.filter(
-            Q(disaggregation_type__indicator__id=indicator) |
-            Q(disaggregation_type__standard=True))
 
-        new = form.save()
+        result = form.save()
 
-        # The following code appears to be accomplishing the following
-        # The for submitted contains key/vals for all disaggregation_labels on creation
-        # if 1 or more values are present, create values in the DB for all key/vals
-        # otherwise leave the disaggregation_value associates completely empty
-        # In other words, save key/vals as all or nothing
-
-        disaggregation_label_ids = set([str(dl.id) for dl in disaggregation_labels])
-        process_disaggregation = False
-        for k, v in self.request.POST.items():
-            if k in disaggregation_label_ids and v:
-                process_disaggregation = True
-                break
-
-        if process_disaggregation is True:
-            for label in disaggregation_labels:
-                form_id_for_label = str(label.id)
-                form_disagg_value = self.request.POST.get(form_id_for_label, '')
-                new.disaggregation_value.create(disaggregation_label=label, value=form_disagg_value)
-
-        ProgramAuditLog.log_result_created(self.request.user, new.indicator, new)
+        ProgramAuditLog.log_result_created(self.request.user, result.indicator, result)
 
         if self.request.is_ajax():
             data = {
-                'pk' : new.pk,
-                'url': reverse('result_update', kwargs={'pk': new.pk})
+                'pk' : result.pk,
+                'url': reverse('result_update', kwargs={'pk': result.pk})
             }
             return JsonResponse(data)
 
         messages.success(self.request, _('Success, Data Created!'))
-        redirect_url = new.indicator.program.program_page_url
+        redirect_url = result.indicator.program.program_page_url
         return HttpResponseRedirect(redirect_url)
 
 
@@ -870,24 +855,9 @@ class ResultUpdate(ResultFormMixin, UpdateView):
         return super(ResultUpdate, self).dispatch(request, *args, **kwargs)
 
     def get_context_data(self, **kwargs):
-        custom_disaggregation_values = DisaggregationValue.objects.filter(
-            result=self.result).exclude(
-            disaggregation_label__disaggregation_type__standard=True)
-
-        standard_disaggregation_values = DisaggregationValue.objects.filter(
-            result=self.result).filter(
-            disaggregation_label__disaggregation_type__standard=True)
-        standard_disaggregation_labels = DisaggregationLabel.get_standard_labels()
-        custom_disaggregation_labels = DisaggregationLabel.objects.filter(
-            disaggregation_type__indicator=self.indicator.id)
         context = super(ResultUpdate, self).get_context_data(**kwargs)
         context['indicator'] = self.indicator
-
         context['readonly'] = not self.request.has_write_access
-        context['custom_disaggregation_labels'] = custom_disaggregation_labels
-        context['custom_disaggregation_values'] = custom_disaggregation_values
-        context['standard_disaggregation_labels'] = standard_disaggregation_labels
-        context['standard_disaggregation_values'] = standard_disaggregation_values
         context['title_str'] = u'{}: {}'.format(
             str(self.indicator.form_title_level),
             str(self.indicator.name)
@@ -903,34 +873,11 @@ class ResultUpdate(ResultFormMixin, UpdateView):
         return kwargs
 
     def form_valid(self, form):
-        old_result = Result.objects.get(id=self.kwargs['pk'])
-
-        getDisaggregationLabel = DisaggregationLabel.objects.filter(
-            Q(disaggregation_type__indicator__id=old_result.indicator_id) |
-            Q(disaggregation_type__standard=True)).distinct()
-
+        old_result = Result.objects.get(pk=self.kwargs['pk'])
         # save the form then update manytomany relationships
         old_values = old_result.logged_fields
-        new_result = form.save()  # internally this clears disaggregation_value m2m relationships!
+        new_result = form.save()
 
-        # like the create view, create disaggregation values as all or nothing
-
-        disaggregation_label_ids = set([str(dl.id) for dl in getDisaggregationLabel])
-        process_disaggregation = False
-        for k, v in self.request.POST.items():
-            if k in disaggregation_label_ids and v:
-                process_disaggregation = True
-                break
-
-        if process_disaggregation:
-            for label in getDisaggregationLabel:
-                form_id_for_label = str(label.id)
-                form_disagg_value = self.request.POST.get(form_id_for_label, '')
-                new_result.disaggregation_value.create(
-                    disaggregation_label=label, value=form_disagg_value)
-
-        # Result.achieved comes back different from the DB than from the ResultForm
-        new_result.refresh_from_db()
         ProgramAuditLog.log_result_updated(self.request.user, new_result.indicator, old_values,
                                            new_result.logged_fields, form.cleaned_data.get('rationale'))
 
