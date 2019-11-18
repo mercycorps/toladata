@@ -59,7 +59,7 @@ class TestIndicatorCreateFormDisaggregations(test.TestCase):
         data = kwargs.get('data', None)
         program = kwargs.get('program', self.program)
         request = mock.MagicMock()
-        request.user.tola_user.available_countries = [self.country, self.user_country]
+        request.user.tola_user.access_data = {'countries': {self.country.pk: [], self.user_country.pk: []}}
         return IndicatorForm(data, program=program, request=request, auto_id=False)
 
 
@@ -130,6 +130,7 @@ class TestIndicatorCreateFormDisaggregations(test.TestCase):
             country=self.country
         )
         form = self.get_create_form()
+        self.maxDiff = None
         self.assertHTMLEqual(
             str(form['grouped_disaggregations']),
             """<fieldset>
@@ -172,7 +173,7 @@ class TestIndicatorCreateFormDisaggregations(test.TestCase):
                  <label class="form-check-label" for="grouped_disaggregations_0_check_0">Test1</label>
                  <a class="ml-2" tabindex="0" data-toggle="popover" data-trigger="focus"
                     data-html="true" data-placement="right"
-                    data-content="<ul><li>Test1 Label 1</li><li>Test1 Label 2</li></ul>">
+                    data-content="<ul class=&quot;popover-list&quot;><li>Test1 Label 1</li><li>Test1 Label 2</li></ul>">
                       <i aria-label="Categories for disaggregation Test1"
                          class="far fa-question-circle"></i>
                    </a>
@@ -252,6 +253,11 @@ class TestIndicatorCreateFormDisaggregations(test.TestCase):
         sd3 = i_factories.DisaggregationTypeFactory(
             disaggregation_type="Test Global 3",
             standard=True
+        )
+        sd4 = i_factories.DisaggregationTypeFactory(
+            disaggregation_type="Test Global 4",
+            standard=True,
+            is_archived=True
         )
         cd1 = i_factories.DisaggregationTypeFactory(
             disaggregation_type="Test Country 1",
@@ -392,7 +398,7 @@ class TestIndicatorUpdateFormDisaggregations(test.TestCase):
             'target_frequency_num_periods': 1 if not instance else instance.target_frequency_num_periods
         })
         request = mock.MagicMock()
-        request.user.tola_user.available_countries = [self.country, self.user_country]
+        request.user.tola_user.access_data = {'countries': {self.country.pk: [], self.user_country.pk: []}}
         form_kwargs = {
             'program': program,
             'initial': initial,
@@ -542,7 +548,7 @@ class TestIndicatorUpdateFormDisaggregations(test.TestCase):
                  <label class="form-check-label" for="grouped_disaggregations_0_check_0">Test1</label>
                  <a class="ml-2" tabindex="0" data-toggle="popover" data-trigger="focus"
                     data-html="true" data-placement="right"
-                    data-content="<ul><li>Test1 Label 1</li><li>Test1 Label 2</li></ul><br /><i>This disaggregation cannot be unselected, because it was already used in submitted program results.</i>">
+                    data-content="<ul class=&quot;popover-list&quot;><li>Test1 Label 1</li><li>Test1 Label 2</li></ul><br /><i>This disaggregation cannot be unselected, because it was already used in submitted program results.</i>">
                       <i aria-label="Categories for disaggregation Test1"
                          class="far fa-question-circle"></i>
                    </a>
@@ -552,7 +558,7 @@ class TestIndicatorUpdateFormDisaggregations(test.TestCase):
                  <label class="form-check-label" for="grouped_disaggregations_0_check_1">Test2</label>
                  <a class="ml-2" tabindex="0" data-toggle="popover" data-trigger="focus"
                     data-html="true" data-placement="right"
-                    data-content="<ul><li>Test2 Label 1</li><li>Test2 Label 2</li></ul>">
+                    data-content="<ul class=&quot;popover-list&quot;><li>Test2 Label 1</li><li>Test2 Label 2</li></ul>">
                       <i aria-label="Categories for disaggregation Test2"
                          class="far fa-question-circle"></i>
                    </a>
@@ -562,7 +568,7 @@ class TestIndicatorUpdateFormDisaggregations(test.TestCase):
                  <label class="form-check-label" for="grouped_disaggregations_0_check_2">Test3</label>
                  <a class="ml-2" tabindex="0" data-toggle="popover" data-trigger="focus"
                     data-html="true" data-placement="right"
-                    data-content="<ul><li>Test3 Label 1</li><li>Test3 Label 2</li></ul>">
+                    data-content="<ul class=&quot;popover-list&quot;><li>Test3 Label 1</li><li>Test3 Label 2</li></ul>">
                       <i aria-label="Categories for disaggregation Test3"
                          class="far fa-question-circle"></i>
                    </a>
