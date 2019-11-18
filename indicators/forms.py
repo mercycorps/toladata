@@ -509,25 +509,47 @@ class BaseDisaggregatedValueFormSet(forms.BaseFormSet):
     def get_default_prefix(cls):
         return "disaggregation-formset-{}".format(cls.disaggregation.pk) if cls.disaggregation else 'form'
 
-    def __init__(self, **kwargs):
+    def __init__(self, *args, **kwargs):
         self.result = kwargs.pop('result', None)
-        super().__init__(**kwargs)
+        super().__init__(*args, **kwargs)
 
     def get_form_kwargs(self, index):
         try:
             label = self.disaggregation.labels[index]
         except (IndexError, AttributeError):
             raise RuntimeError("Disaggregation/Labels not provided to Disaggregation form")
-        value = (
-            self.result.disaggregation_value.filter(disaggregation_label=label.pk).first().value
-            if self.result else None
-        )
+        if self.result and self.result.disaggregation_value.filter(disaggregation_label=label.pk).exists():
+            value = self.result.disaggregation_value.filter(disaggregation_label=label.pk).first().value
+        else:
+            value = None
         return {
             **super().get_form_kwargs(index),
             'label': label,
             'initial_value': value
         }
         return super().get_form_kwargs(index)
+
+    def clean(self):
+        if any(self.errors):
+            return
+        if not self.result:
+            raise forms.ValidationError('cannot save disaggregated values without result provided')
+        achieved = [form.cleaned_data.get('value') for form in self.forms]
+        if sum(achieved) != self.result.achieved:
+            raise forms.ValidationError(
+                'disaggregated values must add up to {}, got {}'.format(self.result.achieved, achieved)
+            )
+
+    def save(self):
+        if self.is_valid():
+            values = []
+            for form in self.forms:
+                value, created = self.result.disaggregation_value.get_or_create(
+                    disaggregation_label_id=form.cleaned_data.get('label_pk'),
+                    value=form.cleaned_data.get('value')
+                )
+                values.append(value)
+        return values
 
 
 class DisaggregatedValueForm(forms.Form):
@@ -549,6 +571,18 @@ class DisaggregatedValueForm(forms.Form):
         except DisaggregationLabel.DoesNotExist:
             raise forms.ValidationError("Invalid form setup - no label for disaggregation value")
         return data
+
+    def clean_value(self):
+        value = self.cleaned_data.get('value', None)
+        if value is None:
+            return value
+        try:
+            value = float(value)
+        except ValueError:
+            raise forms.ValidationError('Please enter a number, you entered {}'.format(value))
+        if round(value, 2) == int(value):
+            return int(value)
+        return value
 
 
 def get_disaggregated_result_formset(disaggregation):

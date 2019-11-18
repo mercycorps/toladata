@@ -60,9 +60,66 @@ class TestDisaggregatedValueFormSet(test.TestCase):
         )
 
     def test_valid_form_values(self):
-        #self.fail('start here, Cameron')
-        self.assertTrue(True)
-        
+        FormSet = get_disaggregated_result_formset(self.disagg)
+        for values in [
+            (130, 120),
+            (0.25, 249.75),
+            (100.89, 149.11),
+            (0, 250)
+        ]:
+            data = {
+                'disaggregation-formset-{}-TOTAL_FORMS'.format(self.disagg.pk): '2',
+                'disaggregation-formset-{}-INITIAL_FORMS'.format(self.disagg.pk): '2',
+                'disaggregation-formset-{}-MAX_NUM_FORMS'.format(self.disagg.pk): '',
+                'disaggregation-formset-{}-0-value'.format(self.disagg.pk): '{}'.format(values[0]),
+                'disaggregation-formset-{}-1-value'.format(self.disagg.pk): '{}'.format(values[1])
+            }
+            formset = FormSet(data, result=self.result)
+            self.assertTrue(formset.is_valid(), "{}\n{}".format(formset.errors, formset.non_form_errors()))
+            self.assertEqual(formset[0].cleaned_data['value'], values[0])
+            self.assertEqual(formset[0].cleaned_data['label_pk'], self.disagg.labels[0].pk)
+            self.assertEqual(formset[1].cleaned_data['value'], values[1])
+            self.assertEqual(formset[1].cleaned_data['label_pk'], self.disagg.labels[1].pk)
+
+    def test_invalid_form_values(self):
+        FormSet = get_disaggregated_result_formset(self.disagg)
+        for values in [
+            (100, 100),
+            (0.25, 249),
+            (0, 10),
+            (200, 400)
+        ]:
+            data = {
+                'disaggregation-formset-{}-TOTAL_FORMS'.format(self.disagg.pk): '2',
+                'disaggregation-formset-{}-INITIAL_FORMS'.format(self.disagg.pk): '2',
+                'disaggregation-formset-{}-MAX_NUM_FORMS'.format(self.disagg.pk): '',
+                'disaggregation-formset-{}-0-value'.format(self.disagg.pk): '{}'.format(values[0]),
+                'disaggregation-formset-{}-1-value'.format(self.disagg.pk): '{}'.format(values[1])
+            }
+            formset = FormSet(data, result=self.result)
+            self.assertFalse(formset.is_valid())
+
+    def test_creates_disaggregated_values(self):
+        FormSet = get_disaggregated_result_formset(self.disagg)
+        data = {
+                'disaggregation-formset-{}-TOTAL_FORMS'.format(self.disagg.pk): '2',
+                'disaggregation-formset-{}-INITIAL_FORMS'.format(self.disagg.pk): '2',
+                'disaggregation-formset-{}-MAX_NUM_FORMS'.format(self.disagg.pk): '',
+                'disaggregation-formset-{}-0-value'.format(self.disagg.pk): '71.45',
+                'disaggregation-formset-{}-1-value'.format(self.disagg.pk): '178.55'
+            }
+        formset = FormSet(data, result=self.result)
+        self.assertTrue(formset.is_valid())
+        values = formset.save()
+        self.assertEqual(len(values), 2)
+        self.assertEqual(float(values[0].value), 71.45)
+        self.assertEqual(values[0].disaggregation_label, self.disagg.labels[0])
+        self.assertEqual(float(values[1].value), 178.55)
+        self.assertEqual(values[1].disaggregation_label, self.disagg.labels[1])
+        value1 = DisaggregationValue.objects.get(pk=values[0].pk)
+        self.assertEqual(value1.value, values[0].value)
+        value2 = DisaggregationValue.objects.get(pk=values[1].pk)
+        self.assertEqual(value2.value, values[1].value)
 
 
 class TestDisaggregatedValueFormSetFactory(test.TestCase):

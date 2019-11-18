@@ -552,16 +552,6 @@ class DisaggregationValue(models.Model):
         return self.value
 
 
-class DisaggregationValueAdmin(admin.ModelAdmin):
-    list_display = ('disaggregation_label', 'value', 'create_date',
-                    'edit_date')
-    list_filter = (
-        'disaggregation_label__disaggregation_type__disaggregation_type',
-        'disaggregation_label'
-    )
-    display = 'Disaggregation Value'
-
-
 class ReportingFrequency(models.Model):
     frequency = models.CharField(
         _("Frequency"), max_length=135, blank=True)
