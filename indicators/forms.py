@@ -16,6 +16,8 @@ from indicators.models import (
     Objective,
     StrategicObjective,
     DisaggregationType,
+    DisaggregationLabel,
+    DisaggregationValue,
     Level,
     IndicatorType,
     PinnedReport,
@@ -425,6 +427,7 @@ class ResultForm(forms.ModelForm):
         self.fields['indicator'].initial = self.indicator.id
         self.fields['program'].initial = self.indicator.program.id
 
+
     def set_initial_querysets(self):
         """populate foreign key fields with limited quersets based on user / country / program"""
         # provide only in-program / in-country Site objects for the evidence queryset
@@ -493,130 +496,68 @@ class ResultForm(forms.ModelForm):
             self.add_error('evidence_url', msg)
 
 
-
-
-class ReportFormCommon(forms.Form):
-    EMPTY = 0
-    YEARS = Indicator.ANNUAL
-    SEMIANNUAL = Indicator.SEMI_ANNUAL
-    TRIANNUAL = Indicator.TRI_ANNUAL
-    QUARTERS = Indicator.QUARTERLY
-    MONTHS = Indicator.MONTHLY
-    TIMEPERIODS_CHOICES = (
-        (YEARS, _("years")),
-        (SEMIANNUAL, _("semi-annual periods")),
-        (TRIANNUAL, _("tri-annual periods")),
-        (QUARTERS, _("quarters")),
-        (MONTHS, _("months"))
-    )
-
-    SHOW_ALL = 1
-    MOST_RECENT = 2
-    TIMEFRAME_CHOICES = (
-        (SHOW_ALL, _("Show all")),
-        (MOST_RECENT, _("Most recent"))
-    )
-
-    EMPTY_OPTION = (EMPTY, "---------")
-    # combine the target_frequencies (except EVENT) and the EMPTY option
-    TARGETPERIODS_CHOICES = (EMPTY_OPTION,) + Indicator.TARGET_FREQUENCIES[0:7]
-
-    program = forms.ModelChoiceField(queryset=Program.objects.none())
-    timeperiods = forms.ChoiceField(choices=TIMEPERIODS_CHOICES, required=False)
-    targetperiods = forms.ChoiceField(choices=TARGETPERIODS_CHOICES, required=False)
-    timeframe = forms.ChoiceField(choices=TIMEFRAME_CHOICES, widget=forms.RadioSelect(), required=False)
-    numrecentperiods = forms.IntegerField(required=False)
-    formprefix = forms.CharField(widget=forms.HiddenInput(), required=False)
-
-    def __init__(self, *args, **kwargs):
-        self.request = kwargs.pop('request')
-        countries = getCountry(self.request.user)
-        super(ReportFormCommon, self).__init__(*args, **kwargs)
-        self.fields['program'].label = _("Program")
-        self.fields['timeperiods'].label = _("Time periods")
-        self.fields['timeperiods'].choices = ((k, v.capitalize()) for k, v in self.TIMEPERIODS_CHOICES)
-        self.fields['numrecentperiods'].widget.attrs['placeholder'] = _("enter a number")
-        self.fields['targetperiods'].label = _("Target periods")
-        self.fields['program'].queryset = self.request.user.tola_user.available_programs \
-            .filter(funding_status="Funded",
-                    reporting_period_start__isnull=False,
-                    reporting_period_end__isnull=False,
-                    reporting_period_start__lte=timezone.localdate(),
-                    indicator__target_frequency__isnull=False,) \
-            .exclude(indicator__isnull=True) \
-            .distinct()
-
-
-class IPTTReportQuickstartForm(ReportFormCommon):
-    prefix = 'timeperiods'
-    formprefix = forms.CharField(widget=forms.HiddenInput(), required=False)
-
-    def __init__(self, *args, **kwargs):
-        prefix = kwargs.pop('prefix')
-        self.prefix = prefix if prefix is not None else self.prefix
-        super(IPTTReportQuickstartForm, self).__init__(*args, **kwargs)
-        self.fields['formprefix'].initial = self.prefix
-        self.fields['timeframe'].initial = self.SHOW_ALL
-        # self.fields['timeperiods'].widget = forms.HiddenInput()
-        self.fields['timeperiods'].initial = Indicator.MONTHLY
-
-
-class IPTTReportFilterForm(ReportFormCommon):
-    level = forms.ModelMultipleChoiceField(queryset=Level.objects.none(), required=False, label=_('Levels'))
-    ind_type = forms.ModelMultipleChoiceField(queryset=IndicatorType.objects.none(), required=False, label=_('Types'))
-    sector = forms.ModelMultipleChoiceField(queryset=Sector.objects.none(), required=False, label=_('Sectors'))
-    site = forms.ModelMultipleChoiceField(queryset=SiteProfile.objects.none(), required=False, label=_('Sites'))
-    indicators = forms.ModelMultipleChoiceField(
-        queryset=Indicator.objects.none(), required=False, label=_('Indicators'))
-
-    def __init__(self, *args, **kwargs):
-        program = kwargs.pop('program')
-        periods_choices_start = kwargs.get('initial').get('period_choices_start') # TODO: localize this date
-        periods_choices_end = kwargs.get('initial').get('period_choices_end') # TODO: localize this date
-
-        target_frequencies = program.indicator_set.filter(target_frequency__isnull=False) \
-            .exclude(target_frequency=Indicator.EVENT) \
-            .values('target_frequency') \
-            .distinct() \
-            .order_by('target_frequency')
-
-        target_frequency_choices = []
-        for tp in target_frequencies:
-            try:
-                pk = int(tp['target_frequency'])
-                target_frequency_choices.append((pk, Indicator.TARGET_FREQUENCIES[pk-1][1]))
-            except TypeError:
-                pass
-
-        first_year_first_daterange_key = kwargs.get('initial').get('period_start_initial')
-        last_year_last_daterange_key = kwargs.get('initial').get('period_end_initial')
-
-        super(IPTTReportFilterForm, self).__init__(*args, **kwargs)
-        del self.fields['formprefix']
-        level_ids = program.indicator_set.values(
-            'level_id').distinct().order_by('level')
-
-        self.fields['program'].initial = program
-        self.fields['sector'].queryset = Sector.objects.filter(
-            indicator__program=program).distinct()
-        self.fields['level'].queryset = Level.objects.filter(id__in=level_ids).distinct().order_by('customsort')
-        ind_type_ids = program.indicator_set.values(
-            'indicator_type__id').distinct().order_by('indicator_type')
-        self.fields['ind_type'].queryset = IndicatorType.objects.filter(id__in=ind_type_ids).distinct()
-        self.fields['site'].queryset = program.get_sites()
-        self.fields['indicators'].queryset = program.indicator_set.all()
-
-        # Start and end periods dropdowns are updated dynamically
-        self.fields['start_period'] = forms.ChoiceField(choices=periods_choices_start, label=_("START"))
-        self.fields['end_period'] = forms.ChoiceField(choices=periods_choices_end, label=_("END"))
-
-        self.fields['start_period'].initial = str(first_year_first_daterange_key)
-        self.fields['end_period'].initial = str(last_year_last_daterange_key)
-
-        self.fields['targetperiods'] = forms.ChoiceField(choices=target_frequency_choices, label=_("TARGET PERIODS"))
-
-
 class PinnedReportForm(forms.ModelForm):
     class Meta:
         model = PinnedReport
         exclude = ('tola_user',)
+
+
+class BaseDisaggregatedValueFormSet(forms.BaseFormSet):
+    disaggregation = None
+
+    @classmethod
+    def get_default_prefix(cls):
+        return "disaggregation-formset-{}".format(cls.disaggregation.pk) if cls.disaggregation else 'form'
+
+    def __init__(self, **kwargs):
+        self.result = kwargs.pop('result', None)
+        super().__init__(**kwargs)
+
+    def get_form_kwargs(self, index):
+        try:
+            label = self.disaggregation.labels[index]
+        except (IndexError, AttributeError):
+            raise RuntimeError("Disaggregation/Labels not provided to Disaggregation form")
+        value = (
+            self.result.disaggregation_value.filter(disaggregation_label=label.pk).first().value
+            if self.result else None
+        )
+        return {
+            **super().get_form_kwargs(index),
+            'label': label,
+            'initial_value': value
+        }
+        return super().get_form_kwargs(index)
+
+
+class DisaggregatedValueForm(forms.Form):
+    label_pk = forms.IntegerField(widget=forms.HiddenInput(), required=False)
+    value = forms.FloatField()
+
+    def __init__(self, *args, **kwargs):
+        label = kwargs.pop('label')
+        initial_value = kwargs.pop('initial_value', None)
+        super().__init__(*args, **kwargs)
+        self.fields['label_pk'].initial = label.pk
+        self.fields['value'].label = label.label
+        self.fields['value'].initial = initial_value
+
+    def clean_label_pk(self):
+        data = self.fields['label_pk'].initial
+        try:
+            label = DisaggregationLabel.objects.get(pk=data)
+        except DisaggregationLabel.DoesNotExist:
+            raise forms.ValidationError("Invalid form setup - no label for disaggregation value")
+        return data
+
+
+def get_disaggregated_result_formset(disaggregation):
+    FormSet = forms.formset_factory(
+        DisaggregatedValueForm,
+        formset=BaseDisaggregatedValueFormSet,
+        min_num=len(disaggregation.labels),
+        max_num=len(disaggregation.labels),
+        extra=0
+    )
+    FormSet.disaggregation = disaggregation
+    return FormSet

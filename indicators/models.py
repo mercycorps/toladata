@@ -516,6 +516,10 @@ class DisaggregationType(models.Model):
     def has_indicators(self):
         return self.indicator_set.exists()
 
+    @property
+    def labels(self):
+        return self.disaggregationlabel_set.all().order_by('customsort')
+
 
 class DisaggregationLabel(models.Model):
     """Business logic name: Category - e.g. `Male` or `Females aged 16-24`"""
