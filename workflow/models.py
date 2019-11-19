@@ -221,12 +221,14 @@ class TolaUser(models.Model):
     @property
     def allow_projects_access(self):
         """
-        Only allow existing users to access the Projects/workflow functionality
+        Kept for migration purpose (in case Workflow has issues) - but deprecated: no one has projects access anymore
+        ~~Only allow existing users to access the Projects/workflow functionality~~
         """
-        user_country_codes = set(self.available_countries.values_list('code', flat=True))
-        if self.country:
-            user_country_codes.add(self.country.code)
-        return bool(user_country_codes & settings.PROJECTS_ACCESS_WHITELIST_SET)
+        # user_country_codes = set(self.available_countries.values_list('code', flat=True))
+        # if self.country:
+        #     user_country_codes.add(self.country.code)
+        # return bool(user_country_codes & settings.PROJECTS_ACCESS_WHITELIST_SET)
+        return False
 
 
     def program_role(self, program_id):
