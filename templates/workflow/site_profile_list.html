@@ -49,8 +49,6 @@
         <th>{% trans "Site name" %}</th>
         <th>{% trans "Status" %}</th>
         <th>{% trans "Site type" %}</th>
-        <th>{% trans "Province" %}</th>
-        <th>{% trans "District" %}</th>
         <th style="width:110px;">&nbsp;</th>
     </tr>
     {% if getSiteProfile %}
@@ -70,8 +68,6 @@
                 <td><a href="/workflow/siteprofile_update/{{ item.id }}"><span class="badge">{% trans "Inactive" %}</span></a></td>
                 {%endif%}
                 <td><a href="/workflow/siteprofile_update/{{ item.id }}">{{ item.type }}</a></td>
-                <td>{{ item.province }}</td>
-                <td>{{ item.district }}</td>
                 <td class="text-nowrap">
                     <a href="/workflow/siteprofile_delete/{{ item.id }}"
                        class="btn btn-sm btn-text p-0 pr-2 text-danger"><i class="fas fa-trash-alt"></i>&nbsp;{% trans "Delete site" %}
@@ -84,7 +80,7 @@
         {% endfor %}
     {% else %}
     <tr>
-        <td colspan="7">{% trans "No Site Profiles yet." %}</td>
+        <td colspan="5">{% trans "No Site Profiles yet." %}</td>
     </tr>
     {% endif %}
 </table>
@@ -190,27 +186,6 @@
         userCountryCodes: {}
     };
 </script>
-<!--<script>
-        function ZoomToCountry(region){
-            if(region == "Latin America, Caribbean, Balkans, Caucasus"){
-                map.setView([9,-60], 4);
-            }else if(region == "East Asia"){
-                map.setView([30,96], 4);
-            }else if(region == "Central & South Asia"){
-                map.setView([30,80], 4);
-            }else if(region == "East & Southern Africa"){
-                map.setView([10,10], 4);
-            }else if(region == "West & Central Africa"){
-                map.setView([10,10], 4);
-            }else if(region == "Latin America, Caribbean, Balkans, Caucasus"){
-                map.setView([30,20], 4);
-            }else if(region == "Middle East"){
-                map.setView([30,20], 4);
-            }else if(region == "1"){
-                map.setView([10,-10], 2);
-            };
-        }
-</script>-->
 {% render_bundle 'home_country_map' %}
 {% endblock %}
 
