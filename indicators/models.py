@@ -552,6 +552,18 @@ class DisaggregationValue(models.Model):
         return self.value
 
 
+class DisaggregatedValue(models.Model):
+    result = models.ForeignKey('indicators.Result', on_delete=models.CASCADE)
+    category = models.ForeignKey(DisaggregationLabel, on_delete=models.CASCADE,
+                                 verbose_name=_("Disaggregation category"))
+    value = models.DecimalField(max_digits=20, decimal_places=2)
+
+    class Meta:
+        constraints = [
+            models.UniqueConstraint(fields=['result', 'category'], name='unique_disaggregation_per_result')
+        ]
+
+
 class ReportingFrequency(models.Model):
     frequency = models.CharField(
         _("Frequency"), max_length=135, blank=True)

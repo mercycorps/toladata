@@ -99,6 +99,7 @@ class TestDisaggregatedValueFormSet(test.TestCase):
             formset = FormSet(data, result=self.result)
             self.assertFalse(formset.is_valid())
 
+    @unittest.skip("reworking DB values")
     def test_creates_disaggregated_values(self):
         FormSet = get_disaggregated_result_formset(self.disagg)
         data = {
