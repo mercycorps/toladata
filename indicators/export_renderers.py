@@ -110,7 +110,7 @@ class ExcelRendererBase:
                 cell.alignment = self.CENTER_ALIGN
                 if period.tva:
                     sheet.merge_cells(start_row=row, start_column=col, end_row=row, end_column=col+2)
-        columns = [ugettext('Target'), ugettext('Actual'), ugettext('% Met')] if period.tva else [ugettext('Actual'),]
+        columns = [ugettext('Target'), ugettext('Actual'), str(ugettext('% Met')).title()] if period.tva else [ugettext('Actual'),]
         for col_no, col_header in enumerate(columns):
             cell = sheet.cell(row=4, column=col+col_no)
             cell.value = str(col_header)
