@@ -120,8 +120,9 @@ class SiteProfileList(ListView):
         if request.method == "GET" and "search" in request.GET:
             getSiteProfile = SiteProfile.objects.filter(\
                     Q(country__in=countries),\
-                    Q(name__contains=request.GET["search"])\
-                    | Q(type__profile__contains=request.GET['search']))\
+                    Q(name__icontains=request.GET["search"])\
+                    | Q(type__profile__icontains=request.GET['search'])\
+                    | Q(country__country__icontains=request.GET['search']))\
                 .select_related()\
                 .distinct()
         #paginate site profile list
