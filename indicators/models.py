@@ -556,7 +556,7 @@ class DisaggregatedValue(models.Model):
     result = models.ForeignKey('indicators.Result', on_delete=models.CASCADE)
     category = models.ForeignKey(DisaggregationLabel, on_delete=models.CASCADE,
                                  verbose_name=_("Disaggregation category"))
-    value = models.DecimalField(max_digits=20, decimal_places=2)
+    value = models.DecimalField(max_digits=20, decimal_places=2, blank=True, null=True)
 
     class Meta:
         constraints = [
