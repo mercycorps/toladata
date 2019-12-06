@@ -428,15 +428,10 @@ class DisaggregationIndicatorFormManager(models.Manager):
                 'disaggregationlabel_set',
                 queryset=DisaggregationLabel.objects.annotate(
                     in_use=models.Exists(
-                        DisaggregationValue.objects.filter(
-                            disaggregation_label=models.OuterRef('pk')
-                        ).annotate(
-                            has_results=models.Exists(
-                                Result.objects.select_related(None).prefetch_related(None).order_by().filter(
-                                    disaggregation_value__in=models.OuterRef('pk')
-                                )
-                            )
-                        ).filter(has_results=True)
+                        DisaggregatedValue.objects.filter(
+                            category=models.OuterRef('pk'),
+                            value__isnull=False
+                        )
                     )
                 ),
                 to_attr='categories'
@@ -448,16 +443,11 @@ class DisaggregationIndicatorFormManager(models.Manager):
         qs = self.get_queryset()
         qs = qs.annotate(
             has_results=models.Exists(
-                DisaggregationValue.objects.filter(
-                    disaggregation_label__disaggregation_type=models.OuterRef('pk')
-                ).annotate(
-                    has_results=models.Exists(
-                        Result.objects.select_related(None).prefetch_related(None).order_by().filter(
-                            indicator__pk=indicator_pk,
-                            disaggregation_value__in=models.OuterRef('pk')
-                        )
-                    )
-                ).filter(has_results=True)
+                DisaggregatedValue.objects.filter(
+                    category__disaggregation_type=models.OuterRef('pk'),
+                    value__isnull=False,
+                    result__indicator__pk=indicator_pk
+                )
             )
         )
         return qs
@@ -539,17 +529,6 @@ class DisaggregationLabel(models.Model):
     @classmethod
     def get_standard_labels(cls):
         return cls.objects.filter(disaggregation_type__standard=True)
-
-
-class DisaggregationValue(models.Model):
-    disaggregation_label = models.ForeignKey(DisaggregationLabel, on_delete=models.CASCADE,
-                                             verbose_name=_("Disaggregation category"))
-    value = models.CharField(_("Value"), max_length=765, blank=True)
-    create_date = models.DateTimeField(_("Create date"), null=True, blank=True)
-    edit_date = models.DateTimeField(_("Edit date"), null=True, blank=True)
-
-    def __str__(self):
-        return self.value
 
 
 class DisaggregatedValue(models.Model):
@@ -1863,9 +1842,9 @@ class PeriodicTargetAdmin(admin.ModelAdmin):
 
 class ResultManager(models.Manager):
     def get_queryset(self):
-        return super(ResultManager, self).get_queryset()\
-            .prefetch_related('site', 'disaggregation_value')\
-            .select_related('program', 'indicator')
+        return super(ResultManager, self).get_queryset().prefetch_related(
+            'site'
+        ).select_related('program', 'indicator')
 
 
 class Result(models.Model):
@@ -1880,11 +1859,6 @@ class Result(models.Model):
     achieved = models.DecimalField(
         verbose_name=_("Actual"), max_digits=20, decimal_places=2,
         help_text=" ")
-
-    disaggregation_value = models.ManyToManyField(
-        DisaggregationValue, blank=True, help_text=" ",
-        verbose_name=_("Disaggregation Value")
-    )
 
     comments = models.TextField(_("Comments"), blank=True, default='')
 
@@ -2037,20 +2011,25 @@ class PinnedReport(models.Model):
         if start_period and end_period:
             return u'{} – {}'.format(df(start_period), df(end_period))
 
-        from indicators.forms import ReportFormCommon
+        # from indicators.forms import ReportFormCommon
 
         # This is confusing but ReportFormCommon defines TIMEPERIODS_CHOICES
         # which is defined in terms of enum values in Indicators
         # Indicators also defines TARGET_FREQUENCIES which is also used by ReportFormCommon
         # Because of this, the enum values are interchangeable between ReportFormCommon and Indicators
 
-        # TIMEPERIODS_CHOICES = (
-        #     (YEARS, _("years")),
-        #     (SEMIANNUAL, _("semi-annual periods")),
-        #     (TRIANNUAL, _("tri-annual periods")),
-        #     (QUARTERS, _("quarters")),
-        #     (MONTHS, _("months"))
-        # )
+        # Double-confusing update: reportform is now handled on front end, so the constants are
+        # reproduced here:
+        TIMEPERIODS_CHOICES = (
+            (Indicator.ANNUAL, _("years")),
+            (Indicator.SEMI_ANNUAL, _("semi-annual periods")),
+            (Indicator.TRI_ANNUAL, _("tri-annual periods")),
+            (Indicator.QUARTERLY, _("quarters")),
+            (Indicator.MONTHLY, _("months"))
+        )
+
+        SHOW_ALL = 1
+        MOST_RECENT = 2
 
         # TARGETPERIOD_CHOICES = [empty] +
         # TARGET_FREQUENCIES = (
@@ -2065,7 +2044,7 @@ class PinnedReport(models.Model):
         # )
 
         # time period strings are used for BOTH timeperiod and targetperiod values
-        time_period_str_lookup = dict(ReportFormCommon.TIMEPERIODS_CHOICES)
+        time_period_str_lookup = dict(TIMEPERIODS_CHOICES)
 
         time_or_target_period_str = None
         if time_periods:
@@ -2074,13 +2053,13 @@ class PinnedReport(models.Model):
             time_or_target_period_str = time_period_str_lookup.get(int(target_periods))
 
         # A relative report (Recent progress || Target vs Actuals)
-        if time_frame == str(ReportFormCommon.MOST_RECENT) and num_recent_periods and time_or_target_period_str:
+        if time_frame == str(MOST_RECENT) and num_recent_periods and time_or_target_period_str:
             #  Translators: Example: Most recent 2 Months
             return _('Most recent {num_recent_periods} {time_or_target_period_str}').format(
                 num_recent_periods=num_recent_periods, time_or_target_period_str=time_or_target_period_str)
 
         # Show all (Recent progress || Target vs Actuals w/ time period (such as annual))
-        if time_frame == str(ReportFormCommon.SHOW_ALL) and time_or_target_period_str:
+        if time_frame == str(SHOW_ALL) and time_or_target_period_str:
             # Translators: Example: Show all Years
             return _('Show all {time_or_target_period_str}').format(time_or_target_period_str=time_or_target_period_str)
 
@@ -2090,12 +2069,12 @@ class PinnedReport(models.Model):
             Indicator.MID_END,
             Indicator.EVENT,
         }
-        if time_frame == str(ReportFormCommon.SHOW_ALL) and target_periods \
+        if time_frame == str(SHOW_ALL) and target_periods \
                 and int(target_periods) in remaining_target_freq_set:
             return _('Show all results')
 
         # It's possible to submit bad input, but have the view "fix" it..
-        if time_frame == str(ReportFormCommon.MOST_RECENT) and num_recent_periods and not time_or_target_period_str:
+        if time_frame == str(MOST_RECENT) and num_recent_periods and not time_or_target_period_str:
             return _('Show all results')
 
         return ''

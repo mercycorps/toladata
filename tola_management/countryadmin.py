@@ -167,7 +167,7 @@ class NestedDisaggregationLabelSerializer(serializers.ModelSerializer):
 
     def to_representation(self, disaggregation_label):
         ret = super(NestedDisaggregationLabelSerializer, self).to_representation(disaggregation_label)
-        ret['in_use'] = disaggregation_label.disaggregationvalue_set.exists()
+        ret['in_use'] = disaggregation_label.disaggregatedvalue_set.exists()
         return ret
 
     def to_internal_value(self, data):

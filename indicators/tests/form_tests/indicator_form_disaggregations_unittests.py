@@ -38,7 +38,7 @@ from factories import (
     indicators_models as i_factories
 )
 from indicators.forms import IndicatorForm
-from indicators.models import Indicator, DisaggregationLabel, DisaggregationValue
+from indicators.models import Indicator, DisaggregationLabel, DisaggregatedValue
 
 class TestIndicatorCreateFormDisaggregations(test.TestCase):
 
@@ -509,17 +509,18 @@ class TestIndicatorUpdateFormDisaggregations(test.TestCase):
             periodic_target=indicator.periodictargets.first(),
             achieved=100
         )
-        d_value1 = DisaggregationValue(
-            disaggregation_label=sd1_labels[0],
-            value=45
+        d_value1 = DisaggregatedValue(
+            category=sd1_labels[0],
+            value=45,
+            result=result
         )
         d_value1.save()
-        d_value2 = DisaggregationValue(
+        d_value2 = DisaggregatedValue(
             disaggregation_label=sd1_labels[1],
-            value=55
+            value=55,
+            result=result
         )
         d_value2.save()
-        result.disaggregation_value.set([d_value1, d_value2])
         other_indicator = self.get_indicator()
         other_indicator.disaggregation.set([sd2, sd3])
         other_result = i_factories.ResultFactory(
@@ -527,12 +528,12 @@ class TestIndicatorUpdateFormDisaggregations(test.TestCase):
             periodic_target=other_indicator.periodictargets.first(),
             achieved=100
         )
-        d_value3 = DisaggregationValue(
-            disaggregation_label=sd2_labels[0],
-            value=45
+        d_value3 = DisaggregatedValue(
+            category=sd2_labels[0],
+            value=45,
+            result=other_result
         )
         d_value3.save()
-        other_result.disaggregation_value.add(d_value3)
         self.maxDiff = None
         form = self.get_update_form(instance=indicator)
         self.assertHTMLEqual(

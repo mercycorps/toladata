@@ -1,5 +1,5 @@
 from import_export import resources
-from .models import Indicator, Result, Country, Program, Sector, DisaggregationValue, ReportingFrequency
+from .models import Indicator, Result, Country, Program, Sector, ReportingFrequency
 from workflow.models import TolaUser
 from import_export.admin import ImportExportModelAdmin
 from import_export.widgets import ForeignKeyWidget, ManyToManyWidget

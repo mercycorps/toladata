@@ -5,7 +5,7 @@ from factories import (
     indicators_models as i_factories,
     workflow_models as w_factories
 )
-from indicators.models import DisaggregationType, DisaggregationLabel, DisaggregationValue
+from indicators.models import DisaggregationType, DisaggregationLabel, DisaggregatedValue
 from django import test
 
 
@@ -207,12 +207,12 @@ class TestDisaggregationLabelCounts(test.TestCase):
             periodic_target=indicator.periodictargets.first(),
             achieved=100
         )
-        d_value = DisaggregationValue(
-            disaggregation_label=labels[1],
-            value=100
+        d_value = DisaggregatedValue(
+            category=labels[1],
+            value=100,
+            result=result
         )
         d_value.save()
-        result.disaggregation_value.add(d_value)
         annotated_disagg = DisaggregationType.form_objects.get(pk=disagg.pk)
         self.assertTrue(annotated_disagg.in_use)
         self.assertFalse(
@@ -233,12 +233,12 @@ class TestDisaggregationLabelCounts(test.TestCase):
             periodic_target=indicator_a.periodictargets.first(),
             achieved=100
         )
-        d_value = DisaggregationValue(
-            disaggregation_label=labels[1],
-            value=100
+        d_value = DisaggregatedValue(
+            category=labels[1],
+            value=100,
+            result=result
         )
         d_value.save()
-        result.disaggregation_value.add(d_value)
         annotated_disagg_a = DisaggregationType.form_objects.for_indicator(indicator_a.pk).get(pk=disagg.pk)
         self.assertTrue(annotated_disagg_a.in_use)
         self.assertFalse(

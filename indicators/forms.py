@@ -17,7 +17,6 @@ from indicators.models import (
     StrategicObjective,
     DisaggregationType,
     DisaggregationLabel,
-    DisaggregationValue,
     Level,
     IndicatorType,
     PinnedReport,

@@ -50,7 +50,6 @@ from indicators.models import (
     Indicator,
     PeriodicTarget,
     DisaggregationLabel,
-    DisaggregationValue,
     Result,
 )
 from indicators.queries import ProgramWithMetrics, ResultsIndicator
@@ -810,7 +809,10 @@ class ResultCreate(ResultFormMixin, CreateView):
             initial=[
                 {'disaggregation_label': label.label,
                  'disaggregation_label_pk': label.pk}
-                for label in global_disaggregations.first().disaggregationlabel_set.all()])
+                for label in (
+                    global_disaggregations.first().disaggregationlabel_set.all()
+                    if global_disaggregations.first() else [])
+                ])
         country_disaggregations = self.indicator.disaggregation.filter(standard=False)
         return context
 
@@ -1035,7 +1037,7 @@ class DisaggregationReportMixin:
             program_selected = Program.objects.filter(id=programId).first()
             if program_selected.indicator_set.count() > 0:
                 indicators = indicators.filter(program=programId)
-
+        # TODO: this is wrong (rebuild disaggregated value db models)
         disagg_query = "SELECT \
                 i.id AS IndicatorID, \
                 dt.disaggregation_type AS DType,\

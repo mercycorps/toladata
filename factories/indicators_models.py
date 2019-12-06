@@ -32,7 +32,7 @@ from indicators.models import (
     PinnedReport as PinnedReportM,
     DisaggregationType as DisaggregationTypeM,
     DisaggregationLabel as DisaggregationLabelM,
-    DisaggregationValue as DisaggregationValueM,
+    DisaggregatedValue as DisaggregatedValueM,
     DataCollectionFrequency as DataCollectionFrequencyM
 )
 from factories.workflow_models import OrganizationFactory, ProgramFactory, CountryFactory
@@ -297,11 +297,11 @@ class DisaggregationLabelFactory(DjangoModelFactory):
     customsort = Sequence(lambda n: n + 1)
 
 
-class DisaggregationValueFactory(DjangoModelFactory):
+class DisaggregatedValueFactory(DjangoModelFactory):
     class Meta:
-        model = DisaggregationValueM
+        model = DisaggregatedValueM
 
-    disaggregation_label = SubFactory(DisaggregationLabelFactory)
+    category = SubFactory(DisaggregationLabelFactory)
     value = FuzzyInteger(10, 100)
 
 

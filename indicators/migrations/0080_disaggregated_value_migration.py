@@ -18,6 +18,8 @@ def clear_unassigned_disaggregation_values(apps, schema_editor):
 def get_decimal_value(value):
     if value is None or value == '':
         return None
+    if isinstance(value, str) and ',' in value:
+        value = ''.join([c for c in value if c != ','])
     try:
         value = round(float(value), 2)
     except ValueError:
@@ -90,6 +92,13 @@ def assign_all_sadd_disaggregated_values(apps, schema_editor):
                     disaggregated_value.save()
                     sadd_value.delete()
 
+def clear_blank_old_values(apps, schema_editor):
+    DisaggregationValue = apps.get_model('indicators', 'DisaggregationValue')
+    blank_disaggregations = DisaggregationValue.objects.filter(
+        models.Q(value__isnull=True) | models.Q(value='')
+    )
+    blank_disaggregations.delete()
+
 
 class Migration(migrations.Migration):
 
@@ -118,5 +127,6 @@ class Migration(migrations.Migration):
         ),
         migrations.RunPython(clear_unassigned_disaggregation_values, non_reversible_migration),
         migrations.RunPython(assign_all_new_disaggregated_values, non_reversible_migration),
-        migrations.RunPython(assign_all_sadd_disaggregated_values, non_reversible_migration)
+        migrations.RunPython(assign_all_sadd_disaggregated_values, non_reversible_migration),
+        migrations.RunPython(clear_blank_old_values, non_reversible_migration)
     ]

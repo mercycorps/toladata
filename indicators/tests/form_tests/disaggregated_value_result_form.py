@@ -9,7 +9,7 @@ from factories import (
 )
 
 from indicators.models import (
-    DisaggregationValue
+    DisaggregatedValue
 )
 
 from indicators.forms import (
@@ -117,9 +117,9 @@ class TestDisaggregatedValueFormSet(test.TestCase):
         self.assertEqual(values[0].disaggregation_label, self.disagg.labels[0])
         self.assertEqual(float(values[1].value), 178.55)
         self.assertEqual(values[1].disaggregation_label, self.disagg.labels[1])
-        value1 = DisaggregationValue.objects.get(pk=values[0].pk)
+        value1 = DisaggregatedValue.objects.get(pk=values[0].pk)
         self.assertEqual(value1.value, values[0].value)
-        value2 = DisaggregationValue.objects.get(pk=values[1].pk)
+        value2 = DisaggregatedValue.objects.get(pk=values[1].pk)
         self.assertEqual(value2.value, values[1].value)
 
 
@@ -191,11 +191,11 @@ class TestDisaggregatedValueFormSetFactory(test.TestCase):
         )
         indicator.disaggregation.set([disagg])
         for label in disagg.labels:
-            disagg_value = i_factories.DisaggregationValueFactory(
-                disaggregation_label=label,
-                value=100
+            disagg_value = i_factories.DisaggregatedValueFactory(
+                category=label,
+                value=100,
+                result=result
             )
-            result.disaggregation_value.add(disagg_value)
         formset = get_disaggregated_result_formset(disagg)(result=result)
         self.assertEqual(len(formset), 2)
         self.assertEqual(int(formset[0]['value'].field.initial), 100)
@@ -225,18 +225,18 @@ class TestDisaggregatedValueFormSetFactory(test.TestCase):
         )
         disagg1_values = [200, 300.50]
         for label, value in zip(disagg1.labels, disagg1_values):
-            disagg_value = i_factories.DisaggregationValueFactory(
-                disaggregation_label=label,
-                value=value
+            disagg_value = i_factories.DisaggregatedValueFactory(
+                category=label,
+                value=value,
+                result=result
             )
-            result.disaggregation_value.add(disagg_value)
         disagg2_values = [50, 250.25, 200.25]
         for label, value in zip(disagg2.labels, disagg2_values):
-            disagg_value = i_factories.DisaggregationValueFactory(
-                disaggregation_label=label,
-                value=value
+            disagg_value = i_factories.DisaggregatedValueFactory(
+                category=label,
+                value=value,
+                result=result
             )
-            result.disaggregation_value.add(disagg_value)
         formset1 = get_disaggregated_result_formset(disagg1)(result=result)
         self.assertEqual(formset1.prefix, "disaggregation-formset-{}".format(disagg1.pk))
         self.assertEqual(len(formset1), 2)
