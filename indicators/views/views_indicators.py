@@ -1045,10 +1045,10 @@ class DisaggregationReportMixin:
                 l.label AS Disaggregation, \
                 SUM(dv.value) AS Actuals \
             FROM indicators_indicator AS i\
-            JOIN indicators_result AS c ON c.id = cdv.result_id\
+            JOIN indicators_result AS c ON c.indicator_id = i.id\
             JOIN indicators_disaggregatedvalue AS dv ON dv.result_id=c.id\
-            JOIN indicators_disaggregationlabel AS dl ON dl.id=dv.category_id\
-            JOIN indicators_disaggregationtype AS dt ON dt.id=dl.disaggregation_type_id\
+            JOIN indicators_disaggregationlabel AS l ON l.id=dv.category_id\
+            JOIN indicators_disaggregationtype AS dt ON dt.id=l.disaggregation_type_id\
             WHERE i.program_id = %s \
             GROUP BY IndicatorID, DType, customsort, Disaggregation \
             ORDER BY IndicatorID, DType, customsort, Disaggregation;" \
