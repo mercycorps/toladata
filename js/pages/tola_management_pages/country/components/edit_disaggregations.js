@@ -19,7 +19,7 @@ const ErrorFeedback = observer(({errorMessages}) => {
     )
 })
 
-const CategoryForm = ({index, category, ...props}) => (
+const CategoryForm = ({index, category, listLength, ...props}) => (
     <React.Fragment>
         <div className="form-group col-md-8">
             <input
@@ -33,11 +33,15 @@ const CategoryForm = ({index, category, ...props}) => (
             }
         </div>
         <div className="form-group col-md-2">
-            <input
+            <select
                 value={category.customsort}
                 onChange={ (e) => props.updateLabelOrder(index, e.target.value - 1) }
-                    className="form-control" disabled={props.disabled}
-            />
+                className="form-control" disabled={props.disabled}
+            >
+                {
+                    Array.from(Array(listLength).keys()).map(value => <option value={value+1} key={value}>{value+1}</option>)
+                }
+            </select>
         </div>
         {!props.disabled &&
         <a
@@ -70,6 +74,7 @@ const DisaggregationCategoryList = observer(
                     <CategoryForm
                         index={ rubric.source.index }
                         category={ categories[rubric.source.index] }
+                        listLength={ categories.length }
                         { ...props }
                     />
                     </div>
@@ -82,6 +87,7 @@ const DisaggregationCategoryList = observer(
                             <Draggable
                                 draggableId={ category.id == 'new' ? category.createdId : String(category.id) }
                                 index={ index }
+                                isDragDisabled={props.disabled}
                                 key={ category.id == 'new' ? category.createdId : category.id }>
                                 {(provided, snapshot) => (
                                     <div className="form-group disaggregation-label-group"
@@ -94,6 +100,7 @@ const DisaggregationCategoryList = observer(
                                         <CategoryForm
                                             index={ index }
                                             category={ category }
+                                            listLength={ categories.length }
                                             { ...props }
                                         />
                                     </div>
