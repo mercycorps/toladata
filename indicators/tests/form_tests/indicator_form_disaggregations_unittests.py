@@ -516,7 +516,7 @@ class TestIndicatorUpdateFormDisaggregations(test.TestCase):
         )
         d_value1.save()
         d_value2 = DisaggregatedValue(
-            disaggregation_label=sd1_labels[1],
+            category=sd1_labels[1],
             value=55,
             result=result
         )
