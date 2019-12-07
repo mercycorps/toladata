@@ -1044,22 +1044,15 @@ class DisaggregationReportMixin:
                 l.customsort AS customsort, \
                 l.label AS Disaggregation, \
                 SUM(dv.value) AS Actuals \
-            FROM indicators_result_disaggregation_value AS cdv \
-            INNER JOIN indicators_result AS c \
-                ON c.id = cdv.result_id \
-            INNER JOIN indicators_indicator AS i ON i.id = c.indicator_id\
-            INNER JOIN workflow_program AS p ON p.id = i.program_id \
-            INNER JOIN indicators_disaggregationvalue AS dv \
-                ON dv.id = cdv.disaggregationvalue_id \
-            INNER JOIN indicators_disaggregationlabel AS l \
-                ON l.id = dv.disaggregation_label_id \
-            INNER JOIN indicators_disaggregationtype AS dt \
-                ON dt.id = l.disaggregation_type_id \
-            WHERE p.id = %s \
+            FROM indicators_indicator AS i\
+            JOIN indicators_result AS c ON c.id = cdv.result_id\
+            JOIN indicators_disaggregatedvalue AS dv ON dv.result_id=c.id\
+            JOIN indicators_disaggregationlabel AS dl ON dl.id=dv.category_id\
+            JOIN indicators_disaggregationtype AS dt ON dt.id=dl.disaggregation_type_id\
+            WHERE i.program_id = %s \
             GROUP BY IndicatorID, DType, customsort, Disaggregation \
             ORDER BY IndicatorID, DType, customsort, Disaggregation;" \
                 % programId
-
         cursor = connection.cursor()
         cursor.execute(disagg_query)
         disdata = dictfetchall(cursor)

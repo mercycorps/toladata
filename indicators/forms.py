@@ -17,6 +17,7 @@ from indicators.models import (
     StrategicObjective,
     DisaggregationType,
     DisaggregationLabel,
+    DisaggregatedValue,
     Level,
     IndicatorType,
     PinnedReport,
@@ -517,8 +518,8 @@ class BaseDisaggregatedValueFormSet(forms.BaseFormSet):
             label = self.disaggregation.labels[index]
         except (IndexError, AttributeError):
             raise RuntimeError("Disaggregation/Labels not provided to Disaggregation form")
-        if self.result and self.result.disaggregation_value.filter(disaggregation_label=label.pk).exists():
-            value = self.result.disaggregation_value.filter(disaggregation_label=label.pk).first().value
+        if self.result and self.result.disaggregated_values.filter(category=label.pk).exists():
+            value = self.result.disaggregated_values.filter(category=label.pk).first().value
         else:
             value = None
         return {
@@ -543,9 +544,10 @@ class BaseDisaggregatedValueFormSet(forms.BaseFormSet):
         if self.is_valid():
             values = []
             for form in self.forms:
-                value, created = self.result.disaggregation_value.get_or_create(
-                    disaggregation_label_id=form.cleaned_data.get('label_pk'),
-                    value=form.cleaned_data.get('value')
+                value, created = DisaggregatedValue.update_or_create(
+                    category_id=form.cleaned_data.get('label_pk'),
+                    result_id=self.result.id,
+                    defaults={'value': form.cleaned_data.get('value')}
                 )
                 values.append(value)
         return values

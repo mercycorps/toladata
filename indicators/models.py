@@ -526,6 +526,10 @@ class DisaggregationLabel(models.Model):
     def __str__(self):
         return self.label
 
+    @property
+    def name(self):
+        return self.label
+
     @classmethod
     def get_standard_labels(cls):
         return cls.objects.filter(disaggregation_type__standard=True)
@@ -1915,9 +1919,12 @@ class Result(models.Model):
         return self.date_collected
 
     @property
-    def disaggregations(self):
-        disaggs = self.disaggregation_value.all()
-        return ', '.join([y.disaggregation_label.label + ': ' + y.value for y in disaggs])
+    def disaggregated_values(self):
+        return self.disaggregatedvalue_set.all().order_by(
+            'category__disaggregation_type__standard',
+            'category__disaggregation_type__disaggregation_type',
+            'category__customsort'
+        )
 
     @property
     def logged_fields(self):
@@ -1931,11 +1938,11 @@ class Result(models.Model):
             "sites": ', '.join(site.name for site in self.site.all()) if self.site.exists() else '',
             "disaggregation_values": {
                 dv.disaggregation_label.id: {
-                    "id": dv.disaggregation_label.id,
+                    "id": dv.category.id,
                     "value": dv.value,
-                    "name": dv.disaggregation_label.label,
+                    "name": dv.cateogry.name,
                 }
-                for dv in self.disaggregation_value.all()
+                for dv in self.disaggregated_values
             }
         }
 
