@@ -62,7 +62,7 @@ class Command(BaseCommand):
         headers = [
             'program_id', 'program_name', 'program_date',
             'indicator_id', 'indicator_type', 'indicator_date',
-            'result_count'
+            'result_count','reporting_frequency', 'data_collection_frequency'
         ]
         frequency_labels = dict(Indicator.TARGET_FREQUENCIES)
         with open(filepath, 'w') as fh:
@@ -77,7 +77,8 @@ class Command(BaseCommand):
                     else:
                         frequency = 'None'
                     indicator_values = [
-                        indicator.id, frequency, indicator.create_date, indicator.result_set.count()
+                        indicator.id, frequency, indicator.create_date, indicator.result_set.count(),
+                        indicator.reporting_frequency, indicator.data_collection_frequency
                     ]
 
                     writer.writerow(program_values + indicator_values)
