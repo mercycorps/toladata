@@ -1,7 +1,7 @@
 """Tests for the formset, form, formset-factory function, instantiation, validation, and model saving behavior"""
 
 import unittest
-from django import test, forms
+from django import test
 
 from factories import (
     indicators_models as i_factories,
