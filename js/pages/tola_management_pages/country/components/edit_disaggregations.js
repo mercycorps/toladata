@@ -26,7 +26,7 @@ const CategoryForm = ({index, category, listLength, ...props}) => (
                 value={ category.label }
                 onChange={(e) => props.updateLabel(index, { label: e.target.value })}
                 className={classNames("form-control", {"is-invalid": (props.errors.labels ? Object.keys(props.errors.labels[index]).length : false)})}
-                disabled={props.disabled}
+                disabled={category.in_use || props.disabled}
             />
             { props.errors.labels &&
                 <ErrorFeedback errorMessages={props.errors.labels[index]['label']} />
