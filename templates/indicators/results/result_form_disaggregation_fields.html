@@ -3,7 +3,92 @@
 {# disaggregation fields in result_form_modal.html #}
 {# TODO: update design, test functionality #}
 {# values supercede labels, so show labels if not values #}
-{{ global_disaggregation_formset.management_form }}
-{% for form in global_disaggregation_formset %}
-    {{ form }}
+{% for disaggregation_formset in disaggregation_forms %}
+    <fieldset>
+        <a
+           href="#" id="disaggregations_toggle_{{ forloop.counter0 }}" class="is-accordion-toggle btn btn-link"
+           data-toggle="collapse" data-target="#disaggregations_fields_{{ forloop.counter0 }}"
+           aria-expanded="false" aria-controls="disaggregations_fields_{{ forloop.counter0 }}">
+            <i class="fas fa-caret-right"></i>{{ disaggregation_formset.disaggregation }}
+        </a>
+        <div class="collapse" id="disaggregations_fields_{{ forloop.counter0 }}">
+            {{ disaggregation_formset.management_form }}
+            <table class="table table-bordered table-sm table-hover table-striped">
+                <thead>
+                    <tr>
+                        <th>Category</th>
+                        <th>Value</th>
+                    </tr>
+                </thead>
+                <tbody>
+            {% for form in disaggregation_formset %}
+                <tr>
+                    <td>{{form.label_pk}}{{form.value.label_tag }}</td>
+                    <td>{{ form.value }}</td>
+                </tr>
+            {% endfor %}
+            </tbody>
+            </table>
+        </div>
+    </fieldset>
 {% endfor %}
+
+<script>
+    // Collect all the form prefixes for the different formsets for validation:
+    var disaggForms = [
+        {% for disaggregation_formset in disaggregation_forms %}
+            "{{ disaggregation_formset.prefix }}",
+        {% endfor %}
+    ];
+    function cleanValueFields(prefix, achieved) {
+        let valid = true;
+        // iterate over each value field in the form and check for numeric or null
+        let values = []
+        Array.from(
+            Array(parseInt($(`#id_${prefix}-TOTAL_FORMS`).val())).keys()
+        ).forEach(
+            idx => {
+                let valueField = $(`#id_${prefix}-${idx}-value`);
+                if (valueField.val() == '') {
+                    //do nothing, null is okay
+                } else if (!$.isNumeric(valueField.val()) || parseFloat(valueField.val()) < 0) {
+                    valid = false;
+                    valueField.addClass('is-invalid');
+                    valueField.parent().addClass('has-error');
+                } else {
+                    valueField.val(Math.round(valueField.val() * 100 / 100));
+                    values.append(valueField.val())
+                }
+            }
+        );
+        if (valid && values.length > 0) {
+            if (values.reduce((a, b) => a + b) != achieved) {
+                valid = false;
+                // mark whole table as not summing correctly
+            }
+        }
+        return valid;
+    }
+    
+    function validateDisaggregations() {
+        // get achieved value:
+        const achieved = $('#id_achieved').val();
+        // iterate through each disaggregation formset:
+        disaggForms.forEach(
+            prefix => {
+                // validate all fields are numeric and appropriate decimals:
+                let valid = cleanValueFields(prefix, achieved);
+            }
+        )
+        for (let i=0; i<disaggForms.length; i++) {
+            let thisDisaggFormset = disaggForms[i];
+            console.log("validating", thisDisaggFormset);
+            let numberOfForms = $(`#id_${thisDisaggFormset}-TOTAL_FORMS`).val();
+            for (let j=0; j<numberOfForms; j++) {
+                let labelPk = $(`#id_${thisDisaggFormset}-${j}-label_pk`).val();
+                let value = $(`#id_${thisDisaggFormset}-${j}-value`).val();
+                value = cleanValue(value);
+            }
+        }
+    }
+</script>

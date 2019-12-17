@@ -45,7 +45,7 @@ from indicators.views.view_utils import (
     generate_periodic_targets,
     dictfetchall
 )
-from indicators.forms import IndicatorForm, ResultForm, PTFormInputsForm
+from indicators.forms import IndicatorForm, ResultForm, PTFormInputsForm, get_disaggregated_result_formset
 from indicators.models import (
     Indicator,
     PeriodicTarget,
@@ -774,12 +774,7 @@ class ResultFormMixin(object):
         messages.error(self.request, 'Invalid Form', fail_silently=False)
         return self.render_to_response(self.get_context_data(form=form))
 
-from django import forms
 
-class DisaggregatedResultForm(forms.Form):
-    disaggregation_label = forms.CharField()
-    disaggregation_label_pk = forms.IntegerField(widget=forms.HiddenInput())
-    value = forms.IntegerField(required=False, min_value=0)
 
 class ResultCreate(ResultFormMixin, CreateView):
     """Create new Result called by result_add as modal"""
@@ -803,17 +798,8 @@ class ResultCreate(ResultFormMixin, CreateView):
             str(self.indicator.form_title_level),
             str(self.indicator.name)
         )
-        DisaggregatedValueFormSet = forms.formset_factory(DisaggregatedResultForm, extra=0)
-        global_disaggregations = self.indicator.disaggregation.filter(standard=True)
-        context['global_disaggregation_formset'] = DisaggregatedValueFormSet(
-            initial=[
-                {'disaggregation_label': label.label,
-                 'disaggregation_label_pk': label.pk}
-                for label in (
-                    global_disaggregations.first().disaggregationlabel_set.all()
-                    if global_disaggregations.first() else [])
-                ])
-        country_disaggregations = self.indicator.disaggregation.filter(standard=False)
+        disaggregations = self.indicator.disaggregation.all()
+        context['disaggregation_forms'] = [get_disaggregated_result_formset(disagg)() for disagg in disaggregations]
         return context
 
     def get_form_kwargs(self):
@@ -864,6 +850,8 @@ class ResultUpdate(ResultFormMixin, UpdateView):
             str(self.indicator.form_title_level),
             str(self.indicator.name)
         )
+        disaggregations = self.indicator.disaggregation.all()
+        context['disaggregation_forms'] = [get_disaggregated_result_formset(disagg)(result=self.result) for disagg in disaggregations]
         return context
 
     def get_form_kwargs(self):
