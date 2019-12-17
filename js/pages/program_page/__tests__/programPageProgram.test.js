@@ -22,7 +22,7 @@ describe("full program page program", () => {
         expect(program.getResultsHTML(44)).toBeFalsy();
         await program.updateResultsHTML(44);
         expect(program.getResultsHTML(44)).toEqual(resp);
-        expect(api.indicatorResultsTable).toBeCalledWith(44);
+        expect(api.indicatorResultsTable).toBeCalledWith(44, true);
     });
     describe("with a results html loaded", () => {
         var program;

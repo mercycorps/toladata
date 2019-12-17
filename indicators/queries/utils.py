@@ -553,7 +553,7 @@ def indicator_results_count_annotation():
 
 def indicator_results_evidence_annotation():
     """annotates an indicator queryset with the number of results associated with each indicator that have
-        either a Documentation or TolaTable as evidence"""
+        an evidence_url provided"""
     return models.functions.Coalesce(
         models.Subquery(
             Result.objects.select_related(None).prefetch_related(None).filter(

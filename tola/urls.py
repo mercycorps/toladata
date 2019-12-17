@@ -17,23 +17,22 @@ from django.conf.urls import include, url
 # Import i18n_patterns
 from django.views.i18n import JavaScriptCatalog
 from django.views.generic import TemplateView
-from rest_framework import routers
+from django.contrib import admin
 from django.conf import settings
 from django.conf.urls.static import static
+from rest_framework import routers
 from rest_framework.authtoken import views as authtoken_views
-from django.contrib.auth import views as authviews
+
 
 from tola import views as tolaviews
 from indicators.views import program_page, old_program_page
 from indicators.views.views_results_framework import (
     LevelViewSet, insert_new_level, save_leveltiers, reorder_indicators, save_custom_tiers, save_custom_template, indicator_list)
 from indicators.views import views_program
+from workflow.views import dated_target_info
 
-# Uncomment the next two lines to enable the admin:
-from django.contrib import admin
 admin.autodiscover()
 admin.site.site_header = 'Tola Activity administration'
-from workflow.views import dated_target_info
 
 #REST FRAMEWORK
 router = routers.DefaultRouter()
@@ -60,7 +59,7 @@ urlpatterns = [
     url(r'^api-token-auth/', authtoken_views.obtain_auth_token),
 
     # enable the admin:
-    url(r'^admin/', include(admin.site.urls)),
+    url(r'^admin/', admin.site.urls),
 
     # enable admin documentation:
     url(r'^admin/doc/', include('django.contrib.admindocs.urls')),
@@ -104,11 +103,7 @@ urlpatterns = [
     # app include of indicator urls
     url(r'^indicators/', include('indicators.urls')),
 
-    # app include of customdashboard urls
-    url(r'^customdashboard/', include('customdashboard.urls')),
 
-    # app include of workflow urls
-    url(r'^formlibrary/', include('formlibrary.urls')),
 
     # local login
     url(r'^login/$', tolaviews.TolaLoginView.as_view(), name='login'),

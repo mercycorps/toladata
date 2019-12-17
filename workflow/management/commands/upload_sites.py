@@ -55,32 +55,12 @@ class Command(BaseCommand):
                     self.stdout.write(self.style.ERROR('%s, country not found (%s)' % (site_name, country_name) ))
                     continue
 
-                try:
-                    provinces = Province.objects.filter(country=country)
-                    office = Office.objects.get(name=office_name, province__in=provinces)
-                except Office.DoesNotExist:
-                    self.stdout.write(self.style.WARNING('%s, invalid office_name = %s' % (site_name, office_name) ))
-                    office = None
-                except Office.MultipleObjectsReturned:
-                    self.stdout.write(self.style.WARNING('%s, multiple offices with the same name = %s' % (site_name, office_name) ))
-                    office = None
+                office = None
 
                 try:
                     profile_type = ProfileType.objects.get(profile=type_of_site)
                 except ProfileType.DoesNotExist:
                     profile_type = None
-
-                try:
-                    province = Province.objects.get(name=province_name)
-                except Province.DoesNotExist:
-                    self.stdout.write(self.style.ERROR('%s, province not found (%s)' % (site_name, province_name) ))
-                    continue
-
-                try:
-                    district = District.objects.get(name=district_name)
-                except District.DoesNotExist:
-                    self.stdout.write(self.style.ERROR('%s, district not found (%s)' % (site_name, district_name) ))
-                    continue
 
                 try:
                     lat = float(latitude)
@@ -98,8 +78,8 @@ class Command(BaseCommand):
                     site, created = SiteProfile.objects.update_or_create(name = site_name,\
                         defaults = {\
                             'type': profile_type, 'office': office, 'contact_leader': contact,\
-                            'latitude': lat, 'longitude': lon, 'country': country, 'province': province,\
-                            'district': district, 'create_date': timezone.now()\
+                            'latitude': lat, 'longitude': lon, 'country': country,\
+                            'create_date': timezone.now()\
                             })
                     self.stdout.write(self.style.SUCCESS('%s site_profile created(%s) successfully!' % (site_name, created)))
                 except Exception as e:

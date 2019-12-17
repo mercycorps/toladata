@@ -13,8 +13,8 @@
 
 """
 
-from django.db import models
 from rest_framework import serializers
+from django.db import models
 
 
 def generate_queryset(*queryset_mixins):
@@ -75,7 +75,7 @@ def generate_queryset(*queryset_mixins):
     )
 
 def generate_safedelete_queryset(*queryset_mixins):
-    class SafeDeleteMixin(object):
+    class SafeDeleteMixin:
         qs_name = 'SafeDeleteAware'
         filter_methods = ['hide_deleted']
 

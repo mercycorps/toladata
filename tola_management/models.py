@@ -4,7 +4,6 @@ from __future__ import unicode_literals
 import json
 import itertools
 from django.core.serializers.json import DjangoJSONEncoder
-from django.core import serializers
 from django.db import models
 from django.utils.translation import ugettext as _
 
@@ -16,13 +15,14 @@ from workflow.models import (
 
 from indicators.models import (
     Indicator,
-    Level)
+    Level
+)
 
 def diff(previous, new, mapping):
     diff_list = []
     p = previous
     n = new
-    for (p_field, n_field) in itertools.izip_longest(p.keys(), n.keys()):
+    for (p_field, n_field) in itertools.zip_longest(p.keys(), n.keys()):
         if p_field and p_field not in n:
             diff_list.append({
                 "name": p_field,
@@ -67,8 +67,8 @@ class DiffableLog:
 
 class UserManagementAuditLog(models.Model, DiffableLog):
     date = models.DateTimeField(_('Modification Date'), auto_now_add=True)
-    admin_user = models.ForeignKey(TolaUser, related_name="+")
-    modified_user = models.ForeignKey(TolaUser, related_name="+")
+    admin_user = models.ForeignKey(TolaUser, null=True, on_delete=models.SET_NULL, related_name="+")
+    modified_user = models.ForeignKey(TolaUser, null=True, on_delete=models.SET_NULL, related_name="+")
     change_type = models.CharField(_('Modification Type'), max_length=255)
     previous_entry = models.TextField()
     new_entry = models.TextField()
@@ -116,18 +116,18 @@ class UserManagementAuditLog(models.Model, DiffableLog):
 
             def access_diff(p, n):
                 diff_list = []
-                for (p_field, n_field) in itertools.izip_longest(p.keys(), n.keys()):
+                for (p_field, n_field) in itertools.zip_longest(p.keys(), n.keys()):
                     if p_field and p_field not in n:
                         diff_list.append({
                             "name": p_field,
                             "prev": p[p_field],
-                            "new": {k: 'N/A' for k, _ in p[p_field].iteritems()},
+                            "new": {k: 'N/A' for k, _ in p[p_field].items()},
                         })
 
                     if n_field and n_field not in p:
                         diff_list.append({
                             "name": n_field,
-                            "prev": {k: 'N/A' for k, _ in n[n_field].iteritems()},
+                            "prev": {k: 'N/A' for k, _ in n[n_field].items()},
                             "new": n[n_field]
                         })
 
@@ -191,12 +191,12 @@ class UserManagementAuditLog(models.Model, DiffableLog):
 
 
 class ProgramAuditLog(models.Model, DiffableLog):
-    program = models.ForeignKey(Program, related_name="audit_logs")
+    program = models.ForeignKey(Program, on_delete=models.CASCADE, related_name="audit_logs")
     date = models.DateTimeField(_('Modification Date'), auto_now_add=True)
-    user = models.ForeignKey(TolaUser, related_name="+")
-    organization = models.ForeignKey(Organization, related_name="+")
-    indicator = models.ForeignKey(Indicator, related_name="+", null=True)
-    level = models.ForeignKey(Level, related_query_name="+", null=True)
+    user = models.ForeignKey(TolaUser, null=True, on_delete=models.SET_NULL, related_name="+")
+    organization = models.ForeignKey(Organization, null=True, on_delete=models.SET_NULL, related_name="+")
+    indicator = models.ForeignKey(Indicator, null=True, on_delete=models.SET_NULL, related_name="+")
+    level = models.ForeignKey(Level, null=True, on_delete=models.SET_NULL, related_query_name="+")
     change_type = models.CharField(_('Modification Type'), max_length=255)
     previous_entry = models.TextField(null=True, blank=True)
     new_entry = models.TextField(null=True, blank=True)
@@ -270,19 +270,20 @@ class ProgramAuditLog(models.Model, DiffableLog):
             elif diff["name"] == 'targets' or diff["name"] == 'disaggregation_values':
                 if diff["prev"] == 'N/A':
                     diff["prev"] = {
-                        n["id"]: {"name": n.get("name"), "value": 'N/A', "id": n["id"]} for k, n in diff["new"].iteritems()
+                        n["id"]: {"name": n.get("name"), "value": 'N/A', "id": n["id"]} for k, n in diff["new"].items()
                     }
                     continue
 
                 if diff["new"] == 'N/A':
                     diff["new"] = {
-                        p["id"]: {"name": p.get("name"), "value": 'N/A', "id": p["id"]} for k, p in diff["prev"].iteritems()
+                        p["id"]: {"name": p.get("name"),
+                                  "value": 'N/A', "id": p["id"]} for k, p in diff["prev"].items()
                     }
                     continue
 
                 prev = {}
                 new = {}
-                for (prev_id, new_id) in itertools.izip_longest(diff["prev"].keys(), diff["new"].keys()):
+                for (prev_id, new_id) in itertools.zip_longest(diff["prev"].keys(), diff["new"].keys()):
                     if prev_id and prev_id not in diff["new"]:
                         new[prev_id] = {
                             "name": diff["prev"][prev_id].get('name'),
@@ -474,8 +475,8 @@ class ProgramAuditLog(models.Model, DiffableLog):
 
 class ProgramAdminAuditLog(models.Model, DiffableLog):
     date = models.DateTimeField(_('Modification Date'), auto_now_add=True)
-    admin_user = models.ForeignKey(TolaUser, related_name="+")
-    program = models.ForeignKey(Program, related_name="+")
+    admin_user = models.ForeignKey(TolaUser, null=True, on_delete=models.SET_NULL, related_name="+")
+    program = models.ForeignKey(Program, null=True, on_delete=models.SET_NULL, related_name="+")
     change_type = models.CharField(_('Modification Type'), max_length=255)
     previous_entry = models.TextField()
     new_entry = models.TextField()
@@ -530,8 +531,8 @@ class ProgramAdminAuditLog(models.Model, DiffableLog):
 
 class OrganizationAdminAuditLog(models.Model, DiffableLog):
     date = models.DateTimeField(_('Modification Date'), auto_now_add=True)
-    admin_user = models.ForeignKey(TolaUser, related_name="+")
-    organization = models.ForeignKey(Organization, related_name="+")
+    admin_user = models.ForeignKey(TolaUser, null=True, on_delete=models.SET_NULL, related_name="+")
+    organization = models.ForeignKey(Organization, null=True, on_delete=models.SET_NULL, related_name="+")
     change_type = models.CharField(_('Modification Type'), max_length=255)
     previous_entry = models.TextField()
     new_entry = models.TextField()

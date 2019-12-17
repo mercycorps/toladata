@@ -7,8 +7,8 @@ from rest_framework.response import Response
 
 from rest_framework import serializers
 from rest_framework import permissions
+from rest_framework import pagination
 
-from feed.views import SmallResultsSetPagination
 
 from workflow.models import (
     Country,
@@ -22,13 +22,17 @@ from indicators.models import (
     DisaggregationLabel,
 )
 
-from .permissions import (
+from tola_management.permissions import (
     HasCountryAdminAccess,
     HasRelatedCountryAdminAccess,
 )
 
 
-class Paginator(SmallResultsSetPagination):
+class Paginator(pagination.PageNumberPagination):
+    page_size = 20
+    page_size_query_param = 'page_size'
+    max_page_size = 50
+
     def get_paginated_response(self , data):
         response = Response(OrderedDict([
             ('count', self.page.paginator.count),

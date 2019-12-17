@@ -22,7 +22,7 @@ def domains_allowed(backend, details, response, *args, **kwargs):
 def create_user_okta(backend, details, user, response, *args, **kwargs):
     if backend.name == 'saml' and response.get('idp_name') == 'okta':
         #annoyingly the attributes are coming back as arrays, so let's flatten them
-        attributes = {k: v[0] if len(v) > 0 else None for k,v in response['attributes'].iteritems()}
+        attributes = {k: v[0] if len(v) > 0 else None for k,v in response['attributes'].items()}
         savepoint = transaction.savepoint()
 
         email = attributes['email']

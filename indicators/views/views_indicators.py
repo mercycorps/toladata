@@ -1,16 +1,20 @@
+# -*- coding: utf-8 -*-
+"""
+Views for indicators and related models (results, periodic targets) as well as indicator summaries (Program page)
+"""
+
 import copy
 import json
 import logging
 from datetime import datetime, timedelta
+from decimal import Decimal
 import uuid
 import dateparser
-import requests
-from django.template.defaultfilters import truncatechars
 from weasyprint import HTML, CSS
 
+from django.template.defaultfilters import truncatechars
 from django.contrib import messages
 from django.core import serializers
-from django.core.urlresolvers import reverse_lazy
 from django.core.exceptions import PermissionDenied
 from django.db import connection, transaction
 from django.db.models import (
@@ -18,7 +22,7 @@ from django.db.models import (
 )
 from django.contrib.auth.decorators import login_required
 from django.http import HttpResponse, HttpResponseRedirect, JsonResponse
-from django.shortcuts import render, render_to_response, get_object_or_404, redirect, reverse
+from django.shortcuts import render, render_to_response, get_object_or_404, reverse
 from django.template.loader import render_to_string
 from django.utils import timezone
 from django.utils.decorators import method_decorator
@@ -26,41 +30,35 @@ from django.utils.translation import gettext as _, ugettext
 from django.views.generic import TemplateView
 from django.views.generic.detail import View
 from django.views.generic.edit import CreateView, DeleteView, UpdateView
-from django.views.generic.list import ListView
 
 from tola.util import group_excluded
+
+from workflow.models import (
+    Program
+)
+
 from indicators.serializers import (
     IndicatorSerializer,
-    ProgramSerializer
 )
 from indicators.views.view_utils import (
     import_indicator,
     generate_periodic_targets,
     dictfetchall
 )
-from workflow.models import (
-    Program, TolaSites, FormGuidance
-)
-from ..forms import IndicatorForm, ResultForm, PTFormInputsForm
+from indicators.forms import IndicatorForm, ResultForm, PTFormInputsForm
 from indicators.models import (
     Indicator,
     PeriodicTarget,
     DisaggregationLabel,
     DisaggregationValue,
     Result,
-    LevelTier,
-    Level,
-    TolaTable,
-    PinnedReport
 )
 from indicators.queries import ProgramWithMetrics, ResultsIndicator
-
-logger = logging.getLogger(__name__)
+from indicators import indicator_plan as ip
 
 from tola_management.models import (
     ProgramAuditLog
 )
-
 from tola_management.permissions import (
     indicator_pk_adapter,
     indicator_adapter,
@@ -74,7 +72,7 @@ from tola_management.permissions import (
     verify_program_access_level
 )
 
-import indicators.indicator_plan as ip
+
 
 logger = logging.getLogger(__name__)
 
@@ -133,10 +131,11 @@ def periodic_targets_form(request, program):
     })
 
 
-class PeriodicTargetJsonValidationError(Exception): pass
+class PeriodicTargetJsonValidationError(Exception):
+    pass
 
 
-class IndicatorFormMixin(object):
+class IndicatorFormMixin:
     model = Indicator
     form_class = IndicatorForm
 
@@ -144,7 +143,7 @@ class IndicatorFormMixin(object):
         self.guidance = None
 
     def set_form_guidance(self):
-        self.guidance = FormGuidance.objects.filter(form="Indicator").first()
+        self.guidance = None
 
     def get_template_names(self):
         return 'indicators/indicator_form_modal.html'
@@ -152,7 +151,7 @@ class IndicatorFormMixin(object):
     def form_invalid(self, form):
         return JsonResponse(form.errors, status=400)
 
-    def noramlize_periodic_target_client_json_dates(self, pt_json):
+    def normalize_periodic_target_client_json_dates(self, pt_json):
         """
         The JSON containing periodic targets sent by the client contains dates as: 'Dec 31, 2018'
         The rest of the code expects them to be: '2018-12-31'
@@ -199,8 +198,11 @@ class IndicatorFormMixin(object):
 
         # Are all target values >= 0?
         for pt in normalized_pt_json:
-            if pt['target'] < 0:
-                raise PeriodicTargetJsonValidationError('Target value must be >= 0, found %d' % pt.target)
+            try:
+                if Decimal(pt['target']).as_tuple()[0] == 1:
+                    raise PeriodicTargetJsonValidationError('Target value must be >= 0, found %d' % pt['target'])    
+            except TypeError:
+                pass
 
         # check that event names exist in the future?
         if target_frequency == Indicator.EVENT:
@@ -226,16 +228,18 @@ class IndicatorFormMixin(object):
 
         if len(generated_targets) != len(normalized_pt_json):
             raise PeriodicTargetJsonValidationError(
-                'Number of periodic targets sent by client does not match excepected number of targets on the server (%d vs %d)' % (
-                len(generated_targets), len(normalized_pt_json)))
+                ("Number of periodic targets sent by client "
+                 "does not match excepected number of targets on the server (%d vs %d)") % (
+                    len(generated_targets), len(normalized_pt_json)))
 
         server_period_dates = [(pt['start_date'], pt['end_date']) for pt in generated_targets]
         client_period_dates = [(pt['start_date'], pt['end_date']) for pt in normalized_pt_json]
 
         if server_period_dates != client_period_dates:
             raise PeriodicTargetJsonValidationError(
-                'Periodic Target start/end dates expected by server do not match what was sent by the client: %s vs %s' % (
-                server_period_dates, client_period_dates))
+                ("Periodic Target start/end dates expected by server "
+                 "do not match what was sent by the client: %s vs %s") % (
+                    server_period_dates, client_period_dates))
 
     def _save_success_msg(self, indicator, created=True, level_changed=False):
         """
@@ -263,7 +267,8 @@ class IndicatorFormMixin(object):
                                                        indicator.level_display_ontology) if using_rf else ''
 
         if created or level_changed:
-            # Translators: success message when an indicator was created, ex. "Indicator 2a was saved and linked to Outcome 2.2"
+            # Translators: success message when an indicator was created,
+            #  ex. "Indicator 2a was saved and linked to Outcome 2.2"
             return _('Indicator {indicator_number} was saved and linked to {result_level_display_ontology}').format(
                 indicator_number=indicator_number,
                 result_level_display_ontology=result_level_display_ontology
@@ -326,9 +331,11 @@ class IndicatorCreate(IndicatorFormMixin, CreateView):
             # now create/update periodic targets
             pt_json = json.loads(periodic_targets)
 
-            normalized_pt_json = self.noramlize_periodic_target_client_json_dates(pt_json)
+            normalized_pt_json = self.normalize_periodic_target_client_json_dates(pt_json)
 
-            self.validate_periodic_target_json_from_client(normalized_pt_json, indicator.program, indicator.target_frequency)
+            self.validate_periodic_target_json_from_client(
+                normalized_pt_json, indicator.program, indicator.target_frequency
+            )
 
             for i, pt in enumerate(normalized_pt_json):
                 values = dict(
@@ -401,8 +408,8 @@ class IndicatorUpdate(IndicatorFormMixin, UpdateView):
             return _('Indicator setup')
         elif self.object.old_level:
             return u'{} {}'.format(
-                unicode(ugettext(self.object.old_level)),
-                unicode(_('indicator')),
+                str(ugettext(self.object.old_level)),
+                str(_('indicator')),
             )
         else:
             return _('Indicator setup')
@@ -528,9 +535,11 @@ class IndicatorUpdate(IndicatorFormMixin, UpdateView):
             # now create/update periodic targets (will be empty u'[]' for LoP)
             pt_json = json.loads(periodic_targets)
 
-            normalized_pt_json = self.noramlize_periodic_target_client_json_dates(pt_json)
+            normalized_pt_json = self.normalize_periodic_target_client_json_dates(pt_json)
 
-            self.validate_periodic_target_json_from_client(normalized_pt_json, old_indicator.program, new_target_frequency)
+            self.validate_periodic_target_json_from_client(
+                normalized_pt_json, old_indicator.program, new_target_frequency
+            )
 
             generated_pt_ids = []
             for i, pt in enumerate(normalized_pt_json):
@@ -567,7 +576,7 @@ class IndicatorUpdate(IndicatorFormMixin, UpdateView):
 
         # Write to audit log if results attached or special case of RF level reassignment
         results_count = Result.objects.filter(indicator=self.object).count()
-        if results_count > 0 or old_indicator.level_id != self.object.level_id:
+        if (results_count and results_count > 0) or old_indicator.level_id != self.object.level_id:
             ProgramAuditLog.log_indicator_updated(
                 self.request.user,
                 self.object,
@@ -625,7 +634,9 @@ class IndicatorDelete(DeleteView):
                     )
                 # otherwise the rationale is this default:
                 else:
-                    rationale = _("Reason for change is not required when deleting an indicator with no linked results.")
+                    rationale = _(
+                        "Reason for change is not required when deleting an indicator with no linked results."
+                        )
             else:
                 rationale = request.POST.get('rationale')
             indicator_values = indicator.logged_fields
@@ -722,7 +733,7 @@ class PeriodicTargetDeleteView(DeleteView):
         rationale = request.POST.get('rationale')
         indicator = self.get_object().indicator
         old_indicator_values = indicator.logged_fields
-        if result_count > 0:
+        if result_count and result_count > 0:
             if not rationale:
                 return JsonResponse(
                     {"status": "failed", "msg": _("Reason for change is required")},
@@ -744,12 +755,12 @@ class PeriodicTargetDeleteView(DeleteView):
         indicator.save()
 
         ProgramAuditLog.log_indicator_updated(
-                request.user,
-                indicator,
-                old_indicator_values,
-                indicator.logged_fields,
-                rationale
-            )
+            request.user,
+            indicator,
+            old_indicator_values,
+            indicator.logged_fields,
+            rationale
+        )
 
         return JsonResponse({"status": "success"})
 
@@ -781,7 +792,9 @@ class ResultCreate(ResultFormMixin, CreateView):
         return super(ResultCreate, self).dispatch(request, *args, **kwargs)
 
     def get_context_data(self, **kwargs):
-        custom_disaggregation_labels = DisaggregationLabel.objects.filter(disaggregation_type__indicator=self.indicator.id)
+        custom_disaggregation_labels = DisaggregationLabel.objects.filter(
+            disaggregation_type__indicator=self.indicator.id
+        )
         standard_disaggregation_labels = DisaggregationLabel.get_standard_labels()
 
         context = super(ResultCreate, self).get_context_data(**kwargs)
@@ -789,8 +802,8 @@ class ResultCreate(ResultFormMixin, CreateView):
         context['custom_disaggregation_labels'] = custom_disaggregation_labels
         context['standard_disaggregation_labels'] = standard_disaggregation_labels
         context['title_str'] = u'{}: {}'.format(
-            unicode(self.indicator.form_title_level),
-            unicode(self.indicator.name)
+            str(self.indicator.form_title_level),
+            str(self.indicator.name)
         )
         return context
 
@@ -808,23 +821,6 @@ class ResultCreate(ResultFormMixin, CreateView):
             Q(disaggregation_type__indicator__id=indicator) |
             Q(disaggregation_type__standard=True))
 
-        # update the count with the value of Table unique count
-        if form.instance.update_count_tola_table and form.instance.tola_table:
-            try:
-                tola_table_id = self.request.POST['tola_table']
-                table = TolaTable.objects.get(id=tola_table_id)
-            except DisaggregationLabel.DoesNotExist:
-                table = None
-
-            if table:
-                # remove trailing slash since TT api does not like it.
-                url = table.url if table.url[-1:] != "/" else table.url[:-1]
-                url = url if url[-5:] != "/data" else url[:-5]
-                count = getTableCount(url, table.table_id)
-            else:
-                count = 0
-            form.instance.achieved = count
-
         new = form.save()
 
         # The following code appears to be accomplishing the following
@@ -835,7 +831,7 @@ class ResultCreate(ResultFormMixin, CreateView):
 
         disaggregation_label_ids = set([str(dl.id) for dl in disaggregation_labels])
         process_disaggregation = False
-        for k, v in self.request.POST.iteritems():
+        for k, v in self.request.POST.items():
             if k in disaggregation_label_ids and v:
                 process_disaggregation = True
                 break
@@ -893,8 +889,8 @@ class ResultUpdate(ResultFormMixin, UpdateView):
         context['standard_disaggregation_labels'] = standard_disaggregation_labels
         context['standard_disaggregation_values'] = standard_disaggregation_values
         context['title_str'] = u'{}: {}'.format(
-            unicode(self.indicator.form_title_level),
-            unicode(self.indicator.name)
+            str(self.indicator.form_title_level),
+            str(self.indicator.name)
         )
         return context
 
@@ -913,23 +909,6 @@ class ResultUpdate(ResultFormMixin, UpdateView):
             Q(disaggregation_type__indicator__id=old_result.indicator_id) |
             Q(disaggregation_type__standard=True)).distinct()
 
-        # update the count with the value of Table unique count
-        if form.instance.update_count_tola_table and form.instance.tola_table:
-            try:
-                table = TolaTable.objects.get(
-                    id=self.request.POST['tola_table'])
-
-            except TolaTable.DoesNotExist:
-                table = None
-            if table:
-                # remove trainling slash since TT api does not like it.
-                url = table.url if table.url[-1:] != "/" else table.url[:-1]
-                url = url if url[-5:] != "/data" else url[:-5]
-                count = getTableCount(url, table.table_id)
-            else:
-                count = 0
-            form.instance.achieved = count
-
         # save the form then update manytomany relationships
         old_values = old_result.logged_fields
         new_result = form.save()  # internally this clears disaggregation_value m2m relationships!
@@ -938,7 +917,7 @@ class ResultUpdate(ResultFormMixin, UpdateView):
 
         disaggregation_label_ids = set([str(dl.id) for dl in getDisaggregationLabel])
         process_disaggregation = False
-        for k, v in self.request.POST.iteritems():
+        for k, v in self.request.POST.items():
             if k in disaggregation_label_ids and v:
                 process_disaggregation = True
                 break
@@ -987,7 +966,9 @@ class ResultDelete(DeleteView):
             result = self.get_object()
             result_values = result.logged_fields
             result.delete()
-            ProgramAuditLog.log_result_deleted(self.request.user, result.indicator, result_values, self.request.POST['rationale'])
+            ProgramAuditLog.log_result_deleted(
+                self.request.user, result.indicator, result_values, self.request.POST['rationale']
+            )
 
             return JsonResponse(
                 {"status": "success", "msg": "Result Deleted"}
@@ -999,33 +980,6 @@ class ResultDelete(DeleteView):
         return self.object.program.program_page_url
 
 
-def getTableCount(url, table_id):
-    """
-    Count the number of rowns in a TolaTable
-    """
-    token = TolaSites.objects.get(site_id=1)
-    if token.tola_tables_token:
-        headers = {
-            'content-type': 'application/json',
-            'Authorization': 'Token %s' % token.tola_tables_token
-        }
-    else:
-        headers = {
-            'content-type': 'application/json'
-        }
-        print "Token Not Found"
-
-    response = requests.get(url, headers=headers, verify=True)
-    data = json.loads(response.content)
-    count = None
-
-    try:
-        count = data['data_count']
-        TolaTable.objects.filter(table_id=table_id).update(unique_count=count)
-    except KeyError:
-        pass
-
-    return count
 
 
 def merge_two_dicts(x, y):
@@ -1067,7 +1021,12 @@ def result_view(request, indicator, program):
     periodictargets = indicator.annotated_targets
     on_track_lower = 100 - 100 * Indicator.ONSCOPE_MARGIN
     on_track_upper = 100 + 100 * Indicator.ONSCOPE_MARGIN
-    on_track = True if (on_track_lower <= indicator.lop_percent_met <= on_track_upper) else False
+    if (indicator.lop_percent_met and
+            on_track_lower <= indicator.lop_percent_met and
+            indicator.lop_percent_met <= on_track_upper):
+        on_track = True
+    else:
+        on_track = False
     is_editable = False if request.GET.get('edit') == 'false' else True
 
     readonly = not request.has_write_access
@@ -1116,7 +1075,7 @@ def indicator_plan(request, program):
     })
 
 
-class DisaggregationReportMixin(object):
+class DisaggregationReportMixin:
     def get_context_data(self, **kwargs):
         context = super(DisaggregationReportMixin, self) \
             .get_context_data(**kwargs)

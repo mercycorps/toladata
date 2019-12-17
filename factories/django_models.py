@@ -1,5 +1,5 @@
+from factory import DjangoModelFactory, lazy_attribute, RelatedFactory
 from django.template.defaultfilters import slugify
-from factory import DjangoModelFactory, lazy_attribute, SubFactory, RelatedFactory
 
 
 class UserFactory(DjangoModelFactory):

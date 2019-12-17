@@ -16,17 +16,10 @@
 
         <link rel="icon" href="{% static 'img/favicon.ico' %}">
 
-        <!-- Datatables css for HTML tables -->
-        <link href="{% static 'css/datatables.min.css' %}" rel="stylesheet" type="text/css">
-
         <!-- compiled webpack CSS -->
         {% render_bundle 'base' 'css' %}
 
-        <!--- Django Tables2 css -->
-        <link rel="stylesheet" href="{% static 'django_tables2/themes/paleblue/css/screen.css' %}">
 
-        <!-- Hosted Leaflet CSS -->
-        <link rel="stylesheet" href="{% static "css/leaflet.css" %}">
 
         <link rel="stylesheet" href="{% static "css/jquery-ui.min.css" %}?q=gp1116">
 
@@ -37,8 +30,6 @@
         {# TODO: this should be in at least two separate blocks #}
         {% endblock %}
 
-        <!-- Hosted Leaflet -->
-        <script src="{% static "js/leaflet.js" %}"></script>
 
         <!-- bootstrap multiselect -->
         <script type="text/javascript" src="{% static "js/bootstrap-multiselect.js" %}?q=gp1116"></script>
@@ -79,26 +70,10 @@
                                 {% program_menu %}
                             </li>
                             <li class="nav-item dropdown">
-                                <a class="nav-link dropdown-toggle" href="#" id="navbarBrowse" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">{% trans "Browse" %}</a>
-                                <div class="dropdown-menu" aria-labelledby="navbarBrowse">
-                                    <a class="dropdown-item" href="/workflow/documentation_list/">{% trans "Documents" %}</a>
-                                    {% if user.tola_user.allow_projects_access %}
-                                    <a class="dropdown-item" href="/workflow/dashboard/0/">{% trans "Projects" %}</a>
-                                    {% endif %}
-                                    <a class="dropdown-item" href="/workflow/siteprofile_list/0/0/">{% trans "Sites" %}</a>
-                                    {% if user.tola_user.allow_projects_access %}
-                                    <a class="dropdown-item" href="/workflow/stakeholder_list/0/0">{% trans "Stakeholders" %}</a>
-                                    {% endif %}
-                                </div>
-                            </li>
-                            <li class="nav-item dropdown">
                                 <a class="nav-link dropdown-toggle" href="#" id="navbarReportsDropdown" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">{% trans "Reports" %}</a>
                                 <div class="dropdown-menu" aria-labelledby="navbarReportsDropdown">
                                     <a class="dropdown-item" href="{% url 'iptt_quickstart' %}">{% trans "Indicator Performance Tracking Table" %}</a>
                                     <a class="dropdown-item" href="{% url 'disrep_quickstart' %}">{% trans "Indicator Disaggregation Report" %}</a>
-                                    {% if user.tola_user.allow_projects_access %}
-                                    <a class="dropdown-item" href="/workflow/report/0/none">{% trans "Project Report" %}</a>
-                                    {% endif %}
                                 </div>
                             </li>
                             {% if user.tola_user.has_admin_management_access %}
@@ -263,9 +238,6 @@
 
         <script defer src="https://use.fontawesome.com/releases/v5.5.0/js/all.js"></script>
 
-
-        <script type="text/javascript" src="{% static 'js/datatables.min.js' %}"></script>
-
         <script type="text/javascript" src="{{ STATIC_URL }}js/select2.min.js"></script>
 
         <!-- Add JQuery UI language files -->
@@ -317,8 +289,6 @@
         <!-- Global init and functions - what used to be app.js -->
         {% render_bundle 'base' 'js' %}
 
-        <!-- Projects Javascript -->
-        <script type="text/javascript" src="{% static 'js/projects.js' %}?q=huckleberry"></script>
 
         {% block extra_js_in_body %}
         {% endblock %}

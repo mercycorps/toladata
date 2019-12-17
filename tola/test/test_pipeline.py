@@ -1,4 +1,4 @@
-import mock
+from unittest import mock
 from django.test import TestCase
 
 from factories.workflow_models import CountryFactory, OrganizationFactory

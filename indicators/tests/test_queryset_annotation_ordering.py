@@ -2,7 +2,7 @@ import operator
 from factories.indicators_models import IndicatorFactory, LevelFactory
 from factories.workflow_models import RFProgramFactory
 from workflow.models import Program
-from indicators.models import Indicator
+from indicators.models import Indicator, Max, Min
 
 from django import test
 
@@ -80,9 +80,9 @@ class TestRFLabeling(test.TestCase):
 
 class TestIndicatorNumberLabeling(test.TestCase):
     numbers = [
-        ('1.1.1', (None, 1, None)),
-        ('1', (None, 1, None)),
-        ('1.1', (None, 1, None)),
+        ('1.1.1', (Max, 1, Min)),
+        ('1', (Max, 1, Min)),
+        ('1.1', (Max, 1, Min)),
     ]
     def test_indicator_manual_sorting_manual_display_unmigrated(self):
         program = RFProgramFactory(migrated=False)

@@ -105,7 +105,7 @@ class ProgramBase(object):
         return sorted(
             sorted(
                 [i for i in indicator_set if i.level_id is None or i.results_framework is False],
-                key=lambda i: (i.sort_number is None, i.sort_number)
+                 key=lambda i: i.sort_number
                 ),
             key=lambda i: (i.old_level_pk is None, i.old_level_pk)
         )
@@ -565,10 +565,10 @@ class PeriodDateRangeSerializer(serializers.Serializer):
     year = serializers.SerializerMethodField()
 
     def get_start_label(self, period):
-        return l10n_date_medium(period['start'])
+        return l10n_date_medium(period['start'], decode=True)
 
     def get_end_label(self, period):
-        return l10n_date_medium(period['end'])
+        return l10n_date_medium(period['end'], decode=True)
 
     def get_past(self, period):
         return period['start'] < timezone.now().date()
@@ -822,6 +822,7 @@ class IPTTMixin(object):
 
     def get_indicators(self, program):
         indicators = self._get_program_indicators(program)
+        # TODO: json dump to string: ?
         return IPTTIndicatorSerializer(indicators, context=self.context, many=True).data
 
 
