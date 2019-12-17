@@ -12,22 +12,22 @@ def _create_3_periodic_targets(indicator):
     PeriodicTargetFactory(
         indicator=indicator,
         target=10,
-        start_date=datetime.date(2016, 03, 01),
-        end_date=datetime.date(2016, 03, 31),
+        start_date=datetime.date(2016, 3, 1),
+        end_date=datetime.date(2016, 3, 31),
     )
 
     PeriodicTargetFactory(
         indicator=indicator,
         target=20,
-        start_date=datetime.date(2016, 04, 01),
-        end_date=datetime.date(2016, 04, 30),
+        start_date=datetime.date(2016, 4, 1),
+        end_date=datetime.date(2016, 4, 30),
     )
 
     PeriodicTargetFactory(
         indicator=indicator,
         target=30,
-        start_date=datetime.date(2016, 05, 01),
-        end_date=datetime.date(2016, 05, 31),
+        start_date=datetime.date(2016, 5, 1),
+        end_date=datetime.date(2016, 5, 31),
     )
 
 
@@ -47,13 +47,13 @@ class TestIndicatorGetCurrentPeriodicTarget(TestBase, TestCase):
         _create_3_periodic_targets(self.indicator)
 
         # test in range
-        self.assertEquals(self.indicator.current_periodic_target(datetime.date(2016, 04, 15)).target, 20)
+        self.assertEquals(self.indicator.current_periodic_target(datetime.date(2016, 4, 15)).target, 20)
 
         # test out of range
-        self.assertIsNone(self.indicator.current_periodic_target(datetime.date(2017, 04, 15)))
+        self.assertIsNone(self.indicator.current_periodic_target(datetime.date(2017, 4, 15)))
 
         # test no date given
         self.assertIsNone(self.indicator.current_periodic_target())
 
     def test_current_periodic_target_accessor_none(self):
-        self.assertIsNone(self.indicator.current_periodic_target(datetime.date(2016, 04, 15)))
+        self.assertIsNone(self.indicator.current_periodic_target(datetime.date(2016, 4, 15)))

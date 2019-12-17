@@ -198,7 +198,7 @@ def print_categories(categories, na_values, Indicator, outfile, verbose=True):
     outfile.write('Values considered as N/A: {}\n'.format(', '.join(na_values)))
     outfile.write('Count of programs with end dates of < 1 yr ago and unparsable lop_targets:\n')
     outfile.write('Category counts:\n')
-    for key, values in categories.iteritems():
+    for key, values in categories.items():
         outfile.write('  %s: %s\n' % (categories[key]['label'], len(categories[key]['values'])))
 
 

@@ -1,4 +1,5 @@
 {% extends "base.html" %}
+{% load static %}
 {% load i18n %}
 
 {% block title %} {% trans "Indicator Disaggregation Report" %} | {% endblock %}
@@ -7,6 +8,12 @@
 {% block bread_crumb %}
 {% endblock %}
 
+{% block extra_css_in_header %}
+
+    <!-- Datatables css for HTML tables -->
+    <link href="{% static 'css/datatables.min.css' %}" rel="stylesheet" type="text/css">
+
+{% endblock %}
 
 {% block content %}
 
@@ -320,3 +327,8 @@
     </script>
 
 {% endblock content %}
+
+
+{% block extra_js_in_body %}
+    <script type="text/javascript" src="{% static 'js/datatables.min.js' %}"></script>
+{% endblock %}

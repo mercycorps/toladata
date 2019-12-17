@@ -9,7 +9,6 @@
   5.2. What percentage of indicators?
 """
 
-import unittest
 import datetime
 from indicators.models import Indicator, PeriodicTarget
 from indicators.queries import ProgramWithMetrics
@@ -19,11 +18,14 @@ from factories import (
     )
 from django import test
 
-class TestProgramReportingingCounts (test.TransactionTestCase):
+class TestProgramReportingingCounts(test.TransactionTestCase):
     def setUp(self):
+        today = datetime.date.today()
+        start_date = datetime.date(today.year-2, today.month, 1)
+        end_date = datetime.date(today.year-1, today.month, 1) - datetime.timedelta(days=1)
         self.program = w_factories.ProgramFactory(
-            reporting_period_start=datetime.date.today()-datetime.timedelta(days=365),
-            reporting_period_end=datetime.date.today()-datetime.timedelta(days=1)
+            reporting_period_start=start_date,
+            reporting_period_end=end_date
         )
         self.indicators = []
         self.data = []
@@ -363,4 +365,3 @@ class TestTargetsActualsOverUnderCorrect(test.TestCase):
             program.scope_counts['high'], 1,
             "should show over (350/500), got {0}".format(program.scope_counts)
         )
-

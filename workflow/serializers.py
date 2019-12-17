@@ -2,46 +2,13 @@
 """Serializers for workflow model data, specific to view use cases."""
 from rest_framework import serializers
 
-from workflow.models import Program, Documentation, ProjectAgreement
+from workflow.models import Program
 from indicators.models import Level, Indicator
 
 from django.shortcuts import reverse
 from django.db import models
 from django.utils.translation import ugettext_lazy as _
 
-
-class DocumentListProgramSerializer(serializers.ModelSerializer):
-    class Meta:
-        model = Program
-        fields = [
-            'id',
-            'gaitid',
-            'name',
-        ]
-
-
-class DocumentListProjectSerializer(serializers.ModelSerializer):
-    class Meta:
-        model = ProjectAgreement
-        fields = [
-            'id',
-            'project_name',
-        ]
-
-
-class DocumentListDocumentSerializer(serializers.ModelSerializer):
-    project = DocumentListProjectSerializer(read_only=True)
-
-    class Meta:
-        model = Documentation
-        fields = [
-            'id',
-            'name',
-            'create_date',
-            'program',
-            'project',
-            'url',
-        ]
 
 class LogframeIndicatorSerializer(serializers.ModelSerializer):
     level = serializers.PrimaryKeyRelatedField(read_only=True)
@@ -142,7 +109,7 @@ class LogframeLevelSerializer(serializers.ModelSerializer):
         parts = []
         leveltier = self.get_leveltier(obj)
         if leveltier is not None:
-            parts.append(unicode(_(leveltier.name)))
+            parts.append(str(_(leveltier.name)))
         display_ontology = self.get_display_ontology(obj)
         if display_ontology:
             parts.append(display_ontology)

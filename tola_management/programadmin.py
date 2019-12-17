@@ -1,43 +1,32 @@
 # -*- coding: utf-8 -*-
-import json
-import csv
-from StringIO import StringIO
 
 from collections import OrderedDict
 from django.db import transaction
 from django.db.models import Q
 from django.http import HttpResponse, JsonResponse
 from django.utils import timezone
-from rest_framework import viewsets, permissions
+from django.utils.translation import ugettext as _
+from rest_framework import viewsets, permissions, pagination
 from rest_framework.response import Response
 from rest_framework import status as httpstatus
-from rest_framework.validators import UniqueValidator
-from rest_framework.decorators import list_route, detail_route
+from rest_framework.decorators import action
 from rest_framework.serializers import (
     ModelSerializer,
     Serializer,
-    ModelSerializer,
     CharField,
     IntegerField,
     ValidationError,
-    PrimaryKeyRelatedField,
     BooleanField,
-    HiddenField,
-    JSONField,
     DateTimeField
 )
-from django.utils.translation import ugettext as _
 
 from openpyxl import Workbook, utils
 from openpyxl.cell import Cell
 from openpyxl.styles import Alignment, Font, PatternFill
 
-from feed.views import SmallResultsSetPagination
-
 from workflow.models import (
     Program,
     TolaUser,
-    Organization,
     Country,
     Sector,
     ProgramAccess
@@ -45,18 +34,20 @@ from workflow.models import (
 
 from indicators.models import (
     Indicator,
-    Level)
+    Level
+)
 
-from .models import (
+from tola_management.models import (
     ProgramAdminAuditLog,
     ProgramAuditLog
 )
 
 from tola.util import append_GAIT_dates
 
-from .permissions import (
+from tola_management.permissions import (
     HasProgramAdminAccess
 )
+
 
 def get_audit_log_workbook(ws, program):
 
@@ -65,24 +56,24 @@ def get_audit_log_workbook(ws, program):
         if indicator.results_aware_number:
             return u'{} {}: {}'.format(
                 _('Indicator'),
-                unicode(indicator.results_aware_number),
-                unicode(indicator.name),
+                str(indicator.results_aware_number),
+                str(indicator.name),
             )
         else:
             return u'{}: {}'.format(
                 _('Indicator'),
-                unicode(indicator.name),
+                str(indicator.name),
             )
 
     # helper for result level column
     def _result_level(indicator):
         if indicator.leveltier_name and indicator.level_display_ontology:
             return u'{} {}'.format(
-                unicode(indicator.leveltier_name),
-                unicode(indicator.level_display_ontology),
+                str(indicator.leveltier_name),
+                str(indicator.level_display_ontology),
             )
         elif indicator.leveltier_name:
-            return unicode(indicator.leveltier_name)
+            return str(indicator.leveltier_name)
         else:
             return ''
 
@@ -102,7 +93,7 @@ def get_audit_log_workbook(ws, program):
         # Translators: Part of change log, reason for the change as entered by the user
         Cell(ws, value=_('Rationale'))
     ]
-    
+
     title = Cell(ws, value=_("Change log"))
     title.font = Font(size=18)
     ws.append([title,])
@@ -135,31 +126,33 @@ def get_audit_log_workbook(ws, program):
         prev_string = u''
         for entry in row.diff_list:
             if entry['name'] == 'targets':
-                for k, target in entry['prev'].iteritems():
-                    prev_string += unicode(target['name'])+u": "+unicode(target['value'])+u"\r\n"
+                for k, target in entry['prev'].items():
+                    prev_string += str(target['name']) + u": " + str(target['value']) + u"\r\n"
 
             else:
-                prev_string += unicode(entry['pretty_name'])+u": "+unicode(entry['prev'] if entry['prev'] else _('N/A'))+u"\r\n"
+                prev_string += str(entry['pretty_name']) + u": "
+                prev_string += str(entry['prev'] if entry['prev'] else _('N/A')) + u"\r\n"
 
         new_string = u''
         for entry in row.diff_list:
             if entry['name'] == 'targets':
-                for k, target in entry['new'].iteritems():
-                    new_string += unicode(target['name'])+u": "+unicode(target['value'])+u"\r\n"
+                for k, target in entry['new'].items():
+                    new_string += str(target['name']) + u": " + str(target['value']) + u"\r\n"
 
             else:
-                new_string += unicode(entry['pretty_name'])+u": "+unicode(entry['new'] if entry['new'] else _('N/A'))+u"\r\n"
+                new_string += str(entry['pretty_name']) + u": "
+                new_string += str(entry['new'] if entry['new'] else _('N/A')) + u"\r\n"
 
         xl_row = [
             Cell(ws, value=row.date),
-            Cell(ws, value=unicode(_result_level(row.indicator)) if row.indicator else _('N/A')),
-            Cell(ws, value=unicode(_indicator_name(row.indicator)) if row.indicator else _('N/A')),
-            Cell(ws, value=unicode(row.user.name)),
-            Cell(ws, value=unicode(row.organization.name)),
-            Cell(ws, value=unicode(row.pretty_change_type)),
-            Cell(ws, value=unicode(prev_string)),
-            Cell(ws, value=unicode(new_string)),
-            Cell(ws, value=unicode(row.rationale))
+            Cell(ws, value=str(_result_level(row.indicator)) if row.indicator else _('N/A')),
+            Cell(ws, value=str(_indicator_name(row.indicator)) if row.indicator else _('N/A')),
+            Cell(ws, value=str(row.user.name)),
+            Cell(ws, value=str(row.organization.name)),
+            Cell(ws, value=str(row.pretty_change_type)),
+            Cell(ws, value=str(prev_string)),
+            Cell(ws, value=str(new_string)),
+            Cell(ws, value=str(row.rationale))
         ]
         for cell in xl_row:
             cell.alignment = alignment
@@ -175,8 +168,12 @@ def get_audit_log_workbook(ws, program):
         ws.column_dimensions[utils.get_column_letter(col_no + 1)].width = width
     return ws
 
-class Paginator(SmallResultsSetPagination):
-    def get_paginated_response(self , data):
+class Paginator(pagination.PageNumberPagination):
+    page_size = 20
+    page_size_query_param = 'page_size'
+    max_page_size = 50
+
+    def get_paginated_response(self, data):
         response = Response(OrderedDict([
             ('count', self.page.paginator.count),
             ('page_count', self.page.paginator.num_pages),
@@ -244,7 +241,7 @@ class ProgramAdminSerializer(ModelSerializer):
             | TolaUser.objects.filter(countries__program=program.id).select_related('organization')
         ).distinct()
 
-        organizations = set([tu.organization_id for tu in program_users if tu.organization_id])
+        organizations = set(tu.organization_id for tu in program_users if tu.organization_id)
         organization_count = len(organizations)
 
         ret['program_users'] = len(program_users)
@@ -283,7 +280,8 @@ class ProgramAdminSerializer(ModelSerializer):
 
         # default for any unmigrated program is "auto" - so if someone sets their program to "not grouping" - reset it
         # to default ("auto")
-        if '_using_results_framework' in validated_data and validated_data['_using_results_framework'] == instance.NOT_MIGRATED:
+        if ('_using_results_framework' in validated_data
+                and validated_data['_using_results_framework'] == instance.NOT_MIGRATED):
             validated_data['auto_number_indicators'] = True
 
         original_countries = instance.country.all()
@@ -411,17 +409,20 @@ class ProgramAdminViewSet(viewsets.ModelViewSet):
 
         usersFilter = params.getlist('users[]')
         if usersFilter:
-            queryset = queryset.filter(Q(user_access__id__in=usersFilter) | Q(country__in=Country.objects.filter(users__id__in=usersFilter)))
+            queryset = queryset.filter(
+                Q(user_access__id__in=usersFilter) | Q(country__in=Country.objects.filter(users__id__in=usersFilter))
+            )
 
         organizationFilter = params.getlist('organizations[]')
         if organizationFilter:
             queryset = queryset.filter(
-                Q(user_access__organization__in=organizationFilter) | Q(country__users__organization__in=organizationFilter)
+                Q(user_access__organization__in=organizationFilter) |
+                Q(country__users__organization__in=organizationFilter)
             )
 
         return queryset.distinct()
 
-    @list_route(methods=["get"])
+    @action(detail=False, methods=["get"])
     def program_filter_options(self, request):
         """Provides a non paginated list of countries for the frontend filter"""
         auth_user = self.request.user
@@ -444,7 +445,7 @@ class ProgramAdminViewSet(viewsets.ModelViewSet):
         return Response(programs)
 
 
-    @detail_route(methods=['get'])
+    @action(detail=True, methods=['get'])
     def history(self, request, pk=None):
         program = Program.objects.get(pk=pk)
         history = (ProgramAdminAuditLog
@@ -455,7 +456,7 @@ class ProgramAdminViewSet(viewsets.ModelViewSet):
         serializer = ProgramAdminAuditLogSerializer(history, many=True)
         return Response(serializer.data)
 
-    @list_route(methods=["post"])
+    @action(detail=False, methods=["post"])
     def bulk_update_status(self, request):
         ids = request.data.get("ids")
         new_funding_status = request.data.get("funding_status")
@@ -470,7 +471,7 @@ class ProgramAdminViewSet(viewsets.ModelViewSet):
             return Response(updated)
         return Response({}, status=httpstatus.HTTP_400_BAD_REQUEST)
 
-    @detail_route(methods=["get"])
+    @action(detail=True, methods=["get"])
     def audit_log(self, request, pk=None):
         program = Program.objects.get(pk=pk)
 
@@ -482,7 +483,7 @@ class ProgramAdminViewSet(viewsets.ModelViewSet):
         serializer = self.get_serializer(queryset, many=True)
         return Response(serializer.data)
 
-    @detail_route(methods=["get"])
+    @action(detail=True, methods=["get"])
     def export_audit_log(self, request, pk=None):
         program = Program.objects.get(pk=pk)
         workbook = Workbook()
@@ -495,7 +496,7 @@ class ProgramAdminViewSet(viewsets.ModelViewSet):
         workbook.save(response)
         return response
 
-    @detail_route(methods=['get'], url_path='gait/(?P<gaitid>[^/.]+)')
+    @action(detail=True, methods=['get'], url_path='gait/(?P<gaitid>[^/.]+)')
     def gait(self, request, pk=None, gaitid=None):
         response = {}
         if gaitid is None:
@@ -513,7 +514,7 @@ class ProgramAdminViewSet(viewsets.ModelViewSet):
                                          'SED=&UED=&Emergency=').format(gaitid)
         return JsonResponse(response)
 
-    @detail_route(methods=['put'], url_path='sync_gait_dates')
+    @action(detail=True, methods=['put'], url_path='sync_gait_dates')
     def sync_gait_dates(self, request, pk):
         program = Program.objects.get(pk=pk)
 

@@ -134,7 +134,7 @@ def hash(obj, attr):
         return getattr(obj, attr.encode('utf-8'))
     elif isinstance(attr, str) and hasattr(obj, attr):
         return getattr(obj, attr)
-    elif hasattr(obj, 'has_key') and attr in obj:
+    elif attr in obj:
         return obj.get(attr)
     else:
         return None

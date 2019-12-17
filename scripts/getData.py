@@ -18,7 +18,7 @@ from workflow.models import Country, Program
 import urllib
 
 def run():
-    print "Uploading JSON data"
+    print("Uploading JSON data")
 
 type = "Program"
 program_country = 1
@@ -42,7 +42,7 @@ def getAllData(url, type, program_country):
         keys_to_sql = ", ".join(map(str, keys_to_sql))
 
         query = "INSERT INTO activitydb_country (country,code) VALUES ('%s','%s')" % (vars_to_sql[0], vars_to_sql[1])
-        print query
+        print(query)
 
         try:
             cursor.execute(query)
@@ -70,10 +70,10 @@ def getAllData(url, type, program_country):
         keys_to_sql = ", ".join(map(str, keys_to_sql))
 
         var_to_tuple = tuple(vars_to_sql)
-        print var_to_tuple
+        print(var_to_tuple)
 
         query = "INSERT INTO activitydb_program (%s) VALUES %s" % (keys_to_sql, var_to_tuple)
-        print query
+        print(query)
 
         try:
             cursor.execute(query)
@@ -86,7 +86,7 @@ def getAllData(url, type, program_country):
 
         query2 = "INSERT INTO activitydb_program_country (country_id,program_id) VALUES (%s,%s)" % (program_country, latest.id)
 
-        print query2
+        print(query2)
         try:
             cursor.execute(query2)
             transaction.commit()
@@ -96,10 +96,10 @@ def getAllData(url, type, program_country):
 
 
     for row in data:
-        print row
+        print(row)
         vars_to_sql = []
         keys_to_sql = []
-        for new_key, new_value in row.iteritems():
+        for new_key, new_value in row.items():
             try:
                 new_key = new_key.encode('ascii','ignore')
                 new_value = new_value.encode('ascii','ignore')
@@ -150,13 +150,13 @@ def getAllData(url, type, program_country):
 #getAllData("https://mcapi.mercycorps.org/authoritativecountry/?gait=True&format=json", "Country")
 
 #get an updated json data file for the hub and update or insert new records
-print "Program"
+print("Program")
 getCountries = Country.objects.all()
 for country in getCountries:
-    print country.country
+    print(country.country)
     safe_country = urllib.quote_plus(country.country)
     program_url = "http://mcapi.mercycorps.org/gaitprogram/?country=%s&format=json" % (safe_country)
-    print program_url
+    print(program_url)
     getAllData(program_url, "Program", int(country.id))
 
-print "Alright, all done."
+print("Alright, all done.")

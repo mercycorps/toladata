@@ -10,17 +10,8 @@ from indicators.models import Indicator
 EM_DASH = u'–'
 
 
-def force_unicode(value):
-    """
-    Some values can be of type str, unicode, or django.utils.functional.__proxy__
-    Force these 3 types to just be `unicode` for exporting to XLS
-    """
-    if type(value) == str:
-        return value.decode('utf-8')
-    return unicode(value)
 
-
-class ExcelRendererBase(object):
+class ExcelRendererBase:
     """Set of utility functions for rendering a serialized IPTT into an Excel export"""
 
     TITLE_START_COLUMN = 3 # 2 rows currently hidden at start, title starts at column C
@@ -89,7 +80,7 @@ class ExcelRendererBase(object):
                 self.serializer.report_date_range,
                 self.serializer.program_name]):
             cell = sheet.cell(row=row+1, column=self.TITLE_START_COLUMN)
-            cell.value = unicode(title)
+            cell.value = str(title)
             cell.font = self.TITLE_FONT
             sheet.merge_cells(
                 start_row=row+1, start_column=self.TITLE_START_COLUMN,
@@ -97,7 +88,7 @@ class ExcelRendererBase(object):
                 )
         for column, header in enumerate(self.header_columns):
             cell = sheet.cell(row=4, column=column+1)
-            cell.value = unicode(header)
+            cell.value = str(header)
             cell.font = self.HEADER_FONT
             cell.alignment = self.CENTER_ALIGN
             cell.fill = self.HEADER_FILL
@@ -114,15 +105,15 @@ class ExcelRendererBase(object):
             ]:
             if header:
                 cell = sheet.cell(row=row, column=col)
-                cell.value = force_unicode(header)
+                cell.value = str(header)
                 cell.font = self.HEADER_FONT
                 cell.alignment = self.CENTER_ALIGN
                 if period.tva:
                     sheet.merge_cells(start_row=row, start_column=col, end_row=row, end_column=col+2)
-        columns = [ugettext('Target'), ugettext('Actual'), ugettext('% Met')] if period.tva else [ugettext('Actual'),]
+        columns = [ugettext('Target'), ugettext('Actual'), str(ugettext('% Met')).title()] if period.tva else [ugettext('Actual'),]
         for col_no, col_header in enumerate(columns):
             cell = sheet.cell(row=4, column=col+col_no)
-            cell.value = unicode(col_header)
+            cell.value = str(col_header)
             cell.font = self.HEADER_FONT
             cell.fill = self.HEADER_FILL
             cell.alignment = self.RIGHT_ALIGN
@@ -132,7 +123,7 @@ class ExcelRendererBase(object):
         sheet.cell(row=row, column=1).fill = self.LEVEL_ROW_FILL
         sheet.cell(row=row, column=2).fill = self.LEVEL_ROW_FILL
         cell = sheet.cell(row=row, column=3)
-        cell.value = unicode(level_name)
+        cell.value = str(level_name)
         cell.font = self.LEVEL_ROW_FONT
         cell.fill = self.LEVEL_ROW_FILL
         sheet.merge_cells(start_row=row, start_column=3, end_row=row, end_column=self.column_count)
@@ -174,7 +165,7 @@ class ExcelRendererBase(object):
     def str_cell(self, value):
         if not value:
             return None, 'General'
-        value = unicode(value)
+        value = str(value)
         return value, 'General'
 
     def get_met_func(self, target_attribute, actual_attribute):

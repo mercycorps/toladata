@@ -18,7 +18,7 @@ from workflow.models import ProjectAgreement, ProjectComplete
 import re
 
 def run():
-    print "Running Script..."
+    print("Running Script...")
 
     trim_list = ['estimated_budget', 'actual_budget','total_cost','agency_cost','local_total_cost','local_agency_cost']
 
@@ -26,10 +26,10 @@ def run():
     getProjects = ProjectComplete.objects.all()
     for item in getProjects:
         if item.total_cost and item.local_total_cost != "Nil":
-            print item.total_cost
+            print(item.total_cost)
             trim_item = re.sub("[^0-9.]", "", item.total_cost)
             trim_item = float(trim_item)
-            print trim_item
+            print(trim_item)
             ProjectComplete.objects.all().filter(id=item.id).update(total_cost=trim_item)
         elif item.total_cost in [None, '','Nil']:
             ProjectComplete.objects.all().filter(id=item.id).update(total_cost=0.00)

@@ -51,6 +51,9 @@ export default (
         get currentProgram() {
             return this.filterStore.programFilterData;
         },
+        get currentProgramPageUrl() {
+            return api.getProgramPageUrl(this.currentProgram.pk);
+        },
         get isTVA() {
             return this.filterStore.isTVA;
         },
@@ -97,7 +100,7 @@ export default (
             return 8 + (!this.resultsFramework && 1) + 3 + (this.reportPeriods.length) * (this.isTVA ? 3 : 1);
         },
         loadResultsModal(indicatorPk) {
-            api.indicatorResultsTable(indicatorPk).then(
+            api.indicatorResultsTable(indicatorPk, false).then(
                 (data) => {
                     $('#indicator_modal_content').empty();
                     $('#modalmessages').empty();

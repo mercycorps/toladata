@@ -176,6 +176,6 @@ class IndicatorStatsMixin(object):
                 buckets_values['on_scope'] += 1
 
         # TODO: git rid of float in fovor of a Decimal?
-        buckets_percents = {k: float(v)/len(self.indicator_ids) for (k, v) in buckets_values.iteritems()}
+        buckets_percents = {k: float(v)/len(self.indicator_ids) for (k, v) in buckets_values.items()}
 
         self.assertEqual(buckets_percents, self.response.context['scope_counts'])
