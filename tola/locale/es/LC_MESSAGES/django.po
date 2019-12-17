@@ -7,7 +7,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: \n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2019-12-10 13:33-0800\n"
+"POT-Creation-Date: 2019-12-17 11:10-0800\n"
 "PO-Revision-Date: 2019-12-10 14:39-0800\n"
 "Last-Translator: \n"
 "Language-Team: \n"
@@ -131,7 +131,7 @@ msgstr "Indicadores sin asignar a un nivel del sistema de resultados"
 msgid "Change log"
 msgstr "Registro de Cambios"
 
-#: indicators/forms.py:92 indicators/forms.py:357 indicators/models.py:101
+#: indicators/forms.py:92 indicators/forms.py:361 indicators/models.py:101
 #: indicators/models.py:1086 indicators/models.py:1800 workflow/forms.py:100
 #: workflow/models.py:509
 msgid "Program"
@@ -192,7 +192,7 @@ msgstr ""
 "El identificador de programa %(l_p_id)d del nivel y el identificador de "
 "programa (%i_p_id)d del indicador no concuerdan"
 
-#: indicators/forms.py:210 indicators/models.py:1814
+#: indicators/forms.py:214 indicators/models.py:1814
 #: templates/workflow/siteprofile_form.html:3
 #: templates/workflow/siteprofile_form.html:4
 #: templates/workflow/siteprofile_form.html:14
@@ -200,24 +200,24 @@ msgid "Site"
 msgstr "Sitio"
 
 #. Translators: This is a result that was actually achieved, versus one that was planned.
-#: indicators/forms.py:212
+#: indicators/forms.py:216
 msgid "Actual value"
 msgstr "Valor actual"
 
 #. Translators: field label that
-#: indicators/forms.py:214
+#: indicators/forms.py:218
 msgid "Measure against target"
 msgstr "Medida contra objetivo"
 
-#: indicators/forms.py:215
+#: indicators/forms.py:219
 msgid "Link to file or folder"
 msgstr "Enlace al archivo o carpeta"
 
-#: indicators/forms.py:229
+#: indicators/forms.py:233
 msgid "Result date"
 msgstr "Fecha del resultado"
 
-#: indicators/forms.py:285
+#: indicators/forms.py:289
 #, python-brace-format
 msgid ""
 "You can begin entering results on {program_start_date}, the program start "
@@ -226,7 +226,7 @@ msgstr ""
 "Puede comenzar a ingresar resultados el {program_start_date}, fecha de "
 "inicio del programa"
 
-#: indicators/forms.py:290
+#: indicators/forms.py:294
 #, python-brace-format
 msgid ""
 "Please select a date between {program_start_date} and {program_end_date}"
@@ -234,70 +234,70 @@ msgstr ""
 "Por favor seleccione una fecha entre {program_start_date} y "
 "{program_end_date}"
 
-#: indicators/forms.py:301
+#: indicators/forms.py:305
 #, python-brace-format
 msgid "Please select a date between {program_start_date} and {todays_date}"
 msgstr ""
 "Por favor seleccione una fecha entre {program_start_date} y {todays_date}"
 
-#: indicators/forms.py:314
+#: indicators/forms.py:318
 msgid "URL required if record name is set"
 msgstr "La URL es requerida si el nombre del registro está establecido"
 
-#: indicators/forms.py:328
+#: indicators/forms.py:332
 msgid "years"
 msgstr "años"
 
-#: indicators/forms.py:329
+#: indicators/forms.py:333
 msgid "semi-annual periods"
 msgstr "períodos semestrales"
 
-#: indicators/forms.py:330
+#: indicators/forms.py:334
 msgid "tri-annual periods"
 msgstr "períodos trienales"
 
-#: indicators/forms.py:331
+#: indicators/forms.py:335
 msgid "quarters"
 msgstr "trimestres"
 
-#: indicators/forms.py:332
+#: indicators/forms.py:336
 msgid "months"
 msgstr "meses"
 
-#: indicators/forms.py:338
+#: indicators/forms.py:342
 msgid "Show all"
 msgstr "Ver todo"
 
-#: indicators/forms.py:339
+#: indicators/forms.py:343
 msgid "Most recent"
 msgstr "Más reciente"
 
-#: indicators/forms.py:358
+#: indicators/forms.py:362
 msgid "Time periods"
 msgstr "Períodos de tiempo"
 
-#: indicators/forms.py:360
+#: indicators/forms.py:364
 msgid "enter a number"
 msgstr "ingrese un número"
 
-#: indicators/forms.py:361
+#: indicators/forms.py:365
 msgid "Target periods"
 msgstr "Periodos objetivo"
 
-#: indicators/forms.py:387
+#: indicators/forms.py:391
 msgid "Levels"
 msgstr "Niveles"
 
-#: indicators/forms.py:388
+#: indicators/forms.py:392
 msgid "Types"
 msgstr "Tipos"
 
-#: indicators/forms.py:389 tola_management/models.py:492
+#: indicators/forms.py:393 tola_management/models.py:492
 #: tola_management/models.py:550
 msgid "Sectors"
 msgstr "Sectores"
 
-#: indicators/forms.py:390 templates/indicators/program_page.html:45
+#: indicators/forms.py:394 templates/indicators/program_page.html:45
 #: templates/workflow/site_indicatordata.html:5
 #: templates/workflow/site_profile_list.html:5
 #: templates/workflow/site_profile_list.html:6
@@ -307,20 +307,20 @@ msgstr "Sectores"
 msgid "Sites"
 msgstr "Sitios"
 
-#: indicators/forms.py:392 indicators/views/views_program.py:104
+#: indicators/forms.py:396 indicators/views/views_program.py:104
 #: templates/indicators/disaggregation_report.html:141
 msgid "Indicators"
 msgstr "Indicadores"
 
-#: indicators/forms.py:432
+#: indicators/forms.py:436
 msgid "START"
 msgstr "COMIENZO"
 
-#: indicators/forms.py:433
+#: indicators/forms.py:437
 msgid "END"
 msgstr "FIN"
 
-#: indicators/forms.py:438
+#: indicators/forms.py:442
 msgid "TARGET PERIODS"
 msgstr "PERIODOS OBJETIVO"
 
@@ -329,12 +329,12 @@ msgid "Performance Indicator"
 msgstr "Indicador de rendimiento"
 
 #: indicators/indicator_plan.py:28
-#: templates/indicators/indicator_form_modal.html:82
+#: templates/indicators/indicator_form_modal.html:83
 msgid "Targets"
 msgstr "Objetivos"
 
 #: indicators/indicator_plan.py:29
-#: templates/indicators/indicator_form_modal.html:86
+#: templates/indicators/indicator_form_modal.html:87
 msgid "Data Acquisition"
 msgstr "Adquisición de datos"
 
@@ -1144,6 +1144,10 @@ msgid "Each result must include a link to an evidence file or folder."
 msgstr ""
 "Cada resultado debe incluir un enlace a un archivo o carpeta de evidencia."
 
+#: indicators/templatetags/tola_form_tags.py:17
+msgid "Help"
+msgstr "Ayuda"
+
 #. Translators: success message when an indicator was created
 #: indicators/views/views_indicators.py:258
 msgid "Success! Indicator created."
@@ -1563,7 +1567,7 @@ msgstr "Comience a crear su sistema de resultados y agregar indicadores."
 msgid "No indicators have been entered for this program."
 msgstr "No se han ingresado indicadores para este programa."
 
-#: templates/home.html:129 templates/indicators/indicator_form_modal.html:23
+#: templates/home.html:129 templates/indicators/indicator_form_modal.html:24
 msgid "Add indicator"
 msgstr "Agregar indicador"
 
@@ -1869,40 +1873,40 @@ msgstr "Complete todos los campos obligatorios en la pestaña Resumen."
 msgid "Please complete all required fields in the Performance tab."
 msgstr "Complete todos los campos obligatorios en la pestaña Rendimiento."
 
-#: templates/indicators/indicator_form_modal.html:75
+#: templates/indicators/indicator_form_modal.html:76
 msgid "Summary"
 msgstr "Resumen"
 
-#: templates/indicators/indicator_form_modal.html:79
+#: templates/indicators/indicator_form_modal.html:80
 msgid "Performance"
 msgstr "Rendimiento"
 
-#: templates/indicators/indicator_form_modal.html:90
+#: templates/indicators/indicator_form_modal.html:91
 msgid "Analysis and Reporting"
 msgstr "Análisis e informes"
 
-#: templates/indicators/indicator_form_modal.html:93 workflow/models.py:852
+#: templates/indicators/indicator_form_modal.html:94 workflow/models.py:852
 msgid "Approval"
 msgstr "Aprobación"
 
-#: templates/indicators/indicator_form_modal.html:159
+#: templates/indicators/indicator_form_modal.html:160
 msgid "Delete this indicator"
 msgstr "Eliminar este indicador"
 
 #. Translators: button label to save the item and then close a modal
-#: templates/indicators/indicator_form_modal.html:441
-#: templates/indicators/indicator_form_modal.html:450
+#: templates/indicators/indicator_form_modal.html:442
+#: templates/indicators/indicator_form_modal.html:449
 msgid "Save and close"
 msgstr "Guardar y cerrar"
 
 #. Translators: close a modal throwing away any changes to the form
-#: templates/indicators/indicator_form_modal.html:442
-#: templates/indicators/indicator_form_modal.html:457 tola/forms.py:27
+#: templates/indicators/indicator_form_modal.html:443
+#: templates/indicators/indicator_form_modal.html:456 tola/forms.py:27
 msgid "Cancel"
 msgstr "Cancelar"
 
 #. Translators: button label to save the form and be redirected to a blank for to add another item
-#: templates/indicators/indicator_form_modal.html:454
+#: templates/indicators/indicator_form_modal.html:453
 msgid "Save and add another"
 msgstr "Guardar y agregar otro"
 
@@ -3908,9 +3912,6 @@ msgstr "Ciudad, País:"
 
 #~ msgid "Stakeholders"
 #~ msgstr "Partes interesadas"
-
-#~ msgid "Help"
-#~ msgstr "Ayuda"
 
 #~ msgid "change country"
 #~ msgstr "cambiar país"
