@@ -21,7 +21,6 @@
     end_date: 2016-12-31
     reporting_period_start: 2015-01-01
     reporting_period_end: 2016-12-31
-    fund_code: []
     sector: []
     country: [1]
 - model: indicators.indicator
@@ -40,10 +39,6 @@
     indicator: 1
     target: 500
     customsort: 0
-- model: workflow.documentation
-  pk: 1
-  fields:
-    program: 1
 - model: indicators.result
   pk: 1
   fields:
@@ -68,10 +63,6 @@
     indicator: 2
     target: 1000
     customsort: 0
-- model: workflow.documentation
-  pk: 2
-  fields:
-    program: 1
 - model: indicators.result
   pk: 2
   fields:

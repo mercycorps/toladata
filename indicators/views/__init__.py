@@ -1,4 +1,4 @@
-from views_indicators import (
+from indicators.views.views_indicators import (
     IndicatorCreate,
     IndicatorUpdate,
     IndicatorDelete,
@@ -19,7 +19,7 @@ from views_indicators import (
     periodic_targets_form,
 )
 
-from views_reports import (
+from indicators.views.views_reports import (
     create_pinned_report,
     delete_pinned_report,
     IPTTQuickstart,
@@ -30,12 +30,13 @@ from views_reports import (
     IPTTExcelReport
 )
 
-from views_results_framework import (
+from indicators.views.views_results_framework import (
     ResultsFrameworkBuilder,
 )
 
-from views_program import (
+from indicators.views.views_program import (
     programs_rollup_export,
+    programs_rollup_export_csv,
     program_page,
     old_program_page,
     api_program_page,

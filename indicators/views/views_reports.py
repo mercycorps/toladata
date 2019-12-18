@@ -15,12 +15,11 @@ from indicators.serializers_new import (
     IPTTTVAReportIndicatorSerializer,
     IPTTTPReportIndicatorSerializer
 )
-from django.utils.decorators import method_decorator
 from tola_management.permissions import (
     verify_program_access_level,
     has_program_read_access
 )
-
+from django.utils.decorators import method_decorator
 from django.db import models
 from django.contrib.auth.decorators import login_required
 from django.views.decorators.http import require_POST

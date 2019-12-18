@@ -116,12 +116,12 @@ $("#indicator-list-react-component").on("click", ".indicator-link[data-tab]", fu
 
 // when indicator creation modal form completes a save
 $('#indicator_modal_div').on('created.tola.indicator.save', (e, params) => {
-    rootStore.program.updateIndicator(params.indicatorId);
+    rootStore.program.updateIndicator(parseInt(params.indicatorId));
 });
 
 // when indicator update modal form completes a save or change to periodic targets
 $('#indicator_modal_div').on('updated.tola.indicator.save', (e, params) => {
-    let indicatorId = params.indicatorId;
+    let indicatorId = parseInt(params.indicatorId);
 
     rootStore.program.updateIndicator(indicatorId);
     if (rootStore.program.resultsMap.has(indicatorId)) {
@@ -139,7 +139,7 @@ $('#indicator_modal_div').on('deleted.tola.indicator.save', (e, params) => {
 $('#indicator_results_div').on('hidden.bs.modal', function (e) {
     let recordchanged = $(this).find('form').data('recordchanged');
     if (recordchanged === true) {
-        let indicatorPk = $(this).find('form #id_indicator').val();
+        let indicatorPk = parseInt($(this).find('form #id_indicator').val());
         rootStore.program.updateIndicator(indicatorPk);
         rootStore.program.updateResultsHTML(indicatorPk);
     }

@@ -1,7 +1,7 @@
 """Development settings and globals."""
 import os, yaml
 
-from base import *
+from tola.settings.base import *
 
 def read_yaml(path):
     with open(path) as f:

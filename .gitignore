@@ -1,4 +1,5 @@
 *.log
+login.log.*
 *.pot
 *.pyc
 # Python bytecode:
@@ -57,3 +58,4 @@ webpack-stats-vagrant.json
 .vagrant
 site.retry
 .eslintrc.yml
+requirements.txt

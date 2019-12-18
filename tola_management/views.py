@@ -1,15 +1,13 @@
 # -*- coding: utf-8 -*-
 from __future__ import unicode_literals
+import json
 from collections import OrderedDict
 from django.core.exceptions import PermissionDenied, ObjectDoesNotExist, SuspiciousOperation
 from django.core.serializers.json import DjangoJSONEncoder
-from django.core import serializers
 from django.core.mail import send_mail
 from django.contrib.auth.decorators import login_required
 from django.contrib.auth.tokens import default_token_generator
-from django.db.models import OuterRef, Subquery, Q, Count
 from django.utils.translation import ugettext_lazy as _
-import django.db.models
 from django.template import loader
 from django.shortcuts import render
 from django.utils.http import urlsafe_base64_encode
@@ -17,37 +15,28 @@ from django.utils.encoding import force_bytes
 from django.urls import reverse
 from django.conf import settings
 from django.shortcuts import get_object_or_404
-import json
 
-from rest_framework.views import APIView
 from rest_framework.validators import UniqueValidator
-from rest_framework.decorators import list_route, detail_route
+from rest_framework.decorators import action
 from rest_framework.serializers import (
     Serializer,
     ModelSerializer,
-    ListSerializer,
     CharField,
     IntegerField,
-    PrimaryKeyRelatedField,
     BooleanField,
     DateTimeField,
     EmailField,
     ValidationError
 )
 from rest_framework.response import Response
-from rest_framework import viewsets, mixins, pagination, status, permissions
+from rest_framework import viewsets, pagination, status, permissions
 
-from django.contrib.auth.models import User,Group
-
-from feed.views import (
-    SmallResultsSetPagination
-)
+from django.contrib.auth.models import User
 
 from workflow.models import (
     TolaUser,
     Organization,
     Program,
-    Sector,
     Country,
     Sector,
     ProgramAccess,
@@ -56,19 +45,23 @@ from workflow.models import (
     PROGRAM_ROLE_CHOICES
 )
 
-from .models import (
+from tola_management.models import (
     UserManagementAuditLog,
     OrganizationAdminAuditLog
 )
 
-from .permissions import (
+from tola_management.permissions import (
     user_has_basic_or_super_admin,
     HasUserAdminAccess,
     HasOrganizationAdminAccess
 )
 
-class Paginator(SmallResultsSetPagination):
-    def get_paginated_response(self , data):
+class Paginator(pagination.PageNumberPagination):
+    page_size = 20
+    page_size_query_param = 'page_size'
+    max_page_size = 50
+
+    def get_paginated_response(self, data):
         response = Response(OrderedDict([
             ('count', self.page.paginator.count),
             ('page_count', self.page.paginator.num_pages),
@@ -89,8 +82,10 @@ def requires_basic_or_super_admin(func):
 def get_user_page_context(request):
     #json.dumps doesn't seem to respect ordereddicts so we'll sort it on the frontend
     countries = {
-        country.id: {"id": country.id, "name": country.country, "programs": list(country.program_set.all().values_list('id', flat=True))}
-        for country in request.user.tola_user.managed_countries.distinct()
+        country.id: {
+            "id": country.id, "name": country.country,
+            "programs": list(country.program_set.all().values_list('id', flat=True))
+            } for country in request.user.tola_user.managed_countries.distinct()
     }
 
     programs = {
@@ -250,16 +245,18 @@ def get_country_page_context(request):
 def send_new_user_registration_email(user, request):
     uid = urlsafe_base64_encode(force_bytes(user.pk))
     token = default_token_generator.make_token(user)
-    one_time_url = request.build_absolute_uri(reverse('password_reset_confirm', kwargs={"uidb64": uid, "token": token}))
+    one_time_url = request.build_absolute_uri(
+        reverse('password_reset_confirm', kwargs={"uidb64": uid, "token": token})
+    )
     gmail_url = request.build_absolute_uri(reverse('social:begin', args=['google-oauth2']))
     c = {'one_time_url': one_time_url, 'user': user, 'gmail_url': gmail_url}
-    subject=_('Mercy Corps - Tola New Account Registration')
-    html_email_template_name='registration/one_time_login_email.html'
-    text_email_template_name='registration/one_time_login_email.txt'
+    subject = _('Mercy Corps - Tola New Account Registration')
+    html_email_template_name = 'registration/one_time_login_email.html'
+    text_email_template_name = 'registration/one_time_login_email.txt'
     html_email = loader.render_to_string(html_email_template_name, c)
     text_email = loader.render_to_string(text_email_template_name, c)
 
-    send_mail( subject=subject, message=text_email, from_email=settings.DEFAULT_FROM_EMAIL,
+    send_mail(subject=subject, message=text_email, from_email=settings.DEFAULT_FROM_EMAIL,
               recipient_list=[user.email], fail_silently=False, html_message=html_email)
 
 # Create your views here.
@@ -283,7 +280,10 @@ def app_host_page(request, react_app_page):
 
 
     json_context = json.dumps(js_context, cls=DjangoJSONEncoder)
-    return render(request, 'react_app_base.html', {"bundle_name": "tola_management_"+react_app_page, "js_context": json_context, "page_title": page_title+" | "})
+    return render(
+        request, 'react_app_base.html',
+        {"bundle_name": "tola_management_"+react_app_page, "js_context": json_context, "page_title": page_title+" | "}
+    )
 
 @login_required(login_url='/accounts/login/')
 def audit_log_host_page(request, program_id):
@@ -680,13 +680,13 @@ class UserAdminViewSet(viewsets.ModelViewSet):
         serializer = UserAdminReportSerializer(queryset, many=True)
         return Response(serializer.data)
 
-    @detail_route(methods=['post'])
+    @action(detail=True, methods=['GET'])
     def resend_registration_email(self, request, pk=None):
         tola_user = TolaUser.objects.get(pk=pk)
         send_new_user_registration_email(tola_user.user, request)
         return Response({})
 
-    @detail_route(methods=['get'])
+    @action(detail=True, methods=['GET'])
     def history(self, request, pk=None):
         user = TolaUser.objects.get(pk=pk)
         queryset = UserManagementAuditLog.objects.filter(modified_user=user).select_related('admin_user').order_by('-date')
@@ -694,7 +694,7 @@ class UserAdminViewSet(viewsets.ModelViewSet):
         serializer = UserManagementAuditLogSerializer(queryset, many=True)
         return Response(serializer.data)
 
-    @detail_route(methods=['put'])
+    @action(detail=True, methods=['GET'])
     def is_active(self, request, pk=None):
         is_active = request.data['user']['is_active']
         user = get_object_or_404(TolaUser, id=pk)
@@ -713,7 +713,7 @@ class UserAdminViewSet(viewsets.ModelViewSet):
         serializer = UserAdminSerializer(user)
         return Response(serializer.data)
 
-    @detail_route(methods=['get', 'put'])
+    @action(detail=True, methods=['GET', 'PUT'])
     def program_access(self, request, pk=None):
         user = TolaUser.objects.get(pk=pk)
         admin_user = request.user.tola_user
@@ -730,7 +730,7 @@ class UserAdminViewSet(viewsets.ModelViewSet):
             if request.user.is_superuser:
                 try:
                     user.countryaccess_set.all().delete()
-                    for country_id, access in country_data.iteritems():
+                    for country_id, access in country_data.items():
                         CountryAccess.objects.update_or_create(
                             tolauser=user,
                             country_id=country_id,
@@ -738,7 +738,7 @@ class UserAdminViewSet(viewsets.ModelViewSet):
                                 "role": access["role"],
                             }
                         )
-                except SuspiciousOperation, e:
+                except SuspiciousOperation as e:
                     return Response({"detail": str(e)}, status=status.HTTP_400_BAD_REQUEST)
             elif country_data and not request.user.is_superuser:
                 raise PermissionDenied
@@ -749,7 +749,8 @@ class UserAdminViewSet(viewsets.ModelViewSet):
             managed_countries = {country.id: True for country in admin_user.managed_countries.all()}
 
             for role in ProgramAccess.objects.filter(tolauser=user):
-                if not programs_by_id.get(str(role.country_id)+"_"+str(role.program_id), False) and role.country_id in managed_countries:
+                if (not programs_by_id.get(str(role.country_id)+"_"+str(role.program_id), False)
+                        and role.country_id in managed_countries):
                     role.delete()
 
             added_programs = []
@@ -779,7 +780,7 @@ class UserAdminViewSet(viewsets.ModelViewSet):
         elif request.method == 'GET':
             return Response(user.access_data)
 
-    @list_route(methods=["post"])
+    @action(detail=False, methods=['POST'])
     def bulk_update_status(self, request):
 
         tola_users = TolaUser.objects.filter(pk__in=request.data["user_ids"])
@@ -790,7 +791,7 @@ class UserAdminViewSet(viewsets.ModelViewSet):
         } for tu in tola_users]
         return Response(updated)
 
-    @list_route(methods=["post"])
+    @action(detail=False, methods=['POST'])
     def bulk_add_programs(self, request):
         added_programs = request.data["added_programs"]
 
@@ -825,7 +826,7 @@ class UserAdminViewSet(viewsets.ModelViewSet):
 
         return Response(program_counts)
 
-    @list_route(methods=["post"])
+    @action(detail=False, methods=['POST'])
     def bulk_remove_programs(self, request):
         removed_programs = request.data["removed_programs"]
 
@@ -855,7 +856,7 @@ class UserAdminViewSet(viewsets.ModelViewSet):
 
         return Response(program_counts)
 
-    @detail_route(methods=["get"])
+    @action(detail=True, methods=['GET'])
     def aggregate_data(self, request, pk=None):
         if not pk:
             return Response({}, status=status.HTTP_400_BAD_REQUEST)
@@ -1183,14 +1184,14 @@ class OrganizationAdminViewSet(viewsets.ModelViewSet):
         serializer = OrganizationAdminSerializer(queryset, many=True)
         return Response(serializer.data)
 
-    @detail_route(methods=['get'])
+    @action(detail=True, methods=['GET'])
     def history(self, request, pk=None):
         org = Organization.objects.get(pk=pk)
         queryset = OrganizationAdminAuditLog.objects.filter(organization=org).select_related('admin_user').order_by('-date')
         serializer = OrganizationAdminAuditLogSerializer(queryset, many=True)
         return Response(serializer.data)
 
-    @detail_route(methods=["get"])
+    @action(detail=True, methods=['GET'])
     def aggregate_data(self, request, pk=None):
         if not pk:
             return Response({}, status=status.HTTP_400_BAD_REQUEST)

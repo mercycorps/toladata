@@ -1,3 +1,8 @@
+# -*- coding: utf-8 -*-
+"""
+Views specific to the results framework (creating/updating/viewing)
+"""
+
 import logging
 import copy
 import json
@@ -22,16 +27,21 @@ from rest_framework.decorators import api_view
 from rest_framework.response import Response
 
 from indicators.serializers import (
-    LevelTierSerializer, LevelTierTemplateSerializer, LevelSerializer, IndicatorSerializerMinimal,
-    ProgramObjectiveSerializer)
-from workflow.serializers import ResultsFrameworkProgramSerializer
+    LevelTierSerializer,
+    LevelTierTemplateSerializer,
+    LevelSerializer,
+    IndicatorSerializerMinimal,
+    ProgramObjectiveSerializer
+)
 from indicators.models import Level, LevelTier, LevelTierTemplate, Indicator
 from tola_management.models import ProgramAuditLog
 from workflow.models import Program
+from workflow.serializers import ResultsFrameworkProgramSerializer
+
 
 logger = logging.getLogger(__name__)
 
-# TODO: add security
+
 @method_decorator(login_required, name='dispatch')
 class ResultsFrameworkBuilder(ListView):
     model = Level
@@ -91,7 +101,7 @@ class LazyEncoder(DjangoJSONEncoder):
 
 
 # TODO: add security
-class LevelViewSet (viewsets.ModelViewSet):
+class LevelViewSet(viewsets.ModelViewSet):
 
     serializer_class = LevelSerializer
     queryset = Level.objects.all()
@@ -217,7 +227,7 @@ def insert_new_level(request):
 
 @api_view(http_method_names=['POST'])
 def save_leveltiers(request):
-    print 'post data', request.data['tiers']
+    print('post data', request.data['tiers'])
     program = Program.objects.get(id=request.data['program_id'])
     role = request.user.tola_user.program_role(program.id)
     if request.user.is_anonymous or role != 'high':
@@ -234,7 +244,7 @@ def save_leveltiers(request):
 
             tier_obj.save()
     except Exception as e:
-        print 'error is ', e
+        print('error is {}'.format(e))
         logger.error(e)
         return JsonResponse({'message': _('Your request could not be processed.')}, status=400)
 
@@ -271,7 +281,7 @@ def indicator_list(request, program_id):
         return JsonResponse({'message': _('Your request could not be processed.')}, status=400)
 
     filter_name_map = {'levelId': 'level_id', 'indicatorId': 'pk'}
-    filters = {filter_name_map[key]: request.GET.get(key) for key in filter_name_map.keys() if request.GET.get(key, None)}
+    filters = {filter_name_map[key]: request.GET.get(key) for key in filter_name_map if request.GET.get(key, None)}
 
     indicators = Indicator.objects.filter(program=program, **filters)
 
@@ -298,7 +308,7 @@ def save_custom_template(request):
                 names=request.data['tiers']
             )
 
-    except Exception as e:
+    except Exception:
         logger.exception("Trouble in RF template paradise")
         return JsonResponse({'message': _('Your request could not be processed.')}, status=400)
 
@@ -327,7 +337,7 @@ def save_custom_tiers(request):
                 raise NotImplementedError(_("This level is being used in the results framework."))
 
             for n, template_tier in enumerate(request.data['tiers']):
-                if len(template_tier) == 0:
+                if not template_tier:
                     # Translators:  This is a warning message when users have left an input field blank.
                     raise NotImplementedError(_("Level names should not be blank"))
 

@@ -211,7 +211,6 @@ MIDDLEWARE = (
 # Add Pagination to Rest Framework lists
 REST_FRAMEWORK = {
     'PAGINATE_BY': 10,
-    'DEFAULT_FILTER_BACKENDS': ('django_filters.rest_framework.DjangoFilterBackend',),
     'DEFAULT_AUTHENTICATION_CLASSES': (
         'rest_framework.authentication.SessionAuthentication',
         'rest_framework.authentication.TokenAuthentication',
@@ -242,7 +241,6 @@ DJANGO_APPS = (
     'django.contrib.humanize',
     # Uncomment the next line to enable the admin:
     'django.contrib.admin',
-    'admin_report',
     # Uncomment the next line to enable admin documentation:
     'django.contrib.admindocs',
     'social_django',
@@ -252,8 +250,6 @@ DJANGO_APPS = (
 THIRD_PARTY_APPS = (
     'rest_framework',
     'rest_framework.authtoken',
-    'django_filters',
-    'django_tables2',
     'crispy_forms',
     'django_extensions',
     'mathfilters',
@@ -273,11 +269,9 @@ THIRD_PARTY_APPS = (
 # Apps specific for this project go here.
 LOCAL_APPS = (
     'workflow',
-    'formlibrary',
     'tola',
     'feed',
     'indicators',
-    'customdashboard',
     'tola_management'
 )
 
@@ -374,9 +368,6 @@ WEBPACK_LOADER = {
     }
 }
 
-# Projects whitelist (https://github.com/mercycorps/TolaActivity/issues/132)
-# Limit access to projects to existing users while hiding it from all others
-PROJECTS_ACCESS_WHITELIST_SET = {'AF', 'PK', 'TL'}  # country code in `workflow_country`
 
 ########## LOGGING CONFIGURATION
 LOGGING = {

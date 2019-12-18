@@ -2,24 +2,30 @@ import uuid
 from datetime import timedelta
 
 from workflow.models import (
-    Program, SiteProfile, Documentation, ProjectComplete, TolaUser, Sector
+    Program,
+    SiteProfile,
+    TolaUser,
+    Sector,
 )
 from tola.util import getCountry
 from indicators.models import (
-    Indicator, PeriodicTarget, Result, Objective, StrategicObjective,
-    DisaggregationType, Level, IndicatorType, PinnedReport
+    Indicator,
+    PeriodicTarget,
+    Result,
+    Objective,
+    StrategicObjective,
+    DisaggregationType,
+    Level,
+    IndicatorType,
+    PinnedReport,
 )
 from indicators.widgets import DataAttributesSelect, DatePicker
-
-import dateparser
 
 from django.core.exceptions import ValidationError
 from django.db.models import Q
 from django import forms
-from django.forms.fields import DateField
 from django.utils.translation import ugettext_lazy as _
 from django.utils import formats, translation, timezone
-
 
 
 class PTFormInputsForm(forms.ModelForm):
@@ -70,7 +76,7 @@ class IndicatorForm(forms.ModelForm):
             lop_stripped = str(indicator.lop_target)
             lop_stripped = lop_stripped.rstrip('0').rstrip('.') if '.' in lop_stripped else lop_stripped
             kwargs['initial']['lop_target'] = lop_stripped
-        
+
         self.programval = kwargs.pop('program')
         self.prefilled_level = kwargs.pop('level') if 'level' in kwargs else False
 
@@ -99,9 +105,10 @@ class IndicatorForm(forms.ModelForm):
         else:
             # populate with all levels for the indicator's program:
             # self.fields['level'].queryset = Level.objects.filter(program_id=self.programval)
-            self.fields['level'].choices = [('', '------')] + \
-                                           [(l.id, l.display_name) for l in Level.sort_by_ontology(Level.objects.filter(program_id=self.programval))]
-
+            self.fields['level'].choices = [('', '------')] + [
+                (l.id, l.display_name) for l in Level.sort_by_ontology(
+                    Level.objects.filter(program_id=self.programval)
+                )]
 
         if self.programval.results_framework and not self.programval.manual_numbering:
             # in this (the default) case, the number field is removed (values not updated):
@@ -161,7 +168,7 @@ class IndicatorForm(forms.ModelForm):
 
     def clean_lop_target(self):
         data = self.cleaned_data['lop_target']
-        if data <= 0:
+        if data and data <= 0:
             # Translators: Input form error message
             raise forms.ValidationError(_('Please enter a number larger than zero.'))
         return data
@@ -188,6 +195,10 @@ class IndicatorForm(forms.ModelForm):
         return super(IndicatorForm, self).save(commit)
 
 
+    def get_form_guidance_url(self, language='en'):
+        return 'https://learn.mercycorps.org/index.php/TOLA:Section_05/en#b._TolaActivity_Indicator_Planning_Form_Guides'
+
+
 class ResultForm(forms.ModelForm):
     rationale = forms.CharField(required=False)
 
@@ -198,15 +209,13 @@ class ResultForm(forms.ModelForm):
             'comments': forms.Textarea(attrs={'rows': 4}),
             'program': forms.HiddenInput(),
             'indicator': forms.HiddenInput(),
-            'evidence': forms.HiddenInput()
         }
         labels = {
             'site': _('Site'),
             # Translators: This is a result that was actually achieved, versus one that was planned.
             'achieved': _('Actual value'),
-            # Translators: field label that 
+            # Translators: field label that
             'periodic_target': _('Measure against target'),
-            'complete': _('Project'),
             'evidence_url': _('Link to file or folder'),
         }
 
@@ -231,6 +240,7 @@ class ResultForm(forms.ModelForm):
         self.request = kwargs.pop('request')
         super(ResultForm, self).__init__(*args, **kwargs)
 
+        #TODO: unless I don't know how dicts work, this doesn't modify the actual fields at all?
         if not self.request.has_write_access:
             for name, field in self.fields.items():
                 field.disabled = True
@@ -243,23 +253,16 @@ class ResultForm(forms.ModelForm):
 
     def set_initial_querysets(self):
         """populate foreign key fields with limited quersets based on user / country / program"""
-        # provide only in-program Documentation objects for the evidence queryset
+        # provide only in-program / in-country Site objects for the evidence queryset
 
         self.fields['site'].queryset = SiteProfile.objects.filter(
             country__in=self.indicator.program.country.filter(
-                Q(id__in=self.request.user.tola_user.managed_countries.all().values('id'))
-                | Q(id__in=self.request.user.tola_user.programaccess_set.filter(Q(role='high') | Q(role='medium')).values('country_id'))
+                Q(id__in=self.request.user.tola_user.managed_countries.all().values('id')) |
+                Q(id__in=self.request.user.tola_user.programaccess_set.filter(
+                    Q(role='high') | Q(role='medium')
+                ).values('country_id'))
             )
         )
-
-        self.fields['evidence'].queryset = Documentation.objects\
-            .filter(program=self.indicator.program)
-        # only display Project field to existing users
-        if not self.user.tola_user.allow_projects_access:
-            self.fields.pop('complete')
-        else:
-            # provide only in-program projects for the complete queryset:
-            self.fields['complete'].queryset = ProjectComplete.objects.filter(program=self.program)
 
     def set_periodic_target_widget(self):
         # Django will deliver localized strings to the template but the form needs to be able to compare the date

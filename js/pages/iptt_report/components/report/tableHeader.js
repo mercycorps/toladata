@@ -14,7 +14,9 @@ const ProgramNameRow = inject('rootStore')(
             <tr className="title-row">
                 <td colSpan={ rootStore.resultsFramework ? 8 : 9 } id="id_td_iptt_program_name" className="align-bottom pt-2">
                     <h5 className="m-0">
-                       { program.name }
+                        <a href={ rootStore.currentProgramPageUrl }>
+                            { program.name }
+                        </a>
                     </h5>
                 </td>
                 <td scope="colgroup" colSpan="3"

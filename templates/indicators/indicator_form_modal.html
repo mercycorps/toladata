@@ -1,6 +1,7 @@
 {% load widget_tweaks %}
 {% load i18n %}
 {% load mytags %}
+{% load tola_form_tags %}
 
 
 {# Values pulled out by indicator_form_common_js.html code #}
@@ -435,16 +436,13 @@
 
         </div> <!-- /#indicator_modal_body -->
         {% if not readonly %}
+        <div class="form-actions">
             {% if indicator %}
-            <div class="form-actions">
                 <div>
                     <button type="button" id="id_update_indicator_btn" class="btn btn-primary">{% trans 'Save and close' %}</button>
                     <button type="button" id="id_cancel_btn" class="btn btn-reset">{% trans 'Cancel' %}</button>
                 </div>
-                <div class="text-muted">{% include "form_guidance.html" %}</div>
-            </div>
             {% else %}
-            <div class="form-actions">
                 <div>
                     <button type="button" id="id_save_and_close_indicator_btn" class="btn btn-primary">
                         {# Translators: button label to save the item and then close a modal #}
@@ -456,10 +454,10 @@
                     </button>
                     {# Translators: close a modal throwing away any changes to the form #}
                     <button type="button" id="id_cancel_btn" class="btn btn-reset">{% trans 'Cancel' %}</button>
-                </div>
-                <div class="text-muted">{% include "form_guidance.html" %}</div>
+                </div>    
+                {% endif %}
+            {% form_guidance form %}
             </div>
-            {% endif %}
         {% endif %}
     </form>
 

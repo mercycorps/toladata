@@ -37,7 +37,7 @@ class DecimalDisplayField(serializers.DecimalField):
         return None
 
 
-class IndicatorBase(object):
+class IndicatorBase:
     level_pk = serializers.SerializerMethodField()
     old_level_name = serializers.SerializerMethodField()
 
@@ -65,10 +65,10 @@ class IndicatorBase(object):
 
     def _get_level_order_display(self, indicator):
         if indicator.level_id and indicator.level_order is not None and indicator.level_order < 26:
-            return unicode(string.lowercase[indicator.level_order])
+            return str(string.ascii_lowercase[indicator.level_order])
         elif indicator.level_id and indicator.level_order and indicator.level_order >= 26:
-            return unicode(
-                string.lowercase[indicator.level_order/26 - 1] + string.lowercase[indicator.level_order % 26]
+            return str(
+                string.ascii_lowercase[indicator.level_order/26 - 1] + string.ascii_lowercase[indicator.level_order % 26]
                 )
         return None
 
@@ -82,7 +82,7 @@ class IndicatorBase(object):
             ontology = []
         if level.parent_id is None:
             return depth, u'.'.join(ontology)
-        ontology = [unicode(level.customsort)] + ontology
+        ontology = [str(level.customsort)] + ontology
         parent = [l for l in level_set if l.pk == level.parent_id][0]
         return self._get_level_depth_ontology(parent, level_set, depth+1, ontology)
 
@@ -97,7 +97,7 @@ class IndicatorBase(object):
 IndicatorBaseSerializer = get_serializer(IndicatorBase)
 
 
-class IndicatorMeasurementMixin(object):
+class IndicatorMeasurementMixin:
     is_percent = serializers.SerializerMethodField()
     direction_of_change = serializers.CharField(source='get_direction_of_change')
     baseline = serializers.SerializerMethodField()
@@ -125,7 +125,7 @@ class IndicatorMeasurementMixin(object):
 
 IndicatorWithMeasurementSerializer = get_serializer(IndicatorMeasurementMixin, IndicatorBase)
 
-class ProgramPageIndicatorMixin(object):
+class ProgramPageIndicatorMixin:
     number = serializers.SerializerMethodField('get_long_number')
     was_just_created = serializers.BooleanField(source="just_created")
     is_key_performance_indicator = serializers.BooleanField(source="key_performance_indicator")
@@ -193,7 +193,7 @@ class ProgramPageIndicatorUpdateSerializer(ProgramPageIndicatorSerializer):
             'number'
         ]
 
-class IPTTIndicatorMixin(object):
+class IPTTIndicatorMixin:
     sector_pk = serializers.IntegerField(source='sector_id')
     indicator_type_pks = serializers.SerializerMethodField()
     site_pks = serializers.SerializerMethodField()
@@ -247,7 +247,7 @@ IPTTIndicatorSerializer = get_serializer(
 )
 
 
-class IPTTReportIndicatorMixin(object):
+class IPTTReportIndicatorMixin:
     lop_actual = DecimalDisplayField()
     lop_percent_met = DecimalDisplayField(multiplier=100)
     lop_target = DecimalDisplayField(source='lop_target_calculated')
@@ -286,7 +286,7 @@ class TVAPeriod(serializers.Serializer):
     percent_met = DecimalDisplayField()
 
 
-class IPTTTVAMixin(object):
+class IPTTTVAMixin:
     period_serializer_class = TVAPeriod
     class Meta:
         fields = []
@@ -319,7 +319,7 @@ class TimeperiodsPeriod(serializers.Serializer):
     actual = DecimalDisplayField()
 
 
-class IPTTTPMixin(object):
+class IPTTTPMixin:
     period_serializer_class = TimeperiodsPeriod
     class Meta:
         fields = []
@@ -352,7 +352,7 @@ IPTTTPReportIndicatorSerializer = get_serializer(
     IndicatorBase
 )
 
-class LevelBase(object):
+class LevelBase:
     ontology = serializers.SerializerMethodField()
     tier_name = serializers.SerializerMethodField()
 
@@ -409,7 +409,7 @@ class LevelBase(object):
         return None
 
 
-class RFLevelOrderingLevelMixin(object):
+class RFLevelOrderingLevelMixin:
     indicator_pks = serializers.SerializerMethodField()
 
     class Meta:
@@ -434,7 +434,7 @@ class RFLevelOrderingLevelMixin(object):
 RFLevelOrderingLevelSerializer = get_serializer(RFLevelOrderingLevelMixin, LevelBase)
 
 
-class IPTTLevelMixin(object):
+class IPTTLevelMixin:
     tier_pk = serializers.SerializerMethodField()
     tier_depth = serializers.SerializerMethodField()
     chain_pk = serializers.SerializerMethodField()
@@ -470,7 +470,7 @@ class IPTTLevelMixin(object):
 IPTTLevelSerializer = get_serializer(IPTTLevelMixin, LevelBase)
 
 
-class TierBase(object):
+class TierBase:
     name = serializers.SerializerMethodField()
 
     class Meta:

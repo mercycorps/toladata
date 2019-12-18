@@ -1,5 +1,6 @@
 .home { // bodyclass
     .region-header {
+        align-items: baseline;
         justify-content: flex-start;
     }
     .page-title {
@@ -28,7 +29,7 @@
 }
 
 // Map
-#home_country_map {
+#country_map {
     // This ID is mainly for JS targeting; add styles to the container element, below
     min-height: 350px; // yuck
     height: 100%;

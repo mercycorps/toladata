@@ -25,7 +25,7 @@ export const forProgramPage = (
         updateResultsHTML(rawIndicatorPk) {
             let indicatorPk = parseInt(rawIndicatorPk);
             if (indicatorPk && !isNaN(indicatorPk)) {
-                api.indicatorResultsTable(indicatorPk).then(resultsHTML => {
+                api.indicatorResultsTable(indicatorPk, true).then(resultsHTML => {
                     runInAction(() => {
                         this.deleteResultsHTML(indicatorPk);
                         this.resultsMap.set(indicatorPk, resultsHTML);

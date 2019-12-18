@@ -264,23 +264,30 @@
         <div class="cd-actions__message">
             {% if err %}
             <span id="id_span_date_collected_error_msg" class="text-danger">
-                <small>
                     {% ifequal err 'Error_1' %}
-                        {% trans "Targets are not set up for this indicator." %} <strong>
+                    <div class="text-danger">
+                        <i class="fas fa-bullseye"></i>&nbsp; {% trans "Targets are not set up for this indicator." %}
+                        {% if is_editable is True %}
+                            <a href="{% url 'indicator_update' indicator.id %}" data-tab="#targets" class="indicator-link btn btn-success"><i class="fas fa-plus-circle"></i>&nbsp;{% trans "Add targets" %}</a>
+                        {% endif %}
+                    </div>
                     {% endifequal %}
 
                     {% ifequal err 'Error_2' %}
+                    <small>
                         {% blocktrans %}
                         This record is not associated with a target. Open the data record and select an option from the “Measure against target” menu.
                         {% endblocktrans %}
+                    </small>
                     {% endifequal %}
 
                     {% ifequal err 'Error_3' %}
+                    <small>
                         {% blocktrans with reporting_period_start=program.reporting_period_start|date:"MEDIUM_DATE_FORMAT" reporting_period_end=program.reporting_period_end|date:"MEDIUM_DATE_FORMAT"  %}
                         This date falls outside the range of your target periods. Please select a date between {{ reporting_period_start }} and {{ reporting_period_end }}.
                         {% endblocktrans %}
+                    </small>
                     {% endifequal %}
-                </small>
             </span>
             {% endif %}
         </div>

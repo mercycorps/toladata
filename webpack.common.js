@@ -19,7 +19,8 @@ module.exports = {
         iptt_quickstart: './js/pages/iptt_quickstart/index.js',
         iptt_report: './js/pages/iptt_report/index.js',
         logframe: './js/pages/logframe/index.js',
-        results_framework: './js/pages/results_framework/index.js'
+        results_framework: './js/pages/results_framework/index.js',
+        home_country_map: './js/partials/home_country_map/index.js'
     },
 
     output: {
@@ -72,19 +73,11 @@ module.exports = {
         // css to their own files
         new MiniCssExtractPlugin({filename: '[name]-[contenthash].css'}),
 
-        // new webpack.ProvidePlugin({
-        //     jQuery: 'jquery',
-        //     $: 'jquery',
-        //     jquery: 'jquery',
-        // }),
     ],
 
     optimization: {
         // split manifest out
         runtimeChunk: 'single',
-        // splitChunks: {
-        //     chunks: 'initial',
-        // },
         splitChunks: {
             cacheGroups: {
                 vendors: {

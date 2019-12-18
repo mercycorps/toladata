@@ -3,20 +3,20 @@
 
 from indicators.tests.serializer_tests import (
     # # indicator serializers:
-    # TestIndicatorBaseSerializer,
-    # TestIndicatorWithMeasurementSerializer,
-    # TestProgramPageIndicatorSerializer,
+    TestIndicatorBaseSerializer,
+    TestIndicatorWithMeasurementSerializer,
+    TestProgramPageIndicatorSerializer,
     # # program serializers:
-    # TestProgramBaseSerializer,
-    # TestProgramReportingPeriodSerializer,
-    # TestProgramLevelOrderingProgramSerializer,
-    # TestRFLevelOrderingProgramSerializer,
-    # TestProgramPageProgramSerializer,
+    TestProgramBaseSerializer,
+    TestProgramReportingPeriodSerializer,
+    TestProgramLevelOrderingProgramSerializer,
+    TestRFLevelOrderingProgramSerializer,
+    TestProgramPageProgramSerializer,
     # # endpoint tests (queries / related models):
-    # TestProgramPageEndpoint,
+    TestProgramPageEndpoint,
     # # IPTT QS tests:
-    # TestIPTTQSProgramSerializer,
-    # TestIPTTQSProgramSerializerTransactions,
+    TestIPTTQSProgramSerializer,
+    TestIPTTQSProgramSerializerTransactions,
     # IPTT Report page tests:
     TestIPTTIndicatorSerializer,
     TestIPTTProgramSerializerLevels,
