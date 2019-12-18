@@ -17,7 +17,7 @@
                 <thead>
                     <tr>
                         <th>Category</th>
-                        <th>Value</th>
+                        <th>Value<span class="float-right text-muted">Total: <input disabled id="disaggregation_total_disaggregation_formset.prefix" /></span></th>
                     </tr>
                 </thead>
                 <tbody>
@@ -40,15 +40,16 @@
             "{{ disaggregation_formset.prefix }}",
         {% endfor %}
     ];
+
     function cleanValueFields(prefix, achieved) {
         let valid = true;
         // iterate over each value field in the form and check for numeric or null
-        let values = []
         Array.from(
             Array(parseInt($(`#id_${prefix}-TOTAL_FORMS`).val())).keys()
         ).forEach(
             idx => {
                 let valueField = $(`#id_${prefix}-${idx}-value`);
+                valueField.removeClass('is-invalid, is-valid');
                 if (valueField.val() == '') {
                     //do nothing, null is okay
                 } else if (!$.isNumeric(valueField.val()) || parseFloat(valueField.val()) < 0) {
@@ -57,12 +58,16 @@
                     valueField.parent().addClass('has-error');
                 } else {
                     valueField.val(Math.round(valueField.val() * 100 / 100));
-                    values.append(valueField.val())
+                    valueField.addClass('is-valid');
+                    values.append({
+                        value: valueField.val(),
+                        labelPk: $(`#id_${prefix}-${idx}-label_pk`).val()
+                    });
                 }
             }
         );
         if (valid && values.length > 0) {
-            if (values.reduce((a, b) => a + b) != achieved) {
+            if (values.map(v => v.value).reduce((a, b) => a + b) != achieved) {
                 valid = false;
                 // mark whole table as not summing correctly
             }
