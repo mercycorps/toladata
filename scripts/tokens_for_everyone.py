@@ -15,7 +15,7 @@ import sys
 
 
 def run():
-    print "Setting Tokens"
+    print ("Setting Tokens")
 
 
 from django.contrib.auth.models import User
