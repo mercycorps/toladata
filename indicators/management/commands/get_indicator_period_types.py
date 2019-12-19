@@ -34,11 +34,11 @@ class Command(BaseCommand):
             indicator__create_date__date__gte=options['startdate']).distinct()
         programs_i.prefetch_related('indicator_set')
 
-        print 'exporting indicator cutoff data'
+        print('exporting indicator cutoff data')
         filepath = path.join(home, 'period types - indicator cutoff.csv')
         self.export_program_data(programs_i, filepath)
 
-        print 'exporting pivot data'
+        print('exporting pivot data')
         filepath = path.join(home, 'period types - pivot data.csv')
         self.export_pivot_data(programs_i, filepath)
 
@@ -46,7 +46,7 @@ class Command(BaseCommand):
         programs_p = Program.objects.filter(create_date__date__gte=options['startdate'])
         programs_p.prefetch_related('indicator_set')
 
-        print 'exporting program cutoff data'
+        print('exporting program cutoff data')
         filepath = path.join(home, 'period types - program cutoff.csv')
         self.export_program_data(programs_p, filepath)
 
@@ -62,7 +62,7 @@ class Command(BaseCommand):
         headers = [
             'program_id', 'program_name', 'program_date',
             'indicator_id', 'indicator_type', 'indicator_date',
-            'result_count','reporting_frequency', 'data_collection_frequency'
+            'result_count', 'reporting_frequency', 'data_collection_frequency'
         ]
         frequency_labels = dict(Indicator.TARGET_FREQUENCIES)
         with open(filepath, 'w') as fh:
@@ -70,7 +70,7 @@ class Command(BaseCommand):
             writer.writerow(headers)
 
             for program in programs:
-                program_values = [program.id, program.name.encode('utf8'), program.create_date]
+                program_values = [program.id, program.name, program.create_date]
                 for indicator in program.indicator_set.all():
                     if indicator.target_frequency:
                         frequency = frequency_labels[indicator.target_frequency]
@@ -111,8 +111,8 @@ class Command(BaseCommand):
                         except KeyError:
                             period_type_counts['None'] = 1
 
-                type_count_list = [str(period_type_counts[i]) if i in period_type_counts else '0'\
-                                   for i in frequency_names]
-                countries = ','.join(c.encode('utf8') for c in program.country.values_list('country', flat=True))
-                output_list = [str(program.id), program.name.encode('utf8'), countries] + type_count_list
+                type_count_list = [
+                    str(period_type_counts[i]) if i in period_type_counts else '0' for i in frequency_names]
+                countries = ','.join(program.country.values_list('country', flat=True))
+                output_list = [str(program.id), program.name, countries] + type_count_list
                 writer.writerow(output_list)
