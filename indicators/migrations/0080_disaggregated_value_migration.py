@@ -69,7 +69,11 @@ def assign_all_sadd_disaggregated_values(apps, schema_editor):
     DisaggregatedValue = apps.get_model('indicators', 'DisaggregatedValue')
     DisaggregationValue = apps.get_model('indicators', 'DisaggregationValue')
     DisaggregationType = apps.get_model('indicators', 'DisaggregationType')
-    SADD_disagg = DisaggregationType.objects.get(pk=109)
+    try:
+        SADD_disagg = DisaggregationType.objects.get(pk=109)
+    except DisaggregationType.DoesNotExist:
+        # test database - no sadd migrations, skip it:
+        return
     for label in SADD_disagg.disaggregationlabel_set.all():
         for sadd_value in DisaggregationValue.objects.exclude(
             models.Q(value__isnull=True) | models.Q(value='')
