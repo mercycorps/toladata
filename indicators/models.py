@@ -1937,10 +1937,10 @@ class Result(models.Model):
             "evidence_url": self.evidence_url,
             "sites": ', '.join(site.name for site in self.site.all()) if self.site.exists() else '',
             "disaggregation_values": {
-                dv.disaggregation_label.id: {
-                    "id": dv.category.id,
+                dv.category.pk: {
+                    "id": dv.category.pk,
                     "value": dv.value,
-                    "name": dv.cateogry.name,
+                    "name": dv.category.name,
                 }
                 for dv in self.disaggregated_values
             }

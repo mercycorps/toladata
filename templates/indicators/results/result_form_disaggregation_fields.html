@@ -80,6 +80,7 @@
                 $(`#sum-validation-warning-${prefix}`).hide();
             }
         };
+
         const updateActual = () => {
             $('.actual-value-cell').each(function() {
                 $( this ).children('input').val($('#id_achieved').val());
@@ -93,76 +94,48 @@
         
         updateActual();
         $('#id_achieved').on('change', updateActual);
-        
+        let unLocalizer = window.getNumberLocalizer({decimalPlaces: 2, display: false});
+        let reLocalizer = window.getNumberLocalizer({decimalPlaces: 2, display: true});
         let getDVHandler = (prefix) => {
             let updateSum = () => {
                 let sumValue = Array.from(
                     Array(parseInt($(`#id_${prefix}-TOTAL_FORMS`).val())).keys()
                 ).map(
                     idx => {
-                        let valueField = $(`#id_${prefix}-${idx}-value`);
-                        return !isNaN(parseFloat(valueField.val())) ? parseFloat(valueField.val()) : 0;
+                        return unLocalizer($(`#id_${prefix}-${idx}-value`).val());
                     }
                 ).reduce((a, b) => a + b);
                 if (sumValue == 0) {
                     $(`#disaggregation_sum_${prefix}`).val('').removeClass('is-invalid, is-valid');
                 } else {
-                    $(`#disaggregation_sum_${prefix}`).val(sumValue).removeClass('is-invalid').addClass('is-valid');
+                    $(`#disaggregation_sum_${prefix}`).val(reLocalizer(sumValue)).removeClass('is-invalid').addClass('is-valid');
                 }
                 validateSum($(`#disaggregation_sum_${prefix}`), prefix);
             }
+            updateSum();
             return (ev) => {
                 let $valueCell = $(ev.target);
-                if ($valueCell.val() && (!$.isNumeric($valueCell.val()) || parseFloat($valueCell.val()) < 0)) {
-                    $valueCell.addClass('is-invalid').removeClass('is-valid');
-                    $(`#disaggregation_sum_${prefix}`).val('').removeClass('is-valid, is-invalid');
-                } else if ($valueCell.val() == '') {
+                let value = unLocalizer($valueCell.val());
+                if ($valueCell.val() === '') {
                     $valueCell.removeClass('is-invalid, is-valid');
                     updateSum();
+                } else if (!value || value < 0) {
+                    $valueCell.addClass('is-invalid').removeClass('is-valid');
+                    $(`#disaggregation_sum_${prefix}`).val('').removeClass('is-valid, is-invalid');
                 } else {
-                    let value = Math.round(parseFloat($valueCell.val()) * 100) / 100;
-                    $valueCell.val(value);
-                    $valueCell.removeClass('is-invalid').addClass('is-valid');
+                    $valueCell.val(reLocalizer($valueCell.val())).removeClass('is-invalid').addClass('is-valid');
                     updateSum();
                 }
             }
         };
         $('td.value-cell').each(function() {
             // all disaggregated value cells should validate on change, and update their respective sum field
-            $( this ).children('input').on('change', getDVHandler($( this ).data('prefix')));
+            $( this ).children('input').on('change', getDVHandler($( this ).data('prefix'))).each(function() {
+                $( this ).val(reLocalizer($( this ).val()));
+            });
        });
     });
 
-    function cleanValueFields(prefix) {
-        let valid = true;
-        let values = [];
-        
-        // iterate over each value field in the form and check for numeric or null
-        Array.from(
-            Array(parseInt($(`#id_${prefix}-TOTAL_FORMS`).val())).keys()
-        ).forEach(
-            idx => {
-                let valueField = $(`#id_${prefix}-${idx}-value`);
-                valueField.removeClass('is-invalid');
-                if (!valueField.val() || valueField.val() == '') {
-                    //do nothing, null is okay
-                } else if (!$.isNumeric(valueField.val()) || parseFloat(valueField.val()) < 0) {
-                    valid = false;
-                    valueField.addClass('is-invalid');
-                    valueField.parent().addClass('has-error');
-                } else {
-                    // get decimal value:
-                    valueField.val(Math.round(parseFloat(valueField.val()) * 100) / 100);
-                    valueField.addClass('is-valid');
-                    values.push({
-                        value: valueField.val(),
-                        labelPk: $(`#id_${prefix}-${idx}-label_pk`).val()
-                    });
-                }
-            }
-        );
-        return valid && values;
-    }
     
     function validateDisaggregations() {
         let valid = true;

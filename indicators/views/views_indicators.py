@@ -850,8 +850,10 @@ class ResultUpdate(ResultFormMixin, UpdateView):
             str(self.indicator.form_title_level),
             str(self.indicator.name)
         )
-        disaggregations = self.indicator.disaggregation.all()
-        context['disaggregation_forms'] = [get_disaggregated_result_formset(disagg)(result=self.result) for disagg in disaggregations]
+        context['disaggregation_forms'] = [
+            get_disaggregated_result_formset(disagg)(result=self.result)
+            for disagg in self.indicator.disaggregation.all()
+        ]
         return context
 
     def get_form_kwargs(self):
@@ -867,7 +869,10 @@ class ResultUpdate(ResultFormMixin, UpdateView):
         # save the form then update manytomany relationships
         old_values = old_result.logged_fields
         new_result = form.save()
-
+        for disagg in new_result.indicator.disaggregation.all():
+            formset = get_disaggregated_result_formset(disagg)(self.request.POST, result=new_result)
+            if formset.is_valid:
+                formset.save()
         ProgramAuditLog.log_result_updated(self.request.user, new_result.indicator, old_values,
                                            new_result.logged_fields, form.cleaned_data.get('rationale'))
 

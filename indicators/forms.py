@@ -511,6 +511,7 @@ class BaseDisaggregatedValueFormSet(forms.BaseFormSet):
 
     def __init__(self, *args, **kwargs):
         self.result = kwargs.pop('result', None)
+        self.clear_all = False
         super().__init__(*args, **kwargs)
 
     def get_form_kwargs(self, index):
@@ -534,28 +535,39 @@ class BaseDisaggregatedValueFormSet(forms.BaseFormSet):
             return
         if not self.result:
             raise forms.ValidationError('cannot save disaggregated values without result provided')
-        achieved = [form.cleaned_data.get('value') for form in self.forms]
-        if sum(achieved) != self.result.achieved:
+        achieved = [form.cleaned_data.get('value') for form in self.forms] 
+        if all([v == 0 for v in achieved]):
+            self.clear_all = True
+        elif sum(achieved) != self.result.achieved:
             raise forms.ValidationError(
                 'disaggregated values must add up to {}, got {}'.format(self.result.achieved, achieved)
             )
+
 
     def save(self):
         if self.is_valid():
             values = []
             for form in self.forms:
-                value, created = DisaggregatedValue.update_or_create(
-                    category_id=form.cleaned_data.get('label_pk'),
-                    result_id=self.result.id,
-                    defaults={'value': form.cleaned_data.get('value')}
-                )
-                values.append(value)
-        return values
+                if not self.clear_all:
+                    value, created = DisaggregatedValue.objects.update_or_create(
+                        category_id=form.cleaned_data.get('label_pk'),
+                        result_id=self.result.id,
+                        defaults={'value': form.cleaned_data.get('value')}
+                    )
+                    values.append(value)
+                else:
+                    # if clear all (all values blanked) delete the whole range of disaggs
+                    DisaggregatedValue.objects.filter(
+                        result=self.result,
+                        category_id=form.cleaned_data.get('label_pk')
+                    ).delete()
+            return values
+        return self.errors
 
 
 class DisaggregatedValueForm(forms.Form):
     label_pk = forms.IntegerField(widget=forms.HiddenInput(), required=False)
-    value = forms.DecimalField(decimal_places=2, localize=True)
+    value = forms.DecimalField(decimal_places=2, localize=True, required=False)
 
     def __init__(self, *args, **kwargs):
         label = kwargs.pop('label')
@@ -574,9 +586,9 @@ class DisaggregatedValueForm(forms.Form):
         return data
 
     def clean_value(self):
-        value = self.cleaned_data.get('value', None)
+        value = self.cleaned_data.get('value', 0)
         if value is None:
-            return value
+            return 0
         try:
             value = float(value)
         except ValueError:
