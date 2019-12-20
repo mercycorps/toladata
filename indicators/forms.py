@@ -555,7 +555,7 @@ class BaseDisaggregatedValueFormSet(forms.BaseFormSet):
 
 class DisaggregatedValueForm(forms.Form):
     label_pk = forms.IntegerField(widget=forms.HiddenInput(), required=False)
-    value = forms.FloatField()
+    value = forms.DecimalField(decimal_places=2, localize=True)
 
     def __init__(self, *args, **kwargs):
         label = kwargs.pop('label')

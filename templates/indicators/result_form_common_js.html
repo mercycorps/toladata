@@ -56,9 +56,9 @@
         let datecollected_valid = validateDateCollected();
         let achieved_valid = validate_achieved();
         let evidenceValid = validateEvidence();
-        let disaggsData = achieved_valid && validateDisaggregations();
+        let disaggsValid = validateDisaggregations();
 
-        if ($("#result_update_form div").hasClass('has-error')) {
+        if ($("#result_update_form div").hasClass('has-error') || !disaggsValid) {
             createAlert("danger", "{% trans 'Please complete all required fields.'|escapejs %}", true, "#modalmessages");
             $('#indicator_results_div').animate({ scrollTop: 0 }, 'slow');
             $('#submit-id-submit').removeAttr('disabled');
