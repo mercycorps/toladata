@@ -1,5 +1,6 @@
 import React from 'react'
 import { observer } from "mobx-react"
+import { DragDropContext, Droppable, Draggable } from 'react-beautiful-dnd';
 import classNames from 'classnames'
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome'
 import HelpPopover from "../../../../components/helpPopover";
@@ -18,23 +19,124 @@ const ErrorFeedback = observer(({errorMessages}) => {
     )
 })
 
+const CategoryForm = ({index, category, listLength, ...props}) => (
+    <React.Fragment>
+        <div className="form-group col-md-8">
+            <input
+                value={ category.label }
+                onChange={(e) => props.updateLabel(index, { label: e.target.value })}
+                className={classNames("form-control", {"is-invalid": (props.errors.labels ? Object.keys(props.errors.labels[index]).length : false)})}
+                disabled={category.in_use || props.disabled}
+            />
+            { props.errors.labels &&
+                <ErrorFeedback errorMessages={props.errors.labels[index]['label']} />
+            }
+        </div>
+        <div className="form-group col-md-2">
+            <select
+                value={category.customsort}
+                onChange={ (e) => props.updateLabelOrder(index, e.target.value - 1) }
+                className="form-control" disabled={props.disabled}
+            >
+                {
+                    Array.from(Array(listLength).keys()).map(value => <option value={value+1} key={value}>{value+1}</option>)
+                }
+            </select>
+        </div>
+        {!props.disabled &&
+        <a
+            tabIndex="0"
+            onClick={() => props.deleteLabel(index)}
+            className={classNames("btn btn-link btn-danger", {'disabled': category.in_use})}
+            disabled={category.in_use || props.disabled}
+        >
+            <i className="fas fa-trash"/>{gettext('Remove')}
+        </a>}
+    </React.Fragment>
+);
+
+
+const DisaggregationCategoryList = observer(
+    ({id, categories, ...props}) => (
+        <DragDropContext
+            onDragEnd={ ({source: s = null, destination: d = null}) => { (s !== null && d !== null) && props.updateLabelOrder(s.index, d.index);} }
+          >
+            <Droppable
+                droppableId={ `disaggregation-category-list-${ id }` }
+                renderClone={(provided, snapshot, rubric) => (
+                    <div className="form-group disaggregation-label-group"
+                        ref={ provided.innerRef }
+                        {...provided.draggableProps}   
+                    >
+                    <span className="draggable-arrow" {...provided.dragHandleProps}>
+                        <i className="fas fa-arrows-alt fa-lg"></i>
+                    </span>
+                    <CategoryForm
+                        index={ rubric.source.index }
+                        category={ categories[rubric.source.index] }
+                        listLength={ categories.length }
+                        { ...props }
+                    />
+                    </div>
+                )}
+            >
+                {(provided, snapshot) => (
+                    <div ref={provided.innerRef} {...provided.droppableProps}>
+                        {
+                        categories.map((category, index) => (
+                            <Draggable
+                                draggableId={ category.id == 'new' ? category.createdId : String(category.id) }
+                                index={ index }
+                                isDragDisabled={props.disabled}
+                                key={ category.id == 'new' ? category.createdId : category.id }>
+                                {(provided, snapshot) => (
+                                    <div className="form-group disaggregation-label-group"
+                                        ref={ provided.innerRef }
+                                        {...provided.draggableProps}   
+                                    >
+                                        <span className="draggable-arrow" {...provided.dragHandleProps}>
+                                            <i className="fas fa-arrows-alt fa-lg"></i>
+                                        </span>
+                                        <CategoryForm
+                                            index={ index }
+                                            category={ category }
+                                            listLength={ categories.length }
+                                            { ...props }
+                                        />
+                                    </div>
+                                )}
+                            </Draggable>
+                        ))
+                        }
+                        { provided.placeholder }
+                    </div>
+                )}
+            </Droppable>
+        </DragDropContext>
+    )
+);
+
 
 @observer
 class DisaggregationType extends React.Component {
     constructor(props) {
         super(props)
-
         const {disaggregation} = this.props
-        const labels = disaggregation.labels.map(x => ({...x}))
         this.state = {
-            managed_data: {...disaggregation, labels: [...labels]},
-        }
+            ...disaggregation,
+            labels: this.orderLabels(disaggregation.labels)
+        };
+        this.labelsCreated = 0;
         this.selectedByDefaultPopup = React.createRef();
+    }
+    
+    orderLabels(labels) {
+        return labels.slice().map((label, index) => ({...label, customsort: index + 1}));
     }
 
     hasUnsavedDataAction() {
         const labels = this.props.disaggregation.labels.map(x => ({...x}));
-        this.props.onIsDirtyChange(JSON.stringify(this.state.managed_data) != JSON.stringify({...this.props.disaggregation, labels: [...labels]}))
+        this.props.onIsDirtyChange(JSON.stringify(this.state) != JSON.stringify({...this.props.disaggregation, labels: [...labels]}))
     }
     
     componentDidUpdate = () => {
@@ -47,10 +149,9 @@ class DisaggregationType extends React.Component {
 
     resetForm() {
         this.props.clearErrors()
-        const {disaggregation} = this.props
-        const labels = disaggregation.labels.map(x => ({...x}))
         this.setState({
-            managed_data: {...disaggregation, labels: [...labels]},
+            ...this.props.disaggregation,
+            labels: this.orderLabels(this.props.disaggregation.labels),
         }, () => this.hasUnsavedDataAction())
     }
 
@@ -60,66 +161,64 @@ class DisaggregationType extends React.Component {
 
     updateDisaggregationTypeField(value) {
         this.setState({
-            managed_data: {
-                ...this.state.managed_data,
-                disaggregation_type: value,
-            },
+            disaggregation_type: value,
         }, () => this.hasUnsavedDataAction())
     }
     
     updateSelectedByDefault(checked) {
         this.setState({
-            managed_data: {
-                ...this.state.managed_data,
-                selected_by_default: checked == true
-            }
+            selected_by_default: checked == true
         }, () => this.hasUnsavedDataAction());
     }
 
-    updateLabel(labelIndex, value) {
-        const {managed_data} = this.state
-        const updatedLabels = this.state.managed_data.labels.map((label, idx) => {
-            if (idx==labelIndex) {
-                return Object.assign(label, {label: value})
-            }
-            return label
-        })
+    updateLabel(labelIndex, updatedValues) {
+        let labels = this.state.labels;
+        labels[labelIndex] = { ...labels[labelIndex], ...updatedValues };
         this.setState({
-            managed_data: {...managed_data, labels: [...updatedLabels]}
+            labels: this.orderLabels(labels)
         }, () => this.hasUnsavedDataAction())
+    }
+    
+    updateLabelOrder(oldIndex, newIndex) {
+        let labels = this.state.labels;
+        let remainingLabels = [...labels.slice(0, oldIndex), ...labels.slice(oldIndex + 1)];
+        this.setState({
+            labels: this.orderLabels([...remainingLabels.slice(0, newIndex),
+                                      labels[oldIndex], ...remainingLabels.slice(newIndex)])
+            }, () => this.hasUnsavedDataAction());
     }
 
     appendLabel() {
+        this.labelsCreated += 1;
         const newLabel = {
             id: 'new',
             label: '',
+            createdId: `new-${this.labelsCreated}`
         }
-        const {managed_data} = this.state
         this.setState({
-            managed_data: {...managed_data, labels: [...managed_data.labels, newLabel]}
+            labels: this.orderLabels([...this.state.labels, newLabel])
         }, () => this.hasUnsavedDataAction())
     }
 
     deleteLabel(labelIndex) {
-        const {managed_data} = this.state
-        const updatedLabels = managed_data.labels.filter((label,idx) => idx!=labelIndex || label.in_use)
+        const updatedLabels = this.orderLabels([...this.state.labels.slice(0, labelIndex),
+                                                ...this.state.labels.slice(labelIndex + 1)]);
         this.setState({
-            managed_data: {...managed_data, labels: [...updatedLabels]}
+            labels: updatedLabels
         }, () => this.hasUnsavedDataAction())
     }
 
     save() {
-        const {managed_data} = this.state
-        this.props.saveDisaggregation(managed_data)
+        this.props.saveDisaggregation(this.state)
     }
 
     render() {
         const {disaggregation, expanded, expandAction, deleteAction, archiveAction, unarchiveAction, errors} = this.props
-        const {managed_data} = this.state
+        const managed_data = this.state
         return (
             <div className="accordion-row">
                 <div className="accordion-row__content">
-                    <a onClick={expandAction} className="btn accordion-row__btn btn-link" tabIndex='0'>
+                    <a onClick={() => {expandAction(this.resetForm.bind(this));}} className="btn accordion-row__btn btn-link" tabIndex='0'>
                         <FontAwesomeIcon icon={expanded ? 'caret-down' : 'caret-right'} />
                         {(disaggregation.id == 'new') ? "New disaggregation" : disaggregation.disaggregation_type}
                     </a>
@@ -145,7 +244,8 @@ class DisaggregationType extends React.Component {
                                 <input className="form-check-input" type="checkbox" checked={managed_data.selected_by_default}
                                        onChange={(e) => {this.updateSelectedByDefault(e.target.checked)}} id="selected-by-default-checkbox"
                                         disabled={disaggregation.is_archived} />
-                                <label className="form-check-label" htmlFor="selected-by-default-checkbox">
+                                <nobr>
+                                <label className="form-check-label mr-2" htmlFor="selected-by-default-checkbox">
                                 {
                                     // # Translators: This labels a checkbox, when checked, it will make the associated item "on" (selected) for all new indicators
                                     gettext('Selected by default')
@@ -159,31 +259,21 @@ class DisaggregationType extends React.Component {
                                     innerRef={this.selectedByDefaultPopup}
                                     ariaText={gettext('More information on "selected by default"')}
                                 />
+                                </nobr>
                             </div>
-
                             <div className="form-group">
                                 <label>
                                     {gettext('Categories')}
                                 </label>
-                                {managed_data.labels.map((label, labelIndex) =>
-                                    <div key={labelIndex} className="form-group disaggregation-label-group">
-                                        <input
-                                            value={label.label}
-                                            onChange={(e) => this.updateLabel(labelIndex, e.target.value)}
-                                            className={classNames("form-control", {"is-invalid": (errors.labels ? Object.keys(errors.labels[labelIndex]).length : false)})}
-                                            disabled={disaggregation.is_archived}
-                                        />
-                                        {!disaggregation.is_archived &&
-                                        <a
-                                            tabIndex="0"
-                                            onClick={() => this.deleteLabel(labelIndex)}
-                                            className={classNames("btn btn-link btn-danger", {'disabled': label.in_use})}
-                                            disabled={label.in_use || disaggregation.is_archived}
-                                        >
-                                            <i className="fas fa-trash"/>{gettext('Remove')}
-                                        </a>}
-                                    </div>
-                                )}
+                                <DisaggregationCategoryList
+                                    id={ disaggregation.id }
+                                    categories={ this.state.labels }
+                                    disabled={ disaggregation.is_archived }
+                                    updateLabelOrder={ this.updateLabelOrder.bind(this) }
+                                    updateLabel={ this.updateLabel.bind(this) }
+                                    deleteLabel={ this.deleteLabel.bind(this) }
+                                    errors={ errors }
+                                    />
                                 {!disaggregation.is_archived && <div>
                                     <a tabIndex="0" onClick={() => this.appendLabel()} className="btn btn-link btn-add">
                                         <i className="fas fa-plus-circle"/>{gettext('Add a category')}
@@ -236,7 +326,8 @@ export default class EditDisaggregations extends React.Component {
 
         this.state = {
             expanded_id: null,
-            is_dirty: false
+            is_dirty: false,
+            formReset: null
         }
     }
 
@@ -249,17 +340,21 @@ export default class EditDisaggregations extends React.Component {
         return !this.state.is_dirty || (this.state.is_dirty && confirm(gettext("You have unsaved changes. Are you sure you want to discard them?")))
     }
 
-    toggleExpand(id) {
+    toggleExpand(id, formReset) {
         this.props.clearErrors()
         if(this.dirtyConfirm()) {
-            const {expanded_id} = this.state
+            const {expanded_id} = this.state;
             if (id == expanded_id) {
-                this.setState({expanded_id: null})
+                (this.state.is_dirty && formReset) && formReset();
+                this.setState({expanded_id: null, formReset: null});
             } else {
-                this.setState({expanded_id: id})
+                if (this.state.formReset) {
+                    (this.state.is_dirty && this.state.formReset());
+                }
+                this.setState({expanded_id: id, formReset: formReset})
             }
             if(expanded_id == 'new') {
-                this.props.onDelete(expanded_id)
+                this.onDelete(expanded_id);
             }
             this.handleDirtyUpdate(false)
         }
@@ -271,12 +366,17 @@ export default class EditDisaggregations extends React.Component {
             this.setState({expanded_id: 'new'})
         }
     }
+    
+    onDelete(id) {
+        this.props.onDelete(id, () => {this.setState({is_dirty: false, expanded_id: null, formReset: null})});
+    }
+
 
     saveDisaggregation(data) {
         const withCountry = Object.assign(data, {country: this.props.country_id})
         if (data.id == 'new') {
             this.props.onCreate(withCountry).then(
-                (success) => {if(success) {this.setState({expanded_id: null})}}
+                (success) => {if(success) {this.setState({expanded_id: null, formReset: null})}}
             );
         } else {
             this.props.onUpdate(data.id, withCountry)
@@ -304,9 +404,9 @@ export default class EditDisaggregations extends React.Component {
                         key={disaggregation.id}
                         disaggregation={disaggregation}
                         expanded={disaggregation.id==expanded_id}
-                        expandAction={() => this.toggleExpand(disaggregation.id)}
+                        expandAction={(callback) => this.toggleExpand(disaggregation.id, callback)}
                         updateLabel={(labelIndex, value) => this.updateLabel(disaggregation.id, labelIndex, value)}
-                        deleteAction={() => this.props.onDelete(disaggregation.id)}
+                        deleteAction={this.onDelete.bind(this, disaggregation.id)}
                         archiveAction={() => this.props.onArchive(disaggregation.id)}
                         unarchiveAction={() => this.props.onUnarchive(disaggregation.id)}
                         saveDisaggregation={(data) => this.saveDisaggregation(data)}

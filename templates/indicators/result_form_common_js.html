@@ -51,24 +51,19 @@
     // Intercept ResultsUpdate form submission and then use ajax to submit it.
     $("#indicator_results_div").on("submit", "#result_update_form", function(e){
         e.preventDefault();
-        {#let isFormValid = true;#}
         $("#modalmessages").empty();
         let pts_valid = validatePeriodicTarget();
         let datecollected_valid = validateDateCollected();
         let achieved_valid = validate_achieved();
         let evidenceValid = validateEvidence();
+        let disaggsValid = validateDisaggregations();
 
-        if ($("#result_update_form div").hasClass('has-error')) {
+        if ($("#result_update_form div").hasClass('has-error') || !disaggsValid) {
             createAlert("danger", "{% trans 'Please complete all required fields.'|escapejs %}", true, "#modalmessages");
             $('#indicator_results_div').animate({ scrollTop: 0 }, 'slow');
             $('#submit-id-submit').removeAttr('disabled');
             return;
         }
-        /*
-        var date_collected = new Date($(this.date_collected).val());
-        var date_collected_db_format = date_collected.getFullYear() + '-' + (parseInt(date_collected.getMonth()) + 1) + '-' + date_collected.getDate();
-        $(this.date_collected).val(date_collected_db_format);
-        */
 
         const save = (rationale) => {
             $('#submit-id-submit').attr('disabled', 'disabled');
@@ -185,13 +180,7 @@
 
     function validate_achieved() {
         const actual = $("#id_achieved");
-        // const regexTest = /^\d{0,8}(\.\d{1,2})?$/;
-        // if (regexTest.test(actual.val()) == false) {
-        //     $("#div_id_achieved").addClass('has-error');
-        //     $("#id_achieved").addClass('is-invalid');
-        //     $("#hint_id_achieved").text("{% trans 'Please enter a number with no letters or symbols.'|escapejs %}");
-        //     return false;
-        // }
+
         if (!actual.val() || !$.isNumeric(actual.val()) || actual.val() < 0) {
             $("#div_id_achieved").addClass('has-error');
             $("#id_achieved").addClass('is-invalid');

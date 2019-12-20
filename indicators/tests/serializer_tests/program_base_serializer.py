@@ -119,7 +119,10 @@ class TestProgramReportingPeriodSerializer(test.TestCase):
     def test_percent_complete_half(self):
         today = datetime.date.today()
         start = datetime.date(today.year - 10, today.month, 1)
-        end = datetime.date(today.year + 10, today.month + 1, 1) - datetime.timedelta(days=1)
+        if today.month == 12:
+            end = datetime.date(today.year + 11, 1, 1) - datetime.timedelta(days=1)
+        else:
+            end = datetime.date(today.year + 10, today.month + 1, 1) - datetime.timedelta(days=1)
         data = self.get_program_data(
             reporting_period_start=start,
             reporting_period_end=end

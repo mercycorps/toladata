@@ -1,4 +1,5 @@
 *.log
+login.log.*
 *.pot
 *.pyc
 # Python bytecode:

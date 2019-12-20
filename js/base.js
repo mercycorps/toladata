@@ -654,3 +654,38 @@ function scrollToBottom($el) {
     $el.animate({ scrollTop: height }, 'slow');
 }
 window.scrollToBottom = scrollToBottom;
+
+
+/**
+ * Take a number, with a maximum number of decimal places, process it and return the actual value
+ *  - check for nulls/blanks/non-numerics and return false
+ *  - process input using internationalized guidelines (, for decimal for french/spanish)
+ *  - round to specified number of decimals
+ */
+function getNumberLocalizer({
+    decimalPlaces = 0,
+    display = false,
+    } = {}) {
+    return (val) => {
+        if (val == '' || val == null) {
+            return display ? '' : 0;
+        }
+        let stVal = `${val}`
+        if (['fr', 'es'].includes(userLang) && stVal.includes(',')) {
+            stVal = stVal.replace(',', '.');
+        }
+        if (isNaN(parseFloat(stVal))) {
+            return display ? '' : 0;
+        }
+        let flVal = Math.round(parseFloat(stVal) * Math.pow(10, decimalPlaces)) / Math.pow(10, decimalPlaces);
+        if (!display) {
+            return flVal;
+        }
+        flVal = `${flVal}`;
+        if (['fr', 'es'].includes(userLang) && `${flVal}`.includes('.')) {
+            flVal = flVal.replace('.', ',')
+        }
+        return flVal;
+    }
+}
+window.getNumberLocalizer = getNumberLocalizer;

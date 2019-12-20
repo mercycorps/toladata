@@ -11,11 +11,12 @@ from factory import (
     SubFactory,
     RelatedFactory,
     SelfAttribute,
+    LazyAttribute,
     lazy_attribute,
     Sequence,
     Trait,
 )
-from factory.fuzzy import FuzzyChoice
+from factory.fuzzy import FuzzyChoice, FuzzyInteger
 
 from indicators.models import (
     Result as ResultM,
@@ -30,6 +31,8 @@ from indicators.models import (
     StrategicObjective as StrategicObjectiveM,
     PinnedReport as PinnedReportM,
     DisaggregationType as DisaggregationTypeM,
+    DisaggregationLabel as DisaggregationLabelM,
+    DisaggregatedValue as DisaggregatedValueM,
     DataCollectionFrequency as DataCollectionFrequencyM
 )
 from factories.workflow_models import OrganizationFactory, ProgramFactory, CountryFactory
@@ -103,6 +106,7 @@ class RFIndicatorFactory(DjangoModelFactory):
     name = Faker('company')
     target_frequency = IndicatorM.ANNUAL
     lop_target = 1400
+    unit_of_measure = FuzzyChoice(['cats', 'bananas', 'tennis rackets', 'dollars'])
 
     @post_generation
     def targets(self, create, extracted, **kwargs):
@@ -266,11 +270,40 @@ class PinnedReportFactory(DjangoModelFactory):
     name = Sequence(lambda n: 'Test pinned report: {0}'.format(n))
     report_type = FuzzyChoice(['timeperiods', 'targetperiods'])
 
+
 class DisaggregationTypeFactory(DjangoModelFactory):
     class Meta:
         model = DisaggregationTypeM
+
     disaggregation_type = Sequence(lambda n: "disagg type {0}".format(n))
-    country = SubFactory(CountryFactory)
+    country = LazyAttribute(lambda o: None if o.standard else SubFactory(CountryFactory))
+
+    @post_generation
+    def labels(self, create, extracted, **kwargs):
+        if isinstance(extracted, list):
+            labels = [
+                DisaggregationLabelFactory(
+                    disaggregation_type=self, label=label, customsort=c+1
+                    ) for c, label in enumerate(extracted)
+                ]
+
+
+class DisaggregationLabelFactory(DjangoModelFactory):
+    class Meta:
+        model = DisaggregationLabelM
+
+    disaggregation_type = SubFactory(DisaggregationTypeFactory)
+    label = Sequence(lambda n: "disagg label {}".format(n))
+    customsort = Sequence(lambda n: n + 1)
+
+
+class DisaggregatedValueFactory(DjangoModelFactory):
+    class Meta:
+        model = DisaggregatedValueM
+
+    category = SubFactory(DisaggregationLabelFactory)
+    value = FuzzyInteger(10, 100)
+
 
 class DataCollectionFrequencyFactory(DjangoModelFactory):
     class Meta:

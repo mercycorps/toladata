@@ -352,7 +352,9 @@ export class CountryStore {
         const new_disaggregation_data = {
             id: 'new',
             disaggregation_type: "",
-            labels: [{id: 'new', label: ''}],
+            selected_by_default: false,
+            is_archived: false,
+            labels: [{id: 'new', label: '', createdId: 'new-0'}],
         }
         if (this.editing_disaggregations_data.find(disaggregation => disaggregation.id=='new')) {
             return
@@ -360,7 +362,7 @@ export class CountryStore {
         this.editing_disaggregations_data = [...this.editing_disaggregations_data, new_disaggregation_data]
     }
 
-    @action deleteDisaggregation(id) {
+    @action deleteDisaggregation(id, callback) {
         create_no_rationale_changeset_notice({
             preamble: gettext("This action cannot be undone."),
             // # Translators: This is a confirmation prompt to confirm a user wants to delete an item
@@ -369,13 +371,15 @@ export class CountryStore {
                 if (id=='new') {
                     this.editing_disaggregations_data = this.editing_disaggregations_data.filter(disagg=>disagg.id!='new')
                     this.active_pane_is_dirty = false;
+                    callback && callback();
                     return
                 } else {
                     this.api.deleteDisaggregation(id).then(response => {
                         runInAction(() => {
                             this.editing_disaggregations_data = this.editing_disaggregations_data.filter(disagg => disagg.id!=id)
                             this.active_pane_is_dirty = false;
-                            this.onDeleteSuccessHandler()
+                            this.onDeleteSuccessHandler();
+                            callback && callback();
                         });
                     });
                 }

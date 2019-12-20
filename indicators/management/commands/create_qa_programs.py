@@ -16,7 +16,15 @@ from django.utils import timezone, translation
 from django.conf import settings
 from django.db.utils import IntegrityError
 
-from indicators.models import Indicator, Result, PeriodicTarget, Level, LevelTier
+from indicators.models import (
+    Indicator,
+    Result,
+    PeriodicTarget,
+    Level,
+    LevelTier,
+    DisaggregationType,
+    DisaggregationLabel
+)
 from workflow.models import Program, Country, Organization, TolaUser, CountryAccess, ProgramAccess
 from indicators.views.views_indicators import generate_periodic_targets
 
@@ -72,6 +80,8 @@ class Command(BaseCommand):
         country, created = Country.objects.get_or_create(
             country='Tolaland', defaults={
                 'latitude': 21.4, 'longitude': -158, 'zoom': 6, 'organization': org, 'code': 'TO'})
+        if created:
+            disaggregations = self.create_disaggregations(country)
 
         main_start_date = (date.today() + relativedelta(months=-18)).replace(day=1)
         main_end_date = (main_start_date + relativedelta(months=+32)).replace(day=1) - timedelta(days=1)
@@ -268,6 +278,41 @@ class Command(BaseCommand):
             ca, created = CountryAccess.objects.get_or_create(country=country, tolauser=super_user)
             ca.role = 'basic_admin'
             ca.save()
+
+    def create_disaggregations(self, country):
+        disagg_1 = DisaggregationType(
+            disaggregation_type="A 3 label disaggregation",
+            country=country
+        )
+        disagg_1.save()
+        for c, label in enumerate(['Label 1', 'Label 2', 'Label 3']):
+            category = DisaggregationLabel(
+                disaggregation_type=disagg_1,
+                label=label,
+                customsort=c+1
+            )
+            category.save()
+        disagg_2 = DisaggregationType(
+            disaggregation_type="A selected by default 2 label disaggregation",
+            country=country,
+            selected_by_default=True
+        )
+        disagg_2.save()
+        for c, label in enumerate(['Label 1', 'Label 2']):
+            category = DisaggregationLabel(
+                disaggregation_type=disagg_2,
+                label=label,
+                customsort=c+1
+            )
+            category.save()
+        disagg_3 = DisaggregationType(
+            disaggregation_type="An archived no-label disaggregation",
+            country=country,
+            is_archived=True
+        )
+        disagg_3.save()
+        return [disagg_1, disagg_2, disagg_3]
+        
 
     @staticmethod
     def create_program(start_date, end_date, country, name, post_satsuma=True, multi_country=False):
@@ -570,6 +615,8 @@ class Command(BaseCommand):
     def clean_tolaland():
         try:
             country = Country.objects.get(country='Tolaland')
+            disaggregations = DisaggregationType.objects.filter(country=country)
+            disaggregations.delete()
             country.delete()
         except Country.DoesNotExist:
             pass

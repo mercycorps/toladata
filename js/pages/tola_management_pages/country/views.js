@@ -85,10 +85,11 @@ export const IndexView = observer(
                             newData={store.new_country}
                             data={store.countries}
                             keyField="id"
+                            className="mgmt-table__fixed"
                             HeaderRow={({Col, Row}) =>
                                 <Row>
-                                    <Col size=".2"></Col>
-                                    <Col size="2" className="td--stretch">{gettext("Country")}</Col>
+                                    <Col size="1"></Col>
+                                    <Col size="60">{gettext("Country")}</Col>
                                     <Col>{gettext("Organizations")}</Col>
                                     <Col>{gettext("Programs")}</Col>
                                     <Col>{gettext("Users")}</Col>
@@ -137,7 +138,7 @@ export const IndexView = observer(
                                                         country_id={data.id}
                                                         disaggregations={store.editing_disaggregations_data}
                                                         addDisaggregation={() => store.addDisaggregation()}
-                                                        onDelete={(id) => store.deleteDisaggregation(id)}
+                                                        onDelete={store.deleteDisaggregation.bind(store)}
                                                         onArchive={(id) => store.archiveDisaggregation(id)}
                                                         onUnarchive={(id) => store.unarchiveDisaggregation(id)}
                                                         onUpdate={(id, data) => store.updateDisaggregation(id, data)}
