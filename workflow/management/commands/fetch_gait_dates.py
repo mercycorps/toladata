@@ -2,8 +2,10 @@ import requests
 import json
 import dateutil
 import datetime
+from django.conf import settings
 from django.core.management.base import BaseCommand
 from django.db.models import Q, Min, Max
+
 from workflow.models import Program
 from indicators.models import Indicator
 
@@ -22,15 +24,17 @@ class Command(BaseCommand):
         # Get a list of GAIT ids to submit to the API
         programs = Program.objects.filter(
             Q(gaitid__isnull=False), Q(start_date__isnull=True) | Q(end_date__isnull=True)).order_by('id')
-        program_gaitIDs = []
+        program_gait_ids = []
         for program in programs:
             try:
-                program_gaitIDs.append(str(int(program.gaitid)))
+                program_gait_ids.append(str(int(program.gaitid)))
             except ValueError:
                 pass
-        base_url = 'https://mcapi.mercycorps.org/gaitprogram/?gaitids='
-        response = requests.get(base_url + ','.join(program_gaitIDs))
-        responseObj = json.loads(response.content)
+        base_url = settings['PROGRAM_API_BASE_URL']
+        params = {'id': ','.join(program_gait_ids)}
+        headers = {'Authorization': 'Token {}'.format(settings.PROGRAM_API_TOKEN)}
+        response = requests.get(base_url, params=params, headers=headers)
+        responseObj = json.loads(response.content)['results']
 
         # Create a map from the retrieved data, making sure to flag any duplicate GAIT ids
         gaitid_map = dict()
@@ -110,7 +114,7 @@ class Command(BaseCommand):
                         ", ".join(list(program.country.values_list('country', flat=True))),
                         program.pk,
                         program.gaitid,
-                        unicode(program.name)[:name_max_len],
+                        program.name[:name_max_len],
                         [str(d) for d in unique_start_dates],
                         [str(d) for d in unique_end_dates])
                     if len(unique_start_dates) == 1:
@@ -134,17 +138,17 @@ class Command(BaseCommand):
             else:
                 gait_empty += 1
 
-        print 'Programs with numeric GAIT ids but with no data in GAIT (%s)' % len(warnings)
-        print "\n".join(warnings)
-        print '\nSingle date value programs (%s):' % len(single_date_programs)
-        print '\n'.join(single_date_programs)
-        print '\nMulti date value programs (%s):' % len(multi_date_programs)
-        print '\n'.join(multi_date_programs)
-        print '\nFinal Values in database for programs with date-linked indicators:'
-        print '\n'.join(final_values)
-        print '\nThere were %s duplicate gaitids' % len(duplicate_ids)
-        print '\nTotal program count:', len(programs)
-        print 'GAIT ids in Tola that are not integers:', not_int
-        print 'Programs with no GAIT info:', len(warnings)
-        print 'Programs with no value in the gaitid field:', gait_empty
-        print 'Programs updated:', programs_updated
+        print('Programs with numeric GAIT ids but with no data in GAIT (%s)' % len(warnings))
+        print("\n".join(warnings))
+        print('\nSingle date value programs (%s):' % len(single_date_programs))
+        print('\n'.join(single_date_programs))
+        print('\nMulti date value programs (%s):' % len(multi_date_programs))
+        print('\n'.join(multi_date_programs))
+        print('\nFinal Values in database for programs with date-linked indicators:')
+        print('\n'.join(final_values))
+        print('\nThere were %s duplicate gaitids' % len(duplicate_ids))
+        print('\nTotal program count:', len(programs))
+        print('GAIT ids in Tola that are not integers:', not_int)
+        print('Programs with no GAIT info:', len(warnings))
+        print('Programs with no value in the gaitid field:', gait_empty)
+        print('Programs updated:', programs_updated)
