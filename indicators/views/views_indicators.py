@@ -798,7 +798,7 @@ class ResultCreate(ResultFormMixin, CreateView):
             str(self.indicator.form_title_level),
             str(self.indicator.name)
         )
-        disaggregations = self.indicator.disaggregation.all()
+        disaggregations = self.indicator.disaggregation.all().order_by('disaggregation_type')
         context['disaggregation_forms'] = [get_disaggregated_result_formset(disagg)() for disagg in disaggregations]
         return context
 
@@ -852,7 +852,7 @@ class ResultUpdate(ResultFormMixin, UpdateView):
         )
         context['disaggregation_forms'] = [
             get_disaggregated_result_formset(disagg)(result=self.result)
-            for disagg in self.indicator.disaggregation.all()
+            for disagg in self.indicator.disaggregation.all().order_by('disaggregation_type')
         ]
         return context
 
