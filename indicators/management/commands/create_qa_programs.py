@@ -202,7 +202,7 @@ class Command(BaseCommand):
         program = self.create_program(
             main_start_date, main_end_date, country, 'QA Program --- Pre-Satsuma', post_satsuma=False)
         self.create_levels(program.id, filtered_levels)
-        self.create_indicators(program.id, all_params_base, apply_skips=False)
+        self.create_indicators(program.id, all_params_base, apply_skips=False, apply_rf_skips=True)
 
         print('Creating program with no skips')
         program = self.create_program(
@@ -270,11 +270,8 @@ class Command(BaseCommand):
                 self.create_indicators(program.id, short_param_base)
 
         # Create test users and assign broad permissions to superusers.
-        created_users, existing_users = self.create_test_users(password)
-        if len(created_users) > 0:
-            print('Created the following test users: {}'.format(', '.join(sorted(created_users))))
-        if len(existing_users) > 0:
-            print('The following test users already existed: {}'.format(', '.join(sorted(existing_users))))
+        self.create_test_users(password)
+
 
     @staticmethod
     def create_program(start_date, end_date, country, name, post_satsuma=True, multi_country=False):
@@ -347,7 +344,8 @@ class Command(BaseCommand):
     def calc_increment(target, period_count):
         return int(math.ceil((target/period_count)/10)*10)
 
-    def create_indicators(self, program_id, param_sets, indicator_suffix='', apply_skips=True):
+    def create_indicators(
+        self, program_id, param_sets, indicator_suffix='', apply_skips=True, apply_rf_skips=False):
         indicator_ids = []
         program = Program.objects.get(id=program_id)
         frequency_labels = {
@@ -382,7 +380,7 @@ class Command(BaseCommand):
         old_level_cycle = cycle(old_levels)
 
         rf_levels = list(Level.objects.filter(program__id=program.id))
-        if apply_skips:
+        if apply_rf_skips:
             rf_levels.append(None)
         rf_level_cycle = cycle(rf_levels)
 
@@ -681,7 +679,11 @@ class Command(BaseCommand):
                 ca.role = 'basic_admin'
                 ca.save()
 
-        return created_users, existing_users
+        if len(created_users) > 0:
+            print('\nCreated the following test users: {}\n'.format(', '.join(sorted(created_users))))
+        if len(existing_users) > 0:
+            print('The following test users already existed: {}\n'.format(', '.join(sorted(existing_users))))
+
 
     standard_countries = ['Afghanistan', 'Haiti', 'Jordan', 'Tolaland', 'United States']
     TEST_ORG, created = Organization.objects.get_or_create(name='Test')
