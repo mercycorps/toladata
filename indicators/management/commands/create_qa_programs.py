@@ -15,8 +15,8 @@ from django.utils import timezone, translation
 from django.conf import settings
 from django.db.utils import IntegrityError
 
-from indicators.models import Indicator, Result, PeriodicTarget, Level, LevelTier
-from workflow.models import Program, Country, Organization, TolaUser, CountryAccess, ProgramAccess
+from indicators.models import Indicator, Result, PeriodicTarget, Level, LevelTier, IndicatorType
+from workflow.models import Program, Country, Organization, TolaUser, CountryAccess, ProgramAccess, SiteProfile, Sector
 from indicators.views.views_indicators import generate_periodic_targets
 
 
@@ -77,7 +77,7 @@ class Command(BaseCommand):
         country, created = Country.objects.get_or_create(
             country='Tolaland', defaults={
                 'latitude': 21.4, 'longitude': -158, 'zoom': 6, 'organization': org, 'code': 'TO'})
-
+        self.create_test_sites()
         for super_user in TolaUser.objects.filter(user__is_superuser=True):
             ca, created = CountryAccess.objects.get_or_create(country=country, tolauser=super_user)
             ca.role = 'basic_admin'
@@ -156,8 +156,8 @@ class Command(BaseCommand):
             program = self.create_program(main_start_date, main_end_date, country, program_name)
             print('Creating Indicators for {}'.format(Program.objects.get(id=program.id)))
             self.create_levels(program.id, filtered_levels)
-            self.create_indicators(program.id, all_params_base)
-            self.create_indicators(program.id, null_supplements_params, apply_skips=False)
+            self.create_indicators(program.id, all_params_base, personal_indicator=True)
+            self.create_indicators(program.id, null_supplements_params, apply_skips=False, personal_indicator=True)
 
         if options['named_only']:
             sys.exit()
@@ -345,7 +345,8 @@ class Command(BaseCommand):
         return int(math.ceil((target/period_count)/10)*10)
 
     def create_indicators(
-        self, program_id, param_sets, indicator_suffix='', apply_skips=True, apply_rf_skips=False):
+        self, program_id, param_sets, indicator_suffix='', apply_skips=True, apply_rf_skips=False,
+        personal_indicator=False):
         indicator_ids = []
         program = Program.objects.get(id=program_id)
         frequency_labels = {
@@ -384,6 +385,23 @@ class Command(BaseCommand):
             rf_levels.append(None)
         rf_level_cycle = cycle(rf_levels)
 
+        indicator_types = list(IndicatorType.objects.all())
+        if apply_skips:
+            indicator_types.append(None)
+        type_cycle = cycle(indicator_types)
+
+        sectors = list(Sector.objects.all()[:5])
+        if apply_skips:
+            sectors.append(None)
+        sector_cycle = cycle(sectors)
+
+        sites = list(SiteProfile.objects.filter(country__country="Tolaland"))
+        if apply_skips:
+            sites.append(None)
+        site_cycle = cycle(sites)
+
+
+
         for n, params in enumerate(param_sets):
             if params['is_cumulative']:
                 cumulative_text = 'Cumulative'
@@ -416,7 +434,13 @@ class Command(BaseCommand):
                 program=program,
                 old_level=None if program.results_framework else next(old_level_cycle),
                 level=next(rf_level_cycle),
+                sector=None if not personal_indicator else next(sector_cycle),
             )
+            indicator.save()
+
+            i_type = next(type_cycle)
+            if personal_indicator and i_type:
+                indicator.indicator_type.add(i_type)
             indicator.save()
             indicator_ids.append(indicator.id)
 
@@ -532,6 +556,11 @@ class Command(BaseCommand):
                         continue
                     rs.record_name = 'Evidence {} for result id {}'.format(evidence_count, rs.id)
                     rs.evidence_url = 'http://my/evidence/url'
+
+                    r_site = next(site_cycle)
+                    if personal_indicator and r_site:
+                        rs.site.add(r_site)
+
                     rs.save()
 
             indicator.lop_target = lop_target
@@ -684,6 +713,19 @@ class Command(BaseCommand):
         if len(existing_users) > 0:
             print('The following test users already existed: {}\n'.format(', '.join(sorted(existing_users))))
 
+    @staticmethod
+    def create_test_sites():
+        country = Country.objects.get(country="Tolaland")
+        for i in range(1,6):
+            SiteProfile.objects.get_or_create(
+                name="Tolaland Site {}".format(i),
+                country=country,
+                defaults={
+                    "latitude": 21.4 + i/10,
+                    "longitude": -158 + i/10,
+                    "status": i % 2
+                }
+            )
 
     standard_countries = ['Afghanistan', 'Haiti', 'Jordan', 'Tolaland', 'United States']
     TEST_ORG, created = Organization.objects.get_or_create(name='Test')
