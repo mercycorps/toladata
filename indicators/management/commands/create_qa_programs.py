@@ -1,14 +1,13 @@
-import sys
-import os
-import math
-import random
-import json
+from copy import deepcopy
 from datetime import date, timedelta
 from dateutil.relativedelta import relativedelta
-from copy import deepcopy
+from getpass import getpass
 from itertools import cycle
-import six
-from six.moves import input
+import json
+import math
+import os
+import random
+import sys
 
 from django.core.management.base import BaseCommand
 from django.contrib.auth.models import User
@@ -31,6 +30,7 @@ class Command(BaseCommand):
         parser.add_argument('--clean_tolaland', action='store_true')
         parser.add_argument('--clean_test_users', action='store_true')
         parser.add_argument('--clean_all', action='store_true')
+        parser.add_argument('--create_test_users', action='store_true')
         parser.add_argument('--names')
         parser.add_argument('--named_only', action='store_true')
 
@@ -54,6 +54,11 @@ class Command(BaseCommand):
             self.clean_programs()
             self.clean_tolaland()
             self.clean_test_users()
+            sys.exit()
+
+        if options['create_test_users']:
+            password = getpass(prompt="Enter the password to use for the test users: ")
+            self.create_test_users(password)
             sys.exit()
 
         translation.activate(settings.LANGUAGE_CODE)
@@ -136,6 +141,8 @@ class Command(BaseCommand):
             {'freq': Indicator.EVENT, 'uom_type': Indicator.PERCENTAGE, 'is_cumulative': True,
              'direction': Indicator.DIRECTION_OF_CHANGE_NONE, 'null_level': None},
         ]
+
+        password = getpass(prompt="Enter the password to use for the test users: ")
 
         # Create programs for specific people
 
@@ -263,7 +270,7 @@ class Command(BaseCommand):
                 self.create_indicators(program.id, short_param_base)
 
         # Create test users and assign broad permissions to superusers.
-        created_users, existing_users = self.create_test_users()
+        created_users, existing_users = self.create_test_users(password)
         if len(created_users) > 0:
             print('Created the following test users: {}'.format(', '.join(sorted(created_users))))
         if len(existing_users) > 0:
@@ -555,16 +562,18 @@ class Command(BaseCommand):
             level_map[level_fix['pk']] = level
 
     def clean_test_users(self):
-        for username, profile in six.iteritems(self.user_profiles):
-            try:
-                tola_user_name = ' '.join(profile['first_last'])
-                tola_user = TolaUser.objects.get(name=tola_user_name)
-                auth_user = tola_user.user
-                tola_user.delete()
-                auth_user.delete()
-                print('Deleted user {}'.format(tola_user))
-            except TolaUser.DoesNotExist:
-                pass
+        for username in self.user_profiles.keys():
+            auth_user = User.objects.filter(username=username)
+            if auth_user.count() == 1:
+                tola_user = TolaUser.objects.filter(user=auth_user[0])
+                auth_user[0].delete()
+            else:
+                print("This auth user doesn't exist: {}".format(username))
+                continue
+
+            if tola_user.count() == 1:
+                tola_user[0].delete()
+
 
     @staticmethod
     def clean_tolaland():
@@ -589,11 +598,10 @@ class Command(BaseCommand):
             else:
                 print('\nPrograms not deleted')
 
-    def create_test_users(self):
-        password = input("Enter the password to use for the test users: ")
+    def create_test_users(self, password):
         created_users = []
         existing_users = []
-        for username, profile in six.iteritems(self.user_profiles):
+        for username, profile in self.user_profiles.items():
             home_country = None
             if profile['home_country']:
                 home_country = Country.objects.get(country=profile['home_country'])
@@ -603,8 +611,13 @@ class Command(BaseCommand):
                 accessible_countries.append(Country.objects.get(country=country_name))
 
             user, created = User.objects.get_or_create(
-                username=username, first_name=profile['first_last'][0], last_name=profile['first_last'][1],
-                email=profile['email'])
+                username=username,
+                defaults={
+                    'first_name': profile['first_last'][0],
+                    'last_name': profile['first_last'][1],
+                    'email': profile['email']
+                }
+            )
             user.set_password(password)
             user.save()
             if created:
@@ -613,10 +626,12 @@ class Command(BaseCommand):
                 existing_users.append(username)
 
             tola_user, created = TolaUser.objects.get_or_create(
-                name=' '.join(profile['first_last']),
-                country=home_country,
                 user=user,
-                organization=profile['org']
+                defaults={
+                    'name': ' '.join(profile['first_last']),
+                    'country': home_country,
+                    'organization': profile['org']
+                }
             )
             tola_user.save()
 
