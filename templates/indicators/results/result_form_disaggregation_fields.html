@@ -36,13 +36,13 @@
                 </tr>
             {% endfor %}
             <tr>
-                <td>Sum</td>
+                <td>{% trans "Sum" %}</td>
                 <td class="sum-value-cell">
                     <input disabled class="form-control" id="disaggregation_sum_{{ disaggregation_formset.prefix }}" />
                 </td>
             </tr>
             <tr>
-                <td>Actual value</td>
+                <td>{% trans "Actual value" %}</td>
                 <td class="actual-value-cell"><input disabled class="form-control" id="actual_value_{{ disaggregation_formset.prefix }}" /></td>
             </tr>
             </tbody>
