@@ -267,7 +267,7 @@ class DisaggregationType extends React.Component {
                                     disabled={disaggregation.is_archived}
                                 />
                                 <ErrorFeedback errorMessages={this.formErrors('disaggregation_type')} />
-                                <div className="form-check">
+                                <div className="form-check" style={ {marginTop: '8px'} }>
                                     <input className="form-check-input" type="checkbox" checked={managed_data.selected_by_default}
                                            onChange={(e) => {this.updateSelectedByDefault(e.target.checked)}} id="selected-by-default-checkbox"
                                             disabled={disaggregation.is_archived} />
@@ -289,16 +289,16 @@ class DisaggregationType extends React.Component {
                                     </nobr>
                                 </div>
                             </div>
-                            <div className="form-group">
+                            <div className="form-group" style={ {marginTop: '8px'} }    >
                                 <div className="row">
                                     <div className="col-md-7">
                                         <h4>
                                             {gettext('Categories')}
                                         </h4>
                                     </div>
-                                    <div className="col-md-2">
+                                    <div style={ {marginLeft: '38px'} }>
                                     {/* Paul: I know this is gross, but trying to line up order with the fields below: */}
-                                        <label>&nbsp;&nbsp;&nbsp;&nbsp;{gettext('Order')}</label>
+                                        <label>{gettext('Order')}</label>
                                     </div>
                                 </div>
                                 <DisaggregationCategoryList
@@ -310,7 +310,7 @@ class DisaggregationType extends React.Component {
                                     deleteLabel={ this.deleteLabel.bind(this) }
                                     errors={ errors }
                                     />
-                                {!disaggregation.is_archived && <div style={ {marginTop: '-15px'} }>
+                                {!disaggregation.is_archived && <div style={ {marginTop: '-15px', marginLeft: '-5px'} }>
                                     <a tabIndex="0" onClick={() => this.appendLabel()} className="btn btn-link btn-add">
                                         <i className="fas fa-plus-circle"/>{gettext('Add a category')}
                                     </a>
