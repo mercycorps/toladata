@@ -39,16 +39,16 @@ class TestGroupedMultipleChoiceField(test.TestCase):
                 <a href="#" id="name_toggle_0" class="is-accordion-toggle btn btn-link"
                 data-toggle="collapse" data-target="#name_inputs_0" aria-expanded="false"
                 aria-controls="name_inputs_0">
-                    <i class="fas fa-caret-right"></i>Test Name
+                    <i class="fas fa-caret-right"></i><i class="fas fa-caret-down"></i>Test Name
                 </a>
-                <div class="collapse" id="name_inputs_0">
+                <div class="collapse show" id="name_inputs_0">
                     <div>
                         <div class="form-check"><input class="form-check-input" type="checkbox"
                          name="name_0" value="1" id="name_0_check_0">
-                        <label class="form-check-label" for="name_0_check_0">One</label></div>
+                        <label class="form-check-label" for="name_0_check_0"><small>One</small></label></div>
                         <div class="form-check"><input class="form-check-input" type="checkbox"
                          name="name_0" value="2" id="name_0_check_1">
-                        <label class="form-check-label" for="name_0_check_1">Two</label></div>
+                        <label class="form-check-label" for="name_0_check_1"><small>Two</small></label></div>
                     </div>
                 </div>
             </fieldset>""")
@@ -70,13 +70,13 @@ class TestGroupedMultipleChoiceField(test.TestCase):
                 <a href="#" id="name_toggle_0" class="is-accordion-toggle btn btn-link"
                 data-toggle="collapse" data-target="#name_inputs_0" aria-expanded="false"
                 aria-controls="name_inputs_0">
-                    <i class="fas fa-caret-right"></i>Test Name
+                    <i class="fas fa-caret-right"></i><i class="fas fa-caret-down"></i>Test Name
                 </a>
-                <div class="collapse" id="name_inputs_0">
+                <div class="collapse show" id="name_inputs_0">
                     <div>
                         <div class="form-check"><input class="form-check-input" type="checkbox"
                          name="name_0" value="1" id="name_0_check_0">
-                        <label class="form-check-label" for="name_0_check_0">One</label>
+                        <label class="form-check-label" for="name_0_check_0"><small>One</small></label>
                           <a class="ml-2" tabindex="0" data-toggle="popover" data-trigger="focus"
                              data-html="true" data-placement="right"
                              data-content="<ul><li>Category One</li><li>Category Two</li></ul>">
@@ -86,7 +86,7 @@ class TestGroupedMultipleChoiceField(test.TestCase):
                         </div>
                         <div class="form-check"><input class="form-check-input" type="checkbox"
                          name="name_0" value="2" id="name_0_check_1">
-                        <label class="form-check-label" for="name_0_check_1">Two</label>
+                        <label class="form-check-label" for="name_0_check_1"><small>Two</small></label>
                           <a class="ml-2" tabindex="0" data-toggle="popover" data-trigger="focus"
                              data-html="true" data-placement="right"
                              data-content="<ul><li>Two Cat 1</li><li>Two Cat 2</li><li>Two Cat 3</li></ul>">
@@ -113,29 +113,29 @@ class TestGroupedMultipleChoiceField(test.TestCase):
             """<fieldset>
             <a href="#" id="grouped_field_name_toggle_0" class="is-accordion-toggle btn btn-link"
              data-toggle="collapse" data-target="#grouped_field_name_inputs_0" aria-expanded="false"
-             aria-controls="grouped_field_name_inputs_0"><i class="fas fa-caret-right"></i>{0}</a>
-             <div class="collapse" id="grouped_field_name_inputs_0"><div>
+             aria-controls="grouped_field_name_inputs_0"><i class="fas fa-caret-right"></i><i class="fas fa-caret-down"></i>{0}</a>
+             <div class="collapse show" id="grouped_field_name_inputs_0"><div>
                 <div class="form-check"><input class="form-check-input" type="checkbox"
                  name="grouped_field_name_0" value="100" id="grouped_field_name_0_check_0">
-                 <label class="form-check-label" for="grouped_field_name_0_check_0">Option 0</label></div>
+                 <label class="form-check-label" for="grouped_field_name_0_check_0"><small>Option 0</small></label></div>
                 <div class="form-check"><input class="form-check-input" type="checkbox"
                  name="grouped_field_name_0" value="101" id="grouped_field_name_0_check_1">
-                 <label class="form-check-label" for="grouped_field_name_0_check_1">Option 1</label></div>
+                 <label class="form-check-label" for="grouped_field_name_0_check_1"><small>Option 1</small></label></div>
                 <div class="form-check"><input class="form-check-input" type="checkbox"
                  name="grouped_field_name_0" value="102" id="grouped_field_name_0_check_2">
-                 <label class="form-check-label" for="grouped_field_name_0_check_2">Option 2</label></div>
+                 <label class="form-check-label" for="grouped_field_name_0_check_2"><small>Option 2</small></label></div>
                 <div class="form-check"><input class="form-check-input" type="checkbox"
                  name="grouped_field_name_0" value="103" id="grouped_field_name_0_check_3">
-                 <label class="form-check-label" for="grouped_field_name_0_check_3">Option 3</label></div>
+                 <label class="form-check-label" for="grouped_field_name_0_check_3"><small>Option 3</small></label></div>
                 </div></div>
             </fieldset><fieldset>
             <a href="#" id="grouped_field_name_toggle_1" class="is-accordion-toggle btn btn-link"
              data-toggle="collapse" data-target="#grouped_field_name_inputs_1" aria-expanded="false"
-             aria-controls="grouped_field_name_inputs_1"><i class="fas fa-caret-right"></i>{1}</a>
-             <div class="collapse" id="grouped_field_name_inputs_1"><div>
+             aria-controls="grouped_field_name_inputs_1"><i class="fas fa-caret-right"></i><i class="fas fa-caret-down"></i>{1}</a>
+             <div class="collapse show" id="grouped_field_name_inputs_1"><div>
                 <div class="form-check"><input class="form-check-input" type="checkbox"
                  name="grouped_field_name_1" value="21" id="grouped_field_name_1_check_0">
-                 <label class="form-check-label" for="grouped_field_name_1_check_0">Twenty-one</label></div>
+                 <label class="form-check-label" for="grouped_field_name_1_check_0"><small>Twenty-one</small></label></div>
                </div></div>
             </fieldset>""".format(long_name, special_chars)
         )
@@ -154,29 +154,29 @@ class TestGroupedMultipleChoiceField(test.TestCase):
             """<fieldset>
             <a href="#" id="group_field_toggle_0" class="is-accordion-toggle btn btn-link"
              data-toggle="collapse" data-target="#group_field_inputs_0" aria-expanded="false"
-             aria-controls="group_field_inputs_0"><i class="fas fa-caret-right"></i>One</a>
-             <div class="collapse" id="group_field_inputs_0"><div>
+             aria-controls="group_field_inputs_0"><i class="fas fa-caret-right"></i><i class="fas fa-caret-down"></i>One</a>
+             <div class="collapse show" id="group_field_inputs_0"><div>
                 <div class="form-check"><input class="form-check-input" type="checkbox"
                  name="group_field_0" value="1" id="group_field_0_check_0" checked>
-                 <label class="form-check-label" for="group_field_0_check_0">A</label></div>
+                 <label class="form-check-label" for="group_field_0_check_0"><small>A</small></label></div>
                 <div class="form-check"><input class="form-check-input" type="checkbox"
                  name="group_field_0" value="2" id="group_field_0_check_1" checked>
-                 <label class="form-check-label" for="group_field_0_check_1">B</label></div>
+                 <label class="form-check-label" for="group_field_0_check_1"><small>B</small></label></div>
                 </div></div>
             </fieldset><fieldset>
             <a href="#" id="group_field_toggle_1" class="is-accordion-toggle btn btn-link"
              data-toggle="collapse" data-target="#group_field_inputs_1" aria-expanded="false"
-             aria-controls="group_field_inputs_1"><i class="fas fa-caret-right"></i>Two</a>
-             <div class="collapse" id="group_field_inputs_1"><div>
+             aria-controls="group_field_inputs_1"><i class="fas fa-caret-right"></i><i class="fas fa-caret-down"></i>Two</a>
+             <div class="collapse show" id="group_field_inputs_1"><div>
                 <div class="form-check"><input class="form-check-input" type="checkbox"
                  name="group_field_1" value="3" id="group_field_1_check_0">
-                 <label class="form-check-label" for="group_field_1_check_0">C</label></div>
+                 <label class="form-check-label" for="group_field_1_check_0"><small>C</small></label></div>
                 <div class="form-check"><input class="form-check-input" type="checkbox"
                  name="group_field_1" value="4" id="group_field_1_check_1">
-                 <label class="form-check-label" for="group_field_1_check_1">D</label></div>
+                 <label class="form-check-label" for="group_field_1_check_1"><small>D</small></label></div>
                 <div class="form-check"><input class="form-check-input" type="checkbox"
                  name="group_field_1" value="10" id="group_field_1_check_2" checked>
-                 <label class="form-check-label" for="group_field_1_check_2">E</label></div>
+                 <label class="form-check-label" for="group_field_1_check_2"><small>E</small></label></div>
                 </div></div>
             </fieldset>"""
         )

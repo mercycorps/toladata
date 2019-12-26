@@ -91,12 +91,12 @@ class TestIndicatorCreateFormDisaggregations(test.TestCase):
             """<fieldset>
             <a href="#" id="grouped_disaggregations_toggle_0" class="is-accordion-toggle btn btn-link"
              data-toggle="collapse" data-target="#grouped_disaggregations_inputs_0" aria-expanded="false"
-             aria-controls="grouped_disaggregations_inputs_0"><i class="fas fa-caret-right"></i>
+             aria-controls="grouped_disaggregations_inputs_0"><i class="fas fa-caret-right"></i><i class="fas fa-caret-down"></i>
              Global disaggregations</a>
-             <div class="collapse" id="grouped_disaggregations_inputs_0"><div>
+             <div class="collapse show" id="grouped_disaggregations_inputs_0"><div class="scroll-box-200">
                 <div class="form-check"><input class="form-check-input" type="checkbox"
                  name="grouped_disaggregations_0" value="{}" id="grouped_disaggregations_0_check_0">
-                 <label class="form-check-label" for="grouped_disaggregations_0_check_0">Test Global 1</label></div>
+                 <label class="form-check-label" for="grouped_disaggregations_0_check_0"><small>Test Global 1</small></label></div>
                 </div></div>
             </fieldset>""".format(standard_disagg.pk)
         )
@@ -114,12 +114,12 @@ class TestIndicatorCreateFormDisaggregations(test.TestCase):
             """<fieldset>
             <a href="#" id="grouped_disaggregations_toggle_0" class="is-accordion-toggle btn btn-link"
              data-toggle="collapse" data-target="#grouped_disaggregations_inputs_0" aria-expanded="false"
-             aria-controls="grouped_disaggregations_inputs_0"><i class="fas fa-caret-right"></i>
+             aria-controls="grouped_disaggregations_inputs_0"><i class="fas fa-caret-right"></i><i class="fas fa-caret-down"></i>
              Global disaggregations</a>
-             <div class="collapse" id="grouped_disaggregations_inputs_0"><div>
+             <div class="collapse show" id="grouped_disaggregations_inputs_0"><div class="scroll-box-200">
                 <div class="form-check"><input class="form-check-input" type="checkbox"
                  name="grouped_disaggregations_0" value="{}" id="grouped_disaggregations_0_check_0" checked>
-                 <label class="form-check-label" for="grouped_disaggregations_0_check_0">{}</label></div>
+                 <label class="form-check-label" for="grouped_disaggregations_0_check_0"><small>{}</small></label></div>
                 </div></div>
             </fieldset>""".format(standard_disagg.pk, special_chars)
         )
@@ -136,12 +136,12 @@ class TestIndicatorCreateFormDisaggregations(test.TestCase):
             """<fieldset>
             <a href="#" id="grouped_disaggregations_toggle_0" class="is-accordion-toggle btn btn-link"
              data-toggle="collapse" data-target="#grouped_disaggregations_inputs_0" aria-expanded="false"
-             aria-controls="grouped_disaggregations_inputs_0"><i class="fas fa-caret-right"></i>
+             aria-controls="grouped_disaggregations_inputs_0"><i class="fas fa-caret-right"></i><i class="fas fa-caret-down"></i>
              Testland disaggregations</a>
-             <div class="collapse" id="grouped_disaggregations_inputs_0"><div>
+             <div class="collapse show" id="grouped_disaggregations_inputs_0"><div class="scroll-box-200">
                 <div class="form-check"><input class="form-check-input" type="checkbox"
                  name="grouped_disaggregations_0" value="{}" id="grouped_disaggregations_0_check_0">
-                 <label class="form-check-label" for="grouped_disaggregations_0_check_0">Test1</label></div>
+                 <label class="form-check-label" for="grouped_disaggregations_0_check_0"><small>Test1</small></label></div>
                 </div></div>
             </fieldset>""".format(country_disagg.pk)
         )
@@ -165,12 +165,12 @@ class TestIndicatorCreateFormDisaggregations(test.TestCase):
             """<fieldset>
             <a href="#" id="grouped_disaggregations_toggle_0" class="is-accordion-toggle btn btn-link"
              data-toggle="collapse" data-target="#grouped_disaggregations_inputs_0" aria-expanded="false"
-             aria-controls="grouped_disaggregations_inputs_0"><i class="fas fa-caret-right"></i>
+             aria-controls="grouped_disaggregations_inputs_0"><i class="fas fa-caret-right"></i><i class="fas fa-caret-down"></i>
              Testland disaggregations</a>
-             <div class="collapse" id="grouped_disaggregations_inputs_0"><div>
+             <div class="collapse show" id="grouped_disaggregations_inputs_0"><div class="scroll-box-200">
                 <div class="form-check"><input class="form-check-input" type="checkbox"
                  name="grouped_disaggregations_0" value="{}" id="grouped_disaggregations_0_check_0">
-                 <label class="form-check-label" for="grouped_disaggregations_0_check_0">Test1</label>
+                 <label class="form-check-label" for="grouped_disaggregations_0_check_0"><small>Test1</small></label>
                  <a class="ml-2" tabindex="0" data-toggle="popover" data-trigger="focus"
                     data-html="true" data-placement="right"
                     data-content="<ul class=&quot;popover-list&quot;><li>Test1 Label 1</li><li>Test1 Label 2</li></ul>">
@@ -199,15 +199,15 @@ class TestIndicatorCreateFormDisaggregations(test.TestCase):
             """<fieldset>
             <a href="#" id="grouped_disaggregations_toggle_0" class="is-accordion-toggle btn btn-link"
              data-toggle="collapse" data-target="#grouped_disaggregations_inputs_0" aria-expanded="false"
-             aria-controls="grouped_disaggregations_inputs_0"><i class="fas fa-caret-right"></i>
+             aria-controls="grouped_disaggregations_inputs_0"><i class="fas fa-caret-right"></i><i class="fas fa-caret-down"></i>
              Testland disaggregations</a>
-             <div class="collapse" id="grouped_disaggregations_inputs_0"><div>
+             <div class="collapse show" id="grouped_disaggregations_inputs_0"><div class="scroll-box-200">
                 <div class="form-check"><input class="form-check-input" type="checkbox"
                  name="grouped_disaggregations_0" value="{}" id="grouped_disaggregations_0_check_0">
-                 <label class="form-check-label" for="grouped_disaggregations_0_check_0">Test1</label></div>
+                 <label class="form-check-label" for="grouped_disaggregations_0_check_0"><small>Test1</small></label></div>
                 <div class="form-check"><input class="form-check-input" type="checkbox" checked
                  name="grouped_disaggregations_0" value="{}" id="grouped_disaggregations_0_check_1">
-                 <label class="form-check-label" for="grouped_disaggregations_0_check_1">Test2</label></div>
+                 <label class="form-check-label" for="grouped_disaggregations_0_check_1"><small>Test2</small></label></div>
                 </div></div>
             </fieldset>""".format(country_disagg_1.pk, country_disagg_2.pk)
         )
@@ -541,12 +541,12 @@ class TestIndicatorUpdateFormDisaggregations(test.TestCase):
             """<fieldset>
             <a href="#" id="grouped_disaggregations_toggle_0" class="is-accordion-toggle btn btn-link"
              data-toggle="collapse" data-target="#grouped_disaggregations_inputs_0" aria-expanded="false"
-             aria-controls="grouped_disaggregations_inputs_0"><i class="fas fa-caret-right"></i>
+             aria-controls="grouped_disaggregations_inputs_0"><i class="fas fa-caret-right"></i><i class="fas fa-caret-down"></i>
              Global disaggregations</a>
-             <div class="collapse" id="grouped_disaggregations_inputs_0"><div>
+             <div class="collapse show" id="grouped_disaggregations_inputs_0"><div class="scroll-box-200">
                 <div class="form-check"><input class="form-check-input" type="checkbox" checked disabled
                  name="grouped_disaggregations_0" value="{}" id="grouped_disaggregations_0_check_0">
-                 <label class="form-check-label" for="grouped_disaggregations_0_check_0">Test1</label>
+                 <label class="form-check-label" for="grouped_disaggregations_0_check_0"><small>Test1</small></label>
                  <a class="ml-2" tabindex="0" data-toggle="popover" data-trigger="focus"
                     data-html="true" data-placement="right"
                     data-content="<ul class=&quot;popover-list&quot;><li>Test1 Label 1</li><li>Test1 Label 2</li></ul><br /><i>This disaggregation cannot be unselected, because it was already used in submitted program results.</i>">
@@ -556,7 +556,7 @@ class TestIndicatorUpdateFormDisaggregations(test.TestCase):
                 </div>
                 <div class="form-check"><input class="form-check-input" type="checkbox" checked
                  name="grouped_disaggregations_0" value="{}" id="grouped_disaggregations_0_check_1">
-                 <label class="form-check-label" for="grouped_disaggregations_0_check_1">Test2</label>
+                 <label class="form-check-label" for="grouped_disaggregations_0_check_1"><small>Test2</small></label>
                  <a class="ml-2" tabindex="0" data-toggle="popover" data-trigger="focus"
                     data-html="true" data-placement="right"
                     data-content="<ul class=&quot;popover-list&quot;><li>Test2 Label 1</li><li>Test2 Label 2</li></ul>">
@@ -566,7 +566,7 @@ class TestIndicatorUpdateFormDisaggregations(test.TestCase):
                 </div>
                 <div class="form-check"><input class="form-check-input" type="checkbox" checked
                  name="grouped_disaggregations_0" value="{}" id="grouped_disaggregations_0_check_2">
-                 <label class="form-check-label" for="grouped_disaggregations_0_check_2">Test3</label>
+                 <label class="form-check-label" for="grouped_disaggregations_0_check_2"><small>Test3</small></label>
                  <a class="ml-2" tabindex="0" data-toggle="popover" data-trigger="focus"
                     data-html="true" data-placement="right"
                     data-content="<ul class=&quot;popover-list&quot;><li>Test3 Label 1</li><li>Test3 Label 2</li></ul>">
