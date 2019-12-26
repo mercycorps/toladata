@@ -668,14 +668,14 @@ function getNumberLocalizer({
     } = {}) {
     return (val) => {
         if (val == '' || val == null) {
-            return display ? '' : 0;
+            return display ? '' : false;
         }
         let stVal = `${val}`
         if (['fr', 'es'].includes(userLang) && stVal.includes(',')) {
             stVal = stVal.replace(',', '.');
         }
-        if (isNaN(parseFloat(stVal))) {
-            return display ? '' : 0;
+        if (isNaN(parseFloat(stVal)) || !$.isNumeric(stVal)) {
+            return display ? '' : false;
         }
         let flVal = Math.round(parseFloat(stVal) * Math.pow(10, decimalPlaces)) / Math.pow(10, decimalPlaces);
         if (!display) {

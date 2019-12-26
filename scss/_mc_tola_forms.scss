@@ -61,6 +61,9 @@ input[type=number]::-webkit-outer-spin-button {
         content:"%";
         right: 0.5rem;
     }
+    &.feedback-row:after {
+        top: 1.5rem !important;
+    }
     .input-value, input.input-value { // adds extra specificity vs. .periodic-target .input-value
         padding-right: 1.5rem;
     }

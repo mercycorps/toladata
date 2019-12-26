@@ -9,47 +9,71 @@
            href="#" id="disaggregations_toggle_{{ forloop.counter0 }}" class="is-accordion-toggle btn btn-link"
            data-toggle="collapse" data-target="#disaggregations_fields_{{ forloop.counter0 }}"
            aria-expanded="false" aria-controls="disaggregations_fields_{{ forloop.counter0 }}">
-            <i class="fas fa-caret-right"></i>{{ disaggregation_formset.disaggregation }}    
+            <i class="fas fa-caret-right"></i>{{ disaggregation_formset.disaggregation }}
         </a>
-        <span id="sum-validation-warning-{{ disaggregation_formset.prefix }}" class="inline-feedback invalid-feedback disaggregations-needs-attention">
+        <span id="sum-validation-warning-{{ disaggregation_formset.prefix }}" class="hidden inline-feedback invalid-feedback disaggregations-needs-attention">
             <i class="fas fa-exclamation-triangle"></i>{% trans "Needs attention" %}
         </span>
         <div class="collapse" id="disaggregations_fields_{{ forloop.counter0 }}">
             {{ disaggregation_formset.management_form }}
-            <table class="table table-bordered table-sm table-hover table-striped">
+            <table class="table table-sm table-striped">
+                <colgroup>
+                    <col>
+                    <col style="width: 200px">
+                </colgroup>
                 <thead>
                     <tr>
-                        <th>Category</th>
-                        <th>Value</th>
+                        <th>{% trans "Disaggregation" %}</th>
+                        <th>{% trans "Actual value" %}</th>
                     </tr>
                 </thead>
                 <tbody>
             {% for form in disaggregation_formset %}
-                <tr>
+                <tr class="form-input-row">
                     <td>{{form.label_pk}}{{form.value.label_tag }}</td>
-                    <td class="value-cell" data-prefix="{{ disaggregation_formset.prefix }}">
-                        {{ form.value|add_class:"form-control" }}
+                    <td class="value-cell {% if indicator.unit_of_measure_type == indicator.PERCENTAGE %}input-symbol-percent feedback-row{% endif %}" data-prefix="{{ disaggregation_formset.prefix }}">
+                        {{ form.value|add_class:"form-control text-right" }}
                         <div class="invalid-feedback">
                             {% trans "Please enter a number greater than zero." %}
                         </div>
                     </td>
                 </tr>
             {% endfor %}
-            <tr>
-                <td>Sum</td>
-                <td class="sum-value-cell">
-                    <input disabled class="form-control" id="disaggregation_sum_{{ disaggregation_formset.prefix }}" />
+            {% if indicator.unit_of_measure_type != indicator.PERCENTAGE %}
+                <tr class="calculated-value">
+                    <td>
+                        {% trans "Sum" %}
+                        <span class="float-right" style="display: none;" id="sum-validation-actions-{{ disaggregation_formset.prefix }}">
+                            <a href="#" class="action-if-invalid update-actual-value-button">
+                                <i class="fas fa-sync"></i>
+                                {% trans "Update actual value" %}
+                            </a>
+                            <span class="action-if-invalid text-danger sum-difference">-100</span>
+                        </span>
+                    </td>
+                    <td class="sum-value-cell">
+                        <input disabled class="form-control no-validate" id="disaggregation_sum_{{ disaggregation_formset.prefix }}" />
+                    </td>
+                </tr>
+            {% endif %}
+            <tr class="calculated-value">
+                <td>{% trans "Actual value" %}</td>
+                <td class="actual-value-cell {% if indicator.unit_of_measure_type == indicator.PERCENTAGE %}input-symbol-percent{% endif %}">
+                    <input disabled class="form-control" id="actual_value_{{ disaggregation_formset.prefix }}" />
                 </td>
             </tr>
-            <tr>
-                <td>Actual value</td>
-                <td class="actual-value-cell"><input disabled class="form-control" id="actual_value_{{ disaggregation_formset.prefix }}" /></td>
-            </tr>
             </tbody>
+            <tfoot>
+                <tr>
+                    <td colspan="2">
+                        <div id="sum-validation-{{ disaggregation_formset.prefix }}" class="invalid-feedback">
+                            {% trans "The sum of disaggregated values does not match the actual value." %}
+                        </div>
+                    </td>
+                </tr>
+            </tfoot>
             </table>
-            <div id="sum-validation-{{ disaggregation_formset.prefix }}" class="invalid-feedback">
-                {% trans "The sum of disaggregated values does not match the actual value." %}
-            </div>
+            
         </div>
     </fieldset>
 {% endfor %}
@@ -61,37 +85,48 @@
             "{{ disaggregation_formset.prefix }}",
         {% endfor %}
     ];
-
     
+    function validateSum($sum, prefix) {
+        if ($sum.hasClass('no-validate')) {
+            return;
+        }
+        if ($sum.val() == '' || !$sum.val()) {
+            $sum.removeClass('is-invalid', 'is-valid');
+            $(`#sum-validation-${prefix}`).hide();
+            $(`#sum-validation-warning-${prefix}`).addClass('hidden');
+            $(`#sum-validation-actions-${prefix}`).hide();
+        } else if ($sum.val() != $('#id_achieved').val()) {
+            $sum.removeClass('is-valid').addClass('is-invalid');
+            $(`#sum-validation-${prefix}`).show();
+            $(`#sum-validation-warning-${prefix}`).removeClass('hidden');
+            $(`#sum-validation-actions-${prefix}`).show().find('.sum-difference').html($sum.val() - $('#id_achieved').val());
+        } else {
+            $sum.removeClass('is-invalid').addClass('is-valid');
+            $(`#sum-validation-${prefix}`).hide();
+            $(`#sum-validation-warning-${prefix}`).addClass('hidden');
+            $(`#sum-validation-actions-${prefix}`).hide();
+        }
+    };
+
+    function updateActual() {
+        $('.actual-value-cell').each(function() {
+            $( this ).children('input').val($('#id_achieved').val());
+        });
+        disaggForms.forEach(
+            prefix => {
+                validateSum($(`#disaggregation_sum_${prefix}`), prefix);
+            }
+        )
+    };
+    
+    function updateActualButton(ev) {
+        ev.preventDefault();
+        $('#id_achieved').val($(ev.target).parents('tr.calculated-value').find('.sum-value-cell>input').val());
+        updateActual();
+    }
 
     $(function() {
-        const validateSum = ($sum, prefix) => {
-            if ($sum.val() == '' || !$sum.val()) {
-                $sum.removeClass('is-invalid', 'is-valid');
-                $(`#sum-validation-${prefix}`).hide();
-                $(`#sum-validation-warning-${prefix}`).hide();
-            } else if ($sum.val() != $('#id_achieved').val()) {
-                $sum.removeClass('is-valid').addClass('is-invalid');
-                $(`#sum-validation-${prefix}`).show();
-                $(`#sum-validation-warning-${prefix}`).show();
-            } else {
-                $sum.removeClass('is-invalid').addClass('is-valid');
-                $(`#sum-validation-${prefix}`).hide();
-                $(`#sum-validation-warning-${prefix}`).hide();
-            }
-        };
-
-        const updateActual = () => {
-            $('.actual-value-cell').each(function() {
-                $( this ).children('input').val($('#id_achieved').val());
-            });
-            disaggForms.forEach(
-                prefix => {
-                    validateSum($(`#disaggregation_sum_${prefix}`), prefix);
-                }
-            )
-        };
-        
+        $('.update-actual-value-button').on('click', updateActualButton);
         updateActual();
         $('#id_achieved').on('change', updateActual);
         let unLocalizer = window.getNumberLocalizer({decimalPlaces: 2, display: false});
@@ -139,6 +174,8 @@
     
     function validateDisaggregations() {
         let valid = true;
+        $('.no-validate').removeClass('no-validate');
+        updateActual();
         $('.disaggregation-table').find('.is-invalid').each(function() {
             valid = false;
         });

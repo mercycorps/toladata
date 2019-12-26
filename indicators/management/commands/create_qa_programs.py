@@ -1,3 +1,4 @@
+# -*- coding: utf-8 -*-
 import sys
 import os
 import math
@@ -281,11 +282,11 @@ class Command(BaseCommand):
 
     def create_disaggregations(self, country):
         disagg_1 = DisaggregationType(
-            disaggregation_type="A 3 label disaggregation",
+            disaggregation_type="A 3-category disaggregation",
             country=country
         )
         disagg_1.save()
-        for c, label in enumerate(['Label 1', 'Label 2', 'Label 3']):
+        for c, label in enumerate(['Category 1', 'Category 2', 'Category 3']):
             category = DisaggregationLabel(
                 disaggregation_type=disagg_1,
                 label=label,
@@ -293,12 +294,12 @@ class Command(BaseCommand):
             )
             category.save()
         disagg_2 = DisaggregationType(
-            disaggregation_type="A selected by default 2 label disaggregation",
+            disaggregation_type="A selected-by-default 2-category disaggregation",
             country=country,
             selected_by_default=True
         )
         disagg_2.save()
-        for c, label in enumerate(['Label 1', 'Label 2']):
+        for c, label in enumerate(['Cåtégøry 1', 'Category 2']):
             category = DisaggregationLabel(
                 disaggregation_type=disagg_2,
                 label=label,

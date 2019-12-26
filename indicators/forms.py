@@ -511,6 +511,7 @@ class BaseDisaggregatedValueFormSet(forms.BaseFormSet):
 
     def __init__(self, *args, **kwargs):
         self.result = kwargs.pop('result', None)
+        self.request = kwargs.pop('request', None)
         self.clear_all = False
         super().__init__(*args, **kwargs)
 
@@ -523,10 +524,13 @@ class BaseDisaggregatedValueFormSet(forms.BaseFormSet):
             value = self.result.disaggregated_values.filter(category=label.pk).first().value
         else:
             value = None
+        enabled = self.request and self.request.has_write_access
+
         return {
             **super().get_form_kwargs(index),
             'label': label,
-            'initial_value': value
+            'initial_value': value,
+            'enabled': enabled
         }
         return super().get_form_kwargs(index)
 
@@ -538,6 +542,8 @@ class BaseDisaggregatedValueFormSet(forms.BaseFormSet):
         achieved = [form.cleaned_data.get('value') for form in self.forms] 
         if all([v == 0 for v in achieved]):
             self.clear_all = True
+        elif self.result.indicator.unit_of_measure_type == Indicator.PERCENTAGE:
+            return
         elif sum(achieved) != self.result.achieved:
             raise forms.ValidationError(
                 'disaggregated values must add up to {}, got {}'.format(self.result.achieved, achieved)
@@ -570,12 +576,16 @@ class DisaggregatedValueForm(forms.Form):
     value = forms.DecimalField(decimal_places=2, localize=True, required=False)
 
     def __init__(self, *args, **kwargs):
+        kwargs.setdefault('label_suffix', '')
         label = kwargs.pop('label')
+        enabled = kwargs.pop('enabled')
         initial_value = kwargs.pop('initial_value', None)
         super().__init__(*args, **kwargs)
         self.fields['label_pk'].initial = label.pk
         self.fields['value'].label = label.label
         self.fields['value'].initial = initial_value
+        if not enabled:
+            self.fields['value'].disabled = True
 
     def clean_label_pk(self):
         data = self.fields['label_pk'].initial
