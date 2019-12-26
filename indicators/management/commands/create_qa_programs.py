@@ -387,6 +387,10 @@ class Command(BaseCommand):
         return int(math.ceil((target/period_count)/10)*10)
 
     def create_indicators(self, program_id, param_sets, indicator_suffix='', apply_skips=True):
+        try:
+            sadd_disagg = DisaggregationType.objects.get(pk=109)
+        except DisaggregationType.DoesNotExist:
+            sadd_disagg = False
         indicator_ids = []
         program = Program.objects.get(id=program_id)
         frequency_labels = {
@@ -459,6 +463,8 @@ class Command(BaseCommand):
                 level=next(rf_level_cycle),
             )
             indicator.save()
+            if sadd_disagg:
+                indicator.disaggregation.add(sadd_disagg)
             indicator_ids.append(indicator.id)
 
             if params['null_level'] == 'targets':
@@ -610,7 +616,9 @@ class Command(BaseCommand):
                 auth_user.delete()
                 print('Deleted user {}'.format(tola_user))
             except TolaUser.DoesNotExist:
-                pass
+                # fixes data bug where sometimes a username still exists (i.e. 'mc-low') with no TolaUser:
+                if User.objects.filter(username=username).count() > 0:
+                    User.objects.filter(username=username).delete()
 
     @staticmethod
     def clean_tolaland():
