@@ -376,7 +376,8 @@ export default class EditDisaggregations extends React.Component {
         const withCountry = Object.assign(data, {country: this.props.country_id})
         if (data.id == 'new') {
             this.props.onCreate(withCountry).then(
-                (success) => {if(success) {this.setState({expanded_id: null, formReset: null})}}
+                (newDisaggregation) => {
+                    if(newDisaggregation !== false) {this.setState({expanded_id: newDisaggregation.id, formReset: null})}}
             );
         } else {
             this.props.onUpdate(data.id, withCountry)

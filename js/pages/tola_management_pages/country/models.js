@@ -462,13 +462,13 @@ export class CountryStore {
     @action createDisaggregation(data) {
         this.editing_disaggregations_errors = {}
         return this.api.createDisaggregation(data).then(response => {
-            runInAction(() => {
+            return runInAction(() => {
                 this.onSaveSuccessHandler()
                 const newDisaggregation = response.data
                 this.active_pane_is_dirty = false
                 this.editing_disaggregations_data = [...this.editing_disaggregations_data.filter(disaggregation => disaggregation.id!='new'), newDisaggregation]
+                return newDisaggregation;
             });
-            return true;
         }).catch((errors) => {
             runInAction(() => {
                 this.saving = false
