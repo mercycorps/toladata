@@ -19,41 +19,69 @@ const ErrorFeedback = observer(({errorMessages}) => {
     )
 })
 
-const CategoryForm = ({index, category, listLength, ...props}) => (
-    <React.Fragment>
-        <div className="form-group col-md-8">
-            <input
-                value={ category.label }
-                onChange={(e) => props.updateLabel(index, { label: e.target.value })}
-                className={classNames("form-control", {"is-invalid": (props.errors.labels ? Object.keys(props.errors.labels[index]).length : false)})}
-                disabled={category.in_use || props.disabled}
-            />
-            { props.errors.labels &&
-                <ErrorFeedback errorMessages={props.errors.labels[index]['label']} />
-            }
-        </div>
-        <div className="form-group col-md-2">
-            <select
-                value={category.customsort}
-                onChange={ (e) => props.updateLabelOrder(index, e.target.value - 1) }
-                className="form-control" disabled={props.disabled}
-            >
-                {
-                    Array.from(Array(listLength).keys()).map(value => <option value={value+1} key={value}>{value+1}</option>)
+@observer
+class CategoryForm extends React.Component {
+    constructor(props) {
+        super(props);
+        this.disabledRef = React.createRef();
+    }
+    
+    componentDidMount = () => {
+        if (this.disabledRef.current) {
+            $(this.disabledRef.current).popover({
+                html: true
+            });
+        }
+    }
+
+    render() {
+        const {index, category, listLength, ...props} = this.props;
+        return (
+            <React.Fragment>
+                <div className="form-group col-md-7">
+                    <input
+                        value={ category.label }
+                        onChange={(e) => props.updateLabel(index, { label: e.target.value })}
+                        className={classNames("form-control", {"is-invalid": (props.errors.labels ? Object.keys(props.errors.labels[index]).length : false)})}
+                        disabled={category.in_use || props.disabled}
+                    />
+                    { props.errors.labels &&
+                        <ErrorFeedback errorMessages={props.errors.labels[index]['label']} />
+                    }
+                </div>
+                <div className="form-group col-md-2">
+                    <select
+                        value={category.customsort}
+                        onChange={ (e) => props.updateLabelOrder(index, e.target.value - 1) }
+                        className="form-control" disabled={props.disabled}
+                    >
+                        {
+                            Array.from(Array(listLength).keys()).map(value => <option value={value+1} key={value}>{value+1}</option>)
+                        }
+                    </select>
+                </div>
+                {(!props.disabled && !category.in_use) ? 
+                <a
+                    tabIndex="0"
+                    onClick={() => props.deleteLabel(index)}
+                    className={classNames("btn btn-link btn-danger text-nowrap", {'disabled': category.in_use})}
+                >
+                    <i className="fas fa-trash"/>{gettext('Remove')}
+                </a>
+                :
+                <HelpPopover
+                    key={1}
+                    content={ gettext('This category cannot be edited or removed because it was used to disaggregate a result.') }
+                    placement="bottom"
+                    iconClass="fa fa-lock text-muted"
+                    innerRef={ this.disabledRef }
+                    ariaText={gettext('Explanation for absence of delete button')}
+                />
                 }
-            </select>
-        </div>
-        {!props.disabled &&
-        <a
-            tabIndex="0"
-            onClick={() => props.deleteLabel(index)}
-            className={classNames("btn btn-link btn-danger", {'disabled': category.in_use})}
-            disabled={category.in_use || props.disabled}
-        >
-            <i className="fas fa-trash"/>{gettext('Remove')}
-        </a>}
-    </React.Fragment>
-);
+            </React.Fragment>
+        );
+    }
+}
 
 
 const DisaggregationCategoryList = observer(
@@ -64,7 +92,7 @@ const DisaggregationCategoryList = observer(
             <Droppable
                 droppableId={ `disaggregation-category-list-${ id }` }
                 renderClone={(provided, snapshot, rubric) => (
-                    <div className="form-group disaggregation-label-group"
+                    <div className="form-group mb-0 disaggregation-label-group"
                         ref={ provided.innerRef }
                         {...provided.draggableProps}   
                     >
@@ -90,7 +118,7 @@ const DisaggregationCategoryList = observer(
                                 isDragDisabled={props.disabled}
                                 key={ category.id == 'new' ? category.createdId : category.id }>
                                 {(provided, snapshot) => (
-                                    <div className="form-group disaggregation-label-group"
+                                    <div className="form-group mb-0 disaggregation-label-group"
                                         ref={ provided.innerRef }
                                         {...provided.draggableProps}   
                                     >
@@ -239,32 +267,40 @@ class DisaggregationType extends React.Component {
                                     disabled={disaggregation.is_archived}
                                 />
                                 <ErrorFeedback errorMessages={this.formErrors('disaggregation_type')} />
-                            </div>
-                            <div className="form-check">
-                                <input className="form-check-input" type="checkbox" checked={managed_data.selected_by_default}
-                                       onChange={(e) => {this.updateSelectedByDefault(e.target.checked)}} id="selected-by-default-checkbox"
-                                        disabled={disaggregation.is_archived} />
-                                <nobr>
-                                <label className="form-check-label mr-2" htmlFor="selected-by-default-checkbox">
-                                {
-                                    // # Translators: This labels a checkbox, when checked, it will make the associated item "on" (selected) for all new indicators
-                                    gettext('Selected by default')
-                                }
-                                </label>
-                                <HelpPopover
-                                    key={1}
-                                    content={`<p>${gettext('When adding a program indicator, this disaggregation will be selected by default.  (It can be unselected for specific indicators)')}</p>
-                                              <p>${gettext('This option is recommended for disaggregations that are required for all programs in a country, regardless of sector.')}</p>`}
-                                    placement="right"
-                                    innerRef={this.selectedByDefaultPopup}
-                                    ariaText={gettext('More information on "selected by default"')}
-                                />
-                                </nobr>
+                                <div className="form-check">
+                                    <input className="form-check-input" type="checkbox" checked={managed_data.selected_by_default}
+                                           onChange={(e) => {this.updateSelectedByDefault(e.target.checked)}} id="selected-by-default-checkbox"
+                                            disabled={disaggregation.is_archived} />
+                                    <nobr>
+                                    <label className="form-check-label mr-2" htmlFor="selected-by-default-checkbox">
+                                    {
+                                        // # Translators: This labels a checkbox, when checked, it will make the associated item "on" (selected) for all new indicators
+                                        gettext('Selected by default')
+                                    }
+                                    </label>
+                                    <HelpPopover
+                                        key={1}
+                                        content={`<p>${gettext('When adding a program indicator, this disaggregation will be selected by default.  (It can be unselected for specific indicators)')}</p>
+                                                  <p>${gettext('This option is recommended for disaggregations that are required for all programs in a country, regardless of sector.')}</p>`}
+                                        placement="right"
+                                        innerRef={this.selectedByDefaultPopup}
+                                        ariaText={gettext('More information on "selected by default"')}
+                                    />
+                                    </nobr>
+                                </div>
                             </div>
                             <div className="form-group">
-                                <label>
-                                    {gettext('Categories')}
-                                </label>
+                                <div className="row">
+                                    <div className="col-md-7">
+                                        <h4>
+                                            {gettext('Categories')}
+                                        </h4>
+                                    </div>
+                                    <div className="col-md-2">
+                                    {/* Paul: I know this is gross, but trying to line up order with the fields below: */}
+                                        <label>&nbsp;&nbsp;&nbsp;&nbsp;{gettext('Order')}</label>
+                                    </div>
+                                </div>
                                 <DisaggregationCategoryList
                                     id={ disaggregation.id }
                                     categories={ this.state.labels }
@@ -274,40 +310,40 @@ class DisaggregationType extends React.Component {
                                     deleteLabel={ this.deleteLabel.bind(this) }
                                     errors={ errors }
                                     />
-                                {!disaggregation.is_archived && <div>
+                                {!disaggregation.is_archived && <div style={ {marginTop: '-15px'} }>
                                     <a tabIndex="0" onClick={() => this.appendLabel()} className="btn btn-link btn-add">
                                         <i className="fas fa-plus-circle"/>{gettext('Add a category')}
                                     </a>
                                 </div>}
-                                <div className="disaggregation-form-buttons">
-                                    <div className="form-row btn-row">
-                                        <button className="btn btn-primary" onClick={(e) => this.save()}
-                                            disabled={disaggregation.is_archived} type="button">{gettext('Save Changes')}</button>
-                                        <button className="btn btn-reset" type="button" onClick={() => this.resetForm()}
-                                            disabled={disaggregation.is_archived}>{gettext('Reset')}</button>
-                                    </div>
-                                    <div className="right-buttons">
-                                    {(disaggregation.is_archived) ? (
-                                        <a tabIndex="0" onClick={unarchiveAction} className="btn btn-link">
+                            </div>
+                            <div className="disaggregation-form-buttons">
+                                <div className="form-row btn-row">
+                                    <button className="btn btn-primary" onClick={(e) => this.save()}
+                                        disabled={disaggregation.is_archived} type="button">{gettext('Save Changes')}</button>
+                                    <button className="btn btn-reset" type="button" onClick={() => this.resetForm()}
+                                        disabled={disaggregation.is_archived}>{gettext('Reset')}</button>
+                                </div>
+                                <div className="right-buttons">
+                                {(disaggregation.is_archived) ? (
+                                    <a tabIndex="0" onClick={unarchiveAction} className="btn btn-link">
+                                        <i className="fas fa-archive"/>{
+                                            // # Translators: this is a verb (on a button that archives the selected item)
+                                            gettext('Unarchive disaggregation')
+                                            }
+                                    </a>
+                                ) : ((disaggregation.id == 'new' || !disaggregation.has_indicators) ? (
+                                        <a tabIndex="0" onClick={deleteAction} className="btn btn-link btn-danger">
+                                            <i className="fas fa-trash"/>{gettext('Delete disaggregation')}
+                                        </a>
+                                        ) : (
+                                        <a tabIndex="0" onClick={archiveAction} className="btn btn-link">
                                             <i className="fas fa-archive"/>{
                                                 // # Translators: this is a verb (on a button that archives the selected item)
-                                                gettext('Unarchive disaggregation')
+                                                gettext('Archive disaggregation')
                                                 }
                                         </a>
-                                    ) : ((disaggregation.id == 'new' || !disaggregation.has_indicators) ? (
-                                            <a tabIndex="0" onClick={deleteAction} className="btn btn-link btn-danger">
-                                                <i className="fas fa-trash"/>{gettext('Delete disaggregation')}
-                                            </a>
-                                            ) : (
-                                            <a tabIndex="0" onClick={archiveAction} className="btn btn-link">
-                                                <i className="fas fa-archive"/>{
-                                                    // # Translators: this is a verb (on a button that archives the selected item)
-                                                    gettext('Archive disaggregation')
-                                                    }
-                                            </a>
-                                        )
-                                    )}
-                                    </div>
+                                    )
+                                )}
                                 </div>
                             </div>
                         </form>
