@@ -6,6 +6,7 @@ export default class HelpPopover extends React.Component {
         super(props)
         this.placement = props.placement || null;
         this.popoverRef = props.innerRef || React.createRef();
+        this.iconClass = props.iconClass || "far fa-question-circle";
     }
 
     render() {
@@ -19,7 +20,7 @@ export default class HelpPopover extends React.Component {
                 data-content={this.props.content}
                 ref={this.popoverRef}
                 >
-            <i aria-label={ this.props.ariaText } className="far fa-question-circle"></i></a>
+            <i aria-label={ this.props.ariaText } className={ this.iconClass }></i></a>
         )
     }
 }
