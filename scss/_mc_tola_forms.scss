@@ -133,3 +133,25 @@ ul.popover-list {
     padding-top: 8px;
     padding-right: 4px;
 }
+
+a.is-accordion-toggle {
+    &>.fa-caret-down {
+        display: inline-block;
+    }
+    &>.fa-caret-right {
+        display: none;
+    }
+    &.collapsed {
+        &>.fa-caret-right {
+            display: inline-block;
+        }
+        &>.fa-caret-down {
+            display: none;
+        }
+    }
+}
+
+div.scroll-box-200 {
+    max-height: 200px;
+    overflow-y: scroll;
+}

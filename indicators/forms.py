@@ -72,10 +72,11 @@ class GroupedMultipleChoiceWidget(forms.MultiWidget):
 
     def __init__(self, groups, **kwargs):
         groups = [group for group in groups if group[1]]
+        subwidget_attrs = kwargs.pop('subwidget_attrs', {})
         self.values_map = [[option[0] for option in group[1]] for group in groups]
         widgets = [
             GroupCheckboxSelectMultipleWidget(
-                title=group[0], choices=group[1], order=c,
+                attrs=subwidget_attrs, title=group[0], choices=group[1], order=c,
                 helptext=(group[2] if (len(group) > 2 and group[2]) else None),
                 individual_disabled=(group[3] if (len(group) > 3 and group[3]) else None)
             ) for c, group in enumerate(groups)
@@ -101,10 +102,11 @@ class GroupedMultipleChoiceWidget(forms.MultiWidget):
 class GroupedMultipleChoiceField(forms.Field):
     def __init__(self, groups, **kwargs):
         self.groups = groups
+        subwidget_attrs = kwargs.pop('subwidget_attrs', {})
         kwargs = {
             'required': False,
             **kwargs,
-            'widget': GroupedMultipleChoiceWidget(groups)
+            'widget': GroupedMultipleChoiceWidget(groups, subwidget_attrs=subwidget_attrs)
         }
         super().__init__(**kwargs)
 
@@ -284,7 +286,8 @@ class IndicatorForm(forms.ModelForm):
               [(disagg.pk, str(disagg)) for disagg in country_disaggs],
               [get_helptext(disagg) for disagg in country_disaggs],
               [getattr(disagg, 'has_results') for disagg in country_disaggs])
-                for country_name, country_disaggs in countries_disaggs]
+                for country_name, country_disaggs in countries_disaggs],
+            subwidget_attrs={'class': 'scroll-box-200'}
         )
         if indicator:
             self.fields['grouped_disaggregations'].initial = [
