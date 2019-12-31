@@ -225,7 +225,7 @@ class DisaggregationType extends React.Component {
         }
         this.setState({
             labels: this.orderLabels([...this.state.labels, newLabel])
-        }, () => this.hasUnsavedDataAction())
+        }, () => {$('.disaggregation-label-group').last().find('input').first().focus(); this.hasUnsavedDataAction();})
     }
 
     deleteLabel(labelIndex) {
@@ -399,7 +399,7 @@ export default class EditDisaggregations extends React.Component {
     addDisaggregation() {
         if(this.dirtyConfirm()) {
             this.props.addDisaggregation()
-            this.setState({expanded_id: 'new'})
+            this.setState({expanded_id: 'new'}, () => {$('#disaggregation-type-input').focus();});
         }
     }
     
