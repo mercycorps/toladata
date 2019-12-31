@@ -689,3 +689,32 @@ function getNumberLocalizer({
     }
 }
 window.getNumberLocalizer = getNumberLocalizer;
+
+/**
+ * on key down validates a field to be numeric in the current language
+ * (if French/Spanish, allows numbers and "," otherwise numbers and ".")
+ * usage $('.input').keydown(window.numberInputValidator)
+ */
+function numberInputValidator(e) {
+    // Allow backspace, delete, tab, escape, and enter
+    if ($.inArray(e.keyCode, [46, 8, 9, 27, 13, 110]) !== -1 ||
+        // allow: Ctrl+A select all)
+        (e.keyCode == 65 && e.ctrlKey === true) ||
+        // allow home, end, left, right
+        (e.keyCode >= 35 && e.keyCode <= 39) ||
+        // allow negative sign
+       ($.inArray(e.keyCode, [109, 189, 173]) !== -1)) {
+        // don't do anything (allow key to be used as normal)
+        return;
+    }
+    // Allow numbers:
+    if ((e.keyCode >= 48 && e.keyCode <= 57 && !e.shiftKey) ||
+        // if french/spanish allow comma:
+        (e.keyCode == 188 && ['fr', 'es'].includes(userLang)) ||
+        // allow period:
+        e.keyCode == 190) {
+        return;
+    }
+    e.preventDefault();
+}
+window.numberInputValidator = numberInputValidator;
