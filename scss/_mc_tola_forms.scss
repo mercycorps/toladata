@@ -142,8 +142,13 @@ div.scroll-box-200 {
 
 a.is-accordion-toggle.btn.btn-link {
     background-color: rgba(0, 0, 0, 0);
+    padding-right: 10px;
+    &:hover {
+        text-decoration: none !important;
+    }
     &:focus {
         background-color: rgba(0, 0, 0, 0) !important;
+        text-decoration: none !important;
     }
 }
 
