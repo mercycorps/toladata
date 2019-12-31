@@ -59,6 +59,9 @@
                     </div>
                 </li>
             </ul>
+            <div class="bad-sum-feedback invalid-feedback">
+                {% trans "The sum of disaggregated values does not match the actual value." %}
+            </div>
         </div>
     </fieldset>
 {% endfor %}
@@ -136,7 +139,7 @@
             if (achievedValue != sumValue) {
                 $sumValueCell.parent().addClass('bad-sum-value');
                 $sumValueCell.parent().find('.sum-difference')
-                    .html(`${achievedValue < sumValue ? '+' : ''} ${reLocalizer(sumValue - achievedValue)}`);
+                    .html(`${achievedValue < sumValue ? '+' : ''}${reLocalizer(sumValue - achievedValue)}`);
             }
         }
         $( this ).trigger('validateFormset');

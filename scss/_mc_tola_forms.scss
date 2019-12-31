@@ -183,24 +183,35 @@ ul.form-rows-list-group {
     }
     .actions-container {
         display: flex;
+        font-weight: 200;
     }
     .bad-sum-value>div.value-cell {
-        background-color: $red-200;
+        background-color: $red-050;
+        padding-left: 8px;
+        padding-right: 8px;
     }
     .bad-sum-value>.invalid-actions {
         display: inline-block;
         margin-right: 10px;
     }
+    & .bad-sum-feedback {
+        display: inline-block;
+        padding-left: 2px;
+        padding-top: 4px;
+    }
 }
 
 .disaggregation-formset .input-symbol-percent {
     &:after {
-        right: 1.6rem;
+        right: 1.7rem;
     }
     & .disaggregated-value-cell {
         padding-right: 28px;
-    }
-    
+    }   
+}
+
+.sum-difference {
+    margin-left: 10px;
 }
 
 
