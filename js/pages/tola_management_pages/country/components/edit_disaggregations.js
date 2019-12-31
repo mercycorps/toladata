@@ -74,6 +74,8 @@ class CategoryForm extends React.Component {
                     content={ gettext('This category cannot be edited or removed because it was used to disaggregate a result.') }
                     placement="bottom"
                     iconClass="fa fa-lock text-muted"
+                    iconStyle={ {marginTop: '10px' }}
+                    linkHeight="30px"
                     innerRef={ this.disabledRef }
                     ariaText={gettext('Explanation for absence of delete button')}
                 />
