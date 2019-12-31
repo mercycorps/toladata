@@ -667,7 +667,7 @@ function getNumberLocalizer({
     display = false,
     } = {}) {
     return (val) => {
-        if (val == '' || val == null) {
+        if (val === '' || val === null) {
             return display ? '' : false;
         }
         let stVal = `${val}`
