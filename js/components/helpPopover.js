@@ -7,12 +7,18 @@ export default class HelpPopover extends React.Component {
         this.placement = props.placement || null;
         this.popoverRef = props.innerRef || React.createRef();
         this.iconClass = props.iconClass || "far fa-question-circle";
+        this.iconStyle = props.iconStyle || {};
+        this.linkStyle = {};
+        if (props.linkHeight) {
+            this.linkStyle.height = props.linkHeight;
+        }
     }
 
     render() {
         return (
             <a
                 tabIndex="0"
+                style={ this.linkStyle }
                 data-toggle="popover"
                 data-trigger="focus"
                 data-html="true"
@@ -20,7 +26,7 @@ export default class HelpPopover extends React.Component {
                 data-content={this.props.content}
                 ref={this.popoverRef}
                 >
-            <i aria-label={ this.props.ariaText } className={ this.iconClass }></i></a>
+            <i aria-label={ this.props.ariaText } style={ this.iconStyle } className={ this.iconClass }></i></a>
         )
     }
 }
