@@ -7,7 +7,7 @@
 """
 
 import datetime
-from factories.indicators_models import RFIndicatorFactory, IndicatorTypeFactory
+from factories.indicators_models import RFIndicatorFactory, IndicatorTypeFactory, DisaggregationTypeFactory
 from factories.workflow_models import RFProgramFactory, SiteProfileFactory, SectorFactory
 from workflow.serializers_new import IPTTProgramSerializer
 from indicators.models import Indicator
@@ -15,7 +15,7 @@ from django import test
 from django.utils import translation
 
 
-IPTT_QUERY_COUNT = 7
+IPTT_QUERY_COUNT = 10
 
 def get_serialized_data(program_pk):
     return IPTTProgramSerializer.get_for_pk(program_pk).data
@@ -28,6 +28,8 @@ class TestIPTTEndpoint(test.TestCase):
         )
         site = SiteProfileFactory()
         it = IndicatorTypeFactory()
+        dt1 = DisaggregationTypeFactory(standard=True)
+        dt2 = DisaggregationTypeFactory(country=p.country.first(), labels=["1", "2", "3"])
         sector = SectorFactory()
         indicators = [RFIndicatorFactory(
             program=p, level=level, target_frequency=Indicator.LOP, targets=500, results=400
@@ -36,8 +38,10 @@ class TestIPTTEndpoint(test.TestCase):
         level_pks = [{'pk': level.pk, 'indicator_pks': [indicator.pk]}
                      for level, indicator in zip(levels, indicators)]
         indicators[0].indicator_type.add(it)
+        indicators[0].disaggregation.add(dt1)
         indicators[1].sector = sector
         indicators[1].save()
+        indicators[1].disaggregation.set([dt1, dt2])
         indicators[0].result_set.first().site.add(site)
         indicators[1].result_set.first().site.add(site)
         with self.assertNumQueries(IPTT_QUERY_COUNT):
@@ -51,6 +55,7 @@ class TestIPTTEndpoint(test.TestCase):
         self.assertEqual(data['sites'], [{'pk': site.pk, 'name': site.name}])
         self.assertEqual(data['sectors'], [{'pk': sector.pk, 'name': sector.sector}])
         self.assertEqual(data['indicator_types'], [{'pk': it.pk, 'name': it.indicator_type}])
+        self.assertEqual(len(data['disaggregations']), 2)
         self.assertEqual(data['unassigned_indicator_pks'], [])
         self.assertEqual(data['level_pks_level_order'], [l.pk for l in levels])
         self.assertEqual(data['level_pks_chain_order'], [l.pk for l in levels])
@@ -75,7 +80,7 @@ class TestIPTTEndpoint(test.TestCase):
                 ).pk
             )
         expected_pks = list(reversed(pks))
-        with self.assertNumQueries(IPTT_QUERY_COUNT):
+        with self.assertNumQueries(IPTT_QUERY_COUNT-1): # -1 because labels prefetch doesnt go with no disaggregations
             data = get_serialized_data(p.pk)
         self.assertEqual(expected_pks, data['unassigned_indicator_pks'])
         self.assertEqual(data['level_pks_level_order'], [])
@@ -85,7 +90,7 @@ class TestIPTTEndpoint(test.TestCase):
         activity = [i_data for i_data in data['indicators'] if i_data['number'] == '5'][0]
         self.assertEqual(activity['old_level_name'], 'Activity')
         translation.activate('fr')
-        with self.assertNumQueries(IPTT_QUERY_COUNT):
+        with self.assertNumQueries(IPTT_QUERY_COUNT-1): # -1 because see above
             french_data = get_serialized_data(p.pk)
         activity = [i_data for i_data in french_data['indicators'] if i_data['number'] == '5'][0]
         self.assertEqual(activity['old_level_name'], u'Activité')
