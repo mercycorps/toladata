@@ -22,6 +22,10 @@ export const forIPTT = (
     _sitePks: observable(new Set(indicatorJSON.site_pks || [])),
     hasSite(sitePk) {
         return !isNaN(parseInt(sitePk)) && this._sitePks.has(parseInt(sitePk));
+    },
+    _disaggregationPks: observable(new Set((indicatorJSON.disaggregation_pks || []).map(pk => parseInt(pk)))),
+    hasDisaggregation(disaggregationPk) {
+        return !isNaN(parseInt(disaggregationPk)) && this._disaggregationPks.has(parseInt(disaggregationPk));
     }
 });
 
