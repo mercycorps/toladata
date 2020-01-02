@@ -11,11 +11,14 @@ from indicators.models import (
     Level,
     IndicatorType,
     Sector,
-    PeriodicTarget
+    PeriodicTarget,
+    DisaggregationType,
+    DisaggregationLabel
 )
 from indicators.serializers_new import (
     ProgramPageIndicatorSerializer,
     ProgramPageIndicatorUpdateSerializer,
+    DisaggregationSerializer,
     RFLevelOrderingLevelSerializer,
     IPTTLevelSerializer,
     IPTTTierSerializer,
@@ -706,6 +709,7 @@ class IPTTProgramFilterItemsMixin(object):
     sectors = serializers.SerializerMethodField()
     indicator_types = serializers.SerializerMethodField()
     sites = serializers.SerializerMethodField()
+    disaggregations = serializers.SerializerMethodField()
     old_levels = serializers.SerializerMethodField()
 
     class Meta:
@@ -715,7 +719,8 @@ class IPTTProgramFilterItemsMixin(object):
             'sectors',
             'indicator_types',
             'sites',
-            'old_levels'
+            'disaggregations',
+            'old_levels',
         ]
 
     def get_result_chain_label(self, program):
@@ -743,6 +748,15 @@ class IPTTProgramFilterItemsMixin(object):
             return self.context['sites']
         return SiteProfile.objects.filter(result__indicator__program=program).values('pk', 'name')
 
+    def _get_program_disaggregations(self, program):
+        if hasattr(self, 'context') and 'disaggregations' in self.context:
+            disaggregations = self.context['disaggregations']
+        else:
+            disaggregations = DisaggregationType.objects.filter(
+                indicator__program=program
+            ).distinct()
+        return disaggregations
+
     def get_sectors(self, program):
         return sorted({
             v['pk']: v for v in [{'pk': sector['pk'], 'name': sector['sector']}
@@ -759,6 +773,15 @@ class IPTTProgramFilterItemsMixin(object):
         return sorted({
             v['pk']: v for v in [{'pk': site['pk'], 'name': site['name']} for site in self._get_program_sites(program)]
         }.values(), key=operator.itemgetter('name'))
+
+    def get_disaggregations(self, program):
+        return sorted(
+            DisaggregationSerializer(
+                self._get_program_disaggregations(program),
+                many=True
+            ).data,
+            key=operator.itemgetter('name')
+            )
 
     def get_old_levels(self, program):
         if program.results_framework:
@@ -816,6 +839,20 @@ class IPTTMixin(object):
             'sectors': Sector.objects.select_related(None).prefetch_related(None).filter(
                 indicator__program_id=program_pk
             ).order_by('sector').values('pk', 'sector', 'indicator__pk'),
+            'indicator_disaggregations': DisaggregationType.objects.select_related(None).prefetch_related(None).filter(
+                indicator__program_id=program_pk
+            ).values('pk', 'disaggregation_type', 'indicator__pk'),
+            'disaggregations': DisaggregationType.objects.select_related(None).prefetch_related(
+                models.Prefetch(
+                    'disaggregationlabel_set',
+                    queryset=DisaggregationLabel.objects.select_related(None).prefetch_related(None).only(
+                        'disaggregation_type_id', 'pk', 'label', 'customsort'
+                    ).order_by('customsort'),
+                    to_attr='prefetch_labels'
+                )
+            ).filter(
+                indicator__program_id=program_pk
+            ).order_by('disaggregation_type').distinct(),
             'now': timezone.now().date()
         }
         return cls(program, context=context)
