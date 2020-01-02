@@ -13,12 +13,10 @@ from indicators.models import (
     Sector,
     PeriodicTarget,
     DisaggregationType,
-    DisaggregationLabel
 )
 from indicators.serializers_new import (
     ProgramPageIndicatorSerializer,
     ProgramPageIndicatorUpdateSerializer,
-    DisaggregationSerializer,
     RFLevelOrderingLevelSerializer,
     IPTTLevelSerializer,
     IPTTTierSerializer,
@@ -750,12 +748,8 @@ class IPTTProgramFilterItemsMixin(object):
 
     def _get_program_disaggregations(self, program):
         if hasattr(self, 'context') and 'disaggregations' in self.context:
-            disaggregations = self.context['disaggregations']
-        else:
-            disaggregations = DisaggregationType.objects.filter(
-                indicator__program=program
-            ).distinct()
-        return disaggregations
+            return self.context['disaggregations']
+        return DisaggregationType.objects.filter(indicator__program=program).values('pk', 'disaggregation_type')
 
     def get_sectors(self, program):
         return sorted({
@@ -775,13 +769,12 @@ class IPTTProgramFilterItemsMixin(object):
         }.values(), key=operator.itemgetter('name'))
 
     def get_disaggregations(self, program):
-        return sorted(
-            DisaggregationSerializer(
-                self._get_program_disaggregations(program),
-                many=True
-            ).data,
-            key=operator.itemgetter('name')
-            )
+        return sorted({
+            v['pk']: v for v in [
+                {'pk': disaggregation['pk'], 'name': disaggregation['disaggregation_type']}
+                for disaggregation in self._get_program_disaggregations(program)
+            ]
+        }.values(), key=operator.itemgetter('name'))
 
     def get_old_levels(self, program):
         if program.results_framework:
@@ -839,20 +832,9 @@ class IPTTMixin(object):
             'sectors': Sector.objects.select_related(None).prefetch_related(None).filter(
                 indicator__program_id=program_pk
             ).order_by('sector').values('pk', 'sector', 'indicator__pk'),
-            'indicator_disaggregations': DisaggregationType.objects.select_related(None).prefetch_related(None).filter(
+            'disaggregations': DisaggregationType.objects.select_related(None).prefetch_related(None).filter(
                 indicator__program_id=program_pk
-            ).values('pk', 'disaggregation_type', 'indicator__pk'),
-            'disaggregations': DisaggregationType.objects.select_related(None).prefetch_related(
-                models.Prefetch(
-                    'disaggregationlabel_set',
-                    queryset=DisaggregationLabel.objects.select_related(None).prefetch_related(None).only(
-                        'disaggregation_type_id', 'pk', 'label', 'customsort'
-                    ).order_by('customsort'),
-                    to_attr='prefetch_labels'
-                )
-            ).filter(
-                indicator__program_id=program_pk
-            ).order_by('disaggregation_type').distinct(),
+            ).order_by('disaggregation_type').values('pk', 'disaggregation_type', 'indicator__pk'),
             'now': timezone.now().date()
         }
         return cls(program, context=context)

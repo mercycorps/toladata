@@ -286,8 +286,6 @@ class TestIPTTProgramSerializerFilterData(test.TestCase):
         disagg_data = data['disaggregations'][0]
         self.assertEqual(disagg_data['pk'], country_dt.pk)
         self.assertEqual(disagg_data['name'], "Test Disaggregation")
-        self.assertEqual(len(disagg_data['labels']), 3)
-        self.assertEqual(disagg_data['labels'][1]['name'], "Test Label 2")
 
     def test_one_standard_disaggregation_type(self):
         standard_dt = DisaggregationTypeFactory(
@@ -299,8 +297,6 @@ class TestIPTTProgramSerializerFilterData(test.TestCase):
         data = get_serialized_data(indicator.program.pk)
         self.assertEqual(data['disaggregations'][0]['pk'], standard_dt.pk)
         self.assertEqual(data['disaggregations'][0]['name'], 'Test Standard Disagg')
-        self.assertEqual(data['disaggregations'][0]['labels'][0]['pk'], standard_dt.labels[0].pk)
-        self.assertEqual(data['disaggregations'][0]['labels'][0]['name'], "Test Standard One Label")
 
     def test_special_characters_disaggregation_type(self):
         special_chars = "Spéçîål Charäcterß"
@@ -312,8 +308,6 @@ class TestIPTTProgramSerializerFilterData(test.TestCase):
         indicator.disaggregation.set([special_chars_dt])
         data = get_serialized_data(indicator.program.pk)
         self.assertEqual(data['disaggregations'][0]['name'], special_chars)
-        self.assertEqual(data['disaggregations'][0]['labels'][0]['name'], "{} 1".format(special_chars))
-        self.assertEqual(data['disaggregations'][0]['labels'][1]['name'], "{} 2".format(special_chars))
 
     def test_one_disaggregation_type_duplicated(self):
         standard_dt = DisaggregationTypeFactory(

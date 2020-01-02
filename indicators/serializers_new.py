@@ -4,7 +4,7 @@ import string
 import operator
 from decimal import Decimal
 from rest_framework import serializers
-from indicators.models import Indicator, Level, LevelTier, DisaggregationType
+from indicators.models import Indicator, Level, LevelTier
 from indicators.queries import IPTTIndicator
 from workflow.models import Program
 from tola.model_utils import get_serializer
@@ -198,7 +198,6 @@ class IPTTIndicatorMixin:
     indicator_type_pks = serializers.SerializerMethodField()
     site_pks = serializers.SerializerMethodField()
     number = serializers.SerializerMethodField(method_name='get_long_number')
-    #disaggregation_pks = serializers.PrimaryKeyRelatedField(many=True, read_only=True, source="disaggregation")
     disaggregation_pks = serializers.SerializerMethodField()
 
     class Meta(IndicatorWithMeasurementSerializer.Meta):
@@ -225,9 +224,9 @@ class IPTTIndicatorMixin:
         return sorted(set([site.pk for result in indicator.result_set.all() for site in result.site.all()]))
 
     def get_disaggregation_pks(self, indicator):
-        if hasattr(self, 'context') and 'indicator_disaggregations' in self.context:
+        if hasattr(self, 'context') and 'disaggregations' in self.context:
             return sorted(
-                set(disaggregation['pk'] for disaggregation in self.context['indicator_disaggregations']
+                set(disaggregation['pk'] for disaggregation in self.context['disaggregations']
                     if disaggregation['indicator__pk'] == indicator.pk)
             )
         return sorted(set([disaggregation.pk for disaggregation in indicator.disaggregation.all()]))
@@ -496,36 +495,3 @@ class TierBase:
         return _(tier.name)
 
 IPTTTierSerializer = get_serializer(TierBase)
-
-
-class DisaggregationBase:
-    name = serializers.CharField(source="disaggregation_type", read_only=True)
-    labels = serializers.SerializerMethodField(read_only=True)
-
-    class Meta:
-        model = DisaggregationType
-        fields = [
-            'pk',
-            'name',
-            'labels'
-        ]
-
-    def _get_disaggregation_labels(self, disagg):
-        if hasattr(disagg, 'prefetch_labels'):
-            return disagg.prefetch_labels
-        return disagg.disaggregationlabel_set.all()
-
-    def get_labels(self, disagg):
-        return sorted(
-            [
-                {
-                    'pk': label.pk,
-                    'name': label.label,
-                    'order': label.customsort
-                } for label in self._get_disaggregation_labels(disagg)
-            ],
-            key=operator.itemgetter('order')
-        )
-
-
-DisaggregationSerializer = get_serializer(DisaggregationBase)

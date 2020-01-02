@@ -15,7 +15,7 @@ from django import test
 from django.utils import translation
 
 
-IPTT_QUERY_COUNT = 10
+IPTT_QUERY_COUNT = 8
 
 def get_serialized_data(program_pk):
     return IPTTProgramSerializer.get_for_pk(program_pk).data
@@ -80,7 +80,7 @@ class TestIPTTEndpoint(test.TestCase):
                 ).pk
             )
         expected_pks = list(reversed(pks))
-        with self.assertNumQueries(IPTT_QUERY_COUNT-1): # -1 because labels prefetch doesnt go with no disaggregations
+        with self.assertNumQueries(IPTT_QUERY_COUNT):
             data = get_serialized_data(p.pk)
         self.assertEqual(expected_pks, data['unassigned_indicator_pks'])
         self.assertEqual(data['level_pks_level_order'], [])
@@ -90,7 +90,7 @@ class TestIPTTEndpoint(test.TestCase):
         activity = [i_data for i_data in data['indicators'] if i_data['number'] == '5'][0]
         self.assertEqual(activity['old_level_name'], 'Activity')
         translation.activate('fr')
-        with self.assertNumQueries(IPTT_QUERY_COUNT-1): # -1 because see above
+        with self.assertNumQueries(IPTT_QUERY_COUNT): # -1 because see above
             french_data = get_serialized_data(p.pk)
         activity = [i_data for i_data in french_data['indicators'] if i_data['number'] == '5'][0]
         self.assertEqual(activity['old_level_name'], u'Activité')
