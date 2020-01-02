@@ -152,6 +152,18 @@ a.is-accordion-toggle.btn.btn-link {
     }
 }
 
+a.accordion-row__btn.btn.btn-link {
+    background-color: rgba(0, 0, 0, 0);
+    padding-right: 10px;
+    &:hover {
+        text-decoration: none !important;
+    }
+    &:focus {
+        background-color: rgba(0, 0, 0, 0) !important;
+        text-decoration: none !important;
+    }
+}
+
 
 ul.form-rows-list-group {
     &>li {
