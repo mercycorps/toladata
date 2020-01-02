@@ -3,7 +3,7 @@ import browserPlugin from 'router5-plugin-browser';
 import { observable } from 'mobx';
 import { TVA, TIMEPERIODS } from '../../constants';
 
-const goodQueryParams = ['frequency', 'start', 'end', 'levels', 'types', 'sites',    
+const goodQueryParams = ['frequency', 'start', 'end', 'levels', 'types', 'sites', 'disaggregations',    
                          'sectors', 'indicators', 'tiers', 'groupby', 'mr'];
 const oldQueryParams = ['timeframe', 'numrecentperiods', 'numrecentcount', 'start_period', 'end_period'];
 
@@ -94,6 +94,9 @@ export default () => {
         },
         get sites() {
             return parseArrayParams(this._router.getState().params.sites);
+        },
+        get disaggregations() {
+            return parseArrayParams(this._router.getState().params.disaggregations);
         },
         get types() {
             return parseArrayParams(this._router.getState().params.types);

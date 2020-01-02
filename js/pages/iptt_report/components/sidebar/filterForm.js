@@ -26,6 +26,7 @@ const FilterMiddle = () => {
     return (
         <React.Fragment>
             <Filters.LevelSelect />
+            <Filters.DisaggregationSelect />
             <Filters.SiteSelect />
             <Filters.TypeSelect />
             <Filters.SectorSelect />
