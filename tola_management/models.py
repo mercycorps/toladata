@@ -206,35 +206,36 @@ class ProgramAuditLog(models.Model, DiffableLog):
     def field_map(self):
         return {
             "name": _("Name"),
-            "unit_of_measure": _("Unit of Measure"),
-            "unit_of_measure_type": _("Unit of Measure Type"),
-            "is_cumulative": _("Is Cumulative"),
-            "lop_target": _("LOP Target"),
-            "direction_of_change": _("Direction of Change"),
-            "rationale_for_target": _("Rationale for Target"),
+            "unit_of_measure": _("Unit of measure"),
+            "unit_of_measure_type": _("Unit of measure type"),
+            "is_cumulative": _("Is cumulative"),
+            "lop_target": _("LOP target"),
+            "direction_of_change": _("Direction of change"),
+            "rationale_for_target": _("Rationale for target"),
             "baseline_value": _("Baseline"),
             "baseline_na": _("Baseline N/A"),
-            "evidence_url": _('Evidence Url'),
-            "evidence_name": _('Evidence Name'),
+            "evidence_url": _('Evidence link'),
+            "evidence_name": _('Evidence record name'),
             "date": _('Date'),
             "target": _('Target'),
             "value": _('Value'),
             "start_date": _('Start Date'),
             "end_date": _('End Date'),
             "assumptions": _('Assumptions'),
+            "sites": _("Sites")
         }
 
     @property
     def change_type_map(self):
         return {
-            "indicator_created": _("Indicator Created"),
-            "indicator_changed": _('Indicator Changed'),
-            "indicator_deleted": _('Indicator Deleted'),
-            "result_changed": _('Result Changed'),
-            "result_created": _('Result Created'),
-            "result_deleted": _('Result Deleted'),
-            "program_dates_changed": _('Program Dates Changed'),
-            "level_changed": _('Result Level Changed'),
+            "indicator_created": _("Indicator created"),
+            "indicator_changed": _('Indicator changed'),
+            "indicator_deleted": _('Indicator deleted'),
+            "result_changed": _('Result changed'),
+            "result_created": _('Result created'),
+            "result_deleted": _('Result deleted'),
+            "program_dates_changed": _('Program dates changed'),
+            "level_changed": _('Result level changed'),
         }
 
     @property

@@ -542,7 +542,7 @@ class BaseDisaggregatedValueFormSet(forms.BaseFormSet):
             return
         if not self.result:
             raise forms.ValidationError('cannot save disaggregated values without result provided')
-        achieved = [form.cleaned_data.get('value') for form in self.forms] 
+        achieved = [form.cleaned_data.get('value') for form in self.forms]
         if all([v == 0 for v in achieved]):
             self.clear_all = True
         elif self.result.indicator.unit_of_measure_type == Indicator.PERCENTAGE:

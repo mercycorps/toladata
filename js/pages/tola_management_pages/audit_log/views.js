@@ -6,7 +6,9 @@ import {FontAwesomeIcon} from "@fortawesome/react-fontawesome"
 import LoadingSpinner from 'components/loading-spinner'
 
 const ResultChangeset = ({data, name, pretty_name}) => {
-    if(name == 'evidence_url') {
+    if (name === 'id') {
+        return null
+    } else if(name == 'Target_url') {
         return <div className="change__field"><strong>{pretty_name}</strong>: {(data != 'N/A' && data !== '')?<a href={data} target="_blank">Link</a>:data}</div>
     } else if (name === 'disaggregation_values') {
         if (Object.entries(data).length) {
@@ -167,7 +169,7 @@ export const IndexView = observer(
                         <thead>
                             <tr>
                                 <th className="text-nowrap">{gettext("Date and time")}</th>
-                                <th className="text-nowrap">{gettext("Result Level")}</th>
+                                <th className="text-nowrap">{gettext("Result level")}</th>
                                 <th className="text-nowrap">{gettext("Indicator")}</th>
                                 <th className="text-nowrap">{gettext("User")}</th>
                                 <th className="text-nowrap">{gettext("Organization")}</th>
