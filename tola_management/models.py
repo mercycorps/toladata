@@ -28,14 +28,14 @@ def diff(previous, new, mapping):
                 "name": p_field,
                 "pretty_name": mapping.get(p_field, p_field),
                 "prev": p[p_field],
-                "new": 'N/A'
+                "new": ''
             })
 
         if n_field and n_field not in p:
             diff_list.append({
                 "name": n_field,
                 "pretty_name": mapping.get(n_field, n_field),
-                "prev": 'N/A',
+                "prev": '',
                 "new": n[n_field]
             })
 
@@ -206,35 +206,36 @@ class ProgramAuditLog(models.Model, DiffableLog):
     def field_map(self):
         return {
             "name": _("Name"),
-            "unit_of_measure": _("Unit of Measure"),
-            "unit_of_measure_type": _("Unit of Measure Type"),
-            "is_cumulative": _("Is Cumulative"),
-            "lop_target": _("LOP Target"),
-            "direction_of_change": _("Direction of Change"),
-            "rationale_for_target": _("Rationale for Target"),
+            "unit_of_measure": _("Unit of measure"),
+            "unit_of_measure_type": _("Unit of measure type"),
+            "is_cumulative": _("Is cumulative"),
+            "lop_target": _("LOP target"),
+            "direction_of_change": _("Direction of change"),
+            "rationale_for_target": _("Rationale for target"),
             "baseline_value": _("Baseline"),
             "baseline_na": _("Baseline N/A"),
-            "evidence_url": _('Evidence Url'),
-            "evidence_name": _('Evidence Name'),
+            "evidence_url": _('Evidence link'),
+            "evidence_name": _('Evidence record name'),
             "date": _('Date'),
             "target": _('Target'),
             "value": _('Value'),
             "start_date": _('Start Date'),
             "end_date": _('End Date'),
             "assumptions": _('Assumptions'),
+            "sites": _("Sites")
         }
 
     @property
     def change_type_map(self):
         return {
-            "indicator_created": _("Indicator Created"),
-            "indicator_changed": _('Indicator Changed'),
-            "indicator_deleted": _('Indicator Deleted'),
-            "result_changed": _('Result Changed'),
-            "result_created": _('Result Created'),
-            "result_deleted": _('Result Deleted'),
-            "program_dates_changed": _('Program Dates Changed'),
-            "level_changed": _('Result Level Changed'),
+            "indicator_created": _("Indicator created"),
+            "indicator_changed": _('Indicator changed'),
+            "indicator_deleted": _('Indicator deleted'),
+            "result_changed": _('Result changed'),
+            "result_created": _('Result created'),
+            "result_deleted": _('Result deleted'),
+            "program_dates_changed": _('Program dates changed'),
+            "level_changed": _('Result level changed'),
         }
 
     @property
@@ -259,7 +260,7 @@ class ProgramAuditLog(models.Model, DiffableLog):
     @property
     def diff_list(self):
         diff_list = super(ProgramAuditLog, self).diff_list
-
+        null_text = ''
         for diff in diff_list:
             if diff["name"] == 'unit_of_measure_type':
                 diff["prev"] = self.unit_of_measure_type_map.get(diff["prev"], diff["prev"])
@@ -268,16 +269,16 @@ class ProgramAuditLog(models.Model, DiffableLog):
                 diff["prev"] = self.direction_of_change_map.get(diff["prev"], diff["prev"])
                 diff["new"] = self.direction_of_change_map.get(diff["new"], diff["new"])
             elif diff["name"] == 'targets' or diff["name"] == 'disaggregation_values':
-                if diff["prev"] == 'N/A':
+                if diff["prev"] == null_text:
                     diff["prev"] = {
-                        n["id"]: {"name": n.get("name"), "value": 'N/A', "id": n["id"]} for k, n in diff["new"].items()
+                        n["id"]: {"name": n.get("name"), "value": null_text, "id": n["id"]} for k, n in diff["new"].items()
                     }
                     continue
 
-                if diff["new"] == 'N/A':
+                if diff["new"] == null_text:
                     diff["new"] = {
-                        p["id"]: {"name": p.get("name"),
-                                  "value": 'N/A', "id": p["id"]} for k, p in diff["prev"].items()
+                        p["id"]: {
+                            "name": p.get("name"), "value": null_text, "id": p["id"]} for k, p in diff["prev"].items()
                     }
                     continue
 
@@ -287,7 +288,7 @@ class ProgramAuditLog(models.Model, DiffableLog):
                     if prev_id and prev_id not in diff["new"]:
                         new[prev_id] = {
                             "name": diff["prev"][prev_id].get('name'),
-                            "value": 'N/A',
+                            "value": null_text,
                             "id": diff["prev"][prev_id].get('id')
                         }
 
@@ -300,7 +301,7 @@ class ProgramAuditLog(models.Model, DiffableLog):
                     if new_id and new_id not in diff["prev"]:
                         prev[new_id] = {
                             "name": diff["new"][new_id].get('name'),
-                            "value": 'N/A',
+                            "value": null_text,
                             "id": diff["new"][new_id].get('id')
                         }
 

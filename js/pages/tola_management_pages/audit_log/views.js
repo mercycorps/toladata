@@ -6,7 +6,9 @@ import {FontAwesomeIcon} from "@fortawesome/react-fontawesome"
 import LoadingSpinner from 'components/loading-spinner'
 
 const ResultChangeset = ({data, name, pretty_name}) => {
-    if(name == 'evidence_url') {
+    if (name === 'id') {
+        return null
+    } else if(name == 'Target_url') {
         return <div className="change__field"><strong>{pretty_name}</strong>: {(data != 'N/A' && data !== '')?<a href={data} target="_blank">Link</a>:data}</div>
     } else if (name === 'disaggregation_values') {
         if (Object.entries(data).length) {
@@ -141,7 +143,7 @@ export const IndexView = observer(
     ({store}) => {
         return <div id="audit-log-index-view">
             <header className="page-title">
-                <h1 class="page-title h2">
+                <h1 className="page-title h2">
                     <a href={`/program/${store.program_id}/`}>{store.program_name}</a>: <span className="font-weight-normal text-muted text-nowrap">{gettext("Indicator change log")}&nbsp;<small><i className="fa fa-history" /></small></span>
                 </h1>
             </header>
@@ -167,7 +169,7 @@ export const IndexView = observer(
                         <thead>
                             <tr>
                                 <th className="text-nowrap">{gettext("Date and time")}</th>
-                                <th className="text-nowrap">{gettext("Result Level")}</th>
+                                <th className="text-nowrap">{gettext("Result level")}</th>
                                 <th className="text-nowrap">{gettext("Indicator")}</th>
                                 <th className="text-nowrap">{gettext("User")}</th>
                                 <th className="text-nowrap">{gettext("Organization")}</th>
