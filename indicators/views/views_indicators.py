@@ -199,7 +199,7 @@ class IndicatorFormMixin:
         for pt in normalized_pt_json:
             try:
                 if Decimal(pt['target']).as_tuple()[0] == 1:
-                    raise PeriodicTargetJsonValidationError('Target value must be >= 0, found %d' % pt['target'])    
+                    raise PeriodicTargetJsonValidationError('Target value must be >= 0, found %d' % pt['target'])
             except TypeError:
                 pass
 
