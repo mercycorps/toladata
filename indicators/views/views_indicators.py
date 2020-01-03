@@ -840,6 +840,7 @@ class ResultUpdate(ResultFormMixin, UpdateView):
     def dispatch(self, request, *args, **kwargs):
         self.result = get_object_or_404(Result, pk=self.kwargs.get('pk'))
         self.indicator = self.result.indicator
+        print ('syahyah')
         return super(ResultUpdate, self).dispatch(request, *args, **kwargs)
 
     def get_context_data(self, **kwargs):
@@ -868,6 +869,7 @@ class ResultUpdate(ResultFormMixin, UpdateView):
         old_result = Result.objects.get(pk=self.kwargs['pk'])
         # save the form then update manytomany relationships
         old_values = old_result.logged_fields
+        old_values['value'] = old_values['value'].normalize()
         new_result = form.save()
         for disagg in new_result.indicator.disaggregation.all():
             formset = get_disaggregated_result_formset(disagg)(self.request.POST, result=new_result, request=self.request)
