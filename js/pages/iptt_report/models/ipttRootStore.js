@@ -99,6 +99,13 @@ export default (
         get reportColumnWidth() {
             return 8 + (!this.resultsFramework && 1) + 3 + (this.reportPeriods.length) * (this.isTVA ? 3 : 1);
         },
+        get activeDisaggregationPks() {
+            return this.filterStore.currentDisaggregations;
+        },
+        getDisaggregationLabels(disaggregationPk) {
+            return (this.currentProgram && this.currentProgram.disaggregations.has(disaggregationPk)) ?
+                this.currentProgram.disaggregations.get(disaggregationPk) : false;
+        },
         loadResultsModal(indicatorPk) {
             api.indicatorResultsTable(indicatorPk, false).then(
                 (data) => {

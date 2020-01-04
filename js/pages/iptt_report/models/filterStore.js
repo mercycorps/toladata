@@ -449,6 +449,18 @@ export default (
                         .map(disaggregation => ({value: disaggregation.pk, label: disaggregation.name})) :
                     [BLANK_OPTION];
         },
+        get currentDisaggregations() {
+            let disaggregationPks = (this._indicatorFilters.disaggregations && this._indicatorFilters.disaggregations.length > 0)
+                ? this._indicatorFilters.disaggregations
+                : [...new Set(this.getAllIndicators('disaggregations').map(
+                        indicator => Array.from(indicator._disaggregationPks.values())
+                    ).reduce((a, b) => a.concat(b), []))];
+            return this.programFilterData ?
+                Array.from(this.programFilterData.disaggregations.values())
+                    .filter(disaggregation => disaggregationPks.includes(disaggregation.pk))
+                    .sort((disagg_a, disagg_b) => (disagg_a.name > disagg_b.name) ? 1 : -1)
+                    .map(disaggregation => disaggregation.pk) : []  
+        },
         get disaggregationFilters() {
             return this.disaggregationOptions.filter(option => this._indicatorFilters.disaggregations.includes(option.value));
         },

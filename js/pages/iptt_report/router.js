@@ -36,7 +36,7 @@ const parseArrayParams = (param) => {
     } else if (Array.isArray(param)) {
         return param.map(p => parseInt(p));
     } else if (Number.isInteger(param)) {
-        return param;
+        return [param];
     } else if (!isNaN(parseInt(param))) {
         return [parseInt(param)];
     }
