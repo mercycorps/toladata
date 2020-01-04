@@ -116,7 +116,7 @@ class TestIPTTIndicatorSerializer(test.TestCase):
         data = get_serialized_data(i.pk)
         self.assertEqual(data['disaggregation_pks'], [country_dt.pk])
 
-    def test_has_multiple_disaggregations_assigneD(self):
+    def test_has_multiple_disaggregations_assigned(self):
         program, standard_dt, country_dt = self.get_disaggregations()
         i = RFIndicatorFactory(program=program)
         i.disaggregation.set([country_dt, standard_dt])

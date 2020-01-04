@@ -1,0 +1,1 @@
+from indicators.tests.iptt_tests.tp_annotations import *
