@@ -52,4 +52,3 @@ class TestResultAuditLog(test.TestCase):
 #        self.assertEqual(response.status_code, 200)
         self.assertEqual(result2.achieved, achieved_value)
         #self.assertEqual(audits.count(), 2)
-

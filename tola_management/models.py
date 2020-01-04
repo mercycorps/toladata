@@ -22,8 +22,15 @@ def diff(previous, new, mapping):
     diff_list = []
     p = previous
     n = new
+    disagg_index = -1
+    has_value_diff = False
     for (p_field, n_field) in itertools.zip_longest(p.keys(), n.keys()):
+        orig_diff_count = len(diff_list)
         if p_field and p_field not in n:
+            if p_field == 'value':
+                has_value_diff = True
+            if p_field == 'disaggregation_values':
+                disagg_index = len(diff_list)
             diff_list.append({
                 "name": p_field,
                 "pretty_name": mapping.get(p_field, p_field),
@@ -32,6 +39,10 @@ def diff(previous, new, mapping):
             })
 
         if n_field and n_field not in p:
+            if n_field == 'value':
+                has_value_diff = True
+            if n_field == 'disaggregation_values':
+                disagg_index = len(diff_list)
             diff_list.append({
                 "name": n_field,
                 "pretty_name": mapping.get(n_field, n_field),
@@ -40,12 +51,25 @@ def diff(previous, new, mapping):
             })
 
         if n_field in p and p_field in n and n[p_field] != p[n_field]:
+            if p_field == 'value':
+                has_value_diff = True
+            if p_field == 'disaggregation_values':
+                disagg_index = len(diff_list)
             diff_list.append({
                 "name": n_field,
                 "pretty_name": mapping.get(n_field, n_field),
                 "prev": p[p_field],
                 "new": n[n_field]
             })
+
+    if disagg_index >=0 and not has_value_diff:
+        diff_list.insert(disagg_index, {
+            "name": "value",
+            "pretty_name": mapping.get('value'),
+            "prev": p.get('value', ''),
+            "new": n.get('value', '')
+        })
+
     return diff_list
 
 
