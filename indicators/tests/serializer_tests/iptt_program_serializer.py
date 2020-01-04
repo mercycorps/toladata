@@ -286,6 +286,7 @@ class TestIPTTProgramSerializerFilterData(test.TestCase):
         disagg_data = data['disaggregations'][0]
         self.assertEqual(disagg_data['pk'], country_dt.pk)
         self.assertEqual(disagg_data['name'], "Test Disaggregation")
+        self.assertEqual(disagg_data['labels'][0]['name'], "Test Label 1")
 
     def test_one_standard_disaggregation_type(self):
         standard_dt = DisaggregationTypeFactory(

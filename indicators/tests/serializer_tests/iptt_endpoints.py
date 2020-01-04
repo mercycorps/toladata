@@ -15,7 +15,7 @@ from django import test
 from django.utils import translation
 
 
-IPTT_QUERY_COUNT = 8
+IPTT_QUERY_COUNT = 9
 
 def get_serialized_data(program_pk):
     return IPTTProgramSerializer.get_for_pk(program_pk).data
