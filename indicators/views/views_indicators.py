@@ -840,7 +840,6 @@ class ResultUpdate(ResultFormMixin, UpdateView):
     def dispatch(self, request, *args, **kwargs):
         self.result = get_object_or_404(Result, pk=self.kwargs.get('pk'))
         self.indicator = self.result.indicator
-        print ('syahyah')
         return super(ResultUpdate, self).dispatch(request, *args, **kwargs)
 
     def get_context_data(self, **kwargs):

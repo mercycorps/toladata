@@ -257,16 +257,12 @@ class RFProgramFactory(DjangoModelFactory):
                 'program': self
             })
             for count in range(extracted):
-                print('kwargsss', kwargs)
-                print('count is', count)
-
                 this_indicator_data = {}
                 this_indicator_data.update(indicator_data)
                 this_indicator_data.update(kwargs.get(str(count), {}))
                 if levels:
                     (level_field, level_value) = next(levels)
                     this_indicator_data.update({level_field: level_value})
-                print('thisdata', this_indicator_data)
                 RFIndicatorFactory(**this_indicator_data)
 
 

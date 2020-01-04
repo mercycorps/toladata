@@ -44,11 +44,10 @@ class TestResultAuditLog(test.TestCase):
         # result_data.update({'result': result.id})
         response2 = self.client.post(
             f'/indicators/result_update/{result.id}/', result_data, **{'HTTP_X_REQUESTED_WITH': 'XMLHttpRequest'})
-        print('dirres2', dir(response2))
-        print('res2', response2.content)
+
         result2 = indicator.result_set.first()
         audits2 = ProgramAuditLog.objects.all()
-        print('response', response2._headers)
+
 #        self.assertEqual(response.status_code, 200)
         self.assertEqual(result2.achieved, achieved_value)
         #self.assertEqual(audits.count(), 2)
