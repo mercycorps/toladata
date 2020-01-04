@@ -13,6 +13,7 @@ from indicators.models import (
     Sector,
     PeriodicTarget,
     DisaggregationType,
+    DisaggregationLabel
 )
 from indicators.serializers_new import (
     ProgramPageIndicatorSerializer,
@@ -751,6 +752,13 @@ class IPTTProgramFilterItemsMixin(object):
             return self.context['disaggregations']
         return DisaggregationType.objects.filter(indicator__program=program).values('pk', 'disaggregation_type')
 
+    def _get_program_disaggregation_labels(self, program):
+        if hasattr(self, 'context') and 'disaggregation_labels' in self.context:
+            return self.context['disaggregation_labels']
+        return DisaggregationLabel.objects.filter(
+            disaggregation_type__indicator__program=program
+        ).values('pk', 'disaggregation_type_id', 'label', 'customsort')
+
     def get_sectors(self, program):
         return sorted({
             v['pk']: v for v in [{'pk': sector['pk'], 'name': sector['sector']}
@@ -769,9 +777,13 @@ class IPTTProgramFilterItemsMixin(object):
         }.values(), key=operator.itemgetter('name'))
 
     def get_disaggregations(self, program):
+        labels = [{'pk': l['pk'], 'name': l['label'],
+                   'customsort': l['customsort'], 'disaggregation': l['disaggregation_type_id']}
+                  for l in self._get_program_disaggregation_labels(program)]
         return sorted({
             v['pk']: v for v in [
-                {'pk': disaggregation['pk'], 'name': disaggregation['disaggregation_type']}
+                {'pk': disaggregation['pk'], 'name': disaggregation['disaggregation_type'],
+                 'labels': [label for label in labels if label['disaggregation'] == disaggregation['pk']]}
                 for disaggregation in self._get_program_disaggregations(program)
             ]
         }.values(), key=operator.itemgetter('name'))
@@ -835,6 +847,9 @@ class IPTTMixin(object):
             'disaggregations': DisaggregationType.objects.select_related(None).prefetch_related(None).filter(
                 indicator__program_id=program_pk
             ).order_by('disaggregation_type').values('pk', 'disaggregation_type', 'indicator__pk'),
+            'disaggregation_labels': DisaggregationLabel.objects.select_related(None).prefetch_related(None).filter(
+                disaggregation_type__indicator__program_id=program_pk
+            ).order_by('customsort').values('pk', 'disaggregation_type_id', 'label', 'customsort').distinct(),
             'now': timezone.now().date()
         }
         return cls(program, context=context)
