@@ -439,18 +439,6 @@ export default (
             this._indicatorFilters.sites = siteFilterValues.map(v => parseInt(v));
         },
         get disaggregationOptions() {
-            let indicators = this.getAllIndicators('disaggregations');
-            console.log("all indicators", indicators);
-            let mapped = indicators.map(indicator => Array.from(indicator._disaggregationPks.values()));
-            console.log("mappeDd", mapped);
-            let reduced = mapped.reduce((a, b) => a.concat(b), []);
-            console.log("reduced", reduced);
-            let setted = new Set(reduced);
-            console.log("setted", setted);
-            let filters = this._indicatorFilters.disaggregations;
-            console.log("filters", filters);
-            let combined = [...setted, ...filters];
-            console.log("combined", combined);
             let disaggregationPks = [...new Set(this.getAllIndicators('disaggregations').map(
                 indicator => Array.from(indicator._disaggregationPks.values())
             ).reduce((a, b) => a.concat(b), [])),

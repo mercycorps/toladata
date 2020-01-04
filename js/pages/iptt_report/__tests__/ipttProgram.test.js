@@ -12,5 +12,5 @@ describe("bare iptt program", () => {
     it("handles disaggregations", () => {
         let program = Program({disaggregations: [{pk: 4, name: 'Test Disaggregation'}]});
         expect(Array.from(program.disaggregations.values())).toStrictEqual([{pk: 4, name: 'Test Disaggregation'}]);
-    })
+    });
 });
