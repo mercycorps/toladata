@@ -296,4 +296,3 @@ def grant_country_access(tolauser, country, role=COUNTRY_ROLE_CHOICES[0][0]):
     )
     access_object.role = role
     access_object.save()
-    
