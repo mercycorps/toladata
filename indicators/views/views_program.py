@@ -4,6 +4,8 @@
 """
 
 from operator import itemgetter
+import csv
+import datetime
 import logging
 import openpyxl
 from django.contrib.auth.decorators import login_required
@@ -211,6 +213,8 @@ def programs_rollup_export(request):
         p.gaitid if p.gaitid else "no gait id {}".format(count): {
             'gaitid': p.gaitid,
             'name': p.name,
+            'tola_creation_date': p.create_date.date().isoformat(),
+            'is_active': p.funding_status.lower().strip() == 'funded',
             'indicator_count': p.metrics['indicator_count'],
             'indicators_with_targets': p.metrics['targets_defined'],
             'indicators_with_results': p.metrics['reported_results'],
@@ -223,6 +227,49 @@ def programs_rollup_export(request):
             } for count, p in enumerate(annotated_programs)
         }
     return JsonResponse(data)
+
+
+@login_required
+def programs_rollup_export_csv(request):
+    # TODO: after LevelUp please remove unicode calls:
+    CSV_HEADERS = [
+        'program_name', 'gait_id', 'countries', 'sectors', 'status', 'funding_status', 'start_date', 'end_date',
+        'program_period', 'indicator_count', 'indicators_reporting_above_target', 'indicators_reporting_on_target', 
+        'indicators_reporting_below_target', 'indicators_with_targets',
+        'indicators_with_results', 'results_count', 'results_with_evidence'
+    ]
+    response = HttpResponse(content_type='text/csv')
+    response['Content-Disposition'] = 'attachment; filename="program_rollup_{}.csv'.format(
+        datetime.date.today().isoformat()
+    )
+    writer = csv.writer(response)
+    writer.writerow(CSV_HEADERS)
+    program_pks = [p.pk for p in request.user.tola_user.available_programs]
+    annotated_programs = ProgramWithMetrics.home_page.filter(pk__in=program_pks).with_annotations()
+    for program in sorted([p for p in annotated_programs], key=lambda p: p.name):
+        row = [
+            program.name,
+            program.gaitid if program.gaitid else "no gait_id, program id {}".format(program.id),
+            " / ".join([c.country for c in program.country.all()]),
+            " / ".join(set([i.sector.sector for i in program.indicator_set.all() if i.sector and i.sector.sector])),
+            "active" if program.funding_status.lower().strip() == 'funded' else "inactive",
+            program.funding_status,
+            program.reporting_period_start.isoformat() if program.reporting_period_start else '',
+            program.reporting_period_end.isoformat() if program.reporting_period_end else '',
+            '{}%'.format(program.percent_complete) if program.percent_complete >= 0 else '',
+            program.metrics['indicator_count'],
+            program.scope_counts['high'],
+            program.scope_counts['on_scope'],
+            program.scope_counts['low'],
+            program.metrics['targets_defined'],
+            program.metrics['reported_results'],
+            program.metrics['results_count'],
+            program.metrics['results_evidence']
+        ]
+        row = [unicode(s).encode("utf-8") for s in row]
+        writer.writerow(row)
+    return response
+        
 
 
 # API views:
