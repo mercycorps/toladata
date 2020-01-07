@@ -1941,6 +1941,8 @@ class Result(models.Model):
                     "id": dv.category.pk,
                     "value": dv.value,
                     "name": dv.category.name,
+                    "custom_sort": dv.category.customsort,
+                    "type": dv.category.disaggregation_type.disaggregation_type,
                 }
                 for dv in self.disaggregated_values
             }

@@ -22,10 +22,12 @@ def diff(previous, new, mapping):
     diff_list = []
     p = previous
     n = new
+    # If there are disaggregation changes but the overall actual value hasn't changed,
+    # we still want to include the actual value in the diff list so it can be displayed
+    # just above the disaggregation list. So the position of the disaggs in the list is being tracked.
     disagg_index = -1
     has_value_diff = False
     for (p_field, n_field) in itertools.zip_longest(p.keys(), n.keys()):
-        orig_diff_count = len(diff_list)
         if p_field and p_field not in n:
             if p_field == 'value':
                 has_value_diff = True
@@ -62,6 +64,7 @@ def diff(previous, new, mapping):
                 "new": n[n_field]
             })
 
+    # This is where the actual value is being inserted just above the disaggs
     if disagg_index >=0 and not has_value_diff:
         diff_list.insert(disagg_index, {
             "name": "value",
@@ -240,11 +243,11 @@ class ProgramAuditLog(models.Model, DiffableLog):
             "baseline_na": _("Baseline N/A"),
             "evidence_url": _('Evidence link'),
             "evidence_name": _('Evidence record name'),
-            "date": _('Date'),
-            "target": _('Target'),
-            "value": _('Value'),
-            "start_date": _('Start Date'),
-            "end_date": _('End Date'),
+            "date": _('Result date'),
+            "target": _('Measure against target'),
+            "value": _('Actual value'),
+            "start_date": _('Start date'),
+            "end_date": _('End date'),
             "assumptions": _('Assumptions'),
             "sites": _("Sites")
         }
@@ -295,14 +298,26 @@ class ProgramAuditLog(models.Model, DiffableLog):
             elif diff["name"] == 'targets' or diff["name"] == 'disaggregation_values':
                 if diff["prev"] == null_text:
                     diff["prev"] = {
-                        n["id"]: {"name": n.get("name"), "value": null_text, "id": n["id"]} for k, n in diff["new"].items()
+                        n["id"]: {
+                            "name": n.get("name"),
+                            "value": null_text,
+                            "id": n["id"],
+                            "custom_sort": n["custom_sort"],
+                            "type": n["type"]
+                        }
+                        for k, n in diff["new"].items()
                     }
                     continue
 
                 if diff["new"] == null_text:
                     diff["new"] = {
                         p["id"]: {
-                            "name": p.get("name"), "value": null_text, "id": p["id"]} for k, p in diff["prev"].items()
+                            "name": p.get("name"),
+                            "value": null_text,
+                            "id": p["id"],
+                            "custom_sort": p["custom_sort"],
+                            "type": p["type"]
+                        } for k, p in diff["prev"].items()
                     }
                     continue
 
@@ -313,50 +328,66 @@ class ProgramAuditLog(models.Model, DiffableLog):
                         new[prev_id] = {
                             "name": diff["prev"][prev_id].get('name'),
                             "value": null_text,
-                            "id": diff["prev"][prev_id].get('id')
+                            "id": diff["prev"][prev_id].get('id'),
+                            "custom_sort": diff["prev"][prev_id].get('custom_sort'),
+                            "type": diff["prev"][prev_id].get('type'),
                         }
 
                         prev[prev_id] = {
                             "name": diff["prev"][prev_id].get('name'),
                             "value": diff["prev"][prev_id].get('value'),
-                            "id": diff["prev"][prev_id].get('id')
+                            "id": diff["prev"][prev_id].get('id'),
+                            "custom_sort": diff["prev"][prev_id].get('custom_sort'),
+                            "type": diff["prev"][prev_id].get('type'),
                         }
 
                     if new_id and new_id not in diff["prev"]:
                         prev[new_id] = {
                             "name": diff["new"][new_id].get('name'),
                             "value": null_text,
-                            "id": diff["new"][new_id].get('id')
+                            "id": diff["new"][new_id].get('id'),
+                            "custom_sort": diff["new"][new_id].get('custom_sort'),
+                            "type": diff["new"][new_id].get('type'),
                         }
 
                         new[new_id] = {
                             "name": diff["new"][new_id].get('name'),
                             "value": diff["new"][new_id].get('value'),
-                            "id": diff["new"][new_id].get('id')
+                            "id": diff["new"][new_id].get('id'),
+                            "custom_sort": diff["new"][new_id].get('custom_sort'),
+                            "type": diff["new"][new_id].get('type'),
                         }
 
                     if new_id in diff["prev"] and diff["prev"][new_id]["value"] != diff["new"][new_id]["value"]:
                         new[new_id] = {
                             "name": diff["new"][new_id].get('name'),
                             "value": diff["new"][new_id].get('value'),
-                            "id": diff["new"][new_id].get('id')
+                            "id": diff["new"][new_id].get('id'),
+                            "custom_sort": diff["new"][new_id].get('custom_sort'),
+                            "type": diff["new"][new_id].get('type'),
                         }
                         prev[new_id] = {
                             "name": diff["prev"][new_id].get('name'),
                             "value": diff["prev"][new_id].get('value'),
-                            "id": diff["prev"][new_id].get('id')
+                            "id": diff["prev"][new_id].get('id'),
+                            "custom_sort": diff["prev"][new_id].get('custom_sort'),
+                            "type": diff["prev"][new_id].get('type'),
                         }
 
                     if prev_id in diff["new"] and diff["prev"][prev_id]["value"] != diff["new"][prev_id]["value"]:
                         new[prev_id] = {
                             "name": diff["new"][prev_id].get('name'),
                             "value": diff["new"][prev_id].get('value'),
-                            "id": diff["new"][prev_id].get('id')
+                            "id": diff["new"][prev_id].get('id'),
+                            "custom_sort": diff["new"][prev_id].get('custom_sort'),
+                            "type": diff["new"][prev_id].get('type'),
                         }
                         prev[prev_id] = {
                             "name": diff["prev"][prev_id].get('name'),
                             "value": diff["prev"][prev_id].get('value'),
-                            "id": diff["prev"][prev_id].get('id')
+                            "id": diff["prev"][prev_id].get('id'),
+                            "custom_sort": diff["prev"][prev_id].get('custom_sort'),
+                            "type": diff["prev"][prev_id].get('type'),
                         }
 
                 diff["prev"] = prev

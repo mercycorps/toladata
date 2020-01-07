@@ -1,5 +1,6 @@
 # -*- coding: utf-8 -*-
 
+from unittest import skip
 from django import test
 from factories import (
     workflow_models as w_factories,
@@ -51,3 +52,11 @@ class TestResultAuditLog(test.TestCase):
 #        self.assertEqual(response.status_code, 200)
         self.assertEqual(result2.achieved, achieved_value)
         #self.assertEqual(audits.count(), 2)
+
+    @skip
+    def test_disagg_sorting(self):
+        pass
+
+    @skip
+    def test_result_log_sorting(self):
+        pass
