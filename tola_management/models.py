@@ -15,7 +15,8 @@ from workflow.models import (
 
 from indicators.models import (
     Indicator,
-    Level
+    Level,
+    Result
 )
 
 def diff(previous, new, mapping):
@@ -288,6 +289,7 @@ class ProgramAuditLog(models.Model, DiffableLog):
     def diff_list(self):
         diff_list = super(ProgramAuditLog, self).diff_list
         null_text = ''
+
         for diff in diff_list:
             if diff["name"] == 'unit_of_measure_type':
                 diff["prev"] = self.unit_of_measure_type_map.get(diff["prev"], diff["prev"])
@@ -302,8 +304,8 @@ class ProgramAuditLog(models.Model, DiffableLog):
                             "name": n.get("name"),
                             "value": null_text,
                             "id": n["id"],
-                            "custom_sort": n["custom_sort"],
-                            "type": n["type"]
+                            "custom_sort": n.get("custom_sort"),
+                            "type": n.get("type")
                         }
                         for k, n in diff["new"].items()
                     }
@@ -315,12 +317,11 @@ class ProgramAuditLog(models.Model, DiffableLog):
                             "name": p.get("name"),
                             "value": null_text,
                             "id": p["id"],
-                            "custom_sort": p["custom_sort"],
-                            "type": p["type"]
+                            "custom_sort": p.get("custom_sort"),
+                            "type": p.get("type")
                         } for k, p in diff["prev"].items()
                     }
                     continue
-
                 prev = {}
                 new = {}
                 for (prev_id, new_id) in itertools.zip_longest(diff["prev"].keys(), diff["new"].keys()):
@@ -393,7 +394,26 @@ class ProgramAuditLog(models.Model, DiffableLog):
                 diff["prev"] = prev
                 diff["new"] = new
 
+        diff_list = sorted(diff_list, key=self.diff_list_sorter)
         return diff_list
+
+    def diff_list_sorter(self, element):
+        change_type_field_order_map = {
+            "indicator_created": Indicator.logged_field_order(),
+            "indicator_changed": Indicator.logged_field_order(),
+            "indicator_deleted": Indicator.logged_field_order(),
+            "result_changed": Result.logged_field_order(),
+            "result_created": Result.logged_field_order(),
+            "result_deleted": Result.logged_field_order(),
+            "program_dates_changed": None,
+            "level_changed": None,
+        }
+        template_field_order = change_type_field_order_map[self.change_type]
+        try:
+            return template_field_order.index(element['name'])
+        except ValueError:
+            return 999
+
 
     @staticmethod
     def log_indicator_created(user, created_indicator, rationale):

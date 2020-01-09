@@ -2,6 +2,7 @@ import React from 'react';
 import { observer } from "mobx-react"
 import Pagination from 'components/pagination'
 import {FontAwesomeIcon} from "@fortawesome/react-fontawesome"
+import { toJS } from "mobx"
 
 import LoadingSpinner from 'components/loading-spinner'
 
@@ -34,7 +35,7 @@ const ResultChangeset = ({data, name, pretty_name}) => {
             return <div className="changelog__change__targets">
                 <h4 className="text-small">{gettext('Disaggregated values changed')}</h4>
                 {Object.keys(groupedDiffs).sort().map( (typeName ) => {
-                    return  <DisaggregationDiffs disagg_type={typeName} disagg_diffs={groupedDiffs[typeName]} />
+                    return  <DisaggregationDiffs key={typeName+'_diff'} disagg_type={typeName === null ? typeName : ""} disagg_diffs={groupedDiffs[typeName]} />
                 })}
             </div>
         } else {

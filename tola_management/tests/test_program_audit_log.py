@@ -60,3 +60,18 @@ class TestResultAuditLog(test.TestCase):
     @skip
     def test_result_log_sorting(self):
         pass
+
+    def test_logged_field_order_counts(self):
+        # The fields being tracked in the audit log should always be present in the logged field order list. The
+        # logged field order list may contain more fields than are currently tracked.
+        models_to_test = [
+            i_factories.IndicatorFactory(),
+            i_factories.ResultFactory()
+        ]
+
+        for model in models_to_test:
+            logged_field_set = set(model.logged_fields.keys())
+            logged_fields_order_set = set(model.logged_field_order())
+            self.assertEqual(len(logged_field_set - logged_fields_order_set), 0)
+
+
