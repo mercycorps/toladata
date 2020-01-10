@@ -263,11 +263,24 @@ class Level(models.Model):
 
     @property
     def logged_fields(self):
-        """Fields logged by program audit log"""
+        """
+        Fields logged by program audit log. If you change the composition of this property you may also want
+        to update the logged_field_order property.
+        """
+
         return {
             "name": self.name.strip(),
             "assumptions": self.assumptions.strip(),
         }
+
+    @staticmethod
+    def logged_field_order():
+        """
+        This list determines the order in which result fields will be displayed in the change log.  Because it
+        represents all fields that have ever been used in the Result form change log, it should never be
+        shrunk, only expanded or reordered.
+        """
+        return ['name', 'assumptions']
 
 
 class LevelAdmin(admin.ModelAdmin):
@@ -1422,14 +1435,12 @@ class Indicator(SafeDeleteModel):
         today = date_ or timezone.localdate()
         return self.periodictargets.filter(start_date__lte=today, end_date__gte=today).first()
 
-
     @property
     def last_ended_periodic_target(self):
         """
         Returns the last periodic target if any, or None
         """
         return self.periodictargets.filter(end_date__lte=timezone.localdate()).last()
-
 
     @cached_property
     def cached_data_count(self):

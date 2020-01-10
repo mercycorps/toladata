@@ -18,6 +18,7 @@ from rest_framework.serializers import (
     ValidationError,
     BooleanField,
     DateTimeField,
+    SerializerMethodField
 )
 
 from openpyxl import Workbook, utils
@@ -80,7 +81,7 @@ def get_audit_log_workbook(ws, program):
     header = [
         Cell(ws, value=_("Date and Time")),
         # Translators: Number of the indicator being shown
-        Cell(ws, value=_('Result Level')),
+        Cell(ws, value=_('Result level')),
         Cell(ws, value=_('Indicator')),
         Cell(ws, value=_('User')),
         Cell(ws, value=_('Organization')),
@@ -325,13 +326,18 @@ class ProgramAuditLogIndicatorSerializer(ModelSerializer):
 
 
 class ProgramAuditLogLevelSerializer(ModelSerializer):
+    tier = SerializerMethodField()
+
     class Meta:
         model = Level
         fields = (
             'name',
             'display_ontology',
+            'tier'
         )
 
+    def get_tier(self, obj):
+        return obj.leveltier.name
 
 class ProgramAuditLogSerializer(ModelSerializer):
     id = IntegerField(allow_null=True, required=False)

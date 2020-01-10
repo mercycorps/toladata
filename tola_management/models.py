@@ -65,6 +65,9 @@ def diff(previous, new, mapping):
                 "new": n[n_field]
             })
 
+
+
+
     # This is where the actual value is being inserted just above the disaggs
     if disagg_index >=0 and not has_value_diff:
         diff_list.insert(disagg_index, {
@@ -250,7 +253,8 @@ class ProgramAuditLog(models.Model, DiffableLog):
             "start_date": _('Start date'),
             "end_date": _('End date'),
             "assumptions": _('Assumptions'),
-            "sites": _("Sites")
+            "sites": _("Sites"),
+            "level": _("Result level")
         }
 
     @property
@@ -405,8 +409,8 @@ class ProgramAuditLog(models.Model, DiffableLog):
             "result_changed": Result.logged_field_order(),
             "result_created": Result.logged_field_order(),
             "result_deleted": Result.logged_field_order(),
-            "program_dates_changed": None,
-            "level_changed": None,
+            "program_dates_changed": ['start_date', 'end_date'],
+            "level_changed": Level.logged_field_order(),
         }
         template_field_order = change_type_field_order_map[self.change_type]
         try:

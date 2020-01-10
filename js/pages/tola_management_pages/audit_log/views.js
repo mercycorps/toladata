@@ -33,7 +33,7 @@ const ResultChangeset = ({data, name, pretty_name}) => {
             });
 
             return <div className="changelog__change__targets">
-                <h4 className="text-small">{gettext('Disaggregated values changed')}</h4>
+                <h4 className="text-small">{gettext('Disaggregated values')}</h4>
                 {Object.keys(groupedDiffs).sort().map( (typeName ) => {
                     return  <DisaggregationDiffs key={typeName+'_diff'} disagg_type={typeName === null ? typeName : ""} disagg_diffs={groupedDiffs[typeName]} />
                 })}
@@ -50,7 +50,7 @@ const ProgramDatesChangeset = ({data, name, pretty_name}) => {
     return <p>{pretty_name}: {data}</p>
 }
 
-const IndicatorChangeset = ({data, name, pretty_name}) => {
+const IndicatorChangeset = ({data, name, pretty_name, indicator}) => {
     if(name === 'targets') {
         return <div className="changelog__change__targets">
             <h4 className="text-small">{gettext('Targets changed')}</h4>
@@ -60,26 +60,29 @@ const IndicatorChangeset = ({data, name, pretty_name}) => {
         </div>
     } else {
         return <div className="change__field">
-            { name !== 'name' ? <strong>{pretty_name}: </strong>  : '' }
-            {(data !== null && data !== undefined)?data.toString():gettext('N/A')}
+            <strong>
+                { name === 'name' ?
+                    <span>{gettext('Indicator')} {indicator.results_aware_number}: </span> : <span>{pretty_name}:</span>}
+            </strong>
+            {(data !== null && data !== undefined)?data.toString() : ""}
         </div>
     }
 }
 
-const ResultLevelChangeset = ({data, name, pretty_name}) => {
+const ResultLevelChangeset = ({data, name, pretty_name, level}) => {
     return <div className="change__field">
-        { name !== 'name' ? <strong>{pretty_name}: </strong>  : '' }
+        { name !== 'name' ? <strong>{pretty_name}: </strong>  : <strong>{level.tier}{level.display_ontology}: </strong> }
         {(data !== null && data !== undefined)?data.toString():gettext('N/A')}
     </div>
 }
 
 class ChangesetEntry extends React.Component {
-    renderType(type, data, name, pretty_name) {
+    renderType(type, data, name, pretty_name, indicator, level) {
         switch(type) {
             case 'indicator_changed':
             case 'indicator_created':
             case 'indicator_deleted':
-                return <IndicatorChangeset data={data} name={name} pretty_name={pretty_name} />
+                return <IndicatorChangeset data={data} name={name} pretty_name={pretty_name} indicator={indicator} level={level}/>
                 break
             case 'result_changed':
             case 'result_created':
@@ -90,14 +93,15 @@ class ChangesetEntry extends React.Component {
                 return <ProgramDatesChangeset data={data} name={name} pretty_name={pretty_name} />
                 break
             case 'level_changed':
-                return <ResultLevelChangeset data={data} name={name} pretty_name={pretty_name} />
+                return <ResultLevelChangeset
+                    data={data} name={name} pretty_name={pretty_name} level={level} />
                 break
         }
     }
 
     render() {
-        const {data, type, name, pretty_name} = this.props
-        return this.renderType(type, data, name, pretty_name)
+        const {data, type, name, pretty_name, indicator, level} = this.props
+        return this.renderType(type, data, name, pretty_name, indicator, level)
     }
 }
 
@@ -144,16 +148,16 @@ const IndicatorNameSpan = ({indicator}) => {
 };
 
 const ResultLevel = ({indicator, level}) => {
+    if (level) {
+        return `${level.tier} ${level.display_ontology}`;
+    }
+
     if (indicator) {
 
         if (indicator.leveltier_name && indicator.level_display_ontology)
             return `${indicator.leveltier_name} ${indicator.level_display_ontology}`;
         else if (indicator.leveltier_name)
             return indicator.leveltier_name;
-    }
-
-    if (level) {
-        return `${level.name} ${level.display_ontology}`;
     }
 
     return <span>{gettext('N/A')}</span>
@@ -227,14 +231,16 @@ export const IndexView = observer(
                                         {data.diff_list.map(changeset => {
                                             return <ChangesetEntry key={changeset.name} name={changeset.name}
                                                                    pretty_name={changeset.pretty_name}
-                                                                   type={data.change_type} data={changeset.prev}/>
+                                                                   type={data.change_type} data={changeset.prev}
+                                                                   indicator={data.indicator} level={data.level}/>
                                         })}
                                     </td>
                                     <td className="changelog__change--new">
                                         {data.diff_list.map(changeset => {
                                             return <ChangesetEntry key={changeset.name} name={changeset.name}
                                                                    pretty_name={changeset.pretty_name}
-                                                                   type={data.change_type} data={changeset.new}/>
+                                                                   type={data.change_type} data={changeset.new}
+                                                                   indicator={data.indicator} level={data.level}/>
                                         })}
                                     </td>
                                     <td className="changelog__change--rationale">{data.rationale}</td>
