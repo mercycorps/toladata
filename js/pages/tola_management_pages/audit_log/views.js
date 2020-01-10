@@ -5,17 +5,36 @@ import {FontAwesomeIcon} from "@fortawesome/react-fontawesome"
 
 import LoadingSpinner from 'components/loading-spinner'
 
+const DisaggregationDiffs = ({disagg_type, disagg_diffs}) => {
+    disagg_diffs.sort( (a, b) => a.custom_sort - b.custom_sort);
+    return <div><p className="disagg-type__title">{disagg_type}</p>
+        {disagg_diffs.map( diff => {
+            return <div className="change__field" key={diff.id}><strong>{diff.name}:</strong> {diff.value}</div>
+        })}
+    </div>
+};
+
 const ResultChangeset = ({data, name, pretty_name}) => {
     if (name === 'id') {
         return null
-    } else if(name == 'Target_url') {
-        return <div className="change__field"><strong>{pretty_name}</strong>: {(data != 'N/A' && data !== '')?<a href={data} target="_blank">Link</a>:data}</div>
+    } else if(name === 'Target_url') {
+        return <div className="change__field"><strong>{pretty_name}</strong>: {(data !== 'N/A' && data !== '')?<a href={data} target="_blank">Link</a>:data}</div>
     } else if (name === 'disaggregation_values') {
         if (Object.entries(data).length) {
+            let groupedDiffs = {};
+            Object.values(data).forEach( entry => {
+                if (entry.type in groupedDiffs) {
+                    groupedDiffs[entry.type].push(entry);
+                }
+                else {
+                    groupedDiffs[entry.type] = [entry];
+                }
+            });
+
             return <div className="changelog__change__targets">
                 <h4 className="text-small">{gettext('Disaggregated values changed')}</h4>
-                {Object.entries(data).map(([id, dv]) => {
-                    return <div className="change__field" key={id}><strong>{dv.name}:</strong> {dv.value}</div>
+                {Object.keys(groupedDiffs).sort().map( (typeName ) => {
+                    return  <DisaggregationDiffs disagg_type={typeName} disagg_diffs={groupedDiffs[typeName]} />
                 })}
             </div>
         } else {
@@ -24,14 +43,14 @@ const ResultChangeset = ({data, name, pretty_name}) => {
     } else {
         return <div className="change__field"><strong>{pretty_name}</strong>: {data}</div>
     }
-}
+};
 
 const ProgramDatesChangeset = ({data, name, pretty_name}) => {
     return <p>{pretty_name}: {data}</p>
 }
 
 const IndicatorChangeset = ({data, name, pretty_name}) => {
-    if(name == 'targets') {
+    if(name === 'targets') {
         return <div className="changelog__change__targets">
             <h4 className="text-small">{gettext('Targets changed')}</h4>
             {Object.entries(data).map(([id, target]) => {
