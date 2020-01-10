@@ -263,11 +263,24 @@ class Level(models.Model):
 
     @property
     def logged_fields(self):
-        """Fields logged by program audit log"""
+        """
+        Fields logged by program audit log. If you change the composition of this property you may also want
+        to update the logged_field_order property.
+        """
+
         return {
             "name": self.name.strip(),
             "assumptions": self.assumptions.strip(),
         }
+
+    @staticmethod
+    def logged_field_order():
+        """
+        This list determines the order in which result fields will be displayed in the change log.  Because it
+        represents all fields that have ever been used in the Result form change log, it should never be
+        shrunk, only expanded or reordered.
+        """
+        return ['name', 'assumptions']
 
 
 class LevelAdmin(admin.ModelAdmin):
@@ -1293,6 +1306,9 @@ class Indicator(SafeDeleteModel):
 
     @property
     def logged_fields(self):
+        """
+        If you change the composition of this property you may also want to update the logged_field_order property.
+        """
         s = self
         return {
             "name": s.name.strip(),
@@ -1313,6 +1329,18 @@ class Indicator(SafeDeleteModel):
             },
             "level": str(s.level) if s.level is not None else '',
         }
+
+    @staticmethod
+    def logged_field_order():
+        """
+        This list determines the order in which result fields will be displayed in the change log.  Because it
+        represents all fields that have ever been used in the Result form change log, it should never be
+        shrunk, only expanded or reordered.
+        """
+        return [
+            'name', 'level', 'unit_of_measure', 'unit_of_measure_type', 'baseline_value',
+            'direction_of_change', 'baseline_na', 'targets', 'lop_target', 'is_cumulative'
+        ]
 
     @property
     def get_target_frequency_label(self):
@@ -1407,14 +1435,12 @@ class Indicator(SafeDeleteModel):
         today = date_ or timezone.localdate()
         return self.periodictargets.filter(start_date__lte=today, end_date__gte=today).first()
 
-
     @property
     def last_ended_periodic_target(self):
         """
         Returns the last periodic target if any, or None
         """
         return self.periodictargets.filter(end_date__lte=timezone.localdate()).last()
-
 
     @cached_property
     def cached_data_count(self):
@@ -1888,7 +1914,7 @@ class Result(models.Model):
 
     create_date = models.DateTimeField(null=True, blank=True, help_text=" ", verbose_name=_("Create date"))
     edit_date = models.DateTimeField(null=True, blank=True, help_text=" ", verbose_name=_("Edit date"))
-    site = models.ManyToManyField(SiteProfile, blank=True, help_text=" ", verbose_name=_("Site"))
+    site = models.ManyToManyField(SiteProfile, blank=True, help_text=" ", verbose_name=_("Sites"))
 
     history = HistoricalRecords()
     objects = ResultManager()
@@ -1928,6 +1954,9 @@ class Result(models.Model):
 
     @property
     def logged_fields(self):
+        """
+        If you change the composition of this property you may also want to update the logged_field_order property.
+        """
         return {
             "id": self.id,
             "value": self.achieved,
@@ -1948,6 +1977,15 @@ class Result(models.Model):
             }
         }
 
+    @staticmethod
+    def logged_field_order():
+        """
+        This list determines the order in which result fields will be displayed in the change log.  Because it
+        represents all fields that have ever been used in the Result form change log, it should never be
+        shrunk, only expanded or reordered.
+        """
+        return [
+            'id', 'date', 'target', 'value', 'disaggregation_values', 'evidence_url', 'evidence_name', 'sites']
 
 
 class ResultAdmin(admin.ModelAdmin):

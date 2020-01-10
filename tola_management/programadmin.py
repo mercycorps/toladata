@@ -17,7 +17,8 @@ from rest_framework.serializers import (
     IntegerField,
     ValidationError,
     BooleanField,
-    DateTimeField
+    DateTimeField,
+    SerializerMethodField
 )
 
 from openpyxl import Workbook, utils
@@ -34,7 +35,7 @@ from workflow.models import (
 
 from indicators.models import (
     Indicator,
-    Level
+    Level,
 )
 
 from tola_management.models import (
@@ -80,7 +81,7 @@ def get_audit_log_workbook(ws, program):
     header = [
         Cell(ws, value=_("Date and Time")),
         # Translators: Number of the indicator being shown
-        Cell(ws, value=_('Result Level')),
+        Cell(ws, value=_('Result level')),
         Cell(ws, value=_('Indicator')),
         Cell(ws, value=_('User')),
         Cell(ws, value=_('Organization')),
@@ -102,7 +103,6 @@ def get_audit_log_workbook(ws, program):
     subtitle.font = Font(size=18)
     ws.append([subtitle,])
     ws.merge_cells(start_row=2, end_row=2, start_column=1, end_column=len(header))
-
 
     header_font = Font(bold=True)
     header_fill = PatternFill('solid', 'EEEEEE')
@@ -168,6 +168,7 @@ def get_audit_log_workbook(ws, program):
         ws.column_dimensions[utils.get_column_letter(col_no + 1)].width = width
     return ws
 
+
 class Paginator(pagination.PageNumberPagination):
     page_size = 20
     page_size_query_param = 'page_size'
@@ -182,6 +183,7 @@ class Paginator(pagination.PageNumberPagination):
             ('results', data),
         ]))
         return response
+
 
 class NestedSectorSerializer(Serializer):
     def to_representation(self, sector):
@@ -200,6 +202,7 @@ class NestedCountrySerializer(Serializer):
     def to_internal_value(self, data):
         country = Country.objects.get(pk=data)
         return country
+
 
 class ProgramAdminSerializer(ModelSerializer):
     id = IntegerField(allow_null=True, required=False)
@@ -289,7 +292,6 @@ class ProgramAdminSerializer(ModelSerializer):
         added_countries = [x for x in incoming_countries if x not in original_countries]
         removed_countries = [x for x in original_countries if x not in incoming_countries]
 
-
         original_sectors = instance.sector.all()
         incoming_sectors = validated_data.pop('sector')
         added_sectors = [x for x in incoming_sectors if x not in original_sectors]
@@ -311,6 +313,7 @@ class ProgramAdminSerializer(ModelSerializer):
         )
         return updated_instance
 
+
 class ProgramAuditLogIndicatorSerializer(ModelSerializer):
     class Meta:
         model = Indicator
@@ -321,13 +324,20 @@ class ProgramAuditLogIndicatorSerializer(ModelSerializer):
             'results_aware_number',
         )
 
+
 class ProgramAuditLogLevelSerializer(ModelSerializer):
+    tier = SerializerMethodField()
+
     class Meta:
         model = Level
         fields = (
             'name',
             'display_ontology',
+            'tier'
         )
+
+    def get_tier(self, obj):
+        return obj.leveltier.name
 
 class ProgramAuditLogSerializer(ModelSerializer):
     id = IntegerField(allow_null=True, required=False)
@@ -368,6 +378,7 @@ class ProgramAdminAuditLogSerializer(ModelSerializer):
             'pretty_change_type',
         )
 
+
 class ProgramAdminViewSet(viewsets.ModelViewSet):
     serializer_class = ProgramAdminSerializer
     pagination_class = Paginator
@@ -377,7 +388,7 @@ class ProgramAdminViewSet(viewsets.ModelViewSet):
         auth_user = self.request.user
         params = self.request.query_params
 
-        #we have to handle this explicitly in case there are some programs without a country
+        # We have to handle this explicitly in case there are some programs without a country
         if auth_user.is_superuser:
             queryset = Program.objects.all()
         else:
