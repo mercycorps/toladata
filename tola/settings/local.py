@@ -131,6 +131,7 @@ GOOGLE_ANALYTICS_DOMAIN = app_settings.get('GOOGLE_ANALYTICS_DOMAIN', None)
 SECRET_KEY = app_settings['SECRET_KEY']
 
 LOGGING['handlers']['file']['filename'] = app_settings['LOGFILE']
+LOGGING['handlers']['login_file']['filename'] = os.path.join(os.path.dirname(app_settings['LOGFILE']), 'login.log')
 
 # use webpack dev server
 WEBPACK_LOADER = {
@@ -139,6 +140,9 @@ WEBPACK_LOADER = {
 		'STATS_FILE': os.path.join(SITE_ROOT, app_settings.get('WEBPACK_STATS_FILE', 'webpack-stats-local.json')),
     }
 }
+
+PROGRAM_API_BASE_URL = app_settings['PROGRAM_API_BASE_URL']
+PROGRAM_API_TOKEN = app_settings['PROGRAM_API_TOKEN']
 
 SOCIAL_AUTH_SAML_SP_ENTITY_ID = app_settings['SOCIAL_AUTH_SAML_SP_ENTITY_ID']
 SOCIAL_AUTH_SAML_SP_PUBLIC_CERT = app_settings['SOCIAL_AUTH_SAML_SP_PUBLIC_CERT']

@@ -1,15 +1,14 @@
 # -*- coding: utf-8 -*-
-import sys
-import os
-import math
-import random
 import json
+import math
+import os
+import random
+import sys
+from copy import deepcopy
 from datetime import date, timedelta
 from dateutil.relativedelta import relativedelta
-from copy import deepcopy
+from getpass import getpass
 from itertools import cycle
-import six
-from six.moves import input
 
 from django.core.management.base import BaseCommand
 from django.contrib.auth.models import User
@@ -26,7 +25,7 @@ from indicators.models import (
     DisaggregationType,
     DisaggregationLabel
 )
-from workflow.models import Program, Country, Organization, TolaUser, CountryAccess, ProgramAccess
+from workflow.models import Program, Country, Organization, TolaUser, CountryAccess, ProgramAccess, SiteProfile, Sector
 from indicators.views.views_indicators import generate_periodic_targets
 
 
@@ -40,6 +39,7 @@ class Command(BaseCommand):
         parser.add_argument('--clean_tolaland', action='store_true')
         parser.add_argument('--clean_test_users', action='store_true')
         parser.add_argument('--clean_all', action='store_true')
+        parser.add_argument('--create_test_users', action='store_true')
         parser.add_argument('--names')
         parser.add_argument('--named_only', action='store_true')
 
@@ -65,6 +65,11 @@ class Command(BaseCommand):
             self.clean_test_users()
             sys.exit()
 
+        if options['create_test_users']:
+            password = getpass(prompt="Enter the password to use for the test users: ")
+            self.create_test_users(password)
+            sys.exit()
+
         translation.activate(settings.LANGUAGE_CODE)
 
         # Load the levels fixture and get the levels by filtering out the Tiers that are also in that file
@@ -83,6 +88,11 @@ class Command(BaseCommand):
                 'latitude': 21.4, 'longitude': -158, 'zoom': 6, 'organization': org, 'code': 'TO'})
         if created:
             disaggregations = self.create_disaggregations(country)
+        self.create_test_sites()
+        for super_user in TolaUser.objects.filter(user__is_superuser=True):
+            ca, created = CountryAccess.objects.get_or_create(country=country, tolauser=super_user)
+            ca.role = 'basic_admin'
+            ca.save()
 
         main_start_date = (date.today() + relativedelta(months=-18)).replace(day=1)
         main_end_date = (main_start_date + relativedelta(months=+32)).replace(day=1) - timedelta(days=1)
@@ -143,6 +153,8 @@ class Command(BaseCommand):
              'direction': Indicator.DIRECTION_OF_CHANGE_NONE, 'null_level': None},
         ]
 
+        password = getpass(prompt="Enter the password to use for the test users: ")
+
         # Create programs for specific people
 
         if options['names']:
@@ -155,8 +167,8 @@ class Command(BaseCommand):
             program = self.create_program(main_start_date, main_end_date, country, program_name)
             print('Creating Indicators for {}'.format(Program.objects.get(id=program.id)))
             self.create_levels(program.id, filtered_levels)
-            self.create_indicators(program.id, all_params_base)
-            self.create_indicators(program.id, null_supplements_params, apply_skips=False)
+            self.create_indicators(program.id, all_params_base, personal_indicator=True)
+            self.create_indicators(program.id, null_supplements_params, apply_skips=False, personal_indicator=True)
 
         if options['named_only']:
             sys.exit()
@@ -201,7 +213,7 @@ class Command(BaseCommand):
         program = self.create_program(
             main_start_date, main_end_date, country, 'QA Program --- Pre-Satsuma', post_satsuma=False)
         self.create_levels(program.id, filtered_levels)
-        self.create_indicators(program.id, all_params_base, apply_skips=False)
+        self.create_indicators(program.id, all_params_base, apply_skips=False, apply_rf_skips=True)
 
         print('Creating program with no skips')
         program = self.create_program(
@@ -269,16 +281,8 @@ class Command(BaseCommand):
                 self.create_indicators(program.id, short_param_base)
 
         # Create test users and assign broad permissions to superusers.
-        created_users, existing_users = self.create_test_users()
-        if len(created_users) > 0:
-            print('Created the following test users: {}'.format(', '.join(sorted(created_users))))
-        if len(existing_users) > 0:
-            print('The following test users already existed: {}'.format(', '.join(sorted(existing_users))))
+        self.create_test_users(password)
 
-        for super_user in TolaUser.objects.filter(user__is_superuser=True):
-            ca, created = CountryAccess.objects.get_or_create(country=country, tolauser=super_user)
-            ca.role = 'basic_admin'
-            ca.save()
 
     def create_disaggregations(self, country):
         disagg_1 = DisaggregationType(
@@ -386,7 +390,9 @@ class Command(BaseCommand):
     def calc_increment(target, period_count):
         return int(math.ceil((target/period_count)/10)*10)
 
-    def create_indicators(self, program_id, param_sets, indicator_suffix='', apply_skips=True):
+    def create_indicators(
+        self, program_id, param_sets, indicator_suffix='', apply_skips=True, apply_rf_skips=False,
+        personal_indicator=False):
         try:
             sadd_disagg = DisaggregationType.objects.get(pk=109)
         except DisaggregationType.DoesNotExist:
@@ -425,9 +431,26 @@ class Command(BaseCommand):
         old_level_cycle = cycle(old_levels)
 
         rf_levels = list(Level.objects.filter(program__id=program.id))
-        if apply_skips:
+        if apply_rf_skips:
             rf_levels.append(None)
         rf_level_cycle = cycle(rf_levels)
+
+        indicator_types = list(IndicatorType.objects.all())
+        if apply_skips:
+            indicator_types.append(None)
+        type_cycle = cycle(indicator_types)
+
+        sectors = list(Sector.objects.all()[:5])
+        if apply_skips:
+            sectors.append(None)
+        sector_cycle = cycle(sectors)
+
+        sites = list(SiteProfile.objects.filter(country__country="Tolaland"))
+        if apply_skips:
+            sites.append(None)
+        site_cycle = cycle(sites)
+
+
 
         for n, params in enumerate(param_sets):
             if params['is_cumulative']:
@@ -461,10 +484,16 @@ class Command(BaseCommand):
                 program=program,
                 old_level=None if program.results_framework else next(old_level_cycle),
                 level=next(rf_level_cycle),
+                sector=None if not personal_indicator else next(sector_cycle),
             )
             indicator.save()
             if sadd_disagg:
                 indicator.disaggregation.add(sadd_disagg)
+
+            i_type = next(type_cycle)
+            if personal_indicator and i_type:
+                indicator.indicator_type.add(i_type)
+            indicator.save()
             indicator_ids.append(indicator.id)
 
             if params['null_level'] == 'targets':
@@ -579,6 +608,11 @@ class Command(BaseCommand):
                         continue
                     rs.record_name = 'Evidence {} for result id {}'.format(evidence_count, rs.id)
                     rs.evidence_url = 'http://my/evidence/url'
+
+                    r_site = next(site_cycle)
+                    if personal_indicator and r_site:
+                        rs.site.add(r_site)
+
                     rs.save()
 
             indicator.lop_target = lop_target
@@ -607,18 +641,18 @@ class Command(BaseCommand):
             level_map[level_fix['pk']] = level
 
     def clean_test_users(self):
-        for username, profile in six.iteritems(self.user_profiles):
-            try:
-                tola_user_name = ' '.join(profile['first_last'])
-                tola_user = TolaUser.objects.get(name=tola_user_name)
-                auth_user = tola_user.user
-                tola_user.delete()
-                auth_user.delete()
-                print('Deleted user {}'.format(tola_user))
-            except TolaUser.DoesNotExist:
-                # fixes data bug where sometimes a username still exists (i.e. 'mc-low') with no TolaUser:
-                if User.objects.filter(username=username).count() > 0:
-                    User.objects.filter(username=username).delete()
+        for username in self.user_profiles.keys():
+            auth_user = User.objects.filter(username=username)
+            if auth_user.count() == 1:
+                tola_user = TolaUser.objects.filter(user=auth_user[0])
+                auth_user[0].delete()
+            else:
+                print("This auth user doesn't exist: {}".format(username))
+                continue
+
+            if tola_user.count() == 1:
+                tola_user[0].delete()
+
 
     @staticmethod
     def clean_tolaland():
@@ -645,11 +679,10 @@ class Command(BaseCommand):
             else:
                 print('\nPrograms not deleted')
 
-    def create_test_users(self):
-        password = input("Enter the password to use for the test users: ")
+    def create_test_users(self, password):
         created_users = []
         existing_users = []
-        for username, profile in six.iteritems(self.user_profiles):
+        for username, profile in self.user_profiles.items():
             home_country = None
             if profile['home_country']:
                 home_country = Country.objects.get(country=profile['home_country'])
@@ -659,8 +692,13 @@ class Command(BaseCommand):
                 accessible_countries.append(Country.objects.get(country=country_name))
 
             user, created = User.objects.get_or_create(
-                username=username, first_name=profile['first_last'][0], last_name=profile['first_last'][1],
-                email=profile['email'])
+                username=username,
+                defaults={
+                    'first_name': profile['first_last'][0],
+                    'last_name': profile['first_last'][1],
+                    'email': profile['email']
+                }
+            )
             user.set_password(password)
             user.save()
             if created:
@@ -669,10 +707,12 @@ class Command(BaseCommand):
                 existing_users.append(username)
 
             tola_user, created = TolaUser.objects.get_or_create(
-                name=' '.join(profile['first_last']),
-                country=home_country,
                 user=user,
-                organization=profile['org']
+                defaults={
+                    'name': ' '.join(profile['first_last']),
+                    'country': home_country,
+                    'organization': profile['org']
+                }
             )
             tola_user.save()
 
@@ -722,7 +762,24 @@ class Command(BaseCommand):
                 ca.role = 'basic_admin'
                 ca.save()
 
-        return created_users, existing_users
+        if len(created_users) > 0:
+            print('\nCreated the following test users: {}\n'.format(', '.join(sorted(created_users))))
+        if len(existing_users) > 0:
+            print('The following test users already existed: {}\n'.format(', '.join(sorted(existing_users))))
+
+    @staticmethod
+    def create_test_sites():
+        country = Country.objects.get(country="Tolaland")
+        for i in range(1,6):
+            SiteProfile.objects.get_or_create(
+                name="Tolaland Site {}".format(i),
+                country=country,
+                defaults={
+                    "latitude": 21.4 + i/10,
+                    "longitude": -158 + i/10,
+                    "status": i % 2
+                }
+            )
 
     standard_countries = ['Afghanistan', 'Haiti', 'Jordan', 'Tolaland', 'United States']
     TEST_ORG, created = Organization.objects.get_or_create(name='Test')

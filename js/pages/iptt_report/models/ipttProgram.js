@@ -20,7 +20,7 @@ const IPTTPeriod = (
     past: Boolean(periodJSON.past),
     year: periodJSON.year,
     get range() {
-        return this._frequency == 7 ? null : `${this.startLabel} – ${this.endLabel}`;
+        return [2, 7].includes(this._frequency) ? null : `${this.startLabel} – ${this.endLabel}`;
     },
     get name() {
         return this._frequency == 7 ? `${this._name} ${this.year}` : this._name;
