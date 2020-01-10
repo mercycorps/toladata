@@ -1,4 +1,3 @@
-#! /usr/local/bin/python
 
 """
 This script uses GitHub APIs to fetch a list of issues associated with a project.
@@ -24,28 +23,28 @@ parser.add_argument('--column', help='the column name of the tickets you want to
 parser.add_argument('--closeissues', action='store_true', help='Close all of the issues in the column')
 args = parser.parse_args()
 
-project_name = raw_input('Enter the project name: ')
-print '\nEnter 1 to use GitHub token authorization (https://github.com/settings/tokens)'
-print 'Enter 2 to use GitHub username and password: '
-auth_pref = raw_input('Enter 1 or 2: ')
+project_name = input('Enter the project name: ')
+print('\nEnter 1 to use GitHub token authorization (https://github.com/settings/tokens)')
+print('Enter 2 to use GitHub username and password: ')
+auth_pref = input('Enter 1 or 2: ')
 if auth_pref == '1':
     CONFIG_PATH = os.path.abspath(os.path.join(os.path.abspath(__file__), os.pardir, os.pardir, 'config', 'settings.secret.yml'))
     with open(CONFIG_PATH, 'r') as fh:
-        app_settings = yaml.load(fh, Loader=yaml.FullLoader)
+        app_settings = yaml.full_load(fh)
     try:
         token = app_settings['GITHUB_TOKEN']
-        print 'Found your GitHub key in the settings file\n'
+        print('Found your GitHub key in the settings file\n')
     except KeyError:
         token = getpass.getpass('GitHub token: ')
     headers['Authorization'] = 'token %s' % token
     auth = ''
 elif auth_pref == '2':
-    username = raw_input('GitHub username: ')
+    username = input('GitHub username: ')
     password = getpass.getpass('GitHub password: ')
     auth = HTTPBasicAuth(username, password)
 else:
-    print type(auth_pref)
-    print 'You must choose either 1 or 2.  You chose %s. Exiting.' % auth_pref
+    print (type(auth_pref))
+    print('You must choose either 1 or 2.  You chose %s. Exiting.' % auth_pref)
     sys.exit()
 
 projects_url = 'https://api.github.com/repos/mercycorps/TolaActivity/projects'
@@ -54,7 +53,7 @@ cards_template = 'https://api.github.com/projects/columns/{}/cards'
 issue_template = 'https://api.github.com/repos/mercycorps/TolaActivity/issues/{}'
 
 # Get the project id
-print 'Fetching data'
+print('Fetching data')
 response = requests.get(projects_url, headers=headers, auth=auth)
 projects = json.loads(response.text)
 project_id = ''
@@ -63,14 +62,14 @@ for project in projects:
     try:
         pname = project['name'].strip()
     except TypeError:
-        print 'Exiting, failed to process this project:'
-        print project
+        print('Exiting, failed to process this project:')
+        print(project)
         sys.exit()
     if project_name == pname:
         project_id = project['id']
         break
 else:
-    print "The project you entered couldn't be found in the list of your available projects. Exiting."
+    print("The project you entered couldn't be found in the list of your available projects. Exiting.")
     sys.exit()
 
 # Get the columns ids associated with the project
@@ -93,7 +92,11 @@ for col_id in column_ids:
         cards_url = cards_url_partial.format(page_num)
         cards_response = requests.get(cards_url, headers=headers, auth=auth)
         for card in json.loads(cards_response.text):
-            match = re.search('(\d+)$', card['content_url'])
+            # If there is a note in the column, it will not have a content url and can be skipped
+            try:
+                match = re.search('(\d+)$', card['content_url'])
+            except KeyError:
+                continue
             issue_num = match.group(1)
             issue_url = issue_template.format(issue_num)
             issue_response = requests.get(issue_url, headers=headers, auth=auth)
@@ -108,8 +111,8 @@ for col_id in column_ids:
 
 if issues:
     issues.sort(key=lambda k: int(k[0]), reverse=True)
-    print ''
+    print('')
     for i in issues:
-        print '#%s - %s' % i
+        print('#%s - %s' % i)
 else:
-    print "No cards in the column(s)", ', '.join(cols_to_fetch)
+    print("No cards in the column(s)", ', '.join(cols_to_fetch))

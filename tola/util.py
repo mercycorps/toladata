@@ -7,6 +7,7 @@ import datetime
 
 from workflow.models import Country, TolaUser
 from django.db.models import Q
+from django.conf import settings
 from django.contrib.auth.models import User
 from django.core.mail import mail_admins, EmailMessage
 from django.core.exceptions import PermissionDenied
@@ -60,7 +61,6 @@ def emailGroup(country, group, link, subject, message, submitter=None):
         to = [str(item) for item in getGroupEmails]
         if submitter:
             to.append(submitter)
-        print(to)
 
         email = EmailMessage(subject, message, 'systems@mercycorps.org', to)
 
@@ -123,17 +123,19 @@ def get_GAIT_data(gait_ids):
     """
     May throw requests.exceptions.RequestException
     """
-
     cleaned_ids = []
     for gait_id in gait_ids:
         try:
             cleaned_ids.append(str(int(gait_id)))
         except ValueError:
             pass
-    base_url = 'https://mcapi.mercycorps.org/gaitprogram/?gaitids='
 
-    response = requests.get(base_url + ','.join(cleaned_ids))
-    return json.loads(response.content)
+    base_url = settings.PROGRAM_API_BASE_URL
+    params = {'gaitid': ','.join(cleaned_ids)}
+    headers = {'Authorization': 'Token {}'.format(settings.PROGRAM_API_TOKEN)}
+    response = requests.get(base_url, params=params, headers=headers)
+
+    return json.loads(response.content)['results']
 
 def get_dates_from_gait_response(gait_response):
     """take a gait response (from get_GAIT_data) and parse out start and end dates, return dict"""
@@ -157,7 +159,7 @@ def append_GAIT_dates(program):
     try:
         gait_data = get_GAIT_data([program.gaitid])
     except requests.exceptions.RequestException:
-        logger.exception('Error reaching GAIT service')
+        logger.exception('Error reaching GAIT service. ')
         # Translators: There was a network or server error trying to reach the GAIT service
         return _('There was a problem connecting to the GAIT server.')
 

@@ -13,7 +13,7 @@
     {% regroup results by program as program_list %}
 
     {% for program in program_list %}
-        <h3><a href="{% url "default_custom_dashboard" program.grouper.id %}">{{ program.grouper }}</a></h3>
+        <h3><a href="{% url 'program_page' program.grouper.id %}">{{ program.grouper }}</a></h3>
         <table class="table mb-4">
             <tr class="">
                 <th>{% trans "Achieved" %}</th>
@@ -32,5 +32,7 @@
                 {%  endfor %}
             {% endfor %}
         </table>
+    {% empty %}
+    {% trans "There is no indicator data for this site." %}
     {% endfor %}
 {% endblock content %}
