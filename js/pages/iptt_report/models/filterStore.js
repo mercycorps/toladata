@@ -443,11 +443,23 @@ export default (
                 indicator => Array.from(indicator._disaggregationPks.values())
             ).reduce((a, b) => a.concat(b), [])),
             ...this._indicatorFilters.disaggregations];
-            return this.programFilterData ?
-                    Array.from(this.programFilterData.disaggregations.values())
-                        .filter(disaggregation => disaggregationPks.includes(disaggregation.pk))
-                        .map(disaggregation => ({value: disaggregation.pk, label: disaggregation.name})) :
-                    [BLANK_OPTION];
+            if (!this.programFilterData) {
+                return [BLANK_OPTION];
+            }
+            let disaggregationOptions = Array.from(this.programFilterData.disaggregations.values())
+                                                .filter(disaggregation => disaggregationPks.includes(disaggregation.pk))
+                                                .map(disaggregation => ({value: disaggregation.pk, label: disaggregation.name, country: disaggregation.country}));
+            let countries = [...new Set(disaggregationOptions.map(option => option.country))].filter(country => country !== null).sort();
+            let optgroups = [];
+            if (disaggregationOptions.filter(option => option.country === null).length > 0) {
+                optgroups.push({label: gettext('Global disaggregations'), options: disaggregationOptions.filter(option => option.country === null)});
+            }
+            countries.forEach(
+                country => {
+                    optgroups.push({label: country, options:disaggregationOptions.filter(option => option.country === country)});
+                }
+            );
+            return optgroups;
         },
         get currentDisaggregations() {
             let disaggregationPks = (this._indicatorFilters.disaggregations && this._indicatorFilters.disaggregations.length > 0)
