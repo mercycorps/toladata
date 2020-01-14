@@ -31,6 +31,24 @@ const LevelSelect = inject('filterStore')(
 );
 
 /**
+ * input-ready multi-select checkbox widget for filtering IPTT report by disaggregations
+ */
+const DisaggregationSelect = inject('filterStore')(
+    observer(({ filterStore }) => {
+        return <MultiSelectCheckbox
+                    label={
+                        /* # Translators: labels sites that a data could be collected at */
+                        gettext('Disaggregations')
+                    }
+                    options={ filterStore.disaggregationOptions }
+                    value={ filterStore.disaggregationFilters }
+                    update={ selected => {filterStore.disaggregationFilters = selected.map(s => s.value);} }
+                />;
+    })
+);
+
+
+/**
  * multi-select checkbox for selecting sites for filtering IPTT */
 const SiteSelect = inject('filterStore')(
     observer(({ filterStore }) => {
@@ -96,4 +114,4 @@ const IndicatorSelect = inject('filterStore')(
                 />;
     })
 );
-export { LevelSelect, SiteSelect, TypeSelect, SectorSelect, IndicatorSelect };
+export { LevelSelect, DisaggregationSelect, SiteSelect, TypeSelect, SectorSelect, IndicatorSelect };

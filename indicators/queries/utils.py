@@ -3,7 +3,8 @@
 from indicators.models import (
     Indicator,
     Result,
-    PeriodicTarget
+    PeriodicTarget,
+    DisaggregatedValue
 )
 from django.db import models
 
@@ -56,13 +57,16 @@ def indicator_lop_actual_progress_annotation():
         - only data associated with active periodic targets
         - summed if NUMBER, latest if PERCENTAGE
     """
+    result_set = Result.objects.select_related(None).prefetch_related(None).filter(
+        periodic_target__isnull=False,
+        indicator=models.OuterRef('pk')
+    )
     return models.Case(
         models.When(
             models.Q(
                 models.Q(
                     models.Q(
                         models.Q(target_frequency=Indicator.LOP) &
-                        # models.Q(program__reporting_period_end__lte=models.functions.Now())
                         models.Q(program__reporting_period_end__lt=UTCNow())
                     ) |
                     models.Q(target_frequency__in=[Indicator.MID_END, Indicator.EVENT])
@@ -70,26 +74,19 @@ def indicator_lop_actual_progress_annotation():
                 models.Q(unit_of_measure_type=Indicator.PERCENTAGE)
                 ),
             then=models.Subquery(
-                Result.objects.select_related(None).prefetch_related(None).filter(
-                    periodic_target__isnull=False,
-                    indicator=models.OuterRef('pk')
-                ).order_by('-date_collected').values('achieved')[:1]
+                result_set.order_by('-date_collected').values('achieved')[:1]
             )
         ),
         models.When(
             models.Q(
                 models.Q(
                     models.Q(target_frequency=Indicator.LOP) &
-                    # models.Q(program__reporting_period_end__lte=models.functions.Now())
                     models.Q(program__reporting_period_end__lt=UTCNow())
                 ) |
                 models.Q(target_frequency__in=[Indicator.MID_END, Indicator.EVENT])
             ),
             then=models.Subquery(
-                Result.objects.select_related(None).prefetch_related(None).filter(
-                    periodic_target__isnull=False,
-                    indicator=models.OuterRef('pk')
-                ).order_by().values('indicator').annotate(
+                result_set.order_by().values('indicator').annotate(
                     actual_sum=models.Sum('achieved')
                 ).values('actual_sum')[:1]
             )
@@ -100,9 +97,7 @@ def indicator_lop_actual_progress_annotation():
                 models.Q(unit_of_measure_type=Indicator.PERCENTAGE)
                 ),
             then=models.Subquery(
-                Result.objects.select_related(None).prefetch_related(None).filter(
-                    models.Q(periodic_target__isnull=False) &
-                    models.Q(indicator=models.OuterRef('pk')) &
+                result_set.filter(
                     models.Q(periodic_target__end_date__lt=UTCNow())
                 ).order_by('-date_collected').values('achieved')[:1]
             )
@@ -110,10 +105,7 @@ def indicator_lop_actual_progress_annotation():
         models.When(
             target_frequency__in=[f[0] for f in TIME_AWARE_FREQUENCIES],
             then=models.Subquery(
-                Result.objects.select_related(None).prefetch_related(None).filter(
-                    models.Q(periodic_target__isnull=False) &
-                    models.Q(indicator=models.OuterRef('pk')) &
-                    # models.Q(periodic_target__end_date__lt=models.functions.Now())
+                result_set.filter(
                     models.Q(periodic_target__end_date__lt=UTCNow())
                 ).order_by().values('indicator').annotate(
                     actual_sum=models.Sum('achieved')
@@ -123,6 +115,7 @@ def indicator_lop_actual_progress_annotation():
         default=models.Value(None),
         output_field=models.DecimalField(decimal_places=2)
     )
+    
 
 def indicator_lop_target_progress_annotation():
     """ target progress:
@@ -344,32 +337,53 @@ def indicator_lop_target_calculated_annotation():
         )
     )
 
-
-def indicator_lop_actual_annotation():
-    """annotates an indicator with the value for the results table Life of Program Actual field
-       NOT FOR progress measurement, does not take into account completed/active periods"""
-
+def _lop_actual_annotation(result_set):
+    """takes a set of results annotated with 'this_value' (either achieved or a disaggregation) and returns
+    
+    life of program actual progress for that value"""
     return models.Case(
         models.When(
             unit_of_measure_type=Indicator.PERCENTAGE,
             then=models.Subquery(
-                Result.objects.select_related(None).prefetch_related(None).filter(
-                    periodic_target__isnull=False,
-                    indicator=models.OuterRef('pk')
-                ).order_by('-date_collected').values('achieved')[:1]
+                result_set.order_by('-date_collected').values('this_value')[:1]
                 )
             ),
         default=models.Subquery(
-            Result.objects.select_related(None).prefetch_related(None).filter(
-                periodic_target__isnull=False,
-                indicator=models.OuterRef('pk')
-            ).order_by().values('indicator').annotate(
-                achieved_sum=models.Sum('achieved')
-            ).values('achieved_sum')[:1]
-            ),
+            result_set.order_by().values('indicator').annotate(
+                achieved_sum=models.Sum('this_value')
+            ).values('achieved_sum')[:1]),
         output_field=models.DecimalField(decimal_places=2)
         )
 
+def indicator_lop_actual_annotation():
+    """annotates an indicator with the value for the results table Life of Program Actual field
+       NOT FOR progress measurement, does not take into account completed/active periods"""
+    result_set = Result.objects.select_related(None).prefetch_related(None).filter(
+        periodic_target__isnull=False,
+        indicator=models.OuterRef('pk')
+    ).annotate(
+        this_value=models.F('achieved')
+    )
+    return _lop_actual_annotation(result_set)
+    
+
+def indicator_disaggregated_lop_actual_annotation(disaggregation_category_pk):
+    """actual values for a disaggregation category:
+        - only data associated with active periodic targets
+        - summed if NUMBER, latest if PERCENTAGE
+    """
+    result_set = Result.objects.select_related(None).prefetch_related(None).filter(
+        periodic_target__isnull=False,
+        indicator=models.OuterRef('pk')
+    ).annotate(
+        this_value=models.Subquery(
+            DisaggregatedValue.objects.select_related(None).prefetch_related(None).filter(
+                category_id=disaggregation_category_pk,
+                result_id=models.OuterRef('pk')
+            ).values('value')[:1]
+        )
+    )
+    return _lop_actual_annotation(result_set)
 
 def indicator_lop_percent_met_annotation():
     """annotates an indicator with the percent met using:
@@ -388,22 +402,19 @@ def indicator_lop_percent_met_annotation():
         )
     )
 
-
-def timeaware_value_annotation(period):
-    values_subquery = Result.objects.select_related(None).prefetch_related(None).filter(
-        periodic_target__isnull=False,
-        indicator=models.OuterRef('pk'),
-        date_collected__lte=period['end']
-    ).order_by('-date_collected')
+def _period_value_annotation(result_set, period):
     return models.Case(
         models.When(
             unit_of_measure_type=Indicator.PERCENTAGE,
-            then=models.Subquery(values_subquery.filter(date_collected__gte=period['start']).values('achieved')[:1])
+            then=models.Subquery(
+                result_set.filter(
+                    date_collected__gte=period['start']
+                ).order_by('-date_collected').values('this_value')[:1])
         ),
         models.When(
             is_cumulative=True,
             then=models.Subquery(
-                values_subquery.order_by().values('indicator').annotate(
+                result_set.order_by().values('indicator').annotate(
                     this_period_count=models.Sum(
                         models.Case(
                             models.When(
@@ -416,7 +427,7 @@ def timeaware_value_annotation(period):
                         achieved_sum=models.Case(
                             models.When(
                                 this_period_count__gt=0,
-                                then=models.Sum('achieved')
+                                then=models.Sum('this_value')
                             ),
                             default=models.Value(None)
                         )
@@ -424,12 +435,41 @@ def timeaware_value_annotation(period):
             )
         ),
         default=models.Subquery(
-            values_subquery.order_by().filter(
+            result_set.order_by().filter(
                 date_collected__gte=period['start']
-            ).values('indicator').annotate(achieved_sum=models.Sum('achieved')).values('achieved_sum')[:1]
+            ).values('indicator').annotate(
+                achieved_sum=models.Sum('this_value')
+            ).values('achieved_sum')[:1]
         ),
         output_field=models.DecimalField(decimal_places=2)
     )
+
+def timeaware_value_annotation(period):
+    result_set = Result.objects.select_related(None).prefetch_related(None).filter(
+        periodic_target__isnull=False,
+        indicator=models.OuterRef('pk'),
+        date_collected__lte=period['end']
+    ).annotate(
+        this_value=models.F('achieved')
+    )
+    return _period_value_annotation(result_set, period)
+    
+
+def timeaware_disaggregated_value_annotation(category_pk, period):
+    result_set = Result.objects.select_related(None).prefetch_related(None).filter(
+        periodic_target__isnull=False,
+        indicator=models.OuterRef('pk'),
+        date_collected__lte=period['end']
+    ).annotate(
+        this_value=models.Subquery(
+            DisaggregatedValue.objects.select_related(None).prefetch_related(None).filter(
+                category_id=category_pk,
+                result_id=models.OuterRef('pk')
+            ).values('value')[:1]
+        )
+    )
+    return _period_value_annotation(result_set, period)
+
 
 def targets_count_annotation():
     return models.Count('periodictargets')
@@ -455,21 +495,17 @@ def mid_end_target_annotation(count):
         ).values('target')[:1]
     )
 
-def mid_end_value_annotation(count):
-    values_subquery = Result.objects.select_related(None).prefetch_related(None).filter(
-        periodic_target__isnull=False,
-        indicator=models.OuterRef('pk'),
-        periodic_target__customsort__lte=count
-    ).order_by('-date_collected')
+def _mid_end_annotation(result_set, count):
     return models.Case(
         models.When(
             unit_of_measure_type=Indicator.PERCENTAGE,
-            then=models.Subquery(values_subquery.filter(periodic_target__customsort=count).values('achieved')[:1])
+            then=models.Subquery(
+                result_set.filter(periodic_target__customsort=count).order_by('-date_collected').values('this_value')[:1])
         ),
         models.When(
             is_cumulative=True,
             then=models.Subquery(
-                values_subquery.order_by().values('indicator').annotate(
+                result_set.order_by().values('indicator').annotate(
                     this_period_count=models.Sum(
                         models.Case(
                             models.When(
@@ -482,7 +518,7 @@ def mid_end_value_annotation(count):
                         achieved_sum=models.Case(
                             models.When(
                                 this_period_count__gt=0,
-                                then=models.Sum('achieved')
+                                then=models.Sum('this_value')
                             ),
                             default=models.Value(None)
                         )
@@ -490,12 +526,37 @@ def mid_end_value_annotation(count):
             )
         ),
         default=models.Subquery(
-            values_subquery.order_by().filter(
+            result_set.order_by().filter(
                 periodic_target__customsort=count
-            ).values('indicator').annotate(achieved_sum=models.Sum('achieved')).values('achieved_sum')[:1]
+            ).values('indicator').annotate(achieved_sum=models.Sum('this_value')).values('achieved_sum')[:1]
         ),
         output_field=models.DecimalField(decimal_places=2)
     )
+
+def mid_end_value_annotation(count):
+    result_set = Result.objects.select_related(None).prefetch_related(None).filter(
+        periodic_target__isnull=False,
+        indicator=models.OuterRef('pk'),
+        periodic_target__customsort__lte=count
+    ).annotate(
+        this_value=models.F('achieved')
+    )
+    return _mid_end_annotation(result_set, count)
+
+def mid_end_disaggregated_value_annotation(category_pk, count):
+    result_set = Result.objects.select_related(None).prefetch_related(None).filter(
+        periodic_target__isnull=False,
+        indicator=models.OuterRef('pk'),
+        periodic_target__customsort__lte=count
+    ).annotate(
+        this_value=models.Subquery(
+            DisaggregatedValue.objects.select_related(None).prefetch_related(None).filter(
+                category_id=category_pk,
+                result_id=models.OuterRef('pk')
+            ).values('value')[:1]
+        )
+    )
+    return _mid_end_annotation(result_set, count)
 
 def indicator_get_program_months_annotation():
     """annotates an indicator with the number of months in the associated program

@@ -10,8 +10,18 @@ from workflow.serializers_new import (
 )
 from workflow.models import Program
 from indicators.models import Indicator
-from factories.workflow_models import RFProgramFactory, SectorFactory, SiteProfileFactory
-from factories.indicators_models import RFIndicatorFactory, LevelFactory, IndicatorTypeFactory
+from factories.workflow_models import (
+    RFProgramFactory,
+    SectorFactory,
+    SiteProfileFactory,
+    CountryFactory,
+)
+from factories.indicators_models import (
+    RFIndicatorFactory,
+    LevelFactory,
+    IndicatorTypeFactory,
+    DisaggregationTypeFactory,
+)
 from django import test
 from django.utils import translation
 
@@ -145,6 +155,7 @@ class TestIPTTProgramSerializerFilterData(test.TestCase):
         self.assertEqual(data['sectors'], [])
         self.assertEqual(data['indicator_types'], [])
         self.assertEqual(data['sites'], [])
+        self.assertEqual(data['disaggregations'], [])
 
     def test_one_sector(self):
         program = RFProgramFactory()
@@ -259,6 +270,112 @@ class TestIPTTProgramSerializerFilterData(test.TestCase):
             set(std['pk'] for std in data['sites']),
             set([site.pk, site1.pk, site2.pk])
         )
+
+    def test_one_country_disaggregation_type(self):
+        country = CountryFactory(country="TestTown", code="TT")
+        program = RFProgramFactory()
+        program.country.add(country)
+        country_dt = DisaggregationTypeFactory(
+            disaggregation_type="Test Disaggregation", country=country, standard=False,
+            labels=["Test Label 1", "Test Label 2", "Test Label 3"]
+        )
+        indicator = RFIndicatorFactory(program=program)
+        indicator.disaggregation.set([country_dt])
+        data = get_serialized_data(program.pk)
+        self.assertEqual(len(data['disaggregations']), 1)
+        disagg_data = data['disaggregations'][0]
+        self.assertEqual(disagg_data['pk'], country_dt.pk)
+        self.assertEqual(disagg_data['name'], "Test Disaggregation")
+        self.assertEqual(disagg_data['labels'][0]['name'], "Test Label 1")
+
+    def test_one_standard_disaggregation_type(self):
+        standard_dt = DisaggregationTypeFactory(
+            disaggregation_type="Test Standard Disagg", country=None, standard=True,
+            labels=["Test Standard One Label"]
+        )
+        indicator = RFIndicatorFactory(program=RFProgramFactory())
+        indicator.disaggregation.set([standard_dt])
+        data = get_serialized_data(indicator.program.pk)
+        self.assertEqual(data['disaggregations'][0]['pk'], standard_dt.pk)
+        self.assertEqual(data['disaggregations'][0]['name'], 'Test Standard Disagg')
+
+    def test_special_characters_disaggregation_type(self):
+        special_chars = "Spéçîål Charäcterß"
+        special_chars_dt = DisaggregationTypeFactory(
+            disaggregation_type=special_chars, country=None, standard=True,
+            labels=["{} 1".format(special_chars), "{} 2".format(special_chars)]
+        )
+        indicator = RFIndicatorFactory(program=RFProgramFactory())
+        indicator.disaggregation.set([special_chars_dt])
+        data = get_serialized_data(indicator.program.pk)
+        self.assertEqual(data['disaggregations'][0]['name'], special_chars)
+
+    def test_one_disaggregation_type_duplicated(self):
+        standard_dt = DisaggregationTypeFactory(
+            disaggregation_type="Test Standard Disagg", country=None, standard=True,
+            labels=["Test Standard One Label"]
+        )
+        indicator1 = RFIndicatorFactory(program=RFProgramFactory())
+        indicator1.disaggregation.set([standard_dt])
+        indicator2 = RFIndicatorFactory(program=RFProgramFactory())
+        indicator2.disaggregation.set([standard_dt])
+        data = get_serialized_data(indicator1.program.pk)
+        self.assertEqual(len(data['disaggregations']), 1)
+        self.assertEqual(data['disaggregations'][0]['pk'], standard_dt.pk)
+
+    def test_multiple_disaggregation_types(self):
+        country = CountryFactory(country="TestTown", code="TT")
+        program = RFProgramFactory()
+        program.country.add(country)
+        country_dt1 = DisaggregationTypeFactory(
+            disaggregation_type="Test Disaggregation", country=country, standard=False,
+            labels=["Test Label 1", "Test Label 2", "Test Label 3"]
+        )
+        country_dt2 = DisaggregationTypeFactory(
+            disaggregation_type="Test Disaggregation 2", country=country, standard=False,
+            selected_by_default=True,
+            labels=["Test Really really really really really really really really long Label 1", "Test Label 2"]
+        )
+        standard_dt1 = DisaggregationTypeFactory(
+            disaggregation_type="Test Standard Disagg", country=None, standard=True,
+            labels=["Test Standard One Label"]
+        )
+        standard_dt2 = DisaggregationTypeFactory(
+            disaggregation_type="Test Standard Disagg 2", country=None, standard=True,
+            labels=["Test Standard Four Label 1", "Test Standard Four Label 2",
+                    "Test Standard Four Label 3", "Test Standard Four Label 4", ]
+        )
+        indicator = RFIndicatorFactory(program=program)
+        indicator.disaggregation.set([country_dt1, country_dt2])
+        indicator2 = RFIndicatorFactory(program=program)
+        indicator2.disaggregation.set([country_dt1, standard_dt1])
+        indicator3 = RFIndicatorFactory(program=program)
+        indicator3.disaggregation.set([standard_dt2])
+        data = get_serialized_data(program.pk)
+        self.assertEqual(len(data['disaggregations']), 4, data['disaggregations'])
+
+    def test_country_disaggregation_unassigned_to_program_does_not_show_up(self):
+        country = CountryFactory(country="TestTown", code="TT")
+        program = RFProgramFactory()
+        program.country.add(country)
+        country_dt = DisaggregationTypeFactory(
+            disaggregation_type="Test Disaggregation", country=country, standard=False,
+            labels=["Test Label 1", "Test Label 2", "Test Label 3"]
+        )
+        indicator = RFIndicatorFactory(program=program)
+        indicator.disaggregation.set([])
+        data = get_serialized_data(program.pk)
+        self.assertEqual(len(data['disaggregations']), 0)
+
+    def test_standard_disaggregation_unassigned_to_program_does_not_show_up(self):
+        standard_dt = DisaggregationTypeFactory(
+            disaggregation_type="Test Standard Disagg", country=None, standard=True,
+            labels=["Test Standard One Label"]
+        )
+        indicator = RFIndicatorFactory(program=RFProgramFactory())
+        indicator.disaggregation.set([])
+        data = get_serialized_data(indicator.program.pk)
+        self.assertEqual(len(data['disaggregations']), 0)
 
 
 class TestIPTTProgramSerializerPeriodData(test.TestCase):

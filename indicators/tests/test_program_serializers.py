@@ -24,4 +24,7 @@ from indicators.tests.serializer_tests import (
     TestIPTTProgramSerializerFilterData,
     TestIPTTProgramSerializerPeriodData,
     TestIPTTEndpoint,
+    TestIPTTReportLOPValues,
+    TestIPTTReportTPPeriodValues,
+    TestIPTTReportTVAPeriodValues,
 )

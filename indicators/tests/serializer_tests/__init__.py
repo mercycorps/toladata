@@ -10,3 +10,4 @@ from indicators.tests.serializer_tests.iptt_qs_program_serializer import *
 from indicators.tests.serializer_tests.iptt_indicator_serializer import *
 from indicators.tests.serializer_tests.iptt_program_serializer import *
 from indicators.tests.serializer_tests.iptt_endpoints import *
+from indicators.tests.serializer_tests.iptt_report_serializer import *

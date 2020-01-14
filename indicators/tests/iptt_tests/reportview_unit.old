@@ -30,7 +30,6 @@ class TestIPTTReportviewURL(test.TestCase):
 
     def test_get(self):
         """Does get return 200 and the right template?"""
-
         url_kwargs = {
             'program': self.program.id,
             'reporttype': 'targetperiods',

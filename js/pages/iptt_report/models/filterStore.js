@@ -438,6 +438,35 @@ export default (
         set siteFilters(siteFilterValues = []) {
             this._indicatorFilters.sites = siteFilterValues.map(v => parseInt(v));
         },
+        get disaggregationOptions() {
+            let disaggregationPks = [...new Set(this.getAllIndicators('disaggregations').map(
+                indicator => Array.from(indicator._disaggregationPks.values())
+            ).reduce((a, b) => a.concat(b), [])),
+            ...this._indicatorFilters.disaggregations];
+            return this.programFilterData ?
+                    Array.from(this.programFilterData.disaggregations.values())
+                        .filter(disaggregation => disaggregationPks.includes(disaggregation.pk))
+                        .map(disaggregation => ({value: disaggregation.pk, label: disaggregation.name})) :
+                    [BLANK_OPTION];
+        },
+        get currentDisaggregations() {
+            let disaggregationPks = (this._indicatorFilters.disaggregations && this._indicatorFilters.disaggregations.length > 0)
+                ? this._indicatorFilters.disaggregations
+                : [...new Set(this.getAllIndicators('disaggregations').map(
+                        indicator => Array.from(indicator._disaggregationPks.values())
+                    ).reduce((a, b) => a.concat(b), []))];
+            return this.programFilterData ?
+                Array.from(this.programFilterData.disaggregations.values())
+                    .filter(disaggregation => disaggregationPks.includes(disaggregation.pk))
+                    .sort((disagg_a, disagg_b) => (disagg_a.name > disagg_b.name) ? 1 : -1)
+                    .map(disaggregation => disaggregation.pk) : []  
+        },
+        get disaggregationFilters() {
+            return this.disaggregationOptions.filter(option => this._indicatorFilters.disaggregations.includes(option.value));
+        },
+        set disaggregationFilters(disaggregationFilterValues = []) {
+            this._indicatorFilters.disaggregations = disaggregationFilterValues.map(v => parseInt(v));
+        },
         get indicatorTypeOptions() {
             let typePks = [...new Set(this.getAllIndicators('types').map(
                 indicator => Array.from(indicator._typePks.values())
@@ -492,6 +521,14 @@ export default (
             }
             return indicators;
         },
+        _filterDisaggregations(indicators) {
+            if (this._indicatorFilters.disaggregations && this._indicatorFilters.disaggregations.length > 0) {
+                indicators = indicators.filter(
+                    indicator => this._indicatorFilters.disaggregations.some(disaggregationPk => indicator.hasDisaggregation(disaggregationPk))
+                );
+            }
+            return indicators;
+        },
         _filterIndicatorTypes(indicators) {
             if (this._indicatorFilters.indicatorTypes && this._indicatorFilters.indicatorTypes.length > 0) {
                 indicators = indicators.filter(
@@ -520,6 +557,9 @@ export default (
             indicators = this._filterFrequency(indicators);
             if (skip != 'levels') {
                 indicators = this._filterLevelTiers(indicators);
+            }
+            if (skip != 'disaggregations') {
+                indicators = this._filterDisaggregations(indicators);
             }
             if (skip != 'sites') {
                 indicators = this._filterSites(indicators);
@@ -609,6 +649,7 @@ export default (
                 levels: [],
                 tiers: [],
                 oldLevels: [],
+                disaggregations: [],
                 sectors: [],
                 sites: [],
                 indicatorTypes: [],
@@ -677,6 +718,7 @@ export default (
     filterStore.groupBy = filterStore._router.groupBy;
     filterStore.sectorFilters = filterStore._router.sectors;
     filterStore.siteFilters = filterStore._router.sites;
+    filterStore.disaggregationFilters = filterStore._router.disaggregations;
     filterStore.indicatorTypeFilters = filterStore._router.types;
     filterStore.indicatorFilters = filterStore._router.indicators;
     filterStore.levelTierFilters = {
