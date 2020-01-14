@@ -1,1 +1,1 @@
-from indicators.tests.iptt_tests.tp_annotations import *
+#from indicators.tests.iptt_tests.tp_annotations import *
