@@ -23,7 +23,25 @@ const getIndicatorReport = (
         ))),
     get periodValues() {
         return Array.from(this._reportData.values());
+    },
+    _disaggregatedData: observable(new Map(Object.entries(indicatorReportJSON.disaggregated_data || {})
+                                           .map(([disaggregationPk, disaggregationJSON]) => [parseInt(disaggregationPk), disaggregationJSON]))),
+    disaggregatedLop(disaggregationPk) {
+        return (!isNaN(parseInt(disaggregationPk)) && this._disaggregatedData.has(parseInt(disaggregationPk))) ?
+                this._disaggregatedData.get(parseInt(disaggregationPk)).lop_actual : null;
+    },
+    _disaggregatedReportData: observable(new Map(Object.entries(indicatorReportJSON.disaggregated_report_data || {})
+                                                 .map(([disaggregationPk, disaggregationJSON]) => [parseInt(disaggregationPk), disaggregationJSON]))),
+    disaggregatedPeriodValues(disaggregationPk) {
+        return (!isNaN(parseInt(disaggregationPk)) && this._disaggregatedReportData.has(parseInt(disaggregationPk))) ?
+                this._disaggregatedReportData.get(parseInt(disaggregationPk)) : [];
     }
+    //_disaggregatedReportData: observable(new Map(Object.entries((indicatorReportJSON.disaggregated_report_data || {}))
+    //                                             .map((disaggregationPk, disaggregatedJSON) => {
+    //                                                return [parseInt(disaggregationPk),
+    //                                                        new Map(disaggregatedJSON.map(disaggJSON => [parseInt(disaggJSON.index), disaggJSON]))];
+    //                                             }))),
+    
 });
 
 
