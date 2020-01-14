@@ -27,9 +27,9 @@ from factories.workflow_models import RFProgramFactory, CountryFactory
 
 
 def get_tp_report_data(indicator, frequency):
-    return IPTTTPReportIndicatorSerializer.load_report(
+    return [report for report in IPTTTPReportIndicatorSerializer.load_report(
         indicator.program.pk, frequency
-        )[0]
+        ) if report['pk'] == indicator.pk][0]
 
 
 def get_tp_annotated_indicator(indicator, frequency):
@@ -476,6 +476,24 @@ class TestIPTTReportTPPeriodValues(test.TestCase):
         self.assertEqual(disaggregated_report_data[country_disaggregation.labels[0].pk][1]['actual'], None)
         self.assertEqual(disaggregated_report_data[country_disaggregation.labels[1].pk][0]['actual'], None)
         self.assertEqual(disaggregated_report_data[country_disaggregation.labels[1].pk][1]['actual'], None)
+
+    def test_extraneous_disaggregations_excluded(self):
+        other_indicator = RFIndicatorFactory(program=self.program, targets=500, target_frequency=Indicator.ANNUAL,
+                                       unit_of_measure_type=Indicator.PERCENTAGE)
+        standard_disaggregation = add_standard_disaggregation(other_indicator)
+        result = get_result(other_indicator, 140, target_period=1)
+        get_disaggregated_value(result, standard_disaggregation, [1, 139])
+        indicator = RFIndicatorFactory(program=self.program, targets=500, target_frequency=Indicator.ANNUAL,
+                                       unit_of_measure_type=Indicator.PERCENTAGE)
+        country_disaggregation = add_country_disaggregation(indicator, self.country)
+        result2 = get_result(indicator, 100, target_period=1)
+        get_disaggregated_value(result2, country_disaggregation, [40, 60])
+        disaggregated_report_data = get_tp_report_data(indicator, Indicator.ANNUAL)['disaggregated_report_data']
+        self.assertIn(country_disaggregation.labels[0].pk, disaggregated_report_data)
+        self.assertNotIn(standard_disaggregation.labels[0].pk, disaggregated_report_data)
+        disaggregated_data = get_tp_report_data(indicator, Indicator.ANNUAL)['disaggregated_data']
+        self.assertIn(country_disaggregation.labels[0].pk, disaggregated_data)
+        self.assertNotIn(standard_disaggregation.labels[0].pk, disaggregated_data)
 
 
 class TestIPTTReportTVAPeriodValues(test.TestCase):
