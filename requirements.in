@@ -1,9 +1,9 @@
 Django>=2.2,<3
-dateparser==0.7.1
-beautifulsoup4==4.8.0
-django-admin-sortable2==0.7.3
+dateparser
+beautifulsoup4
+django-admin-sortable2
 django-ckeditor
-django-crispy-forms==1.7.2
+django-crispy-forms
 django-daterange-filter
 django-extensions
 django-leaflet
