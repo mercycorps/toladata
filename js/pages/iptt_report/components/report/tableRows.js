@@ -172,10 +172,19 @@ class IndicatorRow extends React.Component {
         this.state = {
             expanded: false
         };
+        this.props.rootStore._expandoRows.push(this);
     }
     
     handleExpandoClick = (e) => {
         this.setState({expanded: !this.state.expanded});
+    }
+    
+    expandRow = () => {
+        this.setState({expanded: true});
+    }
+    
+    collapseRow = () => {
+        this.setState({expanded: false});
     }
     
     render() {
@@ -239,16 +248,6 @@ class IndicatorRow extends React.Component {
                                     <td colSpan={ rootStore.reportColumnWidth }></td>
                                 </tr>
                             </React.Fragment>
-                            //<React.Fragment key={ pk }>
-                            //    <tr className="expando-table-row">
-                            //        <td colSpan={ rootStore.reportColumnWidth }>
-                            //            <DisaggregationTable indicator={ indicator } disaggregationPk={ pk } />
-                            //        </td>
-                            //    </tr>
-                            //    <tr className="expando-table-row-spacer">
-                            //        <td colSpan={ rootStore.reportColumnWidth }></td>
-                            //    </tr>
-                            //    </React.Fragment>
                         ))
                     }
                     </React.Fragment>

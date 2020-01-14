@@ -14,6 +14,19 @@ export default (
         _filterStore: getFilterStore(reactContext),
         get filterStore() {return this._filterStore},
         _reportStore: getReportStore(reactContext.report || {}),
+        _expandoRows: [],
+        expandAllRows() {
+            this._expandoRows.forEach(row => {row.expandRow()});
+        },
+        get allExpanded() {
+            return this._expandoRows.every(row => row.state.expanded)
+        },
+        get allCollapsed() {
+            return this._expandoRows.every(row => !row.state.expanded)
+        },
+        collapseAllRows() {
+            this._expandoRows.forEach(row => {row.collapseRow()});
+        },
         get reportStore() {return this._reportStore},
         get currentReport() {
             return this.reportStore.getReport(this.filterStore.selectedFrequency);
