@@ -36,11 +36,6 @@ const getIndicatorReport = (
         return (!isNaN(parseInt(disaggregationPk)) && this._disaggregatedReportData.has(parseInt(disaggregationPk))) ?
                 this._disaggregatedReportData.get(parseInt(disaggregationPk)) : [];
     }
-    //_disaggregatedReportData: observable(new Map(Object.entries((indicatorReportJSON.disaggregated_report_data || {}))
-    //                                             .map((disaggregationPk, disaggregatedJSON) => {
-    //                                                return [parseInt(disaggregationPk),
-    //                                                        new Map(disaggregatedJSON.map(disaggJSON => [parseInt(disaggJSON.index), disaggJSON]))];
-    //                                             }))),
     
 });
 

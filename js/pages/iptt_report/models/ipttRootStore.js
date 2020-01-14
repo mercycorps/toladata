@@ -96,6 +96,20 @@ export default (
             }
             return periodValues;
         },
+        disaggregatedLop(indicatorPk, disaggregationPk) {
+            return this.currentReport.has(parseInt(indicatorPk)) ?
+                this.currentReport.get(parseInt(indicatorPk)).disaggregatedLop(parseInt(disaggregationPk)) : null;
+        },
+        disaggregatedPeriodValues(indicatorPk, disaggregationPk) {
+            let periodValues = this.currentReport.has(parseInt(indicatorPk)) ? this.currentReport.get(parseInt(indicatorPk)).disaggregatedPeriodValues(parseInt(disaggregationPk)) : null;
+            if (periodValues && this.filterStore.selectedFrequency != 2) {
+                periodValues = periodValues.slice(this.filterStore.startPeriodValue, this.filterStore.endPeriodValue + 1);
+            }
+            if (periodValues && !this.isTVA) {
+                periodValues = periodValues.map(periodValue => periodValue.actual);
+            }
+            return periodValues || [];
+        },
         get reportColumnWidth() {
             return 8 + (!this.resultsFramework && 1) + 3 + (this.reportPeriods.length) * (this.isTVA ? 3 : 1);
         },

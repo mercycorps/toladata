@@ -123,9 +123,12 @@ const DisaggregationTable = inject('rootStore')(
         if (!disaggregation) {
             return null;
         }
+        var ValueCell = NumberCell;
+        if (indicator.isPercent) {
+            ValueCell = PercentCell;
+        }
         return (
-            <table>
-                <tbody>
+            <React.Fragment>
                 {
                     disaggregation.labels.map(
                         (label, idx) => (
@@ -134,17 +137,28 @@ const DisaggregationTable = inject('rootStore')(
                                 <td className="disaggregation-name-cell" rowSpan={disaggregation.labels.length}>
                                     {disaggregation.name}</td>
                                 }
-                                <td className="disaggregation-label-cell">{label.name}</td>
+                                <td colSpan="6" className="disaggregation-label-cell">{label.name}</td>
                                 <td className="disaggregation-value-cell" >–</td>
                                 <td className="disaggregation-value-cell" >–</td>
-                                <td className="disaggregation-value-cell" >lop actual</td>
+                                <ValueCell className="disaggregation-value-cell" value={ ipttRound(rootStore.disaggregatedLop(indicator.pk, label.pk), false) } />
                                 <td className="disaggregation-value-cell" >–</td>
+                                {
+                                    rootStore.disaggregatedPeriodValues(indicator.pk, label.pk).map(
+                                        (periodValue, idx) => {
+                                            return rootStore.isTVA ?
+                                                <React.Fragment>
+                                                    <td></td>
+                                                    <ValueCell key={idx} value={ periodValue.actual } />
+                                                    <td></td>
+                                                </React.Fragment> :
+                                                <ValueCell key={idx} value={ periodValue } />
+                                        })
+                                }
                             </tr>
                         )
                     )
                 }
-                </tbody>
-            </table>
+            </React.Fragment>
         );
     }
 ))
@@ -220,15 +234,21 @@ class IndicatorRow extends React.Component {
                     { rootStore.activeDisaggregationPks.filter(pk => indicator.hasDisaggregation(pk))
                         .map(pk => (
                             <React.Fragment key={ pk }>
-                                <tr className="expando-table-row">
-                                    <td colSpan={ rootStore.reportColumnWidth }>
-                                        <DisaggregationTable indicator={ indicator } disaggregationPk={ pk } />
-                                    </td>
-                                </tr>
+                                <DisaggregationTable indicator={ indicator } disaggregationPk={ pk } />
                                 <tr className="expando-table-row-spacer">
                                     <td colSpan={ rootStore.reportColumnWidth }></td>
                                 </tr>
-                                </React.Fragment>
+                            </React.Fragment>
+                            //<React.Fragment key={ pk }>
+                            //    <tr className="expando-table-row">
+                            //        <td colSpan={ rootStore.reportColumnWidth }>
+                            //            <DisaggregationTable indicator={ indicator } disaggregationPk={ pk } />
+                            //        </td>
+                            //    </tr>
+                            //    <tr className="expando-table-row-spacer">
+                            //        <td colSpan={ rootStore.reportColumnWidth }></td>
+                            //    </tr>
+                            //    </React.Fragment>
                         ))
                     }
                     </React.Fragment>
