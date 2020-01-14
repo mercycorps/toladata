@@ -474,7 +474,8 @@ export default (
                     .map(disaggregation => disaggregation.pk) : []  
         },
         get disaggregationFilters() {
-            return this.disaggregationOptions.filter(option => this._indicatorFilters.disaggregations.includes(option.value));
+            let disaggregationOptions = [].concat.apply([], this.disaggregationOptions.map(optgroup => optgroup.options))
+            return disaggregationOptions.filter(option => this._indicatorFilters.disaggregations.includes(option.value));
         },
         set disaggregationFilters(disaggregationFilterValues = []) {
             this._indicatorFilters.disaggregations = disaggregationFilterValues.map(v => parseInt(v));
@@ -688,7 +689,8 @@ export default (
                 sectors: this.sectorFilters.map(f => f.value),
                 sites: this.siteFilters.map(f => f.value),
                 types: this.indicatorTypeFilters.map(f => f.value),
-                indicators: this.indicatorFilters.map(f => f.value)
+                indicators: this.indicatorFilters.map(f => f.value),
+                disaggregations: this.disaggregationFilters.map(f => f.value)
             };
             Object.keys(params).forEach(
                 key => (params[key] === null) && delete params[key]

@@ -161,5 +161,13 @@ export default (
         },
         {fireImmediately: true}
     );
+    const _updateDisaggregationFilters = reaction(
+        () => [rootStore.filterStore._indicatorFilters.disaggregations],
+        ([disaggregationPks]) => {
+            if (disaggregationPks && disaggregationPks.length > 0) {
+                rootStore.expandAllRows();
+            }
+        }
+    );
     return rootStore;
 }
