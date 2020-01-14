@@ -750,7 +750,7 @@ class IPTTProgramFilterItemsMixin(object):
     def _get_program_disaggregations(self, program):
         if hasattr(self, 'context') and 'disaggregations' in self.context:
             return self.context['disaggregations']
-        return DisaggregationType.objects.filter(indicator__program=program).values('pk', 'disaggregation_type')
+        return DisaggregationType.objects.filter(indicator__program=program).values('pk', 'disaggregation_type', 'standard', 'country__country')
 
     def _get_program_disaggregation_labels(self, program):
         if hasattr(self, 'context') and 'disaggregation_labels' in self.context:
@@ -783,6 +783,7 @@ class IPTTProgramFilterItemsMixin(object):
         return sorted({
             v['pk']: v for v in [
                 {'pk': disaggregation['pk'], 'name': disaggregation['disaggregation_type'],
+                 'country': None if disaggregation['standard'] else disaggregation['country__country'],
                  'labels': [label for label in labels if label['disaggregation'] == disaggregation['pk']]}
                 for disaggregation in self._get_program_disaggregations(program)
             ]
@@ -846,7 +847,7 @@ class IPTTMixin(object):
             ).order_by('sector').values('pk', 'sector', 'indicator__pk'),
             'disaggregations': DisaggregationType.objects.select_related(None).prefetch_related(None).filter(
                 indicator__program_id=program_pk
-            ).order_by('disaggregation_type').values('pk', 'disaggregation_type', 'indicator__pk'),
+            ).order_by('disaggregation_type').values('pk', 'disaggregation_type', 'indicator__pk', 'standard', 'country__country'),
             'disaggregation_labels': DisaggregationLabel.objects.select_related(None).prefetch_related(None).filter(
                 disaggregation_type__indicator__program_id=program_pk
             ).order_by('customsort').values('pk', 'disaggregation_type_id', 'label', 'customsort').distinct(),
