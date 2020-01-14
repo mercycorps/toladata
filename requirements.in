@@ -29,6 +29,7 @@ mysqlclient
 pbr
 pip-tools
 python3-saml
+pyyaml
 simplejson
 social-auth-app-django
 WeasyPrint
