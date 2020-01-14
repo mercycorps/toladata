@@ -750,7 +750,7 @@ class IPTTProgramFilterItemsMixin(object):
     def _get_program_disaggregations(self, program):
         if hasattr(self, 'context') and 'disaggregations' in self.context:
             return self.context['disaggregations']
-        return DisaggregationType.objects.filter(indicator__program=program).values('pk', 'disaggregation_type')
+        return DisaggregationType.objects.filter(indicator__program=program).values('pk', 'disaggregation_type', 'standard', 'country__country')
 
     def _get_program_disaggregation_labels(self, program):
         if hasattr(self, 'context') and 'disaggregation_labels' in self.context:
