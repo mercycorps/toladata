@@ -39,6 +39,7 @@ django-widget-tweaks==1.4.5
 django-wysiwyg==0.8.0
 django==2.2.9
 djangorestframework==3.11.0
+et-xmlfile==1.0.1         # via openpyxl
 factory-boy==2.12.0
 faker==4.0.0              # via factory-boy
 google-api-python-client==1.7.11
@@ -48,9 +49,11 @@ html5lib==1.0.1           # via weasyprint
 httplib2==0.15.0          # via google-api-python-client, google-auth-httplib2
 idna==2.8                 # via requests
 isodate==0.6.0            # via python3-saml
+jdcal==1.4.1              # via openpyxl
 lxml==4.4.2               # via xmlsec
 mysqlclient==1.4.6
 oauthlib==3.1.0           # via requests-oauthlib, social-auth-core
+openpyxl==3.0.3
 pbr==5.4.4
 pillow==7.0.0             # via cairosvg
 pip-tools==4.3.0

@@ -26,6 +26,7 @@ google-api-python-client
 google-auth
 google-auth-httplib2
 mysqlclient
+openpyxl
 pbr
 pip-tools
 python3-saml
