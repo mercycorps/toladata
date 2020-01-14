@@ -37,17 +37,17 @@ admin.site.site_header = 'Tola Activity administration'
 #REST FRAMEWORK
 router = routers.DefaultRouter()
 router.register(r'level', LevelViewSet)
-router.register(r'programtargetfrequencies', ProgramTargetFrequencies, base_name='programtargetfrequencies')
+router.register(r'programtargetfrequencies', ProgramTargetFrequencies, basename='programtargetfrequencies')
 
 #tola admin
-router.register(r'tola_management/user', UserAdminViewSet, base_name='tolamanagementuser')
-router.register(r'tola_management/organization', OrganizationAdminViewSet, base_name='tolamanagementorganization')
-router.register(r'tola_management/program', ProgramAdminViewSet, base_name='tolamanagementprograms')
-router.register(r'tola_management/country', CountryAdminViewSet, base_name='tolamanagementcountry')
+router.register(r'tola_management/user', UserAdminViewSet, basename='tolamanagementuser')
+router.register(r'tola_management/organization', OrganizationAdminViewSet, basename='tolamanagementorganization')
+router.register(r'tola_management/program', ProgramAdminViewSet, basename='tolamanagementprograms')
+router.register(r'tola_management/country', CountryAdminViewSet, basename='tolamanagementcountry')
 router.register(r'tola_management/countryobjective', CountryObjectiveViewset,
-                base_name='tolamanagementcountryobjective')
+                basename='tolamanagementcountryobjective')
 router.register(r'tola_management/countrydisaggregation', CountryDisaggregationViewSet,
-                base_name='tolamanagementcountrydisaggregation')
+                basename='tolamanagementcountrydisaggregation')
 
 
 urlpatterns = [
