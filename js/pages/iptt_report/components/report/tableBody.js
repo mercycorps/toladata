@@ -25,22 +25,6 @@ const ReportTableBody = inject('rootStore', 'filterStore')(
                         )
                     )
             }
-            {/*
-                reportStore.levelRows ?
-                    reportStore.groupedIndicatorRows.map(
-                        ({level, indicators}, index) => (
-                            <LevelGroup level={ level } indicators={ indicators } key={ index } />
-                        )
-                    )
-                :
-                    reportStore.indicatorRows.map(
-                        (indicator, index) => (
-                            <IndicatorRow indicator={ indicator }
-                                          levelCol={ reportStore.levelColumn }
-                                          key={ index } />
-                        )
-                    )
-            */}
         </tbody>
         );
     })
