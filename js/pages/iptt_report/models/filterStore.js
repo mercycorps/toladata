@@ -475,7 +475,7 @@ export default (
         },
         get disaggregationFilters() {
             let disaggregationOptions = [].concat.apply([], this.disaggregationOptions.map(optgroup => optgroup.options))
-            return disaggregationOptions.filter(option => this._indicatorFilters.disaggregations.includes(option.value));
+            return disaggregationOptions.filter(option => (option && option.value && this._indicatorFilters.disaggregations.includes(option.value)));
         },
         set disaggregationFilters(disaggregationFilterValues = []) {
             this._indicatorFilters.disaggregations = disaggregationFilterValues.map(v => parseInt(v));
