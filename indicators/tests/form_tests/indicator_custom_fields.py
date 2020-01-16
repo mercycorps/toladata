@@ -37,9 +37,9 @@ class TestGroupedMultipleChoiceField(test.TestCase):
             field.widget.render('name', []),
             """<fieldset>
                 <a href="#" id="name_toggle_0" class="is-accordion-toggle btn btn-link"
-                data-toggle="collapse" data-target="#name_inputs_0" aria-expanded="false"
-                aria-controls="name_inputs_0">
-                    <i class="fas fa-caret-right"></i><i class="fas fa-caret-down"></i>Test Name
+                data-toggle="collapse" data-target="#name_inputs_0"
+                aria-expanded="true" aria-controls="name_inputs_0">
+                    <i class="fas fa-caret-down"></i>Test Name
                 </a>
                 <div class="collapse show" id="name_inputs_0">
                     <div>
@@ -68,9 +68,9 @@ class TestGroupedMultipleChoiceField(test.TestCase):
             field.widget.render('name', []),
             """<fieldset>
                 <a href="#" id="name_toggle_0" class="is-accordion-toggle btn btn-link"
-                data-toggle="collapse" data-target="#name_inputs_0" aria-expanded="false"
+                data-toggle="collapse" data-target="#name_inputs_0" aria-expanded="true"
                 aria-controls="name_inputs_0">
-                    <i class="fas fa-caret-right"></i><i class="fas fa-caret-down"></i>Test Name
+                    <i class="fas fa-caret-down"></i>Test Name
                 </a>
                 <div class="collapse show" id="name_inputs_0">
                     <div>
@@ -112,8 +112,8 @@ class TestGroupedMultipleChoiceField(test.TestCase):
             field.widget.render('grouped_field_name', []),
             """<fieldset>
             <a href="#" id="grouped_field_name_toggle_0" class="is-accordion-toggle btn btn-link"
-             data-toggle="collapse" data-target="#grouped_field_name_inputs_0" aria-expanded="false"
-             aria-controls="grouped_field_name_inputs_0"><i class="fas fa-caret-right"></i><i class="fas fa-caret-down"></i>{0}</a>
+             data-toggle="collapse" data-target="#grouped_field_name_inputs_0" aria-expanded="true"
+             aria-controls="grouped_field_name_inputs_0"><i class="fas fa-caret-down"></i>{0}</a>
              <div class="collapse show" id="grouped_field_name_inputs_0"><div>
                 <div class="form-check"><input class="form-check-input" type="checkbox"
                  name="grouped_field_name_0" value="100" id="grouped_field_name_0_check_0">
@@ -130,8 +130,8 @@ class TestGroupedMultipleChoiceField(test.TestCase):
                 </div></div>
             </fieldset><fieldset>
             <a href="#" id="grouped_field_name_toggle_1" class="is-accordion-toggle btn btn-link"
-             data-toggle="collapse" data-target="#grouped_field_name_inputs_1" aria-expanded="false"
-             aria-controls="grouped_field_name_inputs_1"><i class="fas fa-caret-right"></i><i class="fas fa-caret-down"></i>{1}</a>
+             data-toggle="collapse" data-target="#grouped_field_name_inputs_1" aria-expanded="true"
+             aria-controls="grouped_field_name_inputs_1"><i class="fas fa-caret-down"></i>{1}</a>
              <div class="collapse show" id="grouped_field_name_inputs_1"><div>
                 <div class="form-check"><input class="form-check-input" type="checkbox"
                  name="grouped_field_name_1" value="21" id="grouped_field_name_1_check_0">
@@ -153,8 +153,8 @@ class TestGroupedMultipleChoiceField(test.TestCase):
             str(form['group_field']),
             """<fieldset>
             <a href="#" id="group_field_toggle_0" class="is-accordion-toggle btn btn-link"
-             data-toggle="collapse" data-target="#group_field_inputs_0" aria-expanded="false"
-             aria-controls="group_field_inputs_0"><i class="fas fa-caret-right"></i><i class="fas fa-caret-down"></i>One</a>
+             data-toggle="collapse" data-target="#group_field_inputs_0" aria-expanded="true"
+             aria-controls="group_field_inputs_0"><i class="fas fa-caret-down"></i>One</a>
              <div class="collapse show" id="group_field_inputs_0"><div>
                 <div class="form-check"><input class="form-check-input" type="checkbox"
                  name="group_field_0" value="1" id="group_field_0_check_0" checked>
@@ -165,8 +165,8 @@ class TestGroupedMultipleChoiceField(test.TestCase):
                 </div></div>
             </fieldset><fieldset>
             <a href="#" id="group_field_toggle_1" class="is-accordion-toggle btn btn-link"
-             data-toggle="collapse" data-target="#group_field_inputs_1" aria-expanded="false"
-             aria-controls="group_field_inputs_1"><i class="fas fa-caret-right"></i><i class="fas fa-caret-down"></i>Two</a>
+             data-toggle="collapse" data-target="#group_field_inputs_1" aria-expanded="true"
+             aria-controls="group_field_inputs_1"><i class="fas fa-caret-down"></i>Two</a>
              <div class="collapse show" id="group_field_inputs_1"><div>
                 <div class="form-check"><input class="form-check-input" type="checkbox"
                  name="group_field_1" value="3" id="group_field_1_check_0">
