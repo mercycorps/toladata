@@ -17,7 +17,8 @@ from indicators.models import (
     LevelTier,
     LevelTierTemplate,
     PeriodicTarget,
-    Objective
+    Objective,
+    DisaggregationLabel
 )
 from indicators.queries import IPTTIndicator
 from indicators.export_renderers import (
@@ -507,6 +508,13 @@ class Period:
             return 'frequency_{f}_period_{p}'.format(f=self.frequency, p=self.period_count)
 
     @property
+    def actual_disaggregation_attribute(self):
+        if self.frequency == 1:
+            return 'disaggregation_{}_lop_actual'
+        else:
+            return 'disaggregation_{}_' + 'frequency_{f}_period_{p}'.format(f=self.frequency, p=self.period_count)
+
+    @property
     def start_display(self):
         return l10n_date_medium(self.period['start'])
 
@@ -550,6 +558,16 @@ class IPTTFullReportSerializerMixin:
                 indicator for indicator in indicators if indicator.target_frequency == frequency
                 ] for frequency in self.frequencies}
         return indicators_by_frequency
+
+    def annotate_disaggregations(self, indicators):
+        return indicators.with_disaggregation_lop_annotations(
+            self.disaggregation_categories
+        ).with_disaggregation_frequency_annotations(
+            'all',
+            self.program_data['reporting_period_start'],
+            self.program_data['reporting_period_end'],
+            disaggregations=self.disaggregation_categories
+        )
 
 
     @property
@@ -617,7 +635,19 @@ class IPTTTVASerializerMixin:
         return indicators.with_frequency_annotations(
             frequency,
             self.program_data['reporting_period_start'],
-            self.program_data['reporting_period_end']
+            self.program_data['reporting_period_end'],
+        )
+
+    def annotate_disaggregations(self, indicators):
+        frequency = int(self.request.get('frequency'))
+        indicators = indicators.filter(target_frequency=frequency)
+        return indicators.with_disaggregation_lop_annotations(
+            self.disaggregation_categories
+        ).with_disaggregation_frequency_annotations(
+            frequency,
+            self.program_data['reporting_period_start'],
+            self.program_data['reporting_period_end'],
+            disaggregations=self.disaggregation_categories
         )
 
     def get_period(self, frequency, period_dict):
@@ -660,8 +690,19 @@ class IPTTTimeperiodsSerializerMixin:
         return indicators.with_frequency_annotations(
             frequency,
             self.program_data['reporting_period_start'],
-            self.program_data['reporting_period_end']
-            )
+            self.program_data['reporting_period_end'],
+        )
+
+    def annotate_disaggregations(self, indicators):
+        frequency = int(self.request.get('frequency'))
+        return indicators.with_disaggregation_lop_annotations(
+            self.disaggregation_categories
+        ).with_disaggregation_frequency_annotations(
+            frequency,
+            self.program_data['reporting_period_start'],
+            self.program_data['reporting_period_end'],
+            disaggregations=self.disaggregation_categories
+        )
 
     def get_period(self, frequency, period_dict):
         return Period(frequency, period_dict, tva=False)
@@ -731,9 +772,16 @@ class IPTTExcelRendererBase:
 
     @property
     def column_count(self):
-        return 12 + (self.level_column and 1) + (
-            len(self.get_periods(self.frequency)) * self.period_column_count
-            )
+        return sum([
+            7,
+            (1 if self.level_column else 0),
+            (1 if self.uom_column else 0),
+            (1 if self.change_column else 0),
+            (1 if self.cnc_column else 0),
+            (1 if self.uom_type_column else 0),
+            (1 if self.baseline_column else 0),
+            (len(self.get_periods(self.frequency)) * self.period_column_count)
+            ])
 
     def get_periods(self, frequency):
         if frequency == 1:
@@ -773,6 +821,9 @@ class IPTTFullReportExcelRendererMixin(IPTTExcelRendererBase):
     def load_indicators(self):
         return self.indicator_qs.filter(program_id=self.program_data['pk'])
 
+    def load_disaggregated_indicators(self):
+        return IPTTIndicator.timeperiods.filter(program_id=self.program_data['pk'])
+
 
 
 class IPTTSingleExcelRendererMixin(IPTTExcelRendererBase):
@@ -806,6 +857,9 @@ class IPTTSingleExcelRendererMixin(IPTTExcelRendererBase):
             filters['old_levels'] = not self.program_data['results_framework']
             indicators = indicators.apply_filters(**filters)
         return indicators
+
+    def load_disaggregated_indicators(self):
+        return IPTTIndicator.timeperiods.filter(pk__in=[i.pk for i in self._indicators])
 
     @property
     def blank_level_row(self):
@@ -846,12 +900,22 @@ class IPTTSerializer:
         self.program_data = IPTTProgramSerializer(
             Program.objects.get(pk=self.request.get('programId'))
             ).data
+        self.disaggregation_categories = DisaggregationLabel.objects.select_related(
+            None
+        ).prefetch_related(None).order_by().filter(
+            disaggregation_type__indicator__program_id=self.request.get('programId')
+        ).distinct().values_list('pk', flat=True)
         self._indicators = self.annotate_indicators(self.load_indicators())
+        self._disaggregated_indicators = {
+            i.pk: i for i in self.annotate_disaggregations(self.load_disaggregated_indicators())}
         if self.program_data['results_framework']:
             self._level_rows = self.get_rf_levels()
         if not self.full_report:
             self.frequency = int(self.request.get('frequency'))
             self.periods = self.get_periods(self.frequency)
+
+    def get_disaggregated_indicator(self, pk):
+        return self._disaggregated_indicators.get(pk, None)
 
     @property
     def program_name(self):
@@ -864,3 +928,37 @@ class IPTTSerializer:
     @property
     def indicators(self):
         return self._indicators
+
+    @property
+    def uom_column(self):    
+        return '0' not in self.request.getlist('columns')
+
+    @property
+    def change_column(self):    
+        return '1' not in self.request.getlist('columns')
+
+    @property
+    def cnc_column(self):    
+        return '2' not in self.request.getlist('columns')
+
+    @property
+    def uom_type_column(self):    
+        return '3' not in self.request.getlist('columns')
+
+    @property
+    def baseline_column(self):    
+        return '4' not in self.request.getlist('columns')
+
+    @property
+    def optional_columns_length(self):
+        return sum([
+            (1 if self.uom_column else 0),
+            (1 if self.change_column else 0),
+            (1 if self.cnc_column else 0),
+            (1 if self.uom_type_column else 0),
+            (1 if self.baseline_column else 0),
+        ])
+
+    @property
+    def disaggregations(self):
+        return self.request.getlist('disaggregations')

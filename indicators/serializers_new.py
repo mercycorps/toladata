@@ -285,18 +285,29 @@ class IPTTReportIndicatorMixin:
         ).prefetch_related(None).order_by().filter(
             disaggregation_type__indicator__program_id=program_id
         ).distinct().values_list('pk', flat=True)
-        indicators = cls.get_queryset(program_id, frequency).with_disaggregation_annotations(
-            disaggregation_categories
-        ).with_frequency_annotations(
+        # indicators = cls.get_queryset(program_id, frequency).with_disaggregation_annotations(
+        #     disaggregation_categories
+        # ).with_frequency_annotations(
+        #     frequency, program_data.reporting_period_start, program_data.reporting_period_end,
+        #     disaggregations=disaggregation_categories
+        # )
+        indicators = cls.get_queryset(program_id, frequency).with_frequency_annotations(
+            frequency, program_data.reporting_period_start, program_data.reporting_period_end,
+        )
+        disaggregated_indicators = cls.get_disaggregations_queryset(
+            program_id, frequency
+        ).with_disaggregation_lop_annotations(disaggregation_categories).with_disaggregation_frequency_annotations(
             frequency, program_data.reporting_period_start, program_data.reporting_period_end,
             disaggregations=disaggregation_categories
         )
-        return cls(indicators, many=True, context={'frequency': frequency}).data
+        return cls(indicators, many=True,
+                   context={'frequency': frequency, 'disaggregated_indicators': {di.pk: di for di in disaggregated_indicators}}
+                    ).data
 
     def get_disaggregated_data(self, indicator):
         return {
             disaggregation_pk: {
-                'lop_actual': getattr(indicator, 'disaggregation_{}_lop_actual'.format(disaggregation_pk))
+                'lop_actual': getattr(self.context['disaggregated_indicators'][indicator.pk], 'disaggregation_{}_lop_actual'.format(disaggregation_pk))
             }
         for disaggregation_pk in indicator.disaggregation_category_pks}
 
@@ -311,7 +322,7 @@ class IPTTReportIndicatorMixin:
         return {
             'index': count,
             'actual': getattr(
-                indicator, 'disaggregation_{0}_frequency_{1}_period_{2}'.format(
+                self.context['disaggregated_indicators'][indicator.pk], 'disaggregation_{0}_frequency_{1}_period_{2}'.format(
                     disaggregation_pk,
                     self.context.get('frequency'),
                     count),
@@ -352,6 +363,12 @@ class IPTTTVAMixin:
         return IPTTIndicator.tva.filter(
             program_id=program_id, target_frequency=frequency
         )
+    
+    @classmethod
+    def get_disaggregations_queryset(cls, program_id, frequency):
+        return IPTTIndicator.timeperiods.filter(
+            program_id=program_id, target_frequency=frequency
+        )
 
     def get_period_data(self, indicator, count):
         period_data = {
@@ -378,6 +395,12 @@ class IPTTTPMixin:
 
     @classmethod
     def get_queryset(cls, program_id, frequency):
+        return IPTTIndicator.timeperiods.filter(
+            program_id=program_id
+        )
+
+    @classmethod
+    def get_disaggregations_queryset(cls, program_id, frequency):
         return IPTTIndicator.timeperiods.filter(
             program_id=program_id
         )
