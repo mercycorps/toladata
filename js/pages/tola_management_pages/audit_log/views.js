@@ -35,7 +35,7 @@ const ResultChangeset = ({data, name, pretty_name}) => {
             return <div className="changelog__change__targets">
                 <h4 className="text-small">{gettext('Disaggregated values')}</h4>
                 {Object.keys(groupedDiffs).sort().map( (typeName ) => {
-                    return  <DisaggregationDiffs key={typeName+'_diff'} disagg_type={typeName === null ? typeName : ""} disagg_diffs={groupedDiffs[typeName]} />
+                    return  <DisaggregationDiffs key={typeName+'_diff'} disagg_type={typeName ? typeName : null } disagg_diffs={groupedDiffs[typeName]} />
                 })}
             </div>
         } else {
