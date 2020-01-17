@@ -159,8 +159,7 @@ class Command(BaseCommand):
              'direction': Indicator.DIRECTION_OF_CHANGE_NONE, 'null_level': None},
         ]
 
-        # password = getpass(prompt="Enter the password to use for the test users: ")
-        password = 'lasjdflaskjdfasdlj'
+        password = getpass(prompt="Enter the password to use for the test users: ")
         # Create programs for specific people
 
         if options['names']:
