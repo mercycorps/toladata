@@ -36,6 +36,8 @@ def get_tp_annotated_indicator(indicator, frequency):
     disaggregations = [label.pk for disagg in indicator.disaggregation.all() for label in disagg.labels]
     return IPTTIndicator.timeperiods.filter(pk=indicator.pk).with_frequency_annotations(
         frequency, indicator.program.reporting_period_start, indicator.program.reporting_period_end,
+    ).with_disaggregation_frequency_annotations(
+        frequency, indicator.program.reporting_period_start, indicator.program.reporting_period_end,
         disaggregations=disaggregations
     ).first()
 
@@ -54,7 +56,7 @@ def get_tva_annotated_indicator(indicator, frequency):
 
 def get_annotated_indicator(indicator):
     disaggregations = [label.pk for disagg in indicator.disaggregation.all() for label in disagg.labels]
-    return IPTTIndicator.tva.filter(pk=indicator.pk).with_disaggregation_annotations(disaggregations).first()
+    return IPTTIndicator.tva.filter(pk=indicator.pk).with_disaggregation_lop_annotations(disaggregations).first()
 
 
 def get_result(indicator, achieved, target_period=0, days=1, date=None):
@@ -544,7 +546,7 @@ class TestIPTTReportTVAPeriodValues(test.TestCase):
         standard_disaggregation = add_standard_disaggregation(indicator)
         result = get_result(indicator, 250, target_period=1)
         get_disaggregated_value(result, standard_disaggregation, [100, 150])
-        annotated = get_tva_annotated_indicator(indicator, Indicator.ANNUAL)
+        annotated = get_tp_annotated_indicator(indicator, Indicator.ANNUAL)
         self.assertEqual(
             getattr(annotated, 'disaggregation_{}_frequency_{}_period_{}'.format(
                 standard_disaggregation.labels[0].pk,
