@@ -7,6 +7,8 @@ from indicators.models import (
     Level,
     PeriodicTarget,
     Result,
+    DisaggregationType,
+    DisaggregationLabel,
     IndicatorSortingManagerMixin,
     IndicatorSortingQSMixin
 )
@@ -26,7 +28,14 @@ class IPTTIndicatorQueryset(models.QuerySet, IndicatorSortingQSMixin):
             'result_set',
             'result_set__site',
             'indicator_type',
-            'program__level_tiers'
+            'program__level_tiers',
+            models.Prefetch(
+                'disaggregation',
+                queryset=DisaggregationType.objects.select_related(None).prefetch_related(
+                    models.Prefetch('disaggregationlabel_set', to_attr='prefetch_labels')
+                ),
+                to_attr="prefetch_disaggregations"
+            )
         )
         return qs
 
@@ -77,14 +86,14 @@ class IPTTIndicatorQueryset(models.QuerySet, IndicatorSortingQSMixin):
         qs = self.annotate_old_level(qs).order_by(models.F('old_level_pk').asc(nulls_last=True))
         return qs
 
-    def with_disaggregation_annotations(self, disaggregations=[]):
+    def with_disaggregation_annotations(self, disaggregation_category_pks=[]):
         qs = self.all()
         # add one lop_actual annotation for each disaggregation (targets/percent met to come with a later release)
         annotations = {
             'disaggregation_{}_lop_actual'.format(
-                disaggregation_pk
-            ): utils.indicator_disaggregated_lop_actual_annotation(disaggregation_pk)
-        for disaggregation_pk in disaggregations
+                disaggregation_category_pk
+            ): utils.indicator_disaggregated_lop_actual_annotation(disaggregation_category_pk)
+        for disaggregation_category_pk in disaggregation_category_pks
         }
         qs = qs.annotate(**annotations)
         return qs
@@ -213,12 +222,11 @@ class IPTTIndicator(Indicator):
                  'name': indicator_type.indicator_type} for indicator_type in self.indicator_type.all()]
 
     @property
-    def disaggregation_pks(self):
-        return [disaggregation.pk for disaggregation in self.disaggregation.all()]
-
-    @property
     def disaggregation_category_pks(self):
-        return [category.pk for disaggregation in self.disaggregation.all() for category in disaggregation.labels]
+        return [
+            category.pk for disaggregation in getattr(self, 'prefetch_disaggregations', self.disaggregation.all())
+            for category in getattr(disaggregation, 'prefetch_labels', disaggregation.disaggregationlabel_set.all())
+        ]
 
     @property
     def lop_met_target(self):
