@@ -706,7 +706,8 @@ export default (
                 sites: this.siteFilters.map(f => f.value),
                 types: this.indicatorTypeFilters.map(f => f.value),
                 indicators: this.indicatorFilters.map(f => f.value),
-                disaggregations: this.disaggregationFilters.map(f => f.value)
+                disaggregations: this.disaggregationFilters.map(f => f.value),
+                columns: this.hiddenColumns.map(f => f.value),
             };
             Object.keys(params).forEach(
                 key => (params[key] === null) && delete params[key]
@@ -751,6 +752,7 @@ export default (
     filterStore.disaggregationFilters = filterStore._router.disaggregations;
     filterStore.indicatorTypeFilters = filterStore._router.types;
     filterStore.indicatorFilters = filterStore._router.indicators;
+    filterStore._hiddenColumns = filterStore._router.columns;
     filterStore.levelTierFilters = {
         levels: filterStore._router.levels,
         tiers: filterStore._router.tiers,

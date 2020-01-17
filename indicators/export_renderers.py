@@ -28,6 +28,15 @@ class ExcelRendererBase:
         font=openpyxl.styles.Font(underline='single'),
         alignment=openpyxl.styles.Alignment(wrap_text=True)
     )
+    DISAGGREGATION_CELL = openpyxl.styles.NamedStyle(
+        name='disaggregation_cell',
+        font=openpyxl.styles.Font(bold=True),
+        alignment=openpyxl.styles.Alignment(horizontal='left', vertical='top', wrap_text=True)
+    )
+    DISAGGREGATION_CATEGORY = openpyxl.styles.NamedStyle(
+        name='category_cell',
+        alignment=openpyxl.styles.Alignment(horizontal='right', wrap_text=True)
+    )
 
     def __init__(self, serializer):
         self.NAME_MAP = {
@@ -63,15 +72,28 @@ class ExcelRendererBase:
             headers += [
                 ugettext('Level')
             ]
-        headers += [
-            ugettext('Unit of measure'),
-            # Translators: this is short for "Direction of Change" as in + or -
-            ugettext('Change'),
-            # Translators: 'C' as in Cumulative and 'NC' as in Non Cumulative
-            ugettext('C / NC'),
-            u'# / %',
-            ugettext('Baseline')
-        ]
+        if self.serializer.uom_column:
+            headers += [
+                ugettext('Unit of measure'),    
+            ]
+        if self.serializer.change_column:
+            headers += [
+                # Translators: this is short for "Direction of Change" as in + or -
+                ugettext('Change'),
+            ]
+        if self.serializer.cnc_column:
+            headers += [
+                # Translators: 'C' as in Cumulative and 'NC' as in Non Cumulative
+                ugettext('C / NC'),
+            ]
+        if self.serializer.uom_type_column:
+            headers += [
+                u'# / %',
+            ]
+        if self.serializer.baseline_column:
+            headers += [
+                ugettext('Baseline')
+            ]
         return headers
 
     def add_headers(self, sheet):
@@ -198,13 +220,26 @@ class ExcelRendererBase:
             indicator_columns.append(
                 ('old_level', self.str_cell, None, None)
             )
-        indicator_columns += [
-            ('unit_of_measure', self.str_cell, None, None),
-            ('get_direction_of_change', self.str_cell, self.CENTER_ALIGN, 'empty_blank'),
-            ('is_cumulative_display', self.str_cell, None, None),
-            ('get_unit_of_measure_type', self.str_cell, self.CENTER_ALIGN, 'empty_blank'),
-            ('baseline', values_func, None, None),
+        if self.serializer.uom_column:
+            indicator_columns += [
+                ('unit_of_measure', self.str_cell, None, None),
             ]
+        if self.serializer.change_column:
+            indicator_columns += [
+                ('get_direction_of_change', self.str_cell, self.CENTER_ALIGN, 'empty_blank'),
+            ]
+        if self.serializer.cnc_column:
+            indicator_columns += [
+                ('is_cumulative_display', self.str_cell, None, None),
+            ]
+        if self.serializer.uom_type_column:
+            indicator_columns += [
+                ('get_unit_of_measure_type', self.str_cell, self.CENTER_ALIGN, 'empty_blank'),
+            ]
+        if self.serializer.baseline_column:
+            indicator_columns += [
+                ('baseline', values_func, None, None),
+                ]
         for period in self.all_periods:
             if period.tva:
                 indicator_columns.append(
@@ -249,11 +284,83 @@ class ExcelRendererBase:
                 if number_format is not None:
                     cell.number_format = number_format
 
+    def add_disaggregation_rows(self, row, sheet, indicator, disaggregation, categories):
+        disagg_indicator = self.serializer.get_disaggregated_indicator(indicator.pk)
+        if indicator.unit_of_measure_type == Indicator.PERCENTAGE:
+            values_func = self.percent_value_cell
+        else:
+            values_func = self.float_cell
+        disaggregation_cell = sheet.cell(row=row, column=3)
+        disaggregation_cell.value = disaggregation.disaggregation_type
+        disaggregation_cell.style = self.DISAGGREGATION_CELL
+        for c, category in enumerate(categories):
+            category_cell = sheet.cell(row=row+c, column=4)
+            category_cell.value = category.label
+            category_cell.style = self.DISAGGREGATION_CATEGORY
+            end_column = 4 + self.serializer.optional_columns_length - (1 if self.serializer.baseline_column else 0)
+            sheet.merge_cells(
+                start_row=row+c, start_column=4, end_row=row+c,
+                end_column=end_column
+            )
+            column = end_column + 1
+            if self.serializer.baseline_column:
+                # in the future if we have disaggregated baselines, they go here, for now blank:
+                baseline_cell = sheet.cell(row=row+c, column=column)
+                baseline_cell.value = EM_DASH
+                baseline_cell.alignment = self.CENTER_ALIGN
+                column += 1
+            lop_target_cell = sheet.cell(row=row+c, column=column)
+            lop_target_cell.value = EM_DASH
+            lop_target_cell.alignment = self.CENTER_ALIGN
+            column += 1
+            lop_actual_cell = sheet.cell(row=row+c, column=column)
+            value, number_format = values_func(
+                getattr(disagg_indicator, 'disaggregation_{}_lop_actual'.format(category.pk), None)
+            )
+            lop_actual_cell.value = value or EM_DASH
+            lop_actual_cell.number_format = number_format
+            lop_actual_cell.alignment = self.RIGHT_ALIGN
+            column += 1
+            lop_percent_met_cell = sheet.cell(row=row+c, column=column)
+            lop_percent_met_cell.value= EM_DASH
+            lop_percent_met_cell.alignment = self.CENTER_ALIGN
+            column += 1
+            for period in self.serializer.get_periods(self.serializer.frequency):
+                if period.tva:
+                    period_target_cell = sheet.cell(row=row+c, column=column)
+                    period_target_cell.value = EM_DASH
+                    period_target_cell.alignment = self.CENTER_ALIGN
+                    column += 1
+                period_actual_cell = sheet.cell(row=row+c, column=column)
+                value, number_format = values_func(
+                    getattr(disagg_indicator, period.actual_disaggregation_attribute.format(category.pk), None)
+                )
+                period_actual_cell.value = value or EM_DASH
+                period_actual_cell.number_format = number_format
+
+                period_actual_cell.alignment = self.RIGHT_ALIGN
+                column += 1
+                if period.tva:
+                    period_percent_met_cell = sheet.cell(row=row+c, column=column)
+                    period_percent_met_cell.value = EM_DASH
+                    period_percent_met_cell.alignment = self.CENTER_ALIGN
+                    column += 1
+        sheet.merge_cells(start_row=row, start_column=3, end_row=row+len(categories)-1, end_column=3)
+
     def set_column_widths(self, sheet):
         widths = [10, 10, 17, 100]
         if self.serializer.level_column:
             widths.append(12)
-        widths += [30, 12, 15, 8, 20]
+        if self.serializer.uom_column:
+            widths.append(30)
+        if self.serializer.change_column:
+            widths.append(12)
+        if self.serializer.cnc_column:
+            widths.append(15)
+        if self.serializer.uom_type_column:
+            widths.append(8)
+        if self.serializer.baseline_column:
+            widths.append(20)
         for period in self.all_periods:
             widths += [12]*3 if period.tva else [12,]
         for col_no, width in enumerate(widths):
@@ -276,6 +383,13 @@ class ExcelRendererBase:
             for indicator in level_row['indicators']:
                 self.add_indicator_row(row_offset, sheet, indicator)
                 row_offset += 1
+                for disaggregation in getattr(indicator, 'prefetch_disaggregations', indicator.disaggregation.all()):
+                    if not self.serializer.disaggregations or disaggregation.pk in self.serializer.disaggregations:
+                        categories = getattr(
+                            disaggregation, 'prefetch_labels', disaggregation.disaggregationlabel_set.all()
+                        )
+                        self.add_disaggregation_rows(row_offset, sheet, indicator, disaggregation, categories)
+                        row_offset += len(categories)
         if self.serializer.blank_level_row:
             self.add_level_row(
                 row_offset,
@@ -286,12 +400,27 @@ class ExcelRendererBase:
             for indicator in self.serializer.blank_level_row:
                 self.add_indicator_row(row_offset, sheet, indicator)
                 row_offset += 1
+                for disaggregation in getattr(indicator, 'prefetch_disaggregations', indicator.disaggregation.all()):
+                    if not self.serializer.disaggregations or disaggregation.pk in self.serializer.disaggregations:
+                        categories = getattr(
+                            disaggregation, 'prefetch_labels', disaggregation.disaggregationlabel_set.all()
+                        )
+                        self.add_disaggregation_rows(row_offset, sheet, indicator, disaggregation, categories)
+                        row_offset += len(categories)
+
 
     def add_indicator_row_data(self, sheet):
         row_offset = 5
         for indicator in self.serializer.indicators:
             self.add_indicator_row(row_offset, sheet, indicator)
             row_offset += 1
+            for disaggregation in getattr(indicator, 'prefetch_disaggregations', indicator.disaggregation.all()):
+                if not self.serializer.disaggregations or disaggregation.pk in self.serializer.disaggregations:
+                    categories = getattr(
+                        disaggregation, 'prefetch_labels', disaggregation.disaggregationlabel_set.all()
+                    )
+                    self.add_disaggregation_rows(row_offset, sheet, indicator, disaggregation, categories)
+                    row_offset += len(categories)
 
     def add_data(self, sheet):
         if self.serializer.level_rows:

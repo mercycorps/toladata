@@ -4,7 +4,7 @@ import { observable } from 'mobx';
 import { TVA, TIMEPERIODS } from '../../constants';
 
 const goodQueryParams = ['frequency', 'start', 'end', 'levels', 'types', 'sites', 'disaggregations',    
-                         'sectors', 'indicators', 'tiers', 'groupby', 'mr'];
+                         'sectors', 'indicators', 'tiers', 'groupby', 'mr', 'columns'];
 const oldQueryParams = ['timeframe', 'numrecentperiods', 'numrecentcount', 'start_period', 'end_period'];
 
 const queryParams = '?' + [...goodQueryParams, ...oldQueryParams].join('&');
@@ -97,6 +97,9 @@ export default () => {
         },
         get disaggregations() {
             return parseArrayParams(this._router.getState().params.disaggregations);
+        },
+        get columns() {
+            return parseArrayParams(this._router.getState().params.columns);
         },
         get types() {
             return parseArrayParams(this._router.getState().params.types);
