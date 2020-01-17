@@ -21,7 +21,7 @@ from indicators.serializers_new import (
     IPTTTVAReportIndicatorSerializer,
     IPTTTPReportIndicatorSerializer
 )
-from indicators.models import Indicator
+from indicators.models import Indicator, PeriodicTarget
 from indicators.queries.iptt_queries import IPTTIndicator
 from factories import (
     indicators_models as i_factories,
@@ -29,6 +29,14 @@ from factories import (
 )
 
 QUERIES_PREFETCH = 8
+
+QUERIES_FREQUENCIES = QUERIES_PREFETCH + 0
+
+QUERIES_DISAGG_FREQUENCIES = QUERIES_FREQUENCIES + 0
+
+
+TP_QUERYSET = IPTTIndicator.timeperiods
+TVA_QUERYSET = IPTTIndicator.tva
 
 
 class TestIPTTIndicatorQuerysetPrefetch(test.TestCase):
@@ -53,8 +61,15 @@ class TestIPTTIndicatorQuerysetPrefetch(test.TestCase):
         ]
         cls.program = w_factories.RFProgramFactory()
         cls.program.country.set([cls.country])
+        cls.periods = {}
+        for frequency in Indicator.REGULAR_TARGET_FREQUENCIES:
+            cls.periods[frequency] = [p for p in PeriodicTarget.generate_for_frequency(frequency)(
+                cls.program.reporting_period_start,
+                cls.program.reporting_period_end
+            )]
         cls.indicators = []
         cls.results = []
+        cls.disaggs = []
         for frequency, _ in Indicator.TARGET_FREQUENCIES[:-1]:
             indicator = i_factories.RFIndicatorFactory(
                 program=cls.program,
@@ -64,8 +79,10 @@ class TestIPTTIndicatorQuerysetPrefetch(test.TestCase):
             )
             indicator.disaggregation.set([cls.standard_disagg, cls.country_disagg])
             results = 0
+            disaggs = 0
             for result in indicator.result_set.all():
                 results += result.achieved
+                disaggs += 2
                 for label in [label for disagg in indicator.disaggregation.all() for label in disagg.labels]:
                     i_factories.DisaggregatedValueFactory(
                         result=result,
@@ -74,38 +91,192 @@ class TestIPTTIndicatorQuerysetPrefetch(test.TestCase):
                     )
             cls.indicators.append(indicator)
             cls.results.append(results)
-
-    def test_tp_indicator_queryset_queries_one_indicator(self):
-        with self.assertNumQueries(QUERIES_PREFETCH):
-            indicator = IPTTIndicator.timeperiods.filter(pk=self.indicators[0].pk).first()
-            # has rf marked
-            self.assertTrue(indicator.using_results_framework)
-            self.assertEqual(indicator.lop_target_calculated, 1000)
-            self.assertEqual(indicator.lop_actual, self.results[0])
-            self.assertAlmostEqual(indicator.lop_percent_met, float(self.results[0])/1000)
-            self.assertCountEqual(indicator.disaggregation_category_pks, self.category_pks)
-
-    def test_tp_indicator_queryset_queries_two_indicators(self):
-        with self.assertNumQueries(QUERIES_PREFETCH):
-            indicators = [
-                indicator for indicator in IPTTIndicator.timeperiods.filter(
-                    pk__in=[self.indicators[0].pk, self.indicators[1].pk]
-                )]
-            for c, indicator in enumerate(indicators):
-                self.assertTrue(indicator.using_results_framework)
-                self.assertEqual(indicator.lop_target_calculated, 1000)
-                self.assertEqual(indicator.lop_actual, self.results[c])
-                self.assertAlmostEqual(indicator.lop_percent_met, float(self.results[c])/1000)
-                self.assertCountEqual(indicator.disaggregation_category_pks, self.category_pks)
+            cls.disaggs.append(disaggs)
+        cls.period_results = [
+            [],
+            [],
+            [],
+            [[], [10,], [20,], [10,], [20,], [30,], [40,], [120,]],
+            [[], [10, None], [20, None], [10, None], [10, 10], [20, 10], [20, 20], [60, 60]],
+            [[], [10, None, None], [20, None, None], [10, None, None], [10, 10, None],
+                [10, 10, 10], [20, 10, 10], [40, 40, 40]]
+        ]
         
-    def test_tp_indicator_queryset_queries_multiple_indicators(self):
-        with self.assertNumQueries(QUERIES_PREFETCH):
-            indicators = [indicator for indicator in IPTTIndicator.timeperiods.filter(program=self.program)]
-            for c, indicator in enumerate(indicators):
+
+    def test_indicator_queryset_queries_one_indicator(self):
+        filters = {'pk': self.indicators[0].pk}
+        for queryset in [TP_QUERYSET, TVA_QUERYSET]:
+            with self.assertNumQueries(QUERIES_PREFETCH):
+                indicator = queryset.filter(**filters).first()
+                # has rf marked
                 self.assertTrue(indicator.using_results_framework)
                 self.assertEqual(indicator.lop_target_calculated, 1000)
-                self.assertEqual(indicator.lop_actual, self.results[c])
-                self.assertAlmostEqual(indicator.lop_percent_met, float(self.results[c])/1000)
+                self.assertEqual(indicator.lop_actual, self.results[0])
+                self.assertAlmostEqual(indicator.lop_percent_met, float(self.results[0])/1000)
                 self.assertCountEqual(indicator.disaggregation_category_pks, self.category_pks)
+        for queryset in [TP_QUERYSET, TVA_QUERYSET]:
+            with self.assertNumQueries(QUERIES_PREFETCH):
+                indicator = queryset.filter(**filters).with_disaggregation_annotations(self.category_pks).first()
+                for category_pk in self.category_pks:
+                    self.assertEqual(
+                        getattr(indicator, f'disaggregation_{category_pk}_lop_actual'),
+                        self.disaggs[0]
+                        )
+        for frequency in Indicator.REGULAR_TARGET_FREQUENCIES:
+            period_count = len(self.periods[frequency])
+            with self.assertNumQueries(QUERIES_FREQUENCIES):
+                indicator = TP_QUERYSET.filter(**filters).with_disaggregation_annotations(
+                    self.category_pks
+                ).with_frequency_annotations(
+                    frequency, self.program.reporting_period_start, self.program.reporting_period_end,
+                    disaggregations=[]
+                ).first()
+                self.assertEqual(getattr(indicator, f'frequency_{frequency}_count'), period_count)
+                for c in range(period_count):
+                    self.assertEqual(
+                        getattr(indicator, f'frequency_{frequency}_period_{c}'),
+                        10 if c == 0 else None
+                    )
+            with self.assertNumQueries(QUERIES_DISAGG_FREQUENCIES):
+                indicator = TP_QUERYSET.filter(**filters).with_disaggregation_annotations(
+                    self.category_pks
+                ).with_frequency_annotations(
+                    frequency, self.program.reporting_period_start, self.program.reporting_period_end,
+                    disaggregations=self.category_pks
+                ).first()
+                for c in range(period_count):
+                    for category_pk in self.category_pks:
+                        self.assertEqual(
+                            getattr(indicator, f'disaggregation_{category_pk}_frequency_{frequency}_period_{c}'),
+                            2 if c == 0 else None
+                        )
+        self.assertTrue(True)
+
+    def test_indicator_queryset_queries_two_indicators(self):
+        filters = {'pk__in': [self.indicators[0].pk, self.indicators[1].pk]}
+        for queryset in [TP_QUERYSET, TVA_QUERYSET]:
+            with self.assertNumQueries(QUERIES_PREFETCH):
+                indicators = [indicator for indicator in queryset.filter(**filters)]
+                for c, indicator in enumerate(indicators):
+                    self.assertTrue(indicator.using_results_framework)
+                    self.assertEqual(indicator.lop_target_calculated, 1000)
+                    self.assertEqual(indicator.lop_actual, self.results[c])
+                    self.assertAlmostEqual(indicator.lop_percent_met, float(self.results[c])/1000)
+                    self.assertCountEqual(indicator.disaggregation_category_pks, self.category_pks)
+            with self.assertNumQueries(QUERIES_PREFETCH):
+                indicators = [indicator for indicator in queryset.filter(
+                    **filters
+                ).with_disaggregation_annotations(self.category_pks)]
+                for c, indicator in enumerate(indicators):
+                    for category_pk in self.category_pks:
+                        self.assertEqual(
+                            getattr(indicator, 'disaggregation_{}_lop_actual'.format(category_pk)),
+                            self.disaggs[c]
+                            )
+        for frequency in Indicator.REGULAR_TARGET_FREQUENCIES:
+            period_count = len(self.periods[frequency])
+            with self.assertNumQueries(QUERIES_FREQUENCIES):
+                indicators = [indicator for indicator in TP_QUERYSET.filter(
+                    **filters
+                ).with_disaggregation_annotations(self.category_pks).with_frequency_annotations(
+                    frequency, self.program.reporting_period_start, self.program.reporting_period_end,
+                    disaggregations=[]
+                )]
+                for c, indicator in enumerate(indicators):
+                    self.assertEqual(getattr(indicator, 'frequency_{}_count'.format(frequency)), period_count)
+                    for c in range(period_count):
+                        achieved = getattr(indicator, 'frequency_{}_period_{}'.format(frequency, c))
+                        if frequency in [1, 2, 3, 4, 5]:
+                            self.assertEqual(
+                                achieved,
+                                self.period_results[frequency][indicator.target_frequency][c]
+                            )
+            with self.assertNumQueries(QUERIES_DISAGG_FREQUENCIES):
+                indicators = [
+                    indicator for indicator in TP_QUERYSET.filter(**filters).with_disaggregation_annotations(
+                        self.category_pks
+                    ).with_frequency_annotations(
+                        frequency, self.program.reporting_period_start, self.program.reporting_period_end,
+                        disaggregations=self.category_pks
+                    )]
+                for indicator in indicators:
+                    for c in range(period_count):
+                        for category_pk in self.category_pks:
+                            d_value = getattr(
+                                indicator,  f'disaggregation_{category_pk}_frequency_{frequency}_period_{c}'
+                            )
+                            if frequency in [1, 2, 3, 4, 5]:
+                                expected = self.period_results[frequency][indicator.target_frequency][c]
+                                if expected is not None:
+                                    expected = expected/5
+                                self.assertEqual(
+                                    d_value, expected
+                                )
+        self.assertTrue(True)
+                    
+        
+    def test_indicator_queryset_queries_multiple_indicators(self):
+        filters = {'program': self.program}
+        for queryset in [TP_QUERYSET, TVA_QUERYSET]:
+            with self.assertNumQueries(QUERIES_PREFETCH):
+                indicators = [indicator for indicator in queryset.filter(**filters)]
+                for c, indicator in enumerate(indicators):
+                    self.assertTrue(indicator.using_results_framework)
+                    self.assertEqual(indicator.lop_target_calculated, 1000)
+                    self.assertEqual(indicator.lop_actual, self.results[c])
+                    self.assertAlmostEqual(indicator.lop_percent_met, float(self.results[c])/1000)
+                    self.assertCountEqual(indicator.disaggregation_category_pks, self.category_pks)
+            with self.assertNumQueries(QUERIES_PREFETCH):
+                indicators = [
+                    indicator for indicator in queryset.filter(
+                        **filters
+                        ).with_disaggregation_annotations(self.category_pks)]
+                for c, indicator in enumerate(indicators):
+                    for category_pk in self.category_pks:
+                        self.assertEqual(
+                            getattr(indicator, 'disaggregation_{}_lop_actual'.format(category_pk)),
+                            self.disaggs[c]
+                            )
+        for frequency in Indicator.REGULAR_TARGET_FREQUENCIES:
+            period_count = len(self.periods[frequency])
+            with self.assertNumQueries(QUERIES_FREQUENCIES):
+                indicators = [indicator for indicator in TP_QUERYSET.filter(
+                    **filters
+                ).with_disaggregation_annotations(self.category_pks).with_frequency_annotations(
+                    frequency, self.program.reporting_period_start, self.program.reporting_period_end,
+                    disaggregations=[]
+                )]
+                for c, indicator in enumerate(indicators):
+                    self.assertEqual(getattr(indicator, 'frequency_{}_count'.format(frequency)), period_count)
+                    for c in range(period_count):
+                        achieved = getattr(indicator, 'frequency_{}_period_{}'.format(frequency, c))
+                        if frequency in [1, 2, 3, 4, 5]:
+                            self.assertEqual(
+                                achieved,
+                                self.period_results[frequency][indicator.target_frequency][c]
+                            )
+            with self.assertNumQueries(QUERIES_DISAGG_FREQUENCIES):
+                indicators = [indicator for indicator in TP_QUERYSET.filter(
+                    **filters
+                ).with_disaggregation_annotations(
+                    self.category_pks
+                ).with_frequency_annotations(
+                    frequency, self.program.reporting_period_start, self.program.reporting_period_end,
+                    disaggregations=self.category_pks
+                )]
+                for indicator in indicators:
+                    for c in range(period_count):
+                        for category_pk in self.category_pks:
+                            d_value = getattr(
+                                indicator,  f'disaggregation_{category_pk}_frequency_{frequency}_period_{c}'
+                            )
+                            if frequency in [1, 2, 3, 4, 5]:
+                                expected = self.period_results[frequency][indicator.target_frequency][c]
+                                if expected is not None:
+                                    expected = expected/5
+                                self.assertEqual(
+                                    d_value, expected
+                                )
+        self.assertTrue(True)
             
             
