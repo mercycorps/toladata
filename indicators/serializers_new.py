@@ -321,11 +321,10 @@ class IPTTReportIndicatorMixin:
 
     def get_disaggregated_report_data(self, indicator):
         count = getattr(indicator, 'frequency_{0}_count'.format(self.context.get('frequency')), 0)
-        categories = [label.pk for disagg in indicator.disaggregation.all() for label in disagg.labels]
         disaggregated_report_data = {
             category_pk: self.disaggregated_period_serializer_class(
                 [self.get_disaggregated_period_data(indicator, category_pk, c) for c in range(count)], many=True
-            ).data for category_pk in categories}
+            ).data for category_pk in indicator.disaggregation_category_pks}
         return disaggregated_report_data
 
 
