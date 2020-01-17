@@ -968,6 +968,7 @@ class Command(BaseCommand):
                 else:
                     reduction_amount -= filled[i]
                     filled[i] = 0
+
         if sum(filled) != aggregate_value:
             raise NotImplementedError('You wrote a bad algorithm')
         random.shuffle(filled)
