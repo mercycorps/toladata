@@ -94,7 +94,7 @@ class TestDisaggregatedValueFormSet(test.TestCase):
         formset = get_disaggregated_result_formset(self.disagg)(data, result=self.result, request=self.request)
         self.assertTrue(formset.is_valid(), "{}\n{}".format(formset.errors, formset.non_form_errors()))
         self.assertEqual(formset[0].cleaned_data['value'], 250)
-        self.assertEqual(formset[1].cleaned_data['value'], 0)
+        self.assertEqual(formset[1].cleaned_data['value'], None)
 
     def test_invalid_form_values(self):
         FormSet = get_disaggregated_result_formset(self.disagg)

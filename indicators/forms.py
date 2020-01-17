@@ -547,11 +547,11 @@ class BaseDisaggregatedValueFormSet(forms.BaseFormSet):
         if not self.result:
             raise forms.ValidationError('cannot save disaggregated values without result provided')
         achieved = [form.cleaned_data.get('value') for form in self.forms]
-        if all([v == 0 for v in achieved]):
+        if all([v is None for v in achieved]):
             self.clear_all = True
         elif self.result.indicator.unit_of_measure_type == Indicator.PERCENTAGE:
             return
-        elif sum(achieved) != self.result.achieved:
+        elif sum([value for value in achieved if value is not None]) != self.result.achieved:
             raise forms.ValidationError(
                 'disaggregated values must add up to {}, got {}'.format(self.result.achieved, achieved)
             )
@@ -603,9 +603,9 @@ class DisaggregatedValueForm(forms.Form):
         return data
 
     def clean_value(self):
-        value = self.cleaned_data.get('value', 0)
+        value = self.cleaned_data.get('value', None)
         if value is None:
-            return 0
+            return value
         try:
             value = float(value)
         except ValueError:
