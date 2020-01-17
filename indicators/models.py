@@ -1832,6 +1832,7 @@ class PeriodicTarget(models.Model):
         else:
             next_date_func = None
             name_func = None
+
         def short_form_generator(start, end):
             count = 0
             while start < end:
@@ -1845,6 +1846,7 @@ class PeriodicTarget(models.Model):
                 start = next_start
         if short_form:
             return short_form_generator
+
         def period_generator(start, end):
             count = 0
             while start < end:
