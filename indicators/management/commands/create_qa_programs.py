@@ -955,7 +955,20 @@ class Command(BaseCommand):
             elif slot_index == total_slot_count - 1:
                 filled.append(aggregate_value - sum(filled))
             else:
-                filled.append(random.randrange(1, max_value))
-
+                filled.append(random.randrange(0, max_value))
+        if sum(filled) < aggregate_value:
+            filled[0] += aggregate_value - sum(filled)
+        if sum(filled) > aggregate_value:
+            reduction_amount = sum(filled) - aggregate_value
+            while reduction_amount > 0:
+                i = filled.index(max(filled))
+                if filled[i] >= reduction_amount:
+                    filled[i] -= reduction_amount
+                    reduction_amount = 0
+                else:
+                    reduction_amount -= filled[i]
+                    filled[i] = 0
+        if sum(filled) != aggregate_value:
+            raise NotImplementedError('You wrote a bad algorithm')
         random.shuffle(filled)
         return filled
