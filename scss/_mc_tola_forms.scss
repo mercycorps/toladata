@@ -195,7 +195,7 @@ ul.form-rows-list-group {
 }
 
 .has-errors:not(.unvalidated) {
-    .collapsed + .formset-feedback {
+    .formset-feedback {
         display: inline-block;
     }
     .actions-container {

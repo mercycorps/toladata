@@ -59,7 +59,7 @@
         let disaggsValid = validateDisaggregations();
 
         if ($("#result_update_form div").hasClass('has-error') || !disaggsValid) {
-            createAlert("danger", "{% trans 'Please complete all required fields.'|escapejs %}", true, "#modalmessages");
+            createAlert("danger", "{% trans 'One or more fields needs attention.'|escapejs %}", true, "#modalmessages");
             $('#indicator_results_div').animate({ scrollTop: 0 }, 'slow');
             $('#submit-id-submit').removeAttr('disabled');
             return;
