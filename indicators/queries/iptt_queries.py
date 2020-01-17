@@ -7,6 +7,8 @@ from indicators.models import (
     Level,
     PeriodicTarget,
     Result,
+    DisaggregationType,
+    DisaggregationLabel,
     IndicatorSortingManagerMixin,
     IndicatorSortingQSMixin
 )
@@ -77,14 +79,14 @@ class IPTTIndicatorQueryset(models.QuerySet, IndicatorSortingQSMixin):
         qs = self.annotate_old_level(qs).order_by(models.F('old_level_pk').asc(nulls_last=True))
         return qs
 
-    def with_disaggregation_annotations(self, disaggregations=[]):
+    def with_disaggregation_annotations(self, disaggregation_category_pks=[]):
         qs = self.all()
         # add one lop_actual annotation for each disaggregation (targets/percent met to come with a later release)
         annotations = {
             'disaggregation_{}_lop_actual'.format(
-                disaggregation_pk
-            ): utils.indicator_disaggregated_lop_actual_annotation(disaggregation_pk)
-        for disaggregation_pk in disaggregations
+                disaggregation_category_pk
+            ): utils.indicator_disaggregated_lop_actual_annotation(disaggregation_category_pk)
+        for disaggregation_category_pk in disaggregation_category_pks
         }
         qs = qs.annotate(**annotations)
         return qs
