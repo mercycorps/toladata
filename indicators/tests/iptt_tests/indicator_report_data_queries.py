@@ -28,7 +28,7 @@ from factories import (
     workflow_models as w_factories
 )
 
-QUERIES_PREFETCH = 1
+QUERIES_PREFETCH = 8
 
 
 class TestIPTTIndicatorQuerysetPrefetch(test.TestCase):
@@ -48,18 +48,24 @@ class TestIPTTIndicatorQuerysetPrefetch(test.TestCase):
             disaggregation_type="Test Country Disagg",
             labels=["Test CD Label {}".format(c+1) for c in range(5)]
         )
+        cls.category_pks = [
+            label.pk for disagg in [cls.standard_disagg, cls.country_disagg] for label in disagg.labels
+        ]
         cls.program = w_factories.RFProgramFactory()
-        cls.program.country.set([self.country])
+        cls.program.country.set([cls.country])
         cls.indicators = []
+        cls.results = []
         for frequency, _ in Indicator.TARGET_FREQUENCIES[:-1]:
             indicator = i_factories.RFIndicatorFactory(
                 program=cls.program,
-                frequency=frequency,
+                target_frequency=frequency,
                 targets=1000,
                 results=True
             )
             indicator.disaggregation.set([cls.standard_disagg, cls.country_disagg])
+            results = 0
             for result in indicator.result_set.all():
+                results += result.achieved
                 for label in [label for disagg in indicator.disaggregation.all() for label in disagg.labels]:
                     i_factories.DisaggregatedValueFactory(
                         result=result,
@@ -67,9 +73,39 @@ class TestIPTTIndicatorQuerysetPrefetch(test.TestCase):
                         value=2
                     )
             cls.indicators.append(indicator)
+            cls.results.append(results)
+
+    def test_tp_indicator_queryset_queries_one_indicator(self):
+        with self.assertNumQueries(QUERIES_PREFETCH):
+            indicator = IPTTIndicator.timeperiods.filter(pk=self.indicators[0].pk).first()
+            # has rf marked
+            self.assertTrue(indicator.using_results_framework)
+            self.assertEqual(indicator.lop_target_calculated, 1000)
+            self.assertEqual(indicator.lop_actual, self.results[0])
+            self.assertAlmostEqual(indicator.lop_percent_met, float(self.results[0])/1000)
+            self.assertCountEqual(indicator.disaggregation_category_pks, self.category_pks)
+
+    def test_tp_indicator_queryset_queries_two_indicators(self):
+        with self.assertNumQueries(QUERIES_PREFETCH):
+            indicators = [
+                indicator for indicator in IPTTIndicator.timeperiods.filter(
+                    pk__in=[self.indicators[0].pk, self.indicators[1].pk]
+                )]
+            for c, indicator in enumerate(indicators):
+                self.assertTrue(indicator.using_results_framework)
+                self.assertEqual(indicator.lop_target_calculated, 1000)
+                self.assertEqual(indicator.lop_actual, self.results[c])
+                self.assertAlmostEqual(indicator.lop_percent_met, float(self.results[c])/1000)
+                self.assertCountEqual(indicator.disaggregation_category_pks, self.category_pks)
         
-    def test_tp_indicator_queryset_queries(self):
+    def test_tp_indicator_queryset_queries_multiple_indicators(self):
         with self.assertNumQueries(QUERIES_PREFETCH):
             indicators = [indicator for indicator in IPTTIndicator.timeperiods.filter(program=self.program)]
+            for c, indicator in enumerate(indicators):
+                self.assertTrue(indicator.using_results_framework)
+                self.assertEqual(indicator.lop_target_calculated, 1000)
+                self.assertEqual(indicator.lop_actual, self.results[c])
+                self.assertAlmostEqual(indicator.lop_percent_met, float(self.results[c])/1000)
+                self.assertCountEqual(indicator.disaggregation_category_pks, self.category_pks)
             
             

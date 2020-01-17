@@ -28,7 +28,14 @@ class IPTTIndicatorQueryset(models.QuerySet, IndicatorSortingQSMixin):
             'result_set',
             'result_set__site',
             'indicator_type',
-            'program__level_tiers'
+            'program__level_tiers',
+            models.Prefetch(
+                'disaggregation',
+                queryset=DisaggregationType.objects.select_related(None).prefetch_related(
+                    models.Prefetch('disaggregationlabel_set', to_attr='prefetch_labels')
+                ),
+                to_attr="prefetch_disaggregations"
+            )
         )
         return qs
 
@@ -215,12 +222,11 @@ class IPTTIndicator(Indicator):
                  'name': indicator_type.indicator_type} for indicator_type in self.indicator_type.all()]
 
     @property
-    def disaggregation_pks(self):
-        return [disaggregation.pk for disaggregation in self.disaggregation.all()]
-
-    @property
     def disaggregation_category_pks(self):
-        return [category.pk for disaggregation in self.disaggregation.all() for category in disaggregation.labels]
+        return [
+            category.pk for disaggregation in getattr(self, 'prefetch_disaggregations', self.disaggregation.all())
+            for category in getattr(disaggregation, 'prefetch_labels', disaggregation.disaggregationlabel_set.all())
+        ]
 
     @property
     def lop_met_target(self):
