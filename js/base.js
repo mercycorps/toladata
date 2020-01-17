@@ -701,9 +701,10 @@ function numberInputValidator(e) {
         // allow: Ctrl+A select all)
         (e.keyCode == 65 && e.ctrlKey === true) ||
         // allow home, end, left, right
-        (e.keyCode >= 35 && e.keyCode <= 39) ||
+        (e.keyCode >= 35 && e.keyCode <= 39) //||
         // allow negative sign
-       ($.inArray(e.keyCode, [109, 189, 173]) !== -1)) {
+       //($.inArray(e.keyCode, [109, 189, 173]) !== -1)
+       ) {
         // don't do anything (allow key to be used as normal)
         return;
     }
