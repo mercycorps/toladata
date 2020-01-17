@@ -137,7 +137,7 @@ const DisaggregationTable = inject('rootStore')(
                                 <td className="disaggregation-name-cell" rowSpan={disaggregation.labels.length}>
                                     {disaggregation.name}</td>
                                 }
-                                <td colSpan="6" className="disaggregation-label-cell">{label.name}</td>
+                                <td colSpan={rootStore.baseColumns - 2} className="disaggregation-label-cell">{label.name}</td>
                                 <td className="disaggregation-value-cell" >–</td>
                                 <td className="disaggregation-value-cell" >–</td>
                                 <ValueCell className="disaggregation-value-cell" value={ ipttRound(rootStore.disaggregatedLop(indicator.pk, label.pk), false) } />
@@ -217,11 +217,11 @@ class IndicatorRow extends React.Component {
                     <IndicatorResultModalCell indicator={ indicator } />
                     <IndicatorEditModalCell indicator={ indicator } />
                     { !rootStore.resultsFramework && <IndicatorCell value={ indicator.oldLevelDisplay } /> }
-                    <IndicatorCell value={ indicator.unitOfMeasure } />
-                    <IndicatorCell value={ indicator.directionOfChange || gettext('N/A') } align="center" />
-                    <IndicatorCell value={ cumulative || gettext('N/A') } />
-                    <IndicatorCell value={ indicator.isPercent ? '%' : '#' } align="center" />
-                    { indicator.baseline === null ? <IndicatorCell value={ gettext('N/A') } align="right"/> : <ValueCell value={ indicator.baseline } /> }
+                    { rootStore.hasUOMColumn && <IndicatorCell value={ indicator.unitOfMeasure } /> }
+                    { rootStore.hasChangeColumn && <IndicatorCell value={ indicator.directionOfChange || gettext('N/A') } align="center" /> }
+                    { rootStore.hasCNCColumn && <IndicatorCell value={ cumulative || gettext('N/A') } /> }
+                    { rootStore.hasUOMTypeColumn && <IndicatorCell value={ indicator.isPercent ? '%' : '#' } align="center" /> }
+                    { rootStore.hasBaselineColumn && (indicator.baseline === null ? <IndicatorCell value={ gettext('N/A') } align="right"/> : <ValueCell value={ indicator.baseline } /> ) }
                     { reportData && (
                     <React.Fragment>
                     <ValueCell value={ reportData.lopTarget } />

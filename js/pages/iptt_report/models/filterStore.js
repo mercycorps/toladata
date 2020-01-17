@@ -68,6 +68,7 @@ export default (
         _mostRecentForce: null,
         _groupBy: GROUP_BY_CHAIN,
         _indicatorFilters: {},
+        _hiddenColumns: [],
         get isTVA() {
             return this._reportType === TVA;
         },
@@ -671,6 +672,21 @@ export default (
         },
         get filtersActive() {
             return Object.values(this._indicatorFilters).reduce((a, b) => a + b.length, 0) > 0;
+        },
+        get hideColumnOptions() {
+            return [
+                {label: gettext('Unit of measure'), value: 0},
+                {label: gettext('Change'), value: 1},
+                {label: gettext('C / NC'), value: 2},
+                {label: '# / %', value: 3},
+                {label: gettext('Baseline'), value: 4}
+            ];
+        },
+        get hiddenColumns() {
+            return this.hideColumnOptions.filter(option => this._hiddenColumns.includes(option.value));
+        },
+        set hiddenColumns(hiddenColumnOptions = []) {
+            this._hiddenColumns = hiddenColumnOptions.map(v => parseInt(v));
         },
         get pathParams() {
             let params = {

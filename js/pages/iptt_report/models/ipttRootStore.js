@@ -123,8 +123,11 @@ export default (
             }
             return periodValues || [];
         },
+        get baseColumns() {
+            return 8 - (this.filterStore._hiddenColumns.length);
+        },
         get reportColumnWidth() {
-            return 8 + (!this.resultsFramework && 1) + 3 + (this.reportPeriods.length) * (this.isTVA ? 3 : 1);
+            return this.baseColumns + (!this.resultsFramework && 1) + 3 + (this.reportPeriods.length) * (this.isTVA ? 3 : 1);
         },
         get activeDisaggregationPks() {
             return this.filterStore.currentDisaggregations;
@@ -132,6 +135,21 @@ export default (
         getDisaggregationLabels(disaggregationPk) {
             return (this.currentProgram && this.currentProgram.disaggregations.has(disaggregationPk)) ?
                 this.currentProgram.disaggregations.get(disaggregationPk) : false;
+        },
+        get hasUOMColumn() {
+            return !this.filterStore._hiddenColumns.includes(0);
+        },
+        get hasChangeColumn() {
+            return !this.filterStore._hiddenColumns.includes(1);
+        },
+        get hasCNCColumn() {
+            return !this.filterStore._hiddenColumns.includes(2);
+        },
+        get hasUOMTypeColumn() {
+            return !this.filterStore._hiddenColumns.includes(3);
+        },
+        get hasBaselineColumn() {
+            return !this.filterStore._hiddenColumns.includes(4);
         },
         loadResultsModal(indicatorPk) {
             api.indicatorResultsTable(indicatorPk, false).then(

@@ -3,6 +3,7 @@ import { observer, inject } from 'mobx-react';
 import { MultiSelectCheckbox } from '../../../../components/selectWidgets';
 
 
+
 /**
  * input-ready multi-select checkbox widget for filtering IPTT report by level
  * contains both "grouping" and "chaining" filtering options, displayed as two optgroups
@@ -37,7 +38,7 @@ const DisaggregationSelect = inject('filterStore')(
     observer(({ filterStore }) => {
         return <MultiSelectCheckbox
                     label={
-                        /* # Translators: labels sites that a data could be collected at */
+                        /* # Translators: labels categories that  data could be disaggregated into */
                         gettext('Disaggregations')
                     }
                     options={ filterStore.disaggregationOptions }
@@ -47,6 +48,19 @@ const DisaggregationSelect = inject('filterStore')(
     })
 );
 
+const HiddenColumnSelect = inject('filterStore')(
+    observer(({ filterStore }) => {
+        return <MultiSelectCheckbox
+                    label={
+                        /* # Translators: labels columns that could be hidden in the report */
+                        gettext('Hide columns')
+                    }
+                    options={ filterStore.hideColumnOptions }
+                    value={ filterStore.hiddenColumns }
+                    update={ selected => {filterStore.hiddenColumns = selected.map(s => s.value);} }
+                />;
+    })
+);
 
 /**
  * multi-select checkbox for selecting sites for filtering IPTT */
@@ -114,4 +128,4 @@ const IndicatorSelect = inject('filterStore')(
                 />;
     })
 );
-export { LevelSelect, DisaggregationSelect, SiteSelect, TypeSelect, SectorSelect, IndicatorSelect };
+export { LevelSelect, DisaggregationSelect, SiteSelect, TypeSelect, SectorSelect, IndicatorSelect, HiddenColumnSelect };
