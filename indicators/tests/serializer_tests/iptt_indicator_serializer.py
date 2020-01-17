@@ -4,8 +4,8 @@
     corresponding to js/pages/program_page/models/ProgramPageIndicator
 """
 
-from factories.workflow_models import RFProgramFactory, SectorFactory, SiteProfileFactory
-from factories.indicators_models import RFIndicatorFactory, IndicatorTypeFactory
+from factories.workflow_models import RFProgramFactory, SectorFactory, SiteProfileFactory, CountryFactory
+from factories.indicators_models import RFIndicatorFactory, IndicatorTypeFactory, DisaggregationTypeFactory
 from indicators.serializers_new import IPTTIndicatorSerializer
 from indicators.models import Indicator
 
@@ -87,3 +87,38 @@ class TestIPTTIndicatorSerializer(test.TestCase):
         i.result_set.all()[1].site.add(site2)
         data = get_serialized_data(i.pk)
         self.assertEqual(data['site_pks'], sorted([site1.pk, site2.pk]))
+
+    def get_disaggregations(self):
+        standard_dt = DisaggregationTypeFactory(
+            disaggregation_type="Test Standard Disagg", standard=True,
+            labels=["Standard Label 1", "Standard Label 2"])
+        country = CountryFactory(country="TestLand", code="TL")
+        program = RFProgramFactory()
+        program.country.add(country)
+        country_dt = DisaggregationTypeFactory(
+            disaggregation_type="Test Disagg", country=country, standard=False,
+            labels=["Country Label 1", "Cøüntry Label 2", "Country Låbél 3"])
+        return program, standard_dt, country_dt
+
+    def test_has_no_disaggregations_assigned(self):
+        program, *_ = self.get_disaggregations()
+        i = RFIndicatorFactory(program=program)
+        data = get_serialized_data(i.pk)
+        self.assertEqual(data['disaggregation_pks'], [])
+
+    def test_has_one_disaggregations_assigned(self):
+        program, standard_dt, country_dt = self.get_disaggregations()
+        i = RFIndicatorFactory(program=program)
+        i.disaggregation.set([standard_dt])
+        data = get_serialized_data(i.pk)
+        self.assertEqual(data['disaggregation_pks'], [standard_dt.pk])
+        i.disaggregation.set([country_dt])
+        data = get_serialized_data(i.pk)
+        self.assertEqual(data['disaggregation_pks'], [country_dt.pk])
+
+    def test_has_multiple_disaggregations_assigned(self):
+        program, standard_dt, country_dt = self.get_disaggregations()
+        i = RFIndicatorFactory(program=program)
+        i.disaggregation.set([country_dt, standard_dt])
+        data = get_serialized_data(i.pk)
+        self.assertEqual(data['disaggregation_pks'], sorted([standard_dt.pk, country_dt.pk]))

@@ -14,6 +14,19 @@ export default (
         _filterStore: getFilterStore(reactContext),
         get filterStore() {return this._filterStore},
         _reportStore: getReportStore(reactContext.report || {}),
+        _expandoRows: [],
+        expandAllRows() {
+            this._expandoRows.forEach(row => {row.expandRow()});
+        },
+        get allExpanded() {
+            return this._expandoRows.every(row => row.state.expanded)
+        },
+        get allCollapsed() {
+            return this._expandoRows.every(row => !row.state.expanded)
+        },
+        collapseAllRows() {
+            this._expandoRows.forEach(row => {row.collapseRow()});
+        },
         get reportStore() {return this._reportStore},
         get currentReport() {
             return this.reportStore.getReport(this.filterStore.selectedFrequency);
@@ -96,8 +109,29 @@ export default (
             }
             return periodValues;
         },
+        disaggregatedLop(indicatorPk, disaggregationPk) {
+            return this.currentReport.has(parseInt(indicatorPk)) ?
+                this.currentReport.get(parseInt(indicatorPk)).disaggregatedLop(parseInt(disaggregationPk)) : null;
+        },
+        disaggregatedPeriodValues(indicatorPk, disaggregationPk) {
+            let periodValues = this.currentReport.has(parseInt(indicatorPk)) ? this.currentReport.get(parseInt(indicatorPk)).disaggregatedPeriodValues(parseInt(disaggregationPk)) : null;
+            if (periodValues && this.filterStore.selectedFrequency != 2) {
+                periodValues = periodValues.slice(this.filterStore.startPeriodValue, this.filterStore.endPeriodValue + 1);
+            }
+            if (periodValues && !this.isTVA) {
+                periodValues = periodValues.map(periodValue => periodValue.actual);
+            }
+            return periodValues || [];
+        },
         get reportColumnWidth() {
             return 8 + (!this.resultsFramework && 1) + 3 + (this.reportPeriods.length) * (this.isTVA ? 3 : 1);
+        },
+        get activeDisaggregationPks() {
+            return this.filterStore.currentDisaggregations;
+        },
+        getDisaggregationLabels(disaggregationPk) {
+            return (this.currentProgram && this.currentProgram.disaggregations.has(disaggregationPk)) ?
+                this.currentProgram.disaggregations.get(disaggregationPk) : false;
         },
         loadResultsModal(indicatorPk) {
             api.indicatorResultsTable(indicatorPk, false).then(
@@ -126,6 +160,14 @@ export default (
             }
         },
         {fireImmediately: true}
+    );
+    const _updateDisaggregationFilters = reaction(
+        () => [rootStore.filterStore._indicatorFilters.disaggregations],
+        ([disaggregationPks]) => {
+            if (disaggregationPks && disaggregationPks.length > 0) {
+                rootStore.expandAllRows();
+            }
+        }
     );
     return rootStore;
 }

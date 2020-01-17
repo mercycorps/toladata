@@ -7,6 +7,8 @@ from indicators.models import (
     Level,
     PeriodicTarget,
     Result,
+    DisaggregationType,
+    DisaggregationLabel,
     IndicatorSortingManagerMixin,
     IndicatorSortingQSMixin
 )
@@ -14,9 +16,10 @@ from indicators.queries import utils
 from workflow.models import Program
 from django.db import models
 from django.db.models.functions import Concat
-from django.utils.functional import cached_property
+
 
 class IPTTIndicatorQueryset(models.QuerySet, IndicatorSortingQSMixin):
+
     def with_prefetch(self):
         qs = self.all()
         qs = qs.select_related(
@@ -25,7 +28,14 @@ class IPTTIndicatorQueryset(models.QuerySet, IndicatorSortingQSMixin):
             'result_set',
             'result_set__site',
             'indicator_type',
-            'program__level_tiers'
+            'program__level_tiers',
+            models.Prefetch(
+                'disaggregation',
+                queryset=DisaggregationType.objects.select_related(None).prefetch_related(
+                    models.Prefetch('disaggregationlabel_set', to_attr='prefetch_labels')
+                ),
+                to_attr="prefetch_disaggregations"
+            )
         )
         return qs
 
@@ -76,6 +86,19 @@ class IPTTIndicatorQueryset(models.QuerySet, IndicatorSortingQSMixin):
         qs = self.annotate_old_level(qs).order_by(models.F('old_level_pk').asc(nulls_last=True))
         return qs
 
+    def with_disaggregation_annotations(self, disaggregation_category_pks=[]):
+        qs = self.all()
+        # add one lop_actual annotation for each disaggregation (targets/percent met to come with a later release)
+        annotations = {
+            'disaggregation_{}_lop_actual'.format(
+                disaggregation_category_pk
+            ): utils.indicator_disaggregated_lop_actual_annotation(disaggregation_category_pk)
+        for disaggregation_category_pk in disaggregation_category_pks
+        }
+        qs = qs.annotate(**annotations)
+        return qs
+        
+
     def apply_filters(self, levels=None, sites=None, types=None,
                       sectors=None, indicators=None, old_levels=False):
         qs = self.all()
@@ -110,11 +133,11 @@ class IPTTIndicatorQueryset(models.QuerySet, IndicatorSortingQSMixin):
         return [{'start': p['start'], 'end': p['end']} for p in PeriodicTarget.generate_for_frequency(frequency)(start, end)]
 
 class TVAIPTTQueryset(IPTTIndicatorQueryset):
-    def with_frequency_annotations(self, frequency, start, end):
+    def with_frequency_annotations(self, frequency, start, end, disaggregations=[]):
         qs = self
         if frequency == 'all':
             for freq in Indicator.REGULAR_TARGET_FREQUENCIES + tuple([Indicator.MID_END,]):
-                qs = qs.with_frequency_annotations(freq, start, end)
+                qs = qs.with_frequency_annotations(freq, start, end, disaggregations=disaggregations)
             return qs
         if frequency == Indicator.LOP:
             return qs
@@ -127,6 +150,10 @@ class TVAIPTTQueryset(IPTTIndicatorQueryset):
             for c, period in enumerate(periods):
                 annotations['frequency_{0}_period_{1}'.format(frequency, c)] = utils.timeaware_value_annotation(period)
                 annotations['frequency_{0}_period_{1}_target'.format(frequency, c)] = utils.timeaware_target_annotation(c)
+                for category_pk in disaggregations:
+                    annotations['disaggregation_{0}_frequency_{1}_period_{2}'.format(
+                        category_pk, frequency, c
+                        )] = utils.timeaware_disaggregated_value_annotation(category_pk, period)
             qs = qs.annotate(**annotations)
         elif frequency == Indicator.MID_END:
             qs = qs.annotate(
@@ -136,11 +163,15 @@ class TVAIPTTQueryset(IPTTIndicatorQueryset):
             for c in range(2):
                 annotations['frequency_{0}_period_{1}'.format(frequency, c)] = utils.mid_end_value_annotation(c)
                 annotations['frequency_{0}_period_{1}_target'.format(frequency, c)] = utils.mid_end_target_annotation(c)
+                for category_pk in disaggregations:
+                    annotations['disaggregation_{0}_frequency_{1}_period_{2}'.format(
+                        category_pk, frequency, c
+                        )] = utils.mid_end_disaggregated_value_annotation(category_pk, c)
             qs = qs.annotate(**annotations)
         return qs
 
 class TimeperiodsIPTTQueryset(IPTTIndicatorQueryset):
-    def with_frequency_annotations(self, frequency, start, end):
+    def with_frequency_annotations(self, frequency, start, end, disaggregations=[]):
         qs = self
         if frequency in [Indicator.LOP, Indicator.MID_END, Indicator.EVENT]:
             # LOP target timeperiods require no annotations
@@ -151,6 +182,10 @@ class TimeperiodsIPTTQueryset(IPTTIndicatorQueryset):
         annotations = {}
         for c, period in enumerate(periods):
             annotations['frequency_{0}_period_{1}'.format(frequency, c)] = utils.timeaware_value_annotation(period)
+            for category_pk in disaggregations:
+                annotations['disaggregation_{0}_frequency_{1}_period_{2}'.format(
+                    category_pk, frequency, c
+                )] = utils.timeaware_disaggregated_value_annotation(category_pk, period)
         qs = qs.annotate(**annotations)
         return qs
 
@@ -185,6 +220,13 @@ class IPTTIndicator(Indicator):
     def indicator_types(self):
         return [{'pk': indicator_type.pk,
                  'name': indicator_type.indicator_type} for indicator_type in self.indicator_type.all()]
+
+    @property
+    def disaggregation_category_pks(self):
+        return [
+            category.pk for disaggregation in getattr(self, 'prefetch_disaggregations', self.disaggregation.all())
+            for category in getattr(disaggregation, 'prefetch_labels', disaggregation.disaggregationlabel_set.all())
+        ]
 
     @property
     def lop_met_target(self):

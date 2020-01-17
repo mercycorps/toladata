@@ -73,3 +73,42 @@ td.iptt-level-row, td.ip-level-row {
     background-color: $gray-300;
     font-weight: bold;
 }
+
+td.expando-cell {
+    color: blue;
+    cursor: pointer;
+}
+
+tr.expando-table-row {
+    &>td {
+        border: 0px;
+        padding: 0px;
+    }
+}
+
+tr.expando-table-row-spacer {
+    background-color: $body-bg;
+    height: 5px;
+    td {
+        border: 0px;
+        padding: 0px;
+    }
+}
+
+td.disaggregation-name-cell {
+    width: 142px;
+    font-weight: bold;
+}
+
+td.disaggregation-label-cell {
+    width: 1176px;
+    text-align: right;
+    border-right: 0px;
+}
+
+td.disaggregation-value-cell {
+    width: 110px;
+    text-align: center;
+    border-right: 0px;
+    border-left: 0px;
+}

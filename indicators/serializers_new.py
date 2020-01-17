@@ -4,7 +4,7 @@ import string
 import operator
 from decimal import Decimal
 from rest_framework import serializers
-from indicators.models import Indicator, Level, LevelTier
+from indicators.models import Indicator, Level, LevelTier, DisaggregationType, DisaggregationLabel
 from indicators.queries import IPTTIndicator
 from workflow.models import Program
 from tola.model_utils import get_serializer
@@ -198,6 +198,7 @@ class IPTTIndicatorMixin:
     indicator_type_pks = serializers.SerializerMethodField()
     site_pks = serializers.SerializerMethodField()
     number = serializers.SerializerMethodField(method_name='get_long_number')
+    disaggregation_pks = serializers.SerializerMethodField()
 
     class Meta(IndicatorWithMeasurementSerializer.Meta):
         fields = IndicatorWithMeasurementSerializer.Meta.fields + [
@@ -205,6 +206,7 @@ class IPTTIndicatorMixin:
             'indicator_type_pks',
             'site_pks',
             'number',
+            'disaggregation_pks',
         ]
 
     def get_indicator_type_pks(self, indicator):
@@ -220,6 +222,14 @@ class IPTTIndicatorMixin:
                 set(site['pk'] for site in self.context['sites'] if site['result__indicator__pk'] == indicator.pk)
             )
         return sorted(set([site.pk for result in indicator.result_set.all() for site in result.site.all()]))
+
+    def get_disaggregation_pks(self, indicator):
+        if hasattr(self, 'context') and 'disaggregations' in self.context:
+            return sorted(
+                set(disaggregation['pk'] for disaggregation in self.context['disaggregations']
+                    if disaggregation['indicator__pk'] == indicator.pk)
+            )
+        return sorted(set([disaggregation.pk for disaggregation in indicator.disaggregation.all()]))
 
     def _get_rf_long_number(self, indicator):
         level_set = self.context.get('levels',
@@ -251,14 +261,18 @@ class IPTTReportIndicatorMixin:
     lop_actual = DecimalDisplayField()
     lop_percent_met = DecimalDisplayField(multiplier=100)
     lop_target = DecimalDisplayField(source='lop_target_calculated')
+    disaggregated_data = serializers.SerializerMethodField()
     report_data = serializers.SerializerMethodField()
+    disaggregated_report_data = serializers.SerializerMethodField()
 
     class Meta:
         fields = [
             'lop_actual',
             'lop_percent_met',
             'lop_target',
-            'report_data'
+            'disaggregated_data',
+            'report_data',
+            'disaggregated_report_data'
         ]
 
     @classmethod
@@ -266,10 +280,25 @@ class IPTTReportIndicatorMixin:
         program_data = Program.rf_aware_objects.only(
             'pk', 'reporting_period_start', 'reporting_period_end'
         ).get(pk=program_id)
-        indicators = cls.get_queryset(program_id, frequency).with_frequency_annotations(
-            frequency, program_data.reporting_period_start, program_data.reporting_period_end
+        disaggregation_categories = DisaggregationLabel.objects.select_related(
+            None
+        ).prefetch_related(None).order_by().filter(
+            disaggregation_type__indicator__program_id=program_id
+        ).distinct().values_list('pk', flat=True)
+        indicators = cls.get_queryset(program_id, frequency).with_disaggregation_annotations(
+            disaggregation_categories
+        ).with_frequency_annotations(
+            frequency, program_data.reporting_period_start, program_data.reporting_period_end,
+            disaggregations=disaggregation_categories
         )
         return cls(indicators, many=True, context={'frequency': frequency}).data
+
+    def get_disaggregated_data(self, indicator):
+        return {
+            disaggregation_pk: {
+                'lop_actual': getattr(indicator, 'disaggregation_{}_lop_actual'.format(disaggregation_pk))
+            }
+        for disaggregation_pk in indicator.disaggregation_category_pks}
 
     def get_report_data(self, indicator):
         count = getattr(indicator, 'frequency_{0}_count'.format(self.context.get('frequency')), 0)
@@ -277,6 +306,27 @@ class IPTTReportIndicatorMixin:
             [self.get_period_data(indicator, c) for c in range(count)], many=True
             ).data
         return report_data
+
+    def get_disaggregated_period_data(self, indicator, disaggregation_pk, count):
+        return {
+            'index': count,
+            'actual': getattr(
+                indicator, 'disaggregation_{0}_frequency_{1}_period_{2}'.format(
+                    disaggregation_pk,
+                    self.context.get('frequency'),
+                    count),
+                None
+                )
+            }
+
+    def get_disaggregated_report_data(self, indicator):
+        count = getattr(indicator, 'frequency_{0}_count'.format(self.context.get('frequency')), 0)
+        categories = [label.pk for disagg in indicator.disaggregation.all() for label in disagg.labels]
+        disaggregated_report_data = {
+            category_pk: self.disaggregated_period_serializer_class(
+                [self.get_disaggregated_period_data(indicator, category_pk, c) for c in range(count)], many=True
+            ).data for category_pk in categories}
+        return disaggregated_report_data
 
 
 class TVAPeriod(serializers.Serializer):
@@ -286,8 +336,15 @@ class TVAPeriod(serializers.Serializer):
     percent_met = DecimalDisplayField()
 
 
+class TimeperiodsPeriod(serializers.Serializer):
+    index = serializers.IntegerField()
+    actual = DecimalDisplayField()
+    
+
 class IPTTTVAMixin:
     period_serializer_class = TVAPeriod
+    disaggregated_period_serializer_class = TimeperiodsPeriod # until we add disaggregated targets, use TP serializer
+
     class Meta:
         fields = []
 
@@ -314,13 +371,9 @@ class IPTTTVAMixin:
         return period_data
 
 
-class TimeperiodsPeriod(serializers.Serializer):
-    index = serializers.IntegerField()
-    actual = DecimalDisplayField()
-
-
 class IPTTTPMixin:
     period_serializer_class = TimeperiodsPeriod
+    disaggregated_period_serializer_class = TimeperiodsPeriod
     class Meta:
         fields = []
 
@@ -485,4 +538,3 @@ class TierBase:
         return _(tier.name)
 
 IPTTTierSerializer = get_serializer(TierBase)
-        

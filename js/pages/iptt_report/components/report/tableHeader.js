@@ -39,6 +39,21 @@ const ProgramNameRow = inject('rootStore')(
     })
 );
 
+const ExpandAllRow = inject('rootStore')(observer(({ rootStore }) => {
+    return (
+        <tr className="title-row">
+            <td colSpan="2">
+                <button className="btn btn-medium text-action btn-sm"
+                onClick={rootStore.expandAllRows.bind(rootStore)}
+                disabled={ rootStore.allExpanded }>{ gettext('Expand all') }</button>
+                <button className="btn btn-medium text-action btn-sm"
+                onClick={rootStore.collapseAllRows.bind(rootStore)}
+                disabled={ rootStore.allCollapsed }>{ gettext('Collapse all') }</button>
+            </td>
+        </tr>
+    )
+}))
+
 const ColumnHeaderRow = inject('rootStore')(
     observer(({ rootStore }) => {
         return (
@@ -108,6 +123,7 @@ const ReportTableHeader = () => {
     return (
         <thead className="thead-light">
             <ProgramNameRow />
+            <ExpandAllRow />
             <ColumnHeaderRow />
         </thead>
         );
