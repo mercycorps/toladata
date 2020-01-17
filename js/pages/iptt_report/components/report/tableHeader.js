@@ -79,34 +79,34 @@ const ColumnHeaderRow = inject('rootStore')(
                         gettext('Level')
                     } />
                 }
-                <HeaderCells.BorderedHeader
+                { rootStore.hasUOMColumn && <HeaderCells.BorderedHeader
                     styleWidth={250}
                     label={
                         /* # Translators: Column header */
                         gettext('Unit of measure')
-                    } />
-                <HeaderCells.BorderedHeader
+                    } /> }
+                { rootStore.hasChangeColumn && <HeaderCells.BorderedHeader
                     label={
                         /* # Translators: Column header for "direction of change" column (increasing/decreasing) */
                         gettext('Change')
-                    } />
-                <HeaderCells.BorderedHeader
+                    } /> }
+                { rootStore.hasCNCColumn && <HeaderCells.BorderedHeader
                     styleWidth={130}
                     label={
                         /* # Translators: Column header, stands for "Cumulative"/"Non-cumulative" */
                         gettext('C / NC')
-                    } />
-                <HeaderCells.BorderedHeader
+                    } /> }
+                { rootStore.hasUOMTypeColumn && <HeaderCells.BorderedHeader
                     styleWidth={50}
                     label={
                         /* # Translators: Column header, numeric or percentage type indicator */
                         gettext('# / %')
-                    } />
-                <HeaderCells.BorderedHeader
+                    } /> }
+                { rootStore.hasBaselineColumn && <HeaderCells.BorderedHeader
                     label={
                         /* # Translators: Column header */
                         gettext('Baseline')
-                    } />
+                    } /> }
                 <HeaderCells.TVAHeader />
                 { rootStore.reportPeriods.map(
                     (period, index) => (rootStore.isTVA ?

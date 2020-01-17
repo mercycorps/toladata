@@ -17,6 +17,7 @@ const FilterTop = inject('filterStore')(
                 { filterStore.resultsFramework &&
                     <Selectors.GroupingSelect />
                 }
+                <Filters.HiddenColumnSelect />
             </React.Fragment>
         );
     })
