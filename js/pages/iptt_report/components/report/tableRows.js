@@ -138,10 +138,10 @@ const DisaggregationTable = inject('rootStore')(
                                     {disaggregation.name}</td>
                                 }
                                 <td colSpan={rootStore.baseColumns - 2} className="disaggregation-label-cell">{label.name}</td>
-                                <td className="disaggregation-value-cell" >–</td>
-                                <td className="disaggregation-value-cell" >–</td>
+                                <td className="disaggregation-value-cell" >—</td>
+                                <td className="disaggregation-value-cell" >—</td>
                                 <ValueCell className="disaggregation-value-cell" value={ ipttRound(rootStore.disaggregatedLop(indicator.pk, label.pk), false) } />
-                                <td className="disaggregation-value-cell" >–</td>
+                                <td className="disaggregation-value-cell" >—</td>
                                 {
                                     rootStore.disaggregatedPeriodValues(indicator.pk, label.pk).map(
                                         (periodValue, idx) => {
