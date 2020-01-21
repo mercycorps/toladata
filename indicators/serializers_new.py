@@ -285,12 +285,6 @@ class IPTTReportIndicatorMixin:
         ).prefetch_related(None).order_by().filter(
             disaggregation_type__indicator__program_id=program_id
         ).distinct().values_list('pk', flat=True)
-        # indicators = cls.get_queryset(program_id, frequency).with_disaggregation_annotations(
-        #     disaggregation_categories
-        # ).with_frequency_annotations(
-        #     frequency, program_data.reporting_period_start, program_data.reporting_period_end,
-        #     disaggregations=disaggregation_categories
-        # )
         indicators = cls.get_queryset(program_id, frequency).with_frequency_annotations(
             frequency, program_data.reporting_period_start, program_data.reporting_period_end,
         )
