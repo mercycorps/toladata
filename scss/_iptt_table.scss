@@ -77,6 +77,7 @@ td.iptt-level-row, td.ip-level-row {
 td.expando-cell {
     color: $blue;
     cursor: pointer;
+    border-right: none;
 }
 
 tr.expando-table-row {
@@ -96,19 +97,60 @@ tr.expando-table-row-spacer {
 }
 
 td.disaggregation-name-cell {
-    width: 142px;
+    width: 142px; // TODO: hardcoded!
     font-weight: bold;
 }
 
 td.disaggregation-label-cell {
-    width: 1176px;
+    width: 1176px; // TODO: hardcoded!
     text-align: right;
     border-right: 0px;
 }
 
 td.disaggregation-value-cell {
-    width: 110px;
-    text-align: center;
+    background: $gray-150;
+    width: 110px; // TODO: hardcoded!
+    text-align: right;
     border-right: 0px;
     border-left: 0px;
+}
+%borderless-cell {
+    border-left: none;
+    border-right: none;
+}
+%right-aligned-cell {
+    text-align: right;
+}
+// note specificity on following selectors, clobbers td/th specificity from BS
+td.indicator-edit-modal-cell {
+    @extend %borderless-cell;
+}
+td.indicator-result-modal-cell {
+    @extend %borderless-cell;
+}
+td.indicator-cell {
+    @extend %borderless-cell;
+}
+.result-cell {
+    @extend %right-aligned-cell;
+}
+.number-cell {
+    @extend %right-aligned-cell;
+}
+.percent-cell {
+    @extend %right-aligned-cell;
+}
+.old-level-display {
+}
+.unit-of-measure-column {
+}
+.has-change-column {
+}
+.has-cnc-column {
+}
+.is-percent-column {
+    @extend %right-aligned-cell;
+}
+.baseline-column {
+    @extend %right-aligned-cell;
 }
