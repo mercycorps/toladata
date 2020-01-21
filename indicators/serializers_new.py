@@ -326,9 +326,14 @@ class IPTTReportIndicatorMixin:
 
     def get_disaggregated_report_data(self, indicator):
         count = getattr(indicator, 'frequency_{0}_count'.format(self.context.get('frequency')), 0)
+        # note: filter here means only the periods with values and the final period (null or not) get sent
+        # this is to minimize the size of the JSON transfers going back and forth
         disaggregated_report_data = {
             category_pk: self.disaggregated_period_serializer_class(
-                [self.get_disaggregated_period_data(indicator, category_pk, c) for c in range(count)], many=True
+                filter(
+                    lambda period_data: (period_data['index'] == count-1 or period_data['actual'] is not None),
+                    [self.get_disaggregated_period_data(indicator, category_pk, c) for c in range(count)]
+                ), many=True
             ).data for category_pk in indicator.disaggregation_category_pks}
         return disaggregated_report_data
 
