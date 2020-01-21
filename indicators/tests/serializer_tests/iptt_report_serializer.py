@@ -411,15 +411,15 @@ class TestIPTTReportTPPeriodValues(test.TestCase):
         disaggregated_report_data = get_tp_report_data(indicator, Indicator.ANNUAL)['disaggregated_report_data']
         self.assertListEqual(list(disaggregated_report_data.keys()),
                              [l.pk for l in standard_disaggregation.labels])
-        self.assertEqual(disaggregated_report_data[standard_disaggregation.labels[0].pk][0]['actual'], None)
-        self.assertEqual(disaggregated_report_data[standard_disaggregation.labels[0].pk][1]['actual'], '100')
-        self.assertEqual(disaggregated_report_data[standard_disaggregation.labels[1].pk][0]['actual'], None)
-        self.assertEqual(disaggregated_report_data[standard_disaggregation.labels[1].pk][1]['actual'], '150')
+        self.assertEqual(disaggregated_report_data[standard_disaggregation.labels[0].pk][0]['actual'], '100')
+        self.assertEqual(disaggregated_report_data[standard_disaggregation.labels[0].pk][0]['index'], 1)
+        self.assertEqual(disaggregated_report_data[standard_disaggregation.labels[1].pk][0]['actual'], '150')
+        self.assertEqual(disaggregated_report_data[standard_disaggregation.labels[1].pk][0]['index'], 1)
         disaggregated_report_data2 = get_tp_report_data(indicator, Indicator.TRI_ANNUAL)['disaggregated_report_data']
-        self.assertEqual(disaggregated_report_data2[standard_disaggregation.labels[0].pk][0]['actual'], None)
-        self.assertEqual(disaggregated_report_data2[standard_disaggregation.labels[0].pk][3]['actual'], '100')
-        self.assertEqual(disaggregated_report_data2[standard_disaggregation.labels[1].pk][0]['actual'], None)
-        self.assertEqual(disaggregated_report_data2[standard_disaggregation.labels[1].pk][3]['actual'], '150')
+        self.assertEqual(disaggregated_report_data2[standard_disaggregation.labels[0].pk][0]['actual'], '100')
+        self.assertEqual(disaggregated_report_data2[standard_disaggregation.labels[0].pk][0]['index'], 3)
+        self.assertEqual(disaggregated_report_data2[standard_disaggregation.labels[1].pk][0]['actual'], '150')
+        self.assertEqual(disaggregated_report_data2[standard_disaggregation.labels[1].pk][0]['index'], 3)
 
     def test_two_disaggregated_results_in_two_periods(self):
         indicator = RFIndicatorFactory(program=self.program, targets=500, target_frequency=Indicator.ANNUAL)
@@ -435,9 +435,11 @@ class TestIPTTReportTPPeriodValues(test.TestCase):
         self.assertEqual(disaggregated_report_data[standard_disaggregation.labels[1].pk][1]['actual'], '120')
         disaggregated_report_data2 = get_tp_report_data(indicator, Indicator.TRI_ANNUAL)['disaggregated_report_data']
         self.assertEqual(disaggregated_report_data2[standard_disaggregation.labels[0].pk][0]['actual'], '100.1')
-        self.assertEqual(disaggregated_report_data2[standard_disaggregation.labels[0].pk][3]['actual'], '200')
+        self.assertEqual(disaggregated_report_data2[standard_disaggregation.labels[0].pk][1]['actual'], '200')
+        self.assertEqual(disaggregated_report_data2[standard_disaggregation.labels[0].pk][1]['index'], 3)
         self.assertEqual(disaggregated_report_data2[standard_disaggregation.labels[1].pk][0]['actual'], '49.9')
-        self.assertEqual(disaggregated_report_data2[standard_disaggregation.labels[1].pk][3]['actual'], '120')
+        self.assertEqual(disaggregated_report_data2[standard_disaggregation.labels[1].pk][1]['actual'], '120')
+        self.assertEqual(disaggregated_report_data2[standard_disaggregation.labels[1].pk][1]['index'], 3)
 
     def test_two_disaggregated_results_in_one_period_numeric(self):
         indicator = RFIndicatorFactory(program=self.program, targets=500, target_frequency=Indicator.ANNUAL)
@@ -449,14 +451,14 @@ class TestIPTTReportTPPeriodValues(test.TestCase):
         result2 = get_result(indicator, 300, target_period=1, days=4)
         get_disaggregated_value(result2, standard_disaggregation, [1, 299])
         disaggregated_report_data = get_tp_report_data(indicator, Indicator.ANNUAL)['disaggregated_report_data']
-        self.assertEqual(disaggregated_report_data[standard_disaggregation.labels[0].pk][0]['actual'], None)
-        self.assertEqual(disaggregated_report_data[standard_disaggregation.labels[0].pk][1]['actual'], '2')
-        self.assertEqual(disaggregated_report_data[standard_disaggregation.labels[1].pk][0]['actual'], None)
-        self.assertEqual(disaggregated_report_data[standard_disaggregation.labels[1].pk][1]['actual'], '448')
-        self.assertEqual(disaggregated_report_data[country_disaggregation.labels[0].pk][0]['actual'], None)
-        self.assertEqual(disaggregated_report_data[country_disaggregation.labels[0].pk][1]['actual'], '100')
-        self.assertEqual(disaggregated_report_data[country_disaggregation.labels[1].pk][0]['actual'], None)
-        self.assertEqual(disaggregated_report_data[country_disaggregation.labels[1].pk][1]['actual'], '50')
+        self.assertEqual(disaggregated_report_data[standard_disaggregation.labels[0].pk][0]['actual'], '2')
+        self.assertEqual(disaggregated_report_data[standard_disaggregation.labels[0].pk][0]['index'], 1)
+        self.assertEqual(disaggregated_report_data[standard_disaggregation.labels[1].pk][0]['actual'], '448')
+        self.assertEqual(disaggregated_report_data[standard_disaggregation.labels[1].pk][0]['index'], 1)
+        self.assertEqual(disaggregated_report_data[country_disaggregation.labels[0].pk][0]['actual'], '100')
+        self.assertEqual(disaggregated_report_data[country_disaggregation.labels[0].pk][0]['index'], 1)
+        self.assertEqual(disaggregated_report_data[country_disaggregation.labels[1].pk][0]['actual'], '50')
+        self.assertEqual(disaggregated_report_data[country_disaggregation.labels[1].pk][0]['index'], 1)
 
 
     def test_two_disaggregated_results_in_one_period_percent(self):
@@ -470,14 +472,14 @@ class TestIPTTReportTPPeriodValues(test.TestCase):
         result2 = get_result(indicator, 300, target_period=1, days=4)
         get_disaggregated_value(result2, standard_disaggregation, [1, 299])
         disaggregated_report_data = get_tp_report_data(indicator, Indicator.ANNUAL)['disaggregated_report_data']
-        self.assertEqual(disaggregated_report_data[standard_disaggregation.labels[0].pk][0]['actual'], None)
-        self.assertEqual(disaggregated_report_data[standard_disaggregation.labels[0].pk][1]['actual'], '1')
-        self.assertEqual(disaggregated_report_data[standard_disaggregation.labels[1].pk][0]['actual'], None)
-        self.assertEqual(disaggregated_report_data[standard_disaggregation.labels[1].pk][1]['actual'], '299')
+        self.assertEqual(disaggregated_report_data[standard_disaggregation.labels[0].pk][0]['actual'], '1')
+        self.assertEqual(disaggregated_report_data[standard_disaggregation.labels[0].pk][0]['index'], 1)
+        self.assertEqual(disaggregated_report_data[standard_disaggregation.labels[1].pk][0]['actual'], '299')
+        self.assertEqual(disaggregated_report_data[standard_disaggregation.labels[1].pk][0]['index'], 1)
         self.assertEqual(disaggregated_report_data[country_disaggregation.labels[0].pk][0]['actual'], None)
-        self.assertEqual(disaggregated_report_data[country_disaggregation.labels[0].pk][1]['actual'], None)
+        self.assertEqual(disaggregated_report_data[country_disaggregation.labels[0].pk][0]['index'], 1)
         self.assertEqual(disaggregated_report_data[country_disaggregation.labels[1].pk][0]['actual'], None)
-        self.assertEqual(disaggregated_report_data[country_disaggregation.labels[1].pk][1]['actual'], None)
+        self.assertEqual(disaggregated_report_data[country_disaggregation.labels[1].pk][0]['index'], 1)
 
     def test_extraneous_disaggregations_excluded(self):
         other_indicator = RFIndicatorFactory(program=self.program, targets=500, target_frequency=Indicator.ANNUAL,
@@ -578,10 +580,10 @@ class TestIPTTReportTVAPeriodValues(test.TestCase):
         disaggregated_report_data = get_tva_report_data(indicator, Indicator.ANNUAL)['disaggregated_report_data']
         self.assertListEqual(list(disaggregated_report_data.keys()),
                              [l.pk for l in standard_disaggregation.labels])
-        self.assertEqual(disaggregated_report_data[standard_disaggregation.labels[0].pk][0]['actual'], None)
-        self.assertEqual(disaggregated_report_data[standard_disaggregation.labels[0].pk][1]['actual'], '100')
-        self.assertEqual(disaggregated_report_data[standard_disaggregation.labels[1].pk][0]['actual'], None)
-        self.assertEqual(disaggregated_report_data[standard_disaggregation.labels[1].pk][1]['actual'], '150')
+        self.assertEqual(disaggregated_report_data[standard_disaggregation.labels[0].pk][0]['actual'], '100')
+        self.assertEqual(disaggregated_report_data[standard_disaggregation.labels[0].pk][0]['index'], 1)
+        self.assertEqual(disaggregated_report_data[standard_disaggregation.labels[1].pk][0]['actual'], '150')
+        self.assertEqual(disaggregated_report_data[standard_disaggregation.labels[1].pk][0]['index'], 1)
 
     def test_two_disaggregated_results_in_two_periods(self):
         indicator = RFIndicatorFactory(program=self.program, targets=500, target_frequency=Indicator.SEMI_ANNUAL)
@@ -606,14 +608,14 @@ class TestIPTTReportTVAPeriodValues(test.TestCase):
         result2 = get_result(indicator, 300, target_period=4, days=4)
         get_disaggregated_value(result2, standard_disaggregation, [1, 299])
         disaggregated_report_data = get_tva_report_data(indicator, Indicator.MONTHLY)['disaggregated_report_data']
-        self.assertEqual(disaggregated_report_data[standard_disaggregation.labels[0].pk][0]['actual'], None)
-        self.assertEqual(disaggregated_report_data[standard_disaggregation.labels[0].pk][4]['actual'], '2')
-        self.assertEqual(disaggregated_report_data[standard_disaggregation.labels[1].pk][0]['actual'], None)
-        self.assertEqual(disaggregated_report_data[standard_disaggregation.labels[1].pk][4]['actual'], '448')
-        self.assertEqual(disaggregated_report_data[country_disaggregation.labels[0].pk][0]['actual'], None)
-        self.assertEqual(disaggregated_report_data[country_disaggregation.labels[0].pk][4]['actual'], '100')
-        self.assertEqual(disaggregated_report_data[country_disaggregation.labels[1].pk][0]['actual'], None)
-        self.assertEqual(disaggregated_report_data[country_disaggregation.labels[1].pk][4]['actual'], '50')
+        self.assertEqual(disaggregated_report_data[standard_disaggregation.labels[0].pk][0]['actual'], '2')
+        self.assertEqual(disaggregated_report_data[standard_disaggregation.labels[0].pk][0]['index'], 4)
+        self.assertEqual(disaggregated_report_data[standard_disaggregation.labels[1].pk][0]['actual'], '448')
+        self.assertEqual(disaggregated_report_data[standard_disaggregation.labels[1].pk][0]['index'], 4)
+        self.assertEqual(disaggregated_report_data[country_disaggregation.labels[0].pk][0]['actual'], '100')
+        self.assertEqual(disaggregated_report_data[country_disaggregation.labels[0].pk][0]['index'], 4)
+        self.assertEqual(disaggregated_report_data[country_disaggregation.labels[1].pk][0]['actual'], '50')
+        self.assertEqual(disaggregated_report_data[country_disaggregation.labels[1].pk][0]['index'], 4)
 
     def test_two_disaggregated_results_in_one_period_midend(self):
         indicator = RFIndicatorFactory(program=self.program, targets=500, target_frequency=Indicator.MID_END)
@@ -628,11 +630,11 @@ class TestIPTTReportTVAPeriodValues(test.TestCase):
                              date=self.program.reporting_period_end - datetime.timedelta(days=2))
         get_disaggregated_value(result2, standard_disaggregation, [1, 299])
         disaggregated_report_data = get_tva_report_data(indicator, Indicator.MID_END)['disaggregated_report_data']
-        self.assertEqual(disaggregated_report_data[standard_disaggregation.labels[0].pk][0]['actual'], None)
-        self.assertEqual(disaggregated_report_data[standard_disaggregation.labels[0].pk][1]['actual'], '2')
-        self.assertEqual(disaggregated_report_data[standard_disaggregation.labels[1].pk][0]['actual'], None)
-        self.assertEqual(disaggregated_report_data[standard_disaggregation.labels[1].pk][1]['actual'], '448')
-        self.assertEqual(disaggregated_report_data[country_disaggregation.labels[0].pk][0]['actual'], None)
-        self.assertEqual(disaggregated_report_data[country_disaggregation.labels[0].pk][1]['actual'], '100')
-        self.assertEqual(disaggregated_report_data[country_disaggregation.labels[1].pk][0]['actual'], None)
-        self.assertEqual(disaggregated_report_data[country_disaggregation.labels[1].pk][1]['actual'], '50')
+        self.assertEqual(disaggregated_report_data[standard_disaggregation.labels[0].pk][0]['actual'], '2')
+        self.assertEqual(disaggregated_report_data[standard_disaggregation.labels[0].pk][0]['index'], 1)
+        self.assertEqual(disaggregated_report_data[standard_disaggregation.labels[1].pk][0]['actual'], '448')
+        self.assertEqual(disaggregated_report_data[standard_disaggregation.labels[1].pk][0]['index'], 1)
+        self.assertEqual(disaggregated_report_data[country_disaggregation.labels[0].pk][0]['actual'], '100')
+        self.assertEqual(disaggregated_report_data[country_disaggregation.labels[0].pk][0]['index'], 1)
+        self.assertEqual(disaggregated_report_data[country_disaggregation.labels[1].pk][0]['actual'], '50')
+        self.assertEqual(disaggregated_report_data[country_disaggregation.labels[1].pk][0]['index'], 1)
