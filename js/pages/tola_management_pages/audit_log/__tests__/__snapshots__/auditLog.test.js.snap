@@ -1,0 +1,157 @@
+// Jest Snapshot v1, https://goo.gl/fbAQLP
+
+exports[`Audit log orders disaggregations correctly 1`] = `
+<div>
+  <p
+    className="disagg-type__title"
+  >
+    Type of Leader
+  </p>
+  <div
+    className="change__field"
+  >
+    <strong>
+      Value One
+      :
+    </strong>
+     
+    
+  </div>
+  <div
+    className="change__field"
+  >
+    <strong>
+      Value Two
+      :
+    </strong>
+     
+    
+  </div>
+  <div
+    className="change__field"
+  >
+    <strong>
+      Value Three
+      :
+    </strong>
+     
+    
+  </div>
+  <div
+    className="change__field"
+  >
+    <strong>
+      Value Four
+      :
+    </strong>
+     
+    
+  </div>
+</div>
+`;
+
+exports[`Audit log orders disaggregations correctly 2`] = `
+<div>
+  <p
+    className="disagg-type__title"
+  >
+    Type of Leader
+  </p>
+  <div
+    className="change__field"
+  >
+    <strong>
+      Value Four
+      :
+    </strong>
+     
+    
+  </div>
+  <div
+    className="change__field"
+  >
+    <strong>
+      Value Two
+      :
+    </strong>
+     
+    
+  </div>
+  <div
+    className="change__field"
+  >
+    <strong>
+      Value Three
+      :
+    </strong>
+     
+    
+  </div>
+  <div
+    className="change__field"
+  >
+    <strong>
+      Value One
+      :
+    </strong>
+     
+    
+  </div>
+</div>
+`;
+
+exports[`Audit log orders disaggregations types correctly 1`] = `
+<div
+  className="changelog__change__targets"
+>
+  <h4
+    className="text-small"
+  >
+    Disaggregated values
+  </h4>
+  <div>
+    <p
+      className="disagg-type__title"
+    >
+      Another Disaggregation
+    </p>
+    <div
+      className="change__field"
+    >
+      <strong>
+        Type Two Value One
+        :
+      </strong>
+       
+      18.00
+    </div>
+  </div>
+  <div>
+    <p
+      className="disagg-type__title"
+    >
+      Type of Leader
+    </p>
+    <div
+      className="change__field"
+    >
+      <strong>
+        Type One Value Two
+        :
+      </strong>
+       
+      23.00
+    </div>
+    <div
+      className="change__field"
+    >
+      <strong>
+        Type One Value One
+        :
+      </strong>
+       
+      2.00
+    </div>
+  </div>
+</div>
+`;
