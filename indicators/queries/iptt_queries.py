@@ -127,7 +127,7 @@ class IPTTIndicatorQueryset(models.QuerySet, IndicatorSortingQSMixin):
                     )] = utils.timeaware_disaggregated_value_annotation(category_pk, period)
             qs = qs.annotate(**annotations)
         return qs
-        
+
 
     def apply_filters(self, levels=None, sites=None, types=None,
                       sectors=None, indicators=None, old_levels=False):
@@ -245,6 +245,18 @@ class IPTTIndicator(Indicator):
             category.pk for disaggregation in getattr(self, 'prefetch_disaggregations', self.disaggregation.all())
             for category in getattr(disaggregation, 'prefetch_labels', disaggregation.disaggregationlabel_set.all())
         ]
+
+    @property
+    def active_disaggregation_category_pks(self):
+        return [category_pk for category_pk in self.disaggregation_category_pks if getattr(
+            self, f'disaggregation_{category_pk}_lop_actual', None
+            )]
+
+    @property
+    def inactive_disaggregation_category_pks(self):
+        return [category_pk for category_pk in self.disaggregation_category_pks if getattr(
+            self, f'disaggregation_{category_pk}_lop_actual', None
+            ) is None]
 
     @property
     def lop_met_target(self):
