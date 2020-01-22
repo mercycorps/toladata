@@ -1,8 +1,17 @@
 import { observable } from 'mobx';
 
+
+/*
+ * Take an array [{index: #, actual: #},] and fill in all indices from 0 to max with actual: null
+ * Uncompresses serialized report data for IPTT
+ */
 const impliedNullValuesMapper = (values) => {
+    // map of existing (non-null) indices to their actual value
     let valuesMap = new Map(values.map(v => [v.index, v.actual]));
-    let valuesArray = [...Array(Math.max(...values.map(v => v.index)) + 1).keys()].map(i => ({index: i, actual: valuesMap.has(i) ? valuesMap.get(i) : null}))
+    // iterate from 0 to largest index value provided
+    let valuesArray = [...Array(Math.max(...values.map(v => v.index)) + 1).keys()]
+    // for each either provide the value from the values Map if it exists (this value was provided) or default to null
+        .map(i => ({index: i, actual: valuesMap.has(i) ? valuesMap.get(i) : null}))
     return valuesArray;
 }
 
