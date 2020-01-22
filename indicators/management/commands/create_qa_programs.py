@@ -455,7 +455,9 @@ class Command(BaseCommand):
             sites.append(None)
         site_cycle = cycle(sites)
 
-        disagg_cycle = cycle([0, 1, 2])
+
+        country_disagg_cycle = cycle([0, 1, 2])
+        sadd_disagg_cycle = cycle([True, True, True, False])
         result_disagg_cycle = cycle(['sadd', 'one', 'two', 'none', 'all', 'all', 'all', 'none'])
 
         for n, params in enumerate(param_sets):
@@ -463,7 +465,8 @@ class Command(BaseCommand):
                 cumulative_text = 'Cumulative'
             else:
                 cumulative_text = 'Non-cumulative'
-            disagg_count = next(disagg_cycle)
+            country_disagg_count = next(country_disagg_cycle)
+            sadd_disagg = next(sadd_disagg_cycle)
             result_disagg = next(result_disagg_cycle)
 
             indicator_name_list = [
@@ -471,12 +474,21 @@ class Command(BaseCommand):
                 uom_labels[params['uom_type']],
                 cumulative_text,
                 direction_labels[params['direction']],
-                f"Disagg: {disagg_count}",
+                f"Disagg type - SADD:{sadd_disagg}, Country:{country_disagg_count}",
+
             ]
             if params['null_level']:
                 indicator_name_list.append(f"| No {params['null_level']}")
             else:
-                indicator_name_list.append(f"Result disagg: {result_disagg}")
+                result_text_list = []
+                result_text_list.append(f"SADD:{result_disagg in ('all', 'sadd')}") if sadd_disagg else None
+                result_text_list.append(f"Country:{result_disagg in ('one', 'two', 'all')}") if country_disagg_count > 0 else None
+                if len(result_text_list) > 0:
+                    result_text = ", ".join(result_text_list)
+                else:
+                    result_text = "None"
+                indicator_name_list.append(
+                    f"Disaggs applied - {result_text}")
             if indicator_suffix:
                 indicator_name_list.append(indicator_suffix)
             indicator_name = ' | '.join(indicator_name_list)
@@ -500,10 +512,10 @@ class Command(BaseCommand):
                 sector=None if not personal_indicator else next(sector_cycle),
             )
             indicator.save()
-            if self.sadd_disagg:
+            if self.sadd_disagg and sadd_disagg:
                 indicator.disaggregation.add(self.sadd_disagg)
             country = Country.objects.get(country="Tolaland")
-            for disagg in country.disaggregationtype_set.all().order_by('?')[:disagg_count]:
+            for disagg in country.disaggregationtype_set.all().order_by('?')[:country_disagg_count]:
                 indicator.disaggregation.add(disagg)
 
             i_type = next(type_cycle)

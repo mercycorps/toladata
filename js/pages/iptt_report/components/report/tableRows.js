@@ -39,7 +39,7 @@ const IndicatorEditModalCell = inject('rootStore')(
                 });
         }
         return (
-            <td className="td-no-side-borders">
+            <td className="indicator-edit-modal-cell">
                 <button type="button" className="btn btn-link p-1 float-right"
                         onClick={ loadModal }>
                     <i className="fas fa-cog"></i>
@@ -57,7 +57,7 @@ const IndicatorResultModalCell = inject("rootStore")(
             rootStore.loadResultsModal(indicator.pk);
         }
         return (
-            <td className="td-no-side-borders">
+            <td className="indicator-result-modal-cell">
                 <button type="button" className="btn btn-link p-1 indicator-ajax-popup indicator-data"
                         onClick={ loadModal }>
                     <i className="fas fa-table"></i>
@@ -71,17 +71,17 @@ const IndicatorResultModalCell = inject("rootStore")(
 const IndicatorCell = ({ value, resultCell, ...props }) => {
     const displayValue = (value || value === 0) ? value : BLANK_TABLE_CELL;
     if (resultCell && resultCell === true) {
-        return <td { ...props }>{ displayValue }</td>;
+        return <td className="indicator-cell result-cell" { ...props }>{ displayValue }</td>;
     }
     return (
-        <td className="td-no-side-borders" { ...props }>{ displayValue }</td>
+        <td className="indicator-cell" { ...props }>{ displayValue }</td>
     );
 }
 
 const ExpandoCell = observer(({ value, expanded, clickHandler, ...props }) => {
     const displayValue = (value || value === 0) ? value : BLANK_TABLE_CELL;
     return (
-        <td className="td-no-side-borders expando-cell" { ...props } onClick={ clickHandler }>
+        <td className="expando-cell" { ...props } onClick={ clickHandler }>
             <FontAwesomeIcon icon={expanded ? 'caret-down' : 'caret-right'} />&nbsp;
             { displayValue }
         </td>
@@ -90,11 +90,11 @@ const ExpandoCell = observer(({ value, expanded, clickHandler, ...props }) => {
 
 const PercentCell = ({ value, ...props }) => {
     value = (value !== undefined && value !== null) ? `${value}%` : null;
-    return <IndicatorCell value={ value } align="right" { ...props } />;
+    return <IndicatorCell className="indicator-cell percent-cell" value={ value } { ...props } />;
 }
 
 const NumberCell = ({ value, ...props }) => {
-    return <IndicatorCell value={ value } align="right" { ...props } />;
+    return <IndicatorCell className="indicator-cell number-cell" value={ value } { ...props } />;
 }
 
 const TVAResultsGroup = ({ value, resultCell, ...props }) => {
@@ -138,10 +138,10 @@ const DisaggregationTable = inject('rootStore')(
                                     {disaggregation.name}</td>
                                 }
                                 <td colSpan={rootStore.baseColumns - 2} className="disaggregation-label-cell">{label.name}</td>
-                                <td className="disaggregation-value-cell" >–</td>
-                                <td className="disaggregation-value-cell" >–</td>
+                                <td className="disaggregation-value-cell" >—</td>
+                                <td className="disaggregation-value-cell" >—</td>
                                 <ValueCell className="disaggregation-value-cell" value={ ipttRound(rootStore.disaggregatedLop(indicator.pk, label.pk), false) } />
-                                <td className="disaggregation-value-cell" >–</td>
+                                <td className="disaggregation-value-cell" >—</td>
                                 {
                                     rootStore.disaggregatedPeriodValues(indicator.pk, label.pk).map(
                                         (periodValue, idx) => {
@@ -174,19 +174,19 @@ class IndicatorRow extends React.Component {
         };
         this.props.rootStore._expandoRows.push(this);
     }
-    
+
     handleExpandoClick = (e) => {
         this.setState({expanded: !this.state.expanded});
     }
-    
+
     expandRow = () => {
         this.setState({expanded: true});
     }
-    
+
     collapseRow = () => {
         this.setState({expanded: false});
     }
-    
+
     render() {
         let indicator = this.props.indicator;
         let rootStore = this.props.rootStore;
@@ -212,16 +212,16 @@ class IndicatorRow extends React.Component {
                 <tr>
                     {indicator.hasDisaggregations(rootStore.activeDisaggregationPks) ?
                     <ExpandoCell value={ displayNumber } expanded={ this.state.expanded } clickHandler={ this.handleExpandoClick } /> :
-                    <IndicatorCell value={ displayNumber } />
+                    <IndicatorCell className="indicator-cell display-number" value={ displayNumber } />
                     }
                     <IndicatorResultModalCell indicator={ indicator } />
                     <IndicatorEditModalCell indicator={ indicator } />
-                    { !rootStore.resultsFramework && <IndicatorCell value={ indicator.oldLevelDisplay } /> }
-                    { rootStore.hasUOMColumn && <IndicatorCell value={ indicator.unitOfMeasure } /> }
-                    { rootStore.hasChangeColumn && <IndicatorCell value={ indicator.directionOfChange || gettext('N/A') } align="center" /> }
-                    { rootStore.hasCNCColumn && <IndicatorCell value={ cumulative || gettext('N/A') } /> }
-                    { rootStore.hasUOMTypeColumn && <IndicatorCell value={ indicator.isPercent ? '%' : '#' } align="center" /> }
-                    { rootStore.hasBaselineColumn && (indicator.baseline === null ? <IndicatorCell value={ gettext('N/A') } align="right"/> : <ValueCell value={ indicator.baseline } /> ) }
+                    { !rootStore.resultsFramework && <IndicatorCell className="indicator-cell old-level-display" value={ indicator.oldLevelDisplay } /> }
+                    { rootStore.hasUOMColumn && <IndicatorCell className="indicator-cell unit-of-measure-column" value={ indicator.unitOfMeasure } /> }
+                    { rootStore.hasChangeColumn && <IndicatorCell className="indicator-cell has-change-column" value={ indicator.directionOfChange || gettext('N/A') } /> }
+                    { rootStore.hasCNCColumn && <IndicatorCell className="indicator-cell has-cnc-column" value={ cumulative || gettext('N/A') } /> }
+                    { rootStore.hasUOMTypeColumn && <IndicatorCell className="indicator-cell is-percent-column" value={ indicator.isPercent ? '%' : '#' } /> }
+                    { rootStore.hasBaselineColumn && (indicator.baseline === null ? <IndicatorCell className="indicator-cell baseline-column" value={ gettext('N/A') } /> : <ValueCell value={ indicator.baseline } /> ) }
                     { reportData && (
                     <React.Fragment>
                     <ValueCell value={ reportData.lopTarget } />
