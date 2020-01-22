@@ -108,5 +108,36 @@ describe('bare IPTT Indicator Report Data', () => {
             expect(indicator.disaggregatedPeriodValues(14).length).toBe(2);
             expect(indicator.disaggregatedPeriodValues(14)[1].actual).toBe("4.51");
         });
+        it("returns non-null values with implied nulls", () => {
+            let disaggregatedData = [{index: 1, actual: "100"}, {index: 4, actual: "182"}];
+            let indicator = Indicator(3, {disaggregated_report_data: {11: disaggregatedData}});
+            expect(indicator.disaggregatedPeriodValues(11).length).toBe(5);
+            expect(indicator.disaggregatedPeriodValues(11)[0].actual).toBeNull();
+            expect(indicator.disaggregatedPeriodValues(11)[1].actual).toBe("100");
+            expect(indicator.disaggregatedPeriodValues(11)[2].actual).toBeNull();
+            expect(indicator.disaggregatedPeriodValues(11)[3].actual).toBeNull();
+            expect(indicator.disaggregatedPeriodValues(11)[4].actual).toBe("182");
+        });
+        it("returns non-null values with implied nulls - last entry null", () => {
+            let disaggregatedData = [{index: 2, actual: "75"}, {index: 6, actual: null}];
+            let indicator = Indicator(3, {disaggregated_report_data: {11: disaggregatedData}});
+            expect(indicator.disaggregatedPeriodValues(11).length).toBe(7);
+            expect(indicator.disaggregatedPeriodValues(11)[0].actual).toBeNull();
+            expect(indicator.disaggregatedPeriodValues(11)[1].actual).toBeNull();
+            expect(indicator.disaggregatedPeriodValues(11)[2].actual).toBe("75");
+            expect(indicator.disaggregatedPeriodValues(11)[3].actual).toBeNull();
+            expect(indicator.disaggregatedPeriodValues(11)[4].actual).toBeNull();
+            expect(indicator.disaggregatedPeriodValues(11)[5].actual).toBeNull();
+            expect(indicator.disaggregatedPeriodValues(11)[6].actual).toBeNull();
+        });
+        it("returns null values with implied nulls", () => {
+            let disaggregatedData = [{index: 3, actual: null}];
+            let indicator = Indicator(3, {disaggregated_report_data: {142: disaggregatedData}});
+            expect(indicator.disaggregatedPeriodValues(142).length).toBe(4);
+            expect(indicator.disaggregatedPeriodValues(142)[0].actual).toBeNull();
+            expect(indicator.disaggregatedPeriodValues(142)[1].actual).toBeNull();
+            expect(indicator.disaggregatedPeriodValues(142)[2].actual).toBeNull();
+            expect(indicator.disaggregatedPeriodValues(142)[3].actual).toBeNull();
+        });
     });
 });
