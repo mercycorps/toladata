@@ -1,12 +1,12 @@
 import React from 'react';
 import { observer } from "mobx-react"
-import Pagination from 'components/pagination'
+import Pagination from '../../../components/pagination'
 import {FontAwesomeIcon} from "@fortawesome/react-fontawesome"
 import { toJS } from "mobx"
 
-import LoadingSpinner from 'components/loading-spinner'
+import LoadingSpinner from '../../../components/loading-spinner'
 
-const DisaggregationDiffs = ({disagg_type, disagg_diffs}) => {
+export const DisaggregationDiffs = ({disagg_type, disagg_diffs}) => {
     disagg_diffs.sort( (a, b) => a.custom_sort - b.custom_sort);
     return <div><p className="disagg-type__title">{disagg_type}</p>
         {disagg_diffs.map( diff => {
@@ -15,7 +15,7 @@ const DisaggregationDiffs = ({disagg_type, disagg_diffs}) => {
     </div>
 };
 
-const ResultChangeset = ({data, name, pretty_name}) => {
+export const ResultChangeset = ({data, name, pretty_name}) => {
     if (name === 'id') {
         return null
     } else if(name === 'Target_url') {

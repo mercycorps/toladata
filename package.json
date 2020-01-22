@@ -46,7 +46,8 @@
         "enzyme-adapter-react-16": "^1.7.1",
         "jest": "^25.0.0",
         "nodemon": "^1.18.3",
-        "npm-run-all": "*"
+        "npm-run-all": "*",
+        "react-test-renderer": "^16.12.0"
     },
     "dependencies": {
         "@babel/core": "^7.1.2",
