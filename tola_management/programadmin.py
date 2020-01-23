@@ -1,4 +1,3 @@
-# -*- coding: utf-8 -*-
 
 from collections import OrderedDict
 import pytz
@@ -94,8 +93,7 @@ def get_audit_log_workbook(ws, program):
                 output_string += f"\r\n{disagg_type}\r\n"
             else:
                 output_string += "\r\n"
-            disaggs[disagg_type].sort(
-                key=lambda item: "" if item["custom_sort"] is None else item["custom_sort"])
+            disaggs[disagg_type].sort(key=lambda item: "" if item["custom_sort"] is None else item["custom_sort"])
 
             for item in disaggs[disagg_type]:
                 output_string += f"{item['name']}: {item['value']}\r\n"
@@ -159,7 +157,7 @@ def get_audit_log_workbook(ws, program):
                 continue
             else:
                 prev_string += str(entry['pretty_name']) + ": "
-                prev_string += str(entry['prev'] if entry['prev'] else _('N/A')) + "\r\n"
+                prev_string += str(entry['prev'] if entry['prev'] else "") + "\r\n"
 
         new_string = ''
         for entry in row.diff_list:
@@ -175,7 +173,7 @@ def get_audit_log_workbook(ws, program):
                 new_string += str(entry['new'] if entry['new'] else "") + u"\r\n"
 
         xl_row = [
-            Cell(ws, value=row.date),
+            Cell(ws, value=row.date.strftime("%Y-%m-%d %H:%M:%S (UTC)")),
             Cell(ws, value=str(_result_level(row.indicator)) if row.indicator else _('N/A')),
             Cell(ws, value=str(_indicator_name(row.indicator)) if row.indicator else _('N/A')),
             Cell(ws, value=str(row.user.name)),
@@ -194,7 +192,7 @@ def get_audit_log_workbook(ws, program):
 
     for cd in ws.column_dimensions:
         cd.auto_size = True
-    widths = [20, 12, 50, 20, 15, 20, 40, 40, 40]
+    widths = [23, 12, 50, 20, 15, 20, 40, 40, 40]
     for col_no, width in enumerate(widths):
         ws.column_dimensions[utils.get_column_letter(col_no + 1)].width = width
     return ws
