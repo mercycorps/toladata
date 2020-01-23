@@ -24,18 +24,21 @@ export const ResultChangeset = ({data, name, pretty_name}) => {
         if (Object.entries(data).length) {
             let groupedDiffs = {};
             Object.values(data).forEach( entry => {
+                const groupKey = entry.type || "__none__";
                 if (entry.type in groupedDiffs) {
-                    groupedDiffs[entry.type].push(entry);
+                    groupedDiffs[groupKey].push(entry);
                 }
                 else {
-                    groupedDiffs[entry.type] = [entry];
+                    groupedDiffs[groupKey] = [entry];
                 }
             });
 
             return <div className="changelog__change__targets">
                 <h4 className="text-small">{gettext('Disaggregated values')}</h4>
                 {Object.keys(groupedDiffs).sort().map( (typeName ) => {
-                    return  <DisaggregationDiffs key={typeName+'_diff'} disagg_type={typeName ? typeName : null } disagg_diffs={groupedDiffs[typeName]} />
+                    return  <DisaggregationDiffs
+                        key={typeName+'_diff'}
+                        disagg_type={typeName === "__none__" ? "" : typeName } disagg_diffs={groupedDiffs[typeName]} />
                 })}
             </div>
         } else {
@@ -62,7 +65,7 @@ const IndicatorChangeset = ({data, name, pretty_name, indicator}) => {
         return <div className="change__field">
             <strong>
                 { name === 'name' ?
-                    <span>{gettext('Indicator')} {indicator.results_aware_number}: </span> : <span>{pretty_name}:</span>}
+                    <span>{gettext('Indicator')} {indicator.results_aware_number}: </span> : <span>{pretty_name}: </span>}
             </strong>
             {(data !== null && data !== undefined)?data.toString() : ""}
         </div>
@@ -71,7 +74,7 @@ const IndicatorChangeset = ({data, name, pretty_name, indicator}) => {
 
 const ResultLevelChangeset = ({data, name, pretty_name, level}) => {
     return <div className="change__field">
-        { name !== 'name' ? <strong>{pretty_name}: </strong>  : <strong>{level.tier}{level.display_ontology}: </strong> }
+        { name !== 'name' ? <strong>{pretty_name}: </strong>  : <strong>{level.tier} {level.display_ontology}: </strong> }
         {(data !== null && data !== undefined)?data.toString():gettext('N/A')}
     </div>
 }
@@ -206,9 +209,12 @@ export const IndexView = observer(
                         {store.log_rows.map(data => {
                                 let is_expanded = store.expando_rows.has(data.id);
                                 return <tbody key={data.id}>
-                                <tr className={is_expanded ? 'changelog__entry__header is-expanded' : 'changelog__entry__header'} onClick={() => store.toggleRowExpando(data.id)}>
+                                <tr
+                                    className={is_expanded ? 'changelog__entry__header is-expanded' : 'changelog__entry__header'}
+                                    onClick={() => store.toggleRowExpando(data.id)}>
                                     <td className="text-action">
-                                        <FontAwesomeIcon icon={is_expanded ? 'caret-down' : 'caret-right'} />&nbsp;{data.date}
+                                        <FontAwesomeIcon icon={is_expanded ? 'caret-down' : 'caret-right'} />
+                                        &nbsp;{data.date} (UTC)
                                     </td>
                                     <td><ResultLevel indicator={data.indicator} level={data.level} /></td>
                                     <td>{<IndicatorNameSpan indicator={data.indicator} />}</td>

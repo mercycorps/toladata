@@ -1,6 +1,6 @@
-# -*- coding: utf-8 -*-
 
 from collections import OrderedDict
+import pytz
 from django.db import transaction
 from django.db.models import Q
 from django.http import HttpResponse, JsonResponse
@@ -78,6 +78,29 @@ def get_audit_log_workbook(ws, program):
         else:
             return ''
 
+    # helper for result level column
+    def _result_disaggregation_serializer(raw_disaggs):
+        disaggs = {}
+        for item in raw_disaggs.values():
+            try:
+                disaggs[item['type']].append(item)
+            except KeyError:
+                disaggs[item['type']] = [item]
+
+        output_string = "\r\nDisaggregated values"
+        for disagg_type in sorted(list(disaggs.keys())):
+            if disagg_type:
+                output_string += f"\r\n{disagg_type}\r\n"
+            else:
+                output_string += "\r\n"
+            disaggs[disagg_type].sort(key=lambda item: "" if item["custom_sort"] is None else item["custom_sort"])
+
+            for item in disaggs[disagg_type]:
+                output_string += f"{item['name']}: {item['value']}\r\n"
+
+        return output_string
+
+
     header = [
         Cell(ws, value=_("Date and Time")),
         # Translators: Number of the indicator being shown
@@ -123,28 +146,34 @@ def get_audit_log_workbook(ws, program):
     )
 
     for row in program.audit_logs.all().order_by('-date'):
-        prev_string = u''
+        prev_string = ''
         for entry in row.diff_list:
             if entry['name'] == 'targets':
                 for k, target in entry['prev'].items():
-                    prev_string += str(target['name']) + u": " + str(target['value']) + u"\r\n"
-
+                    prev_string += str(target['name']) + ": " + str(target['value']) + "\r\n"
+            elif entry['name'] == 'disaggregation_values':
+                prev_string += _result_disaggregation_serializer(entry['prev']) + "\r\n"
+            elif entry['name'] == "id":
+                continue
             else:
-                prev_string += str(entry['pretty_name']) + u": "
-                prev_string += str(entry['prev'] if entry['prev'] else _('N/A')) + u"\r\n"
+                prev_string += str(entry['pretty_name']) + ": "
+                prev_string += str(entry['prev'] if entry['prev'] else "") + "\r\n"
 
-        new_string = u''
+        new_string = ''
         for entry in row.diff_list:
             if entry['name'] == 'targets':
                 for k, target in entry['new'].items():
-                    new_string += str(target['name']) + u": " + str(target['value']) + u"\r\n"
-
+                    new_string += str(target['name']) + ": " + str(target['value']) + "\r\n"
+            elif entry['name'] == 'disaggregation_values':
+                new_string += _result_disaggregation_serializer(entry['new']) + "\r\n"
+            elif entry['name'] == "id":
+                continue
             else:
                 new_string += str(entry['pretty_name']) + u": "
-                new_string += str(entry['new'] if entry['new'] else _('N/A')) + u"\r\n"
+                new_string += str(entry['new'] if entry['new'] else "") + u"\r\n"
 
         xl_row = [
-            Cell(ws, value=row.date),
+            Cell(ws, value=row.date.strftime("%Y-%m-%d %H:%M:%S (UTC)")),
             Cell(ws, value=str(_result_level(row.indicator)) if row.indicator else _('N/A')),
             Cell(ws, value=str(_indicator_name(row.indicator)) if row.indicator else _('N/A')),
             Cell(ws, value=str(row.user.name)),
@@ -163,7 +192,7 @@ def get_audit_log_workbook(ws, program):
 
     for cd in ws.column_dimensions:
         cd.auto_size = True
-    widths = [20, 12, 50, 20, 15, 20, 40, 40, 40]
+    widths = [23, 12, 50, 20, 15, 20, 40, 40, 40]
     for col_no, width in enumerate(widths):
         ws.column_dimensions[utils.get_column_letter(col_no + 1)].width = width
     return ws
@@ -345,7 +374,7 @@ class ProgramAuditLogSerializer(ModelSerializer):
     level = ProgramAuditLogLevelSerializer()
     user = CharField(source='user.name', read_only=True)
     organization = CharField(source='organization.name', read_only=True)
-    date = DateTimeField(format="%Y-%m-%d %H:%M:%S")
+    date = DateTimeField(format="%Y-%m-%d %H:%M:%S", default_timezone=pytz.timezone("UTC"))
 
     class Meta:
         model = ProgramAuditLog
@@ -502,7 +531,7 @@ class ProgramAdminViewSet(viewsets.ModelViewSet):
         ws = workbook.create_sheet(_('Change log'))
         get_audit_log_workbook(ws, program)
         response = HttpResponse(content_type='application/ms-excel')
-        filename = u'{} Audit Log {}.xlsx'.format(program.name, timezone.now().strftime('%b %d, %Y'))
+        filename = '{} Audit Log {}.xlsx'.format(program.name, timezone.now().strftime('%b %d, %Y'))
         response['Content-Disposition'] = 'attachment; filename="{}"'.format(filename)
         workbook.save(response)
         return response
