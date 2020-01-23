@@ -62,7 +62,6 @@ const IndicatorResultModalCell = inject("rootStore")(
                         onClick={ loadModal }>
                     <i className="fas fa-table"></i>
                 </button>
-                { indicator.name }
             </td>
         )
     })
@@ -87,6 +86,16 @@ const ExpandoCell = observer(({ value, expanded, clickHandler, ...props }) => {
         </td>
     );
 })
+
+const IndicatorNameExpandoCell = observer(({ value, expanded, clickHandler, ...props }) => {
+    const displayValue = (value || value === 0) ? value : BLANK_TABLE_CELL;
+    return (
+        <td className="indicator-cell expando-cell" { ...props } onClick={ clickHandler }>
+            { displayValue }
+        </td>
+    );
+})
+
 
 const PercentCell = ({ value, ...props }) => {
     value = (value !== undefined && value !== null) ? `${value}%` : null;
@@ -215,6 +224,10 @@ class IndicatorRow extends React.Component {
                     <IndicatorCell className="indicator-cell display-number" value={ displayNumber } />
                     }
                     <IndicatorResultModalCell indicator={ indicator } />
+                    {indicator.hasDisaggregations(rootStore.activeDisaggregationPks) ?
+                    <IndicatorNameExpandoCell value={ indicator.name } expanded={ this.state.expanded } clickHandler={ this.handleExpandoClick } /> :
+                    <IndicatorCell className="indicator-cell" value={ indicator.name } />
+                    }
                     <IndicatorEditModalCell indicator={ indicator } />
                     { !rootStore.resultsFramework && <IndicatorCell className="indicator-cell old-level-display" value={ indicator.oldLevelDisplay } /> }
                     { rootStore.hasUOMColumn && <IndicatorCell className="indicator-cell unit-of-measure-column" value={ indicator.unitOfMeasure } /> }

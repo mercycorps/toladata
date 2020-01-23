@@ -20,6 +20,7 @@ const UnBorderedHeader = ( props ) => {
     return (
         <th
             scope="col"
+            colSpan={ props.colSpan }
             className="align-bottom text-uppercase td-no-side-borders"
             style={style}
         >{ props.label }</th>

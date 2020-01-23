@@ -11,7 +11,7 @@ const ProgramNameRow = inject('rootStore')(
             return (<tr><td>Loading</td></tr>);
         }
         return (
-            <tr className="title-row">
+            <tr className="title-row program-name">
                 <td colSpan={ rootStore.resultsFramework ? 8 : 9 } id="id_td_iptt_program_name" className="align-bottom pt-2">
                     <h5 className="m-0">
                         <a href={ rootStore.currentProgramPageUrl }>
@@ -19,8 +19,8 @@ const ProgramNameRow = inject('rootStore')(
                         </a>
                     </h5>
                 </td>
-                <td scope="colgroup" colSpan="3"
-                    className="text-center title-row text-nowrap align-bottom text-uppercase">
+                <td scope="colgroup" colSpan="4"
+                    className="text-center text-nowrap align-bottom text-uppercase">
                     {
                         /* # Translators: header for a group of columns showing totals over the life of the program */
                         gettext('Life of program')
@@ -41,8 +41,8 @@ const ProgramNameRow = inject('rootStore')(
 
 const ExpandAllRow = inject('rootStore')(observer(({ rootStore }) => {
     return (
-        <tr className="title-row">
-            <td colSpan="2">
+        <tr className="title-row action-buttons">
+            <td colSpan={ rootStore.resultsFramework ? 12 : 13 }>
                 <button className="btn btn-medium text-action btn-sm"
                 onClick={rootStore.expandAllRows.bind(rootStore)}
                 disabled={ rootStore.allExpanded }>{ gettext('Expand all') }</button>
@@ -67,6 +67,7 @@ const ColumnHeaderRow = inject('rootStore')(
                     } />
                 <HeaderCells.UnBorderedHeader
                     styleWidth={600}
+                    colSpan={2}
                     label={
                         /* # Translators: Column header for indicator Name column */
                         gettext('Indicator')
