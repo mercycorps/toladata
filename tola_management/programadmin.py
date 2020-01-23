@@ -1,6 +1,7 @@
 # -*- coding: utf-8 -*-
 
 from collections import OrderedDict
+import pytz
 from django.db import transaction
 from django.db.models import Q
 from django.http import HttpResponse, JsonResponse
@@ -87,10 +88,12 @@ def get_audit_log_workbook(ws, program):
             except KeyError:
                 disaggs[item['type']] = [item]
 
-        output_string = ""
+        output_string = "\r\nDisaggregated values"
         for disagg_type in sorted(list(disaggs.keys())):
-
-            output_string += f"\r\n{disagg_type}\r\n"
+            if disagg_type:
+                output_string += f"\r\n{disagg_type}\r\n"
+            else:
+                output_string += "\r\n"
             disaggs[disagg_type].sort(
                 key=lambda item: "" if item["custom_sort"] is None else item["custom_sort"])
 
@@ -151,7 +154,7 @@ def get_audit_log_workbook(ws, program):
                 for k, target in entry['prev'].items():
                     prev_string += str(target['name']) + ": " + str(target['value']) + "\r\n"
             elif entry['name'] == 'disaggregation_values':
-                prev_string += _result_disaggregation_serializer(entry['prev']) + "\r\n\r\n"
+                prev_string += _result_disaggregation_serializer(entry['prev']) + "\r\n"
             elif entry['name'] == "id":
                 continue
             else:
@@ -164,7 +167,7 @@ def get_audit_log_workbook(ws, program):
                 for k, target in entry['new'].items():
                     new_string += str(target['name']) + ": " + str(target['value']) + "\r\n"
             elif entry['name'] == 'disaggregation_values':
-                new_string += _result_disaggregation_serializer(entry['new'])
+                new_string += _result_disaggregation_serializer(entry['new']) + "\r\n"
             elif entry['name'] == "id":
                 continue
             else:
@@ -373,7 +376,7 @@ class ProgramAuditLogSerializer(ModelSerializer):
     level = ProgramAuditLogLevelSerializer()
     user = CharField(source='user.name', read_only=True)
     organization = CharField(source='organization.name', read_only=True)
-    date = DateTimeField(format="%Y-%m-%d %H:%M:%S")
+    date = DateTimeField(format="%Y-%m-%d %H:%M:%S", default_timezone=pytz.timezone("UTC"))
 
     class Meta:
         model = ProgramAuditLog

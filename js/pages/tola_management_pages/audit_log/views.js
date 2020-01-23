@@ -8,6 +8,7 @@ import LoadingSpinner from '../../../components/loading-spinner'
 
 export const DisaggregationDiffs = ({disagg_type, disagg_diffs}) => {
     disagg_diffs.sort( (a, b) => a.custom_sort - b.custom_sort);
+    disagg_type = disagg_type && disagg_type !== "null" ? disagg_type : "";
     return <div><p className="disagg-type__title">{disagg_type}</p>
         {disagg_diffs.map( diff => {
             return <div className="change__field" key={diff.id}><strong>{diff.name}:</strong> {diff.value}</div>
