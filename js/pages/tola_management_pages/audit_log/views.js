@@ -63,7 +63,7 @@ const IndicatorChangeset = ({data, name, pretty_name, indicator}) => {
         return <div className="change__field">
             <strong>
                 { name === 'name' ?
-                    <span>{gettext('Indicator')} {indicator.results_aware_number}: </span> : <span>{pretty_name}:</span>}
+                    <span>{gettext('Indicator')} {indicator.results_aware_number}: </span> : <span>{pretty_name}: </span>}
             </strong>
             {(data !== null && data !== undefined)?data.toString() : ""}
         </div>
@@ -72,7 +72,7 @@ const IndicatorChangeset = ({data, name, pretty_name, indicator}) => {
 
 const ResultLevelChangeset = ({data, name, pretty_name, level}) => {
     return <div className="change__field">
-        { name !== 'name' ? <strong>{pretty_name}: </strong>  : <strong>{level.tier}{level.display_ontology}: </strong> }
+        { name !== 'name' ? <strong>{pretty_name}: </strong>  : <strong>{level.tier} {level.display_ontology}: </strong> }
         {(data !== null && data !== undefined)?data.toString():gettext('N/A')}
     </div>
 }
