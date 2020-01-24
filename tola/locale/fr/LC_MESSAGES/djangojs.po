@@ -1638,15 +1638,12 @@ msgstr ""
 #. Translators: Notify user that the program start and end date were successfully retrieved from the GAIT service and added to the newly saved Program
 #: js/pages/tola_management_pages/program/models.js:198
 msgid "Successfully synced GAIT program start and end dates"
-msgstr ""
-"Les dates de début et de fin du programme GAIT ont été synchronisées avec "
-"succès"
+msgstr "Les dates de début et de fin du programme GAIT ont été synchronisées avec succès"
 
 #. Translators: Notify user that the program start and end date failed to be retrieved from the GAIT service with a specific reason appended after the :
 #: js/pages/tola_management_pages/program/models.js:204
 msgid "Failed to sync GAIT program start and end dates: "
-msgstr ""
-"Échec de la synchronisation des dates de début et de fin du programme GAIT : "
+msgstr "Échec de la synchronisation des dates de début et de fin du programme GAIT : "
 
 #. Translators: A request failed, ask the user if they want to try the request again
 #: js/pages/tola_management_pages/program/models.js:212
@@ -1660,8 +1657,7 @@ msgstr "Ignorer"
 
 #: js/pages/tola_management_pages/program/models.js:268
 msgid "The GAIT ID for this program is shared with at least one other program."
-msgstr ""
-"L’ID GAIT de ce programme est partagé avec au moins un autre programme."
+msgstr "L’ID GAIT de ce programme est partagé avec au moins un autre programme."
 
 #: js/pages/tola_management_pages/program/models.js:269
 msgid "View programs with this ID in GAIT."
