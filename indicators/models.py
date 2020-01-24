@@ -1339,7 +1339,7 @@ class Indicator(SafeDeleteModel):
         """
         return [
             'name', 'level', 'unit_of_measure', 'unit_of_measure_type', 'baseline_value',
-            'direction_of_change', 'baseline_na', 'targets', 'lop_target', 'is_cumulative'
+            'baseline_na', 'direction_of_change', 'targets', 'lop_target', 'is_cumulative'
         ]
 
     @property
