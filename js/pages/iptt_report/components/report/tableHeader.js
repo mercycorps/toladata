@@ -12,7 +12,7 @@ const ProgramNameRow = inject('rootStore')(
         }
         return (
             <tr className="title-row program-name">
-                <td colSpan={ rootStore.resultsFramework ? 8 : 9 } id="id_td_iptt_program_name" className="align-bottom pt-2">
+                <td colSpan={ rootStore.baseColumns } id="id_td_iptt_program_name" className="align-bottom pt-2">
                     <h5 className="m-0">
                         <a href={ rootStore.currentProgramPageUrl }>
                             { program.name }
@@ -42,7 +42,7 @@ const ProgramNameRow = inject('rootStore')(
 const ExpandAllRow = inject('rootStore')(observer(({ rootStore }) => {
     return (
         <tr className="title-row action-buttons">
-            <td colSpan={ rootStore.resultsFramework ? 12 : 13 }>
+            <td colSpan={ rootStore.reportColumnWidth }>
                 <button className="btn btn-medium text-action btn-sm"
                 onClick={rootStore.expandAllRows.bind(rootStore)}
                 disabled={ rootStore.allExpanded }>{ gettext('Expand all') }</button>
