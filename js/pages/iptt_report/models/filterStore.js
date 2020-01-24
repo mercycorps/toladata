@@ -457,7 +457,7 @@ export default (
             }
             countries.forEach(
                 country => {
-                    optgroups.push({label: country, options:disaggregationOptions.filter(option => option.country === country)});
+                    optgroups.push({label: `${country} ${gettext('Disaggregations')}`, options:disaggregationOptions.filter(option => option.country === country)});
                 }
             );
             return optgroups;
