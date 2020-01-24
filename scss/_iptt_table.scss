@@ -3,6 +3,9 @@
 
 #iptt_table {
     background-color: white;
+    td, th {
+        // border: 1px solid red; // for column debugging
+    }
     &, & thead tr td {
         border: 0px !important;
     }
@@ -48,9 +51,11 @@ body.page_iptt_table { // body element for extra specificity
     color: $gray-700; // why is this not #54585A ?
 }
 
-.title-row {
+tr.title-row {
     background-color: $gray-150;
 }
+tr.program-name { }
+tr.action-buttons { }
 
 .table__iptt .row__level {
     font-weight: bold;
