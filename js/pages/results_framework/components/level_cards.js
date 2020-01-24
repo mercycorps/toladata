@@ -126,7 +126,9 @@ export class LevelCardCollapsed extends React.Component {
         // Get indicator ids linked to this level and create a hyperlink for a filtered IPTT.
         let sameLevelIndicatorIds = this.props.levelProps.indicators.map( i => i.id);
         if (sameLevelIndicatorIds.length > 0) {
-            const linkText = `All indicators linked to ${this.props.levelProps.tierName} ${this.props.levelProps.ontologyLabel}`
+            /* # Translators: this link opens a view of all indicators linked to (associated with) a particular level (level name follows) */
+            const linkPreface = gettext('All indicators linked to');
+            const linkText = `${linkPreface} ${this.props.levelProps.tierName} ${this.props.levelProps.ontologyLabel}`
             allIndicatorLinks.push(`<li class="nav-item level-card--iptt-links"><a href=${this.buildIPTTUrl(sameLevelIndicatorIds)}>${linkText}</a></li>`);
         }
 
@@ -221,7 +223,10 @@ export class LevelCardCollapsed extends React.Component {
                             data-trigger="focus"
                             data-placement="bottom"
                             data-html="true"
-                            title="Track indicator performance"
+                            title={
+                                /* # Translators: this is the title of a button to open a popup with indicator performance metrics*/
+                                gettext("Track indicator performance")
+                            }
                             data-content={indicatorMarkup}>
                             {indicatorCountText}
                         </a>
