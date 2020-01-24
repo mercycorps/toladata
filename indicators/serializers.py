@@ -27,6 +27,8 @@ from indicators.export_renderers import (
     EM_DASH,
 )
 
+from silk.profiling.profiler import silk_profile
+
 
 
 #######################
@@ -470,9 +472,31 @@ class IndicatorPlanLevelExcelSerializer(IndicatorPlanLevelSerializerBase):
 
 
 
-class IPTTProgramSerializer(ProgramSerializer):
+class IPTTProgramSerializer(serializers.ModelSerializer):
+    """
+    Serializer specific to IPTT Excel Exports
+    """
+    class Meta:
+        model = Program
+        fields = [
+            'pk',
+            'name',
+            'reporting_period_start',
+            'reporting_period_end',
+            'results_framework',
+            'auto_number_indicators'
+            ]
+
     reporting_period_start = serializers.DateField(format=None)
     reporting_period_end = serializers.DateField(format=None)
+
+    @classmethod
+    def load_program(cls, pk):
+        program = Program.rf_aware_objects.only(
+            'pk', 'name', 'reporting_period_start', 'reporting_period_end',
+            'auto_number_indicators', '_using_results_framework'
+        ).get(pk=pk)
+        return cls(program)
 
 
 
@@ -753,7 +777,7 @@ class IPTTExcelRendererBase:
 
     @property
     def filename(self):
-        report_date = l10n_date_medium(timezone.now().date())
+        report_date = l10n_date_medium(timezone.now().date(), decode=True)
         return u'{name} {report_date}.xlsx'.format(name=self.report_name, report_date=report_date)
 
     @property
@@ -863,13 +887,19 @@ class IPTTSingleExcelRendererMixin(IPTTExcelRendererBase):
 
     @property
     def blank_level_row(self):
-        return [indicator for indicator in self.indicators.filter(level__isnull=True).with_logframe_sorting()]
+        return [indicator for indicator in self.indicators if indicator.level is None]
 
     @property
     def level_rows(self):
         if not self.program_data['results_framework'] or len(self.blank_level_row) == len(self.indicators):
             return False
-        return self._level_rows
+        for level in self._levels:
+            level_row = {
+                'level': level,
+                'indicators': [indicator for indicator in self.indicators.filter(level_id=level.pk)]
+            }
+            if level_row['indicators'] or level.parent_id is None:
+                yield level_row
 
 
 class IPTTSerializer:
@@ -896,26 +926,70 @@ class IPTTSerializer:
                 'IPTTReportSerializer', tuple(cls.REPORT_TYPES[report_type] + [IPTTSerializer]), kwargs
                 ))
 
-    def __init__(self, *args, **kwargs):
-        self.program_data = IPTTProgramSerializer(
-            Program.objects.get(pk=self.request.get('programId'))
-            ).data
+    def initialize(self):
+        self.init_program_data()
         self.disaggregation_categories = DisaggregationLabel.objects.select_related(
             None
         ).prefetch_related(None).order_by().filter(
             disaggregation_type__indicator__program_id=self.request.get('programId')
         ).distinct().values_list('pk', flat=True)
-        self._indicators = self.annotate_indicators(self.load_indicators())
+        self.init_level_data()
+        self.init_indicator_data()
         self._disaggregated_indicators = {
             i.pk: i for i in self.annotate_disaggregations(self.load_disaggregated_indicators())}
         if self.program_data['results_framework']:
             self._level_rows = self.get_rf_levels()
         if not self.full_report:
-            self.frequency = int(self.request.get('frequency'))
             self.periods = self.get_periods(self.frequency)
+
+    def init_program_data(self):
+        self.program_data = IPTTProgramSerializer.load_program(self.request.get('programId')).data
+
+    def init_level_data(self):
+        if not self.program_data['results_framework']:
+            self._levels = []
+        else:
+            self._tiers = [tier for tier in LevelTier.objects.filter(program_id=self.program_data['pk'])]
+            level_objects = Level.objects.filter(program_id=self.program_data['pk'])
+            levels = sorted(
+                [level for level in level_objects if level.parent_id is None],
+                key=attrgetter('customsort')
+                )
+            for level in levels:
+                level._tier = self._tiers[0]
+            if self.group_by_level:
+                depth = 1
+                parent_pks = [level.pk for level in levels]
+                while len(levels) < len(level_objects):
+                    new_levels = sorted(
+                        [level for level in level_objects if level.parent_id in parent_pks],
+                        key=attrgetter('customsort')
+                    )
+                    for level in new_levels:
+                        level._tier = self._tiers[depth]
+                    parent_pks = [level.pk for level in new_levels]
+                    depth += 1
+                    levels += new_levels
+                self._levels = levels
+            else:
+                def get_child_levels(this_level_pk=None, depth=0):
+                    chain_order_levels = []
+                    for level in [level for level in level_objects if level.parent_id == this_level_pk]:
+                        level._tier = self._tiers[depth]
+                        chain_order_levels.append(level)
+                        chain_order_levels += get_child_levels(level.pk, depth=depth+1)
+                    return chain_order_levels
+                self._levels = get_child_levels()
+
+    def init_indicator_data(self):
+        self._indicators = self.annotate_indicators(self.load_indicators())
 
     def get_disaggregated_indicator(self, pk):
         return self._disaggregated_indicators.get(pk, None)
+
+    @property
+    def frequency(self):
+        return None if self.full_report else int(self.request.get('frequency'))
 
     @property
     def program_name(self):
@@ -928,6 +1002,10 @@ class IPTTSerializer:
     @property
     def indicators(self):
         return self._indicators
+
+    @property
+    def group_by_level(self):
+        return self.request.get('groupby') == '2'
 
     @property
     def uom_column(self):    

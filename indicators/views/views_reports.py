@@ -78,11 +78,13 @@ class IPTTQuickstart(LoginRequiredMixin, TemplateView):
         }
         return self.render_to_response({'js_context': js_context})
 
+from silk.profiling.profiler import silk_profile
 
 @method_decorator(has_program_read_access, name='dispatch')
 class IPTTReport(LoginRequiredMixin, TemplateView):
     template_name = 'indicators/iptt_report.html'
 
+    @silk_profile(name='IPTT report get')
     def get(self, request, *args, **kwargs):
         program_id = kwargs.get('program')
         programs = request.user.tola_user.available_programs.annotate(
@@ -113,30 +115,31 @@ class IPTTReport(LoginRequiredMixin, TemplateView):
         }
         return self.render_to_response({'react_context': react_data})
 
-
 @login_required
 @has_program_read_access
 def api_iptt_report_data(request, program):
-    if request.GET.get('report_type') == '1':
-        data = IPTTTVAReportIndicatorSerializer.load_report(
-            program,
-            int(request.GET.get('frequency'))
-        )
-    else:
-        data = IPTTTPReportIndicatorSerializer.load_report(
-            program,
-            int(request.GET.get('frequency'))
-        )
-    return JsonResponse(
-        {'report_data': data,
-         'report_frequency': int(request.GET.get('frequency')),
-         'program_pk': int(program)})
+    with silk_profile(name='API IPTT Report Data program %s' % program):
+        if request.GET.get('report_type') == '1':
+            data = IPTTTVAReportIndicatorSerializer.load_report(
+                program,
+                int(request.GET.get('frequency'))
+            )
+        else:
+            data = IPTTTPReportIndicatorSerializer.load_report(
+                program,
+                int(request.GET.get('frequency'))
+            )
+        return JsonResponse(
+            {'report_data': data,
+             'report_frequency': int(request.GET.get('frequency')),
+             'program_pk': int(program)})
 
 
 @login_required
 @has_program_read_access
 def api_iptt_filter_data(request, program):
-    return JsonResponse(IPTTProgramSerializer.get_for_pk(program).data)
+    with silk_profile(name='API iptt filter data %s' % program):
+        return JsonResponse(IPTTProgramSerializer.get_for_pk(program).data)
 
 
 class IPTTExcelReport(LoginRequiredMixin, View):
@@ -153,5 +156,9 @@ class IPTTExcelReport(LoginRequiredMixin, View):
         return IPTTSerializer(report_type, request.GET)
 
     def get(self, request):
-        serialized = self.get_serialized_data(request)
-        return serialized.render(request)
+        with silk_profile(name='get serialized excel data for program %s' % request.GET.get('programId')):
+            serialized = self.get_serialized_data(request)
+        with silk_profile(name='initialize serialized excel data for program %s' % request.GET.get('programId')):
+            serialized.initialize()
+        with silk_profile(name="render serialized data for program %s" % request.GET.get('programId')):
+            return serialized.render(request)
