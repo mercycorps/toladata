@@ -52,20 +52,11 @@ from tola_management.permissions import (
 
 def get_audit_log_workbook(ws, program):
 
-
     def _indicator_number(indicator):
         if indicator.results_aware_number:
-            return '{} {}'.format(
-                _('Indicator'),
-                str(indicator.results_aware_number),
-                #str(indicator.name),
-            )
+            return f"{_('Indicator')} {indicator.results_aware_number}"
         else:
             return _('Indicator')
-            # return '{}: {}'.format(
-            #     _('Indicator'),
-            #     str(indicator.name),
-            # )
 
     # helper for result level column and result level diff row text
     def _result_level(row):
@@ -107,10 +98,12 @@ def get_audit_log_workbook(ws, program):
 
 
     header = [
+        # Translators: The date and time of the change made to a piece of data
         Cell(ws, value=_("Date and Time")),
         # Translators: Number of the indicator being shown
         Cell(ws, value=_('Result level')),
         Cell(ws, value=_('Indicator')),
+        # Translators: The name of the user who carried out an action
         Cell(ws, value=_('User')),
         Cell(ws, value=_('Organization')),
         # Translators: Part of change log, indicates the type of change being made to a particular piece of data
