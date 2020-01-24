@@ -67,17 +67,21 @@ def get_audit_log_workbook(ws, program):
             #     str(indicator.name),
             # )
 
-    # helper for result level column
-    def _result_level(indicator):
-        if indicator.leveltier_name and indicator.level_display_ontology:
-            return u'{} {}'.format(
-                str(indicator.leveltier_name),
-                str(indicator.level_display_ontology),
-            )
-        elif indicator.leveltier_name:
-            return str(indicator.leveltier_name)
+    # helper for result level column and result level diff row text
+    def _result_level(row):
+        if row.indicator:
+            if row.indicator.leveltier_name and row.indicator.level_display_ontology:
+                return u'{} {}'.format(
+                    str(row.indicator.leveltier_name),
+                    str(row.indicator.level_display_ontology),
+                )
+            elif row.indicator.leveltier_name:
+                return str(row.indicator.leveltier_name)
+        if row.level:
+            return f"{row.level.leveltier} {row.level.display_ontology}"
         else:
-            return ''
+            return None
+
 
     # helper for result level column
     def _result_disaggregation_serializer(raw_disaggs):
@@ -147,46 +151,35 @@ def get_audit_log_workbook(ws, program):
     )
 
     for row in program.audit_logs.all().order_by('-date'):
-        print('row in', (row.change_type))
-        result_level = _result_level(row.indicator) if row.indicator else "N/A"
         indicator_name = f'{_indicator_number(row.indicator)}: {row.indicator.name}' if row.indicator else "N/A"
-        print('relevel, indname', result_level, indicator_name)
         prev_string = ''
+        new_string = ''
         for entry in row.diff_list:
             if entry['name'] == "id":
                 continue
             elif entry['name'] == 'targets':
                 for k, target in entry['prev'].items():
                     prev_string += str(target['name']) + ": " + str(target['value']) + "\r\n"
-            elif entry['name'] == 'disaggregation_values':
-                prev_string += _result_disaggregation_serializer(entry['prev']) + "\r\n"
-            elif row.change_type == "indicator_changed" and entry["name"] == "name":
-                prev_string += f"{_indicator_number(row.indicator)}: {entry['prev']}"
-
-            else:
-                prev_string += str(entry['pretty_name']) + ": "
-                prev_string += str(entry['prev'] if entry['prev'] else "") + "\r\n"
-
-        new_string = ''
-        for entry in row.diff_list:
-            print('entry', entry)
-            if entry['name'] == "id":
-                continue
-            elif entry['name'] == 'targets':
                 for k, target in entry['new'].items():
                     new_string += str(target['name']) + ": " + str(target['value']) + "\r\n"
             elif entry['name'] == 'disaggregation_values':
+                prev_string += _result_disaggregation_serializer(entry['prev']) + "\r\n"
                 new_string += _result_disaggregation_serializer(entry['new']) + "\r\n"
             elif row.change_type == "indicator_changed" and entry["name"] == "name":
-                new_string += f"{_indicator_number(row.indicator)}: {entry['new']}"
-
+                prev_string += f"{_indicator_number(row.indicator)}: {entry['prev']} \r\n"
+                new_string += f"{_indicator_number(row.indicator)}: {entry['new']} \r\n"
+            elif row.change_type == "level_changed" and entry["name"] == "name":
+                prev_string += f"{_result_level(row)}: {entry['prev']} \r\n"
+                new_string += f"{_result_level(row)}: {entry['new']} \r\n"
             else:
-                new_string += str(entry['pretty_name']) + u": "
-                new_string += str(entry['new'] if entry['new'] else "") + u"\r\n"
+                prev_string += str(entry['pretty_name']) + ": "
+                prev_string += str(entry['prev'] if entry['prev'] else "") + "\r\n"
+                new_string += str(entry['pretty_name']) + ": "
+                new_string += str(entry['new'] if entry['new'] else "") + "\r\n"
 
         xl_row = [
             Cell(ws, value=row.date.strftime("%Y-%m-%d %H:%M:%S (UTC)")),
-            Cell(ws, value=str(_result_level(row.indicator)) if row.indicator else _('N/A')),
+            Cell(ws, value=_result_level(row) or _('N/A')),
             Cell(ws, value=indicator_name),
             Cell(ws, value=str(row.user.name)),
             Cell(ws, value=str(row.organization.name)),
