@@ -52,19 +52,20 @@ from tola_management.permissions import (
 
 def get_audit_log_workbook(ws, program):
 
-    # helper for indicator name column
-    def _indicator_name(indicator):
+
+    def _indicator_number(indicator):
         if indicator.results_aware_number:
-            return u'{} {}: {}'.format(
+            return '{} {}'.format(
                 _('Indicator'),
                 str(indicator.results_aware_number),
-                str(indicator.name),
+                #str(indicator.name),
             )
         else:
-            return u'{}: {}'.format(
-                _('Indicator'),
-                str(indicator.name),
-            )
+            return _('Indicator')
+            # return '{}: {}'.format(
+            #     _('Indicator'),
+            #     str(indicator.name),
+            # )
 
     # helper for result level column
     def _result_level(indicator):
@@ -146,28 +147,39 @@ def get_audit_log_workbook(ws, program):
     )
 
     for row in program.audit_logs.all().order_by('-date'):
+        print('row in', (row.change_type))
+        result_level = _result_level(row.indicator) if row.indicator else "N/A"
+        indicator_name = f'{_indicator_number(row.indicator)}: {row.indicator.name}' if row.indicator else "N/A"
+        print('relevel, indname', result_level, indicator_name)
         prev_string = ''
         for entry in row.diff_list:
-            if entry['name'] == 'targets':
+            if entry['name'] == "id":
+                continue
+            elif entry['name'] == 'targets':
                 for k, target in entry['prev'].items():
                     prev_string += str(target['name']) + ": " + str(target['value']) + "\r\n"
             elif entry['name'] == 'disaggregation_values':
                 prev_string += _result_disaggregation_serializer(entry['prev']) + "\r\n"
-            elif entry['name'] == "id":
-                continue
+            elif row.change_type == "indicator_changed" and entry["name"] == "name":
+                prev_string += f"{_indicator_number(row.indicator)}: {entry['prev']}"
+
             else:
                 prev_string += str(entry['pretty_name']) + ": "
                 prev_string += str(entry['prev'] if entry['prev'] else "") + "\r\n"
 
         new_string = ''
         for entry in row.diff_list:
-            if entry['name'] == 'targets':
+            print('entry', entry)
+            if entry['name'] == "id":
+                continue
+            elif entry['name'] == 'targets':
                 for k, target in entry['new'].items():
                     new_string += str(target['name']) + ": " + str(target['value']) + "\r\n"
             elif entry['name'] == 'disaggregation_values':
                 new_string += _result_disaggregation_serializer(entry['new']) + "\r\n"
-            elif entry['name'] == "id":
-                continue
+            elif row.change_type == "indicator_changed" and entry["name"] == "name":
+                new_string += f"{_indicator_number(row.indicator)}: {entry['new']}"
+
             else:
                 new_string += str(entry['pretty_name']) + u": "
                 new_string += str(entry['new'] if entry['new'] else "") + u"\r\n"
@@ -175,7 +187,7 @@ def get_audit_log_workbook(ws, program):
         xl_row = [
             Cell(ws, value=row.date.strftime("%Y-%m-%d %H:%M:%S (UTC)")),
             Cell(ws, value=str(_result_level(row.indicator)) if row.indicator else _('N/A')),
-            Cell(ws, value=str(_indicator_name(row.indicator)) if row.indicator else _('N/A')),
+            Cell(ws, value=indicator_name),
             Cell(ws, value=str(row.user.name)),
             Cell(ws, value=str(row.organization.name)),
             Cell(ws, value=str(row.pretty_change_type)),
