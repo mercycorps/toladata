@@ -683,7 +683,7 @@ class CountryAdminAuditLog(models.Model, DiffableLog):
     def field_map(self):
         return {
             # Translators: Heading for list of disaggregation types assigned to a country
-            "disaggregation_type": _("Disaggregation type"),
+            "disaggregation_type_name": _("Disaggregation type"),
             # Translators: Heading for list of disaggregation categories in a particular disaggregation type.
             "disaggregation_category": _("Disaggregation category"),
         }
@@ -712,87 +712,38 @@ class CountryAdminAuditLog(models.Model, DiffableLog):
     @property
     def diff_list(self):
 
-        if self.change_type == 'country_disaggregation_updated':
+        p = {}
+        if self.previous_entry:
+            p = json.loads(self.previous_entry)
 
-            p = {}
-            if self.previous_entry:
-                p = json.loads(self.previous_entry)
+        n = {}
+        if self.new_entry:
+            n = json.loads(self.new_entry)
 
-            n = {}
-            if self.new_entry:
-                n = json.loads(self.new_entry)
 
-            def access_diff(p, n):
-                diff_list = []
-                for (p_field, n_field) in itertools.zip_longest(p.keys(), n.keys()):
-                    if p_field and p_field not in n:
-                        diff_list.append({
-                            "name": p_field,
-                            "prev": p[p_field],
-                            "new": {k: 'N/A' for k, _ in p[p_field].items()},
-                        })
+        diff_list = []
+        for (p_field, n_field) in itertools.zip_longest(p.keys(), n.keys()):
+            if p_field and p_field not in n:
+                diff_list.append({
+                    "name": p_field,
+                    "prev": p[p_field],
+                    "new": {k: '' for k, _ in p[p_field].items()},
+                })
 
-                    if n_field and n_field not in p:
-                        diff_list.append({
-                            "name": n_field,
-                            "prev": {k: 'N/A' for k, _ in n[n_field].items()},
-                            "new": n[n_field]
-                        })
+            if n_field and n_field not in p:
+                print(n, n_field)
+                diff_list.append({
+                    "name": n_field,
+                    "prev": {k: '' for k, _ in n[n_field].items()},
+                    "new": n[n_field]
+                })
 
-                    if n_field in p and p_field in n and n[p_field] != p[n_field]:
-                        diff_list.append({
-                            "name": n_field,
-                            "prev": p[p_field],
-                            "new": n[n_field]
-                        })
+            if n_field in p and p_field in n and n[p_field] != p[n_field]:
+                diff_list.append({
+                    "name": n_field,
+                    "prev": p[p_field],
+                    "new": n[n_field]
+                })
 
-                return diff_list
+        return diff_list
 
-            countries_diff = access_diff(p["countries"], n["countries"])
-            programs_diff = access_diff(p["programs"], n["programs"])
-
-            return {
-                "countries": countries_diff,
-                "programs": programs_diff
-            }
-        else:
-            return super(CountryAdminAuditLog, self).diff_list
-
-    @classmethod
-    def created(cls, user, created_by, entry):
-        new_entry = json.dumps(entry)
-        entry = cls(
-            admin_user=created_by,
-            modified_user=user,
-            change_type="user_created",
-            new_entry=new_entry,
-        )
-        entry.save()
-
-    @classmethod
-    def programs_updated(cls, user, changed_by, old, new):
-        old = json.dumps(old)
-        new = json.dumps(new)
-        if old != new:
-            entry = cls(
-                admin_user=changed_by,
-                modified_user=user,
-                change_type="user_programs_updated",
-                previous_entry=old,
-                new_entry=new,
-            )
-            entry.save()
-
-    @classmethod
-    def profile_updated(cls, user, changed_by, old, new):
-        old = json.dumps(old)
-        new = json.dumps(new)
-        if old != new:
-            entry = cls(
-                admin_user=changed_by,
-                modified_user=user,
-                change_type="user_profile_updated",
-                previous_entry=old,
-                new_entry=new,
-            )
-            entry.save()

@@ -1,4 +1,5 @@
 from collections import OrderedDict
+import json
 from django.db import transaction
 from django.db.models import Q
 from rest_framework import viewsets
@@ -8,6 +9,7 @@ from rest_framework import status
 from rest_framework import serializers
 from rest_framework import permissions
 from rest_framework import pagination
+from rest_framework.decorators import action
 
 
 from workflow.models import (
@@ -117,6 +119,14 @@ class CountryAdminViewSet(viewsets.ModelViewSet):
             )
 
         return queryset.distinct()
+
+    @action(detail=True, methods=['GET'])
+    def history(self, request, pk=None):
+        country = Country.objects.get(pk=pk)
+        queryset = CountryAdminAuditLog.objects.filter(
+            country=country).select_related("admin_user", "disaggregation_type").order_by('-date')
+        serializer = CountryAdminAuditLogSerializer(queryset, many=True)
+        return Response(serializer.data)
 
 
 class CountryObjectiveSerializer(serializers.ModelSerializer):
@@ -233,8 +243,8 @@ class CountryDisaggregationSerializer(serializers.ModelSerializer):
             country = instance.country,
             disaggregation_type=instance,
             change_type=change_type,
-            previous_entry=previous_entry,
-            new_entry=updated_instance.logged_fields,
+            previous_entry=json.dumps(previous_entry),
+            new_entry=json.dumps(updated_instance.logged_fields),
         )
 
         return updated_instance
@@ -254,7 +264,7 @@ class CountryDisaggregationSerializer(serializers.ModelSerializer):
             disaggregation_type=instance,
             change_type="country_disaggregation_created",
             previous_entry={},
-            new_entry=instance.logged_fields,
+            new_entry=json.dumps(instance.logged_fields),
         )
 
         return instance
@@ -287,8 +297,8 @@ class CountryDisaggregationViewSet(viewsets.ModelViewSet):
                 country=disaggregation.country,
                 disaggregation_type=disaggregation,
                 change_type="country_disaggregation_archived",
-                previous_entry=previous_entry,
-                new_entry=disaggregation.logged_fields,
+                previous_entry=json.dumps(previous_entry),
+                new_entry=json.dumps(disaggregation.logged_fields),
             )
             return Response(status=status.HTTP_204_NO_CONTENT)
         else:
@@ -296,9 +306,9 @@ class CountryDisaggregationViewSet(viewsets.ModelViewSet):
             CountryAdminAuditLog.objects.create(
                 admin_user=self.request.user.tola_user,
                 country=previous_country,
-                disaggregation_type=previous_type,
+                disaggregation_type=None,
                 change_type="country_disaggregation_deleted",
-                previous_entry=previous_entry,
+                previous_entry=json.dumps(previous_entry),
                 new_entry={},
             )
 
@@ -308,3 +318,21 @@ class CountryDisaggregationViewSet(viewsets.ModelViewSet):
         context = super(CountryDisaggregationViewSet, self).get_serializer_context()
         context['tola_user'] = self.request.user.tola_user
         return context
+
+
+class CountryAdminAuditLogSerializer(serializers.ModelSerializer):
+    date = serializers.DateTimeField(format="%Y-%m-%d %H:%M:%S")
+    admin_user = serializers.CharField(source="admin_user.name")
+    disaggregation_type_name = serializers.CharField(source="disaggregation_type.disaggregation_type")
+    disaggregation_type_id = serializers.IntegerField(source="disaggregation_type.pk")
+
+    class Meta:
+        model = CountryAdminAuditLog
+        fields = [
+            "date",
+            "admin_user",
+            "disaggregation_type_id",
+            "disaggregation_type_name",
+            "change_type",
+            "diff_list"
+        ]

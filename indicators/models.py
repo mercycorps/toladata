@@ -531,6 +531,7 @@ class DisaggregationType(models.Model):
         return {
             "type": self.disaggregation_type,
             "country": self.country.id,
+            "disaggregation_type": self.disaggregation_type,
             "is_archived": self.is_archived,
             "labels": {
                 l.id: {

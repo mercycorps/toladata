@@ -10,6 +10,7 @@ import EditObjectives from './components/edit_objectives'
 import LoadingSpinner from 'components/loading-spinner'
 import FoldingSidebar from 'components/folding-sidebar'
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome'
+import CountryHistory from "./components/country_history";
 
 const CountryFilter = observer(({store, filterOptions}) => {
     return <div className="form-group react-multiselect-checkbox">
@@ -146,6 +147,19 @@ export const IndexView = observer(
                                                         errors={store.editing_disaggregations_errors}
                                                         clearErrors={() => store.clearDisaggregationEditingErrors()}
                                                         onIsDirtyChange={is_dirty => store.setActiveFormIsDirty(is_dirty)}
+                                                    />
+                                                </LoadingSpinner>
+                                            )}
+                                            HistorySection={observer(() =>
+                                                <LoadingSpinner isLoading={store.fetching_editing_data || store.saving}>
+                                                    <CountryHistory
+                                                        store={store}
+                                                        onIsDirtyChange={is_dirty => store.setActiveFormIsDirty(is_dirty)}
+                                                        country_data={data}
+                                                        fetching_history={store.fetching_editing_history}
+                                                        history={store.editing_history}
+                                                        saving={store.saving}
+                                                        onSave={(id, data) => store.updateProgram(id, data)}
                                                     />
                                                 </LoadingSpinner>
                                             )}
