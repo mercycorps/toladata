@@ -11,12 +11,14 @@ from workflow.models import (
     TolaUser,
     Organization,
     Program,
+    Country
 )
 
 from indicators.models import (
     Indicator,
     Level,
-    Result
+    Result,
+    DisaggregationType
 )
 
 def diff(previous, new, mapping):
@@ -97,10 +99,10 @@ class DiffableLog:
 
 
 class UserManagementAuditLog(models.Model, DiffableLog):
-    date = models.DateTimeField(_('Modification Date'), auto_now_add=True)
+    date = models.DateTimeField(_('Modification date'), auto_now_add=True)
     admin_user = models.ForeignKey(TolaUser, null=True, on_delete=models.SET_NULL, related_name="+")
     modified_user = models.ForeignKey(TolaUser, null=True, on_delete=models.SET_NULL, related_name="+")
-    change_type = models.CharField(_('Modification Type'), max_length=255)
+    change_type = models.CharField(_('Modification type'), max_length=255)
     previous_entry = models.TextField()
     new_entry = models.TextField()
 
@@ -109,23 +111,23 @@ class UserManagementAuditLog(models.Model, DiffableLog):
         return {
             "title": _("Title"),
             "name": _("Name"),
-            "first_name": _("First Name"),
-            "last_name": _("Last Name"),
+            "first_name": _("First name"),
+            "last_name": _("Last name"),
             "user": _("Username"),
-            "mode_of_address": _("Mode of Address"),
-            "mode_of_contact": _("Mode of Contact"),
-            "phone_number": _("Phone Number"),
+            "mode_of_address": _("Mode of address"),
+            "mode_of_contact": _("Mode of contact"),
+            "phone_number": _("Phone number"),
             "email": _("Email"),
             "organization": _("Organization"),
-            "active": _("Is Active")
+            "active": _("Is active")
         }
 
     @property
     def change_type_map(self):
         return {
-            "user_created": _("User Created"),
-            "user_programs_updated": _("User Programs Updated"),
-            "user_profile_updated": _("User Profile Updated")
+            "user_created": _("User created"),
+            "user_programs_updated": _("User programs updated"),
+            "user_profile_updated": _("User profile updated")
         }
 
     @property
@@ -223,12 +225,12 @@ class UserManagementAuditLog(models.Model, DiffableLog):
 
 class ProgramAuditLog(models.Model, DiffableLog):
     program = models.ForeignKey(Program, on_delete=models.CASCADE, related_name="audit_logs")
-    date = models.DateTimeField(_('Modification Date'), auto_now_add=True)
+    date = models.DateTimeField(_('Modification date'), auto_now_add=True)
     user = models.ForeignKey(TolaUser, null=True, on_delete=models.SET_NULL, related_name="+")
     organization = models.ForeignKey(Organization, null=True, on_delete=models.SET_NULL, related_name="+")
     indicator = models.ForeignKey(Indicator, null=True, on_delete=models.SET_NULL, related_name="+")
     level = models.ForeignKey(Level, null=True, on_delete=models.SET_NULL, related_query_name="+")
-    change_type = models.CharField(_('Modification Type'), max_length=255)
+    change_type = models.CharField(_('Modification type'), max_length=255)
     previous_entry = models.TextField(null=True, blank=True)
     new_entry = models.TextField(null=True, blank=True)
     rationale = models.TextField(null=True)
@@ -554,10 +556,10 @@ class ProgramAuditLog(models.Model, DiffableLog):
 
 
 class ProgramAdminAuditLog(models.Model, DiffableLog):
-    date = models.DateTimeField(_('Modification Date'), auto_now_add=True)
+    date = models.DateTimeField(_('Modification date'), auto_now_add=True)
     admin_user = models.ForeignKey(TolaUser, null=True, on_delete=models.SET_NULL, related_name="+")
     program = models.ForeignKey(Program, null=True, on_delete=models.SET_NULL, related_name="+")
-    change_type = models.CharField(_('Modification Type'), max_length=255)
+    change_type = models.CharField(_('Modification type'), max_length=255)
     previous_entry = models.TextField()
     new_entry = models.TextField()
 
@@ -566,8 +568,8 @@ class ProgramAdminAuditLog(models.Model, DiffableLog):
         return {
             'gaitid': _("GAIT ID"),
             'name': _("Name"),
-            'funding_status': _("Funding Status"),
-            'cost_center': _("Cost Center"),
+            'funding_status': _("Funding status"),
+            'cost_center': _("Cost center"),
             'description': _("Description"),
             'sectors': _("Sectors"),
             'countries': _("Countries")
@@ -576,8 +578,8 @@ class ProgramAdminAuditLog(models.Model, DiffableLog):
     @property
     def change_type_map(self):
         return {
-            "program_created": _("Program Created"),
-            "program_updated": _("Program Updated"),
+            "program_created": _("Program created"),
+            "program_updated": _("Program updated"),
         }
 
     @property
@@ -609,11 +611,12 @@ class ProgramAdminAuditLog(models.Model, DiffableLog):
             )
             entry.save()
 
+
 class OrganizationAdminAuditLog(models.Model, DiffableLog):
-    date = models.DateTimeField(_('Modification Date'), auto_now_add=True)
+    date = models.DateTimeField(_('Modification date'), auto_now_add=True)
     admin_user = models.ForeignKey(TolaUser, null=True, on_delete=models.SET_NULL, related_name="+")
     organization = models.ForeignKey(Organization, null=True, on_delete=models.SET_NULL, related_name="+")
-    change_type = models.CharField(_('Modification Type'), max_length=255)
+    change_type = models.CharField(_('Modification type'), max_length=255)
     previous_entry = models.TextField()
     new_entry = models.TextField()
 
@@ -621,20 +624,20 @@ class OrganizationAdminAuditLog(models.Model, DiffableLog):
     def field_map(self):
         return {
             "name": _("Name"),
-            "primary_address": _("Primary Address"),
-            "primary_contact_name": _("Primary Contact Name"),
-            "primary_contact_email": _("Primary Contact Email"),
-            "primary_contact_phone": _("Primary Contact Phone"),
-            "mode_of_contact": _("Mode of Contact"),
-            "is_active": _("Is Active"),
+            "primary_address": _("Primary address"),
+            "primary_contact_name": _("Primary contact name"),
+            "primary_contact_email": _("Primary contact email"),
+            "primary_contact_phone": _("Primary contact phone"),
+            "mode_of_contact": _("Mode of contact"),
+            "is_active": _("Is active"),
             "sectors": _("Sectors")
         }
 
     @property
     def change_type_map(self):
         return {
-            "organization_created": _("Organization Created"),
-            "organization_updated": _("Organization Updated"),
+            "organization_created": _("Organization created"),
+            "organization_updated": _("Organization updated"),
         }
 
     @property
@@ -661,6 +664,134 @@ class OrganizationAdminAuditLog(models.Model, DiffableLog):
                 admin_user=changed_by,
                 organization=organization,
                 change_type="organization_updated",
+                previous_entry=old,
+                new_entry=new,
+            )
+            entry.save()
+
+
+class CountryAdminAuditLog(models.Model, DiffableLog):
+    date = models.DateTimeField(_('Modification date'), auto_now_add=True)
+    admin_user = models.ForeignKey(TolaUser, null=True, on_delete=models.SET_NULL, related_name="+")
+    country = models.ForeignKey(Country, null=True, on_delete=models.SET_NULL, related_name="+")
+    disaggregation_type = models.ForeignKey(DisaggregationType, null=True, on_delete=models.SET_NULL, related_name="+")
+    change_type = models.CharField(_('Modification type'), max_length=255)
+    previous_entry = models.TextField()
+    new_entry = models.TextField()
+
+    @property
+    def field_map(self):
+        return {
+            # Translators: Heading for list of disaggregation types assigned to a country
+            "disaggregation_type": _("Disaggregation type"),
+            # Translators: Heading for list of disaggregation categories in a particular disaggregation type.
+            "disaggregation_category": _("Disaggregation category"),
+        }
+
+    @property
+    def change_type_map(self):
+        return {
+            # Translators: Heading for data that tracks when a data disaggregation as been created for a country
+            "country_disaggregation_created": _("Country disaggregation created"),
+            # Translators: Heading for data that tracks when a data disaggregation assigned to a country has been changed.
+            "country_disaggregation_updated": _("Country disaggregation updated"),
+            # Translators: Heading for data that tracks when a data disaggregation assigned to a country has been deleted.
+            "country_disaggregation_deleted": _("Country disaggregation deleted"),
+            # Translators: Heading for data that tracks when a data disaggregation assigned to a country has been archived.
+            "country_disaggregation_archived": _("Country disaggregation archived"),
+            # Translators: Heading for data that tracks when a data disaggregation assigned to a country has been restored.
+            "country_disaggregation_unarchived": _("Country disaggregation unarchived"),
+            # Translators: Heading for data that tracks when the categories of a data disaggregation that has been assigned to country have been updated.
+            "country_disaggregation_categories_updated": _("Country disaggregation categories updated"),
+        }
+
+    @property
+    def pretty_change_type(self):
+        return self.change_type_map.get(self.change_type, self.change_type)
+
+    @property
+    def diff_list(self):
+
+        if self.change_type == 'country_disaggregation_updated':
+
+            p = {}
+            if self.previous_entry:
+                p = json.loads(self.previous_entry)
+
+            n = {}
+            if self.new_entry:
+                n = json.loads(self.new_entry)
+
+            def access_diff(p, n):
+                diff_list = []
+                for (p_field, n_field) in itertools.zip_longest(p.keys(), n.keys()):
+                    if p_field and p_field not in n:
+                        diff_list.append({
+                            "name": p_field,
+                            "prev": p[p_field],
+                            "new": {k: 'N/A' for k, _ in p[p_field].items()},
+                        })
+
+                    if n_field and n_field not in p:
+                        diff_list.append({
+                            "name": n_field,
+                            "prev": {k: 'N/A' for k, _ in n[n_field].items()},
+                            "new": n[n_field]
+                        })
+
+                    if n_field in p and p_field in n and n[p_field] != p[n_field]:
+                        diff_list.append({
+                            "name": n_field,
+                            "prev": p[p_field],
+                            "new": n[n_field]
+                        })
+
+                return diff_list
+
+            countries_diff = access_diff(p["countries"], n["countries"])
+            programs_diff = access_diff(p["programs"], n["programs"])
+
+            return {
+                "countries": countries_diff,
+                "programs": programs_diff
+            }
+        else:
+            return super(CountryAdminAuditLog, self).diff_list
+
+    @classmethod
+    def created(cls, user, created_by, entry):
+        new_entry = json.dumps(entry)
+        entry = cls(
+            admin_user=created_by,
+            modified_user=user,
+            change_type="user_created",
+            new_entry=new_entry,
+        )
+        entry.save()
+
+    @classmethod
+    def programs_updated(cls, user, changed_by, old, new):
+        old = json.dumps(old)
+        new = json.dumps(new)
+        if old != new:
+            entry = cls(
+                admin_user=changed_by,
+                modified_user=user,
+                change_type="user_programs_updated",
+                previous_entry=old,
+                new_entry=new,
+            )
+            entry.save()
+
+    @classmethod
+    def profile_updated(cls, user, changed_by, old, new):
+        old = json.dumps(old)
+        new = json.dumps(new)
+        if old != new:
+            entry = cls(
+                admin_user=changed_by,
+                modified_user=user,
+                change_type="user_profile_updated",
                 previous_entry=old,
                 new_entry=new,
             )
