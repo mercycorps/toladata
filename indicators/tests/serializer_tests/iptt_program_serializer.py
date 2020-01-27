@@ -430,7 +430,7 @@ class TestIPTTProgramSerializerPeriodData(test.TestCase):
         self.assertEqual(annual_period['start'], '2016-01-01')
         self.assertEqual(annual_period['end'], '2016-12-31')
         self.assertEqual(annual_period['name'], 'Year 1')
-        self.assertEqual(annual_period['label'], 'Jan 1, 2016 - Dec 31, 2016')
+        self.assertEqual(annual_period['label'], 'Jan 1, 2016 – Dec 31, 2016')
         monthly_period = data['period_date_ranges'][Indicator.MONTHLY][4]
         self.assertEqual(monthly_period['start'], '2016-05-01')
         self.assertEqual(monthly_period['end'], '2016-05-31')
@@ -453,7 +453,7 @@ class TestIPTTProgramSerializerPeriodData(test.TestCase):
             self.assertEqual(period['label'], None)
         annual_period = data['period_date_ranges'][Indicator.ANNUAL][0]
         self.assertEqual(annual_period['name'], u'Année 1')
-        self.assertEqual(annual_period['label'], u'1 jan. 2016 - 31 déc. 2016')
+        self.assertEqual(annual_period['label'], u'1 jan. 2016 – 31 déc. 2016')
         monthly_period = data['period_date_ranges'][Indicator.MONTHLY][7]
         self.assertEqual(monthly_period['name'], u'août')
         self.assertEqual(monthly_period['label'], None)
