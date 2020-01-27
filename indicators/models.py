@@ -1854,7 +1854,7 @@ class PeriodicTarget(models.Model):
                 yield {
                     'name': name_func(start, count+1),
                     'start': start,
-                    'label': u'{0} - {1}'.format(
+                    'label': u'{0} – {1}'.format(
                         l10n_date_medium(start).decode('UTF-8'),
                         l10n_date_medium(next_start - timedelta(days=1)).decode('UTF-8')
                         ) if frequency != Indicator.MONTHLY else None,
