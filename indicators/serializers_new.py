@@ -215,14 +215,14 @@ class IPTTIndicatorMixin:
             return sorted(
                 set(it['pk'] for it in self.context['indicator_types'] if it['indicator__pk'] == indicator.pk)
                 )
-        return sorted(set([it.pk for it in indicator.indicator_type.all()]))
+        return sorted(set(it.pk for it in indicator.indicator_type.all()))
 
     def get_site_pks(self, indicator):
         if hasattr(self, 'context') and 'sites' in self.context:
             return sorted(
                 set(site['pk'] for site in self.context['sites'] if site['result__indicator__pk'] == indicator.pk)
             )
-        return sorted(set([site.pk for result in indicator.result_set.all() for site in result.site.all()]))
+        return sorted(set(site.pk for result in indicator.result_set.all() for site in result.site.all()))
 
     def get_disaggregation_pks(self, indicator):
         if hasattr(self, 'context') and 'disaggregations' in self.context:
@@ -230,7 +230,7 @@ class IPTTIndicatorMixin:
                 set(disaggregation['pk'] for disaggregation in self.context['disaggregations']
                     if disaggregation['indicator__pk'] == indicator.pk)
             )
-        return sorted(set([disaggregation.pk for disaggregation in indicator.disaggregation.all()]))
+        return sorted(set(disaggregation.pk for disaggregation in indicator.disaggregation.all()))
 
     def _get_rf_long_number(self, indicator):
         level_set = self.context.get('levels',
@@ -328,7 +328,8 @@ class IPTTReportIndicatorMixin:
         return {
             'index': count,
             'actual': getattr(
-                self.context['disaggregated_indicators'][indicator.pk], 'disaggregation_{0}_frequency_{1}_period_{2}'.format(
+                self.context['disaggregated_indicators'][indicator.pk],
+                'disaggregation_{0}_frequency_{1}_period_{2}'.format(
                     disaggregation_pk,
                     self.context.get('frequency'),
                     count),
@@ -348,7 +349,8 @@ class IPTTReportIndicatorMixin:
                     [self.get_disaggregated_period_data(indicator, category_pk, c) for c in range(count)]
                 ), many=True
                 ).data for category_pk in indicator.active_disaggregation_category_pks},
-            **{category_pk: [{'index': count-1, 'actual': None}] for category_pk in indicator.inactive_disaggregation_category_pks}
+            **{category_pk: [{'index': count-1, 'actual': None}]
+               for category_pk in indicator.inactive_disaggregation_category_pks}
         }
         return disaggregated_report_data
 

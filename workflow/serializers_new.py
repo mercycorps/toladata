@@ -28,7 +28,7 @@ from django.utils import timezone
 from django.utils.translation import ugettext as _
 
 
-class ProgramBase(object):
+class ProgramBase:
     """Base class for serialized program data.  Corresponds to js/models/bareProgram"""
     results_framework = serializers.BooleanField(source='using_results_framework')
     by_result_chain = serializers.SerializerMethodField()
@@ -107,7 +107,7 @@ class ProgramBase(object):
         return sorted(
             sorted(
                 [i for i in indicator_set if i.level_id is None or i.results_framework is False],
-                 key=lambda i: i.sort_number
+                key=lambda i: i.sort_number
                 ),
             key=lambda i: (i.old_level_pk is None, i.old_level_pk)
         )
@@ -115,7 +115,7 @@ class ProgramBase(object):
 ProgramBaseSerializer = get_serializer(ProgramBase)
 
 
-class ProgramReportingPeriodMixin(object):
+class ProgramReportingPeriodMixin:
     """Extends the base program serializer to include date information, corresponds to js/models/withReportingPeriod"""
     reporting_period_start_iso = serializers.DateField(source='reporting_period_start')
     reporting_period_end_iso = serializers.DateField(source='reporting_period_end')
@@ -158,7 +158,7 @@ class ProgramReportingPeriodMixin(object):
 ProgramReportingPeriodSerializer = get_serializer(ProgramReportingPeriodMixin, ProgramBase)
 
 
-class ProgramLevelOrderingMixin(object):
+class ProgramLevelOrderingMixin:
     """Extends program serializer to include a list of indicator pks in level order and chain order"""
     indicator_pks_level_order = serializers.SerializerMethodField()
     indicator_pks_chain_order = serializers.SerializerMethodField()
@@ -203,7 +203,7 @@ ProgramLevelOrderingProgramSerializer = get_serializer(
 )
 
 
-class RFLevelOrderingMixin(object):
+class RFLevelOrderingMixin:
     """Extends program serializer to include a list of level pks in level order and chain order
 
         also adds serialized level data to program for IPTT Report
@@ -247,7 +247,7 @@ RFLevelOrderingProgramSerializer = get_serializer(
 )
 
 
-class ProgramLevelUpdateMixin(object):
+class ProgramLevelUpdateMixin:
     class Meta:
         fields = []
 
@@ -288,7 +288,7 @@ ProgramLevelUpdateSerializer = get_serializer(
 )
 
 
-class ProgramPageMixin(object):
+class ProgramPageMixin:
     needs_additional_target_periods = serializers.BooleanField()
     site_count = serializers.SerializerMethodField()
     has_levels = serializers.SerializerMethodField()
@@ -414,7 +414,7 @@ ProgramPageProgramSerializer = get_serializer(
     ProgramBase
 )
 
-class ProgramPageUpdateMixin(object):
+class ProgramPageUpdateMixin:
     indicator = serializers.SerializerMethodField()
     indicators = serializers.SerializerMethodField()
 
@@ -584,7 +584,7 @@ class PeriodDateRangeSerializer(serializers.Serializer):
         return period['start'].year
 
 
-class ProgramPeriodsMixin(object):
+class ProgramPeriodsMixin:
     frequencies = serializers.SerializerMethodField()
     period_date_ranges = serializers.SerializerMethodField()
 
@@ -595,9 +595,9 @@ class ProgramPeriodsMixin(object):
         ]
 
     def get_frequencies(self, program):
-        return sorted(set(
-            [i.target_frequency for i in self._get_program_indicators(program)
-             if i.target_frequency is not None]))
+        return sorted(
+            set(i.target_frequency for i in self._get_program_indicators(program) if i.target_frequency is not None)
+        )
 
 
     def get_period_date_ranges(self, program):
@@ -610,7 +610,7 @@ class ProgramPeriodsMixin(object):
         }
 
 
-class IPTTQSMixin(object):
+class IPTTQSMixin:
     class Meta:
         override_fields = True
         fields = [
@@ -677,7 +677,7 @@ IPTTQSProgramSerializer = get_serializer(
     ProgramBase
 )
 
-class IPTTProgramLevelsMixin(object):
+class IPTTProgramLevelsMixin:
     levels = serializers.SerializerMethodField()
 
     class Meta:
@@ -702,7 +702,7 @@ IPTTProgramLevelSerializer = get_serializer(
     ProgramBase
 )
 
-class IPTTProgramFilterItemsMixin(object):
+class IPTTProgramFilterItemsMixin:
     result_chain_label = serializers.SerializerMethodField()
     tiers = serializers.SerializerMethodField()
     sectors = serializers.SerializerMethodField()
@@ -750,7 +750,9 @@ class IPTTProgramFilterItemsMixin(object):
     def _get_program_disaggregations(self, program):
         if hasattr(self, 'context') and 'disaggregations' in self.context:
             return self.context['disaggregations']
-        return DisaggregationType.objects.filter(indicator__program=program).values('pk', 'disaggregation_type', 'standard', 'country__country')
+        return DisaggregationType.objects.filter(indicator__program=program).values(
+            'pk', 'disaggregation_type', 'standard', 'country__country'
+        )
 
     def _get_program_disaggregation_labels(self, program):
         if hasattr(self, 'context') and 'disaggregation_labels' in self.context:
@@ -797,7 +799,7 @@ class IPTTProgramFilterItemsMixin(object):
             i.old_level for i in self._get_program_indicators(program) if i.old_level)], key=operator.itemgetter('pk'))
 
 
-class IPTTMixin(object):
+class IPTTMixin:
     indicators = serializers.SerializerMethodField()
 
     class Meta:
@@ -847,7 +849,9 @@ class IPTTMixin(object):
             ).order_by('sector').values('pk', 'sector', 'indicator__pk'),
             'disaggregations': DisaggregationType.objects.select_related(None).prefetch_related(None).filter(
                 indicator__program_id=program_pk
-            ).order_by('disaggregation_type').values('pk', 'disaggregation_type', 'indicator__pk', 'standard', 'country__country'),
+            ).order_by('disaggregation_type').values(
+                'pk', 'disaggregation_type', 'indicator__pk', 'standard', 'country__country'
+            ),
             'disaggregation_labels': DisaggregationLabel.objects.select_related(None).prefetch_related(None).filter(
                 disaggregation_type__indicator__program_id=program_pk
             ).order_by('customsort').values('pk', 'disaggregation_type_id', 'label', 'customsort').distinct(),
@@ -857,7 +861,6 @@ class IPTTMixin(object):
 
     def get_indicators(self, program):
         indicators = self._get_program_indicators(program)
-        # TODO: json dump to string: ?
         return IPTTIndicatorSerializer(indicators, context=self.context, many=True).data
 
 
