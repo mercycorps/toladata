@@ -36,8 +36,11 @@
     // only on indicator report, ie. from IPTT
     // group of targets inside the prev/new component
 }
+.change__field {}
+.change__field__name {}
+.change__field__value {
+    // color: $primary; // potential to highlight new values; hold for now
+}
 
 .disagg-type__title {
-    margin-top: .5rem;
-    margin-bottom: .2rem
 }
