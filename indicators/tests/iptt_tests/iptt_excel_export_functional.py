@@ -1,5 +1,6 @@
 """Functional tests for the IPTT Excel export - test overall excel export for completeness and accuracy"""
 
+import io
 import datetime
 import unittest
 import openpyxl
@@ -17,11 +18,15 @@ class TestIPTTHeaders(test.TestCase):
     start_period = 0
     end_period = 2
     groupby = 1
+    title = "Indicator Performance Tracking Report"
 
     @classmethod
     def get_program(cls):
         cls.country = CountryFactory(country=f'{SPECIAL_CHARS} country', code='TL')
-        cls.program = RFProgramFactory(months=36)
+        cls.program = RFProgramFactory(
+            reporting_period_start=datetime.date(2015, 1, 1),
+            reporting_period_end=datetime.date(2018, 1, 1) - datetime.timedelta(days=1),
+            name=SPECIAL_CHARS)
         cls.program.country.set([cls.country])
 
     @classmethod
@@ -47,10 +52,6 @@ class TestIPTTHeaders(test.TestCase):
         cls.set_up_client()
 
     @property
-    def filename(self):
-        return f"IPTT Actuals only report {datetime.date.today().strftime('%b %-d, %Y')}.xlsx"
-
-    @property
     def frequency(self):
         return Indicator.ANNUAL
 
@@ -70,6 +71,48 @@ class TestIPTTHeaders(test.TestCase):
             'groupby': self.groupby
         }
 
+    @property
+    def filename(self):
+        return f"IPTT Actuals only report {datetime.date.today().strftime('%b %-d, %Y')}.xlsx"
+
+    @property
+    def report_date_range(self):
+        return "Jan 1, 2015 – Dec 31, 2017"
+
+    def get_date_row1(self):
+        return [
+            (13, "Year 1"),
+            (14, "Year 2"),
+            (15, "Year 3")
+        ]
+
+    def get_date_row2(self):
+        return [
+            (10, "Life of Program"),
+            (13, "Jan 1, 2015 – Dec 31, 2015"),
+            (14, "Jan 1, 2016 – Dec 31, 2016"),
+            (15, "Jan 1, 2017 – Dec 31, 2017"),
+        ]
+
+    def get_column_headers(self):
+        return [
+            "Program ID",
+            "Indicator ID",
+            "No.",
+            "Indicator",
+            "Unit of measure",
+            "Change",
+            "C / NC",
+            "# / %",
+            "Baseline",
+            "Target",
+            "Actual",
+            "% Met",
+            "Actual",
+            "Actual",
+            "Actual",
+        ]
+
     def get_report_response(self):
         self.client.force_login(user=self.tolauser.user)
         response = self.client.get(self.iptt_url, self.request_params)
@@ -87,8 +130,34 @@ class TestIPTTHeaders(test.TestCase):
             f'attachment; filename="{self.filename}"'
         )
 
-    @unittest.skip("no")
+    def get_report(self):
+        response = self.get_report_response()
+        return openpyxl.load_workbook(io.BytesIO(response.content))
+
     def test_report_header_row(self):
-        report = self.get_report()
-        wb = openpyxl.load_workbook(report.content)
-        print("ws {}".format(wb))
+        wb = self.get_report()
+        ws = wb.active
+        self.assertEqual(ws.cell(row=1, column=3).value, self.title)
+        self.assertEqual(
+            ws.cell(row=2, column=3).value,
+            self.report_date_range
+            )
+        for column, period_value in self.get_date_row1():
+            self.assertEqual(
+                ws.cell(row=2, column=column).value,
+                period_value
+            )
+        self.assertEqual(
+            ws.cell(row=3, column=3).value,
+            SPECIAL_CHARS
+        )
+        for column, period_value in self.get_date_row2():
+            self.assertEqual(
+                ws.cell(row=3, column=column).value,
+                period_value
+            )
+        for column, header_value in enumerate(self.get_column_headers()):
+            self.assertEqual(
+                ws.cell(row=4, column=column+1).value,
+                header_value
+            )
