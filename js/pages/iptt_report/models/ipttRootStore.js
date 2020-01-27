@@ -185,6 +185,9 @@ export default (
             if (disaggregationPks && disaggregationPks.length > 0) {
                 rootStore.expandAllRows();
             }
+        },
+        {
+            delay: 30 //adds a short delay so "expand all rows" will have access to all the newly added rows to expand
         }
     );
     return rootStore;
