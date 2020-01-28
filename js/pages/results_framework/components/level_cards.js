@@ -128,7 +128,7 @@ export class LevelCardCollapsed extends React.Component {
         if (sameLevelIndicatorIds.length > 0) {
             /* # Translators: this link opens a view of all indicators linked to (associated with) a particular level (level name replaces %s) */
             const linkPreface = gettext('All indicators linked to %s');
-            const linkText = interpolate(linkPreface, `${this.props.levelProps.tierName} ${this.props.levelProps.ontologyLabel}`);
+            const linkText = interpolate(linkPreface, [`${this.props.levelProps.tierName} ${this.props.levelProps.ontologyLabel}`]);
             allIndicatorLinks.push(`<li class="nav-item level-card--iptt-links"><a href=${this.buildIPTTUrl(sameLevelIndicatorIds)}>${linkText}</a></li>`);
         }
 
@@ -140,7 +140,7 @@ export class LevelCardCollapsed extends React.Component {
             if (descendantIndicatorIds.length > 0) {
                 /* # Translators: this link opens a view of all indicators linked to (associated with) a particular level and its child levels (level name replaces %s) */
                 const linkPreface = gettext('All indicators linked to %s and sub-levels');
-                const linkText = interpolate(linkPreface, `${this.props.levelProps.tierName} ${this.props.levelProps.ontologyLabel}`);
+                const linkText = interpolate(linkPreface, [`${this.props.levelProps.tierName} ${this.props.levelProps.ontologyLabel}`]);
                 allIndicatorLinks.unshift(`<li class="nav-item level-card--iptt-links"><a href=${this.buildIPTTUrl(descendantIndicatorIds)}>${linkText}</a></li>`);
             }
         }
