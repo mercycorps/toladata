@@ -8,9 +8,9 @@ import LoadingSpinner from '../../../components/loading-spinner'
 
 export const DisaggregationDiffs = ({disagg_type, disagg_diffs}) => {
     disagg_diffs.sort( (a, b) => a.custom_sort - b.custom_sort);
-    return <div><p className="disagg-type__title">{disagg_type}</p>
+    return <div><h4 className="disagg-type__title text-small">{disagg_type}</h4>
         {disagg_diffs.map( diff => {
-            return <div className="change__field" key={diff.id}><strong>{diff.name}:</strong> {diff.value}</div>
+            return <div className="change__field" key={diff.id}><span className="change__field__name">{diff.name}:</span> <span className="change__field__value">{diff.value}</span></div>
         })}
     </div>
 };
@@ -19,7 +19,7 @@ export const ResultChangeset = ({data, name, pretty_name}) => {
     if (name === 'id') {
         return null
     } else if(name === 'Target_url') {
-        return <div className="change__field"><strong>{pretty_name}</strong>: {(data !== 'N/A' && data !== '')?<a href={data} target="_blank">Link</a>:data}</div>
+        return <div className="change__field"><strong className="change__field__name">{pretty_name}</strong>: {(data !== 'N/A' && data !== '')?<a href={data} target="_blank">Link</a>:data}</div>
     } else if (name === 'disaggregation_values') {
         if (Object.entries(data).length) {
             let groupedDiffs = {};
@@ -34,7 +34,6 @@ export const ResultChangeset = ({data, name, pretty_name}) => {
             });
 
             return <div className="changelog__change__targets">
-                <h4 className="text-small">{gettext('Disaggregated values')}</h4>
                 {Object.keys(groupedDiffs).sort().map( (typeName ) => {
                     return  <DisaggregationDiffs
                         key={typeName+'_diff'}
@@ -45,7 +44,7 @@ export const ResultChangeset = ({data, name, pretty_name}) => {
             return null;
         }
     } else {
-        return <div className="change__field"><strong>{pretty_name}</strong>: {data}</div>
+        return <div className="change__field"><strong className="change__field__name">{pretty_name}</strong>: <span className="change__field__value">{data}</span></div>
     }
 };
 
@@ -58,12 +57,12 @@ const IndicatorChangeset = ({data, name, pretty_name, indicator}) => {
         return <div className="changelog__change__targets">
             <h4 className="text-small">{gettext('Targets changed')}</h4>
             {Object.entries(data).map(([id, target]) => {
-                return <div className="change__field" key={id}><strong>{target.name}:</strong> {target.value}</div>
+                return <div className="change__field" key={id}><strong className="change__field__name">{target.name}:</strong> {target.value}</div>
             })}
         </div>
     } else {
         return <div className="change__field">
-            <strong>
+            <strong className="change__field__name">
                 { name === 'name' ?
                     <span>{gettext('Indicator')} {indicator.results_aware_number}: </span> : <span>{pretty_name}: </span>}
             </strong>
@@ -74,7 +73,7 @@ const IndicatorChangeset = ({data, name, pretty_name, indicator}) => {
 
 const ResultLevelChangeset = ({data, name, pretty_name, level}) => {
     return <div className="change__field">
-        { name !== 'name' ? <strong>{pretty_name}: </strong>  : <strong>{level.tier} {level.display_ontology}: </strong> }
+        { name !== 'name' ? <strong className="change__field__name">{pretty_name}: </strong>  : <span className="field__level-tier">{level.tier} {level.display_ontology}: </span> }
         {(data !== null && data !== undefined)?data.toString():gettext('N/A')}
     </div>
 }
