@@ -287,7 +287,7 @@ class IndicatorForm(forms.ModelForm):
               [get_helptext(disagg) for disagg in country_disaggs],
               [getattr(disagg, 'has_results') for disagg in country_disaggs])
                 for country_name, country_disaggs in countries_disaggs],
-            subwidget_attrs={'class': 'scroll-box-200'}
+            subwidget_attrs={'class': 'scroll-box-200 grouped-disaggregations'}
         )
         if indicator:
             self.fields['grouped_disaggregations'].initial = [
