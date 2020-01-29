@@ -15,6 +15,12 @@ const ProgramNameRow = inject('rootStore')(
                 <td
                     colSpan={ rootStore.hasBaselineColumn ? rootStore.baseColumns : rootStore.baseColumns + 1}
                     className="base-column">
+                    <button className="btn btn-medium text-action btn-sm"
+                    onClick={rootStore.expandAllRows.bind(rootStore)}
+                    disabled={ rootStore.allExpanded }>{ gettext('Expand all') }</button>
+                    <button className="btn btn-medium text-action btn-sm"
+                    onClick={rootStore.collapseAllRows.bind(rootStore)}
+                    disabled={ rootStore.allCollapsed }>{ gettext('Collapse all') }</button>
                 </td>
                 <td scope="colgroup" colSpan={ rootStore.hasBaselineColumn ? 4 : 3 }
                     // centered under LOP superheader
@@ -36,21 +42,6 @@ const ProgramNameRow = inject('rootStore')(
         );
     })
 );
-
-const ExpandAllRow = inject('rootStore')(observer(({ rootStore }) => {
-    return (
-        <tr className="title-row action-buttons">
-            <td colSpan={ rootStore.reportColumnWidth }>
-                <button className="btn btn-medium text-action btn-sm"
-                onClick={rootStore.expandAllRows.bind(rootStore)}
-                disabled={ rootStore.allExpanded }>{ gettext('Expand all') }</button>
-                <button className="btn btn-medium text-action btn-sm"
-                onClick={rootStore.collapseAllRows.bind(rootStore)}
-                disabled={ rootStore.allCollapsed }>{ gettext('Collapse all') }</button>
-            </td>
-        </tr>
-    )
-}))
 
 const ColumnHeaderRow = inject('rootStore')(
     observer(({ rootStore }) => {
@@ -151,7 +142,6 @@ const ReportTableHeader = () => {
     return (
         <thead>
             <ProgramNameRow />
-            { /* <ExpandAllRow /> // TODO: */ }
             <ColumnHeaderRow />
         </thead>
         );
