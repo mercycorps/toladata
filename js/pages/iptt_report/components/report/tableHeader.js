@@ -12,9 +12,11 @@ const ProgramNameRow = inject('rootStore')(
         }
         return (
             <tr className="title-row">
-                <td colSpan={ rootStore.baseColumns } className="base-column">
+                <td
+                    colSpan={ rootStore.hasBaselineColumn ? rootStore.baseColumns : rootStore.baseColumns + 1}
+                    className="base-column">
                 </td>
-                <td scope="colgroup" colSpan="4"
+                <td scope="colgroup" colSpan={ rootStore.hasBaselineColumn ? 4 : 3 }
                     // centered under LOP superheader
                     className="text-center text-nowrap text-uppercase lop-column">
                     {

@@ -146,11 +146,14 @@ const DisaggregationTable = inject('rootStore')(
                                 <td className="disaggregation-name-cell" rowSpan={disaggregation.labels.length}>
                                     {disaggregation.name}</td>
                                 }
-                                <td colSpan={rootStore.baseColumns - 2} className="disaggregation-label-cell">{label.name}</td>
-                                <td className="disaggregation-value-cell" >—</td>
-                                <td className="disaggregation-value-cell" >—</td>
-                                <ValueCell className="disaggregation-value-cell" value={ ipttRound(rootStore.disaggregatedLop(indicator.pk, label.pk), false) } />
-                                <td className="disaggregation-value-cell" >—</td>
+                                <td colSpan={rootStore.baseColumns - 1} className="disaggregation-label-cell">{label.name}</td>
+                                { rootStore.hasBaselineColumn ?
+                                    <td className="disaggregation-value-cell lop-column" >—</td>:
+                                    {}
+                                }
+                                <td className="disaggregation-value-cell lop-column" >—</td>
+                                <ValueCell className="disaggregation-value-cell lop-column" value={ ipttRound(rootStore.disaggregatedLop(indicator.pk, label.pk), false) } />
+                                <td className="disaggregation-value-cell lop-column" >—</td>
                                 {
                                     rootStore.disaggregatedPeriodValues(indicator.pk, label.pk).map(
                                         (periodValue, idx) => {
@@ -274,11 +277,10 @@ const LevelTitleRow = inject('rootStore')(
     observer(({ rootStore, children }) => {
         return (
             <tr>
-            <td colSpan={ rootStore.reportColumnWidth }
-                className="iptt-level-row"
-            >
-               { children }
-            </td>
+                <td colSpan={ rootStore.reportColumnWidth + 1 /* TODO: might be off by one ? */}
+                    className="iptt-level-row">
+                   { children }
+                </td>
             </tr>
         )
     })
