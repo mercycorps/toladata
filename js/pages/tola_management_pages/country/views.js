@@ -85,7 +85,6 @@ export const IndexView = observer(
                             newData={store.new_country}
                             data={store.countries}
                             keyField="id"
-                            className="mgmt-table__fixed"
                             HeaderRow={({Col, Row}) =>
                                 <Row>
                                     <Col size="1"></Col>

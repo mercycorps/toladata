@@ -4,7 +4,7 @@ import ChangeLog from 'components/changelog'
 
 @observer
 export class CountryHistory extends React.Component {
-
+    // TODO: is disaggregation name necessary in the country history serializer?
     render() {
         const {history, store} = this.props;
         const changelog_expanded_rows = store.changelog_expanded_rows;
