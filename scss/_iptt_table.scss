@@ -4,21 +4,17 @@
 #iptt_table {
     background-color: white;
     td, th {
-        // border: 1px solid red; // for column debugging
+        // border: 1px solid red; // TODO: for column debugging
     }
     &, & thead tr td {
-        border: 0px !important;
+        // border: 0px !important; // commented for debugging
     }
     tr th {
-        background-color:$gray-150 !important;
+        // background-color:$gray-150 !important; // TODO
     }
     // tbody{
     //background-color:#ffffff !important;
     //}
-}
-#id_td_iptt_program_name {
-    padding-left: 0; // overloads .table-sm td
-    padding-right: 0; // overloads .table-sm td
 }
 body.page_iptt_table { // body element for extra specificity
     margin-bottom: 0;
@@ -53,6 +49,16 @@ body.page_iptt_table { // body element for extra specificity
 
 tr.title-row {
     background-color: $gray-150;
+}
+.base-column {
+    // columns that act as general info "headers" for the row
+    //background: transparentize(pink, 0.5); // TODO: for debuggin
+}
+.lop-column {
+    // columns that summarize LOP data
+    //background: transparentize(green, 0.8); // TODO: for debugging
+    @extend %right-aligned-cell;
+    background-color: transparentize($gray-400, 0.8);
 }
 tr.program-name { }
 tr.action-buttons { }
@@ -144,14 +150,6 @@ td.indicator-cell {
 }
 .percent-cell {
     @extend %right-aligned-cell;
-}
-.old-level-display {
-}
-.unit-of-measure-column {
-}
-.has-change-column {
-}
-.has-cnc-column {
 }
 .is-percent-column {
     @extend %right-aligned-cell;

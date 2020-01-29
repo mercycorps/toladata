@@ -14,5 +14,5 @@ export default () => {
                     </table>
                 </div>
             </main>;
-                
+
 }

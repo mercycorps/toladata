@@ -1,5 +1,20 @@
 import React from 'react';
 
+const HeaderCell = ( props ) => {
+    let style = props.styleWidth ? {
+        minWidth: `${props.styleWidth}px`
+    } : {};
+    return (
+        <th
+            scope="col"
+            colSpan={ props.colSpan }
+            className={ props.className }
+            style={ style }>
+            { props.label }
+        </th>
+    )
+}
+
 const BorderedHeader = ( { label, styleWidth } ) => {
     let style = styleWidth ? {
         minWidth: `${styleWidth}px`
@@ -94,4 +109,4 @@ const TVAHeader = () => {
     )
 }
 
-export { BorderedHeader, UnBorderedHeader, PeriodHeader, TVAHeader, ActualHeader }
+export { HeaderCell, BorderedHeader, UnBorderedHeader, PeriodHeader, TVAHeader, ActualHeader }
