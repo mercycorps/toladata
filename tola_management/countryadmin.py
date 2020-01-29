@@ -323,16 +323,25 @@ class CountryDisaggregationViewSet(viewsets.ModelViewSet):
 class CountryAdminAuditLogSerializer(serializers.ModelSerializer):
     date = serializers.DateTimeField(format="%Y-%m-%d %H:%M:%S")
     admin_user = serializers.CharField(source="admin_user.name")
-    disaggregation_type_name = serializers.CharField(source="disaggregation_type.disaggregation_type")
-    disaggregation_type_id = serializers.IntegerField(source="disaggregation_type.pk")
+    disaggregation_type = serializers.SerializerMethodField()
+    disaggregation_type_name = serializers.SerializerMethodField()
 
     class Meta:
         model = CountryAdminAuditLog
         fields = [
+            "id",
             "date",
             "admin_user",
-            "disaggregation_type_id",
+            "disaggregation_type",
             "disaggregation_type_name",
-            "change_type",
+            "pretty_change_type",
             "diff_list"
         ]
+
+    def get_disaggregation_type(self, obj):
+        if obj.disaggregation_type:
+            return obj.disaggregation_type.pk
+
+    def get_disaggregation_type_name(self, obj):
+        if obj.disaggregation_type:
+            return obj.disaggregation_type.disaggregation_type

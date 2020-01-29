@@ -1,11 +1,26 @@
 import React from 'react'
 import { observer } from 'mobx-react';
 import {FontAwesomeIcon} from "@fortawesome/react-fontawesome"
+import { toJS } from 'mobx';
 
 const ChangeField = ({name, data}) => {
-    return <div className="change__field">
-        <strong>{name}</strong>: {(data != undefined && data != null)?data.toString():'N/A'}
-    </div>
+    if (name==="Disaggregation categories" && typeof data === 'object' && data !== null) {
+        const sorted_labels = Object.values(data).sort((a,b) => a.custom_sort - b.custom_sort)
+        return <React.Fragment>
+            <strong>{name}: </strong>
+            <ul className="no-list-style">
+                {sorted_labels.map( (entry, index) => {
+                    return <li key={index}>{(entry.label !== undefined && entry.label != null) ? entry.label : ""}</li>
+                })}
+            </ul>
+        </React.Fragment>
+    }
+
+    else {
+        return <div className="change__field">
+            <strong>{name}</strong>: {(data != undefined && data != null) ? data.toString() : 'N/A'}
+        </div>
+    }
 }
 
 const ChangeLogEntryHeader = ({data, is_expanded, toggle_expando_cb}) => {

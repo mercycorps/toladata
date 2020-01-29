@@ -529,8 +529,6 @@ class DisaggregationType(models.Model):
         If you change the composition of this property you may also want to update the logged_field_order property.
         """
         return {
-            "type": self.disaggregation_type,
-            "country": self.country.id,
             "disaggregation_type": self.disaggregation_type,
             "is_archived": self.is_archived,
             "labels": {

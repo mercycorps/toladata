@@ -63,6 +63,10 @@ export default class CountryEditor extends React.Component {
                     {active_pane == 'disaggregations' && (
                         <DisaggregationSection />
                     )}
+
+                    {active_pane == 'history' && (
+                        <HistorySection />
+                    )}
                 </div>
             </div>
         )

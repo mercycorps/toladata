@@ -686,6 +686,12 @@ class CountryAdminAuditLog(models.Model, DiffableLog):
             "disaggregation_type_name": _("Disaggregation type"),
             # Translators: Heading for list of disaggregation categories in a particular disaggregation type.
             "disaggregation_category": _("Disaggregation category"),
+            # Translators: Heading for list of disaggregation categories in a particular disaggregation type.
+            "labels": _("Disaggregation categories"),
+            # Translators: Heading for list of disaggregation categories in a particular disaggregation type.
+            "is_archived": _("Archived"),
+            # Translators: Heading for list of disaggregation categories in a particular disaggregation type.
+            "disaggregation_type": _("Disaggregation type"),
         }
 
     @property
@@ -708,42 +714,4 @@ class CountryAdminAuditLog(models.Model, DiffableLog):
     @property
     def pretty_change_type(self):
         return self.change_type_map.get(self.change_type, self.change_type)
-
-    @property
-    def diff_list(self):
-
-        p = {}
-        if self.previous_entry:
-            p = json.loads(self.previous_entry)
-
-        n = {}
-        if self.new_entry:
-            n = json.loads(self.new_entry)
-
-
-        diff_list = []
-        for (p_field, n_field) in itertools.zip_longest(p.keys(), n.keys()):
-            if p_field and p_field not in n:
-                diff_list.append({
-                    "name": p_field,
-                    "prev": p[p_field],
-                    "new": {k: '' for k, _ in p[p_field].items()},
-                })
-
-            if n_field and n_field not in p:
-                print(n, n_field)
-                diff_list.append({
-                    "name": n_field,
-                    "prev": {k: '' for k, _ in n[n_field].items()},
-                    "new": n[n_field]
-                })
-
-            if n_field in p and p_field in n and n[p_field] != p[n_field]:
-                diff_list.append({
-                    "name": n_field,
-                    "prev": p[p_field],
-                    "new": n[n_field]
-                })
-
-        return diff_list
 

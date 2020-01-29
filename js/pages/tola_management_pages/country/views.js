@@ -53,7 +53,6 @@ export const IndexView = observer(
         const countryFilterOptions = store.allCountries.map(country => {return {value: country.id, label: country.country}})
         const organizationFilterOptions = Object.entries(store.organizations).map(([id, org]) => ({value: org.id, label: org.name}))
         const programFilterOptions = Object.entries(store.allPrograms).map(([id, program]) => ({value: program.id, label: program.name}))
-
         return <div id="country-management-index-view" className="row">
             <FoldingSidebar>
                 <div className="filter-section">
@@ -154,12 +153,7 @@ export const IndexView = observer(
                                                 <LoadingSpinner isLoading={store.fetching_editing_data || store.saving}>
                                                     <CountryHistory
                                                         store={store}
-                                                        onIsDirtyChange={is_dirty => store.setActiveFormIsDirty(is_dirty)}
-                                                        country_data={data}
-                                                        fetching_history={store.fetching_editing_history}
                                                         history={store.editing_history}
-                                                        saving={store.saving}
-                                                        onSave={(id, data) => store.updateProgram(id, data)}
                                                     />
                                                 </LoadingSpinner>
                                             )}

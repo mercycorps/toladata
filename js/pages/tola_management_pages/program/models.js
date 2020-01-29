@@ -252,13 +252,13 @@ export class ProgramStore {
             this.editing_target = 'new'
         }
     }
-    
+
     /*
      * if there is no GAIT Id, resolve and move on,
      * if there is a GAIT ID, call to see if it is unique, and if not confirm that the user wants to enter a
      * duplicate GAIT ID for this program (displaying the link to view programs with the same ID in GAIT)
      */
-    
+
     validateGaitId(program_data) {
         if (program_data.gaitid) {
             let id = program_data.id || 0;
