@@ -113,8 +113,10 @@ tr.expando-table-row-spacer {
 }
 
 td.disaggregation-name-cell {
+    background: $white !important;
     width: 142px; // TODO: hardcoded!
     font-weight: bold;
+    border-right: 1px solid $table-border-color;
 }
 
 td.disaggregation-label-cell {
