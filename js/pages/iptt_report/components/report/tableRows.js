@@ -157,7 +157,7 @@ const DisaggregationTable = inject('rootStore')(
                                     rootStore.disaggregatedPeriodValues(indicator.pk, label.pk).map(
                                         (periodValue, idx) => {
                                             return rootStore.isTVA ?
-                                                <React.Fragment>
+                                                <React.Fragment key={idx}>
                                                     <td></td>
                                                     <ValueCell key={idx} value={ periodValue.actual } />
                                                     <td></td>
