@@ -3,18 +3,14 @@
 
 #iptt_table {
     background-color: white;
-    td, th {
-        // border: 1px solid orange; // TODO: for column debugging
+    thead {
+        th, td {
+            background-color:$gray-150 !important;
+        }
     }
-    &, & thead tr td {
-        // border: 0px !important; // commented for debugging
+    tbody {
+        border-bottom: 1px solid $table-border-color;
     }
-    tr th {
-        // background-color:$gray-150 !important; // TODO
-    }
-    // tbody{
-    //background-color:#ffffff !important;
-    //}
 }
 body.page_iptt_table { // body element for extra specificity
     margin-bottom: 0;

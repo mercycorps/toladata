@@ -38,7 +38,7 @@ const ProgramNameRow = inject('rootStore')(
             return (<tr><td>Loading</td></tr>);
         }
         return (
-            <tr className="title-row-">
+            <tr className="title-row">
                 <td
                     colSpan={ rootStore.hasBaselineColumn ? rootStore.baseColumns : rootStore.baseColumns + 1}
                     className="base-column">
