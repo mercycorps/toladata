@@ -93,7 +93,7 @@ class TestIndicatorCreateFormDisaggregations(test.TestCase):
              data-toggle="collapse" data-target="#grouped_disaggregations_inputs_0" aria-expanded="true"
              aria-controls="grouped_disaggregations_inputs_0"><i class="fas fa-caret-down"></i>
              Global disaggregations</a>
-             <div class="collapse show" id="grouped_disaggregations_inputs_0"><div class="scroll-box-200">
+             <div class="collapse show" id="grouped_disaggregations_inputs_0"><div class="grouped-disaggregations scroll-box-200">
                 <div class="form-check"><input class="form-check-input" type="checkbox"
                  name="grouped_disaggregations_0" value="{}" id="grouped_disaggregations_0_check_0">
                  <label class="form-check-label" for="grouped_disaggregations_0_check_0"><small>Test Global 1</small></label></div>
@@ -116,7 +116,7 @@ class TestIndicatorCreateFormDisaggregations(test.TestCase):
              data-toggle="collapse" data-target="#grouped_disaggregations_inputs_0" aria-expanded="true"
              aria-controls="grouped_disaggregations_inputs_0"><i class="fas fa-caret-down"></i>
              Global disaggregations</a>
-             <div class="collapse show" id="grouped_disaggregations_inputs_0"><div class="scroll-box-200">
+             <div class="collapse show" id="grouped_disaggregations_inputs_0"><div class="grouped-disaggregations scroll-box-200">
                 <div class="form-check"><input class="form-check-input" type="checkbox"
                  name="grouped_disaggregations_0" value="{}" id="grouped_disaggregations_0_check_0" checked>
                  <label class="form-check-label" for="grouped_disaggregations_0_check_0"><small>{}</small></label></div>
@@ -138,7 +138,7 @@ class TestIndicatorCreateFormDisaggregations(test.TestCase):
              data-toggle="collapse" data-target="#grouped_disaggregations_inputs_0" aria-expanded="true"
              aria-controls="grouped_disaggregations_inputs_0"><i class="fas fa-caret-down"></i>
              Testland disaggregations</a>
-             <div class="collapse show" id="grouped_disaggregations_inputs_0"><div class="scroll-box-200">
+             <div class="collapse show" id="grouped_disaggregations_inputs_0"><div class="grouped-disaggregations scroll-box-200">
                 <div class="form-check"><input class="form-check-input" type="checkbox"
                  name="grouped_disaggregations_0" value="{}" id="grouped_disaggregations_0_check_0">
                  <label class="form-check-label" for="grouped_disaggregations_0_check_0"><small>Test1</small></label></div>
@@ -167,7 +167,7 @@ class TestIndicatorCreateFormDisaggregations(test.TestCase):
              data-toggle="collapse" data-target="#grouped_disaggregations_inputs_0" aria-expanded="true"
              aria-controls="grouped_disaggregations_inputs_0"><i class="fas fa-caret-down"></i>
              Testland disaggregations</a>
-             <div class="collapse show" id="grouped_disaggregations_inputs_0"><div class="scroll-box-200">
+             <div class="collapse show" id="grouped_disaggregations_inputs_0"><div class="grouped-disaggregations scroll-box-200">
                 <div class="form-check"><input class="form-check-input" type="checkbox"
                  name="grouped_disaggregations_0" value="{}" id="grouped_disaggregations_0_check_0">
                  <label class="form-check-label" for="grouped_disaggregations_0_check_0"><small>Test1</small></label>
@@ -201,7 +201,7 @@ class TestIndicatorCreateFormDisaggregations(test.TestCase):
              data-toggle="collapse" data-target="#grouped_disaggregations_inputs_0" aria-expanded="true"
              aria-controls="grouped_disaggregations_inputs_0"><i class="fas fa-caret-down"></i>
              Testland disaggregations</a>
-             <div class="collapse show" id="grouped_disaggregations_inputs_0"><div class="scroll-box-200">
+             <div class="collapse show" id="grouped_disaggregations_inputs_0"><div class="grouped-disaggregations scroll-box-200">
                 <div class="form-check"><input class="form-check-input" type="checkbox"
                  name="grouped_disaggregations_0" value="{}" id="grouped_disaggregations_0_check_0">
                  <label class="form-check-label" for="grouped_disaggregations_0_check_0"><small>Test1</small></label></div>
@@ -543,7 +543,7 @@ class TestIndicatorUpdateFormDisaggregations(test.TestCase):
              data-toggle="collapse" data-target="#grouped_disaggregations_inputs_0" aria-expanded="true"
              aria-controls="grouped_disaggregations_inputs_0"><i class="fas fa-caret-down"></i>
              Global disaggregations</a>
-             <div class="collapse show" id="grouped_disaggregations_inputs_0"><div class="scroll-box-200">
+             <div class="collapse show" id="grouped_disaggregations_inputs_0"><div class="grouped-disaggregations scroll-box-200">
                 <div class="form-check"><input class="form-check-input" type="checkbox" checked disabled
                  name="grouped_disaggregations_0" value="{}" id="grouped_disaggregations_0_check_0">
                  <label class="form-check-label" for="grouped_disaggregations_0_check_0"><small>Test1</small></label>
