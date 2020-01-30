@@ -3,7 +3,7 @@ import { observer } from 'mobx-react';
 import {FontAwesomeIcon} from "@fortawesome/react-fontawesome"
 import { toJS } from 'mobx';
 
-const ChangeField = ({name, data}) => {
+export const ChangeField = ({name, data}) => {
     if (name==="Disaggregation categories" && typeof data === 'object' && data !== null) {
         const sorted_labels = Object.values(data).sort((a,b) => a.custom_sort - b.custom_sort)
         return <React.Fragment>

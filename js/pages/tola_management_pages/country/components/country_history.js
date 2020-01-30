@@ -5,6 +5,7 @@ import ChangeLog from 'components/changelog'
 @observer
 export class CountryHistory extends React.Component {
     // TODO: is disaggregation name necessary in the country history serializer?
+    // TODO: in changelog.js, should "program", "country", and "role" be capitalized?
     render() {
         const {history, store} = this.props;
         const changelog_expanded_rows = store.changelog_expanded_rows;
