@@ -3,6 +3,33 @@ import { observer, inject } from 'mobx-react';
 
 import * as HeaderCells from './headerCells';
 
+const ColGroups = inject('rootStore')(
+    observer(({ rootStore }) => {
+        return (
+            <React.Fragment>
+                <colgroup
+                    span={ rootStore.hasBaselineColumn ? rootStore.baseColumns : rootStore.baseColumns + 1}
+                    className="iptt-base-columns" />
+                <colgroup
+                    span={ rootStore.hasBaselineColumn ? 4 : 3 }
+                    className="iptt-lop-columns" />
+                {
+                    rootStore.reportPeriods.map(
+                        (period, index) => (
+                            <colgroup
+                                key={ index }
+                                span={ rootStore.isTVA ? 3 : 1}
+                                className="iptt-period-columns"
+                                id={ 'period-' + index }
+                            />
+                        )
+                    )
+                }
+            </React.Fragment>
+        )
+    })
+);
+
 
 const ProgramNameRow = inject('rootStore')(
     observer(({ rootStore }) => {
@@ -11,7 +38,7 @@ const ProgramNameRow = inject('rootStore')(
             return (<tr><td>Loading</td></tr>);
         }
         return (
-            <tr className="title-row">
+            <tr className="title-row-">
                 <td
                     colSpan={ rootStore.hasBaselineColumn ? rootStore.baseColumns : rootStore.baseColumns + 1}
                     className="base-column">
@@ -22,7 +49,8 @@ const ProgramNameRow = inject('rootStore')(
                     onClick={rootStore.collapseAllRows.bind(rootStore)}
                     disabled={ rootStore.allCollapsed }>{ gettext('Collapse all') }</button>
                 </td>
-                <td scope="colgroup" colSpan={ rootStore.hasBaselineColumn ? 4 : 3 }
+                <td scope="colgroup"
+                    colSpan={ rootStore.hasBaselineColumn ? 4 : 3 }
                     // centered under LOP superheader
                     className="text-center text-nowrap text-uppercase lop-column">
                     {
@@ -141,10 +169,13 @@ const ColumnHeaderRow = inject('rootStore')(
 
 const ReportTableHeader = () => {
     return (
-        <thead>
-            <ProgramNameRow />
-            <ColumnHeaderRow />
-        </thead>
+        <React.Fragment>
+            <ColGroups />
+            <thead>
+                <ProgramNameRow />
+                <ColumnHeaderRow />
+            </thead>
+        </React.Fragment>
         );
 }
 

@@ -4,7 +4,7 @@
 #iptt_table {
     background-color: white;
     td, th {
-        // border: 1px solid red; // TODO: for column debugging
+        // border: 1px solid orange; // TODO: for column debugging
     }
     &, & thead tr td {
         // border: 0px !important; // commented for debugging
@@ -46,19 +46,28 @@ body.page_iptt_table { // body element for extra specificity
 #id_div_top_iptt_report {
     color: $gray-700; // why is this not #54585A ?
 }
-
+.empty-value {
+    // for cells with no value
+    color: $gray-300;
+}
 tr.title-row {
     background-color: $gray-150;
 }
-.base-column {
-    // columns that act as general info "headers" for the row
-    //background: transparentize(pink, 0.5); // TODO: for debuggin
+// logical columns, applied to colgroup > col
+.iptt-base-columns {
+    border-left: 1px solid $table-border-color;
+    border-right: 1px solid $table-border-color;
+}
+.iptt-lop-columns {
+    background-color: transparentize($gray-400, 0.8);
+    border-right: 1px solid $table-border-color;
+}
+.iptt-period-columns {
+    border-right: 1px solid $table-border-color;
 }
 .lop-column {
     // columns that summarize LOP data
-    //background: transparentize(green, 0.8); // TODO: for debugging
     @extend %right-aligned-cell;
-    background-color: transparentize($gray-400, 0.8);
 }
 tr.program-name { }
 tr.action-buttons { }

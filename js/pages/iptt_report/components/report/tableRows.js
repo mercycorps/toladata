@@ -68,7 +68,7 @@ const IndicatorResultModalCell = inject("rootStore")(
 );
 
 const IndicatorCell = ({ value, resultCell, ...props }) => {
-    const displayValue = (value || value === 0) ? value : BLANK_TABLE_CELL;
+    const displayValue = (value || value === 0) ? value : <span className="empty-value">{BLANK_TABLE_CELL}</span>;
     if (resultCell && resultCell === true) {
         return <td className="indicator-cell result-cell" { ...props }>{ displayValue }</td>;
     }
@@ -78,7 +78,7 @@ const IndicatorCell = ({ value, resultCell, ...props }) => {
 }
 
 const ExpandoCell = observer(({ value, expanded, clickHandler, ...props }) => {
-    const displayValue = (value || value === 0) ? value : BLANK_TABLE_CELL;
+    const displayValue = (value || value === 0) ? value : <span className="empty-value">{BLANK_TABLE_CELL}</span>;
     return (
         <td className="expando-cell base-column" { ...props } onClick={ clickHandler }>
             <FontAwesomeIcon icon={expanded ? 'caret-down' : 'caret-right'} />&nbsp;
@@ -148,19 +148,19 @@ const DisaggregationTable = inject('rootStore')(
                                 }
                                 <td colSpan={ rootStore.hasBaselineColumn ? rootStore.baseColumns - 1 : rootStore.baseColumns } className="disaggregation-label-cell">{label.name}</td>
                                 { rootStore.hasBaselineColumn &&
-                                <td className="disaggregation-value-cell lop-column" >—</td>
+                                    <td className="disaggregation-value-cell lop-column empty-value">—</td>
                                 }
-                                <td className="disaggregation-value-cell lop-column" >—</td>
+                                <td className="disaggregation-value-cell lop-column empty-value">—</td>
                                 <ValueCell className="disaggregation-value-cell lop-column" value={ ipttRound(rootStore.disaggregatedLop(indicator.pk, label.pk), false) } />
-                                <td className="disaggregation-value-cell lop-column" >—</td>
+                                <td className="disaggregation-value-cell lop-column empty-value">—</td>
                                 {
                                     rootStore.disaggregatedPeriodValues(indicator.pk, label.pk).map(
                                         (periodValue, idx) => {
                                             return rootStore.isTVA ?
                                                 <React.Fragment key={idx}>
-                                                    <td></td>
+                                                    <td className="disaggregation-value-cell empty-value">—</td>
                                                     <ValueCell key={idx} value={ periodValue.actual } />
-                                                    <td></td>
+                                                    <td className="disaggregation-value-cell empty-value">—</td>
                                                 </React.Fragment> :
                                                 <ValueCell key={idx} value={ periodValue } />
                                         })
