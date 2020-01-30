@@ -64,6 +64,7 @@ const ColumnHeaderRow = inject('rootStore')(
                     } />
                 <HeaderCells.HeaderCell
                     className='base-column'
+                    // empty cell above gear widget column
                     />
                 { !rootStore.filterStore.resultsFramework && <HeaderCells.HeaderCell
                     className='base-column'
