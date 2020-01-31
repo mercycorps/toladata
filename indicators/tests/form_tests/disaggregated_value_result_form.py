@@ -1,6 +1,7 @@
 """Tests for the formset, form, formset-factory function, instantiation, validation, and model saving behavior"""
 
 import unittest
+from decimal import Decimal
 from django import test
 
 from factories import (
@@ -78,9 +79,9 @@ class TestDisaggregatedValueFormSet(test.TestCase):
             }
             formset = FormSet(data, result=self.result, request=self.request)
             self.assertTrue(formset.is_valid(), "{}\n{}".format(formset.errors, formset.non_form_errors()))
-            self.assertEqual(formset[0].cleaned_data['value'], values[0])
+            self.assertEqual(formset[0].cleaned_data['value'], Decimal(values[0]).quantize(Decimal('.01')))
             self.assertEqual(formset[0].cleaned_data['label_pk'], self.disagg.labels[0].pk)
-            self.assertEqual(formset[1].cleaned_data['value'], values[1])
+            self.assertEqual(formset[1].cleaned_data['value'], Decimal(values[1]).quantize(Decimal('.01')))
             self.assertEqual(formset[1].cleaned_data['label_pk'], self.disagg.labels[1].pk)
 
     def test_valid_form_values_with_blanks(self):
@@ -93,7 +94,7 @@ class TestDisaggregatedValueFormSet(test.TestCase):
         }
         formset = get_disaggregated_result_formset(self.disagg)(data, result=self.result, request=self.request)
         self.assertTrue(formset.is_valid(), "{}\n{}".format(formset.errors, formset.non_form_errors()))
-        self.assertEqual(formset[0].cleaned_data['value'], 250)
+        self.assertEqual(formset[0].cleaned_data['value'], Decimal(250))
         self.assertEqual(formset[1].cleaned_data['value'], None)
 
     def test_invalid_form_values(self):
@@ -127,14 +128,14 @@ class TestDisaggregatedValueFormSet(test.TestCase):
         self.assertTrue(formset.is_valid())
         values = formset.save()
         self.assertEqual(len(values), 2)
-        self.assertEqual(float(values[0].value), 71.45)
+        self.assertEqual(values[0].value, Decimal('71.45'))
         self.assertEqual(values[0].category, self.disagg.labels[0])
-        self.assertEqual(float(values[1].value), 178.55)
+        self.assertEqual(values[1].value, Decimal('178.55'))
         self.assertEqual(values[1].category, self.disagg.labels[1])
         value1 = DisaggregatedValue.objects.get(pk=values[0].pk)
-        self.assertEqual(float(value1.value), values[0].value)
+        self.assertEqual(value1.value, values[0].value)
         value2 = DisaggregatedValue.objects.get(pk=values[1].pk)
-        self.assertEqual(float(value2.value), values[1].value)
+        self.assertEqual(value2.value, values[1].value)
 
     def test_doesnt_create_with_no_values(self):
         FormSet = get_disaggregated_result_formset(self.disagg)

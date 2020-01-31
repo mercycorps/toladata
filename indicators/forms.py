@@ -1,5 +1,6 @@
 # -*- coding: utf-8 -*-
 import uuid
+import decimal
 from datetime import timedelta
 
 from workflow.models import (
@@ -612,7 +613,7 @@ class DisaggregatedValueForm(forms.Form):
             raise forms.ValidationError('Please enter a number, you entered {}'.format(value))
         if round(value, 2) == int(value):
             return int(value)
-        return value
+        return decimal.Decimal(value).quantize(decimal.Decimal('.01'))
 
 
 def get_disaggregated_result_formset(disaggregation):
