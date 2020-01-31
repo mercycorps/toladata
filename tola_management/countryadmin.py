@@ -238,14 +238,15 @@ class CountryDisaggregationSerializer(serializers.ModelSerializer):
                 label.delete()
         updated_instance = super(CountryDisaggregationSerializer, self).update(instance, validated_data)
 
-        CountryAdminAuditLog.objects.create(
-            admin_user=self.context['tola_user'],
-            country = instance.country,
-            disaggregation_type=instance,
-            change_type=change_type,
-            previous_entry=json.dumps(previous_entry),
-            new_entry=json.dumps(updated_instance.logged_fields),
-        )
+        if updated_instance.logged_fields != previous_entry:
+            CountryAdminAuditLog.objects.create(
+                admin_user=self.context['tola_user'],
+                country = instance.country,
+                disaggregation_type=instance,
+                change_type=change_type,
+                previous_entry=json.dumps(previous_entry),
+                new_entry=json.dumps(updated_instance.logged_fields),
+            )
 
         return updated_instance
 
@@ -287,7 +288,6 @@ class CountryDisaggregationViewSet(viewsets.ModelViewSet):
         disaggregation = DisaggregationType.objects.get(pk=pk)
         previous_entry = disaggregation.logged_fields
         previous_country = disaggregation.country
-        previous_type = disaggregation.disaggregation_type
         if disaggregation.has_indicators:
             disaggregation.is_archived = True
             disaggregation.save()
