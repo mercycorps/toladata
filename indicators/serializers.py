@@ -777,14 +777,14 @@ class IPTTExcelRendererBase:
 
     @property
     def filename(self):
-        report_date = l10n_date_medium(timezone.now().date(), decode=True)
+        report_date = l10n_date_medium(timezone.localtime().date(), decode=True)
         return u'{name} {report_date}.xlsx'.format(name=self.report_name, report_date=report_date)
 
     @property
     def report_date_range(self):
         if self.frequency == 1:
-            return u'{} – {}'.format(self.program_data['reporting_period_start'],
-                                     self.program_data['reporting_period_end'])
+            return u'{} – {}'.format(l10n_date_medium(self.program_data['reporting_period_start'], decode=True),
+                                     l10n_date_medium(self.program_data['reporting_period_end'], decode=True))
         periods = self.get_periods(self.frequency)
         return u'{} – {}'.format(periods[0].start_display.decode('utf-8'), periods[-1].end_display.decode('utf-8'))
 
@@ -928,6 +928,7 @@ class IPTTSerializer:
 
     def initialize(self):
         self.init_program_data()
+        self.frequency = None if self.full_report else int(self.request.get('frequency'))
         self.disaggregation_categories = DisaggregationLabel.objects.select_related(
             None
         ).prefetch_related(None).order_by().filter(
@@ -986,10 +987,6 @@ class IPTTSerializer:
 
     def get_disaggregated_indicator(self, pk):
         return self._disaggregated_indicators.get(pk, None)
-
-    @property
-    def frequency(self):
-        return None if self.full_report else int(self.request.get('frequency'))
 
     @property
     def program_name(self):

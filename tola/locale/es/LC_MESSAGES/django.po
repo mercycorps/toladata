@@ -1000,7 +1000,7 @@ msgstr "Informe del IPTT TvA"
 
 #: indicators/serializers.py:656
 msgid "IPTT Actuals only report"
-msgstr "Informes de reales únicamente del IPTT TvA"
+msgstr "Informes de reales únicamente del IPTT"
 
 #: indicators/serializers.py:840
 msgid "Indicator Performance Tracking Report"
