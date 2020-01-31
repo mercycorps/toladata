@@ -156,9 +156,9 @@ class IPTTExcelReport(LoginRequiredMixin, View):
         return IPTTSerializer(report_type, request.GET)
 
     def get(self, request):
-        with silk_profile(name='get serialized excel data for program %s' % request.GET.get('programId')):
-            serialized = self.get_serialized_data(request)
-        with silk_profile(name='initialize serialized excel data for program %s' % request.GET.get('programId')):
-            serialized.initialize()
-        with silk_profile(name="render serialized data for program %s" % request.GET.get('programId')):
-            return serialized.render(request)
+        # with silk_profile(name='get serialized excel data for program %s' % request.GET.get('programId')):
+        serialized = self.get_serialized_data(request)
+        # with silk_profile(name='initialize serialized excel data for program %s' % request.GET.get('programId')):
+        serialized.initialize()
+        # with silk_profile(name="render serialized data for program %s" % request.GET.get('programId')):
+        return serialized.render(request)

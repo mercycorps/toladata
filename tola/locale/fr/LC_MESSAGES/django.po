@@ -996,7 +996,7 @@ msgstr "Rapport TVA IPTT"
 
 #: indicators/serializers.py:656
 msgid "IPTT Actuals only report"
-msgstr "Rapport IPPT relatif aux valeurs réelles"
+msgstr "Rapport IPTT relatif aux valeurs réelles"
 
 #: indicators/serializers.py:840
 msgid "Indicator Performance Tracking Report"
