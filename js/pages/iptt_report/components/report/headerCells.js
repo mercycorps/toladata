@@ -19,7 +19,7 @@ const HeaderCell = ( props ) => {
 const PeriodHeader = ( props ) => {
     return (
         <td scope="colgroup" colSpan={ props.isTVA ? 3 : 1}
-            className="text-center text-nowrap align-bottom">
+            className="iptt-period-header">
             <span className="text-uppercase">{ props.period.name }</span>
             { props.period.range &&
                 <React.Fragment>
@@ -35,7 +35,7 @@ const TargetHeader = () => {
     return (
         <th
             scope="col"
-            className="align-bottom text-right"
+            className="iptt-period-subheader"
             style={{minWidth: '110px'}}>
             {
                 /* # Translators: Column header for a target value column */
@@ -49,7 +49,7 @@ const ActualHeader = () => {
     return (
         <th
             scope="col"
-            className="align-bottom text-right"
+            className="iptt-period-subheader"
             style={{minWidth: '110px'}}>
             {
                 /* # Translators: Column header for an "actual" or achieved/real value column */
@@ -63,7 +63,7 @@ const PercentMetHeader = () => {
     return (
         <th
             scope="col"
-            className="align-bottom text-right"
+            className="iptt-period-subheader"
             style={{minWidth: '110px'}}>
             {
                 /* # Translators: Column header for a percent-met column */

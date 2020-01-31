@@ -52,11 +52,13 @@ const ProgramNameRow = inject('rootStore')(
                 <td scope="colgroup"
                     colSpan={ rootStore.hasBaselineColumn ? 4 : 3 }
                     // centered under LOP superheader
-                    className="text-center text-nowrap text-uppercase lop-column">
+                    className="iptt-period-header">
+                    <span className="text-uppercase">
                     {
                         /* # Translators: header for a group of columns showing totals over the life of the program */
                         gettext('Life of program')
                     }
+                    </span>
                 </td>
                 {
                     rootStore.reportPeriods.map(
