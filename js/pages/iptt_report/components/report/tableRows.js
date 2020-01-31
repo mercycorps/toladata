@@ -141,7 +141,13 @@ const DisaggregationTable = inject('rootStore')(
                 {
                     disaggregation.labels.map(
                         (label, idx) => (
-                            <tr key={idx}>
+                            <tr
+                                id={ idx }
+                                className={ (idx == disaggregation.labels.length - 1) ?
+                                    "disaggregation-end-row" :
+                                    ""
+                                }
+                                key={idx}>
                                 {idx == 0 &&
                                 <td className="disaggregation-name-cell"
                                     colSpan={ 2 }
@@ -254,16 +260,10 @@ class IndicatorRow extends React.Component {
                 </tr>
                 { this.state.expanded &&
                     <React.Fragment>
-                    <tr className="expando-table-row-spacer">
-                        <td colSpan={ rootStore.reportColumnWidth }></td>
-                    </tr>
                     { rootStore.activeDisaggregationPks.filter(pk => indicator.hasDisaggregation(pk))
                         .map(pk => (
                             <React.Fragment key={ pk }>
                                 <DisaggregationTable indicator={ indicator } disaggregationPk={ pk } />
-                                <tr className="expando-table-row-spacer">
-                                    <td colSpan={ rootStore.reportColumnWidth }></td>
-                                </tr>
                             </React.Fragment>
                         ))
                     }

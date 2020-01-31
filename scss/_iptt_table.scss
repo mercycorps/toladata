@@ -111,7 +111,9 @@ tr.expando-table-row-spacer {
         padding: 0px;
     }
 }
-
+tr.disaggregation-end-row {
+    border-bottom: 3px solid $table-border-color;
+}
 td.disaggregation-name-cell {
     background: $white !important;
     width: 142px; // TODO: hardcoded!
