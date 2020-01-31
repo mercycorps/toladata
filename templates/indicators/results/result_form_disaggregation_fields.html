@@ -156,7 +156,8 @@
     
     function updateActualWithSum() {
         let sumValue = $( this ).parents('.actions-container').find('.sum-value-cell').first().html();
-        $('#id_achieved').val(sumValue);
+        let unLocalizer = window.getNumberLocalizer({decimalPlaces: 2, display: false});
+        $('#id_achieved').val(unLocalizer(sumValue));
         updateActuals();
         $('.disaggregation-formset').trigger('updateSum');
     }
