@@ -31,7 +31,7 @@ export const forIPTT = (
     get resultChainLabel() {
         /* # Translators: this labels a filter option for a label as including subordinate levels */
         let labelStr = gettext('%(this_level_number)s and sub-levels: %(this_level_full_name)s');
-        return interpolate(labelStr, {this_level_number: this.tierNumber, this_level_full_name: this.name}); 
+        return interpolate(labelStr, {this_level_number: this.tierNumber, this_level_full_name: this.name}, true); 
     }
 });
 
