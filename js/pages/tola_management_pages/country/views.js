@@ -104,7 +104,11 @@ export const IndexView = observer(
                                             active_pane={store.active_editor_pane}
                                             new={data.id == 'new'}
                                             ProfileSection={observer(() =>
-                                                <LoadingSpinner isLoading={store.fetching_editing_data || store.saving}>
+                                                <LoadingSpinner isLoading={
+                                                    store.fetching_editing_data ||
+                                                    store.saving ||
+                                                    store.fetching_editing_history
+                                                }>
                                                     <EditCountryProfile
                                                         new={data.id == 'new'}
                                                         country_data={data}
@@ -117,7 +121,11 @@ export const IndexView = observer(
                                                 </LoadingSpinner>
                                             )}
                                             StrategicObjectiveSection={observer(() =>
-                                                <LoadingSpinner isLoading={store.fetching_editing_data || store.saving}>
+                                                <LoadingSpinner isLoading={
+                                                    store.fetching_editing_data ||
+                                                    store.saving ||
+                                                    store.fetching_editing_history
+                                                }>
                                                     <EditObjectives
                                                         country_id={data.id}
                                                         objectives={store.editing_objectives_data}
@@ -132,7 +140,11 @@ export const IndexView = observer(
                                                 </LoadingSpinner>
                                             )}
                                             DisaggregationSection={observer(() =>
-                                                <LoadingSpinner isLoading={store.fetching_editing_data || store.saving}>
+                                                <LoadingSpinner isLoading={
+                                                    store.fetching_editing_data ||
+                                                    store.saving ||
+                                                    store.fetching_editing_history
+                                                }>
                                                     <EditDisaggregations
                                                         country_id={data.id}
                                                         disaggregations={store.editing_disaggregations_data}
@@ -149,7 +161,11 @@ export const IndexView = observer(
                                                 </LoadingSpinner>
                                             )}
                                             HistorySection={observer(() =>
-                                                <LoadingSpinner isLoading={store.fetching_editing_data || store.saving}>
+                                                <LoadingSpinner isLoading={
+                                                    store.fetching_editing_data ||
+                                                    store.saving ||
+                                                    store.fetching_editing_history
+                                                }>
                                                     <CountryHistory
                                                         store={store}
                                                         history={store.editing_history}

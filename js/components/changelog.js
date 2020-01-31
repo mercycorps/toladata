@@ -65,12 +65,12 @@ const ChangeLogEntryRowBuilder = ({data}) => {
             Object.entries(data.diff_list.countries).forEach( ([id, country]) => {
                 const key = `${id}_${country}`;
                 const previousEntry = <React.Fragment>
-                    <ChangeField name="country" data={country.prev.country} />
-                    <ChangeField name="role" data={country.prev.role} />
+                    <ChangeField name={gettext("Country")} data={country.prev.country} />
+                    <ChangeField name={gettext("Role")} data={country.prev.role} />
                 </React.Fragment>;
                 const newEntry = <React.Fragment>
-                    <ChangeField name="country" data={country.new.country} />
-                    <ChangeField name="role" data={country.new.role} />
+                    <ChangeField name={gettext("Country")} data={country.new.country} />
+                    <ChangeField name={gettext("Role")} data={country.new.role} />
                 </React.Fragment>;
 
                 allRows.push(<ChangeLogEntryRow previous={previousEntry} new={newEntry} id={key} key={key} />);
@@ -78,14 +78,14 @@ const ChangeLogEntryRowBuilder = ({data}) => {
             Object.entries(data.diff_list.programs).forEach(([id, program]) => {
                 const key = `${id}_${program}`;
                 const previousEntry = <React.Fragment>
-                    <ChangeField name="program" data={program.prev.program} />
-                    <ChangeField name="country" data={program.prev.country} />
-                    <ChangeField name="role" data={program.prev.role} />
+                    <ChangeField name={gettext("Program")} data={program.prev.program} />
+                    <ChangeField name={gettext("Country")} data={program.prev.country} />
+                    <ChangeField name={gettext("Role")} data={program.prev.role} />
                 </React.Fragment>;
                 const newEntry = <React.Fragment>
-                    <ChangeField name="program" data={program.new.program} />
-                    <ChangeField name="country" data={program.new.country} />
-                    <ChangeField name="role" data={program.new.role} />
+                    <ChangeField name={gettext("Program")} data={program.new.program} />
+                    <ChangeField name={gettext("Country")} data={program.new.country} />
+                    <ChangeField name={gettext("Role")} data={program.new.role} />
                 </React.Fragment>;
 
                 allRows.push(<ChangeLogEntryRow previous={previousEntry} new={newEntry} id={key} key={key} />);
@@ -97,7 +97,7 @@ const ChangeLogEntryRowBuilder = ({data}) => {
         let skipDisaggType = false;
         if (data.pretty_change_type === "Country disaggregation updated") {
             const diff_list = data.diff_list;
-            const disaggType = diff_list.filter( (diff) => diff.name === "disaggregation_type" )
+            const disaggType = diff_list.filter( (diff) => diff.name === "disaggregation_type" );
             if (disaggType[0].prev === disaggType[0].new){
                 extraTitleText = disaggType[0].prev;
                 skipDisaggType = true;
@@ -118,9 +118,9 @@ const ChangeLogEntryRowBuilder = ({data}) => {
 
                 allRows.push(<ChangeLogEntryRow previous={previousEntry} new={newEntry} id={key} key={key}/>);
             }
-        })
+        });
         if (allRows.length === 0){
-            allRows.push(<ChangeLogEntryRow previous={_("No differences found")} new={null} id={1} key={1}/>)
+            allRows.push(<ChangeLogEntryRow previous={gettext("No differences found")} new={null} id={1} key={1}/>)
         }
     }
     return allRows;

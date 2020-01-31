@@ -175,7 +175,7 @@ export class CountryStore {
             return acc
         }, [])
     }
-    // TODO: add fetching_editing_history to spinner trigger.
+
     updateHistory(id) {
         this.api.fetchCountryHistory(id).then( response => {
             this.editing_history = response.data;
@@ -206,7 +206,8 @@ export class CountryStore {
     }
 
     onHistoryFail() {
-        PNotify.error({text: gettext("Failed to update history.  You may need to reload the page."), delay: 5000})
+        // Not notifying of history loading failures at this time, but we may want to at some point.
+        // PNotify.error({text: gettext("Failed to update history.  You may need to reload the page."), delay: 5000})
     }
 
     @observable active_editor_pane = 'profile'
@@ -383,8 +384,7 @@ export class CountryStore {
         }
         this.editing_disaggregations_data = [...this.editing_disaggregations_data, new_disaggregation_data]
     }
-    // TODO: error handling on disagg calls
-    // TODO: always display type when categories have changed
+
     @action deleteDisaggregation(id, callback) {
         create_no_rationale_changeset_notice({
             preamble: gettext("This action cannot be undone."),
