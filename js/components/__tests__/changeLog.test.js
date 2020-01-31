@@ -6,7 +6,7 @@ import {
     userChangeLog,
     organizationChangeLog,
     programChangeLog,
-} from './__fixtures__/changeLogFixtures';
+} from '../__fixtures__/changeLogFixtures';
 import ChangeLog, { ChangeField } from '../changelog'
 import renderer from 'react-test-renderer';
 
