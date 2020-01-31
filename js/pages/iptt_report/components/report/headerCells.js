@@ -15,32 +15,6 @@ const HeaderCell = ( props ) => {
     )
 }
 
-const BorderedHeader = ( { label, styleWidth } ) => {
-    let style = styleWidth ? {
-        minWidth: `${styleWidth}px`
-    } : {};
-    return (
-        <th
-            scope="col"
-            className="align-bottom text-uppercase"
-            style={style}
-        >{ label }</th>
-    );
-}
-
-const UnBorderedHeader = ( props ) => {
-    let style = props.styleWidth ? {
-        minWidth: `${props.styleWidth}px`
-    } : {};
-    return (
-        <th
-            scope="col"
-            colSpan={ props.colSpan }
-            className="align-bottom text-uppercase td-no-side-borders"
-            style={style}
-        >{ props.label }</th>
-    );
-}
 
 const PeriodHeader = ( props ) => {
     return (
@@ -109,4 +83,4 @@ const TVAHeader = () => {
     )
 }
 
-export { HeaderCell, BorderedHeader, UnBorderedHeader, PeriodHeader, TVAHeader, ActualHeader }
+export { HeaderCell, PeriodHeader, TVAHeader, ActualHeader }
