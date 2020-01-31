@@ -1,5 +1,6 @@
 # -*- coding: utf-8 -*-
 import uuid
+import decimal
 from datetime import timedelta
 
 from workflow.models import (
@@ -551,8 +552,7 @@ class BaseDisaggregatedValueFormSet(forms.BaseFormSet):
             self.clear_all = True
         elif self.result.indicator.unit_of_measure_type == Indicator.PERCENTAGE:
             return
-        elif float(sum([value for value in achieved if value is not None])) != float(self.result.achieved):
-            # regarding the above - float comparison because Decimal != Float of same value (should we map both to decimals?)
+        elif sum([value for value in achieved if value is not None]) != self.result.achieved:
             raise forms.ValidationError(
                 'disaggregated values must add up to {}, got {}'.format(self.result.achieved, achieved)
             )
@@ -613,7 +613,7 @@ class DisaggregatedValueForm(forms.Form):
             raise forms.ValidationError('Please enter a number, you entered {}'.format(value))
         if round(value, 2) == int(value):
             return int(value)
-        return value
+        return decimal.Decimal(value).quantize(decimal.Decimal('.01'))
 
 
 def get_disaggregated_result_formset(disaggregation):
