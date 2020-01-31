@@ -81,6 +81,10 @@ from factories.indicators_models import (
     DisaggregatedValueFactory,
 )
 
+ENGLISH = 1
+FRENCH = 2
+SPANISH = 3
+
 
 class IPTTScenarioBuilder:
     program_name = "Nåmé of the Program its long and has Spécîal Characters"
@@ -669,6 +673,38 @@ class TestIPTTExcelExports(test.TestCase):
         ):
             self.assertEqual(change_log.cell(row=3, column=1+column).value, header)
 
+    def header_cells_test(self, sheet, language=ENGLISH):
+        self.assertEqual(sheet.cell(row=1, column=3).value, "Indicator Performance Tracking Report")
+        self.assertEqual(
+            sheet.cell(row=2, column=3).value,
+            f"{self.scenario.start_date.strftime('%b %-d, %Y')} – {self.scenario.end_date.strftime('%b %-d, %Y')}",
+        )
+        self.assertEqual(
+            sheet.cell(row=3, column=3).value,
+            self.scenario.program_name
+        )
+        self.assertEqual(
+            sheet.cell(row=3, column=10).value,
+            "Life of Program"
+        )
+        for column, header in enumerate(ENGLISH_COLUMNS):
+            self.assertEqual(
+                sheet.cell(row=4, column=3+column).value,
+                header
+            )
+        self.assertEqual(
+            sheet.cell(row=4, column=10).value,
+            "Target"
+        )
+        self.assertEqual(
+            sheet.cell(row=4, column=11).value,
+            "Actual"
+        )
+        self.assertEqual(
+            sheet.cell(row=4, column=12).value,
+            "% Met"
+        )
+
     def test_tva_lop_report_headers(self):
         tva_lop_report = self.get_tva_report(frequency=Indicator.LOP)
         self.assertEqual(len(tva_lop_report.worksheets), 1)
@@ -703,7 +739,99 @@ class TestIPTTExcelExports(test.TestCase):
             sheet.cell(row=4, column=12).value,
             "% Met"
         )
-        
+
+    def test_tva_midend_report_headers(self):
+        tva_midend_report = self.get_tva_report(frequency=Indicator.MID_END)
+        self.assertEqual(len(tva_midend_report.worksheets), 1)
+        sheet = tva_midend_report.worksheets[0]
+        self.assertEqual(sheet.cell(row=1, column=3).value, "Indicator Performance Tracking Report")
+        self.assertEqual(
+            sheet.cell(row=2, column=3).value,
+            f"{self.scenario.start_date.strftime('%b %-d, %Y')} – {self.scenario.end_date.strftime('%b %-d, %Y')}",
+        )
+        self.assertEqual(
+            sheet.cell(row=3, column=3).value,
+            self.scenario.program_name
+        )
+        self.assertEqual(
+            sheet.cell(row=3, column=10).value,
+            "Life of Program"
+        )
+        for column, header in enumerate(ENGLISH_COLUMNS):
+            self.assertEqual(
+                sheet.cell(row=4, column=3+column).value,
+                header
+            )
+        self.assertEqual(
+            sheet.cell(row=4, column=10).value,
+            "Target"
+        )
+        self.assertEqual(
+            sheet.cell(row=4, column=11).value,
+            "Actual"
+        )
+        self.assertEqual(
+            sheet.cell(row=4, column=12).value,
+            "% Met"
+        )
+        for col, period in enumerate(["Midline", "Endline"]):
+            self.assertEqual(
+                sheet.cell(row=3, column=13+3*col).value,
+                period
+            )
+            self.assertEqual(
+                sheet.cell(row=4, column=13+3*col).value,
+                "Target"
+            )
+            self.assertEqual(
+                sheet.cell(row=4, column=14+3*col).value,
+                "Actual"
+            )
+            self.assertEqual(
+                sheet.cell(row=4, column=15+3*col).value,
+                "% Met"
+            )
+
+    def test_tva_semi_annual_report_headers(self):
+        tva_semi_annual_report = self.get_tp_report(frequency=Indicator.ANNUAL)
+        self.assertEqual(len(tva_midend_report.worksheets), 1)
+        sheet = tva_midend_report.worksheets[0]
+        self.assertEqual(sheet.cell(row=1, column=3).value, "Indicator Performance Tracking Report")
+        self.assertEqual(
+            sheet.cell(row=2, column=3).value,
+            f"{self.scenario.start_date.strftime('%b %-d, %Y')} – {self.scenario.end_date.strftime('%b %-d, %Y')}",
+        )
+        self.assertEqual(
+            sheet.cell(row=3, column=3).value,
+            self.scenario.program_name
+        )
+        self.assertEqual(
+            sheet.cell(row=3, column=10).value,
+            "Life of Program"
+        )
+        for column, header in enumerate(ENGLISH_COLUMNS):
+            self.assertEqual(
+                sheet.cell(row=4, column=3+column).value,
+                header
+            )
+        self.assertEqual(
+            sheet.cell(row=4, column=10).value,
+            "Target"
+        )
+        self.assertEqual(
+            sheet.cell(row=4, column=11).value,
+            "Actual"
+        )
+        self.assertEqual(
+            sheet.cell(row=4, column=12).value,
+            "% Met"
+        )
+
+    def test_tp_annual_report_headers(self):
+        pass
+
+    def test_tp_monthly_report_headers(self):
+        pass        
 
     
         
