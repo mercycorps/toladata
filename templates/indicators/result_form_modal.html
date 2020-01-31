@@ -12,15 +12,13 @@
 
 {% block content %}
     <script type="text/javascript">
-        window.onload = function() {
-            // don't let the modal load as a new page (modal form direct child of body):
-            // note: uses raw JS because jQuery hasn't loaded if this form is not in a modal on a page with base.js
-            if (document.getElementById('result_update_form').parentNode == document.body) {
-                let programId = document.getElementById('id_program').value;
-                // pathname to avoid having to grab host:
-                window.location.pathname = `/program/${programId}/`;
-            }
+        let programId = {{ indicator.program.pk }};
+        // don't let the modal load as a new page (jQuery not defined is a quick standin that doesn't need page to load)
+        if (typeof $ === 'undefined') {    
+            // pathname to avoid having to grab host:
+            window.location.pathname = `/program/${programId}/`;
         }
+
         $(document).ready(function() {
             /* enhanced single select for sites */
             $("#id_site").select2();
