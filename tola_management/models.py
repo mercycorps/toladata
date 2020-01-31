@@ -21,6 +21,7 @@ from indicators.models import (
     DisaggregationType
 )
 
+
 def diff(previous, new, mapping):
     diff_list = []
     p = previous
@@ -67,11 +68,8 @@ def diff(previous, new, mapping):
                 "new": n[n_field]
             })
 
-
-
-
     # This is where the actual value is being inserted just above the disaggs
-    if disagg_index >=0 and not has_value_diff:
+    if disagg_index >= 0 and not has_value_diff:
         diff_list.insert(disagg_index, {
             "name": "value",
             "pretty_name": mapping.get('value'),
@@ -420,7 +418,6 @@ class ProgramAuditLog(models.Model, DiffableLog):
         except ValueError:
             return 999
 
-
     @staticmethod
     def log_indicator_created(user, created_indicator, rationale):
         new_program_log_entry = ProgramAuditLog(
@@ -715,3 +712,20 @@ class CountryAdminAuditLog(models.Model, DiffableLog):
     def pretty_change_type(self):
         return self.change_type_map.get(self.change_type, self.change_type)
 
+    @property
+    def diff_list(self):
+        '''
+        Need to add back disaggregation type into the diffs if labels have changed but
+        the type hasn't.  Need this to put the type name at the top of the list of label changes
+        so users know which type the labels belong to.
+        '''
+        diffs = super(CountryAdminAuditLog, self).diff_list
+        diff_names = [d['name'] for d in diffs]
+        if 'labels' in diff_names and 'disaggregation_type' not in diff_names:
+            diffs.append({
+                "name": "disaggregation_type",
+                "pretty_name": "Disaggregation Type",
+                "prev": json.loads(self.previous_entry)['disaggregation_type'],
+                "new": json.loads(self.new_entry)['disaggregation_type']
+            })
+        return diffs
