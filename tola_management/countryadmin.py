@@ -341,7 +341,11 @@ class CountryAdminAuditLogSerializer(serializers.ModelSerializer):
     def get_disaggregation_type(self, obj):
         if obj.disaggregation_type:
             return obj.disaggregation_type.pk
+        else:
+            return ""
 
     def get_disaggregation_type_name(self, obj):
         if obj.disaggregation_type:
             return obj.disaggregation_type.disaggregation_type
+        else:
+            return ""

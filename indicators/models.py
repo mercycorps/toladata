@@ -546,7 +546,10 @@ class DisaggregationType(models.Model):
         """
         This list determines the order in which result fields will be displayed in the change log.  Because it
         represents all fields that have ever been used in the Result form change log, it should never be
-        shrunk, only expanded or reordered.
+        shrunk, only expanded or reordered.  Adding another property was the path of least resistance for enabling
+        front end ordering of the fields.  An ordered dict doesn't work because it loses order in JS and changing
+        the logged fields to an ordered type would require a similar change in all models that use the same logging
+        mechanism to track history.
         """
         return ['type', 'is_archived', 'labels',]
 

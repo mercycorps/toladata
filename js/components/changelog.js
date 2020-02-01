@@ -58,7 +58,19 @@ const ChangeLogEntryRow = (props) => {
 };
 
 const ChangeLogEntryRowBuilder = ({data}) => {
+
     let allRows = [];
+
+    // We should never need this but just in case someone manages to store a log entry without actual diffs, give them
+    // a soft place to land.
+    const nullRow = <ChangeLogEntryRow previous={gettext("No differences found")} new={null} id={1} key={1}/>
+
+    // If they manage to store a log without any diffs at all, send them to the soft landing place.
+    if (data.diff_list.length === 0){
+        allRows.push(nullRow);
+        return allRows
+    }
+
     if (data.change_type === 'user_programs_updated') {
         // Create multiple row for program/country changes:
         if (Object.entries(data.diff_list.countries).length > 0) {
@@ -97,16 +109,16 @@ const ChangeLogEntryRowBuilder = ({data}) => {
         let skipDisaggType = false;
         if (data.pretty_change_type === "Country disaggregation updated") {
             const diff_list = data.diff_list;
-            const disaggType = diff_list.filter( (diff) => diff.name === "disaggregation_type" );
-            if (disaggType[0].prev === disaggType[0].new){
+            const disaggType = diff_list.filter((diff) => diff.name === "disaggregation_type");
+            if (disaggType[0].prev === disaggType[0].new) {
                 extraTitleText = disaggType[0].prev;
                 skipDisaggType = true;
             }
 
         }
-        data.diff_list.forEach((changeSet, id)  => {
+        data.diff_list.forEach((changeSet, id) => {
             const key = `${id}_${changeSet.pretty_name}`;
-            if ( !(changeSet.name === "disaggregation_type" && skipDisaggType) ) {
+            if (!(changeSet.name === "disaggregation_type" && skipDisaggType)) {
                 const previousEntry = <React.Fragment>
                     <ChangeField key={id} name={changeSet.pretty_name} data={changeSet.prev} id={id}
                                  extraTitleText={extraTitleText}/>
@@ -119,9 +131,12 @@ const ChangeLogEntryRowBuilder = ({data}) => {
                 allRows.push(<ChangeLogEntryRow previous={previousEntry} new={newEntry} id={key} key={key}/>);
             }
         });
-        if (allRows.length === 0){
-            allRows.push(<ChangeLogEntryRow previous={gettext("No differences found")} new={null} id={1} key={1}/>)
-        }
+    }
+
+    // If they manage to store a log with identical values in diffs, send them to the soft landing place.  Hopefully
+    // the system will refuse to log no-difference diffs.
+    if (allRows.length === 0){
+        allRows.push(nullRow)
     }
     return allRows;
 
