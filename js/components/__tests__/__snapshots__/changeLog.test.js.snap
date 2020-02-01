@@ -1,0 +1,1575 @@
+// Jest Snapshot v1, https://goo.gl/fbAQLP
+
+exports[`Change log should display all  Organization change log entries 1`] = `
+<table
+  className="table table-sm bg-white table-bordered text-small changelog"
+>
+  <thead>
+    <tr>
+      <th
+        className="text-nowrap"
+      >
+        Date
+      </th>
+      <th
+        className="text-nowrap"
+      >
+        Admin
+      </th>
+      <th
+        className="text-nowrap"
+      >
+        Change Type
+      </th>
+      <th
+        className="text-nowrap td--half-stretch"
+      >
+        Previous Entry
+      </th>
+      <th
+        className="text-nowrap td--half-stretch"
+      >
+        New Entry
+      </th>
+    </tr>
+  </thead>
+  <tbody
+    className="changelog__entry"
+  >
+    <tr
+      className="changelog__entry__header is-expanded"
+      onClick={[Function]}
+    >
+      <td
+        className="text-nowrap text-action"
+      >
+         
+        <strong>
+          2020-01-29 11:24:34
+        </strong>
+      </td>
+      <td
+        className="text-nowrap"
+      >
+        Pat Smith
+      </td>
+      <td
+        className="text-nowrap"
+      >
+        Organization updated
+      </td>
+      <td />
+      <td />
+    </tr>
+    <tr
+      className="changelog__entry__row"
+    >
+      <td />
+      <td />
+      <td />
+      <td>
+        <div
+          className="changelog__change--prev"
+        >
+          <div
+            className="change__field"
+          >
+            <strong>
+              Name
+            </strong>
+            : 
+            Organization Example
+          </div>
+        </div>
+      </td>
+      <td>
+        <div
+          className="changelog__change--new"
+        >
+          <div
+            className="change__field"
+          >
+            <strong>
+              Name
+            </strong>
+            : 
+            Organization Example Changed
+          </div>
+        </div>
+      </td>
+    </tr>
+    <tr
+      className="changelog__entry__row"
+    >
+      <td />
+      <td />
+      <td />
+      <td>
+        <div
+          className="changelog__change--prev"
+        >
+          <div
+            className="change__field"
+          >
+            <strong>
+              Primary address
+            </strong>
+            : 
+            Primary contact address
+          </div>
+        </div>
+      </td>
+      <td>
+        <div
+          className="changelog__change--new"
+        >
+          <div
+            className="change__field"
+          >
+            <strong>
+              Primary address
+            </strong>
+            : 
+            Primary contact address changed
+          </div>
+        </div>
+      </td>
+    </tr>
+    <tr
+      className="changelog__entry__row"
+    >
+      <td />
+      <td />
+      <td />
+      <td>
+        <div
+          className="changelog__change--prev"
+        >
+          <div
+            className="change__field"
+          >
+            <strong>
+              Primary contact name
+            </strong>
+            : 
+            Primary Contact Name
+          </div>
+        </div>
+      </td>
+      <td>
+        <div
+          className="changelog__change--new"
+        >
+          <div
+            className="change__field"
+          >
+            <strong>
+              Primary contact name
+            </strong>
+            : 
+            Primary Contact Name changed
+          </div>
+        </div>
+      </td>
+    </tr>
+    <tr
+      className="changelog__entry__row"
+    >
+      <td />
+      <td />
+      <td />
+      <td>
+        <div
+          className="changelog__change--prev"
+        >
+          <div
+            className="change__field"
+          >
+            <strong>
+              Primary contact email
+            </strong>
+            : 
+            primarycontact@example.com
+          </div>
+        </div>
+      </td>
+      <td>
+        <div
+          className="changelog__change--new"
+        >
+          <div
+            className="change__field"
+          >
+            <strong>
+              Primary contact email
+            </strong>
+            : 
+            primarycontactchanged@example.com
+          </div>
+        </div>
+      </td>
+    </tr>
+  </tbody>
+  <tbody
+    className="changelog__entry"
+  >
+    <tr
+      className="changelog__entry__header is-expanded"
+      onClick={[Function]}
+    >
+      <td
+        className="text-nowrap text-action"
+      >
+         
+        <strong>
+          2020-01-29 11:24:09
+        </strong>
+      </td>
+      <td
+        className="text-nowrap"
+      >
+        Pat Smith
+      </td>
+      <td
+        className="text-nowrap"
+      >
+        Organization created
+      </td>
+      <td />
+      <td />
+    </tr>
+    <tr
+      className="changelog__entry__row"
+    >
+      <td />
+      <td />
+      <td />
+      <td>
+        <div
+          className="changelog__change--prev"
+        >
+          <div
+            className="change__field"
+          >
+            <strong>
+              Name
+            </strong>
+            : 
+            
+          </div>
+        </div>
+      </td>
+      <td>
+        <div
+          className="changelog__change--new"
+        >
+          <div
+            className="change__field"
+          >
+            <strong>
+              Name
+            </strong>
+            : 
+            Organization Example
+          </div>
+        </div>
+      </td>
+    </tr>
+    <tr
+      className="changelog__entry__row"
+    >
+      <td />
+      <td />
+      <td />
+      <td>
+        <div
+          className="changelog__change--prev"
+        >
+          <div
+            className="change__field"
+          >
+            <strong>
+              Primary address
+            </strong>
+            : 
+            
+          </div>
+        </div>
+      </td>
+      <td>
+        <div
+          className="changelog__change--new"
+        >
+          <div
+            className="change__field"
+          >
+            <strong>
+              Primary address
+            </strong>
+            : 
+            Primary contact address
+          </div>
+        </div>
+      </td>
+    </tr>
+    <tr
+      className="changelog__entry__row"
+    >
+      <td />
+      <td />
+      <td />
+      <td>
+        <div
+          className="changelog__change--prev"
+        >
+          <div
+            className="change__field"
+          >
+            <strong>
+              Primary contact name
+            </strong>
+            : 
+            
+          </div>
+        </div>
+      </td>
+      <td>
+        <div
+          className="changelog__change--new"
+        >
+          <div
+            className="change__field"
+          >
+            <strong>
+              Primary contact name
+            </strong>
+            : 
+            Primary Contact Name
+          </div>
+        </div>
+      </td>
+    </tr>
+    <tr
+      className="changelog__entry__row"
+    >
+      <td />
+      <td />
+      <td />
+      <td>
+        <div
+          className="changelog__change--prev"
+        >
+          <div
+            className="change__field"
+          >
+            <strong>
+              Primary contact email
+            </strong>
+            : 
+            
+          </div>
+        </div>
+      </td>
+      <td>
+        <div
+          className="changelog__change--new"
+        >
+          <div
+            className="change__field"
+          >
+            <strong>
+              Primary contact email
+            </strong>
+            : 
+            primarycontact@example.com
+          </div>
+        </div>
+      </td>
+    </tr>
+    <tr
+      className="changelog__entry__row"
+    >
+      <td />
+      <td />
+      <td />
+      <td>
+        <div
+          className="changelog__change--prev"
+        >
+          <div
+            className="change__field"
+          >
+            <strong>
+              Primary contact phone
+            </strong>
+            : 
+            
+          </div>
+        </div>
+      </td>
+      <td>
+        <div
+          className="changelog__change--new"
+        >
+          <div
+            className="change__field"
+          >
+            <strong>
+              Primary contact phone
+            </strong>
+            : 
+            5551212
+          </div>
+        </div>
+      </td>
+    </tr>
+    <tr
+      className="changelog__entry__row"
+    >
+      <td />
+      <td />
+      <td />
+      <td>
+        <div
+          className="changelog__change--prev"
+        >
+          <div
+            className="change__field"
+          >
+            <strong>
+              Mode of contact
+            </strong>
+            : 
+            
+          </div>
+        </div>
+      </td>
+      <td>
+        <div
+          className="changelog__change--new"
+        >
+          <div
+            className="change__field"
+          >
+            <strong>
+              Mode of contact
+            </strong>
+            : 
+            
+          </div>
+        </div>
+      </td>
+    </tr>
+    <tr
+      className="changelog__entry__row"
+    >
+      <td />
+      <td />
+      <td />
+      <td>
+        <div
+          className="changelog__change--prev"
+        >
+          <div
+            className="change__field"
+          >
+            <strong>
+              Is active
+            </strong>
+            : 
+            
+          </div>
+        </div>
+      </td>
+      <td>
+        <div
+          className="changelog__change--new"
+        >
+          <div
+            className="change__field"
+          >
+            <strong>
+              Is active
+            </strong>
+            : 
+            true
+          </div>
+        </div>
+      </td>
+    </tr>
+    <tr
+      className="changelog__entry__row"
+    >
+      <td />
+      <td />
+      <td />
+      <td>
+        <div
+          className="changelog__change--prev"
+        >
+          <div
+            className="change__field"
+          >
+            <strong>
+              Sectors
+            </strong>
+            : 
+            
+          </div>
+        </div>
+      </td>
+      <td>
+        <div
+          className="changelog__change--new"
+        >
+          <div
+            className="change__field"
+          >
+            <strong>
+              Sectors
+            </strong>
+            : 
+            Basic Needs
+          </div>
+        </div>
+      </td>
+    </tr>
+  </tbody>
+</table>
+`;
+
+exports[`Change log should display all  Program change log entries 1`] = `
+<table
+  className="table table-sm bg-white table-bordered text-small changelog"
+>
+  <thead>
+    <tr>
+      <th
+        className="text-nowrap"
+      >
+        Date
+      </th>
+      <th
+        className="text-nowrap"
+      >
+        Admin
+      </th>
+      <th
+        className="text-nowrap"
+      >
+        Change Type
+      </th>
+      <th
+        className="text-nowrap td--half-stretch"
+      >
+        Previous Entry
+      </th>
+      <th
+        className="text-nowrap td--half-stretch"
+      >
+        New Entry
+      </th>
+    </tr>
+  </thead>
+  <tbody
+    className="changelog__entry"
+  >
+    <tr
+      className="changelog__entry__header is-expanded"
+      onClick={[Function]}
+    >
+      <td
+        className="text-nowrap text-action"
+      >
+         
+        <strong>
+          2020-01-29 11:20:35
+        </strong>
+      </td>
+      <td
+        className="text-nowrap"
+      >
+        Pat Jones
+      </td>
+      <td
+        className="text-nowrap"
+      >
+        Program updated
+      </td>
+      <td />
+      <td />
+    </tr>
+    <tr
+      className="changelog__entry__row"
+    >
+      <td />
+      <td />
+      <td />
+      <td>
+        <div
+          className="changelog__change--prev"
+        >
+          <div
+            className="change__field"
+          >
+            <strong>
+              Name
+            </strong>
+            : 
+            Program Example
+          </div>
+        </div>
+      </td>
+      <td>
+        <div
+          className="changelog__change--new"
+        >
+          <div
+            className="change__field"
+          >
+            <strong>
+              Name
+            </strong>
+            : 
+            Program Example Change
+          </div>
+        </div>
+      </td>
+    </tr>
+    <tr
+      className="changelog__entry__row"
+    >
+      <td />
+      <td />
+      <td />
+      <td>
+        <div
+          className="changelog__change--prev"
+        >
+          <div
+            className="change__field"
+          >
+            <strong>
+              Sectors
+            </strong>
+            : 
+            Agribusiness,Agriculture
+          </div>
+        </div>
+      </td>
+      <td>
+        <div
+          className="changelog__change--new"
+        >
+          <div
+            className="change__field"
+          >
+            <strong>
+              Sectors
+            </strong>
+            : 
+            Agribusiness
+          </div>
+        </div>
+      </td>
+    </tr>
+    <tr
+      className="changelog__entry__row"
+    >
+      <td />
+      <td />
+      <td />
+      <td>
+        <div
+          className="changelog__change--prev"
+        >
+          <div
+            className="change__field"
+          >
+            <strong>
+              Countries
+            </strong>
+            : 
+            Kenya,United States
+          </div>
+        </div>
+      </td>
+      <td>
+        <div
+          className="changelog__change--new"
+        >
+          <div
+            className="change__field"
+          >
+            <strong>
+              Countries
+            </strong>
+            : 
+            United States
+          </div>
+        </div>
+      </td>
+    </tr>
+  </tbody>
+  <tbody
+    className="changelog__entry"
+  >
+    <tr
+      className="changelog__entry__header is-expanded"
+      onClick={[Function]}
+    >
+      <td
+        className="text-nowrap text-action"
+      >
+         
+        <strong>
+          2020-01-29 11:19:58
+        </strong>
+      </td>
+      <td
+        className="text-nowrap"
+      >
+        Pat Smith
+      </td>
+      <td
+        className="text-nowrap"
+      >
+        Program created
+      </td>
+      <td />
+      <td />
+    </tr>
+    <tr
+      className="changelog__entry__row"
+    >
+      <td />
+      <td />
+      <td />
+      <td>
+        <div
+          className="changelog__change--prev"
+        >
+          <div
+            className="change__field"
+          >
+            <strong>
+              GAIT ID
+            </strong>
+            : 
+            
+          </div>
+        </div>
+      </td>
+      <td>
+        <div
+          className="changelog__change--new"
+        >
+          <div
+            className="change__field"
+          >
+            <strong>
+              GAIT ID
+            </strong>
+            : 
+            123
+          </div>
+        </div>
+      </td>
+    </tr>
+    <tr
+      className="changelog__entry__row"
+    >
+      <td />
+      <td />
+      <td />
+      <td>
+        <div
+          className="changelog__change--prev"
+        >
+          <div
+            className="change__field"
+          >
+            <strong>
+              Name
+            </strong>
+            : 
+            
+          </div>
+        </div>
+      </td>
+      <td>
+        <div
+          className="changelog__change--new"
+        >
+          <div
+            className="change__field"
+          >
+            <strong>
+              Name
+            </strong>
+            : 
+            Program Example
+          </div>
+        </div>
+      </td>
+    </tr>
+    <tr
+      className="changelog__entry__row"
+    >
+      <td />
+      <td />
+      <td />
+      <td>
+        <div
+          className="changelog__change--prev"
+        >
+          <div
+            className="change__field"
+          >
+            <strong>
+              Funding status
+            </strong>
+            : 
+            
+          </div>
+        </div>
+      </td>
+      <td>
+        <div
+          className="changelog__change--new"
+        >
+          <div
+            className="change__field"
+          >
+            <strong>
+              Funding status
+            </strong>
+            : 
+            Funded
+          </div>
+        </div>
+      </td>
+    </tr>
+    <tr
+      className="changelog__entry__row"
+    >
+      <td />
+      <td />
+      <td />
+      <td>
+        <div
+          className="changelog__change--prev"
+        >
+          <div
+            className="change__field"
+          >
+            <strong>
+              Cost center
+            </strong>
+            : 
+            
+          </div>
+        </div>
+      </td>
+      <td>
+        <div
+          className="changelog__change--new"
+        >
+          <div
+            className="change__field"
+          >
+            <strong>
+              Cost center
+            </strong>
+            : 
+            N/A
+          </div>
+        </div>
+      </td>
+    </tr>
+    <tr
+      className="changelog__entry__row"
+    >
+      <td />
+      <td />
+      <td />
+      <td>
+        <div
+          className="changelog__change--prev"
+        >
+          <div
+            className="change__field"
+          >
+            <strong>
+              Description
+            </strong>
+            : 
+            
+          </div>
+        </div>
+      </td>
+      <td>
+        <div
+          className="changelog__change--new"
+        >
+          <div
+            className="change__field"
+          >
+            <strong>
+              Description
+            </strong>
+            : 
+            
+          </div>
+        </div>
+      </td>
+    </tr>
+    <tr
+      className="changelog__entry__row"
+    >
+      <td />
+      <td />
+      <td />
+      <td>
+        <div
+          className="changelog__change--prev"
+        >
+          <div
+            className="change__field"
+          >
+            <strong>
+              Sectors
+            </strong>
+            : 
+            
+          </div>
+        </div>
+      </td>
+      <td>
+        <div
+          className="changelog__change--new"
+        >
+          <div
+            className="change__field"
+          >
+            <strong>
+              Sectors
+            </strong>
+            : 
+            Agribusiness,Agriculture
+          </div>
+        </div>
+      </td>
+    </tr>
+    <tr
+      className="changelog__entry__row"
+    >
+      <td />
+      <td />
+      <td />
+      <td>
+        <div
+          className="changelog__change--prev"
+        >
+          <div
+            className="change__field"
+          >
+            <strong>
+              Countries
+            </strong>
+            : 
+            
+          </div>
+        </div>
+      </td>
+      <td>
+        <div
+          className="changelog__change--new"
+        >
+          <div
+            className="change__field"
+          >
+            <strong>
+              Countries
+            </strong>
+            : 
+            Kenya,United States
+          </div>
+        </div>
+      </td>
+    </tr>
+  </tbody>
+</table>
+`;
+
+exports[`Change log should display all  User change log entries 1`] = `
+<table
+  className="table table-sm bg-white table-bordered text-small changelog"
+>
+  <thead>
+    <tr>
+      <th
+        className="text-nowrap"
+      >
+        Date
+      </th>
+      <th
+        className="text-nowrap"
+      >
+        Admin
+      </th>
+      <th
+        className="text-nowrap"
+      >
+        Change Type
+      </th>
+      <th
+        className="text-nowrap td--half-stretch"
+      >
+        Previous Entry
+      </th>
+      <th
+        className="text-nowrap td--half-stretch"
+      >
+        New Entry
+      </th>
+    </tr>
+  </thead>
+  <tbody
+    className="changelog__entry"
+  >
+    <tr
+      className="changelog__entry__header is-expanded"
+      onClick={[Function]}
+    >
+      <td
+        className="text-nowrap text-action"
+      >
+         
+        <strong>
+          2020-01-29 10:48:56
+        </strong>
+      </td>
+      <td
+        className="text-nowrap"
+      >
+        Pat Smith
+      </td>
+      <td
+        className="text-nowrap"
+      >
+        User programs updated
+      </td>
+      <td />
+      <td />
+    </tr>
+    <tr
+      className="changelog__entry__row"
+    >
+      <td />
+      <td />
+      <td />
+      <td>
+        <div
+          className="changelog__change--prev"
+        >
+          <div
+            className="change__field"
+          >
+            <strong>
+              Country
+            </strong>
+            : 
+            N/A
+          </div>
+          <div
+            className="change__field"
+          >
+            <strong>
+              Role
+            </strong>
+            : 
+            N/A
+          </div>
+        </div>
+      </td>
+      <td>
+        <div
+          className="changelog__change--new"
+        >
+          <div
+            className="change__field"
+          >
+            <strong>
+              Country
+            </strong>
+            : 
+            Bangladesh
+          </div>
+          <div
+            className="change__field"
+          >
+            <strong>
+              Role
+            </strong>
+            : 
+            user
+          </div>
+        </div>
+      </td>
+    </tr>
+    <tr
+      className="changelog__entry__row"
+    >
+      <td />
+      <td />
+      <td />
+      <td>
+        <div
+          className="changelog__change--prev"
+        >
+          <div
+            className="change__field"
+          >
+            <strong>
+              Country
+            </strong>
+            : 
+            N/A
+          </div>
+          <div
+            className="change__field"
+          >
+            <strong>
+              Role
+            </strong>
+            : 
+            N/A
+          </div>
+        </div>
+      </td>
+      <td>
+        <div
+          className="changelog__change--new"
+        >
+          <div
+            className="change__field"
+          >
+            <strong>
+              Country
+            </strong>
+            : 
+            Bahamas
+          </div>
+          <div
+            className="change__field"
+          >
+            <strong>
+              Role
+            </strong>
+            : 
+            user
+          </div>
+        </div>
+      </td>
+    </tr>
+    <tr
+      className="changelog__entry__row"
+    >
+      <td />
+      <td />
+      <td />
+      <td>
+        <div
+          className="changelog__change--prev"
+        >
+          <div
+            className="change__field"
+          >
+            <strong>
+              Program
+            </strong>
+            : 
+            N/A
+          </div>
+          <div
+            className="change__field"
+          >
+            <strong>
+              Country
+            </strong>
+            : 
+            N/A
+          </div>
+          <div
+            className="change__field"
+          >
+            <strong>
+              Role
+            </strong>
+            : 
+            N/A
+          </div>
+        </div>
+      </td>
+      <td>
+        <div
+          className="changelog__change--new"
+        >
+          <div
+            className="change__field"
+          >
+            <strong>
+              Program
+            </strong>
+            : 
+            Do Wah Diddy
+          </div>
+          <div
+            className="change__field"
+          >
+            <strong>
+              Country
+            </strong>
+            : 
+            United States
+          </div>
+          <div
+            className="change__field"
+          >
+            <strong>
+              Role
+            </strong>
+            : 
+            medium
+          </div>
+        </div>
+      </td>
+    </tr>
+  </tbody>
+  <tbody
+    className="changelog__entry"
+  >
+    <tr
+      className="changelog__entry__header is-expanded"
+      onClick={[Function]}
+    >
+      <td
+        className="text-nowrap text-action"
+      >
+         
+        <strong>
+          2020-01-27 15:53:28
+        </strong>
+      </td>
+      <td
+        className="text-nowrap"
+      >
+        Path Smit
+      </td>
+      <td
+        className="text-nowrap"
+      >
+        User profile updated
+      </td>
+      <td />
+      <td />
+    </tr>
+    <tr
+      className="changelog__entry__row"
+    >
+      <td />
+      <td />
+      <td />
+      <td>
+        <div
+          className="changelog__change--prev"
+        >
+          <div
+            className="change__field"
+          >
+            <strong>
+              First name
+            </strong>
+            : 
+            Anna
+          </div>
+        </div>
+      </td>
+      <td>
+        <div
+          className="changelog__change--new"
+        >
+          <div
+            className="change__field"
+          >
+            <strong>
+              First name
+            </strong>
+            : 
+            Annie
+          </div>
+        </div>
+      </td>
+    </tr>
+    <tr
+      className="changelog__entry__row"
+    >
+      <td />
+      <td />
+      <td />
+      <td>
+        <div
+          className="changelog__change--prev"
+        >
+          <div
+            className="change__field"
+          >
+            <strong>
+              Last name
+            </strong>
+            : 
+            Jones
+          </div>
+        </div>
+      </td>
+      <td>
+        <div
+          className="changelog__change--new"
+        >
+          <div
+            className="change__field"
+          >
+            <strong>
+              Last name
+            </strong>
+            : 
+            Smith
+          </div>
+        </div>
+      </td>
+    </tr>
+  </tbody>
+  <tbody
+    className="changelog__entry"
+  >
+    <tr
+      className="changelog__entry__header is-expanded"
+      onClick={[Function]}
+    >
+      <td
+        className="text-nowrap text-action"
+      >
+         
+        <strong>
+          2020-01-27 15:53:09
+        </strong>
+      </td>
+      <td
+        className="text-nowrap"
+      >
+        Path Smit
+      </td>
+      <td
+        className="text-nowrap"
+      >
+        User profile updated
+      </td>
+      <td />
+      <td />
+    </tr>
+    <tr
+      className="changelog__entry__row"
+    >
+      <td />
+      <td />
+      <td />
+      <td>
+        <div
+          className="changelog__change--prev"
+        >
+          <div
+            className="change__field"
+          >
+            <strong>
+              Last name
+            </strong>
+            : 
+            Jones
+          </div>
+        </div>
+      </td>
+      <td>
+        <div
+          className="changelog__change--new"
+        >
+          <div
+            className="change__field"
+          >
+            <strong>
+              Last name
+            </strong>
+            : 
+            Smith
+          </div>
+        </div>
+      </td>
+    </tr>
+  </tbody>
+</table>
+`;
+
+exports[`Country change log lists all changes 1`] = `
+<table
+  className="table table-sm bg-white table-bordered text-small changelog"
+>
+  <thead>
+    <tr>
+      <th
+        className="text-nowrap"
+      >
+        Date
+      </th>
+      <th
+        className="text-nowrap"
+      >
+        Admin
+      </th>
+      <th
+        className="text-nowrap"
+      >
+        Change Type
+      </th>
+      <th
+        className="text-nowrap td--half-stretch"
+      >
+        Previous Entry
+      </th>
+      <th
+        className="text-nowrap td--half-stretch"
+      >
+        New Entry
+      </th>
+    </tr>
+  </thead>
+  <tbody
+    className="changelog__entry"
+  >
+    <tr
+      className="changelog__entry__header is-expanded"
+      onClick={[Function]}
+    >
+      <td
+        className="text-nowrap text-action"
+      >
+         
+        <strong>
+          2020-01-28 16:00:00
+        </strong>
+      </td>
+      <td
+        className="text-nowrap"
+      >
+        Pat Jones
+      </td>
+      <td
+        className="text-nowrap"
+      >
+        Country disaggregation updated
+      </td>
+      <td />
+      <td />
+    </tr>
+    <tr
+      className="changelog__entry__row"
+    >
+      <td />
+      <td />
+      <td />
+      <td>
+        <div
+          className="changelog__change--prev"
+        >
+          <div
+            className="change__field"
+          >
+            <strong>
+              Disaggregation type
+            </strong>
+            : 
+            asdf
+          </div>
+        </div>
+      </td>
+      <td>
+        <div
+          className="changelog__change--new"
+        >
+          <div
+            className="change__field"
+          >
+            <strong>
+              Disaggregation type
+            </strong>
+            : 
+            asdf222
+          </div>
+        </div>
+      </td>
+    </tr>
+    <tr
+      className="changelog__entry__row"
+    >
+      <td />
+      <td />
+      <td />
+      <td>
+        <div
+          className="changelog__change--prev"
+        >
+          <strong>
+            Disaggregation categories
+            : 
+          </strong>
+          <ul
+            className="no-list-style"
+          >
+            <li>
+              category 1
+            </li>
+            <li>
+              category 3
+            </li>
+            <li>
+              category 2
+            </li>
+          </ul>
+        </div>
+      </td>
+      <td>
+        <div
+          className="changelog__change--new"
+        >
+          <strong>
+            Disaggregation categories
+            : 
+          </strong>
+          <ul
+            className="no-list-style"
+          >
+            <li>
+              category 22
+            </li>
+            <li>
+              category 11
+            </li>
+            <li>
+              category 33
+            </li>
+          </ul>
+        </div>
+      </td>
+    </tr>
+  </tbody>
+</table>
+`;

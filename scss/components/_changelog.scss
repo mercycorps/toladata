@@ -2,6 +2,10 @@
 .changelog { // <table>
 }
 .changelog__entry { // each timestamped batch of DB updates; <tbody>
+     h4 {
+        margin-bottom: .2rem;
+        margin-top: .4rem;
+    }
 }
 .changelog__entry__header { // title row for changelog__entry; <tr>
     &.is-expanded {

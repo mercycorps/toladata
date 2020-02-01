@@ -1,4 +1,5 @@
 from collections import OrderedDict
+import json
 from django.db import transaction
 from django.db.models import Q
 from rest_framework import viewsets
@@ -8,6 +9,7 @@ from rest_framework import status
 from rest_framework import serializers
 from rest_framework import permissions
 from rest_framework import pagination
+from rest_framework.decorators import action
 
 
 from workflow.models import (
@@ -21,6 +23,8 @@ from indicators.models import (
     DisaggregationType,
     DisaggregationLabel,
 )
+
+from tola_management.models import CountryAdminAuditLog
 
 from tola_management.permissions import (
     HasCountryAdminAccess,
@@ -116,6 +120,14 @@ class CountryAdminViewSet(viewsets.ModelViewSet):
 
         return queryset.distinct()
 
+    @action(detail=True, methods=['GET'])
+    def history(self, request, pk=None):
+        country = Country.objects.get(pk=pk)
+        queryset = CountryAdminAuditLog.objects.filter(
+            country=country).select_related("admin_user", "disaggregation_type").order_by('-date')
+        serializer = CountryAdminAuditLogSerializer(queryset, many=True)
+        return Response(serializer.data)
+
 
 class CountryObjectiveSerializer(serializers.ModelSerializer):
     #id = serializers.IntegerField(allow_null=True, required=False)
@@ -208,6 +220,10 @@ class CountryDisaggregationSerializer(serializers.ModelSerializer):
 
     @transaction.atomic
     def update(self, instance, validated_data):
+        previous_entry = instance.logged_fields
+        change_type = "country_disaggregation_updated"
+        if previous_entry['is_archived'] and not validated_data['is_archived']:
+            change_type = "country_disaggregation_unarchived"
         updated_label_data = validated_data.pop('disaggregationlabel_set', None)
         if not self.partial or updated_label_data is not None:
             current_labels = [label for label in instance.disaggregationlabel_set.all()]
@@ -221,15 +237,37 @@ class CountryDisaggregationSerializer(serializers.ModelSerializer):
             for label in removed_labels:
                 label.delete()
         updated_instance = super(CountryDisaggregationSerializer, self).update(instance, validated_data)
+
+        if updated_instance.logged_fields != previous_entry:
+            CountryAdminAuditLog.objects.create(
+                admin_user=self.context['tola_user'],
+                country = instance.country,
+                disaggregation_type=instance,
+                change_type=change_type,
+                previous_entry=json.dumps(previous_entry),
+                new_entry=json.dumps(updated_instance.logged_fields),
+            )
+
         return updated_instance
 
     @transaction.atomic
     def create(self, validated_data):
+
         labels = validated_data.pop('disaggregationlabel_set')
         instance = super(CountryDisaggregationSerializer, self).create(validated_data)
         for label in labels:
             label.disaggregation_type = instance
             label.save()
+
+        CountryAdminAuditLog.objects.create(
+            admin_user=self.context['tola_user'],
+            country = instance.country,
+            disaggregation_type=instance,
+            change_type="country_disaggregation_created",
+            previous_entry={},
+            new_entry=json.dumps(instance.logged_fields),
+        )
+
         return instance
 
 class CountryDisaggregationViewSet(viewsets.ModelViewSet):
@@ -248,10 +286,66 @@ class CountryDisaggregationViewSet(viewsets.ModelViewSet):
 
     def destroy(self, request, pk=None):
         disaggregation = DisaggregationType.objects.get(pk=pk)
+        previous_entry = disaggregation.logged_fields
+        previous_country = disaggregation.country
         if disaggregation.has_indicators:
             disaggregation.is_archived = True
             disaggregation.save()
             # TODO: try catch here in case of bad model / unarchivable?  Test whether archive is the right action?
+            CountryAdminAuditLog.objects.create(
+                admin_user=self.request.user.tola_user,
+                country=disaggregation.country,
+                disaggregation_type=disaggregation,
+                change_type="country_disaggregation_archived",
+                previous_entry=json.dumps(previous_entry),
+                new_entry=json.dumps(disaggregation.logged_fields),
+            )
             return Response(status=status.HTTP_204_NO_CONTENT)
         else:
-            return super().destroy(request, pk)
+            destroyed = super().destroy(request, pk)
+            CountryAdminAuditLog.objects.create(
+                admin_user=self.request.user.tola_user,
+                country=previous_country,
+                disaggregation_type=None,
+                change_type="country_disaggregation_deleted",
+                previous_entry=json.dumps(previous_entry),
+                new_entry={},
+            )
+
+            return destroyed
+
+    def get_serializer_context(self):
+        context = super(CountryDisaggregationViewSet, self).get_serializer_context()
+        context['tola_user'] = self.request.user.tola_user
+        return context
+
+
+class CountryAdminAuditLogSerializer(serializers.ModelSerializer):
+    date = serializers.DateTimeField(format="%Y-%m-%d %H:%M:%S")
+    admin_user = serializers.CharField(source="admin_user.name")
+    disaggregation_type = serializers.SerializerMethodField()
+    disaggregation_type_name = serializers.SerializerMethodField()
+
+    class Meta:
+        model = CountryAdminAuditLog
+        fields = [
+            "id",
+            "date",
+            "admin_user",
+            "disaggregation_type",
+            "disaggregation_type_name",
+            "pretty_change_type",
+            "diff_list"
+        ]
+
+    def get_disaggregation_type(self, obj):
+        if obj.disaggregation_type:
+            return obj.disaggregation_type.pk
+        else:
+            return ""
+
+    def get_disaggregation_type_name(self, obj):
+        if obj.disaggregation_type:
+            return obj.disaggregation_type.disaggregation_type
+        else:
+            return ""

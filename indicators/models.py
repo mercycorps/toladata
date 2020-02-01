@@ -523,6 +523,36 @@ class DisaggregationType(models.Model):
     def labels(self):
         return self.disaggregationlabel_set.all().order_by('customsort')
 
+    @property
+    def logged_fields(self):
+        """
+        If you change the composition of this property you may also want to update the logged_field_order property.
+        """
+        return {
+            "disaggregation_type": self.disaggregation_type,
+            "is_archived": self.is_archived,
+            "labels": {
+                l.id: {
+                    "id": l.id,
+                    "label": l.label,
+                    "custom_sort": l.customsort,
+                }
+                for l in self.disaggregationlabel_set.all()
+            },
+        }
+
+    @staticmethod
+    def logged_field_order():
+        """
+        This list determines the order in which result fields will be displayed in the change log.  Because it
+        represents all fields that have ever been used in the Result form change log, it should never be
+        shrunk, only expanded or reordered.  Adding another property was the path of least resistance for enabling
+        front end ordering of the fields.  An ordered dict doesn't work because it loses order in JS and changing
+        the logged fields to an ordered type would require a similar change in all models that use the same logging
+        mechanism to track history.
+        """
+        return ['type', 'is_archived', 'labels',]
+
 
 class DisaggregationLabel(models.Model):
     """Business logic name: Category - e.g. `Male` or `Females aged 16-24`"""

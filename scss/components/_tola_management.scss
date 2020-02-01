@@ -161,12 +161,20 @@
 
 .admin-edit-pane {}
 
-table.mgmt-table__fixed {
-    table-layout: fixed;
-    .mgmt-table__col__width-1 {
-        width: 1%;
-    }
-    .mgmt-table__col__width-60 {
-        width: 60%;
-    }
+// mgmt-table__fixed was used on country admin table but it was leading to overlapping columns.
+// If you're reading this note in the absence of a layout problem in the country admin, you
+// can probably delete mgmt-table__fixed (comment added 2020-01-31).
+//table.mgmt-table__fixed {
+//    table-layout: fixed;
+//    .mgmt-table__col__width-1 {
+//        width: 1%;
+//    }
+//    .mgmt-table__col__width-60 {
+//        width: 60%;
+//    }
+//}
+
+.no-list-style {
+    list-style-type: none;
+    padding-inline-start: 0px;
 }
