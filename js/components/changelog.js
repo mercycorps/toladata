@@ -19,8 +19,14 @@ export const ChangeField = ({name, data, extraTitleText=null}) => {
     }
 
     else {
+        let change_value = "N/A";
+        if (data !== undefined && data !== null) {
+            change_value = ["true", "false"].includes(data.toString())
+                ? data.toString().replace("t", "T").replace("f", "F")
+                : data.toString();
+        }
         return <div className="change__field">
-            <strong>{name}</strong>: {(data !== undefined && data !== null) ? data.toString() : 'N/A'}
+            <strong>{name}</strong>: {change_value}
         </div>
     }
 };
