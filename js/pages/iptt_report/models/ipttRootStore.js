@@ -65,7 +65,7 @@ export default (
             return this.filterStore.programFilterData;
         },
         get currentProgramPageUrl() {
-            return api.getProgramPageUrl(this.currentProgram.pk);
+            return this.currentProgram ? api.getProgramPageUrl(this.currentProgram.pk) : null;
         },
         get isTVA() {
             return this.filterStore.isTVA;
