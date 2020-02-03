@@ -130,9 +130,10 @@ class IPTTIndicatorQueryset(models.QuerySet, IndicatorSortingQSMixin):
 
 
     def apply_filters(self, levels=None, sites=None, types=None,
-                      sectors=None, indicators=None, old_levels=False):
+                      sectors=None, indicators=None, old_levels=False,
+                      disaggregations=None):
         qs = self.all()
-        if not any([levels, sites, types, sectors, indicators]):
+        if not any([levels, sites, types, sectors, indicators, disaggregations, old_levels]):
             return qs
         # if levels (add after Satsuma integration)
         if sites:
@@ -156,6 +157,8 @@ class IPTTIndicatorQueryset(models.QuerySet, IndicatorSortingQSMixin):
         else:
             if levels:
                 qs = qs.filter(level__in=levels)
+        if disaggregations:
+            qs = qs.filter(disaggregation__in=disaggregations)
         qs = qs.distinct()
         return qs
 

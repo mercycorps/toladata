@@ -348,8 +348,9 @@ class ExcelRendererBase:
                     column += 1
         end_row = row+len(categories)
         sheet.merge_cells(start_row=row, start_column=3, end_row=end_row-1, end_column=3)
-        for category_row in range(row, end_row):
-            sheet.row_dimensions[category_row].hidden = True
+        if disaggregation.pk not in self.serializer.expanded_disaggregations:
+            for category_row in range(row, end_row):
+                sheet.row_dimensions[category_row].hidden = True
 
     def set_column_widths(self, sheet):
         widths = [10, 10, 17, 100]

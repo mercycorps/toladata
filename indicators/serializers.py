@@ -858,7 +858,7 @@ class IPTTSingleExcelRendererMixin(IPTTExcelRendererBase):
         indicators = self.indicator_qs.filter(program_id=self.program_data['pk'])
         if not self.program_data['results_framework'] or not self.program_data['auto_number_indicators']:
             indicators = indicators.with_logframe_sorting()
-        filter_params = ['sites', 'types', 'sectors', 'indicators']
+        filter_params = ['sites', 'types', 'sectors', 'indicators', 'disaggregations']
         filters = {param: self.request.getlist(param) for param in self.request.keys() & filter_params}
         if self.request.getlist('levels'):
             if self.program_data['results_framework']:
@@ -1036,4 +1036,11 @@ class IPTTSerializer:
 
     @property
     def disaggregations(self):
-        return self.request.getlist('disaggregations')
+        return [int(x) for x in self.request.getlist('disaggregations')]
+
+    @property
+    def expanded_disaggregations(self):
+        """ for now this is just the disaggregations filtered upon (if you filtered to it, you get it) but
+            leaving flexibility to later pass an "expanded" parameter to have certain rows expanded by default
+        """
+        return self.disaggregations
