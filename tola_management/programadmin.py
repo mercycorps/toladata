@@ -83,7 +83,7 @@ def get_audit_log_workbook(ws, program):
             except KeyError:
                 disaggs[item['type']] = [item]
 
-        output_string = "\r\nDisaggregated values"
+        output_string = ""
         for disagg_type in sorted(list(disaggs.keys())):
             if disagg_type:
                 output_string += f"\r\n{disagg_type}\r\n"
