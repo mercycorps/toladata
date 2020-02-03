@@ -63,6 +63,7 @@ from django import test
 from django.urls import reverse
 from django.utils import translation
 from indicators.models import Indicator
+from indicators.tests.iptt_tests.iptt_scenario import IPTTScenarioBuilder
 from factories.workflow_models import (
     CountryFactory,
     RFProgramFactory,
@@ -81,299 +82,81 @@ from factories.indicators_models import (
     DisaggregatedValueFactory,
 )
 
+
+
 ENGLISH = 1
 FRENCH = 2
 SPANISH = 3
 
+DATE_FORMATS = {
+    ENGLISH: lambda d: d.strftime('%b %-d, %Y'),
+    FRENCH: lambda d: d.strftime('%-d %b. %Y'),
+    SPANISH: lambda d: d.strftime('%-d %b. %Y').title()
+}
 
-class IPTTScenarioBuilder:
-    program_name = "Nåmé of the Program its long and has Spécîal Characters"
-    start_date = datetime.date(2016, 1, 1)
-    end_date = datetime.date(2018, 12, 31)
+ENGLISH_COLUMNS = [
+    'No.',
+    'Indicator',
+    'Unit of measure',
+    'Change',
+    'C / NC',
+    '# / %',
+    'Baseline'
+]
 
-    def __init__(self):
-        self.get_program()
-        self.get_levels()
-        self.get_disaggregations()
-        self.get_sectors()
-        self.get_indicator_types()
-        self.get_sites()
-        self.get_indicators()
+FRENCH_COLUMNS = [
+    'Nº',
+    'Indicateur',
+    'Unité de mesure',
+    'Changement',
+    'C / NC',
+    '# / %',
+    'Base de référence'
+]
 
-    def get_program(self):
-        self.country = CountryFactory(country="TéstLand", code="TL")
-        self.program = RFProgramFactory(
-            name=self.program_name,
-            reporting_period_start=self.start_date,
-            reporting_period_end=self.end_date,
-        )
+SPANISH_COLUMNS = [
+    'No.',
+    'Indicador',
+    'Unidad de medida',
+    'Cambio',
+    'C / NC',
+    '# / %',
+    'Base'
+]
 
-    def get_levels(self):
-        self.tiers = [
-            LevelTierFactory(
-                name=f"Tîér{c+1}",
-                tier_depth=c+1,
-                program=self.program
-            ) for c in range(3)]
-        goal_level = LevelFactory(
-                name="Lévël goal a",
-                parent=None,
-                program=self.program,
-                customsort=1
-            )
-        outcome_levels = [
-            LevelFactory(
-                name="Lévêl outcome 1a",
-                parent=goal_level,
-                program=self.program,
-                customsort=1
-            ),
-            LevelFactory(
-                name="Lévêl outcome 1b",
-                parent=goal_level,
-                program=self.program,
-                customsort=2
-            ),
-        ]
-        output_level = LevelFactory(
-            name="Lévêl output 1.1a",
-            parent=outcome_levels[0],
-            program=self.program,
-            customsort=1
-        )
-        self.levels = [goal_level, outcome_levels[0], outcome_levels[1], output_level]
+REPORT_TITLE = {
+    ENGLISH: "Indicator Performance Tracking Report",
+    FRENCH: "Rapport de suivi des performances de l’indicateur",
+    SPANISH: "Informe de seguimiento del rendimiento del indicador",
+}
 
-    def get_disaggregations(self):
-        self.standard_disagg = DisaggregationTypeFactory(
-            standard=True,
-            country=None,
-            disaggregation_type="Ståndard Dîsäggregation",
-            labels=["Label 1", "Låbél 2"]
-        )
-        self.country_disagg = DisaggregationTypeFactory(
-            standard=False,
-            country=self.country,
-            disaggregation_type="Country Dîsäggregation with a VERY VERY VERY VERY VERY LONG NAME",
-            labels=["Label 1", "Låbél 2", "Label 3"]
-        )
+LOP_PERIOD = {
+    ENGLISH: "Life of Program",
+    FRENCH: "Vie du programme",
+    SPANISH: "Vida del programa",
+}
 
-    def get_sectors(self):
-        self.sector1 = SectorFactory(sector="Test Séctor 1")
-        self.sector2 = SectorFactory(sector="Test Séctor 2 with a very long name which doesn't matter at all")
+TARGET = {
+    ENGLISH: "Target",
+    FRENCH: "Cible",
+    SPANISH: "Objetivo",
+}
 
-    def get_sites(self):
-        self.site1 = SiteProfileFactory(name="Site profile 1 with Spécîal Characters")
-        self.site2 = SiteProfileFactory(name="Site profile 2 with a very long name which doesn't matter at all")
+ACTUAL = {
+    ENGLISH: "Actual",
+    FRENCH: "Réel",
+    SPANISH: "Real",
+}
 
-    def get_indicator_types(self):
-        self.type1 = IndicatorTypeFactory(indicator_type="Typé 1")
-        self.type2 = IndicatorTypeFactory(indicator_type="Typé 2 with a very long name which doesn't matter at all")
-
-    def get_indicators(self):
-        self.indicators = [
-            self.get_indicator1(),
-            self.get_indicator2(),
-            self.get_indicator3(),
-            self.get_indicator4(),
-            self.get_indicator5(),
-            self.get_indicator6(),
-            self.get_indicator7(),
-        ]
-
-    def add_result(self, achieved, indicator, target, month):
-        date_collected = datetime.date(
-            self.start_date.year,
-            self.start_date.month+month-1,
-            1
-        )
-        return ResultFactory(
-            indicator=indicator,
-            periodic_target=target,
-            achieved=achieved,
-            date_collected=date_collected
-        )
-
-    def add_disagg(self, result, disagg):
-        if len(disagg.labels) == 2:
-            values = [1, result.achieved-1]
-        elif len(disagg.labels) == 3:
-            values = [1, 1, result.achieved-2]
-        for value, label in zip(values, disagg.labels):
-            DisaggregatedValueFactory(
-                result=result,
-                category=label,
-                value=value
-            )
-        
-
-    def get_indicator1(self):
-        indicator = RFIndicatorFactory(
-            program=self.program,
-            target_frequency=Indicator.LOP,
-            level=self.levels[0],
-            level_order=1,
-            name="Indicåtor Náme 1",
-            number="1.1.1",
-            unit_of_measure_type=Indicator.NUMBER,
-            is_cumulative=False,
-            baseline=0,
-            baseline_na=False,
-            sector=self.sector1,
-            targets=1000,
-        )
-        return indicator
-
-    def get_indicator2(self):
-        indicator = RFIndicatorFactory(
-            program=self.program,
-            target_frequency=Indicator.MID_END,
-            level=self.levels[0],
-            level_order=2,
-            name="Indicåtor Náme 2",
-            number="aaa",
-            unit_of_measure_type=Indicator.PERCENTAGE,
-            baseline=None,
-            baseline_na=True,
-            sector=None,
-            targets=100
-        )
-        mid_target = indicator.periodictargets.first()
-        indicator.disaggregation.set([self.country_disagg])
-        indicator.indicator_type.set([self.type1])
-        result = self.add_result(95, indicator, mid_target, month=2)
-        result.site.set([self.site1])
-        return indicator
-
-    def get_indicator3(self):
-        indicator = RFIndicatorFactory(
-            program=self.program,
-            target_frequency=Indicator.ANNUAL,
-            level=self.levels[1],
-            level_order=1,
-            name="Indicåtor Náme 3",
-            number="x4.1",
-            unit_of_measure_type=Indicator.NUMBER,
-            is_cumulative=True,
-            baseline=100,
-            baseline_na=False,
-            sector=self.sector2,
-            targets=45
-        )
-        first_target = indicator.periodictargets.first()
-        indicator.indicator_type.set([self.type1, self.type2])
-        result = self.add_result(50, indicator, first_target, month=4)
-        result.site.set([self.site1])
-        result = self.add_result(20, indicator, first_target, month=5)
-        result.site.set([self.site2])
-        return indicator
-
-    def get_indicator4(self):
-        indicator = RFIndicatorFactory(
-            program=self.program,
-            target_frequency=Indicator.QUARTERLY,
-            level=self.levels[2],
-            level_order=1,
-            name="Indicåtor Náme 4",
-            number="4a",
-            unit_of_measure_type=Indicator.NUMBER,
-            is_cumulative=False,
-            baseline=0,
-            baseline_na=False,
-            sector=self.sector1,
-            targets=10
-        )
-        first_target = indicator.periodictargets.first()
-        third_target = indicator.periodictargets.all()[2]
-        indicator.indicator_type.set([self.type2])
-        indicator.disaggregation.set([self.standard_disagg, self.country_disagg])
-        result1 = self.add_result(4, indicator, first_target, month=2)
-        self.add_disagg(result1, self.standard_disagg)
-        self.add_disagg(result1, self.country_disagg)
-        result2 = self.add_result(7, indicator, first_target, month=2)
-        self.add_disagg(result2, self.standard_disagg)
-        self.add_disagg(result2, self.country_disagg)
-        result3 = self.add_result(9, indicator, third_target, month=10)
-        self.add_disagg(result3, self.standard_disagg)
-        self.add_disagg(result3, self.country_disagg)
-        return indicator
-
-    def get_indicator5(self):
-        indicator = RFIndicatorFactory(
-            program=self.program,
-            target_frequency=Indicator.TRI_ANNUAL,
-            level=self.levels[2],
-            level_order=2,
-            name="Indicåtor Náme 5",
-            number="4b",
-            unit_of_measure_type=Indicator.PERCENTAGE,
-            baseline=None,
-            baseline_na=True,
-            sector=None,
-            targets=15
-        )
-        indicator.indicator_type.set([])
-        indicator.disaggregation.set([])
-        return indicator
-
-    def get_indicator6(self):
-        indicator = RFIndicatorFactory(
-            program=self.program,
-            target_frequency=Indicator.MONTHLY,
-            level=self.levels[3],
-            level_order=1,
-            name="Indicåtor Náme 6",
-            number="21.4",
-            unit_of_measure_type=Indicator.NUMBER,
-            is_cumulative=True,
-            baseline=100,
-            baseline_na=False,
-            sector=self.sector2,
-            targets=80
-        )
-        targets = list(indicator.periodictargets.all())
-        indicator.indicator_type.set([self.type1])
-        indicator.disaggregation.set([self.standard_disagg])
-        result1 = self.add_result(40, indicator, targets[2], month=3)
-        result1.site.set([self.site1])
-        result2 = self.add_result(70, indicator, targets[5], month=6)
-        result2.site.set([self.site2])
-        self.add_disagg(result2, self.standard_disagg)
-        return indicator
-
-    def get_indicator7(self):
-        indicator = RFIndicatorFactory(
-            program=self.program,
-            target_frequency=Indicator.EVENT,
-            level=self.levels[3],
-            level_order=2,
-            name="Indicåtor Náme 7",
-            number="19.1",
-            unit_of_measure_type=Indicator.NUMBER,
-            is_cumulative=False,
-            baseline=0,
-            baseline_na=False,
-            sector=self.sector1,
-        )
-        event_targets = [
-            PeriodicTargetFactory(
-                indicator=indicator,
-                period=f"Evént {c}",
-                target=40 + 10*c,
-                start_date=self.start_date,
-                end_date=self.end_date,
-                customsort=c
-            ) for c in range(4)
-        ]
-        first_target = event_targets[0]
-        indicator.indicator_type.set([self.type1, self.type2])
-        indicator.disaggregation.set([self.country_disagg])
-        result = self.add_result(42, indicator, first_target, month=1)
-        self.add_disagg(result, self.country_disagg)
-        return indicator
-
+MET = {
+    ENGLISH: "% Met",
+    FRENCH: "% Atteint",
+    SPANISH: "% Cumplido",
+}
 
 
 SPECIAL_CHARS = "Spécîal Chårs"
+
 
 class TestScenarioBuilder(test.TestCase):
     @classmethod
@@ -395,19 +178,6 @@ class TestScenarioBuilder(test.TestCase):
             self.assertEqual(indicators[c].target_frequency, frequency)
 
 
-
-ENGLISH_COLUMNS = [
-    'No.',
-    'Indicator',
-    'Unit of measure',
-    'Change',
-    'C / NC',
-    '# / %',
-    'Baseline'
-]
-
-
-
 class TestIPTTExcelExports(test.TestCase):
     iptt_url = reverse('iptt_excel')
 
@@ -420,14 +190,17 @@ class TestIPTTExcelExports(test.TestCase):
         cls.tolauser.user.save()
         cls.client = test.Client()
 
-    def get_tva_report_full(self, response=False, language="English", **kwargs):
-        if language == "French":
+    def login_client(self, language):
+        if language == FRENCH:
             self.tolauser.language = 'fr'
             self.tolauser.save()
-        elif language == "Spanish":
+        elif language == SPANISH:
             self.tolauser.language = 'es'
             self.tolauser.save()
         self.client.force_login(user=self.tolauser.user)
+
+    def get_tva_report_full(self, response=False, language=ENGLISH, **kwargs):
+        self.login_client(language)
         get_response = self.client.get(
             self.iptt_url,
             {
@@ -445,14 +218,8 @@ class TestIPTTExcelExports(test.TestCase):
             return get_response
         return openpyxl.load_workbook(io.BytesIO(get_response.content))
 
-    def get_tva_report(self, frequency=Indicator.LOP, response=False, language="English", **kwargs):
-        if language == "French":
-            self.tolauser.language = 'fr'
-            self.tolauser.save()
-        elif language == "Spanish":
-            self.tolauser.language = 'es'
-            self.tolauser.save()
-        self.client.force_login(user=self.tolauser.user)
+    def get_tva_report(self, frequency=Indicator.LOP, response=False, language=ENGLISH, **kwargs):
+        self.login_client(language)
         get_response = self.client.get(
             self.iptt_url,
             { **{
@@ -472,14 +239,8 @@ class TestIPTTExcelExports(test.TestCase):
             return get_response
         return openpyxl.load_workbook(io.BytesIO(get_response.content))
 
-    def get_tp_report(self, frequency=Indicator.ANNUAL, response=False, language="English", **kwargs):
-        if language == "French":
-            self.tolauser.language = 'fr'
-            self.tolauser.save()
-        elif language == "Spanish":
-            self.tolauser.language = 'es'
-            self.tolauser.save()
-        self.client.force_login(user=self.tolauser.user)
+    def get_tp_report(self, frequency=Indicator.ANNUAL, response=False, language=ENGLISH, **kwargs):
+        self.login_client(language)
         get_response = self.client.get(
             self.iptt_url,
             { **{
@@ -499,107 +260,139 @@ class TestIPTTExcelExports(test.TestCase):
             return get_response
         return openpyxl.load_workbook(io.BytesIO(get_response.content))
 
+    def assert_response_headers(self, response, filename):
+        self.assertEqual(
+            response.get('Content-Type'),
+            "application/ms-excel"
+        )
+        self.assertEqual(
+            response.get('Content-Disposition'),
+            f'attachment; filename="{filename}"'
+        )
+
     def test_responses(self):
         tva_full_response = self.get_tva_report_full(response=True)
         filename = f"IPTT TvA full program report {datetime.date.today().strftime('%b %-d, %Y')}.xlsx"
-        self.assertEqual(
-            tva_full_response.get('Content-Type'),
-            "application/ms-excel"
-        )
-        self.assertEqual(
-            tva_full_response.get('Content-Disposition'),
-            f'attachment; filename="{filename}"'
-        )
+        self.assert_response_headers(tva_full_response, filename)
         tva_response = self.get_tva_report(response=True)
         filename = f"IPTT TvA report {datetime.date.today().strftime('%b %-d, %Y')}.xlsx"
-        self.assertEqual(
-            tva_response.get('Content-Type'),
-            "application/ms-excel"
-        )
-        self.assertEqual(
-            tva_response.get('Content-Disposition'),
-            f'attachment; filename="{filename}"'
-        )
+        self.assert_response_headers(tva_response, filename)
         tp_response = self.get_tp_report(response=True)
         filename = f"IPTT Actuals only report {datetime.date.today().strftime('%b %-d, %Y')}.xlsx"
-        self.assertEqual(
-            tp_response.get('Content-Type'),
-            "application/ms-excel"
-        )
-        self.assertEqual(
-            tp_response.get('Content-Disposition'),
-            f'attachment; filename="{filename}"'
-        )
+        self.assert_response_headers(tp_response, filename)
 
     def test_responses_french(self):
         default_locale = locale.getlocale()
         locale.setlocale(locale.LC_ALL, 'fr_FR')
-        tva_full_response = self.get_tva_report_full(response=True, language="French")
+        tva_full_response = self.get_tva_report_full(response=True, language=FRENCH)
         filename = f"Rapport IPTT relatif à la totalité de la TVA du programme {datetime.date.today().strftime('%-d %b. %Y').lower()}.xlsx"
-        self.assertEqual(
-            tva_full_response.get('Content-Type'),
-            "application/ms-excel"
-        )
-        self.assertEqual(
-            tva_full_response.get('Content-Disposition'),
-            f'attachment; filename="{filename}"'
-        )
-        tva_response = self.get_tva_report(response=True, language="French")
+        self.assert_response_headers(tva_full_response, filename)
+        tva_response = self.get_tva_report(response=True, language=FRENCH)
         filename = f"Rapport TVA IPTT {datetime.date.today().strftime('%-d %b. %Y').lower()}.xlsx"
-        self.assertEqual(
-            tva_response.get('Content-Type'),
-            "application/ms-excel"
-        )
-        self.assertEqual(
-            tva_response.get('Content-Disposition'),
-            f'attachment; filename="{filename}"'
-        )
-        tp_response = self.get_tp_report(response=True, language="French")
+        self.assert_response_headers(tva_response, filename)
+        tp_response = self.get_tp_report(response=True, language=FRENCH)
         filename = f"Rapport IPTT relatif aux valeurs réelles {datetime.date.today().strftime('%-d %b. %Y').lower()}.xlsx"
-        self.assertEqual(
-            tp_response.get('Content-Type'),
-            "application/ms-excel"
-        )
-        self.assertEqual(
-            tp_response.get('Content-Disposition'),
-            f'attachment; filename="{filename}"'
-        )
+        self.assert_response_headers(tp_response, filename)
         locale.setlocale(locale.LC_ALL, default_locale)
 
     def test_responses_spanish(self):
         default_locale = locale.getlocale()
         locale.setlocale(locale.LC_ALL, 'es_ES')
-        tva_full_response = self.get_tva_report_full(response=True, language="Spanish")
+        tva_full_response = self.get_tva_report_full(response=True, language=SPANISH)
         filename = f"Informe completo del programa del IPTT TvA {datetime.date.today().strftime('%-d %b. %Y').title()}.xlsx"
-        self.assertEqual(
-            tva_full_response.get('Content-Type'),
-            "application/ms-excel"
-        )
-        self.assertEqual(
-            tva_full_response.get('Content-Disposition'),
-            f'attachment; filename="{filename}"'
-        )
-        tva_response = self.get_tva_report(response=True, language="Spanish")
+        self.assert_response_headers(tva_full_response, filename)
+        tva_response = self.get_tva_report(response=True, language=SPANISH)
         filename = f"Informe del IPTT TvA {datetime.date.today().strftime('%-d %b. %Y').title()}.xlsx"
-        self.assertEqual(
-            tva_response.get('Content-Type'),
-            "application/ms-excel"
-        )
-        self.assertEqual(
-            tva_response.get('Content-Disposition'),
-            f'attachment; filename="{filename}"'
-        )
-        tp_response = self.get_tp_report(response=True, language="Spanish")
+        self.assert_response_headers(tva_response, filename)
+        tp_response = self.get_tp_report(response=True, language=SPANISH)
         filename = f"Informes de reales únicamente del IPTT {datetime.date.today().strftime('%-d %b. %Y').title()}.xlsx"
-        self.assertEqual(
-            tp_response.get('Content-Type'),
-            "application/ms-excel"
-        )
-        self.assertEqual(
-            tp_response.get('Content-Disposition'),
-            f'attachment; filename="{filename}"'
-        )
+        self.assert_response_headers(tp_response, filename)
         locale.setlocale(locale.LC_ALL, default_locale)
+
+    def assert_iptt_title_cells(self, sheet, language=ENGLISH):
+        default_locale = locale.getlocale()
+        if language == FRENCH:
+            locale.setlocale(locale.LC_ALL, 'fr_FR')
+        elif language == SPANISH:
+            locale.setlocale(locale.LC_ALL, 'es_ES')
+        self.assertEqual(sheet.cell(row=1, column=3).value, REPORT_TITLE[language])
+        self.assertEqual(
+            sheet.cell(row=2, column=3).value,
+            f"{DATE_FORMATS[language](self.scenario.start_date)} – {DATE_FORMATS[language](self.scenario.end_date)}",
+        )
+        self.assertEqual(
+            sheet.cell(row=3, column=3).value,
+            self.scenario.program_name
+        )
+        
+        locale.setlocale(locale.LC_ALL, default_locale)
+
+    def assert_lop_header_cells(self, sheet, language=ENGLISH, column=10):
+        self.assertEqual(
+            sheet.cell(row=3, column=column).value,
+            LOP_PERIOD[language]
+        )
+        self.assertEqual(
+            sheet.cell(row=4, column=column).value,
+            TARGET[language]
+        )
+        self.assertEqual(
+            sheet.cell(row=4, column=column+1).value,
+            ACTUAL[language]
+        )
+        self.assertEqual(
+            sheet.cell(row=4, column=column+2).value,
+            MET[language]
+        )
+
+    def assert_period_tva_header_cells(self, sheet, period, column, language=ENGLISH, subheader=None):
+        if subheader is None:
+            self.assertEqual(
+                sheet.cell(row=3, column=column).value,
+                period
+            )
+        else:
+            self.assertEqual(
+                sheet.cell(row=2, column=column).value,
+                period
+            )
+            self.assertEqual(
+                sheet.cell(row=3, column=column).value,
+                subheader
+            )
+        self.assertEqual(
+            sheet.cell(row=4, column=column).value,
+            TARGET[language]
+        )
+        self.assertEqual(
+            sheet.cell(row=4, column=column+1).value,
+            ACTUAL[language]
+        )
+        self.assertEqual(
+            sheet.cell(row=4, column=column+2).value,
+            MET[language]
+        )
+
+    def assert_period_tp_header_cells(self, sheet, period, column, language=ENGLISH, subheader=None):
+        if subheader is None:
+            self.assertEqual(
+                sheet.cell(row=3, column=column).value,
+                period
+            )
+        else:
+            self.assertEqual(
+                sheet.cell(row=2, column=column).value,
+                period
+            )
+            self.assertEqual(
+                sheet.cell(row=3, column=column).value,
+                subheader
+            )
+        self.assertEqual(
+            sheet.cell(row=4, column=column).value,
+            ACTUAL[language]
+        )
+        
 
     def test_tva_full_report_headers(self):
         tva_full_report = self.get_tva_report_full()
@@ -616,54 +409,16 @@ class TestIPTTExcelExports(test.TestCase):
                 "Change log"
             ])
         for sheet in tva_full_report.worksheets[:-1]:
-            self.assertEqual(sheet.cell(row=1, column=3).value, "Indicator Performance Tracking Report")
-            self.assertEqual(
-                sheet.cell(row=2, column=3).value,
-                f"{self.scenario.start_date.strftime('%b %-d, %Y')} – {self.scenario.end_date.strftime('%b %-d, %Y')}",
-            )
-            self.assertEqual(
-                sheet.cell(row=3, column=3).value,
-                self.scenario.program_name
-            )
-            self.assertEqual(
-                sheet.cell(row=3, column=10).value,
-                "Life of Program"
-            )
+            self.assert_iptt_title_cells(sheet)
             for column, header in enumerate(ENGLISH_COLUMNS):
                 self.assertEqual(
                     sheet.cell(row=4, column=3+column).value,
                     header
                 )
-            self.assertEqual(
-                sheet.cell(row=4, column=10).value,
-                "Target"
-            )
-            self.assertEqual(
-                sheet.cell(row=4, column=11).value,
-                "Actual"
-            )
-            self.assertEqual(
-                sheet.cell(row=4, column=12).value,
-                "% Met"
-            )
+            self.assert_lop_header_cells(sheet)
         midend = tva_full_report.worksheets[1]
         for col, period in enumerate(["Midline", "Endline"]):
-            self.assertEqual(
-                midend.cell(row=3, column=13+3*col).value,
-                period
-            )
-            self.assertEqual(
-                midend.cell(row=4, column=13+3*col).value,
-                "Target"
-            )
-            self.assertEqual(
-                midend.cell(row=4, column=14+3*col).value,
-                "Actual"
-            )
-            self.assertEqual(
-                midend.cell(row=4, column=15+3*col).value,
-                "% Met"
-            )
+            self.assert_period_tva_header_cells(midend, period, 13+3*col)
         change_log = tva_full_report.worksheets[-1]
         self.assertEqual(change_log.cell(row=1, column=1).value, "Change log")
         self.assertEqual(change_log.cell(row=2, column=1).value, self.scenario.program_name)
@@ -673,165 +428,246 @@ class TestIPTTExcelExports(test.TestCase):
         ):
             self.assertEqual(change_log.cell(row=3, column=1+column).value, header)
 
-    def header_cells_test(self, sheet, language=ENGLISH):
-        self.assertEqual(sheet.cell(row=1, column=3).value, "Indicator Performance Tracking Report")
-        self.assertEqual(
-            sheet.cell(row=2, column=3).value,
-            f"{self.scenario.start_date.strftime('%b %-d, %Y')} – {self.scenario.end_date.strftime('%b %-d, %Y')}",
-        )
-        self.assertEqual(
-            sheet.cell(row=3, column=3).value,
-            self.scenario.program_name
-        )
-        self.assertEqual(
-            sheet.cell(row=3, column=10).value,
-            "Life of Program"
-        )
-        for column, header in enumerate(ENGLISH_COLUMNS):
-            self.assertEqual(
-                sheet.cell(row=4, column=3+column).value,
-                header
-            )
-        self.assertEqual(
-            sheet.cell(row=4, column=10).value,
-            "Target"
-        )
-        self.assertEqual(
-            sheet.cell(row=4, column=11).value,
-            "Actual"
-        )
-        self.assertEqual(
-            sheet.cell(row=4, column=12).value,
-            "% Met"
-        )
 
-    def test_tva_lop_report_headers(self):
+    def test_tva_lop_report(self):
         tva_lop_report = self.get_tva_report(frequency=Indicator.LOP)
         self.assertEqual(len(tva_lop_report.worksheets), 1)
         sheet = tva_lop_report.worksheets[0]
-        self.assertEqual(sheet.cell(row=1, column=3).value, "Indicator Performance Tracking Report")
-        self.assertEqual(
-            sheet.cell(row=2, column=3).value,
-            f"{self.scenario.start_date.strftime('%b %-d, %Y')} – {self.scenario.end_date.strftime('%b %-d, %Y')}",
-        )
-        self.assertEqual(
-            sheet.cell(row=3, column=3).value,
-            self.scenario.program_name
-        )
-        self.assertEqual(
-            sheet.cell(row=3, column=10).value,
-            "Life of Program"
-        )
+        self.assert_iptt_title_cells(sheet)
         for column, header in enumerate(ENGLISH_COLUMNS):
             self.assertEqual(
                 sheet.cell(row=4, column=3+column).value,
                 header
             )
+        self.assert_lop_header_cells(sheet)
         self.assertEqual(
-            sheet.cell(row=4, column=10).value,
-            "Target"
-        )
+            sheet.cell(row=5, column=3).value,
+            self.scenario.goal_level_row
+            )
         self.assertEqual(
-            sheet.cell(row=4, column=11).value,
-            "Actual"
+            sheet.cell(row=6, column=3).value,
+            "Tîér1 a"
         )
-        self.assertEqual(
-            sheet.cell(row=4, column=12).value,
-            "% Met"
-        )
+        for col, val in enumerate([
+            self.scenario.indicators[0].name,
+            self.scenario.indicators[0].unit_of_measure,
+            None,
+            "Not cumulative",
+            "#",
+            0,
+            1000,
+            "–",
+            "–",
+            None]):
+            self.assertEqual(
+                sheet.cell(row=6, column=4+col).value,
+                val
+            )
+        self.assertIsNone(sheet.cell(row=7, column=3).value)
 
     def test_tva_midend_report_headers(self):
         tva_midend_report = self.get_tva_report(frequency=Indicator.MID_END)
         self.assertEqual(len(tva_midend_report.worksheets), 1)
         sheet = tva_midend_report.worksheets[0]
-        self.assertEqual(sheet.cell(row=1, column=3).value, "Indicator Performance Tracking Report")
-        self.assertEqual(
-            sheet.cell(row=2, column=3).value,
-            f"{self.scenario.start_date.strftime('%b %-d, %Y')} – {self.scenario.end_date.strftime('%b %-d, %Y')}",
-        )
-        self.assertEqual(
-            sheet.cell(row=3, column=3).value,
-            self.scenario.program_name
-        )
-        self.assertEqual(
-            sheet.cell(row=3, column=10).value,
-            "Life of Program"
-        )
+        self.assert_iptt_title_cells(sheet)
         for column, header in enumerate(ENGLISH_COLUMNS):
             self.assertEqual(
                 sheet.cell(row=4, column=3+column).value,
                 header
             )
-        self.assertEqual(
-            sheet.cell(row=4, column=10).value,
-            "Target"
-        )
-        self.assertEqual(
-            sheet.cell(row=4, column=11).value,
-            "Actual"
-        )
-        self.assertEqual(
-            sheet.cell(row=4, column=12).value,
-            "% Met"
-        )
+        self.assert_lop_header_cells(sheet)
         for col, period in enumerate(["Midline", "Endline"]):
-            self.assertEqual(
-                sheet.cell(row=3, column=13+3*col).value,
-                period
+            self.assert_period_tva_header_cells(sheet, period, 13+3*col)
+        self.assertEqual(
+            sheet.cell(row=5, column=3).value,
+            self.scenario.goal_level_row
             )
+        self.assertEqual(
+            sheet.cell(row=6, column=3).value,
+            "Tîér1 b"
+        )
+        self.assertEqual(
+            sheet.cell(row=6, column=4).value,
+            self.scenario.indicators[1].name
+        )
+        self.assertEqual(
+            sheet.cell(row=7, column=3).value,
+            self.scenario.country_disagg.disaggregation_type
+        )
+        for c, label in enumerate(["Label 1", "Låbél 2", "Label 3"]):
             self.assertEqual(
-                sheet.cell(row=4, column=13+3*col).value,
-                "Target"
+                sheet.cell(row=7+c, column=4).value,
+                label
             )
-            self.assertEqual(
-                sheet.cell(row=4, column=14+3*col).value,
-                "Actual"
-            )
-            self.assertEqual(
-                sheet.cell(row=4, column=15+3*col).value,
-                "% Met"
-            )
+            for col in range(10):
+                self.assertEqual(
+                    sheet.cell(row=7+c, column=9+col).value,
+                    "–"
+                )
+            self.assertIsNone(sheet.cell(row=7+c, column=19).value)
+            self.assertTrue(sheet.row_dimensions[7+c].hidden, f"row {c}")
+        self.assertIsNone(sheet.cell(row=10, column=3).value)
 
-    def test_tva_semi_annual_report_headers(self):
-        tva_semi_annual_report = self.get_tp_report(frequency=Indicator.ANNUAL)
-        self.assertEqual(len(tva_midend_report.worksheets), 1)
-        sheet = tva_midend_report.worksheets[0]
-        self.assertEqual(sheet.cell(row=1, column=3).value, "Indicator Performance Tracking Report")
-        self.assertEqual(
-            sheet.cell(row=2, column=3).value,
-            f"{self.scenario.start_date.strftime('%b %-d, %Y')} – {self.scenario.end_date.strftime('%b %-d, %Y')}",
-        )
-        self.assertEqual(
-            sheet.cell(row=3, column=3).value,
-            self.scenario.program_name
-        )
-        self.assertEqual(
-            sheet.cell(row=3, column=10).value,
-            "Life of Program"
-        )
+    def test_tva_quarterly_report_headers(self):
+        tva_quarterly_report = self.get_tva_report(frequency=Indicator.QUARTERLY)
+        self.assertEqual(len(tva_quarterly_report.worksheets), 1)
+        sheet = tva_quarterly_report.worksheets[0]
+        self.assert_iptt_title_cells(sheet)
         for column, header in enumerate(ENGLISH_COLUMNS):
             self.assertEqual(
                 sheet.cell(row=4, column=3+column).value,
                 header
             )
+        self.assert_lop_header_cells(sheet)
+        for c in range(12):
+            start_date = datetime.date(
+                self.scenario.start_date.year + c//4,
+                ((c % 4)*3)+1,
+                1
+            )
+            end_date = datetime.date(
+                self.scenario.start_date.year + (c+1)//4,
+                (((c+1)%4)*3)+1,
+                1
+            ) - datetime.timedelta(days=1)
+            period = f"Quarter {c+1}"
+            subheader = f"{start_date.strftime('%b %-d, %Y')} – {end_date.strftime('%b %-d, %Y')}"
+            self.assert_period_tva_header_cells(sheet, period, 13+3*c, subheader=subheader)
         self.assertEqual(
-            sheet.cell(row=4, column=10).value,
-            "Target"
+            sheet.cell(row=5, column=3).value,
+            self.scenario.goal_level_row
         )
         self.assertEqual(
-            sheet.cell(row=4, column=11).value,
-            "Actual"
+            sheet.cell(row=6, column=3).value,
+            "Tîér2 2: Lévêl outcome 1b"
         )
+        for c, val in enumerate([
+            "Tîér2 2a",
+            self.scenario.indicators[3].name,
+            self.scenario.indicators[3].unit_of_measure,
+            None, "Not cumulative", "#", 0, 10, 20, 2, 0.83, 11, 13.253,
+            0.83, "–", "–", 0.83, "–", "–", 0.83, 9, 10.8434
+            ]):
+            self.assertEqual(
+                sheet.cell(row=7, column=3+c).value,
+                val
+            )
+        self.assertIsNone(sheet.cell(row=7, column=49).value)
         self.assertEqual(
-            sheet.cell(row=4, column=12).value,
-            "% Met"
+            sheet.cell(row=8, column=3).value,
+            self.scenario.country_disagg.disaggregation_type
         )
+        for c, label in enumerate(["Label 1", "Låbél 2", "Label 3"]):
+            self.assertEqual(sheet.cell(row=8+c, column=4).value, label)
+        self.assertEqual(
+            sheet.cell(row=11, column=3).value,
+            self.scenario.standard_disagg.disaggregation_type
+        )
+        for c, label in enumerate(["Label 1", "Låbél 2"]):
+            self.assertEqual(sheet.cell(row=11+c, column=4).value, label)
+        
+
+    def test_tva_semi_annual_report_headers_spanish(self):
+        default_locale = locale.getlocale()
+        locale.setlocale(locale.LC_ALL, 'es_ES')
+        tva_semi_annual_report = self.get_tva_report(frequency=Indicator.SEMI_ANNUAL, language=SPANISH)
+        self.assertEqual(len(tva_semi_annual_report.worksheets), 1)
+        sheet = tva_semi_annual_report.worksheets[0]
+        self.assert_iptt_title_cells(sheet, language=SPANISH)
+        for column, header in enumerate(SPANISH_COLUMNS):
+            self.assertEqual(
+                sheet.cell(row=4, column=3+column).value,
+                header
+            )
+        self.assert_lop_header_cells(sheet, language=SPANISH)
+        for c in range(6):
+            start_date = datetime.date(
+                self.scenario.start_date.year + c//2,
+                1 if c % 2 == 0 else 7,
+                1
+            )
+            end_date = datetime.date(
+                self.scenario.start_date.year + (c+1)//2,
+                1 if c % 2 == 1 else 7,
+                1
+            ) - datetime.timedelta(days=1)
+            period = f"Períodos semestrales {c+1}"
+            subheader = f"{start_date.strftime('%-d %b. %Y').title()} – {end_date.strftime('%-d %b. %Y').title()}"
+            self.assert_period_tva_header_cells(sheet, period, 13+3*c, subheader=subheader, language=SPANISH)
+        locale.setlocale(locale.LC_ALL, default_locale)
+            
 
     def test_tp_annual_report_headers(self):
-        pass
+        tp_annual_report = self.get_tp_report(frequency=Indicator.ANNUAL)
+        self.assertEqual(len(tp_annual_report.worksheets), 1)
+        sheet = tp_annual_report.worksheets[0]
+        self.assert_iptt_title_cells(sheet)
+        for column, header in enumerate(ENGLISH_COLUMNS):
+            self.assertEqual(
+                sheet.cell(row=4, column=3+column).value,
+                header
+            )
+        self.assert_lop_header_cells(sheet)
+        for c in range(3):
+            start_date = datetime.date(self.scenario.start_date.year + c, 1, 1)
+            end_date = datetime.date(self.scenario.start_date.year + c + 1, 1, 1) - datetime.timedelta(days=1)
+            period = f"Year {c+1}"
+            subheader = f"{start_date.strftime('%b %-d, %Y')} – {end_date.strftime('%b %-d, %Y')}"
+            self.assert_period_tp_header_cells(sheet, period, 13+c, subheader=subheader)
+
+    def test_tp_annual_report_headers_columns_missing(self):
+        tp_annual_report = self.get_tp_report(frequency=Indicator.ANNUAL, columns=['1', '2', '4'])
+        self.assertEqual(len(tp_annual_report.worksheets), 1)
+        sheet = tp_annual_report.worksheets[0]
+        self.assert_iptt_title_cells(sheet)
+        columns = [column for c, column in enumerate(ENGLISH_COLUMNS) if c not in (3, 4, 6)]
+        for column, header in enumerate(columns):
+            self.assertEqual(
+                sheet.cell(row=4, column=3+column).value,
+                header
+            )
+        self.assert_lop_header_cells(sheet, column=7)
+        for c in range(3):
+            start_date = datetime.date(self.scenario.start_date.year + c, 1, 1)
+            end_date = datetime.date(self.scenario.start_date.year + c + 1, 1, 1) - datetime.timedelta(days=1)
+            period = f"Year {c+1}"
+            subheader = f"{start_date.strftime('%b %-d, %Y')} – {end_date.strftime('%b %-d, %Y')}"
+            self.assert_period_tp_header_cells(sheet, period, 10+c, subheader=subheader)
 
     def test_tp_monthly_report_headers(self):
-        pass        
+        tp_monthly_report = self.get_tp_report(frequency=Indicator.MONTHLY)
+        self.assertEqual(len(tp_monthly_report.worksheets), 1)
+        sheet = tp_monthly_report.worksheets[0]
+        self.assert_iptt_title_cells(sheet)
+        for column, header in enumerate(ENGLISH_COLUMNS):
+            self.assertEqual(
+                sheet.cell(row=4, column=3+column).value,
+                header
+            )
+        self.assert_lop_header_cells(sheet)
+        for c in range(36):
+            start_date = datetime.date(self.scenario.start_date.year + c//12, 1 + (c % 12), 1)
+            period = f"{start_date.strftime('%B %Y')}"
+            self.assert_period_tp_header_cells(sheet, period, 13+c)
+
+    def test_tp_monthly_report_headers_french(self):
+        default_locale = locale.getlocale()
+        locale.setlocale(locale.LC_ALL, 'fr_FR')
+        tp_monthly_report = self.get_tp_report(frequency=Indicator.MONTHLY, language=FRENCH)
+        self.assertEqual(len(tp_monthly_report.worksheets), 1)
+        sheet = tp_monthly_report.worksheets[0]
+        self.assert_iptt_title_cells(sheet, language=FRENCH)
+        for column, header in enumerate(FRENCH_COLUMNS):
+            self.assertEqual(
+                sheet.cell(row=4, column=3+column).value,
+                header
+            )
+        self.assert_lop_header_cells(sheet, language=FRENCH)
+        for c in range(36):
+            start_date = datetime.date(self.scenario.start_date.year + c//12, 1 + (c % 12), 1)
+            period = f"{start_date.strftime('%B %Y')}"
+            self.assert_period_tp_header_cells(sheet, period, 13+c, language=FRENCH)
+        locale.setlocale(locale.LC_ALL, default_locale)
 
     
         

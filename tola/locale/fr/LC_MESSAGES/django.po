@@ -93,7 +93,7 @@ msgstr "Changement"
 #. Translators: 'C' as in Cumulative and 'NC' as in Non Cumulative
 #: indicators/export_renderers.py:71 indicators/models.py:996
 msgid "C / NC"
-msgstr "C/NC"
+msgstr "C / NC"
 
 #: indicators/export_renderers.py:73 indicators/models.py:977
 #: tola_management/models.py:215

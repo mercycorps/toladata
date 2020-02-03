@@ -1,5 +1,6 @@
 # -*- coding: utf-8 -*-
 import openpyxl
+import operator
 from django.utils.translation import ugettext
 from django.http import HttpResponse
 
@@ -345,7 +346,10 @@ class ExcelRendererBase:
                     period_percent_met_cell.value = EM_DASH
                     period_percent_met_cell.alignment = self.CENTER_ALIGN
                     column += 1
-        sheet.merge_cells(start_row=row, start_column=3, end_row=row+len(categories)-1, end_column=3)
+        end_row = row+len(categories)
+        sheet.merge_cells(start_row=row, start_column=3, end_row=end_row-1, end_column=3)
+        for category_row in range(row, end_row):
+            sheet.row_dimensions[category_row].hidden = True
 
     def set_column_widths(self, sheet):
         widths = [10, 10, 17, 100]
@@ -383,7 +387,10 @@ class ExcelRendererBase:
             for indicator in level_row['indicators']:
                 self.add_indicator_row(row_offset, sheet, indicator)
                 row_offset += 1
-                for disaggregation in getattr(indicator, 'prefetch_disaggregations', indicator.disaggregation.all()):
+                for disaggregation in sorted(
+                    getattr(indicator, 'prefetch_disaggregations', indicator.disaggregation.all()),
+                    key=operator.attrgetter('disaggregation_type')
+                    ):
                     if not self.serializer.disaggregations or disaggregation.pk in self.serializer.disaggregations:
                         categories = getattr(
                             disaggregation, 'prefetch_labels', disaggregation.disaggregationlabel_set.all()
@@ -400,7 +407,10 @@ class ExcelRendererBase:
             for indicator in self.serializer.blank_level_row:
                 self.add_indicator_row(row_offset, sheet, indicator)
                 row_offset += 1
-                for disaggregation in getattr(indicator, 'prefetch_disaggregations', indicator.disaggregation.all()):
+                for disaggregation in sorted(
+                    getattr(indicator, 'prefetch_disaggregations', indicator.disaggregation.all()),
+                    key=operator.attrgetter('disaggregation_type')
+                    ):
                     if not self.serializer.disaggregations or disaggregation.pk in self.serializer.disaggregations:
                         categories = getattr(
                             disaggregation, 'prefetch_labels', disaggregation.disaggregationlabel_set.all()
@@ -414,7 +424,10 @@ class ExcelRendererBase:
         for indicator in self.serializer.indicators:
             self.add_indicator_row(row_offset, sheet, indicator)
             row_offset += 1
-            for disaggregation in getattr(indicator, 'prefetch_disaggregations', indicator.disaggregation.all()):
+            for disaggregation in sorted(
+                getattr(indicator, 'prefetch_disaggregations', indicator.disaggregation.all()),
+                key=operator.attrgetter('disaggregation_type')
+                ):
                 if not self.serializer.disaggregations or disaggregation.pk in self.serializer.disaggregations:
                     categories = getattr(
                         disaggregation, 'prefetch_labels', disaggregation.disaggregationlabel_set.all()
