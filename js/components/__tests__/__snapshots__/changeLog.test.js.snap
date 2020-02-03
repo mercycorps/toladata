@@ -492,7 +492,7 @@ exports[`Change log should display all  Organization change log entries 1`] = `
               Is active
             </strong>
             : 
-            true
+            True
           </div>
         </div>
       </td>
