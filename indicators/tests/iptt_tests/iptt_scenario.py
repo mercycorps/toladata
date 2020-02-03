@@ -4,7 +4,7 @@ Indicators:
     MID_END - b - "aaa" - Percent - baseline na - One result Mid (month 2) - country disagg (no disagg results) - site 1 - type 1 - no sector
     ANNUAL - 1a - "x4.1" - Numeric Cum - baseline 100 - Two results month 4,5 - no disaggs - sites 1 and 2 - types 1 + 2 - sector 2
     QUARTERLY - 2a - "4a" - Numeric NC - baseline 0 - Two results month 2 One result month 10 - standard disagg and country disagg (all results disagg'd) - no sites - type 2 - sector 1
-    TRI_ANNUAL - 2b - "4b" - Percent - baseline na - No results - no disaggs - site 1 - no types - no sector
+    TRI_ANNUAL - 2b - "4b" - Percent - baseline na - No results - no disaggs - no sites - no types - no sector
     MONTHLY - 1.1a - "21.4" - Numeric Cum - baseline 100 - One result month 3 One result month 6 - standard disagg (disagg'd result) - sites 1 and 2 - type 1 - sector 2
     EVENT - 1.1b - "19.1" - Numeric NC - baseline 0 - One result month 1 event 1 - country disagg (disagg'd result) - no sites - types 1 + 2 - sector 1
 """

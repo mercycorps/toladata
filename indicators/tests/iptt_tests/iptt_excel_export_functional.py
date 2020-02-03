@@ -557,14 +557,39 @@ class TestIPTTExcelExports(test.TestCase):
             sheet.cell(row=8, column=3).value,
             self.scenario.country_disagg.disaggregation_type
         )
+        target_columns = [10, 13, 16, 19, 22]
+        met_columns = [12, 15, 18, 21]
         for c, label in enumerate(["Label 1", "Låbél 2", "Label 3"]):
             self.assertEqual(sheet.cell(row=8+c, column=4).value, label)
+            # baseline:
+            self.assertEqual(sheet.cell(row=8+c, column=9).value, "–")
+            for column in target_columns:
+                self.assertEqual(sheet.cell(row=8+c, column=column).value, "–")
+            for column in met_columns:
+                self.assertEqual(sheet.cell(row=8+c, column=column).value, "–")
+            self.assertEqual(sheet.cell(row=8+c, column=11).value, 14 if c == 2 else 3)
+            self.assertEqual(sheet.cell(row=8+c, column=14).value, 7 if c == 2 else 2)
+            self.assertEqual(sheet.cell(row=8+c, column=17).value, "–")
+            self.assertEqual(sheet.cell(row=8+c, column=20).value, "–")
+            self.assertEqual(sheet.cell(row=8+c, column=23).value, 7 if c == 2 else 1)
         self.assertEqual(
             sheet.cell(row=11, column=3).value,
             self.scenario.standard_disagg.disaggregation_type
         )
         for c, label in enumerate(["Label 1", "Låbél 2"]):
             self.assertEqual(sheet.cell(row=11+c, column=4).value, label)
+            # baseline:
+            self.assertEqual(sheet.cell(row=11+c, column=9).value, "–")
+            for column in target_columns:
+                self.assertEqual(sheet.cell(row=8+c, column=column).value, "–")
+            for column in met_columns:
+                self.assertEqual(sheet.cell(row=8+c, column=column).value, "–")
+            self.assertEqual(sheet.cell(row=11+c, column=11).value, 17 if c == 1 else 3)
+            self.assertEqual(sheet.cell(row=11+c, column=14).value, 9 if c == 1 else 2)
+            self.assertEqual(sheet.cell(row=11+c, column=17).value, "–")
+            self.assertEqual(sheet.cell(row=11+c, column=20).value, "–")
+            self.assertEqual(sheet.cell(row=11+c, column=23).value, 8 if c == 1 else 1)
+        self.assertIsNone(sheet.cell(row=13, column=3).value)
         
 
     def test_tva_semi_annual_report_headers_spanish(self):
@@ -595,7 +620,6 @@ class TestIPTTExcelExports(test.TestCase):
             subheader = f"{start_date.strftime('%-d %b. %Y').title()} – {end_date.strftime('%-d %b. %Y').title()}"
             self.assert_period_tva_header_cells(sheet, period, 13+3*c, subheader=subheader, language=SPANISH)
         locale.setlocale(locale.LC_ALL, default_locale)
-            
 
     def test_tp_annual_report_headers(self):
         tp_annual_report = self.get_tp_report(frequency=Indicator.ANNUAL)
@@ -614,6 +638,83 @@ class TestIPTTExcelExports(test.TestCase):
             period = f"Year {c+1}"
             subheader = f"{start_date.strftime('%b %-d, %Y')} – {end_date.strftime('%b %-d, %Y')}"
             self.assert_period_tp_header_cells(sheet, period, 13+c, subheader=subheader)
+        for row_num, level_name in [
+            (5, self.scenario.goal_level_row),
+            (11, "Tîér2 1: Lévêl outcome 1a"),
+            (13, "Tîér3 1.1: Lévêl output 1.1a"),
+            (21, "Tîér2 2: Lévêl outcome 1b"),
+        ]:
+            self.assertEqual(sheet.cell(row=row_num, column=3).value, level_name)
+        for row_num, indicator_name, indicator_number, year_1 in [
+            (6, self.scenario.indicators[0].name, "Tîér1 a", "–"),
+            (7, self.scenario.indicators[1].name, "Tîér1 b", 0.95),
+            (12, self.scenario.indicators[2].name, "Tîér2 1a", 70),
+            (14, self.scenario.indicators[5].name, "Tîér3 1.1a", 110),
+            (17, self.scenario.indicators[6].name, "Tîér3 1.1b", 42),
+            (22, self.scenario.indicators[3].name, "Tîér2 2a", 20),
+            (28, self.scenario.indicators[4].name, "Tîér2 2b", "–"),
+        ]:
+            self.assertEqual(sheet.cell(row=row_num, column=3).value, indicator_number)
+            self.assertEqual(sheet.cell(row=row_num, column=4).value, indicator_name)
+            self.assertEqual(sheet.cell(row=row_num, column=13).value, year_1)
+
+    def test_tp_semi_annual_report_headers_sites_filter(self):
+        tp_semi_annual_report = self.get_tp_report(frequency=Indicator.SEMI_ANNUAL, sites=[self.scenario.site1.pk])
+        self.assertEqual(len(tp_semi_annual_report.worksheets), 1)
+        sheet = tp_semi_annual_report.worksheets[0]
+        self.assert_iptt_title_cells(sheet)
+        for column, header in enumerate(ENGLISH_COLUMNS):
+            self.assertEqual(
+                sheet.cell(row=4, column=3+column).value,
+                header
+            )
+        self.assert_lop_header_cells(sheet)
+        for row_num, level_name in [
+            (5, self.scenario.goal_level_row),
+            (10, "Tîér2 1: Lévêl outcome 1a"),
+            (12, "Tîér3 1.1: Lévêl output 1.1a"),
+        ]:
+            self.assertEqual(sheet.cell(row=row_num, column=3).value, level_name)
+        for row_num, indicator_name, indicator_number in [
+            (6, self.scenario.indicators[1].name, "Tîér1 b"),
+            (11, self.scenario.indicators[2].name, "Tîér2 1a"),
+            (13, self.scenario.indicators[5].name, "Tîér3 1.1a"),
+        ]:
+            self.assertEqual(sheet.cell(row=row_num, column=3).value, indicator_number)
+            self.assertEqual(sheet.cell(row=row_num, column=4).value, indicator_name)
+        self.assertIsNone(sheet.cell(row=16, column=3).value)
+
+    def test_tp_tri_annual_report_headers_disaggs_filter(self):
+        tp_tri_annual_report = self.get_tp_report(
+            frequency=Indicator.TRI_ANNUAL, disaggregations=[self.scenario.standard_disagg.pk])
+        self.assertEqual(len(tp_tri_annual_report.worksheets), 1)
+        sheet = tp_tri_annual_report.worksheets[0]
+        self.assert_iptt_title_cells(sheet)
+        for column, header in enumerate(ENGLISH_COLUMNS):
+            self.assertEqual(
+                sheet.cell(row=4, column=3+column).value,
+                header
+            )
+        self.assert_lop_header_cells(sheet)
+        for row_num, level_name in [
+            (5, self.scenario.goal_level_row),
+            (6, "Tîér3 1.1: Lévêl output 1.1a"),
+            (10, "Tîér2 2: Lévêl outcome 1b"),
+        ]:
+            self.assertEqual(sheet.cell(row=row_num, column=3).value, level_name)
+        for row_num, indicator_name, indicator_number in [
+            (7, self.scenario.indicators[5].name, "Tîér3 1.1a"),
+            (11, self.scenario.indicators[3].name, "Tîér2 2a"),
+        ]:
+            self.assertEqual(sheet.cell(row=row_num, column=3).value, indicator_number)
+            self.assertEqual(sheet.cell(row=row_num, column=4).value, indicator_name)
+            self.assertEqual(sheet.cell(row=row_num+1, column=3).value, self.scenario.standard_disagg.disaggregation_type)
+            self.assertEqual(sheet.cell(row=row_num+1, column=4).value, "Label 1")
+            self.assertFalse(sheet.row_dimensions[row_num+1].hidden)
+            self.assertEqual(sheet.cell(row=row_num+2, column=4).value, "Låbél 2")
+            self.assertFalse(sheet.row_dimensions[row_num+2].hidden) # don't collapse disagg rows when filtered by disaggs
+        self.assertIsNone(sheet.cell(row=14, column=3).value)
+        
 
     def test_tp_annual_report_headers_columns_missing(self):
         tp_annual_report = self.get_tp_report(frequency=Indicator.ANNUAL, columns=['1', '2', '4'])
@@ -633,9 +734,16 @@ class TestIPTTExcelExports(test.TestCase):
             period = f"Year {c+1}"
             subheader = f"{start_date.strftime('%b %-d, %Y')} – {end_date.strftime('%b %-d, %Y')}"
             self.assert_period_tp_header_cells(sheet, period, 10+c, subheader=subheader)
+        for row_num, level_name in [
+            (5, self.scenario.goal_level_row),
+            (11, "Tîér2 1: Lévêl outcome 1a"),
+            (13, "Tîér3 1.1: Lévêl output 1.1a"),
+            (21, "Tîér2 2: Lévêl outcome 1b"),
+        ]:
+            self.assertEqual(sheet.cell(row=row_num, column=3).value, level_name)
 
-    def test_tp_monthly_report_headers(self):
-        tp_monthly_report = self.get_tp_report(frequency=Indicator.MONTHLY)
+    def test_tp_monthly_report_headers_group_by_level(self):
+        tp_monthly_report = self.get_tp_report(frequency=Indicator.MONTHLY, groupby='2')
         self.assertEqual(len(tp_monthly_report.worksheets), 1)
         sheet = tp_monthly_report.worksheets[0]
         self.assert_iptt_title_cells(sheet)
@@ -649,6 +757,85 @@ class TestIPTTExcelExports(test.TestCase):
             start_date = datetime.date(self.scenario.start_date.year + c//12, 1 + (c % 12), 1)
             period = f"{start_date.strftime('%B %Y')}"
             self.assert_period_tp_header_cells(sheet, period, 13+c)
+        for row_num, level_name in [
+            (5, self.scenario.goal_level_row),
+            (11, "Tîér2 1: Lévêl outcome 1a"),
+            (13, "Tîér2 2: Lévêl outcome 1b"),
+            (21, "Tîér3 1.1: Lévêl output 1.1a"),
+        ]:
+            self.assertEqual(sheet.cell(row=row_num, column=3).value, level_name)
+        for row_num, indicator_name, indicator_number in [
+            (6, self.scenario.indicators[0].name, "Tîér1 a"),
+            (7, self.scenario.indicators[1].name, "Tîér1 b"),
+            (12, self.scenario.indicators[2].name, "Tîér2 1a"),
+            (14, self.scenario.indicators[3].name, "Tîér2 2a"),
+            (20, self.scenario.indicators[4].name, "Tîér2 2b"),
+            (22, self.scenario.indicators[5].name, "Tîér3 1.1a"),
+            (25, self.scenario.indicators[6].name, "Tîér3 1.1b"),
+        ]:
+            self.assertEqual(sheet.cell(row=row_num, column=3).value, indicator_number)
+            self.assertEqual(sheet.cell(row=row_num, column=4).value, indicator_name)
+
+    def test_tp_report_headers_group_by_level_and_type_filter(self):
+        tp_monthly_report = self.get_tp_report(
+            frequency=Indicator.MONTHLY, groupby='2', types=[self.scenario.type1.pk]
+        )
+        self.assertEqual(len(tp_monthly_report.worksheets), 1)
+        sheet = tp_monthly_report.worksheets[0]
+        self.assert_iptt_title_cells(sheet)
+        for column, header in enumerate(ENGLISH_COLUMNS):
+            self.assertEqual(
+                sheet.cell(row=4, column=3+column).value,
+                header
+            )
+        self.assert_lop_header_cells(sheet)
+        for row_num, level_name in [
+            (5, self.scenario.goal_level_row),
+            (10, "Tîér2 1: Lévêl outcome 1a"),
+            (12, "Tîér3 1.1: Lévêl output 1.1a"),
+        ]:
+            self.assertEqual(sheet.cell(row=row_num, column=3).value, level_name)
+        for row_num, indicator_name, indicator_number in [
+            (6, self.scenario.indicators[1].name, "Tîér1 b"),
+            (11, self.scenario.indicators[2].name, "Tîér2 1a"),
+            (13, self.scenario.indicators[5].name, "Tîér3 1.1a"),
+            (16, self.scenario.indicators[6].name, "Tîér3 1.1b"),
+        ]:
+            self.assertEqual(sheet.cell(row=row_num, column=3).value, indicator_number)
+            self.assertEqual(sheet.cell(row=row_num, column=4).value, indicator_name)
+        self.assertIsNone(sheet.cell(row=20, column=4).value)
+
+    def test_tp_monthly_report_headers_sector_filter(self):
+        tp_monthly_report = self.get_tp_report(
+            frequency=Indicator.MONTHLY, sectors=[self.scenario.sector1.pk, self.scenario.sector2.pk]
+        )
+        self.assertEqual(len(tp_monthly_report.worksheets), 1)
+        sheet = tp_monthly_report.worksheets[0]
+        self.assert_iptt_title_cells(sheet)
+        for column, header in enumerate(ENGLISH_COLUMNS):
+            self.assertEqual(
+                sheet.cell(row=4, column=3+column).value,
+                header
+            )
+        self.assert_lop_header_cells(sheet)
+
+        for row_num, level_name in [
+            (5, self.scenario.goal_level_row),
+            (7, "Tîér2 1: Lévêl outcome 1a"),
+            (9, "Tîér3 1.1: Lévêl output 1.1a"),
+            (17, "Tîér2 2: Lévêl outcome 1b"),
+        ]:
+            self.assertEqual(sheet.cell(row=row_num, column=3).value, level_name)
+        for row_num, indicator_name, indicator_number in [
+            (6, self.scenario.indicators[0].name, "Tîér1 a"),
+            (8, self.scenario.indicators[2].name, "Tîér2 1a"),
+            (10, self.scenario.indicators[5].name, "Tîér3 1.1a"),
+            (13, self.scenario.indicators[6].name, "Tîér3 1.1b"),
+            (18, self.scenario.indicators[3].name, "Tîér2 2a"),
+        ]:
+            self.assertEqual(sheet.cell(row=row_num, column=3).value, indicator_number)
+            self.assertEqual(sheet.cell(row=row_num, column=4).value, indicator_name)
+        self.assertIsNone(sheet.cell(row=24, column=3).value)
 
     def test_tp_monthly_report_headers_french(self):
         default_locale = locale.getlocale()
