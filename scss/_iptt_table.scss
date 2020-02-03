@@ -129,6 +129,7 @@ td.disaggregation-name-cell {
     width: 142px; // TODO: hardcoded!
     font-weight: bold;
     border-right: 1px solid $table-border-color;
+    border-bottom: 3px solid $table-border-color;
 }
 
 td.disaggregation-label-cell {

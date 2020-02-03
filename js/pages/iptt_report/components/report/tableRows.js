@@ -142,7 +142,6 @@ const DisaggregationTable = inject('rootStore')(
                     disaggregation.labels.map(
                         (label, idx) => (
                             <tr
-                                id={ idx }
                                 className={ (idx == disaggregation.labels.length - 1) ?
                                     "disaggregation-end-row" :
                                     ""
