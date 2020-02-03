@@ -356,8 +356,7 @@ export class ProgramStore {
                 this.saving = false
             })
         }).catch(error => {
-            console.log('bottom level catch')
-            console.log(error);
+            console.log("There was an error in saving a new program");
         })
     }
 
