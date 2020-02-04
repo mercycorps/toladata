@@ -13,8 +13,11 @@ const IPTTHeader = inject('filterStore', 'rootStore')(
                         <h4 className="pb-3">{ (filterStore.startPeriod && filterStore.endPeriod)
                                                ? filterStore.startPeriod.startLabel + " - " + filterStore.endPeriod.endLabel
                                                : "" }</h4>
-                        <h3><a href={ rootStore.currentProgramPageUrl }>
-                            { rootStore.currentProgram.name }</a></h3>
+                        { rootStore.currentProgram &&
+                            <h3><a href={ rootStore.currentProgramPageUrl }>
+                            { rootStore.currentProgram.name }</a>
+                            </h3>
+                        }
                     </div>
                     <div className="subheader__actions">
                         <div className="btn-row">
