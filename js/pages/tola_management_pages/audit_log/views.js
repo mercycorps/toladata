@@ -10,16 +10,18 @@ export const DisaggregationDiffs = ({disagg_type, disagg_diffs}) => {
     disagg_diffs.sort( (a, b) => a.custom_sort - b.custom_sort);
     return <div><h4 className="disagg-type__title text-small">{disagg_type}</h4>
         {disagg_diffs.map( diff => {
-            return <div className="change__field" key={diff.id}><span className="change__field__name">{diff.name}:</span> <span className="change__field__value">{diff.value}</span></div>
+            const displayValue = (diff.value === null || diff.value === "") ? "–" : diff.value;
+            return <div className="change__field" key={diff.id}><span className="change__field__name">{diff.name}:</span> <span className="change__field__value">{displayValue}</span></div>
         })}
     </div>
 };
 
 export const ResultChangeset = ({data, name, pretty_name}) => {
+    const displayValue = data === "" ? "–" : data;
     if (name === 'id') {
         return null
     } else if(name === 'Target_url') {
-        return <div className="change__field"><strong className="change__field__name">{pretty_name}</strong>: {(data !== 'N/A' && data !== '')?<a href={data} target="_blank">Link</a>:data}</div>
+        return <div className="change__field"><strong className="change__field__name">{pretty_name}</strong>: {(data !== 'N/A' && data !== '')?<a href={displayValue} target="_blank">Link</a>:data}</div>
     } else if (name === 'disaggregation_values') {
         if (Object.entries(data).length) {
             let groupedDiffs = {};
@@ -44,12 +46,13 @@ export const ResultChangeset = ({data, name, pretty_name}) => {
             return null;
         }
     } else {
-        return <div className="change__field"><strong className="change__field__name">{pretty_name}</strong>: <span className="change__field__value">{data}</span></div>
+        return <div className="change__field"><strong className="change__field__name">{pretty_name}</strong>: <span className="change__field__value">{displayValue}</span></div>
     }
 };
 
 const ProgramDatesChangeset = ({data, name, pretty_name}) => {
-    return <p>{pretty_name}: {data}</p>
+    const displayValue = data === "" ? "–" : data;
+    return <p>{pretty_name}: {displayValue}</p>
 }
 
 const IndicatorChangeset = ({data, name, pretty_name, indicator}) => {
@@ -57,7 +60,8 @@ const IndicatorChangeset = ({data, name, pretty_name, indicator}) => {
         return <div className="changelog__change__targets">
             <h4 className="text-small">{gettext('Targets changed')}</h4>
             {Object.entries(data).map(([id, target]) => {
-                return <div className="change__field" key={id}><strong className="change__field__name">{target.name}:</strong> {target.value}</div>
+                const displayValue = target.value === "" ? "–" : target.value;
+                return <div className="change__field" key={id}><strong className="change__field__name">{target.name}:</strong> {displayValue}</div>
             })}
         </div>
     } else {
@@ -66,7 +70,7 @@ const IndicatorChangeset = ({data, name, pretty_name, indicator}) => {
                 { name === 'name' ?
                     <span>{gettext('Indicator')} {indicator.results_aware_number}: </span> : <span>{pretty_name}: </span>}
             </strong>
-            {(data !== null && data !== undefined)?data.toString() : ""}
+            {(data !== null && data !== undefined && data !== "") ? data.toString() : "–"}
         </div>
     }
 }
