@@ -12,7 +12,15 @@
 
 {% block content %}
     <script type="text/javascript">
-        let redirectProgramId = {{ indicator.program.pk }};
+        /* declare programId only if not declared (otherwise just overwrite it with the new program pk)
+         * for example, if the result form was opened, and then closed, then opened again
+         */
+        if (typeof redirectProgramId == 'undefined') {
+            var redirectProgramId = "{{ indicator.program.pk }}";
+        } else {
+            redirectProgramId = "{{ indicator.program.pk }}";
+        }
+        
         // don't let the modal load as a new page (jQuery not defined is a quick standin that doesn't need page to load)
         if (typeof $ === 'undefined') {    
             // pathname to avoid having to grab host:
