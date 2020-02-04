@@ -1,5 +1,10 @@
 import React from 'react';
 import { observer, inject } from 'mobx-react';
+import { library } from '@fortawesome/fontawesome-svg-core'
+import { FontAwesomeIcon } from "@fortawesome/react-fontawesome"
+import { faPlusSquare, faMinusSquare } from '@fortawesome/free-solid-svg-icons'
+
+library.add(faPlusSquare, faMinusSquare)
 
 import * as HeaderCells from './headerCells';
 
@@ -43,11 +48,17 @@ const ProgramNameRow = inject('rootStore')(
                     colSpan={ rootStore.hasBaselineColumn ? rootStore.baseColumns : rootStore.baseColumns + 1}
                     className="base-column">
                     <button className="btn btn-medium text-action btn-sm"
-                    onClick={rootStore.expandAllRows.bind(rootStore)}
-                    disabled={ rootStore.allExpanded }>{ gettext('Expand all') }</button>
+                        onClick={rootStore.expandAllRows.bind(rootStore)}
+                        disabled={ rootStore.allExpanded }>
+                        <FontAwesomeIcon icon="plus-square" />
+                        { gettext('Expand all') }
+                    </button>
                     <button className="btn btn-medium text-action btn-sm"
-                    onClick={rootStore.collapseAllRows.bind(rootStore)}
-                    disabled={ rootStore.allCollapsed }>{ gettext('Collapse all') }</button>
+                        onClick={rootStore.collapseAllRows.bind(rootStore)}
+                        disabled={ rootStore.allCollapsed }>
+                        <FontAwesomeIcon icon="minus-square" />
+                        { gettext('Collapse all') }
+                    </button>
                 </td>
                 <td scope="colgroup"
                     colSpan={ rootStore.hasBaselineColumn ? 4 : 3 }
