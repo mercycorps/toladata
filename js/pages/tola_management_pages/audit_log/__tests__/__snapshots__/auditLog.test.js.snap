@@ -20,7 +20,7 @@ exports[`Audit log orders disaggregations correctly 1`] = `
     <span
       className="change__field__value"
     >
-      
+      –
     </span>
   </div>
   <div
@@ -36,7 +36,7 @@ exports[`Audit log orders disaggregations correctly 1`] = `
     <span
       className="change__field__value"
     >
-      
+      –
     </span>
   </div>
   <div
@@ -52,7 +52,7 @@ exports[`Audit log orders disaggregations correctly 1`] = `
     <span
       className="change__field__value"
     >
-      
+      –
     </span>
   </div>
   <div
@@ -68,7 +68,7 @@ exports[`Audit log orders disaggregations correctly 1`] = `
     <span
       className="change__field__value"
     >
-      
+      –
     </span>
   </div>
 </div>
@@ -94,7 +94,7 @@ exports[`Audit log orders disaggregations correctly 2`] = `
     <span
       className="change__field__value"
     >
-      
+      –
     </span>
   </div>
   <div
@@ -110,7 +110,7 @@ exports[`Audit log orders disaggregations correctly 2`] = `
     <span
       className="change__field__value"
     >
-      
+      –
     </span>
   </div>
   <div
@@ -126,7 +126,7 @@ exports[`Audit log orders disaggregations correctly 2`] = `
     <span
       className="change__field__value"
     >
-      
+      –
     </span>
   </div>
   <div
@@ -142,7 +142,7 @@ exports[`Audit log orders disaggregations correctly 2`] = `
     <span
       className="change__field__value"
     >
-      
+      –
     </span>
   </div>
 </div>
