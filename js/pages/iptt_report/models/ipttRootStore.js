@@ -19,7 +19,7 @@ export default (
             this._expandoRows.forEach(row => {row.expandRow()});
         },
         get allExpanded() {
-            return this._expandoRows.every(row => row.state.expanded)
+            return this._expandoRows.every(row => row.state.expanded);
         },
         get allCollapsed() {
             return this._expandoRows.every(row => !row.state.expanded)

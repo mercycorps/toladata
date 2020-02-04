@@ -190,7 +190,14 @@ class IndicatorRow extends React.Component {
         this.state = {
             expanded: false
         };
+    }
+    
+    componentDidMount() {
         this.props.rootStore._expandoRows.push(this);
+    }
+    
+    componentWillUnmount() {
+        this.props.rootStore._expandoRows = this.props.rootStore._expandoRows.filter(row => row != this);
     }
 
     handleExpandoClick = (e) => {
