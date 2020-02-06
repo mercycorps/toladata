@@ -1,0 +1,72 @@
+# Duplicated label only
+
+- model: workflow.country
+  pk: 100
+  fields:
+    country: Fixture Country 1
+    code: FC1
+    description: ''
+    latitude: '33.9391'
+    longitude: '67.7100'
+    zoom: 5
+
+- model: indicators.disaggregationtype
+  pk: 100
+  fields:
+      disaggregation_type: Fixture Disagg 1
+      country: 100
+
+- model: indicators.disaggregationlabel
+  pk: 100
+  fields:
+    label: Fixture label
+    disaggregation_type: 100
+    customsort: 1
+
+- model: indicators.disaggregationlabel
+  pk: 101
+  fields:
+    label: Fixture label
+    disaggregation_type: 100
+    customsort: 2
+
+
+# Duplicated labels and type
+
+- model: workflow.country
+  pk: 200
+  fields:
+    country: Fixture Country 2
+    code: FC2
+    description: ''
+    latitude: '33.9391'
+    longitude: '67.7100'
+    zoom: 5
+
+- model: indicators.disaggregationtype
+  pk: 200
+  fields:
+      disaggregation_type: Fixture Disagg 1
+      country: 200
+
+- model: indicators.disaggregationtype
+  pk: 201
+  fields:
+      disaggregation_type: Fixture Disagg Dupe
+      country: 200
+
+- model: indicators.disaggregationlabel
+  pk: 200
+  fields:
+    label: Fixture label
+    disaggregation_type: 200
+    customsort: 1
+
+- model: indicators.disaggregationlabel
+  pk: 201
+  fields:
+    label: Fixture label
+    disaggregation_type: 200
+    customsort: 2
+
+

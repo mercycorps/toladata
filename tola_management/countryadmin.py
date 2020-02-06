@@ -229,10 +229,26 @@ class CountryDisaggregationSerializer(serializers.ModelSerializer):
             current_labels = [label for label in instance.disaggregationlabel_set.all()]
             removed_labels = [label for label in current_labels if label not in updated_label_data]
             new_labels = [label for label in updated_label_data if label not in current_labels]
+
+            # This seems awful.  There must be a better way that doesn't result in a lot of DB calls.
+            # In order to allow for de-duplication of labels, we need to first save any labels with
+            # changed names.  Otherwise, the unchanged label may be queued to save first and the whole
+            # save will fail because there is a duplicate.
+            with_changed_label_names = []
+            without_changed_label_names = []
+            for updated_label in updated_label_data:
+                changed_label = [current_label for current_label in current_labels if updated_label.pk == current_label.pk and updated_label.label != current_label.label]
+                if len(changed_label) > 0:
+                    with_changed_label_names.append(updated_label)
+                else:
+                    without_changed_label_names.append(updated_label)
+
             for label in new_labels:
                 label.disaggregation_type = instance
                 label.save()
-            for label in updated_label_data:
+            for label in with_changed_label_names:
+                label.save()
+            for label in without_changed_label_names:
                 label.save()
             for label in removed_labels:
                 label.delete()

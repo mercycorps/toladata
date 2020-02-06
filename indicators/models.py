@@ -465,6 +465,7 @@ class DisaggregationIndicatorFormManager(models.Manager):
         )
         return qs
 
+
 class DisaggregationType(models.Model):
     """Business logic name: Disaggregation - e.g. `Gender` or `SADD`"""
     disaggregation_type = models.CharField(_("Disaggregation"), max_length=135)
@@ -479,6 +480,27 @@ class DisaggregationType(models.Model):
 
     def __str__(self):
         return self.disaggregation_type
+
+    def save(self, *args, **kwargs):
+        # If saving a new disagg_type, make sure it doesn't have the same name as another one in that country
+        # Do this as a database restriction once the existing duplicates have been removed from the DB
+
+        same_name_count = DisaggregationType.objects.filter(
+            country=self.country, disaggregation_type=self.disaggregation_type).exclude(pk=self.pk).count()
+        is_duplicate = True if same_name_count > 0 else False
+
+        if is_duplicate:
+            raise ValidationError(
+                # Translators: Error message treturned when a user tries to create a duplicate disaggregation type.
+                _("There is already a disaggregation type with the name \"{disagg_type}\" in {country}")
+                .format(disagg_type=self.disaggregation_type, country=self.country.country)
+            )
+
+        if self.create_date is None:
+            self.create_date = timezone.now()
+        self.edit_date = timezone.now()
+
+        super(DisaggregationType, self).save(*args, **kwargs)
 
     @classmethod
     def program_disaggregations(cls, program_pk, countries=None, indicator_pk=None):
@@ -565,6 +587,27 @@ class DisaggregationLabel(models.Model):
 
     class Meta:
         ordering = ['customsort']
+
+    def save(self, *args, **kwargs):
+        # If saving a new disagg_label, make sure it doesn't have the same name as another one in that disaggregation type.
+        # Do this as a database restriction once the existing duplicates have been removed from the DB
+
+        same_name_count = DisaggregationLabel.objects.filter(
+            disaggregation_type=self.disaggregation_type, label=self.label).exclude(pk=self.pk).count()
+        is_duplicate = True if same_name_count > 0 else False
+
+        if is_duplicate:
+            raise ValidationError(
+                # Translators: Error message treturned when a user tries to create a duplicate disaggregation type.
+                _("There is already a disaggregation label with the name \"{disagg_label}\" in {disagg_type}")
+                .format(disagg_label=self.label, disagg_type=self.disaggregation_type.disaggregation_type)
+            )
+
+        if self.create_date is None:
+            self.create_date = timezone.now()
+        self.edit_date = timezone.now()
+
+        super(DisaggregationLabel, self).save(*args, **kwargs)
 
     def __str__(self):
         return self.label
