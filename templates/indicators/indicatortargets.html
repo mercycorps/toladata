@@ -21,9 +21,9 @@
                 {% if indicator.target_frequency == 8 %} {# 8 is an EVENT #}
                     {% if pt.id %}
                         {# this li is closed inside the for-loop but after all other conditions have closed #}
-                        <li class="list-group-item" data-collected-count="{{ pt.num_data }}"
+                        <li data-collected-count="{{ pt.num_data }}"
                             data-ptid="{{ pt.id }}"
-                            class="periodic-target">
+                            class="periodic-target list-group-item item--event">
                             <div class="item__label">
                                 {% if not readonly %}
                                 <a href="{% url 'pt_delete' pt.id %}" id="delete_event_{{ pt.id }}"
@@ -33,10 +33,10 @@
                                 {% endif %}
                     {% else %}
                         {# this li is closed inside the for-loop but after all other conditions have closed #}
-                        <li class="list-group-item" id="target_row_{{forloop.counter0}}"
+                        <li id="target_row_{{forloop.counter0}}"
                             data-collected-count="0"
                             data-ptid="0"
-                            class="periodic-target">
+                            class="periodic-target list-group-item item--event">
                             <div class="item__label">
                                 <a href="#" id="delete_event_{{forloop.counter0}}"
                                    data-target-row="target_row_{{forloop.counter0}}"
