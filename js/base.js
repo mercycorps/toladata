@@ -675,7 +675,7 @@ function getValidatedNumericInput(selector) {
             return;
         }
         // if decimal point/comma, and already 2 digits to the right of it, and cursor is to the right of it, prevent:
-        let curVal = `${$input.val()}`;
+        let curVal = `${$(e.target).val()}`;
         let floatingPointPosition = Math.max(curVal.indexOf('.'), curVal.indexOf(','));
         if ((curVal.match(/[,.]/) || []).length > 0 && curVal.length - floatingPointPosition > 2 && e.target.selectionStart > floatingPointPosition) {
             e.preventDefault();
@@ -691,9 +691,11 @@ function getValidatedNumericInput(selector) {
         return;
     }
     $input.keydown(preventNonNumericInput);
-    $input.updateDisplayVal();
-    $input.on('blur', function() {
-        $input.updateDisplayVal();
+    $input.each(function() {
+        $(this).updateDisplayVal();
+    });
+    $input.on('blur', function(e) {
+        $(e.target).updateDisplayVal();
     });
     return $input;
 }
@@ -736,7 +738,7 @@ jQuery.fn.extend({
         if (this.is('input')) {
             this.val(value);
         }
-        if (this.is('div')) {
+        if (this.is('div') || this.is('span')) {
             this.html(`${value}${percent ? '&ensp;%' : ''}`);
         }
     }
