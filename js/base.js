@@ -657,65 +657,87 @@ window.scrollToBottom = scrollToBottom;
 
 
 /**
- * Take a number, with a maximum number of decimal places, process it and return the actual value
- *  - check for nulls/blanks/non-numerics and return false
- *  - process input using internationalized guidelines (, for decimal for french/spanish)
- *  - round to specified number of decimals
+ * takes a selector string, (i.e. '#id_achieved') returns an input that is validated based on
+ * universal rules (2 decimal places, comma or period as floating-point separator, no negative signs)
  */
-function getNumberLocalizer({
-    decimalPlaces = 0,
-    display = false,
-    } = {}) {
-    return (val) => {
-        if (val === '' || val === null) {
-            return display ? '' : false;
+function getValidatedNumericInput(selector) {
+    let $input = $(selector);
+    function preventNonNumericInput(e) {
+        if ($.inArray(e.keyCode, [46, 8, 9, 27, 13, 110]) !== -1 ||
+            // allow: Ctrl characters (don't break browsers):
+            (e.ctrlKey === true || e.metaKey === true) ||
+            // allow home, end, left, right
+            (e.keyCode >= 35 && e.keyCode <= 39) //||
+            // allow negative sign
+           //($.inArray(e.keyCode, [109, 189, 173]) !== -1)
+           ) {
+            // don't do anything (allow key to be used as normal)
+            return;
         }
-        let stVal = `${val}`
-        if (['fr', 'es'].includes(userLang) && stVal.includes(',')) {
-            stVal = stVal.replace(',', '.');
+        // if decimal point/comma, and already 2 digits to the right of it, and cursor is to the right of it, prevent:
+        let curVal = `${$input.val()}`;
+        let floatingPointPosition = Math.max(curVal.indexOf('.'), curVal.indexOf(','));
+        if ((curVal.match(/[,.]/) || []).length > 0 && curVal.length - floatingPointPosition > 2 && e.target.selectionStart > floatingPointPosition) {
+            e.preventDefault();
+            return;
         }
-        if (isNaN(parseFloat(stVal)) || !$.isNumeric(stVal)) {
-            return display ? '' : false;
+        // Allow numbers:
+        if ((e.keyCode >= 48 && e.keyCode <= 57 && !e.shiftKey) ||
+            // allow comma or period if there isn't one already:
+            ($.inArray(e.keyCode, [188, 190]) !== -1 && (curVal.match(/[,.]/) || []).length < 1)) {
+            return;
         }
-        let flVal = Math.round(parseFloat(stVal) * Math.pow(10, decimalPlaces)) / Math.pow(10, decimalPlaces);
-        if (!display) {
-            return flVal;
-        }
-        flVal = `${flVal}`;
-        if (['fr', 'es'].includes(userLang) && `${flVal}`.includes('.')) {
-            flVal = flVal.replace('.', ',')
-        }
-        return flVal;
+        e.preventDefault();
+        return;
     }
+    $input.keydown(preventNonNumericInput);
+    $input.updateDisplayVal();
+    $input.on('blur', function() {
+        $input.updateDisplayVal();
+    });
+    return $input;
 }
-window.getNumberLocalizer = getNumberLocalizer;
 
-/**
- * on key down validates a field to be numeric in the current language
- * (if French/Spanish, allows numbers and "," otherwise numbers and ".")
- * usage $('.input').keydown(window.numberInputValidator)
- */
-function numberInputValidator(e) {
-    // Allow backspace, delete, tab, escape, and enter
-    if ($.inArray(e.keyCode, [46, 8, 9, 27, 13, 110]) !== -1 ||
-        // allow: Ctrl+A select all)
-        (e.keyCode == 65 && e.ctrlKey === true) ||
-        // allow home, end, left, right
-        (e.keyCode >= 35 && e.keyCode <= 39) //||
-        // allow negative sign
-       //($.inArray(e.keyCode, [109, 189, 173]) !== -1)
-       ) {
-        // don't do anything (allow key to be used as normal)
-        return;
+window.getValidatedNumericInput = getValidatedNumericInput;
+
+
+jQuery.fn.extend({
+    numericVal: function() {
+        if (this.is('input')) {
+            return !isNaN(parseFloat(this.val().replace(',', '.'))) ? parseFloat(this.val().replace(',', '.')) : null;
+        }
+        if (this.is('div')) {
+            let value = this.html();
+            value = value.replace("%", "");
+            value = value.replace(',', '.');
+            value = parseFloat(value);
+            return !isNaN(value) ? value : null;
+        }
+    },
+    updateDisplayVal: function() {
+        this.displayVal(this.val());
+    },
+    toDisplayVal: function(value) {
+        value = `${value}`;
+        if (isNaN(parseFloat(value))) {
+            return '';
+        }
+        value = `${parseFloat(value.replace(',', '.')).toFixed(2)}`;
+        if (['fr', 'es'].includes(userLang)) {
+            value = value.replace('.', ',');
+        } else {
+            value = value.replace(',', '.');
+        }
+        value = value.replace(new RegExp("([,\.][1-9])?[,\.]?0+$"), "$1");
+        return value;
+    },
+    displayVal: function(value, percent = false) {
+        value = this.toDisplayVal(value);
+        if (this.is('input')) {
+            this.val(value);
+        }
+        if (this.is('div')) {
+            this.html(`${value}${percent ? '&ensp;%' : ''}`);
+        }
     }
-    // Allow numbers:
-    if ((e.keyCode >= 48 && e.keyCode <= 57 && !e.shiftKey) ||
-        // if french/spanish allow comma:
-        (e.keyCode == 188 && ['fr', 'es'].includes(userLang)) ||
-        // allow period:
-        e.keyCode == 190) {
-        return;
-    }
-    e.preventDefault();
-}
-window.numberInputValidator = numberInputValidator;
+});
