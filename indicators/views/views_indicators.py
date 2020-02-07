@@ -180,6 +180,7 @@ class IndicatorFormMixin:
             pt['id'] = pk
             pt['start_date'] = start_date
             pt['end_date'] = end_date
+            pt['target'] = pt['target'].replace(',', '.')
 
         return pt_json
 
