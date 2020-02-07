@@ -20,7 +20,7 @@
                 {% for pt in periodic_targets %}
                 {% if indicator.target_frequency == 8 %} {# 8 is an EVENT #}
                     {% if pt.id %}
-                    <li class="list-group-item" data-collected-count="{{ pt.num_data }}"
+                        <li class="list-group-item" data-collected-count="{{ pt.num_data }}"
                             data-ptid="{{ pt.id }}"
                             class="periodic-target">
                             <div class="item__label">
@@ -42,41 +42,41 @@
                                     <i class="fas fa-times text-danger"></i>
                                 </a>
                     {% endif %}
-                        <input type="text"
-                               placeholder="{% trans 'Enter event name' %}"
-                               name="{{ pt.period }}"
-                               value="{{ pt.period }}"
-                               class="form-control input-text"
-                               {% if readonly %}disabled="disabled"{% endif %}>
-                        <span style="" class="help-block"> </span>
-                    </div>
+                                <input type="text"
+                                       placeholder="{% trans 'Enter event name' %}"
+                                       name="{{ pt.period }}"
+                                       value="{{ pt.period }}"
+                                       class="form-control input-text"
+                                       {% if readonly %}disabled="disabled"{% endif %}>
+                                <span style="" class="help-block"> </span>
+                            </div>
                 {% else %}
-                <li class="list-group-item periodic-target" id="{{ pt.id }}" data-collected-count="{{ pt.num_data }}">
-                    <div class="item__label">
-                        <strong>{{ pt.period_name }}</strong>
-                        {% if pt.start_date %}
-                            <br><small>{{ pt.start_date|convert2dateobject|date:"MEDIUM_DATE_FORMAT"|default:'' }} {% if pt.start_date %} - {% endif %} {{ pt.end_date|convert2dateobject|date:"MEDIUM_DATE_FORMAT"|default:'' }}</small>
-                        {% endif %}
-                    </div>
-                    {% endif %}
+                    <li class="list-group-item periodic-target" id="{{ pt.id }}" data-collected-count="{{ pt.num_data }}">
+                        <div class="item__label">
+                            <strong>{{ pt.period_name }}</strong>
+                            {% if pt.start_date %}
+                                <br><small>{{ pt.start_date|convert2dateobject|date:"MEDIUM_DATE_FORMAT"|default:'' }} {% if pt.start_date %} - {% endif %} {{ pt.end_date|convert2dateobject|date:"MEDIUM_DATE_FORMAT"|default:'' }}</small>
+                            {% endif %}
+                        </div>
+                {% endif %}
 
-                    <div class="item__value">
-                        <span id="id_span_{{ pt.id }}" class="{% if indicator.unit_of_measure_type == 2 %}input-symbol-percent{% endif %}">
-                            <input
-                                type="number"
-                                id="pt-{{ pt.id }}"
-                                name="{{ pt.period }}"
-                                value="{{ pt.target|trailingzero }}"
-                                {% if readonly %}disabled="disabled"{% endif %}
-                                data-periodictarget="pt"
-                                data-start-date="{{pt.start_date|convert2dateobject|date:"MEDIUM_DATE_FORMAT"|default:''}}"
-                                data-end-date="{{pt.end_date|convert2dateobject|date:"MEDIUM_DATE_FORMAT"|default:''}}"
-                                placeholder="{% trans 'Enter target' %}"
-                                class="form-control input-value">
-                        </span>
-                        <span id="hint_id_pt_{{pt.id}}" style="margin:0px;" class="help-block"> </span>{# TODO: this style attr #}
-                    </div>
-                </li>
+                        <div class="item__value">
+                            <span id="id_span_{{ pt.id }}" class="{% if indicator.unit_of_measure_type == 2 %}input-symbol-percent{% endif %}">
+                                <input
+                                    type="number"
+                                    id="pt-{{ pt.id }}"
+                                    name="{{ pt.period }}"
+                                    value="{{ pt.target|trailingzero }}"
+                                    {% if readonly %}disabled="disabled"{% endif %}
+                                    data-periodictarget="pt"
+                                    data-start-date="{{pt.start_date|convert2dateobject|date:"MEDIUM_DATE_FORMAT"|default:''}}"
+                                    data-end-date="{{pt.end_date|convert2dateobject|date:"MEDIUM_DATE_FORMAT"|default:''}}"
+                                    placeholder="{% trans 'Enter target' %}"
+                                    class="form-control input-value">
+                            </span>
+                            <span id="hint_id_pt_{{pt.id}}" style="margin:0px;" class="help-block"> </span>{# TODO: this style attr #}
+                        </div>
+                    </li>
                 {% endfor %}{# for pt in periodic_targets #}
 
                 <li class="list-group-item reference-row">
