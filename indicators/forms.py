@@ -173,6 +173,8 @@ class IndicatorForm(forms.ModelForm):
         choices=[('', '------')] + [(name, name) for (pk, name) in Indicator.OLD_LEVELS],
         initial=None
     )
+    
+    baseline = NonLocalizedDecimalField(decimal_places=2, localize=True, required=False)
 
     rationale = forms.CharField(required=False)
 

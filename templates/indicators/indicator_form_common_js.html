@@ -866,9 +866,9 @@
             return true;
         }
 
-        if (!baseline.val()) {
+        if (baseline.val() === '') {
             errMsg = "{% trans 'Please complete this field. Your baseline can be zero.'|escapejs %}";
-        } else if (!$.isNumeric(baseline.val()) || baseline.val() < 0 ) {
+        } else if (baseline.numericVal() === null) {
             errMsg = "{% trans 'Please complete this field. Your baseline can be zero.'|escapejs %}";
         }
         if (errMsg){
