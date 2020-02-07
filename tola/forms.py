@@ -103,3 +103,17 @@ class NewTolaUserRegistrationForm(forms.ModelForm):
         Fieldset('Privacy Statement','privacy_disclaimer_accepted',),
 
     )
+
+
+
+class NonLocalizedDecimalField(forms.DecimalField):
+    """Decimal Field which accepts "," as floating-point separator regardless of locale
+    
+        Tola users are from a variety of cultures, and use of English does not guarantee preference for "." as
+        floating-point separator, as such we accept "," for floating-point separator for any language/locale.
+        This input displays values according to locale settings ("," for ES/FR, "." for EN)
+    """
+    def to_python(self, value):
+        if ',' in value:
+            value = value.replace(',', '.')
+        return super().to_python(value)
