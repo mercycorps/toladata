@@ -16,10 +16,11 @@
             {{ targets_label.strip|capfirst }}
         </h3>
         <div class="" id="periodic-targets-tablediv">
-            <ul class="list-group form-list-group" id="periodic_targets_table">
+            <ul class="list-group form-list-group" id="periodic_targets_table">{# this ul is closed AFTER the for-loop beloe #}
                 {% for pt in periodic_targets %}
                 {% if indicator.target_frequency == 8 %} {# 8 is an EVENT #}
                     {% if pt.id %}
+                        {# this li is closed inside the for-loop but after all other conditions have closed #}
                         <li class="list-group-item" data-collected-count="{{ pt.num_data }}"
                             data-ptid="{{ pt.id }}"
                             class="periodic-target">
@@ -31,6 +32,7 @@
                                 </a>
                                 {% endif %}
                     {% else %}
+                        {# this li is closed inside the for-loop but after all other conditions have closed #}
                         <li class="list-group-item" id="target_row_{{forloop.counter0}}"
                             data-collected-count="0"
                             data-ptid="0"
@@ -42,6 +44,8 @@
                                     <i class="fas fa-times text-danger"></i>
                                 </a>
                     {% endif %}
+                                {# input for event target LABEL #}
+                                {# this li is closed inside the for-loop but after all other conditions have closed #}
                                 <input type="text"
                                        placeholder="{% trans 'Enter event name' %}"
                                        name="{{ pt.period }}"
@@ -50,7 +54,8 @@
                                        {% if readonly %}disabled="disabled"{% endif %}>
                                 <span style="" class="help-block"> </span>
                             </div>
-                {% else %}
+                {% else %} {# all non-events #}
+                    {# this li is closed inside the for-loop but after all other conditions have closed #}
                     <li class="list-group-item periodic-target" id="{{ pt.id }}" data-collected-count="{{ pt.num_data }}">
                         <div class="item__label">
                             <strong>{{ pt.period_name }}</strong>
@@ -76,7 +81,7 @@
                             </span>
                             <span id="hint_id_pt_{{pt.id}}" style="margin:0px;" class="help-block"> </span>{# TODO: this style attr #}
                         </div>
-                    </li>
+                    </li>{# end of pt in periodic_targets #}
                 {% endfor %}{# for pt in periodic_targets #}
 
                 <li class="list-group-item reference-row">
