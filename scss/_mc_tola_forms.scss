@@ -178,16 +178,15 @@ a.accordion-row__btn.btn.btn-link {
     }
 }
 .item__label {
-    align-items: center;
-    display: flex;
+    line-height: 1;
     label {
         margin-bottom: 0;
     }
-    min-height: $input-height; // TODO: hardcoded; approx min height of a text input
 }
 .item__value {
 }
-
+.error-row {
+}
 .reference-row {
     background-color: $gray-200;
     font-weight: bold;
