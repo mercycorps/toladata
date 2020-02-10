@@ -247,7 +247,7 @@
             }
         };
         let url = $(this).attr('href');
-        let row = $(e.currentTarget).closest('tr');
+        let row = $(e.currentTarget).closest('.periodic-target');
         let numResultsLinkedToEventTarget = parseInt(row.data('collected-count'));
 
         // if no other periodic target values have changed, update the snapshot to reflect new server state
@@ -1193,7 +1193,7 @@
         let periodic_targets = [];
 
         // Collect all existing periodic_targets into an array.
-        $('#periodic_targets_table tbody tr.periodic-target').each(function () {
+        $('#periodic_targets_table .periodic-target').each(function () {
             let $this = $(this);
             let eventNameElement = $($this.find('input[type=text]'));
             let targetValueSelector = $($this.find('input[type=number]'));
