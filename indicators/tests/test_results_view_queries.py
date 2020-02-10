@@ -24,8 +24,8 @@ from django import test
 
 def get_open_program():
     return w_factories.ProgramFactory(
-        reporting_period_start=datetime.date(2017, 1, 1),
-        reporting_period_end=datetime.date(2020, 12, 31)
+        reporting_period_start=datetime.date(2018, 1, 1),
+        reporting_period_end=datetime.date(2021, 12, 31)
     )
 
 def get_annual_indicator(program, lop_target, is_cumulative):
