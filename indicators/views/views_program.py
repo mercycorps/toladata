@@ -266,7 +266,7 @@ def programs_rollup_export_csv(request):
             program.metrics['results_count'],
             program.metrics['results_evidence']
         ]
-        row = [unicode(s).encode("utf-8") for s in row]
+        row = [str(s) for s in row]
         writer.writerow(row)
     return response
         
