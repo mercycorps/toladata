@@ -50,16 +50,16 @@ input[type=number]::-webkit-outer-spin-button {
 }
 
 .input-symbol-percent {
+    display: block;
     position: relative;
-    display: inline-block;
-    width: 100%;
     &:after {
         position: absolute;
         top: 50%;
         transform: translateY(-50%);
         margin: auto;
         content:"%";
-        right: 0.5rem;
+        color: $gray-600;
+        right: 0.25rem;
     }
     &.feedback-row:after {
         top: 1.5rem !important;
@@ -230,10 +230,10 @@ a.accordion-row__btn.btn.btn-link {
 
 .disaggregation-formset .input-symbol-percent {
     &:after {
-        right: 1.7rem;
+        //right: 1.7rem;
     }
     & .disaggregated-value-cell {
-        padding-right: 28px;
+        //padding-right: 28px;
     }
 }
 
