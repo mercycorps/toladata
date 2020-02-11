@@ -44,6 +44,11 @@ td.periodic-targets__sum { // td needed for extra specificity
         padding: 0;
     }
 }
+.item--event {
+    .item__label {
+        display: flex;
+    }
+}
 
 // .periodic-target .input-value - needed as you can't @extend nested selectors
 %pt-input {

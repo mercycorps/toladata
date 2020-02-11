@@ -164,7 +164,7 @@
     function indicatorId() {
         return $('#indicatorId').text() ? parseInt($('#indicatorId').text()) : undefined;
     }
-    
+
     function isResultsForm() {
         return $('.results-table__wrapper').length > 0;
     }
@@ -247,7 +247,7 @@
             }
         };
         let url = $(this).attr('href');
-        let row = $(e.currentTarget).closest('tr');
+        let row = $(e.currentTarget).closest('.periodic-target');
         let numResultsLinkedToEventTarget = parseInt(row.data('collected-count'));
 
         // if no other periodic target values have changed, update the snapshot to reflect new server state
@@ -460,16 +460,16 @@
     // When adding an event, a row may need to be dynamically inserted
     function createPeriodicTargetRow() {
         return `
-                <tr class="periodic-target" data-collected-count="0" data-ptid="0">
-                    <td class="text-left d-flex align-items-center td--stretch">
+                <li class="periodic-target list-group-item item--event" data-collected-count="0" data-ptid="0">
+                    <div class="item__label">
                         <a href="#" class="deletebtn btn btn-sm event-target-delete-button">
                             <i class="fas fa-times text-danger"></i>
                         </a>
                         <input type="text" placeholder="{% trans 'Enter event name' %}" class="form-control input-text">
                                 <span style="margin:0px;" class="help-block"> </span>
-                    </td>
+                    </div>
 
-                    <td class="text-right">
+                    <div class="item__value">
                         <span class=${ $("#id_unit_of_measure_type_1").is(":checked")?"input-symbol-percent":""}>
                             <input
                                 type="number"
@@ -479,8 +479,8 @@
                                 class="form-control input-value">
                         </span>
                         <span id="hint_id_pt_0" style="margin:0px;" class="help-block"> </span>
-                    </td>
-                </tr>
+                    </div>
+                </li>
             `;
     }
 
@@ -489,7 +489,7 @@
         e.preventDefault();
 
         let markup = createPeriodicTargetRow();
-        $("#periodic_targets_table tbody tr:nth-last-child(1)").before(markup);
+        $("#periodic_targets_table li:nth-last-child(1)").before(markup);
     });
 
     // submits form - returns a jQuery deferred obj to attached callbacks onto
@@ -702,7 +702,7 @@
     function getIsPercentage() {
         return $("#id_unit_of_measure_type_1").is(":checked");
     }
-    
+
     function cleanFloat(value) {
         if (isNaN(parseFloat(value))) {
             return value;
@@ -824,7 +824,7 @@
         validation_msgs['lop_target_not_matching'] = msg;
         showValidations('#modalmessages');
     }
-    
+
     function validateName() {
         const $nameField = $('#id_name');
         const $nameValidation = $('#validation_id_name');
@@ -848,7 +848,7 @@
             return true;
         }
     }
-    
+
 
     function reset_baseline_errors(){
         $("#id_baseline").removeClass('is-invalid');
@@ -1040,7 +1040,7 @@
         var validationsSummaryTab = true;
         var validationsPerformanceTab = true;
         var noMessageValidations = true;
-        
+
         if  (validate_baseline() === false ) {
             validationsTargetTab = false
         }
@@ -1077,7 +1077,7 @@
         if (validateName() === false) {
             noMessageValidations = false;
         }
-        
+
         /* validate fields from the Performance tab */
         if (validateForEmptyField("id_level") === false) {
             validationsSummaryTab = false;
@@ -1087,8 +1087,8 @@
             validation_msgs['summary'] = '{% trans "Please complete all required fields in the Summary tab."|escapejs %}';
         }
 
-        
-        
+
+
         if (validateForEmptyField("id_old_level") === false) {
             validationsPerformanceTab = false;
         }
@@ -1164,7 +1164,7 @@
         $("#id_baseline_na").prop('checked', false);
         validate_baseline();
     });
-    
+
     $("#indicator_modal_content").on("keyup", "#id_name", function(e){
         validateName();
     });
@@ -1193,7 +1193,7 @@
         let periodic_targets = [];
 
         // Collect all existing periodic_targets into an array.
-        $('#periodic_targets_table tbody tr.periodic-target').each(function () {
+        $('#periodic_targets_table .periodic-target').each(function () {
             let $this = $(this);
             let eventNameElement = $($this.find('input[type=text]'));
             let targetValueSelector = $($this.find('input[type=number]'));
