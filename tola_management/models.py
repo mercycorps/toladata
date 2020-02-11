@@ -680,7 +680,7 @@ class CountryAdminAuditLog(models.Model, DiffableLog):
     def field_map(self):
         return {
             # Translators: Heading for list of disaggregation types assigned to a country
-            "disaggregation_type_name": _("Disaggregation type"),
+            "disaggregation_type_name": _("Disaggregation"),
             # Translators: Heading for list of disaggregation categories in a particular disaggregation type.
             "disaggregation_category": _("Disaggregation category"),
             # Translators: Heading for list of disaggregation categories in a particular disaggregation type.
@@ -688,7 +688,7 @@ class CountryAdminAuditLog(models.Model, DiffableLog):
             # Translators: Heading for list of disaggregation categories in a particular disaggregation type.
             "is_archived": _("Archived"),
             # Translators: Heading for list of disaggregation categories in a particular disaggregation type.
-            "disaggregation_type": _("Disaggregation type"),
+            "disaggregation_type": _("Disaggregation"),
         }
 
     @property
