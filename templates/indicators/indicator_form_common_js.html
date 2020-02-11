@@ -866,15 +866,15 @@
             return true;
         }
 
-        if (!baseline.val()) {
-            errMsg = "{% trans 'Please complete this field. Your baseline can be zero.'|escapejs %}";
-        } else if (!$.isNumeric(baseline.val()) || baseline.val() < 0 ) {
-            errMsg = "{% trans 'Please complete this field. Your baseline can be zero.'|escapejs %}";
+        if (baseline.val() === '') {
+            errMsg = "{% trans 'Please enter a number greater than or equal to zero.'|escapejs %}";
+        } else if (baseline.numericVal() === null) {
+            errMsg = "{% trans 'Please enter a number greater than or equal to zero.'|escapejs %}";
         }
         if (errMsg){
             baseline.addClass('is-invalid');
             // baseline_na.addClass('is-invalid');
-            $("#validation_id_baseline").html(errMsg);
+            $("#validation_id_baseline").html(`<small>${errMsg}</small>`);
             return false;
         } else {
             reset_baseline_errors();
@@ -893,8 +893,8 @@
         }
 
         let errMsg = undefined;
-        if (!lop.val() || !$.isNumeric(lop.val()) || lop.val() <= 0) {
-            errMsg = "{% trans 'Please enter a number larger than zero.'|escapejs %}";
+        if (lop.numericVal() === null) {
+            errMsg = "{% trans 'Please enter a number greater than zero.'|escapejs %}";
         }
 
         if (errMsg) {
