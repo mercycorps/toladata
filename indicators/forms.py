@@ -587,7 +587,8 @@ class BaseDisaggregatedValueFormSet(forms.BaseFormSet):
 
 class DisaggregatedValueForm(forms.Form):
     label_pk = forms.IntegerField(widget=forms.HiddenInput(), required=False)
-    value = NonLocalizedDecimalField(decimal_places=2, localize=True, required=False)
+    value = NonLocalizedDecimalField(decimal_places=2, localize=True, required=False,
+                                     widget=forms.TexTInput(attrs={'autocomplete': 'off'}))
 
     def __init__(self, *args, **kwargs):
         kwargs.setdefault('label_suffix', '')

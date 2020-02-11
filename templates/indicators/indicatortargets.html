@@ -16,52 +16,56 @@
             {{ targets_label.strip|capfirst }}
         </h3>
         <div class="" id="periodic-targets-tablediv">
-            <table class="table table-sm periodic-targets__table" id="periodic_targets_table">
-                <tbody>
-                    {% for pt in periodic_targets %}
-                    {% if indicator.target_frequency == 8 %} {# 8 is an EVENT #}
-                        {% if pt.id %}
-                            <tr data-collected-count="{{ pt.num_data }}"
-                                data-ptid="{{ pt.id }}"
-                                class="periodic-target">
-                                <td class="text-left d-flex align-items-center td--stretch">
-                                    {% if not readonly %}
-                                    <a href="{% url 'pt_delete' pt.id %}" id="delete_event_{{ pt.id }}"
-                                       class="deletebtn btn btn-sm event-target-delete-button">
-                                        <i class="fas fa-times text-danger"></i>
-                                    </a>
-                                    {% endif %}
-                        {% else %}
-                            <tr id="target_row_{{forloop.counter0}}"
-                                data-collected-count="0"
-                                data-ptid="0"
-                                class="periodic-target">
-                                <td class="text-left d-flex align-items-center td--stretch">
-                                    <a href="#" id="delete_event_{{forloop.counter0}}"
-                                       data-target-row="target_row_{{forloop.counter0}}"
-                                       class="deletebtn btn btn-sm event-target-delete-button">
-                                        <i class="fas fa-times text-danger"></i>
-                                    </a>
-                        {% endif %}
-                            <input type="text"
-                                   placeholder="{% trans 'Enter event name' %}"
-                                   name="{{ pt.period }}"
-                                   value="{{ pt.period }}"
-                                   class="form-control input-text target-label"
-                                   {% if readonly %}disabled="disabled"{% endif %}>
-                            <span style="" class="help-block"> </span>
-                        </td>
+            <ul class="list-group form-list-group" id="periodic_targets_table">{# this ul is closed AFTER the for-loop beloe #}
+                {% for pt in periodic_targets %}
+                {% if indicator.target_frequency == 8 %} {# 8 is an EVENT #}
+                    {% if pt.id %}
+                        {# this li is closed inside the for-loop but after all other conditions have closed #}
+                        <li data-collected-count="{{ pt.num_data }}"
+                            data-ptid="{{ pt.id }}"
+                            class="periodic-target list-group-item item--event">
+                            <div class="item__label">
+                                {% if not readonly %}
+                                <a href="{% url 'pt_delete' pt.id %}" id="delete_event_{{ pt.id }}"
+                                   class="deletebtn btn btn-sm event-target-delete-button">
+                                    <i class="fas fa-times text-danger"></i>
+                                </a>
+                                {% endif %}
                     {% else %}
-                    <tr id="{{ pt.id }}" data-collected-count="{{ pt.num_data }}" class="periodic-target">
-                        <td class="text-left align-middle td--stretch">
+                        {# this li is closed inside the for-loop but after all other conditions have closed #}
+                        <li id="target_row_{{forloop.counter0}}"
+                            data-collected-count="0"
+                            data-ptid="0"
+                            class="periodic-target list-group-item item--event">
+                            <div class="item__label">
+                                <a href="#" id="delete_event_{{forloop.counter0}}"
+                                   data-target-row="target_row_{{forloop.counter0}}"
+                                   class="deletebtn btn btn-sm event-target-delete-button">
+                                    <i class="fas fa-times text-danger"></i>
+                                </a>
+                    {% endif %}
+                                {# input for event target LABEL #}
+                                {# this li is closed inside the for-loop but after all other conditions have closed #}
+                                <input type="text"
+                                       placeholder="{% trans 'Enter event name' %}"
+                                       name="{{ pt.period }}"
+                                       value="{{ pt.period }}"
+                                       class="form-control input-text"
+                                       {% if readonly %}disabled="disabled"{% endif %}>
+                                <span style="" class="help-block"> </span>
+                            </div>
+                {% else %} {# all non-events #}
+                    {# this li is closed inside the for-loop but after all other conditions have closed #}
+                    <li class="list-group-item periodic-target" id="{{ pt.id }}" data-collected-count="{{ pt.num_data }}">
+                        <div class="item__label">
                             <strong>{{ pt.period_name }}</strong>
                             {% if pt.start_date %}
                                 <br><small>{{ pt.start_date|convert2dateobject|date:"MEDIUM_DATE_FORMAT"|default:'' }} {% if pt.start_date %} - {% endif %} {{ pt.end_date|convert2dateobject|date:"MEDIUM_DATE_FORMAT"|default:'' }}</small>
                             {% endif %}
-                        </td>
-                        {% endif %}
+                        </div>
+                {% endif %}
 
-                        <td class="text-right align-middle">
+                        <div class="item__value">
                             <span id="id_span_{{ pt.id }}" class="{% if indicator.unit_of_measure_type == 2 %}input-symbol-percent{% endif %}">
                                 <input
                                     type="text"
@@ -76,29 +80,23 @@
                                     class="form-control input-value periodic-target-input">
                             </span>
                             <span id="hint_id_pt_{{pt.id}}" style="margin:0px;" class="help-block"> </span>{# TODO: this style attr #}
-                        </td>
-                    </tr>
-                    {% endfor %}{# for pt in periodic_targets #}
+                        </div>
+                    </li>{# end of pt in periodic_targets #}
+                {% endfor %}{# for pt in periodic_targets #}
 
-                    <tr class="table-secondary">
-                        <td class="periodic-targets__sum text-left td--stretch">
-                            <strong>{% trans "Life of Program (LoP) target" %}</strong>
-                        </td>
-                        <td class="periodic-targets__sum text-right ">
-                            <strong class="periodic-targets__sum__value {% if indicator.unit_of_measure_type == 2 %}input-symbol-percent{% endif %}">
-                                <span id="id_span_loptarget" class="input-value">
-
-                                </span>
-                            </strong>
-                        </td>
-                    </tr>
-                </tbody>
-                <tfoot>
-                    <tr class="bg-danger-lighter">
-                        <td colspan="2" class="text-danger" style="padding: 0px" id="id_pt_errors"></td>
-                    </tr>
-                </tfoot>
-            </table>
+                <li class="list-group-item reference-row">
+                    <div class="periodic-targets__sum item__label">
+                        <strong>{% trans "Life of Program (LoP) target" %}</strong>
+                    </div>
+                    <div class="periodic-targets__sum item__value">
+                        <strong class="periodic-targets__sum__value {% if indicator.unit_of_measure_type == 2 %}input-symbol-percent{% endif %}">
+                            <span id="id_span_loptarget" class="input-value">
+                            </span>
+                        </strong>
+                    </div>
+                </li>
+            </ul>
+            <div class="text-danger item__label" id="id_pt_errors"></div>
         </div>
 
         <div class="d-flex justify-content-between align-items-baseline">
@@ -188,35 +186,29 @@
         </h3>
 
         <div class="" id="periodic-targets-tablediv">
-            <table class="table table-sm periodic-targets__table" id="periodic_targets_table">
-                <tbody>
-                    <tr class="table-secondary lop-only-target">
-                        <td class="periodic-targets__sum text-left">
-                            <strong>{% trans "Life of Program (LoP) target" %}</strong>
-                        </td>
-                        <td class="periodic-targets__sum text-right">
-                            <span id="span_id_lop_target" class="{% if indicator.unit_of_measure_type == 2 %}input-symbol-percent{% endif %}">
-                                <input type="text"
-                                       name="lop_target"
-                                       id="id_lop_target"
-                                       class="form-control input-value periodic-target-input"
-                                       min="1"
-                                       {% if readonly %}disabled="disabled"{% endif %}
-                                    {% if indicator.lop_target != None %}
-                                       value="{{ indicator.lop_target_stripped }}"
-                                    {% endif %}
-                                       required
-                                >
-                            </span>
-                        </td>
-                    </tr>
-                </tbody>
-                <tfoot>
-                    <tr class="bg-danger-lighter">
-                        <td colspan="2" class="text-danger" style="padding: 0px" id="id_pt_errors"></td>
-                    </tr>
-                </tfoot>
-            </table>
+            <ul class="list-group form-list-group periodic-targets__table" id="periodic_targets_table">
+                <li class="list-group-item periodic-target reference-row">
+                    <div class="item__label">
+                        <strong>{% trans "Life of Program (LoP) target" %}</strong>
+                    </div>
+                    <div class="item__value">
+                        <span id="span_id_lop_target" class="input-value {% if indicator.unit_of_measure_type == 2 %}input-symbol-percent{% endif %}">
+                            <input type="text"
+                                   name="lop_target"
+                                   id="id_lop_target"
+                                   class="form-control input-value periodic-target-input"
+                                   min="1"
+                                   {% if readonly %}disabled="disabled"{% endif %}
+                                   {% if indicator.lop_target != None %}
+                                   value="{{ indicator.lop_target_stripped }}"
+                                   {% endif %}
+                                   required
+                                   >
+                        </span>
+                    </div>
+                </li>
+            </ul>
+            <div class="text-danger item__label" id="id_pt_errors"></div>
         </div>
 
         {% if not readonly %}
