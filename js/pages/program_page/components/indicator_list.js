@@ -185,7 +185,6 @@ export class IndicatorListTable extends React.Component {
         const indicators = this.props.indicators;
         const program = this.props.program;
         const resultsMap = this.props.program.resultsMap;
-
         return <table className="table indicators-list">
             <thead>
             <tr className="table-header">
@@ -203,9 +202,12 @@ export class IndicatorListTable extends React.Component {
                 const resultsExist = resultsMap.has(indicator.pk);
                 const resultsStr = resultsExist ? resultsMap.get(indicator.pk) : "";
                 const targetPeriodLastEndDate = indicator.targetPeriodLastEndDate;
+                const localizeFunc = ['fr', 'es'].includes(userLang) ?
+                    (val) => `${val}`.replace('.', ',') :
+                    (val) => `${val}`.replace(',', '.');
                 const displayFunc = indicator.isPercent ?
-                        (val) => val ? `${val}%` : '' :
-                        (val) => val ? `${val}` : '';
+                        (val) => val ? `${localizeFunc(val)}%` : '' :
+                        (val) => val ? `${localizeFunc(val)}` : '';
                 const numberCellFunc = (val) => {
                     if (val == '' || isNaN(parseFloat(val))) {
                         return '';

@@ -96,13 +96,15 @@ const IndicatorNameExpandoCell = observer(({ value, expanded, clickHandler, ...p
     );
 })
 
+const localizeFunc = ['es', 'fr'].includes(userLang) ? (val) => `${val}`.replace('.', ',') : (val) => `${val}`.replace(',', '.');
 
 const PercentCell = ({ value, ...props }) => {
-    value = (value !== undefined && value !== null) ? `${value}%` : null;
+    value = (value !== undefined && value !== null) ? `${localizeFunc(value)}%` : null;
     return <IndicatorCell className="indicator-cell percent-cell" value={ value } { ...props } />;
 }
 
 const NumberCell = ({ value, ...props }) => {
+    value = (value !== undefined && value !== null) ? localizeFunc(value) : null;
     return <IndicatorCell className="indicator-cell number-cell" value={ value } { ...props } />;
 }
 
