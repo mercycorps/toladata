@@ -202,9 +202,7 @@ export class IndicatorListTable extends React.Component {
                 const resultsExist = resultsMap.has(indicator.pk);
                 const resultsStr = resultsExist ? resultsMap.get(indicator.pk) : "";
                 const targetPeriodLastEndDate = indicator.targetPeriodLastEndDate;
-                const localizeFunc = ['fr', 'es'].includes(userLang) ?
-                    (val) => `${val}`.replace('.', ',') :
-                    (val) => `${val}`.replace(',', '.');
+                const localizeFunc = window.localizeNumber;
                 const displayFunc = indicator.isPercent ?
                         (val) => val ? `${localizeFunc(val)}%` : '' :
                         (val) => val ? `${localizeFunc(val)}` : '';

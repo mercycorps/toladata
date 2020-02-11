@@ -96,7 +96,9 @@ const IndicatorNameExpandoCell = observer(({ value, expanded, clickHandler, ...p
     );
 })
 
-const localizeFunc = ['es', 'fr'].includes(userLang) ? (val) => `${val}`.replace('.', ',') : (val) => `${val}`.replace(',', '.');
+
+const localizeFunc = window.localizeNumber;
+
 
 const PercentCell = ({ value, ...props }) => {
     value = (value !== undefined && value !== null) ? `${localizeFunc(value)}%` : null;

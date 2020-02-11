@@ -743,3 +743,42 @@ jQuery.fn.extend({
         }
     }
 });
+
+window.localizeNumber = (val) => {
+    if (val === undefined || val === null || isNaN(parseFloat(val))) {
+        return null;
+    }
+    var intPart = val.toString();
+    var floatPart = null;
+    if (val.toString().includes(",")) {
+        intPart = val.toString().split(",")[0];
+        floatPart = val.toString().split(",").length > 1 ? val.toString().split(",")[1 ] : null;
+    } else if (val.toString().includes(".")) {
+        intPart = val.toString().split(".")[0];
+        floatPart = val.toString().split(".").length > 1 ? val.toString().split(".")[1 ] : null;
+    }
+    floatPart = (floatPart && floatPart.length > 0) ? floatPart : null;
+    var displayValue;
+    switch(userLang) {
+        case 'es':
+            displayValue = intPart.replace(/\B(?=(\d{3})+(?!\d))/g, ".");
+            if (floatPart) {
+                displayValue += `,${floatPart}`;
+            }
+        break;
+        case 'fr':
+            displayValue = intPart.replace(/\B(?=(\d{3})+(?!\d))/g, String.fromCharCode(160)); //nbsp
+            if (floatPart) {
+                displayValue += `,${floatPart}`;
+            }
+        break;
+        case 'en':
+        default:
+            displayValue = intPart.replace(/\B(?=(\d{3})+(?!\d))/g, ",");
+            if (floatPart) {
+                displayValue += `.${floatPart}`;
+            }
+        break;
+    }
+    return displayValue;
+}
