@@ -69,6 +69,7 @@ export default (
         _groupBy: GROUP_BY_CHAIN,
         _indicatorFilters: {},
         _hiddenColumns: [],
+        _hiddenCategories: false,
         get isTVA() {
             return this._reportType === TVA;
         },
@@ -452,6 +453,7 @@ export default (
                                                 .map(disaggregation => ({value: disaggregation.pk, label: disaggregation.name, country: disaggregation.country}));
             let countries = [...new Set(disaggregationOptions.map(option => option.country))].filter(country => country !== null).sort();
             let optgroups = [];
+            optgroups.push({value: "hide-categories", label: gettext('Only show categories with results'), noList: true});
             if (disaggregationOptions.filter(option => option.country === null).length > 0) {
                 optgroups.push({label: gettext('Global disaggregations'), options: disaggregationOptions.filter(option => option.country === null)});
             }
@@ -475,11 +477,16 @@ export default (
                     .map(disaggregation => disaggregation.pk) : []  
         },
         get disaggregationFilters() {
-            let disaggregationOptions = [].concat.apply([], this.disaggregationOptions.map(optgroup => optgroup.options))
-            return disaggregationOptions.filter(option => (option && option.value && this._indicatorFilters.disaggregations.includes(option.value)));
+            let disaggregationOptions = [].concat.apply([], this.disaggregationOptions.slice(1).map(optgroup => optgroup.options));
+            disaggregationOptions = disaggregationOptions.filter(option => (option && option.value && this._indicatorFilters.disaggregations.includes(option.value)));
+            if (this._hiddenCategories) {
+                disaggregationOptions = [this.disaggregationOptions[0], ...disaggregationOptions];
+            }
+            return disaggregationOptions;
         },
         set disaggregationFilters(disaggregationFilterValues = []) {
-            this._indicatorFilters.disaggregations = disaggregationFilterValues.map(v => parseInt(v));
+            this._indicatorFilters.disaggregations = disaggregationFilterValues.filter(v => v != 'hide-categories').map(v => parseInt(v));
+            this._hiddenCategories = disaggregationFilterValues.includes('hide-categories');
         },
         get indicatorTypeOptions() {
             let typePks = [...new Set(this.getAllIndicators('types').map(
