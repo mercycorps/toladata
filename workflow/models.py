@@ -375,6 +375,7 @@ class TolaUserProxy(TolaUser):
 
 class CountryAccessInline(admin.TabularInline):
     model = CountryAccess
+    ordering = ('country',)
 
 class TolaUserAdmin(admin.ModelAdmin):
 
