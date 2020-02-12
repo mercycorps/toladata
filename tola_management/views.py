@@ -694,7 +694,7 @@ class UserAdminViewSet(viewsets.ModelViewSet):
         serializer = UserManagementAuditLogSerializer(queryset, many=True)
         return Response(serializer.data)
 
-    @action(detail=True, methods=['GET'])
+    @action(detail=True, methods=['GET', 'PUT'])
     def is_active(self, request, pk=None):
         is_active = request.data['user']['is_active']
         user = get_object_or_404(TolaUser, id=pk)
