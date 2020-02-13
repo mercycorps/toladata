@@ -184,7 +184,14 @@ a.accordion-row__btn.btn.btn-link {
     }
 }
 
+.item__value {    
+}
+
+.error-row {
+}
+
 .ul__error_row {
+    background-color: $red-050;
     margin-top: -15px;
     line-height: 2em;
     &>.target-value-error {
