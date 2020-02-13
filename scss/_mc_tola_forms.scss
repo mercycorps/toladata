@@ -183,9 +183,13 @@ a.accordion-row__btn.btn.btn-link {
         margin-bottom: 0;
     }
 }
-.item__value {
-}
-.error-row {
+
+.ul__error_row {
+    margin-top: -15px;
+    line-height: 2em;
+    &>.target-value-error {
+      padding-left: 6px;  
+    }
 }
 .reference-row {
     background-color: $gray-200;
