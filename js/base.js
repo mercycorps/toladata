@@ -656,20 +656,44 @@ function scrollToBottom($el) {
 window.scrollToBottom = scrollToBottom;
 
 
+const CONTROL_CHARACTER_KEYCODES = [
+    8, //backspace
+    9, //tab
+    13, //enter
+    27, //escape
+    35, //end,
+    36, //home
+    37, //arrow left
+    39, //arrow right
+    46, //delete
+]
+
+const SPANISH = 'es';
+const FRENCH = 'fr';
+const ENGLISH = 'en';
+
+/***********
+ * LOCALE-AWARE FORM INPUT FUNCTIONS:
+ *  these functions are for _inputs_ (and divs/spans being used to show user input)
+ *  they do not account for thousands separators, and merely convert back and forth between ',' and '.' floating-point separators
+ **********/
+
 /**
  * takes a selector string, (i.e. '#id_achieved') returns an input that is validated based on
  * universal rules (2 decimal places, comma or period as floating-point separator, no negative signs)
+ * e.g.```
+ *      let $myInput = window.getValidatedNumericInput('#my_input_id');
+ * ```
+ * returns the input selected by $('#my_input_id') but with rules preventing non-numeric input, and with an auto-updating
+ * display value (strips trailing zeros, converts floating point to locale-aware display of a number)
  */
 function getValidatedNumericInput(selector) {
     let $input = $(selector);
     function preventNonNumericInput(e) {
-        if ($.inArray(e.keyCode, [46, 8, 9, 27, 13, 110]) !== -1 ||
+        // allow cursor control characters:
+        if (CONTROL_CHARACTER_KEYCODES.includes(e.keyCode) ||
             // allow: Ctrl characters (don't break browsers):
-            (e.ctrlKey === true || e.metaKey === true) ||
-            // allow home, end, left, right
-            (e.keyCode >= 35 && e.keyCode <= 39) //||
-            // allow negative sign
-           //($.inArray(e.keyCode, [109, 189, 173]) !== -1)
+            (e.ctrlKey === true || e.metaKey === true))
            ) {
             // don't do anything (allow key to be used as normal)
             return;
@@ -678,15 +702,18 @@ function getValidatedNumericInput(selector) {
         let curVal = `${$(e.target).val()}`;
         let floatingPointPosition = Math.max(curVal.indexOf('.'), curVal.indexOf(','));
         if ((curVal.match(/[,.]/) || []).length > 0 && curVal.length - floatingPointPosition > 2 && e.target.selectionStart > floatingPointPosition) {
+            //prevent numbers more than 2 spaces to the right of the decimal/comma from being entered:
             e.preventDefault();
             return;
         }
-        // Allow numbers:
+        // allow numbers (48 - 57 map to 0-9):
         if ((e.keyCode >= 48 && e.keyCode <= 57 && !e.shiftKey) ||
             // allow comma or period if there isn't one already:
             ($.inArray(e.keyCode, [188, 190]) !== -1 && (curVal.match(/[,.]/) || []).length < 1)) {
+            // don't do anything (allow number / decimal / comma to be entered as normal)
             return;
         }
+        // prevent any key not mentioned above from being entered:
         e.preventDefault();
         return;
     }
@@ -704,6 +731,8 @@ window.getValidatedNumericInput = getValidatedNumericInput;
 
 
 jQuery.fn.extend({
+    // $input.numericVal() returns a float or null, and handles a displayed value with a comma floating-point separator or decimal
+    // so "43,2" as a French/Spanish number returns, from numericVal(), the float 43.2
     numericVal: function() {
         if (this.is('input')) {
             return !isNaN(parseFloat(this.val().replace(',', '.'))) ? parseFloat(this.val().replace(',', '.')) : null;
@@ -716,16 +745,19 @@ jQuery.fn.extend({
             return !isNaN(value) ? value : null;
         }
     },
+    // updates the displayed value based on the stored numeric value of an input:
     updateDisplayVal: function() {
         this.displayVal(this.val());
     },
+    // helper function: called with a float/int/string representation of a number, returns a display-ready string,
+    // with trailing zeros removed (and trailing , or .) and the correct floating-point separator based on language
     toDisplayVal: function(value) {
         value = `${value}`;
         if (isNaN(parseFloat(value))) {
             return '';
         }
         value = `${parseFloat(value.replace(',', '.')).toFixed(2)}`;
-        if (['fr', 'es'].includes(userLang)) {
+        if ([FRENCH, ENGLISH].includes(userLang)) {
             value = value.replace('.', ',');
         } else {
             value = value.replace(',', '.');
@@ -733,6 +765,8 @@ jQuery.fn.extend({
         value = value.replace(new RegExp("([,\.][1-9])?[,\.]?0+$"), "$1");
         return value;
     },
+    // called with a float/int/string representation of a number, processes it with the above helper function toDisplayVal,
+    // and sets the val (if an input) or the inner html (if a span/div)
     displayVal: function(value, percent = false) {
         value = this.toDisplayVal(value);
         if (this.is('input')) {
@@ -743,6 +777,18 @@ jQuery.fn.extend({
         }
     }
 });
+
+
+/***********
+ * LOCALE-AWARE DISPLAY FUNCTIONS
+ *  these functions are for _display_ - they will break forms
+ *  they account for thousands separators and floating point separators, and trim zeros.
+ *  12423.40:
+ *      ES: 12.423,4
+ *      FR: 12 423,4
+ *      EN: 12,423.4
+ **********/
+
 
 window.localizeNumber = (val) => {
     if (val === undefined || val === null || isNaN(parseFloat(val))) {
@@ -760,25 +806,25 @@ window.localizeNumber = (val) => {
     floatPart = (floatPart && floatPart.length > 0) ? floatPart : null;
     var displayValue;
     switch(userLang) {
-        case 'es':
+        case SPANISH:
             displayValue = intPart.replace(/\B(?=(\d{3})+(?!\d))/g, ".");
             if (floatPart) {
                 displayValue += `,${floatPart}`;
             }
         break;
-        case 'fr':
+        case FRENCH:
             displayValue = intPart.replace(/\B(?=(\d{3})+(?!\d))/g, String.fromCharCode(160)); //nbsp
             if (floatPart) {
                 displayValue += `,${floatPart}`;
             }
         break;
-        case 'en':
+        case ENGLISH:
         default:
             displayValue = intPart.replace(/\B(?=(\d{3})+(?!\d))/g, ",");
             if (floatPart) {
                 displayValue += `.${floatPart}`;
             }
         break;
-    }
+ v   }
     return displayValue;
 }
