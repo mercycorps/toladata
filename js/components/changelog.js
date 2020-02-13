@@ -1,6 +1,7 @@
 import React from 'react'
 import { observer } from 'mobx-react';
 import {FontAwesomeIcon} from "@fortawesome/react-fontawesome"
+import { toJS } from 'mobx'
 
 
 export const ChangeField = ({name, data, extraTitleText=null}) => {
@@ -72,43 +73,42 @@ const ChangeLogEntryRowBuilder = ({data}) => {
     const nullRow = <ChangeLogEntryRow previous={gettext("No differences found")} new={null} id={1} key={1}/>
 
     // If they manage to store a log without any diffs at all, send them to the soft landing place.
-    if (data.diff_list.length === 0){
+    if ((Array.isArray(data.diff_list) && data.diff_list.length === 0) || (Object.keys(data.diff_list).length === 0)) {
         allRows.push(nullRow);
         return allRows
     }
 
     if (data.change_type === 'user_programs_updated') {
         // Create multiple row for program/country changes:
-        if (Object.entries(data.diff_list.countries).length > 0) {
-            Object.entries(data.diff_list.countries).forEach( ([id, country]) => {
-                const key = `${id}_${country}`;
-                const previousEntry = <React.Fragment>
-                    <ChangeField name={gettext("Country")} data={country.prev.country} />
-                    <ChangeField name={gettext("Role")} data={country.prev.role} />
-                </React.Fragment>;
-                const newEntry = <React.Fragment>
-                    <ChangeField name={gettext("Country")} data={country.new.country} />
-                    <ChangeField name={gettext("Role")} data={country.new.role} />
-                </React.Fragment>;
+        Object.entries(data.diff_list.countries).forEach( ([id, country]) => {
+            const key = `${id}_${country}`;
+            const previousEntry = <React.Fragment>
+                <ChangeField name={gettext("Country")} data={country.prev.country} />
+                <ChangeField name={gettext("Role")} data={country.prev.role} />
+            </React.Fragment>;
+            const newEntry = <React.Fragment>
+                <ChangeField name={gettext("Country")} data={country.new.country} />
+                <ChangeField name={gettext("Role")} data={country.new.role} />
+            </React.Fragment>;
 
-                allRows.push(<ChangeLogEntryRow previous={previousEntry} new={newEntry} id={key} key={key} />);
-            });
-            Object.entries(data.diff_list.programs).forEach(([id, program]) => {
-                const key = `${id}_${program}`;
-                const previousEntry = <React.Fragment>
-                    <ChangeField name={gettext("Program")} data={program.prev.program} />
-                    <ChangeField name={gettext("Country")} data={program.prev.country} />
-                    <ChangeField name={gettext("Role")} data={program.prev.role} />
-                </React.Fragment>;
-                const newEntry = <React.Fragment>
-                    <ChangeField name={gettext("Program")} data={program.new.program} />
-                    <ChangeField name={gettext("Country")} data={program.new.country} />
-                    <ChangeField name={gettext("Role")} data={program.new.role} />
-                </React.Fragment>;
+            allRows.push(<ChangeLogEntryRow previous={previousEntry} new={newEntry} id={key} key={key} />);
+        });
+        Object.entries(data.diff_list.programs).forEach(([id, program]) => {
+            const key = `${id}_${program}`;
+            const previousEntry = <React.Fragment>
+                <ChangeField name={gettext("Program")} data={program.prev.program} />
+                <ChangeField name={gettext("Country")} data={program.prev.country} />
+                <ChangeField name={gettext("Role")} data={program.prev.role} />
+            </React.Fragment>;
+            const newEntry = <React.Fragment>
+                <ChangeField name={gettext("Program")} data={program.new.program} />
+                <ChangeField name={gettext("Country")} data={program.new.country} />
+                <ChangeField name={gettext("Role")} data={program.new.role} />
+            </React.Fragment>;
 
-                allRows.push(<ChangeLogEntryRow previous={previousEntry} new={newEntry} id={key} key={key} />);
-            })
-        }
+            allRows.push(<ChangeLogEntryRow previous={previousEntry} new={newEntry} id={key} key={key} />);
+        })
+
     }
     else {
         let extraTitleText = null;

@@ -55,7 +55,7 @@
                         <strong>{% trans "Actual value" %}</strong>
                     </div>
                     <div class="item__value">
-                        <div class="value-cell actual-value-cell"></div>
+                        <div class="value-cell actual-value-cell {% if indicator.unit_of_measure_type == indicator.PERCENTAGE %}input-symbol-percent{% endif %}"></div>
                     </div>
                 </li>
             </ul>
