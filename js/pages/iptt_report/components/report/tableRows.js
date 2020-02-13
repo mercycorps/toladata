@@ -284,7 +284,7 @@ const LevelTitleRow = inject('rootStore')(
     observer(({ rootStore, children }) => {
         return (
             <tr>
-                <td colSpan={ rootStore.reportColumnWidth + 1 /* TODO: might be off by one ? */}
+                <td colSpan={ rootStore.reportColumnWidth + 1 }
                     className="iptt-level-row">
                    { children }
                 </td>

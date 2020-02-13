@@ -16,14 +16,14 @@ const ColGroups = inject('rootStore')(
                     span={ rootStore.baseColumns + 1 }
                     className="iptt-base-columns" />
                 <colgroup
-                    span={  3 }
+                    span={ 3 }
                     className="iptt-lop-columns" />
                 {
                     rootStore.reportPeriods.map(
                         (period, index) => (
                             <colgroup
                                 key={ index }
-                                span={ rootStore.isTVA ? 3 : 1}
+                                span={ rootStore.isTVA ? 3 : 1 }
                                 className="iptt-period-columns"
                                 id={ 'period-' + index }
                             />
@@ -45,7 +45,7 @@ const ProgramNameRow = inject('rootStore')(
         return (
             <tr className="title-row">
                 <td
-                    colSpan={ rootStore.baseColumns + 1}
+                    colSpan={ rootStore.baseColumns + 1 }
                     className="base-column">
                     <button className="btn btn-medium text-action btn-sm"
                         onClick={rootStore.expandAllRows.bind(rootStore)}
@@ -60,7 +60,7 @@ const ProgramNameRow = inject('rootStore')(
                         { gettext('Collapse all') }
                     </button>
                 </td>
-                <td scope="colgroup"
+                <td
                     colSpan={ 3 }
                     // centered under LOP superheader
                     className="iptt-period-header">
