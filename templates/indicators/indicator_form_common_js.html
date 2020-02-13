@@ -395,7 +395,6 @@
 
     // Button click handler for CREATE form (save and add another)
     $("#indicator_modal_content").on("click", "#id_save_and_add_another_indicator_btn", function(e){
-        console.log(initialLevelId())
         if (validateForm() === false) {
             showValidations("#modalmessages");
             return;
@@ -896,7 +895,7 @@
             errMsg = "{% trans 'The Life of Program (LoP) target cannot be zero.'|escapejs %}";
         }
         if (lop.numericVal() === null) {
-            errMsg = "{% trans 'Please enter a number greater than zero.'|escapejs %}";
+            errMsg = "{% trans 'Please enter a target.'|escapejs %}";
         }
         if (errMsg) {
             lop.addClass('is-invalid');
@@ -1007,12 +1006,10 @@
     }
 
     function showTargetErrors(msg) {
-        console.log("show erros", msg);
         $("#id_pt_errors").html(`<span class="target-value-error"><small>${msg}</small></span>`);
     }
 
     function clearTargetErrors() {
-        console.log("clearing");
         $("#id_pt_errors").empty();
     }
 
@@ -1045,11 +1042,9 @@
         if  (validate_baseline() === false ) {
             validationsTargetTab = false
         }
-        console.log("validating loptarget");
         if (validate_loptarget() === false ) {
             validationsTargetTab = false;
         }
-        console.log("validated loptarget");
         if (validateForEmptyField("id_unit_of_measure") === false ) {
             validationsTargetTab = false;
         }
@@ -1058,15 +1053,14 @@
             $("#div_id_target_frequency").addClass("marginbottom-225");
             $("#div_id_target_frequency").removeClass("mb-3")
         }
-        console.log("validating pts");
+        var periodicTargetsValidated = true;
         if (validatePeriodicTargets() === false) {
+            periodicTargetsValidated = false;
             validationsTargetTab = false;
         }
-console.log("validating computed lop");
-        if (validateComputedLopTarget() === false) {
+        if (periodicTargetsValidated && validateComputedLopTarget() === false) {
             validationsTargetTab = false;
         }
-console.log("validated computed lop");
         // validate periodic targets
         if ($("#id_div_periodic_tables_placeholder input").hasClass('is-invalid')) {
             validationsTargetTab = false;
@@ -1138,7 +1132,7 @@ console.log("validated computed lop");
         } else {
             $(this).addClass('is-invalid');
         }
-        if ($("#id_div_periodic_tables_placeholder input[type=text], input[type=number]").hasClass("has-error") ) {
+        if ($("#id_div_periodic_tables_placeholder input[type=text], input[type=number]").hasClass("is-invalid") ) {
             showTargetErrors(getPTMessage());
         }
     });
