@@ -693,7 +693,7 @@ function getValidatedNumericInput(selector) {
         // allow cursor control characters:
         if (CONTROL_CHARACTER_KEYCODES.includes(e.keyCode) ||
             // allow: Ctrl characters (don't break browsers):
-            (e.ctrlKey === true || e.metaKey === true))
+            (e.ctrlKey === true || e.metaKey === true)
            ) {
             // don't do anything (allow key to be used as normal)
             return;
