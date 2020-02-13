@@ -13,10 +13,10 @@ const ColGroups = inject('rootStore')(
         return (
             <React.Fragment>
                 <colgroup
-                    span={ rootStore.hasBaselineColumn ? rootStore.baseColumns : rootStore.baseColumns + 1}
+                    span={ rootStore.baseColumns + 1 }
                     className="iptt-base-columns" />
                 <colgroup
-                    span={ rootStore.hasBaselineColumn ? 4 : 3 }
+                    span={  3 }
                     className="iptt-lop-columns" />
                 {
                     rootStore.reportPeriods.map(
@@ -45,7 +45,7 @@ const ProgramNameRow = inject('rootStore')(
         return (
             <tr className="title-row">
                 <td
-                    colSpan={ rootStore.hasBaselineColumn ? rootStore.baseColumns : rootStore.baseColumns + 1}
+                    colSpan={ rootStore.baseColumns + 1}
                     className="base-column">
                     <button className="btn btn-medium text-action btn-sm"
                         onClick={rootStore.expandAllRows.bind(rootStore)}
@@ -61,7 +61,7 @@ const ProgramNameRow = inject('rootStore')(
                     </button>
                 </td>
                 <td scope="colgroup"
-                    colSpan={ rootStore.hasBaselineColumn ? 4 : 3 }
+                    colSpan={ 3 }
                     // centered under LOP superheader
                     className="iptt-period-header">
                     <span className="text-uppercase">
@@ -143,7 +143,7 @@ const ColumnHeaderRow = inject('rootStore')(
                         gettext('# / %')
                     } /> }
                 { rootStore.hasBaselineColumn && <HeaderCells.HeaderCell
-                    className='lop-column'
+                    className='base-column'
                     label={
                         /* # Translators: Column header */
                         gettext('Baseline')
