@@ -266,7 +266,7 @@
                             <div class="" id="fieldgroup_id_baseline">
                                 <div id="div_id_baseline">
                                 <span id="span_{{ form.baseline.id_for_label }}">
-                                    <input type="number"
+                                    <input type="text"
                                            {% if readonly %}disabled="disabled"{% endif %}
                                            name="{{ form.baseline.name }}"
                                            id="{{ form.baseline.id_for_label }}"
@@ -477,6 +477,10 @@
         $('#indicator_modal_div [data-toggle="popover"]').popover();
         // initial state of target frequency box if form is already populated
         disable_target_frequency_field();
+        
+        //make baseline field a numeric input
+        window.getValidatedNumericInput('#id_baseline');
+        
 
         // Disabled objectives pulldown if nothing to choose
         if ($("#id_objectives option").length < 1) {

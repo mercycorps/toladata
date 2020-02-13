@@ -10,6 +10,8 @@ from workflow.models import (
     Sector,
 )
 from tola.util import getCountry
+from tola.forms import NonLocalizedDecimalField
+
 from indicators.models import (
     Indicator,
     PeriodicTarget,
@@ -171,6 +173,9 @@ class IndicatorForm(forms.ModelForm):
         choices=[('', '------')] + [(name, name) for (pk, name) in Indicator.OLD_LEVELS],
         initial=None
     )
+
+    baseline = NonLocalizedDecimalField(decimal_places=2, localize=True, required=False)
+    lop_target = NonLocalizedDecimalField(decimal_places=2, localize=True, required=False)
 
     rationale = forms.CharField(required=False)
 
@@ -385,6 +390,7 @@ class IndicatorForm(forms.ModelForm):
 
 class ResultForm(forms.ModelForm):
     rationale = forms.CharField(required=False)
+    achieved = NonLocalizedDecimalField(decimal_places=2, localize=True)
 
     class Meta:
         model = Result
@@ -581,8 +587,8 @@ class BaseDisaggregatedValueFormSet(forms.BaseFormSet):
 
 class DisaggregatedValueForm(forms.Form):
     label_pk = forms.IntegerField(widget=forms.HiddenInput(), required=False)
-    value = forms.DecimalField(decimal_places=2, localize=True, required=False,
-                               widget=forms.NumberInput(attrs={'autocomplete':'off'}))
+    value = NonLocalizedDecimalField(decimal_places=2, localize=True, required=False,
+                                     widget=forms.TextInput(attrs={'autocomplete': 'off'}))
 
     def __init__(self, *args, **kwargs):
         kwargs.setdefault('label_suffix', '')

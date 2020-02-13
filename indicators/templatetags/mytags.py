@@ -157,8 +157,8 @@ def js(obj):
 def strip_trailing_zero(value):
     """Like builtin "floatformat" but strips trailing zeros from the right (12.5 does not become 12.50)"""
     value = str(value)
-    if "." in value:
-        return value.rstrip("0").rstrip(".")
+    if "." in value or "," in value:
+        return value.rstrip("0").rstrip(".").rstrip(",")
     return value
 
 

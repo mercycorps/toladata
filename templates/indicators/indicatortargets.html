@@ -68,7 +68,7 @@
                         <div class="item__value">
                             <span id="id_span_{{ pt.id }}" class="{% if indicator.unit_of_measure_type == 2 %}input-symbol-percent{% endif %}">
                                 <input
-                                    type="number"
+                                    type="text"
                                     id="pt-{{ pt.id }}"
                                     name="{{ pt.period }}"
                                     value="{{ pt.target|trailingzero }}"
@@ -77,7 +77,7 @@
                                     data-start-date="{{pt.start_date|convert2dateobject|date:"MEDIUM_DATE_FORMAT"|default:''}}"
                                     data-end-date="{{pt.end_date|convert2dateobject|date:"MEDIUM_DATE_FORMAT"|default:''}}"
                                     placeholder="{% trans 'Enter target' %}"
-                                    class="form-control input-value">
+                                    class="form-control input-value periodic-target-input">
                             </span>
                             <span id="hint_id_pt_{{pt.id}}" style="margin:0px;" class="help-block"> </span>{# TODO: this style attr #}
                         </div>
@@ -193,10 +193,10 @@
                     </div>
                     <div class="item__value">
                         <span id="span_id_lop_target" class="input-value {% if indicator.unit_of_measure_type == 2 %}input-symbol-percent{% endif %}">
-                            <input type="number"
+                            <input type="text"
                                    name="lop_target"
                                    id="id_lop_target"
-                                   class="form-control input-value"
+                                   class="form-control input-value periodic-target-input"
                                    min="1"
                                    {% if readonly %}disabled="disabled"{% endif %}
                                    {% if indicator.lop_target != None %}
@@ -222,3 +222,10 @@
 
 
 {% endif %}
+
+<script>
+    $(function() {
+        //make periodic target inputs numeric
+        window.getValidatedNumericInput('.periodic-target-input')
+    })
+</script>

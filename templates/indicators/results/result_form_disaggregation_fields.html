@@ -76,28 +76,22 @@
     var percentageInput = {% if indicator.unit_of_measure_type == indicator.PERCENTAGE %}true{% else %}false{% endif %};
 
     function updateActuals() {
-        let val = $('#id_achieved').val();
-        $('.actual-value-cell').html(`${val}`);
+        let val = $('#id_achieved').numericVal();
+        $('.actual-value-cell').displayVal(val, percentageInput);
         $('.disaggregation-formset').trigger('validateSum');
     }
 
     function validateDisaggregatedValue(ev) {
         $( this ).removeClass('is-invalid');
-        let unLocalizer = window.getNumberLocalizer({decimalPlaces: 2, display: false});
-        let reLocalizer = window.getNumberLocalizer({decimalPlaces: 2, display: true});
         if ($( this ).val() == '') {
             // user entered blank, do nothing
-        } else if (unLocalizer($( this ).val()) === false || unLocalizer($( this ).val()) < 0) {
+        } else if ($( this ).numericVal() === null || $(this).numericVal() < 0) {
             $( this ).addClass('is-invalid');
-        } else {
-            $( this ).val(reLocalizer(unLocalizer($( this ).val())));
         }
         $( this ).parents('.disaggregation-formset').trigger('updateSum');
     }
 
     function updateSum(ev) {
-        let unLocalizer = window.getNumberLocalizer({decimalPlaces: 2, display: false});
-        let reLocalizer = window.getNumberLocalizer({decimalPlaces: 2, display: true});
         if( $( this ).find('.is-invalid').length > 0 ) {
             $( this ).find('.sum-value-cell').html('');
         } else {
@@ -106,15 +100,15 @@
                 Array(parseInt($(`#id_${prefix}-TOTAL_FORMS`).val())).keys()
             ).map(
                 idx => {
-                    return unLocalizer($(`#id_${prefix}-${idx}-value`).val());
+                    return $(`#id_${prefix}-${idx}-value`).numericVal();
                 }
             );
-            if (values.every(val => val === false)) {
+            if (values.every(val => (val === false || val === null))) {
                 // disaggregation is empty (all blank)
                 $( this ).find('.sum-value-cell').html('');
             } else {
-                let sumValue = values.filter(val => val !== false).reduce((a, b) => a + b);
-                $( this ).find('.sum-value-cell').html(`${reLocalizer(sumValue)}${percentageInput ? '&ensp;%' : ''}`);
+                let sumValue = values.filter(val => val > 0).reduce((a, b) => a + b);
+                $( this ).find('.sum-value-cell').displayVal(sumValue, percentageInput);
             }
         }
         $( this ).trigger('validateSum');
@@ -126,20 +120,18 @@
             // percent cell - no sum validation
             return;
         }
-        let unLocalizer = window.getNumberLocalizer({decimalPlaces: 2, display: false});
-        let reLocalizer = window.getNumberLocalizer({decimalPlaces: 2, display: true});
         let $sumValueCell = $( this ).find('.sum-value-cell').first();
         $sumValueCell.parent().removeClass('no-sum-value').removeClass('bad-sum-value');
-        let sumValue = unLocalizer($sumValueCell.html());
+        let sumValue = $sumValueCell.numericVal();
         if (sumValue === false) {
             // sum value is not good:
             $sumValueCell.parent().addClass('no-sum-value');
         } else {
-            let achievedValue = unLocalizer($('#id_achieved').val());
+            let achievedValue = $('#id_achieved').numericVal();
             if (achievedValue != sumValue) {
                 $sumValueCell.parent().addClass('bad-sum-value');
                 $sumValueCell.parent().find('.sum-difference')
-                    .html(`${achievedValue < sumValue ? '+' : ''}${reLocalizer(sumValue - achievedValue)}`);
+                    .html(`${achievedValue < sumValue ? '+' : ''}${$sumValueCell.toDisplayVal(sumValue - achievedValue)}`);
             }
         }
         $( this ).trigger('validateFormset');
@@ -156,8 +148,7 @@
 
     function updateActualWithSum() {
         let sumValue = $( this ).parents('.actions-container').find('.sum-value-cell').first().html();
-        let unLocalizer = window.getNumberLocalizer({decimalPlaces: 2, display: false});
-        $('#id_achieved').val(unLocalizer(sumValue));
+        $('#id_achieved').displayVal(sumValue);
         updateActuals();
         $('.disaggregation-formset').trigger('updateSum');
     }
@@ -178,7 +169,10 @@
         // whenever the actual value changes, update the actual values in each disaggregation row:
         $('#id_achieved').on('change', updateActuals);
         // whenever any of the value fields change, validate the individual value field:
-        $('.disaggregated-value-cell').keydown(window.numberInputValidator).on('change', validateDisaggregatedValue);
+        // $('.disaggregated-value-cell').keydown(window.numberInputValidator).on('change', validateDisaggregatedValue);
+        $('.disaggregated-value-cell').each(function() {
+            window.getValidatedNumericInput(this).on('change', validateDisaggregatedValue);
+        });
         $('.disaggregation-formset')
             .on('updateSum', updateSum)
             .on('validateSum', validateSum)
