@@ -192,10 +192,10 @@ a.accordion-row__btn.btn.btn-link {
 
 .ul__error_row {
     background-color: $red-050;
-    margin-top: -15px;
-    line-height: 2em;
+    margin-top: -15px; // negates the 15px bottom padding on a UL when appending an error row to it (so the error row is visually attached to the list)
+    line-height: 2em; // adds space above and below the text for the pink background danger highlighting
     &>.target-value-error {
-      padding-left: 6px;  
+      padding-left: 6px;  // spaces warning message from the left edge for a visually uncluttered appearance (arbitrary value to match spec'd screenshot)
     }
 }
 .reference-row {
