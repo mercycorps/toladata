@@ -485,7 +485,7 @@ export default (
             return disaggregationOptions;
         },
         set disaggregationFilters(disaggregationFilterValues = []) {
-            this._indicatorFilters.disaggregations = disaggregationFilterValues.filter(v => v != 'hide-categories').map(v => parseInt(v));
+            this._indicatorFilters.disaggregations = disaggregationFilterValues.filter(v => (v != 'hide-categories' && v != 'NaN' && !isNaN(parseInt(v)))).map(v => parseInt(v));
             this._hiddenCategories = disaggregationFilterValues.includes('hide-categories');
         },
         get indicatorTypeOptions() {
@@ -760,6 +760,7 @@ export default (
     filterStore.indicatorTypeFilters = filterStore._router.types;
     filterStore.indicatorFilters = filterStore._router.indicators;
     filterStore._hiddenColumns = filterStore._router.columns;
+    filterStore._hiddenCategories = filterStore._router.hiddenCategories;
     filterStore.levelTierFilters = {
         levels: filterStore._router.levels,
         tiers: filterStore._router.tiers,

@@ -98,6 +98,10 @@ export default () => {
         get disaggregations() {
             return parseArrayParams(this._router.getState().params.disaggregations);
         },
+        get hiddenCategories() {
+            let disaggParams = this._router.getState().params.disaggregations;
+            return Array.isArray(disaggParams) ? disaggParams.includes('hide-categories') : disaggParams && disaggParams == 'hide-categories';
+        },
         get columns() {
             return parseArrayParams(this._router.getState().params.columns);
         },
