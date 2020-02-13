@@ -757,7 +757,7 @@ jQuery.fn.extend({
             return '';
         }
         value = `${parseFloat(value.replace(',', '.')).toFixed(2)}`;
-        if ([FRENCH, ENGLISH].includes(userLang)) {
+        if ([FRENCH, SPANISH].includes(userLang)) {
             value = value.replace('.', ',');
         } else {
             value = value.replace(',', '.');
