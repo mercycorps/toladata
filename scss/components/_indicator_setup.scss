@@ -33,8 +33,10 @@
 .periodic-target {
     background: $white;
 }
-td.periodic-targets__sum { // td needed for extra specificity
-    //padding-right: $grid-gutter-width/2;
+.periodic-targets__sum { // td needed for extra specificity
+    &.item__label {
+        text-align: right;
+    }
 }
 .periodic-targets__sum__value {
     // fakes alignment on targets table for NON-percent (i.e. Number) values
