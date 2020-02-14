@@ -50,16 +50,16 @@ input[type=number]::-webkit-outer-spin-button {
 }
 
 .input-symbol-percent {
+    display: block;
     position: relative;
-    display: inline-block;
-    width: 100%;
     &:after {
         position: absolute;
         top: 50%;
         transform: translateY(-50%);
         margin: auto;
         content:"%";
-        right: 0.5rem;
+        color: $gray-600;
+        right: 0.25rem;
     }
     &.feedback-row:after {
         top: 1.5rem !important;
@@ -164,48 +164,58 @@ a.accordion-row__btn.btn.btn-link {
     }
 }
 
-
-ul.form-rows-list-group {
-    &>li {
+// form-list-group: extends bootstrap list-group
+.form-list-group {
+    $_form-list-group-padding: 0.25rem;
+    margin-bottom: $grid-gutter-width/2;
+    margin-top: $grid-gutter-width/2;
+    > .list-group-item {
+        align-items: center;
         display: flex;
         justify-content: space-between;
-        padding-right: 2px;
-        &.form-rows-list-group__form-row {
-            padding-top: 2px;
-            padding-bottom: 2px;
-            vertical-align: middle;
-            & label {
-                padding-top: 8px;
-            }
-            & input {
-                padding-right: 10px;
-            }
-        }
-        &.form-rows-list-group__footer-row {
-            font-weight: 700;
-            & .value-cell {
-                float: right;
-                margin-right: 27px;
-            }
-        }
-        &.reference-row {
-            background-color: $gray-200;
-        }
+        padding-bottom: $_form-list-group-padding;
+        padding-top: $_form-list-group-padding;
     }
 }
+.item__label {
+    line-height: 1;
+    label {
+        margin-bottom: 0;
+    }
+}
+.item__value {
+}
+.error-row {
+}
+.reference-row {
+    background-color: $gray-200;
+    font-weight: bold;
+}
+.value-cell {
+    // mimics the size of an input for the sake of keeping elements aligned
+    border: $input-border-width solid transparent;
+    min-height: $input-height;
+    padding: $input-padding-y $input-padding-x;
+}
+.sum-value-cell {
+    font-weight: bold;
+}
+.actual-value-cell {
+    font-weight: bold;
+}
+
 
 .has-errors:not(.unvalidated) {
     .formset-feedback {
         display: inline-block;
     }
     .actions-container {
+        align-items: center;
         display: flex;
         font-weight: 200;
     }
     .bad-sum-value>div.value-cell {
         background-color: $red-050;
-        padding-left: 8px;
-        padding-right: 8px;
     }
     .bad-sum-value>.invalid-actions {
         display: inline-block;
@@ -220,11 +230,11 @@ ul.form-rows-list-group {
 
 .disaggregation-formset .input-symbol-percent {
     &:after {
-        right: 1.7rem;
+        //right: 1.7rem;
     }
     & .disaggregated-value-cell {
-        padding-right: 28px;
-    }   
+        //padding-right: 28px;
+    }
 }
 
 .sum-difference {

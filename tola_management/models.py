@@ -292,7 +292,7 @@ class ProgramAuditLog(models.Model, DiffableLog):
     @property
     def diff_list(self):
         diff_list = super(ProgramAuditLog, self).diff_list
-        null_text = ''
+        null_text = ""
 
         for diff in diff_list:
             if diff["name"] == 'unit_of_measure_type':
@@ -302,7 +302,7 @@ class ProgramAuditLog(models.Model, DiffableLog):
                 diff["prev"] = self.direction_of_change_map.get(diff["prev"], diff["prev"])
                 diff["new"] = self.direction_of_change_map.get(diff["new"], diff["new"])
             elif diff["name"] == 'targets' or diff["name"] == 'disaggregation_values':
-                if diff["prev"] == null_text:
+                if diff["prev"] == "":
                     diff["prev"] = {
                         n["id"]: {
                             "name": n.get("name"),
@@ -315,7 +315,7 @@ class ProgramAuditLog(models.Model, DiffableLog):
                     }
                     continue
 
-                if diff["new"] == null_text:
+                if diff["new"] == "":
                     diff["new"] = {
                         p["id"]: {
                             "name": p.get("name"),
@@ -680,7 +680,7 @@ class CountryAdminAuditLog(models.Model, DiffableLog):
     def field_map(self):
         return {
             # Translators: Heading for list of disaggregation types assigned to a country
-            "disaggregation_type_name": _("Disaggregation type"),
+            "disaggregation_type_name": _("Disaggregation"),
             # Translators: Heading for list of disaggregation categories in a particular disaggregation type.
             "disaggregation_category": _("Disaggregation category"),
             # Translators: Heading for list of disaggregation categories in a particular disaggregation type.
@@ -688,7 +688,7 @@ class CountryAdminAuditLog(models.Model, DiffableLog):
             # Translators: Heading for list of disaggregation categories in a particular disaggregation type.
             "is_archived": _("Archived"),
             # Translators: Heading for list of disaggregation categories in a particular disaggregation type.
-            "disaggregation_type": _("Disaggregation type"),
+            "disaggregation_type": _("Disaggregation"),
         }
 
     @property

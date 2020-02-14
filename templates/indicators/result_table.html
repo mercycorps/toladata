@@ -1,4 +1,5 @@
 {% load i18n mytags %}
+{% load humanize %}
 {% load assign %}
 
 <script type="text/javascript">
@@ -116,7 +117,7 @@
                             {% endif %}
                         <td class="results__result--value {% if cdata.periodic_target == None %}bg-danger-lighter{% endif %}">
                             {% with achieved=cdata.achieved|floatformat:"-2" %}
-                                {{ achieved|trailingzero }}{% if indicator.unit_of_measure_type == 2 %}%{% endif %}
+                                {{ achieved|intcomma|trailingzero }}{% if indicator.unit_of_measure_type == 2 %}%{% endif %}
                             {% endwith %}
                         </td>
                         <td class="td--stretch results__result--url">
