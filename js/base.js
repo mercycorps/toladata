@@ -773,7 +773,7 @@ jQuery.fn.extend({
             this.val(value);
         }
         if (this.is('div') || this.is('span')) {
-            this.html(`${value}${percent ? '&ensp;%' : ''}`);
+            this.html(`${value}`);
         }
     }
 });
