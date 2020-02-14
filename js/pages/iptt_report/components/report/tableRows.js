@@ -159,7 +159,7 @@ const DisaggregationTable = inject('rootStore')(
                                 }
                                 <td colSpan={ rootStore.hasBaselineColumn ? rootStore.baseColumns - 2 : rootStore.baseColumns - 1 } className="disaggregation-label-cell">{ label.name }</td>
                                 { rootStore.hasBaselineColumn &&
-                                    <td className="disaggregation-value-cell lop-column empty-value">—</td>
+                                    <td className="disaggregation-value-cell base-column empty-value">—</td>
                                 }
                                 <td className="disaggregation-value-cell lop-column empty-value">—</td>
                                 <ValueCell className="disaggregation-value-cell lop-column" value={ ipttRound(rootStore.disaggregatedLop(indicator.pk, label.pk), false) } />
@@ -195,11 +195,11 @@ class IndicatorRow extends React.Component {
             expanded: false
         };
     }
-    
+
     componentDidMount() {
         this.props.rootStore._expandoRows.push(this);
     }
-    
+
     componentWillUnmount() {
         this.props.rootStore._expandoRows = this.props.rootStore._expandoRows.filter(row => row != this);
     }
@@ -288,7 +288,7 @@ const LevelTitleRow = inject('rootStore')(
     observer(({ rootStore, children }) => {
         return (
             <tr>
-                <td colSpan={ rootStore.reportColumnWidth + 1 /* TODO: might be off by one ? */}
+                <td colSpan={ rootStore.reportColumnWidth + 1 }
                     className="iptt-level-row">
                    { children }
                 </td>
