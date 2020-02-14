@@ -44,7 +44,7 @@ export class CountryStore {
     @observable editing_objectives_errors = {};
     @observable editing_disaggregations_data = [];
     @observable editing_disaggregations_errors = {};
-    @observable fetching_editing_history = true;
+    @observable fetching_editing_history = false;
     @observable editing_history = [];
     @observable saving = false;
 
@@ -177,12 +177,17 @@ export class CountryStore {
     }
 
     updateHistory(id) {
-        this.api.fetchCountryHistory(id).then( response => {
-            this.editing_history = response.data;
-        }).catch( errors => {
-            this.onHistoryFail()
-        });
-        this.fetching_editing_history = false;
+        if (id === "new") {
+            this.editing_history = [];
+        }
+        else {
+            this.api.fetchCountryHistory(id).then(response => {
+                this.editing_history = response.data;
+                this.fetching_editing_history = false;
+            }).catch(errors => {
+                this.fetching_editing_history = false;
+            });
+        }
     }
 
     onSaveSuccessHandler() {
@@ -205,9 +210,20 @@ export class CountryStore {
         PNotify.success({text: gettext("Successfully unarchived"), delay: 5000})
     }
 
-    onHistoryFail() {
-        // Not notifying of history loading failures at this time, but we may want to at some point.
-        // PNotify.error({text: gettext("Failed to update history.  You may need to reload the page."), delay: 5000})
+    onDuplicatedDisaggLabelMessage(message) {
+        PNotify.error({text: message ||
+            // # Translators: error message generated when item names are duplicated but are required to be unqiue.
+            gettext("Saving failed: Disaggregation categories should be unique within a disaggregation."),
+            delay: 5000
+        });
+    }
+
+    onDuplicatedDisaggTypeMessage(message) {
+        PNotify.error({text: message ||
+            // # Translators: error message generated when item names are duplicated but are required to be unqiue.
+            gettext("Saving failed: disaggregation names should be unique within a country."),
+            delay: 5000
+        });
     }
 
     @observable active_editor_pane = 'profile'
@@ -384,7 +400,7 @@ export class CountryStore {
         }
         this.editing_disaggregations_data = [...this.editing_disaggregations_data, new_disaggregation_data]
     }
-
+    // TODO: can I still archive and delete?  Probably not
     @action deleteDisaggregation(id, callback) {
         create_no_rationale_changeset_notice({
             preamble: gettext("This action cannot be undone."),
@@ -462,8 +478,41 @@ export class CountryStore {
             blocking: true
         });
     }
-
+    // TODO: better error messages for dupes
     @action updateDisaggregation(id, data) {
+        console.log('submitted data', toJS(data))
+        console.log('main data', toJS(this.editing_disaggregations_data))
+        // const existing_disagg_types = this.editing_disaggregations_data
+        //     .filter( disagg => disagg.id !== id)
+        //     .map( disagg => disagg.disaggregation_type);
+        // if (existing_disagg_types.includes(data.disaggregation_type)) {
+        //     this.onDuplicatedDisaggTypeMessage();
+        //     runInAction(() => {
+        //         this.editing_disaggregations_errors['disaggregation_type'] = [gettext("Save failed for duplicate disaggregation")];
+        //     });
+        //     return;
+        // }
+        // const label_set = new Set(data.labels.map( label => label.label));
+        const duplicateIndexes = findDuplicateLabelIndexes(data.labels.map( label => label.label));
+        console.log('duplicates', duplicateIndexes, data.labels);
+        if (duplicateIndexes.length > 0) {
+            // // First fill up the label error array with blank values, then fill those that actually have duplicates
+            // this.editing_disaggregations_errors['labels'] = Array(data.labels.length).fill({label: null});
+            // // # Translators:  This error message appears underneath user-input labels that appear more than once in a set of labels.  Only unique labels are allowed.
+            // const errorText = gettext("Duplicate categories not allowed.");
+            // duplicateIndexes.forEach( dIndex => {
+            //     runInAction( () => {
+            //         this.editing_disaggregations_errors['labels'][dIndex]['label']=[errorText]
+            //     });
+            //
+            // });
+            // this.onDuplicatedDisaggLabelMessage();
+            // return;
+        }
+        else {
+            runInAction( () => this.editing_disaggregations_errors = {});
+        }
+
         this.editing_disaggregations_errors = {};
         delete data.is_archived;
         this.api.updateDisaggregation(id, data).then(response => {
@@ -480,13 +529,24 @@ export class CountryStore {
                 this.updateHistory(this.editing_target);
             })
         }).catch((errors) => {
-            this.saving = false
-            this.editing_disaggregations_errors = errors.response.data
-            this.onSaveErrorHandler()
+            this.saving = false;
+            this.editing_disaggregations_errors = errors.response.data;
+            this.onSaveErrorHandler();
         })
     }
 
     @action createDisaggregation(data) {
+        const existing_disagg_types = this.editing_disaggregations_data.map( disagg => disagg.disaggregation_type);
+        if (existing_disagg_types.includes(data.disaggregation_type)) {
+            this.onDuplicatedDisaggTypeMessage();
+            return;
+        }
+        const label_set = new Set(data.labels.map( label => label.label));
+        if (label_set.size !== data.labels.length) {
+            this.onDuplicatedDisaggLabelMessage();
+            return;
+        }
+
         this.editing_disaggregations_errors = {};
         return this.api.createDisaggregation(data).then(response => {
             this.updateHistory(response.data.country);
@@ -518,3 +578,16 @@ export class CountryStore {
     }
 
 }
+
+
+export const findDuplicateLabelIndexes = function (label_list) {
+        let dupeIndexes = new Set();
+        label_list.forEach( (label, index) => {
+            const dupeIndex = label_list.indexOf(label, index+1);
+            if (dupeIndex > 0) {
+                dupeIndexes.add(index).add(dupeIndex)
+            }
+        })
+        return Array.from(dupeIndexes);
+
+    }

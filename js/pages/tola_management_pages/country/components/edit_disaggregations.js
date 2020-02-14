@@ -4,7 +4,7 @@ import { DragDropContext, Droppable, Draggable } from 'react-beautiful-dnd';
 import classNames from 'classnames'
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome'
 import HelpPopover from "../../../../components/helpPopover";
-
+import { toJS } from 'mobx';
 
 const ErrorFeedback = observer(({errorMessages}) => {
     if (!errorMessages) {
@@ -25,7 +25,7 @@ class CategoryForm extends React.Component {
         super(props);
         this.disabledRef = React.createRef();
     }
-    
+
     componentDidMount = () => {
         if (this.disabledRef.current) {
             $(this.disabledRef.current).popover({
@@ -60,7 +60,7 @@ class CategoryForm extends React.Component {
                         }
                     </select>
                 </div>
-                {(!props.disabled && !category.in_use) ? 
+                {(!props.disabled && !category.in_use) ?
                 <a
                     tabIndex="0"
                     onClick={() => props.deleteLabel(index)}
@@ -96,7 +96,7 @@ const DisaggregationCategoryList = observer(
                 renderClone={(provided, snapshot, rubric) => (
                     <div className="form-group mb-0 disaggregation-label-group"
                         ref={ provided.innerRef }
-                        {...provided.draggableProps}   
+                        {...provided.draggableProps}
                     >
                     <span className="draggable-arrow" {...provided.dragHandleProps}>
                         <i className="fas fa-arrows-alt fa-lg"></i>
@@ -122,7 +122,7 @@ const DisaggregationCategoryList = observer(
                                 {(provided, snapshot) => (
                                     <div className="form-group mb-0 disaggregation-label-group"
                                         ref={ provided.innerRef }
-                                        {...provided.draggableProps}   
+                                        {...provided.draggableProps}
                                     >
                                         <span className="draggable-arrow" {...provided.dragHandleProps}>
                                             <i className="fas fa-arrows-alt fa-lg"></i>
@@ -159,7 +159,7 @@ class DisaggregationType extends React.Component {
         this.labelsCreated = 0;
         this.selectedByDefaultPopup = React.createRef();
     }
-    
+
     orderLabels(labels) {
         return labels.slice().map((label, index) => ({...label, customsort: index + 1}));
     }
@@ -168,7 +168,7 @@ class DisaggregationType extends React.Component {
         const labels = this.props.disaggregation.labels.map(x => ({...x}));
         this.props.onIsDirtyChange(JSON.stringify(this.state) != JSON.stringify({...this.props.disaggregation, labels: [...labels]}))
     }
-    
+
     componentDidUpdate = () => {
         if (this.selectedByDefaultPopup.current) {
             $(this.selectedByDefaultPopup.current).popover({
@@ -194,7 +194,7 @@ class DisaggregationType extends React.Component {
             disaggregation_type: value,
         }, () => this.hasUnsavedDataAction())
     }
-    
+
     updateSelectedByDefault(checked) {
         this.setState({
             selected_by_default: checked == true
@@ -208,7 +208,7 @@ class DisaggregationType extends React.Component {
             labels: this.orderLabels(labels)
         }, () => this.hasUnsavedDataAction())
     }
-    
+
     updateLabelOrder(oldIndex, newIndex) {
         let labels = this.state.labels;
         let remainingLabels = [...labels.slice(0, oldIndex), ...labels.slice(oldIndex + 1)];
@@ -217,8 +217,12 @@ class DisaggregationType extends React.Component {
                                       labels[oldIndex], ...remainingLabels.slice(newIndex)])
             }, () => this.hasUnsavedDataAction());
     }
-
+    // TODO: check for label duplicates
     appendLabel() {
+        const label_set = new Set(this.state.labels);
+        if (label_set.size !== this.state.labels.length){
+
+        }
         this.labelsCreated += 1;
         const newLabel = {
             id: 'new',
@@ -404,7 +408,7 @@ export default class EditDisaggregations extends React.Component {
             this.setState({expanded_id: 'new'}, () => {$('#disaggregation-type-input').focus();});
         }
     }
-    
+
     onDelete(id) {
         this.props.onDelete(id, () => {this.setState({is_dirty: false, expanded_id: null, formReset: null})});
     }

@@ -1,0 +1,40 @@
+export const duplicatedDisaggregationData = [
+    {
+        "id":100,
+        "country":100,
+        "disaggregation_type":"First",
+        "labels":[
+            {"id":10,"label":"First","customsort":1,"in_use":false},
+            {"id":20,"label":"First","customsort":2,"in_use":false}
+        ],
+        "has_indicators":false,
+        "is_archived":false,
+        "selected_by_default":false
+    },
+    {
+        "id":101,
+        "country":100,
+        "disaggregation_type":"First",
+        "labels":[
+            {"id":30,"label":"First","customsort":1,"in_use":false},
+            {"id":40,"label":"First","customsort":2,"in_use":false}
+        ],
+        "has_indicators":false,
+        "is_archived":false,
+        "selected_by_default":false
+    },
+    {
+        "id":102,
+        "country":100,
+        "disaggregation_type":"Second",
+        "labels":[
+            {"id":50,"label":"First","customsort":1,"in_use":false},
+            {"id":60,"label":"First","customsort":2,"in_use":false}
+        ],
+        "has_indicators":false,
+        "is_archived":false,
+        "selected_by_default":false
+    },
+]
+
+
