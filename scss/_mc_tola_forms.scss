@@ -168,7 +168,7 @@ a.accordion-row__btn.btn.btn-link {
 .form-list-group {
     $_form-list-group-padding: 0.25rem;
     margin-bottom: $grid-gutter-width/2;
-    margin-top: $grid-gutter-width/2;
+    margin-top: 0;
     > .list-group-item {
         align-items: center;
         display: flex;
