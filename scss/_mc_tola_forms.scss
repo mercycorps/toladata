@@ -186,7 +186,7 @@ a.accordion-row__btn.btn.btn-link {
     }
 }
 .item__value {
-    flex: 0 1 $grid-gutter-width * 4;
+    flex: 0 1 auto;
 }
 .error-row {
 }
@@ -202,6 +202,7 @@ a.accordion-row__btn.btn.btn-link {
 }
 .sum-value-cell {
     font-weight: bold;
+    text-align: right;
 }
 .actual-value-cell {
     font-weight: bold;

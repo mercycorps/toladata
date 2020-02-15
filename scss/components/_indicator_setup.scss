@@ -33,10 +33,7 @@
 .periodic-target {
     background: $white;
 }
-.periodic-targets__sum { // td needed for extra specificity
-    &.item__label {
-        text-align: right;
-    }
+.periodic-targets__sum {
 }
 .periodic-targets__sum__value {
     // fakes alignment on targets table for NON-percent (i.e. Number) values
