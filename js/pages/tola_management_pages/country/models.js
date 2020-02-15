@@ -509,9 +509,6 @@ export class CountryStore {
             // this.onDuplicatedDisaggLabelMessage();
             // return;
         }
-        else {
-            runInAction( () => this.editing_disaggregations_errors = {});
-        }
 
         this.editing_disaggregations_errors = {};
         delete data.is_archived;

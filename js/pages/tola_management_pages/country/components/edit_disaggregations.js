@@ -170,6 +170,28 @@ class DisaggregationType extends React.Component {
     }
 
     componentDidUpdate = () => {
+        /*
+        This is a super ugly hack to fix a bug and avoid re-writing the state management of this component.
+        Without this code block, if a new label is added and the form is saved, the id of "new"
+        never gets replaced with the real id coming from the server.  So if the user tries to add
+        another label and save, a validation error occurs because it looks like there are two
+        new labels, one of which would be a duplicate.
+         */
+
+        if (this.state.labels) {
+            const labelMap = this.props.disaggregation.labels.reduce((accum, labelObj) => {
+                accum[labelObj.label] = labelObj.id;
+                return accum;
+            }, {});
+            this.state.labels.forEach(labelInState => {
+                if (labelInState.id === "new") {
+                    if (Object.keys(labelMap).includes(labelInState.label)) {
+                        labelInState.id = labelMap[labelInState.label];
+                    }
+                }
+            });
+        }
+
         if (this.selectedByDefaultPopup.current) {
             $(this.selectedByDefaultPopup.current).popover({
                 html: true

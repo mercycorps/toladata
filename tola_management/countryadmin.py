@@ -232,6 +232,8 @@ class CountryDisaggregationSerializer(serializers.ModelSerializer):
             for label in new_labels:
                 label.disaggregation_type = instance
                 label.save()
+            for label in updated_label_data:
+                label.save()
             for label in removed_labels:
                 label.delete()
         updated_instance = super(CountryDisaggregationSerializer, self).update(instance, validated_data)
