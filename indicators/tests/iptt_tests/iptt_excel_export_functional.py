@@ -157,27 +157,6 @@ MET = {
 
 SPECIAL_CHARS = "Spécîal Chårs"
 
-
-class TestScenarioBuilder(test.TestCase):
-    @classmethod
-    def setUpClass(cls):
-        super().setUpClass()
-        cls.scenario = IPTTScenarioBuilder()
-
-    def test_indicators(self):
-        indicators = self.scenario.indicators
-        for c, frequency in enumerate([
-            Indicator.LOP,
-            Indicator.MID_END,
-            Indicator.ANNUAL,
-            Indicator.QUARTERLY,
-            Indicator.TRI_ANNUAL,
-            Indicator.MONTHLY,
-            Indicator.EVENT
-        ]):
-            self.assertEqual(indicators[c].target_frequency, frequency)
-
-
 class TestIPTTExcelExports(test.TestCase):
     iptt_url = reverse('iptt_excel')
 
@@ -189,6 +168,10 @@ class TestIPTTExcelExports(test.TestCase):
         cls.tolauser.user.is_superuser = True
         cls.tolauser.user.save()
         cls.client = test.Client()
+
+    def tearDown(self):
+        locale.setlocale(locale.LC_ALL, 'en_US')
+        translation.activate('en')
 
     def login_client(self, language):
         if language == FRENCH:
@@ -324,7 +307,6 @@ class TestIPTTExcelExports(test.TestCase):
             sheet.cell(row=3, column=3).value,
             self.scenario.program_name
         )
-        
         locale.setlocale(locale.LC_ALL, default_locale)
 
     def assert_lop_header_cells(self, sheet, language=ENGLISH, column=10):
