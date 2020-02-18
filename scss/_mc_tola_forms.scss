@@ -183,9 +183,20 @@ a.accordion-row__btn.btn.btn-link {
         margin-bottom: 0;
     }
 }
-.item__value {
+
+.item__value {    
 }
+
 .error-row {
+}
+
+.ul__error_row {
+    background-color: $red-050;
+    margin-top: -15px; // negates the 15px bottom padding on a UL when appending an error row to it (so the error row is visually attached to the list)
+    line-height: 2em; // adds space above and below the text for the pink background danger highlighting
+    &>.target-value-error {
+      padding-left: 6px;  // spaces warning message from the left edge for a visually uncluttered appearance (arbitrary value to match spec'd screenshot)
+    }
 }
 .reference-row {
     background-color: $gray-200;
