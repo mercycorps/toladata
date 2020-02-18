@@ -83,7 +83,7 @@ class EditableLevelTier extends React.Component {
         onClick from firing.  This code is required to make sure buttons don't need to be clicked twice.
         If the user is deleting a level, that should be called before the validation is called.
          */
-        if (event.relatedTarget && event.relatedTarget.classList.contains("deletebtn")) {
+        if (event.relatedTarget && event.relatedTarget.classList.contains("btn-delete")) {
             this.props.rootStore.levelStore.deleteCustomTier(event);
         }
         else {
