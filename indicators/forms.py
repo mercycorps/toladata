@@ -390,7 +390,10 @@ class IndicatorForm(forms.ModelForm):
 
 class ResultForm(forms.ModelForm):
     rationale = forms.CharField(required=False)
-    achieved = NonLocalizedDecimalField(decimal_places=2, localize=True)
+    achieved = NonLocalizedDecimalField(
+        decimal_places=2, localize=True,
+        # Translators: This is a result that was actually achieved, versus one that was planned.
+        label=_('Actual value'))
 
     class Meta:
         model = Result
@@ -402,9 +405,7 @@ class ResultForm(forms.ModelForm):
         }
         labels = {
             'site': _('Site'),
-            # Translators: This is a result that was actually achieved, versus one that was planned.
-            'achieved': _('Actual value'),
-            # Translators: field label that
+            # Translators: field label that identifies which of a set of a targets (e.g. monthly/annual) a result is being compared to
             'periodic_target': _('Measure against target'),
             'evidence_url': _('Link to file or folder'),
         }
