@@ -395,7 +395,6 @@
 
     // Button click handler for CREATE form (save and add another)
     $("#indicator_modal_content").on("click", "#id_save_and_add_another_indicator_btn", function(e){
-        console.log(initialLevelId())
         if (validateForm() === false) {
             showValidations("#modalmessages");
             return;
@@ -465,7 +464,7 @@
                         <a href="#" class="deletebtn btn btn-sm event-target-delete-button">
                             <i class="fas fa-times text-danger"></i>
                         </a>
-                        <input type="text" placeholder="{% trans 'Enter event name' %}" class="form-control input-text">
+                        <input type="text" placeholder="{% trans 'Enter event name' %}" class="form-control input-text target-label">
                                 <span style="margin:0px;" class="help-block"> </span>
                     </div>
 
@@ -954,7 +953,6 @@
                 errorFlag = true;
             }
         });
-
         if (errorFlag) {
             showTargetErrors(getPTMessage());
             return false;
@@ -974,6 +972,14 @@
                 if (val === null) {
                     allValid = false;
                 }
+            }
+        });
+        $("#periodic_targets_table .target-label").each(function(){
+            if ($(this).val()) {
+                $(this).removeClass('is-invalid');
+            } else {
+                $(this).addClass('is-invalid');
+                allValid = false;
             }
         });
 
@@ -1131,7 +1137,7 @@
         } else {
             $(this).addClass('is-invalid');
         }
-        if ($("#id_div_periodic_tables_placeholder input[type=text], input[type=number]").hasClass("has-error") ) {
+        if ($("#id_div_periodic_tables_placeholder input[type=text], input[type=number]").hasClass('is-invalid') ) {
             showTargetErrors(getPTMessage());
         }
     });
