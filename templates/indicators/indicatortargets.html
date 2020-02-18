@@ -50,7 +50,7 @@
                                        placeholder="{% trans 'Enter event name' %}"
                                        name="{{ pt.period }}"
                                        value="{{ pt.period }}"
-                                       class="form-control input-text"
+                                       class="form-control input-text target-label"
                                        {% if readonly %}disabled="disabled"{% endif %}>
                                 <span style="" class="help-block"> </span>
                             </div>
@@ -96,7 +96,7 @@
                     </div>
                 </li>
             </ul>
-            <div class="text-danger item__label" id="id_pt_errors"></div>
+            <div class="text-danger item__label ul__error_row" id="id_pt_errors"></div>
         </div>
 
         <div class="d-flex justify-content-between align-items-baseline">
@@ -208,7 +208,7 @@
                     </div>
                 </li>
             </ul>
-            <div class="text-danger item__label" id="id_pt_errors"></div>
+            <div class="text-danger item__label ul__error_row" id="id_pt_errors"></div>
         </div>
 
         {% if not readonly %}

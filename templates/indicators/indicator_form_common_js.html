@@ -395,7 +395,6 @@
 
     // Button click handler for CREATE form (save and add another)
     $("#indicator_modal_content").on("click", "#id_save_and_add_another_indicator_btn", function(e){
-        console.log(initialLevelId())
         if (validateForm() === false) {
             showValidations("#modalmessages");
             return;
@@ -891,10 +890,13 @@
         }
 
         let errMsg = undefined;
-        if (lop.numericVal() === null) {
-            errMsg = "{% trans 'Please enter a number greater than zero.'|escapejs %}";
+        
+        if (lop.numericVal() === 0) {
+            errMsg = "{% trans 'The Life of Program (LoP) target cannot be zero.'|escapejs %}";
         }
-
+        if (lop.numericVal() === null) {
+            errMsg = "{% trans 'Please enter a target.'|escapejs %}";
+        }
         if (errMsg) {
             lop.addClass('is-invalid');
             showTargetErrors(errMsg);
@@ -977,7 +979,7 @@
             }
         });
 
-        if (allValid) {
+        if (allValid && validate_loptarget()) {
             clearTargetErrors();
         }
 
@@ -985,7 +987,7 @@
 
         let computedLop = computeLopTarget();
         if (allValid && computedLop != null && computedLop < 0.01) {
-            let msg = "{% trans 'The LoP target cannot be zero.'|escapejs %}";
+            let msg = "{% trans 'TheLife of Program (LoP) target cannot be zero.  Please update targets.'|escapejs %}";
             showTargetErrors(msg);
             return false;
         }
@@ -999,7 +1001,7 @@
             return ("{% trans 'Please enter a name and target number for every event.'|escapejs %}");
         }
         else {
-            return ("{% trans 'Please enter a number with no letters or symbols.'|escapejs %}");
+            return ("{% trans 'Please complete targets.'|escapejs %}");
         }
     }
 
@@ -1051,15 +1053,14 @@
             $("#div_id_target_frequency").addClass("marginbottom-225");
             $("#div_id_target_frequency").removeClass("mb-3")
         }
-
+        var periodicTargetsValidated = true;
         if (validatePeriodicTargets() === false) {
+            periodicTargetsValidated = false;
             validationsTargetTab = false;
         }
-
-        if (validateComputedLopTarget() === false) {
+        if (periodicTargetsValidated && validateComputedLopTarget() === false) {
             validationsTargetTab = false;
         }
-
         // validate periodic targets
         if ($("#id_div_periodic_tables_placeholder input").hasClass('is-invalid')) {
             validationsTargetTab = false;
@@ -1131,7 +1132,7 @@
         } else {
             $(this).addClass('is-invalid');
         }
-        if ($("#id_div_periodic_tables_placeholder input[type=text], input[type=number]").hasClass("has-error") ) {
+        if ($("#id_div_periodic_tables_placeholder input[type=text], input[type=number]").hasClass("is-invalid") ) {
             showTargetErrors(getPTMessage());
         }
     });
