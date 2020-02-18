@@ -752,11 +752,11 @@ jQuery.fn.extend({
     // helper function: called with a float/int/string representation of a number, returns a display-ready string,
     // with trailing zeros removed (and trailing , or .) and the correct floating-point separator based on language
     toDisplayVal: function(value) {
-        value = `${value}`;
+        value = `${value}`.replace(',', '.');
         if (isNaN(parseFloat(value))) {
             return '';
         }
-        value = `${parseFloat(value.replace(',', '.')).toFixed(2)}`;
+        value = `${parseFloat(value).toFixed(2)}`;
         if ([FRENCH, SPANISH].includes(userLang)) {
             value = value.replace('.', ',');
         } else {
