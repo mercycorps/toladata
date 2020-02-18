@@ -140,13 +140,17 @@ const DisaggregationTable = inject('rootStore')(
         if (indicator.isPercent) {
             ValueCell = PercentCell;
         }
+        let labels = rootStore.hiddenCategories ? disaggregation.labels.filter(label => rootStore.disaggregatedLop(indicator.pk, label.pk)) : disaggregation.labels;
+        if (!labels) {
+            return <React.Fragment></React.Fragment>;
+        }
         return (
             <React.Fragment>
                 {
-                    disaggregation.labels.map(
+                    labels.map(
                         (label, idx) => (
                             <tr
-                                className={ (idx == disaggregation.labels.length - 1) ?
+                                className={ (idx == labels.length - 1) ?
                                     "disaggregation-end-row" :
                                     ""
                                 }
@@ -154,7 +158,7 @@ const DisaggregationTable = inject('rootStore')(
                                 {idx == 0 &&
                                 <td className="disaggregation-name-cell"
                                     colSpan={ 2 }
-                                    rowSpan={disaggregation.labels.length}>
+                                    rowSpan={labels.length}>
                                     {disaggregation.name}</td>
                                 }
                                 <td colSpan={ rootStore.hasBaselineColumn ? rootStore.baseColumns - 2 : rootStore.baseColumns - 1 } className="disaggregation-label-cell">{ label.name }</td>
@@ -239,12 +243,12 @@ class IndicatorRow extends React.Component {
         return (
             <React.Fragment>
                 <tr>
-                    {indicator.hasDisaggregations(rootStore.activeDisaggregationPks) ?
+                    {rootStore.indicatorHasActiveDisaggregations(indicator) ?
                     <ExpandoCell value={ displayNumber } expanded={ this.state.expanded } clickHandler={ this.handleExpandoClick } /> :
                     <IndicatorCell className="indicator-cell " value={ displayNumber } />
                     }
                     <IndicatorResultModalCell indicator={ indicator } />
-                    {indicator.hasDisaggregations(rootStore.activeDisaggregationPks) ?
+                    {rootStore.indicatorHasActiveDisaggregations(indicator) ?
                     <IndicatorNameExpandoCell value={ indicator.name } expanded={ this.state.expanded } clickHandler={ this.handleExpandoClick } /> :
                     <IndicatorCell className="indicator-cell " value={ indicator.name } />
                     }
