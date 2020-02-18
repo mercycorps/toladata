@@ -28,7 +28,6 @@
                     <div class="item__value {% if indicator.unit_of_measure_type == indicator.PERCENTAGE %} input-symbol-percent {% endif %}">
                         {{ disaggregation_form.value|add_class:"form-control text-right force-numeric-input disaggregated-value-cell" }}
                         <div class="invalid-feedback">
-                            {% trans "Please enter a number greater than or equal to zero." %}
                         </div>
                     </div>
                 </li>
