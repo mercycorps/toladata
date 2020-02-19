@@ -553,7 +553,6 @@ export class CountryStore {
 
     @action
     assignDisaggregationErrors(existingDisagg, newDisagg, disaggId) {
-
         const existingDisaggTypes = existingDisagg.filter(disagg => disagg.id !== disaggId)
             .map(disagg => disagg.disaggregation_type);
         if (existingDisaggTypes.includes(newDisagg.disaggregation_type)) {
@@ -568,7 +567,7 @@ export class CountryStore {
 
     @action
     assignDisaggregationLabelErrors(newDisagg) {
-        const duplicateIndexes = findDuplicateLabelIndexes(newDisagg.labels.map(label => label.label));
+        const duplicateIndexes = this.findDuplicateLabelIndexes(newDisagg.labels.map(label => label.label));
         let labelErrors = Array(newDisagg.labels.length).fill().map( e => ({}));
 
         newDisagg.labels.forEach( (label, index) => {
@@ -583,9 +582,8 @@ export class CountryStore {
         });
         this.editing_disaggregations_errors['labels'] = labelErrors;
     }
-}
 
-export const findDuplicateLabelIndexes = function (label_list) {
+    findDuplicateLabelIndexes(label_list) {
         const lowerCaseList = label_list.map( label => label.toLowerCase())
         let dupeIndexes = new Set();
         lowerCaseList.forEach( (label, index) => {
@@ -597,3 +595,18 @@ export const findDuplicateLabelIndexes = function (label_list) {
         return Array.from(dupeIndexes);
 
     };
+
+}
+
+// export const findDuplicateLabelIndexes = function (label_list) {
+//         const lowerCaseList = label_list.map( label => label.toLowerCase())
+//         let dupeIndexes = new Set();
+//         lowerCaseList.forEach( (label, index) => {
+//             const dupeIndex = lowerCaseList.indexOf(label, index+1);
+//             if (dupeIndex > 0) {
+//                 dupeIndexes.add(index).add(dupeIndex);
+//             }
+//         });
+//         return Array.from(dupeIndexes);
+//
+//     };
