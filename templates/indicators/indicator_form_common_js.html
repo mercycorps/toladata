@@ -166,7 +166,7 @@
     }
 
     function isResultsForm() {
-        return $('.results-table__wrapper').length > 0;
+        return $('#indicator_results_modal_content form').length > 0;
     }
 
     function programId() {
@@ -745,7 +745,6 @@
     function updateLopTargetDisplay() {
         let targetsSum = computeLopTarget();
         $("#id_span_loptarget").displayVal(targetsSum);
-
         // also show any validation errors related to a 0 LoP
         validateComputedLopTarget();
     }
@@ -985,8 +984,7 @@
                 allValid = false;
             }
         });
-
-        if (allValid && validate_loptarget()) {
+        if (allValid) {
             clearTargetErrors();
         }
 
@@ -1049,9 +1047,6 @@
         if  (validate_baseline() === false ) {
             validationsTargetTab = false
         }
-        if (validate_loptarget() === false ) {
-            validationsTargetTab = false;
-        }
         if (validateForEmptyField("id_unit_of_measure") === false ) {
             validationsTargetTab = false;
         }
@@ -1066,6 +1061,9 @@
             validationsTargetTab = false;
         }
         if (periodicTargetsValidated && validateComputedLopTarget() === false) {
+            validationsTargetTab = false;
+        }
+        if (validate_loptarget() === false ) {
             validationsTargetTab = false;
         }
         // validate periodic targets
