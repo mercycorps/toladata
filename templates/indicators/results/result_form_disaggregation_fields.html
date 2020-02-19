@@ -28,7 +28,6 @@
                     <div class="item__value {% if indicator.unit_of_measure_type == indicator.PERCENTAGE %} input-symbol-percent {% endif %}">
                         {{ disaggregation_form.value|add_class:"form-control text-right force-numeric-input disaggregated-value-cell" }}
                         <div class="invalid-feedback">
-                            {% trans "Please enter a number greater than or equal to zero." %}
                         </div>
                     </div>
                 </li>
@@ -126,8 +125,8 @@
         let $sumValueCell = $( this ).find('.sum-value-cell').first();
         $sumValueCell.parent().removeClass('no-sum-value').removeClass('bad-sum-value');
         let sumValue = $sumValueCell.numericVal();
-        if (sumValue === false) {
-            // sum value is not good:
+        if (sumValue === null) {
+            // sum value is blank:
             $sumValueCell.parent().addClass('no-sum-value');
         } else {
             let achievedValue = $('#id_achieved').numericVal();

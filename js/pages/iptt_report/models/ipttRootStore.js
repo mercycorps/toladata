@@ -123,6 +123,9 @@ export default (
             }
             return periodValues || [];
         },
+        get hiddenCategories() {
+            return this.filterStore._hiddenCategories === true;
+        },
         get baseColumns() {
             return 8 + (this.filterStore.resultsFramework ? 0 : 1) - (this.filterStore._hiddenColumns.length);
         },
@@ -131,6 +134,17 @@ export default (
         },
         get activeDisaggregationPks() {
             return this.filterStore.currentDisaggregations;
+        },
+        indicatorHasActiveDisaggregations(indicator) {
+            if (!indicator.hasDisaggregations(this.activeDisaggregationPks)) {
+                return false;
+            }
+            if (this.hiddenCategories) {
+                return this.activeDisaggregationPks.map(pk => (this.getDisaggregationLabels(pk).labels || []))
+                                                           .reduce((a, b) => a.concat(b), [])
+                                                           .filter(label => this.disaggregatedLop(indicator.pk, label.pk)).length > 0;
+            }
+            return true;
         },
         getDisaggregationLabels(disaggregationPk) {
             return (this.currentProgram && this.currentProgram.disaggregations.has(disaggregationPk)) ?

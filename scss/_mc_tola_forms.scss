@@ -168,7 +168,7 @@ a.accordion-row__btn.btn.btn-link {
 .form-list-group {
     $_form-list-group-padding: 0.25rem;
     margin-bottom: $grid-gutter-width/2;
-    margin-top: $grid-gutter-width/2;
+    margin-top: 0;
     > .list-group-item {
         align-items: center;
         display: flex;
@@ -178,14 +178,27 @@ a.accordion-row__btn.btn.btn-link {
     }
 }
 .item__label {
+    flex: 1 0 auto;
     line-height: 1;
+    margin-right: 0.25rem;
     label {
         margin-bottom: 0;
     }
 }
 .item__value {
+    flex: 0 1 auto;
 }
+
 .error-row {
+}
+
+.ul__error_row {
+    background-color: $red-050;
+    margin-top: -15px; // negates the 15px bottom padding on a UL when appending an error row to it (so the error row is visually attached to the list)
+    line-height: 2em; // adds space above and below the text for the pink background danger highlighting
+    &>.target-value-error {
+      padding-left: 6px;  // spaces warning message from the left edge for a visually uncluttered appearance (arbitrary value to match spec'd screenshot)
+    }
 }
 .reference-row {
     background-color: $gray-200;
@@ -199,9 +212,11 @@ a.accordion-row__btn.btn.btn-link {
 }
 .sum-value-cell {
     font-weight: bold;
+    text-align: right;
 }
 .actual-value-cell {
     font-weight: bold;
+    text-align: right;
 }
 
 

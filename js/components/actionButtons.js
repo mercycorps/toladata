@@ -12,7 +12,7 @@ library.add(faPlusSquare, faMinusSquare);
 
 export class DeleteButton extends React.Component {
     render() {
-        const buttonClasses = classNames('deletebtn btn btn-sm text-danger', this.props.buttonClasses);
+        const buttonClasses = classNames('btn-delete btn btn-sm text-danger', this.props.buttonClasses);
         const iconClasses = classNames('fa fa-times', this.props.iconClasses);
         return (
             <button

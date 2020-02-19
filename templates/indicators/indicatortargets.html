@@ -27,7 +27,7 @@
                             <div class="item__label">
                                 {% if not readonly %}
                                 <a href="{% url 'pt_delete' pt.id %}" id="delete_event_{{ pt.id }}"
-                                   class="deletebtn btn btn-sm event-target-delete-button">
+                                   class="btn-delete btn btn-sm event-target-delete-button">
                                     <i class="fas fa-times text-danger"></i>
                                 </a>
                                 {% endif %}
@@ -40,7 +40,7 @@
                             <div class="item__label">
                                 <a href="#" id="delete_event_{{forloop.counter0}}"
                                    data-target-row="target_row_{{forloop.counter0}}"
-                                   class="deletebtn btn btn-sm event-target-delete-button">
+                                   class="btn-delete btn btn-sm event-target-delete-button">
                                     <i class="fas fa-times text-danger"></i>
                                 </a>
                     {% endif %}
@@ -96,7 +96,7 @@
                     </div>
                 </li>
             </ul>
-            <div class="text-danger item__label" id="id_pt_errors"></div>
+            <div class="text-danger item__label ul__error_row" id="id_pt_errors"></div>
         </div>
 
         <div class="d-flex justify-content-between align-items-baseline">
@@ -208,7 +208,7 @@
                     </div>
                 </li>
             </ul>
-            <div class="text-danger item__label" id="id_pt_errors"></div>
+            <div class="text-danger item__label ul__error_row" id="id_pt_errors"></div>
         </div>
 
         {% if not readonly %}

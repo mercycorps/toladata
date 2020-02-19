@@ -709,7 +709,7 @@ function getValidatedNumericInput(selector) {
         // allow numbers (48 - 57 map to 0-9):
         if ((e.keyCode >= 48 && e.keyCode <= 57 && !e.shiftKey) ||
             // allow comma or period if there isn't one already:
-            ($.inArray(e.keyCode, [188, 190]) !== -1 && (curVal.match(/[,.]/) || []).length < 1)) {
+            ($.inArray(e.keyCode, [188, 190]) !== -1 && (curVal.match(/[,.]/) || []).length < 1) && !e.shiftKey) {
             // don't do anything (allow number / decimal / comma to be entered as normal)
             return;
         }
@@ -773,7 +773,7 @@ jQuery.fn.extend({
             this.val(value);
         }
         if (this.is('div') || this.is('span')) {
-            this.html(`${value}${percent ? '&ensp;%' : ''}`);
+            this.html(`${value}`);
         }
     }
 });
