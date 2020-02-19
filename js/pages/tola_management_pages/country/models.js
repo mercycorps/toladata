@@ -400,7 +400,7 @@ export class CountryStore {
         }
         this.editing_disaggregations_data = [...this.editing_disaggregations_data, new_disaggregation_data]
     }
-    // TODO: can I still archive and delete?  Probably not
+
     @action deleteDisaggregation(id, callback) {
         create_no_rationale_changeset_notice({
             preamble: gettext("This action cannot be undone."),
@@ -480,8 +480,13 @@ export class CountryStore {
     }
 
     @action updateDisaggregation(id, data) {
-        this.populateDisaggregationErrors(this.editing_disaggregations_data, data, id);
-        if (this.editing_disaggregations_errors) {
+        this.assignDisaggregationErrors(this.editing_disaggregations_data, data, id);
+        const hasLabelErrors = this.editing_disaggregations_errors.hasOwnProperty('labels')
+            && this.editing_disaggregations_errors['labels'].length > 0
+            && this.editing_disaggregations_errors['labels'].some( entry => {
+                    return entry.hasOwnProperty('label')
+                });
+        if (this.editing_disaggregations_errors['disaggregation_type'] || hasLabelErrors) {
             return;
         }
 
@@ -507,18 +512,16 @@ export class CountryStore {
     }
 
     @action createDisaggregation(data) {
-        const existing_disagg_types = this.editing_disaggregations_data.map( disagg => disagg.disaggregation_type);
-        if (existing_disagg_types.includes(data.disaggregation_type)) {
-            this.onDuplicatedDisaggTypeMessage();
-            return;
-        }
-        const label_set = new Set(data.labels.map( label => label.label));
-        if (label_set.size !== data.labels.length) {
-            this.onDuplicatedDisaggLabelMessage();
+        this.assignDisaggregationErrors(this.editing_disaggregations_data, data, "new");
+        const hasLabelErrors = this.editing_disaggregations_errors.hasOwnProperty('labels')
+            && this.editing_disaggregations_errors['labels'].length > 0
+            && this.editing_disaggregations_errors['labels'].some( entry => {
+                    return entry.hasOwnProperty('label');
+                });
+        if (this.editing_disaggregations_errors['disaggregation_type'] || hasLabelErrors) {
             return;
         }
 
-        this.editing_disaggregations_errors = {};
         return this.api.createDisaggregation(data).then(response => {
             this.updateHistory(response.data.country);
             return runInAction(() => {
@@ -549,35 +552,44 @@ export class CountryStore {
     }
 
     @action
-    populateDisaggregationErrors(existingDisagg, newDisagg, disaggId) {
-        let disaggErrors = {};
+    assignDisaggregationErrors(existingDisagg, newDisagg, disaggId) {
+
         const existingDisaggTypes = existingDisagg.filter(disagg => disagg.id !== disaggId)
             .map(disagg => disagg.disaggregation_type);
         if (existingDisaggTypes.includes(newDisagg.disaggregation_type)) {
             // # Translators:  This error message appears underneath a user-input name if it appears more than once in a set of names.  Only unique names are allowed.
-            disaggErrors['disaggregation_type'] = [gettext("Duplicate disaggregations not allowed.")];
+            this.editing_disaggregations_errors['disaggregation_type'] = [gettext("Duplicate disaggregations not allowed.")];
         }
+        else{
+            this.editing_disaggregations_errors = {}
+        }
+        this.assignDisaggregationLabelErrors(newDisagg)
+    }
+
+    @action
+    assignDisaggregationLabelErrors(newDisagg) {
         const duplicateIndexes = findDuplicateLabelIndexes(newDisagg.labels.map(label => label.label));
-        disaggErrors['labels'] = Array(newDisagg.labels.length).fill({})
+        let labelErrors = Array(newDisagg.labels.length).fill().map( e => ({}));
 
         newDisagg.labels.forEach( (label, index) => {
             if (!label.label || label.label.length === 0) {
                 // # Translators:  This error message appears underneath user-input labels that appear more than once in a set of labels.  Only unique labels are allowed.
-                disaggErrors['labels'][index] = {label: [gettext("Blank values not allowed.")]};
+                labelErrors[index]['label'] = [gettext("Blank values not allowed.")];
             }
-            if (duplicateIndexes.includes(index)) {
+            else if (duplicateIndexes.includes(index)) {
                 // # Translators:  This error message appears underneath user-input labels that appear more than once in a set of labels.  Only unique labels are allowed.
-                disaggErrors['labels'][index] = {label: [gettext("Duplicate categories not allowed.")]};
+                labelErrors[index]['label'] = [gettext("Duplicate categories not allowed.")];
             }
         });
-        this.editing_disaggregations_errors = disaggErrors;
+        this.editing_disaggregations_errors['labels'] = labelErrors;
     }
 }
 
 export const findDuplicateLabelIndexes = function (label_list) {
+        const lowerCaseList = label_list.map( label => label.toLowerCase())
         let dupeIndexes = new Set();
-        label_list.forEach( (label, index) => {
-            const dupeIndex = label_list.indexOf(label, index+1);
+        lowerCaseList.forEach( (label, index) => {
+            const dupeIndex = lowerCaseList.indexOf(label, index+1);
             if (dupeIndex > 0) {
                 dupeIndexes.add(index).add(dupeIndex);
             }

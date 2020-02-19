@@ -36,13 +36,19 @@ class CategoryForm extends React.Component {
 
     render() {
         const {index, category, listLength, ...props} = this.props;
+        const isInvalid = props.errors
+            && props.errors.labels
+            && props.errors.labels.length > index
+            && props.errors.labels[index].hasOwnProperty('label')
+            && props.errors.labels[index]['label'].length;
+
         return (
             <React.Fragment>
                 <div className="form-group col-md-7">
                     <input
                         value={ category.label }
                         onChange={(e) => props.updateLabel(index, { label: e.target.value })}
-                        className={classNames("form-control", {"is-invalid": (props.errors.labels && props.errors.labels[index] ? Object.keys(props.errors.labels[index]).length : false)})}
+                        className={classNames("form-control", {"is-invalid": isInvalid})}
                         disabled={category.in_use || props.disabled}
                     />
                     { props.errors.labels &&
@@ -243,7 +249,7 @@ class DisaggregationType extends React.Component {
                                       labels[oldIndex], ...remainingLabels.slice(newIndex)])
             }, () => this.hasUnsavedDataAction());
     }
-    // TODO: check for label duplicates
+
     appendLabel() {
         const label_set = new Set(this.state.labels);
         if (label_set.size !== this.state.labels.length){
