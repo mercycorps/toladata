@@ -42,11 +42,13 @@ class CategoryForm extends React.Component {
                     <input
                         value={ category.label }
                         onChange={(e) => props.updateLabel(index, { label: e.target.value })}
-                        className={classNames("form-control", {"is-invalid": (props.errors.labels ? Object.keys(props.errors.labels[index]).length : false)})}
+                        className={classNames("form-control", {"is-invalid": (props.errors.labels && props.errors.labels[index] ? Object.keys(props.errors.labels[index]).length : false)})}
                         disabled={category.in_use || props.disabled}
                     />
                     { props.errors.labels &&
-                        <ErrorFeedback errorMessages={props.errors.labels[index]['label']} />
+                        <ErrorFeedback errorMessages={props.errors.labels.length > index
+                            ? props.errors.labels[index]['label']
+                            : null} />
                     }
                 </div>
                 <div className="form-group col-md-2">
@@ -177,19 +179,21 @@ class DisaggregationType extends React.Component {
         another label and save, a validation error occurs because it looks like there are two
         new labels, one of which would be a duplicate.
          */
-
         if (this.state.labels) {
             const labelMap = this.props.disaggregation.labels.reduce((accum, labelObj) => {
                 accum[labelObj.label] = labelObj.id;
                 return accum;
             }, {});
-            this.state.labels.forEach(labelInState => {
-                if (labelInState.id === "new") {
-                    if (Object.keys(labelMap).includes(labelInState.label)) {
-                        labelInState.id = labelMap[labelInState.label];
+            const a = new Set(Object.keys(labelMap));
+            if (a.size === this.state.labels.length) {
+                this.state.labels.forEach(labelInState => {
+                    if (labelInState.id === "new") {
+                        if (Object.keys(labelMap).includes(labelInState.label)) {
+                            labelInState.id = labelMap[labelInState.label];
+                        }
                     }
-                }
-            });
+                });
+            }
         }
 
         if (this.selectedByDefaultPopup.current) {

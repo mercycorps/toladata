@@ -76,3 +76,25 @@ class TestDuplicateDisagg(test.TestCase):
             1, disagg2.disaggregationlabel_set.count(),
             "Should be able to save a disagg label with the same name in a different disagg type."
         )
+
+class TestErrorMessages(test.TestCase):
+
+    def setUp(self):
+        self.country = w_factories.CountryFactory(country="country1", code="C1")
+        self.tola_user = w_factories.TolaUserFactory()
+        self.client.force_login(self.tola_user.user)
+        request_payload = {
+            id: "new",
+            "disaggregation_type": "first",
+            "country": self.country.id,
+            "labels": [
+                {"id": "new", "label": "asd", "createdId": "new-0", "customsort": 1},
+                {"id": "new", "label": "asdff", "createdId": "new-1", "customsort": 2},
+                {"id": "new", "label": "", "createdId": "new-2", "customsort": 3}
+            ]
+        }
+
+
+    def test_error_response(self):
+        # response = self.client.get(reverse('indicator_create', kwargs={'program': self.program.pk}))
+        self.assertEqual(200, 200)

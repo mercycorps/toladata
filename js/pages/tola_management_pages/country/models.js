@@ -478,39 +478,13 @@ export class CountryStore {
             blocking: true
         });
     }
-    // TODO: better error messages for dupes
+
     @action updateDisaggregation(id, data) {
-        console.log('submitted data', toJS(data))
-        console.log('main data', toJS(this.editing_disaggregations_data))
-        // const existing_disagg_types = this.editing_disaggregations_data
-        //     .filter( disagg => disagg.id !== id)
-        //     .map( disagg => disagg.disaggregation_type);
-        // if (existing_disagg_types.includes(data.disaggregation_type)) {
-        //     this.onDuplicatedDisaggTypeMessage();
-        //     runInAction(() => {
-        //         this.editing_disaggregations_errors['disaggregation_type'] = [gettext("Save failed for duplicate disaggregation")];
-        //     });
-        //     return;
-        // }
-        // const label_set = new Set(data.labels.map( label => label.label));
-        const duplicateIndexes = findDuplicateLabelIndexes(data.labels.map( label => label.label));
-        console.log('duplicates', duplicateIndexes, data.labels);
-        if (duplicateIndexes.length > 0) {
-            // // First fill up the label error array with blank values, then fill those that actually have duplicates
-            // this.editing_disaggregations_errors['labels'] = Array(data.labels.length).fill({label: null});
-            // // # Translators:  This error message appears underneath user-input labels that appear more than once in a set of labels.  Only unique labels are allowed.
-            // const errorText = gettext("Duplicate categories not allowed.");
-            // duplicateIndexes.forEach( dIndex => {
-            //     runInAction( () => {
-            //         this.editing_disaggregations_errors['labels'][dIndex]['label']=[errorText]
-            //     });
-            //
-            // });
-            // this.onDuplicatedDisaggLabelMessage();
-            // return;
+        this.populateDisaggregationErrors(this.editing_disaggregations_data, data, id);
+        if (this.editing_disaggregations_errors) {
+            return;
         }
 
-        this.editing_disaggregations_errors = {};
         delete data.is_archived;
         this.api.updateDisaggregation(id, data).then(response => {
             runInAction(() => {
@@ -574,17 +548,40 @@ export class CountryStore {
         }
     }
 
-}
+    @action
+    populateDisaggregationErrors(existingDisagg, newDisagg, disaggId) {
+        let disaggErrors = {};
+        const existingDisaggTypes = existingDisagg.filter(disagg => disagg.id !== disaggId)
+            .map(disagg => disagg.disaggregation_type);
+        if (existingDisaggTypes.includes(newDisagg.disaggregation_type)) {
+            // # Translators:  This error message appears underneath a user-input name if it appears more than once in a set of names.  Only unique names are allowed.
+            disaggErrors['disaggregation_type'] = [gettext("Duplicate disaggregations not allowed.")];
+        }
+        const duplicateIndexes = findDuplicateLabelIndexes(newDisagg.labels.map(label => label.label));
+        disaggErrors['labels'] = Array(newDisagg.labels.length).fill({})
 
+        newDisagg.labels.forEach( (label, index) => {
+            if (!label.label || label.label.length === 0) {
+                // # Translators:  This error message appears underneath user-input labels that appear more than once in a set of labels.  Only unique labels are allowed.
+                disaggErrors['labels'][index] = {label: [gettext("Blank values not allowed.")]};
+            }
+            if (duplicateIndexes.includes(index)) {
+                // # Translators:  This error message appears underneath user-input labels that appear more than once in a set of labels.  Only unique labels are allowed.
+                disaggErrors['labels'][index] = {label: [gettext("Duplicate categories not allowed.")]};
+            }
+        });
+        this.editing_disaggregations_errors = disaggErrors;
+    }
+}
 
 export const findDuplicateLabelIndexes = function (label_list) {
         let dupeIndexes = new Set();
         label_list.forEach( (label, index) => {
             const dupeIndex = label_list.indexOf(label, index+1);
             if (dupeIndex > 0) {
-                dupeIndexes.add(index).add(dupeIndex)
+                dupeIndexes.add(index).add(dupeIndex);
             }
-        })
+        });
         return Array.from(dupeIndexes);
 
-    }
+    };
