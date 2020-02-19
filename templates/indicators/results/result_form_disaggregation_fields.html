@@ -88,7 +88,11 @@
             $( this ).val('');
             // user entered a comma or . and tabbed out, do nothing
         } else if ($( this ).numericVal() === null || $(this).numericVal() < 0) {
-            $( this ).addClass('is-invalid');
+            if ($( this ).displayVal() == '') {
+                $( this ).val('');
+            } else {
+                $( this ).addClass('is-invalid');
+            }
         }
         $( this ).parents('.disaggregation-formset').trigger('updateSum');
     }

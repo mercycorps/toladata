@@ -701,7 +701,11 @@ function getValidatedNumericInput(selector) {
         // if decimal point/comma, and already 2 digits to the right of it, and cursor is to the right of it, prevent:
         let curVal = `${$(e.target).val()}`;
         let floatingPointPosition = Math.max(curVal.indexOf('.'), curVal.indexOf(','));
-        if ((curVal.match(/[,.]/) || []).length > 0 && curVal.length - floatingPointPosition > 2 && e.target.selectionStart > floatingPointPosition) {
+        let curSelection = curVal.slice(e.target.selectionStart, e.target.selectionEnd);
+        let selectionContainsSeparator = (curSelection && curSelection.length > 0 && (curSelection.match(/[,.]/) || []).length > 0);
+        if ((curVal.match(/[,.]/) || []).length > 0 &&
+            curVal.length - floatingPointPosition > 2 &&
+            e.target.selectionStart > floatingPointPosition && (!curSelection || curSelection.length < 1)) {
             //prevent numbers more than 2 spaces to the right of the decimal/comma from being entered:
             e.preventDefault();
             return;
@@ -709,7 +713,8 @@ function getValidatedNumericInput(selector) {
         // allow numbers (48 - 57 map to 0-9):
         if ((e.keyCode >= 48 && e.keyCode <= 57 && !e.shiftKey) ||
             // allow comma or period if there isn't one already:
-            ($.inArray(e.keyCode, [188, 190]) !== -1 && (curVal.match(/[,.]/) || []).length < 1) && !e.shiftKey) {
+            ($.inArray(e.keyCode, [188, 190]) !== -1 && ((curVal.match(/[,.]/) || []).length < 1 || selectionContainsSeparator)) &&
+            !e.shiftKey) {
             // don't do anything (allow number / decimal / comma to be entered as normal)
             return;
         }
