@@ -977,10 +977,7 @@
             }
         });
         $("#periodic_targets_table .target-label").each(function(){
-            if ($(this).val()) {
-                $(this).removeClass('is-invalid');
-            } else {
-                $(this).addClass('is-invalid');
+            if (!$(this).val()) {
                 allValid = false;
             }
         });
