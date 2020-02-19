@@ -84,6 +84,9 @@
         $( this ).removeClass('is-invalid');
         if ($( this ).val() == '') {
             // user entered blank, do nothing
+        } else if ($( this ).val() == ',' || $( this ).val() == '.') {
+            $( this ).val('');
+            // user entered a comma or . and tabbed out, do nothing
         } else if ($( this ).numericVal() === null || $(this).numericVal() < 0) {
             $( this ).addClass('is-invalid');
         }
@@ -106,7 +109,7 @@
                 // disaggregation is empty (all blank)
                 $( this ).find('.sum-value-cell').html('');
             } else {
-                let sumValue = values.filter(val => val > 0).reduce((a, b) => a + b);
+                let sumValue = values.filter(val => val > 0).reduce((a, b) => a + b, 0);
                 $( this ).find('.sum-value-cell').displayVal(sumValue, percentageInput);
             }
         }
