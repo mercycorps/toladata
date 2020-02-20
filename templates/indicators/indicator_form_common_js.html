@@ -989,7 +989,7 @@
 
         let computedLop = computeLopTarget();
         if (allValid && computedLop != null && computedLop < 0.01) {
-            let msg = "{% trans 'TheLife of Program (LoP) target cannot be zero.  Please update targets.'|escapejs %}";
+            let msg = "{% trans 'The Life of Program (LoP) target cannot be zero.  Please update targets.'|escapejs %}";
             showTargetErrors(msg);
             return false;
         }
