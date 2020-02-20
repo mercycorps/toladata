@@ -6,6 +6,7 @@ import logging
 
 logger = logging.getLogger('django')
 
+
 def remove_duplicate_types_and_labels(apps, schema_editor):
     logger.error("Starting disagg de-duplication migration that will precede application of database constraints.")
     DType = apps.get_model("indicators", "DisaggregationType")
@@ -69,9 +70,8 @@ def remove_duplicate_types_and_labels(apps, schema_editor):
             if doomed_label.num_values > 0:
                 for doomed_value in DValue.objects.filter(category=doomed_label, value__isnull=False):
 
-
-                    preserved_value = DValue.objects.get_or_create(
-                        result=doomed_value.result, category=label_to_keep, defaults={"value":0}
+                    preserved_value, was_created = DValue.objects.get_or_create(
+                        result=doomed_value.result, category=label_to_keep, defaults={"value": 0}
                     )
                     logger.error("Adding value of {} from dupe Disagg Value({}) to preserverd value({}) of {}".format(
                         doomed_value.value, doomed_value.id, preserved_value.id, preserved_value.value))
@@ -83,6 +83,7 @@ def remove_duplicate_types_and_labels(apps, schema_editor):
             doomed_label.delete()
             logger.error(deleted_text)
     logger.error("End of disagg de-duplication data migration.")
+
 
 class Migration(migrations.Migration):
 
