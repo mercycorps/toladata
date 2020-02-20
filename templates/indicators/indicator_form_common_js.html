@@ -1000,7 +1000,7 @@
 
     function getPTMessage () {
         if ($("#periodic_targets_table input.target-label").length > 0){
-            return ("{% trans 'Please complete all event names and targets..'|escapejs %}");
+            return ("{% trans 'Please complete all event names and targets.'|escapejs %}");
         }
         else {
             return ("{% trans 'Please complete targets.'|escapejs %}");
