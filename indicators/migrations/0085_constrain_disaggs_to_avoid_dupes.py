@@ -69,11 +69,10 @@ def remove_duplicate_types_and_labels(apps, schema_editor):
             if doomed_label.num_values > 0:
                 for doomed_value in DValue.objects.filter(category=doomed_label, value__isnull=False):
 
-                    try:
-                        preserved_value = DValue.objects.get(result__id=doomed_value.result.id, category=label_to_keep)
-                    except DValue.DoesNotExist:
-                        preserved_value = DValue.objects.create(
-                            result=doomed_value.result, category=label_to_keep, value=0)
+
+                    preserved_value = DValue.objects.get_or_create(
+                        result=doomed_value.result, category=label_to_keep, defaults={"value":0}
+                    )
                     logger.error("Adding value of {} from dupe Disagg Value({}) to preserverd value({}) of {}".format(
                         doomed_value.value, doomed_value.id, preserved_value.id, preserved_value.value))
                     preserved_value.value += doomed_value.value
@@ -87,6 +86,13 @@ def remove_duplicate_types_and_labels(apps, schema_editor):
 
 class Migration(migrations.Migration):
 
+    """
+    Django automatically created a workflow dependency on 0057, however this causes an error when running migrations
+    on an empty database (as Travis does).  The error occurs because workflow 0053 deletes Project modules that early
+    indicator migrations need in order to run.  Setting the dependency to 0052 causes the migration engine to
+    run workflow migrations up to 0052, then switch to indicator migrations, then go back to workflow migrations.
+    This pattern allows all migrations to be run on an empty DB.
+    """
     dependencies = [
         ("workflow", "0052_delete_tolasites"),
         ("indicators", "0084_update_verbose_result_sites_name"),
