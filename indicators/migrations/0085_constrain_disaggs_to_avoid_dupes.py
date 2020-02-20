@@ -2,9 +2,12 @@
 
 from django.db import migrations
 from django.db.models import Count, Q
+import logging
 
+logger = logging.getLogger('django')
 
 def remove_duplicate_types_and_labels(apps, schema_editor):
+    logger.error("Starting disagg de-duplication migration that will precede application of database constraints.")
     DType = apps.get_model("indicators", "DisaggregationType")
     DLabel = apps.get_model("indicators", "DisaggregationLabel")
     DValue = apps.get_model("indicators", "DisaggregatedValue")
@@ -18,7 +21,6 @@ def remove_duplicate_types_and_labels(apps, schema_editor):
     for dtype in duplicated_types:
         dupe_group = DType.objects\
             .filter(disaggregation_type=dtype['disaggregation_type'], country__id=dtype['country'])\
-            .prefetch_related()\
             .annotate(num_indicators=Count('indicator', distinct=True))\
             .annotate(num_values=Count(
                 'disaggregationlabel__disaggregatedvalue',
@@ -37,11 +39,11 @@ def remove_duplicate_types_and_labels(apps, schema_editor):
                 """
             )
 
-        print(f"Preserving disaggregation type \"{type_to_keep.disaggregation_type}\"({type_to_keep.id})")
+        logger.error(f"Preserving disaggregation type \"{type_to_keep.disaggregation_type}\"({type_to_keep.id})")
         for doomed_type in types_to_delete:
             deleted_text = f"Deleted the \"{doomed_type.disaggregation_type}\"({doomed_type.id}) disaggregation type"
             doomed_type.delete()
-            print(deleted_text)
+            logger.error(deleted_text)
 
     duplicated_labels = DLabel.objects \
         .values("label", "disaggregation_type") \
@@ -53,7 +55,6 @@ def remove_duplicate_types_and_labels(apps, schema_editor):
     for dlabel in duplicated_labels:
         dupe_group = DLabel.objects \
             .filter(label=dlabel["label"], disaggregation_type__id=dlabel["disaggregation_type"]) \
-            .prefetch_related() \
             .annotate(num_values=Count(
                 "disaggregatedvalue__value",
                 filter=Q(disaggregatedvalue__value__isnull=False),
@@ -63,7 +64,7 @@ def remove_duplicate_types_and_labels(apps, schema_editor):
         label_to_keep = dupe_group[0]
         labels_to_delete = dupe_group[1:]
 
-        print(f"Preserving disaggregation label \"{label_to_keep.label}\"({label_to_keep.id})")
+        logger.error(f"Preserving disaggregation label \"{label_to_keep.label}\"({label_to_keep.id})")
         for doomed_label in labels_to_delete:
             if doomed_label.num_values > 0:
                 for doomed_value in DValue.objects.filter(category=doomed_label, value__isnull=False):
@@ -73,21 +74,21 @@ def remove_duplicate_types_and_labels(apps, schema_editor):
                     except DValue.DoesNotExist:
                         preserved_value = DValue.objects.create(
                             result=doomed_value.result, category=label_to_keep, value=0)
-                    print("Adding value of {} from dupe Disagg Value({}) to preserverd value({}) of {}".format(
+                    logger.error("Adding value of {} from dupe Disagg Value({}) to preserverd value({}) of {}".format(
                         doomed_value.value, doomed_value.id, preserved_value.id, preserved_value.value))
                     preserved_value.value += doomed_value.value
-                    print(f"New preserved value = {preserved_value.value}")
+                    logger.error(f"New preserved value = {preserved_value.value}")
                     preserved_value.save()
 
             deleted_text = f"Deleted the \"{doomed_label.label}\"({doomed_label.id}) disaggregation label."
             doomed_label.delete()
-            print(deleted_text)
-
+            logger.error(deleted_text)
+    logger.error("End of disagg de-duplication data migration.")
 
 class Migration(migrations.Migration):
 
     dependencies = [
-        ("workflow", "0057_delete_loggeduser"),
+        ("workflow", "0052_delete_tolasites"),
         ("indicators", "0084_update_verbose_result_sites_name"),
     ]
 

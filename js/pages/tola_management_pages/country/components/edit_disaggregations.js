@@ -251,10 +251,6 @@ class DisaggregationType extends React.Component {
     }
 
     appendLabel() {
-        const label_set = new Set(this.state.labels);
-        if (label_set.size !== this.state.labels.length){
-
-        }
         this.labelsCreated += 1;
         const newLabel = {
             id: 'new',
