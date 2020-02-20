@@ -192,7 +192,7 @@
                         <strong>{% trans "Life of Program (LoP) target" %}</strong>
                     </div>
                     <div class="item__value">
-                        <span id="span_id_lop_target" class="input-value {% if indicator.unit_of_measure_type == 2 %}input-symbol-percent{% endif %}">
+                        <span id="span_id_lop_target" class="{% if indicator.unit_of_measure_type == 2 %}input-symbol-percent{% endif %}">
                             <input type="text"
                                    name="lop_target"
                                    id="id_lop_target"
