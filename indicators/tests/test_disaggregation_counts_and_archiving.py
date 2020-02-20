@@ -180,7 +180,7 @@ class TestDisaggregationLabelCounts(test.TestCase):
         def make_label(disagg, c):
             label = DisaggregationLabel(
                 disaggregation_type=disagg,
-                label="label {} for disagg {}".format(count+1, disagg.disaggregation_type),
+                label="label {} for disagg {}".format(c+1, disagg.disaggregation_type),
                 customsort=c+1
             )
             label.save()

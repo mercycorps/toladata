@@ -4,7 +4,7 @@ import { DragDropContext, Droppable, Draggable } from 'react-beautiful-dnd';
 import classNames from 'classnames'
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome'
 import HelpPopover from "../../../../components/helpPopover";
-
+import { toJS } from 'mobx';
 
 const ErrorFeedback = observer(({errorMessages}) => {
     if (!errorMessages) {
@@ -25,7 +25,7 @@ class CategoryForm extends React.Component {
         super(props);
         this.disabledRef = React.createRef();
     }
-    
+
     componentDidMount = () => {
         if (this.disabledRef.current) {
             $(this.disabledRef.current).popover({
@@ -36,17 +36,25 @@ class CategoryForm extends React.Component {
 
     render() {
         const {index, category, listLength, ...props} = this.props;
+        const isInvalid = props.errors
+            && props.errors.labels
+            && props.errors.labels.length > index
+            && props.errors.labels[index].hasOwnProperty('label')
+            && props.errors.labels[index]['label'].length;
+
         return (
             <React.Fragment>
                 <div className="form-group col-md-7">
                     <input
                         value={ category.label }
                         onChange={(e) => props.updateLabel(index, { label: e.target.value })}
-                        className={classNames("form-control", {"is-invalid": (props.errors.labels ? Object.keys(props.errors.labels[index]).length : false)})}
+                        className={classNames("form-control", {"is-invalid": isInvalid})}
                         disabled={category.in_use || props.disabled}
                     />
                     { props.errors.labels &&
-                        <ErrorFeedback errorMessages={props.errors.labels[index]['label']} />
+                        <ErrorFeedback errorMessages={props.errors.labels.length > index
+                            ? props.errors.labels[index]['label']
+                            : null} />
                     }
                 </div>
                 <div className="form-group col-md-2">
@@ -60,7 +68,7 @@ class CategoryForm extends React.Component {
                         }
                     </select>
                 </div>
-                {(!props.disabled && !category.in_use) ? 
+                {(!props.disabled && !category.in_use) ?
                 <a
                     tabIndex="0"
                     onClick={() => props.deleteLabel(index)}
@@ -96,7 +104,7 @@ const DisaggregationCategoryList = observer(
                 renderClone={(provided, snapshot, rubric) => (
                     <div className="form-group mb-0 disaggregation-label-group"
                         ref={ provided.innerRef }
-                        {...provided.draggableProps}   
+                        {...provided.draggableProps}
                     >
                     <span className="draggable-arrow" {...provided.dragHandleProps}>
                         <i className="fas fa-arrows-alt fa-lg"></i>
@@ -122,7 +130,7 @@ const DisaggregationCategoryList = observer(
                                 {(provided, snapshot) => (
                                     <div className="form-group mb-0 disaggregation-label-group"
                                         ref={ provided.innerRef }
-                                        {...provided.draggableProps}   
+                                        {...provided.draggableProps}
                                     >
                                         <span className="draggable-arrow" {...provided.dragHandleProps}>
                                             <i className="fas fa-arrows-alt fa-lg"></i>
@@ -159,7 +167,7 @@ class DisaggregationType extends React.Component {
         this.labelsCreated = 0;
         this.selectedByDefaultPopup = React.createRef();
     }
-    
+
     orderLabels(labels) {
         return labels.slice().map((label, index) => ({...label, customsort: index + 1}));
     }
@@ -168,8 +176,32 @@ class DisaggregationType extends React.Component {
         const labels = this.props.disaggregation.labels.map(x => ({...x}));
         this.props.onIsDirtyChange(JSON.stringify(this.state) != JSON.stringify({...this.props.disaggregation, labels: [...labels]}))
     }
-    
+
     componentDidUpdate = () => {
+        /*
+        This is a super ugly hack to fix a bug and avoid re-writing the state management of this component.
+        Without this code block, if a new label is added and the form is saved, the id of "new"
+        never gets replaced with the real id coming from the server.  So if the user tries to add
+        another label and save, a validation error occurs because it looks like there are two
+        new labels, one of which would be a duplicate.
+         */
+        if (this.state.labels) {
+            const labelMap = this.props.disaggregation.labels.reduce((accum, labelObj) => {
+                accum[labelObj.label] = labelObj.id;
+                return accum;
+            }, {});
+            const a = new Set(Object.keys(labelMap));
+            if (a.size === this.state.labels.length) {
+                this.state.labels.forEach(labelInState => {
+                    if (labelInState.id === "new") {
+                        if (Object.keys(labelMap).includes(labelInState.label)) {
+                            labelInState.id = labelMap[labelInState.label];
+                        }
+                    }
+                });
+            }
+        }
+
         if (this.selectedByDefaultPopup.current) {
             $(this.selectedByDefaultPopup.current).popover({
                 html: true
@@ -194,7 +226,7 @@ class DisaggregationType extends React.Component {
             disaggregation_type: value,
         }, () => this.hasUnsavedDataAction())
     }
-    
+
     updateSelectedByDefault(checked) {
         this.setState({
             selected_by_default: checked == true
@@ -208,7 +240,7 @@ class DisaggregationType extends React.Component {
             labels: this.orderLabels(labels)
         }, () => this.hasUnsavedDataAction())
     }
-    
+
     updateLabelOrder(oldIndex, newIndex) {
         let labels = this.state.labels;
         let remainingLabels = [...labels.slice(0, oldIndex), ...labels.slice(oldIndex + 1)];
@@ -404,7 +436,7 @@ export default class EditDisaggregations extends React.Component {
             this.setState({expanded_id: 'new'}, () => {$('#disaggregation-type-input').focus();});
         }
     }
-    
+
     onDelete(id) {
         this.props.onDelete(id, () => {this.setState({is_dirty: false, expanded_id: null, formReset: null})});
     }

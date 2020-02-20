@@ -44,7 +44,7 @@ export class CountryStore {
     @observable editing_objectives_errors = {};
     @observable editing_disaggregations_data = [];
     @observable editing_disaggregations_errors = {};
-    @observable fetching_editing_history = true;
+    @observable fetching_editing_history = false;
     @observable editing_history = [];
     @observable saving = false;
 
@@ -177,12 +177,17 @@ export class CountryStore {
     }
 
     updateHistory(id) {
-        this.api.fetchCountryHistory(id).then( response => {
-            this.editing_history = response.data;
-        }).catch( errors => {
-            this.onHistoryFail()
-        });
-        this.fetching_editing_history = false;
+        if (id === "new") {
+            this.editing_history = [];
+        }
+        else {
+            this.api.fetchCountryHistory(id).then(response => {
+                this.editing_history = response.data;
+                this.fetching_editing_history = false;
+            }).catch(errors => {
+                this.fetching_editing_history = false;
+            });
+        }
     }
 
     onSaveSuccessHandler() {
@@ -205,9 +210,20 @@ export class CountryStore {
         PNotify.success({text: gettext("Successfully unarchived"), delay: 5000})
     }
 
-    onHistoryFail() {
-        // Not notifying of history loading failures at this time, but we may want to at some point.
-        // PNotify.error({text: gettext("Failed to update history.  You may need to reload the page."), delay: 5000})
+    onDuplicatedDisaggLabelMessage(message) {
+        PNotify.error({text: message ||
+            // # Translators: error message generated when item names are duplicated but are required to be unqiue.
+            gettext("Saving failed: Disaggregation categories should be unique within a disaggregation."),
+            delay: 5000
+        });
+    }
+
+    onDuplicatedDisaggTypeMessage(message) {
+        PNotify.error({text: message ||
+            // # Translators: error message generated when item names are duplicated but are required to be unqiue.
+            gettext("Saving failed: disaggregation names should be unique within a country."),
+            delay: 5000
+        });
     }
 
     @observable active_editor_pane = 'profile'
@@ -464,7 +480,16 @@ export class CountryStore {
     }
 
     @action updateDisaggregation(id, data) {
-        this.editing_disaggregations_errors = {};
+        this.assignDisaggregationErrors(this.editing_disaggregations_data, data, id);
+        const hasLabelErrors = this.editing_disaggregations_errors.hasOwnProperty('labels')
+            && this.editing_disaggregations_errors['labels'].length > 0
+            && this.editing_disaggregations_errors['labels'].some( entry => {
+                    return entry.hasOwnProperty('label')
+                });
+        if (this.editing_disaggregations_errors['disaggregation_type'] || hasLabelErrors) {
+            return;
+        }
+
         delete data.is_archived;
         this.api.updateDisaggregation(id, data).then(response => {
             runInAction(() => {
@@ -480,14 +505,23 @@ export class CountryStore {
                 this.updateHistory(this.editing_target);
             })
         }).catch((errors) => {
-            this.saving = false
-            this.editing_disaggregations_errors = errors.response.data
-            this.onSaveErrorHandler()
+            this.saving = false;
+            this.editing_disaggregations_errors = errors.response.data;
+            this.onSaveErrorHandler();
         })
     }
 
     @action createDisaggregation(data) {
-        this.editing_disaggregations_errors = {};
+        this.assignDisaggregationErrors(this.editing_disaggregations_data, data, "new");
+        const hasLabelErrors = this.editing_disaggregations_errors.hasOwnProperty('labels')
+            && this.editing_disaggregations_errors['labels'].length > 0
+            && this.editing_disaggregations_errors['labels'].some( entry => {
+                    return entry.hasOwnProperty('label');
+                });
+        if (this.editing_disaggregations_errors['disaggregation_type'] || hasLabelErrors) {
+            return;
+        }
+
         return this.api.createDisaggregation(data).then(response => {
             this.updateHistory(response.data.country);
             return runInAction(() => {
@@ -517,4 +551,62 @@ export class CountryStore {
         }
     }
 
+    @action
+    assignDisaggregationErrors(existingDisagg, newDisagg, disaggId) {
+        const existingDisaggTypes = existingDisagg.filter(disagg => disagg.id !== disaggId)
+            .map(disagg => disagg.disaggregation_type);
+        if (existingDisaggTypes.includes(newDisagg.disaggregation_type)) {
+            // # Translators:  This error message appears underneath a user-input name if it appears more than once in a set of names.  Only unique names are allowed.
+            this.editing_disaggregations_errors['disaggregation_type'] = [gettext("Duplicate disaggregations not allowed.")];
+        }
+        else{
+            this.editing_disaggregations_errors = {}
+        }
+        this.assignDisaggregationLabelErrors(newDisagg)
+    }
+
+    @action
+    assignDisaggregationLabelErrors(newDisagg) {
+        const duplicateIndexes = this.findDuplicateLabelIndexes(newDisagg.labels.map(label => label.label));
+        let labelErrors = Array(newDisagg.labels.length).fill().map( e => ({}));
+
+        newDisagg.labels.forEach( (label, index) => {
+            if (!label.label || label.label.length === 0) {
+                // # Translators:  This error message appears underneath user-input labels that appear more than once in a set of labels.  Only unique labels are allowed.
+                labelErrors[index]['label'] = [gettext("Blank values not allowed.")];
+            }
+            else if (duplicateIndexes.includes(index)) {
+                // # Translators:  This error message appears underneath user-input labels that appear more than once in a set of labels.  Only unique labels are allowed.
+                labelErrors[index]['label'] = [gettext("Duplicate categories not allowed.")];
+            }
+        });
+        this.editing_disaggregations_errors['labels'] = labelErrors;
+    }
+
+    findDuplicateLabelIndexes(label_list) {
+        const lowerCaseList = label_list.map( label => label.toLowerCase())
+        let dupeIndexes = new Set();
+        lowerCaseList.forEach( (label, index) => {
+            const dupeIndex = lowerCaseList.indexOf(label, index+1);
+            if (dupeIndex > 0) {
+                dupeIndexes.add(index).add(dupeIndex);
+            }
+        });
+        return Array.from(dupeIndexes);
+
+    };
+
 }
+
+// export const findDuplicateLabelIndexes = function (label_list) {
+//         const lowerCaseList = label_list.map( label => label.toLowerCase())
+//         let dupeIndexes = new Set();
+//         lowerCaseList.forEach( (label, index) => {
+//             const dupeIndex = lowerCaseList.indexOf(label, index+1);
+//             if (dupeIndex > 0) {
+//                 dupeIndexes.add(index).add(dupeIndex);
+//             }
+//         });
+//         return Array.from(dupeIndexes);
+//
+//     };

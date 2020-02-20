@@ -1,8 +1,4 @@
 
-from datetime import date
-import json
-from unittest import skip
-
 from django import test
 from factories import (
     workflow_models as w_factories,
@@ -109,10 +105,6 @@ class TestResultAuditLog(test.TestCase):
             len(disagg_values['prev']), len(indexes),
             "Only the disaggregation values that have changed should appear in the diff list"
         )
-
-    @skip
-    def test_result_log_sorting(self):
-        pass
 
     def test_logged_field_order_counts(self):
         # The fields being tracked in the audit log (which is determined by a property of the model) should always

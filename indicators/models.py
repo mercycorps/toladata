@@ -465,6 +465,7 @@ class DisaggregationIndicatorFormManager(models.Manager):
         )
         return qs
 
+
 class DisaggregationType(models.Model):
     """Business logic name: Disaggregation - e.g. `Gender` or `SADD`"""
     disaggregation_type = models.CharField(_("Disaggregation"), max_length=135)
@@ -477,8 +478,18 @@ class DisaggregationType(models.Model):
     objects = models.Manager()
     form_objects = DisaggregationIndicatorFormManager()
 
+    class Meta:
+        unique_together = ['disaggregation_type', 'country']
+
     def __str__(self):
         return self.disaggregation_type
+
+    def save(self, *args, **kwargs):
+        if self.create_date is None:
+            self.create_date = timezone.now()
+        self.edit_date = timezone.now()
+
+        super(DisaggregationType, self).save(*args, **kwargs)
 
     @classmethod
     def program_disaggregations(cls, program_pk, countries=None, indicator_pk=None):
@@ -565,6 +576,14 @@ class DisaggregationLabel(models.Model):
 
     class Meta:
         ordering = ['customsort']
+        unique_together = ['disaggregation_type', 'label']
+
+    def save(self, *args, **kwargs):
+        if self.create_date is None:
+            self.create_date = timezone.now()
+        self.edit_date = timezone.now()
+
+        super(DisaggregationLabel, self).save(*args, **kwargs)
 
     def __str__(self):
         return self.label
