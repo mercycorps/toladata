@@ -82,7 +82,7 @@ export const forIPTT = (
                                country: disaggregationJSON.country || null,
                                labels: (disaggregationJSON.labels || []).map(
                                     labelJSON => ({pk: parseInt(labelJSON.pk), name: labelJSON.name}))}]
-        ))),
+        ).filter(([disaggregationPk, disaggregation]) => (disaggregation.labels && disaggregation.labels.length > 0)))),
     indicatorTypes: observable(new Map((programJSON.indicator_types || []).map(
         indicatorTypeJSON => [parseInt(indicatorTypeJSON.pk), {pk: parseInt(indicatorTypeJSON.pk), name: indicatorTypeJSON.name}]
         ))),
