@@ -306,7 +306,7 @@ msgstr "Cibles"
 #: indicators/indicator_plan.py:29
 #: templates/indicators/indicator_form_modal.html:88
 msgid "Data Acquisition"
-msgstr "Acquisition des données"
+msgstr "Collecte des données"
 
 #: indicators/indicator_plan.py:30
 msgid "Analyses and Reporting"
@@ -384,7 +384,7 @@ msgstr "Utilisation de l’information"
 
 #: indicators/indicator_plan.py:187
 msgid "Frequency of reporting"
-msgstr "Fréquence de déclaration"
+msgstr "Fréquence de rapportage"
 
 #: indicators/indicator_plan.py:194
 msgid "Quality assurance measures"
@@ -392,7 +392,7 @@ msgstr "Mesures d’assurance qualité"
 
 #: indicators/indicator_plan.py:201 indicators/models.py:1216
 msgid "Data issues"
-msgstr "Données émises"
+msgstr "Problèmes liés aux données"
 
 #: indicators/indicator_plan.py:208 indicators/models.py:1226
 #: indicators/models.py:1944
@@ -477,7 +477,7 @@ msgstr "Mercy Corps"
 #. Translators: Highest level objective of a project.  High level KPIs can be attached here.
 #: indicators/models.py:309 indicators/models.py:347 indicators/models.py:375
 msgid "Goal"
-msgstr "Objectif"
+msgstr "But"
 
 #. Translators: Below Goals, the 2nd highest organizing level to attach KPIs to.
 #: indicators/models.py:311 indicators/models.py:323
@@ -491,7 +491,7 @@ msgstr "Résultat"
 #: indicators/models.py:313 indicators/models.py:325 indicators/models.py:353
 #: indicators/models.py:367 indicators/models.py:383
 msgid "Output"
-msgstr "Rendement"
+msgstr "Extrant"
 
 #. Translators: Below Output, the lowest organizing level to attach KPIs to.
 #. Translators: Below Result, the lowest organizing level to attach KPIs to.
@@ -513,7 +513,7 @@ msgstr "Impact"
 #. Translators: Below Output, the lowest organizing level to attach KPIs to. Noun.
 #: indicators/models.py:327 indicators/models.py:355 indicators/models.py:369
 msgid "Input"
-msgstr "Données"
+msgstr "Contribution"
 
 #. Translators: The KPI organizational hierarchy used when we work on EC projects.
 #: indicators/models.py:330
@@ -534,7 +534,7 @@ msgstr "Objectif spécifique"
 #. Translators: Below Goal, the 2nd highest organizing level to attach KPIs to.
 #: indicators/models.py:337 indicators/models.py:349 indicators/models.py:377
 msgid "Purpose"
-msgstr "But"
+msgstr "Intention"
 
 #. Translators: Below Purpose, the 4th highest organizing level to attach KPIs to.
 #: indicators/models.py:339 templates/indicators/result_form_modal.html:129
@@ -549,7 +549,7 @@ msgstr "USAID 1"
 #. Translators: Below Purpose, the 3rd highest organizing level to attach KPIs to.
 #: indicators/models.py:351 indicators/models.py:379
 msgid "Sub-Purpose"
-msgstr "But secondaire"
+msgstr "Sous-intention"
 
 #. Translators: The KPI organizational hierarchy used when we work on certain USAID projects.
 #: indicators/models.py:358
@@ -569,7 +569,7 @@ msgstr "Résultat intermédiaire"
 #. Translators: Below Intermediate Result, the 3rd highest organizing level to attach KPIs to.
 #: indicators/models.py:365
 msgid "Sub-Intermediate Result"
-msgstr "Résultat intermédiaire inférieur"
+msgstr "Résultat sous-intermédiaire"
 
 #. Translators: The KPI organizational hierarchy used when we work on USAID Food for Peace projects.
 #: indicators/models.py:372
@@ -675,7 +675,7 @@ msgstr "Pourcentage (%)"
 
 #: indicators/models.py:1034
 msgid "Direction of change (not applicable)"
-msgstr "Direction du changement (sans objet)"
+msgstr "Direction du changement (non applicable)"
 
 #: indicators/models.py:1035 tola_management/models.py:284
 msgid "Increase (+)"
@@ -716,7 +716,7 @@ msgstr "Type d’unité"
 
 #: indicators/models.py:1126
 msgid "Not applicable"
-msgstr "Sans objet"
+msgstr "Non applicable"
 
 #: indicators/models.py:1131 templates/indicators/indicatortargets.html:89
 #: templates/indicators/indicatortargets.html:192
@@ -1383,7 +1383,7 @@ msgstr "Organisations"
 #: templates/base.html:82 templates/workflow/tags/program_menu.html:8
 #: tola_management/models.py:572 workflow/models.py:122
 msgid "Countries"
-msgstr "Des pays"
+msgstr "Pays"
 
 #: templates/base.html:114 templates/registration/profile.html:4
 #: templates/registration/profile.html:5
@@ -1909,7 +1909,7 @@ msgstr "Performance"
 
 #: templates/indicators/indicator_form_modal.html:92
 msgid "Analysis and Reporting"
-msgstr "Analyse et rapport"
+msgstr "Analyse et rapportage"
 
 #: templates/indicators/indicator_form_modal.html:95 workflow/models.py:853
 msgid "Approval"
@@ -3280,7 +3280,7 @@ msgstr "Cumulatif"
 
 #: tola_management/models.py:247
 msgid "Baseline N/A"
-msgstr "Base de référence N/A"
+msgstr "Mesure de base N/A"
 
 #: tola_management/models.py:248
 #, fuzzy
