@@ -442,11 +442,12 @@ export default class EditDisaggregations extends React.Component {
     }
 
     saveDisaggregation(data) {
-        const withCountry = Object.assign(data, {country: this.props.country_id})
-        if (data.id == 'new') {
+        const withCountry = Object.assign(data, {country: this.props.country_id});
+        if (data.id === 'new') {
             this.props.onCreate(withCountry).then(
                 (newDisaggregation) => {
-                    this.setState({expanded_id: newDisaggregation.id, formReset: null})},
+                    this.setState({expanded_id: newDisaggregation.id, formReset: null});
+                },
                 ()=>{}
             );
         } else {
