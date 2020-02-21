@@ -244,10 +244,10 @@ class DisaggregationType extends React.Component {
     updateLabelOrder(oldIndex, newIndex) {
         let labels = this.state.labels;
         let remainingLabels = [...labels.slice(0, oldIndex), ...labels.slice(oldIndex + 1)];
-        this.setState({
-            labels: this.orderLabels([...remainingLabels.slice(0, newIndex),
-                                      labels[oldIndex], ...remainingLabels.slice(newIndex)])
-            }, () => this.hasUnsavedDataAction());
+        const reorderedLabels = this.orderLabels(
+            [...remainingLabels.slice(0, newIndex), labels[oldIndex], ...remainingLabels.slice(newIndex)]);
+        this.setState({labels: reorderedLabels}, () => this.hasUnsavedDataAction());
+        this.props.assignLabelErrors({labels: reorderedLabels});
     }
 
     appendLabel() {
@@ -441,13 +441,14 @@ export default class EditDisaggregations extends React.Component {
         this.props.onDelete(id, () => {this.setState({is_dirty: false, expanded_id: null, formReset: null})});
     }
 
-
     saveDisaggregation(data) {
-        const withCountry = Object.assign(data, {country: this.props.country_id})
-        if (data.id == 'new') {
+        const withCountry = Object.assign(data, {country: this.props.country_id});
+        if (data.id === 'new') {
             this.props.onCreate(withCountry).then(
                 (newDisaggregation) => {
-                    if(newDisaggregation !== false) {this.setState({expanded_id: newDisaggregation.id, formReset: null})}}
+                    this.setState({expanded_id: newDisaggregation.id, formReset: null});
+                },
+                ()=>{}
             );
         } else {
             this.props.onUpdate(data.id, withCountry)
@@ -456,8 +457,8 @@ export default class EditDisaggregations extends React.Component {
     }
 
     render() {
-        const {disaggregations} = this.props
-        const {expanded_id} = this.state
+        const {disaggregations} = this.props;
+        const {expanded_id} = this.state;
         return (
             <div className="tab-pane--react">
             <div className="d-flex justify-content-between">
@@ -475,6 +476,7 @@ export default class EditDisaggregations extends React.Component {
                         key={disaggregation.id}
                         disaggregation={disaggregation}
                         expanded={disaggregation.id==expanded_id}
+                        assignLabelErrors={this.props.assignLabelErrors}
                         expandAction={(callback) => this.toggleExpand(disaggregation.id, callback)}
                         updateLabel={(labelIndex, value) => this.updateLabel(disaggregation.id, labelIndex, value)}
                         deleteAction={this.onDelete.bind(this, disaggregation.id)}

@@ -141,6 +141,7 @@ export class CountryStore {
 
             this.active_editor_pane = 'profile';
             this.active_pane_is_dirty = false;
+            this.editing_disaggregations_errors = {};
             if(this.editing_target === id) {
                 this.editing_target = false;
                 this.editing_errors = {};
@@ -519,7 +520,8 @@ export class CountryStore {
                     return entry.hasOwnProperty('label');
                 });
         if (this.editing_disaggregations_errors['disaggregation_type'] || hasLabelErrors) {
-            return;
+            this.saving = false;
+            return Promise.reject("Validation failed") ;
         }
 
         return this.api.createDisaggregation(data).then(response => {
@@ -538,7 +540,7 @@ export class CountryStore {
                 this.editing_disaggregations_errors = errors.response.data;
                 this.onSaveErrorHandler();
             });
-            return false;
+            return Promise.reject("API handling error");
         })
     }
 
@@ -556,8 +558,11 @@ export class CountryStore {
         const existingDisaggTypes = existingDisagg.filter(disagg => disagg.id !== disaggId)
             .map(disagg => disagg.disaggregation_type);
         if (existingDisaggTypes.includes(newDisagg.disaggregation_type)) {
+            const countryName = this.allCountries.filter( c => parseInt(c.id) === parseInt(newDisagg.country))[0] || "";
             // # Translators:  This error message appears underneath a user-input name if it appears more than once in a set of names.  Only unique names are allowed.
-            this.editing_disaggregations_errors['disaggregation_type'] = [gettext("Duplicate disaggregations not allowed.")];
+            this.editing_disaggregations_errors['disaggregation_type'] = [interpolate(gettext("There is already a disaggregation type called \"%(newDisagg)s\" in %(country)s. Please choose a unique name."),
+                {newDisagg: newDisagg['disaggregation_type'], country: countryName.country},
+                true)]
         }
         else{
             this.editing_disaggregations_errors = {}
@@ -566,18 +571,18 @@ export class CountryStore {
     }
 
     @action
-    assignDisaggregationLabelErrors(newDisagg) {
+    assignDisaggregationLabelErrors = (newDisagg) => {
         const duplicateIndexes = this.findDuplicateLabelIndexes(newDisagg.labels.map(label => label.label));
         let labelErrors = Array(newDisagg.labels.length).fill().map( e => ({}));
 
         newDisagg.labels.forEach( (label, index) => {
             if (!label.label || label.label.length === 0) {
                 // # Translators:  This error message appears underneath user-input labels that appear more than once in a set of labels.  Only unique labels are allowed.
-                labelErrors[index]['label'] = [gettext("Blank values not allowed.")];
+                labelErrors[index]['label'] = [gettext("Categories must not be blank.")];
             }
             else if (duplicateIndexes.includes(index)) {
                 // # Translators:  This error message appears underneath user-input labels that appear more than once in a set of labels.  Only unique labels are allowed.
-                labelErrors[index]['label'] = [gettext("Duplicate categories not allowed.")];
+                labelErrors[index]['label'] = [gettext("Categories must have unique names..")];
             }
         });
         this.editing_disaggregations_errors['labels'] = labelErrors;
@@ -598,15 +603,3 @@ export class CountryStore {
 
 }
 
-// export const findDuplicateLabelIndexes = function (label_list) {
-//         const lowerCaseList = label_list.map( label => label.toLowerCase())
-//         let dupeIndexes = new Set();
-//         lowerCaseList.forEach( (label, index) => {
-//             const dupeIndex = lowerCaseList.indexOf(label, index+1);
-//             if (dupeIndex > 0) {
-//                 dupeIndexes.add(index).add(dupeIndex);
-//             }
-//         });
-//         return Array.from(dupeIndexes);
-//
-//     };
