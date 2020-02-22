@@ -258,7 +258,7 @@ class DisaggregationType extends React.Component {
             id: 'new',
             label: '',
             createdId: `new-${this.labelsCreated}`
-        }
+        };
         this.setState({
             labels: this.orderLabels([...this.state.labels, newLabel])
         }, () => {$('.disaggregation-label-group').last().find('input').first().focus(); this.hasUnsavedDataAction();})
@@ -269,7 +269,8 @@ class DisaggregationType extends React.Component {
                                                 ...this.state.labels.slice(labelIndex + 1)]);
         this.setState({
             labels: updatedLabels
-        }, () => this.hasUnsavedDataAction())
+        }, () => this.hasUnsavedDataAction());
+        this.props.assignLabelErrors({labels: updatedLabels});
     }
 
     save() {
@@ -449,6 +450,7 @@ export default class EditDisaggregations extends React.Component {
 
     onDelete(id) {
         this.props.onDelete(id, () => {this.setState({is_dirty: false, expanded_id: null, formReset: null})});
+        this.props.clearErrors();
     }
 
     saveDisaggregation(data) {

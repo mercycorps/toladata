@@ -167,6 +167,7 @@ a.accordion-row__btn.btn.btn-link {
 // form-list-group: extends bootstrap list-group
 .form-list-group {
     $_form-list-group-padding-y: 0.25rem;
+    $_reference-row-list-group-padding-y: 0.5rem;
     $_form-list-group-padding-x: 0.625rem; // per spec: half of bootstrap 1.25rem x padding 
     margin-bottom: $grid-gutter-width/2;
     margin-top: 0;
@@ -178,6 +179,10 @@ a.accordion-row__btn.btn.btn-link {
         padding-top: $_form-list-group-padding-y;
         padding-right: $_form-list-group-padding-x;
         padding-left: $_form-list-group-padding-x;
+        &.reference-row {
+            padding-top: $_reference-row-list-group-padding-y;
+            padding-bottom: $_reference-row-list-group-padding-y;
+        }
     }
 }
 .item__label {
