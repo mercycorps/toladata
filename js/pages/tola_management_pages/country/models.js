@@ -582,7 +582,7 @@ export class CountryStore {
             }
             else if (duplicateIndexes.includes(index)) {
                 // # Translators:  This error message appears underneath user-input labels that appear more than once in a set of labels.  Only unique labels are allowed.
-                labelErrors[index]['label'] = [gettext("Categories must have unique names..")];
+                labelErrors[index]['label'] = [gettext("Categories must have unique names.")];
             }
         });
         this.editing_disaggregations_errors['labels'] = labelErrors;
