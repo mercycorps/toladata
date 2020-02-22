@@ -289,6 +289,7 @@ class DisaggregationType extends React.Component {
                         <form className="form card card-body bg-white">
                             <div className="form-group">
                                 <label className="label--required" htmlFor="disaggregation-type-input">
+                                    {/* # Translators: Form field label for the disaggregation name.*/}
                                     {gettext('Disaggregation')}
                                 </label>
                                 <input
@@ -314,7 +315,9 @@ class DisaggregationType extends React.Component {
                                     </label>
                                     <HelpPopover
                                         key={1}
+                                        // # Translators: Help text for the "selected by default" checkbox on the disaggregation form
                                         content={`<p>${gettext('When adding a program indicator, this disaggregation will be selected by default.  (It can be unselected for specific indicators)')}</p>
+                                            <!-- # Translators: Additional help text for the "selected by default" checkbox on the disaggregation form -->
                                                   <p>${gettext('This option is recommended for disaggregations that are required for all programs in a country, regardless of sector.')}</p>`}
                                         placement="right"
                                         innerRef={this.selectedByDefaultPopup}

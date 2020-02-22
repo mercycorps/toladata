@@ -6,7 +6,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: \n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2020-02-21 13:31-0800\n"
+"POT-Creation-Date: 2020-02-21 16:16-0800\n"
 "PO-Revision-Date: 2019-12-10 13:53-0800\n"
 "Last-Translator: \n"
 "Language-Team: \n"
@@ -492,20 +492,20 @@ msgstr "Nivel"
 
 #. Translators: Column header */
 #: js/pages/iptt_report/components/report/tableHeader.js:123
-#: js/pages/iptt_report/models/filterStore.js:685
+#: js/pages/iptt_report/models/filterStore.js:689
 #: js/pages/program_page/components/indicator_list.js:194
 msgid "Unit of measure"
 msgstr "Unidad de medida"
 
 #. Translators: Column header for "direction of change" column (increasing/decreasing) */
 #: js/pages/iptt_report/components/report/tableHeader.js:129
-#: js/pages/iptt_report/models/filterStore.js:686
+#: js/pages/iptt_report/models/filterStore.js:690
 msgid "Change"
 msgstr "Cambio"
 
 #. Translators: Column header, stands for "Cumulative"/"Non-cumulative" */
 #: js/pages/iptt_report/components/report/tableHeader.js:136
-#: js/pages/iptt_report/models/filterStore.js:687
+#: js/pages/iptt_report/models/filterStore.js:691
 msgid "C / NC"
 msgstr "C / NC"
 
@@ -516,7 +516,7 @@ msgstr "# / %"
 
 #. Translators: Column header */
 #: js/pages/iptt_report/components/report/tableHeader.js:149
-#: js/pages/iptt_report/models/filterStore.js:689
+#: js/pages/iptt_report/models/filterStore.js:693
 #: js/pages/program_page/components/indicator_list.js:195
 msgid "Baseline"
 msgstr "Base"
@@ -569,8 +569,9 @@ msgid "Levels"
 msgstr "Niveles"
 
 #. Translators: labels categories that  data could be disaggregated into */
+#. Translators: A list of disaggregation types follows this header. */
 #: js/pages/iptt_report/components/sidebar/reportFilter.js:42
-#: js/pages/iptt_report/models/filterStore.js:462
+#: js/pages/iptt_report/models/filterStore.js:465
 #, fuzzy
 #| msgid "Disaggregation"
 msgid "Disaggregations"
@@ -624,19 +625,22 @@ msgstr "Fin"
 msgid "Show/Hide Filters"
 msgstr "Mostrar/Ocultar filtros"
 
-#: js/pages/iptt_report/models/filterStore.js:456
+#. Translators: User-selectable option that filters out rows from a table where the disaggregation category has not been used (i.e. avoids showing lots of blank rows. */
+#: js/pages/iptt_report/models/filterStore.js:457
 #, fuzzy
 #| msgid "Indicators with results"
 msgid "Only show categories with results"
 msgstr "Indicadores con resultados"
 
-#: js/pages/iptt_report/models/filterStore.js:458
+#. Translators: filter that allows users to select only those disaggregation types that are available across the globe (i.e. across the agency). */
+#: js/pages/iptt_report/models/filterStore.js:460
 #, fuzzy
 #| msgid "New disaggregations"
 msgid "Global disaggregations"
 msgstr "Nuevas desagregaciones"
 
-#: js/pages/iptt_report/models/filterStore.js:634
+#. Translators: Allows users to filter an indicator list for indicators that are unassigned. */
+#: js/pages/iptt_report/models/filterStore.js:638
 #: js/pages/logframe/components/table.js:110
 msgid "Indicators unassigned to  a results framework level"
 msgstr "Indicadores sin asignar a un nivel del sistema de resultados"
@@ -1175,7 +1179,7 @@ msgid "Strategic Objectives"
 msgstr "Objetivos estratégicos"
 
 #: js/pages/tola_management_pages/country/components/country_editor.js:41
-#: js/pages/tola_management_pages/country/components/edit_disaggregations.js:465
+#: js/pages/tola_management_pages/country/components/edit_disaggregations.js:468
 msgid "Country Disaggregations"
 msgstr "Desagregación del País"
 
@@ -1200,7 +1204,7 @@ msgstr "Código del País"
 
 #: js/pages/tola_management_pages/country/components/edit_country_profile.js:101
 #: js/pages/tola_management_pages/country/components/edit_country_profile.js:108
-#: js/pages/tola_management_pages/country/components/edit_disaggregations.js:356
+#: js/pages/tola_management_pages/country/components/edit_disaggregations.js:359
 #: js/pages/tola_management_pages/country/components/edit_objectives.js:119
 #: js/pages/tola_management_pages/country/components/edit_objectives.js:124
 #: js/pages/tola_management_pages/organization/components/edit_organization_history.js:69
@@ -1216,7 +1220,7 @@ msgstr "Guardar cambios"
 
 #: js/pages/tola_management_pages/country/components/edit_country_profile.js:103
 #: js/pages/tola_management_pages/country/components/edit_country_profile.js:109
-#: js/pages/tola_management_pages/country/components/edit_disaggregations.js:358
+#: js/pages/tola_management_pages/country/components/edit_disaggregations.js:361
 #: js/pages/tola_management_pages/country/components/edit_objectives.js:125
 #: js/pages/tola_management_pages/country/views.js:65
 #: js/pages/tola_management_pages/organization/components/edit_organization_history.js:70
@@ -1249,68 +1253,71 @@ msgstr ""
 msgid "Explanation for absence of delete button"
 msgstr ""
 
-#: js/pages/tola_management_pages/country/components/edit_disaggregations.js:292
+#. Translators: Form field label for the disaggregation name.*/}
+#: js/pages/tola_management_pages/country/components/edit_disaggregations.js:293
 msgid "Disaggregation"
 msgstr "Desagregación"
 
 #. Translators: This labels a checkbox, when checked, it will make the associated item "on" (selected) for all new indicators
-#: js/pages/tola_management_pages/country/components/edit_disaggregations.js:312
+#: js/pages/tola_management_pages/country/components/edit_disaggregations.js:313
 msgid "Selected by default"
 msgstr ""
 
-#: js/pages/tola_management_pages/country/components/edit_disaggregations.js:317
+#. Translators: Help text for the "selected by default" checkbox on the disaggregation form
+#: js/pages/tola_management_pages/country/components/edit_disaggregations.js:319
 msgid ""
 "When adding a program indicator, this disaggregation will be selected by "
 "default.  (It can be unselected for specific indicators)"
 msgstr ""
 
-#: js/pages/tola_management_pages/country/components/edit_disaggregations.js:318
+#. Translators: Additional help text for the "selected by default" checkbox on the disaggregation form -->
+#: js/pages/tola_management_pages/country/components/edit_disaggregations.js:321
 msgid ""
 "This option is recommended for disaggregations that are required for all "
 "programs in a country, regardless of sector."
 msgstr ""
 
-#: js/pages/tola_management_pages/country/components/edit_disaggregations.js:321
+#: js/pages/tola_management_pages/country/components/edit_disaggregations.js:324
 msgid "More information on \"selected by default\""
 msgstr ""
 
-#: js/pages/tola_management_pages/country/components/edit_disaggregations.js:330
+#: js/pages/tola_management_pages/country/components/edit_disaggregations.js:333
 #, fuzzy
 #| msgid "Countries"
 msgid "Categories"
 msgstr "Países"
 
-#: js/pages/tola_management_pages/country/components/edit_disaggregations.js:335
+#: js/pages/tola_management_pages/country/components/edit_disaggregations.js:338
 msgid "Order"
 msgstr ""
 
-#: js/pages/tola_management_pages/country/components/edit_disaggregations.js:349
+#: js/pages/tola_management_pages/country/components/edit_disaggregations.js:352
 #, fuzzy
 #| msgid "Add a quarter"
 msgid "Add a category"
 msgstr "Agregar un trimestre"
 
 #. Translators: this is a verb (on a button that archives the selected item)
-#: js/pages/tola_management_pages/country/components/edit_disaggregations.js:365
+#: js/pages/tola_management_pages/country/components/edit_disaggregations.js:368
 #, fuzzy
 #| msgid "Standard disaggregations"
 msgid "Unarchive disaggregation"
 msgstr "Desagregaciones estándar"
 
-#: js/pages/tola_management_pages/country/components/edit_disaggregations.js:370
+#: js/pages/tola_management_pages/country/components/edit_disaggregations.js:373
 #, fuzzy
 #| msgid "New disaggregations"
 msgid "Delete disaggregation"
 msgstr "Nuevas desagregaciones"
 
 #. Translators: this is a verb (on a button that archives the selected item)
-#: js/pages/tola_management_pages/country/components/edit_disaggregations.js:376
+#: js/pages/tola_management_pages/country/components/edit_disaggregations.js:379
 #, fuzzy
 #| msgid "New disaggregations"
 msgid "Archive disaggregation"
 msgstr "Nuevas desagregaciones"
 
-#: js/pages/tola_management_pages/country/components/edit_disaggregations.js:410
+#: js/pages/tola_management_pages/country/components/edit_disaggregations.js:413
 #: js/pages/tola_management_pages/country/components/edit_objectives.js:159
 #: js/pages/tola_management_pages/country/models.js:235
 #: js/pages/tola_management_pages/organization/models.js:112
@@ -1319,7 +1326,7 @@ msgstr "Nuevas desagregaciones"
 msgid "You have unsaved changes. Are you sure you want to discard them?"
 msgstr "Tiene cambios sin guardar. ¿Está seguro que desea descartarlos?"
 
-#: js/pages/tola_management_pages/country/components/edit_disaggregations.js:469
+#: js/pages/tola_management_pages/country/components/edit_disaggregations.js:472
 msgid "Add country disaggregation"
 msgstr "Agregar desagregación del país"
 
