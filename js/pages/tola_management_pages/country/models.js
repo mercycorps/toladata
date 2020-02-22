@@ -200,14 +200,17 @@ export class CountryStore {
     }
 
     onDeleteSuccessHandler() {
+        // # Translators: Notification that a user has been able to delete a disaggregation
         PNotify.success({text: gettext("Successfully deleted"), delay: 5000})
     }
 
     onArchiveSuccessHandler() {
+        // # Translators: Notification that a user has been able to disable a disaggregation
         PNotify.success({text: gettext("Successfully archived"), delay: 5000})
     }
 
     onUnarchiveSuccessHandler() {
+        // # Translators: Notification that a user has been able to reactivate a disaggregation
         PNotify.success({text: gettext("Successfully unarchived"), delay: 5000})
     }
 

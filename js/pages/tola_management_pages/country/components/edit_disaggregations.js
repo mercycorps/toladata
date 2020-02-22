@@ -74,6 +74,7 @@ class CategoryForm extends React.Component {
                     onClick={() => props.deleteLabel(index)}
                     className={classNames("btn btn-link btn-danger text-nowrap", {'disabled': category.in_use})}
                 >
+                    {/* # Translators;  Allows users to delete a disaggregation category*/}
                     <i className="fas fa-trash"/>{gettext('Remove')}
                 </a>
                 :
@@ -85,6 +86,7 @@ class CategoryForm extends React.Component {
                     iconStyle={ {marginTop: '10px' }}
                     linkHeight="30px"
                     innerRef={ this.disabledRef }
+                    // # Translators: This is an explanation of a web page element for use with screen readers
                     ariaText={gettext('Explanation for absence of delete button')}
                 />
                 }
@@ -330,11 +332,13 @@ class DisaggregationType extends React.Component {
                                 <div className="row">
                                     <div className="col-md-7">
                                         <h4>
+                                            {/* # Translators:  This is header text for a list of disaggregation categories*/}
                                             {gettext('Categories')}
                                         </h4>
                                     </div>
                                     <div style={ {marginLeft: '38px'} }>
                                     {/* Paul: I know this is gross, but trying to line up order with the fields below: */}
+                                    {/* # Translators:  This a column header that shows the sort order of the rows below*/}
                                         <label>{gettext('Order')}</label>
                                     </div>
                                 </div>
@@ -349,6 +353,7 @@ class DisaggregationType extends React.Component {
                                     />
                                 {!disaggregation.is_archived && <div style={ {marginTop: '-15px', marginLeft: '-5px'} }>
                                     <a tabIndex="0" onClick={() => this.appendLabel()} className="btn btn-link btn-add">
+                                        {/* # Translators:  Button label.  Button allows users to add a disaggregation category to a list.  */}
                                         <i className="fas fa-plus-circle"/>{gettext('Add a category')}
                                     </a>
                                 </div>}
@@ -358,6 +363,7 @@ class DisaggregationType extends React.Component {
                                     <button className="btn btn-primary" onClick={(e) => this.save()}
                                         disabled={disaggregation.is_archived} type="button">{gettext('Save Changes')}</button>
                                     <button className="btn btn-reset" type="button" onClick={() => this.resetForm()}
+                                        // # Translators:  Button label.  Allows users to undo whatever changes they have made.
                                         disabled={disaggregation.is_archived}>{gettext('Reset')}</button>
                                 </div>
                                 <div className="right-buttons">
@@ -370,6 +376,7 @@ class DisaggregationType extends React.Component {
                                     </a>
                                 ) : ((disaggregation.id == 'new' || !disaggregation.has_indicators) ? (
                                         <a tabIndex="0" onClick={deleteAction} className="btn btn-link btn-danger">
+                                            {/* # Translators:  Button text that allows users to delete a disaggregation */}
                                             <i className="fas fa-trash"/>{gettext('Delete disaggregation')}
                                         </a>
                                         ) : (

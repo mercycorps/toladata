@@ -13,6 +13,7 @@
                 <i class="fas fa-caret-right"></i>{{ disaggregation_formset.disaggregation }}
             </a>
             <span class="formset-feedback invalid-feedback">
+                {# # Translators:  Allows the user to select only those items that need to be updated in some way#}
                 <i class="fas fa-exclamation-triangle"></i>&nbsp;{% trans "Needs attention" %}
             </span>
         </span>
@@ -40,6 +41,7 @@
                     <div class="item__value actions-container">
                         <div class="invalid-actions invalid-feedback">
                             <a href="#">
+                                {# # Translators: Button text. When user clicks, a form will be updated with a calculated value based on what the user has entered. #}
                                 <i class="fas fa-sync"></i>&nbsp;&nbsp;{% trans "Update actual value" %}
                             </a>
                             <span class="sum-difference"></span>
