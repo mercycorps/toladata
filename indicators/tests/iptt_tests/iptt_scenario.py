@@ -51,7 +51,7 @@ from factories.indicators_models import (
     DisaggregatedValueFactory,
 )
 
-class IPTTScenarioBuilder:
+class IPTTScenarioGeneral:
     program_name = "Nåmé of the Program its long and has Spécîal Characters"
     start_date = datetime.date(2016, 1, 1)
     end_date = datetime.date(2018, 12, 31)
@@ -336,3 +336,126 @@ class IPTTScenarioBuilder:
         result = self.add_result(42, indicator, first_target, month=1)
         self.add_disagg(result, self.country_disagg)
         return indicator
+
+class IPTTScenarioSums:
+    reporting_period_start = datetime.date(2016, 1, 1)
+    reporting_period_end = datetime.date(2016, 12, 31)
+
+    def __init__(self):
+        self.get_program()
+        self.get_levels()
+        self.get_disaggregations()
+        self.get_indicators()
+
+    def get_program(self):
+        self.country = CountryFactory(country="TéstLand", code="TL")
+        self.program = RFProgramFactory(
+            name="Test for data not for language",
+            reporting_period_start=self.reporting_period_start,
+            reporting_period_end=self.reporting_period_end
+        )
+
+    def get_levels(self):
+        self.tier = LevelTierFactory(
+            name="Tier for data not for language",
+            tier_depth=1,
+            program=self.program
+        )
+        self.level = LevelFactory(
+            name="Level for data not for language",
+            parent=None,
+            program=self.program,
+            customsort=1
+        )
+
+    def get_disaggregations(self):
+        self.standard_disagg = DisaggregationTypeFactory(
+            standard=True,
+            country=None,
+            disaggregation_type="Std Disagg for data not for language",
+            labels=["Label 1", "Label 2"]
+        )
+
+    def get_indicators(self):
+        self.indicators = []
+        level_order = 0
+        indicator_kwargs = {
+            'program': self.program,
+            'level': self.level,
+            'target_frequency': Indicator.QUARTERLY,
+            'targets': 1000,
+            'baseline': 100,
+            'baseline_na': False
+        }
+        for uom_type, cumulative in [
+            (Indicator.NUMBER, False), (Indicator.NUMBER, True), (Indicator.PERCENTAGE, True)
+            ]:
+            these_kwargs = {
+                **indicator_kwargs,
+                'unit_of_measure_type': uom_type,
+                'is_cumulative': cumulative
+            }
+            indicator_no_results = RFIndicatorFactory(
+                **{
+                    **these_kwargs,
+                    'level_order': level_order,
+                }
+            )
+            indicator_no_results.disaggregation.set([self.standard_disagg])
+            self.indicators.append(indicator_no_results)
+            level_order += 1
+            indicator_one_result = RFIndicatorFactory(
+                **{
+                    **these_kwargs,
+                    'level_order': level_order,
+                }
+            )
+            indicator_one_result.disaggregation.set([self.standard_disagg])
+            result = ResultFactory(
+                indicator=indicator_one_result,
+                periodic_target=indicator_one_result.periodictargets.first(),
+                date_collected=self.program.reporting_period_start+datetime.timedelta(days=1),
+                achieved=500
+            )
+            dv1 = DisaggregatedValueFactory(
+                result=result,
+                category=self.standard_disagg.labels[0],
+                value=100
+            )
+            dv2 = DisaggregatedValueFactory(
+                result=result,
+                category=self.standard_disagg.labels[1],
+                value=400
+            )
+            self.indicators.append(indicator_one_result)
+            level_order += 1
+            indicator_multi_result = RFIndicatorFactory(
+                **{
+                    **these_kwargs,
+                    'level_order': level_order,
+                }
+            )
+            indicator_multi_result.disaggregation.set([self.standard_disagg])
+            for date_collected, target in [
+                (datetime.date(2016, 1, 1), indicator_multi_result.periodictargets.first()),
+                (datetime.date(2016, 5, 1), indicator_multi_result.periodictargets.all()[1]),
+                (datetime.date(2016, 12, 30), indicator_multi_result.periodictargets.all()[3])
+                ]:    
+                result = ResultFactory(
+                    indicator=indicator_multi_result,
+                    periodic_target=indicator_multi_result.periodictargets.first(),
+                    date_collected=date_collected,
+                    achieved=500
+                )
+                dv1 = DisaggregatedValueFactory(
+                    result=result,
+                    category=self.standard_disagg.labels[0],
+                    value=100
+                )
+                dv2 = DisaggregatedValueFactory(
+                    result=result,
+                    category=self.standard_disagg.labels[1],
+                    value=400
+                )
+            self.indicators.append(indicator_multi_result)
+            level_order += 1

@@ -63,7 +63,7 @@ from django import test
 from django.urls import reverse
 from django.utils import translation
 from indicators.models import Indicator
-from indicators.tests.iptt_tests.iptt_scenario import IPTTScenarioBuilder
+from indicators.tests.iptt_tests.iptt_scenario import IPTTScenarioGeneral
 from factories.workflow_models import (
     CountryFactory,
     RFProgramFactory,
@@ -163,7 +163,7 @@ class TestIPTTExcelExports(test.TestCase):
     @classmethod
     def setUpClass(cls):
         super().setUpClass()
-        cls.scenario = IPTTScenarioBuilder()
+        cls.scenario = IPTTScenarioGeneral()
         cls.tolauser = TolaUserFactory()
         cls.tolauser.user.is_superuser = True
         cls.tolauser.user.save()
