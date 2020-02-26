@@ -59,9 +59,9 @@ class CategoryForm extends React.Component {
                     key={1}
                     content={ gettext('This category cannot be edited or removed because it was used to disaggregate a result.') }
                     placement="bottom"
+                    className='btn btn-link'
                     iconClass="fa fa-lock text-muted"
-                    iconStyle={ {marginTop: '10px' }}
-                    linkHeight="30px"
+                    className="btn btn-link"
                     innerRef={ this.disabledRef }
                     ariaText={gettext('Explanation for absence of delete button')}
                 />
@@ -96,7 +96,9 @@ class CategoryForm extends React.Component {
                         }
                     </select>
                 </div>
-                {deletionElement}
+                <div className="form-group">
+                    {deletionElement}
+                </div>
             </React.Fragment>
         );
     }
