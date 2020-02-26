@@ -24,6 +24,7 @@ export default class HelpPopover extends React.Component {
                 data-html="true"
                 data-placement={this.placement}
                 data-content={this.props.content}
+                className={this.props.className}
                 ref={this.popoverRef}
                 >
             <i aria-label={ this.props.ariaText } style={ this.iconStyle } className={ this.iconClass }></i></a>
@@ -62,7 +63,7 @@ export class BootstrapPopoverButton extends React.Component {
             placement: 'bottom'
         }).on('shown.bs.popover', shownFn);
     }
-    
+
     getPopoverContent = () => {
         throw new Error('not implemented');
     }
