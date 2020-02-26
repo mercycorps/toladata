@@ -467,6 +467,20 @@ class DisaggregationIndicatorFormManager(models.Manager):
 
 
 class DisaggregationType(models.Model):
+    """
+    #####!!!!!!!!!!! IMPORTANT!!    !!!!!!!!!!!#####
+    The GLOBAL_DISAGGREGATION_LABELS constant was created to ensure that a translated string appears
+    in the PO file.  It won't appear through the normal translation machinery because
+    the global disagg types are stored in the DB rather than the code.  When adding
+    a global disaggregation type you will need to add the marked string to this list.
+
+    If you update these templates, make sure you update the globalDisaggregationTypes constant in
+    js/extra_translations.js.
+    """
+    GLOBAL_DISAGGREGATION_LABELS = [
+        _("Sex and Age Disaggregated Data (SADD)")
+    ]
+
     """Business logic name: Disaggregation - e.g. `Gender` or `SADD`"""
     disaggregation_type = models.CharField(_("Disaggregation"), max_length=135)
     country = models.ForeignKey(Country, on_delete=models.CASCADE, null=True, blank=True, verbose_name="Country")
