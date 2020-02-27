@@ -450,7 +450,7 @@ export default (
             }
             let disaggregationOptions = Array.from(this.programFilterData.disaggregations.values())
                                                 .filter(disaggregation => disaggregationPks.includes(disaggregation.pk))
-                                                .map(disaggregation => ({value: disaggregation.pk, label: gettext(disaggregation.name), country: disaggregation.country}));
+                                                .map(disaggregation => ({value: disaggregation.pk, label: disaggregation.name, country: disaggregation.country}));
             let countries = [...new Set(disaggregationOptions.map(option => option.country))].filter(country => country !== null).sort();
             let optgroups = [];
             optgroups.push({value: "hide-categories", label: gettext('Only show categories with results'), noList: true});
