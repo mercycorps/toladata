@@ -159,7 +159,7 @@ const DisaggregationTable = inject('rootStore')(
                                 <td className="disaggregation-name-cell"
                                     colSpan={ 2 }
                                     rowSpan={labels.length}>
-                                    {disaggregation.name}</td>
+                                    {gettext(disaggregation.name)}</td>
                                 }
                                 <td colSpan={ rootStore.hasBaselineColumn ? rootStore.baseColumns - 2 : rootStore.baseColumns - 1 } className="disaggregation-label-cell">{ label.name }</td>
                                 { rootStore.hasBaselineColumn &&
