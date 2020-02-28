@@ -3947,8 +3947,8 @@ msgstr "Ville, Pays :"
 #~ "l’ensemble des organisations. Si vous n’en voyez aucun ici, veuillez "
 #~ "contacter votre administrateur système."
 
-#~ msgid "Sex and Age Disaggregated Data (SADD)"
-#~ msgstr "Données ventilées par sexe et par âge"
+msgid "Sex and Age Disaggregated Data (SADD)"
+msgstr "Données ventilées par sexe et par âge"
 
 #~ msgid "Disaggregation level"
 #~ msgstr "Niveau de désagrégation"
