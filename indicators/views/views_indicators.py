@@ -787,6 +787,7 @@ class ResultCreate(ResultFormMixin, CreateView):
     @method_decorator(indicator_adapter(has_result_write_access))
     def dispatch(self, request, *args, **kwargs):
         if not request.has_write_access:
+            print('oops')
             raise PermissionDenied
 
         self.indicator = get_object_or_404(Indicator, pk=self.kwargs['indicator'])

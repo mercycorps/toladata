@@ -78,3 +78,27 @@ class TestDuplicateDisagg(test.TestCase):
             1, disagg2.disaggregationlabel_set.count(),
             "Should be able to save a disagg label with the same name in a different disagg type."
         )
+
+
+class TestGlobalDisaggTranslation(test.TestCase):
+
+    @classmethod
+    def setUpClass(cls):
+        super().setUpClass()
+        cls.country = w_factories.CountryFactory()
+        cls.tola_user = w_factories.TolaUserFactory()
+        cls.tola_user.user.is_superuser = True
+        cls.tola_user.user.save()
+        cls.program = w_factories.ProgramFactory()
+        cls.program.country.add(cls.country)
+        cls.program.save()
+        cls.indicator = i_factories.IndicatorFactory()
+        cls.client = test.Client()
+        cls.client.force_login(user=cls.tola_user.user)
+
+    def test_global_disaggs_are_translated(self):
+        response = self.client.get(f"/indicators/result_add/{self.indicator.id}")
+        print(response)
+
+
+
