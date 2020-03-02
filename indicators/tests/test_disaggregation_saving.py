@@ -2,8 +2,10 @@
 """Tests that duplicate disaggregation types and labels can't be created"""
 from django import test
 from django.db import IntegrityError, transaction
+from django.urls import reverse
 from unittest import skip
 
+from workflow.models import ProgramAccess
 from factories import (
     indicators_models as i_factories,
     workflow_models as w_factories
@@ -87,18 +89,21 @@ class TestGlobalDisaggTranslation(test.TestCase):
         super().setUpClass()
         cls.country = w_factories.CountryFactory()
         cls.tola_user = w_factories.TolaUserFactory()
-        cls.tola_user.user.is_superuser = True
-        cls.tola_user.user.save()
         cls.program = w_factories.ProgramFactory()
         cls.program.country.add(cls.country)
         cls.program.save()
+        w_factories.grant_program_access(cls.tola_user, cls.program, cls.country, role="high")
+        cls.tola_user.user.username = "testuser"
+        cls.tola_user.user.set_password("password")
+        cls.tola_user.user.save()
+
         cls.indicator = i_factories.IndicatorFactory()
-        cls.client = test.Client()
+        cls.client = test.Client(enforce_csrf_checks=False)
         cls.client.force_login(user=cls.tola_user.user)
 
+    @skip
     def test_global_disaggs_are_translated(self):
-        response = self.client.get(f"/indicators/result_add/{self.indicator.id}")
+        url = reverse('result_add', kwargs={"indicator": self.indicator.id}) + "?modal=1"
+        response = self.client.get(url, HTTP_X_REQUESTED_WITH='XMLHttpRequest')
+
         print(response)
-
-
-
