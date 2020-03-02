@@ -286,6 +286,8 @@ class ExcelRendererBase:
                     cell.number_format = number_format
 
     def add_disaggregation_rows(self, row, sheet, indicator, disaggregation, categories):
+        if not categories:
+            return
         disagg_indicator = self.serializer.get_disaggregated_indicator(indicator.pk)
         if indicator.unit_of_measure_type == Indicator.PERCENTAGE:
             values_func = self.percent_value_cell

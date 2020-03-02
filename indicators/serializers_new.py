@@ -8,7 +8,9 @@ from indicators.models import Indicator, Level, LevelTier, DisaggregationLabel
 from indicators.queries import IPTTIndicator
 from workflow.models import Program
 from tola.model_utils import get_serializer
+from tola.l10n_utils import l10n_date_medium
 from django.utils.translation import ugettext as _
+from django.utils import timezone
 
 
 class DecimalDisplayField(serializers.DecimalField):
@@ -576,3 +578,26 @@ class TierBase:
         return _(tier.name)
 
 IPTTTierSerializer = get_serializer(TierBase)
+
+
+class IPTTReportSerializer(serializers.Serializer):
+    """Serializer for an entire IPTT Report - contains report-level data and methods to instance sub-serializers"""
+    
+    @property
+    def filename(self):
+        return f"{self.report_name} {l10n_date_medium(timezone.localtime().date(), decode=True)}.xlsx"
+
+class IPTTTPReportSerializer(IPTTReportSerializer):
+    @property
+    def report_name(self):
+        return _("IPTT Actuals only report")
+
+class IPTTTVAReportSerializer(IPTTReportSerializer):
+    @property
+    def report_name(self):
+        return _("IPTT TvA report")
+
+class IPTTFullReportSerializer(IPTTReportSerializer):
+    @property
+    def report_name(self):
+        return _("IPTT TvA full program report")

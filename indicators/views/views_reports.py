@@ -141,6 +141,7 @@ def api_iptt_filter_data(request, program):
     with silk_profile(name='API iptt filter data %s' % program):
         return JsonResponse(IPTTProgramSerializer.get_for_pk(program).data)
 
+from indicators.serializers_new import IPTTReportSerializer
 
 class IPTTExcelReport(LoginRequiredMixin, View):
 
