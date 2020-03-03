@@ -3,7 +3,7 @@ msgstr ""
 "Project-Id-Version: \n"
 "Report-Msgid-Bugs-To: \n"
 "POT-Creation-Date: 2020-02-21 18:23-0800\n"
-"PO-Revision-Date: 2020-02-21 18:12-0800\n"
+"PO-Revision-Date: 2020-03-02 08:29+0000\n"
 "Last-Translator: \n"
 "Language-Team: \n"
 "Language: fr\n"
@@ -24,24 +24,22 @@ msgstr "statut"
 #. Translators:  This is a filter option that allows users to limit results based on status of archived or not-archived
 #: indicators/admin.py:59
 msgid "Active (not archived)"
-msgstr ""
+msgstr "Actif (non archivé)"
 
 #. Translators:  This is a filter option that allows users to limit results based on status of archived or not-archived
 #: indicators/admin.py:61
 msgid "Inactive (archived)"
-msgstr ""
+msgstr "Inactif (archivé)"
 
 #. Translators:  This is label text for an individual category in a listing of disaggregation categories
 #: indicators/admin.py:153
 msgid "Category"
-msgstr ""
+msgstr "Catégorie"
 
 #. Translators:  This is label text for a listing of disaggregation categories
 #: indicators/admin.py:155
-#, fuzzy
-#| msgid "Countries"
 msgid "Categories"
-msgstr "Des pays"
+msgstr "Catégories"
 
 #. Translators: Heading for list of disaggregation types assigned to a country
 #. Translators: Heading for list of disaggregation categories in a particular disaggregation type.
@@ -214,20 +212,19 @@ msgid ""
 "This disaggregation cannot be unselected, because it was already used in "
 "submitted program results."
 msgstr ""
+"Cette désagrégation a déjà été utilisée au sein des résultats du programme "
+"envoyés, c'est pourquoi elle ne peut pas être désélectionnée."
 
 #. Translators:  disaggregation types that are available to all programs
 #: indicators/forms.py:288
-#, fuzzy
-#| msgid "Custom disaggregations"
 msgid "Global disaggregations"
-msgstr "Désagrégations personnalisées"
+msgstr "Désagrégations globales"
 
 #. Translators:  disaggregation types that are available only to a specific country
 #: indicators/forms.py:293
-#, fuzzy, python-format
-#| msgid "Custom disaggregations"
+#, python-format
 msgid "%(country_name)s disaggregations"
-msgstr "Désagrégations personnalisées"
+msgstr "Désagrégations %(country_name)s"
 
 #: indicators/forms.py:338
 msgid "Multiple submissions detected"
@@ -604,12 +601,12 @@ msgstr "Modèles de niveaux"
 
 #: indicators/models.py:473
 msgid "Global (all programs, all countries)"
-msgstr ""
+msgstr "Général (tous les programmes, tous les pays)"
 
 #. Translators: Heading for list of disaggregation categories in a particular disaggregation type.
 #: indicators/models.py:474 tola_management/models.py:693
 msgid "Archived"
-msgstr ""
+msgstr "Archivé"
 
 #: indicators/models.py:572 templates/indicators/disaggregation_print.html:59
 #: templates/indicators/disaggregation_report.html:98
@@ -618,10 +615,8 @@ msgstr "Étiquette"
 
 #. Translators: Heading for list of disaggregation categories in a particular disaggregation type.
 #: indicators/models.py:603 tola_management/models.py:689
-#, fuzzy
-#| msgid "Disaggregation type"
 msgid "Disaggregation category"
-msgstr "Type de désagrégation"
+msgstr "Catégorie de désagrégation"
 
 #: indicators/models.py:614 indicators/models.py:629
 msgid "Frequency"
@@ -1004,10 +999,9 @@ msgid "Indicator Performance Tracking Report"
 msgstr "Rapport de suivi des performances de l’indicateur"
 
 #: indicators/templates/forms/widgets/groupcheckbox_option.html:10
-#, fuzzy, python-format
-#| msgid "Custom disaggregations"
+#, python-format
 msgid "Categories for disaggregation %(disagg)s"
-msgstr "Désagrégations personnalisées"
+msgstr "Catégories de la désagrégation %(disagg)s"
 
 #: indicators/templatetags/mytags.py:48 indicators/templatetags/mytags.py:70
 #: templates/indicators/result_form_common_js.html:231
@@ -1859,39 +1853,31 @@ msgstr "Veuillez entrer un indicateur de moins de 500 caractères."
 
 #: templates/indicators/indicator_form_common_js.html:866
 #: templates/indicators/indicator_form_common_js.html:868
-#, fuzzy
-#| msgid "Please enter a number larger than zero."
 msgid "Please enter a number greater than or equal to zero."
-msgstr "Veuillez entrer un nombre supérieur à zéro."
+msgstr "Veuillez entrer un nombre supérieur ou égal à zéro."
 
 #: templates/indicators/indicator_form_common_js.html:894
-#, fuzzy
-#| msgid "The LoP target cannot be zero."
 msgid "The Life of Program (LoP) target cannot be zero."
 msgstr "La valeur de la cible LoP ne peut être zéro."
 
 #: templates/indicators/indicator_form_common_js.html:897
-#, fuzzy
-#| msgid "Please select a target."
 msgid "Please enter a target."
-msgstr "Veuillez sélectionner une cible."
+msgstr "Veuillez entrer une cible."
 
 #: templates/indicators/indicator_form_common_js.html:992
 msgid ""
 "The Life of Program (LoP) target cannot be zero.  Please update targets."
 msgstr ""
+"La valeur de la cible LoP ne peut être zéro. Veuillez mettre à jour les "
+"cibles."
 
 #: templates/indicators/indicator_form_common_js.html:1003
-#, fuzzy
-#| msgid "Please complete all required fields in the Targets tab."
 msgid "Please complete all event names and targets."
-msgstr "Veuillez compléter tous les champs requis dans l’onglet Cibles."
+msgstr "Veuillez remplir tous les noms d'événements et de cibles."
 
 #: templates/indicators/indicator_form_common_js.html:1006
-#, fuzzy
-#| msgid "Please select a target."
 msgid "Please complete targets."
-msgstr "Veuillez sélectionner une cible."
+msgstr "Veuillez compléter les cibles."
 
 #: templates/indicators/indicator_form_common_js.html:1072
 msgid "Please complete all required fields in the Targets tab."
@@ -2376,7 +2362,7 @@ msgstr ""
 
 #: templates/indicators/result_form_common_js.html:61
 msgid "One or more fields needs attention."
-msgstr ""
+msgstr "Un ou plusieurs champs requièrent votre attention."
 
 #: templates/indicators/result_form_common_js.html:90
 msgid "Result saved - however please review warnings below."
@@ -2567,23 +2553,19 @@ msgstr "Vous pouvez comparer ce résultat à la cible de mi-parcours ou de fin."
 
 #: templates/indicators/results/result_form_disaggregation_fields.html:17
 msgid "Needs attention"
-msgstr ""
+msgstr "Requiert votre attention"
 
 #: templates/indicators/results/result_form_disaggregation_fields.html:39
-#, fuzzy
-#| msgid "Submit"
 msgid "Sum"
-msgstr "Soumettre"
+msgstr "Somme"
 
 #: templates/indicators/results/result_form_disaggregation_fields.html:45
-#, fuzzy
-#| msgid "Actual value"
 msgid "Update actual value"
-msgstr "Valeur réelle"
+msgstr "Mettre à jour la valeur réelle"
 
 #: templates/indicators/results/result_form_disaggregation_fields.html:64
 msgid "The sum of disaggregated values does not match the actual value."
-msgstr ""
+msgstr "La somme des valeurs désagrégées ne correspond pas à la valeur réelle."
 
 #: templates/indicators/results/result_form_evidence_fields.html:13
 msgid ""
@@ -3194,7 +3176,6 @@ msgstr "Date de modification"
 #: tola_management/models.py:103 tola_management/models.py:233
 #: tola_management/models.py:563 tola_management/models.py:620
 #: tola_management/models.py:679
-#, fuzzy
 msgid "Modification type"
 msgstr "Type de modification"
 
@@ -3203,14 +3184,10 @@ msgid "Title"
 msgstr "Titre"
 
 #: tola_management/models.py:112
-#, fuzzy
-#| msgid "First Name"
 msgid "First name"
 msgstr "Prénom"
 
 #: tola_management/models.py:113
-#, fuzzy
-#| msgid "Last Name"
 msgid "Last name"
 msgstr "Nom"
 
@@ -3220,16 +3197,13 @@ msgstr "Nom d’utilisateur"
 
 #. Translators:  Form field capturing how a user wants to be called (e.g. Marsha or Mr. Wiggles).
 #: tola_management/models.py:116
-#, fuzzy
-#| msgid "Mode of Address"
 msgid "Mode of address"
 msgstr "Prénom d’usage"
 
 #. Translators:  Form field capturing whether a user prefers to be contacted by phone, email, etc...
 #: tola_management/models.py:118 tola_management/models.py:632
-#, fuzzy
 msgid "Mode of contact"
-msgstr "Contact"
+msgstr "Moyen de communication"
 
 #: tola_management/models.py:119
 msgid "Phone number"
@@ -3274,15 +3248,11 @@ msgstr "Mesure de base N/A"
 
 #. Translators:  A Noun.  The URL or computer file path where a document can be found.
 #: tola_management/models.py:251
-#, fuzzy
-#| msgid "Evidence Url"
 msgid "Evidence link"
-msgstr "URL de la preuve"
+msgstr "Lien de la preuve"
 
 #. Translators:  A Noun.  The user-friendly name of the evidence document they are attaching to a result.
 #: tola_management/models.py:253
-#, fuzzy
-#| msgid "Evidence Name"
 msgid "Evidence record name"
 msgstr "Nom de la preuve"
 
@@ -3372,52 +3342,38 @@ msgstr "Société mise à jour"
 
 #. Translators: Heading for list of disaggregation categories in a particular disaggregation type.
 #: tola_management/models.py:691
-#, fuzzy
-#| msgid "Disaggregation type"
 msgid "Disaggregation categories"
-msgstr "Type de désagrégation"
+msgstr "Catégories de désagrégation"
 
 #. Translators: Heading for data that tracks when a data disaggregation as been created for a country
 #: tola_management/models.py:702
-#, fuzzy
-#| msgid "Disaggregation type"
 msgid "Country disaggregation created"
-msgstr "Type de désagrégation"
+msgstr "Désagrégation au niveau du pays créée"
 
 #. Translators: Heading for data that tracks when a data disaggregation assigned to a country has been changed.
 #: tola_management/models.py:704
-#, fuzzy
-#| msgid "Custom disaggregations"
 msgid "Country disaggregation updated"
-msgstr "Désagrégations personnalisées"
+msgstr "Désagrégation au niveau du pays mise à jour"
 
 #. Translators: Heading for data that tracks when a data disaggregation assigned to a country has been deleted.
 #: tola_management/models.py:706
-#, fuzzy
-#| msgid "Disaggregation level"
 msgid "Country disaggregation deleted"
-msgstr "Niveau de désagrégation"
+msgstr "Désagrégation au niveau du pays supprimée"
 
 #. Translators: Heading for data that tracks when a data disaggregation assigned to a country has been archived.
 #: tola_management/models.py:708
-#, fuzzy
-#| msgid "Custom disaggregations"
 msgid "Country disaggregation archived"
-msgstr "Désagrégations personnalisées"
+msgstr "Désagrégation au niveau du pays archivée"
 
 #. Translators: Heading for data that tracks when a data disaggregation assigned to a country has been restored.
 #: tola_management/models.py:710
-#, fuzzy
-#| msgid "Custom disaggregations"
 msgid "Country disaggregation unarchived"
-msgstr "Désagrégations personnalisées"
+msgstr "Désagrégation au niveau du pays non archivée"
 
 #. Translators: Heading for data that tracks when the categories of a data disaggregation that has been assigned to country have been updated.
 #: tola_management/models.py:712
-#, fuzzy
-#| msgid "Disaggregation type"
 msgid "Country disaggregation categories updated"
-msgstr "Type de désagrégation"
+msgstr "Catégories de désagrégation au niveau du pays mises à jour"
 
 #. Translators: The date and time of the change made to a piece of data
 #: tola_management/programadmin.py:102

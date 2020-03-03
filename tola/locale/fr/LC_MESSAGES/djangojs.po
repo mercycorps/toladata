@@ -3,7 +3,7 @@ msgstr ""
 "Project-Id-Version: \n"
 "Report-Msgid-Bugs-To: \n"
 "POT-Creation-Date: 2020-02-21 18:23-0800\n"
-"PO-Revision-Date: 2019-12-10 14:57-0800\n"
+"PO-Revision-Date: 2020-03-02 09:12+0000\n"
 "Last-Translator: \n"
 "Language-Team: \n"
 "Language: fr\n"
@@ -11,7 +11,7 @@ msgstr ""
 "Content-Type: text/plain; charset=UTF-8\n"
 "Content-Transfer-Encoding: 8bit\n"
 "Plural-Forms: nplurals=2; plural=(n > 1);\n"
-"X-Generator: Poedit 2.2.4\n"
+"X-Generator: Poedit 2.3\n"
 
 #: js/base.js:331 js/base.js:332
 msgid ""
@@ -91,7 +91,7 @@ msgstr "Masquer"
 
 #: js/components/changelog.js:73
 msgid "No differences found"
-msgstr ""
+msgstr "Aucune différence"
 
 #: js/components/changelog.js:86 js/components/changelog.js:91
 #: js/components/changelog.js:101 js/components/changelog.js:106
@@ -103,7 +103,7 @@ msgstr "Pays"
 #: js/components/changelog.js:88 js/components/changelog.js:92
 #: js/components/changelog.js:102 js/components/changelog.js:107
 msgid "Role"
-msgstr ""
+msgstr "Rôle"
 
 #: js/components/changelog.js:100 js/components/changelog.js:105
 #: js/pages/iptt_quickstart/components/selects.js:22
@@ -456,7 +456,7 @@ msgstr "Valeur réelle"
 #. Translators: Column header for a percent-met column */
 #: js/pages/iptt_report/components/report/headerCells.js:70
 msgid "% Met"
-msgstr ""
+msgstr "% Atteint"
 
 #. Translators: header for a group of columns showing totals over the life of the program */
 #: js/pages/iptt_report/components/report/tableHeader.js:70
@@ -567,15 +567,13 @@ msgstr "Niveaux"
 #. Translators: A list of disaggregation types follows this header. */
 #: js/pages/iptt_report/components/sidebar/reportFilter.js:42
 #: js/pages/iptt_report/models/filterStore.js:465
-#, fuzzy
-#| msgid "Disaggregation Type"
 msgid "Disaggregations"
-msgstr "Type de désagrégation"
+msgstr "Désagrégations"
 
 #. Translators: labels columns that could be hidden in the report */
 #: js/pages/iptt_report/components/sidebar/reportFilter.js:56
 msgid "Hide columns"
-msgstr ""
+msgstr "Masquer les colonnes"
 
 #. Translators: labels sites that a data could be collected at */
 #: js/pages/iptt_report/components/sidebar/reportFilter.js:72
@@ -622,17 +620,13 @@ msgstr "Afficher/Masquer les filtres"
 
 #. Translators: User-selectable option that filters out rows from a table where the disaggregation category has not been used (i.e. avoids showing lots of blank rows. */
 #: js/pages/iptt_report/models/filterStore.js:457
-#, fuzzy
-#| msgid "Indicators with results"
 msgid "Only show categories with results"
-msgstr "Indicateurs avec résultats"
+msgstr "Afficher uniquement les catégories contenant des résultats"
 
 #. Translators: filter that allows users to select only those disaggregation types that are available across the globe (i.e. across the agency). */
 #: js/pages/iptt_report/models/filterStore.js:460
-#, fuzzy
-#| msgid "Country Disaggregations"
 msgid "Global disaggregations"
-msgstr "Désagrégations du pays"
+msgstr "Désagrégations globales"
 
 #. Translators: Allows users to filter an indicator list for indicators that are unassigned. */
 #: js/pages/iptt_report/models/filterStore.js:638
@@ -644,7 +638,7 @@ msgstr "Indicateurs non affectés à un niveau de cadre de résultats"
 #: js/pages/iptt_report/models/ipttLevel.js:33
 #, python-format
 msgid "%(this_level_number)s and sub-levels: %(this_level_full_name)s"
-msgstr ""
+msgstr "%(this_level_number)s et sous-niveaux : %(this_level_full_name)s"
 
 #: js/pages/logframe/components/subtitle.js:14
 msgid "View results framework"
@@ -921,24 +915,20 @@ msgstr "Êtes-vous sûr de vouloir supprimer %s ?"
 
 #. Translators: this link opens a view of all indicators linked to (associated with) a particular level (level name replaces %s) */
 #: js/pages/results_framework/components/level_cards.js:130
-#, fuzzy, python-format
-#| msgid "Indicators linked to this %s"
+#, python-format
 msgid "All indicators linked to %s"
-msgstr "Indicateurs liés à %s"
+msgstr "Tous les indicateurs liés à %s"
 
 #. Translators: this link opens a view of all indicators linked to (associated with) a particular level and its child levels (level name replaces %s) */
 #: js/pages/results_framework/components/level_cards.js:142
-#, fuzzy, python-format
-#| msgid "Indicators linked to this %s"
+#, python-format
 msgid "All indicators linked to %s and sub-levels"
-msgstr "Indicateurs liés à %s"
+msgstr "Tous les indicateurs liés à %s et aux sous-niveaux"
 
 #. Translators: this is the title of a button to open a popup with indicator performance metrics*/
 #: js/pages/results_framework/components/level_cards.js:230
-#, fuzzy
-#| msgid "Indicator Performance Tracking Table"
 msgid "Track indicator performance"
-msgstr "Tableau de suivi des performances de l’indicateur"
+msgstr "Suivre les performances de l’indicateur"
 
 #. Translators: This is a validation message given to the user when the user-editable name field has been deleted or omitted. */
 #. Translators: This is a warning messages when a user has entered duplicate names for two different objects and those names contain only white spaces, both of which are not permitted. */
@@ -1185,7 +1175,7 @@ msgstr "Désagrégations du pays"
 #: js/pages/tola_management_pages/country/components/country_editor.js:50
 #: js/pages/tola_management_pages/country/components/country_history.js:13
 msgid "History"
-msgstr ""
+msgstr "Historique"
 
 #: js/pages/tola_management_pages/country/components/edit_country_profile.js:69
 msgid "Country name"
@@ -1249,23 +1239,23 @@ msgid ""
 "This category cannot be edited or removed because it was used to "
 "disaggregate a result."
 msgstr ""
+"Cette catégorie a servi à désagréger un résultat, c'est pourquoi elle ne "
+"peut être ni modifiée, ni supprimée."
 
 #. Translators: This is an explanation of a web page element for use with screen readers
 #: js/pages/tola_management_pages/country/components/edit_disaggregations.js:90
 msgid "Explanation for absence of delete button"
-msgstr ""
+msgstr "Motif de l'absence d'un bouton de suppression"
 
 #. Translators: Form field label for the disaggregation name.*/}
 #: js/pages/tola_management_pages/country/components/edit_disaggregations.js:296
-#, fuzzy
-#| msgid "Disaggregation Type"
 msgid "Disaggregation"
-msgstr "Type de désagrégation"
+msgstr "Désagrégation"
 
 #. Translators: This labels a checkbox, when checked, it will make the associated item "on" (selected) for all new indicators
 #: js/pages/tola_management_pages/country/components/edit_disaggregations.js:316
 msgid "Selected by default"
-msgstr ""
+msgstr "Sélectionné par défaut"
 
 #. Translators: Help text for the "selected by default" checkbox on the disaggregation form
 #: js/pages/tola_management_pages/country/components/edit_disaggregations.js:322
@@ -1273,6 +1263,9 @@ msgid ""
 "When adding a program indicator, this disaggregation will be selected by "
 "default.  (It can be unselected for specific indicators)"
 msgstr ""
+"En ajoutant un indicateur de programme, cette désagrégation sera "
+"sélectionnée par défaut. (Elle peut être désélectionnée pour certains "
+"indicateurs)"
 
 #. Translators: Additional help text for the "selected by default" checkbox on the disaggregation form -->
 #: js/pages/tola_management_pages/country/components/edit_disaggregations.js:324
@@ -1280,50 +1273,42 @@ msgid ""
 "This option is recommended for disaggregations that are required for all "
 "programs in a country, regardless of sector."
 msgstr ""
+"Cette option est conseillée pour les désagrégations nécessaires aux "
+"programmes dans un pays, peu importe le secteur."
 
 #: js/pages/tola_management_pages/country/components/edit_disaggregations.js:327
 msgid "More information on \"selected by default\""
-msgstr ""
+msgstr "Plus d'informations sur « sélectionnée par défaut »"
 
 #. Translators:  This is header text for a list of disaggregation categories*/}
 #: js/pages/tola_management_pages/country/components/edit_disaggregations.js:337
-#, fuzzy
-#| msgid "Countries"
 msgid "Categories"
-msgstr "Pays"
+msgstr "Catégories"
 
 #. Translators:  This a column header that shows the sort order of the rows below*/}
 #: js/pages/tola_management_pages/country/components/edit_disaggregations.js:343
 msgid "Order"
-msgstr ""
+msgstr "Classement"
 
 #. Translators:  Button label.  Button allows users to add a disaggregation category to a list.  */}
 #: js/pages/tola_management_pages/country/components/edit_disaggregations.js:358
-#, fuzzy
-#| msgid "Add indicator"
 msgid "Add a category"
-msgstr "Ajouter un indicateur"
+msgstr "Ajouter une catégorie"
 
 #. Translators: this is a verb (on a button that archives the selected item)
 #: js/pages/tola_management_pages/country/components/edit_disaggregations.js:375
-#, fuzzy
-#| msgid "Country Disaggregations"
 msgid "Unarchive disaggregation"
-msgstr "Désagrégations du pays"
+msgstr "Désarchiver la désagrégation"
 
 #. Translators:  Button text that allows users to delete a disaggregation */}
 #: js/pages/tola_management_pages/country/components/edit_disaggregations.js:381
-#, fuzzy
-#| msgid "Disaggregation Type"
 msgid "Delete disaggregation"
-msgstr "Type de désagrégation"
+msgstr "Supprimer une désagrégation"
 
 #. Translators: this is a verb (on a button that archives the selected item)
 #: js/pages/tola_management_pages/country/components/edit_disaggregations.js:387
-#, fuzzy
-#| msgid "Add country disaggregation"
 msgid "Archive disaggregation"
-msgstr "Ajouter une désagrégation de pays"
+msgstr "Archiver la désagrégation"
 
 #: js/pages/tola_management_pages/country/components/edit_disaggregations.js:421
 #: js/pages/tola_management_pages/country/components/edit_objectives.js:159
@@ -1406,24 +1391,18 @@ msgstr "Échec de l’enregistrement"
 
 #. Translators: Notification that a user has been able to delete a disaggregation
 #: js/pages/tola_management_pages/country/models.js:204
-#, fuzzy
-#| msgid "Successfully Deleted"
 msgid "Successfully deleted"
-msgstr "Supprimé avec succès"
+msgstr "Supprimée avec succès"
 
 #. Translators: Notification that a user has been able to disable a disaggregation
 #: js/pages/tola_management_pages/country/models.js:209
-#, fuzzy
-#| msgid "Successfully Saved"
 msgid "Successfully archived"
-msgstr "Enregistré avec succès"
+msgstr "Archivée avec succès"
 
 #. Translators: Notification that a user has been able to reactivate a disaggregation
 #: js/pages/tola_management_pages/country/models.js:214
-#, fuzzy
-#| msgid "Successfully Saved"
 msgid "Successfully unarchived"
-msgstr "Enregistré avec succès"
+msgstr "Désarchivée avec succès"
 
 #. Translators: error message generated when item names are duplicated but are required to be unqiue.
 #: js/pages/tola_management_pages/country/models.js:220
@@ -1431,18 +1410,20 @@ msgid ""
 "Saving failed: Disaggregation categories should be unique within a "
 "disaggregation."
 msgstr ""
+"Échec de l'enregistrement : les catégories de désagrégation ne peuvent pas "
+"être identiques au sein d'une même désagrégation."
 
 #. Translators: error message generated when item names are duplicated but are required to be unqiue.
 #: js/pages/tola_management_pages/country/models.js:228
 msgid "Saving failed: disaggregation names should be unique within a country."
 msgstr ""
+"Échec de l'enregistrement : les noms des désagrégations ne peuvent pas être "
+"identiques au sein d'un même pays."
 
 #. Translators: This is a confirmation prompt to confirm a user wants to delete an item
 #: js/pages/tola_management_pages/country/models.js:412
-#, fuzzy
-#| msgid "Are you sure you want to delete %s?"
 msgid "Are you sure you want to delete this disaggregation?"
-msgstr "Êtes-vous sûr de vouloir supprimer %s ?"
+msgstr "Êtes-vous sûr de vouloir supprimer cette désagrégation ?"
 
 #. Translators: This is part of a confirmation prompt to archive a type of disaggregation (e.g. "gender" or "age")
 #: js/pages/tola_management_pages/country/models.js:439
@@ -1450,12 +1431,14 @@ msgid ""
 "New programs will be unable to use this disaggregation. (Programs already "
 "using the disaggregation will be unaffected.)"
 msgstr ""
+"Les nouveaux programmes ne pourront pas utiliser cette désagrégation. (Cela "
+"n'impactera pas les programmes qui utilisent déjà cette désagrégation.)"
 
 #. Translators: This is part of a confirmation prompt to unarchive a type of disaggregation (e.g. "gender" or "age")
 #: js/pages/tola_management_pages/country/models.js:465
 #, python-format
 msgid "All programs in %s will be able to use this disaggregation."
-msgstr ""
+msgstr "Les programmes situés dans %s pourront utiliser cette désagrégation."
 
 #. Translators:  This error message appears underneath a user-input name if it appears more than once in a set of names.  Only unique names are allowed.
 #: js/pages/tola_management_pages/country/models.js:566
@@ -1464,18 +1447,18 @@ msgid ""
 "There is already a disaggregation type called \"%(newDisagg)s\" in "
 "%(country)s. Please choose a unique name."
 msgstr ""
+"Un type de désagrégation portant le nom de « %(newDisagg)s » dans "
+"%(country)s existe déjà. Veuillez saisir un nom unique."
 
 #. Translators:  This error message appears underneath user-input labels that appear more than once in a set of labels.  Only unique labels are allowed.
 #: js/pages/tola_management_pages/country/models.js:584
 msgid "Categories must not be blank."
-msgstr ""
+msgstr "Les catégories ne peuvent pas être vides."
 
 #. Translators:  This error message appears underneath user-input labels that appear more than once in a set of labels.  Only unique labels are allowed.
 #: js/pages/tola_management_pages/country/models.js:588
-#, fuzzy
-#| msgid "Result levels must have unique names."
 msgid "Categories must have unique names."
-msgstr "Les niveaux de résultats doivent avoir des noms uniques."
+msgstr "Les catégories doivent avoir des noms uniques."
 
 #: js/pages/tola_management_pages/country/views.js:17
 #: js/pages/tola_management_pages/country/views.js:70
