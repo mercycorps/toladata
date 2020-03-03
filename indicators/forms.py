@@ -1,4 +1,4 @@
-# -*- coding: utf-8 -*-
+
 import uuid
 import decimal
 from datetime import timedelta
@@ -432,9 +432,9 @@ class ResultForm(forms.ModelForm):
         self.request = kwargs.pop('request')
         super(ResultForm, self).__init__(*args, **kwargs)
 
-        #TODO: unless I don't know how dicts work, this doesn't modify the actual fields at all?
+        # Disable all field objects contained in this dict if the user has read-only access.
         if not self.request.has_write_access:
-            for name, field in self.fields.items():
+            for field in self.fields.values():
                 field.disabled = True
 
         self.set_initial_querysets()
@@ -634,4 +634,5 @@ def get_disaggregated_result_formset(disaggregation):
         extra=0
     )
     FormSet.disaggregation = disaggregation
+    FormSet.disaggregation_label = _(disaggregation.disaggregation_type)
     return FormSet

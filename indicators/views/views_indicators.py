@@ -1,4 +1,4 @@
-# -*- coding: utf-8 -*-
+
 """
 Views for indicators and related models (results, periodic targets) as well as indicator summaries (Program page)
 """
@@ -788,7 +788,6 @@ class ResultCreate(ResultFormMixin, CreateView):
     def dispatch(self, request, *args, **kwargs):
         if not request.has_write_access:
             raise PermissionDenied
-
         self.indicator = get_object_or_404(Indicator, pk=self.kwargs['indicator'])
         return super(ResultCreate, self).dispatch(request, *args, **kwargs)
 

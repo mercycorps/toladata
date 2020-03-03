@@ -10,7 +10,13 @@
                href="#" id="disaggregations_toggle_{{ forloop.counter0 }}" class="is-accordion-toggle btn btn-link collapsed"
                data-toggle="collapse" data-target="#disaggregations_fields_{{ forloop.counter0 }}"
                aria-expanded="false" aria-controls="disaggregations_fields_{{ forloop.counter0 }}">
-                <i class="fas fa-caret-right"></i>{{ disaggregation_formset.disaggregation }}
+                <i class="fas fa-caret-right"></i>
+                {# Use translated disaggregation label if it's a global disagg type (i.e. has no country association #}
+                {% if disaggregation_formset.disaggregation.country %}
+                    {{ disaggregation_formset.disaggregation }}
+                {% else %}
+                    {{ disaggregation_formset.disaggregation_label }}
+                {% endif %}
             </a>
             <span class="formset-feedback invalid-feedback">
                 <i class="fas fa-exclamation-triangle"></i>&nbsp;{% trans "Needs attention" %}

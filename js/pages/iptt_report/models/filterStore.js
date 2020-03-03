@@ -160,7 +160,7 @@ export default (
                     start: this.startPeriodValue,
                     end: this.endPeriodValue
                 };
-                
+
                 this._selectedFrequency = frequency;
                 this.setPeriods(periods);
                 return true;
@@ -391,7 +391,7 @@ export default (
             return [
                 ...this._tierOptions.filter(option => this._indicatorFilters.tiers.includes(option.value)),
                 ...this._levelOptions.filter(option => this._indicatorFilters.levels.includes(option.value)),
-                ...this._oldLevelOptions.filter(option => this._indicatorFilters.oldLevels.includes(option.value)),                
+                ...this._oldLevelOptions.filter(option => this._indicatorFilters.oldLevels.includes(option.value)),
             ];
         },
         set levelTierFilters({levels = [], tiers = [], oldLevels = []} = {}) {
@@ -474,7 +474,7 @@ export default (
                 Array.from(this.programFilterData.disaggregations.values())
                     .filter(disaggregation => disaggregationPks.includes(disaggregation.pk))
                     .sort((disagg_a, disagg_b) => (disagg_a.name > disagg_b.name) ? 1 : -1)
-                    .map(disaggregation => disaggregation.pk) : []  
+                    .map(disaggregation => disaggregation.pk) : []
         },
         get disaggregationFilters() {
             let disaggregationOptions = [].concat.apply([], this.disaggregationOptions.slice(1).map(optgroup => optgroup.options));
