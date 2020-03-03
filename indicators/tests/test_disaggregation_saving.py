@@ -105,5 +105,3 @@ class TestGlobalDisaggTranslation(test.TestCase):
     def test_global_disaggs_are_translated(self):
         url = reverse('result_add', kwargs={"indicator": self.indicator.id}) + "?modal=1"
         response = self.client.get(url, HTTP_X_REQUESTED_WITH='XMLHttpRequest')
-
-        print(response)
