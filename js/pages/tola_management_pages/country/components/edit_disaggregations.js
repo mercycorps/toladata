@@ -32,7 +32,7 @@ class CategoryForm extends React.Component {
                 html: true
             });
         }
-    }
+    };
 
     render() {
         const {index, category, listLength, ...props} = this.props;
@@ -41,6 +41,34 @@ class CategoryForm extends React.Component {
             && props.errors.labels.length > index
             && props.errors.labels[index].hasOwnProperty('label')
             && props.errors.labels[index]['label'].length;
+
+        let deletionElement =
+            <a
+                tabIndex="0"
+                onClick={() => props.deleteLabel(index)}
+                className={classNames("btn btn-link btn-danger text-nowrap", {'disabled': category.in_use})}
+            >
+                <i className="fas fa-trash"/>{gettext('Remove')}
+            </a>;
+
+        if (props.disabled || category.in_use) {
+            // In the case that there is only one category and it is in use or archived, preference the disabled
+            // element over the null element
+            deletionElement =
+                <HelpPopover
+                    key={1}
+                    content={ gettext('This category cannot be edited or removed because it was used to disaggregate a result.') }
+                    placement="bottom"
+                    className='btn btn-link'
+                    iconClass="fa fa-lock text-muted"
+                    className="btn btn-link"
+                    innerRef={ this.disabledRef }
+                    ariaText={gettext('Explanation for absence of delete button')}
+                />
+        }
+        else if(listLength === 1) {
+            deletionElement = null;
+        }
 
         return (
             <React.Fragment>
@@ -68,28 +96,9 @@ class CategoryForm extends React.Component {
                         }
                     </select>
                 </div>
-                {(!props.disabled && !category.in_use) ?
-                <a
-                    tabIndex="0"
-                    onClick={() => props.deleteLabel(index)}
-                    className={classNames("btn btn-link btn-danger text-nowrap", {'disabled': category.in_use})}
-                >
-                    {/* # Translators;  Allows users to delete a disaggregation category*/}
-                    <i className="fas fa-trash"/>{gettext('Remove')}
-                </a>
-                :
-                <HelpPopover
-                    key={1}
-                    content={ gettext('This category cannot be edited or removed because it was used to disaggregate a result.') }
-                    placement="bottom"
-                    iconClass="fa fa-lock text-muted"
-                    iconStyle={ {marginTop: '10px' }}
-                    linkHeight="30px"
-                    innerRef={ this.disabledRef }
-                    // # Translators: This is an explanation of a web page element for use with screen readers
-                    ariaText={gettext('Explanation for absence of delete button')}
-                />
-                }
+                <div className="form-group">
+                    {deletionElement}
+                </div>
             </React.Fragment>
         );
     }

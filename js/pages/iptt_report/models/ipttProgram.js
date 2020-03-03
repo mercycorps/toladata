@@ -77,11 +77,14 @@ export const forIPTT = (
         siteJSON => [parseInt(siteJSON.pk), {pk: parseInt(siteJSON.pk), name: siteJSON.name}]
         ))),
     disaggregations: observable(new Map((programJSON.disaggregations || []).map(
-        disaggregationJSON => [parseInt(disaggregationJSON.pk),
-                               {pk: parseInt(disaggregationJSON.pk), name: disaggregationJSON.name,
-                               country: disaggregationJSON.country || null,
-                               labels: (disaggregationJSON.labels || []).map(
-                                    labelJSON => ({pk: parseInt(labelJSON.pk), name: labelJSON.name}))}]
+        disaggregationJSON => [parseInt(disaggregationJSON.pk), {
+                                   pk: parseInt(disaggregationJSON.pk),
+                                   // Only translate disagg type if it's a global disagg
+                                   name: disaggregationJSON.country ? disaggregationJSON.name : gettext(disaggregationJSON.name),
+                                   country: disaggregationJSON.country || null,
+                                   labels: (disaggregationJSON.labels || []).map(
+                                        labelJSON => ({pk: parseInt(labelJSON.pk), name: labelJSON.name}))
+                               }]
         ).filter(([disaggregationPk, disaggregation]) => (disaggregation.labels && disaggregation.labels.length > 0)))),
     indicatorTypes: observable(new Map((programJSON.indicator_types || []).map(
         indicatorTypeJSON => [parseInt(indicatorTypeJSON.pk), {pk: parseInt(indicatorTypeJSON.pk), name: indicatorTypeJSON.name}]
