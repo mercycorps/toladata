@@ -453,12 +453,15 @@ export default (
                                                 .map(disaggregation => ({value: disaggregation.pk, label: disaggregation.name, country: disaggregation.country}));
             let countries = [...new Set(disaggregationOptions.map(option => option.country))].filter(country => country !== null).sort();
             let optgroups = [];
+            /* # Translators: User-selectable option that filters out rows from a table where the disaggregation category has not been used (i.e. avoids showing lots of blank rows. */
             optgroups.push({value: "hide-categories", label: gettext('Only show categories with results'), noList: true});
             if (disaggregationOptions.filter(option => option.country === null).length > 0) {
+                /* # Translators: filter that allows users to select only those disaggregation types that are available across the globe (i.e. across the agency). */
                 optgroups.push({label: gettext('Global disaggregations'), options: disaggregationOptions.filter(option => option.country === null)});
             }
             countries.forEach(
                 country => {
+                    /* # Translators: A list of disaggregation types follows this header. */
                     optgroups.push({label: `${country} ${gettext('Disaggregations')}`, options:disaggregationOptions.filter(option => option.country === country)});
                 }
             );
@@ -631,6 +634,7 @@ export default (
                 let groups = this.getLevelIndicatorGroups('indicators');
                 if (this.resultsFramework) {
                     groups = groups.map(
+                        /* # Translators: Allows users to filter an indicator list for indicators that are unassigned. */
                         levelGroup => ({label: levelGroup.level ? levelGroup.level.tierNumber : gettext('Indicators unassigned to  a results framework level'),
                                         options: levelGroup.indicators.map(indicator => ({value: indicator.pk, label: indicator.name}))
                     }));

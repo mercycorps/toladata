@@ -112,7 +112,9 @@ class UserManagementAuditLog(models.Model, DiffableLog):
             "first_name": _("First name"),
             "last_name": _("Last name"),
             "user": _("Username"),
+            # Translators:  Form field capturing how a user wants to be called (e.g. Marsha or Mr. Wiggles).
             "mode_of_address": _("Mode of address"),
+            # Translators:  Form field capturing whether a user prefers to be contacted by phone, email, etc...
             "mode_of_contact": _("Mode of contact"),
             "phone_number": _("Phone number"),
             "email": _("Email"),
@@ -245,7 +247,9 @@ class ProgramAuditLog(models.Model, DiffableLog):
             "rationale_for_target": _("Rationale for target"),
             "baseline_value": _("Baseline"),
             "baseline_na": _("Baseline N/A"),
+            # Translators:  A Noun.  The URL or computer file path where a document can be found.
             "evidence_url": _('Evidence link'),
+            # Translators:  A Noun.  The user-friendly name of the evidence document they are attaching to a result.
             "evidence_name": _('Evidence record name'),
             "date": _('Result date'),
             "target": _('Measure against target'),

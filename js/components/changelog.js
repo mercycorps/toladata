@@ -84,6 +84,7 @@ const ChangeLogEntryRowBuilder = ({data}) => {
             const key = `${id}_${country}`;
             const previousEntry = <React.Fragment>
                 <ChangeField name={gettext("Country")} data={country.prev.country} />
+                {/* # Translators:  Role references a user's permission level when accessing data (i.e. User or Admin) */}
                 <ChangeField name={gettext("Role")} data={country.prev.role} />
             </React.Fragment>;
             const newEntry = <React.Fragment>
