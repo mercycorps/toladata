@@ -154,7 +154,7 @@ msgstr "Real"
 
 #: indicators/export_renderers.py:135
 msgid "% Met"
-msgstr "% cumplido"
+msgstr "% Cumplido"
 
 #: indicators/export_renderers.py:397 indicators/indicator_plan.py:297
 #: indicators/indicator_plan.py:430 indicators/views/views_program.py:167

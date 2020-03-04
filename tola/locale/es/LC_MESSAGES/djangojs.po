@@ -462,7 +462,7 @@ msgstr "Real"
 #. Translators: Column header for a percent-met column */
 #: js/pages/iptt_report/components/report/headerCells.js:70
 msgid "% Met"
-msgstr "% cumplido"
+msgstr "% Cumplido"
 
 #. Translators: header for a group of columns showing totals over the life of the program */
 #: js/pages/iptt_report/components/report/tableHeader.js:70
