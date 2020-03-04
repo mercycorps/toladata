@@ -2,10 +2,9 @@
 
 """
 
-import locale
 import datetime
 from django import test
-from django.utils import translation
+from django.utils import translation, formats
 from indicators.serializers_new import (
     IPTTTPReportSerializer,
     IPTTTVAReportSerializer,
@@ -17,7 +16,10 @@ class TestReportSerializers(test.TestCase):
     def test_report_filename(self):
         # English:
         today = datetime.date.today()
-        date_string = f"{today.strftime('%b')} {today.day}, {today.year}"
+        en_format = 'M j, Y'
+        es_format = 'j N Y'
+        fr_format = 'j N Y'
+        date_string = formats.date_format(today, en_format, use_l10n=True)
         actuals_report = IPTTTPReportSerializer()
         self.assertEqual(
             actuals_report.filename,
@@ -33,11 +35,9 @@ class TestReportSerializers(test.TestCase):
             full_report.filename,
             f"IPTT TvA full program report {date_string}.xlsx"
         )
-        default_locale = locale.getlocale()
         # French
-        locale.setlocale(locale.LC_ALL, 'fr_FR')
-        fr_date_string = f"{today.day} {today.strftime('%b')}. {today.year}"
         translation.activate('fr')
+        fr_date_string = formats.date_format(today, fr_format, use_l10n=True)
         fr_actuals_report = IPTTTPReportSerializer()
         fr_tva_report = IPTTTVAReportSerializer()
         fr_full_report = IPTTFullReportSerializer()
@@ -56,15 +56,14 @@ class TestReportSerializers(test.TestCase):
             f"Rapport IPTT relatif à la totalité de la TVA du programme {fr_date_string}.xlsx"
         )
         # Spanish
-        locale.setlocale(locale.LC_ALL, 'es_ES')
-        es_date_string = f"{today.day} {today.strftime('%b')}. {today.year}"
         translation.activate('es')
+        es_date_string = formats.date_format(today, es_format, use_l10n=True)
         es_actuals_report = IPTTTPReportSerializer()
         es_tva_report = IPTTTVAReportSerializer()
         es_full_report = IPTTFullReportSerializer()
         self.assertEqual(
             es_actuals_report.filename,
-            f"Informe completo del programa del IPTT TvA {es_date_string}.xlsx"
+            f"Informes de reales únicamente del IPTT {es_date_string}.xlsx"
         )
         self.assertEqual(
             es_tva_report.filename,
@@ -74,5 +73,4 @@ class TestReportSerializers(test.TestCase):
             es_full_report.filename,
             f"Informe completo del programa del IPTT TvA {es_date_string}.xlsx"
         )
-        locale.setlocale(locale.LC_ALL, default_locale)
         translation.activate('en')
