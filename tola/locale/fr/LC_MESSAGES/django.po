@@ -2,7 +2,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: \n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2020-03-03 14:24-0800\n"
+"POT-Creation-Date: 2020-03-03 16:13-0800\n"
 "PO-Revision-Date: 2020-03-03 14:21-0800\n"
 "Last-Translator: \n"
 "Language-Team: \n"
@@ -2554,6 +2554,7 @@ msgstr ""
 "Vous pouvez comparer ce résultat à la cible de mi-parcours ou de fin de "
 "programme."
 
+#. Translators:  Allows the user to select only those items that need to be updated in some way
 #: templates/indicators/results/result_form_disaggregation_fields.html:23
 msgid "Needs attention"
 msgstr "Requiert votre attention"
@@ -2562,6 +2563,7 @@ msgstr "Requiert votre attention"
 msgid "Sum"
 msgstr "Somme"
 
+#. Translators: Button text. When user clicks, a form will be updated with a calculated value based on what the user has entered.
 #: templates/indicators/results/result_form_disaggregation_fields.html:51
 msgid "Update actual value"
 msgstr "Mettre à jour la valeur réelle"
