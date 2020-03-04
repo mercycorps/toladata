@@ -689,6 +689,7 @@ const ENGLISH = 'en';
  */
 function getValidatedNumericInput(selector) {
     let $input = $(selector);
+    const floatingPointSeparator = [FRENCH, SPANISH].includes(userLang) ? 188 : 190;
     function preventNonNumericInput(e) {
         // allow cursor control characters:
         if (CONTROL_CHARACTER_KEYCODES.includes(e.keyCode) ||
@@ -713,7 +714,7 @@ function getValidatedNumericInput(selector) {
         // allow numbers (48 - 57 map to 0-9):
         if ((e.keyCode >= 48 && e.keyCode <= 57 && !e.shiftKey) ||
             // allow comma or period if there isn't one already:
-            ($.inArray(e.keyCode, [188, 190]) !== -1 && ((curVal.match(/[,.]/) || []).length < 1 || selectionContainsSeparator)) &&
+            (e.keyCode == floatingPointSeparator && ((curVal.match(/[,.]/) || []).length < 1 || selectionContainsSeparator)) &&
             !e.shiftKey) {
             // don't do anything (allow number / decimal / comma to be entered as normal)
             return;
