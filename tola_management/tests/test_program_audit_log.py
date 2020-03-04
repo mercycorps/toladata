@@ -1,4 +1,5 @@
-
+import json
+from decimal import Decimal
 from django import test
 from factories import (
     workflow_models as w_factories,
@@ -10,20 +11,23 @@ from indicators.models import Indicator, Result, DisaggregatedValue
 
 class TestResultAuditLog(test.TestCase):
 
-    def setUp(self):
-        self.country = w_factories.CountryFactory(country="Test Country", code="TC")
-        self.program = w_factories.RFProgramFactory(name="Test Program")
-        self.program.country.add(self.country)
-        self.disagg_type = i_factories.DisaggregationTypeFactory(
+    @classmethod
+    def setUpClass(cls):
+        super(TestResultAuditLog, cls).setUpClass()
+        cls.country = w_factories.CountryFactory(country="Test Country", code="TC")
+        cls.program = w_factories.RFProgramFactory(name="Test Program")
+        cls.program.country.add(cls.country)
+        cls.disagg_type = i_factories.DisaggregationTypeFactory(
             disaggregation_type="Test Disagg Type",
             labels=[f"DisaggLabel{i}" for i in range(5)],
-            country=self.country
+            country=cls.country
         )
-        self.disagg_labels = self.disagg_type.disaggregationlabel_set.all()
+        cls.disagg_labels = cls.disagg_type.disaggregationlabel_set.all()
+        cls.tola_user = w_factories.TolaUserFactory(country=cls.country)
+        w_factories.grant_country_access(cls.tola_user, cls.country, 'basic_admin')
+        w_factories.grant_program_access(cls.tola_user, cls.program, cls.country, role='high')
 
-        self.tola_user = w_factories.TolaUserFactory(country=self.country)
-        w_factories.grant_country_access(self.tola_user, self.country, 'basic_admin')
-        w_factories.grant_program_access(self.tola_user, self.program, self.country, role='high')
+    def setUp(self):
         self.client.force_login(user=self.tola_user.user)
 
     def test_audit_save(self):
@@ -49,12 +53,92 @@ class TestResultAuditLog(test.TestCase):
         result_data.update({'result': result.id, 'achieved': 6})
         response_update = self.client.post(
             f'/indicators/result_update/{result.id}/', result_data, **{'HTTP_X_REQUESTED_WITH': 'XMLHttpRequest'})
-
-        result = indicator.result_set.first()
+        result.refresh_from_db()
         audits = ProgramAuditLog.objects.all()
         self.assertEqual(response_update.status_code, 200)
         self.assertEqual(result.achieved, 6)
         self.assertEqual(audits.count(), 2)
+
+        """
+        Now test that the audit log values are stored property (i.e. with the right number
+        of decimal places, not as exponents, etc...
+
+        Note that the currently the number format being saved to the previous_value field is different
+        than what is being saved to the new_value field.  Until such time we can take a deeper
+        dive into how the change log is working, these tests accommodate the inconsistency.
+        """
+        result_data.update({'result': result.id, 'achieved': 7.00})
+        response = self.client.post(
+            f'/indicators/result_update/{result.id}/',
+            result_data,
+            **{'HTTP_X_REQUESTED_WITH': 'XMLHttpRequest'})
+        self.assertEqual(response.status_code, 200)
+        result_data.update({'result': result.id, 'achieved': 8.01})
+        response = self.client.post(
+            f'/indicators/result_update/{result.id}/',
+            result_data,
+            **{'HTTP_X_REQUESTED_WITH': 'XMLHttpRequest'})
+        self.assertEqual(response.status_code, 200)
+        audit = ProgramAuditLog.objects.order_by("id").last()
+        previous_entry = json.loads(audit.previous_entry)
+        new_entry = json.loads(audit.new_entry)
+        self.assertEqual(
+            Decimal(previous_entry['value']),
+            Decimal("7"),
+            "Trailing zeros in prev values should be ignored")
+        self.assertEqual(
+            Decimal(new_entry['value']),
+            Decimal("8.01"),
+            "Decimals to two places should be respected in new values")
+
+        result_data.update({'result': result.id, 'achieved': 50000.00})
+        response = self.client.post(
+            f'/indicators/result_update/{result.id}/',
+            result_data,
+            **{'HTTP_X_REQUESTED_WITH': 'XMLHttpRequest'})
+        self.assertEqual(response.status_code, 200)
+        audit = ProgramAuditLog.objects.order_by("id").last()
+        previous_entry = json.loads(audit.previous_entry)
+        new_entry = json.loads(audit.new_entry)
+        self.assertEqual(
+            Decimal(previous_entry['value']),
+            Decimal("8.01"),
+            "Decimals to two places should be respected in prev values")
+        self.assertEqual(
+            Decimal(new_entry['value']),
+            Decimal("50000.0"),
+            "Values should not be saved as exponents in new values")
+
+        result_data.update({'result': result.id, 'achieved': 0.05})
+        response = self.client.post(
+            f'/indicators/result_update/{result.id}/',
+            result_data,
+            **{'HTTP_X_REQUESTED_WITH': 'XMLHttpRequest'})
+        self.assertEqual(response.status_code, 200)
+        audit = ProgramAuditLog.objects.order_by("id").last()
+        previous_entry = json.loads(audit.previous_entry)
+        new_entry = json.loads(audit.new_entry)
+        self.assertEqual(
+            Decimal(previous_entry['value']),
+            Decimal("50000"),
+            "Values should not be saved as exponents in prev values")
+        self.assertEqual(
+            Decimal(new_entry['value']),
+            Decimal(".05"),
+            "Values less than one should be saved properly in new values")
+
+        result_data.update({'result': result.id, 'achieved': 60000.00})
+        response = self.client.post(
+            f'/indicators/result_update/{result.id}/',
+            result_data,
+            **{'HTTP_X_REQUESTED_WITH': 'XMLHttpRequest'})
+        self.assertEqual(response.status_code, 200)
+        audit = ProgramAuditLog.objects.order_by("id").last()
+        previous_entry = json.loads(audit.previous_entry)
+        self.assertEqual(
+            Decimal(previous_entry['value']),
+            Decimal(".05"),
+            "Values less than one should be saved properly in prev values")
 
     def test_disaggregation_display_data(self):
         indicator = i_factories.RFIndicatorFactory(

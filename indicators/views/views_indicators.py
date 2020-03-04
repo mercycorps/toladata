@@ -31,7 +31,7 @@ from django.views.generic import TemplateView
 from django.views.generic.detail import View
 from django.views.generic.edit import CreateView, DeleteView, UpdateView
 
-from tola.util import group_excluded
+from tola.util import group_excluded, usefully_normalize_decimal
 
 from workflow.models import (
     Program
@@ -822,7 +822,7 @@ class ResultCreate(ResultFormMixin, CreateView):
 
         if self.request.is_ajax():
             data = {
-                'pk' : result.pk,
+                'pk': result.pk,
                 'url': reverse('result_update', kwargs={'pk': result.pk})
             }
             return JsonResponse(data)
@@ -868,17 +868,30 @@ class ResultUpdate(ResultFormMixin, UpdateView):
         return kwargs
 
     def form_valid(self, form):
-        old_result = Result.objects.get(pk=self.kwargs['pk'])
         # save the form then update manytomany relationships
+        old_result = Result.objects.get(pk=self.kwargs['pk'])
         old_values = old_result.logged_fields
-        old_values['value'] = old_values['value'].normalize()
+        old_values['value'] = usefully_normalize_decimal(old_values['value'])
+        if "disaggregation_values" in old_values:
+            for disagg_id, disagg_dict in old_values["disaggregation_values"].items():
+                normalized_value = usefully_normalize_decimal(old_values["disaggregation_values"][disagg_id]["value"])
+                old_values["disaggregation_values"][disagg_id]["value"] = normalized_value
+
         new_result = form.save()
         for disagg in new_result.indicator.disaggregation.all():
             formset = get_disaggregated_result_formset(disagg)(self.request.POST, result=new_result, request=self.request)
             if formset.is_valid:
                 formset.save()
-        ProgramAuditLog.log_result_updated(self.request.user, new_result.indicator, old_values,
-                                           new_result.logged_fields, form.cleaned_data.get('rationale'))
+        new_values = new_result.logged_fields
+        new_values['value'] = usefully_normalize_decimal(new_values['value'])
+        if "disaggregation_values" in new_values:
+            for disagg_id, disagg_dict in new_values["disaggregation_values"].items():
+                normalized_value = usefully_normalize_decimal(new_values["disaggregation_values"][disagg_id]["value"])
+                new_values["disaggregation_values"][disagg_id]["value"] = normalized_value
+
+        ProgramAuditLog.log_result_updated(
+            self.request.user, new_result.indicator, old_values,
+            new_values, form.cleaned_data.get('rationale'))
 
         if self.request.is_ajax():
             data = serializers.serialize('json', [self.object])

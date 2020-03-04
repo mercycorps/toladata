@@ -4,6 +4,7 @@ import logging
 import requests
 import dateutil
 import datetime
+from decimal import Decimal, InvalidOperation
 
 from workflow.models import Country, TolaUser
 from django.db.models import Q
@@ -17,7 +18,8 @@ from django.utils.translation import ugettext as _
 
 logger = logging.getLogger(__name__)
 
-#CREATE NEW DATA DICTIONARY OBJECT
+
+# CREATE NEW DATA DICTIONARY OBJECT
 def siloToDict(silo):
     parsed_data = {}
     key_value = 1
@@ -25,7 +27,7 @@ def siloToDict(silo):
         label = unicodedata.normalize('NFKD', d.field.name).encode('ascii', 'ignore')
         value = unicodedata.normalize('NFKD', d.char_store).encode('ascii', 'ignore')
         # row = unicodedata.normalize('NFKD', d.row_number).encode('ascii', 'ignore')
-        parsed_data[key_value] = {label : value}
+        parsed_data[key_value] = {label: value}
 
         key_value += 1
 
@@ -46,8 +48,9 @@ def getCountry(user):
     else:
         return Country.objects.none()
 
+
 def emailGroup(country, group, link, subject, message, submitter=None):
-    #email incident to admins in each country assoicated with the projects program
+    # email incident to admins in each country associated with the projects program
     for single_country in country.all():
         country = Country.objects.all().filter(country=single_country)
         getGroupEmails = User.objects.all().filter(
@@ -82,7 +85,7 @@ def user_to_tola(backend, user, response, *args, **kwargs):
     userprofile.email = response.get('emails["value"]')
 
     userprofile.save()
-    #add user to country permissions table
+    # add user to country permissions table
     userprofile.countries.add(default_country)
 
 
@@ -137,6 +140,7 @@ def get_GAIT_data(gait_ids):
 
     return json.loads(response.content)['results']
 
+
 def get_dates_from_gait_response(gait_response):
     """take a gait response (from get_GAIT_data) and parse out start and end dates, return dict"""
     try:
@@ -151,6 +155,7 @@ def get_dates_from_gait_response(gait_response):
         'start_date': start_date,
         'end_date': end_date
     }
+
 
 def append_GAIT_dates(program):
     if not program.gaitid:
@@ -183,6 +188,7 @@ def append_GAIT_dates(program):
 
     return None
 
+
 def get_reporting_dates(program):
     """takes a program with start and end dates and returns default reporting_period start and end dates"""
     if program.start_date is None:
@@ -199,3 +205,19 @@ def get_reporting_dates(program):
         'reporting_period_start': reporting_period_start,
         'reporting_period_end': reporting_period_end
     }
+
+
+# Decimal normalization can result in exponents being returned.  This returns a "normal" Decimal value.
+def usefully_normalize_decimal(number):
+    if not number:
+        return number
+    if type(number) != "Decimal":
+        try:
+            number = Decimal(number)
+        except InvalidOperation:
+            return number
+
+        if int(number) == number:
+            return Decimal(int(number))
+        else:
+            return number.normalize()
