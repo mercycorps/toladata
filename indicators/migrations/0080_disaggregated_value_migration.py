@@ -75,7 +75,7 @@ def assign_all_sadd_disaggregated_values(apps, schema_editor):
         # test database - no sadd migrations, skip it:
         return
     for label in SADD_disagg.disaggregationlabel_set.all():
-        for sadd_value in DisaggregationValue.objects.exclude(
+        for sadd_value in DisaggregationValue.objects.filter(disaggregation_label=label).exclude(
             models.Q(value__isnull=True) | models.Q(value='')
             ):
             for result in sadd_value.result_set.all():
