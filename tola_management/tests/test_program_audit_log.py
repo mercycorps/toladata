@@ -17,35 +17,36 @@ class TestResultAuditLog(test.TestCase):
         cls.country = w_factories.CountryFactory(country="Test Country", code="TC")
         cls.program = w_factories.RFProgramFactory(name="Test Program")
         cls.program.country.add(cls.country)
+        cls.label_count = 5
         cls.disagg_type = i_factories.DisaggregationTypeFactory(
             disaggregation_type="Test Disagg Type",
-            labels=[f"DisaggLabel{i}" for i in range(5)],
+            labels=[f"DisaggLabel{i}" for i in range(cls.label_count)],
             country=cls.country
         )
-        cls.disagg_labels = cls.disagg_type.disaggregationlabel_set.all()
+        cls.disagg_labels = cls.disagg_type.disaggregationlabel_set.order_by("id")
         cls.tola_user = w_factories.TolaUserFactory(country=cls.country)
         w_factories.grant_country_access(cls.tola_user, cls.country, 'basic_admin')
         w_factories.grant_program_access(cls.tola_user, cls.program, cls.country, role='high')
+        cls.indicator = i_factories.RFIndicatorFactory(targets=20, program=cls.program)
 
     def setUp(self):
         self.client.force_login(user=self.tola_user.user)
 
     def test_audit_save(self):
-        indicator = i_factories.RFIndicatorFactory(targets=20, program=self.program)
-        target = indicator.periodictargets.first()
+        target = self.indicator.periodictargets.first()
         result_data = {
             'achieved': 5,
             'target': target.id,
             'date_collected': self.program.reporting_period_start,
-            'indicator': indicator.id
+            'indicator': self.indicator.id
         }
 
         # Audit log entry should be triggered by result creation
-        response_create = self.client.post(
-            f'/indicators/result_add/{indicator.id}/', result_data, **{'HTTP_X_REQUESTED_WITH': 'XMLHttpRequest'})
-        result = indicator.result_set.first()
+        response = self.client.post(
+            f'/indicators/result_add/{self.indicator.id}/', result_data, **{'HTTP_X_REQUESTED_WITH': 'XMLHttpRequest'})
+        result = self.indicator.result_set.first()
         audits = ProgramAuditLog.objects.all()
-        self.assertEqual(response_create.status_code, 200)
+        self.assertEqual(response.status_code, 200)
         self.assertEqual(result.achieved, 5)
         self.assertEqual(audits.count(), 1)
 
@@ -59,19 +60,23 @@ class TestResultAuditLog(test.TestCase):
         self.assertEqual(result.achieved, 6)
         self.assertEqual(audits.count(), 2)
 
+    def test_audit_number_format(self):
         """
         Now test that the audit log values are stored property (i.e. with the right number
         of decimal places, not as exponents, etc...
-
-        Note that the currently the number format being saved to the previous_value field is different
-        than what is being saved to the new_value field.  Until such time we can take a deeper
-        dive into how the change log is working, these tests accommodate the inconsistency.
         """
-        result_data.update({'result': result.id, 'achieved': 7.00})
+        target = self.indicator.periodictargets.first()
+        result_data = {
+            'achieved': 7,
+            'target': target.id,
+            'date_collected': self.program.reporting_period_start,
+            'indicator': self.indicator.id
+        }
         response = self.client.post(
-            f'/indicators/result_update/{result.id}/',
+            f'/indicators/result_add/{self.indicator.id}/',
             result_data,
             **{'HTTP_X_REQUESTED_WITH': 'XMLHttpRequest'})
+        result = self.indicator.result_set.first()
         self.assertEqual(response.status_code, 200)
         result_data.update({'result': result.id, 'achieved': 8.01})
         response = self.client.post(
@@ -79,6 +84,7 @@ class TestResultAuditLog(test.TestCase):
             result_data,
             **{'HTTP_X_REQUESTED_WITH': 'XMLHttpRequest'})
         self.assertEqual(response.status_code, 200)
+        self.assertEqual(ProgramAuditLog.objects.count(), 2)
         audit = ProgramAuditLog.objects.order_by("id").last()
         previous_entry = json.loads(audit.previous_entry)
         new_entry = json.loads(audit.new_entry)
@@ -90,6 +96,7 @@ class TestResultAuditLog(test.TestCase):
             Decimal(new_entry['value']),
             Decimal("8.01"),
             "Decimals to two places should be respected in new values")
+        self.assertEqual(ProgramAuditLog.objects.count(), 2)
 
         result_data.update({'result': result.id, 'achieved': 50000.00})
         response = self.client.post(
@@ -108,6 +115,7 @@ class TestResultAuditLog(test.TestCase):
             Decimal(new_entry['value']),
             Decimal("50000.0"),
             "Values should not be saved as exponents in new values")
+        self.assertEqual(ProgramAuditLog.objects.count(), 3)
 
         result_data.update({'result': result.id, 'achieved': 0.05})
         response = self.client.post(
@@ -126,6 +134,7 @@ class TestResultAuditLog(test.TestCase):
             Decimal(new_entry['value']),
             Decimal(".05"),
             "Values less than one should be saved properly in new values")
+        self.assertEqual(ProgramAuditLog.objects.count(), 4)
 
         result_data.update({'result': result.id, 'achieved': 60000.00})
         response = self.client.post(
@@ -139,6 +148,24 @@ class TestResultAuditLog(test.TestCase):
             Decimal(previous_entry['value']),
             Decimal(".05"),
             "Values less than one should be saved properly in prev values")
+        self.assertEqual(ProgramAuditLog.objects.count(), 5)
+
+        # Test if disaggregation number formats are correct.
+        disagg_values_initial = [50000.00, 9981, 5.55, 14.5, 1.50]
+        disagg_values_display = set(Decimal(k) for k in ["50000", "9981", "5.55", "14.5", "1.5"])
+        #
+        disagg_value_objects = []
+        for index, disagg_value in enumerate(disagg_values_initial):
+            disagg_value_object = DisaggregatedValue.objects.create(
+                result=result,
+                category=self.disagg_labels[index],
+                value=disagg_value,
+            )
+            disagg_value_objects.append(disagg_value_object)
+
+        logged_fields = result.logged_fields
+        raw_logged_disagg_values = set([disagg['value'] for disagg in logged_fields['disaggregation_values'].values()])
+        self.assertSetEqual(disagg_values_display, raw_logged_disagg_values)
 
     def test_disaggregation_display_data(self):
         indicator = i_factories.RFIndicatorFactory(
