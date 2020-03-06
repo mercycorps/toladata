@@ -201,7 +201,7 @@ export class ProgramStore {
     onGAITDatesSyncFailure(reason, program_id) {
         PNotify.notice({
             // # Translators: Notify user that the program start and end date failed to be retrieved from the GAIT service with a specific reason appended after the :
-            text: gettext("Failed to sync GAIT program start and end dates: " + reason),
+            text: gettext("Failed to sync GAIT program start and end dates: ") + reason,
             hide: false,
             modules: {
                 Confirm: {
