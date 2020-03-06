@@ -10,8 +10,8 @@ export const DisaggregationDiffs = ({disagg_type, disagg_diffs}) => {
     disagg_diffs.sort( (a, b) => a.custom_sort - b.custom_sort);
     return <div><h4 className="disagg-type__title text-small">{disagg_type}</h4>
         {disagg_diffs.map( diff => {
-            const displayValue = (diff.value === null || diff.value === "") ? "–" : diff.value;
-            return <div className="change__field" key={diff.id}><span className="change__field__name">{diff.name}:</span> <span className="change__field__value">{displayValue}</span></div>
+            const displayValue = (diff.value === null || diff.value === "") ? "–" : localizeNumber(diff.value);
+            return <div className="change__field" key={diff.id}><span className="change__field__name">{diff.name}:</span> <span className="change__field__value">{localizeNumber(displayValue)}</span></div>
         })}
     </div>
 };
@@ -46,7 +46,7 @@ export const ResultChangeset = ({data, name, pretty_name}) => {
             return null;
         }
     } else {
-        return <div className="change__field"><strong className="change__field__name">{pretty_name}</strong>: <span className="change__field__value">{displayValue}</span></div>
+        return <div className="change__field"><strong className="change__field__name">{pretty_name}</strong>: <span className="change__field__value">{localizeNumber(displayValue)}</span></div>
     }
 };
 
@@ -61,7 +61,7 @@ const IndicatorChangeset = ({data, name, pretty_name, indicator}) => {
             <h4 className="text-small">{gettext('Targets changed')}</h4>
             {Object.entries(data).map(([id, target]) => {
                 const displayValue = target.value === "" ? "–" : target.value;
-                return <div className="change__field" key={id}><strong className="change__field__name">{target.name}:</strong> {displayValue}</div>
+                return <div className="change__field" key={id}><strong className="change__field__name">{target.name}:</strong> {localizeNumber(displayValue)}</div>
             })}
         </div>
     } else {

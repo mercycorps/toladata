@@ -29,6 +29,7 @@ from safedelete.models import SafeDeleteModel
 from safedelete.managers import SafeDeleteManager
 from safedelete.queryset import SafeDeleteQueryset
 from django_mysql.models import ListCharField
+from tola.util import usefully_normalize_decimal
 
 from workflow.models import (
     Program, Sector, SiteProfile, Country, TolaUser
@@ -2024,7 +2025,7 @@ class Result(models.Model):
         """
         return {
             "id": self.id,
-            "value": self.achieved,
+            "value": usefully_normalize_decimal(self.achieved),
             "date": self.date_collected,
             "target": self.periodic_target.period_name if self.periodic_target else 'N/A',
             "evidence_name": self.record_name,
@@ -2033,7 +2034,7 @@ class Result(models.Model):
             "disaggregation_values": {
                 dv.category.pk: {
                     "id": dv.category.pk,
-                    "value": dv.value,
+                    "value": usefully_normalize_decimal(dv.value),
                     "name": dv.category.name,
                     "custom_sort": dv.category.customsort,
                     "type": dv.category.disaggregation_type.disaggregation_type,
