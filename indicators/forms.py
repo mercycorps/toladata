@@ -286,7 +286,7 @@ class IndicatorForm(forms.ModelForm):
         self.fields['grouped_disaggregations'] = GroupedMultipleChoiceField(
             # Translators:  disaggregation types that are available to all programs
             [(_('Global disaggregations'),
-              [(disagg.pk, str(disagg)) for disagg in global_disaggs],
+              [(disagg.pk, _(str(disagg))) for disagg in global_disaggs],
               [get_helptext(disagg) for disagg in global_disaggs],
               [getattr(disagg, 'has_results') for disagg in global_disaggs])] +
             # Translators:  disaggregation types that are available only to a specific country
