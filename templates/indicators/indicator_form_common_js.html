@@ -475,7 +475,7 @@
                                 id="pt-0"
                                 data-periodictarget="pt"
                                 placeholder="{% trans 'Enter target' %}"
-                                class="form-control input-value">
+                                class="form-control input-value periodic-target-input">
                         </span>
                         <span id="hint_id_pt_0" style="margin:0px;" class="help-block"> </span>
                     </div>
@@ -889,7 +889,7 @@
         }
 
         let errMsg = undefined;
-        
+
         if (lop.numericVal() === 0) {
             errMsg = "{% trans 'The Life of Program (LoP) target cannot be zero.'|escapejs %}";
         }
