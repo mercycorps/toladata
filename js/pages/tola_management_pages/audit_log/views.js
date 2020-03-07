@@ -8,7 +8,7 @@ import LoadingSpinner from '../../../components/loading-spinner'
 
 export const DisaggregationDiffs = ({disagg_type, disagg_diffs}) => {
     disagg_diffs.sort( (a, b) => a.custom_sort - b.custom_sort);
-    return <div><h4 className="disagg-type__title text-small">{disagg_type}</h4>
+    return <div><h4 className="disagg-type__title text-small">{gettext(disagg_type)}</h4>
         {disagg_diffs.map( diff => {
             const displayValue = (diff.value === null || diff.value === "") ? "–" : localizeNumber(diff.value);
             return <div className="change__field" key={diff.id}><span className="change__field__name">{diff.name}:</span> <span className="change__field__value">{localizeNumber(displayValue)}</span></div>
