@@ -135,7 +135,7 @@ msgstr "C/NC"
 #: indicators/export_renderers.py:95 indicators/models.py:1135
 #: tola_management/models.py:248
 msgid "Baseline"
-msgstr "Base de référence"
+msgstr "Mesure de base"
 
 #: indicators/export_renderers.py:135 indicators/models.py:1677
 #: templates/indicators/result_table.html:25
@@ -771,7 +771,7 @@ msgstr "Utilisation de l’information"
 
 #: indicators/models.py:1221
 msgid "Frequency of Reporting"
-msgstr "Fréquence de déclaration"
+msgstr "Fréquence de Rapportage"
 
 #: indicators/models.py:1226
 msgid "Quality Assurance Measures"
@@ -1369,7 +1369,7 @@ msgstr "Rapports"
 
 #: templates/base.html:77
 msgid "Admin"
-msgstr "Administrateur"
+msgstr "Administration"
 
 #: templates/base.html:79
 msgid "Users"
@@ -2529,9 +2529,9 @@ msgid ""
 "of the <i>target period in which you want the result to appear.</i>"
 msgstr ""
 "Cette date détermine l’endroit où le résultat apparaît dans les tableaux de "
-"suivi des indicateurs de performance. Si le recueil de données a eu lieu "
+"suivi des indicateurs de performance. Si la collecte des données a eu lieu "
 "durant la période cible, nous vous recommandons de saisir le dernier jour où "
-"vous avez recueilli des données. Si le recueil de données a eu lieu après la "
+"vous avez recueilli des données. Si la collecte des données a eu lieu après la "
 "fin de la période cible, nous vous recommandons de saisir le dernier jour de "
 "la <i>période cible au sein de laquelle vous souhaitez voir apparaître le "
 "résultat</i>"
