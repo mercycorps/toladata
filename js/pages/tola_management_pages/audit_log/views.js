@@ -10,14 +10,23 @@ export const DisaggregationDiffs = ({disagg_type, disagg_diffs}) => {
     disagg_diffs.sort( (a, b) => a.custom_sort - b.custom_sort);
     return <div><h4 className="disagg-type__title text-small">{gettext(disagg_type)}</h4>
         {disagg_diffs.map( diff => {
-            const displayValue = (diff.value === null || diff.value === "") ? "–" : localizeNumber(diff.value);
-            return <div className="change__field" key={diff.id}><span className="change__field__name">{diff.name}:</span> <span className="change__field__value">{localizeNumber(displayValue)}</span></div>
+            const displayValue = ["", null, undefined].includes(diff.value) ? "–" : localizeNumber(diff.value);
+            return <div className="change__field" key={diff.id}><span className="change__field__name">{diff.name}:</span> <span className="change__field__value">{displayValue}</span></div>
         })}
     </div>
 };
 
 export const ResultChangeset = ({data, name, pretty_name}) => {
-    const displayValue = data === "" ? "–" : data;
+    let displayValue = "";
+    if (["", null, undefined].includes(data)) {
+        displayValue = "-";
+    }
+    else if (isNaN(data)) {
+        displayValue = data;
+    }
+    else {
+        displayValue = localizeNumber(data);
+    }
     if (name === 'id') {
         return null
     } else if(name === 'Target_url') {
@@ -46,12 +55,12 @@ export const ResultChangeset = ({data, name, pretty_name}) => {
             return null;
         }
     } else {
-        return <div className="change__field"><strong className="change__field__name">{pretty_name}</strong>: <span className="change__field__value">{localizeNumber(displayValue)}</span></div>
+        return <div className="change__field"><strong className="change__field__name">{pretty_name}</strong>: <span className="change__field__value">{displayValue}</span></div>
     }
 };
 
 const ProgramDatesChangeset = ({data, name, pretty_name}) => {
-    const displayValue = data === "" ? "–" : data;
+    const displayValue = ["", null].includes(data)  ? "–" : data;
     return <p>{pretty_name}: {displayValue}</p>
 }
 
@@ -60,17 +69,27 @@ const IndicatorChangeset = ({data, name, pretty_name, indicator}) => {
         return <div className="changelog__change__targets">
             <h4 className="text-small">{gettext('Targets changed')}</h4>
             {Object.entries(data).map(([id, target]) => {
-                const displayValue = target.value === "" ? "–" : target.value;
-                return <div className="change__field" key={id}><strong className="change__field__name">{target.name}:</strong> {localizeNumber(displayValue)}</div>
+                const displayValue = ["", null, undefined].includes(target.value)  ? "–" : localizeNumber(target.value);
+                return <div className="change__field" key={id}><strong className="change__field__name">{target.name}:</strong> {displayValue}</div>
             })}
         </div>
     } else {
+        let displayValue = "";
+        if (["", null, undefined].includes(data)) {
+            displayValue = "-";
+        }
+        else if (isNaN(data)) {
+            displayValue = data;
+        }
+        else {
+            displayValue = localizeNumber(data);
+        }
         return <div className="change__field">
             <strong className="change__field__name">
                 { name === 'name' ?
                     <span>{gettext('Indicator')} {indicator.results_aware_number}: </span> : <span>{pretty_name}: </span>}
             </strong>
-            {(data !== null && data !== undefined && data !== "") ? data.toString() : "–"}
+            {displayValue}
         </div>
     }
 }
@@ -106,7 +125,7 @@ class ChangesetEntry extends React.Component {
     }
 
     render() {
-        const {data, type, name, pretty_name, indicator, level} = this.props
+        const {data, type, name, pretty_name, indicator, level} = this.props;
         return this.renderType(type, data, name, pretty_name, indicator, level)
     }
 }
