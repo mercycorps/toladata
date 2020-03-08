@@ -771,7 +771,7 @@ msgstr "Utilisation de l’information"
 
 #: indicators/models.py:1221
 msgid "Frequency of Reporting"
-msgstr "Fréquence de Rapportage"
+msgstr "Fréquence de rapportage"
 
 #: indicators/models.py:1226
 msgid "Quality Assurance Measures"
