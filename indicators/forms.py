@@ -219,6 +219,7 @@ class IndicatorForm(forms.ModelForm):
         )
         self.fields['program_display'].disabled = True
         self.fields['program_display'].label = _('Program')
+        self.fields['baseline'].label = _('Baseline')
 
         # level is here the new "result level" (RF) level option (FK to model Level)
         # Translators: This is a form field label that allows users to select which Level object to associate with the Result that's being entered into the form
