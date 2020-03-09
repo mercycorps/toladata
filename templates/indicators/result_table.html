@@ -47,7 +47,7 @@
                     <strong>
                         {% if indicator.lop_target_progress %}
                             {% with target_progress=indicator.lop_target_progress|floatformat:'-2' %}
-                                {{ target_progress|trailingzero }}{% if indicator.unit_of_measure_type == 2 %}%{% endif %}
+                                {{ target_progress|trailingzero|intcomma }}{% if indicator.unit_of_measure_type == 2 %}%{% endif %}
                             {% endwith %}
                         {% else %}
                             —
@@ -58,7 +58,7 @@
                     <strong>
                         {% if indicator.lop_actual_progress %}
                             {% with actual_progress=indicator.lop_actual_progress|floatformat:'-2' %}
-                                {{ actual_progress |trailingzero }}{% if indicator.unit_of_measure_type == 2 %}%{% endif %}
+                                {{ actual_progress |trailingzero|intcomma }}{% if indicator.unit_of_measure_type == 2 %}%{% endif %}
                             {% endwith %}
                         {% else %}
                             —
@@ -87,14 +87,14 @@
                 <td {% if pt.results_count %} rowspan="{{ pt.results_count }}" {% endif %} class="text-right">
                     {% if pt.target is not None %}
                         {% with target=pt.target|floatformat:"-2" %}
-                            {{ target|trailingzero }}{% if indicator.unit_of_measure_type == 2 %}%{% endif %}
+                            {{ target|trailingzero|intcomma }}{% if indicator.unit_of_measure_type == 2 %}%{% endif %}
                         {% endwith %}
                     {% else %}—{% endif %}
                 </td>
                 <td {% if pt.results_count %} rowspan="{{ pt.results_count }}" {% endif %} class="text-right">
                     {% if pt.actual is not None %}
                         {% with actual=pt.actual|floatformat:"-2" %}
-                            {{ actual|trailingzero }}{% if indicator.unit_of_measure_type == 2 %}%{% endif %}
+                            {{ actual|trailingzero|intcomma }}{% if indicator.unit_of_measure_type == 2 %}%{% endif %}
                         {% endwith %}
                     {% else %}—{% endif %}
                 </td>
@@ -117,7 +117,7 @@
                             {% endif %}
                         <td class="results__result--value {% if cdata.periodic_target == None %}bg-danger-lighter{% endif %}">
                             {% with achieved=cdata.achieved|floatformat:"-2" %}
-                                {{ achieved|intcomma|trailingzero }}{% if indicator.unit_of_measure_type == 2 %}%{% endif %}
+                                {{ achieved|trailingzero|intcomma }}{% if indicator.unit_of_measure_type == 2 %}%{% endif %}
                             {% endwith %}
                         </td>
                         <td class="td--stretch results__result--url">
@@ -174,7 +174,7 @@
             </td>
             <td class="results__result--value bg-danger-lighter">
                     {% with achieved=result.achieved|floatformat:"-2" %}
-                        {{ achieved|trailingzero }}{% if indicator.unit_of_measure_type == 2 %}%{% endif %}
+                        {{ achieved|trailingzero|intcomma }}{% if indicator.unit_of_measure_type == 2 %}%{% endif %}
                     {% endwith %}
             </td>
             <td class="td--stretch">
@@ -222,7 +222,7 @@
             <td class="text-right">
                 <strong>
                     {% with lop=indicator.lop_target_active|floatformat:"-2" %}
-                        {{ lop|trailingzero }}{% if indicator.unit_of_measure_type == 2 %}%{% endif %}
+                        {{ lop|trailingzero|intcomma }}{% if indicator.unit_of_measure_type == 2 %}%{% endif %}
                     {% endwith %}
                 </strong>
             </td>
@@ -230,7 +230,7 @@
                 {% with actual=indicator.lop_actual|floatformat:"-2"  %}
                     {% if actual %}
                         <strong>
-                        {{ actual|trailingzero }}{% if indicator.unit_of_measure_type == 2 %}%{% endif %}
+                        {{ actual|trailingzero|intcomma }}{% if indicator.unit_of_measure_type == 2 %}%{% endif %}
                         </strong>
                     {% else %}
                         &mdash;
