@@ -167,7 +167,7 @@ msgstr "Regrouper les indicateurs"
 
 #: js/constants.js:21 js/pages/iptt_quickstart/models/root_store.js:30
 msgid "Life of Program (LoP) only"
-msgstr "La vie du programme (LoP) seulement"
+msgstr "La vie du programme [(LoP) seulement]"
 
 #: js/constants.js:22 js/pages/iptt_quickstart/models/root_store.js:31
 msgid "Midline and endline"
