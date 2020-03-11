@@ -218,6 +218,10 @@ class DisaggregationType extends React.Component {
                 html: true
             });
         }
+    };
+
+    componentDidMount(){
+        $('[data-toggle="popover"]').popover();
     }
 
     resetForm() {
