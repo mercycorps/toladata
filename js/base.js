@@ -713,6 +713,8 @@ function getValidatedNumericInput(selector) {
         }
         // allow numbers (48 - 57 map to 0-9):
         if ((e.keyCode >= 48 && e.keyCode <= 57 && !e.shiftKey) ||
+            // allow numpad numbers:
+            ((e.keyCode >= 96 && e.keyCode <= 105) && !e.shiftKey) ||
             // allow comma or period if there isn't one already:
             (e.keyCode == floatingPointSeparator && ((curVal.match(/[,.]/) || []).length < 1 || selectionContainsSeparator)) &&
             !e.shiftKey) {
