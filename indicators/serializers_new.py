@@ -592,6 +592,10 @@ class IPTTTPReportSerializer(IPTTReportSerializer):
     def report_name(self):
         return _("IPTT Actuals only report")
 
+    @classmethod
+    def load_report(cls, program_pk, frequency, filters):
+        pass
+
 class IPTTTVAReportSerializer(IPTTReportSerializer):
     @property
     def report_name(self):
