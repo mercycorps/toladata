@@ -1409,7 +1409,10 @@ class Indicator(SafeDeleteModel):
     @property
     def get_target_frequency_label(self):
         if self.target_frequency:
-            return Indicator.TARGET_FREQUENCIES[self.target_frequency-1][1]
+            #  Need to lowercase the first letter to allow for word rearrangements due to translations.
+            label = Indicator.TARGET_FREQUENCIES[self.target_frequency-1][1]
+            label = label[0].lower() + label[1:]
+            return label
         return None
 
     @property
