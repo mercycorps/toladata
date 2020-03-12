@@ -727,7 +727,7 @@ msgstr "Non applicable"
 #: indicators/models.py:1145 templates/indicators/indicatortargets.html:89
 #: templates/indicators/indicatortargets.html:192
 msgid "Life of Program (LoP) target"
-msgstr "Cible de la de vie du programme (LoP)"
+msgstr "Cible de la vie du programme (LoP)"
 
 #: indicators/models.py:1150
 msgid "Direction of Change"
@@ -2111,7 +2111,7 @@ msgid ""
 "            "
 msgstr ""
 "\n"
-"            cibles %(get_target_frequency_label)s\n"
+"            Cibles %(get_target_frequency_label)s\n"
 "            "
 
 #: templates/indicators/indicatortargets.html:105
