@@ -225,7 +225,7 @@ class DisaggregationType extends React.Component {
     }
 
     resetForm() {
-        this.props.clearErrors()
+        this.props.clearErrors();
         this.setState({
             ...this.props.disaggregation,
             labels: this.orderLabels(this.props.disaggregation.labels),
@@ -421,7 +421,8 @@ export default class EditDisaggregations extends React.Component {
         this.state = {
             expanded_id: null,
             is_dirty: false,
-            formReset: null
+            formReset: null,
+            origSelectedByDefault: null
         }
     }
 
@@ -435,17 +436,23 @@ export default class EditDisaggregations extends React.Component {
     }
 
     toggleExpand(id, formReset) {
-        this.props.clearErrors()
+        this.props.clearErrors();
         if(this.dirtyConfirm()) {
             const {expanded_id} = this.state;
             if (id == expanded_id) {
                 (this.state.is_dirty && formReset) && formReset();
-                this.setState({expanded_id: null, formReset: null});
+                this.setState({expanded_id: null, formReset: null, origSelectedByDefault: null});
             } else {
                 if (this.state.formReset) {
                     (this.state.is_dirty && this.state.formReset());
                 }
-                this.setState({expanded_id: id, formReset: formReset})
+                const currentDisaggList = this.props.disaggregations.filter( disagg => disagg.id === id);
+                let selectedByDefault = currentDisaggList.length > 0 ? currentDisaggList[0].selected_by_default : null;
+                this.setState({
+                    expanded_id: id,
+                    formReset: formReset,
+                    origSelectedByDefault: selectedByDefault
+                });
             }
             if(expanded_id == 'new') {
                 this.onDelete(expanded_id);
@@ -466,19 +473,41 @@ export default class EditDisaggregations extends React.Component {
         this.props.clearErrors();
     }
 
+    onSaveChangesPress(data) {
+        if (this.state.origSelectedByDefault !== null && this.state.origSelectedByDefault !== data.selected_by_default){
+            create_no_rationale_changeset_notice({
+                // # Translators:  This is a warning popup when the user tries to do something that has broader effects than they might anticipate
+                preamble: interpolate(gettext("This disaggregation will be automatically selected for all new indicators in %s. (Existing indicators will be unaffected.)"), [this.props.countryName]),
+                // # Translators: This is the prompt on a popup that has warned users about a change they are about to make that could have broad consequences
+                message_text: gettext("Are you sure you want to continue?"),
+                on_submit: () => this.saveDisaggregation(data),
+                on_cancel:()=>{},
+                type: "notice"
+            })
+        }
+        else{
+            this.saveDisaggregation(data);
+        }
+    }
+
     saveDisaggregation(data) {
         const withCountry = Object.assign(data, {country: this.props.country_id});
         if (data.id === 'new') {
             this.props.onCreate(withCountry).then(
                 (newDisaggregation) => {
-                    this.setState({expanded_id: newDisaggregation.id, formReset: null});
+                    this.setState({
+                        expanded_id: newDisaggregation.id,
+                        formReset: null,
+                        origSelectedByDefault: data.selected_by_default
+                    });
                 },
                 ()=>{}
             );
         } else {
-            this.props.onUpdate(data.id, withCountry)
+            this.props.onUpdate(data.id, withCountry);
+            this.setState({origSelectedByDefault: data.selected_by_default});
         }
-        this.setState({is_dirty: false})
+        this.setState({is_dirty: false});
     }
 
     render() {
@@ -507,7 +536,7 @@ export default class EditDisaggregations extends React.Component {
                         deleteAction={this.onDelete.bind(this, disaggregation.id)}
                         archiveAction={() => this.props.onArchive(disaggregation.id)}
                         unarchiveAction={() => this.props.onUnarchive(disaggregation.id)}
-                        saveDisaggregation={(data) => this.saveDisaggregation(data)}
+                        saveDisaggregation={(data) => this.onSaveChangesPress(data)}
                         errors={this.props.errors}
                         clearErrors={this.props.clearErrors}
                         onIsDirtyChange={(is_dirty) => this.handleDirtyUpdate(is_dirty)}
