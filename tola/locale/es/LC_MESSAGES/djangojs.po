@@ -6,8 +6,8 @@ msgid ""
 msgstr ""
 "Project-Id-Version: \n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2020-03-03 16:18-0800\n"
-"PO-Revision-Date: 2020-03-03 14:23-0800\n"
+"POT-Creation-Date: 2020-03-13 10:40-0700\n"
+"PO-Revision-Date: 2020-03-13 10:43-0700\n"
 "Last-Translator: \n"
 "Language-Team: \n"
 "Language: es\n"
@@ -68,7 +68,7 @@ msgstr "Advertencia: esta acción no se puede deshacer."
 msgid "Warning"
 msgstr "Advertencia"
 
-#: js/base.js:509 js/pages/tola_management_pages/audit_log/views.js:209
+#: js/base.js:509 js/pages/tola_management_pages/audit_log/views.js:237
 msgid "Reason for change"
 msgstr "Justificación para el cambio"
 
@@ -80,7 +80,7 @@ msgstr "¡Éxito!"
 #. Translators: button label to show the details of all rows in a list */}
 #: js/components/actionButtons.js:38
 #: js/pages/iptt_report/components/report/tableHeader.js:54
-#: js/pages/tola_management_pages/audit_log/views.js:122
+#: js/pages/tola_management_pages/audit_log/views.js:150
 msgid "Expand all"
 msgstr "Expandir todos"
 
@@ -88,7 +88,7 @@ msgstr "Expandir todos"
 #. Translators: button label to hide the details of all rows in a list */}
 #: js/components/actionButtons.js:52
 #: js/pages/iptt_report/components/report/tableHeader.js:60
-#: js/pages/tola_management_pages/audit_log/views.js:135
+#: js/pages/tola_management_pages/audit_log/views.js:163
 msgid "Collapse all"
 msgstr "Colapsar todos"
 
@@ -478,10 +478,10 @@ msgstr "No."
 #: js/pages/iptt_report/components/report/tableHeader.js:104
 #: js/pages/logframe/components/table.js:30
 #: js/pages/program_page/components/indicator_list.js:191
-#: js/pages/tola_management_pages/audit_log/views.js:71
-#: js/pages/tola_management_pages/audit_log/views.js:147
-#: js/pages/tola_management_pages/audit_log/views.js:151
-#: js/pages/tola_management_pages/audit_log/views.js:203
+#: js/pages/tola_management_pages/audit_log/views.js:97
+#: js/pages/tola_management_pages/audit_log/views.js:175
+#: js/pages/tola_management_pages/audit_log/views.js:179
+#: js/pages/tola_management_pages/audit_log/views.js:231
 msgid "Indicator"
 msgstr "Indicador"
 
@@ -532,9 +532,8 @@ msgstr "% cumplido"
 #: js/pages/iptt_report/components/report/tableRows.js:259
 #: js/pages/iptt_report/components/report/tableRows.js:261
 #: js/pages/program_page/components/indicator_list.js:260
-#: js/pages/tola_management_pages/audit_log/views.js:81
-#: js/pages/tola_management_pages/audit_log/views.js:142
-#: js/pages/tola_management_pages/audit_log/views.js:169
+#: js/pages/tola_management_pages/audit_log/views.js:170
+#: js/pages/tola_management_pages/audit_log/views.js:197
 msgid "N/A"
 msgstr "N/A"
 
@@ -656,7 +655,7 @@ msgid "Logframe"
 msgstr "Marco Lógico"
 
 #: js/pages/logframe/models/filterStore.js:33
-#: js/pages/tola_management_pages/audit_log/views.js:202
+#: js/pages/tola_management_pages/audit_log/views.js:230
 msgid "Result level"
 msgstr "Nivel del resultado"
 
@@ -1084,9 +1083,11 @@ msgid "%s updated."
 msgstr "%s actualizado."
 
 #. Translators:  This is a confirmation prompt that is triggered by clicking on a cancel button.  */
+#. Translators: This is the prompt on a popup that has warned users about a change they are about to make that could have broad consequences
 #. Translators: This is a confirmation prompt to confirm a user wants to archive an item
 #. Translators: This is a confirmation prompt to confirm a user wants to unarchive an item
 #: js/pages/results_framework/models.js:636
+#: js/pages/tola_management_pages/country/components/edit_disaggregations.js:482
 #: js/pages/tola_management_pages/country/models.js:441
 #: js/pages/tola_management_pages/country/models.js:467
 #: js/pages/tola_management_pages/program/models.js:272
@@ -1109,28 +1110,28 @@ msgstr "Los niveles de resultados no deben contener comas."
 msgid "Result levels must have unique names."
 msgstr "Los niveles de resultados deben tener nombres únicos."
 
-#: js/pages/tola_management_pages/audit_log/views.js:61
+#: js/pages/tola_management_pages/audit_log/views.js:75
 msgid "Targets changed"
 msgstr "Objetivos modificados"
 
-#: js/pages/tola_management_pages/audit_log/views.js:177
+#: js/pages/tola_management_pages/audit_log/views.js:205
 msgid "Indicator change log"
 msgstr "Registro de cambios de indicadores"
 
-#: js/pages/tola_management_pages/audit_log/views.js:191
+#: js/pages/tola_management_pages/audit_log/views.js:219
 msgid "Excel"
 msgstr "Sobresalir"
 
-#: js/pages/tola_management_pages/audit_log/views.js:201
+#: js/pages/tola_management_pages/audit_log/views.js:229
 msgid "Date and time"
 msgstr "Fecha y hora"
 
-#: js/pages/tola_management_pages/audit_log/views.js:204
+#: js/pages/tola_management_pages/audit_log/views.js:232
 #: js/pages/tola_management_pages/user/views.js:258
 msgid "User"
 msgstr "Usuario"
 
-#: js/pages/tola_management_pages/audit_log/views.js:205
+#: js/pages/tola_management_pages/audit_log/views.js:233
 #: js/pages/tola_management_pages/organization/views.js:109
 #: js/pages/tola_management_pages/user/components/edit_user_profile.js:183
 #: js/pages/tola_management_pages/user/views.js:202
@@ -1138,19 +1139,19 @@ msgstr "Usuario"
 msgid "Organization"
 msgstr "Organización"
 
-#: js/pages/tola_management_pages/audit_log/views.js:206
+#: js/pages/tola_management_pages/audit_log/views.js:234
 msgid "Change type"
 msgstr "Tipo de cambio"
 
-#: js/pages/tola_management_pages/audit_log/views.js:207
+#: js/pages/tola_management_pages/audit_log/views.js:235
 msgid "Previous entry"
 msgstr "Valor anterior"
 
-#: js/pages/tola_management_pages/audit_log/views.js:208
+#: js/pages/tola_management_pages/audit_log/views.js:236
 msgid "New entry"
 msgstr "Nuevo valor"
 
-#: js/pages/tola_management_pages/audit_log/views.js:263
+#: js/pages/tola_management_pages/audit_log/views.js:291
 msgid "entries"
 msgstr "ítems"
 
@@ -1170,7 +1171,7 @@ msgid "Strategic Objectives"
 msgstr "Objetivos estratégicos"
 
 #: js/pages/tola_management_pages/country/components/country_editor.js:41
-#: js/pages/tola_management_pages/country/components/edit_disaggregations.js:486
+#: js/pages/tola_management_pages/country/components/edit_disaggregations.js:521
 msgid "Country Disaggregations"
 msgstr "Desagregación del País"
 
@@ -1195,7 +1196,7 @@ msgstr "Código del País"
 
 #: js/pages/tola_management_pages/country/components/edit_country_profile.js:101
 #: js/pages/tola_management_pages/country/components/edit_country_profile.js:108
-#: js/pages/tola_management_pages/country/components/edit_disaggregations.js:374
+#: js/pages/tola_management_pages/country/components/edit_disaggregations.js:378
 #: js/pages/tola_management_pages/country/components/edit_objectives.js:119
 #: js/pages/tola_management_pages/country/components/edit_objectives.js:124
 #: js/pages/tola_management_pages/organization/components/edit_organization_history.js:69
@@ -1212,7 +1213,7 @@ msgstr "Guardar cambios"
 #. Translators:  Button label.  Allows users to undo whatever changes they have made.
 #: js/pages/tola_management_pages/country/components/edit_country_profile.js:103
 #: js/pages/tola_management_pages/country/components/edit_country_profile.js:109
-#: js/pages/tola_management_pages/country/components/edit_disaggregations.js:377
+#: js/pages/tola_management_pages/country/components/edit_disaggregations.js:381
 #: js/pages/tola_management_pages/country/components/edit_objectives.js:125
 #: js/pages/tola_management_pages/country/views.js:65
 #: js/pages/tola_management_pages/organization/components/edit_organization_history.js:70
@@ -1248,17 +1249,17 @@ msgid "Explanation for absence of delete button"
 msgstr "Explicación de la ausencia de un botón de eliminación"
 
 #. Translators: Form field label for the disaggregation name.*/}
-#: js/pages/tola_management_pages/country/components/edit_disaggregations.js:305
+#: js/pages/tola_management_pages/country/components/edit_disaggregations.js:309
 msgid "Disaggregation"
 msgstr "Desagregación"
 
 #. Translators: This labels a checkbox, when checked, it will make the associated item "on" (selected) for all new indicators
-#: js/pages/tola_management_pages/country/components/edit_disaggregations.js:325
+#: js/pages/tola_management_pages/country/components/edit_disaggregations.js:329
 msgid "Selected by default"
 msgstr "Selección por defecto"
 
 #. Translators: Help text for the "selected by default" checkbox on the disaggregation form
-#: js/pages/tola_management_pages/country/components/edit_disaggregations.js:331
+#: js/pages/tola_management_pages/country/components/edit_disaggregations.js:335
 msgid ""
 "When adding a program indicator, this disaggregation will be selected by "
 "default.  (It can be unselected for specific indicators)"
@@ -1267,7 +1268,7 @@ msgstr ""
 "defecto.  (Se puede desmarcar para indicadores específicos)"
 
 #. Translators: Additional help text for the "selected by default" checkbox on the disaggregation form -->
-#: js/pages/tola_management_pages/country/components/edit_disaggregations.js:333
+#: js/pages/tola_management_pages/country/components/edit_disaggregations.js:337
 msgid ""
 "This option is recommended for disaggregations that are required for all "
 "programs in a country, regardless of sector."
@@ -1275,41 +1276,41 @@ msgstr ""
 "Esta opción se recomienda para las desagregaciones que son necesarias para "
 "todos los programas de un país, independientemente del sector."
 
-#: js/pages/tola_management_pages/country/components/edit_disaggregations.js:336
+#: js/pages/tola_management_pages/country/components/edit_disaggregations.js:340
 msgid "More information on \"selected by default\""
 msgstr "Más información sobre \"selección por defecto\""
 
 #. Translators:  This is header text for a list of disaggregation categories*/}
-#: js/pages/tola_management_pages/country/components/edit_disaggregations.js:346
+#: js/pages/tola_management_pages/country/components/edit_disaggregations.js:350
 msgid "Categories"
 msgstr "Categorías"
 
 #. Translators:  This a column header that shows the sort order of the rows below*/}
-#: js/pages/tola_management_pages/country/components/edit_disaggregations.js:352
+#: js/pages/tola_management_pages/country/components/edit_disaggregations.js:356
 msgid "Order"
 msgstr "Orden"
 
 #. Translators:  Button label.  Button allows users to add a disaggregation category to a list.  */}
-#: js/pages/tola_management_pages/country/components/edit_disaggregations.js:367
+#: js/pages/tola_management_pages/country/components/edit_disaggregations.js:371
 msgid "Add a category"
 msgstr "Agregar una categoría"
 
 #. Translators: this is a verb (on a button that archives the selected item)
-#: js/pages/tola_management_pages/country/components/edit_disaggregations.js:384
+#: js/pages/tola_management_pages/country/components/edit_disaggregations.js:388
 msgid "Unarchive disaggregation"
 msgstr "Desarchivar desagregación"
 
 #. Translators:  Button text that allows users to delete a disaggregation */}
-#: js/pages/tola_management_pages/country/components/edit_disaggregations.js:390
+#: js/pages/tola_management_pages/country/components/edit_disaggregations.js:394
 msgid "Delete disaggregation"
 msgstr "Eliminar desagregación"
 
 #. Translators: this is a verb (on a button that archives the selected item)
-#: js/pages/tola_management_pages/country/components/edit_disaggregations.js:396
+#: js/pages/tola_management_pages/country/components/edit_disaggregations.js:400
 msgid "Archive disaggregation"
 msgstr "Archivar desagregación"
 
-#: js/pages/tola_management_pages/country/components/edit_disaggregations.js:430
+#: js/pages/tola_management_pages/country/components/edit_disaggregations.js:435
 #: js/pages/tola_management_pages/country/components/edit_objectives.js:159
 #: js/pages/tola_management_pages/country/models.js:238
 #: js/pages/tola_management_pages/organization/models.js:112
@@ -1318,7 +1319,17 @@ msgstr "Archivar desagregación"
 msgid "You have unsaved changes. Are you sure you want to discard them?"
 msgstr "Tiene cambios sin guardar. ¿Está seguro que desea descartarlos?"
 
-#: js/pages/tola_management_pages/country/components/edit_disaggregations.js:490
+#. Translators:  This is a warning popup when the user tries to do something that has broader effects than they might anticipate
+#: js/pages/tola_management_pages/country/components/edit_disaggregations.js:480
+#, python-format
+msgid ""
+"This disaggregation will be automatically selected for all new indicators in "
+"%s. (Existing indicators will be unaffected.)"
+msgstr ""
+"Esta desagregación se seleccionará automáticamente para todos los nuevos "
+"indicadores en %s. (Los indicadores existentes no se verán afectados)."
+
+#: js/pages/tola_management_pages/country/components/edit_disaggregations.js:525
 msgid "Add country disaggregation"
 msgstr "Agregar desagregación del país"
 
@@ -1486,7 +1497,7 @@ msgstr "Ninguno/a Seleccionado"
 
 #: js/pages/tola_management_pages/country/views.js:29
 #: js/pages/tola_management_pages/country/views.js:92
-#: js/pages/tola_management_pages/country/views.js:197
+#: js/pages/tola_management_pages/country/views.js:198
 #: js/pages/tola_management_pages/organization/views.js:42
 #: js/pages/tola_management_pages/organization/views.js:90
 #: js/pages/tola_management_pages/program/views.js:41
@@ -1496,7 +1507,7 @@ msgstr "Organizaciones"
 
 #: js/pages/tola_management_pages/country/views.js:41
 #: js/pages/tola_management_pages/country/views.js:93
-#: js/pages/tola_management_pages/country/views.js:205
+#: js/pages/tola_management_pages/country/views.js:206
 #: js/pages/tola_management_pages/organization/views.js:30
 #: js/pages/tola_management_pages/organization/views.js:110
 #: js/pages/tola_management_pages/program/views.js:82
@@ -1518,7 +1529,7 @@ msgid "Add Country"
 msgstr "Agregar País"
 
 #: js/pages/tola_management_pages/country/views.js:94
-#: js/pages/tola_management_pages/country/views.js:213
+#: js/pages/tola_management_pages/country/views.js:214
 #: js/pages/tola_management_pages/organization/views.js:111
 #: js/pages/tola_management_pages/program/views.js:17
 #: js/pages/tola_management_pages/program/views.js:229
@@ -1527,7 +1538,7 @@ msgstr "Agregar País"
 msgid "Users"
 msgstr "Usuarios"
 
-#: js/pages/tola_management_pages/country/views.js:223
+#: js/pages/tola_management_pages/country/views.js:224
 msgid "countries"
 msgstr "países"
 
