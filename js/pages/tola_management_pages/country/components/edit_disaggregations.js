@@ -420,7 +420,7 @@ export default class EditDisaggregations extends React.Component {
             expanded_id: null,
             is_dirty: false,
             formReset: null,
-            origSelectedByDefault: null
+            origSelectedByDefault: false
         }
     }
 
@@ -462,7 +462,10 @@ export default class EditDisaggregations extends React.Component {
     addDisaggregation() {
         if(this.dirtyConfirm()) {
             this.props.addDisaggregation()
-            this.setState({expanded_id: 'new'}, () => {$('#disaggregation-type-input').focus();});
+            this.setState({
+                expanded_id: 'new',
+                origSelectedByDefault: false,
+            }, () => {$('#disaggregation-type-input').focus();});
         }
     }
 
@@ -472,7 +475,7 @@ export default class EditDisaggregations extends React.Component {
     }
 
     onSaveChangesPress(data) {
-        if (this.state.origSelectedByDefault !== null && this.state.origSelectedByDefault !== data.selected_by_default){
+        if ( this.state.origSelectedByDefault !== data.selected_by_default ){
             if (data.selected_by_default) {
                 create_no_rationale_changeset_notice({
                     // # Translators:  This is a warning popup when the user tries to do something that has broader effects than they might anticipate
