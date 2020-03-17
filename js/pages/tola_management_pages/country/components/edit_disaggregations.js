@@ -332,9 +332,7 @@ class DisaggregationType extends React.Component {
                                     <HelpPopover
                                         key={1}
                                         // # Translators: Help text for the "selected by default" checkbox on the disaggregation form
-                                        content={`<p>${gettext('When adding a program indicator, this disaggregation will be selected by default.  (It can be unselected for specific indicators)')}</p>
-                                            <!-- # Translators: Additional help text for the "selected by default" checkbox on the disaggregation form -->
-                                                  <p>${gettext('This option is recommended for disaggregations that are required for all programs in a country, regardless of sector.')}</p>`}
+                                        content={`<p>${interpolate(gettext('When adding a new program indicator, this disaggregation will be selected by default for every program in %s. The disaggregation can be manually removed from an indicator on the indicator setup form.'), [gettext(this.props.countryName)])}</p>`}
                                         placement="right"
                                         innerRef={this.selectedByDefaultPopup}
                                         ariaText={gettext('More information on "selected by default"')}
@@ -475,15 +473,29 @@ export default class EditDisaggregations extends React.Component {
 
     onSaveChangesPress(data) {
         if (this.state.origSelectedByDefault !== null && this.state.origSelectedByDefault !== data.selected_by_default){
-            create_no_rationale_changeset_notice({
-                // # Translators:  This is a warning popup when the user tries to do something that has broader effects than they might anticipate
-                preamble: interpolate(gettext("This disaggregation will be automatically selected for all new indicators in %s. (Existing indicators will be unaffected.)"), [this.props.countryName]),
-                // # Translators: This is the prompt on a popup that has warned users about a change they are about to make that could have broad consequences
-                message_text: gettext("Are you sure you want to continue?"),
-                on_submit: () => this.saveDisaggregation(data),
-                on_cancel:()=>{},
-                type: "notice"
-            })
+            if (data.selected_by_default) {
+                create_no_rationale_changeset_notice({
+                    // # Translators:  This is a warning popup when the user tries to do something that has broader effects than they might anticipate
+                    preamble: interpolate(gettext("This disaggregation will be automatically selected for all new indicators in %s. Existing indicators will be unaffected."), [gettext(this.props.countryName)]),
+                    // # Translators: This is the prompt on a popup that has warned users about a change they are about to make that could have broad consequences
+                    message_text: gettext("Are you sure you want to continue?"),
+                    on_submit: () => this.saveDisaggregation(data),
+                    on_cancel: () => {},
+                    type: "notice"
+                })
+            }
+            else {
+                create_no_rationale_changeset_notice({
+                    // # Translators:  This is a warning popup when the user tries to do something that has broader effects than they might anticipate
+                    preamble: interpolate(gettext("This disaggregation will no longer be automatically selected for all new indicators in %s. Existing indicators will be unaffected."), [this.props.countryName]),
+                    // # Translators: This is the prompt on a popup that has warned users about a change they are about to make that could have broad consequences
+                    message_text: gettext("Are you sure you want to continue?"),
+                    on_submit: () => this.saveDisaggregation(data),
+                    on_cancel:()=>{},
+                    type: "notice"
+                })
+            }
+
         }
         else{
             this.saveDisaggregation(data);
@@ -540,6 +552,7 @@ export default class EditDisaggregations extends React.Component {
                         errors={this.props.errors}
                         clearErrors={this.props.clearErrors}
                         onIsDirtyChange={(is_dirty) => this.handleDirtyUpdate(is_dirty)}
+                        countryName={this.props.countryName}
                     />
                 )}
             </div>
