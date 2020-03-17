@@ -6,7 +6,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: \n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2020-03-13 10:40-0700\n"
+"POT-Creation-Date: 2020-03-17 12:41-0700\n"
 "PO-Revision-Date: 2020-03-13 10:43-0700\n"
 "Last-Translator: \n"
 "Language-Team: \n"
@@ -1087,7 +1087,8 @@ msgstr "%s actualizado."
 #. Translators: This is a confirmation prompt to confirm a user wants to archive an item
 #. Translators: This is a confirmation prompt to confirm a user wants to unarchive an item
 #: js/pages/results_framework/models.js:636
-#: js/pages/tola_management_pages/country/components/edit_disaggregations.js:482
+#: js/pages/tola_management_pages/country/components/edit_disaggregations.js:481
+#: js/pages/tola_management_pages/country/components/edit_disaggregations.js:493
 #: js/pages/tola_management_pages/country/models.js:441
 #: js/pages/tola_management_pages/country/models.js:467
 #: js/pages/tola_management_pages/program/models.js:272
@@ -1171,7 +1172,7 @@ msgid "Strategic Objectives"
 msgstr "Objetivos estratégicos"
 
 #: js/pages/tola_management_pages/country/components/country_editor.js:41
-#: js/pages/tola_management_pages/country/components/edit_disaggregations.js:521
+#: js/pages/tola_management_pages/country/components/edit_disaggregations.js:532
 msgid "Country Disaggregations"
 msgstr "Desagregación del País"
 
@@ -1196,7 +1197,7 @@ msgstr "Código del País"
 
 #: js/pages/tola_management_pages/country/components/edit_country_profile.js:101
 #: js/pages/tola_management_pages/country/components/edit_country_profile.js:108
-#: js/pages/tola_management_pages/country/components/edit_disaggregations.js:378
+#: js/pages/tola_management_pages/country/components/edit_disaggregations.js:376
 #: js/pages/tola_management_pages/country/components/edit_objectives.js:119
 #: js/pages/tola_management_pages/country/components/edit_objectives.js:124
 #: js/pages/tola_management_pages/organization/components/edit_organization_history.js:69
@@ -1213,7 +1214,7 @@ msgstr "Guardar cambios"
 #. Translators:  Button label.  Allows users to undo whatever changes they have made.
 #: js/pages/tola_management_pages/country/components/edit_country_profile.js:103
 #: js/pages/tola_management_pages/country/components/edit_country_profile.js:109
-#: js/pages/tola_management_pages/country/components/edit_disaggregations.js:381
+#: js/pages/tola_management_pages/country/components/edit_disaggregations.js:379
 #: js/pages/tola_management_pages/country/components/edit_objectives.js:125
 #: js/pages/tola_management_pages/country/views.js:65
 #: js/pages/tola_management_pages/organization/components/edit_organization_history.js:70
@@ -1261,56 +1262,50 @@ msgstr "Selección por defecto"
 #. Translators: Help text for the "selected by default" checkbox on the disaggregation form
 #: js/pages/tola_management_pages/country/components/edit_disaggregations.js:335
 msgid ""
-"When adding a program indicator, this disaggregation will be selected by "
-"default.  (It can be unselected for specific indicators)"
+"When adding a new program indicator, this disaggregation will be selected by "
+"default for every program in %s. The disaggregation can be manually removed "
+"from an indicator on the indicator setup form."
 msgstr ""
-"Al añadir un indicador de programa, se seleccionará esta desagregación por "
-"defecto.  (Se puede desmarcar para indicadores específicos)"
+"Al agregar un nuevo indicador de programa, esta desagregación se seleccionará "
+"de manera predeterminada para cada programa en %s. La desagregación se puede eliminar "
+"manualmente de un indicador en el formulario de configuración del indicador."
 
-#. Translators: Additional help text for the "selected by default" checkbox on the disaggregation form -->
-#: js/pages/tola_management_pages/country/components/edit_disaggregations.js:337
-msgid ""
-"This option is recommended for disaggregations that are required for all "
-"programs in a country, regardless of sector."
-msgstr ""
-"Esta opción se recomienda para las desagregaciones que son necesarias para "
-"todos los programas de un país, independientemente del sector."
 
-#: js/pages/tola_management_pages/country/components/edit_disaggregations.js:340
+#: js/pages/tola_management_pages/country/components/edit_disaggregations.js:338
 msgid "More information on \"selected by default\""
 msgstr "Más información sobre \"selección por defecto\""
 
 #. Translators:  This is header text for a list of disaggregation categories*/}
-#: js/pages/tola_management_pages/country/components/edit_disaggregations.js:350
+#: js/pages/tola_management_pages/country/components/edit_disaggregations.js:348
 msgid "Categories"
 msgstr "Categorías"
 
 #. Translators:  This a column header that shows the sort order of the rows below*/}
-#: js/pages/tola_management_pages/country/components/edit_disaggregations.js:356
+#: js/pages/tola_management_pages/country/components/edit_disaggregations.js:354
 msgid "Order"
 msgstr "Orden"
 
 #. Translators:  Button label.  Button allows users to add a disaggregation category to a list.  */}
-#: js/pages/tola_management_pages/country/components/edit_disaggregations.js:371
+#: js/pages/tola_management_pages/country/components/edit_disaggregations.js:369
 msgid "Add a category"
 msgstr "Agregar una categoría"
 
 #. Translators: this is a verb (on a button that archives the selected item)
-#: js/pages/tola_management_pages/country/components/edit_disaggregations.js:388
+#: js/pages/tola_management_pages/country/components/edit_disaggregations.js:386
 msgid "Unarchive disaggregation"
 msgstr "Desarchivar desagregación"
 
 #. Translators:  Button text that allows users to delete a disaggregation */}
-#: js/pages/tola_management_pages/country/components/edit_disaggregations.js:394
+#: js/pages/tola_management_pages/country/components/edit_disaggregations.js:392
 msgid "Delete disaggregation"
 msgstr "Eliminar desagregación"
 
 #. Translators: this is a verb (on a button that archives the selected item)
-#: js/pages/tola_management_pages/country/components/edit_disaggregations.js:400
+#: js/pages/tola_management_pages/country/components/edit_disaggregations.js:398
 msgid "Archive disaggregation"
 msgstr "Archivar desagregación"
 
-#: js/pages/tola_management_pages/country/components/edit_disaggregations.js:435
+#: js/pages/tola_management_pages/country/components/edit_disaggregations.js:433
 #: js/pages/tola_management_pages/country/components/edit_objectives.js:159
 #: js/pages/tola_management_pages/country/models.js:238
 #: js/pages/tola_management_pages/organization/models.js:112
@@ -1320,16 +1315,26 @@ msgid "You have unsaved changes. Are you sure you want to discard them?"
 msgstr "Tiene cambios sin guardar. ¿Está seguro que desea descartarlos?"
 
 #. Translators:  This is a warning popup when the user tries to do something that has broader effects than they might anticipate
-#: js/pages/tola_management_pages/country/components/edit_disaggregations.js:480
+#: js/pages/tola_management_pages/country/components/edit_disaggregations.js:479
 #, python-format
 msgid ""
 "This disaggregation will be automatically selected for all new indicators in "
-"%s. (Existing indicators will be unaffected.)"
+"%s. Existing indicators will be unaffected."
 msgstr ""
 "Esta desagregación se seleccionará automáticamente para todos los nuevos "
-"indicadores en %s. (Los indicadores existentes no se verán afectados)."
+"indicadores en %s. Los indicadores existentes no se verán afectados."
 
-#: js/pages/tola_management_pages/country/components/edit_disaggregations.js:525
+#. Translators:  This is a warning popup when the user tries to do something that has broader effects than they might anticipate
+#: js/pages/tola_management_pages/country/components/edit_disaggregations.js:491
+#, python-format
+msgid ""
+"This disaggregation will no longer be automatically selected for all new "
+"indicators in %s. Existing indicators will be unaffected."
+msgstr ""
+"Esta desagregación ya no se seleccionará automáticamente para todos los "
+"nuevos indicadores en %s. Los indicadores existentes no se verán afectados."
+
+#: js/pages/tola_management_pages/country/components/edit_disaggregations.js:536
 msgid "Add country disaggregation"
 msgstr "Agregar desagregación del país"
 
@@ -1893,6 +1898,13 @@ msgstr "Agregar Usuario"
 #: js/pages/tola_management_pages/user/views.js:332
 msgid "Super Admin"
 msgstr "Super Administrador"
+
+#~ msgid ""
+#~ "This option is recommended for disaggregations that are required for all "
+#~ "programs in a country, regardless of sector."
+#~ msgstr ""
+#~ "Esta opción se recomienda para las desagregaciones que son necesarias "
+#~ "para todos los programas de un país, independientemente del sector."
 
 #, fuzzy
 #~| msgid "Disaggregated values changed"
