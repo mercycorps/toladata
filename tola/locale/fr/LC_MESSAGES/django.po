@@ -856,7 +856,7 @@ msgstr "indicateur"
 #: indicators/models.py:1662 indicators/serializers.py:484
 #: templates/indicators/result_table.html:221
 msgid "Life of Program"
-msgstr "Vie du programme"
+msgstr "La vie du programme"
 
 #: indicators/models.py:1663
 msgid "Midline"

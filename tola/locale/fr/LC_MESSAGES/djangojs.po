@@ -167,7 +167,7 @@ msgstr "Regrouper les indicateurs"
 
 #: js/constants.js:21 js/pages/iptt_quickstart/models/root_store.js:30
 msgid "Life of Program (LoP) only"
-msgstr "La vie du programme [(LoP) seulement]"
+msgstr "La vie du programme (LoP) seulement"
 
 #: js/constants.js:22 js/pages/iptt_quickstart/models/root_store.js:31
 msgid "Midline and endline"
@@ -465,7 +465,7 @@ msgstr "% Atteint"
 #. Translators: header for a group of columns showing totals over the life of the program */
 #: js/pages/iptt_report/components/report/tableHeader.js:70
 msgid "Life of program"
-msgstr "Vie du programme"
+msgstr "La vie du programme"
 
 #. Translators: Abbreviation as column header for "number" column */
 #: js/pages/iptt_report/components/report/tableHeader.js:96
