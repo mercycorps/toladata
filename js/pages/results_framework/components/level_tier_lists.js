@@ -197,7 +197,7 @@ export class EditableLevelTierList extends React.Component{
         let isAddTierButtonDisabled =
             !this.props.rootStore.levelStore.tierTemplates[customKey]['tiers'].every( tierName => tierName.length > 0) ||
             this.props.rootStore.uiStore.addLevelButtonIsLocked;
-        const addTierButton = savedTiers.length > 5 ? null :
+        const addTierButton = savedTiers.length > this.props.rootStore.levelStore.maxTiers ? null :
             <button
                 id="addLevelButton"
                 type="button"
