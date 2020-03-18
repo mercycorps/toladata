@@ -57,7 +57,7 @@
         let evidenceValid = validateEvidence();
         let disaggsValid = validateDisaggregations();
 
-        if ($("#result_update_form div").hasClass('has-error') || !disaggsValid) {
+        if ($("#result_update_form div").hasClass('has-error')) {
             createAlert("danger", "{% trans 'One or more fields needs attention.'|escapejs %}", true, "#modalmessages");
             $('#indicator_results_div').animate({ scrollTop: 0 }, 'slow');
             $('#submit-id-submit').removeAttr('disabled');
@@ -86,7 +86,7 @@
                         $('#result_update_form').attr('action', response.url);
                     }
                     $("#modalmessages").empty();
-                    if ($("#result_update_form div").hasClass('has-warning')) {
+                    if ($("#result_update_form div").hasClass('has-warning') || !disaggsValid) {
                         createAlert("warning", "{% trans 'Result saved - however please review warnings below.'|escapejs %}", true, "#modalmessages");
                     } else {
                         createAlert("success", "{% trans 'Success, form data saved.'|escapejs %}", true, "#modalmessages");
