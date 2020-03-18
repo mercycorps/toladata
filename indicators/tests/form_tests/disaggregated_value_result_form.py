@@ -29,7 +29,7 @@ class TestDisaggregatedValueForm(test.TestCase):
             standard=True,
             labels=["Test label 1", "Test label 2"]
         )
-        
+
 
     def test_accepts_new_value(self):
         form = DisaggregatedValueForm({'value': 120}, label=self.disagg.labels[0], enabled=True)
@@ -96,24 +96,6 @@ class TestDisaggregatedValueFormSet(test.TestCase):
         self.assertTrue(formset.is_valid(), "{}\n{}".format(formset.errors, formset.non_form_errors()))
         self.assertEqual(formset[0].cleaned_data['value'], Decimal(250))
         self.assertEqual(formset[1].cleaned_data['value'], None)
-
-    def test_invalid_form_values(self):
-        FormSet = get_disaggregated_result_formset(self.disagg)
-        for values in [
-            (100, 100),
-            (0.25, 249),
-            (0, 10),
-            (200, 400)
-        ]:
-            data = {
-                'disaggregation-formset-{}-TOTAL_FORMS'.format(self.disagg.pk): '2',
-                'disaggregation-formset-{}-INITIAL_FORMS'.format(self.disagg.pk): '2',
-                'disaggregation-formset-{}-MAX_NUM_FORMS'.format(self.disagg.pk): '',
-                'disaggregation-formset-{}-0-value'.format(self.disagg.pk): '{}'.format(values[0]),
-                'disaggregation-formset-{}-1-value'.format(self.disagg.pk): '{}'.format(values[1])
-            }
-            formset = FormSet(data, result=self.result, request=self.request)
-            self.assertFalse(formset.is_valid())
 
     def test_creates_disaggregated_values(self):
         FormSet = get_disaggregated_result_formset(self.disagg)
