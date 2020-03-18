@@ -20,9 +20,9 @@
         } else {
             redirectProgramId = "{{ indicator.program.pk }}";
         }
-        
+
         // don't let the modal load as a new page (jQuery not defined is a quick standin that doesn't need page to load)
-        if (typeof $ === 'undefined') {    
+        if (typeof $ === 'undefined') {
             // pathname to avoid having to grab host:
             window.location.pathname = `/program/${redirectProgramId}/`;
         }

@@ -815,7 +815,7 @@ class ResultCreate(ResultFormMixin, CreateView):
         result = form.save()
         for disagg in result.indicator.disaggregation.all():
             formset = get_disaggregated_result_formset(disagg)(self.request.POST, result=result, request=self.request)
-            if formset.is_valid:
+            if formset.is_valid():
                 formset.save()
         ProgramAuditLog.log_result_created(self.request.user, result.indicator, result)
 
@@ -874,7 +874,7 @@ class ResultUpdate(ResultFormMixin, UpdateView):
         new_result = form.save()
         for disagg in new_result.indicator.disaggregation.all():
             formset = get_disaggregated_result_formset(disagg)(self.request.POST, result=new_result, request=self.request)
-            if formset.is_valid:
+            if formset.is_valid():
                 formset.save()
 
         ProgramAuditLog.log_result_updated(

@@ -563,10 +563,6 @@ class BaseDisaggregatedValueFormSet(forms.BaseFormSet):
             self.clear_all = True
         elif self.result.indicator.unit_of_measure_type == Indicator.PERCENTAGE:
             return
-        elif sum([value for value in achieved if value is not None]) != self.result.achieved:
-            raise forms.ValidationError(
-                'disaggregated values must add up to {}, got {}'.format(self.result.achieved, achieved)
-            )
 
 
     def save(self):

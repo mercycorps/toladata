@@ -168,19 +168,26 @@
     }
 
     function validateDisaggregations() {
-        $('.disaggregation-formset').removeClass('unvalidated').trigger('validateSum').trigger('validateFormset');
-        if ($('.disaggregation-formset.has-errors').length > 0) {
-            return false;
-        }
-        return true;
+        // skip validation on disaggs with no entries, which has the side benefit of skipping validation on
+        // new results until save is clicked.
+        $('.disaggregation-formset').each((index, disaggElement)=> {
+            const sumValue = $( disaggElement ).find('.sum-value-cell').html();
+            if (sumValue !== '') {
+                $( disaggElement ).removeClass('unvalidated').trigger('validateSum').trigger('validateFormset');
+            }
+            else {
+                $( disaggElement ).addClass('unvalidated')
+            }
+        });
+        return $('.disaggregation-formset.has-errors').length > 0 ? false : true
     }
-    
+
     function resetDisaggregationValidation() {
         //set timeout with instant timeout ensures this fires _after_ form is reset
         setTimeout(function() {
-            $('.disaggregation-formset').addClass('unvalidated');
             updateActuals();
-            $('.disaggregation-formset').each(updateSum);    
+            $('.disaggregation-formset').each(updateSum);
+            validateDisaggregations()
         });
     }
 
@@ -203,7 +210,7 @@
             .on('validateFormset', validateFormset)
         $('.invalid-actions>a').on('click', updateActualWithSum);
         $('#result_update_form').on('reset', resetDisaggregationValidation);
-
+        validateDisaggregations();
     });
 
 
