@@ -1,6 +1,7 @@
 # -*- coding: utf-8 -*-
 import datetime
 import operator
+import dateutil.parser
 from rest_framework import serializers
 from tola.l10n_utils import l10n_date_medium, l10n_monthname
 from tola.model_utils import get_serializer
@@ -22,6 +23,7 @@ from indicators.serializers_new import (
     IPTTLevelSerializer,
     IPTTTierSerializer,
     IPTTIndicatorSerializer,
+    IPTTExcelIndicatorSerializer,
 )
 from django.db import models
 from django.utils import timezone
@@ -156,6 +158,95 @@ class ProgramReportingPeriodMixin:
 
 
 ProgramReportingPeriodSerializer = get_serializer(ProgramReportingPeriodMixin, ProgramBase)
+
+
+class Period:
+
+    @classmethod
+    def lop_period(cls):
+        return cls(1, {
+            'name': _('Life of Program')
+        }, True)
+
+    def __init__(self, frequency, period, tva=False):
+        self.period = period
+        self.frequency = int(frequency)
+        self.tva = tva
+
+    @property
+    def period_count(self):
+        return self.period['customsort']
+
+    @property
+    def columns(self):
+        actual_column = {
+            'header': _('Actual'),
+            'attribute': self.actual_attribute,
+            'disaggregation_attribute': self.actual_disaggregation_attribute
+        }
+        if not self.tva:
+            return [actual_column]
+        else:
+            return [
+                {
+                    'header': _('Target'),
+                    'attribute': self.target_attribute,
+                    'disaggregation_attribute': None
+                 },
+                actual_column,
+                {
+                    'header': _('% Met'),
+                    'attribute': self.percent_met_attribute,
+                    'disaggregation_attribute': None
+                }
+            ]
+    @property
+    def target_attribute(self):
+        if self.frequency == 1:
+            return 'lop_target_real'
+        else:
+            return 'frequency_{f}_period_{p}_target'.format(f=self.frequency, p=self.period_count)
+
+    @property
+    def actual_attribute(self):
+        if self.frequency == 1:
+            return 'lop_actual'
+        else:
+            return 'frequency_{f}_period_{p}'.format(f=self.frequency, p=self.period_count)
+
+    @property
+    def percent_met_attribute(self):
+        if self.frequency == 1:
+            return 'lop_met_target_decimal'
+
+    @property
+    def actual_disaggregation_attribute(self):
+        if self.frequency == 1:
+            return 'disaggregation_{}_lop_actual'
+        else:
+            return 'disaggregation_{}_' + 'frequency_{f}_period_{p}'.format(f=self.frequency, p=self.period_count)
+
+    @property
+    def start_display(self):
+        return l10n_date_medium(self.period['start'], decode=True)
+
+    @property
+    def end_display(self):
+        return l10n_date_medium(self.period['end'], decode=True)
+
+    @property
+    def header(self):
+        """LOP/MidEnd/Monthly have no header, just the label, time-aware has the period name"""
+        if self.frequency in [1, 2, 7]:
+            return None
+        return self.period['name']
+
+    @property
+    def subheader(self):
+        """ Name for Lop/MidEnd/monthly is the subheader on the excel report, label for other time-aware"""
+        if self.frequency in [1, 2, 7]:
+            return self.period['name']
+        return self.period['label']
 
 
 class ProgramLevelOrderingMixin:
@@ -873,3 +964,236 @@ IPTTProgramSerializer = get_serializer(
     ProgramReportingPeriodMixin,
     ProgramBase
 )
+
+class IPTTExcelMixin:
+    levels = serializers.SerializerMethodField()
+    
+    class Meta:
+        fields = [
+            'levels',
+        ]
+
+    @classmethod
+    def get_for_pk(cls, program_pk, context={}):
+        program = Program.rf_aware_objects.select_related(None).prefetch_related(None).only(
+            *cls._get_query_fields()
+        ).get(pk=program_pk)
+        return cls(program, context=context)
+   
+    def get_levels(self, program):
+        if self.context.get('level_order', False):
+            return [IPTTLevelSerializer(level) for level in self._get_levels_level_order(program)]
+        else:
+            return [IPTTLevelSerializer(level) for level in self._get_levels_chain_order(program)]
+        
+        
+        
+
+IPTTExcelProgramSerializer = get_serializer(
+    IPTTExcelMixin,
+    ProgramReportingPeriodMixin,
+    ProgramBase
+)
+
+class IPTTReportSerializer(serializers.Serializer):
+    """Serializer for an entire IPTT Report - contains report-level data and methods to instance sub-serializers"""
+    report_title = serializers.SerializerMethodField()
+    program_name = serializers.SerializerMethodField()
+    report_date_range = serializers.SerializerMethodField()
+    lop_period = serializers.SerializerMethodField()
+    periods = serializers.SerializerMethodField()
+    level_rows = serializers.SerializerMethodField()
+    blank_level_rows = serializers.SerializerMethodField()
+
+    class Meta:
+        fields = [
+            'report_title',
+            'program_name',
+            'report_date_range',
+            'lop_period',
+            'periods',
+            'level_rows',
+            'blank_level_rows'
+        ]
+    
+    @property
+    def filename(self):
+        return f"{self.report_name} {l10n_date_medium(timezone.localtime().date(), decode=True)}.xlsx"
+
+    @classmethod
+    def load_program_data(cls, program_pk, program_context={}):
+        return IPTTExcelProgramSerializer.get_for_pk(program_pk, context=program_context)
+
+    @classmethod
+    def load_indicator_data(cls, indicator_context={}, indicator_filters={}):        
+        indicators = Indicator.rf_aware_objects.select_related('program').prefetch_related(None).only(
+            'pk', 'name', 'deleted', 'program_id', 'means_of_verification', 'level_id', 'level_order',
+            'number', 'target_frequency', 'unit_of_measure', 'unit_of_measure_type', 'baseline', 'baseline_na',
+            'direction_of_change', 'is_cumulative', 'key_performance_indicator', 'old_level',
+            'create_date', 'sector_id'
+        ).filter(**indicator_filters).order_by().distinct()
+        return IPTTExcelIndicatorSerializer(indicators, context=indicator_context, many=True)
+
+    @classmethod
+    def get_indicator_filters(cls, filters, program_pk=None):
+        indicator_filters = {}
+        if program_pk:
+            indicator_filters['program'] = program_pk
+        if filters.get('sectors', None):
+            indicator_filters['sector__in'] = filters.get('sectors')
+        if filters.get('types', None):
+            indicator_filters['indicator_type__in'] = filters.get('types')
+        if filters.get('indicators', None):
+            indicator_filters['pk__in'] = filters.get('indicators')
+        if filters.get('disaggregations', None):
+            indicator_filters['disaggregation__in'] = filters.get('disaggregations')
+        if filters.get('sites', None):
+            indicator_filters['result__site__in'] = filters.get('sites')
+        return indicator_filters
+
+    @classmethod
+    def get_context(cls, program_pk, frequencies, filters={}):
+        if type(frequencies) == int:
+            frequencies = [frequencies]
+        context = {}
+        program_context = {}
+        if filters.get('groupby', None) == 2:
+            program_context['level_order'] = True
+        context['program'] = cls.load_program_data(program_pk, program_context=program_context).data
+        context['frequencies'] = [int(frequency) for frequency in frequencies]
+        indicator_context = {
+            'indicator_types': IndicatorType.objects.select_related(None).prefetch_related(None).filter(
+                indicator__program_id=program_pk
+            ).order_by('indicator_type').values('pk', 'indicator_type', 'indicator__pk'),
+            'sites': SiteProfile.objects.select_related(None).prefetch_related(None).filter(
+                result__indicator__program_id=program_pk
+            ).order_by('name').values('pk', 'name', 'result__indicator__pk'),
+            'sectors': Sector.objects.select_related(None).prefetch_related(None).filter(
+                indicator__program_id=program_pk
+            ).order_by('sector').values('pk', 'sector', 'indicator__pk'),
+            'disaggregations': DisaggregationType.objects.select_related(None).prefetch_related(None).filter(
+                indicator__program_id=program_pk
+            ).order_by('disaggregation_type').values(
+                'pk', 'disaggregation_type', 'indicator__pk', 'standard', 'country__country'
+            ),
+            'disaggregation_labels': DisaggregationLabel.objects.select_related(None).prefetch_related(None).filter(
+                disaggregation_type__indicator__program_id=program_pk
+            ).order_by('customsort').values('pk', 'disaggregation_type_id', 'label', 'customsort').distinct(),
+            'now': timezone.now().date(),
+        }
+        indicator_filters = cls.get_indicator_filters(filters, program_pk)
+        context['indicators'] = cls.load_indicator_data(
+            indicator_context=indicator_context,
+            indicator_filters=indicator_filters
+        ).data
+        return context
+
+    def get_report_title(self, obj):
+        return _('Indicator Performance Tracking Report')
+
+    def get_program_name(self, obj):
+        return self.context['program']['name']
+
+    @property
+    def reporting_periods(self):
+        return (
+            dateutil.parser.isoparse(self.context['program']['reporting_period_start_iso']).date(),
+            dateutil.parser.isoparse(self.context['program']['reporting_period_end_iso']).date()
+        )
+
+    def get_report_date_range(self, obj):
+        return u'{} – {}'.format(
+            l10n_date_medium(self.reporting_periods[0], decode=True),
+            l10n_date_medium(self.reporting_periods[1], decode=True)
+        )
+
+    def get_lop_period(self, obj):
+        return Period.lop_period()
+
+    def get_periods(self, obj):
+        frequencies = self.context['frequencies']
+        periods = {}
+        if Indicator.LOP in frequencies:
+            frequencies = [f for f in frequencies if f is not Indicator.LOP]
+            periods[Indicator.LOP] = []
+        return {
+            **periods,
+            **{frequency: [
+                Period(frequency, period_dict, tva=self.is_tva)
+                for period_dict in PeriodicTarget.generate_for_frequency(frequency)(
+                    *self.reporting_periods
+                )] for frequency in  frequencies
+            }
+        }
+
+    def _get_frequency_indicators(self, frequency, level_pk=None):
+        return [
+            indicator for indicator in self.context['indicators']
+            if indicator['level_pk'] == level_pk and indicator['target_frequency'] == frequency
+            ]
+
+    def _get_level_rows_for_frequency(self, frequency):
+        for level in self.context['program']['levels']:
+            yield {
+                'level': level.data,
+                'indicators': self._get_frequency_indicators(frequency, level_pk=level.data['pk'])
+            }
+
+    def _get_blank_level_row_for_frequency(self, frequency):
+        return {
+            'level': {'display_name': _('Indicators unassigned to a results framework level')},
+            'indicators': self._get_frequency_indicators(frequency, level_pk=None)
+        }
+
+    def get_level_rows(self, obj):
+        return {
+            frequency: self._get_level_rows_for_frequency(frequency)
+            for frequency in self.context['frequencies']
+        }
+
+    def get_blank_level_rows(self, obj):
+        return {
+            frequency: self._get_blank_level_row_for_frequency(frequency)
+            for frequency in self.context['frequencies']
+        }
+
+class IPTTTPReportSerializer(IPTTReportSerializer):
+    is_tva = False
+    @property
+    def report_name(self):
+        return _("IPTT Actuals only report")
+
+    @classmethod
+    def load_report(cls, program_pk, frequency=Indicator.MONTHLY, filters={}):
+        context = cls.get_context(program_pk, [frequency,], filters=filters)
+        return cls({}, context=context)
+
+    def _get_frequency_indicators(self, frequency, level_pk=None):
+        return [indicator for indicator in self.context['indicators'] if indicator['level_pk'] == level_pk]
+
+class IPTTTVAReportSerializer(IPTTReportSerializer):
+    is_tva = True
+    @property
+    def report_name(self):
+        return _("IPTT TvA report")
+
+    @classmethod
+    def load_report(cls, program_pk, frequency=Indicator.LOP, filters={}):
+        context = cls.get_context(program_pk, [frequency,], filters=filters)
+        return cls({}, context=context)
+
+class IPTTFullReportSerializer(IPTTReportSerializer):
+    is_tva = True
+    frequencies = [
+        frequency for frequency, name in Indicator.TARGET_FREQUENCIES
+        if frequency is not Indicator.EVENT
+    ]
+
+    @property
+    def report_name(self):
+        return _("IPTT TvA full program report")
+
+    @classmethod
+    def load_report(cls, program_pk, filters={}):
+        context = cls.get_context(program_pk, cls.frequencies, filters=filters)
+        return cls({}, context=context)

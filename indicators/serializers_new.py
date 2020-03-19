@@ -104,17 +104,18 @@ class IndicatorMeasurementMixin:
     is_percent = serializers.SerializerMethodField()
     direction_of_change = serializers.CharField(source='get_direction_of_change')
     baseline = serializers.SerializerMethodField()
-    lop_target = serializers.FloatField(source='lop_target_calculated')
+    
+    unit_of_measure_type = serializers.SerializerMethodField()
 
     class Meta:
         fields = [
             'target_frequency',
             'unit_of_measure',
+            'unit_of_measure_type',
             'is_percent',
             'is_cumulative',
             'direction_of_change',
-            'baseline',
-            'lop_target'
+            'baseline'
         ]
 
     def get_is_percent(self, indicator):
@@ -124,6 +125,13 @@ class IndicatorMeasurementMixin:
         if indicator.baseline_na or not indicator.baseline:
             return None
         return indicator.baseline
+
+    def get_unit_of_measure_type(self, indicator):
+        if indicator.unit_of_measure_type == indicator.NUMBER:
+            return '#'
+        elif indicator.unit_of_measure_type == indicator.PERCENTAGE:
+            return '%'
+        return None
 
 
 IndicatorWithMeasurementSerializer = get_serializer(IndicatorMeasurementMixin, IndicatorBase)
@@ -141,6 +149,7 @@ class ProgramPageIndicatorMixin:
     missing_evidence = serializers.SerializerMethodField()
     most_recent_completed_target_end_date = serializers.DateField()
     target_period_last_end_date = serializers.DateField()
+    lop_target = serializers.FloatField(source='lop_target_calculated')
 
     class Meta(IndicatorWithMeasurementSerializer.Meta):
         fields = IndicatorWithMeasurementSerializer.Meta.fields + [
@@ -155,7 +164,8 @@ class ProgramPageIndicatorMixin:
             'results_with_evidence_count',
             'missing_evidence',
             'most_recent_completed_target_end_date',
-            'target_period_last_end_date'
+            'target_period_last_end_date',
+            'lop_target',
         ]
 
     def get_has_results(self, indicator):
@@ -255,6 +265,37 @@ class IPTTIndicatorMixin:
 
 IPTTIndicatorSerializer = get_serializer(
     IPTTIndicatorMixin,
+    IndicatorMeasurementMixin,
+    IndicatorBase
+)
+
+class IPTTExcelIndicatorMixin:
+    number = serializers.SerializerMethodField(method_name='get_long_number')
+
+    class Meta:
+        fields = [
+            'number'
+        ]
+
+    def _get_rf_long_number(self, indicator):
+        level_set = self.context.get('levels', indicator.program.levels.all())
+        level = [l for l in level_set if l.pk == indicator.level_id]
+        if not level:
+            return None
+        level_depth, display_ontology = self._get_level_depth_ontology(level[0], level_set)
+        leveltier = [t for t in self.context.get(
+            'tiers', indicator.program.level_tiers.all()
+            ) if t.tier_depth == level_depth]
+        if not leveltier:
+            leveltier_name = u''
+        else:
+            leveltier_name = u'{} '.format(_(leveltier[0].name))
+        return u"{}{}{}".format(
+            leveltier_name, display_ontology, self._get_level_order_display(indicator)
+        )
+
+IPTTExcelIndicatorSerializer = get_serializer(
+    IPTTExcelIndicatorMixin,
     IndicatorMeasurementMixin,
     IndicatorBase
 )
@@ -580,28 +621,3 @@ class TierBase:
 IPTTTierSerializer = get_serializer(TierBase)
 
 
-class IPTTReportSerializer(serializers.Serializer):
-    """Serializer for an entire IPTT Report - contains report-level data and methods to instance sub-serializers"""
-    
-    @property
-    def filename(self):
-        return f"{self.report_name} {l10n_date_medium(timezone.localtime().date(), decode=True)}.xlsx"
-
-class IPTTTPReportSerializer(IPTTReportSerializer):
-    @property
-    def report_name(self):
-        return _("IPTT Actuals only report")
-
-    @classmethod
-    def load_report(cls, program_pk, frequency, filters):
-        pass
-
-class IPTTTVAReportSerializer(IPTTReportSerializer):
-    @property
-    def report_name(self):
-        return _("IPTT TvA report")
-
-class IPTTFullReportSerializer(IPTTReportSerializer):
-    @property
-    def report_name(self):
-        return _("IPTT TvA full program report")

@@ -1,7 +1,7 @@
 """Querymanagers and proxymodels to abstract complex queries on indicator models
 
 """
-
+import decimal
 from indicators.models import (
     Indicator,
     Level,
@@ -264,6 +264,12 @@ class IPTTIndicator(Indicator):
     @property
     def lop_met_target(self):
         return str(int(round(float(self.lop_actual_sum)*100/self.lop_target_sum))) + "%"
+
+    @property
+    def lop_met_target_decimal(self):
+        return decimal.Decimal(float(self.lop_actual_sum)/float(self.lop_target_sum)).quantize(
+            decimal.Decimal('0.01')
+        )
 
     @property
     def lop_target_real(self):
