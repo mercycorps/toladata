@@ -48,74 +48,7 @@
     });
 
     // Intercept ResultsUpdate form submission and then use ajax to submit it.
-    $("#indicator_results_div").on("submit", "#result_update_form", function(e){
-        e.preventDefault();
-        $("#modalmessages").empty();
-        let pts_valid = validatePeriodicTarget();
-        let datecollected_valid = validateDateCollected();
-        let achieved_valid = validate_achieved();
-        let evidenceValid = validateEvidence();
-        let disaggsValid = validateDisaggregations();
-
-        if ($("#result_update_form div").hasClass('has-error')) {
-            createAlert("danger", "{% trans 'One or more fields needs attention.'|escapejs %}", true, "#modalmessages");
-            $('#indicator_results_div').animate({ scrollTop: 0 }, 'slow');
-            $('#submit-id-submit').removeAttr('disabled');
-            return;
-        }
-
-        const save = (rationale) => {
-            $('#submit-id-submit').attr('disabled', 'disabled');
-            let form_url = $(this).attr('action');
-
-            let form_data = getResultFormAsArray();
-
-            // tack on rationale
-            form_data.push({
-                name: 'rationale',
-                value: rationale
-            });
-
-            // mark that the form data has changed so that when the modal is closed the list view can be updated
-            $(this).data('recordchanged', true);
-
-            $.post(form_url, form_data,
-                function(response, status, jqXHR) { // success callback
-                    $('#submit-id-submit').removeAttr('disabled');
-                    if (response.url) {
-                        $('#result_update_form').attr('action', response.url);
-                    }
-                    $("#modalmessages").empty();
-                    if ($("#result_update_form div").hasClass('has-warning') || !disaggsValid) {
-                        createAlert("warning", "{% trans 'Result saved - however please review warnings below.'|escapejs %}", true, "#modalmessages");
-                    } else {
-                        createAlert("success", "{% trans 'Success, form data saved.'|escapejs %}", true, "#modalmessages");
-                    }
-
-                    // record new base state
-                    recordResultFormSnapshot();
-                })
-            .fail(function(error){
-                $('#submit-id-submit').removeAttr('disabled');
-                createAlert("danger", "{% trans 'Could not save form.'|escapejs %}", true, "#modalmessages");
-            });
-            $('#indicator_results_div').animate({ scrollTop: 0 }, 'slow');
-        }
-
-        const message_text = hasResultDateFormFieldChanged() ? MODIFY_RESULT_DATE_MESSAGE : '';
-        const result_is_new = $(this).attr('action').indexOf('result_add') !== -1;
-
-        if(result_is_new || ! hasResultFormChanged()) {
-            save('');
-        } else {
-            window.create_nondestructive_changeset_notice({
-                message_text: message_text,
-                context: document.getElementById('result_update_form'),
-                on_submit: save
-            });
-            scrollToResultFormBottom();
-        }
-    });
+    $("#indicator_results_div").on("submit", "#result_update_form", submitHandler);
 
     $("#indicator_results_div").on("change", "#id_date_collected", function(e){
         validatePeriodicTarget(onlyPeriodic = true);
@@ -388,6 +321,77 @@
 
     function hasResultDateFormFieldChanged() {
         return resultFormSnapshot.find(e => e.name === 'date_collected').value !== getResultFormAsArray().find(e => e.name === 'date_collected').value;
+    }
+
+    function submitHandler(e){
+        if (e) {
+            e.preventDefault();
+        }
+        $("#modalmessages").empty();
+        let pts_valid = validatePeriodicTarget();
+        let datecollected_valid = validateDateCollected();
+        let achieved_valid = validate_achieved();
+        let evidenceValid = validateEvidence();
+        let disaggsValid = validateDisaggregations();
+
+        if ($("#result_update_form div").hasClass('has-error')) {
+            createAlert("danger", "{% trans 'One or more fields needs attention.'|escapejs %}", true, "#modalmessages");
+            $('#indicator_results_div').animate({ scrollTop: 0 }, 'slow');
+            $('#submit-id-submit').removeAttr('disabled');
+            return;
+        }
+
+        const save = (rationale) => {
+            $('#submit-id-submit').attr('disabled', 'disabled');
+            let form_url = $(this).attr('action');
+
+            let form_data = getResultFormAsArray();
+
+            // tack on rationale
+            form_data.push({
+                name: 'rationale',
+                value: rationale
+            });
+
+            // mark that the form data has changed so that when the modal is closed the list view can be updated
+            $(this).data('recordchanged', true);
+
+            $.post(form_url, form_data,
+                function(response, status, jqXHR) { // success callback
+                    $('#submit-id-submit').removeAttr('disabled');
+                    if (response.url) {
+                        $('#result_update_form').attr('action', response.url);
+                    }
+                    $("#modalmessages").empty();
+                    if ($("#result_update_form div").hasClass('has-warning') || !disaggsValid) {
+                        createAlert("warning", "{% trans 'Result saved - however please review warnings below.'|escapejs %}", true, "#modalmessages");
+                    } else {
+                        createAlert("success", "{% trans 'Success, form data saved.'|escapejs %}", true, "#modalmessages");
+                    }
+
+                    // record new base state
+                    recordResultFormSnapshot();
+                })
+            .fail(function(error){
+                $('#submit-id-submit').removeAttr('disabled');
+                createAlert("danger", "{% trans 'Could not save form.'|escapejs %}", true, "#modalmessages");
+            });
+            $('#indicator_results_div').animate({ scrollTop: 0 }, 'slow');
+        };
+
+        const message_text = hasResultDateFormFieldChanged() ? MODIFY_RESULT_DATE_MESSAGE : '';
+        const result_is_new = $(this).attr('action').indexOf('result_add') !== -1;
+
+        if(result_is_new || ! hasResultFormChanged()) {
+            save('');
+        } else {
+            window.create_nondestructive_changeset_notice({
+                message_text: message_text,
+                context: document.getElementById('result_update_form'),
+                on_submit: save
+            });
+            scrollToResultFormBottom();
+        }
     }
 
 </script>

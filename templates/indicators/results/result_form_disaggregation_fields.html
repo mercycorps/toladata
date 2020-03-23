@@ -199,10 +199,17 @@
         $('.disaggregation-formset').each(updateSum);
         // whenever the actual value changes, update the actual values in each disaggregation row:
         $('#id_achieved').on('change', updateActuals);
-        // whenever any of the value fields change, validate the individual value field:
-        // $('.disaggregated-value-cell').keydown(window.numberInputValidator).on('change', validateDisaggregatedValue);
+        // whenever any of the value fields change, validate the individual value field.  Need to trigger
+        // submit if the button has been clicked immediately after modifying a value because
+        // the blur blocks submit event.
         $('.disaggregated-value-cell').each(function() {
-            window.getValidatedNumericInput(this).on('change', validateDisaggregatedValue);
+            window.getValidatedNumericInput(this).on('blur', (e)=>{
+                validateDisaggregatedValue.call(this, e);
+                const $relatedTarget = e.originalEvent.relatedTarget;
+                if ($relatedTarget && $relatedTarget.id === "submit-id-submit") {
+                    submitHandler.call($("#result_update_form"));
+                }
+            });
         });
         $('.disaggregation-formset')
             .on('updateSum', updateSum)
