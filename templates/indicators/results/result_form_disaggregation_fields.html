@@ -84,7 +84,11 @@
 
     function updateActuals() {
         let val = $('#id_achieved').numericVal();
-        $('.actual-value-cell').displayVal(val, percentageInput);
+        $('#id_achieved').displayVal(val);
+        $('.actual-value-cell').displayVal(val);
+        $("#result_update_form .disaggregated-value-cell").each( (index, element) => {
+            $(element).displayVal($(element).val())
+        });
         $('.disaggregation-formset').trigger('validateSum');
     }
 
