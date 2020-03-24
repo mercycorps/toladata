@@ -2,8 +2,8 @@ msgid ""
 msgstr ""
 "Project-Id-Version: \n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2020-03-17 11:55-0700\n"
-"PO-Revision-Date: 2020-03-03 14:21-0800\n"
+"POT-Creation-Date: 2020-03-24 07:53-0700\n"
+"PO-Revision-Date: 2020-03-24 08:32-0700\n"
 "Last-Translator: \n"
 "Language-Team: \n"
 "Language: fr\n"
@@ -1009,8 +1009,8 @@ msgid "Categories for disaggregation %(disagg)s"
 msgstr "Catégories de la désagrégation %(disagg)s"
 
 #: indicators/templatetags/mytags.py:51 indicators/templatetags/mytags.py:73
-#: templates/indicators/result_form_common_js.html:231
-#: templates/indicators/result_form_common_js.html:239
+#: templates/indicators/result_form_common_js.html:164
+#: templates/indicators/result_form_common_js.html:172
 msgid "and"
 msgstr "et"
 
@@ -1390,8 +1390,8 @@ msgstr "Organisations"
 msgid "Countries"
 msgstr "Pays"
 
-#: templates/base.html:114 templates/registration/profile.html:4
-#: templates/registration/profile.html:5
+#: templates/base.html:114 templates/registration/profile.html:5
+#: templates/registration/profile.html:6
 msgid "Settings"
 msgstr "Réglages"
 
@@ -1848,7 +1848,7 @@ msgstr ""
 
 #: templates/indicators/indicator_form_common_js.html:829
 #: templates/indicators/indicator_form_common_js.html:924
-#: templates/indicators/result_form_common_js.html:211
+#: templates/indicators/result_form_common_js.html:144
 msgid "Please complete this field."
 msgstr "Veuillez compléter ce champ."
 
@@ -2041,7 +2041,8 @@ msgstr ""
 "                                "
 
 #: templates/indicators/indicator_reportingperiod_modal.html:99
-#: templates/indicators/result_form_modal.html:154 tola/forms.py:26
+#: templates/indicators/result_form_modal.html:154
+#: templates/registration/profile.html:95 tola/forms.py:26
 #: workflow/forms.py:122
 msgid "Save changes"
 msgstr "Sauvegarder les modifications"
@@ -2052,7 +2053,8 @@ msgstr "Retour à la page d’accueil"
 
 #: templates/indicators/indicator_reportingperiod_modal.html:104
 #: templates/indicators/iptt_filter_form.html:134
-#: templates/indicators/result_form_modal.html:155 workflow/forms.py:123
+#: templates/indicators/result_form_modal.html:155
+#: templates/registration/profile.html:100 workflow/forms.py:123
 msgid "Reset"
 msgstr "Réinitialiser"
 
@@ -2361,45 +2363,45 @@ msgstr ""
 "d’entrée de données. À titre de référence, veuillez fournir une "
 "justification pour la modification de ce résultat."
 
-#: templates/indicators/result_form_common_js.html:61
+#: templates/indicators/result_form_common_js.html:86
+#: templates/indicators/result_form_common_js.html:377
+msgid "Could not save form."
+msgstr "Impossible d’enregistrer le formulaire."
+
+#: templates/indicators/result_form_common_js.html:118
+msgid "Please enter a number with no letters or symbols."
+msgstr "Veuillez entrer un nombre sans lettres ni symboles."
+
+#: templates/indicators/result_form_common_js.html:150
+msgid "Please enter a valid date."
+msgstr "Veuillez entrer une date valide."
+
+#: templates/indicators/result_form_common_js.html:157
+msgid "You can begin entering results on"
+msgstr "Vous pouvez commencer à saisir des résultats le"
+
+#: templates/indicators/result_form_common_js.html:164
+#: templates/indicators/result_form_common_js.html:172
+msgid "Please select a date between"
+msgstr "Veuillez sélectionner une date entre"
+
+#: templates/indicators/result_form_common_js.html:258
+msgid "A link must be included along with the record name."
+msgstr "Un lien doit être inclus avec le nom de l’enregistrement."
+
+#: templates/indicators/result_form_common_js.html:338
 msgid "One or more fields needs attention."
 msgstr "Un ou plusieurs champs requièrent votre attention."
 
-#: templates/indicators/result_form_common_js.html:90
+#: templates/indicators/result_form_common_js.html:367
 msgid "Result saved - however please review warnings below."
 msgstr ""
 "Résultat enregistré - veuillez toutefois consulter les avertissements ci-"
 "dessous."
 
-#: templates/indicators/result_form_common_js.html:92
+#: templates/indicators/result_form_common_js.html:369
 msgid "Success, form data saved."
 msgstr "Succès, données de formulaire enregistrées."
-
-#: templates/indicators/result_form_common_js.html:100
-#: templates/indicators/result_form_common_js.html:153
-msgid "Could not save form."
-msgstr "Impossible d’enregistrer le formulaire."
-
-#: templates/indicators/result_form_common_js.html:185
-msgid "Please enter a number with no letters or symbols."
-msgstr "Veuillez entrer un nombre sans lettres ni symboles."
-
-#: templates/indicators/result_form_common_js.html:217
-msgid "Please enter a valid date."
-msgstr "Veuillez entrer une date valide."
-
-#: templates/indicators/result_form_common_js.html:224
-msgid "You can begin entering results on"
-msgstr "Vous pouvez commencer à saisir des résultats le"
-
-#: templates/indicators/result_form_common_js.html:231
-#: templates/indicators/result_form_common_js.html:239
-msgid "Please select a date between"
-msgstr "Veuillez sélectionner une date entre"
-
-#: templates/indicators/result_form_common_js.html:325
-msgid "A link must be included along with the record name."
-msgstr "Un lien doit être inclus avec le nom de l’enregistrement."
 
 #: templates/indicators/result_form_modal.html:136
 #: templates/indicators/result_table.html:29
@@ -3000,6 +3002,68 @@ msgstr ""
 "Utilisez ce formulaire afin de vous envoyer un e-mail contenant le lien pour "
 "modifier votre mot de passe."
 
+#: templates/registration/profile.html:29 tola/forms.py:32
+msgid "Language"
+msgstr "Langue"
+
+#: templates/registration/profile.html:36
+msgid ""
+"Your language selection determines the number format expected when you enter "
+"targets and results. Your language also determines how numbers are displayed "
+"on the program page and reports, including Excel exports."
+msgstr ""
+"Votre sélection de langue détermine le format de nombre attendu lorsque vous "
+"entrez des cibles et des résultats. Votre langue détermine également la "
+"façon dont les nombres sont affichés sur la page du programme et les "
+"rapports, y compris les exportations Excel."
+
+#: templates/registration/profile.html:40
+msgid "Number formatting conventions"
+msgstr "Conventions de formatage des nombres"
+
+#: templates/registration/profile.html:41 tola/settings/base.py:93
+msgid "English"
+msgstr "Anglais"
+
+#: templates/registration/profile.html:42 tola/settings/base.py:94
+msgid "French"
+msgstr "Français"
+
+#: templates/registration/profile.html:43 tola/settings/base.py:95
+msgid "Spanish"
+msgstr "Espanol"
+
+#: templates/registration/profile.html:48
+msgid "Decimal separator"
+msgstr "Séparateur décimal"
+
+#: templates/registration/profile.html:49
+msgid "Applies to number entry and display"
+msgstr "S’applique à la saisie et à l’affichage des numéros"
+
+#. Translators: The punctuation mark used as a decimal point in English
+#: templates/registration/profile.html:53
+#: templates/registration/profile.html:84
+msgctxt "radix"
+msgid "Period"
+msgstr "Période"
+
+#. Translators: The punctuation mark used as a decimal point in French, Spanish
+#: templates/registration/profile.html:58
+#: templates/registration/profile.html:63
+#: templates/registration/profile.html:74
+msgid "Comma"
+msgstr "Virgule"
+
+#: templates/registration/profile.html:69
+msgid "Thousands separator"
+msgstr "Séparateur de milliers"
+
+#. Translators: The whitespace used to separate thousands in large numbers in French
+#: templates/registration/profile.html:79
+msgid "Space"
+msgstr "Espace"
+
 #: templates/validation_js.html:17
 msgid ""
 "Warning: This may be a badly formatted web address. It should be something "
@@ -3129,25 +3193,9 @@ msgstr "Informations personnelles"
 msgid "Important dates"
 msgstr "Dates importantes"
 
-#: tola/forms.py:32
-msgid "Language"
-msgstr "Langue"
-
 #: tola/forms.py:43
 msgid "Form Errors"
 msgstr "Erreurs de formulaire"
-
-#: tola/settings/base.py:93
-msgid "English"
-msgstr "Anglais"
-
-#: tola/settings/base.py:94
-msgid "French"
-msgstr "Français"
-
-#: tola/settings/base.py:95
-msgid "Spanish"
-msgstr "Espanol"
 
 #: tola/util.py:162
 msgid "Program does not have a GAIT id"
@@ -4923,9 +4971,6 @@ msgstr "Ville, Pays :"
 
 #~ msgid "View your indicator on the program page."
 #~ msgstr "Visualisez vos indicateurs sur la page du programme."
-
-#~ msgid "Number of events"
-#~ msgstr "Nombre d’événements"
 
 #~ msgid "Please enter a number larger than zero with no letters or symbols."
 #~ msgstr "Veuillez entrer un nombre positif sans lettres ni symboles."
