@@ -2,7 +2,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: \n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2020-03-24 07:53-0700\n"
+"POT-Creation-Date: 2020-03-24 16:38-0700\n"
 "PO-Revision-Date: 2020-03-24 08:32-0700\n"
 "Last-Translator: \n"
 "Language-Team: \n"
@@ -2042,7 +2042,7 @@ msgstr ""
 
 #: templates/indicators/indicator_reportingperiod_modal.html:99
 #: templates/indicators/result_form_modal.html:154
-#: templates/registration/profile.html:95 tola/forms.py:26
+#: templates/registration/profile.html:98 tola/forms.py:26
 #: workflow/forms.py:122
 msgid "Save changes"
 msgstr "Sauvegarder les modifications"
@@ -2054,7 +2054,7 @@ msgstr "Retour à la page d’accueil"
 #: templates/indicators/indicator_reportingperiod_modal.html:104
 #: templates/indicators/iptt_filter_form.html:134
 #: templates/indicators/result_form_modal.html:155
-#: templates/registration/profile.html:100 workflow/forms.py:123
+#: templates/registration/profile.html:103 workflow/forms.py:123
 msgid "Reset"
 msgstr "Réinitialiser"
 
@@ -3002,11 +3002,12 @@ msgstr ""
 "Utilisez ce formulaire afin de vous envoyer un e-mail contenant le lien pour "
 "modifier votre mot de passe."
 
-#: templates/registration/profile.html:29 tola/forms.py:32
+#: templates/registration/profile.html:28 tola/forms.py:32
 msgid "Language"
 msgstr "Langue"
 
-#: templates/registration/profile.html:36
+#. Translators: Explanation of how language selection will affect number formatting within the app
+#: templates/registration/profile.html:34
 msgid ""
 "Your language selection determines the number format expected when you enter "
 "targets and results. Your language also determines how numbers are displayed "
@@ -3017,19 +3018,20 @@ msgstr ""
 "façon dont les nombres sont affichés sur la page du programme et les "
 "rapports, y compris les exportations Excel."
 
-#: templates/registration/profile.html:40
+#. Translators: Column header in a table.  Row entries are different ways number can be formatted (e.g. what punctuation mark to use as a decimal point)
+#: templates/registration/profile.html:39
 msgid "Number formatting conventions"
 msgstr "Conventions de formatage des nombres"
 
-#: templates/registration/profile.html:41 tola/settings/base.py:93
+#: templates/registration/profile.html:40 tola/settings/base.py:93
 msgid "English"
 msgstr "Anglais"
 
-#: templates/registration/profile.html:42 tola/settings/base.py:94
+#: templates/registration/profile.html:41 tola/settings/base.py:94
 msgid "French"
 msgstr "Français"
 
-#: templates/registration/profile.html:43 tola/settings/base.py:95
+#: templates/registration/profile.html:42 tola/settings/base.py:95
 msgid "Spanish"
 msgstr "Espanol"
 
@@ -3037,30 +3039,34 @@ msgstr "Espanol"
 msgid "Decimal separator"
 msgstr "Séparateur décimal"
 
-#: templates/registration/profile.html:49
+#: templates/registration/profile.html:50
 msgid "Applies to number entry and display"
 msgstr "S’applique à la saisie et à l’affichage des numéros"
 
 #. Translators: The punctuation mark used as a decimal point in English
-#: templates/registration/profile.html:53
-#: templates/registration/profile.html:84
+#: templates/registration/profile.html:54
+#: templates/registration/profile.html:87
 msgctxt "radix"
 msgid "Period"
 msgstr "Période"
 
 #. Translators: The punctuation mark used as a decimal point in French, Spanish
-#: templates/registration/profile.html:58
-#: templates/registration/profile.html:63
-#: templates/registration/profile.html:74
+#: templates/registration/profile.html:59
+#: templates/registration/profile.html:64
+#: templates/registration/profile.html:77
 msgid "Comma"
 msgstr "Virgule"
 
-#: templates/registration/profile.html:69
+#: templates/registration/profile.html:71
 msgid "Thousands separator"
 msgstr "Séparateur de milliers"
 
+#: templates/registration/profile.html:73
+msgid "Applies to number display"
+msgstr "S'applique à l'affichage des nombres"
+
 #. Translators: The whitespace used to separate thousands in large numbers in French
-#: templates/registration/profile.html:79
+#: templates/registration/profile.html:82
 msgid "Space"
 msgstr "Espace"
 

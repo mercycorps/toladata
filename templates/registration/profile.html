@@ -30,10 +30,12 @@
         </div>
 
         <p class="mt-4" role="definition">
+            {# Translators: Explanation of how language selection will affect number formatting within the app #}
         {% trans "Your language selection determines the number format expected when you enter targets and results. Your language also determines how numbers are displayed on the program page and reports, including Excel exports." %}
         </p>
         <table id="profile--format-description__table">
             <thead>
+                {# Translators: Column header in a table.  Row entries are different ways number can be formatted (e.g. what punctuation mark to use as a decimal point) #}
                 <th>{% trans "Number formatting conventions"%}</th>
                 <th>{% trans "English"%}</th>
                 <th>{% trans "French"%}</th>
@@ -42,7 +44,9 @@
             <tbody>
                 <tr>
                     <td>
+                        {# Row descriptor in a table that describes how language selection will affect number formats, in this case what punctuation mark is used as the decimal point.  #}
                         <strong>{% trans "Decimal separator" %}</strong>
+                        {# Subtext of "Decimal separator", explains that language selection will affect the decimal separator for both form entry and number display.  #}
                         <p>{% trans "Applies to number entry and display" %}</p>
                     </td>
                     <td>
@@ -63,8 +67,10 @@
                 </tr>
                 <tr>
                     <td>
+                        {# Row descriptor in a table that describes how language selection will affect number formats, in this case what punctuation mark is used to separate thousands, millions, etc....  #}
                         <strong>{% trans "Thousands separator" %}</strong>
-                        <p>Applies to number display</p>
+                        {# Subtext of "Thousands separator", explains that language selection will affect the thousands separator only for number display purposes, not on entry of numbers into a form.  #}
+                        <p>{% trans "Applies to number display" %}</p>
                     </td>
                     <td>
                         {# Translators: The punctuation mark used as a decimal point in French, Spanish  #}
