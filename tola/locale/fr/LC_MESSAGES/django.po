@@ -3048,7 +3048,7 @@ msgstr "S’applique à la saisie et à l’affichage des numéros"
 #: templates/registration/profile.html:87
 msgctxt "radix"
 msgid "Period"
-msgstr "Période"
+msgstr "Point"
 
 #. Translators: The punctuation mark used as a decimal point in French, Spanish
 #: templates/registration/profile.html:59
