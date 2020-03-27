@@ -7,7 +7,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: \n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2020-03-27 14:56-0700\n"
+"POT-Creation-Date: 2020-03-27 15:42-0700\n"
 "PO-Revision-Date: 2020-03-24 08:32-0700\n"
 "Last-Translator: \n"
 "Language-Team: \n"
@@ -3040,8 +3040,8 @@ msgid "Thousands separator"
 msgstr "Separadora de miles"
 
 #: templates/registration/profile.html:73
-msgid "Applies to number display"
-msgstr "Se aplica a la visualización de números"
+msgid "Applies only to number display"
+msgstr "Se aplica solo a la visualización de números"
 
 #. Translators: The whitespace used to separate thousands in large numbers in French
 #: templates/registration/profile.html:82
