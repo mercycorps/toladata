@@ -14,8 +14,7 @@
         setViewButtonDisabledState();
     }
 
-    const DELETE_RESULT_MESSAGE = "{% trans 'This action cannot be undone. The result value and any information associated with it will be permanently removed. For future reference, please provide a reason for deleting this result.' %}"
-    const MODIFY_RESULT_DATE_MESSAGE = "{% trans 'Modifying results will affect program metrics for this indicator and should only be done to correct a data entry error. For future reference, please provide a reason for modifying this result.' %}"
+    const DELETE_RESULT_MESSAGE = "{% trans 'This action cannot be undone. The result value and any information associated with it will be permanently removed. For future reference, please provide a reason for deleting this result.' %}";
 
     $("#indicator_results_div").on('click', '#id_browse_google_drive', function(e) {
         e.preventDefault();
@@ -112,7 +111,8 @@
 
     function validate_achieved() {
         const actual = $("#id_achieved").numericVal();
-        if (!actual || !$.isNumeric(actual) || actual < 0) {
+        // Can't test for !actual because it evaluates to true when value is 0.  isNumeric should be sufficient
+        if (!$.isNumeric(actual) || actual < 0) {
             $("#div_id_achieved").addClass('has-error');
             $("#id_achieved").addClass('is-invalid');
             $("#hint_id_achieved").text("{% trans 'Please enter a number with no letters or symbols.'|escapejs %}");
@@ -312,10 +312,21 @@
         resultFormSnapshot = getTrackedResultFieldsArray();
     }
 
-    // have any tracked fields changed in the form?
+    // Have any tracked fields changed in the form?  Need to remove the extra zero decimal places if we're
+    // going to find out.
     function hasResultFormChanged() {
-        let prevState = JSON.stringify(resultFormSnapshot);
-        let currState = JSON.stringify(getTrackedResultFieldsArray());
+        let prevState = JSON.stringify(resultFormSnapshot, function (key, value) {
+            if (key === "value") {
+               return window.normalizeNumber(value)
+            }
+            return value;
+        });
+        let currState = JSON.stringify(getTrackedResultFieldsArray(),function (key, value) {
+            if (key === "value") {
+                return window.normalizeNumber(value)
+            }
+            return value;
+        });
         return prevState !== currState;
     }
 
@@ -378,20 +389,51 @@
             });
             $('#indicator_results_div').animate({ scrollTop: 0 }, 'slow');
         };
-
-        const message_text = hasResultDateFormFieldChanged() ? MODIFY_RESULT_DATE_MESSAGE : '';
+        const MODIFY_RESULT_MESSAGE = "{% trans 'Modifying results will affect program metrics for this indicator and should only be done to correct a data entry error. For future reference, please provide a reason for modifying this result.' %}";
+        const DISAGG_MISMATCH_PREAMBLE = "{% trans 'The sum of disaggregated values does not match the actual value.' %}";
+        const DISAGG_MISMATCH_MESSAGE = "{% trans 'For future reference, please provide a reason for modifying this result.' %}";
         const result_is_new = $(this).attr('action').indexOf('result_add') !== -1;
-
-        if(result_is_new || ! hasResultFormChanged()) {
+        const resultFormHasChanged = hasResultFormChanged();
+        if( disaggsValid && (result_is_new || ! resultFormHasChanged )) {
             save('');
-        } else {
-            window.create_nondestructive_changeset_notice({
-                message_text: message_text,
-                context: document.getElementById('result_update_form'),
-                on_submit: save
-            });
-            scrollToResultFormBottom();
+            return;
         }
+
+        // configure and launch the PNotify warning/rationale prompt
+        let messageText = "";
+        let preambleText = "";
+        let no_preamble = false;
+
+        let include_warning = true;
+
+        if (! disaggsValid) {
+            if (result_is_new){
+                preambleText = DISAGG_MISMATCH_PREAMBLE;
+                messageText = DISAGG_MISMATCH_MESSAGE;
+            }
+            else { // This means result has change and there's a disagg mismatch
+                preambleText = DISAGG_MISMATCH_PREAMBLE;
+                messageText = MODIFY_RESULT_MESSAGE;
+            }
+        }
+        else {
+            messageText = MODIFY_RESULT_MESSAGE;
+            include_warning = false;
+            no_preamble = true;
+        }
+
+        window.create_unified_changeset_notice({
+            preamble: preambleText,
+            no_preamble: no_preamble,
+            message_text: messageText,
+            context: document.getElementById('result_update_form'),
+            on_submit: save,
+            notice_type: "notice",
+            include_rationale: true,
+            include_warning: include_warning,
+        });
+
+        scrollToResultFormBottom();
     }
 
 </script>
