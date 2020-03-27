@@ -13,7 +13,9 @@ export const DisaggregationDiffs = ({disagg_type, disagg_diffs}) => {
     disagg_diffs.sort( (a, b) => a.custom_sort - b.custom_sort);
     return <div><h4 className="disagg-type__title text-small">{gettext(disagg_type)}</h4>
         {disagg_diffs.map( diff => {
-            const displayValue = ["", null, undefined].includes(diff.value) ? emptyValue : localizeNumber(diff.value);
+            const displayValue = ["", null, undefined].includes(diff.value)
+                ? emptyValue
+                : localizeNumber(normalizeNumber(diff.value));
             const displayClasses = classNames("change__field__value", {"empty-value": displayValue===emptyValue});
             return <div className="change__field" key={diff.id}><span className="change__field__name">{diff.name}:</span> <span className={displayClasses}>{displayValue}</span></div>
         })}
