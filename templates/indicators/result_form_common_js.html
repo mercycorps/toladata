@@ -78,7 +78,7 @@
                 $.post(url, {rationale: rationale},
                     function(response, status, jqXHR) { // success callback
                         // Close modal
-                        $('#indicator_results_div').modal('hide')
+                        $('#indicator_results_div').modal('hide');
                         PNotify.success("Result deleted")
                     })
                 .fail(function(error){
@@ -391,7 +391,7 @@
         };
         const MODIFY_RESULT_MESSAGE = "{% trans 'Modifying results will affect program metrics for this indicator and should only be done to correct a data entry error. For future reference, please provide a reason for modifying this result.' %}";
         const DISAGG_MISMATCH_PREAMBLE = "{% trans 'The sum of disaggregated values does not match the actual value.' %}";
-        const DISAGG_MISMATCH_MESSAGE = "{% trans 'For future reference, please provide a reason for modifying this result.' %}";
+        const DISAGG_MISMATCH_MESSAGE = "{% trans 'For future reference, please share your reason for these variations.' %}";
         const result_is_new = $(this).attr('action').indexOf('result_add') !== -1;
         const resultFormHasChanged = hasResultFormChanged();
         if( disaggsValid && (result_is_new || ! resultFormHasChanged )) {
