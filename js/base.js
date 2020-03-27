@@ -444,6 +444,7 @@ const create_changeset_notice = ({
     }
 }
 
+// Consider using the create_unified_changeset_notice instead of this one
 window.create_destructive_changeset_notice = ({
     message_text = DEFAULT_DESTRUCTIVE_MESSAGE,
     on_submit = () => {},
@@ -492,6 +493,7 @@ window.create_destructive_changeset_notice = ({
     })
 }
 
+// Consider using the create_unified_changeset_notice instead of this one
 window.create_nondestructive_changeset_notice = ({
     message_text = DEFAULT_NONDESTRUCTIVE_MESSAGE,
     on_submit = () => {},
@@ -534,6 +536,7 @@ window.create_nondestructive_changeset_notice = ({
     })
 }
 
+// Consider using the create_unified_changeset_notice instead of this one
 window.create_no_rationale_changeset_notice = ({
     message_text = DEFAULT_NO_RATIONALE_TEXT,
     on_submit = () => {},
@@ -587,6 +590,95 @@ window.create_no_rationale_changeset_notice = ({
         });
 }
 
+/*
+Consider using this notification function rather than the more specific ones above.  It should be able to
+everything they can do. The configurable parameters are for the 4 sections of the notification and
+for other visual and functional elements.
+
+- You can provide a header, leave it to default text, or override with a Warning icon and text.
+- The preamble can be specified, left to a default, or omitted by using the no_preamble parameter.
+- The message can be specified or left to a default.
+- Defaults to not including a rationale text box.
+
+ */
+window.create_unified_changeset_notice = ({
+    include_warning = false,
+    header = gettext("Reason for change"),
+    preamble = false,
+    no_preamble = false,
+    on_submit = () => {},
+    on_cancel = () => {},
+    message_text = DEFAULT_DESTRUCTIVE_MESSAGE,
+    include_rationale = false,
+    showCloser = false,
+    // # Translators: Button to approve a form
+    confirm_text = gettext('Ok'),
+    // # Translators: Button to cancel a form submission
+    cancel_text = gettext('Cancel'),
+    context = null,
+    notice_type = 'error',
+    blocking = true,
+} = {}) => {
+    let header_section = '';
+    if (include_warning){
+        header_section = `<div class="row">
+            <div class="col">
+                <h2 class="pnotify--header"><i class="fas fa-exclamation-triangle"></i>${gettext("Warning")}</h2>
+            </div>
+        </div>`
+    }
+    else {
+        header_section = `<div class="row">
+            <div class="col">
+                <h2>${header}</h2>
+            </div>
+        </div>`
+    }
+    if (!preamble) { preamble = (no_preamble)?'' : gettext("This action cannot be undone.") }
+    const preamble_section = !preamble ? '' :
+        `<div class="row">
+            <div class="col">
+                <span class='text-danger'>
+                    ${preamble}
+                </span>
+            </div>
+        </div>`;
+    const message_section =
+        `<div class="row mt-1">
+            <div class="col">
+                <span>
+                    ${message_text}
+                </span>
+            </div>
+        </div>`;
+    const rationale_section = ! include_rationale ? '' :
+        `<div class="row">
+            <div class="col">
+                <div class="form-group">
+                    <textarea class="form-control" name="rationale"></textarea>
+                </div>
+            </div>
+        </div>`;
+
+    const inner = `
+        ${header_section}
+        ${preamble_section}
+        ${message_section}
+        ${rationale_section}
+    `;
+    return create_changeset_notice({
+        message_text: message_text,
+        on_submit: on_submit,
+        on_cancel: on_cancel,
+        confirm_text: confirm_text,
+        cancel_text: cancel_text,
+        type: notice_type,
+        inner: inner,
+        context: context,
+        showCloser: showCloser,
+        blocking: blocking,
+    })
+}
 
 const createPnotifyAlert = (passedInConfig) => {
     let config = {
@@ -833,6 +925,15 @@ window.localizeNumber = (val) => {
                 displayValue += `.${floatPart}`;
             }
         break;
- v   }
+    }
     return displayValue;
-}
+};
+
+window.normalizeNumber = function (value) {
+    if (isNaN(parseFloat(value)) || isDate(value)) {
+        return value;
+    }
+    else {
+        return parseFloat(value).toString();
+    }
+};
