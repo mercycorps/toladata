@@ -2,7 +2,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: \n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2020-03-24 16:38-0700\n"
+"POT-Creation-Date: 2020-03-27 14:56-0700\n"
 "PO-Revision-Date: 2020-03-24 08:32-0700\n"
 "Last-Translator: \n"
 "Language-Team: \n"
@@ -2352,19 +2352,8 @@ msgstr ""
 "référence, veuillez fournir une justification pour la suppression de ce "
 "résultat."
 
-#: templates/indicators/result_form_common_js.html:18
-msgid ""
-"Modifying results will affect program metrics for this indicator and should "
-"only be done to correct a data entry error. For future reference, please "
-"provide a reason for modifying this result."
-msgstr ""
-"La modification des résultats affectera les statistiques du programme pour "
-"cet indicateur, et ne doit être réalisée qu’en vue de corriger une erreur "
-"d’entrée de données. À titre de référence, veuillez fournir une "
-"justification pour la modification de ce résultat."
-
-#: templates/indicators/result_form_common_js.html:86
-#: templates/indicators/result_form_common_js.html:377
+#: templates/indicators/result_form_common_js.html:85
+#: templates/indicators/result_form_common_js.html:388
 msgid "Could not save form."
 msgstr "Impossible d’enregistrer le formulaire."
 
@@ -2389,19 +2378,39 @@ msgstr "Veuillez sélectionner une date entre"
 msgid "A link must be included along with the record name."
 msgstr "Un lien doit être inclus avec le nom de l’enregistrement."
 
-#: templates/indicators/result_form_common_js.html:338
+#: templates/indicators/result_form_common_js.html:349
 msgid "One or more fields needs attention."
 msgstr "Un ou plusieurs champs requièrent votre attention."
 
-#: templates/indicators/result_form_common_js.html:367
+#: templates/indicators/result_form_common_js.html:378
 msgid "Result saved - however please review warnings below."
 msgstr ""
 "Résultat enregistré - veuillez toutefois consulter les avertissements ci-"
 "dessous."
 
-#: templates/indicators/result_form_common_js.html:369
+#: templates/indicators/result_form_common_js.html:380
 msgid "Success, form data saved."
 msgstr "Succès, données de formulaire enregistrées."
+
+#: templates/indicators/result_form_common_js.html:392
+msgid ""
+"Modifying results will affect program metrics for this indicator and should "
+"only be done to correct a data entry error. For future reference, please "
+"provide a reason for modifying this result."
+msgstr ""
+"La modification des résultats affectera les statistiques du programme pour "
+"cet indicateur, et ne doit être réalisée qu’en vue de corriger une erreur "
+"d’entrée de données. À titre de référence, veuillez fournir une "
+"justification pour la modification de ce résultat."
+
+#: templates/indicators/result_form_common_js.html:393
+#: templates/indicators/results/result_form_disaggregation_fields.html:70
+msgid "The sum of disaggregated values does not match the actual value."
+msgstr "La somme des valeurs désagrégées ne correspond pas à la valeur réelle."
+
+#: templates/indicators/result_form_common_js.html:394
+msgid "For future reference, please share your reason for these variations."
+msgstr "Pour référence future, veuillez partager la raison de ces variations."
 
 #: templates/indicators/result_form_modal.html:136
 #: templates/indicators/result_table.html:29
@@ -2569,10 +2578,6 @@ msgstr "Somme"
 #: templates/indicators/results/result_form_disaggregation_fields.html:51
 msgid "Update actual value"
 msgstr "Mettre à jour la valeur réelle"
-
-#: templates/indicators/results/result_form_disaggregation_fields.html:70
-msgid "The sum of disaggregated values does not match the actual value."
-msgstr "La somme des valeurs désagrégées ne correspond pas à la valeur réelle."
 
 #: templates/indicators/results/result_form_evidence_fields.html:13
 msgid ""
