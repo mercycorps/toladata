@@ -111,7 +111,8 @@
 
     function validate_achieved() {
         const actual = $("#id_achieved").numericVal();
-        if (!actual || !$.isNumeric(actual) || actual < 0) {
+        // Can't test for !actual because it evaluates to true when value is 0.  isNumeric should be sufficient
+        if (!$.isNumeric(actual) || actual < 0) {
             $("#div_id_achieved").addClass('has-error');
             $("#id_achieved").addClass('is-invalid');
             $("#hint_id_achieved").text("{% trans 'Please enter a number with no letters or symbols.'|escapejs %}");
