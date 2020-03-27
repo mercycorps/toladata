@@ -5,6 +5,7 @@ import { ResultChangeset, DisaggregationDiffs } from "../views"
 import renderer from 'react-test-renderer';
 
 window.localizeNumber = function (number) { number };
+window.normalizeNumber = function (number) { number };
 
 describe("Audit log", () => {
 
