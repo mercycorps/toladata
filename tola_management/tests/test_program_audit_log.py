@@ -179,7 +179,7 @@ class TestResultAuditLog(test.TestCase):
             'indicator': indicator
         }
         result = Result.objects.create(**result_data)
-        ProgramAuditLog.log_result_created(self.tola_user.user, indicator, result)
+        ProgramAuditLog.log_result_created(self.tola_user.user, indicator, result, "a rationale")
         creation_log = ProgramAuditLog.objects.all().order_by('-pk')[0]
         diff_list = creation_log.diff_list
         diff_keys = set([diff['name'] for diff in diff_list])
