@@ -474,14 +474,14 @@ class ProgramAuditLog(models.Model, DiffableLog):
             new_program_log_entry.save()
 
     @staticmethod
-    def log_result_created(user, indicator, created_result):
+    def log_result_created(user, indicator, created_result, rationale):
         new_program_log_entry = ProgramAuditLog(
             program=indicator.program,
             user=user.tola_user,
             organization=user.tola_user.organization,
             indicator=indicator,
             change_type="result_created",
-            rationale='N/A',
+            rationale=rationale,
             previous_entry=None,
             new_entry=json.dumps(created_result.logged_fields, cls=DjangoJSONEncoder)
         )

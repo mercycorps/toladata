@@ -817,7 +817,9 @@ class ResultCreate(ResultFormMixin, CreateView):
             formset = get_disaggregated_result_formset(disagg)(self.request.POST, result=result, request=self.request)
             if formset.is_valid():
                 formset.save()
-        ProgramAuditLog.log_result_created(self.request.user, result.indicator, result)
+        rationale = form.cleaned_data.get('rationale') if form.cleaned_data.get('rationale') else "N/A"
+        ProgramAuditLog.log_result_created(
+            self.request.user, result.indicator, result, rationale)
 
         if self.request.is_ajax():
             data = {
