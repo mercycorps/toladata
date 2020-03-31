@@ -394,7 +394,7 @@
         const DISAGG_MISMATCH_MESSAGE = "{% trans 'For future reference, please share your reason for these variations.' %}";
         const result_is_new = $(this).attr('action').indexOf('result_add') !== -1;
         const resultFormHasChanged = hasResultFormChanged();
-        if( disaggsValid && (result_is_new || ! resultFormHasChanged )) {
+        if( (disaggsValid && result_is_new) || ! resultFormHasChanged ) {
             save('');
             return;
         }
@@ -406,12 +406,12 @@
 
         let include_warning = true;
 
-        if (! disaggsValid) {
-            if (result_is_new){
+        if (! disaggsValid ) {
+            if (result_is_new) {
                 preambleText = DISAGG_MISMATCH_PREAMBLE;
                 messageText = DISAGG_MISMATCH_MESSAGE;
             }
-            else { // This means result has change and there's a disagg mismatch
+            else {
                 preambleText = DISAGG_MISMATCH_PREAMBLE;
                 messageText = MODIFY_RESULT_MESSAGE;
             }
