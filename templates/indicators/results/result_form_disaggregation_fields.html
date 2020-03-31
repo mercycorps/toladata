@@ -66,8 +66,12 @@
                     </div>
                 </li>
             </ul>
-            <div class="bad-sum-feedback invalid-feedback">
-                {% trans "The sum of disaggregated values does not match the actual value." %}
+            <div class="bad-sum-feedback">
+                {# invalid feedback is nested inside bad-sum-feedback to hold at least one empty line for the feedback message, to keep the modal a consistent(ish) height #}
+                <div class="invalid-feedback">
+                    {% trans "The sum of disaggregated values does not match the actual value." %}
+                </div>
+                &nbsp; {# (see note above) #}
             </div>
         </div>
     </fieldset>

@@ -245,11 +245,12 @@ a.accordion-row__btn.btn.btn-link {
         display: inline-block;
         margin-right: 10px;
     }
-    & .bad-sum-feedback {
-        display: inline-block;
-        padding-left: 2px;
-        padding-top: 4px;
+    & .bad-sum-feedback > .invalid-feedback {
+        display: inline;
     }
+}
+.bad-sum-feedback {
+    margin: 0.5rem 0;
 }
 
 .disaggregation-formset .input-symbol-percent {
@@ -265,10 +266,6 @@ a.accordion-row__btn.btn.btn-link {
     .form-list-group {
         margin-bottom: 0;
     }
-    & .bad-sum-feedback {
-        margin-bottom: 20px;
-    }
-
 }
 
 .sum-difference {
