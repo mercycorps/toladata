@@ -207,17 +207,15 @@ def get_reporting_dates(program):
     }
 
 
-# Decimal normalization can result in exponents being returned.  This returns a "normal" Decimal value.
+# Standard library Decimal normalization can result in exponents being returned.  This returns a "normal" Decimal value.
 def usefully_normalize_decimal(number):
-    if not number:
-        return number
     if type(number) != "Decimal":
         try:
             number = Decimal(number)
-        except InvalidOperation:
+        except (InvalidOperation, TypeError):
             return number
 
-        if int(number) == number:
-            return Decimal(int(number))
-        else:
-            return number.normalize()
+    if int(number) == number:
+        return Decimal(int(number))
+    else:
+        return number.normalize()
