@@ -31,7 +31,7 @@ class TestIPTTQSProgramSerializer(test.TestCase):
         self.assertEqual(data2['frequencies'], [3])
 
     def test_period_date_ranges(self):
-        p = RFProgramFactory(closed=False, months=12, age=4) # 4+months ago
+        p = RFProgramFactory(closed=False, months=12, age=4) # 4+months ago 
         RFIndicatorFactory(program=p, target_frequency=Indicator.LOP, targets=200)
         data = self.get_serialized_data([p.pk])[0]
         self.assertEqual(data['pk'], p.pk)
