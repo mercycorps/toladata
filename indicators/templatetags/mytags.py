@@ -178,10 +178,13 @@ def target_percent_met(context, percent_met, has_ended):
     margin = Indicator.ONSCOPE_MARGIN
     on_track = None
     formatted = None
-    if percent_met:
+    try:
+        float(percent_met)
         percent_met = percent_met * 100
         on_track = (1 - margin) * 100 <= percent_met <= (1 + margin) * 100
         formatted = formats.number_format(usefully_normalize_decimal(percent_met).quantize(decimal.Decimal("0.00")), use_l10n=True, force_grouping=True)
+    except TypeError:
+        pass
     return {
         'on_track': on_track,
         'percent_met': percent_met,
@@ -259,7 +262,7 @@ def gauge_tank(context, metric, has_filters=True):
     filter_title_count = program.metrics['needs_evidence'] if metric == 'results_evidence' else unfilled_value
     #filled_percent = make_percent(filled_value, denominator)
     filled_percent = 0 if denominator == 0 else (100 - make_percent(unfilled_value, denominator))
-    
+
     filter_active = filled_percent != 100 and (
         metric == 'targets_defined' or (
             metric == 'reported_results' and program.metrics.get('targets_defined', False)
