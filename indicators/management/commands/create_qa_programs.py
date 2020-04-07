@@ -15,7 +15,7 @@ from django.utils import timezone, translation
 from django.conf import settings
 from django.db.utils import IntegrityError
 
-from indicators.models import Indicator, Result, PeriodicTarget, Level, LevelTier, IndicatorType
+from indicators.models import Indicator, Result, PeriodicTarget, Level, LevelTier, LevelTierTemplate, IndicatorType
 from workflow.models import Program, Country, Organization, TolaUser, CountryAccess, ProgramAccess, SiteProfile, Sector
 from indicators.views.views_indicators import generate_periodic_targets
 
@@ -33,6 +33,9 @@ class Command(BaseCommand):
         parser.add_argument('--create_test_users', action='store_true')
         parser.add_argument('--names')
         parser.add_argument('--named_only', action='store_true')
+        parser.add_argument('--levelicious_only', action='store_true')
+        parser.add_argument('--children_per_node', type=int, default=3)
+        parser.add_argument('--childless_nodes', type=int, default=2)
 
     def handle(self, *args, **options):
         # ***********
@@ -142,19 +145,60 @@ class Command(BaseCommand):
              'direction': Indicator.DIRECTION_OF_CHANGE_NONE, 'null_level': None},
         ]
 
-        password = getpass(prompt="Enter the password to use for the test users: ")
+        if not options['named_only'] and not options['levelicious_only']:
+            password = getpass(prompt="Enter the password to use for the test users: ")
+
+        if options['levelicious_only']:
+            Program.objects.filter(
+                name__in=['QA Program -- Levels all the way down', 'QA Program -- Levels most of the way down']
+            ).delete()
+
+        if not options['named_only']:
+            # Program that have the max number of levels allowed, one of which has levels with no indicators assigned
+            print('Creating levelicious programs')
+            program_titles = ['QA Program -- Levels all the way down', 'QA Program -- Levels most of the way down']
+            for title in program_titles:
+                program = self.create_program(
+                    passed_start_date, passed_end_date, country, title)
+                template_names = []
+                tier_depth = LevelTier.MAX_TIERS
+                for tier_number in range(tier_depth + 1):
+                    tier_name = f"Tier {tier_number + 1}"
+                    LevelTier.objects.create(program=program, name=tier_name, tier_depth=tier_number + 1)
+                    template_names.append(tier_name)
+                LevelTierTemplate.objects.create(program=program, names=(','.join(template_names)))
+                self.generate_levels(
+                    None, program, LevelTier.MAX_TIERS + 1, children_per_node=options['children_per_node'],
+                    childless_nodes=options['childless_nodes'])
+                generated_levels = Level.objects.filter(program=program).order_by('id')
+                # if needed, select a couple of levels that that have no indicators.  They should be levels with child
+                # levels because what would be the point of creating the level then.
+                indicatorless_levels = []
+                if title == 'QA Program -- Levels most of the way down':
+                    parent_levels = list(generated_levels.values_list('parent_id', flat=True))
+                    if tier_depth-2 > 2:
+                        tier2_with_children = [
+                            level.id for level in generated_levels if level.level_depth == 2 and level.id in parent_levels]
+                        tier6_with_children = [
+                            level.id for level in generated_levels if level.level_depth == tier_depth-2 and level.id in parent_levels]
+                        indicatorless_levels = [tier2_with_children[:1][0], tier6_with_children[:1][0]]
+                    else:
+                        indicatorless_levels = [int(tier_depth/2)]
+                self.create_indicators(program.id, all_params_base, indicatorless_levels=indicatorless_levels)
+
+        if options['levelicious_only']:
+            sys.exit()
 
         # Create programs for specific people
-
         if options['names']:
             tester_names = options['names'].split(',')
         else:
-            tester_names = ['Kelly', 'Marie', 'Jenny', 'Sanjuro', 'Cameron', 'Ken']
+            tester_names = sorted(['Kelly', 'Marie', 'Jenny', 'Sanjuro', 'Cameron', 'Ken', 'Carly', 'Marco'])
 
         for t_name in tester_names:
-            program_name = 'QA Program - {}'.format(t_name)
+            program_name = 'QA program - {}'.format(t_name)
             program = self.create_program(main_start_date, main_end_date, country, program_name)
-            print('Creating Indicators for {}'.format(Program.objects.get(id=program.id)))
+            print('Creating indicators for {}'.format(Program.objects.get(id=program.id)))
             self.create_levels(program.id, filtered_levels)
             self.create_indicators(program.id, all_params_base, personal_indicator=True)
             self.create_indicators(program.id, null_supplements_params, apply_skips=False, personal_indicator=True)
@@ -206,7 +250,7 @@ class Command(BaseCommand):
 
         print('Creating program with no skips')
         program = self.create_program(
-            main_start_date, main_end_date, country, 'QA Program --- All the things! (no Skipped values)')
+            main_start_date, main_end_date, country, 'QA Program --- All the things! (no skipped values)')
         self.create_levels(program.id, filtered_levels)
         self.create_indicators(program.id, all_params_base, apply_skips=False)
 
@@ -271,7 +315,6 @@ class Command(BaseCommand):
 
         # Create test users and assign broad permissions to superusers.
         self.create_test_users(password)
-
 
     @staticmethod
     def create_program(start_date, end_date, country, name, post_satsuma=True, multi_country=False):
@@ -345,8 +388,9 @@ class Command(BaseCommand):
         return int(math.ceil((target/period_count)/10)*10)
 
     def create_indicators(
-        self, program_id, param_sets, indicator_suffix='', apply_skips=True, apply_rf_skips=False,
-        personal_indicator=False):
+            self, program_id, param_sets, indicator_suffix='', apply_skips=True, apply_rf_skips=False,
+            personal_indicator=False, indicatorless_levels=None):
+        indicatorless_levels = [] if not indicatorless_levels else indicatorless_levels
         indicator_ids = []
         program = Program.objects.get(id=program_id)
         frequency_labels = {
@@ -380,7 +424,7 @@ class Command(BaseCommand):
         old_levels.append(None)
         old_level_cycle = cycle(old_levels)
 
-        rf_levels = list(Level.objects.filter(program__id=program.id))
+        rf_levels = list(Level.objects.filter(program__id=program.id).exclude(id__in=indicatorless_levels))
         if apply_rf_skips:
             rf_levels.append(None)
         rf_level_cycle = cycle(rf_levels)
@@ -399,8 +443,6 @@ class Command(BaseCommand):
         if apply_skips:
             sites.append(None)
         site_cycle = cycle(sites)
-
-
 
         for n, params in enumerate(param_sets):
             if params['is_cumulative']:
@@ -601,7 +643,6 @@ class Command(BaseCommand):
             if tola_user.count() == 1:
                 tola_user[0].delete()
 
-
     @staticmethod
     def clean_tolaland():
         try:
@@ -716,7 +757,7 @@ class Command(BaseCommand):
     @staticmethod
     def create_test_sites():
         country = Country.objects.get(country="Tolaland")
-        for i in range(1,6):
+        for i in range(1, 6):
             SiteProfile.objects.get_or_create(
                 name="Tolaland Site {}".format(i),
                 country=country,
@@ -726,6 +767,69 @@ class Command(BaseCommand):
                     "status": i % 2
                 }
             )
+
+    def generate_levels(self, parent, program, max_depth=3, children_per_node=2, childless_nodes=1, cycle_start=1):
+        """
+        This is a recursive function that generates an RF Level hierarchy for a program.  In addition to the
+        parameters required to create a Level object, it takes parameters that control how many levels in any given
+        "generation" of levels have child levels, where generation is considered a set of levels with the same parent
+        level.  The number of levels grows exponentially:
+        2 levels per generation ** 8 tiers =  ~255 levels
+        3 levels per generation ** 8 tiers = ~6559 levels
+        To avoid overwhelming the RF, the childless_nodes parameter can be used to limit the number of levels that
+        have children in any given generation.  And to give some variety to which levels have children, a cycle
+        is used to pick the levels that do have children (e.g. the "oldest" level will be childless in one generation,
+        but the 2nd oldest will be childless in the next generation).
+
+        :param parent: level object
+        :param program: program object
+        :param max_depth: integer, depth of the level hierarchy
+        :param children_per_node: integer, how many children should each level have
+        :param childless_nodes: integer, how many levels in a generation should have children (number must be
+            less than children_per_node
+        :param cycle_start: only used in recursion
+        :return: Nothing
+        """
+        if children_per_node > childless_nodes:
+            cycle_start = cycle_start + 1 if cycle_start + 1 <= children_per_node else 1
+        else:
+            raise NotImplementedError("The value of children_per_node must be greater than childless_nodes")
+
+        if not parent:
+            top_level = Level.objects.create(
+                program=program,
+                name="Tier 1 (top level)",
+                assumptions="So many assumptions",
+                parent_id=None,
+                customsort=1,
+            )
+            self.generate_levels(
+                top_level, program, max_depth=max_depth, children_per_node=children_per_node,
+                childless_nodes=childless_nodes, cycle_start=cycle_start)
+        else:
+            new_levels = []
+            current_depth = parent.level_depth + 1
+            for i in range(children_per_node):
+                new_level = Level.objects.create(
+                    program=program,
+                    name=f"Placeholder",
+                    assumptions="So many assumptions",
+                    parent_id=parent.id,
+                    customsort=i+1,
+                )
+                new_level.name = f"Tier {current_depth} - Level {new_level.display_ontology}"
+                new_level.save()
+                new_levels.append(new_level)
+            if current_depth < max_depth:
+                # Use array slicing to rearrange the order of the nodes in such a way that childless levels
+                # will be at the back of the list.
+                nodes_with_children = new_levels[cycle_start:]
+                nodes_with_children.extend(new_levels[:cycle_start])
+                nodes_with_children = nodes_with_children[:(children_per_node - childless_nodes)]
+                for nl in nodes_with_children:
+                    self.generate_levels(
+                        nl, program, max_depth=max_depth, children_per_node=children_per_node,
+                        childless_nodes=childless_nodes, cycle_start=cycle_start)
 
     standard_countries = ['Afghanistan', 'Haiti', 'Jordan', 'Tolaland', 'United States']
     TEST_ORG, created = Organization.objects.get_or_create(name='Test')
