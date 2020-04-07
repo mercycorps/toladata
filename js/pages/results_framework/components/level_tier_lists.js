@@ -193,11 +193,11 @@ export class EditableLevelTierList extends React.Component{
                 errorMsg={errorMsg} />
         }) || null;
 
-        // At the bottom of the tier list, show the add level and apply buttons, if appropriate
+        // At the bottom of the tier list, show the add level and apply buttons, if appropriate.
         let isAddTierButtonDisabled =
             !this.props.rootStore.levelStore.tierTemplates[customKey]['tiers'].every( tierName => tierName.length > 0) ||
             this.props.rootStore.uiStore.addLevelButtonIsLocked;
-        const addTierButton = savedTiers.length > this.props.rootStore.levelStore.maxTiers ? null :
+        const addTierButton = savedTiers.length >= this.props.rootStore.levelStore.maxTiers ? null :
             <button
                 id="addLevelButton"
                 type="button"
