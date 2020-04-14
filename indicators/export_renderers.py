@@ -317,18 +317,10 @@ class ExcelRendererBase:
             top_row = current_row
             for label in disaggregation['labels']:
                 current_column = len(self.header_columns)+2
-                # BASELINE:
-                cell = sheet.cell(row=current_row, column=current_column-2)
-                cell.value = EM_DASH
-                cell.alignment = self.CENTER_ALIGN
-                # LOP TARGET:
-                celll = sheet.cell(row=current_row, column=current_column-1)
-                cell.value = EM_DASH
-                cell.alignment = self.CENTER_ALIGN
-                # LOP % MET:
-                cell = sheet.cell(row=current_row, column=current_column+1)
-                cell.value = EM_DASH
-                cell.alignment = self.CENTER_ALIGN
+                # BASELINE, LOP TARGET, LOP % MET:
+                for column in [current_column-2, current_column-1, current_column+1]:
+                    sheet.cell(row=current_row, column=column).value = EM_DASH
+                    sheet.alignment = self.CENTER_ALIGN
                 def label_value_func(cell, period, empty_blank=False):
                     alignment = None
                     value, number_format = values_func(
@@ -364,13 +356,13 @@ class ExcelRendererBase:
                         cell.alignment = self.CENTER_ALIGN
                         current_column += 1
                 current_row += 1
+            sheet.merge_cells(start_row=top_row, start_column=3, end_row=current_row-1, end_column=3)
+            cell = sheet.cell(row=top_row, column=3)
+            cell.value = disaggregation['name']
+            cell.style = self.DISAGGREGATION_CELL
             if not self.disaggregations:
                 for row in range(top_row, current_row):
                     sheet.row_dimensions[row].hidden = True
-            sheet.merge_cells(start_row=top_row, start_column=3, end_row=current_row-1, end_column=3)
-            cell = sheet.cell(row=current_row, column=3)
-            cell.value = disaggregation['name']
-            cell.style = self.DISAGGREGATION_CELL
         return current_row
 
     def set_column_widths(self, sheet):
@@ -421,9 +413,17 @@ class IPTTExcelRenderer(ExcelRendererBase):
         self.create_workbook()
         self.columns = params.get('columns', [])
         self.disaggregations = params.get('disaggregations', False)
+        has_sheets = False
         for frequency in self.serializer['frequencies']:
             self.frequency = frequency
-            sheet = self.add_sheet()
+            if self.add_sheet() is not None:
+                has_sheets = True
+        if not has_sheets:
+            self.add_blank_sheet()
+
+    def add_blank_sheet(self):
+        sheet = self.wb.create_sheet(ugettext('No data'))
+        sheet['A1'].value = "No data matched the criteria"
 
     @property
     def level_column(self):

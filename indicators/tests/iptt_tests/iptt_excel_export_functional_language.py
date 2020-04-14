@@ -148,9 +148,12 @@ class TestIPTTExcelExports(test.TestCase):
         cls.user_es = UserFactory(is_superuser=True, username="ES user", tola_user__language='es')
         cls.client = test.Client()
 
+    def setUp(self):
+        self.default_locale = locale.getlocale()
+
     def tearDown(self):
         self.client.logout()
-        locale.setlocale(locale.LC_ALL, 'en_US')
+        locale.setlocale(locale.LC_ALL, self.default_locale)
         translation.activate('en')
 
     def login_client(self, language):
@@ -248,6 +251,9 @@ class TestIPTTExcelExports(test.TestCase):
             locale.setlocale(locale.LC_ALL, 'fr_FR')
         elif language == SPANISH:
             locale.setlocale(locale.LC_ALL, 'es_ES')
+        if sheet.cell(row=1, column=3).value is None:
+            for row in sheet.rows:
+                print(" | ".join([str(cell.value) for cell in row]))
         self.assertEqual(sheet.cell(row=1, column=3).value, REPORT_TITLE[language])
         self.assertEqual(
             sheet.cell(row=2, column=3).value,
@@ -328,14 +334,13 @@ class TestIPTTExcelExports(test.TestCase):
 
     def test_tva_full_report_headers(self):
         tva_full_report = self.get_tva_report_full()
-        self.assertEqual(len(tva_full_report.worksheets), 8)
+        self.assertEqual(len(tva_full_report.worksheets), 7)
         self.assertEqual(
             tva_full_report.sheetnames,
             [
                 "Life of Program (LoP) only",
                 "Midline and endline",
                 "Annual",
-                "Semi-annual",
                 "Tri-annual",
                 "Quarterly",
                 "Monthly",
@@ -524,35 +529,6 @@ class TestIPTTExcelExports(test.TestCase):
             self.assertEqual(sheet.cell(row=11+c, column=23).value, 8 if c == 1 else 1)
         self.assertIsNone(sheet.cell(row=13, column=3).value)
         
-
-    def test_tva_semi_annual_report_headers_spanish(self):
-        default_locale = locale.getlocale()
-        locale.setlocale(locale.LC_ALL, 'es_ES')
-        tva_semi_annual_report = self.get_tva_report(frequency=Indicator.SEMI_ANNUAL, language=SPANISH)
-        self.assertEqual(len(tva_semi_annual_report.worksheets), 1)
-        sheet = tva_semi_annual_report.worksheets[0]
-        self.assert_iptt_title_cells(sheet, language=SPANISH)
-        for column, header in enumerate(COLUMNS[SPANISH]):
-            self.assertEqual(
-                sheet.cell(row=4, column=3+column).value,
-                header
-            )
-        self.assert_lop_header_cells(sheet, language=SPANISH)
-        for c in range(6):
-            start_date = datetime.date(
-                self.scenario.start_date.year + c//2,
-                1 if c % 2 == 0 else 7,
-                1
-            )
-            end_date = datetime.date(
-                self.scenario.start_date.year + (c+1)//2,
-                1 if c % 2 == 1 else 7,
-                1
-            ) - datetime.timedelta(days=1)
-            period = f"Períodos semestrales {c+1}"
-            subheader = f"{start_date.strftime('%-d %b. %Y').title()} – {end_date.strftime('%-d %b. %Y').title()}"
-            self.assert_period_tva_header_cells(sheet, period, 13+3*c, subheader=subheader, language=SPANISH)
-        locale.setlocale(locale.LC_ALL, default_locale)
 
     def test_tp_annual_report_headers(self):
         tp_annual_report = self.get_tp_report(frequency=Indicator.ANNUAL)
