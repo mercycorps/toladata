@@ -39,7 +39,7 @@ const IndicatorEditModalCell = inject('rootStore')(
                 });
         }
         return (
-            <td className="indicator-edit-modal-cell">
+            <td className="indicator-edit-modal-cell ">
                 <button type="button" className="btn btn-link p-1 float-right"
                         onClick={ loadModal }>
                     <i className="fas fa-cog"></i>
@@ -57,43 +57,56 @@ const IndicatorResultModalCell = inject("rootStore")(
             rootStore.loadResultsModal(indicator.pk);
         }
         return (
-            <td className="indicator-result-modal-cell">
+            <td className="indicator-result-modal-cell ">
                 <button type="button" className="btn btn-link p-1 indicator-ajax-popup indicator-data"
                         onClick={ loadModal }>
                     <i className="fas fa-table"></i>
                 </button>
-                { indicator.name }
             </td>
         )
     })
 );
 
 const IndicatorCell = ({ value, resultCell, ...props }) => {
-    const displayValue = (value || value === 0) ? value : BLANK_TABLE_CELL;
+    const displayValue = (value || value === 0) ? value : <span className="empty-value">{BLANK_TABLE_CELL}</span>;
     if (resultCell && resultCell === true) {
         return <td className="indicator-cell result-cell" { ...props }>{ displayValue }</td>;
     }
     return (
-        <td className="indicator-cell" { ...props }>{ displayValue }</td>
+        <td className="indicator-cell " { ...props }>{ displayValue }</td>
     );
 }
 
 const ExpandoCell = observer(({ value, expanded, clickHandler, ...props }) => {
-    const displayValue = (value || value === 0) ? value : BLANK_TABLE_CELL;
+    const displayValue = (value || value === 0) ? value : <span className="empty-value">{BLANK_TABLE_CELL}</span>;
     return (
-        <td className="expando-cell" { ...props } onClick={ clickHandler }>
+        <td className="expando-cell " { ...props } onClick={ clickHandler }>
             <FontAwesomeIcon icon={expanded ? 'caret-down' : 'caret-right'} />&nbsp;
             { displayValue }
         </td>
     );
 })
 
+const IndicatorNameExpandoCell = observer(({ value, expanded, clickHandler, ...props }) => {
+    const displayValue = (value || value === 0) ? value : BLANK_TABLE_CELL;
+    return (
+        <td className="indicator-cell expando-cell " { ...props } onClick={ clickHandler }>
+            { displayValue }
+        </td>
+    );
+})
+
+
+const localizeFunc = window.localizeNumber;
+
+
 const PercentCell = ({ value, ...props }) => {
-    value = (value !== undefined && value !== null) ? `${value}%` : null;
+    value = (value !== undefined && value !== null) ? `${localizeFunc(value)}%` : null;
     return <IndicatorCell className="indicator-cell percent-cell" value={ value } { ...props } />;
 }
 
 const NumberCell = ({ value, ...props }) => {
+    value = (value !== undefined && value !== null) ? localizeFunc(value) : null;
     return <IndicatorCell className="indicator-cell number-cell" value={ value } { ...props } />;
 }
 
@@ -127,29 +140,42 @@ const DisaggregationTable = inject('rootStore')(
         if (indicator.isPercent) {
             ValueCell = PercentCell;
         }
+        let labels = rootStore.hiddenCategories ? disaggregation.labels.filter(label => rootStore.disaggregatedLop(indicator.pk, label.pk)) : disaggregation.labels;
+        if (!labels) {
+            return <React.Fragment></React.Fragment>;
+        }
         return (
             <React.Fragment>
                 {
-                    disaggregation.labels.map(
+                    labels.map(
                         (label, idx) => (
-                            <tr key={idx}>
+                            <tr
+                                className={ (idx == labels.length - 1) ?
+                                    "disaggregation-end-row" :
+                                    ""
+                                }
+                                key={idx}>
                                 {idx == 0 &&
-                                <td className="disaggregation-name-cell" rowSpan={disaggregation.labels.length}>
+                                <td className="disaggregation-name-cell"
+                                    colSpan={ 2 }
+                                    rowSpan={labels.length}>
                                     {disaggregation.name}</td>
                                 }
-                                <td colSpan={rootStore.baseColumns - 2} className="disaggregation-label-cell">{label.name}</td>
-                                <td className="disaggregation-value-cell" >—</td>
-                                <td className="disaggregation-value-cell" >—</td>
-                                <ValueCell className="disaggregation-value-cell" value={ ipttRound(rootStore.disaggregatedLop(indicator.pk, label.pk), false) } />
-                                <td className="disaggregation-value-cell" >—</td>
+                                <td colSpan={ rootStore.hasBaselineColumn ? rootStore.baseColumns - 2 : rootStore.baseColumns - 1 } className="disaggregation-label-cell">{ label.name }</td>
+                                { rootStore.hasBaselineColumn &&
+                                    <td className="disaggregation-value-cell base-column empty-value">—</td>
+                                }
+                                <td className="disaggregation-value-cell lop-column empty-value">—</td>
+                                <ValueCell className="disaggregation-value-cell lop-column" value={ ipttRound(rootStore.disaggregatedLop(indicator.pk, label.pk), false) } />
+                                <td className="disaggregation-value-cell lop-column empty-value">—</td>
                                 {
                                     rootStore.disaggregatedPeriodValues(indicator.pk, label.pk).map(
                                         (periodValue, idx) => {
                                             return rootStore.isTVA ?
-                                                <React.Fragment>
-                                                    <td></td>
+                                                <React.Fragment key={idx}>
+                                                    <td className="disaggregation-value-cell empty-value">—</td>
                                                     <ValueCell key={idx} value={ periodValue.actual } />
-                                                    <td></td>
+                                                    <td className="disaggregation-value-cell empty-value">—</td>
                                                 </React.Fragment> :
                                                 <ValueCell key={idx} value={ periodValue } />
                                         })
@@ -172,7 +198,14 @@ class IndicatorRow extends React.Component {
         this.state = {
             expanded: false
         };
+    }
+
+    componentDidMount() {
         this.props.rootStore._expandoRows.push(this);
+    }
+
+    componentWillUnmount() {
+        this.props.rootStore._expandoRows = this.props.rootStore._expandoRows.filter(row => row != this);
     }
 
     handleExpandoClick = (e) => {
@@ -210,23 +243,27 @@ class IndicatorRow extends React.Component {
         return (
             <React.Fragment>
                 <tr>
-                    {indicator.hasDisaggregations(rootStore.activeDisaggregationPks) ?
+                    {rootStore.indicatorHasActiveDisaggregations(indicator) ?
                     <ExpandoCell value={ displayNumber } expanded={ this.state.expanded } clickHandler={ this.handleExpandoClick } /> :
-                    <IndicatorCell className="indicator-cell display-number" value={ displayNumber } />
+                    <IndicatorCell className="indicator-cell " value={ displayNumber } />
                     }
                     <IndicatorResultModalCell indicator={ indicator } />
+                    {rootStore.indicatorHasActiveDisaggregations(indicator) ?
+                    <IndicatorNameExpandoCell value={ indicator.name } expanded={ this.state.expanded } clickHandler={ this.handleExpandoClick } /> :
+                    <IndicatorCell className="indicator-cell " value={ indicator.name } />
+                    }
                     <IndicatorEditModalCell indicator={ indicator } />
-                    { !rootStore.resultsFramework && <IndicatorCell className="indicator-cell old-level-display" value={ indicator.oldLevelDisplay } /> }
-                    { rootStore.hasUOMColumn && <IndicatorCell className="indicator-cell unit-of-measure-column" value={ indicator.unitOfMeasure } /> }
-                    { rootStore.hasChangeColumn && <IndicatorCell className="indicator-cell has-change-column" value={ indicator.directionOfChange || gettext('N/A') } /> }
-                    { rootStore.hasCNCColumn && <IndicatorCell className="indicator-cell has-cnc-column" value={ cumulative || gettext('N/A') } /> }
-                    { rootStore.hasUOMTypeColumn && <IndicatorCell className="indicator-cell is-percent-column" value={ indicator.isPercent ? '%' : '#' } /> }
-                    { rootStore.hasBaselineColumn && (indicator.baseline === null ? <IndicatorCell className="indicator-cell baseline-column" value={ gettext('N/A') } /> : <ValueCell value={ indicator.baseline } /> ) }
+                    { !rootStore.resultsFramework && <IndicatorCell className="indicator-cell " value={ indicator.oldLevelDisplay } /> }
+                    { rootStore.hasUOMColumn && <IndicatorCell className="indicator-cell " value={ indicator.unitOfMeasure } /> }
+                    { rootStore.hasChangeColumn && <IndicatorCell className="indicator-cell " value={ indicator.directionOfChange || gettext('N/A') } /> }
+                    { rootStore.hasCNCColumn && <IndicatorCell className="indicator-cell " value={ cumulative || gettext('N/A') } /> }
+                    { rootStore.hasUOMTypeColumn && <IndicatorCell className="indicator-cell is-percent-column " value={ indicator.isPercent ? '%' : '#' } /> }
+                    { rootStore.hasBaselineColumn && (indicator.baseline === null ? <IndicatorCell className="indicator-cell baseline-column" value={ gettext('N/A') } /> : <ValueCell value={ indicator.baseline } className="lop-column" /> ) }
                     { reportData && (
                     <React.Fragment>
-                    <ValueCell value={ reportData.lopTarget } />
-                    <ValueCell value={ reportData.lopActual } />
-                    <PercentCell value={ reportData.lopMet } />
+                    <ValueCell value={ reportData.lopTarget } className="lop-column " />
+                    <ValueCell value={ reportData.lopActual } className="lop-column" />
+                    <PercentCell value={ reportData.lopMet } className="lop-column" />
                     {reportData.periodValues &&
                         (rootStore.periodValues(indicator.pk).map(
                             (value, index) => <PeriodCell value={ value } key={ index } resultCell={ true }/>
@@ -237,16 +274,10 @@ class IndicatorRow extends React.Component {
                 </tr>
                 { this.state.expanded &&
                     <React.Fragment>
-                    <tr className="expando-table-row-spacer">
-                        <td colSpan={ rootStore.reportColumnWidth }></td>
-                    </tr>
                     { rootStore.activeDisaggregationPks.filter(pk => indicator.hasDisaggregation(pk))
                         .map(pk => (
                             <React.Fragment key={ pk }>
                                 <DisaggregationTable indicator={ indicator } disaggregationPk={ pk } />
-                                <tr className="expando-table-row-spacer">
-                                    <td colSpan={ rootStore.reportColumnWidth }></td>
-                                </tr>
                             </React.Fragment>
                         ))
                     }
@@ -261,11 +292,10 @@ const LevelTitleRow = inject('rootStore')(
     observer(({ rootStore, children }) => {
         return (
             <tr>
-            <td colSpan={ rootStore.reportColumnWidth }
-                className="iptt-level-row"
-            >
-               { children }
-            </td>
+                <td colSpan={ rootStore.reportColumnWidth + 1 }
+                    className="iptt-level-row">
+                   { children }
+                </td>
             </tr>
         )
     })

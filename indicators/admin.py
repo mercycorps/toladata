@@ -55,7 +55,9 @@ class ArchivedFilter(BooleanListFilterWithDefault):
 
     def lookups(self, request, model_admin):
         return (
+            # Translators:  This is a filter option that allows users to limit results based on status of archived or not-archived
             (0, _('Active (not archived)')),
+            # Translators:  This is a filter option that allows users to limit results based on status of archived or not-archived
             (1, _('Inactive (archived)'))
         )
 
@@ -147,7 +149,9 @@ class DisaggregationCategoryAdmin(SortableInlineAdminMixin, admin.StackedInline)
     model = DisaggregationLabel
     min_num = 2
     extra = 0
+    # Translators:  This is label text for an individual category in a listing of disaggregation categories
     verbose_name = _('Category')
+    # Translators:  This is label text for a listing of disaggregation categories
     verbose_name_plural = _('Categories')
     fieldsets = (
         (None, {'fields': ('customsort', ('label', 'indicator_count')),

@@ -234,8 +234,8 @@ def programs_rollup_export_csv(request):
     # TODO: after LevelUp please remove unicode calls:
     CSV_HEADERS = [
         'program_name', 'gait_id', 'countries', 'sectors', 'status', 'funding_status', 'start_date', 'end_date',
-        'program_period', 'indicator_count', 'indicators_reporting_above_target', 'indicators_reporting_on_target', 
-        'indicators_reporting_below_target', 'indicators_with_targets',
+        'tola_creation_date', 'program_period', 'indicator_count', 'indicators_reporting_above_target',
+        'indicators_reporting_on_target', 'indicators_reporting_below_target', 'indicators_with_targets',
         'indicators_with_results', 'results_count', 'results_with_evidence'
     ]
     response = HttpResponse(content_type='text/csv')
@@ -256,6 +256,7 @@ def programs_rollup_export_csv(request):
             program.funding_status,
             program.reporting_period_start.isoformat() if program.reporting_period_start else '',
             program.reporting_period_end.isoformat() if program.reporting_period_end else '',
+            program.create_date.date().isoformat() if program.create_date else '',
             '{}%'.format(program.percent_complete) if program.percent_complete >= 0 else '',
             program.metrics['indicator_count'],
             program.scope_counts['high'],
@@ -266,7 +267,7 @@ def programs_rollup_export_csv(request):
             program.metrics['results_count'],
             program.metrics['results_evidence']
         ]
-        row = [unicode(s).encode("utf-8") for s in row]
+        row = [str(s) for s in row]
         writer.writerow(row)
     return response
         

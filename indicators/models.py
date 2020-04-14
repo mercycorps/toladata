@@ -29,6 +29,7 @@ from safedelete.models import SafeDeleteModel
 from safedelete.managers import SafeDeleteManager
 from safedelete.queryset import SafeDeleteQueryset
 from django_mysql.models import ListCharField
+from tola.util import usefully_normalize_decimal
 
 from workflow.models import (
     Program, Sector, SiteProfile, Country, TolaUser
@@ -465,7 +466,22 @@ class DisaggregationIndicatorFormManager(models.Manager):
         )
         return qs
 
+
 class DisaggregationType(models.Model):
+    """
+    #####!!!!!!!!!!! IMPORTANT!!    !!!!!!!!!!!#####
+    The GLOBAL_DISAGGREGATION_LABELS constant was created to ensure that a translated string appears
+    in the PO file.  It won't appear through the normal translation machinery because
+    the global disagg types are stored in the DB rather than the code.  When adding
+    a global disaggregation type you will need to add the marked string to this list.
+
+    If you update these templates, make sure you update the globalDisaggregationTypes constant in
+    js/extra_translations.js.
+    """
+    GLOBAL_DISAGGREGATION_LABELS = [
+        _("Sex and Age Disaggregated Data (SADD)")
+    ]
+
     """Business logic name: Disaggregation - e.g. `Gender` or `SADD`"""
     disaggregation_type = models.CharField(_("Disaggregation"), max_length=135)
     country = models.ForeignKey(Country, on_delete=models.CASCADE, null=True, blank=True, verbose_name="Country")
@@ -477,8 +493,18 @@ class DisaggregationType(models.Model):
     objects = models.Manager()
     form_objects = DisaggregationIndicatorFormManager()
 
+    class Meta:
+        unique_together = ['disaggregation_type', 'country']
+
     def __str__(self):
         return self.disaggregation_type
+
+    def save(self, *args, **kwargs):
+        if self.create_date is None:
+            self.create_date = timezone.now()
+        self.edit_date = timezone.now()
+
+        super(DisaggregationType, self).save(*args, **kwargs)
 
     @classmethod
     def program_disaggregations(cls, program_pk, countries=None, indicator_pk=None):
@@ -523,6 +549,36 @@ class DisaggregationType(models.Model):
     def labels(self):
         return self.disaggregationlabel_set.all().order_by('customsort')
 
+    @property
+    def logged_fields(self):
+        """
+        If you change the composition of this property you may also want to update the logged_field_order property.
+        """
+        return {
+            "disaggregation_type": self.disaggregation_type,
+            "is_archived": self.is_archived,
+            "labels": {
+                l.id: {
+                    "id": l.id,
+                    "label": l.label,
+                    "custom_sort": l.customsort,
+                }
+                for l in self.disaggregationlabel_set.all()
+            },
+        }
+
+    @staticmethod
+    def logged_field_order():
+        """
+        This list determines the order in which result fields will be displayed in the change log.  Because it
+        represents all fields that have ever been used in the Result form change log, it should never be
+        shrunk, only expanded or reordered.  Adding another property was the path of least resistance for enabling
+        front end ordering of the fields.  An ordered dict doesn't work because it loses order in JS and changing
+        the logged fields to an ordered type would require a similar change in all models that use the same logging
+        mechanism to track history.
+        """
+        return ['type', 'is_archived', 'labels',]
+
 
 class DisaggregationLabel(models.Model):
     """Business logic name: Category - e.g. `Male` or `Females aged 16-24`"""
@@ -535,6 +591,14 @@ class DisaggregationLabel(models.Model):
 
     class Meta:
         ordering = ['customsort']
+        unique_together = ['disaggregation_type', 'label']
+
+    def save(self, *args, **kwargs):
+        if self.create_date is None:
+            self.create_date = timezone.now()
+        self.edit_date = timezone.now()
+
+        super(DisaggregationLabel, self).save(*args, **kwargs)
 
     def __str__(self):
         return self.label
@@ -1339,13 +1403,16 @@ class Indicator(SafeDeleteModel):
         """
         return [
             'name', 'level', 'unit_of_measure', 'unit_of_measure_type', 'baseline_value',
-            'direction_of_change', 'baseline_na', 'targets', 'lop_target', 'is_cumulative'
+            'baseline_na', 'direction_of_change', 'targets', 'lop_target', 'is_cumulative'
         ]
 
     @property
     def get_target_frequency_label(self):
         if self.target_frequency:
-            return Indicator.TARGET_FREQUENCIES[self.target_frequency-1][1]
+            #  Need to lowercase the first letter to allow for word rearrangements due to translations.
+            label = Indicator.TARGET_FREQUENCIES[self.target_frequency-1][1]
+            label = label[0].lower() + label[1:]
+            return label
         return None
 
     @property
@@ -1961,7 +2028,7 @@ class Result(models.Model):
         """
         return {
             "id": self.id,
-            "value": self.achieved,
+            "value": usefully_normalize_decimal(self.achieved),
             "date": self.date_collected,
             "target": self.periodic_target.period_name if self.periodic_target else 'N/A',
             "evidence_name": self.record_name,
@@ -1970,7 +2037,7 @@ class Result(models.Model):
             "disaggregation_values": {
                 dv.category.pk: {
                     "id": dv.category.pk,
-                    "value": dv.value,
+                    "value": usefully_normalize_decimal(dv.value),
                     "name": dv.category.name,
                     "custom_sort": dv.category.customsort,
                     "type": dv.category.disaggregation_type.disaggregation_type,

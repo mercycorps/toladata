@@ -3,51 +3,72 @@ import { observer } from "mobx-react"
 import Pagination from '../../../components/pagination'
 import {FontAwesomeIcon} from "@fortawesome/react-fontawesome"
 import { toJS } from "mobx"
+import classNames from "classnames";
 
 import LoadingSpinner from '../../../components/loading-spinner'
 
+const emptyValue = "—";
+
 export const DisaggregationDiffs = ({disagg_type, disagg_diffs}) => {
     disagg_diffs.sort( (a, b) => a.custom_sort - b.custom_sort);
-    return <div><p className="disagg-type__title">{disagg_type}</p>
+    return <div><h4 className="disagg-type__title text-small">{gettext(disagg_type)}</h4>
         {disagg_diffs.map( diff => {
-            return <div className="change__field" key={diff.id}><strong>{diff.name}:</strong> {diff.value}</div>
+            const displayValue = ["", null, undefined].includes(diff.value)
+                ? emptyValue
+                : localizeNumber(normalizeNumber(diff.value));
+            const displayClasses = classNames("change__field__value", {"empty-value": displayValue===emptyValue});
+            return <div className="change__field" key={diff.id}><span className="change__field__name">{diff.name}:</span> <span className={displayClasses}>{displayValue}</span></div>
         })}
     </div>
 };
 
 export const ResultChangeset = ({data, name, pretty_name}) => {
+    let displayValue = "";
+    if (["", null, undefined].includes(data)) {
+        displayValue = emptyValue;
+    }
+    else if (isNaN(data)) {
+        displayValue = data;
+    }
+    else {
+        displayValue = localizeNumber(data);
+    }
     if (name === 'id') {
         return null
     } else if(name === 'Target_url') {
-        return <div className="change__field"><strong>{pretty_name}</strong>: {(data !== 'N/A' && data !== '')?<a href={data} target="_blank">Link</a>:data}</div>
+        return <div className="change__field"><strong className="change__field__name">{pretty_name}</strong>: {(data !== 'N/A' && data !== '')?<a href={displayValue} target="_blank">Link</a>:data}</div>
     } else if (name === 'disaggregation_values') {
         if (Object.entries(data).length) {
             let groupedDiffs = {};
             Object.values(data).forEach( entry => {
+                const groupKey = entry.type || "__none__";
                 if (entry.type in groupedDiffs) {
-                    groupedDiffs[entry.type].push(entry);
+                    groupedDiffs[groupKey].push(entry);
                 }
                 else {
-                    groupedDiffs[entry.type] = [entry];
+                    groupedDiffs[groupKey] = [entry];
                 }
             });
 
             return <div className="changelog__change__targets">
-                <h4 className="text-small">{gettext('Disaggregated values')}</h4>
                 {Object.keys(groupedDiffs).sort().map( (typeName ) => {
-                    return  <DisaggregationDiffs key={typeName+'_diff'} disagg_type={typeName ? typeName : null } disagg_diffs={groupedDiffs[typeName]} />
+                    return  <DisaggregationDiffs
+                        key={typeName+'_diff'}
+                        disagg_type={typeName === "__none__" ? "" : typeName } disagg_diffs={groupedDiffs[typeName]} />
                 })}
             </div>
         } else {
             return null;
         }
     } else {
-        return <div className="change__field"><strong>{pretty_name}</strong>: {data}</div>
+        const displayClasses = classNames("change__field__value", {"empty-value": displayValue===emptyValue});
+        return <div className="change__field"><strong className="change__field__name">{pretty_name}</strong>: <span className={displayClasses}>{displayValue}</span></div>
     }
 };
 
 const ProgramDatesChangeset = ({data, name, pretty_name}) => {
-    return <p>{pretty_name}: {data}</p>
+    const displayValue = ["", null].includes(data)  ? "–" : data;
+    return <p>{pretty_name}: {displayValue}</p>
 }
 
 const IndicatorChangeset = ({data, name, pretty_name, indicator}) => {
@@ -55,24 +76,39 @@ const IndicatorChangeset = ({data, name, pretty_name, indicator}) => {
         return <div className="changelog__change__targets">
             <h4 className="text-small">{gettext('Targets changed')}</h4>
             {Object.entries(data).map(([id, target]) => {
-                return <div className="change__field" key={id}><strong>{target.name}:</strong> {target.value}</div>
+                const displayValue = ["", null, undefined].includes(target.value) ? emptyValue : localizeNumber(target.value);
+                const displayClasses = classNames({"empty-value": displayValue===emptyValue});
+                return <div className="change__field" key={id}><strong className="change__field__name">{target.name}:</strong> <span className={displayClasses}>{displayValue}</span></div>
             })}
         </div>
     } else {
+        let displayValue = "";
+        if (["", null, undefined].includes(data)) {
+            displayValue = emptyValue;
+        }
+        else if (isNaN(data)) {
+            displayValue = data;
+        }
+        else {
+            displayValue = localizeNumber(data);
+        }
+        const displayClasses = classNames({"empty-value": displayValue===emptyValue});
         return <div className="change__field">
-            <strong>
+            <strong className="change__field__name">
                 { name === 'name' ?
-                    <span>{gettext('Indicator')} {indicator.results_aware_number}: </span> : <span>{pretty_name}:</span>}
+                    <span>{gettext('Indicator')} {indicator.results_aware_number}: </span> : <span>{pretty_name}: </span>}
             </strong>
-            {(data !== null && data !== undefined)?data.toString() : ""}
+            <span className={displayClasses}>{displayValue}</span>
         </div>
     }
 }
 
 const ResultLevelChangeset = ({data, name, pretty_name, level}) => {
+    const displayValue = ["", null, undefined].includes(data) ? emptyValue : data.toString();
+    const displayClasses = displayValue === emptyValue ? "empty-value" : null;
     return <div className="change__field">
-        { name !== 'name' ? <strong>{pretty_name}: </strong>  : <strong>{level.tier}{level.display_ontology}: </strong> }
-        {(data !== null && data !== undefined)?data.toString():gettext('N/A')}
+        { name !== 'name' ? <strong className="change__field__name">{pretty_name}: </strong>  : <strong><span className="field__level-tier">{level.tier} {level.display_ontology}: </span></strong> }
+        <span className={displayClasses}>{displayValue}</span>
     </div>
 }
 
@@ -100,7 +136,7 @@ class ChangesetEntry extends React.Component {
     }
 
     render() {
-        const {data, type, name, pretty_name, indicator, level} = this.props
+        const {data, type, name, pretty_name, indicator, level} = this.props;
         return this.renderType(type, data, name, pretty_name, indicator, level)
     }
 }
@@ -206,9 +242,12 @@ export const IndexView = observer(
                         {store.log_rows.map(data => {
                                 let is_expanded = store.expando_rows.has(data.id);
                                 return <tbody key={data.id}>
-                                <tr className={is_expanded ? 'changelog__entry__header is-expanded' : 'changelog__entry__header'} onClick={() => store.toggleRowExpando(data.id)}>
+                                <tr
+                                    className={is_expanded ? 'changelog__entry__header is-expanded' : 'changelog__entry__header'}
+                                    onClick={() => store.toggleRowExpando(data.id)}>
                                     <td className="text-action">
-                                        <FontAwesomeIcon icon={is_expanded ? 'caret-down' : 'caret-right'} />&nbsp;{data.date}
+                                        <FontAwesomeIcon icon={is_expanded ? 'caret-down' : 'caret-right'} />
+                                        &nbsp;{data.date} (UTC)
                                     </td>
                                     <td><ResultLevel indicator={data.indicator} level={data.level} /></td>
                                     <td>{<IndicatorNameSpan indicator={data.indicator} />}</td>

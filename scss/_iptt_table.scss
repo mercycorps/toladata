@@ -3,19 +3,14 @@
 
 #iptt_table {
     background-color: white;
-    &, & thead tr td {
-        border: 0px !important;
+    thead {
+        th, td {
+            background-color:$gray-150 !important;
+        }
     }
-    tr th {
-        background-color:$gray-150 !important;
+    tbody {
+        border-bottom: 1px solid $table-border-color;
     }
-    // tbody{
-    //background-color:#ffffff !important;
-    //}
-}
-#id_td_iptt_program_name {
-    padding-left: 0; // overloads .table-sm td
-    padding-right: 0; // overloads .table-sm td
 }
 body.page_iptt_table { // body element for extra specificity
     margin-bottom: 0;
@@ -47,10 +42,41 @@ body.page_iptt_table { // body element for extra specificity
 #id_div_top_iptt_report {
     color: $gray-700; // why is this not #54585A ?
 }
-
-.title-row {
+.empty-value {
+    // for cells with no value
+    color: $gray-300;
+}
+tr.title-row {
     background-color: $gray-150;
 }
+.iptt-period-header {
+    text-align: center;
+    vertical-align: bottom !important;
+    white-space: nowrap;
+}
+.iptt-period-subheader {
+    text-align: right;
+    vertical-align: bottom;
+}
+// logical columns, applied to colgroup > col
+.iptt-base-columns {
+    border-left: 1px solid $table-border-color;
+    border-right: 1px solid $table-border-color;
+}
+.iptt-lop-columns {
+    background-color: transparentize($gray-400, 0.8);
+    border-right: 1px solid $table-border-color;
+    text-align: right;
+}
+.iptt-period-columns {
+    border-right: 1px solid $table-border-color;
+}
+.lop-column {
+    // columns that summarize LOP data
+    @extend %right-aligned-cell;
+}
+tr.program-name { }
+tr.action-buttons { }
 
 .table__iptt .row__level {
     font-weight: bold;
@@ -95,10 +121,15 @@ tr.expando-table-row-spacer {
         padding: 0px;
     }
 }
-
+tr.disaggregation-end-row {
+    border-bottom: 3px solid $table-border-color;
+}
 td.disaggregation-name-cell {
+    background: $white !important;
     width: 142px; // TODO: hardcoded!
     font-weight: bold;
+    border-right: 1px solid $table-border-color;
+    border-bottom: 3px solid $table-border-color;
 }
 
 td.disaggregation-label-cell {
@@ -108,28 +139,20 @@ td.disaggregation-label-cell {
 }
 
 td.disaggregation-value-cell {
-    background: $gray-150;
     width: 110px; // TODO: hardcoded!
     text-align: right;
     border-right: 0px;
     border-left: 0px;
-}
-%borderless-cell {
-    border-left: none;
-    border-right: none;
 }
 %right-aligned-cell {
     text-align: right;
 }
 // note specificity on following selectors, clobbers td/th specificity from BS
 td.indicator-edit-modal-cell {
-    @extend %borderless-cell;
 }
 td.indicator-result-modal-cell {
-    @extend %borderless-cell;
 }
 td.indicator-cell {
-    @extend %borderless-cell;
 }
 .result-cell {
     @extend %right-aligned-cell;
@@ -139,14 +162,6 @@ td.indicator-cell {
 }
 .percent-cell {
     @extend %right-aligned-cell;
-}
-.old-level-display {
-}
-.unit-of-measure-column {
-}
-.has-change-column {
-}
-.has-cnc-column {
 }
 .is-percent-column {
     @extend %right-aligned-cell;

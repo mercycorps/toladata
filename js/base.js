@@ -444,6 +444,7 @@ const create_changeset_notice = ({
     }
 }
 
+// Consider using the create_unified_changeset_notice instead of this one
 window.create_destructive_changeset_notice = ({
     message_text = DEFAULT_DESTRUCTIVE_MESSAGE,
     on_submit = () => {},
@@ -492,6 +493,7 @@ window.create_destructive_changeset_notice = ({
     })
 }
 
+// Consider using the create_unified_changeset_notice instead of this one
 window.create_nondestructive_changeset_notice = ({
     message_text = DEFAULT_NONDESTRUCTIVE_MESSAGE,
     on_submit = () => {},
@@ -534,6 +536,7 @@ window.create_nondestructive_changeset_notice = ({
     })
 }
 
+// Consider using the create_unified_changeset_notice instead of this one
 window.create_no_rationale_changeset_notice = ({
     message_text = DEFAULT_NO_RATIONALE_TEXT,
     on_submit = () => {},
@@ -587,6 +590,95 @@ window.create_no_rationale_changeset_notice = ({
         });
 }
 
+/*
+Consider using this notification function rather than the more specific ones above.  It should be able to
+everything they can do. The configurable parameters are for the 4 sections of the notification and
+for other visual and functional elements.
+
+- You can provide a header, leave it to default text, or override with a Warning icon and text.
+- The preamble can be specified, left to a default, or omitted by using the no_preamble parameter.
+- The message can be specified or left to a default.
+- Defaults to not including a rationale text box.
+
+ */
+window.create_unified_changeset_notice = ({
+    include_warning = false,
+    header = gettext("Reason for change"),
+    preamble = false,
+    no_preamble = false,
+    on_submit = () => {},
+    on_cancel = () => {},
+    message_text = DEFAULT_DESTRUCTIVE_MESSAGE,
+    include_rationale = false,
+    showCloser = false,
+    // # Translators: Button to approve a form
+    confirm_text = gettext('Ok'),
+    // # Translators: Button to cancel a form submission
+    cancel_text = gettext('Cancel'),
+    context = null,
+    notice_type = 'error',
+    blocking = true,
+} = {}) => {
+    let header_section = '';
+    if (include_warning){
+        header_section = `<div class="row">
+            <div class="col">
+                <h2 class="pnotify--header"><i class="fas fa-exclamation-triangle"></i>${gettext("Warning")}</h2>
+            </div>
+        </div>`
+    }
+    else {
+        header_section = `<div class="row">
+            <div class="col">
+                <h2>${header}</h2>
+            </div>
+        </div>`
+    }
+    if (!preamble) { preamble = (no_preamble)?'' : gettext("This action cannot be undone.") }
+    const preamble_section = !preamble ? '' :
+        `<div class="row">
+            <div class="col">
+                <span class='text-danger'>
+                    ${preamble}
+                </span>
+            </div>
+        </div>`;
+    const message_section =
+        `<div class="row mt-1">
+            <div class="col">
+                <span>
+                    ${message_text}
+                </span>
+            </div>
+        </div>`;
+    const rationale_section = ! include_rationale ? '' :
+        `<div class="row">
+            <div class="col">
+                <div class="form-group">
+                    <textarea class="form-control" name="rationale"></textarea>
+                </div>
+            </div>
+        </div>`;
+
+    const inner = `
+        ${header_section}
+        ${preamble_section}
+        ${message_section}
+        ${rationale_section}
+    `;
+    return create_changeset_notice({
+        message_text: message_text,
+        on_submit: on_submit,
+        on_cancel: on_cancel,
+        confirm_text: confirm_text,
+        cancel_text: cancel_text,
+        type: notice_type,
+        inner: inner,
+        context: context,
+        showCloser: showCloser,
+        blocking: blocking,
+    })
+}
 
 const createPnotifyAlert = (passedInConfig) => {
     let config = {
@@ -656,66 +748,192 @@ function scrollToBottom($el) {
 window.scrollToBottom = scrollToBottom;
 
 
-/**
- * Take a number, with a maximum number of decimal places, process it and return the actual value
- *  - check for nulls/blanks/non-numerics and return false
- *  - process input using internationalized guidelines (, for decimal for french/spanish)
- *  - round to specified number of decimals
- */
-function getNumberLocalizer({
-    decimalPlaces = 0,
-    display = false,
-    } = {}) {
-    return (val) => {
-        if (val === '' || val === null) {
-            return display ? '' : false;
-        }
-        let stVal = `${val}`
-        if (['fr', 'es'].includes(userLang) && stVal.includes(',')) {
-            stVal = stVal.replace(',', '.');
-        }
-        if (isNaN(parseFloat(stVal)) || !$.isNumeric(stVal)) {
-            return display ? '' : false;
-        }
-        let flVal = Math.round(parseFloat(stVal) * Math.pow(10, decimalPlaces)) / Math.pow(10, decimalPlaces);
-        if (!display) {
-            return flVal;
-        }
-        flVal = `${flVal}`;
-        if (['fr', 'es'].includes(userLang) && `${flVal}`.includes('.')) {
-            flVal = flVal.replace('.', ',')
-        }
-        return flVal;
-    }
-}
-window.getNumberLocalizer = getNumberLocalizer;
+const CONTROL_CHARACTER_KEYCODES = [
+    8, //backspace
+    9, //tab
+    13, //enter
+    27, //escape
+    35, //end,
+    36, //home
+    37, //arrow left
+    39, //arrow right
+    46, //delete
+]
+
+const SPANISH = 'es';
+const FRENCH = 'fr';
+const ENGLISH = 'en';
+
+/***********
+ * LOCALE-AWARE FORM INPUT FUNCTIONS:
+ *  these functions are for _inputs_ (and divs/spans being used to show user input)
+ *  they do not account for thousands separators, and merely convert back and forth between ',' and '.' floating-point separators
+ **********/
 
 /**
- * on key down validates a field to be numeric in the current language
- * (if French/Spanish, allows numbers and "," otherwise numbers and ".")
- * usage $('.input').keydown(window.numberInputValidator)
+ * takes a selector string, (i.e. '#id_achieved') returns an input that is validated based on
+ * universal rules (2 decimal places, comma or period as floating-point separator, no negative signs)
+ * e.g.```
+ *      let $myInput = window.getValidatedNumericInput('#my_input_id');
+ * ```
+ * returns the input selected by $('#my_input_id') but with rules preventing non-numeric input, and with an auto-updating
+ * display value (strips trailing zeros, converts floating point to locale-aware display of a number)
  */
-function numberInputValidator(e) {
-    // Allow backspace, delete, tab, escape, and enter
-    if ($.inArray(e.keyCode, [46, 8, 9, 27, 13, 110]) !== -1 ||
-        // allow: Ctrl+A select all)
-        (e.keyCode == 65 && e.ctrlKey === true) ||
-        // allow home, end, left, right
-        (e.keyCode >= 35 && e.keyCode <= 39) //||
-        // allow negative sign
-       //($.inArray(e.keyCode, [109, 189, 173]) !== -1)
-       ) {
-        // don't do anything (allow key to be used as normal)
+function getValidatedNumericInput(selector) {
+    let $input = $(selector);
+    const floatingPointSeparator = [FRENCH, SPANISH].includes(userLang) ? 188 : 190;
+    function preventNonNumericInput(e) {
+        // allow cursor control characters:
+        if (CONTROL_CHARACTER_KEYCODES.includes(e.keyCode) ||
+            // allow: Ctrl characters (don't break browsers):
+            (e.ctrlKey === true || e.metaKey === true)
+           ) {
+            // don't do anything (allow key to be used as normal)
+            return;
+        }
+        // if decimal point/comma, and already 2 digits to the right of it, and cursor is to the right of it, prevent:
+        let curVal = `${$(e.target).val()}`;
+        let floatingPointPosition = Math.max(curVal.indexOf('.'), curVal.indexOf(','));
+        let curSelection = curVal.slice(e.target.selectionStart, e.target.selectionEnd);
+        let selectionContainsSeparator = (curSelection && curSelection.length > 0 && (curSelection.match(/[,.]/) || []).length > 0);
+        if ((curVal.match(/[,.]/) || []).length > 0 &&
+            curVal.length - floatingPointPosition > 2 &&
+            e.target.selectionStart > floatingPointPosition && (!curSelection || curSelection.length < 1)) {
+            //prevent numbers more than 2 spaces to the right of the decimal/comma from being entered:
+            e.preventDefault();
+            return;
+        }
+        // allow numbers (48 - 57 map to 0-9):
+        if ((e.keyCode >= 48 && e.keyCode <= 57 && !e.shiftKey) ||
+            // allow numpad numbers:
+            ((e.keyCode >= 96 && e.keyCode <= 105) && !e.shiftKey) ||
+            // allow comma or period if there isn't one already:
+            (e.keyCode == floatingPointSeparator && ((curVal.match(/[,.]/) || []).length < 1 || selectionContainsSeparator)) &&
+            !e.shiftKey) {
+            // don't do anything (allow number / decimal / comma to be entered as normal)
+            return;
+        }
+        // prevent any key not mentioned above from being entered:
+        e.preventDefault();
         return;
     }
-    // Allow numbers:
-    if ((e.keyCode >= 48 && e.keyCode <= 57 && !e.shiftKey) ||
-        // if french/spanish allow comma:
-        (e.keyCode == 188 && ['fr', 'es'].includes(userLang)) ||
-        // allow period:
-        e.keyCode == 190) {
-        return;
-    }
-    e.preventDefault();
+    $input.keydown(preventNonNumericInput);
+    $input.each(function() {
+        $(this).updateDisplayVal();
+    });
+    $input.on('blur', function(e) {
+        $(e.target).updateDisplayVal();
+    });
+    return $input;
 }
-window.numberInputValidator = numberInputValidator;
+
+window.getValidatedNumericInput = getValidatedNumericInput;
+
+
+jQuery.fn.extend({
+    // $input.numericVal() returns a float or null, and handles a displayed value with a comma floating-point separator or decimal
+    // so "43,2" as a French/Spanish number returns, from numericVal(), the float 43.2
+    numericVal: function() {
+        if (this.is('input')) {
+            return !isNaN(parseFloat(this.val().replace(',', '.'))) ? parseFloat(this.val().replace(',', '.')) : null;
+        }
+        if (this.is('div')) {
+            let value = this.html();
+            value = value.replace("%", "");
+            value = value.replace(',', '.');
+            value = parseFloat(value);
+            return !isNaN(value) ? value : null;
+        }
+    },
+    // updates the displayed value based on the stored numeric value of an input:
+    updateDisplayVal: function() {
+        this.displayVal(this.val());
+    },
+    // helper function: called with a float/int/string representation of a number, returns a display-ready string,
+    // with trailing zeros removed (and trailing , or .) and the correct floating-point separator based on language
+    toDisplayVal: function(value) {
+        value = `${value}`.replace(',', '.');
+        if (isNaN(parseFloat(value))) {
+            return '';
+        }
+        value = `${parseFloat(value).toFixed(2)}`;
+        if ([FRENCH, SPANISH].includes(userLang)) {
+            value = value.replace('.', ',');
+        } else {
+            value = value.replace(',', '.');
+        }
+        value = value.replace(new RegExp("([,\.][1-9])?[,\.]?0+$"), "$1");
+        return value;
+    },
+    // called with a float/int/string representation of a number, processes it with the above helper function toDisplayVal,
+    // and sets the val (if an input) or the inner html (if a span/div)
+    displayVal: function(value, percent = false) {
+        value = this.toDisplayVal(value);
+        if (this.is('input')) {
+            this.val(value);
+        }
+        if (this.is('div') || this.is('span')) {
+            this.html(`${value}`);
+        }
+    }
+});
+
+
+/***********
+ * LOCALE-AWARE DISPLAY FUNCTIONS
+ *  these functions are for _display_ - they will break forms
+ *  they account for thousands separators and floating point separators, and trim zeros.
+ *  12423.40:
+ *      ES: 12.423,4
+ *      FR: 12 423,4
+ *      EN: 12,423.4
+ **********/
+
+
+window.localizeNumber = (val) => {
+    if (val === undefined || val === null || isNaN(parseFloat(val))) {
+        return null;
+    }
+    var intPart = val.toString();
+    var floatPart = null;
+    if (val.toString().includes(",")) {
+        intPart = val.toString().split(",")[0];
+        floatPart = val.toString().split(",").length > 1 ? val.toString().split(",")[1 ] : null;
+    } else if (val.toString().includes(".")) {
+        intPart = val.toString().split(".")[0];
+        floatPart = val.toString().split(".").length > 1 ? val.toString().split(".")[1 ] : null;
+    }
+    floatPart = (floatPart && floatPart.length > 0) ? floatPart : null;
+    var displayValue;
+    switch(userLang) {
+        case SPANISH:
+            displayValue = intPart.replace(/\B(?=(\d{3})+(?!\d))/g, ".");
+            if (floatPart) {
+                displayValue += `,${floatPart}`;
+            }
+        break;
+        case FRENCH:
+            displayValue = intPart.replace(/\B(?=(\d{3})+(?!\d))/g, String.fromCharCode(160)); //nbsp
+            if (floatPart) {
+                displayValue += `,${floatPart}`;
+            }
+        break;
+        case ENGLISH:
+        default:
+            displayValue = intPart.replace(/\B(?=(\d{3})+(?!\d))/g, ",");
+            if (floatPart) {
+                displayValue += `.${floatPart}`;
+            }
+        break;
+    }
+    return displayValue;
+};
+
+window.normalizeNumber = function (value) {
+    if (isNaN(parseFloat(value)) || isDate(value)) {
+        return value;
+    }
+    else {
+        return parseFloat(value).toString();
+    }
+};

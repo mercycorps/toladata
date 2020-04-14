@@ -4,6 +4,9 @@ import { ProgramAuditLogStore } from "../models"
 import { ResultChangeset, DisaggregationDiffs } from "../views"
 import renderer from 'react-test-renderer';
 
+window.localizeNumber = function (number) { number };
+window.normalizeNumber = function (number) { number };
+
 describe("Audit log", () => {
 
     it("orders disaggregations correctly", () => {
@@ -14,7 +17,11 @@ describe("Audit log", () => {
                 disagg_diffs={disaggList}
             />
         );
-        expect(component.toJSON()).toMatchSnapshot();
+        let renderedLabels = [];
+        for (let i=1; i<5; i++) {
+            renderedLabels.push(component.toJSON().children[i].children[0].children[0]);
+        }
+        expect(renderedLabels).toEqual([ 'Value One', 'Value Two', 'Value Three', 'Value Four' ]);
 
         resultLogDisaggs["10"]["custom_sort"] = 4;
         resultLogDisaggs["20"]["custom_sort"] = 1;
@@ -25,7 +32,12 @@ describe("Audit log", () => {
                 disagg_diffs={disaggList}
             />
         );
-        expect(component.toJSON()).toMatchSnapshot();
+        renderedLabels = [];
+        for (let i=1; i<5; i++) {
+            renderedLabels.push(component.toJSON().children[i].children[0].children[0]);
+        }
+        expect(renderedLabels).toEqual([ 'Value Four', 'Value Two', 'Value Three', 'Value One' ]);
+
     });
 
     it("orders disaggregations types correctly", () => {
@@ -36,6 +48,10 @@ describe("Audit log", () => {
                 data={resultLogChanged.new}
             />
         );
-        expect(component).toMatchSnapshot();
+        let renderedLabels = [];
+        for (let i=0; i<2; i++) {
+            renderedLabels.push(component.toJSON().children[i].children[0].children[0]);
+        }
+        expect(renderedLabels).toEqual([ 'Another Disaggregation', 'Type of Leader' ]);
     })
 });

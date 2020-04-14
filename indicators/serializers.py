@@ -344,7 +344,7 @@ class IndicatorWebMixin(IndicatorFormatsMixin):
         except ValueError:
             return value
         else:
-            value = formats.number_format(f_value, use_l10n=True)
+            value = formats.number_format(f_value, use_l10n=True, force_grouping=True)
             if indicator.unit_of_measure_type == indicator.PERCENTAGE:
                 value = u'{}%'.format(value)
             return value

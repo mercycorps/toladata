@@ -1,5 +1,6 @@
-# -*- coding: utf-8 -*-
+
 import uuid
+import decimal
 from datetime import timedelta
 
 from workflow.models import (
@@ -9,6 +10,8 @@ from workflow.models import (
     Sector,
 )
 from tola.util import getCountry
+from tola.forms import NonLocalizedDecimalField
+
 from indicators.models import (
     Indicator,
     PeriodicTarget,
@@ -171,6 +174,9 @@ class IndicatorForm(forms.ModelForm):
         initial=None
     )
 
+    baseline = NonLocalizedDecimalField(decimal_places=2, localize=True, required=False)
+    lop_target = NonLocalizedDecimalField(decimal_places=2, localize=True, required=False)
+
     rationale = forms.CharField(required=False)
 
     class Meta:
@@ -213,6 +219,7 @@ class IndicatorForm(forms.ModelForm):
         )
         self.fields['program_display'].disabled = True
         self.fields['program_display'].label = _('Program')
+        self.fields['baseline'].label = _('Baseline')
 
         # level is here the new "result level" (RF) level option (FK to model Level)
         # Translators: This is a form field label that allows users to select which Level object to associate with the Result that's being entered into the form
@@ -278,16 +285,18 @@ class IndicatorForm(forms.ModelForm):
                 )
             return helptext
         self.fields['grouped_disaggregations'] = GroupedMultipleChoiceField(
+            # Translators:  disaggregation types that are available to all programs
             [(_('Global disaggregations'),
-              [(disagg.pk, str(disagg)) for disagg in global_disaggs],
+              [(disagg.pk, _(str(disagg))) for disagg in global_disaggs],
               [get_helptext(disagg) for disagg in global_disaggs],
               [getattr(disagg, 'has_results') for disagg in global_disaggs])] +
+            # Translators:  disaggregation types that are available only to a specific country
             [(_('%(country_name)s disaggregations') % {'country_name': country_name},
               [(disagg.pk, str(disagg)) for disagg in country_disaggs],
               [get_helptext(disagg) for disagg in country_disaggs],
               [getattr(disagg, 'has_results') for disagg in country_disaggs])
                 for country_name, country_disaggs in countries_disaggs],
-            subwidget_attrs={'class': 'scroll-box-200'}
+            subwidget_attrs={'class': 'scroll-box-200 grouped-disaggregations'}
         )
         if indicator:
             self.fields['grouped_disaggregations'].initial = [
@@ -310,6 +319,7 @@ class IndicatorForm(forms.ModelForm):
         self.fields['name'].required = True
         self.fields['name'].widget = forms.Textarea(attrs={'rows': 3})
         self.fields['unit_of_measure'].required = True
+        self.fields['unit_of_measure'].widget = forms.TextInput(attrs={'autocomplete':'off'})
         self.fields['target_frequency'].required = True
         # self.fields['is_cumulative'].widget = forms.RadioSelect()
         if self.instance.target_frequency and self.instance.target_frequency != Indicator.LOP:
@@ -384,6 +394,10 @@ class IndicatorForm(forms.ModelForm):
 
 class ResultForm(forms.ModelForm):
     rationale = forms.CharField(required=False)
+    achieved = NonLocalizedDecimalField(
+        decimal_places=2, localize=True,
+        # Translators: This is a result that was actually achieved, versus one that was planned.
+        label=_('Actual value'))
 
     class Meta:
         model = Result
@@ -395,9 +409,7 @@ class ResultForm(forms.ModelForm):
         }
         labels = {
             'site': _('Site'),
-            # Translators: This is a result that was actually achieved, versus one that was planned.
-            'achieved': _('Actual value'),
-            # Translators: field label that
+            # Translators: field label that identifies which of a set of a targets (e.g. monthly/annual) a result is being compared to
             'periodic_target': _('Measure against target'),
             'evidence_url': _('Link to file or folder'),
         }
@@ -423,9 +435,9 @@ class ResultForm(forms.ModelForm):
         self.request = kwargs.pop('request')
         super(ResultForm, self).__init__(*args, **kwargs)
 
-        #TODO: unless I don't know how dicts work, this doesn't modify the actual fields at all?
+        # Disable all field objects contained in this dict if the user has read-only access.
         if not self.request.has_write_access:
-            for name, field in self.fields.items():
+            for field in self.fields.values():
                 field.disabled = True
 
         self.set_initial_querysets()
@@ -551,10 +563,6 @@ class BaseDisaggregatedValueFormSet(forms.BaseFormSet):
             self.clear_all = True
         elif self.result.indicator.unit_of_measure_type == Indicator.PERCENTAGE:
             return
-        elif sum([value for value in achieved if value is not None]) != self.result.achieved:
-            raise forms.ValidationError(
-                'disaggregated values must add up to {}, got {}'.format(self.result.achieved, achieved)
-            )
 
 
     def save(self):
@@ -580,7 +588,8 @@ class BaseDisaggregatedValueFormSet(forms.BaseFormSet):
 
 class DisaggregatedValueForm(forms.Form):
     label_pk = forms.IntegerField(widget=forms.HiddenInput(), required=False)
-    value = forms.DecimalField(decimal_places=2, localize=True, required=False)
+    value = NonLocalizedDecimalField(decimal_places=2, localize=True, required=False,
+                                     widget=forms.TextInput(attrs={'autocomplete': 'off'}))
 
     def __init__(self, *args, **kwargs):
         kwargs.setdefault('label_suffix', '')
@@ -612,7 +621,7 @@ class DisaggregatedValueForm(forms.Form):
             raise forms.ValidationError('Please enter a number, you entered {}'.format(value))
         if round(value, 2) == int(value):
             return int(value)
-        return value
+        return decimal.Decimal(value).quantize(decimal.Decimal('.01'))
 
 
 def get_disaggregated_result_formset(disaggregation):
@@ -624,4 +633,5 @@ def get_disaggregated_result_formset(disaggregation):
         extra=0
     )
     FormSet.disaggregation = disaggregation
+    FormSet.disaggregation_label = _(disaggregation.disaggregation_type)
     return FormSet

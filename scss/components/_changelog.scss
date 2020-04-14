@@ -2,6 +2,10 @@
 .changelog { // <table>
 }
 .changelog__entry { // each timestamped batch of DB updates; <tbody>
+     h4 {
+        margin-bottom: .2rem;
+        margin-top: .4rem;
+    }
 }
 .changelog__entry__header { // title row for changelog__entry; <tr>
     &.is-expanded {
@@ -36,8 +40,11 @@
     // only on indicator report, ie. from IPTT
     // group of targets inside the prev/new component
 }
+.change__field {}
+.change__field__name {}
+.change__field__value {
+    // color: $primary; // potential to highlight new values; hold for now
+}
 
 .disagg-type__title {
-    margin-top: .5rem;
-    margin-bottom: .2rem
 }

@@ -69,6 +69,7 @@ export default (
         _groupBy: GROUP_BY_CHAIN,
         _indicatorFilters: {},
         _hiddenColumns: [],
+        _hiddenCategories: false,
         get isTVA() {
             return this._reportType === TVA;
         },
@@ -159,7 +160,7 @@ export default (
                     start: this.startPeriodValue,
                     end: this.endPeriodValue
                 };
-                
+
                 this._selectedFrequency = frequency;
                 this.setPeriods(periods);
                 return true;
@@ -390,7 +391,7 @@ export default (
             return [
                 ...this._tierOptions.filter(option => this._indicatorFilters.tiers.includes(option.value)),
                 ...this._levelOptions.filter(option => this._indicatorFilters.levels.includes(option.value)),
-                ...this._oldLevelOptions.filter(option => this._indicatorFilters.oldLevels.includes(option.value)),                
+                ...this._oldLevelOptions.filter(option => this._indicatorFilters.oldLevels.includes(option.value)),
             ];
         },
         set levelTierFilters({levels = [], tiers = [], oldLevels = []} = {}) {
@@ -452,12 +453,16 @@ export default (
                                                 .map(disaggregation => ({value: disaggregation.pk, label: disaggregation.name, country: disaggregation.country}));
             let countries = [...new Set(disaggregationOptions.map(option => option.country))].filter(country => country !== null).sort();
             let optgroups = [];
+            /* # Translators: User-selectable option that filters out rows from a table where the disaggregation category has not been used (i.e. avoids showing lots of blank rows. */
+            optgroups.push({value: "hide-categories", label: gettext('Only show categories with results'), noList: true});
             if (disaggregationOptions.filter(option => option.country === null).length > 0) {
+                /* # Translators: filter that allows users to select only those disaggregation types that are available across the globe (i.e. across the agency). */
                 optgroups.push({label: gettext('Global disaggregations'), options: disaggregationOptions.filter(option => option.country === null)});
             }
             countries.forEach(
                 country => {
-                    optgroups.push({label: country, options:disaggregationOptions.filter(option => option.country === country)});
+                    /* # Translators: A list of disaggregation types follows this header. */
+                    optgroups.push({label: `${country} ${gettext('Disaggregations')}`, options:disaggregationOptions.filter(option => option.country === country)});
                 }
             );
             return optgroups;
@@ -472,14 +477,19 @@ export default (
                 Array.from(this.programFilterData.disaggregations.values())
                     .filter(disaggregation => disaggregationPks.includes(disaggregation.pk))
                     .sort((disagg_a, disagg_b) => (disagg_a.name > disagg_b.name) ? 1 : -1)
-                    .map(disaggregation => disaggregation.pk) : []  
+                    .map(disaggregation => disaggregation.pk) : []
         },
         get disaggregationFilters() {
-            let disaggregationOptions = [].concat.apply([], this.disaggregationOptions.map(optgroup => optgroup.options))
-            return disaggregationOptions.filter(option => (option && option.value && this._indicatorFilters.disaggregations.includes(option.value)));
+            let disaggregationOptions = [].concat.apply([], this.disaggregationOptions.slice(1).map(optgroup => optgroup.options));
+            disaggregationOptions = disaggregationOptions.filter(option => (option && option.value && this._indicatorFilters.disaggregations.includes(option.value)));
+            if (this._hiddenCategories) {
+                disaggregationOptions = [this.disaggregationOptions[0], ...disaggregationOptions];
+            }
+            return disaggregationOptions;
         },
         set disaggregationFilters(disaggregationFilterValues = []) {
-            this._indicatorFilters.disaggregations = disaggregationFilterValues.map(v => parseInt(v));
+            this._indicatorFilters.disaggregations = disaggregationFilterValues.filter(v => (v != 'hide-categories' && v != 'NaN' && !isNaN(parseInt(v)))).map(v => parseInt(v));
+            this._hiddenCategories = disaggregationFilterValues.includes('hide-categories');
         },
         get indicatorTypeOptions() {
             let typePks = [...new Set(this.getAllIndicators('types').map(
@@ -624,6 +634,7 @@ export default (
                 let groups = this.getLevelIndicatorGroups('indicators');
                 if (this.resultsFramework) {
                     groups = groups.map(
+                        /* # Translators: Allows users to filter an indicator list for indicators that are unassigned. */
                         levelGroup => ({label: levelGroup.level ? levelGroup.level.tierNumber : gettext('Indicators unassigned to  a results framework level'),
                                         options: levelGroup.indicators.map(indicator => ({value: indicator.pk, label: indicator.name}))
                     }));
@@ -753,6 +764,7 @@ export default (
     filterStore.indicatorTypeFilters = filterStore._router.types;
     filterStore.indicatorFilters = filterStore._router.indicators;
     filterStore._hiddenColumns = filterStore._router.columns;
+    filterStore._hiddenCategories = filterStore._router.hiddenCategories;
     filterStore.levelTierFilters = {
         levels: filterStore._router.levels,
         tiers: filterStore._router.tiers,

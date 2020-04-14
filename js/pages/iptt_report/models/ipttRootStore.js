@@ -19,7 +19,7 @@ export default (
             this._expandoRows.forEach(row => {row.expandRow()});
         },
         get allExpanded() {
-            return this._expandoRows.every(row => row.state.expanded)
+            return this._expandoRows.every(row => row.state.expanded);
         },
         get allCollapsed() {
             return this._expandoRows.every(row => !row.state.expanded)
@@ -65,7 +65,7 @@ export default (
             return this.filterStore.programFilterData;
         },
         get currentProgramPageUrl() {
-            return api.getProgramPageUrl(this.currentProgram.pk);
+            return this.currentProgram ? api.getProgramPageUrl(this.currentProgram.pk) : null;
         },
         get isTVA() {
             return this.filterStore.isTVA;
@@ -123,14 +123,28 @@ export default (
             }
             return periodValues || [];
         },
+        get hiddenCategories() {
+            return this.filterStore._hiddenCategories === true;
+        },
         get baseColumns() {
-            return 8 - (this.filterStore._hiddenColumns.length);
+            return 8 + (this.filterStore.resultsFramework ? 0 : 1) - (this.filterStore._hiddenColumns.length);
         },
         get reportColumnWidth() {
             return this.baseColumns + (!this.resultsFramework && 1) + 3 + (this.reportPeriods.length) * (this.isTVA ? 3 : 1);
         },
         get activeDisaggregationPks() {
             return this.filterStore.currentDisaggregations;
+        },
+        indicatorHasActiveDisaggregations(indicator) {
+            if (!indicator.hasDisaggregations(this.activeDisaggregationPks)) {
+                return false;
+            }
+            if (this.hiddenCategories) {
+                return this.activeDisaggregationPks.map(pk => (this.getDisaggregationLabels(pk).labels || []))
+                                                           .reduce((a, b) => a.concat(b), [])
+                                                           .filter(label => this.disaggregatedLop(indicator.pk, label.pk)).length > 0;
+            }
+            return true;
         },
         getDisaggregationLabels(disaggregationPk) {
             return (this.currentProgram && this.currentProgram.disaggregations.has(disaggregationPk)) ?
@@ -185,6 +199,9 @@ export default (
             if (disaggregationPks && disaggregationPks.length > 0) {
                 rootStore.expandAllRows();
             }
+        },
+        {
+            delay: 30 //adds a short delay so "expand all rows" will have access to all the newly added rows to expand
         }
     );
     return rootStore;

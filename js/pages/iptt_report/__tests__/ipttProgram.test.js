@@ -10,7 +10,11 @@ describe("bare iptt program", () => {
         expect(program2.validFrequency(3)).toBeFalsy();
     });
     it("handles disaggregations", () => {
-        let program = Program({disaggregations: [{pk: 4, name: 'Test Disaggregation'}]});
-        expect(Array.from(program.disaggregations.values())).toStrictEqual([{pk: 4, name: 'Test Disaggregation', labels: [], country: null}]);
+        let program = Program({disaggregations: [{pk: 4, name: 'Test Disaggregation', labels: [{pk: '10', name: "banana"}]}]});
+        expect(Array.from(program.disaggregations.values())).toStrictEqual([{pk: 4, name: 'Test Disaggregation', labels: [{pk: 10, name: "banana"}], country: null}]);
+    });
+    it("doesn't show category-less disaggregations", () => {
+        let program = Program({disaggregations: [{pk: 4, name: 'Test Disaggregation', labels: []}]});
+        expect(Array.from(program.disaggregations.values())).toStrictEqual([]);
     });
 });

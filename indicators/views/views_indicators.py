@@ -1,4 +1,4 @@
-# -*- coding: utf-8 -*-
+
 """
 Views for indicators and related models (results, periodic targets) as well as indicator summaries (Program page)
 """
@@ -31,7 +31,7 @@ from django.views.generic import TemplateView
 from django.views.generic.detail import View
 from django.views.generic.edit import CreateView, DeleteView, UpdateView
 
-from tola.util import group_excluded
+from tola.util import group_excluded, usefully_normalize_decimal
 
 from workflow.models import (
     Program
@@ -180,6 +180,7 @@ class IndicatorFormMixin:
             pt['id'] = pk
             pt['start_date'] = start_date
             pt['end_date'] = end_date
+            pt['target'] = pt['target'].replace(',', '.')
 
         return pt_json
 
@@ -775,7 +776,6 @@ class ResultFormMixin(object):
         return self.render_to_response(self.get_context_data(form=form))
 
 
-
 class ResultCreate(ResultFormMixin, CreateView):
     """Create new Result called by result_add as modal"""
     model = Result
@@ -787,7 +787,6 @@ class ResultCreate(ResultFormMixin, CreateView):
     def dispatch(self, request, *args, **kwargs):
         if not request.has_write_access:
             raise PermissionDenied
-
         self.indicator = get_object_or_404(Indicator, pk=self.kwargs['indicator'])
         return super(ResultCreate, self).dispatch(request, *args, **kwargs)
 
@@ -816,13 +815,15 @@ class ResultCreate(ResultFormMixin, CreateView):
         result = form.save()
         for disagg in result.indicator.disaggregation.all():
             formset = get_disaggregated_result_formset(disagg)(self.request.POST, result=result, request=self.request)
-            if formset.is_valid:
+            if formset.is_valid():
                 formset.save()
-        ProgramAuditLog.log_result_created(self.request.user, result.indicator, result)
+        rationale = form.cleaned_data.get('rationale') if form.cleaned_data.get('rationale') else "N/A"
+        ProgramAuditLog.log_result_created(
+            self.request.user, result.indicator, result, rationale)
 
         if self.request.is_ajax():
             data = {
-                'pk' : result.pk,
+                'pk': result.pk,
                 'url': reverse('result_update', kwargs={'pk': result.pk})
             }
             return JsonResponse(data)
@@ -868,17 +869,19 @@ class ResultUpdate(ResultFormMixin, UpdateView):
         return kwargs
 
     def form_valid(self, form):
-        old_result = Result.objects.get(pk=self.kwargs['pk'])
         # save the form then update manytomany relationships
+        old_result = Result.objects.get(pk=self.kwargs['pk'])
         old_values = old_result.logged_fields
-        old_values['value'] = old_values['value'].normalize()
+
         new_result = form.save()
         for disagg in new_result.indicator.disaggregation.all():
             formset = get_disaggregated_result_formset(disagg)(self.request.POST, result=new_result, request=self.request)
-            if formset.is_valid:
+            if formset.is_valid():
                 formset.save()
-        ProgramAuditLog.log_result_updated(self.request.user, new_result.indicator, old_values,
-                                           new_result.logged_fields, form.cleaned_data.get('rationale'))
+
+        ProgramAuditLog.log_result_updated(
+            self.request.user, new_result.indicator, old_values,
+            new_result.logged_fields, form.cleaned_data.get('rationale'))
 
         if self.request.is_ajax():
             data = serializers.serialize('json', [self.object])

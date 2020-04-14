@@ -11,13 +11,16 @@ from workflow.models import (
     TolaUser,
     Organization,
     Program,
+    Country
 )
 
 from indicators.models import (
     Indicator,
     Level,
-    Result
+    Result,
+    DisaggregationType
 )
+
 
 def diff(previous, new, mapping):
     diff_list = []
@@ -65,11 +68,8 @@ def diff(previous, new, mapping):
                 "new": n[n_field]
             })
 
-
-
-
     # This is where the actual value is being inserted just above the disaggs
-    if disagg_index >=0 and not has_value_diff:
+    if disagg_index >= 0 and not has_value_diff:
         diff_list.insert(disagg_index, {
             "name": "value",
             "pretty_name": mapping.get('value'),
@@ -97,10 +97,10 @@ class DiffableLog:
 
 
 class UserManagementAuditLog(models.Model, DiffableLog):
-    date = models.DateTimeField(_('Modification Date'), auto_now_add=True)
+    date = models.DateTimeField(_('Modification date'), auto_now_add=True)
     admin_user = models.ForeignKey(TolaUser, null=True, on_delete=models.SET_NULL, related_name="+")
     modified_user = models.ForeignKey(TolaUser, null=True, on_delete=models.SET_NULL, related_name="+")
-    change_type = models.CharField(_('Modification Type'), max_length=255)
+    change_type = models.CharField(_('Modification type'), max_length=255)
     previous_entry = models.TextField()
     new_entry = models.TextField()
 
@@ -109,23 +109,25 @@ class UserManagementAuditLog(models.Model, DiffableLog):
         return {
             "title": _("Title"),
             "name": _("Name"),
-            "first_name": _("First Name"),
-            "last_name": _("Last Name"),
+            "first_name": _("First name"),
+            "last_name": _("Last name"),
             "user": _("Username"),
-            "mode_of_address": _("Mode of Address"),
-            "mode_of_contact": _("Mode of Contact"),
-            "phone_number": _("Phone Number"),
+            # Translators:  Form field capturing how a user wants to be called (e.g. Marsha or Mr. Wiggles).
+            "mode_of_address": _("Mode of address"),
+            # Translators:  Form field capturing whether a user prefers to be contacted by phone, email, etc...
+            "mode_of_contact": _("Mode of contact"),
+            "phone_number": _("Phone number"),
             "email": _("Email"),
             "organization": _("Organization"),
-            "active": _("Is Active")
+            "active": _("Is active")
         }
 
     @property
     def change_type_map(self):
         return {
-            "user_created": _("User Created"),
-            "user_programs_updated": _("User Programs Updated"),
-            "user_profile_updated": _("User Profile Updated")
+            "user_created": _("User created"),
+            "user_programs_updated": _("User programs updated"),
+            "user_profile_updated": _("User profile updated")
         }
 
     @property
@@ -223,12 +225,12 @@ class UserManagementAuditLog(models.Model, DiffableLog):
 
 class ProgramAuditLog(models.Model, DiffableLog):
     program = models.ForeignKey(Program, on_delete=models.CASCADE, related_name="audit_logs")
-    date = models.DateTimeField(_('Modification Date'), auto_now_add=True)
+    date = models.DateTimeField(_('Modification date'), auto_now_add=True)
     user = models.ForeignKey(TolaUser, null=True, on_delete=models.SET_NULL, related_name="+")
     organization = models.ForeignKey(Organization, null=True, on_delete=models.SET_NULL, related_name="+")
     indicator = models.ForeignKey(Indicator, null=True, on_delete=models.SET_NULL, related_name="+")
     level = models.ForeignKey(Level, null=True, on_delete=models.SET_NULL, related_query_name="+")
-    change_type = models.CharField(_('Modification Type'), max_length=255)
+    change_type = models.CharField(_('Modification type'), max_length=255)
     previous_entry = models.TextField(null=True, blank=True)
     new_entry = models.TextField(null=True, blank=True)
     rationale = models.TextField(null=True)
@@ -245,7 +247,9 @@ class ProgramAuditLog(models.Model, DiffableLog):
             "rationale_for_target": _("Rationale for target"),
             "baseline_value": _("Baseline"),
             "baseline_na": _("Baseline N/A"),
+            # Translators:  A Noun.  The URL or computer file path where a document can be found.
             "evidence_url": _('Evidence link'),
+            # Translators:  A Noun.  The user-friendly name of the evidence document they are attaching to a result.
             "evidence_name": _('Evidence record name'),
             "date": _('Result date'),
             "target": _('Measure against target'),
@@ -292,7 +296,7 @@ class ProgramAuditLog(models.Model, DiffableLog):
     @property
     def diff_list(self):
         diff_list = super(ProgramAuditLog, self).diff_list
-        null_text = ''
+        null_text = ""
 
         for diff in diff_list:
             if diff["name"] == 'unit_of_measure_type':
@@ -302,7 +306,7 @@ class ProgramAuditLog(models.Model, DiffableLog):
                 diff["prev"] = self.direction_of_change_map.get(diff["prev"], diff["prev"])
                 diff["new"] = self.direction_of_change_map.get(diff["new"], diff["new"])
             elif diff["name"] == 'targets' or diff["name"] == 'disaggregation_values':
-                if diff["prev"] == null_text:
+                if diff["prev"] == "":
                     diff["prev"] = {
                         n["id"]: {
                             "name": n.get("name"),
@@ -315,7 +319,7 @@ class ProgramAuditLog(models.Model, DiffableLog):
                     }
                     continue
 
-                if diff["new"] == null_text:
+                if diff["new"] == "":
                     diff["new"] = {
                         p["id"]: {
                             "name": p.get("name"),
@@ -418,7 +422,6 @@ class ProgramAuditLog(models.Model, DiffableLog):
         except ValueError:
             return 999
 
-
     @staticmethod
     def log_indicator_created(user, created_indicator, rationale):
         new_program_log_entry = ProgramAuditLog(
@@ -471,14 +474,14 @@ class ProgramAuditLog(models.Model, DiffableLog):
             new_program_log_entry.save()
 
     @staticmethod
-    def log_result_created(user, indicator, created_result):
+    def log_result_created(user, indicator, created_result, rationale):
         new_program_log_entry = ProgramAuditLog(
             program=indicator.program,
             user=user.tola_user,
             organization=user.tola_user.organization,
             indicator=indicator,
             change_type="result_created",
-            rationale='N/A',
+            rationale=rationale,
             previous_entry=None,
             new_entry=json.dumps(created_result.logged_fields, cls=DjangoJSONEncoder)
         )
@@ -554,10 +557,10 @@ class ProgramAuditLog(models.Model, DiffableLog):
 
 
 class ProgramAdminAuditLog(models.Model, DiffableLog):
-    date = models.DateTimeField(_('Modification Date'), auto_now_add=True)
+    date = models.DateTimeField(_('Modification date'), auto_now_add=True)
     admin_user = models.ForeignKey(TolaUser, null=True, on_delete=models.SET_NULL, related_name="+")
     program = models.ForeignKey(Program, null=True, on_delete=models.SET_NULL, related_name="+")
-    change_type = models.CharField(_('Modification Type'), max_length=255)
+    change_type = models.CharField(_('Modification type'), max_length=255)
     previous_entry = models.TextField()
     new_entry = models.TextField()
 
@@ -566,8 +569,8 @@ class ProgramAdminAuditLog(models.Model, DiffableLog):
         return {
             'gaitid': _("GAIT ID"),
             'name': _("Name"),
-            'funding_status': _("Funding Status"),
-            'cost_center': _("Cost Center"),
+            'funding_status': _("Funding status"),
+            'cost_center': _("Cost center"),
             'description': _("Description"),
             'sectors': _("Sectors"),
             'countries': _("Countries")
@@ -576,8 +579,8 @@ class ProgramAdminAuditLog(models.Model, DiffableLog):
     @property
     def change_type_map(self):
         return {
-            "program_created": _("Program Created"),
-            "program_updated": _("Program Updated"),
+            "program_created": _("Program created"),
+            "program_updated": _("Program updated"),
         }
 
     @property
@@ -609,11 +612,12 @@ class ProgramAdminAuditLog(models.Model, DiffableLog):
             )
             entry.save()
 
+
 class OrganizationAdminAuditLog(models.Model, DiffableLog):
-    date = models.DateTimeField(_('Modification Date'), auto_now_add=True)
+    date = models.DateTimeField(_('Modification date'), auto_now_add=True)
     admin_user = models.ForeignKey(TolaUser, null=True, on_delete=models.SET_NULL, related_name="+")
     organization = models.ForeignKey(Organization, null=True, on_delete=models.SET_NULL, related_name="+")
-    change_type = models.CharField(_('Modification Type'), max_length=255)
+    change_type = models.CharField(_('Modification type'), max_length=255)
     previous_entry = models.TextField()
     new_entry = models.TextField()
 
@@ -621,20 +625,20 @@ class OrganizationAdminAuditLog(models.Model, DiffableLog):
     def field_map(self):
         return {
             "name": _("Name"),
-            "primary_address": _("Primary Address"),
-            "primary_contact_name": _("Primary Contact Name"),
-            "primary_contact_email": _("Primary Contact Email"),
-            "primary_contact_phone": _("Primary Contact Phone"),
-            "mode_of_contact": _("Mode of Contact"),
-            "is_active": _("Is Active"),
+            "primary_address": _("Primary address"),
+            "primary_contact_name": _("Primary contact name"),
+            "primary_contact_email": _("Primary contact email"),
+            "primary_contact_phone": _("Primary contact phone"),
+            "mode_of_contact": _("Mode of contact"),
+            "is_active": _("Is active"),
             "sectors": _("Sectors")
         }
 
     @property
     def change_type_map(self):
         return {
-            "organization_created": _("Organization Created"),
-            "organization_updated": _("Organization Updated"),
+            "organization_created": _("Organization created"),
+            "organization_updated": _("Organization updated"),
         }
 
     @property
@@ -665,3 +669,67 @@ class OrganizationAdminAuditLog(models.Model, DiffableLog):
                 new_entry=new,
             )
             entry.save()
+
+
+class CountryAdminAuditLog(models.Model, DiffableLog):
+    date = models.DateTimeField(_('Modification date'), auto_now_add=True)
+    admin_user = models.ForeignKey(TolaUser, null=True, on_delete=models.SET_NULL, related_name="+")
+    country = models.ForeignKey(Country, null=True, on_delete=models.SET_NULL, related_name="+")
+    disaggregation_type = models.ForeignKey(DisaggregationType, null=True, on_delete=models.SET_NULL, related_name="+")
+    change_type = models.CharField(_('Modification type'), max_length=255)
+    previous_entry = models.TextField()
+    new_entry = models.TextField()
+
+    @property
+    def field_map(self):
+        return {
+            # Translators: Heading for list of disaggregation types assigned to a country
+            "disaggregation_type_name": _("Disaggregation"),
+            # Translators: Heading for list of disaggregation categories in a particular disaggregation type.
+            "disaggregation_category": _("Disaggregation category"),
+            # Translators: Heading for list of disaggregation categories in a particular disaggregation type.
+            "labels": _("Disaggregation categories"),
+            # Translators: Heading for list of disaggregation categories in a particular disaggregation type.
+            "is_archived": _("Archived"),
+            # Translators: Heading for list of disaggregation categories in a particular disaggregation type.
+            "disaggregation_type": _("Disaggregation"),
+        }
+
+    @property
+    def change_type_map(self):
+        return {
+            # Translators: Heading for data that tracks when a data disaggregation as been created for a country
+            "country_disaggregation_created": _("Country disaggregation created"),
+            # Translators: Heading for data that tracks when a data disaggregation assigned to a country has been changed.
+            "country_disaggregation_updated": _("Country disaggregation updated"),
+            # Translators: Heading for data that tracks when a data disaggregation assigned to a country has been deleted.
+            "country_disaggregation_deleted": _("Country disaggregation deleted"),
+            # Translators: Heading for data that tracks when a data disaggregation assigned to a country has been archived.
+            "country_disaggregation_archived": _("Country disaggregation archived"),
+            # Translators: Heading for data that tracks when a data disaggregation assigned to a country has been restored.
+            "country_disaggregation_unarchived": _("Country disaggregation unarchived"),
+            # Translators: Heading for data that tracks when the categories of a data disaggregation that has been assigned to country have been updated.
+            "country_disaggregation_categories_updated": _("Country disaggregation categories updated"),
+        }
+
+    @property
+    def pretty_change_type(self):
+        return self.change_type_map.get(self.change_type, self.change_type)
+
+    @property
+    def diff_list(self):
+        '''
+        Need to add back disaggregation type into the diffs if labels have changed but
+        the type hasn't.  Need this to put the type name at the top of the list of label changes
+        so users know which type the labels belong to.
+        '''
+        diffs = super(CountryAdminAuditLog, self).diff_list
+        diff_names = [d['name'] for d in diffs]
+        if 'labels' in diff_names and 'disaggregation_type' not in diff_names:
+            diffs.append({
+                "name": "disaggregation_type",
+                "pretty_name": "Disaggregation Type",
+                "prev": json.loads(self.previous_entry)['disaggregation_type'],
+                "new": json.loads(self.new_entry)['disaggregation_type']
+            })
+        return diffs

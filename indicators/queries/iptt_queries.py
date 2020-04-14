@@ -257,9 +257,8 @@ class IPTTIndicator(Indicator):
 
     @property
     def inactive_disaggregation_category_pks(self):
-        return [category_pk for category_pk in self.disaggregation_category_pks if getattr(
-            self, f'disaggregation_{category_pk}_lop_actual', None
-            ) is None]
+        return [category_pk for category_pk in self.disaggregation_category_pks
+                if category_pk not in self.active_disaggregation_category_pks]
 
     @property
     def lop_met_target(self):

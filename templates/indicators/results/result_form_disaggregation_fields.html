@@ -10,37 +10,44 @@
                href="#" id="disaggregations_toggle_{{ forloop.counter0 }}" class="is-accordion-toggle btn btn-link collapsed"
                data-toggle="collapse" data-target="#disaggregations_fields_{{ forloop.counter0 }}"
                aria-expanded="false" aria-controls="disaggregations_fields_{{ forloop.counter0 }}">
-                <i class="fas fa-caret-right"></i>{{ disaggregation_formset.disaggregation }}
+                <i class="fas fa-caret-right"></i>
+                {# Use translated disaggregation label if it's a global disagg type (i.e. has no country association #}
+                {% if disaggregation_formset.disaggregation.country %}
+                    {{ disaggregation_formset.disaggregation }}
+                {% else %}
+                    {{ disaggregation_formset.disaggregation_label }}
+                {% endif %}
             </a>
             <span class="formset-feedback invalid-feedback">
+                {# Translators:  Allows the user to select only those items that need to be updated in some way#}
                 <i class="fas fa-exclamation-triangle"></i>&nbsp;{% trans "Needs attention" %}
             </span>
         </span>
-        
+
         <div class="collapse" id="disaggregations_fields_{{ forloop.counter0 }}">
             {{ disaggregation_formset.management_form }}
-            <ul class="list-group form-rows-list-group">
+            <ul class="list-group form-list-group">
                 {% for disaggregation_form in disaggregation_formset %}
-                <li class="list-group-item form-rows-list-group__form-row">
-                    <div class="form-row__label">
+                <li class="list-group-item">
+                    <div class="item__label">
                         {{disaggregation_form.label_pk}}{{disaggregation_form.value.label_tag }}
                     </div>
-                    <div class="col-md-4{% if indicator.unit_of_measure_type == indicator.PERCENTAGE %} input-symbol-percent {% endif %}">
+                    <div class="item__value {% if indicator.unit_of_measure_type == indicator.PERCENTAGE %} input-symbol-percent {% endif %}">
                         {{ disaggregation_form.value|add_class:"form-control text-right force-numeric-input disaggregated-value-cell" }}
                         <div class="invalid-feedback">
-                            {% trans "Please enter a number greater than or equal to zero." %}
                         </div>
                     </div>
                 </li>
                 {% endfor %}
                 {% if indicator.unit_of_measure_type != indicator.PERCENTAGE %}
-                <li class="list-group-item form-rows-list-group__footer-row">
-                    <div class="form-row__label">
-                        {% trans "Sum" %}
+                <li class="list-group-item">
+                    <div class="item__label">
+                        <strong>{% trans "Sum" %}</strong>
                     </div>
-                    <div class="float-right actions-container">
+                    <div class="item__value actions-container">
                         <div class="invalid-actions invalid-feedback">
                             <a href="#">
+                                {# Translators: Button text. When user clicks, a form will be updated with a calculated value based on what the user has entered. #}
                                 <i class="fas fa-sync"></i>&nbsp;&nbsp;{% trans "Update actual value" %}
                             </a>
                             <span class="sum-difference"></span>
@@ -50,17 +57,21 @@
                     </div>
                 </li>
                 {% endif %}
-                <li class="list-group-item form-rows-list-group__footer-row reference-row">
-                    <div class="form-row__label">
-                        {% trans "Actual value" %}
+                <li class="list-group-item reference-row">
+                    <div class="item__label">
+                        <strong>{% trans "Actual value" %}</strong>
                     </div>
-                    <div class="float-right">
-                        <div class="value-cell actual-value-cell"></div>
+                    <div class="item__value">
+                        <div class="value-cell actual-value-cell {% if indicator.unit_of_measure_type == indicator.PERCENTAGE %}input-symbol-percent{% endif %}"></div>
                     </div>
                 </li>
             </ul>
-            <div class="bad-sum-feedback invalid-feedback">
-                {% trans "The sum of disaggregated values does not match the actual value." %}
+            <div class="bad-sum-feedback">
+                {# invalid feedback is nested inside bad-sum-feedback to hold at least one empty line for the feedback message, to keep the modal a consistent(ish) height #}
+                <div class="invalid-feedback">
+                    {% trans "The sum of disaggregated values does not match the actual value." %}
+                </div>
+                &nbsp; {# (see note above) #}
             </div>
         </div>
     </fieldset>
@@ -74,30 +85,35 @@
         {% endfor %}
     ];
     var percentageInput = {% if indicator.unit_of_measure_type == indicator.PERCENTAGE %}true{% else %}false{% endif %};
-    
+
     function updateActuals() {
-        let val = $('#id_achieved').val();
-        $('.actual-value-cell').html(`${val}${percentageInput ? ' %' : ''}`);
+        let val = $('#id_achieved').numericVal();
+        $('#id_achieved').displayVal(val);
+        $('.actual-value-cell').displayVal(val);
+        $("#result_update_form .disaggregated-value-cell").each( (index, element) => {
+            $(element).displayVal($(element).val())
+        });
         $('.disaggregation-formset').trigger('validateSum');
     }
 
     function validateDisaggregatedValue(ev) {
         $( this ).removeClass('is-invalid');
-        let unLocalizer = window.getNumberLocalizer({decimalPlaces: 2, display: false});
-        let reLocalizer = window.getNumberLocalizer({decimalPlaces: 2, display: true});
         if ($( this ).val() == '') {
             // user entered blank, do nothing
-        } else if (unLocalizer($( this ).val()) === false || unLocalizer($( this ).val()) < 0) {
-            $( this ).addClass('is-invalid');
-        } else {
-            $( this ).val(reLocalizer(unLocalizer($( this ).val())));
+        } else if ($( this ).val() == ',' || $( this ).val() == '.') {
+            $( this ).val('');
+            // user entered a comma or . and tabbed out, do nothing
+        } else if ($( this ).numericVal() === null || $(this).numericVal() < 0) {
+            if ($( this ).displayVal() == '') {
+                $( this ).val('');
+            } else {
+                $( this ).addClass('is-invalid');
+            }
         }
         $( this ).parents('.disaggregation-formset').trigger('updateSum');
     }
-    
+
     function updateSum(ev) {
-        let unLocalizer = window.getNumberLocalizer({decimalPlaces: 2, display: false});
-        let reLocalizer = window.getNumberLocalizer({decimalPlaces: 2, display: true});
         if( $( this ).find('.is-invalid').length > 0 ) {
             $( this ).find('.sum-value-cell').html('');
         } else {
@@ -106,40 +122,38 @@
                 Array(parseInt($(`#id_${prefix}-TOTAL_FORMS`).val())).keys()
             ).map(
                 idx => {
-                    return unLocalizer($(`#id_${prefix}-${idx}-value`).val());
+                    return $(`#id_${prefix}-${idx}-value`).numericVal();
                 }
             );
-            if (values.every(val => val === false)) {
+            if (values.every(val => (val === false || val === null))) {
                 // disaggregation is empty (all blank)
                 $( this ).find('.sum-value-cell').html('');
             } else {
-                let sumValue = values.filter(val => val !== false).reduce((a, b) => a + b);
-                $( this ).find('.sum-value-cell').html(`${reLocalizer(sumValue)}${percentageInput ? '&ensp;%' : ''}`);
+                let sumValue = values.filter(val => val > 0).reduce((a, b) => a + b, 0);
+                $( this ).find('.sum-value-cell').displayVal(sumValue, percentageInput);
             }
         }
         $( this ).trigger('validateSum');
         $( this ).trigger('validateFormset');
     }
-    
+
     function validateSum() {
         if (!$( this ).find('.sum-value-cell')) {
             // percent cell - no sum validation
             return;
         }
-        let unLocalizer = window.getNumberLocalizer({decimalPlaces: 2, display: false});
-        let reLocalizer = window.getNumberLocalizer({decimalPlaces: 2, display: true});
         let $sumValueCell = $( this ).find('.sum-value-cell').first();
         $sumValueCell.parent().removeClass('no-sum-value').removeClass('bad-sum-value');
-        let sumValue = unLocalizer($sumValueCell.html());
-        if (sumValue === false) {
-            // sum value is not good:
+        let sumValue = $sumValueCell.numericVal();
+        if (sumValue === null) {
+            // sum value is blank:
             $sumValueCell.parent().addClass('no-sum-value');
         } else {
-            let achievedValue = unLocalizer($('#id_achieved').val());
+            let achievedValue = $('#id_achieved').numericVal();
             if (achievedValue != sumValue) {
                 $sumValueCell.parent().addClass('bad-sum-value');
                 $sumValueCell.parent().find('.sum-difference')
-                    .html(`${achievedValue < sumValue ? '+' : ''}${reLocalizer(sumValue - achievedValue)}`);
+                    .html(`${achievedValue < sumValue ? '+' : ''}${$sumValueCell.toDisplayVal(sumValue - achievedValue)}`);
             }
         }
         $( this ).trigger('validateFormset');
@@ -153,21 +167,38 @@
             $( this ).addClass('has-errors');
         }
     }
-    
+
     function updateActualWithSum() {
         let sumValue = $( this ).parents('.actions-container').find('.sum-value-cell').first().html();
-        $('#id_achieved').val(sumValue);
+        $('#id_achieved').displayVal(sumValue);
         updateActuals();
         $('.disaggregation-formset').trigger('updateSum');
     }
-    
+
     function validateDisaggregations() {
-        $('.disaggregation-formset').removeClass('unvalidated').trigger('validateSum').trigger('validateFormset');
-        if ($('.disaggregation-formset.has-errors').length > 0) {
-            return false;
-        }
-        return true;
+        // skip validation on disaggs with no entries, which has the side benefit of skipping validation on
+        // new results until save is clicked.
+        $('.disaggregation-formset').each((index, disaggElement)=> {
+            const sumValue = $( disaggElement ).find('.sum-value-cell').html();
+            if (sumValue !== '') {
+                $( disaggElement ).removeClass('unvalidated').trigger('validateSum').trigger('validateFormset');
+            }
+            else {
+                $( disaggElement ).addClass('unvalidated')
+            }
+        });
+        return $('.disaggregation-formset.has-errors').length > 0 ? false : true
     }
+
+    function resetDisaggregationValidation() {
+        //set timeout with instant timeout ensures this fires _after_ form is reset
+        setTimeout(function() {
+            updateActuals();
+            $('.disaggregation-formset').each(updateSum);
+            validateDisaggregations()
+        });
+    }
+
 
     $(function() {
         // set initial actuals value:
@@ -176,16 +207,27 @@
         $('.disaggregation-formset').each(updateSum);
         // whenever the actual value changes, update the actual values in each disaggregation row:
         $('#id_achieved').on('change', updateActuals);
-        // whenever any of the value fields change, validate the individual value field:
-        $('.disaggregated-value-cell').keydown(window.numberInputValidator).on('change', validateDisaggregatedValue);
+        // whenever any of the value fields change, validate the individual value field.  Need to trigger
+        // submit if the button has been clicked immediately after modifying a value because
+        // the blur blocks submit event.
+        $('.disaggregated-value-cell').each(function() {
+            window.getValidatedNumericInput(this).on('blur', (e)=>{
+                validateDisaggregatedValue.call(this, e);
+                const $relatedTarget = e.originalEvent.relatedTarget;
+                if ($relatedTarget && $relatedTarget.id === "submit-id-submit") {
+                    submitHandler.call($("#result_update_form"));
+                }
+            });
+        });
         $('.disaggregation-formset')
             .on('updateSum', updateSum)
             .on('validateSum', validateSum)
             .on('validateFormset', validateFormset)
         $('.invalid-actions>a').on('click', updateActualWithSum);
-        
+        $('#result_update_form').on('reset', resetDisaggregationValidation);
+        validateDisaggregations();
     });
 
-    
-    
+
+
 </script>
