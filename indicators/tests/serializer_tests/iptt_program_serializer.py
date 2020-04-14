@@ -446,9 +446,9 @@ class TestIPTTProgramSerializerPeriodData(test.TestCase):
         lop_period = data['period_date_ranges'][Indicator.LOP][0]
         self.assertEqual(lop_period['start'], '2016-01-01')
         self.assertEqual(lop_period['end'], '2016-12-31')
-        self.assertEqual(lop_period['name'], 'La vie du programme')
+        self.assertEqual(lop_period['name'], 'Vie du programme')
         self.assertEqual(lop_period['label'], None)
-        for name, period in zip(['Mesure de mi-parcours', 'Mesure de fin de programme'], data['period_date_ranges'][Indicator.MID_END]):
+        for name, period in zip(['Milieu de ligne', 'Fin de ligne'], data['period_date_ranges'][Indicator.MID_END]):
             self.assertEqual(period['name'], name)
             self.assertEqual(period['label'], None)
         annual_period = data['period_date_ranges'][Indicator.ANNUAL][0]

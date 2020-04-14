@@ -99,7 +99,7 @@ def get_audit_log_workbook(ws, program):
 
     header = [
         # Translators: The date and time of the change made to a piece of data
-        Cell(ws, value=_("Date and Time")),
+        Cell(ws, value=_("Date and time")),
         # Translators: Number of the indicator being shown
         Cell(ws, value=_('Result level')),
         Cell(ws, value=_('Indicator')),

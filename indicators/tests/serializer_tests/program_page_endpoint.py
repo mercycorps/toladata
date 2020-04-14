@@ -161,8 +161,8 @@ class TestProgramPageEndpoint(test.TestCase):
             french_data = ProgramPageProgramSerializer.get_for_pk(p.pk).data
         translation.activate('en')
         self.assertEqual(french_data['by_result_chain'], 'par chaîne Résultat')
-        self.assertEqual(french_data['indicators'][goal_pk_b]['number'], 'But b')
-        self.assertEqual(french_data['indicators'][expected_pks[6]]['number'], 'Extrant 1.2a')
+        self.assertEqual(french_data['indicators'][goal_pk_b]['number'], 'Objectif b')
+        self.assertEqual(french_data['indicators'][expected_pks[6]]['number'], 'Rendement 1.2a')
         self.assertEqual(french_data['indicators'][unassigned_pks[1]]['old_level_name'], None)
 
     def test_manual_numbering(self):
