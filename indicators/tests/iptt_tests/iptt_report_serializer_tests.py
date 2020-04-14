@@ -1,9 +1,8 @@
 """ Tests for the IPTTReportSerializer class (used by Excel endpoint renderer)
 
 """
-
-import unittest
 import datetime
+from unittest import mock
 from contextlib import contextmanager
 from django import test
 from django.utils import translation, formats
@@ -13,6 +12,9 @@ from workflow.serializers_new import (
     IPTTFullReportSerializer
 )
 from indicators.models import Indicator
+from indicators.tests.iptt_tests.iptt_scenario import (
+    IndicatorGenerator
+)
 from factories.workflow_models import (
     RFProgramFactory,
     SectorFactory,
@@ -214,6 +216,8 @@ class TestReportSerializers(test.TestCase):
         self.assertEqual(len(tp.data['periods'][Indicator.ANNUAL]), 4)
         self.assertEqual(tp.data['periods'][Indicator.ANNUAL][-1].header, 'Year 4')
         self.assertEqual(tp.data['periods'][Indicator.ANNUAL][1].subheader, 'Apr 1, 2017 – Mar 31, 2018')
+        self.assertEqual(tp.data['periods'][Indicator.ANNUAL][2].count, 2)
+        self.assertFalse(tp.data['periods'][Indicator.ANNUAL][2].tva)
         self.assertIn(Indicator.LOP, tva.data['periods'])
         self.assertEqual(len(tva.data['periods'][Indicator.LOP]), 0)
         for (frequency, period_count) in [
@@ -227,39 +231,23 @@ class TestReportSerializers(test.TestCase):
         ]:
             self.assertIn(frequency, full.data['periods'])
             self.assertEqual(len(full.data['periods'][frequency]), period_count)
+            if full.data['periods'][frequency]:
+                self.assertTrue(full.data['periods'][frequency][0].tva)
+                self.assertEqual(full.data['periods'][frequency][-1].count, period_count-1)
         for report in [tp, tva, full]:
             self.assertIn('lop_period', report.data)
             lop_period = report.data['lop_period']
+            self.assertIsNone(lop_period.header)
             self.assertEqual(
                 lop_period.subheader,
                 'Life of Program'
             )
+            self.assertIsNone(lop_period.count)
+            self.assertTrue(lop_period.tva)
             self.assertEqual(len(lop_period.columns),  3)
-            self.assertEqual(
-                lop_period.columns[0],
-                {
-                    'header': 'Target',
-                    'attribute': 'lop_target_real',
-                    'disaggregation_attribute': None
-                }
-            )
-            self.assertEqual(
-                lop_period.columns[1],
-                {
-                    'header': 'Actual',
-                    'attribute': 'lop_actual',
-                    'disaggregation_attribute': 'disaggregation_{}_lop_actual'
-                }
-            )
-            
-            self.assertEqual(
-                lop_period.columns[2],
-                {
-                    'header': '% Met',
-                    'attribute': 'lop_met_target_decimal',
-                    'disaggregation_attribute': None
-                }
-            )
+            self.assertEqual(lop_period.columns[0], {'header': 'Target'})
+            self.assertEqual(lop_period.columns[1], {'header': 'Actual'})
+            self.assertEqual(lop_period.columns[2], {'header': '% Met'})
 
     def test_level_rows(self):
         program = RFProgramFactory(
@@ -271,6 +259,7 @@ class TestReportSerializers(test.TestCase):
             LevelFactory(
                 program=program,
                 parent=None,
+                name=f"goal level {SPECIAL_CHARACTERS}",
                 customsort=1
             )
         ]
@@ -283,6 +272,7 @@ class TestReportSerializers(test.TestCase):
             LevelFactory(
                 program=program,
                 parent=levels[0],
+                name=f"output sorting test",
                 customsort=2
             ),
         ]
@@ -299,6 +289,21 @@ class TestReportSerializers(test.TestCase):
                 target_frequency=Indicator.SEMI_ANNUAL,
                 level=level
             )
+        RFIndicatorFactory(
+            program=program,
+            target_frequency=Indicator.SEMI_ANNUAL,
+            level=None
+        )
+        RFIndicatorFactory(
+            program=program,
+            target_frequency=Indicator.MONTHLY,
+            level=levels[1]
+        )
+        RFIndicatorFactory(
+            program=program,
+            target_frequency=Indicator.MONTHLY,
+            level=None
+        )
         reports = self.get_reports(
             program.pk, tp_frequency=Indicator.SEMI_ANNUAL,
             tva_frequency=Indicator.SEMI_ANNUAL
@@ -306,35 +311,39 @@ class TestReportSerializers(test.TestCase):
         for report in reports:
             self.assertIn('level_rows', report.data)
             self.assertIn(Indicator.SEMI_ANNUAL, report.data['level_rows'])
-            level_pks = [
-                level_row['level']['pk'] for level_row in report.data['level_rows'][Indicator.SEMI_ANNUAL]
-            ]
+            level_rows = list(report.data['level_rows'][Indicator.SEMI_ANNUAL])
+            level_pks = [level_row['level']['pk'] for level_row in level_rows]
             expected_pks = [
-                levels[0].pk, levels[1].pk, levels[3].pk, levels[2].pk
+                levels[0].pk, levels[1].pk, levels[3].pk, levels[2].pk, None
             ]
             self.assertEqual(level_pks, expected_pks)
-            self.assertIn('blank_level_rows', report.data)
-            self.assertIn(Indicator.SEMI_ANNUAL, report.data['blank_level_rows'])
-            blank_level_row = report.data['blank_level_rows'][Indicator.SEMI_ANNUAL]
-            self.assertEqual(
-                blank_level_row['level']['display_name'],
-                'Indicators unassigned to a results framework level'
-            )
-            self.assertEqual(blank_level_row['indicators'], [])
+            self.assertEqual(level_rows[0]['level']['name'], f"Goal: goal level {SPECIAL_CHARACTERS}")
+            self.assertEqual(level_rows[3]['level']['name'], "Outcome 2: output sorting test")
+            self.assertEqual(level_rows[-1]['level']['name'], "Indicators unassigned to a results framework level")
+            del level_rows
         level_order_reports = self.get_reports(
             program.pk, tp_frequency=Indicator.MONTHLY,
             tva_frequency=Indicator.MONTHLY, filters={'groupby': 2}
         )
-        for report in level_order_reports:
+        for report, tva in zip(level_order_reports, [False, True, True]):
             self.assertIn('level_rows', report.data)
             self.assertIn(Indicator.MONTHLY, report.data['level_rows'])
-            level_pks = [
-                level_row['level']['pk'] for level_row in report.data['level_rows'][Indicator.MONTHLY]
-            ]
-            expected_pks = [
-                levels[0].pk, levels[1].pk, levels[2].pk, levels[3].pk
-            ]
+            level_rows = list(report.data['level_rows'][Indicator.MONTHLY])
+            level_pks = [level_row['level']['pk'] for level_row in level_rows]
+            if tva:
+                expected_pks = [
+                    levels[0].pk, levels[1].pk, None
+                ]
+            else:
+                expected_pks = [
+                    levels[0].pk, levels[1].pk, levels[2].pk, levels[3].pk, None
+                ]
             self.assertEqual(level_pks, expected_pks)
+            self.assertEqual(level_rows[0]['level']['name'], f"Goal: goal level {SPECIAL_CHARACTERS}")
+            if not tva:
+                self.assertEqual(level_rows[2]['level']['name'], "Outcome 2: output sorting test")
+            self.assertEqual(level_rows[-1]['level']['name'], "Indicators unassigned to a results framework level")
+            del level_rows
 
     def test_indicators_details(self):
         indicator = RFIndicatorFactory(
@@ -361,17 +370,17 @@ class TestReportSerializers(test.TestCase):
             level_rows = report.data['level_rows'][Indicator.SEMI_ANNUAL]
             goal_level_row = next(level_rows)
             for level_row in level_rows:
-                self.assertEqual(level_row['indicators'], [])
-            self.assertEqual(len(goal_level_row['indicators']), 1)
-            goal_indicator = goal_level_row['indicators'][0]
-            self.assertEqual(goal_indicator['pk'], indicator.pk)
-            self.assertEqual(goal_indicator['number'], 'Goal a')
-            self.assertEqual(goal_indicator['name'], SPECIAL_CHARACTERS)
-            self.assertEqual(goal_indicator['unit_of_measure'], 'bananas')
-            self.assertEqual(goal_indicator['direction_of_change'], '+')
-            self.assertEqual(goal_indicator['is_cumulative'], False)
-            self.assertEqual(goal_indicator['unit_of_measure_type'], '#')
-            self.assertEqual(goal_indicator['baseline'], '100')
+                self.assertEqual(list(level_row['indicators']), [])
+            goal_indicators = list(goal_level_row['indicators'])
+            self.assertEqual(len(goal_indicators), 1)
+            self.assertEqual(goal_indicators[0]['pk'], indicator.pk)
+            self.assertEqual(goal_indicators[0]['number'], 'Goal a')
+            self.assertEqual(goal_indicators[0]['name'], SPECIAL_CHARACTERS)
+            self.assertEqual(goal_indicators[0]['unit_of_measure'], 'bananas')
+            self.assertEqual(goal_indicators[0]['direction_of_change'], '+')
+            self.assertEqual(goal_indicators[0]['is_cumulative'], False)
+            self.assertEqual(goal_indicators[0]['unit_of_measure_type'], '#')
+            self.assertEqual(goal_indicators[0]['baseline'], '100')
 
     def test_indicator_sector_filters(self):
         in_indicator = self.get_indicator(sector=self.sector1)
@@ -383,13 +392,13 @@ class TestReportSerializers(test.TestCase):
         for report in [tp_report, tva_report]:
             level_rows = report.data['level_rows'][Indicator.ANNUAL]
             goal_level = next(level_rows)
-            self.assertEqual(goal_level['indicators'], [])
+            self.assertEqual(list(goal_level['indicators']), [])
             second_level = next(level_rows)
-            self.assertEqual(len(second_level['indicators']), 1)
-            indicator = second_level['indicators'][0]
+            indicator = next(second_level['indicators'])
             self.assertEqual(indicator['pk'], in_indicator.pk)
+            self.assertRaises(StopIteration, next, second_level['indicators'])
             for level_row in level_rows:
-                self.assertEqual(level_row['indicators'], [])
+                self.assertEqual(list(level_row['indicators']), [])
             
     def test_indicator_types_filters(self):
         in_indicator = self.get_indicator()
@@ -405,8 +414,9 @@ class TestReportSerializers(test.TestCase):
             goal_level = next(level_rows)
             self.assertEqual(goal_level['indicators'], [])
             second_level = next(level_rows)
-            self.assertEqual(len(second_level['indicators']), 1)
-            indicator = second_level['indicators'][0]
+            indicator = next(second_level['indicators'])
+            with self.assertRaises(StopIteration):
+                next(second_level['indicators'])
             self.assertEqual(indicator['pk'], in_indicator.pk)
             for level_row in level_rows:
                 self.assertEqual(level_row['indicators'], [])
@@ -423,9 +433,9 @@ class TestReportSerializers(test.TestCase):
             goal_level = next(level_rows)
             self.assertEqual(goal_level['indicators'], [])
             second_level = next(level_rows)
-            self.assertEqual(len(second_level['indicators']), 1)
-            indicator = second_level['indicators'][0]
+            indicator = next(second_level['indicators'])
             self.assertEqual(indicator['pk'], in_indicator.pk)
+            self.assertRaises(StopIteration, next, second_level['indicators'])
             for level_row in level_rows:
                 self.assertEqual(level_row['indicators'], [])
 
@@ -443,9 +453,9 @@ class TestReportSerializers(test.TestCase):
             goal_level = next(level_rows)
             self.assertEqual(goal_level['indicators'], [])
             second_level = next(level_rows)
-            self.assertEqual(len(second_level['indicators']), 1)
-            indicator = second_level['indicators'][0]
+            indicator = next(second_level['indicators'])
             self.assertEqual(indicator['pk'], in_indicator.pk)
+            self.assertRaises(StopIteration, next, second_level['indicators'])
             for level_row in level_rows:
                 self.assertEqual(level_row['indicators'], [])
 
@@ -463,12 +473,11 @@ class TestReportSerializers(test.TestCase):
             goal_level = next(level_rows)
             self.assertEqual(goal_level['indicators'], [])
             second_level = next(level_rows)
-            self.assertEqual(len(second_level['indicators']), 1)
-            indicator = second_level['indicators'][0]
+            indicator = next(second_level['indicators'])
             self.assertEqual(indicator['pk'], in_indicator.pk)
+            self.assertRaises(StopIteration, next, second_level['indicators'])
             for level_row in level_rows:
                 self.assertEqual(level_row['indicators'], [])
-        
         
 
     def test_indicator_disaggregations_filter_multiple(self):
@@ -490,14 +499,17 @@ class TestReportSerializers(test.TestCase):
         for report in [tp_report, tva_report]:
             level_rows = report.data['level_rows'][Indicator.ANNUAL]
             goal_level = next(level_rows)
-            self.assertEqual(len(goal_level['indicators']), 1)
-            self.assertEqual(goal_level['indicators'][0]['pk'], in_indicator1.pk)
+            indicator = next(goal_level['indicators'])
+            self.assertEqual(indicator['pk'], in_indicator1.pk)
+            self.assertRaises(StopIteration, next, goal_level['indicators'])
             second_level = next(level_rows)
-            self.assertEqual(len(second_level['indicators']), 1)
-            self.assertEqual(second_level['indicators'][0]['pk'], in_indicator2.pk)
+            indicator = next(second_level['indicators'])
+            self.assertEqual(indicator['pk'], in_indicator2.pk)
+            self.assertRaises(StopIteration, next, second_level['indicators'])
             third_level = next(level_rows)
-            self.assertEqual(len(third_level['indicators']), 1)
-            self.assertEqual(third_level['indicators'][0]['pk'], in_indicator3.pk)
+            indicator = next(third_level['indicators'])
+            self.assertEqual(indicator['pk'], in_indicator3.pk)
+            self.assertRaises(StopIteration, next, third_level['indicators'])
             for level_row in level_rows:
                 self.assertEqual(level_row['indicators'], [])
 
@@ -530,8 +542,115 @@ class TestReportSerializers(test.TestCase):
             goal_level = next(level_rows)
             self.assertEqual(goal_level['indicators'], [])
             second_level = next(level_rows)
-            self.assertEqual(len(second_level['indicators']), 1)
-            indicator = second_level['indicators'][0]
+            indicator = next(second_level['indicators'])
             self.assertEqual(indicator['pk'], in_indicator.pk)
+            self.assertRaises(StopIteration, next, second_level['indicators'])
             for level_row in level_rows:
                 self.assertEqual(level_row['indicators'], [])
+
+
+class TestIPTTReportSerializerLevelRowData(test.TestCase):
+    @classmethod
+    def setUpClass(cls):
+        super().setUpClass()
+        cls.i_gen = IndicatorGenerator(
+            sectors=True, indicator_types=True, disaggregations=True, sites=True
+        )
+
+    def tearDown(self):
+        self.i_gen.clear_after_test()
+
+    def get_reports(self, pk=None, tp_frequency=Indicator.ANNUAL, tva_frequency=Indicator.ANNUAL, filters={}):
+        if pk is None:
+            pk = self.i_gen.program.pk
+        actuals_report = IPTTTPReportSerializer.load_report(pk, tp_frequency, filters=filters)
+        tva_report = IPTTTVAReportSerializer.load_report(pk, tva_frequency, filters=filters)
+        full_report = IPTTFullReportSerializer.load_report(pk, filters=filters)
+        return actuals_report, tva_report, full_report
+
+    def test_level_row_names(self):
+        indicators = list(self.i_gen.indicators_per_level(target_frequency=Indicator.ANNUAL, blank=True))
+        for report in self.get_reports():
+            level_rows = list(report.data['level_rows'][Indicator.ANNUAL])
+            self.assertEqual(len(level_rows), 7)
+            for expected_level, level_row in zip(self.i_gen.levels_chain_order, level_rows[:-1]):
+                self.assertEqual(expected_level.pk, level_row['level']['pk'])
+                self.assertEqual(expected_level.display_name, level_row['level']['name'])
+            blank_level_row = level_rows[-1]
+            self.assertEqual(
+                blank_level_row['level']['name'],
+                'Indicators unassigned to a results framework level'
+            )
+            self.assertEqual(blank_level_row['level']['pk'], None)
+        for report in self.get_reports(filters={'groupby': 2}):
+            level_row_pks = [l_r['level']['pk'] for l_r in report.data['level_rows'][Indicator.ANNUAL]]
+            expected_pks = [l.pk for l in self.i_gen.levels_level_order] + [None]
+            self.assertEqual(level_row_pks, expected_pks)
+
+    def test_no_blank_level_row(self):
+        indicators = list(self.i_gen.indicators_per_level(target_frequency=Indicator.ANNUAL))
+        for report in self.get_reports():
+            level_row_pks = [l_r['level']['pk'] for l_r in report.data['level_rows'][Indicator.ANNUAL]]
+            expected_pks = [l.pk for l in self.i_gen.levels_chain_order]
+            self.assertEqual(level_row_pks, expected_pks)
+
+    def test_goal_row_with_no_indicators(self):
+        indicators = list(self.i_gen.indicators_for_non_goal_levels(target_frequency=Indicator.ANNUAL))
+        for report in self.get_reports():
+            goal_level = next(report.data['level_rows'][Indicator.ANNUAL])
+            expected_goal_level = next(self.i_gen.levels_chain_order)
+            self.assertEqual(goal_level['level']['pk'], expected_goal_level.pk)
+            self.assertEqual(goal_level['indicators'], [])
+
+    def test_just_blank_level_row(self):
+        indicators = list(self.i_gen.indicators_no_levels(target_frequency=Indicator.ANNUAL))
+        for report in self.get_reports():
+            blank_level = next(report.data['level_rows'][Indicator.ANNUAL])
+            self.assertEqual(blank_level['level'], None)
+            self.assertEqual(
+                [i.pk for i in indicators],
+                [i['pk'] for i in blank_level['indicators']],
+            )
+            with self.assertRaises(StopIteration):
+                next(report.data['level_rows'][Indicator.ANNUAL])
+
+    def test_missing_middle_level_rows(self):
+        indicators = list(self.i_gen.indicators_some_levels(
+            target_frequency=Indicator.ANNUAL, count=3
+        ))
+        for report in self.get_reports():
+            expected_levels = list(self.i_gen.levels_chain_order)
+            goal_level = next(report.data['level_rows'][Indicator.ANNUAL])
+            self.assertEqual(goal_level['level']['pk'], expected_levels[0].pk)
+            self.assertEqual(goal_level['level']['ontology'], '')
+            self.assertEqual(goal_level['indicators'], [])
+            output_level = next(report.data['level_rows'][Indicator.ANNUAL])
+            self.assertEqual(output_level['level']['pk'], expected_levels[3].pk)
+            self.assertEqual(output_level['level']['ontology'], '1.2')
+            output_level_indicators = list(output_level['indicators'])
+            self.assertEqual(len(output_level_indicators), 3)
+            outcome_level = next(report.data['level_rows'][Indicator.ANNUAL])
+            self.assertEqual(outcome_level['level']['pk'], expected_levels[4].pk)
+            self.assertEqual(len(list(outcome_level['indicators'])), 3)
+            self.assertEqual(outcome_level['level']['ontology'], '2')
+            with self.assertRaises(StopIteration):
+                next(report.data['level_rows'][Indicator.ANNUAL])
+
+    def test_translated_level_rows(self):
+        indicators = list(self.i_gen.indicators_per_level(target_frequency=Indicator.SEMI_ANNUAL))
+        with mock.patch('indicators.serializers_new._') as mock_uggetext_lazy:
+            mock_uggetext_lazy.side_effect = lambda x: 'XXX ' + x
+            with lang_context('fr'):
+                for report in self.get_reports(tp_frequency=Indicator.SEMI_ANNUAL, tva_frequency=Indicator.SEMI_ANNUAL):
+                    for expected_level, level_row in zip(
+                        self.i_gen.levels_chain_order, report.data['level_rows'][Indicator.SEMI_ANNUAL]
+                    ):
+                        self.assertEqual(
+                            level_row['level']['tier_name'],
+                            f'XXX {expected_level.leveltier.name}'
+                            )
+                        self.assertEqual(
+                            level_row['level']['name'],
+                            f'XXX {expected_level.display_name}'
+                        )
+

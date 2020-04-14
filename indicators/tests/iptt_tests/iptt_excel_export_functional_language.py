@@ -56,33 +56,14 @@ Indicators:
 import io
 import datetime
 import locale
-import itertools
-import unittest
 import openpyxl
 from django import test
 from django.urls import reverse
 from django.utils import translation
 from indicators.models import Indicator
 from indicators.tests.iptt_tests.iptt_scenario import IPTTScenarioGeneral
-from factories.workflow_models import (
-    CountryFactory,
-    RFProgramFactory,
-    TolaUserFactory,
-    SectorFactory,
-    SiteProfileFactory,
-)
-from factories.indicators_models import (
-    RFIndicatorFactory,
-    LevelFactory,
-    LevelTierFactory,
-    DisaggregationTypeFactory,
-    IndicatorTypeFactory,
-    PeriodicTargetFactory,
-    ResultFactory,
-    DisaggregatedValueFactory,
-)
-
-
+from factories.workflow_models import TolaUserFactory
+from factories.django_models import UserFactory
 
 ENGLISH = 1
 FRENCH = 2
@@ -94,35 +75,33 @@ DATE_FORMATS = {
     SPANISH: lambda d: d.strftime('%-d %b. %Y').title()
 }
 
-ENGLISH_COLUMNS = [
-    'No.',
-    'Indicator',
-    'Unit of measure',
-    'Change',
-    'C / NC',
-    '# / %',
-    'Baseline'
-]
-
-FRENCH_COLUMNS = [
-    'Nº',
-    'Indicateur',
-    'Unité de mesure',
-    'Changement',
-    'C / NC',
-    '# / %',
-    'Base de référence'
-]
-
-SPANISH_COLUMNS = [
-    'No.',
-    'Indicador',
-    'Unidad de medida',
-    'Cambio',
-    'C / NC',
-    '# / %',
-    'Base'
-]
+COLUMNS = {
+    ENGLISH: [
+        'No.',
+        'Indicator',
+        'Unit of measure',
+        'Change',
+        'C / NC',
+        '# / %',
+        'Baseline'
+    ], FRENCH: [
+        'Nº',
+        'Indicateur',
+        'Unité de mesure',
+        'Changement',
+        'C / NC',
+        '# / %',
+        'Base de référence'
+    ], SPANISH: [
+        'No.',
+        'Indicador',
+        'Unidad de medida',
+        'Cambio',
+        'C / NC',
+        '# / %',
+        'Base'
+    ]
+}
 
 REPORT_TITLE = {
     ENGLISH: "Indicator Performance Tracking Report",
@@ -164,81 +143,52 @@ class TestIPTTExcelExports(test.TestCase):
     def setUpClass(cls):
         super().setUpClass()
         cls.scenario = IPTTScenarioGeneral()
-        cls.tolauser = TolaUserFactory()
-        cls.tolauser.user.is_superuser = True
-        cls.tolauser.user.save()
+        cls.user_en = UserFactory(is_superuser=True, username="EN user", tola_user__language='en')
+        cls.user_fr = UserFactory(is_superuser=True, username="FR user", tola_user__language='fr')
+        cls.user_es = UserFactory(is_superuser=True, username="ES user", tola_user__language='es')
         cls.client = test.Client()
 
     def tearDown(self):
+        self.client.logout()
         locale.setlocale(locale.LC_ALL, 'en_US')
         translation.activate('en')
 
     def login_client(self, language):
+        self.client.logout()
         if language == FRENCH:
-            self.tolauser.language = 'fr'
-            self.tolauser.save()
+            self.client.force_login(user=self.user_fr)
         elif language == SPANISH:
-            self.tolauser.language = 'es'
-            self.tolauser.save()
-        self.client.force_login(user=self.tolauser.user)
+            self.client.force_login(user=self.user_es)
+        else:
+            self.client.force_login(user=self.user_en)
+
+    def get_response(self, get_params):
+        get_response = self.client.get(self.iptt_url, {'programId': self.scenario.program.pk, **get_params})
+        self.assertEqual(get_response.status_code, 200)
+        return get_response
 
     def get_tva_report_full(self, response=False, language=ENGLISH, **kwargs):
         self.login_client(language)
-        get_response = self.client.get(
-            self.iptt_url,
-            {
-                **{
-                    'programId': self.scenario.program.pk,
-                    'fullTVA': 'true'
-                    },
-                **kwargs
-        })
-        self.assertEqual(get_response.status_code, 200)
-        self.client.logout()
-        self.tolauser.language = 'en'
-        self.tolauser.save()
+        get_response = self.get_response({'fullTVA': 'true', **kwargs})
         if response:
             return get_response
         return openpyxl.load_workbook(io.BytesIO(get_response.content))
 
     def get_tva_report(self, frequency=Indicator.LOP, response=False, language=ENGLISH, **kwargs):
         self.login_client(language)
-        get_response = self.client.get(
-            self.iptt_url,
-            { **{
-                'programId': self.scenario.program.pk,
-                'fullTVA': 'false',
-                'reportType': '1',
-                'frequency': frequency,
-                },
-             **kwargs
-            }
-        )
-        self.assertEqual(get_response.status_code, 200)
-        self.client.logout()
-        self.tolauser.language = 'en'
-        self.tolauser.save()
+        get_response = self.get_response({
+            'fullTVA': 'false',
+            'reportType': '1',
+            'frequency': frequency,
+            **kwargs
+        })
         if response:
             return get_response
         return openpyxl.load_workbook(io.BytesIO(get_response.content))
 
     def get_tp_report(self, frequency=Indicator.ANNUAL, response=False, language=ENGLISH, **kwargs):
         self.login_client(language)
-        get_response = self.client.get(
-            self.iptt_url,
-            { **{
-                'programId': self.scenario.program.pk,
-                'fullTVA': 'false',
-                'reportType': '2',
-                'frequency': frequency,
-                },
-             **kwargs
-            }
-        )
-        self.assertEqual(get_response.status_code, 200)
-        self.client.logout()
-        self.tolauser.language = 'en'
-        self.tolauser.save()
+        get_response = self.get_response({'fullTVA': 'false', 'reportType': '2', 'frequency': frequency, **kwargs})
         if response:
             return get_response
         return openpyxl.load_workbook(io.BytesIO(get_response.content))
@@ -378,13 +328,14 @@ class TestIPTTExcelExports(test.TestCase):
 
     def test_tva_full_report_headers(self):
         tva_full_report = self.get_tva_report_full()
-        self.assertEqual(len(tva_full_report.worksheets), 7)
+        self.assertEqual(len(tva_full_report.worksheets), 8)
         self.assertEqual(
             tva_full_report.sheetnames,
             [
                 "Life of Program (LoP) only",
                 "Midline and endline",
                 "Annual",
+                "Semi-annual",
                 "Tri-annual",
                 "Quarterly",
                 "Monthly",
@@ -392,7 +343,7 @@ class TestIPTTExcelExports(test.TestCase):
             ])
         for sheet in tva_full_report.worksheets[:-1]:
             self.assert_iptt_title_cells(sheet)
-            for column, header in enumerate(ENGLISH_COLUMNS):
+            for column, header in enumerate(COLUMNS[ENGLISH]):
                 self.assertEqual(
                     sheet.cell(row=4, column=3+column).value,
                     header
@@ -416,7 +367,7 @@ class TestIPTTExcelExports(test.TestCase):
         self.assertEqual(len(tva_lop_report.worksheets), 1)
         sheet = tva_lop_report.worksheets[0]
         self.assert_iptt_title_cells(sheet)
-        for column, header in enumerate(ENGLISH_COLUMNS):
+        for column, header in enumerate(COLUMNS[ENGLISH]):
             self.assertEqual(
                 sheet.cell(row=4, column=3+column).value,
                 header
@@ -452,7 +403,7 @@ class TestIPTTExcelExports(test.TestCase):
         self.assertEqual(len(tva_midend_report.worksheets), 1)
         sheet = tva_midend_report.worksheets[0]
         self.assert_iptt_title_cells(sheet)
-        for column, header in enumerate(ENGLISH_COLUMNS):
+        for column, header in enumerate(COLUMNS[ENGLISH]):
             self.assertEqual(
                 sheet.cell(row=4, column=3+column).value,
                 header
@@ -495,7 +446,7 @@ class TestIPTTExcelExports(test.TestCase):
         self.assertEqual(len(tva_quarterly_report.worksheets), 1)
         sheet = tva_quarterly_report.worksheets[0]
         self.assert_iptt_title_cells(sheet)
-        for column, header in enumerate(ENGLISH_COLUMNS):
+        for column, header in enumerate(COLUMNS[ENGLISH]):
             self.assertEqual(
                 sheet.cell(row=4, column=3+column).value,
                 header
@@ -581,7 +532,7 @@ class TestIPTTExcelExports(test.TestCase):
         self.assertEqual(len(tva_semi_annual_report.worksheets), 1)
         sheet = tva_semi_annual_report.worksheets[0]
         self.assert_iptt_title_cells(sheet, language=SPANISH)
-        for column, header in enumerate(SPANISH_COLUMNS):
+        for column, header in enumerate(COLUMNS[SPANISH]):
             self.assertEqual(
                 sheet.cell(row=4, column=3+column).value,
                 header
@@ -608,7 +559,7 @@ class TestIPTTExcelExports(test.TestCase):
         self.assertEqual(len(tp_annual_report.worksheets), 1)
         sheet = tp_annual_report.worksheets[0]
         self.assert_iptt_title_cells(sheet)
-        for column, header in enumerate(ENGLISH_COLUMNS):
+        for column, header in enumerate(COLUMNS[ENGLISH]):
             self.assertEqual(
                 sheet.cell(row=4, column=3+column).value,
                 header
@@ -649,7 +600,7 @@ class TestIPTTExcelExports(test.TestCase):
         self.assertEqual(len(tp_annual_report.worksheets), 1)
         sheet = tp_annual_report.worksheets[0]
         self.assert_iptt_title_cells(sheet)
-        for column, header in enumerate(ENGLISH_COLUMNS):
+        for column, header in enumerate(COLUMNS[ENGLISH]):
             self.assertEqual(
                 sheet.cell(row=4, column=3+column).value,
                 header
@@ -685,7 +636,7 @@ class TestIPTTExcelExports(test.TestCase):
         self.assertEqual(len(tp_semi_annual_report.worksheets), 1)
         sheet = tp_semi_annual_report.worksheets[0]
         self.assert_iptt_title_cells(sheet)
-        for column, header in enumerate(ENGLISH_COLUMNS):
+        for column, header in enumerate(COLUMNS[ENGLISH]):
             self.assertEqual(
                 sheet.cell(row=4, column=3+column).value,
                 header
@@ -712,7 +663,7 @@ class TestIPTTExcelExports(test.TestCase):
         self.assertEqual(len(tp_tri_annual_report.worksheets), 1)
         sheet = tp_tri_annual_report.worksheets[0]
         self.assert_iptt_title_cells(sheet)
-        for column, header in enumerate(ENGLISH_COLUMNS):
+        for column, header in enumerate(COLUMNS[ENGLISH]):
             self.assertEqual(
                 sheet.cell(row=4, column=3+column).value,
                 header
@@ -743,7 +694,7 @@ class TestIPTTExcelExports(test.TestCase):
         self.assertEqual(len(tp_annual_report.worksheets), 1)
         sheet = tp_annual_report.worksheets[0]
         self.assert_iptt_title_cells(sheet)
-        columns = [column for c, column in enumerate(ENGLISH_COLUMNS) if c not in (3, 4, 6)]
+        columns = [column for c, column in enumerate(COLUMNS[ENGLISH]) if c not in (3, 4, 6)]
         for column, header in enumerate(columns):
             self.assertEqual(
                 sheet.cell(row=4, column=3+column).value,
@@ -769,7 +720,7 @@ class TestIPTTExcelExports(test.TestCase):
         self.assertEqual(len(tp_monthly_report.worksheets), 1)
         sheet = tp_monthly_report.worksheets[0]
         self.assert_iptt_title_cells(sheet)
-        for column, header in enumerate(ENGLISH_COLUMNS):
+        for column, header in enumerate(COLUMNS[ENGLISH]):
             self.assertEqual(
                 sheet.cell(row=4, column=3+column).value,
                 header
@@ -805,7 +756,7 @@ class TestIPTTExcelExports(test.TestCase):
         self.assertEqual(len(tp_monthly_report.worksheets), 1)
         sheet = tp_monthly_report.worksheets[0]
         self.assert_iptt_title_cells(sheet)
-        for column, header in enumerate(ENGLISH_COLUMNS):
+        for column, header in enumerate(COLUMNS[ENGLISH]):
             self.assertEqual(
                 sheet.cell(row=4, column=3+column).value,
                 header
@@ -834,7 +785,7 @@ class TestIPTTExcelExports(test.TestCase):
         self.assertEqual(len(tp_monthly_report.worksheets), 1)
         sheet = tp_monthly_report.worksheets[0]
         self.assert_iptt_title_cells(sheet)
-        for column, header in enumerate(ENGLISH_COLUMNS):
+        for column, header in enumerate(COLUMNS[ENGLISH]):
             self.assertEqual(
                 sheet.cell(row=4, column=3+column).value,
                 header
@@ -866,7 +817,7 @@ class TestIPTTExcelExports(test.TestCase):
         self.assertEqual(len(tp_monthly_report.worksheets), 1)
         sheet = tp_monthly_report.worksheets[0]
         self.assert_iptt_title_cells(sheet, language=FRENCH)
-        for column, header in enumerate(FRENCH_COLUMNS):
+        for column, header in enumerate(COLUMNS[FRENCH]):
             self.assertEqual(
                 sheet.cell(row=4, column=3+column).value,
                 header
