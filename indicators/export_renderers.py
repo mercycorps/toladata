@@ -39,8 +39,64 @@ class ExcelRendererBase:
         alignment=openpyxl.styles.Alignment(horizontal='right', wrap_text=True)
     )
 
-    def __init__(self, serializer):
-        self.NAME_MAP = {
+    def create_workbook(self):
+        wb = openpyxl.Workbook()
+        wb.remove(wb.active)
+        title_style = openpyxl.styles.NamedStyle(name='title')
+        title_style.font = openpyxl.styles.Font(size=18)
+        wb.add_named_style(title_style)
+        header_style = openpyxl.styles.NamedStyle(name='header')
+        header_style.font = openpyxl.styles.Font(bold=True)
+        header_style.alignment = self.CENTER_ALIGN
+        header_style.fill = openpyxl.styles.PatternFill('solid', 'EEEEEE')
+        wb.add_named_style(header_style)
+        level_row_style = openpyxl.styles.NamedStyle(name='level_row')
+        level_row_style.font = openpyxl.styles.Font(bold=True)
+        level_row_style.fill = openpyxl.styles.PatternFill('solid', 'CCCCCC')
+        wb.add_named_style(level_row_style)
+        self.wb = wb
+        
+
+    @property
+    def header_columns(self):
+        """accurate list of headers for non-report (non period) data (name and description)"""
+        headers = [
+            ugettext('Program ID'),
+            ugettext('Indicator ID'),
+            # Translators: "No." as in abbreviation for Number
+            ugettext('No.'),
+            ugettext('Indicator')
+        ]
+        if self.level_column:
+            headers += [
+                ugettext('Level')
+            ]
+        if self.uom_column:
+            headers += [
+                ugettext('Unit of measure'),    
+            ]
+        if self.change_column:
+            headers += [
+                # Translators: this is short for "Direction of Change" as in + or -
+                ugettext('Change'),
+            ]
+        if self.cnc_column:
+            headers += [
+                # Translators: 'C' as in Cumulative and 'NC' as in Non Cumulative
+                ugettext('C / NC'),
+            ]
+        if self.uom_type_column:
+            headers += [
+                u'# / %',
+            ]
+        if self.baseline_column:
+            headers += [
+                ugettext('Baseline')
+            ]
+        return headers
+
+    def _get_name(self):
+        name = {
             1: ugettext('Life of Program (LoP) only'),
             2: ugettext('Midline and endline'),
             3: ugettext('Annual'),
@@ -49,76 +105,41 @@ class ExcelRendererBase:
             # Translators: this is the measure of time (3 months)
             6: ugettext('Quarterly'),
             7: ugettext('Monthly')
-        }
-        self.serializer = serializer
-        self.wb = openpyxl.Workbook()
-        self.wb.remove(self.wb.active)
-
-    def add_sheet(self, name):
+        }[self.frequency]
         if name and len(name) > 30:
             name = name[:26] + u'...'
-        sheet = self.wb.create_sheet(name)
+        return name
+        
+    def add_sheet(self):
+        sheet = self.wb.create_sheet(self._get_name())
+        self.add_headers(sheet)
+        current_row = 5
+        for level_row in self.serializer['level_rows'][self.frequency]:
+            current_row = self.add_level_row(level_row, sheet, current_row)
+        self.set_column_widths(sheet)
         return sheet
 
-    @property
-    def header_columns(self):
-        headers = [
-            ugettext('Program ID'),
-            ugettext('Indicator ID'),
-            # Translators: "No." as in abbreviation for Number
-            ugettext('No.'),
-            ugettext('Indicator')
-        ]
-        if self.serializer.level_column:
-            headers += [
-                ugettext('Level')
-            ]
-        if self.serializer.uom_column:
-            headers += [
-                ugettext('Unit of measure'),    
-            ]
-        if self.serializer.change_column:
-            headers += [
-                # Translators: this is short for "Direction of Change" as in + or -
-                ugettext('Change'),
-            ]
-        if self.serializer.cnc_column:
-            headers += [
-                # Translators: 'C' as in Cumulative and 'NC' as in Non Cumulative
-                ugettext('C / NC'),
-            ]
-        if self.serializer.uom_type_column:
-            headers += [
-                u'# / %',
-            ]
-        if self.serializer.baseline_column:
-            headers += [
-                ugettext('Baseline')
-            ]
-        return headers
-
     def add_headers(self, sheet):
-        for row, title in enumerate([
-                self.serializer.report_title,
-                self.serializer.report_date_range,
-                self.serializer.program_name]):
-            cell = sheet.cell(row=row+1, column=self.TITLE_START_COLUMN)
+        current_row = 1
+        for title in [self.serializer['report_title'], self.serializer['report_date_range'], self.serializer['program_name']]:
+            cell = sheet.cell(row=current_row, column=self.TITLE_START_COLUMN)
             cell.value = str(title)
-            cell.font = self.TITLE_FONT
+            cell.style = 'title'
             sheet.merge_cells(
-                start_row=row+1, start_column=self.TITLE_START_COLUMN,
-                end_row=row+1, end_column=len(self.header_columns)
+                start_row=current_row, start_column=self.TITLE_START_COLUMN,
+                end_row=current_row, end_column=len(self.header_columns)
                 )
-        for column, header in enumerate(self.header_columns):
-            cell = sheet.cell(row=4, column=column+1)
+            current_row += 1
+        current_column = 1
+        for header in self.header_columns:
+            cell = sheet.cell(row=current_row, column=current_column)
             cell.value = str(header)
-            cell.font = self.HEADER_FONT
-            cell.alignment = self.CENTER_ALIGN
-            cell.fill = self.HEADER_FILL
-        period_column = len(self.header_columns) + 1
-        for period in self.all_periods:
-            period_column = self.add_period_header(
-                sheet, period_column, period
+            cell.style = 'header'
+            current_column += 1
+        current_column = self.add_period_header(sheet, current_column, self.serializer['lop_period'])
+        for period in self.serializer['periods'][self.frequency]:
+            current_column = self.add_period_header(
+                sheet, current_column, period
             )
 
     def add_period_header(self, sheet, col, period):
@@ -133,24 +154,30 @@ class ExcelRendererBase:
                 cell.alignment = self.CENTER_ALIGN
                 if period.tva:
                     sheet.merge_cells(start_row=row, start_column=col, end_row=row, end_column=col+2)
-        columns = [ugettext('Target'), ugettext('Actual'), str(ugettext('% Met')).title()] if period.tva else [ugettext('Actual'),]
+        columns = [
+            ugettext('Target'), ugettext('Actual'), str(ugettext('% Met')).title()
+        ] if period.tva else [ugettext('Actual'),]
         for col_no, col_header in enumerate(columns):
             cell = sheet.cell(row=4, column=col+col_no)
             cell.value = str(col_header)
             cell.font = self.HEADER_FONT
             cell.fill = self.HEADER_FILL
             cell.alignment = self.RIGHT_ALIGN
-        return col + (3 if period.tva else 1)
+        return col + len(columns)
 
-    def add_level_row(self, row, sheet, level_name):
-        sheet.cell(row=row, column=1).fill = self.LEVEL_ROW_FILL
-        sheet.cell(row=row, column=2).fill = self.LEVEL_ROW_FILL
-        cell = sheet.cell(row=row, column=3)
-        cell.value = str(level_name)
-        cell.font = self.LEVEL_ROW_FONT
-        cell.fill = self.LEVEL_ROW_FILL
-        sheet.merge_cells(start_row=row, start_column=3, end_row=row, end_column=self.column_count)
-
+    def add_level_row(self, level_row, sheet, current_row):
+        if level_row['level']:
+            sheet.cell(row=current_row, column=1).fill = self.LEVEL_ROW_FILL
+            sheet.cell(row=current_row, column=2).fill = self.LEVEL_ROW_FILL
+            cell = sheet.cell(row=current_row, column=3)
+            cell.value = str(level_row['level']['name'])
+            cell.style = 'level_row'
+            sheet.merge_cells(start_row=current_row, start_column=3, end_row=current_row, end_column=self.column_count)
+            current_row += 1
+        for indicator in level_row['indicators']:
+            current_row = self.add_indicator_data(indicator, sheet, current_row)
+        return current_row
+        
     def int_cell(self, value):
         if not value:
             return None, 'General'
@@ -191,88 +218,78 @@ class ExcelRendererBase:
         value = str(value)
         return value, 'General'
 
-    def get_met_func(self, target_attribute, actual_attribute):
-        def get_percent_met(indicator):
-            try:
-                actual = float(getattr(indicator, actual_attribute))
-                target = float(getattr(indicator, target_attribute))
-            except (TypeError, ValueError) as e:
-                return None
-            if target == 0:
-                return None
-            return actual / target
-        return get_percent_met
-
-    def get_number(self, indicator):
-        return indicator.number_display
-
-    def add_indicator_row(self, row, sheet, indicator):
-        if indicator.unit_of_measure_type == Indicator.PERCENTAGE:
+    def add_indicator_data(self, indicator, sheet, current_row):
+        if indicator['unit_of_measure_type'] == '%':
             values_func = self.percent_value_cell
         else:
             values_func = self.float_cell
         indicator_columns = [
-            ('program_id', self.int_cell, self.RIGHT_ALIGN, None),
-            ('id', self.int_cell, self.RIGHT_ALIGN, None),
-            (self.get_number, self.str_cell, self.LEFT_ALIGN_WRAP, None),
-            ('name', self.str_cell, None, self.INDICATOR_NAME)
+            (indicator['program_pk'], self.int_cell, self.RIGHT_ALIGN, None),
+            (indicator['pk'], self.int_cell, self.RIGHT_ALIGN, None),
+            (indicator['number'], self.str_cell, self.LEFT_ALIGN_WRAP, None),
+            (indicator['name'], self.str_cell, None, self.INDICATOR_NAME)
         ]
-        if self.serializer.level_column:
+        if self.level_column:
             indicator_columns.append(
-                ('old_level', self.str_cell, None, None)
+                (indicator['old_level_name'], self.str_cell, None, None)
             )
-        if self.serializer.uom_column:
+        if self.uom_column:
             indicator_columns += [
-                ('unit_of_measure', self.str_cell, None, None),
+                (indicator['unit_of_measure'], self.str_cell, None, None),
             ]
-        if self.serializer.change_column:
+        if self.change_column:
             indicator_columns += [
-                ('get_direction_of_change', self.str_cell, self.CENTER_ALIGN, 'empty_blank'),
+                (indicator['direction_of_change'], self.str_cell, self.CENTER_ALIGN, 'empty_blank'),
             ]
-        if self.serializer.cnc_column:
+        if self.cnc_column:
+            col_value = ugettext("Cumulative") if indicator['is_cumulative'] else ugettext("Not cumulative")
             indicator_columns += [
-                ('is_cumulative_display', self.str_cell, None, None),
+                (col_value, self.str_cell, None, None),
             ]
-        if self.serializer.uom_type_column:
+        if self.uom_type_column:
             indicator_columns += [
-                ('get_unit_of_measure_type', self.str_cell, self.CENTER_ALIGN, 'empty_blank'),
+                (indicator['unit_of_measure_type'], self.str_cell, self.CENTER_ALIGN, 'empty_blank'),
             ]
-        if self.serializer.baseline_column:
+        if self.baseline_column:
             indicator_columns += [
-                ('baseline', values_func, None, None),
+                (indicator['baseline'], values_func, None, None),
                 ]
-        for period in self.all_periods:
-            if period.tva:
+        indicator_columns += [
+            (indicator['report_data']['lop_period']['target'], values_func, None, None),
+            (indicator['report_data']['lop_period']['actual'], values_func, None, None),
+            (indicator['report_data']['lop_period']['met'], self.percent_cell, None, None),
+        ]
+        for period_header, period_data in zip(self.serializer['periods'][self.frequency],
+                                              indicator['report_data']['periods']):
+            assert period_header.count == period_data['count']
+            if period_header.tva:
                 indicator_columns.append(
-                    (period.target_attribute, values_func, None, None)
+                    (period_data['target'], values_func, None, None)
                 )
             indicator_columns.append(
-                (period.actual_attribute, values_func, None, None)
+                (period_data['actual'], values_func, None, None)
             )
-            if period.tva:
+            if period_header.tva:
                 indicator_columns.append(
-                    (self.get_met_func(period.target_attribute, period.actual_attribute),
-                     self.percent_cell, None, None)
+                    (period_data['met'], self.percent_cell, None, None)
                 )
-        for column, (attribute, format_func, alignment, style) in enumerate(indicator_columns):
-            cell = sheet.cell(row=row, column=column+1)
-            empty_blank = False
+        for column, (value, format_func, alignment, style) in enumerate(indicator_columns):
+            number_format = None
+            cell = sheet.cell(row=current_row, column=column+1)
             if style == 'empty_blank':
                 style = None
                 empty_blank = True
+            else:
+                empty_blank = False
             try:
-                if callable(attribute):
-                    value, number_format = format_func(attribute(indicator))
-                elif isinstance(attribute, str):
-                    value, number_format = format_func(getattr(indicator, attribute))
-                else:
-                    value, number_format = None, None
+                value, number_format = format_func(value)
             except (AttributeError, TypeError, ValueError) as e:
                 cell.value = None
                 cell.comment = openpyxl.comments.Comment(
                     'error {} with attribute {} on indicator pk {}'.format(
-                        e, attribute, indicator.pk
+                        e, value, indicator['pk']
                         ), 'Tola System')
+                print("comment {}".format(cell.comment))
             else:
                 if value is None:
                     value = '' if empty_blank else EM_DASH
@@ -284,91 +301,68 @@ class ExcelRendererBase:
                     cell.style = style
                 if number_format is not None:
                     cell.number_format = number_format
-
-    def add_disaggregation_rows(self, row, sheet, indicator, disaggregation, categories):
-        if not categories:
-            return
-        disagg_indicator = self.serializer.get_disaggregated_indicator(indicator.pk)
-        if indicator.unit_of_measure_type == Indicator.PERCENTAGE:
-            values_func = self.percent_value_cell
-        else:
-            values_func = self.float_cell
-        disaggregation_cell = sheet.cell(row=row, column=3)
-        disaggregation_cell.value = disaggregation.disaggregation_type
-        disaggregation_cell.style = self.DISAGGREGATION_CELL
-        for c, category in enumerate(categories):
-            category_cell = sheet.cell(row=row+c, column=4)
-            category_cell.value = category.label
-            category_cell.style = self.DISAGGREGATION_CATEGORY
-            end_column = 4 + self.serializer.optional_columns_length - (1 if self.serializer.baseline_column else 0)
-            sheet.merge_cells(
-                start_row=row+c, start_column=4, end_row=row+c,
-                end_column=end_column
-            )
-            column = end_column + 1
-            if self.serializer.baseline_column:
-                # in the future if we have disaggregated baselines, they go here, for now blank:
-                baseline_cell = sheet.cell(row=row+c, column=column)
-                baseline_cell.value = EM_DASH
-                baseline_cell.alignment = self.CENTER_ALIGN
-                column += 1
-            lop_target_cell = sheet.cell(row=row+c, column=column)
-            lop_target_cell.value = EM_DASH
-            lop_target_cell.alignment = self.CENTER_ALIGN
-            column += 1
-            lop_actual_cell = sheet.cell(row=row+c, column=column)
-            value, number_format = values_func(
-                getattr(disagg_indicator, 'disaggregation_{}_lop_actual'.format(category.pk), None)
-            )
-            lop_actual_cell.value = value or EM_DASH
-            lop_actual_cell.number_format = number_format
-            lop_actual_cell.alignment = self.RIGHT_ALIGN
-            column += 1
-            lop_percent_met_cell = sheet.cell(row=row+c, column=column)
-            lop_percent_met_cell.value= EM_DASH
-            lop_percent_met_cell.alignment = self.CENTER_ALIGN
-            column += 1
-            for period in self.serializer.get_periods(self.serializer.frequency):
-                if period.tva:
-                    period_target_cell = sheet.cell(row=row+c, column=column)
-                    period_target_cell.value = EM_DASH
-                    period_target_cell.alignment = self.CENTER_ALIGN
-                    column += 1
-                period_actual_cell = sheet.cell(row=row+c, column=column)
-                value, number_format = values_func(
-                    getattr(disagg_indicator, period.actual_disaggregation_attribute.format(category.pk), None)
+        current_row += 1
+        for disaggregation in indicator.get('disaggregations', []):
+            top_row = current_row
+            sheet.cell(row=current_row, column=3).value = disaggregation['name']
+            for label in disaggregation['labels']:
+                current_column = len(self.header_columns)+2
+                # BASELINE:
+                sheet.cell(row=current_row, column=current_column-2).value = EM_DASH
+                # LOP TARGET:
+                sheet.cell(row=current_row, column=current_column-1).value = EM_DASH
+                # LOP % MET:
+                sheet.cell(row=current_row, column=current_column+1).value = EM_DASH
+                def label_value_func(cell, period, empty_blank=False):
+                    alignment = None
+                    value, number_format = values_func(
+                        period.get('disaggregations', {}).get(label['pk'], {}).get('actual', None)
+                    )
+                    if value is None:
+                        cell.value = '' if empty_blank else EM_DASH
+                        cell.alignment = self.CENTER_ALIGN
+                    else:                        
+                        cell.value = value
+                        if number_format is not None:
+                            cell.number_format = number_format
+                sheet.cell(row=current_row, column=4).value = label['name']
+                label_value_func(
+                    sheet.cell(row=current_row, column=current_column), indicator['report_data']['lop_period']
                 )
-                period_actual_cell.value = value or EM_DASH
-                period_actual_cell.number_format = number_format
-
-                period_actual_cell.alignment = self.RIGHT_ALIGN
-                column += 1
-                if period.tva:
-                    period_percent_met_cell = sheet.cell(row=row+c, column=column)
-                    period_percent_met_cell.value = EM_DASH
-                    period_percent_met_cell.alignment = self.CENTER_ALIGN
-                    column += 1
-        end_row = row+len(categories)
-        sheet.merge_cells(start_row=row, start_column=3, end_row=end_row-1, end_column=3)
-        if disaggregation.pk not in self.serializer.expanded_disaggregations:
-            for category_row in range(row, end_row):
-                sheet.row_dimensions[category_row].hidden = True
+                current_column += 2
+                for period_header, period_data in zip(self.serializer['periods'][self.frequency],
+                                                      indicator['report_data']['periods']):
+                    if period_header.tva:
+                        sheet.cell(row=current_row, column=current_column).value = EM_DASH
+                        current_column += 1
+                    label_value_func(sheet.cell(row=current_row, column=current_column), period_data)
+                    current_column += 1
+                    if period_header.tva:
+                        sheet.cell(row=current_row, column=current_column).value = EM_DASH
+                        current_column += 1
+                current_row += 1
+            if not self.disaggregations:
+                for row in range(top_row, current_row):
+                    sheet.row_dimensions[row].hidden = True
+            sheet.merge_cells(start_row=top_row, start_column=3, end_row=current_row-1, end_column=3)
+        return current_row
 
     def set_column_widths(self, sheet):
         widths = [10, 10, 17, 100]
-        if self.serializer.level_column:
+        if self.level_column:
             widths.append(12)
-        if self.serializer.uom_column:
+        if self.uom_column:
             widths.append(30)
-        if self.serializer.change_column:
+        if self.change_column:
             widths.append(12)
-        if self.serializer.cnc_column:
+        if self.cnc_column:
             widths.append(15)
-        if self.serializer.uom_type_column:
+        if self.uom_type_column:
             widths.append(8)
-        if self.serializer.baseline_column:
+        if self.baseline_column:
             widths.append(20)
-        for period in self.all_periods:
+        widths += [12]*3
+        for period in self.serializer['periods'][self.frequency]:
             widths += [12]*3 if period.tva else [12,]
         for col_no, width in enumerate(widths):
             sheet.column_dimensions[openpyxl.utils.get_column_letter(col_no + 1)].width = width
@@ -376,118 +370,71 @@ class ExcelRendererBase:
         sheet.column_dimensions['B'].hidden = True
 
 
-    def render(self):
+    def render_to_response(self):
         response = HttpResponse(content_type='application/ms-excel')
-        response['Content-Disposition'] = u'attachment; filename="{}"'.format(self.serializer.filename)
+        response['Content-Disposition'] = u'attachment; filename="{}"'.format(self.filename)
         self.wb.save(response)
         return response
-
-    def add_level_row_data(self, sheet):
-        row_offset = 5
-        for level_row in self.serializer.level_rows:
-            self.add_level_row(row_offset, sheet, level_row['level'].display_name)
-            row_offset += 1
-            for indicator in level_row['indicators']:
-                self.add_indicator_row(row_offset, sheet, indicator)
-                row_offset += 1
-                for disaggregation in sorted(
-                    getattr(indicator, 'prefetch_disaggregations', indicator.disaggregation.all()),
-                    key=operator.attrgetter('disaggregation_type')
-                    ):
-                    if not self.serializer.disaggregations or disaggregation.pk in self.serializer.disaggregations:
-                        categories = getattr(
-                            disaggregation, 'prefetch_labels', disaggregation.disaggregationlabel_set.all()
-                        )
-                        self.add_disaggregation_rows(row_offset, sheet, indicator, disaggregation, categories)
-                        row_offset += len(categories)
-        if self.serializer.blank_level_row:
-            self.add_level_row(
-                row_offset,
-                sheet,
-                ugettext('Indicators unassigned to a results framework level')
-                )
-            row_offset += 1
-            for indicator in self.serializer.blank_level_row:
-                self.add_indicator_row(row_offset, sheet, indicator)
-                row_offset += 1
-                for disaggregation in sorted(
-                    getattr(indicator, 'prefetch_disaggregations', indicator.disaggregation.all()),
-                    key=operator.attrgetter('disaggregation_type')
-                    ):
-                    if not self.serializer.disaggregations or disaggregation.pk in self.serializer.disaggregations:
-                        categories = getattr(
-                            disaggregation, 'prefetch_labels', disaggregation.disaggregationlabel_set.all()
-                        )
-                        self.add_disaggregation_rows(row_offset, sheet, indicator, disaggregation, categories)
-                        row_offset += len(categories)
-
-
-    def add_indicator_row_data(self, sheet):
-        row_offset = 5
-        for indicator in self.serializer.indicators:
-            self.add_indicator_row(row_offset, sheet, indicator)
-            row_offset += 1
-            for disaggregation in sorted(
-                getattr(indicator, 'prefetch_disaggregations', indicator.disaggregation.all()),
-                key=operator.attrgetter('disaggregation_type')
-                ):
-                if not self.serializer.disaggregations or disaggregation.pk in self.serializer.disaggregations:
-                    categories = getattr(
-                        disaggregation, 'prefetch_labels', disaggregation.disaggregationlabel_set.all()
-                    )
-                    self.add_disaggregation_rows(row_offset, sheet, indicator, disaggregation, categories)
-                    row_offset += len(categories)
-
-    def add_data(self, sheet):
-        if self.serializer.level_rows:
-            self.add_level_row_data(sheet)
-        else:
-            self.add_indicator_row_data(sheet)
 
     @property
     def column_count(self):
         return len(self.header_columns) + sum(
-            [3 if period.tva else 1 for period in self.all_periods]
+            [3 if period.tva else 1 for period in self.serializer['periods'][self.frequency]]
             )
 
-
-class FullReportExcelRenderer(ExcelRendererBase):
-
-    def __init__(self, serializer):
-        super(FullReportExcelRenderer, self).__init__(serializer)
-        for frequency in self.NAME_MAP:
-            serializer.frequency = frequency
-            if serializer.indicators:
-                sheet = self.add_sheet(self.NAME_MAP[frequency])
-                self.frequency = frequency
-                self.add_headers(sheet)
-                self.add_data(sheet)
-                self.set_column_widths(sheet)
-        sheet = self.add_sheet(ugettext('Change log'))
-        program = Program.objects.get(pk=self.serializer.program_data['pk'])
+    def add_change_log(self, program_pk):
+        sheet = self.wb.create_sheet(ugettext('Change log'))
+        program = Program.rf_aware_objects.get(pk=program_pk)
         get_audit_log_workbook(sheet, program)
 
-    def get_indicators(self):
-        return self.serializer.indicators
+
+class IPTTExcelRenderer(ExcelRendererBase):
+    def __init__(self, serializer, params={}):
+        self.filename = serializer.filename
+        self.serializer = serializer.data
+        self.create_workbook()
+        self.columns = params.get('columns', [])
+        self.disaggregations = params.get('disaggregations', False)
+        for frequency in self.serializer['frequencies']:
+            self.frequency = frequency
+            sheet = self.add_sheet()
 
     @property
-    def all_periods(self):
-        return self.serializer.all_periods_for_frequency
+    def level_column(self):
+        return not self.serializer['results_framework']
 
+    @property
+    def uom_column(self):    
+        return 0 not in self.columns
 
+    @property
+    def change_column(self):    
+        return 1 not in self.columns
+
+    @property
+    def cnc_column(self):    
+        return 2 not in self.columns
+
+    @property
+    def uom_type_column(self):    
+        return 3 not in self.columns
+
+    @property
+    def baseline_column(self):    
+        return 4 not in self.columns
+
+    @property
+    def optional_columns_length(self):
+        return sum([
+            (1 if self.uom_column else 0),
+            (1 if self.change_column else 0),
+            (1 if self.cnc_column else 0),
+            (1 if self.uom_type_column else 0),
+            (1 if self.baseline_column else 0),
+        ])
+
+class FullReportExcelRenderer(ExcelRendererBase):
+    pass
 
 class OneSheetExcelRenderer(ExcelRendererBase):
-
-    def __init__(self, serializer):
-        super(OneSheetExcelRenderer, self).__init__(serializer)
-        sheet = self.add_sheet(self.NAME_MAP[serializer.frequency])
-        self.add_headers(sheet)
-        self.add_data(sheet)
-        self.set_column_widths(sheet)
-
-    def get_indicators(self):
-        return self.serializer.indicators
-
-    @property
-    def all_periods(self):
-        return self.serializer.all_periods_for_frequency
+    pass
