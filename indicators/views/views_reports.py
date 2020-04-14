@@ -15,6 +15,12 @@ from indicators.serializers_new import (
     IPTTTVAReportIndicatorSerializer,
     IPTTTPReportIndicatorSerializer
 )
+from indicators.export_renderers import IPTTExcelRenderer
+from workflow.serializers_new import (
+    IPTTTPReportSerializer,
+    IPTTTVAReportSerializer,
+    IPTTFullReportSerializer
+)
 from tola_management.permissions import (
     verify_program_access_level,
     has_program_read_access
@@ -78,13 +84,11 @@ class IPTTQuickstart(LoginRequiredMixin, TemplateView):
         }
         return self.render_to_response({'js_context': js_context})
 
-from silk.profiling.profiler import silk_profile
 
 @method_decorator(has_program_read_access, name='dispatch')
 class IPTTReport(LoginRequiredMixin, TemplateView):
     template_name = 'indicators/iptt_report.html'
 
-    @silk_profile(name='IPTT report get')
     def get(self, request, *args, **kwargs):
         program_id = kwargs.get('program')
         programs = request.user.tola_user.available_programs.annotate(
@@ -118,48 +122,71 @@ class IPTTReport(LoginRequiredMixin, TemplateView):
 @login_required
 @has_program_read_access
 def api_iptt_report_data(request, program):
-    with silk_profile(name='API IPTT Report Data program %s' % program):
-        if request.GET.get('report_type') == '1':
-            data = IPTTTVAReportIndicatorSerializer.load_report(
-                program,
-                int(request.GET.get('frequency'))
-            )
-        else:
-            data = IPTTTPReportIndicatorSerializer.load_report(
-                program,
-                int(request.GET.get('frequency'))
-            )
-        return JsonResponse(
-            {'report_data': data,
-             'report_frequency': int(request.GET.get('frequency')),
-             'program_pk': int(program)})
+    if request.GET.get('report_type') == '1':
+        data = IPTTTVAReportIndicatorSerializer.load_report(
+            program,
+            int(request.GET.get('frequency'))
+        )
+    else:
+        data = IPTTTPReportIndicatorSerializer.load_report(
+            program,
+            int(request.GET.get('frequency'))
+        )
+    return JsonResponse(
+        {'report_data': data,
+         'report_frequency': int(request.GET.get('frequency')),
+         'program_pk': int(program)})
 
 
 @login_required
 @has_program_read_access
 def api_iptt_filter_data(request, program):
-    with silk_profile(name='API iptt filter data %s' % program):
-        return JsonResponse(IPTTProgramSerializer.get_for_pk(program).data)
+    return JsonResponse(IPTTProgramSerializer.get_for_pk(program).data)
 
-from workflow.serializers_new import IPTTReportSerializer
+
 
 class IPTTExcelReport(LoginRequiredMixin, View):
+    filter_params = ['sites', 'types', 'sectors', 'indicators', 'disaggregations', 'levels', 'tiers']
 
-    def get_serialized_data(self, request):
-        if request.GET.get('fullTVA') == 'true':
-            report_type = IPTTSerializer.TVA_FULL_EXCEL
-        elif request.GET.get('reportType') == '1':
-            report_type = IPTTSerializer.TVA_EXCEL
-        elif request.GET.get('reportType') == '2':
-            report_type = IPTTSerializer.TIMEPERIODS_EXCEL
+    def dispatch(self, request, *args, **kwargs):
+        self.fullTVA = request.GET.get('fullTVA', None) == 'true'
+        self.report_type = int(request.GET.get('reportType', 0))
+        self.program_pk = int(request.GET.get('programId', 0))
+        if not self.fullTVA:
+            self.frequency = int(request.GET.get('frequency', 0))
+            self.filters = {param: request.GET.getlist(param) for param in request.GET.keys() & self.filter_params}
+            self.filters['groupby'] = int(request.GET.get('groupby', 1))
+        return super().dispatch(request, *args, **kwargs)
+        
+    
+    def serializer_class(self, request):
+        if self.fullTVA:
+            return IPTTFullReportSerializer
+        elif self.report_type == 1:
+            return IPTTTVAReportSerializer
+        elif self.report_type == 2:
+            return IPTTTPReportSerializer
         else:
             raise NotImplementedError('No report type specified')
-        return IPTTSerializer(report_type, request.GET)
+
+    def get_params(self, request):
+        params = {}
+        columns = request.GET.getlist('columns')
+        if columns:
+            params['columns'] = list(map(int, columns))
+        disaggregations = request.GET.getlist('disaggregations')
+        if disaggregations:
+            params['disaggregations'] = list(map(int, disaggregations))
+        return params
 
     def get(self, request):
-        # with silk_profile(name='get serialized excel data for program %s' % request.GET.get('programId')):
-        serialized = self.get_serialized_data(request)
-        # with silk_profile(name='initialize serialized excel data for program %s' % request.GET.get('programId')):
-        serialized.initialize()
-        # with silk_profile(name="render serialized data for program %s" % request.GET.get('programId')):
-        return serialized.render(request)
+        Serializer = self.serializer_class(request)
+        if self.fullTVA:
+            serialized_report = Serializer.load_report(self.program_pk)
+        else:
+            serialized_report = Serializer.load_report(self.program_pk, frequency=self.frequency, filters=self.filters)
+        params = self.get_params(request)
+        renderer = IPTTExcelRenderer(serialized_report, params)
+        if self.fullTVA:
+            renderer.add_change_log(self.program_pk)
+        return renderer.render_to_response()

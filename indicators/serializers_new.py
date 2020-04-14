@@ -1,10 +1,9 @@
-# -*- coding: utf-8 -*-
-from __future__ import division
 import string
 import operator
 from decimal import Decimal
+from collections import defaultdict
 from rest_framework import serializers
-from indicators.models import Indicator, Level, LevelTier, DisaggregationLabel
+from indicators.models import Indicator, Level, LevelTier, DisaggregationLabel, DisaggregationType
 from indicators.queries import IPTTIndicator
 from workflow.models import Program
 from tola.model_utils import get_serializer
@@ -12,6 +11,14 @@ from tola.l10n_utils import l10n_date_medium
 from django.utils.translation import ugettext as _
 from django.utils import timezone
 
+def make_quantized_decimal(value, places=2):
+    if value is None:
+        return value
+    try:
+        value = Decimal(value)
+    except (TypeError, ValueError):
+        return None
+    return value.quantize(Decimal(f".{'0'*(places-1)}1"))
 
 class DecimalDisplayField(serializers.DecimalField):
     """
@@ -213,8 +220,8 @@ class IPTTIndicatorMixin:
     number = serializers.SerializerMethodField(method_name='get_long_number')
     disaggregation_pks = serializers.SerializerMethodField()
 
-    class Meta(IndicatorWithMeasurementSerializer.Meta):
-        fields = IndicatorWithMeasurementSerializer.Meta.fields + [
+    class Meta:
+        fields = [
             'sector_pk',
             'indicator_type_pks',
             'site_pks',
@@ -253,7 +260,7 @@ class IPTTIndicatorMixin:
             return None
         level_depth, display_ontology = self._get_level_depth_ontology(level[0], level_set)
         leveltier = [t for t in self.context.get('tiers', getattr(
-            indicator.program, 'prefetch_tiers', indicator.program.level_tiers.all()
+            indicator.program, 'prefetch_leveltiers', indicator.program.level_tiers.all()
         )) if t.tier_depth == level_depth]
         if not leveltier:
             leveltier_name = u''
@@ -269,12 +276,53 @@ IPTTIndicatorSerializer = get_serializer(
     IndicatorBase
 )
 
-class IPTTExcelIndicatorMixin:
-    number = serializers.SerializerMethodField(method_name='get_long_number')
+class DisaggregationBase:
+    name = serializers.CharField(source='disaggregation_type')
+    labels = serializers.SerializerMethodField()
+
+    class Meta:
+        model = DisaggregationType
+        fields = [
+            'pk',
+            'name',
+            'labels',
+        ]
+
+    def get_labels(self, disagg):
+        labels = self.context.get('labels_map', {}).get(disagg.pk, None)
+        if labels is None:
+            raise NotImplementedError("no prefetch disaggs")
+        return [{'pk': label.pk, 'name': label.label} for label in labels]
+
+class IPTTDisaggregationMixin:
+    has_results = serializers.SerializerMethodField()
 
     class Meta:
         fields = [
-            'number'
+            'has_results',
+        ]
+
+    def get_has_results(self, disagg):
+        if disagg.pk in self.context.get('with_results', []):
+            return True
+        return False
+
+IPTTDisaggregationSerializer = get_serializer(
+    IPTTDisaggregationMixin,
+    DisaggregationBase,
+)
+
+class IPTTExcelIndicatorMixin:
+    program_pk = serializers.IntegerField(source='program_id')
+    number = serializers.SerializerMethodField(method_name='get_long_number')
+    disaggregations = serializers.SerializerMethodField()
+
+    class Meta:
+        fields = [
+            'program_pk',
+            'number',
+            'is_cumulative_display',
+            'disaggregations',
         ]
 
     def _get_rf_long_number(self, indicator):
@@ -294,12 +342,145 @@ class IPTTExcelIndicatorMixin:
             leveltier_name, display_ontology, self._get_level_order_display(indicator)
         )
 
+    def get_disaggregations(self, indicator):
+        disaggregation_map = self.context.get('disaggregations')
+        disaggregation_labels = {}
+        disaggregation_objects = []
+        disagg_list = self.context.get('disaggregations_indicators').get(indicator.pk, {})
+        for disaggregation_dict in [
+            disaggregation_map.get(d_pk) for d_pk in disagg_list.get('all', [])
+        ]:
+            disaggregation = disaggregation_dict.get('disaggregation', None)
+            labels = disaggregation_dict.get('labels', [])
+            disaggregation_objects.append(disaggregation)
+            disaggregation_labels[disaggregation.pk] = labels
+        disaggregation_context = {
+            **self.context.get('disaggregation_context', {}),
+            'labels_map': disaggregation_labels,
+            'with_results': disagg_list.get('with_results', []),
+        }
+        return sorted(
+            IPTTDisaggregationSerializer(
+                disaggregation_objects, context=disaggregation_context, many=True
+                ).data,
+            key=operator.itemgetter('name')
+        )
+            
+
 IPTTExcelIndicatorSerializer = get_serializer(
     IPTTExcelIndicatorMixin,
     IndicatorMeasurementMixin,
     IndicatorBase
 )
 
+class IPTTExcelReportIndicatorBase:
+    lop_period = serializers.SerializerMethodField()
+    periods = serializers.SerializerMethodField()
+
+    class Meta:
+        model = Indicator
+        fields = [
+            'pk',
+            'level_id',
+            'lop_period',
+            'periods'
+        ]
+
+    def _get_all_results(self, indicator):
+        return sorted(self.context.get('results').get(indicator.pk, []), key=operator.attrgetter('date_collected'))
+
+    def _get_period_results(self, indicator, period_dict):
+        past_results = [result for result in self._get_all_results(indicator)
+                        if result.date_collected <= period_dict['end']]
+        period_results = [result for result in past_results
+                          if result.date_collected >= period_dict['start']]
+        if period_results and any(result.achieved is not None for result in period_results):
+            return past_results if indicator.is_cumulative else period_results
+        else:
+            return []
+
+    def _get_all_targets(self, indicator):
+        return self.context.get('targets').get(indicator.pk) or []
+
+    def _disaggregations_dict(self, values={}):
+        """Makes a dict with a default that will avoid key errors and return None for any unfilled dvs
+        
+            method instead of function to allow for overriding when disaggregated targets happen"""
+        return defaultdict(lambda: {'actual': None}, values)
+
+    def _get_results_totals(self, indicator, results):
+        if not results:
+            return (None, self._disaggregations_dict())
+        get_dv = lambda result, category_id: next(
+            (dv.value for dv in result.prefetch_disaggregated_values if dv.category_id == category_id), None
+        )
+        def get_value_sum(values_list):
+            clean_values = list(filter(None.__ne__, values_list))
+            if not clean_values:
+                return None
+            if indicator.unit_of_measure_type == Indicator.PERCENTAGE:
+                return clean_values[-1]
+            return sum(clean_values)
+    
+        return (get_value_sum([result.achieved for result in results]),
+                self._disaggregations_dict(
+                    {category_pk: {'actual': get_value_sum([get_dv(result, category_pk) for result in results])}
+                     for category_pk in self.context.get('labels_indicators_map').get(indicator.pk, [])
+                     })
+                )
+        
+    def get_lop_period(self, indicator):
+        results = self._get_all_results(indicator)
+        actual, disaggregations = self._get_results_totals(indicator, results)
+        period = {
+            'target': make_quantized_decimal(indicator.lop_target_calculated),
+            'actual': actual,
+            'disaggregations': disaggregations,
+            'count': None
+        }
+        if period['target'] and period['actual']:
+            period['met'] = make_quantized_decimal(period['actual'] / period['target'], places=4)
+        else:
+            period['met'] = None
+        return period
+
+    def _get_period(self, indicator, period_dict):
+        results = self._get_period_results(indicator, period_dict)
+        actual, disaggregations = self._get_results_totals(indicator, results)
+        return {
+            'count': period_dict.get('customsort', None),
+            'actual': actual,
+            'disaggregations': disaggregations
+            
+        }
+
+    def get_periods(self, indicator):
+        return [self._get_period(indicator, period) for period in self.context.get('periods')]
+
+class TVAMixin:
+    class Meta:
+        pass
+    def _get_period(self, indicator, period_dict):
+        period = super()._get_period(indicator, period_dict)
+        targets = [
+            target for target in self._get_all_targets(indicator) if target.customsort == period_dict['customsort']
+        ] 
+        period['target'] = targets[0].target if targets else None
+        if period['target'] and period['actual']:
+            period['met'] = make_quantized_decimal(period['actual'] / period['target'], places=4)
+        else:
+            period['met'] = None
+        return period
+            
+
+IPTTExcelTPReportIndicatorSerializer = get_serializer(
+    IPTTExcelReportIndicatorBase
+)
+
+IPTTExcelTVAReportIndicatorSerializer = get_serializer(
+    TVAMixin,
+    IPTTExcelReportIndicatorBase
+)    
 
 class IPTTReportIndicatorMixin:
     lop_actual = DecimalDisplayField()
@@ -489,6 +670,7 @@ IPTTTPReportIndicatorSerializer = get_serializer(
 class LevelBase:
     ontology = serializers.SerializerMethodField()
     tier_name = serializers.SerializerMethodField()
+    name = serializers.SerializerMethodField()
 
     class Meta:
         model = Level
@@ -541,6 +723,9 @@ class LevelBase:
         if self._get_level_tier(level):
             return _(self._get_level_tier(level).name)
         return None
+
+    def get_name(self, level):
+        return level.name
 
 
 class RFLevelOrderingLevelMixin:
@@ -600,8 +785,19 @@ class IPTTLevelMixin:
             depth = self._get_level_depth(target)
         return target.pk
 
-
 IPTTLevelSerializer = get_serializer(IPTTLevelMixin, LevelBase)
+
+class IPTTExcelLevelMixin:
+    class Meta:
+        fields = []
+    def get_name(self, level):
+        tier = self.get_tier_name(level) or ""
+        ontology = self.get_ontology(level) or ""
+        ontology = f' {ontology}' if ontology else ""
+        return f'{tier}{ontology}: {level.name}' if tier else level.name
+
+
+IPTTExcelLevelSerializer = get_serializer(IPTTExcelLevelMixin, IPTTLevelMixin, LevelBase)
 
 
 class TierBase:
