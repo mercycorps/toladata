@@ -61,15 +61,3 @@ class TestIndicatorWithMeasurementSerializer(test.TestCase):
             ]:
             data = self.get_indicator_data(baseline=baseline, baseline_na=na)
             self.assertEqual(data['baseline'], result)
-
-    def test_lop_indicator_lop_target(self):
-        data = self.get_indicator_data(target_frequency=Indicator.LOP, targets=200)
-        self.assertEqual(data['lop_target'], 200)
-
-    def test_lop_indicator_lop_target_vs_calculated(self):
-        data = self.get_indicator_data(target_frequency=Indicator.LOP, lop_target=1000, targets=10.5)
-        self.assertEqual(data['lop_target'], 10.5)
-
-    def test_annual_indicator_lop_target(self):
-        data = self.get_indicator_data(target_frequency=Indicator.ANNUAL, targets=2000)
-        self.assertEqual(data['lop_target'], 2000)

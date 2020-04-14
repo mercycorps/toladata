@@ -28,7 +28,7 @@ class TestIPTTEndpoint(test.TestCase):
         )
         site = SiteProfileFactory()
         it = IndicatorTypeFactory()
-        dt1 = DisaggregationTypeFactory(standard=True)
+        dt1 = DisaggregationTypeFactory(standard=True, labels=False)
         dt2 = DisaggregationTypeFactory(country=p.country.first(), labels=["1", "2", "3"])
         sector = SectorFactory()
         indicators = [RFIndicatorFactory(
