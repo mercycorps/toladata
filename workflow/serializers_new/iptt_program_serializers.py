@@ -315,10 +315,14 @@ class IPTTExcelMixin:
         return self.context.get('tiers', [])
    
     def get_levels(self, program):
+        level_context = {
+            'levels': self._get_program_levels(program),
+            'tiers': self._get_program_tiers(program)
+        }
         if self.context.get('level_order', False):
-            return [IPTTExcelLevelSerializer(level) for level in self._get_levels_level_order(program)]
+            return [IPTTExcelLevelSerializer(level, context=level_context) for level in self._get_levels_level_order(program)]
         else:
-            return [IPTTExcelLevelSerializer(level) for level in self._get_levels_chain_order(program)]
+            return [IPTTExcelLevelSerializer(level, context=level_context) for level in self._get_levels_chain_order(program)]
 
 IPTTExcelProgramSerializer = get_serializer(
     IPTTExcelMixin,

@@ -111,24 +111,32 @@ class ExcelRendererBase:
         return name
         
     def add_sheet(self):
+        level_rows = self.serializer['level_rows'][self.frequency]
+        try:
+            level_row = next(level_rows)
+        except StopIteration:
+            return None
         sheet = self.wb.create_sheet(self._get_name())
         self.add_headers(sheet)
         current_row = 5
-        for level_row in self.serializer['level_rows'][self.frequency]:
+        while True:
             current_row = self.add_level_row(level_row, sheet, current_row)
-        self.set_column_widths(sheet)
-        return sheet
+            try:
+                level_row = next(level_rows)
+            except StopIteration:
+                self.set_column_widths(sheet)
+                return sheet
 
     def add_headers(self, sheet):
         current_row = 1
         for title in [self.serializer['report_title'], self.serializer['report_date_range'], self.serializer['program_name']]:
-            cell = sheet.cell(row=current_row, column=self.TITLE_START_COLUMN)
-            cell.value = str(title)
-            cell.style = 'title'
             sheet.merge_cells(
                 start_row=current_row, start_column=self.TITLE_START_COLUMN,
                 end_row=current_row, end_column=len(self.header_columns)
                 )
+            cell = sheet.cell(row=current_row, column=self.TITLE_START_COLUMN)
+            cell.value = str(title)
+            cell.style = 'title'
             current_row += 1
         current_column = 1
         for header in self.header_columns:
@@ -148,12 +156,12 @@ class ExcelRendererBase:
                 (period.subheader, 3)
             ]:
             if header:
+                if period.tva:
+                    sheet.merge_cells(start_row=row, start_column=col, end_row=row, end_column=col+2)
                 cell = sheet.cell(row=row, column=col)
                 cell.value = str(header)
                 cell.font = self.HEADER_FONT
                 cell.alignment = self.CENTER_ALIGN
-                if period.tva:
-                    sheet.merge_cells(start_row=row, start_column=col, end_row=row, end_column=col+2)
         columns = [
             ugettext('Target'), ugettext('Actual'), str(ugettext('% Met')).title()
         ] if period.tva else [ugettext('Actual'),]
@@ -169,10 +177,10 @@ class ExcelRendererBase:
         if level_row['level']:
             sheet.cell(row=current_row, column=1).fill = self.LEVEL_ROW_FILL
             sheet.cell(row=current_row, column=2).fill = self.LEVEL_ROW_FILL
+            sheet.merge_cells(start_row=current_row, start_column=3, end_row=current_row, end_column=self.column_count)
             cell = sheet.cell(row=current_row, column=3)
             cell.value = str(level_row['level']['name'])
             cell.style = 'level_row'
-            sheet.merge_cells(start_row=current_row, start_column=3, end_row=current_row, end_column=self.column_count)
             current_row += 1
         for indicator in level_row['indicators']:
             current_row = self.add_indicator_data(indicator, sheet, current_row)
@@ -282,7 +290,10 @@ class ExcelRendererBase:
             else:
                 empty_blank = False
             try:
-                value, number_format = format_func(value)
+                if value is None:
+                    value, number_format = None, None
+                else:
+                    value, number_format = format_func(value)
             except (AttributeError, TypeError, ValueError) as e:
                 cell.value = None
                 cell.comment = openpyxl.comments.Comment(
@@ -304,15 +315,20 @@ class ExcelRendererBase:
         current_row += 1
         for disaggregation in indicator.get('disaggregations', []):
             top_row = current_row
-            sheet.cell(row=current_row, column=3).value = disaggregation['name']
             for label in disaggregation['labels']:
                 current_column = len(self.header_columns)+2
                 # BASELINE:
-                sheet.cell(row=current_row, column=current_column-2).value = EM_DASH
+                cell = sheet.cell(row=current_row, column=current_column-2)
+                cell.value = EM_DASH
+                cell.alignment = self.CENTER_ALIGN
                 # LOP TARGET:
-                sheet.cell(row=current_row, column=current_column-1).value = EM_DASH
+                celll = sheet.cell(row=current_row, column=current_column-1)
+                cell.value = EM_DASH
+                cell.alignment = self.CENTER_ALIGN
                 # LOP % MET:
-                sheet.cell(row=current_row, column=current_column+1).value = EM_DASH
+                cell = sheet.cell(row=current_row, column=current_column+1)
+                cell.value = EM_DASH
+                cell.alignment = self.CENTER_ALIGN
                 def label_value_func(cell, period, empty_blank=False):
                     alignment = None
                     value, number_format = values_func(
@@ -325,7 +341,10 @@ class ExcelRendererBase:
                         cell.value = value
                         if number_format is not None:
                             cell.number_format = number_format
-                sheet.cell(row=current_row, column=4).value = label['name']
+                sheet.merge_cells(start_row=current_row, start_column=4, end_row=current_row, end_column=6)
+                cell = sheet.cell(row=current_row, column=4)
+                cell.value = label['name']
+                cell.style = self.DISAGGREGATION_CATEGORY
                 label_value_func(
                     sheet.cell(row=current_row, column=current_column), indicator['report_data']['lop_period']
                 )
@@ -333,18 +352,25 @@ class ExcelRendererBase:
                 for period_header, period_data in zip(self.serializer['periods'][self.frequency],
                                                       indicator['report_data']['periods']):
                     if period_header.tva:
-                        sheet.cell(row=current_row, column=current_column).value = EM_DASH
+                        cell = sheet.cell(row=current_row, column=current_column)
+                        cell.value = EM_DASH
+                        cell.alignment = self.CENTER_ALIGN
                         current_column += 1
                     label_value_func(sheet.cell(row=current_row, column=current_column), period_data)
                     current_column += 1
                     if period_header.tva:
-                        sheet.cell(row=current_row, column=current_column).value = EM_DASH
+                        cell = sheet.cell(row=current_row, column=current_column)
+                        cell.value = EM_DASH
+                        cell.alignment = self.CENTER_ALIGN
                         current_column += 1
                 current_row += 1
             if not self.disaggregations:
                 for row in range(top_row, current_row):
                     sheet.row_dimensions[row].hidden = True
             sheet.merge_cells(start_row=top_row, start_column=3, end_row=current_row-1, end_column=3)
+            cell = sheet.cell(row=current_row, column=3)
+            cell.value = disaggregation['name']
+            cell.style = self.DISAGGREGATION_CELL
         return current_row
 
     def set_column_widths(self, sheet):
@@ -378,7 +404,7 @@ class ExcelRendererBase:
 
     @property
     def column_count(self):
-        return len(self.header_columns) + sum(
+        return len(self.header_columns) + 3 + sum(
             [3 if period.tva else 1 for period in self.serializer['periods'][self.frequency]]
             )
 

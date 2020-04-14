@@ -316,6 +316,7 @@ class IPTTExcelIndicatorMixin:
     program_pk = serializers.IntegerField(source='program_id')
     number = serializers.SerializerMethodField(method_name='get_long_number')
     disaggregations = serializers.SerializerMethodField()
+    no_rf_level = serializers.SerializerMethodField()
 
     class Meta:
         fields = [
@@ -323,6 +324,7 @@ class IPTTExcelIndicatorMixin:
             'number',
             'is_cumulative_display',
             'disaggregations',
+            'no_rf_level',
         ]
 
     def _get_rf_long_number(self, indicator):
@@ -365,6 +367,10 @@ class IPTTExcelIndicatorMixin:
                 ).data,
             key=operator.itemgetter('name')
         )
+
+    
+    def get_no_rf_level(self, indicator):
+        return (not indicator.results_framework or not indicator.level_id)
             
 
 IPTTExcelIndicatorSerializer = get_serializer(
@@ -376,6 +382,7 @@ IPTTExcelIndicatorSerializer = get_serializer(
 class IPTTExcelReportIndicatorBase:
     lop_period = serializers.SerializerMethodField()
     periods = serializers.SerializerMethodField()
+    
 
     class Meta:
         model = Indicator
@@ -383,7 +390,7 @@ class IPTTExcelReportIndicatorBase:
             'pk',
             'level_id',
             'lop_period',
-            'periods'
+            'periods',
         ]
 
     def _get_all_results(self, indicator):
@@ -681,6 +688,7 @@ class LevelBase:
             'tier_name',
             'parent_id'
         ]
+        
 
     def _get_tiers(self, level):
         if hasattr(self, 'context') and 'tiers' in self.context:

@@ -301,6 +301,9 @@ class IPTTReportSerializer(serializers.Serializer):
         }
 
     def _get_frequency_indicators(self, frequency, level_pk=None):
+        if level_pk is None:
+            return [indicator for indicator in self.context['indicators']
+                    if indicator['no_rf_level'] and indicator['target_frequency'] == frequency]
         return [indicator for indicator in self.context['indicators']
                 if indicator['level_pk'] == level_pk and indicator['target_frequency'] == frequency]
 
@@ -346,6 +349,7 @@ class IPTTReportSerializer(serializers.Serializer):
                 }
         if not has_indicators:
             self.context['frequencies'].remove(frequency)
+            return None
 
     def get_level_rows(self, obj):
         return {
@@ -368,6 +372,8 @@ class IPTTTPReportSerializer(IPTTReportSerializer):
         return cls({}, context=context)
 
     def _get_frequency_indicators(self, frequency, level_pk=None):
+        if level_pk is None:
+            return [indicator for indicator in self.context['indicators'] if indicator['no_rf_level']]
         return [indicator for indicator in self.context['indicators'] if indicator['level_pk'] == level_pk]
 
 
