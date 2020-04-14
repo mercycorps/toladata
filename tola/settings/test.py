@@ -17,7 +17,6 @@ if TESTING:
             return None
 
     MIGRATION_MODULES = DisableMigrations()
-    INSTALLED_APPS = INSTALLED_APPS + tuple(['silk'])
 
 PASSWORD_HASHERS = (
     'django.contrib.auth.hashers.MD5PasswordHasher',

@@ -27,7 +27,6 @@ from indicators.export_renderers import (
     EM_DASH,
 )
 
-from silk.profiling.profiler import silk_profile
 
 
 
