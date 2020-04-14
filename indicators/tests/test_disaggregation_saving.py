@@ -20,25 +20,25 @@ class TestDuplicateDisagg(test.TestCase):
         cls.country1 = w_factories.CountryFactory(country="country1", code="C1")
         cls.disagg_name = "Disaggregation Type 1"
         cls.disagg1 = i_factories.DisaggregationTypeFactory(
-            disaggregation_type=cls.disagg_name, country=cls.country1)
+            disaggregation_type=cls.disagg_name, country=cls.country1, labels=[])
 
     def test_prevent_create_duplicate_type(self):
         # catch the validation error that results when an attempt is made to create a dupe
         with transaction.atomic():
             with self.assertRaises(IntegrityError) as error_manager:
                 i_factories.DisaggregationTypeFactory(
-                    disaggregation_type=self.disagg_name, country=self.country1)
+                    disaggregation_type=self.disagg_name, country=self.country1, labels=[])
             self.assertIsNotNone(error_manager.exception)
 
         country2 = w_factories.CountryFactory(country="country2", code="C2")
-        i_factories.DisaggregationTypeFactory(disaggregation_type=self.disagg_name, country=country2)
+        i_factories.DisaggregationTypeFactory(disaggregation_type=self.disagg_name, country=country2, labels=[])
         self.assertEqual(
             1, country2.disaggregationtype_set.count(),
             "Should be able to save a disagg type of the same name in a different country."
         )
 
     def test_prevent_update_to_duplicate_type(self):
-        disagg2 = i_factories.DisaggregationTypeFactory(country=self.country1)
+        disagg2 = i_factories.DisaggregationTypeFactory(country=self.country1, labels=[])
         self.assertEqual(
             2, self.country1.disaggregationtype_set.count(),
             "Should be able to save a new disaggregation type in same country as another type."
@@ -74,7 +74,7 @@ class TestDuplicateDisagg(test.TestCase):
                 label2.save()
             self.assertIsNotNone(error_manager.exception)
 
-        disagg2 = i_factories.DisaggregationTypeFactory()
+        disagg2 = i_factories.DisaggregationTypeFactory(labels=[])
         i_factories.DisaggregationLabelFactory(label=label_name, disaggregation_type=disagg2)
         self.assertEqual(
             1, disagg2.disaggregationlabel_set.count(),
