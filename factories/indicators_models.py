@@ -111,7 +111,19 @@ class RFIndicatorFactory(DjangoModelFactory):
     @post_generation
     def targets(self, create, extracted, **kwargs):
         if extracted and self.target_frequency:
-            period_generator = PeriodicTargetM.generate_for_frequency(self.target_frequency)
+            if self.target_frequency == IndicatorM.EVENT:
+                def event_generator(start, end):
+                    for c in range(2):
+                        yield {
+                            'customsort': c,
+                            'start': start,
+                            'end': end,
+                            'name': f"Event {c+1}",
+                            'label': f"Event {c+1} label?",
+                        }
+                period_generator = event_generator
+            else:
+                period_generator = PeriodicTargetM.generate_for_frequency(self.target_frequency)
             if self.program:
                 periods = period_generator(
                     self.program.reporting_period_start, self.program.reporting_period_end
@@ -127,11 +139,15 @@ class RFIndicatorFactory(DjangoModelFactory):
                     target_values = [self.lop_target/len(periods)]*len(periods)
                 else:
                     periods = []
-                    target_values = []
+                    target_values = [] 
             elif isinstance(extracted, (int, float)):
                 target_values = [round(extracted/len(periods), 2)]*len(periods)
                 if len(target_values) > 1:
                     target_values[-1] = extracted - sum(target_values[0:-1])
+            elif isinstance(extracted, list):
+                target_values = extracted
+                if len(extracted) < len(periods):
+                    extracted += [None] * (len(periods) - len(extracted))
             elif self.lop_target:
                 target_values = [round(self.lop_target / len(periods))]*len(periods)
                 if len(target_values) > 1:
@@ -164,15 +180,22 @@ class RFIndicatorFactory(DjangoModelFactory):
             elif isinstance(extracted, (int, float)):
                 achieveds = [extracted/count]*count
                 achieveds[-1] = extracted - sum(achieveds[0:-1])
-            for target, achieved, evidence in zip(targets, achieveds, evidence):
-                ResultFactory(
-                    periodic_target=target,
-                    achieved=achieved,
-                    indicator=self,
-                    program=self.program,
-                    evidence_url=evidence,
-                    date_collected=target.start_date + datetime.timedelta(days=1)
-                )
+            elif isinstance(extracted, list):
+                achieveds = extracted
+                if count > len(extracted):
+                    achieveds += [None]*(count - len(extracted))
+            for c, (target, achieved, evidence) in enumerate(zip(targets, achieveds, evidence)):
+                if not isinstance(achieved, list):
+                    achieved = [achieved]
+                for j, this_achieved in enumerate(achieved):
+                    ResultFactory(
+                        periodic_target=target,
+                        achieved=this_achieved,
+                        indicator=self,
+                        program=self.program,
+                        evidence_url=evidence,
+                        date_collected=target.start_date + datetime.timedelta(days=1+j+c%count)
+                    )
 
 class Objective(DjangoModelFactory):
     class Meta:
@@ -280,6 +303,8 @@ class DisaggregationTypeFactory(DjangoModelFactory):
 
     @post_generation
     def labels(self, create, extracted, **kwargs):
+        if extracted is None:
+            extracted = ['Label 1', 'Label 2']
         if isinstance(extracted, list):
             labels = [
                 DisaggregationLabelFactory(

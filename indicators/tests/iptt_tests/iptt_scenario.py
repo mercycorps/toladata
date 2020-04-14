@@ -31,8 +31,11 @@ Indicators:
 """
 
 import datetime
-
-from indicators.models import Indicator
+import operator
+import itertools
+from collections import defaultdict
+from decimal import Decimal
+from indicators.models import Indicator, PeriodicTarget
 from factories.workflow_models import (
     CountryFactory,
     RFProgramFactory,
@@ -459,3 +462,502 @@ class IPTTScenarioSums:
                 )
             self.indicators.append(indicator_multi_result)
             level_order += 1
+
+class IndicatorGenerator:
+    default_program_kwargs = {
+        'active': True,
+        'months': 24,
+        'closed': False,
+        'tiers': ['Tier_name at depth 1 (i.e. Goal)',
+                  'Tier_name at depth 2 (i.e. Outcome)',
+                  'Tier_name at depth 3 (i.e. Output)'],
+        'levels': [(1,), ((2,),), (((2, 1),),)],
+    }
+    default_indicator_kwargs = {
+        'lop_target': 1000,
+        'targets': True,
+    }
+
+    def __init__(self, **kwargs):
+        self.country = CountryFactory(code="TT", country="Test Tola Land")
+        if kwargs.pop('sectors', False) is True:
+            self.sectors = SectorFactory.create_batch(2)
+        if kwargs.pop('indicator_types', False) is True:
+            self.indicator_types = IndicatorTypeFactory.create_batch(2)
+        if kwargs.pop('disaggregations', False) is True:
+            self.standard_disaggs = DisaggregationTypeFactory.create_batch(2, standard=True)
+            self.country_disaggs = DisaggregationTypeFactory.create_batch(2, standard=False, country=self.country)
+        if kwargs.pop('sites', False):
+            self.sites = SiteProfileFactory.create_batch(2, country=self.country)
+        program_kwargs = {
+            **self.default_program_kwargs,
+            **kwargs
+        }
+        self.program = RFProgramFactory(**program_kwargs)
+        self.program.country.set([self.country])
+        self.tiers = list(self.program.level_tiers.all().order_by('tier_depth'))
+        self.levels = sorted(
+            list(self.program.levels.all()),
+            key=operator.attrgetter('level_depth', 'customsort')
+            )
+        self.indicators_with_disaggregated_results = defaultdict(set)
+
+    @property
+    def levels_level_order(self):
+        for level_depth in range(4):
+            for level in sorted(
+                [level for level in self.levels if level.level_depth == level_depth],
+                key=operator.attrgetter('customsort')
+                ):
+                yield level
+
+    @property
+    def levels_chain_order(self):
+        def get_children(parent_level):
+            for level in [level for level in self.levels if level.parent == parent_level]:
+                yield level
+                for child in get_children(level):
+                    yield child
+        levels = get_children(None)
+        return levels
+        
+
+    def clear_after_test(self):
+        Indicator.objects.all().delete()
+        self.indicators_with_disaggregated_results = defaultdict(set)
+        
+        
+    def add_indicator(self, **kwargs):
+        disaggregations = kwargs.pop('disaggregations', [])
+        disaggregations_with_results = kwargs.pop('disaggregated_results', [])
+        indicator_types = kwargs.pop('indicator_types', [])
+        sites = kwargs.pop('sites', [])
+        indicator_kwargs = {
+            'program': self.program,
+            **self.default_indicator_kwargs,
+            **kwargs
+        }
+        indicator = RFIndicatorFactory(**indicator_kwargs)
+        indicator.indicator_type.set(indicator_types)
+        indicator.disaggregation.set(disaggregations)
+        if indicator.result_set.exists() and (sites or disaggregations_with_results):
+            self.add_sites_and_disaggregations(indicator, sites, disaggregations_with_results)
+        return indicator
+
+    def add_result(self, indicator, result_kwargs):
+        target = indicator.periodictargets.all()[result_kwargs.pop('target', 0)]
+        return ResultFactory(
+            indicator=indicator,
+            periodic_target=target,
+            achieved=result_kwargs.get('achieved', 10),
+            program=self.program,
+            date_collected=result_kwargs.get('date_collected', target.start_date),
+        )
+
+    def add_sites_and_disaggregations(self, indicator, sites, disaggregations_to_add):
+        if not disaggregations_to_add:
+            disaggregations_to_add = []
+        for result in indicator.result_set.all():
+            result.site.set(sites)
+            for disaggregation in disaggregations_to_add:
+                results_disaggregated = False
+                disaggregation_label_set = disaggregation.labels
+                if len(disaggregation_label_set) > 0:
+                    values = [round(result.achieved/len(disaggregation_label_set), 2)]*(len(disaggregation_label_set)-1)
+                    values.append(result.achieved - sum(values))
+                    for label, value in zip(disaggregation_label_set, values):
+                        DisaggregatedValueFactory(
+                            category=label,
+                            result=result,
+                            value=value
+                        )
+                        results_disaggregated = True
+                if results_disaggregated:
+                    self.indicators_with_disaggregated_results[indicator.pk].add(disaggregation.pk)
+
+    def _indicators_for_levels(self, levels, **kwargs):
+        count = kwargs.pop('count', 2)
+        for level_kwargs in levels_generator(levels, count, repeat=False):
+            yield self.add_indicator(**{
+                **kwargs,
+                **level_kwargs,
+            })
+
+    def indicators_per_level(self, **kwargs):
+        blank = kwargs.pop('blank', False)
+        levels = self.levels
+        if blank:
+            levels = [None,] + levels
+        return self._indicators_for_levels(levels, **kwargs)
+    
+    def indicators_for_non_goal_levels(self, **kwargs):
+        blank = kwargs.pop('blank', False)
+        levels = self.levels[1:]
+        if blank:
+            levels = [None,] + levels
+        return self._indicators_for_levels(levels, **kwargs)
+
+    def indicators_no_levels(self, **kwargs):
+        levels = [None,]
+        return self._indicators_for_levels([None], **kwargs)
+
+    def indicators_some_levels(self, **kwargs):
+        levels = [level for level, add in zip(
+            self.levels_level_order, [False, False, True, False, True, False]
+            ) if add]
+        return self._indicators_for_levels(levels, **kwargs)
+
+    def old_level_indicators(self, **kwargs):
+        count = kwargs.pop('count', 1)
+        number_gen = kwargs.pop('number_generator', number_generator())
+        for _, old_level in Indicator.OLD_LEVELS:
+            level_gen = next(number_gen)
+            for c in range(count):
+                yield self.add_indicator(**{
+                    'level': None,
+                    'old_level': old_level,
+                    'number': next(level_gen),
+                })
+
+    def all_measurement_type_indicators(self, **kwargs):
+        levels = levels_generator(self.levels, 1)
+        measurements = measurements_generator()
+        baselines = itertools.cycle(baselines_generator())
+        for level_kwargs, measurement_kwargs, baseline_kwargs in zip(
+            levels, measurements, baselines
+        ):
+            yield self.add_indicator(**{
+                **level_kwargs,
+                **measurement_kwargs,
+                **baseline_kwargs,
+                **kwargs
+                })
+
+    def all_frequencies_indicators(self, **kwargs):
+        count = kwargs.pop('count', 2)
+        event = kwargs.pop('event', True)
+        levels = levels_generator(self.levels, 1)
+        frequencies = frequencies_generator(count=count, event=event)
+        for level_kwargs, frequency_kwargs in zip(
+            levels, frequencies
+        ):
+            yield self.add_indicator(**{
+                **level_kwargs,
+                **frequency_kwargs,
+                **kwargs,
+                })
+
+    def all_filters_indicators(self, **kwargs):
+        sectors = itertools.cycle([None,] + self.sectors)
+        indicator_types = itertools.cycle(powerset(self.indicator_types))
+        disaggregations = powerset(self.standard_disaggs + self.country_disaggs)
+        frequencies = itertools.cycle(frequencies_generator())
+        levels = levels_generator(self.levels, 1)
+        for sector, indicator_type_set, disaggregation_set, frequency_kwargs, level_kwargs in zip(
+            sectors, indicator_types, disaggregations, frequencies, levels
+        ):
+            yield self.add_indicator(**{
+                'sector': sector,
+                **level_kwargs,
+                **frequency_kwargs,
+                'disaggregations': disaggregation_set,
+                'indicator_types': indicator_type_set,
+                **kwargs
+            })
+
+    def sites_indicators(self, **kwargs):
+        sites = itertools.chain(powerset(self.sites), powerset(self.sites))
+        levels = levels_generator(self.levels, 1)
+        frequencies = itertools.cycle(frequencies_generator())
+        for sites, level_kwargs, frequency_kwargs in zip(
+            sites, levels, frequencies
+        ):
+            yield self.add_indicator(**{
+                **level_kwargs,
+                **frequency_kwargs,
+                'results': True,
+                'sites': sites,
+                **kwargs
+            })
+
+    def disaggregations_indicators(self, **kwargs):
+        disaggregations = powerset(self.standard_disaggs + self.country_disaggs)
+        levels = levels_generator(self.levels, 1)
+        frequencies = itertools.cycle(frequencies_generator())
+        for disaggregation_set, level_kwargs, frequency_kwargs in zip(
+            disaggregations, levels, frequencies
+        ):
+            for with_results in powerset(disaggregation_set):
+                yield self.add_indicator(**{
+                    **level_kwargs,
+                    **frequency_kwargs,
+                    'results': True,
+                    'disaggregations': disaggregation_set,
+                    'disaggregated_results': with_results
+                })
+
+    def one_indicator_with_one_result(self, **kwargs):
+        return self.add_indicator(
+            level=self.levels[0],
+            target_frequency=Indicator.ANNUAL,
+            lop_target=1500,
+            targets=1500,
+            results=100,
+            results__count=1,
+            **kwargs
+            )
+
+    def indicators_with_results_different_uoms(self, **kwargs):
+        for measurements_kwargs, levels_kwargs in zip(
+            levels_generator(self.levels, 1),
+            measurements_generator()
+        ):
+            yield self.add_indicator(
+                target_frequency=Indicator.ANNUAL,
+                lop_target=1200,
+                targets=1200,
+                results=[20, 80, 50],
+                results__count=3,
+                **measurements_kwargs,
+                **levels_kwargs
+            )
+
+    def mismatched_lop_target_indicators(self):
+        for measurements_kwargs, levels_kwargs in zip(
+            levels_generator(self.levels, 1),
+            measurements_generator()
+        ):
+            yield self.add_indicator(
+                target_frequency=Indicator.ANNUAL,
+                lop_target=1400,
+                targets=160,
+                results=True,
+                **measurements_kwargs,
+                **levels_kwargs
+            )
+
+    def disaggregated_result_indicator(self):
+        return self.add_indicator(
+            target_frequency=Indicator.ANNUAL,
+            targets=140,
+            results=100,
+            disaggregations=[self.standard_disaggs[0]],
+            disaggregated_results=[self.standard_disaggs[0]]
+        )
+
+    def different_disaggregated_result_measurement_type_indicators(self):
+        for measurements_kwargs, levels_kwargs in zip(
+            levels_generator(self.levels, 1),
+            measurements_generator()
+        ):
+            yield self.add_indicator(
+                target_frequency=Indicator.SEMI_ANNUAL,
+                targets=[50*c for c in range(1, 5)],
+                results=[60, 105, 150, 195],
+                disaggregations=[self.standard_disaggs[0]] + self.country_disaggs,
+                disaggregated_results=[self.standard_disaggs[0], self.country_disaggs[0]],
+                **measurements_kwargs,
+                **levels_kwargs
+            )
+
+    def indicators_mixed_results(self, **kwargs):
+        result_sets = results_generator(
+            Indicator.QUARTERLY, self.program.reporting_period_start,
+            self.program.reporting_period_end
+        )
+        for levels_kwargs, result_set in zip(
+            levels_generator(self.levels, 1),
+            result_sets,
+        ):
+            indicator = self.add_indicator(
+                target_frequency=Indicator.QUARTERLY,
+                targets=1000.2,
+                disaggregations=[self.standard_disaggs[1]],
+                **levels_kwargs,
+                **kwargs
+            )
+            months = [[] for i in range(24)]
+            for result_dict in result_set:
+                if result_dict['date_collected'] <= datetime.date.today():
+                    result = self.add_result(indicator, result_dict)
+                    dvs = [
+                        DisaggregatedValueFactory(result=result, category=category, value=value)
+                        for value, category in zip([1, result.achieved - 1], self.standard_disaggs[1].labels)
+                    ]
+                    count = result.date_collected.month - self.program.reporting_period_start.month
+                    count += 12*(result.date_collected.year - self.program.reporting_period_start.year)
+                    months[count].append(result.achieved)
+            yield indicator, months
+
+    def two_results_per_semi_annual_indicators(self, **kwargs):
+        common_kwargs = {
+            'target_frequency': Indicator.SEMI_ANNUAL,
+            'targets': [50, 100, 150, 200],
+            'disaggregations': [self.standard_disaggs[0], self.country_disaggs[0]]
+        }
+        for is_cumulative, uom_type, level_kwargs in zip(
+            [True, False, False], [Indicator.NUMBER, Indicator.NUMBER, Indicator.PERCENTAGE],
+            levels_generator(self.levels, 1)
+        ):
+            indicator = self.add_indicator(
+                is_cumulative=is_cumulative, unit_of_measure_type=uom_type,
+                **level_kwargs,
+                **common_kwargs,
+                **kwargs
+            )
+            for target in indicator.periodictargets.all().order_by('customsort'):
+                result = self.add_result(
+                    indicator,
+                    {'target': target.customsort, 'date_collected': target.start_date + datetime.timedelta(days=1),
+                     'achieved': target.target-5}
+                )
+                DisaggregatedValueFactory(
+                    result=result, category=self.standard_disaggs[0].labels[0], value=target.target-5
+                )
+                result2 = self.add_result(
+                    indicator,
+                    {'target': target.customsort, 'date_collected': target.start_date + datetime.timedelta(days=50),
+                     'achieved': target.target+Decimal(5.15)}
+                )
+                for label, value in zip(self.country_disaggs[0].labels, [target.target, 5.15]):
+                    DisaggregatedValueFactory(
+                        result=result2, category=label, value=value
+                    )
+            yield indicator
+
+    def one_indicator_with_one_result_per_frequency(self, **kwargs):
+        for frequency_kwargs, level_kwargs in zip(
+            frequencies_generator(), levels_generator(self.levels, 1)
+        ):
+            yield self.add_indicator(
+                targets=100.25,
+                unit_of_measure_type=Indicator.NUMBER,
+                is_cumulative=False,
+                results=[4.1,],
+                **frequency_kwargs,
+                **level_kwargs,
+                **kwargs,
+            )
+
+    def lop_only_indicator_with_results(self, **kwargs):
+        return self.add_indicator(
+            target_frequency=Indicator.LOP,
+            targets=1200,
+            results=[100],
+            level=self.levels[0],
+        )
+            
+        
+def results_generator(frequency, start_date, end_date):
+    target_periods = list(PeriodicTarget.generate_for_frequency(frequency)(start_date, end_date))
+    # one per target:
+    yield [{
+        'achieved': 100,
+        'date_collected': tp['start']+datetime.timedelta(days=1),
+        'target': tp['customsort']
+        } for tp in target_periods]
+    # two per target:
+    yield [{
+        'achieved': 45.5 * c,
+        'date_collected': tp['start']+datetime.timedelta(days=1),
+        'target': tp['customsort']
+    } for c, tp in enumerate(target_periods)] + [{
+        'achieved': 12.05 * c,
+        'date_collected': tp['start']+datetime.timedelta(days=20),
+        'target': tp['customsort']
+    } for c, tp in enumerate(target_periods)]
+    # monthly
+    results = []
+    for tp in target_periods:
+        collect_date = tp['start'] + datetime.timedelta(days=1)
+        while collect_date < tp['end']:
+            results.append({
+                'achieved': 50.15,
+                'date_collected': collect_date,
+                'target': tp['customsort']
+            })
+            if collect_date.month == 12:
+                year = collect_date.year + 1
+                month = 1
+            else:
+                year = collect_date.year
+                month = collect_date.month + 1
+            collect_date = datetime.date(year, month, 2)
+    yield results
+    # only first target:
+    yield [{
+        'achieved': 10,
+        'date_collected': target_periods[0]['start']+datetime.timedelta(days=1),
+        'target': target_periods[0]['customsort']
+    }]
+    # only last target:
+    yield [{
+        'achieved': 10,
+        'date_collected': target_periods[-1]['start']+datetime.timedelta(days=1),
+        'target': target_periods[-1]['customsort']
+    }]
+    # only middle target:
+    period = len(target_periods)//2
+    yield [{
+        'achieved': 400,
+        'date_collected': target_periods[period]['start']+datetime.timedelta(days=1),
+        'target': target_periods[period]['customsort']
+    }]
+    # every other:
+    yield [{
+        'achieved': 100,
+        'date_collected': tp['start']+datetime.timedelta(days=1),
+        'target': tp['customsort']
+        } for tp in target_periods[::2]]
+    
+        
+    
+
+def levels_generator(levels, count, repeat=True):
+    for level in itertools.cycle(levels) if repeat else iter(levels):
+        for level_order in range(count):
+            yield {'level': level, 'level_order': level_order}
+
+def number_generator():
+    def _number_generator(number_base):
+        count = 1
+        while True:
+            yield f'{number_base}{count}'
+            count += 1
+    number_base = ''
+    while True:
+        yield _number_generator(number_base)
+        number_base = f'1.{number_base}'
+
+def measurements_generator():
+    generator = itertools.product(
+        [doc for (doc, _) in Indicator.DIRECTION_OF_CHANGE],
+        [uom for (uom, _) in Indicator.UNIT_OF_MEASURE_TYPES],
+        [True, False]
+    )
+    for doc, uom, is_cumulative in generator:
+        yield {
+            'direction_of_change': doc,
+            'unit_of_measure_type': uom,
+            'is_cumulative': is_cumulative
+        }
+
+def baselines_generator():
+    for baseline_na, baseline in [
+        (True, None),
+        (False, 100),
+        (False, 0),
+        (False, 99999)
+    ]:
+        yield {'baseline_na': baseline_na, 'baseline': baseline}
+
+def frequencies_generator(count=1, event=True):
+    for frequency, _ in Indicator.TARGET_FREQUENCIES:
+        if event or frequency != Indicator.EVENT:
+            for c in range(count):
+                yield {'target_frequency': frequency}
+
+def powerset(iterable):
+    "powerset([1,2,3]) --> () (1,) (2,) (3,) (1,2) (1,3) (2,3) (1,2,3)"
+    s = list(iterable)
+    return itertools.chain.from_iterable(itertools.combinations(s, r) for r in range(len(s)+1))

@@ -168,6 +168,8 @@ class RFProgramFactory(DjangoModelFactory):
     @post_generation
     def tiers(self, create, extracted, **kwargs):
         """generate tiers - can take True to generate MC tiers, or a list of tier names"""
+        if not extracted:
+            return
         from factories.indicators_models import LevelTierFactory
         if extracted is True:
             LevelTierFactory.build_mc_template(program=self)
@@ -180,6 +182,10 @@ class RFProgramFactory(DjangoModelFactory):
     @post_generation
     def levels(self, create, extracted, **kwargs):
         """post-gen hooks are called in declaration order, so this can depend upon tiers method"""
+        if not extracted:
+            return
+        elif isinstance(extracted, (dict, tuple, list)):
+            extracted = extracted.copy()
         tiers = self.level_tiers.all()
         from factories.indicators_models import LevelFactory
         def get_children(parents, count):
