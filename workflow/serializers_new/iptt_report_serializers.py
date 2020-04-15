@@ -208,7 +208,7 @@ class IPTTReportSerializer(serializers.Serializer):
             frequency_context = {'frequency': frequency}
             periods = (list(PeriodicTarget.generate_for_frequency(frequency)(*reporting_period))
                        if frequency != Indicator.LOP else [])
-            end_period = (filters['end'] + 1) if 'end' in filters else len(periods)
+            end_period = (filters['end'] + 1) if filters.get('end', None) else len(periods)
             frequency_context['periods'] = periods[filters.get('start', 0):end_period]
             frequency_context['results'] = result_map
             frequency_context['targets'] = targets_map
