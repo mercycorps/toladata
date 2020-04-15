@@ -224,6 +224,10 @@ class IPTTReportSerializer(serializers.Serializer):
         program_context = {**base_context}
         if filters.get('groupby', None) == 2:
             program_context['level_order'] = True
+        if filters.get('start', None):
+            context['start'] = filters.get('start')
+        if filters.get('end', None):
+            context['end'] = filters.get('end') + 1
         context['program'] = cls.load_program_data(program_pk, program_context=program_context).data
         context['frequencies'] = [int(frequency) for frequency in frequencies]
         disaggregations_context = cls._disaggregations_context(program_pk, filters=filters)
@@ -282,6 +286,15 @@ class IPTTReportSerializer(serializers.Serializer):
     def get_lop_period(self, obj):
         return IPTTExcelPeriod.lop_period()
 
+    def _get_frequency_periods(self, frequency):
+        periods = [IPTTExcelPeriod(frequency, period_dict, tva=self.is_tva)
+                   for period_dict in PeriodicTarget.generate_for_frequency(frequency)(*self.reporting_periods)]
+        if self.full_tva:
+            return periods
+        start = self.context.get('start', 0)
+        end = self.context.get('end', len(periods))
+        return periods[start:end]
+
     def get_periods(self, obj):
         frequencies = self.context['frequencies']
         periods = {}
@@ -290,12 +303,7 @@ class IPTTReportSerializer(serializers.Serializer):
             periods[Indicator.LOP] = []
         return {
             **periods,
-            **{frequency: [
-                IPTTExcelPeriod(frequency, period_dict, tva=self.is_tva)
-                for period_dict in PeriodicTarget.generate_for_frequency(frequency)(
-                    *self.reporting_periods
-                )] for frequency in  frequencies
-            }
+            **{frequency: self._get_frequency_periods(frequency) for frequency in  frequencies}
         }
 
     def _get_frequency_indicators(self, frequency, level_pk=None):
@@ -358,6 +366,7 @@ class IPTTReportSerializer(serializers.Serializer):
 
 class IPTTTPReportSerializer(IPTTReportSerializer):
     is_tva = False
+    full_tva = False
     report_serializer = IPTTExcelTPReportIndicatorSerializer
 
     @property
@@ -377,6 +386,7 @@ class IPTTTPReportSerializer(IPTTReportSerializer):
 
 class IPTTTVAReportSerializer(IPTTReportSerializer):
     is_tva = True
+    full_tva = False
     report_serializer = IPTTExcelTVAReportIndicatorSerializer
 
     @property
@@ -398,6 +408,7 @@ class IPTTTVAReportSerializer(IPTTReportSerializer):
 
 class IPTTFullReportSerializer(IPTTReportSerializer):
     is_tva = True
+    full_tva = True
     report_serializer = IPTTExcelTVAReportIndicatorSerializer
 
     all_frequencies = [

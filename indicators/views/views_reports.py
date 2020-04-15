@@ -154,6 +154,10 @@ class IPTTExcelReport(LoginRequiredMixin, View):
             self.frequency = int(request.GET.get('frequency', 0))
             self.filters = {param: request.GET.getlist(param) for param in request.GET.keys() & self.filter_params}
             self.filters['groupby'] = int(request.GET.get('groupby', 1))
+            start = request.GET.get('start', None)
+            end = request.GET.get('end', None)
+            self.filters['start'] = int(start) if start else None
+            self.filters['end'] = int(end) if end else None
         return super().dispatch(request, *args, **kwargs)
         
     
