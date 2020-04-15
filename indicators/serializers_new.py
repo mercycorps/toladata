@@ -394,11 +394,16 @@ class IPTTExcelReportIndicatorBase:
         ]
 
     def _get_all_results(self, indicator):
-        return sorted(self.context.get('results').get(indicator.pk, []), key=operator.attrgetter('date_collected'))
+        results = [result for result in self.context.get('results').get(indicator.pk, [])]
+        dateless = [result for result in results if result.date_collected is None]
+        if dateless:
+            results = [result for result in results if result.date_collected is not None]
+        return dateless + sorted(results, key=operator.attrgetter('date_collected'))
 
     def _get_period_results(self, indicator, period_dict):
         past_results = [result for result in self._get_all_results(indicator)
-                        if result.date_collected <= period_dict['end']]
+                        if (result.date_collected is not None and
+                            result.date_collected <= period_dict['end'])]
         period_results = [result for result in past_results
                           if result.date_collected >= period_dict['start']]
         if period_results and any(result.achieved is not None for result in period_results):
