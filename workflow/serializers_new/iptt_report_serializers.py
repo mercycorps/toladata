@@ -93,7 +93,14 @@ class IPTTReportSerializer(serializers.Serializer):
         if filters.get('sites', None):
             indicator_filters['result__site__in'] = filters.get('sites')
         if filters.get('levels', None):
-            indicator_filters['level__in'] = filters.get('levels')
+            level_pks = []
+            levels = kwargs.get('context').get('levels')
+            parent_pks = filters.get('levels')
+            while parent_pks:
+                child_pks = [level.pk for level in levels if level.parent_id in parent_pks]
+                level_pks += parent_pks
+                parent_pks = child_pks
+            indicator_filters['level__in'] = level_pks
         if filters.get('tiers', None):
             levels = kwargs.get('context').get('levels')
             filter_levels = []
