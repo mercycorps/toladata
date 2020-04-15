@@ -8,9 +8,7 @@ from workflow.serializers_new import (
 )
 from indicators.models import Indicator, PinnedReport, PeriodicTarget
 from indicators.forms import PinnedReportForm
-from indicators.serializers import (
-    IPTTSerializer,
-)
+
 from indicators.serializers_new import (
     IPTTTVAReportIndicatorSerializer,
     IPTTTPReportIndicatorSerializer

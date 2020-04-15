@@ -110,6 +110,13 @@ class RFIndicatorFactory(DjangoModelFactory):
 
     @post_generation
     def targets(self, create, extracted, **kwargs):
+        """Automatically add targets when creating an indicator.
+
+            targets="incomplete" - will add one less target than there are available periods
+            targets=10 (int or float) will split that value evenly among all available periods
+            targets=[5, 6] - will assign those targets to those periods
+                (if list is shorter than available periods, remaining targets are blank)
+            targets=True - will assign the lop_target value split among all available periods"""
         if extracted and self.target_frequency:
             if self.target_frequency == IndicatorM.EVENT:
                 def event_generator(start, end):
@@ -139,7 +146,7 @@ class RFIndicatorFactory(DjangoModelFactory):
                     target_values = [self.lop_target/len(periods)]*len(periods)
                 else:
                     periods = []
-                    target_values = [] 
+                    target_values = []
             elif isinstance(extracted, (int, float)):
                 target_values = [round(extracted/len(periods), 2)]*len(periods)
                 if len(target_values) > 1:
@@ -147,8 +154,8 @@ class RFIndicatorFactory(DjangoModelFactory):
             elif isinstance(extracted, list):
                 target_values = extracted
                 if len(extracted) < len(periods):
-                    extracted += [None] * (len(periods) - len(extracted))
-            elif self.lop_target:
+                    target_values += [None] * (len(periods) - len(extracted))
+            elif extracted and self.lop_target:
                 target_values = [round(self.lop_target / len(periods))]*len(periods)
                 if len(target_values) > 1:
                     target_values[-1] = self.lop_target - sum(target_values[0:-1])
@@ -165,6 +172,14 @@ class RFIndicatorFactory(DjangoModelFactory):
 
     @post_generation
     def results(self, create, extracted, **kwargs):
+        """automatically adds results when creating an indicator.
+        
+            results=True - will add one result to each target with achieved value of 10
+            results=10 (int/float) - will divide that lop_achieved value among each target
+            results=[4, 5] - will assign one result to each target in order, None for any remaining
+            results=[[4, 5], 10] - first target gets two results (4 and 5) second target gets one result (10)
+            """
+
         if extracted:
             targets = self.periodictargets.all()
             count = kwargs.get('count', len(targets))
