@@ -488,7 +488,26 @@ class TVAMixin:
                     return []
                 return midline_results + endline_result if indicator.is_cumulative else endline_results
         else:
-            return super()._get_period_results(indicator, period_dict)
+            targets = sorted([target for target in self._get_all_targets(indicator)
+                              if target.customsort <= period_dict['customsort']],
+                            key=operator.attrgetter('customsort'))
+            if not targets:
+                return []
+            period_target = targets[-1]
+            if period_target.customsort != period_dict['customsort']:
+                return []
+            period_results = [result for result in self._get_all_results(indicator)
+                              if (result.periodic_target == period_target and result.achieved is not None)]
+            if not period_results:
+                return []
+            if not indicator.is_cumulative:
+                return period_results
+            else:
+                return [result for result in self._get_all_results(indicator)
+                                 if (result.periodic_target.pk in [t.pk for t in targets]
+                                     and result.achieved is not None)]
+            
+            #return super()._get_period_results(indicator, period_dict)
             
     def _get_period(self, indicator, period_dict):
         period = super()._get_period(indicator, period_dict)

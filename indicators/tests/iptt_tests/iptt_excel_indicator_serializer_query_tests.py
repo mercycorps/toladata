@@ -552,10 +552,8 @@ class TestIPTTSerializedReportData(test.TestCase, DecimalComparator):
             disaggregated_values_queryset = disaggregated_values_queryset.filter(
                 category__disaggregation_type__id__in=filters.get('disaggregations')
             )
-        results = Result.objects.select_related(None).prefetch_related(None).filter(
+        results = Result.objects.select_related('periodic_target').prefetch_related(None).filter(
             indicator__program_id=program_pk
-        ).only(
-            'indicator_id', 'pk', 'date_collected', 'achieved'
         ).order_by('indicator_id').prefetch_related(
             models.Prefetch(
                 'disaggregatedvalue_set',

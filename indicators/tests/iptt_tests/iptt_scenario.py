@@ -446,7 +446,7 @@ class IPTTScenarioSums:
                 ]:    
                 result = ResultFactory(
                     indicator=indicator_multi_result,
-                    periodic_target=indicator_multi_result.periodictargets.first(),
+                    periodic_target=target,
                     date_collected=date_collected,
                     achieved=500
                 )

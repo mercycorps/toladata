@@ -186,10 +186,8 @@ class IPTTReportSerializer(serializers.Serializer):
         )
         report_context = {}
         result_map = defaultdict(list)
-        for result in Result.objects.select_related(None).prefetch_related(None).filter(
+        for result in Result.objects.select_related('periodic_target').prefetch_related(None).filter(
             indicator__program_id=program_data['pk']
-        ).only(
-            'indicator_id', 'pk', 'date_collected', 'achieved'
         ).order_by('indicator_id').prefetch_related(
             models.Prefetch(
                 'disaggregatedvalue_set',
