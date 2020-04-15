@@ -152,7 +152,7 @@ class IPTTExcelReport(LoginRequiredMixin, View):
         self.program_pk = int(request.GET.get('programId', 0))
         if not self.fullTVA:
             self.frequency = int(request.GET.get('frequency', 0))
-            self.filters = {param: request.GET.getlist(param) for param in request.GET.keys() & self.filter_params}
+            self.filters = {param: list(map(int, request.GET.getlist(param))) for param in request.GET.keys() & self.filter_params}
             self.filters['groupby'] = int(request.GET.get('groupby', 1))
             start = request.GET.get('start', None)
             end = request.GET.get('end', None)

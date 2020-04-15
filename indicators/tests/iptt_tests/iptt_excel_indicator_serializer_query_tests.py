@@ -433,25 +433,17 @@ class TestIPTTIndicatorSerializerQueries(test.TestCase):
     def test_level_filters(self):
         i_gen = IndicatorGenerator()
         indicators = i_gen.indicators_per_level()
-        one_level = [i_gen.levels[1].pk]
-        two_levels = [i_gen.levels[2].pk, i_gen.levels[4].pk]
-        one_level_indicator_pks = []
-        two_level_indicator_pks = []
+        selected_level_pk = [i_gen.levels[1].pk]
+        selected_level_and_chain_pks = [i_gen.levels[x].pk for x in [1, 3, 4]]
+        selected_indicator_pks = []
         for indicator in indicators:
-            if indicator.level_id in one_level:
-                one_level_indicator_pks.append(indicator.pk)
-            elif indicator.level_id in two_levels:
-                two_level_indicator_pks.append(indicator.pk)
+            if indicator.level_id in selected_level_and_chain_pks:
+                selected_indicator_pks.append(indicator.pk)
         for report in self.get_serialized_indicator_data(
-            program_pk=i_gen.program.pk, filters={'levels': one_level}, no_full_report=True
+            program_pk=i_gen.program.pk, filters={'levels': selected_level_pk}, no_full_report=True
         ):
             with self.assertNumQueries(0):
-                self.assertCountEqual([s_i['pk'] for s_i in report], one_level_indicator_pks)
-        for report in self.get_serialized_indicator_data(
-            program_pk=i_gen.program.pk, filters={'levels': two_levels}, no_full_report=True
-        ):
-            with self.assertNumQueries(0):
-                self.assertCountEqual([s_i['pk'] for s_i in report], two_level_indicator_pks)
+                self.assertCountEqual([s_i['pk'] for s_i in report], selected_indicator_pks)
 
     def test_tier_filters(self):
         i_gen = IndicatorGenerator()
