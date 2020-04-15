@@ -187,12 +187,12 @@ class ExcelRendererBase:
         return current_row
         
     def int_cell(self, value):
-        if not value:
+        if not value and value != 0:
             return None, 'General'
         return int(value), '0'
 
     def float_cell(self, value):
-        if not value:
+        if not value and value != 0:
             return None, 'General'
         value = round(float(value), 2)
         if value == int(value):
@@ -202,7 +202,7 @@ class ExcelRendererBase:
         return value, '0.00'
 
     def percent_cell(self, value):
-        if not value:
+        if not value and value != 0:
             return None, 'General'
         value = round(float(value), 4)
         if value == round(value, 2):
@@ -212,7 +212,7 @@ class ExcelRendererBase:
         return value, '0.00%'
 
     def percent_value_cell(self, value):
-        if not value:
+        if not value and value != 0:
             return None, 'General'
         value = round(float(value), 2)
         if value == int(value):
