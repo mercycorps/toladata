@@ -153,7 +153,9 @@ class IPTTExcelReport(LoginRequiredMixin, View):
         if not self.fullTVA:
             self.frequency = int(request.GET.get('frequency', 0))
             self.filters = {param: list(map(int, request.GET.getlist(param))) for param in request.GET.keys() & self.filter_params}
-            self.filters['disaggregations'] = list(map(int, filter(str.isdigit, request.GET.getlist('disaggregations'))))
+            disaggregations = list(map(int, filter(str.isdigit, request.GET.getlist('disaggregations'))))
+            if disaggregations:
+                self.filters['disaggregations'] = disaggregations
             self.filters['hide_empty_disagg_categories'] = 'hide-categories' in request.GET.getlist('disaggregations')
             self.filters['groupby'] = int(request.GET.get('groupby', 1))
             start = request.GET.get('start', None)
