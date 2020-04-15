@@ -57,6 +57,7 @@ import io
 import datetime
 import locale
 import openpyxl
+import unittest
 from django import test
 from django.urls import reverse
 from django.utils import translation
@@ -136,6 +137,19 @@ MET = {
 
 SPECIAL_CHARS = "Spécîal Chårs"
 
+def locales_exist():
+    try:
+        default_locale = locale.getlocale()
+        locale.setlocale(locale.LC_ALL, 'fr_FR')
+        locale.setlocale(locale.LC_ALL, 'es_ES')
+        locale.setlocale(locale.LC_ALL, 'en_US')
+    except locale.ERROR:
+        return True
+    else:
+        locale.setlocale(default_locale)
+        return False
+
+@unittest.skipIf(locales_exist(), "no locale support")
 class TestIPTTExcelExports(test.TestCase):
     iptt_url = reverse('iptt_excel')
 
