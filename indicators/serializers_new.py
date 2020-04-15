@@ -472,6 +472,24 @@ class IPTTExcelReportIndicatorBase:
 class TVAMixin:
     class Meta:
         pass
+
+    def _get_period_results(self, indicator, period_dict):
+        if indicator.target_frequency == Indicator.MID_END:
+            midline_target = [target for target in self._get_all_targets(indicator) if target.customsort == 0][0]
+            midline_results = [result for result in self._get_all_results(indicator)
+                               if result.periodic_target_id == midline_target.pk and result.achieved is not None]
+            if period_dict['customsort'] == 0:
+                return midline_results
+            else:
+                endline_target = [target for target in self._get_all_targets(indicator) if target.customsort == 1][0]
+                endline_results = [result for result in self._get_all_results(indicator)
+                                   if result.periodic_target_id == endline_target.pk and result.achieved is not None]
+                if not endline_results:
+                    return []
+                return midline_results + endline_result if indicator.is_cumulative else endline_results
+        else:
+            return super()._get_period_results(indicator, period_dict)
+            
     def _get_period(self, indicator, period_dict):
         period = super()._get_period(indicator, period_dict)
         targets = [
