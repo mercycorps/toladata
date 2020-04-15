@@ -188,13 +188,9 @@ class IPTTExcelReport(LoginRequiredMixin, View):
     def get(self, request):
         Serializer = self.serializer_class(request)
         if self.fullTVA:
-            r_t = 'full'
-            with silk_profile(name="load full tva report"):
-                serialized_report = Serializer.load_report(self.program_pk)
+            serialized_report = Serializer.load_report(self.program_pk)
         else:
-            r_t = 'tp' if self.report_type == 2 else 'tva'
-            with silk_profile(name='load %s report' % r_t):
-                serialized_report = Serializer.load_report(self.program_pk, frequency=self.frequency, filters=self.filters)
+            serialized_report = Serializer.load_report(self.program_pk, frequency=self.frequency, filters=self.filters)
         params = self.get_params(request)
         renderer = IPTTExcelRenderer(serialized_report, params)
         if self.fullTVA:
