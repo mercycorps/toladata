@@ -196,11 +196,8 @@ class IPTTExcelReport(LoginRequiredMixin, View):
             with silk_profile(name='load %s report' % r_t):
                 serialized_report = Serializer.load_report(self.program_pk, frequency=self.frequency, filters=self.filters)
         params = self.get_params(request)
-        with silk_profile(name="render excel %s" % r_t):
-            renderer = IPTTExcelRenderer(serialized_report, params)
+        renderer = IPTTExcelRenderer(serialized_report, params)
         if self.fullTVA:
             renderer.add_change_log(self.program_pk)
-        with silk_profile(name="render to response %s" % r_t):
-            response = renderer.render_to_response()
-        #return renderer.render_to_response()
-        return response
+        response = renderer.render_to_response()
+        return renderer.render_to_response()
