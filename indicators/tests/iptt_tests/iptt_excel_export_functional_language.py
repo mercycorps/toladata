@@ -144,9 +144,10 @@ def locales_exist():
         locale.setlocale(locale.LC_ALL, 'es_ES')
         locale.setlocale(locale.LC_ALL, 'en_US')
     except locale.Error:
+        locale.setlocale(locale.LC_ALL, '')
         return True
     else:
-        locale.setlocale(default_locale)
+        locale.setlocale(locale.LC_ALL, default_locale)
         return False
 
 @unittest.skipIf(locales_exist(), "no locale support")
