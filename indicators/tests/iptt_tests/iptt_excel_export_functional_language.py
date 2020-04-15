@@ -143,7 +143,6 @@ def locales_exist():
         locale.setlocale(locale.LC_ALL, 'fr_FR')
         locale.setlocale(locale.LC_ALL, 'es_ES')
         locale.setlocale(locale.LC_ALL, 'en_US')
-        locale.setlocale(locale.LC_ALL, 'bananas')
     except locale.Error:
         return True
     else:
