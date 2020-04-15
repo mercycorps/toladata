@@ -491,7 +491,7 @@ class TVAMixin:
                                    if result.periodic_target_id == endline_target.pk and result.achieved is not None]
                 if not endline_results:
                     return []
-                return midline_results + endline_result if indicator.is_cumulative else endline_results
+                return midline_results + endline_results if indicator.is_cumulative else endline_results
         else:
             targets = sorted([target for target in self._get_all_targets(indicator)
                               if target.customsort <= period_dict['customsort']],

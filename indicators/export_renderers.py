@@ -313,6 +313,7 @@ class ExcelRendererBase:
                 if number_format is not None:
                     cell.number_format = number_format
         current_row += 1
+        label_merge_column = len(self.header_columns) - (1 if self.baseline_column else 0)
         for disaggregation in indicator.get('disaggregations', []):
             top_row = current_row
             for label in disaggregation['labels']:
@@ -320,7 +321,7 @@ class ExcelRendererBase:
                 # BASELINE, LOP TARGET, LOP % MET:
                 for column in [current_column-2, current_column-1, current_column+1]:
                     sheet.cell(row=current_row, column=column).value = EM_DASH
-                    sheet.alignment = self.CENTER_ALIGN
+                    sheet.cell(row=current_row, column=column).alignment = self.CENTER_ALIGN
                 def label_value_func(cell, period, empty_blank=False):
                     alignment = None
                     value, number_format = values_func(
@@ -333,7 +334,10 @@ class ExcelRendererBase:
                         cell.value = value
                         if number_format is not None:
                             cell.number_format = number_format
-                sheet.merge_cells(start_row=current_row, start_column=4, end_row=current_row, end_column=6)
+                sheet.merge_cells(
+                    start_row=current_row, start_column=4,
+                    end_row=current_row, end_column=label_merge_column
+                )
                 cell = sheet.cell(row=current_row, column=4)
                 cell.value = label['name']
                 cell.style = self.DISAGGREGATION_CATEGORY

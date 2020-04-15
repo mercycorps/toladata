@@ -163,11 +163,12 @@ class IPTTReportSerializer(serializers.Serializer):
                 value__isnull=False
             )
         )):
-            disaggregations_indicators[d_i['indicator__pk']]['all'].append(d_i['pk'])
-            label_pks = [label.pk for label in disaggregations_map.get(d_i['pk'], {}).get('labels', [])]
-            labels_indicators[d_i['indicator__pk']] += label_pks
-            if d_i['has_results']:
-                disaggregations_indicators[d_i['indicator__pk']]['with_results'].append(d_i['pk'])
+            if d_i['has_results'] or not filters.get('hide_empty_disagg_categories', False):
+                disaggregations_indicators[d_i['indicator__pk']]['all'].append(d_i['pk'])
+                label_pks = [label.pk for label in disaggregations_map.get(d_i['pk'], {}).get('labels', [])]
+                labels_indicators[d_i['indicator__pk']] += label_pks
+                if d_i['has_results']:
+                    disaggregations_indicators[d_i['indicator__pk']]['with_results'].append(d_i['pk'])
         return {
             'disaggregations': disaggregations_map,
             'disaggregations_indicators': disaggregations_indicators,

@@ -144,7 +144,7 @@ def api_iptt_filter_data(request, program):
 
 
 class IPTTExcelReport(LoginRequiredMixin, View):
-    filter_params = ['sites', 'types', 'sectors', 'indicators', 'disaggregations', 'levels', 'tiers']
+    filter_params = ['sites', 'types', 'sectors', 'indicators', 'levels', 'tiers']
 
     def dispatch(self, request, *args, **kwargs):
         self.fullTVA = request.GET.get('fullTVA', None) == 'true'
@@ -153,14 +153,16 @@ class IPTTExcelReport(LoginRequiredMixin, View):
         if not self.fullTVA:
             self.frequency = int(request.GET.get('frequency', 0))
             self.filters = {param: list(map(int, request.GET.getlist(param))) for param in request.GET.keys() & self.filter_params}
+            self.filters['disaggregations'] = list(map(int, filter(str.isdigit, request.GET.getlist('disaggregations'))))
+            self.filters['hide_empty_disagg_categories'] = 'hide-categories' in request.GET.getlist('disaggregations')
             self.filters['groupby'] = int(request.GET.get('groupby', 1))
             start = request.GET.get('start', None)
             end = request.GET.get('end', None)
             self.filters['start'] = int(start) if start else None
             self.filters['end'] = int(end) if end else None
         return super().dispatch(request, *args, **kwargs)
-        
-    
+
+
     def serializer_class(self, request):
         if self.fullTVA:
             return IPTTFullReportSerializer
@@ -173,22 +175,30 @@ class IPTTExcelReport(LoginRequiredMixin, View):
 
     def get_params(self, request):
         params = {}
-        columns = request.GET.getlist('columns')
-        if columns:
-            params['columns'] = list(map(int, columns))
-        disaggregations = request.GET.getlist('disaggregations')
-        if disaggregations:
-            params['disaggregations'] = list(map(int, disaggregations))
+        if not self.fullTVA:
+            columns = request.GET.getlist('columns')
+            if columns:
+                params['columns'] = list(map(int, columns))
+            if self.filters.get('disaggregations', []):
+                params['disaggregations'] = self.filters['disaggregations']
         return params
 
     def get(self, request):
         Serializer = self.serializer_class(request)
         if self.fullTVA:
-            serialized_report = Serializer.load_report(self.program_pk)
+            r_t = 'full'
+            with silk_profile(name="load full tva report"):
+                serialized_report = Serializer.load_report(self.program_pk)
         else:
-            serialized_report = Serializer.load_report(self.program_pk, frequency=self.frequency, filters=self.filters)
+            r_t = 'tp' if self.report_type == 2 else 'tva'
+            with silk_profile(name='load %s report' % r_t):
+                serialized_report = Serializer.load_report(self.program_pk, frequency=self.frequency, filters=self.filters)
         params = self.get_params(request)
-        renderer = IPTTExcelRenderer(serialized_report, params)
+        with silk_profile(name="render excel %s" % r_t):
+            renderer = IPTTExcelRenderer(serialized_report, params)
         if self.fullTVA:
             renderer.add_change_log(self.program_pk)
-        return renderer.render_to_response()
+        with silk_profile(name="render to response %s" % r_t):
+            response = renderer.render_to_response()
+        #return renderer.render_to_response()
+        return response
