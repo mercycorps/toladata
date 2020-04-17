@@ -3,10 +3,6 @@ from django.db import models
 from django.utils import timezone
 from django.utils.translation import ugettext as _
 from rest_framework import serializers
-from workflow.models import (
-    Program,
-    SiteProfile,
-)
 from indicators.models import (
     Indicator,
     PeriodicTarget,
@@ -21,15 +17,18 @@ from indicators.serializers_new import (
     IPTTTierSerializer,
     IPTTIndicatorSerializer,
 )
-from .base_program_serializers import (
+from workflow.models import (
+    Program,
+    SiteProfile,
+)
+from workflow.serializers_new.base_program_serializers import (
     ProgramBase,
     ProgramReportingPeriodMixin,
     RFLevelOrderingMixin,
     ProgramPeriodsMixin,
 )
+from workflow.serializers_new.period_serializers import QSPeriodDateRangeSerializer
 from tola.model_utils import get_serializer
-from .period_serializers import QSPeriodDateRangeSerializer
-
 
 
 class IPTTQSMixin:
@@ -295,14 +294,15 @@ IPTTProgramSerializer = get_serializer(
 
 class IPTTExcelMixin:
     levels = serializers.SerializerMethodField()
-    
+
     class Meta:
         fields = [
             'levels',
         ]
 
     @classmethod
-    def get_for_pk(cls, program_pk, context={}):
+    def get_for_pk(cls, program_pk, **kwargs):
+        context = kwargs.get('context', {})
         program = Program.rf_aware_objects.select_related(None).prefetch_related(None).only(
             *cls._get_query_fields()
         ).get(pk=program_pk)
@@ -313,16 +313,18 @@ class IPTTExcelMixin:
 
     def _get_program_tiers(self, program):
         return self.context.get('tiers', [])
-   
+
     def get_levels(self, program):
         level_context = {
             'levels': self._get_program_levels(program),
             'tiers': self._get_program_tiers(program)
         }
         if self.context.get('level_order', False):
-            return [IPTTExcelLevelSerializer(level, context=level_context) for level in self._get_levels_level_order(program)]
+            level_objects = self._get_levels_level_order(program)
         else:
-            return [IPTTExcelLevelSerializer(level, context=level_context) for level in self._get_levels_chain_order(program)]
+            level_objects = self._get_levels_chain_order(program)
+        return [IPTTExcelLevelSerializer(level, context=level_context) for level in level_objects]
+
 
 IPTTExcelProgramSerializer = get_serializer(
     IPTTExcelMixin,

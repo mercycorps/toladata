@@ -81,8 +81,7 @@ class WebIPTTPeriod(BasePeriod):
     def target_column(self):
         return {**super().target_column, **{
             'attribute': (
-                'lop_target_real' if self.is_lop
-                    else f"frequency_{self.ferquency}_period_{self.period_count}_target"
+                'lop_target_real' if self.is_lop else f"frequency_{self.ferquency}_period_{self.period_count}_target"
                 ),
             'disaggregation_attribute': None
         }}
@@ -91,12 +90,11 @@ class WebIPTTPeriod(BasePeriod):
     def actual_column(self):
         return {**super().actual_column, **{
             'attribute': (
-                'lop_actual' if self.is_lop
-                    else f"frequency_{self.ferquency}_period_{self.period_count}"
+                'lop_actual' if self.is_lop else f"frequency_{self.ferquency}_period_{self.period_count}"
                 ),
             'disaggregation_attribute': (
-                'disaggregation_{}_lop_actual' if self.is_lop
-                    else "disaggregation_{}_" + f"frequency_{self.frequency}_period_{self.period_count}"
+                'disaggregation_{}_lop_actual' if self.is_lop else
+                "disaggregation_{}_" + f"frequency_{self.frequency}_period_{self.period_count}"
                 ),
         }}
 
@@ -148,4 +146,3 @@ class PeriodDateRangeSerializer(serializers.Serializer):
 
     def get_year(self, period):
         return period['start'].year
-

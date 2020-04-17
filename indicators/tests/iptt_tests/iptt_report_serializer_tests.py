@@ -150,8 +150,8 @@ class TestReportSerializers(test.TestCase):
     def get_reports(self, pk=None, tp_frequency=Indicator.ANNUAL, tva_frequency=Indicator.LOP, filters={}):
         if pk is None:
             pk = self.program1.pk
-        actuals_report = IPTTTPReportSerializer.load_report(pk, tp_frequency, filters=filters)
-        tva_report = IPTTTVAReportSerializer.load_report(pk, tva_frequency, filters=filters)
+        actuals_report = IPTTTPReportSerializer.load_report(pk, frequency=tp_frequency, filters=filters)
+        tva_report = IPTTTVAReportSerializer.load_report(pk, frequency=tva_frequency, filters=filters)
         full_report = IPTTFullReportSerializer.load_report(pk, filters=filters)
         return actuals_report, tva_report, full_report
 
@@ -176,16 +176,16 @@ class TestReportSerializers(test.TestCase):
             for report in self.get_reports(program.pk):
                 self.assertEqual(
                     report.data['report_date_range'],
-                    '1 avr. 2014 – 31 mar. 2017'
+                    '1 avr. 2014 – 31 mars 2017'
                 )
         with lang_context('es'):
             for report in self.get_reports(program.pk):
                 self.assertEqual(
                     report.data['report_date_range'],
-                    'Apr 1, 2014 – Mar 31, 2017'
+                    '1 Abr. 2014 – 31 Mar. 2017'
                 )
 
-    def test_program_reporting_period(self):
+    def test_report_title(self):
         for report in self.get_reports():
             self.assertEqual(
                 report.data['report_title'],
@@ -478,7 +478,6 @@ class TestReportSerializers(test.TestCase):
             self.assertRaises(StopIteration, next, second_level['indicators'])
             for level_row in level_rows:
                 self.assertEqual(level_row['indicators'], [])
-        
 
     def test_indicator_disaggregations_filter_multiple(self):
         in_indicator1 = self.get_indicator(level=self.goal_level)
@@ -563,8 +562,8 @@ class TestIPTTReportSerializerLevelRowData(test.TestCase):
     def get_reports(self, pk=None, tp_frequency=Indicator.ANNUAL, tva_frequency=Indicator.ANNUAL, filters={}):
         if pk is None:
             pk = self.i_gen.program.pk
-        actuals_report = IPTTTPReportSerializer.load_report(pk, tp_frequency, filters=filters)
-        tva_report = IPTTTVAReportSerializer.load_report(pk, tva_frequency, filters=filters)
+        actuals_report = IPTTTPReportSerializer.load_report(pk, frequency=tp_frequency, filters=filters)
+        tva_report = IPTTTVAReportSerializer.load_report(pk, frequency=tva_frequency, filters=filters)
         full_report = IPTTFullReportSerializer.load_report(pk, filters=filters)
         return actuals_report, tva_report, full_report
 

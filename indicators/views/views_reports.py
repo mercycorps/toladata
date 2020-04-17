@@ -165,7 +165,8 @@ class IPTTExcelReport(LoginRequiredMixin, View):
         return super().dispatch(request, *args, **kwargs)
 
 
-    def serializer_class(self, request):
+    @property
+    def serializer_class(self):
         if self.fullTVA:
             return IPTTFullReportSerializer
         elif self.report_type == 1:
@@ -181,18 +182,16 @@ class IPTTExcelReport(LoginRequiredMixin, View):
             columns = request.GET.getlist('columns')
             if columns:
                 params['columns'] = list(map(int, columns))
-            if self.filters.get('disaggregations', []):
-                params['disaggregations'] = self.filters['disaggregations']
         return params
 
     def get(self, request):
-        Serializer = self.serializer_class(request)
         if self.fullTVA:
-            serialized_report = Serializer.load_report(self.program_pk)
+            serialized_report = self.serializer_class.load_report(self.program_pk)
         else:
-            serialized_report = Serializer.load_report(self.program_pk, frequency=self.frequency, filters=self.filters)
-        params = self.get_params(request)
-        renderer = IPTTExcelRenderer(serialized_report, params)
+            serialized_report = self.serializer_class.load_report(
+                self.program_pk, frequency=self.frequency, filters=self.filters
+            )
+        renderer = IPTTExcelRenderer(serialized_report, params=self.get_params(request))
         if self.fullTVA:
             renderer.add_change_log(self.program_pk)
         response = renderer.render_to_response()

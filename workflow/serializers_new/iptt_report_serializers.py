@@ -19,8 +19,8 @@ from indicators.serializers_new import (
     IPTTExcelTPReportIndicatorSerializer,
     IPTTExcelTVAReportIndicatorSerializer
 )
-from .iptt_program_serializers import IPTTExcelProgramSerializer
-from .period_serializers import IPTTExcelPeriod
+from workflow.serializers_new.iptt_program_serializers import IPTTExcelProgramSerializer
+from workflow.serializers_new.period_serializers import IPTTExcelPeriod
 from tola.l10n_utils import l10n_date_medium
 
 
@@ -45,17 +45,20 @@ class IPTTReportSerializer(serializers.Serializer):
             'periods',
             'level_rows',
         ]
-    
+
     @property
     def filename(self):
         return f"{self.report_name} {l10n_date_medium(timezone.localtime().date(), decode=True)}.xlsx"
 
     @classmethod
-    def load_program_data(cls, program_pk, program_context={}):
+    def load_program_data(cls, program_pk, **kwargs):
+        program_context = kwargs.get('program_context', {})
         return IPTTExcelProgramSerializer.get_for_pk(program_pk, context=program_context)
 
     @classmethod
-    def load_indicator_data(cls, indicator_context={}, indicator_filters={}):        
+    def load_indicator_data(cls, **kwargs):
+        indicator_context = kwargs.get('indicator_context', {})
+        indicator_filters = kwargs.get('indicator_filters', {})
         indicators = Indicator.rf_aware_objects.select_related('program').prefetch_related(None).only(
             'pk', 'name', 'deleted', 'program_id', 'means_of_verification', 'level_id', 'level_order',
             'number', 'target_frequency', 'unit_of_measure', 'unit_of_measure_type', 'baseline', 'baseline_na',
@@ -65,22 +68,24 @@ class IPTTReportSerializer(serializers.Serializer):
         return IPTTExcelIndicatorSerializer(indicators, context=indicator_context, many=True)
 
     @classmethod
-    def load_report_indicators(cls, report_filters={}):
+    def load_report_indicators(cls, **kwargs):
+        report_filters = kwargs.get('report_filters', {})
         return Indicator.rf_aware_objects.select_related(None).prefetch_related(None).only(
             'pk', 'target_frequency', 'unit_of_measure_type', 'is_cumulative', 'level_id', 'lop_target',
         ).filter(**report_filters).order_by().distinct()
 
     @classmethod
-    def load_report_data(cls, report_context={}, report_filters={}, indicators=None):
-        if indicators is None:
-            indicators = cls.load_report_indicators(report_filters=report_filters)
+    def load_report_data(cls, **kwargs):
+        report_context = kwargs.get('report_context', {})
+        report_filters = kwargs.get('report_filters', {})
+        indicators = kwargs.get('indicators', cls.load_report_indicators(report_filters=report_filters))
         data = cls.report_serializer(indicators, context=report_context, many=True).data
         return {report['pk']: report for report in data}
 
     @classmethod
     def get_indicator_filters(cls, filters, program_pk=None, **kwargs):
         indicator_filters = {}
-        if program_pk:
+        if program_pk is not None:
             indicator_filters['program'] = program_pk
         if filters.get('sectors', None):
             indicator_filters['sector__in'] = filters.get('sectors')
@@ -125,7 +130,8 @@ class IPTTReportSerializer(serializers.Serializer):
         return cls.get_indicator_filters(*args, **kwargs)
 
     @classmethod
-    def _disaggregations_context(cls, program_pk, filters={}):
+    def _disaggregations_context(cls, program_pk, **kwargs):
+        filters = kwargs.get('filters', {})
         disaggregations_map = {}
         disaggregation_filters = list(map(int, filters.get('disaggregations', [])))
         disaggregations_indicators = defaultdict(
@@ -137,9 +143,9 @@ class IPTTReportSerializer(serializers.Serializer):
         }
         if disaggregation_filters:
             disaggregation_label_filters['disaggregation_type__pk__in'] = disaggregation_filters
-        for label in DisaggregationLabel.objects.select_related(
-            'disaggregation_type'
-        ).prefetch_related(None).filter(**disaggregation_label_filters).distinct():
+        for label in DisaggregationLabel.objects.select_related('disaggregation_type').prefetch_related(None).filter(
+                **disaggregation_label_filters
+            ).distinct():
             if label.disaggregation_type.pk not in disaggregations_map:
                 disaggregations_map[label.disaggregation_type.pk] = {
                     'disaggregation': label.disaggregation_type,
@@ -187,7 +193,8 @@ class IPTTReportSerializer(serializers.Serializer):
         }
 
     @classmethod
-    def _report_data_context(cls, frequencies, program_data, filters={}):
+    def _report_data_context(cls, frequencies, program_data, **kwargs):
+        filters = kwargs.get('filters', {})
         reporting_period = (
             dateutil.parser.isoparse(program_data['reporting_period_start_iso']).date(),
             dateutil.parser.isoparse(program_data['reporting_period_end_iso']).date()
@@ -224,7 +231,8 @@ class IPTTReportSerializer(serializers.Serializer):
         return report_context
 
     @classmethod
-    def get_context(cls, program_pk, frequencies, filters={}):
+    def get_context(cls, program_pk, frequencies, **kwargs):
+        filters = kwargs.get('filters', {})
         if type(frequencies) == int:
             frequencies = [frequencies]
         context = {}
@@ -382,7 +390,9 @@ class IPTTTPReportSerializer(IPTTReportSerializer):
         return _("IPTT Actuals only report")
 
     @classmethod
-    def load_report(cls, program_pk, frequency=Indicator.MONTHLY, filters={}):
+    def load_report(cls, program_pk, **kwargs):
+        frequency = kwargs.get('frequency', Indicator.MONTHLY)
+        filters = kwargs.get('filters', {})
         context = cls.get_context(program_pk, [frequency,], filters=filters)
         return cls({}, context=context)
 
@@ -402,7 +412,9 @@ class IPTTTVAReportSerializer(IPTTReportSerializer):
         return _("IPTT TvA report")
 
     @classmethod
-    def load_report(cls, program_pk, frequency=Indicator.LOP, filters={}):
+    def load_report(cls, program_pk, **kwargs):
+        frequency = kwargs.get('frequency', Indicator.LOP)
+        filters = kwargs.get('filters', {})
         context = cls.get_context(program_pk, [frequency,], filters=filters)
         return cls({}, context=context)
 
@@ -429,7 +441,8 @@ class IPTTFullReportSerializer(IPTTReportSerializer):
         return _("IPTT TvA full program report")
 
     @classmethod
-    def load_report(cls, program_pk, filters={}):
+    def load_report(cls, program_pk, **kwargs):
+        filters = kwargs.get('filters', {})
         context = cls.get_context(program_pk, cls.all_frequencies, filters=filters)
         return cls({}, context=context)
 

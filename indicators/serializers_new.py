@@ -7,9 +7,8 @@ from indicators.models import Indicator, Level, LevelTier, DisaggregationLabel, 
 from indicators.queries import IPTTIndicator
 from workflow.models import Program
 from tola.model_utils import get_serializer
-from tola.l10n_utils import l10n_date_medium
 from django.utils.translation import ugettext as _
-from django.utils import timezone
+
 
 def make_quantized_decimal(value, places=2):
     if value is None:
@@ -19,6 +18,7 @@ def make_quantized_decimal(value, places=2):
     except (TypeError, ValueError):
         return None
     return value.quantize(Decimal(f".{'0'*(places-1)}1"))
+
 
 class DecimalDisplayField(serializers.DecimalField):
     """
@@ -111,7 +111,6 @@ class IndicatorMeasurementMixin:
     is_percent = serializers.SerializerMethodField()
     direction_of_change = serializers.CharField(source='get_direction_of_change')
     baseline = serializers.SerializerMethodField()
-    
     unit_of_measure_type = serializers.SerializerMethodField()
 
     class Meta:
@@ -142,6 +141,7 @@ class IndicatorMeasurementMixin:
 
 
 IndicatorWithMeasurementSerializer = get_serializer(IndicatorMeasurementMixin, IndicatorBase)
+
 
 class ProgramPageIndicatorMixin:
     number = serializers.SerializerMethodField('get_long_number')
@@ -368,7 +368,7 @@ class IPTTExcelIndicatorMixin:
             key=operator.itemgetter('name')
         )
 
-    
+
     def get_no_rf_level(self, indicator):
         return (not indicator.results_framework or not indicator.level_id)
             
@@ -382,7 +382,6 @@ IPTTExcelIndicatorSerializer = get_serializer(
 class IPTTExcelReportIndicatorBase:
     lop_period = serializers.SerializerMethodField()
     periods = serializers.SerializerMethodField()
-    
 
     class Meta:
         model = Indicator
@@ -466,6 +465,7 @@ class IPTTExcelReportIndicatorBase:
     def get_periods(self, indicator):
         return [self._get_period(indicator, period) for period in self.context.get('periods')]
 
+
 class TVAMixin:
     class Meta:
         pass
@@ -511,30 +511,30 @@ class TVAMixin:
                 return [result for result in self._get_all_results(indicator)
                                  if (result.periodic_target.pk in [t.pk for t in targets]
                                      and result.achieved is not None)]
-            
 
-            
     def _get_period(self, indicator, period_dict):
         period = super()._get_period(indicator, period_dict)
         targets = [
             target for target in self._get_all_targets(indicator) if target.customsort == period_dict['customsort']
-        ] 
+        ]
         period['target'] = targets[0].target if targets else None
         if period['target'] and period['actual']:
             period['met'] = make_quantized_decimal(period['actual'] / period['target'], places=4)
         else:
             period['met'] = None
         return period
-            
+
 
 IPTTExcelTPReportIndicatorSerializer = get_serializer(
     IPTTExcelReportIndicatorBase
 )
 
+
 IPTTExcelTVAReportIndicatorSerializer = get_serializer(
     TVAMixin,
     IPTTExcelReportIndicatorBase
-)    
+)
+
 
 class IPTTReportIndicatorMixin:
     lop_actual = DecimalDisplayField()
@@ -715,11 +715,13 @@ IPTTTVAReportIndicatorSerializer = get_serializer(
     IndicatorBase
 )
 
+
 IPTTTPReportIndicatorSerializer = get_serializer(
     IPTTTPMixin,
     IPTTReportIndicatorMixin,
     IndicatorBase
 )
+
 
 class LevelBase:
     ontology = serializers.SerializerMethodField()
@@ -869,6 +871,5 @@ class TierBase:
     def get_name(self, tier):
         return _(tier.name)
 
+
 IPTTTierSerializer = get_serializer(TierBase)
-
-

@@ -105,10 +105,10 @@ class TestIPTTTPReportSerializer(test.TestCase, IPTTReportSerializerQueriesMixin
         cls.set_up_test_programs()
         cls.set_up_test_indicators()
 
-    def load_report(self, program_pk=None, frequency=Indicator.ANNUAL, filters={}):
+    def load_report(self, program_pk=None, **kwargs):
         if program_pk is None:
             program_pk = self.program.pk
-        return self.serializer.load_report(program_pk, frequency, filters=filters)
+        return self.serializer.load_report(program_pk, **kwargs)
 
     def test_base_queries(self):
         self.program_query_tests()
@@ -126,8 +126,8 @@ class TestIPTTTVAReportSerializer(test.TestCase, IPTTReportSerializerQueriesMixi
         cls.set_up_test_programs()
         cls.set_up_test_indicators()
 
-    def load_report(self, frequency=Indicator.MID_END, filters={}):
-        return self.serializer.load_report(self.program.pk, frequency, filters=filters)
+    def load_report(self, **kwargs):
+        return self.serializer.load_report(self.program.pk, **kwargs)
 
     def test_base_queries(self):
         self.program_query_tests()

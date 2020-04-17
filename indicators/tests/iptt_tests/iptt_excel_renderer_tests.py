@@ -366,8 +366,7 @@ class TestExcelRendererGlobals(test.TestCase):
         global tva
         tva = False
         serializer = FakeSerializer()
-        params = {}
-        renderer = IPTTExcelRenderer(serializer, params)
+        renderer = IPTTExcelRenderer(serializer)
         wb = renderer.wb
         self.assertEqual(len(wb.worksheets), 1)
         sheet = wb.worksheets[0]
@@ -392,8 +391,7 @@ class TestExcelRendererGlobals(test.TestCase):
         global tva
         tva = True
         serializer = FakeSerializer()
-        params = {}
-        renderer = IPTTExcelRenderer(serializer, params)
+        renderer = IPTTExcelRenderer(serializer)
         wb = renderer.wb
         self.assertEqual(len(wb.worksheets), 1)
         sheet = wb.worksheets[0]
@@ -419,8 +417,7 @@ class TestExcelRendererGlobals(test.TestCase):
         global tva
         tva = True
         serializer = FakeSerializer(self.get_full_data())
-        params = {}
-        renderer = IPTTExcelRenderer(serializer, params)
+        renderer = IPTTExcelRenderer(serializer)
         wb = renderer.wb
         self.assertEqual(len(wb.worksheets), 6)
         for c, (sheet, title) in enumerate(zip(

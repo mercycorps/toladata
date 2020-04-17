@@ -1,22 +1,16 @@
 """Serializers (query-optimized) for workflow.Program"""
 
-import datetime
 import operator
 from rest_framework import serializers
 from django.db import models
-from django.utils.translation import ugettext as _
-from workflow.models import Program
-from indicators.models import (
-    Indicator,
-    LevelTier,
-    Level,
-)
+from indicators.models import Indicator
 from indicators.serializers_new import (
     ProgramPageIndicatorSerializer,
     ProgramPageIndicatorUpdateSerializer,
 )
 from tola.model_utils import get_serializer
-from .base_program_serializers import (
+from workflow.models import Program
+from workflow.serializers_new.base_program_serializers import (
     ProgramBase,
     ProgramReportingPeriodMixin,
     ProgramLevelOrderingMixin,
@@ -39,7 +33,7 @@ RFLevelOrderingProgramSerializer = get_serializer(RFLevelOrderingMixin, ProgramB
 
 class ProgramLevelUpdateMixin:
     """Single-purpose serializer for returning new level order for indicators after one was deleted
-    
+
         used by program page to handle reordering of indicators after indicator deletion
     """
     class Meta:
@@ -68,7 +62,7 @@ ProgramLevelUpdateSerializer = get_serializer(ProgramLevelUpdateMixin, RFLevelOr
 
 class ProgramPageMixin:
     """Serializer specific to the Program Page
-    
+
         - produces JSON-serializable object which contains all information needed for Program Page React model
         to populate program page
     """
@@ -189,7 +183,6 @@ ProgramPageProgramSerializer = get_serializer(
 
 
 class ProgramPageUpdateMixin:
-    
     indicator = serializers.SerializerMethodField()
     indicators = serializers.SerializerMethodField()
 

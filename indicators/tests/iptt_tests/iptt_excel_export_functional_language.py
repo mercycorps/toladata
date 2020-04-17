@@ -674,9 +674,10 @@ class TestIPTTExcelExports(test.TestCase):
             self.assertEqual(sheet.cell(row=row_num, column=4).value, indicator_name)
             self.assertEqual(sheet.cell(row=row_num+1, column=3).value, self.scenario.standard_disagg.disaggregation_type)
             self.assertEqual(sheet.cell(row=row_num+1, column=4).value, "Label 1")
-            self.assertFalse(sheet.row_dimensions[row_num+1].hidden)
+            # changed to true - no longer expanding rows when filters applied, so should still be hidden:
+            self.assertTrue(sheet.row_dimensions[row_num+1].hidden)
             self.assertEqual(sheet.cell(row=row_num+2, column=4).value, "Låbél 2")
-            self.assertFalse(sheet.row_dimensions[row_num+2].hidden) # don't collapse disagg rows when filtered by disaggs
+            self.assertTrue(sheet.row_dimensions[row_num+2].hidden)
         self.assertIsNone(sheet.cell(row=14, column=3).value)
         
 

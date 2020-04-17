@@ -185,7 +185,7 @@ class ExcelRendererBase:
         for indicator in level_row['indicators']:
             current_row = self.add_indicator_data(indicator, sheet, current_row)
         return current_row
-        
+
     def int_cell(self, value):
         if not value and value != 0:
             return None, 'General'
@@ -323,14 +323,13 @@ class ExcelRendererBase:
                     sheet.cell(row=current_row, column=column).value = EM_DASH
                     sheet.cell(row=current_row, column=column).alignment = self.CENTER_ALIGN
                 def label_value_func(cell, period, empty_blank=False):
-                    alignment = None
                     value, number_format = values_func(
                         period.get('disaggregations', {}).get(label['pk'], {}).get('actual', None)
                     )
                     if value is None:
                         cell.value = '' if empty_blank else EM_DASH
                         cell.alignment = self.CENTER_ALIGN
-                    else:                        
+                    else:
                         cell.value = value
                         if number_format is not None:
                             cell.number_format = number_format
@@ -364,9 +363,8 @@ class ExcelRendererBase:
             cell = sheet.cell(row=top_row, column=3)
             cell.value = disaggregation['name']
             cell.style = self.DISAGGREGATION_CELL
-            if not self.disaggregations:
-                for row in range(top_row, current_row):
-                    sheet.row_dimensions[row].hidden = True
+            for row in range(top_row, current_row):
+                sheet.row_dimensions[row].hidden = True
         return current_row
 
     def set_column_widths(self, sheet):
@@ -411,12 +409,12 @@ class ExcelRendererBase:
 
 
 class IPTTExcelRenderer(ExcelRendererBase):
-    def __init__(self, serializer, params={}):
+    def __init__(self, serializer, **kwargs):
+        params = kwargs.get('params', {})
         self.filename = serializer.filename
         self.serializer = serializer.data
         self.create_workbook()
         self.columns = params.get('columns', [])
-        self.disaggregations = params.get('disaggregations', False)
         has_sheets = False
         for frequency in self.serializer['frequencies']:
             self.frequency = frequency

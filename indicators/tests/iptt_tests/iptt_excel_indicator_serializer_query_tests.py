@@ -1079,12 +1079,12 @@ class TestIPTTSerializedReportData(test.TestCase, DecimalComparator):
             self.assertIn(key, tp_context)
             self.assertEqual(context[key], tp_context[key])
         expected_report_data = self.get_serialized_report_data(frequency=Indicator.SEMI_ANNUAL)
-        tp_report = IPTTTPReportSerializer.get_context(program_pk, [frequency], filters)
+        tp_report = IPTTTPReportSerializer.get_context(program_pk, [frequency], filters=filters)
         self.assertIn('report_data', tp_report)
         self.assertIn(Indicator.SEMI_ANNUAL, tp_report['report_data'])
         tp_report_data = tp_report['report_data'][Indicator.SEMI_ANNUAL]
         self.assertCountEqual(expected_report_data[0].keys(), tp_report_data.keys())
-        tva_report = IPTTTVAReportSerializer.get_context(program_pk, [frequency], filters)
+        tva_report = IPTTTVAReportSerializer.get_context(program_pk, [frequency], filters=filters)
         self.assertIn('report_data', tva_report)
         self.assertIn(Indicator.SEMI_ANNUAL, tva_report['report_data'])
         tva_report_data = tva_report['report_data'][Indicator.SEMI_ANNUAL]

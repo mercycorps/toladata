@@ -4,7 +4,6 @@ from rest_framework import serializers
 from django.db import models
 from django.utils import timezone
 from django.utils.translation import ugettext as _
-from workflow.models import Program
 from indicators.models import (
     Indicator,
     LevelTier,
@@ -13,7 +12,8 @@ from indicators.models import (
 from indicators.serializers_new import (
     RFLevelOrderingLevelSerializer,
 )
-from .period_serializers import PeriodDateRangeSerializer
+from workflow.models import Program
+from workflow.serializers_new.period_serializers import PeriodDateRangeSerializer
 
 
 class ProgramBase:
@@ -91,8 +91,6 @@ class ProgramBase:
                 ),
             key=lambda i: (i.old_level_pk is None, i.old_level_pk)
         )
-
-
 
 
 class ProgramReportingPeriodMixin:
@@ -254,4 +252,3 @@ class ProgramPeriodsMixin:
             ).data
             for frequency, _ in Indicator.TARGET_FREQUENCIES if frequency != Indicator.EVENT
         }
-
