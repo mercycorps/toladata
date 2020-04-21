@@ -162,7 +162,7 @@ class Command(BaseCommand):
                     passed_start_date, passed_end_date, country, title)
                 template_names = []
                 tier_depth = LevelTier.MAX_TIERS
-                for tier_number in range(tier_depth + 1):
+                for tier_number in range(tier_depth):
                     tier_name = f"Tier {tier_number + 1}"
                     LevelTier.objects.create(program=program, name=tier_name, tier_depth=tier_number + 1)
                     template_names.append(tier_name)
