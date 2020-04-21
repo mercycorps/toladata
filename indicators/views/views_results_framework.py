@@ -83,6 +83,7 @@ class ResultsFrameworkBuilder(ListView):
             'programObjectives': ProgramObjectiveSerializer(program.objective_set.all(), many=True).data,
             'accessLevel': role,
             'usingResultsFramework': program.results_framework,
+            'maxTiers': LevelTier.MAX_TIERS,
         }
 
         context_data = {
