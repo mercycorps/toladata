@@ -22,10 +22,10 @@ from workflow.models import (
     SiteProfile,
 )
 from workflow.serializers_new.base_program_serializers import (
-    ProgramBase,
+    ProgramBaseSerializerMixin,
     ProgramReportingPeriodMixin,
-    RFLevelOrderingMixin,
-    ProgramPeriodsMixin,
+    ProgramRFOrderingMixin,
+    ProgramPeriodsForFrequencyMixin,
 )
 from workflow.serializers_new.period_serializers import QSPeriodDateRangeSerializer
 from tola.model_utils import get_serializer
@@ -33,6 +33,8 @@ from tola.model_utils import get_serializer
 
 class IPTTQSMixin:
     """Serializer for a program to populate the IPTT Quickstart selection screen"""
+    frequencies = serializers.SerializerMethodField()
+    period_date_ranges = serializers.SerializerMethodField()
 
     class Meta:
         override_fields = True
@@ -53,13 +55,15 @@ class IPTTQSMixin:
         return ['pk', 'name', 'reporting_period_start', 'reporting_period_end', 'start_date', 'end_date']
 
     @classmethod
+    def _get_context(cls, *args, **kwargs):
+        context = super()._get_context(*args, **kwargs)
+        context['now'] = timezone.now().date()
+        return context
+
+    @classmethod
     def load_for_user(cls, user):
         return cls.load_for_pks(user.tola_user.available_programs.annotate(
-            targets_exist=models.Exists(
-                PeriodicTarget.objects.filter(
-                    indicator__program=models.OuterRef('pk')
-                )
-            )
+            targets_exist=models.Exists(PeriodicTarget.objects.filter(indicator__program=models.OuterRef('pk')))
         ).filter(
             funding_status="Funded",
             targets_exist=True,
@@ -68,36 +72,34 @@ class IPTTQSMixin:
 
     @classmethod
     def load_for_pks(cls, pks):
-        now = timezone.now().date()
-        programs = Program.rf_aware_objects.only(
-            *cls._get_query_fields()
-        ).prefetch_related(
-            models.Prefetch(
-                'indicator_set',
-                queryset=Indicator.objects.order_by().select_related(None).prefetch_related(None).only(
-                    'pk', 'program_id', 'target_frequency'
-                ).filter(program_id__in=pks),
-                to_attr='prefetch_indicators'
-            )
-        ).filter(pk__in=pks)
-        return cls(programs, many=True, context={'now': now})
+        queryset = cls.get_queryset(filters={'pk__in': pks})
+        annotations = {
+            f'frequency_{frequency}_indicators_exist': models.Exists(
+                Indicator.objects.select_related(None).prefetch_related(None).filter(
+                    deleted__isnull=True, program=models.OuterRef('pk'), target_frequency=frequency,
+                ).only('pk', 'program_id', 'target_frequency')) for frequency, x in Indicator.TARGET_FREQUENCIES
+        }
+        queryset = queryset.annotate(**annotations)
+        return cls(queryset, context=cls._get_context(), many=True)
+
+    def get_frequencies(self, program):
+        return [frequency for frequency, x in Indicator.TARGET_FREQUENCIES
+                if getattr(program, f'frequency_{frequency}_indicators_exist', False)]
 
     def get_period_date_ranges(self, program):
+        now = self.context.get('now', timezone.now().date())
         return {
             frequency: QSPeriodDateRangeSerializer(
-                list(program.get_short_form_periods_for_frequency(frequency)), many=True,
-                context={'frequency': frequency, 'now': self.context.get('now', timezone.now().date())}).data
-            for frequency, _ in Indicator.TARGET_FREQUENCIES if frequency not in [
-                Indicator.EVENT, Indicator.LOP, Indicator.MID_END
-            ]
+                list(program.get_short_form_periods_for_frequency(frequency)),
+                many=True, context={'frequency': frequency, 'now': now}
+            ).data for frequency in Indicator.REGULAR_TARGET_FREQUENCIES
         }
 
 
 IPTTQSProgramSerializer = get_serializer(
     IPTTQSMixin,
-    ProgramPeriodsMixin,
     ProgramReportingPeriodMixin,
-    ProgramBase
+    ProgramBaseSerializerMixin
 )
 
 
@@ -124,7 +126,7 @@ class IPTTProgramLevelsMixin:
 
 IPTTProgramLevelSerializer = get_serializer(
     IPTTProgramLevelsMixin,
-    ProgramBase
+    ProgramBaseSerializerMixin
 )
 
 
@@ -151,13 +153,13 @@ class IPTTProgramFilterItemsMixin:
 
     def get_result_chain_label(self, program):
         """returns "Outcome Chain" or "Chaîne Résultat" for labeling the ordering filter"""
-        tier_name = self._get_result_tier(program)
-        if tier_name:
-            return _('%(tier)s Chain') % {'tier': _(tier_name)}
+        result_tier = [tier for tier in self._get_program_tiers(program) if tier['tier_depth'] == 2]
+        if result_tier and len(result_tier) == 1:
+            return _('%(tier)s Chain') % {'tier': _(result_tier[0]['name'])}
         return None
 
     def get_tiers(self, program):
-        return IPTTTierSerializer(self._get_program_tiers(program), many=True).data
+        return self.context.get('tiers', [])
 
     def _get_program_indicator_types(self, program):
         if hasattr(self, 'context') and 'indicator_types' in self.context:
@@ -285,10 +287,10 @@ IPTTProgramSerializer = get_serializer(
     IPTTIndicatorsMixin,
     IPTTProgramFilterItemsMixin,
     IPTTProgramLevelsMixin,
-    ProgramPeriodsMixin,
-    RFLevelOrderingMixin,
+    ProgramPeriodsForFrequencyMixin,
+    ProgramRFOrderingMixin,
     ProgramReportingPeriodMixin,
-    ProgramBase
+    ProgramBaseSerializerMixin
 )
 
 
@@ -329,5 +331,5 @@ class IPTTExcelMixin:
 IPTTExcelProgramSerializer = get_serializer(
     IPTTExcelMixin,
     ProgramReportingPeriodMixin,
-    ProgramBase
+    ProgramBaseSerializerMixin
 )
