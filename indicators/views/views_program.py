@@ -20,8 +20,8 @@ from workflow.models import Program
 from workflow.serializers import LogframeProgramSerializer
 from workflow.serializers_new import (
     ProgramPageProgramSerializer,
-    ProgramPageUpdateSerializer,
-    ProgramLevelUpdateSerializer,
+    ProgramPageIndicatorUpdateSerializer,
+    ProgramRFOrderingUpdateSerializer,
 )
 
 from tola_management.permissions import (
@@ -320,18 +320,7 @@ def old_program_page(request, program_id, indicator_id, indicator_type_id):
 def api_program_ordering(request, program):
     """Returns program-wide RF-aware ordering (used after indicator deletion on program page)"""
     try:
-        data = ProgramPageUpdateSerializer.update_ordering(program).data
-    except Program.DoesNotExist:
-        logger.warning('attempt to access program page ordering for bad pk {}'.format(program))
-        return JsonResponse({'success': False, 'msg': 'bad Program PK'})
-    return JsonResponse(data)
-
-@login_required
-@has_program_read_access
-def api_program_level_ordering(request, program):
-    """Returns program-wide RF-aware ordering (used after indicator deletion on program page)"""
-    try:
-        data = ProgramLevelUpdateSerializer.update_ordering(program).data
+        data = ProgramRFOrderingUpdateSerializer.load_for_pk(program).data
     except Program.DoesNotExist:
         logger.warning('attempt to access program page ordering for bad pk {}'.format(program))
         return JsonResponse({'success': False, 'msg': 'bad Program PK'})
@@ -344,7 +333,7 @@ def api_program_level_ordering(request, program):
 def api_program_page_indicator(request, pk, program):
     """Returns single indicator updated JSON and ordering information for program page)"""
     try:
-        data = ProgramPageUpdateSerializer.update_indicator_pk(program, pk).data
+        data = ProgramPageIndicatorUpdateSerializer.update_indicator_pk(pk, program).data
     except (Program.DoesNotExist, Indicator.DoesNotExist):
         logger.warning('attempt to access indicator update for bad pk {}'.format(pk))
         return JsonResponse({'success': False, 'msg': 'bad Indicator PK'})
