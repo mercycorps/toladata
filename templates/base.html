@@ -37,6 +37,17 @@
     </head>
     <body class="{% block bodyclasses %}{% endblock %}">
 
+        <div class="alert alert--banner bg-warning alert-dismissible fade show" role="alert">
+            <strong>
+            😷 COVID-19:
+            <a href="https://library.mercycorps.org/record/32352/files/COVID19RemoteMERL.pdf" target="_blank">Remote MERL guidance (PDF)</a>
+            | <a href="https://drive.google.com/file/d/1x24sddNU1uY851-JW-6f43K4TRS2B96J/view" target="_blank">Recorded webinar</a>
+            </strong>
+            <button type="button" class="close" data-dismiss="alert" aria-label="Close">
+                <span aria-hidden="true">&times;</span>
+            </button>
+        </div>
+
         <nav class="navbar navbar-dark navbar-expand-sm navbar-tola {% if user.is_superuser %}for-superadmin{% endif %}">
             <div class="container-fluid navbar-tola--container">
                 <button
