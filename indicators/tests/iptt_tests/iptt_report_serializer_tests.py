@@ -3,7 +3,6 @@
 """
 import datetime
 from unittest import mock
-from contextlib import contextmanager
 from django import test
 from django.utils import translation, formats
 from workflow.serializers_new import (
@@ -11,6 +10,7 @@ from workflow.serializers_new import (
     IPTTTVAReportSerializer,
     IPTTFullReportSerializer
 )
+from tola.test.utils import lang_context
 from indicators.models import Indicator
 from indicators.tests.iptt_tests.iptt_scenario import (
     IndicatorGenerator
@@ -30,14 +30,6 @@ from factories.indicators_models import (
 )
 
 SPECIAL_CHARACTERS = "Spécîål Character Fillëd Name"
-
-@contextmanager
-def lang_context(lang):
-    try:
-        translation.activate(lang)
-        yield
-    finally:
-        translation.activate('en')
 
 
 class TestReportSerializers(test.TestCase):
