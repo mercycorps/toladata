@@ -8,7 +8,7 @@ apipatterns = [
     # program-wide ordering update (program page):
     url(r'^program/ordering/(?P<program>\d+)/', views.api_program_ordering, name='program_ordering'),
     # program by-level ordering update (IPTT):
-    url(r'^program/level_ordering/(?P<program>\d+)/', views.api_program_level_ordering, name='level_ordering'),
+    url(r'^program/level_ordering/(?P<program>\d+)/', views.api_program_ordering, name='level_ordering'),
     # program page indicator update (with included orderin update):
     url(r'^program_page/indicator/(?P<pk>\d+)/',
         views.api_program_page_indicator, name='program_page_indicator'),
