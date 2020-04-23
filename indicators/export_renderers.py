@@ -179,7 +179,7 @@ class ExcelRendererBase:
             sheet.cell(row=current_row, column=2).fill = self.LEVEL_ROW_FILL
             sheet.merge_cells(start_row=current_row, start_column=3, end_row=current_row, end_column=self.column_count)
             cell = sheet.cell(row=current_row, column=3)
-            cell.value = str(level_row['level']['name'])
+            cell.value = str(level_row['level']['full_name'])
             cell.style = 'level_row'
             current_row += 1
         for indicator in level_row['indicators']:
