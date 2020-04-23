@@ -106,6 +106,7 @@
 @import 'components/results-framework'; // Results Framework and Framelog
 @import 'components/sortable-list'; // Sortable list widget
 @import 'components/logframe'; // styling for logframe web view
+@import 'components/alert-banner'; // banners that appear at the top of the page; extend bootstrap alert class
 
 /* Local custom CSS and overloads for non-BS libraries */
 @import 'mc_tola_forms'; // extremely custom!

@@ -73,6 +73,9 @@ urlpatterns = [
     url(r'^tola_management/', include('tola_management.urls')),
     url(r'^saml_metadata/$', tolaviews.saml_metadata_view, name="saml_metadata"),
 
+    # Session Variable updates:
+    url(r'^update_user_session/$', tolaviews.update_user_session, name='update_user_session'),
+
     # Site home page filtered by country
     url(r'^(?P<selected_country>\w+)/$', tolaviews.index, name='index'),
 
@@ -92,6 +95,7 @@ urlpatterns = [
     url(r'^api/indicator_list/(?P<program_id>\d+)/$', indicator_list, name='indicator_list'),
     url(r'^api/save_custom_tiers', save_custom_tiers, name='save_custom_tiers'),
     url(r'^api/save_custom_template', save_custom_template, name='save_custom_template'),
+
 
     # url redirect for people with old bookmarks
     url(r'^program/(?P<program_id>\d+)/(?P<indicator_id>\d+)/(?P<indicator_type_id>\d+)/$',
