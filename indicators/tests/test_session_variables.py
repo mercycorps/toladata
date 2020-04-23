@@ -15,8 +15,8 @@ COVID_BANNER_TITLE = {
 
 COVID_BANNER_LINK = {
     ENGLISH: "https://library.mercycorps.org/record/32352/files/COVID19RemoteMERL.pdf",
-    FRENCH: "https://library.mercycorps.org/record/32352/files/COVID19RemoteMERLfr.pdf",
-    SPANISH: "https://library.mercycorps.org/record/32352/files/COVID19RemoteMERLes.pdf",
+    FRENCH: "https://library.mercycorps.org/record/32636/files/COVID19RemoteMERLfr.pdf",
+    SPANISH: "https://library.mercycorps.org/record/32635/files/COVID19RemoteMERLes.pdf",
 }
 
 COVID_WEBINAR_TITLE = {
