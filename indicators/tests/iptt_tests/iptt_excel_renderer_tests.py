@@ -63,14 +63,14 @@ class FakeSerializer:
                         {
                             'level': {
                                 'pk': 8,
-                                'name': 'Goal level Name'
+                                'full_name': 'Goal level Name'
                             },
                             'indicators': []
                         },
                         {
                             'level': {
                                 'pk': 10,
-                                'name': 'Level Name',
+                                'full_name': 'Level Name',
                             },
                             'indicators': (i for i in [
                                 {
@@ -134,7 +134,7 @@ class FakeSerializer:
                         {
                             'level': {
                                 'pk': None,
-                                'name': 'Unassigned level name',
+                                'full_name': 'Unassigned level name',
                             },
                             'indicators': (i for i in [
                                 {
@@ -459,7 +459,7 @@ class TestExcelRendererGlobals(test.TestCase):
                     {
                         'level': {
                             'pk': 8,
-                            'name': 'Goal level Name'
+                            'full_name': 'Goal level Name'
                         },
                         'indicators': (i for i in [
                             {

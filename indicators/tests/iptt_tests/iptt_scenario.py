@@ -472,6 +472,7 @@ class IndicatorGenerator:
                   'Tier_name at depth 2 (i.e. Outcome)',
                   'Tier_name at depth 3 (i.e. Output)'],
         'levels': [(1,), ((2,),), (((2, 1),),)],
+        'levels__pks': [901, 902, 903, 904, 905, 906],
     }
     default_indicator_kwargs = {
         'lop_target': 1000,
@@ -504,12 +505,19 @@ class IndicatorGenerator:
 
     @property
     def levels_level_order(self):
-        for level_depth in range(4):
-            for level in sorted(
-                [level for level in self.levels if level.level_depth == level_depth],
-                key=operator.attrgetter('customsort')
-                ):
-                yield level
+        levels_in_order = []
+        parents = sorted([level for level in self.levels if level.parent_id is None], key=operator.attrgetter('customsort'))
+        children = []
+        while parents:
+            for parent in parents:
+                children += sorted(
+                    [level for level in self.levels if level.parent_id == parent.id],
+                    key=operator.attrgetter('customsort'))
+            levels_in_order += parents
+            parents = children
+            children = []
+        for level in levels_in_order:
+            yield level
 
     @property
     def levels_chain_order(self):

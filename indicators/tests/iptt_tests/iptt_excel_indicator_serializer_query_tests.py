@@ -434,7 +434,7 @@ class TestIPTTIndicatorSerializerQueries(test.TestCase):
         i_gen = IndicatorGenerator()
         indicators = i_gen.indicators_per_level()
         selected_level_pk = [i_gen.levels[1].pk]
-        selected_level_and_chain_pks = [i_gen.levels[x].pk for x in [1, 3, 4]]
+        selected_level_and_chain_pks = [i_gen.levels[x].pk for x in [1, 3, 5]]
         selected_indicator_pks = []
         for indicator in indicators:
             if indicator.level_id in selected_level_and_chain_pks:

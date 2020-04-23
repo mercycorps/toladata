@@ -309,9 +309,9 @@ class TestReportSerializers(test.TestCase):
                 levels[0].pk, levels[1].pk, levels[3].pk, levels[2].pk, None
             ]
             self.assertEqual(level_pks, expected_pks)
-            self.assertEqual(level_rows[0]['level']['name'], f"Goal: goal level {SPECIAL_CHARACTERS}")
-            self.assertEqual(level_rows[3]['level']['name'], "Outcome 2: output sorting test")
-            self.assertEqual(level_rows[-1]['level']['name'], "Indicators unassigned to a results framework level")
+            self.assertEqual(level_rows[0]['level']['full_name'], f"Goal: goal level {SPECIAL_CHARACTERS}")
+            self.assertEqual(level_rows[3]['level']['full_name'], "Outcome 2: output sorting test")
+            self.assertEqual(level_rows[-1]['level']['full_name'], "Indicators unassigned to a results framework level")
             del level_rows
         level_order_reports = self.get_reports(
             program.pk, tp_frequency=Indicator.MONTHLY,
@@ -331,10 +331,10 @@ class TestReportSerializers(test.TestCase):
                     levels[0].pk, levels[1].pk, levels[2].pk, levels[3].pk, None
                 ]
             self.assertEqual(level_pks, expected_pks)
-            self.assertEqual(level_rows[0]['level']['name'], f"Goal: goal level {SPECIAL_CHARACTERS}")
+            self.assertEqual(level_rows[0]['level']['full_name'], f"Goal: goal level {SPECIAL_CHARACTERS}")
             if not tva:
-                self.assertEqual(level_rows[2]['level']['name'], "Outcome 2: output sorting test")
-            self.assertEqual(level_rows[-1]['level']['name'], "Indicators unassigned to a results framework level")
+                self.assertEqual(level_rows[2]['level']['full_name'], "Outcome 2: output sorting test")
+            self.assertEqual(level_rows[-1]['level']['full_name'], "Indicators unassigned to a results framework level")
             del level_rows
 
     def test_indicators_details(self):
@@ -566,10 +566,10 @@ class TestIPTTReportSerializerLevelRowData(test.TestCase):
             self.assertEqual(len(level_rows), 7)
             for expected_level, level_row in zip(self.i_gen.levels_chain_order, level_rows[:-1]):
                 self.assertEqual(expected_level.pk, level_row['level']['pk'])
-                self.assertEqual(expected_level.display_name, level_row['level']['name'])
+                self.assertEqual(expected_level.display_name, level_row['level']['full_name'])
             blank_level_row = level_rows[-1]
             self.assertEqual(
-                blank_level_row['level']['name'],
+                blank_level_row['level']['full_name'],
                 'Indicators unassigned to a results framework level'
             )
             self.assertEqual(blank_level_row['level']['pk'], None)
@@ -629,7 +629,7 @@ class TestIPTTReportSerializerLevelRowData(test.TestCase):
 
     def test_translated_level_rows(self):
         indicators = list(self.i_gen.indicators_per_level(target_frequency=Indicator.SEMI_ANNUAL))
-        with mock.patch('indicators.serializers_new._') as mock_uggetext_lazy:
+        with mock.patch('indicators.serializers_new.tier_and_level_serializers._') as mock_uggetext_lazy:
             mock_uggetext_lazy.side_effect = lambda x: 'XXX ' + x
             with lang_context('fr'):
                 for report in self.get_reports(tp_frequency=Indicator.SEMI_ANNUAL, tva_frequency=Indicator.SEMI_ANNUAL):
@@ -641,7 +641,7 @@ class TestIPTTReportSerializerLevelRowData(test.TestCase):
                             f'XXX {expected_level.leveltier.name}'
                             )
                         self.assertEqual(
-                            level_row['level']['name'],
+                            level_row['level']['full_name'],
                             f'XXX {expected_level.display_name}'
                         )
 
