@@ -334,8 +334,8 @@ class IPTTReportSerializer(serializers.Serializer):
         goal_level = None
         has_indicators = False
         frequency_report_data = self.context.get('report_data', {}).get(frequency, {})
-        for level in self.context['program']['levels']:
-            indicators = self._get_frequency_indicators(frequency, level_pk=level.data['pk'])
+        for level_data in self.context['program']['levels']:
+            indicators = self._get_frequency_indicators(frequency, level_pk=level_data['pk'])
             if indicators:
                 has_indicators = True
                 if goal_level:
@@ -343,13 +343,13 @@ class IPTTReportSerializer(serializers.Serializer):
                     goal_level = None
                 indicators = map(lambda i: {**i, **{'report_data': frequency_report_data.get(i['pk'])}}, indicators)
                 yield {
-                    'level': level.data,
+                    'level': level_data,
                     'indicators': indicators
                 }
                 has_levels = True
-            elif level.data['tier_depth'] == 1:
+            elif level_data['tier_depth'] == 1:
                 goal_level = {
-                    'level': level.data,
+                    'level': level_data,
                     'indicators': indicators
                 }
         indicators = self._get_frequency_indicators(frequency, level_pk=None)
@@ -359,7 +359,7 @@ class IPTTReportSerializer(serializers.Serializer):
             if has_levels:
                 yield {
                     'level': {
-                        'name': _('Indicators unassigned to a results framework level'),
+                        'full_name': _('Indicators unassigned to a results framework level'),
                         'pk': None
                     },
                     'indicators': indicators

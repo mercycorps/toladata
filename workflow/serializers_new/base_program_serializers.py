@@ -300,7 +300,8 @@ class ProgramPeriodsForFrequencyMixin:
 
     def get_frequencies(self, program):
         return sorted(
-            set(i.target_frequency for i in self._get_program_indicators(program) if i.target_frequency is not None)
+            set(i['target_frequency'] for i in self._get_program_indicators(program)
+                if i['target_frequency'] is not None)
         )
 
     def get_period_date_ranges(self, program):

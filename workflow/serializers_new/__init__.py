@@ -10,7 +10,6 @@ from .program_page_program_serializers import (
 )
 from .iptt_program_serializers import (
     IPTTQSProgramSerializer,
-    IPTTProgramLevelSerializer,
     IPTTProgramSerializer,
     IPTTExcelProgramSerializer,
 )

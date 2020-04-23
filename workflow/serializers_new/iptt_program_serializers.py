@@ -1,4 +1,5 @@
 import operator
+from collections import defaultdict
 from django.db import models
 from django.utils import timezone
 from django.utils.translation import ugettext as _
@@ -13,9 +14,7 @@ from indicators.models import (
 )
 from indicators.serializers_new import (
     IPTTLevelSerializer,
-    IPTTExcelLevelSerializer,
-    IPTTTierSerializer,
-    IPTTIndicatorSerializer,
+    IPTTJSONIndicatorLabelsSerializer,
 )
 from workflow.models import (
     Program,
@@ -103,46 +102,22 @@ IPTTQSProgramSerializer = get_serializer(
 )
 
 
-class IPTTProgramLevelsMixin:
-    """Serializer to populate levels for IPTT display (web/excel)"""
-    levels = serializers.SerializerMethodField()
-
-    class Meta:
-        fields = [
-            'levels'
-        ]
-
-    def get_levels(self, program):
-        levels = self._get_program_levels(program)
-        return IPTTLevelSerializer(
-            levels,
-            context={
-                'levels': levels,
-                'tiers': self._get_program_tiers(program),
-                'indicators': self._get_program_indicators(program)
-            },
-            many=True).data
-
-
-IPTTProgramLevelSerializer = get_serializer(
-    IPTTProgramLevelsMixin,
-    ProgramBaseSerializerMixin
-)
-
-
 class IPTTProgramFilterItemsMixin:
     """Serializer to populate the filter panel for an IPTT program on initial load (not report data)"""
     result_chain_label = serializers.SerializerMethodField()
+    levels = serializers.SerializerMethodField()
     tiers = serializers.SerializerMethodField()
     sectors = serializers.SerializerMethodField()
     indicator_types = serializers.SerializerMethodField()
     sites = serializers.SerializerMethodField()
     disaggregations = serializers.SerializerMethodField()
     old_levels = serializers.SerializerMethodField()
+    _level_serializer = IPTTLevelSerializer
 
     class Meta:
         fields = [
             'result_chain_label',
+            'levels',
             'tiers',
             'sectors',
             'indicator_types',
@@ -151,6 +126,30 @@ class IPTTProgramFilterItemsMixin:
             'old_levels',
         ]
 
+    @classmethod
+    def _get_context(cls, *args, **kwargs):
+        context = super()._get_context(*args, **kwargs)
+        program_pk = context['program_pk']
+        context['indicator_types'] = IndicatorType.objects.select_related(None).prefetch_related(None).filter(
+                indicator__program_id=program_pk
+        ).order_by('indicator_type').distinct().values_list('pk', 'indicator_type')
+        context['sites'] = SiteProfile.objects.select_related(None).prefetch_related(None).filter(
+            result__indicator__program_id=program_pk
+        ).order_by('name').distinct().values_list('pk', 'name')
+        context['sectors'] = Sector.objects.select_related(None).prefetch_related(None).filter(
+            indicator__program_id=program_pk
+        ).order_by('sector').distinct().values_list('pk', 'sector')
+        context['disaggregations'] = DisaggregationType.objects.select_related('country').filter(
+            indicator__program_id=program_pk, is_archived=False,
+        ).order_by('standard', 'disaggregation_type').distinct().prefetch_related(
+            models.Prefetch('disaggregationlabel_set',
+                            queryset=DisaggregationLabel.objects.select_related(None).order_by('customsort').only(
+                                'pk', 'label', 'customsort', 'disaggregation_type_id'),
+                            to_attr='prefetch_categories')
+        ).only('pk', 'disaggregation_type', 'country__country', 'standard')
+        context['now'] = timezone.now().date()
+        return context
+
     def get_result_chain_label(self, program):
         """returns "Outcome Chain" or "Chaîne Résultat" for labeling the ordering filter"""
         result_tier = [tier for tier in self._get_program_tiers(program) if tier['tier_depth'] == 2]
@@ -158,135 +157,55 @@ class IPTTProgramFilterItemsMixin:
             return _('%(tier)s Chain') % {'tier': _(result_tier[0]['name'])}
         return None
 
+    def get_levels(self, program):
+        return self.context.get('levels', [])
+
     def get_tiers(self, program):
         return self.context.get('tiers', [])
 
-    def _get_program_indicator_types(self, program):
-        if hasattr(self, 'context') and 'indicator_types' in self.context:
-            return self.context['indicator_types']
-        return IndicatorType.objects.filter(indicator__program=program).values('pk', 'indicator_type')
-
-    def _get_program_sectors(self, program):
-        if hasattr(self, 'context') and 'sectors' in self.context:
-            return self.context['sectors']
-        return Sector.objects.filter(indicator__program=program).values('pk', 'sector')
-
-    def _get_program_sites(self, program):
-        if hasattr(self, 'context') and 'sites' in self.context:
-            return self.context['sites']
-        return SiteProfile.objects.filter(result__indicator__program=program).values('pk', 'name')
-
-    def _get_program_disaggregations(self, program):
-        if hasattr(self, 'context') and 'disaggregations' in self.context:
-            return self.context['disaggregations']
-        return DisaggregationType.objects.filter(indicator__program=program).values(
-            'pk', 'disaggregation_type', 'standard', 'country__country'
-        )
-
-    def _get_program_disaggregation_labels(self, program):
-        if hasattr(self, 'context') and 'disaggregation_labels' in self.context:
-            return self.context['disaggregation_labels']
-        return DisaggregationLabel.objects.filter(
-            disaggregation_type__indicator__program=program
-        ).values('pk', 'disaggregation_type_id', 'label', 'customsort')
-
     def get_sectors(self, program):
-        return sorted({
-            v['pk']: v for v in [{'pk': sector['pk'], 'name': sector['sector']}
-                                 for sector in self._get_program_sectors(program)]
-            }.values(), key=operator.itemgetter('name'))
+        return list(map(lambda sect: {'pk': sect[0], 'name': sect[1]}, self.context['sectors']))
 
     def get_indicator_types(self, program):
-        return sorted({
-            v['pk']: v for v in [{'pk': indicator_type['pk'], 'name': indicator_type['indicator_type']}
-                                 for indicator_type in self._get_program_indicator_types(program)]
-            }.values(), key=operator.itemgetter('name'))
+        return list(map(lambda i_t: {'pk': i_t[0], 'name': i_t[1]}, self.context['indicator_types']))
 
     def get_sites(self, program):
-        return sorted({
-            v['pk']: v for v in [{'pk': site['pk'], 'name': site['name']} for site in self._get_program_sites(program)]
-        }.values(), key=operator.itemgetter('name'))
+        return list(map(lambda site: {'pk': site[0], 'name': site[1]}, self.context['sites']))
 
     def get_disaggregations(self, program):
-        labels = [{'pk': l['pk'], 'name': l['label'],
-                   'customsort': l['customsort'], 'disaggregation': l['disaggregation_type_id']}
-                  for l in self._get_program_disaggregation_labels(program)]
-        return sorted({
-            v['pk']: v for v in [
-                {'pk': disaggregation['pk'], 'name': disaggregation['disaggregation_type'],
-                 'country': None if disaggregation['standard'] else disaggregation['country__country'],
-                 'labels': [label for label in labels if label['disaggregation'] == disaggregation['pk']]}
-                for disaggregation in self._get_program_disaggregations(program)
-            ]
-        }.values(), key=operator.itemgetter('name'))
+        return list(map(
+            lambda dt: {'pk': dt.pk, 'name': dt.disaggregation_type,
+                        'labels': [{'pk': label.pk, 'name': label.label} for label in dt.prefetch_categories]},
+            self.context['disaggregations']))
 
     def get_old_levels(self, program):
         if program.results_framework:
             return []
         old_level_pks = {name: pk for (pk, name) in Indicator.OLD_LEVELS}
         return sorted([{'pk': old_level_pks[name], 'name': _(name)} for name in set(
-            i.old_level for i in self._get_program_indicators(program) if i.old_level)], key=operator.itemgetter('pk'))
+            i['old_level'] for i in self._get_program_indicators(program) if i['old_level'])],
+            key=operator.itemgetter('pk'))
 
 
 class IPTTIndicatorsMixin:
     """Serializer to populate Indicator items for a program (not report data, all other indicator data)"""
     indicators = serializers.SerializerMethodField()
+    _indicator_serializer = IPTTJSONIndicatorLabelsSerializer
 
     class Meta:
         fields = [
             'indicators'
         ]
 
-    @classmethod
-    def get_for_pk(cls, program_pk):
-        program = Program.rf_aware_objects.select_related(None).prefetch_related(None).only(
-            *cls._get_query_fields()
-        ).prefetch_related(
-            models.Prefetch(
-                'indicator_set',
-                queryset=Indicator.rf_aware_objects.select_related(None).prefetch_related(None).only(
-                    'pk', 'name', 'deleted', 'program_id', 'means_of_verification', 'level_id', 'level_order',
-                    'number', 'target_frequency', 'unit_of_measure', 'unit_of_measure_type', 'baseline', 'baseline_na',
-                    'direction_of_change', 'is_cumulative', 'key_performance_indicator', 'old_level',
-                    'create_date', 'sector_id'
-                ),
-                to_attr='prefetch_indicators'
-            ),
-            cls._get_leveltiers_prefetch(),
-            cls._get_levels_prefetch(),
-        ).get(pk=program_pk)
-        context = {
-            'indicator_types': IndicatorType.objects.select_related(None).prefetch_related(None).filter(
-                indicator__program_id=program_pk
-            ).order_by('indicator_type').values('pk', 'indicator_type', 'indicator__pk'),
-            'sites': SiteProfile.objects.select_related(None).prefetch_related(None).filter(
-                result__indicator__program_id=program_pk
-            ).order_by('name').values('pk', 'name', 'result__indicator__pk'),
-            'sectors': Sector.objects.select_related(None).prefetch_related(None).filter(
-                indicator__program_id=program_pk
-            ).order_by('sector').values('pk', 'sector', 'indicator__pk'),
-            'disaggregations': DisaggregationType.objects.select_related(None).prefetch_related(None).filter(
-                indicator__program_id=program_pk
-            ).order_by('disaggregation_type').values(
-                'pk', 'disaggregation_type', 'indicator__pk', 'standard', 'country__country'
-            ),
-            'disaggregation_labels': DisaggregationLabel.objects.select_related(None).prefetch_related(None).filter(
-                disaggregation_type__indicator__program_id=program_pk
-            ).order_by('customsort').values('pk', 'disaggregation_type_id', 'label', 'customsort').distinct(),
-            'now': timezone.now().date()
-        }
-        return cls(program, context=context)
-
     def get_indicators(self, program):
         indicators = self._get_program_indicators(program)
-        return IPTTIndicatorSerializer(indicators, context=self.context, many=True).data
+        return indicators
 
 
-# Web view only currently:
+# Main serializer for labels, filters, and program data for the IPTT (Web/JSON):
 IPTTProgramSerializer = get_serializer(
     IPTTIndicatorsMixin,
     IPTTProgramFilterItemsMixin,
-    IPTTProgramLevelsMixin,
     ProgramPeriodsForFrequencyMixin,
     ProgramRFOrderingMixin,
     ProgramReportingPeriodMixin,
@@ -296,6 +215,7 @@ IPTTProgramSerializer = get_serializer(
 
 class IPTTExcelMixin:
     levels = serializers.SerializerMethodField()
+    _level_serializer = IPTTLevelSerializer
 
     class Meta:
         fields = [
@@ -305,6 +225,12 @@ class IPTTExcelMixin:
     @classmethod
     def get_for_pk(cls, program_pk, **kwargs):
         context = kwargs.get('context', {})
+        tiers = context.pop('tiers', [])
+        levels = context.pop('levels', [])
+        if tiers:
+            context['tiers'] = cls._tier_serializer(tiers, context=context, many=True).data
+        if levels:
+            context['levels'] = cls._level_serializer(levels, context=context, many=True).data
         program = Program.rf_aware_objects.select_related(None).prefetch_related(None).only(
             *cls._get_query_fields()
         ).get(pk=program_pk)
@@ -317,19 +243,18 @@ class IPTTExcelMixin:
         return self.context.get('tiers', [])
 
     def get_levels(self, program):
-        level_context = {
-            'levels': self._get_program_levels(program),
-            'tiers': self._get_program_tiers(program)
-        }
+        # print("level order {}".format(self.context.get('level_order', False)))
+        # print("levels level order:\n{}".format(self._get_levels_level_order(program)))
+        # print("levels chain order:\n{}".format(self._get_levels_chain_order(program)))
         if self.context.get('level_order', False):
-            level_objects = self._get_levels_level_order(program)
+            return self._get_levels_level_order(program)
         else:
-            level_objects = self._get_levels_chain_order(program)
-        return [IPTTExcelLevelSerializer(level, context=level_context) for level in level_objects]
+            return self._get_levels_chain_order(program)
 
 
 IPTTExcelProgramSerializer = get_serializer(
     IPTTExcelMixin,
+    ProgramRFOrderingMixin,
     ProgramReportingPeriodMixin,
     ProgramBaseSerializerMixin
 )
