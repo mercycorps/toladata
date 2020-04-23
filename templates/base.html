@@ -36,19 +36,20 @@
 
     </head>
     <body class="{% block bodyclasses %}{% endblock %}">
-
+        
         {% get_current_language as LANGUAGE_CODE %}
-
-        <div class="alert alert--banner bg-warning alert-dismissible fade show" role="alert">
-            <strong>
-            😷 COVID-19:
-            <a href="https://library.mercycorps.org/record/32352/files/COVID19RemoteMERL{% if LANGUAGE_CODE != 'en' %}{{ LANGUAGE_CODE }}{% endif %}.pdf" target="_blank">{% trans "Remote MERL guidance (PDF)" %}</a>
-            | <a href="https://drive.google.com/file/d/1x24sddNU1uY851-JW-6f43K4TRS2B96J/view" target="_blank">{% trans "Recorded webinar" %}</a>
-            </strong>
-            <button type="button" class="close" data-dismiss="alert" aria-label="Close">
-                <span aria-hidden="true">&times;</span>
-            </button>
-        </div>
+        {% if request.session.show_covid_banner %}
+            <div id="covid-banner-alert" class="alert alert--banner bg-warning alert-dismissible fade show" role="alert">
+                <strong>
+                😷 COVID-19:
+                <a href="https://library.mercycorps.org/record/32352/files/COVID19RemoteMERL{% if LANGUAGE_CODE != 'en' %}{{ LANGUAGE_CODE }}{% endif %}.pdf" target="_blank">{% trans "Remote MERL guidance (PDF)" %}</a>
+                | <a href="https://drive.google.com/file/d/1x24sddNU1uY851-JW-6f43K4TRS2B96J/view" target="_blank">{% trans "Recorded webinar" %}</a>
+                </strong>
+                <button type="button" class="close" data-dismiss="alert" aria-label="Close">
+                    <span aria-hidden="true">&times;</span>
+                </button>
+            </div>
+        {% endif %}
 
         <nav class="navbar navbar-dark navbar-expand-sm navbar-tola {% if user.is_superuser %}for-superadmin{% endif %}">
             <div class="container-fluid navbar-tola--container">
