@@ -81,6 +81,6 @@ from workflow.tests.serializer_tests.iptt_qs_program_serializer_tests import (
 )
 
 # tests of serializers for the IPTT Web view (React endpoints):
-# from workflow.tests.serializer_tests.iptt_program_serializer_tests import (
-#   TestIPTTProgramSerializerFilterData,
-# )
+from workflow.tests.serializer_tests.iptt_program_serializer_tests import (
+  TestIPTTProgramSerializerFilterData,
+)
