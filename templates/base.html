@@ -42,7 +42,16 @@
             <div id="covid-banner-alert" class="alert alert--banner bg-warning alert-dismissible fade show" role="alert">
                 <strong>
                 😷 COVID-19:
-                <a href="https://library.mercycorps.org/record/32352/files/COVID19RemoteMERL{% if LANGUAGE_CODE != 'en' %}{{ LANGUAGE_CODE }}{% endif %}.pdf" target="_blank">{% trans "Remote MERL guidance (PDF)" %}</a>
+                <a {% if LANGUAGE_CODE == 'en' %}
+                        href="https://library.mercycorps.org/record/32352/files/COVID19RemoteMERL.pdf"
+                    {% elif LANGUAGE_CODE == 'fr' %}
+                        href="https://library.mercycorps.org/record/32636/files/COVID19RemoteMERLfr.pdf"
+                    {% elif LANGUAGE_CODE == 'es' %}
+                        href="https://library.mercycorps.org/record/32635/files/COVID19RemoteMERLes.pdf"
+                    {% else %}{# default to english? #}
+                        href="https://library.mercycorps.org/record/32352/files/COVID19RemoteMERL.pdf"
+                    {% endif %}
+                target="_blank">{% trans "Remote MERL guidance (PDF)" %}</a>
                 | <a href="https://drive.google.com/file/d/1x24sddNU1uY851-JW-6f43K4TRS2B96J/view" target="_blank">{% trans "Recorded webinar" %}</a>
                 </strong>
                 <button type="button" class="close" data-dismiss="alert" aria-label="Close">
