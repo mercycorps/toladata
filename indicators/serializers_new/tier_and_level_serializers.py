@@ -105,13 +105,52 @@ class LevelBaseSerializerMixin:
 
     def get_tier_name(self, level):
         if self._get_level_tier(level):
-            return _(self._get_level_tier(level).get('name', ''))
+            return self._get_level_tier(level).get('name', '')
         return None
 
     def get_name(self, level):
         return level.name
 
 
+class IPTTLevelMixin:
+    tier_pk = serializers.SerializerMethodField()
+    tier_depth = serializers.SerializerMethodField(method_name='_get_level_depth')
+    chain_pk = serializers.SerializerMethodField()
+    full_name = serializers.SerializerMethodField()
+
+    class Meta:
+        fields = [
+            'tier_pk',
+            'tier_depth',
+            'chain_pk',
+            'full_name'
+        ]
+
+    def get_tier_pk(self, level):
+        if self._get_level_tier(level):
+            return self._get_level_tier(level).get('pk', None)
+        return None
+
+    def get_chain_pk(self, level):
+        depth = self._get_level_depth(level)
+        target = level
+        if depth == 1:
+            return 'all'
+        while depth > 2:
+            target = self._get_parent(target)
+            depth = self._get_level_depth(target)
+        return target.pk
+
+    def get_full_name(self, level):
+        tier = self.get_tier_name(level) or ""
+        ontology = self.get_ontology(level) or ""
+        ontology = f' {ontology}' if ontology else ""
+        return f'{tier}{ontology}: {level.name}' if tier else level.name
+
+
+
 TierBaseSerializer = get_serializer(TierBaseSerializerMixin)
 
 LevelBaseSerializer = get_serializer(LevelBaseSerializerMixin)
+
+IPTTLevelSerializer = get_serializer(IPTTLevelMixin, LevelBaseSerializerMixin)

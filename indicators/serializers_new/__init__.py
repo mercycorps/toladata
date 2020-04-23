@@ -13,8 +13,10 @@ from .program_page_indicator_serializers import (
 from .tier_and_level_serializers import (
     TierBaseSerializer,
     LevelBaseSerializer,
+    IPTTLevelSerializer,
 )
 
 from .iptt_indicator_serializers import (
-    IPTTIndicatorSerializer
+    IPTTJSONIndicatorLabelsSerializer,
+    IPTTExcelIndicatorSerializer
 )
