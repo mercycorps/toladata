@@ -9,26 +9,26 @@ SPANISH = 3
 
 COVID_BANNER_TITLE = {
     ENGLISH: "Remote MERL guidance (PDF)",
-    FRENCH: "Remote MERL guidance (PDF)",
-    SPANISH: "Remote MERL guidance (PDF)",
+    FRENCH: "Guide SERA à distance (PDF)",
+    SPANISH: "Guía de la MERL remota (PDF)",
 }
 
 COVID_BANNER_LINK = {
     ENGLISH: "https://library.mercycorps.org/record/32352/files/COVID19RemoteMERL.pdf",
-    FRENCH: "https://library.mercycorps.org/record/32352/files/COVID19RemoteMERLfr.pdf",
-    SPANISH: "https://library.mercycorps.org/record/32352/files/COVID19RemoteMERLes.pdf",
+    FRENCH: "https://library.mercycorps.org/record/32636/files/COVID19RemoteMERLfr.pdf",
+    SPANISH: "https://library.mercycorps.org/record/32635/files/COVID19RemoteMERLes.pdf",
 }
 
 COVID_WEBINAR_TITLE = {
     ENGLISH: "Recorded webinar",
-    FRENCH: "Recorded webinar",
-    SPANISH: "Recorded webinar",
+    FRENCH: "Webinaire enregistré",
+    SPANISH: "Webinar grabado",
 }
 
 COVID_WEBINAR_LINK = {
-    ENGLISH: "https://drive.google.com/file/d/1x24sddNU1uY851-JW-6f43K4TRS2B96J/view",
-    FRENCH: "https://drive.google.com/file/d/1x24sddNU1uY851-JW-6f43K4TRS2B96J/view",
-    SPANISH: "https://drive.google.com/file/d/1x24sddNU1uY851-JW-6f43K4TRS2B96J/view"
+    ENGLISH: "https://drive.google.com/open?id=1x24sddNU1uY851-JW-6f43K4TRS2B96J",
+    FRENCH: "https://drive.google.com/open?id=19CW8mfUzHfxX_E2RlMFgao-XfElHbaaR",
+    SPANISH: "https://drive.google.com/open?id=1x24sddNU1uY851-JW-6f43K4TRS2B96J"
 }
 
 COVID_BANNER_CONTENTS = (COVID_BANNER_TITLE, COVID_BANNER_LINK, COVID_WEBINAR_TITLE, COVID_WEBINAR_LINK)
