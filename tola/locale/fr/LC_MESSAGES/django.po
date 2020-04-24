@@ -1355,13 +1355,11 @@ msgstr ""
 
 #: templates/base.html:45
 msgid "Remote MERL guidance (PDF)"
-msgstr ""
+msgstr "Guide SERA à distance (PDF)"
 
 #: templates/base.html:46
-#, fuzzy
-#| msgid "Record name"
 msgid "Recorded webinar"
-msgstr "Nom de l’enregistrement"
+msgstr "Webinaire enregistré"
 
 #: templates/base.html:87
 msgid "Reports"

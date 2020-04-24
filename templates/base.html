@@ -52,7 +52,16 @@
                         href="https://library.mercycorps.org/record/32352/files/COVID19RemoteMERL.pdf"
                     {% endif %}
                 target="_blank">{% trans "Remote MERL guidance (PDF)" %}</a>
-                | <a href="https://drive.google.com/file/d/1x24sddNU1uY851-JW-6f43K4TRS2B96J/view" target="_blank">{% trans "Recorded webinar" %}</a>
+                <a {% if LANGUAGE_CODE == 'en' %}
+                        href="https://drive.google.com/file/d/1x24sddNU1uY851-JW-6f43K4TRS2B96J/view"
+                    {% elif LANGUAGE_CODE == 'fr' %}
+                        href="https://drive.google.com/open?id=19CW8mfUzHfxX_E2RlMFgao-XfElHbaaR"
+                    {% elif LANGUAGE_CODE == 'es' %}
+                        href="https://drive.google.com/file/d/1x24sddNU1uY851-JW-6f43K4TRS2B96J/view"
+                    {% else %}{# default to english? #}
+                        href="https://library.mercycorps.org/record/32352/files/COVID19RemoteMERL.pdf"
+                    {% endif %}
+                target="_blank">{% trans "Recorded webinar" %}</a>
                 </strong>
                 <button type="button" class="close" data-dismiss="alert" aria-label="Close">
                     <span aria-hidden="true">&times;</span>
