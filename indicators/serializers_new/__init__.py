@@ -18,5 +18,8 @@ from .tier_and_level_serializers import (
 
 from .iptt_indicator_serializers import (
     IPTTJSONIndicatorLabelsSerializer,
-    IPTTExcelIndicatorSerializer
+    IPTTJSONTPReportIndicatorSerializer,
+    IPTTExcelIndicatorSerializer,
+    IPTTExcelTPReportIndicatorSerializer,
+    IPTTExcelTVAReportIndicatorSerializer,
 )

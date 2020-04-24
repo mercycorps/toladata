@@ -51,36 +51,37 @@ from indicators.tests.serializer_tests.program_page_indicator_serializer import 
 
 # tests for indicator serializers used on the IPTT report:
 from indicators.tests.serializer_tests.iptt_indicator_serializer import (
-    TestIPTTIndicatorSerializer
+    TestIPTTJSONIndicatorLabelAndFilterDataSerializer,
+    TestIPTTJSONIndicatorReportDataSerializer
 )
-
-# tests of base program serializers not used on their own (components for other serializers):
-from workflow.tests.serializer_tests.program_base_serializers import (
-    TestProgramBaseSerializer,
-    TestProgramBaseSerializerQueryCounts,
-    TestProgramReportingPeriodSerializer,
-    TestProgramReportingPeriodSerializerQueryCounts
-)
-
-# tests of level and ordering serializer components:
-from workflow.tests.serializer_tests.program_ordering_serializers import (
-    TestProgramIndicatorOrderingProgramSerializer,
-    TestProgramIndicatorOrderingProgramSerializerQueryCounts,
-    TestProgramRFLevelOrderingProgramSerializer
-)
-
-# tests of serializers required for the Program Page endpoints:
-from workflow.tests.serializer_tests.program_page_program_serializers import (
-    TestProgramPageProgramSerializer,
-    TestProgramPageSerializersFunctional,
-)
-
-# tests of serializers required for the IPTT Quickstart Page endpoints:
-from workflow.tests.serializer_tests.iptt_qs_program_serializer_tests import (
-    TestIPTTQSProgramSerializer,
-)
-
-# tests of serializers for the IPTT Web view (React endpoints):
-from workflow.tests.serializer_tests.iptt_program_serializer_tests import (
-  TestIPTTProgramSerializerFilterData,
-)
+# 
+# # tests of base program serializers not used on their own (components for other serializers):
+# from workflow.tests.serializer_tests.program_base_serializers import (
+#     TestProgramBaseSerializer,
+#     TestProgramBaseSerializerQueryCounts,
+#     TestProgramReportingPeriodSerializer,
+#     TestProgramReportingPeriodSerializerQueryCounts
+# )
+# 
+# # tests of level and ordering serializer components:
+# from workflow.tests.serializer_tests.program_ordering_serializers import (
+#     TestProgramIndicatorOrderingProgramSerializer,
+#     TestProgramIndicatorOrderingProgramSerializerQueryCounts,
+#     TestProgramRFLevelOrderingProgramSerializer
+# )
+# 
+# # tests of serializers required for the Program Page endpoints:
+# from workflow.tests.serializer_tests.program_page_program_serializers import (
+#     TestProgramPageProgramSerializer,
+#     TestProgramPageSerializersFunctional,
+# )
+# 
+# # tests of serializers required for the IPTT Quickstart Page endpoints:
+# from workflow.tests.serializer_tests.iptt_qs_program_serializer_tests import (
+#     TestIPTTQSProgramSerializer,
+# )
+# 
+# # tests of serializers for the IPTT Web view (React endpoints):
+# from workflow.tests.serializer_tests.iptt_program_serializer_tests import (
+#   TestIPTTProgramSerializerFilterData,
+# )

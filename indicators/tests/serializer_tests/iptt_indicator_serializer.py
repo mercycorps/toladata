@@ -3,12 +3,13 @@ from factories.workflow_models import (
     RFProgramFactory, SectorFactory, SiteProfileFactory, CountryFactory
 )
 from factories.indicators_models import (
-    RFIndicatorFactory, IndicatorTypeFactory, DisaggregationTypeFactory
+    RFIndicatorFactory, IndicatorTypeFactory, DisaggregationTypeFactory, DisaggregatedValueFactory
 )
 from indicators.serializers_new import (
     TierBaseSerializer,
     LevelBaseSerializer,
     IPTTJSONIndicatorLabelsSerializer,
+    IPTTJSONTPReportIndicatorSerializer,
 )
 from indicators.models import Indicator
 
@@ -24,7 +25,7 @@ def get_program_context(program):
     return context
 
 
-class TestIPTTIndicatorSerializer(test.TestCase):
+class TestIPTTJSONIndicatorLabelAndFilterDataSerializer(test.TestCase):
     @classmethod
     def setUpTestData(cls):
         super().setUpTestData()
@@ -128,3 +129,153 @@ class TestIPTTIndicatorSerializer(test.TestCase):
     def test_has_multiple_disaggregations_assigned(self):
         data = self.get_indicator_data(disaggregation=[self.standard_dt, self.country_dt])
         self.assertEqual(data['disaggregation_pks'], sorted([self.standard_dt.pk, self.country_dt.pk]))
+
+
+class TestIPTTJSONIndicatorReportDataSerializer(test.TestCase):
+    @classmethod
+    def setUpTestData(cls):
+        super().setUpTestData()
+        cls.country = CountryFactory(country="TestLand", code="TL")
+        cls.program = RFProgramFactory(months=24)
+        cls.program.country.add(cls.country)
+        cls.standard_disaggregation = DisaggregationTypeFactory(
+            standard=True, country=None, labels=['label 1', 'label 2'])
+        cls.country_disaggregation = DisaggregationTypeFactory(
+            standard=False, country=cls.country, labels=['clabel 1', 'clabel 2'])
+
+    def get_tp_report_data(self, frequency=Indicator.ANNUAL, program=None):
+        program = program or self.program
+        data = IPTTJSONTPReportIndicatorSerializer.load_report(program.pk, frequency).data
+        return data
+
+    def test_indicator_with_no_results(self):
+        indicator = RFIndicatorFactory(program=self.program)
+        report_data = self.get_tp_report_data()
+        self.assertEqual(len(report_data), 1)
+        self.assertEqual(report_data[0]['lop_period']['actual'], None)
+        self.assertEqual(report_data[0]['lop_period']['target'], None)
+        self.assertEqual(report_data[0]['lop_period']['met'], None)
+        self.assertEqual(report_data[0]['lop_period']['disaggregations'], {})
+
+    def test_indicator_with_targets_and_no_results(self):
+        indicator = RFIndicatorFactory(program=self.program, targets=1000)
+        report_data = self.get_tp_report_data()
+        self.assertEqual(len(report_data), 1)
+        self.assertEqual(report_data[0]['lop_period']['actual'], None)
+        self.assertEqual(report_data[0]['lop_period']['target'], '1000')
+        self.assertEqual(report_data[0]['lop_period']['met'], None)
+        self.assertEqual(report_data[0]['lop_period']['disaggregations'], {})
+
+    def test_indicator_with_targets_and_one_result(self):
+        indicator = RFIndicatorFactory(
+            program=self.program, target_frequency=Indicator.LOP, targets=500.24,
+            results=[250.12], results__count=1
+        )
+        report_data = self.get_tp_report_data()
+        self.assertEqual(len(report_data), 1)
+        self.assertEqual(report_data[0]['lop_period']['actual'], '250.12')
+        self.assertEqual(report_data[0]['lop_period']['target'], '500.24')
+        self.assertEqual(report_data[0]['lop_period']['met'], '50')
+        self.assertEqual(report_data[0]['lop_period']['disaggregations'], {})
+
+    def test_indicator_with_one_disaggregation(self):
+        indicator = RFIndicatorFactory(program=self.program)
+        indicator.disaggregation.set([self.standard_disaggregation])
+        report_data = self.get_tp_report_data()
+        self.assertEqual(len(report_data), 1)
+        for label in self.standard_disaggregation.labels:
+            self.assertEqual(report_data[0]['lop_period']['disaggregations'][label.pk]['actual'], None)
+
+    def test_indicator_with_one_disaggregated_value(self):
+        indicator = RFIndicatorFactory(
+            program=self.program, target_frequency=Indicator.LOP, targets=450, results=500, results__count=1
+            )
+        indicator.disaggregation.set([self.standard_disaggregation])
+        result = indicator.result_set.first()
+        DisaggregatedValueFactory(result=result, category=self.standard_disaggregation.labels[1], value=250)
+        report_data = self.get_tp_report_data()
+        self.assertEqual(len(report_data), 1)
+        lop_period_disaggs = report_data[0]['lop_period']['disaggregations']
+        label = self.standard_disaggregation.labels[0]
+        self.assertEqual(lop_period_disaggs[label.pk]['actual'], None)
+        label = self.standard_disaggregation.labels[1]
+        self.assertEqual(lop_period_disaggs[label.pk]['actual'], '250')
+
+    def test_indicator_with_one_disaggregation_and_multiple_values(self):
+        indicator = RFIndicatorFactory(
+            program=self.program,
+            targets=500,
+            target_frequency=Indicator.LOP,
+            results=600, results__count=2)
+        indicator.disaggregation.set([self.standard_disaggregation])
+        results = list(indicator.result_set.all())
+        for label, value in zip(self.standard_disaggregation.labels, [50.25, 100.4]):
+            for result in results:
+                DisaggregatedValueFactory(result=result, category=label, value=value)
+        report_data = self.get_tp_report_data()
+        self.assertEqual(len(report_data), 1)
+        lop_period_disaggs = report_data[0]['lop_period']['disaggregations']
+        label = self.standard_disaggregation.labels[0]
+        self.assertEqual(lop_period_disaggs[label.pk]['actual'], '100.5')
+        label = self.standard_disaggregation.labels[1]
+        self.assertEqual(lop_period_disaggs[label.pk]['actual'], '200.8')
+
+    def test_indicator_with_one_disaggregation_and_multiple_values_cumulative(self):
+        indicator = RFIndicatorFactory(
+            program=self.program,
+            targets=500,
+            target_frequency=Indicator.LOP,
+            is_cumulative=True,
+            results=600, results__count=2)
+        indicator.disaggregation.set([self.standard_disaggregation])
+        results = list(indicator.result_set.all())
+        for label, value in zip(self.standard_disaggregation.labels, [50.25, 100.4]):
+            for result in results:
+                DisaggregatedValueFactory(result=result, category=label, value=value)
+        report_data = self.get_tp_report_data()
+        self.assertEqual(len(report_data), 1)
+        lop_period_disaggs = report_data[0]['lop_period']['disaggregations']
+        label = self.standard_disaggregation.labels[0]
+        self.assertEqual(lop_period_disaggs[label.pk]['actual'], '100.5')
+        label = self.standard_disaggregation.labels[1]
+        self.assertEqual(lop_period_disaggs[label.pk]['actual'], '200.8')
+
+    def test_percentage_indicator(self):
+        indicator = RFIndicatorFactory(
+            program=self.program, targets=500, target_frequency=Indicator.LOP,
+            unit_of_measure_type=Indicator.PERCENTAGE,
+            results=400, results__count=2
+        )
+        indicator.disaggregation.set([self.standard_disaggregation, self.country_disaggregation])
+        results = list(indicator.result_set.all())
+        for label, value in zip(self.standard_disaggregation.labels, [0.1, 400]):
+            DisaggregatedValueFactory(result=results[0], category=label, value=900)
+            DisaggregatedValueFactory(result=results[1], category=label, value=value)
+        for label, value in zip(self.country_disaggregation.labels, [0, 33]):
+            DisaggregatedValueFactory(result=results[0], category=label, value=900)
+            DisaggregatedValueFactory(result=results[1], category=label, value=value)
+        report_data = self.get_tp_report_data()
+        self.assertEqual(len(report_data), 1)
+        lop_period_disaggs = report_data[0]['lop_period']['disaggregations']
+        label = self.standard_disaggregation.labels[0]
+        self.assertEqual(lop_period_disaggs[label.pk]['actual'], '0.1')
+        label = self.standard_disaggregation.labels[1]
+        self.assertEqual(lop_period_disaggs[label.pk]['actual'], '400')
+        label = self.country_disaggregation.labels[0]
+        self.assertEqual(lop_period_disaggs[label.pk]['actual'], '0')
+        label = self.country_disaggregation.labels[1]
+        self.assertEqual(lop_period_disaggs[label.pk]['actual'], '33')
+
+    def test_one_result_in_one_period(self):
+        indicator = RFIndicatorFactory(
+            program=self.program, targets=500, target_frequency=Indicator.ANNUAL,
+            results=[None, 250]
+            )
+        result = get_result(indicator, 250, target_period=1)
+        report_data = self.get_tp_report_data(frequency=Indicator.ANNUAL)
+        self.assertEqual(report_data[0]['periods'][0]['actual'], None)
+        self.assertEqual(report_data[0]['periods'][1]['index'], 1)
+        self.assertEqual(report_data[0]['periods'][1]['actual'], '250')
+        # report_data2 = get_tp_report_data(indicator, Indicator.TRI_ANNUAL)['report_data']
+        # self.assertEqual(report_data2[0]['actual'], None)
+        # self.assertEqual(report_data2[3]['actual'], '250')
