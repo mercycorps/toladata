@@ -1360,8 +1360,8 @@ msgid "Remote MERL guidance (PDF)"
 msgstr "Guía de la MERL remota (PDF)"
 
 #: templates/base.html:46
-msgid "https://drive.google.com/file/d/1x24sddNU1uY851-JW-6f43K4TRS2B96J/view"
-msgstr "https://drive.google.com/file/d/1x24sddNU1uY851-JW-6f43K4TRS2B96J/view"
+msgid "https://drive.google.com/open?id=1x24sddNU1uY851-JW-6f43K4TRS2B96J"
+msgstr "https://drive.google.com/open?id=1x24sddNU1uY851-JW-6f43K4TRS2B96J"
 
 #: templates/base.html:46
 msgid "Recorded webinar"

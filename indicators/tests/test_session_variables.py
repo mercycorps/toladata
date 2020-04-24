@@ -26,9 +26,9 @@ COVID_WEBINAR_TITLE = {
 }
 
 COVID_WEBINAR_LINK = {
-    ENGLISH: "https://drive.google.com/file/d/1x24sddNU1uY851-JW-6f43K4TRS2B96J/view",
+    ENGLISH: "https://drive.google.com/open?id=1x24sddNU1uY851-JW-6f43K4TRS2B96J",
     FRENCH: "https://drive.google.com/open?id=19CW8mfUzHfxX_E2RlMFgao-XfElHbaaR",
-    SPANISH: "https://drive.google.com/file/d/1x24sddNU1uY851-JW-6f43K4TRS2B96J/view"
+    SPANISH: "https://drive.google.com/open?id=1x24sddNU1uY851-JW-6f43K4TRS2B96J"
 }
 
 COVID_BANNER_CONTENTS = (COVID_BANNER_TITLE, COVID_BANNER_LINK, COVID_WEBINAR_TITLE, COVID_WEBINAR_LINK)

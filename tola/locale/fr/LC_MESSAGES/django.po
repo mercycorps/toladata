@@ -1362,7 +1362,7 @@ msgid "Remote MERL guidance (PDF)"
 msgstr "Guide SERA à distance (PDF)"
 
 #: templates/base.html:46
-msgid "https://drive.google.com/file/d/1x24sddNU1uY851-JW-6f43K4TRS2B96J/view"
+msgid "https://drive.google.com/open?id=1x24sddNU1uY851-JW-6f43K4TRS2B96J"
 msgstr "https://drive.google.com/open?id=19CW8mfUzHfxX_E2RlMFgao-XfElHbaaR"
 
 #: templates/base.html:46
