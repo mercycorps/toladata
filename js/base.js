@@ -222,6 +222,26 @@ function mediumDateFormatStr(date) {
 }
 window.mediumDateFormatStr = mediumDateFormatStr;
 
+/**
+ *  updates session variables for the currently logged in user
+ *  @param {Object} sessionVarsToUpdate - key value pairs of session variable name and updated value
+ *  @param {function} [callback] - callback to run upon successful session update
+ *  @returns {Promise} Promise object with the resutls of the ajax call
+ */
+function sendSessionVariableUpdate(sessionVarsToUpdate, callback=null) {
+    let ajaxSettings = {
+        url: '/update_user_session/',
+        type: 'PUT',
+        contentType: 'application/json',
+        data: JSON.stringify(sessionVarsToUpdate),
+        processData: false
+    };
+    let updateRequest = $.ajax(ajaxSettings);
+    if (callback) {
+        updateRequest.done(callback);
+    }
+    return updateRequest;
+}
 
 $(function() {
      // Javascript to enable link to tab
@@ -241,6 +261,12 @@ $(function() {
     })
     $('[data-toggle="popover"]').on('click', function(e){
         e.preventDefault();
+    });
+    
+    /* specific actions tied to item-specific site-wide events here: */
+    // in case of covid alert dismissal, update the session to clear it for the rest of this login session:
+    $('#covid-banner-alert').on('close.bs.alert', function() {
+        sendSessionVariableUpdate({show_covid_banner: false});
     });
 });
 

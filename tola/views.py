@@ -1,6 +1,6 @@
 import json
 import urllib
-
+import logging
 from social_django.utils import load_strategy, load_backend
 
 from django.contrib import messages
@@ -19,6 +19,8 @@ from workflow.models import SiteProfile, Country, TolaUser
 from tola.forms import ProfileUpdateForm
 from indicators.queries import ProgramWithMetrics
 
+
+logger = logging.getLogger(__name__)
 
 @login_required(login_url='/accounts/login/')
 def index(request, selected_country=None):
@@ -167,3 +169,33 @@ def logout_view(request):
 
 def invalid_user_view(request):
     return render(request, 'registration/invalid_user.html')
+
+
+@login_required
+def update_user_session(request):
+    """
+    Update user session variables
+        - expects a PUT with data being a JSON object of session keys and values
+        - updates the user's currently active session with the new values
+        - returns 202 "Accepted" on success
+    """
+    if request.is_ajax() and request.method == "PUT":
+        error = None
+        try:
+            body = json.loads(request.body)
+            for session_key, session_value in body.items():
+                request.session[session_key] = session_value
+            return HttpResponse(status=202)
+        except json.decoder.JSONDecodeError as err:
+            error = "Error processing session variable update request: {0} (request body {1})".format(err, body)
+        except:
+            error = "Error updating session variables (request body {0})".format(body)
+        if error is not None:
+            logger.error(error)
+            return HttpResponse(error, status=500)
+        return HttpResponse(status=204)
+    logger.warning(
+        "Attempted to access update_user_session with method: %s / %s, and payload: %s",
+        request.method, "AJAX" if request.is_ajax() else "synchronous", request.body
+    )
+    return HttpResponseRedirect("/")

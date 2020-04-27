@@ -37,17 +37,17 @@ admin.site.site_header = 'Tola Activity administration'
 #REST FRAMEWORK
 router = routers.DefaultRouter()
 router.register(r'level', LevelViewSet)
-router.register(r'programtargetfrequencies', ProgramTargetFrequencies, base_name='programtargetfrequencies')
+router.register(r'programtargetfrequencies', ProgramTargetFrequencies, basename='programtargetfrequencies')
 
 #tola admin
-router.register(r'tola_management/user', UserAdminViewSet, base_name='tolamanagementuser')
-router.register(r'tola_management/organization', OrganizationAdminViewSet, base_name='tolamanagementorganization')
-router.register(r'tola_management/program', ProgramAdminViewSet, base_name='tolamanagementprograms')
-router.register(r'tola_management/country', CountryAdminViewSet, base_name='tolamanagementcountry')
+router.register(r'tola_management/user', UserAdminViewSet, basename='tolamanagementuser')
+router.register(r'tola_management/organization', OrganizationAdminViewSet, basename='tolamanagementorganization')
+router.register(r'tola_management/program', ProgramAdminViewSet, basename='tolamanagementprograms')
+router.register(r'tola_management/country', CountryAdminViewSet, basename='tolamanagementcountry')
 router.register(r'tola_management/countryobjective', CountryObjectiveViewset,
-                base_name='tolamanagementcountryobjective')
+                basename='tolamanagementcountryobjective')
 router.register(r'tola_management/countrydisaggregation', CountryDisaggregationViewSet,
-                base_name='tolamanagementcountrydisaggregation')
+                basename='tolamanagementcountrydisaggregation')
 
 
 urlpatterns = [
@@ -73,6 +73,9 @@ urlpatterns = [
     url(r'^tola_management/', include('tola_management.urls')),
     url(r'^saml_metadata/$', tolaviews.saml_metadata_view, name="saml_metadata"),
 
+    # Session Variable updates:
+    url(r'^update_user_session/$', tolaviews.update_user_session, name='update_user_session'),
+
     # Site home page filtered by country
     url(r'^(?P<selected_country>\w+)/$', tolaviews.index, name='index'),
 
@@ -92,6 +95,7 @@ urlpatterns = [
     url(r'^api/indicator_list/(?P<program_id>\d+)/$', indicator_list, name='indicator_list'),
     url(r'^api/save_custom_tiers', save_custom_tiers, name='save_custom_tiers'),
     url(r'^api/save_custom_template', save_custom_template, name='save_custom_template'),
+
 
     # url redirect for people with old bookmarks
     url(r'^program/(?P<program_id>\d+)/(?P<indicator_id>\d+)/(?P<indicator_type_id>\d+)/$',

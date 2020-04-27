@@ -2,8 +2,8 @@ import { observable, computed, action, toJS, runInAction, autorun } from "mobx";
 import { api } from "../../api.js"
 
 export class RootStore {
-    constructor (program, levels, indicators, levelTiers, tierTemplates, englishTemplates, customTemplates, programObjectives, accessLevel, usingResultsFramework) {
-        this.levelStore =  new LevelStore(program, levels, indicators, levelTiers, tierTemplates, englishTemplates, customTemplates, programObjectives, accessLevel, usingResultsFramework, this);
+    constructor (program, levels, indicators, levelTiers, tierTemplates, englishTemplates, customTemplates, programObjectives, accessLevel, usingResultsFramework, maxTiers) {
+        this.levelStore =  new LevelStore(program, levels, indicators, levelTiers, tierTemplates, englishTemplates, customTemplates, programObjectives, accessLevel, usingResultsFramework, maxTiers, this);
         this.uiStore = new UIStore(this);
     }
 }
@@ -23,7 +23,7 @@ export class LevelStore {
     accessLevel = false;
     usingResultsFramework;
 
-    constructor(program, levels, indicators, levelTiers, tierTemplates, englishTemplates, customTemplates, programObjectives, accessLevel, usingResultsFramework, rootStore) {
+    constructor(program, levels, indicators, levelTiers, tierTemplates, englishTemplates, customTemplates, programObjectives, accessLevel, usingResultsFramework, maxTiers, rootStore) {
         this.rootStore = rootStore;
         this.levels = levels;
         this.indicators = indicators;
@@ -36,6 +36,7 @@ export class LevelStore {
         this.accessLevel = accessLevel;
         this.usingResultsFramework = usingResultsFramework;
         this.formErrors = {hasError: false};
+        this.maxTiers = maxTiers;
 
         this.tierTemplates = JSON.parse(tierTemplates);
         this.tierTemplates[this.customTierSetKey] = {name: "Custom"};
