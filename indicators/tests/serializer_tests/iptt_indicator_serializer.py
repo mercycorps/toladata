@@ -10,6 +10,7 @@ from indicators.serializers_new import (
     LevelBaseSerializer,
     IPTTJSONIndicatorLabelsSerializer,
     IPTTJSONTPReportIndicatorSerializer,
+    IPTTJSONTVAReportIndicatorSerializer
 )
 from indicators.models import Indicator
 
@@ -148,43 +149,48 @@ class TestIPTTJSONIndicatorReportDataSerializer(test.TestCase):
         data = IPTTJSONTPReportIndicatorSerializer.load_report(program.pk, frequency).data
         return data
 
+    def get_tva_report_data(self, frequency=Indicator.LOP, program=None):
+        program = program or self.program
+        data = IPTTJSONTVAReportIndicatorSerializer.load_report(program.pk, frequency).data
+        return data
+
     def test_indicator_with_no_results(self):
-        indicator = RFIndicatorFactory(program=self.program)
-        report_data = self.get_tp_report_data()
-        self.assertEqual(len(report_data), 1)
-        self.assertEqual(report_data[0]['lop_period']['actual'], None)
-        self.assertEqual(report_data[0]['lop_period']['target'], None)
-        self.assertEqual(report_data[0]['lop_period']['met'], None)
-        self.assertEqual(report_data[0]['lop_period']['disaggregations'], {})
+        indicator = RFIndicatorFactory(program=self.program, target_frequency=Indicator.ANNUAL)
+        for report_data in [self.get_tp_report_data(), self.get_tva_report_data(frequency=Indicator.ANNUAL)]:
+            self.assertEqual(len(report_data), 1)
+            self.assertEqual(report_data[0]['lop_period']['actual'], None)
+            self.assertEqual(report_data[0]['lop_period']['target'], None)
+            self.assertEqual(report_data[0]['lop_period']['met'], None)
+            self.assertEqual(report_data[0]['lop_period']['disaggregations'], {})
 
     def test_indicator_with_targets_and_no_results(self):
-        indicator = RFIndicatorFactory(program=self.program, targets=1000)
-        report_data = self.get_tp_report_data()
-        self.assertEqual(len(report_data), 1)
-        self.assertEqual(report_data[0]['lop_period']['actual'], None)
-        self.assertEqual(report_data[0]['lop_period']['target'], '1000')
-        self.assertEqual(report_data[0]['lop_period']['met'], None)
-        self.assertEqual(report_data[0]['lop_period']['disaggregations'], {})
+        indicator = RFIndicatorFactory(program=self.program, targets=1000, target_frequency=Indicator.ANNUAL)
+        for report_data in [self.get_tp_report_data(), self.get_tva_report_data(frequency=Indicator.ANNUAL)]:
+            self.assertEqual(len(report_data), 1)
+            self.assertEqual(report_data[0]['lop_period']['actual'], None)
+            self.assertEqual(report_data[0]['lop_period']['target'], '1000')
+            self.assertEqual(report_data[0]['lop_period']['met'], None)
+            self.assertEqual(report_data[0]['lop_period']['disaggregations'], {})
 
     def test_indicator_with_targets_and_one_result(self):
         indicator = RFIndicatorFactory(
             program=self.program, target_frequency=Indicator.LOP, targets=500.24,
             results=[250.12], results__count=1
         )
-        report_data = self.get_tp_report_data()
-        self.assertEqual(len(report_data), 1)
-        self.assertEqual(report_data[0]['lop_period']['actual'], '250.12')
-        self.assertEqual(report_data[0]['lop_period']['target'], '500.24')
-        self.assertEqual(report_data[0]['lop_period']['met'], '50')
-        self.assertEqual(report_data[0]['lop_period']['disaggregations'], {})
+        for report_data in [self.get_tp_report_data(), self.get_tva_report_data()]:
+            self.assertEqual(len(report_data), 1)
+            self.assertEqual(report_data[0]['lop_period']['actual'], '250.12')
+            self.assertEqual(report_data[0]['lop_period']['target'], '500.24')
+            self.assertEqual(report_data[0]['lop_period']['met'], '50')
+            self.assertEqual(report_data[0]['lop_period']['disaggregations'], {})
 
     def test_indicator_with_one_disaggregation(self):
-        indicator = RFIndicatorFactory(program=self.program)
+        indicator = RFIndicatorFactory(program=self.program, target_frequency=Indicator.LOP)
         indicator.disaggregation.set([self.standard_disaggregation])
-        report_data = self.get_tp_report_data()
-        self.assertEqual(len(report_data), 1)
-        for label in self.standard_disaggregation.labels:
-            self.assertEqual(report_data[0]['lop_period']['disaggregations'][label.pk]['actual'], None)
+        for report_data in [self.get_tp_report_data(), self.get_tva_report_data()]:
+            self.assertEqual(len(report_data), 1)
+            for label in self.standard_disaggregation.labels:
+                self.assertEqual(report_data[0]['lop_period']['disaggregations'][label.pk]['actual'], None)
 
     def test_indicator_with_one_disaggregated_value(self):
         indicator = RFIndicatorFactory(
@@ -193,13 +199,13 @@ class TestIPTTJSONIndicatorReportDataSerializer(test.TestCase):
         indicator.disaggregation.set([self.standard_disaggregation])
         result = indicator.result_set.first()
         DisaggregatedValueFactory(result=result, category=self.standard_disaggregation.labels[1], value=250)
-        report_data = self.get_tp_report_data()
-        self.assertEqual(len(report_data), 1)
-        lop_period_disaggs = report_data[0]['lop_period']['disaggregations']
-        label = self.standard_disaggregation.labels[0]
-        self.assertEqual(lop_period_disaggs[label.pk]['actual'], None)
-        label = self.standard_disaggregation.labels[1]
-        self.assertEqual(lop_period_disaggs[label.pk]['actual'], '250')
+        for report_data in [self.get_tp_report_data(), self.get_tva_report_data()]:
+            self.assertEqual(len(report_data), 1)
+            lop_period_disaggs = report_data[0]['lop_period']['disaggregations']
+            label = self.standard_disaggregation.labels[0]
+            self.assertEqual(lop_period_disaggs[label.pk]['actual'], None)
+            label = self.standard_disaggregation.labels[1]
+            self.assertEqual(lop_period_disaggs[label.pk]['actual'], '250')
 
     def test_indicator_with_one_disaggregation_and_multiple_values(self):
         indicator = RFIndicatorFactory(
@@ -212,13 +218,13 @@ class TestIPTTJSONIndicatorReportDataSerializer(test.TestCase):
         for label, value in zip(self.standard_disaggregation.labels, [50.25, 100.4]):
             for result in results:
                 DisaggregatedValueFactory(result=result, category=label, value=value)
-        report_data = self.get_tp_report_data()
-        self.assertEqual(len(report_data), 1)
-        lop_period_disaggs = report_data[0]['lop_period']['disaggregations']
-        label = self.standard_disaggregation.labels[0]
-        self.assertEqual(lop_period_disaggs[label.pk]['actual'], '100.5')
-        label = self.standard_disaggregation.labels[1]
-        self.assertEqual(lop_period_disaggs[label.pk]['actual'], '200.8')
+        for report_data in [self.get_tp_report_data(), self.get_tva_report_data()]:
+            self.assertEqual(len(report_data), 1)
+            lop_period_disaggs = report_data[0]['lop_period']['disaggregations']
+            label = self.standard_disaggregation.labels[0]
+            self.assertEqual(lop_period_disaggs[label.pk]['actual'], '100.5')
+            label = self.standard_disaggregation.labels[1]
+            self.assertEqual(lop_period_disaggs[label.pk]['actual'], '200.8')
 
     def test_indicator_with_one_disaggregation_and_multiple_values_cumulative(self):
         indicator = RFIndicatorFactory(
@@ -232,13 +238,13 @@ class TestIPTTJSONIndicatorReportDataSerializer(test.TestCase):
         for label, value in zip(self.standard_disaggregation.labels, [50.25, 100.4]):
             for result in results:
                 DisaggregatedValueFactory(result=result, category=label, value=value)
-        report_data = self.get_tp_report_data()
-        self.assertEqual(len(report_data), 1)
-        lop_period_disaggs = report_data[0]['lop_period']['disaggregations']
-        label = self.standard_disaggregation.labels[0]
-        self.assertEqual(lop_period_disaggs[label.pk]['actual'], '100.5')
-        label = self.standard_disaggregation.labels[1]
-        self.assertEqual(lop_period_disaggs[label.pk]['actual'], '200.8')
+        for report_data in [self.get_tp_report_data(), self.get_tva_report_data()]:
+            self.assertEqual(len(report_data), 1)
+            lop_period_disaggs = report_data[0]['lop_period']['disaggregations']
+            label = self.standard_disaggregation.labels[0]
+            self.assertEqual(lop_period_disaggs[label.pk]['actual'], '100.5')
+            label = self.standard_disaggregation.labels[1]
+            self.assertEqual(lop_period_disaggs[label.pk]['actual'], '200.8')
 
     def test_percentage_indicator(self):
         indicator = RFIndicatorFactory(
@@ -254,28 +260,84 @@ class TestIPTTJSONIndicatorReportDataSerializer(test.TestCase):
         for label, value in zip(self.country_disaggregation.labels, [0, 33]):
             DisaggregatedValueFactory(result=results[0], category=label, value=900)
             DisaggregatedValueFactory(result=results[1], category=label, value=value)
-        report_data = self.get_tp_report_data()
-        self.assertEqual(len(report_data), 1)
-        lop_period_disaggs = report_data[0]['lop_period']['disaggregations']
-        label = self.standard_disaggregation.labels[0]
-        self.assertEqual(lop_period_disaggs[label.pk]['actual'], '0.1')
-        label = self.standard_disaggregation.labels[1]
-        self.assertEqual(lop_period_disaggs[label.pk]['actual'], '400')
-        label = self.country_disaggregation.labels[0]
-        self.assertEqual(lop_period_disaggs[label.pk]['actual'], '0')
-        label = self.country_disaggregation.labels[1]
-        self.assertEqual(lop_period_disaggs[label.pk]['actual'], '33')
+        for report_data in [self.get_tp_report_data(), self.get_tva_report_data()]:
+            self.assertEqual(len(report_data), 1)
+            lop_period_disaggs = report_data[0]['lop_period']['disaggregations']
+            label = self.standard_disaggregation.labels[0]
+            self.assertEqual(lop_period_disaggs[label.pk]['actual'], '0.1')
+            label = self.standard_disaggregation.labels[1]
+            self.assertEqual(lop_period_disaggs[label.pk]['actual'], '400')
+            label = self.country_disaggregation.labels[0]
+            self.assertEqual(lop_period_disaggs[label.pk]['actual'], '0')
+            label = self.country_disaggregation.labels[1]
+            self.assertEqual(lop_period_disaggs[label.pk]['actual'], '33')
 
     def test_one_result_in_one_period(self):
         indicator = RFIndicatorFactory(
             program=self.program, targets=500, target_frequency=Indicator.ANNUAL,
             results=[None, 250]
             )
-        result = get_result(indicator, 250, target_period=1)
         report_data = self.get_tp_report_data(frequency=Indicator.ANNUAL)
         self.assertEqual(report_data[0]['periods'][0]['actual'], None)
-        self.assertEqual(report_data[0]['periods'][1]['index'], 1)
+        self.assertEqual(report_data[0]['periods'][0]['count'], 0)
+        self.assertEqual(report_data[0]['periods'][1]['count'], 1)
         self.assertEqual(report_data[0]['periods'][1]['actual'], '250')
-        # report_data2 = get_tp_report_data(indicator, Indicator.TRI_ANNUAL)['report_data']
-        # self.assertEqual(report_data2[0]['actual'], None)
-        # self.assertEqual(report_data2[3]['actual'], '250')
+        tva_report_data = self.get_tva_report_data(frequency=Indicator.ANNUAL)
+        self.assertEqual(tva_report_data[0]['periods'][0]['actual'], None)
+        self.assertEqual(tva_report_data[0]['periods'][0]['target'], '250')
+        self.assertEqual(tva_report_data[0]['periods'][0]['met'], None)
+        self.assertEqual(tva_report_data[0]['periods'][0]['count'], 0)
+        self.assertEqual(tva_report_data[0]['periods'][1]['count'], 1)
+        self.assertEqual(tva_report_data[0]['periods'][1]['actual'], '250')
+        self.assertEqual(tva_report_data[0]['periods'][1]['target'], '250')
+        self.assertEqual(tva_report_data[0]['periods'][1]['met'], '100')
+        report_data2 = self.get_tp_report_data(frequency=Indicator.TRI_ANNUAL)
+        for period in range(3):
+            self.assertEqual(report_data2[0]['periods'][period]['actual'], None)
+            self.assertEqual(report_data2[0]['periods'][period]['count'], period)
+        self.assertEqual(report_data2[0]['periods'][3]['count'], 3)
+        self.assertEqual(report_data2[0]['periods'][3]['actual'], '250')
+
+    def test_two_results_in_one_period_numeric(self):
+        indicator = RFIndicatorFactory(
+            program=self.program,
+            targets=500,
+            target_frequency=Indicator.ANNUAL,
+            results=[None, [150, 350]])
+        report_data = self.get_tp_report_data(frequency=Indicator.ANNUAL)
+        self.assertEqual(report_data[0]['periods'][0]['actual'], None)
+        self.assertEqual(report_data[0]['periods'][1]['actual'], '500')
+        tva_report_data = self.get_tva_report_data(frequency=Indicator.ANNUAL)
+        self.assertEqual(tva_report_data[0]['periods'][0]['actual'], None)
+        self.assertEqual(tva_report_data[0]['periods'][0]['target'], '250')
+        self.assertEqual(tva_report_data[0]['periods'][0]['met'], None)
+        self.assertEqual(tva_report_data[0]['periods'][1]['actual'], '500')
+        self.assertEqual(tva_report_data[0]['periods'][1]['target'], '250')
+        self.assertEqual(tva_report_data[0]['periods'][1]['met'], '200')
+        report_data2 = self.get_tp_report_data(frequency=Indicator.SEMI_ANNUAL)
+        self.assertEqual(report_data2[0]['periods'][0]['actual'], None)
+        self.assertEqual(report_data2[0]['periods'][1]['actual'], None)
+        self.assertEqual(report_data2[0]['periods'][2]['actual'], '500')
+        self.assertEqual(report_data2[0]['periods'][3]['actual'], None)
+        
+    def test_two_results_in_one_period_percent(self):
+        indicator = RFIndicatorFactory(
+            program=self.program, targets=500, target_frequency=Indicator.ANNUAL,
+            unit_of_measure_type=Indicator.PERCENTAGE, results=[None, [150, 350]])
+        report_data = self.get_tp_report_data(frequency=Indicator.ANNUAL)
+        self.assertEqual(report_data[0]['periods'][0]['actual'], None)
+        self.assertEqual(report_data[0]['periods'][1]['actual'], '350')
+        tva_report_data = self.get_tva_report_data(frequency=Indicator.ANNUAL)
+        self.assertEqual(tva_report_data[0]['periods'][0]['actual'], None)
+        self.assertEqual(tva_report_data[0]['periods'][0]['target'], '250')
+        self.assertEqual(tva_report_data[0]['periods'][0]['met'], None)
+        self.assertEqual(tva_report_data[0]['periods'][1]['actual'], '350')
+        self.assertEqual(tva_report_data[0]['periods'][1]['target'], '250')
+        self.assertEqual(tva_report_data[0]['periods'][1]['met'], '140')
+        report_data2 = self.get_tp_report_data(frequency=Indicator.SEMI_ANNUAL)
+        self.assertEqual(report_data2[0]['periods'][0]['actual'], None)
+        self.assertEqual(report_data2[0]['periods'][1]['actual'], None)
+        self.assertEqual(report_data2[0]['periods'][2]['actual'], '350')
+        self.assertEqual(report_data2[0]['periods'][3]['actual'], None)
+
+    

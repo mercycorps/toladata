@@ -19,6 +19,13 @@ from tola.model_utils import get_serializer
 from tola.serializers import make_quantized_decimal, DecimalDisplayField
 from django.db import models
 from django.utils.translation import ugettext as _
+from .disaggregation_serializers import IPTTDisaggregationSerializer
+from .iptt_period_data_serializers import (
+    TPReportPeriodSerializer,
+    TPExcelReportPeriodSerializer,
+    TVAReportPeriodSerializer,
+    TVAExcelReportPeriodSerializer
+)
 from .indicator_serializers import (
     IndicatorOrderingMixin,
     IndicatorMeasurementMixin,
@@ -35,6 +42,7 @@ class IPTTIndicatorFiltersMixin:
     disaggregation_pks = serializers.SerializerMethodField()
 
     class Meta:
+        purpose = "JSONFilters"
         fields = [
             'sector_pk',
             'indicator_type_pks',
@@ -91,45 +99,6 @@ IPTTJSONIndicatorLabelsSerializer = get_serializer(
     IndicatorBaseSerializerMixin
 )
 
-# EXCEL export specific serializers:
-
-
-class DisaggregationBase:
-    name = serializers.CharField(source='disaggregation_type')
-    labels = serializers.SerializerMethodField()
-
-    class Meta:
-        model = DisaggregationType
-        fields = [
-            'pk',
-            'name',
-            'labels',
-        ]
-
-    def get_labels(self, disagg):
-        labels = self.context.get('labels_map', {}).get(disagg.pk, None)
-        if labels is None:
-            raise NotImplementedError("no prefetch disaggs")
-        return [{'pk': label.pk, 'name': label.label} for label in labels]
-
-class IPTTDisaggregationMixin:
-    has_results = serializers.SerializerMethodField()
-
-    class Meta:
-        fields = [
-            'has_results',
-        ]
-
-    def get_has_results(self, disagg):
-        if disagg.pk in self.context.get('with_results', []):
-            return True
-        return False
-
-IPTTDisaggregationSerializer = get_serializer(
-    IPTTDisaggregationMixin,
-    DisaggregationBase,
-)
-
 
 class IPTTExcelIndicatorFiltersMixin:
     program_pk = serializers.IntegerField(source='program_id')
@@ -138,6 +107,7 @@ class IPTTExcelIndicatorFiltersMixin:
     no_rf_level = serializers.SerializerMethodField()
 
     class Meta:
+        purpose = "ExcelLabels"
         fields = [
             'program_pk',
             'number',
@@ -164,17 +134,14 @@ class IPTTExcelIndicatorFiltersMixin:
         )
 
     def get_disaggregations(self, indicator):
-        disaggregation_map = self.context.get('disaggregations')
         disaggregation_labels = {}
         disaggregation_objects = []
-        disagg_list = self.context.get('disaggregations_indicators').get(indicator.pk, {})
+        disagg_list = self.context['disaggregations_indicators'].get(indicator.pk, {})
         for disaggregation_dict in [
-            disaggregation_map.get(d_pk) for d_pk in disagg_list.get('all', [])
+            self.context['disaggregations'][d_pk] for d_pk in disagg_list.get('all', [])
         ]:
-            disaggregation = disaggregation_dict.get('disaggregation', None)
-            labels = disaggregation_dict.get('labels', [])
-            disaggregation_objects.append(disaggregation)
-            disaggregation_labels[disaggregation.pk] = labels
+            disaggregation_objects.append(disaggregation_dict['disaggregation'])
+            disaggregation_labels[disaggregation_dict['disaggregation'].pk] = disaggregation_dict.get('labels', [])
         disaggregation_context = {
             **self.context.get('disaggregation_context', {}),
             'labels_map': disaggregation_labels,
@@ -187,7 +154,6 @@ class IPTTExcelIndicatorFiltersMixin:
             key=operator.itemgetter('name')
         )
 
-
     def get_no_rf_level(self, indicator):
         return (not indicator.results_framework or not indicator.level_id)
 
@@ -199,53 +165,6 @@ IPTTExcelIndicatorSerializer = get_serializer(
     IndicatorBaseSerializerMixin
 )
 
-class TPReportPeriodSerializer(serializers.Serializer):
-    met = DecimalDisplayField(multiplier=100)
-    actual = DecimalDisplayField()
-    count = serializers.IntegerField(allow_null=True, default=None)
-    disaggregations = serializers.SerializerMethodField()
-
-    class PeriodObject:
-        def __init__(self, period_dict):
-            period_dict['count'] = period_dict.get('count', None)
-            self.__dict__ = period_dict
-
-    @classmethod
-    def get_period_object(cls, period_dict):
-        return cls.PeriodObject(period_dict)
-
-    def _format_disagg(self, disaggregation):
-        actual = disaggregation.pop('actual', None)
-        try:
-            actual = make_quantized_decimal(actual, coerce_to_string=True)
-        except TypeError:
-            pass
-        return {
-            'actual': actual
-        }
-
-    def get_disaggregations(self, period):
-        return {label_pk: self._format_disagg(period.disaggregations[label_pk])
-                for label_pk in self.context.get('categories', [])}
-
-
-class TVAReportPeriodSerializer(TPReportPeriodSerializer):
-    target = DecimalDisplayField()
-
-    class PeriodObject:
-        def __init__(self, period_dict):
-            period_dict['count'] = period_dict.get('count', None)
-            target = period_dict.get('target', None)
-            actual = period_dict.get('actual', None)
-            period_dict['met'] = None
-            if target is not None and actual is not None and target != 0:
-                try:
-                    period_dict['met'] = make_quantized_decimal(
-                        make_quantized_decimal(actual) / make_quantized_decimal(target), places=4
-                    )
-                except TypeError:
-                    pass
-            self.__dict__ = period_dict
 
 
 class IPTTIndicatorReportBase:
@@ -257,6 +176,7 @@ class IPTTIndicatorReportBase:
 
     class Meta:
         model = Indicator
+        purpose = "IPTTReportData"
         fields = [
             'pk',
             'lop_period',
@@ -276,6 +196,16 @@ class IPTTIndicatorReportBase:
         results = [result for result in self.context.get('results').get(indicator.pk, [])
                    if result.date_collected is not None]
         return sorted(results, key=operator.attrgetter('date_collected'))
+
+    def _get_period_results(self, indicator, period_dict):
+        past_results = [result for result in self._get_all_results(indicator)
+                        if result.date_collected <= period_dict['end']]
+        period_results = [result for result in past_results
+                          if result.date_collected >= period_dict['start']]
+        if period_results and any(result.achieved is not None for result in period_results):
+            return past_results if indicator.is_cumulative else period_results
+        else:
+            return []
 
     def _get_results_totals(self, indicator, results):
         if not results:
@@ -300,22 +230,33 @@ class IPTTIndicatorReportBase:
     def get_lop_period(self, indicator):
         results = self._get_all_results(indicator)
         actual, disaggregations = self._get_results_totals(indicator, results)
-        period_serialized = self._lop_period_serializer(
-            self._lop_period_serializer.get_period_object(
-                {'target': indicator.lop_target_calculated,
-                 'actual': actual,
-                 'disaggregations': disaggregations}),
-            context={'categories': self.context.get('labels_indicators_map').get(indicator.pk, [])}).data
-        return period_serialized
+        context = {'categories': self.context['labels_indicators_map'].get(indicator.pk, [])}
+        return self._lop_period_serializer.from_dict(
+            {'target': indicator.lop_target_calculated,
+             'actual': actual,
+             'disaggregations': disaggregations},
+            context=context).data
+
+    def _get_period(self, indicator, period_dict):
+        results = self._get_period_results(indicator, period_dict)
+        actual, disaggregations = self._get_results_totals(indicator, results)
+        return {
+            'count': period_dict.get('customsort', None),
+            'actual': actual,
+            'disaggregations': disaggregations
+        }
 
     def get_periods(self, indicator):
-        return [self._get_period(indicator, period) for period in self.context.get('periods')]
+        context = {'categories': self.context['labels_indicators_map'].get(indicator.pk, [])}
+        return [self._period_serializer.from_dict(self._get_period(indicator, period), context=context).data
+                for period in self.context['periods']]
 
 
 class IPTTJSONReportMixin:
     """Adapts report data serializer for creating a React-consumable output"""
 
     class Meta:
+        purpose = "JSON"
         fields = [
             'program_id',
         ]
@@ -354,6 +295,12 @@ class IPTTJSONReportMixin:
             to_attr='prefetch_disaggregated_values')):
             result_map[result.indicator_id].append(result)
         context['results'] = result_map
+        targets_map = defaultdict(list)
+        for target in PeriodicTarget.objects.select_related(None).prefetch_related(None).filter(
+            indicator__program_id=program_data.pk
+        ).only('indicator_id', 'pk', 'customsort', 'target'):
+            targets_map[target.indicator_id].append(target)
+        context['targets'] = targets_map
         labels_indicators = defaultdict(list)
         for label in DisaggregationLabel.objects.select_related('disaggregation_type').prefetch_related(None).filter(
             disaggregation_type__indicator__program_id=program_pk
@@ -381,50 +328,23 @@ IPTTJSONTPReportIndicatorSerializer = get_serializer(
     IPTTIndicatorReportBase
 )
 
-
-class IPTTExcelReportMixin:
-    """Adapts report data serializer for creating an Excel-renderer-consumable output"""
+class IPTTTVAReportMixin:
+    """Adds targets to periods in IPTTJSONReport"""
+    _period_serializer = TVAReportPeriodSerializer
 
     class Meta:
-        fields = [
-            'level_id',
-        ]
-
-    def _get_period_results(self, indicator, period_dict):
-        past_results = [result for result in self._get_all_results(indicator)
-                        if result.date_collected <= period_dict['end']]
-        period_results = [result for result in past_results
-                          if result.date_collected >= period_dict['start']]
-        if period_results and any(result.achieved is not None for result in period_results):
-            return past_results if indicator.is_cumulative else period_results
-        else:
-            return []
-
-    def _get_all_targets(self, indicator):
-        return self.context.get('targets').get(indicator.pk) or []
-
-    def _get_period(self, indicator, period_dict):
-        results = self._get_period_results(indicator, period_dict)
-        actual, disaggregations = self._get_results_totals(indicator, results)
-        return {
-            'count': period_dict.get('customsort', None),
-            'actual': actual,
-            'disaggregations': disaggregations
-            
-        }
-
-
-class IPTTExcelTVAReportMixin:
-    class Meta:
-        pass
+        purpose = "TvA"
 
     def _get_all_results(self, indicator):
-        results = [result for result in self.context.get('results').get(indicator.pk, [])
+        results = [result for result in self.context['results'].get(indicator.pk, [])
                    if result.periodic_target is not None]
         dateless = [result for result in results if result.date_collected is None]
         if dateless:
             results = [result for result in results if result.date_collected is not None]
         return dateless + sorted(results, key=operator.attrgetter('periodic_target.customsort', 'date_collected'))
+
+    def _get_all_targets(self, indicator):
+        return self.context['targets'].get(indicator.pk) or []
 
     def _get_period_results(self, indicator, period_dict):
         if indicator.target_frequency == Indicator.MID_END:
@@ -473,6 +393,30 @@ class IPTTExcelTVAReportMixin:
         return period
 
 
+IPTTJSONTVAReportIndicatorSerializer = get_serializer(
+    IPTTTVAReportMixin,
+    IPTTJSONReportMixin,
+    IPTTIndicatorReportBase
+)
+
+class IPTTExcelReportMixin:
+    """Adapts report data serializer for creating an Excel-renderer-consumable output"""
+    _lop_period_serializer = TVAExcelReportPeriodSerializer
+    _period_serializer = TPExcelReportPeriodSerializer
+
+    class Meta:
+        purpose = "Excel"
+        fields = [
+            'level_id',
+        ]
+
+
+class IPTTTVAExcelReportMixin:
+    _period_serializer = TVAExcelReportPeriodSerializer
+
+    
+
+
 IPTTExcelTPReportIndicatorSerializer = get_serializer(
     IPTTExcelReportMixin,
     IPTTIndicatorReportBase,
@@ -480,7 +424,8 @@ IPTTExcelTPReportIndicatorSerializer = get_serializer(
 
 
 IPTTExcelTVAReportIndicatorSerializer = get_serializer(
-    IPTTExcelTVAReportMixin,
+    IPTTTVAExcelReportMixin,
+    IPTTTVAReportMixin,
     IPTTExcelReportMixin,
     IPTTIndicatorReportBase
 )

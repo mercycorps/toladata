@@ -203,14 +203,15 @@ class RFIndicatorFactory(DjangoModelFactory):
                 if not isinstance(achieved, list):
                     achieved = [achieved]
                 for j, this_achieved in enumerate(achieved):
-                    ResultFactory(
-                        periodic_target=target,
-                        achieved=this_achieved,
-                        indicator=self,
-                        program=self.program,
-                        evidence_url=evidence,
-                        date_collected=target.start_date + datetime.timedelta(days=1+j+c%count)
-                    )
+                    if this_achieved is not None:
+                        ResultFactory(
+                            periodic_target=target,
+                            achieved=this_achieved,
+                            indicator=self,
+                            program=self.program,
+                            evidence_url=evidence,
+                            date_collected=target.start_date + datetime.timedelta(days=1+j+c%count)
+                        )
 
 class Objective(DjangoModelFactory):
     class Meta:

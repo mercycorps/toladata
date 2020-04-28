@@ -30,10 +30,11 @@ class DecimalDisplayField(serializers.DecimalField):
     def __init__(self, *args, **kwargs):
         self.multiplier = decimal.Decimal(kwargs.pop('multiplier', 1))
         self.decimal_places = kwargs.pop('decimal_places', 2)
+        localize = kwargs.pop('localize', True)
         kwargs.update({
             'decimal_places': self.decimal_places,
             'max_digits': None,
-            'localize': True
+            'localize': localize
         })
         super(DecimalDisplayField, self).__init__(*args, **kwargs)
 

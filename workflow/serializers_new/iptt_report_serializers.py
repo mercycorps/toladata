@@ -71,7 +71,7 @@ class IPTTReportSerializer(serializers.Serializer):
     def load_report_indicators(cls, **kwargs):
         report_filters = kwargs.get('report_filters', {})
         return Indicator.rf_aware_objects.select_related(None).prefetch_related(None).only(
-            'pk', 'target_frequency', 'unit_of_measure_type', 'is_cumulative', 'level_id', 'lop_target',
+            'pk', 'program_id', 'target_frequency', 'unit_of_measure_type', 'is_cumulative', 'level_id', 'lop_target',
         ).filter(**report_filters).order_by().distinct()
 
     @classmethod

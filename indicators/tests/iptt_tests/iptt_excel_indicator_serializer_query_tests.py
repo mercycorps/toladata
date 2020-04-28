@@ -53,7 +53,7 @@ FULL_QUERIES = BASE_SERIALIZER_QUERIES + 0
 CONTEXT_QUERIES = 4
 
 class DecimalComparator:
-    def assertDecimalEqual(self, a, b, msg=None):
+    def assertDecimalEqual(self, a, b, msg=None, strict=False):
         msg = f"{msg}: " if msg else ''
         if a != b:
             raise self.failureException(f"{msg}{a} not equal to {b}")
@@ -61,7 +61,7 @@ class DecimalComparator:
             raise self.failureException(f"{msg}{a} expected type Decimal, got {type(a)}")
         if not isinstance(b, decimal.Decimal):
             raise self.failureException(f"{msg}{b} expected type Decimal, got {type(b)}")
-        if not a.same_quantum(b):
+        if strict and not a.same_quantum(b):
             raise self.failureException(f"{msg}{a} has exponent {a.as_tuple()[2]}, and {b} has exponent {b.as_tuple()[2]}")
 
 def get_decimal(value, places=2):

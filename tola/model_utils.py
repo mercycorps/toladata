@@ -92,21 +92,23 @@ def get_serializer(*serializer_classes):
             hasattr(base_class, 'Meta') and hasattr(base_class.Meta, 'model')
             )
         ][0]
+    purpose = '|'.join([getattr(base_class.Meta, 'purpose') for base_class in serializer_classes if (
+        hasattr(base_class, 'Meta') and hasattr(base_class.Meta, 'purpose'))][::-1]) or "Base"
     override_fields = [
-        field for base_class in serializer_classes if getattr(base_class.Meta, 'override_fields', False)
+        field for base_class in serializer_classes if (hasattr(base_class, 'Meta') and getattr(base_class.Meta, 'override_fields', False))
         for field in getattr(base_class.Meta, 'fields', [])
         ]
     klas = type(
-        'New{}Serializer'.format(model.__name__),
+        '{}|{}Serializer'.format(purpose, model.__name__),
         tuple(list(serializer_classes) + [serializers.ModelSerializer]),
         {
             field: getattr(base_class, field) for base_class in serializer_classes
-            for field in getattr(base_class.Meta, 'fields', []) if (
+            for field in getattr(getattr(base_class, 'Meta', {}), 'fields', []) if (
                 hasattr(base_class, field) and (field in override_fields or not override_fields)
             )
         })
     klas.Meta.model = model
     klas.Meta.fields = [
-        field for base_class in serializer_classes for field in getattr(base_class.Meta, 'fields', [])
+        field for base_class in serializer_classes for field in getattr(getattr(base_class, 'Meta', {}), 'fields', [])
         ] if not override_fields else override_fields
     return klas
