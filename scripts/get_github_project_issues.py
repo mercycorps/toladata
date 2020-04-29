@@ -72,7 +72,7 @@ else:
     print("The project you entered couldn't be found in the list of your available projects. Exiting.")
     sys.exit()
 
-# Get the columns ids associated with the project
+# Get the column ids associated with the project
 columns_url = columns_template % project_id
 response = requests.get(columns_url, headers=headers, auth=auth)
 cols_to_fetch = ['Done', 'Ready for Deploy']
