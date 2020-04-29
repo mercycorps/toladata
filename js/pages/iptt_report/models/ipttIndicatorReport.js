@@ -21,15 +21,15 @@ const getIndicatorReport = (
 ) => observable({
     pk: parseInt(indicatorReportJSON.pk),
     frequency: parseInt(frequency),
-    _lopTarget: indicatorReportJSON.lop_target,
+    _lopTarget: (indicatorReportJSON.lop_period || {}).target,
     get lopTarget() {
         return this._lopTarget;
     },
-    _lopActual: indicatorReportJSON.lop_actual,
+    _lopActual: (indicatorReportJSON.lop_period || {}).actual,
     get lopActual() {
         return this._lopActual;
     },
-    _lopMet: indicatorReportJSON.lop_percent_met,
+    _lopMet: (indicatorReportJSON.lop_period || {}).met,
     get lopMet() {
         return this._lopMet;
     },

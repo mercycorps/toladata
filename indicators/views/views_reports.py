@@ -10,8 +10,8 @@ from indicators.models import Indicator, PinnedReport, PeriodicTarget
 from indicators.forms import PinnedReportForm
 
 from indicators.serializers_new import (
-    IPTTTVAReportIndicatorSerializer,
-    IPTTTPReportIndicatorSerializer
+    IPTTJSONTVAReportIndicatorSerializer,
+    IPTTJSONTPReportIndicatorSerializer
 )
 from indicators.export_renderers import IPTTExcelRenderer
 from workflow.serializers_new import (
@@ -110,7 +110,7 @@ class IPTTReport(LoginRequiredMixin, TemplateView):
             reporting_period_end__isnull=False,
             indicators_count__gt=0
         ).order_by('name').values_list('pk', 'name', 'tva_indicators_count')
-        program_data = IPTTProgramSerializer.get_for_pk(program_id).data
+        program_data = IPTTProgramSerializer.load_for_pk(program_id).data
         react_data = {
             'programs_list': list(programs),
             'program_data': program_data,
@@ -121,15 +121,15 @@ class IPTTReport(LoginRequiredMixin, TemplateView):
 @has_program_read_access
 def api_iptt_report_data(request, program):
     if request.GET.get('report_type') == '1':
-        data = IPTTTVAReportIndicatorSerializer.load_report(
+        data = IPTTJSONTVAReportIndicatorSerializer.load_report(
             program,
             int(request.GET.get('frequency'))
-        )
+        ).data
     else:
-        data = IPTTTPReportIndicatorSerializer.load_report(
+        data = IPTTJSONTPReportIndicatorSerializer.load_report(
             program,
             int(request.GET.get('frequency'))
-        )
+        ).data
     return JsonResponse(
         {'report_data': data,
          'report_frequency': int(request.GET.get('frequency')),
@@ -139,7 +139,7 @@ def api_iptt_report_data(request, program):
 @login_required
 @has_program_read_access
 def api_iptt_filter_data(request, program):
-    return JsonResponse(IPTTProgramSerializer.get_for_pk(program).data)
+    return JsonResponse(IPTTProgramSerializer.load_for_pk(program).data)
 
 
 
