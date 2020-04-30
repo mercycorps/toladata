@@ -2,7 +2,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: \n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2020-03-27 15:42-0700\n"
+"POT-Creation-Date: 2020-04-29 23:43-0700\n"
 "PO-Revision-Date: 2020-03-24 08:32-0700\n"
 "Last-Translator: \n"
 "Language-Team: \n"
@@ -51,57 +51,21 @@ msgstr "Catégories"
 msgid "Disaggregation"
 msgstr "Désagrégation"
 
-#: indicators/export_renderers.py:43 indicators/models.py:1014
-#: indicators/models.py:1661
-msgid "Life of Program (LoP) only"
-msgstr "La vie du programme (LoP) seulement"
-
-#: indicators/export_renderers.py:44 indicators/models.py:1015
-msgid "Midline and endline"
-msgstr "Mesure de mi-parcours et mesure de fin de programme"
-
-#. Translators:  label for the date of the last completed Annual target period.
-#: indicators/export_renderers.py:45 indicators/models.py:1016
-#: templates/indicators/program_target_period_info_helptext.html:16
-msgid "Annual"
-msgstr "Annuel"
-
-#: indicators/export_renderers.py:46 indicators/models.py:1017
-msgid "Semi-annual"
-msgstr "Semestriel"
-
-#: indicators/export_renderers.py:47 indicators/models.py:1018
-msgid "Tri-annual"
-msgstr "Quadrimestriel"
-
-#. Translators: this is the measure of time (3 months)
-#. Translators:  label for the date of the last completed Quarterly target period.
-#: indicators/export_renderers.py:49 indicators/models.py:1019
-#: templates/indicators/program_target_period_info_helptext.html:22
-msgid "Quarterly"
-msgstr "Trimestriel"
-
-#. Translators:  label for the date of the last completed Monthly target period.
-#: indicators/export_renderers.py:50 indicators/models.py:1020
-#: templates/indicators/program_target_period_info_helptext.html:24
-msgid "Monthly"
-msgstr "Mensuel"
-
-#: indicators/export_renderers.py:65
+#: indicators/export_renderers.py:64
 msgid "Program ID"
 msgstr "Identifiant du programme"
 
-#: indicators/export_renderers.py:66
+#: indicators/export_renderers.py:65
 msgid "Indicator ID"
 msgstr "Identifiant de l’indicateur"
 
 #. Translators: "No." as in abbreviation for Number
-#: indicators/export_renderers.py:68 indicators/indicator_plan.py:48
+#: indicators/export_renderers.py:67 indicators/indicator_plan.py:48
 #: templates/indicators/iptt_indicators_varied_startdates.html:34
 msgid "No."
 msgstr "Nº"
 
-#: indicators/export_renderers.py:69 indicators/forms.py:318
+#: indicators/export_renderers.py:68 indicators/forms.py:318
 #: indicators/models.py:1306 indicators/models.py:1672
 #: indicators/models.py:1965 indicators/views/views_program.py:133
 #: indicators/views/views_program.py:172
@@ -112,56 +76,106 @@ msgstr "Nº"
 msgid "Indicator"
 msgstr "Indicateur"
 
-#: indicators/export_renderers.py:73 indicators/indicator_plan.py:41
+#: indicators/export_renderers.py:72 indicators/indicator_plan.py:41
 #: indicators/models.py:132 indicators/models.py:1079
 msgid "Level"
 msgstr "Niveau"
 
-#: indicators/export_renderers.py:77 indicators/indicator_plan.py:83
+#: indicators/export_renderers.py:76 indicators/indicator_plan.py:83
 #: indicators/models.py:1121 tola_management/models.py:242
 msgid "Unit of measure"
 msgstr "Unité de mesure"
 
 #. Translators: this is short for "Direction of Change" as in + or -
-#: indicators/export_renderers.py:82
+#: indicators/export_renderers.py:81
 msgid "Change"
 msgstr "Changement"
 
 #. Translators: 'C' as in Cumulative and 'NC' as in Non Cumulative
-#: indicators/export_renderers.py:87 indicators/models.py:1155
+#: indicators/export_renderers.py:86 indicators/models.py:1155
 msgid "C / NC"
 msgstr "C / NC"
 
-#: indicators/export_renderers.py:95 indicators/forms.py:222
+#: indicators/export_renderers.py:94 indicators/forms.py:222
 #: indicators/models.py:1136 tola_management/models.py:248
 msgid "Baseline"
 msgstr "Mesure de base"
 
-#: indicators/export_renderers.py:135 indicators/models.py:1681
+#: indicators/export_renderers.py:100 indicators/models.py:1014
+#: indicators/models.py:1661
+msgid "Life of Program (LoP) only"
+msgstr "La vie du programme (LoP) seulement"
+
+#: indicators/export_renderers.py:101 indicators/models.py:1015
+msgid "Midline and endline"
+msgstr "Mesure de mi-parcours et mesure de fin de programme"
+
+#. Translators:  label for the date of the last completed Annual target period.
+#: indicators/export_renderers.py:102 indicators/models.py:1016
+#: templates/indicators/program_target_period_info_helptext.html:16
+msgid "Annual"
+msgstr "Annuel"
+
+#: indicators/export_renderers.py:103 indicators/models.py:1017
+msgid "Semi-annual"
+msgstr "Semestriel"
+
+#: indicators/export_renderers.py:104 indicators/models.py:1018
+msgid "Tri-annual"
+msgstr "Quadrimestriel"
+
+#. Translators: this is the measure of time (3 months)
+#. Translators:  label for the date of the last completed Quarterly target period.
+#: indicators/export_renderers.py:106 indicators/models.py:1019
+#: templates/indicators/program_target_period_info_helptext.html:22
+msgid "Quarterly"
+msgstr "Trimestriel"
+
+#. Translators:  label for the date of the last completed Monthly target period.
+#: indicators/export_renderers.py:107 indicators/models.py:1020
+#: templates/indicators/program_target_period_info_helptext.html:24
+msgid "Monthly"
+msgstr "Mensuel"
+
+#: indicators/export_renderers.py:166 indicators/models.py:1681
 #: templates/indicators/result_table.html:25
+#: workflow/serializers_new/period_serializers.py:41
 msgid "Target"
 msgstr "Cible"
 
-#: indicators/export_renderers.py:135 indicators/models.py:1959
-#: templates/indicators/result_table.html:26
+#: indicators/export_renderers.py:166 indicators/export_renderers.py:167
+#: indicators/models.py:1959 templates/indicators/result_table.html:26
+#: workflow/serializers_new/period_serializers.py:47
 msgid "Actual"
 msgstr "Réel"
 
-#: indicators/export_renderers.py:135
+#: indicators/export_renderers.py:166
+#: workflow/serializers_new/period_serializers.py:53
 msgid "% Met"
 msgstr "% Atteint"
 
-#: indicators/export_renderers.py:397 indicators/indicator_plan.py:297
-#: indicators/indicator_plan.py:430 indicators/views/views_program.py:167
-msgid "Indicators unassigned to a results framework level"
-msgstr "Indicateurs non affectés à un niveau de cadre de résultats"
+#. Translators: referring to an indicator whose results accumulate over time
+#: indicators/export_renderers.py:253 indicators/models.py:1430
+msgid "Cumulative"
+msgstr "Cumulatif"
 
-#: indicators/export_renderers.py:450
+#. Translators: referring to an indicator whose results do not accumulate over time
+#: indicators/export_renderers.py:253 indicators/models.py:1435
+msgid "Not cumulative"
+msgstr "Non cumulatif"
+
+#: indicators/export_renderers.py:405
 #: templates/indicators/iptt_filter_form.html:141
 #: templates/indicators/program_page.html:36
 #: tola_management/programadmin.py:119 tola_management/programadmin.py:529
 msgid "Change log"
 msgstr "Journal des modifications"
+
+#: indicators/export_renderers.py:426
+#, fuzzy
+#| msgid "Project data"
+msgid "No data"
+msgstr "Données du projet"
 
 #: indicators/forms.py:221 indicators/models.py:102 indicators/models.py:1245
 #: indicators/models.py:1972 workflow/forms.py:100 workflow/models.py:510
@@ -402,6 +416,12 @@ msgstr "Problèmes liés aux données"
 #: indicators/models.py:1962
 msgid "Comments"
 msgstr "Commentaires"
+
+#: indicators/indicator_plan.py:297 indicators/indicator_plan.py:430
+#: indicators/views/views_program.py:167
+#: workflow/serializers_new/iptt_report_serializers.py:362
+msgid "Indicators unassigned to a results framework level"
+msgstr "Indicateurs non affectés à un niveau de cadre de résultats"
 
 #: indicators/indicator_plan.py:348 indicators/indicator_plan.py:363
 #: templates/indicators/program_page.html:37
@@ -828,16 +848,6 @@ msgstr "#"
 msgid "%"
 msgstr "%"
 
-#. Translators: referring to an indicator whose results accumulate over time
-#: indicators/models.py:1430
-msgid "Cumulative"
-msgstr "Cumulatif"
-
-#. Translators: referring to an indicator whose results do not accumulate over time
-#: indicators/models.py:1435
-msgid "Not cumulative"
-msgstr "Non cumulatif"
-
 #: indicators/models.py:1440 indicators/templatetags/mytags.py:87
 msgid "-"
 msgstr "-"
@@ -853,8 +863,8 @@ msgstr "+"
 msgid "indicator"
 msgstr "indicateur"
 
-#: indicators/models.py:1662 indicators/serializers.py:484
-#: templates/indicators/result_table.html:221
+#: indicators/models.py:1662 templates/indicators/result_table.html:209
+#: workflow/serializers_new/period_serializers.py:16
 msgid "Life of Program"
 msgstr "La vie du programme"
 
@@ -987,22 +997,6 @@ msgstr "Afficher tous les résultats"
 msgid "Recent progress for all indicators"
 msgstr "Progrès récent pour tous les indicateurs"
 
-#: indicators/serializers.py:547
-msgid "IPTT TvA full program report"
-msgstr "Rapport IPTT relatif à la totalité de la TVA du programme"
-
-#: indicators/serializers.py:630
-msgid "IPTT TvA report"
-msgstr "Rapport TVA IPTT"
-
-#: indicators/serializers.py:686
-msgid "IPTT Actuals only report"
-msgstr "Rapport IPTT relatif aux valeurs réelles"
-
-#: indicators/serializers.py:894
-msgid "Indicator Performance Tracking Report"
-msgstr "Rapport de suivi des performances de l’indicateur"
-
 #: indicators/templates/forms/widgets/groupcheckbox_option.html:10
 #, python-format
 msgid "Categories for disaggregation %(disagg)s"
@@ -1024,99 +1018,99 @@ msgid "N/A"
 msgstr "S.O."
 
 #. Translators: title of a graphic showing indicators with targets
-#: indicators/templatetags/mytags.py:198
+#: indicators/templatetags/mytags.py:201
 msgid "Indicators with targets"
 msgstr "Indicateurs avec cibles"
 
 #. Translators: a label in a graphic. Example: 31% have targets
-#: indicators/templatetags/mytags.py:200
+#: indicators/templatetags/mytags.py:203
 msgid "have targets"
 msgstr "ont des cibles"
 
 #. Translators: a label in a graphic. Example: 31% no targets
-#: indicators/templatetags/mytags.py:202
+#: indicators/templatetags/mytags.py:205
 msgid "no targets"
 msgstr "pas de cibles"
 
 #. Translators: a link that displays a filtered list of indicators which are missing targets
-#: indicators/templatetags/mytags.py:204 indicators/templatetags/mytags.py:208
+#: indicators/templatetags/mytags.py:207 indicators/templatetags/mytags.py:211
 msgid "Indicators missing targets"
 msgstr "Indicateurs avec cibles manquantes"
 
 #. Translators: a label in a graphic. Example: 31% have missing targets
-#: indicators/templatetags/mytags.py:206
+#: indicators/templatetags/mytags.py:209
 msgid "have missing targets"
 msgstr "ont des cibles manquantes"
 
-#: indicators/templatetags/mytags.py:209
+#: indicators/templatetags/mytags.py:212
 msgid "No targets"
 msgstr "Pas de cibles"
 
 #. Translators: title of a graphic showing indicators with results
-#: indicators/templatetags/mytags.py:215
+#: indicators/templatetags/mytags.py:218
 msgid "Indicators with results"
 msgstr "Indicateurs avec résultats"
 
 #. Translators: a label in a graphic. Example: 31% have results
-#: indicators/templatetags/mytags.py:217
+#: indicators/templatetags/mytags.py:220
 msgid "have results"
 msgstr "ont des résultats"
 
 #. Translators: a label in a graphic. Example: 31% no results
-#: indicators/templatetags/mytags.py:219
+#: indicators/templatetags/mytags.py:222
 msgid "no results"
 msgstr "aucun résultat"
 
 #. Translators: a link that displays a filtered list of indicators which are missing results
-#: indicators/templatetags/mytags.py:221 indicators/templatetags/mytags.py:225
+#: indicators/templatetags/mytags.py:224 indicators/templatetags/mytags.py:228
 msgid "Indicators missing results"
 msgstr "Indicateurs avec résultats manquants"
 
 #. Translators: a label in a graphic. Example: 31% have missing results
-#: indicators/templatetags/mytags.py:223
+#: indicators/templatetags/mytags.py:226
 msgid "have missing results"
 msgstr "ont des résultats manquants"
 
-#: indicators/templatetags/mytags.py:226
+#: indicators/templatetags/mytags.py:229
 msgid "No results"
 msgstr "Aucun résultat"
 
 #. Translators: title of a graphic showing results with evidence
-#: indicators/templatetags/mytags.py:232
+#: indicators/templatetags/mytags.py:235
 msgid "Results with evidence"
 msgstr "Résultats avec preuves"
 
 #. Translators: a label in a graphic. Example: 31% have evidence
-#: indicators/templatetags/mytags.py:234
+#: indicators/templatetags/mytags.py:237
 msgid "have evidence"
 msgstr "ont des preuves"
 
 #. Translators: a label in a graphic. Example: 31% no evidence
-#: indicators/templatetags/mytags.py:236
+#: indicators/templatetags/mytags.py:239
 msgid "no evidence"
 msgstr "aucune preuve"
 
 #. Translators: a link that displays a filtered list of indicators which are missing evidence
-#: indicators/templatetags/mytags.py:238 indicators/templatetags/mytags.py:242
+#: indicators/templatetags/mytags.py:241 indicators/templatetags/mytags.py:245
 msgid "Indicators missing evidence"
 msgstr "Indicateurs avec preuves manquantes"
 
 #. Translators: a label in a graphic. Example: 31% have missing evidence
-#: indicators/templatetags/mytags.py:240
+#: indicators/templatetags/mytags.py:243
 msgid "have missing evidence"
 msgstr "ont des preuves manquantes"
 
-#: indicators/templatetags/mytags.py:243
+#: indicators/templatetags/mytags.py:246
 msgid "No evidence"
 msgstr "Aucune preuve"
 
 #. Translators: a label in a graphic. Example: 31% of programs have all targets defined
-#: indicators/templatetags/mytags.py:306
+#: indicators/templatetags/mytags.py:309
 msgid "of programs have all targets defined"
 msgstr "les programmes ont tous des objectifs définis"
 
 #. Translators: help text explaining why a certain percentage of indicators are marked "missing targets"
-#: indicators/templatetags/mytags.py:308
+#: indicators/templatetags/mytags.py:311
 msgid ""
 "Each indicator must have a target frequency selected and targets entered for "
 "all periods."
@@ -1125,22 +1119,22 @@ msgstr ""
 "renseignées pour toutes les périodes."
 
 #. Translators: a label in a graphic. Example: 31% of indicators have reported results
-#: indicators/templatetags/mytags.py:312
+#: indicators/templatetags/mytags.py:315
 msgid "of indicators have reported results"
 msgstr "des indicateurs ont des résultats publiés"
 
 #. Translators: help text explaining why a certain percentage of indicators are marked "missing results"
-#: indicators/templatetags/mytags.py:314
+#: indicators/templatetags/mytags.py:317
 msgid "Each indicator must have at least one reported result."
 msgstr "Chaque indicateur doit avoir au moins un résultat publié."
 
 #. Translators: a label in a graphic. Example: 31% of results are backed up with evidence
-#: indicators/templatetags/mytags.py:318
+#: indicators/templatetags/mytags.py:321
 msgid "of results are backed up with evidence"
 msgstr "des résultats sont étayés par des preuves"
 
 #. Translators: help text explaining why a certain percentage of indicators are marked "missing evidence"
-#: indicators/templatetags/mytags.py:320
+#: indicators/templatetags/mytags.py:323
 msgid "Each result must include a link to an evidence file or folder."
 msgstr ""
 "Chaque résultat doit inclure un lien vers un dossier ou fichier de preuve."
@@ -1205,7 +1199,7 @@ msgstr "L’indicateur a été supprimé avec succès."
 #. Translators: Text of an error message that appears when a user hasn't provided a justification for the change they are making to some data
 #: indicators/views/views_indicators.py:680
 #: indicators/views/views_indicators.py:739
-#: indicators/views/views_indicators.py:909 workflow/views.py:299
+#: indicators/views/views_indicators.py:911 workflow/views.py:299
 msgid "Reason for change is required"
 msgstr "Une justification pour la modification est requise"
 
@@ -1215,11 +1209,11 @@ msgstr "Une justification pour la modification est requise"
 msgid "No reason for change required."
 msgstr "Aucune justification pour la modification n’est requise."
 
-#: indicators/views/views_indicators.py:829
+#: indicators/views/views_indicators.py:831
 msgid "Success, Data Created!"
 msgstr "Succès, données créées !"
 
-#: indicators/views/views_indicators.py:888
+#: indicators/views/views_indicators.py:890
 msgid "Success, Data Updated!"
 msgstr "Succès, données mises à jour !"
 
@@ -2404,7 +2398,7 @@ msgstr ""
 "justification pour la modification de ce résultat."
 
 #: templates/indicators/result_form_common_js.html:393
-#: templates/indicators/results/result_form_disaggregation_fields.html:70
+#: templates/indicators/results/result_form_disaggregation_fields.html:72
 msgid "The sum of disaggregated values does not match the actual value."
 msgstr "La somme des valeurs désagrégées ne correspond pas à la valeur réelle."
 
@@ -2446,22 +2440,22 @@ msgstr "%% atteint"
 msgid "Program to date"
 msgstr "Programme à cette date"
 
-#: templates/indicators/result_table.html:137
-#: templates/indicators/result_table.html:141
+#: templates/indicators/result_table.html:127
+#: templates/indicators/result_table.html:131
 msgid "View project"
 msgstr "Voir le projet"
 
-#: templates/indicators/result_table.html:149
+#: templates/indicators/result_table.html:139
 msgid "No results reported"
 msgstr "Aucun résultat rapporté"
 
-#: templates/indicators/result_table.html:195
-#: templates/indicators/result_table.html:199
+#: templates/indicators/result_table.html:183
+#: templates/indicators/result_table.html:187
 msgid "View Project"
 msgstr "Voir le projet"
 
-#: templates/indicators/result_table.html:248
-#: templates/indicators/result_table.html:254
+#: templates/indicators/result_table.html:232
+#: templates/indicators/result_table.html:238
 msgid ""
 "Results are cumulative. The Life of Program result mirrors the latest period "
 "result."
@@ -2469,7 +2463,7 @@ msgstr ""
 "Les résultats sont cumulatifs. Le résultat de la vie du programme reflète le "
 "dernier résultat de période."
 
-#: templates/indicators/result_table.html:250
+#: templates/indicators/result_table.html:234
 msgid ""
 "Results are non-cumulative. The Life of Program result is the sum of target "
 "periods results."
@@ -2477,7 +2471,7 @@ msgstr ""
 "Les résultats sont non cumulatifs. Le résultat de la vie du programme est la "
 "somme des résultats des périodes cibles."
 
-#: templates/indicators/result_table.html:256
+#: templates/indicators/result_table.html:240
 msgid ""
 "Results are non-cumulative. Target period and Life of Program results are "
 "calculated from the average of results."
@@ -2485,16 +2479,16 @@ msgstr ""
 "Les résultats sont non cumulatifs. La période cible et la durée de vie du "
 "programme sont calculées à partir de la moyenne des résultats."
 
-#: templates/indicators/result_table.html:270
+#: templates/indicators/result_table.html:254
 msgid "Targets are not set up for this indicator."
 msgstr "Les cibles ne sont pas configurées pour cet indicateur."
 
-#: templates/indicators/result_table.html:272
-#: templates/indicators/result_table.html:305
+#: templates/indicators/result_table.html:256
+#: templates/indicators/result_table.html:289
 msgid "Add targets"
 msgstr "Ajouter des cibles"
 
-#: templates/indicators/result_table.html:279
+#: templates/indicators/result_table.html:263
 msgid ""
 "\n"
 "                        This record is not associated with a target. Open "
@@ -2508,7 +2502,7 @@ msgstr ""
 "menu « Mesure par rapport à la cible ».\n"
 "                        "
 
-#: templates/indicators/result_table.html:287
+#: templates/indicators/result_table.html:271
 #, python-format
 msgid ""
 "\n"
@@ -2523,11 +2517,11 @@ msgstr ""
 "%(reporting_period_end)s.\n"
 "                        "
 
-#: templates/indicators/result_table.html:297
+#: templates/indicators/result_table.html:281
 msgid "Add result"
 msgstr "Ajouter un résultat"
 
-#: templates/indicators/result_table.html:303
+#: templates/indicators/result_table.html:287
 msgid "This indicator has no targets."
 msgstr "Cet indicateur n’a pas de cible."
 
@@ -3441,7 +3435,9 @@ msgstr "Catégories de désagrégation au niveau du pays mises à jour"
 
 #. Translators: The date and time of the change made to a piece of data
 #: tola_management/programadmin.py:102
-msgid "Date and Time"
+#, fuzzy
+#| msgid "Date and Time"
+msgid "Date and time"
 msgstr "Date et heure"
 
 #. Translators: The name of the user who carried out an action
@@ -3951,15 +3947,31 @@ msgstr "Cela devrait être GIS Manager"
 msgid "Location verified by"
 msgstr "Lieu vérifié par"
 
-#: workflow/serializers_new.py:67
+#: workflow/serializers_new/base_program_serializers.py:239
 #, python-format
 msgid "by %(tier)s chain"
 msgstr "par chaîne %(tier)s"
 
-#: workflow/serializers_new.py:729
+#: workflow/serializers_new/iptt_program_serializers.py:157
 #, python-format
 msgid "%(tier)s Chain"
 msgstr "Chaîne %(tier)s"
+
+#: workflow/serializers_new/iptt_report_serializers.py:278
+msgid "Indicator Performance Tracking Report"
+msgstr "Rapport de suivi des performances de l’indicateur"
+
+#: workflow/serializers_new/iptt_report_serializers.py:390
+msgid "IPTT Actuals only report"
+msgstr "Rapport IPTT relatif aux valeurs réelles"
+
+#: workflow/serializers_new/iptt_report_serializers.py:412
+msgid "IPTT TvA report"
+msgstr "Rapport TVA IPTT"
+
+#: workflow/serializers_new/iptt_report_serializers.py:441
+msgid "IPTT TvA full program report"
+msgstr "Rapport IPTT relatif à la totalité de la TVA du programme"
 
 #: workflow/views.py:304
 msgid "Reporting period must start on the first of the month"
@@ -4297,9 +4309,6 @@ msgstr "Ville, Pays :"
 
 #~ msgid "District"
 #~ msgstr "District"
-
-#~ msgid "Project data"
-#~ msgstr "Données du projet"
 
 #~ msgid "Village"
 #~ msgstr "Village"
