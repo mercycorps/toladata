@@ -2,10 +2,10 @@ from rest_framework import serializers
 from tola.serializers import make_quantized_decimal, DecimalDisplayField
 
 class TPReportPeriodSerializer(serializers.Serializer):
-    actual = DecimalDisplayField()
+    actual_json = DecimalDisplayField(localize=False, coerce_to_string=True, source='actual')
+    actual_excel = DecimalDisplayField(localize=False, coerce_to_string=False, source='actual')
     count = serializers.IntegerField(allow_null=True, default=None)
     disaggregations = serializers.SerializerMethodField()
-    _coerce_to_string=True
 
     class PeriodObject:
         def __init__(self, period_dict):
@@ -19,10 +19,20 @@ class TPReportPeriodSerializer(serializers.Serializer):
         period_obj = cls.PeriodObject(period_dict)
         return cls(period_obj, context=context)
 
+    def to_representation(self, instance):
+        rep = super().to_representation(instance)
+        actual_json = rep.pop('actual_json', None)
+        actual_excel = rep.pop('actual_excel', None)
+        if self.context.get('coerce_to_string', False):
+            rep['actual'] = actual_json
+        else:
+            rep['actual'] = actual_excel
+        return rep
+
     def _format_disagg(self, disaggregation):
         actual = disaggregation.pop('actual', None)
         try:
-            actual = make_quantized_decimal(actual, coerce_to_string=self._coerce_to_string)
+            actual = make_quantized_decimal(actual, coerce_to_string=self.context.get('coerce_to_string', False))
         except TypeError:
             pass
         return {
@@ -33,15 +43,12 @@ class TPReportPeriodSerializer(serializers.Serializer):
         return {label_pk: self._format_disagg(period.disaggregations[label_pk])
                 for label_pk in self.context.get('categories', [])}
 
-class TPExcelReportPeriodSerializer(TPReportPeriodSerializer):
-    actual = DecimalDisplayField(localize=False, coerce_to_string=False)
-    _coerce_to_string=False
-
 
 class TVAReportPeriodSerializer(TPReportPeriodSerializer):
-    met = DecimalDisplayField(multiplier=100)
-    met_excel = DecimalDisplayField(decimal_places=4, source='met')
-    target = DecimalDisplayField()
+    met_json = DecimalDisplayField(localize=False, multiplier=100, coerce_to_string=True, source='met')
+    met_excel = DecimalDisplayField(localize=False, decimal_places=4, source='met', coerce_to_string=False)
+    target_json = DecimalDisplayField(localize=False, coerce_to_string=True, source='target')
+    target_excel = DecimalDisplayField(localize=False, coerce_to_string=False, source='target')
 
     class PeriodObject:
         def __init__(self, period_dict):
@@ -58,8 +65,16 @@ class TVAReportPeriodSerializer(TPReportPeriodSerializer):
                     pass
             self.__dict__ = period_dict
 
-class TVAExcelReportPeriodSerializer(TVAReportPeriodSerializer):
-    actual = DecimalDisplayField(localize=False, coerce_to_string=False)
-    met = DecimalDisplayField(decimal_places=4, localize=False, coerce_to_string=False)
-    target = DecimalDisplayField(localize=False, coerce_to_string=False)
-    _coerce_to_string=False
+    def to_representation(self, instance):
+        rep = super().to_representation(instance)
+        target_json = rep.pop('target_json', None)
+        target_excel = rep.pop('target_excel', None)
+        met_json = rep.pop('met_json', None)
+        met_excel = rep.pop('met_excel', None)
+        if self.context.get('coerce_to_string', False):
+            rep['target'] = target_json
+            rep['met'] = met_json
+        else:
+            rep['target'] = target_excel
+            rep['met'] = met_excel
+        return rep

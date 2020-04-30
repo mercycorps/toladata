@@ -680,9 +680,10 @@ export default (
                 indicatorTypes: [],
                 indicators: []
             };
+            this._hiddenCategories = false;
         },
         get filtersActive() {
-            return Object.values(this._indicatorFilters).reduce((a, b) => a + b.length, 0) > 0;
+            return Object.values(this._indicatorFilters).reduce((a, b) => a + b.length, 0) > 0 || this._hiddenCategories;
         },
         get hideColumnOptions() {
             return [

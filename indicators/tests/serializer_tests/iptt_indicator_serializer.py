@@ -340,4 +340,18 @@ class TestIPTTJSONIndicatorReportDataSerializer(test.TestCase):
         self.assertEqual(report_data2[0]['periods'][2]['actual'], '350')
         self.assertEqual(report_data2[0]['periods'][3]['actual'], None)
 
+    def test_correct_indicators_for_tva(self):
+        frequencies = [frequency for frequency, name in Indicator.TARGET_FREQUENCIES if frequency != Indicator.EVENT]
+        for frequency in frequencies:
+            RFIndicatorFactory(
+                program=self.program, targets=500, target_frequency=frequency,
+                results=True
+            )
+            RFIndicatorFactory(
+                program=self.program, targets=1000, target_frequency=frequency
+            )
+        for frequency in frequencies:
+            tva_report_data = self.get_tva_report_data(frequency=frequency)
+            self.assertEqual(len(tva_report_data), 2)
+
     

@@ -199,7 +199,7 @@ class IPTTReportSerializer(serializers.Serializer):
             dateutil.parser.isoparse(program_data['reporting_period_start_iso']).date(),
             dateutil.parser.isoparse(program_data['reporting_period_end_iso']).date()
         )
-        report_context = {}
+        report_context = {'coerce_to_string': False}
         result_map = defaultdict(list)
         for result in Result.objects.select_related('periodic_target').prefetch_related(None).filter(
             indicator__program_id=program_data['pk']

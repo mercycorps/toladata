@@ -586,8 +586,6 @@ class TestIPTTSerializedReportData(test.TestCase, DecimalComparator):
         context_query_count = REPORT_CONTEXT_QUERIES + (RESULTS_CONTEXT_QUERIES if results_exist else 0)
         with self.assertNumQueries(context_query_count):
             context = self.get_context(program_pk=program_pk, frequency=frequency, filters=filters)
-        
-        
         base_filters = filters.copy()
         if not tva_only:
             with self.assertNumQueries(TP_REPORT_QUERIES):
@@ -965,7 +963,6 @@ class TestIPTTSerializedReportData(test.TestCase, DecimalComparator):
                 indicator_pks['cumulative'] = indicator.pk
             else:
                 indicator_pks['noncumulative'] = indicator.pk
-            
         def lop_asserts(report_pk, lop_period):
             noncumulative = report_pk == indicator_pks['noncumulative']
             cumulative = report_pk == indicator_pks['cumulative']
@@ -1009,7 +1006,10 @@ class TestIPTTSerializedReportData(test.TestCase, DecimalComparator):
                             disagg_actual += (150 if target == 150 else 300)
                         self.assertDecimalEqual(period['disaggregations'][on_target_label]['actual'], get_decimal(disagg_actual))
                         disagg_actual -= (5 if period_counter != 1 else 5*period_count)
-                        self.assertDecimalEqual(period['disaggregations'][below_five_label]['actual'], get_decimal(disagg_actual))
+                        if period_counter != 2:
+                            self.assertDecimalEqual(period['disaggregations'][below_five_label]['actual'], get_decimal(disagg_actual))
+                        else:
+                            self.assertIsNone(period['disaggregations'][below_five_label]['actual'])
                         self.assertDecimalEqual(period['disaggregations'][decimal_value_label]['actual'],
                                                 get_decimal(5.15 if period_counter != 1 else 5.15*period_count))
             tva = True
@@ -1031,7 +1031,10 @@ class TestIPTTSerializedReportData(test.TestCase, DecimalComparator):
                         self.assertDecimalEqual(period_data['met'], get_decimal(period_met, places=4))
                     self.assertCountEqual(period_data['disaggregations'].keys(), [below_five_label, empty_label, on_target_label, decimal_value_label])
                     self.assertIsNone(period_data['disaggregations'][empty_label]['actual'])
-                    self.assertDecimalEqual(period_data['disaggregations'][below_five_label]['actual'], get_decimal(45))
+                    if period_counter == 2:
+                        self.assertIsNone(period_data['disaggregations'][below_five_label]['actual'])
+                    else:
+                        self.assertDecimalEqual(period_data['disaggregations'][below_five_label]['actual'], get_decimal(45))
                     self.assertDecimalEqual(period_data['disaggregations'][on_target_label]['actual'], get_decimal(50))
                     self.assertDecimalEqual(period_data['disaggregations'][decimal_value_label]['actual'], get_decimal(5.15))
             tva = True
@@ -1054,7 +1057,10 @@ class TestIPTTSerializedReportData(test.TestCase, DecimalComparator):
                         self.assertDecimalEqual(period_data['met'], get_decimal([2.0015, 3.003, 1.0515][period_counter], places=4))
                     self.assertCountEqual(period_data['disaggregations'].keys(), [below_five_label, empty_label, on_target_label, decimal_value_label])
                     self.assertIsNone(period_data['disaggregations'][empty_label]['actual'])
-                    self.assertDecimalEqual(period_data['disaggregations'][below_five_label]['actual'], get_decimal([95, 140, 95][period_counter]))
+                    if period_counter == 2:
+                        self.assertIsNone(period_data['disaggregations'][below_five_label]['actual'])
+                    else:
+                        self.assertDecimalEqual(period_data['disaggregations'][below_five_label]['actual'], get_decimal([95, 140, 95][period_counter]))
                     self.assertDecimalEqual(period_data['disaggregations'][on_target_label]['actual'], get_decimal([100, 150, 100][period_counter]))
                     self.assertDecimalEqual(period_data['disaggregations'][decimal_value_label]['actual'], get_decimal([5.15, 10.3, 5.15][period_counter]))
             tva = True

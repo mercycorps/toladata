@@ -15,26 +15,31 @@ const impliedNullValuesMapper = (values) => {
     return valuesArray;
 }
 
+function getPeriodData ({target = null, actual = null, met = null, disaggregations = {}} = {}) {
+    let disaggregatedPeriodData = new Map(Object.entries(disaggregations).map(
+                    ([disaggregationPk, disaggregationJSON]) => [parseInt(disaggregationPk),
+                                                                 {actual: disaggregationJSON.actual}]));
+    return {target: target, actual: actual, met: met, disaggregations: disaggregatedPeriodData};
+}
+
 const getIndicatorReport = (
     frequency,
     indicatorReportJSON = {}
 ) => observable({
     pk: parseInt(indicatorReportJSON.pk),
     frequency: parseInt(frequency),
-    _lopTarget: (indicatorReportJSON.lop_period || {}).target,
+    _lopPeriod: getPeriodData(indicatorReportJSON.lop_period),
     get lopTarget() {
-        return this._lopTarget;
+        return this._lopPeriod.target;
     },
-    _lopActual: (indicatorReportJSON.lop_period || {}).actual,
     get lopActual() {
-        return this._lopActual;
+        return this._lopPeriod.actual;
     },
-    _lopMet: (indicatorReportJSON.lop_period || {}).met,
     get lopMet() {
-        return this._lopMet;
+        return this._lopPeriod.met;
     },
-    _reportData: observable(new Map((indicatorReportJSON.report_data || [])
-                                    .map(periodJSON => [parseInt(periodJSON.index), periodJSON]
+    _reportData: observable(new Map((indicatorReportJSON.periods || [])
+                                    .map(periodJSON => [parseInt(periodJSON.count), getPeriodData(periodJSON)]
         ))),
     get periodValues() {
         return Array.from(this._reportData.values());
@@ -42,14 +47,11 @@ const getIndicatorReport = (
     _disaggregatedData: observable(new Map(Object.entries(indicatorReportJSON.disaggregated_data || {})
                                            .map(([disaggregationPk, disaggregationJSON]) => [parseInt(disaggregationPk), disaggregationJSON]))),
     disaggregatedLop(disaggregationPk) {
-        return (!isNaN(parseInt(disaggregationPk)) && this._disaggregatedData.has(parseInt(disaggregationPk))) ?
-                this._disaggregatedData.get(parseInt(disaggregationPk)).lop_actual : null;
+        return (!isNaN(parseInt(disaggregationPk)) && this._lopPeriod.disaggregations.has(parseInt(disaggregationPk))) ?
+                this._lopPeriod.disaggregations.get(parseInt(disaggregationPk)).actual : null;
     },
-    _disaggregatedReportData: observable(new Map(Object.entries(indicatorReportJSON.disaggregated_report_data || {})
-                                                 .map(([disaggregationPk, disaggregationJSON]) => [parseInt(disaggregationPk), impliedNullValuesMapper(disaggregationJSON)]))),
     disaggregatedPeriodValues(disaggregationPk) {
-        return (!isNaN(parseInt(disaggregationPk)) && this._disaggregatedReportData.has(parseInt(disaggregationPk))) ?
-                this._disaggregatedReportData.get(parseInt(disaggregationPk)) : [];
+        return !isNaN(parseInt(disaggregationPk)) ? this.periodValues.map(period => period.disaggregations.get(parseInt(disaggregationPk))) : [];
     }
     
 });

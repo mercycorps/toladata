@@ -174,7 +174,7 @@ class IPTTProgramFilterItemsMixin:
 
     def get_disaggregations(self, program):
         return list(map(
-            lambda dt: {'pk': dt.pk, 'name': dt.disaggregation_type,
+            lambda dt: {'pk': dt.pk, 'name': dt.disaggregation_type, 'country': dt.country.country if dt.country else None,
                         'labels': [{'pk': label.pk, 'name': label.label} for label in dt.prefetch_categories]},
             self.context['disaggregations']))
 
@@ -243,9 +243,6 @@ class IPTTExcelMixin:
         return self.context.get('tiers', [])
 
     def get_levels(self, program):
-        # print("level order {}".format(self.context.get('level_order', False)))
-        # print("levels level order:\n{}".format(self._get_levels_level_order(program)))
-        # print("levels chain order:\n{}".format(self._get_levels_chain_order(program)))
         if self.context.get('level_order', False):
             return self._get_levels_level_order(program)
         else:

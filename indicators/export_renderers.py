@@ -300,7 +300,6 @@ class ExcelRendererBase:
                     'error {} with attribute {} on indicator pk {}'.format(
                         e, value, indicator['pk']
                         ), 'Tola System')
-                print("comment {}".format(cell.comment))
             else:
                 if value is None:
                     value = '' if empty_blank else EM_DASH
@@ -361,7 +360,7 @@ class ExcelRendererBase:
                 current_row += 1
             sheet.merge_cells(start_row=top_row, start_column=3, end_row=current_row-1, end_column=3)
             cell = sheet.cell(row=top_row, column=3)
-            cell.value = disaggregation['name']
+            cell.value = ugettext(disaggregation['name'])
             cell.style = self.DISAGGREGATION_CELL
             for row in range(top_row, current_row):
                 sheet.row_dimensions[row].hidden = True

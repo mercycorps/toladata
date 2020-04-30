@@ -3,6 +3,7 @@ import decimal
 from collections import defaultdict
 from rest_framework import serializers
 from indicators.models import (
+    Indicator,
     PeriodicTarget,
     IndicatorType,
     Result,
@@ -10,7 +11,6 @@ from indicators.models import (
     DisaggregationType,
     DisaggregatedValue,
 )
-from indicators.models import Indicator
 from workflow.models import (
     Program,
     SiteProfile
@@ -181,11 +181,12 @@ class IPTTIndicatorReportBase:
             'pk',
             'lop_period',
             'periods',
+            'level_id',
         ]
 
     @classmethod
     def _get_query_fields(cls):
-        return ['program_id', 'pk', 'unit_of_measure_type', 'is_cumulative']
+        return ['program_id', 'pk', 'unit_of_measure_type', 'is_cumulative', 'level_id']
 
     def _disaggregations_dict(self, values={}):
         """Makes a dict with a default that will avoid key errors and return None for any unfilled dvs
@@ -260,7 +261,6 @@ class IPTTIndicatorReportBase:
 
 class IPTTJSONReportMixin:
     """Adapts report data serializer for creating a React-consumable output"""
-    _output_format = REACT_JSON
 
     class Meta:
         purpose = "JSON"

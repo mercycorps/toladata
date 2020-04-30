@@ -26,7 +26,6 @@ from tola.model_utils import get_serializer
 class ProgramBaseSerializerMixin:
     """Base class for serialized program data.  Corresponds to js/models/bareProgram"""
     results_framework = serializers.BooleanField(source='using_results_framework')
-    #by_result_chain = serializers.SerializerMethodField()
 
     class Meta:
         model = Program
@@ -34,12 +33,11 @@ class ProgramBaseSerializerMixin:
             'pk',
             'name',
             'results_framework',
-            #'by_result_chain',
         ]
 
     @classmethod
     def _get_query_fields(cls):
-        return ['pk', 'name', '_using_results_framework'] #'auto_number_indicators']
+        return ['pk', 'name', '_using_results_framework']
 
     @classmethod
     def get_queryset(cls, **kwargs):
@@ -61,50 +59,6 @@ class ProgramBaseSerializerMixin:
     @classmethod
     def load_for_pk(cls, pk):
         return cls(cls.get_queryset(pk=pk), context=cls._get_context(program_pk=pk))
-
-    @classmethod
-    def _get_leveltiers_prefetch(cls):
-        return models.Prefetch(
-            'level_tiers',
-            queryset=LevelTier.objects.select_related(None).prefetch_related(None).only(
-                'pk', 'name', 'program_id', 'tier_depth',
-            ),
-            to_attr='prefetch_leveltiers'
-        )
-
-    @classmethod
-    def _get_levels_prefetch(cls):
-        return models.Prefetch(
-            'levels',
-            queryset=Level.objects.select_related(None).prefetch_related(None).only(
-                'pk', 'name', 'parent_id', 'customsort', 'program_id'
-            ),
-            to_attr='prefetch_levels'
-        )
-
-    def _get_result_tier(self, program):
-        if program.using_results_framework:
-            tiers = [tier for tier in self._get_program_tiers(program) if tier.tier_depth == 2]
-            return tiers[0].name if tiers else False
-        return None
-
-    def get_by_result_chain(self, program):
-        """returns "by Outcome chain" or "par chaîne Résultat" for labeling the ordering filter"""
-        tier_name = self._get_result_tier(program)
-        if tier_name:
-            return _('by %(tier)s chain') % {'tier': _(tier_name)}
-        return None
-
-    def _get_program_indicators(self, program):
-        return getattr(program, 'prefetch_indicators', Indicator.rf_aware_objects.filter(program=program))
-
-
-    def _get_program_levels(self, program):
-        return getattr(program, 'prefetch_levels', program.levels.order_by('customsort'))
-
-    def _get_program_tiers(self, program):
-        return getattr(program, 'prefetch_leveltiers', program.level_tiers.order_by('tier_depth'))
-
 
 
 # for any page requiring reporting periods (to include % complete and whether program has started)
