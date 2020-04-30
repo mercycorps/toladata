@@ -1,5 +1,3 @@
-from .serializers_new_old import *
-
 from .indicator_serializers import (
     IndicatorBaseSerializer,
     IndicatorRFOrderingSerializer,
