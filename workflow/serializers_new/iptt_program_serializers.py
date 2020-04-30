@@ -181,9 +181,9 @@ class IPTTProgramFilterItemsMixin:
     def get_old_levels(self, program):
         if program.results_framework:
             return []
-        old_level_pks = {name: pk for (pk, name) in Indicator.OLD_LEVELS}
-        return sorted([{'pk': old_level_pks[name], 'name': _(name)} for name in set(
-            i['old_level'] for i in self._get_program_indicators(program) if i['old_level'])],
+        return sorted(
+            [{'pk': x[0], 'name': x[1]} for x in set([(i['level_pk'], i['old_level_name'])
+                for i in self._get_program_indicators(program) if i['old_level_name']])],
             key=operator.itemgetter('pk'))
 
 
