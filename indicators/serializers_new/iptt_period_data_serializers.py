@@ -1,3 +1,8 @@
+"""Serializers for Period Report Data - actual/target/met data for a given target period and indicator
+
+    Each contains both json and excel formatting until to_representation, which chooses correct version
+"""
+
 from rest_framework import serializers
 from tola.serializers import make_quantized_decimal, DecimalDisplayField
 
@@ -30,6 +35,7 @@ class TPReportPeriodSerializer(serializers.Serializer):
         return rep
 
     def _format_disagg(self, disaggregation):
+        """method to override in future if disaggregated target data is added"""
         actual = disaggregation.pop('actual', None)
         try:
             actual = make_quantized_decimal(actual, coerce_to_string=self.context.get('coerce_to_string', False))

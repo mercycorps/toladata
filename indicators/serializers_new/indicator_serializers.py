@@ -1,3 +1,5 @@
+"""Partial seiralizers for Indicator objects which can be composed into a serializer for a specific use case"""
+
 import string
 from rest_framework import serializers
 from django.db import models
@@ -8,6 +10,8 @@ from tola.model_utils import get_serializer
 # Base indicator serializer - returns pk, name, level_pk, means_of_verification (one query)
 
 class IndicatorBaseSerializerMixin:
+    """Indicator serializer component for basic indicator data."""
+
     level_pk = serializers.SerializerMethodField()
     old_level_name = serializers.SerializerMethodField()
 
@@ -21,6 +25,8 @@ class IndicatorBaseSerializerMixin:
             'old_level_name',
             'means_of_verification',
         ]
+
+    # class methods to instantiate serializer and minimize queries:
 
     @classmethod
     def _get_query_fields(cls):
@@ -48,6 +54,8 @@ class IndicatorBaseSerializerMixin:
         kwargs['filters'] = {**filters, 'program_id': program_pk}
         return cls.load_for_filters(**kwargs)
 
+    # serializer method fields (populate fields on serializer):
+
     def get_old_level_name(self, indicator):
         if not indicator.results_framework and indicator.old_level:
             return _(indicator.old_level)
@@ -58,44 +66,31 @@ class IndicatorBaseSerializerMixin:
             return getattr(indicator, 'old_level_pk', None)
         return indicator.level_id
 
-    def _get_rf_long_number(self, indicator):
-        return u"{} {}{}".format(
-            indicator.leveltier_name, indicator.level_display_ontology, indicator.level_order_display
-        )
-
-    def _get_level_depth_ontology(self, level, level_set, depth=1, ontology=None):
-        if ontology is None:
-            ontology = []
-        if level.parent_id is None:
-            return depth, u'.'.join(ontology)
-        ontology = [str(level.customsort)] + ontology
-        parent = [l for l in level_set if l.pk == level.parent_id][0]
-        return self._get_level_depth_ontology(parent, level_set, depth+1, ontology)
-
-    def get_long_number(self, indicator):
-        """Returns the number for i.e. Program Page, "1.1" (manual) or "Output 1.1a" (auto)"""
-        if indicator.manual_number_display:
-            return indicator.number if indicator.number else None
-        if indicator.level_id:
-            return self._get_rf_long_number(indicator)
-        return None
 
 IndicatorBaseSerializer = get_serializer(IndicatorBaseSerializerMixin)
 
 
 class IndicatorOrderingMixin:
+    """Indicator serializer component to add ordering between/within level, and numbering data"""
+
     number = serializers.SerializerMethodField('get_long_number')
     level_order = serializers.SerializerMethodField()
+    has_rf_level = serializers.SerializerMethodField()
 
     class Meta:
+        purpose = "LevelAwareOrdering"
         fields = [
             'number',
             'level_order',
-            'results_framework'
+            'results_framework',
+            'has_rf_level',
         ]
+
+    # class methods to instantiate serializer with minimum queries:
 
     @classmethod
     def many_init(cls, instance, *args, **kwargs):
+        """Adds sorting data for rf-level-less indicators when instantiated with a whole queryset (many=True)"""
         indicators = list(instance.all()) if isinstance(instance, models.Manager) else list(instance)
         context = kwargs.pop('context', {})
         context['sort_numbers'] = {
@@ -110,12 +105,28 @@ class IndicatorOrderingMixin:
     def _get_query_fields(cls):
         return super()._get_query_fields() + ['number', 'level_order']
 
+    # serializer method fields (populate fields on serializer):
+
     def get_level_order(self, indicator):
         if indicator.results_framework and indicator.level_id is not None:
             return indicator.level_order
         return self.context.get('sort_numbers', {}).get(indicator.pk, None)
 
+    def get_has_rf_level(self, indicator):
+        return indicator.results_framework and indicator.level_id is not None
+
+    def get_long_number(self, indicator):
+        """Returns the number for i.e. Program Page, "1.1" (manual) or "Output 1.1a" (auto)"""
+        if indicator.manual_number_display:
+            return indicator.number if indicator.number else None
+        if indicator.level_id:
+            return self._get_rf_long_number(indicator)
+        return None
+
+    # helper methods used by serializer method fields to access context/related items without querying db:
+
     def _get_level(self, indicator):
+        """return the level object from context (not db) associated with a given indicator"""
         level = [level_data for level_data in self.context.get('levels', [])
                  if level_data['pk'] == indicator.level_id]
         if level and len(level) == 1:
@@ -123,6 +134,7 @@ class IndicatorOrderingMixin:
         return None
 
     def _get_level_order_display(self, indicator):
+        """Returns the letter portion of the indicator number (the 'c' in 'Outcome 1.2c')"""
         if indicator.level_id and indicator.level_order is not None and indicator.level_order < 26:
             return str(string.ascii_lowercase[indicator.level_order])
         elif indicator.level_id and indicator.level_order and indicator.level_order >= 26:
@@ -133,6 +145,7 @@ class IndicatorOrderingMixin:
         return None
 
     def _get_rf_long_number(self, indicator):
+        """formats level, tier, and indicator information into e.g. 'Activity 1.2.1c'"""
         level = self._get_level(indicator)
         if not level:
             return None
@@ -143,6 +156,7 @@ IndicatorRFOrderingSerializer = get_serializer(IndicatorOrderingMixin, Indicator
 
 
 class IndicatorMeasurementMixin:
+    """Indicator serializer component to add measurement information to serialized output"""
     is_percent = serializers.SerializerMethodField()
     direction_of_change = serializers.CharField(source='get_direction_of_change')
     baseline = serializers.SerializerMethodField()
@@ -165,6 +179,8 @@ class IndicatorMeasurementMixin:
             'target_frequency', 'unit_of_measure', 'unit_of_measure_type', 'is_cumulative',
             'direction_of_change', 'baseline', 'baseline_na'
         ]
+
+    # serializer method fields:
 
     def get_is_percent(self, indicator):
         return indicator.unit_of_measure_type == Indicator.PERCENTAGE

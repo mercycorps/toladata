@@ -70,10 +70,11 @@ ENGLISH = 1
 FRENCH = 2
 SPANISH = 3
 
+
 DATE_FORMATS = {
     ENGLISH: lambda d: d.strftime('%b %-d, %Y'),
-    FRENCH: lambda d: d.strftime('%-d %b. %Y'),
-    SPANISH: lambda d: d.strftime('%-d %b. %Y').title()
+    FRENCH: lambda d: d.strftime('%-d %b. %Y').lower() if d.month != 5 else d.strftime('%-d %b %Y').lower(),
+    SPANISH: lambda d: d.strftime('%-d %b. %Y').title() if d.month != 5 else d.strftime('%-d %B %Y').title()
 }
 
 COLUMNS = {
@@ -212,51 +213,48 @@ class TestIPTTExcelExports(test.TestCase):
         return openpyxl.load_workbook(io.BytesIO(get_response.content))
 
     def assert_response_headers(self, response, filename):
-        self.assertEqual(
-            response.get('Content-Type'),
-            "application/ms-excel"
-        )
-        self.assertEqual(
-            response.get('Content-Disposition'),
-            f'attachment; filename="{filename}"'
-        )
+        self.assertEqual(response.get('Content-Type'), "application/ms-excel")
+        self.assertEqual(response.get('Content-Disposition'), f'attachment; filename="{filename}"')
 
     def test_responses(self):
+        today_local = DATE_FORMATS[ENGLISH](datetime.date.today())
         tva_full_response = self.get_tva_report_full(response=True)
-        filename = f"IPTT TvA full program report {datetime.date.today().strftime('%b %-d, %Y')}.xlsx"
+        filename = f"IPTT TvA full program report {today_local}.xlsx"
         self.assert_response_headers(tva_full_response, filename)
         tva_response = self.get_tva_report(response=True)
-        filename = f"IPTT TvA report {datetime.date.today().strftime('%b %-d, %Y')}.xlsx"
+        filename = f"IPTT TvA report {today_local}.xlsx"
         self.assert_response_headers(tva_response, filename)
         tp_response = self.get_tp_report(response=True)
-        filename = f"IPTT Actuals only report {datetime.date.today().strftime('%b %-d, %Y')}.xlsx"
+        filename = f"IPTT Actuals only report {today_local}.xlsx"
         self.assert_response_headers(tp_response, filename)
 
     def test_responses_french(self):
         default_locale = locale.getlocale()
         locale.setlocale(locale.LC_ALL, 'fr_FR')
+        today_local = DATE_FORMATS[FRENCH](datetime.date.today())
         tva_full_response = self.get_tva_report_full(response=True, language=FRENCH)
-        filename = f"Rapport IPTT relatif à la totalité de la TVA du programme {datetime.date.today().strftime('%-d %b. %Y').lower()}.xlsx"
+        filename = f"Rapport IPTT relatif à la totalité de la TVA du programme {today_local}.xlsx"
         self.assert_response_headers(tva_full_response, filename)
         tva_response = self.get_tva_report(response=True, language=FRENCH)
-        filename = f"Rapport TVA IPTT {datetime.date.today().strftime('%-d %b. %Y').lower()}.xlsx"
+        filename = f"Rapport TVA IPTT {today_local}.xlsx"
         self.assert_response_headers(tva_response, filename)
         tp_response = self.get_tp_report(response=True, language=FRENCH)
-        filename = f"Rapport IPTT relatif aux valeurs réelles {datetime.date.today().strftime('%-d %b. %Y').lower()}.xlsx"
+        filename = f"Rapport IPTT relatif aux valeurs réelles {today_local}.xlsx"
         self.assert_response_headers(tp_response, filename)
         locale.setlocale(locale.LC_ALL, default_locale)
 
     def test_responses_spanish(self):
         default_locale = locale.getlocale()
         locale.setlocale(locale.LC_ALL, 'es_ES')
+        today_local = DATE_FORMATS[SPANISH](datetime.date.today())
         tva_full_response = self.get_tva_report_full(response=True, language=SPANISH)
-        filename = f"Informe completo del programa del IPTT TvA {datetime.date.today().strftime('%-d %b. %Y').title()}.xlsx"
+        filename = f"Informe completo del programa del IPTT TvA {today_local}.xlsx"
         self.assert_response_headers(tva_full_response, filename)
         tva_response = self.get_tva_report(response=True, language=SPANISH)
-        filename = f"Informe del IPTT TvA {datetime.date.today().strftime('%-d %b. %Y').title()}.xlsx"
+        filename = f"Informe del IPTT TvA {today_local}.xlsx"
         self.assert_response_headers(tva_response, filename)
         tp_response = self.get_tp_report(response=True, language=SPANISH)
-        filename = f"Informes de reales únicamente del IPTT {datetime.date.today().strftime('%-d %b. %Y').title()}.xlsx"
+        filename = f"Informes de reales únicamente del IPTT {today_local}.xlsx"
         self.assert_response_headers(tp_response, filename)
         locale.setlocale(locale.LC_ALL, default_locale)
 
@@ -274,78 +272,32 @@ class TestIPTTExcelExports(test.TestCase):
             sheet.cell(row=2, column=3).value,
             f"{DATE_FORMATS[language](self.scenario.start_date)} – {DATE_FORMATS[language](self.scenario.end_date)}",
         )
-        self.assertEqual(
-            sheet.cell(row=3, column=3).value,
-            self.scenario.program_name
-        )
+        self.assertEqual(sheet.cell(row=3, column=3).value, self.scenario.program_name)
         locale.setlocale(locale.LC_ALL, default_locale)
 
     def assert_lop_header_cells(self, sheet, language=ENGLISH, column=10):
-        self.assertEqual(
-            sheet.cell(row=3, column=column).value,
-            LOP_PERIOD[language]
-        )
-        self.assertEqual(
-            sheet.cell(row=4, column=column).value,
-            TARGET[language]
-        )
-        self.assertEqual(
-            sheet.cell(row=4, column=column+1).value,
-            ACTUAL[language]
-        )
-        self.assertEqual(
-            sheet.cell(row=4, column=column+2).value,
-            MET[language]
-        )
+        self.assertEqual(sheet.cell(row=3, column=column).value, LOP_PERIOD[language])
+        self.assertEqual(sheet.cell(row=4, column=column).value, TARGET[language])
+        self.assertEqual(sheet.cell(row=4, column=column+1).value, ACTUAL[language])
+        self.assertEqual(sheet.cell(row=4, column=column+2).value, MET[language])
 
     def assert_period_tva_header_cells(self, sheet, period, column, language=ENGLISH, subheader=None):
         if subheader is None:
-            self.assertEqual(
-                sheet.cell(row=3, column=column).value,
-                period
-            )
+            self.assertEqual(sheet.cell(row=3, column=column).value, period)
         else:
-            self.assertEqual(
-                sheet.cell(row=2, column=column).value,
-                period
-            )
-            self.assertEqual(
-                sheet.cell(row=3, column=column).value,
-                subheader
-            )
-        self.assertEqual(
-            sheet.cell(row=4, column=column).value,
-            TARGET[language]
-        )
-        self.assertEqual(
-            sheet.cell(row=4, column=column+1).value,
-            ACTUAL[language]
-        )
-        self.assertEqual(
-            sheet.cell(row=4, column=column+2).value,
-            MET[language]
-        )
+            self.assertEqual(sheet.cell(row=2, column=column).value, period)
+            self.assertEqual(sheet.cell(row=3, column=column).value, subheader)
+        self.assertEqual(sheet.cell(row=4, column=column).value, TARGET[language])
+        self.assertEqual(sheet.cell(row=4, column=column+1).value, ACTUAL[language])
+        self.assertEqual(sheet.cell(row=4, column=column+2).value, MET[language])
 
     def assert_period_tp_header_cells(self, sheet, period, column, language=ENGLISH, subheader=None):
         if subheader is None:
-            self.assertEqual(
-                sheet.cell(row=3, column=column).value,
-                period
-            )
+            self.assertEqual(sheet.cell(row=3, column=column).value, period)
         else:
-            self.assertEqual(
-                sheet.cell(row=2, column=column).value,
-                period
-            )
-            self.assertEqual(
-                sheet.cell(row=3, column=column).value,
-                subheader
-            )
-        self.assertEqual(
-            sheet.cell(row=4, column=column).value,
-            ACTUAL[language]
-        )
-        
+            self.assertEqual(sheet.cell(row=2, column=column).value, period)
+            self.assertEqual(sheet.cell(row=3, column=column).value, subheader)
+        self.assertEqual(sheet.cell(row=4, column=column).value, ACTUAL[language])
 
     def test_tva_full_report_headers(self):
         tva_full_report = self.get_tva_report_full()

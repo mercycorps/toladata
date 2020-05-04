@@ -6,7 +6,7 @@
 
 import datetime
 import unittest
-from workflow.serializers_new import (
+from workflow.serializers_new.base_program_serializers import (
     ProgramBaseSerializerMixin,
     ProgramReportingPeriodMixin
 )

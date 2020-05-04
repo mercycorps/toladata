@@ -45,3 +45,20 @@ class DecimalDisplayField(serializers.DecimalField):
             self.decimal_places = _get_normalized_decimal_place_count(value, self.decimal_places)
             return super(DecimalDisplayField, self).to_representation(value)
         return None
+
+
+class ContextField(serializers.Field):
+    """Retrieves a value from the parent serializer's context and returns it"""
+    def __init__(self, context_key=None, **kwargs):
+        self.context_key = context_key
+        kwargs['source'] = '*'
+        kwargs['read_only'] = True
+        super().__init__(**kwargs)
+
+    def bind(self, field_name, parent):
+        if self.context_key is None:
+            self.context_key = field_name
+        super().bind(field_name, parent)
+
+    def to_representation(self, value):
+        return self.parent.context.get(self.context_key, None)

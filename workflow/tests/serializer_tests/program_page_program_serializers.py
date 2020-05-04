@@ -9,7 +9,7 @@ from indicators.models import Indicator
 from tola.test.utils import lang_context
 from workflow.serializers_new import (
     ProgramPageProgramSerializer,
-    ProgramRFOrderingUpdateSerializer,
+    #ProgramRFOrderingUpdateSerializer,
     ProgramPageIndicatorUpdateSerializer,
 )
 
@@ -19,7 +19,7 @@ PROGRAM_PAGE_UPDATE_QUERIES = PROGRAM_PAGE_QUERIES + 1
 class TestProgramPageProgramSerializer(test.TestCase):
     def get_serialized_data(self, program_pk):
         with self.assertNumQueries(PROGRAM_PAGE_QUERIES):
-            return ProgramPageProgramSerializer.get_for_pk(program_pk).data
+            return ProgramPageProgramSerializer.load_for_pk(program_pk).data
 
     def get_program_data(self, **kwargs):
         program = RFProgramFactory(**kwargs)
@@ -172,15 +172,15 @@ class TestProgramPageProgramSerializer(test.TestCase):
 class TestProgramPageSerializersFunctional(test.TestCase):
     def get_serialized_data(self, program_pk):
         with self.assertNumQueries(PROGRAM_PAGE_QUERIES):
-            return ProgramPageProgramSerializer.get_for_pk(program_pk).data
+            return ProgramPageProgramSerializer.load_for_pk(program_pk).data
 
     def get_ordering_update_serialized_data(self, program_pk):
         with self.assertNumQueries(PROGRAM_PAGE_QUERIES):
-            return ProgramRFOrderingUpdateSerializer.load_for_pk(program_pk).data
+            return ProgramPageIndicatorUpdateSerializer.load_for_pk(program_pk).data
 
     def get_update_indicator_data(self, program_pk, indicator_pk):
         with self.assertNumQueries(PROGRAM_PAGE_UPDATE_QUERIES):
-            return ProgramPageIndicatorUpdateSerializer.update_indicator_pk(indicator_pk, program_pk).data
+            return ProgramPageIndicatorUpdateSerializer.load_for_indicator_and_program(indicator_pk, program_pk).data
 
     def test_rf_program_two_indicators(self):
         p = RFProgramFactory(

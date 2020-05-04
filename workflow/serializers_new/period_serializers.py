@@ -117,7 +117,7 @@ class QSPeriodDateRangeSerializer(serializers.Serializer):
     past = serializers.SerializerMethodField()
 
     def get_past(self, period):
-        return period['start'] < self.context.get('now', timezone.now().date())
+        return period['start'] <= self.context.get('now', timezone.now().date())
 
 
 class PeriodDateRangeSerializer(serializers.Serializer):

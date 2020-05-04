@@ -1,14 +1,10 @@
-import datetime
+"""Partial serializers for Program objects which can be composited into a serializer for a specific use"""
+
 import operator
 from rest_framework import serializers
-from django.db import models
 from django.utils import timezone
 from django.utils.translation import ugettext as _
-from indicators.models import (
-    Indicator,
-    LevelTier,
-    Level
-)
+from indicators.models import (Indicator)
 from indicators.serializers_new import (
     TierBaseSerializer,
     LevelBaseSerializer,
@@ -16,18 +12,18 @@ from indicators.serializers_new import (
 )
 from workflow.models import Program
 from workflow.serializers_new.period_serializers import PeriodDateRangeSerializer
-from tola.model_utils import get_serializer
 
-
-# base for serializers for Program Page, IPTT, Logframe, Report Quickstart
-# provides pk, name, and whether the program is using the results framework
-# also contains helper methods to access prefetched related items (indicators, levels, tiers)
 
 class ProgramBaseSerializerMixin:
-    """Base class for serialized program data.  Corresponds to js/models/bareProgram"""
+    """Program Serializer component to load and serialize base program data.
+
+    JSON output corresponds to js/models/bareProgram
+    """
+
     results_framework = serializers.BooleanField(source='using_results_framework')
 
     class Meta:
+        purpose = "Base"
         model = Program
         fields = [
             'pk',
@@ -35,13 +31,22 @@ class ProgramBaseSerializerMixin:
             'results_framework',
         ]
 
+    # Class methods used to instantiate serializer with queryset and context to minimize queries
+
     @classmethod
     def _get_query_fields(cls):
+        """Returns list of DB fields needed for included fields"""
         return ['pk', 'name', '_using_results_framework']
 
     @classmethod
     def get_queryset(cls, **kwargs):
-        queryset = Program.rf_aware_objects.select_related(None).prefetch_related().only(*cls._get_query_fields())
+        """Returns the specific queryset used to load this serializer for a speficic program or programs
+
+            Args:
+                pk: pk in order to load for a specific program
+                filters: dict of filters (i.e. {'pk__in': [5, 6, 7]}) to apply to queryset
+        """
+        queryset = Program.rf_aware_objects.select_related(None).prefetch_related(None).only(*cls._get_query_fields())
         pk = kwargs.get('pk', None)
         if pk is not None:
             return queryset.get(pk=pk)
@@ -49,7 +54,8 @@ class ProgramBaseSerializerMixin:
         return queryset.filter(**filters)
 
     @classmethod
-    def _get_context(cls, *args, **kwargs):
+    def _get_context(cls, **kwargs):
+        """Returns dict containing extra context needed to serialize specified fields"""
         context = {}
         program_pk = kwargs.get('program_pk', None)
         if program_pk:
@@ -58,18 +64,21 @@ class ProgramBaseSerializerMixin:
 
     @classmethod
     def load_for_pk(cls, pk):
+        """pk (int): Returns initialized serializer for a specified program pk"""
         return cls(cls.get_queryset(pk=pk), context=cls._get_context(program_pk=pk))
 
 
-# for any page requiring reporting periods (to include % complete and whether program has started)
 class ProgramReportingPeriodMixin:
-    """Extends the base program serializer to include date information, corresponds to js/models/withReportingPeriod"""
+    """Program Serializer component which serializes date information.
+
+    JSON output corresponds to js/models/withReportingPeriod
+    """
+
     reporting_period_start_iso = serializers.DateField(source='reporting_period_start')
     reporting_period_end_iso = serializers.DateField(source='reporting_period_end')
-    percent_complete = serializers.SerializerMethodField()
-    has_started = serializers.SerializerMethodField()
 
     class Meta:
+        purpose = "ReportingPeriod"
         fields = [
             'start_date',
             'end_date',
@@ -79,8 +88,10 @@ class ProgramReportingPeriodMixin:
             'has_started'
         ]
 
+    # Class method used to instantiate queryset with required fields (to minimize queries)
     @classmethod
     def _get_query_fields(cls):
+        """Extends parent's list of DB fields needed for included fields"""
         return super()._get_query_fields() + [
             'start_date',
             'end_date',
@@ -88,22 +99,9 @@ class ProgramReportingPeriodMixin:
             'reporting_period_end'
         ]
 
-    def get_percent_complete(self, program):
-        if program.reporting_period_end is None or program.reporting_period_start is None:
-            return -1 # otherwise the UI might show "None% complete"
-        if program.reporting_period_start > datetime.datetime.utcnow().date():
-            return 0
-        total_days = (program.reporting_period_end - program.reporting_period_start).days
-        complete = (datetime.datetime.utcnow().date() - program.reporting_period_start).days
-        return int(round(float(complete)*100/total_days)) if complete < total_days else 100
 
-    def get_has_started(self, program):
-        return program.reporting_period_start and program.reporting_period_start <= datetime.date.today()
-
-
-# Mixin to add indicator and level ordering to a program serializer
 class ProgramRFOrderingMixin:
-    """Extends program serializer to include a list of indicator pks in level order and chain order"""
+    """Program Serializer component which serializes level and indicator pks in RF-aware order"""
     level_pks_level_order = serializers.SerializerMethodField()
     level_pks_chain_order = serializers.SerializerMethodField()
     indicator_pks_for_level = serializers.SerializerMethodField()
@@ -111,11 +109,9 @@ class ProgramRFOrderingMixin:
     indicator_pks_level_order = serializers.SerializerMethodField()
     indicator_pks_chain_order = serializers.SerializerMethodField()
     by_result_chain = serializers.SerializerMethodField()
-    _tier_serializer = TierBaseSerializer
-    _level_serializer = LevelBaseSerializer
-    _indicator_serializer = IndicatorRFOrderingSerializer
 
     class Meta:
+        purpose = "RFOrderingAware"
         fields = [
             'level_pks_level_order',
             'level_pks_chain_order',
@@ -125,72 +121,24 @@ class ProgramRFOrderingMixin:
             'indicator_pks_chain_order',
             'by_result_chain',
         ]
+        _related_serializers = {
+            'tiers': TierBaseSerializer,
+            'levels': LevelBaseSerializer,
+            'indicators': IndicatorRFOrderingSerializer
+        }
 
+    # Class method used to instantiate serializer with required context (to minimize queries)
     @classmethod
-    def _get_context(cls, *args, **kwargs):
-        context = super()._get_context(*args, **kwargs)
+    def _get_context(cls, **kwargs):
+        context = super()._get_context(**kwargs)
         program_pk = context['program_pk']
-        context['tiers'] = cls._tier_serializer.load_for_program(program_pk, context=context).data
-        context['levels'] = cls._level_serializer.load_for_program(program_pk, context=context).data
-        context['indicators'] = cls._indicator_serializer.load_for_program(program_pk, context=context).data
+        context['tiers'] = cls.related_serializers['tiers'].load_for_program(program_pk, context=context).data
+        context['levels'] = cls.related_serializers['levels'].load_for_program(program_pk, context=context).data
+        context['indicators'] = cls.related_serializers['indicators'].load_for_program(
+            program_pk, context=context).data
         return context
 
-    @property
-    def _is_in_list(self):
-        if hasattr(self, 'parent') and getattr(self.parent, 'many', False) and len(self.parent.instance) > 1:
-            return True
-        return False
-
-    def _get_program_tiers(self, program):
-        tiers = getattr(self, 'context', {}).get('tiers', [])
-        if self._is_in_list:
-            return [tier for tier in tiers if tier['program_id'] == program.pk]
-        return tiers
-
-    def _get_program_levels(self, program):
-        levels = getattr(self, 'context', {}).get('levels', [])
-        if self._is_in_list:
-            return [level for level in levels if level['program_id'] == program.pk]
-        return levels
-
-    def _get_program_indicators(self, program):
-        indicators = getattr(self, 'context', {}).get('indicators', [])
-        if self._is_in_list:
-            return [indicator for indicator in indicators if indicator['program_id'] == program.pk]
-        return indicators
-
-    def _get_levels_level_order(self, program):
-        """returns levels sorted in level order (first by depth, then by parents' order, then by customsort)"""
-        program_levels = self._get_program_levels(program)
-        levels = []
-        parents = [None]
-        child_levels = [l for l in program_levels if l['parent_id'] is None]
-        while child_levels:
-            levels += child_levels
-            parents = child_levels
-            child_levels = [l for parent in parents for l in program_levels if l['parent_id'] == parent['pk']]
-        return levels
-
-    def _get_level_children(self, parent, level_set):
-        """recursively maps levels children and their children to produce a chain-sorted level list"""
-        levels = []
-        child_levels = [l for l in level_set if l['parent_id'] == (parent['pk'] if parent else None)]
-        for child_level in child_levels:
-            levels.append(child_level)
-            levels += self._get_level_children(child_level, level_set)
-        return levels
-
-    def _get_levels_chain_order(self, program):
-        """returns levels sorted in chain order (each parent and their children and their children)"""
-        program_levels = self._get_program_levels(program)
-        levels = self._get_level_children(None, program_levels)
-        return levels
-
-    def _get_unassigned_indicators(self, indicator_set):
-        return sorted(
-            [indicator for indicator in indicator_set
-             if (indicator['level_pk'] is None or indicator['results_framework'] is False)],
-            key=operator.itemgetter('level_order'))
+    # Serializer Method Field methods (populate fields for serializer):
 
     def get_level_pks_level_order(self, program):
         return [l['pk'] for l in self._get_levels_level_order(program)]
@@ -199,37 +147,29 @@ class ProgramRFOrderingMixin:
         return [l['pk'] for l in self._get_levels_chain_order(program)]
 
     def get_indicator_pks_for_level(self, program):
-        indicators = self._get_program_indicators(program)
-        return [
-            {'pk': level['pk'], 'indicator_pks': [indicator['pk'] for indicator in indicators
-                                                  if indicator['level_pk'] == level['pk']]}
-            for level in self._get_program_levels(program)]
+        """returns a list of levels serialized with only pk and a list of indicator_pks"""
+        return [{
+            'pk': level['pk'],
+            'indicator_pks': [i['pk'] for i in self._sorted_indicators_for_level(program, level)],
+            } for level in self._get_program_levels(program)]
 
     def get_unassigned_indicator_pks(self, program):
-        return [i['pk'] for i in self._get_unassigned_indicators(self._get_program_indicators(program))]
+        return [i['pk'] for i in self._sorted_indicators_for_level(program, None)]
 
     def get_indicator_pks_level_order(self, program):
         """returns a list of pks, sorted by level in level order then indicator level_order (if RF) otherwise manual"""
-        indicator_pks = []
-        indicators = self._get_program_indicators(program)
         levels = self._get_levels_level_order(program) if program.results_framework else []
-        for level in levels:
-            indicator_pks += [i['pk'] for i in sorted(
-                [indicator for indicator in indicators if indicator['level_pk'] == level['pk']],
-                 key=operator.itemgetter('level_order'))]
-        indicator_pks += [i['pk'] for i in self._get_unassigned_indicators(indicators)]
+        indicator_pks = [i['pk'] for level in levels
+                         for i in self._sorted_indicators_for_level(program, level)]
+        indicator_pks += self.get_unassigned_indicator_pks(program)
         return indicator_pks
 
     def get_indicator_pks_chain_order(self, program):
         """returns a list of pks, sorted by level in chain order then indicator level_order (if RF) otherwise manual"""
-        indicator_pks = []
-        indicators = self._get_program_indicators(program)
         levels = self._get_levels_chain_order(program) if program.results_framework else []
-        for level in levels:
-            indicator_pks += [i['pk'] for i in sorted([
-                indicator for indicator in indicators if indicator['level_pk'] == level['pk']],
-                key=operator.itemgetter('level_order'))]
-        indicator_pks += [i['pk'] for i in self._get_unassigned_indicators(indicators)]
+        indicator_pks = [i['pk'] for level in levels
+                         for i in self._sorted_indicators_for_level(program, level)]
+        indicator_pks += self.get_unassigned_indicator_pks(program)
         return indicator_pks
 
     def get_by_result_chain(self, program):
@@ -239,30 +179,90 @@ class ProgramRFOrderingMixin:
             return _('by %(tier)s chain') % {'tier': _(result_tier[0]['name'])}
         return None
 
+    # Helper functions for serializer method fields:
+
+    @property
+    def _is_in_list(self):
+        """Returns True if this serializer is instanced as part of a ListSerializer (many=True), False otherwise"""
+        return hasattr(self, 'parent') and getattr(self.parent, 'many', False) and len(self.parent.instance) > 1
+
+    def _get_program_tiers(self, program):
+        """returns list of serialized tiers for a given program"""
+        tiers = self.context.get('tiers', [])
+        if self._is_in_list:
+            return [tier for tier in tiers if tier['program_id'] == program.pk]
+        return tiers
+
+    def _get_program_levels(self, program):
+        """returns list of serialized levels for a given program"""
+        levels = self.context.get('levels', [])
+        if self._is_in_list:
+            return [level for level in levels if level['program_id'] == program.pk]
+        return levels
+
+    def _get_program_indicators(self, program):
+        """returns list of serialized indicators for a given program"""
+        indicators = self.context.get('indicators', [])
+        if self._is_in_list:
+            return [indicator for indicator in indicators if indicator['program_id'] == program.pk]
+        return indicators
+
+    def _get_levels_level_order(self, program):
+        """returns levels sorted in level order (first by depth, then by parents' order, then by customsort)"""
+        program_levels = self._get_program_levels(program)
+        levels = []
+        child_levels = [l for l in program_levels if l['parent_id'] is None]
+        while child_levels:
+            levels += child_levels
+            child_levels = [l for parent in child_levels for l in program_levels if l['parent_id'] == parent['pk']]
+        return levels
+
+    def _get_levels_chain_order(self, program):
+        """returns levels sorted in chain order (each parent and their children and their children)"""
+
+        def get_level_children(parent, level_set):
+            """recursively maps levels children and their children to produce a chain-sorted level list"""
+            levels = []
+            child_levels = [l for l in level_set if l['parent_id'] == (parent['pk'] if parent else None)]
+            for child_level in child_levels:
+                levels.append(child_level)
+                levels += get_level_children(child_level, level_set)
+            return levels
+
+        return get_level_children(None, self._get_program_levels(program))
+
+    def _sorted_indicators_for_level(self, program, level=None):
+        """returns indicators for level sorted by their level_order"""
+        if level is None:
+            filt_func = lambda i: i['has_rf_level'] is False
+        else:
+            filt_func = lambda i: i['level_pk'] == level['pk']
+        return sorted(filter(filt_func, self._get_program_indicators(program)), key=operator.itemgetter('level_order'))
 
 
-# Used (e.g. in IPTT) where periods with date information need to be generated from program reporting period
 class ProgramPeriodsForFrequencyMixin:
+    """Program Serializer component which adds data for populating period-related pages (e.g. IPTT)"""
+
     frequencies = serializers.SerializerMethodField()
     period_date_ranges = serializers.SerializerMethodField()
 
     class Meta:
+        purpose = "PeriodRanges"
         fields = [
             'frequencies',
             'period_date_ranges'
         ]
 
+    # Serializer Method Field methods (populate fields for serializer):
+
     def get_frequencies(self, program):
-        return sorted(
-            set(i['target_frequency'] for i in self._get_program_indicators(program)
-                if i['target_frequency'] is not None)
-        )
+        """Returns a list of frequencies for which the program has at least one indicator"""
+        return sorted(set(i['target_frequency'] for i in self._get_program_indicators(program)
+                          if i['target_frequency'] is not None))
 
     def get_period_date_ranges(self, program):
-        return {
-            frequency: PeriodDateRangeSerializer(
-                list(program.get_periods_for_frequency(frequency)),
-                many=True, context={'frequency': frequency, 'now': self.context.get('now', timezone.now().date())}
-            ).data
-            for frequency, _ in Indicator.TARGET_FREQUENCIES if frequency != Indicator.EVENT
-        }
+        """Returns a dict mapping all frequencies to serialized data for each period they correspond with"""
+        now = self.context.get('now', timezone.now().date())
+        return {frequency: PeriodDateRangeSerializer(list(program.get_periods_for_frequency(frequency)),
+                                                     many=True, context={'frequency': frequency, 'now': now}).data
+                for frequency, _ in Indicator.TARGET_FREQUENCIES if frequency != Indicator.EVENT}

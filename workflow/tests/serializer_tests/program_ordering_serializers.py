@@ -3,7 +3,7 @@
 
     corresponding to js/models/program/ProgramLevelOrdering"""
 
-from workflow.serializers_new import (
+from workflow.serializers_new.base_program_serializers import (
     ProgramBaseSerializerMixin,
     ProgramRFOrderingMixin,
 )
