@@ -29,16 +29,16 @@ from tola.l10n_utils import l10n_date_medium
 class IPTTReport:
     def __init__(self, context):
         self.report_title = _('Indicator Performance Tracking Report')
-        self.report_date_range = u'{} – {}'.format(
-            l10n_date_medium(
-                dateutil.parser.isoparse(context['program']['reporting_period_start_iso']).date(), decode=True),
-            l10n_date_medium(
-                dateutil.parser.isoparse(context['program']['reporting_period_end_iso']).date(), decode=True)
-        )
         self.program_name = context['program']['name']
         self.results_framework = context['program']['results_framework']
         self.frequencies = context['frequencies']
         self.lop_period = IPTTExcelPeriod.lop_period()
+        self.reporting_period_start_display = l10n_date_medium(
+            dateutil.parser.isoparse(context['program']['reporting_period_start_iso']).date(),
+            decode=True)
+        self.reporting_period_end_display = l10n_date_medium(
+            dateutil.parser.isoparse(context['program']['reporting_period_end_iso']).date(),
+            decode=True)
 
 
 class IPTTReportSerializer(serializers.Serializer):
@@ -46,7 +46,7 @@ class IPTTReportSerializer(serializers.Serializer):
     report_title = serializers.CharField()
     program_name = serializers.CharField()
     results_framework = serializers.BooleanField()
-    report_date_range = serializers.CharField()
+    report_date_range = serializers.SerializerMethodField()
     frequencies = serializers.ListField(child=serializers.IntegerField())
     lop_period = serializers.SerializerMethodField()
     periods = serializers.SerializerMethodField()
@@ -94,12 +94,15 @@ class IPTTReportSerializer(serializers.Serializer):
 
     @classmethod
     def _get_serializer_context(cls, program_pk, frequencies, filters):
+        frequencies = [int(frequency) for frequency in frequencies]
+        time_aware_frequencies = list(set(frequencies) & set(Indicator.REGULAR_TARGET_FREQUENCIES))
         return {
             'program_pk': program_pk,
-            'frequencies': sorted([int(frequency) for frequency in frequencies]),
+            'frequencies': sorted(frequencies),
+            'time_aware_frequencies': sorted(time_aware_frequencies),
             'filters': filters,
             'is_tva': cls.is_tva,
-            'is_tva_full': cls.full_tva
+            'is_tva_full': cls.full_tva,
         }
 
     @staticmethod
@@ -132,9 +135,9 @@ class IPTTReportSerializer(serializers.Serializer):
         start = filters.get('start', None)
         end = filters.get('end', None)
         filter_context = {}
-        if start is not None:
+        if start is not None and not context.get('is_tva_full') and context.get('time_aware_frequencies'):
             filter_context['start'] = start
-        if end is not None:
+        if end is not None and not context.get('is_tva_full') and context.get('time_aware_frequencies'):
             filter_context['end'] = end + 1
         return filter_context
 
@@ -274,6 +277,7 @@ class IPTTReportSerializer(serializers.Serializer):
             dateutil.parser.isoparse(self.context['program']['reporting_period_end_iso']).date()
         )
 
+
     def _get_frequency_periods(self, frequency):
         """Returns all periods serialized as period headers for a given frequency"""
         periods = [IPTTExcelPeriod(frequency, period_dict, tva=self.is_tva)
@@ -358,6 +362,17 @@ class IPTTReportSerializer(serializers.Serializer):
             frequency: self._get_level_rows_for_frequency(frequency)
             for frequency in report.frequencies
         }
+
+    def get_report_date_range(self, report):
+        start = report.reporting_period_start_display
+        end = report.reporting_period_end_display
+        if self.context.get('start') is not None:
+            assert len(self.context.get('time_aware_frequencies')) == 1 # not a full report if has a start filter
+            start = self._get_frequency_periods(self.context.get('time_aware_frequencies')[0])[0].start_display
+        if self.context.get('end') is not None:
+            assert len(self.context.get('time_aware_frequencies')) == 1 # not a full report if has an end filter
+            end = self._get_frequency_periods(self.context.get('time_aware_frequencies')[0])[-1].end_display
+        return f"{start} – {end}"
 
 
 class IPTTTPReportSerializer(IPTTReportSerializer):
