@@ -356,7 +356,7 @@ class TestIPTTExcelExports(test.TestCase):
         for col, val in enumerate([
             self.scenario.indicators[0].name,
             self.scenario.indicators[0].unit_of_measure,
-            None,
+            "N/A",
             "Not cumulative",
             "#",
             0,
@@ -395,6 +395,7 @@ class TestIPTTExcelExports(test.TestCase):
             sheet.cell(row=6, column=4).value,
             self.scenario.indicators[1].name
         )
+        self.assertEqual(sheet.cell(row=6, column=9).value, "N/A")
         self.assertEqual(
             sheet.cell(row=7, column=3).value,
             self.scenario.country_disagg.disaggregation_type
@@ -450,7 +451,7 @@ class TestIPTTExcelExports(test.TestCase):
             "Tîér2 2a",
             self.scenario.indicators[3].name,
             self.scenario.indicators[3].unit_of_measure,
-            None, "Not cumulative", "#", 0, 10, 20, 2, 0.83, 11, 13.253,
+            "N/A", "Not cumulative", "#", 0, 10, 20, 2, 0.83, 11, 13.253,
             0.83, "–", "–", 0.83, "–", "–", 0.83, 9, 10.8434
             ]):
             self.assertEqual(
@@ -495,7 +496,21 @@ class TestIPTTExcelExports(test.TestCase):
             self.assertEqual(sheet.cell(row=11+c, column=20).value, "–")
             self.assertEqual(sheet.cell(row=11+c, column=23).value, 8 if c == 1 else 1)
         self.assertIsNone(sheet.cell(row=13, column=3).value)
-        
+
+    def test_tva_start_end_filters(self):
+        def get_formatted_date(start, end):
+            return "{} – {}".format(DATE_FORMATS[ENGLISH](start), DATE_FORMATS[ENGLISH](end))
+
+        # 2016-1-1 2018-12-31
+        tva_start_filter = self.get_tva_report(frequency=Indicator.QUARTERLY, start=2).worksheets[0]
+        self.assertEqual(tva_start_filter.cell(row=2, column=3).value,
+                         get_formatted_date(datetime.date(2016, 7, 1), datetime.date(2018, 12, 31)))
+        tva_end_filter = self.get_tva_report(frequency=Indicator.TRI_ANNUAL, end=4).worksheets[0]
+        self.assertEqual(tva_end_filter.cell(row=2, column=3).value,
+                         get_formatted_date(datetime.date(2016, 1, 1), datetime.date(2017, 8, 31)))
+        tva_both_filters = self.get_tva_report(frequency=Indicator.MONTHLY, start=14, end=18).worksheets[0]
+        self.assertEqual(tva_both_filters.cell(row=2, column=3).value,
+                         get_formatted_date(datetime.date(2017, 3, 1), datetime.date(2017, 7, 31)))
 
     def test_tp_annual_report_headers(self):
         tp_annual_report = self.get_tp_report(frequency=Indicator.ANNUAL)
@@ -753,6 +768,28 @@ class TestIPTTExcelExports(test.TestCase):
             self.assertEqual(sheet.cell(row=row_num, column=3).value, indicator_number)
             self.assertEqual(sheet.cell(row=row_num, column=4).value, indicator_name)
         self.assertIsNone(sheet.cell(row=24, column=3).value)
+
+    def test_tp_report_report_dates_with_start_end_filters(self):
+        tp_quarterly_report = self.get_tp_report(
+            frequency=Indicator.QUARTERLY, start=1
+        )
+        self.assertEqual(len(tp_quarterly_report.worksheets), 1)
+        sheet = tp_quarterly_report.worksheets[0]
+        date_range = "{} – {}".format(
+            DATE_FORMATS[ENGLISH](datetime.date(2016, 4, 1)),
+            DATE_FORMATS[ENGLISH](datetime.date(2018, 12, 31))
+        )
+        self.assertEqual(sheet.cell(row=2, column=3).value, date_range)
+        tp_monthly_report = self.get_tp_report(
+            frequency=Indicator.MONTHLY, start=13, end=16
+        )
+        self.assertEqual(len(tp_monthly_report.worksheets), 1)
+        sheet2 = tp_monthly_report.worksheets[0]
+        date_range2 = "{} – {}".format(
+            DATE_FORMATS[ENGLISH](datetime.date(2017, 2, 1)),
+            DATE_FORMATS[ENGLISH](datetime.date(2017, 5, 31))
+        )
+        self.assertEqual(sheet2.cell(row=2, column=3).value, date_range2)
 
     def test_tp_monthly_report_headers_french(self):
         default_locale = locale.getlocale()

@@ -1,61 +1,51 @@
-# -*- coding: utf-8 -*-
 import openpyxl
-import operator
 from django.utils.translation import ugettext
 from django.http import HttpResponse
 
 from tola_management.programadmin import get_audit_log_workbook
 from workflow.models import Program
-from indicators.models import Indicator
-
-EM_DASH = u'–'
 
 
+EM_DASH = '–'
+
+
+CENTER_ALIGN = openpyxl.styles.Alignment(horizontal='center', vertical='bottom')
+RIGHT_ALIGN = openpyxl.styles.Alignment(horizontal='right', vertical='bottom')
+LEFT_ALIGN_WRAP = openpyxl.styles.Alignment(wrap_text=True)
 
 class ExcelRendererBase:
     """Set of utility functions for rendering a serialized IPTT into an Excel export"""
-
-    TITLE_START_COLUMN = 3 # 2 rows currently hidden at start, title starts at column C
     TITLE_FONT = openpyxl.styles.Font(size=18)
     HEADER_FONT = openpyxl.styles.Font(bold=True)
-    LEVEL_ROW_FONT = openpyxl.styles.Font(bold=True)
     HEADER_FILL = openpyxl.styles.PatternFill('solid', 'EEEEEE')
     LEVEL_ROW_FILL = openpyxl.styles.PatternFill('solid', 'CCCCCC')
-    CENTER_ALIGN = openpyxl.styles.Alignment(horizontal='center', vertical='bottom')
-    RIGHT_ALIGN = openpyxl.styles.Alignment(horizontal='right', vertical='bottom')
-    LEFT_ALIGN_WRAP = openpyxl.styles.Alignment(wrap_text=True)
-    INDICATOR_NAME = openpyxl.styles.NamedStyle(
-        name="indicator_name",
-        font=openpyxl.styles.Font(underline='single'),
-        alignment=openpyxl.styles.Alignment(wrap_text=True)
-    )
-    DISAGGREGATION_CELL = openpyxl.styles.NamedStyle(
-        name='disaggregation_cell',
-        font=openpyxl.styles.Font(bold=True),
-        alignment=openpyxl.styles.Alignment(horizontal='left', vertical='top', wrap_text=True)
-    )
-    DISAGGREGATION_CATEGORY = openpyxl.styles.NamedStyle(
-        name='category_cell',
-        alignment=openpyxl.styles.Alignment(horizontal='right', wrap_text=True)
-    )
 
-    def create_workbook(self):
-        wb = openpyxl.Workbook()
-        wb.remove(wb.active)
+    def __init__(self):
+        self.wb = openpyxl.Workbook()
+        self.wb.remove(self.wb.active)
+
+    def initialize_workbook(self):
         title_style = openpyxl.styles.NamedStyle(name='title')
         title_style.font = openpyxl.styles.Font(size=18)
-        wb.add_named_style(title_style)
+        self.wb.add_named_style(title_style)
         header_style = openpyxl.styles.NamedStyle(name='header')
         header_style.font = openpyxl.styles.Font(bold=True)
-        header_style.alignment = self.CENTER_ALIGN
+        header_style.alignment = CENTER_ALIGN
         header_style.fill = openpyxl.styles.PatternFill('solid', 'EEEEEE')
-        wb.add_named_style(header_style)
+        self.wb.add_named_style(header_style)
+        sub_header_style = openpyxl.styles.NamedStyle(name='sub_header')
+        sub_header_style.font = openpyxl.styles.Font(bold=True)
+        sub_header_style.alignment = CENTER_ALIGN
+        self.wb.add_named_style(sub_header_style)
+        right_align_header_style = openpyxl.styles.NamedStyle(name='header_right')
+        right_align_header_style.font = openpyxl.styles.Font(bold=True)
+        right_align_header_style.alignment = RIGHT_ALIGN
+        right_align_header_style.fill = openpyxl.styles.PatternFill('solid', 'EEEEEE')
+        self.wb.add_named_style(right_align_header_style)
         level_row_style = openpyxl.styles.NamedStyle(name='level_row')
         level_row_style.font = openpyxl.styles.Font(bold=True)
         level_row_style.fill = openpyxl.styles.PatternFill('solid', 'CCCCCC')
-        wb.add_named_style(level_row_style)
-        self.wb = wb
-        
+        self.wb.add_named_style(level_row_style)
 
     @property
     def header_columns(self):
@@ -68,17 +58,13 @@ class ExcelRendererBase:
             ugettext('Indicator')
         ]
         if self.level_column:
-            headers += [
-                ugettext('Level')
-            ]
+            headers += [ugettext('Level')]
         if self.uom_column:
-            headers += [
-                ugettext('Unit of measure'),    
-            ]
+            headers += [ugettext('Unit of measure')]
         if self.change_column:
             headers += [
                 # Translators: this is short for "Direction of Change" as in + or -
-                ugettext('Change'),
+                ugettext('Change')
             ]
         if self.cnc_column:
             headers += [
@@ -86,13 +72,9 @@ class ExcelRendererBase:
                 ugettext('C / NC'),
             ]
         if self.uom_type_column:
-            headers += [
-                u'# / %',
-            ]
+            headers += ['# / %']
         if self.baseline_column:
-            headers += [
-                ugettext('Baseline')
-            ]
+            headers += [ugettext('Baseline')]
         return headers
 
     def _get_name(self):
@@ -107,9 +89,9 @@ class ExcelRendererBase:
             7: ugettext('Monthly')
         }[self.frequency]
         if name and len(name) > 30:
-            name = name[:26] + u'...'
+            name = name[:26] + '...'
         return name
-        
+
     def add_sheet(self):
         level_rows = self.serializer['level_rows'][self.frequency]
         try:
@@ -129,7 +111,8 @@ class ExcelRendererBase:
 
     def add_headers(self, sheet):
         current_row = 1
-        for title in [self.serializer['report_title'], self.serializer['report_date_range'], self.serializer['program_name']]:
+        for title in [self.serializer['report_title'], self.serializer['report_date_range'],
+                      self.serializer['program_name']]:
             sheet.merge_cells(
                 start_row=current_row, start_column=self.TITLE_START_COLUMN,
                 end_row=current_row, end_column=len(self.header_columns)
@@ -150,7 +133,8 @@ class ExcelRendererBase:
                 sheet, current_column, period
             )
 
-    def add_period_header(self, sheet, col, period):
+    @staticmethod
+    def add_period_header(sheet, col, period):
         for header, row in [
                 (period.header, 2),
                 (period.subheader, 3)
@@ -160,23 +144,20 @@ class ExcelRendererBase:
                     sheet.merge_cells(start_row=row, start_column=col, end_row=row, end_column=col+2)
                 cell = sheet.cell(row=row, column=col)
                 cell.value = str(header)
-                cell.font = self.HEADER_FONT
-                cell.alignment = self.CENTER_ALIGN
+                cell.style = 'sub_header'
         columns = [
             ugettext('Target'), ugettext('Actual'), str(ugettext('% Met')).title()
         ] if period.tva else [ugettext('Actual'),]
         for col_no, col_header in enumerate(columns):
             cell = sheet.cell(row=4, column=col+col_no)
             cell.value = str(col_header)
-            cell.font = self.HEADER_FONT
-            cell.fill = self.HEADER_FILL
-            cell.alignment = self.RIGHT_ALIGN
+            cell.style = 'header_right'
         return col + len(columns)
 
     def add_level_row(self, level_row, sheet, current_row):
         if level_row['level']:
-            sheet.cell(row=current_row, column=1).fill = self.LEVEL_ROW_FILL
-            sheet.cell(row=current_row, column=2).fill = self.LEVEL_ROW_FILL
+            sheet.cell(row=current_row, column=1).style = 'level_row'
+            sheet.cell(row=current_row, column=2).style = 'level_row'
             sheet.merge_cells(start_row=current_row, start_column=3, end_row=current_row, end_column=self.column_count)
             cell = sheet.cell(row=current_row, column=3)
             cell.value = str(level_row['level']['full_name'])
@@ -186,45 +167,108 @@ class ExcelRendererBase:
             current_row = self.add_indicator_data(indicator, sheet, current_row)
         return current_row
 
-    def int_cell(self, value):
+    @staticmethod
+    def int_cell(value):
         if not value and value != 0:
             return None, 'General'
         return int(value), '0'
 
-    def float_cell(self, value):
+    @staticmethod
+    def float_cell(value):
         if not value and value != 0:
             return None, 'General'
         value = round(float(value), 2)
         if value == int(value):
             return int(value), '0'
-        elif value == round(value, 1):
+        if value == round(value, 1):
             return round(value, 1), '0.0'
         return value, '0.00'
 
-    def percent_cell(self, value):
+    @staticmethod
+    def percent_cell(value):
         if not value and value != 0:
             return None, 'General'
         value = round(float(value), 4)
         if value == round(value, 2):
             return round(value, 2), '0%'
-        elif value == round(value, 3):
+        if value == round(value, 3):
             return round(value, 3), '0.0%'
         return value, '0.00%'
 
-    def percent_value_cell(self, value):
+    @staticmethod
+    def percent_value_cell(value):
         if not value and value != 0:
             return None, 'General'
         value = round(float(value), 2)
         if value == int(value):
             return value/100, '0%'
-        else:
-            return value/100, '0.00%'
+        return value/100, '0.00%'
 
-    def str_cell(self, value):
+    @staticmethod
+    def str_cell(value):
         if not value:
             return None, 'General'
         value = str(value)
         return value, 'General'
+
+    def get_period_report_data_columns(self, indicator_periods, values_func):
+        for period_header, period_data in zip(self.serializer['periods'][self.frequency], indicator_periods):
+            assert period_header.count == period_data['count']
+            if period_header.tva:
+                yield (period_data['target'], values_func, None, None)
+            yield (period_data['actual'], values_func, None, None)
+            if period_header.tva:
+                yield (period_data['met'], self.percent_cell, None, None)
+
+    @staticmethod
+    def write_indicator_row(sheet, current_row, indicator_columns):
+        indicator_pk = indicator_columns[1][0]
+        for column, (value, format_func, alignment, style) in enumerate(indicator_columns):
+            number_format = None
+            cell = sheet.cell(row=current_row, column=column+1)
+            empty_cell = EM_DASH
+            if style == 'empty_blank':
+                empty_cell = ''
+                style = None
+            elif style == 'empty_na':
+                empty_cell = ugettext('N/A')
+                style = None
+            try:
+                if value is None:
+                    value, number_format = None, None
+                else:
+                    value, number_format = format_func(value)
+            except (AttributeError, TypeError, ValueError) as e:
+                cell.value = None
+                cell.comment = openpyxl.comments.Comment(
+                    'error {} with attribute {} on indicator pk {}'.format(
+                        e, value, indicator_pk
+                        ), 'Tola System')
+            else:
+                if value is None:
+                    value = empty_cell
+                    alignment = CENTER_ALIGN
+                cell.value = value
+                if alignment is not None:
+                    cell.alignment = alignment
+                if style is not None:
+                    cell.style = style
+                if number_format is not None:
+                    cell.number_format = number_format
+
+    def get_label_values(self, label_pk, report_data):
+        label_values = []
+        if self.baseline_column:
+            label_values.append(None)
+        label_values += [
+            None, report_data['lop_period'].get('disaggregations', {}).get(label_pk, {}).get('actual'), None]
+        for period_header, period_data in zip(self.serializer['periods'][self.frequency], report_data['periods']):
+            if period_header.tva:
+                label_values.append(None)
+            label_values.append(period_data.get('disaggregations', {}).get(label_pk, {}).get('actual'))
+            if period_header.tva:
+                label_values.append(None)
+        return label_values
 
     def add_indicator_data(self, indicator, sheet, current_row):
         if indicator['unit_of_measure_type'] == '%':
@@ -232,10 +276,10 @@ class ExcelRendererBase:
         else:
             values_func = self.float_cell
         indicator_columns = [
-            (indicator['program_pk'], self.int_cell, self.RIGHT_ALIGN, None),
-            (indicator['pk'], self.int_cell, self.RIGHT_ALIGN, None),
-            (indicator['number'], self.str_cell, self.LEFT_ALIGN_WRAP, None),
-            (indicator['name'], self.str_cell, None, self.INDICATOR_NAME)
+            (indicator['program_pk'], self.int_cell, RIGHT_ALIGN, None),
+            (indicator['pk'], self.int_cell, RIGHT_ALIGN, None),
+            (indicator['number'], self.str_cell, LEFT_ALIGN_WRAP, None),
+            (indicator['name'], self.str_cell, None, self.INDICATOR_NAME_CELL)
         ]
         if self.level_column:
             indicator_columns.append(
@@ -247,116 +291,51 @@ class ExcelRendererBase:
             ]
         if self.change_column:
             indicator_columns += [
-                (indicator['direction_of_change'], self.str_cell, self.CENTER_ALIGN, 'empty_blank'),
+                (indicator['direction_of_change'], self.str_cell, CENTER_ALIGN, 'empty_na'),
             ]
         if self.cnc_column:
-            col_value = ugettext("Cumulative") if indicator['is_cumulative'] else ugettext("Not cumulative")
             indicator_columns += [
-                (col_value, self.str_cell, None, None),
+                (ugettext("Cumulative") if indicator['is_cumulative'] else ugettext("Not cumulative"),
+                 self.str_cell, None, None),
             ]
         if self.uom_type_column:
             indicator_columns += [
-                (indicator['unit_of_measure_type'], self.str_cell, self.CENTER_ALIGN, 'empty_blank'),
+                (indicator['unit_of_measure_type'], self.str_cell, CENTER_ALIGN, 'empty_blank'),
             ]
         if self.baseline_column:
             indicator_columns += [
-                (indicator['baseline'], values_func, None, None),
+                (indicator['baseline'], values_func, None, 'empty_na'),
                 ]
         indicator_columns += [
             (indicator['report_data']['lop_period']['target'], values_func, None, None),
             (indicator['report_data']['lop_period']['actual'], values_func, None, None),
             (indicator['report_data']['lop_period']['met'], self.percent_cell, None, None),
         ]
-        for period_header, period_data in zip(self.serializer['periods'][self.frequency],
-                                              indicator['report_data']['periods']):
-            assert period_header.count == period_data['count']
-            if period_header.tva:
-                indicator_columns.append(
-                    (period_data['target'], values_func, None, None)
-                )
-            indicator_columns.append(
-                (period_data['actual'], values_func, None, None)
-            )
-            if period_header.tva:
-                indicator_columns.append(
-                    (period_data['met'], self.percent_cell, None, None)
-                )
-        for column, (value, format_func, alignment, style) in enumerate(indicator_columns):
-            number_format = None
-            cell = sheet.cell(row=current_row, column=column+1)
-            if style == 'empty_blank':
-                style = None
-                empty_blank = True
-            else:
-                empty_blank = False
-            try:
-                if value is None:
-                    value, number_format = None, None
-                else:
-                    value, number_format = format_func(value)
-            except (AttributeError, TypeError, ValueError) as e:
-                cell.value = None
-                cell.comment = openpyxl.comments.Comment(
-                    'error {} with attribute {} on indicator pk {}'.format(
-                        e, value, indicator['pk']
-                        ), 'Tola System')
-            else:
-                if value is None:
-                    value = '' if empty_blank else EM_DASH
-                    alignment = self.CENTER_ALIGN
-                cell.value = value
-                if alignment is not None:
-                    cell.alignment = alignment
-                if style is not None:
-                    cell.style = style
-                if number_format is not None:
-                    cell.number_format = number_format
+        for period_column in self.get_period_report_data_columns(indicator['report_data']['periods'], values_func):
+            indicator_columns.append(period_column)
+        self.write_indicator_row(sheet, current_row, indicator_columns)
         current_row += 1
         label_merge_column = len(self.header_columns) - (1 if self.baseline_column else 0)
         for disaggregation in indicator.get('disaggregations', []):
             top_row = current_row
             for label in disaggregation['labels']:
-                current_column = len(self.header_columns)+2
-                # BASELINE, LOP TARGET, LOP % MET:
-                for column in [current_column-2, current_column-1, current_column+1]:
-                    sheet.cell(row=current_row, column=column).value = EM_DASH
-                    sheet.cell(row=current_row, column=column).alignment = self.CENTER_ALIGN
-                def label_value_func(cell, period, empty_blank=False):
-                    value, number_format = values_func(
-                        period.get('disaggregations', {}).get(label['pk'], {}).get('actual', None)
-                    )
-                    if value is None:
-                        cell.value = '' if empty_blank else EM_DASH
-                        cell.alignment = self.CENTER_ALIGN
-                    else:
-                        cell.value = value
-                        if number_format is not None:
-                            cell.number_format = number_format
                 sheet.merge_cells(
                     start_row=current_row, start_column=4,
                     end_row=current_row, end_column=label_merge_column
                 )
                 cell = sheet.cell(row=current_row, column=4)
                 cell.value = label['name']
-                cell.style = self.DISAGGREGATION_CATEGORY
-                label_value_func(
-                    sheet.cell(row=current_row, column=current_column), indicator['report_data']['lop_period']
-                )
-                current_column += 2
-                for period_header, period_data in zip(self.serializer['periods'][self.frequency],
-                                                      indicator['report_data']['periods']):
-                    if period_header.tva:
-                        cell = sheet.cell(row=current_row, column=current_column)
+                cell.style = self.DISAGGREGATION_CATEGORY_CELL
+                for column_count, value in enumerate(self.get_label_values(label['pk'], indicator['report_data'])):
+                    cell = sheet.cell(row=current_row, column=label_merge_column+column_count+1)
+                    value, number_format = values_func(value)
+                    if value is None:
                         cell.value = EM_DASH
-                        cell.alignment = self.CENTER_ALIGN
-                        current_column += 1
-                    label_value_func(sheet.cell(row=current_row, column=current_column), period_data)
-                    current_column += 1
-                    if period_header.tva:
-                        cell = sheet.cell(row=current_row, column=current_column)
-                        cell.value = EM_DASH
-                        cell.alignment = self.CENTER_ALIGN
-                        current_column += 1
+                        cell.alignment = CENTER_ALIGN
+                    else:
+                        cell.value = value
+                    if number_format is not None:
+                        cell.number_format = number_format
                 current_row += 1
             sheet.merge_cells(start_row=top_row, start_column=3, end_row=current_row-1, end_column=3)
             cell = sheet.cell(row=top_row, column=3)
@@ -391,7 +370,7 @@ class ExcelRendererBase:
 
     def render_to_response(self):
         response = HttpResponse(content_type='application/ms-excel')
-        response['Content-Disposition'] = u'attachment; filename="{}"'.format(self.filename)
+        response['Content-Disposition'] = 'attachment; filename="{}"'.format(self.filename)
         self.wb.save(response)
         return response
 
@@ -408,11 +387,28 @@ class ExcelRendererBase:
 
 
 class IPTTExcelRenderer(ExcelRendererBase):
+    TITLE_START_COLUMN = 3 # 2 rows currently hidden at start, title starts at column C
+    INDICATOR_NAME_CELL = openpyxl.styles.NamedStyle(
+        name="indicator_name",
+        font=openpyxl.styles.Font(underline='single'),
+        alignment=openpyxl.styles.Alignment(wrap_text=True)
+    )
+    DISAGGREGATION_CELL = openpyxl.styles.NamedStyle(
+        name='disaggregation_cell',
+        font=openpyxl.styles.Font(bold=True),
+        alignment=openpyxl.styles.Alignment(horizontal='left', vertical='top', wrap_text=True)
+    )
+    DISAGGREGATION_CATEGORY_CELL = openpyxl.styles.NamedStyle(
+        name='category_cell',
+        alignment=openpyxl.styles.Alignment(horizontal='right', wrap_text=True)
+    )
+
     def __init__(self, serializer, **kwargs):
+        super().__init__()
         params = kwargs.get('params', {})
         self.filename = serializer.filename
         self.serializer = serializer.data
-        self.create_workbook()
+        self.initialize_workbook()
         self.columns = params.get('columns', [])
         has_sheets = False
         for frequency in self.serializer['frequencies']:
@@ -431,23 +427,23 @@ class IPTTExcelRenderer(ExcelRendererBase):
         return not self.serializer['results_framework']
 
     @property
-    def uom_column(self):    
+    def uom_column(self):
         return 0 not in self.columns
 
     @property
-    def change_column(self):    
+    def change_column(self):
         return 1 not in self.columns
 
     @property
-    def cnc_column(self):    
+    def cnc_column(self):
         return 2 not in self.columns
 
     @property
-    def uom_type_column(self):    
+    def uom_type_column(self):
         return 3 not in self.columns
 
     @property
-    def baseline_column(self):    
+    def baseline_column(self):
         return 4 not in self.columns
 
     @property
@@ -459,9 +455,3 @@ class IPTTExcelRenderer(ExcelRendererBase):
             (1 if self.uom_type_column else 0),
             (1 if self.baseline_column else 0),
         ])
-
-class FullReportExcelRenderer(ExcelRendererBase):
-    pass
-
-class OneSheetExcelRenderer(ExcelRendererBase):
-    pass

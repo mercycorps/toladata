@@ -64,9 +64,9 @@ class IndicatorBaseSerializerMixin:
 
     @staticmethod
     def get_level_pk(indicator):
-        if not indicator.results_framework and indicator.old_level:
-            return getattr(indicator, 'old_level_pk', None)
-        return indicator.level_id
+        if indicator.results_framework:
+            return indicator.level_id
+        return getattr(indicator, 'old_level_pk', None)
 
 
 IndicatorBaseSerializer = get_serializer(IndicatorBaseSerializerMixin)
