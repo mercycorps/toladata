@@ -101,7 +101,8 @@ class IPTTQSMixin:
 
     # Serializer Method Fields (populate specific fields on serializer):
 
-    def get_frequencies(self, program):
+    @staticmethod
+    def get_frequencies(program):
         """which frequencies should the TvA drop down list for this program (has indicators with that frequency)"""
         return [frequency for frequency, x in Indicator.TARGET_FREQUENCIES
                 if getattr(program, f'frequency_{frequency}_indicators_exist', False)]
@@ -187,9 +188,11 @@ class IPTTProgramFilterItemsMixin:
         """Returns a map of old levels used by indicators in this program (for sorting and filter menus)"""
         if program.results_framework:
             return []
-        return sorted([{'pk': x[0], 'name': x[1]} for x in set((i['level_pk'], i['old_level_name'])
-            for i in self._get_program_indicators(program) if i['old_level_name'])],
-            key=operator.itemgetter('pk'))
+        return sorted(
+            [{'pk': x[0], 'name': x[1]} for x in set(
+                (i['level_pk'], i['old_level_name']) for i in self._get_program_indicators(program)
+                if i['old_level_name'])
+            ], key=operator.itemgetter('pk'))
 
 
 
@@ -215,14 +218,14 @@ class IPTTExcelMixin:
 
     # Class methods to instantiate serializer with required context (adjusts given context):
     @classmethod
-    def get_for_pk(cls, program_pk, **kwargs):
+    def load_for_pk(cls, program_pk, **kwargs):
         context = kwargs.get('context', {})
-        tiers = context.pop('tiers', [])
-        levels = context.pop('levels', [])
-        if tiers:
-            context['tiers'] = cls.related_serializers['tiers'](tiers, context=context, many=True).data
-        if levels:
-            context['levels'] = cls.related_serializers['levels'](levels, context=context, many=True).data
+        context['tiers'] = cls.related_serializers['tiers'](
+            context.get('tier_objects', []), context=context, many=True
+        ).data
+        context['levels'] = cls.related_serializers['levels'](
+            context.get('level_objects', []), context=context, many=True
+        ).data
         program = Program.rf_aware_objects.select_related(None).prefetch_related(None).only(
             *cls._get_query_fields()
         ).get(pk=program_pk)
@@ -234,8 +237,7 @@ class IPTTExcelMixin:
         """Returns serialized data _in order_ based on context key"""
         if self.context.get('level_order', False):
             return self._get_levels_level_order(program)
-        else:
-            return self._get_levels_chain_order(program)
+        return self._get_levels_chain_order(program)
 
 
 IPTTExcelProgramSerializer = get_serializer(

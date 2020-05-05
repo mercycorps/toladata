@@ -1,4 +1,4 @@
-"""Partial seiralizers for Indicator objects which can be composed into a serializer for a specific use case"""
+"""Partial serializers for Indicator objects which can be composed into a serializer for a specific use case"""
 
 import string
 from rest_framework import serializers
@@ -56,12 +56,14 @@ class IndicatorBaseSerializerMixin:
 
     # serializer method fields (populate fields on serializer):
 
-    def get_old_level_name(self, indicator):
+    @staticmethod
+    def get_old_level_name(indicator):
         if not indicator.results_framework and indicator.old_level:
             return _(indicator.old_level)
         return None
 
-    def get_level_pk(self, indicator):
+    @staticmethod
+    def get_level_pk(indicator):
         if not indicator.results_framework and indicator.old_level:
             return getattr(indicator, 'old_level_pk', None)
         return indicator.level_id
@@ -112,7 +114,8 @@ class IndicatorOrderingMixin:
             return indicator.level_order
         return self.context.get('sort_numbers', {}).get(indicator.pk, None)
 
-    def get_has_rf_level(self, indicator):
+    @staticmethod
+    def get_has_rf_level(indicator):
         return indicator.results_framework and indicator.level_id is not None
 
     def get_long_number(self, indicator):
@@ -133,11 +136,12 @@ class IndicatorOrderingMixin:
             return level[0]
         return None
 
-    def _get_level_order_display(self, indicator):
+    @staticmethod
+    def _get_level_order_display(indicator):
         """Returns the letter portion of the indicator number (the 'c' in 'Outcome 1.2c')"""
         if indicator.level_id and indicator.level_order is not None and indicator.level_order < 26:
             return str(string.ascii_lowercase[indicator.level_order])
-        elif indicator.level_id and indicator.level_order and indicator.level_order >= 26:
+        if indicator.level_id and indicator.level_order and indicator.level_order >= 26:
             return str(
                 string.ascii_lowercase[indicator.level_order/26 - 1] +
                 string.ascii_lowercase[indicator.level_order % 26]
@@ -182,18 +186,21 @@ class IndicatorMeasurementMixin:
 
     # serializer method fields:
 
-    def get_is_percent(self, indicator):
+    @staticmethod
+    def get_is_percent(indicator):
         return indicator.unit_of_measure_type == Indicator.PERCENTAGE
 
-    def get_baseline(self, indicator):
+    @staticmethod
+    def get_baseline(indicator):
         if indicator.baseline_na or not indicator.baseline:
             return None
         return indicator.baseline
 
-    def get_unit_of_measure_type(self, indicator):
+    @staticmethod
+    def get_unit_of_measure_type(indicator):
         if indicator.unit_of_measure_type == indicator.NUMBER:
             return '#'
-        elif indicator.unit_of_measure_type == indicator.PERCENTAGE:
+        if indicator.unit_of_measure_type == indicator.PERCENTAGE:
             return '%'
         return None
 

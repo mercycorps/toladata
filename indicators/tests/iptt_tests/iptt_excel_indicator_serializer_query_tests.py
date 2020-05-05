@@ -37,7 +37,8 @@ from indicators.tests.iptt_tests.iptt_scenario import (
     IndicatorGenerator
 )
 from indicators.serializers_new import (
-    IPTTLevelSerializer
+    IPTTLevelSerializer,
+    IPTTExcelIndicatorSerializer
 )
 from workflow.serializers_new import (
     IPTTTPReportSerializer,
@@ -109,9 +110,11 @@ class TestIPTTIndicatorSerializerQueries(test.TestCase):
             targets=True
         )
 
-    def get_context(self, program_pk=None):
+    def get_context(self, program_pk=None, filters=None):
         if program_pk is None:
             program_pk = self.program.pk
+        if filters is None:
+            filters = {}
         with self.assertNumQueries(CONTEXT_QUERIES):
             disaggregation_labels = DisaggregationLabel.objects.select_related(
                 'disaggregation_type'
@@ -147,13 +150,15 @@ class TestIPTTIndicatorSerializerQueries(test.TestCase):
                 if d_i['has_results']:
                     disaggregations_indicators[d_i['indicator__pk']]['with_results'].append(d_i['pk'])
             context = {
+                'program_pk': program_pk,
+                'filters': filters,
+                'frequencies': [1, 2, 3, 4, 5, 6, 7, 8],
                 'levels': list(Level.objects.select_related(None).only(
                     'pk', 'name', 'parent_id', 'customsort', 'program_id'
                 ).filter(program_id=program_pk)),
                 'tiers': list(LevelTier.objects.select_related(None).only(
                     'pk', 'name', 'program_id', 'tier_depth'
                 ).filter(program_id=program_pk)),
-                #'disaggregations': {d.pk: d for d in disaggregations},
                 'disaggregations': disaggregations_map,
                 'disaggregations_indicators': disaggregations_indicators
             }
@@ -162,26 +167,19 @@ class TestIPTTIndicatorSerializerQueries(test.TestCase):
     def get_serialized_indicator_data(self, program_pk=None, filters={}, no_full_report=False):
         if program_pk is None:
             program_pk = self.program.pk
-        context = self.get_context(program_pk=program_pk)
-        base_filters = filters.copy()
-        base_context = IPTTTPReportSerializer._get_base_context(program_pk)
+        context = self.get_context(program_pk=program_pk, filters=filters)
+        base_context = {'levels': context['levels'], 'tiers': context['tiers']}
         with self.assertNumQueries(TP_QUERIES):
-            filters = IPTTTPReportSerializer.get_indicator_filters(base_filters, program_pk, context=base_context)
-            tp = IPTTTPReportSerializer.load_indicator_data(
-                indicator_context=context, indicator_filters=filters
-            ).data
+            tp_context = {**context, 'is_tva': False, 'is_tva_full': False}
+            tp = IPTTExcelIndicatorSerializer.load_filtered(tp_context).data
         with self.assertNumQueries(TVA_QUERIES):
-            filters = IPTTTVAReportSerializer.get_indicator_filters(base_filters, program_pk, context=base_context)
-            tva = IPTTTVAReportSerializer.load_indicator_data(
-                indicator_context=context, indicator_filters=filters
-            ).data
+            tva_context = {**context, 'is_tva': True, 'is_tva_full': False}
+            tva = IPTTExcelIndicatorSerializer.load_filtered(tva_context).data
         if no_full_report:
             return tp, tva
         with self.assertNumQueries(FULL_QUERIES):
-            filters = IPTTFullReportSerializer.get_indicator_filters(base_filters, program_pk)
-            full = IPTTFullReportSerializer.load_indicator_data(
-                indicator_context=context, indicator_filters=filters
-            ).data
+            full_context = {**context, 'is_tva': True, 'is_tva_full': True}
+            full = IPTTExcelIndicatorSerializer.load_filtered(full_context).data
         return tp, tva, full
         
     def test_loads_one_basic_indicator(self):
@@ -337,6 +335,7 @@ class TestIPTTIndicatorSerializerQueries(test.TestCase):
                 self.assertEqual(
                     set(s_i['pk'] for s_i in serialized_data),
                     set(expected_sectors),
+                    "\n".join([str(s) for s in serialized_data])
                 )
             self.assertEqual(set(s_i['pk'] for s_i in full), set(no_filters))
         del tp, tva, full
@@ -507,7 +506,7 @@ class TestIPTTIndicatorSerializerQueries(test.TestCase):
                         self.assertEqual(label_name, expected_label.label)
 
 
-REPORT_CONTEXT_QUERIES = 4
+REPORT_CONTEXT_QUERIES = 3
 RESULTS_CONTEXT_QUERIES = 1
 
 REPORT_QUERIES = 1
@@ -525,9 +524,13 @@ class TestIPTTSerializedReportData(test.TestCase, DecimalComparator):
     def tearDown(self):
         self.i_gen.clear_after_test()
 
-    def get_context(self, program_pk, frequency, filters={}):
+    def get_context(self, program_pk, frequency, filters=None):
+        if filters is None:
+            filters = {}
         context = {}
-        context['frequency'] = frequency
+        context['program_pk'] = program_pk
+        context['frequencies'] = [frequency]
+        context['filters'] = filters
         program = Program.rf_aware_objects.only(
             'reporting_period_start', 'reporting_period_end'
         ).get(pk=program_pk)
@@ -535,6 +538,11 @@ class TestIPTTSerializedReportData(test.TestCase, DecimalComparator):
             program.reporting_period_start, program.reporting_period_end
         ))
         end_period = (filters['end'] + 1) if 'end' in filters else len(periods)
+        context['program'] = {
+            'pk': program.pk,
+            'reporting_period_start_iso': program.reporting_period_start.isoformat(),
+            'reporting_period_end_iso': program.reporting_period_end.isoformat()
+        }
         context['periods'] = periods[filters.get('start', 0):end_period]
         context['results'] = defaultdict(list)
         disaggregated_values_queryset = DisaggregatedValue.objects.filter(
@@ -577,38 +585,30 @@ class TestIPTTSerializedReportData(test.TestCase, DecimalComparator):
             labels_indicators_map[indicator_pk].append(label_pk)
         context['labels_indicators_map'] = labels_indicators_map
         return context
-    
+
     def get_serialized_report_data(self, program_pk=None, frequency=Indicator.ANNUAL,
-                                   filters={}, tp_only=False, tva_only=False, no_tva_full=False):
+                                   filters=None, tp_only=False, tva_only=False, no_tva_full=False):
         if program_pk is None:
             program_pk = self.i_gen.program.pk
+        if filters is None:
+            filters = {}
         results_exist = Result.objects.filter(indicator__program_id=program_pk).exists()
         context_query_count = REPORT_CONTEXT_QUERIES + (RESULTS_CONTEXT_QUERIES if results_exist else 0)
-        with self.assertNumQueries(context_query_count):
-            context = self.get_context(program_pk=program_pk, frequency=frequency, filters=filters)
-        base_filters = filters.copy()
+        context = self.get_context(program_pk=program_pk, frequency=frequency, filters=filters)
+        context['indicators'] = list(Indicator.rf_aware_objects.filter(program_id=program_pk).values('pk'))
         if not tva_only:
-            with self.assertNumQueries(TP_REPORT_QUERIES):
-                filters = IPTTTPReportSerializer.get_report_filters(base_filters, program_pk, frequency=frequency)
-                tp = IPTTTPReportSerializer.load_report_data(
-                    report_context=context, report_filters=filters
-                )
+            with self.assertNumQueries(context_query_count):
+                tp = IPTTTPReportSerializer.load_report_data(context)[frequency]
             if tp_only:
                 return tp
-        with self.assertNumQueries(TVA_REPORT_QUERIES):
-            filters = IPTTTVAReportSerializer.get_report_filters(base_filters, program_pk, frequency=frequency)
-            tva = IPTTTVAReportSerializer.load_report_data(
-                report_context=context, report_filters=filters
-            )
+        with self.assertNumQueries(context_query_count):
+            tva = IPTTTVAReportSerializer.load_report_data(context=context)[frequency]
         if tva_only:
             return tva
         if no_tva_full:
             return tp, tva
-        with self.assertNumQueries(FULL_REPORT_QUERIES):
-            filters = IPTTFullReportSerializer.get_report_filters(base_filters, program_pk)
-            full = IPTTFullReportSerializer.load_report_data(
-                report_context=context, report_filters=filters
-            )
+        with self.assertNumQueries(context_query_count):
+            full = IPTTFullReportSerializer.load_report_data(context=context)[frequency]
         return tp, tva, full
 
     def test_one_indicator_with_one_result(self):
@@ -873,87 +873,6 @@ class TestIPTTSerializedReportData(test.TestCase, DecimalComparator):
                         self.assertIsNone(period['disaggregations'][all_ones_label]['actual'])
                         self.assertIsNone(period['disaggregations'][one_off_label]['actual'])
 
-    def test_loads_only_frequency_indicators_in_tva_report(self):
-        frequency_indicators = {
-            freq: [] for freq in range(1, 8)
-        }
-        for indicator in self.i_gen.all_frequencies_indicators(event=False):
-            frequency_indicators[indicator.target_frequency].append(indicator.pk)
-        for frequency, indicator_pks in frequency_indicators.items():
-            report = self.get_serialized_report_data(frequency=frequency, tva_only=True)
-            with self.assertNumQueries(0):
-                self.assertCountEqual(report.keys(), indicator_pks)
-
-    def test_loads_only_sites_indicators(self):
-        indicators = self.i_gen.sites_indicators(target_frequency=Indicator.ANNUAL, targets=1000)
-        expected_pks = []
-        no_filters = []
-        for indicator in indicators:
-            no_filters.append(indicator.pk)
-            if any([s.pk == self.i_gen.sites[0].pk for r in indicator.result_set.all() for s in r.site.all()]):
-                expected_pks.append(indicator.pk)
-        for c, report in enumerate(self.get_serialized_report_data(filters={'sites': [self.i_gen.sites[0].pk]})):
-            with self.assertNumQueries(0):
-                if c == 2:
-                    # Full TVA report, no filters
-                    self.assertCountEqual(report.keys(), no_filters)
-                else:
-                    self.assertCountEqual(report.keys(), expected_pks)
-
-    def test_filters_indicators(self):
-        expected_sectors = []
-        expected_indicator_types = []
-        expected_standard_disaggs = []
-        expected_country_disaggs = []
-        indicators = self.i_gen.all_filters_indicators(target_frequency=Indicator.ANNUAL, targets=1200, results=True)
-        no_filters = []
-        pk_filters = []
-        standard_label_pks = [l.pk for l in self.i_gen.standard_disaggs[0].labels]
-        country_label_pks = [l.pk for l in self.i_gen.country_disaggs[0].labels]
-        for c, indicator in enumerate(indicators):
-            no_filters.append(indicator.pk)
-            if c < 3:
-                pk_filters.append(indicator.pk)
-            if indicator.sector and indicator.sector.pk == self.i_gen.sectors[0].pk:
-                expected_sectors.append(indicator.pk)
-            if any(it.pk == self.i_gen.indicator_types[0].pk for it in indicator.indicator_type.all()):
-                expected_indicator_types.append(indicator.pk)
-            if any(d.pk == self.i_gen.standard_disaggs[0].pk for d in indicator.disaggregation.all()):
-                expected_standard_disaggs.append(indicator.pk)
-            if any(d.pk == self.i_gen.country_disaggs[0].pk for d in indicator.disaggregation.all()):
-                expected_country_disaggs.append(indicator.pk)
-        for report in self.get_serialized_report_data(filters={'sectors': [self.i_gen.sectors[0].pk]}, no_tva_full=True):
-            with self.assertNumQueries(0):
-                self.assertCountEqual(report.keys(), expected_sectors)
-        for report in self.get_serialized_report_data(filters={'disaggregations': [self.i_gen.standard_disaggs[0].pk]}, no_tva_full=True):
-            with self.assertNumQueries(0):
-                self.assertCountEqual(report.keys(), expected_standard_disaggs)
-                for indicator_report in report.values():
-                    self.assertCountEqual(
-                        indicator_report['lop_period']['disaggregations'].keys(),
-                        standard_label_pks
-                    )
-        for report in self.get_serialized_report_data(filters={'disaggregations': [self.i_gen.country_disaggs[0].pk]}, no_tva_full=True):
-            with self.assertNumQueries(0):
-                self.assertCountEqual(report.keys(), expected_country_disaggs)
-        for report in self.get_serialized_report_data(filters={'types': [self.i_gen.indicator_types[0].pk]}, no_tva_full=True):
-            with self.assertNumQueries(0):
-                self.assertCountEqual(report.keys(), expected_indicator_types)
-        for report in self.get_serialized_report_data(
-            filters={
-                'types': [self.i_gen.indicator_types[0].pk],
-                'disaggregations': [self.i_gen.country_disaggs[0].pk, self.i_gen.standard_disaggs[0].pk],
-                'sectors': [self.i_gen.sectors[0].pk]
-            }, no_tva_full=True):
-            with self.assertNumQueries(0):
-                self.assertCountEqual(
-                    report.keys(),
-                    list(set(expected_indicator_types) & set(expected_standard_disaggs + expected_country_disaggs) & set(expected_sectors))
-                )
-        for report in self.get_serialized_report_data(filters={'indicators': pk_filters}, no_tva_full=True):
-            with self.assertNumQueries(0):
-                self.assertCountEqual(report.keys(), pk_filters)
-
     def test_start_and_end_period_filters(self):
         indicator_pks = {}
         for indicator in self.i_gen.two_results_per_semi_annual_indicators():
@@ -1064,37 +983,6 @@ class TestIPTTSerializedReportData(test.TestCase, DecimalComparator):
                     self.assertDecimalEqual(period_data['disaggregations'][on_target_label]['actual'], get_decimal([100, 150, 100][period_counter]))
                     self.assertDecimalEqual(period_data['disaggregations'][decimal_value_label]['actual'], get_decimal([5.15, 10.3, 5.15][period_counter]))
             tva = True
-
-    def test_contexts(self):
-        indicators = list(self.i_gen.different_disaggregated_result_measurement_type_indicators())
-        program_pk = self.i_gen.program.pk
-        frequency = Indicator.SEMI_ANNUAL
-        filters = {}
-        context_query_count = REPORT_CONTEXT_QUERIES + RESULTS_CONTEXT_QUERIES
-        with self.assertNumQueries(context_query_count):
-            context = self.get_context(program_pk=program_pk, frequency=frequency, filters=filters)
-        base_context = IPTTTPReportSerializer._get_base_context(program_pk)
-        program_data = IPTTTPReportSerializer.load_program_data(program_pk, program_context=base_context).data
-        tp_contexts = IPTTTPReportSerializer._report_data_context(
-            [frequency], program_data
-        )
-        self.assertIn(Indicator.SEMI_ANNUAL, tp_contexts)
-        tp_context = tp_contexts[Indicator.SEMI_ANNUAL]
-        keys = ['frequency', 'periods', 'results', 'targets']
-        for key in keys:
-            self.assertIn(key, tp_context)
-            self.assertEqual(context[key], tp_context[key])
-        expected_report_data = self.get_serialized_report_data(frequency=Indicator.SEMI_ANNUAL)
-        tp_report = IPTTTPReportSerializer.get_context(program_pk, [frequency], filters=filters)
-        self.assertIn('report_data', tp_report)
-        self.assertIn(Indicator.SEMI_ANNUAL, tp_report['report_data'])
-        tp_report_data = tp_report['report_data'][Indicator.SEMI_ANNUAL]
-        self.assertCountEqual(expected_report_data[0].keys(), tp_report_data.keys())
-        tva_report = IPTTTVAReportSerializer.get_context(program_pk, [frequency], filters=filters)
-        self.assertIn('report_data', tva_report)
-        self.assertIn(Indicator.SEMI_ANNUAL, tva_report['report_data'])
-        tva_report_data = tva_report['report_data'][Indicator.SEMI_ANNUAL]
-        self.assertCountEqual(expected_report_data[1].keys(), tva_report_data.keys())
 
     def test_lop_only_indicator(self):
         indicator = self.i_gen.lop_only_indicator_with_results()

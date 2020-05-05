@@ -70,10 +70,12 @@ class ProgramPageIndicatorMixin:
 
     # Serializer method fields:
 
-    def get_has_results(self, indicator):
+    @staticmethod
+    def get_has_results(indicator):
         return indicator.results_count > 0
 
-    def get_missing_evidence(self, indicator):
+    @staticmethod
+    def get_missing_evidence(indicator):
         return indicator.results_count > 0 and indicator.results_with_evidence_count < indicator.results_count
 
 

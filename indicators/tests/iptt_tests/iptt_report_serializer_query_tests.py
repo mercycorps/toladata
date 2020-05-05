@@ -68,16 +68,16 @@ class IPTTReportSerializerQueriesMixin:
         return self.report_queries + self.context_queries + PROGRAM_QUERIES
 
     def program_query_tests(self):
-        program_context = {
+        rf_context = {
             'tiers': self.tiers,
             'levels': self.levels
         }
         with self.assertNumQueries(PROGRAM_QUERIES):
-            data = self.serializer.load_program_data(self.program.pk, program_context=program_context).data
-            self.assertEqual(data['name'], "Program Name!!")
-            assert data['reporting_period_start_iso'] is not None
-            assert data['reporting_period_end_iso'] is not None
-            self.assertEqual(len(data['levels']), 6)
+            data = self.serializer._get_program_context({'program_pk': self.program.pk, **rf_context})
+            self.assertEqual(data['program']['name'], "Program Name!!")
+            assert data['program']['reporting_period_start_iso'] is not None
+            assert data['program']['reporting_period_end_iso'] is not None
+            self.assertEqual(len(data['program']['levels']), 6)
 
     def context_data_query_tests(self, frequency=Indicator.ANNUAL):
         with self.assertNumQueries(self.context_queries + PROGRAM_QUERIES):

@@ -1,9 +1,12 @@
+"""Serializers for Level and LevelTier objects for various applications site-wide"""
+
 from indicators.models import LevelTier, Level
 from tola.model_utils import get_serializer
 from rest_framework import serializers
 from django.utils.translation import ugettext as _
 
 class TierBaseSerializerMixin:
+    """Serializer component for LevelTier objects for basic data needed in most applications"""
     name = serializers.SerializerMethodField()
 
     class Meta:
@@ -28,11 +31,13 @@ class TierBaseSerializerMixin:
         context = kwargs.get('context', {})
         return cls(cls._get_queryset().filter(program_id=program_pk), context=context, many=True)
 
-    def get_name(self, tier):
+    @staticmethod
+    def get_name(tier):
         return _(tier.name)
 
 
 class LevelBaseSerializerMixin:
+    """Serializer component for Level objects for basic data needed in most applications"""
     ontology = serializers.SerializerMethodField()
     tier_name = serializers.SerializerMethodField()
     name = serializers.SerializerMethodField()
@@ -47,6 +52,8 @@ class LevelBaseSerializerMixin:
             'tier_name',
             'parent_id'
         ]
+
+    # class methods used to instantiate serializer with minimal queries
 
     @classmethod
     def _get_query_fields(cls):
@@ -64,13 +71,15 @@ class LevelBaseSerializerMixin:
         filters = {**kwargs.get('filters', {}), 'program_id': program_pk}
         return cls(cls._get_queryset(filters=filters), context=context, many=True)
 
+    # helper methods for serializer method fields - mostly to avoid querying database when traversing related objects
+
     def _get_tiers(self, level):
         if hasattr(self, 'context') and 'tiers' in self.context:
             return self.context['tiers']
         return level.program.level_tiers.all()
 
     def _get_levels(self, level):
-        if hasattr(self, 'parent'):
+        if hasattr(self, 'parent'): # initiated with "many=True" - parent instance will be levels queryset
             return self.parent.instance
         if hasattr(self, 'context') and 'levels' in self.context:
             return self.context['levels']
@@ -95,6 +104,8 @@ class LevelBaseSerializerMixin:
             return tiers[self._get_level_depth(level) - 1]
         return None
 
+    # serializer method fields:
+
     def get_ontology(self, level):
         target = level
         ontology = []
@@ -108,11 +119,13 @@ class LevelBaseSerializerMixin:
             return self._get_level_tier(level).get('name', '')
         return None
 
-    def get_name(self, level):
+    @staticmethod
+    def get_name(level):
         return level.name
 
 
 class IPTTLevelMixin:
+    """Mixin adding IPTT-specific level data to Level serializer object"""
     tier_pk = serializers.SerializerMethodField()
     tier_depth = serializers.SerializerMethodField(method_name='_get_level_depth')
     chain_pk = serializers.SerializerMethodField()

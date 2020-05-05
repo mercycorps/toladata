@@ -47,7 +47,7 @@ class DecimalDisplayField(serializers.DecimalField):
         return None
 
 
-class ContextField(serializers.Field):
+class ContextField(serializers.ReadOnlyField):
     """Retrieves a value from the parent serializer's context and returns it"""
     def __init__(self, context_key=None, **kwargs):
         self.context_key = context_key

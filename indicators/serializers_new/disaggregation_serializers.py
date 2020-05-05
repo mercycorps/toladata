@@ -62,14 +62,15 @@ class IPTTDisaggregationJSONMixin:
             'disaggregationlabel_set',
             queryset=DisaggregationLabel.objects.select_related(None).order_by('customsort').only(
                 'pk', 'label', 'customsort', 'disaggregation_type_id'),
-            to_attr='prefetch_categories')
-        ).only('pk', 'disaggregation_type', 'country__country', 'standard')
+            to_attr='prefetch_categories')).only('pk', 'disaggregation_type', 'country__country', 'standard')
         return cls(queryset, many=True)
 
-    def get_labels(self, disagg):
+    @staticmethod
+    def get_labels(disagg):
         return [{'pk': label.pk, 'name': label.label} for label in disagg.prefetch_categories]
 
-    def get_country(self, disagg):
+    @staticmethod
+    def get_country(disagg):
         return disagg.country.country if disagg.country else None
 
 

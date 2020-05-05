@@ -1,8 +1,10 @@
-import dateutil.parser
+"""Serializers which fetch, consolidate, and serialize data for an IPTT report to be consumed by an excel renderer"""
+
 from collections import defaultdict
+import dateutil.parser
 from django.db import models
 from django.utils import timezone
-from django.utils.translation import ugettext as _
+from django.utils.translation import ugettext_lazy as _
 from rest_framework import serializers
 from indicators.models import (
     Indicator,
@@ -22,20 +24,34 @@ from indicators.serializers_new import (
 from workflow.serializers_new.iptt_program_serializers import IPTTExcelProgramSerializer
 from workflow.serializers_new.period_serializers import IPTTExcelPeriod
 from tola.l10n_utils import l10n_date_medium
+from tola.serializers import ContextField
 
+class IPTTReport:
+    def __init__(self, context):
+        self.report_title = _('Indicator Performance Tracking Report')
+        self.report_date_range = u'{} – {}'.format(
+            l10n_date_medium(
+                dateutil.parser.isoparse(context['program']['reporting_period_start_iso']).date(), decode=True),
+            l10n_date_medium(
+                dateutil.parser.isoparse(context['program']['reporting_period_end_iso']).date(), decode=True)
+        )
+        self.program_name = context['program']['name']
+        self.results_framework = context['program']['results_framework']
+        self.frequencies = context['frequencies']
 
 class IPTTReportSerializer(serializers.Serializer):
     """Serializer for an entire IPTT Report - contains report-level data and methods to instance sub-serializers"""
-    report_title = serializers.SerializerMethodField()
-    program_name = serializers.SerializerMethodField()
-    results_framework = serializers.SerializerMethodField()
-    frequencies = serializers.SerializerMethodField()
-    report_date_range = serializers.SerializerMethodField()
+    report_title = serializers.CharField()
+    program_name = serializers.CharField()
+    results_framework = serializers.BooleanField()
+    report_date_range = serializers.CharField()
+    frequencies = serializers.ListField(child=serializers.IntegerField())
     lop_period = serializers.SerializerMethodField()
     periods = serializers.SerializerMethodField()
     level_rows = serializers.SerializerMethodField()
 
     class Meta:
+        purpose = "IPTTReport"
         fields = [
             'report_title',
             'program_name',
@@ -46,130 +62,125 @@ class IPTTReportSerializer(serializers.Serializer):
             'level_rows',
         ]
 
-    @property
-    def filename(self):
-        return f"{self.report_name} {l10n_date_medium(timezone.localtime().date(), decode=True)}.xlsx"
+    # class methods to instantiate serializer with minimal queries:
 
     @classmethod
-    def load_program_data(cls, program_pk, **kwargs):
-        program_context = kwargs.get('program_context', {})
-        return IPTTExcelProgramSerializer.get_for_pk(program_pk, context=program_context)
-
-    @classmethod
-    def load_indicator_data(cls, **kwargs):
-        indicator_context = kwargs.get('indicator_context', {})
-        indicator_filters = kwargs.get('indicator_filters', {})
-        indicators = Indicator.rf_aware_objects.select_related('program').prefetch_related(None).only(
-            'pk', 'name', 'deleted', 'program_id', 'means_of_verification', 'level_id', 'level_order',
-            'number', 'target_frequency', 'unit_of_measure', 'unit_of_measure_type', 'baseline', 'baseline_na',
-            'direction_of_change', 'is_cumulative', 'key_performance_indicator', 'old_level',
-            'create_date', 'sector_id'
-        ).filter(**indicator_filters).order_by().distinct()
-        return IPTTExcelIndicatorSerializer(indicators, context=indicator_context, many=True)
-
-    @classmethod
-    def load_report_indicators(cls, **kwargs):
-        report_filters = kwargs.get('report_filters', {})
-        return Indicator.rf_aware_objects.select_related(None).prefetch_related(None).only(
-            'pk', 'program_id', 'target_frequency', 'unit_of_measure_type', 'is_cumulative', 'level_id', 'lop_target',
-        ).filter(**report_filters).order_by().distinct()
-
-    @classmethod
-    def load_report_data(cls, **kwargs):
-        report_context = kwargs.get('report_context', {})
-        report_filters = kwargs.get('report_filters', {})
-        indicators = kwargs.get('indicators', cls.load_report_indicators(report_filters=report_filters))
-        data = cls.report_serializer(indicators, context=report_context, many=True).data
-        return {report['pk']: report for report in data}
-
-    @classmethod
-    def get_indicator_filters(cls, filters, program_pk=None, **kwargs):
-        indicator_filters = {}
-        if program_pk is not None:
-            indicator_filters['program'] = program_pk
-        if filters.get('sectors', None):
-            indicator_filters['sector__in'] = filters.get('sectors')
-        if filters.get('types', None):
-            indicator_filters['indicator_type__in'] = filters.get('types')
-        if filters.get('indicators', None):
-            indicator_filters['pk__in'] = filters.get('indicators')
-        if filters.get('disaggregations', None):
-            indicator_filters['disaggregation__in'] = filters.get('disaggregations')
-        if filters.get('sites', None):
-            indicator_filters['result__site__in'] = filters.get('sites')
-        if filters.get('levels', None):
-            level_pks = []
-            levels = kwargs.get('context').get('levels')
-            parent_pks = filters.get('levels')
-            while parent_pks:
-                child_pks = [level.pk for level in levels if level.parent_id in parent_pks]
-                level_pks += parent_pks
-                parent_pks = child_pks
-            indicator_filters['level__in'] = level_pks
-        if filters.get('tiers', None):
-            levels = kwargs.get('context').get('levels')
-            filter_levels = []
-            tier_depths = sorted(
-                [tier.tier_depth for tier in kwargs.get('context').get('tiers') if tier.pk in filters.get('tiers')]
-            )
-            this_tier_levels = [level.pk for level in levels if not level.parent_id]
-            depth = 1
-            while this_tier_levels:
-                if depth in tier_depths:
-                    filter_levels += this_tier_levels
-                child_levels = [level.pk for level in levels if level.parent_id in this_tier_levels]
-                this_tier_levels = child_levels
-                depth += 1
-            indicator_filters['level__in'] = filter_levels
-        return indicator_filters
-
-    @classmethod
-    def get_report_filters(cls, *args, **kwargs):
-        if 'frequency' in kwargs:
-            kwargs['frequencies'] = [kwargs.pop('frequency')]
-        return cls.get_indicator_filters(*args, **kwargs)
-
-    @classmethod
-    def _disaggregations_context(cls, program_pk, **kwargs):
+    def get_context(cls, program_pk, frequencies, **kwargs):
+        """Loads context for all included serializers for one IPTT report with no additional queries"""
+        if isinstance(frequencies, int):
+            frequencies = [frequencies]
         filters = kwargs.get('filters', {})
+        # base serializer context:
+        context = cls._get_serializer_context(program_pk, frequencies, filters)
+        # level and tier objects:
+        context.update(cls._get_rf_context(context))
+        # program data (and data required for context fields):
+        context.update(cls._get_program_context(context))
+        # filter data:
+        context.update(cls._get_filter_context(context))
+        # disaggregation context data, needed for indicators and report data:
+        context.update(cls._get_disaggregation_context(context))
+        # indicator label data (filters, names, numbers):
+        context['indicators'] = IPTTExcelIndicatorSerializer.load_filtered(context).data
+        # report data (quantitative data for indicator for this report type and frequency):
+        context['report_data'] = cls.load_report_data(context)
+        return context
+
+    @classmethod
+    def _get_serializer_context(cls, program_pk, frequencies, filters):
+        return {
+            'program_pk': program_pk,
+            'frequencies': sorted([int(frequency) for frequency in frequencies]),
+            'filters': filters,
+            'is_tva': False,
+            'is_tva_full': False
+        }
+
+    @staticmethod
+    def _get_rf_context(context):
+        return {
+            'levels': list(Level.objects.select_related(None).only(
+                'pk', 'name', 'parent_id', 'customsort', 'program_id'
+                ).filter(program_id=context['program_pk'])),
+            'tiers': list(LevelTier.objects.select_related(None).only(
+                'pk', 'name', 'program_id', 'tier_depth'
+                ).filter(program_id=context['program_pk'])),
+        }
+
+    @staticmethod
+    def _get_program_context(context):
+        program_context = {
+            'tier_objects': context.get('tiers', []),
+            'level_objects': context.get('levels', []),
+            'level_order': context.get('filters', {}).get('groupby', None) == 2,
+        }
+        return {
+            'program': IPTTExcelProgramSerializer.load_for_pk(context['program_pk'], context=program_context).data,
+        }
+
+    @staticmethod
+    def _get_filter_context(context):
+        filters = context.get('filters')
+        if not filters or not isinstance(filters, dict):
+            return {}
+        start = filters.get('start', None)
+        end = filters.get('end', None)
+        filter_context = {}
+        if start is not None:
+            filter_context['start'] = start
+        if end is not None:
+            filter_context['end'] = end + 1
+        return filter_context
+
+    @staticmethod
+    def _get_disaggregation_context(context):
+        """Returns three dicts mapping indicators, disaggregations and labels
+
+        Argument:
+            {'program_pk': program_pk:int,
+            'filters' (optional): {'disaggregations': [list of pks to include, filtering others out]}
+            }
+        Returns:
+            {
+                'disaggregations': {disaggregation_type_pk: {'disaggregation': name, 'labels': [label obj...]}},
+                'disaggregations_indicators':
+                    {indicator_pk: {'all': [all disaggregation_type pks for this indicator...],
+                                    'has_results': [disaggregation_type pks with results for this indicator...]}}
+                'labels_indicators_map': {indicator_pk: [all label pks for this indicator...]}
+            }
+        """
         disaggregations_map = {}
-        disaggregation_filters = list(map(int, filters.get('disaggregations', [])))
         disaggregations_indicators = defaultdict(
             lambda: {'all': [], 'with_results': []}
         )
         labels_indicators = defaultdict(list)
-        disaggregation_label_filters = {
-            'disaggregation_type__indicator__program_id': program_pk
+        disaggregation_type_filters = {
+            'indicator__program_id': context['program_pk'],
+            'indicator__pk__isnull': False
         }
-        if disaggregation_filters:
-            disaggregation_label_filters['disaggregation_type__pk__in'] = disaggregation_filters
+        disaggregation_label_filters = {
+            'disaggregation_type__indicator__program_id': context['program_pk']
+        }
+        if 'filters' in context and context['filters'] and 'disaggregations' in context['filters']:
+            disaggregation_pks = list(map(int, context['filters']['disaggregations']))
+            disaggregation_type_filters['pk__in'] = disaggregation_pks
+            disaggregation_label_filters['disaggregation_type__pk__in'] = disaggregation_pks
         for label in DisaggregationLabel.objects.select_related('disaggregation_type').prefetch_related(None).filter(
                 **disaggregation_label_filters
             ).distinct():
             if label.disaggregation_type.pk not in disaggregations_map:
-                disaggregations_map[label.disaggregation_type.pk] = {
-                    'disaggregation': label.disaggregation_type,
-                    'labels': []
-                }
+                disaggregations_map[label.disaggregation_type.pk] = {'disaggregation': label.disaggregation_type,
+                                                                     'labels': []}
             disaggregations_map[label.disaggregation_type.pk]['labels'].append(label)
-        disaggregation_type_filters = {
-            'indicator__program_id': program_pk,
-            'indicator__pk__isnull': False
-        }
-        if disaggregation_filters:
-            disaggregation_type_filters['pk__in'] = disaggregation_filters
         for d_i in DisaggregationType.objects.select_related(None).prefetch_related(None).filter(
-            **disaggregation_type_filters
-        ).values('pk', 'indicator__pk').annotate(has_results=models.Exists(
-            DisaggregatedValue.objects.select_related(None).prefetch_related(
-                None
-            ).filter(
-                category_id__disaggregation_type_id=models.OuterRef('pk'),
-                result__indicator_id=models.OuterRef('indicator__pk'),
-                value__isnull=False
-            )
-        )):
-            if d_i['has_results'] or not filters.get('hide_empty_disagg_categories', False):
+                **disaggregation_type_filters
+            ).values('pk', 'indicator__pk').annotate(has_results=models.Exists(
+                DisaggregatedValue.objects.select_related(None).prefetch_related(None).filter(
+                    category_id__disaggregation_type_id=models.OuterRef('pk'),
+                    result__indicator_id=models.OuterRef('indicator__pk'),
+                    value__isnull=False
+                ))):
+            if d_i['has_results'] or not context.get('filters', {}).get('hide_empty_disagg_categories', False):
                 disaggregations_indicators[d_i['indicator__pk']]['all'].append(d_i['pk'])
                 label_pks = [label.pk for label in disaggregations_map.get(d_i['pk'], {}).get('labels', [])]
                 labels_indicators[d_i['indicator__pk']] += label_pks
@@ -182,121 +193,77 @@ class IPTTReportSerializer(serializers.Serializer):
         }
 
     @classmethod
-    def _get_base_context(cls, program_pk):
-        return {
-            'levels': list(Level.objects.select_related(None).only(
-                'pk', 'name', 'parent_id', 'customsort', 'program_id'
-                ).filter(program_id=program_pk)),
-            'tiers': list(LevelTier.objects.select_related(None).only(
-                'pk', 'name', 'program_id', 'tier_depth'
-                ).filter(program_id=program_pk)),
-        }
+    def load_report_data(cls, context):
+        report_data_contexts = cls._report_data_context(context)
+        filters = {'pk__in': [indicator['pk'] for indicator in context['indicators']]}
+        report_indicators = list(cls.load_report_indicators(filters))
+        report_data = {}
+        for frequency in context['frequencies']:
+            report_context = report_data_contexts[frequency]
+            indicators = list(report_indicators)
+            if cls.is_tva:
+                indicators = [indicator for indicator in indicators if indicator.target_frequency == frequency]
+            data = cls.report_serializer(indicators, context=report_context, many=True).data
+            report_data[frequency] = {report['pk']: report for report in data}
+        return report_data
 
-    @classmethod
-    def _report_data_context(cls, frequencies, program_data, **kwargs):
-        filters = kwargs.get('filters', {})
+    @staticmethod
+    def load_report_indicators(filters):
+        return Indicator.rf_aware_objects.select_related(None).prefetch_related(None).only(
+            'pk', 'program_id', 'target_frequency', 'unit_of_measure_type', 'is_cumulative', 'level_id', 'lop_target',
+        ).filter(**filters).order_by().distinct()
+
+
+    @staticmethod
+    def _report_data_context(context):
+        filters = context.get('filters', {})
         reporting_period = (
-            dateutil.parser.isoparse(program_data['reporting_period_start_iso']).date(),
-            dateutil.parser.isoparse(program_data['reporting_period_end_iso']).date()
+            dateutil.parser.isoparse(context['program']['reporting_period_start_iso']).date(),
+            dateutil.parser.isoparse(context['program']['reporting_period_end_iso']).date()
         )
         report_context = {'coerce_to_string': False}
         result_map = defaultdict(list)
         for result in Result.objects.select_related('periodic_target').prefetch_related(None).filter(
-            indicator__program_id=program_data['pk']
-        ).order_by('indicator_id').prefetch_related(
-            models.Prefetch(
-                'disaggregatedvalue_set',
-                queryset=DisaggregatedValue.objects.select_related(None).prefetch_related(None).filter(
-                    **{'value__isnull': False,
-                     **({'category__disaggregation_type__id__in': filters.get('disaggregations')}
-                        if 'disaggregations' in filters else {}),}).only('result_id', 'category_id', 'value'),
-                to_attr='prefetch_disaggregated_values'
-            )
-        ):
+                indicator__program_id=context['program']['pk']
+            ).order_by('indicator_id').prefetch_related(
+                models.Prefetch(
+                    'disaggregatedvalue_set',
+                    queryset=DisaggregatedValue.objects.select_related(None).prefetch_related(None).filter(
+                        **{'value__isnull': False,
+                           **({'category__disaggregation_type__id__in': filters.get('disaggregations')}
+                              if 'disaggregations' in filters else {}),}).only('result_id', 'category_id', 'value'),
+                    to_attr='prefetch_disaggregated_values'
+                )
+            ):
             result_map[result.indicator_id].append(result)
         targets_map = defaultdict(list)
         for target in PeriodicTarget.objects.select_related(None).prefetch_related(None).filter(
-            indicator__program_id=program_data['pk']
-        ).only('indicator_id', 'pk', 'customsort', 'target'):
+                indicator__program_id=context['program']['pk']
+            ).only('indicator_id', 'pk', 'customsort', 'target'):
             targets_map[target.indicator_id].append(target)
-        for frequency in frequencies:
-            frequency_context = {'frequency': frequency}
+        for frequency in context['frequencies']:
+            frequency_context = {
+                'frequency': frequency,
+                'labels_indicators_map': context['labels_indicators_map']
+            }
             periods = (list(PeriodicTarget.generate_for_frequency(frequency)(*reporting_period))
                        if frequency != Indicator.LOP else [])
-            end_period = (filters['end'] + 1) if filters.get('end', None) else len(periods)
+            end_period = (filters['end'] + 1) if (filters.get('end') is not None) else len(periods)
             frequency_context['periods'] = periods[filters.get('start', 0):end_period]
             frequency_context['results'] = result_map
             frequency_context['targets'] = targets_map
             report_context[frequency] = frequency_context
         return report_context
 
-    @classmethod
-    def get_context(cls, program_pk, frequencies, **kwargs):
-        filters = kwargs.get('filters', {})
-        if type(frequencies) == int:
-            frequencies = [frequencies]
-        context = {}
-        base_context = cls._get_base_context(program_pk)
-        program_context = {**base_context}
-        if filters.get('groupby', None) == 2:
-            program_context['level_order'] = True
-        if filters.get('start', None):
-            context['start'] = filters.get('start')
-        if filters.get('end', None):
-            context['end'] = filters.get('end') + 1
-        context['program'] = cls.load_program_data(program_pk, program_context=program_context).data
-        context['frequencies'] = [int(frequency) for frequency in frequencies]
-        disaggregations_context = cls._disaggregations_context(program_pk, filters=filters)
-        indicator_context = {
-            **base_context,
-            **disaggregations_context
-        }
-        indicator_filters = cls.get_indicator_filters(
-            filters, program_pk, frequencies=frequencies, context=base_context
-        )
-        context['indicators'] = cls.load_indicator_data(
-            indicator_context=indicator_context,
-            indicator_filters=indicator_filters
-        ).data
-        report_data_contexts = cls._report_data_context(frequencies, context['program'], filters=filters)
-        report_indicators = list(cls.load_report_indicators(report_filters=indicator_filters))
-        context['report_data'] = {}
-        for frequency in frequencies:
-            report_context = {
-                **report_data_contexts[frequency],
-                **disaggregations_context
-            }
-            indicators = list(report_indicators)
-            if cls.is_tva:
-                indicators = list(filter(lambda indicator: indicator.target_frequency == frequency, indicators))
-            context['report_data'][frequency] = cls.load_report_data(
-                report_context=report_context, indicators=indicators
-            )
-        return context
-
-    def get_report_title(self, obj):
-        return _('Indicator Performance Tracking Report')
-
-    def get_program_name(self, obj):
-        return self.context['program']['name']
-
-    def get_results_framework(self, obj):
-        return self.context['program']['results_framework']
-
-    def get_frequencies(self, obj):
-        return sorted(self.context['frequencies'])
+    @property
+    def filename(self):
+        return f"{self.report_name} {l10n_date_medium(timezone.localtime().date(), decode=True)}.xlsx"
 
     @property
     def reporting_periods(self):
         return (
             dateutil.parser.isoparse(self.context['program']['reporting_period_start_iso']).date(),
             dateutil.parser.isoparse(self.context['program']['reporting_period_end_iso']).date()
-        )
-
-    def get_report_date_range(self, obj):
-        return u'{} – {}'.format(
-            l10n_date_medium(self.reporting_periods[0], decode=True),
-            l10n_date_medium(self.reporting_periods[1], decode=True)
         )
 
     def get_lop_period(self, obj):
@@ -311,8 +278,8 @@ class IPTTReportSerializer(serializers.Serializer):
         end = self.context.get('end', len(periods))
         return periods[start:end]
 
-    def get_periods(self, obj):
-        frequencies = self.context['frequencies']
+    def get_periods(self, report):
+        frequencies = list(report.frequencies)
         periods = {}
         if Indicator.LOP in frequencies:
             frequencies = [f for f in frequencies if f is not Indicator.LOP]
@@ -370,7 +337,6 @@ class IPTTReportSerializer(serializers.Serializer):
                     'indicators': indicators
                 }
         if not has_indicators:
-            self.context['frequencies'].remove(frequency)
             return None
 
     def get_level_rows(self, obj):
@@ -394,7 +360,8 @@ class IPTTTPReportSerializer(IPTTReportSerializer):
         frequency = kwargs.get('frequency', Indicator.MONTHLY)
         filters = kwargs.get('filters', {})
         context = cls.get_context(program_pk, [frequency,], filters=filters)
-        return cls({}, context=context)
+        report = IPTTReport(context)
+        return cls(report, context=context)
 
     def _get_frequency_indicators(self, frequency, level_pk=None):
         if level_pk is None:
@@ -416,14 +383,15 @@ class IPTTTVAReportSerializer(IPTTReportSerializer):
         frequency = kwargs.get('frequency', Indicator.LOP)
         filters = kwargs.get('filters', {})
         context = cls.get_context(program_pk, [frequency,], filters=filters)
-        return cls({}, context=context)
+        report = IPTTReport(context)
+        return cls(report, context=context)
 
     @classmethod
-    def get_indicator_filters(cls, filters, program_pk=None, **kwargs):
-        indicator_filters = super().get_indicator_filters(filters, program_pk, **kwargs)
-        if 'frequencies' in kwargs:
-            indicator_filters['target_frequency__in'] = kwargs.get('frequencies')
-        return indicator_filters
+    def _get_serializer_context(cls, program_pk, frequencies, filters):
+        return {
+            **super()._get_serializer_context(program_pk, frequencies, filters),
+            'is_tva': True,
+        }
 
 
 class IPTTFullReportSerializer(IPTTReportSerializer):
@@ -444,11 +412,13 @@ class IPTTFullReportSerializer(IPTTReportSerializer):
     def load_report(cls, program_pk, **kwargs):
         filters = kwargs.get('filters', {})
         context = cls.get_context(program_pk, cls.all_frequencies, filters=filters)
-        return cls({}, context=context)
+        report = IPTTReport(context)
+        return cls(report, context=context)
 
     @classmethod
-    def get_indicator_filters(cls, filters, program_pk=None, **kwargs):
-        indicator_filters = {}
-        if program_pk:
-            indicator_filters['program'] = program_pk
-        return indicator_filters
+    def _get_serializer_context(cls, program_pk, frequencies, filters):
+        return {
+            **super()._get_serializer_context(program_pk, frequencies, filters),
+            'is_tva': True,
+            'is_tva_full': True
+        }

@@ -98,13 +98,16 @@ class IPTTIndicatorFiltersMixin:
         )
         return qs
 
-    def get_indicator_type_pks(self, indicator):
+    @staticmethod
+    def get_indicator_type_pks(indicator):
         return sorted(set(it.pk for it in indicator.prefetch_indicator_type_pks))
 
-    def get_site_pks(self, indicator):
+    @staticmethod
+    def get_site_pks(indicator):
         return sorted(set(site.pk for result in indicator.prefetch_results for site in result.prefetch_site_pks))
 
-    def get_disaggregation_pks(self, indicator):
+    @staticmethod
+    def get_disaggregation_pks(indicator):
         return sorted(set(disaggregation_type.pk for disaggregation_type in indicator.prefetch_disaggregation_pks))
 
 
@@ -133,6 +136,54 @@ class IPTTExcelIndicatorFiltersMixin:
             'disaggregations',
             'no_rf_level',
         ]
+
+    # class methods to aid in instantiating with minimal queries:
+
+    @staticmethod
+    def _get_queryset_filters(context):
+        levels = context.get('levels', [])
+        tiers = context.get('tiers', [])
+        filters = context.get('filters', {})
+        query_filters = {'program': context['program_pk']}
+        if context['is_tva_full']:
+            return query_filters
+        elif context['is_tva']:
+            query_filters['target_frequency__in'] = context['frequencies']
+        for (filter_key, query_name) in [('sectors', 'sector__in'), ('types', 'indicator_type__in'),
+            ('indicators', 'pk__in'), ('disaggregations', 'disaggregation__in'), ('sites', 'result__site__in')]:
+            if filter_key in filters and isinstance(filters[filter_key], list):
+                query_filters[query_name] = filters[filter_key]
+        if 'levels' in filters and isinstance(filters['levels'], list):
+            level_pks = []
+            parent_pks = filters.get('levels')
+            while parent_pks:
+                child_pks = [level.pk for level in levels if level.parent_id in parent_pks]
+                level_pks += parent_pks
+                parent_pks = child_pks
+            query_filters['level__in'] = level_pks
+        elif 'tiers' in filters and isinstance(filters['tiers'], list):
+            filter_levels = []
+            tier_depths = sorted([tier.tier_depth for tier in tiers if tier.pk in filters.get('tiers')])
+            this_tier_levels = [level.pk for level in levels if not level.parent_id]
+            depth = 1
+            while this_tier_levels:
+                if depth in tier_depths:
+                    filter_levels += this_tier_levels
+                child_levels = [level.pk for level in levels if level.parent_id in this_tier_levels]
+                this_tier_levels = child_levels
+                depth += 1
+            query_filters['level__in'] = filter_levels
+        return query_filters
+
+    @classmethod
+    def load_filtered(cls, context):
+        queryset = Indicator.rf_aware_objects.select_related('program').prefetch_related(None).only(
+            'pk', 'name', 'deleted', 'program_id', 'means_of_verification', 'level_id', 'level_order',
+            'number', 'target_frequency', 'unit_of_measure', 'unit_of_measure_type', 'baseline', 'baseline_na',
+            'direction_of_change', 'is_cumulative', 'key_performance_indicator', 'old_level',
+            'create_date', 'sector_id'
+        ).filter(**cls._get_queryset_filters(context)).order_by().distinct()
+        return cls(queryset, context=context, many=True)
 
     # helper methods for serializer method fields:
 
@@ -181,8 +232,9 @@ class IPTTExcelIndicatorFiltersMixin:
             IPTTExcelDisaggregationSerializer(disaggregation_objects, context=disaggregation_context, many=True).data,
             key=operator.itemgetter('name'))
 
-    def get_no_rf_level(self, indicator):
-        return not indicator.results_framework or not indicator.level_id
+    @staticmethod
+    def get_no_rf_level(indicator):
+        return not (indicator.results_framework and indicator.level_id)
 
 
 IPTTExcelIndicatorSerializer = get_serializer(
@@ -218,7 +270,8 @@ class IPTTIndicatorReportBase:
 
     # Helper methods for serializer method fields:
 
-    def _disaggregations_dict(self, values=None):
+    @staticmethod
+    def _disaggregations_dict(values=None):
         """Makes a dict with a default that will avoid key errors and return None for any unfilled dvs
             method instead of function to allow for overriding when disaggregated targets happen"""
         if values is None:
@@ -239,8 +292,7 @@ class IPTTIndicatorReportBase:
                           if result.date_collected >= period_dict['start']]
         if period_results and any(result.achieved is not None for result in period_results):
             return past_results if indicator.is_cumulative else period_results
-        else:
-            return []
+        return []
 
     def _get_results_totals(self, indicator, results):
         """Return result totals (achieved/disaggregated-values) for a given set of results"""
@@ -312,6 +364,7 @@ class IPTTJSONReportMixin:
 
     @classmethod
     def get_filters(cls, program_pk, frequency):
+        """unused args to match overridden method signature"""
         filters = {'program_id': program_pk}
         return filters
 
@@ -334,24 +387,24 @@ class IPTTJSONReportMixin:
         result_map = defaultdict(list)
         result_filters = {f"indicator__{key}": value for key, value in filters.items()}
         for result in Result.objects.select_related('periodic_target').prefetch_related(None).filter(
-            **result_filters
-        ).order_by('indicator_id').prefetch_related(models.Prefetch(
-            'disaggregatedvalue_set',
-            queryset=DisaggregatedValue.objects.filter(value__isnull=False).select_related(None).only(
-                'result_id', 'category_id', 'value'),
-            to_attr='prefetch_disaggregated_values')):
+                **result_filters
+            ).order_by('indicator_id').prefetch_related(models.Prefetch(
+                'disaggregatedvalue_set',
+                queryset=DisaggregatedValue.objects.filter(value__isnull=False).select_related(None).only(
+                    'result_id', 'category_id', 'value'),
+                to_attr='prefetch_disaggregated_values')):
             result_map[result.indicator_id].append(result)
         context['results'] = result_map
         targets_map = defaultdict(list)
         for target in PeriodicTarget.objects.select_related(None).prefetch_related(None).filter(
-            indicator__program_id=program_data.pk
-        ).only('indicator_id', 'pk', 'customsort', 'target'):
+                indicator__program_id=program_data.pk
+            ).only('indicator_id', 'pk', 'customsort', 'target'):
             targets_map[target.indicator_id].append(target)
         context['targets'] = targets_map
         labels_indicators = defaultdict(list)
         for label in DisaggregationLabel.objects.select_related('disaggregation_type').prefetch_related(None).filter(
-            disaggregation_type__indicator__program_id=program_pk
-        ).values('pk', 'disaggregation_type__indicator__pk').distinct():
+                disaggregation_type__indicator__program_id=program_pk
+            ).values('pk', 'disaggregation_type__indicator__pk').distinct():
             labels_indicators[label['disaggregation_type__indicator__pk']].append(label['pk'])
         context['labels_indicators_map'] = labels_indicators
         return context
@@ -408,33 +461,28 @@ class IPTTTVAReportMixin:
                                if result.periodic_target_id == midline_target.pk and result.achieved is not None]
             if period_dict['customsort'] == 0:
                 return midline_results
-            else:
-                endline_target = [target for target in self._get_all_targets(indicator) if target.customsort == 1][0]
-                endline_results = [result for result in self._get_all_results(indicator)
-                                   if result.periodic_target_id == endline_target.pk and result.achieved is not None]
-                if not endline_results:
-                    return []
-                return midline_results + endline_results if indicator.is_cumulative else endline_results
-        else:
-            targets = sorted(
-                [target for target in self._get_all_targets(indicator)
-                 if target.customsort <= period_dict['customsort']],
-                key=operator.attrgetter('customsort'))
-            if not targets:
+            endline_target = [target for target in self._get_all_targets(indicator) if target.customsort == 1][0]
+            endline_results = [result for result in self._get_all_results(indicator)
+                               if result.periodic_target_id == endline_target.pk and result.achieved is not None]
+            if not endline_results:
                 return []
-            period_target = targets[-1]
-            if period_target.customsort != period_dict['customsort']:
-                return []
-            period_results = [result for result in self._get_all_results(indicator)
-                              if (result.periodic_target == period_target and result.achieved is not None)]
-            if not period_results:
-                return []
-            if not indicator.is_cumulative:
-                return period_results
-            else:
-                return [result for result in self._get_all_results(indicator)
-                                 if (result.periodic_target.pk in [t.pk for t in targets]
-                                     and result.achieved is not None)]
+            return midline_results + endline_results if indicator.is_cumulative else endline_results
+        targets = sorted(
+            [target for target in self._get_all_targets(indicator) if target.customsort <= period_dict['customsort']],
+            key=operator.attrgetter('customsort'))
+        if not targets:
+            return []
+        period_target = targets[-1]
+        if period_target.customsort != period_dict['customsort']:
+            return []
+        period_results = [result for result in self._get_all_results(indicator)
+                          if (result.periodic_target == period_target and result.achieved is not None)]
+        if not period_results:
+            return []
+        if not indicator.is_cumulative:
+            return period_results
+        return [result for result in self._get_all_results(indicator)
+                if (result.periodic_target.pk in [t.pk for t in targets] and result.achieved is not None)]
 
     def _get_period(self, indicator, period_dict):
         """overrides parent method to add target and % met data to serialized period data"""
