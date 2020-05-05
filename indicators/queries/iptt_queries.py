@@ -1,7 +1,7 @@
 """Querymanagers and proxymodels to abstract complex queries on indicator models
 
 """
-
+import decimal
 from indicators.models import (
     Indicator,
     Level,
@@ -130,9 +130,10 @@ class IPTTIndicatorQueryset(models.QuerySet, IndicatorSortingQSMixin):
 
 
     def apply_filters(self, levels=None, sites=None, types=None,
-                      sectors=None, indicators=None, old_levels=False):
+                      sectors=None, indicators=None, old_levels=False,
+                      disaggregations=None):
         qs = self.all()
-        if not any([levels, sites, types, sectors, indicators]):
+        if not any([levels, sites, types, sectors, indicators, disaggregations, old_levels]):
             return qs
         # if levels (add after Satsuma integration)
         if sites:
@@ -156,6 +157,8 @@ class IPTTIndicatorQueryset(models.QuerySet, IndicatorSortingQSMixin):
         else:
             if levels:
                 qs = qs.filter(level__in=levels)
+        if disaggregations:
+            qs = qs.filter(disaggregation__in=disaggregations)
         qs = qs.distinct()
         return qs
 
@@ -260,6 +263,12 @@ class IPTTIndicator(Indicator):
     @property
     def lop_met_target(self):
         return str(int(round(float(self.lop_actual_sum)*100/self.lop_target_sum))) + "%"
+
+    @property
+    def lop_met_target_decimal(self):
+        return decimal.Decimal(float(self.lop_actual_sum)/float(self.lop_target_sum)).quantize(
+            decimal.Decimal('0.01')
+        )
 
     @property
     def lop_target_real(self):

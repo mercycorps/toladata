@@ -17,10 +17,6 @@
 
 from django import test
 
-from indicators.serializers_new import (
-    IPTTTVAReportIndicatorSerializer,
-    IPTTTPReportIndicatorSerializer
-)
 from indicators.models import Indicator, PeriodicTarget
 from indicators.queries.iptt_queries import IPTTIndicator
 from factories import (
@@ -99,9 +95,8 @@ class TestIPTTIndicatorQuerysetPrefetch(test.TestCase):
             [[], [10,], [20,], [10,], [20,], [30,], [40,], [120,]],
             [[], [10, None], [20, None], [10, None], [10, 10], [20, 10], [20, 20], [60, 60]],
             [[], [10, None, None], [20, None, None], [10, None, None], [10, 10, None],
-                [10, 10, 10], [20, 10, 10], [40, 40, 40]]
+             [10, 10, 10], [20, 10, 10], [40, 40, 40]]
         ]
-        
 
     def test_indicator_queryset_queries_one_indicator(self):
         filters = {'pk': self.indicators[0].pk}
@@ -151,7 +146,6 @@ class TestIPTTIndicatorQuerysetPrefetch(test.TestCase):
                             getattr(indicator, f'disaggregation_{category_pk}_frequency_{frequency}_period_{c}'),
                             2 if c == 0 else None
                         )
-        self.assertTrue(True)
 
     def test_indicator_queryset_queries_two_indicators(self):
         filters = {'pk__in': [self.indicators[0].pk, self.indicators[1].pk]}
@@ -182,7 +176,7 @@ class TestIPTTIndicatorQuerysetPrefetch(test.TestCase):
                 ).with_disaggregation_lop_annotations(self.category_pks).with_frequency_annotations(
                     frequency, self.program.reporting_period_start, self.program.reporting_period_end,
                 )]
-                for c, indicator in enumerate(indicators):
+                for indicator in indicators:
                     self.assertEqual(getattr(indicator, 'frequency_{}_count'.format(frequency)), period_count)
                     for c in range(period_count):
                         achieved = getattr(indicator, 'frequency_{}_period_{}'.format(frequency, c))
@@ -205,7 +199,7 @@ class TestIPTTIndicatorQuerysetPrefetch(test.TestCase):
                     for c in range(period_count):
                         for category_pk in self.category_pks:
                             d_value = getattr(
-                                indicator,  f'disaggregation_{category_pk}_frequency_{frequency}_period_{c}'
+                                indicator, f'disaggregation_{category_pk}_frequency_{frequency}_period_{c}'
                             )
                             if frequency in [1, 2, 3, 4, 5]:
                                 expected = self.period_results[frequency][indicator.target_frequency][c]
@@ -214,9 +208,7 @@ class TestIPTTIndicatorQuerysetPrefetch(test.TestCase):
                                 self.assertEqual(
                                     d_value, expected
                                 )
-        self.assertTrue(True)
-                    
-        
+
     def test_indicator_queryset_queries_multiple_indicators(self):
         filters = {'program': self.program}
         for queryset in [TP_QUERYSET, TVA_QUERYSET]:
@@ -247,7 +239,7 @@ class TestIPTTIndicatorQuerysetPrefetch(test.TestCase):
                 ).with_disaggregation_lop_annotations(self.category_pks).with_frequency_annotations(
                     frequency, self.program.reporting_period_start, self.program.reporting_period_end
                 )]
-                for c, indicator in enumerate(indicators):
+                for indicator in indicators:
                     self.assertEqual(getattr(indicator, 'frequency_{}_count'.format(frequency)), period_count)
                     for c in range(period_count):
                         achieved = getattr(indicator, 'frequency_{}_period_{}'.format(frequency, c))
@@ -271,7 +263,7 @@ class TestIPTTIndicatorQuerysetPrefetch(test.TestCase):
                     for c in range(period_count):
                         for category_pk in self.category_pks:
                             d_value = getattr(
-                                indicator,  f'disaggregation_{category_pk}_frequency_{frequency}_period_{c}'
+                                indicator, f'disaggregation_{category_pk}_frequency_{frequency}_period_{c}'
                             )
                             if frequency in [1, 2, 3, 4, 5]:
                                 expected = self.period_results[frequency][indicator.target_frequency][c]
@@ -280,4 +272,3 @@ class TestIPTTIndicatorQuerysetPrefetch(test.TestCase):
                                 self.assertEqual(
                                     d_value, expected
                                 )
-        self.assertTrue(True) # do we need to exit the "with" to ensure query count?  Probably not.  

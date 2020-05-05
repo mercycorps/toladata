@@ -23,7 +23,7 @@ class TestCountryDisaggregationSerializer(test.TestCase):
         self.assertEqual(response.json(), [])
 
     def test_one_disaggregation(self):
-        disagg = i_factories.DisaggregationTypeFactory(country=self.country)
+        disagg = i_factories.DisaggregationTypeFactory(country=self.country, labels=False)
         response = self.client.get('/api/tola_management/countrydisaggregation/', {'country': self.country.pk})
         self.assertEqual(response.status_code, 200)
         self.assertEqual(len(response.json()), 1)
@@ -85,7 +85,8 @@ class TestCountryDisaggregationSerializer(test.TestCase):
 
     def test_labels_in_use(self):
         disagg = i_factories.DisaggregationTypeFactory(
-            country=self.country
+            country=self.country,
+            labels=False
         )
         in_use_1 = i_factories.DisaggregationLabelFactory(
             disaggregation_type=disagg,

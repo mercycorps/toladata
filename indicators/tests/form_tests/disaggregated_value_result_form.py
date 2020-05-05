@@ -225,6 +225,7 @@ class TestDisaggregatedValueFormSetFactory(test.TestCase):
         disagg = i_factories.DisaggregationTypeFactory(
             disaggregation_type="Test Disagg 1",
             standard=True,
+            labels=False,
         )
         formset = get_disaggregated_result_formset(disagg)(request=unittest.mock.Mock(has_write_access=True))
         self.assertEqual(len(formset), 0)

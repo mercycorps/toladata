@@ -7,114 +7,154 @@
 import datetime
 from factories.workflow_models import RFProgramFactory
 from factories.indicators_models import RFIndicatorFactory
-from indicators.serializers_new import ProgramPageIndicatorSerializer
+from indicators.serializers_new import (
+    TierBaseSerializer,
+    LevelBaseSerializer,
+    ProgramPageIndicatorSerializer,
+)
 from indicators.models import Indicator
-
+from tola.test.utils import SPECIAL_CHARS, lang_context
 from django import test
 from django.utils import translation, timezone
 
+QUERY_COUNT = 1
+
+def get_program_context(program):
+    pk = program.pk
+    context = {'program_pk': pk}
+    context['tiers'] = TierBaseSerializer.load_for_program(pk, context=context).data
+    context['levels'] = LevelBaseSerializer.load_for_program(pk, context=context).data
+    return context
+
 
 class TestProgramPageIndicatorSerializer(test.TestCase):
-    def get_indicator_data(self, **kwargs):
-        return ProgramPageIndicatorSerializer(
-            Indicator.program_page_objects.filter(pk=RFIndicatorFactory(**kwargs).pk), many=True
-        ).data[0]
+    @classmethod
+    def setUpTestData(cls):
+        super().setUpTestData()
+        cls.non_rf_program = RFProgramFactory(closed=False, migrated=False)
+        cls.non_rf_context = get_program_context(cls.non_rf_program)
+        cls.manual_number_program = RFProgramFactory(
+            closed=True, migrated=True, auto_number_indicators=False
+        )
+        cls.manual_number_context = get_program_context(cls.manual_number_program)
+        cls.migrated_program = RFProgramFactory(
+            migrated=True, auto_number_indicators=True,
+            tiers=['tier1', 'tier2', 'Outcome'], levels=[(1,), ((2,),), (((1, 1),),)]
+        )
+        cls.migrated_context = get_program_context(cls.migrated_program)
+        cls.migrated_levels = sorted(
+            cls.migrated_program.levels.all(),
+            key=lambda l: (l.level_depth, l.customsort)
+        )
+
+    def tearDown(self):
+        self.non_rf_program.indicator_set.all().delete()
+        self.manual_number_program.indicator_set.all().delete()
+        self.migrated_program.indicator_set.all().delete()
+
+    def get_serialized_data(self, context):
+        program_pk = context['program_pk']
+        with self.assertNumQueries(QUERY_COUNT):
+            return {
+                s_i['pk']: s_i for s_i in
+                ProgramPageIndicatorSerializer.load_for_program(program_pk, context=context).data
+            }
+
+    def get_non_migrated_indicator_data(self, **kwargs):
+        refresh = kwargs.pop('refresh', False)
+        indicator = RFIndicatorFactory(program=self.non_rf_program, **kwargs)
+        if refresh:
+            context = get_program_context(self.non_rf_program)
+        else:
+            context = self.non_rf_context.copy()
+        return self.get_serialized_data(context)[indicator.pk]
+
+    def get_manual_numbered_indicator_data(self, **kwargs):
+        refresh = kwargs.pop('refresh', False)
+        indicator = RFIndicatorFactory(program=self.manual_number_program, **kwargs)
+        if refresh:
+            context = get_program_context(self.manual_number_program)
+        else:
+            context = self.manual_number_context.copy()
+        return self.get_serialized_data(context)[indicator.pk]
+
+    def get_migrated_indicator_data(self, **kwargs):
+        refresh = kwargs.pop('refresh', False)
+        indicator = RFIndicatorFactory(program=self.migrated_program, **kwargs)
+        if refresh:
+            context = get_program_context(self.migrated_program)
+        else:
+            context = self.migrated_context.copy()
+        return self.get_serialized_data(context)[indicator.pk]
 
     def test_non_migrated_long_number(self):
-        p = RFProgramFactory(migrated=False)
-        data = self.get_indicator_data(program=p, number="142.5a")
+        data = self.get_non_migrated_indicator_data(number="142.5a")
         self.assertEqual(data['number'], "142.5a")
 
     def test_non_migrated_long_number_special_chars(self):
-        p = RFProgramFactory(migrated=False)
-        data = self.get_indicator_data(program=p, number=u"1.1å")
+        data = self.get_non_migrated_indicator_data(number=u"1.1å")
         self.assertEqual(data['number'], u"1.1å")
 
     def test_non_migrated_long_number_number_blank(self):
-        p = RFProgramFactory(migrated=False)
-        data = self.get_indicator_data(program=p, number=None)
+        data = self.get_non_migrated_indicator_data(number=None)
         self.assertEqual(data['number'], None)
 
     def test_non_migrated_long_number_number_empty(self):
-        p = RFProgramFactory(migrated=False)
-        data = self.get_indicator_data(program=p, number="")
+        data = self.get_non_migrated_indicator_data(number="")
         self.assertEqual(data['number'], None)
 
     def test_migrated_manual_number_long_number(self):
-        p = RFProgramFactory(migrated=True, auto_number_indicators=False)
-        data = self.get_indicator_data(program=p, number="203893.12")
+        data = self.get_manual_numbered_indicator_data(number="203893.12")
         self.assertEqual(data['number'], "203893.12")
 
     def test_migrated_manual_number_long_number_number_blank(self):
-        p = RFProgramFactory(migrated=True, auto_number_indicators=False)
-        data = self.get_indicator_data(program=p, number=None)
+        data = self.get_manual_numbered_indicator_data(number=None)
         self.assertEqual(data['number'], None)
 
     def test_migrated_manual_number_long_number_number_empty(self):
-        p = RFProgramFactory(migrated=True, auto_number_indicators=False)
-        data = self.get_indicator_data(program=p, number="")
+        data = self.get_manual_numbered_indicator_data(number="")
         self.assertEqual(data['number'], None)
 
     def test_migrated_no_level_number(self):
-        p = RFProgramFactory(tiers=['tier1', 'tier2'], levels=True)
-        data = self.get_indicator_data(program=p, level=None)
+        data = self.get_migrated_indicator_data(level=None)
         self.assertEqual(data['number'], None)
 
     def test_migrated_has_level_number(self):
-        p = RFProgramFactory(tiers=['tier1', 'tier2'], levels=True)
-        l = [l for l in p.levels.all() if l.level_depth == 2][0]
-        data = self.get_indicator_data(program=p, level=l, level_order=0)
+        data = self.get_migrated_indicator_data(level=self.migrated_levels[1], level_order=0)
         self.assertEqual(data['number'], "tier2 1a")
-        l2 = [l for l in p.levels.all() if l.level_depth == 1][0]
-        RFIndicatorFactory(program=p, level=l2, level_order=0)
-        data2 = self.get_indicator_data(program=p, level=l2, level_order=1)
+        RFIndicatorFactory(program=self.migrated_program, level=self.migrated_levels[0], level_order=0)
+        data2 = self.get_migrated_indicator_data(level=self.migrated_levels[0], level_order=1)
         self.assertEqual(data2['number'], "tier1 b")
-
-    def test_migrated_has_level_number_lower_tier(self):
-        p = RFProgramFactory(tiers=['tier1', 'tier2', 'tier3'], levels=2)
-        l1 = [l for l in p.levels.all() if l.level_depth == 2][0]
-        level = p.levels.filter(parent=l1, customsort=2).first()
-        RFIndicatorFactory(program=p, level=level, level_order=0)
-        RFIndicatorFactory(program=p, level=level, level_order=1)
-        data = self.get_indicator_data(program=p, level=level, level_order=2)
-        self.assertEqual(data['number'], "tier3 1.2c")
-
-    def test_migrated_has_level_number_special_chars(self):
-        special_chars = u"Tiér Speciål Chars"
-        p = RFProgramFactory(tiers=['tier1', special_chars], levels=True)
-        l = [l for l in p.levels.all() if l.level_depth == 2][0]
-        data = self.get_indicator_data(program=p, level=l, level_order=0)
-        self.assertEqual(data['number'], u"{} 1a".format(special_chars))
+        RFIndicatorFactory(program=self.migrated_program, level=self.migrated_levels[4], level_order=0)
+        RFIndicatorFactory(program=self.migrated_program, level=self.migrated_levels[4], level_order=1)
+        data3 = self.get_migrated_indicator_data(level=self.migrated_levels[4], level_order=2)
+        self.assertEqual(data3['number'], "Outcome 2.1c")
 
     def test_migrated_has_translated_level_number(self):
-        p = RFProgramFactory(tiers=['tier1', 'Outcome'], levels=True)
-        l = [l for l in p.levels.all() if l.level_depth == 2][0]
-        translation.activate('fr')
-        data = self.get_indicator_data(program=p, level=l, level_order=0)
-        translation.activate('en')
-        self.assertEqual(data['number'], u"Résultat 1a")
+        with lang_context('fr'):
+            data = self.get_migrated_indicator_data(refresh=True, level=self.migrated_levels[3])
+        self.assertEqual(data['number'], u"Résultat 1.1a")
 
     def test_was_just_created(self):
-        data = self.get_indicator_data()
+        data = self.get_migrated_indicator_data()
         self.assertEqual(data['was_just_created'], True)
 
     def test_was_not_just_created(self):
-        data = self.get_indicator_data(
+        data = self.get_non_migrated_indicator_data(
             create_date=timezone.now()-datetime.timedelta(minutes=6)
         )
         self.assertEqual(data['was_just_created'], False)
 
     def test_kpi_indicator(self):
-        data = self.get_indicator_data(key_performance_indicator=True)
+        data = self.get_migrated_indicator_data(key_performance_indicator=True)
         self.assertEqual(data['is_key_performance_indicator'], True)
 
     def test_non_kpi_indicator(self):
-        data = self.get_indicator_data()
+        data = self.get_non_migrated_indicator_data()
         self.assertEqual(data['is_key_performance_indicator'], False)
 
     def test_reporting_closed_program_lop_with_results(self):
-        data = self.get_indicator_data(
-            program=RFProgramFactory(),
+        data = self.get_manual_numbered_indicator_data(
             target_frequency=Indicator.LOP,
             targets=True,
             results=True
@@ -122,8 +162,7 @@ class TestProgramPageIndicatorSerializer(test.TestCase):
         self.assertEqual(data['is_reporting'], True)
 
     def test_reporting_closed_program_lop_no_results(self):
-        data = self.get_indicator_data(
-            program=RFProgramFactory(),
+        data = self.get_manual_numbered_indicator_data(
             target_frequency=Indicator.LOP,
             targets=True
         )
@@ -131,8 +170,7 @@ class TestProgramPageIndicatorSerializer(test.TestCase):
         self.assertEqual(data['over_under'], None)
 
     def test_reporting_open_program_lop_with_results(self):
-        data = self.get_indicator_data(
-            program=RFProgramFactory(closed=False),
+        data = self.get_non_migrated_indicator_data(
             target_frequency=Indicator.LOP,
             targets=True,
             results=True
@@ -141,8 +179,7 @@ class TestProgramPageIndicatorSerializer(test.TestCase):
         self.assertEqual(data['over_under'], None)
 
     def test_over_under_program_lop_under_target(self):
-        data = self.get_indicator_data(
-            program=RFProgramFactory(),
+        data = self.get_migrated_indicator_data(
             target_frequency=Indicator.LOP,
             targets=200,
             results=150
@@ -150,42 +187,29 @@ class TestProgramPageIndicatorSerializer(test.TestCase):
         self.assertEqual(data['over_under'], -1)
 
     def test_over_under_program_lop_over_target(self):
-        data = self.get_indicator_data(
-            program=RFProgramFactory(),
-            target_frequency=Indicator.LOP,
-            targets=200,
-            results=250
-        )
+        data = self.get_migrated_indicator_data(target_frequency=Indicator.LOP, targets=200, results=250)
         self.assertEqual(data['over_under'], 1)
 
     def test_over_under_program_lop_on_target(self):
-        data = self.get_indicator_data(
-            program=RFProgramFactory(),
-            target_frequency=Indicator.LOP,
-            targets=200,
-            results=205
-        )
+        data = self.get_migrated_indicator_data(target_frequency=Indicator.LOP, targets=200, results=205)
         self.assertEqual(data['over_under'], 0)
 
     def test_all_targets_defined(self):
-        data = self.get_indicator_data(
-            program=RFProgramFactory(),
+        data = self.get_migrated_indicator_data(
             target_frequency=Indicator.ANNUAL,
             targets=500
         )
         self.assertEqual(data['has_all_targets_defined'], True)
 
     def test_all_targets_not_defined(self):
-        data = self.get_indicator_data(
-            program=RFProgramFactory(),
+        data = self.get_migrated_indicator_data(
             target_frequency=Indicator.SEMI_ANNUAL,
             targets='incomplete'
         )
         self.assertEqual(data['has_all_targets_defined'], False)
 
     def test_results_count(self):
-        data = self.get_indicator_data(
-            program=RFProgramFactory(),
+        data = self.get_migrated_indicator_data(
             target_frequency=Indicator.SEMI_ANNUAL,
             targets=1000,
             results=1000,
@@ -195,8 +219,7 @@ class TestProgramPageIndicatorSerializer(test.TestCase):
         self.assertEqual(data['has_results'], True)
 
     def test_results_count_lop(self):
-        data = self.get_indicator_data(
-            program=RFProgramFactory(),
+        data = self.get_migrated_indicator_data(
             target_frequency=Indicator.LOP,
             targets=1000,
             results=1000,
@@ -206,8 +229,7 @@ class TestProgramPageIndicatorSerializer(test.TestCase):
         self.assertEqual(data['has_results'], True)
 
     def test_results_count_zero(self):
-        data = self.get_indicator_data(
-            program=RFProgramFactory(),
+        data = self.get_migrated_indicator_data(
             target_frequency=Indicator.SEMI_ANNUAL,
             targets=1000
         )
@@ -216,8 +238,7 @@ class TestProgramPageIndicatorSerializer(test.TestCase):
         self.assertEqual(data['missing_evidence'], False)
 
     def test_results_evidence_count(self):
-        data = self.get_indicator_data(
-            program=RFProgramFactory(),
+        data = self.get_migrated_indicator_data(
             target_frequency=Indicator.ANNUAL,
             targets=1000,
             results=1000,
@@ -228,8 +249,7 @@ class TestProgramPageIndicatorSerializer(test.TestCase):
         self.assertEqual(data['missing_evidence'], False)
 
     def test_results_evidence_count_lower(self):
-        data = self.get_indicator_data(
-            program=RFProgramFactory(),
+        data = self.get_migrated_indicator_data(
             target_frequency=Indicator.ANNUAL,
             targets=1000,
             results=1000,
@@ -241,13 +261,14 @@ class TestProgramPageIndicatorSerializer(test.TestCase):
         self.assertEqual(data['missing_evidence'], True)
 
     def test_most_recent_completed_end_date(self):
-        data = self.get_indicator_data(
-            program=RFProgramFactory(
-                reporting_period_start=datetime.date(2015, 1, 1),
-                reporting_period_end=datetime.date(2024, 1, 1)
-            ),
-            target_frequency=Indicator.ANNUAL,
-            targets=1000
+        program = RFProgramFactory(
+            reporting_period_start=datetime.date(2015, 1, 1),
+            reporting_period_end=datetime.date(2024, 1, 1)
         )
+        context = get_program_context(program)
+        indicator = RFIndicatorFactory(
+            program=program, target_frequency=Indicator.ANNUAL, targets=1000
+        )
+        data = self.get_serialized_data(context)[indicator.pk]
         expected_date = datetime.date(datetime.date.today().year, 1, 1) - datetime.timedelta(days=1)
         self.assertEqual(data['most_recent_completed_target_end_date'], expected_date.isoformat())

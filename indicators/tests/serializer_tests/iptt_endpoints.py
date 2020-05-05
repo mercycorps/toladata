@@ -15,10 +15,11 @@ from django import test
 from django.utils import translation
 
 
-IPTT_QUERY_COUNT = 9
+IPTT_QUERY_COUNT_NO_DISAGGS = 12
+IPTT_QUERY_COUNT_WITH_DISAGGS = 13
 
 def get_serialized_data(program_pk):
-    return IPTTProgramSerializer.get_for_pk(program_pk).data
+    return IPTTProgramSerializer.load_for_pk(program_pk).data
 
 class TestIPTTEndpoint(test.TestCase):
     def test_rf_program_two_indicators(self):
@@ -28,7 +29,7 @@ class TestIPTTEndpoint(test.TestCase):
         )
         site = SiteProfileFactory()
         it = IndicatorTypeFactory()
-        dt1 = DisaggregationTypeFactory(standard=True)
+        dt1 = DisaggregationTypeFactory(standard=True, labels=False)
         dt2 = DisaggregationTypeFactory(country=p.country.first(), labels=["1", "2", "3"])
         sector = SectorFactory()
         indicators = [RFIndicatorFactory(
@@ -44,7 +45,7 @@ class TestIPTTEndpoint(test.TestCase):
         indicators[1].disaggregation.set([dt1, dt2])
         indicators[0].result_set.first().site.add(site)
         indicators[1].result_set.first().site.add(site)
-        with self.assertNumQueries(IPTT_QUERY_COUNT):
+        with self.assertNumQueries(IPTT_QUERY_COUNT_WITH_DISAGGS):
             data = get_serialized_data(p.pk)
         self.assertEqual(data['pk'], p.pk)
         self.assertEqual(data['name'], p.name)
@@ -80,7 +81,7 @@ class TestIPTTEndpoint(test.TestCase):
                 ).pk
             )
         expected_pks = list(reversed(pks))
-        with self.assertNumQueries(IPTT_QUERY_COUNT):
+        with self.assertNumQueries(IPTT_QUERY_COUNT_NO_DISAGGS):
             data = get_serialized_data(p.pk)
         self.assertEqual(expected_pks, data['unassigned_indicator_pks'])
         self.assertEqual(data['level_pks_level_order'], [])
@@ -90,7 +91,7 @@ class TestIPTTEndpoint(test.TestCase):
         activity = [i_data for i_data in data['indicators'] if i_data['number'] == '5'][0]
         self.assertEqual(activity['old_level_name'], 'Activity')
         translation.activate('fr')
-        with self.assertNumQueries(IPTT_QUERY_COUNT): # -1 because see above
+        with self.assertNumQueries(IPTT_QUERY_COUNT_NO_DISAGGS): # -1 because see above
             french_data = get_serialized_data(p.pk)
         activity = [i_data for i_data in french_data['indicators'] if i_data['number'] == '5'][0]
         self.assertEqual(activity['old_level_name'], u'Activité')

@@ -1,15 +1,5 @@
-# -*- coding: utf-8 -*-
-"""Tests for the Program Serializer providing Level-based ordering by level and chain
-
-    corresponding to js/models/program/RFLevelOrdering"""
-
 import datetime
-from workflow.serializers_new import (
-    IPTTProgramLevelSerializer,
-    IPTTProgramSerializer
-)
-from workflow.models import Program
-from indicators.models import Indicator
+from django import test
 from factories.workflow_models import (
     RFProgramFactory,
     SectorFactory,
@@ -20,41 +10,86 @@ from factories.indicators_models import (
     RFIndicatorFactory,
     LevelFactory,
     IndicatorTypeFactory,
-    DisaggregationTypeFactory,
+    DisaggregationTypeFactory
 )
-from django import test
-from django.utils import translation
+from tola.test.utils import SPECIAL_CHARS, lang_context
+from indicators.models import Indicator
+from workflow.serializers_new import IPTTProgramSerializer
 
-
-def get_serialized_data(program_pk, levels=False):
-    if levels:
-        return IPTTProgramLevelSerializer(
-            Program.rf_aware_objects.filter(pk=program_pk), many=True
-        ).data[0]
-    return IPTTProgramSerializer(
-        Program.rf_aware_objects.filter(pk=program_pk), many=True
-    ).data[0]
-
-def get_program_data(**kwargs):
-    return get_serialized_data(RFProgramFactory(**kwargs).pk)
-
-SPECIAL_CHARS = u'Spéçîål Chars'
 LONG_NAME = 'Long '*26
 MC_TIER_NAMES = ['Goal', 'Outcome', 'Output', 'Activity']
 
+QUERY_COUNT = 11
+WITH_RESULTS = 1
+WITH_DISAGGREGATIONS = 1
 
-class TestIPTTProgramSerializerLevels(test.TestCase):
+def get_serialized_data(program_pk):
+    return IPTTProgramSerializer.load_for_pk(program_pk).data
+
+def get_program_data(**kwargs):
+    add_indicator = kwargs.pop('add_indicator', True)
+    program = RFProgramFactory(**kwargs)
+    if add_indicator:
+        RFIndicatorFactory(program=program)
+    return program
+
+
+class TestIPTTProgramSerializerFilterData(test.TestCase):
+    @classmethod
+    def setUpTestData(cls):
+        super().setUpTestData()
+        cls.empty_program = RFProgramFactory()
+        RFIndicatorFactory(program=cls.empty_program)
+        cls.country = CountryFactory(country="TestTown", code="TT")
+
+    ### TIERS ###
+
+    def test_no_tiers(self):
+        with self.assertNumQueries(QUERY_COUNT):
+            data = get_serialized_data(self.empty_program.pk)
+        self.assertEqual(data['tiers'], [])
+
+    def test_one_tier(self):
+        program = get_program_data(tiers=['Tier1'])
+        program_pk = program.pk
+        tier_pk = program.level_tiers.first().pk
+        with self.assertNumQueries(QUERY_COUNT):
+            data = get_serialized_data(program_pk)
+        self.assertEqual(len(data['tiers']), 1)
+        self.assertEqual(data['tiers'][0]['pk'], tier_pk)
+        self.assertEqual(data['tiers'][0]['name'], 'Tier1')
+        self.assertEqual(data['tiers'][0]['tier_depth'], 1)
+
+    def test_multiple_tiers(self):
+        program_pk = get_program_data(tiers=True).pk
+        with self.assertNumQueries(QUERY_COUNT):
+            data = get_serialized_data(program_pk)
+        self.assertEqual(len(data['tiers']), 4)
+        for tier_data, (c, mc_name) in zip(data['tiers'], enumerate(MC_TIER_NAMES)):
+            self.assertEqual(tier_data['tier_depth'], c+1)
+            self.assertEqual(tier_data['name'], mc_name)
+
+    def test_translated_tiers(self):
+        program_pk = get_program_data(tiers=['Outcome']).pk
+        with lang_context('fr'):
+            with self.assertNumQueries(QUERY_COUNT):
+                data = get_serialized_data(program_pk)
+            self.assertEqual(data['tiers'][0]['name'], 'Résultat')
+
+    ### LEVELS ###
 
     def test_program_no_levels(self):
-        program = RFProgramFactory()
-        data = get_serialized_data(program.pk, levels=True)
+        with self.assertNumQueries(QUERY_COUNT):
+            data = get_serialized_data(self.empty_program.pk)
         self.assertEqual(data['levels'], [])
 
     def test_program_one_level(self):
-        program = RFProgramFactory(tiers=['Tier1'])
+        program = get_program_data(tiers=['Tier1'], levels=1, levels__0={'name': 'Test name'})
         tier = program.level_tiers.first()
-        level = LevelFactory(program=program, parent=None, name="Test name")
-        data = get_serialized_data(program.pk, levels=True)
+        level = program.levels.first()
+        program_pk = program.pk
+        with self.assertNumQueries(QUERY_COUNT):
+            data = get_serialized_data(program_pk)
         for key, value in {
                 'pk': level.pk,
                 'name': "Test name",
@@ -66,9 +101,9 @@ class TestIPTTProgramSerializerLevels(test.TestCase):
             self.assertEqual(data['levels'][0][key], value)
 
     def test_program_multiple_levels(self):
-        program = RFProgramFactory(tiers=['Tier1', SPECIAL_CHARS, LONG_NAME])
+        program = get_program_data(tiers=['Tier1', SPECIAL_CHARS, LONG_NAME])
+        tiers = program.level_tiers.order_by('tier_depth').all()
         levels = {}
-        tiers = sorted(program.level_tiers.all(), key=lambda tier: tier.tier_depth)
         goal = LevelFactory(program=program, parent=None, name=SPECIAL_CHARS, customsort=1)
         levels[goal.pk] = {
             'name': SPECIAL_CHARS,
@@ -111,7 +146,8 @@ class TestIPTTProgramSerializerLevels(test.TestCase):
             'chain_pk': impact2.pk,
             'ontology': '2.1'
         }
-        data = get_serialized_data(program.pk, levels=True)
+        with self.assertNumQueries(QUERY_COUNT):
+            data = get_serialized_data(program.pk)
         counted = []
         for level_data in data['levels']:
             self.assertIn(level_data['pk'], levels)
@@ -120,48 +156,22 @@ class TestIPTTProgramSerializerLevels(test.TestCase):
             counted.append(level_data['pk'])
         self.assertEqual(set(counted), set(levels.keys()))
 
-
-class TestIPTTProgramSerializerTiers(test.TestCase):
-
-    def test_no_tiers(self):
-        data = get_program_data()
-        self.assertEqual(data['tiers'], [])
-
-    def test_one_tier(self):
-        data = get_program_data(tiers=['Tier1'])
-        self.assertEqual(len(data['tiers']), 1)
-        self.assertEqual(data['tiers'][0]['name'], 'Tier1')
-        self.assertEqual(data['tiers'][0]['tier_depth'], 1)
-
-    def test_multiple_tiers(self):
-        data = get_program_data(tiers=True)
-        self.assertEqual(len(data['tiers']), 4)
-        self.assertEqual(set(td['name'] for td in data['tiers']),
-                         set(MC_TIER_NAMES))
-
-    def test_translated_tiers(self):
-        program = RFProgramFactory(tiers=True)
-        translation.activate('fr')
-        data = get_serialized_data(program.pk)
-        names = set(td['name'] for td in data['tiers'])
-        self.assertIn(u'Résultat', names)
-        translation.activate('en')
-
-
-class TestIPTTProgramSerializerFilterData(test.TestCase):
+    ### FILTER ITEMS ###
 
     def test_no_filter_data(self):
-        data = get_program_data()
+        with self.assertNumQueries(QUERY_COUNT):
+            data = get_serialized_data(self.empty_program.pk)
         self.assertEqual(data['sectors'], [])
         self.assertEqual(data['indicator_types'], [])
         self.assertEqual(data['sites'], [])
-        self.assertEqual(data['disaggregations'], [])
+        #self.assertEqual(data['disaggregations'], [])
 
     def test_one_sector(self):
         program = RFProgramFactory()
         sector = SectorFactory(program=program)
         RFIndicatorFactory(program=program, sector=sector)
-        data = get_serialized_data(program.pk)
+        with self.assertNumQueries(QUERY_COUNT):
+            data = get_serialized_data(program.pk)
         self.assertEqual(len(data['sectors']), 1)
         self.assertEqual(data['sectors'][0]['pk'], sector.pk)
         self.assertEqual(data['sectors'][0]['name'], sector.sector)
@@ -171,25 +181,31 @@ class TestIPTTProgramSerializerFilterData(test.TestCase):
         sector = SectorFactory(program=program)
         RFIndicatorFactory(program=program, sector=sector)
         RFIndicatorFactory(program=program, sector=sector)
-        data = get_serialized_data(program.pk)
+        with self.assertNumQueries(QUERY_COUNT):
+            data = get_serialized_data(program.pk)
         self.assertEqual(len(data['sectors']), 1)
+        self.assertEqual(data['sectors'][0]['pk'], sector.pk)
 
     def test_multiple_sectors(self):
         program = RFProgramFactory()
-        sector = SectorFactory(program=program)
-        sector2 = SectorFactory(program=program)
+        sector = SectorFactory(program=program, sector="Alpha")
+        sector2 = SectorFactory(program=program, sector="Beta")
         RFIndicatorFactory(program=program, sector=sector)
         RFIndicatorFactory(program=program, sector=sector2)
-        data = get_serialized_data(program.pk)
+        with self.assertNumQueries(QUERY_COUNT):
+            data = get_serialized_data(program.pk)
         self.assertEqual(len(data['sectors']), 2)
-        self.assertEqual(set(sd['pk'] for sd in data['sectors']), set([sector.pk, sector2.pk]))
+        for sector_data, sector_obj in zip(data['sectors'], [sector, sector2]):
+            self.assertEqual(sector_data['pk'], sector_obj.pk)
+            self.assertEqual(sector_data['name'], sector_obj.sector)
 
     def test_one_indicator_type(self):
         program = RFProgramFactory()
         i_type = IndicatorTypeFactory()
         indicator = RFIndicatorFactory(program=program)
         indicator.indicator_type.add(i_type)
-        data = get_serialized_data(program.pk)
+        with self.assertNumQueries(QUERY_COUNT):
+            data = get_serialized_data(program.pk)
         self.assertEqual(len(data['indicator_types']), 1)
         self.assertEqual(data['indicator_types'][0]['pk'], i_type.pk)
         self.assertEqual(data['indicator_types'][0]['name'], i_type.indicator_type)
@@ -201,7 +217,8 @@ class TestIPTTProgramSerializerFilterData(test.TestCase):
         indicator.indicator_type.add(i_type)
         indicator2 = RFIndicatorFactory(program=program)
         indicator2.indicator_type.add(i_type)
-        data = get_serialized_data(program.pk)
+        with self.assertNumQueries(QUERY_COUNT):
+            data = get_serialized_data(program.pk)
         self.assertEqual(len(data['indicator_types']), 1)
 
     def test_multiple_indicator_types(self):
@@ -214,12 +231,10 @@ class TestIPTTProgramSerializerFilterData(test.TestCase):
         i_1.indicator_type.add(i_type1)
         i_2 = RFIndicatorFactory(program=program)
         i_2.indicator_type.add(i_type2)
-        data = get_serialized_data(program.pk)
+        with self.assertNumQueries(QUERY_COUNT):
+            data = get_serialized_data(program.pk)
         self.assertEqual(len(data['indicator_types']), 3)
-        self.assertEqual(
-            set(itd['pk'] for itd in data['indicator_types']),
-            set([i_type.pk, i_type1.pk, i_type2.pk])
-        )
+        self.assertCountEqual([itd['pk'] for itd in data['indicator_types']], [i_type.pk, i_type1.pk, i_type2.pk])
 
     def test_one_site(self):
         program = RFProgramFactory()
@@ -228,7 +243,8 @@ class TestIPTTProgramSerializerFilterData(test.TestCase):
             program=program, target_frequency=Indicator.LOP, targets=500, results=100, results__count=1
         )
         indicator.result_set.first().site.add(site)
-        data = get_serialized_data(program.pk)
+        with self.assertNumQueries(QUERY_COUNT + WITH_RESULTS):
+            data = get_serialized_data(program.pk)
         self.assertEqual(len(data['sites']), 1)
         self.assertEqual(data['sites'][0]['pk'], site.pk)
         self.assertEqual(data['sites'][0]['name'], site.name)
@@ -246,7 +262,8 @@ class TestIPTTProgramSerializerFilterData(test.TestCase):
         )
         for result in indicator.result_set.all():
             result.site.add(site)
-        data = get_serialized_data(program.pk)
+        with self.assertNumQueries(QUERY_COUNT + WITH_RESULTS):
+            data = get_serialized_data(program.pk)
         self.assertEqual(len(data['sites']), 1)
 
     def test_multiple_sites(self):
@@ -264,24 +281,24 @@ class TestIPTTProgramSerializerFilterData(test.TestCase):
         )
         for result in indicator.result_set.all():
             result.site.add(site2)
-        data = get_serialized_data(program.pk)
+        with self.assertNumQueries(QUERY_COUNT + WITH_RESULTS):
+            data = get_serialized_data(program.pk)
         self.assertEqual(len(data['sites']), 3)
-        self.assertEqual(
-            set(std['pk'] for std in data['sites']),
-            set([site.pk, site1.pk, site2.pk])
-        )
+        for site_data, site_obj in zip(data['sites'], [site, site2, site1]):
+            self.assertEqual(site_data['pk'], site_obj.pk)
+            self.assertEqual(site_data['name'], site_obj.name)
 
     def test_one_country_disaggregation_type(self):
-        country = CountryFactory(country="TestTown", code="TT")
         program = RFProgramFactory()
-        program.country.add(country)
+        program.country.add(self.country)
         country_dt = DisaggregationTypeFactory(
-            disaggregation_type="Test Disaggregation", country=country, standard=False,
+            disaggregation_type="Test Disaggregation", country=self.country, standard=False,
             labels=["Test Label 1", "Test Label 2", "Test Label 3"]
         )
         indicator = RFIndicatorFactory(program=program)
         indicator.disaggregation.set([country_dt])
-        data = get_serialized_data(program.pk)
+        with self.assertNumQueries(QUERY_COUNT + WITH_DISAGGREGATIONS):
+            data = get_serialized_data(program.pk)
         self.assertEqual(len(data['disaggregations']), 1)
         disagg_data = data['disaggregations'][0]
         self.assertEqual(disagg_data['pk'], country_dt.pk)
@@ -295,7 +312,8 @@ class TestIPTTProgramSerializerFilterData(test.TestCase):
         )
         indicator = RFIndicatorFactory(program=RFProgramFactory())
         indicator.disaggregation.set([standard_dt])
-        data = get_serialized_data(indicator.program.pk)
+        with self.assertNumQueries(QUERY_COUNT + WITH_DISAGGREGATIONS):
+            data = get_serialized_data(indicator.program.pk)
         self.assertEqual(data['disaggregations'][0]['pk'], standard_dt.pk)
         self.assertEqual(data['disaggregations'][0]['name'], 'Test Standard Disagg')
 
@@ -307,7 +325,8 @@ class TestIPTTProgramSerializerFilterData(test.TestCase):
         )
         indicator = RFIndicatorFactory(program=RFProgramFactory())
         indicator.disaggregation.set([special_chars_dt])
-        data = get_serialized_data(indicator.program.pk)
+        with self.assertNumQueries(QUERY_COUNT + WITH_DISAGGREGATIONS):
+            data = get_serialized_data(indicator.program.pk)
         self.assertEqual(data['disaggregations'][0]['name'], special_chars)
 
     def test_one_disaggregation_type_duplicated(self):
@@ -319,20 +338,20 @@ class TestIPTTProgramSerializerFilterData(test.TestCase):
         indicator1.disaggregation.set([standard_dt])
         indicator2 = RFIndicatorFactory(program=RFProgramFactory())
         indicator2.disaggregation.set([standard_dt])
-        data = get_serialized_data(indicator1.program.pk)
+        with self.assertNumQueries(QUERY_COUNT + WITH_DISAGGREGATIONS):
+            data = get_serialized_data(indicator1.program.pk)
         self.assertEqual(len(data['disaggregations']), 1)
         self.assertEqual(data['disaggregations'][0]['pk'], standard_dt.pk)
 
     def test_multiple_disaggregation_types(self):
-        country = CountryFactory(country="TestTown", code="TT")
         program = RFProgramFactory()
-        program.country.add(country)
+        program.country.add(self.country)
         country_dt1 = DisaggregationTypeFactory(
-            disaggregation_type="Test Disaggregation", country=country, standard=False,
+            disaggregation_type="Test Disaggregation", country=self.country, standard=False,
             labels=["Test Label 1", "Test Label 2", "Test Label 3"]
         )
         country_dt2 = DisaggregationTypeFactory(
-            disaggregation_type="Test Disaggregation 2", country=country, standard=False,
+            disaggregation_type="Test Disaggregation 2", country=self.country, standard=False,
             selected_by_default=True,
             labels=["Test Really really really really really really really really long Label 1", "Test Label 2"]
         )
@@ -351,20 +370,21 @@ class TestIPTTProgramSerializerFilterData(test.TestCase):
         indicator2.disaggregation.set([country_dt1, standard_dt1])
         indicator3 = RFIndicatorFactory(program=program)
         indicator3.disaggregation.set([standard_dt2])
-        data = get_serialized_data(program.pk)
+        with self.assertNumQueries(QUERY_COUNT + WITH_DISAGGREGATIONS):
+            data = get_serialized_data(program.pk)
         self.assertEqual(len(data['disaggregations']), 4, data['disaggregations'])
 
     def test_country_disaggregation_unassigned_to_program_does_not_show_up(self):
-        country = CountryFactory(country="TestTown", code="TT")
         program = RFProgramFactory()
-        program.country.add(country)
+        program.country.add(self.country)
         country_dt = DisaggregationTypeFactory(
-            disaggregation_type="Test Disaggregation", country=country, standard=False,
+            disaggregation_type="Test Disaggregation", country=self.country, standard=False,
             labels=["Test Label 1", "Test Label 2", "Test Label 3"]
         )
         indicator = RFIndicatorFactory(program=program)
         indicator.disaggregation.set([])
-        data = get_serialized_data(program.pk)
+        with self.assertNumQueries(QUERY_COUNT):
+            data = get_serialized_data(program.pk)
         self.assertEqual(len(data['disaggregations']), 0)
 
     def test_standard_disaggregation_unassigned_to_program_does_not_show_up(self):
@@ -374,30 +394,29 @@ class TestIPTTProgramSerializerFilterData(test.TestCase):
         )
         indicator = RFIndicatorFactory(program=RFProgramFactory())
         indicator.disaggregation.set([])
-        data = get_serialized_data(indicator.program.pk)
+        with self.assertNumQueries(QUERY_COUNT):
+            data = get_serialized_data(indicator.program.pk)
         self.assertEqual(len(data['disaggregations']), 0)
 
-
-class TestIPTTProgramSerializerPeriodData(test.TestCase):
+    ### FREQUENCY AND PERIOD DATA ###
 
     def test_frequencies_none(self):
-        data = get_program_data()
+        program = RFProgramFactory()
+        data = get_serialized_data(program.pk)
         self.assertEqual(data['frequencies'], [])
 
     def test_frequencies_lop(self):
         program = RFProgramFactory()
-        RFIndicatorFactory(
-            program=program, target_frequency=Indicator.LOP
-        )
-        data = get_serialized_data(program.pk)
+        RFIndicatorFactory(program=program, target_frequency=Indicator.LOP)
+        with self.assertNumQueries(QUERY_COUNT):
+            data = get_serialized_data(program.pk)
         self.assertEqual(data['frequencies'], [Indicator.LOP])
 
     def test_frequencies_annual(self):
         program = RFProgramFactory()
-        RFIndicatorFactory(
-            program=program, target_frequency=Indicator.ANNUAL
-        )
-        data = get_serialized_data(program.pk)
+        RFIndicatorFactory(program=program, target_frequency=Indicator.ANNUAL)
+        with self.assertNumQueries(QUERY_COUNT):
+            data = get_serialized_data(program.pk)
         self.assertEqual(data['frequencies'], [Indicator.ANNUAL])
 
     def test_frequencies_many(self):
@@ -405,13 +424,17 @@ class TestIPTTProgramSerializerPeriodData(test.TestCase):
         frequencies = [Indicator.ANNUAL, Indicator.SEMI_ANNUAL, Indicator.TRI_ANNUAL, Indicator.MONTHLY]
         for frequency in frequencies:
             RFIndicatorFactory(program=program, target_frequency=frequency)
-        data = get_serialized_data(program.pk)
+        with self.assertNumQueries(QUERY_COUNT):
+            data = get_serialized_data(program.pk)
         self.assertEqual(data['frequencies'], frequencies)
 
     def test_period_date_ranges_one_year(self):
         rep_start = datetime.date(2016, 1, 1)
         rep_end = datetime.date(2016, 12, 31)
-        data = get_program_data(reporting_period_start=rep_start, reporting_period_end=rep_end)
+        program = RFProgramFactory(reporting_period_start=rep_start, reporting_period_end=rep_end)
+        RFIndicatorFactory(program=program)
+        with self.assertNumQueries(QUERY_COUNT):
+            data = get_serialized_data(program.pk)
         for frequency, count in [(1, 1), (2, 2), (3, 1), (4, 2), (5, 3), (6, 4), (7, 12)]:
             self.assertEqual(len(data['period_date_ranges'][frequency]), count)
         lop_period = data['period_date_ranges'][Indicator.LOP][0]
@@ -430,7 +453,7 @@ class TestIPTTProgramSerializerPeriodData(test.TestCase):
         self.assertEqual(annual_period['start'], '2016-01-01')
         self.assertEqual(annual_period['end'], '2016-12-31')
         self.assertEqual(annual_period['name'], 'Year 1')
-        self.assertEqual(annual_period['label'], 'Jan 1, 2016 - Dec 31, 2016')
+        self.assertEqual(annual_period['label'], 'Jan 1, 2016 – Dec 31, 2016')
         monthly_period = data['period_date_ranges'][Indicator.MONTHLY][4]
         self.assertEqual(monthly_period['start'], '2016-05-01')
         self.assertEqual(monthly_period['end'], '2016-05-31')
@@ -440,20 +463,22 @@ class TestIPTTProgramSerializerPeriodData(test.TestCase):
     def test_period_date_ranges_french(self):
         rep_start = datetime.date(2016, 1, 1)
         rep_end = datetime.date(2016, 12, 31)
-        translation.activate('fr')
-        data = get_program_data(reporting_period_start=rep_start, reporting_period_end=rep_end)
-        translation.activate('en')
+        program = RFProgramFactory(reporting_period_start=rep_start, reporting_period_end=rep_end)
+        RFIndicatorFactory(program=program)
+        with lang_context('fr'):
+            with self.assertNumQueries(QUERY_COUNT):
+                data = get_serialized_data(program.pk)
         lop_period = data['period_date_ranges'][Indicator.LOP][0]
         self.assertEqual(lop_period['start'], '2016-01-01')
         self.assertEqual(lop_period['end'], '2016-12-31')
-        self.assertEqual(lop_period['name'], 'La vie du programme')
+        self.assertEqual(lop_period['name'], 'Vie du programme')
         self.assertEqual(lop_period['label'], None)
-        for name, period in zip(['Mesure de mi-parcours', 'Mesure de fin de programme'], data['period_date_ranges'][Indicator.MID_END]):
+        for name, period in zip(['Milieu de ligne', 'Fin de ligne'], data['period_date_ranges'][Indicator.MID_END]):
             self.assertEqual(period['name'], name)
             self.assertEqual(period['label'], None)
         annual_period = data['period_date_ranges'][Indicator.ANNUAL][0]
         self.assertEqual(annual_period['name'], u'Année 1')
-        self.assertEqual(annual_period['label'], u'1 jan. 2016 - 31 déc. 2016')
+        self.assertEqual(annual_period['label'], u'1 jan. 2016 – 31 déc. 2016')
         monthly_period = data['period_date_ranges'][Indicator.MONTHLY][7]
         self.assertEqual(monthly_period['name'], u'août')
         self.assertEqual(monthly_period['label'], None)

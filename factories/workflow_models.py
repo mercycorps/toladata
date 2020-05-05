@@ -168,6 +168,8 @@ class RFProgramFactory(DjangoModelFactory):
     @post_generation
     def tiers(self, create, extracted, **kwargs):
         """generate tiers - can take True to generate MC tiers, or a list of tier names"""
+        if not extracted:
+            return
         from factories.indicators_models import LevelTierFactory
         if extracted is True:
             LevelTierFactory.build_mc_template(program=self)
@@ -180,6 +182,10 @@ class RFProgramFactory(DjangoModelFactory):
     @post_generation
     def levels(self, create, extracted, **kwargs):
         """post-gen hooks are called in declaration order, so this can depend upon tiers method"""
+        if not extracted:
+            return
+        elif isinstance(extracted, (dict, tuple, list)):
+            extracted = extracted.copy()
         tiers = self.level_tiers.all()
         from factories.indicators_models import LevelFactory
         def get_children(parents, count):
@@ -222,14 +228,19 @@ class RFProgramFactory(DjangoModelFactory):
         universal_level_data.update({'program': self})
         level_pks = kwargs.get('pks', [])
         tier = None
+        parent_counts = {}
         for count, level_data in enumerate(levels_data):
             new_tier = tiers[level_data['depth']]
             if new_tier != tier:
                 depth_count = 1
                 tier = new_tier
+            parent_id_for_count = 'x' if level_data['parent'] is None else level_data['parent']
+            if parent_id_for_count not in parent_counts:
+                parent_counts[parent_id_for_count] = 0
+            parent_counts[parent_id_for_count] += 1
             this_level_data = {
-                'name': u"Tier: {} Order: {}".format(tier.name, depth_count),
-                'customsort': depth_count,
+                'name': "Tier: {} Order: {}".format(tier.name, depth_count),
+                'customsort': parent_counts[parent_id_for_count],
                 'parent': levels[level_data['parent']] if level_data['parent'] is not None else None
             }
             depth_count += 1
