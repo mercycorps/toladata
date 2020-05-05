@@ -1,5 +1,6 @@
 """Serializers which fetch, consolidate, and serialize data for an IPTT report to be consumed by an excel renderer"""
 
+import operator
 from collections import defaultdict
 import dateutil.parser
 from django.db import models
@@ -288,13 +289,24 @@ class IPTTReportSerializer(serializers.Serializer):
         end = self.context.get('end', len(periods))
         return periods[start:end]
 
-    def _get_frequency_indicators(self, frequency, level_pk=None):
+    def _fetch_frequency_indicators(self, frequency, level_pk=None):
         """Returns all indicators for a given frequency and level"""
         if level_pk is None:
             return [indicator for indicator in self.context['indicators']
                     if indicator['no_rf_level'] and indicator['target_frequency'] == frequency]
         return [indicator for indicator in self.context['indicators']
-                if indicator['level_pk'] == level_pk and indicator['target_frequency'] == frequency]
+                if (indicator['level_pk'] == level_pk and indicator['target_frequency'] == frequency
+                    and not indicator['no_rf_level'])]
+
+    def _get_frequency_indicators(self, frequency, level_pk=None):
+        """sorts and returns indicators for a given frequency and level"""
+        if not self.context['program']['results_framework']:
+            if level_pk is None:
+                indicators = self._fetch_frequency_indicators(frequency, level_pk=None)
+                return sorted(indicators, key=lambda i: (i['level_pk'] is None, i['level_pk']))
+            return []
+        indicators = self._fetch_frequency_indicators(frequency, level_pk=level_pk)
+        return sorted(indicators, key=operator.itemgetter('level_order'))
 
     def _get_level_rows_for_frequency(self, frequency):
         """Returns serialized level rows with indicator/report data for a given frequency"""
@@ -302,7 +314,7 @@ class IPTTReportSerializer(serializers.Serializer):
         goal_level = None
         has_indicators = False
         frequency_report_data = self.context.get('report_data', {}).get(frequency, {})
-        for level_data in self.context['program']['levels']:
+        for level_data in (self.context['program']['levels'] if self.context['program']['results_framework'] else []):
             indicators = self._get_frequency_indicators(frequency, level_pk=level_data['pk'])
             if indicators:
                 has_indicators = True
@@ -388,10 +400,11 @@ class IPTTTPReportSerializer(IPTTReportSerializer):
         report = IPTTReport(context)
         return cls(report, context=context)
 
-    def _get_frequency_indicators(self, frequency, level_pk=None):
+    def _fetch_frequency_indicators(self, frequency, level_pk=None):
         if level_pk is None:
             return [indicator for indicator in self.context['indicators'] if indicator['no_rf_level']]
-        return [indicator for indicator in self.context['indicators'] if indicator['level_pk'] == level_pk]
+        return [indicator for indicator in self.context['indicators'] if (
+            indicator['level_pk'] == level_pk and not indicator['no_rf_level'])]
 
 
 class IPTTTVAReportSerializer(IPTTReportSerializer):
