@@ -24,7 +24,7 @@ from indicators.serializers_new import (
 from workflow.serializers_new.iptt_program_serializers import IPTTExcelProgramSerializer
 from workflow.serializers_new.period_serializers import IPTTExcelPeriod
 from tola.l10n_utils import l10n_date_medium
-from tola.serializers import ContextField
+
 
 class IPTTReport:
     def __init__(self, context):
@@ -38,6 +38,8 @@ class IPTTReport:
         self.program_name = context['program']['name']
         self.results_framework = context['program']['results_framework']
         self.frequencies = context['frequencies']
+        self.lop_period = IPTTExcelPeriod.lop_period()
+
 
 class IPTTReportSerializer(serializers.Serializer):
     """Serializer for an entire IPTT Report - contains report-level data and methods to instance sub-serializers"""
@@ -49,6 +51,10 @@ class IPTTReportSerializer(serializers.Serializer):
     lop_period = serializers.SerializerMethodField()
     periods = serializers.SerializerMethodField()
     level_rows = serializers.SerializerMethodField()
+
+    is_tva = False
+    full_tva = False
+    report_serializer = IPTTExcelTPReportIndicatorSerializer
 
     class Meta:
         purpose = "IPTTReport"
@@ -92,8 +98,8 @@ class IPTTReportSerializer(serializers.Serializer):
             'program_pk': program_pk,
             'frequencies': sorted([int(frequency) for frequency in frequencies]),
             'filters': filters,
-            'is_tva': False,
-            'is_tva_full': False
+            'is_tva': cls.is_tva,
+            'is_tva_full': cls.full_tva
         }
 
     @staticmethod
@@ -255,6 +261,8 @@ class IPTTReportSerializer(serializers.Serializer):
             report_context[frequency] = frequency_context
         return report_context
 
+    # helper methods for serializer method fields / renderer use:
+
     @property
     def filename(self):
         return f"{self.report_name} {l10n_date_medium(timezone.localtime().date(), decode=True)}.xlsx"
@@ -266,10 +274,8 @@ class IPTTReportSerializer(serializers.Serializer):
             dateutil.parser.isoparse(self.context['program']['reporting_period_end_iso']).date()
         )
 
-    def get_lop_period(self, obj):
-        return IPTTExcelPeriod.lop_period()
-
     def _get_frequency_periods(self, frequency):
+        """Returns all periods serialized as period headers for a given frequency"""
         periods = [IPTTExcelPeriod(frequency, period_dict, tva=self.is_tva)
                    for period_dict in PeriodicTarget.generate_for_frequency(frequency)(*self.reporting_periods)]
         if self.full_tva:
@@ -278,18 +284,8 @@ class IPTTReportSerializer(serializers.Serializer):
         end = self.context.get('end', len(periods))
         return periods[start:end]
 
-    def get_periods(self, report):
-        frequencies = list(report.frequencies)
-        periods = {}
-        if Indicator.LOP in frequencies:
-            frequencies = [f for f in frequencies if f is not Indicator.LOP]
-            periods[Indicator.LOP] = []
-        return {
-            **periods,
-            **{frequency: self._get_frequency_periods(frequency) for frequency in  frequencies}
-        }
-
     def _get_frequency_indicators(self, frequency, level_pk=None):
+        """Returns all indicators for a given frequency and level"""
         if level_pk is None:
             return [indicator for indicator in self.context['indicators']
                     if indicator['no_rf_level'] and indicator['target_frequency'] == frequency]
@@ -297,6 +293,7 @@ class IPTTReportSerializer(serializers.Serializer):
                 if indicator['level_pk'] == level_pk and indicator['target_frequency'] == frequency]
 
     def _get_level_rows_for_frequency(self, frequency):
+        """Returns serialized level rows with indicator/report data for a given frequency"""
         has_levels = False
         goal_level = None
         has_indicators = False
@@ -337,20 +334,33 @@ class IPTTReportSerializer(serializers.Serializer):
                     'indicators': indicators
                 }
         if not has_indicators:
-            return None
+            return
 
-    def get_level_rows(self, obj):
+    # Serializer method fields:
+
+    @staticmethod
+    def get_lop_period(report):
+        return report.lop_period
+
+    def get_periods(self, report):
+        frequencies = list(report.frequencies)
+        periods = {}
+        if Indicator.LOP in frequencies:
+            frequencies = [f for f in frequencies if f is not Indicator.LOP]
+            periods[Indicator.LOP] = []
+        return {
+            **periods,
+            **{frequency: self._get_frequency_periods(frequency) for frequency in  frequencies}
+        }
+
+    def get_level_rows(self, report):
         return {
             frequency: self._get_level_rows_for_frequency(frequency)
-            for frequency in self.context['frequencies']
+            for frequency in report.frequencies
         }
 
 
 class IPTTTPReportSerializer(IPTTReportSerializer):
-    is_tva = False
-    full_tva = False
-    report_serializer = IPTTExcelTPReportIndicatorSerializer
-
     @property
     def report_name(self):
         return _("IPTT Actuals only report")
@@ -386,13 +396,6 @@ class IPTTTVAReportSerializer(IPTTReportSerializer):
         report = IPTTReport(context)
         return cls(report, context=context)
 
-    @classmethod
-    def _get_serializer_context(cls, program_pk, frequencies, filters):
-        return {
-            **super()._get_serializer_context(program_pk, frequencies, filters),
-            'is_tva': True,
-        }
-
 
 class IPTTFullReportSerializer(IPTTReportSerializer):
     is_tva = True
@@ -414,11 +417,3 @@ class IPTTFullReportSerializer(IPTTReportSerializer):
         context = cls.get_context(program_pk, cls.all_frequencies, filters=filters)
         report = IPTTReport(context)
         return cls(report, context=context)
-
-    @classmethod
-    def _get_serializer_context(cls, program_pk, frequencies, filters):
-        return {
-            **super()._get_serializer_context(program_pk, frequencies, filters),
-            'is_tva': True,
-            'is_tva_full': True
-        }
