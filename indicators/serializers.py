@@ -21,11 +21,7 @@ from indicators.models import (
     DisaggregationLabel
 )
 from indicators.queries import IPTTIndicator
-from indicators.export_renderers import (
-    FullReportExcelRenderer,
-    OneSheetExcelRenderer,
-    EM_DASH,
-)
+from indicators.export_renderers import EM_DASH
 
 
 
