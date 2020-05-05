@@ -538,6 +538,18 @@ class Program(models.Model):
         except TypeError: # esp. if there's no reporting dates
             return False
 
+    @property
+    def percent_complete(self):
+        if not self.reporting_period_end or not self.reporting_period_start:
+            return -1
+        if not self.has_started:
+            return 0
+        if self.has_ended:
+            return 100
+        total_days = (self.reporting_period_end - self.reporting_period_start).days
+        complete = (timezone.localdate() - self.reporting_period_start).days
+        return int(round(complete*100/total_days))
+
     # displayed in admin templates
     def __str__(self):
         return self.name

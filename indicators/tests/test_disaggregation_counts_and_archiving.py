@@ -158,22 +158,26 @@ class TestDisaggregationLabelCounts(test.TestCase):
             disaggregation_type="Standard 1",
             standard=True,
             country=None,
+            labels=[],
         )
         self.standard_disagg_archived = i_factories.DisaggregationTypeFactory(
             disaggregation_type="Standard 2",
             standard=True,
             country=None,
-            is_archived=True
+            is_archived=True,
+            labels=[],
         )
         self.country_disagg = i_factories.DisaggregationTypeFactory(
             disaggregation_type="Country 1",
             standard=False,
-            country=self.country
+            country=self.country,
+            labels=[],
         )
         self.country_disagg_archived = i_factories.DisaggregationTypeFactory(
             disaggregation_type="Country 2",
             standard=False,
-            country=self.country
+            country=self.country,
+            labels=[],
         )
 
     def get_labels(self, disagg, count=2):

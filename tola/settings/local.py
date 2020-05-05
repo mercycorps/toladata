@@ -1,10 +1,11 @@
 """Development settings and globals."""
-import os, yaml
+import os
+import yaml
 
 from tola.settings.base import *
 
-def read_yaml(path):
-    with open(path) as f:
+def read_yaml(yaml_path):
+    with open(yaml_path) as f:
         data = yaml.load(f, Loader=yaml.FullLoader)
     return data
 
@@ -64,41 +65,30 @@ SOCIAL_AUTH_GOOGLE_OAUTH2_SECRET = app_settings['SOCIAL_AUTH_GOOGLE_OAUTH2_SECRE
 # domains listed here will fail auth IF settings.DEBUG is off (mercycorps users should use Okta on production)
 SOCIAL_AUTH_GOOGLE_OAUTH2_OKTA_DOMAINS = ["mercycorps.org"]
 
-# TOLA TABLES AUTH
-# TOLA_TABLES_TOKEN = app_settings['TOLA_TABLES_TOKEN']
-# TOLA_TABLES_USER = app_settings['TOLA_TABLES_USER']
 
-# LOCAL APPS DEPENDING ON SERVER DEBUG FOR DEV BOXES,
-# REPORT BUILDER FOR REPORT SERVER
+# LOCAL APPS DEPENDING ON SERVER DEBUG FOR DEV BOXES, silk or other profiling for local builds, etc.
 DEV_APPS = app_settings.get('DEV_APPS', None)
 
-# silk only for testing locally:
-# LOCAL_APPS = (
-#    'silk',
-# )
-LOCAL_APPS = ()
+if DEV_APPS is not None:
+    INSTALLED_APPS = INSTALLED_APPS + tuple(DEV_APPS)
 
-#INSTALLED_APPS = INSTALLED_APPS #+ tuple(DEV_APPS)
-INSTALLED_APPS = INSTALLED_APPS + LOCAL_APPS
+# LOCAL MIDDLEWARE (loaded top of middleware stack) DEPENDING ON SERVER i.e. silk profiling for local builds:
+DEV_MIDDLEWARE_BEFORE = app_settings.get('DEV_MIDDLEWARE_BEFORE', None)
 
-# silk only for testing:
-# LOCAL_MIDDLEWARE = (
-#     'silk.middleware.SilkyMiddleware',
-# )
-LOCAL_MIDDLEWARE = ()
+if DEV_MIDDLEWARE_BEFORE is not None:
+    MIDDLEWARE = tuple(DEV_MIDDLEWARE_BEFORE) + MIDDLEWARE
 
-MIDDLEWARE =  LOCAL_MIDDLEWARE + MIDDLEWARE
-# SILK_ENABLED = True
-# SILKY_PYTHON_PROFILER = True
+# LOCAL MIDDLEWARE (loaded bottom of middleware stack) DEPENDING ON SERVER i.e. silk profiling for local builds:
+DEV_MIDDLEWARE_AFTER = app_settings.get('DEV_MIDDLEWARE_AFTER', None)
 
-MIDDLEWARE =  LOCAL_MIDDLEWARE + MIDDLEWARE
-SILK_ENABLED = True
+if DEV_MIDDLEWARE_AFTER is not None:
+    MIDDLEWARE = MIDDLEWARE + tuple(DEV_MIDDLEWARE_AFTER)
 
-# LDAP_LOGIN = app_settings['LDAP_LOGIN']
-# LDAP_SERVER = app_settings['LDAP_SERVER']
-# LDAP_PASSWORD = app_settings['LDAP_PASSWORD']
-# LDAP_USER_GROUP = app_settings['LDAP_USER_GROUP']
-# LDAP_ADMIN_GROUP = app_settings['LDAP_ADMIN_GROUP']
+SILK_ENABLED = app_settings.get('SILK_ENABLED', False)
+SILKY_PYTHON_PROFILER = app_settings.get('SILK_PYTHON_PROFILER', False)
+SILKY_PYTHON_PROFILER_BINARY = app_settings.get('SILK_PYTHON_PROFILER_BINARY', False)
+
+
 
 AUTHENTICATION_BACKENDS = app_settings['AUTHENTICATION_BACKENDS']
 
@@ -115,7 +105,6 @@ EMAIL_HOST_USER = app_settings['EMAIL_HOST_USER']
 EMAIL_HOST_PASSWORD = app_settings['EMAIL_HOST_PASSWORD']
 DEFAULT_FROM_EMAIL = app_settings.get('DEFAULT_FROM_EMAIL', 'systems@mercycorps.org')
 SERVER_EMAIL = app_settings['SERVER_EMAIL']
-#DEFAULT_TO_EMAIL = 'to email'
 EMAIL_BACKEND = app_settings.get('EMAIL_BACKEND', 'django.core.mail.backends.smtp.EmailBackend')
 
 
@@ -137,9 +126,9 @@ LOGGING['handlers']['login_file']['filename'] = os.path.join(os.path.dirname(app
 WEBPACK_LOADER = {
     'DEFAULT': {
         'BUNDLE_DIR_NAME': app_settings.get('WEBPACK_BUNDLE_DIR_NAME', 'dist/'),
-		'STATS_FILE': os.path.join(SITE_ROOT, app_settings.get('WEBPACK_STATS_FILE', 'webpack-stats-local.json')),
+        'STATS_FILE': os.path.join(SITE_ROOT, app_settings.get('WEBPACK_STATS_FILE', 'webpack-stats-local.json')),
+        }
     }
-}
 
 PROGRAM_API_BASE_URL = app_settings['PROGRAM_API_BASE_URL']
 PROGRAM_API_TOKEN = app_settings['PROGRAM_API_TOKEN']

@@ -115,7 +115,7 @@ const TVAResultsGroup = ({ value, resultCell, ...props }) => {
         <React.Fragment>
             <NumberCell value={ value.target } />
             <NumberCell value={ value.actual } />
-            <PercentCell value={ value.percent_met }/>
+            <PercentCell value={ value.met }/>
         </React.Fragment>
     );
 }
@@ -125,7 +125,7 @@ const TVAResultsGroupPercent = ({ value, resultCell, ...props }) => {
         <React.Fragment>
             <PercentCell value={ value.target } />
             <PercentCell value={ value.actual } />
-            <PercentCell value={ value.percent_met }/>
+            <PercentCell value={ value.met }/>
         </React.Fragment>
     );
 }

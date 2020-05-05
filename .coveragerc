@@ -7,8 +7,17 @@ omit =
     **/tests/*
     **/test_*py
     formlibrary/*
+    scripts/*
+    **/management/*
 
 [report]
+omit =
+    **/tests/*
+    **/test_*py
+    formlibrary/*
+    scripts/*
+    **/management/*
+    **/migrations/*
 skip_covered = True
 sort = Cover
 

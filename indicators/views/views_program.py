@@ -20,8 +20,7 @@ from workflow.models import Program
 from workflow.serializers import LogframeProgramSerializer
 from workflow.serializers_new import (
     ProgramPageProgramSerializer,
-    ProgramPageUpdateSerializer,
-    ProgramLevelUpdateSerializer,
+    ProgramPageIndicatorUpdateSerializer,
 )
 
 from tola_management.permissions import (
@@ -294,7 +293,7 @@ def program_page(request, program):
             {'program': program, 'redirect_url': request.path}
         )
     context = {
-        'program': ProgramPageProgramSerializer.get_for_pk(program.pk).data,
+        'program': ProgramPageProgramSerializer.load_for_pk(program.pk).data,
         'pinned_reports': list(PinnedReport.objects.filter(
             program_id=program.pk, tola_user=request.user.tola_user
             )) + [PinnedReport.default_report(program.pk)],
@@ -320,18 +319,7 @@ def old_program_page(request, program_id, indicator_id, indicator_type_id):
 def api_program_ordering(request, program):
     """Returns program-wide RF-aware ordering (used after indicator deletion on program page)"""
     try:
-        data = ProgramPageUpdateSerializer.update_ordering(program).data
-    except Program.DoesNotExist:
-        logger.warning('attempt to access program page ordering for bad pk {}'.format(program))
-        return JsonResponse({'success': False, 'msg': 'bad Program PK'})
-    return JsonResponse(data)
-
-@login_required
-@has_program_read_access
-def api_program_level_ordering(request, program):
-    """Returns program-wide RF-aware ordering (used after indicator deletion on program page)"""
-    try:
-        data = ProgramLevelUpdateSerializer.update_ordering(program).data
+        data = ProgramPageIndicatorUpdateSerializer.load_for_pk(program).data
     except Program.DoesNotExist:
         logger.warning('attempt to access program page ordering for bad pk {}'.format(program))
         return JsonResponse({'success': False, 'msg': 'bad Program PK'})
@@ -344,7 +332,7 @@ def api_program_level_ordering(request, program):
 def api_program_page_indicator(request, pk, program):
     """Returns single indicator updated JSON and ordering information for program page)"""
     try:
-        data = ProgramPageUpdateSerializer.update_indicator_pk(program, pk).data
+        data = ProgramPageIndicatorUpdateSerializer.load_for_indicator_and_program(pk, program).data
     except (Program.DoesNotExist, Indicator.DoesNotExist):
         logger.warning('attempt to access indicator update for bad pk {}'.format(pk))
         return JsonResponse({'success': False, 'msg': 'bad Indicator PK'})
@@ -356,7 +344,7 @@ def api_program_page_indicator(request, pk, program):
 def api_program_page(request, program):
     """Returns program JSON to hydrate Program Page react models"""
     try:
-        data = ProgramPageProgramSerializer.get_for_pk(program).data
+        data = ProgramPageProgramSerializer.load_for_pk(program).data
     except Program.DoesNotExist:
         logger.warning('attempt to access program page ordering for bad pk {}'.format(program))
         return JsonResponse({'success': False, 'msg': 'bad Program PK'})
