@@ -154,13 +154,18 @@ class IPTTExcelIndicatorFiltersMixin:
             if filter_key in filters and isinstance(filters[filter_key], list):
                 query_filters[query_name] = filters[filter_key]
         if 'levels' in filters and isinstance(filters['levels'], list):
-            level_pks = []
-            parent_pks = filters.get('levels')
-            while parent_pks:
-                child_pks = [level.pk for level in levels if level.parent_id in parent_pks]
-                level_pks += parent_pks
-                parent_pks = child_pks
-            query_filters['level__in'] = level_pks
+            if context['program']['results_framework']:
+                level_pks = []
+                parent_pks = filters.get('levels')
+                while parent_pks:
+                    child_pks = [level.pk for level in levels if level.parent_id in parent_pks]
+                    level_pks += parent_pks
+                    parent_pks = child_pks
+                query_filters['level__in'] = level_pks
+            else:
+                old_level_map = {pk: name for (pk, name) in Indicator.OLD_LEVELS}
+                old_level_names = [old_level_map[pk] for pk in filters['levels']]
+                query_filters['old_level__in'] = old_level_names
         elif 'tiers' in filters and isinstance(filters['tiers'], list):
             filter_levels = []
             tier_depths = sorted([tier.tier_depth for tier in tiers if tier.pk in filters.get('tiers')])
