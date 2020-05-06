@@ -929,6 +929,14 @@ window.localizeNumber = (val) => {
     return displayValue;
 };
 
+// Useful if you need to delocalize form values, e.g. to evaluate if the form has changed.
+// Doesn't delocalize the thousands separator.
+window.delocalizeRadix = function (localizedValue) {
+    let delocalized = localizedValue.replace(",", ".");
+    return isNaN(delocalized) ? localizedValue : delocalized;
+}
+
+
 window.normalizeNumber = function (value) {
     if (isNaN(parseFloat(value)) || isDate(value)) {
         return value;
@@ -937,3 +945,4 @@ window.normalizeNumber = function (value) {
         return parseFloat(value).toString();
     }
 };
+

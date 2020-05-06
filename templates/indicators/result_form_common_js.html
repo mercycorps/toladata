@@ -317,13 +317,13 @@
     function hasResultFormChanged() {
         let prevState = JSON.stringify(resultFormSnapshot, function (key, value) {
             if (key === "value") {
-               return window.normalizeNumber(value)
+                return window.normalizeNumber(window.delocalizeRadix(value))
             }
             return value;
         });
         let currState = JSON.stringify(getTrackedResultFieldsArray(),function (key, value) {
             if (key === "value") {
-                return window.normalizeNumber(value)
+                return window.normalizeNumber(window.delocalizeRadix(value))
             }
             return value;
         });
