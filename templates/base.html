@@ -36,6 +36,20 @@
 
     </head>
     <body class="{% block bodyclasses %}{% endblock %}">
+        
+        {% get_current_language as LANGUAGE_CODE %}
+        {% if request.session.show_covid_banner %}
+            <div id="covid-banner-alert" class="alert alert--banner bg-warning alert-dismissible fade show" role="alert">
+                <strong>
+                😷 COVID-19:
+                <a href="{% trans 'https://library.mercycorps.org/record/32352/files/COVID19RemoteMERL.pdf' %}" target="_blank">{% trans "Remote MERL guidance (PDF)" %}</a>
+                | <a href="{% trans 'https://drive.google.com/open?id=1x24sddNU1uY851-JW-6f43K4TRS2B96J' %}" target="_blank">{% trans "Recorded webinar" %}</a>
+                </strong>
+                <button type="button" class="close" data-dismiss="alert" aria-label="Close">
+                    <span aria-hidden="true">&times;</span>
+                </button>
+            </div>
+        {% endif %}
 
         <nav class="navbar navbar-dark navbar-expand-sm navbar-tola {% if user.is_superuser %}for-superadmin{% endif %}">
             <div class="container-fluid navbar-tola--container">
@@ -244,8 +258,6 @@
         <script type="text/javascript" src="{% static "js/PNotify.js" %}"></script>
         <script type="text/javascript" src="{% static "js/PNotifyButtons.js" %}"></script>
         <script type="text/javascript" src="{% static "js/PNotifyConfirm.js" %}"></script>
-
-        {% get_current_language as LANGUAGE_CODE %}
 
         <script type="text/javascript">
             // This is now referenced in other JS, not just here in the date picker!

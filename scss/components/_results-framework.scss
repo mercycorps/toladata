@@ -34,7 +34,7 @@
         margin-top: $grid-gutter-width/4;
     }
 }
-@for $i from 1 through 6 { // TODO: what is our max depth?
+@for $i from 1 through 10 { // Current max is 8 but not much harm in putting in a little extra?
     .leveltier--level-#{$i} {
         margin-left: #{$grid-gutter-width/2 * $i}
     }
