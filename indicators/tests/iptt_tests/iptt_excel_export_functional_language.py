@@ -93,7 +93,7 @@ COLUMNS = {
         'Changement',
         'C / NC',
         '# / %',
-        'Base de référence'
+        'Mesure de base'
     ], SPANISH: [
         'No.',
         'Indicador',
@@ -113,7 +113,7 @@ REPORT_TITLE = {
 
 LOP_PERIOD = {
     ENGLISH: "Life of Program",
-    FRENCH: "Vie du programme",
+    FRENCH: "La vie du programme",
     SPANISH: "Vida del programa",
 }
 
