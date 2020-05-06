@@ -1359,7 +1359,7 @@ msgstr ""
 
 #: templates/base.html:45
 msgid "https://library.mercycorps.org/record/32352/files/COVID19RemoteMERL.pdf"
-msgstr "https://library.mercycorps.org/record/32636/files/COVID19RemoteMERLfr.pd"
+msgstr "https://library.mercycorps.org/record/32636/files/COVID19RemoteMERLfr.pdf"
 
 #: templates/base.html:45
 msgid "Remote MERL guidance (PDF)"
