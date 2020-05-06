@@ -151,6 +151,7 @@ class TestIPTTIndicatorSerializerQueries(test.TestCase):
                     disaggregations_indicators[d_i['indicator__pk']]['with_results'].append(d_i['pk'])
             context = {
                 'program_pk': program_pk,
+                'program': {'results_framework': True},
                 'filters': filters,
                 'frequencies': [1, 2, 3, 4, 5, 6, 7, 8],
                 'levels': list(Level.objects.select_related(None).only(
