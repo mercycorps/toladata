@@ -23,6 +23,28 @@ QUERY_COUNT = 11
 WITH_RESULTS = 1
 WITH_DISAGGREGATIONS = 1
 
+ENGLISH = 1
+FRENCH = 2
+SPANISH = 3
+
+LOP = {
+    ENGLISH: 'Life of Program',
+    FRENCH: 'La vie du programme',
+    SPANISH: 'Vida del programa'
+}
+
+MIDLINE = {
+    ENGLISH: 'Midline',
+    FRENCH: 'Mesure de mi-parcours',
+    SPANISH: 'Línea media'
+}
+
+ENDLINE = {
+    ENGLISH: 'Endline',
+    FRENCH: 'Mesure de fin de programme',
+    SPANISH: 'Línea final'
+}
+
 def get_serialized_data(program_pk):
     return IPTTProgramSerializer.load_for_pk(program_pk).data
 
@@ -377,7 +399,7 @@ class TestIPTTProgramSerializerFilterData(test.TestCase):
     def test_country_disaggregation_unassigned_to_program_does_not_show_up(self):
         program = RFProgramFactory()
         program.country.add(self.country)
-        country_dt = DisaggregationTypeFactory(
+        DisaggregationTypeFactory(
             disaggregation_type="Test Disaggregation", country=self.country, standard=False,
             labels=["Test Label 1", "Test Label 2", "Test Label 3"]
         )
@@ -388,7 +410,7 @@ class TestIPTTProgramSerializerFilterData(test.TestCase):
         self.assertEqual(len(data['disaggregations']), 0)
 
     def test_standard_disaggregation_unassigned_to_program_does_not_show_up(self):
-        standard_dt = DisaggregationTypeFactory(
+        DisaggregationTypeFactory(
             disaggregation_type="Test Standard Disagg", country=None, standard=True,
             labels=["Test Standard One Label"]
         )
@@ -442,9 +464,9 @@ class TestIPTTProgramSerializerFilterData(test.TestCase):
         self.assertEqual(lop_period['start'], '2016-01-01')
         self.assertEqual(lop_period['end'], data['reporting_period_end_iso'])
         self.assertEqual(lop_period['end'], '2016-12-31')
-        self.assertEqual(lop_period['name'], 'Life of Program')
+        self.assertEqual(lop_period['name'], LOP[ENGLISH])
         self.assertEqual(lop_period['label'], None)
-        for name, period in zip(['Midline', 'Endline'], data['period_date_ranges'][Indicator.MID_END]):
+        for name, period in zip([MIDLINE[ENGLISH], ENDLINE[ENGLISH]], data['period_date_ranges'][Indicator.MID_END]):
             self.assertEqual(period['start'], '2016-01-01')
             self.assertEqual(period['end'], '2016-12-31')
             self.assertEqual(period['name'], name)
@@ -471,9 +493,9 @@ class TestIPTTProgramSerializerFilterData(test.TestCase):
         lop_period = data['period_date_ranges'][Indicator.LOP][0]
         self.assertEqual(lop_period['start'], '2016-01-01')
         self.assertEqual(lop_period['end'], '2016-12-31')
-        self.assertEqual(lop_period['name'], 'Vie du programme')
+        self.assertEqual(lop_period['name'], LOP[FRENCH])
         self.assertEqual(lop_period['label'], None)
-        for name, period in zip(['Milieu de ligne', 'Fin de ligne'], data['period_date_ranges'][Indicator.MID_END]):
+        for name, period in zip([MIDLINE[FRENCH], ENDLINE[FRENCH]], data['period_date_ranges'][Indicator.MID_END]):
             self.assertEqual(period['name'], name)
             self.assertEqual(period['label'], None)
         annual_period = data['period_date_ranges'][Indicator.ANNUAL][0]

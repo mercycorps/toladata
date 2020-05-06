@@ -410,6 +410,11 @@ LOGGING = {
             'level': 'ERROR',
             'propagate': True,
         },
+        'tola': {
+            'handlers': ['file'],
+            'level': 'ERROR',
+            'propagate': True,
+        },
         'login': {
             'handlers': ['login_file'],
             'level': 'DEBUG',

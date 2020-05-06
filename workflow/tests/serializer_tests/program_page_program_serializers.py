@@ -9,12 +9,41 @@ from indicators.models import Indicator
 from tola.test.utils import lang_context
 from workflow.serializers_new import (
     ProgramPageProgramSerializer,
-    #ProgramRFOrderingUpdateSerializer,
     ProgramPageIndicatorUpdateSerializer,
 )
 
 PROGRAM_PAGE_QUERIES = 4
 PROGRAM_PAGE_UPDATE_QUERIES = PROGRAM_PAGE_QUERIES + 1
+
+ENGLISH = 1
+FRENCH = 2
+SPANISH = 3
+
+BY_TIER_CHAIN = {
+    ENGLISH: 'by {} chain',
+    FRENCH: 'par chaîne {}',
+    SPANISH: 'por cadena de {}'
+}
+GOAL = {
+    ENGLISH: 'Goal',
+    FRENCH: 'But',
+    SPANISH: 'Objetivo'
+}
+OUTCOME = {
+    ENGLISH: 'Outcome',
+    FRENCH: 'Résultat',
+    SPANISH: 'Resultado'
+}
+OUTPUT = {
+    ENGLISH: 'Output',
+    FRENCH: 'Extrant',
+    SPANISH: 'Salida'
+}
+ACTIVITY = {
+    ENGLISH: 'Activity',
+    FRENCH: 'Activité',
+    SPANISH: 'Actividad'
+}
 
 class TestProgramPageProgramSerializer(test.TestCase):
     def get_serialized_data(self, program_pk):
@@ -240,8 +269,8 @@ class TestProgramPageSerializersFunctional(test.TestCase):
         self.assertEqual(data['indicators'][pks[3]]['level_pk'], 3)
         with lang_context('fr'):
             french_data = self.get_serialized_data(p.pk)
-        self.assertEqual(french_data['indicators'][pks[0]]['old_level_name'], u'Activité')
-        self.assertEqual(french_data['indicators'][pks[4]]['old_level_name'], u'Résultat')
+        self.assertEqual(french_data['indicators'][pks[0]]['old_level_name'], ACTIVITY[FRENCH])
+        self.assertEqual(french_data['indicators'][pks[4]]['old_level_name'], OUTCOME[FRENCH])
 
     def test_rf_program_many_indicators(self):
         p = RFProgramFactory(months=20, tiers=['Goal', 'Outcome', 'Output', 'Activity'], levels=3)
@@ -293,9 +322,9 @@ class TestProgramPageSerializersFunctional(test.TestCase):
         self.assertEqual(data['indicators'][unassigned_pks[2]]['level_pk'], None)
         with lang_context('fr'):
             french_data = self.get_serialized_data(p.pk)
-        self.assertEqual(french_data['by_result_chain'], 'par chaîne Résultat')
-        self.assertEqual(french_data['indicators'][goal_pk_b]['number'], 'Objectif b')
-        self.assertEqual(french_data['indicators'][expected_pks[6]]['number'], 'Rendement 1.2a')
+        self.assertEqual(french_data['by_result_chain'], BY_TIER_CHAIN[FRENCH].format(OUTCOME[FRENCH]))
+        self.assertEqual(french_data['indicators'][goal_pk_b]['number'], '{} b'.format(GOAL[FRENCH]))
+        self.assertEqual(french_data['indicators'][expected_pks[6]]['number'], '{} 1.2a'.format(OUTPUT[FRENCH]))
         self.assertEqual(french_data['indicators'][unassigned_pks[1]]['old_level_name'], None)
 
     def test_manual_numbering(self):

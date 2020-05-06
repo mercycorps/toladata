@@ -291,6 +291,7 @@ class LevelAdmin(admin.ModelAdmin):
 
 class LevelTier(models.Model):
 
+    MAX_TIERS = 8
     @property
     def TEMPLATES(self):
         return self.get_templates()
