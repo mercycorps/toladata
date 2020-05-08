@@ -155,6 +155,27 @@ class ProgramPageIndicatorMixin:
             'target_period_last_end_date'
         ]
 
+    def get_long_number(self, indicator):
+        number = super().get_long_number(indicator)
+        if not indicator.manual_number_display or not indicator.level_id:
+            return number
+        level_set = getattr(indicator.program, 'prefetch_levels', indicator.program.levels.all())
+        level = [l for l in level_set if l.pk == indicator.level_id]
+        if not level:
+            return number
+        level_depth, display_ontology = self._get_level_depth_ontology(level[0], level_set)
+        leveltier = [t for t in getattr(
+            indicator.program, 'prefetch_leveltiers', indicator.program.level_tiers.all()
+            ) if t.tier_depth == level_depth]
+        if not leveltier:
+            if number is None:
+                return ''
+            return number
+        leveltier_name = _(leveltier[0].name)
+        if not number:
+            return leveltier_name
+        return f"{leveltier_name} {number}"
+
     def get_has_results(self, indicator):
         return indicator.results_count > 0
 
