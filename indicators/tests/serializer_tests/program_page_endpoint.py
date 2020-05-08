@@ -177,6 +177,7 @@ class TestProgramPageEndpoint(test.TestCase):
         )
         numbers = ['482', '28.C', '999']
         pks = []
+        tiers = []
         for level, number in zip(list(reversed(levels)), numbers):
             pks.append(
                 RFIndicatorFactory(
@@ -185,15 +186,17 @@ class TestProgramPageEndpoint(test.TestCase):
                     number=number
                 ).pk
             )
+            tiers.append(level.leveltier.name)
         expected_pks = list(reversed(pks))
         expected_numbers = list(reversed(numbers))
+        expected_tiers = list(reversed(tiers))
         with self.assertNumQueries(4):
             data = ProgramPageProgramSerializer.get_for_pk(p.pk).data
         self.assertEqual(len(data['indicators']), 3)
         self.assertEqual(data['indicator_pks_level_order'], expected_pks)
         self.assertEqual(data['indicator_pks_chain_order'], expected_pks)
-        for pk, number in zip(expected_pks, expected_numbers):
-            self.assertEqual(data['indicators'][pk]['number'], number)
+        for pk, number, tier in zip(expected_pks, expected_numbers, expected_tiers):
+            self.assertEqual(data['indicators'][pk]['number'], f"{tier} {number}")
 
     def test_rollups(self):
         p = RFProgramFactory()
