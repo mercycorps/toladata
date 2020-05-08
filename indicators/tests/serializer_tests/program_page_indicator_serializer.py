@@ -55,6 +55,27 @@ class TestProgramPageIndicatorSerializer(test.TestCase):
         data = self.get_indicator_data(program=p, number="")
         self.assertEqual(data['number'], None)
 
+    def test_migrated_manual_number_long_number_with_tier(self):
+        p = RFProgramFactory(migrated=True, tiers=['tier1', 'tier2'],
+                             levels=True, auto_number_indicators=False)
+        l = [l for l in p.levels.all() if l.level_depth == 2][0]
+        data = self.get_indicator_data(program=p, number="203893.12", level=l, level_order=0)
+        self.assertEqual(data['number'], "tier2 203893.12")
+
+    def test_migrated_manual_number_long_number_number_blank_with_tier(self):
+        p = RFProgramFactory(migrated=True, tiers=['tier1', 'tier2'],
+                             levels=True, auto_number_indicators=False)
+        l = [l for l in p.levels.all() if l.level_depth == 2][0]
+        data = self.get_indicator_data(program=p, number=None, level=l, level_order=0)
+        self.assertEqual(data['number'], 'tier2')
+
+    def test_migrated_manual_number_long_number_number_empty_with_tier(self):
+        p = RFProgramFactory(migrated=True, tiers=['tier1', 'tier2'],
+                             levels=True, auto_number_indicators=False)
+        l = [l for l in p.levels.all() if l.level_depth == 2][0]
+        data = self.get_indicator_data(program=p, number="", level=l, level_order=0)
+        self.assertEqual(data['number'], 'tier2')
+
     def test_migrated_no_level_number(self):
         p = RFProgramFactory(tiers=['tier1', 'tier2'], levels=True)
         data = self.get_indicator_data(program=p, level=None)
