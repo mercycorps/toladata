@@ -403,14 +403,12 @@ class IPTTExcelRenderer(ExcelRendererBase):
         alignment=openpyxl.styles.Alignment(horizontal='right', wrap_text=True)
     )
 
-    # Translators: referring to an indicator whose results accumulate over time
-    CUMULATIVE = ugettext("Cumulative")
-
-    # Translators: referring to an indicator whose results do not accumulate over time
-    NON_CUMULATIVE = ugettext("Non-cumulative")
-
     def __init__(self, serializer, **kwargs):
         super().__init__()
+         # Translators: referring to an indicator whose results accumulate over time
+        self.CUMULATIVE = ugettext("Cumulative")
+        # Translators: referring to an indicator whose results do not accumulate over time
+        self.NON_CUMULATIVE = ugettext("Non-cumulative")
         params = kwargs.get('params', {})
         self.filename = serializer.filename
         self.serializer = serializer.data
