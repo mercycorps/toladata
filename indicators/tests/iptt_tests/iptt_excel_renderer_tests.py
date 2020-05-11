@@ -223,7 +223,7 @@ class TestExcelRendererGlobals(test.TestCase):
             4: 'Indicator 11',
             5: 'Indicator 11 UOM',
             6: '+',
-            7: "Not cumulative",
+            7: "Non-cumulative",
             8: "#",
             9: 100,
             10: 200,
@@ -261,7 +261,7 @@ class TestExcelRendererGlobals(test.TestCase):
             4: 'Indicator 13',
             5: 'Indicator 13 UOM',
             6: 'N/A',
-            7: "Not cumulative",
+            7: "Non-cumulative",
             8: "#",
             9: 10000.12,
             10: 500,
@@ -384,6 +384,8 @@ class TestExcelRendererGlobals(test.TestCase):
             for column, expected_value in row_expectations.items():
                 self.assertEqual(sheet.cell(row=row, column=column).value, expected_value,
                                  f"Row {row} column {column} expected {expected_value}")
+                if expected_value == '–':
+                    self.assertEqual(sheet.cell(row=row, column=column).alignment.horizontal, 'right')
         response = renderer.render_to_response()
         self.assertEqual(response['Content-Disposition'], 'attachment; filename="Filename"')
 

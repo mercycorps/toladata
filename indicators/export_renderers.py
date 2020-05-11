@@ -247,7 +247,7 @@ class ExcelRendererBase:
             else:
                 if value is None:
                     value = empty_cell
-                    alignment = CENTER_ALIGN
+                    alignment = RIGHT_ALIGN
                 cell.value = value
                 if alignment is not None:
                     cell.alignment = alignment
@@ -295,7 +295,7 @@ class ExcelRendererBase:
             ]
         if self.cnc_column:
             indicator_columns += [
-                (ugettext("Cumulative") if indicator['is_cumulative'] else ugettext("Not cumulative"),
+                (self.CUMULATIVE if indicator['is_cumulative'] else self.NON_CUMULATIVE,
                  self.str_cell, None, None),
             ]
         if self.uom_type_column:
@@ -331,7 +331,7 @@ class ExcelRendererBase:
                     value, number_format = values_func(value)
                     if value is None:
                         cell.value = EM_DASH
-                        cell.alignment = CENTER_ALIGN
+                        cell.alignment = RIGHT_ALIGN
                     else:
                         cell.value = value
                     if number_format is not None:
@@ -402,6 +402,12 @@ class IPTTExcelRenderer(ExcelRendererBase):
         name='category_cell',
         alignment=openpyxl.styles.Alignment(horizontal='right', wrap_text=True)
     )
+
+    # Translators: referring to an indicator whose results accumulate over time
+    CUMULATIVE = ugettext("Cumulative")
+
+    # Translators: referring to an indicator whose results do not accumulate over time
+    NON_CUMULATIVE = ugettext("Non-cumulative")
 
     def __init__(self, serializer, **kwargs):
         super().__init__()
