@@ -132,7 +132,6 @@ class IPTTExcelIndicatorFiltersMixin:
         fields = [
             'program_pk',
             'number',
-            'is_cumulative_display',
             'disaggregations',
             'no_rf_level',
         ]

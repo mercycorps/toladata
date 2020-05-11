@@ -250,8 +250,7 @@ class TestIPTTIndicatorSerializerQueries(test.TestCase):
                     )
 
     def test_loads_measurement_stats(self):
-        fields = ['unit_of_measure', 'direction_of_change', 'unit_of_measure_type',
-                  'is_cumulative_display', 'baseline']
+        fields = ['unit_of_measure', 'direction_of_change', 'unit_of_measure_type', 'baseline']
         i_gen = IndicatorGenerator()
         expected = {}
         for indicator in i_gen.all_measurement_type_indicators():
@@ -268,10 +267,6 @@ class TestIPTTIndicatorSerializerQueries(test.TestCase):
                 expected_data['expected_unit_of_measure_type'] = '%'
             else:
                 expected_data['expected_unit_of_measure_type'] = '#'
-            if indicator.is_cumulative:
-                expected_data['expected_is_cumulative_display'] = 'Cumulative'
-            else:
-                expected_data['expected_is_cumulative_display'] = 'Not cumulative'
             if indicator.baseline_na:
                 expected_data['expected_baseline'] = None
             else:

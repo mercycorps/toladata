@@ -357,7 +357,7 @@ class TestIPTTExcelExports(test.TestCase):
             self.scenario.indicators[0].name,
             self.scenario.indicators[0].unit_of_measure,
             "N/A",
-            "Not cumulative",
+            "Non-cumulative",
             "#",
             0,
             1000,
@@ -451,7 +451,7 @@ class TestIPTTExcelExports(test.TestCase):
             "Tîér2 2a",
             self.scenario.indicators[3].name,
             self.scenario.indicators[3].unit_of_measure,
-            "N/A", "Not cumulative", "#", 0, 10, 20, 2, 0.83, 11, 13.253,
+            "N/A", "Non-cumulative", "#", 0, 10, 20, 2, 0.83, 11, 13.253,
             0.83, "–", "–", 0.83, "–", "–", 0.83, 9, 10.8434
             ]):
             self.assertEqual(
