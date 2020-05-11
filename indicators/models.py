@@ -1426,6 +1426,8 @@ class Indicator(SafeDeleteModel):
 
     @property
     def is_cumulative_display(self):
+        """Deprecated?  Could not find where this was used, but text is updated in both
+        setup form and IPTT to read "Non-cumulative" """
         if self.is_cumulative:
             # Translators: referring to an indicator whose results accumulate over time
             return _("Cumulative")
