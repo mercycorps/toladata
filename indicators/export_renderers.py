@@ -295,7 +295,7 @@ class ExcelRendererBase:
             ]
         if self.cnc_column:
             indicator_columns += [
-                (ugettext("Cumulative") if indicator['is_cumulative'] else ugettext("Not cumulative"),
+                (ugettext("Cumulative") if indicator['is_cumulative'] else ugettext("Non-cumulative"),
                  self.str_cell, None, None),
             ]
         if self.uom_type_column:
