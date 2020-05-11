@@ -247,7 +247,7 @@ class ExcelRendererBase:
             else:
                 if value is None:
                     value = empty_cell
-                    alignment = CENTER_ALIGN
+                    alignment = RIGHT_ALIGN
                 cell.value = value
                 if alignment is not None:
                     cell.alignment = alignment
@@ -331,7 +331,7 @@ class ExcelRendererBase:
                     value, number_format = values_func(value)
                     if value is None:
                         cell.value = EM_DASH
-                        cell.alignment = CENTER_ALIGN
+                        cell.alignment = RIGHT_ALIGN
                     else:
                         cell.value = value
                     if number_format is not None:

@@ -384,6 +384,8 @@ class TestExcelRendererGlobals(test.TestCase):
             for column, expected_value in row_expectations.items():
                 self.assertEqual(sheet.cell(row=row, column=column).value, expected_value,
                                  f"Row {row} column {column} expected {expected_value}")
+                if expected_value == '–':
+                    self.assertEqual(sheet.cell(row=row, column=column).alignment.horizontal, 'right')
         response = renderer.render_to_response()
         self.assertEqual(response['Content-Disposition'], 'attachment; filename="Filename"')
 
