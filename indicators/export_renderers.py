@@ -295,7 +295,7 @@ class ExcelRendererBase:
             ]
         if self.cnc_column:
             indicator_columns += [
-                (ugettext("Cumulative") if indicator['is_cumulative'] else ugettext("Non-cumulative"),
+                (self.CUMULATIVE if indicator['is_cumulative'] else self.NON_CUMULATIVE,
                  self.str_cell, None, None),
             ]
         if self.uom_type_column:
@@ -402,6 +402,12 @@ class IPTTExcelRenderer(ExcelRendererBase):
         name='category_cell',
         alignment=openpyxl.styles.Alignment(horizontal='right', wrap_text=True)
     )
+
+    # Translators: referring to an indicator whose results accumulate over time
+    CUMULATIVE = ugettext("Cumulative")
+
+    # Translators: referring to an indicator whose results do not accumulate over time
+    NON_CUMULATIVE = ugettext("Non-cumulative")
 
     def __init__(self, serializer, **kwargs):
         super().__init__()
