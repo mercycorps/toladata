@@ -2,7 +2,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: \n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2020-05-06 13:00-0700\n"
+"POT-Creation-Date: 2020-05-11 11:21-0700\n"
 "PO-Revision-Date: 2020-03-24 08:32-0700\n"
 "Last-Translator: \n"
 "Language-Team: \n"
@@ -164,9 +164,8 @@ msgstr "S.O."
 msgid "Cumulative"
 msgstr "Cumulatif"
 
-#. Translators: referring to an indicator whose results do not accumulate over time
-#: indicators/export_renderers.py:298 indicators/models.py:1436
-msgid "Not cumulative"
+#: indicators/export_renderers.py:298
+msgid "Non-cumulative"
 msgstr "Non cumulatif"
 
 #: indicators/export_renderers.py:384
@@ -853,6 +852,11 @@ msgstr "#"
 msgid "%"
 msgstr "%"
 
+#. Translators: referring to an indicator whose results do not accumulate over time
+#: indicators/models.py:1436
+msgid "Not cumulative"
+msgstr "Non cumulatif"
+
 #: indicators/models.py:1441 indicators/templatetags/mytags.py:87
 msgid "-"
 msgstr "-"
@@ -1359,7 +1363,8 @@ msgstr ""
 
 #: templates/base.html:45
 msgid "https://library.mercycorps.org/record/32352/files/COVID19RemoteMERL.pdf"
-msgstr "https://library.mercycorps.org/record/32636/files/COVID19RemoteMERLfr.pdf"
+msgstr ""
+"https://library.mercycorps.org/record/32636/files/COVID19RemoteMERLfr.pdf"
 
 #: templates/base.html:45
 msgid "Remote MERL guidance (PDF)"
