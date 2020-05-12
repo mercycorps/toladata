@@ -2,7 +2,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: \n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2020-05-06 13:00-0700\n"
+"POT-Creation-Date: 2020-05-12 14:12-0700\n"
 "PO-Revision-Date: 2020-03-13 10:43-0700\n"
 "Last-Translator: \n"
 "Language-Team: \n"
@@ -166,31 +166,31 @@ msgstr "par Niveau"
 msgid "Group indicators"
 msgstr "Regrouper les indicateurs"
 
-#: js/constants.js:21 js/pages/iptt_quickstart/models/root_store.js:30
+#: js/constants.js:21 js/pages/iptt_quickstart/models/ipttQSRootStore.js:30
 msgid "Life of Program (LoP) only"
 msgstr "La vie du programme (LoP) seulement"
 
-#: js/constants.js:22 js/pages/iptt_quickstart/models/root_store.js:31
+#: js/constants.js:22 js/pages/iptt_quickstart/models/ipttQSRootStore.js:31
 msgid "Midline and endline"
 msgstr "Mesure de mi-parcours et mesure de fin de programme"
 
-#: js/constants.js:23 js/pages/iptt_quickstart/models/root_store.js:32
+#: js/constants.js:23 js/pages/iptt_quickstart/models/ipttQSRootStore.js:32
 msgid "Annual"
 msgstr "Annuel"
 
-#: js/constants.js:24 js/pages/iptt_quickstart/models/root_store.js:33
+#: js/constants.js:24 js/pages/iptt_quickstart/models/ipttQSRootStore.js:33
 msgid "Semi-annual"
 msgstr "Semestriel"
 
-#: js/constants.js:25 js/pages/iptt_quickstart/models/root_store.js:34
+#: js/constants.js:25 js/pages/iptt_quickstart/models/ipttQSRootStore.js:34
 msgid "Tri-annual"
 msgstr "Quadrimestriel"
 
-#: js/constants.js:26 js/pages/iptt_quickstart/models/root_store.js:35
+#: js/constants.js:26 js/pages/iptt_quickstart/models/ipttQSRootStore.js:35
 msgid "Quarterly"
 msgstr "Trimestriel"
 
-#: js/constants.js:27 js/pages/iptt_quickstart/models/root_store.js:36
+#: js/constants.js:27 js/pages/iptt_quickstart/models/ipttQSRootStore.js:36
 msgid "Monthly"
 msgstr "Mensuel"
 
@@ -378,19 +378,19 @@ msgstr ""
 "périodiques"
 
 #. Translators: option to show all periods for the report */
-#: js/pages/iptt_quickstart/components/radios.js:26
+#: js/pages/iptt_quickstart/components/radios.js:35
 #: js/pages/iptt_report/components/sidebar/reportSelect.js:113
 #: js/pages/program_page/components/indicator_list.js:80
 msgid "Show all"
 msgstr "Tout afficher"
 
 #. Translators: option to show a number of recent periods for the report */
-#: js/pages/iptt_quickstart/components/radios.js:42
+#: js/pages/iptt_quickstart/components/radios.js:51
 #: js/pages/iptt_report/components/sidebar/reportSelect.js:131
 msgid "Most recent"
 msgstr "Plus récent"
 
-#: js/pages/iptt_quickstart/components/radios.js:49
+#: js/pages/iptt_quickstart/components/radios.js:58
 msgid "enter a number"
 msgstr "saisir un nombre"
 
@@ -460,6 +460,7 @@ msgstr "Valeur réelle"
 
 #. Translators: Column header for a percent-met column */
 #: js/pages/iptt_report/components/report/headerCells.js:70
+#: js/pages/iptt_report/components/report/tableHeader.js:170
 msgid "% Met"
 msgstr "% Atteint"
 
@@ -520,11 +521,6 @@ msgstr "# / %"
 #: js/pages/program_page/components/indicator_list.js:195
 msgid "Baseline"
 msgstr "Mesure de base"
-
-#. Translators: Column header for a percent-met column */
-#: js/pages/iptt_report/components/report/tableHeader.js:170
-msgid "% met"
-msgstr "% atteint"
 
 #: js/pages/iptt_report/components/report/tableRows.js:11
 #: js/pages/iptt_report/components/report/tableRows.js:258
@@ -1909,6 +1905,9 @@ msgstr "Ajouter un utilisateur"
 #: js/pages/tola_management_pages/user/views.js:332
 msgid "Super Admin"
 msgstr "Super-administrateur"
+
+#~ msgid "% met"
+#~ msgstr "% atteint"
 
 #~ msgid ""
 #~ "This option is recommended for disaggregations that are required for all "
