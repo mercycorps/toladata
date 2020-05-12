@@ -78,14 +78,16 @@ def get_audit_log_workbook(ws, program):
     def _result_disaggregation_serializer(raw_disaggs):
         disaggs = {}
         for item in raw_disaggs.values():
+            disaggregation_type = item.get('type', 'unknown')
             try:
-                disaggs[item['type']].append(item)
+                disaggs[disaggregation_type].append(item)
             except KeyError:
-                disaggs[item['type']] = [item]
+                # data entered before we stored the disaggregation_type needs a default value:
+                disaggs[disaggregation_type] = [item]
 
         output_string = ""
         for disagg_type in sorted(list(disaggs.keys())):
-            if disagg_type:
+            if disagg_type != 'unknown':
                 output_string += f"\r\n{disagg_type}\r\n"
             else:
                 output_string += "\r\n"
