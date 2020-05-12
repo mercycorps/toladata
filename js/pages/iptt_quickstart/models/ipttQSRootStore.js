@@ -118,6 +118,13 @@ export default class QSRootStore {
         }
         return '';
     }
+
+    @computed get mostRecentCountAccurate() {
+        if (this.mostRecent && this.mostRecentCount) {
+            return Math.min(this.mostRecentCount, this.programStore.getProgram(this.tvaProgramId).currentPeriod(this.frequencyId));
+        }
+        return false
+    }
     
     /* SET tva program to the designated ID, and make the report type TVA */
     @action setTVAProgram(programId) {
@@ -151,7 +158,6 @@ export default class QSRootStore {
 
     @action setMostRecentCount = (count) => {
         this.setMostRecent();
-        count = Math.min(count, this.programStore.getProgram(this.tvaProgramId).currentPeriod(this.frequencyId));
         this.mostRecentCount = count;
     }
     
@@ -169,10 +175,15 @@ export default class QSRootStore {
                 return url;
             } else if (this.showAll) {
                 return `${url}&start=0&end=${program.periodCount(this.frequencyId)-1}`;
+            } else if (this.mostRecent && this.mostRecentCount) {
+                let current = program.currentPeriod(this.frequencyId)-1;
+                let past = current - Math.max(this.mostRecentCountAccurate, 1) + 1;
+                let mrURL = `${url}&start=${past}&end=${current}`;
+                if (program.currentPeriod(this.frequencyId) == program.periodCount(this.frequencyId) && past == 0) {
+                    return `${mrURL}&mr=1`;
+                }
+                return mrURL;
             }
-            let current = program.currentPeriod(this.frequencyId);
-            let past = current - Math.max(this.mostRecentCount, 1) + 1;
-            return `${url}&start=${past}&end=${current}`;
         }
         return false;
     }

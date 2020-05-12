@@ -2,7 +2,7 @@ import React from 'react';
 import ReactDOM from 'react-dom';
 import { Provider } from 'mobx-react';
 
-import QSRootStore from './models/root_store';
+import QSRootStore from './models/ipttQSRootStore';
 import { IPTTQuickstartForm } from './components/main';
 
 const rootStore = new QSRootStore(jsContext);
