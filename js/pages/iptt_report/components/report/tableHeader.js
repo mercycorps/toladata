@@ -167,7 +167,7 @@ const ColumnHeaderRow = inject('rootStore')(
                     className='lop-column'
                     label={
                         /* # Translators: Column header for a percent-met column */
-                        gettext('% met')
+                        gettext('% Met')
                     } />
                 { rootStore.reportPeriods.map(
                     (period, index) => (rootStore.isTVA ?
