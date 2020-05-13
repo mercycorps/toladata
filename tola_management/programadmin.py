@@ -91,7 +91,7 @@ def get_audit_log_workbook(ws, program):
                 output_string += f"\r\n{disagg_type}\r\n"
             else:
                 output_string += "\r\n"
-            disaggs[disagg_type].sort(key=lambda item: "" if item["custom_sort"] is None else item["custom_sort"])
+            disaggs[disagg_type].sort(key=lambda item: item.get('customsort', ''))
 
             for item in disaggs[disagg_type]:
                 output_string += f"{item['name']}: {item['value']}\r\n"
