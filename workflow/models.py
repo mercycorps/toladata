@@ -201,7 +201,10 @@ class TolaUser(models.Model):
                 access_level = 'low'
 
         try:
-            access_level = ProgramAccess.objects.get(tolauser=self, program=program).role
+            # Use the highest level role the user has for this program
+            for access_grant in ProgramAccess.objects.filter(tolauser=self, program=program):
+                if PROGRAM_ROLE_INT_MAP[access_grant.role] > PROGRAM_ROLE_INT_MAP[access_level]:
+                    access_level = access_grant.role
         except Exception as e:
             print(e)
         return access_level
