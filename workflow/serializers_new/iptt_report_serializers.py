@@ -303,7 +303,9 @@ class IPTTReportSerializer(serializers.Serializer):
         if not self.context['program']['results_framework']:
             if level_pk is None:
                 indicators = self._fetch_frequency_indicators(frequency, level_pk=None)
-                return sorted(indicators, key=lambda i: (i['level_pk'] is None, i['level_pk']))
+                return sorted(
+                    sorted(indicators, key=lambda i: (i['level_pk'] is None, i['level_pk'])),
+                    key=lambda i: (i['level_order'] is None, i['level_order']))
             return []
         indicators = self._fetch_frequency_indicators(frequency, level_pk=level_pk)
         return sorted(indicators, key=operator.itemgetter('level_order'))
