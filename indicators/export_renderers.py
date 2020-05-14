@@ -319,24 +319,27 @@ class ExcelRendererBase:
         for disaggregation in indicator.get('disaggregations', []):
             top_row = current_row
             for label in disaggregation['labels']:
-                sheet.merge_cells(
-                    start_row=current_row, start_column=4,
-                    end_row=current_row, end_column=label_merge_column
-                )
-                cell = sheet.cell(row=current_row, column=4)
-                cell.value = label['name']
-                cell.style = self.DISAGGREGATION_CATEGORY_CELL
-                for column_count, value in enumerate(self.get_label_values(label['pk'], indicator['report_data'])):
-                    cell = sheet.cell(row=current_row, column=label_merge_column+column_count+1)
-                    value, number_format = values_func(value)
-                    if value is None:
-                        cell.value = EM_DASH
-                        cell.alignment = RIGHT_ALIGN
-                    else:
-                        cell.value = value
-                    if number_format is not None:
-                        cell.number_format = number_format
-                current_row += 1
+                # only include row if we are _not_ hiding empty categories or this category isn't empty:
+                if (not self.hide_empty_disagg_categories or
+                    indicator['report_data']['lop_period'].get('disaggregations', {}).get(label['pk'], {}).get('actual', None)):
+                    sheet.merge_cells(
+                        start_row=current_row, start_column=4,
+                        end_row=current_row, end_column=label_merge_column
+                    )
+                    cell = sheet.cell(row=current_row, column=4)
+                    cell.value = label['name']
+                    cell.style = self.DISAGGREGATION_CATEGORY_CELL
+                    for column_count, value in enumerate(self.get_label_values(label['pk'], indicator['report_data'])):
+                        cell = sheet.cell(row=current_row, column=label_merge_column+column_count+1)
+                        value, number_format = values_func(value)
+                        if value is None:
+                            cell.value = EM_DASH
+                            cell.alignment = RIGHT_ALIGN
+                        else:
+                            cell.value = value
+                        if number_format is not None:
+                            cell.number_format = number_format
+                    current_row += 1
             sheet.merge_cells(start_row=top_row, start_column=3, end_row=current_row-1, end_column=3)
             cell = sheet.cell(row=top_row, column=3)
             cell.value = ugettext(disaggregation['name'])
@@ -414,6 +417,7 @@ class IPTTExcelRenderer(ExcelRendererBase):
         self.serializer = serializer.data
         self.initialize_workbook()
         self.columns = params.get('columns', [])
+        self.hide_empty_disagg_categories = params.get('hide_empty_disagg_categories', False)
         has_sheets = False
         for frequency in self.serializer['frequencies']:
             self.frequency = frequency

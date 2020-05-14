@@ -182,6 +182,8 @@ class IPTTExcelReport(LoginRequiredMixin, View):
             columns = request.GET.getlist('columns')
             if columns:
                 params['columns'] = list(map(int, columns))
+            if self.filters.get('hide_empty_disagg_categories', False):
+                params['hide_empty_disagg_categories'] = True
         return params
 
     def get(self, request):
