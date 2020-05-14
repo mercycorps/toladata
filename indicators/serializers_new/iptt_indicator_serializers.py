@@ -224,9 +224,11 @@ class IPTTExcelIndicatorFiltersMixin:
         disaggregation_labels = {}
         disaggregation_objects = []
         disagg_list = self.context['disaggregations_indicators'].get(indicator.pk, {})
-        for disaggregation_dict in [self.context['disaggregations'][d_pk] for d_pk in disagg_list.get('all', [])]:
-            disaggregation_objects.append(disaggregation_dict['disaggregation'])
-            disaggregation_labels[disaggregation_dict['disaggregation'].pk] = disaggregation_dict.get('labels', [])
+        for disaggregation_dict in [self.context['disaggregations'].get(d_pk, None) for d_pk in disagg_list.get('all', [])]:
+            if disaggregation_dict is not None:
+                #  None catch here in case of a disaggregation with no labels (will not be in disaggregations context)
+                disaggregation_objects.append(disaggregation_dict['disaggregation'])
+                disaggregation_labels[disaggregation_dict['disaggregation'].pk] = disaggregation_dict.get('labels', [])
         disaggregation_context = {
             **self.context.get('disaggregation_context', {}),
             'labels_map': disaggregation_labels,
