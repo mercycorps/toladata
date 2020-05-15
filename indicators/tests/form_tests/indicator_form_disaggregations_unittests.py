@@ -177,6 +177,7 @@ class TestIndicatorCreateFormDisaggregations(test.TestCase):
                  <label class="form-check-label" for="grouped_disaggregations_0_check_0"><small>Test1</small></label>
                  <a class="ml-2" tabindex="0" data-toggle="popover" data-trigger="focus"
                     data-html="true" data-placement="right"
+                    data-boundary="window"
                     data-content="<ul class=&quot;popover-list&quot;><li>Test1 Label 1</li><li>Test1 Label 2</li></ul>">
                       <i aria-label="Categories for disaggregation Test1"
                          class="far fa-question-circle"></i>
@@ -576,6 +577,7 @@ class TestIndicatorUpdateFormDisaggregations(test.TestCase):
                  <label class="form-check-label" for="grouped_disaggregations_0_check_0"><small>Test1</small></label>
                  <a class="ml-2" tabindex="0" data-toggle="popover" data-trigger="focus"
                     data-html="true" data-placement="right"
+                    data-boundary="window"
                     data-content="<ul class=&quot;popover-list&quot;><li>Test1 Label 1</li><li>Test1 Label 2</li></ul><br /><i>This disaggregation cannot be unselected, because it was already used in submitted program results.</i>">
                       <i aria-label="Categories for disaggregation Test1"
                          class="far fa-question-circle"></i>
@@ -586,6 +588,7 @@ class TestIndicatorUpdateFormDisaggregations(test.TestCase):
                  <label class="form-check-label" for="grouped_disaggregations_0_check_1"><small>Test2</small></label>
                  <a class="ml-2" tabindex="0" data-toggle="popover" data-trigger="focus"
                     data-html="true" data-placement="right"
+                    data-boundary="window"
                     data-content="<ul class=&quot;popover-list&quot;><li>Test2 Label 1</li><li>Test2 Label 2</li></ul>">
                       <i aria-label="Categories for disaggregation Test2"
                          class="far fa-question-circle"></i>
@@ -596,6 +599,7 @@ class TestIndicatorUpdateFormDisaggregations(test.TestCase):
                  <label class="form-check-label" for="grouped_disaggregations_0_check_2"><small>Test3</small></label>
                  <a class="ml-2" tabindex="0" data-toggle="popover" data-trigger="focus"
                     data-html="true" data-placement="right"
+                    data-boundary="window"
                     data-content="<ul class=&quot;popover-list&quot;><li>Test3 Label 1</li><li>Test3 Label 2</li></ul>">
                       <i aria-label="Categories for disaggregation Test3"
                          class="far fa-question-circle"></i>
