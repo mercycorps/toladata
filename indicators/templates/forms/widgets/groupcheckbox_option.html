@@ -5,8 +5,8 @@
            {% if widget.disabled or widget.attrs.disabled %}disabled{% endif %}>
     <label class="form-check-label" for="{{ widget.name }}_check_{{ widget.index }}"><small>{{ widget.label }}</small></label>
     {% if widget.helptext %}
-        <a class="ml-2" tabindex="0" data-toggle="popover" data-trigger="focus" data-html="true" 
-           data-placement="right" data-content="{{ widget.helptext|safe }}">
+        <a class="ml-2" tabindex="0" data-toggle="popover" data-trigger="focus" data-html="true"
+           data-placement="right" data-boundary="window" data-content="{{ widget.helptext|safe }}">
             <i aria-label="{% blocktrans with disagg=widget.label %}Categories for disaggregation {{ disagg }}{% endblocktrans %}"
                class="far fa-question-circle"></i>
         </a>
