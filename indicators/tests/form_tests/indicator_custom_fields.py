@@ -79,6 +79,7 @@ class TestGroupedMultipleChoiceField(test.TestCase):
                         <label class="form-check-label" for="name_0_check_0"><small>One</small></label>
                           <a class="ml-2" tabindex="0" data-toggle="popover" data-trigger="focus"
                              data-html="true" data-placement="right"
+                             data-boundary="window"
                              data-content="<ul><li>Category One</li><li>Category Two</li></ul>">
                                <i aria-label="Categories for disaggregation One"
                                   class="far fa-question-circle"></i>
@@ -89,6 +90,7 @@ class TestGroupedMultipleChoiceField(test.TestCase):
                         <label class="form-check-label" for="name_0_check_1"><small>Two</small></label>
                           <a class="ml-2" tabindex="0" data-toggle="popover" data-trigger="focus"
                              data-html="true" data-placement="right"
+                             data-boundary="window"
                              data-content="<ul><li>Two Cat 1</li><li>Two Cat 2</li><li>Two Cat 3</li></ul>">
                                <i aria-label="Categories for disaggregation Two"
                                   class="far fa-question-circle"></i>
