@@ -797,8 +797,12 @@ class ResultCreate(ResultFormMixin, CreateView):
             str(self.indicator.form_title_level),
             str(self.indicator.name)
         )
-        disaggregations = self.indicator.disaggregation.all().order_by('disaggregation_type')
-        context['disaggregation_forms'] = [get_disaggregated_result_formset(disagg)(request=self.request) for disagg in disaggregations]
+        context['disaggregation_forms'] = [
+            get_disaggregated_result_formset(disagg)(request=self.request)
+            for disagg in sorted(
+                self.indicator.disaggregation.all(),
+                key=lambda disagg: ugettext(disagg.disaggregation_type))
+            ]
         return context
 
     def get_form_kwargs(self):
@@ -856,7 +860,9 @@ class ResultUpdate(ResultFormMixin, UpdateView):
         )
         context['disaggregation_forms'] = [
             get_disaggregated_result_formset(disagg)(result=self.result, request=self.request)
-            for disagg in self.indicator.disaggregation.all().order_by('disaggregation_type')
+            for disagg in sorted(
+                self.indicator.disaggregation.all(),
+                key=lambda disagg: ugettext(disagg.disaggregation_type))
         ]
         return context
 
