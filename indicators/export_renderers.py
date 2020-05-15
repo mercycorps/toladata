@@ -316,7 +316,8 @@ class ExcelRendererBase:
         self.write_indicator_row(sheet, current_row, indicator_columns)
         current_row += 1
         label_merge_column = len(self.header_columns) - (1 if self.baseline_column else 0)
-        for disaggregation in indicator.get('disaggregations', []):
+        for disaggregation in sorted(indicator.get('disaggregations', []),
+                                     key=lambda disagg: ugettext(disagg['name'])):
             top_row = current_row
             for label in disaggregation['labels']:
                 # only include row if we are _not_ hiding empty categories or this category isn't empty:
