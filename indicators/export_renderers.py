@@ -321,7 +321,8 @@ class ExcelRendererBase:
             for label in disaggregation['labels']:
                 # only include row if we are _not_ hiding empty categories or this category isn't empty:
                 if (not self.hide_empty_disagg_categories or
-                    indicator['report_data']['lop_period'].get('disaggregations', {}).get(label['pk'], {}).get('actual', None)):
+                    indicator['report_data']['lop_period'].get(
+                        'disaggregations', {}).get(label['pk'], {}).get('actual', None) is not None):
                     sheet.merge_cells(
                         start_row=current_row, start_column=4,
                         end_row=current_row, end_column=label_merge_column
