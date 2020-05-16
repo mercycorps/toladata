@@ -318,12 +318,16 @@ class ExcelRendererBase:
         label_merge_column = len(self.header_columns) - (1 if self.baseline_column else 0)
         for disaggregation in sorted(indicator.get('disaggregations', []),
                                      key=lambda disagg: ugettext(disagg['name'])):
-            top_row = current_row
-            for label in disaggregation['labels']:
+            labels = disaggregation['labels']
+            if self.hide_empty_disagg_categories:
                 # only include row if we are _not_ hiding empty categories or this category isn't empty:
-                if (not self.hide_empty_disagg_categories or
-                    indicator['report_data']['lop_period'].get(
-                        'disaggregations', {}).get(label['pk'], {}).get('actual', None) is not None):
+                labels = list(filter(
+                    lambda label: indicator['report_data']['lop_period'].get('disaggregations', {}).get(
+                        label['pk'], {}).get('actual', None) is not None,
+                    labels))
+            if labels:
+                top_row = current_row
+                for label in labels:
                     sheet.merge_cells(
                         start_row=current_row, start_column=4,
                         end_row=current_row, end_column=label_merge_column
@@ -342,12 +346,12 @@ class ExcelRendererBase:
                         if number_format is not None:
                             cell.number_format = number_format
                     current_row += 1
-            sheet.merge_cells(start_row=top_row, start_column=3, end_row=current_row-1, end_column=3)
-            cell = sheet.cell(row=top_row, column=3)
-            cell.value = ugettext(disaggregation['name'])
-            cell.style = self.DISAGGREGATION_CELL
-            for row in range(top_row, current_row):
-                sheet.row_dimensions[row].hidden = True
+                sheet.merge_cells(start_row=top_row, start_column=3, end_row=current_row-1, end_column=3)
+                cell = sheet.cell(row=top_row, column=3)
+                cell.value = ugettext(disaggregation['name'])
+                cell.style = self.DISAGGREGATION_CELL
+                for row in range(top_row, current_row):
+                    sheet.row_dimensions[row].hidden = True
         return current_row
 
     def set_column_widths(self, sheet):
