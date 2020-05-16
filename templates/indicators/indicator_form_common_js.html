@@ -166,7 +166,8 @@
     }
 
     function isResultsForm() {
-        return $('#indicator_results_modal_content form').length > 0;
+        return ($('#indicator_results_modal_content form').length > 0 ||
+            $('#indicator_modal_div .results-table__wrapper').length > 0);
     }
 
     function programId() {
