@@ -1477,7 +1477,7 @@
         alert('Not implemented yet!');
     });
 
-    $("#indicator_modal_content, #indicator_form").on("click", "a.deletebtn", function(e){
+    $("#indicator_modal_content, #indicator_form").on("click", "a.btn-delete", function(e){
         e.preventDefault();
          // $(e.target).closest("tr").prev("tr").find("a").show(); //.css("display", "block");
         var url = $(this).attr('href');
@@ -1566,7 +1566,7 @@
         var markup = `
                 <tr class="periodic-target">
                     <td class="align-middle pr-0" style="width: 50px; text-align: center;">
-                        <a href="/indicators/periodic_target_delete/${pt.id}/" class="deletebtn" style="text-align: center; color:red; display: ${(isLastIteration && target_frequency != 2 || target_frequency == 8) ? 'block' : 'none'}">
+                        <a href="/indicators/periodic_target_delete/${pt.id}/" class="btn-delete" style="text-align: center; color:red; display: ${(isLastIteration && target_frequency != 2 || target_frequency == 8) ? 'block' : 'none'}">
                             <i class="fas fa-times"></i>
                         </a>
                     </td>

@@ -164,9 +164,10 @@
     function indicatorId() {
         return $('#indicatorId').text() ? parseInt($('#indicatorId').text()) : undefined;
     }
-    
+
     function isResultsForm() {
-        return $('.results-table__wrapper').length > 0;
+        return ($('#indicator_results_modal_content form').length > 0 ||
+            $('#indicator_modal_div .results-table__wrapper').length > 0);
     }
 
     function programId() {
@@ -174,7 +175,7 @@
     }
 
     function initialLopTarget() {
-        return $('#initialLopTarget').text() ? parseFloat($('#initialLopTarget').text()) : undefined;
+        return $('#initialLopTarget').numericVal();
     }
 
     function initialLevelId() {
@@ -247,7 +248,7 @@
             }
         };
         let url = $(this).attr('href');
-        let row = $(e.currentTarget).closest('tr');
+        let row = $(e.currentTarget).closest('.periodic-target');
         let numResultsLinkedToEventTarget = parseInt(row.data('collected-count'));
 
         // if no other periodic target values have changed, update the snapshot to reflect new server state
@@ -395,7 +396,6 @@
 
     // Button click handler for CREATE form (save and add another)
     $("#indicator_modal_content").on("click", "#id_save_and_add_another_indicator_btn", function(e){
-        console.log(initialLevelId())
         if (validateForm() === false) {
             showValidations("#modalmessages");
             return;
@@ -460,27 +460,27 @@
     // When adding an event, a row may need to be dynamically inserted
     function createPeriodicTargetRow() {
         return `
-                <tr class="periodic-target" data-collected-count="0" data-ptid="0">
-                    <td class="text-left d-flex align-items-center td--stretch">
-                        <a href="#" class="deletebtn btn btn-sm event-target-delete-button">
+                <li class="periodic-target list-group-item item--event" data-collected-count="0" data-ptid="0">
+                    <div class="item__label">
+                        <a href="#" class="btn-delete btn btn-sm event-target-delete-button">
                             <i class="fas fa-times text-danger"></i>
                         </a>
-                        <input type="text" placeholder="{% trans 'Enter event name' %}" class="form-control input-text">
+                        <input type="text" placeholder="{% trans 'Enter event name' %}" class="form-control input-text target-label">
                                 <span style="margin:0px;" class="help-block"> </span>
-                    </td>
+                    </div>
 
-                    <td class="text-right">
+                    <div class="item__value">
                         <span class=${ $("#id_unit_of_measure_type_1").is(":checked")?"input-symbol-percent":""}>
                             <input
                                 type="number"
                                 id="pt-0"
                                 data-periodictarget="pt"
                                 placeholder="{% trans 'Enter target' %}"
-                                class="form-control input-value">
+                                class="form-control input-value periodic-target-input">
                         </span>
                         <span id="hint_id_pt_0" style="margin:0px;" class="help-block"> </span>
-                    </td>
-                </tr>
+                    </div>
+                </li>
             `;
     }
 
@@ -489,7 +489,7 @@
         e.preventDefault();
 
         let markup = createPeriodicTargetRow();
-        $("#periodic_targets_table tbody tr:nth-last-child(1)").before(markup);
+        $("#periodic_targets_table li:nth-last-child(1)").before(markup);
     });
 
     // submits form - returns a jQuery deferred obj to attached callbacks onto
@@ -702,7 +702,7 @@
     function getIsPercentage() {
         return $("#id_unit_of_measure_type_1").is(":checked");
     }
-    
+
     function cleanFloat(value) {
         if (isNaN(parseFloat(value))) {
             return value;
@@ -724,11 +724,10 @@
         let values = [];
 
         $("#periodic_targets_table input[data-periodictarget]").each(function () {
-            let targetValue = parseFloat($(this).val());
-            values.push(targetValue);
+            values.push($(this).numericVal());
         });
 
-        let validValues = values.filter(n => !isNaN(n));
+        let validValues = values.filter(n => (!isNaN(n) && n !== null));
 
         if (validValues.length === 0) {
             return null;
@@ -746,8 +745,7 @@
     */
     function updateLopTargetDisplay() {
         let targetsSum = computeLopTarget();
-        $("#id_span_loptarget").text(targetsSum);
-
+        $("#id_span_loptarget").displayVal(targetsSum);
         // also show any validation errors related to a 0 LoP
         validateComputedLopTarget();
     }
@@ -795,7 +793,6 @@
         let dbTarget = initialLopTarget();
         let calculatedTarget = computeLopTarget();
         let msg;
-
         // either create form - or very old indicator w/ no LoP set
         if (dbTarget === undefined) return;
 
@@ -824,7 +821,7 @@
         validation_msgs['lop_target_not_matching'] = msg;
         showValidations('#modalmessages');
     }
-    
+
     function validateName() {
         const $nameField = $('#id_name');
         const $nameValidation = $('#validation_id_name');
@@ -848,7 +845,7 @@
             return true;
         }
     }
-    
+
 
     function reset_baseline_errors(){
         $("#id_baseline").removeClass('is-invalid');
@@ -866,15 +863,15 @@
             return true;
         }
 
-        if (!baseline.val()) {
-            errMsg = "{% trans 'Please complete this field. Your baseline can be zero.'|escapejs %}";
-        } else if (!$.isNumeric(baseline.val()) || baseline.val() < 0 ) {
-            errMsg = "{% trans 'Please complete this field. Your baseline can be zero.'|escapejs %}";
+        if (baseline.val() === '') {
+            errMsg = "{% trans 'Please enter a number greater than or equal to zero.'|escapejs %}";
+        } else if (baseline.numericVal() === null) {
+            errMsg = "{% trans 'Please enter a number greater than or equal to zero.'|escapejs %}";
         }
         if (errMsg){
             baseline.addClass('is-invalid');
             // baseline_na.addClass('is-invalid');
-            $("#validation_id_baseline").html(errMsg);
+            $("#validation_id_baseline").html(`<small>${errMsg}</small>`);
             return false;
         } else {
             reset_baseline_errors();
@@ -893,10 +890,13 @@
         }
 
         let errMsg = undefined;
-        if (!lop.val() || !$.isNumeric(lop.val()) || lop.val() <= 0) {
-            errMsg = "{% trans 'Please enter a number larger than zero.'|escapejs %}";
-        }
 
+        if (lop.numericVal() === 0) {
+            errMsg = "{% trans 'The Life of Program (LoP) target cannot be zero.'|escapejs %}";
+        }
+        if (lop.numericVal() === null) {
+            errMsg = "{% trans 'Please enter a target.'|escapejs %}";
+        }
         if (errMsg) {
             lop.addClass('is-invalid');
             showTargetErrors(errMsg);
@@ -904,7 +904,6 @@
         } else {
             lop.removeClass('is-invalid');
             clearTargetErrors();
-            lop.val(Math.round(lop.val() * 100) / 100);
             return true;
         }
     }
@@ -936,11 +935,10 @@
     function validatePeriodicTargets(){
         let errorFlag = false;
         // validate target values (number fields)
-        $("#periodic_targets_table input[type=number]").each(function(){
+        $("#periodic_targets_table input.periodic-target-input").each(function(){
             if ($(this).attr('id').substr(0, 2) == "pt" ) {
-                let val = $(this).val();
-                if (val && $.isNumeric(val) && val >= 0) {
-                    $(this).val(cleanFloat(val));
+                let val = $(this).numericVal();
+                if (val !== null) {
                     $(this).removeClass('is-invalid');
                 } else {
                     $(this).addClass('is-invalid');
@@ -950,7 +948,7 @@
         });
 
         // validate target labels (text fields)
-        $("#periodic_targets_table input[type=text]").each(function(){
+        $("#periodic_targets_table .target-label").each(function(){
             if ($(this).val()) {
                 $(this).removeClass('is-invalid');
             } else {
@@ -958,7 +956,6 @@
                 errorFlag = true;
             }
         });
-
         if (errorFlag) {
             showTargetErrors(getPTMessage());
             return false;
@@ -972,15 +969,19 @@
         let allValid = true;
 
         // validate target values (number fields)
-        $("#periodic_targets_table input[type=number]").each(function(){
+        $("#periodic_targets_table input.periodic-target-input").each(function(){
             if ($(this).attr('id').substr(0, 2) == "pt" ) {
-                let val = $(this).val();
-                if (! (val && $.isNumeric(val) && val >= 0)) {
+                let val = $(this).numericVal();
+                if (val === null) {
                     allValid = false;
                 }
             }
         });
-
+        $("#periodic_targets_table .target-label").each(function(){
+            if (!$(this).val()) {
+                allValid = false;
+            }
+        });
         if (allValid) {
             clearTargetErrors();
         }
@@ -989,7 +990,7 @@
 
         let computedLop = computeLopTarget();
         if (allValid && computedLop != null && computedLop < 0.01) {
-            let msg = "{% trans 'The LoP target cannot be zero.'|escapejs %}";
+            let msg = "{% trans 'The Life of Program (LoP) target cannot be zero.  Please update targets.'|escapejs %}";
             showTargetErrors(msg);
             return false;
         }
@@ -999,11 +1000,11 @@
 
 
     function getPTMessage () {
-        if ($("#periodic_targets_table input[type=text]").length > 0){
-            return ("{% trans 'Please enter a name and target number for every event.'|escapejs %}");
+        if ($("#periodic_targets_table input.target-label").length > 0){
+            return ("{% trans 'Please complete all event names and targets.'|escapejs %}");
         }
         else {
-            return ("{% trans 'Please enter a number with no letters or symbols.'|escapejs %}");
+            return ("{% trans 'Please complete targets.'|escapejs %}");
         }
     }
 
@@ -1040,12 +1041,9 @@
         var validationsSummaryTab = true;
         var validationsPerformanceTab = true;
         var noMessageValidations = true;
-        
+
         if  (validate_baseline() === false ) {
             validationsTargetTab = false
-        }
-        if (validate_loptarget() === false ) {
-            validationsTargetTab = false;
         }
         if (validateForEmptyField("id_unit_of_measure") === false ) {
             validationsTargetTab = false;
@@ -1055,15 +1053,17 @@
             $("#div_id_target_frequency").addClass("marginbottom-225");
             $("#div_id_target_frequency").removeClass("mb-3")
         }
-
+        var periodicTargetsValidated = true;
         if (validatePeriodicTargets() === false) {
+            periodicTargetsValidated = false;
             validationsTargetTab = false;
         }
-
-        if (validateComputedLopTarget() === false) {
+        if (periodicTargetsValidated && validateComputedLopTarget() === false) {
             validationsTargetTab = false;
         }
-
+        if (validate_loptarget() === false ) {
+            validationsTargetTab = false;
+        }
         // validate periodic targets
         if ($("#id_div_periodic_tables_placeholder input").hasClass('is-invalid')) {
             validationsTargetTab = false;
@@ -1077,7 +1077,7 @@
         if (validateName() === false) {
             noMessageValidations = false;
         }
-        
+
         /* validate fields from the Performance tab */
         if (validateForEmptyField("id_level") === false) {
             validationsSummaryTab = false;
@@ -1087,8 +1087,8 @@
             validation_msgs['summary'] = '{% trans "Please complete all required fields in the Summary tab."|escapejs %}';
         }
 
-        
-        
+
+
         if (validateForEmptyField("id_old_level") === false) {
             validationsPerformanceTab = false;
         }
@@ -1113,7 +1113,7 @@
     $("#indicator_modal_content").on("input", "#periodic_targets_table input[data-periodictarget]", function(e){
         clearTargetErrors();
 
-        if ($(this).val() && $(this).val() >= 0) {
+        if ($(this).numericVal() !== null) {
             $(this).removeClass('is-invalid');
         } else {
             $(this).addClass('is-invalid');
@@ -1127,7 +1127,7 @@
         updateLopTargetDisplay();
     });
 
-    $("#indicator_modal_content").on("input", "#periodic_targets_table input[type=text]", function(e){
+    $("#indicator_modal_content").on("input", "#periodic_targets_table input.target-label", function(e){
         clearTargetErrors();
 
         if ($(this).val()) {
@@ -1135,7 +1135,8 @@
         } else {
             $(this).addClass('is-invalid');
         }
-        if ($("#id_div_periodic_tables_placeholder input[type=text], input[type=number]").hasClass("has-error") ) {
+
+        if ($("#id_div_periodic_tables_placeholder input[type=text], input[type=number]").hasClass("is-invalid") ) {
             showTargetErrors(getPTMessage());
         }
     });
@@ -1164,7 +1165,7 @@
         $("#id_baseline_na").prop('checked', false);
         validate_baseline();
     });
-    
+
     $("#indicator_modal_content").on("keyup", "#id_name", function(e){
         validateName();
     });
@@ -1193,10 +1194,10 @@
         let periodic_targets = [];
 
         // Collect all existing periodic_targets into an array.
-        $('#periodic_targets_table tbody tr.periodic-target').each(function () {
+        $('#periodic_targets_table .periodic-target').each(function () {
             let $this = $(this);
-            let eventNameElement = $($this.find('input[type=text]'));
-            let targetValueSelector = $($this.find('input[type=number]'));
+            let eventNameElement = $($this.find('input.target-label'));
+            let targetValueSelector = $($this.find('input.periodic-target-input'));
 
             let pt_id;
             let pt_name;

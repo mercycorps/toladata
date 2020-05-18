@@ -1,14 +1,17 @@
+import decimal
 import math
 import simplejson
 from datetime import datetime, date
 from django.core.serializers import serialize
 from django import template
 from django.db.models import QuerySet
+from django.utils import formats
 from django.utils.timezone import localdate
 from django.utils.translation import ugettext_lazy as _
 from django.utils.safestring import mark_safe
 from indicators.models import Indicator
 from django.conf import settings
+from tola.util import usefully_normalize_decimal
 
 register = template.Library()
 
@@ -157,8 +160,8 @@ def js(obj):
 def strip_trailing_zero(value):
     """Like builtin "floatformat" but strips trailing zeros from the right (12.5 does not become 12.50)"""
     value = str(value)
-    if "." in value:
-        return value.rstrip("0").rstrip(".")
+    if "." in value or "," in value:
+        return value.rstrip("0").rstrip(".").rstrip(",")
     return value
 
 
@@ -174,13 +177,19 @@ def make_percent(numerator, denominator):
 def target_percent_met(context, percent_met, has_ended):
     margin = Indicator.ONSCOPE_MARGIN
     on_track = None
-    if percent_met:
+    formatted = None
+    try:
+        float(percent_met)
         percent_met = percent_met * 100
         on_track = (1 - margin) * 100 <= percent_met <= (1 + margin) * 100
+        formatted = formats.number_format(usefully_normalize_decimal(percent_met).quantize(decimal.Decimal("0.00")), use_l10n=True, force_grouping=True)
+    except TypeError:
+        pass
     return {
         'on_track': on_track,
         'percent_met': percent_met,
-        'has_ended': has_ended
+        'has_ended': has_ended,
+        'formatted_percent_met': formatted
     }
 
 
@@ -253,7 +262,7 @@ def gauge_tank(context, metric, has_filters=True):
     filter_title_count = program.metrics['needs_evidence'] if metric == 'results_evidence' else unfilled_value
     #filled_percent = make_percent(filled_value, denominator)
     filled_percent = 0 if denominator == 0 else (100 - make_percent(unfilled_value, denominator))
-    
+
     filter_active = filled_percent != 100 and (
         metric == 'targets_defined' or (
             metric == 'reported_results' and program.metrics.get('targets_defined', False)

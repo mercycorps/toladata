@@ -41,6 +41,5 @@ from indicators.views.views_program import (
     old_program_page,
     api_program_page,
     api_program_ordering,
-    api_program_level_ordering,
     api_program_page_indicator,
 )

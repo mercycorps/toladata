@@ -201,7 +201,7 @@ export class ProgramStore {
     onGAITDatesSyncFailure(reason, program_id) {
         PNotify.notice({
             // # Translators: Notify user that the program start and end date failed to be retrieved from the GAIT service with a specific reason appended after the :
-            text: gettext("Failed to sync GAIT program start and end dates: " + reason),
+            text: gettext("Failed to sync GAIT program start and end dates: ") + reason,
             hide: false,
             modules: {
                 Confirm: {
@@ -252,13 +252,13 @@ export class ProgramStore {
             this.editing_target = 'new'
         }
     }
-    
+
     /*
      * if there is no GAIT Id, resolve and move on,
      * if there is a GAIT ID, call to see if it is unique, and if not confirm that the user wants to enter a
      * duplicate GAIT ID for this program (displaying the link to view programs with the same ID in GAIT)
      */
-    
+
     validateGaitId(program_data) {
         if (program_data.gaitid) {
             let id = program_data.id || 0;
@@ -356,8 +356,7 @@ export class ProgramStore {
                 this.saving = false
             })
         }).catch(error => {
-            console.log('bottom level catch')
-            console.log(error);
+            console.log("There was an error in saving a new program");
         })
     }
 

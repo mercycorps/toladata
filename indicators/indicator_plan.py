@@ -27,7 +27,7 @@ from indicators.xls_export_utils import apply_title_styling, apply_label_styling
 PERFORMANCE_INDICATOR = _('Performance Indicator')
 TARGETS = _('Targets')
 DATA_ACQUISITION = _('Data Acquisition')
-ANALYSES_AND_REPORTING = _('Analyses and Reporting')
+ANALYSES_AND_REPORTING = _('Analysis and Reporting')
 
 # XLS cell widths
 LARGE_CELL = 40

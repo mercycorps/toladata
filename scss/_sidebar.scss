@@ -82,6 +82,7 @@
     .sidebar_wrapper {
         padding-right: 40px;
         position: fixed;
+        z-index: $zindex-fixed;
     }
     .sidebar-toggle {
         position: absolute;

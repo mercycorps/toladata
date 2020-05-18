@@ -263,7 +263,8 @@ THIRD_PARTY_APPS = (
     'widget_tweaks',
     'webpack_loader',
     'safedelete',
-    'django_mysql'
+    'django_mysql',
+    'adminsortable2',
 )
 
 # Apps specific for this project go here.
@@ -329,7 +330,7 @@ LOGIN_REDIRECT_URL = '/'
 SOCIAL_AUTH_LOGIN_REDIRECT_URL = '/'
 SOCIAL_AUTH_URL_NAMESPACE = 'social'
 
-import os
+
 PROJECT_PATH = dirname(dirname(dirname(abspath(__file__))))
 path.append(PROJECT_PATH)
 
@@ -364,7 +365,7 @@ GOOGLE_ANALYTICS_DOMAIN = 'example.org' # replaced in private settings file
 WEBPACK_LOADER = {
     'DEFAULT': {
         'BUNDLE_DIR_NAME': 'dist/',
-        'STATS_FILE': os.path.join(SITE_ROOT, 'webpack-stats.json'),
+        'STATS_FILE': join(SITE_ROOT, 'webpack-stats.json'),
     }
 }
 

@@ -1,12 +1,14 @@
 """Querymanagers and proxymodels to abstract complex queries on indicator models
 
 """
-
+import decimal
 from indicators.models import (
     Indicator,
     Level,
     PeriodicTarget,
     Result,
+    DisaggregationType,
+    DisaggregationLabel,
     IndicatorSortingManagerMixin,
     IndicatorSortingQSMixin
 )
@@ -14,9 +16,10 @@ from indicators.queries import utils
 from workflow.models import Program
 from django.db import models
 from django.db.models.functions import Concat
-from django.utils.functional import cached_property
+
 
 class IPTTIndicatorQueryset(models.QuerySet, IndicatorSortingQSMixin):
+
     def with_prefetch(self):
         qs = self.all()
         qs = qs.select_related(
@@ -25,7 +28,14 @@ class IPTTIndicatorQueryset(models.QuerySet, IndicatorSortingQSMixin):
             'result_set',
             'result_set__site',
             'indicator_type',
-            'program__level_tiers'
+            'program__level_tiers',
+            models.Prefetch(
+                'disaggregation',
+                queryset=DisaggregationType.objects.select_related(None).prefetch_related(
+                    models.Prefetch('disaggregationlabel_set', to_attr='prefetch_labels')
+                ),
+                to_attr="prefetch_disaggregations"
+            )
         )
         return qs
 
@@ -76,10 +86,54 @@ class IPTTIndicatorQueryset(models.QuerySet, IndicatorSortingQSMixin):
         qs = self.annotate_old_level(qs).order_by(models.F('old_level_pk').asc(nulls_last=True))
         return qs
 
-    def apply_filters(self, levels=None, sites=None, types=None,
-                      sectors=None, indicators=None, old_levels=False):
+    def with_disaggregation_lop_annotations(self, disaggregation_category_pks=[]):
         qs = self.all()
-        if not any([levels, sites, types, sectors, indicators]):
+        # add one lop_actual annotation for each disaggregation (targets/percent met to come with a later release)
+        annotations = {
+            'disaggregation_{}_lop_actual'.format(
+                disaggregation_category_pk
+            ): utils.indicator_disaggregated_lop_actual_annotation(disaggregation_category_pk)
+        for disaggregation_category_pk in disaggregation_category_pks
+        }
+        qs = qs.annotate(**annotations)
+        return qs
+
+    def with_disaggregation_frequency_annotations(self, frequency, start, end, disaggregations=[]):
+        qs = self
+        if frequency in [Indicator.LOP, Indicator.EVENT]:
+            # LOP target timeperiods require no annotations
+            pass
+        elif frequency == 'all':
+            for freq in Indicator.REGULAR_TARGET_FREQUENCIES + tuple([Indicator.MID_END,]):
+                qs = qs.with_disaggregation_frequency_annotations(freq, start, end, disaggregations=disaggregations)
+        elif frequency == Indicator.MID_END:
+            qs = qs.annotate(**{'frequency_{0}_count'.format(frequency): models.Value(2, output_field=models.IntegerField())})
+            annotations = {}
+            for c in range(2):
+                for category_pk in disaggregations:
+                    annotations['disaggregation_{0}_frequency_{1}_period_{2}'.format(
+                        category_pk, frequency, c
+                        )] = utils.mid_end_disaggregated_value_annotation(category_pk, c)
+            qs = qs.annotate(**annotations)
+        else:
+            periods = self.get_periods(frequency, start, end)
+            qs = qs.annotate(
+                **{'frequency_{0}_count'.format(frequency): models.Value(len(periods), output_field=models.IntegerField())})
+            annotations = {}
+            for c, period in enumerate(periods):
+                for category_pk in disaggregations:
+                    annotations['disaggregation_{0}_frequency_{1}_period_{2}'.format(
+                        category_pk, frequency, c
+                    )] = utils.timeaware_disaggregated_value_annotation(category_pk, period)
+            qs = qs.annotate(**annotations)
+        return qs
+
+
+    def apply_filters(self, levels=None, sites=None, types=None,
+                      sectors=None, indicators=None, old_levels=False,
+                      disaggregations=None):
+        qs = self.all()
+        if not any([levels, sites, types, sectors, indicators, disaggregations, old_levels]):
             return qs
         # if levels (add after Satsuma integration)
         if sites:
@@ -103,6 +157,8 @@ class IPTTIndicatorQueryset(models.QuerySet, IndicatorSortingQSMixin):
         else:
             if levels:
                 qs = qs.filter(level__in=levels)
+        if disaggregations:
+            qs = qs.filter(disaggregation__in=disaggregations)
         qs = qs.distinct()
         return qs
 
@@ -187,8 +243,32 @@ class IPTTIndicator(Indicator):
                  'name': indicator_type.indicator_type} for indicator_type in self.indicator_type.all()]
 
     @property
+    def disaggregation_category_pks(self):
+        return [
+            category.pk for disaggregation in getattr(self, 'prefetch_disaggregations', self.disaggregation.all())
+            for category in getattr(disaggregation, 'prefetch_labels', disaggregation.disaggregationlabel_set.all())
+        ]
+
+    @property
+    def active_disaggregation_category_pks(self):
+        return [category_pk for category_pk in self.disaggregation_category_pks if getattr(
+            self, f'disaggregation_{category_pk}_lop_actual', None
+            )]
+
+    @property
+    def inactive_disaggregation_category_pks(self):
+        return [category_pk for category_pk in self.disaggregation_category_pks
+                if category_pk not in self.active_disaggregation_category_pks]
+
+    @property
     def lop_met_target(self):
         return str(int(round(float(self.lop_actual_sum)*100/self.lop_target_sum))) + "%"
+
+    @property
+    def lop_met_target_decimal(self):
+        return decimal.Decimal(float(self.lop_actual_sum)/float(self.lop_target_sum)).quantize(
+            decimal.Decimal('0.01')
+        )
 
     @property
     def lop_target_real(self):

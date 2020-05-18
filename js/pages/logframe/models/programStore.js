@@ -35,7 +35,7 @@ class Level {
         });
         this.assumptions = levelData.assumptions;
         this.child_levels = levelData.child_levels || [];
-        
+
     }
 }
 
@@ -81,9 +81,9 @@ class ProgramStore {
             );
             this._levelsByChain = sortedByChain;
         }
-        
+
     }
-    
+
     getChildLevels = (levelpk) => {
         let levels = [levelpk];
         this._levelsByPk[levelpk].child_levels.forEach(
@@ -93,7 +93,7 @@ class ProgramStore {
         );
         return levels;
     }
-    
+
     getLevelsGroupedBy = (grouping) => {
         if (parseInt(grouping) === GROUP_BY_CHAIN) {
             return this._levelsByChain.map(
@@ -106,14 +106,14 @@ class ProgramStore {
         }
         return Object.values(this._levelsByPk);
     }
-    
+
     get unassignedIndicators() {
         if (!this._unassignedIndicators || this._unassignedIndicators.length == 0) {
             return [];
         }
         return this._unassignedIndicators;
     }
-    
+
 }
 
 export default ProgramStore;

@@ -1,4 +1,5 @@
-{% load i18n mytags %}
+{% load i18n l10n mytags humanize %}
+{% localize on %}
 {% if percent_met is not None %}
     {% with percent_float=percent_met|floatformat:"-2" %}
         {% if has_ended %}
@@ -21,11 +22,12 @@
                 <p><em>Remember to consider your direction of change when thinking about whether the indicator is on track.</em></p>
                 {% endblocktrans %}
                 "
-                >{{ percent_float|trailingzero }}%</span>
+                >{{ formatted_percent_met|trailingzero }}%</span>
         {% else %}
-                <span class="badge">{{ percent_float|trailingzero }}%</span>
+                <span class="badge">{{ formatted_percent_met|trailingzero }}%</span>
         {% endif %}
     {% endwith %}
 {% else %}
     <span class="badge">N/A</span>
 {% endif %}
+{% endlocalize %}

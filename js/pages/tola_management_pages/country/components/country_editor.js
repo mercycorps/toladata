@@ -12,7 +12,7 @@ export default class CountryEditor extends React.Component {
     }
 
     render() {
-        const {ProfileSection, StrategicObjectiveSection, DisaggregationSection, active_pane} = this.props
+        const {ProfileSection, StrategicObjectiveSection, DisaggregationSection, HistorySection, active_pane} = this.props
 
         return (
             <div className="tab-set--vertical">
@@ -41,6 +41,15 @@ export default class CountryEditor extends React.Component {
                             {gettext("Country Disaggregations")}
                         </a>
                     </li>
+                    <li className="nav-item">
+                        <a href="#" className={classNames('nav-link', {
+                                'active': active_pane=='history',
+                                'disabled': this.props.new,
+                            })}
+                            onClick={(e) => { e.preventDefault(); this.updateActivePage('history')}}>
+                            {gettext("History")}
+                        </a>
+                    </li>
                 </ul>
                 <div className="tab-content">
                     {active_pane == 'profile' && (
@@ -53,6 +62,10 @@ export default class CountryEditor extends React.Component {
 
                     {active_pane == 'disaggregations' && (
                         <DisaggregationSection />
+                    )}
+
+                    {active_pane == 'history' && (
+                        <HistorySection />
                     )}
                 </div>
             </div>

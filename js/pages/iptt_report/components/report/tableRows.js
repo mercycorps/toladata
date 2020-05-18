@@ -1,6 +1,11 @@
 import React from 'react';
 import { inject, observer } from 'mobx-react';
+import { library } from '@fortawesome/fontawesome-svg-core';
+import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
+import { faCaretDown, faCaretRight } from '@fortawesome/free-solid-svg-icons';
 import {BLANK_TABLE_CELL} from '../../../../constants';
+
+library.add(faCaretDown, faCaretRight);
 
 function ipttRound(value, percent) {
     if (value == gettext('N/A')) {
@@ -34,7 +39,7 @@ const IndicatorEditModalCell = inject('rootStore')(
                 });
         }
         return (
-            <td className="td-no-side-borders">
+            <td className="indicator-edit-modal-cell ">
                 <button type="button" className="btn btn-link p-1 float-right"
                         onClick={ loadModal }>
                     <i className="fas fa-cog"></i>
@@ -52,35 +57,57 @@ const IndicatorResultModalCell = inject("rootStore")(
             rootStore.loadResultsModal(indicator.pk);
         }
         return (
-            <td className="td-no-side-borders">
+            <td className="indicator-result-modal-cell ">
                 <button type="button" className="btn btn-link p-1 indicator-ajax-popup indicator-data"
                         onClick={ loadModal }>
                     <i className="fas fa-table"></i>
                 </button>
-                { indicator.name }
             </td>
         )
     })
 );
 
 const IndicatorCell = ({ value, resultCell, ...props }) => {
-    const displayValue = (value || value === 0) ? value : BLANK_TABLE_CELL;
+    const displayValue = (value || value === 0) ? value : <span className="empty-value">{BLANK_TABLE_CELL}</span>;
     if (resultCell && resultCell === true) {
-        return <td { ...props }>{ displayValue }</td>;
+        return <td className="indicator-cell result-cell" { ...props }>{ displayValue }</td>;
     }
     return (
-        <td className="td-no-side-borders" { ...props }>{ displayValue }</td>
+        <td className="indicator-cell " { ...props }>{ displayValue }</td>
     );
 }
 
+const ExpandoCell = observer(({ value, expanded, clickHandler, ...props }) => {
+    const displayValue = (value || value === 0) ? value : <span className="empty-value">{BLANK_TABLE_CELL}</span>;
+    return (
+        <td className="expando-cell " { ...props } onClick={ clickHandler }>
+            <FontAwesomeIcon icon={expanded ? 'caret-down' : 'caret-right'} />&nbsp;
+            { displayValue }
+        </td>
+    );
+})
+
+const IndicatorNameExpandoCell = observer(({ value, expanded, clickHandler, ...props }) => {
+    const displayValue = (value || value === 0) ? value : BLANK_TABLE_CELL;
+    return (
+        <td className="indicator-cell expando-cell " { ...props } onClick={ clickHandler }>
+            { displayValue }
+        </td>
+    );
+})
+
+
+const localizeFunc = window.localizeNumber;
+
 
 const PercentCell = ({ value, ...props }) => {
-    value = (value !== undefined && value !== null) ? `${value}%` : null;
-    return <IndicatorCell value={ value } align="right" { ...props } />;
+    value = (value !== undefined && value !== null) ? `${localizeFunc(value)}%` : null;
+    return <IndicatorCell className="indicator-cell percent-cell" value={ value } { ...props } />;
 }
 
 const NumberCell = ({ value, ...props }) => {
-    return <IndicatorCell value={ value } align="right" { ...props } />;
+    value = (value !== undefined && value !== null) ? localizeFunc(value) : null;
+    return <IndicatorCell className="indicator-cell number-cell" value={ value } { ...props } />;
 }
 
 const TVAResultsGroup = ({ value, resultCell, ...props }) => {
@@ -88,7 +115,7 @@ const TVAResultsGroup = ({ value, resultCell, ...props }) => {
         <React.Fragment>
             <NumberCell value={ value.target } />
             <NumberCell value={ value.actual } />
-            <PercentCell value={ value.percent_met }/>
+            <PercentCell value={ value.met }/>
         </React.Fragment>
     );
 }
@@ -98,13 +125,104 @@ const TVAResultsGroupPercent = ({ value, resultCell, ...props }) => {
         <React.Fragment>
             <PercentCell value={ value.target } />
             <PercentCell value={ value.actual } />
-            <PercentCell value={ value.percent_met }/>
+            <PercentCell value={ value.met }/>
         </React.Fragment>
     );
 }
 
-const IndicatorRow = inject('rootStore', 'reportStore')(
-    observer(({ rootStore, reportStore, indicator }) => {
+const DisaggregationTable = inject('rootStore')(
+    observer(({indicator, disaggregationPk, rootStore}) => {
+        let disaggregation = rootStore.getDisaggregationLabels(disaggregationPk);
+        if (!disaggregation) {
+            return null;
+        }
+        var ValueCell = NumberCell;
+        if (indicator.isPercent) {
+            ValueCell = PercentCell;
+        }
+        let labels = rootStore.hiddenCategories ? disaggregation.labels.filter(label => rootStore.disaggregatedLop(indicator.pk, label.pk)) : disaggregation.labels;
+        if (!labels) {
+            return <React.Fragment></React.Fragment>;
+        }
+        return (
+            <React.Fragment>
+                {
+                    labels.map(
+                        (label, idx) => (
+                            <tr
+                                className={ (idx == labels.length - 1) ?
+                                    "disaggregation-end-row" :
+                                    ""
+                                }
+                                key={idx}>
+                                {idx == 0 &&
+                                <td className="disaggregation-name-cell"
+                                    colSpan={ 2 }
+                                    rowSpan={labels.length}>
+                                    {disaggregation.name}</td>
+                                }
+                                <td colSpan={ rootStore.hasBaselineColumn ? rootStore.baseColumns - 2 : rootStore.baseColumns - 1 } className="disaggregation-label-cell">{ label.name }</td>
+                                { rootStore.hasBaselineColumn &&
+                                    <td className="disaggregation-value-cell base-column empty-value">—</td>
+                                }
+                                <td className="disaggregation-value-cell lop-column empty-value">—</td>
+                                <ValueCell className="disaggregation-value-cell lop-column" value={ ipttRound(rootStore.disaggregatedLop(indicator.pk, label.pk), false) } />
+                                <td className="disaggregation-value-cell lop-column empty-value">—</td>
+                                {
+                                    rootStore.disaggregatedPeriodValues(indicator.pk, label.pk).map(
+                                        (periodValue, idx) => {
+                                            return rootStore.isTVA ?
+                                                <React.Fragment key={idx}>
+                                                    <td className="disaggregation-value-cell empty-value">—</td>
+                                                    <ValueCell key={idx} value={ periodValue.actual } />
+                                                    <td className="disaggregation-value-cell empty-value">—</td>
+                                                </React.Fragment> :
+                                                <ValueCell key={idx} value={ periodValue } />
+                                        })
+                                }
+                            </tr>
+                        )
+                    )
+                }
+            </React.Fragment>
+        );
+    }
+))
+
+
+@inject('rootStore')
+@observer
+class IndicatorRow extends React.Component {
+    constructor(props) {
+        super(props);
+        this.state = {
+            expanded: false
+        };
+    }
+
+    componentDidMount() {
+        this.props.rootStore._expandoRows.push(this);
+    }
+
+    componentWillUnmount() {
+        this.props.rootStore._expandoRows = this.props.rootStore._expandoRows.filter(row => row != this);
+    }
+
+    handleExpandoClick = (e) => {
+        this.setState({expanded: !this.state.expanded});
+    }
+
+    expandRow = () => {
+        this.setState({expanded: true});
+    }
+
+    collapseRow = () => {
+        this.setState({expanded: false});
+    }
+
+    render() {
+        let indicator = this.props.indicator;
+        let rootStore = this.props.rootStore;
         var ValueCell;
         var PeriodCell;
         if (indicator.isPercent) {
@@ -123,43 +241,61 @@ const IndicatorRow = inject('rootStore', 'reportStore')(
         }
         let reportData = rootStore.getReportData(indicator.pk);
         return (
-            <tr>
-                <IndicatorCell value={ displayNumber } />
-                <IndicatorResultModalCell indicator={ indicator } />
-                <IndicatorEditModalCell indicator={ indicator } />
-                { !rootStore.resultsFramework && <IndicatorCell value={ indicator.oldLevelDisplay } /> }
-                <IndicatorCell value={ indicator.unitOfMeasure } />
-                <IndicatorCell value={ indicator.directionOfChange || gettext('N/A') } align="center" />
-                <IndicatorCell value={ cumulative || gettext('N/A') } />
-                <IndicatorCell value={ indicator.isPercent ? '%' : '#' } align="center" />
-                { indicator.baseline === null ? <IndicatorCell value={ gettext('N/A') } align="right"/> : <ValueCell value={ indicator.baseline } /> }
-                { reportData && (
-                <React.Fragment>
-                <ValueCell value={ reportData.lopTarget } />
-                <ValueCell value={ reportData.lopActual } />
-                <PercentCell value={ reportData.lopMet } />
-                {reportData.periodValues &&
-                    (rootStore.periodValues(indicator.pk).map(
-                        (value, index) => <PeriodCell value={ value } key={ index } resultCell={ true }/>
-                    ))
+            <React.Fragment>
+                <tr>
+                    {rootStore.indicatorHasActiveDisaggregations(indicator) ?
+                    <ExpandoCell value={ displayNumber } expanded={ this.state.expanded } clickHandler={ this.handleExpandoClick } /> :
+                    <IndicatorCell className="indicator-cell " value={ displayNumber } />
+                    }
+                    <IndicatorResultModalCell indicator={ indicator } />
+                    {rootStore.indicatorHasActiveDisaggregations(indicator) ?
+                    <IndicatorNameExpandoCell value={ indicator.name } expanded={ this.state.expanded } clickHandler={ this.handleExpandoClick } /> :
+                    <IndicatorCell className="indicator-cell " value={ indicator.name } />
+                    }
+                    <IndicatorEditModalCell indicator={ indicator } />
+                    { !rootStore.resultsFramework && <IndicatorCell className="indicator-cell " value={ indicator.oldLevelDisplay } /> }
+                    { rootStore.hasUOMColumn && <IndicatorCell className="indicator-cell " value={ indicator.unitOfMeasure } /> }
+                    { rootStore.hasChangeColumn && <IndicatorCell className="indicator-cell " value={ indicator.directionOfChange || gettext('N/A') } /> }
+                    { rootStore.hasCNCColumn && <IndicatorCell className="indicator-cell " value={ cumulative || gettext('N/A') } /> }
+                    { rootStore.hasUOMTypeColumn && <IndicatorCell className="indicator-cell is-percent-column " value={ indicator.isPercent ? '%' : '#' } /> }
+                    { rootStore.hasBaselineColumn && (indicator.baseline === null ? <IndicatorCell className="indicator-cell baseline-column" value={ gettext('N/A') } /> : <ValueCell value={ indicator.baseline } className="lop-column" /> ) }
+                    { reportData && (
+                    <React.Fragment>
+                    <ValueCell value={ reportData.lopTarget } className="lop-column " />
+                    <ValueCell value={ reportData.lopActual } className="lop-column" />
+                    <PercentCell value={ reportData.lopMet } className="lop-column" />
+                    {reportData.periodValues &&
+                        (rootStore.periodValues(indicator.pk).map(
+                            (value, index) => <PeriodCell value={ value } key={ index } resultCell={ true }/>
+                        ))
+                    }
+                    </React.Fragment>
+                    )}
+                </tr>
+                { this.state.expanded &&
+                    <React.Fragment>
+                    { rootStore.activeDisaggregationPks.filter(pk => indicator.hasDisaggregation(pk))
+                        .map(pk => (
+                            <React.Fragment key={ pk }>
+                                <DisaggregationTable indicator={ indicator } disaggregationPk={ pk } />
+                            </React.Fragment>
+                        ))
+                    }
+                    </React.Fragment>
                 }
-                </React.Fragment>
-                )}
-
-            </tr>
+            </React.Fragment>
         );
-    })
-);
+    }
+}
 
 const LevelTitleRow = inject('rootStore')(
     observer(({ rootStore, children }) => {
         return (
             <tr>
-            <td colSpan={ rootStore.reportColumnWidth }
-                className="iptt-level-row"
-            >
-               { children }
-            </td>
+                <td colSpan={ rootStore.reportColumnWidth + 1 }
+                    className="iptt-level-row">
+                   { children }
+                </td>
             </tr>
         )
     })
