@@ -1,6 +1,6 @@
-# -*- coding: utf-8 -*-
 
 from collections import OrderedDict
+import pytz
 from django.db import transaction
 from django.db.models import Q
 from django.http import HttpResponse, JsonResponse
@@ -17,7 +17,8 @@ from rest_framework.serializers import (
     IntegerField,
     ValidationError,
     BooleanField,
-    DateTimeField
+    DateTimeField,
+    SerializerMethodField
 )
 
 from openpyxl import Workbook, utils
@@ -34,7 +35,7 @@ from workflow.models import (
 
 from indicators.models import (
     Indicator,
-    Level
+    Level,
 )
 
 from tola_management.models import (
@@ -51,37 +52,60 @@ from tola_management.permissions import (
 
 def get_audit_log_workbook(ws, program):
 
-    # helper for indicator name column
-    def _indicator_name(indicator):
+    def _indicator_number(indicator):
         if indicator.results_aware_number:
-            return u'{} {}: {}'.format(
-                _('Indicator'),
-                str(indicator.results_aware_number),
-                str(indicator.name),
-            )
+            return f"{_('Indicator')} {indicator.results_aware_number}"
         else:
-            return u'{}: {}'.format(
-                _('Indicator'),
-                str(indicator.name),
-            )
+            return _('Indicator')
+
+    # helper for result level column and result level diff row text
+    def _result_level(row):
+        if row.indicator:
+            if row.indicator.leveltier_name and row.indicator.level_display_ontology:
+                return u'{} {}'.format(
+                    str(row.indicator.leveltier_name),
+                    str(row.indicator.level_display_ontology),
+                )
+            elif row.indicator.leveltier_name:
+                return str(row.indicator.leveltier_name)
+        if row.level:
+            return f"{row.level.leveltier} {row.level.display_ontology}"
+        else:
+            return None
+
 
     # helper for result level column
-    def _result_level(indicator):
-        if indicator.leveltier_name and indicator.level_display_ontology:
-            return u'{} {}'.format(
-                str(indicator.leveltier_name),
-                str(indicator.level_display_ontology),
-            )
-        elif indicator.leveltier_name:
-            return str(indicator.leveltier_name)
-        else:
-            return ''
+    def _result_disaggregation_serializer(raw_disaggs):
+        disaggs = {}
+        for item in raw_disaggs.values():
+            # default value of "unknown" for data stored before we were also logging 'type'
+            disaggregation_type = item.get('type', 'unknown')
+            try:
+                disaggs[disaggregation_type].append(item)
+            except KeyError:
+                disaggs[disaggregation_type] = [item]
+
+        output_string = ""
+        for disagg_type in sorted(list(disaggs.keys())):
+            if disagg_type and disagg_type != 'unknown':  # don't include "unknown" placeholder in output
+                output_string += f"\r\n{disagg_type}\r\n"
+            else:
+                output_string += "\r\n"
+            disaggs[disagg_type].sort(key=lambda item: item.get('customsort', ''))
+
+            for item in disaggs[disagg_type]:
+                output_string += f"{item['name']}: {item['value']}\r\n"
+
+        return output_string
+
 
     header = [
-        Cell(ws, value=_("Date and Time")),
+        # Translators: The date and time of the change made to a piece of data
+        Cell(ws, value=_("Date and time")),
         # Translators: Number of the indicator being shown
-        Cell(ws, value=_('Result Level')),
+        Cell(ws, value=_('Result level')),
         Cell(ws, value=_('Indicator')),
+        # Translators: The name of the user who carried out an action
         Cell(ws, value=_('User')),
         Cell(ws, value=_('Organization')),
         # Translators: Part of change log, indicates the type of change being made to a particular piece of data
@@ -103,7 +127,6 @@ def get_audit_log_workbook(ws, program):
     ws.append([subtitle,])
     ws.merge_cells(start_row=2, end_row=2, start_column=1, end_column=len(header))
 
-
     header_font = Font(bold=True)
     header_fill = PatternFill('solid', 'EEEEEE')
 
@@ -123,30 +146,36 @@ def get_audit_log_workbook(ws, program):
     )
 
     for row in program.audit_logs.all().order_by('-date'):
-        prev_string = u''
+        indicator_name = f'{_indicator_number(row.indicator)}: {row.indicator.name}' if row.indicator else "N/A"
+        prev_string = ''
+        new_string = ''
         for entry in row.diff_list:
-            if entry['name'] == 'targets':
+            if entry['name'] == "id":
+                continue
+            elif entry['name'] == 'targets':
                 for k, target in entry['prev'].items():
-                    prev_string += str(target['name']) + u": " + str(target['value']) + u"\r\n"
-
-            else:
-                prev_string += str(entry['pretty_name']) + u": "
-                prev_string += str(entry['prev'] if entry['prev'] else _('N/A')) + u"\r\n"
-
-        new_string = u''
-        for entry in row.diff_list:
-            if entry['name'] == 'targets':
+                    prev_string += str(target['name']) + ": " + str(target['value']) + "\r\n"
                 for k, target in entry['new'].items():
-                    new_string += str(target['name']) + u": " + str(target['value']) + u"\r\n"
-
+                    new_string += str(target['name']) + ": " + str(target['value']) + "\r\n"
+            elif entry['name'] == 'disaggregation_values':
+                prev_string += _result_disaggregation_serializer(entry['prev']) + "\r\n"
+                new_string += _result_disaggregation_serializer(entry['new']) + "\r\n"
+            elif row.change_type == "indicator_changed" and entry["name"] == "name":
+                prev_string += f"{_indicator_number(row.indicator)}: {entry['prev']} \r\n"
+                new_string += f"{_indicator_number(row.indicator)}: {entry['new']} \r\n"
+            elif row.change_type == "level_changed" and entry["name"] == "name":
+                prev_string += f"{_result_level(row)}: {entry['prev']} \r\n"
+                new_string += f"{_result_level(row)}: {entry['new']} \r\n"
             else:
-                new_string += str(entry['pretty_name']) + u": "
-                new_string += str(entry['new'] if entry['new'] else _('N/A')) + u"\r\n"
+                prev_string += str(entry['pretty_name']) + ": "
+                prev_string += str(entry['prev'] if entry['prev'] else "") + "\r\n"
+                new_string += str(entry['pretty_name']) + ": "
+                new_string += str(entry['new'] if entry['new'] else "") + "\r\n"
 
         xl_row = [
-            Cell(ws, value=row.date),
-            Cell(ws, value=str(_result_level(row.indicator)) if row.indicator else _('N/A')),
-            Cell(ws, value=str(_indicator_name(row.indicator)) if row.indicator else _('N/A')),
+            Cell(ws, value=row.date.strftime("%Y-%m-%d %H:%M:%S (UTC)")),
+            Cell(ws, value=_result_level(row) or _('N/A')),
+            Cell(ws, value=indicator_name),
             Cell(ws, value=str(row.user.name)),
             Cell(ws, value=str(row.organization.name)),
             Cell(ws, value=str(row.pretty_change_type)),
@@ -163,10 +192,11 @@ def get_audit_log_workbook(ws, program):
 
     for cd in ws.column_dimensions:
         cd.auto_size = True
-    widths = [20, 12, 50, 20, 15, 20, 40, 40, 40]
+    widths = [23, 12, 50, 20, 15, 20, 40, 40, 40]
     for col_no, width in enumerate(widths):
         ws.column_dimensions[utils.get_column_letter(col_no + 1)].width = width
     return ws
+
 
 class Paginator(pagination.PageNumberPagination):
     page_size = 20
@@ -182,6 +212,7 @@ class Paginator(pagination.PageNumberPagination):
             ('results', data),
         ]))
         return response
+
 
 class NestedSectorSerializer(Serializer):
     def to_representation(self, sector):
@@ -200,6 +231,7 @@ class NestedCountrySerializer(Serializer):
     def to_internal_value(self, data):
         country = Country.objects.get(pk=data)
         return country
+
 
 class ProgramAdminSerializer(ModelSerializer):
     id = IntegerField(allow_null=True, required=False)
@@ -289,7 +321,6 @@ class ProgramAdminSerializer(ModelSerializer):
         added_countries = [x for x in incoming_countries if x not in original_countries]
         removed_countries = [x for x in original_countries if x not in incoming_countries]
 
-
         original_sectors = instance.sector.all()
         incoming_sectors = validated_data.pop('sector')
         added_sectors = [x for x in incoming_sectors if x not in original_sectors]
@@ -311,6 +342,7 @@ class ProgramAdminSerializer(ModelSerializer):
         )
         return updated_instance
 
+
 class ProgramAuditLogIndicatorSerializer(ModelSerializer):
     class Meta:
         model = Indicator
@@ -321,13 +353,20 @@ class ProgramAuditLogIndicatorSerializer(ModelSerializer):
             'results_aware_number',
         )
 
+
 class ProgramAuditLogLevelSerializer(ModelSerializer):
+    tier = SerializerMethodField()
+
     class Meta:
         model = Level
         fields = (
             'name',
             'display_ontology',
+            'tier'
         )
+
+    def get_tier(self, obj):
+        return obj.leveltier.name
 
 class ProgramAuditLogSerializer(ModelSerializer):
     id = IntegerField(allow_null=True, required=False)
@@ -335,7 +374,7 @@ class ProgramAuditLogSerializer(ModelSerializer):
     level = ProgramAuditLogLevelSerializer()
     user = CharField(source='user.name', read_only=True)
     organization = CharField(source='organization.name', read_only=True)
-    date = DateTimeField(format="%Y-%m-%d %H:%M:%S")
+    date = DateTimeField(format="%Y-%m-%d %H:%M:%S", default_timezone=pytz.timezone("UTC"))
 
     class Meta:
         model = ProgramAuditLog
@@ -368,6 +407,7 @@ class ProgramAdminAuditLogSerializer(ModelSerializer):
             'pretty_change_type',
         )
 
+
 class ProgramAdminViewSet(viewsets.ModelViewSet):
     serializer_class = ProgramAdminSerializer
     pagination_class = Paginator
@@ -377,7 +417,7 @@ class ProgramAdminViewSet(viewsets.ModelViewSet):
         auth_user = self.request.user
         params = self.request.query_params
 
-        #we have to handle this explicitly in case there are some programs without a country
+        # We have to handle this explicitly in case there are some programs without a country
         if auth_user.is_superuser:
             queryset = Program.objects.all()
         else:
@@ -491,7 +531,7 @@ class ProgramAdminViewSet(viewsets.ModelViewSet):
         ws = workbook.create_sheet(_('Change log'))
         get_audit_log_workbook(ws, program)
         response = HttpResponse(content_type='application/ms-excel')
-        filename = u'{} Audit Log {}.xlsx'.format(program.name, timezone.now().strftime('%b %d, %Y'))
+        filename = '{} Audit Log {}.xlsx'.format(program.name, timezone.now().strftime('%b %d, %Y'))
         response['Content-Disposition'] = 'attachment; filename="{}"'.format(filename)
         workbook.save(response)
         return response

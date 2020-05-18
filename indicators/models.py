@@ -29,6 +29,7 @@ from safedelete.models import SafeDeleteModel
 from safedelete.managers import SafeDeleteManager
 from safedelete.queryset import SafeDeleteQueryset
 from django_mysql.models import ListCharField
+from tola.util import usefully_normalize_decimal
 
 from workflow.models import (
     Program, Sector, SiteProfile, Country, TolaUser
@@ -263,11 +264,24 @@ class Level(models.Model):
 
     @property
     def logged_fields(self):
-        """Fields logged by program audit log"""
+        """
+        Fields logged by program audit log. If you change the composition of this property you may also want
+        to update the logged_field_order property.
+        """
+
         return {
             "name": self.name.strip(),
             "assumptions": self.assumptions.strip(),
         }
+
+    @staticmethod
+    def logged_field_order():
+        """
+        This list determines the order in which result fields will be displayed in the change log.  Because it
+        represents all fields that have ever been used in the Result form change log, it should never be
+        shrunk, only expanded or reordered.
+        """
+        return ['name', 'assumptions']
 
 
 class LevelAdmin(admin.ModelAdmin):
@@ -416,28 +430,182 @@ class LevelTierTemplate(models.Model):
         self.edit_date = timezone.now()
         super(LevelTierTemplate, self).save(*args, **kwargs)
 
+class DisaggregationIndicatorFormManager(models.Manager):
+    def get_queryset(self):
+        qs = super().get_queryset().order_by('disaggregation_type').annotate(
+            _in_use=models.Exists(
+                Indicator.rf_aware_objects.filter(
+                    disaggregation__in=models.OuterRef('pk')
+                )
+            )
+        ).prefetch_related(
+            models.Prefetch(
+                'disaggregationlabel_set',
+                queryset=DisaggregationLabel.objects.annotate(
+                    in_use=models.Exists(
+                        DisaggregatedValue.objects.filter(
+                            category=models.OuterRef('pk'),
+                            value__isnull=False
+                        )
+                    )
+                ),
+                to_attr='categories'
+                )
+            )
+        return qs
+
+    def for_indicator(self, indicator_pk):
+        qs = self.get_queryset()
+        qs = qs.annotate(
+            has_results=models.Exists(
+                DisaggregatedValue.objects.filter(
+                    category__disaggregation_type=models.OuterRef('pk'),
+                    value__isnull=False,
+                    result__indicator__pk=indicator_pk
+                )
+            )
+        )
+        return qs
+
 
 class DisaggregationType(models.Model):
-    disaggregation_type = models.CharField(_("Disaggregation type"), max_length=135, blank=True)
-    description = models.CharField(_("Description"), max_length=765, blank=True)
-    country = models.ForeignKey(Country, on_delete=models.SET_NULL, null=True, blank=True, verbose_name="Country")
-    standard = models.BooleanField(default=False, verbose_name=_("Standard (TolaData Admins Only)"))
+    """
+    #####!!!!!!!!!!! IMPORTANT!!    !!!!!!!!!!!#####
+    The GLOBAL_DISAGGREGATION_LABELS constant was created to ensure that a translated string appears
+    in the PO file.  It won't appear through the normal translation machinery because
+    the global disagg types are stored in the DB rather than the code.  When adding
+    a global disaggregation type you will need to add the marked string to this list.
+
+    If you update these templates, make sure you update the globalDisaggregationTypes constant in
+    js/extra_translations.js.
+    """
+    GLOBAL_DISAGGREGATION_LABELS = [
+        _("Sex and Age Disaggregated Data (SADD)")
+    ]
+
+    """Business logic name: Disaggregation - e.g. `Gender` or `SADD`"""
+    disaggregation_type = models.CharField(_("Disaggregation"), max_length=135)
+    country = models.ForeignKey(Country, on_delete=models.CASCADE, null=True, blank=True, verbose_name="Country")
+    standard = models.BooleanField(default=False, verbose_name=_("Global (all programs, all countries)"))
+    is_archived = models.BooleanField(default=False, verbose_name=_("Archived"))
+    selected_by_default = models.BooleanField(default=False)
     create_date = models.DateTimeField(_("Create date"), null=True, blank=True)
     edit_date = models.DateTimeField(_("Edit date"), null=True, blank=True)
+    objects = models.Manager()
+    form_objects = DisaggregationIndicatorFormManager()
+
+    class Meta:
+        unique_together = ['disaggregation_type', 'country']
 
     def __str__(self):
         return self.disaggregation_type
 
+    def save(self, *args, **kwargs):
+        if self.create_date is None:
+            self.create_date = timezone.now()
+        self.edit_date = timezone.now()
+
+        super(DisaggregationType, self).save(*args, **kwargs)
+
+    @classmethod
+    def program_disaggregations(cls, program_pk, countries=None, indicator_pk=None):
+        """Takes a program or program_pk and returns all disaggregations available to that program
+
+            - returns (list of global disaggs, list of tuples (country name, list of country disaggs))
+            - filters for not-archived, or in use by program (even after archiving, actively in-use disaggs
+                are still available to a program
+        """
+        program = Program.rf_aware_objects.get(pk=program_pk)
+        country_set = program.country.all()
+        if countries is not None:
+            country_set = country_set.filter(pk__in=[c.pk for c in countries])
+        disaggs = cls.form_objects
+        if indicator_pk is not None:
+            disaggs = disaggs.for_indicator(indicator_pk)
+        else:
+            disaggs = disaggs.annotate(has_results=models.Value(False, output_field=models.BooleanField()))
+        disaggs = disaggs.filter(
+            models.Q(standard=True) | models.Q(country__in=country_set),
+            models.Q(is_archived=False) | models.Q(indicator__program=program)
+        ).distinct()
+        return (
+            disaggs.filter(standard=True),
+            [
+                (country_name, disaggs.filter(country=country_pk))
+                for country_pk, country_name in disaggs.filter(
+                    standard=False
+                ).values_list('country', 'country__country').distinct().order_by('country__country')
+            ]
+        )
+
+    @property
+    def in_use(self):
+        return getattr(self, '_in_use', self.has_indicators)
+
+    @property
+    def has_indicators(self):
+        return self.indicator_set.exists()
+
+    @property
+    def labels(self):
+        return self.disaggregationlabel_set.all().order_by('customsort')
+
+    @property
+    def logged_fields(self):
+        """
+        If you change the composition of this property you may also want to update the logged_field_order property.
+        """
+        return {
+            "disaggregation_type": self.disaggregation_type,
+            "is_archived": self.is_archived,
+            "labels": {
+                l.id: {
+                    "id": l.id,
+                    "label": l.label,
+                    "custom_sort": l.customsort,
+                }
+                for l in self.disaggregationlabel_set.all()
+            },
+        }
+
+    @staticmethod
+    def logged_field_order():
+        """
+        This list determines the order in which result fields will be displayed in the change log.  Because it
+        represents all fields that have ever been used in the Result form change log, it should never be
+        shrunk, only expanded or reordered.  Adding another property was the path of least resistance for enabling
+        front end ordering of the fields.  An ordered dict doesn't work because it loses order in JS and changing
+        the logged fields to an ordered type would require a similar change in all models that use the same logging
+        mechanism to track history.
+        """
+        return ['type', 'is_archived', 'labels',]
+
 
 class DisaggregationLabel(models.Model):
+    """Business logic name: Category - e.g. `Male` or `Females aged 16-24`"""
     disaggregation_type = models.ForeignKey(DisaggregationType, on_delete=models.CASCADE,
-                                            verbose_name=_("Disaggregation type"))
-    label = models.CharField(_("Label"), max_length=765, blank=True)
-    customsort = models.IntegerField(_("Customsort"), blank=True, null=True)
+                                            verbose_name=_("Disaggregation"))
+    label = models.CharField(_("Label"), max_length=765)
+    customsort = models.PositiveSmallIntegerField(_("Sort order"), default=0, blank=False, null=False)
     create_date = models.DateTimeField(_("Create date"), null=True, blank=True)
     edit_date = models.DateTimeField(_("Edit date"), null=True, blank=True)
 
+    class Meta:
+        ordering = ['customsort']
+        unique_together = ['disaggregation_type', 'label']
+
+    def save(self, *args, **kwargs):
+        if self.create_date is None:
+            self.create_date = timezone.now()
+        self.edit_date = timezone.now()
+
+        super(DisaggregationLabel, self).save(*args, **kwargs)
+
     def __str__(self):
+        return self.label
+
+    @property
+    def name(self):
         return self.label
 
     @classmethod
@@ -445,25 +613,16 @@ class DisaggregationLabel(models.Model):
         return cls.objects.filter(disaggregation_type__standard=True)
 
 
-class DisaggregationValue(models.Model):
-    disaggregation_label = models.ForeignKey(DisaggregationLabel, on_delete=models.CASCADE,
-                                             verbose_name=_("Disaggregation label"))
-    value = models.CharField(_("Value"), max_length=765, blank=True)
-    create_date = models.DateTimeField(_("Create date"), null=True, blank=True)
-    edit_date = models.DateTimeField(_("Edit date"), null=True, blank=True)
+class DisaggregatedValue(models.Model):
+    result = models.ForeignKey('indicators.Result', on_delete=models.CASCADE)
+    category = models.ForeignKey(DisaggregationLabel, on_delete=models.CASCADE,
+                                 verbose_name=_("Disaggregation category"))
+    value = models.DecimalField(max_digits=20, decimal_places=2, blank=True, null=True)
 
-    def __str__(self):
-        return self.value
-
-
-class DisaggregationValueAdmin(admin.ModelAdmin):
-    list_display = ('disaggregation_label', 'value', 'create_date',
-                    'edit_date')
-    list_filter = (
-        'disaggregation_label__disaggregation_type__disaggregation_type',
-        'disaggregation_label'
-    )
-    display = 'Disaggregation Value'
+    class Meta:
+        constraints = [
+            models.UniqueConstraint(fields=['result', 'category'], name='unique_disaggregation_per_result')
+        ]
 
 
 class ReportingFrequency(models.Model):
@@ -954,7 +1113,7 @@ class Indicator(SafeDeleteModel):
 
     justification = models.TextField(
         max_length=500, null=True, blank=True,
-        verbose_name=_("Rationale or Justification for Indicator"),
+        verbose_name=_("Rationale or justification for indicator"),
         help_text=" "
     )
 
@@ -1212,6 +1371,9 @@ class Indicator(SafeDeleteModel):
 
     @property
     def logged_fields(self):
+        """
+        If you change the composition of this property you may also want to update the logged_field_order property.
+        """
         s = self
         return {
             "name": s.name.strip(),
@@ -1233,10 +1395,25 @@ class Indicator(SafeDeleteModel):
             "level": str(s.level) if s.level is not None else '',
         }
 
+    @staticmethod
+    def logged_field_order():
+        """
+        This list determines the order in which result fields will be displayed in the change log.  Because it
+        represents all fields that have ever been used in the Result form change log, it should never be
+        shrunk, only expanded or reordered.
+        """
+        return [
+            'name', 'level', 'unit_of_measure', 'unit_of_measure_type', 'baseline_value',
+            'baseline_na', 'direction_of_change', 'targets', 'lop_target', 'is_cumulative'
+        ]
+
     @property
     def get_target_frequency_label(self):
         if self.target_frequency:
-            return Indicator.TARGET_FREQUENCIES[self.target_frequency-1][1]
+            #  Need to lowercase the first letter to allow for word rearrangements due to translations.
+            label = Indicator.TARGET_FREQUENCIES[self.target_frequency-1][1]
+            label = label[0].lower() + label[1:]
+            return label
         return None
 
     @property
@@ -1249,6 +1426,8 @@ class Indicator(SafeDeleteModel):
 
     @property
     def is_cumulative_display(self):
+        """Deprecated?  Could not find where this was used, but text is updated in both
+        setup form and IPTT to read "Non-cumulative" """
         if self.is_cumulative:
             # Translators: referring to an indicator whose results accumulate over time
             return _("Cumulative")
@@ -1326,14 +1505,12 @@ class Indicator(SafeDeleteModel):
         today = date_ or timezone.localdate()
         return self.periodictargets.filter(start_date__lte=today, end_date__gte=today).first()
 
-
     @property
     def last_ended_periodic_target(self):
         """
         Returns the last periodic target if any, or None
         """
         return self.periodictargets.filter(end_date__lte=timezone.localdate()).last()
-
 
     @cached_property
     def cached_data_count(self):
@@ -1725,6 +1902,7 @@ class PeriodicTarget(models.Model):
         else:
             next_date_func = None
             name_func = None
+
         def short_form_generator(start, end):
             count = 0
             while start < end:
@@ -1738,6 +1916,7 @@ class PeriodicTarget(models.Model):
                 start = next_start
         if short_form:
             return short_form_generator
+
         def period_generator(start, end):
             count = 0
             while start < end:
@@ -1745,7 +1924,7 @@ class PeriodicTarget(models.Model):
                 yield {
                     'name': name_func(start, count+1),
                     'start': start,
-                    'label': u'{0} - {1}'.format(
+                    'label': u'{0} – {1}'.format(
                         l10n_date_medium(start).decode('UTF-8'),
                         l10n_date_medium(next_start - timedelta(days=1)).decode('UTF-8')
                         ) if frequency != Indicator.MONTHLY else None,
@@ -1765,9 +1944,9 @@ class PeriodicTargetAdmin(admin.ModelAdmin):
 
 class ResultManager(models.Manager):
     def get_queryset(self):
-        return super(ResultManager, self).get_queryset()\
-            .prefetch_related('site', 'disaggregation_value')\
-            .select_related('program', 'indicator')
+        return super(ResultManager, self).get_queryset().prefetch_related(
+            'site'
+        ).select_related('program', 'indicator')
 
 
 class Result(models.Model):
@@ -1782,11 +1961,6 @@ class Result(models.Model):
     achieved = models.DecimalField(
         verbose_name=_("Actual"), max_digits=20, decimal_places=2,
         help_text=" ")
-
-    disaggregation_value = models.ManyToManyField(
-        DisaggregationValue, blank=True, help_text=" ",
-        verbose_name=_("Disaggregation Value")
-    )
 
     comments = models.TextField(_("Comments"), blank=True, default='')
 
@@ -1812,7 +1986,7 @@ class Result(models.Model):
 
     create_date = models.DateTimeField(null=True, blank=True, help_text=" ", verbose_name=_("Create date"))
     edit_date = models.DateTimeField(null=True, blank=True, help_text=" ", verbose_name=_("Edit date"))
-    site = models.ManyToManyField(SiteProfile, blank=True, help_text=" ", verbose_name=_("Site"))
+    site = models.ManyToManyField(SiteProfile, blank=True, help_text=" ", verbose_name=_("Sites"))
 
     history = HistoricalRecords()
     objects = ResultManager()
@@ -1843,30 +2017,47 @@ class Result(models.Model):
         return self.date_collected
 
     @property
-    def disaggregations(self):
-        disaggs = self.disaggregation_value.all()
-        return ', '.join([y.disaggregation_label.label + ': ' + y.value for y in disaggs])
+    def disaggregated_values(self):
+        return self.disaggregatedvalue_set.all().order_by(
+            'category__disaggregation_type__standard',
+            'category__disaggregation_type__disaggregation_type',
+            'category__customsort'
+        )
 
     @property
     def logged_fields(self):
+        """
+        If you change the composition of this property you may also want to update the logged_field_order property.
+        """
         return {
             "id": self.id,
-            "value": self.achieved,
+            "value": usefully_normalize_decimal(self.achieved),
             "date": self.date_collected,
             "target": self.periodic_target.period_name if self.periodic_target else 'N/A',
             "evidence_name": self.record_name,
             "evidence_url": self.evidence_url,
             "sites": ', '.join(site.name for site in self.site.all()) if self.site.exists() else '',
             "disaggregation_values": {
-                dv.disaggregation_label.id: {
-                    "id": dv.disaggregation_label.id,
-                    "value": dv.value,
-                    "name": dv.disaggregation_label.label,
+                dv.category.pk: {
+                    "id": dv.category.pk,
+                    "value": usefully_normalize_decimal(dv.value),
+                    "name": dv.category.name,
+                    "custom_sort": dv.category.customsort,
+                    "type": dv.category.disaggregation_type.disaggregation_type,
                 }
-                for dv in self.disaggregation_value.all()
+                for dv in self.disaggregated_values
             }
         }
 
+    @staticmethod
+    def logged_field_order():
+        """
+        This list determines the order in which result fields will be displayed in the change log.  Because it
+        represents all fields that have ever been used in the Result form change log, it should never be
+        shrunk, only expanded or reordered.
+        """
+        return [
+            'id', 'date', 'target', 'value', 'disaggregation_values', 'evidence_url', 'evidence_name', 'sites']
 
 
 class ResultAdmin(admin.ModelAdmin):
@@ -1939,20 +2130,25 @@ class PinnedReport(models.Model):
         if start_period and end_period:
             return u'{} – {}'.format(df(start_period), df(end_period))
 
-        from indicators.forms import ReportFormCommon
+        # from indicators.forms import ReportFormCommon
 
         # This is confusing but ReportFormCommon defines TIMEPERIODS_CHOICES
         # which is defined in terms of enum values in Indicators
         # Indicators also defines TARGET_FREQUENCIES which is also used by ReportFormCommon
         # Because of this, the enum values are interchangeable between ReportFormCommon and Indicators
 
-        # TIMEPERIODS_CHOICES = (
-        #     (YEARS, _("years")),
-        #     (SEMIANNUAL, _("semi-annual periods")),
-        #     (TRIANNUAL, _("tri-annual periods")),
-        #     (QUARTERS, _("quarters")),
-        #     (MONTHS, _("months"))
-        # )
+        # Double-confusing update: reportform is now handled on front end, so the constants are
+        # reproduced here:
+        TIMEPERIODS_CHOICES = (
+            (Indicator.ANNUAL, _("years")),
+            (Indicator.SEMI_ANNUAL, _("semi-annual periods")),
+            (Indicator.TRI_ANNUAL, _("tri-annual periods")),
+            (Indicator.QUARTERLY, _("quarters")),
+            (Indicator.MONTHLY, _("months"))
+        )
+
+        SHOW_ALL = 1
+        MOST_RECENT = 2
 
         # TARGETPERIOD_CHOICES = [empty] +
         # TARGET_FREQUENCIES = (
@@ -1967,7 +2163,7 @@ class PinnedReport(models.Model):
         # )
 
         # time period strings are used for BOTH timeperiod and targetperiod values
-        time_period_str_lookup = dict(ReportFormCommon.TIMEPERIODS_CHOICES)
+        time_period_str_lookup = dict(TIMEPERIODS_CHOICES)
 
         time_or_target_period_str = None
         if time_periods:
@@ -1976,13 +2172,13 @@ class PinnedReport(models.Model):
             time_or_target_period_str = time_period_str_lookup.get(int(target_periods))
 
         # A relative report (Recent progress || Target vs Actuals)
-        if time_frame == str(ReportFormCommon.MOST_RECENT) and num_recent_periods and time_or_target_period_str:
+        if time_frame == str(MOST_RECENT) and num_recent_periods and time_or_target_period_str:
             #  Translators: Example: Most recent 2 Months
             return _('Most recent {num_recent_periods} {time_or_target_period_str}').format(
                 num_recent_periods=num_recent_periods, time_or_target_period_str=time_or_target_period_str)
 
         # Show all (Recent progress || Target vs Actuals w/ time period (such as annual))
-        if time_frame == str(ReportFormCommon.SHOW_ALL) and time_or_target_period_str:
+        if time_frame == str(SHOW_ALL) and time_or_target_period_str:
             # Translators: Example: Show all Years
             return _('Show all {time_or_target_period_str}').format(time_or_target_period_str=time_or_target_period_str)
 
@@ -1992,12 +2188,12 @@ class PinnedReport(models.Model):
             Indicator.MID_END,
             Indicator.EVENT,
         }
-        if time_frame == str(ReportFormCommon.SHOW_ALL) and target_periods \
+        if time_frame == str(SHOW_ALL) and target_periods \
                 and int(target_periods) in remaining_target_freq_set:
             return _('Show all results')
 
         # It's possible to submit bad input, but have the view "fix" it..
-        if time_frame == str(ReportFormCommon.MOST_RECENT) and num_recent_periods and not time_or_target_period_str:
+        if time_frame == str(MOST_RECENT) and num_recent_periods and not time_or_target_period_str:
             return _('Show all results')
 
         return ''

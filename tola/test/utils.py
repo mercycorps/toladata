@@ -1,12 +1,14 @@
 import time
 import datetime
 from decimal import Decimal, ROUND_HALF_UP
+from contextlib import contextmanager
 
 from factory import Sequence
 
-from django.utils import timezone
+from django.utils import timezone, translation
 from django.core.exceptions import ImproperlyConfigured
 from django.test import runner
+
 from unittest import runner as ut_runner
 
 from factories.indicators_models import IndicatorFactory, PeriodicTargetFactory, ResultFactory
@@ -252,3 +254,16 @@ class TimedTestRunner(runner.DiscoverRunner):
             for msg in result.getTestTimings():
                 result.stream.writeln(msg)
         return result
+
+
+SPECIAL_CHARS = 'Spécîal Chårs 1234 !@#$; DROP TABLE indicators.indicator;'
+
+
+
+@contextmanager
+def lang_context(lang):
+    try:
+        translation.activate(lang)
+        yield
+    finally:
+        translation.activate('en')

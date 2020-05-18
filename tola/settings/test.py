@@ -31,6 +31,7 @@ DATABASES = {
             'charset': 'utf8mb4',
         },
         "HOST": "localhost",
+        "USER": "root",
         "PORT": "",
     },
 }

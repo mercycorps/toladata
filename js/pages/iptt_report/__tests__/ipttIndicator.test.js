@@ -46,4 +46,21 @@ describe("bare iptt indicator", () => {
         let indicator2 = Indicator();
         expect(indicator2.hasSite(3)).toBeFalsy();
     });
+    it("returns a single disaggregation pk", () => {
+        let indicator = Indicator({disaggregation_pks: [4]});
+        expect(indicator.hasDisaggregation(4)).toBeTruthy();
+        expect(indicator.hasDisaggregation(12)).toBeFalsy();
+    });
+    it("returns multiple disaggregation pks", () => {
+        let indicator = Indicator({disaggregation_pks: [483, 244]});
+        expect(indicator.hasDisaggregation(483)).toBeTruthy();
+        expect(indicator.hasDisaggregation(244)).toBeTruthy();
+        expect(indicator.hasDisaggregation(4)).toBeFalsy();
+    });
+    it("returns no disaggregation pks", () => {
+        let indicator = Indicator({disaggregation_pks: []});
+        expect(indicator.hasDisaggregation(3)).toBeFalsy();
+        let indicator2 = Indicator();
+        expect(indicator2.hasDisaggregation(3)).toBeFalsy();
+    });
 })

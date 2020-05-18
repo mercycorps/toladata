@@ -1,4 +1,4 @@
-from __future__ import unicode_literals
+# -*- coding: utf-8 -*-
 
 from django.db import models
 from django.contrib import admin
@@ -378,6 +378,7 @@ class TolaUserProxy(TolaUser):
 
 class CountryAccessInline(admin.TabularInline):
     model = CountryAccess
+    ordering = ('country',)
 
 class TolaUserAdmin(admin.ModelAdmin):
 
@@ -539,6 +540,18 @@ class Program(models.Model):
             return self.reporting_period_end < timezone.localdate()
         except TypeError: # esp. if there's no reporting dates
             return False
+
+    @property
+    def percent_complete(self):
+        if not self.reporting_period_end or not self.reporting_period_start:
+            return -1
+        if not self.has_started:
+            return 0
+        if self.has_ended:
+            return 100
+        total_days = (self.reporting_period_end - self.reporting_period_start).days
+        complete = (timezone.localdate() - self.reporting_period_start).days
+        return int(round(complete*100/total_days))
 
     # displayed in admin templates
     def __str__(self):

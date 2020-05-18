@@ -1,0 +1,266 @@
+{
+    "report_data": [{
+            "program_id": 726,
+            "pk": 8678,
+            "lop_period": {
+                "actual": "92",
+                "count": null,
+                "disaggregations": {
+                    "2095": {
+                        "actual": null
+                    },
+                    "2096": {
+                        "actual": null
+                    },
+                    "2097": {
+                        "actual": null
+                    }
+                },
+                "met": "104.55",
+                "met_excel": "1,0455",
+                "target": "88"
+            },
+            "periods": [{
+                    "actual": "95",
+                    "count": 0,
+                    "disaggregations": {
+                        "2095": {
+                            "actual": null
+                        },
+                        "2096": {
+                            "actual": null
+                        },
+                        "2097": {
+                            "actual": null
+                        }
+                    },
+                    "met": "105,56",
+                    "met_excel": "1,0556",
+                    "target": "90"
+                }, {
+                    "actual": "92",
+                    "count": 1,
+                    "disaggregations": {
+                        "2095": {
+                            "actual": null
+                        },
+                        "2096": {
+                            "actual": null
+                        },
+                        "2097": {
+                            "actual": null
+                        }
+                    },
+                    "met": "104,55",
+                    "met_excel": "1,0455",
+                    "target": "88"
+                }
+            ],
+            "level_id": 1565
+        }, {
+            "program_id": 726,
+            "pk": 8719,
+            "lop_period": {
+                "actual": "279",
+                "count": null,
+                "disaggregations": {
+                    "271": {
+                        "actual": "173"
+                    },
+                    "2095": {
+                        "actual": "94"
+                    },
+                    "272": {
+                        "actual": "27"
+                    },
+                    "2096": {
+                        "actual": "95"
+                    },
+                    "273": {
+                        "actual": "3"
+                    },
+                    "2097": {
+                        "actual": "90"
+                    },
+                    "274": {
+                        "actual": "27"
+                    },
+                    "275": {
+                        "actual": "2"
+                    },
+                    "276": {
+                        "actual": null
+                    },
+                    "277": {
+                        "actual": "10"
+                    },
+                    "278": {
+                        "actual": null
+                    },
+                    "279": {
+                        "actual": null
+                    },
+                    "280": {
+                        "actual": "10"
+                    },
+                    "281": {
+                        "actual": null
+                    },
+                    "282": {
+                        "actual": "5"
+                    },
+                    "283": {
+                        "actual": "11"
+                    },
+                    "284": {
+                        "actual": null
+                    },
+                    "285": {
+                        "actual": "3"
+                    },
+                    "286": {
+                        "actual": "8"
+                    }
+                },
+                "met": "93",
+                "met_excel": "0,93",
+                "target": "300"
+            },
+            "periods": [{
+                    "actual": "90",
+                    "count": 0,
+                    "disaggregations": {
+                        "271": {
+                            "actual": "1"
+                        },
+                        "2095": {
+                            "actual": null
+                        },
+                        "272": {
+                            "actual": "27"
+                        },
+                        "2096": {
+                            "actual": null
+                        },
+                        "273": {
+                            "actual": "3"
+                        },
+                        "2097": {
+                            "actual": "90"
+                        },
+                        "274": {
+                            "actual": "27"
+                        },
+                        "275": {
+                            "actual": "2"
+                        },
+                        "276": {
+                            "actual": null
+                        },
+                        "277": {
+                            "actual": "4"
+                        },
+                        "278": {
+                            "actual": null
+                        },
+                        "279": {
+                            "actual": null
+                        },
+                        "280": {
+                            "actual": "10"
+                        },
+                        "281": {
+                            "actual": null
+                        },
+                        "282": {
+                            "actual": "5"
+                        },
+                        "283": {
+                            "actual": "11"
+                        },
+                        "284": {
+                            "actual": null
+                        },
+                        "285": {
+                            "actual": null
+                        },
+                        "286": {
+                            "actual": null
+                        }
+                    },
+                    "met": "90",
+                    "met_excel": "0,9",
+                    "target": "100"
+                }, {
+                    "actual": "189",
+                    "count": 1,
+                    "disaggregations": {
+                        "271": {
+                            "actual": "172"
+                        },
+                        "2095": {
+                            "actual": "94"
+                        },
+                        "272": {
+                            "actual": null
+                        },
+                        "2096": {
+                            "actual": "95"
+                        },
+                        "273": {
+                            "actual": null
+                        },
+                        "2097": {
+                            "actual": null
+                        },
+                        "274": {
+                            "actual": null
+                        },
+                        "275": {
+                            "actual": null
+                        },
+                        "276": {
+                            "actual": null
+                        },
+                        "277": {
+                            "actual": "6"
+                        },
+                        "278": {
+                            "actual": null
+                        },
+                        "279": {
+                            "actual": null
+                        },
+                        "280": {
+                            "actual": null
+                        },
+                        "281": {
+                            "actual": null
+                        },
+                        "282": {
+                            "actual": null
+                        },
+                        "283": {
+                            "actual": null
+                        },
+                        "284": {
+                            "actual": null
+                        },
+                        "285": {
+                            "actual": "3"
+                        },
+                        "286": {
+                            "actual": "8"
+                        }
+                    },
+                    "met": "94,5",
+                    "met_excel": "0,945",
+                    "target": "200"
+                }
+            ],
+            "level_id": 1568
+        }
+    ],
+    "report_frequency": 2,
+    "program_pk": 726
+}

@@ -11,11 +11,12 @@ from factory import (
     SubFactory,
     RelatedFactory,
     SelfAttribute,
+    LazyAttribute,
     lazy_attribute,
     Sequence,
     Trait,
 )
-from factory.fuzzy import FuzzyChoice
+from factory.fuzzy import FuzzyChoice, FuzzyInteger
 
 from indicators.models import (
     Result as ResultM,
@@ -30,6 +31,8 @@ from indicators.models import (
     StrategicObjective as StrategicObjectiveM,
     PinnedReport as PinnedReportM,
     DisaggregationType as DisaggregationTypeM,
+    DisaggregationLabel as DisaggregationLabelM,
+    DisaggregatedValue as DisaggregatedValueM,
     DataCollectionFrequency as DataCollectionFrequencyM
 )
 from factories.workflow_models import OrganizationFactory, ProgramFactory, CountryFactory
@@ -103,11 +106,31 @@ class RFIndicatorFactory(DjangoModelFactory):
     name = Faker('company')
     target_frequency = IndicatorM.ANNUAL
     lop_target = 1400
+    unit_of_measure = FuzzyChoice(['cats', 'bananas', 'tennis rackets', 'dollars'])
 
     @post_generation
     def targets(self, create, extracted, **kwargs):
+        """Automatically add targets when creating an indicator.
+
+            targets="incomplete" - will add one less target than there are available periods
+            targets=10 (int or float) will split that value evenly among all available periods
+            targets=[5, 6] - will assign those targets to those periods
+                (if list is shorter than available periods, remaining targets are blank)
+            targets=True - will assign the lop_target value split among all available periods"""
         if extracted and self.target_frequency:
-            period_generator = PeriodicTargetM.generate_for_frequency(self.target_frequency)
+            if self.target_frequency == IndicatorM.EVENT:
+                def event_generator(start, end):
+                    for c in range(2):
+                        yield {
+                            'customsort': c,
+                            'start': start,
+                            'end': end,
+                            'name': f"Event {c+1}",
+                            'label': f"Event {c+1} label?",
+                        }
+                period_generator = event_generator
+            else:
+                period_generator = PeriodicTargetM.generate_for_frequency(self.target_frequency)
             if self.program:
                 periods = period_generator(
                     self.program.reporting_period_start, self.program.reporting_period_end
@@ -128,7 +151,11 @@ class RFIndicatorFactory(DjangoModelFactory):
                 target_values = [round(extracted/len(periods), 2)]*len(periods)
                 if len(target_values) > 1:
                     target_values[-1] = extracted - sum(target_values[0:-1])
-            elif self.lop_target:
+            elif isinstance(extracted, list):
+                target_values = extracted
+                if len(extracted) < len(periods):
+                    target_values += [None] * (len(periods) - len(extracted))
+            elif extracted and self.lop_target:
                 target_values = [round(self.lop_target / len(periods))]*len(periods)
                 if len(target_values) > 1:
                     target_values[-1] = self.lop_target - sum(target_values[0:-1])
@@ -145,6 +172,14 @@ class RFIndicatorFactory(DjangoModelFactory):
 
     @post_generation
     def results(self, create, extracted, **kwargs):
+        """automatically adds results when creating an indicator.
+        
+            results=True - will add one result to each target with achieved value of 10
+            results=10 (int/float) - will divide that lop_achieved value among each target
+            results=[4, 5] - will assign one result to each target in order, None for any remaining
+            results=[[4, 5], 10] - first target gets two results (4 and 5) second target gets one result (10)
+            """
+
         if extracted:
             targets = self.periodictargets.all()
             count = kwargs.get('count', len(targets))
@@ -160,15 +195,23 @@ class RFIndicatorFactory(DjangoModelFactory):
             elif isinstance(extracted, (int, float)):
                 achieveds = [extracted/count]*count
                 achieveds[-1] = extracted - sum(achieveds[0:-1])
-            for target, achieved, evidence in zip(targets, achieveds, evidence):
-                ResultFactory(
-                    periodic_target=target,
-                    achieved=achieved,
-                    indicator=self,
-                    program=self.program,
-                    evidence_url=evidence,
-                    date_collected=target.start_date + datetime.timedelta(days=1)
-                )
+            elif isinstance(extracted, list):
+                achieveds = extracted
+                if count > len(extracted):
+                    achieveds += [None]*(count - len(extracted))
+            for c, (target, achieved, evidence) in enumerate(zip(targets, achieveds, evidence)):
+                if not isinstance(achieved, list):
+                    achieved = [achieved]
+                for j, this_achieved in enumerate(achieved):
+                    if this_achieved is not None:
+                        ResultFactory(
+                            periodic_target=target,
+                            achieved=this_achieved,
+                            indicator=self,
+                            program=self.program,
+                            evidence_url=evidence,
+                            date_collected=target.start_date + datetime.timedelta(days=1+j+c%count)
+                        )
 
 class Objective(DjangoModelFactory):
     class Meta:
@@ -266,12 +309,43 @@ class PinnedReportFactory(DjangoModelFactory):
     name = Sequence(lambda n: 'Test pinned report: {0}'.format(n))
     report_type = FuzzyChoice(['timeperiods', 'targetperiods'])
 
+
 class DisaggregationTypeFactory(DjangoModelFactory):
     class Meta:
         model = DisaggregationTypeM
+
+    standard = False
     disaggregation_type = Sequence(lambda n: "disagg type {0}".format(n))
-    description = "disaggregation description"
-    country = SubFactory(CountryFactory)
+    country = LazyAttribute(lambda o: None if o.standard else CountryFactory())
+
+    @post_generation
+    def labels(self, create, extracted, **kwargs):
+        if extracted is None:
+            extracted = ['Label 1', 'Label 2']
+        if isinstance(extracted, list):
+            labels = [
+                DisaggregationLabelFactory(
+                    disaggregation_type=self, label=label, customsort=c+1
+                    ) for c, label in enumerate(extracted)
+                ]
+
+
+class DisaggregationLabelFactory(DjangoModelFactory):
+    class Meta:
+        model = DisaggregationLabelM
+
+    disaggregation_type = SubFactory(DisaggregationTypeFactory)
+    label = Sequence(lambda n: "disagg label {}".format(n))
+    customsort = Sequence(lambda n: n + 1)
+
+
+class DisaggregatedValueFactory(DjangoModelFactory):
+    class Meta:
+        model = DisaggregatedValueM
+
+    category = SubFactory(DisaggregationLabelFactory)
+    value = FuzzyInteger(10, 100)
+
 
 class DataCollectionFrequencyFactory(DjangoModelFactory):
     class Meta:

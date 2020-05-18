@@ -17,6 +17,7 @@ const FilterTop = inject('filterStore')(
                 { filterStore.resultsFramework &&
                     <Selectors.GroupingSelect />
                 }
+                <Filters.HiddenColumnSelect />
             </React.Fragment>
         );
     })
@@ -26,6 +27,7 @@ const FilterMiddle = () => {
     return (
         <React.Fragment>
             <Filters.LevelSelect />
+            <Filters.DisaggregationSelect />
             <Filters.SiteSelect />
             <Filters.TypeSelect />
             <Filters.SectorSelect />

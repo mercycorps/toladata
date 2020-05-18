@@ -56,6 +56,7 @@ from tola_management.permissions import (
     HasOrganizationAdminAccess
 )
 
+
 class Paginator(pagination.PageNumberPagination):
     page_size = 20
     page_size_query_param = 'page_size'
@@ -71,6 +72,7 @@ class Paginator(pagination.PageNumberPagination):
         ]))
         return response
 
+
 def requires_basic_or_super_admin(func):
     def wrapper(request, *args, **kwargs):
         if user_has_basic_or_super_admin(request.user):
@@ -79,8 +81,9 @@ def requires_basic_or_super_admin(func):
             raise PermissionDenied
     return wrapper
 
+
 def get_user_page_context(request):
-    #json.dumps doesn't seem to respect ordereddicts so we'll sort it on the frontend
+    # json.dumps doesn't seem to respect ordereddicts so we'll sort it on the frontend
     countries = {
         country.id: {
             "id": country.id, "name": country.country,
@@ -110,6 +113,7 @@ def get_user_page_context(request):
         "program_role_choices": PROGRAM_ROLE_CHOICES,
         "country_role_choices": COUNTRY_ROLE_CHOICES,
     }
+
 
 def get_organization_page_context(request):
     country_filter = request.GET.getlist('countries[]')
@@ -141,6 +145,7 @@ def get_organization_page_context(request):
         "program_filter": program_filter,
     }
 
+
 def get_program_page_context(request):
     auth_user = request.user
     tola_user = auth_user.tola_user
@@ -150,21 +155,21 @@ def get_program_page_context(request):
 
     country_queryset = tola_user.managed_countries
     filtered_countries = {
-        country.id : {
+        country.id: {
             'id': country.id,
             'name': country.country,
         } for country in country_queryset.all()
     }
 
     all_countries = {
-        country.id : {
+        country.id: {
             'id': country.id,
             'name': country.country,
         } for country in tola_user.managed_countries
     }
 
     organizations = {
-        organization.id : {
+        organization.id: {
             'id': organization.id,
             'name': organization.name,
         } for organization in Organization.objects.all()
@@ -205,6 +210,7 @@ def get_program_page_context(request):
         'users_filter': users_filter,
     }
 
+
 def get_country_page_context(request):
     auth_user = request.user
     tola_user = auth_user.tola_user
@@ -219,7 +225,7 @@ def get_country_page_context(request):
     } for country in country_queryset.distinct()]
 
     organizations = {
-        organization.id : {
+        organization.id: {
             'id': organization.id,
             'name': organization.name,
         } for organization in Organization.objects.all()
@@ -242,6 +248,7 @@ def get_country_page_context(request):
         'programs': programs,
     }
 
+
 def send_new_user_registration_email(user, request):
     uid = urlsafe_base64_encode(force_bytes(user.pk))
     token = default_token_generator.make_token(user)
@@ -258,6 +265,7 @@ def send_new_user_registration_email(user, request):
 
     send_mail(subject=subject, message=text_email, from_email=settings.DEFAULT_FROM_EMAIL,
               recipient_list=[user.email], fail_silently=False, html_message=html_email)
+
 
 # Create your views here.
 @login_required(login_url='/accounts/login/')
@@ -278,12 +286,12 @@ def app_host_page(request, react_app_page):
         js_context = get_country_page_context(request)
         page_title = "Country Management"
 
-
     json_context = json.dumps(js_context, cls=DjangoJSONEncoder)
     return render(
         request, 'react_app_base.html',
         {"bundle_name": "tola_management_"+react_app_page, "js_context": json_context, "page_title": page_title+" | "}
     )
+
 
 @login_required(login_url='/accounts/login/')
 def audit_log_host_page(request, program_id):
@@ -300,9 +308,11 @@ def audit_log_host_page(request, program_id):
 
 class AuthUserSerializer(ModelSerializer):
     id = IntegerField(allow_null=True, required=False)
+
     class Meta:
         model = User
         fields = ('id', 'is_staff', 'is_superuser', 'is_active')
+
 
 class UserManagementAuditLogSerializer(ModelSerializer):
     id = IntegerField(allow_null=True, required=False)
@@ -375,7 +385,7 @@ class UserAdminSerializer(ModelSerializer):
 
         auth_user_data = validated_data.pop('user')
 
-        #create auth user
+        # create auth user
         new_django_user = User(
             email=auth_user_data["email"],
             is_active=auth_user_data["is_active"],
@@ -385,7 +395,7 @@ class UserAdminSerializer(ModelSerializer):
         )
         new_django_user.save()
 
-        #create tola user
+        # create tola user
         new_user = TolaUser(
             organization_id=validated_data["organization_id"],
             user=new_django_user,
@@ -457,9 +467,11 @@ class UserAdminSerializer(ModelSerializer):
             'email'
         )
 
+
 class UserAdminReportSerializer(ModelSerializer):
     id = IntegerField(allow_null=True, required=False)
-    organization_name = CharField(source="organization.name", max_length=255, allow_null=True, allow_blank=True, required=False)
+    organization_name = CharField(
+        source="organization.name", max_length=255, allow_null=True, allow_blank=True, required=False)
     organization_id = IntegerField(source="organization.id")
     user_programs = IntegerField(required=False)
     is_active = BooleanField(source="user.is_active")
@@ -891,7 +903,6 @@ class UserAdminViewSet(viewsets.ModelViewSet):
         })
 
 
-
 class OrganizationAdminSerializer(Serializer):
     id = IntegerField(allow_null=True, required=False)
     name = CharField(max_length=100)
@@ -917,6 +928,7 @@ class OrganizationAdminSerializer(Serializer):
             'user_count',
             'is_active',
         )
+
 
 class SectorSerializer(Serializer):
     def to_representation(self, sector):
@@ -985,6 +997,7 @@ class OrganizationSerializer(ModelSerializer):
             'sectors'
         )
 
+
 class OrganizationAdminAuditLogSerializer(ModelSerializer):
     id = IntegerField(allow_null=True, required=False)
     admin_user = CharField(source="admin_user.name", max_length=255)
@@ -1000,6 +1013,7 @@ class OrganizationAdminAuditLogSerializer(ModelSerializer):
             'diff_list',
             'pretty_change_type',
         )
+
 
 class OrganizationAdminViewSet(viewsets.ModelViewSet):
     serializer_class = OrganizationSerializer

@@ -37,7 +37,7 @@ def result_pk_adapter(inner):
         def wrapper(request, *args, **kwargs):
             result = get_object_or_404(Result, pk=kwargs.get('pk'))
             indicator_id = result.indicator_id
-            program_id = result.program_id
+            program_id = result.indicator.program_id
             kwargs['program'] = program_id
             kwargs['indicator'] = indicator_id
             return wrapped(request, *args, **kwargs)
