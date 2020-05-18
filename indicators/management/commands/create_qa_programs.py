@@ -1,13 +1,14 @@
-from copy import deepcopy
-from datetime import date, timedelta
-from dateutil.relativedelta import relativedelta
-from getpass import getpass
-from itertools import cycle
+
 import json
 import math
 import os
 import random
 import sys
+from copy import deepcopy
+from datetime import date, timedelta
+from dateutil.relativedelta import relativedelta
+from getpass import getpass
+from itertools import cycle
 
 from django.core.management.base import BaseCommand
 from django.contrib.auth.models import User
@@ -15,15 +16,29 @@ from django.utils import timezone, translation
 from django.conf import settings
 from django.db.utils import IntegrityError
 
-from indicators.models import Indicator, Result, PeriodicTarget, Level, LevelTier, LevelTierTemplate, IndicatorType
+from indicators.models import (
+    Indicator,
+    IndicatorType,
+    Result,
+    PeriodicTarget,
+    Level,
+    LevelTier,
+    LevelTierTemplate,
+    DisaggregationType,
+    DisaggregationLabel,
+    DisaggregatedValue,
+)
 from workflow.models import Program, Country, Organization, TolaUser, CountryAccess, ProgramAccess, SiteProfile, Sector
 from indicators.views.views_indicators import generate_periodic_targets
-
 
 class Command(BaseCommand):
     help = """
         Setup targets for indicators by reading a CSV file
         """
+
+    def __init__(self):
+        super().__init__()
+        self.sadd_disagg = ''
 
     def add_arguments(self, parser):
         parser.add_argument('--clean_programs', action='store_true')
@@ -80,6 +95,9 @@ class Command(BaseCommand):
         country, created = Country.objects.get_or_create(
             country='Tolaland', defaults={
                 'latitude': 21.4, 'longitude': -158, 'zoom': 6, 'organization': org, 'code': 'TO'})
+        if created:
+            self.create_disaggregations(country)
+
         self.create_test_sites()
         for super_user in TolaUser.objects.filter(user__is_superuser=True):
             ca, created = CountryAccess.objects.get_or_create(country=country, tolauser=super_user)
@@ -145,6 +163,7 @@ class Command(BaseCommand):
              'direction': Indicator.DIRECTION_OF_CHANGE_NONE, 'null_level': None},
         ]
 
+        # Create programs for specific people
         if not options['named_only'] and not options['levelicious_only']:
             password = getpass(prompt="Enter the password to use for the test users: ")
 
@@ -193,7 +212,7 @@ class Command(BaseCommand):
         if options['names']:
             tester_names = options['names'].split(',')
         else:
-            tester_names = sorted(['Kelly', 'Marie', 'Jenny', 'Sanjuro', 'Cameron', 'Ken', 'Carly', 'Marco'])
+            tester_names = ['Kelly', 'Marie', 'Jenny', 'Sanjuro', 'Cameron', 'Ken', 'Paul', 'Carly', 'Marco']
 
         for t_name in tester_names:
             program_name = 'QA program - {}'.format(t_name)
@@ -317,6 +336,42 @@ class Command(BaseCommand):
         self.create_test_users(password)
 
     @staticmethod
+    def create_disaggregations(country):
+        disagg_1 = DisaggregationType(
+            disaggregation_type="A 3-category disaggregation",
+            country=country
+        )
+        disagg_1.save()
+        for c, label in enumerate(['Category 1', 'Category 2', 'Category 3']):
+            category = DisaggregationLabel(
+                disaggregation_type=disagg_1,
+                label=label,
+                customsort=c+1
+            )
+            category.save()
+        disagg_2 = DisaggregationType(
+            disaggregation_type="A 2-category disaggregation",
+            country=country,
+        )
+        disagg_2.save()
+        for c, label in enumerate(['Cåtégøry 1', 'Category 2']):
+            category = DisaggregationLabel(
+                disaggregation_type=disagg_2,
+                label=label,
+                customsort=c+1
+            )
+            category.save()
+        # disagg_3 = DisaggregationType(
+        #     disaggregation_type="An archived no-label disaggregation",
+        #     country=country,
+        #     is_archived=True,
+        #     selected_by_default=False,
+        # )
+        # disagg_3.save()
+        # return [disagg_1, disagg_2, disagg_3]
+        return [disagg_1, disagg_2]
+
+    @staticmethod
     def create_program(start_date, end_date, country, name, post_satsuma=True, multi_country=False):
         program = Program.objects.create(**{
             'name': name,
@@ -388,9 +443,13 @@ class Command(BaseCommand):
         return int(math.ceil((target/period_count)/10)*10)
 
     def create_indicators(
-            self, program_id, param_sets, indicator_suffix='', apply_skips=True, apply_rf_skips=False,
+        self, program_id, param_sets, indicator_suffix='', apply_skips=True, apply_rf_skips=False,
             personal_indicator=False, indicatorless_levels=None):
         indicatorless_levels = [] if not indicatorless_levels else indicatorless_levels
+        try:
+            self.sadd_disagg = DisaggregationType.objects.get(pk=109)
+        except DisaggregationType.DoesNotExist:
+            self.sadd_disagg = False
         indicator_ids = []
         program = Program.objects.get(id=program_id)
         frequency_labels = {
@@ -444,21 +503,43 @@ class Command(BaseCommand):
             sites.append(None)
         site_cycle = cycle(sites)
 
+
+        country_disagg_cycle = cycle([0, 1, 2])
+        sadd_disagg_cycle = cycle([True, True, True, False])
+        result_disagg_cycle = cycle(['sadd', 'one', 'two', 'none', 'all', 'all', 'all', 'none'])
+
         for n, params in enumerate(param_sets):
             if params['is_cumulative']:
                 cumulative_text = 'Cumulative'
             else:
                 cumulative_text = 'Non-cumulative'
+            country_disagg_count = next(country_disagg_cycle)
+            sadd_disagg = next(sadd_disagg_cycle)
+            result_disagg = next(result_disagg_cycle)
 
-            null_text = '| No {}'.format(params['null_level']) if params['null_level'] else ''
-
-            indicator_name = '{} | {} | {} | {} {}'.format(
+            indicator_name_list = [
                 frequency_labels[params['freq']],
                 uom_labels[params['uom_type']],
                 cumulative_text,
                 direction_labels[params['direction']],
-                null_text,
-            )
+                f"Disagg type - SADD:{sadd_disagg}, Country:{country_disagg_count}",
+
+            ]
+            if params['null_level']:
+                indicator_name_list.append(f"| No {params['null_level']}")
+            else:
+                result_text_list = []
+                result_text_list.append(f"SADD:{result_disagg in ('all', 'sadd')}") if sadd_disagg else None
+                result_text_list.append(f"Country:{result_disagg in ('one', 'two', 'all')}") if country_disagg_count > 0 else None
+                if len(result_text_list) > 0:
+                    result_text = ", ".join(result_text_list)
+                else:
+                    result_text = "None"
+                indicator_name_list.append(
+                    f"Disaggs applied - {result_text}")
+            if indicator_suffix:
+                indicator_name_list.append(indicator_suffix)
+            indicator_name = ' | '.join(indicator_name_list)
 
             frequency = params['freq']
             if params['null_level'] == 'targets':
@@ -466,7 +547,7 @@ class Command(BaseCommand):
 
             # Finally, create the indicator
             indicator = Indicator(
-                name=indicator_name + ' | ' + indicator_suffix,
+                name=indicator_name,
                 is_cumulative=params['is_cumulative'],
                 target_frequency=frequency,
                 unit_of_measure='This is a UOM',
@@ -479,6 +560,11 @@ class Command(BaseCommand):
                 sector=None if not personal_indicator else next(sector_cycle),
             )
             indicator.save()
+            if self.sadd_disagg and sadd_disagg:
+                indicator.disaggregation.add(self.sadd_disagg)
+            country = Country.objects.get(country="Tolaland")
+            for disagg in country.disaggregationtype_set.all().order_by('?')[:country_disagg_count]:
+                indicator.disaggregation.add(disagg)
 
             i_type = next(type_cycle)
             if personal_indicator and i_type:
@@ -583,6 +669,8 @@ class Command(BaseCommand):
                         achieved=achieved_value,
                         date_collected=date_collected)
                     rs.save()
+                    if result_disagg != 'none':
+                        self.disaggregate_result(rs, result_disagg, indicator)
                     date_collected = date_collected + day_offset
                     if params['uom_type'] == Indicator.NUMBER:
                         achieved_value = int(achieved_value * 1.5)
@@ -609,6 +697,36 @@ class Command(BaseCommand):
             indicator.save()
 
         return indicator_ids
+
+    def disaggregate_result(self, result, result_disagg_type, indicator):
+        label_sets = []
+        if result_disagg_type == 'sadd' and self.sadd_disagg:
+            label_sets.append(list(DisaggregationLabel.objects.filter(disaggregation_type=self.sadd_disagg)))
+        elif result_disagg_type == 'one' and indicator.disaggregation.all().count() > 1:
+            disagg_type = DisaggregationType.objects\
+                .filter(indicator=indicator)\
+                .exclude(pk=self.sadd_disagg.pk)\
+                .order_by('?')\
+                .first()
+            label_sets.append(list(DisaggregationLabel.objects.filter(disaggregation_type=disagg_type)))
+        elif result_disagg_type == 'two' and indicator.disaggregation.all().count() > 1:
+            disagg_types = DisaggregationType.objects.filter(indicator=indicator).exclude(pk=self.sadd_disagg.pk)
+            for disagg_type in disagg_types:
+                label_sets.append(list(DisaggregationLabel.objects.filter(disaggregation_type=disagg_type)))
+        elif result_disagg_type == 'all':
+            for disagg_type in indicator.disaggregation.all():
+                label_sets.append(list(DisaggregationLabel.objects.filter(disaggregation_type=disagg_type)))
+
+        if len(label_sets) < 1:
+            return
+        for label_set in label_sets:
+            # Calculate how many of the labels we will use (k) and then randomly select that number of label indexes
+            k = random.randrange(1, len(label_set) + 1)
+            label_indexes = random.sample(list(range(len(label_set))), k)
+            values = self.make_random_disagg_values(result.achieved, len(label_indexes))
+            for label_index, value in zip(label_indexes, values):
+                label = label_set[label_index]
+                DisaggregatedValue.objects.create(category_id=label.pk, value=value, result=result)
 
     @staticmethod
     def create_levels(program_id, level_data):
@@ -647,6 +765,8 @@ class Command(BaseCommand):
     def clean_tolaland():
         try:
             country = Country.objects.get(country='Tolaland')
+            disaggregations = DisaggregationType.objects.filter(country=country)
+            disaggregations.delete()
             country.delete()
         except Country.DoesNotExist:
             pass
@@ -944,3 +1064,34 @@ class Command(BaseCommand):
         },
 
     }
+
+    @staticmethod
+    def make_random_disagg_values(aggregate_value, total_slot_count):
+        filled = []
+        for slot_index in range(total_slot_count):
+            slots_available_count = total_slot_count - len(filled)
+            max_value = aggregate_value - sum(filled) - slots_available_count + 1
+            if max_value <=1:
+                filled.extend([1]*slots_available_count)
+                break
+            elif slot_index == total_slot_count - 1:
+                filled.append(aggregate_value - sum(filled))
+            else:
+                filled.append(random.randrange(0, max_value))
+        if sum(filled) < aggregate_value:
+            filled[0] += aggregate_value - sum(filled)
+        if sum(filled) > aggregate_value:
+            reduction_amount = sum(filled) - aggregate_value
+            while reduction_amount > 0:
+                i = filled.index(max(filled))
+                if filled[i] >= reduction_amount:
+                    filled[i] -= reduction_amount
+                    reduction_amount = 0
+                else:
+                    reduction_amount -= filled[i]
+                    filled[i] = 0
+
+        if sum(filled) != aggregate_value:
+            raise NotImplementedError('You wrote a bad algorithm')
+        random.shuffle(filled)
+        return filled

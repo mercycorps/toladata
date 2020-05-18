@@ -143,13 +143,14 @@ export const MultiSelectCheckbox = ( props ) => {
                         return gettext('None selected');
                     }
                     if (Array.isArray(_ref.value)) {
-                        if (_ref.value.length == 0) {
+                        let options = _ref.value.filter(option => !option.noList);
+                        if (options.length == 0) {
                             return gettext('None selected');
                         }
-                        if (_ref.value.length == 1) {
-                            return _ref.value[0].label;
+                        if (options.length == 1) {
+                            return options[0].label;
                         }
-                        return `${_ref.value.length}  ${gettext('selected')}`;
+                        return `${options.length}  ${gettext('selected')}`;
                     }
                     return _ref.value.label;
                 }

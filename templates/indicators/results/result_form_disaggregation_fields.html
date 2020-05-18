@@ -3,114 +3,231 @@
 {# disaggregation fields in result_form_modal.html #}
 {# TODO: update design, test functionality #}
 {# values supercede labels, so show labels if not values #}
-{% if not standard_disaggregation_values and not standard_disaggregation_labels %}
-    {# setup error, inform user (no standard disagg - this is a setup problem) #}
-    <h4>{% trans "Standard disaggregation levels not entered" %}</h4>
-    <p>{% trans "Standard disaggregations are entered by the administrator for the entire organizations.  If you are not seeing any here, please contact your system administrator." %}</p>
-{% else %}
-    <fieldset class="">
-        <a
-            href="#"
-            id="disagg_toggle"
-            class="is-accordion-toggle btn btn-link"
-            data-toggle="collapse"
-            data-target="#standardDisagg"
-            aria-expanded="false"
-            aria-controls="standardDisagg">
-            <i class="fas fa-caret-right"></i>{% trans "Sex and Age Disaggregated Data (SADD)" %}
-        </a>
-        <div class="collapse" id="standardDisagg">
-            <table class="table table-bordered table-sm table-hover table-striped">
-                <tr>
-                    <th>{% trans "Disaggregation level" %}</th>
-                    {% comment %}Translators: in the sense of "actual values"{% endcomment %}
-                    <th>{% trans "Actuals" %}</th>
-                </tr>
-                {% if standard_disaggregation_values %}
-                    {# values superceded labels (show disagg values if entered for this result) #}
-                    {% for item in standard_disaggregation_values %}
-                        <tr>
-                            <td>{{ item.disaggregation_label.label }}</td>
-                            <td>
-                                <input type="number" min="0"
-                                    {% if readonly %}disabled="disabled"{% endif %}
-                                    class="form-control form-control-sm"
-                                    name="{{ item.disaggregation_label.id }}"
-                                    value="{{ item.value }}">
-                            </td>
-                        </tr>
-                    {% endfor %}
+{% for disaggregation_formset in disaggregation_forms %}
+    <fieldset class="disaggregation-formset unvalidated" data-prefix="{{ disaggregation_formset.prefix }}">
+        <span style="white-space: nowrap;">
+            <a
+               href="#" id="disaggregations_toggle_{{ forloop.counter0 }}" class="is-accordion-toggle btn btn-link collapsed"
+               data-toggle="collapse" data-target="#disaggregations_fields_{{ forloop.counter0 }}"
+               aria-expanded="false" aria-controls="disaggregations_fields_{{ forloop.counter0 }}">
+                <i class="fas fa-caret-right"></i>
+                {# Use translated disaggregation label if it's a global disagg type (i.e. has no country association #}
+                {% if disaggregation_formset.disaggregation.country %}
+                    {{ disaggregation_formset.disaggregation }}
                 {% else %}
-                    {# no values (no entered disaggs for this result) show standard labels to add new ones #}
-                    {% for item in standard_disaggregation_labels %}
-                        <tr>
-                            <td>{{ item.label }}</td>
-                            <td>
-                                <input type="number" min="0"
-                                    {% if readonly %}disabled="disabled"{% endif %}
-                                    class="form-control form-control-sm"
-                                    name="{{ item.id }}"
-                                    value="">
-                            </td>
-                        </tr>
-                    {% endfor %}
+                    {{ disaggregation_formset.disaggregation_label }}
                 {% endif %}
-                </table>
+            </a>
+            <span class="formset-feedback invalid-feedback">
+                {# Translators:  Allows the user to select only those items that need to be updated in some way#}
+                <i class="fas fa-exclamation-triangle"></i>&nbsp;{% trans "Needs attention" %}
+            </span>
+        </span>
+
+        <div class="collapse" id="disaggregations_fields_{{ forloop.counter0 }}">
+            {{ disaggregation_formset.management_form }}
+            <ul class="list-group form-list-group">
+                {% for disaggregation_form in disaggregation_formset %}
+                <li class="list-group-item">
+                    <div class="item__label">
+                        {{disaggregation_form.label_pk}}{{disaggregation_form.value.label_tag }}
+                    </div>
+                    <div class="item__value {% if indicator.unit_of_measure_type == indicator.PERCENTAGE %} input-symbol-percent {% endif %}">
+                        {{ disaggregation_form.value|add_class:"form-control text-right force-numeric-input disaggregated-value-cell" }}
+                        <div class="invalid-feedback">
+                        </div>
+                    </div>
+                </li>
+                {% endfor %}
+                {% if indicator.unit_of_measure_type != indicator.PERCENTAGE %}
+                <li class="list-group-item">
+                    <div class="item__label">
+                        <strong>{% trans "Sum" %}</strong>
+                    </div>
+                    <div class="item__value actions-container">
+                        <div class="invalid-actions invalid-feedback">
+                            <a href="#">
+                                {# Translators: Button text. When user clicks, a form will be updated with a calculated value based on what the user has entered. #}
+                                <i class="fas fa-sync"></i>&nbsp;&nbsp;{% trans "Update actual value" %}
+                            </a>
+                            <span class="sum-difference"></span>
+                        </div>
+                        <div class="value-cell sum-value-cell">
+                        </div>
+                    </div>
+                </li>
+                {% endif %}
+                <li class="list-group-item reference-row">
+                    <div class="item__label">
+                        <strong>{% trans "Actual value" %}</strong>
+                    </div>
+                    <div class="item__value">
+                        <div class="value-cell actual-value-cell {% if indicator.unit_of_measure_type == indicator.PERCENTAGE %}input-symbol-percent{% endif %}"></div>
+                    </div>
+                </li>
+            </ul>
+            <div class="bad-sum-feedback">
+                {# invalid feedback is nested inside bad-sum-feedback to hold at least one empty line for the feedback message, to keep the modal a consistent(ish) height #}
+                <div class="invalid-feedback">
+                    {% trans "The sum of disaggregated values does not match the actual value." %}
+                </div>
+                &nbsp; {# (see note above) #}
             </div>
         </div>
     </fieldset>
-{% endif %}
-{% if not custom_disaggregation_values and not custom_disaggregation_labels %}
-    {# no custom disaggregations associated with this indicator.  current behavior: pass #}
-{% else %}
-    <fieldset class="">
-        <a
-            href="#"
-            class="is-accordion-toggle btn btn-link"
-            data-toggle="collapse"
-            data-target="#customDisagg"
-            aria-expanded="false"
-            aria-controls="customDisagg">
-            <i class="fas fa-caret-right"></i>{% trans "Custom disaggregations" %}
-            {% comment %} These are "custom" in the sense that they are specific to this indicator{% endcomment %}
-        </a>
-        <div class="collapse" id="customDisagg">
-            <table class="table table-sm table-hover table-striped">
-                <tr>
-                    <th>{% trans "Disaggregation level" %}</th>
-                    {% comment %}Translators: in the sense of "actual values"{% endcomment %}
-                    <th>{% trans "Actuals" %}</th>
-                </tr>
-                {% if custom_disaggregation_values %}
-                    {# a user has entered custom disaggregation values, display them instead of labels for new ones #}
-                    {% for item in custom_disaggregation_values %}
-                        <tr>
-                            <td>{{ item.disaggregation_label.label }}</td>
-                            <td>
-                                <input type="number" min="0"
-                                    {% if readonly %}disabled="disabled"{% endif %}
-                                    class="form-control form-controm-sm"
-                                    name="{{ item.disaggregation_label.id }}"
-                                    value="{{ item.value }}">
-                            </td>
-                        </tr>
-                    {% endfor %}
-                {% elif custom_disaggregation_labels %}
-                    {# indicator has custom disaggregations but none are entered, show labels to allow new custom disaggs #}
-                    {% for item in custom_disaggregation_labels %}
-                    <tr>
-                        <td>{{ item.label }}</td>
-                        <td>
-                            <input type="number" min="0"
-                                {% if readonly %}disabled="disabled"{% endif %}
-                                class="form-control form-control-sm"
-                                name="{{ item.id }}"
-                                value="">
-                        </td>
-                    </tr>
-                    {% endfor %}
-                {% endif %}
-            </table>
-        </div>
-    </fieldset>
-{% endif %}
+{% endfor %}
+
+<script>
+    // Collect all the form prefixes for the different formsets for validation:
+    var disaggForms = [
+        {% for disaggregation_formset in disaggregation_forms %}
+            "{{ disaggregation_formset.prefix }}",
+        {% endfor %}
+    ];
+    var percentageInput = {% if indicator.unit_of_measure_type == indicator.PERCENTAGE %}true{% else %}false{% endif %};
+
+    function updateActuals() {
+        let val = $('#id_achieved').numericVal();
+        $('#id_achieved').displayVal(val);
+        $('.actual-value-cell').displayVal(val);
+        $("#result_update_form .disaggregated-value-cell").each( (index, element) => {
+            $(element).displayVal($(element).val())
+        });
+        $('.disaggregation-formset').trigger('validateSum');
+    }
+
+    function validateDisaggregatedValue(ev) {
+        $( this ).removeClass('is-invalid');
+        if ($( this ).val() == '') {
+            // user entered blank, do nothing
+        } else if ($( this ).val() == ',' || $( this ).val() == '.') {
+            $( this ).val('');
+            // user entered a comma or . and tabbed out, do nothing
+        } else if ($( this ).numericVal() === null || $(this).numericVal() < 0) {
+            if ($( this ).displayVal() == '') {
+                $( this ).val('');
+            } else {
+                $( this ).addClass('is-invalid');
+            }
+        }
+        $( this ).parents('.disaggregation-formset').trigger('updateSum');
+    }
+
+    function updateSum(ev) {
+        if( $( this ).find('.is-invalid').length > 0 ) {
+            $( this ).find('.sum-value-cell').html('');
+        } else {
+            let prefix = $( this ).data('prefix');
+            let values = Array.from(
+                Array(parseInt($(`#id_${prefix}-TOTAL_FORMS`).val())).keys()
+            ).map(
+                idx => {
+                    return $(`#id_${prefix}-${idx}-value`).numericVal();
+                }
+            );
+            if (values.every(val => (val === false || val === null))) {
+                // disaggregation is empty (all blank)
+                $( this ).find('.sum-value-cell').html('');
+            } else {
+                let sumValue = values.filter(val => val > 0).reduce((a, b) => a + b, 0);
+                $( this ).find('.sum-value-cell').displayVal(sumValue, percentageInput);
+            }
+        }
+        $( this ).trigger('validateSum');
+        $( this ).trigger('validateFormset');
+    }
+
+    function validateSum() {
+        if (!$( this ).find('.sum-value-cell')) {
+            // percent cell - no sum validation
+            return;
+        }
+        let $sumValueCell = $( this ).find('.sum-value-cell').first();
+        $sumValueCell.parent().removeClass('no-sum-value').removeClass('bad-sum-value');
+        let sumValue = $sumValueCell.numericVal();
+        if (sumValue === null) {
+            // sum value is blank:
+            $sumValueCell.parent().addClass('no-sum-value');
+        } else {
+            let achievedValue = $('#id_achieved').numericVal();
+            if (achievedValue != sumValue) {
+                $sumValueCell.parent().addClass('bad-sum-value');
+                $sumValueCell.parent().find('.sum-difference')
+                    .html(`${achievedValue < sumValue ? '+' : ''}${$sumValueCell.toDisplayVal(sumValue - achievedValue)}`);
+            }
+        }
+        $( this ).trigger('validateFormset');
+    }
+    function validateFormset() {
+        $( this ).removeClass('has-errors');
+        if ($( this ).find('.is-invalid').length > 0 ) {
+            $( this ).addClass('has-errors');
+        }
+        if ($( this ).find('.bad-sum-value').length > 0) {
+            $( this ).addClass('has-errors');
+        }
+    }
+
+    function updateActualWithSum() {
+        let sumValue = $( this ).parents('.actions-container').find('.sum-value-cell').first().html();
+        $('#id_achieved').displayVal(sumValue);
+        updateActuals();
+        $('.disaggregation-formset').trigger('updateSum');
+    }
+
+    function validateDisaggregations() {
+        // skip validation on disaggs with no entries, which has the side benefit of skipping validation on
+        // new results until save is clicked.
+        $('.disaggregation-formset').each((index, disaggElement)=> {
+            const sumValue = $( disaggElement ).find('.sum-value-cell').html();
+            if (sumValue !== '') {
+                $( disaggElement ).removeClass('unvalidated').trigger('validateSum').trigger('validateFormset');
+            }
+            else {
+                $( disaggElement ).addClass('unvalidated')
+            }
+        });
+        return $('.disaggregation-formset.has-errors').length > 0 ? false : true
+    }
+
+    function resetDisaggregationValidation() {
+        //set timeout with instant timeout ensures this fires _after_ form is reset
+        setTimeout(function() {
+            updateActuals();
+            $('.disaggregation-formset').each(updateSum);
+            validateDisaggregations()
+        });
+    }
+
+
+    $(function() {
+        // set initial actuals value:
+        updateActuals();
+        $('.disaggregated-value-cell').each(validateDisaggregatedValue);
+        $('.disaggregation-formset').each(updateSum);
+        // whenever the actual value changes, update the actual values in each disaggregation row:
+        $('#id_achieved').on('change', updateActuals);
+        // whenever any of the value fields change, validate the individual value field.  Need to trigger
+        // submit if the button has been clicked immediately after modifying a value because
+        // the blur blocks submit event.
+        $('.disaggregated-value-cell').each(function() {
+            window.getValidatedNumericInput(this).on('blur', (e)=>{
+                validateDisaggregatedValue.call(this, e);
+                const $relatedTarget = e.originalEvent.relatedTarget;
+                if ($relatedTarget && $relatedTarget.id === "submit-id-submit") {
+                    submitHandler.call($("#result_update_form"));
+                }
+            });
+        });
+        $('.disaggregation-formset')
+            .on('updateSum', updateSum)
+            .on('validateSum', validateSum)
+            .on('validateFormset', validateFormset)
+        $('.invalid-actions>a').on('click', updateActualWithSum);
+        $('#result_update_form').on('reset', resetDisaggregationValidation);
+        validateDisaggregations();
+    });
+
+
+
+</script>

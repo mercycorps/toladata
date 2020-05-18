@@ -3,6 +3,7 @@ import { observer, inject } from 'mobx-react';
 import { MultiSelectCheckbox } from '../../../../components/selectWidgets';
 
 
+
 /**
  * input-ready multi-select checkbox widget for filtering IPTT report by level
  * contains both "grouping" and "chaining" filtering options, displayed as two optgroups
@@ -26,6 +27,37 @@ const LevelSelect = inject('filterStore')(
                                 tiers: selected.filter(s => s.category === "tier").map(s => s.value),
                                 oldLevels: selected.filter(s => s.category === "oldLevel").map(s => s.value),
                              };} }
+                />;
+    })
+);
+
+/**
+ * input-ready multi-select checkbox widget for filtering IPTT report by disaggregations
+ */
+const DisaggregationSelect = inject('filterStore')(
+    observer(({ filterStore }) => {
+        return <MultiSelectCheckbox
+                    label={
+                        /* # Translators: labels categories that  data could be disaggregated into */
+                        gettext('Disaggregations')
+                    }
+                    options={ filterStore.disaggregationOptions }
+                    value={ filterStore.disaggregationFilters }
+                    update={ selected => {filterStore.disaggregationFilters = selected.map(s => s.value);} }
+                />;
+    })
+);
+
+const HiddenColumnSelect = inject('filterStore')(
+    observer(({ filterStore }) => {
+        return <MultiSelectCheckbox
+                    label={
+                        /* # Translators: labels columns that could be hidden in the report */
+                        gettext('Hide columns')
+                    }
+                    options={ filterStore.hideColumnOptions }
+                    value={ filterStore.hiddenColumns }
+                    update={ selected => {filterStore.hiddenColumns = selected.map(s => s.value);} }
                 />;
     })
 );
@@ -96,4 +128,4 @@ const IndicatorSelect = inject('filterStore')(
                 />;
     })
 );
-export { LevelSelect, SiteSelect, TypeSelect, SectorSelect, IndicatorSelect };
+export { LevelSelect, DisaggregationSelect, SiteSelect, TypeSelect, SectorSelect, IndicatorSelect, HiddenColumnSelect };

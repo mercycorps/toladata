@@ -1,9 +1,9 @@
 {% extends "base.html" %}
 {% load i18n %}
+{% load widget_tweaks %}
 
 {% block title %}{% trans "Settings" %} | {% endblock %}
 {% block page_title %}{% trans "Settings" %}{% endblock %}
-{% block bodyclasses %}has-crispy-form{% endblock %}
 
 {% block content %}
 
@@ -21,7 +21,90 @@
         </div>
     {% endfor %}
 {% endif %}
-{% load crispy_forms_tags %}
-{% crispy form form.helper %}
 
+    <form class="hide-askerisks" method="post">
+        {% csrf_token %}
+        <div id="div_id_language" class="form-group">
+            <label for="{{ form.language.id_for_label }}" class="control-label required">{% trans "Language" %}</label>
+            {{ form.language|attr:"required"|add_class:"select form-control" }}
+        </div>
+
+        <p class="mt-4" role="definition">
+            {# Translators: Explanation of how language selection will affect number formatting within the app #}
+        {% trans "Your language selection determines the number format expected when you enter targets and results. Your language also determines how numbers are displayed on the program page and reports, including Excel exports." %}
+        </p>
+        <table id="profile--format-description__table">
+            <thead>
+                {# Translators: Column header in a table.  Row entries are different ways number can be formatted (e.g. what punctuation mark to use as a decimal point) #}
+                <th>{% trans "Number formatting conventions"%}</th>
+                <th>{% trans "English"%}</th>
+                <th>{% trans "French"%}</th>
+                <th>{% trans "Spanish"%}</th>
+            </thead>
+            <tbody>
+                <tr>
+                    <td>
+                        {# Row descriptor in a table that describes how language selection will affect number formats, in this case what punctuation mark is used as the decimal point.  #}
+                        <strong>{% trans "Decimal separator" %}</strong>
+                        {# Subtext of "Decimal separator", explains that language selection will affect the decimal separator for both form entry and number display.  #}
+                        <p>{% trans "Applies to number entry and display" %}</p>
+                    </td>
+                    <td>
+                        {# Translators: The punctuation mark used as a decimal point in English #}
+                        <strong>{% trans "Period" context "radix"%}</strong>
+                        <p>1.23</p>
+                    </td>
+                    <td>
+                        {# Translators: The punctuation mark used as a decimal point in French, Spanish  #}
+                        <strong>{% trans "Comma" %}</strong>
+                        <p>1,23</p>
+                    </td>
+                    <td>
+                        {# Translators: The punctuation mark used as a decimal point in French, Spanish  #}
+                        <strong>{% trans "Comma" %}</strong>
+                        <p>1,23</p>
+                    </td>
+                </tr>
+                <tr>
+                    <td>
+                        {# Row descriptor in a table that describes how language selection will affect number formats, in this case what punctuation mark is used to separate thousands, millions, etc....  #}
+                        <strong>{% trans "Thousands separator" %}</strong>
+                        {# Subtext of "Thousands separator", explains that language selection will affect the thousands separator only for number display purposes, not on entry of numbers into a form.  #}
+                        <p>{% trans "Applies only to number display" %}</p>
+                    </td>
+                    <td>
+                        {# Translators: The punctuation mark used as a decimal point in French, Spanish  #}
+                        <strong>{% trans "Comma" %}</strong>
+                        <p>1,000</p>
+                    </td>
+                    <td>
+                        {# Translators: The whitespace used to separate thousands in large numbers in French #}
+                        <strong>{% trans "Space" %}</strong>
+                        <p>1 000</p>
+                    </td>
+                    <td>
+                        {# Translators: The punctuation mark used as a decimal point in English #}
+                        <strong>{% trans "Period" context "radix" %}</strong>
+                        <p>1.000</p>
+                    </td>
+                </tr>
+            </tbody>
+        </table>
+        <div class="mt-3">
+            <div class="form-group">
+                <div class="controls">
+                    <input
+                        type="submit"
+                        value="{% trans "Save changes" %}"
+                        class="btn btn-primary mr-2"
+                        id="submit-id-submit">
+                    <input
+                        type="reset"
+                        value="{% trans "Reset" %}"
+                        class="btn btn-inverse"
+                        id="reset-id-reset">
+                </div>
+            </div>
+        </div>
+    </form>
 {% endblock content %}

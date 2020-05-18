@@ -1,4 +1,4 @@
-# -*- coding: utf-8 -*-
+
 """
 Views for indicators and related models (results, periodic targets) as well as indicator summaries (Program page)
 """
@@ -31,7 +31,7 @@ from django.views.generic import TemplateView
 from django.views.generic.detail import View
 from django.views.generic.edit import CreateView, DeleteView, UpdateView
 
-from tola.util import group_excluded
+from tola.util import group_excluded, usefully_normalize_decimal
 
 from workflow.models import (
     Program
@@ -45,12 +45,11 @@ from indicators.views.view_utils import (
     generate_periodic_targets,
     dictfetchall
 )
-from indicators.forms import IndicatorForm, ResultForm, PTFormInputsForm
+from indicators.forms import IndicatorForm, ResultForm, PTFormInputsForm, get_disaggregated_result_formset
 from indicators.models import (
     Indicator,
     PeriodicTarget,
     DisaggregationLabel,
-    DisaggregationValue,
     Result,
 )
 from indicators.queries import ProgramWithMetrics, ResultsIndicator
@@ -181,6 +180,7 @@ class IndicatorFormMixin:
             pt['id'] = pk
             pt['start_date'] = start_date
             pt['end_date'] = end_date
+            pt['target'] = pt['target'].replace(',', '.')
 
         return pt_json
 
@@ -200,7 +200,7 @@ class IndicatorFormMixin:
         for pt in normalized_pt_json:
             try:
                 if Decimal(pt['target']).as_tuple()[0] == 1:
-                    raise PeriodicTargetJsonValidationError('Target value must be >= 0, found %d' % pt['target'])    
+                    raise PeriodicTargetJsonValidationError('Target value must be >= 0, found %d' % pt['target'])
             except TypeError:
                 pass
 
@@ -787,24 +787,22 @@ class ResultCreate(ResultFormMixin, CreateView):
     def dispatch(self, request, *args, **kwargs):
         if not request.has_write_access:
             raise PermissionDenied
-
         self.indicator = get_object_or_404(Indicator, pk=self.kwargs['indicator'])
         return super(ResultCreate, self).dispatch(request, *args, **kwargs)
 
     def get_context_data(self, **kwargs):
-        custom_disaggregation_labels = DisaggregationLabel.objects.filter(
-            disaggregation_type__indicator=self.indicator.id
-        )
-        standard_disaggregation_labels = DisaggregationLabel.get_standard_labels()
-
         context = super(ResultCreate, self).get_context_data(**kwargs)
         context['indicator'] = self.indicator
-        context['custom_disaggregation_labels'] = custom_disaggregation_labels
-        context['standard_disaggregation_labels'] = standard_disaggregation_labels
         context['title_str'] = u'{}: {}'.format(
             str(self.indicator.form_title_level),
             str(self.indicator.name)
         )
+        context['disaggregation_forms'] = [
+            get_disaggregated_result_formset(disagg)(request=self.request)
+            for disagg in sorted(
+                self.indicator.disaggregation.all(),
+                key=lambda disagg: ugettext(disagg.disaggregation_type))
+            ]
         return context
 
     def get_form_kwargs(self):
@@ -817,42 +815,25 @@ class ResultCreate(ResultFormMixin, CreateView):
 
     def form_valid(self, form):
         indicator = self.request.POST['indicator']
-        disaggregation_labels = DisaggregationLabel.objects.filter(
-            Q(disaggregation_type__indicator__id=indicator) |
-            Q(disaggregation_type__standard=True))
 
-        new = form.save()
-
-        # The following code appears to be accomplishing the following
-        # The for submitted contains key/vals for all disaggregation_labels on creation
-        # if 1 or more values are present, create values in the DB for all key/vals
-        # otherwise leave the disaggregation_value associates completely empty
-        # In other words, save key/vals as all or nothing
-
-        disaggregation_label_ids = set([str(dl.id) for dl in disaggregation_labels])
-        process_disaggregation = False
-        for k, v in self.request.POST.items():
-            if k in disaggregation_label_ids and v:
-                process_disaggregation = True
-                break
-
-        if process_disaggregation is True:
-            for label in disaggregation_labels:
-                form_id_for_label = str(label.id)
-                form_disagg_value = self.request.POST.get(form_id_for_label, '')
-                new.disaggregation_value.create(disaggregation_label=label, value=form_disagg_value)
-
-        ProgramAuditLog.log_result_created(self.request.user, new.indicator, new)
+        result = form.save()
+        for disagg in result.indicator.disaggregation.all():
+            formset = get_disaggregated_result_formset(disagg)(self.request.POST, result=result, request=self.request)
+            if formset.is_valid():
+                formset.save()
+        rationale = form.cleaned_data.get('rationale') if form.cleaned_data.get('rationale') else "N/A"
+        ProgramAuditLog.log_result_created(
+            self.request.user, result.indicator, result, rationale)
 
         if self.request.is_ajax():
             data = {
-                'pk' : new.pk,
-                'url': reverse('result_update', kwargs={'pk': new.pk})
+                'pk': result.pk,
+                'url': reverse('result_update', kwargs={'pk': result.pk})
             }
             return JsonResponse(data)
 
         messages.success(self.request, _('Success, Data Created!'))
-        redirect_url = new.indicator.program.program_page_url
+        redirect_url = result.indicator.program.program_page_url
         return HttpResponseRedirect(redirect_url)
 
 
@@ -870,28 +851,19 @@ class ResultUpdate(ResultFormMixin, UpdateView):
         return super(ResultUpdate, self).dispatch(request, *args, **kwargs)
 
     def get_context_data(self, **kwargs):
-        custom_disaggregation_values = DisaggregationValue.objects.filter(
-            result=self.result).exclude(
-            disaggregation_label__disaggregation_type__standard=True)
-
-        standard_disaggregation_values = DisaggregationValue.objects.filter(
-            result=self.result).filter(
-            disaggregation_label__disaggregation_type__standard=True)
-        standard_disaggregation_labels = DisaggregationLabel.get_standard_labels()
-        custom_disaggregation_labels = DisaggregationLabel.objects.filter(
-            disaggregation_type__indicator=self.indicator.id)
         context = super(ResultUpdate, self).get_context_data(**kwargs)
         context['indicator'] = self.indicator
-
         context['readonly'] = not self.request.has_write_access
-        context['custom_disaggregation_labels'] = custom_disaggregation_labels
-        context['custom_disaggregation_values'] = custom_disaggregation_values
-        context['standard_disaggregation_labels'] = standard_disaggregation_labels
-        context['standard_disaggregation_values'] = standard_disaggregation_values
         context['title_str'] = u'{}: {}'.format(
             str(self.indicator.form_title_level),
             str(self.indicator.name)
         )
+        context['disaggregation_forms'] = [
+            get_disaggregated_result_formset(disagg)(result=self.result, request=self.request)
+            for disagg in sorted(
+                self.indicator.disaggregation.all(),
+                key=lambda disagg: ugettext(disagg.disaggregation_type))
+        ]
         return context
 
     def get_form_kwargs(self):
@@ -903,36 +875,19 @@ class ResultUpdate(ResultFormMixin, UpdateView):
         return kwargs
 
     def form_valid(self, form):
-        old_result = Result.objects.get(id=self.kwargs['pk'])
-
-        getDisaggregationLabel = DisaggregationLabel.objects.filter(
-            Q(disaggregation_type__indicator__id=old_result.indicator_id) |
-            Q(disaggregation_type__standard=True)).distinct()
-
         # save the form then update manytomany relationships
+        old_result = Result.objects.get(pk=self.kwargs['pk'])
         old_values = old_result.logged_fields
-        new_result = form.save()  # internally this clears disaggregation_value m2m relationships!
 
-        # like the create view, create disaggregation values as all or nothing
+        new_result = form.save()
+        for disagg in new_result.indicator.disaggregation.all():
+            formset = get_disaggregated_result_formset(disagg)(self.request.POST, result=new_result, request=self.request)
+            if formset.is_valid():
+                formset.save()
 
-        disaggregation_label_ids = set([str(dl.id) for dl in getDisaggregationLabel])
-        process_disaggregation = False
-        for k, v in self.request.POST.items():
-            if k in disaggregation_label_ids and v:
-                process_disaggregation = True
-                break
-
-        if process_disaggregation:
-            for label in getDisaggregationLabel:
-                form_id_for_label = str(label.id)
-                form_disagg_value = self.request.POST.get(form_id_for_label, '')
-                new_result.disaggregation_value.create(
-                    disaggregation_label=label, value=form_disagg_value)
-
-        # Result.achieved comes back different from the DB than from the ResultForm
-        new_result.refresh_from_db()
-        ProgramAuditLog.log_result_updated(self.request.user, new_result.indicator, old_values,
-                                           new_result.logged_fields, form.cleaned_data.get('rationale'))
+        ProgramAuditLog.log_result_updated(
+            self.request.user, new_result.indicator, old_values,
+            new_result.logged_fields, form.cleaned_data.get('rationale'))
 
         if self.request.is_ajax():
             data = serializers.serialize('json', [self.object])
@@ -1088,29 +1043,22 @@ class DisaggregationReportMixin:
             program_selected = Program.objects.filter(id=programId).first()
             if program_selected.indicator_set.count() > 0:
                 indicators = indicators.filter(program=programId)
-
+        # TODO: this is wrong (rebuild disaggregated value db models)
         disagg_query = "SELECT \
                 i.id AS IndicatorID, \
                 dt.disaggregation_type AS DType,\
                 l.customsort AS customsort, \
                 l.label AS Disaggregation, \
                 SUM(dv.value) AS Actuals \
-            FROM indicators_result_disaggregation_value AS cdv \
-            INNER JOIN indicators_result AS c \
-                ON c.id = cdv.result_id \
-            INNER JOIN indicators_indicator AS i ON i.id = c.indicator_id\
-            INNER JOIN workflow_program AS p ON p.id = i.program_id \
-            INNER JOIN indicators_disaggregationvalue AS dv \
-                ON dv.id = cdv.disaggregationvalue_id \
-            INNER JOIN indicators_disaggregationlabel AS l \
-                ON l.id = dv.disaggregation_label_id \
-            INNER JOIN indicators_disaggregationtype AS dt \
-                ON dt.id = l.disaggregation_type_id \
-            WHERE p.id = %s \
+            FROM indicators_indicator AS i\
+            JOIN indicators_result AS c ON c.indicator_id = i.id\
+            JOIN indicators_disaggregatedvalue AS dv ON dv.result_id=c.id\
+            JOIN indicators_disaggregationlabel AS l ON l.id=dv.category_id\
+            JOIN indicators_disaggregationtype AS dt ON dt.id=l.disaggregation_type_id\
+            WHERE i.program_id = %s \
             GROUP BY IndicatorID, DType, customsort, Disaggregation \
             ORDER BY IndicatorID, DType, customsort, Disaggregation;" \
                 % programId
-
         cursor = connection.cursor()
         cursor.execute(disagg_query)
         disdata = dictfetchall(cursor)

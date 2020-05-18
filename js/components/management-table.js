@@ -6,7 +6,7 @@ import classNames from 'classnames';
 const ColumnComponent = ({className, size, ...props}) => <td className={["mgmt-table__col", className].join(' ')}  {...props}>{props.children}</td>
 
 // TODO: this is redundant with ColumnComponent
-const HeaderColumnComponent = ({className, size, ...props}) => <th className={["mgmt-table__col", className].join(' ')}  {...props}>{props.children}</th>
+const HeaderColumnComponent = ({className, size, ...props}) => <th className={["mgmt-table__col", `mgmt-table__col__width-${size}`, className].join(' ')}  {...props}>{props.children}</th>
 
 const InnerRowComponent = ({className, ...props}) => <tr className={["mgmt-table__row", className].join(' ')} {...props}>{props.children}</tr>
 
@@ -36,7 +36,7 @@ const RowComponent = observer(({className, expanded, Expando, ...props}) => {
         </tbody>
     }
 })
-const ExpandoWrapper = ({className, ...props}) => <tr className={["mgmt-table__row--expanded", className].join(' ')} {...props}><td colSpan="6">{props.children}</td></tr>
+const ExpandoWrapper = ({className, ...props}) => <tr className={["mgmt-table__row--expanded", className].join(' ')} {...props}><td colSpan="5">{props.children}</td></tr>
 
 const RowList = observer(({data, Row, keyField, ...props}) => {
     const ObservedRow = observer(Row)

@@ -47,13 +47,14 @@
         <span id="id_span_achieved"
             {% if indicator.unit_of_measure_type == 2 or object.indicator.unit_of_measure_type == 2 %} class="input-symbol-percent" {% endif %}
         >
-            {% render_field form.achieved class+="form-control" %}
+            {% render_field form.achieved class+="form-control force-numeric-input" %}
         </span>
         <small class="form-text text-muted">{{ form.achieved.help_text }}</small>
         <span id="validation_id_achieved" class="has-error"></span>
     </div>
     {% include 'indicators/results/result_form_disaggregation_fields.html' %}
-    <div class="form-group" id="div_id_site">
+    
+    <div class="form-group mt-2" id="div_id_site">
         <label for="id_site">{{ form.site.label }}</label>
         <div class="select2-wrapper"> {# extra div to provide width to child select2 widget #}
             {% render_field form.site class+="form-control" %}
@@ -61,28 +62,10 @@
         <small class="form-text text-muted">{{ form.site.help_text }}</small>
         <span id="validation_id_site" class="has-error"></span>
     </div>
-    <div class="form-group" id="parent_div_id_submitted_by">
-
-    </div>
     <div class="form-group" id="div_id_comments">
         <label for="id_comments">{{ form.comments.label }}</label>
         {% render_field form.comments class+="form-control" %}
         <small class="form-text text-muted">{{ form.comments.help_text }}</small>
         <span id="validation_id_comments" class="has-error"></span>
-    </div>
-    {% if form.complete %}
-        <!-- only displayed to users with projects activated: -->
-        <div class="form-group" id="div_id_complete">
-            <label for="id_complete">{{ form.complete.label }}</label>
-            {% render_field form.complete class+="form-control" %}
-            <small class="form-text text-muted">{{ form.complete.help_text }}</small>
-            <span id="validation_id_complete" class="hass-error"></span>
-        </div>
-    {% endif %}
-    <div class="form-group" id="div_id_submitted_by">
-        <label for="id_submitted_by">{{ form.submitted_by.label }}</label>
-        {% render_field form.submitted_by class+="form-control" %}
-        <small class="form-text text-muted">{{ form.submitted_by.help_text }}</small>
-        <span id="validation_id_submitted_by" class="has-error"></span>
     </div>
 </fieldset>

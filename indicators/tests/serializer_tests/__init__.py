@@ -1,12 +1,13 @@
-from indicators.tests.serializer_tests.indicator_base_serializer import *
-from indicators.tests.serializer_tests.indicator_with_measurement_serializer import *
-from indicators.tests.serializer_tests.program_page_indicator_serializer import *
-from indicators.tests.serializer_tests.program_base_serializer import *
-from indicators.tests.serializer_tests.program_level_ordering_program_serializer import *
-from indicators.tests.serializer_tests.rf_level_ordering_program_serializer import *
-from indicators.tests.serializer_tests.program_page_program_serializer import *
-from indicators.tests.serializer_tests.program_page_endpoint import *
-from indicators.tests.serializer_tests.iptt_qs_program_serializer import *
-from indicators.tests.serializer_tests.iptt_indicator_serializer import *
-from indicators.tests.serializer_tests.iptt_program_serializer import *
-from indicators.tests.serializer_tests.iptt_endpoints import *
+# from indicators.tests.serializer_tests.indicator_base_serializer import *
+# from indicators.tests.serializer_tests.indicator_with_measurement_serializer import *
+# from indicators.tests.serializer_tests.program_page_indicator_serializer import *
+# from indicators.tests.serializer_tests.program_base_serializer import *
+# from indicators.tests.serializer_tests.program_level_ordering_program_serializer import *
+# from indicators.tests.serializer_tests.rf_level_ordering_program_serializer import *
+# from indicators.tests.serializer_tests.program_page_program_serializer import *
+# from indicators.tests.serializer_tests.program_page_endpoint import *
+# from indicators.tests.serializer_tests.iptt_qs_program_serializer import *
+# from indicators.tests.serializer_tests.iptt_indicator_serializer import *
+# from indicators.tests.serializer_tests.iptt_program_serializer import *
+# from indicators.tests.serializer_tests.iptt_endpoints import *
+# from indicators.tests.serializer_tests.iptt_report_serializer import *

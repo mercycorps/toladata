@@ -1,0 +1,7 @@
+fieldset.inline-fieldset > div.form-row:not(.is_hidden) {
+    display: flex;
+}
+
+fieldset.inline-fieldset > div.form-row:not(.is_hidden) > div.field-box {
+    margin-right: 30px;
+}

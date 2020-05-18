@@ -54,6 +54,7 @@
             id="indicator_update_form"
             class="form-horizontal"
             method="post"
+            autocomplete="off"
             novalidate>
 
         <div class="indicator-setup tab-set--vertical" id="indicator_modal_body">
@@ -200,11 +201,8 @@
                             <span id="validation_id_justification" class="has-error"></span>
                         </div>
 
-                        <div class="form-group" id="div_id_disaggregation">
-                            <label for="id_disaggregation" class="">{{ form.disaggregation.label }} </label>
-                            {% render_field form.disaggregation class+="form-control" %}
-                            <small class="form-text text-muted">{{ form.disaggregation.help_text }}</small>
-                            <span id="validation_id_disaggregation" class="has-error"></span>
+                        <div class="form-group grouped-disaggregations-list" id="div_id_grouped_disaggregations">
+                            {{ form.grouped_disaggregations }}
                         </div>
 
                         <div class="form-group" id="div_id_indicator_type">
@@ -269,7 +267,7 @@
                             <div class="" id="fieldgroup_id_baseline">
                                 <div id="div_id_baseline">
                                 <span id="span_{{ form.baseline.id_for_label }}">
-                                    <input type="number"
+                                    <input type="text"
                                            {% if readonly %}disabled="disabled"{% endif %}
                                            name="{{ form.baseline.name }}"
                                            id="{{ form.baseline.id_for_label }}"
@@ -454,7 +452,7 @@
                     </button>
                     {# Translators: close a modal throwing away any changes to the form #}
                     <button type="button" id="id_cancel_btn" class="btn btn-reset">{% trans 'Cancel' %}</button>
-                </div>    
+                </div>
                 {% endif %}
             {% form_guidance form %}
             </div>
@@ -480,6 +478,10 @@
         $('#indicator_modal_div [data-toggle="popover"]').popover();
         // initial state of target frequency box if form is already populated
         disable_target_frequency_field();
+        
+        //make baseline field a numeric input
+        window.getValidatedNumericInput('#id_baseline');
+        
 
         // Disabled objectives pulldown if nothing to choose
         if ($("#id_objectives option").length < 1) {
@@ -507,6 +509,16 @@
         recordTrackedFieldsSnapshot(true);
 
         allowModalToClose = false;
+
+        // disaggregation accordion
+        $('.is-accordion-toggle').on('click', function(e) {
+            let icon = $(this).find("svg");
+            if (icon.hasClass('fa-caret-right')) {
+                icon.attr('class', 'fa-caret-down');
+            } else {
+                icon.attr('class', 'fa-caret-right');
+            }
+        });
     });
 
     // Use BS multiselect widget where needed
@@ -523,10 +535,16 @@
             filterClearBtn: '<span class="input-group-btn"><button class="btn btn-default multiselect-clear-filter" type="button"><i class="fas fa-times-circle"></i></button></span>',
         }
     };
-
-    $('#id_objectives').multiselect(multiselectOptions);
-    $('#id_disaggregation').multiselect(multiselectOptions);
-    $('#id_indicator_type').multiselect(multiselectOptions);
-    $('#id_strategic_objectives').multiselect(multiselectOptions);
+    var multiselects = ['#id_objectives', '#id_strategic_objectives', '#id_indicator_type'];
+    multiselects.forEach(function(selectID) {
+        let $select = $(selectID);
+        if ($select) {
+            let theseOptions = Object.assign({}, multiselectOptions);
+            if ($select.hasClass('disabled-select')) {
+                theseOptions.includeSelectAllOption = false;
+            }
+            $select.multiselect(theseOptions);
+        }
+    });
 
 </script>
