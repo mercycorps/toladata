@@ -72,7 +72,7 @@ class ProgramPageIndicatorMixin:
     def get_long_number(self, indicator):
         """overrides parent method to include tier if manually numbering"""
         number = super().get_long_number(indicator)
-        if not indicator.manual_number_display or not indicator.level_id:
+        if not (indicator.using_results_framework and indicator.manual_number_display) or not indicator.level_id:
             return number
         level = self._get_level(indicator)
         if not level or not level['tier_name']:

@@ -108,6 +108,13 @@ class TestProgramPageIndicatorSerializer(test.TestCase):
         data = self.get_non_migrated_indicator_data(number="")
         self.assertEqual(data['number'], None)
 
+    def test_non_migrated_long_number_with_level(self):
+        p = RFProgramFactory(migrated=False, tiers=['tier1', 'tier2'],
+                             levels=True)
+        l = [l for l in p.levels.all() if l.level_depth == 2][0]
+        data = self.get_indicator_data(program=p, number="a443a", level=l, level_order=0)
+        self.assertEqual(data['number'], "a443a")
+
     def test_migrated_manual_number_long_number(self):
         data = self.get_manual_numbered_indicator_data(number="203893.12")
         self.assertEqual(data['number'], "203893.12")
