@@ -12,7 +12,24 @@
 
 {% block content %}
     <script type="text/javascript">
+        /* declare programId only if not declared (otherwise just overwrite it with the new program pk)
+         * for example, if the result form was opened, and then closed, then opened again
+         */
+        if (typeof redirectProgramId == 'undefined') {
+            var redirectProgramId = "{{ indicator.program.pk }}";
+        } else {
+            redirectProgramId = "{{ indicator.program.pk }}";
+        }
+
+        // don't let the modal load as a new page (jQuery not defined is a quick standin that doesn't need page to load)
+        if (typeof $ === 'undefined') {
+            // pathname to avoid having to grab host:
+            window.location.pathname = `/program/${redirectProgramId}/`;
+        }
+
         $(document).ready(function() {
+            /* ensure achieved is a numeric input */
+            window.getValidatedNumericInput('#id_achieved');
             /* enhanced single select for sites */
             $("#id_site").select2();
 
@@ -25,13 +42,6 @@
                     icon.attr('class', 'fa-caret-right');
                 }
             });
-
-            // truncate float and round if whole number
-            let achievedVal = $("#id_achieved").val();
-            if (achievedVal) {
-                let achieved_formatted_value = parseFloat(achievedVal).toFixed(2).replace(/[.,]00$/, "");
-                $("#id_achieved").val(achieved_formatted_value);
-            }
 
             // prevent triggering of datepicker when label is clicked
             $('label[for="id_date_collected"]').on('click', function(e) {e.preventDefault();});
@@ -108,6 +118,7 @@
         id="result_update_form"
         class=""
         method="post"
+        autocomplete="off"
         novalidate>
         {% csrf_token %}
 

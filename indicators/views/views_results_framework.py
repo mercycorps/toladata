@@ -101,7 +101,6 @@ class LazyEncoder(DjangoJSONEncoder):
         return super(LazyEncoder, self).default(obj)
 
 
-# TODO: add security
 class LevelViewSet(viewsets.ModelViewSet):
 
     serializer_class = LevelSerializer
@@ -121,7 +120,6 @@ class LevelViewSet(viewsets.ModelViewSet):
 
         with transaction.atomic():
             # update Level
-
             serializer = self.get_serializer(instance, data=request.data, partial=False)
             serializer.is_valid(raise_exception=True)
             serializer.save()
@@ -228,7 +226,6 @@ def insert_new_level(request):
 
 @api_view(http_method_names=['POST'])
 def save_leveltiers(request):
-    print('post data', request.data['tiers'])
     program = Program.objects.get(id=request.data['program_id'])
     role = request.user.tola_user.program_role(program.id)
     if request.user.is_anonymous or role != 'high':
@@ -245,7 +242,6 @@ def save_leveltiers(request):
 
             tier_obj.save()
     except Exception as e:
-        print('error is {}'.format(e))
         logger.error(e)
         return JsonResponse({'message': _('Your request could not be processed.')}, status=400)
 

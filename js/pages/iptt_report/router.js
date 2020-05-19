@@ -3,8 +3,8 @@ import browserPlugin from 'router5-plugin-browser';
 import { observable } from 'mobx';
 import { TVA, TIMEPERIODS } from '../../constants';
 
-const goodQueryParams = ['frequency', 'start', 'end', 'levels', 'types', 'sites',    
-                         'sectors', 'indicators', 'tiers', 'groupby', 'mr'];
+const goodQueryParams = ['frequency', 'start', 'end', 'levels', 'types', 'sites', 'disaggregations',    
+                         'sectors', 'indicators', 'tiers', 'groupby', 'mr', 'columns'];
 const oldQueryParams = ['timeframe', 'numrecentperiods', 'numrecentcount', 'start_period', 'end_period'];
 
 const queryParams = '?' + [...goodQueryParams, ...oldQueryParams].join('&');
@@ -36,7 +36,7 @@ const parseArrayParams = (param) => {
     } else if (Array.isArray(param)) {
         return param.map(p => parseInt(p));
     } else if (Number.isInteger(param)) {
-        return param;
+        return [param];
     } else if (!isNaN(parseInt(param))) {
         return [parseInt(param)];
     }
@@ -94,6 +94,16 @@ export default () => {
         },
         get sites() {
             return parseArrayParams(this._router.getState().params.sites);
+        },
+        get disaggregations() {
+            return parseArrayParams(this._router.getState().params.disaggregations);
+        },
+        get hiddenCategories() {
+            let disaggParams = this._router.getState().params.disaggregations;
+            return Array.isArray(disaggParams) ? disaggParams.includes('hide-categories') : disaggParams && disaggParams == 'hide-categories';
+        },
+        get columns() {
+            return parseArrayParams(this._router.getState().params.columns);
         },
         get types() {
             return parseArrayParams(this._router.getState().params.types);

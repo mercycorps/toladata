@@ -116,7 +116,8 @@ class TestAnnualNoncumulativeNumeric(test.TestCase):
         # lop_percent_met_progress is the sum of all results in active targets divided by the sum of all active
         # targets:
         self.assertEqual(round(self.metrics_indicator.lop_percent_met_progress, 2), self.lop_percent_met_progress,
-                         "actual progress {0} and target progress {1}".format(self.metrics_indicator.lop_actual_progress, self.metrics_indicator.lop_target_progress))
+                         "actual progress {0} and target progress {1}".format(
+                            self.metrics_indicator.lop_actual_progress, self.metrics_indicator.lop_target_progress))
 
     def test_annotated_target_targets(self):
         # target should always match exactly what was entered for that target:

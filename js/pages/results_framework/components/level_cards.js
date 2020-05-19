@@ -122,11 +122,13 @@ export class LevelCardCollapsed extends React.Component {
 
         // Prepare the indicator links for the indicator popover
         let allIndicatorLinks = [];
-
+        
         // Get indicator ids linked to this level and create a hyperlink for a filtered IPTT.
         let sameLevelIndicatorIds = this.props.levelProps.indicators.map( i => i.id);
         if (sameLevelIndicatorIds.length > 0) {
-            const linkText = `All indicators linked to ${this.props.levelProps.tierName} ${this.props.levelProps.ontologyLabel}`
+            /* # Translators: this link opens a view of all indicators linked to (associated with) a particular level (level name replaces %s) */
+            const linkPreface = gettext('All indicators linked to %s');
+            const linkText = interpolate(linkPreface, [`${this.props.levelProps.tierName} ${this.props.levelProps.ontologyLabel}`]);
             allIndicatorLinks.push(`<li class="nav-item level-card--iptt-links"><a href=${this.buildIPTTUrl(sameLevelIndicatorIds)}>${linkText}</a></li>`);
         }
 
@@ -136,7 +138,9 @@ export class LevelCardCollapsed extends React.Component {
             let descendantIndicatorIds = this.props.levelProps.descendantIndicatorIds;
             descendantIndicatorIds = descendantIndicatorIds.concat(sameLevelIndicatorIds);
             if (descendantIndicatorIds.length > 0) {
-                const linkText = `All indicators linked to ${this.props.levelProps.tierName} ${this.props.levelProps.ontologyLabel} and sub-levels`;
+                /* # Translators: this link opens a view of all indicators linked to (associated with) a particular level and its child levels (level name replaces %s) */
+                const linkPreface = gettext('All indicators linked to %s and sub-levels');
+                const linkText = interpolate(linkPreface, [`${this.props.levelProps.tierName} ${this.props.levelProps.ontologyLabel}`]);
                 allIndicatorLinks.unshift(`<li class="nav-item level-card--iptt-links"><a href=${this.buildIPTTUrl(descendantIndicatorIds)}>${linkText}</a></li>`);
             }
         }
@@ -221,7 +225,10 @@ export class LevelCardCollapsed extends React.Component {
                             data-trigger="focus"
                             data-placement="bottom"
                             data-html="true"
-                            title="Track indicator performance"
+                            title={
+                                /* # Translators: this is the title of a button to open a popup with indicator performance metrics*/
+                                gettext("Track indicator performance")
+                            }
                             data-content={indicatorMarkup}>
                             {indicatorCountText}
                         </a>

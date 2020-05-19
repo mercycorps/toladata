@@ -5,12 +5,14 @@ import { library } from '@fortawesome/fontawesome-svg-core'
 import {FontAwesomeIcon} from "@fortawesome/react-fontawesome"
 import { faPlusSquare, faMinusSquare } from '@fortawesome/free-solid-svg-icons'
 
+library.add(faPlusSquare, faMinusSquare)
+
 
 library.add(faPlusSquare, faMinusSquare);
 
 export class DeleteButton extends React.Component {
     render() {
-        const buttonClasses = classNames('deletebtn btn btn-sm text-danger', this.props.buttonClasses);
+        const buttonClasses = classNames('btn-delete btn btn-sm text-danger', this.props.buttonClasses);
         const iconClasses = classNames('fa fa-times', this.props.iconClasses);
         return (
             <button

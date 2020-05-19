@@ -50,16 +50,19 @@ input[type=number]::-webkit-outer-spin-button {
 }
 
 .input-symbol-percent {
+    display: block;
     position: relative;
-    display: inline-block;
-    width: 100%;
     &:after {
         position: absolute;
         top: 50%;
         transform: translateY(-50%);
         margin: auto;
         content:"%";
-        right: 0.5rem;
+        color: $gray-600;
+        right: 0.25rem;
+    }
+    &.feedback-row:after {
+        top: 1.5rem !important;
     }
     .input-value, input.input-value { // adds extra specificity vs. .periodic-target .input-value
         padding-right: 1.5rem;
@@ -101,4 +104,173 @@ input[type=number]::-webkit-outer-spin-button {
         width: 100%;
     }
 }
+
+//div for preventing interaction with background while popup is active
+#notification_blocking_div {
+    /* Don't display on entry */
+    display:none;
+    /* 1001 _should_ be the highest z-index item on the page */
+    z-index: 1001;
+    /* cover whole content area */
+    position: absolute;
+    top: 0%;
+    left: 0%;
+    width: 100%;
+    height: 100%;
+    /* semi-transparent gray (visual feedback that div is hidden) */
+    background-color: gray;
+    opacity: .3;
+}
+
+ul.popover-list {
+    margin: 0px 5px;
+    padding: 0px;
+    font-size: 1rem;
+    line-height: 1.2;
+    list-style-type: none;
+}
+.draggable-arrow {
+    padding-top: 8px;
+    padding-right: 4px;
+}
+
+
+div.scroll-box-200 {
+    max-height: 200px;
+    overflow-y: scroll;
+}
+
+a.is-accordion-toggle.btn.btn-link {
+    background-color: rgba(0, 0, 0, 0);
+    padding-right: 10px;
+    &:hover {
+        text-decoration: none !important;
+    }
+    &:focus {
+        background-color: rgba(0, 0, 0, 0) !important;
+        text-decoration: none !important;
+    }
+}
+
+a.accordion-row__btn.btn.btn-link {
+    background-color: rgba(0, 0, 0, 0);
+    padding-right: 10px;
+    &:hover {
+        text-decoration: none !important;
+    }
+    &:focus {
+        background-color: rgba(0, 0, 0, 0) !important;
+        text-decoration: none !important;
+    }
+}
+
+// form-list-group: extends bootstrap list-group
+.form-list-group {
+    $_form-list-group-padding-y: 0.25rem;
+    $_reference-row-list-group-padding-y: 0.5rem;
+    $_form-list-group-padding-x: 0.625rem; // per spec: half of bootstrap 1.25rem x padding
+    margin-bottom: $grid-gutter-width/2;
+    margin-top: 0;
+    > .list-group-item {
+        align-items: center;
+        display: flex;
+        justify-content: space-between;
+        padding-bottom: $_form-list-group-padding-y;
+        padding-top: $_form-list-group-padding-y;
+        padding-right: $_form-list-group-padding-x;
+        padding-left: $_form-list-group-padding-x;
+        &.reference-row {
+            padding-top: $_reference-row-list-group-padding-y;
+            padding-bottom: $_reference-row-list-group-padding-y;
+        }
+    }
+}
+.item__label {
+    flex: 1 1 auto;
+    line-height: 1;
+    margin-right: 0.25rem;
+    label {
+        margin-bottom: 0;
+    }
+}
+.item__value {
+    flex: 0 1 auto;
+}
+
+.error-row {
+}
+
+.ul__error_row {
+    background-color: $red-050;
+    margin-top: -15px; // negates the 15px bottom padding on a UL when appending an error row to it (so the error row is visually attached to the list)
+    line-height: 2em; // adds space above and below the text for the pink background danger highlighting
+    margin-right: 0px; // overrules item__label's margin (used for inline form fields) to make the error row go full width
+    &>.target-value-error {
+      padding-left: 6px;  // spaces warning message from the left edge for a visually uncluttered appearance (arbitrary value to match spec'd screenshot)
+    }
+}
+.reference-row {
+    background-color: $gray-200;
+    font-weight: bold;
+}
+.value-cell {
+    // mimics the size of an input for the sake of keeping elements aligned
+    border: $input-border-width solid transparent;
+    min-height: $input-height;
+    padding: $input-padding-y $input-padding-x;
+}
+.sum-value-cell {
+    font-weight: bold;
+    text-align: right;
+}
+.actual-value-cell {
+    font-weight: bold;
+    text-align: right;
+}
+
+
+.has-errors:not(.unvalidated) {
+    .formset-feedback {
+        display: inline-block;
+    }
+    .actions-container {
+        align-items: center;
+        display: flex;
+        font-weight: 200;
+    }
+    .bad-sum-value>div.value-cell {
+        background-color: $red-050;
+    }
+    .bad-sum-value>.invalid-actions {
+        display: inline-block;
+        margin-right: 10px;
+    }
+    & .bad-sum-feedback > .invalid-feedback {
+        display: inline;
+    }
+}
+.bad-sum-feedback {
+    margin: 0.5rem 0;
+}
+
+.disaggregation-formset .input-symbol-percent {
+    &:after {
+        //right: 1.7rem;
+    }
+    & .disaggregated-value-cell {
+        //padding-right: 28px;
+    }
+}
+
+.disaggregation-formset.has-errors:not(.unvalidated) {
+    .form-list-group {
+        margin-bottom: 0;
+    }
+}
+
+.sum-difference {
+    margin-left: 10px;
+}
+
+
 

@@ -4,24 +4,33 @@ import ReactDOM from 'react-dom';
 export default class HelpPopover extends React.Component {
     constructor(props) {
         super(props)
-        this.content = props.content;
         this.placement = props.placement || null;
+        this.popoverRef = props.innerRef || React.createRef();
+        this.iconClass = props.iconClass || "far fa-question-circle";
+        this.iconStyle = props.iconStyle || {};
+        this.linkStyle = {};
+        if (props.linkHeight) {
+            this.linkStyle.height = props.linkHeight;
+        }
     }
 
     render() {
         return (
             <a
                 tabIndex="0"
+                style={ this.linkStyle }
                 data-toggle="popover"
                 data-trigger="focus"
                 data-html="true"
                 data-placement={this.placement}
-                data-content={this.content}>
-            <i className="far fa-question-circle"></i></a>
+                data-content={this.props.content}
+                className={this.props.className}
+                ref={this.popoverRef}
+                >
+            <i aria-label={ this.props.ariaText } style={ this.iconStyle } className={ this.iconClass }></i></a>
         )
     }
 }
-
 
 export class BootstrapPopoverButton extends React.Component {
     popoverName = 'base';
@@ -54,7 +63,7 @@ export class BootstrapPopoverButton extends React.Component {
             placement: 'bottom'
         }).on('shown.bs.popover', shownFn);
     }
-    
+
     getPopoverContent = () => {
         throw new Error('not implemented');
     }

@@ -1,4 +1,4 @@
-from __future__ import unicode_literals
+# -*- coding: utf-8 -*-
 
 from django.db import models
 from django.contrib import admin
@@ -201,7 +201,10 @@ class TolaUser(models.Model):
                 access_level = 'low'
 
         try:
-            access_level = ProgramAccess.objects.get(tolauser=self, program=program).role
+            # Use the highest level role the user has for this program
+            for access_grant in ProgramAccess.objects.filter(tolauser=self, program=program):
+                if PROGRAM_ROLE_INT_MAP[access_grant.role] > PROGRAM_ROLE_INT_MAP[access_level]:
+                    access_level = access_grant.role
         except Exception as e:
             print(e)
         return access_level
@@ -375,6 +378,7 @@ class TolaUserProxy(TolaUser):
 
 class CountryAccessInline(admin.TabularInline):
     model = CountryAccess
+    ordering = ('country',)
 
 class TolaUserAdmin(admin.ModelAdmin):
 
@@ -536,6 +540,18 @@ class Program(models.Model):
             return self.reporting_period_end < timezone.localdate()
         except TypeError: # esp. if there's no reporting dates
             return False
+
+    @property
+    def percent_complete(self):
+        if not self.reporting_period_end or not self.reporting_period_start:
+            return -1
+        if not self.has_started:
+            return 0
+        if self.has_ended:
+            return 100
+        total_days = (self.reporting_period_end - self.reporting_period_start).days
+        complete = (timezone.localdate() - self.reporting_period_start).days
+        return int(round(complete*100/total_days))
 
     # displayed in admin templates
     def __str__(self):

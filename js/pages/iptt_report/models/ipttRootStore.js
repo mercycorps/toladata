@@ -14,6 +14,19 @@ export default (
         _filterStore: getFilterStore(reactContext),
         get filterStore() {return this._filterStore},
         _reportStore: getReportStore(reactContext.report || {}),
+        _expandoRows: [],
+        expandAllRows() {
+            this._expandoRows.forEach(row => {row.expandRow()});
+        },
+        get allExpanded() {
+            return this._expandoRows.every(row => row.state.expanded);
+        },
+        get allCollapsed() {
+            return this._expandoRows.every(row => !row.state.expanded)
+        },
+        collapseAllRows() {
+            this._expandoRows.forEach(row => {row.collapseRow()});
+        },
         get reportStore() {return this._reportStore},
         get currentReport() {
             return this.reportStore.getReport(this.filterStore.selectedFrequency);
@@ -52,7 +65,7 @@ export default (
             return this.filterStore.programFilterData;
         },
         get currentProgramPageUrl() {
-            return api.getProgramPageUrl(this.currentProgram.pk);
+            return this.currentProgram ? api.getProgramPageUrl(this.currentProgram.pk) : null;
         },
         get isTVA() {
             return this.filterStore.isTVA;
@@ -96,8 +109,61 @@ export default (
             }
             return periodValues;
         },
+        disaggregatedLop(indicatorPk, disaggregationPk) {
+            return this.currentReport.has(parseInt(indicatorPk)) ?
+                this.currentReport.get(parseInt(indicatorPk)).disaggregatedLop(parseInt(disaggregationPk)) : null;
+        },
+        disaggregatedPeriodValues(indicatorPk, disaggregationPk) {
+            let periodValues = this.currentReport.has(parseInt(indicatorPk)) ? this.currentReport.get(parseInt(indicatorPk)).disaggregatedPeriodValues(parseInt(disaggregationPk)) : null;
+            if (periodValues && this.filterStore.selectedFrequency != 2) {
+                periodValues = periodValues.slice(this.filterStore.startPeriodValue, this.filterStore.endPeriodValue + 1);
+            }
+            if (periodValues && !this.isTVA) {
+                periodValues = periodValues.map(periodValue => periodValue.actual);
+            }
+            return periodValues || [];
+        },
+        get hiddenCategories() {
+            return this.filterStore._hiddenCategories === true;
+        },
+        get baseColumns() {
+            return 8 + (this.filterStore.resultsFramework ? 0 : 1) - (this.filterStore._hiddenColumns.length);
+        },
         get reportColumnWidth() {
-            return 8 + (!this.resultsFramework && 1) + 3 + (this.reportPeriods.length) * (this.isTVA ? 3 : 1);
+            return this.baseColumns + (!this.resultsFramework && 1) + 3 + (this.reportPeriods.length) * (this.isTVA ? 3 : 1);
+        },
+        get activeDisaggregationPks() {
+            return this.filterStore.currentDisaggregations;
+        },
+        indicatorHasActiveDisaggregations(indicator) {
+            if (!indicator.hasDisaggregations(this.activeDisaggregationPks)) {
+                return false;
+            }
+            if (this.hiddenCategories) {
+                return this.activeDisaggregationPks.map(pk => (this.getDisaggregationLabels(pk).labels || []))
+                                                           .reduce((a, b) => a.concat(b), [])
+                                                           .filter(label => this.disaggregatedLop(indicator.pk, label.pk)).length > 0;
+            }
+            return true;
+        },
+        getDisaggregationLabels(disaggregationPk) {
+            return (this.currentProgram && this.currentProgram.disaggregations.has(disaggregationPk)) ?
+                this.currentProgram.disaggregations.get(disaggregationPk) : false;
+        },
+        get hasUOMColumn() {
+            return !this.filterStore._hiddenColumns.includes(0);
+        },
+        get hasChangeColumn() {
+            return !this.filterStore._hiddenColumns.includes(1);
+        },
+        get hasCNCColumn() {
+            return !this.filterStore._hiddenColumns.includes(2);
+        },
+        get hasUOMTypeColumn() {
+            return !this.filterStore._hiddenColumns.includes(3);
+        },
+        get hasBaselineColumn() {
+            return !this.filterStore._hiddenColumns.includes(4);
         },
         loadResultsModal(indicatorPk) {
             api.indicatorResultsTable(indicatorPk, false).then(

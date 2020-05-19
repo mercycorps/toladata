@@ -10,6 +10,7 @@ import EditObjectives from './components/edit_objectives'
 import LoadingSpinner from 'components/loading-spinner'
 import FoldingSidebar from 'components/folding-sidebar'
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome'
+import CountryHistory from "./components/country_history";
 
 const CountryFilter = observer(({store, filterOptions}) => {
     return <div className="form-group react-multiselect-checkbox">
@@ -52,7 +53,6 @@ export const IndexView = observer(
         const countryFilterOptions = store.allCountries.map(country => {return {value: country.id, label: country.country}})
         const organizationFilterOptions = Object.entries(store.organizations).map(([id, org]) => ({value: org.id, label: org.name}))
         const programFilterOptions = Object.entries(store.allPrograms).map(([id, program]) => ({value: program.id, label: program.name}))
-
         return <div id="country-management-index-view" className="row">
             <FoldingSidebar>
                 <div className="filter-section">
@@ -87,8 +87,8 @@ export const IndexView = observer(
                             keyField="id"
                             HeaderRow={({Col, Row}) =>
                                 <Row>
-                                    <Col size=".2"></Col>
-                                    <Col size="2" className="td--stretch">{gettext("Country")}</Col>
+                                    <Col size="1"></Col>
+                                    <Col size="60">{gettext("Country")}</Col>
                                     <Col>{gettext("Organizations")}</Col>
                                     <Col>{gettext("Programs")}</Col>
                                     <Col>{gettext("Users")}</Col>
@@ -104,7 +104,11 @@ export const IndexView = observer(
                                             active_pane={store.active_editor_pane}
                                             new={data.id == 'new'}
                                             ProfileSection={observer(() =>
-                                                <LoadingSpinner isLoading={store.fetching_editing_data || store.saving}>
+                                                <LoadingSpinner isLoading={
+                                                    store.fetching_editing_data ||
+                                                    store.saving ||
+                                                    store.fetching_editing_history
+                                                }>
                                                     <EditCountryProfile
                                                         new={data.id == 'new'}
                                                         country_data={data}
@@ -117,7 +121,11 @@ export const IndexView = observer(
                                                 </LoadingSpinner>
                                             )}
                                             StrategicObjectiveSection={observer(() =>
-                                                <LoadingSpinner isLoading={store.fetching_editing_data || store.saving}>
+                                                <LoadingSpinner isLoading={
+                                                    store.fetching_editing_data ||
+                                                    store.saving ||
+                                                    store.fetching_editing_history
+                                                }>
                                                     <EditObjectives
                                                         country_id={data.id}
                                                         objectives={store.editing_objectives_data}
@@ -132,17 +140,37 @@ export const IndexView = observer(
                                                 </LoadingSpinner>
                                             )}
                                             DisaggregationSection={observer(() =>
-                                                <LoadingSpinner isLoading={store.fetching_editing_data || store.saving}>
+                                                <LoadingSpinner isLoading={
+                                                    store.fetching_editing_data ||
+                                                    store.saving ||
+                                                    store.fetching_editing_history
+                                                }>
                                                     <EditDisaggregations
                                                         country_id={data.id}
+                                                        countryName={data.country}
                                                         disaggregations={store.editing_disaggregations_data}
                                                         addDisaggregation={() => store.addDisaggregation()}
-                                                        onDelete={(id) => store.deleteDisaggregation(id)}
+                                                        assignLabelErrors={store.assignDisaggregationLabelErrors}
+                                                        onDelete={store.deleteDisaggregation.bind(store)}
+                                                        onArchive={(id) => store.archiveDisaggregation(id)}
+                                                        onUnarchive={(id) => store.unarchiveDisaggregation(id)}
                                                         onUpdate={(id, data) => store.updateDisaggregation(id, data)}
                                                         onCreate={(data) => store.createDisaggregation(data)}
                                                         errors={store.editing_disaggregations_errors}
                                                         clearErrors={() => store.clearDisaggregationEditingErrors()}
                                                         onIsDirtyChange={is_dirty => store.setActiveFormIsDirty(is_dirty)}
+                                                    />
+                                                </LoadingSpinner>
+                                            )}
+                                            HistorySection={observer(() =>
+                                                <LoadingSpinner isLoading={
+                                                    store.fetching_editing_data ||
+                                                    store.saving ||
+                                                    store.fetching_editing_history
+                                                }>
+                                                    <CountryHistory
+                                                        store={store}
+                                                        history={store.editing_history}
                                                     />
                                                 </LoadingSpinner>
                                             )}

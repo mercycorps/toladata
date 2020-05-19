@@ -5,9 +5,16 @@ import classNames from 'classnames';
 @inject('rootStore')
 @observer
 export class QSTVATimeFrameRadio extends React.Component {
-    setMostRecentCount = (e) => {
-        this.props.rootStore.setMostRecentCount(e.target.value);
+    constructor(props) {
+        super(props);
     }
+    
+    setMostRecentCount = (e) => {
+        // eliminate leading zeros and non-digit characters then update state and store
+        let value = e.target.value.replace(/^0+/, '').replace(/[^0-9]*/gi, '');
+        this.props.rootStore.setMostRecentCount(value);
+    }
+
     render() {
         return <div className="form-group d-lg-flex pb-4">
                     <div className={
@@ -43,7 +50,7 @@ export class QSTVATimeFrameRadio extends React.Component {
                         </label>
                     </div>
                     <div>
-                        <input type="number" className="form-control"
+                        <input type="text" className="form-control"
                            value={ this.props.rootStore.mostRecentCountDisplay }
                            disabled={ this.props.rootStore.periodCountDisabled }
                            placeholder={ gettext('enter a number') }
