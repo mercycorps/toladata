@@ -145,7 +145,8 @@ class GaugeBand extends React.Component {
         let GaugeLabels = (props) => { // success case
             return <div className="gauge__labels">
                 <div className="gauge__label">
-                    <span className="text-muted">
+                    <span className="text-muted filter-trigger--band"
+                     onClick={ e => this.onFilterLinkClick(e, IndicatorFilterType.nonReporting) }>
                         {
                             /* # Translators: variable %s shows what percentage of indicators have no targets reporting data. Example: 31% unavailable */
                             interpolate(gettext('%(percentNonReporting)s% unavailable'), {percentNonReporting}, true)

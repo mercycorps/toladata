@@ -41,6 +41,10 @@ function getStatusIndicatorString(filterType, indicatorCount) {
             // # Translators: shows what number of indicators are within a set range of target. Example: 3 indicators are on track
             fmts = ngettext("%s indicator is on track", "%s indicators are on track", indicatorCount);
             return interpolate(fmts, [indicatorCount]);
+        case IndicatorFilterType.nonReporting:
+            // # Translators: shows what number of indicators that for various reasons are not being reported for program metrics
+            fmts = ngettext("%s indicator is unavailable", "%s indicators are unavailable", indicatorCount);
+            return interpolate(fmts, [indicatorCount]);
 
         default:
             // # Translators: the number of indicators in a list. Example: 3 indicators
