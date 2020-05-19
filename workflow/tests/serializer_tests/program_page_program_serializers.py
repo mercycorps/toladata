@@ -352,8 +352,7 @@ class TestProgramPageSerializersFunctional(test.TestCase):
         expected_pks = list(reversed(pks))
         expected_numbers = list(reversed(numbers))
         expected_tiers = list(reversed(tiers))
-        with self.assertNumQueries(4):
-            data = ProgramPageProgramSerializer.get_for_pk(p.pk).data
+        data = self.get_serialized_data(p.pk)
         self.assertEqual(len(data['indicators']), 3)
         self.assertEqual(data['indicator_pks_level_order'], expected_pks)
         self.assertEqual(data['indicator_pks_chain_order'], expected_pks)
