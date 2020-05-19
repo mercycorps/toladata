@@ -86,6 +86,7 @@ class GaugeBand extends React.Component {
             IndicatorFilterType.aboveTarget,
             IndicatorFilterType.belowTarget,
             IndicatorFilterType.onTarget,
+            IndicatorFilterType.nonReporting
         ]);
     }
 
