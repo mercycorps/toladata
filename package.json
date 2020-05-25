@@ -68,7 +68,7 @@
         "babel-polyfill": "^6.26.0",
         "bootstrap": "4.3.1",
         "bootstrap-multiselect": "github:davidstutz/bootstrap-multiselect",
-        "canvas": "2.5.0",
+        "canvas": "^2.5.0",
         "classnames": "^2.2.6",
         "clean-webpack-plugin": "^0.1.19",
         "css-loader": "^2.1.0",
