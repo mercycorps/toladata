@@ -475,7 +475,7 @@ class UserAdminReportSerializer(ModelSerializer):
     organization_id = IntegerField(source="organization.id")
     user_programs = IntegerField(required=False)
     is_active = BooleanField(source="user.is_active")
-    is_admin = BooleanField(source="user.is_staff", required=False)
+    is_admin = BooleanField(source="user.has_admin_management_access", required=False)
     is_super = BooleanField(source="user.is_superuser", required=False)
 
     class Meta:
@@ -566,7 +566,7 @@ class UserAdminViewSet(viewsets.ModelViewSet):
                                 GROUP BY wpua.tolauser_id, wc.id
                             ) cz ON cz.tolauser_id = wtu.id
                             """
-            country_where = 'AND (wtuc.country_id IN ({}) OR wtu.country_id IN ({}) OR cz.country_id IN ({}))'.format(in_param_string, in_param_string, in_param_string)
+            country_where = 'AND (wtuc.country_id IN ({}) OR wtu.country_id IN ({}) OR cz.country_id IN ({}) OR au.is_superuser)'.format(in_param_string, in_param_string, in_param_string)
 
         base_country_where = ''
         if req.GET.getlist('base_countries[]'):
@@ -586,7 +586,7 @@ class UserAdminViewSet(viewsets.ModelViewSet):
             in_param_string = ('%s,'*len(req.GET.getlist('programs[]')))[:-1]
 
             program_join = """
-                INNER JOIN (
+                LEFT JOIN (
                         SELECT
                             wpua.tolauser_id,
                             wpua.program_id
@@ -599,13 +599,13 @@ class UserAdminViewSet(viewsets.ModelViewSet):
                         INNER JOIN workflow_program_country wpc ON wpc.country_id = wtuc.country_id
                 ) pz ON pz.tolauser_id = wtu.id
             """
-            program_where = 'AND (pz.program_id IN ({}))'.format(in_param_string)
+            program_where = 'AND (pz.program_id IN ({}) OR au.is_superuser)'.format(in_param_string)
 
         organization_where = ''
-        if req.GET.get('organizations[]'):
-            params.append(req.GET.get('organizations[]'))
-
-            organization_where = 'AND wtu.organization_id = %s'
+        if req.GET.getlist('organizations[]'):
+            params.extend(req.GET.getlist('organizations[]'))
+            in_param_string = ('%s,'*len(req.GET.getlist('organizations[]')))[:-1]
+            organization_where = 'AND (wtu.organization_id IN ({}))'.format(in_param_string)
 
         user_status_where = ''
         if req.GET.get('user_status'):
@@ -616,7 +616,6 @@ class UserAdminViewSet(viewsets.ModelViewSet):
         admin_role_where = ''
         if req.GET.get('admin_role'):
             params.append(req.GET.get('admin_role'))
-
             admin_role_where = 'AND au.is_staff = %s'
 
         users_where = ''
