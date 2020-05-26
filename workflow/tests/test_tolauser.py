@@ -1,7 +1,12 @@
 
 from django.test import TestCase
 from factories.workflow_models import (
-    ProgramFactory, CountryFactory, TolaUserFactory, grant_program_access, grant_country_access)
+    ProgramFactory,
+    CountryFactory,
+    TolaUserFactory,
+    grant_program_access,
+    grant_country_access
+)
 from workflow.models import COUNTRY_ROLE_CHOICES, PROGRAM_ROLE_INT_MAP, PROGRAM_ROLE_CHOICES
 
 
