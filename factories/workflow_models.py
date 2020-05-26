@@ -1,18 +1,20 @@
 import itertools
 import datetime
-from django.template.defaultfilters import slugify
 from factory import (
     DjangoModelFactory,
     lazy_attribute,
     LazyAttribute,
+    SelfAttribute,
     SubFactory,
+    Faker,
+    Maybe,
     PostGeneration,
     post_generation,
     Sequence,
     RelatedFactory,
     Trait
 )
-from factories.django_models import UserFactory, Site
+from factories.django_models import UserFactory, UserOnlyFactory
 from workflow.models import (
     Country as CountryM,
     Organization as OrganizationM,
@@ -31,11 +33,13 @@ def generate_mc_levels(obj, create, extracted, **kwargs):
     from factories.indicators_models import LevelTierFactory
     LevelTierFactory.build_mc_template(program=obj)
 
+
 def custom_level_generator(tier_set):
     def generate_custom_levels(obj, create, extracted, **kwargs):
         from factories.indicators_models import LevelTierFactory
         tiers = LevelTierFactory.build_custom_template(program=obj, tiers=tier_set)
     return generate_custom_levels
+
 
 class CountryFactory(DjangoModelFactory):
     class Meta:
@@ -45,10 +49,10 @@ class CountryFactory(DjangoModelFactory):
     country = 'Afghanistan'
     code = 'AF'
 
+
 class CountryAccessFactory(DjangoModelFactory):
     class Meta:
         model = CountryAccessM
-
 
 
 class OrganizationFactory(DjangoModelFactory):
@@ -75,6 +79,31 @@ class TolaUserFactory(DjangoModelFactory):
     name = LazyAttribute(lambda o: o.user.first_name + " " + o.user.last_name)
     organization = SubFactory(OrganizationFactory, id=1)
     country = SubFactory(CountryFactory, country='United States', code='US')
+
+
+class NewTolaUserFactory(DjangoModelFactory):
+    class Meta:
+        model = TolaUserM
+
+    class Params:
+        mc_staff = True
+        superadmin = False
+        active = True
+
+    name = Sequence(lambda n: f"tola_user_{n}")
+    organization = Maybe(
+        'mc_staff',
+        yes_declaration=SubFactory(OrganizationFactory, id=1, name="MC Org"),
+        no_declaration=SubFactory(OrganizationFactory, name=Faker('company'))
+    )
+    user = SubFactory(
+        UserOnlyFactory,
+        username=SelfAttribute('..name'),
+        is_superuser=SelfAttribute('..superadmin'),
+        is_active=SelfAttribute('..active')
+    )
+    country = SubFactory(CountryFactory)
+
 
 class ProgramFactory(DjangoModelFactory):
     class Meta:
@@ -275,6 +304,14 @@ class RFProgramFactory(DjangoModelFactory):
                     (level_field, level_value) = next(levels)
                     this_indicator_data.update({level_field: level_value})
                 RFIndicatorFactory(**this_indicator_data)
+
+    @post_generation
+    def country(self, create, extracted, **kwargs):
+        if not create:
+            return
+        if extracted:
+            for country in extracted:
+                self.country.add(country)
 
 
 class SectorFactory(DjangoModelFactory):
