@@ -1,0 +1,23 @@
+.ui-pnotify-text {
+    white-space: initial !important;
+    // TODO: this ^^^ is an unnecessary style applied by the library. We should remove it there
+}
+
+.pnotify__header {
+    margin-bottom: 1rem;
+    h3, h4 {
+        color: inherit;
+    }
+}
+.pnotify__preamble {
+    color: inherit;
+    font-weight: bold;
+    margin-bottom: 0.5rem;
+}
+.pnotify__message {
+    color: $body-color;
+    margin-bottom: 0.5rem;
+}
+.pnotify__rationale {
+    margin-bottom: 0.5rem;
+}

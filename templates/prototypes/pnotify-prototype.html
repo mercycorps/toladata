@@ -5,8 +5,9 @@
         function pnotifyMe(e) {
             e.preventDefault();
             window.create_unified_changeset_notice({
-                include_warning: true,
+                include_warning: false,
                 header: 'header',
+                show_icon: true,
                 preamble: 'preamble',
                 no_preamble: true,
                 message_text: 'message_text',
@@ -15,7 +16,7 @@
                 confirm_text: 'OK',
                 cancel_text: 'Cancel',
                 context: null,
-                notice_type: 'notice',
+                notice_type: 'success',
                 blocking: false,
             });
         }

@@ -628,8 +628,9 @@ for other visual and functional elements.
 
  */
 window.create_unified_changeset_notice = ({
-    include_warning = false, // overrides header & adds an icon
+    include_warning = false, // overrides header & adds an icon. We should deprecate in favor of explicit headings & icons
     header = gettext("Reason for change"),
+    show_icon = false, // show an icon in the header (this is NOT in the warning)
     preamble = false, // appears in colored text
     no_preamble = false, // overrides preamble? Not sure why we need this if we can leave preamble empty
     on_submit = () => {},
@@ -645,15 +646,27 @@ window.create_unified_changeset_notice = ({
     notice_type = 'error', // possible values: error (danger/red), info (blue), success (green), notice (warning/yellow)
     blocking = true,
 } = {}) => {
+    let header_icons = {
+        'error': 'fa-exclamation-triangle',
+        'info': 'fa-info-circle',
+        'success': 'fa-check-circle',
+        'notice': 'fa-exclamation-triangle',
+    }
+    let header_text = include_warning ? gettext("Warning") : header;
     let header_section = '';
     if (include_warning){
         header_section = `<header class="pnotify__header">
-            <h4><i class="fas fa-exclamation-triangle"></i>&nbsp;${gettext("Warning")}</h4>
+            <h3>
+                <i class="fas fa-exclamation-triangle"></i>
+                ${gettext("Warning")}</h3>
         </header>`
     }
     else {
         header_section = `<header class="pnotify__header">
-            <h4>${header}</h4>
+            <h3>
+                <i class="fas ${header_icons[notice_type]}"></i>
+                ${header}
+            </h3>
         </header>`
     }
     if (!preamble) { preamble = (no_preamble)?'' : gettext("This action cannot be undone.") }
