@@ -58,6 +58,9 @@ if hasattr(settings, 'SILK_ENABLED') and settings.SILK_ENABLED:
 urlpatterns += [
     url(r'^jsi18n/$', JavaScriptCatalog.as_view(), name='javascript-catalog'),
 
+    # pnotify prototype
+    url(r'^pnotify-prototype/', TemplateView.as_view(template_name='prototypes/pnotify-prototype.html')),
+
     # rest framework
     url(r'^api/', include(router.urls)),
     url(r'^api-auth/', include('rest_framework.urls', namespace='rest_framework')),

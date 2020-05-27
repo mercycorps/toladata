@@ -1,0 +1,24 @@
+{% extends "base.html" %}
+{% block content %}
+    <div><a href="#" class="btn btn-primary" id="clickme">Click me</a></div>
+    <script>
+        function pnotifyMe(e) {
+            e.preventDefault();
+            window.create_unified_changeset_notice({
+                include_warning: true,
+                header: 'header',
+                preamble: 'preamble',
+                no_preamble: false,
+                message_text: 'message_text',
+                include_rationale: true,
+                showCloser: true,
+                confirm_text: 'OK',
+                cancel_text: 'Cancel',
+                context: null,
+                notice_type: 'error',
+                blocking: false,
+            });
+        }
+        $("#clickme").on("click", pnotifyMe);
+    </script>
+{% endblock %}
