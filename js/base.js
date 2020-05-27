@@ -262,7 +262,7 @@ $(function() {
     $('[data-toggle="popover"]').on('click', function(e){
         e.preventDefault();
     });
-    
+
     /* specific actions tied to item-specific site-wide events here: */
     // in case of covid alert dismissal, update the session to clear it for the rest of this login session:
     $('#covid-banner-alert').on('close.bs.alert', function() {
@@ -384,7 +384,7 @@ const create_changeset_notice = ({
     showCloser = false,
 } = {}) => {
     var notice = PNotify.alert({
-        text: $(`<div><form action="" method="post" class="form container">${inner}</form></div>`).html(),
+        text: $(`<div><form action="" method="post" class="form">${inner}</form></div>`).html(),
         textTrusted: true,
         icon: false,
         width: '350px',
@@ -628,63 +628,49 @@ for other visual and functional elements.
 
  */
 window.create_unified_changeset_notice = ({
-    include_warning = false,
+    include_warning = false, // overrides header & adds an icon
     header = gettext("Reason for change"),
-    preamble = false,
-    no_preamble = false,
+    preamble = false, // appears in colored text
+    no_preamble = false, // overrides preamble? Not sure why we need this if we can leave preamble empty
     on_submit = () => {},
     on_cancel = () => {},
     message_text = DEFAULT_DESTRUCTIVE_MESSAGE,
-    include_rationale = false,
-    showCloser = false,
+    include_rationale = false, // shows rationale textarea
+    showCloser = false, // show close box (should be TRUE by default)
     // # Translators: Button to approve a form
     confirm_text = gettext('Ok'),
     // # Translators: Button to cancel a form submission
     cancel_text = gettext('Cancel'),
     context = null,
-    notice_type = 'error',
+    notice_type = 'error', // possible values: error (danger/red), info (blue), success (green), notice (warning/yellow)
     blocking = true,
 } = {}) => {
     let header_section = '';
     if (include_warning){
-        header_section = `<div class="row">
-            <div class="col">
-                <h2 class="pnotify--header"><i class="fas fa-exclamation-triangle"></i>${gettext("Warning")}</h2>
-            </div>
-        </div>`
+        header_section = `<header class="pnotify__header">
+            <h4><i class="fas fa-exclamation-triangle"></i>&nbsp;${gettext("Warning")}</h4>
+        </header>`
     }
     else {
-        header_section = `<div class="row">
-            <div class="col">
-                <h2>${header}</h2>
-            </div>
-        </div>`
+        header_section = `<header class="pnotify__header">
+            <h4>${header}</h4>
+        </header>`
     }
     if (!preamble) { preamble = (no_preamble)?'' : gettext("This action cannot be undone.") }
     const preamble_section = !preamble ? '' :
-        `<div class="row">
-            <div class="col">
-                <span class='text-danger'>
-                    ${preamble}
-                </span>
-            </div>
-        </div>`;
+        `<section class="pnotify__preamble">
+            <p>${preamble}</p>
+        </section>`;
     const message_section =
-        `<div class="row mt-1">
-            <div class="col">
-                <span>
-                    ${message_text}
-                </span>
-            </div>
-        </div>`;
+        `<section class="pnotify__message">
+            <p>${message_text}</p>
+        </section>`;
     const rationale_section = ! include_rationale ? '' :
-        `<div class="row">
-            <div class="col">
-                <div class="form-group">
-                    <textarea class="form-control" name="rationale"></textarea>
-                </div>
+        `<section class="pnotify__rationale">
+            <div class="form-group">
+                <textarea class="form-control" name="rationale"></textarea>
             </div>
-        </div>`;
+        </section>`;
 
     const inner = `
         ${header_section}
