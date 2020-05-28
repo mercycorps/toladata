@@ -2,7 +2,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: \n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2020-05-12 14:12-0700\n"
+"POT-Creation-Date: 2020-05-28 10:14-0700\n"
 "PO-Revision-Date: 2020-03-13 10:43-0700\n"
 "Last-Translator: \n"
 "Language-Team: \n"
@@ -378,19 +378,19 @@ msgstr ""
 "périodiques"
 
 #. Translators: option to show all periods for the report */
-#: js/pages/iptt_quickstart/components/radios.js:35
+#: js/pages/iptt_quickstart/components/radios.js:33
 #: js/pages/iptt_report/components/sidebar/reportSelect.js:113
 #: js/pages/program_page/components/indicator_list.js:80
 msgid "Show all"
 msgstr "Tout afficher"
 
 #. Translators: option to show a number of recent periods for the report */
-#: js/pages/iptt_quickstart/components/radios.js:51
+#: js/pages/iptt_quickstart/components/radios.js:49
 #: js/pages/iptt_report/components/sidebar/reportSelect.js:131
 msgid "Most recent"
 msgstr "Plus récent"
 
-#: js/pages/iptt_quickstart/components/radios.js:58
+#: js/pages/iptt_quickstart/components/radios.js:56
 msgid "enter a number"
 msgstr "saisir un nombre"
 
@@ -555,7 +555,7 @@ msgid "Clear filters"
 msgstr "Effacer les filtres"
 
 #: js/pages/iptt_report/components/sidebar/filterForm.js:68
-#: js/pages/results_framework/components/leveltier_picker.js:84
+#: js/pages/results_framework/components/leveltier_picker.js:86
 msgid "Change log"
 msgstr "Journal des modifications"
 
@@ -933,7 +933,7 @@ msgstr "Suivre les performances de l’indicateur"
 #. Translators: This is a validation message given to the user when the user-editable name field has been deleted or omitted. */
 #. Translators: This is a warning messages when a user has entered duplicate names for two different objects and those names contain only white spaces, both of which are not permitted. */
 #: js/pages/results_framework/components/level_cards.js:430
-#: js/pages/results_framework/models.js:719
+#: js/pages/results_framework/models.js:720
 msgid "Please complete this field."
 msgstr "Veuillez remplir ce champ."
 
@@ -994,17 +994,6 @@ msgstr ""
 msgid "Indicators linked to this %s"
 msgstr "Indicateurs liés à %s"
 
-#: js/pages/results_framework/components/level_list.js:64
-msgid ""
-"<strong class=\"text-danger\">Choose your results framework template "
-"carefully!</strong> Once you begin building your framework, it will not be "
-"possible to change templates without first deleting all saved levels."
-msgstr ""
-"<strong class=\"text-danger\">Choisissez bien la structure de votre cadre de "
-"résultats !</strong> Lorsque vous commencez à concevoir votre cadre, si vous "
-"n’avez pas au préalable supprimé les niveaux enregistrés, vous ne pourrez "
-"pas modifier les structures."
-
 #. Translators: this refers to an imperative verb on a button ("Apply filters")*/}
 #: js/pages/results_framework/components/level_tier_lists.js:32
 #: js/pages/results_framework/components/level_tier_lists.js:219
@@ -1022,37 +1011,29 @@ msgstr "Appliquer"
 msgid "This level is being used in the results framework"
 msgstr "Ce niveau est utilisé dans le cadre de résultats"
 
-#. Translators: This is one of several user modifiable fields, e.g. "Level 1", "Level 2", etc... Level 1 is the top of the hierarch, Level six is the bottom.*/
+#. Translators: This is one of several user modifiable fields, e.g. "Level 1", "Level 2", etc... Level 1 is the top of the hierarchy, Level six is the bottom.*/
 #: js/pages/results_framework/components/level_tier_lists.js:137
 #, python-format
 msgid "Level %s"
 msgstr "Niveau %s"
 
-#: js/pages/results_framework/components/leveltier_picker.js:29
+#. Translators: Warning message displayed to users explaining why they can't change a setting they could change before.
+#: js/pages/results_framework/components/leveltier_picker.js:31
+#, python-format
 msgid ""
-"<span class=\"text-danger\"><strong>The results framework template cannot be "
-"changed after levels are saved.</strong></span> To change templates, all "
-"saved levels first must be deleted.  A level can be deleted when it has no "
-"sub-levels and no linked indicators."
+"<span class=\"text-danger\"><strong>The results framework template is locked "
+"as soon as the first %(secondTier)s is saved.</strong></span> To change "
+"templates, all saved levels must be deleted except for the original "
+"%(firstTier)s. A level can only be deleted when it has no sub-levels and no "
+"linked indicators."
 msgstr ""
-"<span class=\"text-danger\"><strong>Une fois les niveaux enregistrés, la "
-"structure du cadre de résultats ne peut être modifiée.</strong></span> Si "
-"vous souhaitez modifier une structure, vous devrez commencer par supprimer "
-"tous les niveaux enregistrés. Un niveau peut être supprimé lorsqu’il ne "
-"possède aucun sous-niveau ou indicateur lié."
+"<span class=\"text-danger\"><strong>Le modèle de structure de résultats est "
+"verrouillé dès que le premier %(secondTier)s est enregistré.</strong></span> "
+"Pour modifier les modèles, tous les niveaux enregistrés doivent être "
+"supprimés, à l'exception des %(firstTier)s d'origine. Un niveau ne peut être "
+"supprimé que s'il n'a pas de sous-niveaux et aucun indicateur lié."
 
-#: js/pages/results_framework/components/leveltier_picker.js:37
-msgid ""
-"<span class=\"text-danger\"><strong>Choose your results framework template "
-"carefully!</strong></span> Once you begin building your framework, it will "
-"not be possible to change templates without first deleting all saved levels."
-msgstr ""
-"<span class=\"text-danger\"><strong>Choisissez bien la structure de votre "
-"cadre de résultats !</strong></span> Lorsque vous commencez à concevoir "
-"votre cadre, si vous n’avez pas au préalable supprimé les niveaux "
-"enregistrés, vous ne pourrez pas modifier les structures."
-
-#: js/pages/results_framework/components/leveltier_picker.js:64
+#: js/pages/results_framework/components/leveltier_picker.js:66
 msgid "Results framework template"
 msgstr "Structure du cadre de résultats"
 
@@ -1081,11 +1062,22 @@ msgstr "%s enregistrée."
 msgid "%s updated."
 msgstr "%s mis à jour."
 
+#: js/pages/results_framework/models.js:585
+msgid ""
+"<strong class=\"text-danger\">Choose your results framework template "
+"carefully!</strong> Once you begin building your framework, it will not be "
+"possible to change templates without first deleting saved levels."
+msgstr ""
+"<strong class=\"text-danger\">Choisissez bien la structure de votre cadre de "
+"résultats !</strong> Lorsque vous commencez à concevoir votre cadre, si vous "
+"n’avez pas au préalable supprimé les niveaux enregistrés, vous ne pourrez "
+"pas modifier les structures."
+
 #. Translators:  This is a confirmation prompt that is triggered by clicking on a cancel button.  */
 #. Translators: This is the prompt on a popup that has warned users about a change they are about to make that could have broad consequences
 #. Translators: This is a confirmation prompt to confirm a user wants to archive an item
 #. Translators: This is a confirmation prompt to confirm a user wants to unarchive an item
-#: js/pages/results_framework/models.js:637
+#: js/pages/results_framework/models.js:638
 #: js/pages/tola_management_pages/country/components/edit_disaggregations.js:484
 #: js/pages/tola_management_pages/country/components/edit_disaggregations.js:495
 #: js/pages/tola_management_pages/country/models.js:441
@@ -1095,18 +1087,18 @@ msgid "Are you sure you want to continue?"
 msgstr "Voulez-vous vraiment continuer ?"
 
 #. Translators:  This is a warning provided to the user when they try to cancel the editing of something they have already modified.  */
-#: js/pages/results_framework/models.js:639
+#: js/pages/results_framework/models.js:640
 #, python-format
 msgid "Changes to this %s will not be saved"
 msgstr "Les modifications apportées à %s n’ont pas été enregistrées"
 
 #. Translators: This is a warning messages when a user has entered duplicate names for two different objects */
-#: js/pages/results_framework/models.js:724
+#: js/pages/results_framework/models.js:725
 msgid "Result levels should not contain commas."
 msgstr "Les niveaux de résultats ne doivent pas contenir de virgules."
 
 #. Translators: This is a warning messages when a user has a comma in a name that shouldn't contain commas */
-#: js/pages/results_framework/models.js:729
+#: js/pages/results_framework/models.js:730
 msgid "Result levels must have unique names."
 msgstr "Les niveaux de résultats doivent avoir des noms uniques."
 
@@ -1905,6 +1897,17 @@ msgstr "Ajouter un utilisateur"
 #: js/pages/tola_management_pages/user/views.js:332
 msgid "Super Admin"
 msgstr "Super-administrateur"
+
+#~ msgid ""
+#~ "<span class=\"text-danger\"><strong>Choose your results framework "
+#~ "template carefully!</strong></span> Once you begin building your "
+#~ "framework, it will not be possible to change templates without first "
+#~ "deleting all saved levels."
+#~ msgstr ""
+#~ "<span class=\"text-danger\"><strong>Choisissez bien la structure de votre "
+#~ "cadre de résultats !</strong></span> Lorsque vous commencez à concevoir "
+#~ "votre cadre, si vous n’avez pas au préalable supprimé les niveaux "
+#~ "enregistrés, vous ne pourrez pas modifier les structures."
 
 #~ msgid "% met"
 #~ msgstr "% atteint"
