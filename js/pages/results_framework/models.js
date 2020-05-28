@@ -581,20 +581,21 @@ export class UIStore {
         this.disableCardActions = false;
         this.customFormErrors = {hasErrors: false, errors: []};
         this.addLevelButtonIsLocked = false;  //used to prevent creating two new levels by smashing the Add Level button
+
+        this.splashWarning = gettext('<strong class="text-danger">Choose your results framework template carefully!</strong> Once you begin building your framework, it will not be possible to change templates without first deleting saved levels.')
     }
 
     @computed get tierLockStatus () {
         // The leveltier picker should be disabled if there is at least one saved level in the DB or if the user is
         // doesn't have 'high' permissions.
         let notNewLevels = this.rootStore.levelStore.levels.filter( l => l.id != "new");
-        if  (notNewLevels.length > 0 || !this.rootStore.levelStore.hasEditPermissions) {
+        if  (notNewLevels.length > 1 || !this.rootStore.levelStore.hasEditPermissions) {
             return "locked"
         }
         // The apply button should not be visible if there is only one level visible (i.e. saved to the db or not)
-        else if (this.rootStore.levelStore.levels.length == 1){
+        else if (this.rootStore.levelStore.levels.length > 0){
             return "primed"
         }
-
         return null;
     }
 
