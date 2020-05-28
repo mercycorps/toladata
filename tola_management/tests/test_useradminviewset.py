@@ -45,7 +45,8 @@ class TestUserAdminViewSet(test.TestCase):
         cls.country2 = CountryFactory(country="TestLand2", code="T2")
         cls.country2_program = RFProgramFactory(active=True, country=[cls.country2])
         cls.country3 = CountryFactory(country="TestLand3", code="T3")
-        cls.country3_program = RFProgramFactory(active=True, country=[cls.country3])
+        cls.country3_program1 = RFProgramFactory(active=True, country=[cls.country3])
+        cls.country3_program2 = RFProgramFactory(active=True, country=[cls.country3])
         cls.factory = drf_test.APIRequestFactory()
         cls.superadmin = NewTolaUserFactory(
             country=cls.base_country,
@@ -164,7 +165,7 @@ class TestUserAdminViewSet(test.TestCase):
         admin_level_user = self.get_user(mc_staff=False, program_admin=[self.country1_program])
         user_level_user2 = self.get_user(mc_staff=False, program_user=[self.country2_program])
         multi_program_user = self.get_user(mc_staff=False, program_user=[self.country1_program, self.country2_program])
-        non_permissioned_user = self.get_user(mc_staff=False, program_user=[self.country3_program])
+        non_permissioned_user = self.get_user(mc_staff=False, program_user=[self.country3_program1])
         response = self.get_response(**{'programs[]': [self.country1_program.pk]})
         user_pks = self.get_pks(response, count=7)
         self.assertIn(user_level_user.pk, user_pks)
@@ -283,3 +284,15 @@ class TestUserAdminViewSet(test.TestCase):
         self.assertIn(user1.pk, user_pks)
         self.assertIn(user3.pk, user_pks)
         self.assertNotIn(user2.pk, user_pks)
+
+    def test_programs_count(self):
+        user_with_one_program = self.get_user(country_admin=[self.country1])
+        response = self.get_response(**{'users[]': [user_with_one_program.pk]})
+        self.assertEqual(response['results'][0]['user_programs'], 1)
+        user_with_two_programs = self.get_user(country_admin=[self.country3])
+        response = self.get_response(**{'users[]': [user_with_two_programs.pk]})
+        self.assertEqual(response['results'][0]['user_programs'], 2)
+        user_with_three_programs = self.get_user(country_user=[self.country2], country_admin=[self.country3])
+        response = self.get_response(**{'users[]': [user_with_three_programs.pk]})
+        self.assertEqual(response['results'][0]['user_programs'], 3)
+        
