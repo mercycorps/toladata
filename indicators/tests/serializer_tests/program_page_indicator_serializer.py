@@ -110,7 +110,7 @@ class TestProgramPageIndicatorSerializer(test.TestCase):
         self.assertEqual(data['number'], u"Output 1.1å")
         with lang_context('fr'):
             data = self.get_non_migrated_indicator_data(number=u"1.1å", old_level="Output")
-            self.assertEqual(data['number'], u"Rendement 1.1å")
+            self.assertEqual(data['number'], u"Extrant 1.1å")
 
     def test_non_migrated_long_number_number_blank(self):
         data = self.get_non_migrated_indicator_data(number=None)
