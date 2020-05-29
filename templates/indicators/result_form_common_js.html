@@ -403,8 +403,9 @@
         let messageText = "";
         let preambleText = "";
         let no_preamble = false;
+        let header = gettext("Warning");
+        let show_icon = true;
 
-        let include_warning = true;
 
         if (! disaggsValid ) {
             if (result_is_new) {
@@ -418,7 +419,7 @@
         }
         else {
             messageText = MODIFY_RESULT_MESSAGE;
-            include_warning = false;
+            header = "";
             no_preamble = true;
         }
 
@@ -430,7 +431,8 @@
             on_submit: save,
             notice_type: "notice",
             include_rationale: true,
-            include_warning: include_warning,
+            header: header,
+            show_icon: show_icon,
         });
 
         scrollToResultFormBottom();

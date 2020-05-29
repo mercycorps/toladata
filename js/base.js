@@ -613,7 +613,7 @@ window.create_no_rationale_changeset_notice = ({
         context: context,
         rationale_required: false,
         showCloser: true
-        });
+    });
 }
 
 /*
@@ -628,14 +628,14 @@ for other visual and functional elements.
 
  */
 window.create_unified_changeset_notice = ({
-    include_warning = false, // overrides header & adds an icon. We should deprecate in favor of explicit headings & icons
-    header = gettext("Reason for change"),
+    header = gettext("Reason for change"), // TODO: this should be '' or null, but left here for backwards compatibility
     show_icon = false, // show an icon in the header (this is NOT in the warning)
     preamble = false, // appears in colored text
     no_preamble = false, // overrides preamble? Not sure why we need this if we can leave preamble empty
     on_submit = () => {},
     on_cancel = () => {},
     message_text = DEFAULT_DESTRUCTIVE_MESSAGE,
+    show_reason = false, // shows the reason multiselect dropdown, see #2320
     include_rationale = false, // shows rationale textarea
     showCloser = false, // show close box (should be TRUE by default)
     // # Translators: Button to approve a form
@@ -652,16 +652,8 @@ window.create_unified_changeset_notice = ({
         'success': 'fa-check-circle',
         'notice': 'fa-exclamation-triangle',
     }
-    let header_text = include_warning ? gettext("Warning") : header;
     let header_section = '';
-    if (include_warning){
-        header_section = `<header class="pnotify__header">
-            <h3>
-                <i class="fas fa-exclamation-triangle"></i>
-                ${gettext("Warning")}</h3>
-        </header>`
-    }
-    else {
+    if (show_icon){ // TODO: how to fit this conditional inline with the icon below?
         header_section = `<header class="pnotify__header">
             <h3>
                 <i class="fas ${header_icons[notice_type]}"></i>
@@ -669,15 +661,33 @@ window.create_unified_changeset_notice = ({
             </h3>
         </header>`
     }
+    else {
+        header_section = `<header class="pnotify__header">
+            <h3>
+                ${header}
+            </h3>
+        </header>`
+    }
+
     if (!preamble) { preamble = (no_preamble)?'' : gettext("This action cannot be undone.") }
+
     const preamble_section = !preamble ? '' :
         `<section class="pnotify__preamble">
             <p>${preamble}</p>
         </section>`;
-    const message_section =
+
+    const message_section = ! message_text ? '' :
         `<section class="pnotify__message">
             <p>${message_text}</p>
         </section>`;
+
+    const reason_section = ! show_reason ? '' :
+        `<section class="pnotify__reason">
+            <div class="form-group">
+                (reason dropdown)
+            </div>
+        </section>`;
+
     const rationale_section = ! include_rationale ? '' :
         `<section class="pnotify__rationale">
             <div class="form-group">
@@ -689,6 +699,7 @@ window.create_unified_changeset_notice = ({
         ${header_section}
         ${preamble_section}
         ${message_section}
+        ${reason_section}
         ${rationale_section}
     `;
     return create_changeset_notice({
