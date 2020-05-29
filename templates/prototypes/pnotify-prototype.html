@@ -1,25 +1,83 @@
 {% extends "base.html" %}
 {% block content %}
-    <div><a href="#" class="btn btn-primary" id="clickme">Click me</a></div>
+
+    <p><a href="#" class="btn btn-success" id="success">Success!</a></p>
+    <p><a href="#" class="btn btn-warning" id="notice">Notice!</a></p>
+    <p><a href="#" class="btn btn-danger" id="error">Error!</a></p>
+    <p><a href="#" class="btn btn-info" id="info">Info!</a></p>
+
     <script>
         function pnotifyMe(e) {
             e.preventDefault();
-            window.create_unified_changeset_notice({
-                include_warning: false,
-                header: 'header',
-                show_icon: true,
-                preamble: 'preamble',
-                no_preamble: true,
-                message_text: 'message_text',
-                include_rationale: true,
-                showCloser: true,
-                confirm_text: 'OK',
-                cancel_text: 'Cancel',
-                context: null,
-                notice_type: 'success',
-                blocking: false,
-            });
+            window.create_unified_changeset_notice(e.data);
         }
-        $("#clickme").on("click", pnotifyMe);
+
+        let success_options = {
+            header: 'This is a success message',
+            show_icon: true,
+            preamble: 'You have invoked something successfully',
+            no_preamble: true,
+            message_text: null,
+            show_reason: false,
+            include_rationale: false,
+            showCloser: true,
+            confirm_text: null,
+            cancel_text: null,
+            context: null,
+            notice_type: 'success',
+            blocking: false,
+        };
+
+        let notice_options = {
+            header: 'This is a warning message',
+            show_icon: true,
+            preamble: 'Why are you doing this?',
+            no_preamble: true,
+            message_text: 'Please rationalize yourself below.',
+            show_reason: true,
+            include_rationale: true,
+            showCloser: true,
+            confirm_text: 'OK',
+            cancel_text: 'Cancel',
+            context: null,
+            notice_type: 'notice',
+            blocking: true,
+        };
+
+        let error_options = {
+            header: 'This looks dangerous',
+            show_icon: true,
+            preamble: 'This cannot be undone, are you sure?',
+            no_preamble: true,
+            message_text: 'Fly, you fools!',
+            show_reason: false,
+            include_rationale: false,
+            showCloser: true,
+            confirm_text: 'Destroy!',
+            cancel_text: 'Nevermind',
+            context: null,
+            notice_type: 'error',
+            blocking: true,
+        };
+
+        let info_options = {
+            header: 'For your information…',
+            show_icon: true,
+            preamble: 'Let me tell you something boring',
+            no_preamble: true,
+            message_text: 'In a hole in the ground there lived a Hobbit.',
+            include_rationale: false,
+            showCloser: true,
+            confirm_text: null,
+            cancel_text: null,
+            context: null,
+            notice_type: 'info',
+            blocking: false,
+        };
+
+        $("#success").on("click", success_options, pnotifyMe);
+        $("#notice").on("click", notice_options, pnotifyMe);
+        $("#error").on("click", error_options, pnotifyMe);
+        $("#info").on("click", info_options, pnotifyMe);
     </script>
 {% endblock %}
