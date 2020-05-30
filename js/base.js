@@ -631,6 +631,7 @@ window.create_unified_changeset_notice = ({
     on_submit = () => {}, // action to trigger on submit
     on_cancel = () => {}, // action to trigger on cancel
     show_reason = false, // shows the reason multiselect dropdown, see #2320
+    rationale_required = true, // do not allow submission without writing a rationale
     include_rationale = false, // shows rationale textarea
     showCloser = true, // show close box
     // # Translators: Button to approve a form
@@ -647,6 +648,13 @@ window.create_unified_changeset_notice = ({
         'info': 'fa-info-circle',
         'success': 'fa-check-circle',
         'notice': 'fa-exclamation-triangle',
+    }
+
+    let button_classes = {
+        'error': 'btn-danger',
+        'info': 'btn-info',
+        'success': 'btn-success',
+        'notice': 'btn-warning',
     }
 
     let icon = null;
@@ -705,7 +713,8 @@ window.create_unified_changeset_notice = ({
     let confirm_button = {
         text: confirm_text,
         primary: true,
-        addClass:(notice_type == 'error')?'btn-danger':'',
+        removeClass: 'btn-primary',
+        addClass: 'btn-sm ' + button_classes[notice_type],
         click: function (notice) {
             var close = true;
             var textarea = $(notice.refs.elem).find('textarea[name="rationale"]')
@@ -737,6 +746,7 @@ window.create_unified_changeset_notice = ({
 
     let cancel_button = {
         text: cancel_text,
+        addClass: 'btn-sm',
         click: function (notice) {
             close = on_cancel()
             if(close === undefined) {
@@ -750,17 +760,15 @@ window.create_unified_changeset_notice = ({
         }
     }
 
-    var buttons = []
+    var changeset_buttons = []
 
     if (confirm_text) {
-        buttons.push(confirm_button)
+        changeset_buttons.push(confirm_button)
     }
 
     if (cancel_text) {
-        buttons.push(cancel_button)
+        changeset_buttons.push(cancel_button)
     }
-
-
 
     var notice = PNotify.alert({
         text: $(`<div><form action="" method="post" class="form">${inner}</form></div>`).html(),
@@ -786,7 +794,7 @@ window.create_unified_changeset_notice = ({
             },
             Confirm: {
                 confirm: true,
-                buttons: buttons
+                buttons: changeset_buttons
             }
         }
     });
