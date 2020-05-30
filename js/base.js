@@ -694,18 +694,113 @@ window.create_unified_changeset_notice = ({
         ${reason_section}
         ${rationale_section}
     `;
-    return create_changeset_notice({
-        message_text: message_text,
-        on_submit: on_submit,
-        on_cancel: on_cancel,
-        confirm_text: confirm_text,
-        cancel_text: cancel_text,
+
+
+    // IMPORTANT TODO
+    // **************
+    // Following code cribs from create_changeset_notice
+    // I left create_changeset_notice untouched to avoid lots of regressions
+    // I think we should deprecate create_changeset_notice entirely
+
+    let confirm_button = {
+        text: confirm_text,
+        primary: true,
+        addClass:(notice_type == 'error')?'btn-danger':'',
+        click: function (notice) {
+            var close = true;
+            var textarea = $(notice.refs.elem).find('textarea[name="rationale"]')
+            var rationale = textarea.val();
+            textarea.parent().find('.invalid-feedback').remove();
+            if(!rationale && rationale_required) {
+                textarea.addClass('is-invalid');
+                textarea.parent().append(
+                    '<div class="invalid-feedback">'
+                    + gettext('A reason is required.')
+                    + '</div>'
+                );
+                return false;
+            } else {
+                textarea.removeClass('is-invalid');
+            }
+            if(on_submit) {
+                close = on_submit(rationale);
+                if(close === undefined) {
+                    close = true;
+                }
+            }
+            if(close) {
+                document.getElementById('notification_blocking_div').style.display='none';
+                notice.close();
+            }
+        }
+    }
+
+    let cancel_button = {
+        text: cancel_text,
+        click: function (notice) {
+            close = on_cancel()
+            if(close === undefined) {
+                close = true;
+            }
+
+            if(close) {
+                document.getElementById('notification_blocking_div').style.display='none';
+                notice.close();
+            }
+        }
+    }
+
+    var buttons = []
+
+    if (confirm_text) {
+        buttons.push(confirm_button)
+    }
+
+    if (cancel_text) {
+        buttons.push(cancel_button)
+    }
+
+
+
+    var notice = PNotify.alert({
+        text: $(`<div><form action="" method="post" class="form">${inner}</form></div>`).html(),
+        textTrusted: true,
+        icon: false,
+        width: '350px',
+        hide: false,
         type: notice_type,
-        inner: inner,
-        context: context,
-        showCloser: showCloser,
-        blocking: blocking,
-    })
+        addClass: 'program-page__rationale-form',
+        stack: {
+            'overlayClose': true,
+            'dir1': 'right',
+            'dir2': 'up',
+            'firstpos1': 20,
+            'firstpos2': 20,
+            'context': context
+        },
+        modules: {
+            Buttons: {
+                closer: showCloser,
+                closerHover: false,
+                sticker: false
+            },
+            Confirm: {
+                confirm: true,
+                buttons: buttons
+            }
+        }
+    });
+    if (on_cancel) {
+        notice.on('click', function(e) {
+            if ($(e.target).is('.ui-pnotify-closer *')) {
+                let close = on_cancel();
+                if (close || close === undefined) {
+                    document.getElementById('notification_blocking_div').style.display='none';
+                    notice.close();
+                }
+        }});
+    }
+
 }
 
 const createPnotifyAlert = (passedInConfig) => {
