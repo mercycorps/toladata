@@ -383,6 +383,66 @@ const create_changeset_notice = ({
     rationale_required = true,
     showCloser = false,
 } = {}) => {
+
+    let confirm_button = {
+        text: confirm_text,
+        primary: true,
+        addClass:(type == 'error')?'btn-danger':'',
+        click: function (notice) {
+            var close = true;
+            var textarea = $(notice.refs.elem).find('textarea[name="rationale"]')
+            var rationale = textarea.val();
+            textarea.parent().find('.invalid-feedback').remove();
+            if(!rationale && rationale_required) {
+                textarea.addClass('is-invalid');
+                textarea.parent().append(
+                    '<div class="invalid-feedback">'
+                    + gettext('A reason is required.')
+                    + '</div>'
+                );
+                return false;
+            } else {
+                textarea.removeClass('is-invalid');
+            }
+            if(on_submit) {
+                close = on_submit(rationale);
+                if(close === undefined) {
+                    close = true;
+                }
+            }
+            if(close) {
+                document.getElementById('notification_blocking_div').style.display='none';
+                notice.close();
+            }
+        }
+    }
+
+    let cancel_button = {
+        text: cancel_text,
+        click: function (notice) {
+            close = on_cancel()
+            if(close === undefined) {
+                close = true;
+            }
+
+            if(close) {
+                document.getElementById('notification_blocking_div').style.display='none';
+                notice.close();
+            }
+        }
+    }
+
+    var buttons = []
+
+    if (cancel_text) {
+        buttons.push(cancel_button)
+    }
+
+    if (confirm_text) {
+        buttons.push(confirm_button)
+    }
+
+
     var notice = PNotify.alert({
         text: $(`<div><form action="" method="post" class="form">${inner}</form></div>`).html(),
         textTrusted: true,
@@ -407,54 +467,7 @@ const create_changeset_notice = ({
             },
             Confirm: {
                 confirm: true,
-                buttons: [
-                    {
-                        text: confirm_text,
-                        primary: true,
-                        addClass:(type == 'error')?'btn-danger':'',
-                        click: function (notice) {
-                            var close = true;
-                            var textarea = $(notice.refs.elem).find('textarea[name="rationale"]')
-                            var rationale = textarea.val();
-                            textarea.parent().find('.invalid-feedback').remove();
-                            if(!rationale && rationale_required) {
-                                textarea.addClass('is-invalid');
-                                textarea.parent().append(
-                                    '<div class="invalid-feedback">'
-                                    + gettext('A reason is required.')
-                                    + '</div>'
-                                );
-                                return false;
-                            } else {
-                                textarea.removeClass('is-invalid');
-                            }
-                            if(on_submit) {
-                                close = on_submit(rationale);
-                                if(close === undefined) {
-                                    close = true;
-                                }
-                            }
-                            if(close) {
-                                document.getElementById('notification_blocking_div').style.display='none';
-                                notice.close();
-                            }
-                        }
-                    },
-                    {
-                        text: cancel_text,
-                        click: function (notice) {
-                            close = on_cancel()
-                            if(close === undefined) {
-                                close = true;
-                            }
-
-                            if(close) {
-                                document.getElementById('notification_blocking_div').style.display='none';
-                                notice.close();
-                            }
-                        }
-                    }
-                ]
+                buttons: buttons
             }
         }
     });
