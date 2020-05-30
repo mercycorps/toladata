@@ -619,25 +619,19 @@ window.create_no_rationale_changeset_notice = ({
 /*
 Consider using this notification function rather than the more specific ones above.  It should be able to
 everything they can do. The configurable parameters are for the 4 sections of the notification and
-for other visual and functional elements.
-
-- You can provide a header, leave it to default text, or override with a Warning icon and text.
-- The preamble can be specified, left to a default, or omitted by using the no_preamble parameter.
-- The message can be specified or left to a default.
-- Defaults to not including a rationale text box.
+for other visual and functional elements. Leave any of these null or false to omit them. There is NO DEFAULT TEXT. You must explicitly provide text to text elements.
 
  */
 window.create_unified_changeset_notice = ({
-    header = gettext("Reason for change"), // TODO: this should be '' or null, but left here for backwards compatibility
-    show_icon = false, // show an icon in the header (this is NOT in the warning)
-    preamble = false, // appears in colored text
-    no_preamble = false, // overrides preamble? Not sure why we need this if we can leave preamble empty
-    on_submit = () => {},
-    on_cancel = () => {},
-    message_text = DEFAULT_DESTRUCTIVE_MESSAGE,
+    header = null, // text for the header
+    show_icon = false, // show an appropriate icon in the header
+    message_text = null, // appears in black (body color) text
+    preamble = null, // appears in colored text below the header
+    on_submit = () => {}, // action to trigger on submit
+    on_cancel = () => {}, // action to trigger on cancel
     show_reason = false, // shows the reason multiselect dropdown, see #2320
     include_rationale = false, // shows rationale textarea
-    showCloser = false, // show close box (should be TRUE by default)
+    showCloser = true, // show close box
     // # Translators: Button to approve a form
     confirm_text = gettext('Ok'),
     // # Translators: Button to cancel a form submission
@@ -662,14 +656,13 @@ window.create_unified_changeset_notice = ({
         </header>`
     }
     else {
-        header_section = `<header class="pnotify__header">
+        header_section = !header ? '' :
+        `<header class="pnotify__header">
             <h3>
                 ${header}
             </h3>
         </header>`
     }
-
-    if (!preamble) { preamble = (no_preamble)?'' : gettext("This action cannot be undone.") }
 
     const preamble_section = !preamble ? '' :
         `<section class="pnotify__preamble">
@@ -678,7 +671,7 @@ window.create_unified_changeset_notice = ({
 
     const message_section = ! message_text ? '' :
         `<section class="pnotify__message">
-            <p>${message_text}</p>
+            <p>{message_text}</p>
         </section>`;
 
     const reason_section = ! show_reason ? '' :

@@ -400,9 +400,8 @@
         }
 
         // configure and launch the PNotify warning/rationale prompt
-        let messageText = "";
-        let preambleText = "";
-        let no_preamble = false;
+        let messageText = null;
+        let preambleText = null;
         let header = gettext("Warning");
         let show_icon = true;
 
@@ -420,12 +419,10 @@
         else {
             messageText = MODIFY_RESULT_MESSAGE;
             header = "";
-            no_preamble = true;
         }
 
         window.create_unified_changeset_notice({
             preamble: preambleText,
-            no_preamble: no_preamble,
             message_text: messageText,
             context: document.getElementById('result_update_form'),
             on_submit: save,

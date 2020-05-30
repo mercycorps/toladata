@@ -1,6 +1,7 @@
 {% extends "base.html" %}
 {% block content %}
 
+    <p><a href="#" class="btn btn-primary" id="default">Default</a></p>
     <p><a href="#" class="btn btn-success" id="success">Success!</a></p>
     <p><a href="#" class="btn btn-warning" id="notice">Notice!</a></p>
     <p><a href="#" class="btn btn-danger" id="error">Error!</a></p>
@@ -16,7 +17,6 @@
             header: 'This is a success message',
             show_icon: true,
             preamble: 'You have invoked something successfully',
-            no_preamble: true,
             message_text: null,
             show_reason: false,
             include_rationale: false,
@@ -32,7 +32,6 @@
             header: 'This is a warning message',
             show_icon: true,
             preamble: 'Why are you doing this?',
-            no_preamble: true,
             message_text: 'Please rationalize yourself below.',
             show_reason: true,
             include_rationale: true,
@@ -75,6 +74,7 @@
             blocking: false,
         };
 
+        $("#default").on("click", {}, pnotifyMe);
         $("#success").on("click", success_options, pnotifyMe);
         $("#notice").on("click", notice_options, pnotifyMe);
         $("#error").on("click", error_options, pnotifyMe);
