@@ -2,6 +2,7 @@
 {% block content %}
 
     <p><a href="#" class="btn btn-primary" id="default">Default</a></p>
+    <p><a href="#" class="btn btn-secondary" id="empty">Empty</a></p>
     <p><a href="#" class="btn btn-success" id="success">Success!</a></p>
     <p><a href="#" class="btn btn-warning" id="notice">Notice!</a></p>
     <p><a href="#" class="btn btn-danger" id="error">Error!</a></p>
@@ -12,6 +13,21 @@
             e.preventDefault();
             window.create_unified_changeset_notice(e.data);
         }
+
+        let empty_options = {
+            header: null,
+            show_icon: false,
+            preamble: null,
+            message_text: null,
+            show_reason: false,
+            include_rationale: false,
+            showCloser: false,
+            confirm_text: null,
+            cancel_text: null,
+            context: null,
+            notice_type: 'info',
+            blocking: false,
+        };
 
         let success_options = {
             header: 'This is a success message',
@@ -75,6 +91,7 @@
         };
 
         $("#default").on("click", {}, pnotifyMe);
+        $("#empty").on("click", empty_options, pnotifyMe);
         $("#success").on("click", success_options, pnotifyMe);
         $("#notice").on("click", notice_options, pnotifyMe);
         $("#error").on("click", error_options, pnotifyMe);

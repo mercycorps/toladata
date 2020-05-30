@@ -617,14 +617,15 @@ window.create_no_rationale_changeset_notice = ({
 }
 
 /*
-Consider using this notification function rather than the more specific ones above.  It should be able to
-everything they can do. The configurable parameters are for the 4 sections of the notification and
-for other visual and functional elements. Leave any of these null or false to omit them. There is NO DEFAULT TEXT. You must explicitly provide text to text elements.
+* Consider using this notification function rather than the more specific ones above.  It should be able to
+* everything they can do. The configurable parameters are for the 4 sections of the notification and
+* for other visual and functional elements. Leave any of these null or false to omit them.
+* There is NO DEFAULT TEXT. You must explicitly provide text to text elements.
+*/
 
- */
 window.create_unified_changeset_notice = ({
     header = null, // text for the header
-    show_icon = false, // show an appropriate icon in the header
+    show_icon = true, // show an appropriate icon in the header
     message_text = null, // appears in black (body color) text
     preamble = null, // appears in colored text below the header
     on_submit = () => {}, // action to trigger on submit
@@ -637,32 +638,30 @@ window.create_unified_changeset_notice = ({
     // # Translators: Button to cancel a form submission
     cancel_text = gettext('Cancel'),
     context = null,
-    notice_type = 'error', // possible values: error (danger/red), info (blue), success (green), notice (warning/yellow)
+    notice_type = 'notice', // possible values: error (danger/red), info (blue), success (green), notice (warning/yellow)
     blocking = true,
 } = {}) => {
+
     let header_icons = {
         'error': 'fa-exclamation-triangle',
         'info': 'fa-info-circle',
         'success': 'fa-check-circle',
         'notice': 'fa-exclamation-triangle',
     }
-    let header_section = '';
-    if (show_icon){ // TODO: how to fit this conditional inline with the icon below?
-        header_section = `<header class="pnotify__header">
-            <h3>
-                <i class="fas ${header_icons[notice_type]}"></i>
-                ${header}
-            </h3>
-        </header>`
+
+    let icon = null;
+
+    if (show_icon) {
+        icon = `<i class="fas ${header_icons[notice_type]}"></i>`
     }
-    else {
-        header_section = !header ? '' :
+
+    const header_section = (header || icon) ?
         `<header class="pnotify__header">
             <h3>
+                ${icon}
                 ${header}
             </h3>
-        </header>`
-    }
+        </header>` : ''
 
     const preamble_section = !preamble ? '' :
         `<section class="pnotify__preamble">
@@ -671,7 +670,7 @@ window.create_unified_changeset_notice = ({
 
     const message_section = ! message_text ? '' :
         `<section class="pnotify__message">
-            <p>{message_text}</p>
+            <p>${message_text}</p>
         </section>`;
 
     const reason_section = ! show_reason ? '' :
