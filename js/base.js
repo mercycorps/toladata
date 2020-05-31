@@ -654,7 +654,7 @@ window.create_unified_changeset_notice = ({
         'error': 'btn-danger',
         'info': 'btn-info',
         'success': 'btn-success',
-        'notice': 'btn-warning',
+        'notice': 'btn-primary',
     }
 
     let icon = null;
