@@ -262,7 +262,7 @@ $(function() {
     $('[data-toggle="popover"]').on('click', function(e){
         e.preventDefault();
     });
-    
+
     /* specific actions tied to item-specific site-wide events here: */
     // in case of covid alert dismissal, update the session to clear it for the rest of this login session:
     $('#covid-banner-alert').on('close.bs.alert', function() {
@@ -706,7 +706,7 @@ window.create_unified_changeset_notice = ({
     })
 }
 
-const createPnotifyAlert = (passedInConfig) => {
+const   createPnotifyAlert = (passedInConfig) => {
     let config = {
         textTrusted: true,
         icon: false,
