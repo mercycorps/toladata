@@ -650,11 +650,11 @@ window.create_unified_changeset_notice = ({
         'notice': 'fa-exclamation-triangle',
     }
 
-    let button_classes = {
-        'error': 'btn-danger',
-        'info': 'btn-info',
-        'success': 'btn-success',
-        'notice': 'btn-primary',
+    let color_classes = {
+        'error': 'danger',
+        'info': 'info',
+        'success': 'success',
+        'notice': 'primary',
     }
 
     let icon = null;
@@ -665,15 +665,15 @@ window.create_unified_changeset_notice = ({
 
     const header_section = (header || icon) ?
         `<header class="pnotify__header">
-            <h3>
+            <h4>
                 ${icon}
                 ${header}
-            </h3>
+            </h4>
         </header>` : ''
 
     const preamble_section = !preamble ? '' :
         `<section class="pnotify__preamble">
-            <p>${preamble}</p>
+            <p><b>${preamble}</b></p>
         </section>`;
 
     const message_section = ! message_text ? '' :
@@ -713,8 +713,7 @@ window.create_unified_changeset_notice = ({
     let confirm_button = {
         text: confirm_text,
         primary: true,
-        removeClass: 'btn-primary',
-        addClass: 'btn-sm ' + button_classes[notice_type],
+        addClass: 'btn-sm btn-' + color_classes[notice_type],
         click: function (notice) {
             var close = true;
             var textarea = $(notice.refs.elem).find('textarea[name="rationale"]')
@@ -793,6 +792,7 @@ window.create_unified_changeset_notice = ({
                 sticker: false
             },
             Confirm: {
+                align: 'flex-start',
                 confirm: true,
                 buttons: changeset_buttons
             }
@@ -808,6 +808,8 @@ window.create_unified_changeset_notice = ({
                 }
         }});
     }
+
+    // END CRIBBED CODE
 
 }
 

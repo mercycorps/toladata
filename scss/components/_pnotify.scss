@@ -1,16 +1,17 @@
+// overloaded styles from pnotify core
 .ui-pnotify-text {
     white-space: initial !important;
     // TODO: this ^^^ is an unnecessary style applied by the library. We should remove it there
-}
-
-.pnotify__header {
-    margin-bottom: 1rem;
-    h3, h4 {
+    h4 {
         color: inherit;
     }
 }
+
+// our components
+.pnotify__header {
+    margin-bottom: 1rem;
+}
 .pnotify__preamble {
-    color: inherit;
     font-weight: bold;
     margin-bottom: 0.5rem;
 }
