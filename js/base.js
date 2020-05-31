@@ -682,9 +682,21 @@ window.create_unified_changeset_notice = ({
         </section>`;
 
     const reason_section = ! show_reason ? '' :
+        // TODO this is all FPO
         `<section class="pnotify__reason">
             <div class="form-group">
-                (reason dropdown)
+                <label for="reason_ms">Reason for change</label>
+                <select class="form-control" name="reason_ms" id="reason_ms">
+                    <option>Adaptive management</option>
+                    <option>Budget realignment</option>
+                    <option>Changes in context</option>
+                    <option>Costed extension</option>
+                    <option>COVID-19</option>
+                    <option>Donor requirement</option>
+                    <option>Implementation delays</option>
+                    <option>------------------------</option>
+                    <option>Other</option>
+                </select>
             </div>
         </section>`;
 
