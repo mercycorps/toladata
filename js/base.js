@@ -667,7 +667,7 @@ window.create_unified_changeset_notice = ({
         `<header class="pnotify__header">
             <h4>
                 ${icon}
-                ${header}
+                ${header ? header : ''}
             </h4>
         </header>` : ''
 
