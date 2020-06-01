@@ -706,7 +706,7 @@ window.create_unified_changeset_notice = ({
     })
 }
 
-const   createPnotifyAlert = (passedInConfig) => {
+const createPnotifyAlert = (passedInConfig) => {
     let config = {
         textTrusted: true,
         icon: false,
