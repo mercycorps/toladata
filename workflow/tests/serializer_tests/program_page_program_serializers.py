@@ -261,7 +261,7 @@ class TestProgramPageSerializersFunctional(test.TestCase):
         self.assertEqual(expected_pks, indicator_pks)
         for (old_level, number), pk in zip(old_levels_numbers, pks):
             indicator_data = data['indicators'][pk]
-            self.assertEqual(indicator_data['number'], u'{}'.format(number))
+            self.assertEqual(indicator_data['number'], u'{} {}'.format(old_level, number))
             self.assertEqual(indicator_data['old_level_name'], old_level)
             self.assertTrue(indicator_data['is_reporting'])
             self.assertEqual(indicator_data['over_under'], 1)
