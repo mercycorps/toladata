@@ -630,7 +630,7 @@ window.create_unified_changeset_notice = ({
     preamble = null, // appears in colored text below the header
     on_submit = () => {}, // action to trigger on submit
     on_cancel = () => {}, // action to trigger on cancel
-    show_reason = false, // shows the reason multiselect dropdown, see #2320
+    //show_reason = false, // TODO: shows the reason multiselect dropdown, see #2320
     rationale_required = true, // do not allow submission without writing a rationale
     include_rationale = false, // shows rationale textarea
     showCloser = true, // show close box
@@ -681,8 +681,9 @@ window.create_unified_changeset_notice = ({
             <p>${message_text}</p>
         </section>`;
 
+    /*
+    // TODO this is all FPO
     const reason_section = ! show_reason ? '' :
-        // TODO this is all FPO
         `<section class="pnotify__reason">
             <div class="form-group">
                 <label for="reason_ms">Reason for change</label>
@@ -699,6 +700,7 @@ window.create_unified_changeset_notice = ({
                 </select>
             </div>
         </section>`;
+     */
 
     const rationale_section = ! include_rationale ? '' :
         `<section class="pnotify__rationale">
