@@ -712,13 +712,10 @@ msgstr[1] "%s Indicateurs sont en bonne voie"
 
 #. Translators: shows what number of indicators that for various reasons are not being reported for program metrics
 #: js/pages/program_page/components/indicator_list.js:46
-#, fuzzy, python-format
-#| msgid "%s indicator is on track"
-#| msgid_plural "%s indicators are on track"
 msgid "%s indicator is unavailable"
 msgid_plural "%s indicators are unavailable"
-msgstr[0] "%s indicateur est en bonne voie"
-msgstr[1] "%s Indicateurs sont en bonne voie"
+msgstr[0] "%s indicateur n'est pas disponible"
+msgstr[1] "%s indicateurs ne sont pas disponibles"
 
 #. Translators: the number of indicators in a list. Example: 3 indicators
 #. Translators: This is a count of indicators associated with another object */
