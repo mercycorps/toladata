@@ -13,23 +13,6 @@ from factories.workflow_models import (
 )
 from workflow.models import COUNTRY_ROLE_CHOICES, PROGRAM_ROLE_INT_MAP, PROGRAM_ROLE_CHOICES
 from tola_management.views import UserAdminViewSet
-# 
-# 
-# def get_country_admin(country, count):
-#     admin = TolaUserFactory(
-#         country=country,
-#         user__username=f"admin {count}"
-#     )
-#     grant_country_access(admin, country, COUNTRY_ROLE_CHOICES[1][0])
-#     return admin
-# 
-# def get_country_user(country, count):
-#     user = TolaUserFactory(
-#         country=country,
-#         user__username=f"user {count}"
-#     )
-#     grant_country_access(user, country, COUNTRY_ROLE_CHOICES[0][0])
-#     return user
 
 
 class TestUserAdminViewSet(test.TestCase):
@@ -40,6 +23,7 @@ class TestUserAdminViewSet(test.TestCase):
         cls.partner_org1 = OrganizationFactory(name="PO1")
         cls.partner_org2 = OrganizationFactory(name="PO2")
         cls.base_country = CountryFactory(country="Base Country", code="BC")
+        cls.base_country2 = CountryFactory(country="Base Country2", code="BC2")
         cls.country1 = CountryFactory(country="TestLand", code="T1")
         cls.country1_program = RFProgramFactory(active=True, country=[cls.country1])
         cls.country2 = CountryFactory(country="TestLand2", code="T2")
@@ -67,7 +51,9 @@ class TestUserAdminViewSet(test.TestCase):
 
     def get_pks(self, response, count=None):
         if count is not None:
-            self.assertEqual(response['count'], count, response['results'])
+            self.assertEqual(
+                response['count'], count, "received:\n{}".format("\n".join(str(r) for r in response['results']))
+                )
         return set(user['id'] for user in response['results'])
 
     def get_user(self, **kwargs):
@@ -173,7 +159,8 @@ class TestUserAdminViewSet(test.TestCase):
         self.assertIn(multi_program_user.pk, user_pks)
         self.assertNotIn(user_level_user2.pk, user_pks)
         self.assertNotIn(non_permissioned_user.pk, user_pks)
-        response = self.get_response(**{'programs[]': [self.country1_program.pk, self.country2_program.pk]})
+        response = self.get_response(**{'programs[]': [self.country1_program.pk, self.country2_program.pk],
+                                        'test': True})
         user_pks = self.get_pks(response, count=9)
         self.assertIn(user_level_user.pk, user_pks)
         self.assertIn(admin_level_user.pk, user_pks)
@@ -228,6 +215,20 @@ class TestUserAdminViewSet(test.TestCase):
         self.assertIn(in_user_1.pk, user_pks)
         self.assertIn(in_user_2.pk, user_pks)
         self.assertIn(in_user_3.pk, user_pks)
+
+    def test_admin_filter(self):
+        admin_user1 = self.get_user(country_admin=[self.country1])
+        admin_user2 = self.get_user(country_admin=[self.country2])
+        admin_user3 = self.get_user(country_admin=[self.country2, self.country3])
+        non_admin1 = self.get_user()
+        non_admin2 = self.get_user(country_user=[self.country1])
+        non_admin3 = self.get_user(mc_staff=False, program_user=[self.country1_program])
+        response = self.get_response(**{'admin_role': 1})
+        user_pks = self.get_pks(response, count=4)
+        self.assertIn(admin_user1.pk, user_pks)
+        self.assertIn(admin_user2.pk, user_pks)
+        self.assertIn(admin_user3.pk, user_pks)
+        self.assertIn(self.superadmin.pk, user_pks)
 
     def test_status_filter(self):
         active_user = self.get_user()
@@ -291,8 +292,23 @@ class TestUserAdminViewSet(test.TestCase):
         self.assertEqual(response['results'][0]['user_programs'], 1)
         user_with_two_programs = self.get_user(country_admin=[self.country3])
         response = self.get_response(**{'users[]': [user_with_two_programs.pk]})
-        self.assertEqual(response['results'][0]['user_programs'], 2)
+        self.assertEqual(response['results'][0]['user_programs'], 2, response['results'])
         user_with_three_programs = self.get_user(country_user=[self.country2], country_admin=[self.country3])
         response = self.get_response(**{'users[]': [user_with_three_programs.pk]})
         self.assertEqual(response['results'][0]['user_programs'], 3)
+        response = self.get_response(**{'users[]': [self.superadmin.pk]})
+        self.assertEqual(response['results'][0]['user_programs'], 4)
+
+    def test_pagination(self):
+        first_user = self.get_user(user__first_name="AAAAaron", country=self.base_country2)
+        users = [self.get_user(user__first_name="AAAB{}".format(x), country=self.base_country2) for x in range(19)]
+        twenty_first_user = self.get_user(user__first_name="ZZZron", country=self.base_country2)
+        response = self.get_response(**{'base_countries[]': [self.base_country2.pk]})
+        user_pks = self.get_pks(response, count=21)
+        self.assertIn(first_user.pk, user_pks)
+        for user in users:
+            self.assertIn(user.pk, user_pks)
+        response = self.get_response(**{'base_countries[]': [self.base_country2.pk], 'page': 2})
+        user_pks = self.get_pks(response, count=21)
+        self.assertIn(twenty_first_user.pk, user_pks)
         
