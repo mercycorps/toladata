@@ -158,6 +158,7 @@ class RFProgramFactory(DjangoModelFactory):
         closed = True
         age = False
 
+    name = Faker('company')
     funding_status = LazyAttribute(lambda o: "Funded" if o.active else "Inactive")
     _using_results_framework = LazyAttribute(
         lambda o: ProgramM.RF_ALWAYS if o.migrated is None else ProgramM.MIGRATED if o.migrated else ProgramM.NOT_MIGRATED
