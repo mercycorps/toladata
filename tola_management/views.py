@@ -502,7 +502,6 @@ class UserAdminViewSet(viewsets.ModelViewSet):
     def get_list_queryset(self):
         req = self.request
 
-        #theres a bug with django rest framework pagination that prevents this from working
         queryset = TolaUser.objects.all()
 
         countries = req.GET.getlist('countries[]')
@@ -558,10 +557,8 @@ class UserAdminViewSet(viewsets.ModelViewSet):
     def list(self, request):
         queryset = self.get_list_queryset()
 
-        #TODO write a more performant paginator, rather than converting the
-        #query to a list. For now, we're extremely performant with about 1000
-        #rows, so just convert to a list and paginate that way
-        page = self.paginate_queryset(list(queryset))
+        # if problems arise, replace this with page = self.paginate_queryset(list(queryset))
+        page = self.paginate_queryset(queryset)
         if page is not None:
             serializer = UserAdminReportSerializer(page, many=True)            
             return self.get_paginated_response(serializer.data)
