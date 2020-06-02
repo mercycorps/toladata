@@ -115,19 +115,24 @@ export class LevelStore {
 
     @action
     changeTierSet(newTierSetKey) {
+        const oldTopTier = this.chosenTierSet[0];
         this.chosenTierSetKey = newTierSetKey;
         if (this.chosenTierSetKey === this.customTierSetKey) {
-            // The tiers switcher/editor should load if there are fewer than two saved levels.
-            this.useStaticTierList = this.levels.length > 2;
+            this.editTierSet();
 
-            //Set a default first tier in the event the user is swiching from a defined template to a blank custom one
-            if (this.tierTemplates[this.customTierSetKey]['tiers'].length === 1
-                && !this.tierTemplates[this.customTierSetKey]['tiers'][0]
-                && this.levels.length === 1) {
-                    this.tierTemplates[this.customTierSetKey]['tiers'] = [gettext("Goal")]
+            // Set a default first tier in the event the user is switching from a defined template to a blank custom one
+            // It's a bit of a hack, since new custom levels should be kept in the local component state and
+            // the root store would only be modified when the "Apply" button was pressed.  But this is easier
+            // than passing an the old level down to the component and the only downside seems a slightly sticky
+            // first tier value when you switch from a pre-defined template, to custom, and back to pre-defined, and
+            // back to custom again.  How did I write so much about 3 lines of code?
+            if (!this.tierTemplates[this.customTierSetKey]['tiers'][0]
+                && this.levels.filter(level=>level.id !== "new").length === 1) {
+                    this.tierTemplates[this.customTierSetKey]['tiers'] = [gettext(oldTopTier)]
             }
         }
         else {
+            this.rootStore.uiStore.customFormErrors = {hasErrors: false, errors: []};
             this.rootStore.uiStore.setDisableCardActions(false);
         }
         if (this.levels.length > 0 && this.chosenTierSetKey !== this.customTierSetKey) {
@@ -191,10 +196,10 @@ export class LevelStore {
         if (event) {
             event.preventDefault();
         }
-        if (this.rootStore.uiStore.customFormErrors.hasErrors){
+        if (this.chosenTierSetKey === this.customTierSetKey
+            && this.rootStore.uiStore.customFormErrors.hasErrors){
             return false;
         }
-
         this.saveLevelTiersToDB();
 
         if (this.chosenTierSetKey === this.customTierSetKey){
@@ -605,11 +610,13 @@ export class UIStore {
     }
 
     @computed get tierLockStatus () {
-        // The leveltier picker should be disabled if there is at least one saved level in the DB or if the user is
-        // doesn't have 'high' permissions.
-        let notNewLevels = this.rootStore.levelStore.levels.filter( l => l.id != "new");
-        if  (notNewLevels.length > 1 || !this.rootStore.levelStore.hasEditPermissions) {
-            return "locked"
+        // Tiers should be locked if user doesn't have write permissions or when more than one level exists,
+        // regardless of saved or unsaved.  Allowing a second (unsaved) level to lock the tier
+        // switcher prevents a user from adding a second level and switching to a custom template before saving the
+        // level they're currently editing.  This could be a problem because there are two levels and potentially
+        // no second tier that corresponds to the second level.
+        if  (!this.rootStore.levelStore.hasEditPermissions || this.rootStore.levelStore.levels.length > 1) {
+            return "locked";
         }
         // The apply button should not be visible if there is only one level visible (i.e. saved to the db or not)
         else if (this.rootStore.levelStore.levels.length > 0){
