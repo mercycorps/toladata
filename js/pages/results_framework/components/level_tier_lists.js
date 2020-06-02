@@ -133,7 +133,7 @@ class EditableLevelTier extends React.Component {
                 <div className="form-group">
                     <label className="leveltier--editable__label">
                         {
-                            /* # Translators: This is one of several user modifiable fields, e.g. "Level 1", "Level 2", etc... Level 1 is the top of the hierarch, Level six is the bottom.*/
+                            /* # Translators: This is one of several user modifiable fields, e.g. "Level 1", "Level 2", etc... Level 1 is the top of the hierarchy, Level six is the bottom.*/
                              interpolate(gettext("Level %s"), [this.props.tierOrder + 1])
                         }
                     </label>

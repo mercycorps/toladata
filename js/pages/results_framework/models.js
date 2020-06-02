@@ -39,7 +39,7 @@ export class LevelStore {
         this.maxTiers = maxTiers;
 
         this.tierTemplates = JSON.parse(tierTemplates);
-        this.tierTemplates[this.customTierSetKey] = {name: "Custom"};
+        this.tierTemplates[this.customTierSetKey] = {name: gettext("Custom")};
         this.tierTemplates[this.customTierSetKey]['tiers'] = customTemplates.names || [""];
 
         // Set the stored tier set key and the values, if they exist.  Use the default if they don't.
@@ -117,19 +117,40 @@ export class LevelStore {
     changeTierSet(newTierSetKey) {
         this.chosenTierSetKey = newTierSetKey;
         if (this.chosenTierSetKey === this.customTierSetKey) {
-            // The tier editor should load if there are no levels or if the only level is a new level and
-            // the first tier has not been created yet.  Otherwise load the static tier display.
-            this.useStaticTierList = !(this.levels.length === 0 ||
-                (this.levels.length === 1 && this.levels[0].id === "new" && this.chosenTierSet.length > 0 && this.chosenTierSet[0].length === 0));
-            if (this.tierTemplates[this.customTierSetKey]['tiers'].length === 0) {
-                this.tierTemplates[this.customTierSetKey]['tiers'] = [""]
+            // The tiers switcher/editor should load if there are fewer than two saved levels.
+            this.useStaticTierList = this.levels.length > 2;
+
+            //Set a default first tier in the event the user is swiching from a defined template to a blank custom one
+            if (this.tierTemplates[this.customTierSetKey]['tiers'].length === 1
+                && !this.tierTemplates[this.customTierSetKey]['tiers'][0]
+                && this.levels.length === 1) {
+                    this.tierTemplates[this.customTierSetKey]['tiers'] = [gettext("Goal")]
             }
         }
         else {
             this.rootStore.uiStore.setDisableCardActions(false);
         }
-        if (this.levels.length > 0) {
-            this.saveLevelTiersToDB()
+        if (this.levels.length > 0 && this.chosenTierSetKey !== this.customTierSetKey) {
+            const result = this.saveLevelTiersToDB();
+            result.then(result => {
+                if (this.chosenTierSetKey !== this.customTierSetKey && this.levels.filter(level=>level.id !== "new").length > 0 ) {
+                    success_notice({
+                        // # Translators: Notification to user that the an update was successful
+                        message_text: gettext("Changes to the results framework template were saved."),
+                        addClass: 'program-page__rationale-form',
+                        stack: {
+                            dir1: 'up',
+                            dir2: 'right',
+                            firstpos1: 20,
+                            firstpos2: 20,
+                        }
+                    })
+                }
+            }).catch(error => {
+                // Ok, I know this is dumb, but we're in the middle of a revamp of the alerts and I don't
+                // want to add to the mess.  Punting.
+                console.log("There was an error saving the template to the database")
+            })
         }
     }
 
@@ -324,16 +345,14 @@ export class LevelStore {
 
     saveLevelTiersToDB = () => {
         const tier_data = {program_id: this.program_id};
-        if (this.chosenTierSetKey === "custom") {
+        if (this.chosenTierSetKey === this.customTierSetKey) {
             tier_data.tiers = this.chosenTierSet;
         }
         else {
             tier_data.tiers = this.englishTierTemlates[this.chosenTierSetKey]['tiers']
         }
-        api.post(`/save_leveltiers/`, tier_data)
-            .then(response => {
-            })
-            .catch(error => console.log('error', error))
+        // Need to catch errors for this
+        return api.post(`/save_leveltiers/`, tier_data)
     };
 
     deleteLevelFromDB = (levelId) => {
@@ -581,20 +600,21 @@ export class UIStore {
         this.disableCardActions = false;
         this.customFormErrors = {hasErrors: false, errors: []};
         this.addLevelButtonIsLocked = false;  //used to prevent creating two new levels by smashing the Add Level button
+
+        this.splashWarning = gettext('<strong class="text-danger">Choose your results framework template carefully!</strong> Once you begin building your framework, it will not be possible to change templates without first deleting saved levels.')
     }
 
     @computed get tierLockStatus () {
         // The leveltier picker should be disabled if there is at least one saved level in the DB or if the user is
         // doesn't have 'high' permissions.
         let notNewLevels = this.rootStore.levelStore.levels.filter( l => l.id != "new");
-        if  (notNewLevels.length > 0 || !this.rootStore.levelStore.hasEditPermissions) {
+        if  (notNewLevels.length > 1 || !this.rootStore.levelStore.hasEditPermissions) {
             return "locked"
         }
         // The apply button should not be visible if there is only one level visible (i.e. saved to the db or not)
-        else if (this.rootStore.levelStore.levels.length == 1){
+        else if (this.rootStore.levelStore.levels.length > 0){
             return "primed"
         }
-
         return null;
     }
 

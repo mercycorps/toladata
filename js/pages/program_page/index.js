@@ -159,6 +159,7 @@ const routes = [
     { name: 'scope.on', path: '/on', filterType: IndicatorFilterType.onTarget },
     { name: 'scope.above', path: '/above', filterType: IndicatorFilterType.aboveTarget },
     { name: 'scope.below', path: '/below', filterType: IndicatorFilterType.belowTarget },
+    { name: 'scope.nonreporting', path: '/nonreporting', filterType: IndicatorFilterType.nonReporting },
     { name: 'indicator', path: '/indicator/:indicator_id<\\d+>', filterType: IndicatorFilterType.noFilter }
 ];
 

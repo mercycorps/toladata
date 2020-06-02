@@ -20,11 +20,13 @@
         {% if results_count > 0 and scope_percents.reporting > 0 %}
         <div class="gauge__labels">
             <div class="gauge__label">
-                <span class="text-muted" >
+                <span class="text-muted filter-trigger--band" >
+                    {% if program_url %} <a href="{{ program_url }}#/scope/nonreporting/">{% endif %}
                     {% comment %}Translators: variable {{ unavailable }} shows what percentage of indicators have no targets reporting data. Example: 31% unavailable{% endcomment %}
                     {% blocktrans with scope_percents.nonreporting as unavailable %}
                     {{ unavailable }}% unavailable
                     {% endblocktrans %}
+                    {% if program_url %}</a>{% endif %}
                 </span>
                     <a href="#"
                        tabindex="0"

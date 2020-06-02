@@ -107,6 +107,9 @@ export default class ProgramPageRootStore {
             case IndicatorFilterType.onTarget:
                 indicators = this.getIndicatorsOnTarget;
                 break;
+            case IndicatorFilterType.nonReporting:
+                indicators = this.getIndicatorsNotReporting;
+                break;
             case IndicatorFilterType.noFilter:
             default:
                 indicators = this._sortedIndicators;

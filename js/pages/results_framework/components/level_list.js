@@ -61,7 +61,7 @@ class LevelList extends React.Component {
 export class LevelListPanel  extends React.Component {
 
     getWarningText = () => {
-        return {__html: gettext('<strong class="text-danger">Choose your results framework template carefully!</strong> Once you begin building your framework, it will not be possible to change templates without first deleting all saved levels.') }
+        return {__html: this.props.rootStore.uiStore.splashWarning }
     };
 
     render() {
