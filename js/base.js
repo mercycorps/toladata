@@ -630,7 +630,6 @@ window.create_unified_changeset_notice = ({
     preamble = null, // appears in colored text below the header
     on_submit = () => {}, // action to trigger on submit
     on_cancel = () => {}, // action to trigger on cancel
-    //show_reason = false, // TODO: shows the reason multiselect dropdown, see #2320
     rationale_required = true, // do not allow submission without writing a rationale
     include_rationale = false, // shows rationale textarea
     showCloser = true, // show close box
@@ -680,28 +679,6 @@ window.create_unified_changeset_notice = ({
         `<section class="pnotify__message">
             <p>${message_text}</p>
         </section>`;
-
-    /*
-    // TODO this is all FPO
-    const reason_section = ! show_reason ? '' :
-        `<section class="pnotify__reason">
-            <div class="form-group">
-                <label for="reason_ms">Reason for change</label>
-                <select class="form-control" name="reason_ms" id="reason_ms">
-                    <option>Adaptive management</option>
-                    <option>Budget realignment</option>
-                    <option>Changes in context</option>
-                    <option>Costed extension</option>
-                    <option>COVID-19</option>
-                    <option>Donor requirement</option>
-                    <option>Implementation delays</option>
-                    <option>------------------------</option>
-                    <option>Other</option>
-                </select>
-            </div>
-        </section>`;
-     */
-
     const rationale_section = ! include_rationale ? '' :
         `<section class="pnotify__rationale">
             <div class="form-group">
@@ -713,7 +690,6 @@ window.create_unified_changeset_notice = ({
         ${header_section}
         ${preamble_section}
         ${message_section}
-        ${reason_section}
         ${rationale_section}
     `;
 
