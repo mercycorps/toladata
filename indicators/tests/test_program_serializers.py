@@ -18,6 +18,7 @@ from indicators.tests.serializer_tests.indicator_base_serializers_tests import (
 # tests of the program page indicator serializer
 from indicators.tests.serializer_tests.program_page_indicator_serializer import (
     TestProgramPageIndicatorSerializer,
+    TestProgramPageOrderingUpdateSerializer
 )
 
 # tests for indicator serializers used on the IPTT report:

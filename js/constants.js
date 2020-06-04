@@ -84,4 +84,5 @@ export const IndicatorFilterType = Object.freeze({
     aboveTarget: 5,
     belowTarget: 6,
     onTarget: 7,
+    nonReporting: 8
 });

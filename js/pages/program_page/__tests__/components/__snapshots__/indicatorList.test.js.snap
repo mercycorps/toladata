@@ -22,12 +22,6 @@ exports[`Indicator List elements Indicator List Table component renders without 
       </th>
       <th
         className=""
-        id="id_indicator_level_col_header"
-      >
-        Level
-      </th>
-      <th
-        className=""
         id="id_indicator_unit_col_header"
       >
         Unit of measure

@@ -14,6 +14,7 @@ from django.utils.http import urlsafe_base64_encode
 from django.utils.encoding import force_bytes
 from django.urls import reverse
 from django.conf import settings
+from django.db import models
 from django.shortcuts import get_object_or_404
 
 from rest_framework.validators import UniqueValidator
@@ -473,9 +474,9 @@ class UserAdminReportSerializer(ModelSerializer):
     organization_name = CharField(
         source="organization.name", max_length=255, allow_null=True, allow_blank=True, required=False)
     organization_id = IntegerField(source="organization.id")
-    user_programs = IntegerField(required=False)
+    user_programs = IntegerField(required=False, source='available_programs.count')
     is_active = BooleanField(source="user.is_active")
-    is_admin = BooleanField(source="user.is_staff", required=False)
+    is_admin = BooleanField(source="user.has_admin_management_access", required=False)
     is_super = BooleanField(source="user.is_superuser", required=False)
 
     class Meta:
@@ -501,192 +502,65 @@ class UserAdminViewSet(viewsets.ModelViewSet):
     def get_list_queryset(self):
         req = self.request
 
-        #theres a bug with django rest framework pagination that prevents this from working
-        # queryset = TolaUser.objects.all()
+        queryset = TolaUser.objects.all()
 
-        # countries = req.GET.getlist('countries[]')
-        # if countries:
-        #     queryset = queryset.filter(Q(countries_id__in=countries) | Q(programaccess_set__country_id__in=countries))
+        countries = req.GET.getlist('countries[]')
+        if countries:
+            queryset = queryset.filter(
+                models.Q(countries__in=countries) |
+                models.Q(programaccess__country_id__in=countries) |
+                models.Q(user__is_superuser=True)
+            )
 
-        # base_countries = req.GET.getlist('base_countries[]')
-        # if base_countries:
-        #     queryset = queryset.filter(base_country_id_in=base_countries)
+        base_countries = req.GET.getlist('base_countries[]')
+        if base_countries:
+            queryset = queryset.filter(country_id__in=base_countries)
 
-        # programs = req.GET.getlist('programs[]')
-        # if programs:
-        #     queryset = queryset.filter(Q(programaccess_set__program_id__in=programs) | Q(countries__program_set__id__in=programs))
+        programs = req.GET.getlist('programs[]')
+        if programs:
+            queryset = queryset.filter(
+                models.Q(programaccess__program_id__in=programs) |
+                models.Q(countries__program__in=programs) |
+                models.Q(user__is_superuser=True)
+            )
 
-        # organizations = req.GET.get('organizations[]')
-        # if organizations:
-        #     queryset = queryset.filter(organization_id__in=organizations)
+        organizations = req.GET.getlist('organizations[]')
+        if organizations:
+            queryset = queryset.filter(organization_id__in=organizations)
 
-        # user_status = req.GET.get('user_status')
-        # if user_status:
-        #     queryset = queryset.filter(user__is_active=user_status)
+        user_status = req.GET.get('user_status')
+        if user_status:
+            queryset = queryset.filter(user__is_active=user_status)
 
-        # is_admin = req.GET.get('admin_role')
-        # if is_admin:
-        #     queryset = queryset.filter(user__is_staff=is_admin)
+        is_admin = req.GET.get('admin_role')
+        if is_admin:
+            queryset = queryset.annotate(
+                country_admin=models.Exists(
+                    CountryAccess.objects.filter(
+                        tolauser_id=models.OuterRef('pk'),
+                        role=COUNTRY_ROLE_CHOICES[1][0]
+                    )
+                )
+            )
+            queryset = queryset.filter(
+                models.Q(user__is_superuser=True) |
+                models.Q(country_admin=True)
+            )
 
-        # users = req.GET.getlist('users[]')
-        # if users:
-        #     queryset = queryset.filter(id__in=users)
+        users = req.GET.getlist('users[]')
+        if users:
+            queryset = queryset.filter(id__in=users)
 
-        # program_counts = (
-        #     Program.objects.filter(programaccess__tolauser_id=OuterRef('id'))
-        #     | Program.objects.filter(country__in=OuterRef('countries'))
-        #     | Program.objects.filter(country=OuterRef('country'))
-        # ).distinct().order_by().values('id').annotate(c=Count('*')).values('c')
-
-        # queryset = queryset.annotate(user_programs=Subquery(program_counts))
-
-        # return queryset
-
-        params = []
-
-        country_join = ''
-        country_where = ''
-        if req.GET.getlist('countries[]'):
-            params.extend(req.GET.getlist('countries[]'))
-            params.extend(req.GET.getlist('countries[]'))
-            params.extend(req.GET.getlist('countries[]'))
-
-            #create placeholders for multiple countries and strip the trailing comma
-            in_param_string = ('%s,'*len(req.GET.getlist('countries[]')))[:-1]
-
-            country_join = """
-                            LEFT JOIN workflow_tolauser_countries wtuc ON wtuc.tolauser_id = wtu.id
-                            LEFT JOIN (
-                                SELECT
-                                    wc.id AS country_id,
-                                    wpua.tolauser_id AS tolauser_id
-                                FROM workflow_country wc
-                                INNER JOIN workflow_program_country wpc ON wc.id = wpc.country_id
-                                INNER JOIN workflow_program_user_access wpua ON wpua.program_id = wpc.program_id
-                                GROUP BY wpua.tolauser_id, wc.id
-                            ) cz ON cz.tolauser_id = wtu.id
-                            """
-            country_where = 'AND (wtuc.country_id IN ({}) OR wtu.country_id IN ({}) OR cz.country_id IN ({}))'.format(in_param_string, in_param_string, in_param_string)
-
-        base_country_where = ''
-        if req.GET.getlist('base_countries[]'):
-            params.extend(req.GET.getlist('base_countries[]'))
-
-            #create placeholders for multiple countries and strip the trailing comma
-            in_param_string = ('%s,'*len(req.GET.getlist('base_countries[]')))[:-1]
-
-            base_country_where = 'AND wtu.country_id IN ({})'.format(in_param_string)
-
-        program_join = ''
-        program_where = ''
-        if req.GET.getlist('programs[]'):
-            params.extend(req.GET.getlist('programs[]'))
-
-            #create placeholders for multiple programs and strip the trailing comma
-            in_param_string = ('%s,'*len(req.GET.getlist('programs[]')))[:-1]
-
-            program_join = """
-                INNER JOIN (
-                        SELECT
-                            wpua.tolauser_id,
-                            wpua.program_id
-                        FROM workflow_program_user_access wpua
-                    UNION DISTINCT
-                        SELECT
-                            wtuc.tolauser_id,
-                            wpc.program_id
-                        FROM workflow_tolauser_countries wtuc
-                        INNER JOIN workflow_program_country wpc ON wpc.country_id = wtuc.country_id
-                ) pz ON pz.tolauser_id = wtu.id
-            """
-            program_where = 'AND (pz.program_id IN ({}))'.format(in_param_string)
-
-        organization_where = ''
-        if req.GET.get('organizations[]'):
-            params.append(req.GET.get('organizations[]'))
-
-            organization_where = 'AND wtu.organization_id = %s'
-
-        user_status_where = ''
-        if req.GET.get('user_status'):
-            params.append(req.GET.get('user_status'))
-
-            user_status_where = 'AND au.is_active = %s'
-
-        admin_role_where = ''
-        if req.GET.get('admin_role'):
-            params.append(req.GET.get('admin_role'))
-
-            admin_role_where = 'AND au.is_staff = %s'
-
-        users_where = ''
-        if req.GET.getlist('users[]'):
-            params.extend(req.GET.getlist('users[]'))
-
-            #create placeholders for multiple countries and strip the trailing comma
-            in_param_string = ('%s,'*len(req.GET.getlist('users[]')))[:-1]
-
-            users_where = 'AND wtu.id IN ({})'.format(in_param_string)
-
-        return TolaUser.objects.raw("""
-            SELECT
-                wtu.id,
-                au.is_active AS is_active,
-                au.is_staff AS is_admin,
-                au.is_superuser AS is_super,
-                wtu.name,
-                wo.name AS organization_name,
-                wo.id AS organization_id,
-                COUNT(z.program_id) AS user_programs
-            FROM workflow_tolauser wtu
-            INNER JOIN auth_user au ON wtu.user_id = au.id
-            {country_join}
-            LEFT JOIN (
-                    SELECT
-                        wpua.tolauser_id,
-                        wpua.program_id
-                    FROM workflow_program_user_access wpua
-                UNION DISTINCT
-                    SELECT
-                        wtuc.tolauser_id,
-                        wpc.program_id
-                    FROM workflow_tolauser_countries wtuc
-                    INNER JOIN workflow_program_country wpc ON wpc.country_id = wtuc.country_id
-            ) z ON z.tolauser_id = wtu.id
-            {program_join}
-            LEFT JOIN workflow_organization wo ON wtu.organization_id = wo.id
-            WHERE
-                1=1
-                {country_where}
-                {base_country_where}
-                {program_where}
-                {organization_where}
-                {user_status_where}
-                {admin_role_where}
-                {users_where}
-            GROUP BY wtu.id
-            ORDER BY wtu.name
-        """.format(
-            country_join=country_join,
-            country_where=country_where,
-            base_country_where=base_country_where,
-            program_join=program_join,
-            program_where=program_where,
-            organization_where=organization_where,
-            user_status_where=user_status_where,
-            admin_role_where=admin_role_where,
-            users_where=users_where
-        ), params)
+        queryset = queryset.distinct()
+        return queryset
 
     def list(self, request):
         queryset = self.get_list_queryset()
 
-        #TODO write a more performant paginator, rather than converting the
-        #query to a list. For now, we're extremely performant with about 1000
-        #rows, so just convert to a list and paginate that way
-        page = self.paginate_queryset(list(queryset))
+        # if problems arise, replace this with page = self.paginate_queryset(list(queryset))
+        page = self.paginate_queryset(queryset)
         if page is not None:
-            serializer = UserAdminReportSerializer(page, many=True)
+            serializer = UserAdminReportSerializer(page, many=True)            
             return self.get_paginated_response(serializer.data)
 
         serializer = UserAdminReportSerializer(queryset, many=True)

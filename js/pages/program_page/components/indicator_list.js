@@ -41,6 +41,10 @@ function getStatusIndicatorString(filterType, indicatorCount) {
             // # Translators: shows what number of indicators are within a set range of target. Example: 3 indicators are on track
             fmts = ngettext("%s indicator is on track", "%s indicators are on track", indicatorCount);
             return interpolate(fmts, [indicatorCount]);
+        case IndicatorFilterType.nonReporting:
+            // # Translators: shows what number of indicators that for various reasons are not being reported for program metrics
+            fmts = ngettext("%s indicator is unavailable", "%s indicators are unavailable", indicatorCount);
+            return interpolate(fmts, [indicatorCount]);
 
         default:
             // # Translators: the number of indicators in a list. Example: 3 indicators
@@ -190,7 +194,6 @@ export class IndicatorListTable extends React.Component {
             <tr className="table-header">
                 <th className="" id="id_indicator_name_col_header">{gettext("Indicator")}</th>
                 <th className="" id="id_indicator_buttons_col_header">&nbsp;</th>
-                {!program.resultsFramework && <th className="" id="id_indicator_level_col_header">{gettext("Level")}</th>}
                 <th className="" id="id_indicator_unit_col_header">{gettext("Unit of measure")}</th>
                 <th className="text-right" id="id_indicator_baseline_col_header">{gettext("Baseline")}</th>
                 <th className="text-right" id="id_indicator_target_col_header">{gettext("Target")}</th>
@@ -255,7 +258,6 @@ export class IndicatorListTable extends React.Component {
                                onClick={(e) => this.onIndicatorUpdateClick(e, indicator.pk)}><i
                                 className="fas fa-cog"/></a>
                         </td>
-                        { !program.resultsFramework && <td>{ indicator.oldLevelDisplay }</td> }
                         <td>{indicator.unitOfMeasure}</td>
                         <td className="text-right">{ indicator.baseline === null ? gettext('N/A') : numberCellFunc(indicator.baseline) }</td>
                         <td className="text-right">{ numberCellFunc(indicator.lopTarget) }</td>
