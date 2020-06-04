@@ -384,7 +384,7 @@ const create_changeset_notice = ({
     showCloser = false,
 } = {}) => {
     var notice = PNotify.alert({
-        text: $(`<div><form action="" method="post" class="form container">${inner}</form></div>`).html(),
+        text: $(`<div><form action="" method="post" class="form">${inner}</form></div>`).html(),
         textTrusted: true,
         icon: false,
         width: '350px',
@@ -613,78 +613,78 @@ window.create_no_rationale_changeset_notice = ({
         context: context,
         rationale_required: false,
         showCloser: true
-        });
+    });
 }
 
 /*
-Consider using this notification function rather than the more specific ones above.  It should be able to
-everything they can do. The configurable parameters are for the 4 sections of the notification and
-for other visual and functional elements.
+* Consider using this notification function rather than the more specific ones above.  It should be able to
+* everything they can do. The configurable parameters are for the 4 sections of the notification and
+* for other visual and functional elements. Leave any of these null or false to omit them.
+* There is NO DEFAULT TEXT. You must explicitly provide text to text elements.
+*/
 
-- You can provide a header, leave it to default text, or override with a Warning icon and text.
-- The preamble can be specified, left to a default, or omitted by using the no_preamble parameter.
-- The message can be specified or left to a default.
-- Defaults to not including a rationale text box.
-
- */
 window.create_unified_changeset_notice = ({
-    include_warning = false,
-    header = gettext("Reason for change"),
-    preamble = false,
-    no_preamble = false,
-    on_submit = () => {},
-    on_cancel = () => {},
-    message_text = DEFAULT_DESTRUCTIVE_MESSAGE,
-    include_rationale = false,
-    showCloser = false,
+    header = null, // text for the header
+    show_icon = true, // show an appropriate icon in the header
+    message_text = null, // appears in black (body color) text
+    preamble = null, // appears in colored text below the header
+    on_submit = () => {}, // action to trigger on submit
+    on_cancel = () => {}, // action to trigger on cancel
+    rationale_required = true, // do not allow submission without writing a rationale
+    include_rationale = false, // shows rationale textarea
+    showCloser = true, // show close box
     // # Translators: Button to approve a form
     confirm_text = gettext('Ok'),
     // # Translators: Button to cancel a form submission
     cancel_text = gettext('Cancel'),
     context = null,
-    notice_type = 'error',
+    notice_type = 'notice', // possible values: error (danger/red), info (blue), success (green), notice (warning/yellow)
     blocking = true,
 } = {}) => {
-    let header_section = '';
-    if (include_warning){
-        header_section = `<div class="row">
-            <div class="col">
-                <h2 class="pnotify--header"><i class="fas fa-exclamation-triangle"></i>${gettext("Warning")}</h2>
-            </div>
-        </div>`
+
+    let header_icons = {
+        'error': 'fa-exclamation-triangle',
+        'info': 'fa-info-circle',
+        'success': 'fa-check-circle',
+        'notice': 'fa-exclamation-triangle',
     }
-    else {
-        header_section = `<div class="row">
-            <div class="col">
-                <h2>${header}</h2>
-            </div>
-        </div>`
+
+    let color_classes = {
+        'error': 'danger',
+        'info': 'info',
+        'success': 'success',
+        'notice': 'primary',
     }
-    if (!preamble) { preamble = (no_preamble)?'' : gettext("This action cannot be undone.") }
+
+    let icon = null;
+
+    if (show_icon) {
+        icon = `<i class="fas ${header_icons[notice_type]}"></i>`
+    }
+
+    const header_section = (header || icon) ?
+        `<header class="pnotify__header">
+            <h4>
+                ${icon}
+                ${header ? header : ''}
+            </h4>
+        </header>` : ''
+
     const preamble_section = !preamble ? '' :
-        `<div class="row">
-            <div class="col">
-                <span class='text-danger'>
-                    ${preamble}
-                </span>
-            </div>
-        </div>`;
-    const message_section =
-        `<div class="row mt-1">
-            <div class="col">
-                <span>
-                    ${message_text}
-                </span>
-            </div>
-        </div>`;
+        `<section class="pnotify__preamble">
+            <p><b>${preamble}</b></p>
+        </section>`;
+
+    const message_section = ! message_text ? '' :
+        `<section class="pnotify__message">
+            <p>${message_text}</p>
+        </section>`;
     const rationale_section = ! include_rationale ? '' :
-        `<div class="row">
-            <div class="col">
-                <div class="form-group">
-                    <textarea class="form-control" name="rationale"></textarea>
-                </div>
+        `<section class="pnotify__rationale">
+            <div class="form-group">
+                <textarea class="form-control" name="rationale"></textarea>
             </div>
-        </div>`;
+        </section>`;
 
     const inner = `
         ${header_section}
@@ -692,18 +692,115 @@ window.create_unified_changeset_notice = ({
         ${message_section}
         ${rationale_section}
     `;
-    return create_changeset_notice({
-        message_text: message_text,
-        on_submit: on_submit,
-        on_cancel: on_cancel,
-        confirm_text: confirm_text,
-        cancel_text: cancel_text,
+
+
+    // IMPORTANT TODO
+    // **************
+    // Following code cribs from create_changeset_notice
+    // I left create_changeset_notice untouched to avoid lots of regressions
+    // I think we should deprecate create_changeset_notice entirely
+
+    let confirm_button = {
+        text: confirm_text,
+        primary: true,
+        addClass: 'btn-sm btn-' + color_classes[notice_type],
+        click: function (notice) {
+            var close = true;
+            var textarea = $(notice.refs.elem).find('textarea[name="rationale"]')
+            var rationale = textarea.val();
+            textarea.parent().find('.invalid-feedback').remove();
+            if(!rationale && rationale_required) {
+                textarea.addClass('is-invalid');
+                textarea.parent().append(
+                    '<div class="invalid-feedback">'
+                    + gettext('A reason is required.')
+                    + '</div>'
+                );
+                return false;
+            } else {
+                textarea.removeClass('is-invalid');
+            }
+            if(on_submit) {
+                close = on_submit(rationale);
+                if(close === undefined) {
+                    close = true;
+                }
+            }
+            if(close) {
+                document.getElementById('notification_blocking_div').style.display='none';
+                notice.close();
+            }
+        }
+    }
+
+    let cancel_button = {
+        text: cancel_text,
+        addClass: 'btn-sm',
+        click: function (notice) {
+            close = on_cancel()
+            if(close === undefined) {
+                close = true;
+            }
+
+            if(close) {
+                document.getElementById('notification_blocking_div').style.display='none';
+                notice.close();
+            }
+        }
+    }
+
+    var changeset_buttons = []
+
+    if (confirm_text) {
+        changeset_buttons.push(confirm_button)
+    }
+
+    if (cancel_text) {
+        changeset_buttons.push(cancel_button)
+    }
+
+    var notice = PNotify.alert({
+        text: $(`<div><form action="" method="post" class="form">${inner}</form></div>`).html(),
+        textTrusted: true,
+        icon: false,
+        width: '350px',
+        hide: false,
         type: notice_type,
-        inner: inner,
-        context: context,
-        showCloser: showCloser,
-        blocking: blocking,
-    })
+        addClass: 'program-page__rationale-form',
+        stack: {
+            'overlayClose': true,
+            'dir1': 'right',
+            'dir2': 'up',
+            'firstpos1': 20,
+            'firstpos2': 20,
+            'context': context
+        },
+        modules: {
+            Buttons: {
+                closer: showCloser,
+                closerHover: false,
+                sticker: false
+            },
+            Confirm: {
+                align: 'flex-start',
+                confirm: true,
+                buttons: changeset_buttons
+            }
+        }
+    });
+    if (on_cancel) {
+        notice.on('click', function(e) {
+            if ($(e.target).is('.ui-pnotify-closer *')) {
+                let close = on_cancel();
+                if (close || close === undefined) {
+                    document.getElementById('notification_blocking_div').style.display='none';
+                    notice.close();
+                }
+        }});
+    }
+
+    // END CRIBBED CODE
+
 }
 
 const createPnotifyAlert = (passedInConfig) => {

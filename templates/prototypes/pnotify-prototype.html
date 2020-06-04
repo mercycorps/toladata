@@ -1,0 +1,102 @@
+{% extends "base.html" %}
+{% block content %}
+{# TODO: remove this file before merging into dev #}
+
+    <p><a href="#" class="btn btn-primary" id="default">Default</a></p>
+    <p><a href="#" class="btn btn-success" id="success">Success!</a></p>
+    <p><a href="#" class="btn btn-warning" id="notice">Notice!</a></p>
+    <p><a href="#" class="btn btn-danger" id="error">Error!</a></p>
+    <p><a href="#" class="btn btn-info" id="info">Info!</a></p>
+    <p><a href="#" class="btn btn-secondary" id="empty">Empty</a> (note: has no close button)</p>
+
+    <script>
+        function pnotifyMe(e) {
+            e.preventDefault();
+            window.create_unified_changeset_notice(e.data);
+        }
+
+        let empty_options = {
+            header: null,
+            show_icon: false,
+            preamble: null,
+            message_text: null,
+            // show_reason: false, // TODO
+            include_rationale: false,
+            showCloser: false,
+            confirm_text: null,
+            cancel_text: null,
+            context: null,
+            notice_type: 'info',
+            blocking: false,
+        };
+
+        let success_options = {
+            header: 'This is a success message',
+            show_icon: true,
+            preamble: 'You have invoked something successfully',
+            message_text: null,
+            // show_reason: false, // TODO
+            include_rationale: false,
+            showCloser: true,
+            confirm_text: null,
+            cancel_text: null,
+            context: null,
+            notice_type: 'success',
+            blocking: false,
+        };
+
+        let notice_options = {
+            header: 'This is a warning message',
+            show_icon: true,
+            preamble: 'Why are you doing this?',
+            message_text: 'Please rationalize yourself below.',
+            // show_reason: true, // TODO
+            include_rationale: true,
+            showCloser: true,
+            confirm_text: 'OK',
+            cancel_text: 'Cancel',
+            context: null,
+            notice_type: 'notice',
+            blocking: true,
+        };
+
+        let error_options = {
+            header: 'This looks dangerous',
+            show_icon: true,
+            preamble: 'This cannot be undone, are you sure?',
+            no_preamble: true,
+            message_text: 'Fly, you fools!',
+            // show_reason: false, // TODO
+            include_rationale: false,
+            showCloser: true,
+            confirm_text: 'Destroy!',
+            cancel_text: 'Nevermind',
+            context: null,
+            notice_type: 'error',
+            blocking: true,
+        };
+
+        let info_options = {
+            header: 'For your information…',
+            show_icon: true,
+            preamble: 'Let me tell you something boring',
+            no_preamble: true,
+            message_text: 'In a hole in the ground there lived a Hobbit.',
+            include_rationale: false,
+            showCloser: true,
+            confirm_text: 'You betcha',
+            cancel_text: 'Whatever',
+            context: null,
+            notice_type: 'info',
+            blocking: false,
+        };
+
+        $("#default").on("click", {}, pnotifyMe);
+        $("#empty").on("click", empty_options, pnotifyMe);
+        $("#success").on("click", success_options, pnotifyMe);
+        $("#notice").on("click", notice_options, pnotifyMe);
+        $("#error").on("click", error_options, pnotifyMe);
+        $("#info").on("click", info_options, pnotifyMe);
+
+    </script>
+{% endblock %}

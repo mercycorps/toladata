@@ -107,6 +107,7 @@
 @import 'components/sortable-list'; // Sortable list widget
 @import 'components/logframe'; // styling for logframe web view
 @import 'components/alert-banner'; // banners that appear at the top of the page; extend bootstrap alert class
+@import 'components/pnotify'; // overloads pnotify styles & adds our own
 
 /* Local custom CSS and overloads for non-BS libraries */
 @import 'mc_tola_forms'; // extremely custom!
