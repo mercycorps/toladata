@@ -1,4 +1,4 @@
-from factory import DjangoModelFactory, lazy_attribute, RelatedFactory
+from factory import DjangoModelFactory, lazy_attribute, RelatedFactory, Faker
 from django.template.defaultfilters import slugify
 
 
@@ -31,3 +31,13 @@ class Site(DjangoModelFactory):
 
     name = 'toladata.io'
     domain = 'toladata.io'
+
+
+class UserOnlyFactory(DjangoModelFactory):
+    class Meta:
+        model = 'auth.User'
+
+    first_name = Faker('first_name')
+    last_name = Faker('last_name')
+    email = Faker('ascii_email')
+    username = lazy_attribute(lambda o: slugify(o.first_name + '.' + o.last_name))

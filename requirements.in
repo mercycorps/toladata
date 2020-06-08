@@ -13,6 +13,7 @@ django-multiupload
 django-registration
 django-report-utils
 django-safedelete
+django-silk
 django-simple-history
 django-uuidfield
 django-widget-tweaks

@@ -23,10 +23,12 @@ class Picker extends React.Component {
     render() {
         let helpIcon = null;
         if (this.props.rootStore.uiStore.tierLockStatus == "locked"){
-
+            let firstTier = this.props.rootStore.levelStore.chosenTierSet[0];
+            let secondTier = this.props.rootStore.levelStore.chosenTierSet[1];
             helpIcon = <HelpPopover
                 key={1}
-                content={gettext('<span class="text-danger"><strong>The results framework template cannot be changed after levels are saved.</strong></span> To change templates, all saved levels first must be deleted.  A level can be deleted when it has no sub-levels and no linked indicators.')}
+                // # Translators: Warning message displayed to users explaining why they can't change a setting they could change before.
+                content={interpolate(gettext('<span class="text-danger"><strong>The results framework template is locked as soon as the first %(secondTier)s is saved.</strong></span> To change templates, all saved levels must be deleted except for the original %(firstTier)s. A level can only be deleted when it has no sub-levels and no linked indicators.'), {secondTier: secondTier, firstTier: firstTier}, true)}
             />
 
         }
@@ -34,7 +36,7 @@ class Picker extends React.Component {
 
             helpIcon = <HelpPopover
                 key={2}
-                content={gettext('<span class="text-danger"><strong>Choose your results framework template carefully!</strong></span> Once you begin building your framework, it will not be possible to change templates without first deleting all saved levels.')}
+                content={this.props.rootStore.uiStore.splashWarning}
             />
         }
 

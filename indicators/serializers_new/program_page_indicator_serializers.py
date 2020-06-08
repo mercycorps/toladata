@@ -21,6 +21,30 @@ from indicators.models import Indicator
 from tola.model_utils import get_serializer
 
 
+class NumberWithTierIndicatorMixin:
+    """Indicator serializer component to add the tier name to the number in case of manually numbered programs"""
+
+    # Helper fields for serializer method fields:
+    def get_long_number(self, indicator):
+        """overrides parent method to include tier if manually numbering"""
+        number = super().get_long_number(indicator)
+        if not indicator.using_results_framework:
+            level_name = self.get_old_level_name(indicator)
+            if not level_name:
+                return number
+            if not number:
+                return level_name
+            return f"{level_name} {number}"
+        if not (indicator.using_results_framework and indicator.manual_number_display) or not indicator.level_id:
+            return number
+        level = self._get_level(indicator)
+        if not level or not level['tier_name']:
+            return number
+        if not number:
+            return level['tier_name']
+        return f"{level['tier_name']} {number}"
+
+
 class ProgramPageIndicatorMixin:
     """Indicator serializer component to add all Program Page information to a given indicator set"""
     was_just_created = serializers.BooleanField(source="just_created")
@@ -81,12 +105,14 @@ class ProgramPageIndicatorMixin:
 
 ProgramPageIndicatorSerializer = get_serializer(
     ProgramPageIndicatorMixin,
+    NumberWithTierIndicatorMixin,
     IndicatorMeasurementMixin,
     IndicatorOrderingMixin,
     IndicatorBaseSerializerMixin
 )
 
 ProgramPageIndicatorOrderingSerializer = get_serializer(
+    NumberWithTierIndicatorMixin,
     IndicatorOrderingMixin,
     IndicatorBaseSerializerMixin
 )

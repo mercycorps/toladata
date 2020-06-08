@@ -261,7 +261,7 @@ class TestProgramPageSerializersFunctional(test.TestCase):
         self.assertEqual(expected_pks, indicator_pks)
         for (old_level, number), pk in zip(old_levels_numbers, pks):
             indicator_data = data['indicators'][pk]
-            self.assertEqual(indicator_data['number'], u'{}'.format(number))
+            self.assertEqual(indicator_data['number'], u'{} {}'.format(old_level, number))
             self.assertEqual(indicator_data['old_level_name'], old_level)
             self.assertTrue(indicator_data['is_reporting'])
             self.assertEqual(indicator_data['over_under'], 1)
@@ -339,6 +339,7 @@ class TestProgramPageSerializersFunctional(test.TestCase):
         )
         numbers = ['482', '28.C', '999']
         pks = []
+        tiers = []
         for level, number in zip(list(reversed(levels)), numbers):
             pks.append(
                 RFIndicatorFactory(
@@ -347,14 +348,16 @@ class TestProgramPageSerializersFunctional(test.TestCase):
                     number=number
                 ).pk
             )
+            tiers.append(level.leveltier.name)
         expected_pks = list(reversed(pks))
         expected_numbers = list(reversed(numbers))
+        expected_tiers = list(reversed(tiers))
         data = self.get_serialized_data(p.pk)
         self.assertEqual(len(data['indicators']), 3)
         self.assertEqual(data['indicator_pks_level_order'], expected_pks)
         self.assertEqual(data['indicator_pks_chain_order'], expected_pks)
-        for pk, number in zip(expected_pks, expected_numbers):
-            self.assertEqual(data['indicators'][pk]['number'], number)
+        for pk, number, tier in zip(expected_pks, expected_numbers, expected_tiers):
+            self.assertEqual(data['indicators'][pk]['number'], f"{tier} {number}")
 
     def test_rollups(self):
         p = RFProgramFactory()
