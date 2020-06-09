@@ -3,7 +3,10 @@
 
 {% block title %}{% trans "Error 400: bad request" %}{% endblock %}
 
-{% block page_title %}{% trans "Error 400: bad request" %}{% endblock page_title %}
+{% block page_title %}
+    <i class="fas fa-bug text-danger display-4"></i>
+    {% trans "Error 400: bad request" %}
+{% endblock page_title %}
 
 {% block content %}
 

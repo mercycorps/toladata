@@ -3,7 +3,10 @@
 
 {% block title %}{% trans "Error 500: internal server error" %}{% endblock %}
 
-{% block page_title %}{% trans "Error 500: internal server error"  %}{% endblock %}
+{% block page_title %}
+    <i class="fas fa-robot text-danger display-4"></i>
+    {% trans "Error 500: internal server error"  %}
+{% endblock %}
 
 {% block content %}
 

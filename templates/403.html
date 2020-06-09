@@ -3,7 +3,10 @@
 
 {% block title %}{% trans "Additional Permissions Required" %}{% endblock %}
 
-{% block page_title %}{% trans "You need permission to view this page." %}{% endblock page_title %}
+{% block page_title %}
+    <i class="fas fa-user-secret text-dark display-4"></i>
+    {% trans "You need permission to view this page." %}
+{% endblock page_title %}
 
 {% block content %}
 <p>
