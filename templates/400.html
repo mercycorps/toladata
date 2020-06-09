@@ -1,11 +1,16 @@
 {% extends "base.html" %}
-{% load i18n %}
+{% load i18n static %}
 
-{% block title %}Page Not found{% endblock %}
+{% block title %}{% trans "Error 400: bad request" %}{% endblock %}
 
-{% block page_title %}Page Not found{% endblock page_title %}
+{% block page_title %}{% trans "Error 400: bad request" %}{% endblock page_title %}
 
 {% block content %}
-<p>{% trans "This is not the page you were looking for, you may be lost."|escapejs %}</p>
-<img src="{{ STATIC_URL }}img/Portland-404.png" border="1">
+
+<p>
+    {% blocktrans %}
+    There was a problem loading this page. This is likely to be a problem with the request sent by your web browser, but it is not your fault.  Please try reloading this page. If this problem persists, please <a href="https://learn.mercycorps.org/index.php/TOLA:Section_06/en">contact the TolaData team.</a>"
+    {% endblocktrans %}
+</p>
+
 {% endblock content %}
