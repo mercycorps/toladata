@@ -640,6 +640,8 @@ window.create_unified_changeset_notice = ({
     context = null,
     notice_type = 'notice', // possible values: error (danger/red), info (blue), success (green), notice (warning/yellow)
     blocking = true,
+    self_dismissing = false, // automatically hides the notice after 8000 ms (default). NOTE: this is the OPPOSITE behavior as default PNotify
+    dismiss_delay = 8000, // also PNotify default
 } = {}) => {
 
     let header_icons = {
@@ -764,7 +766,8 @@ window.create_unified_changeset_notice = ({
         textTrusted: true,
         icon: false,
         width: '350px',
-        hide: false,
+        hide: self_dismissing,
+        delay: dismiss_delay,
         type: notice_type,
         addClass: 'program-page__rationale-form',
         stack: {
