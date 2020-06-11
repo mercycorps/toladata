@@ -4,16 +4,16 @@
 {% block title %}{% trans "Page not found" %}{% endblock %}
 
 {% block page_title %}
-    <i class="fas fa-map-signs text-primary display-4"></i>
+    <i class="fas fa-map-signs text-secondary display-4"></i>
     {% trans "Page not found" %}
 {% endblock page_title %}
 
 {% block content %}
 
+{% blocktrans %}
 <p>
-    {% blocktrans %}
-    We can’t find the page you’re trying to visit. Please try returning to the homepage. If this problem persists, please <a href="https://learn.mercycorps.org/index.php/TOLA:Section_06/en">contact the TolaData team.</a>
-    {% endblocktrans %}
+    We can’t find the page you’re trying to visit. If this problem persists, please <a href="https://learn.mercycorps.org/index.php/TOLA:Section_06/en">contact the TolaData team.</a>
 </p>
+{% endblocktrans %}
 
 {% endblock content %}

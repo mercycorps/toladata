@@ -4,16 +4,22 @@
 {% block title %}{% trans "Error 500: internal server error" %}{% endblock %}
 
 {% block page_title %}
-    <i class="fas fa-robot text-danger display-4"></i>
-    {% trans "Error 500: internal server error"  %}
+    <i class="fas fa-robot text-secondary display-4"></i>
+    {% trans "There was a server-related problem"  %}
 {% endblock %}
 
 {% block content %}
 
+{% blocktrans %}
 <p>
-    {% blocktrans %}
-    There was a problem loading this page. This is likely to be a problem with the server, and not your web browser.  If you need assistance, please <a href="https://learn.mercycorps.org/index.php/TOLA:Section_06/en">contact the TolaData team.</a>
-    {% endblocktrans %}
+    There was a problem loading this page, most likely with the server. We’re sorry for the trouble.
 </p>
+<p>
+    If you need assistance, please <a href="https://learn.mercycorps.org/index.php/TOLA:Section_06/en">contact the TolaData team.</a>
+</p>
+<p>
+    <code class="text-secondary">[Error 500: internal server error]</code>
+</p>
+{% endblocktrans %}
 
 {% endblock %}
