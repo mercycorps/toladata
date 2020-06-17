@@ -372,7 +372,7 @@ class ProgramAuditLog(models.Model, DiffableLog):
         return self.change_type_map.get(self.change_type, self.change_type)
 
     @property
-    def rationale_types(self):
+    def rationale_selected_options(self):
         if not self.rationale_selections:
             return []
         return self.rationale_selections.pretty_list
