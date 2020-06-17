@@ -362,9 +362,19 @@
                     }
                 });
             } else {
-                window.create_nondestructive_changeset_notice({
+                window.create_unified_changeset_notice({
+                    header: "Reason for change",
+                    show_icon: false,
+                    message_text: window.DEFAULT_NONDESTRUCTIVE_MESSAGE,
+                    rationale_required: true,
+                    include_rationale: true,
+                    rfc_required: true,
+                    rfc_options: ['first', 'second'],
+                    validation_type: 1,
+                    showCloser: false,
+                    no_preamble: true,
                     context: document.getElementById('indicator_update_form'),
-                    on_submit: (rationale) => {
+                    on_submit: (rationale, reason_for_change) => {
                         submitFormUpdate(rationale);
                     }
                 });

@@ -358,6 +358,10 @@ const DEFAULT_DESTRUCTIVE_MESSAGE = gettext("Your changes will be recorded in a 
 const DEFAULT_NONDESTRUCTIVE_MESSAGE = gettext('Your changes will be recorded in a change log. For future reference, please share your reason for these changes.')
 const DEFAULT_NO_RATIONALE_TEXT = gettext("This action cannot be undone");
 
+window.DEFAULT_DESTRUCTIVE_MESSAGE = DEFAULT_DESTRUCTIVE_MESSAGE;
+window.DEFAULT_NONDESTRUCTIVE_MESSAGE = DEFAULT_NONDESTRUCTIVE_MESSAGE;
+window.DEFAULT_NO_RATIONALE_TEXT = DEFAULT_NO_RATIONALE_TEXT;
+
 // This is only until we get indicator_form_common_js moved to webpack and out of html (makemessages bug)
 // these translation strings are used exclusively in the indicator setup form:
 const target_with_results_text = (numResults) => {
@@ -630,8 +634,11 @@ window.create_unified_changeset_notice = ({
     preamble = null, // appears in colored text below the header
     on_submit = () => {}, // action to trigger on submit
     on_cancel = () => {}, // action to trigger on cancel
-    rationale_required = true, // do not allow submission without writing a rationale
+    rfc_required = true, // is reason for change required (can be overridden by validation_type)
+    rfc_options = [], // reason for change dropdown options
+    rationale_required = true, // do not allow submission without writing a rationale (can be overridden by validation_type)
     include_rationale = false, // shows rationale textarea
+    validation_type = 0, // Types - 0: use paramaters/defaults, 1: rationale is optional if rfc is chosen, unless rfc value is other
     showCloser = true, // show close box
     // # Translators: Button to approve a form
     confirm_text = gettext('Ok'),
@@ -649,16 +656,16 @@ window.create_unified_changeset_notice = ({
         'info': 'fa-info-circle',
         'success': 'fa-check-circle',
         'notice': 'fa-exclamation-triangle',
-    }
+    };
 
     let color_classes = {
         'error': 'danger',
         'info': 'info',
         'success': 'success',
         'notice': 'primary',
-    }
+    };
 
-    let icon = null;
+    let icon = '';
 
     if (show_icon) {
         icon = `<i class="fas ${header_icons[notice_type]}"></i>`
@@ -670,7 +677,7 @@ window.create_unified_changeset_notice = ({
                 ${icon}
                 ${header ? header : ''}
             </h4>
-        </header>` : ''
+        </header>` : '';
 
     const preamble_section = !preamble ? '' :
         `<section class="pnotify__preamble">
@@ -681,10 +688,34 @@ window.create_unified_changeset_notice = ({
         `<section class="pnotify__message">
             <p>${message_text}</p>
         </section>`;
+
+    let rfc_section = '';
+    if (rfc_options.length > 0) {
+        let options_html = rfc_options.reduce( (acc, option) => acc += `<option value=${option}>${option}</option>`, '');
+        options_html += "<option disabled>----------</option>";
+        // # Translators: "Other" is an option in a dropdown menu that allows users to specify an alternative to the default options
+        options_html += `<option value="other">${gettext("Other")}</option>`;
+        // # Translators: This is a label for a dropdown that presents several possible justifications for changing a value
+        const rfc_label = `<label>${gettext("Reason for change")}</label>`;
+        rfc_section =
+            `<section class="pnotify__reason-for-change">
+                <div class="form-group">
+                    ${rfc_label}
+                    <select multiple class="form-control" name="reason_for_change">
+                      ${options_html}
+                    </select>
+                </div>
+            </section>`;
+
+    }
+
+    // # Translators: This is the label for a textbox where a user can provide details about their reason for selecting a particular option
+    const rationale_label = rfc_options.length > 0 ?  `<label>${gettext("Details")}</label>` : '';
     const rationale_section = ! include_rationale ? '' :
         `<section class="pnotify__rationale">
             <div class="form-group">
-                <textarea class="form-control" name="rationale"></textarea>
+                ${rationale_label}
+                <textarea class="form-control" name="rationale" />
             </div>
         </section>`;
 
@@ -692,6 +723,7 @@ window.create_unified_changeset_notice = ({
         ${header_section}
         ${preamble_section}
         ${message_section}
+        ${rfc_section}
         ${rationale_section}
     `;
 
@@ -707,11 +739,34 @@ window.create_unified_changeset_notice = ({
         primary: true,
         addClass: 'btn-sm btn-' + color_classes[notice_type],
         click: function (notice) {
-            var close = true;
-            var textarea = $(notice.refs.elem).find('textarea[name="rationale"]')
-            var rationale = textarea.val();
+            let close = true;
+            let textarea = $(notice.refs.elem).find('textarea[name="rationale"]');
             textarea.parent().find('.invalid-feedback').remove();
-            if(!rationale && rationale_required) {
+            let rationale = textarea.val();
+            let rfc_select  = $(notice.refs.elem).find('select[name="reason_for_change"]');
+            let reason_for_change = rfc_select.val();
+            let is_valid = false;
+            if (validation_type === 0 &&
+                (!rationale && rationale_required) ||
+                (reason_for_change.length === 0 && rfc_required)) {
+                    is_valid = false;
+            }
+            else {
+                is_valid = true;
+            }
+
+            if (validation_type === 1 &&
+                (!rationale && (reason_for_change.length === 0 || reason_for_change.indexOf("other") >= 0))) {
+                    is_valid = false;
+            }
+            else {
+                is_valid = true;
+            }
+
+
+            if (is_valid){
+                textarea.removeClass('is-invalid');
+            } else {
                 textarea.addClass('is-invalid');
                 textarea.parent().append(
                     '<div class="invalid-feedback">'
@@ -719,11 +774,9 @@ window.create_unified_changeset_notice = ({
                     + '</div>'
                 );
                 return false;
-            } else {
-                textarea.removeClass('is-invalid');
             }
             if(on_submit) {
-                close = on_submit(rationale);
+                close = on_submit(rationale, reason_for_change);
                 if(close === undefined) {
                     close = true;
                 }
@@ -791,6 +844,11 @@ window.create_unified_changeset_notice = ({
             }
         }
     });
+
+    // $('.pnotify__reason-for-change').multiselect();
+
+
+
     if (on_cancel) {
         notice.on('click', function(e) {
             if ($(e.target).is('.ui-pnotify-closer *')) {
