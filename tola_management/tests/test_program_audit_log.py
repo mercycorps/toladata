@@ -258,7 +258,7 @@ class TestIndicatorAuditLog(test.TestCase):
         self.assertEqual(audits.count(), 1)
         audit = audits.first()
         self.assertEqual(audit.pretty_change_type, "Indicator created")
-        self.assertEqual(audit.rationale_types, [])
+        self.assertEqual(audit.rationale_selected_options, [])
         self.assertEqual(audit.rationale, "N/A")
 
     def test_indicator_update_is_logged_with_just_rationale(self):
@@ -279,7 +279,7 @@ class TestIndicatorAuditLog(test.TestCase):
         self.assertEqual(audits.count(), 1)
         audit = audits.first()
         self.assertEqual(audit.pretty_change_type, "Indicator changed")
-        self.assertEqual(audit.rationale_types, [])
+        self.assertEqual(audit.rationale_selected_options, [])
         self.assertEqual(audit.rationale, "This is a rationale")
 
     def test_indicator_update_is_logged_with_rationale_option_other(self):
@@ -301,7 +301,7 @@ class TestIndicatorAuditLog(test.TestCase):
         self.assertEqual(audits.count(), 1)
         audit = audits.first()
         self.assertEqual(audit.pretty_change_type, "Indicator changed")
-        self.assertEqual(audit.rationale_types, ["Other",])
+        self.assertEqual(audit.rationale_selected_options, ["Other",])
         self.assertEqual(audit.rationale, "This is a rationale")
 
     def test_indicator_update_is_logged_with_non_other_rationale_options(self):
@@ -322,7 +322,7 @@ class TestIndicatorAuditLog(test.TestCase):
         self.assertEqual(audits.count(), 1)
         audit = audits.first()
         self.assertEqual(audit.pretty_change_type, "Indicator changed")
-        self.assertEqual(audit.rationale_types, ["Adaptive management", "Changes in context"])
+        self.assertEqual(audit.rationale_selected_options, ["Adaptive management", "Changes in context"])
         self.assertIsNone(audit.rationale)
 
     def test_indicator_update_is_logged_with_rationale_options_and_rationale(self):
@@ -344,7 +344,7 @@ class TestIndicatorAuditLog(test.TestCase):
         self.assertEqual(audits.count(), 1)
         audit = audits.first()
         self.assertEqual(audit.pretty_change_type, "Indicator changed")
-        self.assertEqual(audit.rationale_types, ["Budget realignment", "Changes in context", "Other"])
+        self.assertEqual(audit.rationale_selected_options, ["Budget realignment", "Changes in context", "Other"])
         self.assertEqual(audit.rationale, "Test rationale")
 
     def test_indicator_update_is_logged_with_non_other_rationale_options_and_rationale(self):
@@ -367,7 +367,7 @@ class TestIndicatorAuditLog(test.TestCase):
         self.assertEqual(audits.count(), 1)
         audit = audits.first()
         self.assertEqual(audit.pretty_change_type, "Indicator changed")
-        self.assertEqual(audit.rationale_types, ["COVID-19"])
+        self.assertEqual(audit.rationale_selected_options, ["COVID-19"])
         self.assertEqual(audit.rationale, SPECIAL_CHARS)
 
     def test_indicator_update_fails_validation(self):
@@ -424,6 +424,88 @@ class TestIndicatorAuditLog(test.TestCase):
             expected_options
             )
         self.assertContains(response, 'var reason_for_change_options')
-                
-            
-        
+
+
+class TestAuditLogRationaleSelectionsDisplay(test.TestCase):
+
+    @classmethod
+    def setUpClass(cls):
+        super().setUpClass()
+        cls.country = w_factories.CountryFactory(country="Test Country", code="TC")
+        cls.program = w_factories.RFProgramFactory(name="Test Program")
+        cls.program.country.add(cls.country)
+        cls.tola_user = w_factories.NewTolaUserFactory(country=cls.country)
+        w_factories.grant_country_access(cls.tola_user, cls.country, COUNTRY_ROLE_CHOICES[1][0])
+
+    def setUp(self):
+        self.indicator = i_factories.RFIndicatorFactory(
+            targets=100, program=self.program, results=True, is_cumulative=False
+        )
+        self.client.force_login(user=self.tola_user.user)
+
+    def get_update_audit_log(self, rationale=None, rationale_options=None):
+        old_indicator_values = self.indicator.logged_fields
+        self.indicator.is_cumulative = True
+        self.indicator.save()
+        args = [self.tola_user.user, self.indicator, old_indicator_values, self.indicator.logged_fields]
+        kwargs = {}
+        if rationale and rationale_options is None:
+            args.append(rationale)
+        elif rationale:
+            kwargs['rationale'] = rationale
+        if rationale_options:
+            kwargs['rationale_options'] = rationale_options
+        ProgramAuditLog.log_indicator_updated(*args, **kwargs)
+
+    def fetch_audit_log_single(self):
+        response = self.client.get(reverse('tolamanagementprograms-audit-log', kwargs={'pk': self.program.pk}))
+        self.assertIn('results', response.json())
+        self.assertEqual(len(response.json()['results']), 1)
+        return response.json()['results'][0]
+
+    def test_indicator_create_audit_log(self):
+        new_indicator = i_factories.RFIndicatorFactory(program=self.program)
+        ProgramAuditLog.log_indicator_created(
+            self.tola_user.user,
+            new_indicator,
+            'N/A'
+        )
+        result = self.fetch_audit_log_single()
+        self.assertEqual(result['pretty_change_type'], 'Indicator created')
+        self.assertEqual(result['rationale'], 'N/A')
+        self.assertEqual(result['rationale_selected_options'], [])
+
+    def test_indicator_update_audit_log_rationale_string_only(self):
+        self.get_update_audit_log("This is a rationale")
+        result = self.fetch_audit_log_single()
+        self.assertEqual(result['pretty_change_type'], 'Indicator changed')
+        self.assertEqual(result['rationale'], 'This is a rationale')
+        self.assertEqual(result['rationale_selected_options'], [])
+
+    def test_indicator_update_audit_log_rationale_other_and_string(self):
+        self.get_update_audit_log("This is a rationale", [1])
+        result = self.fetch_audit_log_single()
+        self.assertEqual(result['pretty_change_type'], 'Indicator changed')
+        self.assertEqual(result['rationale'], 'This is a rationale')
+        self.assertEqual(result['rationale_selected_options'], ['Other'])
+
+    def test_indicator_update_audit_log_rationale_just_option(self):
+        self.get_update_audit_log(rationale_options=[3])
+        result = self.fetch_audit_log_single()
+        self.assertEqual(result['pretty_change_type'], 'Indicator changed')
+        self.assertEqual(result['rationale'], None)
+        self.assertEqual(result['rationale_selected_options'], ['Budget realignment'])
+
+    def test_indicator_update_audit_log_rationale_multiple_options(self):
+        self.get_update_audit_log(rationale_options=[6, 8])
+        result = self.fetch_audit_log_single()
+        self.assertEqual(result['pretty_change_type'], 'Indicator changed')
+        self.assertEqual(result['rationale'], None)
+        self.assertEqual(result['rationale_selected_options'], ['COVID-19', 'Implementation delays'])
+
+    def test_indicator_update_audit_log_rationale_multiple_options_and_rationale(self):
+        self.get_update_audit_log(rationale="Test rationale", rationale_options=[1, 6])
+        result = self.fetch_audit_log_single()
+        self.assertEqual(result['pretty_change_type'], 'Indicator changed')
+        self.assertEqual(result['rationale'], 'Test rationale')
+        self.assertEqual(result['rationale_selected_options'], ['COVID-19', 'Other'])
