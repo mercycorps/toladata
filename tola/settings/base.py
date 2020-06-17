@@ -202,6 +202,7 @@ MIDDLEWARE = (
     'simple_history.middleware.HistoryRequestMiddleware',
     'social_django.middleware.SocialAuthExceptionMiddleware',
     'tola.middleware.TimingMiddleware',
+    'tola_management.middleware.GlobalConstantsMiddleware',
     #'debug_toolbar.middleware.DebugToolbarMiddleware',
 )
 ########## END MIDDLEWARE CONFIGURATION
