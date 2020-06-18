@@ -845,7 +845,7 @@ window.create_unified_changeset_notice = ({
         }
     });
 
-    // $('.pnotify__reason-for-change').multiselect();
+    $('.pnotify__reason-for-change select').multiselect();
 
 
 
