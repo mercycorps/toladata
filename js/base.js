@@ -701,7 +701,7 @@ window.create_unified_changeset_notice = ({
             `<section class="pnotify__reason-for-change">
                 <div class="form-group">
                     ${rfc_label}
-                    <select multiple class="form-control" name="reason_for_change">
+                    <select multiple class="form-control" name="reasons_for_change">
                       ${options_html}
                     </select>
                 </div>
@@ -743,12 +743,12 @@ window.create_unified_changeset_notice = ({
             let textarea = $(notice.refs.elem).find('textarea[name="rationale"]');
             textarea.parent().find('.invalid-feedback').remove();
             let rationale = textarea.val();
-            let rfc_select  = $(notice.refs.elem).find('select[name="reason_for_change"]');
-            let reason_for_change = rfc_select.val();
+            let rfc_select  = $(notice.refs.elem).find('select[name="reasons_for_change"]');
+            let reasons_for_change = rfc_select.val();
             let is_valid = false;
             if (validation_type === 0 &&
                 (!rationale && rationale_required) ||
-                (reason_for_change.length === 0 && rfc_required)) {
+                (reasons_for_change.length === 0 && rfc_required)) {
                     is_valid = false;
             }
             else {
@@ -756,7 +756,7 @@ window.create_unified_changeset_notice = ({
             }
 
             if (validation_type === 1 &&
-                (!rationale && (reason_for_change.length === 0 || reason_for_change.indexOf("other") >= 0))) {
+                (!rationale && (reasons_for_change.length === 0 || reasons_for_change.indexOf("other") >= 0))) {
                     is_valid = false;
             }
             else {
@@ -775,8 +775,9 @@ window.create_unified_changeset_notice = ({
                 );
                 return false;
             }
+
             if(on_submit) {
-                close = on_submit(rationale, reason_for_change);
+                close = on_submit(rationale, reasons_for_change, validation_type);
                 if(close === undefined) {
                     close = true;
                 }
