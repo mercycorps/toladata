@@ -350,15 +350,23 @@
             showValidations("#modalmessages");
             return;
         }
-
         if(indicatorHasResults() && hasTrackedFieldsChanged()) {
             if(hasTargetsChanged()) {
-                window.create_destructive_changeset_notice({
-                    message_text: MODIFY_TARGETS_MESSAGE,
+                window.create_unified_changeset_notice({
+                    header: "Warning",
+                    show_icon: false,
+                    message_text: window.MODIFY_TARGETS_MESSAGE,
+                    rationale_required: true,
+                    include_rationale: true,
+                    rfc_required: true,
+                    rfc_options: ['first', 'second'],
+                    validation_type: 1,
+                    showCloser: false,
                     no_preamble: true,
                     context: document.getElementById('indicator_update_form'),
-                    on_submit: (rationale) => {
-                        submitFormUpdate(rationale);
+                    notice_type: 'error',
+                    on_submit: (rationale, reasons_for_change, validation_type) => {
+                        submitFormUpdate(rationale, reasons_for_change, validation_type);
                     }
                 });
             } else {
@@ -374,17 +382,27 @@
                     showCloser: false,
                     no_preamble: true,
                     context: document.getElementById('indicator_update_form'),
-                    on_submit: (rationale, reason_for_change) => {
-                        submitFormUpdate(rationale);
+                    on_submit: (rationale, reasons_for_change, validation_type) => {
+                        submitFormUpdate(rationale, reasons_for_change, validation_type);
                     }
                 });
             }
             scrollToIndicatorFormBottom();
         } else if (hasLevelBeenUpdatedOrCleared()) {
-            window.create_nondestructive_changeset_notice({
+            window.create_unified_changeset_notice({
+                header: "Reason for change",
+                show_icon: false,
+                message_text: window.DEFAULT_NONDESTRUCTIVE_MESSAGE,
+                rationale_required: true,
+                include_rationale: true,
+                rfc_required: true,
+                rfc_options: ['first', 'second'],
+                validation_type: 1,
+                showCloser: false,
+                no_preamble: true,
                 context: document.getElementById('indicator_update_form'),
-                on_submit: (rationale) => {
-                    submitFormUpdate(rationale);
+                on_submit: (rationale, reasons_for_change, validation_type) => {
+                    submitFormUpdate(rationale, reasons_for_change, validation_type);
                 }
             });
         } else {
@@ -504,7 +522,7 @@
 
     // submits form - returns a jQuery deferred obj to attached callbacks onto
     // only has code shared by both CREATE and UPDATE
-    function submitForm(rationale = '') {
+    function submitForm(rationale='', reasons_for_change='', validation_type='') {
         // clear any success/failure messages
         let alertElement = "#modalmessages";
         $(alertElement).html('');
@@ -521,8 +539,10 @@
             formArr.push({name: 'is_cumulative', value: 3});
         }
 
-        // user entered rationale for change
+        // user entered rationale and reason for change dropdown values
         formArr.push({name: 'rationale', value: rationale});
+        formArr.push({name: 'reasons_for_change', value: JSON.stringify(reasons_for_change)});
+        formArr.push({name: 'validation_type', value: validation_type});
 
         // If LoP target not explicit, submit computed value
         if (formArr.find(e => e.name === 'lop_target') === undefined) {
@@ -555,8 +575,8 @@
     }
 
     // Submit the UPDATE form
-    function submitFormUpdate(rationale = '') {
-        return submitForm(rationale).done((data) => {
+    function submitFormUpdate(rationale = '', reasons_for_change='', validation_type='') {
+        return submitForm(rationale, reasons_for_change, validation_type).done((data) => {
             $('#indicator_modal_div').trigger('updated.tola.indicator.save', saveEventParams());
 
             // Clear any validation error messages
