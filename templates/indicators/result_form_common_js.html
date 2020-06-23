@@ -400,11 +400,11 @@
         }
 
         // configure and launch the PNotify warning/rationale prompt
-        let messageText = "";
-        let preambleText = "";
-        let no_preamble = false;
+        let messageText = null;
+        let preambleText = null;
+        let header = gettext("Warning");
+        let show_icon = true;
 
-        let include_warning = true;
 
         if (! disaggsValid ) {
             if (result_is_new) {
@@ -418,19 +418,18 @@
         }
         else {
             messageText = MODIFY_RESULT_MESSAGE;
-            include_warning = false;
-            no_preamble = true;
+            header = gettext("Reason for change");
         }
 
         window.create_unified_changeset_notice({
             preamble: preambleText,
-            no_preamble: no_preamble,
             message_text: messageText,
             context: document.getElementById('result_update_form'),
             on_submit: save,
             notice_type: "notice",
             include_rationale: true,
-            include_warning: include_warning,
+            header: header,
+            show_icon: show_icon,
         });
 
         scrollToResultFormBottom();
