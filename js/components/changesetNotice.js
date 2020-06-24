@@ -1,28 +1,53 @@
+import { RFC_OPTIONS } from '../constants';
 
 const create_rfc_dropdown = ({
-    rfc_options = [],
-    rfc_default = false
-} = {}) = {
-    let rfc_section = '';
-    if (rfc_options.length > 0) {
-        let options_html = rfc_options.reduce( (acc, option) => acc += `<option value=${option}>${option}</option>`, '');
-        options_html += "<option disabled>----------</option>";
-        // # Translators: "Other" is an option in a dropdown menu that allows users to specify an alternative to the default options
-        options_html += `<option value="other">${gettext("Other")}</option>`;
-        // # Translators: This is a label for a dropdown that presents several possible justifications for changing a value
-        const rfc_label = `<label>${gettext("Reason for change")}</label>`;
-        rfc_section =
-            `<section class="pnotify__reason-for-change">
-                <div class="form-group">
-                    ${rfc_label}
-                    <select multiple class="form-control" name="reasons_for_change">
-                      ${options_html}
-                    </select>
-                </div>
-            </section>`;
-
+    custom_rfc_options = null,
+} = {}) => {
+    let options = custom_rfc_options || RFC_OPTIONS;
+    if (!options) {
+        return '';
     }
+    let rfc_section = document.createElement('section');
+    rfc_section.classList.add('pnotify__reason-for-change');
+    let form_div = document.createElement('div');
+    form_div.classList.add('form-group');
+    let label = document.createElement('label');
+    // # Translators: This is a label for a dropdown that presents several possible justifications for changing a value
+    label.appendChild(document.createTextNode(gettext('Reason for change')));
+    label.htmlFor = 'reasons_for_change_select';
+    form_div.appendChild(label);
+    let select = document.createElement('select');
+    select.name = 'reasons_for_change';
+    select.id = 'reasons_for_change_select';
+    select.setAttribute('multiple', '');
+    select.classList.add('form-control');
+    for (let i=0; i<options.length; i++) {
+        let optionElement = document.createElement('option');
+        optionElement.value = options[i].value;
+        optionElement.label = options[i].label;
+        optionElement.text = options[i].label;
+        if (i == options.length-1) {
+            let divider = document.createElement('option');
+            divider.setAttribute('data-role', 'divider');
+            select.appendChild(divider);
+        }
+        select.appendChild(optionElement);
+    }
+    form_div.appendChild(select);
+    rfc_section.appendChild(form_div);
     return rfc_section;
+}
+
+const create_changeset_form = ({
+    header = null,
+    show_icon = true,
+    message_text = null,
+    preamble = null,
+    rfc_options = null,
+    include_rationale = false
+} = {}) => {
+    const div = document.createElement('div');
+    return div;
 }
 
 /*
@@ -40,8 +65,7 @@ const create_unified_changeset_notice = ({
     on_submit = () => {}, // action to trigger on submit
     on_cancel = () => {}, // action to trigger on cancel
     rfc_required = true, // is reason for change required (can be overridden by validation_type)
-    rfc_options = [], // reason for change dropdown options
-    rfc_default = false,
+    rfc_options = null, // reason for change dropdown options or true for default
     rationale_required = true, // do not allow submission without writing a rationale (can be overridden by validation_type)
     include_rationale = false, // shows rationale textarea
     validation_type = 0, // Types - 0: use paramaters/defaults, 1: rationale is optional if rfc is chosen, unless rfc value is other
@@ -272,5 +296,6 @@ const create_unified_changeset_notice = ({
 export { create_unified_changeset_notice };
 
 export const testables = {
-    create_rfc_dropdown: create_rfc_dropdown
+    create_rfc_dropdown: create_rfc_dropdown,
+    create_changeset_form: create_changeset_form
 };

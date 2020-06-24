@@ -36,9 +36,10 @@
         
         <!-- GLOBALS -->
         <script>
+            var JS_GLOBALS = (typeof JS_GLOBALS === 'undefined') ? {} : JS_GLOBALS;
             {% if request.session.js_globals %}
                 {% for var_name, value in request.session.js_globals.items %}
-                var {{var_name}} = {{ value|safe}};
+                    JS_GLOBALS["{{var_name}}"] = {{ value|safe}};
                 {% endfor %}
             {% endif %}
         </script>

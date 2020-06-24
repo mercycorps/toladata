@@ -1,3 +1,10 @@
+function getGlobal(key) {
+    if ((typeof JS_GLOBALS !== 'undefined')  && JS_GLOBALS.hasOwnProperty(key)) {
+        return JS_GLOBALS[key];
+    }
+    return null;
+}
+
 
 /**
  * IPTT Constants:
@@ -86,3 +93,5 @@ export const IndicatorFilterType = Object.freeze({
     onTarget: 7,
     nonReporting: 8
 });
+
+export const RFC_OPTIONS = getGlobal('reason_for_change_options') ?? [];
