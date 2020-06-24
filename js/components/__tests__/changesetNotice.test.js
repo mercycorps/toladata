@@ -42,6 +42,77 @@ describe("RFC Dropdown creator", () => {
     });
 });
 
+
+/* notice_type = 'notice',
+    header = null,
+    show_icon = true,
+    message_text = null,
+    preamble = null,
+    rfc_options = null,
+    include_rationale = false
+ *
+ *if(indicatorHasResults() && hasTrackedFieldsChanged()) {
+            if(hasTargetsChanged()) {
+                window.create_unified_changeset_notice({
+                    header: "Warning",
+                    show_icon: false,
+                    message_text: window.MODIFY_TARGETS_MESSAGE,
+                    rationale_required: true,
+                    include_rationale: true,
+                    rfc_required: true,
+                    rfc_options: ['first', 'second'],
+                    validation_type: 1,
+                    showCloser: false,
+                    no_preamble: true,
+                    context: document.getElementById('indicator_update_form'),
+                    notice_type: 'error',
+                    on_submit: (rationale, reasons_for_change, validation_type) => {
+                        submitFormUpdate(rationale, reasons_for_change, validation_type);
+                    }
+                });
+            } else {
+                window.create_unified_changeset_notice({
+                    header: "Reason for change",
+                    show_icon: false,
+                    message_text: window.DEFAULT_NONDESTRUCTIVE_MESSAGE,
+                    rationale_required: true,
+                    include_rationale: true,
+                    rfc_required: true,
+                    rfc_options: ['first', 'second'],
+                    validation_type: 1,
+                    showCloser: false,
+                    no_preamble: true,
+                    context: document.getElementById('indicator_update_form'),
+                    on_submit: (rationale, reasons_for_change, validation_type) => {
+                        submitFormUpdate(rationale, reasons_for_change, validation_type);
+                    }
+                });
+            }
+            scrollToIndicatorFormBottom();
+        } else if (hasLevelBeenUpdatedOrCleared()) {
+            window.create_unified_changeset_notice({
+                header: "Reason for change",
+                show_icon: false,
+                message_text: window.DEFAULT_NONDESTRUCTIVE_MESSAGE,
+                rationale_required: true,
+                include_rationale: true,
+                rfc_required: true,
+                rfc_options: ['first', 'second'],
+                validation_type: 1,
+                showCloser: false,
+                no_preamble: true,
+                context: document.getElementById('indicator_update_form'),
+                on_submit: (rationale, reasons_for_change, validation_type) => {
+                    submitFormUpdate(rationale, reasons_for_change, validation_type);
+                }
+            });*/
 describe("RFC Form creator", () => {
-    describe("")
+    describe("with indicator targets changed settings", () => {
+        var defaults = {
+            notice_type: 'error',
+            header: "Warning",
+            show_icon: false,
+            message_text: "Message text here"
+        }
+    })
 })

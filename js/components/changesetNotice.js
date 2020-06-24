@@ -39,6 +39,7 @@ const create_rfc_dropdown = ({
 }
 
 const create_changeset_form = ({
+    notice_type = 'notice',
     header = null,
     show_icon = true,
     message_text = null,
