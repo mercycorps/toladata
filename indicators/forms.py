@@ -193,7 +193,13 @@ class IndicatorForm(forms.ModelForm):
             'rationale_for_target': forms.Textarea(attrs={'rows': 4}),
             'objectives': ShowOnDisabledMultiSelect,
             'strategic_objectives': ShowOnDisabledMultiSelect,
-            'indicator_type': ShowOnDisabledMultiSelect
+            'indicator_type': ShowOnDisabledMultiSelect,
+            'means_of_verification': forms.Textarea(attrs={'rows': 4}),
+            'data_collection_method': forms.Textarea(attrs={'rows': 4}),
+            'data_points': forms.Textarea(attrs={'rows': 4}),
+            'responsible_person': forms.Textarea(attrs={'rows': 4}),
+            'method_of_analysis': forms.Textarea(attrs={'rows': 4}),
+            'information_use': forms.Textarea(attrs={'rows': 4}),
         }
 
     def __init__(self, *args, **kwargs):
