@@ -58,6 +58,10 @@ if hasattr(settings, 'SILK_ENABLED') and settings.SILK_ENABLED:
 urlpatterns += [
     url(r'^jsi18n/$', JavaScriptCatalog.as_view(), name='javascript-catalog'),
 
+    # pnotify prototype
+    # TODO: remove before merging into dev
+    url(r'^pnotify-prototype/', TemplateView.as_view(template_name='prototypes/pnotify-prototype.html')),
+
     # rest framework
     url(r'^api/', include(router.urls)),
     url(r'^api-auth/', include('rest_framework.urls', namespace='rest_framework')),
@@ -140,6 +144,8 @@ urlpatterns += [
 
 if settings.DEBUG:
     urlpatterns = [
-        url(r'^500/$', TemplateView.as_view(template_name='500.html')),
-        url(r'^404/$', TemplateView.as_view(template_name='404.html')),
+        url(r'^400/', TemplateView.as_view(template_name='400.html')),
+        url(r'^403/', TemplateView.as_view(template_name='403.html')),
+        url(r'^404/', TemplateView.as_view(template_name='404.html')),
+        url(r'^500/', TemplateView.as_view(template_name='500.html')),
     ] + urlpatterns
