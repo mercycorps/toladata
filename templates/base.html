@@ -36,7 +36,7 @@
 
     </head>
     <body class="{% block bodyclasses %}{% endblock %}">
-        
+
         {% get_current_language as LANGUAGE_CODE %}
         {% if request.session.show_covid_banner %}
             <div id="covid-banner-alert" class="alert alert--banner bg-warning alert-dismissible fade show" role="alert">
@@ -129,10 +129,6 @@
                                         <a class="dropdown-item" href="{% url 'logout' %}">{% trans "Log out" %}</a>
                                     </div>
                                 </li>
-                            {% else %}
-                            <li class="nav-item">
-                                <a class="nav-link" href="{% url 'login' %}">{% trans "Log in" %}</a>
-                            </li>
                             {% endif %}
                         </ul>
                     </div>
