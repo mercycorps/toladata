@@ -326,6 +326,8 @@ class IndicatorForm(forms.ModelForm):
         self.fields['name'].widget = forms.Textarea(attrs={'rows': 3})
         self.fields['unit_of_measure'].required = True
         self.fields['unit_of_measure'].widget = forms.TextInput(attrs={'autocomplete':'off'})
+        # Translators: Label of a form field.  User specifies whether changes should increase or decrease.
+        self.fields['direction_of_change'].label = _("Direction of change")
         self.fields['target_frequency'].required = True
         # self.fields['is_cumulative'].widget = forms.RadioSelect()
         if self.instance.target_frequency and self.instance.target_frequency != Indicator.LOP:
