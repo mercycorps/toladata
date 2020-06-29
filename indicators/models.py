@@ -1047,7 +1047,7 @@ class Indicator(SafeDeleteModel):
     DIRECTION_OF_CHANGE_POSITIVE = 2
     DIRECTION_OF_CHANGE_NEGATIVE = 3
     DIRECTION_OF_CHANGE = (
-        (DIRECTION_OF_CHANGE_NONE, _("Direction of change (not applicable)")),
+        (DIRECTION_OF_CHANGE_NONE, _("Not applicable")),
         (DIRECTION_OF_CHANGE_POSITIVE, _("Increase (+)")),
         (DIRECTION_OF_CHANGE_NEGATIVE, _("Decrease (-)"))
     )

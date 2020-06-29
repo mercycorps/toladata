@@ -287,7 +287,8 @@
 
                         <div class="form-group" id="parent_div_id_direction_of_change">
                             <div class="" id="fieldgroup_id_direction_of_change">
-                                {% render_field form.direction_of_change class+="form-control mt-2" style="width:100%; border-radius: 0%" %}
+                                <label for="id_direction_of_change">{{ form.direction_of_change.label }}</label>
+                                {% render_field form.direction_of_change class+="form-control" style="width:100%; border-radius: 0%" %}
                             </div>
                         </div>
 
@@ -478,10 +479,10 @@
         $('#indicator_modal_div [data-toggle="popover"]').popover();
         // initial state of target frequency box if form is already populated
         disable_target_frequency_field();
-        
+
         //make baseline field a numeric input
         window.getValidatedNumericInput('#id_baseline');
-        
+
 
         // Disabled objectives pulldown if nothing to choose
         if ($("#id_objectives option").length < 1) {
