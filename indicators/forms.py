@@ -11,6 +11,7 @@ from workflow.models import (
 )
 from tola.util import getCountry
 from tola.forms import NonLocalizedDecimalField
+from tola_management.models import AuditLogRationaleSelection
 
 from indicators.models import (
     Indicator,
@@ -178,6 +179,11 @@ class IndicatorForm(forms.ModelForm):
     lop_target = NonLocalizedDecimalField(decimal_places=2, localize=True, required=False)
 
     rationale = forms.CharField(required=False)
+    reasons_for_change = forms.TypedMultipleChoiceField(
+        choices=AuditLogRationaleSelection.OPTIONS.items(),
+        coerce=int,
+        required=False
+    )
 
     class Meta:
         model = Indicator

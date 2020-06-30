@@ -583,7 +583,8 @@ class IndicatorUpdate(IndicatorFormMixin, UpdateView):
                 self.object,
                 old_indicator_values,
                 self.object.logged_fields,
-                rationale
+                rationale=rationale,
+                rationale_options=reasons_for_change
             )
 
         # refresh the periodic targets form such that pkids of new PeriodicTargets are submitted in the future

@@ -522,7 +522,7 @@
 
     // submits form - returns a jQuery deferred obj to attached callbacks onto
     // only has code shared by both CREATE and UPDATE
-    function submitForm(rationale='', reasons_for_change='', validation_type='') {
+    function submitForm(rationale='', reasons_for_change=null, validation_type='') {
         // clear any success/failure messages
         let alertElement = "#modalmessages";
         $(alertElement).html('');
@@ -541,7 +541,9 @@
 
         // user entered rationale and reason for change dropdown values
         formArr.push({name: 'rationale', value: rationale});
-        formArr.push({name: 'reasons_for_change', value: JSON.stringify(reasons_for_change)});
+        (reasons_for_change || []).forEach(reason => {
+            formArr.push({name: 'reasons_for_change', value: JSON.stringify(reason)});
+        });
         formArr.push({name: 'validation_type', value: validation_type});
 
         // If LoP target not explicit, submit computed value

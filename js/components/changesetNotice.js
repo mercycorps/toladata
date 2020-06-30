@@ -1,7 +1,7 @@
 import { RFC_OPTIONS } from '../constants';
-import PNotify from 'pnotify/dist/es/PNotify.js';
-import 'pnotify/dist/es/PNotifyCallbacks.js';
-import 'pnotify/dist/es/PNotifyButtons.js';
+//import PNotify from 'pnotify/dist/es/PNotify.js'; // needed for jest teseting, leaving in for future testing attempts
+//import 'pnotify/dist/es/PNotifyCallbacks.js';
+//import 'pnotify/dist/es/PNotifyButtons.js';
 
 const create_rfc_dropdown = ({
     custom_rfc_options = null,
@@ -149,7 +149,7 @@ const create_unified_changeset_notice = ({
             textarea.parent().find('.invalid-feedback').remove();
             let rationale = textarea.val();
             let rfc_select  = $(notice.refs.elem).find('select[name="reasons_for_change"]');
-            let reasons_for_change = rfc_select.val();
+            let reasons_for_change = (rfc_select.val() || []).map(v => parseInt(v));
             let is_valid = false;
             if (validation_type === 0 &&
                 (!rationale && rationale_required) ||
@@ -161,7 +161,7 @@ const create_unified_changeset_notice = ({
             }
 
             if (validation_type === 1 &&
-                (!rationale && (reasons_for_change.length === 0 || reasons_for_change.indexOf("other") >= 0))) {
+                (!rationale && (reasons_for_change.length === 0 || reasons_for_change.indexOf(1) >= 0))) {
                     is_valid = false;
             }
             else {
@@ -251,7 +251,11 @@ const create_unified_changeset_notice = ({
         }
     });
 
-    $('.pnotify__reason-for-change select').multiselect();
+    $('.pnotify__reason-for-change select').multiselect({
+        numberDisplayed: 1,
+        // # Translators: (preceded by a number) e.g. "4 options selected"
+        nSelectedText: gettext(' options selected')
+    });
 
 
 
