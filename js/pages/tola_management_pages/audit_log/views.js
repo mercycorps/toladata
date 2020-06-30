@@ -35,8 +35,8 @@ export const ResultChangeset = ({data, name, pretty_name}) => {
     }
     if (name === 'id') {
         return null
-    } else if(name === 'Target_url') {
-        return <div className="change__field"><strong className="change__field__name">{pretty_name}</strong>: {(data !== 'N/A' && data !== '')?<a href={displayValue} target="_blank">Link</a>:data}</div>
+    } else if(name === 'evidence_url') {
+        return <div className="change__field"><strong className="change__field__name">{pretty_name}</strong>: {(data !== 'N/A' && data !== '')?<a className="change__field__value--evidence-url" href={displayValue} target="_blank">{displayValue}</a>:data}</div>
     } else if (name === 'disaggregation_values') {
         if (Object.entries(data).length) {
             let groupedDiffs = {};
