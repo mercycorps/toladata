@@ -1,6 +1,7 @@
 import { RFC_OPTIONS } from '../constants';
 import PNotify from 'pnotify/dist/es/PNotify.js';
 import 'pnotify/dist/es/PNotifyCallbacks.js';
+import 'pnotify/dist/es/PNotifyButtons.js';
 
 const create_rfc_dropdown = ({
     custom_rfc_options = null,
@@ -38,46 +39,6 @@ const create_rfc_dropdown = ({
     form_div.appendChild(select);
     rfc_section.appendChild(form_div);
     return rfc_section;
-}
-
-const create_changeset_form = ({
-    notice_type = 'notice',
-    header = null,
-    show_icon = true,
-    message_text = null,
-    preamble = null,
-    rfc_options = null,
-    include_rationale = false
-} = {}) => {
-    const div = document.createElement('div');
-    return div;
-}
-
-const temp_create_notice = ({
-    context = null,
-    afterOpen = null,
-} = {}) => {
-    let stack = {
-        'overlayClose': true,
-        'dir1': 'right',
-        'dir2': 'up',
-        'firstpos1': 20,
-        'firstpos2': 20,
-        'context': context
-    };
-    let callbacksModule = {};
-    if (afterOpen !== null) {
-        callbacksModule.afterOpen = afterOpen;
-    }
-    let options = {
-        stack: stack,
-        modules: {
-            Callbacks: callbacksModule
-        }
-    };
-    console.log(options);
-    let notice = PNotify.alert(options);
-    return notice;
 }
 
 /*
@@ -148,27 +109,13 @@ const create_unified_changeset_notice = ({
         </section>`;
 
     let rfc_section = '';
-    if (rfc_options.length > 0) {
-        let options_html = rfc_options.reduce( (acc, option) => acc += `<option value=${option}>${option}</option>`, '');
-        options_html += "<option disabled>----------</option>";
-        // # Translators: "Other" is an option in a dropdown menu that allows users to specify an alternative to the default options
-        options_html += `<option value="other">${gettext("Other")}</option>`;
-        // # Translators: This is a label for a dropdown that presents several possible justifications for changing a value
-        const rfc_label = `<label>${gettext("Reason for change")}</label>`;
-        rfc_section =
-            `<section class="pnotify__reason-for-change">
-                <div class="form-group">
-                    ${rfc_label}
-                    <select multiple class="form-control" name="reasons_for_change">
-                      ${options_html}
-                    </select>
-                </div>
-            </section>`;
-
+    if (rfc_options !== null) {
+        let custom_rfc_options = rfc_options === true ? null : rfc_options;
+        rfc_section = create_rfc_dropdown({custom_rfc_options: custom_rfc_options}).outerHTML;
     }
 
     // # Translators: This is the label for a textbox where a user can provide details about their reason for selecting a particular option
-    const rationale_label = rfc_options.length > 0 ?  `<label>${gettext("Details")}</label>` : '';
+    const rationale_label = rfc_section.length > 0 ?  `<label>${gettext("Details")}</label>` : '';
     const rationale_section = ! include_rationale ? '' :
         `<section class="pnotify__rationale">
             <div class="form-group">
@@ -327,6 +274,4 @@ export { create_unified_changeset_notice };
 
 export const testables = {
     create_rfc_dropdown: create_rfc_dropdown,
-    create_changeset_form: create_changeset_form,
-    temp_create_notice: temp_create_notice
 };
