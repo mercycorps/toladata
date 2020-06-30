@@ -423,7 +423,7 @@ class TestIndicatorAuditLog(test.TestCase):
             self.client.session['js_globals']['reason_for_change_options'],
             expected_options
             )
-        self.assertContains(response, 'var reason_for_change_options')
+        self.assertContains(response, 'reason_for_change_options')
 
 
 class TestAuditLogRationaleSelectionsDisplay(test.TestCase):

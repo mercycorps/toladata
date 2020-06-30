@@ -1,4 +1,6 @@
 import { RFC_OPTIONS } from '../constants';
+import PNotify from 'pnotify/dist/es/PNotify.js';
+import 'pnotify/dist/es/PNotifyCallbacks.js';
 
 const create_rfc_dropdown = ({
     custom_rfc_options = null,
@@ -49,6 +51,33 @@ const create_changeset_form = ({
 } = {}) => {
     const div = document.createElement('div');
     return div;
+}
+
+const temp_create_notice = ({
+    context = null,
+    afterOpen = null,
+} = {}) => {
+    let stack = {
+        'overlayClose': true,
+        'dir1': 'right',
+        'dir2': 'up',
+        'firstpos1': 20,
+        'firstpos2': 20,
+        'context': context
+    };
+    let callbacksModule = {};
+    if (afterOpen !== null) {
+        callbacksModule.afterOpen = afterOpen;
+    }
+    let options = {
+        stack: stack,
+        modules: {
+            Callbacks: callbacksModule
+        }
+    };
+    console.log(options);
+    let notice = PNotify.alert(options);
+    return notice;
 }
 
 /*
@@ -298,5 +327,6 @@ export { create_unified_changeset_notice };
 
 export const testables = {
     create_rfc_dropdown: create_rfc_dropdown,
-    create_changeset_form: create_changeset_form
+    create_changeset_form: create_changeset_form,
+    temp_create_notice: temp_create_notice
 };
