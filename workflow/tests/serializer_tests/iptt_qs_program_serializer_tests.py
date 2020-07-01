@@ -1,3 +1,5 @@
+import datetime
+from django.utils import timezone
 from django import test
 from factories.indicators_models import RFIndicatorFactory
 from factories.workflow_models import (
@@ -88,7 +90,11 @@ class TestIPTTQSProgramSerializer(test.TestCase):
         self.assertEqual(data['pk'], p.pk)
         for frequency, count in [(3, 1), (4, 2), (5, 3), (6, 4), (7, 12)]:
             self.assertEqual(len(data['period_date_ranges'][frequency]), count)
-        self.assertEqual(len([f for f in data['period_date_ranges'][7] if f['past']]), 5)
+        # this ugly hack is because our factories use datetime and our serializers use timezone:
+        past_count = 5
+        if datetime.date.today().month != timezone.now().date().month:
+            past_count += 1
+        self.assertEqual(len([f for f in data['period_date_ranges'][7] if f['past']]), past_count)
 
     def test_one_program(self):
         p = RFProgramFactory()
