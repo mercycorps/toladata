@@ -2,7 +2,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: \n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2020-05-30 20:09-0700\n"
+"POT-Creation-Date: 2020-07-01 12:07-0700\n"
 "PO-Revision-Date: 2020-03-13 10:43-0700\n"
 "Last-Translator: \n"
 "Language-Team: \n"
@@ -26,7 +26,7 @@ msgstr ""
 msgid "This action cannot be undone"
 msgstr "Cette action est irréversible"
 
-#: js/base.js:365
+#: js/base.js:369
 #, python-format
 msgid ""
 "Removing this target means that %s result will no longer have targets "
@@ -42,35 +42,38 @@ msgstr[1] ""
 "associés à des cibles."
 
 #. Translators: Button to approve a form
-#: js/base.js:377 js/base.js:479 js/base.js:528 js/base.js:571 js/base.js:641
+#: js/base.js:381 js/base.js:483 js/base.js:532 js/base.js:575
+#: js/components/changesetNotice.js:65
 msgid "Ok"
 msgstr "Confirmer"
 
 #. Translators: Button to cancel a form submission
-#: js/base.js:379 js/base.js:481 js/base.js:530 js/base.js:573 js/base.js:643
+#: js/base.js:383 js/base.js:485 js/base.js:534 js/base.js:577
+#: js/components/changesetNotice.js:67
 #: js/pages/results_framework/components/level_cards.js:567
 msgid "Cancel"
 msgstr "Annuler"
 
-#: js/base.js:424
+#: js/base.js:428 js/components/changesetNotice.js:178
 msgid "A reason is required."
 msgstr "Une justification est nécessaire."
 
-#: js/base.js:488 js/base.js:583 js/base.js:663
+#: js/base.js:492 js/base.js:587
 #: js/pages/tola_management_pages/country/models.js:410
 msgid "This action cannot be undone."
 msgstr "Cette action est irréversible."
 
-#: js/base.js:492 js/base.js:587 js/base.js:652
+#: js/base.js:496 js/base.js:591
 msgid "Warning"
 msgstr "Attention"
 
-#: js/base.js:537 js/base.js:632
+#. Translators: This is a label for a dropdown that presents several possible justifications for changing a value
+#: js/base.js:541 js/components/changesetNotice.js:19
 #: js/pages/tola_management_pages/audit_log/views.js:239
 msgid "Reason for change"
 msgstr "Justification de la modification"
 
-#: js/base.js:728
+#: js/base.js:653
 msgid "Success!"
 msgstr "Succès !"
 
@@ -134,10 +137,23 @@ msgstr "Entrée précédente"
 msgid "New Entry"
 msgstr "Nouvelle entrée"
 
+#. Translators: This is the label for a textbox where a user can provide details about their reason for selecting a particular option
+#: js/components/changesetNotice.js:118
+msgid "Details"
+msgstr "Los détails"
+
+#. Translators: (preceded by a number) e.g. "4 options selected"
+#: js/components/changesetNotice.js:257
 #: js/components/checkboxed-multi-select.js:55
 #: js/components/selectWidgets.js:153
 msgid "selected"
 msgstr "sélectionné"
+
+#. Translators: for a dropdown menu with no options checked:
+#: js/components/changesetNotice.js:259 js/components/selectWidgets.js:143
+#: js/components/selectWidgets.js:148
+msgid "None selected"
+msgstr "Aucun élément sélectionné"
 
 #: js/components/checkboxed-multi-select.js:67
 msgid "Search"
@@ -151,10 +167,6 @@ msgstr "Ajouter un indicateur"
 msgid "None available"
 msgstr "Aucun élément disponible"
 
-#: js/components/selectWidgets.js:143 js/components/selectWidgets.js:148
-msgid "None selected"
-msgstr "Aucun élément sélectionné"
-
 #. Translators: refers to grouping the report by the level of the indicator */
 #: js/components/selectWidgets.js:196
 #: js/pages/program_page/models/programPageUIStore.js:52
@@ -166,51 +178,51 @@ msgstr "par Niveau"
 msgid "Group indicators"
 msgstr "Regrouper les indicateurs"
 
-#: js/constants.js:21 js/pages/iptt_quickstart/models/ipttQSRootStore.js:30
+#: js/constants.js:36 js/pages/iptt_quickstart/models/ipttQSRootStore.js:30
 msgid "Life of Program (LoP) only"
 msgstr "La vie du programme (LoP) seulement"
 
-#: js/constants.js:22 js/pages/iptt_quickstart/models/ipttQSRootStore.js:31
+#: js/constants.js:37 js/pages/iptt_quickstart/models/ipttQSRootStore.js:31
 msgid "Midline and endline"
 msgstr "Mesure de mi-parcours et mesure de fin de programme"
 
-#: js/constants.js:23 js/pages/iptt_quickstart/models/ipttQSRootStore.js:32
+#: js/constants.js:38 js/pages/iptt_quickstart/models/ipttQSRootStore.js:32
 msgid "Annual"
 msgstr "Annuel"
 
-#: js/constants.js:24 js/pages/iptt_quickstart/models/ipttQSRootStore.js:33
+#: js/constants.js:39 js/pages/iptt_quickstart/models/ipttQSRootStore.js:33
 msgid "Semi-annual"
 msgstr "Semestriel"
 
-#: js/constants.js:25 js/pages/iptt_quickstart/models/ipttQSRootStore.js:34
+#: js/constants.js:40 js/pages/iptt_quickstart/models/ipttQSRootStore.js:34
 msgid "Tri-annual"
 msgstr "Quadrimestriel"
 
-#: js/constants.js:26 js/pages/iptt_quickstart/models/ipttQSRootStore.js:35
+#: js/constants.js:41 js/pages/iptt_quickstart/models/ipttQSRootStore.js:35
 msgid "Quarterly"
 msgstr "Trimestriel"
 
-#: js/constants.js:27 js/pages/iptt_quickstart/models/ipttQSRootStore.js:36
+#: js/constants.js:42 js/pages/iptt_quickstart/models/ipttQSRootStore.js:36
 msgid "Monthly"
 msgstr "Mensuel"
 
-#: js/constants.js:33
+#: js/constants.js:48
 msgid "Years"
 msgstr "Années"
 
-#: js/constants.js:34
+#: js/constants.js:49
 msgid "Semi-annual periods"
 msgstr "Périodes semestrielles"
 
-#: js/constants.js:35
+#: js/constants.js:50
 msgid "Tri-annual periods"
 msgstr "Périodes quadrimestrielles"
 
-#: js/constants.js:36
+#: js/constants.js:51
 msgid "Quarters"
 msgstr "Trimestres"
 
-#: js/constants.js:37
+#: js/constants.js:52
 msgid "Months"
 msgstr "Mois"
 
@@ -223,7 +235,6 @@ msgid "Mercy Corps"
 msgstr "Mercy Corps"
 
 #: js/level_utils.js:19 js/level_utils.js:41 js/level_utils.js:57
-#: js/pages/results_framework/models.js:127
 msgid "Goal"
 msgstr "But"
 
@@ -449,7 +460,7 @@ msgstr "Tableau de suivi des performances de l’indicateur"
 #. Translators: Column header for a target value column */
 #: js/pages/iptt_report/components/report/headerCells.js:42
 #: js/pages/iptt_report/components/report/tableHeader.js:156
-#: js/pages/program_page/components/indicator_list.js:200
+#: js/pages/program_page/components/indicator_list.js:199
 msgid "Target"
 msgstr "Cible"
 
@@ -488,14 +499,13 @@ msgstr "Indicateur"
 
 #. Translators: Column header for indicator Level name column */
 #: js/pages/iptt_report/components/report/tableHeader.js:115
-#: js/pages/program_page/components/indicator_list.js:197
 msgid "Level"
 msgstr "Niveau"
 
 #. Translators: Column header */
 #: js/pages/iptt_report/components/report/tableHeader.js:123
 #: js/pages/iptt_report/models/filterStore.js:690
-#: js/pages/program_page/components/indicator_list.js:198
+#: js/pages/program_page/components/indicator_list.js:197
 msgid "Unit of measure"
 msgstr "Unité de mesure"
 
@@ -519,7 +529,7 @@ msgstr "# / %"
 #. Translators: Column header */
 #: js/pages/iptt_report/components/report/tableHeader.js:149
 #: js/pages/iptt_report/models/filterStore.js:694
-#: js/pages/program_page/components/indicator_list.js:199
+#: js/pages/program_page/components/indicator_list.js:198
 msgid "Baseline"
 msgstr "Mesure de base"
 
@@ -527,7 +537,7 @@ msgstr "Mesure de base"
 #: js/pages/iptt_report/components/report/tableRows.js:258
 #: js/pages/iptt_report/components/report/tableRows.js:259
 #: js/pages/iptt_report/components/report/tableRows.js:261
-#: js/pages/program_page/components/indicator_list.js:264
+#: js/pages/program_page/components/indicator_list.js:262
 #: js/pages/tola_management_pages/audit_log/views.js:172
 #: js/pages/tola_management_pages/audit_log/views.js:199
 msgid "N/A"
@@ -712,6 +722,7 @@ msgstr[1] "%s Indicateurs sont en bonne voie"
 
 #. Translators: shows what number of indicators that for various reasons are not being reported for program metrics
 #: js/pages/program_page/components/indicator_list.js:46
+#, python-format
 msgid "%s indicator is unavailable"
 msgid_plural "%s indicators are unavailable"
 msgstr[0] "%s indicateur n'est pas disponible"
@@ -740,11 +751,11 @@ msgid "Group indicators:"
 msgstr "Regrouper les indicateurs :"
 
 #. Translators: Adj: labels this indicator as one which is missing one or more targets */
-#: js/pages/program_page/components/indicator_list.js:252
+#: js/pages/program_page/components/indicator_list.js:251
 msgid "Missing targets"
 msgstr "Cibles manquantes"
 
-#: js/pages/program_page/components/indicator_list.js:300
+#: js/pages/program_page/components/indicator_list.js:298
 msgid ""
 "Some indicators have missing targets. To enter these values, click the "
 "target icon near the indicator name."
@@ -941,7 +952,7 @@ msgstr "Suivre les performances de l’indicateur"
 #. Translators: This is a validation message given to the user when the user-editable name field has been deleted or omitted. */
 #. Translators: This is a warning messages when a user has entered duplicate names for two different objects and those names contain only white spaces, both of which are not permitted. */
 #: js/pages/results_framework/components/level_cards.js:430
-#: js/pages/results_framework/models.js:739
+#: js/pages/results_framework/models.js:746
 msgid "Please complete this field."
 msgstr "Veuillez remplir ce champ."
 
@@ -1051,32 +1062,32 @@ msgstr "Personnalisé"
 
 #. Translators: Notification to user that the an update was successful
 #. Translators: Notification to user that the update they initiated was successful */
-#: js/pages/results_framework/models.js:139
-#: js/pages/results_framework/models.js:237
+#: js/pages/results_framework/models.js:144
+#: js/pages/results_framework/models.js:242
 msgid "Changes to the results framework template were saved."
 msgstr ""
 "Les modifications apportées au modèle de cadre de résultats ont été "
 "enregistrées."
 
 #. Translators: Notification to user that the deletion command that they issued was successful */
-#: js/pages/results_framework/models.js:369
+#: js/pages/results_framework/models.js:374
 #, python-format
 msgid "%s was deleted."
 msgstr "%s a été supprimée."
 
 #. Translators: This is a confirmation message that confirms that change has been successfully saved to the DB.
-#: js/pages/results_framework/models.js:413
+#: js/pages/results_framework/models.js:418
 #, python-format
 msgid "%s saved."
 msgstr "%s enregistrée."
 
 #. Translators:  Confirmation message that user-supplied updates were successfully applied.
-#: js/pages/results_framework/models.js:447
+#: js/pages/results_framework/models.js:452
 #, python-format
 msgid "%s updated."
 msgstr "%s mis à jour."
 
-#: js/pages/results_framework/models.js:604
+#: js/pages/results_framework/models.js:609
 msgid ""
 "<strong class=\"text-danger\">Choose your results framework template "
 "carefully!</strong> Once you begin building your framework, it will not be "
@@ -1091,7 +1102,7 @@ msgstr ""
 #. Translators: This is the prompt on a popup that has warned users about a change they are about to make that could have broad consequences
 #. Translators: This is a confirmation prompt to confirm a user wants to archive an item
 #. Translators: This is a confirmation prompt to confirm a user wants to unarchive an item
-#: js/pages/results_framework/models.js:657
+#: js/pages/results_framework/models.js:664
 #: js/pages/tola_management_pages/country/components/edit_disaggregations.js:484
 #: js/pages/tola_management_pages/country/components/edit_disaggregations.js:495
 #: js/pages/tola_management_pages/country/models.js:441
@@ -1101,18 +1112,18 @@ msgid "Are you sure you want to continue?"
 msgstr "Voulez-vous vraiment continuer ?"
 
 #. Translators:  This is a warning provided to the user when they try to cancel the editing of something they have already modified.  */
-#: js/pages/results_framework/models.js:659
+#: js/pages/results_framework/models.js:666
 #, python-format
 msgid "Changes to this %s will not be saved"
 msgstr "Les modifications apportées à %s n’ont pas été enregistrées"
 
 #. Translators: This is a warning messages when a user has entered duplicate names for two different objects */
-#: js/pages/results_framework/models.js:744
+#: js/pages/results_framework/models.js:751
 msgid "Result levels should not contain commas."
 msgstr "Les niveaux de résultats ne doivent pas contenir de virgules."
 
 #. Translators: This is a warning messages when a user has a comma in a name that shouldn't contain commas */
-#: js/pages/results_framework/models.js:749
+#: js/pages/results_framework/models.js:756
 msgid "Result levels must have unique names."
 msgstr "Les niveaux de résultats doivent avoir des noms uniques."
 
@@ -1157,7 +1168,7 @@ msgstr "Entrée précédente"
 msgid "New entry"
 msgstr "Nouvelle entrée"
 
-#: js/pages/tola_management_pages/audit_log/views.js:293
+#: js/pages/tola_management_pages/audit_log/views.js:301
 msgid "entries"
 msgstr "entrées"
 
@@ -1911,6 +1922,11 @@ msgstr "Ajouter un utilisateur"
 #: js/pages/tola_management_pages/user/views.js:332
 msgid "Super Admin"
 msgstr "Super-administrateur"
+
+#, fuzzy
+#~| msgid "None selected"
+#~ msgid " options selected"
+#~ msgstr "Aucun élément sélectionné"
 
 #, fuzzy
 #~| msgid "Changes to the results framework template were saved."
