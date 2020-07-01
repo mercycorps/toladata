@@ -281,7 +281,7 @@ class AuditLogRationaleSelection(models.Model):
     @classmethod
     def options_display(cls):
         """returns all options in (ENUM, human-readable name, whether a rationale is required) tuple form"""
-        return [(option, label, option in cls.RATIONALE_REQUIRED) for (option, field, label) in cls.ordered_options()]
+        return [(option, _(label), option in cls.RATIONALE_REQUIRED) for (option, field, label) in cls.ordered_options()]
 
     @classmethod
     def from_options(cls, options=None):
