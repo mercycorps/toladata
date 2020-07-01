@@ -1,3 +1,11 @@
+/* Site-wide constants */
+
+
+/**
+ * JS_GLOBALS is in base.html (base Tola template) - delivered by middleware from the backend
+ * this function returns the global constant for a given key (i.e. 'reason_for_change_options')
+ */
+
 function getGlobal(key) {
     if ((typeof JS_GLOBALS !== 'undefined')  && JS_GLOBALS.hasOwnProperty(key)) {
         return JS_GLOBALS[key];
