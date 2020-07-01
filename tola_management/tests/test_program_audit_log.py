@@ -406,7 +406,7 @@ class TestIndicatorAuditLog(test.TestCase):
             (6, "COVID-19", False),
             (7, "Donor requirement", False),
             (8, "Implementation delays", False),
-            (1, "Other", True)
+            (1, "Other (please specify)", True)
         ]
         self.assertEqual(options, expected_options)
 
