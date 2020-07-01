@@ -301,7 +301,7 @@ class TestIndicatorAuditLog(test.TestCase):
         self.assertEqual(audits.count(), 1)
         audit = audits.first()
         self.assertEqual(audit.pretty_change_type, "Indicator changed")
-        self.assertEqual(audit.rationale_selected_options, ["Other",])
+        self.assertEqual(audit.rationale_selected_options, ["Other (please specify)",])
         self.assertEqual(audit.rationale, "This is a rationale")
 
     def test_indicator_update_is_logged_with_non_other_rationale_options(self):
@@ -344,7 +344,8 @@ class TestIndicatorAuditLog(test.TestCase):
         self.assertEqual(audits.count(), 1)
         audit = audits.first()
         self.assertEqual(audit.pretty_change_type, "Indicator changed")
-        self.assertEqual(audit.rationale_selected_options, ["Budget realignment", "Changes in context", "Other"])
+        self.assertEqual(audit.rationale_selected_options,
+                         ["Budget realignment", "Changes in context", "Other (please specify)"])
         self.assertEqual(audit.rationale, "Test rationale")
 
     def test_indicator_update_is_logged_with_non_other_rationale_options_and_rationale(self):
@@ -487,7 +488,7 @@ class TestAuditLogRationaleSelectionsDisplay(test.TestCase):
         result = self.fetch_audit_log_single()
         self.assertEqual(result['pretty_change_type'], 'Indicator changed')
         self.assertEqual(result['rationale'], 'This is a rationale')
-        self.assertEqual(result['rationale_selected_options'], ['Other'])
+        self.assertEqual(result['rationale_selected_options'], ['Other (please specify)'])
 
     def test_indicator_update_audit_log_rationale_just_option(self):
         self.get_update_audit_log(rationale_options=[3])
@@ -508,4 +509,4 @@ class TestAuditLogRationaleSelectionsDisplay(test.TestCase):
         result = self.fetch_audit_log_single()
         self.assertEqual(result['pretty_change_type'], 'Indicator changed')
         self.assertEqual(result['rationale'], 'Test rationale')
-        self.assertEqual(result['rationale_selected_options'], ['COVID-19', 'Other'])
+        self.assertEqual(result['rationale_selected_options'], ['COVID-19', 'Other (please specify)'])
