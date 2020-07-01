@@ -2,7 +2,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: \n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2020-07-01 10:25-0700\n"
+"POT-Creation-Date: 2020-07-01 11:05-0700\n"
 "PO-Revision-Date: 2020-03-13 10:43-0700\n"
 "Last-Translator: \n"
 "Language-Team: \n"
@@ -144,21 +144,16 @@ msgstr ""
 
 #. Translators: (preceded by a number) e.g. "4 options selected"
 #: js/components/changesetNotice.js:257
-#, fuzzy
-#| msgid "None selected"
-msgid " options selected"
-msgstr "Aucun élément sélectionné"
+#: js/components/checkboxed-multi-select.js:55
+#: js/components/selectWidgets.js:153
+msgid "selected"
+msgstr "sélectionné"
 
 #. Translators: for a dropdown menu with no options checked:
 #: js/components/changesetNotice.js:259 js/components/selectWidgets.js:143
 #: js/components/selectWidgets.js:148
 msgid "None selected"
 msgstr "Aucun élément sélectionné"
-
-#: js/components/checkboxed-multi-select.js:55
-#: js/components/selectWidgets.js:153
-msgid "selected"
-msgstr "sélectionné"
 
 #: js/components/checkboxed-multi-select.js:67
 msgid "Search"
@@ -1927,6 +1922,11 @@ msgstr "Ajouter un utilisateur"
 #: js/pages/tola_management_pages/user/views.js:332
 msgid "Super Admin"
 msgstr "Super-administrateur"
+
+#, fuzzy
+#~| msgid "None selected"
+#~ msgid " options selected"
+#~ msgstr "Aucun élément sélectionné"
 
 #, fuzzy
 #~| msgid "Changes to the results framework template were saved."
