@@ -353,7 +353,7 @@
         if(indicatorHasResults() && hasTrackedFieldsChanged()) {
             if(hasTargetsChanged()) {
                 window.create_unified_changeset_notice({
-                    header: "Warning",
+                    header: "{% trans 'Warning' %}",
                     show_icon: false,
                     message_text: MODIFY_TARGETS_MESSAGE,
                     rationale_required: true,
@@ -371,7 +371,7 @@
                 });
             } else {
                 window.create_unified_changeset_notice({
-                    header: "Reason for change",
+                    header: "{% trans 'Reason for change' %}",
                     show_icon: false,
                     message_text: window.DEFAULT_NONDESTRUCTIVE_MESSAGE,
                     rationale_required: true,
@@ -390,7 +390,7 @@
             scrollToIndicatorFormBottom();
         } else if (hasLevelBeenUpdatedOrCleared()) {
             window.create_unified_changeset_notice({
-                header: "Reason for change",
+                header: "{% trans 'Reason for change' %}",
                 show_icon: false,
                 message_text: window.DEFAULT_NONDESTRUCTIVE_MESSAGE,
                 rationale_required: true,
