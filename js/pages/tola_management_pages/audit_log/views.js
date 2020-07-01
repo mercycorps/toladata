@@ -282,7 +282,15 @@ export const IndexView = observer(
                                                                    indicator={data.indicator} level={data.level}/>
                                         })}
                                     </td>
-                                    <td className="changelog__change--rationale">{data.rationale}</td>
+                                    <td className="changelog__change--rationale">
+                                    {data.rationale_selected_options &&
+                                        data.rationale_selected_options.map(option => {
+                                            return <React.Fragment key={option}><span className="changelog__change--rationale-option">{option}</span><br /></React.Fragment>;
+                                        })
+                                    }
+                                    {(data.rationale_selected_options && data.rationale_selected_options.length > 0 && data.rationale) && <br/>}
+                                        <span className="changelog__change--rationale-text">{data.rationale}</span>
+                                    </td>
                                 </tr>
                                 }
                                 </tbody>

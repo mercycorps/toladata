@@ -101,6 +101,13 @@ span.multiselect-native-select select{
             cursor: pointer;
         }
         
+        &.divider {
+            height: 1px;
+            margin: 9px 0;
+            overflow: hidden;
+            background: map-get($colors, 'gray');
+        }
+        
         > a {
             color: $gray-700;
             display: block;

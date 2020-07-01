@@ -53,5 +53,3 @@ class UserLanguageMiddleware(object):
             request.session[translation.LANGUAGE_SESSION_KEY] = user_language
         else:
             request.session[translation.LANGUAGE_SESSION_KEY] = 'en'
-
-
