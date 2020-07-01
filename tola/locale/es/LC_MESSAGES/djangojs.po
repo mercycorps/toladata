@@ -6,7 +6,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: \n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2020-07-01 11:05-0700\n"
+"POT-Creation-Date: 2020-07-01 12:07-0700\n"
 "PO-Revision-Date: 2020-03-13 10:43-0700\n"
 "Last-Translator: \n"
 "Language-Team: \n"
@@ -143,7 +143,7 @@ msgstr "Nuevo Valor"
 #. Translators: This is the label for a textbox where a user can provide details about their reason for selecting a particular option
 #: js/components/changesetNotice.js:118
 msgid "Details"
-msgstr ""
+msgstr "Los detalles"
 
 #. Translators: (preceded by a number) e.g. "4 options selected"
 #: js/components/changesetNotice.js:257

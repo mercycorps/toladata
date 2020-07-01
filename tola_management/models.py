@@ -252,13 +252,21 @@ class AuditLogRationaleSelection(models.Model):
 
     RATIONALE_REQUIRED = [OTHER,]
 
-    other = models.BooleanField(_('Other'), default=False)
+    # Translators: this is an alternative to picking a reason from a dropdown
+    other = models.BooleanField(_('Other (please specify)'), default=False)
+    # Translators: this is one option in a dropdown list of reasons to change a program's details while in progress
     adaptive_management = models.BooleanField(_('Adaptive management'), default=False)
+    # Translators: this is one option in a dropdown list of reasons to change a program's details while in progress
     budget_realignment = models.BooleanField(_('Budget realignment'), default=False)
+    # Translators: this is one option in a dropdown list of reasons to change a program's details while in progress
     changes_in_context = models.BooleanField(_('Changes in context'), default=False)
+    # Translators: this is one option in a dropdown list of reasons to change a program's details while in progress
     costed_extension = models.BooleanField(_('Costed extension'), default=False)
+    # Translators: this is one option in a dropdown list of reasons to change a program's details while in progress
     covid_19 = models.BooleanField(_('COVID-19'), default=False)
+    # Translators: this is one option in a dropdown list of reasons to change a program's details while in progress
     donor_requirement = models.BooleanField(_('Donor requirement'), default=False)
+    # Translators: this is one option in a dropdown list of reasons to change a program's details while in progress
     implementation_delays = models.BooleanField(_('Implementation delays'), default=False)
 
     @classmethod
