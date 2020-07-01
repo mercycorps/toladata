@@ -503,6 +503,7 @@ class IndicatorUpdate(IndicatorFormMixin, UpdateView):
         new_target_frequency = form.cleaned_data.get('target_frequency')
         lop = form.cleaned_data.get('lop_target')
         rationale = form.cleaned_data.get('rationale')
+        reasons_for_change = form.cleaned_data.get('reasons_for_change')
         old_indicator_values = old_indicator.logged_fields
         prev_level = old_indicator.level  # previous value of "new" level (not to be confused with Indicator.old_level)
 
@@ -582,7 +583,8 @@ class IndicatorUpdate(IndicatorFormMixin, UpdateView):
                 self.object,
                 old_indicator_values,
                 self.object.logged_fields,
-                rationale
+                rationale=rationale,
+                rationale_options=reasons_for_change
             )
 
         # refresh the periodic targets form such that pkids of new PeriodicTargets are submitted in the future

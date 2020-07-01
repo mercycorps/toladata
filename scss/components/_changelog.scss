@@ -45,6 +45,8 @@
 .change__field__value {
     // color: $primary; // potential to highlight new values; hold for now
 }
-
+.change__field__value--evidence-url {
+    word-break: break-all;
+}
 .disagg-type__title {
 }
