@@ -25,3 +25,15 @@
 .pnotify__rationale {
     margin-bottom: 0.5rem;
 }
+
+// Per #2320 form-field label text in pNotify form should be black and tight to form field
+.pnotify__reason-for-change label {
+    color: $black;
+    margin-bottom: 0.2rem;
+}
+
+// Per #2320 form-field label text in pNotify form should be black and tight to form field
+.pnotify__rationale label {
+    color: $black;
+    margin-bottom: 0.2rem;
+}
