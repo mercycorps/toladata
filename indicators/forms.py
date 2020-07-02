@@ -11,6 +11,7 @@ from workflow.models import (
 )
 from tola.util import getCountry
 from tola.forms import NonLocalizedDecimalField
+from tola_management.models import AuditLogRationaleSelection
 
 from indicators.models import (
     Indicator,
@@ -178,6 +179,11 @@ class IndicatorForm(forms.ModelForm):
     lop_target = NonLocalizedDecimalField(decimal_places=2, localize=True, required=False)
 
     rationale = forms.CharField(required=False)
+    reasons_for_change = forms.TypedMultipleChoiceField(
+        choices=AuditLogRationaleSelection.OPTIONS.items(),
+        coerce=int,
+        required=False
+    )
 
     class Meta:
         model = Indicator
@@ -193,7 +199,13 @@ class IndicatorForm(forms.ModelForm):
             'rationale_for_target': forms.Textarea(attrs={'rows': 4}),
             'objectives': ShowOnDisabledMultiSelect,
             'strategic_objectives': ShowOnDisabledMultiSelect,
-            'indicator_type': ShowOnDisabledMultiSelect
+            'indicator_type': ShowOnDisabledMultiSelect,
+            'means_of_verification': forms.Textarea(attrs={'rows': 4}),
+            'data_collection_method': forms.Textarea(attrs={'rows': 4}),
+            'data_points': forms.Textarea(attrs={'rows': 4}),
+            'responsible_person': forms.Textarea(attrs={'rows': 4}),
+            'method_of_analysis': forms.Textarea(attrs={'rows': 4}),
+            'information_use': forms.Textarea(attrs={'rows': 4}),
         }
 
     def __init__(self, *args, **kwargs):
@@ -320,6 +332,8 @@ class IndicatorForm(forms.ModelForm):
         self.fields['name'].widget = forms.Textarea(attrs={'rows': 3})
         self.fields['unit_of_measure'].required = True
         self.fields['unit_of_measure'].widget = forms.TextInput(attrs={'autocomplete':'off'})
+        # Translators: Label of a form field.  User specifies whether changes should increase or decrease.
+        self.fields['direction_of_change'].label = _("Direction of change")
         self.fields['target_frequency'].required = True
         # self.fields['is_cumulative'].widget = forms.RadioSelect()
         if self.instance.target_frequency and self.instance.target_frequency != Indicator.LOP:

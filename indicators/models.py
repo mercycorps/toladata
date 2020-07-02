@@ -1047,7 +1047,7 @@ class Indicator(SafeDeleteModel):
     DIRECTION_OF_CHANGE_POSITIVE = 2
     DIRECTION_OF_CHANGE_NEGATIVE = 3
     DIRECTION_OF_CHANGE = (
-        (DIRECTION_OF_CHANGE_NONE, _("Direction of change (not applicable)")),
+        (DIRECTION_OF_CHANGE_NONE, _("Not applicable")),
         (DIRECTION_OF_CHANGE_POSITIVE, _("Increase (+)")),
         (DIRECTION_OF_CHANGE_NEGATIVE, _("Decrease (-)"))
     )
@@ -1183,13 +1183,13 @@ class Indicator(SafeDeleteModel):
         help_text=" "
     )
 
-    means_of_verification = models.CharField(
-        max_length=255, null=True, blank=True,
+    means_of_verification = models.TextField(
+        max_length=1500, null=True, blank=True,
         verbose_name=_("Means of Verification / Data Source"), help_text=" "
     )
 
-    data_collection_method = models.CharField(
-        max_length=255, null=True, blank=True,
+    data_collection_method = models.TextField(
+        max_length=2500, null=True, blank=True,
         verbose_name=_("Data Collection Method"), help_text=" "
     )
 
@@ -1199,22 +1199,22 @@ class Indicator(SafeDeleteModel):
     )
 
     data_points = models.TextField(
-        max_length=500, null=True, blank=True, verbose_name=_("Data points"),
+        max_length=1000, null=True, blank=True, verbose_name=_("Data points"),
         help_text=" "
     )
 
-    responsible_person = models.CharField(
-        max_length=255, null=True, blank=True,
+    responsible_person = models.TextField(
+        max_length=500, null=True, blank=True,
         verbose_name=_("Responsible Person(s) and Team"), help_text=" "
     )
 
-    method_of_analysis = models.CharField(
-        max_length=255, null=True, blank=True,
+    method_of_analysis = models.TextField(
+        max_length=4000, null=True, blank=True,
         verbose_name=_("Method of Analysis"), help_text=" "
     )
 
-    information_use = models.CharField(
-        max_length=255, null=True, blank=True,
+    information_use = models.TextField(
+        max_length=500, null=True, blank=True,
         verbose_name=_("Information Use"), help_text=" "
     )
 
@@ -1393,6 +1393,10 @@ class Indicator(SafeDeleteModel):
                 for t in s.periodictargets.all()
             },
             "level": str(s.level) if s.level is not None else '',
+            "definition": s.definition,
+            "means_of_verification": s.means_of_verification,
+            "data_collection_method": s.data_collection_method,
+            "method_of_analysis": s.method_of_analysis
         }
 
     @staticmethod
@@ -1403,8 +1407,9 @@ class Indicator(SafeDeleteModel):
         shrunk, only expanded or reordered.
         """
         return [
-            'name', 'level', 'unit_of_measure', 'unit_of_measure_type', 'baseline_value',
-            'baseline_na', 'direction_of_change', 'targets', 'lop_target', 'is_cumulative'
+            'name', 'definition', 'level', 'unit_of_measure', 'unit_of_measure_type', 'baseline_value',
+            'baseline_na', 'direction_of_change', 'targets', 'lop_target', 'is_cumulative',
+            'means_of_verification', 'data_collection_method', 'method_of_analysis',
         ]
 
     @property
