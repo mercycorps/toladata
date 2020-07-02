@@ -39,6 +39,11 @@
 }
 
 // Per #2320 more space at bottom of dropdown list (drop up in pNotify is too clsoe to the bottom)
-.pnotify__reason-for-change .dropdown-menu li:last-child {
-    margin-bottom: 4px;
+.pnotify__reason-for-change .dropdown-menu {
+    li:first-child {
+        margin-top: 6px;
+    }
+    li:last-child {
+        margin-bottom: 6px;
+    }
 }

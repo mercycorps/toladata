@@ -74,7 +74,7 @@ msgstr "Advertencia"
 #: js/base.js:541 js/components/changesetNotice.js:19
 #: js/pages/tola_management_pages/audit_log/views.js:239
 msgid "Reason for change"
-msgstr "Justificación para el cambio"
+msgstr "Razón para el cambio"
 
 #: js/base.js:653
 msgid "Success!"
