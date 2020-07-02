@@ -140,7 +140,7 @@ msgstr "Nouvelle entrée"
 #. Translators: This is the label for a textbox where a user can provide details about their reason for selecting a particular option
 #: js/components/changesetNotice.js:118
 msgid "Details"
-msgstr "Los détails"
+msgstr "Détails"
 
 #. Translators: (preceded by a number) e.g. "4 options selected"
 #: js/components/changesetNotice.js:257

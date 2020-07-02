@@ -3389,7 +3389,7 @@ msgstr "Perfil de usuario actualizado"
 #. Translators: this is an alternative to picking a reason from a dropdown
 #: tola_management/models.py:256
 msgid "Other (please specify)"
-msgstr "Otro (por favor especificar"
+msgstr "Otro (por favor especificar)"
 
 #. Translators: this is one option in a dropdown list of reasons to change a program's details while in progress
 #: tola_management/models.py:258
@@ -3409,7 +3409,7 @@ msgstr "Cambios en el contexto"
 #. Translators: this is one option in a dropdown list of reasons to change a program's details while in progress
 #: tola_management/models.py:264
 msgid "Costed extension"
-msgstr "Extensión costada"
+msgstr "Extensión financiada"
 
 #. Translators: this is one option in a dropdown list of reasons to change a program's details while in progress
 #: tola_management/models.py:266
@@ -3419,12 +3419,12 @@ msgstr "COVID-19"
 #. Translators: this is one option in a dropdown list of reasons to change a program's details while in progress
 #: tola_management/models.py:268
 msgid "Donor requirement"
-msgstr "Requisito de donante"
+msgstr "Requisito del donante"
 
 #. Translators: this is one option in a dropdown list of reasons to change a program's details while in progress
 #: tola_management/models.py:270
 msgid "Implementation delays"
-msgstr "Retraso de implementación"
+msgstr "Retrasos en la implementación"
 
 #: tola_management/models.py:325
 msgid "Unit of measure type"
