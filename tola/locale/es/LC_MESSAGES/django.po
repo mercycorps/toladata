@@ -7,7 +7,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: \n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2020-07-01 12:07-0700\n"
+"POT-Creation-Date: 2020-07-01 17:03-0700\n"
 "PO-Revision-Date: 2020-06-24 10:01-0700\n"
 "Last-Translator: \n"
 "Language-Team: \n"
@@ -1878,38 +1878,45 @@ msgid "Success"
 msgstr "¡Éxito!"
 
 #: templates/indicators/indicator_form_common_js.html:356
+#: templates/indicators/indicator_form_common_js.html:376
+#: templates/indicators/indicator_form_common_js.html:396
 #: templates/indicators/indicator_list_modals.html:7
 msgid "Warning"
 msgstr "Advertencia"
 
-#: templates/indicators/indicator_form_common_js.html:374
-#: templates/indicators/indicator_form_common_js.html:393
-msgid "Reason for change"
-msgstr "Razón para el cambio"
+#: templates/indicators/indicator_form_common_js.html:359
+msgid "Modifying target values will affect program metrics for this indicator."
+msgstr "Modificar los valores objetivo afectará las métricas para este indicador."
 
-#: templates/indicators/indicator_form_common_js.html:496
+#: templates/indicators/indicator_form_common_js.html:360
+#: templates/indicators/indicator_form_common_js.html:379
+#: templates/indicators/indicator_form_common_js.html:399
+msgid "Your changes will be recorded in a change log."
+msgstr "Sus cambios serán guardados en un registro de cambios."
+
+#: templates/indicators/indicator_form_common_js.html:500
 #: templates/indicators/indicatortargets.html:50
 msgid "Enter event name"
 msgstr "Ingrese el nombre del evento"
 
-#: templates/indicators/indicator_form_common_js.html:506
+#: templates/indicators/indicator_form_common_js.html:510
 #: templates/indicators/indicatortargets.html:79
 msgid "Enter target"
 msgstr "Ingrese el objetivo"
 
-#: templates/indicators/indicator_form_common_js.html:710
+#: templates/indicators/indicator_form_common_js.html:714
 #: templates/indicators/indicatortargets.html:124
 msgid "Options for number (#) indicators"
 msgstr "Opciones para indicadores de número (#)"
 
 #. Translators: This is the title of some informational text describing what it means when an indicator is being measured as a percentage e.g. % of population with access to water
-#: templates/indicators/indicator_form_common_js.html:716
+#: templates/indicators/indicator_form_common_js.html:720
 #, python-format
 msgid "Percentage (%%) indicators"
 msgstr "Indicadores de porcentaje (%%)"
 
 #. Translators: warning to user that manually entered in value doesn't match computed value, %s is a number or percentage
-#: templates/indicators/indicator_form_common_js.html:841
+#: templates/indicators/indicator_form_common_js.html:845
 #, python-format
 msgid ""
 "Life of Program (LoP) targets are now automatically displayed. The current "
@@ -1921,7 +1928,7 @@ msgstr ""
 "el pasado -- %%s. Es posible que deba actualizar los valores objetivo."
 
 #. Translators: warning to user that manually entered in value doesn't match computed value, %s is a number or percentage
-#: templates/indicators/indicator_form_common_js.html:846
+#: templates/indicators/indicator_form_common_js.html:850
 #, python-format
 msgid ""
 "This program previously had a LoP target of %%s. Life of Program (LoP) "
@@ -1930,53 +1937,53 @@ msgstr ""
 "Este programa tenía anteriormente un objetivo de LoP de %%s. Los objetivos "
 "de Vida del Programa (LoP) ahora se muestran automáticamente."
 
-#: templates/indicators/indicator_form_common_js.html:862
-#: templates/indicators/indicator_form_common_js.html:957
+#: templates/indicators/indicator_form_common_js.html:866
+#: templates/indicators/indicator_form_common_js.html:961
 #: templates/indicators/result_form_common_js.html:144
 msgid "Please complete this field."
 msgstr "Por favor complete este campo."
 
-#: templates/indicators/indicator_form_common_js.html:864
+#: templates/indicators/indicator_form_common_js.html:868
 msgid "Please enter an indicator with fewer than 500 characters."
 msgstr "Por favor, introduzca un indicador con menos de 500 caracteres."
 
-#: templates/indicators/indicator_form_common_js.html:899
-#: templates/indicators/indicator_form_common_js.html:901
+#: templates/indicators/indicator_form_common_js.html:903
+#: templates/indicators/indicator_form_common_js.html:905
 msgid "Please enter a number greater than or equal to zero."
 msgstr "Por favor, ingrese un número mayor o igual a cero."
 
-#: templates/indicators/indicator_form_common_js.html:927
+#: templates/indicators/indicator_form_common_js.html:931
 msgid "The Life of Program (LoP) target cannot be zero."
 msgstr "El objetivo de Vida del Programa (LoP) no puede ser cero."
 
-#: templates/indicators/indicator_form_common_js.html:930
+#: templates/indicators/indicator_form_common_js.html:934
 msgid "Please enter a target."
 msgstr "Por favor, introduzca un objetivo."
 
-#: templates/indicators/indicator_form_common_js.html:1025
+#: templates/indicators/indicator_form_common_js.html:1029
 msgid ""
 "The Life of Program (LoP) target cannot be zero.  Please update targets."
 msgstr ""
 "El objetivo de Vida del Programa (LoP) no puede ser cero. Por favor, "
 "actualice los objetivos."
 
-#: templates/indicators/indicator_form_common_js.html:1036
+#: templates/indicators/indicator_form_common_js.html:1040
 msgid "Please complete all event names and targets."
 msgstr "Por favor, complete todos nombres de eventos y objetivos."
 
-#: templates/indicators/indicator_form_common_js.html:1039
+#: templates/indicators/indicator_form_common_js.html:1043
 msgid "Please complete targets."
 msgstr "Por favor, complete los objetivos."
 
-#: templates/indicators/indicator_form_common_js.html:1105
+#: templates/indicators/indicator_form_common_js.html:1109
 msgid "Please complete all required fields in the Targets tab."
 msgstr "Complete todos los campos obligatorios en la pestaña Objetivos."
 
-#: templates/indicators/indicator_form_common_js.html:1119
+#: templates/indicators/indicator_form_common_js.html:1123
 msgid "Please complete all required fields in the Summary tab."
 msgstr "Complete todos los campos obligatorios en la pestaña Resumen."
 
-#: templates/indicators/indicator_form_common_js.html:1129
+#: templates/indicators/indicator_form_common_js.html:1133
 msgid "Please complete all required fields in the Performance tab."
 msgstr "Complete todos los campos obligatorios en la pestaña Rendimiento."
 
@@ -4134,6 +4141,9 @@ msgstr "Encontrar"
 #: workflow/widgets.py:133
 msgid "City, Country:"
 msgstr "Ciudad, País:"
+
+#~ msgid "Reason for change"
+#~ msgstr "Razón para el cambio"
 
 #~ msgid "Direction of change (not applicable)"
 #~ msgstr "Dirección de cambio (no aplica)"
