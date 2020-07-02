@@ -3415,7 +3415,7 @@ msgstr "Profil de l’utilisateur mis à jour"
 #. Translators: this is an alternative to picking a reason from a dropdown
 #: tola_management/models.py:256
 msgid "Other (please specify)"
-msgstr "Autre (veuillez préciser"
+msgstr "Autre (veuillez préciser)"
 
 #. Translators: this is one option in a dropdown list of reasons to change a program's details while in progress
 #: tola_management/models.py:258
@@ -3425,17 +3425,17 @@ msgstr "Gestion adaptative"
 #. Translators: this is one option in a dropdown list of reasons to change a program's details while in progress
 #: tola_management/models.py:260
 msgid "Budget realignment"
-msgstr "Réalignement budgétaire"
+msgstr "Réalignement du budget"
 
 #. Translators: this is one option in a dropdown list of reasons to change a program's details while in progress
 #: tola_management/models.py:262
 msgid "Changes in context"
-msgstr "Changements de contexte"
+msgstr "Changements dans le contexte"
 
 #. Translators: this is one option in a dropdown list of reasons to change a program's details while in progress
 #: tola_management/models.py:264
 msgid "Costed extension"
-msgstr "Extension chiffrée"
+msgstr "Extension financée"
 
 #. Translators: this is one option in a dropdown list of reasons to change a program's details while in progress
 #: tola_management/models.py:266
@@ -3445,12 +3445,12 @@ msgstr "COVID-19"
 #. Translators: this is one option in a dropdown list of reasons to change a program's details while in progress
 #: tola_management/models.py:268
 msgid "Donor requirement"
-msgstr "Exigence du donateur"
+msgstr "Exigence du bailleur de fonds"
 
 #. Translators: this is one option in a dropdown list of reasons to change a program's details while in progress
 #: tola_management/models.py:270
 msgid "Implementation delays"
-msgstr "Retard de mise en œvre"
+msgstr "Délais de mise en œvre"
 
 #: tola_management/models.py:325
 msgid "Unit of measure type"
