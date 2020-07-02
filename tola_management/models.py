@@ -301,7 +301,7 @@ class AuditLogRationaleSelection(models.Model):
     @property
     def pretty_list(self):
         """returns list of selected value names, human readable"""
-        return [label for (option, field, label) in self.ordered_options() if getattr(self, field, False)]
+        return [_(label) for (option, field, label) in self.ordered_options() if getattr(self, field, False)]
 
 
 class ProgramAuditLog(models.Model, DiffableLog):
@@ -340,7 +340,11 @@ class ProgramAuditLog(models.Model, DiffableLog):
             "end_date": _('End date'),
             "assumptions": _('Assumptions'),
             "sites": _("Sites"),
-            "level": _("Result level")
+            "level": _("Result level"),
+            "definition": _("Definition"),
+            "means_of_verification": _("Means of verification"),
+            "data_collection_method": _("Data collection method"),
+            "method_of_analysis": _("Method of analysis")
         }
 
     @property
