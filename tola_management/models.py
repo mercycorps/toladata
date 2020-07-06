@@ -252,13 +252,21 @@ class AuditLogRationaleSelection(models.Model):
 
     RATIONALE_REQUIRED = [OTHER,]
 
-    other = models.BooleanField(_('Other'), default=False)
+    # Translators: this is an alternative to picking a reason from a dropdown
+    other = models.BooleanField(_('Other (please specify)'), default=False)
+    # Translators: this is one option in a dropdown list of reasons to change a program's details while in progress
     adaptive_management = models.BooleanField(_('Adaptive management'), default=False)
+    # Translators: this is one option in a dropdown list of reasons to change a program's details while in progress
     budget_realignment = models.BooleanField(_('Budget realignment'), default=False)
+    # Translators: this is one option in a dropdown list of reasons to change a program's details while in progress
     changes_in_context = models.BooleanField(_('Changes in context'), default=False)
+    # Translators: this is one option in a dropdown list of reasons to change a program's details while in progress
     costed_extension = models.BooleanField(_('Costed extension'), default=False)
+    # Translators: this is one option in a dropdown list of reasons to change a program's details while in progress
     covid_19 = models.BooleanField(_('COVID-19'), default=False)
+    # Translators: this is one option in a dropdown list of reasons to change a program's details while in progress
     donor_requirement = models.BooleanField(_('Donor requirement'), default=False)
+    # Translators: this is one option in a dropdown list of reasons to change a program's details while in progress
     implementation_delays = models.BooleanField(_('Implementation delays'), default=False)
 
     @classmethod
@@ -273,7 +281,7 @@ class AuditLogRationaleSelection(models.Model):
     @classmethod
     def options_display(cls):
         """returns all options in (ENUM, human-readable name, whether a rationale is required) tuple form"""
-        return [(option, label, option in cls.RATIONALE_REQUIRED) for (option, field, label) in cls.ordered_options()]
+        return [(option, _(label), option in cls.RATIONALE_REQUIRED) for (option, field, label) in cls.ordered_options()]
 
     @classmethod
     def from_options(cls, options=None):
@@ -293,7 +301,7 @@ class AuditLogRationaleSelection(models.Model):
     @property
     def pretty_list(self):
         """returns list of selected value names, human readable"""
-        return [label for (option, field, label) in self.ordered_options() if getattr(self, field, False)]
+        return [_(label) for (option, field, label) in self.ordered_options() if getattr(self, field, False)]
 
 
 class ProgramAuditLog(models.Model, DiffableLog):
@@ -332,7 +340,11 @@ class ProgramAuditLog(models.Model, DiffableLog):
             "end_date": _('End date'),
             "assumptions": _('Assumptions'),
             "sites": _("Sites"),
-            "level": _("Result level")
+            "level": _("Result level"),
+            "definition": _("Definition"),
+            "means_of_verification": _("Means of verification"),
+            "data_collection_method": _("Data collection method"),
+            "method_of_analysis": _("Method of analysis")
         }
 
     @property

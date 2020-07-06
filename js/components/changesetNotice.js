@@ -254,7 +254,9 @@ const create_unified_changeset_notice = ({
     $('.pnotify__reason-for-change select').multiselect({
         numberDisplayed: 1,
         // # Translators: (preceded by a number) e.g. "4 options selected"
-        nSelectedText: gettext(' options selected')
+        nSelectedText: ` ${gettext('selected')}`,
+        // # Translators: for a dropdown menu with no options checked:
+        nonSelectedText: gettext('None selected')
     });
 
 

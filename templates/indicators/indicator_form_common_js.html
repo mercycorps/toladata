@@ -15,6 +15,11 @@
     // this variable is set to TRUE meaning by default any modal that attempts to close can close
     // in the Indicator Form Open function it is set to false to allow validation to proceed normally
     let allowModalToClose = true;  // Can the create modal be closed without prompting the user?
+    
+    /* These are mostly unused but not removed because the JS is scattered atm.  As we move to the
+     * unified changeset notice it should be easier to consolidate these in constants.js (for use by the changeset
+     * function) or in-place trans tags
+     */
 
     const DELETE_ALL_TARGETS_MESSAGE = "{% trans 'Any results assigned to these targets will need to be reassigned. For future reference, please provide a reason for deleting these targets.' %}"
     const DELETE_INDICATOR_MESSAGE = "{% trans 'All details about this indicator and results recorded to the indicator will be permanently removed. For future reference, please provide a reason for deleting this indicator.' %}"
@@ -41,6 +46,10 @@
         'baseline_na',
         'periodic_targets',
         'target_frequency',
+        'definition',
+        'method_of_analysis',
+        'data_collection_method',
+        'means_of_verification'
     ]);
 
     function showSuccessNotifiction(message) {
@@ -352,17 +361,18 @@
         }
         if(indicatorHasResults() && hasTrackedFieldsChanged()) {
             if(hasTargetsChanged()) {
+                // options for the TARGETS CHANGED changeset notice per GH ticket #2320
                 window.create_unified_changeset_notice({
-                    header: "Warning",
-                    show_icon: false,
-                    message_text: MODIFY_TARGETS_MESSAGE,
+                    header: "{% trans 'Warning' %}",
+                    show_icon: true,
+                    preamble: "{% trans 'Modifying target values will affect program metrics for this indicator.' %}",
+                    message_text: "{% trans 'Your changes will be recorded in a change log.' %}",
                     rationale_required: true,
                     include_rationale: true,
                     rfc_required: true,
                     rfc_options: true,
                     validation_type: 1,
                     showCloser: false,
-                    no_preamble: true,
                     context: document.getElementById('indicator_update_form'),
                     notice_type: 'error',
                     on_submit: (rationale, reasons_for_change, validation_type) => {
@@ -370,17 +380,17 @@
                     }
                 });
             } else {
+                // options for the SOMETHING OTHER THAN TARGETS CHANGED changeset notice per GH ticket #2320
                 window.create_unified_changeset_notice({
-                    header: "Reason for change",
-                    show_icon: false,
-                    message_text: window.DEFAULT_NONDESTRUCTIVE_MESSAGE,
+                    header: "{% trans 'Warning' %}",
+                    show_icon: true,
+                    preamble: "{% trans 'Your changes will be recorded in a change log.' %}",
                     rationale_required: true,
                     include_rationale: true,
                     rfc_required: true,
                     rfc_options: true,
                     validation_type: 1,
                     showCloser: false,
-                    no_preamble: true,
                     context: document.getElementById('indicator_update_form'),
                     on_submit: (rationale, reasons_for_change, validation_type) => {
                         submitFormUpdate(rationale, reasons_for_change, validation_type);
@@ -389,17 +399,18 @@
             }
             scrollToIndicatorFormBottom();
         } else if (hasLevelBeenUpdatedOrCleared()) {
+            // options for the ONLY LEVEL HAS CHANGED changeset notice per GH ticket #2320
+            // note: this is the same as the other something-besides-targets has changed notice per latest spec
             window.create_unified_changeset_notice({
-                header: "Reason for change",
-                show_icon: false,
-                message_text: window.DEFAULT_NONDESTRUCTIVE_MESSAGE,
+                header: "{% trans 'Warning' %}",
+                show_icon: true,
+                preamble: "{% trans 'Your changes will be recorded in a change log.' %}",
                 rationale_required: true,
                 include_rationale: true,
                 rfc_required: true,
                 rfc_options: true,
                 validation_type: 1,
                 showCloser: false,
-                no_preamble: true,
                 context: document.getElementById('indicator_update_form'),
                 on_submit: (rationale, reasons_for_change, validation_type) => {
                     submitFormUpdate(rationale, reasons_for_change, validation_type);
