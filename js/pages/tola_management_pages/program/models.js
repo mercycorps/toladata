@@ -268,8 +268,13 @@ export class ProgramStore {
                         let message_intro = gettext('The GAIT ID for this program is shared with at least one other program.')
                         let link_text = gettext('View programs with this ID in GAIT.');
                         let preamble_text = `${message_intro} <a href="${response.data.gait_link}" target="_blank">${link_text}</a>`;
-                        window.create_no_rationale_changeset_notice({
+                        window.create_unified_changeset_notice({
+                            header: gettext('Warning'),
+                            show_icon: true,
+                            rationale_required: false,
+                            include_rationale: false,
                             message_text: gettext('Are you sure you want to continue?'),
+                            notice_type: 'error',
                             on_submit: resolve,
                             on_cancel: reject,
                             preamble: preamble_text
