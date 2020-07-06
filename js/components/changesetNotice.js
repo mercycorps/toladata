@@ -159,7 +159,9 @@ const create_unified_changeset_notice = ({
                 case 0:
                 default:
                     // Either a rationale is submitted, or there was no rationale form, or it was optional:
-                    is_valid = (rationale || !include_rationale || !rationale_required);
+                    is_valid = ((rationale || !include_rationale || !rationale_required) &&
+                    // Either one or more reasons for change or there were no options or they weren't required:
+                                (reasons_for_change.length > 0 || !rfc_options || !rfc_required));
             }
             if (is_valid){
                 textarea.removeClass('is-invalid');
