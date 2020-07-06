@@ -168,10 +168,13 @@ export default (
         loadResultsModal(indicatorPk) {
             api.indicatorResultsTable(indicatorPk, false).then(
                 (data) => {
-                    $('#indicator_modal_content').empty();
                     $('#modalmessages').empty();
-                    $('#indicator_modal_content').html(data);
+                    let $modal = $('#indicator_modal_content');
+                    $modal.empty().html(data);
                     $('#indicator_modal_div').modal('show');
+                    $modal.find('[data-toggle="popover"]').popover({
+                        html: true, placement: 'right', container: $modal
+                    });
                 }
             );
         },
