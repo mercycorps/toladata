@@ -3,7 +3,9 @@ from __future__ import unicode_literals
 
 import json
 import itertools
+import operator
 from django.core.serializers.json import DjangoJSONEncoder
+from django.core.exceptions import ValidationError
 from django.db import models
 from django.utils.translation import ugettext as _
 
@@ -222,6 +224,85 @@ class UserManagementAuditLog(models.Model, DiffableLog):
             )
             entry.save()
 
+class AuditLogRationaleSelection(models.Model):
+    """Rationale options to supplement/supplant a rationale string in some cases
+
+        To add options: add enum, add to list of OPTIONS (leaving "other" at the end), add field
+    """
+
+    OTHER = 1
+    ADAPTIVE_MANAGEMENT = 2
+    BUDGET_REALIGNMENT = 3
+    CHANGES_IN_CONTEXT = 4
+    COSTED_EXTENSION = 5
+    COVID_19 = 6
+    DONOR_REQUIREMENT = 7
+    IMPLEMENTATION_DELAYS = 8
+
+    OPTIONS = {
+        ADAPTIVE_MANAGEMENT: 'adaptive_management',
+        BUDGET_REALIGNMENT: 'budget_realignment',
+        CHANGES_IN_CONTEXT: 'changes_in_context',
+        COSTED_EXTENSION: 'costed_extension',
+        COVID_19: 'covid_19',
+        DONOR_REQUIREMENT: 'donor_requirement',
+        IMPLEMENTATION_DELAYS: 'implementation_delays',
+        OTHER: 'other',
+    }
+
+    RATIONALE_REQUIRED = [OTHER,]
+
+    # Translators: this is an alternative to picking a reason from a dropdown
+    other = models.BooleanField(_('Other (please specify)'), default=False)
+    # Translators: this is one option in a dropdown list of reasons to change a program's details while in progress
+    adaptive_management = models.BooleanField(_('Adaptive management'), default=False)
+    # Translators: this is one option in a dropdown list of reasons to change a program's details while in progress
+    budget_realignment = models.BooleanField(_('Budget realignment'), default=False)
+    # Translators: this is one option in a dropdown list of reasons to change a program's details while in progress
+    changes_in_context = models.BooleanField(_('Changes in context'), default=False)
+    # Translators: this is one option in a dropdown list of reasons to change a program's details while in progress
+    costed_extension = models.BooleanField(_('Costed extension'), default=False)
+    # Translators: this is one option in a dropdown list of reasons to change a program's details while in progress
+    covid_19 = models.BooleanField(_('COVID-19'), default=False)
+    # Translators: this is one option in a dropdown list of reasons to change a program's details while in progress
+    donor_requirement = models.BooleanField(_('Donor requirement'), default=False)
+    # Translators: this is one option in a dropdown list of reasons to change a program's details while in progress
+    implementation_delays = models.BooleanField(_('Implementation delays'), default=False)
+
+    @classmethod
+    def ordered_options(cls):
+        """orders options by translated name, OTHER last"""
+        other_option = (cls.OTHER, 'other', cls._meta.get_field('other').verbose_name)
+        return sorted([
+            (option, field, cls._meta.get_field(field).verbose_name)
+            for (option, field) in cls.OPTIONS.items() if option != cls.OTHER
+            ], key=lambda option_tuple: option_tuple[2].lower()) + [other_option]
+
+    @classmethod
+    def options_display(cls):
+        """returns all options in (ENUM, human-readable name, whether a rationale is required) tuple form"""
+        return [(option, _(label), option in cls.RATIONALE_REQUIRED) for (option, field, label) in cls.ordered_options()]
+
+    @classmethod
+    def from_options(cls, options=None):
+        """creates an instance of this class from a list of integers matching class ENUMs"""
+        if options is None:
+            options = []
+        kwargs = {cls.OPTIONS[option]: True for option in options}
+        selection_object = cls(**kwargs)
+        selection_object.save()
+        return selection_object
+
+    @property
+    def selected_options(self):
+        """returns list of integers corresponding to selected items"""
+        return [option for (option, field, label) in self.ordered_options() if getattr(self, field, False)]
+
+    @property
+    def pretty_list(self):
+        """returns list of selected value names, human readable"""
+        return [_(label) for (option, field, label) in self.ordered_options() if getattr(self, field, False)]
+
 
 class ProgramAuditLog(models.Model, DiffableLog):
     program = models.ForeignKey(Program, on_delete=models.CASCADE, related_name="audit_logs")
@@ -234,6 +315,7 @@ class ProgramAuditLog(models.Model, DiffableLog):
     previous_entry = models.TextField(null=True, blank=True)
     new_entry = models.TextField(null=True, blank=True)
     rationale = models.TextField(null=True)
+    rationale_selections = models.OneToOneField(AuditLogRationaleSelection, null=True, on_delete=models.SET_NULL)
 
     @property
     def field_map(self):
@@ -258,7 +340,11 @@ class ProgramAuditLog(models.Model, DiffableLog):
             "end_date": _('End date'),
             "assumptions": _('Assumptions'),
             "sites": _("Sites"),
-            "level": _("Result level")
+            "level": _("Result level"),
+            "definition": _("Definition"),
+            "means_of_verification": _("Means of verification"),
+            "data_collection_method": _("Data collection method"),
+            "method_of_analysis": _("Method of analysis")
         }
 
     @property
@@ -273,6 +359,10 @@ class ProgramAuditLog(models.Model, DiffableLog):
             "program_dates_changed": _('Program dates changed'),
             "level_changed": _('Result level changed'),
         }
+
+    @staticmethod
+    def reason_for_change_options():
+        return AuditLogRationaleSelection.options_display()
 
     @property
     def unit_of_measure_type_map(self):
@@ -292,6 +382,12 @@ class ProgramAuditLog(models.Model, DiffableLog):
     @property
     def pretty_change_type(self):
         return self.change_type_map.get(self.change_type, self.change_type)
+
+    @property
+    def rationale_selected_options(self):
+        if not self.rationale_selections:
+            return []
+        return self.rationale_selections.pretty_list
 
     @property
     def diff_list(self):
@@ -451,16 +547,16 @@ class ProgramAuditLog(models.Model, DiffableLog):
         new_program_log_entry.save()
 
     @staticmethod
-    def log_indicator_updated(user, indicator, old_indicator_values, new_indicator_values, rationale):
+    def log_indicator_updated(user, indicator, old_indicator_values,
+                              new_indicator_values, rationale=None, rationale_options=None):
         previous_entry_json = json.dumps(old_indicator_values, cls=DjangoJSONEncoder)
         new_entry_json = json.dumps(new_indicator_values, cls=DjangoJSONEncoder)
         if new_entry_json != previous_entry_json:
-            # Don't prevent user from saving if the UI is out of sync with the DB,
-            # or dummy PT LoP only value != indicator LoP target
-            if rationale == '':
-                # raise Exception('rationale string missing when saving change to indicator audit log')
-                rationale = _('No reason for change required.')
-
+            rationale_selections = AuditLogRationaleSelection.from_options(rationale_options)
+            if not rationale and rationale_selections.selected_options == [rationale_selections.OTHER]:
+                raise ValidationError("Rationale required when 'Other' selected")
+            if not rationale and not rationale_selections.selected_options:
+                raise ValidationError("Rationale required when no options selected")
             new_program_log_entry = ProgramAuditLog(
                 program=indicator.program,
                 user=user.tola_user,
@@ -468,6 +564,7 @@ class ProgramAuditLog(models.Model, DiffableLog):
                 indicator=indicator,
                 change_type="indicator_changed",
                 rationale=rationale,
+                rationale_selections=rationale_selections,
                 previous_entry=previous_entry_json,
                 new_entry=new_entry_json
             )

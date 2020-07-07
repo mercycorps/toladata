@@ -35,8 +35,8 @@ export const ResultChangeset = ({data, name, pretty_name}) => {
     }
     if (name === 'id') {
         return null
-    } else if(name === 'Target_url') {
-        return <div className="change__field"><strong className="change__field__name">{pretty_name}</strong>: {(data !== 'N/A' && data !== '')?<a href={displayValue} target="_blank">Link</a>:data}</div>
+    } else if(name === 'evidence_url') {
+        return <div className="change__field"><strong className="change__field__name">{pretty_name}</strong>: {(data !== 'N/A' && data !== '')?<a className="change__field__value--evidence-url" href={displayValue} target="_blank">{displayValue}</a>:data}</div>
     } else if (name === 'disaggregation_values') {
         if (Object.entries(data).length) {
             let groupedDiffs = {};
@@ -282,7 +282,15 @@ export const IndexView = observer(
                                                                    indicator={data.indicator} level={data.level}/>
                                         })}
                                     </td>
-                                    <td className="changelog__change--rationale">{data.rationale}</td>
+                                    <td className="changelog__change--rationale">
+                                    {data.rationale_selected_options &&
+                                        data.rationale_selected_options.map(option => {
+                                            return <React.Fragment key={option}><span className="changelog__change--rationale-option">{option}</span><br /></React.Fragment>;
+                                        })
+                                    }
+                                    {(data.rationale_selected_options && data.rationale_selected_options.length > 0 && data.rationale) && <br/>}
+                                        <span className="changelog__change--rationale-text">{data.rationale}</span>
+                                    </td>
                                 </tr>
                                 }
                                 </tbody>

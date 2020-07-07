@@ -15,6 +15,11 @@
     // this variable is set to TRUE meaning by default any modal that attempts to close can close
     // in the Indicator Form Open function it is set to false to allow validation to proceed normally
     let allowModalToClose = true;  // Can the create modal be closed without prompting the user?
+    
+    /* These are mostly unused but not removed because the JS is scattered atm.  As we move to the
+     * unified changeset notice it should be easier to consolidate these in constants.js (for use by the changeset
+     * function) or in-place trans tags
+     */
 
     const DELETE_ALL_TARGETS_MESSAGE = "{% trans 'Any results assigned to these targets will need to be reassigned. For future reference, please provide a reason for deleting these targets.' %}"
     const DELETE_INDICATOR_MESSAGE = "{% trans 'All details about this indicator and results recorded to the indicator will be permanently removed. For future reference, please provide a reason for deleting this indicator.' %}"
@@ -41,6 +46,10 @@
         'baseline_na',
         'periodic_targets',
         'target_frequency',
+        'definition',
+        'method_of_analysis',
+        'data_collection_method',
+        'means_of_verification'
     ]);
 
     function showSuccessNotifiction(message) {
@@ -350,31 +359,61 @@
             showValidations("#modalmessages");
             return;
         }
-
         if(indicatorHasResults() && hasTrackedFieldsChanged()) {
             if(hasTargetsChanged()) {
-                window.create_destructive_changeset_notice({
-                    message_text: MODIFY_TARGETS_MESSAGE,
-                    no_preamble: true,
+                // options for the TARGETS CHANGED changeset notice per GH ticket #2320
+                window.create_unified_changeset_notice({
+                    header: "{% trans 'Warning' %}",
+                    show_icon: true,
+                    preamble: "{% trans 'Modifying target values will affect program metrics for this indicator.' %}",
+                    message_text: "{% trans 'Your changes will be recorded in a change log.' %}",
+                    rationale_required: true,
+                    include_rationale: true,
+                    rfc_required: true,
+                    rfc_options: true,
+                    validation_type: 1,
+                    showCloser: false,
                     context: document.getElementById('indicator_update_form'),
-                    on_submit: (rationale) => {
-                        submitFormUpdate(rationale);
+                    notice_type: 'error',
+                    on_submit: (rationale, reasons_for_change, validation_type) => {
+                        submitFormUpdate(rationale, reasons_for_change, validation_type);
                     }
                 });
             } else {
-                window.create_nondestructive_changeset_notice({
+                // options for the SOMETHING OTHER THAN TARGETS CHANGED changeset notice per GH ticket #2320
+                window.create_unified_changeset_notice({
+                    header: "{% trans 'Warning' %}",
+                    show_icon: true,
+                    preamble: "{% trans 'Your changes will be recorded in a change log.' %}",
+                    rationale_required: true,
+                    include_rationale: true,
+                    rfc_required: true,
+                    rfc_options: true,
+                    validation_type: 1,
+                    showCloser: false,
                     context: document.getElementById('indicator_update_form'),
-                    on_submit: (rationale) => {
-                        submitFormUpdate(rationale);
+                    on_submit: (rationale, reasons_for_change, validation_type) => {
+                        submitFormUpdate(rationale, reasons_for_change, validation_type);
                     }
                 });
             }
             scrollToIndicatorFormBottom();
         } else if (hasLevelBeenUpdatedOrCleared()) {
-            window.create_nondestructive_changeset_notice({
+            // options for the ONLY LEVEL HAS CHANGED changeset notice per GH ticket #2320
+            // note: this is the same as the other something-besides-targets has changed notice per latest spec
+            window.create_unified_changeset_notice({
+                header: "{% trans 'Warning' %}",
+                show_icon: true,
+                preamble: "{% trans 'Your changes will be recorded in a change log.' %}",
+                rationale_required: true,
+                include_rationale: true,
+                rfc_required: true,
+                rfc_options: true,
+                validation_type: 1,
+                showCloser: false,
                 context: document.getElementById('indicator_update_form'),
-                on_submit: (rationale) => {
-                    submitFormUpdate(rationale);
+                on_submit: (rationale, reasons_for_change, validation_type) => {
+                    submitFormUpdate(rationale, reasons_for_change, validation_type);
                 }
             });
         } else {
@@ -494,7 +533,7 @@
 
     // submits form - returns a jQuery deferred obj to attached callbacks onto
     // only has code shared by both CREATE and UPDATE
-    function submitForm(rationale = '') {
+    function submitForm(rationale='', reasons_for_change=null, validation_type='') {
         // clear any success/failure messages
         let alertElement = "#modalmessages";
         $(alertElement).html('');
@@ -511,8 +550,12 @@
             formArr.push({name: 'is_cumulative', value: 3});
         }
 
-        // user entered rationale for change
+        // user entered rationale and reason for change dropdown values
         formArr.push({name: 'rationale', value: rationale});
+        (reasons_for_change || []).forEach(reason => {
+            formArr.push({name: 'reasons_for_change', value: JSON.stringify(reason)});
+        });
+        formArr.push({name: 'validation_type', value: validation_type});
 
         // If LoP target not explicit, submit computed value
         if (formArr.find(e => e.name === 'lop_target') === undefined) {
@@ -545,8 +588,8 @@
     }
 
     // Submit the UPDATE form
-    function submitFormUpdate(rationale = '') {
-        return submitForm(rationale).done((data) => {
+    function submitFormUpdate(rationale = '', reasons_for_change='', validation_type='') {
+        return submitForm(rationale, reasons_for_change, validation_type).done((data) => {
             $('#indicator_modal_div').trigger('updated.tola.indicator.save', saveEventParams());
 
             // Clear any validation error messages

@@ -25,3 +25,25 @@
 .pnotify__rationale {
     margin-bottom: 0.5rem;
 }
+
+// Per #2320 form-field label text in pNotify form should be black and tight to form field
+.pnotify__reason-for-change label {
+    color: $black;
+    margin-bottom: 0.2rem;
+}
+
+// Per #2320 form-field label text in pNotify form should be black and tight to form field
+.pnotify__rationale label {
+    color: $black;
+    margin-bottom: 0.2rem;
+}
+
+// Per #2320 more space at bottom of dropdown list (drop up in pNotify is too clsoe to the bottom)
+.pnotify__reason-for-change .dropdown-menu {
+    li:first-child {
+        margin-top: 6px;
+    }
+    li:last-child {
+        margin-bottom: 6px;
+    }
+}
