@@ -5,6 +5,8 @@ from django.conf.urls import url, include
 apipatterns = [
     # results table html string for one indicator (Program Page and IPTT):
     url(r'^result_table/(?P<indicator>\d+)/', views.result_view, name='result_view'),
+    # all results tables as html strings for one program (Program Page):
+    url(r'^program_result_tables/(?P<program>\d+)/', views.all_results_view, name='program_results_view'),
     # program-wide ordering update (program page):
     url(r'^program/ordering/(?P<program>\d+)/', views.api_program_ordering, name='program_ordering'),
     # program by-level ordering update (IPTT):

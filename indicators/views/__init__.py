@@ -9,6 +9,7 @@ from indicators.views.views_indicators import (
     ResultDelete,
     service_json,
     result_view,
+    all_results_view,
     indicator_plan,
     DisaggregationReportQuickstart,
     DisaggregationReport,

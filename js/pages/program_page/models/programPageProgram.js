@@ -41,6 +41,17 @@ export const forProgramPage = (
             }
             return false;
         }),
+        updateAllResultsHTML() {
+            api.allIndicatorResultsTables(this.pk).then(data => {
+                runInAction(() => {
+                    data.results.forEach((result) => {
+                        this.deleteResultsHTML(parseInt(result[0]));
+                        this.resultsMap.set(parseInt(result[0]), result[1]);
+                    });
+                    return true;
+                });
+            });
+        },
         deleteAllResultsHTML: action(function() {
             this.resultsMap.clear();
         }),
