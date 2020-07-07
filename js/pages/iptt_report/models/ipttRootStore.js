@@ -173,7 +173,10 @@ export default (
                     $modal.empty().html(data);
                     $('#indicator_modal_div').modal('show');
                     $modal.find('[data-toggle="popover"]').popover({
-                        html: true, placement: 'right', container: $modal
+                        html: true, placement: 'right', container: $modal,
+                        // note: this template is just the default with the addition of a width attribute
+                        // already tried: container, boundary, placement, offset, and loading order, but this works:
+                        template: '<div class="popover" style="width: 325px;" role="tooltip"><div class="arrow"></div><h3 class="popover-header"></h3><div class="popover-body"></div></div>'
                     });
                 }
             );
