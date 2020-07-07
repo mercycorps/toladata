@@ -1,11 +1,12 @@
 import React from 'react';
-import { observer } from "mobx-react"
-import Pagination from '../../../components/pagination'
-import {FontAwesomeIcon} from "@fortawesome/react-fontawesome"
-import { toJS } from "mobx"
+import { observer } from "mobx-react";
+import Pagination from '../../../components/pagination';
+import {FontAwesomeIcon} from "@fortawesome/react-fontawesome";
+import { toJS } from "mobx";
 import classNames from "classnames";
 
-import LoadingSpinner from '../../../components/loading-spinner'
+import { ExpandAllButton, CollapseAllButton } from '../../../components/indicatorModalComponents';
+import LoadingSpinner from '../../../components/loading-spinner';
 
 const emptyValue = "—";
 
@@ -141,31 +142,6 @@ class ChangesetEntry extends React.Component {
     }
 }
 
-const ExpandAllButton = observer(
-    ({store}) => {
-        return <button className="btn btn-medium text-action btn-sm"
-                       onClick={() => store.expandAllExpandos()}
-                       disabled={store.log_rows.length === store.expando_rows.size}>
-            <i className="fas fa-plus-square"></i>
-            {
-                /* # Translators: button label to show the details of all rows in a list */}
-            {gettext('Expand all')}
-        </button>
-    }
-);
-
-const CollapseAllButton = observer(
-    ({store}) => {
-        return <button className="btn btn-medium text-action btn-sm"
-                       onClick={() => store.collapsAllExpandos()}
-                       disabled={store.expando_rows.size === 0}>
-            <i className="fas fa-minus-square"></i>
-            {
-                /* # Translators: button label to hide the details of all rows in a list */}
-            {gettext('Collapse all')}
-        </button>
-    }
-);
 
 const IndicatorNameSpan = ({indicator}) => {
     if (! indicator) {
@@ -211,8 +187,8 @@ export const IndexView = observer(
             <div className="admin-list__controls">
                 <div className="controls__bulk-actions">
                     <div className="btn-group">
-                        <ExpandAllButton store={store} />
-                        <CollapseAllButton store={store} />
+                        <ExpandAllButton clickHandler={ () => store.expandAllExpandos() } disabled={ store.log_rows.length === store.expando_rows.size } />
+                        <CollapseAllButton clickHandler={ () => store.collapseAllExpandos() } disabled={ store.expando_rows.size === 0 } />
                     </div>
                 </div>
                 <div className="controls__buttons">

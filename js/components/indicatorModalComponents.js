@@ -25,3 +25,31 @@ export const UpdateIndicatorButton = observer(({ readonly, label=null, ...params
             </button>
     );
 });
+
+
+
+export const ExpandAllButton = observer(
+    ({clickHandler, disabled}) => {
+        return <button className="btn btn-medium text-action btn-sm"
+                       onClick={ clickHandler }
+                       disabled={ disabled }>
+            <i className="fas fa-plus-square"></i>
+            {
+                /* # Translators: button label to show the details of all rows in a list */}
+            {gettext('Expand all')}
+        </button>
+    }
+);
+
+export const CollapseAllButton = observer(
+    ({clickHandler, disabled}) => {
+        return <button className="btn btn-medium text-action btn-sm"
+                       onClick={ clickHandler }
+                       disabled={ disabled }>
+            <i className="fas fa-minus-square"></i>
+            {
+                /* # Translators: button label to hide the details of all rows in a list */}
+            {gettext('Collapse all')}
+        </button>
+    }
+);

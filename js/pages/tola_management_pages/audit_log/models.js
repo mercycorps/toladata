@@ -61,7 +61,7 @@ export class ProgramAuditLogStore {
     }
 
     @action
-    collapsAllExpandos() {
+    collapseAllExpandos() {
         this.expando_rows.clear();
     }
 }
