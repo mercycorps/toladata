@@ -1,5 +1,6 @@
 import { observable, computed, action, toJS, runInAction, autorun } from "mobx";
 import { api } from "../../api.js"
+import { create_unified_changeset_notice } from '../../components/changesetNotice';
 
 export class RootStore {
     constructor (program, levels, indicators, levelTiers, tierTemplates, englishTemplates, customTemplates, programObjectives, accessLevel, usingResultsFramework, maxTiers) {
@@ -659,12 +660,17 @@ export class UIStore {
             this.setDisableCardActions(true);
             $(`#level-card-${this.activeCard}`)[0].scrollIntoView({behavior:"smooth"});
             const oldTierName = this.rootStore.levelStore.levelProperties[this.activeCard].tierName;
-            create_no_rationale_changeset_notice({
+            create_unified_changeset_notice({
+                header: gettext("Warning"),
+                show_icon: true,
                 /* # Translators:  This is a confirmation prompt that is triggered by clicking on a cancel button.  */
                 message_text: gettext("Are you sure you want to continue?"),
                 /* # Translators:  This is a warning provided to the user when they try to cancel the editing of something they have already modified.  */
                 preamble: interpolate(gettext("Changes to this %s will not be saved"), [oldTierName]),
-                type: "notice",
+                notice_type: "notice",
+                include_rationale: false,
+                rationale_required: false,
+                showCloser: true,
                 on_submit: () => this.onLeaveConfirm(levelId, cancelledLevelId),
                 on_cancel: () => this.setDisableCardActions(false),
             })

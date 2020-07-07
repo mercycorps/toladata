@@ -151,24 +151,18 @@ const create_unified_changeset_notice = ({
             let rfc_select  = $(notice.refs.elem).find('select[name="reasons_for_change"]');
             let reasons_for_change = (rfc_select.val() || []).map(v => parseInt(v));
             let is_valid = false;
-            if (validation_type === 0 &&
-                (!rationale && rationale_required) ||
-                (reasons_for_change.length === 0 && rfc_required)) {
-                    is_valid = false;
+            switch (validation_type) {
+                case 1:
+                    // Uses RFC dropdown logic (either a rationale or a non-Other reason for change required):
+                    is_valid = (rationale || (reasons_for_change.length > 0 && reasons_for_change.indexOf(1) == -1))
+                    break;
+                case 0:
+                default:
+                    // Either a rationale is submitted, or there was no rationale form, or it was optional:
+                    is_valid = ((rationale || !include_rationale || !rationale_required) &&
+                    // Either one or more reasons for change or there were no options or they weren't required:
+                                (reasons_for_change.length > 0 || !rfc_options || !rfc_required));
             }
-            else {
-                is_valid = true;
-            }
-
-            if (validation_type === 1 &&
-                (!rationale && (reasons_for_change.length === 0 || reasons_for_change.indexOf(1) >= 0))) {
-                    is_valid = false;
-            }
-            else {
-                is_valid = true;
-            }
-
-
             if (is_valid){
                 textarea.removeClass('is-invalid');
             } else {

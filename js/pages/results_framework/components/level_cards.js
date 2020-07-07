@@ -11,6 +11,7 @@ import {sortableContainer, sortableElement, sortableHandle} from 'react-sortable
 import HelpPopover from "../../../components/helpPopover";
 import TextareaAutosize from 'react-autosize-textarea';
 import Select from "react-select"
+import { create_unified_changeset_notice } from '../../../components/changesetNotice';
 
 
 
@@ -81,7 +82,11 @@ export class LevelCardCollapsed extends React.Component {
     deleteLevel = () => {
         this.props.rootStore.uiStore.setDisableCardActions(true);
         const levelTitle = this.props.levelProps.tierName + " " + this.props.levelProps.ontologyLabel;
-        create_no_rationale_changeset_notice({
+        create_unified_changeset_notice({
+            header: gettext("Warning"),
+            show_icon: true ,
+            notice_type: 'error',
+            preamble: gettext("This action cannot be undone."),
             /* # Translators:  This is a confirmation prompt that is triggered by clicking on a delete button. The code is a reference to the name of the specific item being deleted.  Only one item can be deleted at a time. */
             message_text: interpolate(gettext("Are you sure you want to delete %s?"), [levelTitle]),
             on_submit: () => this.props.rootStore.levelStore.deleteLevelFromDB(this.props.level.id),
@@ -395,7 +400,14 @@ export class LevelCardExpanded extends React.Component {
         const hasUpdatedName = this.name != this.props.level.name;
 
         if ( hasIndicators && (hasUpdatedAssumptions || hasUpdatedName)){
-            create_nondestructive_changeset_notice({
+            create_unified_changeset_notice({
+                header: gettext("Reason for change"),
+                show_icon: false,
+                message_text: gettext("Your changes will be recorded in a change log.  For future reference, please share your reason for these changes."),
+                include_rationale: true,
+                rationale_required: true,
+                notice_type: 'notice',
+                showCloser: false,
                 on_submit: saveFunc,
                 on_cancel: () => this.props.rootStore.uiStore.setDisableCardActions(false),
             });
