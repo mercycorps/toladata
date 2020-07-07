@@ -402,7 +402,7 @@ export class LevelCardExpanded extends React.Component {
         if ( hasIndicators && (hasUpdatedAssumptions || hasUpdatedName)){
             create_unified_changeset_notice({
                 header: gettext("Reason for change"),
-                show_icon: false,
+                show_icon: true,
                 message_text: gettext("Your changes will be recorded in a change log.  For future reference, please share your reason for these changes."),
                 include_rationale: true,
                 rationale_required: true,
