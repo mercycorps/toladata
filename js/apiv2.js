@@ -49,6 +49,11 @@ const api = {
             .then(response => response.data)
             .catch(this.logFailure);
     },
+    allIndicatorResultsTables(programPk, editable) {
+        return this.apiInstance.get(`/program_result_tables/${programPk}/`, {params: {raw: true, edit: editable}})
+            .then(response => response.data)
+            .catch(this.logFailure);
+    },
     updateProgramPageIndicator(indicatorPk) {
         return this.apiInstance.get(`/program_page/indicator/${indicatorPk}/`)
         .then(response => response.data)
