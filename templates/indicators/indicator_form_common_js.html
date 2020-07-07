@@ -218,7 +218,7 @@
                 context: document.getElementById('indicator_update_form'),
                 rationale_required: false,
                 notice_type: 'error',
-                showCloser: false,
+                : false,
                 on_submit: delete_indicator
             });
         } else {
@@ -232,7 +232,6 @@
                 context: document.getElementById('indicator_update_form'),
                 on_submit: delete_indicator,
                 notice_type: 'error',
-                showCloser: false
             });
         }
         scrollToIndicatorFormBottom();
@@ -393,7 +392,6 @@
                     rfc_required: true,
                     rfc_options: true,
                     validation_type: 1,
-                    showCloser: false,
                     context: document.getElementById('indicator_update_form'),
                     notice_type: 'error',
                     on_submit: (rationale, reasons_for_change, validation_type) => {
@@ -411,7 +409,6 @@
                     rfc_required: true,
                     rfc_options: true,
                     validation_type: 1,
-                    showCloser: false,
                     context: document.getElementById('indicator_update_form'),
                     on_submit: (rationale, reasons_for_change, validation_type) => {
                         submitFormUpdate(rationale, reasons_for_change, validation_type);
@@ -431,7 +428,6 @@
                 rfc_required: true,
                 rfc_options: true,
                 validation_type: 1,
-                showCloser: false,
                 context: document.getElementById('indicator_update_form'),
                 on_submit: (rationale, reasons_for_change, validation_type) => {
                     submitFormUpdate(rationale, reasons_for_change, validation_type);
