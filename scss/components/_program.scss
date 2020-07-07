@@ -87,3 +87,29 @@
     }
 }
 
+.list__filters {
+    margin-top: 2px;
+    margin-bottom: 2px;
+}
+
+.indicator-list__buttons-row {
+    // expand/collapse all and add indicator button at top of indicator list on program page
+    background-color: white;
+    border-bottom: 2px solid $table-border-color;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    
+    .expand-collapse-buttons .btn {
+        background-color: white;
+        border: none;
+    }
+
+    .indicator-list__add-indicator-button {
+        // ensure this button has enough space and style the icon in the button
+        margin-right: 10px;
+        svg {
+            margin-right: 0px;
+        }
+    }
+}

@@ -2,7 +2,7 @@ import React from 'react';
 import classNames from 'classnames';
 import { observer } from "mobx-react"
 import eventBus from '../../../eventbus';
-import { AddIndicatorButton } from '../../../components/indicatorModalComponents';
+import { AddIndicatorButton, ExpandAllButton, CollapseAllButton } from '../../../components/indicatorModalComponents';
 
 import { library } from '@fortawesome/fontawesome-svg-core'
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome'
@@ -71,7 +71,6 @@ export class StatusHeader extends React.Component {
             programId,
             currentIndicatorFilter,
             filterApplied,
-            readonly,
         } = this.props;
 
         return <div className="indicators-list__header">
@@ -85,11 +84,6 @@ export class StatusHeader extends React.Component {
                 </a>
                 }
             </h3>
-            <div>
-                {!readonly &&
-                <AddIndicatorButton readonly={readonly} programId={programId}/>
-                }
-            </div>
         </div>
     }
 }
@@ -280,6 +274,23 @@ export class IndicatorListTable extends React.Component {
 }
 
 
+const IndicatorListTableButtons = observer(function ({program, readonly, ...props}) {
+    return (
+        <div className="indicator-list__buttons-row">
+            <div className="expand-collapse-buttons">
+                <ExpandAllButton clickHandler={ () => { program.updateAllResultsHTML(); } } />
+                <CollapseAllButton clickHandler={ () => {program.deleteAllResultsHTML(); } } />
+            </div>
+            <div className="indicator-list__add-indicator-button">
+                {!readonly &&
+                <AddIndicatorButton readonly={readonly} programId={program.pk}/>
+                }
+            </div>
+        </div>
+    );
+})
+
+
 const IndicatorList = observer(function (props) {
     const program = props.rootStore.program;
 
@@ -288,9 +299,9 @@ const IndicatorList = observer(function (props) {
                       programId={program.pk}
                       currentIndicatorFilter={ props.uiStore.currentIndicatorFilter }
                       filterApplied={ props.uiStore.filterApplied }
-                      readonly={props.rootStore.readOnly}/>
-
+                      />
         <IndicatorFilter uiStore={props.uiStore} rootStore={props.rootStore} />
+        <IndicatorListTableButtons program={program} readonly={props.rootStore.readOnly} />
 
         {program.needsAdditionalTargetPeriods &&
             <div id="id_missing_targets_msg" className="color-red">
