@@ -225,7 +225,7 @@
             window.create_unified_changeset_notice({
                 header: gettext('Warning'),
                 preamble: DESTRUCTIVE_PREAMBLE,
-                show_icon: false,
+                show_icon: true,
                 rationale_required: true,
                 include_rationale: true,
                 message_text: DELETE_INDICATOR_MESSAGE,
@@ -301,7 +301,7 @@
             //This is an existing, saved event target on an indicator that has results (rationale required):
             window.create_unified_changeset_notice({
                 header: gettext('Warning'),
-                show_icon: false,
+                show_icon: true,
                 preamble: numResultsLinkedToEventTarget === 0 ? DESTRUCTIVE_PREAMBLE : window.target_with_results_text(numResultsLinkedToEventTarget),
                 message_text: DELETE_TARGET_MESSAGE,
                 context: document.getElementById('indicator_update_form'),

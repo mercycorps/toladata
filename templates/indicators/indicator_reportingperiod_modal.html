@@ -455,8 +455,13 @@
             let program_data = $('#id_link_reporting_period_'+program_id).data()
 
             if(program_data['rptstart'] && program_data["rptstart"] != "None") {
-                window.create_nondestructive_changeset_notice({
+                window.create_unified_changeset_notice({
+                    header: gettext("Reason for change"),
+                    show_icon: true,
                     message_text: REPORTING_PERIOD_CHANGE_TEXT,
+                    include_rationale: true,
+                    rationale_required: true,
+                    showCloser: false,
                     context: document.getElementById('reportingperiod_update_form'),
                     on_submit: (rationale) => save(rationale)
                 })
