@@ -127,7 +127,7 @@ export class CountryStore {
     @action
     clearFilters() {
         let clearFilters = {
-            countries: [],
+            countries: this.filters.countries || [],
             organizations: [],
             sectors: [],
             programStatus: null,

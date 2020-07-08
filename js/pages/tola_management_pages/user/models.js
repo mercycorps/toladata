@@ -636,7 +636,7 @@ export class UserStore {
             programs: [],
             user_status: '',
             admin_role: '',
-            users: []
+            users: this.filters.users || []
         }
     }
 
