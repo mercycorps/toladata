@@ -407,7 +407,6 @@ export class LevelCardExpanded extends React.Component {
                 include_rationale: true,
                 rationale_required: true,
                 notice_type: 'notice',
-                showCloser: false,
                 on_submit: saveFunc,
                 on_cancel: () => this.props.rootStore.uiStore.setDisableCardActions(false),
             });

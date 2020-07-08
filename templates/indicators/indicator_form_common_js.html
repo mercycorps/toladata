@@ -218,7 +218,6 @@
                 context: document.getElementById('indicator_update_form'),
                 rationale_required: false,
                 notice_type: 'error',
-                showCloser: false,
                 on_submit: delete_indicator
             });
         } else {
@@ -232,7 +231,6 @@
                 context: document.getElementById('indicator_update_form'),
                 on_submit: delete_indicator,
                 notice_type: 'error',
-                showCloser: false
             });
         }
         scrollToIndicatorFormBottom();
@@ -280,8 +278,8 @@
          /* If target is new, delete means just remove row,
          * If target is saved, delete means call to delete
          */
-        if (url === '#' || !indicatorHasResults()) {
-            //This is a new event target (not yet saved) or this indicator has no results, just confirm:
+        if (url === '#') {
+            //This is a new event target (not yet saved), just confirm and remove:
             window.create_unified_changeset_notice({
                 header: gettext('Warning'),
                 show_icon: true,
@@ -296,6 +294,32 @@
                     updateIfLastEvent();
                     updateLopTargetDisplay();
                 })(row)
+            });
+        } else if (!indicatorHasResults()) {
+            //This indicator has no results, just confirm and then post removal:
+            window.create_unified_changeset_notice({
+                header: gettext('Warning'),
+                show_icon: true,
+                preamble: DESTRUCTIVE_PREAMBLE,
+                message_text: DELETE_TARGET_NO_RATIONALE,
+                context: document.getElementById('indicator_update_form'),
+                rationale_required: false,
+                include_rationale: false,
+                notice_type: 'error',
+                on_submit: ((url, row) => () => {
+                    $.post(url, {rationale: null})
+                        .done((data) => {
+                            if (data.status === 'success') {
+                                $('#indicator_modal_div').trigger('updated.tola.indicator.save', saveEventParams());
+                                row.remove();
+                                if (updateSnapshot) {
+                                    updatePTsAndLopTargetOnSnapshot();
+                                }
+                                updateIfLastEvent();
+                                updateLopTargetDisplay();
+                            }
+                        });
+                })(url, row)
             });
         } else {
             //This is an existing, saved event target on an indicator that has results (rationale required):
@@ -393,7 +417,6 @@
                     rfc_required: true,
                     rfc_options: true,
                     validation_type: 1,
-                    showCloser: false,
                     context: document.getElementById('indicator_update_form'),
                     notice_type: 'error',
                     on_submit: (rationale, reasons_for_change, validation_type) => {
@@ -411,7 +434,6 @@
                     rfc_required: true,
                     rfc_options: true,
                     validation_type: 1,
-                    showCloser: false,
                     context: document.getElementById('indicator_update_form'),
                     on_submit: (rationale, reasons_for_change, validation_type) => {
                         submitFormUpdate(rationale, reasons_for_change, validation_type);
@@ -431,7 +453,6 @@
                 rfc_required: true,
                 rfc_options: true,
                 validation_type: 1,
-                showCloser: false,
                 context: document.getElementById('indicator_update_form'),
                 on_submit: (rationale, reasons_for_change, validation_type) => {
                     submitFormUpdate(rationale, reasons_for_change, validation_type);

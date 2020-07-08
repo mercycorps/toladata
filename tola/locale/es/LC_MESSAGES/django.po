@@ -7,7 +7,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: \n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2020-07-08 10:55-0700\n"
+"POT-Creation-Date: 2020-07-08 09:32-0700\n"
 "PO-Revision-Date: 2020-06-24 10:01-0700\n"
 "Last-Translator: \n"
 "Language-Team: \n"
@@ -167,7 +167,7 @@ msgstr "N/A"
 #: indicators/export_renderers.py:393
 #: templates/indicators/iptt_filter_form.html:141
 #: templates/indicators/program_page.html:36
-#: tola_management/programadmin.py:121 tola_management/programadmin.py:532
+#: tola_management/programadmin.py:121 tola_management/programadmin.py:534
 msgid "Change log"
 msgstr "Registro de Cambios"
 
@@ -1014,8 +1014,8 @@ msgid "Categories for disaggregation %(disagg)s"
 msgstr "Categorías de %(disagg)s de desagregación"
 
 #: indicators/templatetags/mytags.py:51 indicators/templatetags/mytags.py:73
-#: templates/indicators/result_form_common_js.html:174
-#: templates/indicators/result_form_common_js.html:182
+#: templates/indicators/result_form_common_js.html:173
+#: templates/indicators/result_form_common_js.html:181
 msgid "and"
 msgstr "y"
 
@@ -1879,47 +1879,47 @@ msgstr "¿Está seguro que quiere continuar?"
 msgid "Success"
 msgstr "¡Éxito!"
 
-#: templates/indicators/indicator_form_common_js.html:387
-#: templates/indicators/indicator_form_common_js.html:406
-#: templates/indicators/indicator_form_common_js.html:426
+#: templates/indicators/indicator_form_common_js.html:411
+#: templates/indicators/indicator_form_common_js.html:429
+#: templates/indicators/indicator_form_common_js.html:448
 #: templates/indicators/indicator_list_modals.html:7
 msgid "Warning"
 msgstr "Advertencia"
 
-#: templates/indicators/indicator_form_common_js.html:389
+#: templates/indicators/indicator_form_common_js.html:413
 msgid "Modifying target values will affect program metrics for this indicator."
 msgstr ""
 "Modificar los valores objetivo afectará las métricas para este indicador."
 
-#: templates/indicators/indicator_form_common_js.html:390
-#: templates/indicators/indicator_form_common_js.html:408
-#: templates/indicators/indicator_form_common_js.html:428
+#: templates/indicators/indicator_form_common_js.html:414
+#: templates/indicators/indicator_form_common_js.html:431
+#: templates/indicators/indicator_form_common_js.html:450
 msgid "Your changes will be recorded in a change log."
 msgstr "Sus cambios serán guardados en un registro de cambios."
 
-#: templates/indicators/indicator_form_common_js.html:528
+#: templates/indicators/indicator_form_common_js.html:549
 #: templates/indicators/indicatortargets.html:50
 msgid "Enter event name"
 msgstr "Ingrese el nombre del evento"
 
-#: templates/indicators/indicator_form_common_js.html:538
+#: templates/indicators/indicator_form_common_js.html:559
 #: templates/indicators/indicatortargets.html:79
 msgid "Enter target"
 msgstr "Ingrese el objetivo"
 
-#: templates/indicators/indicator_form_common_js.html:742
+#: templates/indicators/indicator_form_common_js.html:763
 #: templates/indicators/indicatortargets.html:124
 msgid "Options for number (#) indicators"
 msgstr "Opciones para indicadores de número (#)"
 
 #. Translators: This is the title of some informational text describing what it means when an indicator is being measured as a percentage e.g. % of population with access to water
-#: templates/indicators/indicator_form_common_js.html:748
+#: templates/indicators/indicator_form_common_js.html:769
 #, python-format
 msgid "Percentage (%%) indicators"
 msgstr "Indicadores de porcentaje (%%)"
 
 #. Translators: warning to user that manually entered in value doesn't match computed value, %s is a number or percentage
-#: templates/indicators/indicator_form_common_js.html:873
+#: templates/indicators/indicator_form_common_js.html:894
 #, python-format
 msgid ""
 "Life of Program (LoP) targets are now automatically displayed. The current "
@@ -1931,7 +1931,7 @@ msgstr ""
 "el pasado -- %%s. Es posible que deba actualizar los valores objetivo."
 
 #. Translators: warning to user that manually entered in value doesn't match computed value, %s is a number or percentage
-#: templates/indicators/indicator_form_common_js.html:878
+#: templates/indicators/indicator_form_common_js.html:899
 #, python-format
 msgid ""
 "This program previously had a LoP target of %%s. Life of Program (LoP) "
@@ -1940,53 +1940,53 @@ msgstr ""
 "Este programa tenía anteriormente un objetivo de LoP de %%s. Los objetivos "
 "de Vida del Programa (LoP) ahora se muestran automáticamente."
 
-#: templates/indicators/indicator_form_common_js.html:894
-#: templates/indicators/indicator_form_common_js.html:989
-#: templates/indicators/result_form_common_js.html:154
+#: templates/indicators/indicator_form_common_js.html:915
+#: templates/indicators/indicator_form_common_js.html:1010
+#: templates/indicators/result_form_common_js.html:153
 msgid "Please complete this field."
 msgstr "Por favor complete este campo."
 
-#: templates/indicators/indicator_form_common_js.html:896
+#: templates/indicators/indicator_form_common_js.html:917
 msgid "Please enter an indicator with fewer than 500 characters."
 msgstr "Por favor, introduzca un indicador con menos de 500 caracteres."
 
-#: templates/indicators/indicator_form_common_js.html:931
-#: templates/indicators/indicator_form_common_js.html:933
+#: templates/indicators/indicator_form_common_js.html:952
+#: templates/indicators/indicator_form_common_js.html:954
 msgid "Please enter a number greater than or equal to zero."
 msgstr "Por favor, ingrese un número mayor o igual a cero."
 
-#: templates/indicators/indicator_form_common_js.html:959
+#: templates/indicators/indicator_form_common_js.html:980
 msgid "The Life of Program (LoP) target cannot be zero."
 msgstr "El objetivo de Vida del Programa (LoP) no puede ser cero."
 
-#: templates/indicators/indicator_form_common_js.html:962
+#: templates/indicators/indicator_form_common_js.html:983
 msgid "Please enter a target."
 msgstr "Por favor, introduzca un objetivo."
 
-#: templates/indicators/indicator_form_common_js.html:1057
+#: templates/indicators/indicator_form_common_js.html:1078
 msgid ""
 "The Life of Program (LoP) target cannot be zero.  Please update targets."
 msgstr ""
 "El objetivo de Vida del Programa (LoP) no puede ser cero. Por favor, "
 "actualice los objetivos."
 
-#: templates/indicators/indicator_form_common_js.html:1068
+#: templates/indicators/indicator_form_common_js.html:1089
 msgid "Please complete all event names and targets."
 msgstr "Por favor, complete todos nombres de eventos y objetivos."
 
-#: templates/indicators/indicator_form_common_js.html:1071
+#: templates/indicators/indicator_form_common_js.html:1092
 msgid "Please complete targets."
 msgstr "Por favor, complete los objetivos."
 
-#: templates/indicators/indicator_form_common_js.html:1137
+#: templates/indicators/indicator_form_common_js.html:1158
 msgid "Please complete all required fields in the Targets tab."
 msgstr "Complete todos los campos obligatorios en la pestaña Objetivos."
 
-#: templates/indicators/indicator_form_common_js.html:1151
+#: templates/indicators/indicator_form_common_js.html:1172
 msgid "Please complete all required fields in the Summary tab."
 msgstr "Complete todos los campos obligatorios en la pestaña Resumen."
 
-#: templates/indicators/indicator_form_common_js.html:1161
+#: templates/indicators/indicator_form_common_js.html:1182
 msgid "Please complete all required fields in the Performance tab."
 msgstr "Complete todos los campos obligatorios en la pestaña Rendimiento."
 
@@ -2432,54 +2432,54 @@ msgstr ""
 
 #: templates/indicators/result_form_common_js.html:17
 msgid ""
-"This action cannot be undone. The result value and any information "
-"associated with it will be permanently removed. For future reference, please "
-"provide a reason for deleting this result."
+"The result value and any information associated with it will be permanently "
+"removed. For future reference, please provide a reason for deleting this "
+"result."
 msgstr ""
-"Esta acción no puede deshacerse. El valor del resultado y toda información "
+"El valor del resultado y toda información "
 "asociada serán eliminados permanentemente. Para referencia futura, indique "
 "una justificación para eliminar este resultado."
 
-#: templates/indicators/result_form_common_js.html:95
-#: templates/indicators/result_form_common_js.html:398
+#: templates/indicators/result_form_common_js.html:94
+#: templates/indicators/result_form_common_js.html:397
 msgid "Could not save form."
 msgstr "No se pudo guardar el formulario."
 
-#: templates/indicators/result_form_common_js.html:128
+#: templates/indicators/result_form_common_js.html:127
 msgid "Please enter a number with no letters or symbols."
 msgstr "Por favor ingrese un número sin letras ni símbolos."
 
-#: templates/indicators/result_form_common_js.html:160
+#: templates/indicators/result_form_common_js.html:159
 msgid "Please enter a valid date."
 msgstr "Por favor ingrese una fecha válida."
 
-#: templates/indicators/result_form_common_js.html:167
+#: templates/indicators/result_form_common_js.html:166
 msgid "You can begin entering results on"
 msgstr "Puede comenzar a ingresar resultados el"
 
-#: templates/indicators/result_form_common_js.html:174
-#: templates/indicators/result_form_common_js.html:182
+#: templates/indicators/result_form_common_js.html:173
+#: templates/indicators/result_form_common_js.html:181
 msgid "Please select a date between"
 msgstr "Por favor seleccione una fecha entre"
 
-#: templates/indicators/result_form_common_js.html:268
+#: templates/indicators/result_form_common_js.html:267
 msgid "A link must be included along with the record name."
 msgstr "Debe incluir un enlace junto al nombre del registro."
 
-#: templates/indicators/result_form_common_js.html:359
+#: templates/indicators/result_form_common_js.html:358
 msgid "One or more fields needs attention."
 msgstr "Uno o más campos requieren atención."
 
-#: templates/indicators/result_form_common_js.html:388
+#: templates/indicators/result_form_common_js.html:387
 msgid "Result saved - however please review warnings below."
 msgstr ""
 "Resultado guardado - no obstante, revise las advertencias a continuación."
 
-#: templates/indicators/result_form_common_js.html:390
+#: templates/indicators/result_form_common_js.html:389
 msgid "Success, form data saved."
 msgstr "Éxito, datos de formulario guardados."
 
-#: templates/indicators/result_form_common_js.html:402
+#: templates/indicators/result_form_common_js.html:401
 msgid ""
 "Modifying results will affect program metrics for this indicator and should "
 "only be done to correct a data entry error. For future reference, please "
@@ -2489,12 +2489,12 @@ msgstr ""
 "y debe hacerse únicamente para corregir errores de ingreso de datos. Para "
 "referencia futura, indique una justificación para modificar este resultado."
 
-#: templates/indicators/result_form_common_js.html:403
+#: templates/indicators/result_form_common_js.html:402
 #: templates/indicators/results/result_form_disaggregation_fields.html:72
 msgid "The sum of disaggregated values does not match the actual value."
 msgstr "La suma de los valores desagregados no coincide con el valor real."
 
-#: templates/indicators/result_form_common_js.html:404
+#: templates/indicators/result_form_common_js.html:403
 msgid "For future reference, please share your reason for these variations."
 msgstr "Para referencia futura, comparta su razón para estas variaciones."
 

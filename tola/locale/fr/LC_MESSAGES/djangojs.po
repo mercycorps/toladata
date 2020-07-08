@@ -2,7 +2,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: \n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2020-07-08 10:55-0700\n"
+"POT-Creation-Date: 2020-07-08 09:32-0700\n"
 "PO-Revision-Date: 2020-03-13 10:43-0700\n"
 "Last-Translator: \n"
 "Language-Team: \n"
@@ -50,7 +50,7 @@ msgstr "Confirmer"
 #. Translators: Button to cancel a form submission
 #: js/base.js:383 js/base.js:485 js/base.js:534 js/base.js:577
 #: js/components/changesetNotice.js:67
-#: js/pages/results_framework/components/level_cards.js:579
+#: js/pages/results_framework/components/level_cards.js:578
 msgid "Cancel"
 msgstr "Annuler"
 
@@ -680,7 +680,7 @@ msgid "Means of verification"
 msgstr "Moyens de vérification"
 
 #: js/pages/logframe/models/filterStore.js:36
-#: js/pages/results_framework/components/level_cards.js:525
+#: js/pages/results_framework/components/level_cards.js:524
 msgid "Assumptions"
 msgstr "Hypothèses"
 
@@ -970,35 +970,35 @@ msgstr ""
 
 #. Translators: This is a validation message given to the user when the user-editable name field has been deleted or omitted. */
 #. Translators: This is a warning messages when a user has entered duplicate names for two different objects and those names contain only white spaces, both of which are not permitted. */
-#: js/pages/results_framework/components/level_cards.js:442
-#: js/pages/results_framework/models.js:752
+#: js/pages/results_framework/components/level_cards.js:441
+#: js/pages/results_framework/models.js:751
 msgid "Please complete this field."
 msgstr "Veuillez remplir ce champ."
 
 #. Translators: This is button text that allows users to save their work and unlock the ability to add indicators */ }
-#: js/pages/results_framework/components/level_cards.js:478
+#: js/pages/results_framework/components/level_cards.js:477
 #, python-format
 msgid "Save %s and add indicators"
 msgstr "Enregistrer %s et ajouter des indicateurs"
 
 #. Translators: On a button, with a tiered set of objects, save current object and add another one in the same tier, e.g. "Save and add another Outcome" when the user is editing an Outcome */}
-#: js/pages/results_framework/components/level_cards.js:562
+#: js/pages/results_framework/components/level_cards.js:561
 #, python-format
 msgid "Save and add another %s"
 msgstr "Enregistrer et ajouter plus de %s"
 
 #. Translators: On a button, with a tiered set of objects, save current object and add another one in the next lower tier, e.g. "Save and add another Activity" when the user is editing a Goal */}
-#: js/pages/results_framework/components/level_cards.js:571
+#: js/pages/results_framework/components/level_cards.js:570
 #, python-format
 msgid "Save and link %s"
 msgstr "Enregistrer et lier %s"
 
-#: js/pages/results_framework/components/level_cards.js:576
+#: js/pages/results_framework/components/level_cards.js:575
 msgid "Save and close"
 msgstr "Enregistrer et fermer"
 
-#: js/pages/results_framework/components/level_cards.js:649
-#: js/pages/results_framework/components/level_cards.js:691
+#: js/pages/results_framework/components/level_cards.js:648
+#: js/pages/results_framework/components/level_cards.js:690
 #: js/pages/results_framework/components/level_tier_lists.js:48
 #: js/pages/tola_management_pages/program/components/program_editor.js:33
 #: js/pages/tola_management_pages/program/components/program_settings.js:64
@@ -1006,7 +1006,7 @@ msgid "Settings"
 msgstr "Paramètres"
 
 #. Translators: Popover for help link telling users how to associate an Indicator not yet linked to a Level */
-#: js/pages/results_framework/components/level_cards.js:661
+#: js/pages/results_framework/components/level_cards.js:660
 msgid ""
 "To link an already saved indicator to your results framework: Open the "
 "indicator from the program page and use the “Result level” menu on the "
@@ -1017,7 +1017,7 @@ msgstr ""
 "« Niveau de résultat », à partir de l’onglet Sommaire."
 
 #. Translators: Popover for help link, tell user how to disassociate an Indicator from the Level they are currently editing. */
-#: js/pages/results_framework/components/level_cards.js:663
+#: js/pages/results_framework/components/level_cards.js:662
 msgid ""
 "To remove an indicator: Click “Settings”, where you can reassign the "
 "indicator to a different level or delete it."
@@ -1027,7 +1027,7 @@ msgstr ""
 "niveau ou de le supprimer."
 
 #. Translators: Title for a section that lists the Indicators associated with whatever this.props.tiername is. */}
-#: js/pages/results_framework/components/level_cards.js:679
+#: js/pages/results_framework/components/level_cards.js:678
 #, python-format
 msgid "Indicators linked to this %s"
 msgstr "Indicateurs liés à %s"
@@ -1137,12 +1137,12 @@ msgid "Changes to this %s will not be saved"
 msgstr "Les modifications apportées à %s n’ont pas été enregistrées"
 
 #. Translators: This is a warning messages when a user has entered duplicate names for two different objects */
-#: js/pages/results_framework/models.js:757
+#: js/pages/results_framework/models.js:756
 msgid "Result levels should not contain commas."
 msgstr "Les niveaux de résultats ne doivent pas contenir de virgules."
 
 #. Translators: This is a warning messages when a user has a comma in a name that shouldn't contain commas */
-#: js/pages/results_framework/models.js:762
+#: js/pages/results_framework/models.js:761
 msgid "Result levels must have unique names."
 msgstr "Les niveaux de résultats doivent avoir des noms uniques."
 

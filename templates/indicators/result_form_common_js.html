@@ -14,7 +14,7 @@
         setViewButtonDisabledState();
     }
 
-    const DELETE_RESULT_MESSAGE = "{% trans 'This action cannot be undone. The result value and any information associated with it will be permanently removed. For future reference, please provide a reason for deleting this result.' %}";
+    const DELETE_RESULT_MESSAGE = "{% trans 'The result value and any information associated with it will be permanently removed. For future reference, please provide a reason for deleting this result.' %}";
     // including a second time for cases where result form but not indicator form is loaded:
     // TODO: move these constants to some sort of constant file (and move the translations to gettext)
     const RESULT_DESTRUCTIVE_PREAMBLE = "{% trans 'This action cannot be undone.' %}"
@@ -81,7 +81,6 @@
             rationale_required: true,
             context: document.getElementById('result_update_form'),
             notice_type: 'error',
-            showCloser: false,
             on_submit: (rationale) => {
                 // Mark the record being changed so results table is reloaded on modal close
                 $('#indicator_results_div form').data('recordchanged', true);

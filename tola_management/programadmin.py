@@ -238,6 +238,7 @@ class ProgramAdminSerializer(ModelSerializer):
     name = CharField(required=True, max_length=255)
     funding_status = CharField(required=True)
     gaitid = CharField(required=False, allow_blank=True, allow_null=True)
+    fundCode = CharField(required=False, allow_blank=True, allow_null=True, source='cost_center')
     description = CharField(allow_null=True, allow_blank=True)
     sector = NestedSectorSerializer(required=True, many=True)
     country = NestedCountrySerializer(required=True, many=True)
@@ -256,6 +257,7 @@ class ProgramAdminSerializer(ModelSerializer):
             'name',
             'funding_status',
             'gaitid',
+            'fundCode',
             'description',
             'sector',
             'country',
