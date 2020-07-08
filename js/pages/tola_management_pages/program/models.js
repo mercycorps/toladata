@@ -134,6 +134,10 @@ export class ProgramStore {
     @action
     changeFilter(filterKey, value) {
         this.filters = Object.assign(this.filters, {[filterKey]: value})
+        if (filterKey == 'programs') {
+            // "Find a program" filter should immediately activate filters:
+            this.applyFilters();
+        }
     }
 
     @action

@@ -79,7 +79,7 @@ const ProgramStatusFilter = observer(({store}) => {
 
 const ProgramFilter = observer(({store, filterOptions}) => {
     return <div className="form-group react-multiselect-checkbox">
-        <label htmlFor="programs-filter">{gettext("Programs")}</label>
+        <label htmlFor="programs-filter">{gettext("Find a Program")}</label>
         <CheckboxedMultiSelect
             value={store.filters.programs}
             options={filterOptions}
@@ -194,7 +194,6 @@ export const IndexView = observer(
                     <OrganizationFilter store={store} filterOptions={organizationFilterOptions} />
                     <SectorFilter store={store} filterOptions={sectorFilterOptions} />
                     <ProgramStatusFilter store={store} />
-                    <ProgramFilter store={store} filterOptions={programFilterOptions} />
                 </div>
                 <div className="filter-section filter-buttons">
                     <button className="btn btn-primary" onClick={() => store.applyFilters()}>{gettext("Apply")}</button>
@@ -212,6 +211,9 @@ export const IndexView = observer(
                             <i className="fas fa-plus-circle"/>{gettext("Add Program")}
                         </a>
                     </div>
+                </div>
+                <div className="admin-list__top-filter">
+                    <ProgramFilter store={store} filterOptions={programFilterOptions} />
                 </div>
                 <LoadingSpinner isLoading={store.fetching_main_listing || store.applying_bulk_updates }>
                     <div className="admin-list__table">
