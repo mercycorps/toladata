@@ -5,8 +5,20 @@
 .admin-list__controls { // was: .list-controls; contains add button & bulk actions
     display: flex;
     justify-content: space-between;
-    margin-bottom: $grid-gutter-width; // NOTE: will overlap with following table top margin
+    align-items: center;
+    margin-bottom: $grid-gutter-width/2; // NOTE: will overlap with following table top margin
     margin-top: $grid-gutter-width/2;
+    .controls__top-filter {
+        flex-grow: 1;
+        & + .controls__buttons {
+            //if the buttons are next to a "find a thing" filter, center in the filter select height:
+            position: relative;
+            top: 10px;
+        }
+    }
+}
+.admin-list__top-filter {
+    margin-bottom: $grid-gutter-width/2;
 }
 .controls__bulk-actions { // was: .bulk-controls; wraps bulk action controls
     align-items: flex-start;
@@ -25,7 +37,7 @@
 .admin-list__table { // was: .list-table; the admin list itself
     // usually .mgmt-table component
     margin-bottom: $grid-gutter-width;
-    margin-top: $grid-gutter-width;
+    margin-top: $grid-gutter-width/2;
 }
 
 .admin-list__metadata { // was: .list-metadata; contains metadata (e.g. count) & pagination

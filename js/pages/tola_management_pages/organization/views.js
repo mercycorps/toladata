@@ -39,7 +39,7 @@ const ProgramFilter = observer(({store, selections}) => {
 
 const OrganizationFilter = observer(({store, selections}) => {
     return <div className="form-group react-multiselect-checkbox">
-        <label htmlFor="organizations_filter">{gettext("Organizations")}</label>
+        <label htmlFor="organizations_filter">{gettext("Find an Organization")}</label>
         <CheckboxedMultiSelect
             value={store.filters.organizations}
             options={selections}
@@ -68,7 +68,6 @@ export const IndexView = observer(
                 <div className="filter-section">
                     <SectorFilter store={store} selections={store.sector_selections} />
                     <ProgramFilter store={store} selections={store.program_selections} />
-                    <OrganizationFilter store={store} selections={store.organization_selections} />
                     <CountryFilter store={store} selections={store.country_selections} />
                     <div className="form-group">
                         <label htmlFor="status_filter">{gettext("Status")}</label>
@@ -90,7 +89,9 @@ export const IndexView = observer(
                     <h1>{gettext("Admin:")} <small>{gettext("Organizations")}</small></h1>
                 </header>
                 <div className="admin-list__controls">
-                    <div className="controls__bulk-actions"></div>
+                    <div className="controls__top-filter">
+                        <OrganizationFilter store={store} selections={store.organization_selections} />
+                    </div>
                     <div className="controls__buttons">
                         <a href="#" tabIndex="0" className="btn btn-link btn-add" onClick={() => store.createOrganization()}>
                             <i className="fas fa-plus-circle"/>{gettext("Add Organization")}

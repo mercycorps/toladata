@@ -118,6 +118,10 @@ export class CountryStore {
     @action
     changeFilter(filterKey, value) {
         this.filters = Object.assign(this.filters, {[filterKey]: value})
+        if (filterKey === "countries") {
+            // for "Find a country" filter, immediately apply filters when value changes:
+            this.applyFilters();
+        }
     }
 
     @action
