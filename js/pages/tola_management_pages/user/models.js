@@ -306,7 +306,9 @@ export class UserStore {
 
     @action
     changeUserFilter(users) {
-        this.filters.users = users
+        this.filters.users = users;
+        // "Find a user" filter should immediately activate filters:
+        this.applyFilters();
     }
 
     @action

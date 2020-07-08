@@ -16,7 +16,7 @@ import { FontAwesomeIcon } from '@fortawesome/react-fontawesome'
 const selection_placeholder = gettext("None Selected");
 const UserFilter = observer(({store, selections}) => {
     return <div className="form-group react-multiselect-checkbox">
-        <label htmlFor="users_filter">{gettext("Users")}</label>
+        <label htmlFor="users_filter">{gettext("Find a User")}</label>
         <CheckboxedMultiSelect
             value={store.filters.users}
             options={selections}
@@ -225,7 +225,6 @@ export const IndexView = observer(
                         placeholder={selection_placeholder}
                         id="admin_role_filter" />
                     </div>
-                    <UserFilter store={store} selections={store.user_selections} />
                 </div>
                 <div className="filter-section filter-buttons">
                     <button className="btn btn-primary" onClick={() => store.applyFilters()}>{gettext("Apply")}</button>
@@ -244,6 +243,9 @@ export const IndexView = observer(
                             {gettext("Add user")}
                         </a>
                     </div>
+                </div>
+                <div className="admin-list__top-filter">
+                    <UserFilter store={store} selections={store.user_selections} />
                 </div>
                 <LoadingSpinner isLoading={store.fetching_users_listing || store.applying_bulk_updates}>
                     <div className="admin-list__table">
