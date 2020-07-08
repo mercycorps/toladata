@@ -105,10 +105,16 @@ class OrganizationAdmin(admin.ModelAdmin):
     list_display = ('name', 'create_date', 'edit_date')
     display = 'Organization'
 
+
+class Region(models.Model):
+    name = models.CharField(_("Region Name"), max_length=255)
+    gait_region_id = models.PositiveIntegerField(blank=True, null=True)
+
 class Country(models.Model):
     country = models.CharField(_("Country Name"), max_length=255, blank=True)
     organization = models.ForeignKey(Organization, on_delete=models.SET_NULL,
                                      blank=True, null=True, verbose_name=_("organization"))
+    region = models.ForeignKey(Region, on_delete=models.SET_NULL, blank=True, null=True)
     code = models.CharField(_("2 Letter Country Code"), max_length=4, blank=True)
     description = models.TextField(_("Description/Notes"), max_length=765,blank=True)
     latitude = models.CharField(_("Latitude"), max_length=255, null=True, blank=True)
