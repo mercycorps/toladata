@@ -19,6 +19,9 @@
 }
 .admin-list__top-filter {
     margin-bottom: $grid-gutter-width/2;
+    label {
+        margin-bottom: 0px;
+    }
 }
 .controls__bulk-actions { // was: .bulk-controls; wraps bulk action controls
     align-items: flex-start;

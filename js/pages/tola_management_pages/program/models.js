@@ -147,7 +147,7 @@ export class ProgramStore {
             organizations: [],
             sectors: [],
             programStatus: null,
-            programs: [],
+            programs: this.filters.programs || [],
             users: []
         }
         this.filters = Object.assign(this.filters, clearFilters);

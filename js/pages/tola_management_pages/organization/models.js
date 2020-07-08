@@ -345,7 +345,7 @@ export class OrganizationStore {
     clearFilters() {
         this.filters = {
             countries: [],
-            organizations: [],
+            organizations: this.filters.organizations || [],
             programs: [],
             sectors: [],
             organization_status: '',
