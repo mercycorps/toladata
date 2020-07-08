@@ -6,7 +6,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: \n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2020-07-06 15:18-0700\n"
+"POT-Creation-Date: 2020-07-08 10:55-0700\n"
 "PO-Revision-Date: 2020-03-13 10:43-0700\n"
 "Last-Translator: \n"
 "Language-Team: \n"
@@ -57,13 +57,13 @@ msgstr "OK"
 msgid "Cancel"
 msgstr "Cancelar"
 
-#: js/base.js:428 js/components/changesetNotice.js:170
+#: js/base.js:428 js/components/changesetNotice.js:172
 msgid "A reason is required."
 msgstr "Se requiere una justificación."
 
 #: js/base.js:492 js/base.js:587
 #: js/pages/results_framework/components/level_cards.js:89
-#: js/pages/tola_management_pages/country/models.js:413
+#: js/pages/tola_management_pages/country/models.js:417
 msgid "This action cannot be undone."
 msgstr "Advertencia: esta acción no se puede deshacer."
 
@@ -72,10 +72,10 @@ msgstr "Advertencia: esta acción no se puede deshacer."
 #: js/pages/results_framework/models.js:664
 #: js/pages/tola_management_pages/country/components/edit_disaggregations.js:482
 #: js/pages/tola_management_pages/country/components/edit_disaggregations.js:496
-#: js/pages/tola_management_pages/country/models.js:411
-#: js/pages/tola_management_pages/country/models.js:445
-#: js/pages/tola_management_pages/country/models.js:476
-#: js/pages/tola_management_pages/program/models.js:272
+#: js/pages/tola_management_pages/country/models.js:415
+#: js/pages/tola_management_pages/country/models.js:449
+#: js/pages/tola_management_pages/country/models.js:480
+#: js/pages/tola_management_pages/program/models.js:276
 msgid "Warning"
 msgstr "Advertencia"
 
@@ -112,7 +112,7 @@ msgstr "No se encontraron diferencias"
 
 #: js/components/changelog.js:86 js/components/changelog.js:91
 #: js/components/changelog.js:101 js/components/changelog.js:106
-#: js/pages/tola_management_pages/country/views.js:91
+#: js/pages/tola_management_pages/country/views.js:93
 msgid "Country"
 msgstr "País"
 
@@ -126,7 +126,7 @@ msgstr "Función"
 #: js/pages/iptt_quickstart/components/selects.js:22
 #: js/pages/iptt_quickstart/components/selects.js:39
 #: js/pages/iptt_report/components/sidebar/reportSelect.js:14
-#: js/pages/tola_management_pages/program/views.js:227
+#: js/pages/tola_management_pages/program/views.js:229
 msgid "Program"
 msgstr "Programa"
 
@@ -156,14 +156,14 @@ msgid "Details"
 msgstr "Detalles"
 
 #. Translators: (preceded by a number) e.g. "4 options selected"
-#: js/components/changesetNotice.js:249
+#: js/components/changesetNotice.js:251
 #: js/components/checkboxed-multi-select.js:55
 #: js/components/selectWidgets.js:153
 msgid "selected"
 msgstr "seleccionado"
 
 #. Translators: for a dropdown menu with no options checked:
-#: js/components/changesetNotice.js:251 js/components/selectWidgets.js:143
+#: js/components/changesetNotice.js:253 js/components/selectWidgets.js:143
 #: js/components/selectWidgets.js:148
 msgid "None selected"
 msgstr "Ninguno/a Seleccionado"
@@ -1035,11 +1035,11 @@ msgstr "Indicadores vinculados a este %s"
 #: js/pages/results_framework/components/level_tier_lists.js:32
 #: js/pages/results_framework/components/level_tier_lists.js:219
 #: js/pages/tola_management_pages/country/views.js:64
-#: js/pages/tola_management_pages/organization/views.js:84
+#: js/pages/tola_management_pages/organization/views.js:83
 #: js/pages/tola_management_pages/program/views.js:142
-#: js/pages/tola_management_pages/program/views.js:200
+#: js/pages/tola_management_pages/program/views.js:199
 #: js/pages/tola_management_pages/user/views.js:162
-#: js/pages/tola_management_pages/user/views.js:231
+#: js/pages/tola_management_pages/user/views.js:230
 msgid "Apply"
 msgstr "Aplicar"
 
@@ -1121,9 +1121,9 @@ msgstr ""
 #: js/pages/results_framework/models.js:667
 #: js/pages/tola_management_pages/country/components/edit_disaggregations.js:487
 #: js/pages/tola_management_pages/country/components/edit_disaggregations.js:501
-#: js/pages/tola_management_pages/country/models.js:450
-#: js/pages/tola_management_pages/country/models.js:481
-#: js/pages/tola_management_pages/program/models.js:276
+#: js/pages/tola_management_pages/country/models.js:454
+#: js/pages/tola_management_pages/country/models.js:485
+#: js/pages/tola_management_pages/program/models.js:280
 msgid "Are you sure you want to continue?"
 msgstr "¿Está seguro que quiere continuar?"
 
@@ -1160,15 +1160,15 @@ msgid "Date and time"
 msgstr "Fecha y hora"
 
 #: js/pages/tola_management_pages/audit_log/views.js:234
-#: js/pages/tola_management_pages/user/views.js:258
+#: js/pages/tola_management_pages/user/views.js:260
 msgid "User"
 msgstr "Usuario"
 
 #: js/pages/tola_management_pages/audit_log/views.js:235
-#: js/pages/tola_management_pages/organization/views.js:109
+#: js/pages/tola_management_pages/organization/views.js:110
 #: js/pages/tola_management_pages/user/components/edit_user_profile.js:183
 #: js/pages/tola_management_pages/user/views.js:202
-#: js/pages/tola_management_pages/user/views.js:259
+#: js/pages/tola_management_pages/user/views.js:261
 msgid "Organization"
 msgstr "Organización"
 
@@ -1252,16 +1252,16 @@ msgstr "Guardar cambios"
 #: js/pages/tola_management_pages/organization/components/edit_organization_history.js:70
 #: js/pages/tola_management_pages/organization/components/edit_organization_profile.js:212
 #: js/pages/tola_management_pages/organization/components/edit_organization_profile.js:218
-#: js/pages/tola_management_pages/organization/views.js:85
+#: js/pages/tola_management_pages/organization/views.js:84
 #: js/pages/tola_management_pages/program/components/edit_program_profile.js:143
 #: js/pages/tola_management_pages/program/components/edit_program_profile.js:149
 #: js/pages/tola_management_pages/program/components/program_history.js:65
 #: js/pages/tola_management_pages/program/components/program_settings.js:131
-#: js/pages/tola_management_pages/program/views.js:201
+#: js/pages/tola_management_pages/program/views.js:200
 #: js/pages/tola_management_pages/user/components/edit_user_history.js:75
 #: js/pages/tola_management_pages/user/components/edit_user_profile.js:248
 #: js/pages/tola_management_pages/user/components/edit_user_profile.js:254
-#: js/pages/tola_management_pages/user/views.js:232
+#: js/pages/tola_management_pages/user/views.js:231
 msgid "Reset"
 msgstr "Reiniciar"
 
@@ -1340,7 +1340,7 @@ msgstr "Archivar desagregación"
 
 #: js/pages/tola_management_pages/country/components/edit_disaggregations.js:434
 #: js/pages/tola_management_pages/country/components/edit_objectives.js:159
-#: js/pages/tola_management_pages/country/models.js:239
+#: js/pages/tola_management_pages/country/models.js:243
 #: js/pages/tola_management_pages/organization/models.js:112
 #: js/pages/tola_management_pages/program/models.js:72
 #: js/pages/tola_management_pages/user/models.js:178
@@ -1378,14 +1378,14 @@ msgstr "Propuesto"
 #: js/pages/tola_management_pages/country/components/edit_objectives.js:10
 #: js/pages/tola_management_pages/organization/components/edit_organization_history.js:9
 #: js/pages/tola_management_pages/organization/models.js:56
-#: js/pages/tola_management_pages/organization/views.js:176
+#: js/pages/tola_management_pages/organization/views.js:177
 #: js/pages/tola_management_pages/program/components/program_history.js:9
 #: js/pages/tola_management_pages/program/views.js:65
 #: js/pages/tola_management_pages/program/views.js:157
 #: js/pages/tola_management_pages/program/views.js:163
 #: js/pages/tola_management_pages/user/components/edit_user_history.js:8
 #: js/pages/tola_management_pages/user/models.js:74
-#: js/pages/tola_management_pages/user/views.js:346
+#: js/pages/tola_management_pages/user/views.js:348
 msgid "Active"
 msgstr "Activo"
 
@@ -1405,14 +1405,14 @@ msgstr "Nombre corto"
 #. Translators: Label for column identifying "active" or "inactive" user status */}
 #: js/pages/tola_management_pages/country/components/edit_objectives.js:106
 #: js/pages/tola_management_pages/organization/components/edit_organization_history.js:59
-#: js/pages/tola_management_pages/organization/views.js:74
-#: js/pages/tola_management_pages/organization/views.js:112
+#: js/pages/tola_management_pages/organization/views.js:73
+#: js/pages/tola_management_pages/organization/views.js:113
 #: js/pages/tola_management_pages/program/components/program_history.js:53
 #: js/pages/tola_management_pages/program/views.js:69
-#: js/pages/tola_management_pages/program/views.js:230
+#: js/pages/tola_management_pages/program/views.js:232
 #: js/pages/tola_management_pages/user/components/edit_user_history.js:64
 #: js/pages/tola_management_pages/user/views.js:211
-#: js/pages/tola_management_pages/user/views.js:263
+#: js/pages/tola_management_pages/user/views.js:265
 msgid "Status"
 msgstr "Estado"
 
@@ -1425,33 +1425,33 @@ msgstr "¿Eliminar Objetivo Estratégico?"
 msgid "Add strategic objective"
 msgstr "Agregar objetivo estratégico"
 
-#: js/pages/tola_management_pages/country/models.js:196
-#: js/pages/tola_management_pages/program/models.js:189
+#: js/pages/tola_management_pages/country/models.js:200
+#: js/pages/tola_management_pages/program/models.js:193
 msgid "Successfully saved"
 msgstr "Guardado exitosamente"
 
-#: js/pages/tola_management_pages/country/models.js:200
-#: js/pages/tola_management_pages/program/models.js:193
+#: js/pages/tola_management_pages/country/models.js:204
+#: js/pages/tola_management_pages/program/models.js:197
 msgid "Saving failed"
 msgstr "Falló operación de guardado"
 
 #. Translators: Notification that a user has been able to delete a disaggregation
-#: js/pages/tola_management_pages/country/models.js:205
+#: js/pages/tola_management_pages/country/models.js:209
 msgid "Successfully deleted"
 msgstr "Eliminado con éxito"
 
 #. Translators: Notification that a user has been able to disable a disaggregation
-#: js/pages/tola_management_pages/country/models.js:210
+#: js/pages/tola_management_pages/country/models.js:214
 msgid "Successfully archived"
 msgstr "Guardado con éxito"
 
 #. Translators: Notification that a user has been able to reactivate a disaggregation
-#: js/pages/tola_management_pages/country/models.js:215
+#: js/pages/tola_management_pages/country/models.js:219
 msgid "Successfully unarchived"
 msgstr "Desarchivado con éxito"
 
 #. Translators: error message generated when item names are duplicated but are required to be unqiue.
-#: js/pages/tola_management_pages/country/models.js:221
+#: js/pages/tola_management_pages/country/models.js:225
 msgid ""
 "Saving failed: Disaggregation categories should be unique within a "
 "disaggregation."
@@ -1460,18 +1460,18 @@ msgstr ""
 "la desagregación."
 
 #. Translators: error message generated when item names are duplicated but are required to be unqiue.
-#: js/pages/tola_management_pages/country/models.js:229
+#: js/pages/tola_management_pages/country/models.js:233
 msgid "Saving failed: disaggregation names should be unique within a country."
 msgstr ""
 "Error al guardar: Los nombres desagregados deben ser únicos dentro del país."
 
 #. Translators: This is a confirmation prompt to confirm a user wants to delete an item
-#: js/pages/tola_management_pages/country/models.js:415
+#: js/pages/tola_management_pages/country/models.js:419
 msgid "Are you sure you want to delete this disaggregation?"
 msgstr "¿Está seguro de que quiere eliminar esta desagregación?"
 
 #. Translators: This is part of a confirmation prompt to archive a type of disaggregation (e.g. "gender" or "age")
-#: js/pages/tola_management_pages/country/models.js:448
+#: js/pages/tola_management_pages/country/models.js:452
 msgid ""
 "New programs will be unable to use this disaggregation. (Programs already "
 "using the disaggregation will be unaffected.)"
@@ -1480,13 +1480,13 @@ msgstr ""
 "ya usan la desagregación no se verán afectados)."
 
 #. Translators: This is part of a confirmation prompt to unarchive a type of disaggregation (e.g. "gender" or "age")
-#: js/pages/tola_management_pages/country/models.js:479
+#: js/pages/tola_management_pages/country/models.js:483
 #, python-format
 msgid "All programs in %s will be able to use this disaggregation."
 msgstr "Todos los programas de %s podrán usar esta desagregación."
 
 #. Translators:  This error message appears underneath a user-input name if it appears more than once in a set of names.  Only unique names are allowed.
-#: js/pages/tola_management_pages/country/models.js:581
+#: js/pages/tola_management_pages/country/models.js:585
 #, python-format
 msgid ""
 "There is already a disaggregation type called \"%(newDisagg)s\" in "
@@ -1496,22 +1496,18 @@ msgstr ""
 "Por favor, elija un nombre único."
 
 #. Translators:  This error message appears underneath user-input labels that appear more than once in a set of labels.  Only unique labels are allowed.
-#: js/pages/tola_management_pages/country/models.js:599
+#: js/pages/tola_management_pages/country/models.js:603
 msgid "Categories must not be blank."
 msgstr "Las categorías no pueden estar en blanco."
 
 #. Translators:  This error message appears underneath user-input labels that appear more than once in a set of labels.  Only unique labels are allowed.
-#: js/pages/tola_management_pages/country/models.js:603
+#: js/pages/tola_management_pages/country/models.js:607
 msgid "Categories must have unique names."
 msgstr "Las categorías deben tener nombres únicos."
 
 #: js/pages/tola_management_pages/country/views.js:17
-#: js/pages/tola_management_pages/country/views.js:70
-#: js/pages/tola_management_pages/organization/views.js:18
-#: js/pages/tola_management_pages/program/components/edit_program_profile.js:118
-#: js/pages/tola_management_pages/program/views.js:29
-msgid "Countries"
-msgstr "Países"
+msgid "Find a Country"
+msgstr "Encontrar un pais"
 
 #. Translators: Nothing selected by user
 #: js/pages/tola_management_pages/country/views.js:22
@@ -1522,7 +1518,7 @@ msgstr "Países"
 #: js/pages/tola_management_pages/organization/views.js:35
 #: js/pages/tola_management_pages/organization/views.js:47
 #: js/pages/tola_management_pages/organization/views.js:59
-#: js/pages/tola_management_pages/organization/views.js:79
+#: js/pages/tola_management_pages/organization/views.js:78
 #: js/pages/tola_management_pages/program/views.js:22
 #: js/pages/tola_management_pages/program/views.js:34
 #: js/pages/tola_management_pages/program/views.js:46
@@ -1534,62 +1530,66 @@ msgid "None Selected"
 msgstr "Ninguno/a Seleccionado"
 
 #: js/pages/tola_management_pages/country/views.js:29
-#: js/pages/tola_management_pages/country/views.js:92
-#: js/pages/tola_management_pages/country/views.js:198
-#: js/pages/tola_management_pages/organization/views.js:42
-#: js/pages/tola_management_pages/organization/views.js:90
+#: js/pages/tola_management_pages/country/views.js:94
+#: js/pages/tola_management_pages/country/views.js:200
+#: js/pages/tola_management_pages/organization/views.js:89
 #: js/pages/tola_management_pages/program/views.js:41
-#: js/pages/tola_management_pages/program/views.js:228
+#: js/pages/tola_management_pages/program/views.js:230
 msgid "Organizations"
 msgstr "Organizaciones"
 
 #: js/pages/tola_management_pages/country/views.js:41
-#: js/pages/tola_management_pages/country/views.js:93
-#: js/pages/tola_management_pages/country/views.js:206
+#: js/pages/tola_management_pages/country/views.js:95
+#: js/pages/tola_management_pages/country/views.js:208
 #: js/pages/tola_management_pages/organization/views.js:30
-#: js/pages/tola_management_pages/organization/views.js:110
-#: js/pages/tola_management_pages/program/views.js:82
-#: js/pages/tola_management_pages/program/views.js:206
+#: js/pages/tola_management_pages/organization/views.js:111
+#: js/pages/tola_management_pages/program/views.js:205
 #: js/pages/tola_management_pages/user/views.js:59
-#: js/pages/tola_management_pages/user/views.js:260
+#: js/pages/tola_management_pages/user/views.js:262
 msgid "Programs"
 msgstr "Programas"
 
 #: js/pages/tola_management_pages/country/views.js:70
-#: js/pages/tola_management_pages/organization/views.js:90
-#: js/pages/tola_management_pages/program/views.js:206
-#: js/pages/tola_management_pages/user/views.js:237
+#: js/pages/tola_management_pages/organization/views.js:89
+#: js/pages/tola_management_pages/program/views.js:205
+#: js/pages/tola_management_pages/user/views.js:236
 msgid "Admin:"
 msgstr "Administrador:"
 
-#: js/pages/tola_management_pages/country/views.js:77
+#: js/pages/tola_management_pages/country/views.js:70
+#: js/pages/tola_management_pages/organization/views.js:18
+#: js/pages/tola_management_pages/program/components/edit_program_profile.js:118
+#: js/pages/tola_management_pages/program/views.js:29
+msgid "Countries"
+msgstr "Países"
+
+#: js/pages/tola_management_pages/country/views.js:79
 msgid "Add Country"
 msgstr "Agregar País"
 
-#: js/pages/tola_management_pages/country/views.js:94
-#: js/pages/tola_management_pages/country/views.js:214
-#: js/pages/tola_management_pages/organization/views.js:111
+#: js/pages/tola_management_pages/country/views.js:96
+#: js/pages/tola_management_pages/country/views.js:216
+#: js/pages/tola_management_pages/organization/views.js:112
 #: js/pages/tola_management_pages/program/views.js:17
-#: js/pages/tola_management_pages/program/views.js:229
-#: js/pages/tola_management_pages/user/views.js:19
-#: js/pages/tola_management_pages/user/views.js:237
+#: js/pages/tola_management_pages/program/views.js:231
+#: js/pages/tola_management_pages/user/views.js:236
 msgid "Users"
 msgstr "Usuarios"
 
-#: js/pages/tola_management_pages/country/views.js:224
+#: js/pages/tola_management_pages/country/views.js:226
 msgid "countries"
 msgstr "países"
 
 #: js/pages/tola_management_pages/organization/components/edit_organization_history.js:10
 #: js/pages/tola_management_pages/organization/models.js:57
-#: js/pages/tola_management_pages/organization/views.js:176
+#: js/pages/tola_management_pages/organization/views.js:177
 #: js/pages/tola_management_pages/program/components/program_history.js:10
 #: js/pages/tola_management_pages/program/views.js:66
 #: js/pages/tola_management_pages/program/views.js:158
 #: js/pages/tola_management_pages/program/views.js:163
 #: js/pages/tola_management_pages/user/components/edit_user_history.js:9
 #: js/pages/tola_management_pages/user/models.js:75
-#: js/pages/tola_management_pages/user/views.js:346
+#: js/pages/tola_management_pages/user/views.js:348
 msgid "Inactive"
 msgstr "Inactivo"
 
@@ -1646,23 +1646,27 @@ msgstr "Falló Operación de Guardado"
 msgid "Successfully Saved"
 msgstr "Guardado Exitosamente"
 
-#: js/pages/tola_management_pages/organization/views.js:96
+#: js/pages/tola_management_pages/organization/views.js:42
+msgid "Find an Organization"
+msgstr "Encontrar una Organización"
+
+#: js/pages/tola_management_pages/organization/views.js:97
 msgid "Add Organization"
 msgstr "Agregar Organización"
 
-#: js/pages/tola_management_pages/organization/views.js:167
-#: js/pages/tola_management_pages/program/views.js:318
-#: js/pages/tola_management_pages/user/views.js:343
+#: js/pages/tola_management_pages/organization/views.js:168
+#: js/pages/tola_management_pages/program/views.js:320
+#: js/pages/tola_management_pages/user/views.js:345
 msgid "programs"
 msgstr "programas"
 
-#: js/pages/tola_management_pages/organization/views.js:173
-#: js/pages/tola_management_pages/program/views.js:309
-#: js/pages/tola_management_pages/user/views.js:353
+#: js/pages/tola_management_pages/organization/views.js:174
+#: js/pages/tola_management_pages/program/views.js:311
+#: js/pages/tola_management_pages/user/views.js:355
 msgid "users"
 msgstr "usuarios"
 
-#: js/pages/tola_management_pages/organization/views.js:183
+#: js/pages/tola_management_pages/organization/views.js:184
 msgid "organizations"
 msgstr "organizaciones"
 
@@ -1737,42 +1741,46 @@ msgstr ""
 "los indicadores; su único fin es ser mostrados."
 
 #. Translators: Notify user that the program start and end date were successfully retrieved from the GAIT service and added to the newly saved Program
-#: js/pages/tola_management_pages/program/models.js:198
+#: js/pages/tola_management_pages/program/models.js:202
 msgid "Successfully synced GAIT program start and end dates"
 msgstr ""
 "Se sincronizaron satisfactoriamente las fechas de inicio y fin del programa "
 "desde el servicio GAIT"
 
 #. Translators: Notify user that the program start and end date failed to be retrieved from the GAIT service with a specific reason appended after the :
-#: js/pages/tola_management_pages/program/models.js:204
+#: js/pages/tola_management_pages/program/models.js:208
 msgid "Failed to sync GAIT program start and end dates: "
 msgstr ""
 "Hubo un fallo en la sincronización de las fechas de inicio y fin del "
 "programa desde el servicio GAIT: "
 
 #. Translators: A request failed, ask the user if they want to try the request again
-#: js/pages/tola_management_pages/program/models.js:212
+#: js/pages/tola_management_pages/program/models.js:216
 msgid "Retry"
 msgstr "Reintentar"
 
 #. Translators: button label - ignore the current warning modal on display
-#: js/pages/tola_management_pages/program/models.js:221
+#: js/pages/tola_management_pages/program/models.js:225
 msgid "Ignore"
 msgstr "Ignorar"
 
-#: js/pages/tola_management_pages/program/models.js:268
+#: js/pages/tola_management_pages/program/models.js:272
 msgid "The GAIT ID for this program is shared with at least one other program."
 msgstr ""
 "El ID GAIT para este programa está compartido con al menos un programa más."
 
-#: js/pages/tola_management_pages/program/models.js:269
+#: js/pages/tola_management_pages/program/models.js:273
 msgid "View programs with this ID in GAIT."
 msgstr "Ver programas con este ID en GAIT."
 
 #. Translators: error message when trying to connect to the server
-#: js/pages/tola_management_pages/program/models.js:309
+#: js/pages/tola_management_pages/program/models.js:313
 msgid "There was a network or server connection error."
 msgstr "Hubo un error de red o conectividad con el servidor."
+
+#: js/pages/tola_management_pages/program/views.js:82
+msgid "Find a Program"
+msgstr "Encontrar un Programa"
 
 #: js/pages/tola_management_pages/program/views.js:128
 #: js/pages/tola_management_pages/user/views.js:148
@@ -1793,7 +1801,7 @@ msgstr "Sin opciones"
 msgid "Set program status"
 msgstr "Definir estado del programa"
 
-#: js/pages/tola_management_pages/program/views.js:212
+#: js/pages/tola_management_pages/program/views.js:211
 msgid "Add Program"
 msgstr "Agregar Programa"
 
@@ -1885,14 +1893,18 @@ msgid "No"
 msgstr "No"
 
 #. Translators: An email was sent to the user to verify that the email address is valid
-#: js/pages/tola_management_pages/user/models.js:438
+#: js/pages/tola_management_pages/user/models.js:440
 msgid "Verification email sent"
 msgstr "Correo electrónico de verificación enviado"
 
 #. Translators: Sending an email to the user did not work
-#: js/pages/tola_management_pages/user/models.js:442
+#: js/pages/tola_management_pages/user/models.js:444
 msgid "Verification email send failed"
 msgstr "Falló el envío de correo electrónico de verificación"
+
+#: js/pages/tola_management_pages/user/views.js:19
+msgid "Find a User"
+msgstr "Encontrar una Usuario"
 
 #. Translators: The countries a user is allowed to access */}
 #: js/pages/tola_management_pages/user/views.js:33
@@ -1923,12 +1935,12 @@ msgstr "Eliminar del programa"
 msgid "Administrator?"
 msgstr "¿Administrador?"
 
-#: js/pages/tola_management_pages/user/views.js:244
+#: js/pages/tola_management_pages/user/views.js:243
 msgid "Add user"
 msgstr "Agregar Usuario"
 
 #. Translators: The highest level of administrator in the system */}
-#: js/pages/tola_management_pages/user/views.js:332
+#: js/pages/tola_management_pages/user/views.js:334
 msgid "Super Admin"
 msgstr "Super Administrador"
 
