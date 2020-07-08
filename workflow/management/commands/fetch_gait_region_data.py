@@ -28,8 +28,25 @@ class Command(BaseCommand):
 
     @staticmethod
     def _get_and_update_countries_list(countries_json):
-        for country in countries_json:
-            print("country {}".format(country))
+        countries_by_code = {c['iso2']: c for c in countries_json}
+        countries_by_name = {c['country_name']: c for c in countries_json}
+        for country in Country.objects.all():
+            if country.code in countries_by_code:
+                region = Region.objects.get(gait_region_id=countries_by_code[country.code]['region_id'])
+            elif country.country in countries_by_name:
+                if not country.code and countries_by_name[country.country]['iso2']:
+                    country.code = countries_by_name[country.country]['iso2']
+                    country.save()
+                    print('C', end='')
+                region = Region.objects.get(gait_region_id=countries_by_name[country.country]['region_id'])
+            else:
+                region = None
+            if country.region != region:
+                country.region = region
+                country.save()
+                print('U', end='')
+            else:
+                print('.', end='')
 
     def handle(self, *args, **options):
         COUNTRY_URL = f"{settings.MCAPI_BASE_URL}gaitcountry/"
@@ -40,4 +57,3 @@ class Command(BaseCommand):
         print("\nUpdating countries list")
         response = self._get_response(COUNTRY_URL)
         self._get_and_update_countries_list(response.json())
-        
