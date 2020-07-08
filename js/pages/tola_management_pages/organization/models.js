@@ -274,6 +274,8 @@ export class OrganizationStore {
     @action
     changeOrganizationFilter(organizations) {
         this.filters.organizations = organizations
+        // immediately apply changes to the "find a thing" filter
+        this.applyFilters();
     }
 
     @action
