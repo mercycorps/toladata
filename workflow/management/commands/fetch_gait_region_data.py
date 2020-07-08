@@ -3,6 +3,11 @@ from django.core.management.base import BaseCommand, CommandError
 from django.conf import settings
 from workflow.models import Region, Country
 
+# These are HQ managed countries that do not appear in the GAIT database:
+COUNTRY_EXCEPTIONS = {
+    'AFA': {'region_id': 99},
+    'TO':  {'region_id': 99}
+}
 
 class Command(BaseCommand):
     help = """
@@ -39,6 +44,8 @@ class Command(BaseCommand):
                     country.save()
                     print('C', end='')
                 region = Region.objects.get(gait_region_id=countries_by_name[country.country]['region_id'])
+            elif country.code in COUNTRY_EXCEPTIONS:
+                region = Region.objects.get(gait_region_id=COUNTRY_EXCEPTIONS[country.code]['region_id'])
             else:
                 region = None
             if country.region != region:
