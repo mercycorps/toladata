@@ -670,7 +670,6 @@ export class UIStore {
                 notice_type: "notice",
                 include_rationale: false,
                 rationale_required: false,
-                showCloser: true,
                 on_submit: () => this.onLeaveConfirm(levelId, cancelledLevelId),
                 on_cancel: () => this.setDisableCardActions(false),
             })

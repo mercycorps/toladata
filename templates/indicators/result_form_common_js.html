@@ -81,7 +81,6 @@
             rationale_required: true,
             context: document.getElementById('result_update_form'),
             notice_type: 'error',
-            showCloser: false,
             on_submit: (rationale) => {
                 // Mark the record being changed so results table is reloaded on modal close
                 $('#indicator_results_div form').data('recordchanged', true);
