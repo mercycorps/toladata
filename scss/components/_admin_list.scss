@@ -5,8 +5,17 @@
 .admin-list__controls { // was: .list-controls; contains add button & bulk actions
     display: flex;
     justify-content: space-between;
+    align-items: center;
     margin-bottom: $grid-gutter-width/2; // NOTE: will overlap with following table top margin
     margin-top: $grid-gutter-width/2;
+    .controls__top-filter {
+        flex-grow: 1;
+        & + .controls__buttons {
+            //if the buttons are next to a "find a thing" filter, center in the filter select height:
+            position: relative;
+            top: 10px;
+        }
+    }
 }
 .admin-list__top-filter {
     margin-bottom: $grid-gutter-width/2;
