@@ -1507,7 +1507,7 @@ msgstr "Las categorías deben tener nombres únicos."
 
 #: js/pages/tola_management_pages/country/views.js:17
 msgid "Find a Country"
-msgstr "Encontrar un pais"
+msgstr "Encontrar un País"
 
 #. Translators: Nothing selected by user
 #: js/pages/tola_management_pages/country/views.js:22
