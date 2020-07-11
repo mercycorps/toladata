@@ -127,7 +127,7 @@ export class LevelCardCollapsed extends React.Component {
 
         // Prepare the indicator links for the indicator popover
         let allIndicatorLinks = [];
-        
+
         // Get indicator ids linked to this level and create a hyperlink for a filtered IPTT.
         let sameLevelIndicatorIds = this.props.levelProps.indicators.map( i => i.id);
         if (sameLevelIndicatorIds.length > 0) {
@@ -141,8 +141,8 @@ export class LevelCardCollapsed extends React.Component {
         // above, and create a hyperlink for a filtered IPTT.  Only do this if the level has sublevels.
         if (this.props.levelProps.tierName != this.props.rootStore.levelStore.chosenTierSet.slice(-1)[0]) {
             let descendantIndicatorIds = this.props.levelProps.descendantIndicatorIds;
-            descendantIndicatorIds = descendantIndicatorIds.concat(sameLevelIndicatorIds);
             if (descendantIndicatorIds.length > 0) {
+                descendantIndicatorIds = descendantIndicatorIds.concat(sameLevelIndicatorIds);
                 /* # Translators: this link opens a view of all indicators linked to (associated with) a particular level and its child levels (level name replaces %s) */
                 const linkPreface = gettext('All indicators linked to %s and sub-levels');
                 const linkText = interpolate(linkPreface, [`${this.props.levelProps.tierName} ${this.props.levelProps.ontologyLabel}`]);
