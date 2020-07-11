@@ -10,9 +10,9 @@
 {% block region_header %}
 <h1 class="page-title h2">
     <a href="{{ program.program_page_url }}">
-        {% if program.gaitid %}
-            {{ program.gaitid }} - {{ program.name }}:
-        {% endif %}
+    {% if program.gaitid %}
+        {{ program.gaitid }} - 
+    {% endif %}
     {{ program.name }}:</a>
     <span class="font-weight-normal text-muted text-nowrap">
         {% trans "Indicator Plan" %}
