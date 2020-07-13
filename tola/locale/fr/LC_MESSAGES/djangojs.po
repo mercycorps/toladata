@@ -3,7 +3,7 @@ msgstr ""
 "Project-Id-Version: \n"
 "Report-Msgid-Bugs-To: \n"
 "POT-Creation-Date: 2020-07-13 14:49-0700\n"
-"PO-Revision-Date: 2020-03-13 10:43-0700\n"
+"PO-Revision-Date: 2020-07-13 15:02-0700\n"
 "Last-Translator: \n"
 "Language-Team: \n"
 "Language: fr\n"
@@ -11,7 +11,7 @@ msgstr ""
 "Content-Type: text/plain; charset=UTF-8\n"
 "Content-Transfer-Encoding: 8bit\n"
 "Plural-Forms: nplurals=2; plural=(n > 1);\n"
-"X-Generator: Poedit 2.3\n"
+"X-Generator: Poedit 2.3.1\n"
 
 #: js/base.js:357 js/base.js:358
 msgid ""
@@ -749,10 +749,8 @@ msgstr[1] "%s indicateurs"
 
 #. Translators: A link that shows all the indicators, some of which are currently filtered from view
 #: js/pages/program_page/components/indicator_list.js:87
-#, fuzzy
-#| msgid "Group indicators"
 msgid "Show all indicators"
-msgstr "Regrouper les indicateurs"
+msgstr "Afficher tous les indicateurs"
 
 #: js/pages/program_page/components/indicator_list.js:134
 msgid "Find an indicator:"
