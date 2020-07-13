@@ -1,5 +1,139 @@
 {
-    "users": [
-
+    "regions": {
+        "1": {
+            "id": 1,
+            "name": "Americas"
+        },
+        "2": {
+            "id": 2,
+            "name": "Africa"
+        },
+        "3": {
+            "id": 3,
+            "name": "Asia"
+        }
+    },
+    "countries": {
+        "1": {
+            "id": 1,
+            "name": "Test Country",
+            "region": 1,
+            "programs": [1, 3]
+        },
+        "2": {
+            "id": 2,
+            "name": "Test Country 2",
+            "region": 2,
+            "programs": [2]
+        },
+        "3": {
+            "id": 3,
+            "name": "A Test Country 3",
+            "region": 2,
+            "programs": [4]
+        }
+    },
+    "organizations": {
+        "2": {
+            "name": "Partner Org",
+            "id": 2
+        },
+        "1": {
+            "name": "Mercy Corps",
+            "id": 1
+        }
+    },
+    "programs": {
+        "1": {
+            "id": 1,
+            "name": "Program 1"
+        },
+        "2": {
+            "id": 2,
+            "name": "Program 2"
+        },
+        "3": {
+            "id": 3,
+            "name": "Program 3"
+        },
+        "4": {
+            "id": 4,
+            "name": "Program 4"
+        }
+    },
+    "users": [{
+            "id": 101,
+            "title": null,
+            "name": "Aaron TestUser",
+            "employee_number": 101000,
+            "user_id": 1101,
+            "organization_id": 1,
+            "language": "en",
+            "country_id": 1,
+            "active_country_id": null,
+            "tables_api_token": null,
+            "activity_api_token": null,
+            "privacy_disclaimer_accepted": false,
+            "create_date": "2019-02-04T13:02:04Z",
+            "edit_date": "2019-04-24T08:32:17Z",
+            "mode_of_address": null,
+            "mode_of_contact": null,
+            "phone_number": null
+        }, {
+            "id": 102,
+            "title": "Program Manager",
+            "name": "Amber TestUser",
+            "employee_number": null,
+            "user_id": 1102,
+            "organization_id": 2,
+            "language": "en",
+            "country_id": null,
+            "active_country_id": null,
+            "tables_api_token": null,
+            "activity_api_token": null,
+            "privacy_disclaimer_accepted": false,
+            "create_date": "2019-12-10T13:10:14Z",
+            "edit_date": "2019-12-10T13:10:14Z",
+            "mode_of_address": null,
+            "mode_of_contact": "Email",
+            "phone_number": ""
+        }
+    ],
+    "access": {
+        "countries": {
+            "1": {
+                "role": "user"
+            },
+            "2": {
+                "role": "basic_admin"
+            }
+        },
+        "programs": [{
+                "role": "high",
+                "program": 1,
+                "country": 1
+            }, {
+                "role": "low",
+                "program": 3,
+                "country": 1
+            }, {
+                "role": "high",
+                "program": 2,
+                "country": 2
+            }
+        ]
+    },
+    "is_superuser": false,
+    "programs_filter": [],
+    "country_filter": [],
+    "organizations_filter": [],
+    "program_role_choices": [
+        ["low", "Low (view only)"],
+        ["medium", "Medium (add and edit results)"],
+        ["high", "High (edit anything)"]
+    ],
+    "country_role_choices": [
+        ["user", "User (all programs)"],
+        ["basic_admin", "Basic Admin (all programs)"]
     ]
 }

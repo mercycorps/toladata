@@ -110,6 +110,7 @@ class Region(models.Model):
     name = models.CharField(_("Region Name"), max_length=255)
     gait_region_id = models.PositiveIntegerField(blank=True, null=True)
 
+
 class Country(models.Model):
     country = models.CharField(_("Country Name"), max_length=255, blank=True)
     organization = models.ForeignKey(Organization, on_delete=models.SET_NULL,
@@ -137,6 +138,11 @@ class Country(models.Model):
 
     # displayed in admin templates
     def __str__(self):
+        return self.country
+
+    @property
+    def name(self):
+        """Standardize Object.name as returning the object's name for all models"""
         return self.country
 
     @property

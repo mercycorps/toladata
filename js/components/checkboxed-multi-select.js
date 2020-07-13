@@ -19,6 +19,15 @@ const CountLabel = props => {
         
 }
 
+const boldStyles = {
+    option: (styles, { data, isDisabled, isFocused, isSelected }) => {
+        return {
+            ...styles,
+            fontWeight: data.bold ? "bold" : "normal"
+        }
+    }
+}
+
 @observer
 class CheckboxedMultiSelect extends React.Component {
     constructor(props) {
@@ -64,6 +73,7 @@ class CheckboxedMultiSelect extends React.Component {
       render() {
         return <ReactMultiSelectCheckboxes
                 { ...this.props}
+                styles={boldStyles}
                 placeholder={ gettext("Search")}
                 placeholderButtonLabel={ this.props.placeholder }
                 getDropdownButtonLabel={ this.makeLabel }

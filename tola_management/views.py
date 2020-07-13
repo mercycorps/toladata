@@ -38,6 +38,7 @@ from workflow.models import (
     TolaUser,
     Organization,
     Program,
+    Region,
     Country,
     Sector,
     ProgramAccess,
@@ -85,9 +86,14 @@ def requires_basic_or_super_admin(func):
 
 def get_user_page_context(request):
     # json.dumps doesn't seem to respect ordereddicts so we'll sort it on the frontend
+    regions = {
+        region.id: {
+            "id": region.id, "name": region.name
+        } for region in Region.objects.all()
+    }
     countries = {
         country.id: {
-            "id": country.id, "name": country.country,
+            "id": country.id, "name": country.name, "region": country.region_id,
             "programs": list(country.program_set.all().values_list('id', flat=True))
             } for country in request.user.tola_user.managed_countries.distinct()
     }
@@ -102,6 +108,7 @@ def get_user_page_context(request):
     }
 
     return {
+        "regions": regions,
         "countries": countries,
         "organizations": organizations,
         "programs": programs,

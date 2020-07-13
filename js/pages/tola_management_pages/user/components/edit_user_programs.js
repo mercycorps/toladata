@@ -1,8 +1,21 @@
 import React from 'react'
+import { observable } from 'mobx'
 import { observer } from "mobx-react"
 import {AutoSizer, Table, Column, CellMeasurer, CellMeasurerCache} from 'react-virtualized'
 import CheckboxedMultiSelect from 'components/checkboxed-multi-select'
 
+
+const create_region_objects = (regions, countries, store) => {
+    let regionsList = Object.values(regions || {})
+                            .map(region => ({
+                                id: region.id,
+                                name: gettext(region.name),
+                                countries: Object.values(countries)
+                                                 .filter(country => country.region == region.id)
+                            }))
+                            .filter(region => region.countries.length > 0)
+                            .sort((regionA, regionB) => (regionA.name.toUpperCase() < regionB.name.toUpperCase()) ? -1 : 1);
+}
 //we need a pretty peculiar structure to accommodate the virtualized table
 const create_country_objects = (countries, store) => Object.entries(countries)
                                                     .reduce((countries, [id, country]) => ({
@@ -53,9 +66,19 @@ const apply_program_filter = (programs, countries, filter_string) => {
 }
 
 const apply_country_filter = (countries, filtered) => {
+    //console.log("to filter", filtered);
+    let regions_countries = filtered.filter(option => option.region === true)
+        .map(region => region.countries_ids)
+        .reduce((countries, region_countries) => ([...countries, ...region_countries]), []);
+    filtered = filtered.filter(option => !option.region).map(option => option.value);
+    //console.log("filtered", filtered, regions_countries)
+    filtered = [...new Set([...filtered, ...regions_countries])];
+    //console.log("summed", filtered);
     if(filtered.length > 0) {
-        return filtered.filter(option => countries[option.value])
-                .map(option => countries[option.value])
+        //return filtered.filter(option => countries[option.value])
+        //        .map(option => countries[option.value])
+        return filtered.filter(value => countries[value])
+                .map(value => countries[value])
                 .reduce((countries, country) => ({...countries, [country.id]: country}), {})
     } else {
         return countries
@@ -75,15 +98,35 @@ const country_has_all_access = (country, visible_programs, user_program_access) 
                 && user_program_access.programs[`${country.id}_${program_id}`].has_access
             )
 
+const createRegionCountryFilterOptions = (store) => {
+    let regionOptions = {
+        label: gettext("Regions"),
+        options: store.countriesByRegion.map(region => ({
+            value: `region-${region.id}`,
+            label: region.name,
+            region: true,
+            countries_ids: region.countries.map(country => country.id)
+        }))
+    };
+    let countryOptions = store.countriesByRegion.map(region => ({
+        label: region.name,
+        options: region.countries.map(country => ({value: country.id, label: country.name}))
+    }));
+    return [regionOptions, ...countryOptions];
+}
+
 @observer
 export default class EditUserPrograms extends React.Component {
+
     constructor(props) {
         super(props)
         const {store} = props
 
+        const regions = create_region_objects(store.regions, store)
         const countries = create_country_objects(store.countries, store)
         const programs = create_program_objects(store.programs, store)
 
+        
         this.state = {
             program_filter: '',
             country_filter: [],
@@ -114,6 +157,7 @@ export default class EditUserPrograms extends React.Component {
             filtered_countries,
             this.state.program_filter
         )
+
 
         this.setState({
             countries: countries_obj,
@@ -325,6 +369,10 @@ export default class EditUserPrograms extends React.Component {
 
     changeCountryFilter(e) {
         const filtered_countries = apply_country_filter(this.state.countries, e)
+        let country_options = e.filter(option => !option.region);
+        let region_options = this.countryFilterOptions[0].options.filter(
+            region => region.countries_ids.every(v => Object.keys(filtered_countries).includes(`${v}`))
+        );
         const {countries, programs} = apply_program_filter(
             this.state.programs,
             filtered_countries,
@@ -332,7 +380,7 @@ export default class EditUserPrograms extends React.Component {
         )
 
         this.setState({
-            country_filter: e,
+            country_filter: [...region_options, ...country_options],
             filtered_countries: countries,
             flattened_programs: flattened_listing(this.state.ordered_country_ids.filter(id => id in countries).map(id => countries[id]), this.state.filtered_programs),
         })
@@ -420,7 +468,7 @@ export default class EditUserPrograms extends React.Component {
 
                 <div className="edit-user-programs__filter-form">
                     <div className="edit-user-programs__country-filter form-group react-multiselect-checkbox">
-                        <CheckboxedMultiSelect placeholder={gettext("Filter countries")} isMulti={true} value={this.state.country_filter} options={this.state.country_selections} onChange={(e) => this.changeCountryFilter(e)} />
+                        <CheckboxedMultiSelect placeholder={gettext("Filter countries")} isMulti={true} value={this.state.country_filter} options={this.countryFilterOptions} onChange={(e) => this.changeCountryFilter(e)} />
                     </div>
                     <div className="form-group edit-user-programs__program-filter">
                         <div className="input-group">

@@ -97,6 +97,7 @@ export class UserStore {
     @observable changelog_expanded_rows = new Set();
 
     constructor({
+        regions,
         countries,
         organizations,
         programs,
@@ -109,6 +110,7 @@ export class UserStore {
         program_role_choices,
         country_role_choices,
     }) {
+        this.regions = regions
         this.countries = countries
         this.ordered_country_ids = Object.values(countries).sort((a, b) => a.name.localeCompare(b.name)).map(country => country.id)
         this.organizations = organizations
@@ -172,6 +174,17 @@ export class UserStore {
             }
             return xs
         }, {})
+    }
+
+    @computed get countriesByRegion() {
+        return Object.values(this.regions || {})
+            .map(region => ({
+                id: region.id,
+                name: gettext(region.name),
+                countries: Object.values(this.countries).filter(country => country.region == region.id)
+            }))
+            .filter(region => region.countries.length > 0)
+            .sort((regionA, regionB) => (regionA.name.toUpperCase() < regionB.name.toUpperCase()) ? -1 : 1);
     }
 
     dirtyConfirm() {
@@ -647,5 +660,67 @@ export class UserStore {
         } else {
             this.changelog_expanded_rows.add(row_id);
         }
+    }
+}
+
+
+export class CountryStore {
+    @observable regions;
+    @observable countries;
+    @observable _selectedCountryIds;
+
+    constructor(regions, countries) {
+        this.regions = regions;
+        this.countries = countries;
+        this._selectedCountryIds = [];
+        this.nameSort = (objA, objB) => (objA.name.toUpperCase() < objB.name.toUpperCase()) ? -1 : 1;
+    }
+
+    @computed
+    get orderedRegions() {
+        return Object.values(this.regions || {})
+            .map(region => ({
+                id: region.id,
+                name: gettext(region.name),
+                countries: Object.values(this.countries)
+                                 .filter(country => country.region == region.id)
+                                 .sort(this.nameSort)
+            }))
+            .filter(region => region.countries.length > 0)
+            .sort(this.nameSort);
+    }
+    
+    @computed
+    get groupedOptions() {
+        return [
+            {
+                label: gettext("Regions"),
+                value: null,
+                options: this.orderedRegions.map(region => ({label: region.name, value: `r-${region.id}`}))
+            },
+            ...this.orderedRegions.map(region => (
+                {
+                    label: region.name,
+                    value: null,
+                    options: region.countries.map(country => ({label: country.name, value: country.id}))
+                }))
+        ];
+    }
+
+    @computed
+    get selectedCountries() {
+        return this._selectedCountryIds.map(countryId => parseInt(countryId));
+    }
+
+    @computed
+    get selectedOptions() {
+        return this.selectedCountries.map(countryId => (
+            {label: this.countries[countryId].name, value: this.countries[countryId].id}
+        ));
+    }
+
+    @action
+    updateSelected(selected) {
+        this._selectedCountryIds = selected.map(selection => selection.value);
     }
 }
