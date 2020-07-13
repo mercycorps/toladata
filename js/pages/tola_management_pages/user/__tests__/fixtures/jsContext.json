@@ -31,6 +31,12 @@
             "name": "A Test Country 3",
             "region": 2,
             "programs": [4]
+        },
+        "4": {
+            "id": 4,
+            "name": "Test Country 4",
+            "region": 1,
+            "programs": []
         }
     },
     "organizations": {

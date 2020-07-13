@@ -714,9 +714,13 @@ export class CountryStore {
 
     @computed
     get selectedOptions() {
-        return this.selectedCountries.map(countryId => (
+        const isSelected = (country) => this.selectedCountries.includes(country.id)
+        return [
+            ...this.orderedRegions.filter(region => region.countries.every(isSelected))
+                                  .map(region => ({value: `r-${region.id}`, label: region.name})),
+            ...this.selectedCountries.map(countryId => (
             {label: this.countries[countryId].name, value: this.countries[countryId].id}
-        ));
+        ))];
     }
 
     @action
