@@ -6,7 +6,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: \n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2020-07-08 11:09-0700\n"
+"POT-Creation-Date: 2020-07-13 14:49-0700\n"
 "PO-Revision-Date: 2020-03-13 10:43-0700\n"
 "Last-Translator: \n"
 "Language-Team: \n"
@@ -404,7 +404,6 @@ msgstr ""
 #. Translators: option to show all periods for the report */
 #: js/pages/iptt_quickstart/components/radios.js:33
 #: js/pages/iptt_report/components/sidebar/reportSelect.js:113
-#: js/pages/program_page/components/indicator_list.js:84
 msgid "Show all"
 msgstr "Ver todo"
 
@@ -472,7 +471,7 @@ msgstr "Tabla de seguimiento del rendimiento del indicador"
 #. Translators: Column header for a target value column */
 #: js/pages/iptt_report/components/report/headerCells.js:42
 #: js/pages/iptt_report/components/report/tableHeader.js:156
-#: js/pages/program_page/components/indicator_list.js:199
+#: js/pages/program_page/components/indicator_list.js:204
 msgid "Target"
 msgstr "Objetivo"
 
@@ -501,7 +500,7 @@ msgstr "No."
 #. Translators: Column header for indicator Name column */
 #: js/pages/iptt_report/components/report/tableHeader.js:104
 #: js/pages/logframe/components/table.js:30
-#: js/pages/program_page/components/indicator_list.js:195
+#: js/pages/program_page/components/indicator_list.js:200
 #: js/pages/tola_management_pages/audit_log/views.js:99
 #: js/pages/tola_management_pages/audit_log/views.js:177
 #: js/pages/tola_management_pages/audit_log/views.js:181
@@ -517,7 +516,7 @@ msgstr "Nivel"
 #. Translators: Column header */
 #: js/pages/iptt_report/components/report/tableHeader.js:123
 #: js/pages/iptt_report/models/filterStore.js:690
-#: js/pages/program_page/components/indicator_list.js:197
+#: js/pages/program_page/components/indicator_list.js:202
 msgid "Unit of measure"
 msgstr "Unidad de medida"
 
@@ -541,7 +540,7 @@ msgstr "# / %"
 #. Translators: Column header */
 #: js/pages/iptt_report/components/report/tableHeader.js:149
 #: js/pages/iptt_report/models/filterStore.js:694
-#: js/pages/program_page/components/indicator_list.js:198
+#: js/pages/program_page/components/indicator_list.js:203
 msgid "Baseline"
 msgstr "Base"
 
@@ -549,7 +548,7 @@ msgstr "Base"
 #: js/pages/iptt_report/components/report/tableRows.js:258
 #: js/pages/iptt_report/components/report/tableRows.js:259
 #: js/pages/iptt_report/components/report/tableRows.js:261
-#: js/pages/program_page/components/indicator_list.js:262
+#: js/pages/program_page/components/indicator_list.js:267
 #: js/pages/tola_management_pages/audit_log/views.js:172
 #: js/pages/tola_management_pages/audit_log/views.js:199
 msgid "N/A"
@@ -750,24 +749,31 @@ msgid_plural "%s indicators"
 msgstr[0] "%s indicador"
 msgstr[1] "%s indicadores"
 
-#: js/pages/program_page/components/indicator_list.js:129
+#. Translators: A link that shows all the indicators, some of which are currently filtered from view
+#: js/pages/program_page/components/indicator_list.js:87
+#, fuzzy
+#| msgid "program indicators"
+msgid "Show all indicators"
+msgstr "indicadores de programa"
+
+#: js/pages/program_page/components/indicator_list.js:134
 msgid "Find an indicator:"
 msgstr "Encontrar un indicador:"
 
-#: js/pages/program_page/components/indicator_list.js:136
+#: js/pages/program_page/components/indicator_list.js:141
 msgid "None"
 msgstr "Ninguno"
 
-#: js/pages/program_page/components/indicator_list.js:146
+#: js/pages/program_page/components/indicator_list.js:151
 msgid "Group indicators:"
 msgstr "Indicadores de grupo:"
 
 #. Translators: Adj: labels this indicator as one which is missing one or more targets */
-#: js/pages/program_page/components/indicator_list.js:251
+#: js/pages/program_page/components/indicator_list.js:256
 msgid "Missing targets"
 msgstr "Objetivos faltantes"
 
-#: js/pages/program_page/components/indicator_list.js:298
+#: js/pages/program_page/components/indicator_list.js:303
 msgid ""
 "Some indicators have missing targets. To enter these values, click the "
 "target icon near the indicator name."
@@ -4431,9 +4437,6 @@ msgstr "Super Administrador"
 
 #~ msgid "program indicator"
 #~ msgstr "indicador de programa"
-
-#~ msgid "program indicators"
-#~ msgstr "indicadores de programa"
 
 #, fuzzy
 #~ msgid "feedback form"

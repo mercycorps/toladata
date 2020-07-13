@@ -7,7 +7,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: \n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2020-07-08 11:09-0700\n"
+"POT-Creation-Date: 2020-07-13 14:44-0700\n"
 "PO-Revision-Date: 2020-06-24 10:01-0700\n"
 "Last-Translator: \n"
 "Language-Team: \n"
@@ -2036,15 +2036,15 @@ msgid "No"
 msgstr "No"
 
 #: templates/indicators/indicator_plan.html:4
-#: templates/indicators/indicator_plan.html:14
+#: templates/indicators/indicator_plan.html:18
 msgid "Indicator Plan"
 msgstr "Plan Indicador"
 
-#: templates/indicators/indicator_plan.html:31
+#: templates/indicators/indicator_plan.html:35
 msgid "Group indicators"
 msgstr "Agrupar indicadores"
 
-#: templates/indicators/indicator_plan.html:35
+#: templates/indicators/indicator_plan.html:39
 msgid "by Level"
 msgstr "por Nivel"
 

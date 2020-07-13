@@ -82,7 +82,10 @@ export class StatusHeader extends React.Component {
                 {filterApplied &&
                     <small className="ml-2 text-medium-dark text-nowrap">|
                         <a className="ml-2" href="#" id="show-all-indicators" onClick={this.onShowAllClick}>
-                            {gettext('Show all indicators')}
+                            {
+                                // # Translators: A link that shows all the indicators, some of which are currently filtered from view
+                                gettext('Show all indicators')
+                            }
                         </a>
                     </small>
                 }
