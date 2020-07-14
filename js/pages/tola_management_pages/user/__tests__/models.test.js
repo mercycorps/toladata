@@ -82,6 +82,7 @@ describe('countryStore', () => {
         it("handles manually selecting a region countries", () => {
             expect(countryStore.selectedCountries).toHaveLength(0);
             expect(countryStore.selectedOptions).toHaveLength(0);
+            countryStore.updateSelected([countryStore.groupedOptions[1].options[1]]);
             countryStore.updateSelected([countryStore.groupedOptions[1].options[1],
                                          countryStore.groupedOptions[1].options[0]]);
             expect(countryStore.selectedCountries).toHaveLength(2);
@@ -101,6 +102,6 @@ describe('countryStore', () => {
             expect(countryStore.selectedOptions).toHaveLength(3);
             expect(countryStore.selectedOptions[0].label).toBe("Americas");
             expect(countryStore.selectedOptions[0].value).toBe("r-1");
-        })
+        });
     })
 });
