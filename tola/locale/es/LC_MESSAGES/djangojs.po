@@ -7,7 +7,7 @@ msgstr ""
 "Project-Id-Version: \n"
 "Report-Msgid-Bugs-To: \n"
 "POT-Creation-Date: 2020-07-14 14:08-0700\n"
-"PO-Revision-Date: 2020-07-13 15:02-0700\n"
+"PO-Revision-Date: 2020-07-14 15:01-0700\n"
 "Last-Translator: \n"
 "Language-Team: \n"
 "Language: es\n"
@@ -1914,7 +1914,7 @@ msgstr "Falló el envío de correo electrónico de verificación"
 #. Translators: a list of groups of countries (i.e. "Asia")
 #: js/pages/tola_management_pages/user/models.js:710
 msgid "Regions"
-msgstr ""
+msgstr "Regiones"
 
 #: js/pages/tola_management_pages/user/views.js:19
 msgid "Find a User"

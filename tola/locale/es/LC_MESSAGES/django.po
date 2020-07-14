@@ -8,7 +8,7 @@ msgstr ""
 "Project-Id-Version: \n"
 "Report-Msgid-Bugs-To: \n"
 "POT-Creation-Date: 2020-07-14 14:07-0700\n"
-"PO-Revision-Date: 2020-06-24 10:01-0700\n"
+"PO-Revision-Date: 2020-07-14 15:01-0700\n"
 "Last-Translator: \n"
 "Language-Team: \n"
 "Language: es\n"
@@ -3724,10 +3724,8 @@ msgid "Primary Mode of Contact"
 msgstr "Forma de Contacto Principal"
 
 #: workflow/models.py:110
-#, fuzzy
-#| msgid "Report Name"
 msgid "Region Name"
-msgstr "Nombre del Informe"
+msgstr "Nombre de la región"
 
 #: workflow/models.py:115
 msgid "Country Name"
