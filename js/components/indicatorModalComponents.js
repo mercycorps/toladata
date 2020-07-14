@@ -6,7 +6,7 @@ export const AddIndicatorButton = observer(({ readonly, ...params }) => {
             <button
                 type="button"
                 disabled={readonly}
-                className="btn btn-link btn-add text-nowrap"
+                className="btn btn-sm btn-link px-0 btn-add text-nowrap"
                 onClick={e => {openCreateIndicatorFormModal(params)}}>
                 <i className="fas fa-plus-circle"/> {gettext("Add indicator")}
             </button>

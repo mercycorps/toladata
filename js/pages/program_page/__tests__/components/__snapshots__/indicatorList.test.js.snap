@@ -61,7 +61,7 @@ exports[`Indicator List elements Status Header component calls for filter title 
     >
       |
       <a
-        className="ml-2"
+        className="btn btn-sm btn-link btn-inline ml-2"
         href="#"
         id="show-all-indicators"
         onClick={[Function]}
@@ -72,7 +72,7 @@ exports[`Indicator List elements Status Header component calls for filter title 
   </h3>
   <div>
     <button
-      className="btn btn-link btn-add text-nowrap"
+      className="btn btn-sm btn-link px-0 btn-add text-nowrap"
       disabled={false}
       onClick={[Function]}
       type="button"
@@ -104,7 +104,7 @@ exports[`Indicator List elements Status Header component renders filter applied 
     >
       |
       <a
-        className="ml-2"
+        className="btn btn-sm btn-link btn-inline ml-2"
         href="#"
         id="show-all-indicators"
         onClick={[Function]}
@@ -115,7 +115,7 @@ exports[`Indicator List elements Status Header component renders filter applied 
   </h3>
   <div>
     <button
-      className="btn btn-link btn-add text-nowrap"
+      className="btn btn-sm btn-link px-0 btn-add text-nowrap"
       disabled={false}
       onClick={[Function]}
       type="button"
@@ -162,7 +162,7 @@ exports[`Indicator List elements Status Header component renders without crashin
   </h3>
   <div>
     <button
-      className="btn btn-link btn-add text-nowrap"
+      className="btn btn-sm btn-link px-0 btn-add text-nowrap"
       disabled={false}
       onClick={[Function]}
       type="button"
