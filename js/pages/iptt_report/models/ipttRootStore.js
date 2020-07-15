@@ -168,10 +168,16 @@ export default (
         loadResultsModal(indicatorPk) {
             api.indicatorResultsTable(indicatorPk, false).then(
                 (data) => {
-                    $('#indicator_modal_content').empty();
                     $('#modalmessages').empty();
-                    $('#indicator_modal_content').html(data);
+                    let $modal = $('#indicator_modal_content');
+                    $modal.empty().html(data);
                     $('#indicator_modal_div').modal('show');
+                    $modal.find('[data-toggle="popover"]').popover({
+                        html: true, placement: 'right', container: $modal,
+                        // note: this template is just the default with the addition of a width attribute
+                        // already tried: container, boundary, placement, offset, and loading order, but this works:
+                        template: '<div class="popover" style="width: 325px;" role="tooltip"><div class="arrow"></div><h3 class="popover-header"></h3><div class="popover-body"></div></div>'
+                    });
                 }
             );
         },

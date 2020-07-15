@@ -37,11 +37,11 @@
     // usual pattern:
     // -- a title & optional subtitles on the left (.subheader__title)
     // -- actions on the right (.subheader__actions)
-    align-items: center;
+    align-items: flex-start;
     display: flex;
     direction: row;
     justify-content: space-between;
-    margin-bottom: $grid-gutter-width/2;
+    margin-top: $grid-gutter-width/2;
 }
 .subheader__title {}
 .subheader__actions {

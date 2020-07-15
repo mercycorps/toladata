@@ -267,6 +267,7 @@ a:hover {
 // just a row of buttons without the special styling of btn-group
 // adds a little margin between buttons
 .btn-row {
+    white-space: nowrap;
     .btn {
         margin-left: $grid-gutter-width/4;
         &:first-child {

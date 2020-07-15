@@ -212,7 +212,7 @@ class Command(BaseCommand):
         if options['names']:
             tester_names = options['names'].split(',')
         else:
-            tester_names = ['Kelly', 'Marie', 'Jenny', 'Sanjuro', 'Cameron', 'Ken', 'Paul', 'Carly', 'Marco']
+            tester_names = ['Barbara', 'Cameron', 'Carly', 'Jenny', 'Marie', 'Marco', 'Paul', 'Sanjuro']
 
         for t_name in tester_names:
             program_name = 'QA program - {}'.format(t_name)

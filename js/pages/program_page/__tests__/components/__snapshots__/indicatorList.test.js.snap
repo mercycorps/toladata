@@ -56,20 +56,23 @@ exports[`Indicator List elements Status Header component calls for filter title 
     >
       %s indicator is &gt;15% above target
     </span>
-    <a
-      className="ml-2"
-      href="#"
-      id="show-all-indicators"
-      onClick={[Function]}
+    <small
+      className="ml-2 text-medium-dark text-nowrap"
     >
-      <small>
-        Show all
-      </small>
-    </a>
+      |
+      <a
+        className="btn btn-sm btn-link btn-inline ml-2"
+        href="#"
+        id="show-all-indicators"
+        onClick={[Function]}
+      >
+        Show all indicators
+      </a>
+    </small>
   </h3>
   <div>
     <button
-      className="btn btn-link btn-add"
+      className="btn btn-sm btn-link px-0 btn-add text-nowrap"
       disabled={false}
       onClick={[Function]}
       type="button"
@@ -96,20 +99,23 @@ exports[`Indicator List elements Status Header component renders filter applied 
     >
       %s indicator
     </span>
-    <a
-      className="ml-2"
-      href="#"
-      id="show-all-indicators"
-      onClick={[Function]}
+    <small
+      className="ml-2 text-medium-dark text-nowrap"
     >
-      <small>
-        Show all
-      </small>
-    </a>
+      |
+      <a
+        className="btn btn-sm btn-link btn-inline ml-2"
+        href="#"
+        id="show-all-indicators"
+        onClick={[Function]}
+      >
+        Show all indicators
+      </a>
+    </small>
   </h3>
   <div>
     <button
-      className="btn btn-link btn-add"
+      className="btn btn-sm btn-link px-0 btn-add text-nowrap"
       disabled={false}
       onClick={[Function]}
       type="button"
@@ -156,7 +162,7 @@ exports[`Indicator List elements Status Header component renders without crashin
   </h3>
   <div>
     <button
-      className="btn btn-link btn-add"
+      className="btn btn-sm btn-link px-0 btn-add text-nowrap"
       disabled={false}
       onClick={[Function]}
       type="button"
