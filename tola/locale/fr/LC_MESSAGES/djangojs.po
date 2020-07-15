@@ -2,8 +2,8 @@ msgid ""
 msgstr ""
 "Project-Id-Version: \n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2020-07-13 14:49-0700\n"
-"PO-Revision-Date: 2020-07-13 15:02-0700\n"
+"POT-Creation-Date: 2020-07-14 14:08-0700\n"
+"PO-Revision-Date: 2020-07-14 15:02-0700\n"
 "Last-Translator: \n"
 "Language-Team: \n"
 "Language: fr\n"
@@ -153,8 +153,9 @@ msgid "Details"
 msgstr "Détails"
 
 #. Translators: (preceded by a number) e.g. "4 options selected"
+#. Translators: prefixed with a number, as in "4 selected" displayed on a multi-select
 #: js/components/changesetNotice.js:251
-#: js/components/checkboxed-multi-select.js:55
+#: js/components/checkboxed-multi-select.js:99
 #: js/components/selectWidgets.js:153
 msgid "selected"
 msgstr "sélectionné"
@@ -165,7 +166,8 @@ msgstr "sélectionné"
 msgid "None selected"
 msgstr "Aucun élément sélectionné"
 
-#: js/components/checkboxed-multi-select.js:67
+#. Translators: placeholder text in a search box
+#: js/components/checkboxed-multi-select.js:113
 msgid "Search"
 msgstr "Rechercher"
 
@@ -1350,7 +1352,7 @@ msgstr "Archiver la désagrégation"
 #: js/pages/tola_management_pages/country/models.js:243
 #: js/pages/tola_management_pages/organization/models.js:112
 #: js/pages/tola_management_pages/program/models.js:72
-#: js/pages/tola_management_pages/user/models.js:178
+#: js/pages/tola_management_pages/user/models.js:191
 msgid "You have unsaved changes. Are you sure you want to discard them?"
 msgstr ""
 "Vos modifications n’ont pas été enregistrées. Voulez-vous vraiment les "
@@ -1647,13 +1649,13 @@ msgstr "Statut et historique"
 
 #. Translators: Saving to the server failed
 #: js/pages/tola_management_pages/organization/models.js:104
-#: js/pages/tola_management_pages/user/models.js:190
+#: js/pages/tola_management_pages/user/models.js:203
 msgid "Saving Failed"
 msgstr "Échec de l’enregistrement"
 
 #. Translators: Saving to the server succeeded
 #: js/pages/tola_management_pages/organization/models.js:108
-#: js/pages/tola_management_pages/user/models.js:197
+#: js/pages/tola_management_pages/user/models.js:210
 msgid "Successfully Saved"
 msgstr "Enregistré avec succès"
 
@@ -1856,45 +1858,48 @@ msgstr "Enregistrer les modifications"
 msgid "Save And Add Another"
 msgstr "Enregistrer et ajouter à nouveau"
 
-#: js/pages/tola_management_pages/user/components/edit_user_programs.js:13
+#: js/pages/tola_management_pages/user/components/edit_user_programs.js:17
 msgid "Individual programs only"
 msgstr "Programmes individuels seulement"
 
-#: js/pages/tola_management_pages/user/components/edit_user_programs.js:416
+#: js/pages/tola_management_pages/user/components/edit_user_programs.js:421
 #: js/pages/tola_management_pages/user/components/user_editor.js:32
 msgid "Programs and Roles"
 msgstr "Programmes et rôles"
 
-#: js/pages/tola_management_pages/user/components/edit_user_programs.js:418
+#. Translators: link to learn more about permissions-granting roles a user can be assigned
+#: js/pages/tola_management_pages/user/components/edit_user_programs.js:425
 msgid "More information on Program Roles"
 msgstr "Plus d’informations sur les programmes et les rôles"
 
-#: js/pages/tola_management_pages/user/components/edit_user_programs.js:423
+#. Translators: This is placeholder text on a dropdown of countries which limit the displayed programs
+#: js/pages/tola_management_pages/user/components/edit_user_programs.js:432
 msgid "Filter countries"
 msgstr "Filtrer les pays"
 
-#: js/pages/tola_management_pages/user/components/edit_user_programs.js:427
+#. Translators: this is placeholder text on a dropdown of programs which limit the displayed results
+#: js/pages/tola_management_pages/user/components/edit_user_programs.js:438
 msgid "Filter programs"
 msgstr "Filtrer les programmes"
 
 #. Translators: Column header for a checkbox indicating if a user has access to a program */
-#: js/pages/tola_management_pages/user/components/edit_user_programs.js:452
+#: js/pages/tola_management_pages/user/components/edit_user_programs.js:463
 msgid "Has access?"
 msgstr "A accès ?"
 
-#: js/pages/tola_management_pages/user/components/edit_user_programs.js:469
+#: js/pages/tola_management_pages/user/components/edit_user_programs.js:480
 msgid "Deselect All"
 msgstr "Tout déselectionner"
 
-#: js/pages/tola_management_pages/user/components/edit_user_programs.js:469
+#: js/pages/tola_management_pages/user/components/edit_user_programs.js:480
 msgid "Select All"
 msgstr "Tout sélectionner"
 
-#: js/pages/tola_management_pages/user/components/edit_user_programs.js:482
+#: js/pages/tola_management_pages/user/components/edit_user_programs.js:493
 msgid "Countries and Programs"
 msgstr "Pays et programmes"
 
-#: js/pages/tola_management_pages/user/components/edit_user_programs.js:498
+#: js/pages/tola_management_pages/user/components/edit_user_programs.js:509
 msgid "Roles and Permissions"
 msgstr "Rôles et autorisations"
 
@@ -1907,14 +1912,19 @@ msgid "No"
 msgstr "Non"
 
 #. Translators: An email was sent to the user to verify that the email address is valid
-#: js/pages/tola_management_pages/user/models.js:440
+#: js/pages/tola_management_pages/user/models.js:453
 msgid "Verification email sent"
 msgstr "E-mail de vérification envoyé"
 
 #. Translators: Sending an email to the user did not work
-#: js/pages/tola_management_pages/user/models.js:444
+#: js/pages/tola_management_pages/user/models.js:457
 msgid "Verification email send failed"
 msgstr "Échec de l’envoi de l’e-mail de vérification"
+
+#. Translators: a list of groups of countries (i.e. "Asia")
+#: js/pages/tola_management_pages/user/models.js:710
+msgid "Regions"
+msgstr "Régions"
 
 #: js/pages/tola_management_pages/user/views.js:19
 msgid "Find a User"

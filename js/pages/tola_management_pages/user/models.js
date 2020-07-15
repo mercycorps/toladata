@@ -97,6 +97,7 @@ export class UserStore {
     @observable changelog_expanded_rows = new Set();
 
     constructor({
+        regions,
         countries,
         organizations,
         programs,
@@ -109,6 +110,7 @@ export class UserStore {
         program_role_choices,
         country_role_choices,
     }) {
+        this.regions = regions
         this.countries = countries
         this.ordered_country_ids = Object.values(countries).sort((a, b) => a.name.localeCompare(b.name)).map(country => country.id)
         this.organizations = organizations
@@ -172,6 +174,17 @@ export class UserStore {
             }
             return xs
         }, {})
+    }
+
+    @computed get countriesByRegion() {
+        return Object.values(this.regions || {})
+            .map(region => ({
+                id: region.id,
+                name: gettext(region.name),
+                countries: Object.values(this.countries).filter(country => country.region == region.id)
+            }))
+            .filter(region => region.countries.length > 0)
+            .sort((regionA, regionB) => (regionA.name.toUpperCase() < regionB.name.toUpperCase()) ? -1 : 1);
     }
 
     dirtyConfirm() {
@@ -646,6 +659,139 @@ export class UserStore {
             this.changelog_expanded_rows.delete(row_id);
         } else {
             this.changelog_expanded_rows.add(row_id);
+        }
+    }
+}
+
+
+/**
+ * To manage a list of countries and regions being selected and unselected,
+ * this takes region data and country data (including country.region) and makes a store that
+ * handles selecting and unselecting regions and countries intelligently:
+ *   - if all countries in a region are selected, that region becomes automatically selected
+ *   - if one country from a selected region is unselected, that region is automatically unselected
+ *   - selecting a region automatically selects all countries from that region
+ *   - unselecteding a region automatically unselects all countries from that region
+ */
+
+export class CountryStore {
+    @observable regions;
+    @observable countries;
+    @observable _selectedCountryIds;
+
+    constructor(regions, countries) {
+        this.regions = regions;
+        this.countries = countries;
+        this._selectedCountryIds = [];
+        this.nameSort = (objA, objB) => (objA.name.toUpperCase() < objB.name.toUpperCase()) ? -1 : 1;
+    }
+
+    @computed
+    get orderedRegions() {
+        return Object.values(this.regions || {})
+            .map(region => ({
+                id: region.id,
+                name: gettext(region.name),
+                countries: Object.values(this.countries)
+                                 .filter(country => country.region == region.id)
+                                 .sort(this.nameSort)
+            }))
+            .filter(region => region.countries.length > 0)
+            .sort(this.nameSort);
+    }
+    
+    @computed
+    get groupedOptions() {
+        // in the following possible options listing, "selectable: false" ensures the group heading
+        // will not have a checkbox adjacent to it
+        return [
+            {
+                // # Translators: a list of groups of countries (i.e. "Asia")
+                label: gettext("Regions"),
+                value: null,
+                selectable: false,
+                options: this.orderedRegions.map(region => ({label: region.name, value: `r-${region.id}`}))
+            },
+            ...this.orderedRegions.map(region => (
+                {
+                    label: region.name,
+                    value: null,
+                    options: region.countries.map(country => ({label: country.name, value: country.id}))
+                }))
+        ];
+    }
+
+    @computed
+    get selectedCountries() {
+        return this._selectedCountryIds.map(countryId => parseInt(countryId));
+    }
+
+    @computed
+    get selectedOptions() {
+        // in the following selected option listing, "nolist" prevents counting the option in the
+        // "n selected" (i.e. "4 selected") display on the multiselect:
+        const isSelected = (country) => this.selectedCountries.includes(country.id)
+        return [
+            ...this.orderedRegions.filter(region => region.countries.every(isSelected))
+                                  .map(region => ({value: `r-${region.id}`, label: region.name, noList: true})),
+            ...this.selectedCountries.map(countryId => (
+            {label: this.countries[countryId].name, value: this.countries[countryId].id}
+        ))];
+    }
+
+    @action
+    removeRegion(regionId) {
+        let countryIds = Object.values(this.countries).filter(country => country.region == regionId)
+                                .map(country => country.id);
+        this._selectedCountryIds = this._selectedCountryIds.filter(id => !countryIds.includes(id));
+    }
+
+    @action
+    addRegion(regionId) {
+        let countryIds = Object.values(this.countries).filter(country => country.region == regionId)
+                                .map(country => country.id);
+        this._selectedCountryIds = [...new Set([...this._selectedCountryIds, ...countryIds])];
+    }
+
+    @action
+    removeCountry(countryId) {
+        this._selectedCountryIds = this._selectedCountryIds.filter(id => id !== countryId);
+    }
+
+    @action
+    addCountry(countryId) {
+        this._selectedCountryIds = [...new Set([...this._selectedCountryIds, countryId])];
+    }
+
+    @action
+    updateSelected(selected) {
+        if (selected.length == 0) {
+            // selection is cleared
+            this._selectedCountryIds = [];
+        }
+        else if (selected.length < this.selectedOptions.length) {
+            // user removed items
+            const unSelected = (option) => !selected.map(option => option.value).includes(option.value);
+            let missingOptions = this.selectedOptions.filter(unSelected);
+            missingOptions.forEach(option => {
+                if (option.value && `${option.value}`.includes('r')) {
+                    this.removeRegion(option.value.slice(2));
+                } else if (option.value) {
+                    this.removeCountry(option.value);
+                }
+            });
+            
+        } else {
+            // user added items
+            const notYetSelected = (option) => !this.selectedOptions.map(option => option.value).includes(option.value);
+            let addedOptions = selected.filter(notYetSelected);
+            addedOptions.forEach(option => {
+                if (option.value && `${option.value}`.includes('r')) {
+                    this.addRegion(option.value.slice(2));
+                } else if (option.value) {
+                    this.addCountry(option.value);
+                }
+            })
         }
     }
 }
