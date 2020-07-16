@@ -25,6 +25,7 @@ const CountLabel = props => {
 /*
  * CheckboxGroup drop in replacement that delivers a heading without a checkbox if the optgroup has
  * the attribute "selectable: false"
+ * Also adds a vertical divider above any optgroup with the attribute divider: true
  */
 function Group(props) {
     if (props.data.selectable === false) {
@@ -48,6 +49,12 @@ function Group(props) {
                     {'group-heading': true}, className)}>{props.data.label}</div>
                 <div>{props.children}</div>
             </div>);
+    }
+    if (props.data.divider === true) {
+        return (<React.Fragment>
+                <hr style={{ margin: '3px 0px 0px 0px' }} />
+                <CheckboxGroup {... props} />
+                </React.Fragment>);
     }
     return <CheckboxGroup {... props} />;
 }
