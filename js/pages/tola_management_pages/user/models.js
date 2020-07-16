@@ -716,6 +716,7 @@ export class CountryStore {
                 {
                     label: region.name,
                     value: null,
+                    divider: true,
                     options: region.countries.map(country => ({label: country.name, value: country.id}))
                 }))
         ];
