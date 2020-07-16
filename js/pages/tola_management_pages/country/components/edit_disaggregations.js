@@ -5,6 +5,7 @@ import classNames from 'classnames'
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome'
 import HelpPopover from "../../../../components/helpPopover";
 import { toJS } from 'mobx';
+import {create_unified_changeset_notice} from '../../../../components/changesetNotice';
 
 const ErrorFeedback = observer(({errorMessages}) => {
     if (!errorMessages) {
@@ -477,25 +478,31 @@ export default class EditDisaggregations extends React.Component {
     onSaveChangesPress(data) {
         if ( this.state.origSelectedByDefault !== data.selected_by_default ){
             if (data.selected_by_default) {
-                create_no_rationale_changeset_notice({
+                create_unified_changeset_notice({
+                    header: gettext("Warning"),
+                    show_icon: true,
                     // # Translators:  This is a warning popup when the user tries to do something that has broader effects than they might anticipate
                     preamble: interpolate(gettext("This disaggregation will be automatically selected for all new indicators in %s. Existing indicators will be unaffected."), [gettext(this.props.countryName)]),
                     // # Translators: This is the prompt on a popup that has warned users about a change they are about to make that could have broad consequences
                     message_text: gettext("Are you sure you want to continue?"),
+                    notice_type: 'notice',
+                    showCloser: true,
                     on_submit: () => this.saveDisaggregation(data),
-                    on_cancel: () => {},
-                    type: "notice"
+                    on_cancel: () => {}
                 })
             }
             else {
-                create_no_rationale_changeset_notice({
+                create_unified_changeset_notice({
+                    header: gettext("Warning"),
+                    show_icon: true,
                     // # Translators:  This is a warning popup when the user tries to do something that has broader effects than they might anticipate
                     preamble: interpolate(gettext("This disaggregation will no longer be automatically selected for all new indicators in %s. Existing indicators will be unaffected."), [this.props.countryName]),
                     // # Translators: This is the prompt on a popup that has warned users about a change they are about to make that could have broad consequences
                     message_text: gettext("Are you sure you want to continue?"),
+                    notice_type: "notice",
+                    showCloser: true,
                     on_submit: () => this.saveDisaggregation(data),
-                    on_cancel:()=>{},
-                    type: "notice"
+                    on_cancel:()=>{}
                 })
             }
 

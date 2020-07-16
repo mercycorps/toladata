@@ -14,7 +14,7 @@ import CountryHistory from "./components/country_history";
 
 const CountryFilter = observer(({store, filterOptions}) => {
     return <div className="form-group react-multiselect-checkbox">
-        <label htmlFor="countries_filter">{gettext("Countries")}</label>
+        <label htmlFor="countries_filter">{gettext("Find a Country")}</label>
         <CheckboxedMultiSelect
             value={store.filters.countries}
             options={filterOptions}
@@ -58,7 +58,7 @@ export const IndexView = observer(
                 <div className="filter-section">
                     <OrganizationFilter store={store} filterOptions={organizationFilterOptions} />
                     <ProgramFilter store={store} filterOptions={programFilterOptions} />
-                    <CountryFilter store={store} filterOptions={countryFilterOptions} />
+                    
                 </div>
                 <div className="filter-section filter-buttons">
                     <button className="btn btn-primary" onClick={() => store.applyFilters()}>{gettext("Apply")}</button>
@@ -70,7 +70,9 @@ export const IndexView = observer(
                     <h1>{gettext("Admin:")} <small>{gettext("Countries")}</small></h1>
                 </header>
                 <div className="admin-list__controls">
-                    <div className="controls__bulk-actions"></div>
+                    <div className="controls__top-filter">
+                        <CountryFilter store={store} filterOptions={countryFilterOptions} />
+                    </div>
                     {store.is_superuser &&
                     <div className="controls__buttons">
                         <a href="#" tabIndex="0" className="btn btn-link btn-add" onClick={() => store.addCountry()}>

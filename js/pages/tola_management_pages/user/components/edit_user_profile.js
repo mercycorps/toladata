@@ -137,7 +137,7 @@ export default class EditUserProfile extends React.Component {
                             disabled={disabled}
                             className={"form-control "+error_classes.first_name}
                             type="text"
-                            value={ud.first_name}
+                            value={ud.first_name || ''}
                             onChange={(e) => this.updateFirstName(e.target.value) }
                             id="user-first-name-input"
                             required />
@@ -153,7 +153,7 @@ export default class EditUserProfile extends React.Component {
                             disabled={disabled}
                             className={"form-control "+error_classes.last_name}
                             type="text"
-                            value={ud.last_name}
+                            value={ud.last_name || ''}
                             onChange={(e) => this.updateLastName(e.target.value) }
                             id="user-last-name-input"
                             required />
@@ -169,7 +169,7 @@ export default class EditUserProfile extends React.Component {
                             disabled={disabled}
                             className={"form-control "+error_classes.username}
                             type="text"
-                            value={ud.username}
+                            value={ud.username || ''}
                             onChange={(e) => this.updateUsername(e.target.value) }
                             id="user-username-input"
                             required />
@@ -201,7 +201,7 @@ export default class EditUserProfile extends React.Component {
                             disabled={disabled}
                             maxLength="50"
                             type="text"
-                            value={ud.title}
+                            value={ud.title || ''}
                             onChange={(e) => this.updateTitle(e.target.value)}
                             className="form-control"
                             id="user-title-input" />
@@ -212,7 +212,7 @@ export default class EditUserProfile extends React.Component {
                             disabled={disabled}
                             className={"form-control "+error_classes.email}
                             type="email"
-                            value={ud.email}
+                            value={ud.email || ''}
                             onChange={(e) => this.updateEmail(e.target.value)}
                             id="user-email-input" />
                         {e.email &&
@@ -226,7 +226,7 @@ export default class EditUserProfile extends React.Component {
                         <input
                             disabled={disabled}
                             type="tel"
-                            value={ud.phone_number}
+                            value={ud.phone_number || ''}
                             onChange={(e) => this.updatePhone(e.target.value)}
                             className="form-control"
                             id="user-phone-input" />
@@ -236,7 +236,7 @@ export default class EditUserProfile extends React.Component {
                         <input
                             disabled={disabled}
                             type="text"
-                            value={ud.mode_of_contact}
+                            value={ud.mode_of_contact || ''}
                             onChange={(e) => this.updateModeOfContact(e.target.value)}
                             className="form-control"
                             id="user-mode-of-contact-input" />

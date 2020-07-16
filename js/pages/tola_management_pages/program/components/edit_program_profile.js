@@ -96,11 +96,11 @@ export default class EditProgramProfile extends React.Component {
                         <label htmlFor="program-fund-code-input">{gettext("Fund Code")}</label>
                         <input
                             type="tel"
-                            value=""
+                            value={formdata.fundCode}
                             onChange={(e) => this.updateFormField('fundCode', e.target.value) }
                             className={classNames('form-control', { 'is-invalid': this.formErrors('fundCode') })}
                             id="program-fund-code-input"
-                            disabled={true}
+                            disabled={!this.props.new}
                             />
                         <ErrorFeedback errorMessages={this.formErrors('fundCode')} />
                     </div>

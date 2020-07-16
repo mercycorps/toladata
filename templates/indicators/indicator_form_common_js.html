@@ -135,10 +135,13 @@
             e.preventDefault();
 
             // prompt the user if they actually want to close
-            window.create_no_rationale_changeset_notice({
+            window.create_unified_changeset_notice({
+                header: gettext('Warning'),
                 preamble: CLOSE_BEFORE_SAVING_WARNING_PREAMBLE,
                 message_text: CLOSE_BEFORE_SAVING_WARNING_MESSAGE,
                 context: document.getElementById('indicator_update_form'),
+                rationale_required: false,
+                notice_type: 'error',
                 on_submit: () => {
                     allowModalToClose = true;
                     closeIndicatorFormModal();
@@ -208,18 +211,26 @@
     // delete indicator helper
     function confirmAndRedirect(delete_indicator) {
         if(! indicatorHasResults()) {
-            create_no_rationale_changeset_notice({
+            window.create_unified_changeset_notice({
+                header: gettext('Warning'),
                 preamble: [DESTRUCTIVE_PREAMBLE, DELETE_INDICATOR_PREAMBLE].join(' '),
                 message_text: DELETE_INDICATOR_NO_RATIONALE,
                 context: document.getElementById('indicator_update_form'),
+                rationale_required: false,
+                notice_type: 'error',
                 on_submit: delete_indicator
             });
         } else {
-            create_destructive_changeset_notice({
+            window.create_unified_changeset_notice({
+                header: gettext('Warning'),
+                preamble: DESTRUCTIVE_PREAMBLE,
+                show_icon: true,
+                rationale_required: true,
+                include_rationale: true,
                 message_text: DELETE_INDICATOR_MESSAGE,
                 context: document.getElementById('indicator_update_form'),
                 on_submit: delete_indicator,
-                showCloser: true
+                notice_type: 'error',
             });
         }
         scrollToIndicatorFormBottom();
@@ -267,50 +278,77 @@
          /* If target is new, delete means just remove row,
          * If target is saved, delete means call to delete
          */
-        const delete_callback = url === '#' ?
-            (url, row) => () => {
-                row.remove();
-                updateIfLastEvent();
-                updateLopTargetDisplay();
-            } :
-            (url, row) => (rationale) => {
-                $.post(url, {rationale: rationale})
-                    .done((data) => {
-                        if (data.status === "success") {
-                            $('#indicator_modal_div').trigger('updated.tola.indicator.save', saveEventParams());
-                            row.remove();
-                            if (updateSnapshot) {
-                                updatePTsAndLopTargetOnSnapshot();
+        if (url === '#') {
+            //This is a new event target (not yet saved), just confirm and remove:
+            window.create_unified_changeset_notice({
+                header: gettext('Warning'),
+                show_icon: true,
+                preamble: DESTRUCTIVE_PREAMBLE,
+                message_text: DELETE_TARGET_NO_RATIONALE,
+                context: document.getElementById('indicator_update_form'),
+                rationale_required: false,
+                include_rationale: false,
+                notice_type: 'error',
+                on_submit: ((row) => () => {
+                    row.remove();
+                    updateIfLastEvent();
+                    updateLopTargetDisplay();
+                })(row)
+            });
+        } else if (!indicatorHasResults()) {
+            //This indicator has no results, just confirm and then post removal:
+            window.create_unified_changeset_notice({
+                header: gettext('Warning'),
+                show_icon: true,
+                preamble: DESTRUCTIVE_PREAMBLE,
+                message_text: DELETE_TARGET_NO_RATIONALE,
+                context: document.getElementById('indicator_update_form'),
+                rationale_required: false,
+                include_rationale: false,
+                notice_type: 'error',
+                on_submit: ((url, row) => () => {
+                    $.post(url, {rationale: null})
+                        .done((data) => {
+                            if (data.status === 'success') {
+                                $('#indicator_modal_div').trigger('updated.tola.indicator.save', saveEventParams());
+                                row.remove();
+                                if (updateSnapshot) {
+                                    updatePTsAndLopTargetOnSnapshot();
+                                }
+                                updateIfLastEvent();
+                                updateLopTargetDisplay();
                             }
-                            updateIfLastEvent();
-                            updateLopTargetDisplay();
-                        }
-                    });
-            };
-        let hasResults = indicatorHasResults();
-        /* If target has results, message refers to number of results,
-         * Otherwise, if indicator has results and target is not brand new, record rationale
-         * otherwise merely confirm:
-         */
-        const preamble = numResultsLinkedToEventTarget == 0 ? DESTRUCTIVE_PREAMBLE :
-            window.target_with_results_text(numResultsLinkedToEventTarget);
-        const message_text = (url == '#' || !hasResults) ?
-                DELETE_TARGET_NO_RATIONALE :
-                DELETE_TARGET_MESSAGE;
-        /* If the indicator has any results linked to it, we prompt for a rationale,
-         * otherwise we do not.
-         */
-        const changeset_notice_function = (url === '#' || !hasResults) ?
-                window.create_no_rationale_changeset_notice :
-                window.create_destructive_changeset_notice;
-        changeset_notice_function({
-            preamble: preamble,
-            message_text: message_text,
-            context: document.getElementById('indicator_update_form'),
-            on_submit: (rationale = null) => {
-                delete_callback(url, row)(rationale);
-            }
-        });
+                        });
+                })(url, row)
+            });
+        } else {
+            //This is an existing, saved event target on an indicator that has results (rationale required):
+            window.create_unified_changeset_notice({
+                header: gettext('Warning'),
+                show_icon: true,
+                preamble: numResultsLinkedToEventTarget === 0 ? DESTRUCTIVE_PREAMBLE : window.target_with_results_text(numResultsLinkedToEventTarget),
+                message_text: DELETE_TARGET_MESSAGE,
+                context: document.getElementById('indicator_update_form'),
+                rationale_required: true,
+                include_rationale: true,
+                notice_type: 'error',
+                on_submit: ((url, row) => (rationale) => {
+                    $.post(url, {rationale: rationale})
+                        .done((data) => {
+                            if (data.status === 'success') {
+                                $('#indicator_modal_div').trigger('updated.tola.indicator.save', saveEventParams());
+                                row.remove();
+                                if (updateSnapshot) {
+                                    updatePTsAndLopTargetOnSnapshot();
+                                }
+                                updateIfLastEvent();
+                                updateLopTargetDisplay();
+                            }
+                        });
+                    
+                })(url, row)
+            });
+        }
         scrollToIndicatorFormBottom();
     });
 
@@ -330,20 +368,27 @@
                             }
                         });
             };
-
-
         if(indicatorHasResults()) {
-            window.create_destructive_changeset_notice({
+            window.create_unified_changeset_notice({
+                header: gettext('Warning'),
+                preamble: DESTRUCTIVE_PREAMBLE,
                 message_text: DELETE_ALL_TARGETS_MESSAGE,
                 context: document.getElementById('indicator_update_form'),
-                on_submit: actionCb
+                include_rationale: true,
+                rationale_required: true,
+                on_submit: actionCb,
+                notice_type: 'error'
             });
             scrollToIndicatorFormBottom();
         } else {
-            window.create_no_rationale_changeset_notice({
+            window.create_unified_changeset_notice({
+                header: gettext('Warning'),
+                show_icon: true,
                 preamble: DESTRUCTIVE_PREAMBLE,
                 message_text: DELETE_TARGETS_NO_RATIONALE,
                 context: document.getElementById('indicator_update_form'),
+                notice_type: 'error',
+                rationale_required: false,
                 on_submit: actionCb
             });
         }
@@ -372,7 +417,6 @@
                     rfc_required: true,
                     rfc_options: true,
                     validation_type: 1,
-                    showCloser: false,
                     context: document.getElementById('indicator_update_form'),
                     notice_type: 'error',
                     on_submit: (rationale, reasons_for_change, validation_type) => {
@@ -390,7 +434,6 @@
                     rfc_required: true,
                     rfc_options: true,
                     validation_type: 1,
-                    showCloser: false,
                     context: document.getElementById('indicator_update_form'),
                     on_submit: (rationale, reasons_for_change, validation_type) => {
                         submitFormUpdate(rationale, reasons_for_change, validation_type);
@@ -410,7 +453,6 @@
                 rfc_required: true,
                 rfc_options: true,
                 validation_type: 1,
-                showCloser: false,
                 context: document.getElementById('indicator_update_form'),
                 on_submit: (rationale, reasons_for_change, validation_type) => {
                     submitFormUpdate(rationale, reasons_for_change, validation_type);
