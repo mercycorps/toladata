@@ -398,6 +398,13 @@ class IndicatorForm(forms.ModelForm):
             return self.instance.data_collection_method
         return data_collection_method
 
+    def clean_definition(self):
+        """field typed changed to return "" instead of None causing a non-update, this returns old null"""
+        definition = self.cleaned_data['definition']
+        if not definition and self.instance and not self.instance.definition:
+            return self.instance.definition
+        return definition
+
     def update_disaggregations(self, instance):
         # collect disaggs that this user doesn't have access to and don't touch them:
         existing_disaggregations = instance.disaggregation.exclude(
