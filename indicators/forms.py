@@ -377,6 +377,27 @@ class IndicatorForm(forms.ModelForm):
             )
         return level
 
+    def clean_means_of_verification(self):
+        """field typed changed to return "" instead of None causing a non-update, this returns old null"""
+        means_of_verification = self.cleaned_data['means_of_verification']
+        if not means_of_verification and self.instance and not self.instance.means_of_verification:
+            return self.instance.means_of_verification
+        return means_of_verification
+
+    def clean_method_of_analysis(self):
+        """field typed changed to return "" instead of None causing a non-update, this returns old null"""
+        method_of_analysis = self.cleaned_data['method_of_analysis']
+        if not method_of_analysis and self.instance and not self.instance.method_of_analysis:
+            return self.instance.method_of_analysis
+        return method_of_analysis
+
+    def clean_data_collection_method(self):
+        """field typed changed to return "" instead of None causing a non-update, this returns old null"""
+        data_collection_method = self.cleaned_data['data_collection_method']
+        if not data_collection_method and self.instance and not self.instance.data_collection_method:
+            return self.instance.data_collection_method
+        return data_collection_method
+
     def update_disaggregations(self, instance):
         # collect disaggs that this user doesn't have access to and don't touch them:
         existing_disaggregations = instance.disaggregation.exclude(
