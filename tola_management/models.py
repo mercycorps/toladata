@@ -557,12 +557,12 @@ class ProgramAuditLog(models.Model, DiffableLog):
             rationale_selections = AuditLogRationaleSelection.from_options(rationale_options)
             if not rationale and rationale_selections.selected_options == [rationale_selections.OTHER]:
                 logger.error(
-                    "No rationale provided, expected new json:\n{}to match old json:\n{}".format(new_entry_json, previous_entry_json)
+                    "No rationale provided, expected new json:\n{}\nto match old json:\n{}".format(new_entry_json, previous_entry_json)
                 )
                 raise ValidationError("Rationale required when 'Other' selected")
             if not rationale and not rationale_selections.selected_options:
                 logger.error(
-                    "No rationale provided, expected new json:\n{}to match old json:\n{}".format(new_entry_json, previous_entry_json)
+                    "No rationale provided, expected new json:\n{}\nto match old json:\n{}".format(new_entry_json, previous_entry_json)
                 )
                 raise ValidationError("Rationale required when no options selected")
             new_program_log_entry = ProgramAuditLog(
