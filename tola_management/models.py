@@ -554,7 +554,6 @@ class ProgramAuditLog(models.Model, DiffableLog):
         previous_entry_json = json.dumps(old_indicator_values, cls=DjangoJSONEncoder)
         new_entry_json = json.dumps(new_indicator_values, cls=DjangoJSONEncoder)
         if new_entry_json != previous_entry_json:
-            print("new entry json\n{}\nold json\n{}".format(new_entry_json, previous_entry_json))
             rationale_selections = AuditLogRationaleSelection.from_options(rationale_options)
             if not rationale and rationale_selections.selected_options == [rationale_selections.OTHER]:
                 logger.error(
