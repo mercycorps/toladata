@@ -458,6 +458,8 @@
                     submitFormUpdate(rationale, reasons_for_change, validation_type);
                 }
             });
+        } else if (hasLevelBeenInitiallySet()) {
+            submitFormUpdate('No reason for change required.');
         } else {
             submitFormUpdate('');
         }
@@ -1416,18 +1418,23 @@
     }
 
     // has `level` changed in a way we care about (as opposed to any way possible)?
-    // the rules here are that we don't care of a level goes from nothing -> something
+    // the rules here are that we don't care if a level goes from nothing -> something
     // only if it goes from something -> something or something -> nothing
     function hasLevelBeenUpdatedOrCleared() {
         let currLevelFormValue = getLevelFormValue();
 
         // empty string if nothing selected
         if (! initialLevelFormValue) {
-            // don't bother prompting using if they are setting a level
+            // don't bother prompting user if they are setting a level
             // where a level wasn't set in the past
             return false;
         }
 
         return initialLevelFormValue !== currLevelFormValue;
+    }
+
+    // has the level been set from nothing -> something?
+    function hasLevelBeenInitiallySet() {
+        return !initialLevelFormValue && (initialLevelFormValue != getLevelFormValue());
     }
 </script>
