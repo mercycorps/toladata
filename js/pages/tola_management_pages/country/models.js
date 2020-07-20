@@ -1,4 +1,5 @@
 import { observable, computed, action, runInAction, toJS } from "mobx";
+import {create_unified_changeset_notice} from '../../../components/changesetNotice';
 
 
 const new_objective_data = {
@@ -117,12 +118,16 @@ export class CountryStore {
     @action
     changeFilter(filterKey, value) {
         this.filters = Object.assign(this.filters, {[filterKey]: value})
+        if (filterKey === "countries") {
+            // for "Find a country" filter, immediately apply filters when value changes:
+            this.applyFilters();
+        }
     }
 
     @action
     clearFilters() {
         let clearFilters = {
-            countries: [],
+            countries: this.filters.countries || [],
             organizations: [],
             sectors: [],
             programStatus: null,
@@ -406,10 +411,16 @@ export class CountryStore {
     }
 
     @action deleteDisaggregation(id, callback) {
-        create_no_rationale_changeset_notice({
+        create_unified_changeset_notice({
+            header: gettext("Warning"),
+            show_icon: true,
             preamble: gettext("This action cannot be undone."),
             // # Translators: This is a confirmation prompt to confirm a user wants to delete an item
             message_text: gettext("Are you sure you want to delete this disaggregation?"),
+            include_rationale: false,
+            rationale_required: false,
+            showCloser: true,
+            notice_type: 'error',
             on_submit: () => {
                 if (id=='new') {
                     this.editing_disaggregations_data = this.editing_disaggregations_data.filter(disagg=>disagg.id!='new')
@@ -434,12 +445,17 @@ export class CountryStore {
     }
 
     @action archiveDisaggregation(id) {
-        create_no_rationale_changeset_notice({
+        create_unified_changeset_notice({
+            header: gettext("Warning"),
+            show_icon: true,
             // # Translators: This is part of a confirmation prompt to archive a type of disaggregation (e.g. "gender" or "age")
             preamble: gettext("New programs will be unable to use this disaggregation. (Programs already using the disaggregation will be unaffected.)"),
             // # Translators: This is a confirmation prompt to confirm a user wants to archive an item
             message_text: gettext("Are you sure you want to continue?"),
-            type: 'notice',
+            include_rationale: false,
+            rationale_required: false,
+            notice_type: 'notice',
+            showCloser: true,
             on_submit: () => {
                 this.api.deleteDisaggregation(id).then(response => {
                     runInAction(() => {
@@ -460,12 +476,15 @@ export class CountryStore {
     @action unarchiveDisaggregation(id) {
         let countryData = this.countries.find(country => country.id == this.editing_target);
         let countryName = countryData ? countryData.country : "this country";
-        create_no_rationale_changeset_notice({
+        create_unified_changeset_notice({
+            header: gettext("Warning"),
+            show_icon: true,
             // # Translators: This is part of a confirmation prompt to unarchive a type of disaggregation (e.g. "gender" or "age")
             preamble: interpolate(gettext("All programs in %s will be able to use this disaggregation."), [countryName]),
             // # Translators: This is a confirmation prompt to confirm a user wants to unarchive an item
             message_text: gettext("Are you sure you want to continue?"),
-            type: 'notice',
+            notice_type: 'notice',
+            showCloser: true,
             on_submit: () => {
                 this.api.partialUpdateDisaggregation(id, {is_archived: false}).then(response => {
                     runInAction(() => {

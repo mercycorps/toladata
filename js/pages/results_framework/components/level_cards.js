@@ -11,6 +11,7 @@ import {sortableContainer, sortableElement, sortableHandle} from 'react-sortable
 import HelpPopover from "../../../components/helpPopover";
 import TextareaAutosize from 'react-autosize-textarea';
 import Select from "react-select"
+import { create_unified_changeset_notice } from '../../../components/changesetNotice';
 
 
 
@@ -81,7 +82,11 @@ export class LevelCardCollapsed extends React.Component {
     deleteLevel = () => {
         this.props.rootStore.uiStore.setDisableCardActions(true);
         const levelTitle = this.props.levelProps.tierName + " " + this.props.levelProps.ontologyLabel;
-        create_no_rationale_changeset_notice({
+        create_unified_changeset_notice({
+            header: gettext("Warning"),
+            show_icon: true ,
+            notice_type: 'error',
+            preamble: gettext("This action cannot be undone."),
             /* # Translators:  This is a confirmation prompt that is triggered by clicking on a delete button. The code is a reference to the name of the specific item being deleted.  Only one item can be deleted at a time. */
             message_text: interpolate(gettext("Are you sure you want to delete %s?"), [levelTitle]),
             on_submit: () => this.props.rootStore.levelStore.deleteLevelFromDB(this.props.level.id),
@@ -122,7 +127,7 @@ export class LevelCardCollapsed extends React.Component {
 
         // Prepare the indicator links for the indicator popover
         let allIndicatorLinks = [];
-        
+
         // Get indicator ids linked to this level and create a hyperlink for a filtered IPTT.
         let sameLevelIndicatorIds = this.props.levelProps.indicators.map( i => i.id);
         if (sameLevelIndicatorIds.length > 0) {
@@ -136,8 +141,8 @@ export class LevelCardCollapsed extends React.Component {
         // above, and create a hyperlink for a filtered IPTT.  Only do this if the level has sublevels.
         if (this.props.levelProps.tierName != this.props.rootStore.levelStore.chosenTierSet.slice(-1)[0]) {
             let descendantIndicatorIds = this.props.levelProps.descendantIndicatorIds;
-            descendantIndicatorIds = descendantIndicatorIds.concat(sameLevelIndicatorIds);
             if (descendantIndicatorIds.length > 0) {
+                descendantIndicatorIds = descendantIndicatorIds.concat(sameLevelIndicatorIds);
                 /* # Translators: this link opens a view of all indicators linked to (associated with) a particular level and its child levels (level name replaces %s) */
                 const linkPreface = gettext('All indicators linked to %s and sub-levels');
                 const linkText = interpolate(linkPreface, [`${this.props.levelProps.tierName} ${this.props.levelProps.ontologyLabel}`]);
@@ -395,7 +400,13 @@ export class LevelCardExpanded extends React.Component {
         const hasUpdatedName = this.name != this.props.level.name;
 
         if ( hasIndicators && (hasUpdatedAssumptions || hasUpdatedName)){
-            create_nondestructive_changeset_notice({
+            create_unified_changeset_notice({
+                header: gettext("Reason for change"),
+                show_icon: true,
+                message_text: gettext("Your changes will be recorded in a change log.  For future reference, please share your reason for these changes."),
+                include_rationale: true,
+                rationale_required: true,
+                notice_type: 'notice',
                 on_submit: saveFunc,
                 on_cancel: () => this.props.rootStore.uiStore.setDisableCardActions(false),
             });

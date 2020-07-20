@@ -69,9 +69,9 @@ describe("Indicator List elements", () => {
             expect(wrapper.find('div > h3 > span').text()).toEqual("%s indicator is >15% above target");
             // show all link is displayed:
             expect(wrapper.find('#show-all-indicators').exists()).toBeTruthy();
-            expect(wrapper.find('#show-all-indicators').shallow().find('small').first().text()).toBe("Show all");
+            expect(wrapper.find('#show-all-indicators').shallow().text()).toBe("Show all indicators");
             //text was translated:
-            expect(window.gettext).toHaveBeenCalledWith('Show all');
+            expect(window.gettext).toHaveBeenCalledWith('Show all indicators');
         });
     });
     describe("Indicator Filter component", () => {
@@ -120,7 +120,7 @@ describe("Indicator List elements", () => {
             expect(eventBus.emit).toHaveBeenCalledWith('nav-select-indicator-to-filter', 2);
             //expect(props.uiStore.setSelectedIndicatorId).toHaveBeenCalledWith(2);
         });
-        
+
         it("renders group by options", () => {
             const groupByOptions = [
                 {value: 1, label: 'chain'},
