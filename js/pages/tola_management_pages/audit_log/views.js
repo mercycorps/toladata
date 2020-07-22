@@ -242,10 +242,9 @@ export const IndexView = observer(
                         {store.log_rows.map(data => {
                                 let is_expanded = store.expando_rows.has(data.id);
                                 return <tbody key={data.id}>
-                                <tr
-                                    className={is_expanded ? 'changelog__entry__header is-expanded' : 'changelog__entry__header'}
-                                    onClick={() => store.toggleRowExpando(data.id)}>
-                                    <td className="text-action">
+                                <tr className={is_expanded ? 'changelog__entry__header is-expanded' : 'changelog__entry__header'}>
+                                    <td className="text-action"
+                                        onClick={() => store.toggleRowExpando(data.id)}>
                                         <FontAwesomeIcon icon={is_expanded ? 'caret-down' : 'caret-right'} />
                                         &nbsp;{data.date} (UTC)
                                     </td>
@@ -254,9 +253,15 @@ export const IndexView = observer(
                                     <td>{data.user}</td>
                                     <td>{data.organization}</td>
                                     <td className="text-nowrap">{data.pretty_change_type}</td>
-                                    <td></td>
-                                    <td></td>
-                                    <td></td>
+                                    <td className="text-action"
+                                        onClick={is_expanded ? '' : () => store.toggleRowExpando(data.id)}>
+                                        {is_expanded ? '' : '...'}</td>
+                                    <td className="text-action"
+                                        onClick={() => store.toggleRowExpando(data.id)}>
+                                        {is_expanded ? '' : '...'}</td>
+                                    <td className="text-action"
+                                        onClick={() => store.toggleRowExpando(data.id)}>
+                                        {is_expanded ? '' : '...'}</td>
                                 </tr>
                                 {is_expanded &&
                                 <tr className="changelog__entry__row" key={data.id}>
