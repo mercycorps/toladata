@@ -487,7 +487,8 @@ export default class EditUserPrograms extends React.Component {
                                     disabled: is_check_disabled(rowData),
                                     id: rowData.id,
                                     type: rowData.type,
-                                    expanded: (rowData.type == "country")? rowData.expanded : false,
+                                    expanded: (rowData.type == "country") ? rowData.expanded : false,
+                                    programsCount: (rowData.type == "country") ? rowData.programs.size : null,
                                     expandoAction: (rowData.type == "country") ? this.toggleCountryExpanded.bind(this, rowData.id):null,
                                     action: (rowData.type == "country")?this.toggleAllProgramsForCountry.bind(this):this.toggleProgramAccess.bind(this)
                                 })}
@@ -499,12 +500,10 @@ export default class EditUserPrograms extends React.Component {
                                             this.state.user_program_access
                                         )
                                         const expandoIcon = cellData.expanded ? 'caret-down' : 'caret-right';
+                                        const expandoButton = cellData.programsCount ? <a className="edit-user-programs__expando"><FontAwesomeIcon icon={expandoIcon} onClick={cellData.expandoAction}/></a> : null;
                                         const button_label = (country_has_all_checked)?gettext('Deselect All'):gettext('Select All')
-                                        if(cellData.disabled) {
-                                            return null
-                                        } else {
-                                            return <div className="check-column"><a className="edit-user-programs__expando"><FontAwesomeIcon icon={expandoIcon} onClick={cellData.expandoAction}/></a><a className="edit-user-programs__select-all" onClick={(e) => cellData.action(cellData.id)}>{button_label}</a></div>
-                                        }
+                                        const selectAllButton = cellData.disabled ? null : <a className="edit-user-programs__select-all" onClick={(e) => cellData.action(cellData.id)}>{button_label}</a>
+                                        return <div className="check-column">{expandoButton}{selectAllButton}</div>;
                                     } else {
                                         return <div className="check-column"><input type="checkbox" checked={cellData.checked} disabled={cellData.disabled} onChange={() => cellData.action(cellData.id)} /></div>
                                     }
