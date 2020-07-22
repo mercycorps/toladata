@@ -245,7 +245,8 @@ export const IndexView = observer(
                                 <tr
                                     className={is_expanded ? 'changelog__entry__header is-expanded' : 'changelog__entry__header'}
                                     onClick={() => store.toggleRowExpando(data.id)}>
-                                    <td className="text-action">
+                                    <td className="text-action"
+                                        onClick={() => store.toggleRowExpando(data.id)}>
                                         <FontAwesomeIcon icon={is_expanded ? 'caret-down' : 'caret-right'} />
                                         &nbsp;{data.date} (UTC)
                                     </td>
@@ -254,9 +255,9 @@ export const IndexView = observer(
                                     <td>{data.user}</td>
                                     <td>{data.organization}</td>
                                     <td className="text-nowrap">{data.pretty_change_type}</td>
-                                    <td></td>
-                                    <td></td>
-                                    <td></td>
+                                    <td className="text-action">{is_expanded ? '' : '...'}</td>
+                                    <td className="text-action">{is_expanded ? '' : '...'}</td>
+                                    <td className="text-action">{is_expanded ? '' : '...'}</td>
                                 </tr>
                                 {is_expanded &&
                                 <tr className="changelog__entry__row" key={data.id}>
