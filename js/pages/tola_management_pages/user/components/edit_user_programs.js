@@ -58,10 +58,10 @@ const apply_program_filter = (programs, countries, filter_string) => {
     }
 }
 
-const apply_country_filter = (countries, filtered) => {
+const apply_country_filter = (countries, filtered, collapseAll=false) => {
     if(filtered.length > 0) {
         return filtered.filter(id => countries[id])
-                       .map(id => countries[id])
+                       .map(id => collapseAll ? {...countries[id], expanded: false} : countries[id])
                        .reduce((countries, country) => ({...countries, [country.id]: country}), {})
     } else {
         return countries
@@ -331,8 +331,7 @@ export default class EditUserPrograms extends React.Component {
 
     changeCountryFilter(e) {
         this.countryStore.updateSelected(e);
-        const filtered_countries = apply_country_filter(this.state.countries, this.countryStore.selectedCountries)
-        
+        const filtered_countries = apply_country_filter(this.state.countries, this.countryStore.selectedCountries, true)
         const {countries, programs} = apply_program_filter(
             this.state.programs,
             filtered_countries,
@@ -502,7 +501,7 @@ export default class EditUserPrograms extends React.Component {
                                         const expandoIcon = cellData.expanded ? 'caret-down' : 'caret-right';
                                         const expandoButton = cellData.programsCount ? <a className="edit-user-programs__expando"><FontAwesomeIcon icon={expandoIcon} onClick={cellData.expandoAction}/></a> : null;
                                         const button_label = (country_has_all_checked)?gettext('Deselect All'):gettext('Select All')
-                                        const selectAllButton = cellData.disabled ? null : <a className="edit-user-programs__select-all" onClick={(e) => cellData.action(cellData.id)}>{button_label}</a>
+                                        const selectAllButton = (cellData.disabled || !cellData.expanded) ? null : <a className="edit-user-programs__select-all" onClick={(e) => cellData.action(cellData.id)}>{button_label}</a>
                                         return <div className="check-column">{expandoButton}{selectAllButton}</div>;
                                     } else {
                                         return <div className="check-column"><input type="checkbox" checked={cellData.checked} disabled={cellData.disabled} onChange={() => cellData.action(cellData.id)} /></div>
