@@ -510,6 +510,7 @@ export default class EditUserPrograms extends React.Component {
                                 label={gettext("Countries and Programs")}
                                 width={200}
                                 flexGrow={2}
+                                className='pl-0'
                                 cellDataGetter={({rowData}) => ({
                                     expanded: (rowData.type == "country") ? rowData.expanded : false,
                                     programsCount: (rowData.type == "country") ? rowData.programs.size : null,
@@ -529,6 +530,7 @@ export default class EditUserPrograms extends React.Component {
                                 <Column
                                 width={100}
                                 flexGrow={1}
+                                className='pl-0'
                                 dataKey="not_applicable_but_required"
                                 label={gettext("Roles and Permissions")}
                                 cellDataGetter={({rowData}) => ({
