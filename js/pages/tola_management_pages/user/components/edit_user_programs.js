@@ -91,7 +91,7 @@ export default class EditUserPrograms extends React.Component {
         const countries = create_country_objects(store.countries, store)
         const programs = create_program_objects(store.programs, store)
         this.countryStore = new CountryStore(store.regions, store.countries);
-        
+
         this.state = {
             program_filter: '',
             countries,
@@ -109,7 +109,7 @@ export default class EditUserPrograms extends React.Component {
         const {store} = next_props
         const countries_obj = create_country_objects(store.countries, store)
         const programs_obj = create_program_objects(store.programs, store)
-    
+
         const filtered_countries = apply_country_filter(
             countries_obj,
             this.countryStore.selectedCountries
@@ -488,7 +488,6 @@ export default class EditUserPrograms extends React.Component {
                                     type: rowData.type,
                                     expanded: (rowData.type == "country") ? rowData.expanded : false,
                                     programsCount: (rowData.type == "country") ? rowData.programs.size : null,
-                                    expandoAction: (rowData.type == "country") ? this.toggleCountryExpanded.bind(this, rowData.id):null,
                                     action: (rowData.type == "country")?this.toggleAllProgramsForCountry.bind(this):this.toggleProgramAccess.bind(this)
                                 })}
                                 cellRenderer={({cellData}) => {
@@ -498,11 +497,9 @@ export default class EditUserPrograms extends React.Component {
                                             this.state.filtered_programs,
                                             this.state.user_program_access
                                         )
-                                        const expandoIcon = cellData.expanded ? 'caret-down' : 'caret-right';
-                                        const expandoButton = cellData.programsCount ? <a className="edit-user-programs__expando"><FontAwesomeIcon icon={expandoIcon} onClick={cellData.expandoAction}/></a> : null;
                                         const button_label = (country_has_all_checked)?gettext('Deselect All'):gettext('Select All')
                                         const selectAllButton = (cellData.disabled || !cellData.expanded) ? null : <a className="edit-user-programs__select-all" onClick={(e) => cellData.action(cellData.id)}>{button_label}</a>
-                                        return <div className="check-column">{expandoButton}{selectAllButton}</div>;
+                                        return <div className="check-column">{selectAllButton}</div>;
                                     } else {
                                         return <div className="check-column"><input type="checkbox" checked={cellData.checked} disabled={cellData.disabled} onChange={() => cellData.action(cellData.id)} /></div>
                                     }
@@ -513,10 +510,17 @@ export default class EditUserPrograms extends React.Component {
                                 label={gettext("Countries and Programs")}
                                 width={200}
                                 flexGrow={2}
-                                cellDataGetter={({rowData}) => ({bold: rowData.type == "country", name: rowData.name})}
+                                cellDataGetter={({rowData}) => ({
+                                    expanded: (rowData.type == "country") ? rowData.expanded : false,
+                                    programsCount: (rowData.type == "country") ? rowData.programs.size : null,
+                                    expandoAction: (rowData.type == "country") ? this.toggleCountryExpanded.bind(this, rowData.id):null,
+                                    bold: rowData.type == "country", name: rowData.name
+                                })}
                                 cellRenderer={({cellData}) => {
                                     if(cellData.bold) {
-                                        return <strong>{cellData.name}</strong>
+                                        const expandoIcon = cellData.expanded ? 'caret-down' : 'caret-right';
+                                        const expandoButton = cellData.programsCount ? <div className="edit-user-programs__expando expando-toggle icon__clickable" onClick={cellData.expandoAction}><div className="expando-toggle__icon"><FontAwesomeIcon icon={expandoIcon} /></div><div class="expando-toggle__label"><strong>{cellData.name}</strong></div></div> : null;
+                                        return expandoButton
                                     } else {
                                         return <span>{cellData.name}</span>
                                     }
