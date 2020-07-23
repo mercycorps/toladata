@@ -245,8 +245,7 @@ export const IndexView = observer(
                                 <tr
                                     className={is_expanded ? 'changelog__entry__header is-expanded' : 'changelog__entry__header'}
                                     onClick={() => store.toggleRowExpando(data.id)}>
-                                    <td className="text-action"
-                                        onClick={() => store.toggleRowExpando(data.id)}>
+                                    <td className="text-action">
                                         <FontAwesomeIcon icon={is_expanded ? 'caret-down' : 'caret-right'} />
                                         &nbsp;{data.date} (UTC)
                                     </td>
