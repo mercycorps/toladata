@@ -3,7 +3,8 @@
 .edit-user-programs { // Program and Country access pane
     // TODO: too specific?
     .check-column {
-        text-align: center;
+        margin-right: $grid-gutter-width/2;
+        text-align: right;
     }
 
     &__filter-form {

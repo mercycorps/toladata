@@ -1,9 +1,10 @@
-import React from 'react'
-import { observable } from 'mobx'
-import { observer } from "mobx-react"
-import {AutoSizer, Table, Column, CellMeasurer, CellMeasurerCache} from 'react-virtualized'
+import React from 'react';
+import { observable } from 'mobx';
+import { observer } from 'mobx-react';
+import {AutoSizer, Table, Column, CellMeasurer, CellMeasurerCache} from 'react-virtualized';
 import { CountryStore } from '../models';
-import CheckboxedMultiSelect from 'components/checkboxed-multi-select'
+import CheckboxedMultiSelect from 'components/checkboxed-multi-select';
+import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 
 
 
@@ -16,7 +17,8 @@ const create_country_objects = (countries, store) => Object.entries(countries)
                                                             type: 'country',
                                                             options: [{label: gettext('Individual programs only'), value: 'none'}, ...store.country_role_choices],
                                                             admin_access: store.is_superuser,
-                                                            programs: new Set(country.programs)
+                                                            programs: new Set(country.programs),
+                                                            expanded: true
                                                         }
                                                     }),{})
 
@@ -34,9 +36,9 @@ const create_program_objects = (programs, store) => Object.entries(programs)
 const flattened_listing = (countries, programs) => countries.flatMap(country =>
                                                         [
                                                             country,
-                                                            ...Array.from(country.programs)
+                                                            ...(country.expanded ? Array.from(country.programs)
                                                                 .filter(program_id => programs[program_id])
-                                                                .map(program_id => ({...programs[program_id], id: `${country.id}_${program_id}`, country_id: country.id}))
+                                                                .map(program_id => ({...programs[program_id], id: `${country.id}_${program_id}`, country_id: country.id})) : [])
                                                         ]
                                                     )
 
@@ -56,10 +58,10 @@ const apply_program_filter = (programs, countries, filter_string) => {
     }
 }
 
-const apply_country_filter = (countries, filtered) => {
+const apply_country_filter = (countries, filtered, collapseAll=false) => {
     if(filtered.length > 0) {
         return filtered.filter(id => countries[id])
-                       .map(id => countries[id])
+                       .map(id => collapseAll ? {...countries[id], expanded: false} : countries[id])
                        .reduce((countries, country) => ({...countries, [country.id]: country}), {})
     } else {
         return countries
@@ -89,7 +91,7 @@ export default class EditUserPrograms extends React.Component {
         const countries = create_country_objects(store.countries, store)
         const programs = create_program_objects(store.programs, store)
         this.countryStore = new CountryStore(store.regions, store.countries);
-        
+
         this.state = {
             program_filter: '',
             countries,
@@ -107,7 +109,7 @@ export default class EditUserPrograms extends React.Component {
         const {store} = next_props
         const countries_obj = create_country_objects(store.countries, store)
         const programs_obj = create_program_objects(store.programs, store)
-    
+
         const filtered_countries = apply_country_filter(
             countries_obj,
             this.countryStore.selectedCountries
@@ -329,8 +331,7 @@ export default class EditUserPrograms extends React.Component {
 
     changeCountryFilter(e) {
         this.countryStore.updateSelected(e);
-        const filtered_countries = apply_country_filter(this.state.countries, this.countryStore.selectedCountries)
-        
+        const filtered_countries = apply_country_filter(this.state.countries, this.countryStore.selectedCountries, true)
         const {countries, programs} = apply_program_filter(
             this.state.programs,
             filtered_countries,
@@ -341,6 +342,23 @@ export default class EditUserPrograms extends React.Component {
             filtered_countries: countries,
             flattened_programs: flattened_listing(this.state.ordered_country_ids.filter(id => id in countries).map(id => countries[id]), this.state.filtered_programs),
         })
+    }
+
+    toggleCountryExpanded(id) {
+        let updatedCountries = Object.assign({}, this.state.countries);
+        updatedCountries[id].expanded = !updatedCountries[id].expanded;
+        const filtered_countries = apply_country_filter(updatedCountries, this.countryStore.selectedCountries);
+        const {countries, programs} = apply_program_filter(
+            this.state.programs,
+            filtered_countries,
+            this.state.program_filter
+        )
+
+        this.setState({
+            countries: updatedCountries,
+            filtered_countries: countries,
+            flattened_programs: flattened_listing(this.state.ordered_country_ids.filter(id => id in countries).map(id => countries[id]), this.state.filtered_programs),
+        });
     }
 
     render() {
@@ -468,6 +486,8 @@ export default class EditUserPrograms extends React.Component {
                                     disabled: is_check_disabled(rowData),
                                     id: rowData.id,
                                     type: rowData.type,
+                                    expanded: (rowData.type == "country") ? rowData.expanded : false,
+                                    programsCount: (rowData.type == "country") ? rowData.programs.size : null,
                                     action: (rowData.type == "country")?this.toggleAllProgramsForCountry.bind(this):this.toggleProgramAccess.bind(this)
                                 })}
                                 cellRenderer={({cellData}) => {
@@ -478,11 +498,8 @@ export default class EditUserPrograms extends React.Component {
                                             this.state.user_program_access
                                         )
                                         const button_label = (country_has_all_checked)?gettext('Deselect All'):gettext('Select All')
-                                        if(cellData.disabled) {
-                                            return null
-                                        } else {
-                                            return <div className="check-column"><a className="edit-user-programs__select-all" onClick={(e) => cellData.action(cellData.id)}>{button_label}</a></div>
-                                        }
+                                        const selectAllButton = (cellData.disabled || !cellData.expanded) ? null : <a className="edit-user-programs__select-all" onClick={(e) => cellData.action(cellData.id)}>{button_label}</a>
+                                        return <div className="check-column">{selectAllButton}</div>;
                                     } else {
                                         return <div className="check-column"><input type="checkbox" checked={cellData.checked} disabled={cellData.disabled} onChange={() => cellData.action(cellData.id)} /></div>
                                     }
@@ -493,10 +510,18 @@ export default class EditUserPrograms extends React.Component {
                                 label={gettext("Countries and Programs")}
                                 width={200}
                                 flexGrow={2}
-                                cellDataGetter={({rowData}) => ({bold: rowData.type == "country", name: rowData.name})}
+                                className='pl-0'
+                                cellDataGetter={({rowData}) => ({
+                                    expanded: (rowData.type == "country") ? rowData.expanded : false,
+                                    programsCount: (rowData.type == "country") ? rowData.programs.size : null,
+                                    expandoAction: (rowData.type == "country") ? this.toggleCountryExpanded.bind(this, rowData.id):null,
+                                    bold: rowData.type == "country", name: rowData.name
+                                })}
                                 cellRenderer={({cellData}) => {
                                     if(cellData.bold) {
-                                        return <strong>{cellData.name}</strong>
+                                        const expandoIcon = cellData.expanded ? 'caret-down' : 'caret-right';
+                                        const expandoButton = cellData.programsCount ? <div className="edit-user-programs__expando expando-toggle icon__clickable" onClick={cellData.expandoAction}><div className="expando-toggle__icon"><FontAwesomeIcon icon={expandoIcon} /></div><div class="expando-toggle__label"><strong>{cellData.name}</strong></div></div> : null;
+                                        return expandoButton
                                     } else {
                                         return <span>{cellData.name}</span>
                                     }
@@ -505,6 +530,7 @@ export default class EditUserPrograms extends React.Component {
                                 <Column
                                 width={100}
                                 flexGrow={1}
+                                className='pl-0'
                                 dataKey="not_applicable_but_required"
                                 label={gettext("Roles and Permissions")}
                                 cellDataGetter={({rowData}) => ({
