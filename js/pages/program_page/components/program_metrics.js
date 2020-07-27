@@ -39,12 +39,12 @@ class GaugeTank extends React.Component {
             <h6 className="gauge__title">{title}</h6>
             <div className="gauge__overview">
                 <div
-                    className="gauge__graphic gauge__graphic--tank{% if filled_percent == 0 %} gauge__graphic--empty{% endif %}">
+                    className={`gauge__graphic gauge__graphic--tank ${filledPercent == 0 ? "gauge__graphic--empty" : ""}`}>
                     <div className="graphic__tick-marks">
                         {[...Array(tickCount)].map((e, i) => <div key={i} className="graphic__tick"/>)}
                     </div>
-                    <div className="graphic__tank--unfilled" style={{'flexBasis': `${unfilledPercent}%`}}/>
-                    <div className="graphic__tank--filled" style={{'flexBasis': `${filledPercent}%`}}/>
+                    <div className="graphic__tank--unfilled" style={{'height': `${unfilledPercent}%`}}/>
+                    <div className="graphic__tank--filled" style={{'height': `${filledPercent}%`}}/>
                 </div>
                 <div className="gauge__labels">
                     {filledPercent > 0 ?
@@ -226,11 +226,11 @@ class GaugeBand extends React.Component {
                     {[...Array(tickCount)].map((e, i) => <div key={i} className="graphic__tick" />)}
                 </div>
                 <div className="graphic__performance-band--above-target"
-                     style={{'flexBasis': `${percentHigh}%`}}/>
+                     style={{'height': `${percentHigh}%`}}/>
                 <div className="graphic__performance-band--on-target"
-                     style={{'flexBasis': `${percentOnTarget}%`}}/>
+                     style={{'height': `${percentOnTarget}%`}}/>
                 <div className="graphic__performance-band--below-target"
-                     style={{'flexBasis': `${percentBelow}%`}}/>
+                     style={{'height': `${percentBelow}%`}}/>
             </div>
             { gaugeHasErrors ?
                 <div className="gauge__labels">
