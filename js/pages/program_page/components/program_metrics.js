@@ -33,18 +33,18 @@ class GaugeTank extends React.Component {
                 Math.max(1, Math.min(Math.round((filteredIndicatorsLength / allIndicatorsLength) * 100), 99)));
         this.unfilledPercent = unfilledPercent;
         const filledPercent = 100 - unfilledPercent;
-
+        
         return <div className={classNames('gauge', {'filter-trigger': unfilledPercent > 0 && !disabled, 'is-highlighted': isHighlighted})}
                     onClick={this.handleClick} >
             <h6 className="gauge__title">{title}</h6>
             <div className="gauge__overview">
                 <div
-                    className="gauge__graphic gauge__graphic--tank{% if filled_percent == 0 %} gauge__graphic--empty{% endif %}">
+                    className={`gauge__graphic gauge__graphic--tank ${filledPercent == 0 ? "gauge__graphic--empty" : ""}`}>
                     <div className="graphic__tick-marks">
                         {[...Array(tickCount)].map((e, i) => <div key={i} className="graphic__tick"/>)}
                     </div>
-                    <div className="graphic__tank--unfilled" style={{'flexBasis': `${unfilledPercent}%`}}/>
-                    <div className="graphic__tank--filled" style={{'flexBasis': `${filledPercent}%`}}/>
+                    <div className="graphic__tank--unfilled" style={{'height': `${unfilledPercent}%`}}/>
+                    <div className="graphic__tank--filled" style={{'height': `${filledPercent}%`}}/>
                 </div>
                 <div className="gauge__labels">
                     {filledPercent > 0 ?
