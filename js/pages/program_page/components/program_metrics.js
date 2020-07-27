@@ -226,11 +226,11 @@ class GaugeBand extends React.Component {
                     {[...Array(tickCount)].map((e, i) => <div key={i} className="graphic__tick" />)}
                 </div>
                 <div className="graphic__performance-band--above-target"
-                     style={{'flexBasis': `${percentHigh}%`}}/>
+                     style={{'height': `${percentHigh}%`}}/>
                 <div className="graphic__performance-band--on-target"
-                     style={{'flexBasis': `${percentOnTarget}%`}}/>
+                     style={{'height': `${percentOnTarget}%`}}/>
                 <div className="graphic__performance-band--below-target"
-                     style={{'flexBasis': `${percentBelow}%`}}/>
+                     style={{'height': `${percentBelow}%`}}/>
             </div>
             { gaugeHasErrors ?
                 <div className="gauge__labels">
