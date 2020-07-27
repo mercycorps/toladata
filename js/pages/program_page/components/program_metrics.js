@@ -33,7 +33,7 @@ class GaugeTank extends React.Component {
                 Math.max(1, Math.min(Math.round((filteredIndicatorsLength / allIndicatorsLength) * 100), 99)));
         this.unfilledPercent = unfilledPercent;
         const filledPercent = 100 - unfilledPercent;
-        
+
         return <div className={classNames('gauge', {'filter-trigger': unfilledPercent > 0 && !disabled, 'is-highlighted': isHighlighted})}
                     onClick={this.handleClick} >
             <h6 className="gauge__title">{title}</h6>
