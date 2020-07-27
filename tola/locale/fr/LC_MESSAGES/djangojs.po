@@ -2,8 +2,8 @@ msgid ""
 msgstr ""
 "Project-Id-Version: \n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2020-07-14 14:08-0700\n"
-"PO-Revision-Date: 2020-07-14 15:02-0700\n"
+"POT-Creation-Date: 2020-07-27 11:05-0700\n"
+"PO-Revision-Date: 2020-07-27 10:27-0700\n"
 "Last-Translator: \n"
 "Language-Team: \n"
 "Language: fr\n"
@@ -11,7 +11,7 @@ msgstr ""
 "Content-Type: text/plain; charset=UTF-8\n"
 "Content-Transfer-Encoding: 8bit\n"
 "Plural-Forms: nplurals=2; plural=(n > 1);\n"
-"X-Generator: Poedit 2.3.1\n"
+"X-Generator: Poedit 2.4\n"
 
 #: js/base.js:357 js/base.js:358
 msgid ""
@@ -80,6 +80,7 @@ msgstr "Attention"
 #: js/base.js:541 js/components/changesetNotice.js:19
 #: js/pages/results_framework/components/level_cards.js:404
 #: js/pages/tola_management_pages/audit_log/views.js:239
+#, fuzzy
 msgid "Reason for change"
 msgstr "Raison du changement"
 
@@ -149,13 +150,14 @@ msgstr "Nouvelle entrée"
 
 #. Translators: This is the label for a textbox where a user can provide details about their reason for selecting a particular option
 #: js/components/changesetNotice.js:118
+#, fuzzy
 msgid "Details"
 msgstr "Détails"
 
 #. Translators: (preceded by a number) e.g. "4 options selected"
 #. Translators: prefixed with a number, as in "4 selected" displayed on a multi-select
 #: js/components/changesetNotice.js:251
-#: js/components/checkboxed-multi-select.js:99
+#: js/components/checkboxed-multi-select.js:106
 #: js/components/selectWidgets.js:153
 msgid "selected"
 msgstr "sélectionné"
@@ -167,7 +169,7 @@ msgid "None selected"
 msgstr "Aucun élément sélectionné"
 
 #. Translators: placeholder text in a search box
-#: js/components/checkboxed-multi-select.js:113
+#: js/components/checkboxed-multi-select.js:120
 msgid "Search"
 msgstr "Rechercher"
 
@@ -268,6 +270,7 @@ msgid "Department for International Development (DFID)"
 msgstr "Département du Développement International (DFID)"
 
 #: js/level_utils.js:26
+#, fuzzy
 msgid "Impact"
 msgstr "Impact"
 
@@ -464,7 +467,7 @@ msgstr "Vue actuelle"
 msgid "All program data"
 msgstr "Ensemble des données du programme"
 
-#: js/pages/iptt_report/components/report/header.js:11
+#: js/pages/iptt_report/components/report/header.js:12
 msgid "Indicator Performance Tracking Table"
 msgstr "Tableau de suivi des performances de l’indicateur"
 
@@ -751,6 +754,7 @@ msgstr[1] "%s indicateurs"
 
 #. Translators: A link that shows all the indicators, some of which are currently filtered from view
 #: js/pages/program_page/components/indicator_list.js:87
+#, fuzzy
 msgid "Show all indicators"
 msgstr "Afficher tous les indicateurs"
 
@@ -768,6 +772,7 @@ msgstr "Regrouper les indicateurs :"
 
 #. Translators: Adj: labels this indicator as one which is missing one or more targets */
 #: js/pages/program_page/components/indicator_list.js:256
+#, fuzzy
 msgid "Missing targets"
 msgstr "Cibles manquantes"
 
@@ -1052,18 +1057,19 @@ msgstr "Appliquer"
 
 #. Translators: This is the help text of an icon that indicates that this element can't be deleted */
 #: js/pages/results_framework/components/level_tier_lists.js:125
+#, fuzzy
 msgid "This level is being used in the results framework"
 msgstr "Ce niveau est utilisé dans le cadre de résultats"
 
 #. Translators: This is one of several user modifiable fields, e.g. "Level 1", "Level 2", etc... Level 1 is the top of the hierarchy, Level six is the bottom.*/
 #: js/pages/results_framework/components/level_tier_lists.js:137
-#, python-format
+#, fuzzy, python-format
 msgid "Level %s"
 msgstr "Niveau %s"
 
 #. Translators: Warning message displayed to users explaining why they can't change a setting they could change before.
 #: js/pages/results_framework/components/leveltier_picker.js:31
-#, python-format
+#, fuzzy, python-format
 msgid ""
 "<span class=\"text-danger\"><strong>The results framework template is locked "
 "as soon as the first %(secondTier)s is saved.</strong></span> To change "
@@ -1089,6 +1095,7 @@ msgstr "Personnalisé"
 #. Translators: Notification to user that the update they initiated was successful */
 #: js/pages/results_framework/models.js:145
 #: js/pages/results_framework/models.js:243
+#, fuzzy
 msgid "Changes to the results framework template were saved."
 msgstr ""
 "Les modifications apportées au modèle de cadre de résultats ont été "
@@ -1144,11 +1151,13 @@ msgstr "Les modifications apportées à %s n’ont pas été enregistrées"
 
 #. Translators: This is a warning messages when a user has entered duplicate names for two different objects */
 #: js/pages/results_framework/models.js:756
+#, fuzzy
 msgid "Result levels should not contain commas."
 msgstr "Les niveaux de résultats ne doivent pas contenir de virgules."
 
 #. Translators: This is a warning messages when a user has a comma in a name that shouldn't contain commas */
 #: js/pages/results_framework/models.js:761
+#, fuzzy
 msgid "Result levels must have unique names."
 msgstr "Les niveaux de résultats doivent avoir des noms uniques."
 
@@ -1302,7 +1311,7 @@ msgstr "Sélectionné par défaut"
 
 #. Translators: Help text for the "selected by default" checkbox on the disaggregation form
 #: js/pages/tola_management_pages/country/components/edit_disaggregations.js:336
-#, python-format
+#, fuzzy, python-format
 msgid ""
 "When adding a new program indicator, this disaggregation will be selected by "
 "default for every program in %s. The disaggregation can be manually removed "
@@ -1360,7 +1369,7 @@ msgstr ""
 
 #. Translators:  This is a warning popup when the user tries to do something that has broader effects than they might anticipate
 #: js/pages/tola_management_pages/country/components/edit_disaggregations.js:485
-#, python-format
+#, fuzzy, python-format
 msgid ""
 "This disaggregation will be automatically selected for all new indicators in "
 "%s. Existing indicators will be unaffected."
@@ -1370,7 +1379,7 @@ msgstr ""
 
 #. Translators:  This is a warning popup when the user tries to do something that has broader effects than they might anticipate
 #: js/pages/tola_management_pages/country/components/edit_disaggregations.js:499
-#, python-format
+#, fuzzy, python-format
 msgid ""
 "This disaggregation will no longer be automatically selected for all new "
 "indicators in %s. Existing indicators will be unaffected."
@@ -1858,48 +1867,48 @@ msgstr "Enregistrer les modifications"
 msgid "Save And Add Another"
 msgstr "Enregistrer et ajouter à nouveau"
 
-#: js/pages/tola_management_pages/user/components/edit_user_programs.js:17
+#: js/pages/tola_management_pages/user/components/edit_user_programs.js:18
 msgid "Individual programs only"
 msgstr "Programmes individuels seulement"
 
-#: js/pages/tola_management_pages/user/components/edit_user_programs.js:421
+#: js/pages/tola_management_pages/user/components/edit_user_programs.js:439
 #: js/pages/tola_management_pages/user/components/user_editor.js:32
 msgid "Programs and Roles"
 msgstr "Programmes et rôles"
 
 #. Translators: link to learn more about permissions-granting roles a user can be assigned
-#: js/pages/tola_management_pages/user/components/edit_user_programs.js:425
+#: js/pages/tola_management_pages/user/components/edit_user_programs.js:443
 msgid "More information on Program Roles"
 msgstr "Plus d’informations sur les programmes et les rôles"
 
 #. Translators: This is placeholder text on a dropdown of countries which limit the displayed programs
-#: js/pages/tola_management_pages/user/components/edit_user_programs.js:432
+#: js/pages/tola_management_pages/user/components/edit_user_programs.js:450
 msgid "Filter countries"
 msgstr "Filtrer les pays"
 
 #. Translators: this is placeholder text on a dropdown of programs which limit the displayed results
-#: js/pages/tola_management_pages/user/components/edit_user_programs.js:438
+#: js/pages/tola_management_pages/user/components/edit_user_programs.js:456
 msgid "Filter programs"
 msgstr "Filtrer les programmes"
 
 #. Translators: Column header for a checkbox indicating if a user has access to a program */
-#: js/pages/tola_management_pages/user/components/edit_user_programs.js:463
+#: js/pages/tola_management_pages/user/components/edit_user_programs.js:481
 msgid "Has access?"
 msgstr "A accès ?"
 
-#: js/pages/tola_management_pages/user/components/edit_user_programs.js:480
+#: js/pages/tola_management_pages/user/components/edit_user_programs.js:500
 msgid "Deselect All"
 msgstr "Tout déselectionner"
 
-#: js/pages/tola_management_pages/user/components/edit_user_programs.js:480
+#: js/pages/tola_management_pages/user/components/edit_user_programs.js:500
 msgid "Select All"
 msgstr "Tout sélectionner"
 
-#: js/pages/tola_management_pages/user/components/edit_user_programs.js:493
+#: js/pages/tola_management_pages/user/components/edit_user_programs.js:510
 msgid "Countries and Programs"
 msgstr "Pays et programmes"
 
-#: js/pages/tola_management_pages/user/components/edit_user_programs.js:509
+#: js/pages/tola_management_pages/user/components/edit_user_programs.js:535
 msgid "Roles and Permissions"
 msgstr "Rôles et autorisations"
 
@@ -1923,6 +1932,7 @@ msgstr "Échec de l’envoi de l’e-mail de vérification"
 
 #. Translators: a list of groups of countries (i.e. "Asia")
 #: js/pages/tola_management_pages/user/models.js:710
+#, fuzzy
 msgid "Regions"
 msgstr "Régions"
 

@@ -705,8 +705,8 @@ class Program(models.Model):
             This helper method provides the second option label"""
         tier = self.level_tiers.filter(tier_depth=2).first() if self.results_framework else None
         if tier:
-            # Translators: this labels a filter to sort indicators, for example, "by Outcome chain":
             tier_name = _(tier.name)
+            # Translators: this labels a filter to sort indicators, for example, "by Outcome chain":
             return _('by %(level_name)s chain') % {'level_name': tier_name}
         return None
 
@@ -716,8 +716,8 @@ class Program(models.Model):
         """
         tier = self.level_tiers.filter(tier_depth=2).first() if self.results_framework else None
         if tier:
-            # Translators: this labels a filter to sort indicators, for example, "by Outcome chain":
             tier_name = _(tier.name)
+            # Translators: this labels a filter to sort indicators, for example, "by Outcome chain":
             return _('%(level_name)s chains') % {'level_name': tier_name}
         return None
 
