@@ -17,8 +17,7 @@ const create_country_objects = (countries, store) => Object.entries(countries)
                                                             type: 'country',
                                                             options: [{label: gettext('Individual programs only'), value: 'none'}, ...store.country_role_choices],
                                                             admin_access: store.is_superuser,
-                                                            programs: new Set(country.programs),
-                                                            expanded: true
+                                                            programs: new Set(country.programs)
                                                         }
                                                     }),{})
 
@@ -295,6 +294,7 @@ export default class EditUserPrograms extends React.Component {
         }, () => this.hasUnsavedDataAction())
 
     }
+
 
     clearFilter() {
         const val = ''

@@ -1,4 +1,4 @@
-import { observable, computed, action, runInAction } from "mobx";
+import { observable, computed, action, runInAction } from 'mobx';
 import api from './api';
 
 const default_user = {
@@ -678,11 +678,13 @@ export class CountryStore {
     @observable regions;
     @observable countries;
     @observable _selectedCountryIds;
+    @observable _expandedCountryIds;
 
     constructor(regions, countries) {
         this.regions = regions;
         this.countries = countries;
         this._selectedCountryIds = [];
+        this._expandedCountryIds = new Set([...Object.keys(this.countries).map(id => parseInt(id))]);
         this.nameSort = (objA, objB) => (objA.name.toUpperCase() < objB.name.toUpperCase()) ? -1 : 1;
     }
 
@@ -740,6 +742,25 @@ export class CountryStore {
         ))];
     }
 
+    isExpanded(countryId) {
+        return this._expandedCountryIds.has(parseInt(countryId));
+    }
+
+    @action
+    toggleExpanded(countryId) {
+        if (this._expandedCountryIds.has(parseInt(countryId))) {
+            this._expandedCountryIds.delete(parseInt(countryId));
+        } else {
+            this._expandedCountryIds.add(parseInt(countryId));
+        }
+    }
+
+    @action
+    setExpanded(countryIds) {
+        let countryIdArr = Array.isArray(countryIds) ? countryIds.map(id => parseInt(id)) : [parseInt(countryIds)];
+        this._expandedCountryIds = new Set(countryIdArr);
+    }
+
     @action
     removeRegion(regionId) {
         let countryIds = Object.values(this.countries).filter(country => country.region == regionId)
@@ -769,6 +790,8 @@ export class CountryStore {
         if (selected.length == 0) {
             // selection is cleared
             this._selectedCountryIds = [];
+            // expand all countries (no selection means all expanded:)
+            this._expandedCountryIds = new Set([...Object.keys(this.countries).map(id => parseInt(id))]);
         }
         else if (selected.length < this.selectedOptions.length) {
             // user removed items
@@ -781,6 +804,7 @@ export class CountryStore {
                     this.removeCountry(option.value);
                 }
             });
+            this._expandedCountryIds = new Set([]);
             
         } else {
             // user added items
@@ -792,7 +816,8 @@ export class CountryStore {
                 } else if (option.value) {
                     this.addCountry(option.value);
                 }
-            })
+            });
+            this._expandedCountryIds = new Set([]);
         }
     }
 }
