@@ -1,6 +1,7 @@
-# -*- coding: utf-8 -*-
+
 from __future__ import unicode_literals
 import json
+import re
 from collections import OrderedDict
 from django.core.exceptions import PermissionDenied, ObjectDoesNotExist, SuspiciousOperation
 from django.core.serializers.json import DjangoJSONEncoder
@@ -345,44 +346,21 @@ class UserAdminSerializer(ModelSerializer):
     name = CharField(max_length=255, required=False)
     first_name = CharField(source="user.first_name", max_length=100, required=True)
     last_name = CharField(source="user.last_name", max_length=100, required=True)
-    username = CharField(source="user.username", max_length=100, required=True)
+    username = CharField(source="user.username", max_length=100, required=True, validators=[UniqueValidator(queryset=User.objects.all())])
     organization_id = IntegerField(required=True)
-    email = EmailField(source="user.email", max_length=255, required=True)
+    email = EmailField(
+        source="user.email", max_length=255, required=True, validators=[UniqueValidator(queryset=User.objects.all())])
     user = AuthUserSerializer()
 
+    # Ensure @mercycorps.org email addresses are in MC organization.
     def validate(self, data):
-        # TODO: this was used to enforce uniqueness only on the email field, which is NOT enforced in the backend
-
         out_data = super(UserAdminSerializer, self).validate(data)
-
-        if self.instance:
-            others_username = list(User.objects.filter(username=data['user']['username']))
-            others_email = list(User.objects.filter(email=data['user']['email']))
-            validation_errors = {}
-
-            if len(others_username) > 1 or (len(others_username) > 0 and others_username[0].id != self.instance.user.id):
-                validation_errors.update({"username": _('This field must be unique')})
-
-            if len(others_email) > 1 or (len(others_email) > 0 and others_email[0].id != self.instance.user.id):
-                validation_errors.update({"email": _('This field must be unique')})
-
-            if len(validation_errors) > 0:
-                raise ValidationError(validation_errors)
-
-        else:
-            others_username = list(User.objects.filter(username=data['user']['username']))
-            others_email = list(User.objects.filter(email=data['user']['email']))
-            validation_errors = {}
-
-            if len(others_username) > 0:
-                validation_errors.update({"username": _('This field must be unique')})
-
-            if len(others_email) > 0:
-                validation_errors.update({"email": _('This field must be unique')})
-
-            if len(validation_errors) > 0:
-                raise ValidationError(validation_errors)
-
+        org_name = Organization.objects.get(id=data['organization_id']).name
+        email_domain_is_mc = re.search("@mercycorps.org$",  data["user"]["email"])
+        if org_name == "Mercy Corps" and not email_domain_is_mc:
+            raise ValidationError({"email": _("Non-Mercy Corps emails should not be used with the Mercy Corps organization.")})
+        elif org_name != "Mercy Corps" and email_domain_is_mc:
+            raise ValidationError({"email": _("Mercy Corps accounts are managed by Single sign-on (SSO). Mercy Corps employees should login using their SSO username and password.")})
         return out_data
 
     def create(self, validated_data):
@@ -567,7 +545,7 @@ class UserAdminViewSet(viewsets.ModelViewSet):
         # if problems arise, replace this with page = self.paginate_queryset(list(queryset))
         page = self.paginate_queryset(queryset)
         if page is not None:
-            serializer = UserAdminReportSerializer(page, many=True)            
+            serializer = UserAdminReportSerializer(page, many=True)
             return self.get_paginated_response(serializer.data)
 
         serializer = UserAdminReportSerializer(queryset, many=True)
