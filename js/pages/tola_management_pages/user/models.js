@@ -1,4 +1,4 @@
-import { observable, computed, action, runInAction } from "mobx";
+import { observable, computed, action, runInAction } from 'mobx';
 import api from './api';
 
 const default_user = {
@@ -678,11 +678,13 @@ export class CountryStore {
     @observable regions;
     @observable countries;
     @observable _selectedCountryIds;
+    @observable _expandedCountryIds;
 
     constructor(regions, countries) {
         this.regions = regions;
         this.countries = countries;
         this._selectedCountryIds = [];
+        this._expandedCountryIds = new Set([...Object.keys(this.countries).map(id => parseInt(id))]);
         this.nameSort = (objA, objB) => (objA.name.toUpperCase() < objB.name.toUpperCase()) ? -1 : 1;
     }
 
@@ -740,6 +742,24 @@ export class CountryStore {
         ))];
     }
 
+    isExpanded(countryId) {
+        return this._expandedCountryIds.has(parseInt(countryId));
+    }
+
+    @action
+    toggleExpanded(countryId) {
+        if (this._expandedCountryIds.has(parseInt(countryId))) {
+            this._expandedCountryIds.delete(parseInt(countryId));
+        } else {
+            this._expandedCountryIds.add(parseInt(countryId));
+        }
+    }
+
+    @action
+    setExpanded(countryId) {
+        this._expandedCountryIds.add(parseInt(countryId));
+    }
+
     @action
     removeRegion(regionId) {
         let countryIds = Object.values(this.countries).filter(country => country.region == regionId)
@@ -757,11 +777,13 @@ export class CountryStore {
     @action
     removeCountry(countryId) {
         this._selectedCountryIds = this._selectedCountryIds.filter(id => id !== countryId);
+        this._expandedCountryIds.delete(parseInt(countryId))
     }
 
     @action
     addCountry(countryId) {
         this._selectedCountryIds = [...new Set([...this._selectedCountryIds, countryId])];
+        this._expandedCountryIds.add(parseInt(countryId));
     }
 
     @action
@@ -769,6 +791,7 @@ export class CountryStore {
         if (selected.length == 0) {
             // selection is cleared
             this._selectedCountryIds = [];
+            this._expandedCountryIds = new Set([...Object.keys(this.countries).map(id => parseInt(id))]);
         }
         else if (selected.length < this.selectedOptions.length) {
             // user removed items
@@ -781,9 +804,15 @@ export class CountryStore {
                     this.removeCountry(option.value);
                 }
             });
-            
+            if (this.selectedOptions.length == 0) {
+               // expand all countries (no selection means all expanded:)
+               this._expandedCountryIds = new Set([...Object.keys(this.countries).map(id => parseInt(id))]);
+            }   
         } else {
             // user added items
+            if (this.selectedOptions.length == 0) {
+                this._expandedCountryIds = new Set([]);
+            }
             const notYetSelected = (option) => !this.selectedOptions.map(option => option.value).includes(option.value);
             let addedOptions = selected.filter(notYetSelected);
             addedOptions.forEach(option => {
@@ -792,7 +821,7 @@ export class CountryStore {
                 } else if (option.value) {
                     this.addCountry(option.value);
                 }
-            })
+            });
         }
     }
 }
