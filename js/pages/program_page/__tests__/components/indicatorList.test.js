@@ -27,7 +27,6 @@ describe("Indicator List elements", () => {
             const wrapper = shallow(
                 <StatusHeader {...props} />
             );
-            expect(wrapper.find('div > div').children().length).toBe(1);
             expect(wrapper.find('#show-all-indicators').exists()).toBeFalsy();
         });
         it("renders read only", () => {
@@ -49,7 +48,6 @@ describe("Indicator List elements", () => {
             const wrapper = shallow(
                 <StatusHeader {...props} filterApplied={true} />
             );
-            expect(wrapper.find('div > div').children().length).toBe(1);
             expect(wrapper.find('#show-all-indicators').exists()).toBeTruthy();
         });
         it("calls for filter title", () => {
@@ -64,7 +62,6 @@ describe("Indicator List elements", () => {
                 indicatorCount={15}
                 currentIndicatorFilter={IndicatorFilterType.aboveTarget} />
             );
-            expect(wrapper.find('div > div').children().length).toBe(1);
             //correct title text:
             expect(wrapper.find('div > h3 > span').text()).toEqual("%s indicator is >15% above target");
             // show all link is displayed:
