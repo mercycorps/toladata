@@ -221,7 +221,7 @@ class GaugeBand extends React.Component {
 
 
         return <Gauge>
-            <div className="gauge__graphic gauge__graphic--performance-band">
+            <div className={`gauge__graphic gauge__graphic--performance-band ${gaugeHasErrors ? "gauge__graphic--empty" : ""}`}>
                 <div className="graphic__tick-marks">
                     {[...Array(tickCount)].map((e, i) => <div key={i} className="graphic__tick" />)}
                 </div>
