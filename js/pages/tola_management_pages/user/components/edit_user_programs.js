@@ -31,12 +31,20 @@ const create_program_objects = (programs, store) => Object.entries(programs)
                                                                }
                                                            }),{})
 
-//we need to flatten the country -> program heirarchy to support the virtualized table
-const flattened_listing = (countries, programs, isExpanded) => countries.flatMap(country =>
+/**
+ * This function returns countries and programs as a flat ordered list as they will be displayed in the virtualized table.
+ *
+ * @param {Object[]} countries - the country objects created by create_country_objects (with program info)
+ * @param {Object[]} programs - the program objects created by create_program_objects (with user role info)
+ * @param {@callback} isExpanded - The callback which determines if a given country ID should be expanded, incorporating
+ *                                filter states and previous user toggles
+ * @returns {Object[]} - the countries and programs as rowData for the virtualized table
+ */
+const flattened_listing = (countries, programs, isExpanded) => countries.flatMap(country => //flatMap to return a flattened list
                                                         [
-                                                            country,
-                                                            ...(isExpanded(country.id) ? Array.from(country.programs)
-                                                                .filter(program_id => programs[program_id])
+                                                            country, // country object itself displays, followed by programs
+                                                            ...(isExpanded(country.id) ? Array.from(country.programs) //only show programs if country is expanded
+                                                                .filter(program_id => programs[program_id]) // don't include programs we don't have information for (filtered out)
                                                                 .map(program_id => ({...programs[program_id], id: `${country.id}_${program_id}`, country_id: country.id})) : [])
                                                         ]
                                                     )
@@ -90,6 +98,9 @@ export default class EditUserPrograms extends React.Component {
         const countries = create_country_objects(store.countries, store)
         const programs = create_program_objects(store.programs, store)
         this.countryStore = new CountryStore(store.regions, store.countries);
+        
+        // callback for determining if a country is expanded based on filter state (initial program filter of ''):
+        const isExpanded = this.isExpanded.bind(this, '');
         this.state = {
             program_filter: '',
             countries,
@@ -97,7 +108,7 @@ export default class EditUserPrograms extends React.Component {
             filtered_countries: countries,
             filtered_programs: programs,
             ordered_country_ids: store.ordered_country_ids,
-            flattened_programs: flattened_listing(store.ordered_country_ids.filter(id => id in countries).map(id => countries[id]), programs, this.isExpanded.bind(this, '')),
+            flattened_programs: flattened_listing(store.ordered_country_ids.filter(id => id in countries).map(id => countries[id]), programs, isExpanded),
             original_user_program_access: create_user_access(store.editing_target_data.access),
             user_program_access: create_user_access(store.editing_target_data.access)
         }
@@ -119,14 +130,16 @@ export default class EditUserPrograms extends React.Component {
             this.state.program_filter
         )
 
-        const val = this.state.program_filter;
+        // callback for determining if a country is expanded based on filter state:
+        const isExpanded = this.isExpanded.bind(this, this.state.program_filter);
+
         this.setState({
             countries: countries_obj,
             programs: programs_obj,
             filtered_countries: countries,
             filtered_programs: programs,
             ordered_country_ids: store.ordered_country_ids,
-            flattened_programs: flattened_listing(store.ordered_country_ids.filter(id => id in countries).map(id => countries[id]), programs, this.isExpanded.bind(this, val)),
+            flattened_programs: flattened_listing(store.ordered_country_ids.filter(id => id in countries).map(id => countries[id]), programs, isExpanded),
             original_user_program_access: create_user_access(store.editing_target_data.access),
             user_program_access: create_user_access(store.editing_target_data.access)
         }, () => this.hasUnsavedDataAction())
@@ -304,11 +317,13 @@ export default class EditUserPrograms extends React.Component {
             val
         )
 
+        // callback for determining if a country is expanded based on filter state:
+        const isExpanded = this.isExpanded.bind(this, val);
         this.setState({
             program_filter: val,
             filtered_programs: programs,
             filtered_countries: countries,
-            flattened_programs: flattened_listing(this.state.ordered_country_ids.filter(id => id in countries).map(id => countries[id]), programs, this.isExpanded.bind(this, val)),
+            flattened_programs: flattened_listing(this.state.ordered_country_ids.filter(id => id in countries).map(id => countries[id]), programs, isExpanded),
         })
     }
 
@@ -320,11 +335,14 @@ export default class EditUserPrograms extends React.Component {
             val
         )
 
+        // callback for determining if a country is expanded based on filter state:
+        const isExpanded = this.isExpanded.bind(this, val);
+
         this.setState({
             program_filter: val,
             filtered_programs: programs,
             filtered_countries: countries,
-            flattened_programs: flattened_listing(this.state.ordered_country_ids.filter(id => id in countries).map(id => countries[id]), programs, this.isExpanded.bind(this, val)),
+            flattened_programs: flattened_listing(this.state.ordered_country_ids.filter(id => id in countries).map(id => countries[id]), programs, isExpanded),
         })
     }
 
@@ -337,11 +355,12 @@ export default class EditUserPrograms extends React.Component {
             this.state.program_filter
         )
 
-        const val = this.state.program_filter;
+        // callback for determining if a country is expanded based on filter state:
+        const isExpanded = this.isExpanded.bind(this, this.state.program_filter);
 
         this.setState({
             filtered_countries: countries,
-            flattened_programs: flattened_listing(this.state.ordered_country_ids.filter(id => id in countries).map(id => countries[id]), this.state.filtered_programs, this.isExpanded.bind(this, val)),
+            flattened_programs: flattened_listing(this.state.ordered_country_ids.filter(id => id in countries).map(id => countries[id]), this.state.filtered_programs, isExpanded),
         })
     }
 
@@ -353,18 +372,22 @@ export default class EditUserPrograms extends React.Component {
             filtered_countries,
             this.state.program_filter
         )
-        const val = this.state.program_filter;
+        // callback for determining if a country is expanded based on filter state:
+        const isExpanded = this.isExpanded.bind(this, this.state.program_filter);
 
         this.setState({
             filtered_countries: countries,
-            flattened_programs: flattened_listing(this.state.ordered_country_ids.filter(id => id in countries).map(id => countries[id]), this.state.filtered_programs, this.isExpanded.bind(this, val)),
+            flattened_programs: flattened_listing(this.state.ordered_country_ids.filter(id => id in countries).map(id => countries[id]), this.state.filtered_programs, isExpanded),
         });
     }
 
     isExpanded(program_filter, countryId) {
+        // when bound with this and program_filter state (a string), and called with country ID, returns true if country should be expanded
         if (program_filter && program_filter.length > 0) {
+            // all countries left showing given a program filter should be expanded to show the programs filtered to
             return true;
         }
+        // countryStore tracks toggling of expanded/collapsed state
         return this.countryStore.isExpanded(countryId);
     }
 
