@@ -287,8 +287,8 @@ const IndicatorListTableButtons = observer(function ({program, rootStore, ...pro
                 <CollapseAllButton clickHandler={ () => {program.deleteAllResultsHTML(); }} disabled={ rootStore.allCollapsed } />
             </div>
             <div className="indicator-list__add-indicator-button">
-                {!readonly &&
-                <AddIndicatorButton readonly={rootStore.readonly} programId={program.pk}/>
+                {!rootStore.readOnly &&
+                <AddIndicatorButton readonly={rootStore.readOnly} programId={program.pk}/>
                 }
             </div>
         </div>
