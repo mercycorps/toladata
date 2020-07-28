@@ -109,92 +109,119 @@ describe('countryStore', () => {
             var countryIds = [1, 2, 3, 4, "1", "2", "3", "4"];
             describe("when initialized", () => {
                 it("shows all countries expanded", () => {
-                    expect(true).toBeFalsy();
+                    countryIds.forEach(id => {expect(countryStore.isExpanded(id)).toBeTruthy();});
                 });
                 describe("when a user toggles a country collapsed", () => {
+                    beforeEach(() => {
+                        countryStore.toggleExpanded(2);
+                    });
                     it("returns that country collapsed", () => {
-                        expect(true).toBeFalsy();
+                        expect(countryStore.isExpanded(2)).toBeFalsy();
                     });
                     it("shows all other countries expanded", () => {
-                        expect(true).toBeFalsy();
+                        [1, 3, 4].forEach(id => {expect(countryStore.isExpanded(id)).toBeTruthy();});
+                    });
+                    describe("when a user toggles a second country collapsed", () => {
+                        beforeEach(() => {
+                            countryStore.toggleExpanded(4);
+                        });
+                        it("returns only those two countries collapsed", () => {
+                            [2, 4].forEach(id => {expect(countryStore.isExpanded(id)).toBeFalsy();});
+                            [1, 3].forEach(id => {expect(countryStore.isExpanded(id)).toBeTruthy();});
+                        });
                     });
                 });
                 describe("when a single country is added to the filter", () => {
-                    it("shows that country expanded", () => {
-                        expect(true).toBeFalsy();
+                    beforeEach(() => {
+                        countryStore.updateSelected([{value: 3}]);
+                    });
+                    it("shows only that country expanded", () => {
+                        expect(countryStore.isExpanded(3)).toBeTruthy();
+                        [1, 2, 4].forEach(id => {expect(countryStore.isExpanded(id)).toBeFalsy();});
                     });
                     describe("when that country is toggled collapsed", () => {
+                        beforeEach(() => {
+                            countryStore.toggleExpanded(3);
+                        });
                         it("shows that country collapsed", () => {
-                            expect(true).toBeFalsy();
+                            countryIds.forEach(id => {expect(countryStore.isExpanded(id)).toBeFalsy();});
                         });
                     });
                     describe("when another country is added to the filter", () =>{
-                        it("shows both countries expanded", () => {
-                            expect(true).toBeFalsy();
+                        beforeEach(() => {
+                            countryStore.updateSelected([{value: 3}, {value: 2}]);
+                        });
+                        it("shows only those two countries expanded", () => {
+                           [2, 3].forEach(id => {expect(countryStore.isExpanded(id)).toBeTruthy();});
+                           [1, 4].forEach(id => {expect(countryStore.isExpanded(id)).toBeFalsy();});
                         });
                     })
                 });
                 describe("when a single region is added to the filter", () => {
+                    beforeEach(() => {
+                        countryStore.updateSelected([{value: 'r-2'}]);
+                        
+                    });
                     it("shows all countries in that region collapsed", () => {
-                        expect(true).toBeFalsy();
+                        countryIds.forEach(id => {expect(countryStore.isExpanded(id)).toBeFalsy();})
                     });
                     describe("when a country in that region is toggled expanded", () => {
+                        beforeEach(() => {
+                            countryStore.toggleExpanded(3);
+                        })
                         it("shows that country expanded", () => {
-                            expect(true).toBeFalsy();
+                            expect(countryStore.isExpanded(3)).toBeTruthy();
                         });
                         it("shows all other countries collapsed", () =>{
-                            expect(true).toBeFalsy();
+                            [1, 2, 4].forEach(id => {expect(countryStore.isExpanded(id)).toBeFalsy();});
                         });
                         describe("when another region is added to the filter", () => {
-                            it("shows the new region countries collapsed", () => {
-                                expect(true).toBeFalsy();
-                            });
-                            it("shows the first region countries (except toggled country) collapsed", () => {
-                                expect(true).toBeFalsy();
-                            });
-                            it("shows the toggled country expanded", () => {
-                                expect(true).toBeFalsy();
+                            beforeEach(() => {
+                                countryStore.updateSelected([...countryStore.selectedOptions, {value: 'r-1'}]);
+                            })
+                            it("shows all countries collapsed except previously toggled country", () => {
+                                [1, 2, 4].forEach(id => {expect(countryStore.isExpanded(id)).toBeFalsy();});
+                                expect(countryStore.isExpanded(3)).toBeTruthy();
                             });
                         });
                     });
                     describe("when another region is added to the filter", () =>{
+                        beforeEach(() => {
+                            countryStore.updateSelected([...countryStore.selectedOptions, {value: 'r-1'}]);
+                        })
                         it("shows countries in both regions collapsed", () => {
-                            expect(true).toBeFalsy();
+                            countryIds.forEach(id => {expect(countryStore.isExpanded(id)).toBeFalsy();})
                         });
+                    });
+                    describe("when the region is removed", () => {
+                        beforeEach(() => {
+                            countryStore.updateSelected([...countryStore.selectedOptions.filter(option => option.value != 'r-2')]);
+                        });
+                        it("shows all countries expanded", () => {
+                            countryIds.forEach(id => {expect(countryStore.isExpanded(id)).toBeTruthy();});
+                        });
+                    });
+                    describe("when everything is removed (filter cleared)", () => {
+                        beforeEach(() => {
+                            countryStore.updateSelected([]);
+                        });
+                        it("shows all countries expanded", () => {
+                            countryIds.forEach(id => {expect(countryStore.isExpanded(id)).toBeTruthy();});
+                        })
                     })
                 });
-                
-                describe("when a country is set to expanded (filter by program)" () => {
+                describe("when a country is set to expanded (filter by program)", () => {
+                    beforeEach(() => {
+                        countryStore.toggleExpanded(2);
+                        countryStore.setExpanded(3);
+                        countryStore.setExpanded(2);
+                    });
                     it("shows that country expanded", () => {
-                        expect(true).toBeFalsy();
+                        expect(countryStore.isExpanded(3)).toBeTruthy();
+                        expect(countryStore.isExpanded(2)).toBeTruthy();
                     });
                 });
             });
-            //it("initialized correctly", () => {
-            //    expect(countryStore.isExpanded).not.toBeUndefined();
-            //    expect(countryStore.selectedCountries).toHaveLength(0);
-            //    countryIds.forEach(id => {expect(countryStore.isExpanded(id)).toBeTruthy();});
-            //});
-            //it("filter by single country", () => {
-            //    countryStore.updateSelected([countryStore.groupedOptions[1].options[0]]);
-            //    countryIds.forEach(id => {expect(countryStore.isExpanded(id)).toBeFalsy();});
-            //});
-            //it("collapses all when filter by region", () => {
-            //    countryStore.updateSelected([countryStore.groupedOptions[0].options[1]]);
-            //    countryIds.forEach(id => {expect(countryStore.isExpanded(id)).toBeFalsy();});
-            //});
-            //it("collapses a country", () => {
-            //    countryStore.toggleExpanded(2);
-            //    [1, 3, 4].forEach(id => {expect(countryStore.isExpanded(id)).toBeTruthy();});
-            //    expect(countryStore.isExpanded(2)).toBeFalsy();
-            //});
-            //it("expands a single country", () => {
-            //    countryStore.updateSelected()
-            //    // when a single program is filtered to, this will set that program's country is expanded:
-            //    countryStore.setExpanded(4);
-            //    [1, 2, 3].forEach(id => {expect(countryStore.isExpanded(id)).toBeFalsy();});
-            //    expect(countryStore.isExpanded(4)).toBeTruthy();
-            //});
         });
     })
 });

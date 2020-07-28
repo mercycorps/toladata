@@ -756,9 +756,8 @@ export class CountryStore {
     }
 
     @action
-    setExpanded(countryIds) {
-        let countryIdArr = Array.isArray(countryIds) ? countryIds.map(id => parseInt(id)) : [parseInt(countryIds)];
-        this._expandedCountryIds = new Set(countryIdArr);
+    setExpanded(countryId) {
+        this._expandedCountryIds.add(parseInt(countryId));
     }
 
     @action
@@ -778,11 +777,13 @@ export class CountryStore {
     @action
     removeCountry(countryId) {
         this._selectedCountryIds = this._selectedCountryIds.filter(id => id !== countryId);
+        this._expandedCountryIds.delete(parseInt(countryId))
     }
 
     @action
     addCountry(countryId) {
         this._selectedCountryIds = [...new Set([...this._selectedCountryIds, countryId])];
+        this._expandedCountryIds.add(parseInt(countryId));
     }
 
     @action
@@ -790,7 +791,6 @@ export class CountryStore {
         if (selected.length == 0) {
             // selection is cleared
             this._selectedCountryIds = [];
-            // expand all countries (no selection means all expanded:)
             this._expandedCountryIds = new Set([...Object.keys(this.countries).map(id => parseInt(id))]);
         }
         else if (selected.length < this.selectedOptions.length) {
@@ -804,10 +804,15 @@ export class CountryStore {
                     this.removeCountry(option.value);
                 }
             });
-            this._expandedCountryIds = new Set([]);
-            
+            if (this.selectedOptions.length == 0) {
+               // expand all countries (no selection means all expanded:)
+               this._expandedCountryIds = new Set([...Object.keys(this.countries).map(id => parseInt(id))]);
+            }   
         } else {
             // user added items
+            if (this.selectedOptions.length == 0) {
+                this._expandedCountryIds = new Set([]);
+            }
             const notYetSelected = (option) => !this.selectedOptions.map(option => option.value).includes(option.value);
             let addedOptions = selected.filter(notYetSelected);
             addedOptions.forEach(option => {
@@ -817,7 +822,6 @@ export class CountryStore {
                     this.addCountry(option.value);
                 }
             });
-            this._expandedCountryIds = new Set([]);
         }
     }
 }

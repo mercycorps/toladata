@@ -32,10 +32,10 @@ const create_program_objects = (programs, store) => Object.entries(programs)
                                                            }),{})
 
 //we need to flatten the country -> program heirarchy to support the virtualized table
-const flattened_listing = (countries, programs) => countries.flatMap(country =>
+const flattened_listing = (countries, programs, isExpanded) => countries.flatMap(country =>
                                                         [
                                                             country,
-                                                            ...(country.expanded ? Array.from(country.programs)
+                                                            ...(isExpanded(country.id) ? Array.from(country.programs)
                                                                 .filter(program_id => programs[program_id])
                                                                 .map(program_id => ({...programs[program_id], id: `${country.id}_${program_id}`, country_id: country.id})) : [])
                                                         ]
@@ -57,10 +57,10 @@ const apply_program_filter = (programs, countries, filter_string) => {
     }
 }
 
-const apply_country_filter = (countries, filtered, collapseAll=false) => {
+const apply_country_filter = (countries, filtered) => {
     if(filtered.length > 0) {
         return filtered.filter(id => countries[id])
-                       .map(id => collapseAll ? {...countries[id], expanded: false} : countries[id])
+                       .map(id => countries[id])
                        .reduce((countries, country) => ({...countries, [country.id]: country}), {})
     } else {
         return countries
@@ -90,7 +90,6 @@ export default class EditUserPrograms extends React.Component {
         const countries = create_country_objects(store.countries, store)
         const programs = create_program_objects(store.programs, store)
         this.countryStore = new CountryStore(store.regions, store.countries);
-
         this.state = {
             program_filter: '',
             countries,
@@ -98,7 +97,7 @@ export default class EditUserPrograms extends React.Component {
             filtered_countries: countries,
             filtered_programs: programs,
             ordered_country_ids: store.ordered_country_ids,
-            flattened_programs: flattened_listing(store.ordered_country_ids.filter(id => id in countries).map(id => countries[id]), programs),
+            flattened_programs: flattened_listing(store.ordered_country_ids.filter(id => id in countries).map(id => countries[id]), programs, this.countryStore.isExpanded.bind(this.countryStore)),
             original_user_program_access: create_user_access(store.editing_target_data.access),
             user_program_access: create_user_access(store.editing_target_data.access)
         }
@@ -127,7 +126,7 @@ export default class EditUserPrograms extends React.Component {
             filtered_countries: countries,
             filtered_programs: programs,
             ordered_country_ids: store.ordered_country_ids,
-            flattened_programs: flattened_listing(store.ordered_country_ids.filter(id => id in countries).map(id => countries[id]), programs),
+            flattened_programs: flattened_listing(store.ordered_country_ids.filter(id => id in countries).map(id => countries[id]), programs, this.countryStore.isExpanded.bind(this.countryStore)),
             original_user_program_access: create_user_access(store.editing_target_data.access),
             user_program_access: create_user_access(store.editing_target_data.access)
         }, () => this.hasUnsavedDataAction())
@@ -309,7 +308,7 @@ export default class EditUserPrograms extends React.Component {
             program_filter: val,
             filtered_programs: programs,
             filtered_countries: countries,
-            flattened_programs: flattened_listing(this.state.ordered_country_ids.filter(id => id in countries).map(id => countries[id]), programs),
+            flattened_programs: flattened_listing(this.state.ordered_country_ids.filter(id => id in countries).map(id => countries[id]), programs, this.countryStore.isExpanded.bind(this.countryStore)),
         })
     }
 
@@ -325,7 +324,7 @@ export default class EditUserPrograms extends React.Component {
             program_filter: val,
             filtered_programs: programs,
             filtered_countries: countries,
-            flattened_programs: flattened_listing(this.state.ordered_country_ids.filter(id => id in countries).map(id => countries[id]), programs),
+            flattened_programs: flattened_listing(this.state.ordered_country_ids.filter(id => id in countries).map(id => countries[id]), programs, this.countryStore.isExpanded.bind(this.countryStore)),
         })
     }
 
@@ -340,14 +339,13 @@ export default class EditUserPrograms extends React.Component {
 
         this.setState({
             filtered_countries: countries,
-            flattened_programs: flattened_listing(this.state.ordered_country_ids.filter(id => id in countries).map(id => countries[id]), this.state.filtered_programs),
+            flattened_programs: flattened_listing(this.state.ordered_country_ids.filter(id => id in countries).map(id => countries[id]), this.state.filtered_programs, this.countryStore.isExpanded.bind(this.countryStore)),
         })
     }
 
     toggleCountryExpanded(id) {
-        let updatedCountries = Object.assign({}, this.state.countries);
-        updatedCountries[id].expanded = !updatedCountries[id].expanded;
-        const filtered_countries = apply_country_filter(updatedCountries, this.countryStore.selectedCountries);
+        this.countryStore.toggleExpanded(id);
+        const filtered_countries = apply_country_filter(this.state.countries, this.countryStore.selectedCountries);
         const {countries, programs} = apply_program_filter(
             this.state.programs,
             filtered_countries,
@@ -355,9 +353,8 @@ export default class EditUserPrograms extends React.Component {
         )
 
         this.setState({
-            countries: updatedCountries,
             filtered_countries: countries,
-            flattened_programs: flattened_listing(this.state.ordered_country_ids.filter(id => id in countries).map(id => countries[id]), this.state.filtered_programs),
+            flattened_programs: flattened_listing(this.state.ordered_country_ids.filter(id => id in countries).map(id => countries[id]), this.state.filtered_programs, this.countryStore.isExpanded.bind(this.countryStore)),
         });
     }
 
@@ -486,7 +483,7 @@ export default class EditUserPrograms extends React.Component {
                                     disabled: is_check_disabled(rowData),
                                     id: rowData.id,
                                     type: rowData.type,
-                                    expanded: (rowData.type == "country") ? rowData.expanded : false,
+                                    expanded: (rowData.type == "country") ? this.countryStore.isExpanded(rowData.id) : false,
                                     programsCount: (rowData.type == "country") ? rowData.programs.size : null,
                                     action: (rowData.type == "country")?this.toggleAllProgramsForCountry.bind(this):this.toggleProgramAccess.bind(this)
                                 })}
@@ -512,16 +509,20 @@ export default class EditUserPrograms extends React.Component {
                                 flexGrow={2}
                                 className='pl-0'
                                 cellDataGetter={({rowData}) => ({
-                                    expanded: (rowData.type == "country") ? rowData.expanded : false,
+                                    expanded: (rowData.type == "country") ? this.countryStore.isExpanded(rowData.id) : false,
                                     programsCount: (rowData.type == "country") ? rowData.programs.size : null,
                                     expandoAction: (rowData.type == "country") ? this.toggleCountryExpanded.bind(this, rowData.id):null,
                                     bold: rowData.type == "country", name: rowData.name
                                 })}
                                 cellRenderer={({cellData}) => {
                                     if(cellData.bold) {
-                                        const expandoIcon = cellData.expanded ? 'caret-down' : 'caret-right';
-                                        const expandoButton = cellData.programsCount ? <div className="edit-user-programs__expando expando-toggle icon__clickable" onClick={cellData.expandoAction}><div className="expando-toggle__icon"><FontAwesomeIcon icon={expandoIcon} /></div><div class="expando-toggle__label"><strong>{cellData.name}</strong></div></div> : null;
-                                        return expandoButton
+                                        const expandoIcon = cellData.programsCount ? <FontAwesomeIcon icon={ cellData.expanded ? 'caret-down' : 'caret-right' } /> : null;
+                                        const nameCellInner = <React.Fragment><div className="expando-toggle__icon">{ expandoIcon }</div><div className="expando-toggle__label"><strong>{cellData.name}</strong></div></React.Fragment>
+                                        if (cellData.programsCount) {
+                                            return <div className="edit-user-programs__expando expando-toggle icon__clickable" onClick={cellData.expandoAction}>{ nameCellInner }</div>;
+                                        } else {
+                                            return <div className="edit-user-programs__expando expando-toggle">{ nameCellInner }</div>;
+                                        }
                                     } else {
                                         return <span>{cellData.name}</span>
                                     }
