@@ -42,13 +42,13 @@ export const forProgramPage = (
             return false;
         }),
         updateAllResultsHTML() {
-            api.allIndicatorResultsTables(this.pk).then(data => {
-                runInAction(() => {
-                    data.results.forEach((result) => {
-                        this.deleteResultsHTML(parseInt(result[0]));
-                        this.resultsMap.set(parseInt(result[0]), result[1]);
+            this.indicators.forEach(indicator => {
+                api.indicatorResultsTable(indicator.pk, true).then(resultsHTML => {
+                    runInAction(() => {
+                        this.deleteResultsHTML(indicator.pk);
+                        this.resultsMap.set(indicator.pk, resultsHTML);
+                        return true;
                     });
-                    return true;
                 });
             });
         },
