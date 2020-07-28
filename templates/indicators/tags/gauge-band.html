@@ -4,18 +4,18 @@
         {% trans "Indicators on track" %}
     </h6>
     <div class="gauge__overview">
-        <div class="gauge__graphic gauge__graphic--performance-band">
+        <div class="gauge__graphic gauge__graphic--performance-band{% if results_count == 0 or scope_percents.reporting == 0 %} gauge__graphic--empty{% endif %}">
             <div class="graphic__tick-marks">
                 {% for i in ticks %}
                 <div class="graphic__tick"></div>
                 {% endfor %}
             </div>
             <div class="graphic__performance-band--above-target"
-                 style="flex-basis: {{ scope_percents.high }}%"></div>
+                 style="height: {{ scope_percents.high }}%"></div>
             <div class="graphic__performance-band--on-target"
-                 style="flex-basis: {{ scope_percents.on_scope }}%"></div>
+                 style="height: {{ scope_percents.on_scope }}%"></div>
             <div class="graphic__performance-band--below-target"
-                 style="flex-basis: {{ scope_percents.low }}%"></div>
+                 style="height: {{ scope_percents.low }}%"></div>
         </div>
         {% if results_count > 0 and scope_percents.reporting > 0 %}
         <div class="gauge__labels">
