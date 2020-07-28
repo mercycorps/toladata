@@ -358,8 +358,10 @@ class UserAdminSerializer(ModelSerializer):
         org_name = Organization.objects.get(id=data['organization_id']).name
         email_domain_is_mc = re.search("@mercycorps.org$",  data["user"]["email"])
         if org_name == "Mercy Corps" and not email_domain_is_mc:
+            # Translators:  Error message given when an administrator tries to save a bad combination of organization and email
             raise ValidationError({"email": _("Non-Mercy Corps emails should not be used with the Mercy Corps organization.")})
         elif org_name != "Mercy Corps" and email_domain_is_mc:
+            # Translators:  Error message given when an administrator tries to save a bad combination of organization and email
             raise ValidationError({"email": _("Mercy Corps accounts are managed by Single sign-on (SSO). Mercy Corps employees should login using their SSO username and password.")})
         return out_data
 
