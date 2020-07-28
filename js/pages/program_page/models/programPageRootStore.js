@@ -79,6 +79,16 @@ export default class ProgramPageRootStore {
     get indicators() {
         return this.filterIndicators(this.uiStore.currentIndicatorFilter, this.uiStore.selectedIndicatorId);
     }
+
+    @computed
+    get allExpanded() {
+        return this.indicators.every(indicator => this.program.resultsMap.has(indicator.pk));
+    }
+
+    @computed
+    get allCollapsed() {
+        return this.indicators.every(indicator => !this.program.resultsMap.has(indicator.pk));
+    }
     
     @computed
     get allIndicators() {
