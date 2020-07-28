@@ -1001,39 +1001,6 @@ def result_view(request, indicator, program):
     )
 
 @login_required
-@has_program_read_access
-def all_results_view(request, program):
-    """Returns a JSON array of (indicatorPk, resultsHTMLString) tuples for every indicator in a program"""
-    indicators = ResultsIndicator.results_view.filter(program_id=program)
-    if not indicators:
-        return JsonResponse({'results': []}, status=204)
-    template_name = 'indicators/result_table.html'
-    program_obj = indicators[0].program
-    on_track_lower = 100 - 100 * Indicator.ONSCOPE_MARGIN
-    on_track_upper = 100 + 100 * Indicator.ONSCOPE_MARGIN
-    is_editable = False if request.GET.get('edit') == 'false' else True
-    readonly = not request.has_write_access
-    results = []
-    for indicator in indicators:
-        reset_indicator_target_frequency(indicator)
-        on_track = (indicator.lop_percent_met and on_track_lower <= indicator.lop_percent_met and
-                    indicator.lop_percent_met <= on_track_upper)
-        results_str = render_to_string(
-            template_name,
-            {
-                'indicator': indicator,
-                'periodictargets': indicator.annotated_targets,
-                'program_id': program_obj.pk,
-                'program': program_obj,
-                'is_editable': is_editable,
-                'on_track': on_track,
-                'readonly': readonly
-            }, request)
-        results.append((indicator.pk, results_str))
-    return JsonResponse({'results': results}, status=200)
-
-
-@login_required
 def indicator_plan(request, program):
     """
     This is the GRID report or indicator plan for a program.
