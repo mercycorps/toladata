@@ -97,7 +97,7 @@ export default class EditUserPrograms extends React.Component {
             filtered_countries: countries,
             filtered_programs: programs,
             ordered_country_ids: store.ordered_country_ids,
-            flattened_programs: flattened_listing(store.ordered_country_ids.filter(id => id in countries).map(id => countries[id]), programs, this.countryStore.isExpanded.bind(this.countryStore)),
+            flattened_programs: flattened_listing(store.ordered_country_ids.filter(id => id in countries).map(id => countries[id]), programs, this.isExpanded.bind(this, '')),
             original_user_program_access: create_user_access(store.editing_target_data.access),
             user_program_access: create_user_access(store.editing_target_data.access)
         }
@@ -119,14 +119,14 @@ export default class EditUserPrograms extends React.Component {
             this.state.program_filter
         )
 
-
+        const val = this.state.program_filter;
         this.setState({
             countries: countries_obj,
             programs: programs_obj,
             filtered_countries: countries,
             filtered_programs: programs,
             ordered_country_ids: store.ordered_country_ids,
-            flattened_programs: flattened_listing(store.ordered_country_ids.filter(id => id in countries).map(id => countries[id]), programs, this.countryStore.isExpanded.bind(this.countryStore)),
+            flattened_programs: flattened_listing(store.ordered_country_ids.filter(id => id in countries).map(id => countries[id]), programs, this.isExpanded.bind(this, val)),
             original_user_program_access: create_user_access(store.editing_target_data.access),
             user_program_access: create_user_access(store.editing_target_data.access)
         }, () => this.hasUnsavedDataAction())
@@ -308,7 +308,7 @@ export default class EditUserPrograms extends React.Component {
             program_filter: val,
             filtered_programs: programs,
             filtered_countries: countries,
-            flattened_programs: flattened_listing(this.state.ordered_country_ids.filter(id => id in countries).map(id => countries[id]), programs, this.countryStore.isExpanded.bind(this.countryStore)),
+            flattened_programs: flattened_listing(this.state.ordered_country_ids.filter(id => id in countries).map(id => countries[id]), programs, this.isExpanded.bind(this, val)),
         })
     }
 
@@ -324,7 +324,7 @@ export default class EditUserPrograms extends React.Component {
             program_filter: val,
             filtered_programs: programs,
             filtered_countries: countries,
-            flattened_programs: flattened_listing(this.state.ordered_country_ids.filter(id => id in countries).map(id => countries[id]), programs, this.countryStore.isExpanded.bind(this.countryStore)),
+            flattened_programs: flattened_listing(this.state.ordered_country_ids.filter(id => id in countries).map(id => countries[id]), programs, this.isExpanded.bind(this, val)),
         })
     }
 
@@ -337,9 +337,11 @@ export default class EditUserPrograms extends React.Component {
             this.state.program_filter
         )
 
+        const val = this.state.program_filter;
+
         this.setState({
             filtered_countries: countries,
-            flattened_programs: flattened_listing(this.state.ordered_country_ids.filter(id => id in countries).map(id => countries[id]), this.state.filtered_programs, this.countryStore.isExpanded.bind(this.countryStore)),
+            flattened_programs: flattened_listing(this.state.ordered_country_ids.filter(id => id in countries).map(id => countries[id]), this.state.filtered_programs, this.isExpanded.bind(this, val)),
         })
     }
 
@@ -351,11 +353,19 @@ export default class EditUserPrograms extends React.Component {
             filtered_countries,
             this.state.program_filter
         )
+        const val = this.state.program_filter;
 
         this.setState({
             filtered_countries: countries,
-            flattened_programs: flattened_listing(this.state.ordered_country_ids.filter(id => id in countries).map(id => countries[id]), this.state.filtered_programs, this.countryStore.isExpanded.bind(this.countryStore)),
+            flattened_programs: flattened_listing(this.state.ordered_country_ids.filter(id => id in countries).map(id => countries[id]), this.state.filtered_programs, this.isExpanded.bind(this, val)),
         });
+    }
+
+    isExpanded(program_filter, countryId) {
+        if (program_filter && program_filter.length > 0) {
+            return true;
+        }
+        return this.countryStore.isExpanded(countryId);
     }
 
     render() {
@@ -483,7 +493,7 @@ export default class EditUserPrograms extends React.Component {
                                     disabled: is_check_disabled(rowData),
                                     id: rowData.id,
                                     type: rowData.type,
-                                    expanded: (rowData.type == "country") ? this.countryStore.isExpanded(rowData.id) : false,
+                                    expanded: (rowData.type == "country") ? this.state.program_filter || this.countryStore.isExpanded(rowData.id) : false,
                                     programsCount: (rowData.type == "country") ? rowData.programs.size : null,
                                     action: (rowData.type == "country")?this.toggleAllProgramsForCountry.bind(this):this.toggleProgramAccess.bind(this)
                                 })}
@@ -509,7 +519,7 @@ export default class EditUserPrograms extends React.Component {
                                 flexGrow={2}
                                 className='pl-0'
                                 cellDataGetter={({rowData}) => ({
-                                    expanded: (rowData.type == "country") ? this.countryStore.isExpanded(rowData.id) : false,
+                                    expanded: (rowData.type == "country") ? this.state.program_filter || this.countryStore.isExpanded(rowData.id) : false,
                                     programsCount: (rowData.type == "country") ? rowData.programs.size : null,
                                     expandoAction: (rowData.type == "country") ? this.toggleCountryExpanded.bind(this, rowData.id):null,
                                     bold: rowData.type == "country", name: rowData.name
