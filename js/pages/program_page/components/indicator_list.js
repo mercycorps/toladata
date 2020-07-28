@@ -274,7 +274,7 @@ export class IndicatorListTable extends React.Component {
 }
 
 
-const IndicatorListTableButtons = observer(function ({program, readonly, rootStore, ...props}) {
+const IndicatorListTableButtons = observer(function ({program, rootStore, ...props}) {
     return (
         <div className="indicator-list__buttons-row">
             <div className="expand-collapse-buttons">
@@ -283,7 +283,7 @@ const IndicatorListTableButtons = observer(function ({program, readonly, rootSto
             </div>
             <div className="indicator-list__add-indicator-button">
                 {!readonly &&
-                <AddIndicatorButton readonly={readonly} programId={program.pk}/>
+                <AddIndicatorButton readonly={rootStore.readonly} programId={program.pk}/>
                 }
             </div>
         </div>
@@ -301,7 +301,7 @@ const IndicatorList = observer(function (props) {
                       filterApplied={ props.uiStore.filterApplied }
                       />
         <IndicatorFilter uiStore={props.uiStore} rootStore={props.rootStore} />
-        <IndicatorListTableButtons program={program} readonly={props.rootStore.readOnly} rootStore={props.rootStore} />
+        <IndicatorListTableButtons program={program} rootStore={props.rootStore} />
 
         {program.needsAdditionalTargetPeriods &&
             <div id="id_missing_targets_msg" className="color-red">
