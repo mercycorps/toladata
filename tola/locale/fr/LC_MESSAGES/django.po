@@ -2,8 +2,8 @@ msgid ""
 msgstr ""
 "Project-Id-Version: \n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2020-07-27 11:05-0700\n"
-"PO-Revision-Date: 2020-07-27 11:04-0700\n"
+"POT-Creation-Date: 2020-07-30 11:12-0700\n"
+"PO-Revision-Date: 2020-07-30 09:51+0200\n"
 "Last-Translator: \n"
 "Language-Team: \n"
 "Language: fr\n"
@@ -251,7 +251,6 @@ msgid "Direction of change"
 msgstr "Direction du changement"
 
 #: indicators/forms.py:354
-#, fuzzy
 msgid "Multiple submissions detected"
 msgstr "Plusieurs soumissions détectées"
 
@@ -538,7 +537,6 @@ msgstr "Département du Développement International (DFID)"
 
 #. Translators: Highest level objective of a project.  High level KPIs can be attached here.
 #: indicators/models.py:323
-#, fuzzy
 msgid "Impact"
 msgstr "Impact"
 
@@ -626,9 +624,8 @@ msgstr "Échelon"
 
 #. Translators: Indicators are assigned to Levels.  Levels are organized in a hierarchy of Tiers.  There are several templates that users can choose from with different names for the Tiers.
 #: indicators/models.py:422
-#, fuzzy
 msgid "Level tier templates"
-msgstr "Modèles de niveaux"
+msgstr "Modèles d'échelons"
 
 #: indicators/models.py:483
 msgid "Sex and Age Disaggregated Data (SADD)"
@@ -1246,33 +1243,27 @@ msgid "Your request could not be processed."
 msgstr "Votre requête n’a pu être traitée."
 
 #: indicators/views/views_results_framework.py:331
-#, fuzzy
 msgid "Result levels must have unique names."
-msgstr "Les niveaux de résultats doivent avoir des noms uniques."
+msgstr "Les niveaux de résultats doivent posséder des noms uniques."
 
 #: indicators/views/views_results_framework.py:334
-#, fuzzy
 msgid "This level is being used in the results framework."
 msgstr "Ce niveau est utilisé dans le cadre de résultats."
 
 #. Translators:  This is a warning message when users have left an input field blank.
 #: indicators/views/views_results_framework.py:339
-#, fuzzy
 msgid "Level names should not be blank"
 msgstr "Les noms de niveau ne doivent pas être vides"
 
 #: templates/400.html:4
-#, fuzzy
 msgid "Error 400: bad request"
-msgstr "Erreur 400: mauvaise demande"
+msgstr "Erreur 400 : Requête incorrecte"
 
 #: templates/400.html:8
-#, fuzzy
 msgid "There was a problem related to the web browser"
-msgstr "Un problème est lié au navigateur Web"
+msgstr "Un problème lié au navigateur Web a été trouvé"
 
 #: templates/400.html:13
-#, fuzzy
 msgid ""
 "\n"
 "<p>\n"
@@ -1292,7 +1283,7 @@ msgstr ""
 "<p>\n"
 "    Un problème est survenu lors du chargement de cette page, probablement à "
 "cause de la demande envoyée par votre navigateur Web. Nous sommes désolés "
-"pour le problème.\n"
+"pour la gêne occasionnée.\n"
 "</p>\n"
 "<p>\n"
 "    Veuillez essayer de recharger la page. Si ce problème persiste, <a href="
@@ -1300,7 +1291,7 @@ msgstr ""
 "\">contactez l'équipe TolaData.</a>\n"
 "</p>\n"
 "<p>\n"
-"    <code class=\"text-secondary\">[Erreur 400: mauvaise demande]</code>\n"
+"    <code class=\"text-secondary\">[Erreur 400 : Requête incorrecte]</code>\n"
 "</p>\n"
 
 #: templates/403.html:4
@@ -1308,38 +1299,32 @@ msgid "Additional Permissions Required"
 msgstr "Autorisations supplémentaires requises"
 
 #: templates/403.html:8
-#, fuzzy
 msgid "You need permission to view this page"
 msgstr "Vous avez besoin d'une autorisation pour afficher cette page"
 
 #: templates/403.html:13
-#, fuzzy
 msgid ""
 "You can request permission from your country's TolaData Administrator. If "
 "you do not know your TolaData Administrator, consult your supervisor."
 msgstr ""
 "Vous pouvez demander l’autorisation à l’administrateur TolaData de votre "
-"pays. Si vous ne connaissez pas votre administrateur TolaData, consultez "
-"votre superviseur."
+"pays. Si vous ne le connaissez pas, consultez votre superviseur."
 
 #: templates/403.html:15
-#, fuzzy
 msgid ""
 "If you need further assistance, please <a href=\"https://learn.mercycorps."
 "org/index.php/TOLA:Section_06/en\" target=\"_blank\">contact the TolaData "
 "Team</a>."
 msgstr ""
-"Si vous avez besoin d’une assistance supplémentaire, veuillez <a href="
-"\"https://learn.mercycorps.org/index.php/TOLA:Section_06/fr\" target=\"_blank"
-"\">contacter l’équipe TolaData</a>."
+"Pour toute assistance supplémentaire, veuillez <a href=\"https://learn."
+"mercycorps.org/index.php/TOLA:Section_06/fr\" target=\"_blank\">contacter "
+"l’équipe TolaData</a>."
 
 #: templates/404.html:4 templates/404.html:8
-#, fuzzy
 msgid "Page not found"
 msgstr "Page non trouvée"
 
 #: templates/404.html:13
-#, fuzzy
 msgid ""
 "\n"
 "<p>\n"
@@ -1350,24 +1335,21 @@ msgid ""
 msgstr ""
 "\n"
 "<p>\n"
-"    Nous ne pouvons pas trouver la page que vous essayez de visiter. Si ce "
-"problème persiste, veuillez <a href=\"https://learn.mercycorps.org/index.php/"
-"TOLA:Section_06/fr\" target=\"_blank\">contacter l'équipe TolaData.</a>\n"
+"    Nous ne parvenons pas à trouver la page que vous tentez de consulter. Si "
+"ce problème persiste, veuillez <a href=\"https://learn.mercycorps.org/index."
+"php/TOLA:Section_06/fr\" target=\"_blank\">contacter l'équipe TolaData.</a>\n"
 "</p>\n"
 
 #: templates/500.html:4
-#, fuzzy
 msgid "Error 500: internal server error"
-msgstr "Erreur 500 - Erreur interne du serveur"
+msgstr "Erreur 500 : Erreur interne du serveur"
 
 #. Translators: Page title for an error page where the error happend on the web server.
 #: templates/500.html:9
-#, fuzzy
 msgid "There was a server-related problem"
-msgstr "Il y a eu un problème lié au serveur"
+msgstr "Un problème lié au serveur est survenu"
 
 #: templates/500.html:14
-#, fuzzy
 msgid ""
 "\n"
 "<p>\n"
@@ -1387,7 +1369,7 @@ msgstr ""
 "\n"
 "<p>\n"
 "    Un problème est survenu lors du chargement de cette page, probablement "
-"avec le serveur. Nous sommes désolés pour le problème.\n"
+"avec le serveur. Nous sommes désolés pour la gêne occasionnée.\n"
 "</p>\n"
 "<p>\n"
 "    Si vous avez besoin d'aide, veuillez <a href=\"https://learn.mercycorps."
@@ -1395,7 +1377,7 @@ msgstr ""
 "TolaData.</a>\n"
 "</p>\n"
 "<p>\n"
-"    <code class=\"text-secondary\">[Erreur 500: Erreur interne du serveur]</"
+"    <code class=\"text-secondary\">[Erreur 500 : Erreur interne du serveur]</"
 "code>\n"
 "</p>\n"
 
@@ -1558,7 +1540,6 @@ msgid "No available programs"
 msgstr "Aucun programme disponible"
 
 #: templates/home.html:11
-#, fuzzy
 msgid "Browse all sites"
 msgstr "Parcourir tous les sites"
 
@@ -1981,9 +1962,8 @@ msgid "Please complete this field."
 msgstr "Veuillez compléter ce champ."
 
 #: templates/indicators/indicator_form_common_js.html:919
-#, fuzzy
 msgid "Please enter an indicator with fewer than 500 characters."
-msgstr "Veuillez entrer un indicateur de moins de 500 caractères."
+msgstr "Veuillez saisir un indicateur de moins de 500 caractères."
 
 #: templates/indicators/indicator_form_common_js.html:954
 #: templates/indicators/indicator_form_common_js.html:956
@@ -2529,14 +2509,12 @@ msgstr ""
 
 #: templates/indicators/result_form_common_js.html:402
 #: templates/indicators/results/result_form_disaggregation_fields.html:72
-#, fuzzy
 msgid "The sum of disaggregated values does not match the actual value."
 msgstr "La somme des valeurs désagrégées ne correspond pas à la valeur réelle."
 
 #: templates/indicators/result_form_common_js.html:403
-#, fuzzy
 msgid "For future reference, please share your reason for these variations."
-msgstr "Pour référence future, veuillez partager la raison de ces variations."
+msgstr "À titre d'information, veuillez partager la raison de ces variations."
 
 #: templates/indicators/result_form_modal.html:136
 #: templates/indicators/result_table.html:29
@@ -2738,14 +2716,13 @@ msgstr "Afficher le cadre logique"
 
 #. Translators: This is help text to explain why a link to the Logframe page is disabled.
 #: templates/indicators/results_framework_page.html:32
-#, fuzzy
 msgid ""
 "Indicators are currently grouped by an older version of indicator levels. To "
 "group indicators according to the results framework and view the Logframe, "
 "an admin will need to adjust program settings."
 msgstr ""
 "Les indicateurs sont actuellement regroupés selon une précédente version de "
-"niveaux d’indicateur. Afin de regrouper les indicateurs selon le cadre de "
+"niveaux d’indicateur. Pour qu'ils soient regroupés selon le cadre de "
 "résultats et afficher le cadre logique, les paramètres du programme devront "
 "être modifiés par un administrateur."
 
@@ -3155,20 +3132,18 @@ msgstr "Langue"
 
 #. Translators: Explanation of how language selection will affect number formatting within the app
 #: templates/registration/profile.html:34
-#, fuzzy
 msgid ""
 "Your language selection determines the number format expected when you enter "
 "targets and results. Your language also determines how numbers are displayed "
 "on the program page and reports, including Excel exports."
 msgstr ""
 "Votre sélection de langue détermine le format de nombre attendu lorsque vous "
-"entrez des cibles et des résultats. Votre langue détermine également la "
+"saisissez des cibles et des résultats. Votre langue détermine également la "
 "façon dont les nombres sont affichés sur la page du programme et les "
 "rapports, y compris les exportations Excel."
 
 #. Translators: Column header in a table.  Row entries are different ways number can be formatted (e.g. what punctuation mark to use as a decimal point)
 #: templates/registration/profile.html:39
-#, fuzzy
 msgid "Number formatting conventions"
 msgstr "Conventions de formatage des nombres"
 
@@ -3185,13 +3160,11 @@ msgid "Spanish"
 msgstr "Espanol"
 
 #: templates/registration/profile.html:49
-#, fuzzy
 msgid "Decimal separator"
 msgstr "Séparateur décimal"
 
 #. Translators: Subtext of "Decimal separator", explains that language selection will affect the decimal separator for both form entry and number display.
 #: templates/registration/profile.html:51
-#, fuzzy
 msgid "Applies to number entry and display"
 msgstr "S’applique à la saisie et à l’affichage des numéros"
 
@@ -3206,25 +3179,21 @@ msgstr "Point"
 #: templates/registration/profile.html:60
 #: templates/registration/profile.html:65
 #: templates/registration/profile.html:78
-#, fuzzy
 msgid "Comma"
 msgstr "Virgule"
 
 #. Translators: Row descriptor in a table that describes how language selection will affect number formats, in this case what punctuation mark is used to separate thousands, millions, etc....
 #: templates/registration/profile.html:72
-#, fuzzy
 msgid "Thousands separator"
 msgstr "Séparateur de milliers"
 
 #. Translators: Subtext of "Thousands separator", explains that language selection will affect the thousands separator only for number display purposes, not on entry of numbers into a form.
 #: templates/registration/profile.html:74
-#, fuzzy
 msgid "Applies only to number display"
 msgstr "S'applique uniquement à l'affichage des nombres"
 
 #. Translators: The whitespace used to separate thousands in large numbers in French
 #: templates/registration/profile.html:83
-#, fuzzy
 msgid "Space"
 msgstr "Espace"
 
@@ -3284,9 +3253,8 @@ msgid "Achieved"
 msgstr "Effectué"
 
 #: templates/workflow/site_indicatordata.html:36
-#, fuzzy
 msgid "There is no indicator data for this site."
-msgstr "Il n’y a pas de données d’indicateur pour ce site."
+msgstr "Il n’y a pas de données d’indicateur disponibles pour ce site."
 
 #: templates/workflow/site_profile_list.html:39
 msgid "Site Profile Map and List"
@@ -3334,9 +3302,9 @@ msgid "Confirm Delete"
 msgstr "Confirmer Supprimer"
 
 #: templates/workflow/siteprofile_confirm_delete.html:8
-#, fuzzy, python-format
+#, python-format
 msgid "Are you sure you want to delete \"%(object)s\"?"
-msgstr "Êtes-vous sûr de vouloir supprimer \\\"%(object)s\\\" ?"
+msgstr "Voulez-vous vraiment supprimer \\\"%(object)s\\\" ?"
 
 #: templates/workflow/siteprofile_confirm_delete.html:9
 msgid "Confirm"
@@ -3454,51 +3422,43 @@ msgstr "Profil de l’utilisateur mis à jour"
 
 #. Translators: this is an alternative to picking a reason from a dropdown
 #: tola_management/models.py:258
-#, fuzzy
 msgid "Other (please specify)"
 msgstr "Autre (veuillez préciser)"
 
 #. Translators: this is one option in a dropdown list of reasons to change a program's details while in progress
 #: tola_management/models.py:260
-#, fuzzy
 msgid "Adaptive management"
 msgstr "Gestion adaptative"
 
 #. Translators: this is one option in a dropdown list of reasons to change a program's details while in progress
 #: tola_management/models.py:262
-#, fuzzy
 msgid "Budget realignment"
 msgstr "Réalignement du budget"
 
 #. Translators: this is one option in a dropdown list of reasons to change a program's details while in progress
 #: tola_management/models.py:264
-#, fuzzy
 msgid "Changes in context"
-msgstr "Changements dans le contexte"
+msgstr "Changements en contexte"
 
 #. Translators: this is one option in a dropdown list of reasons to change a program's details while in progress
 #: tola_management/models.py:266
-#, fuzzy
 msgid "Costed extension"
-msgstr "Extension financée"
+msgstr "Extension chiffrée"
 
 #. Translators: this is one option in a dropdown list of reasons to change a program's details while in progress
 #: tola_management/models.py:268
-#, fuzzy
 msgid "COVID-19"
 msgstr "COVID-19"
 
 #. Translators: this is one option in a dropdown list of reasons to change a program's details while in progress
 #: tola_management/models.py:270
-#, fuzzy
 msgid "Donor requirement"
-msgstr "Exigence du bailleur de fonds"
+msgstr "Exigence du donateur"
 
 #. Translators: this is one option in a dropdown list of reasons to change a program's details while in progress
 #: tola_management/models.py:272
-#, fuzzy
 msgid "Implementation delays"
-msgstr "Délais de mise en œuvre"
+msgstr "Retards de mise en œuvre"
 
 #: tola_management/models.py:327
 msgid "Unit of measure type"
@@ -3796,7 +3756,6 @@ msgid "Primary Mode of Contact"
 msgstr "Moyen de communication principal"
 
 #: workflow/models.py:110
-#, fuzzy
 msgid "Region Name"
 msgstr "Nom de la région"
 
@@ -4167,7 +4126,7 @@ msgid "by %(tier)s chain"
 msgstr "par chaîne %(tier)s"
 
 #: workflow/serializers_new/iptt_program_serializers.py:184
-#, fuzzy, python-format
+#, python-format
 msgid "%(tier)s Chain"
 msgstr "Chaîne %(tier)s"
 

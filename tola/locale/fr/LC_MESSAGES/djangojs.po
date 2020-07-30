@@ -2,8 +2,8 @@ msgid ""
 msgstr ""
 "Project-Id-Version: \n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2020-07-27 11:05-0700\n"
-"PO-Revision-Date: 2020-07-27 10:27-0700\n"
+"POT-Creation-Date: 2020-07-30 11:18-0700\n"
+"PO-Revision-Date: 2020-07-30 09:17+0200\n"
 "Last-Translator: \n"
 "Language-Team: \n"
 "Language: fr\n"
@@ -80,7 +80,6 @@ msgstr "Attention"
 #: js/base.js:541 js/components/changesetNotice.js:19
 #: js/pages/results_framework/components/level_cards.js:404
 #: js/pages/tola_management_pages/audit_log/views.js:239
-#, fuzzy
 msgid "Reason for change"
 msgstr "Raison du changement"
 
@@ -150,7 +149,6 @@ msgstr "Nouvelle entrée"
 
 #. Translators: This is the label for a textbox where a user can provide details about their reason for selecting a particular option
 #: js/components/changesetNotice.js:118
-#, fuzzy
 msgid "Details"
 msgstr "Détails"
 
@@ -270,7 +268,6 @@ msgid "Department for International Development (DFID)"
 msgstr "Département du Développement International (DFID)"
 
 #: js/level_utils.js:26
-#, fuzzy
 msgid "Impact"
 msgstr "Impact"
 
@@ -754,7 +751,6 @@ msgstr[1] "%s indicateurs"
 
 #. Translators: A link that shows all the indicators, some of which are currently filtered from view
 #: js/pages/program_page/components/indicator_list.js:87
-#, fuzzy
 msgid "Show all indicators"
 msgstr "Afficher tous les indicateurs"
 
@@ -772,7 +768,6 @@ msgstr "Regrouper les indicateurs :"
 
 #. Translators: Adj: labels this indicator as one which is missing one or more targets */
 #: js/pages/program_page/components/indicator_list.js:256
-#, fuzzy
 msgid "Missing targets"
 msgstr "Cibles manquantes"
 
@@ -1057,19 +1052,18 @@ msgstr "Appliquer"
 
 #. Translators: This is the help text of an icon that indicates that this element can't be deleted */
 #: js/pages/results_framework/components/level_tier_lists.js:125
-#, fuzzy
 msgid "This level is being used in the results framework"
 msgstr "Ce niveau est utilisé dans le cadre de résultats"
 
 #. Translators: This is one of several user modifiable fields, e.g. "Level 1", "Level 2", etc... Level 1 is the top of the hierarchy, Level six is the bottom.*/
 #: js/pages/results_framework/components/level_tier_lists.js:137
-#, fuzzy, python-format
+#, python-format
 msgid "Level %s"
 msgstr "Niveau %s"
 
 #. Translators: Warning message displayed to users explaining why they can't change a setting they could change before.
 #: js/pages/results_framework/components/leveltier_picker.js:31
-#, fuzzy, python-format
+#, python-format
 msgid ""
 "<span class=\"text-danger\"><strong>The results framework template is locked "
 "as soon as the first %(secondTier)s is saved.</strong></span> To change "
@@ -1077,7 +1071,7 @@ msgid ""
 "%(firstTier)s. A level can only be deleted when it has no sub-levels and no "
 "linked indicators."
 msgstr ""
-"<span class=\"text-danger\"><strong>Le modèle de structure de résultats est "
+"<span class=\"text-danger\"><strong>Le modèle de cadre de résultats est "
 "verrouillé dès que le premier %(secondTier)s est enregistré.</strong></span> "
 "Pour modifier les modèles, tous les niveaux enregistrés doivent être "
 "supprimés, à l'exception des %(firstTier)s d'origine. Un niveau ne peut être "
@@ -1095,7 +1089,6 @@ msgstr "Personnalisé"
 #. Translators: Notification to user that the update they initiated was successful */
 #: js/pages/results_framework/models.js:145
 #: js/pages/results_framework/models.js:243
-#, fuzzy
 msgid "Changes to the results framework template were saved."
 msgstr ""
 "Les modifications apportées au modèle de cadre de résultats ont été "
@@ -1151,15 +1144,13 @@ msgstr "Les modifications apportées à %s n’ont pas été enregistrées"
 
 #. Translators: This is a warning messages when a user has entered duplicate names for two different objects */
 #: js/pages/results_framework/models.js:756
-#, fuzzy
 msgid "Result levels should not contain commas."
 msgstr "Les niveaux de résultats ne doivent pas contenir de virgules."
 
 #. Translators: This is a warning messages when a user has a comma in a name that shouldn't contain commas */
 #: js/pages/results_framework/models.js:761
-#, fuzzy
 msgid "Result levels must have unique names."
-msgstr "Les niveaux de résultats doivent avoir des noms uniques."
+msgstr "Les niveaux de résultats doivent posséder des noms uniques."
 
 #: js/pages/tola_management_pages/audit_log/views.js:77
 msgid "Targets changed"
@@ -1311,15 +1302,15 @@ msgstr "Sélectionné par défaut"
 
 #. Translators: Help text for the "selected by default" checkbox on the disaggregation form
 #: js/pages/tola_management_pages/country/components/edit_disaggregations.js:336
-#, fuzzy, python-format
+#, python-format
 msgid ""
 "When adding a new program indicator, this disaggregation will be selected by "
 "default for every program in %s. The disaggregation can be manually removed "
 "from an indicator on the indicator setup form."
 msgstr ""
-"Lors de l'ajout d'un nouvel indicateur de programme, cette ventilation sera "
-"sélectionnée par défaut pour chaque programme dans %s. La ventilation peut "
-"être supprimée manuellement d'un indicateur sur le formulaire de "
+"Lors de l'ajout d'un nouvel indicateur de programme, cette désagrégation "
+"sera sélectionnée par défaut pour chaque programme dans %s. La désagrégation "
+"peut être supprimée manuellement d'un indicateur depuis le formulaire de "
 "configuration de l'indicateur."
 
 #: js/pages/tola_management_pages/country/components/edit_disaggregations.js:339
@@ -1369,7 +1360,7 @@ msgstr ""
 
 #. Translators:  This is a warning popup when the user tries to do something that has broader effects than they might anticipate
 #: js/pages/tola_management_pages/country/components/edit_disaggregations.js:485
-#, fuzzy, python-format
+#, python-format
 msgid ""
 "This disaggregation will be automatically selected for all new indicators in "
 "%s. Existing indicators will be unaffected."
@@ -1379,7 +1370,7 @@ msgstr ""
 
 #. Translators:  This is a warning popup when the user tries to do something that has broader effects than they might anticipate
 #: js/pages/tola_management_pages/country/components/edit_disaggregations.js:499
-#, fuzzy, python-format
+#, python-format
 msgid ""
 "This disaggregation will no longer be automatically selected for all new "
 "indicators in %s. Existing indicators will be unaffected."
@@ -1932,7 +1923,6 @@ msgstr "Échec de l’envoi de l’e-mail de vérification"
 
 #. Translators: a list of groups of countries (i.e. "Asia")
 #: js/pages/tola_management_pages/user/models.js:710
-#, fuzzy
 msgid "Regions"
 msgstr "Régions"
 
