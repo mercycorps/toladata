@@ -2,8 +2,8 @@ msgid ""
 msgstr ""
 "Project-Id-Version: \n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2020-07-30 11:12-0700\n"
-"PO-Revision-Date: 2020-07-30 09:51+0200\n"
+"POT-Creation-Date: 2020-07-30 15:47-0700\n"
+"PO-Revision-Date: 2020-07-30 15:46-0700\n"
 "Last-Translator: \n"
 "Language-Team: \n"
 "Language: fr\n"
@@ -2147,7 +2147,7 @@ msgstr ""
 
 #: templates/indicators/indicator_reportingperiod_modal.html:99
 #: templates/indicators/result_form_modal.html:154
-#: templates/registration/profile.html:99 tola/forms.py:26
+#: templates/registration/profile.html:98 tola/forms.py:26
 #: workflow/forms.py:122
 msgid "Save changes"
 msgstr "Sauvegarder les modifications"
@@ -2159,7 +2159,7 @@ msgstr "Retour à la page d’accueil"
 #: templates/indicators/indicator_reportingperiod_modal.html:104
 #: templates/indicators/iptt_filter_form.html:134
 #: templates/indicators/result_form_modal.html:155
-#: templates/registration/profile.html:104 workflow/forms.py:123
+#: templates/registration/profile.html:103 workflow/forms.py:123
 msgid "Reset"
 msgstr "Réinitialiser"
 
@@ -3159,41 +3159,42 @@ msgstr "Français"
 msgid "Spanish"
 msgstr "Espanol"
 
-#: templates/registration/profile.html:49
+#. Translators: Row descriptor in a table that describes how language selection will affect number formats, in this case what punctuation mark is used as the decimal point.
+#: templates/registration/profile.html:48
 msgid "Decimal separator"
 msgstr "Séparateur décimal"
 
 #. Translators: Subtext of "Decimal separator", explains that language selection will affect the decimal separator for both form entry and number display.
-#: templates/registration/profile.html:51
+#: templates/registration/profile.html:50
 msgid "Applies to number entry and display"
 msgstr "S’applique à la saisie et à l’affichage des numéros"
 
 #. Translators: The punctuation mark used as a decimal point in English
-#: templates/registration/profile.html:55
-#: templates/registration/profile.html:88
+#: templates/registration/profile.html:54
+#: templates/registration/profile.html:87
 msgctxt "radix"
 msgid "Period"
 msgstr "Point"
 
 #. Translators: The punctuation mark used as a decimal point in French, Spanish
-#: templates/registration/profile.html:60
-#: templates/registration/profile.html:65
-#: templates/registration/profile.html:78
+#: templates/registration/profile.html:59
+#: templates/registration/profile.html:64
+#: templates/registration/profile.html:77
 msgid "Comma"
 msgstr "Virgule"
 
 #. Translators: Row descriptor in a table that describes how language selection will affect number formats, in this case what punctuation mark is used to separate thousands, millions, etc....
-#: templates/registration/profile.html:72
+#: templates/registration/profile.html:71
 msgid "Thousands separator"
 msgstr "Séparateur de milliers"
 
 #. Translators: Subtext of "Thousands separator", explains that language selection will affect the thousands separator only for number display purposes, not on entry of numbers into a form.
-#: templates/registration/profile.html:74
+#: templates/registration/profile.html:73
 msgid "Applies only to number display"
 msgstr "S'applique uniquement à l'affichage des nombres"
 
 #. Translators: The whitespace used to separate thousands in large numbers in French
-#: templates/registration/profile.html:83
+#: templates/registration/profile.html:82
 msgid "Space"
 msgstr "Espace"
 
@@ -3631,21 +3632,56 @@ msgstr "Nouvelle entrée"
 msgid "Rationale"
 msgstr "Justification"
 
-#: tola_management/views.py:268
+#: tola_management/views.py:269
 msgid "Mercy Corps - Tola New Account Registration"
 msgstr "Enregistrement d’un nouveau compte Mercy Corps - Tola"
 
-#: tola_management/views.py:364 tola_management/views.py:367
-#: tola_management/views.py:378 tola_management/views.py:381
-msgid "This field must be unique"
-msgstr "Ce champ doit être unique"
+#. Translators: Error message given when an administrator tries to save a username that is already taken
+#: tola_management/views.py:367 tola_management/views.py:379
+msgid "A user account with this username already exists."
+msgstr "Un compte utilisateur avec ce nom d’utilisateur existe déjà."
 
-#: tola_management/views.py:392
+#. Translators: Error message given when an administrator tries to save a email that is already taken
+#: tola_management/views.py:371 tola_management/views.py:383
+msgid "A user account with this email address already exists."
+msgstr "Un compte utilisateur avec cette adresse e-mail existe déjà."
+
+#. Translators:  Error message given when an administrator tries to save a bad combination of organization and email
+#: tola_management/views.py:389
+msgid ""
+"Non-Mercy Corps emails should not be used with the Mercy Corps organization."
+msgstr ""
+"Les e-mails non-Mercy Corps ne doivent pas être utilisés avec l’organisation "
+"Mercy Corps."
+
+#. Translators:  Error message given when an administrator tries to save a bad combination of organization and email
+#: tola_management/views.py:393
+msgid ""
+"A user account with this email address already exists. Mercy Corps accounts "
+"are managed by Okta. Mercy Corps employees should log in using their Okta "
+"username and password."
+msgstr ""
+"Un compte utilisateur avec cette adresse e-mail existe déjà. Les comptes "
+"Mercy Corps sont gérés par Okta. Les employés de Mercy Corps doivent se "
+"connecter en utilisant leur nom d’utilisateur et leur mot de passe Okta."
+
+#. Translators:  Error message given when an administrator tries to save a bad combination of organization and email
+#. Translators:  Error message given when an administrator tries to save an invalid username
+#: tola_management/views.py:396 tola_management/views.py:400
+msgid ""
+"Mercy Corps accounts are managed by Okta. Mercy Corps employees should log "
+"in using their Okta username and password."
+msgstr ""
+"Les comptes Mercy Corps sont gérés par Okta. Les employés de Mercy Corps "
+"doivent se connecter en utilisant leur nom d’utilisateur et leur mot de "
+"passe Okta."
+
+#: tola_management/views.py:411
 msgid "Only superusers can create Mercy Corps staff profiles."
 msgstr ""
 "Seuls les super-utilisateurs peuvent créer des profils d’équipe Mercy Corps."
 
-#: tola_management/views.py:430
+#: tola_management/views.py:449
 msgid "Only superusers can edit Mercy Corps staff profiles."
 msgstr ""
 "Seuls les super-utilisateurs peuvent modifier des profils d’équipe Mercy "
@@ -4186,6 +4222,9 @@ msgstr "Rechercher"
 #: workflow/widgets.py:133
 msgid "City, Country:"
 msgstr "Ville, Pays :"
+
+#~ msgid "This field must be unique"
+#~ msgstr "Ce champ doit être unique"
 
 #~ msgid "Reason for change"
 #~ msgstr "Raison du changement"

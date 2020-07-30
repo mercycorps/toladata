@@ -218,7 +218,7 @@ export class UserStore {
         for (let org of this.organization_selections){
             if (org.label === "Mercy Corps") {
                 runInAction(()=>{
-                    org.label = "Mercy Corps -- managed by Single sign-on (SSO)";
+                    org.label = "Mercy Corps -- managed by Okta";
                     org.isDisabled = disabled;
                 })
                 break;
