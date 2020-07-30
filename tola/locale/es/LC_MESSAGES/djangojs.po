@@ -6,8 +6,8 @@ msgid ""
 msgstr ""
 "Project-Id-Version: \n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2020-07-14 14:08-0700\n"
-"PO-Revision-Date: 2020-07-14 15:01-0700\n"
+"POT-Creation-Date: 2020-07-30 15:20-0700\n"
+"PO-Revision-Date: 2020-07-30 11:52+0100\n"
 "Last-Translator: \n"
 "Language-Team: \n"
 "Language: es\n"
@@ -15,7 +15,7 @@ msgstr ""
 "Content-Type: text/plain; charset=UTF-8\n"
 "Content-Transfer-Encoding: 8bit\n"
 "Plural-Forms: nplurals=2; plural=(n != 1);\n"
-"X-Generator: Poedit 2.3.1\n"
+"X-Generator: Eazy Po 0.9.5.3\n"
 
 #: js/base.js:357 js/base.js:358
 msgid ""
@@ -158,7 +158,7 @@ msgstr "Detalles"
 #. Translators: (preceded by a number) e.g. "4 options selected"
 #. Translators: prefixed with a number, as in "4 selected" displayed on a multi-select
 #: js/components/changesetNotice.js:251
-#: js/components/checkboxed-multi-select.js:99
+#: js/components/checkboxed-multi-select.js:106
 #: js/components/selectWidgets.js:153
 msgid "selected"
 msgstr "seleccionado"
@@ -170,7 +170,7 @@ msgid "None selected"
 msgstr "Ninguno/a Seleccionado"
 
 #. Translators: placeholder text in a search box
-#: js/components/checkboxed-multi-select.js:113
+#: js/components/checkboxed-multi-select.js:120
 msgid "Search"
 msgstr "Buscar"
 
@@ -466,7 +466,7 @@ msgstr "Vista actual"
 msgid "All program data"
 msgstr "Todos los datos del programa"
 
-#: js/pages/iptt_report/components/report/header.js:11
+#: js/pages/iptt_report/components/report/header.js:12
 msgid "Indicator Performance Tracking Table"
 msgstr "Tabla de seguimiento del rendimiento del indicador"
 
@@ -771,7 +771,7 @@ msgstr "Indicadores de grupo:"
 #. Translators: Adj: labels this indicator as one which is missing one or more targets */
 #: js/pages/program_page/components/indicator_list.js:256
 msgid "Missing targets"
-msgstr "Objetivos faltantes"
+msgstr "No hay objetivos"
 
 #: js/pages/program_page/components/indicator_list.js:303
 msgid ""
@@ -1070,7 +1070,7 @@ msgid ""
 "%(firstTier)s. A level can only be deleted when it has no sub-levels and no "
 "linked indicators."
 msgstr ""
-"<span class=\"text-danger\"><strong>La plantilla de marco de resultados se "
+"<span class=\"text-danger\"><strong>La plantilla del marco de resultados se "
 "bloquea tan pronto como se guarda el primer %(secondTier)s.</strong></span> "
 "Para cambiar las plantillas, se deben eliminar todos los niveles guardados, "
 "excepto el %(firstTier)s original. Un nivel solo se puede eliminar cuando no "
@@ -1142,7 +1142,7 @@ msgstr "Los cambios a este/a %s no serán guardados"
 #. Translators: This is a warning messages when a user has entered duplicate names for two different objects */
 #: js/pages/results_framework/models.js:756
 msgid "Result levels should not contain commas."
-msgstr "Los niveles de resultados no deben contener comas."
+msgstr "Los niveles de resultados no pueden contener comas."
 
 #. Translators: This is a warning messages when a user has a comma in a name that shouldn't contain commas */
 #: js/pages/results_framework/models.js:761
@@ -1172,7 +1172,7 @@ msgstr "Usuario"
 
 #: js/pages/tola_management_pages/audit_log/views.js:235
 #: js/pages/tola_management_pages/organization/views.js:110
-#: js/pages/tola_management_pages/user/components/edit_user_profile.js:183
+#: js/pages/tola_management_pages/user/components/edit_user_profile.js:187
 #: js/pages/tola_management_pages/user/views.js:202
 #: js/pages/tola_management_pages/user/views.js:261
 msgid "Organization"
@@ -1199,7 +1199,7 @@ msgstr "ítems"
 #: js/pages/tola_management_pages/organization/components/organization_editor.js:26
 #: js/pages/tola_management_pages/program/components/edit_program_profile.js:70
 #: js/pages/tola_management_pages/program/components/program_editor.js:27
-#: js/pages/tola_management_pages/user/components/edit_user_profile.js:132
+#: js/pages/tola_management_pages/user/components/edit_user_profile.js:136
 #: js/pages/tola_management_pages/user/components/user_editor.js:26
 msgid "Profile"
 msgstr "Perfil"
@@ -1265,8 +1265,8 @@ msgstr "Guardar cambios"
 #: js/pages/tola_management_pages/program/components/program_settings.js:131
 #: js/pages/tola_management_pages/program/views.js:200
 #: js/pages/tola_management_pages/user/components/edit_user_history.js:75
-#: js/pages/tola_management_pages/user/components/edit_user_profile.js:248
-#: js/pages/tola_management_pages/user/components/edit_user_profile.js:254
+#: js/pages/tola_management_pages/user/components/edit_user_profile.js:252
+#: js/pages/tola_management_pages/user/components/edit_user_profile.js:258
 #: js/pages/tola_management_pages/user/views.js:231
 msgid "Reset"
 msgstr "Reiniciar"
@@ -1391,7 +1391,7 @@ msgstr "Propuesto"
 #: js/pages/tola_management_pages/program/views.js:163
 #: js/pages/tola_management_pages/user/components/edit_user_history.js:8
 #: js/pages/tola_management_pages/user/models.js:74
-#: js/pages/tola_management_pages/user/views.js:348
+#: js/pages/tola_management_pages/user/views.js:349
 msgid "Active"
 msgstr "Activo"
 
@@ -1595,7 +1595,7 @@ msgstr "países"
 #: js/pages/tola_management_pages/program/views.js:163
 #: js/pages/tola_management_pages/user/components/edit_user_history.js:9
 #: js/pages/tola_management_pages/user/models.js:75
-#: js/pages/tola_management_pages/user/views.js:348
+#: js/pages/tola_management_pages/user/views.js:349
 msgid "Inactive"
 msgstr "Inactivo"
 
@@ -1624,7 +1624,7 @@ msgid "Primary Contact Phone Number"
 msgstr "Número Telefónico de Contacto Principal"
 
 #: js/pages/tola_management_pages/organization/components/edit_organization_profile.js:200
-#: js/pages/tola_management_pages/user/components/edit_user_profile.js:235
+#: js/pages/tola_management_pages/user/components/edit_user_profile.js:239
 msgid "Preferred Mode of Contact"
 msgstr "Forma de Contacto Preferida"
 
@@ -1662,13 +1662,13 @@ msgstr "Agregar Organización"
 
 #: js/pages/tola_management_pages/organization/views.js:168
 #: js/pages/tola_management_pages/program/views.js:320
-#: js/pages/tola_management_pages/user/views.js:345
+#: js/pages/tola_management_pages/user/views.js:346
 msgid "programs"
 msgstr "programas"
 
 #: js/pages/tola_management_pages/organization/views.js:174
 #: js/pages/tola_management_pages/program/views.js:311
-#: js/pages/tola_management_pages/user/views.js:355
+#: js/pages/tola_management_pages/user/views.js:356
 msgid "users"
 msgstr "usuarios"
 
@@ -1815,81 +1815,81 @@ msgstr "Agregar Programa"
 msgid "Resend Registration Email"
 msgstr "Reenviar Correo Electrónico de Registración"
 
-#: js/pages/tola_management_pages/user/components/edit_user_profile.js:135
+#: js/pages/tola_management_pages/user/components/edit_user_profile.js:139
 msgid "Preferred First Name"
 msgstr "Nombre Preferido"
 
-#: js/pages/tola_management_pages/user/components/edit_user_profile.js:151
+#: js/pages/tola_management_pages/user/components/edit_user_profile.js:155
 msgid "Preferred Last Name"
 msgstr "Apellido Preferido"
 
-#: js/pages/tola_management_pages/user/components/edit_user_profile.js:167
+#: js/pages/tola_management_pages/user/components/edit_user_profile.js:171
 msgid "Username"
 msgstr "Nombre de usuario"
 
-#: js/pages/tola_management_pages/user/components/edit_user_profile.js:199
+#: js/pages/tola_management_pages/user/components/edit_user_profile.js:203
 msgid "Title"
 msgstr "Título"
 
-#: js/pages/tola_management_pages/user/components/edit_user_profile.js:210
+#: js/pages/tola_management_pages/user/components/edit_user_profile.js:214
 msgid "Email"
 msgstr "Correo electrónico"
 
-#: js/pages/tola_management_pages/user/components/edit_user_profile.js:225
+#: js/pages/tola_management_pages/user/components/edit_user_profile.js:229
 msgid "Phone"
 msgstr "Teléfono"
 
-#: js/pages/tola_management_pages/user/components/edit_user_profile.js:246
-#: js/pages/tola_management_pages/user/components/edit_user_profile.js:253
+#: js/pages/tola_management_pages/user/components/edit_user_profile.js:250
+#: js/pages/tola_management_pages/user/components/edit_user_profile.js:257
 msgid "Save changes"
 msgstr "Guardar cambios"
 
-#: js/pages/tola_management_pages/user/components/edit_user_profile.js:247
+#: js/pages/tola_management_pages/user/components/edit_user_profile.js:251
 msgid "Save And Add Another"
 msgstr "Guardar y Agregar otro"
 
-#: js/pages/tola_management_pages/user/components/edit_user_programs.js:17
+#: js/pages/tola_management_pages/user/components/edit_user_programs.js:18
 msgid "Individual programs only"
 msgstr "Solo programas individuales"
 
-#: js/pages/tola_management_pages/user/components/edit_user_programs.js:421
+#: js/pages/tola_management_pages/user/components/edit_user_programs.js:469
 #: js/pages/tola_management_pages/user/components/user_editor.js:32
 msgid "Programs and Roles"
 msgstr "Programas y Roles"
 
 #. Translators: link to learn more about permissions-granting roles a user can be assigned
-#: js/pages/tola_management_pages/user/components/edit_user_programs.js:425
+#: js/pages/tola_management_pages/user/components/edit_user_programs.js:473
 msgid "More information on Program Roles"
 msgstr "Más Información sobre los Roles en los Programas"
 
 #. Translators: This is placeholder text on a dropdown of countries which limit the displayed programs
-#: js/pages/tola_management_pages/user/components/edit_user_programs.js:432
+#: js/pages/tola_management_pages/user/components/edit_user_programs.js:480
 msgid "Filter countries"
 msgstr "Filtrar países"
 
 #. Translators: this is placeholder text on a dropdown of programs which limit the displayed results
-#: js/pages/tola_management_pages/user/components/edit_user_programs.js:438
+#: js/pages/tola_management_pages/user/components/edit_user_programs.js:486
 msgid "Filter programs"
 msgstr "Filtrar programas"
 
 #. Translators: Column header for a checkbox indicating if a user has access to a program */
-#: js/pages/tola_management_pages/user/components/edit_user_programs.js:463
+#: js/pages/tola_management_pages/user/components/edit_user_programs.js:511
 msgid "Has access?"
 msgstr "¿Tiene acceso?"
 
-#: js/pages/tola_management_pages/user/components/edit_user_programs.js:480
+#: js/pages/tola_management_pages/user/components/edit_user_programs.js:530
 msgid "Deselect All"
 msgstr "Deseleccionar todo"
 
-#: js/pages/tola_management_pages/user/components/edit_user_programs.js:480
+#: js/pages/tola_management_pages/user/components/edit_user_programs.js:530
 msgid "Select All"
 msgstr "Seleccionar todo"
 
-#: js/pages/tola_management_pages/user/components/edit_user_programs.js:493
+#: js/pages/tola_management_pages/user/components/edit_user_programs.js:540
 msgid "Countries and Programs"
 msgstr "Países y Programas"
 
-#: js/pages/tola_management_pages/user/components/edit_user_programs.js:509
+#: js/pages/tola_management_pages/user/components/edit_user_programs.js:569
 msgid "Roles and Permissions"
 msgstr "Roles y Permisos"
 
@@ -1902,17 +1902,17 @@ msgid "No"
 msgstr "No"
 
 #. Translators: An email was sent to the user to verify that the email address is valid
-#: js/pages/tola_management_pages/user/models.js:453
+#: js/pages/tola_management_pages/user/models.js:465
 msgid "Verification email sent"
 msgstr "Correo electrónico de verificación enviado"
 
 #. Translators: Sending an email to the user did not work
-#: js/pages/tola_management_pages/user/models.js:457
+#: js/pages/tola_management_pages/user/models.js:469
 msgid "Verification email send failed"
 msgstr "Falló el envío de correo electrónico de verificación"
 
 #. Translators: a list of groups of countries (i.e. "Asia")
-#: js/pages/tola_management_pages/user/models.js:710
+#: js/pages/tola_management_pages/user/models.js:724
 msgid "Regions"
 msgstr "Regiones"
 
@@ -1954,7 +1954,7 @@ msgid "Add user"
 msgstr "Agregar Usuario"
 
 #. Translators: The highest level of administrator in the system */}
-#: js/pages/tola_management_pages/user/views.js:334
+#: js/pages/tola_management_pages/user/views.js:335
 msgid "Super Admin"
 msgstr "Super Administrador"
 

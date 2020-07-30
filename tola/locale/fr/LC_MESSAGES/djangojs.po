@@ -2,8 +2,8 @@ msgid ""
 msgstr ""
 "Project-Id-Version: \n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2020-07-14 14:08-0700\n"
-"PO-Revision-Date: 2020-07-14 15:02-0700\n"
+"POT-Creation-Date: 2020-07-30 15:20-0700\n"
+"PO-Revision-Date: 2020-07-30 09:17+0200\n"
 "Last-Translator: \n"
 "Language-Team: \n"
 "Language: fr\n"
@@ -11,7 +11,7 @@ msgstr ""
 "Content-Type: text/plain; charset=UTF-8\n"
 "Content-Transfer-Encoding: 8bit\n"
 "Plural-Forms: nplurals=2; plural=(n > 1);\n"
-"X-Generator: Poedit 2.3.1\n"
+"X-Generator: Poedit 2.4\n"
 
 #: js/base.js:357 js/base.js:358
 msgid ""
@@ -155,7 +155,7 @@ msgstr "Détails"
 #. Translators: (preceded by a number) e.g. "4 options selected"
 #. Translators: prefixed with a number, as in "4 selected" displayed on a multi-select
 #: js/components/changesetNotice.js:251
-#: js/components/checkboxed-multi-select.js:99
+#: js/components/checkboxed-multi-select.js:106
 #: js/components/selectWidgets.js:153
 msgid "selected"
 msgstr "sélectionné"
@@ -167,7 +167,7 @@ msgid "None selected"
 msgstr "Aucun élément sélectionné"
 
 #. Translators: placeholder text in a search box
-#: js/components/checkboxed-multi-select.js:113
+#: js/components/checkboxed-multi-select.js:120
 msgid "Search"
 msgstr "Rechercher"
 
@@ -464,7 +464,7 @@ msgstr "Vue actuelle"
 msgid "All program data"
 msgstr "Ensemble des données du programme"
 
-#: js/pages/iptt_report/components/report/header.js:11
+#: js/pages/iptt_report/components/report/header.js:12
 msgid "Indicator Performance Tracking Table"
 msgstr "Tableau de suivi des performances de l’indicateur"
 
@@ -1071,7 +1071,7 @@ msgid ""
 "%(firstTier)s. A level can only be deleted when it has no sub-levels and no "
 "linked indicators."
 msgstr ""
-"<span class=\"text-danger\"><strong>Le modèle de structure de résultats est "
+"<span class=\"text-danger\"><strong>Le modèle de cadre de résultats est "
 "verrouillé dès que le premier %(secondTier)s est enregistré.</strong></span> "
 "Pour modifier les modèles, tous les niveaux enregistrés doivent être "
 "supprimés, à l'exception des %(firstTier)s d'origine. Un niveau ne peut être "
@@ -1150,7 +1150,7 @@ msgstr "Les niveaux de résultats ne doivent pas contenir de virgules."
 #. Translators: This is a warning messages when a user has a comma in a name that shouldn't contain commas */
 #: js/pages/results_framework/models.js:761
 msgid "Result levels must have unique names."
-msgstr "Les niveaux de résultats doivent avoir des noms uniques."
+msgstr "Les niveaux de résultats doivent posséder des noms uniques."
 
 #: js/pages/tola_management_pages/audit_log/views.js:77
 msgid "Targets changed"
@@ -1175,7 +1175,7 @@ msgstr "Utilisateur"
 
 #: js/pages/tola_management_pages/audit_log/views.js:235
 #: js/pages/tola_management_pages/organization/views.js:110
-#: js/pages/tola_management_pages/user/components/edit_user_profile.js:183
+#: js/pages/tola_management_pages/user/components/edit_user_profile.js:187
 #: js/pages/tola_management_pages/user/views.js:202
 #: js/pages/tola_management_pages/user/views.js:261
 msgid "Organization"
@@ -1202,7 +1202,7 @@ msgstr "entrées"
 #: js/pages/tola_management_pages/organization/components/organization_editor.js:26
 #: js/pages/tola_management_pages/program/components/edit_program_profile.js:70
 #: js/pages/tola_management_pages/program/components/program_editor.js:27
-#: js/pages/tola_management_pages/user/components/edit_user_profile.js:132
+#: js/pages/tola_management_pages/user/components/edit_user_profile.js:136
 #: js/pages/tola_management_pages/user/components/user_editor.js:26
 msgid "Profile"
 msgstr "Profil"
@@ -1268,8 +1268,8 @@ msgstr "Enregistrer les modifications"
 #: js/pages/tola_management_pages/program/components/program_settings.js:131
 #: js/pages/tola_management_pages/program/views.js:200
 #: js/pages/tola_management_pages/user/components/edit_user_history.js:75
-#: js/pages/tola_management_pages/user/components/edit_user_profile.js:248
-#: js/pages/tola_management_pages/user/components/edit_user_profile.js:254
+#: js/pages/tola_management_pages/user/components/edit_user_profile.js:252
+#: js/pages/tola_management_pages/user/components/edit_user_profile.js:258
 #: js/pages/tola_management_pages/user/views.js:231
 msgid "Reset"
 msgstr "Réinitialiser"
@@ -1308,9 +1308,9 @@ msgid ""
 "default for every program in %s. The disaggregation can be manually removed "
 "from an indicator on the indicator setup form."
 msgstr ""
-"Lors de l'ajout d'un nouvel indicateur de programme, cette ventilation sera "
-"sélectionnée par défaut pour chaque programme dans %s. La ventilation peut "
-"être supprimée manuellement d'un indicateur sur le formulaire de "
+"Lors de l'ajout d'un nouvel indicateur de programme, cette désagrégation "
+"sera sélectionnée par défaut pour chaque programme dans %s. La désagrégation "
+"peut être supprimée manuellement d'un indicateur depuis le formulaire de "
 "configuration de l'indicateur."
 
 #: js/pages/tola_management_pages/country/components/edit_disaggregations.js:339
@@ -1397,7 +1397,7 @@ msgstr "Proposé"
 #: js/pages/tola_management_pages/program/views.js:163
 #: js/pages/tola_management_pages/user/components/edit_user_history.js:8
 #: js/pages/tola_management_pages/user/models.js:74
-#: js/pages/tola_management_pages/user/views.js:348
+#: js/pages/tola_management_pages/user/views.js:349
 msgid "Active"
 msgstr "Actif"
 
@@ -1602,7 +1602,7 @@ msgstr "pays"
 #: js/pages/tola_management_pages/program/views.js:163
 #: js/pages/tola_management_pages/user/components/edit_user_history.js:9
 #: js/pages/tola_management_pages/user/models.js:75
-#: js/pages/tola_management_pages/user/views.js:348
+#: js/pages/tola_management_pages/user/views.js:349
 msgid "Inactive"
 msgstr "Inactif"
 
@@ -1631,7 +1631,7 @@ msgid "Primary Contact Phone Number"
 msgstr "Numéro de téléphone du contact principal"
 
 #: js/pages/tola_management_pages/organization/components/edit_organization_profile.js:200
-#: js/pages/tola_management_pages/user/components/edit_user_profile.js:235
+#: js/pages/tola_management_pages/user/components/edit_user_profile.js:239
 msgid "Preferred Mode of Contact"
 msgstr "Moyen de contact préféré"
 
@@ -1669,13 +1669,13 @@ msgstr "Ajouter une société"
 
 #: js/pages/tola_management_pages/organization/views.js:168
 #: js/pages/tola_management_pages/program/views.js:320
-#: js/pages/tola_management_pages/user/views.js:345
+#: js/pages/tola_management_pages/user/views.js:346
 msgid "programs"
 msgstr "programmes"
 
 #: js/pages/tola_management_pages/organization/views.js:174
 #: js/pages/tola_management_pages/program/views.js:311
-#: js/pages/tola_management_pages/user/views.js:355
+#: js/pages/tola_management_pages/user/views.js:356
 msgid "users"
 msgstr "utilisateurs"
 
@@ -1825,81 +1825,81 @@ msgstr "Ajouter un programme"
 msgid "Resend Registration Email"
 msgstr "Envoyer une nouvelle fois un e-mail d’inscription"
 
-#: js/pages/tola_management_pages/user/components/edit_user_profile.js:135
+#: js/pages/tola_management_pages/user/components/edit_user_profile.js:139
 msgid "Preferred First Name"
 msgstr "Prénom d’usage"
 
-#: js/pages/tola_management_pages/user/components/edit_user_profile.js:151
+#: js/pages/tola_management_pages/user/components/edit_user_profile.js:155
 msgid "Preferred Last Name"
 msgstr "Nom d’usage"
 
-#: js/pages/tola_management_pages/user/components/edit_user_profile.js:167
+#: js/pages/tola_management_pages/user/components/edit_user_profile.js:171
 msgid "Username"
 msgstr "Nom d’utilisateur"
 
-#: js/pages/tola_management_pages/user/components/edit_user_profile.js:199
+#: js/pages/tola_management_pages/user/components/edit_user_profile.js:203
 msgid "Title"
 msgstr "Titre"
 
-#: js/pages/tola_management_pages/user/components/edit_user_profile.js:210
+#: js/pages/tola_management_pages/user/components/edit_user_profile.js:214
 msgid "Email"
 msgstr "Adresse e-mail"
 
-#: js/pages/tola_management_pages/user/components/edit_user_profile.js:225
+#: js/pages/tola_management_pages/user/components/edit_user_profile.js:229
 msgid "Phone"
 msgstr "Numéro de téléphone"
 
-#: js/pages/tola_management_pages/user/components/edit_user_profile.js:246
-#: js/pages/tola_management_pages/user/components/edit_user_profile.js:253
+#: js/pages/tola_management_pages/user/components/edit_user_profile.js:250
+#: js/pages/tola_management_pages/user/components/edit_user_profile.js:257
 msgid "Save changes"
 msgstr "Enregistrer les modifications"
 
-#: js/pages/tola_management_pages/user/components/edit_user_profile.js:247
+#: js/pages/tola_management_pages/user/components/edit_user_profile.js:251
 msgid "Save And Add Another"
 msgstr "Enregistrer et ajouter à nouveau"
 
-#: js/pages/tola_management_pages/user/components/edit_user_programs.js:17
+#: js/pages/tola_management_pages/user/components/edit_user_programs.js:18
 msgid "Individual programs only"
 msgstr "Programmes individuels seulement"
 
-#: js/pages/tola_management_pages/user/components/edit_user_programs.js:421
+#: js/pages/tola_management_pages/user/components/edit_user_programs.js:469
 #: js/pages/tola_management_pages/user/components/user_editor.js:32
 msgid "Programs and Roles"
 msgstr "Programmes et rôles"
 
 #. Translators: link to learn more about permissions-granting roles a user can be assigned
-#: js/pages/tola_management_pages/user/components/edit_user_programs.js:425
+#: js/pages/tola_management_pages/user/components/edit_user_programs.js:473
 msgid "More information on Program Roles"
 msgstr "Plus d’informations sur les programmes et les rôles"
 
 #. Translators: This is placeholder text on a dropdown of countries which limit the displayed programs
-#: js/pages/tola_management_pages/user/components/edit_user_programs.js:432
+#: js/pages/tola_management_pages/user/components/edit_user_programs.js:480
 msgid "Filter countries"
 msgstr "Filtrer les pays"
 
 #. Translators: this is placeholder text on a dropdown of programs which limit the displayed results
-#: js/pages/tola_management_pages/user/components/edit_user_programs.js:438
+#: js/pages/tola_management_pages/user/components/edit_user_programs.js:486
 msgid "Filter programs"
 msgstr "Filtrer les programmes"
 
 #. Translators: Column header for a checkbox indicating if a user has access to a program */
-#: js/pages/tola_management_pages/user/components/edit_user_programs.js:463
+#: js/pages/tola_management_pages/user/components/edit_user_programs.js:511
 msgid "Has access?"
 msgstr "A accès ?"
 
-#: js/pages/tola_management_pages/user/components/edit_user_programs.js:480
+#: js/pages/tola_management_pages/user/components/edit_user_programs.js:530
 msgid "Deselect All"
 msgstr "Tout déselectionner"
 
-#: js/pages/tola_management_pages/user/components/edit_user_programs.js:480
+#: js/pages/tola_management_pages/user/components/edit_user_programs.js:530
 msgid "Select All"
 msgstr "Tout sélectionner"
 
-#: js/pages/tola_management_pages/user/components/edit_user_programs.js:493
+#: js/pages/tola_management_pages/user/components/edit_user_programs.js:540
 msgid "Countries and Programs"
 msgstr "Pays et programmes"
 
-#: js/pages/tola_management_pages/user/components/edit_user_programs.js:509
+#: js/pages/tola_management_pages/user/components/edit_user_programs.js:569
 msgid "Roles and Permissions"
 msgstr "Rôles et autorisations"
 
@@ -1912,17 +1912,17 @@ msgid "No"
 msgstr "Non"
 
 #. Translators: An email was sent to the user to verify that the email address is valid
-#: js/pages/tola_management_pages/user/models.js:453
+#: js/pages/tola_management_pages/user/models.js:465
 msgid "Verification email sent"
 msgstr "E-mail de vérification envoyé"
 
 #. Translators: Sending an email to the user did not work
-#: js/pages/tola_management_pages/user/models.js:457
+#: js/pages/tola_management_pages/user/models.js:469
 msgid "Verification email send failed"
 msgstr "Échec de l’envoi de l’e-mail de vérification"
 
 #. Translators: a list of groups of countries (i.e. "Asia")
-#: js/pages/tola_management_pages/user/models.js:710
+#: js/pages/tola_management_pages/user/models.js:724
 msgid "Regions"
 msgstr "Régions"
 
@@ -1964,7 +1964,7 @@ msgid "Add user"
 msgstr "Ajouter un utilisateur"
 
 #. Translators: The highest level of administrator in the system */}
-#: js/pages/tola_management_pages/user/views.js:334
+#: js/pages/tola_management_pages/user/views.js:335
 msgid "Super Admin"
 msgstr "Super-administrateur"
 

@@ -1,9 +1,10 @@
-import React from 'react'
-import { observable } from 'mobx'
-import { observer } from "mobx-react"
-import {AutoSizer, Table, Column, CellMeasurer, CellMeasurerCache} from 'react-virtualized'
+import React from 'react';
+import { observable } from 'mobx';
+import { observer } from 'mobx-react';
+import {AutoSizer, Table, Column, CellMeasurer, CellMeasurerCache} from 'react-virtualized';
 import { CountryStore } from '../models';
-import CheckboxedMultiSelect from 'components/checkboxed-multi-select'
+import CheckboxedMultiSelect from 'components/checkboxed-multi-select';
+import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 
 
 
@@ -30,13 +31,21 @@ const create_program_objects = (programs, store) => Object.entries(programs)
                                                                }
                                                            }),{})
 
-//we need to flatten the country -> program heirarchy to support the virtualized table
-const flattened_listing = (countries, programs) => countries.flatMap(country =>
+/**
+ * This function returns countries and programs as a flat ordered list as they will be displayed in the virtualized table.
+ *
+ * @param {Object[]} countries - the country objects created by create_country_objects (with program info)
+ * @param {Object[]} programs - the program objects created by create_program_objects (with user role info)
+ * @param {@callback} isExpanded - The callback which determines if a given country ID should be expanded, incorporating
+ *                                filter states and previous user toggles
+ * @returns {Object[]} - the countries and programs as rowData for the virtualized table
+ */
+const flattened_listing = (countries, programs, isExpanded) => countries.flatMap(country => //flatMap to return a flattened list
                                                         [
-                                                            country,
-                                                            ...Array.from(country.programs)
-                                                                .filter(program_id => programs[program_id])
-                                                                .map(program_id => ({...programs[program_id], id: `${country.id}_${program_id}`, country_id: country.id}))
+                                                            country, // country object itself displays, followed by programs
+                                                            ...(isExpanded(country.id) ? Array.from(country.programs) //only show programs if country is expanded
+                                                                .filter(program_id => programs[program_id]) // don't include programs we don't have information for (filtered out)
+                                                                .map(program_id => ({...programs[program_id], id: `${country.id}_${program_id}`, country_id: country.id})) : [])
                                                         ]
                                                     )
 
@@ -90,6 +99,8 @@ export default class EditUserPrograms extends React.Component {
         const programs = create_program_objects(store.programs, store)
         this.countryStore = new CountryStore(store.regions, store.countries);
         
+        // callback for determining if a country is expanded based on filter state (initial program filter of ''):
+        const isExpanded = this.isExpanded.bind(this, '');
         this.state = {
             program_filter: '',
             countries,
@@ -97,7 +108,7 @@ export default class EditUserPrograms extends React.Component {
             filtered_countries: countries,
             filtered_programs: programs,
             ordered_country_ids: store.ordered_country_ids,
-            flattened_programs: flattened_listing(store.ordered_country_ids.filter(id => id in countries).map(id => countries[id]), programs),
+            flattened_programs: flattened_listing(store.ordered_country_ids.filter(id => id in countries).map(id => countries[id]), programs, isExpanded),
             original_user_program_access: create_user_access(store.editing_target_data.access),
             user_program_access: create_user_access(store.editing_target_data.access)
         }
@@ -107,7 +118,7 @@ export default class EditUserPrograms extends React.Component {
         const {store} = next_props
         const countries_obj = create_country_objects(store.countries, store)
         const programs_obj = create_program_objects(store.programs, store)
-    
+
         const filtered_countries = apply_country_filter(
             countries_obj,
             this.countryStore.selectedCountries
@@ -119,6 +130,8 @@ export default class EditUserPrograms extends React.Component {
             this.state.program_filter
         )
 
+        // callback for determining if a country is expanded based on filter state:
+        const isExpanded = this.isExpanded.bind(this, this.state.program_filter);
 
         this.setState({
             countries: countries_obj,
@@ -126,7 +139,7 @@ export default class EditUserPrograms extends React.Component {
             filtered_countries: countries,
             filtered_programs: programs,
             ordered_country_ids: store.ordered_country_ids,
-            flattened_programs: flattened_listing(store.ordered_country_ids.filter(id => id in countries).map(id => countries[id]), programs),
+            flattened_programs: flattened_listing(store.ordered_country_ids.filter(id => id in countries).map(id => countries[id]), programs, isExpanded),
             original_user_program_access: create_user_access(store.editing_target_data.access),
             user_program_access: create_user_access(store.editing_target_data.access)
         }, () => this.hasUnsavedDataAction())
@@ -294,6 +307,7 @@ export default class EditUserPrograms extends React.Component {
 
     }
 
+
     clearFilter() {
         const val = ''
         const filtered_countries = apply_country_filter(this.state.countries, this.countryStore.selectedCountries)
@@ -303,11 +317,13 @@ export default class EditUserPrograms extends React.Component {
             val
         )
 
+        // callback for determining if a country is expanded based on filter state:
+        const isExpanded = this.isExpanded.bind(this, val);
         this.setState({
             program_filter: val,
             filtered_programs: programs,
             filtered_countries: countries,
-            flattened_programs: flattened_listing(this.state.ordered_country_ids.filter(id => id in countries).map(id => countries[id]), programs),
+            flattened_programs: flattened_listing(this.state.ordered_country_ids.filter(id => id in countries).map(id => countries[id]), programs, isExpanded),
         })
     }
 
@@ -319,28 +335,60 @@ export default class EditUserPrograms extends React.Component {
             val
         )
 
+        // callback for determining if a country is expanded based on filter state:
+        const isExpanded = this.isExpanded.bind(this, val);
+
         this.setState({
             program_filter: val,
             filtered_programs: programs,
             filtered_countries: countries,
-            flattened_programs: flattened_listing(this.state.ordered_country_ids.filter(id => id in countries).map(id => countries[id]), programs),
+            flattened_programs: flattened_listing(this.state.ordered_country_ids.filter(id => id in countries).map(id => countries[id]), programs, isExpanded),
         })
     }
 
     changeCountryFilter(e) {
         this.countryStore.updateSelected(e);
-        const filtered_countries = apply_country_filter(this.state.countries, this.countryStore.selectedCountries)
-        
+        const filtered_countries = apply_country_filter(this.state.countries, this.countryStore.selectedCountries, true)
         const {countries, programs} = apply_program_filter(
             this.state.programs,
             filtered_countries,
             this.state.program_filter
         )
 
+        // callback for determining if a country is expanded based on filter state:
+        const isExpanded = this.isExpanded.bind(this, this.state.program_filter);
+
         this.setState({
             filtered_countries: countries,
-            flattened_programs: flattened_listing(this.state.ordered_country_ids.filter(id => id in countries).map(id => countries[id]), this.state.filtered_programs),
+            flattened_programs: flattened_listing(this.state.ordered_country_ids.filter(id => id in countries).map(id => countries[id]), this.state.filtered_programs, isExpanded),
         })
+    }
+
+    toggleCountryExpanded(id) {
+        this.countryStore.toggleExpanded(id);
+        const filtered_countries = apply_country_filter(this.state.countries, this.countryStore.selectedCountries);
+        const {countries, programs} = apply_program_filter(
+            this.state.programs,
+            filtered_countries,
+            this.state.program_filter
+        )
+        // callback for determining if a country is expanded based on filter state:
+        const isExpanded = this.isExpanded.bind(this, this.state.program_filter);
+
+        this.setState({
+            filtered_countries: countries,
+            flattened_programs: flattened_listing(this.state.ordered_country_ids.filter(id => id in countries).map(id => countries[id]), this.state.filtered_programs, isExpanded),
+        });
+    }
+
+    isExpanded(program_filter, countryId) {
+        // when bound with this and program_filter state (a string), and called with country ID, returns true if country should be expanded
+        if (program_filter && program_filter.length > 0) {
+            // all countries left showing given a program filter should be expanded to show the programs filtered to
+            return true;
+        }
+        // countryStore tracks toggling of expanded/collapsed state
+        return this.countryStore.isExpanded(countryId);
     }
 
     render() {
@@ -468,6 +516,8 @@ export default class EditUserPrograms extends React.Component {
                                     disabled: is_check_disabled(rowData),
                                     id: rowData.id,
                                     type: rowData.type,
+                                    expanded: (rowData.type == "country") ? this.state.program_filter || this.countryStore.isExpanded(rowData.id) : false,
+                                    programsCount: (rowData.type == "country") ? rowData.programs.size : null,
                                     action: (rowData.type == "country")?this.toggleAllProgramsForCountry.bind(this):this.toggleProgramAccess.bind(this)
                                 })}
                                 cellRenderer={({cellData}) => {
@@ -478,11 +528,8 @@ export default class EditUserPrograms extends React.Component {
                                             this.state.user_program_access
                                         )
                                         const button_label = (country_has_all_checked)?gettext('Deselect All'):gettext('Select All')
-                                        if(cellData.disabled) {
-                                            return null
-                                        } else {
-                                            return <div className="check-column"><a className="edit-user-programs__select-all" onClick={(e) => cellData.action(cellData.id)}>{button_label}</a></div>
-                                        }
+                                        const selectAllButton = (cellData.disabled || !cellData.expanded) ? null : <a className="edit-user-programs__select-all" onClick={(e) => cellData.action(cellData.id)}>{button_label}</a>
+                                        return <div className="check-column">{selectAllButton}</div>;
                                     } else {
                                         return <div className="check-column"><input type="checkbox" checked={cellData.checked} disabled={cellData.disabled} onChange={() => cellData.action(cellData.id)} /></div>
                                     }
@@ -493,10 +540,22 @@ export default class EditUserPrograms extends React.Component {
                                 label={gettext("Countries and Programs")}
                                 width={200}
                                 flexGrow={2}
-                                cellDataGetter={({rowData}) => ({bold: rowData.type == "country", name: rowData.name})}
+                                className='pl-0'
+                                cellDataGetter={({rowData}) => ({
+                                    expanded: (rowData.type == "country") ? this.state.program_filter || this.countryStore.isExpanded(rowData.id) : false,
+                                    programsCount: (rowData.type == "country") ? rowData.programs.size : null,
+                                    expandoAction: (rowData.type == "country") ? this.toggleCountryExpanded.bind(this, rowData.id):null,
+                                    bold: rowData.type == "country", name: rowData.name
+                                })}
                                 cellRenderer={({cellData}) => {
                                     if(cellData.bold) {
-                                        return <strong>{cellData.name}</strong>
+                                        const expandoIcon = cellData.programsCount ? <FontAwesomeIcon icon={ cellData.expanded ? 'caret-down' : 'caret-right' } /> : null;
+                                        const nameCellInner = <React.Fragment><div className="expando-toggle__icon">{ expandoIcon }</div><div className="expando-toggle__label"><strong>{cellData.name}</strong></div></React.Fragment>
+                                        if (cellData.programsCount) {
+                                            return <div className="edit-user-programs__expando expando-toggle icon__clickable" onClick={cellData.expandoAction}>{ nameCellInner }</div>;
+                                        } else {
+                                            return <div className="edit-user-programs__expando expando-toggle">{ nameCellInner }</div>;
+                                        }
                                     } else {
                                         return <span>{cellData.name}</span>
                                     }
@@ -505,6 +564,7 @@ export default class EditUserPrograms extends React.Component {
                                 <Column
                                 width={100}
                                 flexGrow={1}
+                                className='pl-0'
                                 dataKey="not_applicable_but_required"
                                 label={gettext("Roles and Permissions")}
                                 cellDataGetter={({rowData}) => ({
