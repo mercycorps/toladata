@@ -1,6 +1,7 @@
-# -*- coding: utf-8 -*-
+
 from __future__ import unicode_literals
 import json
+import re
 from collections import OrderedDict
 from django.core.exceptions import PermissionDenied, ObjectDoesNotExist, SuspiciousOperation
 from django.core.serializers.json import DjangoJSONEncoder
@@ -347,41 +348,59 @@ class UserAdminSerializer(ModelSerializer):
     last_name = CharField(source="user.last_name", max_length=100, required=True)
     username = CharField(source="user.username", max_length=100, required=True)
     organization_id = IntegerField(required=True)
-    email = EmailField(source="user.email", max_length=255, required=True)
+    email = EmailField(
+        source="user.email", max_length=255, required=True)
     user = AuthUserSerializer()
 
+    # Validate that username and email are not duplicated, MC emails are not being entered manually for
+    # email or username fields.
     def validate(self, data):
-        # TODO: this was used to enforce uniqueness only on the email field, which is NOT enforced in the backend
-
         out_data = super(UserAdminSerializer, self).validate(data)
-
+        validation_errors = {}
         if self.instance:
             others_username = list(User.objects.filter(username=data['user']['username']))
             others_email = list(User.objects.filter(email=data['user']['email']))
-            validation_errors = {}
 
-            if len(others_username) > 1 or (len(others_username) > 0 and others_username[0].id != self.instance.user.id):
-                validation_errors.update({"username": _('This field must be unique')})
+            if len(others_username) > 1 or (
+                len(others_username) > 0 and others_username[0].id != self.instance.user.id):
+                #Translators: Error message given when an administrator tries to save a username that is already taken
+                validation_errors.update({"username": _('A user account with this username already exists.')})
 
             if len(others_email) > 1 or (len(others_email) > 0 and others_email[0].id != self.instance.user.id):
-                validation_errors.update({"email": _('This field must be unique')})
-
-            if len(validation_errors) > 0:
-                raise ValidationError(validation_errors)
+                # Translators: Error message given when an administrator tries to save a email that is already taken
+                validation_errors.update({"email": _('A user account with this email address already exists.')})
 
         else:
             others_username = list(User.objects.filter(username=data['user']['username']))
             others_email = list(User.objects.filter(email=data['user']['email']))
-            validation_errors = {}
 
             if len(others_username) > 0:
-                validation_errors.update({"username": _('This field must be unique')})
+                # Translators: Error message given when an administrator tries to save a username that is already taken
+                validation_errors.update({"username": _('A user account with this username already exists.')})
 
             if len(others_email) > 0:
-                validation_errors.update({"email": _('This field must be unique')})
+                # Translators: Error message given when an administrator tries to save a email that is already taken
+                validation_errors.update({"email": _('A user account with this email address already exists.')})
 
-            if len(validation_errors) > 0:
-                raise ValidationError(validation_errors)
+        org_name = Organization.objects.get(id=data['organization_id']).name
+        email_domain_is_mc = re.search("@mercycorps.org$",  data["user"]["email"])
+        if org_name == "Mercy Corps" and not email_domain_is_mc:
+            # Translators:  Error message given when an administrator tries to save a bad combination of organization and email
+            validation_errors.update({"email": _("Non-Mercy Corps emails should not be used with the Mercy Corps organization.")})
+        elif org_name != "Mercy Corps" and email_domain_is_mc:
+            if "email" in validation_errors:
+                # Translators:  Error message given when an administrator tries to save a bad combination of organization and email
+                validation_errors.update({"email": _("A user account with this email address already exists. Mercy Corps accounts are managed by Single sign-on (SSO). Mercy Corps employees should login using their SSO username and password.")})
+            else:
+                # Translators:  Error message given when an administrator tries to save a bad combination of organization and email
+                validation_errors.update({"email": _("Mercy Corps accounts are managed by Single sign-on (SSO). Mercy Corps employees should login to TolaData through the Okta SSO.")})
+
+        if org_name != "Mercy Corps" and re.search("@mercycorps.org$", data['user']['username']):
+            # Translators:  Error message given when an administrator tries to save an invalid username
+            validation_errors.update({"username": _("Mercy Corps accounts are managed by Single sign-on (SSO). Mercy Corps employees should login using their SSO username and password.")})
+
+        if len(validation_errors) > 0:
+            raise ValidationError(validation_errors)
 
         return out_data
 
@@ -567,7 +586,7 @@ class UserAdminViewSet(viewsets.ModelViewSet):
         # if problems arise, replace this with page = self.paginate_queryset(list(queryset))
         page = self.paginate_queryset(queryset)
         if page is not None:
-            serializer = UserAdminReportSerializer(page, many=True)            
+            serializer = UserAdminReportSerializer(page, many=True)
             return self.get_paginated_response(serializer.data)
 
         serializer = UserAdminReportSerializer(queryset, many=True)
