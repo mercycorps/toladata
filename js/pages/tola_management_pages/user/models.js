@@ -214,6 +214,18 @@ export class UserStore {
         return Object.values(programs).map(program => ({value: program.id, label: program.name}))
     }
 
+    toggleDisableForMCOrg(disabled=true){
+        for (let org of this.organization_selections){
+            if (org.label === "Mercy Corps") {
+                runInAction(()=>{
+                    org.label = "Mercy Corps -- managed by Single sign-on (SSO)";
+                    org.isDisabled = disabled;
+                })
+                break;
+            }
+        }
+    }
+
     @action
     onProfilePaneChange(new_pane) {
         if(this.dirtyConfirm()) {
@@ -699,7 +711,7 @@ export class CountryStore {
             .filter(region => region.countries.length > 0)
             .sort(this.nameSort);
     }
-    
+
     @computed
     get groupedOptions() {
         // in the following possible options listing, "selectable: false" ensures the group heading
@@ -781,7 +793,7 @@ export class CountryStore {
                     this.removeCountry(option.value);
                 }
             });
-            
+
         } else {
             // user added items
             const notYetSelected = (option) => !this.selectedOptions.map(option => option.value).includes(option.value);
