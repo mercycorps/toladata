@@ -390,14 +390,14 @@ class UserAdminSerializer(ModelSerializer):
         elif org_name != "Mercy Corps" and email_domain_is_mc:
             if "email" in validation_errors:
                 # Translators:  Error message given when an administrator tries to save a bad combination of organization and email
-                validation_errors.update({"email": _("A user account with this email address already exists. Mercy Corps accounts are managed by Single sign-on (SSO). Mercy Corps employees should login using their SSO username and password.")})
+                validation_errors.update({"email": _("A user account with this email address already exists. Mercy Corps accounts are managed by Okta. Mercy Corps employees should log in using their Okta username and password.")})
             else:
                 # Translators:  Error message given when an administrator tries to save a bad combination of organization and email
-                validation_errors.update({"email": _("Mercy Corps accounts are managed by Single sign-on (SSO). Mercy Corps employees should login to TolaData through the Okta SSO.")})
+                validation_errors.update({"email": _("Mercy Corps accounts are managed by Okta. Mercy Corps employees should log in using their Okta username and password.")})
 
         if org_name != "Mercy Corps" and re.search("@mercycorps.org$", data['user']['username']):
             # Translators:  Error message given when an administrator tries to save an invalid username
-            validation_errors.update({"username": _("Mercy Corps accounts are managed by Single sign-on (SSO). Mercy Corps employees should login using their SSO username and password.")})
+            validation_errors.update({"username": _("Mercy Corps accounts are managed by Okta. Mercy Corps employees should log in using their Okta username and password.")})
 
         if len(validation_errors) > 0:
             raise ValidationError(validation_errors)
