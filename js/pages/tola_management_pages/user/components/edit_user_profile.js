@@ -13,7 +13,8 @@ export default class EditUserProfile extends React.Component {
         for (let org of filtered_orgs) {
             let org_js = toJS(org);
             if (org_js.label === "Mercy Corps"){
-                org_js.label = "Mercy Corps -- managed by Okta";
+                // # Translators: This is an deactivated menu item visible to users, indicating that assignment of this option is manaaged by another system.
+                org_js.label = gettext("Mercy Corps -- managed by Okta");
                 org_js.isDisabled = true;
             }
             organization_listing.push(org_js)
@@ -199,7 +200,8 @@ export default class EditUserProfile extends React.Component {
                             value={this.state.selected_organization}
                             options={this.state.organization_listing}
                             onChange={(e) => this.updateOrganization(e)}
-                            placeholder="None Selected"
+                            // # Translators: This is the default option for a dropdown menu
+                            placeholder={gettext("None Selected")}
                             id="user-organization-input" />
                         {e.organization_id &&
                         <div className="invalid-feedback feedback--react-select">
