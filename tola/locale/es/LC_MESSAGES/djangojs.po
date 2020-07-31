@@ -6,7 +6,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: \n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2020-07-31 10:06-0700\n"
+"POT-Creation-Date: 2020-07-31 10:33-0700\n"
 "PO-Revision-Date: 2020-07-30 11:52+0100\n"
 "Last-Translator: \n"
 "Language-Team: \n"
@@ -1265,8 +1265,8 @@ msgstr "Guardar cambios"
 #: js/pages/tola_management_pages/program/components/program_settings.js:131
 #: js/pages/tola_management_pages/program/views.js:200
 #: js/pages/tola_management_pages/user/components/edit_user_history.js:75
-#: js/pages/tola_management_pages/user/components/edit_user_profile.js:261
-#: js/pages/tola_management_pages/user/components/edit_user_profile.js:267
+#: js/pages/tola_management_pages/user/components/edit_user_profile.js:262
+#: js/pages/tola_management_pages/user/components/edit_user_profile.js:268
 #: js/pages/tola_management_pages/user/views.js:231
 msgid "Reset"
 msgstr "Reiniciar"
@@ -1515,6 +1515,7 @@ msgstr "Las categorías deben tener nombres únicos."
 msgid "Find a Country"
 msgstr "Encontrar un País"
 
+#. Translators: This is the default option for a dropdown menu
 #. Translators: Nothing selected by user
 #: js/pages/tola_management_pages/country/views.js:22
 #: js/pages/tola_management_pages/country/views.js:34
@@ -1531,6 +1532,7 @@ msgstr "Encontrar un País"
 #: js/pages/tola_management_pages/program/views.js:58
 #: js/pages/tola_management_pages/program/views.js:75
 #: js/pages/tola_management_pages/program/views.js:87
+#: js/pages/tola_management_pages/user/components/edit_user_profile.js:204
 #: js/pages/tola_management_pages/user/views.js:16
 msgid "None Selected"
 msgstr "Ninguno/a Seleccionado"
@@ -1624,7 +1626,7 @@ msgid "Primary Contact Phone Number"
 msgstr "Número Telefónico de Contacto Principal"
 
 #: js/pages/tola_management_pages/organization/components/edit_organization_profile.js:200
-#: js/pages/tola_management_pages/user/components/edit_user_profile.js:248
+#: js/pages/tola_management_pages/user/components/edit_user_profile.js:249
 msgid "Preferred Mode of Contact"
 msgstr "Forma de Contacto Preferida"
 
@@ -1832,24 +1834,24 @@ msgstr "Apellido Preferido"
 msgid "Username"
 msgstr "Nombre de usuario"
 
-#: js/pages/tola_management_pages/user/components/edit_user_profile.js:212
+#: js/pages/tola_management_pages/user/components/edit_user_profile.js:213
 msgid "Title"
 msgstr "Título"
 
-#: js/pages/tola_management_pages/user/components/edit_user_profile.js:223
+#: js/pages/tola_management_pages/user/components/edit_user_profile.js:224
 msgid "Email"
 msgstr "Correo electrónico"
 
-#: js/pages/tola_management_pages/user/components/edit_user_profile.js:238
+#: js/pages/tola_management_pages/user/components/edit_user_profile.js:239
 msgid "Phone"
 msgstr "Teléfono"
 
-#: js/pages/tola_management_pages/user/components/edit_user_profile.js:259
-#: js/pages/tola_management_pages/user/components/edit_user_profile.js:266
+#: js/pages/tola_management_pages/user/components/edit_user_profile.js:260
+#: js/pages/tola_management_pages/user/components/edit_user_profile.js:267
 msgid "Save changes"
 msgstr "Guardar cambios"
 
-#: js/pages/tola_management_pages/user/components/edit_user_profile.js:260
+#: js/pages/tola_management_pages/user/components/edit_user_profile.js:261
 msgid "Save And Add Another"
 msgstr "Guardar y Agregar otro"
 

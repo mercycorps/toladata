@@ -200,7 +200,8 @@ export default class EditUserProfile extends React.Component {
                             value={this.state.selected_organization}
                             options={this.state.organization_listing}
                             onChange={(e) => this.updateOrganization(e)}
-                            placeholder="None Selected"
+                            // # Translators: This is the default option for a dropdown menu
+                            placeholder={gettext("None Selected")}
                             id="user-organization-input" />
                         {e.organization_id &&
                         <div className="invalid-feedback feedback--react-select">
