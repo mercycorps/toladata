@@ -214,18 +214,6 @@ export class UserStore {
         return Object.values(programs).map(program => ({value: program.id, label: program.name}))
     }
 
-    toggleDisableForMCOrg(disabled=true){
-        for (let org of this.organization_selections){
-            if (org.label === "Mercy Corps") {
-                runInAction(()=>{
-                    org.label = "Mercy Corps -- managed by Okta";
-                    org.isDisabled = disabled;
-                })
-                break;
-            }
-        }
-    }
-
     @action
     onProfilePaneChange(new_pane) {
         if(this.dirtyConfirm()) {
