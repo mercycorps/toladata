@@ -283,7 +283,6 @@ export const IndexView = observer(
                                                             userData={store.editing_target_data.profile}
                                                             errors={store.editing_errors}
                                                             key={store.editing_target_data.profile.id}
-                                                            toggleDisableMCOrg={(disabled)=>store.toggleDisableForMCOrg(disabled)}
                                                             onUpdate={(new_user_data) => store.updateUserProfile(data.id, new_user_data)}
                                                             onCreate={(new_user_data) => store.saveNewUser(new_user_data)}
                                                             onCreateAndAddAnother={(new_user_data) => store.saveNewUserAndAddAnother(new_user_data)}

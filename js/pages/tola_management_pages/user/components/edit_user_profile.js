@@ -1,18 +1,26 @@
 import React from 'react'
 import Select from 'react-select'
 import { observer } from "mobx-react"
+import { toJS } from 'mobx'
 
 @observer
 export default class EditUserProfile extends React.Component {
     constructor(props) {
         super(props)
         const {userData} = props
-        const organization_listing = props.organizations.filter(o => o.value != 1 || props.is_superuser)
+        const filtered_orgs = props.organizations.filter(o => o.value != 1 || props.is_superuser)
+        let organization_listing = []
+        for (let org of filtered_orgs) {
+            let org_js = toJS(org);
+            if (org_js.label === "Mercy Corps"){
+                org_js.label = "Mercy Corps -- managed by Okta";
+                org_js.isDisabled = true;
+            }
+            organization_listing.push(org_js)
+        }
+
         const selected_organization = organization_listing.find(o => o.value == userData.organization_id)
         this.hasMCEmail = userData.email.endsWith("@mercycorps.org");
-        // When the user is MC, disabling the MC Org option results in the label being a different color because
-        // it is double-disabled (both the option and the dropdown itself would be disabled)
-        this.hasMCEmail ? this.props.toggleDisableMCOrg(false) : this.props.toggleDisableMCOrg(true);
         this.state = {
             original_user_data: {...userData},
             managed_user_data: {...userData},
