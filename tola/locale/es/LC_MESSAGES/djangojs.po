@@ -6,7 +6,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: \n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2020-07-30 15:20-0700\n"
+"POT-Creation-Date: 2020-07-31 10:06-0700\n"
 "PO-Revision-Date: 2020-07-30 11:52+0100\n"
 "Last-Translator: \n"
 "Language-Team: \n"
@@ -1172,7 +1172,7 @@ msgstr "Usuario"
 
 #: js/pages/tola_management_pages/audit_log/views.js:235
 #: js/pages/tola_management_pages/organization/views.js:110
-#: js/pages/tola_management_pages/user/components/edit_user_profile.js:187
+#: js/pages/tola_management_pages/user/components/edit_user_profile.js:196
 #: js/pages/tola_management_pages/user/views.js:202
 #: js/pages/tola_management_pages/user/views.js:261
 msgid "Organization"
@@ -1199,7 +1199,7 @@ msgstr "ítems"
 #: js/pages/tola_management_pages/organization/components/organization_editor.js:26
 #: js/pages/tola_management_pages/program/components/edit_program_profile.js:70
 #: js/pages/tola_management_pages/program/components/program_editor.js:27
-#: js/pages/tola_management_pages/user/components/edit_user_profile.js:136
+#: js/pages/tola_management_pages/user/components/edit_user_profile.js:145
 #: js/pages/tola_management_pages/user/components/user_editor.js:26
 msgid "Profile"
 msgstr "Perfil"
@@ -1265,8 +1265,8 @@ msgstr "Guardar cambios"
 #: js/pages/tola_management_pages/program/components/program_settings.js:131
 #: js/pages/tola_management_pages/program/views.js:200
 #: js/pages/tola_management_pages/user/components/edit_user_history.js:75
-#: js/pages/tola_management_pages/user/components/edit_user_profile.js:252
-#: js/pages/tola_management_pages/user/components/edit_user_profile.js:258
+#: js/pages/tola_management_pages/user/components/edit_user_profile.js:261
+#: js/pages/tola_management_pages/user/components/edit_user_profile.js:267
 #: js/pages/tola_management_pages/user/views.js:231
 msgid "Reset"
 msgstr "Reiniciar"
@@ -1391,7 +1391,7 @@ msgstr "Propuesto"
 #: js/pages/tola_management_pages/program/views.js:163
 #: js/pages/tola_management_pages/user/components/edit_user_history.js:8
 #: js/pages/tola_management_pages/user/models.js:74
-#: js/pages/tola_management_pages/user/views.js:349
+#: js/pages/tola_management_pages/user/views.js:348
 msgid "Active"
 msgstr "Activo"
 
@@ -1595,7 +1595,7 @@ msgstr "países"
 #: js/pages/tola_management_pages/program/views.js:163
 #: js/pages/tola_management_pages/user/components/edit_user_history.js:9
 #: js/pages/tola_management_pages/user/models.js:75
-#: js/pages/tola_management_pages/user/views.js:349
+#: js/pages/tola_management_pages/user/views.js:348
 msgid "Inactive"
 msgstr "Inactivo"
 
@@ -1624,7 +1624,7 @@ msgid "Primary Contact Phone Number"
 msgstr "Número Telefónico de Contacto Principal"
 
 #: js/pages/tola_management_pages/organization/components/edit_organization_profile.js:200
-#: js/pages/tola_management_pages/user/components/edit_user_profile.js:239
+#: js/pages/tola_management_pages/user/components/edit_user_profile.js:248
 msgid "Preferred Mode of Contact"
 msgstr "Forma de Contacto Preferida"
 
@@ -1662,13 +1662,13 @@ msgstr "Agregar Organización"
 
 #: js/pages/tola_management_pages/organization/views.js:168
 #: js/pages/tola_management_pages/program/views.js:320
-#: js/pages/tola_management_pages/user/views.js:346
+#: js/pages/tola_management_pages/user/views.js:345
 msgid "programs"
 msgstr "programas"
 
 #: js/pages/tola_management_pages/organization/views.js:174
 #: js/pages/tola_management_pages/program/views.js:311
-#: js/pages/tola_management_pages/user/views.js:356
+#: js/pages/tola_management_pages/user/views.js:355
 msgid "users"
 msgstr "usuarios"
 
@@ -1815,36 +1815,41 @@ msgstr "Agregar Programa"
 msgid "Resend Registration Email"
 msgstr "Reenviar Correo Electrónico de Registración"
 
-#: js/pages/tola_management_pages/user/components/edit_user_profile.js:139
+#. Translators: This is an deactivated menu item visible to users, indicating that assignment of this option is manaaged by another system.
+#: js/pages/tola_management_pages/user/components/edit_user_profile.js:17
+msgid "Mercy Corps -- managed by Okta"
+msgstr "Mercy Corps -- administrada por Okta"
+
+#: js/pages/tola_management_pages/user/components/edit_user_profile.js:148
 msgid "Preferred First Name"
 msgstr "Nombre Preferido"
 
-#: js/pages/tola_management_pages/user/components/edit_user_profile.js:155
+#: js/pages/tola_management_pages/user/components/edit_user_profile.js:164
 msgid "Preferred Last Name"
 msgstr "Apellido Preferido"
 
-#: js/pages/tola_management_pages/user/components/edit_user_profile.js:171
+#: js/pages/tola_management_pages/user/components/edit_user_profile.js:180
 msgid "Username"
 msgstr "Nombre de usuario"
 
-#: js/pages/tola_management_pages/user/components/edit_user_profile.js:203
+#: js/pages/tola_management_pages/user/components/edit_user_profile.js:212
 msgid "Title"
 msgstr "Título"
 
-#: js/pages/tola_management_pages/user/components/edit_user_profile.js:214
+#: js/pages/tola_management_pages/user/components/edit_user_profile.js:223
 msgid "Email"
 msgstr "Correo electrónico"
 
-#: js/pages/tola_management_pages/user/components/edit_user_profile.js:229
+#: js/pages/tola_management_pages/user/components/edit_user_profile.js:238
 msgid "Phone"
 msgstr "Teléfono"
 
-#: js/pages/tola_management_pages/user/components/edit_user_profile.js:250
-#: js/pages/tola_management_pages/user/components/edit_user_profile.js:257
+#: js/pages/tola_management_pages/user/components/edit_user_profile.js:259
+#: js/pages/tola_management_pages/user/components/edit_user_profile.js:266
 msgid "Save changes"
 msgstr "Guardar cambios"
 
-#: js/pages/tola_management_pages/user/components/edit_user_profile.js:251
+#: js/pages/tola_management_pages/user/components/edit_user_profile.js:260
 msgid "Save And Add Another"
 msgstr "Guardar y Agregar otro"
 
@@ -1902,17 +1907,17 @@ msgid "No"
 msgstr "No"
 
 #. Translators: An email was sent to the user to verify that the email address is valid
-#: js/pages/tola_management_pages/user/models.js:465
+#: js/pages/tola_management_pages/user/models.js:453
 msgid "Verification email sent"
 msgstr "Correo electrónico de verificación enviado"
 
 #. Translators: Sending an email to the user did not work
-#: js/pages/tola_management_pages/user/models.js:469
+#: js/pages/tola_management_pages/user/models.js:457
 msgid "Verification email send failed"
 msgstr "Falló el envío de correo electrónico de verificación"
 
 #. Translators: a list of groups of countries (i.e. "Asia")
-#: js/pages/tola_management_pages/user/models.js:724
+#: js/pages/tola_management_pages/user/models.js:712
 msgid "Regions"
 msgstr "Regiones"
 
@@ -1954,7 +1959,7 @@ msgid "Add user"
 msgstr "Agregar Usuario"
 
 #. Translators: The highest level of administrator in the system */}
-#: js/pages/tola_management_pages/user/views.js:335
+#: js/pages/tola_management_pages/user/views.js:334
 msgid "Super Admin"
 msgstr "Super Administrador"
 
