@@ -433,6 +433,7 @@ class IPTTExcelRenderer(ExcelRendererBase):
             self.add_blank_sheet()
 
     def add_blank_sheet(self):
+        # Translators: This is the title of a spreadsheet tab that shows do data has been found for the user's query.
         sheet = self.wb.create_sheet(ugettext('No data'))
         sheet['A1'].value = "No data matched the criteria"
 

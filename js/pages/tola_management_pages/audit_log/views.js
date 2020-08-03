@@ -254,9 +254,9 @@ export const IndexView = observer(
                                     <td>{data.user}</td>
                                     <td>{data.organization}</td>
                                     <td className="text-nowrap">{data.pretty_change_type}</td>
-                                    <td></td>
-                                    <td></td>
-                                    <td></td>
+                                    <td className="text-action">{is_expanded ? '' : '...'}</td>
+                                    <td className="text-action">{is_expanded ? '' : '...'}</td>
+                                    <td className="text-action">{is_expanded ? '' : '...'}</td>
                                 </tr>
                                 {is_expanded &&
                                 <tr className="changelog__entry__row" key={data.id}>

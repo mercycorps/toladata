@@ -1,14 +1,27 @@
 import React from 'react'
 import Select from 'react-select'
 import { observer } from "mobx-react"
+import { toJS } from 'mobx'
 
 @observer
 export default class EditUserProfile extends React.Component {
     constructor(props) {
         super(props)
         const {userData} = props
-        const organization_listing = props.organizations.filter(o => o.value != 1 || props.is_superuser)
+        const filtered_orgs = props.organizations.filter(o => o.value != 1 || props.is_superuser)
+        let organization_listing = []
+        for (let org of filtered_orgs) {
+            let org_js = toJS(org);
+            if (org_js.label === "Mercy Corps"){
+                // # Translators: This is an deactivated menu item visible to users, indicating that assignment of this option is manaaged by another system.
+                org_js.label = gettext("Mercy Corps -- managed by Okta");
+                org_js.isDisabled = true;
+            }
+            organization_listing.push(org_js)
+        }
+
         const selected_organization = organization_listing.find(o => o.value == userData.organization_id)
+        this.hasMCEmail = userData.email.endsWith("@mercycorps.org");
         this.state = {
             original_user_data: {...userData},
             managed_user_data: {...userData},
@@ -134,7 +147,7 @@ export default class EditUserProfile extends React.Component {
                     <div className="form-group">
                         <label className="label--required" htmlFor="user-first-name-input">{gettext("Preferred First Name")}</label>
                         <input
-                            disabled={disabled}
+                            disabled={disabled || this.hasMCEmail}
                             className={"form-control "+error_classes.first_name}
                             type="text"
                             value={ud.first_name || ''}
@@ -150,7 +163,7 @@ export default class EditUserProfile extends React.Component {
                     <div className="form-group">
                         <label className="label--required" htmlFor="user-last-name-input">{gettext("Preferred Last Name")}</label>
                         <input
-                            disabled={disabled}
+                            disabled={disabled || this.hasMCEmail}
                             className={"form-control "+error_classes.last_name}
                             type="text"
                             value={ud.last_name || ''}
@@ -166,7 +179,7 @@ export default class EditUserProfile extends React.Component {
                      <div className="form-group">
                         <label className="label--required" htmlFor="user-username-input">{gettext("Username")}</label>
                         <input
-                            disabled={disabled}
+                            disabled={disabled || this.hasMCEmail}
                             className={"form-control "+error_classes.username}
                             type="text"
                             value={ud.username || ''}
@@ -182,12 +195,13 @@ export default class EditUserProfile extends React.Component {
                     <div className="form-group">
                         <label className="label--required" htmlFor="user-organization-input">{gettext("Organization")}</label>
                         <Select
-                            isDisabled={disabled}
+                            isDisabled={disabled || this.hasMCEmail}
                             className={"react-select "+error_classes.organization}
                             value={this.state.selected_organization}
                             options={this.state.organization_listing}
                             onChange={(e) => this.updateOrganization(e)}
-                            placeholder="None Selected"
+                            // # Translators: This is the default option for a dropdown menu
+                            placeholder={gettext("None Selected")}
                             id="user-organization-input" />
                         {e.organization_id &&
                         <div className="invalid-feedback feedback--react-select">
@@ -209,7 +223,7 @@ export default class EditUserProfile extends React.Component {
                     <div className="form-group">
                         <label className="label--required" htmlFor="user-email-input">{gettext("Email")}</label>
                         <input
-                            disabled={disabled}
+                            disabled={disabled || this.hasMCEmail}
                             className={"form-control "+error_classes.email}
                             type="email"
                             value={ud.email || ''}

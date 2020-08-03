@@ -176,6 +176,7 @@ class ProgramRFOrderingMixin:
         """returns "by Outcome chain" or "par chaîne Résultat" for labeling the ordering filter"""
         result_tier = [tier for tier in self._get_program_tiers(program) if tier['tier_depth'] == 2]
         if result_tier and len(result_tier) == 1:
+            # Translators:  This labels how a list of levels is ordered.  Levels are part of a hierarchy and belong to one of ~six tiers.  Grouping by level means that Levels on the same tier but on different branches are gropued together.  Grouping by tier chain means levels are displayed with other levels in their same branch, as part of the natural hierarchy.
             return _('by %(tier)s chain') % {'tier': _(result_tier[0]['name'])}
         return None
 
