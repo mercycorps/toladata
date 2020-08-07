@@ -72,6 +72,9 @@ const ProgramDatesChangeset = ({data, name, pretty_name}) => {
 }
 
 const IndicatorChangeset = ({data, name, pretty_name, indicator}) => {
+    if(name === "baseline_na"){
+        return null;
+    }
     if(name === 'targets') {
         return <div className="changelog__change__targets">
             <h4 className="text-small">{gettext('Targets changed')}</h4>
@@ -91,6 +94,9 @@ const IndicatorChangeset = ({data, name, pretty_name, indicator}) => {
         }
         else {
             displayValue = localizeNumber(data);
+        }
+        if (name === "baseline_value" && displayValue === emptyValue) {
+            displayValue = "N/A";
         }
         const displayClasses = classNames({"empty-value": displayValue===emptyValue});
         return <div className="change__field">
