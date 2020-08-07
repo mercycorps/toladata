@@ -386,6 +386,7 @@ class ProgramAuditLogSerializer(ModelSerializer):
             'user',
             'organization',
             'indicator',
+            'result_info',
             'change_type',
             'rationale',
             'rationale_selected_options',
