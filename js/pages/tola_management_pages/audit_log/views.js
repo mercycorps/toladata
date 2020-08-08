@@ -173,7 +173,7 @@ const CollapseAllButton = observer(
     }
 );
 
-const IndicatorNameSpan = ({indicator, result_info}) => {
+export const IndicatorNameSpan = ({indicator, result_info}) => {
     if (! indicator) {
         return <span>{gettext('N/A')}</span>
     }
