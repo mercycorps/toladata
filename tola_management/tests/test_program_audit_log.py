@@ -174,13 +174,13 @@ class TestResultAuditLog(test.TestCase):
 
     def test_audit_log_result_info(self):
         ProgramAuditLog.log_indicator_created(self.tola_user.user, self.indicator, "a rationale")
-        log = ProgramAuditLog.objects.get(pk=1)
+        log = ProgramAuditLog.objects.order_by('pk').last()
         serialized_log = ProgramAuditLogSerializer(instance=log)
         self.assertIsNone(serialized_log.data['result_info'])
 
         result = i_factories.ResultFactory(date_collected="2020-05-15")
         ProgramAuditLog.log_result_created(self.tola_user.user, self.indicator, result, "this is a rationale")
-        log = ProgramAuditLog.objects.get(pk=2)
+        log = ProgramAuditLog.objects.order_by('pk').last()
         serialized_log = ProgramAuditLogSerializer(instance=log)
         self.assertEqual(serialized_log.data['result_info'], {"id": 1, "date": "2020-05-15"})
 
@@ -188,13 +188,13 @@ class TestResultAuditLog(test.TestCase):
         result.date_collected = date(2020,5,6)
         ProgramAuditLog.log_result_updated(
             self.tola_user.user, self.indicator, old_values, result.logged_fields, "rationale")
-        log = ProgramAuditLog.objects.get(pk=3)
+        log = ProgramAuditLog.objects.order_by('pk').last()
         serialized_log = ProgramAuditLogSerializer(instance=log)
         self.assertEqual(serialized_log.data['result_info'], {"id": 1, "date": "2020-05-06"})
 
         old_values = result.logged_fields
         ProgramAuditLog.log_result_deleted(self.tola_user.user, self.indicator, old_values, 'this is rational')
-        log = ProgramAuditLog.objects.get(pk=4)
+        log = ProgramAuditLog.objects.order_by('pk').last()
         serialized_log = ProgramAuditLogSerializer(instance=log)
         self.assertEqual(serialized_log.data['result_info'], {"id": 1, "date": "2020-05-06"})
 
