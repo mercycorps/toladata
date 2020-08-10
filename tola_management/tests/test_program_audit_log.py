@@ -182,7 +182,7 @@ class TestResultAuditLog(test.TestCase):
         ProgramAuditLog.log_result_created(self.tola_user.user, self.indicator, result, "this is a rationale")
         log = ProgramAuditLog.objects.order_by('pk').last()
         serialized_log = ProgramAuditLogSerializer(instance=log)
-        self.assertEqual(serialized_log.data['result_info'], {"id": 1, "date": "2020-05-15"})
+        self.assertEqual(serialized_log.data['result_info'], {"id": result.id, "date": "2020-05-15"})
 
         old_values = result.logged_fields
         result.date_collected = date(2020,5,6)
@@ -190,13 +190,13 @@ class TestResultAuditLog(test.TestCase):
             self.tola_user.user, self.indicator, old_values, result.logged_fields, "rationale")
         log = ProgramAuditLog.objects.order_by('pk').last()
         serialized_log = ProgramAuditLogSerializer(instance=log)
-        self.assertEqual(serialized_log.data['result_info'], {"id": 1, "date": "2020-05-06"})
+        self.assertEqual(serialized_log.data['result_info'], {"id": result.id, "date": "2020-05-06"})
 
         old_values = result.logged_fields
         ProgramAuditLog.log_result_deleted(self.tola_user.user, self.indicator, old_values, 'this is rational')
         log = ProgramAuditLog.objects.order_by('pk').last()
         serialized_log = ProgramAuditLogSerializer(instance=log)
-        self.assertEqual(serialized_log.data['result_info'], {"id": 1, "date": "2020-05-06"})
+        self.assertEqual(serialized_log.data['result_info'], {"id": result.id, "date": "2020-05-06"})
 
     def test_disaggregation_display_data(self):
         indicator = i_factories.RFIndicatorFactory(
