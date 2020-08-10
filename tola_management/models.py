@@ -520,6 +520,7 @@ class ProgramAuditLog(models.Model, DiffableLog):
         except ValueError:
             return 999
 
+    # Used in the audit log to show the result date when a result-related log entry is displayed
     @property
     def result_info(self):
         if self.change_type in ["result_created", "result_changed", "result_deleted"]:

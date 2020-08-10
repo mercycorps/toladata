@@ -1,0 +1,25 @@
+// Jest Snapshot v1, https://goo.gl/fbAQLP
+
+exports[`Audit log has two components - one for indicator and one for result 1`] = `
+Array [
+  <span>
+    <strong>
+      Indicator
+       
+      a
+      :
+    </strong>
+     
+    A test indicator
+  </span>,
+  <p
+    className="mt-2"
+  >
+    <strong>
+      Result date:
+    </strong>
+     
+    2020-05-15
+  </p>,
+]
+`;

@@ -74,6 +74,7 @@ describe("Audit log", () => {
             />
         ).toJSON();
         expect(component).toHaveLength(2);
+        expect(component).toMatchSnapshot();
 
     })
 });
