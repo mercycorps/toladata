@@ -1,7 +1,8 @@
 import React from 'react';
 import { resultLogChanged, resultLogDisaggs } from '../__fixtures__/resultLogFixtures';
+import { auditLogIndicator, auditLogResult } from "../__fixtures__/indicator_result_fixtures";
 import { ProgramAuditLogStore } from "../models"
-import { ResultChangeset, DisaggregationDiffs } from "../views"
+import { ResultChangeset, DisaggregationDiffs, IndicatorNameSpan } from "../views"
 import renderer from 'react-test-renderer';
 
 window.localizeNumber = function (number) { number };
@@ -53,5 +54,27 @@ describe("Audit log", () => {
             renderedLabels.push(component.toJSON().children[i].children[0].children[0]);
         }
         expect(renderedLabels).toEqual([ 'Another Disaggregation', 'Type of Leader' ]);
+    })
+
+    it("has one component object for indicator only, none for a result element", () => {
+        const component = renderer.create(
+            <IndicatorNameSpan
+                indicator={auditLogIndicator}
+                result_info={null}
+            />
+        ).toJSON();
+        expect(component['children'][2]).toEqual("A test indicator");
+    })
+
+    it("has two components - one for indicator and one for result", () => {
+        const component = renderer.create(
+            <IndicatorNameSpan
+                indicator={auditLogIndicator}
+                result_info={auditLogResult}
+            />
+        ).toJSON();
+        expect(component).toHaveLength(2);
+        expect(component).toMatchSnapshot();
+
     })
 });

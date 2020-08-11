@@ -173,20 +173,30 @@ const CollapseAllButton = observer(
     }
 );
 
-const IndicatorNameSpan = ({indicator}) => {
+export const IndicatorNameSpan = ({indicator, result_info}) => {
     if (! indicator) {
         return <span>{gettext('N/A')}</span>
     }
-
+    let indicator_output = ''
     if (indicator.results_aware_number) {
-        return <span>
+        indicator_output = <span>
             <strong>{gettext('Indicator')} {indicator.results_aware_number}:</strong> {indicator.name}
         </span>
     } else {
-        return <span>
+        indicator_output = <span>
             <strong>{gettext('Indicator')}:</strong> {indicator.name}
         </span>
     }
+
+    // # Translators: This is part of a change log.  The result date of the Result that has been changed is being shown
+    const result_output = result_info ? <p className="mt-2"><strong>{gettext("Result date:")}</strong> {result_info.date}</p> : null;
+
+    return (
+        <React.Fragment>
+            {indicator_output}
+            {result_output}
+        </React.Fragment>
+    )
 };
 
 const ResultLevel = ({indicator, level}) => {
@@ -236,7 +246,8 @@ export const IndexView = observer(
                             <tr>
                                 <th className="text-nowrap">{gettext("Date and time")}</th>
                                 <th className="text-nowrap">{gettext("Result level")}</th>
-                                <th className="text-nowrap">{gettext("Indicator")}</th>
+                                {/* # Translators: This is a column heading. The column is in a change log and identifies the entities being changed. */}
+                                <th className="text-nowrap">{gettext("Indicators and Results")}</th>
                                 <th className="text-nowrap">{gettext("User")}</th>
                                 <th className="text-nowrap">{gettext("Organization")}</th>
                                 <th className="text-nowrap">{gettext("Change type")}</th>
@@ -256,7 +267,7 @@ export const IndexView = observer(
                                         &nbsp;{data.date} (UTC)
                                     </td>
                                     <td><ResultLevel indicator={data.indicator} level={data.level} /></td>
-                                    <td>{<IndicatorNameSpan indicator={data.indicator} />}</td>
+                                    <td>{<IndicatorNameSpan indicator={data.indicator} result_info={data.result_info} />}</td>
                                     <td>{data.user}</td>
                                     <td>{data.organization}</td>
                                     <td className="text-nowrap">{data.pretty_change_type}</td>
