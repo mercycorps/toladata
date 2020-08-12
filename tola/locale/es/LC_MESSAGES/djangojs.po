@@ -1172,7 +1172,7 @@ msgstr "Fecha y hora"
 #. Translators: This is a column heading. The column is in a change log and identifies the entities being changed. */}
 #: js/pages/tola_management_pages/audit_log/views.js:253
 msgid "Indicators and results"
-msgstr "Indicadores con resultados"
+msgstr "Indicadores y resultados"
 
 #: js/pages/tola_management_pages/audit_log/views.js:254
 #: js/pages/tola_management_pages/user/views.js:260
