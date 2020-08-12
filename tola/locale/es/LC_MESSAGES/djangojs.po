@@ -6,8 +6,8 @@ msgid ""
 msgstr ""
 "Project-Id-Version: \n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2020-08-07 12:21-0700\n"
-"PO-Revision-Date: 2020-08-07 13:00-0700\n"
+"POT-Creation-Date: 2020-08-12 07:14-0700\n"
+"PO-Revision-Date: 2020-08-12 07:13-0700\n"
 "Last-Translator: \n"
 "Language-Team: \n"
 "Language: es\n"
@@ -15,7 +15,7 @@ msgstr ""
 "Content-Type: text/plain; charset=UTF-8\n"
 "Content-Transfer-Encoding: 8bit\n"
 "Plural-Forms: nplurals=2; plural=(n != 1);\n"
-"X-Generator: Poedit 2.4\n"
+"X-Generator: Poedit 2.4.1\n"
 
 #: js/base.js:357 js/base.js:358
 msgid ""
@@ -82,7 +82,7 @@ msgstr "Advertencia"
 #. Translators: This is a label for a dropdown that presents several possible justifications for changing a value
 #: js/base.js:541 js/components/changesetNotice.js:19
 #: js/pages/results_framework/components/level_cards.js:404
-#: js/pages/tola_management_pages/audit_log/views.js:257
+#: js/pages/tola_management_pages/audit_log/views.js:259
 msgid "Reason for change"
 msgstr "Razón para el cambio"
 
@@ -94,7 +94,7 @@ msgstr "¡Éxito!"
 #. Translators: button label to show the details of all rows in a list */}
 #: js/components/actionButtons.js:38
 #: js/pages/iptt_report/components/report/tableHeader.js:54
-#: js/pages/tola_management_pages/audit_log/views.js:158
+#: js/pages/tola_management_pages/audit_log/views.js:161
 msgid "Expand all"
 msgstr "Expandir todos"
 
@@ -102,7 +102,7 @@ msgstr "Expandir todos"
 #. Translators: button label to hide the details of all rows in a list */}
 #: js/components/actionButtons.js:52
 #: js/pages/iptt_report/components/report/tableHeader.js:60
-#: js/pages/tola_management_pages/audit_log/views.js:171
+#: js/pages/tola_management_pages/audit_log/views.js:174
 msgid "Collapse all"
 msgstr "Colapsar todos"
 
@@ -503,9 +503,9 @@ msgstr "No."
 #: js/pages/iptt_report/components/report/tableHeader.js:104
 #: js/pages/logframe/components/table.js:30
 #: js/pages/program_page/components/indicator_list.js:200
-#: js/pages/tola_management_pages/audit_log/views.js:105
-#: js/pages/tola_management_pages/audit_log/views.js:184
-#: js/pages/tola_management_pages/audit_log/views.js:188
+#: js/pages/tola_management_pages/audit_log/views.js:108
+#: js/pages/tola_management_pages/audit_log/views.js:186
+#: js/pages/tola_management_pages/audit_log/views.js:190
 msgid "Indicator"
 msgstr "Indicador"
 
@@ -550,8 +550,8 @@ msgstr "Base"
 #: js/pages/iptt_report/components/report/tableRows.js:259
 #: js/pages/iptt_report/components/report/tableRows.js:261
 #: js/pages/program_page/components/indicator_list.js:267
-#: js/pages/tola_management_pages/audit_log/views.js:179
-#: js/pages/tola_management_pages/audit_log/views.js:216
+#: js/pages/tola_management_pages/audit_log/views.js:181
+#: js/pages/tola_management_pages/audit_log/views.js:218
 msgid "N/A"
 msgstr "N/A"
 
@@ -673,7 +673,7 @@ msgid "Logframe"
 msgstr "Marco Lógico"
 
 #: js/pages/logframe/models/filterStore.js:33
-#: js/pages/tola_management_pages/audit_log/views.js:249
+#: js/pages/tola_management_pages/audit_log/views.js:251
 msgid "Result level"
 msgstr "Nivel del resultado"
 
@@ -1153,33 +1153,33 @@ msgid "Targets changed"
 msgstr "Objetivos modificados"
 
 #. Translators: This is part of a change log.  The result date of the Result that has been changed is being shown
-#: js/pages/tola_management_pages/audit_log/views.js:193
+#: js/pages/tola_management_pages/audit_log/views.js:195
 msgid "Result date:"
 msgstr "Fecha del resultado"
 
-#: js/pages/tola_management_pages/audit_log/views.js:224
+#: js/pages/tola_management_pages/audit_log/views.js:226
 msgid "Indicator change log"
 msgstr "Registro de cambios de indicadores"
 
-#: js/pages/tola_management_pages/audit_log/views.js:238
+#: js/pages/tola_management_pages/audit_log/views.js:240
 msgid "Excel"
 msgstr "Sobresalir"
 
-#: js/pages/tola_management_pages/audit_log/views.js:248
+#: js/pages/tola_management_pages/audit_log/views.js:250
 msgid "Date and time"
 msgstr "Fecha y hora"
 
 #. Translators: This is a column heading. The column is in a change log and identifies the entities being changed. */}
-#: js/pages/tola_management_pages/audit_log/views.js:251
-msgid "Indicators and Results"
-msgstr "Indicadores con Resultados"
+#: js/pages/tola_management_pages/audit_log/views.js:253
+msgid "Indicators and results"
+msgstr "Indicadores con resultados"
 
-#: js/pages/tola_management_pages/audit_log/views.js:252
+#: js/pages/tola_management_pages/audit_log/views.js:254
 #: js/pages/tola_management_pages/user/views.js:260
 msgid "User"
 msgstr "Usuario"
 
-#: js/pages/tola_management_pages/audit_log/views.js:253
+#: js/pages/tola_management_pages/audit_log/views.js:255
 #: js/pages/tola_management_pages/organization/views.js:110
 #: js/pages/tola_management_pages/user/components/edit_user_profile.js:196
 #: js/pages/tola_management_pages/user/views.js:202
@@ -1187,19 +1187,19 @@ msgstr "Usuario"
 msgid "Organization"
 msgstr "Organización"
 
-#: js/pages/tola_management_pages/audit_log/views.js:254
+#: js/pages/tola_management_pages/audit_log/views.js:256
 msgid "Change type"
 msgstr "Tipo de cambio"
 
-#: js/pages/tola_management_pages/audit_log/views.js:255
+#: js/pages/tola_management_pages/audit_log/views.js:257
 msgid "Previous entry"
 msgstr "Valor anterior"
 
-#: js/pages/tola_management_pages/audit_log/views.js:256
+#: js/pages/tola_management_pages/audit_log/views.js:258
 msgid "New entry"
 msgstr "Nuevo valor"
 
-#: js/pages/tola_management_pages/audit_log/views.js:319
+#: js/pages/tola_management_pages/audit_log/views.js:321
 msgid "entries"
 msgstr "ítems"
 

@@ -1,12 +1,13 @@
 import React from 'react';
+// import { localizeNumber } from "../../../../base"
 import { resultLogChanged, resultLogDisaggs } from '../__fixtures__/resultLogFixtures';
 import { auditLogIndicator, auditLogResult } from "../__fixtures__/indicator_result_fixtures";
 import { ProgramAuditLogStore } from "../models"
-import { ResultChangeset, DisaggregationDiffs, IndicatorNameSpan } from "../views"
+import { ResultChangeset, DisaggregationDiffs, IndicatorNameSpan, IndicatorChangeset } from "../views"
 import renderer from 'react-test-renderer';
 
-window.localizeNumber = function (number) { number };
-window.normalizeNumber = function (number) { number };
+window.localizeNumber = function (number) { return number };
+window.normalizeNumber = function (number) { return number };
 
 describe("Audit log", () => {
 
@@ -56,7 +57,7 @@ describe("Audit log", () => {
         expect(renderedLabels).toEqual([ 'Another Disaggregation', 'Type of Leader' ]);
     })
 
-    it("has one component object for indicator only, none for a result element", () => {
+    it("displays only one component object in indicator column when no result has changed", () => {
         const component = renderer.create(
             <IndicatorNameSpan
                 indicator={auditLogIndicator}
@@ -66,7 +67,7 @@ describe("Audit log", () => {
         expect(component['children'][2]).toEqual("A test indicator");
     })
 
-    it("has two components - one for indicator and one for result", () => {
+    it("displays two components in indicator column - one for indicator and one for result", () => {
         const component = renderer.create(
             <IndicatorNameSpan
                 indicator={auditLogIndicator}
@@ -76,5 +77,29 @@ describe("Audit log", () => {
         expect(component).toHaveLength(2);
         expect(component).toMatchSnapshot();
 
+    })
+
+    it("displays an em-dash for the empty prev entry baseline when type is indicator created", () => {
+        const component = renderer.create(
+            <IndicatorChangeset data={""} name={"baseline_value"} pretty_name={"Baseline"} indicator={{}} />
+        )
+        expect(component.toJSON().children[1].children[0]).toEqual("—")
+        expect(component).toMatchSnapshot();
+    })
+
+    it("displays N/A when the baseline not-applicable checkbox has been selected", () => {
+        const component = renderer.create(
+            <IndicatorChangeset data={null} name={"baseline_value"} pretty_name={"Baseline"} indicator={{}} />
+        )
+        expect(component.toJSON().children[1].children[0]).toEqual("N/A")
+        expect(component).toMatchSnapshot();
+    })
+
+    it("displays the baseline number when a baseline has been entered", () => {
+        const component = renderer.create(
+            <IndicatorChangeset data="4" name={"baseline_value"} pretty_name={"Baseline"} indicator={{}} />
+        )
+        expect(component.toJSON().children[1].children[0]).toEqual("4")
+        expect(component).toMatchSnapshot();
     })
 });
