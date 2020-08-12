@@ -71,7 +71,7 @@ const ProgramDatesChangeset = ({data, name, pretty_name}) => {
     return <p>{pretty_name}: {displayValue}</p>
 }
 
-const IndicatorChangeset = ({data, name, pretty_name, indicator}) => {
+export const IndicatorChangeset = ({data, name, pretty_name, indicator}) => {
     if(name === "baseline_na"){
         return null;
     }
@@ -95,9 +95,12 @@ const IndicatorChangeset = ({data, name, pretty_name, indicator}) => {
         else {
             displayValue = localizeNumber(data);
         }
+
         if (name === "baseline_value" && displayValue === emptyValue) {
-            displayValue = "N/A";
+            // Need to differentiate between no value (new indicator) and "N/A" (from N/A checkbox)
+            displayValue = data==="" ? emptyValue : "N/A"
         }
+
         const displayClasses = classNames({"empty-value": displayValue===emptyValue});
         return <div className="change__field">
             <strong className="change__field__name">
@@ -247,7 +250,7 @@ export const IndexView = observer(
                                 <th className="text-nowrap">{gettext("Date and time")}</th>
                                 <th className="text-nowrap">{gettext("Result level")}</th>
                                 {/* # Translators: This is a column heading. The column is in a change log and identifies the entities being changed. */}
-                                <th className="text-nowrap">{gettext("Indicators and Results")}</th>
+                                <th className="text-nowrap">{gettext("Indicators and results")}</th>
                                 <th className="text-nowrap">{gettext("User")}</th>
                                 <th className="text-nowrap">{gettext("Organization")}</th>
                                 <th className="text-nowrap">{gettext("Change type")}</th>
