@@ -1,0 +1,85 @@
+// Jest Snapshot v1, https://goo.gl/fbAQLP
+
+exports[`Audit log displays N/A when the baseline not-applicable checkbox has been selected 1`] = `
+<div
+  className="change__field"
+>
+  <strong
+    className="change__field__name"
+  >
+    <span>
+      Baseline
+      : 
+    </span>
+  </strong>
+  <span
+    className=""
+  >
+    N/A
+  </span>
+</div>
+`;
+
+exports[`Audit log displays an em-dash for the empty prev entry baseline when type is indicator created 1`] = `
+<div
+  className="change__field"
+>
+  <strong
+    className="change__field__name"
+  >
+    <span>
+      Baseline
+      : 
+    </span>
+  </strong>
+  <span
+    className="empty-value"
+  >
+    —
+  </span>
+</div>
+`;
+
+exports[`Audit log displays the baseline number when a baseline has been entered 1`] = `
+<div
+  className="change__field"
+>
+  <strong
+    className="change__field__name"
+  >
+    <span>
+      Baseline
+      : 
+    </span>
+  </strong>
+  <span
+    className=""
+  >
+    4
+  </span>
+</div>
+`;
+
+exports[`Audit log displays two components in indicator column - one for indicator and one for result 1`] = `
+Array [
+  <span>
+    <strong>
+      Indicator
+       
+      a
+      :
+    </strong>
+     
+    A test indicator
+  </span>,
+  <p
+    className="mt-2"
+  >
+    <strong>
+      Result date:
+    </strong>
+     
+    2020-05-15
+  </p>,
+]
+`;
