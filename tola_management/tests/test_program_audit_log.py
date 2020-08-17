@@ -1,4 +1,5 @@
 import json
+from datetime import date
 from decimal import Decimal
 from django import test
 from django.urls import reverse
@@ -8,6 +9,7 @@ from factories import (
     indicators_models as i_factories
 )
 from tola_management.models import ProgramAuditLog
+from tola_management.programadmin import ProgramAuditLogSerializer
 from indicators.models import Indicator, Result, DisaggregatedValue
 from workflow.models import COUNTRY_ROLE_CHOICES
 
@@ -169,6 +171,32 @@ class TestResultAuditLog(test.TestCase):
         logged_fields = result.logged_fields
         raw_logged_disagg_values = set([disagg['value'] for disagg in logged_fields['disaggregation_values'].values()])
         self.assertSetEqual(disagg_values_display, raw_logged_disagg_values)
+
+    def test_audit_log_result_info(self):
+        ProgramAuditLog.log_indicator_created(self.tola_user.user, self.indicator, "a rationale")
+        log = ProgramAuditLog.objects.order_by('pk').last()
+        serialized_log = ProgramAuditLogSerializer(instance=log)
+        self.assertIsNone(serialized_log.data['result_info'])
+
+        result = i_factories.ResultFactory(date_collected="2020-05-15")
+        ProgramAuditLog.log_result_created(self.tola_user.user, self.indicator, result, "this is a rationale")
+        log = ProgramAuditLog.objects.order_by('pk').last()
+        serialized_log = ProgramAuditLogSerializer(instance=log)
+        self.assertEqual(serialized_log.data['result_info'], {"id": result.id, "date": "2020-05-15"})
+
+        old_values = result.logged_fields
+        result.date_collected = date(2020,5,6)
+        ProgramAuditLog.log_result_updated(
+            self.tola_user.user, self.indicator, old_values, result.logged_fields, "rationale")
+        log = ProgramAuditLog.objects.order_by('pk').last()
+        serialized_log = ProgramAuditLogSerializer(instance=log)
+        self.assertEqual(serialized_log.data['result_info'], {"id": result.id, "date": "2020-05-06"})
+
+        old_values = result.logged_fields
+        ProgramAuditLog.log_result_deleted(self.tola_user.user, self.indicator, old_values, 'this is rational')
+        log = ProgramAuditLog.objects.order_by('pk').last()
+        serialized_log = ProgramAuditLogSerializer(instance=log)
+        self.assertEqual(serialized_log.data['result_info'], {"id": result.id, "date": "2020-05-06"})
 
     def test_disaggregation_display_data(self):
         indicator = i_factories.RFIndicatorFactory(
