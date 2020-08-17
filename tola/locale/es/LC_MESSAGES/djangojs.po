@@ -6,8 +6,8 @@ msgid ""
 msgstr ""
 "Project-Id-Version: \n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2020-08-12 07:14-0700\n"
-"PO-Revision-Date: 2020-08-12 07:13-0700\n"
+"POT-Creation-Date: 2020-08-16 22:08-0700\n"
+"PO-Revision-Date: 2020-08-16 22:08-0700\n"
 "Last-Translator: \n"
 "Language-Team: \n"
 "Language: es\n"
@@ -1155,7 +1155,7 @@ msgstr "Objetivos modificados"
 #. Translators: This is part of a change log.  The result date of the Result that has been changed is being shown
 #: js/pages/tola_management_pages/audit_log/views.js:195
 msgid "Result date:"
-msgstr "Fecha del resultado"
+msgstr "Fecha del resultado:"
 
 #: js/pages/tola_management_pages/audit_log/views.js:226
 msgid "Indicator change log"
