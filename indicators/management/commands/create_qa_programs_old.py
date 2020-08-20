@@ -30,7 +30,6 @@ from indicators.models import (
 )
 from workflow.models import Program, Country, Organization, TolaUser, CountryAccess, ProgramAccess, SiteProfile, Sector
 from indicators.views.views_indicators import generate_periodic_targets
-from .qa_program_proletariat.qa_program_proletariate import Cleaner, ProgramFactory, IndicatorFactory, user_profiles
 
 class Command(BaseCommand):
     help = """
@@ -57,27 +56,22 @@ class Command(BaseCommand):
         # ***********
         # Creates programs, indicators and results for qa testing
         # ***********
-        # if options['clean_tolaland']:
-        #     self.clean_tolaland()
-        #     sys.exit()
-        #
-        # if options['clean_programs']:
-        #     self.clean_programs()
-        #     sys.exit()
-        #
-        # if options['clean_test_users']:
-        #     self.clean_test_users()
-        #     sys.exit()
-        #
-        # if options['clean_all']:
-        #     self.clean_programs()
-        #     self.clean_tolaland()
-        #     self.clean_test_users()
-        #     sys.exit()
+        if options['clean_tolaland']:
+            self.clean_tolaland()
+            sys.exit()
 
-        clean_commands = [option for option in options if 'clean' in option and options[option] is True]
-        if clean_commands:
-            Cleaner.clean(*clean_commands)
+        if options['clean_programs']:
+            self.clean_programs()
+            sys.exit()
+
+        if options['clean_test_users']:
+            self.clean_test_users()
+            sys.exit()
+
+        if options['clean_all']:
+            self.clean_programs()
+            self.clean_tolaland()
+            self.clean_test_users()
             sys.exit()
 
         # if options['create_test_users']:
@@ -104,10 +98,6 @@ class Command(BaseCommand):
         if created:
             self.create_disaggregations(country)
 
-
-        password = getpass(prompt="Enter the password to use for the test users: ")
-        self.create_test_users(password)
-
         self.create_test_sites()
         for super_user in TolaUser.objects.filter(user__is_superuser=True):
             ca, created = CountryAccess.objects.get_or_create(country=country, tolauser=super_user)
@@ -124,87 +114,63 @@ class Command(BaseCommand):
         future_end_date = (future_start_date + relativedelta(months=19)).replace(day=28)
         future_end_date = (future_end_date + relativedelta(days=5)).replace(day=1)
 
-        # all_params_base = []
-        # for freq in Indicator.TARGET_FREQUENCIES:
-        #     for uom_type in (Indicator.NUMBER, Indicator.PERCENTAGE):
-        #         for is_cumulative in (True, False):
-        #             for direction in (Indicator.DIRECTION_OF_CHANGE_POSITIVE, Indicator.DIRECTION_OF_CHANGE_NEGATIVE):
-        #                 # Don't create indicators that are LoP|cumulative or percent|non-cumulative
-        #                 # since we don't support those combinations
-        #                 if (freq[0] == Indicator.LOP and is_cumulative) or \
-        #                         (uom_type == Indicator.PERCENTAGE and not is_cumulative):
-        #                     continue
-        #                 all_params_base.append({
-        #                     'freq': freq[0], 'uom_type': uom_type, 'is_cumulative': is_cumulative,
-        #                     'direction': direction, 'null_level': None})
-        # null_supplements_params = [
-        #     {'freq': Indicator.ANNUAL, 'uom_type': Indicator.NUMBER, 'is_cumulative': False,
-        #      'direction': Indicator.DIRECTION_OF_CHANGE_POSITIVE, 'null_level': 'targets'},
-        #     {'freq': Indicator.QUARTERLY, 'uom_type': Indicator.PERCENTAGE, 'is_cumulative': True,
-        #      'direction': Indicator.DIRECTION_OF_CHANGE_NONE, 'null_level': 'results'},
-        #     {'freq': Indicator.LOP, 'uom_type': Indicator.NUMBER, 'is_cumulative': False,
-        #      'direction': Indicator.DIRECTION_OF_CHANGE_NONE, 'null_level': 'results'},
-        #     {'freq': Indicator.EVENT, 'uom_type': Indicator.PERCENTAGE, 'is_cumulative': True,
-        #      'direction': Indicator.DIRECTION_OF_CHANGE_NEGATIVE, 'null_level': 'evidence'},
-        #     {'freq': Indicator.MID_END, 'uom_type': Indicator.NUMBER, 'is_cumulative': False,
-        #      'direction': Indicator.DIRECTION_OF_CHANGE_POSITIVE, 'null_level': 'evidence'},
-        # ]
-        #
-        # short_param_base = [
-        #     {'freq': Indicator.ANNUAL, 'uom_type': Indicator.NUMBER, 'is_cumulative': True,
-        #      'direction': Indicator.DIRECTION_OF_CHANGE_POSITIVE, 'null_level': None},
-        #     {'freq': Indicator.ANNUAL, 'uom_type': Indicator.PERCENTAGE, 'is_cumulative': True,
-        #      'direction': Indicator.DIRECTION_OF_CHANGE_NONE, 'null_level': None},
-        #     {'freq': Indicator.QUARTERLY, 'uom_type': Indicator.NUMBER, 'is_cumulative': False,
-        #      'direction': Indicator.DIRECTION_OF_CHANGE_NONE, 'null_level': None},
-        #     {'freq': Indicator.QUARTERLY, 'uom_type': Indicator.NUMBER, 'is_cumulative': True,
-        #      'direction': Indicator.DIRECTION_OF_CHANGE_POSITIVE, 'null_level': None},
-        #     {'freq': Indicator.QUARTERLY, 'uom_type': Indicator.PERCENTAGE, 'is_cumulative': True,
-        #      'direction': Indicator.DIRECTION_OF_CHANGE_NEGATIVE, 'null_level': None},
-        #     {'freq': Indicator.LOP, 'uom_type': Indicator.NUMBER, 'is_cumulative': True,
-        #      'direction': Indicator.DIRECTION_OF_CHANGE_NONE, 'null_level': None},
-        #     {'freq': Indicator.LOP, 'uom_type': Indicator.PERCENTAGE, 'is_cumulative': True,
-        #      'direction': Indicator.DIRECTION_OF_CHANGE_NONE, 'null_level': None},
-        #     {'freq': Indicator.MID_END, 'uom_type': Indicator.NUMBER, 'is_cumulative': True,
-        #      'direction': Indicator.DIRECTION_OF_CHANGE_NONE, 'null_level': None},
-        #     {'freq': Indicator.MID_END, 'uom_type': Indicator.PERCENTAGE, 'is_cumulative': True,
-        #      'direction': Indicator.DIRECTION_OF_CHANGE_NONE, 'null_level': None},
-        #     {'freq': Indicator.EVENT, 'uom_type': Indicator.PERCENTAGE, 'is_cumulative': True,
-        #      'direction': Indicator.DIRECTION_OF_CHANGE_NONE, 'null_level': None},
-        # ]
+        all_params_base = []
+        for freq in Indicator.TARGET_FREQUENCIES:
+            for uom_type in (Indicator.NUMBER, Indicator.PERCENTAGE):
+                for is_cumulative in (True, False):
+                    for direction in (Indicator.DIRECTION_OF_CHANGE_POSITIVE, Indicator.DIRECTION_OF_CHANGE_NEGATIVE):
+                        # Don't create indicators that are LoP|cumulative or percent|non-cumulative
+                        # since we don't support those combinations
+                        if (freq[0] == Indicator.LOP and is_cumulative) or \
+                                (uom_type == Indicator.PERCENTAGE and not is_cumulative):
+                            continue
+                        all_params_base.append({
+                            'freq': freq[0], 'uom_type': uom_type, 'is_cumulative': is_cumulative,
+                            'direction': direction, 'null_level': None})
+        null_supplements_params = [
+            {'freq': Indicator.ANNUAL, 'uom_type': Indicator.NUMBER, 'is_cumulative': False,
+             'direction': Indicator.DIRECTION_OF_CHANGE_POSITIVE, 'null_level': 'targets'},
+            {'freq': Indicator.QUARTERLY, 'uom_type': Indicator.PERCENTAGE, 'is_cumulative': True,
+             'direction': Indicator.DIRECTION_OF_CHANGE_NONE, 'null_level': 'results'},
+            {'freq': Indicator.LOP, 'uom_type': Indicator.NUMBER, 'is_cumulative': False,
+             'direction': Indicator.DIRECTION_OF_CHANGE_NONE, 'null_level': 'results'},
+            {'freq': Indicator.EVENT, 'uom_type': Indicator.PERCENTAGE, 'is_cumulative': True,
+             'direction': Indicator.DIRECTION_OF_CHANGE_NEGATIVE, 'null_level': 'evidence'},
+            {'freq': Indicator.MID_END, 'uom_type': Indicator.NUMBER, 'is_cumulative': False,
+             'direction': Indicator.DIRECTION_OF_CHANGE_POSITIVE, 'null_level': 'evidence'},
+        ]
+
+        short_param_base = [
+            {'freq': Indicator.ANNUAL, 'uom_type': Indicator.NUMBER, 'is_cumulative': True,
+             'direction': Indicator.DIRECTION_OF_CHANGE_POSITIVE, 'null_level': None},
+            {'freq': Indicator.ANNUAL, 'uom_type': Indicator.PERCENTAGE, 'is_cumulative': True,
+             'direction': Indicator.DIRECTION_OF_CHANGE_NONE, 'null_level': None},
+            {'freq': Indicator.QUARTERLY, 'uom_type': Indicator.NUMBER, 'is_cumulative': False,
+             'direction': Indicator.DIRECTION_OF_CHANGE_NONE, 'null_level': None},
+            {'freq': Indicator.QUARTERLY, 'uom_type': Indicator.NUMBER, 'is_cumulative': True,
+             'direction': Indicator.DIRECTION_OF_CHANGE_POSITIVE, 'null_level': None},
+            {'freq': Indicator.QUARTERLY, 'uom_type': Indicator.PERCENTAGE, 'is_cumulative': True,
+             'direction': Indicator.DIRECTION_OF_CHANGE_NEGATIVE, 'null_level': None},
+            {'freq': Indicator.LOP, 'uom_type': Indicator.NUMBER, 'is_cumulative': True,
+             'direction': Indicator.DIRECTION_OF_CHANGE_NONE, 'null_level': None},
+            {'freq': Indicator.LOP, 'uom_type': Indicator.PERCENTAGE, 'is_cumulative': True,
+             'direction': Indicator.DIRECTION_OF_CHANGE_NONE, 'null_level': None},
+            {'freq': Indicator.MID_END, 'uom_type': Indicator.NUMBER, 'is_cumulative': True,
+             'direction': Indicator.DIRECTION_OF_CHANGE_NONE, 'null_level': None},
+            {'freq': Indicator.MID_END, 'uom_type': Indicator.PERCENTAGE, 'is_cumulative': True,
+             'direction': Indicator.DIRECTION_OF_CHANGE_NONE, 'null_level': None},
+            {'freq': Indicator.EVENT, 'uom_type': Indicator.PERCENTAGE, 'is_cumulative': True,
+             'direction': Indicator.DIRECTION_OF_CHANGE_NONE, 'null_level': None},
+        ]
 
         # Create programs for specific people
-        # if not options['named_only'] and not options['levelicious_only']:
-        #     password = getpass(prompt="Enter the password to use for the test users: ")
-        #     self.create_test_users(password)
+        if not options['named_only'] and not options['levelicious_only']:
+            password = getpass(prompt="Enter the password to use for the test users: ")
 
-        # if options['levelicious_only']:
-        #     Program.objects.filter(
-        #         name__in=['QA Program -- Levels all the way down', 'QA Program -- Levels most of the way down']
-        #     ).delete()
-
-        program_factory = ProgramFactory(country)
-        indicator_factory = IndicatorFactory()
-
-        # Create programs for specific people
-        if options['names']:
-            tester_names = options['names'].split(',')
-        else:
-            tester_names = ['Barbara', 'Cameron', 'Carly', 'Jenny', 'Marie', 'Marco', 'Paul', 'Sanjuro']
-        for t_name in tester_names:
-            program_name = 'QA program - {}'.format(t_name)
-            program = program_factory.create_program(main_start_date, main_end_date, program_name)
-            print('Creating indicators for {}'.format(Program.objects.get(id=program.id)))
-            self.create_levels(program.id, filtered_levels)
-            # self.create_indicators(program, all_params_base, personal_indicator=True)
-            # self.create_indicators(program, null_supplements_params, apply_skips=False, personal_indicator=True)
-            indicator_factory.create_indicators(program, "base", personal_indicator=True)
-            indicator_factory.create_indicators(program, "nulls", apply_skips=False, personal_indicator=True)
-
-        if options['named_only']:
-            # password = getpass(prompt="Enter the password to use for the test users: ")
-            # self.create_test_users(password)
-            sys.exit()
+        if options['levelicious_only']:
+            Program.objects.filter(
+                name__in=['QA Program -- Levels all the way down', 'QA Program -- Levels most of the way down']
+            ).delete()
 
         if not options['named_only']:
             # Program that have the max number of levels allowed, one of which has levels with no indicators assigned
@@ -239,10 +205,25 @@ class Command(BaseCommand):
                         indicatorless_levels = [int(tier_depth/2)]
                 self.create_indicators(program.id, all_params_base, indicatorless_levels=indicatorless_levels)
 
-        # if options['levelicious_only']:
-        #     sys.exit()
+        if options['levelicious_only']:
+            sys.exit()
 
+        # Create programs for specific people
+        if options['names']:
+            tester_names = options['names'].split(',')
+        else:
+            tester_names = ['Barbara', 'Cameron', 'Carly', 'Jenny', 'Marie', 'Marco', 'Paul', 'Sanjuro']
 
+        for t_name in tester_names:
+            program_name = 'QA program - {}'.format(t_name)
+            program = self.create_program(main_start_date, main_end_date, country, program_name)
+            print('Creating indicators for {}'.format(Program.objects.get(id=program.id)))
+            self.create_levels(program.id, filtered_levels)
+            self.create_indicators(program.id, all_params_base, personal_indicator=True)
+            self.create_indicators(program.id, null_supplements_params, apply_skips=False, personal_indicator=True)
+
+        if options['named_only']:
+            sys.exit()
 
         print('Creating ghost of programs past')
         program = self.create_program(
@@ -286,11 +267,11 @@ class Command(BaseCommand):
         self.create_levels(program.id, filtered_levels)
         self.create_indicators(program.id, all_params_base, apply_skips=False, apply_rf_skips=True)
 
-        # print('Creating program with no skips')
-        # program = self.create_program(
-        #     main_start_date, main_end_date, country, 'QA Program --- All the things! (no skipped values)')
-        # self.create_levels(program.id, filtered_levels)
-        # self.create_indicators(program.id, all_params_base, apply_skips=False)
+        print('Creating program with no skips')
+        program = self.create_program(
+            main_start_date, main_end_date, country, 'QA Program --- All the things! (no skipped values)')
+        self.create_levels(program.id, filtered_levels)
+        self.create_indicators(program.id, all_params_base, apply_skips=False)
 
         # Create programs with various levels of no data indicators
         print('Creating null program with no indicators')
@@ -353,9 +334,10 @@ class Command(BaseCommand):
 
         # Create test users and assign broad permissions to superusers.
         # self.create_test_users(password)
-
-        password = getpass(prompt="Enter the password to use for the test users: ")
-        self.create_test_users(password)
+        if options['create_test_users'] and not options['named_only']:
+            password = getpass(prompt="Enter the password to use for the test users: ")
+            self.create_test_users(password)
+            sys.exit()
 
     @staticmethod
     def create_disaggregations(country):
@@ -417,25 +399,25 @@ class Command(BaseCommand):
             params['null_level'] = null_levels[i]
         return False
 
-    # @staticmethod
-    # def make_targets(program, indicator):
-    #     if indicator.target_frequency == Indicator.LOP:
-    #         PeriodicTarget.objects.create(**{
-    #             'indicator': indicator,
-    #             'customsort': 1,
-    #             'edit_date': timezone.now(),
-    #             'period': 'LOP target',
-    #             })
-    #         return
-    #     elif indicator.target_frequency == Indicator.EVENT:
-    #         for i in range(3):
-    #             PeriodicTarget.objects.create(**{
-    #                 'indicator': indicator,
-    #                 'customsort': i,
-    #                 'edit_date': timezone.now(),
-    #                 'period': 'Event {}'.format(i + 1),
-    #             })
-    #         return
+    @staticmethod
+    def make_targets(program, indicator):
+        if indicator.target_frequency == Indicator.LOP:
+            PeriodicTarget.objects.create(**{
+                'indicator': indicator,
+                'customsort': 1,
+                'edit_date': timezone.now(),
+                'period': 'LOP target',
+                })
+            return
+        elif indicator.target_frequency == Indicator.EVENT:
+            for i in range(3):
+                PeriodicTarget.objects.create(**{
+                    'indicator': indicator,
+                    'customsort': i,
+                    'edit_date': timezone.now(),
+                    'period': 'Event {}'.format(i + 1),
+                })
+            return
 
         target_generator = PeriodicTarget.generate_for_frequency(indicator.target_frequency)
         num_periods = len([p for p in target_generator(program.reporting_period_start, program.reporting_period_end)])
@@ -720,35 +702,35 @@ class Command(BaseCommand):
 
         return indicator_ids
 
-    # def disaggregate_result(self, result, result_disagg_type, indicator):
-    #     label_sets = []
-    #     if result_disagg_type == 'sadd' and self.sadd_disagg:
-    #         label_sets.append(list(DisaggregationLabel.objects.filter(disaggregation_type=self.sadd_disagg)))
-    #     elif result_disagg_type == 'one' and indicator.disaggregation.all().count() > 1:
-    #         disagg_type = DisaggregationType.objects\
-    #             .filter(indicator=indicator)\
-    #             .exclude(pk=self.sadd_disagg.pk)\
-    #             .order_by('?')\
-    #             .first()
-    #         label_sets.append(list(DisaggregationLabel.objects.filter(disaggregation_type=disagg_type)))
-    #     elif result_disagg_type == 'two' and indicator.disaggregation.all().count() > 1:
-    #         disagg_types = DisaggregationType.objects.filter(indicator=indicator).exclude(pk=self.sadd_disagg.pk)
-    #         for disagg_type in disagg_types:
-    #             label_sets.append(list(DisaggregationLabel.objects.filter(disaggregation_type=disagg_type)))
-    #     elif result_disagg_type == 'all':
-    #         for disagg_type in indicator.disaggregation.all():
-    #             label_sets.append(list(DisaggregationLabel.objects.filter(disaggregation_type=disagg_type)))
-    #
-    #     if len(label_sets) < 1:
-    #         return
-    #     for label_set in label_sets:
-    #         # Calculate how many of the labels we will use (k) and then randomly select that number of label indexes
-    #         k = random.randrange(1, len(label_set) + 1)
-    #         label_indexes = random.sample(list(range(len(label_set))), k)
-    #         values = self.make_random_disagg_values(result.achieved, len(label_indexes))
-    #         for label_index, value in zip(label_indexes, values):
-    #             label = label_set[label_index]
-    #             DisaggregatedValue.objects.create(category_id=label.pk, value=value, result=result)
+    def disaggregate_result(self, result, result_disagg_type, indicator):
+        label_sets = []
+        if result_disagg_type == 'sadd' and self.sadd_disagg:
+            label_sets.append(list(DisaggregationLabel.objects.filter(disaggregation_type=self.sadd_disagg)))
+        elif result_disagg_type == 'one' and indicator.disaggregation.all().count() > 1:
+            disagg_type = DisaggregationType.objects\
+                .filter(indicator=indicator)\
+                .exclude(pk=self.sadd_disagg.pk)\
+                .order_by('?')\
+                .first()
+            label_sets.append(list(DisaggregationLabel.objects.filter(disaggregation_type=disagg_type)))
+        elif result_disagg_type == 'two' and indicator.disaggregation.all().count() > 1:
+            disagg_types = DisaggregationType.objects.filter(indicator=indicator).exclude(pk=self.sadd_disagg.pk)
+            for disagg_type in disagg_types:
+                label_sets.append(list(DisaggregationLabel.objects.filter(disaggregation_type=disagg_type)))
+        elif result_disagg_type == 'all':
+            for disagg_type in indicator.disaggregation.all():
+                label_sets.append(list(DisaggregationLabel.objects.filter(disaggregation_type=disagg_type)))
+
+        if len(label_sets) < 1:
+            return
+        for label_set in label_sets:
+            # Calculate how many of the labels we will use (k) and then randomly select that number of label indexes
+            k = random.randrange(1, len(label_set) + 1)
+            label_indexes = random.sample(list(range(len(label_set))), k)
+            values = self.make_random_disagg_values(result.achieved, len(label_indexes))
+            for label_index, value in zip(label_indexes, values):
+                label = label_set[label_index]
+                DisaggregatedValue.objects.create(category_id=label.pk, value=value, result=result)
 
     @staticmethod
     def create_levels(program_id, level_data):
@@ -771,7 +753,7 @@ class Command(BaseCommand):
             level_map[level_fix['pk']] = level
 
     def clean_test_users(self):
-        for username in user_profiles.keys():
+        for username in self.user_profiles.keys():
             auth_user = User.objects.filter(username=username)
             if auth_user.count() == 1:
                 tola_user = TolaUser.objects.filter(user=auth_user[0])
@@ -811,7 +793,7 @@ class Command(BaseCommand):
     def create_test_users(self, password):
         created_users = []
         existing_users = []
-        for username, profile in user_profiles.items():
+        for username, profile in self.user_profiles.items():
             home_country = None
             if profile['home_country']:
                 home_country = Country.objects.get(country=profile['home_country'])
@@ -851,7 +833,8 @@ class Command(BaseCommand):
             for accessible_country in accessible_countries:
                 if tola_user.organization.name == 'Mercy Corps':
                     ca, created = CountryAccess.objects.get_or_create(
-                        tolauser=tola_user, country=accessible_country, defaults={"role": 'user'})
+                        tolauser=tola_user, country=accessible_country, role='user')
+                    ca.save()
 
                 # Need to also do program by program for MC members if the permission level is high because
                 # default with country access is low.
@@ -972,147 +955,147 @@ class Command(BaseCommand):
                         nl, program, max_depth=max_depth, children_per_node=children_per_node,
                         childless_nodes=childless_nodes, cycle_start=cycle_start)
 
-    # standard_countries = ['Afghanistan', 'Haiti', 'Jordan', 'Tolaland', 'United States']
-    # TEST_ORG, created = Organization.objects.get_or_create(name='Test')
-    # MC_ORG = Organization.objects.get(name='Mercy Corps')
-    # user_profiles = {
-    #     'mc-low': {
-    #         'first_last': ['mc-low-first', 'mc-low-last'],
-    #         'email': 'tolatestone@mercycorps.org',
-    #         'accessible_countries': standard_countries,
-    #         'permission_level': 'low',
-    #         'home_country': 'United States',
-    #         'org': MC_ORG,
-    #     },
-    #     'mc-medium': {
-    #         'first_last': ['mc-med-first', 'mc-med-last'],
-    #         'email': 'tolatesttwo@mercycorps.org',
-    #         'accessible_countries': standard_countries,
-    #         'permission_level': 'medium',
-    #         'home_country': 'United States',
-    #         'org': MC_ORG,
-    #     },
-    #     'mc-high': {
-    #         'first_last': ['mc-high-first', 'mc-high-last'],
-    #         'email': 'tolatestthree@mercycorps.org',
-    #         'accessible_countries': standard_countries,
-    #         'permission_level': 'high',
-    #         'home_country': 'United States',
-    #         'org': MC_ORG,
-    #     },
-    #     'mc-basicadmin': {
-    #         'first_last': ['mc-basicadmin-first', 'mc-basicadmin-last'],
-    #         'email': 'mcbasicadmin@example.com',
-    #         'accessible_countries': standard_countries,
-    #         'permission_level': 'high',
-    #         'home_country': 'United States',
-    #         'org': MC_ORG,
-    #         'admin': 'all'
-    #     },
-    #     'gmail-low': {
-    #         'first_last': ['gmail-low-first', 'gmail-low-last'],
-    #         'email': 'mctest.low@gmail.com',
-    #         'accessible_countries': standard_countries,
-    #         'permission_level': 'low',
-    #         'home_country': None,
-    #         'org': TEST_ORG,
-    #     },
-    #     'gmail-medium': {
-    #         'first_last': ['gmail-med-first', 'gmail-med-last'],
-    #         'email': 'mctest.medium@gmail.com',
-    #         'accessible_countries': standard_countries,
-    #         'permission_level': 'medium',
-    #         'home_country': None,
-    #         'org': TEST_ORG,
-    #     },
-    #     'gmail-high': {
-    #         'first_last': ['gmail-high-first', 'gmail-high-last'],
-    #         'email': 'mctest.high@gmail.com',
-    #         'accessible_countries': standard_countries,
-    #         'permission_level': 'high',
-    #         'home_country': None,
-    #         'org': TEST_ORG,
-    #     },
-    #     'external-low': {
-    #         'first_last': ['external-low-first', 'external-low-last'],
-    #         'email': 'external-low@example.com',
-    #         'accessible_countries': standard_countries,
-    #         'permission_level': 'low',
-    #         'home_country': None,
-    #         'org': TEST_ORG,
-    #     },
-    #     'external-medium': {
-    #         'first_last': ['external-med-first', 'external-med-last'],
-    #         'email': 'external-medium@example.com',
-    #         'accessible_countries': standard_countries,
-    #         'permission_level': 'medium',
-    #         'home_country': None,
-    #         'org': TEST_ORG,
-    #     },
-    #     'external-high': {
-    #         'first_last': ['external-high-first', 'external-high-last'],
-    #         'email': 'external-high@example.com',
-    #         'accessible_countries': standard_countries,
-    #         'permission_level': 'high',
-    #         'home_country': None,
-    #         'org': TEST_ORG,
-    #     },
-    #     'demo1': {
-    #         'first_last': ['demo', 'one'],
-    #         'email': 'demo1@example.com',
-    #         'accessible_countries': ['Ethiopia'],
-    #         'permission_level': 'low',
-    #         'home_country': 'Ethiopia',
-    #         'org': MC_ORG,
-    #     },
-    #     'demo2': {
-    #         'first_last': ['demo', 'two'],
-    #         'email': 'demo2@example.com',
-    #         'accessible_countries': [],
-    #         'permission_level': 'medium',
-    #         'home_country': None,
-    #         'org': TEST_ORG,
-    #         'program_access': [('Ethiopia', 'Collaboration in Cross-Border Areas', 'medium')]
-    #     },
-    #     'demo3': {
-    #         'first_last': ['demo', 'three'],
-    #         'email': 'demo3@example.com',
-    #         'accessible_countries': [],
-    #         'permission_level': 'high',
-    #         'home_country': None,
-    #         'org': TEST_ORG,
-    #         'program_access': [('Ethiopia', 'Collaboration in Cross-Border Areas', 'high')]
-    #     },
-    #
-    # }
+    standard_countries = ['Afghanistan', 'Haiti', 'Jordan', 'Tolaland', 'United States']
+    TEST_ORG, created = Organization.objects.get_or_create(name='Test')
+    MC_ORG = Organization.objects.get(name='Mercy Corps')
+    user_profiles = {
+        'mc-low': {
+            'first_last': ['mc-low-first', 'mc-low-last'],
+            'email': 'tolatestone@mercycorps.org',
+            'accessible_countries': standard_countries,
+            'permission_level': 'low',
+            'home_country': 'United States',
+            'org': MC_ORG,
+        },
+        'mc-medium': {
+            'first_last': ['mc-med-first', 'mc-med-last'],
+            'email': 'tolatesttwo@mercycorps.org',
+            'accessible_countries': standard_countries,
+            'permission_level': 'medium',
+            'home_country': 'United States',
+            'org': MC_ORG,
+        },
+        'mc-high': {
+            'first_last': ['mc-high-first', 'mc-high-last'],
+            'email': 'tolatestthree@mercycorps.org',
+            'accessible_countries': standard_countries,
+            'permission_level': 'high',
+            'home_country': 'United States',
+            'org': MC_ORG,
+        },
+        'mc-basicadmin': {
+            'first_last': ['mc-basicadmin-first', 'mc-basicadmin-last'],
+            'email': 'mcbasicadmin@example.com',
+            'accessible_countries': standard_countries,
+            'permission_level': 'high',
+            'home_country': 'United States',
+            'org': MC_ORG,
+            'admin': 'all'
+        },
+        'gmail-low': {
+            'first_last': ['gmail-low-first', 'gmail-low-last'],
+            'email': 'mctest.low@gmail.com',
+            'accessible_countries': standard_countries,
+            'permission_level': 'low',
+            'home_country': None,
+            'org': TEST_ORG,
+        },
+        'gmail-medium': {
+            'first_last': ['gmail-med-first', 'gmail-med-last'],
+            'email': 'mctest.medium@gmail.com',
+            'accessible_countries': standard_countries,
+            'permission_level': 'medium',
+            'home_country': None,
+            'org': TEST_ORG,
+        },
+        'gmail-high': {
+            'first_last': ['gmail-high-first', 'gmail-high-last'],
+            'email': 'mctest.high@gmail.com',
+            'accessible_countries': standard_countries,
+            'permission_level': 'high',
+            'home_country': None,
+            'org': TEST_ORG,
+        },
+        'external-low': {
+            'first_last': ['external-low-first', 'external-low-last'],
+            'email': 'external-low@example.com',
+            'accessible_countries': standard_countries,
+            'permission_level': 'low',
+            'home_country': None,
+            'org': TEST_ORG,
+        },
+        'external-medium': {
+            'first_last': ['external-med-first', 'external-med-last'],
+            'email': 'external-medium@example.com',
+            'accessible_countries': standard_countries,
+            'permission_level': 'medium',
+            'home_country': None,
+            'org': TEST_ORG,
+        },
+        'external-high': {
+            'first_last': ['external-high-first', 'external-high-last'],
+            'email': 'external-high@example.com',
+            'accessible_countries': standard_countries,
+            'permission_level': 'high',
+            'home_country': None,
+            'org': TEST_ORG,
+        },
+        'demo1': {
+            'first_last': ['demo', 'one'],
+            'email': 'demo1@example.com',
+            'accessible_countries': ['Ethiopia'],
+            'permission_level': 'low',
+            'home_country': 'Ethiopia',
+            'org': MC_ORG,
+        },
+        'demo2': {
+            'first_last': ['demo', 'two'],
+            'email': 'demo2@example.com',
+            'accessible_countries': [],
+            'permission_level': 'medium',
+            'home_country': None,
+            'org': TEST_ORG,
+            'program_access': [('Ethiopia', 'Collaboration in Cross-Border Areas', 'medium')]
+        },
+        'demo3': {
+            'first_last': ['demo', 'three'],
+            'email': 'demo3@example.com',
+            'accessible_countries': [],
+            'permission_level': 'high',
+            'home_country': None,
+            'org': TEST_ORG,
+            'program_access': [('Ethiopia', 'Collaboration in Cross-Border Areas', 'high')]
+        },
 
-    # @staticmethod
-    # def make_random_disagg_values(aggregate_value, total_slot_count):
-    #     filled = []
-    #     for slot_index in range(total_slot_count):
-    #         slots_available_count = total_slot_count - len(filled)
-    #         max_value = aggregate_value - sum(filled) - slots_available_count + 1
-    #         if max_value <=1:
-    #             filled.extend([1]*slots_available_count)
-    #             break
-    #         elif slot_index == total_slot_count - 1:
-    #             filled.append(aggregate_value - sum(filled))
-    #         else:
-    #             filled.append(random.randrange(0, max_value))
-    #     if sum(filled) < aggregate_value:
-    #         filled[0] += aggregate_value - sum(filled)
-    #     if sum(filled) > aggregate_value:
-    #         reduction_amount = sum(filled) - aggregate_value
-    #         while reduction_amount > 0:
-    #             i = filled.index(max(filled))
-    #             if filled[i] >= reduction_amount:
-    #                 filled[i] -= reduction_amount
-    #                 reduction_amount = 0
-    #             else:
-    #                 reduction_amount -= filled[i]
-    #                 filled[i] = 0
-    #
-    #     if sum(filled) != aggregate_value:
-    #         raise NotImplementedError('You wrote a bad algorithm')
-    #     random.shuffle(filled)
-    #     return filled
+    }
+
+    @staticmethod
+    def make_random_disagg_values(aggregate_value, total_slot_count):
+        filled = []
+        for slot_index in range(total_slot_count):
+            slots_available_count = total_slot_count - len(filled)
+            max_value = aggregate_value - sum(filled) - slots_available_count + 1
+            if max_value <=1:
+                filled.extend([1]*slots_available_count)
+                break
+            elif slot_index == total_slot_count - 1:
+                filled.append(aggregate_value - sum(filled))
+            else:
+                filled.append(random.randrange(0, max_value))
+        if sum(filled) < aggregate_value:
+            filled[0] += aggregate_value - sum(filled)
+        if sum(filled) > aggregate_value:
+            reduction_amount = sum(filled) - aggregate_value
+            while reduction_amount > 0:
+                i = filled.index(max(filled))
+                if filled[i] >= reduction_amount:
+                    filled[i] -= reduction_amount
+                    reduction_amount = 0
+                else:
+                    reduction_amount -= filled[i]
+                    filled[i] = 0
+
+        if sum(filled) != aggregate_value:
+            raise NotImplementedError('You wrote a bad algorithm')
+        random.shuffle(filled)
+        return filled
