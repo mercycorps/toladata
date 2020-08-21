@@ -3,6 +3,8 @@ import math
 import os
 import random
 import sys
+import functools
+import time
 from copy import deepcopy
 from datetime import date, timedelta
 from dateutil.relativedelta import relativedelta
@@ -53,6 +55,7 @@ class ProgramFactory():
         if multi_country:
             country2 = Country.objects.get(country="United States")
             program.country.add(country2)
+
         return program
 
     @staticmethod
@@ -143,10 +146,10 @@ class IndicatorFactory():
         Indicator.DIRECTION_OF_CHANGE_NEGATIVE: "Decrease (-)",
     }
 
-    try:
-        sadd_disagg = DisaggregationType.objects.get(pk=109)
-    except DisaggregationType.DoesNotExist:
-        sadd_disagg = False
+    # try:
+    #     sadd_disagg = DisaggregationType.objects.get(pk=109)
+    # except DisaggregationType.DoesNotExist:
+    #     sadd_disagg = False
 
     # def __init__(self):
     #     try:
@@ -154,12 +157,15 @@ class IndicatorFactory():
     #     except DisaggregationType.DoesNotExist:
     #         self.sadd_disagg = False
 
-    @classmethod
+    def __init__(self, program, country):
+        self.program = program
+        self.country = country
+
     def create_indicators(
-        cls, program, param_sets, indicator_suffix='', apply_skips=True, apply_rf_skips=False,
+            self, param_sets, indicator_suffix='', apply_skips=True, apply_rf_skips=False,
             personal_indicator=False, indicatorless_levels=None):
-        if param_sets in cls.parameter_options:
-            param_sets = cls.parameter_options[param_sets]
+        if param_sets in self.parameter_options:
+            param_sets = self.parameter_options[param_sets]
         indicatorless_levels = [] if not indicatorless_levels else indicatorless_levels
         # try:
         #     self.sadd_disagg = DisaggregationType.objects.get(pk=109)
@@ -187,17 +193,17 @@ class IndicatorFactory():
         # }
 
         # Keep track of results and evidence created across the whole programs so we can skip them periodically
-        result_count = 0
-        result_skip_mod = 7
-        evidence_count = 0
-        evidence_skip_mod = 7
+        # result_count = 0
+        # result_skip_mod = 7
+        # evidence_count = 0
+        # evidence_skip_mod = 7
 
         old_levels = list(Indicator.objects.filter(old_level__isnull=False).order_by('old_level')
                           .distinct().values_list('old_level', flat=True))
         old_levels.append(None)
         old_level_cycle = cycle(old_levels)
 
-        rf_levels = list(Level.objects.filter(program__id=program.id).exclude(id__in=indicatorless_levels))
+        rf_levels = list(Level.objects.filter(program__id=self.program.id).exclude(id__in=indicatorless_levels))
         if apply_rf_skips:
             rf_levels.append(None)
         rf_level_cycle = cycle(rf_levels)
@@ -221,29 +227,30 @@ class IndicatorFactory():
         country_disagg_cycle = cycle([0, 1, 2])
         sadd_disagg_cycle = cycle([True, True, True, False])
         result_disagg_cycle = cycle(['sadd', 'one', 'two', 'none', 'all', 'all', 'all', 'none'])
-
+        result_count = 0
         for n, params in enumerate(param_sets):
             if params['is_cumulative']:
                 cumulative_text = 'Cumulative'
             else:
                 cumulative_text = 'Non-cumulative'
+
             country_disagg_count = next(country_disagg_cycle)
-            sadd_disagg = next(sadd_disagg_cycle)
+            sadd_disagg_flag = next(sadd_disagg_cycle)
             result_disagg = next(result_disagg_cycle)
 
             indicator_name_list = [
-                cls.frequency_labels[params['freq']],
-                cls.uom_labels[params['uom_type']],
+                self.frequency_labels[params['freq']],
+                self.uom_labels[params['uom_type']],
                 cumulative_text,
-                cls.direction_labels[params['direction']],
-                f"Disagg type - SADD:{sadd_disagg}, Country:{country_disagg_count}",
+                self.direction_labels[params['direction']],
+                f"Disagg type - SADD:{sadd_disagg_flag}, Country:{country_disagg_count}",
 
             ]
             if params['null_level']:
                 indicator_name_list.append(f"| No {params['null_level']}")
             else:
                 result_text_list = []
-                result_text_list.append(f"SADD:{result_disagg in ('all', 'sadd')}") if sadd_disagg else None
+                result_text_list.append(f"SADD:{result_disagg in ('all', 'sadd')}") if sadd_disagg_flag else None
                 result_text_list.append(f"Country:{result_disagg in ('one', 'two', 'all')}") if country_disagg_count > 0 else None
                 if len(result_text_list) > 0:
                     result_text = ", ".join(result_text_list)
@@ -268,16 +275,17 @@ class IndicatorFactory():
                 baseline=0,
                 unit_of_measure_type=params['uom_type'],
                 direction_of_change=params['direction'],
-                program=program,
-                old_level=None if program.results_framework else next(old_level_cycle),
+                program=self.program,
+                old_level=None if self.program.results_framework else next(old_level_cycle),
                 level=next(rf_level_cycle),
                 sector=None if not personal_indicator else next(sector_cycle),
             )
             indicator.save()
-            if cls.sadd_disagg and sadd_disagg:
-                indicator.disaggregation.add(cls.sadd_disagg)
-            country = Country.objects.get(country="Tolaland")
-            for disagg in country.disaggregationtype_set.all().order_by('?')[:country_disagg_count]:
+            print('indicator name', indicator.name)
+            # if self.sadd_disagg and sadd_disagg:
+            #     indicator.disaggregation.add(self.sadd_disagg)
+            # country = Country.objects.get(country="Tolaland")
+            for disagg in self.country.disaggregationtype_set.all().order_by('?')[:country_disagg_count]:
                 indicator.disaggregation.add(disagg)
 
             i_type = next(type_cycle)
@@ -291,124 +299,153 @@ class IndicatorFactory():
                 indicator.save()
                 continue
 
-            cls.make_targets(program, indicator)
+            self.make_targets(self.program, indicator)
             periodic_targets = PeriodicTarget.objects.filter(indicator__id=indicator.id)
 
             # Different combinations of UOM type, direction of change and cummulativeness require
             # different inputs.
-            if params['uom_type'] == Indicator.NUMBER:
-                if params['direction'] == Indicator.DIRECTION_OF_CHANGE_POSITIVE:
-                    if params['is_cumulative']:
-                        target_start = 100
-                        target_increment = target_start
-                        achieved_start = 90
-                        achieved_increment = int(achieved_start * 1.1)
-                    else:
-                        target_start = 100
-                        target_increment = target_start
-                        achieved_start = 90
-                        achieved_increment = int(achieved_start * 1.1)
-                else:
-                    if params['is_cumulative']:
-                        target_start = 500
-                        target_increment = -int(math.floor((target_start/len(periodic_targets))/10)*10)
-                        achieved_start = 400
-                        achieved_increment = target_increment+2
-                    else:
-                        target_start = 500
-                        target_increment = -int(math.floor((target_start/len(periodic_targets))/10)*10)
-                        achieved_start = 400
-                        achieved_increment = target_increment * .8
-            else:
-                if params['direction'] == Indicator.DIRECTION_OF_CHANGE_POSITIVE:
-                    # Don't need to check non-cumulative because we don't really handle it
-                    target_start = 10
-                    target_increment = 3
-                    achieved_start = 7
-                    achieved_increment = 4
-                else:
-                    # Don't need to check non-cumulative because we don't really handle it
-                    target_start = 90
-                    target_increment = max(-math.floor(target_start/len(periodic_targets)), -2)
-                    achieved_start = 95
-                    achieved_increment = target_increment - 1
+            # if params['uom_type'] == Indicator.NUMBER:
+            #     if params['direction'] == Indicator.DIRECTION_OF_CHANGE_POSITIVE:
+            #         if params['is_cumulative']:
+            #             target_start = 100
+            #             target_increment = target_start
+            #             achieved_start = 90
+            #             achieved_increment = int(achieved_start * 1.1)
+            #         else:
+            #             target_start = 100
+            #             target_increment = target_start
+            #             achieved_start = 90
+            #             achieved_increment = int(achieved_start * 1.1)
+            #     else:
+            #         if params['is_cumulative']:
+            #             target_start = 500
+            #             target_increment = -int(math.floor((target_start/len(periodic_targets))/10)*10)
+            #             achieved_start = 400
+            #             achieved_increment = target_increment+2
+            #         else:
+            #             target_start = 500
+            #             target_increment = -int(math.floor((target_start/len(periodic_targets))/10)*10)
+            #             achieved_start = 400
+            #             achieved_increment = target_increment * .8
+            # else:
+            #     if params['direction'] == Indicator.DIRECTION_OF_CHANGE_POSITIVE:
+            #         # Don't need to check non-cumulative because we don't really handle it
+            #         target_start = 10
+            #         target_increment = 3
+            #         achieved_start = 7
+            #         achieved_increment = 4
+            #     else:
+            #         # Don't need to check non-cumulative because we don't really handle it
+            #         target_start = 90
+            #         target_increment = max(-math.floor(target_start/len(periodic_targets)), -2)
+            #         achieved_start = 95
+            #         achieved_increment = target_increment - 1
+
+            incrementors = self.calc_target_and_achieved_base(
+                params['uom_type'], params['direction'], params['is_cumulative'], len(periodic_targets))
 
             lop_target = 0
-            day_offset = timedelta(days=2)
+
+
             for i, pt in enumerate(periodic_targets):
                 # Create the target amount (the PeriodicTarget object has already been created)
-                pt.target = target_start + target_increment * i
+                pt.target = incrementors['target_start'] + incrementors['target_increment'] * i
                 pt.save()
-
                 if params['is_cumulative']:
                     lop_target = pt.target
                 else:
                     lop_target += pt.target
 
-                # Users shouldn't put in results with a date in the future, so neither should we.
-                if pt.start_date and date.today() < pt.start_date + day_offset:
-                    continue
-
-                # Skip creating a result if the null_level is result or if
-                # the number of results has reached the arbitrary skip point.
-                result_count += 1
-                if (apply_skips and result_count % result_skip_mod == result_skip_mod - 2) or \
-                        params['null_level'] == 'results':
-                    continue
-
-                # if params['direction'] == Indicator.DIRECTION_OF_CHANGE_NEGATIVE:
-                #     achieved_value = achieved_start - (achieved_increment * i)
-                # else:
-                achieved_value = achieved_start + (achieved_increment * i)
-
-                results_to_create = 1
-                if apply_skips and result_count % result_skip_mod in (1, result_skip_mod - 3):
-                    results_to_create = 2
-                    if params['uom_type'] == Indicator.NUMBER:
-                        achieved_value = int(achieved_value * .4)
-                    else:
-                        achieved_value = int(achieved_value * .9)
-
-                # Now create the Results and their related Records
-                if pt.start_date:
-                    date_collected = pt.start_date + day_offset
-                else:
-                    date_collected = date.today()
-
-                for c in range(results_to_create):
-                    rs = Result(
-                        periodic_target=pt,
-                        indicator=indicator,
-                        program=program,
-                        achieved=achieved_value,
-                        date_collected=date_collected)
-                    rs.save()
-                    if result_disagg != 'none':
-                        cls.disaggregate_result(rs, result_disagg, indicator)
-                    date_collected = date_collected + day_offset
-                    if params['uom_type'] == Indicator.NUMBER:
-                        achieved_value = int(achieved_value * 1.5)
-                    else:
-                        achieved_value = int(achieved_value * 1.15)
-
-                    evidence_count += 1
-                    if params['null_level'] == 'evidence':
-                        continue
-
-                    if apply_skips and evidence_count % evidence_skip_mod == int(evidence_skip_mod / 2):
-                        evidence_count += 1
-                        continue
-                    rs.record_name = 'Evidence {} for result id {}'.format(evidence_count, rs.id)
-                    rs.evidence_url = 'http://my/evidence/url'
-
-                    r_site = next(site_cycle)
-                    if personal_indicator and r_site:
-                        rs.site.add(r_site)
-
-                    rs.save()
+                start = time.process_time()
 
             indicator.lop_target = lop_target
             indicator.save()
+
+            rf = ResultFactory(
+                indicator, self.program, sadd_disagg_flag, result_disagg, params['uom_type'], params['null_level'],
+                site_cycle, personal_indicator, apply_skips)
+            result_count = rf.make_results(periodic_targets, incrementors, result_count)
+
+            #
+            # if n > 2:
+            #     break
+
+            # lop_target = 0
+            # day_offset = timedelta(days=2)
+            # for i, pt in enumerate(periodic_targets):
+            #     # Create the target amount (the PeriodicTarget object has already been created)
+            #     # pt.target = target_start + target_increment * i
+            #     # pt.save()
+            #
+            #     # if params['is_cumulative']:
+            #     #     lop_target = pt.target
+            #     # else:
+            #     #     lop_target += pt.target
+            #
+            #     # Users shouldn't put in results with a date in the future, so neither should we.
+            #     if pt.start_date and date.today() < pt.start_date + day_offset:
+            #         continue
+            #
+            #     # Skip creating a result if the null_level is result or if
+            #     # the number of results has reached the arbitrary skip point.
+            #     result_count += 1
+            #     if (apply_skips and result_count % result_skip_mod == result_skip_mod - 2) or \
+            #             params['null_level'] == 'results':
+            #         continue
+            #
+            #     # if params['direction'] == Indicator.DIRECTION_OF_CHANGE_NEGATIVE:
+            #     #     achieved_value = achieved_start - (achieved_increment * i)
+            #     # else:
+            #     achieved_value = achieved_start + (achieved_increment * i)
+            #
+            #     results_to_create = 1
+            #     if apply_skips and result_count % result_skip_mod in (1, result_skip_mod - 3):
+            #         results_to_create = 2
+            #         if params['uom_type'] == Indicator.NUMBER:
+            #             achieved_value = int(achieved_value * .4)
+            #         else:
+            #             achieved_value = int(achieved_value * .9)
+            #
+            #     # Now create the Results and their related Records
+            #     if pt.start_date:
+            #         date_collected = pt.start_date + day_offset
+            #     else:
+            #         date_collected = date.today()
+            #
+            #     for c in range(results_to_create):
+            #         rs = Result(
+            #             periodic_target=pt,
+            #             indicator=indicator,
+            #             program=program,
+            #             achieved=achieved_value,
+            #             date_collected=date_collected)
+            #         rs.save()
+            #         if result_disagg != 'none':
+            #             cls.disaggregate_result(rs, result_disagg, indicator)
+            #         date_collected = date_collected + day_offset
+            #         if params['uom_type'] == Indicator.NUMBER:
+            #             achieved_value = int(achieved_value * 1.5)
+            #         else:
+            #             achieved_value = int(achieved_value * 1.15)
+            #
+            #         evidence_count += 1
+            #         if params['null_level'] == 'evidence':
+            #             continue
+            #
+            #         if apply_skips and evidence_count % evidence_skip_mod == int(evidence_skip_mod / 2):
+            #             evidence_count += 1
+            #             continue
+            #         rs.record_name = 'Evidence {} for result id {}'.format(evidence_count, rs.id)
+            #         rs.evidence_url = 'http://my/evidence/url'
+            #
+            #         r_site = next(site_cycle)
+            #         if personal_indicator and r_site:
+            #             rs.site.add(r_site)
+            #
+            #         rs.save()
+
+            # indicator.lop_target = lop_target
+            # indicator.save()
 
         return indicator_ids
 
@@ -455,20 +492,230 @@ class IndicatorFactory():
                     'end_date': pt['end_date'],
                 })
 
+    # @classmethod
+    # def disaggregate_result(self, result, result_disagg_type, indicator):
+    #     label_sets = []
+    #     if result_disagg_type == 'sadd' and self.sadd_disagg:
+    #         label_sets.append(list(DisaggregationLabel.objects.filter(disaggregation_type=self.sadd_disagg)))
+    #     elif result_disagg_type == 'one' and indicator.disaggregation.all().count() > 1:
+    #         disagg_type = DisaggregationType.objects\
+    #             .filter(indicator=indicator)\
+    #             .exclude(pk=self.sadd_disagg.pk)\
+    #             .order_by('?')\
+    #             .first()
+    #         label_sets.append(list(DisaggregationLabel.objects.filter(disaggregation_type=disagg_type)))
+    #     elif result_disagg_type == 'two' and indicator.disaggregation.all().count() > 1:
+    #         disagg_types = DisaggregationType.objects.filter(indicator=indicator).exclude(pk=self.sadd_disagg.pk)
+    #         for disagg_type in disagg_types:
+    #             label_sets.append(list(DisaggregationLabel.objects.filter(disaggregation_type=disagg_type)))
+    #     elif result_disagg_type == 'all':
+    #         for disagg_type in indicator.disaggregation.all():
+    #             label_sets.append(list(DisaggregationLabel.objects.filter(disaggregation_type=disagg_type)))
+    #
+    #     if len(label_sets) < 1:
+    #         return
+    #     for label_set in label_sets:
+    #         # Calculate how many of the labels we will use (k) and then randomly select that number of label indexes
+    #         k = random.randrange(1, len(label_set) + 1)
+    #         label_indexes = random.sample(list(range(len(label_set))), k)
+    #         values = self.make_random_disagg_values(result.achieved, len(label_indexes))
+    #         for label_index, value in zip(label_indexes, values):
+    #             label = label_set[label_index]
+    #             DisaggregatedValue.objects.create(category_id=label.pk, value=value, result=result)
+    #
+    # @staticmethod
+    # def make_random_disagg_values(aggregate_value, total_slot_count):
+    #     filled = []
+    #     for slot_index in range(total_slot_count):
+    #         slots_available_count = total_slot_count - len(filled)
+    #         max_value = aggregate_value - sum(filled) - slots_available_count + 1
+    #         if max_value <= 1:
+    #             filled.extend([1] * slots_available_count)
+    #             break
+    #         elif slot_index == total_slot_count - 1:
+    #             filled.append(aggregate_value - sum(filled))
+    #         else:
+    #             filled.append(random.randrange(0, max_value))
+    #     if sum(filled) < aggregate_value:
+    #         filled[0] += aggregate_value - sum(filled)
+    #     if sum(filled) > aggregate_value:
+    #         reduction_amount = sum(filled) - aggregate_value
+    #         while reduction_amount > 0:
+    #             i = filled.index(max(filled))
+    #             if filled[i] >= reduction_amount:
+    #                 filled[i] -= reduction_amount
+    #                 reduction_amount = 0
+    #             else:
+    #                 reduction_amount -= filled[i]
+    #                 filled[i] = 0
+    #
+    #     if sum(filled) != aggregate_value:
+    #         raise NotImplementedError('You wrote a bad algorithm')
+    #     random.shuffle(filled)
+    #     return filled
+
+    @staticmethod
+    def calc_target_and_achieved_base(uom_type, direction, is_cumulative, pt_count):
+        if uom_type == Indicator.NUMBER:
+            if direction == Indicator.DIRECTION_OF_CHANGE_POSITIVE:
+                if is_cumulative:
+                    target_start = 100
+                    target_increment = target_start
+                    achieved_start = 90
+                    achieved_increment = int(achieved_start * 1.1)
+                else:
+                    target_start = 100
+                    target_increment = target_start
+                    achieved_start = 90
+                    achieved_increment = int(achieved_start * 1.1)
+            else:
+                if is_cumulative:
+                    target_start = 500
+                    target_increment = -int(math.floor((target_start / pt_count) / 10) * 10)
+                    achieved_start = 400
+                    achieved_increment = target_increment + 2
+                else:
+                    target_start = 500
+                    target_increment = -int(math.floor((target_start / pt_count) / 10) * 10)
+                    achieved_start = 400
+                    achieved_increment = target_increment * .8
+        else:
+            if direction == Indicator.DIRECTION_OF_CHANGE_POSITIVE:
+                # Don't need to check non-cumulative because we don't really handle it
+                target_start = 10
+                target_increment = 3
+                achieved_start = 7
+                achieved_increment = 4
+            else:
+                # Don't need to check non-cumulative because we don't really handle it
+                target_start = 90
+                target_increment = max(-math.floor(target_start / pt_count), -2)
+                achieved_start = 95
+                achieved_increment = target_increment - 1
+
+        return {
+            "target_start": target_start, "target_increment": target_increment,
+            "achieved_start": achieved_start, "achieved_increment": achieved_increment}
+
+
+class ResultFactory():
+    try:
+        sadd_disagg_obj = DisaggregationType.objects.get(pk=109)
+    except DisaggregationType.DoesNotExist:
+        sadd_disagg_obj = False
+
+    def __init__(
+            self, indicator, program, sadd_disagg_flag, result_disagg, uom_type, null_level,
+            site_cycle, personal_indicator, apply_skips):
+        self.indicator = indicator
+        self.sadd_disagg_flag = sadd_disagg_flag
+        if self.sadd_disagg_obj and sadd_disagg_flag:
+            indicator.disaggregation.add(self.sadd_disagg_obj)
+        self.program = program
+
+        self.result_disagg = result_disagg
+        self.uom_type = uom_type
+        self.null_level = null_level
+        self.site_cycle = site_cycle
+        self.personal_indicator = personal_indicator
+        self.apply_skips = apply_skips
+
+    def make_results(self, periodic_targets, incrementors, result_count):
+        result_skip_mod = 7
+        evidence_count = 0
+        evidence_skip_mod = 7
+
+        day_offset = timedelta(days=2)
+        for i, pt in enumerate(periodic_targets):
+            # Create the target amount (the PeriodicTarget object has already been created)
+            # pt.target = target_start + target_increment * i
+            # pt.save()
+
+            # if params['is_cumulative']:
+            #     lop_target = pt.target
+            # else:
+            #     lop_target += pt.target
+
+            # Users shouldn't put in results with a date in the future, so neither should we.
+            if pt.start_date and date.today() < pt.start_date + day_offset:
+                continue
+
+            # Skip creating a result if the null_level is result or if
+            # the number of results has reached the arbitrary skip point.
+            result_count += 1
+            if (self.apply_skips and result_count % result_skip_mod == result_skip_mod - 2) or \
+                self.null_level == 'results':
+                continue
+
+            # if params['direction'] == Indicator.DIRECTION_OF_CHANGE_NEGATIVE:
+            #     achieved_value = achieved_start - (achieved_increment * i)
+            # else:
+            achieved_value = incrementors['achieved_start'] + (incrementors['achieved_increment'] * i)
+
+            results_to_create = 1
+            if self.apply_skips and result_count % result_skip_mod in (1, result_skip_mod - 3):
+                results_to_create = 2
+                if self.uom_type == Indicator.NUMBER:
+                    achieved_value = int(achieved_value * .4)
+                else:
+                    achieved_value = int(achieved_value * .9)
+            print('apply skips', self.apply_skips, 'result count', result_count, result_count, 'result_skip_mod', result_skip_mod)
+            print('results to create', results_to_create)
+            # Now create the Results and their related Records
+            if pt.start_date:
+                date_collected = pt.start_date + day_offset
+            else:
+                date_collected = date.today()
+
+            for c in range(results_to_create):
+                rs = Result(
+                    periodic_target=pt,
+                    indicator=self.indicator,
+                    program=self.program,
+                    achieved=achieved_value,
+                    date_collected=date_collected)
+                rs.save()
+                print('result date', rs.date_collected)
+                if self.result_disagg != 'none':
+                    self.disaggregate_result(rs, self.result_disagg, self.indicator)
+                date_collected = date_collected + day_offset
+                if self.uom_type == Indicator.NUMBER:
+                    achieved_value = int(achieved_value * 1.5)
+                else:
+                    achieved_value = int(achieved_value * 1.15)
+
+                evidence_count += 1
+                if self.null_level == 'evidence':
+                    continue
+
+                if self.apply_skips and evidence_count % evidence_skip_mod == int(evidence_skip_mod / 2):
+                    evidence_count += 1
+                    continue
+                rs.record_name = 'Evidence {} for result id {}'.format(evidence_count, rs.id)
+                rs.evidence_url = 'http://my/evidence/url'
+
+                r_site = next(self.site_cycle)
+                if self.personal_indicator and r_site:
+                    rs.site.add(r_site)
+
+                rs.save()
+        return result_count
+
     @classmethod
     def disaggregate_result(self, result, result_disagg_type, indicator):
+
         label_sets = []
-        if result_disagg_type == 'sadd' and self.sadd_disagg:
-            label_sets.append(list(DisaggregationLabel.objects.filter(disaggregation_type=self.sadd_disagg)))
+        if result_disagg_type == 'sadd' and self.sadd_disagg_obj:
+            label_sets.append(list(DisaggregationLabel.objects.filter(disaggregation_type=self.sadd_disagg_obj)))
         elif result_disagg_type == 'one' and indicator.disaggregation.all().count() > 1:
             disagg_type = DisaggregationType.objects\
                 .filter(indicator=indicator)\
-                .exclude(pk=self.sadd_disagg.pk)\
+                .exclude(pk=self.sadd_disagg_obj.pk)\
                 .order_by('?')\
                 .first()
             label_sets.append(list(DisaggregationLabel.objects.filter(disaggregation_type=disagg_type)))
         elif result_disagg_type == 'two' and indicator.disaggregation.all().count() > 1:
-            disagg_types = DisaggregationType.objects.filter(indicator=indicator).exclude(pk=self.sadd_disagg.pk)
+            disagg_types = DisaggregationType.objects.filter(indicator=indicator).exclude(pk=self.sadd_disagg_obj.pk)
             for disagg_type in disagg_types:
                 label_sets.append(list(DisaggregationLabel.objects.filter(disaggregation_type=disagg_type)))
         elif result_disagg_type == 'all':
@@ -485,6 +732,8 @@ class IndicatorFactory():
             for label_index, value in zip(label_indexes, values):
                 label = label_set[label_index]
                 DisaggregatedValue.objects.create(category_id=label.pk, value=value, result=result)
+
+
 
     @staticmethod
     def make_random_disagg_values(aggregate_value, total_slot_count):
@@ -516,14 +765,6 @@ class IndicatorFactory():
             raise NotImplementedError('You wrote a bad algorithm')
         random.shuffle(filled)
         return filled
-
-
-class ResultFactory():
-    pass
-
-
-class DisaggFactory():
-    pass
 
 
 class Cleaner():

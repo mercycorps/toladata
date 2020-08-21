@@ -78,7 +78,7 @@ class Command(BaseCommand):
         clean_commands = [option for option in options if 'clean' in option and options[option] is True]
         if clean_commands:
             Cleaner.clean(*clean_commands)
-            sys.exit()
+
 
         # if options['create_test_users']:
         #     password = getpass(prompt="Enter the password to use for the test users: ")
@@ -104,9 +104,9 @@ class Command(BaseCommand):
         if created:
             self.create_disaggregations(country)
 
-
-        password = getpass(prompt="Enter the password to use for the test users: ")
-        self.create_test_users(password)
+        if 'named_only' not in options:
+            password = getpass(prompt="Enter the password to use for the test users: ")
+            self.create_test_users(password)
 
         self.create_test_sites()
         for super_user in TolaUser.objects.filter(user__is_superuser=True):
@@ -184,7 +184,7 @@ class Command(BaseCommand):
         #     ).delete()
 
         program_factory = ProgramFactory(country)
-        indicator_factory = IndicatorFactory()
+
 
         # Create programs for specific people
         if options['names']:
@@ -194,12 +194,13 @@ class Command(BaseCommand):
         for t_name in tester_names:
             program_name = 'QA program - {}'.format(t_name)
             program = program_factory.create_program(main_start_date, main_end_date, program_name)
+            indicator_factory = IndicatorFactory(program, country)
             print('Creating indicators for {}'.format(Program.objects.get(id=program.id)))
             self.create_levels(program.id, filtered_levels)
             # self.create_indicators(program, all_params_base, personal_indicator=True)
             # self.create_indicators(program, null_supplements_params, apply_skips=False, personal_indicator=True)
-            indicator_factory.create_indicators(program, "base", personal_indicator=True)
-            indicator_factory.create_indicators(program, "nulls", apply_skips=False, personal_indicator=True)
+            indicator_factory.create_indicators("base", personal_indicator=True)
+            indicator_factory.create_indicators("nulls", apply_skips=False, personal_indicator=True)
 
         if options['named_only']:
             # password = getpass(prompt="Enter the password to use for the test users: ")

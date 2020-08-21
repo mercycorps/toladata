@@ -564,6 +564,7 @@ class Command(BaseCommand):
                 sector=None if not personal_indicator else next(sector_cycle),
             )
             indicator.save()
+            print('indicator old name', indicator.name)
             if self.sadd_disagg and sadd_disagg:
                 indicator.disaggregation.add(self.sadd_disagg)
             country = Country.objects.get(country="Tolaland")
@@ -658,7 +659,9 @@ class Command(BaseCommand):
                         achieved_value = int(achieved_value * .4)
                     else:
                         achieved_value = int(achieved_value * .9)
-
+                print('apply skips', apply_skips, 'result count', result_count, result_count, 'result_skip_mod',
+                      result_skip_mod)
+                print('results to create', results_to_create)
                 # Now create the Results and their related Records
                 if pt.start_date:
                     date_collected = pt.start_date + day_offset
@@ -673,6 +676,7 @@ class Command(BaseCommand):
                         achieved=achieved_value,
                         date_collected=date_collected)
                     rs.save()
+                    print('result date', rs.date_collected)
                     if result_disagg != 'none':
                         self.disaggregate_result(rs, result_disagg, indicator)
                     date_collected = date_collected + day_offset
