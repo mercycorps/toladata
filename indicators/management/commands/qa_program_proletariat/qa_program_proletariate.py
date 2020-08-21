@@ -228,6 +228,7 @@ class IndicatorFactory():
         sadd_disagg_cycle = cycle([True, True, True, False])
         result_disagg_cycle = cycle(['sadd', 'one', 'two', 'none', 'all', 'all', 'all', 'none'])
         result_count = 0
+        evidence_count = 0
         for n, params in enumerate(param_sets):
             if params['is_cumulative']:
                 cumulative_text = 'Cumulative'
@@ -364,7 +365,8 @@ class IndicatorFactory():
             rf = ResultFactory(
                 indicator, self.program, sadd_disagg_flag, result_disagg, params['uom_type'], params['null_level'],
                 site_cycle, personal_indicator, apply_skips)
-            result_count = rf.make_results(periodic_targets, incrementors, result_count)
+            result_count, evidence_count = rf.make_results(
+                periodic_targets, incrementors, result_count, evidence_count)
 
             #
             # if n > 2:
@@ -620,9 +622,8 @@ class ResultFactory():
         self.personal_indicator = personal_indicator
         self.apply_skips = apply_skips
 
-    def make_results(self, periodic_targets, incrementors, result_count):
+    def make_results(self, periodic_targets, incrementors, result_count, evidence_count):
         result_skip_mod = 7
-        evidence_count = 0
         evidence_skip_mod = 7
 
         day_offset = timedelta(days=2)
@@ -699,7 +700,7 @@ class ResultFactory():
                     rs.site.add(r_site)
 
                 rs.save()
-        return result_count
+        return result_count, evidence_count
 
     @classmethod
     def disaggregate_result(self, result, result_disagg_type, indicator):
