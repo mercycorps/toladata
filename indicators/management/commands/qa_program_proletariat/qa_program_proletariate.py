@@ -627,7 +627,6 @@ class ResultFactory():
     def make_results(self, periodic_targets, incrementors, evidence_skip_cycle, result_skip_cycle, extra_result_cycle):
 
         day_offset = timedelta(days=2)
-        evidence_count = 1
         for i, pt in enumerate(periodic_targets):
             # Create the target amount (the PeriodicTarget object has already been created)
             # pt.target = target_start + target_increment * i
@@ -687,24 +686,21 @@ class ResultFactory():
                 else:
                     achieved_value = int(achieved_value * 1.15)
 
-
-                evidence_skip = next(evidence_skip_cycle)
                 if self.null_level == 'evidence':
                     continue
 
-                if self.apply_skips and evidence_skip:
+                # evidence_skip = next(evidence_skip_cycle)
+                if self.apply_skips and next(evidence_skip_cycle):
                     continue
 
-                rs.record_name = 'Evidence {} for result id {}'.format(evidence_count, rs.id)
-                rs.evidence_url = 'http://my/evidence/url'
+                rs.record_name = 'Evidence for result id {}'.format(rs.id)
+                rs.evidence_url = 'https://www.pinterest.ca/search/pins/?q=cute%20animals'
 
                 r_site = next(self.site_cycle)
                 if self.personal_indicator and r_site:
                     rs.site.add(r_site)
 
                 rs.save()
-
-                evidence_count += 1
 
 
     @classmethod
