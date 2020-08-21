@@ -223,12 +223,15 @@ class IndicatorFactory():
             sites.append(None)
         site_cycle = cycle(sites)
 
+        result_skip_cycle = cycle([False, False, False, False, True, False, False])
+        extra_result_cycle = cycle([True, False, False, True, False, False, False])
+        evidence_skip_cycle = cycle([False, False, True, False, False, False, False])
 
         country_disagg_cycle = cycle([0, 1, 2])
         sadd_disagg_cycle = cycle([True, True, True, False])
         result_disagg_cycle = cycle(['sadd', 'one', 'two', 'none', 'all', 'all', 'all', 'none'])
-        result_count = 0
-        evidence_count = 0
+
+        # result_count = 0
         for n, params in enumerate(param_sets):
             if params['is_cumulative']:
                 cumulative_text = 'Cumulative'
@@ -282,7 +285,6 @@ class IndicatorFactory():
                 sector=None if not personal_indicator else next(sector_cycle),
             )
             indicator.save()
-            print('indicator name', indicator.name)
             # if self.sadd_disagg and sadd_disagg:
             #     indicator.disaggregation.add(self.sadd_disagg)
             # country = Country.objects.get(country="Tolaland")
@@ -365,8 +367,8 @@ class IndicatorFactory():
             rf = ResultFactory(
                 indicator, self.program, sadd_disagg_flag, result_disagg, params['uom_type'], params['null_level'],
                 site_cycle, personal_indicator, apply_skips)
-            result_count, evidence_count = rf.make_results(
-                periodic_targets, incrementors, result_count, evidence_count)
+            rf.make_results(
+                periodic_targets, incrementors, evidence_skip_cycle, result_skip_cycle, extra_result_cycle)
 
             #
             # if n > 2:
@@ -622,11 +624,10 @@ class ResultFactory():
         self.personal_indicator = personal_indicator
         self.apply_skips = apply_skips
 
-    def make_results(self, periodic_targets, incrementors, result_count, evidence_count):
-        result_skip_mod = 7
-        evidence_skip_mod = 7
+    def make_results(self, periodic_targets, incrementors, evidence_skip_cycle, result_skip_cycle, extra_result_cycle):
 
         day_offset = timedelta(days=2)
+        evidence_count = 1
         for i, pt in enumerate(periodic_targets):
             # Create the target amount (the PeriodicTarget object has already been created)
             # pt.target = target_start + target_increment * i
@@ -643,8 +644,10 @@ class ResultFactory():
 
             # Skip creating a result if the null_level is result or if
             # the number of results has reached the arbitrary skip point.
-            result_count += 1
-            if (self.apply_skips and result_count % result_skip_mod == result_skip_mod - 2) or \
+            # result_count += 1
+            result_skip = next(result_skip_cycle)
+            extra_result = next(extra_result_cycle)
+            if (self.apply_skips and result_skip) or \
                 self.null_level == 'results':
                 continue
 
@@ -654,14 +657,13 @@ class ResultFactory():
             achieved_value = incrementors['achieved_start'] + (incrementors['achieved_increment'] * i)
 
             results_to_create = 1
-            if self.apply_skips and result_count % result_skip_mod in (1, result_skip_mod - 3):
+            if self.apply_skips and extra_result:
                 results_to_create = 2
                 if self.uom_type == Indicator.NUMBER:
                     achieved_value = int(achieved_value * .4)
                 else:
                     achieved_value = int(achieved_value * .9)
-            print('apply skips', self.apply_skips, 'result count', result_count, result_count, 'result_skip_mod', result_skip_mod)
-            print('results to create', results_to_create)
+
             # Now create the Results and their related Records
             if pt.start_date:
                 date_collected = pt.start_date + day_offset
@@ -676,7 +678,7 @@ class ResultFactory():
                     achieved=achieved_value,
                     date_collected=date_collected)
                 rs.save()
-                print('result date', rs.date_collected)
+
                 if self.result_disagg != 'none':
                     self.disaggregate_result(rs, self.result_disagg, self.indicator)
                 date_collected = date_collected + day_offset
@@ -685,13 +687,14 @@ class ResultFactory():
                 else:
                     achieved_value = int(achieved_value * 1.15)
 
-                evidence_count += 1
+
+                evidence_skip = next(evidence_skip_cycle)
                 if self.null_level == 'evidence':
                     continue
 
-                if self.apply_skips and evidence_count % evidence_skip_mod == int(evidence_skip_mod / 2):
-                    evidence_count += 1
+                if self.apply_skips and evidence_skip:
                     continue
+
                 rs.record_name = 'Evidence {} for result id {}'.format(evidence_count, rs.id)
                 rs.evidence_url = 'http://my/evidence/url'
 
@@ -700,7 +703,9 @@ class ResultFactory():
                     rs.site.add(r_site)
 
                 rs.save()
-        return result_count, evidence_count
+
+                evidence_count += 1
+
 
     @classmethod
     def disaggregate_result(self, result, result_disagg_type, indicator):
