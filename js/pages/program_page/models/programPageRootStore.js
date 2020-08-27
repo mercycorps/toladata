@@ -82,12 +82,12 @@ export default class ProgramPageRootStore {
 
     @computed
     get allExpanded() {
-        return this.indicators.every(indicator => this.program.resultsMap.has(indicator.pk));
+        return this.indicators.every(indicator => this.program.isExpanded(indicator.pk));
     }
 
     @computed
     get allCollapsed() {
-        return this.indicators.every(indicator => !this.program.resultsMap.has(indicator.pk));
+        return this.indicators.every(indicator => !this.program.isExpanded(indicator.pk));
     }
     
     @computed
