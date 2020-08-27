@@ -4,3 +4,4 @@ from indicators.queries.indicators_queries import (
     ResultsIndicator,
     MetricsIndicator
 )
+from indicators.queries.targets_queries import ResultsTarget

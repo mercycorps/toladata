@@ -999,7 +999,9 @@ class IndicatorMetricsMixin:
     def annotate_metrics(self):
         from indicators.queries import utils as query_utils
         return self.annotate(
-            has_all_targets_defined=query_utils.indicator_all_targets_defined_annotation()
+            has_all_targets_defined=query_utils.indicator_all_targets_defined_annotation(),
+            lop_actual=query_utils.indicator_lop_actual_annotation(),
+            lop_percent_met=query_utils.indicator_lop_percent_met_annotation()
         )
 
 class Indicator(SafeDeleteModel):
