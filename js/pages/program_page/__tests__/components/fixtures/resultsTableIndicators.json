@@ -1,0 +1,261 @@
+{
+    "annual": {
+        "pk": 99,
+        "frequency": 3,
+        "isCumulative": false,
+        "isPercent": false,
+        "lopTarget": 1000,
+        "lopActual": 500,
+        "lopMet": 0.5,
+        "lopTargetProgress": 300,
+        "lopActualProgress": 185,
+        "lopMetProgress": 0.6167,
+        "reportingPeriod": "Jan 1, 2018 – Dec 31, 2019",
+        "periodicTargets": [
+            {
+                "periodName": "Year 1",
+                "dateRange": "Jan 1, 2018 – Dec 31, 2018",
+                "completed": true,
+                "mostRecentlyCompleted": false,
+                "target": 100,
+                "actual": null,
+                "percentMet": null,
+                "results": []
+            }, {
+                "periodName": "Year 2",
+                "dateRange": "Jan 1, 2019 – Dec 31, 2019",
+                "completed": true,
+                "mostRecentlyCompleted": true,
+                "target": 200,
+                "actual": 185,
+                "percentMet": 0.925,
+                "results": [
+                    {
+                        "pk": 95,
+                        "dateCollected": "Jan 3, 2019",
+                        "achieved": 185,
+                        "evidenceUrl": null
+                    }
+                ]
+            }, {
+                "periodName": "Year 3",
+                "dateRange": "Jan 1, 2020 – Dec 31, 2020",
+                "completed": false,
+                "mostRecentlyCompleted": false,
+                "target": 300,
+                "actual": 250,
+                "percentMet": 0.8333,
+                "results": [
+                    {
+                        "pk": 98,
+                        "dateCollected": "Jan 4, 2020",
+                        "achieved": 150,
+                        "evidenceUrl": "http://www.example.com/98",
+                        "recordName": "Evidence for result 98"
+                    }, {
+                        "pk": 99,
+                        "dateCollected": "Jan 10, 2020",
+                        "achieved": 100,
+                        "evidenceUrl": "http://www.example.com/99",
+                        "recordName": null
+                    }
+                ]
+            }
+        ],
+        "noTargetResults": []
+    },
+    "lop": {
+        "pk": 105,
+        "frequency": 1,
+        "isCumulative": false,
+        "isPercent": true,
+        "lopTarget": 92.5,
+        "lopActual": null,
+        "lopMet": null,
+        "periodicTargets": [
+            {
+                "periodName": "Life of program (LoP) only",
+                "dateRange": null,
+                "completed": false,
+                "mostRecentlyCompleted": false,
+                "target": 92.5,
+                "actual": null,
+                "percentMet": null,
+                "results": []
+            }
+        ],
+        "noTargetResults": []
+    },
+    "midEnd": {
+        "pk": 108,
+        "frequency": 2,
+        "isCumulative": true,
+        "isPercent": true,
+        "lopTarget": 10,
+        "lopActual": 5,
+        "lopMet": 0.5,
+        "periodicTargets": [
+            {
+                "periodName": "Midline",
+                "dateRange": null,
+                "completed": false,
+                "mostRecentlyCompleted": false,
+                "target": 8,
+                "actual": null,
+                "percentMet": null,
+                "results": []
+            }, {
+                "periodName": "Endline",
+                "dateRange": null,
+                "completed": false,
+                "mostRecentlyCompleted": false,
+                "target": 10,
+                "actual": null,
+                "percentMet": null,
+                "results": []
+            }
+        ],
+        "noTargetResults": [
+            {
+                "pk": 241,
+                "dateCollected": "Jul 21, 2019",
+                "achieved": 5,
+                "evidenceUrl": null
+            }
+        ]
+    },
+    "semiAnnual": {
+        "pk": 109,
+        "frequency": 4,
+        "isCumulative": true,
+        "isPercent": false,
+        "lopTarget": 200,
+        "lopActual": 200,
+        "lopMet": 1,
+        "lopTargetProgress": 150,
+        "lopActualProgress": 200,
+        "lopMetProgress": 1.3333,
+        "reportingPeriod": "Jan 1, 2018 – Jun 30, 2020",
+        "periodicTargets": [
+            {
+                "periodName": "Semi-annual period 1",
+                "dateRange": "Jan 1, 2018 – Jun 30, 2018",
+                "completed": true,
+                "mostRecentlyCompleted": false,
+                "target": 50,
+                "actual": 45,
+                "percentMet": 0.9,
+                "results": [
+                    {
+                        "pk": 199,
+                        "dateCollected": "Feb 10, 2018",
+                        "achieved": 45,
+                        "evidenceUrl": null
+                    }
+                ]
+            }, {
+                "periodName": "Semi-annual period 2",
+                "dateRange": "Jul 1, 2018 – Dec 31, 2018",
+                "completed": true,
+                "mostRecentlyCompleted": false,
+                "target": 75,
+                "actual": null,
+                "percentMet": null,
+                "results": []
+            },
+            {
+                "periodName": "Semi-annual period 3",
+                "dateRange": "Jan 1, 2019 – Jun 30, 2019",
+                "completed": true,
+                "mostRecentlyCompleted": false,
+                "target": 100,
+                "actual": 100,
+                "percentMet": 1,
+                "results": [
+                    {
+                        "pk": 201,
+                        "dateCollected": "Mar 10, 2019",
+                        "achieved": 55,
+                        "evidenceUrl": null
+                    }
+                ]
+            }, {
+                "periodName": "Semi-annual period 4",
+                "dateRange": "Jul 1, 2019 – Dec 31, 2019",
+                "completed": true,
+                "mostRecentlyCompleted": false,
+                "target": 125,
+                "actual": null,
+                "percentMet": null,
+                "results": []
+            },
+            {
+                "periodName": "Semi-annual period 5",
+                "dateRange": "Jan 1, 2020 – Jun 30, 2020",
+                "completed": true,
+                "mostRecentlyCompleted": true,
+                "target": 150,
+                "actual": 200,
+                "percentMet": null,
+                "results": [
+                    {
+                        "pk": 202,
+                        "dateCollected": "Apr 10, 2020",
+                        "achieved": 100,
+                        "evidenceUrl": null
+                    }
+                ]
+            }, {
+                "periodName": "Semi-annual period 6",
+                "dateRange": "Jul 1, 2020 – Dec 31, 2020",
+                "completed": false,
+                "mostRecentlyCompleted": false,
+                "target": 200,
+                "actual": null,
+                "percentMet": null,
+                "results": []
+            }
+        ],
+        "noTargetResults": []
+    },
+    "noTargets1": {
+        "pk": 112,
+        "frequency": null,
+        "isCumulative": false,
+        "isPercent": false,
+        "lopTarget": null,
+        "lopActual": null,
+        "lopMet": null,
+        "periodicTargets": [],
+        "noTargetResults": []
+    },
+    "noTargets2": {
+        "pk": 112,
+        "frequency": 2,
+        "isCumulative": false,
+        "isPercent": false,
+        "lopTarget": null,
+        "lopActual": null,
+        "lopMet": null,
+        "periodicTargets": [],
+        "noTargetResults": []
+    },
+    "noTargetsWithResults": {
+        "pk": 113,
+        "frequency": 2,
+        "isCumulative": false,
+        "isPercent": false,
+        "lopTarget": null,
+        "lopActual": null,
+        "lopMet": null,
+        "periodicTargets": [],
+        "noTargetResults": [
+            {
+                "pk": 243,
+                "dateCollected": "Jul 21, 2019",
+                "achieved": 5,
+                "evidenceUrl": null
+            }
+        ]
+    }
+}

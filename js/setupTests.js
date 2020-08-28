@@ -7,6 +7,9 @@ import '@root/test_helpers/django_i18n_stubs';
 import $ from 'jquery';
 global.$ = global.jQuery = $;
 
+$.fn.extend({
+    popover: function() {return; },
+})
 
 
 configure({ adapter: new Adapter() });
