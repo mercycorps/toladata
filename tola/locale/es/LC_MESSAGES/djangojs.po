@@ -6,8 +6,8 @@ msgid ""
 msgstr ""
 "Project-Id-Version: \n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2020-08-28 09:02-0700\n"
-"PO-Revision-Date: 2020-08-28 10:08-0700\n"
+"POT-Creation-Date: 2020-08-28 10:46-0700\n"
+"PO-Revision-Date: 2020-08-28 10:49-0700\n"
 "Last-Translator: \n"
 "Language-Team: \n"
 "Language: es\n"
@@ -926,6 +926,20 @@ msgstr "Indicadores sin evidencias"
 msgid "No evidence"
 msgstr "Sin evidencia"
 
+#. Translators: Explains how performance is categorized as close to the target or not close to the target
+#: js/pages/program_page/components/resultsTable.js:27
+msgid ""
+"<p><strong>The actual value is %(percent)s of the target value.</strong> An "
+"indicator is on track if the result is no less than 85% of the target and no "
+"more than 115% of the target.</p><p><em>Remember to consider your direction "
+"of change when thinking about whether the indicator is on track.</em></p>"
+msgstr ""
+"<p><strong>El valor real es del %(percent)s del valor objetivo.</strong> Un "
+"indicador se considerará de acuerdo a lo planificado cuando el valor oscile "
+"entre no menos del 85% y no más del 115% de consecución de dicho objetivo.</"
+"p><p><em>Recuerde considerar la dirección de cambio al evaluar si el "
+"indicador está encaminado.</em></p>"
+
 #. Translators: Label for an indicator that is within a target range
 #: js/pages/program_page/components/resultsTable.js:34
 msgid "On track"
@@ -993,6 +1007,11 @@ msgstr "Agregar resultado"
 #: js/pages/program_page/components/resultsTable.js:255
 msgid "This indicator has no targets."
 msgstr "Este indicador no tiene objetivos."
+
+#. Translators: Button label which opens a form to add targets to a given indicator
+#: js/pages/program_page/components/resultsTable.js:263
+msgid "Add targets"
+msgstr "Agregar objetivos"
 
 #: js/pages/program_page/pinned_reports.js:9
 msgid ""
@@ -2860,9 +2879,6 @@ msgstr "Super Administrador"
 
 #~ msgid "and "
 #~ msgstr "y "
-
-#~ msgid "Add targets"
-#~ msgstr "Agregar objetivos"
 
 #~ msgid "Collected Indicator Data Confirm Delete"
 #~ msgstr "Confirmar eliminación de los datos del indicador recopilados"

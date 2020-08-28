@@ -2,8 +2,8 @@ msgid ""
 msgstr ""
 "Project-Id-Version: \n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2020-08-28 09:02-0700\n"
-"PO-Revision-Date: 2020-08-28 10:05-0700\n"
+"POT-Creation-Date: 2020-08-28 10:46-0700\n"
+"PO-Revision-Date: 2020-08-28 10:48-0700\n"
 "Last-Translator: \n"
 "Language-Team: \n"
 "Language: fr\n"
@@ -924,6 +924,20 @@ msgstr "﻿Indicateurs avec preuves manquantes"
 msgid "No evidence"
 msgstr "Aucune preuve"
 
+#. Translators: Explains how performance is categorized as close to the target or not close to the target
+#: js/pages/program_page/components/resultsTable.js:27
+msgid ""
+"<p><strong>The actual value is %(percent)s of the target value.</strong> An "
+"indicator is on track if the result is no less than 85% of the target and no "
+"more than 115% of the target.</p><p><em>Remember to consider your direction "
+"of change when thinking about whether the indicator is on track.</em></p>"
+msgstr ""
+"<p><strong>La valeur réelle représente %(percent)s de la valeur ciblée.</"
+"strong> Un indicateur est en bonne voie si le résultat n’est ni inférieur à "
+"85% de la cible, ni supérieur à 115% de la cible. </p><p><em>Pensez à "
+"prendre en compte la direction du changement souhaité lorsque vous "
+"réfléchissez au statut d’un indicateur.</em></p>"
+
 #. Translators: Label for an indicator that is within a target range
 #: js/pages/program_page/components/resultsTable.js:34
 msgid "On track"
@@ -991,6 +1005,11 @@ msgstr "Ajouter un résultat"
 #: js/pages/program_page/components/resultsTable.js:255
 msgid "This indicator has no targets."
 msgstr "Cet indicateur n’a pas de cible."
+
+#. Translators: Button label which opens a form to add targets to a given indicator
+#: js/pages/program_page/components/resultsTable.js:263
+msgid "Add targets"
+msgstr "Ajouter des cibles"
 
 #: js/pages/program_page/pinned_reports.js:9
 msgid ""

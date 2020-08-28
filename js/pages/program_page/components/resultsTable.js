@@ -24,8 +24,8 @@ class ProgressPopover extends React.Component {
     render() {
         const percent = localizePercent(this.props.val);
         // # Translators: Explains how performance is categorized as close to the target or not close to the target
-        const msg = interpolate(gettext(`<p><strong>The actual value is %s of the target value.</strong> An indicator is on track if the result is no less than 85% of the target and no more than 115% of the target.</p>
-                <p><em>Remember to consider your direction of change when thinking about whether the indicator is on track.</em></p>`), [percent]);
+        let msg = gettext("<p><strong>The actual value is %(percent)s of the target value.</strong> An indicator is on track if the result is no less than 85% of the target and no more than 115% of the target.</p><p><em>Remember to consider your direction of change when thinking about whether the indicator is on track.</em></p>")
+        msg = interpolate(msg, {percent: percent}, true);
         var badgeClass;
         var onTrackMsg;
         if (percent && this.props.val > 0.85 && this.props.val < 1.15) {
@@ -258,7 +258,10 @@ const NoTargetsWarning = ({indicator, editable, ...props}) => {
                 <a href={`/indicators/indicator_update/${indicator.pk}/`}
                     data-tab="#targets" className="indicator-link btn btn-success">
                     <FontAwesomeIcon icon={ faPlusCircle } />
-                    Add targets
+                    {
+                        // # Translators: Button label which opens a form to add targets to a given indicator
+                        gettext('Add targets')
+                    }
                 </a>
             }
         </div>
