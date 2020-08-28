@@ -53,7 +53,7 @@ const ActualHeader = () => {
             style={{minWidth: '110px'}}>
             {
                 /* # Translators: Column header for an "actual" or achieved/real value column */
-                gettext('Actual')
+                pgettext('report (long) header', 'Actual')
             }
         </th>
     )

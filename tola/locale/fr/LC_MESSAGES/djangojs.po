@@ -2,8 +2,8 @@ msgid ""
 msgstr ""
 "Project-Id-Version: \n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2020-08-28 14:37-0700\n"
-"PO-Revision-Date: 2020-08-28 14:38-0700\n"
+"POT-Creation-Date: 2020-08-28 15:40-0700\n"
+"PO-Revision-Date: 2020-08-28 15:40-0700\n"
 "Last-Translator: \n"
 "Language-Team: \n"
 "Language: fr\n"
@@ -478,10 +478,9 @@ msgid "Target"
 msgstr "Cible"
 
 #. Translators: Column header for an "actual" or achieved/real value column */
-#. Translators: Header for a column listing actual result values for each row
 #: js/pages/iptt_report/components/report/headerCells.js:56
 #: js/pages/iptt_report/components/report/tableHeader.js:163
-#: js/pages/program_page/components/resultsTable.js:205
+msgctxt "report (long) header"
 msgid "Actual"
 msgstr "Valeur réelle"
 
@@ -985,6 +984,12 @@ msgstr "La vie du programme"
 #: js/pages/program_page/components/resultsTable.js:197
 msgid "Target period"
 msgstr "Période cible"
+
+#. Translators: Header for a column listing actual result values for each row
+#: js/pages/program_page/components/resultsTable.js:205
+msgctxt "table (short) header"
+msgid "Actual"
+msgstr "Réelle"
 
 #. Translators: Header for a column listing actual results for a given period
 #: js/pages/program_page/components/resultsTable.js:213

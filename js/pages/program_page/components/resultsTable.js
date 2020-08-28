@@ -202,7 +202,7 @@ const ResultsTableTable = ({indicator, editable, ...props}) => {
                     }</th>
                     <th className="text-right">{
                         // # Translators: Header for a column listing actual result values for each row
-                        gettext('Actual')
+                        pgettext('table (short) header', 'Actual')
                     }</th>
                     <th className="td--pad text-right">{
                         // # Translators: Header for a column listing the progress towards the target value
