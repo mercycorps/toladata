@@ -1,0 +1,2924 @@
+// Jest Snapshot v1, https://goo.gl/fbAQLP
+
+exports[`Results table component result rows for an annual indicator with results matches snapshot 1`] = `
+<div
+  className="results-table__wrapper"
+>
+  <table
+    className="table results-table"
+  >
+    <thead>
+      <tr
+        className="table-header"
+      >
+        <th>
+          Target period
+        </th>
+        <th
+          className="text-right"
+        >
+          Target
+        </th>
+        <th
+          className="text-right"
+        >
+          Actual
+        </th>
+        <th
+          className="td--pad text-right"
+        >
+          % Met
+        </th>
+        <th
+          colSpan="2"
+        >
+          Results
+        </th>
+        <th
+          className="td--stretch"
+        >
+          Evidence
+        </th>
+      </tr>
+    </thead>
+    <tbody>
+      <tr
+        className="results__row--main"
+      >
+        <td
+          className="results__row__target-period"
+          rowSpan={1}
+        >
+          <div>
+            <strong
+              className="text-uppercase"
+            >
+              Year 1
+            </strong>
+          </div>
+          <div
+            className="text-nowrap"
+          >
+            <small>
+              Jan 1, 2018 – Dec 31, 2018
+            </small>
+          </div>
+        </td>
+        <td
+          className="text-right"
+          rowSpan={1}
+        >
+          100
+        </td>
+        <td
+          className="text-right"
+          rowSpan={1}
+        >
+          —
+        </td>
+        <td
+          className="text-right td--pad"
+          rowSpan={1}
+        >
+          <span
+            className="badge"
+          >
+            N/A
+          </span>
+        </td>
+        <td
+          className="results__result--nodata"
+          colSpan="2"
+        >
+          No results reported
+        </td>
+        <td />
+      </tr>
+      <tr
+        className="results__row--main"
+      >
+        <td
+          className="results__row__target-period"
+          rowSpan={1}
+        >
+          <div>
+            <strong
+              className="text-uppercase"
+            >
+              Year 2
+            </strong>
+          </div>
+          <div
+            className="text-nowrap"
+          >
+            <small>
+              Jan 1, 2019 – Dec 31, 2019
+            </small>
+          </div>
+        </td>
+        <td
+          className="text-right"
+          rowSpan={1}
+        >
+          200
+        </td>
+        <td
+          className="text-right"
+          rowSpan={1}
+        >
+          185
+        </td>
+        <td
+          className="text-right td--pad"
+          rowSpan={1}
+        >
+          <strong>
+            <span
+              className="badge badge-success-light"
+              data-content="<h4 class=\\"badge badge-success-light\\">On track</h4><p><strong>The actual value is %s of the target value.</strong> An indicator is on track if the result is no less than 85% of the target and no more than 115% of the target.</p>
+                <p><em>Remember to consider your direction of change when thinking about whether the indicator is on track.</em></p>"
+              data-placement="right"
+              data-toggle="popover"
+              data-trigger="focus"
+              tabIndex="0"
+            >
+              92.5%
+            </span>
+          </strong>
+        </td>
+        <td
+          className="results__result--date"
+        >
+          <a
+            className="results__link"
+            href="/indicators/result_update/95/"
+          >
+            Jan 3, 2019
+          </a>
+        </td>
+        <td
+          className="results__result--value"
+        >
+          185
+        </td>
+        <td
+          className="td--stretch results__result--url"
+        />
+      </tr>
+      <tr
+        className="results__row--subtotal"
+      >
+        <td>
+          <div>
+            <em>
+              <strong>
+                Program to date
+              </strong>
+            </em>
+          </div>
+          <div
+            className="text-nowrap"
+          >
+            <small>
+              Jan 1, 2018 – Dec 31, 2019
+            </small>
+          </div>
+        </td>
+        <td
+          className="text-right"
+        >
+          <strong>
+            300
+          </strong>
+        </td>
+        <td
+          className="text-right"
+        >
+          <strong>
+            185
+          </strong>
+        </td>
+        <td
+          className="text-right"
+        >
+          <strong>
+            <span
+              className="badge badge-warning-light"
+              data-content="<h4 class=\\"badge badge-warning-light\\">Not on track</h4><p><strong>The actual value is %s of the target value.</strong> An indicator is on track if the result is no less than 85% of the target and no more than 115% of the target.</p>
+                <p><em>Remember to consider your direction of change when thinking about whether the indicator is on track.</em></p>"
+              data-placement="right"
+              data-toggle="popover"
+              data-trigger="focus"
+              tabIndex="0"
+            >
+              61.67%
+            </span>
+          </strong>
+        </td>
+        <td
+          className="bg-medium"
+          colSpan="3"
+        />
+      </tr>
+      <tr
+        className="results__row--main"
+      >
+        <td
+          className="results__row__target-period"
+          rowSpan={2}
+        >
+          <div>
+            <strong
+              className="text-uppercase"
+            >
+              Year 3
+            </strong>
+          </div>
+          <div
+            className="text-nowrap"
+          >
+            <small>
+              Jan 1, 2020 – Dec 31, 2020
+            </small>
+          </div>
+        </td>
+        <td
+          className="text-right"
+          rowSpan={2}
+        >
+          300
+        </td>
+        <td
+          className="text-right"
+          rowSpan={2}
+        >
+          250
+        </td>
+        <td
+          className="text-right td--pad"
+          rowSpan={2}
+        >
+          <span
+            className="badge"
+          >
+            83.33%
+          </span>
+        </td>
+        <td
+          className="results__result--date"
+        >
+          <a
+            className="results__link"
+            href="/indicators/result_update/98/"
+          >
+            Jan 4, 2020
+          </a>
+        </td>
+        <td
+          className="results__result--value"
+        >
+          150
+        </td>
+        <td
+          className="td--stretch results__result--url"
+        >
+          <a
+            href="http://www.example.com/98"
+            target="_blank"
+          >
+            Evidence for result 98
+          </a>
+        </td>
+      </tr>
+      <tr
+        className="results__row--supplemental"
+      >
+        <td
+          className="results__result--date"
+        >
+          <a
+            className="results__link"
+            href="/indicators/result_update/99/"
+          >
+            Jan 10, 2020
+          </a>
+        </td>
+        <td
+          className="results__result--value"
+        >
+          100
+        </td>
+        <td
+          className="td--stretch results__result--url"
+        >
+          <a
+            href="http://www.example.com/99"
+            target="_blank"
+          >
+            http://www.example.com/99
+          </a>
+        </td>
+      </tr>
+      <tr
+        className="bg-white"
+      >
+        <td>
+          <strong>
+            Life of Program
+          </strong>
+        </td>
+        <td
+          className="text-right"
+        >
+          <strong>
+            1,000
+          </strong>
+        </td>
+        <td
+          className="text-right"
+        >
+          <strong>
+            500
+          </strong>
+        </td>
+        <td
+          className="text-right"
+        >
+          <span
+            className="badge"
+          >
+            50%
+          </span>
+        </td>
+        <td
+          colSpan="3"
+        >
+          <div
+            className="help-text"
+          >
+            Results are non-cumulative. The Life of Program result is the sum of target periods results.
+          </div>
+        </td>
+      </tr>
+    </tbody>
+  </table>
+  <div
+    className="results-table__actions"
+  >
+    <div
+      className="cd-actions__message"
+    />
+    <div
+      className="cd-actions__button"
+    >
+      <a
+        className="btn-link btn-add results__link"
+        href="/indicators/result_add/99/"
+      >
+        <svg
+          aria-hidden="true"
+          className="svg-inline--fa fa-plus-circle fa-w-16 "
+          data-icon="plus-circle"
+          data-prefix="fas"
+          focusable="false"
+          role="img"
+          style={Object {}}
+          viewBox="0 0 512 512"
+          xmlns="http://www.w3.org/2000/svg"
+        >
+          <path
+            d="M256 8C119 8 8 119 8 256s111 248 248 248 248-111 248-248S393 8 256 8zm144 276c0 6.6-5.4 12-12 12h-92v92c0 6.6-5.4 12-12 12h-56c-6.6 0-12-5.4-12-12v-92h-92c-6.6 0-12-5.4-12-12v-56c0-6.6 5.4-12 12-12h92v-92c0-6.6 5.4-12 12-12h56c6.6 0 12 5.4 12 12v92h92c6.6 0 12 5.4 12 12v56z"
+            fill="currentColor"
+            style={Object {}}
+          />
+        </svg>
+        Add result
+      </a>
+    </div>
+  </div>
+</div>
+`;
+
+exports[`Results table component with a valid indicator and editing privileges matches snapshot 1`] = `
+<div
+  className="results-table__wrapper"
+>
+  <table
+    className="table results-table"
+  >
+    <thead>
+      <tr
+        className="table-header"
+      >
+        <th>
+          Target period
+        </th>
+        <th
+          className="text-right"
+        >
+          Target
+        </th>
+        <th
+          className="text-right"
+        >
+          Actual
+        </th>
+        <th
+          className="td--pad text-right"
+        >
+          % Met
+        </th>
+        <th
+          colSpan="2"
+        >
+          Results
+        </th>
+        <th
+          className="td--stretch"
+        >
+          Evidence
+        </th>
+      </tr>
+    </thead>
+    <tbody>
+      <tr
+        className="results__row--main"
+      >
+        <td
+          className="results__row__target-period"
+          rowSpan={1}
+        >
+          <div>
+            <strong
+              className="text-uppercase"
+            >
+              Life of program (LoP) only
+            </strong>
+          </div>
+        </td>
+        <td
+          className="text-right"
+          rowSpan={1}
+        >
+          92.5%
+        </td>
+        <td
+          className="text-right"
+          rowSpan={1}
+        >
+          —
+        </td>
+        <td
+          className="text-right td--pad"
+          rowSpan={1}
+        >
+          <span
+            className="badge"
+          >
+            N/A
+          </span>
+        </td>
+        <td
+          className="results__result--nodata"
+          colSpan="2"
+        >
+          No results reported
+        </td>
+        <td />
+      </tr>
+      <tr
+        className="bg-white"
+      >
+        <td>
+          <strong>
+            Life of Program
+          </strong>
+        </td>
+        <td
+          className="text-right"
+        >
+          <strong>
+            92.5%
+          </strong>
+        </td>
+        <td
+          className="text-right"
+        >
+          <strong>
+            —
+          </strong>
+        </td>
+        <td
+          className="text-right"
+        >
+          <span
+            className="badge"
+          >
+            N/A
+          </span>
+        </td>
+        <td
+          colSpan="3"
+        >
+          <div
+            className="help-text"
+          >
+            Results are cumulative. The Life of Program result mirrors the latest period result.
+          </div>
+        </td>
+      </tr>
+    </tbody>
+  </table>
+  <div
+    className="results-table__actions"
+  >
+    <div
+      className="cd-actions__message"
+    />
+    <div
+      className="cd-actions__button"
+    >
+      <a
+        className="btn-link btn-add results__link"
+        href="/indicators/result_add/105/"
+      >
+        <svg
+          aria-hidden="true"
+          className="svg-inline--fa fa-plus-circle fa-w-16 "
+          data-icon="plus-circle"
+          data-prefix="fas"
+          focusable="false"
+          role="img"
+          style={Object {}}
+          viewBox="0 0 512 512"
+          xmlns="http://www.w3.org/2000/svg"
+        >
+          <path
+            d="M256 8C119 8 8 119 8 256s111 248 248 248 248-111 248-248S393 8 256 8zm144 276c0 6.6-5.4 12-12 12h-92v92c0 6.6-5.4 12-12 12h-56c-6.6 0-12-5.4-12-12v-92h-92c-6.6 0-12-5.4-12-12v-56c0-6.6 5.4-12 12-12h92v-92c0-6.6 5.4-12 12-12h56c6.6 0 12 5.4 12 12v92h92c6.6 0 12 5.4 12 12v56z"
+            fill="currentColor"
+            style={Object {}}
+          />
+        </svg>
+        Add result
+      </a>
+    </div>
+  </div>
+</div>
+`;
+
+exports[`Results table component with a valid indicator and editing privileges matches snapshot 2`] = `
+<div
+  className="results-table__wrapper"
+>
+  <table
+    className="table results-table"
+  >
+    <thead>
+      <tr
+        className="table-header"
+      >
+        <th>
+          Target period
+        </th>
+        <th
+          className="text-right"
+        >
+          Target
+        </th>
+        <th
+          className="text-right"
+        >
+          Actual
+        </th>
+        <th
+          className="td--pad text-right"
+        >
+          % Met
+        </th>
+        <th
+          colSpan="2"
+        >
+          Results
+        </th>
+        <th
+          className="td--stretch"
+        >
+          Evidence
+        </th>
+      </tr>
+    </thead>
+    <tbody>
+      <tr
+        className="results__row--main"
+      >
+        <td
+          className="results__row__target-period"
+          rowSpan={1}
+        >
+          <div>
+            <strong
+              className="text-uppercase"
+            >
+              Year 1
+            </strong>
+          </div>
+          <div
+            className="text-nowrap"
+          >
+            <small>
+              Jan 1, 2018 – Dec 31, 2018
+            </small>
+          </div>
+        </td>
+        <td
+          className="text-right"
+          rowSpan={1}
+        >
+          100
+        </td>
+        <td
+          className="text-right"
+          rowSpan={1}
+        >
+          —
+        </td>
+        <td
+          className="text-right td--pad"
+          rowSpan={1}
+        >
+          <span
+            className="badge"
+          >
+            N/A
+          </span>
+        </td>
+        <td
+          className="results__result--nodata"
+          colSpan="2"
+        >
+          No results reported
+        </td>
+        <td />
+      </tr>
+      <tr
+        className="results__row--main"
+      >
+        <td
+          className="results__row__target-period"
+          rowSpan={1}
+        >
+          <div>
+            <strong
+              className="text-uppercase"
+            >
+              Year 2
+            </strong>
+          </div>
+          <div
+            className="text-nowrap"
+          >
+            <small>
+              Jan 1, 2019 – Dec 31, 2019
+            </small>
+          </div>
+        </td>
+        <td
+          className="text-right"
+          rowSpan={1}
+        >
+          200
+        </td>
+        <td
+          className="text-right"
+          rowSpan={1}
+        >
+          185
+        </td>
+        <td
+          className="text-right td--pad"
+          rowSpan={1}
+        >
+          <strong>
+            <span
+              className="badge badge-success-light"
+              data-content="<h4 class=\\"badge badge-success-light\\">On track</h4><p><strong>The actual value is %s of the target value.</strong> An indicator is on track if the result is no less than 85% of the target and no more than 115% of the target.</p>
+                <p><em>Remember to consider your direction of change when thinking about whether the indicator is on track.</em></p>"
+              data-placement="right"
+              data-toggle="popover"
+              data-trigger="focus"
+              tabIndex="0"
+            >
+              92.5%
+            </span>
+          </strong>
+        </td>
+        <td
+          className="results__result--date"
+        >
+          <a
+            className="results__link"
+            href="/indicators/result_update/95/"
+          >
+            Jan 3, 2019
+          </a>
+        </td>
+        <td
+          className="results__result--value"
+        >
+          185
+        </td>
+        <td
+          className="td--stretch results__result--url"
+        />
+      </tr>
+      <tr
+        className="results__row--subtotal"
+      >
+        <td>
+          <div>
+            <em>
+              <strong>
+                Program to date
+              </strong>
+            </em>
+          </div>
+          <div
+            className="text-nowrap"
+          >
+            <small>
+              Jan 1, 2018 – Dec 31, 2019
+            </small>
+          </div>
+        </td>
+        <td
+          className="text-right"
+        >
+          <strong>
+            300
+          </strong>
+        </td>
+        <td
+          className="text-right"
+        >
+          <strong>
+            185
+          </strong>
+        </td>
+        <td
+          className="text-right"
+        >
+          <strong>
+            <span
+              className="badge badge-warning-light"
+              data-content="<h4 class=\\"badge badge-warning-light\\">Not on track</h4><p><strong>The actual value is %s of the target value.</strong> An indicator is on track if the result is no less than 85% of the target and no more than 115% of the target.</p>
+                <p><em>Remember to consider your direction of change when thinking about whether the indicator is on track.</em></p>"
+              data-placement="right"
+              data-toggle="popover"
+              data-trigger="focus"
+              tabIndex="0"
+            >
+              61.67%
+            </span>
+          </strong>
+        </td>
+        <td
+          className="bg-medium"
+          colSpan="3"
+        />
+      </tr>
+      <tr
+        className="results__row--main"
+      >
+        <td
+          className="results__row__target-period"
+          rowSpan={2}
+        >
+          <div>
+            <strong
+              className="text-uppercase"
+            >
+              Year 3
+            </strong>
+          </div>
+          <div
+            className="text-nowrap"
+          >
+            <small>
+              Jan 1, 2020 – Dec 31, 2020
+            </small>
+          </div>
+        </td>
+        <td
+          className="text-right"
+          rowSpan={2}
+        >
+          300
+        </td>
+        <td
+          className="text-right"
+          rowSpan={2}
+        >
+          250
+        </td>
+        <td
+          className="text-right td--pad"
+          rowSpan={2}
+        >
+          <span
+            className="badge"
+          >
+            83.33%
+          </span>
+        </td>
+        <td
+          className="results__result--date"
+        >
+          <a
+            className="results__link"
+            href="/indicators/result_update/98/"
+          >
+            Jan 4, 2020
+          </a>
+        </td>
+        <td
+          className="results__result--value"
+        >
+          150
+        </td>
+        <td
+          className="td--stretch results__result--url"
+        >
+          <a
+            href="http://www.example.com/98"
+            target="_blank"
+          >
+            Evidence for result 98
+          </a>
+        </td>
+      </tr>
+      <tr
+        className="results__row--supplemental"
+      >
+        <td
+          className="results__result--date"
+        >
+          <a
+            className="results__link"
+            href="/indicators/result_update/99/"
+          >
+            Jan 10, 2020
+          </a>
+        </td>
+        <td
+          className="results__result--value"
+        >
+          100
+        </td>
+        <td
+          className="td--stretch results__result--url"
+        >
+          <a
+            href="http://www.example.com/99"
+            target="_blank"
+          >
+            http://www.example.com/99
+          </a>
+        </td>
+      </tr>
+      <tr
+        className="bg-white"
+      >
+        <td>
+          <strong>
+            Life of Program
+          </strong>
+        </td>
+        <td
+          className="text-right"
+        >
+          <strong>
+            1,000
+          </strong>
+        </td>
+        <td
+          className="text-right"
+        >
+          <strong>
+            500
+          </strong>
+        </td>
+        <td
+          className="text-right"
+        >
+          <span
+            className="badge"
+          >
+            50%
+          </span>
+        </td>
+        <td
+          colSpan="3"
+        >
+          <div
+            className="help-text"
+          >
+            Results are non-cumulative. The Life of Program result is the sum of target periods results.
+          </div>
+        </td>
+      </tr>
+    </tbody>
+  </table>
+  <div
+    className="results-table__actions"
+  >
+    <div
+      className="cd-actions__message"
+    />
+    <div
+      className="cd-actions__button"
+    >
+      <a
+        className="btn-link btn-add results__link"
+        href="/indicators/result_add/99/"
+      >
+        <svg
+          aria-hidden="true"
+          className="svg-inline--fa fa-plus-circle fa-w-16 "
+          data-icon="plus-circle"
+          data-prefix="fas"
+          focusable="false"
+          role="img"
+          style={Object {}}
+          viewBox="0 0 512 512"
+          xmlns="http://www.w3.org/2000/svg"
+        >
+          <path
+            d="M256 8C119 8 8 119 8 256s111 248 248 248 248-111 248-248S393 8 256 8zm144 276c0 6.6-5.4 12-12 12h-92v92c0 6.6-5.4 12-12 12h-56c-6.6 0-12-5.4-12-12v-92h-92c-6.6 0-12-5.4-12-12v-56c0-6.6 5.4-12 12-12h92v-92c0-6.6 5.4-12 12-12h56c6.6 0 12 5.4 12 12v92h92c6.6 0 12 5.4 12 12v56z"
+            fill="currentColor"
+            style={Object {}}
+          />
+        </svg>
+        Add result
+      </a>
+    </div>
+  </div>
+</div>
+`;
+
+exports[`Results table component with a valid indicator and editing privileges matches snapshot 3`] = `
+<div
+  className="results-table__wrapper"
+>
+  <table
+    className="table results-table"
+  >
+    <thead>
+      <tr
+        className="table-header"
+      >
+        <th>
+          Target period
+        </th>
+        <th
+          className="text-right"
+        >
+          Target
+        </th>
+        <th
+          className="text-right"
+        >
+          Actual
+        </th>
+        <th
+          className="td--pad text-right"
+        >
+          % Met
+        </th>
+        <th
+          colSpan="2"
+        >
+          Results
+        </th>
+        <th
+          className="td--stretch"
+        >
+          Evidence
+        </th>
+      </tr>
+    </thead>
+    <tbody>
+      <tr
+        className="results__row--main"
+      >
+        <td
+          className="results__row__target-period"
+          rowSpan={1}
+        >
+          <div>
+            <strong
+              className="text-uppercase"
+            >
+              Midline
+            </strong>
+          </div>
+        </td>
+        <td
+          className="text-right"
+          rowSpan={1}
+        >
+          8%
+        </td>
+        <td
+          className="text-right"
+          rowSpan={1}
+        >
+          —
+        </td>
+        <td
+          className="text-right td--pad"
+          rowSpan={1}
+        >
+          <span
+            className="badge"
+          >
+            N/A
+          </span>
+        </td>
+        <td
+          className="results__result--nodata"
+          colSpan="2"
+        >
+          No results reported
+        </td>
+        <td />
+      </tr>
+      <tr
+        className="results__row--main"
+      >
+        <td
+          className="results__row__target-period"
+          rowSpan={1}
+        >
+          <div>
+            <strong
+              className="text-uppercase"
+            >
+              Endline
+            </strong>
+          </div>
+        </td>
+        <td
+          className="text-right"
+          rowSpan={1}
+        >
+          10%
+        </td>
+        <td
+          className="text-right"
+          rowSpan={1}
+        >
+          —
+        </td>
+        <td
+          className="text-right td--pad"
+          rowSpan={1}
+        >
+          <span
+            className="badge"
+          >
+            N/A
+          </span>
+        </td>
+        <td
+          className="results__result--nodata"
+          colSpan="2"
+        >
+          No results reported
+        </td>
+        <td />
+      </tr>
+      <tr
+        className="bg-white"
+      >
+        <td>
+          <strong>
+            Life of Program
+          </strong>
+        </td>
+        <td
+          className="text-right"
+        >
+          <strong>
+            10%
+          </strong>
+        </td>
+        <td
+          className="text-right"
+        >
+          <strong>
+            5%
+          </strong>
+        </td>
+        <td
+          className="text-right"
+        >
+          <span
+            className="badge"
+          >
+            50%
+          </span>
+        </td>
+        <td
+          colSpan="3"
+        >
+          <div
+            className="help-text"
+          >
+            Results are cumulative. The Life of Program result mirrors the latest period result.
+          </div>
+        </td>
+      </tr>
+    </tbody>
+  </table>
+  <div
+    className="results-table__actions"
+  >
+    <div
+      className="cd-actions__message"
+    />
+    <div
+      className="cd-actions__button"
+    >
+      <a
+        className="btn-link btn-add results__link"
+        href="/indicators/result_add/108/"
+      >
+        <svg
+          aria-hidden="true"
+          className="svg-inline--fa fa-plus-circle fa-w-16 "
+          data-icon="plus-circle"
+          data-prefix="fas"
+          focusable="false"
+          role="img"
+          style={Object {}}
+          viewBox="0 0 512 512"
+          xmlns="http://www.w3.org/2000/svg"
+        >
+          <path
+            d="M256 8C119 8 8 119 8 256s111 248 248 248 248-111 248-248S393 8 256 8zm144 276c0 6.6-5.4 12-12 12h-92v92c0 6.6-5.4 12-12 12h-56c-6.6 0-12-5.4-12-12v-92h-92c-6.6 0-12-5.4-12-12v-56c0-6.6 5.4-12 12-12h92v-92c0-6.6 5.4-12 12-12h56c6.6 0 12 5.4 12 12v92h92c6.6 0 12 5.4 12 12v56z"
+            fill="currentColor"
+            style={Object {}}
+          />
+        </svg>
+        Add result
+      </a>
+    </div>
+  </div>
+</div>
+`;
+
+exports[`Results table component with a valid indicator and editing privileges matches snapshot 4`] = `
+<div
+  className="results-table__wrapper"
+>
+  <table
+    className="table results-table"
+  >
+    <thead>
+      <tr
+        className="table-header"
+      >
+        <th>
+          Target period
+        </th>
+        <th
+          className="text-right"
+        >
+          Target
+        </th>
+        <th
+          className="text-right"
+        >
+          Actual
+        </th>
+        <th
+          className="td--pad text-right"
+        >
+          % Met
+        </th>
+        <th
+          colSpan="2"
+        >
+          Results
+        </th>
+        <th
+          className="td--stretch"
+        >
+          Evidence
+        </th>
+      </tr>
+    </thead>
+    <tbody>
+      <tr
+        className="results__row--main"
+      >
+        <td
+          className="results__row__target-period"
+          rowSpan={1}
+        >
+          <div>
+            <strong
+              className="text-uppercase"
+            >
+              Semi-annual period 1
+            </strong>
+          </div>
+          <div
+            className="text-nowrap"
+          >
+            <small>
+              Jan 1, 2018 – Jun 30, 2018
+            </small>
+          </div>
+        </td>
+        <td
+          className="text-right"
+          rowSpan={1}
+        >
+          50
+        </td>
+        <td
+          className="text-right"
+          rowSpan={1}
+        >
+          45
+        </td>
+        <td
+          className="text-right td--pad"
+          rowSpan={1}
+        >
+          <strong>
+            <span
+              className="badge badge-success-light"
+              data-content="<h4 class=\\"badge badge-success-light\\">On track</h4><p><strong>The actual value is %s of the target value.</strong> An indicator is on track if the result is no less than 85% of the target and no more than 115% of the target.</p>
+                <p><em>Remember to consider your direction of change when thinking about whether the indicator is on track.</em></p>"
+              data-placement="right"
+              data-toggle="popover"
+              data-trigger="focus"
+              tabIndex="0"
+            >
+              90%
+            </span>
+          </strong>
+        </td>
+        <td
+          className="results__result--date"
+        >
+          <a
+            className="results__link"
+            href="/indicators/result_update/199/"
+          >
+            Feb 10, 2018
+          </a>
+        </td>
+        <td
+          className="results__result--value"
+        >
+          45
+        </td>
+        <td
+          className="td--stretch results__result--url"
+        />
+      </tr>
+      <tr
+        className="results__row--main"
+      >
+        <td
+          className="results__row__target-period"
+          rowSpan={1}
+        >
+          <div>
+            <strong
+              className="text-uppercase"
+            >
+              Semi-annual period 2
+            </strong>
+          </div>
+          <div
+            className="text-nowrap"
+          >
+            <small>
+              Jul 1, 2018 – Dec 31, 2018
+            </small>
+          </div>
+        </td>
+        <td
+          className="text-right"
+          rowSpan={1}
+        >
+          75
+        </td>
+        <td
+          className="text-right"
+          rowSpan={1}
+        >
+          —
+        </td>
+        <td
+          className="text-right td--pad"
+          rowSpan={1}
+        >
+          <span
+            className="badge"
+          >
+            N/A
+          </span>
+        </td>
+        <td
+          className="results__result--nodata"
+          colSpan="2"
+        >
+          No results reported
+        </td>
+        <td />
+      </tr>
+      <tr
+        className="results__row--main"
+      >
+        <td
+          className="results__row__target-period"
+          rowSpan={1}
+        >
+          <div>
+            <strong
+              className="text-uppercase"
+            >
+              Semi-annual period 3
+            </strong>
+          </div>
+          <div
+            className="text-nowrap"
+          >
+            <small>
+              Jan 1, 2019 – Jun 30, 2019
+            </small>
+          </div>
+        </td>
+        <td
+          className="text-right"
+          rowSpan={1}
+        >
+          100
+        </td>
+        <td
+          className="text-right"
+          rowSpan={1}
+        >
+          100
+        </td>
+        <td
+          className="text-right td--pad"
+          rowSpan={1}
+        >
+          <strong>
+            <span
+              className="badge badge-success-light"
+              data-content="<h4 class=\\"badge badge-success-light\\">On track</h4><p><strong>The actual value is %s of the target value.</strong> An indicator is on track if the result is no less than 85% of the target and no more than 115% of the target.</p>
+                <p><em>Remember to consider your direction of change when thinking about whether the indicator is on track.</em></p>"
+              data-placement="right"
+              data-toggle="popover"
+              data-trigger="focus"
+              tabIndex="0"
+            >
+              100%
+            </span>
+          </strong>
+        </td>
+        <td
+          className="results__result--date"
+        >
+          <a
+            className="results__link"
+            href="/indicators/result_update/201/"
+          >
+            Mar 10, 2019
+          </a>
+        </td>
+        <td
+          className="results__result--value"
+        >
+          55
+        </td>
+        <td
+          className="td--stretch results__result--url"
+        />
+      </tr>
+      <tr
+        className="results__row--main"
+      >
+        <td
+          className="results__row__target-period"
+          rowSpan={1}
+        >
+          <div>
+            <strong
+              className="text-uppercase"
+            >
+              Semi-annual period 4
+            </strong>
+          </div>
+          <div
+            className="text-nowrap"
+          >
+            <small>
+              Jul 1, 2019 – Dec 31, 2019
+            </small>
+          </div>
+        </td>
+        <td
+          className="text-right"
+          rowSpan={1}
+        >
+          125
+        </td>
+        <td
+          className="text-right"
+          rowSpan={1}
+        >
+          —
+        </td>
+        <td
+          className="text-right td--pad"
+          rowSpan={1}
+        >
+          <span
+            className="badge"
+          >
+            N/A
+          </span>
+        </td>
+        <td
+          className="results__result--nodata"
+          colSpan="2"
+        >
+          No results reported
+        </td>
+        <td />
+      </tr>
+      <tr
+        className="results__row--main"
+      >
+        <td
+          className="results__row__target-period"
+          rowSpan={1}
+        >
+          <div>
+            <strong
+              className="text-uppercase"
+            >
+              Semi-annual period 5
+            </strong>
+          </div>
+          <div
+            className="text-nowrap"
+          >
+            <small>
+              Jan 1, 2020 – Jun 30, 2020
+            </small>
+          </div>
+        </td>
+        <td
+          className="text-right"
+          rowSpan={1}
+        >
+          150
+        </td>
+        <td
+          className="text-right"
+          rowSpan={1}
+        >
+          200
+        </td>
+        <td
+          className="text-right td--pad"
+          rowSpan={1}
+        >
+          <span
+            className="badge"
+          >
+            N/A
+          </span>
+        </td>
+        <td
+          className="results__result--date"
+        >
+          <a
+            className="results__link"
+            href="/indicators/result_update/202/"
+          >
+            Apr 10, 2020
+          </a>
+        </td>
+        <td
+          className="results__result--value"
+        >
+          100
+        </td>
+        <td
+          className="td--stretch results__result--url"
+        />
+      </tr>
+      <tr
+        className="results__row--subtotal"
+      >
+        <td>
+          <div>
+            <em>
+              <strong>
+                Program to date
+              </strong>
+            </em>
+          </div>
+          <div
+            className="text-nowrap"
+          >
+            <small>
+              Jan 1, 2018 – Jun 30, 2020
+            </small>
+          </div>
+        </td>
+        <td
+          className="text-right"
+        >
+          <strong>
+            150
+          </strong>
+        </td>
+        <td
+          className="text-right"
+        >
+          <strong>
+            200
+          </strong>
+        </td>
+        <td
+          className="text-right"
+        >
+          <strong>
+            <span
+              className="badge badge-warning-light"
+              data-content="<h4 class=\\"badge badge-warning-light\\">Not on track</h4><p><strong>The actual value is %s of the target value.</strong> An indicator is on track if the result is no less than 85% of the target and no more than 115% of the target.</p>
+                <p><em>Remember to consider your direction of change when thinking about whether the indicator is on track.</em></p>"
+              data-placement="right"
+              data-toggle="popover"
+              data-trigger="focus"
+              tabIndex="0"
+            >
+              133.33%
+            </span>
+          </strong>
+        </td>
+        <td
+          className="bg-medium"
+          colSpan="3"
+        />
+      </tr>
+      <tr
+        className="results__row--main"
+      >
+        <td
+          className="results__row__target-period"
+          rowSpan={1}
+        >
+          <div>
+            <strong
+              className="text-uppercase"
+            >
+              Semi-annual period 6
+            </strong>
+          </div>
+          <div
+            className="text-nowrap"
+          >
+            <small>
+              Jul 1, 2020 – Dec 31, 2020
+            </small>
+          </div>
+        </td>
+        <td
+          className="text-right"
+          rowSpan={1}
+        >
+          200
+        </td>
+        <td
+          className="text-right"
+          rowSpan={1}
+        >
+          —
+        </td>
+        <td
+          className="text-right td--pad"
+          rowSpan={1}
+        >
+          <span
+            className="badge"
+          >
+            N/A
+          </span>
+        </td>
+        <td
+          className="results__result--nodata"
+          colSpan="2"
+        >
+          No results reported
+        </td>
+        <td />
+      </tr>
+      <tr
+        className="bg-white"
+      >
+        <td>
+          <strong>
+            Life of Program
+          </strong>
+        </td>
+        <td
+          className="text-right"
+        >
+          <strong>
+            200
+          </strong>
+        </td>
+        <td
+          className="text-right"
+        >
+          <strong>
+            200
+          </strong>
+        </td>
+        <td
+          className="text-right"
+        >
+          <span
+            className="badge"
+          >
+            100%
+          </span>
+        </td>
+        <td
+          colSpan="3"
+        >
+          <div
+            className="help-text"
+          >
+            Results are cumulative. The Life of Program result mirrors the latest period result.
+          </div>
+        </td>
+      </tr>
+    </tbody>
+  </table>
+  <div
+    className="results-table__actions"
+  >
+    <div
+      className="cd-actions__message"
+    />
+    <div
+      className="cd-actions__button"
+    >
+      <a
+        className="btn-link btn-add results__link"
+        href="/indicators/result_add/109/"
+      >
+        <svg
+          aria-hidden="true"
+          className="svg-inline--fa fa-plus-circle fa-w-16 "
+          data-icon="plus-circle"
+          data-prefix="fas"
+          focusable="false"
+          role="img"
+          style={Object {}}
+          viewBox="0 0 512 512"
+          xmlns="http://www.w3.org/2000/svg"
+        >
+          <path
+            d="M256 8C119 8 8 119 8 256s111 248 248 248 248-111 248-248S393 8 256 8zm144 276c0 6.6-5.4 12-12 12h-92v92c0 6.6-5.4 12-12 12h-56c-6.6 0-12-5.4-12-12v-92h-92c-6.6 0-12-5.4-12-12v-56c0-6.6 5.4-12 12-12h92v-92c0-6.6 5.4-12 12-12h56c6.6 0 12 5.4 12 12v92h92c6.6 0 12 5.4 12 12v56z"
+            fill="currentColor"
+            style={Object {}}
+          />
+        </svg>
+        Add result
+      </a>
+    </div>
+  </div>
+</div>
+`;
+
+exports[`Results table component with a valid indicator and no editing privileges matches snapshot 1`] = `
+<div
+  className="results-table__wrapper"
+>
+  <table
+    className="table results-table"
+  >
+    <thead>
+      <tr
+        className="table-header"
+      >
+        <th>
+          Target period
+        </th>
+        <th
+          className="text-right"
+        >
+          Target
+        </th>
+        <th
+          className="text-right"
+        >
+          Actual
+        </th>
+        <th
+          className="td--pad text-right"
+        >
+          % Met
+        </th>
+        <th
+          colSpan="2"
+        >
+          Results
+        </th>
+        <th
+          className="td--stretch"
+        >
+          Evidence
+        </th>
+      </tr>
+    </thead>
+    <tbody>
+      <tr
+        className="results__row--main"
+      >
+        <td
+          className="results__row__target-period"
+          rowSpan={1}
+        >
+          <div>
+            <strong
+              className="text-uppercase"
+            >
+              Life of program (LoP) only
+            </strong>
+          </div>
+        </td>
+        <td
+          className="text-right"
+          rowSpan={1}
+        >
+          92.5%
+        </td>
+        <td
+          className="text-right"
+          rowSpan={1}
+        >
+          —
+        </td>
+        <td
+          className="text-right td--pad"
+          rowSpan={1}
+        >
+          <span
+            className="badge"
+          >
+            N/A
+          </span>
+        </td>
+        <td
+          className="results__result--nodata"
+          colSpan="2"
+        >
+          No results reported
+        </td>
+        <td />
+      </tr>
+      <tr
+        className="bg-white"
+      >
+        <td>
+          <strong>
+            Life of Program
+          </strong>
+        </td>
+        <td
+          className="text-right"
+        >
+          <strong>
+            92.5%
+          </strong>
+        </td>
+        <td
+          className="text-right"
+        >
+          <strong>
+            —
+          </strong>
+        </td>
+        <td
+          className="text-right"
+        >
+          <span
+            className="badge"
+          >
+            N/A
+          </span>
+        </td>
+        <td
+          colSpan="3"
+        >
+          <div
+            className="help-text"
+          >
+            Results are cumulative. The Life of Program result mirrors the latest period result.
+          </div>
+        </td>
+      </tr>
+    </tbody>
+  </table>
+  <div
+    className="results-table__actions"
+  >
+    <div
+      className="cd-actions__message"
+    />
+  </div>
+</div>
+`;
+
+exports[`Results table component with a valid indicator and no editing privileges matches snapshot 2`] = `
+<div
+  className="results-table__wrapper"
+>
+  <table
+    className="table results-table"
+  >
+    <thead>
+      <tr
+        className="table-header"
+      >
+        <th>
+          Target period
+        </th>
+        <th
+          className="text-right"
+        >
+          Target
+        </th>
+        <th
+          className="text-right"
+        >
+          Actual
+        </th>
+        <th
+          className="td--pad text-right"
+        >
+          % Met
+        </th>
+        <th
+          colSpan="2"
+        >
+          Results
+        </th>
+        <th
+          className="td--stretch"
+        >
+          Evidence
+        </th>
+      </tr>
+    </thead>
+    <tbody>
+      <tr
+        className="results__row--main"
+      >
+        <td
+          className="results__row__target-period"
+          rowSpan={1}
+        >
+          <div>
+            <strong
+              className="text-uppercase"
+            >
+              Year 1
+            </strong>
+          </div>
+          <div
+            className="text-nowrap"
+          >
+            <small>
+              Jan 1, 2018 – Dec 31, 2018
+            </small>
+          </div>
+        </td>
+        <td
+          className="text-right"
+          rowSpan={1}
+        >
+          100
+        </td>
+        <td
+          className="text-right"
+          rowSpan={1}
+        >
+          —
+        </td>
+        <td
+          className="text-right td--pad"
+          rowSpan={1}
+        >
+          <span
+            className="badge"
+          >
+            N/A
+          </span>
+        </td>
+        <td
+          className="results__result--nodata"
+          colSpan="2"
+        >
+          No results reported
+        </td>
+        <td />
+      </tr>
+      <tr
+        className="results__row--main"
+      >
+        <td
+          className="results__row__target-period"
+          rowSpan={1}
+        >
+          <div>
+            <strong
+              className="text-uppercase"
+            >
+              Year 2
+            </strong>
+          </div>
+          <div
+            className="text-nowrap"
+          >
+            <small>
+              Jan 1, 2019 – Dec 31, 2019
+            </small>
+          </div>
+        </td>
+        <td
+          className="text-right"
+          rowSpan={1}
+        >
+          200
+        </td>
+        <td
+          className="text-right"
+          rowSpan={1}
+        >
+          185
+        </td>
+        <td
+          className="text-right td--pad"
+          rowSpan={1}
+        >
+          <strong>
+            <span
+              className="badge badge-success-light"
+              data-content="<h4 class=\\"badge badge-success-light\\">On track</h4><p><strong>The actual value is %s of the target value.</strong> An indicator is on track if the result is no less than 85% of the target and no more than 115% of the target.</p>
+                <p><em>Remember to consider your direction of change when thinking about whether the indicator is on track.</em></p>"
+              data-placement="right"
+              data-toggle="popover"
+              data-trigger="focus"
+              tabIndex="0"
+            >
+              92.5%
+            </span>
+          </strong>
+        </td>
+        <td
+          className="results__result--date"
+        >
+          <a
+            className="results__link"
+            href="/indicators/result_update/95/"
+          >
+            Jan 3, 2019
+          </a>
+        </td>
+        <td
+          className="results__result--value"
+        >
+          185
+        </td>
+        <td
+          className="td--stretch results__result--url"
+        />
+      </tr>
+      <tr
+        className="results__row--subtotal"
+      >
+        <td>
+          <div>
+            <em>
+              <strong>
+                Program to date
+              </strong>
+            </em>
+          </div>
+          <div
+            className="text-nowrap"
+          >
+            <small>
+              Jan 1, 2018 – Dec 31, 2019
+            </small>
+          </div>
+        </td>
+        <td
+          className="text-right"
+        >
+          <strong>
+            300
+          </strong>
+        </td>
+        <td
+          className="text-right"
+        >
+          <strong>
+            185
+          </strong>
+        </td>
+        <td
+          className="text-right"
+        >
+          <strong>
+            <span
+              className="badge badge-warning-light"
+              data-content="<h4 class=\\"badge badge-warning-light\\">Not on track</h4><p><strong>The actual value is %s of the target value.</strong> An indicator is on track if the result is no less than 85% of the target and no more than 115% of the target.</p>
+                <p><em>Remember to consider your direction of change when thinking about whether the indicator is on track.</em></p>"
+              data-placement="right"
+              data-toggle="popover"
+              data-trigger="focus"
+              tabIndex="0"
+            >
+              61.67%
+            </span>
+          </strong>
+        </td>
+        <td
+          className="bg-medium"
+          colSpan="3"
+        />
+      </tr>
+      <tr
+        className="results__row--main"
+      >
+        <td
+          className="results__row__target-period"
+          rowSpan={2}
+        >
+          <div>
+            <strong
+              className="text-uppercase"
+            >
+              Year 3
+            </strong>
+          </div>
+          <div
+            className="text-nowrap"
+          >
+            <small>
+              Jan 1, 2020 – Dec 31, 2020
+            </small>
+          </div>
+        </td>
+        <td
+          className="text-right"
+          rowSpan={2}
+        >
+          300
+        </td>
+        <td
+          className="text-right"
+          rowSpan={2}
+        >
+          250
+        </td>
+        <td
+          className="text-right td--pad"
+          rowSpan={2}
+        >
+          <span
+            className="badge"
+          >
+            83.33%
+          </span>
+        </td>
+        <td
+          className="results__result--date"
+        >
+          <a
+            className="results__link"
+            href="/indicators/result_update/98/"
+          >
+            Jan 4, 2020
+          </a>
+        </td>
+        <td
+          className="results__result--value"
+        >
+          150
+        </td>
+        <td
+          className="td--stretch results__result--url"
+        >
+          <a
+            href="http://www.example.com/98"
+            target="_blank"
+          >
+            Evidence for result 98
+          </a>
+        </td>
+      </tr>
+      <tr
+        className="results__row--supplemental"
+      >
+        <td
+          className="results__result--date"
+        >
+          <a
+            className="results__link"
+            href="/indicators/result_update/99/"
+          >
+            Jan 10, 2020
+          </a>
+        </td>
+        <td
+          className="results__result--value"
+        >
+          100
+        </td>
+        <td
+          className="td--stretch results__result--url"
+        >
+          <a
+            href="http://www.example.com/99"
+            target="_blank"
+          >
+            http://www.example.com/99
+          </a>
+        </td>
+      </tr>
+      <tr
+        className="bg-white"
+      >
+        <td>
+          <strong>
+            Life of Program
+          </strong>
+        </td>
+        <td
+          className="text-right"
+        >
+          <strong>
+            1,000
+          </strong>
+        </td>
+        <td
+          className="text-right"
+        >
+          <strong>
+            500
+          </strong>
+        </td>
+        <td
+          className="text-right"
+        >
+          <span
+            className="badge"
+          >
+            50%
+          </span>
+        </td>
+        <td
+          colSpan="3"
+        >
+          <div
+            className="help-text"
+          >
+            Results are non-cumulative. The Life of Program result is the sum of target periods results.
+          </div>
+        </td>
+      </tr>
+    </tbody>
+  </table>
+  <div
+    className="results-table__actions"
+  >
+    <div
+      className="cd-actions__message"
+    />
+  </div>
+</div>
+`;
+
+exports[`Results table component with a valid indicator and no editing privileges matches snapshot 3`] = `
+<div
+  className="results-table__wrapper"
+>
+  <table
+    className="table results-table"
+  >
+    <thead>
+      <tr
+        className="table-header"
+      >
+        <th>
+          Target period
+        </th>
+        <th
+          className="text-right"
+        >
+          Target
+        </th>
+        <th
+          className="text-right"
+        >
+          Actual
+        </th>
+        <th
+          className="td--pad text-right"
+        >
+          % Met
+        </th>
+        <th
+          colSpan="2"
+        >
+          Results
+        </th>
+        <th
+          className="td--stretch"
+        >
+          Evidence
+        </th>
+      </tr>
+    </thead>
+    <tbody>
+      <tr
+        className="results__row--main"
+      >
+        <td
+          className="results__row__target-period"
+          rowSpan={1}
+        >
+          <div>
+            <strong
+              className="text-uppercase"
+            >
+              Midline
+            </strong>
+          </div>
+        </td>
+        <td
+          className="text-right"
+          rowSpan={1}
+        >
+          8%
+        </td>
+        <td
+          className="text-right"
+          rowSpan={1}
+        >
+          —
+        </td>
+        <td
+          className="text-right td--pad"
+          rowSpan={1}
+        >
+          <span
+            className="badge"
+          >
+            N/A
+          </span>
+        </td>
+        <td
+          className="results__result--nodata"
+          colSpan="2"
+        >
+          No results reported
+        </td>
+        <td />
+      </tr>
+      <tr
+        className="results__row--main"
+      >
+        <td
+          className="results__row__target-period"
+          rowSpan={1}
+        >
+          <div>
+            <strong
+              className="text-uppercase"
+            >
+              Endline
+            </strong>
+          </div>
+        </td>
+        <td
+          className="text-right"
+          rowSpan={1}
+        >
+          10%
+        </td>
+        <td
+          className="text-right"
+          rowSpan={1}
+        >
+          —
+        </td>
+        <td
+          className="text-right td--pad"
+          rowSpan={1}
+        >
+          <span
+            className="badge"
+          >
+            N/A
+          </span>
+        </td>
+        <td
+          className="results__result--nodata"
+          colSpan="2"
+        >
+          No results reported
+        </td>
+        <td />
+      </tr>
+      <tr
+        className="bg-white"
+      >
+        <td>
+          <strong>
+            Life of Program
+          </strong>
+        </td>
+        <td
+          className="text-right"
+        >
+          <strong>
+            10%
+          </strong>
+        </td>
+        <td
+          className="text-right"
+        >
+          <strong>
+            5%
+          </strong>
+        </td>
+        <td
+          className="text-right"
+        >
+          <span
+            className="badge"
+          >
+            50%
+          </span>
+        </td>
+        <td
+          colSpan="3"
+        >
+          <div
+            className="help-text"
+          >
+            Results are cumulative. The Life of Program result mirrors the latest period result.
+          </div>
+        </td>
+      </tr>
+    </tbody>
+  </table>
+  <div
+    className="results-table__actions"
+  >
+    <div
+      className="cd-actions__message"
+    />
+  </div>
+</div>
+`;
+
+exports[`Results table component with a valid indicator and no editing privileges matches snapshot 4`] = `
+<div
+  className="results-table__wrapper"
+>
+  <table
+    className="table results-table"
+  >
+    <thead>
+      <tr
+        className="table-header"
+      >
+        <th>
+          Target period
+        </th>
+        <th
+          className="text-right"
+        >
+          Target
+        </th>
+        <th
+          className="text-right"
+        >
+          Actual
+        </th>
+        <th
+          className="td--pad text-right"
+        >
+          % Met
+        </th>
+        <th
+          colSpan="2"
+        >
+          Results
+        </th>
+        <th
+          className="td--stretch"
+        >
+          Evidence
+        </th>
+      </tr>
+    </thead>
+    <tbody>
+      <tr
+        className="results__row--main"
+      >
+        <td
+          className="results__row__target-period"
+          rowSpan={1}
+        >
+          <div>
+            <strong
+              className="text-uppercase"
+            >
+              Semi-annual period 1
+            </strong>
+          </div>
+          <div
+            className="text-nowrap"
+          >
+            <small>
+              Jan 1, 2018 – Jun 30, 2018
+            </small>
+          </div>
+        </td>
+        <td
+          className="text-right"
+          rowSpan={1}
+        >
+          50
+        </td>
+        <td
+          className="text-right"
+          rowSpan={1}
+        >
+          45
+        </td>
+        <td
+          className="text-right td--pad"
+          rowSpan={1}
+        >
+          <strong>
+            <span
+              className="badge badge-success-light"
+              data-content="<h4 class=\\"badge badge-success-light\\">On track</h4><p><strong>The actual value is %s of the target value.</strong> An indicator is on track if the result is no less than 85% of the target and no more than 115% of the target.</p>
+                <p><em>Remember to consider your direction of change when thinking about whether the indicator is on track.</em></p>"
+              data-placement="right"
+              data-toggle="popover"
+              data-trigger="focus"
+              tabIndex="0"
+            >
+              90%
+            </span>
+          </strong>
+        </td>
+        <td
+          className="results__result--date"
+        >
+          <a
+            className="results__link"
+            href="/indicators/result_update/199/"
+          >
+            Feb 10, 2018
+          </a>
+        </td>
+        <td
+          className="results__result--value"
+        >
+          45
+        </td>
+        <td
+          className="td--stretch results__result--url"
+        />
+      </tr>
+      <tr
+        className="results__row--main"
+      >
+        <td
+          className="results__row__target-period"
+          rowSpan={1}
+        >
+          <div>
+            <strong
+              className="text-uppercase"
+            >
+              Semi-annual period 2
+            </strong>
+          </div>
+          <div
+            className="text-nowrap"
+          >
+            <small>
+              Jul 1, 2018 – Dec 31, 2018
+            </small>
+          </div>
+        </td>
+        <td
+          className="text-right"
+          rowSpan={1}
+        >
+          75
+        </td>
+        <td
+          className="text-right"
+          rowSpan={1}
+        >
+          —
+        </td>
+        <td
+          className="text-right td--pad"
+          rowSpan={1}
+        >
+          <span
+            className="badge"
+          >
+            N/A
+          </span>
+        </td>
+        <td
+          className="results__result--nodata"
+          colSpan="2"
+        >
+          No results reported
+        </td>
+        <td />
+      </tr>
+      <tr
+        className="results__row--main"
+      >
+        <td
+          className="results__row__target-period"
+          rowSpan={1}
+        >
+          <div>
+            <strong
+              className="text-uppercase"
+            >
+              Semi-annual period 3
+            </strong>
+          </div>
+          <div
+            className="text-nowrap"
+          >
+            <small>
+              Jan 1, 2019 – Jun 30, 2019
+            </small>
+          </div>
+        </td>
+        <td
+          className="text-right"
+          rowSpan={1}
+        >
+          100
+        </td>
+        <td
+          className="text-right"
+          rowSpan={1}
+        >
+          100
+        </td>
+        <td
+          className="text-right td--pad"
+          rowSpan={1}
+        >
+          <strong>
+            <span
+              className="badge badge-success-light"
+              data-content="<h4 class=\\"badge badge-success-light\\">On track</h4><p><strong>The actual value is %s of the target value.</strong> An indicator is on track if the result is no less than 85% of the target and no more than 115% of the target.</p>
+                <p><em>Remember to consider your direction of change when thinking about whether the indicator is on track.</em></p>"
+              data-placement="right"
+              data-toggle="popover"
+              data-trigger="focus"
+              tabIndex="0"
+            >
+              100%
+            </span>
+          </strong>
+        </td>
+        <td
+          className="results__result--date"
+        >
+          <a
+            className="results__link"
+            href="/indicators/result_update/201/"
+          >
+            Mar 10, 2019
+          </a>
+        </td>
+        <td
+          className="results__result--value"
+        >
+          55
+        </td>
+        <td
+          className="td--stretch results__result--url"
+        />
+      </tr>
+      <tr
+        className="results__row--main"
+      >
+        <td
+          className="results__row__target-period"
+          rowSpan={1}
+        >
+          <div>
+            <strong
+              className="text-uppercase"
+            >
+              Semi-annual period 4
+            </strong>
+          </div>
+          <div
+            className="text-nowrap"
+          >
+            <small>
+              Jul 1, 2019 – Dec 31, 2019
+            </small>
+          </div>
+        </td>
+        <td
+          className="text-right"
+          rowSpan={1}
+        >
+          125
+        </td>
+        <td
+          className="text-right"
+          rowSpan={1}
+        >
+          —
+        </td>
+        <td
+          className="text-right td--pad"
+          rowSpan={1}
+        >
+          <span
+            className="badge"
+          >
+            N/A
+          </span>
+        </td>
+        <td
+          className="results__result--nodata"
+          colSpan="2"
+        >
+          No results reported
+        </td>
+        <td />
+      </tr>
+      <tr
+        className="results__row--main"
+      >
+        <td
+          className="results__row__target-period"
+          rowSpan={1}
+        >
+          <div>
+            <strong
+              className="text-uppercase"
+            >
+              Semi-annual period 5
+            </strong>
+          </div>
+          <div
+            className="text-nowrap"
+          >
+            <small>
+              Jan 1, 2020 – Jun 30, 2020
+            </small>
+          </div>
+        </td>
+        <td
+          className="text-right"
+          rowSpan={1}
+        >
+          150
+        </td>
+        <td
+          className="text-right"
+          rowSpan={1}
+        >
+          200
+        </td>
+        <td
+          className="text-right td--pad"
+          rowSpan={1}
+        >
+          <span
+            className="badge"
+          >
+            N/A
+          </span>
+        </td>
+        <td
+          className="results__result--date"
+        >
+          <a
+            className="results__link"
+            href="/indicators/result_update/202/"
+          >
+            Apr 10, 2020
+          </a>
+        </td>
+        <td
+          className="results__result--value"
+        >
+          100
+        </td>
+        <td
+          className="td--stretch results__result--url"
+        />
+      </tr>
+      <tr
+        className="results__row--subtotal"
+      >
+        <td>
+          <div>
+            <em>
+              <strong>
+                Program to date
+              </strong>
+            </em>
+          </div>
+          <div
+            className="text-nowrap"
+          >
+            <small>
+              Jan 1, 2018 – Jun 30, 2020
+            </small>
+          </div>
+        </td>
+        <td
+          className="text-right"
+        >
+          <strong>
+            150
+          </strong>
+        </td>
+        <td
+          className="text-right"
+        >
+          <strong>
+            200
+          </strong>
+        </td>
+        <td
+          className="text-right"
+        >
+          <strong>
+            <span
+              className="badge badge-warning-light"
+              data-content="<h4 class=\\"badge badge-warning-light\\">Not on track</h4><p><strong>The actual value is %s of the target value.</strong> An indicator is on track if the result is no less than 85% of the target and no more than 115% of the target.</p>
+                <p><em>Remember to consider your direction of change when thinking about whether the indicator is on track.</em></p>"
+              data-placement="right"
+              data-toggle="popover"
+              data-trigger="focus"
+              tabIndex="0"
+            >
+              133.33%
+            </span>
+          </strong>
+        </td>
+        <td
+          className="bg-medium"
+          colSpan="3"
+        />
+      </tr>
+      <tr
+        className="results__row--main"
+      >
+        <td
+          className="results__row__target-period"
+          rowSpan={1}
+        >
+          <div>
+            <strong
+              className="text-uppercase"
+            >
+              Semi-annual period 6
+            </strong>
+          </div>
+          <div
+            className="text-nowrap"
+          >
+            <small>
+              Jul 1, 2020 – Dec 31, 2020
+            </small>
+          </div>
+        </td>
+        <td
+          className="text-right"
+          rowSpan={1}
+        >
+          200
+        </td>
+        <td
+          className="text-right"
+          rowSpan={1}
+        >
+          —
+        </td>
+        <td
+          className="text-right td--pad"
+          rowSpan={1}
+        >
+          <span
+            className="badge"
+          >
+            N/A
+          </span>
+        </td>
+        <td
+          className="results__result--nodata"
+          colSpan="2"
+        >
+          No results reported
+        </td>
+        <td />
+      </tr>
+      <tr
+        className="bg-white"
+      >
+        <td>
+          <strong>
+            Life of Program
+          </strong>
+        </td>
+        <td
+          className="text-right"
+        >
+          <strong>
+            200
+          </strong>
+        </td>
+        <td
+          className="text-right"
+        >
+          <strong>
+            200
+          </strong>
+        </td>
+        <td
+          className="text-right"
+        >
+          <span
+            className="badge"
+          >
+            100%
+          </span>
+        </td>
+        <td
+          colSpan="3"
+        >
+          <div
+            className="help-text"
+          >
+            Results are cumulative. The Life of Program result mirrors the latest period result.
+          </div>
+        </td>
+      </tr>
+    </tbody>
+  </table>
+  <div
+    className="results-table__actions"
+  >
+    <div
+      className="cd-actions__message"
+    />
+  </div>
+</div>
+`;
