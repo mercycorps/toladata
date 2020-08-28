@@ -354,7 +354,7 @@ exports[`Results table component result rows for an annual indicator with result
           <div
             className="help-text"
           >
-            Results are non-cumulative. The Life of Program result is the sum of target periods results.
+            Results are non-cumulative. The Life of Program result is the sum of target period results.
           </div>
         </td>
       </tr>
@@ -918,7 +918,7 @@ exports[`Results table component with a valid indicator and editing privileges m
           <div
             className="help-text"
           >
-            Results are non-cumulative. The Life of Program result is the sum of target periods results.
+            Results are non-cumulative. The Life of Program result is the sum of target period results.
           </div>
         </td>
       </tr>
@@ -2202,7 +2202,7 @@ exports[`Results table component with a valid indicator and no editing privilege
           <div
             className="help-text"
           >
-            Results are non-cumulative. The Life of Program result is the sum of target periods results.
+            Results are non-cumulative. The Life of Program result is the sum of target period results.
           </div>
         </td>
       </tr>
