@@ -1,4 +1,5 @@
 import React from 'react';
+import { FaRegQuestionCircle } from 'react-icons/fa';
 
 const HeaderCell = ( props ) => {
     let style = props.styleWidth ? {
@@ -15,6 +16,40 @@ const HeaderCell = ( props ) => {
     )
 }
 
+class LopActualHeaderCell extends React.Component {
+    constructor( props ) {
+        super(props);
+        this.style = props.styleWidth ? {
+            minWidth: `${props.styleWidth}px`
+        } : {};
+    }
+    componentDidMount() {
+        // Enable popovers after mount (they break otherwise)
+        $('*[data-toggle="popover"]').popover();
+    }
+    render() {
+        // # Translators: label on a report, column header for a column of values that have been rounded
+        const msg = gettext('All actual values in this report are rounded to two decimal places.');
+        return (
+            <th
+                scope="col"
+                colSpan={ this.props.colSpan }
+                className={ this.props.className }
+                style={ this.style }>
+                { this.props.label }
+                <a href="#"
+                    className="popover-icon"
+                    tabIndex="0"
+                    data-toggle="popover"
+                    data-placement="right"
+                    data-trigger="focus"
+                    data-content={msg} >
+                    < FaRegQuestionCircle />
+                </a>
+            </th>        
+        );
+    }
+}
 
 const PeriodHeader = ( props ) => {
     return (
@@ -83,4 +118,4 @@ const TVAHeader = () => {
     )
 }
 
-export { HeaderCell, PeriodHeader, TVAHeader, ActualHeader }
+export { HeaderCell, LopActualHeaderCell, PeriodHeader, TVAHeader, ActualHeader }
