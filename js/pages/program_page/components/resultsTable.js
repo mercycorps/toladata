@@ -171,7 +171,7 @@ const LoPRow = ({indicator, ...props}) => {
         lopMessage = "cumulative"
     } else {
         // # Translators: explanation of the summing rules for the totals row on a list of results
-        lopMessage = gettext("Results are non-cumulative. The Life of Program result is the sum of target periods results.")
+        lopMessage = gettext("Results are non-cumulative. The Life of Program result is the sum of target period results.")
     }
     return (
         <tr className="bg-white">
