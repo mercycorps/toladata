@@ -1,3 +1,8 @@
+/* Tests for the results table React component (rewrite of results table template)
+ *  note: snapshots should be sufficient, but tests of individual row characteristics are left in from TDD
+ *  could provide more useful debugging info than "does not match snapshot" as the snapshots are large
+ *  -Cameron
+ */
 import ResultsTable from '../../components/resultsTable';
 import React from 'react';
 import renderer from 'react-test-renderer';
