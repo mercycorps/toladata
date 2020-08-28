@@ -3,7 +3,7 @@ msgstr ""
 "Project-Id-Version: \n"
 "Report-Msgid-Bugs-To: \n"
 "POT-Creation-Date: 2020-08-28 15:40-0700\n"
-"PO-Revision-Date: 2020-08-28 15:40-0700\n"
+"PO-Revision-Date: 2020-08-28 16:25-0700\n"
 "Last-Translator: \n"
 "Language-Team: \n"
 "Language: fr\n"
@@ -817,7 +817,7 @@ msgid ""
 msgstr ""
 "La valeur réelle correspond à la valeur cible, à plus ou moins 15 %. Donc, "
 "si votre cible est 100 et votre résultat 110, l’indicateur est 10 % au-"
-"dessus de la cible et sur la bonne voie.  <br><br>Veuillez noter que si le "
+"dessus de la cible et en la bonne voie.  <br><br>Veuillez noter que si le "
 "sens de changement de votre indicateur est décroissant, les indicateurs « au-"
 "dessus » et « en dessous » sont alors inversés. Dans ce cas, si votre cible "
 "est 100 et votre résultat 200, votre indicateur est 50 % en dessous de la "
@@ -940,12 +940,12 @@ msgstr ""
 #. Translators: Label for an indicator that is within a target range
 #: js/pages/program_page/components/resultsTable.js:34
 msgid "On track"
-msgstr "Sur la bonne voie"
+msgstr "En bonne voie"
 
 #. Translators: Label for an indicator that is above or below the target value
 #: js/pages/program_page/components/resultsTable.js:38
 msgid "Not on track"
-msgstr "Pas sur la bonne voie"
+msgstr "Pas en bonne voie"
 
 #. Translators: Shown in a results cell when there are no results to display
 #: js/pages/program_page/components/resultsTable.js:119
