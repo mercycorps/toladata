@@ -9,10 +9,13 @@ const EM_DASH = "—"
 // # Translators: short for Not Applicable
 const N_A = gettext("N/A");
 
-
+/*
+ * Creates a <span class="badge">xx%</span> component that when clicked pops up help text
+ * using bootstraps popover library
+ */
 class ProgressPopover extends React.Component {
     componentDidMount() {
-        // Enable popovers after update (they break otherwise)
+        // Enable popovers after mount (they break otherwise)
         $('*[data-toggle="popover"]').popover({
             html: true
         });
@@ -46,6 +49,9 @@ class ProgressPopover extends React.Component {
     }
 }
 
+/**
+ * the cells in the results table containing result date, value, and evidence link, with formatting
+ */
 const ResultCells = ({ result, localizer, ...props }) => {
     return (
         <React.Fragment>
@@ -66,6 +72,9 @@ const ResultCells = ({ result, localizer, ...props }) => {
     );
 }
 
+/**
+ * row(s) in the results table (one instance per target period, includes supplemental result rows and progress row)
+ */
 const ResultRows = ({target, indicator, ...props}) => {
     let rowspan = target.results.length || 1;
     const localizer = (val) => {
@@ -183,12 +192,30 @@ const ResultsTableTable = ({indicator, editable, ...props}) => {
         <table className="table results-table">
             <thead>
                 <tr className="table-header">
-                    <th>Target period</th>
-                    <th className="text-right">Target</th>
-                    <th className="text-right">Actual</th>
-                    <th className="td--pad text-right">% Met</th>
-                    <th colSpan="2">Results</th>
-                    <th className="td--stretch">Evidence</th>
+                    <th>{
+                        // # Translators: Header for a column listing periods in which results are grouped
+                        gettext('Target period')
+                    }</th>
+                    <th className="text-right">{
+                        // # Translators: Header for a column listing values defined as targets for each row
+                        gettext('Target')
+                    }</th>
+                    <th className="text-right">{
+                        // # Translators: Header for a column listing actual result values for each row
+                        gettext('Actual')
+                    }</th>
+                    <th className="td--pad text-right">{
+                        // # Translators: Header for a column listing the progress towards the target value
+                        gettext('% Met')
+                    }</th>
+                    <th colSpan="2">{
+                        // # Translators: Header for a column listing actual results for a given period
+                        gettext('Results')
+                    }</th>
+                    <th className="td--stretch">{
+                        // # Translators: Header for a column listing supporting documents for results
+                        gettext('Evidence')
+                    }</th>
                 </tr>
             </thead>
             <tbody>
@@ -208,7 +235,10 @@ const ResultsTableActions = ({indicator, editable, ...props}) => {
                     <a href={`/indicators/result_add/${indicator.pk}/`}
                         className="btn-link btn-add results__link">
                         <FontAwesomeIcon icon={ faPlusCircle } />
-                        Add result
+                        {
+                            // # Translators: a button that lets the user add a new result
+                            gettext('Add result')
+                        }
                     </a>
                 </div>
             }
@@ -220,7 +250,10 @@ const NoTargetsWarning = ({indicator, editable, ...props}) => {
     return (
         <div className="text-danger">
             <FontAwesomeIcon icon={ faBullseye } />
-            This indicator has no targets.
+            {
+                // # Translators: Message displayed in place of a table that cannot be shown without targets having been set up
+                gettext('This indicator has no targets.')
+            }
             { editable &&
                 <a href={`/indicators/indicator_update/${indicator.pk}/`}
                     data-tab="#targets" className="indicator-link btn btn-success">

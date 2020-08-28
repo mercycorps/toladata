@@ -7,6 +7,8 @@ import '@root/test_helpers/django_i18n_stubs';
 import $ from 'jquery';
 global.$ = global.jQuery = $;
 
+
+// this allows react components that call for bootstrap popovers as part of their lifecycle to be mounted for testing
 $.fn.extend({
     popover: function() {return; },
 })
