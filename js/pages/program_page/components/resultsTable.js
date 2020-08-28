@@ -125,7 +125,7 @@ const ResultRows = ({target, indicator, ...props}) => {
                 
             </tr>
             {target.results.length > 1 && target.results.slice(1).map((result, idx) => (
-                <tr key={idx} className="results__row--supplemental">
+                <tr key={idx} className={(indicator.timeAware && target.completed) ? "results__row--supplemental pt-ended" : "results__row--supplemental"} >
                     <ResultCells result={ result } localizer={ localizer } />
                 </tr>
             ))}
