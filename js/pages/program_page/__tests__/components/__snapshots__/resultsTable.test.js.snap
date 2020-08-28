@@ -135,8 +135,7 @@ exports[`Results table component result rows for an annual indicator with result
           <strong>
             <span
               className="badge badge-success-light"
-              data-content="<h4 class=\\"badge badge-success-light\\">On track</h4><p><strong>The actual value is %s of the target value.</strong> An indicator is on track if the result is no less than 85% of the target and no more than 115% of the target.</p>
-                <p><em>Remember to consider your direction of change when thinking about whether the indicator is on track.</em></p>"
+              data-content="<h4 class=\\"badge badge-success-light\\">On track</h4><p><strong>The actual value is %(percent)s of the target value.</strong> An indicator is on track if the result is no less than 85% of the target and no more than 115% of the target.</p><p><em>Remember to consider your direction of change when thinking about whether the indicator is on track.</em></p>"
               data-placement="right"
               data-toggle="popover"
               data-trigger="focus"
@@ -204,8 +203,7 @@ exports[`Results table component result rows for an annual indicator with result
           <strong>
             <span
               className="badge badge-warning-light"
-              data-content="<h4 class=\\"badge badge-warning-light\\">Not on track</h4><p><strong>The actual value is %s of the target value.</strong> An indicator is on track if the result is no less than 85% of the target and no more than 115% of the target.</p>
-                <p><em>Remember to consider your direction of change when thinking about whether the indicator is on track.</em></p>"
+              data-content="<h4 class=\\"badge badge-warning-light\\">Not on track</h4><p><strong>The actual value is %(percent)s of the target value.</strong> An indicator is on track if the result is no less than 85% of the target and no more than 115% of the target.</p><p><em>Remember to consider your direction of change when thinking about whether the indicator is on track.</em></p>"
               data-placement="right"
               data-toggle="popover"
               data-trigger="focus"
@@ -701,8 +699,7 @@ exports[`Results table component with a valid indicator and editing privileges m
           <strong>
             <span
               className="badge badge-success-light"
-              data-content="<h4 class=\\"badge badge-success-light\\">On track</h4><p><strong>The actual value is %s of the target value.</strong> An indicator is on track if the result is no less than 85% of the target and no more than 115% of the target.</p>
-                <p><em>Remember to consider your direction of change when thinking about whether the indicator is on track.</em></p>"
+              data-content="<h4 class=\\"badge badge-success-light\\">On track</h4><p><strong>The actual value is %(percent)s of the target value.</strong> An indicator is on track if the result is no less than 85% of the target and no more than 115% of the target.</p><p><em>Remember to consider your direction of change when thinking about whether the indicator is on track.</em></p>"
               data-placement="right"
               data-toggle="popover"
               data-trigger="focus"
@@ -770,8 +767,7 @@ exports[`Results table component with a valid indicator and editing privileges m
           <strong>
             <span
               className="badge badge-warning-light"
-              data-content="<h4 class=\\"badge badge-warning-light\\">Not on track</h4><p><strong>The actual value is %s of the target value.</strong> An indicator is on track if the result is no less than 85% of the target and no more than 115% of the target.</p>
-                <p><em>Remember to consider your direction of change when thinking about whether the indicator is on track.</em></p>"
+              data-content="<h4 class=\\"badge badge-warning-light\\">Not on track</h4><p><strong>The actual value is %(percent)s of the target value.</strong> An indicator is on track if the result is no less than 85% of the target and no more than 115% of the target.</p><p><em>Remember to consider your direction of change when thinking about whether the indicator is on track.</em></p>"
               data-placement="right"
               data-toggle="popover"
               data-trigger="focus"
@@ -1260,8 +1256,7 @@ exports[`Results table component with a valid indicator and editing privileges m
           <strong>
             <span
               className="badge badge-success-light"
-              data-content="<h4 class=\\"badge badge-success-light\\">On track</h4><p><strong>The actual value is %s of the target value.</strong> An indicator is on track if the result is no less than 85% of the target and no more than 115% of the target.</p>
-                <p><em>Remember to consider your direction of change when thinking about whether the indicator is on track.</em></p>"
+              data-content="<h4 class=\\"badge badge-success-light\\">On track</h4><p><strong>The actual value is %(percent)s of the target value.</strong> An indicator is on track if the result is no less than 85% of the target and no more than 115% of the target.</p><p><em>Remember to consider your direction of change when thinking about whether the indicator is on track.</em></p>"
               data-placement="right"
               data-toggle="popover"
               data-trigger="focus"
@@ -1383,8 +1378,7 @@ exports[`Results table component with a valid indicator and editing privileges m
           <strong>
             <span
               className="badge badge-success-light"
-              data-content="<h4 class=\\"badge badge-success-light\\">On track</h4><p><strong>The actual value is %s of the target value.</strong> An indicator is on track if the result is no less than 85% of the target and no more than 115% of the target.</p>
-                <p><em>Remember to consider your direction of change when thinking about whether the indicator is on track.</em></p>"
+              data-content="<h4 class=\\"badge badge-success-light\\">On track</h4><p><strong>The actual value is %(percent)s of the target value.</strong> An indicator is on track if the result is no less than 85% of the target and no more than 115% of the target.</p><p><em>Remember to consider your direction of change when thinking about whether the indicator is on track.</em></p>"
               data-placement="right"
               data-toggle="popover"
               data-trigger="focus"
@@ -1567,8 +1561,7 @@ exports[`Results table component with a valid indicator and editing privileges m
           <strong>
             <span
               className="badge badge-warning-light"
-              data-content="<h4 class=\\"badge badge-warning-light\\">Not on track</h4><p><strong>The actual value is %s of the target value.</strong> An indicator is on track if the result is no less than 85% of the target and no more than 115% of the target.</p>
-                <p><em>Remember to consider your direction of change when thinking about whether the indicator is on track.</em></p>"
+              data-content="<h4 class=\\"badge badge-warning-light\\">Not on track</h4><p><strong>The actual value is %(percent)s of the target value.</strong> An indicator is on track if the result is no less than 85% of the target and no more than 115% of the target.</p><p><em>Remember to consider your direction of change when thinking about whether the indicator is on track.</em></p>"
               data-placement="right"
               data-toggle="popover"
               data-trigger="focus"
@@ -1990,8 +1983,7 @@ exports[`Results table component with a valid indicator and no editing privilege
           <strong>
             <span
               className="badge badge-success-light"
-              data-content="<h4 class=\\"badge badge-success-light\\">On track</h4><p><strong>The actual value is %s of the target value.</strong> An indicator is on track if the result is no less than 85% of the target and no more than 115% of the target.</p>
-                <p><em>Remember to consider your direction of change when thinking about whether the indicator is on track.</em></p>"
+              data-content="<h4 class=\\"badge badge-success-light\\">On track</h4><p><strong>The actual value is %(percent)s of the target value.</strong> An indicator is on track if the result is no less than 85% of the target and no more than 115% of the target.</p><p><em>Remember to consider your direction of change when thinking about whether the indicator is on track.</em></p>"
               data-placement="right"
               data-toggle="popover"
               data-trigger="focus"
@@ -2059,8 +2051,7 @@ exports[`Results table component with a valid indicator and no editing privilege
           <strong>
             <span
               className="badge badge-warning-light"
-              data-content="<h4 class=\\"badge badge-warning-light\\">Not on track</h4><p><strong>The actual value is %s of the target value.</strong> An indicator is on track if the result is no less than 85% of the target and no more than 115% of the target.</p>
-                <p><em>Remember to consider your direction of change when thinking about whether the indicator is on track.</em></p>"
+              data-content="<h4 class=\\"badge badge-warning-light\\">Not on track</h4><p><strong>The actual value is %(percent)s of the target value.</strong> An indicator is on track if the result is no less than 85% of the target and no more than 115% of the target.</p><p><em>Remember to consider your direction of change when thinking about whether the indicator is on track.</em></p>"
               data-placement="right"
               data-toggle="popover"
               data-trigger="focus"
@@ -2495,8 +2486,7 @@ exports[`Results table component with a valid indicator and no editing privilege
           <strong>
             <span
               className="badge badge-success-light"
-              data-content="<h4 class=\\"badge badge-success-light\\">On track</h4><p><strong>The actual value is %s of the target value.</strong> An indicator is on track if the result is no less than 85% of the target and no more than 115% of the target.</p>
-                <p><em>Remember to consider your direction of change when thinking about whether the indicator is on track.</em></p>"
+              data-content="<h4 class=\\"badge badge-success-light\\">On track</h4><p><strong>The actual value is %(percent)s of the target value.</strong> An indicator is on track if the result is no less than 85% of the target and no more than 115% of the target.</p><p><em>Remember to consider your direction of change when thinking about whether the indicator is on track.</em></p>"
               data-placement="right"
               data-toggle="popover"
               data-trigger="focus"
@@ -2618,8 +2608,7 @@ exports[`Results table component with a valid indicator and no editing privilege
           <strong>
             <span
               className="badge badge-success-light"
-              data-content="<h4 class=\\"badge badge-success-light\\">On track</h4><p><strong>The actual value is %s of the target value.</strong> An indicator is on track if the result is no less than 85% of the target and no more than 115% of the target.</p>
-                <p><em>Remember to consider your direction of change when thinking about whether the indicator is on track.</em></p>"
+              data-content="<h4 class=\\"badge badge-success-light\\">On track</h4><p><strong>The actual value is %(percent)s of the target value.</strong> An indicator is on track if the result is no less than 85% of the target and no more than 115% of the target.</p><p><em>Remember to consider your direction of change when thinking about whether the indicator is on track.</em></p>"
               data-placement="right"
               data-toggle="popover"
               data-trigger="focus"
@@ -2802,8 +2791,7 @@ exports[`Results table component with a valid indicator and no editing privilege
           <strong>
             <span
               className="badge badge-warning-light"
-              data-content="<h4 class=\\"badge badge-warning-light\\">Not on track</h4><p><strong>The actual value is %s of the target value.</strong> An indicator is on track if the result is no less than 85% of the target and no more than 115% of the target.</p>
-                <p><em>Remember to consider your direction of change when thinking about whether the indicator is on track.</em></p>"
+              data-content="<h4 class=\\"badge badge-warning-light\\">Not on track</h4><p><strong>The actual value is %(percent)s of the target value.</strong> An indicator is on track if the result is no less than 85% of the target and no more than 115% of the target.</p><p><em>Remember to consider your direction of change when thinking about whether the indicator is on track.</em></p>"
               data-placement="right"
               data-toggle="popover"
               data-trigger="focus"
