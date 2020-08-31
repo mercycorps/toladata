@@ -196,6 +196,14 @@ class Level(models.Model):
             name=self.name
         )
 
+    @cached_property
+    def display_number(self):
+        """ (for audit log) this returns the level's tier name and level number, i.e. 'Goal' or 'Output 1.1'"""
+        return '{tier}{ontology}'.format(
+            tier=_(self.leveltier.name) if self.leveltier else '',
+            ontology=' {}'.format(self.display_ontology) if self.display_ontology else '',
+        )
+
     def get_children(self):
         """ Used in group-by-outcome-chain reports, recursively gets children in tree order"""
         child_levels = []
@@ -1392,7 +1400,7 @@ class Indicator(SafeDeleteModel):
                 }
                 for t in s.periodictargets.all()
             },
-            "level": str(s.level) if s.level is not None else '',
+            "level": str(s.level.display_number) if s.level is not None else '',
             "definition": s.definition,
             "means_of_verification": s.means_of_verification,
             "data_collection_method": s.data_collection_method,
