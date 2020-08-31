@@ -73,6 +73,7 @@ export const forProgramPage = (
     reportingPeriod: indicatorJSON.reporting_period || false,
     periodicTargets: (indicatorJSON.periodic_targets || []).map(targetJSON => programPageTarget(targetJSON)),
     noTargetResults: (indicatorJSON.no_target_results || []).map(resultJSON => programPageResult(resultJSON)),
+    get noTargets() { return !(this.frequency && this.periodicTargets && this.periodicTargets.length > 0)},
     updateData(updateJSON) {
         if (updateJSON.pk && !isNaN(parseInt(updateJSON.pk)) && parseInt(updateJSON.pk) === this.pk) {
             this.number = updateJSON.number || false;

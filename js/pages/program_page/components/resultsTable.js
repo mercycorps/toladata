@@ -52,15 +52,16 @@ class ProgressPopover extends React.Component {
 /**
  * the cells in the results table containing result date, value, and evidence link, with formatting
  */
-const ResultCells = ({ result, localizer, ...props }) => {
+const ResultCells = ({ result, localizer, noTarget, ...props }) => {
+    let noTargetsClass = noTarget ? " bg-danger-lighter" : "";
     return (
         <React.Fragment>
-            <td className="results__result--date">
+            <td className={`results__result--date ${noTargetsClass}`} >
                 <a href={`/indicators/result_update/${ result.pk }/`} className="results__link">
                     { result.dateCollected }
                 </a>
             </td>
-            <td className="results__result--value">
+            <td className={`results__result--value ${noTargetsClass}`}>
                 { localizer(result.achieved) }
             </td>
             <td className="td--stretch results__result--url">
@@ -75,16 +76,8 @@ const ResultCells = ({ result, localizer, ...props }) => {
 /**
  * row(s) in the results table (one instance per target period, includes supplemental result rows and progress row)
  */
-const ResultRows = ({target, indicator, ...props}) => {
+const ResultRows = ({target, indicator, localizer, ...props}) => {
     let rowspan = target.results.length || 1;
-    const localizer = (val) => {
-        let localized = localizeNumber(val);
-        if (localized && indicator.isPercent) {
-            return `${localized}%`;
-        }
-        return localized;
-    }
-    
     return (
         <React.Fragment>
             <tr className={(indicator.timeAware && target.completed) ? "results__row--main pt-ended" : "results__row--main"} >
@@ -111,7 +104,7 @@ const ResultRows = ({target, indicator, ...props}) => {
                 }
                 </td>
                 {(target.results && target.results.length > 0) ?
-                    <ResultCells result={ target.results[0] } localizer={ localizer } /> :
+                    <ResultCells result={ target.results[0] } localizer={ localizer } noTarget={ false }/> :
                     <React.Fragment>
                         <td className="results__result--nodata" colSpan="2">
                         {
@@ -126,7 +119,7 @@ const ResultRows = ({target, indicator, ...props}) => {
             </tr>
             {target.results.length > 1 && target.results.slice(1).map((result, idx) => (
                 <tr key={idx} className={(indicator.timeAware && target.completed) ? "results__row--supplemental pt-ended" : "results__row--supplemental"} >
-                    <ResultCells result={ result } localizer={ localizer } />
+                    <ResultCells result={ result } localizer={ localizer } noTarget={ false } />
                 </tr>
             ))}
             {target.mostRecentlyCompleted &&
@@ -155,16 +148,25 @@ const ResultRows = ({target, indicator, ...props}) => {
     )
 }
 
-const LoPRow = ({indicator, ...props}) => {
-    const localizer = (val) => {
-        let localized = localizeNumber(val);
-        if (localized && indicator.isPercent) {
-            return `${localized}%`;
-        }
-        return localized;
-    }
+const NoTargetResultRow = ({result, indciator, localizer, ...props}) => {
+    return (
+        <tr>
+            <td></td>
+            <td></td>
+            <td></td>
+            <td></td>
+            <ResultCells result={ result } localizer={ localizer } noTarget={ true }/>
+        </tr>
+    );
+}
+
+const LoPRow = ({indicator, localizer, ...props}) => {
     var lopMessage;
-    if (indicator.isPercent || indicator.isCumulative) {
+    if (indicator.noTargets) {
+        // if no targets, don't explain summing, it competes with the "add targets" messaging
+        lopMessage = "";
+    }
+    else if (indicator.isPercent || indicator.isCumulative) {
         // # Translators: explanation of the summing rules for the totals row on a list of results
         lopMessage = gettext("Results are cumulative. The Life of Program result mirrors the latest period result.")
     } else if (indicator.isCumulative) {
@@ -188,6 +190,13 @@ const LoPRow = ({indicator, ...props}) => {
 }
 
 const ResultsTableTable = ({indicator, editable, ...props}) => {
+    const localizer = (val) => {
+        let localized = localizeNumber(val);
+        if (localized && indicator.isPercent) {
+            return `${localized}%`;
+        }
+        return localized;
+    }
     return (
         <table className="table results-table">
             <thead>
@@ -219,8 +228,9 @@ const ResultsTableTable = ({indicator, editable, ...props}) => {
                 </tr>
             </thead>
             <tbody>
-                {indicator.periodicTargets.map((periodicTarget, idx) => <ResultRows key={idx} target={periodicTarget} indicator={indicator} />)}
-                <LoPRow indicator={indicator} />
+                {indicator.periodicTargets.map((periodicTarget, idx) => <ResultRows key={`targetrow-${idx}`} target={periodicTarget} indicator={indicator} localizer={localizer}/>)}
+                {indicator.noTargetResults.map((result, idx) => <NoTargetResultRow key={`notarget-${idx}`} result={ result } indicator={ indicator } localizer={localizer}/>)}
+                <LoPRow indicator={indicator} localizer={localizer} />
             </tbody>
         </table>
     );
@@ -229,9 +239,13 @@ const ResultsTableTable = ({indicator, editable, ...props}) => {
 const ResultsTableActions = ({indicator, editable, ...props}) => {
     return (
         <div className="results-table__actions">
-            <div className="cd-actions__message"></div>
+            <div className="cd-actions__message">
+            {indicator.noTargets &&
+                <NoTargetsWarning indicator={indicator} editable={editable} />
+            }
+            </div>
             {editable &&
-                <div className="cd-actions__button">
+                <div className={indicator.noTargets ? "cd-actions__button disable-span" : "cd-actions__button"}>
                     <a href={`/indicators/result_add/${indicator.pk}/`}
                         className="btn-link btn-add results__link">
                         <FontAwesomeIcon icon={ faPlusCircle } />
@@ -252,7 +266,7 @@ const NoTargetsWarning = ({indicator, editable, ...props}) => {
             <FontAwesomeIcon icon={ faBullseye } />
             {
                 // # Translators: Message displayed in place of a table that cannot be shown without targets having been set up
-                gettext('This indicator has no targets.')
+                gettext('Targets are not set up for this indicator.')
             }
             { editable &&
                 <a href={`/indicators/indicator_update/${indicator.pk}/`}
@@ -270,15 +284,13 @@ const NoTargetsWarning = ({indicator, editable, ...props}) => {
 
 export default class ResultsTable extends React.Component {
     render() {
+        let showTable = (!this.props.indicator.noTargets || this.props.indicator.noTargetResults.length > 0);
         return (
             <div className="results-table__wrapper">
-                {(this.props.indicator.frequency && this.props.indicator.periodicTargets.length) ?
-                    <React.Fragment>
-                        <ResultsTableTable indicator={this.props.indicator} editable={this.props.editable} />
-                        <ResultsTableActions indicator={this.props.indicator} editable={this.props.editable}/>
-                    </React.Fragment>:
-                    <NoTargetsWarning indicator={this.props.indicator} editable={this.props.editable} />
+                {showTable &&
+                    <ResultsTableTable indicator={this.props.indicator} editable={this.props.editable} />
                 }
+                <ResultsTableActions indicator={this.props.indicator} editable={this.props.editable}/>
             </div>
         );
     }
