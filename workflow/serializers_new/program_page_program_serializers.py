@@ -24,6 +24,7 @@ from indicators.serializers_new import (
     ProgramPageIndicatorOrderingSerializer,
 )
 from tola.model_utils import get_serializer
+from tola.l10n_utils import l10n_date_medium
 from workflow.models import Program
 from workflow.serializers_new.base_program_serializers import (
     ProgramBaseSerializerMixin,
@@ -103,7 +104,8 @@ class ProgramPageMixin:
                             if i['target_frequency'] == frequency]) > 0
             for frequency in Indicator.IRREGULAR_TARGET_FREQUENCIES
         }
-        get_date_string = lambda date_obj: date_obj.date().isoformat() if date_obj is not None else None
+        # note: provide formatted date here in serializer so it can be displayed raw in template
+        get_date_string = lambda date_obj: l10n_date_medium(date_obj, decode=True) if date_obj is not None else None
         regulars = {
             frequency: get_date_string(max(
                 [dateutil.parser.isoparse(i['most_recent_completed_target_end_date']) for i in indicators if (

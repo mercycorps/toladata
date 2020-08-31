@@ -2,7 +2,7 @@ import itertools
 import datetime
 import operator
 from django import test
-from django.utils import translation
+from django.utils import translation, formats
 from factories.indicators_models import RFIndicatorFactory
 from factories.workflow_models import RFProgramFactory, SiteProfileFactory
 from indicators.models import Indicator
@@ -187,15 +187,16 @@ class TestProgramPageProgramSerializer(test.TestCase):
             1
         ) - datetime.timedelta(days=1)
         tp_data = data['target_period_info']
+        date_format = lambda date_obj: formats.date_format(date_obj, "MEDIUM_DATE_FORMAT")
         self.assertFalse(tp_data['lop'])
         self.assertFalse(tp_data['midend'])
         self.assertFalse(tp_data['event'])
         self.assertTrue(tp_data['time_targets'])
-        self.assertEqual(tp_data['annual'], annual.isoformat())
-        self.assertEqual(tp_data['semi_annual'], semi_annual.isoformat())
-        self.assertEqual(tp_data['tri_annual'], tri_annual.isoformat())
-        self.assertEqual(tp_data['quarterly'], quarterly.isoformat())
-        self.assertEqual(tp_data['monthly'], monthly.isoformat())
+        self.assertEqual(tp_data['annual'], date_format(annual))
+        self.assertEqual(tp_data['semi_annual'], date_format(semi_annual))
+        self.assertEqual(tp_data['tri_annual'], date_format(tri_annual))
+        self.assertEqual(tp_data['quarterly'], date_format(quarterly))
+        self.assertEqual(tp_data['monthly'], date_format(monthly))
 
 
 class TestProgramPageSerializersFunctional(test.TestCase):
