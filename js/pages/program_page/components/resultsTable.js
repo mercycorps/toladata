@@ -266,7 +266,7 @@ const NoTargetsWarning = ({indicator, editable, ...props}) => {
             <FontAwesomeIcon icon={ faBullseye } />
             {
                 // # Translators: Message displayed in place of a table that cannot be shown without targets having been set up
-                gettext('Targets are not set up for this indicator.')
+                gettext('This indicator has no targets.')
             }
             { editable &&
                 <a href={`/indicators/indicator_update/${indicator.pk}/`}
