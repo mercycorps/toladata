@@ -107,7 +107,13 @@ class ExcelRendererBase:
                 level_row = next(level_rows)
             except StopIteration:
                 self.set_column_widths(sheet)
+                self.add_explainer_row(sheet)
                 return sheet
+
+    def add_explainer_row(self, sheet):
+        sheet.append([None, None,
+                      # Translators: Explanation at the bottom of a report (as a footnote) about value rounding
+                      ugettext("*All actual values in this report are rounded to two decimal places.")])
 
     def add_headers(self, sheet):
         current_row = 1
@@ -127,14 +133,14 @@ class ExcelRendererBase:
             cell.value = str(header)
             cell.style = 'header'
             current_column += 1
-        current_column = self.add_period_header(sheet, current_column, self.serializer['lop_period'])
+        current_column = self.add_period_header(sheet, current_column, self.serializer['lop_period'], lop=True)
         for period in self.serializer['periods'][self.frequency]:
             current_column = self.add_period_header(
                 sheet, current_column, period
             )
 
     @staticmethod
-    def add_period_header(sheet, col, period):
+    def add_period_header(sheet, col, period, lop=False):
         for header, row in [
                 (period.header, 2),
                 (period.subheader, 3)
@@ -145,9 +151,12 @@ class ExcelRendererBase:
                 cell = sheet.cell(row=row, column=col)
                 cell.value = str(header)
                 cell.style = 'sub_header'
+        actual_header = ugettext('Actual')
+        if lop:
+            actual_header += " *"
         columns = [
-            ugettext('Target'), ugettext('Actual'), str(ugettext('% Met')).title()
-        ] if period.tva else [ugettext('Actual'),]
+            ugettext('Target'), actual_header, str(ugettext('% Met')).title()
+        ] if period.tva else [actual_header,]
         for col_no, col_header in enumerate(columns):
             cell = sheet.cell(row=4, column=col+col_no)
             cell.value = str(col_header)

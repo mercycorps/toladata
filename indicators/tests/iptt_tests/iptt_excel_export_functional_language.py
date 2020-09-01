@@ -137,6 +137,10 @@ MET = {
     SPANISH: "% Cumplido",
 }
 
+FOOTNOTE = {
+    ENGLISH: "*All actual values in this report are rounded to two decimal places."
+}
+
 
 SPECIAL_CHARS = "Spécîal Chårs"
 
@@ -280,7 +284,7 @@ class TestIPTTExcelExports(test.TestCase):
     def assert_lop_header_cells(self, sheet, language=ENGLISH, column=10):
         self.assertEqual(sheet.cell(row=3, column=column).value, LOP_PERIOD[language])
         self.assertEqual(sheet.cell(row=4, column=column).value, TARGET[language])
-        self.assertEqual(sheet.cell(row=4, column=column+1).value, ACTUAL[language])
+        self.assertEqual(sheet.cell(row=4, column=column+1).value, ACTUAL[language] + " *")
         self.assertEqual(sheet.cell(row=4, column=column+2).value, MET[language])
 
     def assert_period_tva_header_cells(self, sheet, period, column, language=ENGLISH, subheader=None):
@@ -370,7 +374,8 @@ class TestIPTTExcelExports(test.TestCase):
                 sheet.cell(row=6, column=4+col).value,
                 val
             )
-        self.assertIsNone(sheet.cell(row=7, column=3).value)
+        self.assertEqual(sheet.cell(row=7, column=3).value, FOOTNOTE[ENGLISH])
+        self.assertIsNone(sheet.cell(row=8, column=3).value)
 
     def test_tva_midend_report_headers(self):
         tva_midend_report = self.get_tva_report(frequency=Indicator.MID_END)
@@ -414,7 +419,8 @@ class TestIPTTExcelExports(test.TestCase):
                 )
             self.assertIsNone(sheet.cell(row=7+c, column=19).value)
             self.assertTrue(sheet.row_dimensions[7+c].hidden, f"row {c}")
-        self.assertIsNone(sheet.cell(row=10, column=3).value)
+        self.assertEqual(sheet.cell(row=10, column=3).value, FOOTNOTE[ENGLISH])
+        self.assertIsNone(sheet.cell(row=11, column=3).value)
 
     def test_tva_quarterly_report_headers(self):
         tva_quarterly_report = self.get_tva_report(frequency=Indicator.QUARTERLY)
@@ -497,7 +503,7 @@ class TestIPTTExcelExports(test.TestCase):
             self.assertEqual(sheet.cell(row=11+c, column=17).value, "–")
             self.assertEqual(sheet.cell(row=11+c, column=20).value, "–")
             self.assertEqual(sheet.cell(row=11+c, column=23).value, 8 if c == 1 else 1)
-        self.assertIsNone(sheet.cell(row=13, column=3).value)
+        self.assertIsNone(sheet.cell(row=14, column=3).value)
 
     def test_tva_start_end_filters(self):
         def get_formatted_date(start, end):
@@ -615,7 +621,8 @@ class TestIPTTExcelExports(test.TestCase):
         ]:
             self.assertEqual(sheet.cell(row=row_num, column=3).value, indicator_number)
             self.assertEqual(sheet.cell(row=row_num, column=4).value, indicator_name)
-        self.assertIsNone(sheet.cell(row=16, column=3).value)
+        self.assertEqual(sheet.cell(row=16, column=3).value, FOOTNOTE[ENGLISH])
+        self.assertIsNone(sheet.cell(row=17, column=3).value)
 
     def test_tp_tri_annual_report_headers_disaggs_filter(self):
         tp_tri_annual_report = self.get_tp_report(
@@ -647,7 +654,8 @@ class TestIPTTExcelExports(test.TestCase):
             self.assertTrue(sheet.row_dimensions[row_num+1].hidden)
             self.assertEqual(sheet.cell(row=row_num+2, column=4).value, "Låbél 2")
             self.assertTrue(sheet.row_dimensions[row_num+2].hidden)
-        self.assertIsNone(sheet.cell(row=14, column=3).value)
+        self.assertEqual(sheet.cell(row=14, column=3).value, FOOTNOTE[ENGLISH])
+        self.assertIsNone(sheet.cell(row=15, column=3).value)
         
 
     def test_tp_annual_report_headers_columns_missing(self):
@@ -769,7 +777,8 @@ class TestIPTTExcelExports(test.TestCase):
         ]:
             self.assertEqual(sheet.cell(row=row_num, column=3).value, indicator_number)
             self.assertEqual(sheet.cell(row=row_num, column=4).value, indicator_name)
-        self.assertIsNone(sheet.cell(row=24, column=3).value)
+        self.assertEqual(sheet.cell(row=24, column=3).value, FOOTNOTE[ENGLISH])
+        self.assertIsNone(sheet.cell(row=25, column=3).value)
 
     def test_tp_report_report_dates_with_start_end_filters(self):
         tp_quarterly_report = self.get_tp_report(

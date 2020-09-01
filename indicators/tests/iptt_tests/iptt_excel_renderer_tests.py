@@ -205,7 +205,7 @@ class TestExcelRendererGlobals(test.TestCase):
             8: "# / %",
             9: "Baseline",
             10: "Target",
-            11: "Actual",
+            11: "Actual *",
             12: "% Met"
         },
     }

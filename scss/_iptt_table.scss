@@ -14,6 +14,9 @@
 }
 body.page_iptt_table { // body element for extra specificity
     margin-bottom: 0;
+    & .popover {
+        max-width: 200px;
+    }
 }
 .page_iptt_table {
     #id_div_content {
@@ -74,6 +77,12 @@ tr.title-row {
 .lop-column {
     // columns that summarize LOP data
     @extend %right-aligned-cell;
+    & .popover-icon {
+        //places the helptext icon centered with the text and with a small standoff from the text
+        position: relative;
+        right: -3px;
+        top: -2px;
+    }
 }
 tr.program-name { }
 tr.action-buttons { }
@@ -169,3 +178,4 @@ td.indicator-cell {
 .baseline-column {
     @extend %right-aligned-cell;
 }
+

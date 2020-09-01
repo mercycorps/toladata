@@ -2,7 +2,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: \n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2020-08-28 09:02-0700\n"
+"POT-Creation-Date: 2020-08-28 15:33-0700\n"
 "PO-Revision-Date: 2020-07-30 15:46-0700\n"
 "Last-Translator: \n"
 "Language-Team: \n"
@@ -44,7 +44,7 @@ msgstr "Catégories"
 #. Translators: Heading for list of disaggregation types assigned to a country
 #. Translators: Heading for list of disaggregation categories in a particular disaggregation type.
 #: indicators/admin.py:170 indicators/indicator_plan.py:75
-#: indicators/models.py:487 indicators/models.py:587 indicators/models.py:1136
+#: indicators/models.py:487 indicators/models.py:587 indicators/models.py:1134
 #: templates/indicators/disaggregation_print.html:55
 #: templates/indicators/disaggregation_report.html:94
 #: tola_management/models.py:800 tola_management/models.py:808
@@ -66,8 +66,8 @@ msgid "No."
 msgstr "Nº"
 
 #: indicators/export_renderers.py:58 indicators/forms.py:330
-#: indicators/models.py:1309 indicators/models.py:1682
-#: indicators/models.py:1975 indicators/views/views_program.py:132
+#: indicators/models.py:1307 indicators/models.py:1680
+#: indicators/models.py:1973 indicators/views/views_program.py:132
 #: indicators/views/views_program.py:171
 #: templates/indicators/disaggregation_print.html:53
 #: templates/indicators/disaggregation_report.html:91
@@ -77,12 +77,12 @@ msgid "Indicator"
 msgstr "Indicateur"
 
 #: indicators/export_renderers.py:61 indicators/indicator_plan.py:41
-#: indicators/models.py:132 indicators/models.py:1082
+#: indicators/models.py:132 indicators/models.py:1080
 msgid "Level"
 msgstr "Niveau"
 
 #: indicators/export_renderers.py:63 indicators/indicator_plan.py:83
-#: indicators/models.py:1124 tola_management/models.py:326
+#: indicators/models.py:1122 tola_management/models.py:326
 msgid "Unit of measure"
 msgstr "Unité de mesure"
 
@@ -92,74 +92,79 @@ msgid "Change"
 msgstr "Changement"
 
 #. Translators: 'C' as in Cumulative and 'NC' as in Non Cumulative
-#: indicators/export_renderers.py:72 indicators/models.py:1158
+#: indicators/export_renderers.py:72 indicators/models.py:1156
 msgid "C / NC"
 msgstr "C / NC"
 
 #: indicators/export_renderers.py:77 indicators/forms.py:234
-#: indicators/models.py:1139 tola_management/models.py:332
+#: indicators/models.py:1137 tola_management/models.py:332
 msgid "Baseline"
 msgstr "Mesure de base"
 
-#: indicators/export_renderers.py:82 indicators/models.py:1017
-#: indicators/models.py:1671
+#: indicators/export_renderers.py:82 indicators/models.py:1015
+#: indicators/models.py:1669
 msgid "Life of Program (LoP) only"
 msgstr "La vie du programme (LoP) seulement"
 
-#: indicators/export_renderers.py:83 indicators/models.py:1018
+#: indicators/export_renderers.py:83 indicators/models.py:1016
 msgid "Midline and endline"
 msgstr "Mesure de mi-parcours et mesure de fin de programme"
 
 #. Translators:  label for the date of the last completed Annual target period.
-#: indicators/export_renderers.py:84 indicators/models.py:1019
+#: indicators/export_renderers.py:84 indicators/models.py:1017
 #: templates/indicators/program_target_period_info_helptext.html:16
 msgid "Annual"
 msgstr "Annuel"
 
-#: indicators/export_renderers.py:85 indicators/models.py:1020
+#: indicators/export_renderers.py:85 indicators/models.py:1018
 msgid "Semi-annual"
 msgstr "Semestriel"
 
-#: indicators/export_renderers.py:86 indicators/models.py:1021
+#: indicators/export_renderers.py:86 indicators/models.py:1019
 msgid "Tri-annual"
 msgstr "Quadrimestriel"
 
 #. Translators: this is the measure of time (3 months)
 #. Translators:  label for the date of the last completed Quarterly target period.
-#: indicators/export_renderers.py:88 indicators/models.py:1022
+#: indicators/export_renderers.py:88 indicators/models.py:1020
 #: templates/indicators/program_target_period_info_helptext.html:22
 msgid "Quarterly"
 msgstr "Trimestriel"
 
 #. Translators:  label for the date of the last completed Monthly target period.
-#: indicators/export_renderers.py:89 indicators/models.py:1023
+#: indicators/export_renderers.py:89 indicators/models.py:1021
 #: templates/indicators/program_target_period_info_helptext.html:24
 msgid "Monthly"
 msgstr "Mensuel"
 
-#: indicators/export_renderers.py:149 indicators/models.py:1691
+#. Translators: Explanation at the bottom of a report (as a footnote) about value rounding
+#: indicators/export_renderers.py:116
+msgid "*All actual values in this report are rounded to two decimal places."
+msgstr ""
+
+#: indicators/export_renderers.py:154 indicators/models.py:1967
+#: templates/indicators/result_table.html:26
+#: workflow/serializers_new/period_serializers.py:47
+msgid "Actual"
+msgstr "Réel"
+
+#: indicators/export_renderers.py:158 indicators/models.py:1689
 #: templates/indicators/result_table.html:25
 #: workflow/serializers_new/period_serializers.py:41
 msgid "Target"
 msgstr "Cible"
 
-#: indicators/export_renderers.py:149 indicators/export_renderers.py:150
-#: indicators/models.py:1969 templates/indicators/result_table.html:26
-#: workflow/serializers_new/period_serializers.py:47
-msgid "Actual"
-msgstr "Réel"
-
-#: indicators/export_renderers.py:149
+#: indicators/export_renderers.py:158
 #: workflow/serializers_new/period_serializers.py:53
 msgid "% Met"
 msgstr "% Atteint"
 
-#: indicators/export_renderers.py:234 indicators/templatetags/mytags.py:92
+#: indicators/export_renderers.py:243 indicators/templatetags/mytags.py:92
 #: tola_management/models.py:379 tola_management/programadmin.py:177
 msgid "N/A"
 msgstr "S.O."
 
-#: indicators/export_renderers.py:393
+#: indicators/export_renderers.py:402
 #: templates/indicators/iptt_filter_form.html:141
 #: templates/indicators/program_page.html:36
 #: tola_management/programadmin.py:121 tola_management/programadmin.py:535
@@ -167,22 +172,22 @@ msgid "Change log"
 msgstr "Journal des modifications"
 
 #. Translators: referring to an indicator whose results accumulate over time
-#: indicators/export_renderers.py:418 indicators/models.py:1440
+#: indicators/export_renderers.py:427 indicators/models.py:1438
 msgid "Cumulative"
 msgstr "Cumulatif"
 
 #. Translators: referring to an indicator whose results do not accumulate over time
-#: indicators/export_renderers.py:420
+#: indicators/export_renderers.py:429
 msgid "Non-cumulative"
 msgstr "Non cumulatif"
 
 #. Translators: This is the title of a spreadsheet tab that shows do data has been found for the user's query.
-#: indicators/export_renderers.py:437
+#: indicators/export_renderers.py:446
 msgid "No data"
 msgstr "Pas de données"
 
-#: indicators/forms.py:233 indicators/models.py:102 indicators/models.py:1248
-#: indicators/models.py:1982 workflow/forms.py:100 workflow/models.py:525
+#: indicators/forms.py:233 indicators/models.py:102 indicators/models.py:1246
+#: indicators/models.py:1980 workflow/forms.py:100 workflow/models.py:525
 msgid "Program"
 msgstr "Programme"
 
@@ -368,12 +373,12 @@ msgstr "Valeur de base"
 msgid "LOP target"
 msgstr "Cible de LoP"
 
-#: indicators/indicator_plan.py:122 indicators/models.py:1162
+#: indicators/indicator_plan.py:122 indicators/models.py:1160
 #: tola_management/models.py:331
 msgid "Rationale for target"
 msgstr "Justification de la cible"
 
-#: indicators/indicator_plan.py:129 indicators/models.py:1168
+#: indicators/indicator_plan.py:129 indicators/models.py:1166
 #: templates/indicators/iptt_indicators_varied_startdates.html:36
 msgid "Target frequency"
 msgstr "Fréquence de la cible"
@@ -391,7 +396,7 @@ msgstr "Méthode de collecte de données"
 msgid "Frequency of data collection"
 msgstr "Fréquence de collecte de données"
 
-#: indicators/indicator_plan.py:158 indicators/models.py:1204
+#: indicators/indicator_plan.py:158 indicators/models.py:1202
 msgid "Data points"
 msgstr "Points de données"
 
@@ -415,12 +420,12 @@ msgstr "Fréquence de rapportage"
 msgid "Quality assurance measures"
 msgstr "Mesures d’assurance qualité"
 
-#: indicators/indicator_plan.py:201 indicators/models.py:1234
+#: indicators/indicator_plan.py:201 indicators/models.py:1232
 msgid "Data issues"
 msgstr "Problèmes liés aux données"
 
-#: indicators/indicator_plan.py:208 indicators/models.py:1244
-#: indicators/models.py:1972
+#: indicators/indicator_plan.py:208 indicators/models.py:1242
+#: indicators/models.py:1970
 msgid "Comments"
 msgstr "Commentaires"
 
@@ -435,7 +440,7 @@ msgstr "Indicateurs non affectés à un niveau de cadre de résultats"
 msgid "Indicator plan"
 msgstr "Plan d’indicateur"
 
-#: indicators/models.py:61 indicators/models.py:1077
+#: indicators/models.py:61 indicators/models.py:1075
 msgid "Indicator type"
 msgstr "Type d’indicateur"
 
@@ -449,8 +454,8 @@ msgstr "Description"
 #: indicators/models.py:127 indicators/models.py:392 indicators/models.py:417
 #: indicators/models.py:492 indicators/models.py:590 indicators/models.py:633
 #: indicators/models.py:652 indicators/models.py:671 indicators/models.py:692
-#: indicators/models.py:1283 indicators/models.py:1705
-#: indicators/models.py:1994 workflow/models.py:58 workflow/models.py:124
+#: indicators/models.py:1281 indicators/models.py:1703
+#: indicators/models.py:1992 workflow/models.py:58 workflow/models.py:124
 msgid "Create date"
 msgstr "Créer un rendez-vous"
 
@@ -458,8 +463,8 @@ msgstr "Créer un rendez-vous"
 #: indicators/models.py:128 indicators/models.py:393 indicators/models.py:418
 #: indicators/models.py:493 indicators/models.py:591 indicators/models.py:634
 #: indicators/models.py:653 indicators/models.py:672 indicators/models.py:693
-#: indicators/models.py:1287 indicators/models.py:1706
-#: indicators/models.py:1995 workflow/models.py:59 workflow/models.py:125
+#: indicators/models.py:1285 indicators/models.py:1704
+#: indicators/models.py:1993 workflow/models.py:59 workflow/models.py:125
 msgid "Edit date"
 msgstr "Date d’édition"
 
@@ -468,7 +473,7 @@ msgid "Indicator Type"
 msgstr "Type d’indicateur"
 
 #: indicators/models.py:80 indicators/models.py:101 indicators/models.py:122
-#: indicators/models.py:388 indicators/models.py:668 indicators/models.py:1101
+#: indicators/models.py:388 indicators/models.py:668 indicators/models.py:1099
 #: tola_management/models.py:115 tola_management/models.py:325
 #: tola_management/models.py:684 tola_management/models.py:740
 msgid "Name"
@@ -487,7 +492,7 @@ msgstr "Statut"
 msgid "Country Strategic Objectives"
 msgstr "Objectifs stratégiques du pays"
 
-#: indicators/models.py:108 indicators/models.py:1091
+#: indicators/models.py:108 indicators/models.py:1089
 msgid "Program Objective"
 msgstr "Objectif du programme"
 
@@ -694,147 +699,147 @@ msgstr "Identifiant unique"
 msgid "External Service Record"
 msgstr "Enregistrement de service externe"
 
-#: indicators/models.py:1024
+#: indicators/models.py:1022
 msgid "Event"
 msgstr "Événement"
 
-#: indicators/models.py:1044
+#: indicators/models.py:1042
 msgid "Number (#)"
 msgstr "Nombre (#)"
 
-#: indicators/models.py:1045
+#: indicators/models.py:1043
 msgid "Percentage (%)"
 msgstr "Pourcentage (%)"
 
-#: indicators/models.py:1052 indicators/models.py:1144
+#: indicators/models.py:1050 indicators/models.py:1142
 msgid "Not applicable"
 msgstr "Non applicable"
 
-#: indicators/models.py:1053 tola_management/models.py:380
+#: indicators/models.py:1051 tola_management/models.py:380
 msgid "Increase (+)"
 msgstr "Augmenter (+)"
 
-#: indicators/models.py:1054 tola_management/models.py:381
+#: indicators/models.py:1052 tola_management/models.py:381
 msgid "Decrease (-)"
 msgstr "Diminuer (-)"
 
-#: indicators/models.py:1071
+#: indicators/models.py:1069
 msgid "Indicator key"
 msgstr "Clé d’indicateur"
 
-#: indicators/models.py:1097
+#: indicators/models.py:1095
 msgid "Country Strategic Objective"
 msgstr "Objectif stratégique du pays"
 
-#: indicators/models.py:1105 templates/indicators/disaggregation_report.html:90
+#: indicators/models.py:1103 templates/indicators/disaggregation_report.html:90
 #: tola_management/models.py:372
 msgid "Number"
 msgstr "Nombre"
 
-#: indicators/models.py:1109
+#: indicators/models.py:1107
 msgid "Source"
 msgstr "Source"
 
-#: indicators/models.py:1113 tola_management/models.py:346
+#: indicators/models.py:1111 tola_management/models.py:346
 msgid "Definition"
 msgstr "Définition"
 
-#: indicators/models.py:1118
+#: indicators/models.py:1116
 msgid "Rationale or justification for indicator"
 msgstr "Logique ou justification de l’indicateur"
 
-#: indicators/models.py:1131
+#: indicators/models.py:1129
 msgid "Unit Type"
 msgstr "Type d’unité"
 
-#: indicators/models.py:1149 templates/indicators/indicatortargets.html:89
+#: indicators/models.py:1147 templates/indicators/indicatortargets.html:89
 #: templates/indicators/indicatortargets.html:192
 msgid "Life of Program (LoP) target"
 msgstr "Cible de la vie du programme (LoP)"
 
-#: indicators/models.py:1154
+#: indicators/models.py:1152
 msgid "Direction of Change"
 msgstr "Direction du changement"
 
-#: indicators/models.py:1174
+#: indicators/models.py:1172
 msgid "First event name"
 msgstr "Premier nom de l’événement"
 
-#: indicators/models.py:1180
+#: indicators/models.py:1178
 msgid "First target period begins*"
 msgstr "La première période cible commence*"
 
-#: indicators/models.py:1184
+#: indicators/models.py:1182
 msgid "Number of target periods*"
 msgstr "Nombre de périodes cibles*"
 
-#: indicators/models.py:1190
+#: indicators/models.py:1188
 msgid "Means of Verification / Data Source"
 msgstr "Moyens de vérification / Source de données"
 
-#: indicators/models.py:1195
+#: indicators/models.py:1193
 msgid "Data Collection Method"
 msgstr "Méthode de collecte de données"
 
-#: indicators/models.py:1200
+#: indicators/models.py:1198
 msgid "Frequency of Data Collection"
 msgstr "Fréquence de collecte de données"
 
-#: indicators/models.py:1210
+#: indicators/models.py:1208
 msgid "Responsible Person(s) and Team"
 msgstr "Personne(s) responsable(s) et équipe"
 
-#: indicators/models.py:1215
+#: indicators/models.py:1213
 msgid "Method of Analysis"
 msgstr "Méthode d’analyse"
 
-#: indicators/models.py:1220
+#: indicators/models.py:1218
 msgid "Information Use"
 msgstr "Utilisation de l’information"
 
-#: indicators/models.py:1225
+#: indicators/models.py:1223
 msgid "Frequency of Reporting"
 msgstr "Fréquence de rapportage"
 
-#: indicators/models.py:1230
+#: indicators/models.py:1228
 msgid "Quality Assurance Measures"
 msgstr "Mesures d’assurance qualité"
 
-#: indicators/models.py:1240
+#: indicators/models.py:1238
 msgid "Changes to Indicator"
 msgstr "Changements apportés à l’indicateur"
 
-#: indicators/models.py:1253 workflow/models.py:39 workflow/models.py:489
+#: indicators/models.py:1251 workflow/models.py:39 workflow/models.py:489
 msgid "Sector"
 msgstr "Secteur"
 
-#: indicators/models.py:1257
+#: indicators/models.py:1255
 msgid "Key Performance Indicator for this program?"
 msgstr "Indicateur de performance clé pour ce programme ?"
 
-#: indicators/models.py:1263 workflow/models.py:883
+#: indicators/models.py:1261 workflow/models.py:883
 msgid "Approved by"
 msgstr "Approuvé par"
 
-#: indicators/models.py:1268
+#: indicators/models.py:1266
 msgid "Approval submitted by"
 msgstr "Approbation soumise par"
 
-#: indicators/models.py:1272
+#: indicators/models.py:1270
 msgid "External Service ID"
 msgstr "Identifiant de service externe"
 
 #. Translators: This is the name of the Level object in the old system of organising levels
-#: indicators/models.py:1279
+#: indicators/models.py:1277
 msgid "Old Level"
 msgstr "Niveau précédent"
 
-#: indicators/models.py:1290
+#: indicators/models.py:1288
 msgid "Notes"
 msgstr "Remarques"
 
 #. Translators: This is an error message that is returned when a user is trying to assign an indicator to the wrong hierarch of levels.
-#: indicators/models.py:1322
+#: indicators/models.py:1320
 #, python-format
 msgid ""
 "Level/Indicator mismatched program IDs (level %(level_program_id)d and "
@@ -843,68 +848,68 @@ msgstr ""
 "Le niveau/l’indicateur ne correspond pas aux identifiants de programme "
 "(niveau %(level_program_id)d et indicateur %(indicator_program_id)d)"
 
-#: indicators/models.py:1429 indicators/templatetags/mytags.py:117
+#: indicators/models.py:1427 indicators/templatetags/mytags.py:117
 msgid "#"
 msgstr "#"
 
-#: indicators/models.py:1431 indicators/templatetags/mytags.py:120
+#: indicators/models.py:1429 indicators/templatetags/mytags.py:120
 msgid "%"
 msgstr "%"
 
 #. Translators: referring to an indicator whose results do not accumulate over time
-#: indicators/models.py:1445
+#: indicators/models.py:1443
 msgid "Not cumulative"
 msgstr "Non cumulatif"
 
-#: indicators/models.py:1450 indicators/templatetags/mytags.py:87
+#: indicators/models.py:1448 indicators/templatetags/mytags.py:87
 msgid "-"
 msgstr "-"
 
-#: indicators/models.py:1452 indicators/templatetags/mytags.py:90
+#: indicators/models.py:1450 indicators/templatetags/mytags.py:90
 msgid "+"
 msgstr "+"
 
-#: indicators/models.py:1580 indicators/models.py:1587
+#: indicators/models.py:1578 indicators/models.py:1585
 #: indicators/views/views_indicators.py:399
 #: indicators/views/views_indicators.py:406
 #: indicators/views/views_indicators.py:412
 msgid "indicator"
 msgstr "indicateur"
 
-#: indicators/models.py:1672 templates/indicators/result_table.html:209
+#: indicators/models.py:1670 templates/indicators/result_table.html:209
 #: workflow/serializers_new/period_serializers.py:16
 msgid "Life of Program"
 msgstr "La vie du programme"
 
-#: indicators/models.py:1673
+#: indicators/models.py:1671
 msgid "Midline"
 msgstr "Mesure de mi-parcours"
 
-#: indicators/models.py:1674
+#: indicators/models.py:1672
 msgid "Endline"
 msgstr "Mesure de fin de programme"
 
-#: indicators/models.py:1675
+#: indicators/models.py:1673
 msgid "Year"
 msgstr "Année"
 
-#: indicators/models.py:1676
+#: indicators/models.py:1674
 msgid "Semi-annual period"
 msgstr "Période semestrielle"
 
-#: indicators/models.py:1677
+#: indicators/models.py:1675
 msgid "Tri-annual period"
 msgstr "Période quadrimestrielle"
 
-#: indicators/models.py:1678
+#: indicators/models.py:1676
 msgid "Quarter"
 msgstr "Trimestre"
 
-#: indicators/models.py:1687
+#: indicators/models.py:1685
 msgid "Period"
 msgstr "Période"
 
-#: indicators/models.py:1695
+#: indicators/models.py:1693
 #: templates/indicators/indicator_reportingperiod_modal.html:41
 #: templates/indicators/indicator_reportingperiod_modal.html:61
 #: templates/indicators/iptt_indicators_varied_startdates.html:37
@@ -912,46 +917,46 @@ msgstr "Période"
 msgid "Start date"
 msgstr "Date de début"
 
-#: indicators/models.py:1700
+#: indicators/models.py:1698
 #: templates/indicators/indicator_reportingperiod_modal.html:48
 #: templates/indicators/indicator_reportingperiod_modal.html:73
 #: tola_management/models.py:342
 msgid "End date"
 msgstr "Date de fin"
 
-#: indicators/models.py:1704
+#: indicators/models.py:1702
 msgid "Customsort"
 msgstr "Customsort"
 
-#: indicators/models.py:1710 templates/workflow/site_indicatordata.html:20
+#: indicators/models.py:1708 templates/workflow/site_indicatordata.html:20
 msgid "Periodic Target"
 msgstr "Cible périodique"
 
-#: indicators/models.py:1961
+#: indicators/models.py:1959
 msgid "Data key"
 msgstr "Clé de données"
 
-#: indicators/models.py:1965
+#: indicators/models.py:1963
 msgid "Periodic target"
 msgstr "Cible périodique"
 
-#: indicators/models.py:1985
+#: indicators/models.py:1983
 msgid "Date collected"
 msgstr "Date de collecte"
 
-#: indicators/models.py:1988
+#: indicators/models.py:1986
 msgid "Originated By"
 msgstr "Originaire de"
 
-#: indicators/models.py:1991
+#: indicators/models.py:1989
 msgid "Record name"
 msgstr "Nom de l’enregistrement"
 
-#: indicators/models.py:1992
+#: indicators/models.py:1990
 msgid "Evidence URL"
 msgstr "URL de la preuve"
 
-#: indicators/models.py:1996 templates/indicators/program_page.html:45
+#: indicators/models.py:1994 templates/indicators/program_page.html:45
 #: templates/workflow/site_indicatordata.html:5
 #: templates/workflow/site_profile_list.html:5
 #: templates/workflow/site_profile_list.html:6
@@ -961,47 +966,47 @@ msgstr "URL de la preuve"
 msgid "Sites"
 msgstr "Sites"
 
-#: indicators/models.py:2080
+#: indicators/models.py:2078
 msgid "Report Name"
 msgstr "Nom du rapport"
 
-#: indicators/models.py:2150
+#: indicators/models.py:2148
 msgid "years"
 msgstr "années"
 
-#: indicators/models.py:2151
+#: indicators/models.py:2149
 msgid "semi-annual periods"
 msgstr "périodes semestrielles"
 
-#: indicators/models.py:2152
+#: indicators/models.py:2150
 msgid "tri-annual periods"
 msgstr "périodes quadrimestrielles"
 
-#: indicators/models.py:2153
+#: indicators/models.py:2151
 msgid "quarters"
 msgstr "trimestres"
 
-#: indicators/models.py:2154
+#: indicators/models.py:2152
 msgid "months"
 msgstr "mois"
 
 #. Translators: Example: Most recent 2 Months
-#: indicators/models.py:2184
+#: indicators/models.py:2182
 #, python-brace-format
 msgid "Most recent {num_recent_periods} {time_or_target_period_str}"
 msgstr "Le plus récent {num_recent_periods} {time_or_target_period_str}"
 
 #. Translators: Example: Show all Years
-#: indicators/models.py:2190
+#: indicators/models.py:2188
 #, python-brace-format
 msgid "Show all {time_or_target_period_str}"
 msgstr "Tout afficher {time_or_target_period_str}"
 
-#: indicators/models.py:2200 indicators/models.py:2204
+#: indicators/models.py:2198 indicators/models.py:2202
 msgid "Show all results"
 msgstr "Afficher tous les résultats"
 
-#: indicators/models.py:2218
+#: indicators/models.py:2216
 msgid "Recent progress for all indicators"
 msgstr "Progrès récent pour tous les indicateurs"
 
@@ -2668,6 +2673,11 @@ msgid "You can measure this result against the Midline or Endline target."
 msgstr ""
 "Vous pouvez comparer ce résultat à la cible de mi-parcours ou de fin de "
 "programme."
+
+#. Translators: On a form input for "actual values" - warns user that they will be rounded.
+#: templates/indicators/results/result_form_common_fields.html:53
+msgid "Actual values are rounded to two decimal places."
+msgstr ""
 
 #. Translators:  Allows the user to select only those items that need to be updated in some way
 #: templates/indicators/results/result_form_disaggregation_fields.html:23
