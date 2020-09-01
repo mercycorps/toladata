@@ -113,7 +113,7 @@ class ExcelRendererBase:
     def add_explainer_row(self, sheet):
         sheet.append([None, None,
                       # Translators: Explanation at the bottom of a report (as a footnote) about value rounding
-                      ugettext("*All actual values in this report are rounded to two decimal places.")])
+                      ugettext("*All values in this report are rounded to two decimal places.")])
 
     def add_headers(self, sheet):
         current_row = 1
@@ -149,14 +149,13 @@ class ExcelRendererBase:
                 if period.tva:
                     sheet.merge_cells(start_row=row, start_column=col, end_row=row, end_column=col+2)
                 cell = sheet.cell(row=row, column=col)
+                if lop:
+                    header = str(header) + "*"
                 cell.value = str(header)
                 cell.style = 'sub_header'
-        actual_header = ugettext('Actual')
-        if lop:
-            actual_header += " *"
         columns = [
-            ugettext('Target'), actual_header, str(ugettext('% Met')).title()
-        ] if period.tva else [actual_header,]
+            ugettext('Target'), ugettext('Actual'), str(ugettext('% Met')).title()
+        ] if period.tva else [ugettext('Actual'),]
         for col_no, col_header in enumerate(columns):
             cell = sheet.cell(row=4, column=col+col_no)
             cell.value = str(col_header)

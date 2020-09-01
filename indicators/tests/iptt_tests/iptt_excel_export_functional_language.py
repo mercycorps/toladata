@@ -114,9 +114,9 @@ REPORT_TITLE = {
 }
 
 LOP_PERIOD = {
-    ENGLISH: "Life of Program",
-    FRENCH: "La vie du programme",
-    SPANISH: "Vida del programa",
+    ENGLISH: "Life of Program*",
+    FRENCH: "La vie du programme*",
+    SPANISH: "Vida del programa*",
 }
 
 TARGET = {
@@ -138,7 +138,7 @@ MET = {
 }
 
 FOOTNOTE = {
-    ENGLISH: "*All actual values in this report are rounded to two decimal places."
+    ENGLISH: "*All values in this report are rounded to two decimal places."
 }
 
 
@@ -284,7 +284,7 @@ class TestIPTTExcelExports(test.TestCase):
     def assert_lop_header_cells(self, sheet, language=ENGLISH, column=10):
         self.assertEqual(sheet.cell(row=3, column=column).value, LOP_PERIOD[language])
         self.assertEqual(sheet.cell(row=4, column=column).value, TARGET[language])
-        self.assertEqual(sheet.cell(row=4, column=column+1).value, ACTUAL[language] + " *")
+        self.assertEqual(sheet.cell(row=4, column=column+1).value, ACTUAL[language])
         self.assertEqual(sheet.cell(row=4, column=column+2).value, MET[language])
 
     def assert_period_tva_header_cells(self, sheet, period, column, language=ENGLISH, subheader=None):

@@ -51,6 +51,12 @@ body.page_iptt_table { // body element for extra specificity
 }
 tr.title-row {
     background-color: $gray-150;
+    & .popover-icon {
+        // popover fontawesome <i> doesn't center well with text-uppercase, this fixes position:
+        position: relative;
+        top: -2px;
+        right: -5px;
+    }
 }
 .iptt-period-header {
     text-align: center;
