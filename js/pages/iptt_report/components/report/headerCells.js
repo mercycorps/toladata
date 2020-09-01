@@ -16,27 +16,13 @@ const HeaderCell = ( props ) => {
     )
 }
 
-class LopActualHeaderCell extends React.Component {
-    constructor( props ) {
-        super(props);
-        this.style = props.styleWidth ? {
-            minWidth: `${props.styleWidth}px`
-        } : {};
-    }
-    componentDidMount() {
-        // Enable popovers after mount (they break otherwise)
-        $('*[data-toggle="popover"]').popover();
-    }
+class LopHeaderWithPopover extends React.Component {
     render() {
         // # Translators: label on a report, column header for a column of values that have been rounded
-        const msg = gettext('All actual values in this report are rounded to two decimal places.');
+        const msg = gettext('All values in this report are rounded to two decimal places.');
         return (
-            <th
-                scope="col"
-                colSpan={ this.props.colSpan }
-                className={ this.props.className }
-                style={ this.style }>
-                { this.props.label }
+            <span className="text-uppercase">
+            { this.props.children }
                 <a href="#"
                     className="popover-icon"
                     tabIndex="0"
@@ -46,7 +32,7 @@ class LopActualHeaderCell extends React.Component {
                     data-content={msg} >
                     < FaRegQuestionCircle />
                 </a>
-            </th>        
+            </span>        
         );
     }
 }
@@ -118,4 +104,4 @@ const TVAHeader = () => {
     )
 }
 
-export { HeaderCell, LopActualHeaderCell, PeriodHeader, TVAHeader, ActualHeader }
+export { HeaderCell, LopHeaderWithPopover, PeriodHeader, TVAHeader, ActualHeader }

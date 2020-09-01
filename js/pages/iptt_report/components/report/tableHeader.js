@@ -64,12 +64,12 @@ const ProgramNameRow = inject('rootStore')(
                     colSpan={ 3 }
                     // centered under LOP superheader
                     className="iptt-period-header">
-                    <span className="text-uppercase">
+                    <HeaderCells.LopHeaderWithPopover>
                     {
                         /* # Translators: header for a group of columns showing totals over the life of the program */
                         gettext('Life of program')
                     }
-                    </span>
+                    </HeaderCells.LopHeaderWithPopover>
                 </td>
                 {
                     rootStore.reportPeriods.map(
@@ -155,7 +155,7 @@ const ColumnHeaderRow = inject('rootStore')(
                         /* # Translators: Column header for a target value column */
                         gettext('Target')
                     } />
-                <HeaderCells.LopActualHeaderCell
+                <HeaderCells.HeaderCell
                     styleWidth={110}
                     className='lop-column'
                     label={
