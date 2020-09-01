@@ -841,44 +841,10 @@ jQuery.fn.extend({
  **********/
 
 
-window.localizeNumber = (val) => {
-    if (val === undefined || val === null || isNaN(parseFloat(val))) {
-        return null;
-    }
-    var intPart = val.toString();
-    var floatPart = null;
-    if (val.toString().includes(",")) {
-        intPart = val.toString().split(",")[0];
-        floatPart = val.toString().split(",").length > 1 ? val.toString().split(",")[1 ] : null;
-    } else if (val.toString().includes(".")) {
-        intPart = val.toString().split(".")[0];
-        floatPart = val.toString().split(".").length > 1 ? val.toString().split(".")[1 ] : null;
-    }
-    floatPart = (floatPart && floatPart.length > 0) ? floatPart : null;
-    var displayValue;
-    switch(userLang) {
-        case SPANISH:
-            displayValue = intPart.replace(/\B(?=(\d{3})+(?!\d))/g, ".");
-            if (floatPart) {
-                displayValue += `,${floatPart}`;
-            }
-        break;
-        case FRENCH:
-            displayValue = intPart.replace(/\B(?=(\d{3})+(?!\d))/g, String.fromCharCode(160)); //nbsp
-            if (floatPart) {
-                displayValue += `,${floatPart}`;
-            }
-        break;
-        case ENGLISH:
-        default:
-            displayValue = intPart.replace(/\B(?=(\d{3})+(?!\d))/g, ",");
-            if (floatPart) {
-                displayValue += `.${floatPart}`;
-            }
-        break;
-    }
-    return displayValue;
-};
+import { localizeNumber, localizePercent } from 'general_utilities';
+window.localizeNumber = localizeNumber;
+window.localizePercent = localizePercent;
+
 
 // Useful if you need to delocalize form values, e.g. to evaluate if the form has changed.
 // Doesn't delocalize the thousands separator.

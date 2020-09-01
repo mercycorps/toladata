@@ -160,7 +160,7 @@ const ColumnHeaderRow = inject('rootStore')(
                     className='lop-column'
                     label={
                         /* # Translators: Column header for an "actual" or achieved/real value column */
-                        gettext('Actual')
+                        pgettext('report (long) header', 'Actual')
                     } />
                 <HeaderCells.HeaderCell
                     styleWidth={110}

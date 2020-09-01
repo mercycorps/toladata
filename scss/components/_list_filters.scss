@@ -1,7 +1,8 @@
 // list filters
 // TODO: very incomplete, currently used only on program page indicator filters
 .list__filters {
-    margin-bottom: $grid-gutter-width/2;
+    // bottom margin negative to overcome bootstrap padding and place filters close to list
+    margin-bottom: -5px;
     margin-top: $grid-gutter-width/2;
 }
 .list__filters--block-label {

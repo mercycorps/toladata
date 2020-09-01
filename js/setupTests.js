@@ -8,5 +8,10 @@ import $ from 'jquery';
 global.$ = global.jQuery = $;
 
 
+// this allows react components that call for bootstrap popovers as part of their lifecycle to be mounted for testing
+$.fn.extend({
+    popover: function() {return; },
+})
+
 
 configure({ adapter: new Adapter() });

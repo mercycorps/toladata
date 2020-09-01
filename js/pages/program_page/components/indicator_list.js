@@ -2,8 +2,8 @@ import React from 'react';
 import classNames from 'classnames';
 import { observer } from "mobx-react"
 import eventBus from '../../../eventbus';
-import { AddIndicatorButton } from '../../../components/indicatorModalComponents';
-
+import { AddIndicatorButton, ExpandAllButton, CollapseAllButton } from '../../../components/indicatorModalComponents';
+import ResultsTable from './resultsTable';
 import { library } from '@fortawesome/fontawesome-svg-core'
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome'
 import { faCaretDown, faCaretRight } from '@fortawesome/free-solid-svg-icons'
@@ -71,7 +71,6 @@ export class StatusHeader extends React.Component {
             programId,
             currentIndicatorFilter,
             filterApplied,
-            readonly,
         } = this.props;
 
         return <div className="indicators-list__header">
@@ -90,11 +89,6 @@ export class StatusHeader extends React.Component {
                     </small>
                 }
             </h3>
-            <div>
-                {!readonly &&
-                <AddIndicatorButton readonly={readonly} programId={programId}/>
-                }
-            </div>
         </div>
     }
 }
@@ -174,26 +168,26 @@ export class IndicatorListTable extends React.Component {
         this.onIndicatorResultsToggleClick = this.onIndicatorResultsToggleClick.bind(this);
     }
 
-    onIndicatorUpdateClick(e, indicatorId) {
+    onIndicatorUpdateClick(e, indicatorPk) {
         e.preventDefault();
 
-        eventBus.emit('open-indicator-update-modal', indicatorId);
+        eventBus.emit('open-indicator-update-modal', indicatorPk);
     }
 
-    onIndicatorResultsToggleClick(e, indicatorId) {
+    onIndicatorResultsToggleClick(e, indicatorPk) {
         e.preventDefault();
 
-        if (this.props.program.resultsMap.has(indicatorId)) {
-            this.props.program.deleteResultsHTML(indicatorId);
+        if (this.props.program.isExpanded(indicatorPk)) {
+            this.props.program.collapse(indicatorPk);
         } else {
-            this.props.program.updateResultsHTML(indicatorId);
+            this.props.program.expand(indicatorPk);
         }
     }
 
     render() {
         const indicators = this.props.indicators;
         const program = this.props.program;
-        const resultsMap = this.props.program.resultsMap;
+        const editable = !this.props.readOnly;
         return <table className="table indicators-list">
             <thead>
             <tr className="table-header">
@@ -207,8 +201,6 @@ export class IndicatorListTable extends React.Component {
 
             <tbody>
             {indicators.map(indicator => {
-                const resultsExist = resultsMap.has(indicator.pk);
-                const resultsStr = resultsExist ? resultsMap.get(indicator.pk) : "";
                 const targetPeriodLastEndDate = indicator.targetPeriodLastEndDate;
                 const localizeFunc = window.localizeNumber;
                 const displayFunc = indicator.isPercent ?
@@ -229,7 +221,7 @@ export class IndicatorListTable extends React.Component {
                 return <React.Fragment key={indicator.pk}>
                     <tr className={classNames("indicators-list__row", "indicators-list__indicator-header", {
                         "is-highlighted": indicator.wasJustCreated,
-                        "is-expanded": resultsExist
+                        "is-expanded": program.isExpanded(indicator.pk)
                     })}>
                         <td>
                             <a href="#"
@@ -237,7 +229,7 @@ export class IndicatorListTable extends React.Component {
                                tabIndex="0"
                                onClick={(e) => this.onIndicatorResultsToggleClick(e, indicator.pk)}
                             >
-                                <FontAwesomeIcon icon={resultsExist ? 'caret-down' : 'caret-right'} />
+                                <FontAwesomeIcon icon={program.isExpanded(indicator.pk) ? 'caret-down' : 'caret-right'} />
                                 <strong>{ indicator.number ? indicator.number + ':' : '' }</strong>&nbsp;
                                 <span className="indicator_name">{ indicator.name }</span>
                             </a>
@@ -268,11 +260,11 @@ export class IndicatorListTable extends React.Component {
                         <td className="text-right">{ numberCellFunc(indicator.lopTarget) }</td>
                     </tr>
 
-                    {resultsExist &&
+                    {program.isExpanded(indicator.pk) &&
                     <tr className="indicators-list__row indicators-list__indicator-body">
-                        <td colSpan="6" ref={el => $(el).find('[data-toggle="popover"]').popover({html:true})}>
+                        <td colSpan="6">
                             {/* result_table.html container */}
-                                <div dangerouslySetInnerHTML={{__html: resultsStr}} />
+                                <ResultsTable indicator={ indicator } editable={editable} />
                         </td>
                     </tr>
                     }
@@ -285,6 +277,23 @@ export class IndicatorListTable extends React.Component {
 }
 
 
+const IndicatorListTableButtons = observer(function ({program, rootStore, ...props}) {
+    return (
+        <div className="indicator-list__buttons-row">
+            <div className="expand-collapse-buttons">
+                <ExpandAllButton clickHandler={ () => { program.expandAll(); }} disabled={ rootStore.allExpanded } />
+                <CollapseAllButton clickHandler={ () => {program.collapseAll(); }} disabled={ rootStore.allCollapsed } />
+            </div>
+            <div className="indicator-list__add-indicator-button">
+                {!rootStore.readOnly &&
+                <AddIndicatorButton readonly={rootStore.readOnly} programId={program.pk}/>
+                }
+            </div>
+        </div>
+    );
+})
+
+
 const IndicatorList = observer(function (props) {
     const program = props.rootStore.program;
 
@@ -293,9 +302,9 @@ const IndicatorList = observer(function (props) {
                       programId={program.pk}
                       currentIndicatorFilter={ props.uiStore.currentIndicatorFilter }
                       filterApplied={ props.uiStore.filterApplied }
-                      readonly={props.rootStore.readOnly}/>
-
+                      />
         <IndicatorFilter uiStore={props.uiStore} rootStore={props.rootStore} />
+        <IndicatorListTableButtons program={program} rootStore={props.rootStore} />
 
         {program.needsAdditionalTargetPeriods &&
             <div id="id_missing_targets_msg" className="color-red">
@@ -304,7 +313,8 @@ const IndicatorList = observer(function (props) {
             </div>
         }
 
-        <IndicatorListTable indicators={props.rootStore.indicators} program={program} />
+        <IndicatorListTable indicators={props.rootStore.indicators} program={program}
+                                readOnly={ props.rootStore.readOnly }/>
     </React.Fragment>
 });
 

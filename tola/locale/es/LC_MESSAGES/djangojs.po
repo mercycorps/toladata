@@ -6,8 +6,8 @@ msgid ""
 msgstr ""
 "Project-Id-Version: \n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2020-08-16 22:08-0700\n"
-"PO-Revision-Date: 2020-08-16 22:08-0700\n"
+"POT-Creation-Date: 2020-08-28 15:40-0700\n"
+"PO-Revision-Date: 2020-08-28 15:40-0700\n"
 "Last-Translator: \n"
 "Language-Team: \n"
 "Language: es\n"
@@ -82,7 +82,7 @@ msgstr "Advertencia"
 #. Translators: This is a label for a dropdown that presents several possible justifications for changing a value
 #: js/base.js:541 js/components/changesetNotice.js:19
 #: js/pages/results_framework/components/level_cards.js:404
-#: js/pages/tola_management_pages/audit_log/views.js:259
+#: js/pages/tola_management_pages/audit_log/views.js:235
 msgid "Reason for change"
 msgstr "Razón para el cambio"
 
@@ -93,16 +93,16 @@ msgstr "¡Éxito!"
 #. Translators: button label to show the details of all items in a list */}
 #. Translators: button label to show the details of all rows in a list */}
 #: js/components/actionButtons.js:38
+#: js/components/indicatorModalComponents.js:39
 #: js/pages/iptt_report/components/report/tableHeader.js:54
-#: js/pages/tola_management_pages/audit_log/views.js:161
 msgid "Expand all"
 msgstr "Expandir todos"
 
 #. Translators: button label to hide the details of all items in a list */}
 #. Translators: button label to hide the details of all rows in a list */}
 #: js/components/actionButtons.js:52
+#: js/components/indicatorModalComponents.js:52
 #: js/pages/iptt_report/components/report/tableHeader.js:60
-#: js/pages/tola_management_pages/audit_log/views.js:174
 msgid "Collapse all"
 msgstr "Colapsar todos"
 
@@ -184,7 +184,7 @@ msgstr "Ninguno disponible"
 
 #. Translators: refers to grouping the report by the level of the indicator */
 #: js/components/selectWidgets.js:196
-#: js/pages/program_page/models/programPageUIStore.js:52
+#: js/pages/program_page/models/programPageUIStore.js:53
 msgid "by Level"
 msgstr "por Nivel"
 
@@ -471,21 +471,26 @@ msgid "Indicator Performance Tracking Table"
 msgstr "Tabla de seguimiento del rendimiento del indicador"
 
 #. Translators: Column header for a target value column */
+#. Translators: Header for a column listing values defined as targets for each row
 #: js/pages/iptt_report/components/report/headerCells.js:42
 #: js/pages/iptt_report/components/report/tableHeader.js:156
-#: js/pages/program_page/components/indicator_list.js:204
+#: js/pages/program_page/components/indicator_list.js:198
+#: js/pages/program_page/components/resultsTable.js:201
 msgid "Target"
 msgstr "Objetivo"
 
 #. Translators: Column header for an "actual" or achieved/real value column */
 #: js/pages/iptt_report/components/report/headerCells.js:56
 #: js/pages/iptt_report/components/report/tableHeader.js:163
+msgctxt "report (long) header"
 msgid "Actual"
 msgstr "Real"
 
 #. Translators: Column header for a percent-met column */
+#. Translators: Header for a column listing the progress towards the target value
 #: js/pages/iptt_report/components/report/headerCells.js:70
 #: js/pages/iptt_report/components/report/tableHeader.js:170
+#: js/pages/program_page/components/resultsTable.js:209
 msgid "% Met"
 msgstr "% Cumplido"
 
@@ -502,10 +507,10 @@ msgstr "No."
 #. Translators: Column header for indicator Name column */
 #: js/pages/iptt_report/components/report/tableHeader.js:104
 #: js/pages/logframe/components/table.js:30
-#: js/pages/program_page/components/indicator_list.js:200
-#: js/pages/tola_management_pages/audit_log/views.js:108
-#: js/pages/tola_management_pages/audit_log/views.js:186
-#: js/pages/tola_management_pages/audit_log/views.js:190
+#: js/pages/program_page/components/indicator_list.js:194
+#: js/pages/tola_management_pages/audit_log/views.js:109
+#: js/pages/tola_management_pages/audit_log/views.js:162
+#: js/pages/tola_management_pages/audit_log/views.js:166
 msgid "Indicator"
 msgstr "Indicador"
 
@@ -517,7 +522,7 @@ msgstr "Nivel"
 #. Translators: Column header */
 #: js/pages/iptt_report/components/report/tableHeader.js:123
 #: js/pages/iptt_report/models/filterStore.js:690
-#: js/pages/program_page/components/indicator_list.js:202
+#: js/pages/program_page/components/indicator_list.js:196
 msgid "Unit of measure"
 msgstr "Unidad de medida"
 
@@ -541,17 +546,19 @@ msgstr "# / %"
 #. Translators: Column header */
 #: js/pages/iptt_report/components/report/tableHeader.js:149
 #: js/pages/iptt_report/models/filterStore.js:694
-#: js/pages/program_page/components/indicator_list.js:203
+#: js/pages/program_page/components/indicator_list.js:197
 msgid "Baseline"
 msgstr "Base"
 
+#. Translators: short for Not Applicable
 #: js/pages/iptt_report/components/report/tableRows.js:11
 #: js/pages/iptt_report/components/report/tableRows.js:258
 #: js/pages/iptt_report/components/report/tableRows.js:259
 #: js/pages/iptt_report/components/report/tableRows.js:261
-#: js/pages/program_page/components/indicator_list.js:267
-#: js/pages/tola_management_pages/audit_log/views.js:181
-#: js/pages/tola_management_pages/audit_log/views.js:218
+#: js/pages/program_page/components/indicator_list.js:259
+#: js/pages/program_page/components/resultsTable.js:10
+#: js/pages/tola_management_pages/audit_log/views.js:157
+#: js/pages/tola_management_pages/audit_log/views.js:194
 msgid "N/A"
 msgstr "N/A"
 
@@ -673,7 +680,7 @@ msgid "Logframe"
 msgstr "Marco Lógico"
 
 #: js/pages/logframe/models/filterStore.js:33
-#: js/pages/tola_management_pages/audit_log/views.js:251
+#: js/pages/tola_management_pages/audit_log/views.js:227
 msgid "Result level"
 msgstr "Nivel del resultado"
 
@@ -751,28 +758,28 @@ msgstr[0] "%s indicador"
 msgstr[1] "%s indicadores"
 
 #. Translators: A link that shows all the indicators, some of which are currently filtered from view
-#: js/pages/program_page/components/indicator_list.js:87
+#: js/pages/program_page/components/indicator_list.js:86
 msgid "Show all indicators"
 msgstr "Ver todos los indicadores"
 
-#: js/pages/program_page/components/indicator_list.js:134
+#: js/pages/program_page/components/indicator_list.js:128
 msgid "Find an indicator:"
 msgstr "Encontrar un indicador:"
 
-#: js/pages/program_page/components/indicator_list.js:141
+#: js/pages/program_page/components/indicator_list.js:135
 msgid "None"
 msgstr "Ninguno"
 
-#: js/pages/program_page/components/indicator_list.js:151
+#: js/pages/program_page/components/indicator_list.js:145
 msgid "Group indicators:"
 msgstr "Indicadores de grupo:"
 
 #. Translators: Adj: labels this indicator as one which is missing one or more targets */
-#: js/pages/program_page/components/indicator_list.js:256
+#: js/pages/program_page/components/indicator_list.js:248
 msgid "Missing targets"
 msgstr "No hay objetivos"
 
-#: js/pages/program_page/components/indicator_list.js:303
+#: js/pages/program_page/components/indicator_list.js:312
 msgid ""
 "Some indicators have missing targets. To enter these values, click the "
 "target icon near the indicator name."
@@ -917,6 +924,99 @@ msgstr "Indicadores sin evidencias"
 #: js/pages/program_page/components/program_metrics.js:304
 msgid "No evidence"
 msgstr "Sin evidencia"
+
+#. Translators: Explains how performance is categorized as close to the target or not close to the target
+#: js/pages/program_page/components/resultsTable.js:27
+msgid ""
+"<p><strong>The actual value is %(percent)s of the target value.</strong> An "
+"indicator is on track if the result is no less than 85% of the target and no "
+"more than 115% of the target.</p><p><em>Remember to consider your direction "
+"of change when thinking about whether the indicator is on track.</em></p>"
+msgstr ""
+"<p><strong>El valor real es del %(percent)s del valor objetivo.</strong> Un "
+"indicador se considerará de acuerdo a lo planificado cuando el valor oscile "
+"entre no menos del 85% y no más del 115% de consecución de dicho objetivo.</"
+"p><p><em>Recuerde considerar la dirección de cambio al evaluar si el "
+"indicador está encaminado.</em></p>"
+
+#. Translators: Label for an indicator that is within a target range
+#: js/pages/program_page/components/resultsTable.js:34
+msgid "On track"
+msgstr "Encaminado"
+
+#. Translators: Label for an indicator that is above or below the target value
+#: js/pages/program_page/components/resultsTable.js:38
+msgid "Not on track"
+msgstr "No encaminado"
+
+#. Translators: Shown in a results cell when there are no results to display
+#: js/pages/program_page/components/resultsTable.js:119
+msgid "No results reported"
+msgstr "No se han reportado resultados"
+
+#. Translators: Label for a row showing totals from program start until today
+#: js/pages/program_page/components/resultsTable.js:137
+msgid "Program to date"
+msgstr "Programa a la fecha"
+
+#. Translators: explanation of the summing rules for the totals row on a list of results
+#: js/pages/program_page/components/resultsTable.js:169
+msgid ""
+"Results are cumulative. The Life of Program result mirrors the latest period "
+"result."
+msgstr ""
+"Los resultados son acumulativos. El resultado de la vida del programa "
+"refleja el último resultado del período."
+
+#. Translators: explanation of the summing rules for the totals row on a list of results
+#: js/pages/program_page/components/resultsTable.js:174
+msgid ""
+"Results are non-cumulative. The Life of Program result is the sum of target "
+"period results."
+msgstr ""
+"Los resultados no son acumulativos. El resultado de la vida del programa es "
+"la suma de los resultados de los períodos objetivo."
+
+#. Translators: identifies a results row as summative for the entire life of the program
+#: js/pages/program_page/components/resultsTable.js:180
+msgid "Life of Program"
+msgstr "Vida del programa"
+
+#. Translators: Header for a column listing periods in which results are grouped
+#: js/pages/program_page/components/resultsTable.js:197
+msgid "Target period"
+msgstr "Período objetivo"
+
+#. Translators: Header for a column listing actual result values for each row
+#: js/pages/program_page/components/resultsTable.js:205
+msgctxt "table (short) header"
+msgid "Actual"
+msgstr "Real"
+
+#. Translators: Header for a column listing actual results for a given period
+#: js/pages/program_page/components/resultsTable.js:213
+msgid "Results"
+msgstr "Resultados"
+
+#. Translators: Header for a column listing supporting documents for results
+#: js/pages/program_page/components/resultsTable.js:217
+msgid "Evidence"
+msgstr "Evidencia"
+
+#. Translators: a button that lets the user add a new result
+#: js/pages/program_page/components/resultsTable.js:240
+msgid "Add result"
+msgstr "Agregar resultado"
+
+#. Translators: Message displayed in place of a table that cannot be shown without targets having been set up
+#: js/pages/program_page/components/resultsTable.js:255
+msgid "This indicator has no targets."
+msgstr "Este indicador no tiene objetivos."
+
+#. Translators: Button label which opens a form to add targets to a given indicator
+#: js/pages/program_page/components/resultsTable.js:263
+msgid "Add targets"
+msgstr "Agregar objetivos"
 
 #: js/pages/program_page/pinned_reports.js:9
 msgid ""
@@ -1148,38 +1248,38 @@ msgstr "Los niveles de resultados no pueden contener comas."
 msgid "Result levels must have unique names."
 msgstr "Los niveles de resultados deben tener nombres únicos."
 
-#: js/pages/tola_management_pages/audit_log/views.js:80
+#: js/pages/tola_management_pages/audit_log/views.js:81
 msgid "Targets changed"
 msgstr "Objetivos modificados"
 
 #. Translators: This is part of a change log.  The result date of the Result that has been changed is being shown
-#: js/pages/tola_management_pages/audit_log/views.js:195
+#: js/pages/tola_management_pages/audit_log/views.js:171
 msgid "Result date:"
 msgstr "Fecha del resultado:"
 
-#: js/pages/tola_management_pages/audit_log/views.js:226
+#: js/pages/tola_management_pages/audit_log/views.js:202
 msgid "Indicator change log"
 msgstr "Registro de cambios de indicadores"
 
-#: js/pages/tola_management_pages/audit_log/views.js:240
+#: js/pages/tola_management_pages/audit_log/views.js:216
 msgid "Excel"
 msgstr "Sobresalir"
 
-#: js/pages/tola_management_pages/audit_log/views.js:250
+#: js/pages/tola_management_pages/audit_log/views.js:226
 msgid "Date and time"
 msgstr "Fecha y hora"
 
 #. Translators: This is a column heading. The column is in a change log and identifies the entities being changed. */}
-#: js/pages/tola_management_pages/audit_log/views.js:253
+#: js/pages/tola_management_pages/audit_log/views.js:229
 msgid "Indicators and results"
 msgstr "Indicadores y resultados"
 
-#: js/pages/tola_management_pages/audit_log/views.js:254
+#: js/pages/tola_management_pages/audit_log/views.js:230
 #: js/pages/tola_management_pages/user/views.js:260
 msgid "User"
 msgstr "Usuario"
 
-#: js/pages/tola_management_pages/audit_log/views.js:255
+#: js/pages/tola_management_pages/audit_log/views.js:231
 #: js/pages/tola_management_pages/organization/views.js:110
 #: js/pages/tola_management_pages/user/components/edit_user_profile.js:196
 #: js/pages/tola_management_pages/user/views.js:202
@@ -1187,19 +1287,19 @@ msgstr "Usuario"
 msgid "Organization"
 msgstr "Organización"
 
-#: js/pages/tola_management_pages/audit_log/views.js:256
+#: js/pages/tola_management_pages/audit_log/views.js:232
 msgid "Change type"
 msgstr "Tipo de cambio"
 
-#: js/pages/tola_management_pages/audit_log/views.js:257
+#: js/pages/tola_management_pages/audit_log/views.js:233
 msgid "Previous entry"
 msgstr "Valor anterior"
 
-#: js/pages/tola_management_pages/audit_log/views.js:258
+#: js/pages/tola_management_pages/audit_log/views.js:234
 msgid "New entry"
 msgstr "Nuevo valor"
 
-#: js/pages/tola_management_pages/audit_log/views.js:321
+#: js/pages/tola_management_pages/audit_log/views.js:297
 msgid "entries"
 msgstr "ítems"
 
@@ -2701,9 +2801,6 @@ msgstr "Super Administrador"
 #~ msgid "Indicator Data"
 #~ msgstr "Datos del indicador"
 
-#~ msgid "W/Evidence"
-#~ msgstr "Con evidencia"
-
 #~ msgid "Indicator Evidence"
 #~ msgstr "Evidencia del indicador"
 
@@ -2751,28 +2848,11 @@ msgstr "Super Administrador"
 #~ msgid "Sum:"
 #~ msgstr "Suma:"
 
-#~ msgid "Target period"
-#~ msgstr "Período objetivo"
-
 #~ msgid "View project"
 #~ msgstr "Ver proyecto"
 
 #~ msgid "View Project"
 #~ msgstr "Ver proyecto"
-
-#~ msgid ""
-#~ "Results are cumulative. The Life of Program result mirrors the latest "
-#~ "period result."
-#~ msgstr ""
-#~ "Los resultados son acumulativos. El resultado de la vida del programa "
-#~ "refleja el último resultado del período."
-
-#~ msgid ""
-#~ "Results are non-cumulative. The Life of Program result is the sum of "
-#~ "target periods results."
-#~ msgstr ""
-#~ "Los resultados no son acumulativos. El resultado de la vida del programa "
-#~ "es la suma de los resultados de los períodos objetivo."
 
 #~ msgid ""
 #~ "Results are non-cumulative. Target period and Life of Program results are "
@@ -2804,12 +2884,6 @@ msgstr "Super Administrador"
 
 #~ msgid "and "
 #~ msgstr "y "
-
-#~ msgid "Add results"
-#~ msgstr "Agregar resultados"
-
-#~ msgid "Add targets"
-#~ msgstr "Agregar objetivos"
 
 #~ msgid "Collected Indicator Data Confirm Delete"
 #~ msgstr "Confirmar eliminación de los datos del indicador recopilados"
@@ -3823,9 +3897,6 @@ msgstr "Super Administrador"
 
 #~ msgid "Enable Public Dashboard"
 #~ msgstr "Habilitar tablero público"
-
-#~ msgid "Program Start Date"
-#~ msgstr "Fecha de inicio del programa"
 
 #~ msgid "Reporting Period Start Date"
 #~ msgstr "Fecha de inicio del período de informe"
