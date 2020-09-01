@@ -192,7 +192,7 @@ class TestExcelRendererGlobals(test.TestCase):
         },
         3: {
             3: "Program Name",
-            10: "LOP subheader",
+            10: "LOP subheader*",
         },
         4: {
             1: "Program ID",
@@ -205,7 +205,7 @@ class TestExcelRendererGlobals(test.TestCase):
             8: "# / %",
             9: "Baseline",
             10: "Target",
-            11: "Actual *",
+            11: "Actual",
             12: "% Met"
         },
     }
