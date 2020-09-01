@@ -300,7 +300,7 @@ const ResultsTableActions = ({indicator, editable, ...props}) => {
                         gettext('This indicator has no targets.')
                     }
                     { editable &&
-                        <a href={`/indicator/indicator_update/${indicator.pk}/`}
+                        <a href={`/indicators/indicator_update/${indicator.pk}/`}
                            data-tab="#targets" className="indicator-link btn btn-success">
                            <FontAwesomeIcon icon={ faPlusCircle } />
                            {

@@ -4328,7 +4328,7 @@ exports[`Results table component with an indicator with no targets and no freque
         <a
           className="indicator-link btn btn-success"
           data-tab="#targets"
-          href="/indicator/indicator_update/112/"
+          href="/indicators/indicator_update/112/"
         >
           <svg
             aria-hidden="true"
@@ -4416,7 +4416,7 @@ exports[`Results table component with an indicator with no targets and no freque
         <a
           className="indicator-link btn btn-success"
           data-tab="#targets"
-          href="/indicator/indicator_update/112/"
+          href="/indicators/indicator_update/112/"
         >
           <svg
             aria-hidden="true"
