@@ -155,7 +155,7 @@ const ColumnHeaderRow = inject('rootStore')(
                         /* # Translators: Column header for a target value column */
                         gettext('Target')
                     } />
-                <HeaderCells.HeaderCell
+                <HeaderCells.LopActualHeaderCell
                     styleWidth={110}
                     className='lop-column'
                     label={
