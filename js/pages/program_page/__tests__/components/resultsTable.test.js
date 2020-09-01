@@ -16,26 +16,11 @@ describe("Results table component", () => {
                 [{editable: true, indicator: indicatorResultData.noTargets1}],
                 [{editable: true, indicator: indicatorResultData.noTargets2}]
             ]
-            test.each(testProps)("contains wrapper", (props) => {
-                expect(shallow(<ResultsTable {...props} />).find('.results-table__wrapper').length).toBe(1);
-            });
             test.each(testProps)("contains a div with warning information", (props) => {
-                let wrapper = shallow(<ResultsTable {...props} />).find('.results-table__wrapper');
-                expect(wrapper.children().length).toBe(1);
-                // contains a text-danger div with warning error and target icon:
-                let innerWrapper = wrapper.children().first().dive();
-                expect(innerWrapper.hasClass('text-danger')).toBeTruthy();
-                expect(innerWrapper.text()).toContain("This indicator has no targets.");
-                let bullseyeIcon = innerWrapper.childAt(0).dive().find('svg');
-                expect(bullseyeIcon.length).toBe(1);
-                expect(bullseyeIcon.first().hasClass('fa-bullseye')).toBeTruthy();
-                // editable so should contain "add targets link":
-                let addTargetLink = innerWrapper.find('a');
-                expect(addTargetLink.length).toBe(1);
-                expect(addTargetLink.text()).toContain('Add targets');
-                let plusIcon = addTargetLink.childAt(0).dive().find('svg');
-                expect(plusIcon.length).toBe(1);
-                expect(plusIcon.first().hasClass('fa-plus-circle')).toBeTruthy();
+                const tree = renderer.create(<ResultsTable {...props} />);
+                expect(tree.toJSON()).toMatchSnapshot();
+                tree.root.findByProps({className: "text-danger"})
+                expect(tree.root.findByProps({className: "indicator-link btn btn-success"}).children).toContain("Add targets")
             })
         });
         describe("without editing privileges", () => {
@@ -43,19 +28,13 @@ describe("Results table component", () => {
                 [{editable: false, indicator: indicatorResultData.noTargets1}],
                 [{editable: false, indicator: indicatorResultData.noTargets2}]
             ]
-            test.each(testProps)("contains wrapper", (props) => {
-                expect(shallow(<ResultsTable {...props} />).find('.results-table__wrapper').length).toBe(1);
-            });
             test.each(testProps)("contains a div with warning information", (props) => {
-                let wrapper = shallow(<ResultsTable {...props} />).find('.results-table__wrapper');
-                expect(wrapper.children().length).toBe(1);
-                let innerWrapper = wrapper.children().first().dive();
-                expect(innerWrapper.text()).toContain("This indicator has no targets.");
-                let bullseyeIcon = innerWrapper.childAt(0).dive().find('svg');
-                expect(bullseyeIcon.length).toBe(1);
-                expect(bullseyeIcon.first().hasClass('fa-bullseye')).toBeTruthy();
-                // should not contain an add targets link (not editable)
-                expect(innerWrapper.find('a').length).toBe(0);
+                const tree = renderer.create(<ResultsTable {...props} />);
+                expect(tree.toJSON()).toMatchSnapshot();
+                // verify that text-danger div shows (no targets):
+                tree.root.findByProps({className: "text-danger"});
+                // verify that add targets buytton doesn't show (editable is false):
+                expect(() => tree.root.findByProps({className: "indicator-link btn btn-success"})).toThrow();
             })
         });
     });
@@ -66,23 +45,18 @@ describe("Results table component", () => {
             [{editable: true, indicator: indicatorResultData.midEnd}],
             [{editable: true, indicator: indicatorResultData.semiAnnual}],
         ]
-        test.each(testProps)("contains wrapper", (props) => {
-            expect(shallow(<ResultsTable {...props} />).find('.results-table__wrapper').length).toBe(1);
-        });
         test.each(testProps)("contains a results table with appropriate headers", (props) => {
-            let wrapper = shallow(<ResultsTable {...props} />).find('.results-table__wrapper');
-            expect(wrapper.children().length).toBe(2);
-            let table = wrapper.childAt(0).dive();
-            expect(table.is('table.results-table')).toBeTruthy();
-            expect(table.find('thead').length).toBe(1);
-            let headerRow = table.find('thead').first().find('tr').first();
-            expect(headerRow.children().length).toBe(6);
-            expect(headerRow.childAt(0).text()).toBe("Target period");
-            expect(headerRow.childAt(1).text()).toBe("Target");
-            expect(headerRow.childAt(2).text()).toBe("Actual");
-            expect(headerRow.childAt(3).text()).toBe("% Met");
-            expect(headerRow.childAt(4).text()).toBe("Results");
-            expect(headerRow.childAt(5).text()).toBe("Evidence");
+            const tree = renderer.create(<ResultsTable {...props} />);
+            expect(tree.toJSON()).toMatchSnapshot();
+            let table = tree.root.findByProps({className: "table results-table"})
+            let headerRow = table.findByType('thead').findByType('tr');
+            expect(headerRow.children.length).toBe(6);
+            expect(headerRow.children[0].children[0]).toBe("Target period");
+            expect(headerRow.children[1].children[0]).toBe("Target");
+            expect(headerRow.children[2].children[0]).toBe("Actual");
+            expect(headerRow.children[3].children[0]).toBe("% Met");
+            expect(headerRow.children[4].children[0]).toBe("Results");
+            expect(headerRow.children[5].children[0]).toBe("Evidence");
         });
         test.each(testProps)("contains a LoP row at the bottom of the table", (props) => {
             let wrapper = shallow(<ResultsTable {...props} />).find('.results-table__wrapper');
@@ -124,7 +98,7 @@ describe("Results table component", () => {
         test.each(testProps)("contains a results table with appropriate headers", (props) => {
             let wrapper = shallow(<ResultsTable {...props} />).find('.results-table__wrapper');
             expect(wrapper.children().length).toBe(2);
-            let table = wrapper.childAt(0).dive();
+            let table = wrapper.childAt(0).dive().dive();
             expect(table.is('table.results-table')).toBeTruthy();
             expect(table.find('thead').length).toBe(1);
             let headerRow = table.find('thead').first().find('tr').first();

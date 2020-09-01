@@ -227,7 +227,8 @@
         "lopActual": null,
         "lopMet": null,
         "periodicTargets": [],
-        "noTargetResults": []
+        "noTargetResults": [],
+        "noTargets": true
     },
     "noTargets2": {
         "pk": 112,
@@ -238,7 +239,8 @@
         "lopActual": null,
         "lopMet": null,
         "periodicTargets": [],
-        "noTargetResults": []
+        "noTargetResults": [],
+        "noTargets": true
     },
     "noTargetsWithResults": {
         "pk": 113,
@@ -256,6 +258,7 @@
                 "achieved": 5,
                 "evidenceUrl": null
             }
-        ]
+        ],
+        "noTargets": true
     }
 }
