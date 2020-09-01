@@ -75,7 +75,8 @@ DATE_FORMATS = {
     ENGLISH: lambda d: d.strftime('%b %-d, %Y'),
     FRENCH: lambda d: d.strftime('%-d %b. %Y').lower() if d.month not in [5, 6, 7, 8] else (
         d.strftime('%-d juil. %Y') if d.month == 7 else d.strftime('%-d %B %Y').lower()),
-    SPANISH: lambda d: d.strftime('%-d %b. %Y').title() if d.month != 5 else d.strftime('%-d %B %Y').title()
+    SPANISH: lambda d: d.strftime('%-d %b. %Y').title() if d.month not in [5, 9] else (
+        d.strftime('%-d Sept. %Y') if d.month == 9 else d.strftime('%-d %B %Y').title()),
 }
 
 COLUMNS = {
