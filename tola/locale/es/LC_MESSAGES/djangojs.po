@@ -6,8 +6,8 @@ msgid ""
 msgstr ""
 "Project-Id-Version: \n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2020-08-28 15:40-0700\n"
-"PO-Revision-Date: 2020-08-28 15:40-0700\n"
+"POT-Creation-Date: 2020-09-01 14:22-0700\n"
+"PO-Revision-Date: 2020-09-01 14:23-0700\n"
 "Last-Translator: \n"
 "Language-Team: \n"
 "Language: es\n"
@@ -193,51 +193,51 @@ msgstr "por Nivel"
 msgid "Group indicators"
 msgstr "Agrupar indicadores"
 
-#: js/constants.js:36 js/pages/iptt_quickstart/models/ipttQSRootStore.js:30
+#: js/constants.js:37 js/pages/iptt_quickstart/models/ipttQSRootStore.js:30
 msgid "Life of Program (LoP) only"
 msgstr "Vida del programa (LoP) solamente"
 
-#: js/constants.js:37 js/pages/iptt_quickstart/models/ipttQSRootStore.js:31
+#: js/constants.js:38 js/pages/iptt_quickstart/models/ipttQSRootStore.js:31
 msgid "Midline and endline"
 msgstr "Línea media y línea final"
 
-#: js/constants.js:38 js/pages/iptt_quickstart/models/ipttQSRootStore.js:32
+#: js/constants.js:39 js/pages/iptt_quickstart/models/ipttQSRootStore.js:32
 msgid "Annual"
 msgstr "Anual"
 
-#: js/constants.js:39 js/pages/iptt_quickstart/models/ipttQSRootStore.js:33
+#: js/constants.js:40 js/pages/iptt_quickstart/models/ipttQSRootStore.js:33
 msgid "Semi-annual"
 msgstr "Semestral"
 
-#: js/constants.js:40 js/pages/iptt_quickstart/models/ipttQSRootStore.js:34
+#: js/constants.js:41 js/pages/iptt_quickstart/models/ipttQSRootStore.js:34
 msgid "Tri-annual"
 msgstr "Trienal"
 
-#: js/constants.js:41 js/pages/iptt_quickstart/models/ipttQSRootStore.js:35
+#: js/constants.js:42 js/pages/iptt_quickstart/models/ipttQSRootStore.js:35
 msgid "Quarterly"
 msgstr "Trimestral"
 
-#: js/constants.js:42 js/pages/iptt_quickstart/models/ipttQSRootStore.js:36
+#: js/constants.js:43 js/pages/iptt_quickstart/models/ipttQSRootStore.js:36
 msgid "Monthly"
 msgstr "Mensual"
 
-#: js/constants.js:48
+#: js/constants.js:49
 msgid "Years"
 msgstr "Años"
 
-#: js/constants.js:49
+#: js/constants.js:50
 msgid "Semi-annual periods"
 msgstr "Períodos semestrales"
 
-#: js/constants.js:50
+#: js/constants.js:51
 msgid "Tri-annual periods"
 msgstr "Períodos trienales"
 
-#: js/constants.js:51
+#: js/constants.js:52
 msgid "Quarters"
 msgstr "Trimestres"
 
-#: js/constants.js:52
+#: js/constants.js:53
 msgid "Months"
 msgstr "Meses"
 
@@ -470,17 +470,22 @@ msgstr "Todos los datos del programa"
 msgid "Indicator Performance Tracking Table"
 msgstr "Tabla de seguimiento del rendimiento del indicador"
 
+#. Translators: label on a report, column header for a column of values that have been rounded
+#: js/pages/iptt_report/components/report/headerCells.js:22
+msgid "All values in this report are rounded to two decimal places."
+msgstr "Todos los valores de este informe se redondean a dos decimales."
+
 #. Translators: Column header for a target value column */
 #. Translators: Header for a column listing values defined as targets for each row
-#: js/pages/iptt_report/components/report/headerCells.js:42
+#: js/pages/iptt_report/components/report/headerCells.js:63
 #: js/pages/iptt_report/components/report/tableHeader.js:156
 #: js/pages/program_page/components/indicator_list.js:198
-#: js/pages/program_page/components/resultsTable.js:201
+#: js/pages/program_page/components/resultsTable.js:253
 msgid "Target"
 msgstr "Objetivo"
 
 #. Translators: Column header for an "actual" or achieved/real value column */
-#: js/pages/iptt_report/components/report/headerCells.js:56
+#: js/pages/iptt_report/components/report/headerCells.js:77
 #: js/pages/iptt_report/components/report/tableHeader.js:163
 msgctxt "report (long) header"
 msgid "Actual"
@@ -488,9 +493,9 @@ msgstr "Real"
 
 #. Translators: Column header for a percent-met column */
 #. Translators: Header for a column listing the progress towards the target value
-#: js/pages/iptt_report/components/report/headerCells.js:70
+#: js/pages/iptt_report/components/report/headerCells.js:91
 #: js/pages/iptt_report/components/report/tableHeader.js:170
-#: js/pages/program_page/components/resultsTable.js:209
+#: js/pages/program_page/components/resultsTable.js:261
 msgid "% Met"
 msgstr "% Cumplido"
 
@@ -556,7 +561,7 @@ msgstr "Base"
 #: js/pages/iptt_report/components/report/tableRows.js:259
 #: js/pages/iptt_report/components/report/tableRows.js:261
 #: js/pages/program_page/components/indicator_list.js:259
-#: js/pages/program_page/components/resultsTable.js:10
+#: js/pages/program_page/components/resultsTable.js:9
 #: js/pages/tola_management_pages/audit_log/views.js:157
 #: js/pages/tola_management_pages/audit_log/views.js:194
 msgid "N/A"
@@ -926,7 +931,7 @@ msgid "No evidence"
 msgstr "Sin evidencia"
 
 #. Translators: Explains how performance is categorized as close to the target or not close to the target
-#: js/pages/program_page/components/resultsTable.js:27
+#: js/pages/program_page/components/resultsTable.js:38
 msgid ""
 "<p><strong>The actual value is %(percent)s of the target value.</strong> An "
 "indicator is on track if the result is no less than 85% of the target and no "
@@ -940,27 +945,27 @@ msgstr ""
 "indicador está encaminado.</em></p>"
 
 #. Translators: Label for an indicator that is within a target range
-#: js/pages/program_page/components/resultsTable.js:34
+#: js/pages/program_page/components/resultsTable.js:44
 msgid "On track"
 msgstr "Encaminado"
 
 #. Translators: Label for an indicator that is above or below the target value
-#: js/pages/program_page/components/resultsTable.js:38
+#: js/pages/program_page/components/resultsTable.js:48
 msgid "Not on track"
 msgstr "No encaminado"
 
 #. Translators: Shown in a results cell when there are no results to display
-#: js/pages/program_page/components/resultsTable.js:119
+#: js/pages/program_page/components/resultsTable.js:130
 msgid "No results reported"
 msgstr "No se han reportado resultados"
 
 #. Translators: Label for a row showing totals from program start until today
-#: js/pages/program_page/components/resultsTable.js:137
+#: js/pages/program_page/components/resultsTable.js:156
 msgid "Program to date"
 msgstr "Programa a la fecha"
 
 #. Translators: explanation of the summing rules for the totals row on a list of results
-#: js/pages/program_page/components/resultsTable.js:169
+#: js/pages/program_page/components/resultsTable.js:207
 msgid ""
 "Results are cumulative. The Life of Program result mirrors the latest period "
 "result."
@@ -969,7 +974,7 @@ msgstr ""
 "refleja el último resultado del período."
 
 #. Translators: explanation of the summing rules for the totals row on a list of results
-#: js/pages/program_page/components/resultsTable.js:174
+#: js/pages/program_page/components/resultsTable.js:210
 msgid ""
 "Results are non-cumulative. The Life of Program result is the sum of target "
 "period results."
@@ -978,45 +983,45 @@ msgstr ""
 "la suma de los resultados de los períodos objetivo."
 
 #. Translators: identifies a results row as summative for the entire life of the program
-#: js/pages/program_page/components/resultsTable.js:180
+#: js/pages/program_page/components/resultsTable.js:216
 msgid "Life of Program"
 msgstr "Vida del programa"
 
 #. Translators: Header for a column listing periods in which results are grouped
-#: js/pages/program_page/components/resultsTable.js:197
+#: js/pages/program_page/components/resultsTable.js:249
 msgid "Target period"
 msgstr "Período objetivo"
 
 #. Translators: Header for a column listing actual result values for each row
-#: js/pages/program_page/components/resultsTable.js:205
+#: js/pages/program_page/components/resultsTable.js:257
 msgctxt "table (short) header"
 msgid "Actual"
 msgstr "Real"
 
 #. Translators: Header for a column listing actual results for a given period
-#: js/pages/program_page/components/resultsTable.js:213
+#: js/pages/program_page/components/resultsTable.js:265
 msgid "Results"
 msgstr "Resultados"
 
 #. Translators: Header for a column listing supporting documents for results
-#: js/pages/program_page/components/resultsTable.js:217
+#: js/pages/program_page/components/resultsTable.js:269
 msgid "Evidence"
 msgstr "Evidencia"
 
-#. Translators: a button that lets the user add a new result
-#: js/pages/program_page/components/resultsTable.js:240
-msgid "Add result"
-msgstr "Agregar resultado"
-
 #. Translators: Message displayed in place of a table that cannot be shown without targets having been set up
-#: js/pages/program_page/components/resultsTable.js:255
+#: js/pages/program_page/components/resultsTable.js:300
 msgid "This indicator has no targets."
 msgstr "Este indicador no tiene objetivos."
 
 #. Translators: Button label which opens a form to add targets to a given indicator
-#: js/pages/program_page/components/resultsTable.js:263
+#: js/pages/program_page/components/resultsTable.js:308
 msgid "Add targets"
 msgstr "Agregar objetivos"
+
+#. Translators: a button that lets the user add a new result
+#: js/pages/program_page/components/resultsTable.js:322
+msgid "Add result"
+msgstr "Agregar resultado"
 
 #: js/pages/program_page/pinned_reports.js:9
 msgid ""
