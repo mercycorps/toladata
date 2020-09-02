@@ -8,7 +8,7 @@ msgstr ""
 "Project-Id-Version: \n"
 "Report-Msgid-Bugs-To: \n"
 "POT-Creation-Date: 2020-09-01 14:26-0700\n"
-"PO-Revision-Date: 2020-09-01 14:27-0700\n"
+"PO-Revision-Date: 2020-09-02 10:06-0700\n"
 "Last-Translator: \n"
 "Language-Team: \n"
 "Language: es\n"
@@ -282,7 +282,7 @@ msgstr ""
 #: templates/indicators/results/result_form_disaggregation_fields.html:62
 #: tola_management/models.py:340
 msgid "Actual value"
-msgstr "Valor actual"
+msgstr "Valor real"
 
 #: indicators/forms.py:453 templates/workflow/siteprofile_form.html:3
 #: templates/workflow/siteprofile_form.html:4
