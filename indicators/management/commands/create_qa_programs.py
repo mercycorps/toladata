@@ -136,7 +136,7 @@ class Command(BaseCommand):
         indicator_factory = IndicatorFactory(program, tolaland)
         indicator_factory.create_standard_indicators()
 
-        program_name = 'Creating ghost of programs future'
+        program_name = 'QA program -- Ghost of Programs Future'
         print(f'Creating {program_name}')
         future_start_date = (date.today() + relativedelta(months=6)).replace(day=1)
         future_end_date = (future_start_date + relativedelta(months=19)).replace(day=28)
