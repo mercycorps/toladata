@@ -13,8 +13,8 @@ describe("Results table component", () => {
     describe("with an indicator with no targets and no frequency", () => {
         describe("with editing privileges", () => {
             var testProps = [
-                [{editable: true, indicator: indicatorResultData.noTargets1}],
-                [{editable: true, indicator: indicatorResultData.noTargets2}]
+                [{editable: true, resultEditable: true, indicator: indicatorResultData.noTargets1}],
+                [{editable: true, resultEditable: true, indicator: indicatorResultData.noTargets2}]
             ]
             test.each(testProps)("contains a div with warning information", (props) => {
                 const tree = renderer.create(<ResultsTable {...props} />);
@@ -40,10 +40,10 @@ describe("Results table component", () => {
     });
     describe("with a valid indicator and editing privileges", () => {
         var testProps = [
-            [{editable: true, indicator: indicatorResultData.lop}],
-            [{editable: true, indicator: indicatorResultData.annual}],
-            [{editable: true, indicator: indicatorResultData.midEnd}],
-            [{editable: true, indicator: indicatorResultData.semiAnnual}],
+            [{editable: true, resultEditable: true, indicator: indicatorResultData.lop}],
+            [{editable: true, resultEditable: true, indicator: indicatorResultData.annual}],
+            [{editable: true, resultEditable: true, indicator: indicatorResultData.midEnd}],
+            [{editable: true, resultEditable: true, indicator: indicatorResultData.semiAnnual}],
         ]
         test.each(testProps)("contains a results table with appropriate headers", (props) => {
             const tree = renderer.create(<ResultsTable {...props} />);
@@ -134,7 +134,7 @@ describe("Results table component", () => {
     });
     describe("result rows", () => {
         describe("for a lop indicator with no results", () => {
-            var props = {editable: true, indicator: indicatorResultData.lop};
+            var props = {editable: true, resultEditable: true, indicator: indicatorResultData.lop};
             var tableBody;
             beforeEach(() => {
                 let wrapper = shallow(<ResultsTable {...props} />).find('.results-table__wrapper');
@@ -150,7 +150,7 @@ describe("Results table component", () => {
             });
         });
         describe("for an annual indicator with results", () => {
-            var props = {editable: true, indicator: indicatorResultData.annual};
+            var props = {editable: true, resultEditable: true, indicator: indicatorResultData.annual};
             var tableBody;
             beforeEach(() => {
                 let wrapper = shallow(<ResultsTable {...props} />).find('.results-table__wrapper');

@@ -14,10 +14,12 @@ export default class ProgramPageRootStore {
             programJSON = {},
             onScopeMargin = 0.15,
             deletePinnedReportURL = null,
-            readOnly = true
+            readOnly = true,
+            resultReadOnly = true,
         } = {}
     ) {
         this.readOnly = readOnly;
+        this.resultReadOnly = resultReadOnly;
         this.onScopeMargin = onScopeMargin;
         this.deletePinnedReportURL = deletePinnedReportURL;
         this.program = getProgramStore(programJSON);

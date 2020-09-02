@@ -227,6 +227,10 @@ def has_program_read_access(func):
             write_access = (user_has_program_roles(request.user, [kwargs['program']], ['high']) or
                             request.user.is_superuser)
             request.has_write_access = write_access
+            # On Program Page, "add result" display is determined by medium/high access - so this second
+            # level of differentiation is required:
+            medium_access = (write_access or user_has_program_roles(request.user, [kwargs['program']], ['medium']))
+            request.has_medium_access = medium_access
             return func(request, *args, **kwargs)
         else:
             raise PermissionDenied

@@ -188,6 +188,7 @@ export class IndicatorListTable extends React.Component {
         const indicators = this.props.indicators;
         const program = this.props.program;
         const editable = !this.props.readOnly;
+        const resultEditable = !this.props.resultReadOnly;
         return <table className="table indicators-list">
             <thead>
             <tr className="table-header">
@@ -264,7 +265,7 @@ export class IndicatorListTable extends React.Component {
                     <tr className="indicators-list__row indicators-list__indicator-body">
                         <td colSpan="6">
                             {/* result_table.html container */}
-                                <ResultsTable indicator={ indicator } editable={editable} />
+                                <ResultsTable indicator={ indicator } editable={editable} resultEditable={ resultEditable }/>
                         </td>
                     </tr>
                     }
@@ -314,7 +315,8 @@ const IndicatorList = observer(function (props) {
         }
 
         <IndicatorListTable indicators={props.rootStore.indicators} program={program}
-                                readOnly={ props.rootStore.readOnly }/>
+                                readOnly={ props.rootStore.readOnly }
+                                resultReadOnly={ props.rootStore.resultReadOnly } />
     </React.Fragment>
 });
 

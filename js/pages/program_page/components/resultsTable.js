@@ -288,7 +288,7 @@ const ResultsTableTable = ({indicator, editable, ...props}) => {
  *      Messages:
  *          - "This indicator has no targets" - shown if true
  */
-const ResultsTableActions = ({indicator, editable, ...props}) => {
+const ResultsTableActions = ({indicator, editable, resultEditable, ...props}) => {
     return (
         <div className="results-table__actions">
             <div className="cd-actions__message">
@@ -312,7 +312,7 @@ const ResultsTableActions = ({indicator, editable, ...props}) => {
                 </div>    
             }
             </div>
-            {editable &&
+            {resultEditable &&
                 <div className={indicator.noTargets ? "cd-actions__button disable-span" : "cd-actions__button"}>
                     <a href={`/indicators/result_add/${indicator.pk}/`}
                         className="btn-link btn-add results__link">
@@ -342,7 +342,8 @@ export default class ResultsTable extends React.Component {
                 {showTable &&
                     <ResultsTableTable indicator={this.props.indicator} editable={this.props.editable} />
                 }
-                <ResultsTableActions indicator={this.props.indicator} editable={this.props.editable}/>
+                <ResultsTableActions indicator={this.props.indicator} editable={this.props.editable}
+                    resultEditable={ this.props.resultEditable } />
             </div>
         );
     }
