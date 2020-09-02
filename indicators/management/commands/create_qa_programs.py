@@ -19,7 +19,7 @@ from indicators.models import (
     DisaggregationLabel,
 )
 from workflow.models import Program, Country, Organization, TolaUser, CountryAccess, ProgramAccess, SiteProfile
-from .qa_program_proletariat.qa_program_proletariate import Cleaner, ProgramFactory, IndicatorFactory, user_profiles
+from .qa_program_widgets.qa_widgets import Cleaner, ProgramFactory, IndicatorFactory, user_profiles
 
 
 class Command(BaseCommand):
@@ -80,7 +80,7 @@ class Command(BaseCommand):
         else:
             tester_names = ['Barbara', 'Cameron', 'Carly', 'Jenny', 'Marie', 'Marco', 'PaQ', 'Paul', 'Sanjuro']
         for t_name in tester_names:
-            program_name = 'QA program - {}'.format(t_name)
+            program_name = 'QA Program - {}'.format(t_name)
             print(f'Creating {program_name}')
             program = program_factory.create_program(program_name)
             indicator_factory = IndicatorFactory(program, tolaland)

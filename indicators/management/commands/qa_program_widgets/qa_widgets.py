@@ -9,7 +9,6 @@ from dateutil.relativedelta import relativedelta
 
 from django.contrib.auth.models import User
 from django.utils import timezone
-from django.conf import settings
 
 from indicators.models import (
     Indicator,
@@ -18,7 +17,6 @@ from indicators.models import (
     PeriodicTarget,
     Level,
     DisaggregationType,
-    DisaggregationLabel,
     DisaggregatedValue,
     LevelTier,
 )
@@ -27,7 +25,8 @@ from indicators.views.views_indicators import generate_periodic_targets
 
 
 class ProgramFactory:
-    with open(os.path.join(settings.SITE_ROOT, 'fixtures/sample_levels.json'), 'r') as fh:
+    module_location = os.path.dirname(__file__)
+    with open(os.path.join(module_location, 'sample_levels.json'), 'r') as fh:
         sample_levels = json.loads(fh.read())
 
     def __init__(self, country):
@@ -462,7 +461,7 @@ class ResultFactory:
         label_sets = []
         if result_disagg_type == 'sadd':
             label_sets.append(self.sadd_disagg_labels)
-        elif result_disagg_type == 'one' and len(self.indicator_disagg_labelsets) > 1:
+        elif result_disagg_type == 'one' and len(self.indicator_disagg_labelsets) > 0 :
             try:
                 label_sets.append(random.choice(self.indicator_disagg_labelsets))
             except ValueError:
@@ -560,7 +559,7 @@ class Cleaner:
 
     @staticmethod
     def clean_programs():
-        programs = Program.objects.filter(name__contains='QA program -')
+        programs = Program.objects.filter(name__icontains='QA program -')
         if programs.count() > 0:
             print("Delete these programs?\n{}".format('\n'.join(p.name for p in programs)))
             confirm = input('[yes/no]: ')
