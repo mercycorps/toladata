@@ -1,35 +1,24 @@
 
-import json
-import math
-import os
-import random
 import sys
 from copy import deepcopy
 from datetime import date, timedelta
 from dateutil.relativedelta import relativedelta
 from getpass import getpass
-from itertools import cycle
 
 from django.core.management.base import BaseCommand
 from django.contrib.auth.models import User
-from django.utils import timezone, translation
+from django.utils import translation
 from django.conf import settings
 from django.db.utils import IntegrityError
 
 from indicators.models import (
-    Indicator,
-    IndicatorType,
-    Result,
-    PeriodicTarget,
     Level,
     LevelTier,
     LevelTierTemplate,
     DisaggregationType,
     DisaggregationLabel,
-    DisaggregatedValue,
 )
-from workflow.models import Program, Country, Organization, TolaUser, CountryAccess, ProgramAccess, SiteProfile, Sector
-from indicators.views.views_indicators import generate_periodic_targets
+from workflow.models import Program, Country, Organization, TolaUser, CountryAccess, ProgramAccess, SiteProfile
 from .qa_program_proletariat.qa_program_proletariate import Cleaner, ProgramFactory, IndicatorFactory, user_profiles
 
 
@@ -66,16 +55,6 @@ class Command(BaseCommand):
 
         translation.activate(settings.LANGUAGE_CODE)
 
-        # Load the levels fixture and get the levels by filtering out the Tiers that are also in that file
-        with open(os.path.join(settings.SITE_ROOT, 'fixtures/sample_levels.json'), 'r') as fh:
-            sample_levels = json.loads(fh.read())
-
-        filtered_levels = []
-        for level in sample_levels:
-            if 'tier_depth' not in level['fields']:
-                level['fields'].pop('program_id')
-                filtered_levels.append(level)
-
         org = Organization.objects.get(id=1)
         tolaland, created = Country.objects.get_or_create(
             country='Tolaland', defaults={
@@ -83,11 +62,12 @@ class Command(BaseCommand):
         if created:
             self.create_disaggregations(tolaland)
 
-        if 'named_only' not in options:
+        if not options['named_only']:
             password = getpass(prompt="Enter the password to use for the test users: ")
             self.create_test_users(password)
 
         self.create_test_sites()
+
         for super_user in TolaUser.objects.filter(user__is_superuser=True):
             ca, created = CountryAccess.objects.get_or_create(country=tolaland, tolauser=super_user)
             ca.role = 'basic_admin'
@@ -95,14 +75,6 @@ class Command(BaseCommand):
 
         program_factory = ProgramFactory(tolaland)
 
-        # Create a program whose end date has passed ond one whose start date is in the future
-        # passed_end_date = program_factory.default_start_date - timedelta(days=1)
-        # passed_start_date = (passed_end_date + relativedelta(months=-19)).replace(day=1)
-        # future_start_date = (date.today() + relativedelta(months=6)).replace(day=1)
-        # future_end_date = (future_start_date + relativedelta(months=19)).replace(day=28)
-        # future_end_date = (future_end_date + relativedelta(days=5)).replace(day=1)
-
-        # Create programs for specific people
         if options['names']:
             tester_names = options['names'].split(',')
         else:
@@ -111,39 +83,20 @@ class Command(BaseCommand):
             program_name = 'QA program - {}'.format(t_name)
             print(f'Creating {program_name}')
             program = program_factory.create_program(program_name)
-            # self.create_levels(program.id, filtered_levels)
             indicator_factory = IndicatorFactory(program, tolaland)
             indicator_factory.create_standard_indicators(personal_indicator=True)
-            # indicator_factory.create_indicators("nulls", apply_skips=False, personal_indicator=True)
 
         if options['named_only']:
             sys.exit()
 
-        # other_standard_programs = ['QA Program -- Small Indicator Set', 'QA Program -- Multi-country Program']
-        # for program_tuple in other_standard_programs:
         program_name = 'QA program -- Multi-country Program'
         print(f'Creating {program_name}')
         program = program_factory.create_program(program_name, multi_country=True)
-        # self.create_levels(program.id, filtered_levels)
         indicator_factory = IndicatorFactory(program, tolaland)
         indicator_factory.create_standard_indicators()
 
-        # print('Creating {}'.format(program_tuple[0]))
-        # program = program_factory.create_program(
-        #     main_start_date, main_end_date, country, program_tuple[0], multi_country=program_tuple[1])
-        # fail_message = self.set_null_levels(short_param_base, short_null_levels, program.name)
-        # if fail_message:
-        #     print(fail_message)
-        #     program.delete()
-        # else:
-        #     self.create_levels(program.id, filtered_levels)
-        #     indicator_factory.create_indicators(program.id, short_param_base)
-        #
-        # Program that have the max number of levels allowed, one of which has levels with no indicators assigned
-        # program_title = ['QA Program -- Levels all the way down', 'QA Program -- Levels most of the way down']
         program_name = 'QA program -- Custom Results Framework'
         print(f'Creating {program_name}')
-        # for title in program_titles:
         program = program_factory.create_program(program_name, create_levels=False)
         template_names = []
         tier_depth = LevelTier.MAX_TIERS
@@ -173,45 +126,29 @@ class Command(BaseCommand):
             indicatorless_levels = [int(tier_depth/2)]
         indicator_factory = IndicatorFactory(program, tolaland)
         indicator_factory.create_standard_indicators(indicatorless_levels=indicatorless_levels)
-        # create_stindicators(program.id, all_params_base, indicatorless_levels=indicatorless_levels)
 
-        print('Creating ghost of programs past')
+        program_name = 'QA program -- Ghost of Programs Past'
+        print(f'Creating {program_name}')
         passed_end_date = program_factory.default_start_date - timedelta(days=1)
         passed_start_date = (passed_end_date + relativedelta(months=-19)).replace(day=1)
         program = program_factory.create_program(
-            'QA program -- Ghost of Programs Past', start_date=passed_start_date, end_date=passed_end_date)
-        # self.create_levels(program.id, filtered_levels)
+            program_name, start_date=passed_start_date, end_date=passed_end_date)
         indicator_factory = IndicatorFactory(program, tolaland)
         indicator_factory.create_standard_indicators()
 
-        print('Creating ghost of programs future')
+        program_name = 'Creating ghost of programs future'
+        print(f'Creating {program_name}')
         future_start_date = (date.today() + relativedelta(months=6)).replace(day=1)
         future_end_date = (future_start_date + relativedelta(months=19)).replace(day=28)
         future_end_date = (future_end_date + relativedelta(days=5)).replace(day=1)
-        # future_program_params = [
-        #     {'freq': Indicator.ANNUAL, 'uom_type': Indicator.NUMBER, 'is_cumulative': True,
-        #      'direction': Indicator.DIRECTION_OF_CHANGE_POSITIVE, 'null_level': 'targets'},
-        #     {'freq': Indicator.QUARTERLY, 'uom_type': Indicator.PERCENTAGE, 'is_cumulative': True,
-        #      'direction': Indicator.DIRECTION_OF_CHANGE_NEGATIVE, 'null_level': 'targets'},
-        #     {'freq': Indicator.EVENT, 'uom_type': Indicator.PERCENTAGE, 'is_cumulative': True,
-        #      'direction': Indicator.DIRECTION_OF_CHANGE_NONE, 'null_level': 'targets'},
-        #     {'freq': Indicator.LOP, 'uom_type': Indicator.NUMBER, 'is_cumulative': False,
-        #      'direction': Indicator.DIRECTION_OF_CHANGE_NONE, 'null_level': 'targets'},
-        #     {'freq': Indicator.MID_END, 'uom_type': Indicator.NUMBER, 'is_cumulative': True,
-        #      'direction': Indicator.DIRECTION_OF_CHANGE_POSITIVE, 'null_level': 'targets'},
-        # ]
-
         program = program_factory.create_program(
-            'QA program --- Ghost of Programs Future', start_date=future_start_date, end_date=future_end_date,)
-        # self.create_levels(program.id, filtered_levels)
+            program_name, start_date=future_start_date, end_date=future_end_date,)
         indicator_factory = IndicatorFactory(program, tolaland)
         indicator_factory.create_standard_indicators()
 
-
-        # Create program with lots of indicators
-        program = program_factory.create_program('QA program -- I Love Indicators So Much')
-        print('Creating program with many indicators')
-        # self.create_levels(program.id, filtered_levels)
+        program_name = 'QA program -- I Love Indicators So Much'
+        print(f'Creating {program_name}')
+        program = program_factory.create_program(program_name)
         indicator_factory = IndicatorFactory(program, tolaland)
         indicator_factory.create_standard_indicators()
         indicator_factory.create_standard_indicators(indicator_suffix='moar1')
@@ -219,23 +156,19 @@ class Command(BaseCommand):
         indicator_factory.create_standard_indicators(indicator_suffix='moar2')
         indicator_factory.create_standard_indicators(indicator_suffix='moar3')
 
-        print('Creating pre-satsuma program')
-        program = program_factory.create_program('QA program --- Pre-Satsuma', post_satsuma=False)
-        # self.create_levels(program.id, filtered_levels)
+        program_name = 'QA program --- Pre-Satsuma'
+        print(f'Creating {program_name}')
+        program = program_factory.create_program(program_name, post_satsuma=False)
         indicator_factory = IndicatorFactory(program, tolaland)
         indicator_factory.create_standard_indicators(apply_skips=False, apply_rf_skips=True)
 
-        # print('Creating program with no skips')
-        # program = self.create_program(
-        #     main_start_date, main_end_date, country, 'QA Program --- All the things! (no skipped values)')
-        # self.create_levels(program.id, filtered_levels)
-
-
         # Create programs with various levels of no data indicators
-        print('Creating null program with no indicators')
+        program_name = 'QA program --- No Indicators Here'
+        print(f'Creating {program_name}')
         program_factory.create_program('QA program --- No Indicators Here')
 
-        print('Creating null program with no targets')
+        program_name = 'QA program --- No Targets Here'
+        print(f'Creating {program_name}')
         program = program_factory.create_program('QA program --- No Targets Here')
         indicator_factory = IndicatorFactory(program, tolaland)
         indicator_params = deepcopy(indicator_factory.standard_params_base)
@@ -245,47 +178,33 @@ class Command(BaseCommand):
             print(fail_message)
             program.delete()
         else:
-            # self.create_levels(program.id, filtered_levels)
             indicator_factory.create_indicators(indicator_params)
 
-        print('Creating null program with no results')
-        program = program_factory.create_program('QA program --- No Results Here')
+        program_name = 'QA program --- No Results Here'
+        print(f'Creating {program_name}')
+        program = program_factory.create_program(program_name)
         indicator_factory = IndicatorFactory(program, tolaland)
         indicator_params = deepcopy(indicator_factory.standard_params_base)
         long_null_levels = ['results'] * len(indicator_params)
-        # program = program_factory.create_program(main_start_date, main_end_date, country, 'QA program --- No Results Here')
         fail_message = self.set_null_levels(indicator_params, long_null_levels, program.name)
         if fail_message:
             print(fail_message)
             program.delete()
         else:
-            # self.create_levels(program.id, filtered_levels)
             indicator_factory.create_indicators(indicator_params)
 
-        print('Creating null program with no evidence')
-        program = program_factory.create_program('QA program --- No Evidence Here')
+        program_name = 'QA program --- No Evidence Here'
+        print(f'Creating {program_name}')
+        program = program_factory.create_program(program_name)
         indicator_factory = IndicatorFactory(program, tolaland)
         indicator_params = deepcopy(indicator_factory.standard_params_base)
         long_null_levels = ['evidence'] * len(indicator_params)
-        # program = program_factory.create_program(main_start_date, main_end_date, country, 'QA Program --- No Evidence Here')
         fail_message = self.set_null_levels(indicator_params, long_null_levels, program.name)
         if fail_message:
             print(fail_message)
             program.delete()
         else:
-            # self.create_levels(program.id, filtered_levels)
             indicator_factory.create_indicators(indicator_params)
-
-        # short_null_levels = [
-        #     None, None, 'results', 'targets', None, 'results', 'evidence', 'evidence', 'targets', None
-        # ]
-
-
-        # Create test users and assign broad permissions to superusers.
-        # self.create_test_users(password)
-
-        # password = getpass(prompt="Enter the password to use for the test users: ")
-        # self.create_test_users(password)
 
     @staticmethod
     def create_disaggregations(country):
@@ -316,22 +235,6 @@ class Command(BaseCommand):
         return [disagg_1, disagg_2]
 
     @staticmethod
-    def create_program(start_date, end_date, country, name, post_satsuma=True, multi_country=False):
-        program = Program.objects.create(**{
-            'name': name,
-            'reporting_period_start': start_date,
-            'reporting_period_end': end_date,
-            'funding_status': 'Funded',
-            'gaitid': 'fake_gait_id_{}'.format(random.randint(1, 9999)),
-            '_using_results_framework': Program.RF_ALWAYS if post_satsuma else Program.NOT_MIGRATED,
-        })
-        program.country.add(country)
-        if multi_country:
-            country2 = Country.objects.get(country="United States")
-            program.country.add(country2)
-        return program
-
-    @staticmethod
     def set_null_levels(param_base, null_levels, program_name):
         if len(param_base) != len(null_levels):
             return 'Could not create {}.  Null level array length did not match indicator count'.format(program_name)
@@ -340,64 +243,7 @@ class Command(BaseCommand):
         return False
 
     @staticmethod
-    def create_levels(program_id, level_data):
-        fixture_data = deepcopy(level_data)
-        tier_labels = LevelTier.get_templates()['mc_standard']['tiers']
-        for i, tier in enumerate(tier_labels):
-            t = LevelTier(name=tier, tier_depth=i+1, program_id=program_id)
-            t.save()
-
-        level_map = {}
-        for level_fix in fixture_data:
-            parent = None
-            if 'parent_id' in level_fix['fields']:
-                parent = level_map[level_fix['fields'].pop('parent_id')]
-
-            level = Level(**level_fix['fields'])
-            level.parent = parent
-            level.program = Program.objects.get(id=program_id)
-            level.save()
-            level_map[level_fix['pk']] = level
-
-    def clean_test_users(self):
-        for username in user_profiles.keys():
-            auth_user = User.objects.filter(username=username)
-            if auth_user.count() == 1:
-                tola_user = TolaUser.objects.filter(user=auth_user[0])
-                auth_user[0].delete()
-            else:
-                print("This auth user doesn't exist: {}".format(username))
-                continue
-
-            if tola_user.count() == 1:
-                tola_user[0].delete()
-
-    @staticmethod
-    def clean_tolaland():
-        try:
-            country = Country.objects.get(country='Tolaland')
-            disaggregations = DisaggregationType.objects.filter(country=country)
-            disaggregations.delete()
-            country.delete()
-        except Country.DoesNotExist:
-            pass
-
-    @staticmethod
-    def clean_programs():
-        programs = Program.objects.filter(name__contains='QA program -')
-        if programs.count() > 0:
-            print("Delete these programs?\n{}".format('\n'.join(p.name for p in programs)))
-            confirm = input('[yes/no]: ')
-            if confirm == 'yes':
-                for program in programs:
-                    print('Deleting program: {}'.format(program))
-                    for indicator in program.indicator_set.all():
-                        indicator.delete()
-                    program.delete()
-            else:
-                print('\nPrograms not deleted')
-
-    def create_test_users(self, password):
+    def create_test_users(password):
         created_users = []
         existing_users = []
         for username, profile in user_profiles.items():
@@ -439,7 +285,7 @@ class Command(BaseCommand):
             # country as such.  If the user isn't part of MC org, you have to do it on a program by program basis.
             for accessible_country in accessible_countries:
                 if tola_user.organization.name == 'Mercy Corps':
-                    ca, created = CountryAccess.objects.get_or_create(
+                    CountryAccess.objects.get_or_create(
                         tolauser=tola_user, country=accessible_country, defaults={"role": 'user'})
 
                 # Need to also do program by program for MC members if the permission level is high because
@@ -560,4 +406,3 @@ class Command(BaseCommand):
                     self.generate_levels(
                         nl, program, max_depth=max_depth, children_per_node=children_per_node,
                         childless_nodes=childless_nodes, cycle_start=cycle_start)
-

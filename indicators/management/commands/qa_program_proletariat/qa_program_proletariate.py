@@ -26,22 +26,18 @@ from workflow.models import Program, Country, Organization, TolaUser, SiteProfil
 from indicators.views.views_indicators import generate_periodic_targets
 
 
-class ProgramFactory():
+class ProgramFactory:
     with open(os.path.join(settings.SITE_ROOT, 'fixtures/sample_levels.json'), 'r') as fh:
         sample_levels = json.loads(fh.read())
 
     def __init__(self, country):
         self.country = country
         self.org = Organization.objects.get(id=1)
-        self.country, created = Country.objects.get_or_create(
-            country='Tolaland', defaults={
-                'latitude': 21.4, 'longitude': -158, 'zoom': 6, 'organization': self.org, 'code': 'TO'})
-        if created:
-            self.create_disaggregations(self.country)
         self.default_start_date = (date.today() + relativedelta(months=-18)).replace(day=1)
         self.default_end_date = (self.default_start_date + relativedelta(months=+32)).replace(day=1) - timedelta(days=1)
 
-    def create_program(self, name, start_date=False, end_date=False, post_satsuma=True, multi_country=False, create_levels=True):
+    def create_program(
+            self, name, start_date=False, end_date=False, post_satsuma=True, multi_country=False, create_levels=True):
         if not start_date:
             start_date = self.default_start_date
         if not end_date:
@@ -85,38 +81,8 @@ class ProgramFactory():
             level.save()
             level_map[level_fix['pk']] = level
 
-    @staticmethod
-    def create_disaggregations(country):
-        disagg_1, created = DisaggregationType.objects.get_or_create(
-            disaggregation_type="A 3-category disaggregation",
-            country=country
-        )
-        if created:
-            disagg_1.save()
-            for c, label in enumerate(['Category 1', 'Category 2', 'Category 3']):
-                category = DisaggregationLabel(
-                    disaggregation_type=disagg_1,
-                    label=label,
-                    customsort=c + 1
-                )
-                category.save()
 
-        disagg_2, created = DisaggregationType.objects.get_or_create(
-            disaggregation_type="A 2-category disaggregation",
-            country=country,
-        )
-        if created:
-            for c, label in enumerate(['Cåtégøry 1', 'Category 2']):
-                category = DisaggregationLabel(
-                    disaggregation_type=disagg_2,
-                    label=label,
-                    customsort=c + 1
-                )
-                category.save()
-        return [disagg_1, disagg_2]
-
-
-class IndicatorFactory():
+class IndicatorFactory:
     standard_params_base = []
     for freq in Indicator.TARGET_FREQUENCIES:
         for uom_type in (Indicator.NUMBER, Indicator.PERCENTAGE):
@@ -167,6 +133,9 @@ class IndicatorFactory():
     def __init__(self, program, country):
         self.program = program
         self.country = country
+        self.sadd_disagg_obj = DisaggregationType.objects.get(
+            pk=109, disaggregation_type="Sex and Age Disaggregated Data (SADD)")
+        self.sadd_disagg_labels = self.sadd_disagg_obj.disaggregationlabel_set.all()
 
     def create_standard_indicators(self, **kwargs):
         indicator_ids = self.create_indicators(self.standard_params_base, **kwargs)
@@ -208,8 +177,16 @@ class IndicatorFactory():
         extra_result_cycle = cycle([True, False, False, True, False, False, False])
         evidence_skip_cycle = cycle([False, False, True, False, False, False, False])
 
+        # Determines how many country disaggs an indicator will have assigned to it
         country_disagg_cycle = cycle([0, 1, 2])
+
+        # Determins whether the country level SADD disagg will be assigned to an indicator
         sadd_disagg_cycle = cycle([True, True, True, False])
+
+        # Regardless of what disaggs an indicator has assigned, this controls how many disaggas actually get
+        # used by a result.  That way, there are potentially some results that don't have disagg values
+        # even though the indicator has been assigned a particular disagg type.  one and two
+        # indicate that one or two disagg types should be used but not the SADD type.
         result_disagg_cycle = cycle(['sadd', 'one', 'two', 'none', 'all', 'all', 'all', 'none'])
 
         for n, params in enumerate(param_sets):
@@ -218,24 +195,26 @@ class IndicatorFactory():
             else:
                 cumulative_text = 'Non-cumulative'
 
-            country_disagg_count = next(country_disagg_cycle)
+            indicator_disagg_count = next(country_disagg_cycle)
             sadd_disagg_flag = next(sadd_disagg_cycle)
-            result_disagg = next(result_disagg_cycle)
+            result_disagg_type = next(result_disagg_cycle)
 
             indicator_name_list = [
                 self.frequency_labels[params['freq']],
                 self.uom_labels[params['uom_type']],
                 cumulative_text,
                 self.direction_labels[params['direction']],
-                f"Disagg type - SADD:{sadd_disagg_flag}, Country:{country_disagg_count}",
+                f"Disagg type - SADD:{sadd_disagg_flag}, Country:{indicator_disagg_count}",
 
             ]
             if params['null_level']:
                 indicator_name_list.append(f"| No {params['null_level']}")
             else:
                 result_text_list = []
-                result_text_list.append(f"SADD:{result_disagg in ('all', 'sadd')}") if sadd_disagg_flag else None
-                result_text_list.append(f"Country:{result_disagg in ('one', 'two', 'all')}") if country_disagg_count > 0 else None
+                result_text_list.append(f"SADD:{result_disagg_type in ('all', 'sadd')}") if sadd_disagg_flag else None
+                result_text_list.append(
+                    f"Country:{result_disagg_type in ('one', 'two', 'all')}"
+                ) if indicator_disagg_count > 0 else None
                 if len(result_text_list) > 0:
                     result_text = ", ".join(result_text_list)
                 else:
@@ -265,8 +244,12 @@ class IndicatorFactory():
             )
             indicator.save()
 
-            for disagg in self.country.disaggregationtype_set.all().order_by('?')[:country_disagg_count]:
+            country_assigned_disagg_labelsets = []
+            for disagg in self.country.disaggregationtype_set.order_by('?').all()[:indicator_disagg_count]:
                 indicator.disaggregation.add(disagg)
+                country_assigned_disagg_labelsets.append(list(disagg.disaggregationlabel_set.all()))
+            if sadd_disagg_flag:
+                indicator.disaggregation.add(self.sadd_disagg_obj)
 
             i_type = next(type_cycle)
             if personal_indicator and i_type:
@@ -287,9 +270,7 @@ class IndicatorFactory():
 
             lop_target = 0
 
-
             for i, pt in enumerate(periodic_targets):
-                # Create the target amount (the PeriodicTarget object has already been created)
                 pt.target = incrementors['target_start'] + incrementors['target_increment'] * i
                 pt.save()
                 if params['is_cumulative']:
@@ -301,8 +282,9 @@ class IndicatorFactory():
             indicator.save()
 
             result_factory = ResultFactory(
-                indicator, self.program, sadd_disagg_flag, result_disagg, params['uom_type'], params['null_level'],
-                site_cycle, personal_indicator, apply_skips)
+                indicator, self.program, country_assigned_disagg_labelsets, self.sadd_disagg_labels,
+                result_disagg_type, params['uom_type'], params['null_level'], site_cycle, personal_indicator,
+                apply_skips)
             result_factory.make_results(
                 periodic_targets, incrementors, evidence_skip_cycle, result_skip_cycle, extra_result_cycle)
 
@@ -395,21 +377,15 @@ class IndicatorFactory():
             "achieved_start": achieved_start, "achieved_increment": achieved_increment}
 
 
-class ResultFactory():
-    try:
-        sadd_disagg_obj = DisaggregationType.objects.get(pk=109)
-    except DisaggregationType.DoesNotExist:
-        sadd_disagg_obj = False
+class ResultFactory:
 
     def __init__(
-            self, indicator, program, sadd_disagg_flag, result_disagg, uom_type, null_level,
-            site_cycle, personal_indicator, apply_skips):
-        self.indicator = indicator
-        self.sadd_disagg_flag = sadd_disagg_flag
-        if self.sadd_disagg_obj and sadd_disagg_flag:
-            indicator.disaggregation.add(self.sadd_disagg_obj)
+            self, indicator, program, country_assigned_disagg_labelsets, sadd_disagg_labels, result_disagg,
+            uom_type, null_level, site_cycle, personal_indicator, apply_skips):
         self.program = program
-
+        self.indicator = indicator
+        self.sadd_disagg_labels = sadd_disagg_labels
+        self.indicator_disagg_labelsets = country_assigned_disagg_labelsets
         self.result_disagg = result_disagg
         self.uom_type = uom_type
         self.null_level = null_level
@@ -429,8 +405,7 @@ class ResultFactory():
             # the number of results has reached the arbitrary skip point.
             result_skip = next(result_skip_cycle)
             extra_result = next(extra_result_cycle)
-            if (self.apply_skips and result_skip) or \
-                self.null_level == 'results':
+            if (self.apply_skips and result_skip) or self.null_level == 'results':
                 continue
 
             achieved_value = incrementors['achieved_start'] + (incrementors['achieved_increment'] * i)
@@ -477,31 +452,29 @@ class ResultFactory():
                 rs.evidence_url = 'https://www.pinterest.ca/search/pins/?q=cute%20animals'
 
                 r_site = next(self.site_cycle)
+                # TODO: remove personal indicator?
                 if self.personal_indicator and r_site:
                     rs.site.add(r_site)
 
                 rs.save()
 
-    @classmethod
     def disaggregate_result(self, result, result_disagg_type, indicator):
-
         label_sets = []
-        if result_disagg_type == 'sadd' and self.sadd_disagg_obj:
-            label_sets.append(list(DisaggregationLabel.objects.filter(disaggregation_type=self.sadd_disagg_obj)))
-        elif result_disagg_type == 'one' and indicator.disaggregation.all().count() > 1:
-            disagg_type = DisaggregationType.objects\
-                .filter(indicator=indicator)\
-                .exclude(pk=self.sadd_disagg_obj.pk)\
-                .order_by('?')\
-                .first()
-            label_sets.append(list(DisaggregationLabel.objects.filter(disaggregation_type=disagg_type)))
+        if result_disagg_type == 'sadd':
+            label_sets.append(self.sadd_disagg_labels)
+        elif result_disagg_type == 'one' and len(self.indicator_disagg_labelsets) > 1:
+            try:
+                label_sets.append(random.choice(self.indicator_disagg_labelsets))
+            except ValueError:
+                pass
         elif result_disagg_type == 'two' and indicator.disaggregation.all().count() > 1:
-            disagg_types = DisaggregationType.objects.filter(indicator=indicator).exclude(pk=self.sadd_disagg_obj.pk)
-            for disagg_type in disagg_types:
-                label_sets.append(list(DisaggregationLabel.objects.filter(disaggregation_type=disagg_type)))
+            try:
+                label_sets.extend(random.sample(self.indicator_disagg_labelsets, k=2))
+            except ValueError:
+                label_sets.extend(self.indicator_disagg_labelsets)
         elif result_disagg_type == 'all':
-            for disagg_type in indicator.disaggregation.all():
-                label_sets.append(list(DisaggregationLabel.objects.filter(disaggregation_type=disagg_type)))
+            label_sets.append(self.sadd_disagg_labels)
+            label_sets.extend(self.indicator_disagg_labelsets)
 
         if len(label_sets) < 1:
             return
@@ -510,11 +483,12 @@ class ResultFactory():
             k = random.randrange(1, len(label_set) + 1)
             label_indexes = random.sample(list(range(len(label_set))), k)
             values = self.make_random_disagg_values(result.achieved, len(label_indexes))
+            value_objects = []
             for label_index, value in zip(label_indexes, values):
                 label = label_set[label_index]
-                DisaggregatedValue.objects.create(category_id=label.pk, value=value, result=result)
+                value_objects.append(DisaggregatedValue(category=label, value=value, result=result))
 
-
+            DisaggregatedValue.objects.bulk_create(value_objects)
 
     @staticmethod
     def make_random_disagg_values(aggregate_value, total_slot_count):
@@ -548,7 +522,7 @@ class ResultFactory():
         return filled
 
 
-class Cleaner():
+class Cleaner:
 
     @classmethod
     def clean(cls, *args):
@@ -564,7 +538,6 @@ class Cleaner():
                 cls.clean_programs()
             if 'clean_test_users' in args:
                 cls.clean_test_users()
-
 
     @staticmethod
     def clean_test_users():
