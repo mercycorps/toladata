@@ -240,6 +240,11 @@ class IndicatorFactory:
                 old_level=None if self.program.results_framework else next(old_level_cycle),
                 level=next(rf_level_cycle),
                 sector=None if not personal_indicator else next(sector_cycle),
+                baseline_na=False,
+                definition="",
+                means_of_verification="",
+                data_collection_method="",
+                method_of_analysis=""
             )
             indicator.save()
 
@@ -461,7 +466,7 @@ class ResultFactory:
         label_sets = []
         if result_disagg_type == 'sadd':
             label_sets.append(self.sadd_disagg_labels)
-        elif result_disagg_type == 'one' and len(self.indicator_disagg_labelsets) > 0 :
+        elif result_disagg_type == 'one' and len(self.indicator_disagg_labelsets) > 0:
             try:
                 label_sets.append(random.choice(self.indicator_disagg_labelsets))
             except ValueError:

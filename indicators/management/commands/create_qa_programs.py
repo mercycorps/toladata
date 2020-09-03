@@ -77,14 +77,14 @@ class Command(BaseCommand):
         else:
             tester_names = ['Barbara', 'Cameron', 'Carly', 'Jenny', 'Marie', 'Marco', 'PaQ', 'Paul', 'Sanjuro']
         for t_name in tester_names:
-            program_name = 'QA Program - {}'.format(t_name)
+            program_name = 'QA program - {}'.format(t_name)
             print(f'Creating {program_name}')
             program = program_factory.create_program(program_name)
             indicator_factory = IndicatorFactory(program, tolaland)
             indicator_factory.create_standard_indicators(personal_indicator=True)
 
         if options['named_only']:
-            sys.exit()
+            return
 
         program_name = 'QA program -- Multi-country Program'
         print(f'Creating {program_name}')
@@ -161,19 +161,6 @@ class Command(BaseCommand):
         program_name = 'QA program --- No Indicators Here'
         print(f'Creating {program_name}')
         program_factory.create_program('QA program --- No Indicators Here')
-
-        program_name = 'QA program --- No Targets Here'
-        print(f'Creating {program_name}')
-        program = program_factory.create_program('QA program --- No Targets Here')
-        indicator_factory = IndicatorFactory(program, tolaland)
-        indicator_params = deepcopy(indicator_factory.standard_params_base)
-        long_null_levels = ['targets'] * len(indicator_params)
-        fail_message = self.set_null_levels(indicator_params, long_null_levels, program.name)
-        if fail_message:
-            print(fail_message)
-            program.delete()
-        else:
-            indicator_factory.create_indicators(indicator_params)
 
         program_name = 'QA program --- No Results Here'
         print(f'Creating {program_name}')
