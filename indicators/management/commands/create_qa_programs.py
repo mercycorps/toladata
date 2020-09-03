@@ -39,9 +39,6 @@ class Command(BaseCommand):
         parser.add_argument('--create_test_users', action='store_true')
         parser.add_argument('--names')
         parser.add_argument('--named_only', action='store_true')
-        parser.add_argument('--levelicious_only', action='store_true')
-        parser.add_argument('--children_per_node', type=int, default=3)
-        parser.add_argument('--childless_nodes', type=int, default=2)
 
     def handle(self, *args, **options):
         # ***********
@@ -105,9 +102,7 @@ class Command(BaseCommand):
             LevelTier.objects.create(program=program, name=tier_name, tier_depth=tier_number + 1)
             template_names.append(tier_name)
         LevelTierTemplate.objects.create(program=program, names=(','.join(template_names)))
-        self.generate_levels(
-            None, program, LevelTier.MAX_TIERS, children_per_node=options['children_per_node'],
-            childless_nodes=options['childless_nodes'])
+        self.generate_levels(None, program, LevelTier.MAX_TIERS)
         generated_levels = Level.objects.filter(program=program).order_by('id')
 
         # Select top level and a couple of other levels to have no indicators.  They should be levels with child
