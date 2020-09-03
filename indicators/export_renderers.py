@@ -107,7 +107,13 @@ class ExcelRendererBase:
                 level_row = next(level_rows)
             except StopIteration:
                 self.set_column_widths(sheet)
+                self.add_explainer_row(sheet)
                 return sheet
+
+    def add_explainer_row(self, sheet):
+        sheet.append([None, None,
+                      # Translators: Explanation at the bottom of a report (as a footnote) about value rounding
+                      ugettext("*All values in this report are rounded to two decimal places.")])
 
     def add_headers(self, sheet):
         current_row = 1
@@ -127,14 +133,14 @@ class ExcelRendererBase:
             cell.value = str(header)
             cell.style = 'header'
             current_column += 1
-        current_column = self.add_period_header(sheet, current_column, self.serializer['lop_period'])
+        current_column = self.add_period_header(sheet, current_column, self.serializer['lop_period'], lop=True)
         for period in self.serializer['periods'][self.frequency]:
             current_column = self.add_period_header(
                 sheet, current_column, period
             )
 
     @staticmethod
-    def add_period_header(sheet, col, period):
+    def add_period_header(sheet, col, period, lop=False):
         for header, row in [
                 (period.header, 2),
                 (period.subheader, 3)
@@ -143,6 +149,8 @@ class ExcelRendererBase:
                 if period.tva:
                     sheet.merge_cells(start_row=row, start_column=col, end_row=row, end_column=col+2)
                 cell = sheet.cell(row=row, column=col)
+                if lop:
+                    header = str(header) + "*"
                 cell.value = str(header)
                 cell.style = 'sub_header'
         columns = [

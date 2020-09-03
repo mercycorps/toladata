@@ -2,7 +2,7 @@ import itertools
 import datetime
 import operator
 from django import test
-from django.utils import translation
+from django.utils import translation, formats
 from factories.indicators_models import RFIndicatorFactory
 from factories.workflow_models import RFProgramFactory, SiteProfileFactory
 from indicators.models import Indicator
@@ -12,7 +12,7 @@ from workflow.serializers_new import (
     ProgramPageIndicatorUpdateSerializer,
 )
 
-PROGRAM_PAGE_QUERIES = 4
+PROGRAM_PAGE_QUERIES = 7
 PROGRAM_PAGE_UPDATE_QUERIES = PROGRAM_PAGE_QUERIES + 1
 
 ENGLISH = 1
@@ -46,13 +46,16 @@ ACTIVITY = {
 }
 
 class TestProgramPageProgramSerializer(test.TestCase):
-    def get_serialized_data(self, program_pk):
+    def get_serialized_data(self, program_pk, query_count=False):
+        if not query_count:
+            return ProgramPageProgramSerializer.load_for_pk(program_pk).data
         with self.assertNumQueries(PROGRAM_PAGE_QUERIES):
             return ProgramPageProgramSerializer.load_for_pk(program_pk).data
 
     def get_program_data(self, **kwargs):
+        query_count = kwargs.pop('query_count', False)
         program = RFProgramFactory(**kwargs)
-        return self.get_serialized_data(program.pk)
+        return self.get_serialized_data(program.pk, query_count=query_count)
 
     def test_needs_additional_target_periods_false(self):
         p = RFProgramFactory()
@@ -142,7 +145,7 @@ class TestProgramPageProgramSerializer(test.TestCase):
             RFIndicatorFactory(
                 program=p, target_frequency=frequency, targets=100
             )
-        data = self.get_serialized_data(p.pk)
+        data = self.get_serialized_data(p.pk, query_count=True)
         tp_data = data['target_period_info']
         self.assertTrue(tp_data['lop'])
         self.assertTrue(tp_data['midend'])
@@ -187,29 +190,27 @@ class TestProgramPageProgramSerializer(test.TestCase):
             1
         ) - datetime.timedelta(days=1)
         tp_data = data['target_period_info']
+        date_format = lambda date_obj: formats.date_format(date_obj, "MEDIUM_DATE_FORMAT")
         self.assertFalse(tp_data['lop'])
         self.assertFalse(tp_data['midend'])
         self.assertFalse(tp_data['event'])
         self.assertTrue(tp_data['time_targets'])
-        self.assertEqual(tp_data['annual'], annual.isoformat())
-        self.assertEqual(tp_data['semi_annual'], semi_annual.isoformat())
-        self.assertEqual(tp_data['tri_annual'], tri_annual.isoformat())
-        self.assertEqual(tp_data['quarterly'], quarterly.isoformat())
-        self.assertEqual(tp_data['monthly'], monthly.isoformat())
+        self.assertEqual(tp_data['annual'], date_format(annual))
+        self.assertEqual(tp_data['semi_annual'], date_format(semi_annual))
+        self.assertEqual(tp_data['tri_annual'], date_format(tri_annual))
+        self.assertEqual(tp_data['quarterly'], date_format(quarterly))
+        self.assertEqual(tp_data['monthly'], date_format(monthly))
 
 
 class TestProgramPageSerializersFunctional(test.TestCase):
     def get_serialized_data(self, program_pk):
-        with self.assertNumQueries(PROGRAM_PAGE_QUERIES):
-            return ProgramPageProgramSerializer.load_for_pk(program_pk).data
+        return ProgramPageProgramSerializer.load_for_pk(program_pk).data
 
     def get_ordering_update_serialized_data(self, program_pk):
-        with self.assertNumQueries(PROGRAM_PAGE_QUERIES):
-            return ProgramPageIndicatorUpdateSerializer.load_for_pk(program_pk).data
+        return ProgramPageIndicatorUpdateSerializer.load_for_pk(program_pk).data
 
     def get_update_indicator_data(self, program_pk, indicator_pk):
-        with self.assertNumQueries(PROGRAM_PAGE_UPDATE_QUERIES):
-            return ProgramPageIndicatorUpdateSerializer.load_for_indicator_and_program(indicator_pk, program_pk).data
+        return ProgramPageIndicatorUpdateSerializer.load_for_indicator_and_program(indicator_pk, program_pk).data
 
     def test_rf_program_two_indicators(self):
         p = RFProgramFactory(

@@ -13,15 +13,15 @@
         {# Translators: Given a list of periods spanning months or years, indicates the period with and end date closest to the current date  #}
         <br><br><strong>{% trans "Last completed target period" %}</strong>
         {# Translators:  label for the date of the last completed Annual target period. #}
-        {% if tp_info.annual %}<br>{% trans "Annual" %}: {{ tp_info.annual|date:"MEDIUM_DATE_FORMAT" }}{% endif %}
+        {% if tp_info.annual %}<br>{% trans "Annual" %}: {{ tp_info.annual }}{% endif %}
         {# Translators:  label for the date of the last completed Semi-Annual target period. #}
-        {% if tp_info.semi_annual %}<br>{% trans "Semi-Annual" %}: {{ tp_info.semi_annual|date:"MEDIUM_DATE_FORMAT" }}{% endif %}
+        {% if tp_info.semi_annual %}<br>{% trans "Semi-Annual" %}: {{ tp_info.semi_annual }}{% endif %}
         {# Translators:  label for the date of the last completed Tri-Annual target period. #}
-        {% if tp_info.tri_annual %}<br>{% trans "Tri-Annual" %}: {{ tp_info.tri_annual|date:"MEDIUM_DATE_FORMAT" }}{% endif %}
+        {% if tp_info.tri_annual %}<br>{% trans "Tri-Annual" %}: {{ tp_info.tri_annual }}{% endif %}
         {# Translators:  label for the date of the last completed Quarterly target period. #}
-        {% if tp_info.quarterly %}<br>{% trans "Quarterly" %}: {{ tp_info.quarterly|date:"MEDIUM_DATE_FORMAT" }}{% endif %}
+        {% if tp_info.quarterly %}<br>{% trans "Quarterly" %}: {{ tp_info.quarterly }}{% endif %}
         {# Translators:  label for the date of the last completed Monthly target period. #}
-        {% if tp_info.monthly %}<br>{% trans "Monthly" %}: {{ tp_info.monthly|date:"MEDIUM_DATE_FORMAT" }}{% endif %}
+        {% if tp_info.monthly %}<br>{% trans "Monthly" %}: {{ tp_info.monthly }}{% endif %}
     {% endif %}
     {% if tp_info.lop or tp_info.event or tp_info.midend %}<br><br>{% endif %}
     {# Translators: Explains why some target periods are not included in a certain calculation #}

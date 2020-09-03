@@ -54,18 +54,15 @@ eventBus.on('apply-gauge-tank-filter', indicatorFilter => {
 // clear all gas tank and indicator select filters
 eventBus.on('clear-all-indicator-filters', () => {
     uiStore.clearIndicatorFilter();
-    rootStore.program.deleteAllResultsHTML();
+    rootStore.program.collapseAll();
 });
 
 // filter down by selecting individual indicator
 eventBus.on('select-indicator-to-filter', (selectedIndicatorPk) => {
-    console.log("select indicator filter");
     // clear gauge tank filters
     uiStore.clearIndicatorFilter();
 
     uiStore.setSelectedIndicatorId(selectedIndicatorPk);
-    // Open up results pane as well
-    rootStore.program.updateResultsHTML(selectedIndicatorPk);    
 });
 
 
@@ -124,9 +121,7 @@ $('#indicator_modal_div').on('updated.tola.indicator.save', (e, params) => {
     let indicatorId = parseInt(params.indicatorId);
 
     rootStore.program.updateIndicator(indicatorId);
-    if (rootStore.program.resultsMap.has(indicatorId)) {
-        rootStore.program.updateResultsHTML(indicatorId);
-    }
+
 });
 
 // when indicator is deleted from modal
@@ -141,7 +136,6 @@ $('#indicator_results_div').on('hidden.bs.modal', function (e) {
     if (recordchanged === true) {
         let indicatorPk = parseInt($(this).find('form #id_indicator').val());
         rootStore.program.updateIndicator(indicatorPk);
-        rootStore.program.updateResultsHTML(indicatorPk);
     }
 });
 

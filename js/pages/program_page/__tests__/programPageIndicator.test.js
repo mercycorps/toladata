@@ -69,23 +69,116 @@ describe("full program page indicator", () => {
     const Indicator = ProgramPageIndicator;
     let data = {
         pk: 23,
+        target_frequency: 3,
         name: "Test name",
         number: "Output 1.1a",
         is_percent: false,
+        is_cumulative: false,
         baseline: "444",
         is_reporting: true,
-        over_under: 0
+        over_under: 0,
+        lop_target: 64,
+        lop_actual: 42,
+        lop_met: 0.65625,
+        lop_target_progress: 15.5,
+        lop_actual_progress: 31,
+        lop_met_progress: 2,
+        reporting_period: "Jan 1, 2019 – Dec 31, 2019",
+        periodic_targets: [
+            {
+                period_name: "Year 1",
+                date_range: "Jan 1, 2019 – Dec 31, 2019",
+                completed: true,
+                most_recently_completed: true,
+                target: 15.5,
+                actual: 31,
+                percent_met: 2,
+                results: [
+                    {
+                        pk: 101,
+                        date_collected: "Feb 21, 2019",
+                        achieved: 25,
+                        evidence_url: "https://www.example.com/101/",
+                        record_name: null
+                    }, {
+                        pk: 131,
+                        date_collected: "Mar 2, 2019",
+                        achieved: 6,
+                        evidence_url: null,
+                        record_name: null
+                    }
+                ]
+            }, {
+                period_name: "Year 2",
+                date_range: "Jan 1, 2020 – Dec 31, 2020",
+                completed: false,
+                most_recently_completed: false,
+                target: 48.5,
+                actual: 11,
+                percent_met: 0.226804124,
+                results: [
+                    {
+                        pk: 121,
+                        date_collected: "Mar 1, 2020",
+                        achieved: 11,
+                        evidence_url: "https://www.example.com/121/",
+                        record_name: "A record name"
+                    }
+                ]
+            }
+        ],
+        no_target_results: [
+            {
+                pk: 114,
+                date_collected: "Jan 14, 2018",
+                achieved: 5,
+                evidence_url: null,
+                record_name: null
+            }
+        ]
     };
     it("handles values from different elements", () => {
         let indicator = Indicator(data);
         expect(indicator.pk).toBe(23);
+        expect(indicator.frequency).toBe(3);
         expect(indicator.name).toBe("Test name");
         expect(indicator.number).toBe("Output 1.1a");
         expect(indicator.isPercent).toBe(false);
+        expect(indicator.isCumulative).toBe(false);
         expect(indicator.baseline).toBe('444');
         expect(indicator.isReporting).toBeTruthy();
         expect(indicator.aboveTarget).toBe(false);
         expect(indicator.inScope).toBe(true);
+        expect(indicator.lopTarget).toBe(64);
+        expect(indicator.lopActual).toBe(42);
+        expect(indicator.lopMet).toBe(0.65625);
+        expect(indicator.lopTargetProgress).toBe(15.5);
+        expect(indicator.lopActualProgress).toBe(31);
+        expect(indicator.lopMetProgress).toBe(2);
+        expect(indicator.reportingPeriod).toBe("Jan 1, 2019 – Dec 31, 2019");
+        expect(indicator.periodicTargets.length).toBe(2);
+        let target = indicator.periodicTargets[0];
+        expect(target.periodName).toBe("Year 1");
+        expect(target.dateRange).toBe("Jan 1, 2019 – Dec 31, 2019");
+        expect(target.completed).toBeTruthy();
+        expect(target.mostRecentlyCompleted).toBeTruthy();
+        expect(target.target).toBe(15.5);
+        expect(target.actual).toBe(31);
+        expect(target.percentMet).toBe(2);
+        expect(target.results.length).toBe(2);
+        let result = target.results[0];
+        expect(result.pk).toBe(101);
+        expect(result.dateCollected).toBe("Feb 21, 2019");
+        expect(result.achieved).toBe(25);
+        expect(result.evidenceUrl).toBe("https://www.example.com/101/");
+        expect(result.recordName).toBeFalsy();
+        expect(indicator.noTargetResults.length).toBe(1);
+        result = indicator.noTargetResults[0];
+        expect(result.pk).toBe(114);
+        expect(result.dateCollected).toBe("Jan 14, 2018");
+        expect(result.achieved).toBe(5);
+        expect(result.evidenceUrl).toBeFalsy();
+        expect(result.recordName).toBeFalsy();
     });
     it("handles updates", () => {
         let indicator = Indicator(data);
@@ -93,4 +186,5 @@ describe("full program page indicator", () => {
         indicator.updateData({pk: 23, number: "Output 1.1b"});
         expect(indicator.number).toBe("Output 1.1b");
     });
+    
 })

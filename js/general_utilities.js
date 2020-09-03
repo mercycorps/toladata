@@ -1,3 +1,7 @@
+const SPANISH = 'es';
+const FRENCH = 'fr';
+const ENGLISH = 'en';
+
 function flattenArray(arr, depth = 1) {
     if (depth == 5) {
         return arr;
@@ -83,4 +87,52 @@ const indicatorManualNumberSort = (levelFunc, numberFunc) => {
     }
 }
 
-export { flattenArray, ensureNumericArray, reloadPageIfCached, indicatorManualNumberSort };
+const localizeNumber = (val) => {
+    if (val === undefined || val === null || isNaN(parseFloat(val))) {
+        return null;
+    }
+    var intPart = val.toString();
+    var floatPart = null;
+    if (val.toString().includes(",")) {
+        intPart = val.toString().split(",")[0];
+        floatPart = val.toString().split(",").length > 1 ? val.toString().split(",")[1 ] : null;
+    } else if (val.toString().includes(".")) {
+        intPart = val.toString().split(".")[0];
+        floatPart = val.toString().split(".").length > 1 ? val.toString().split(".")[1 ] : null;
+    }
+    floatPart = (floatPart && floatPart.length > 0) ? floatPart : null;
+    var displayValue;
+    switch(window.userLang) {
+        case SPANISH:
+            displayValue = intPart.replace(/\B(?=(\d{3})+(?!\d))/g, ".");
+            if (floatPart) {
+                displayValue += `,${floatPart}`;
+            }
+        break;
+        case FRENCH:
+            displayValue = intPart.replace(/\B(?=(\d{3})+(?!\d))/g, String.fromCharCode(160)); //nbsp
+            if (floatPart) {
+                displayValue += `,${floatPart}`;
+            }
+        break;
+        case ENGLISH:
+        default:
+            displayValue = intPart.replace(/\B(?=(\d{3})+(?!\d))/g, ",");
+            if (floatPart) {
+                displayValue += `.${floatPart}`;
+            }
+        break;
+    }
+    return displayValue;
+};
+
+const localizePercent = (val) => {
+    if (val === undefined || val === null || isNaN(parseFloat(val))) {
+        return null;
+    }
+    let percent = localizeNumber(Math.round(val * 10000)/100);
+    return (percent === null) ? null : `${percent}%`;
+}
+
+export { flattenArray, ensureNumericArray, reloadPageIfCached, indicatorManualNumberSort,
+          localizeNumber, localizePercent };
