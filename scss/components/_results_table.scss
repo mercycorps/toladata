@@ -83,7 +83,17 @@ $border-supplemental-row: 1px solid $gray-150;
     justify-content: space-between;
     align-items: center;
 }
-.cd-actions__message {}
+.cd-actions__message {
+    & .fa-bullseye {
+        // target icon spacing from text
+        margin-right: 5px;
+    }
+    & .indicator-link {
+        // add targets button spacing from text
+        margin-left: 8px;
+    }
+    
+}
 .cd-actions__button {
     margin-left: $grid-gutter-width/2;
     white-space: nowrap;

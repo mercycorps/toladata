@@ -300,6 +300,7 @@ def program_page(request, program):
         'delete_pinned_report_url': reverse('delete_pinned_report'),
         'indicator_on_scope_margin': Indicator.ONSCOPE_MARGIN,
         'readonly': not request.has_write_access,
+        'result_readonly': not request.has_medium_access
     }
     return render(request, 'indicators/program_page.html', context)
 

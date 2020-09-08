@@ -1000,7 +1000,6 @@ def result_view(request, indicator, program):
         }
     )
 
-
 @login_required
 def indicator_plan(request, program):
     """

@@ -16,6 +16,7 @@ from indicators.models import (
     Result
 )
 from workflow.models import Program
+from tola.l10n_utils import l10n_date_medium
 from django.db import models
 from django.utils.functional import cached_property
 
@@ -343,6 +344,7 @@ class ProgramWithMetrics(Program):
             - annual/semi_annual/tri_annual/quarterly/monthly: date that most recently completed period ended for each
                 frequency
         """
+        get_date_string = lambda date_obj: l10n_date_medium(date_obj, decode=True) if date_obj is not None else None
         return {
             'lop': self.has_lop,
             'midend': self.has_midend,
@@ -350,11 +352,11 @@ class ProgramWithMetrics(Program):
             'time_targets': any(
                 [self.has_annual, self.has_semi_annual, self.has_tri_annual, self.has_quarterly, self.has_monthly]
             ),
-            'annual': self.annual_period,
-            'semi_annual': self.semi_annual_period,
-            'tri_annual': self.tri_annual_period,
-            'quarterly': self.quarterly_period,
-            'monthly': self.monthly_period
+            'annual': get_date_string(self.annual_period),
+            'semi_annual': get_date_string(self.semi_annual_period),
+            'tri_annual': get_date_string(self.tri_annual_period),
+            'quarterly': get_date_string(self.quarterly_period),
+            'monthly': get_date_string(self.monthly_period)
         }
 
 

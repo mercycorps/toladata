@@ -21,13 +21,14 @@ export default class ProgramPageUIStore {
     clearIndicatorFilter() {
         this.currentIndicatorFilter = null;
         this.selectedIndicatorId = null;
+        this.rootStore.program.collapseAll();
     }
 
     @action
     setSelectedIndicatorId(indicatorPk) {
         this.clearIndicatorFilter();
         this.selectedIndicatorId = indicatorPk;
-        this.rootStore.program.updateResultsHTML(indicatorPk);
+        this.rootStore.program.expand(indicatorPk);
     }
     
     @computed

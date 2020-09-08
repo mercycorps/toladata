@@ -44,6 +44,15 @@
     </div>
     <div class="form-group" id="div_id_achieved">
         <label for="id_achieved" class="label--required">{{ form.achieved.label }}</label>
+        <a href="#"
+           tabindex="0"
+           data-toggle="popover"
+           data-placement="right"
+           data-trigger="focus"
+           {# Translators: On a form input for "actual values" - warns user that they will be rounded. #}
+           data-content="{% trans 'Actual values are rounded to two decimal places.' %}">
+            <i class="far fa-question-circle"></i>
+        </a>
         <span id="id_span_achieved"
             {% if indicator.unit_of_measure_type == 2 or object.indicator.unit_of_measure_type == 2 %} class="input-symbol-percent" {% endif %}
         >
