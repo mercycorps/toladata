@@ -12,7 +12,11 @@ from factories import (
 )
 from indicators.models import Indicator
 from indicators.queries import ProgramWithMetrics
+from django.utils import formats
 from django import test
+
+
+format_date = lambda date_obj: formats.date_format(date_obj, "MEDIUM_DATE_FORMAT")
 
 class TestProgramHasLOP(test.TestCase):
     def get_program(self, start_date, end_date):
@@ -222,7 +226,7 @@ class TestAnnualLastCompleted(test.TestCase):
         program = self.get_program(start_date, end_date)
         self.add_annual_indicators(program, [start_date,])
         program = self.refresh_program(program)
-        self.assertEqual(program.target_period_info['annual'], end_date)
+        self.assertEqual(program.target_period_info['annual'], format_date(end_date))
 
     def test_no_annual_indicator_returns_false(self):
         start_date = datetime.date(2015, 1, 1)
@@ -248,5 +252,5 @@ class TestAnnualLastCompleted(test.TestCase):
         program = self.get_program(start_date, second_end)
         self.add_annual_indicators(program, [start_date, second_start])
         program = self.refresh_program(program)
-        self.assertEqual(program.target_period_info['annual'], expected_date)
+        self.assertEqual(program.target_period_info['annual'], format_date(expected_date))
         

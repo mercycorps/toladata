@@ -13,49 +13,26 @@ describe("bare program page program", () => {
     });
 });
 
-describe("full program page program", () => {
-    const Program = ProgramPageProgram;
-    const resp = "<div>Html indicator results data</div>";
-    api.indicatorResultsTable.mockResolvedValue(resp);
-    it("updates results html", async () => {
-        let program = Program({});
-        expect(program.getResultsHTML(44)).toBeFalsy();
-        await program.updateResultsHTML(44);
-        expect(program.getResultsHTML(44)).toEqual(resp);
-        expect(api.indicatorResultsTable).toBeCalledWith(44, true);
-    });
-    describe("with a results html loaded", () => {
-        var program;
-        beforeEach(async () => {
-            program = Program({});
-            await program.updateResultsHTML(33);
-            await program.updateResultsHTML(55);
-            await program.updateResultsHTML(77);
-        });
-        it("updates existing result html", async () => {
-            expect(program.getResultsHTML(33)).toEqual(resp);
-            let resp2 = "<span>Another response</div>";
-            api.indicatorResultsTable.mockResolvedValue(resp2);
-            await program.updateResultsHTML(33);
-            expect(program.getResultsHTML(33)).toEqual(resp2);
-            api.indicatorResultsTable.mockResolvedValue(resp);
-        });
-        it("deletes one results html entry", () => {
-            program.deleteResultsHTML(55);
-            expect(program.getResultsHTML(55)).toBeFalsy();
-            expect(program.getResultsHTML(77)).toEqual(resp);
-        });
-        it("deletes all results html", () => {
-            expect(program.getResultsHTML(33)).not.toBeFalsy();
-            program.deleteAllResultsHTML();
-            expect(program.getResultsHTML(33)).toBeFalsy();
-            expect(program.getResultsHTML(55)).toBeFalsy();
-            expect(program.getResultsHTML(77)).toBeFalsy();
-        });
-    });
-});
 describe("with indicator data", () => {
     const Program = ProgramPageProgram;
+    const programJSON = {
+        pk: 100,
+        results_framework: true,
+        indicator_pks_level_order: [41, 14],
+        indicator_pks_chain_order: [41, 14],
+        indicators: {
+            '41': {
+                pk: 41,
+                lop_target: 200,
+                number: "Number1"
+            },
+            '14': {
+                pk: 14,
+                lop_target: 50,
+                number: "Number2"
+            }
+        }
+    };
     const resp = {
         indicator_pks_level_order: [14, 41],
         indicator_pks_chain_order: [14, 41],
@@ -79,25 +56,26 @@ describe("with indicator data", () => {
         {indicator_pks_level_order: resp.indicator_pks_level_order,
          indicator_pks_chain_order: resp.indicator_pks_chain_order,
          indicators: resp.indicators});
+    it("provides expanded/collapsed list", () => {
+        let program = Program(programJSON);
+        expect(program.isExpanded(41)).toBeFalsy();
+        expect(program.isExpanded(14)).toBeFalsy();
+        program.expand(41);
+        expect(program.isExpanded(41)).toBeTruthy();
+        expect(program.isExpanded(14)).toBeFalsy();
+        program.expand(14);
+        program.collapse(41);
+        expect(program.isExpanded(41)).toBeFalsy();
+        expect(program.isExpanded(14)).toBeTruthy();
+        program.collapseAll();
+        expect(program.isExpanded(41)).toBeFalsy();
+        expect(program.isExpanded(14)).toBeFalsy();
+        program.expandAll();
+        expect(program.isExpanded(41)).toBeTruthy();
+        expect(program.isExpanded(14)).toBeTruthy();
+    })
     it("updates indicator and order", async () => {
-        let program = Program({
-            pk: 100,
-            results_framework: true,
-            indicator_pks_level_order: [41, 14],
-            indicator_pks_chain_order: [41, 14],
-            indicators: {
-                '41': {
-                    pk: 41,
-                    lop_target: 200,
-                    number: "Number1"
-                },
-                '14': {
-                    pk: 14,
-                    lop_target: 50,
-                    number: "Number2"
-                }
-            }
-        });
+        let program = Program(programJSON);
         expect.assertions(7);
         expect(program.indicatorsInLevelOrder[0].lopTarget).toEqual(200);
         expect(program.indicatorsInChainOrder[1].pk).toEqual(14);

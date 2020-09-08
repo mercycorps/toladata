@@ -70,20 +70,6 @@ exports[`Indicator List elements Status Header component calls for filter title 
       </a>
     </small>
   </h3>
-  <div>
-    <button
-      className="btn btn-sm btn-link px-0 btn-add text-nowrap"
-      disabled={false}
-      onClick={[Function]}
-      type="button"
-    >
-      <i
-        className="fas fa-plus-circle"
-      />
-       
-      Add indicator
-    </button>
-  </div>
 </div>
 `;
 
@@ -113,20 +99,6 @@ exports[`Indicator List elements Status Header component renders filter applied 
       </a>
     </small>
   </h3>
-  <div>
-    <button
-      className="btn btn-sm btn-link px-0 btn-add text-nowrap"
-      disabled={false}
-      onClick={[Function]}
-      type="button"
-    >
-      <i
-        className="fas fa-plus-circle"
-      />
-       
-      Add indicator
-    </button>
-  </div>
 </div>
 `;
 
@@ -143,7 +115,6 @@ exports[`Indicator List elements Status Header component renders read only 1`] =
       %s indicator
     </span>
   </h3>
-  <div />
 </div>
 `;
 
@@ -160,19 +131,5 @@ exports[`Indicator List elements Status Header component renders without crashin
       %s indicator
     </span>
   </h3>
-  <div>
-    <button
-      className="btn btn-sm btn-link px-0 btn-add text-nowrap"
-      disabled={false}
-      onClick={[Function]}
-      type="button"
-    >
-      <i
-        className="fas fa-plus-circle"
-      />
-       
-      Add indicator
-    </button>
-  </div>
 </div>
 `;

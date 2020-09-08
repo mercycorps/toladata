@@ -14,10 +14,12 @@ export default class ProgramPageRootStore {
             programJSON = {},
             onScopeMargin = 0.15,
             deletePinnedReportURL = null,
-            readOnly = true
+            readOnly = true,
+            resultReadOnly = true,
         } = {}
     ) {
         this.readOnly = readOnly;
+        this.resultReadOnly = resultReadOnly;
         this.onScopeMargin = onScopeMargin;
         this.deletePinnedReportURL = deletePinnedReportURL;
         this.program = getProgramStore(programJSON);
@@ -78,6 +80,16 @@ export default class ProgramPageRootStore {
     @computed
     get indicators() {
         return this.filterIndicators(this.uiStore.currentIndicatorFilter, this.uiStore.selectedIndicatorId);
+    }
+
+    @computed
+    get allExpanded() {
+        return this.indicators.every(indicator => this.program.isExpanded(indicator.pk));
+    }
+
+    @computed
+    get allCollapsed() {
+        return this.indicators.every(indicator => !this.program.isExpanded(indicator.pk));
     }
     
     @computed

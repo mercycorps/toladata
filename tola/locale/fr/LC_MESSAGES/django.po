@@ -2,8 +2,8 @@ msgid ""
 msgstr ""
 "Project-Id-Version: \n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2020-07-31 10:31-0700\n"
-"PO-Revision-Date: 2020-07-30 15:46-0700\n"
+"POT-Creation-Date: 2020-09-01 14:26-0700\n"
+"PO-Revision-Date: 2020-09-01 14:27-0700\n"
 "Last-Translator: \n"
 "Language-Team: \n"
 "Language: fr\n"
@@ -11,7 +11,7 @@ msgstr ""
 "Content-Type: text/plain; charset=UTF-8\n"
 "Content-Transfer-Encoding: 8bit\n"
 "Plural-Forms: nplurals=2; plural=(n > 1);\n"
-"X-Generator: Poedit 2.4\n"
+"X-Generator: Poedit 2.4.1\n"
 
 #: indicators/admin.py:41
 msgid "Show all"
@@ -44,10 +44,10 @@ msgstr "Catégories"
 #. Translators: Heading for list of disaggregation types assigned to a country
 #. Translators: Heading for list of disaggregation categories in a particular disaggregation type.
 #: indicators/admin.py:170 indicators/indicator_plan.py:75
-#: indicators/models.py:487 indicators/models.py:587 indicators/models.py:1134
+#: indicators/models.py:495 indicators/models.py:595 indicators/models.py:1144
 #: templates/indicators/disaggregation_print.html:55
 #: templates/indicators/disaggregation_report.html:94
-#: tola_management/models.py:792 tola_management/models.py:800
+#: tola_management/models.py:800 tola_management/models.py:808
 msgid "Disaggregation"
 msgstr "Désagrégation"
 
@@ -66,9 +66,8 @@ msgid "No."
 msgstr "Nº"
 
 #: indicators/export_renderers.py:58 indicators/forms.py:330
-#: indicators/models.py:1307 indicators/models.py:1680
-#: indicators/models.py:1973 indicators/views/views_program.py:132
-#: indicators/views/views_program.py:171
+#: indicators/models.py:1317 indicators/models.py:1690 indicators/models.py:1983
+#: indicators/views/views_program.py:132 indicators/views/views_program.py:171
 #: templates/indicators/disaggregation_print.html:53
 #: templates/indicators/disaggregation_report.html:91
 #: templates/indicators/iptt_indicators_varied_startdates.html:35
@@ -77,12 +76,12 @@ msgid "Indicator"
 msgstr "Indicateur"
 
 #: indicators/export_renderers.py:61 indicators/indicator_plan.py:41
-#: indicators/models.py:132 indicators/models.py:1080
+#: indicators/models.py:132 indicators/models.py:1090
 msgid "Level"
 msgstr "Niveau"
 
 #: indicators/export_renderers.py:63 indicators/indicator_plan.py:83
-#: indicators/models.py:1122 tola_management/models.py:326
+#: indicators/models.py:1132 tola_management/models.py:326
 msgid "Unit of measure"
 msgstr "Unité de mesure"
 
@@ -92,97 +91,102 @@ msgid "Change"
 msgstr "Changement"
 
 #. Translators: 'C' as in Cumulative and 'NC' as in Non Cumulative
-#: indicators/export_renderers.py:72 indicators/models.py:1156
+#: indicators/export_renderers.py:72 indicators/models.py:1166
 msgid "C / NC"
 msgstr "C / NC"
 
 #: indicators/export_renderers.py:77 indicators/forms.py:234
-#: indicators/models.py:1137 tola_management/models.py:332
+#: indicators/models.py:1147 tola_management/models.py:332
 msgid "Baseline"
 msgstr "Mesure de base"
 
-#: indicators/export_renderers.py:82 indicators/models.py:1015
-#: indicators/models.py:1669
+#: indicators/export_renderers.py:82 indicators/models.py:1025
+#: indicators/models.py:1679
 msgid "Life of Program (LoP) only"
 msgstr "La vie du programme (LoP) seulement"
 
-#: indicators/export_renderers.py:83 indicators/models.py:1016
+#: indicators/export_renderers.py:83 indicators/models.py:1026
 msgid "Midline and endline"
 msgstr "Mesure de mi-parcours et mesure de fin de programme"
 
 #. Translators:  label for the date of the last completed Annual target period.
-#: indicators/export_renderers.py:84 indicators/models.py:1017
+#: indicators/export_renderers.py:84 indicators/models.py:1027
 #: templates/indicators/program_target_period_info_helptext.html:16
 msgid "Annual"
 msgstr "Annuel"
 
-#: indicators/export_renderers.py:85 indicators/models.py:1018
+#: indicators/export_renderers.py:85 indicators/models.py:1028
 msgid "Semi-annual"
 msgstr "Semestriel"
 
-#: indicators/export_renderers.py:86 indicators/models.py:1019
+#: indicators/export_renderers.py:86 indicators/models.py:1029
 msgid "Tri-annual"
 msgstr "Quadrimestriel"
 
 #. Translators: this is the measure of time (3 months)
 #. Translators:  label for the date of the last completed Quarterly target period.
-#: indicators/export_renderers.py:88 indicators/models.py:1020
+#: indicators/export_renderers.py:88 indicators/models.py:1030
 #: templates/indicators/program_target_period_info_helptext.html:22
 msgid "Quarterly"
 msgstr "Trimestriel"
 
 #. Translators:  label for the date of the last completed Monthly target period.
-#: indicators/export_renderers.py:89 indicators/models.py:1021
+#: indicators/export_renderers.py:89 indicators/models.py:1031
 #: templates/indicators/program_target_period_info_helptext.html:24
 msgid "Monthly"
 msgstr "Mensuel"
 
-#: indicators/export_renderers.py:149 indicators/models.py:1689
+#. Translators: Explanation at the bottom of a report (as a footnote) about value rounding
+#: indicators/export_renderers.py:116
+msgid "*All values in this report are rounded to two decimal places."
+msgstr "*Toutes les valeurs de ce rapport sont arrondies à deux décimales."
+
+#: indicators/export_renderers.py:154 indicators/models.py:1977
+#: templates/indicators/result_table.html:26
+#: workflow/serializers_new/period_serializers.py:47
+msgid "Actual"
+msgstr "Réel"
+
+#: indicators/export_renderers.py:158 indicators/models.py:1699
 #: templates/indicators/result_table.html:25
 #: workflow/serializers_new/period_serializers.py:41
 msgid "Target"
 msgstr "Cible"
 
-#: indicators/export_renderers.py:149 indicators/export_renderers.py:150
-#: indicators/models.py:1967 templates/indicators/result_table.html:26
-#: workflow/serializers_new/period_serializers.py:47
-msgid "Actual"
-msgstr "Réel"
-
-#: indicators/export_renderers.py:149
+#: indicators/export_renderers.py:158
 #: workflow/serializers_new/period_serializers.py:53
 msgid "% Met"
 msgstr "% Atteint"
 
-#: indicators/export_renderers.py:234 indicators/templatetags/mytags.py:92
+#: indicators/export_renderers.py:243 indicators/templatetags/mytags.py:92
 #: tola_management/models.py:379 tola_management/programadmin.py:177
 msgid "N/A"
 msgstr "S.O."
 
-#: indicators/export_renderers.py:393
+#: indicators/export_renderers.py:402
 #: templates/indicators/iptt_filter_form.html:141
-#: templates/indicators/program_page.html:36
-#: tola_management/programadmin.py:121 tola_management/programadmin.py:534
+#: templates/indicators/program_page.html:36 tola_management/programadmin.py:121
+#: tola_management/programadmin.py:535
 msgid "Change log"
 msgstr "Journal des modifications"
 
 #. Translators: referring to an indicator whose results accumulate over time
-#: indicators/export_renderers.py:418 indicators/models.py:1438
+#: indicators/export_renderers.py:427 indicators/models.py:1448
 msgid "Cumulative"
 msgstr "Cumulatif"
 
 #. Translators: referring to an indicator whose results do not accumulate over time
-#: indicators/export_renderers.py:420
+#: indicators/export_renderers.py:429
 msgid "Non-cumulative"
 msgstr "Non cumulatif"
 
 #. Translators: This is the title of a spreadsheet tab that shows do data has been found for the user's query.
-#: indicators/export_renderers.py:437
+#: indicators/export_renderers.py:446
 msgid "No data"
 msgstr "Pas de données"
 
-#: indicators/forms.py:233 indicators/models.py:102 indicators/models.py:1246
-#: indicators/models.py:1980 workflow/forms.py:100 workflow/models.py:525
+#: indicators/forms.py:233 indicators/models.py:102 indicators/models.py:1256
+#: indicators/models.py:1990 workflow/forms.py:100 workflow/models.py:525
 msgid "Program"
 msgstr "Programme"
 
@@ -201,8 +205,8 @@ msgstr "Afficher le numéro"
 #: indicators/forms.py:262
 msgid ""
 "This number is displayed in place of the indicator number automatically "
-"generated through the results framework.  An admin can turn on auto-"
-"numbering in program settings"
+"generated through the results framework.  An admin can turn on auto-numbering "
+"in program settings"
 msgstr ""
 "Ce numéro s’affiche à la place du numéro de l’indicateur, automatiquement "
 "généré par le cadre de résultats. Un administrateur peut activer la "
@@ -296,16 +300,14 @@ msgstr "Date de résultat"
 #: indicators/forms.py:527
 #, python-brace-format
 msgid ""
-"You can begin entering results on {program_start_date}, the program start "
-"date"
+"You can begin entering results on {program_start_date}, the program start date"
 msgstr ""
-"Vous pouvez commencer à saisir des résultats le {program_start_date}, date "
-"de début du programme"
+"Vous pouvez commencer à saisir des résultats le {program_start_date}, date de "
+"début du programme"
 
 #: indicators/forms.py:532
 #, python-brace-format
-msgid ""
-"Please select a date between {program_start_date} and {program_end_date}"
+msgid "Please select a date between {program_start_date} and {program_end_date}"
 msgstr ""
 "Veuillez sélectionner une date comprise entre le {program_start_date} et le "
 "{program_end_date}"
@@ -368,12 +370,12 @@ msgstr "Valeur de base"
 msgid "LOP target"
 msgstr "Cible de LoP"
 
-#: indicators/indicator_plan.py:122 indicators/models.py:1160
+#: indicators/indicator_plan.py:122 indicators/models.py:1170
 #: tola_management/models.py:331
 msgid "Rationale for target"
 msgstr "Justification de la cible"
 
-#: indicators/indicator_plan.py:129 indicators/models.py:1166
+#: indicators/indicator_plan.py:129 indicators/models.py:1176
 #: templates/indicators/iptt_indicators_varied_startdates.html:36
 msgid "Target frequency"
 msgstr "Fréquence de la cible"
@@ -391,7 +393,7 @@ msgstr "Méthode de collecte de données"
 msgid "Frequency of data collection"
 msgstr "Fréquence de collecte de données"
 
-#: indicators/indicator_plan.py:158 indicators/models.py:1202
+#: indicators/indicator_plan.py:158 indicators/models.py:1212
 msgid "Data points"
 msgstr "Points de données"
 
@@ -415,12 +417,12 @@ msgstr "Fréquence de rapportage"
 msgid "Quality assurance measures"
 msgstr "Mesures d’assurance qualité"
 
-#: indicators/indicator_plan.py:201 indicators/models.py:1232
+#: indicators/indicator_plan.py:201 indicators/models.py:1242
 msgid "Data issues"
 msgstr "Problèmes liés aux données"
 
-#: indicators/indicator_plan.py:208 indicators/models.py:1242
-#: indicators/models.py:1970
+#: indicators/indicator_plan.py:208 indicators/models.py:1252
+#: indicators/models.py:1980
 msgid "Comments"
 msgstr "Commentaires"
 
@@ -435,31 +437,31 @@ msgstr "Indicateurs non affectés à un niveau de cadre de résultats"
 msgid "Indicator plan"
 msgstr "Plan d’indicateur"
 
-#: indicators/models.py:61 indicators/models.py:1075
+#: indicators/models.py:61 indicators/models.py:1085
 msgid "Indicator type"
 msgstr "Type d’indicateur"
 
 #: indicators/models.py:62 indicators/models.py:82 indicators/models.py:103
-#: indicators/models.py:632 indicators/models.py:647
-#: tola_management/models.py:679 workflow/forms.py:134
+#: indicators/models.py:640 indicators/models.py:655
+#: tola_management/models.py:687 workflow/forms.py:134
 msgid "Description"
 msgstr "Description"
 
 #: indicators/models.py:63 indicators/models.py:84 indicators/models.py:104
-#: indicators/models.py:127 indicators/models.py:392 indicators/models.py:417
-#: indicators/models.py:492 indicators/models.py:590 indicators/models.py:633
-#: indicators/models.py:652 indicators/models.py:671 indicators/models.py:692
-#: indicators/models.py:1281 indicators/models.py:1703
-#: indicators/models.py:1992 workflow/models.py:58 workflow/models.py:124
+#: indicators/models.py:127 indicators/models.py:400 indicators/models.py:425
+#: indicators/models.py:500 indicators/models.py:598 indicators/models.py:641
+#: indicators/models.py:660 indicators/models.py:679 indicators/models.py:700
+#: indicators/models.py:1291 indicators/models.py:1713 indicators/models.py:2002
+#: workflow/models.py:58 workflow/models.py:124
 msgid "Create date"
 msgstr "Créer un rendez-vous"
 
 #: indicators/models.py:64 indicators/models.py:85 indicators/models.py:105
-#: indicators/models.py:128 indicators/models.py:393 indicators/models.py:418
-#: indicators/models.py:493 indicators/models.py:591 indicators/models.py:634
-#: indicators/models.py:653 indicators/models.py:672 indicators/models.py:693
-#: indicators/models.py:1285 indicators/models.py:1704
-#: indicators/models.py:1993 workflow/models.py:59 workflow/models.py:125
+#: indicators/models.py:128 indicators/models.py:401 indicators/models.py:426
+#: indicators/models.py:501 indicators/models.py:599 indicators/models.py:642
+#: indicators/models.py:661 indicators/models.py:680 indicators/models.py:701
+#: indicators/models.py:1295 indicators/models.py:1714 indicators/models.py:2003
+#: workflow/models.py:59 workflow/models.py:125
 msgid "Edit date"
 msgstr "Date d’édition"
 
@@ -468,9 +470,9 @@ msgid "Indicator Type"
 msgstr "Type d’indicateur"
 
 #: indicators/models.py:80 indicators/models.py:101 indicators/models.py:122
-#: indicators/models.py:388 indicators/models.py:668 indicators/models.py:1099
+#: indicators/models.py:396 indicators/models.py:676 indicators/models.py:1109
 #: tola_management/models.py:115 tola_management/models.py:325
-#: tola_management/models.py:676 tola_management/models.py:732
+#: tola_management/models.py:684 tola_management/models.py:740
 msgid "Name"
 msgstr "Prénom"
 
@@ -487,7 +489,7 @@ msgstr "Statut"
 msgid "Country Strategic Objectives"
 msgstr "Objectifs stratégiques du pays"
 
-#: indicators/models.py:108 indicators/models.py:1089
+#: indicators/models.py:108 indicators/models.py:1099
 msgid "Program Objective"
 msgstr "Objectif du programme"
 
@@ -496,22 +498,22 @@ msgstr "Objectif du programme"
 msgid "Assumptions"
 msgstr "Hypothèses"
 
-#: indicators/models.py:126 indicators/models.py:589
+#: indicators/models.py:126 indicators/models.py:597
 msgid "Sort order"
 msgstr "Ordre de classement"
 
 #. Translators: Name of the most commonly used organizational hierarchy of KPIs at Mercy Corps.
-#: indicators/models.py:308
+#: indicators/models.py:316
 msgid "Mercy Corps"
 msgstr "Mercy Corps"
 
 #. Translators: Highest level objective of a project.  High level KPIs can be attached here.
-#: indicators/models.py:311 indicators/models.py:349 indicators/models.py:377
+#: indicators/models.py:319 indicators/models.py:357 indicators/models.py:385
 msgid "Goal"
 msgstr "But"
 
 #. Translators: Below Goals, the 2nd highest organizing level to attach KPIs to.
-#: indicators/models.py:313 indicators/models.py:325
+#: indicators/models.py:321 indicators/models.py:333
 msgid "Outcome"
 msgstr "Résultat"
 
@@ -519,322 +521,322 @@ msgstr "Résultat"
 #. Translators: Below Sub-Purpose, the 4th highest organizing level to attach KPIs to. Noun.
 #. Translators: Below Sub-Intermediate Result, the 4th highest organizing level to attach KPIs to. Noun.
 #. Translators: Below Intermediate Outcome, the lowest organizing level to attach KPIs to. Noun.
-#: indicators/models.py:315 indicators/models.py:327 indicators/models.py:355
-#: indicators/models.py:369 indicators/models.py:385
+#: indicators/models.py:323 indicators/models.py:335 indicators/models.py:363
+#: indicators/models.py:377 indicators/models.py:393
 msgid "Output"
 msgstr "Extrant"
 
 #. Translators: Below Output, the lowest organizing level to attach KPIs to.
 #. Translators: Below Result, the lowest organizing level to attach KPIs to.
-#: indicators/models.py:317 indicators/models.py:343
+#: indicators/models.py:325 indicators/models.py:351
 msgid "Activity"
 msgstr "Activité"
 
 #. Translators: Name of the most commonly used organizational hierarchy of KPIs at Mercy Corps.
-#: indicators/models.py:320
+#: indicators/models.py:328
 msgid "Department for International Development (DFID)"
 msgstr "Département du Développement International (DFID)"
 
 #. Translators: Highest level objective of a project.  High level KPIs can be attached here.
-#: indicators/models.py:323
+#: indicators/models.py:331
 msgid "Impact"
 msgstr "Impact"
 
 #. Translators: Below Output, the lowest organizing level to attach KPIs to.
 #. Translators: Below Output, the lowest organizing level to attach KPIs to. Noun.
-#: indicators/models.py:329 indicators/models.py:357 indicators/models.py:371
+#: indicators/models.py:337 indicators/models.py:365 indicators/models.py:379
 msgid "Input"
 msgstr "Contribution"
 
 #. Translators: The KPI organizational hierarchy used when we work on EC projects.
-#: indicators/models.py:332
+#: indicators/models.py:340
 msgid "European Commission (EC)"
 msgstr "Commission européenne (CE)"
 
 #. Translators: Highest level goal of a project.  High level KPIs can be attached here.
-#: indicators/models.py:335
+#: indicators/models.py:343
 msgid "Overall Objective"
 msgstr "Objectif global"
 
 #. Translators: Below Overall Objective, the 2nd highest organizing level to attach KPIs to.
-#: indicators/models.py:337
+#: indicators/models.py:345
 msgid "Specific Objective"
 msgstr "Objectif spécifique"
 
 #. Translators: Below Specific Objective, the 3rd highest organizing level to attach KPIs to.
 #. Translators: Below Goal, the 2nd highest organizing level to attach KPIs to.
-#: indicators/models.py:339 indicators/models.py:351 indicators/models.py:379
+#: indicators/models.py:347 indicators/models.py:359 indicators/models.py:387
 msgid "Purpose"
 msgstr "Intention"
 
 #. Translators: Below Purpose, the 4th highest organizing level to attach KPIs to.
-#: indicators/models.py:341 templates/indicators/result_form_modal.html:129
+#: indicators/models.py:349 templates/indicators/result_form_modal.html:129
 msgid "Result"
 msgstr "Résultat"
 
 #. Translators: The KPI organizational hierarchy used when we work on certain USAID projects.
-#: indicators/models.py:346
+#: indicators/models.py:354
 msgid "USAID 1"
 msgstr "USAID 1"
 
 #. Translators: Below Purpose, the 3rd highest organizing level to attach KPIs to.
-#: indicators/models.py:353 indicators/models.py:381
+#: indicators/models.py:361 indicators/models.py:389
 msgid "Sub-Purpose"
 msgstr "Sous-intention"
 
 #. Translators: The KPI organizational hierarchy used when we work on certain USAID projects.
-#: indicators/models.py:360
+#: indicators/models.py:368
 msgid "USAID 2"
 msgstr "USAID 2"
 
 #. Translators: Highest level goal of a project.  High level KPIs can be attached here.
-#: indicators/models.py:363
+#: indicators/models.py:371
 msgid "Strategic Objective"
 msgstr "Objectif stratégique"
 
 #. Translators: Below Strategic Objective, the 2nd highest organizing level to attach KPIs to.
-#: indicators/models.py:365
+#: indicators/models.py:373
 msgid "Intermediate Result"
 msgstr "Résultat intermédiaire"
 
 #. Translators: Below Intermediate Result, the 3rd highest organizing level to attach KPIs to.
-#: indicators/models.py:367
+#: indicators/models.py:375
 msgid "Sub-Intermediate Result"
 msgstr "Résultat sous-intermédiaire"
 
 #. Translators: The KPI organizational hierarchy used when we work on USAID Food for Peace projects.
-#: indicators/models.py:374
+#: indicators/models.py:382
 msgid "USAID FFP"
 msgstr "USAID FFP"
 
 #. Translators: Below Sub-Purpose, the 4th highest organizing level to attach KPIs to.
-#: indicators/models.py:383
+#: indicators/models.py:391
 msgid "Intermediate Outcome"
 msgstr "Résultat intermédiaire"
 
 #. Translators: This is depth of the selected object (a level tier) in a hierarchy of level tier objects
-#: indicators/models.py:391
+#: indicators/models.py:399
 msgid "Level Tier depth"
 msgstr "Profondeur de l’échelon"
 
 #. Translators: Indicators are assigned to Levels.  Levels are organized in a hierarchy of Tiers.
-#: indicators/models.py:398
+#: indicators/models.py:406
 msgid "Level Tier"
 msgstr "Échelon"
 
 #. Translators: Indicators are assigned to Levels.  Levels are organized in a hierarchy of Tiers.  There are several templates that users can choose from with different names for the Tiers.
-#: indicators/models.py:422
+#: indicators/models.py:430
 msgid "Level tier templates"
 msgstr "Modèles d'échelons"
 
-#: indicators/models.py:483
+#: indicators/models.py:491
 msgid "Sex and Age Disaggregated Data (SADD)"
 msgstr "Données désagrégées par sexe et âge (SADD)"
 
-#: indicators/models.py:489
+#: indicators/models.py:497
 msgid "Global (all programs, all countries)"
 msgstr "Général (tous les programmes, tous les pays)"
 
 #. Translators: Heading for list of disaggregation categories in a particular disaggregation type.
-#: indicators/models.py:490 tola_management/models.py:798
+#: indicators/models.py:498 tola_management/models.py:806
 msgid "Archived"
 msgstr "Archivé"
 
-#: indicators/models.py:588 templates/indicators/disaggregation_print.html:59
+#: indicators/models.py:596 templates/indicators/disaggregation_print.html:59
 #: templates/indicators/disaggregation_report.html:98
 msgid "Label"
 msgstr "Étiquette"
 
 #. Translators: Heading for list of disaggregation categories in a particular disaggregation type.
-#: indicators/models.py:619 tola_management/models.py:794
+#: indicators/models.py:627 tola_management/models.py:802
 msgid "Disaggregation category"
 msgstr "Catégorie de désagrégation"
 
-#: indicators/models.py:630 indicators/models.py:645
+#: indicators/models.py:638 indicators/models.py:653
 msgid "Frequency"
 msgstr "Fréquence"
 
-#: indicators/models.py:637
+#: indicators/models.py:645
 msgid "Reporting Frequency"
 msgstr "Fréquence de Rapportage"
 
-#: indicators/models.py:650
+#: indicators/models.py:658
 msgid "Frequency in number of days"
 msgstr "Fréquence en nombre de jours"
 
-#: indicators/models.py:656
+#: indicators/models.py:664
 msgid "Data Collection Frequency"
 msgstr "Fréquence de collecte de données"
 
-#: indicators/models.py:669
+#: indicators/models.py:677
 msgid "URL"
 msgstr "URL"
 
-#: indicators/models.py:670
+#: indicators/models.py:678
 msgid "Feed URL"
 msgstr "URL du flux"
 
-#: indicators/models.py:675
+#: indicators/models.py:683
 msgid "External Service"
 msgstr "Service externe"
 
-#: indicators/models.py:689
+#: indicators/models.py:697
 msgid "External service"
 msgstr "Service externe"
 
-#: indicators/models.py:690
+#: indicators/models.py:698
 msgid "Full URL"
 msgstr "URL complète"
 
-#: indicators/models.py:691
+#: indicators/models.py:699
 msgid "Unique ID"
 msgstr "Identifiant unique"
 
-#: indicators/models.py:696
+#: indicators/models.py:704
 msgid "External Service Record"
 msgstr "Enregistrement de service externe"
 
-#: indicators/models.py:1022
+#: indicators/models.py:1032
 msgid "Event"
 msgstr "Événement"
 
-#: indicators/models.py:1042
+#: indicators/models.py:1052
 msgid "Number (#)"
 msgstr "Nombre (#)"
 
-#: indicators/models.py:1043
+#: indicators/models.py:1053
 msgid "Percentage (%)"
 msgstr "Pourcentage (%)"
 
-#: indicators/models.py:1050 indicators/models.py:1142
+#: indicators/models.py:1060 indicators/models.py:1152
 msgid "Not applicable"
 msgstr "Non applicable"
 
-#: indicators/models.py:1051 tola_management/models.py:380
+#: indicators/models.py:1061 tola_management/models.py:380
 msgid "Increase (+)"
 msgstr "Augmenter (+)"
 
-#: indicators/models.py:1052 tola_management/models.py:381
+#: indicators/models.py:1062 tola_management/models.py:381
 msgid "Decrease (-)"
 msgstr "Diminuer (-)"
 
-#: indicators/models.py:1069
+#: indicators/models.py:1079
 msgid "Indicator key"
 msgstr "Clé d’indicateur"
 
-#: indicators/models.py:1095
+#: indicators/models.py:1105
 msgid "Country Strategic Objective"
 msgstr "Objectif stratégique du pays"
 
-#: indicators/models.py:1103 templates/indicators/disaggregation_report.html:90
+#: indicators/models.py:1113 templates/indicators/disaggregation_report.html:90
 #: tola_management/models.py:372
 msgid "Number"
 msgstr "Nombre"
 
-#: indicators/models.py:1107
+#: indicators/models.py:1117
 msgid "Source"
 msgstr "Source"
 
-#: indicators/models.py:1111 tola_management/models.py:346
+#: indicators/models.py:1121 tola_management/models.py:346
 msgid "Definition"
 msgstr "Définition"
 
-#: indicators/models.py:1116
+#: indicators/models.py:1126
 msgid "Rationale or justification for indicator"
 msgstr "Logique ou justification de l’indicateur"
 
-#: indicators/models.py:1129
+#: indicators/models.py:1139
 msgid "Unit Type"
 msgstr "Type d’unité"
 
-#: indicators/models.py:1147 templates/indicators/indicatortargets.html:89
+#: indicators/models.py:1157 templates/indicators/indicatortargets.html:89
 #: templates/indicators/indicatortargets.html:192
 msgid "Life of Program (LoP) target"
 msgstr "Cible de la vie du programme (LoP)"
 
-#: indicators/models.py:1152
+#: indicators/models.py:1162
 msgid "Direction of Change"
 msgstr "Direction du changement"
 
-#: indicators/models.py:1172
+#: indicators/models.py:1182
 msgid "First event name"
 msgstr "Premier nom de l’événement"
 
-#: indicators/models.py:1178
+#: indicators/models.py:1188
 msgid "First target period begins*"
 msgstr "La première période cible commence*"
 
-#: indicators/models.py:1182
+#: indicators/models.py:1192
 msgid "Number of target periods*"
 msgstr "Nombre de périodes cibles*"
 
-#: indicators/models.py:1188
+#: indicators/models.py:1198
 msgid "Means of Verification / Data Source"
 msgstr "Moyens de vérification / Source de données"
 
-#: indicators/models.py:1193
+#: indicators/models.py:1203
 msgid "Data Collection Method"
 msgstr "Méthode de collecte de données"
 
-#: indicators/models.py:1198
+#: indicators/models.py:1208
 msgid "Frequency of Data Collection"
 msgstr "Fréquence de collecte de données"
 
-#: indicators/models.py:1208
+#: indicators/models.py:1218
 msgid "Responsible Person(s) and Team"
 msgstr "Personne(s) responsable(s) et équipe"
 
-#: indicators/models.py:1213
+#: indicators/models.py:1223
 msgid "Method of Analysis"
 msgstr "Méthode d’analyse"
 
-#: indicators/models.py:1218
+#: indicators/models.py:1228
 msgid "Information Use"
 msgstr "Utilisation de l’information"
 
-#: indicators/models.py:1223
+#: indicators/models.py:1233
 msgid "Frequency of Reporting"
 msgstr "Fréquence de rapportage"
 
-#: indicators/models.py:1228
+#: indicators/models.py:1238
 msgid "Quality Assurance Measures"
 msgstr "Mesures d’assurance qualité"
 
-#: indicators/models.py:1238
+#: indicators/models.py:1248
 msgid "Changes to Indicator"
 msgstr "Changements apportés à l’indicateur"
 
-#: indicators/models.py:1251 workflow/models.py:39 workflow/models.py:489
+#: indicators/models.py:1261 workflow/models.py:39 workflow/models.py:489
 msgid "Sector"
 msgstr "Secteur"
 
-#: indicators/models.py:1255
+#: indicators/models.py:1265
 msgid "Key Performance Indicator for this program?"
 msgstr "Indicateur de performance clé pour ce programme ?"
 
-#: indicators/models.py:1261 workflow/models.py:883
+#: indicators/models.py:1271 workflow/models.py:883
 msgid "Approved by"
 msgstr "Approuvé par"
 
-#: indicators/models.py:1266
+#: indicators/models.py:1276
 msgid "Approval submitted by"
 msgstr "Approbation soumise par"
 
-#: indicators/models.py:1270
+#: indicators/models.py:1280
 msgid "External Service ID"
 msgstr "Identifiant de service externe"
 
 #. Translators: This is the name of the Level object in the old system of organising levels
-#: indicators/models.py:1277
+#: indicators/models.py:1287
 msgid "Old Level"
 msgstr "Niveau précédent"
 
-#: indicators/models.py:1288
+#: indicators/models.py:1298
 msgid "Notes"
 msgstr "Remarques"
 
 #. Translators: This is an error message that is returned when a user is trying to assign an indicator to the wrong hierarch of levels.
-#: indicators/models.py:1320
+#: indicators/models.py:1330
 #, python-format
 msgid ""
 "Level/Indicator mismatched program IDs (level %(level_program_id)d and "
@@ -843,68 +845,68 @@ msgstr ""
 "Le niveau/l’indicateur ne correspond pas aux identifiants de programme "
 "(niveau %(level_program_id)d et indicateur %(indicator_program_id)d)"
 
-#: indicators/models.py:1427 indicators/templatetags/mytags.py:117
+#: indicators/models.py:1437 indicators/templatetags/mytags.py:117
 msgid "#"
 msgstr "#"
 
-#: indicators/models.py:1429 indicators/templatetags/mytags.py:120
+#: indicators/models.py:1439 indicators/templatetags/mytags.py:120
 msgid "%"
 msgstr "%"
 
 #. Translators: referring to an indicator whose results do not accumulate over time
-#: indicators/models.py:1443
+#: indicators/models.py:1453
 msgid "Not cumulative"
 msgstr "Non cumulatif"
 
-#: indicators/models.py:1448 indicators/templatetags/mytags.py:87
+#: indicators/models.py:1458 indicators/templatetags/mytags.py:87
 msgid "-"
 msgstr "-"
 
-#: indicators/models.py:1450 indicators/templatetags/mytags.py:90
+#: indicators/models.py:1460 indicators/templatetags/mytags.py:90
 msgid "+"
 msgstr "+"
 
-#: indicators/models.py:1578 indicators/models.py:1585
+#: indicators/models.py:1588 indicators/models.py:1595
 #: indicators/views/views_indicators.py:399
 #: indicators/views/views_indicators.py:406
 #: indicators/views/views_indicators.py:412
 msgid "indicator"
 msgstr "indicateur"
 
-#: indicators/models.py:1670 templates/indicators/result_table.html:209
+#: indicators/models.py:1680 templates/indicators/result_table.html:209
 #: workflow/serializers_new/period_serializers.py:16
 msgid "Life of Program"
 msgstr "La vie du programme"
 
-#: indicators/models.py:1671
+#: indicators/models.py:1681
 msgid "Midline"
 msgstr "Mesure de mi-parcours"
 
-#: indicators/models.py:1672
+#: indicators/models.py:1682
 msgid "Endline"
 msgstr "Mesure de fin de programme"
 
-#: indicators/models.py:1673
+#: indicators/models.py:1683
 msgid "Year"
 msgstr "Année"
 
-#: indicators/models.py:1674
+#: indicators/models.py:1684
 msgid "Semi-annual period"
 msgstr "Période semestrielle"
 
-#: indicators/models.py:1675
+#: indicators/models.py:1685
 msgid "Tri-annual period"
 msgstr "Période quadrimestrielle"
 
-#: indicators/models.py:1676
+#: indicators/models.py:1686
 msgid "Quarter"
 msgstr "Trimestre"
 
-#: indicators/models.py:1685
+#: indicators/models.py:1695
 msgid "Period"
 msgstr "Période"
 
-#: indicators/models.py:1693
+#: indicators/models.py:1703
 #: templates/indicators/indicator_reportingperiod_modal.html:41
 #: templates/indicators/indicator_reportingperiod_modal.html:61
 #: templates/indicators/iptt_indicators_varied_startdates.html:37
@@ -912,46 +914,46 @@ msgstr "Période"
 msgid "Start date"
 msgstr "Date de début"
 
-#: indicators/models.py:1698
+#: indicators/models.py:1708
 #: templates/indicators/indicator_reportingperiod_modal.html:48
 #: templates/indicators/indicator_reportingperiod_modal.html:73
 #: tola_management/models.py:342
 msgid "End date"
 msgstr "Date de fin"
 
-#: indicators/models.py:1702
+#: indicators/models.py:1712
 msgid "Customsort"
 msgstr "Customsort"
 
-#: indicators/models.py:1708 templates/workflow/site_indicatordata.html:20
+#: indicators/models.py:1718 templates/workflow/site_indicatordata.html:20
 msgid "Periodic Target"
 msgstr "Cible périodique"
 
-#: indicators/models.py:1959
+#: indicators/models.py:1969
 msgid "Data key"
 msgstr "Clé de données"
 
-#: indicators/models.py:1963
+#: indicators/models.py:1973
 msgid "Periodic target"
 msgstr "Cible périodique"
 
-#: indicators/models.py:1983
+#: indicators/models.py:1993
 msgid "Date collected"
 msgstr "Date de collecte"
 
-#: indicators/models.py:1986
+#: indicators/models.py:1996
 msgid "Originated By"
 msgstr "Originaire de"
 
-#: indicators/models.py:1989
+#: indicators/models.py:1999
 msgid "Record name"
 msgstr "Nom de l’enregistrement"
 
-#: indicators/models.py:1990
+#: indicators/models.py:2000
 msgid "Evidence URL"
 msgstr "URL de la preuve"
 
-#: indicators/models.py:1994 templates/indicators/program_page.html:45
+#: indicators/models.py:2004 templates/indicators/program_page.html:45
 #: templates/workflow/site_indicatordata.html:5
 #: templates/workflow/site_profile_list.html:5
 #: templates/workflow/site_profile_list.html:6
@@ -961,47 +963,47 @@ msgstr "URL de la preuve"
 msgid "Sites"
 msgstr "Sites"
 
-#: indicators/models.py:2078
+#: indicators/models.py:2088
 msgid "Report Name"
 msgstr "Nom du rapport"
 
-#: indicators/models.py:2148
+#: indicators/models.py:2158
 msgid "years"
 msgstr "années"
 
-#: indicators/models.py:2149
+#: indicators/models.py:2159
 msgid "semi-annual periods"
 msgstr "périodes semestrielles"
 
-#: indicators/models.py:2150
+#: indicators/models.py:2160
 msgid "tri-annual periods"
 msgstr "périodes quadrimestrielles"
 
-#: indicators/models.py:2151
+#: indicators/models.py:2161
 msgid "quarters"
 msgstr "trimestres"
 
-#: indicators/models.py:2152
+#: indicators/models.py:2162
 msgid "months"
 msgstr "mois"
 
 #. Translators: Example: Most recent 2 Months
-#: indicators/models.py:2182
+#: indicators/models.py:2192
 #, python-brace-format
 msgid "Most recent {num_recent_periods} {time_or_target_period_str}"
 msgstr "Le plus récent {num_recent_periods} {time_or_target_period_str}"
 
 #. Translators: Example: Show all Years
-#: indicators/models.py:2188
+#: indicators/models.py:2198
 #, python-brace-format
 msgid "Show all {time_or_target_period_str}"
 msgstr "Tout afficher {time_or_target_period_str}"
 
-#: indicators/models.py:2198 indicators/models.py:2202
+#: indicators/models.py:2208 indicators/models.py:2212
 msgid "Show all results"
 msgstr "Afficher tous les résultats"
 
-#: indicators/models.py:2216
+#: indicators/models.py:2226
 msgid "Recent progress for all indicators"
 msgstr "Progrès récent pour tous les indicateurs"
 
@@ -1192,8 +1194,8 @@ msgid ""
 "Reason for change is not required when deleting an indicator with no linked "
 "results."
 msgstr ""
-"Lors de la suppression d’un indicateur sans résultats liés, une "
-"justification pour la modification n’est pas requise."
+"Lors de la suppression d’un indicateur sans résultats liés, une justification "
+"pour la modification n’est pas requise."
 
 #: indicators/views/views_indicators.py:648
 msgid "The indicator was successfully deleted."
@@ -1207,7 +1209,7 @@ msgid "Reason for change is required"
 msgstr "Une justification pour la modification est requise"
 
 #: indicators/views/views_indicators.py:686
-#: indicators/views/views_indicators.py:748 tola_management/models.py:649
+#: indicators/views/views_indicators.py:748 tola_management/models.py:657
 msgid "No reason for change required."
 msgstr "Aucune justification pour la modification n’est requise."
 
@@ -1304,17 +1306,17 @@ msgstr "Vous avez besoin d'une autorisation pour afficher cette page"
 
 #: templates/403.html:13
 msgid ""
-"You can request permission from your country's TolaData Administrator. If "
-"you do not know your TolaData Administrator, consult your supervisor."
+"You can request permission from your country's TolaData Administrator. If you "
+"do not know your TolaData Administrator, consult your supervisor."
 msgstr ""
 "Vous pouvez demander l’autorisation à l’administrateur TolaData de votre "
 "pays. Si vous ne le connaissez pas, consultez votre superviseur."
 
 #: templates/403.html:15
 msgid ""
-"If you need further assistance, please <a href=\"https://learn.mercycorps."
-"org/index.php/TOLA:Section_06/en\" target=\"_blank\">contact the TolaData "
-"Team</a>."
+"If you need further assistance, please <a href=\"https://learn.mercycorps.org/"
+"index.php/TOLA:Section_06/en\" target=\"_blank\">contact the TolaData Team</"
+"a>."
 msgstr ""
 "Pour toute assistance supplémentaire, veuillez <a href=\"https://learn."
 "mercycorps.org/index.php/TOLA:Section_06/fr\" target=\"_blank\">contacter "
@@ -1353,8 +1355,8 @@ msgstr "Un problème lié au serveur est survenu"
 msgid ""
 "\n"
 "<p>\n"
-"    There was a problem loading this page, most likely with the server. "
-"We’re sorry for the trouble.\n"
+"    There was a problem loading this page, most likely with the server. We’re "
+"sorry for the trouble.\n"
 "</p>\n"
 "<p>\n"
 "    If you need assistance, please <a href=\"https://learn.mercycorps.org/"
@@ -1362,8 +1364,7 @@ msgid ""
 "a>\n"
 "</p>\n"
 "<p>\n"
-"    <code class=\"text-secondary\">[Error 500: internal server error]</"
-"code>\n"
+"    <code class=\"text-secondary\">[Error 500: internal server error]</code>\n"
 "</p>\n"
 msgstr ""
 "\n"
@@ -1418,8 +1419,8 @@ msgid ""
 msgstr ""
 "\n"
 "   Avez-vous des difficultés à vous connecter à votre compte administrateur "
-"TolaActivity ? Nous avons intégré, dans le cadre de notre mise à jour "
-"Partner Access,\n"
+"TolaActivity ? Nous avons intégré, dans le cadre de notre mise à jour Partner "
+"Access,\n"
 " de nouveaux outils d’administration améliorés au sein de TolaActivity. "
 "Veuillez accéder à TolaActivity et rechercher la section\n"
 " Administrateur.\n"
@@ -1465,7 +1466,7 @@ msgid "Organizations"
 msgstr "Organisations"
 
 #: templates/base.html:106 templates/workflow/tags/program_menu.html:8
-#: tola_management/models.py:681 workflow/models.py:129
+#: tola_management/models.py:689 workflow/models.py:129
 msgid "Countries"
 msgstr "Pays"
 
@@ -1518,8 +1519,7 @@ msgstr ""
 
 #: templates/contact.html:15
 msgid ""
-"Let us know if you are having a problem or would like to see something "
-"change."
+"Let us know if you are having a problem or would like to see something change."
 msgstr ""
 "Dites-nous si vous rencontrez un problème ou souhaitez voir quelque chose "
 "changer."
@@ -1586,8 +1586,8 @@ msgstr "Rapport de progrès récent"
 #, python-format
 msgid ""
 "\n"
-"                            Before adding indicators and performance "
-"results, we need to know your program's\n"
+"                            Before adding indicators and performance results, "
+"we need to know your program's\n"
 "                            <a\n"
 "                                id=\"id_link_reporting_period_%(id)s\"\n"
 "                                class=\"\"\n"
@@ -1596,8 +1596,7 @@ msgid ""
 "                                data-program=\"%(id)s\"\n"
 "                                data-progstart=\"%(start_date)s\"\n"
 "                                data-progend=\"%(end_date)s\"\n"
-"                                data-rptstart=\"%(reporting_period_start)s"
-"\"\n"
+"                                data-rptstart=\"%(reporting_period_start)s\"\n"
 "                                data-rptend=\"%(reporting_period_end)s\"\n"
 "                                data-indicator_count="
 "\"%(program.indicator_count)s\"\n"
@@ -1617,8 +1616,7 @@ msgstr ""
 "                                data-program=\"%(id)s\"\n"
 "                                data-progstart=\"%(start_date)s\"\n"
 "                                data-progend=\"%(end_date)s\"\n"
-"                                data-rptstart=\"%(reporting_period_start)s"
-"\"\n"
+"                                data-rptstart=\"%(reporting_period_start)s\"\n"
 "                                data-rptend=\"%(reporting_period_end)s\"\n"
 "                                data-indicator_count="
 "\"%(program.indicator_count)s\"\n"
@@ -1631,8 +1629,8 @@ msgstr ""
 #. Translators: A message telling the user why they can not access it due to the start and end date not being set.
 #: templates/home.html:107
 msgid ""
-"Before you can view this program, an administrator needs to set the "
-"program's start and end dates."
+"Before you can view this program, an administrator needs to set the program's "
+"start and end dates."
 msgstr ""
 "Avant que vous ne soyez en mesure de consulter ce programme, un "
 "administrateur doit définir les dates de début et de fin du programme."
@@ -1668,13 +1666,13 @@ msgstr ""
 msgid ""
 "\n"
 "                        <h4>All indicators are missing targets.</h4>\n"
-"                        <p>Visit the <a href=\"%(program_page_url)s"
-"\">Program page</a> to set up targets.</p>\n"
+"                        <p>Visit the <a href=\"%(program_page_url)s\">Program "
+"page</a> to set up targets.</p>\n"
 "                        "
 msgstr ""
 "\n"
-"                        <h4>Tous les indicateurs sont des cibles manquantes."
-"</h4>\n"
+"                        <h4>Tous les indicateurs sont des cibles manquantes.</"
+"h4>\n"
 "                        <p>Rendez-vous sur la <a href=\"%(program_page_url)s"
 "\">page du programme</a> pour définir des cibles.</p>\n"
 "                        "
@@ -1847,8 +1845,8 @@ msgid ""
 "future reference, please provide a reason for modifying target values."
 msgstr ""
 "La modification des valeurs cibles affectera les statistiques du programme "
-"pour cet indicateur. À titre de référence, veuillez fournir une "
-"justification à la modification des valeurs cibles."
+"pour cet indicateur. À titre de référence, veuillez fournir une justification "
+"à la modification des valeurs cibles."
 
 #: templates/indicators/indicator_form_common_js.html:27
 #: templates/indicators/result_form_common_js.html:20
@@ -1941,9 +1939,9 @@ msgid ""
 "LoP target does not match what was manually entered in the past -- %%s. You "
 "may need to update your target values."
 msgstr ""
-"Les cible de vie du programme (LoP) s’affichent désormais automatiquement. "
-"La cible LoP actuelle ne correspond pas aux données précédemment saisies  — "
-"%%s. Il se peut que vos valeurs cibles nécessitent une mise à jour."
+"Les cible de vie du programme (LoP) s’affichent désormais automatiquement. La "
+"cible LoP actuelle ne correspond pas aux données précédemment saisies  — %%s. "
+"Il se peut que vos valeurs cibles nécessitent une mise à jour."
 
 #. Translators: warning to user that manually entered in value doesn't match computed value, %s is a number or percentage
 #: templates/indicators/indicator_form_common_js.html:901
@@ -1979,8 +1977,7 @@ msgid "Please enter a target."
 msgstr "Veuillez entrer une cible."
 
 #: templates/indicators/indicator_form_common_js.html:1080
-msgid ""
-"The Life of Program (LoP) target cannot be zero.  Please update targets."
+msgid "The Life of Program (LoP) target cannot be zero.  Please update targets."
 msgstr ""
 "La valeur de la cible LoP ne peut être zéro. Veuillez mettre à jour les "
 "cibles."
@@ -2078,8 +2075,8 @@ msgid ""
 "The program period is used in the setup of periodic targets and in Indicator "
 "Performance Tracking Tables (IPTT). TolaActivity initially sets the program "
 "period to include the program’s official start and end dates, as recorded in "
-"the Grant and Award Information Tracker (GAIT) system. The program period "
-"may be adjusted to align with the program’s indicator plan."
+"the Grant and Award Information Tracker (GAIT) system. The program period may "
+"be adjusted to align with the program’s indicator plan."
 msgstr ""
 "La période de déclaration du programme est utilisée dans l’établissement des "
 "cibles périodiques et dans les tableaux de suivi des performances des "
@@ -2087,8 +2084,8 @@ msgstr ""
 "déclaration pour inclure les dates de début et de fin officielles du "
 "programme, telles qu’elles sont enregistrées dans le système de suivi des "
 "informations sur les subventions et les récompenses (GAIT). La période de "
-"déclaration peut être ajustée pour s’harmoniser avec le plan d’indicateurs "
-"du programme."
+"déclaration peut être ajustée pour s’harmoniser avec le plan d’indicateurs du "
+"programme."
 
 #: templates/indicators/indicator_reportingperiod_modal.html:36
 msgid "GAIT program dates"
@@ -2104,18 +2101,18 @@ msgid ""
 "                                While a program may begin and end any day of "
 "the month, program periods must begin on the first day of the month and end "
 "on the last day of the month. Please note that the program start date can "
-"only be adjusted <span class=\"color-red\">before periodic targets are set "
-"up and a program begins submitting performance results.</span> The program "
-"end date can be moved later at any time, but can't be moved earlier once "
-"periodic targets are set up.\n"
+"only be adjusted <span class=\"color-red\">before periodic targets are set up "
+"and a program begins submitting performance results.</span> The program end "
+"date can be moved later at any time, but can't be moved earlier once periodic "
+"targets are set up.\n"
 "                                "
 msgstr ""
 "\n"
 "                                Alors qu’un programme peut débuter et se "
 "terminer n’importe quel jour du mois, les périodes du programme doivent "
 "débuter le premier jour du mois et se terminer le dernier jour du mois. "
-"Veuillez noter que la date de début du programme peut uniquement être "
-"ajustée <span class=\"color-red\">avant que des cibles périodiques aient été "
+"Veuillez noter que la date de début du programme peut uniquement être ajustée "
+"<span class=\"color-red\">avant que des cibles périodiques aient été "
 "spécifiées et qu’un programme commence à transmettre des résultats de "
 "performance.</span> La date de fin du programme peut être déplacée "
 "ultérieurement à tout moment, mais ne peut plus être avancée dès que des "
@@ -2140,15 +2137,14 @@ msgstr ""
 "débuter le premier jour du mois et se terminer le dernier jour du mois. "
 "Veuillez noter que la date de début du programme peut seulement être ajustée "
 "<span class=\"color-red\">avant que des cibles ont été spécifiées et qu’un "
-"programme commence à transmettre des résultats de performance.</span> "
-"Puisque ce programme a déjà des cibles périodiques définies, seule la date "
-"de fin de programme peut être déplacée ultérieurement.\n"
+"programme commence à transmettre des résultats de performance.</span> Puisque "
+"ce programme a déjà des cibles périodiques définies, seule la date de fin de "
+"programme peut être déplacée ultérieurement.\n"
 "                                "
 
 #: templates/indicators/indicator_reportingperiod_modal.html:99
 #: templates/indicators/result_form_modal.html:154
-#: templates/registration/profile.html:98 tola/forms.py:26
-#: workflow/forms.py:122
+#: templates/registration/profile.html:98 tola/forms.py:26 workflow/forms.py:122
 msgid "Save changes"
 msgstr "Sauvegarder les modifications"
 
@@ -2186,8 +2182,8 @@ msgstr ""
 "Cette action peut modifier vos cibles périodiques. Si des cibles périodiques "
 "ont déjà été définies pour vos indicateurs, vous devrez entrer de nouvelles "
 "valeurs de cibles afin de couvrir l’ensemble de la période du rapport. "
-"À titre de référence, veuillez fournir une justification pour la "
-"modification de la période du rapport."
+"À titre de référence, veuillez fournir une justification pour la modification "
+"de la période du rapport."
 
 #: templates/indicators/indicator_reportingperiod_modal.html:404
 msgid ""
@@ -2238,10 +2234,10 @@ msgid ""
 "                    "
 msgstr ""
 "\n"
-"                    <strong>Non cumulatif (NC) :</strong> Les résultats de "
-"la période cible sont calculés automatiquement à partir des données "
-"collectées durant la période. Le résultat de la vie du programme est la "
-"somme des valeurs de la période cible.\n"
+"                    <strong>Non cumulatif (NC) :</strong> Les résultats de la "
+"période cible sont calculés automatiquement à partir des données collectées "
+"durant la période. Le résultat de la vie du programme est la somme des "
+"valeurs de la période cible.\n"
 "                    "
 
 #: templates/indicators/indicatortargets.html:161
@@ -2267,9 +2263,9 @@ msgid ""
 "                    "
 msgstr ""
 "\n"
-"                    <strong>Cumulatif (C) :</strong> Le résultat de la vie "
-"du programme reflète le dernier résultat de période. Aucun calcul n’est "
-"effectué avec les résultats.\n"
+"                    <strong>Cumulatif (C) :</strong> Le résultat de la vie du "
+"programme reflète le dernier résultat de période. Aucun calcul n’est effectué "
+"avec les résultats.\n"
 "                    "
 
 #. Translators: This is a label for a numeric value field. The variable will be replaced with a frequency e.g. quarterly targets
@@ -2452,9 +2448,9 @@ msgid ""
 "removed. For future reference, please provide a reason for deleting this "
 "result."
 msgstr ""
-"La valeur de résultat et toute information y étant associée seront "
-"supprimées définitivement. À titre de référence, veuillez fournir une "
-"justification pour la suppression de ce résultat."
+"La valeur de résultat et toute information y étant associée seront supprimées "
+"définitivement. À titre de référence, veuillez fournir une justification pour "
+"la suppression de ce résultat."
 
 #: templates/indicators/result_form_common_js.html:94
 #: templates/indicators/result_form_common_js.html:397
@@ -2504,8 +2500,8 @@ msgid ""
 msgstr ""
 "La modification des résultats affectera les statistiques du programme pour "
 "cet indicateur, et ne doit être réalisée qu’en vue de corriger une erreur "
-"d’entrée de données. À titre de référence, veuillez fournir une "
-"justification pour la modification de ce résultat."
+"d’entrée de données. À titre de référence, veuillez fournir une justification "
+"pour la modification de ce résultat."
 
 #: templates/indicators/result_form_common_js.html:402
 #: templates/indicators/results/result_form_disaggregation_fields.html:72
@@ -2601,9 +2597,8 @@ msgstr "Ajouter des cibles"
 #: templates/indicators/result_table.html:263
 msgid ""
 "\n"
-"                        This record is not associated with a target. Open "
-"the data record and select an option from the “Measure against target” "
-"menu.\n"
+"                        This record is not associated with a target. Open the "
+"data record and select an option from the “Measure against target” menu.\n"
 "                        "
 msgstr ""
 "\n"
@@ -2640,8 +2635,8 @@ msgid ""
 "This date determines where the result appears in indicator performance "
 "tracking tables. If data collection occurred within the target period, we "
 "recommend entering the last day you collected data. If data collection "
-"occurred after the target period ended, we recommend entering the last day "
-"of the <i>target period in which you want the result to appear.</i>"
+"occurred after the target period ended, we recommend entering the last day of "
+"the <i>target period in which you want the result to appear.</i>"
 msgstr ""
 "Cette date détermine l’endroit où le résultat apparaît dans les tableaux de "
 "suivi des indicateurs de performance. Si la collecte des données a eu lieu "
@@ -2668,6 +2663,11 @@ msgid "You can measure this result against the Midline or Endline target."
 msgstr ""
 "Vous pouvez comparer ce résultat à la cible de mi-parcours ou de fin de "
 "programme."
+
+#. Translators: On a form input for "actual values" - warns user that they will be rounded.
+#: templates/indicators/results/result_form_common_fields.html:53
+msgid "Actual values are rounded to two decimal places."
+msgstr "Les valeurs réelles sont arrondies à deux décimales."
 
 #. Translators:  Allows the user to select only those items that need to be updated in some way
 #: templates/indicators/results/result_form_disaggregation_fields.html:23
@@ -2718,8 +2718,8 @@ msgstr "Afficher le cadre logique"
 #: templates/indicators/results_framework_page.html:32
 msgid ""
 "Indicators are currently grouped by an older version of indicator levels. To "
-"group indicators according to the results framework and view the Logframe, "
-"an admin will need to adjust program settings."
+"group indicators according to the results framework and view the Logframe, an "
+"admin will need to adjust program settings."
 msgstr ""
 "Les indicateurs sont actuellement regroupés selon une précédente version de "
 "niveaux d’indicateur. Pour qu'ils soient regroupés selon le cadre de "
@@ -2791,12 +2791,12 @@ msgid ""
 "d/1Gl9bxJJ6hdhCXeoOCoR1mnVKZa2FlEOhaJcjexiHzY0' target='_blank'>See our "
 "documentation for more information.</a>"
 msgstr ""
-"La valeur réelle correspond à la valeur cible, plus ou moins 15%% . Ainsi, "
-"si votre cible est 100 et votre résultat 110, l’indicateur est 10%% au-"
-"dessus de la cible.  <br><br>Veuillez noter que si le sens de changement de "
-"votre indicateur est décroissant, les indicateurs « au-dessus » et « en "
-"dessous » sont alors inversés. Dans ce cas, si votre cible est 100 et votre "
-"résultat 200, votre indicateur est 50%% en dessous de la cible.<br><br><a "
+"La valeur réelle correspond à la valeur cible, plus ou moins 15%% . Ainsi, si "
+"votre cible est 100 et votre résultat 110, l’indicateur est 10%% au-dessus de "
+"la cible.  <br><br>Veuillez noter que si le sens de changement de votre "
+"indicateur est décroissant, les indicateurs « au-dessus » et « en dessous » "
+"sont alors inversés. Dans ce cas, si votre cible est 100 et votre résultat "
+"200, votre indicateur est 50%% en dessous de la cible.<br><br><a "
 "href='https://docs.google.com/document/"
 "d/1Gl9bxJJ6hdhCXeoOCoR1mnVKZa2FlEOhaJcjexiHzY0' target='_blank'>Consultez "
 "notre documentation pour plus d´informations.</a>"
@@ -2806,8 +2806,8 @@ msgstr ""
 #, python-format
 msgid ""
 "\n"
-"                        <strong>%(low)s%%</strong> are &gt;%(margin)s%% "
-"below target\n"
+"                        <strong>%(low)s%%</strong> are &gt;%(margin)s%% below "
+"target\n"
 "                        "
 msgstr ""
 "\n"
@@ -2819,8 +2819,8 @@ msgstr ""
 #: templates/indicators/tags/gauge-band.html:83
 msgid "Unavailable until the first target period ends with results reported."
 msgstr ""
-"Indisponible jusqu’à la fin de la première période cible avec publication "
-"des résultats."
+"Indisponible jusqu’à la fin de la première période cible avec publication des "
+"résultats."
 
 #: templates/indicators/tags/program-complete.html:5
 #, python-format
@@ -2840,8 +2840,8 @@ msgid ""
 "                data-read-only=\"%(read_only)s\">\n"
 "                Program period\n"
 "            </a>\n"
-"            is <br><strong class=\"text-dark\">%(program.percent_complete)s"
-"%% complete</strong>\n"
+"            is <br><strong class=\"text-dark\">%(program.percent_complete)s%% "
+"complete</strong>\n"
 "        "
 msgstr ""
 "\n"
@@ -2869,8 +2869,8 @@ msgstr ""
 msgid ""
 "\n"
 "                <p><strong>The actual value is %(percent_met)s%% of the "
-"target value.</strong> An indicator is on track if the result is no less "
-"than 85%% of the target and no more than 115%% of the target.</p>\n"
+"target value.</strong> An indicator is on track if the result is no less than "
+"85%% of the target and no more than 115%% of the target.</p>\n"
 "                <p><em>Remember to consider your direction of change when "
 "thinking about whether the indicator is on track.</em></p>\n"
 "                "
@@ -2896,13 +2896,12 @@ msgstr "Veuillez contacter l’équipe TolaData pour obtenir de l’aide."
 #: templates/registration/invalid_user.html:14
 msgid ""
 " You can also reach the TolaData team by using the <a href=\"https://docs."
-"google.com/forms/d/"
-"e/1FAIpQLSclm2PAT9TJ9q23TT6YWQg6hj3EndUAdyF5k6kvNJHu6njNtw/viewform"
-"\">feedback form.</a>\n"
+"google.com/forms/d/e/1FAIpQLSclm2PAT9TJ9q23TT6YWQg6hj3EndUAdyF5k6kvNJHu6njNtw/"
+"viewform\">feedback form.</a>\n"
 "    "
 msgstr ""
-" Vous pouvez également contacter l’équipe de TolaData en utilisant le <a "
-"href=\"https://docs.google.com/forms/d/"
+" Vous pouvez également contacter l’équipe de TolaData en utilisant le <a href="
+"\"https://docs.google.com/forms/d/"
 "e/1FAIpQLSclm2PAT9TJ9q23TT6YWQg6hj3EndUAdyF5k6kvNJHu6njNtw/viewform"
 "\">formulaire de commentaires.</a>\n"
 "    "
@@ -3045,8 +3044,8 @@ msgid ""
 "\n"
 "    <h4>If you are using a Gmail address to log in:</h4>\n"
 "    <p>Return to the <a href=\"%(login_url)s\">log in page</a> and click "
-"<strong>Log in with Gmail.</strong> <em>We cannot reset your Gmail password."
-"</em></p>\n"
+"<strong>Log in with Gmail.</strong> <em>We cannot reset your Gmail password.</"
+"em></p>\n"
 "    "
 msgstr ""
 "\n"
@@ -3073,8 +3072,8 @@ msgstr ""
 "\n"
 "    <h4>Si vous vous connectez à l´aide d´une adresse e-mail Gmail :</h4>\n"
 "    <p>Retournez sur la <a href=\"%(login_url)s\">page de connexion</a> et "
-"cliquez sur <strong>Se connecter avec Gmail.</strong> <em>Nous ne pouvons "
-"pas réinitialiser votre mot de passe Gmail.</em></p>\n"
+"cliquez sur <strong>Se connecter avec Gmail.</strong> <em>Nous ne pouvons pas "
+"réinitialiser votre mot de passe Gmail.</em></p>\n"
 "    "
 
 #: templates/registration/password_reset_email.html:2
@@ -3170,15 +3169,13 @@ msgid "Applies to number entry and display"
 msgstr "S’applique à la saisie et à l’affichage des numéros"
 
 #. Translators: The punctuation mark used as a decimal point in English
-#: templates/registration/profile.html:54
-#: templates/registration/profile.html:87
+#: templates/registration/profile.html:54 templates/registration/profile.html:87
 msgctxt "radix"
 msgid "Period"
 msgstr "Point"
 
 #. Translators: The punctuation mark used as a decimal point in French, Spanish
-#: templates/registration/profile.html:59
-#: templates/registration/profile.html:64
+#: templates/registration/profile.html:59 templates/registration/profile.html:64
 #: templates/registration/profile.html:77
 msgid "Comma"
 msgstr "Virgule"
@@ -3355,14 +3352,14 @@ msgid "Your profile has been updated."
 msgstr "Votre profil a été mis à jour."
 
 #: tola_management/models.py:104 tola_management/models.py:311
-#: tola_management/models.py:665 tola_management/models.py:722
-#: tola_management/models.py:780
+#: tola_management/models.py:673 tola_management/models.py:730
+#: tola_management/models.py:788
 msgid "Modification date"
 msgstr "Date de modification"
 
 #: tola_management/models.py:107 tola_management/models.py:316
-#: tola_management/models.py:668 tola_management/models.py:725
-#: tola_management/models.py:784
+#: tola_management/models.py:676 tola_management/models.py:733
+#: tola_management/models.py:792
 msgid "Modification type"
 msgstr "Type de modification"
 
@@ -3388,7 +3385,7 @@ msgid "Mode of address"
 msgstr "Prénom d’usage"
 
 #. Translators:  Form field capturing whether a user prefers to be contacted by phone, email, etc...
-#: tola_management/models.py:122 tola_management/models.py:737
+#: tola_management/models.py:122 tola_management/models.py:745
 msgid "Mode of contact"
 msgstr "Moyen de communication"
 
@@ -3405,7 +3402,7 @@ msgstr "E-mail"
 msgid "Organization"
 msgstr "Organisation"
 
-#: tola_management/models.py:126 tola_management/models.py:738
+#: tola_management/models.py:126 tola_management/models.py:746
 msgid "Is active"
 msgstr "Actif"
 
@@ -3519,86 +3516,86 @@ msgstr "Niveau de résultat modifié"
 msgid "Percentage"
 msgstr "Pourcentage (%)"
 
-#: tola_management/models.py:675
+#: tola_management/models.py:683
 msgid "GAIT ID"
 msgstr "ID GAIT"
 
-#: tola_management/models.py:677
+#: tola_management/models.py:685
 msgid "Funding status"
 msgstr "Statut de financement"
 
-#: tola_management/models.py:678
+#: tola_management/models.py:686
 msgid "Cost center"
 msgstr "Centre de coût"
 
-#: tola_management/models.py:680 tola_management/models.py:739
+#: tola_management/models.py:688 tola_management/models.py:747
 msgid "Sectors"
 msgstr "Secteurs"
 
-#: tola_management/models.py:687
+#: tola_management/models.py:695
 msgid "Program created"
 msgstr "Programme créé"
 
-#: tola_management/models.py:688
+#: tola_management/models.py:696
 msgid "Program updated"
 msgstr "Programme mis à jour"
 
-#: tola_management/models.py:733
+#: tola_management/models.py:741
 msgid "Primary address"
 msgstr "Adresse principale"
 
-#: tola_management/models.py:734
+#: tola_management/models.py:742
 msgid "Primary contact name"
 msgstr "Nom du contact principal"
 
-#: tola_management/models.py:735
+#: tola_management/models.py:743
 msgid "Primary contact email"
 msgstr "Adresse e-mail du contact principal"
 
-#: tola_management/models.py:736
+#: tola_management/models.py:744
 msgid "Primary contact phone"
 msgstr "Numéro de téléphone du contact principal"
 
-#: tola_management/models.py:745
+#: tola_management/models.py:753
 msgid "Organization created"
 msgstr "Société créée"
 
-#: tola_management/models.py:746
+#: tola_management/models.py:754
 msgid "Organization updated"
 msgstr "Société mise à jour"
 
 #. Translators: Heading for list of disaggregation categories in a particular disaggregation type.
-#: tola_management/models.py:796
+#: tola_management/models.py:804
 msgid "Disaggregation categories"
 msgstr "Catégories de désagrégation"
 
 #. Translators: Heading for data that tracks when a data disaggregation as been created for a country
-#: tola_management/models.py:807
+#: tola_management/models.py:815
 msgid "Country disaggregation created"
 msgstr "Désagrégation au niveau du pays créée"
 
 #. Translators: Heading for data that tracks when a data disaggregation assigned to a country has been changed.
-#: tola_management/models.py:809
+#: tola_management/models.py:817
 msgid "Country disaggregation updated"
 msgstr "Désagrégation au niveau du pays mise à jour"
 
 #. Translators: Heading for data that tracks when a data disaggregation assigned to a country has been deleted.
-#: tola_management/models.py:811
+#: tola_management/models.py:819
 msgid "Country disaggregation deleted"
 msgstr "Désagrégation au niveau du pays supprimée"
 
 #. Translators: Heading for data that tracks when a data disaggregation assigned to a country has been archived.
-#: tola_management/models.py:813
+#: tola_management/models.py:821
 msgid "Country disaggregation archived"
 msgstr "Désagrégation au niveau du pays archivée"
 
 #. Translators: Heading for data that tracks when a data disaggregation assigned to a country has been restored.
-#: tola_management/models.py:815
+#: tola_management/models.py:823
 msgid "Country disaggregation unarchived"
 msgstr "Désagrégation au niveau du pays non archivée"
 
 #. Translators: Heading for data that tracks when the categories of a data disaggregation that has been assigned to country have been updated.
-#: tola_management/models.py:817
+#: tola_management/models.py:825
 msgid "Country disaggregation categories updated"
 msgstr "Catégories de désagrégation au niveau du pays mises à jour"
 
@@ -3669,12 +3666,12 @@ msgstr ""
 #. Translators:  Error message given when an administrator tries to save an invalid username
 #: tola_management/views.py:396 tola_management/views.py:400
 msgid ""
-"Mercy Corps accounts are managed by Okta. Mercy Corps employees should log "
-"in using their Okta username and password."
+"Mercy Corps accounts are managed by Okta. Mercy Corps employees should log in "
+"using their Okta username and password."
 msgstr ""
 "Les comptes Mercy Corps sont gérés par Okta. Les employés de Mercy Corps "
-"doivent se connecter en utilisant leur nom d’utilisateur et leur mot de "
-"passe Okta."
+"doivent se connecter en utilisant leur nom d’utilisateur et leur mot de passe "
+"Okta."
 
 #: tola_management/views.py:411
 msgid "Only superusers can create Mercy Corps staff profiles."
@@ -3902,8 +3899,7 @@ msgstr "Date de fin de la période de déclaration"
 #. Translators: This is an option that users can select to use the new "results framework" option to organize their indicators.
 #: workflow/models.py:508
 msgid "Auto-number indicators according to the results framework"
-msgstr ""
-"Numéroter automatiquement les indicateurs d’après le cadre de résultats"
+msgstr "Numéroter automatiquement les indicateurs d’après le cadre de résultats"
 
 #: workflow/models.py:512
 msgid "Group indicators according to the results framework"
@@ -4306,8 +4302,8 @@ msgstr "Ville, Pays :"
 
 #~ msgid ""
 #~ "Standard disaggregations are entered by the administrator for the entire "
-#~ "organizations.  If you are not seeing any here, please contact your "
-#~ "system administrator."
+#~ "organizations.  If you are not seeing any here, please contact your system "
+#~ "administrator."
 #~ msgstr ""
 #~ "Les désagrégations standard sont entrées par l’administrateur pour "
 #~ "l’ensemble des organisations. Si vous n’en voyez aucun ici, veuillez "
@@ -4465,8 +4461,7 @@ msgstr "Ville, Pays :"
 #~ msgstr "Filtré par <b>(Status) : %(status|default_if_none:'')s</ b>"
 
 #, python-format
-#~ msgid ""
-#~ "Filtered by <b>(Program): %(filtered_program|default_if_none:'')s</b>"
+#~ msgid "Filtered by <b>(Program): %(filtered_program|default_if_none:'')s</b>"
 #~ msgstr ""
 #~ "Filtré par <b>(Programme) : %(filtered_program|default_if_none:'')s</ b>"
 
@@ -4706,8 +4701,8 @@ msgstr "Ville, Pays :"
 #~ msgstr "Date de demande"
 
 #~ msgid ""
-#~ "Please be specific in your name.  Consider that your Project Name "
-#~ "includes WHO, WHAT, WHERE, HOW"
+#~ "Please be specific in your name.  Consider that your Project Name includes "
+#~ "WHO, WHAT, WHERE, HOW"
 #~ msgstr ""
 #~ "Veuillez être précis dans votre nom. Considérez que votre nom de projet "
 #~ "inclut QUI, QUOI, OÙ, COMMENT"
@@ -4784,8 +4779,8 @@ msgstr "Ville, Pays :"
 #~ msgstr "Nombre estimé de bénéficiaires indirects"
 
 #~ msgid ""
-#~ "This is a calculation - multiply direct beneficiaries by average "
-#~ "household size"
+#~ "This is a calculation - multiply direct beneficiaries by average household "
+#~ "size"
 #~ msgstr ""
 #~ "C’est un calcul - multipliez les bénéficiaires directs par la taille "
 #~ "moyenne des ménages"
@@ -5110,8 +5105,8 @@ msgstr "Ville, Pays :"
 #~ "de rapport se situe dans le futur."
 
 #~ msgid ""
-#~ "Your program administrator must initialize this program before you will "
-#~ "be able to view or edit it"
+#~ "Your program administrator must initialize this program before you will be "
+#~ "able to view or edit it"
 #~ msgstr ""
 #~ "Ce programme doit être initialisé par votre administrateur de programme "
 #~ "avant de pouvoir être visible ou modifié"
@@ -5247,8 +5242,8 @@ msgstr "Ville, Pays :"
 #~ msgstr "Cibles périodiques vs. réellles"
 
 #~ msgid ""
-#~ "View results organized by target period for indicators that share the "
-#~ "same target frequency."
+#~ "View results organized by target period for indicators that share the same "
+#~ "target frequency."
 #~ msgstr ""
 #~ "Voir les résultats organisés par période cible pour les indicateurs qui "
 #~ "partagent la même fréquence cible."

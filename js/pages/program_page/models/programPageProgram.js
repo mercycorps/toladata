@@ -1,4 +1,4 @@
-import { observable, runInAction, action } from 'mobx';
+import { observable, runInAction, computed, action } from 'mobx';
 
 import api from '../../../apiv2';
 import { getProgram, withReportingPeriod, withProgramLevelOrdering } from '../../../models/program';
@@ -17,32 +17,22 @@ export const forProgramPage = (
 ) => ({
         indicators: programJSON.indicators ? new Map(Object.values(programJSON.indicators).map(indicatorJSON => new ProgramPageIndicator(indicatorJSON))
                             .map(indicator => [indicator.pk, indicator])) : new Map(),
-        resultsMap: observable(new Map()),
         needsAdditionalTargetPeriods: Boolean(programJSON.needs_additional_target_periods),
-        getResultsHTML(indicatorPk) {
-            return this.resultsMap.get(parseInt(indicatorPk)) || false;
+        _expandedIndicators: new Set(),
+        isExpanded(indicatorPk) {
+            return this._expandedIndicators.has(parseInt(indicatorPk));
         },
-        updateResultsHTML(rawIndicatorPk) {
-            let indicatorPk = parseInt(rawIndicatorPk);
-            if (indicatorPk && !isNaN(indicatorPk)) {
-                api.indicatorResultsTable(indicatorPk, true).then(resultsHTML => {
-                    runInAction(() => {
-                        this.deleteResultsHTML(indicatorPk);
-                        this.resultsMap.set(indicatorPk, resultsHTML);
-                        return true;
-                    });
-                });
-            }
-        },
-        deleteResultsHTML: action(function(indicatorPk) {
-            if (!isNaN(parseInt(indicatorPk)) && this.resultsMap.get(parseInt(indicatorPk))) {
-                this.resultsMap.delete(parseInt(indicatorPk));
-                return true;
-            }
-            return false;
+        expand: action(function(indicatorPk) {
+            this._expandedIndicators.add(parseInt(indicatorPk));
         }),
-        deleteAllResultsHTML: action(function() {
-            this.resultsMap.clear();
+        collapse: action(function(indicatorPk) {
+            this._expandedIndicators.delete(parseInt(indicatorPk))
+        }),
+        expandAll: action(function() {
+            this._expandedIndicators = new Set(this.indicators.keys());
+        }),
+        collapseAll: action(function() {
+            this._expandedIndicators.clear();
         }),
         updateIndicator: action(function(rawIndicatorPk) {
             let indicatorPk = parseInt(rawIndicatorPk);
