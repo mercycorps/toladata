@@ -11,6 +11,7 @@ import ProgramHistory from './components/program_history'
 import LoadingSpinner from 'components/loading-spinner'
 import FoldingSidebar from 'components/folding-sidebar'
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome'
+import { sortObjectListByValue } from '../../../general_utilities'
 
 const UserFilter = observer(({store, filterOptions}) => {
     return <div className="form-group react-multiselect-checkbox">
@@ -147,12 +148,12 @@ class BulkActions extends React.Component {
 export const IndexView = observer(
     ({store}) => {
 
-        const allCountryOptions = Object.entries(store.allCountries).map(([id, country]) => ({value: country.id, label: country.name}))
-        const countryFilterOptions = Object.entries(store.countries).map(([id, country]) => ({value: country.id, label: country.name}))
-        const organizationFilterOptions = Object.entries(store.organizations).map(([id, org]) => ({value: org.id, label: org.name}))
-        const sectorFilterOptions = store.sectors.map(x => ({value: x.id, label: x.name}))
-        const programFilterOptions = Object.entries(store.programFilterPrograms).map(([id, program]) => ({value: program.id, label: program.name}))
-        const userFilterOptions = Object.entries(store.users).map(([id, user]) => ({value: user.id, label: user.name}))
+        const allCountryOptions = sortObjectListByValue(Object.entries(store.allCountries).map(([id, country]) => ({value: country.id, label: country.name})))
+        const countryFilterOptions = sortObjectListByValue(Object.entries(store.countries).map(([id, country]) => ({value: country.id, label: country.name})))
+        const organizationFilterOptions = sortObjectListByValue(Object.entries(store.organizations).map(([id, org]) => ({value: org.id, label: org.name})))
+        const sectorFilterOptions = sortObjectListByValue(store.sectors.map(x => ({value: x.id, label: x.name})))
+        const programFilterOptions = sortObjectListByValue(Object.entries(store.programFilterPrograms).map(([id, program]) => ({value: program.id, label: program.name})))
+        const userFilterOptions = sortObjectListByValue(Object.entries(store.users).map(([id, user]) => ({value: user.id, label: user.name})))
         const bulkProgramStatusOptions = [
             {value: 'Funded', label: gettext('Active')},
             {value: 'Completed', label: gettext('Inactive')},

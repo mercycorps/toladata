@@ -134,5 +134,9 @@ const localizePercent = (val) => {
     return (percent === null) ? null : `${percent}%`;
 }
 
+const sortObjectListByValue = (objects, key='label') => objects.sort((a, b) => {
+    return a[key].toUpperCase() > b[key].toUpperCase() ? 1 : -1
+})
+
 export { flattenArray, ensureNumericArray, reloadPageIfCached, indicatorManualNumberSort,
-          localizeNumber, localizePercent };
+          localizeNumber, localizePercent, sortObjectListByValue };
