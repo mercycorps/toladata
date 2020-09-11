@@ -237,7 +237,7 @@ export class IndicatorListTable extends React.Component {
                             </a>
                             {displayUnassignedWarning &&
                                 <span className="text-danger ml-3"><i className="fas fa-bullseye"/> {
-                                    /* # Translators: Warning provided when a result has been disassociated with the target it belongs to */
+                                    /* # Translators: Warning provided when a result is not longer associated with any target.  It is a warning about state rather than an action.  The full sentence might read "There are results not assigned to targets" rather than "Results have been unassigned from targets. */
                                     gettext('Results unassigned to targets')
                                 }</span>
                             }

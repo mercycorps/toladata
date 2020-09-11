@@ -1,9 +1,10 @@
 import '../../../../test_helpers/django_i18n_stubs';
 import React from 'react';
 import renderer from 'react-test-renderer';
-import { shallow } from 'enzyme';
+import { shallow, render } from 'enzyme';
 import IndicatorList, { StatusHeader, IndicatorFilter, IndicatorListTable } from '../../components/indicator_list';
 import { IndicatorFilterType } from '../../../../constants';
+import indicatorResultData from './fixtures/resultsTableIndicators.json';
 
 
 import eventBus from '../../../../eventbus';
@@ -155,6 +156,18 @@ describe("Indicator List elements", () => {
                 <IndicatorListTable {...props} />
             );
             expect(component.toJSON()).toMatchSnapshot();
+        });
+        it("appropriately displays a disassociated result warning", () => {
+            props.indicators.push(indicatorResultData.unassignedResultsWithTargets);
+            props.program.isExpanded = x => false;
+            let component = render(<IndicatorListTable {...props} />);
+            expect(component.html()).toContain("Results unassigned to targets");
+            props.program.isExpanded = x => true;
+            component = render(<IndicatorListTable {...props} />);
+            expect(component.html()).toContain("Results unassigned to targets");
+            props.indicators[0].periodicTargets = []
+            component = render(<IndicatorListTable {...props} />);
+            expect(component.html()).toEqual(expect.not.stringContaining("Results unassigned to targets"));
         });
     });
 });
