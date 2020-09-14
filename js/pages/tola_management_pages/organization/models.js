@@ -1,5 +1,6 @@
 import { observable, computed, action, runInAction } from "mobx";
 import api from './api';
+import {sortObjectListByValue} from "../../../general_utilities";
 
 const default_organization = {
     id: null ,
@@ -69,10 +70,10 @@ export class OrganizationStore {
         this.available_organizations = organizations
         this.available_sectors = sectors
         this.available_countries = countries
-        this.organization_selections = Object.entries(organizations).map(([id, org]) => ({value: org.id, label: org.name}))
-        this.program_selections = Object.entries(programs).map(([id, program]) => ({value: program.id, label: program.name}))
-        this.sector_selections = Object.entries(sectors).map(([id, sector]) => ({value: sector.id, label: sector.name}))
-        this.country_selections = Object.entries(countries).map(([id, country]) => ({value: country.id, label: country.name}))
+        this.organization_selections = sortObjectListByValue(Object.entries(organizations).map(([id, org]) => ({value: org.id, label: org.name})))
+        this.program_selections = sortObjectListByValue(Object.entries(programs).map(([id, program]) => ({value: program.id, label: program.name})))
+        this.sector_selections = sortObjectListByValue(Object.entries(sectors).map(([id, sector]) => ({value: sector.id, label: sector.name})))
+        this.country_selections = sortObjectListByValue(Object.entries(countries).map(([id, country]) => ({value: country.id, label: country.name})))
         this.filters.countries = country_filter.map(id => this.available_countries[id]).map(country => ({label: country.name, value: country.id}))
         this.filters.programs = program_filter.filter(id => programs[id]).map(id => ({label: programs[id].name, value: id}))
         this.appliedFilters = {...this.filters}
