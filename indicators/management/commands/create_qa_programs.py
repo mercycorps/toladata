@@ -75,7 +75,7 @@ class Command(BaseCommand):
         if options['names']:
             tester_names = options['names'].split(',')
         else:
-            tester_names = ['Barbara', 'Cameron', 'Carly', 'Jenny', 'Marie', 'Marco', 'PaQ', 'Paul', 'Sanjuro']
+            tester_names = ['Alex', 'Barbara', 'Cameron', 'Carly', 'Jenny', 'Marie', 'Marco', 'PaQ', 'Paul', 'Sanjuro']
         for t_name in tester_names:
             program_name = 'QA program - {}'.format(t_name)
             print(f'Creating {program_name}')
