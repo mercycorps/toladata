@@ -226,6 +226,7 @@ class UserManagementAuditLog(models.Model, DiffableLog):
             )
             entry.save()
 
+
 class AuditLogRationaleSelection(models.Model):
     """Rationale options to supplement/supplant a rationale string in some cases
 
@@ -283,7 +284,8 @@ class AuditLogRationaleSelection(models.Model):
     @classmethod
     def options_display(cls):
         """returns all options in (ENUM, human-readable name, whether a rationale is required) tuple form"""
-        return [(option, _(label), option in cls.RATIONALE_REQUIRED) for (option, field, label) in cls.ordered_options()]
+        return [
+            (option, _(label), option in cls.RATIONALE_REQUIRED) for (option, field, label) in cls.ordered_options()]
 
     @classmethod
     def from_options(cls, options=None):
@@ -465,7 +467,10 @@ class ProgramAuditLog(models.Model, DiffableLog):
                             "type": diff["new"][new_id].get('type'),
                         }
 
-                    if new_id in diff["prev"] and diff["prev"][new_id]["value"] != diff["new"][new_id]["value"]:
+                    if new_id in diff["prev"] and (
+                        # Need to check both the value and the name in order to capture changes to the event names
+                            diff["prev"][new_id]["value"] != diff["new"][new_id]["value"] or
+                            diff["prev"][new_id]["name"] != diff["new"][new_id]["name"]):
                         new[new_id] = {
                             "name": diff["new"][new_id].get('name'),
                             "value": diff["new"][new_id].get('value'),
@@ -481,7 +486,10 @@ class ProgramAuditLog(models.Model, DiffableLog):
                             "type": diff["prev"][new_id].get('type'),
                         }
 
-                    if prev_id in diff["new"] and diff["prev"][prev_id]["value"] != diff["new"][prev_id]["value"]:
+                    if prev_id in diff["new"] and (
+                            # Need to check both the value and the name in order to capture changes to the event names
+                            diff["prev"][prev_id]["value"] != diff["new"][prev_id]["value"] or
+                            diff["prev"][prev_id]["name"] != diff["new"][prev_id]["name"]):
                         new[prev_id] = {
                             "name": diff["new"][prev_id].get('name'),
                             "value": diff["new"][prev_id].get('value'),
@@ -565,7 +573,8 @@ class ProgramAuditLog(models.Model, DiffableLog):
             rationale_selections = AuditLogRationaleSelection.from_options(rationale_options)
             if not rationale and rationale_selections.selected_options == [rationale_selections.OTHER]:
                 logger.error(
-                    "No rationale provided, expected new json:\n{}\nto match old json:\n{}".format(new_entry_json, previous_entry_json)
+                    "No rationale provided, expected new json:\n{}\nto match old json:\n{}".format(
+                        new_entry_json, previous_entry_json)
                 )
                 raise ValidationError("Rationale required when 'Other' selected")
             if not rationale and not rationale_selections.selected_options:
