@@ -6,8 +6,8 @@ msgid ""
 msgstr ""
 "Project-Id-Version: \n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2020-09-01 14:22-0700\n"
-"PO-Revision-Date: 2020-09-01 14:23-0700\n"
+"POT-Creation-Date: 2020-09-11 07:08-0700\n"
+"PO-Revision-Date: 2020-09-11 07:07-0700\n"
 "Last-Translator: \n"
 "Language-Team: \n"
 "Language: es\n"
@@ -479,7 +479,7 @@ msgstr "Todos los valores de este informe se redondean a dos decimales."
 #. Translators: Header for a column listing values defined as targets for each row
 #: js/pages/iptt_report/components/report/headerCells.js:63
 #: js/pages/iptt_report/components/report/tableHeader.js:156
-#: js/pages/program_page/components/indicator_list.js:198
+#: js/pages/program_page/components/indicator_list.js:199
 #: js/pages/program_page/components/resultsTable.js:253
 msgid "Target"
 msgstr "Objetivo"
@@ -512,7 +512,7 @@ msgstr "No."
 #. Translators: Column header for indicator Name column */
 #: js/pages/iptt_report/components/report/tableHeader.js:104
 #: js/pages/logframe/components/table.js:30
-#: js/pages/program_page/components/indicator_list.js:194
+#: js/pages/program_page/components/indicator_list.js:195
 #: js/pages/tola_management_pages/audit_log/views.js:109
 #: js/pages/tola_management_pages/audit_log/views.js:162
 #: js/pages/tola_management_pages/audit_log/views.js:166
@@ -527,7 +527,7 @@ msgstr "Nivel"
 #. Translators: Column header */
 #: js/pages/iptt_report/components/report/tableHeader.js:123
 #: js/pages/iptt_report/models/filterStore.js:690
-#: js/pages/program_page/components/indicator_list.js:196
+#: js/pages/program_page/components/indicator_list.js:197
 msgid "Unit of measure"
 msgstr "Unidad de medida"
 
@@ -551,7 +551,7 @@ msgstr "# / %"
 #. Translators: Column header */
 #: js/pages/iptt_report/components/report/tableHeader.js:149
 #: js/pages/iptt_report/models/filterStore.js:694
-#: js/pages/program_page/components/indicator_list.js:197
+#: js/pages/program_page/components/indicator_list.js:198
 msgid "Baseline"
 msgstr "Base"
 
@@ -560,7 +560,7 @@ msgstr "Base"
 #: js/pages/iptt_report/components/report/tableRows.js:258
 #: js/pages/iptt_report/components/report/tableRows.js:259
 #: js/pages/iptt_report/components/report/tableRows.js:261
-#: js/pages/program_page/components/indicator_list.js:259
+#: js/pages/program_page/components/indicator_list.js:266
 #: js/pages/program_page/components/resultsTable.js:9
 #: js/pages/tola_management_pages/audit_log/views.js:157
 #: js/pages/tola_management_pages/audit_log/views.js:194
@@ -779,12 +779,17 @@ msgstr "Ninguno"
 msgid "Group indicators:"
 msgstr "Indicadores de grupo:"
 
+#. Translators: Warning provided when a result has been disassociated with the target it belongs to */
+#: js/pages/program_page/components/indicator_list.js:241
+msgid "Results unassigned to targets"
+msgstr "Resultados sin asignar a los objetivos"
+
 #. Translators: Adj: labels this indicator as one which is missing one or more targets */
-#: js/pages/program_page/components/indicator_list.js:248
+#: js/pages/program_page/components/indicator_list.js:255
 msgid "Missing targets"
 msgstr "No hay objetivos"
 
-#: js/pages/program_page/components/indicator_list.js:312
+#: js/pages/program_page/components/indicator_list.js:319
 msgid ""
 "Some indicators have missing targets. To enter these values, click the "
 "target icon near the indicator name."

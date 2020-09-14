@@ -1,6 +1,6 @@
 import React from 'react';
 import classNames from 'classnames';
-import { observer } from "mobx-react"
+import { observer } from "mobx-react";
 import eventBus from '../../../eventbus';
 import { AddIndicatorButton, ExpandAllButton, CollapseAllButton } from '../../../components/indicatorModalComponents';
 import ResultsTable from './resultsTable';
@@ -219,6 +219,7 @@ export class IndicatorListTable extends React.Component {
                     }
                     return displayFunc(val);
                 }
+                const displayUnassignedWarning = indicator.noTargetResults.length > 0 && indicator.periodicTargets.length > 0
                 return <React.Fragment key={indicator.pk}>
                     <tr className={classNames("indicators-list__row", "indicators-list__indicator-header", {
                         "is-highlighted": indicator.wasJustCreated,
@@ -234,7 +235,12 @@ export class IndicatorListTable extends React.Component {
                                 <strong>{ indicator.number ? indicator.number + ':' : '' }</strong>&nbsp;
                                 <span className="indicator_name">{ indicator.name }</span>
                             </a>
-
+                            {displayUnassignedWarning &&
+                                <span className="text-danger ml-3"><i className="fas fa-bullseye"/> {
+                                    /* # Translators: Warning provided when a result is not longer associated with any target.  It is a warning about state rather than an action.  The full sentence might read "There are results not assigned to targets" rather than "Results have been unassigned from targets. */
+                                    gettext('Results unassigned to targets')
+                                }</span>
+                            }
                             {indicator.isKeyPerformanceIndicator &&
                             <span className="badge">KPI</span>
                             }
