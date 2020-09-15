@@ -137,8 +137,12 @@ class IndicatorFactory:
         self.sadd_disagg_labels = self.sadd_disagg_obj.disaggregationlabel_set.all()
 
     def create_standard_indicators(self, **kwargs):
-        indicator_ids = self.create_indicators(self.standard_params_base, **kwargs)
-        indicator_ids.extend(self.create_indicators(self.null_supplements_params, **kwargs))
+        passed_apply_skips = kwargs.pop('apply_skips', None)
+        apply_skips_main = passed_apply_skips or True
+        apply_skips_supplement = passed_apply_skips or False
+        indicator_ids = self.create_indicators(self.standard_params_base, apply_skips=apply_skips_main, **kwargs)
+        indicator_ids.extend(self.create_indicators(
+            self.null_supplements_params, apply_skips=apply_skips_supplement, **kwargs))
         return indicator_ids
 
     def create_indicators(

@@ -7,7 +7,7 @@ from factories.indicators_models import (
     DisaggregationTypeFactory,
     IndicatorTypeFactory
 )
-from factories.workflow_models import ProgramFactory, OrganizationFactory, TolaUserFactory
+from factories.workflow_models import ProgramFactory, OrganizationFactory, TolaUserFactory, SectorFactory
 from workflow.models import Program, Country
 
 
@@ -19,6 +19,7 @@ class TestQAScript(test.TestCase):
         OrganizationFactory(pk=1, name="Mercy Corps")
         DisaggregationTypeFactory(pk=109, disaggregation_type="Sex and Age Disaggregated Data (SADD)")
         cls.indicator_type = IndicatorTypeFactory()
+        SectorFactory.create_batch(size=5)
         management.call_command('create_qa_programs', names='test_program', named_only=True)
         cls.program = Program.objects.filter(name__contains="QA program")[0]
         cls.tolaland = Country.objects.get(country="Tolaland")

@@ -65,17 +65,42 @@ class Command(BaseCommand):
 
         self.create_test_sites()
 
+        named_testers = {
+            'Alex': 'atran@mercycorps.org',
+            'Barbara': 'bwillett@mercycorps.org',
+            'Cameron': 'cmcfee@mercycorps.org',
+            'Carly': 'colenick@mercycorps.org',
+            'Jenny': 'jmarx@mercycorps.org',
+            'Marie': 'mbakke@mercycorps.org',
+            'Marco': 'mscagliusi@mercycorps.org',
+            'PaQ': None,
+            'Paul': 'psouders@mercycorps.org',
+            'Sanjuro': 'sjogdeo@mercycorps.org',
+        }
+
         for super_user in TolaUser.objects.filter(user__is_superuser=True):
             ca, created = CountryAccess.objects.get_or_create(country=tolaland, tolauser=super_user)
             ca.role = 'basic_admin'
             ca.save()
+
+        named_tester_emails = [email for email in named_testers.values() if email]
+        named_user_objs = TolaUser.objects.filter(user__email__in=named_tester_emails).select_related()
+        for tola_user in named_user_objs:
+            print(f'Making {tola_user.user.email} a basic admin')
+            for country_name in Country.objects.all():
+                ca, created = CountryAccess.objects.get_or_create(
+                    country=Country.objects.get(country=country_name),
+                    tolauser=tola_user
+                )
+                ca.role = 'basic_admin'
+                ca.save()
 
         program_factory = ProgramFactory(tolaland)
 
         if options['names']:
             tester_names = options['names'].split(',')
         else:
-            tester_names = ['Alex', 'Barbara', 'Cameron', 'Carly', 'Jenny', 'Marie', 'Marco', 'PaQ', 'Paul', 'Sanjuro']
+            tester_names = named_testers.keys()
         for t_name in tester_names:
             program_name = 'QA program - {}'.format(t_name)
             print(f'Creating {program_name}')
@@ -135,11 +160,19 @@ class Command(BaseCommand):
         print(f'Creating {program_name}')
         future_start_date = (date.today() + relativedelta(months=6)).replace(day=1)
         future_end_date = (future_start_date + relativedelta(months=19)).replace(day=28)
-        future_end_date = (future_end_date + relativedelta(days=5)).replace(day=1)
+        future_end_date = (future_end_date + relativedelta(days=5)).replace(day=1) - timedelta(days=1)
         program = program_factory.create_program(
             program_name, start_date=future_start_date, end_date=future_end_date,)
         indicator_factory = IndicatorFactory(program, tolaland)
-        indicator_factory.create_standard_indicators()
+        indicator_params = deepcopy(indicator_factory.standard_params_base)
+        null_level_list = ['results'] * len(indicator_params)
+        fail_message = self.set_null_levels(indicator_params, null_level_list, program.name)
+        if fail_message:
+            print(fail_message)
+            program.delete()
+        else:
+            indicator_factory.create_indicators(indicator_params)
+        indicator_factory.create_indicators(indicator_factory.null_supplements_params, apply_skips=False)
 
         program_name = 'QA program -- I Love Indicators So Much'
         print(f'Creating {program_name}')
