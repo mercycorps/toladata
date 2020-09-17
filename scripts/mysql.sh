@@ -83,7 +83,7 @@ then
     echo "backing db $backup"
     #mysqldump --user=$user --password=$password --host=$host $db_name > $backup_path/$db_name-$date.sql
     #mysqldump --user=$user --password --host=$host $db_name > $backup_path/$host-$db_name-$date.sql
-    mysqldump --user=$user --password --host=$host $db_name > $backup_path/$host-$db_name-$date.sql
+    mysqldump --no-tablespaces --user=$user --password --host=$host $db_name > $backup_path/$host-$db_name-$date.sql
 else
     echo "NOT backingup db at $host"
 fi
