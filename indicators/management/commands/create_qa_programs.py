@@ -165,6 +165,7 @@ class Command(BaseCommand):
             program_name, start_date=future_start_date, end_date=future_end_date,)
         indicator_factory = IndicatorFactory(program, tolaland)
         indicator_params = deepcopy(indicator_factory.standard_params_base)
+        indicator_params.extend(deepcopy(indicator_factory.null_supplements_params))
         null_level_list = ['results'] * len(indicator_params)
         fail_message = self.set_null_levels(indicator_params, null_level_list, program.name)
         if fail_message:
@@ -172,7 +173,14 @@ class Command(BaseCommand):
             program.delete()
         else:
             indicator_factory.create_indicators(indicator_params)
-        indicator_factory.create_indicators(indicator_factory.null_supplements_params, apply_skips=False)
+        # supplemental_params = deepcopy(indicator_factory.null_supplements_params)
+        # null_level_list = ['results'] * len(supplemental_params)
+        # fail_message = self.set_null_levels(supplemental_params, null_level_list, program.name)
+        # if fail_message:
+        #     print(fail_message)
+        #     program.delete()
+        # else:
+        #     indicator_factory.create_indicators(supplemental_params, apply_skips=True)
 
         program_name = 'QA program -- I Love Indicators So Much'
         print(f'Creating {program_name}')
