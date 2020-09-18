@@ -1,5 +1,6 @@
 
 import sys
+import uuid
 from copy import deepcopy
 from datetime import date, timedelta
 from dateutil.relativedelta import relativedelta
@@ -53,7 +54,10 @@ class Command(BaseCommand):
         translation.activate(settings.LANGUAGE_CODE)
 
         if not options['named_only']:
-            test_password = getpass(prompt="Enter the password to use for the test users: ")
+            if 'test' in sys.argv:
+                test_password = str(uuid.uuid4())
+            else:
+                test_password = getpass(prompt="Enter the password to use for the test users: ")
 
         org = Organization.objects.get(id=1)
         tolaland, created = Country.objects.get_or_create(
@@ -285,10 +289,8 @@ class Command(BaseCommand):
             home_country = None
             if profile['home_country']:
                 home_country = Country.objects.get(country=profile['home_country'])
-            accessible_countries = []
 
-            for country_name in profile['accessible_countries']:
-                accessible_countries.append(Country.objects.get(country=country_name))
+            accessible_countries = Country.objects.filter(country__in=profile['accessible_countries'])
 
             user, created = User.objects.get_or_create(
                 username=username,
