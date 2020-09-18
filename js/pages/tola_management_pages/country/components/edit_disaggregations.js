@@ -106,6 +106,89 @@ class CategoryForm extends React.Component {
 }
 
 
+class RetroactiveApplicationForm extends React.Component {
+    constructor(props) {
+        super(props);
+        this.disabledRef = React.createRef();
+    }
+
+    componentDidMount = () => {
+        if (this.disabledRef.current) {
+            $(this.disabledRef.current).popover({
+                html: true
+            });
+        }
+    };
+
+    render() {
+        const {index, category, listLength, ...props} = this.props;
+        const isInvalid = props.errors
+            && props.errors.labels
+            && props.errors.labels.length > index
+            && props.errors.labels[index].hasOwnProperty('label')
+            && props.errors.labels[index]['label'].length;
+
+        let deletionElement =
+            <a
+                tabIndex="0"
+                onClick={() => props.deleteLabel(index)}
+                className={classNames("btn btn-link btn-danger text-nowrap", {'disabled': category.in_use})}
+            >
+                <i className="fas fa-trash"/>{gettext('Remove')}
+            </a>;
+
+        if (props.disabled || category.in_use) {
+            // In the case that there is only one category and it is in use or archived, preference the disabled
+            // element over the null element
+            deletionElement =
+                <HelpPopover
+                    key={1}
+                    content={ gettext('This category cannot be edited or removed because it was used to disaggregate a result.') }
+                    placement="bottom"
+                    className='btn btn-link'
+                    iconClass="fa fa-lock text-muted"
+                    className="btn btn-link"
+                    innerRef={ this.disabledRef }
+                    ariaText={gettext('Explanation for absence of delete button')}
+                />
+        }
+        else if(listLength === 1) {
+            deletionElement = null;
+        }
+
+        return (
+            <React.Fragment>
+                <div className="form-group" style={ {marginTop: '8px'} }    >
+                    <div className="row">
+                        <div className="col-md-7">
+                            <h4>
+                                {/* # Translators:  Users have the option of applying the thing they are changing to existing elements, not just new ones */}
+                                {gettext('Apply to existing indicators from these programs')}
+                            </h4>
+                        </div>
+                    </div>
+                    <DisaggregationCategoryList
+                        id={ disaggregation.id }
+                        categories={ this.state.labels }
+                        disabled={ disaggregation.is_archived }
+                        updateLabelOrder={ this.updateLabelOrder.bind(this) }
+                        updateLabel={ this.updateLabel.bind(this) }
+                        deleteLabel={ this.deleteLabel.bind(this) }
+                        errors={ errors }
+                        />
+                    {!disaggregation.is_archived && <div style={ {marginTop: '-15px', marginLeft: '-5px'} }>
+                        <a tabIndex="0" onClick={() => this.appendLabel()} className="btn btn-link btn-add">
+                            {/* # Translators:  Button label.  Button allows users to add a disaggregation category to a list.  */}
+                            <i className="fas fa-plus-circle"/>{gettext('Add a category')}
+                        </a>
+                    </div>}
+                </div>
+            </React.Fragment>
+        );
+    }
+}
+
+
 const DisaggregationCategoryList = observer(
     ({id, categories, ...props}) => (
         <DragDropContext
@@ -323,7 +406,6 @@ class DisaggregationType extends React.Component {
                                     <input className="form-check-input" type="checkbox" checked={managed_data.selected_by_default}
                                            onChange={(e) => {this.updateSelectedByDefault(e.target.checked)}} id="selected-by-default-checkbox"
                                             disabled={disaggregation.is_archived} />
-                                    <nobr>
                                     <label className="form-check-label mr-2" htmlFor="selected-by-default-checkbox">
                                     {
                                         // # Translators: This labels a checkbox, when checked, it will make the associated item "on" (selected) for all new indicators
@@ -338,7 +420,6 @@ class DisaggregationType extends React.Component {
                                         innerRef={this.selectedByDefaultPopup}
                                         ariaText={gettext('More information on "selected by default"')}
                                     />
-                                    </nobr>
                                 </div>
                             </div>
                             <div className="form-group" style={ {marginTop: '8px'} }    >
@@ -410,6 +491,8 @@ class DisaggregationType extends React.Component {
         )
     }
 }
+
+
 
 
 @observer

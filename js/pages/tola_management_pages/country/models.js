@@ -59,7 +59,6 @@ export class CountryStore {
         api,
         initialData,
     ) {
-        this
         this.api = api
         Object.assign(this, initialData)
         this.appliedFilters = {...this.filters}
