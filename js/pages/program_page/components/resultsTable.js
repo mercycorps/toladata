@@ -28,11 +28,11 @@ class ProgressPopover extends React.Component {
             html: true
         });
     }
-    
+
     render() {
         const percent = localizePercent(this.props.val);
         var badgeClass, onTrackMsg, msg;
-        
+
         msg = interpolate(
             // # Translators: Explains how performance is categorized as close to the target or not close to the target
             gettext("<p><strong>The actual value is %(percent)s of the target value.</strong> An indicator is on track if the result is no less than 85% of the target and no more than 115% of the target.</p><p><em>Remember to consider your direction of change when thinking about whether the indicator is on track.</em></p>"),
@@ -133,7 +133,7 @@ const TargetPeriodRows = ({target, indicator, ...props}) => {
                         <td></td>
                     </React.Fragment>
                 }
-                
+
             </tr>
             {/* If there are multiple results, add "supplemental" rows - target period cells are rowspan'd to
               * fill this row also, so just add the result cells for the 2nd->nth results
@@ -294,11 +294,7 @@ const ResultsTableActions = ({indicator, editable, resultEditable, ...props}) =>
             <div className="cd-actions__message">
             {indicator.noTargets &&
                 <div className="text-danger">
-                    <FontAwesomeIcon icon={ faBullseye } />
-                    {
-                        // # Translators: Message displayed in place of a table that cannot be shown without targets having been set up
-                        gettext('This indicator has no targets.')
-                    }
+
                     { editable &&
                         <a href={`/indicators/indicator_update/${indicator.pk}/`}
                            data-tab="#targets" className="indicator-link btn btn-success">
@@ -309,7 +305,7 @@ const ResultsTableActions = ({indicator, editable, resultEditable, ...props}) =>
                            }
                         </a>
                     }
-                </div>    
+                </div>
             }
             </div>
             {resultEditable &&

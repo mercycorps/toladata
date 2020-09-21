@@ -8,6 +8,7 @@ import indicatorResultData from './fixtures/resultsTableIndicators.json';
 
 
 import eventBus from '../../../../eventbus';
+window.localizeNumber = function (number) { return number };
 
 jest.mock('../../../../eventbus');
 
@@ -168,6 +169,19 @@ describe("Indicator List elements", () => {
             props.indicators[0].periodicTargets = []
             component = render(<IndicatorListTable {...props} />);
             expect(component.html()).toEqual(expect.not.stringContaining("Results unassigned to targets"));
+        });
+        it("appropriately displays a missing target warning", () => {
+            props.indicators.push(indicatorResultData.noTargets1);
+            props.program.isExpanded = x => false;
+            let component = render(<IndicatorListTable {...props} />);
+            expect(component.html()).toContain("Indicator missing targets");
+            props.program.isExpanded = x => true;
+            component = render(<IndicatorListTable {...props} />);
+            expect(component.html()).toContain("Indicator missing targets");
+            props.indicators = [indicatorResultData.annual];
+            props.program.isExpanded = x => false;
+            component = render(<IndicatorListTable {...props} />);
+            expect(component.html()).not.toContain("Indicator missing targets");
         });
     });
 });
