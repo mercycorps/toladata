@@ -1,5 +1,6 @@
 
 import sys
+import uuid
 from copy import deepcopy
 from datetime import date, timedelta
 from dateutil.relativedelta import relativedelta
@@ -19,7 +20,7 @@ from indicators.models import (
     DisaggregationLabel,
 )
 from workflow.models import Program, Country, Organization, TolaUser, CountryAccess, ProgramAccess, SiteProfile
-from .qa_program_widgets.qa_widgets import Cleaner, ProgramFactory, IndicatorFactory, user_profiles
+from .qa_program_widgets.qa_widgets import Cleaner, ProgramFactory, IndicatorFactory, user_profiles, standard_countries
 
 
 class Command(BaseCommand):
@@ -48,9 +49,15 @@ class Command(BaseCommand):
         clean_commands = [option for option in options if 'clean' in option and options[option] is True]
         if clean_commands:
             Cleaner.clean(*clean_commands)
-            sys.exit()
+            return
 
         translation.activate(settings.LANGUAGE_CODE)
+
+        if not options['named_only']:
+            if 'test' in sys.argv:
+                test_password = str(uuid.uuid4())
+            else:
+                test_password = getpass(prompt="Enter the password to use for the test users: ")
 
         org = Organization.objects.get(id=1)
         tolaland, created = Country.objects.get_or_create(
@@ -58,10 +65,6 @@ class Command(BaseCommand):
                 'latitude': 21.4, 'longitude': -158, 'zoom': 6, 'organization': org, 'code': 'TO'})
         if created:
             self.create_disaggregations(tolaland)
-
-        if not options['named_only']:
-            password = getpass(prompt="Enter the password to use for the test users: ")
-            self.create_test_users(password)
 
         self.create_test_sites()
 
@@ -78,23 +81,6 @@ class Command(BaseCommand):
             'Sanjuro': 'sjogdeo@mercycorps.org',
         }
 
-        for super_user in TolaUser.objects.filter(user__is_superuser=True):
-            ca, created = CountryAccess.objects.get_or_create(country=tolaland, tolauser=super_user)
-            ca.role = 'basic_admin'
-            ca.save()
-
-        named_tester_emails = [email for email in named_testers.values() if email]
-        named_user_objs = TolaUser.objects.filter(user__email__in=named_tester_emails).select_related()
-        for tola_user in named_user_objs:
-            print(f'Making {tola_user.user.email} a basic admin')
-            for country_name in Country.objects.all():
-                ca, created = CountryAccess.objects.get_or_create(
-                    country=Country.objects.get(country=country_name),
-                    tolauser=tola_user
-                )
-                ca.role = 'basic_admin'
-                ca.save()
-
         program_factory = ProgramFactory(tolaland)
 
         if options['names']:
@@ -109,6 +95,7 @@ class Command(BaseCommand):
             indicator_factory.create_standard_indicators(personal_indicator=True)
 
         if options['named_only']:
+            self.assign_permissions(named_testers, options['named_only'], tolaland)
             return
 
         program_name = 'QA program -- Multi-country Program'
@@ -229,6 +216,35 @@ class Command(BaseCommand):
         else:
             indicator_factory.create_indicators(indicator_params)
 
+        # Create test users and assign permissions last to ensure same permissions are applied to Tolaland programs
+        self.assign_permissions(named_testers, options['named_only'], tolaland, test_password)
+
+    def assign_permissions(self, named_testers, named_only, tolaland, test_password=None):
+        for super_user in TolaUser.objects.filter(user__is_superuser=True):
+            ca, created = CountryAccess.objects.get_or_create(country=tolaland, tolauser=super_user)
+            ca.role = 'basic_admin'
+            ca.save()
+
+        named_tester_emails = [email for email in named_testers.values() if email]
+        named_user_objs = TolaUser.objects.filter(user__email__in=named_tester_emails).select_related()
+        for tola_user in named_user_objs:
+            print(f'Assigning {tola_user.user.email} lots of permissions')
+            for country in Country.objects.filter(country__in=standard_countries):
+                ca, created = CountryAccess.objects.get_or_create(
+                    country=Country.objects.get(country=country),
+                    tolauser=tola_user
+                )
+                ca.role = 'basic_admin'
+                ca.save()
+
+                for program in country.program_set.all():
+                    ProgramAccess.objects.get_or_create(
+                        country=country, program=program, tolauser=tola_user, defaults={'role': 'high'})
+
+        if not named_only:
+            self.create_test_users(test_password)
+
+
     @staticmethod
     def create_disaggregations(country):
         disagg_1 = DisaggregationType(
@@ -273,10 +289,8 @@ class Command(BaseCommand):
             home_country = None
             if profile['home_country']:
                 home_country = Country.objects.get(country=profile['home_country'])
-            accessible_countries = []
 
-            for country_name in profile['accessible_countries']:
-                accessible_countries.append(Country.objects.get(country=country_name))
+            accessible_countries = Country.objects.filter(country__in=profile['accessible_countries'])
 
             user, created = User.objects.get_or_create(
                 username=username,
