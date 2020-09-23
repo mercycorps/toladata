@@ -11,7 +11,7 @@ from factories import (
 from tola_management.models import ProgramAuditLog
 from tola_management.programadmin import ProgramAuditLogSerializer
 from indicators.models import Indicator, Result, DisaggregatedValue
-from workflow.models import COUNTRY_ROLE_CHOICES
+from workflow.models import COUNTRY_ROLE_CHOICES, Organization
 
 
 class TestResultAuditLog(test.TestCase):
@@ -453,6 +453,27 @@ class TestIndicatorAuditLog(test.TestCase):
             expected_options
             )
         self.assertContains(response, 'reason_for_change_options')
+
+    def test_audit_log_captures_event_name_change(self):
+        indicator = i_factories.RFIndicatorFactory(program=self.program, target_frequency=Indicator.EVENT, targets=True)
+        prev_entry = indicator.logged_fields
+        target = indicator.periodictargets.all().first()
+        target.period = "Different event name"
+        target.save()
+        log_entry = ProgramAuditLog(
+            program=self.program,
+            user=self.tola_user,
+            organization=Organization.objects.first(),
+            indicator=indicator,
+            level=indicator.level,
+            change_type="indicator_changed",
+            previous_entry=json.dumps(prev_entry),
+            new_entry=json.dumps(indicator.logged_fields),
+            rationale="A really good reason"
+        )
+        self.assertEqual(len(log_entry.diff_list), 1)
+        json_diff = json.dumps(log_entry.diff_list)
+        self.assertTrue('Event 1' in json_diff and "Different event name" in json_diff)
 
 
 class TestAuditLogRationaleSelectionsDisplay(test.TestCase):

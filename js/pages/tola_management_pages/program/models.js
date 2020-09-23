@@ -1,4 +1,5 @@
 import { observable, computed, action, runInAction } from "mobx";
+import {sortObjectListByValue} from "../../../general_utilities";
 
 
 export class ProgramStore {
@@ -95,7 +96,7 @@ export class ProgramStore {
             this.api.fetchPrograms(this.current_page + 1, this.marshalFilters(this.appliedFilters)).then(results => {
                 runInAction(() => {
                     this.fetching_main_listing = false
-                    this.programs = results.results
+                    this.programs = sortObjectListByValue(results.results, 'name')
                     this.program_count = results.total_results
                     this.total_pages = results.total_pages
                     this.next_page =results.next_page

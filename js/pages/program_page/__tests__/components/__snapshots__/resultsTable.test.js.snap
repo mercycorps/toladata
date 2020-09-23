@@ -4307,24 +4307,6 @@ exports[`Results table component with an indicator with no targets and no freque
       <div
         className="text-danger"
       >
-        <svg
-          aria-hidden="true"
-          className="svg-inline--fa fa-bullseye fa-w-16 "
-          data-icon="bullseye"
-          data-prefix="fas"
-          focusable="false"
-          role="img"
-          style={Object {}}
-          viewBox="0 0 496 512"
-          xmlns="http://www.w3.org/2000/svg"
-        >
-          <path
-            d="M248 8C111.03 8 0 119.03 0 256s111.03 248 248 248 248-111.03 248-248S384.97 8 248 8zm0 432c-101.69 0-184-82.29-184-184 0-101.69 82.29-184 184-184 101.69 0 184 82.29 184 184 0 101.69-82.29 184-184 184zm0-312c-70.69 0-128 57.31-128 128s57.31 128 128 128 128-57.31 128-128-57.31-128-128-128zm0 192c-35.29 0-64-28.71-64-64s28.71-64 64-64 64 28.71 64 64-28.71 64-64 64z"
-            fill="currentColor"
-            style={Object {}}
-          />
-        </svg>
-        This indicator has no targets.
         <a
           className="indicator-link btn btn-success"
           data-tab="#targets"
@@ -4395,24 +4377,6 @@ exports[`Results table component with an indicator with no targets and no freque
       <div
         className="text-danger"
       >
-        <svg
-          aria-hidden="true"
-          className="svg-inline--fa fa-bullseye fa-w-16 "
-          data-icon="bullseye"
-          data-prefix="fas"
-          focusable="false"
-          role="img"
-          style={Object {}}
-          viewBox="0 0 496 512"
-          xmlns="http://www.w3.org/2000/svg"
-        >
-          <path
-            d="M248 8C111.03 8 0 119.03 0 256s111.03 248 248 248 248-111.03 248-248S384.97 8 248 8zm0 432c-101.69 0-184-82.29-184-184 0-101.69 82.29-184 184-184 101.69 0 184 82.29 184 184 0 101.69-82.29 184-184 184zm0-312c-70.69 0-128 57.31-128 128s57.31 128 128 128 128-57.31 128-128-57.31-128-128-128zm0 192c-35.29 0-64-28.71-64-64s28.71-64 64-64 64 28.71 64 64-28.71 64-64 64z"
-            fill="currentColor"
-            style={Object {}}
-          />
-        </svg>
-        This indicator has no targets.
         <a
           className="indicator-link btn btn-success"
           data-tab="#targets"
@@ -4482,26 +4446,7 @@ exports[`Results table component with an indicator with no targets and no freque
     >
       <div
         className="text-danger"
-      >
-        <svg
-          aria-hidden="true"
-          className="svg-inline--fa fa-bullseye fa-w-16 "
-          data-icon="bullseye"
-          data-prefix="fas"
-          focusable="false"
-          role="img"
-          style={Object {}}
-          viewBox="0 0 496 512"
-          xmlns="http://www.w3.org/2000/svg"
-        >
-          <path
-            d="M248 8C111.03 8 0 119.03 0 256s111.03 248 248 248 248-111.03 248-248S384.97 8 248 8zm0 432c-101.69 0-184-82.29-184-184 0-101.69 82.29-184 184-184 101.69 0 184 82.29 184 184 0 101.69-82.29 184-184 184zm0-312c-70.69 0-128 57.31-128 128s57.31 128 128 128 128-57.31 128-128-57.31-128-128-128zm0 192c-35.29 0-64-28.71-64-64s28.71-64 64-64 64 28.71 64 64-28.71 64-64 64z"
-            fill="currentColor"
-            style={Object {}}
-          />
-        </svg>
-        This indicator has no targets.
-      </div>
+      />
     </div>
   </div>
 </div>
@@ -4519,26 +4464,7 @@ exports[`Results table component with an indicator with no targets and no freque
     >
       <div
         className="text-danger"
-      >
-        <svg
-          aria-hidden="true"
-          className="svg-inline--fa fa-bullseye fa-w-16 "
-          data-icon="bullseye"
-          data-prefix="fas"
-          focusable="false"
-          role="img"
-          style={Object {}}
-          viewBox="0 0 496 512"
-          xmlns="http://www.w3.org/2000/svg"
-        >
-          <path
-            d="M248 8C111.03 8 0 119.03 0 256s111.03 248 248 248 248-111.03 248-248S384.97 8 248 8zm0 432c-101.69 0-184-82.29-184-184 0-101.69 82.29-184 184-184 101.69 0 184 82.29 184 184 0 101.69-82.29 184-184 184zm0-312c-70.69 0-128 57.31-128 128s57.31 128 128 128 128-57.31 128-128-57.31-128-128-128zm0 192c-35.29 0-64-28.71-64-64s28.71-64 64-64 64 28.71 64 64-28.71 64-64 64z"
-            fill="currentColor"
-            style={Object {}}
-          />
-        </svg>
-        This indicator has no targets.
-      </div>
+      />
     </div>
   </div>
 </div>
