@@ -785,7 +785,7 @@ msgstr "Résultats non attribués aux cibles"
 #. Translators: Warning message displayed when a critical piece of information (targets) have not been created for an indicator.
 #: js/pages/program_page/components/indicator_list.js:248
 msgid "Indicator missing targets"
-msgstr "Indicateur de cibles manquantes"
+msgstr "Indicateur sans cibles"
 
 #. Translators: Adj: labels this indicator as one which is missing one or more targets */
 #: js/pages/program_page/components/indicator_list.js:262
