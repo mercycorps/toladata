@@ -147,7 +147,7 @@ const create_unified_changeset_notice = ({
             let close = true;
             let textarea = $(notice.refs.elem).find('textarea[name="rationale"]');
             textarea.parent().find('.invalid-feedback').remove();
-            let rationale = textarea.val().trim(); // trim whitespace to disallow whitespace-only submission
+            let rationale = textarea.val() ? textarea.val().trim() : undefined; // trim whitespace to disallow whitespace-only submission
             let rfc_select  = $(notice.refs.elem).find('select[name="reasons_for_change"]');
             let reasons_for_change = (rfc_select.val() || []).map(v => parseInt(v));
             let is_valid = false;
