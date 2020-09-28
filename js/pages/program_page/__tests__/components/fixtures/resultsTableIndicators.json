@@ -260,5 +260,44 @@
             }
         ],
         "noTargets": true
+    },
+    "unassignedResultsWithTargets": {
+        "pk": 114,
+        "frequency": 2,
+        "isCumulative": false,
+        "isPercent": false,
+        "lopTarget": null,
+        "lopActual": null,
+        "lopMet": null,
+        "periodicTargets": [
+            {
+                "periodName": "Midline",
+                "dateRange": null,
+                "completed": false,
+                "mostRecentlyCompleted": false,
+                "target": 8,
+                "actual": null,
+                "percentMet": null,
+                "results": []
+            }, {
+                "periodName": "Endline",
+                "dateRange": null,
+                "completed": false,
+                "mostRecentlyCompleted": false,
+                "target": 10,
+                "actual": null,
+                "percentMet": null,
+                "results": []
+            }
+        ],
+        "noTargetResults": [
+            {
+                "pk": 243,
+                "dateCollected": "Jul 21, 2019",
+                "achieved": 5,
+                "evidenceUrl": null
+            }
+        ],
+        "noTargets": true
     }
 }

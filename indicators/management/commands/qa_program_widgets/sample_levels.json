@@ -97,41 +97,5 @@
             "parent_id": 108,
             "program_id": 442
         }
-    },
-    {
-        "model": "indicators.leveltier",
-        "pk": 1,
-        "fields": {
-            "name": "Goal",
-            "tier_depth": 1,
-            "program_id": 442
-        }
-    },
-    {
-        "model": "indicators.leveltier",
-        "pk": 2,
-        "fields": {
-            "name": "Outcome",
-            "tier_depth": 2,
-            "program_id": 442
-        }
-    },
-    {
-        "model": "indicators.leveltier",
-        "pk": 3,
-        "fields": {
-            "name": "Output",
-            "tier_depth": 3,
-            "program_id": 442
-        }
-    },
-    {
-        "model": "indicators.leveltier",
-        "pk": 4,
-        "fields": {
-            "name": "Activity",
-            "tier_depth": 4,
-            "program_id": 442
-        }
     }
 ]

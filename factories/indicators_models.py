@@ -164,6 +164,7 @@ class RFIndicatorFactory(DjangoModelFactory):
             for period, target_value in zip(periods, target_values):
                 PeriodicTargetFactory(
                     indicator=self,
+                    period=period['name'],
                     customsort=period['customsort'],
                     target=target_value,
                     start_date=period['start'],
@@ -173,7 +174,7 @@ class RFIndicatorFactory(DjangoModelFactory):
     @post_generation
     def results(self, create, extracted, **kwargs):
         """automatically adds results when creating an indicator.
-        
+
             results=True - will add one result to each target with achieved value of 10
             results=10 (int/float) - will divide that lop_achieved value among each target
             results=[4, 5] - will assign one result to each target in order, None for any remaining
