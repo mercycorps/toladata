@@ -1,5 +1,6 @@
 import { observable, computed, action, runInAction } from 'mobx';
 import api from './api';
+import { sortObjectListByValue } from '../../../general_utilities'
 
 const default_user = {
     id: null,
@@ -117,10 +118,10 @@ export class UserStore {
         this.programs = programs
         this.available_users = users.filter(user => user.name)
 
-        this.countries_selections = this.ordered_country_ids.map(id => this.countries[id])
-                                                            .map(country => ({value: country.id, label: country.name}))
+        this.countries_selections = sortObjectListByValue(this.ordered_country_ids.map(id => this.countries[id])
+                                                            .map(country => ({value: country.id, label: country.name})))
 
-        this.organization_selections = Object.values(organizations).map(org => ({value: org.id, label: org.name}))
+        this.organization_selections = sortObjectListByValue(Object.values(organizations).map(org => ({value: org.id, label: org.name})))
 
         this.program_selections = this.createProgramSelections(this.programs)
 
@@ -211,7 +212,7 @@ export class UserStore {
     }
 
     createProgramSelections(programs) {
-        return Object.values(programs).map(program => ({value: program.id, label: program.name}))
+        return sortObjectListByValue(Object.values(programs).map(program => ({value: program.id, label: program.name})))
     }
 
     @action

@@ -11,6 +11,7 @@ import LoadingSpinner from 'components/loading-spinner'
 import FoldingSidebar from 'components/folding-sidebar'
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome'
 import CountryHistory from "./components/country_history";
+import {sortObjectListByValue} from "../../../general_utilities";
 
 const CountryFilter = observer(({store, filterOptions}) => {
     return <div className="form-group react-multiselect-checkbox">
@@ -50,15 +51,15 @@ const ProgramFilter = observer(({store, filterOptions}) => {
 
 export const IndexView = observer(
     ({store}) => {
-        const countryFilterOptions = store.allCountries.map(country => {return {value: country.id, label: country.country}})
-        const organizationFilterOptions = Object.entries(store.organizations).map(([id, org]) => ({value: org.id, label: org.name}))
-        const programFilterOptions = Object.entries(store.allPrograms).map(([id, program]) => ({value: program.id, label: program.name}))
+        const countryFilterOptions = sortObjectListByValue(store.allCountries.map(country => {return {value: country.id, label: country.country}}))
+        const organizationFilterOptions = sortObjectListByValue(Object.entries(store.organizations).map(([id, org]) => ({value: org.id, label: org.name})))
+        const programFilterOptions = sortObjectListByValue(Object.entries(store.allPrograms).map(([id, program]) => ({value: program.id, label: program.name})))
         return <div id="country-management-index-view" className="row">
             <FoldingSidebar>
                 <div className="filter-section">
                     <OrganizationFilter store={store} filterOptions={organizationFilterOptions} />
                     <ProgramFilter store={store} filterOptions={programFilterOptions} />
-                    
+
                 </div>
                 <div className="filter-section filter-buttons">
                     <button className="btn btn-primary" onClick={() => store.applyFilters()}>{gettext("Apply")}</button>
