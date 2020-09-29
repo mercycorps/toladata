@@ -17,7 +17,9 @@
         <div class="d-flex btn-group">
             {% render_field form.evidence_url class+="form-control " %}
             <button type="button" id="id_view_evidence_button" class="btn btn-sm btn-secondary">{% trans 'view' %}</button>
-            <button type="button" id="id_browse_google_drive" class="btn btn-sm btn-link text-nowrap"><i class="fas fa-external-link-alt"></i> {% trans "Browse Google Drive" %}</a>
+            {% if not readonly %}
+                <button type="button" id="id_browse_google_drive" class="btn btn-sm btn-link text-nowrap"><i class="fas fa-external-link-alt"></i> {% trans "Browse Google Drive" %}</a>
+            {% endif %} 
         </div>
 
         <div class="text-right">
