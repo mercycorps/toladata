@@ -80,6 +80,12 @@ const ChangeLogEntryRowBuilder = ({data}) => {
 
     if (data.change_type === 'user_programs_updated') {
         // Create multiple row for program/country changes:
+        if (data.diff_list.base_country) {
+            const previousEntry = <ChangeField name={data.diff_list.base_country.pretty_name} data={data.diff_list.base_country.prev} />
+            const newEntry = <ChangeField name={data.diff_list.base_country.pretty_name} data={data.diff_list.base_country.new} />
+                
+            allRows.push(<ChangeLogEntryRow previous={previousEntry} new={newEntry} id={"base_country"} key={"base_country"} />);
+        }
         Object.entries(data.diff_list.countries).forEach( ([id, country]) => {
             const key = `${id}_${country}`;
             const previousEntry = <React.Fragment>
