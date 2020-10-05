@@ -341,6 +341,7 @@
 
 
     function validateResultForm() {
+        // validates all fields _except disaggreagtions_ - disaggregations produce a warning elsewhere:
         let ptsValid = validatePeriodicTarget();
         let datecollectedValid = validateDateCollected();
         let achievedValid = validate_achieved();
@@ -351,46 +352,68 @@
         return false;
     }
 
+    /**
+     * @param {string} rationale - the rationale to be submitted with the form for saving in changelog
+     * @ returns {Promise} Promise object resolves on successful save, rejects on save failed
+     */
     function submitResultForm(rationale = '') {
+        // handles converting $.post to Promise signature, post failure handling, and success pnotify
         const submission = new Promise((resolve, reject) => {
+            // first clear messages (submitting will display new message there on failure)
             $("#modalmessages").empty();
             let form_url = $('#result_update_form').attr('action');
             let form_data = getResultFormAsArray();
+            // add rationale (passed in from calling function based on getRationale callback)
             form_data.push({
                 name: 'rationale',
                 value: rationale
             });
+            // validate evidence URL again as it affects success conditions (display "review warnings" link)
             let evidenceURL = $('#id_evidence_url').val();
             let URLValidationResult = isValidURLOrFilePath(evidenceURL);
+            let displayEvidenceWarning = (evidenceURL && URLValidationResult.valid == 'warn');
             const successHandler = (response, status, jqXHR) => {
+                // save successful! initial message from back-end to include translated indicator level/number:
                 let message = response.success_message;
-                if (evidenceURL && URLValidationResult.valid == 'warn') {
+                if (displayEvidenceWarning) {
                     // hinky URL means save, but add warning and don't auto-dismiss the success noti:
                     message += "  {% trans 'However, there may be a problem with the evidence URL.' %}";
                     message += '<a href="#" id="warning_review">{% trans "Review warning." %}</a>';
                     noticeType = 'notice';
                     hide = false;
                 } else {
+                    // URL is fine, message doesn't need additions and should auto-dismiss
                     noticeType = 'success';
                     hide = true;
                 }
                 let notice = window.autoDismissingNotification({type: noticeType, message: message, hide: hide, textTrusted: true});
-                let warningCB = (e) => {
-                    e.preventDefault();
-                    $('#indicator_results_div').trigger('review.tola.results.warning', {url: response.url});
-                    notice.close();
+                if (displayEvidenceWarning) {
+                    // if the evidence warning is being displayed, add trigger on "review warning" click to reopen form
+                    let warningCB = (e) => {
+                        e.preventDefault();
+                        // this is handled (for Program Page) in js/pages/program_page/index.js ~line 100
+                        // reloads and reopens results form
+                        $('#indicator_results_div').trigger('review.tola.results.warning', {url: response.url});
+                        notice.close();
+                    }
+                    // pNotify API: this accesses the container of the notice (to add click-handler):
+                    $(notice.refs.elem).find('#warning_review').on('click', warningCB);
                 }
-                $(notice.refs.elem).find('#warning_review').on('click', warningCB);
+                // resolve promise to trigger next "then" in promise chain (see createsave/updatesave)
                 resolve();
             }
             const failureHandler = (error) => {
+                // save failed - add warning and scroll to top:
                 createAlert("danger", "{% trans 'Could not save form.'|escapejs %}", true, "#modalmessages");
                 $('#indicator_results_div').animate({ scrollTop: 0 }, 'slow');
+                // reject promise to avoid "then"s in promise chain (would close form or reset form)
                 reject()
             }
+            // submit ajax, with success and failure handler
             var posting = $.post(form_url, form_data, successHandler);
             posting.fail(failureHandler);
         });
+        // returns promise for chaining:
         return submission;
     }
 
@@ -428,6 +451,7 @@
                 message_text: messageText,
                 context: document.getElementById('result_update_form'),
                 on_submit: (rationale) => {resolve(rationale);},
+                on_cancel: () => {reject('cancel')},
                 notice_type: "notice",
                 include_rationale: true,
                 header: gettext("Warning"),
@@ -444,8 +468,8 @@
         if (validateResultForm() === true) {
             // form is valid, first get rationale if necessary or '' otherwise:
             let posting = getRationale(false)
-            // pass rationale into form submit:
-             .then((rationale) => {return submitResultForm(rationale)})
+            // pass rationale into form submit (with empty failure handler in case user cancels):
+             .then((rationale) => {return submitResultForm(rationale)}, () => {})
              // after all promises resolve (whether save was successful or not) undisable submit buttons:
              .finally(function(data) {
                 $('#result-submit-create').removeAttr('disabled');
@@ -506,8 +530,8 @@
             // form is valid:
             // get appropriate rationale:
             let posting = getRationale(true);
-            // feed rationale to submit form:
-            posting.then((rationale) => {return submitResultForm(rationale);})
+            // feed rationale to submit form (with empty failure handler for user cancelling):
+            posting.then((rationale) => {return submitResultForm(rationale);}, () => {})
              .then(() => {
                 // submission (save) successful, trigger update on indicator list
                 $('#indicator_results_div').trigger('save.tola.result_form');
