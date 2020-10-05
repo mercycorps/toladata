@@ -330,6 +330,40 @@ function notifyError(title, msg) {
 }
 window.notifyError = notifyError;
 
+function autoDismissingNotification({
+    message = '',
+    type = 'success',
+    title = gettext("Success"),
+    hide = true,
+    textTrusted = false
+} = {}) {
+    const notice = PNotify.alert({
+        title: title,
+        text: message,
+        type: type,
+        hide: hide,
+        textTrusted: textTrusted,
+        width: '350px',
+        minHeight: '150px',
+        delay: 3000,
+        stack: {
+            'dir1': 'right',
+            'dir2': 'up',
+            'firstpos1': 0,
+            'firstpos2': 0
+        },
+        modules: {
+            Buttons: {
+                closer: true,
+                closerHover: false,
+                sticker: false
+            }
+        }
+    });
+    return notice;
+}
+
+window.autoDismissingNotification = autoDismissingNotification;
 
 $(document).ready(function() {
     $(document).on('hidden.bs.modal', '.modal', function () {

@@ -38,8 +38,6 @@
         $('#id_view_evidence_button').prop('disabled', ! evidenceURLHasValue);
     }
 
-    $("#indicator_results_div").on('shown.bs.modal', function() {
-    });
 
     $("#indicator_results_div").on('change keyup paste', '#id_evidence_url', function () {
         setViewButtonDisabledState();
@@ -48,9 +46,6 @@
     $("#indicator_results_div").on('blur', '#id_evidence_url', function () {
         validateEvidence();
     });
-
-    // Intercept ResultsUpdate form submission and then use ajax to submit it.
-    $("#indicator_results_div").on("submit", "#result_update_form", submitHandler);
 
     $("#indicator_results_div").on("change", "#id_date_collected", function(e){
         validatePeriodicTarget(onlyPeriodic = true);
@@ -88,6 +83,7 @@
                     function(response, status, jqXHR) { // success callback
                         // Close modal
                         $('#indicator_results_div').modal('hide');
+                        $('#indicator_results_div').trigger('save.tola.result_form');
                         PNotify.success("Result deleted")
                     })
                 .fail(function(error){
@@ -343,105 +339,226 @@
         return resultFormSnapshot.find(e => e.name === 'date_collected').value !== getResultFormAsArray().find(e => e.name === 'date_collected').value;
     }
 
-    function submitHandler(e){
-        if (e) {
-            e.preventDefault();
-        }
-        $("#modalmessages").empty();
-        let pts_valid = validatePeriodicTarget();
-        let datecollected_valid = validateDateCollected();
-        let achieved_valid = validate_achieved();
+
+    function validateResultForm() {
+        // validates all fields _except disaggreagtions_ - disaggregations produce a warning elsewhere:
+        let ptsValid = validatePeriodicTarget();
+        let datecollectedValid = validateDateCollected();
+        let achievedValid = validate_achieved();
         let evidenceValid = validateEvidence();
-        let disaggsValid = validateDisaggregations();
-
-        if ($("#result_update_form div").hasClass('has-error')) {
-            createAlert("danger", "{% trans 'One or more fields needs attention.'|escapejs %}", true, "#modalmessages");
-            $('#indicator_results_div').animate({ scrollTop: 0 }, 'slow');
-            $('#submit-id-submit').removeAttr('disabled');
-            return;
+        if (ptsValid && datecollectedValid && achievedValid && evidenceValid) {
+            return true;
         }
+        return false;
+    }
 
-        const save = (rationale) => {
-            $('#submit-id-submit').attr('disabled', 'disabled');
-            let form_url = $(this).attr('action');
-
+    /**
+     * @param {string} rationale - the rationale to be submitted with the form for saving in changelog
+     * @ returns {Promise} Promise object resolves on successful save, rejects on save failed
+     */
+    function submitResultForm(rationale = '') {
+        // handles converting $.post to Promise signature, post failure handling, and success pnotify
+        const submission = new Promise((resolve, reject) => {
+            // first clear messages (submitting will display new message there on failure)
+            $("#modalmessages").empty();
+            let form_url = $('#result_update_form').attr('action');
             let form_data = getResultFormAsArray();
-
-            // tack on rationale
+            // add rationale (passed in from calling function based on getRationale callback)
             form_data.push({
                 name: 'rationale',
                 value: rationale
             });
-
-            // mark that the form data has changed so that when the modal is closed the list view can be updated
-            $(this).data('recordchanged', true);
-
-            $.post(form_url, form_data,
-                function(response, status, jqXHR) { // success callback
-                    $('#submit-id-submit').removeAttr('disabled');
-                    if (response.url) {
-                        $('#result_update_form').attr('action', response.url);
+            // validate evidence URL again as it affects success conditions (display "review warnings" link)
+            let evidenceURL = $('#id_evidence_url').val();
+            let URLValidationResult = isValidURLOrFilePath(evidenceURL);
+            let displayEvidenceWarning = (evidenceURL && URLValidationResult.valid == 'warn');
+            const successHandler = (response, status, jqXHR) => {
+                // save successful! initial message from back-end to include translated indicator level/number:
+                let message = response.success_message;
+                if (displayEvidenceWarning) {
+                    // hinky URL means save, but add warning and don't auto-dismiss the success noti:
+                    message += "  {% trans 'However, there may be a problem with the evidence URL.' %}";
+                    message += '<a href="#" id="warning_review">{% trans "Review warning." %}</a>';
+                    noticeType = 'notice';
+                    hide = false;
+                } else {
+                    // URL is fine, message doesn't need additions and should auto-dismiss
+                    noticeType = 'success';
+                    hide = true;
+                }
+                let notice = window.autoDismissingNotification({type: noticeType, message: message, hide: hide, textTrusted: true});
+                if (displayEvidenceWarning) {
+                    // if the evidence warning is being displayed, add trigger on "review warning" click to reopen form
+                    let warningCB = (e) => {
+                        e.preventDefault();
+                        // this is handled (for Program Page) in js/pages/program_page/index.js ~line 100
+                        // reloads and reopens results form
+                        $('#indicator_results_div').trigger('review.tola.results.warning', {url: response.url});
+                        notice.close();
                     }
-                    $("#modalmessages").empty();
-                    if ($("#result_update_form div").hasClass('has-warning') || !disaggsValid) {
-                        createAlert("warning", "{% trans 'Result saved - however please review warnings below.'|escapejs %}", true, "#modalmessages");
-                    } else {
-                        createAlert("success", "{% trans 'Success, form data saved.'|escapejs %}", true, "#modalmessages");
-                    }
-
-                    // record new base state
-                    recordResultFormSnapshot();
-                })
-            .fail(function(error){
-                $('#submit-id-submit').removeAttr('disabled');
+                    // pNotify API: this accesses the container of the notice (to add click-handler):
+                    $(notice.refs.elem).find('#warning_review').on('click', warningCB);
+                }
+                // resolve promise to trigger next "then" in promise chain (see createsave/updatesave)
+                resolve();
+            }
+            const failureHandler = (error) => {
+                // save failed - add warning and scroll to top:
                 createAlert("danger", "{% trans 'Could not save form.'|escapejs %}", true, "#modalmessages");
-            });
-            $('#indicator_results_div').animate({ scrollTop: 0 }, 'slow');
-        };
-        const MODIFY_RESULT_MESSAGE = "{% trans 'Modifying results will affect program metrics for this indicator and should only be done to correct a data entry error. For future reference, please provide a reason for modifying this result.' %}";
-        const DISAGG_MISMATCH_PREAMBLE = "{% trans 'The sum of disaggregated values does not match the actual value.' %}";
-        const DISAGG_MISMATCH_MESSAGE = "{% trans 'For future reference, please share your reason for these variations.' %}";
-        const result_is_new = $(this).attr('action').indexOf('result_add') !== -1;
-        const resultFormHasChanged = hasResultFormChanged();
-        if( (disaggsValid && result_is_new) || ! resultFormHasChanged ) {
-            save('');
-            return;
+                $('#indicator_results_div').animate({ scrollTop: 0 }, 'slow');
+                // reject promise to avoid "then"s in promise chain (would close form or reset form)
+                reject()
+            }
+            // submit ajax, with success and failure handler
+            var posting = $.post(form_url, form_data, successHandler);
+            posting.fail(failureHandler);
+        });
+        // returns promise for chaining:
+        return submission;
+    }
+
+    const DISAGG_MISMATCH_PREAMBLE = "{% trans 'The sum of disaggregated values does not match the actual value.' %}";
+    const DISAGG_MISMATCH_MESSAGE = "{% trans 'For future reference, please share your reason for these variations.' %}";
+    const MODIFY_RESULT_MESSAGE = "{% trans 'Modifying results will affect program metrics for this indicator and should only be done to correct a data entry error. For future reference, please provide a reason for modifying this result.' %}";
+
+    function getRationale(update = true) {
+        // prompts for rationale _if necessary_ and returns the rationale provided (or '' if none needed):
+        var preambleText, messageText;
+        if (update && !hasResultFormChanged()) {
+            // nothing has changed in update form, no rationale required:
+            return Promise.resolve('');
         }
-
-        // configure and launch the PNotify warning/rationale prompt
-        let messageText = null;
-        let preambleText = null;
-        let header = gettext("Warning");
-        let show_icon = true;
-
-
-        if (! disaggsValid ) {
-            if (result_is_new) {
-                preambleText = DISAGG_MISMATCH_PREAMBLE;
+        if (validateDisaggregations()) {
+            if (!update) {
+                // valid disaggregations, update form, no rationale required:
+                return Promise.resolve('');
+            }
+            // disaggs valid, update form:
+            preambleText = null;
+            messageText = MODIFY_RESULT_MESSAGE;
+        } else {
+            preambleText = DISAGG_MISMATCH_PREAMBLE;
+            if (update) {
+                // update form, use general modify rationale message:
+                messageText = MODIFY_RESULT_MESSAGE;
+            } else {
                 messageText = DISAGG_MISMATCH_MESSAGE;
             }
-            else {
-                preambleText = DISAGG_MISMATCH_PREAMBLE;
-                messageText = MODIFY_RESULT_MESSAGE;
-            }
         }
-        else {
-            messageText = MODIFY_RESULT_MESSAGE;
-            header = gettext("Warning");
-        }
-
-        window.create_unified_changeset_notice({
-            preamble: preambleText,
-            message_text: messageText,
-            context: document.getElementById('result_update_form'),
-            on_submit: save,
-            notice_type: "notice",
-            include_rationale: true,
-            header: header,
-            show_icon: show_icon,
+        return new Promise((resolve, reject) => {
+            window.create_unified_changeset_notice({
+                preamble: preambleText,
+                message_text: messageText,
+                context: document.getElementById('result_update_form'),
+                on_submit: (rationale) => {resolve(rationale);},
+                on_cancel: () => {reject('cancel')},
+                notice_type: "notice",
+                include_rationale: true,
+                header: gettext("Warning"),
+                show_icon: true,
+            });
+            scrollToResultFormBottom();
         });
+    }
 
-        scrollToResultFormBottom();
+    function createSave() {
+        // whether save and close or save and add another, first disable any submit buttons:
+        $('#result-submit-create').attr('disabled', 'disabled');
+        $('#result-submit-and-add-create').attr('disabled', 'disabled');
+        if (validateResultForm() === true) {
+            // form is valid, first get rationale if necessary or '' otherwise:
+            let posting = getRationale(false)
+            // pass rationale into form submit (with empty failure handler in case user cancels):
+             .then((rationale) => {return submitResultForm(rationale)}, () => {})
+             // after all promises resolve (whether save was successful or not) undisable submit buttons:
+             .finally(function(data) {
+                $('#result-submit-create').removeAttr('disabled');
+                $('#result-submit-and-add-create').removeAttr('disabled');
+            });
+            return posting;
+        } else {
+            // form is invalid, scroll up and show warning in modal:
+            createAlert("danger", "{% trans 'One or more fields needs attention.'|escapejs %}", true, "#modalmessages");
+            $('#indicator_results_div').animate({ scrollTop: 0 }, 'slow');
+            $('#result-submit-create').removeAttr('disabled');
+            $('#result-submit-and-add-create').removeAttr('disabled');
+            return Promise.reject('failed_validation')
+        }
+    }
+    
+    function createSaveAndCloseHandler(e) {
+        // user clicks "save and close" on create form first prevent default submit:
+        e.preventDefault();
+        // do save for typical create:
+        let posting = createSave();
+        posting.then(() => {
+            // save was successful, trigger update on indicator list:
+            $('#indicator_results_div').trigger('save.tola.result_form');
+            // hide result form (save and close):
+            $('#indicator_results_div').modal('hide');
+        }).catch(() => {});
+    }
+    
+    function createSaveAndAddAnotherHandler(e) {
+        // user clicks "save and add another" on create form first prevent default submit:
+        e.preventDefault();
+        // do save for typical create:
+        let posting = createSave();
+        posting.then(() => {
+            // save was successful, trigger update on indicator list:
+            $('#indicator_results_div').trigger('save.tola.result_form');
+            // reset form fields (to add another) - if LoP then reset to LoP when form is reset:
+            let $lopSelect = $('#id_periodic_target');
+            if ($lopSelect.attr('readonly') && $lopSelect.find('option:not([disabled])').length == 1) {
+                let val = $lopSelect.val();
+                $('#result_update_form').trigger('reset');
+                $lopSelect.val(val);
+            } else {
+                $('#result_update_form').trigger('reset');
+            }
+            // remove any lingering validation warnings on evidence field:
+            validateEvidence();
+        }).catch(() => {});
+    }
+
+    function updateSaveChangesHandler(e) {
+        // user clicks "save and close" on an update form, first prevent default submit:
+        e.preventDefault();
+        // disable button to prevent multiple submits:
+        $('#result-submit-update').attr('disabled', 'disabled');
+        if (validateResultForm() === true) {
+            // form is valid:
+            // get appropriate rationale:
+            let posting = getRationale(true);
+            // feed rationale to submit form (with empty failure handler for user cancelling):
+            posting.then((rationale) => {return submitResultForm(rationale);}, () => {})
+             .then(() => {
+                // submission (save) successful, trigger update on indicator list
+                $('#indicator_results_div').trigger('save.tola.result_form');
+                // hide result form (save and close):
+                $('#indicator_results_div').modal('hide');
+            }).finally(() => {
+                // undisable button whether failed or not:
+                $('#result-submit-update').removeAttr('disabled');
+            });
+        } else {
+            // form was not valid:
+            createAlert("danger", "{% trans 'One or more fields needs attention.'|escapejs %}", true, "#modalmessages");
+            $('#indicator_results_div').animate({ scrollTop: 0 }, 'slow');
+            $('#result-submit-update').removeAttr('disabled');
+        }
+    }
+
+    function cancelHandler(e) {
+        $('#indicator_results_div').modal('hide');        
+    }
+    
+    function addFormActionButtonHandlers() {
+        // called on document load to add handlers to buttons
+        $('#result-submit-update').on('click', updateSaveChangesHandler);
+        $('#result-submit-create').on('click', createSaveAndCloseHandler);
+        $('#result-submit-and-add-create').on('click', createSaveAndAddAnotherHandler);
+        $('#result-cancel-btn').on('click', cancelHandler);
     }
 
 </script>

@@ -104,6 +104,7 @@
 
             // record current state of form for later comparision
             recordResultFormSnapshot();
+            addFormActionButtonHandlers();
         });
 
     </script>
@@ -151,8 +152,13 @@
         {% if not readonly %}
         <div class="form-actions">
             <div>
-                <input type="submit" name="submit" value="{% trans 'Save changes' %}" class="btn btn-primary" id="submit-id-submit">
-                <input type="reset" class="btn btn-reset" value="{% trans 'Reset' %}">
+                {% if object.id %}
+                    <button type="button" class="btn btn-primary" id="result-submit-update">{% trans 'Save and close' %}</button>
+                {% else %}
+                    <button type="button" class="btn btn-primary" id="result-submit-create">{% trans 'Save and close' %}</button>
+                    <button type="button" class="btn btn-secondary" id="result-submit-and-add-create">{% trans 'Save and add another' %}</button>
+                {% endif %}
+                <button type="button" class="btn btn-reset" id="result-cancel-btn">{% trans 'Cancel' %}</button>
             </div>
           <div>{# help link goes here #}</div>
         </div>
