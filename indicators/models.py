@@ -1285,8 +1285,6 @@ class Indicator(SafeDeleteModel):
         _("Edit date"), null=True, blank=True, help_text=" "
     )
 
-    notes = models.TextField(_("Notes"), max_length=500, null=True, blank=True)
-
     # optimize query for class based views etc.
     objects = IndicatorManager()
     rf_aware_objects = generate_safedelete_queryset(
