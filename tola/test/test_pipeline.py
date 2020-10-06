@@ -173,8 +173,8 @@ class ImportIndicatorTests(TestCase):
             self.assertEqual(len(um.diff_list['countries']), 2)
             new_country = [x for x in um.diff_list['countries'] if x['name'] == str(banana_country.pk)][0]
             old_country = [x for x in um.diff_list['countries'] if x['name'] == str(self.country.pk)][0]
-            self.assertEqual(new_country['prev']['country'], 'N/A')
-            self.assertEqual(old_country['new']['country'], 'N/A')
+            self.assertEqual(new_country['prev']['country'], None)
+            self.assertEqual(old_country['new']['country'], None)
             self.assertEqual(um.diff_list['base_country']['new'], "BananaTown")
             self.assertEqual(um.diff_list['base_country']['prev'], self.country.country)
         del tu_reload

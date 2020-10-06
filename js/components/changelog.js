@@ -2,6 +2,7 @@ import React from 'react'
 import { observer } from 'mobx-react';
 import {FontAwesomeIcon} from "@fortawesome/react-fontawesome"
 import { toJS } from 'mobx'
+import { EM_DASH } from '../constants';
 
 
 export const ChangeField = ({name, data, extraTitleText=null}) => {
@@ -20,14 +21,20 @@ export const ChangeField = ({name, data, extraTitleText=null}) => {
     }
 
     else {
-        let change_value = "N/A";
-        if (data !== undefined && data !== null) {
-            change_value = ["true", "false"].includes(data.toString())
-                ? data.toString().replace("t", "T").replace("f", "F")
-                : data.toString();
+        var change_value;
+        if (data !== undefined && data !== null && data !== "N/A") {
+            change_value = <span className="change__field__value">
+            {
+                ["true", "false"].includes(data.toString())
+                    ? data.toString().replace("t", "T").replace("f", "F")
+                    : data.toString()
+            }
+            </span>
+        } else {
+            change_value = <span className="change__field__value empty-value">{ EM_DASH }</span>
         }
         return <div className="change__field">
-            <strong>{name}</strong>: {change_value}
+            <strong className="change__field__name">{name}</strong>: {change_value}
         </div>
     }
 };

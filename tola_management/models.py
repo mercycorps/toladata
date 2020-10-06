@@ -183,8 +183,8 @@ class UserManagementAuditLog(models.Model, DiffableLog):
                 base_country_diff = {
                     'name': 'base_country',
                     'pretty_name': _("Base Country"),
-                    'prev': base_country_prev.get('country', _("N/A")),
-                    'new': base_country_next.get('country', _("N/A"))
+                    'prev': base_country_prev.get('country', None),
+                    'new': base_country_next.get('country', None)
                 }
             else:
                 base_country_diff = None
@@ -205,12 +205,12 @@ class UserManagementAuditLog(models.Model, DiffableLog):
                         diff_list.append({
                             "name": key,
                             "prev": update_role(p[key]),
-                            "new": {k: 'N/A' for k, _ in p[key].items()},
+                            "new": {k: None for k, _ in p[key].items()},
                         })
                     if key in n and key not in p:
                         diff_list.append({
                             "name": key,
-                            "prev": {k: 'N/A' for k, _ in n[key].items()},
+                            "prev": {k: None for k, _ in n[key].items()},
                             "new": update_role(n[key])
                         })
                     if key in n and key in p and n[key] != p[key]:
