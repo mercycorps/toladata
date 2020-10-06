@@ -325,8 +325,6 @@ class IndicatorForm(forms.ModelForm):
         else:
             self.fields.pop('objectives')
         self.fields['strategic_objectives'].queryset = StrategicObjective.objects.filter(country__in=countries)
-        self.fields['approved_by'].queryset = TolaUser.objects.filter(country__in=countries).distinct()
-        self.fields['approval_submitted_by'].queryset = TolaUser.objects.filter(country__in=countries).distinct()
         self.fields['name'].label = _('Indicator')
         self.fields['name'].required = True
         self.fields['name'].widget = forms.Textarea(attrs={'rows': 3})

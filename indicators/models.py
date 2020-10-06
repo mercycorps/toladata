@@ -1266,16 +1266,6 @@ class Indicator(SafeDeleteModel):
         default=False, help_text=" "
     )
 
-    approved_by = models.ForeignKey(
-        TolaUser, blank=True, null=True, on_delete=models.SET_NULL, related_name="approving_indicator",
-        verbose_name=_("Approved by"), help_text=" "
-    )
-
-    approval_submitted_by = models.ForeignKey(
-        TolaUser, blank=True, null=True, on_delete=models.SET_NULL, related_name="indicator_submitted_by",
-        verbose_name=_("Approval submitted by"), help_text=" "
-    )
-
     external_service_record = models.ForeignKey(
         ExternalServiceRecord, verbose_name=_("External Service ID"),
         blank=True, null=True, on_delete=models.SET_NULL, help_text=" "
