@@ -80,7 +80,7 @@ const ChangeLogEntryRowBuilder = ({data}) => {
     const nullRow = <ChangeLogEntryRow previous={gettext("No differences found")} new={null} id={1} key={1}/>
 
     // If they manage to store a log without any diffs at all, send them to the soft landing place.
-    if ((Array.isArray(data.diff_list) && data.diff_list.length === 0) || (Object.keys(data.diff_list).length === 0)) {
+    if ((Array.isArray(data.diff_list) && data.diff_list.length === 0) || (Object.keys(data.diff_list || {}).length === 0)) {
         allRows.push(nullRow);
         return allRows
     }
