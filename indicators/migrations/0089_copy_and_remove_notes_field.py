@@ -10,7 +10,7 @@ def copy_notes_field_to_comments(apps, schema_editor):
         comments = notes_indicator.comments
         new_comments = ''
         if comments:
-            new_comments = comments + "\nNotes:"
+            new_comments = comments + "\n\nNotes:\n"
         new_comments += notes_indicator.notes
         notes_indicator.comments = new_comments
         notes_indicator.save()
