@@ -378,7 +378,7 @@
                 if (displayEvidenceWarning) {
                     // hinky URL means save, but add warning and don't auto-dismiss the success noti:
                     message += "  {% trans 'However, there may be a problem with the evidence URL.' %}";
-                    message += '<a href="#" id="warning_review">{% trans "Review warning." %}</a>';
+                    message += ' <a href="#" id="warning_review">{% trans "Review warning." %}</a>';
                     noticeType = 'notice';
                     hide = false;
                 } else {
@@ -395,6 +395,8 @@
                         // reloads and reopens results form
                         $('#indicator_results_div').trigger('review.tola.results.warning', {url: response.url});
                         notice.close();
+                        // scroll to bottom of form, centering warning (or close, since warning is too far down for center)
+                        $('#indicator_results_div').animate({ scrollTop: 200 }, 'slow');
                     }
                     // pNotify API: this accesses the container of the notice (to add click-handler):
                     $(notice.refs.elem).find('#warning_review').on('click', warningCB);
@@ -518,6 +520,8 @@
             }
             // remove any lingering validation warnings on evidence field:
             validateEvidence();
+            // scroll to top to start form over
+            $('#indicator_results_div').animate({ scrollTop: 0 }, 'slow');
         }).catch(() => {});
     }
 

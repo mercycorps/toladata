@@ -2,8 +2,8 @@ msgid ""
 msgstr ""
 "Project-Id-Version: \n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2020-09-28 17:42-0700\n"
-"PO-Revision-Date: 2020-09-28 17:44-0700\n"
+"POT-Creation-Date: 2020-10-06 12:22-0700\n"
+"PO-Revision-Date: 2020-10-06 12:26-0700\n"
 "Last-Translator: \n"
 "Language-Team: \n"
 "Language: fr\n"
@@ -572,7 +572,7 @@ msgid "Purpose"
 msgstr "Intention"
 
 #. Translators: Below Purpose, the 4th highest organizing level to attach KPIs to.
-#: indicators/models.py:349 templates/indicators/result_form_modal.html:129
+#: indicators/models.py:349 templates/indicators/result_form_modal.html:130
 msgid "Result"
 msgstr "Résultat"
 
@@ -1015,8 +1015,8 @@ msgid "Categories for disaggregation %(disagg)s"
 msgstr "Catégories de la désagrégation %(disagg)s"
 
 #: indicators/templatetags/mytags.py:51 indicators/templatetags/mytags.py:73
-#: templates/indicators/result_form_common_js.html:173
-#: templates/indicators/result_form_common_js.html:181
+#: templates/indicators/result_form_common_js.html:169
+#: templates/indicators/result_form_common_js.html:177
 msgid "and"
 msgstr "et"
 
@@ -1206,7 +1206,7 @@ msgstr "L’indicateur a été supprimé avec succès."
 #. Translators: Text of an error message that appears when a user hasn't provided a justification for the change they are making to some data
 #: indicators/views/views_indicators.py:682
 #: indicators/views/views_indicators.py:741
-#: indicators/views/views_indicators.py:919 workflow/views.py:299
+#: indicators/views/views_indicators.py:925 workflow/views.py:299
 msgid "Reason for change is required"
 msgstr "Une justification pour la modification est requise"
 
@@ -1215,11 +1215,20 @@ msgstr "Une justification pour la modification est requise"
 msgid "No reason for change required."
 msgstr "Aucune justification pour la modification n’est requise."
 
-#: indicators/views/views_indicators.py:837
+#: indicators/views/views_indicators.py:834
+#, python-format
+msgid "Result was added to %(level)s indicator %(number)s."
+msgstr ""
+
+#: indicators/views/views_indicators.py:839
 msgid "Success, Data Created!"
 msgstr "Succès, données créées !"
 
-#: indicators/views/views_indicators.py:898
+#: indicators/views/views_indicators.py:900
+msgid "Result updated."
+msgstr ""
+
+#: indicators/views/views_indicators.py:904
 msgid "Success, Data Updated!"
 msgstr "Succès, données mises à jour !"
 
@@ -1957,7 +1966,7 @@ msgstr ""
 
 #: templates/indicators/indicator_form_common_js.html:917
 #: templates/indicators/indicator_form_common_js.html:1012
-#: templates/indicators/result_form_common_js.html:153
+#: templates/indicators/result_form_common_js.html:149
 msgid "Please complete this field."
 msgstr "Veuillez compléter ce champ."
 
@@ -2023,17 +2032,21 @@ msgstr "Supprimer cet indicateur"
 #. Translators: button label to save the item and then close a modal
 #: templates/indicators/indicator_form_modal.html:441
 #: templates/indicators/indicator_form_modal.html:448
+#: templates/indicators/result_form_modal.html:156
+#: templates/indicators/result_form_modal.html:158
 msgid "Save and close"
 msgstr "Sauvegarder et fermer"
 
 #. Translators: close a modal throwing away any changes to the form
 #: templates/indicators/indicator_form_modal.html:442
-#: templates/indicators/indicator_form_modal.html:455 tola/forms.py:27
+#: templates/indicators/indicator_form_modal.html:455
+#: templates/indicators/result_form_modal.html:161 tola/forms.py:27
 msgid "Cancel"
 msgstr "Annuler"
 
 #. Translators: button label to save the form and be redirected to a blank for to add another item
 #: templates/indicators/indicator_form_modal.html:452
+#: templates/indicators/result_form_modal.html:159
 msgid "Save and add another"
 msgstr "Sauvegarder et continuer à ajouter"
 
@@ -2145,7 +2158,6 @@ msgstr ""
 "                                "
 
 #: templates/indicators/indicator_reportingperiod_modal.html:99
-#: templates/indicators/result_form_modal.html:154
 #: templates/registration/profile.html:98 tola/forms.py:26 workflow/forms.py:122
 msgid "Save changes"
 msgstr "Sauvegarder les modifications"
@@ -2156,7 +2168,6 @@ msgstr "Retour à la page d’accueil"
 
 #: templates/indicators/indicator_reportingperiod_modal.html:104
 #: templates/indicators/iptt_filter_form.html:134
-#: templates/indicators/result_form_modal.html:155
 #: templates/registration/profile.html:103 workflow/forms.py:123
 msgid "Reset"
 msgstr "Réinitialiser"
@@ -2454,47 +2465,50 @@ msgstr ""
 "définitivement. À titre de référence, veuillez fournir une justification pour "
 "la suppression de ce résultat."
 
-#: templates/indicators/result_form_common_js.html:94
-#: templates/indicators/result_form_common_js.html:397
+#: templates/indicators/result_form_common_js.html:90
+#: templates/indicators/result_form_common_js.html:409
 msgid "Could not save form."
 msgstr "Impossible d’enregistrer le formulaire."
 
-#: templates/indicators/result_form_common_js.html:127
+#: templates/indicators/result_form_common_js.html:123
 msgid "Please enter a number with no letters or symbols."
 msgstr "Veuillez entrer un nombre sans lettres ni symboles."
 
-#: templates/indicators/result_form_common_js.html:159
+#: templates/indicators/result_form_common_js.html:155
 msgid "Please enter a valid date."
 msgstr "Veuillez entrer une date valide."
 
-#: templates/indicators/result_form_common_js.html:166
+#: templates/indicators/result_form_common_js.html:162
 msgid "You can begin entering results on"
 msgstr "Vous pouvez commencer à saisir des résultats le"
 
-#: templates/indicators/result_form_common_js.html:173
-#: templates/indicators/result_form_common_js.html:181
+#: templates/indicators/result_form_common_js.html:169
+#: templates/indicators/result_form_common_js.html:177
 msgid "Please select a date between"
 msgstr "Veuillez sélectionner une date entre"
 
-#: templates/indicators/result_form_common_js.html:267
+#: templates/indicators/result_form_common_js.html:263
 msgid "A link must be included along with the record name."
 msgstr "Un lien doit être inclus avec le nom de l’enregistrement."
 
-#: templates/indicators/result_form_common_js.html:358
-msgid "One or more fields needs attention."
-msgstr "Un ou plusieurs champs requièrent votre attention."
+#: templates/indicators/result_form_common_js.html:380
+msgid "However, there may be a problem with the evidence URL."
+msgstr "Cependant, il peut y avoir un problème avec l’URL de preuve."
 
-#: templates/indicators/result_form_common_js.html:387
-msgid "Result saved - however please review warnings below."
-msgstr ""
-"Résultat enregistré - veuillez toutefois consulter les avertissements ci-"
-"dessous."
+#: templates/indicators/result_form_common_js.html:381
+msgid "Review warning."
+msgstr "Vérifiez l’avertissement."
 
-#: templates/indicators/result_form_common_js.html:389
-msgid "Success, form data saved."
-msgstr "Succès, données de formulaire enregistrées."
+#: templates/indicators/result_form_common_js.html:422
+#: templates/indicators/results/result_form_disaggregation_fields.html:72
+msgid "The sum of disaggregated values does not match the actual value."
+msgstr "La somme des valeurs désagrégées ne correspond pas à la valeur réelle."
 
-#: templates/indicators/result_form_common_js.html:401
+#: templates/indicators/result_form_common_js.html:423
+msgid "For future reference, please share your reason for these variations."
+msgstr "À titre d'information, veuillez partager la raison de ces variations."
+
+#: templates/indicators/result_form_common_js.html:424
 msgid ""
 "Modifying results will affect program metrics for this indicator and should "
 "only be done to correct a data entry error. For future reference, please "
@@ -2505,28 +2519,24 @@ msgstr ""
 "d’entrée de données. À titre de référence, veuillez fournir une justification "
 "pour la modification de ce résultat."
 
-#: templates/indicators/result_form_common_js.html:402
-#: templates/indicators/results/result_form_disaggregation_fields.html:72
-msgid "The sum of disaggregated values does not match the actual value."
-msgstr "La somme des valeurs désagrégées ne correspond pas à la valeur réelle."
+#: templates/indicators/result_form_common_js.html:483
+#: templates/indicators/result_form_common_js.html:550
+msgid "One or more fields needs attention."
+msgstr "Un ou plusieurs champs requièrent votre attention."
 
-#: templates/indicators/result_form_common_js.html:403
-msgid "For future reference, please share your reason for these variations."
-msgstr "À titre d'information, veuillez partager la raison de ces variations."
-
-#: templates/indicators/result_form_modal.html:136
+#: templates/indicators/result_form_modal.html:137
 #: templates/indicators/result_table.html:29
 msgid "Evidence"
 msgstr "Preuve"
 
-#: templates/indicators/result_form_modal.html:138
+#: templates/indicators/result_form_modal.html:139
 msgid ""
 "Link this result to a record or folder of records that serves as evidence."
 msgstr ""
 "Liez ce résultat à un enregistrement ou un dossier d’enregistrements servant "
 "de preuve."
 
-#: templates/indicators/result_form_modal.html:146
+#: templates/indicators/result_form_modal.html:147
 msgid "Delete this result"
 msgstr "Supprimer ce résultat"
 
@@ -2702,11 +2712,11 @@ msgstr ""
 msgid "view"
 msgstr "afficher"
 
-#: templates/indicators/results/result_form_evidence_fields.html:20
+#: templates/indicators/results/result_form_evidence_fields.html:21
 msgid "Browse Google Drive"
 msgstr "Parcourir Google Drive"
 
-#: templates/indicators/results/result_form_evidence_fields.html:41
+#: templates/indicators/results/result_form_evidence_fields.html:43
 msgid "Give your record a short name that is easy to remember."
 msgstr ""
 "Attribuez un nom court et facilement mémorisable à votre enregistrement."
@@ -4224,6 +4234,14 @@ msgstr "Rechercher"
 #: workflow/widgets.py:133
 msgid "City, Country:"
 msgstr "Ville, Pays :"
+
+#~ msgid "Result saved - however please review warnings below."
+#~ msgstr ""
+#~ "Résultat enregistré - veuillez toutefois consulter les avertissements ci-"
+#~ "dessous."
+
+#~ msgid "Success, form data saved."
+#~ msgstr "Succès, données de formulaire enregistrées."
 
 #~ msgid "User programs updated"
 #~ msgstr "Programmes de l’utilisateur mis à jour"
