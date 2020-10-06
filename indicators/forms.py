@@ -195,7 +195,6 @@ class IndicatorForm(forms.ModelForm):
             'data_issues': forms.Textarea(attrs={'rows': 4}),
             'indicator_changes': forms.Textarea(attrs={'rows': 4}),
             'comments': forms.Textarea(attrs={'rows': 4}),
-            'notes': forms.Textarea(attrs={'rows': 4}),
             'rationale_for_target': forms.Textarea(attrs={'rows': 4}),
             'objectives': ShowOnDisabledMultiSelect,
             'strategic_objectives': ShowOnDisabledMultiSelect,
