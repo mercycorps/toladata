@@ -3,7 +3,7 @@ msgstr ""
 "Project-Id-Version: \n"
 "Report-Msgid-Bugs-To: \n"
 "POT-Creation-Date: 2020-10-06 12:22-0700\n"
-"PO-Revision-Date: 2020-10-06 12:26-0700\n"
+"PO-Revision-Date: 2020-10-07 11:25-0700\n"
 "Last-Translator: \n"
 "Language-Team: \n"
 "Language: fr\n"
@@ -1218,7 +1218,7 @@ msgstr "Aucune justification pour la modification n’est requise."
 #: indicators/views/views_indicators.py:834
 #, python-format
 msgid "Result was added to %(level)s indicator %(number)s."
-msgstr ""
+msgstr "Résultat ajouté à %(level)s indicateur %(number)s."
 
 #: indicators/views/views_indicators.py:839
 msgid "Success, Data Created!"
@@ -1226,7 +1226,7 @@ msgstr "Succès, données créées !"
 
 #: indicators/views/views_indicators.py:900
 msgid "Result updated."
-msgstr ""
+msgstr "Résultat mises à jour."
 
 #: indicators/views/views_indicators.py:904
 msgid "Success, Data Updated!"
