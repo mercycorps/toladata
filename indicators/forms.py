@@ -195,7 +195,6 @@ class IndicatorForm(forms.ModelForm):
             'data_issues': forms.Textarea(attrs={'rows': 4}),
             'indicator_changes': forms.Textarea(attrs={'rows': 4}),
             'comments': forms.Textarea(attrs={'rows': 4}),
-            'notes': forms.Textarea(attrs={'rows': 4}),
             'rationale_for_target': forms.Textarea(attrs={'rows': 4}),
             'objectives': ShowOnDisabledMultiSelect,
             'strategic_objectives': ShowOnDisabledMultiSelect,
@@ -325,8 +324,6 @@ class IndicatorForm(forms.ModelForm):
         else:
             self.fields.pop('objectives')
         self.fields['strategic_objectives'].queryset = StrategicObjective.objects.filter(country__in=countries)
-        self.fields['approved_by'].queryset = TolaUser.objects.filter(country__in=countries).distinct()
-        self.fields['approval_submitted_by'].queryset = TolaUser.objects.filter(country__in=countries).distinct()
         self.fields['name'].label = _('Indicator')
         self.fields['name'].required = True
         self.fields['name'].widget = forms.Textarea(attrs={'rows': 3})

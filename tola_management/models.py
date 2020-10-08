@@ -14,7 +14,9 @@ from workflow.models import (
     TolaUser,
     Organization,
     Program,
-    Country
+    Country,
+    COUNTRY_ROLE_CHOICES,
+    PROGRAM_ROLE_CHOICES,
 )
 
 from indicators.models import (
@@ -103,10 +105,26 @@ class DiffableLog:
 class UserManagementAuditLog(models.Model, DiffableLog):
     date = models.DateTimeField(_('Modification date'), auto_now_add=True)
     admin_user = models.ForeignKey(TolaUser, null=True, on_delete=models.SET_NULL, related_name="+")
+    system_generated_update = models.BooleanField(default=False)
     modified_user = models.ForeignKey(TolaUser, null=True, on_delete=models.SET_NULL, related_name="+")
     change_type = models.CharField(_('Modification type'), max_length=255)
     previous_entry = models.TextField()
     new_entry = models.TextField()
+
+    class Meta:
+        constraints = [
+            models.CheckConstraint(
+                name="user_change_either_system_or_admin_generated",
+                check=(
+                    models.Q(
+                        system_generated_update=True,
+                        admin_user__isnull=True
+                    ) | models.Q(
+                        system_generated_update=False
+                    )
+                ),
+            )
+        ]
 
     @property
     def field_map(self):
@@ -130,13 +148,21 @@ class UserManagementAuditLog(models.Model, DiffableLog):
     def change_type_map(self):
         return {
             "user_created": _("User created"),
-            "user_programs_updated": _("User programs updated"),
-            "user_profile_updated": _("User profile updated")
+            "user_programs_updated": _("Roles and permissions updated"),
+            "user_profile_updated": _("User profile updated"),
         }
 
     @property
     def pretty_change_type(self):
         return self.change_type_map.get(self.change_type, self.change_type)
+
+    @property
+    def admin_user_display(self):
+        if self.system_generated_update:
+            return "Okta"
+        elif self.admin_user:
+            return self.admin_user.name
+        return _("N/A")
 
     @property
     def diff_list(self):
@@ -151,47 +177,81 @@ class UserManagementAuditLog(models.Model, DiffableLog):
             if self.new_entry:
                 n = json.loads(self.new_entry)
 
+            base_country_prev = p.get('base_country', {})
+            base_country_next = n.get('base_country', {})
+            if base_country_prev.get('pk', None) != base_country_next.get('pk', None):
+                base_country_diff = {
+                    'name': 'base_country',
+                    'pretty_name': _("Base Country"),
+                    'prev': base_country_prev.get('country', None),
+                    'new': base_country_next.get('country', None)
+                }
+            else:
+                base_country_diff = None
+
+            def update_role(entry):
+                role_lookup = {
+                    **{k: v for (k, v) in PROGRAM_ROLE_CHOICES},
+                    **{k: v for (k, v) in COUNTRY_ROLE_CHOICES}
+                }
+                if 'role' in entry and entry['role'] in role_lookup:
+                    return {**entry,'role': role_lookup[entry['role']]}
+                return entry
+
             def access_diff(p, n):
                 diff_list = []
-                for (p_field, n_field) in itertools.zip_longest(p.keys(), n.keys()):
-                    if p_field and p_field not in n:
+                for key in (p.keys() | n.keys()):
+                    if key in p and key not in n:
                         diff_list.append({
-                            "name": p_field,
-                            "prev": p[p_field],
-                            "new": {k: 'N/A' for k, _ in p[p_field].items()},
+                            "name": key,
+                            "prev": update_role(p[key]),
+                            "new": {k: None for k, _ in p[key].items()},
                         })
-
-                    if n_field and n_field not in p:
+                    if key in n and key not in p:
                         diff_list.append({
-                            "name": n_field,
-                            "prev": {k: 'N/A' for k, _ in n[n_field].items()},
-                            "new": n[n_field]
+                            "name": key,
+                            "prev": {k: None for k, _ in n[key].items()},
+                            "new": update_role(n[key])
                         })
-
-                    if n_field in p and p_field in n and n[p_field] != p[n_field]:
+                    if key in n and key in p and n[key] != p[key]:
                         diff_list.append({
-                            "name": n_field,
-                            "prev": p[p_field],
-                            "new": n[n_field]
+                            "name": key,
+                            "prev": update_role(p[key]),
+                            "new": update_role(n[key])
                         })
 
                 return diff_list
 
             countries_diff = access_diff(p["countries"], n["countries"])
             programs_diff = access_diff(p["programs"], n["programs"])
+            
 
             return {
+                "base_country": base_country_diff,
                 "countries": countries_diff,
-                "programs": programs_diff
+                "programs": programs_diff,
             }
         else:
             return super(UserManagementAuditLog, self).diff_list
 
+    @staticmethod
+    def _is_system_generated(admin_user):
+        """if the user is a string labeled "okta" then set admin_user to false and flag as system-generated"""
+        if admin_user == "okta":
+            admin_user = None
+            system_generated_update = True
+        else:
+            admin_user = admin_user
+            system_generated_update = False
+        return admin_user, system_generated_update
+
     @classmethod
     def created(cls, user, created_by, entry):
         new_entry = json.dumps(entry)
+        admin_user, system_generated_update = cls._is_system_generated(created_by)
         entry = cls(
-            admin_user=created_by,
+            admin_user=admin_user,
+            system_generated_update=system_generated_update,
             modified_user=user,
             change_type="user_created",
             new_entry=new_entry,
@@ -202,9 +262,11 @@ class UserManagementAuditLog(models.Model, DiffableLog):
     def programs_updated(cls, user, changed_by, old, new):
         old = json.dumps(old)
         new = json.dumps(new)
+        admin_user, system_generated_update = cls._is_system_generated(changed_by)
         if old != new:
             entry = cls(
-                admin_user=changed_by,
+                admin_user=admin_user,
+                system_generated_update=system_generated_update,
                 modified_user=user,
                 change_type="user_programs_updated",
                 previous_entry=old,
@@ -216,9 +278,11 @@ class UserManagementAuditLog(models.Model, DiffableLog):
     def profile_updated(cls, user, changed_by, old, new):
         old = json.dumps(old)
         new = json.dumps(new)
+        admin_user, system_generated_update = cls._is_system_generated(changed_by)
         if old != new:
             entry = cls(
-                admin_user=changed_by,
+                admin_user=admin_user,
+                system_generated_update=system_generated_update,
                 modified_user=user,
                 change_type="user_profile_updated",
                 previous_entry=old,
