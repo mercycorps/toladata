@@ -7,6 +7,7 @@ from django.db import transaction
 from django.contrib.auth.models import User
 from social_core.pipeline.social_auth import associate_by_email, social_user, associate_user
 from workflow.models import TolaUser, Organization, Country
+from tola_management.models import UserManagementAuditLog
 
 logger = logging.getLogger('django')
 login_logger = logging.getLogger('login')
@@ -24,7 +25,7 @@ def create_user_okta(backend, details, user, response, *args, **kwargs):
         #annoyingly the attributes are coming back as arrays, so let's flatten them
         attributes = {k: v[0] if len(v) > 0 else None for k,v in response['attributes'].items()}
         savepoint = transaction.savepoint()
-
+        created = False
         email = attributes['email']
         first_name = attributes['firstName']
         last_name = attributes['lastName']
@@ -35,7 +36,6 @@ def create_user_okta(backend, details, user, response, *args, **kwargs):
             logger.error("In trying to log in {}, could not retrieve Country object for {}.".format(
                 attributes['email'], attributes.get("mcCountryCode")
             ))
-
         user_count = User.objects.filter(email=email).count()
         if user_count > 1:
             logger.error("Found too many users for {}".format(email))
@@ -56,10 +56,14 @@ def create_user_okta(backend, details, user, response, *args, **kwargs):
                 "found user id %s for email %s with tola_user id %s",
                 user.id, email, tola_user.id
             )
+            previous_profile = tola_user.logged_fields
+            previous_permissions = tola_user.logged_program_fields
         else:
             try:
                 tola_user = TolaUser(user=user, organization=Organization.mercy_corps())
                 tola_user.save()
+                created = True
+                previous_permissions = []
             except Exception as e:
                 transaction.savepoint_rollback(savepoint)
                 logger.error("Exception while saving the TolaUser {}".format(email), e)
@@ -82,6 +86,25 @@ def create_user_okta(backend, details, user, response, *args, **kwargs):
         try:
             tola_user.country = country
             tola_user.save()
+            if created:
+                UserManagementAuditLog.created(
+                    user=tola_user,
+                    created_by='okta',
+                    entry=tola_user.logged_fields
+                )
+            else:
+                UserManagementAuditLog.profile_updated(
+                    user=tola_user,
+                    changed_by='okta',
+                    old=previous_profile,
+                    new=tola_user.logged_fields
+                )
+            UserManagementAuditLog.programs_updated(
+                user=tola_user,
+                changed_by='okta',
+                old=previous_permissions,
+                new=tola_user.logged_program_fields
+            )
         except Exception as e:
             transaction.savepoint_rollback(savepoint)
             logger.error("Exception while saving the TolaUser country of {}".format(email), e)

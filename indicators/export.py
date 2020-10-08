@@ -17,8 +17,6 @@ class IndicatorResource(resources.ModelResource):
     reporting_frequency = fields.Field(column_name='reporting_frequency', attribute='reporting_frequency', widget=ForeignKeyWidget(ReportingFrequency, 'frequency'))
     level = fields.Field(column_name='levels', attribute='levels')
     disaggregation = fields.Field(column_name='disaggregation', attribute='disaggregations')
-    approval_submitted_by = fields.Field(column_name='approval submitted by', attribute='approval_submitted_by', widget=ForeignKeyWidget(TolaUser, 'name'))
-    approved_by = fields.Field(column_name='approved by', attribute='approved_by', widget=ForeignKeyWidget(TolaUser, 'name'))
 
     class Meta:
         model = Indicator

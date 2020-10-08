@@ -104,10 +104,6 @@ class Command(BaseCommand):
                 indicator_data['sector'], Sector, 'sector', ['sector'])
             indicator_data['external_service_record'] = self.replace_names_with_values(
                 indicator_data['external_service_record'], ExternalService, 'name', ['name'])
-            indicator_data['approved_by'] = self.replace_names_with_values(
-                indicator_data['approved_by'], TolaUser, 'name', ['name'])
-            indicator_data['approval_submitted_by'] = self.replace_names_with_values(
-                indicator_data['approval_submitted_by'], TolaUser, 'name', ['name'])
 
             indicator = Indicator(**indicator_data)
             indicator.program = program
