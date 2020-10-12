@@ -2,7 +2,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: \n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2020-09-17 09:50-0700\n"
+"POT-Creation-Date: 2020-09-28 17:42-0700\n"
 "PO-Revision-Date: 2020-09-17 09:45-0700\n"
 "Last-Translator: \n"
 "Language-Team: \n"
@@ -107,19 +107,19 @@ msgstr "Masquer"
 msgid "No differences found"
 msgstr "Aucune différence"
 
-#: js/components/changelog.js:86 js/components/changelog.js:91
-#: js/components/changelog.js:101 js/components/changelog.js:106
+#: js/components/changelog.js:92 js/components/changelog.js:97
+#: js/components/changelog.js:107 js/components/changelog.js:112
 #: js/pages/tola_management_pages/country/views.js:94
 msgid "Country"
 msgstr "Pays"
 
 #. Translators:  Role references a user's permission level when accessing data (i.e. User or Admin) */}
-#: js/components/changelog.js:88 js/components/changelog.js:92
-#: js/components/changelog.js:102 js/components/changelog.js:107
+#: js/components/changelog.js:94 js/components/changelog.js:98
+#: js/components/changelog.js:108 js/components/changelog.js:113
 msgid "Role"
 msgstr "Rôle"
 
-#: js/components/changelog.js:100 js/components/changelog.js:105
+#: js/components/changelog.js:106 js/components/changelog.js:111
 #: js/pages/iptt_quickstart/components/selects.js:22
 #: js/pages/iptt_quickstart/components/selects.js:39
 #: js/pages/iptt_report/components/sidebar/reportSelect.js:14
@@ -127,23 +127,23 @@ msgstr "Rôle"
 msgid "Program"
 msgstr "Programme"
 
-#: js/components/changelog.js:167
+#: js/components/changelog.js:173
 msgid "Date"
 msgstr "Date"
 
-#: js/components/changelog.js:168
+#: js/components/changelog.js:174
 msgid "Admin"
 msgstr "Administrateur"
 
-#: js/components/changelog.js:169
+#: js/components/changelog.js:175
 msgid "Change Type"
 msgstr "Type de modification"
 
-#: js/components/changelog.js:170
+#: js/components/changelog.js:176
 msgid "Previous Entry"
 msgstr "Entrée précédente"
 
-#: js/components/changelog.js:171
+#: js/components/changelog.js:177
 msgid "New Entry"
 msgstr "Nouvelle entrée"
 

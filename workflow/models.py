@@ -320,6 +320,9 @@ class TolaUser(models.Model):
         country_access = {}
         if self.country:
             country_access[self.country.id] = {"country": self.country.country, "role": 'user'}
+            base_country = {"pk": self.country.pk, "country": self.country.country}
+        else:
+            base_country = {"pk": None, "country": None}
         country_access.update({
             access.country_id: {"country": access.country.country, "role": access.role}
             for access in self.countryaccess_set.all()
@@ -336,7 +339,8 @@ class TolaUser(models.Model):
 
         return {
             "countries": country_access,
-            "programs": program_access
+            "programs": program_access,
+            "base_country": base_country,
         }
 
     @property

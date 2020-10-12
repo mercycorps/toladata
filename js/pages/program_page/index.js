@@ -82,17 +82,27 @@ ReactDOM.render(<ProgramMetrics rootStore={rootStore} uiStore={uiStore} />,
  * without being completely converted to React
  */
 
-// Open the CollectDataUpdate (update results) form in a modal
-$("#indicator-list-react-component").on("click", ".results__link", function(e) {
-    e.preventDefault();
-    let url = $(this).attr("href");
+function openResultsModal(url) {
     url += "?modal=1";
     $("#indicator_modal_content").empty();
     $("#modalmessages").empty();
 
     $("#indicator_results_modal_content").load(url);
     $("#indicator_results_div").modal('show');
+}
+
+// Open the CollectDataUpdate (update results) form in a modal
+$("#indicator-list-react-component").on("click", ".results__link", function(e) {
+    e.preventDefault();
+    let url = $(this).attr("href");
+    openResultsModal(url);
 });
+
+$('#indicator_results_div').on('review.tola.results.warning', (e, params) => {
+    let url = params.url;
+    openResultsModal(url);
+})
+
 
 // Open the IndicatorUpdate (Add targets btn in results section (HTML)) Form in a modal
 $("#indicator-list-react-component").on("click", ".indicator-link[data-tab]", function(e) {
@@ -131,13 +141,12 @@ $('#indicator_modal_div').on('deleted.tola.indicator.save', (e, params) => {
 
 // When "add results" modal is closed, the targets data needs refreshing
 // the indicator itself also needs refreshing for the gas tank gauge
-$('#indicator_results_div').on('hidden.bs.modal', function (e) {
-    let recordchanged = $(this).find('form').data('recordchanged');
-    if (recordchanged === true) {
-        let indicatorPk = parseInt($(this).find('form #id_indicator').val());
-        rootStore.program.updateIndicator(indicatorPk);
-    }
+$('#indicator_results_div').on('save.tola.result_form', function (e) {
+    let indicatorPk = parseInt($(this).find('form #id_indicator').val());
+    rootStore.program.updateIndicator(indicatorPk);
 });
+
+
 
 
 /*
