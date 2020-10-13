@@ -2,6 +2,7 @@ import React from 'react'
 import { observer } from 'mobx-react';
 import {FontAwesomeIcon} from "@fortawesome/react-fontawesome"
 import { toJS } from 'mobx'
+import { EM_DASH } from '../constants';
 
 
 export const ChangeField = ({name, data, extraTitleText=null}) => {
@@ -20,14 +21,20 @@ export const ChangeField = ({name, data, extraTitleText=null}) => {
     }
 
     else {
-        let change_value = "N/A";
-        if (data !== undefined && data !== null) {
-            change_value = ["true", "false"].includes(data.toString())
-                ? data.toString().replace("t", "T").replace("f", "F")
-                : data.toString();
+        var change_value;
+        if (data !== undefined && data !== null && data !== "N/A") {
+            change_value = <span className="change__field__value">
+            {
+                ["true", "false"].includes(data.toString())
+                    ? data.toString().replace("t", "T").replace("f", "F")
+                    : data.toString()
+            }
+            </span>
+        } else {
+            change_value = <span className="change__field__value empty-value">{ EM_DASH }</span>
         }
         return <div className="change__field">
-            <strong>{name}</strong>: {change_value}
+            <strong className="change__field__name">{name}</strong>: {change_value}
         </div>
     }
 };
@@ -73,13 +80,19 @@ const ChangeLogEntryRowBuilder = ({data}) => {
     const nullRow = <ChangeLogEntryRow previous={gettext("No differences found")} new={null} id={1} key={1}/>
 
     // If they manage to store a log without any diffs at all, send them to the soft landing place.
-    if ((Array.isArray(data.diff_list) && data.diff_list.length === 0) || (Object.keys(data.diff_list).length === 0)) {
+    if ((Array.isArray(data.diff_list) && data.diff_list.length === 0) || (Object.keys(data.diff_list || {}).length === 0)) {
         allRows.push(nullRow);
         return allRows
     }
 
     if (data.change_type === 'user_programs_updated') {
         // Create multiple row for program/country changes:
+        if (data.diff_list.base_country) {
+            const previousEntry = <ChangeField name={data.diff_list.base_country.pretty_name} data={data.diff_list.base_country.prev} />
+            const newEntry = <ChangeField name={data.diff_list.base_country.pretty_name} data={data.diff_list.base_country.new} />
+                
+            allRows.push(<ChangeLogEntryRow previous={previousEntry} new={newEntry} id={"base_country"} key={"base_country"} />);
+        }
         Object.entries(data.diff_list.countries).forEach( ([id, country]) => {
             const key = `${id}_${country}`;
             const previousEntry = <React.Fragment>

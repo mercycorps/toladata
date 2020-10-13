@@ -74,11 +74,17 @@ exports[`Change log should display all  Organization change log entries 1`] = `
           <div
             className="change__field"
           >
-            <strong>
+            <strong
+              className="change__field__name"
+            >
               Name
             </strong>
             : 
-            Organization Example
+            <span
+              className="change__field__value"
+            >
+              Organization Example
+            </span>
           </div>
         </div>
       </td>
@@ -89,11 +95,17 @@ exports[`Change log should display all  Organization change log entries 1`] = `
           <div
             className="change__field"
           >
-            <strong>
+            <strong
+              className="change__field__name"
+            >
               Name
             </strong>
             : 
-            Organization Example Changed
+            <span
+              className="change__field__value"
+            >
+              Organization Example Changed
+            </span>
           </div>
         </div>
       </td>
@@ -111,11 +123,17 @@ exports[`Change log should display all  Organization change log entries 1`] = `
           <div
             className="change__field"
           >
-            <strong>
+            <strong
+              className="change__field__name"
+            >
               Primary address
             </strong>
             : 
-            Primary contact address
+            <span
+              className="change__field__value"
+            >
+              Primary contact address
+            </span>
           </div>
         </div>
       </td>
@@ -126,11 +144,17 @@ exports[`Change log should display all  Organization change log entries 1`] = `
           <div
             className="change__field"
           >
-            <strong>
+            <strong
+              className="change__field__name"
+            >
               Primary address
             </strong>
             : 
-            Primary contact address changed
+            <span
+              className="change__field__value"
+            >
+              Primary contact address changed
+            </span>
           </div>
         </div>
       </td>
@@ -148,11 +172,17 @@ exports[`Change log should display all  Organization change log entries 1`] = `
           <div
             className="change__field"
           >
-            <strong>
+            <strong
+              className="change__field__name"
+            >
               Primary contact name
             </strong>
             : 
-            Primary Contact Name
+            <span
+              className="change__field__value"
+            >
+              Primary Contact Name
+            </span>
           </div>
         </div>
       </td>
@@ -163,11 +193,17 @@ exports[`Change log should display all  Organization change log entries 1`] = `
           <div
             className="change__field"
           >
-            <strong>
+            <strong
+              className="change__field__name"
+            >
               Primary contact name
             </strong>
             : 
-            Primary Contact Name changed
+            <span
+              className="change__field__value"
+            >
+              Primary Contact Name changed
+            </span>
           </div>
         </div>
       </td>
@@ -185,11 +221,17 @@ exports[`Change log should display all  Organization change log entries 1`] = `
           <div
             className="change__field"
           >
-            <strong>
+            <strong
+              className="change__field__name"
+            >
               Primary contact email
             </strong>
             : 
-            primarycontact@example.com
+            <span
+              className="change__field__value"
+            >
+              primarycontact@example.com
+            </span>
           </div>
         </div>
       </td>
@@ -200,11 +242,17 @@ exports[`Change log should display all  Organization change log entries 1`] = `
           <div
             className="change__field"
           >
-            <strong>
+            <strong
+              className="change__field__name"
+            >
               Primary contact email
             </strong>
             : 
-            primarycontactchanged@example.com
+            <span
+              className="change__field__value"
+            >
+              primarycontactchanged@example.com
+            </span>
           </div>
         </div>
       </td>
@@ -251,11 +299,17 @@ exports[`Change log should display all  Organization change log entries 1`] = `
           <div
             className="change__field"
           >
-            <strong>
+            <strong
+              className="change__field__name"
+            >
               Name
             </strong>
             : 
-            
+            <span
+              className="change__field__value"
+            >
+              
+            </span>
           </div>
         </div>
       </td>
@@ -266,11 +320,17 @@ exports[`Change log should display all  Organization change log entries 1`] = `
           <div
             className="change__field"
           >
-            <strong>
+            <strong
+              className="change__field__name"
+            >
               Name
             </strong>
             : 
-            Organization Example
+            <span
+              className="change__field__value"
+            >
+              Organization Example
+            </span>
           </div>
         </div>
       </td>
@@ -288,11 +348,17 @@ exports[`Change log should display all  Organization change log entries 1`] = `
           <div
             className="change__field"
           >
-            <strong>
+            <strong
+              className="change__field__name"
+            >
               Primary address
             </strong>
             : 
-            
+            <span
+              className="change__field__value"
+            >
+              
+            </span>
           </div>
         </div>
       </td>
@@ -303,11 +369,17 @@ exports[`Change log should display all  Organization change log entries 1`] = `
           <div
             className="change__field"
           >
-            <strong>
+            <strong
+              className="change__field__name"
+            >
               Primary address
             </strong>
             : 
-            Primary contact address
+            <span
+              className="change__field__value"
+            >
+              Primary contact address
+            </span>
           </div>
         </div>
       </td>
@@ -325,11 +397,17 @@ exports[`Change log should display all  Organization change log entries 1`] = `
           <div
             className="change__field"
           >
-            <strong>
+            <strong
+              className="change__field__name"
+            >
               Primary contact name
             </strong>
             : 
-            
+            <span
+              className="change__field__value"
+            >
+              
+            </span>
           </div>
         </div>
       </td>
@@ -340,11 +418,17 @@ exports[`Change log should display all  Organization change log entries 1`] = `
           <div
             className="change__field"
           >
-            <strong>
+            <strong
+              className="change__field__name"
+            >
               Primary contact name
             </strong>
             : 
-            Primary Contact Name
+            <span
+              className="change__field__value"
+            >
+              Primary Contact Name
+            </span>
           </div>
         </div>
       </td>
@@ -362,11 +446,17 @@ exports[`Change log should display all  Organization change log entries 1`] = `
           <div
             className="change__field"
           >
-            <strong>
+            <strong
+              className="change__field__name"
+            >
               Primary contact email
             </strong>
             : 
-            
+            <span
+              className="change__field__value"
+            >
+              
+            </span>
           </div>
         </div>
       </td>
@@ -377,11 +467,17 @@ exports[`Change log should display all  Organization change log entries 1`] = `
           <div
             className="change__field"
           >
-            <strong>
+            <strong
+              className="change__field__name"
+            >
               Primary contact email
             </strong>
             : 
-            primarycontact@example.com
+            <span
+              className="change__field__value"
+            >
+              primarycontact@example.com
+            </span>
           </div>
         </div>
       </td>
@@ -399,11 +495,17 @@ exports[`Change log should display all  Organization change log entries 1`] = `
           <div
             className="change__field"
           >
-            <strong>
+            <strong
+              className="change__field__name"
+            >
               Primary contact phone
             </strong>
             : 
-            
+            <span
+              className="change__field__value"
+            >
+              
+            </span>
           </div>
         </div>
       </td>
@@ -414,11 +516,17 @@ exports[`Change log should display all  Organization change log entries 1`] = `
           <div
             className="change__field"
           >
-            <strong>
+            <strong
+              className="change__field__name"
+            >
               Primary contact phone
             </strong>
             : 
-            5551212
+            <span
+              className="change__field__value"
+            >
+              5551212
+            </span>
           </div>
         </div>
       </td>
@@ -436,11 +544,17 @@ exports[`Change log should display all  Organization change log entries 1`] = `
           <div
             className="change__field"
           >
-            <strong>
+            <strong
+              className="change__field__name"
+            >
               Mode of contact
             </strong>
             : 
-            
+            <span
+              className="change__field__value"
+            >
+              
+            </span>
           </div>
         </div>
       </td>
@@ -451,11 +565,17 @@ exports[`Change log should display all  Organization change log entries 1`] = `
           <div
             className="change__field"
           >
-            <strong>
+            <strong
+              className="change__field__name"
+            >
               Mode of contact
             </strong>
             : 
-            
+            <span
+              className="change__field__value"
+            >
+              
+            </span>
           </div>
         </div>
       </td>
@@ -473,11 +593,17 @@ exports[`Change log should display all  Organization change log entries 1`] = `
           <div
             className="change__field"
           >
-            <strong>
+            <strong
+              className="change__field__name"
+            >
               Is active
             </strong>
             : 
-            
+            <span
+              className="change__field__value"
+            >
+              
+            </span>
           </div>
         </div>
       </td>
@@ -488,11 +614,17 @@ exports[`Change log should display all  Organization change log entries 1`] = `
           <div
             className="change__field"
           >
-            <strong>
+            <strong
+              className="change__field__name"
+            >
               Is active
             </strong>
             : 
-            True
+            <span
+              className="change__field__value"
+            >
+              True
+            </span>
           </div>
         </div>
       </td>
@@ -510,11 +642,17 @@ exports[`Change log should display all  Organization change log entries 1`] = `
           <div
             className="change__field"
           >
-            <strong>
+            <strong
+              className="change__field__name"
+            >
               Sectors
             </strong>
             : 
-            
+            <span
+              className="change__field__value"
+            >
+              
+            </span>
           </div>
         </div>
       </td>
@@ -525,11 +663,17 @@ exports[`Change log should display all  Organization change log entries 1`] = `
           <div
             className="change__field"
           >
-            <strong>
+            <strong
+              className="change__field__name"
+            >
               Sectors
             </strong>
             : 
-            Basic Needs
+            <span
+              className="change__field__value"
+            >
+              Basic Needs
+            </span>
           </div>
         </div>
       </td>
@@ -612,11 +756,17 @@ exports[`Change log should display all  Program change log entries 1`] = `
           <div
             className="change__field"
           >
-            <strong>
+            <strong
+              className="change__field__name"
+            >
               Name
             </strong>
             : 
-            Program Example
+            <span
+              className="change__field__value"
+            >
+              Program Example
+            </span>
           </div>
         </div>
       </td>
@@ -627,11 +777,17 @@ exports[`Change log should display all  Program change log entries 1`] = `
           <div
             className="change__field"
           >
-            <strong>
+            <strong
+              className="change__field__name"
+            >
               Name
             </strong>
             : 
-            Program Example Change
+            <span
+              className="change__field__value"
+            >
+              Program Example Change
+            </span>
           </div>
         </div>
       </td>
@@ -649,11 +805,17 @@ exports[`Change log should display all  Program change log entries 1`] = `
           <div
             className="change__field"
           >
-            <strong>
+            <strong
+              className="change__field__name"
+            >
               Sectors
             </strong>
             : 
-            Agribusiness,Agriculture
+            <span
+              className="change__field__value"
+            >
+              Agribusiness,Agriculture
+            </span>
           </div>
         </div>
       </td>
@@ -664,11 +826,17 @@ exports[`Change log should display all  Program change log entries 1`] = `
           <div
             className="change__field"
           >
-            <strong>
+            <strong
+              className="change__field__name"
+            >
               Sectors
             </strong>
             : 
-            Agribusiness
+            <span
+              className="change__field__value"
+            >
+              Agribusiness
+            </span>
           </div>
         </div>
       </td>
@@ -686,11 +854,17 @@ exports[`Change log should display all  Program change log entries 1`] = `
           <div
             className="change__field"
           >
-            <strong>
+            <strong
+              className="change__field__name"
+            >
               Countries
             </strong>
             : 
-            Kenya,United States
+            <span
+              className="change__field__value"
+            >
+              Kenya,United States
+            </span>
           </div>
         </div>
       </td>
@@ -701,11 +875,17 @@ exports[`Change log should display all  Program change log entries 1`] = `
           <div
             className="change__field"
           >
-            <strong>
+            <strong
+              className="change__field__name"
+            >
               Countries
             </strong>
             : 
-            United States
+            <span
+              className="change__field__value"
+            >
+              United States
+            </span>
           </div>
         </div>
       </td>
@@ -752,11 +932,17 @@ exports[`Change log should display all  Program change log entries 1`] = `
           <div
             className="change__field"
           >
-            <strong>
+            <strong
+              className="change__field__name"
+            >
               GAIT ID
             </strong>
             : 
-            
+            <span
+              className="change__field__value"
+            >
+              
+            </span>
           </div>
         </div>
       </td>
@@ -767,11 +953,17 @@ exports[`Change log should display all  Program change log entries 1`] = `
           <div
             className="change__field"
           >
-            <strong>
+            <strong
+              className="change__field__name"
+            >
               GAIT ID
             </strong>
             : 
-            123
+            <span
+              className="change__field__value"
+            >
+              123
+            </span>
           </div>
         </div>
       </td>
@@ -789,11 +981,17 @@ exports[`Change log should display all  Program change log entries 1`] = `
           <div
             className="change__field"
           >
-            <strong>
+            <strong
+              className="change__field__name"
+            >
               Name
             </strong>
             : 
-            
+            <span
+              className="change__field__value"
+            >
+              
+            </span>
           </div>
         </div>
       </td>
@@ -804,11 +1002,17 @@ exports[`Change log should display all  Program change log entries 1`] = `
           <div
             className="change__field"
           >
-            <strong>
+            <strong
+              className="change__field__name"
+            >
               Name
             </strong>
             : 
-            Program Example
+            <span
+              className="change__field__value"
+            >
+              Program Example
+            </span>
           </div>
         </div>
       </td>
@@ -826,11 +1030,17 @@ exports[`Change log should display all  Program change log entries 1`] = `
           <div
             className="change__field"
           >
-            <strong>
+            <strong
+              className="change__field__name"
+            >
               Funding status
             </strong>
             : 
-            
+            <span
+              className="change__field__value"
+            >
+              
+            </span>
           </div>
         </div>
       </td>
@@ -841,11 +1051,17 @@ exports[`Change log should display all  Program change log entries 1`] = `
           <div
             className="change__field"
           >
-            <strong>
+            <strong
+              className="change__field__name"
+            >
               Funding status
             </strong>
             : 
-            Funded
+            <span
+              className="change__field__value"
+            >
+              Funded
+            </span>
           </div>
         </div>
       </td>
@@ -863,11 +1079,17 @@ exports[`Change log should display all  Program change log entries 1`] = `
           <div
             className="change__field"
           >
-            <strong>
+            <strong
+              className="change__field__name"
+            >
               Cost center
             </strong>
             : 
-            
+            <span
+              className="change__field__value"
+            >
+              
+            </span>
           </div>
         </div>
       </td>
@@ -878,11 +1100,17 @@ exports[`Change log should display all  Program change log entries 1`] = `
           <div
             className="change__field"
           >
-            <strong>
+            <strong
+              className="change__field__name"
+            >
               Cost center
             </strong>
             : 
-            N/A
+            <span
+              className="change__field__value empty-value"
+            >
+              —
+            </span>
           </div>
         </div>
       </td>
@@ -900,11 +1128,17 @@ exports[`Change log should display all  Program change log entries 1`] = `
           <div
             className="change__field"
           >
-            <strong>
+            <strong
+              className="change__field__name"
+            >
               Description
             </strong>
             : 
-            
+            <span
+              className="change__field__value"
+            >
+              
+            </span>
           </div>
         </div>
       </td>
@@ -915,11 +1149,17 @@ exports[`Change log should display all  Program change log entries 1`] = `
           <div
             className="change__field"
           >
-            <strong>
+            <strong
+              className="change__field__name"
+            >
               Description
             </strong>
             : 
-            
+            <span
+              className="change__field__value"
+            >
+              
+            </span>
           </div>
         </div>
       </td>
@@ -937,11 +1177,17 @@ exports[`Change log should display all  Program change log entries 1`] = `
           <div
             className="change__field"
           >
-            <strong>
+            <strong
+              className="change__field__name"
+            >
               Sectors
             </strong>
             : 
-            
+            <span
+              className="change__field__value"
+            >
+              
+            </span>
           </div>
         </div>
       </td>
@@ -952,11 +1198,17 @@ exports[`Change log should display all  Program change log entries 1`] = `
           <div
             className="change__field"
           >
-            <strong>
+            <strong
+              className="change__field__name"
+            >
               Sectors
             </strong>
             : 
-            Agribusiness,Agriculture
+            <span
+              className="change__field__value"
+            >
+              Agribusiness,Agriculture
+            </span>
           </div>
         </div>
       </td>
@@ -974,11 +1226,17 @@ exports[`Change log should display all  Program change log entries 1`] = `
           <div
             className="change__field"
           >
-            <strong>
+            <strong
+              className="change__field__name"
+            >
               Countries
             </strong>
             : 
-            
+            <span
+              className="change__field__value"
+            >
+              
+            </span>
           </div>
         </div>
       </td>
@@ -989,11 +1247,17 @@ exports[`Change log should display all  Program change log entries 1`] = `
           <div
             className="change__field"
           >
-            <strong>
+            <strong
+              className="change__field__name"
+            >
               Countries
             </strong>
             : 
-            Kenya,United States
+            <span
+              className="change__field__value"
+            >
+              Kenya,United States
+            </span>
           </div>
         </div>
       </td>
@@ -1076,20 +1340,32 @@ exports[`Change log should display all  User change log entries 1`] = `
           <div
             className="change__field"
           >
-            <strong>
+            <strong
+              className="change__field__name"
+            >
               Country
             </strong>
             : 
-            N/A
+            <span
+              className="change__field__value empty-value"
+            >
+              —
+            </span>
           </div>
           <div
             className="change__field"
           >
-            <strong>
+            <strong
+              className="change__field__name"
+            >
               Role
             </strong>
             : 
-            N/A
+            <span
+              className="change__field__value empty-value"
+            >
+              —
+            </span>
           </div>
         </div>
       </td>
@@ -1100,20 +1376,32 @@ exports[`Change log should display all  User change log entries 1`] = `
           <div
             className="change__field"
           >
-            <strong>
+            <strong
+              className="change__field__name"
+            >
               Country
             </strong>
             : 
-            Bangladesh
+            <span
+              className="change__field__value"
+            >
+              Bangladesh
+            </span>
           </div>
           <div
             className="change__field"
           >
-            <strong>
+            <strong
+              className="change__field__name"
+            >
               Role
             </strong>
             : 
-            user
+            <span
+              className="change__field__value"
+            >
+              user
+            </span>
           </div>
         </div>
       </td>
@@ -1131,20 +1419,32 @@ exports[`Change log should display all  User change log entries 1`] = `
           <div
             className="change__field"
           >
-            <strong>
+            <strong
+              className="change__field__name"
+            >
               Country
             </strong>
             : 
-            N/A
+            <span
+              className="change__field__value empty-value"
+            >
+              —
+            </span>
           </div>
           <div
             className="change__field"
           >
-            <strong>
+            <strong
+              className="change__field__name"
+            >
               Role
             </strong>
             : 
-            N/A
+            <span
+              className="change__field__value empty-value"
+            >
+              —
+            </span>
           </div>
         </div>
       </td>
@@ -1155,20 +1455,32 @@ exports[`Change log should display all  User change log entries 1`] = `
           <div
             className="change__field"
           >
-            <strong>
+            <strong
+              className="change__field__name"
+            >
               Country
             </strong>
             : 
-            Bahamas
+            <span
+              className="change__field__value"
+            >
+              Bahamas
+            </span>
           </div>
           <div
             className="change__field"
           >
-            <strong>
+            <strong
+              className="change__field__name"
+            >
               Role
             </strong>
             : 
-            user
+            <span
+              className="change__field__value"
+            >
+              user
+            </span>
           </div>
         </div>
       </td>
@@ -1186,29 +1498,47 @@ exports[`Change log should display all  User change log entries 1`] = `
           <div
             className="change__field"
           >
-            <strong>
+            <strong
+              className="change__field__name"
+            >
               Program
             </strong>
             : 
-            N/A
+            <span
+              className="change__field__value empty-value"
+            >
+              —
+            </span>
           </div>
           <div
             className="change__field"
           >
-            <strong>
+            <strong
+              className="change__field__name"
+            >
               Country
             </strong>
             : 
-            N/A
+            <span
+              className="change__field__value empty-value"
+            >
+              —
+            </span>
           </div>
           <div
             className="change__field"
           >
-            <strong>
+            <strong
+              className="change__field__name"
+            >
               Role
             </strong>
             : 
-            N/A
+            <span
+              className="change__field__value empty-value"
+            >
+              —
+            </span>
           </div>
         </div>
       </td>
@@ -1219,29 +1549,47 @@ exports[`Change log should display all  User change log entries 1`] = `
           <div
             className="change__field"
           >
-            <strong>
+            <strong
+              className="change__field__name"
+            >
               Program
             </strong>
             : 
-            Do Wah Diddy
+            <span
+              className="change__field__value"
+            >
+              Do Wah Diddy
+            </span>
           </div>
           <div
             className="change__field"
           >
-            <strong>
+            <strong
+              className="change__field__name"
+            >
               Country
             </strong>
             : 
-            United States
+            <span
+              className="change__field__value"
+            >
+              United States
+            </span>
           </div>
           <div
             className="change__field"
           >
-            <strong>
+            <strong
+              className="change__field__name"
+            >
               Role
             </strong>
             : 
-            medium
+            <span
+              className="change__field__value"
+            >
+              medium
+            </span>
           </div>
         </div>
       </td>
@@ -1288,11 +1636,17 @@ exports[`Change log should display all  User change log entries 1`] = `
           <div
             className="change__field"
           >
-            <strong>
+            <strong
+              className="change__field__name"
+            >
               First name
             </strong>
             : 
-            Anna
+            <span
+              className="change__field__value"
+            >
+              Anna
+            </span>
           </div>
         </div>
       </td>
@@ -1303,11 +1657,17 @@ exports[`Change log should display all  User change log entries 1`] = `
           <div
             className="change__field"
           >
-            <strong>
+            <strong
+              className="change__field__name"
+            >
               First name
             </strong>
             : 
-            Annie
+            <span
+              className="change__field__value"
+            >
+              Annie
+            </span>
           </div>
         </div>
       </td>
@@ -1325,11 +1685,17 @@ exports[`Change log should display all  User change log entries 1`] = `
           <div
             className="change__field"
           >
-            <strong>
+            <strong
+              className="change__field__name"
+            >
               Last name
             </strong>
             : 
-            Jones
+            <span
+              className="change__field__value"
+            >
+              Jones
+            </span>
           </div>
         </div>
       </td>
@@ -1340,11 +1706,17 @@ exports[`Change log should display all  User change log entries 1`] = `
           <div
             className="change__field"
           >
-            <strong>
+            <strong
+              className="change__field__name"
+            >
               Last name
             </strong>
             : 
-            Smith
+            <span
+              className="change__field__value"
+            >
+              Smith
+            </span>
           </div>
         </div>
       </td>
@@ -1391,11 +1763,17 @@ exports[`Change log should display all  User change log entries 1`] = `
           <div
             className="change__field"
           >
-            <strong>
+            <strong
+              className="change__field__name"
+            >
               Last name
             </strong>
             : 
-            Jones
+            <span
+              className="change__field__value"
+            >
+              Jones
+            </span>
           </div>
         </div>
       </td>
@@ -1406,11 +1784,17 @@ exports[`Change log should display all  User change log entries 1`] = `
           <div
             className="change__field"
           >
-            <strong>
+            <strong
+              className="change__field__name"
+            >
               Last name
             </strong>
             : 
-            Smith
+            <span
+              className="change__field__value"
+            >
+              Smith
+            </span>
           </div>
         </div>
       </td>
@@ -1493,11 +1877,17 @@ exports[`Country change log lists all changes 1`] = `
           <div
             className="change__field"
           >
-            <strong>
+            <strong
+              className="change__field__name"
+            >
               Disaggregation type
             </strong>
             : 
-            asdf
+            <span
+              className="change__field__value"
+            >
+              asdf
+            </span>
           </div>
         </div>
       </td>
@@ -1508,11 +1898,17 @@ exports[`Country change log lists all changes 1`] = `
           <div
             className="change__field"
           >
-            <strong>
+            <strong
+              className="change__field__name"
+            >
               Disaggregation type
             </strong>
             : 
-            asdf222
+            <span
+              className="change__field__value"
+            >
+              asdf222
+            </span>
           </div>
         </div>
       </td>

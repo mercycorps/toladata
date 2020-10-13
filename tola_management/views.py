@@ -325,7 +325,7 @@ class AuthUserSerializer(ModelSerializer):
 
 class UserManagementAuditLogSerializer(ModelSerializer):
     id = IntegerField(allow_null=True, required=False)
-    admin_user = CharField(source="admin_user.name", max_length=255)
+    admin_user = CharField(source="admin_user_display", max_length=255)
     date = DateTimeField(format="%Y-%m-%d %H:%M:%S")
 
     class Meta:

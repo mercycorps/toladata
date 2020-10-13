@@ -824,13 +824,15 @@ class ResultCreate(ResultFormMixin, CreateView):
             if formset.is_valid():
                 formset.save()
         rationale = form.cleaned_data.get('rationale') if form.cleaned_data.get('rationale') else "N/A"
-        ProgramAuditLog.log_result_created(
-            self.request.user, result.indicator, result, rationale)
+        ProgramAuditLog.log_result_created(self.request.user, result.indicator, result, rationale)
 
         if self.request.is_ajax():
             data = {
                 'pk': result.pk,
-                'url': reverse('result_update', kwargs={'pk': result.pk})
+                'url': reverse('result_update', kwargs={'pk': result.pk}),
+                'success_message': _(
+                    'Result was added to %(level)s indicator %(number)s.'
+                    ) % {'level': result.indicator.leveltier_name, 'number': result.indicator.results_aware_number}
             }
             return JsonResponse(data)
 
@@ -892,8 +894,12 @@ class ResultUpdate(ResultFormMixin, UpdateView):
             new_result.logged_fields, form.cleaned_data.get('rationale'))
 
         if self.request.is_ajax():
-            data = serializers.serialize('json', [self.object])
-            return HttpResponse(data)
+            data = {
+                'pk': self.object.pk,
+                'url': reverse('result_update', kwargs={'pk': self.object.pk}),
+                'success_message': _('Result updated.')
+            }
+            return JsonResponse(data)
 
         messages.success(self.request, _('Success, Data Updated!'))
         redirect_url = new_result.program.program_page_url

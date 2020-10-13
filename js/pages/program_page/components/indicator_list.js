@@ -220,6 +220,7 @@ export class IndicatorListTable extends React.Component {
                     return displayFunc(val);
                 }
                 const displayUnassignedWarning = indicator.noTargetResults.length > 0 && indicator.periodicTargets.length > 0
+                const displayMissingTargetsWarning = indicator.periodicTargets.length === 0
                 return <React.Fragment key={indicator.pk}>
                     <tr className={classNames("indicators-list__row", "indicators-list__indicator-header", {
                         "is-highlighted": indicator.wasJustCreated,
@@ -239,6 +240,12 @@ export class IndicatorListTable extends React.Component {
                                 <span className="text-danger ml-3"><i className="fas fa-bullseye"/> {
                                     /* # Translators: Warning provided when a result is not longer associated with any target.  It is a warning about state rather than an action.  The full sentence might read "There are results not assigned to targets" rather than "Results have been unassigned from targets. */
                                     gettext('Results unassigned to targets')
+                                }</span>
+                            }
+                            {displayMissingTargetsWarning &&
+                                <span className="text-danger ml-3"><i className="fas fa-bullseye"/> {
+                                        // # Translators: Warning message displayed when a critical piece of information (targets) have not been created for an indicator.
+                                        gettext('Indicator missing targets')
                                 }</span>
                             }
                             {indicator.isKeyPerformanceIndicator &&
