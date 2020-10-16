@@ -520,6 +520,7 @@ class Program(models.Model):
 
     objects = models.Manager()
     rf_aware_objects = generate_queryset(ActiveProgramsMixin, RFProgramsMixin).as_manager()
+    rf_aware_all_objects = generate_queryset(RFProgramsMixin).as_manager()
     program_page_objects = generate_queryset(
         ActiveProgramsMixin,
         RFProgramsMixin,
