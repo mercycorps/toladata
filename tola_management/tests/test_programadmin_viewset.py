@@ -240,14 +240,19 @@ class TestProgramFieldsStressTest(test.TestCase):
         self.assertEqual(response_json['count'], 4)
         self.assertEqual(response_json['next'], None)
         results = {result['id']: result for result in response_json['results']}
-        for pk, (organizations, program_users, onlyOrganizationId) in [
-            (self.only_mc_program.pk, (1, 4, 1)),
-            (self.only_partner_program.pk, (1, 10, self.partner_org1.pk)),
-            (self.two_org_program.pk, (3, 19, None)),
-            (self.two_country_program.pk, (3, 24, None))
+        for pk, (organizations, program_users, onlyOrganizationId, sectors, countries) in [
+            (self.only_mc_program.pk, (1, 4, 1, [self.in_sector1.pk], [self.countries[0].pk])),
+            (self.only_partner_program.pk, (1, 10, self.partner_org1.pk,
+                                            [self.in_sector1.pk, self.in_sector2.pk],
+                                            [self.no_mc_country.pk])),
+            (self.two_org_program.pk, (3, 19, None, [self.in_sector2.pk], [self.countries[1].pk])),
+            (self.two_country_program.pk, (3, 24, None, [self.in_sector1.pk],
+                                           [self.countries[2].pk, self.countries[3].pk]))
         ]:
             self.assertIn(pk, results)
             self.assertEqual(results[pk]['organizations'], organizations)
             self.assertEqual(results[pk]['program_users'], program_users)
             self.assertEqual(results[pk]['onlyOrganizationId'], onlyOrganizationId)
+            self.assertEqual(results[pk]['sector'], sectors)
+            self.assertEqual(results[pk]['country'], countries)
         
