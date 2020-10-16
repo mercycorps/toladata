@@ -422,7 +422,7 @@ class ProgramAdminViewSet(viewsets.ModelViewSet):
             all 20+ in a paginated set was costly.  This annotates the information in one (admittedly spendy) query
         """
         # start with the correctly annotated-for-rf queryset:
-        queryset = Program.rf_aware_objects.all()
+        queryset = Program.rf_aware_all_objects.all()
         queryset = queryset.annotate(
             # this counts users who are not mercy corps users (partner access) who have been assigned:
             program_access_users_count=models.functions.Coalesce( # coalesce so None is 0 (summable later)
@@ -565,7 +565,7 @@ class ProgramAdminViewSet(viewsets.ModelViewSet):
         """Provides a non paginated list of countries for the frontend filter"""
         auth_user = self.request.user
         params = self.request.query_params
-        queryset = Program.rf_aware_objects
+        queryset = Program.rf_aware_all_objects
 
         if not auth_user.is_superuser:
             tola_user = auth_user.tola_user
