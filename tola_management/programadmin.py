@@ -29,6 +29,7 @@ from openpyxl.styles import Alignment, Font, PatternFill
 from workflow.models import (
     Program,
     TolaUser,
+    Organization,
     Country,
     Sector,
     ProgramAccess,
@@ -418,7 +419,7 @@ class ProgramAdminViewSet(viewsets.ModelViewSet):
         """this adds annotations for the "users" and "organizations" links using annotations
         
             For performance reasons, looking up every user with permission to see the program individually for
-            all 20+ in a paginated set was costly.  This annotates the same information in one spendy query
+            all 20+ in a paginated set was costly.  This annotates the information in one (admittedly spendy) query
         """
         # start with the correctly annotated-for-rf queryset:
         queryset = Program.rf_aware_objects.all()
@@ -427,8 +428,9 @@ class ProgramAdminViewSet(viewsets.ModelViewSet):
             program_access_users_count=models.functions.Coalesce( # coalesce so None is 0 (summable later)
                 models.Subquery(
                     ProgramAccess.objects.filter(
-                        program=models.OuterRef('pk'),
-                        tolauser__organization_id__gt=1
+                        program=models.OuterRef('pk')
+                    ).exclude(
+                        tolauser__organization_id=Organization.MERCY_CORPS_ID
                     ).order_by().values('program').annotate(
                         users_count=models.Count('tolauser', distinct=True)
                     ).values('users_count')[:1],
@@ -441,7 +443,7 @@ class ProgramAdminViewSet(viewsets.ModelViewSet):
                     models.Subquery(
                         CountryAccess.objects.filter(
                             country=models.OuterRef('country'),
-                            tolauser__organization_id=1,
+                            tolauser__organization_id=Organization.MERCY_CORPS_ID,
                         ).order_by().values('country').annotate(
                             users_count=models.Count('tolauser', distinct=True)
                         ).values('users_count'),
@@ -470,8 +472,9 @@ class ProgramAdminViewSet(viewsets.ModelViewSet):
                 ),
                 default=models.Subquery(
                     ProgramAccess.objects.filter(
-                        program=models.OuterRef('pk'),
-                        tolauser__organization_id__gt=1
+                        program=models.OuterRef('pk')
+                    ).exclude(
+                        tolauser__organization_id=Organization.MERCY_CORPS_ID
                     ).order_by().values('program').annotate(
                         orgs_count=models.Count('tolauser__organization', distinct=True)
                     ).values('orgs_count')[:1],
@@ -494,8 +497,9 @@ class ProgramAdminViewSet(viewsets.ModelViewSet):
                     organization_count=1,
                     then=models.Subquery(
                         ProgramAccess.objects.filter(
-                            program=models.OuterRef('pk'),
-                            tolauser__organization_id__gt=1
+                            program=models.OuterRef('pk')
+                        ).exclude(
+                            tolauser__organization_id=Organization.MERCY_CORPS_ID
                         ).order_by().values('tolauser__organization_id')[:1]
                     ),
                 ),

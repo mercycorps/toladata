@@ -22,6 +22,7 @@ SPECIAL_CHARS = "Spécîal Chåracters"
 class TestProgramBaseFields(test.TestCase):
     @classmethod
     def setUpTestData(cls):
+        cls.mercy_corps_org = OrganizationFactory(id=1)
         cls.country1 = CountryFactory(code='TT', country='TestLand')
         cls.country2 = CountryFactory(code='UU', country='UtherTestLand')
 
