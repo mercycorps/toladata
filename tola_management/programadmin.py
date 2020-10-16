@@ -2,7 +2,8 @@
 from collections import OrderedDict
 import pytz
 from django.db import transaction
-from django.db.models import Q
+#from django.db.models import Q, Count, Subquery, OuterRef
+from django.db import models
 from django.http import HttpResponse, JsonResponse
 from django.utils import timezone
 from django.utils.translation import ugettext as _
@@ -30,7 +31,8 @@ from workflow.models import (
     TolaUser,
     Country,
     Sector,
-    ProgramAccess
+    ProgramAccess,
+    CountryAccess,
 )
 
 from indicators.models import (
@@ -243,6 +245,9 @@ class ProgramAdminSerializer(ModelSerializer):
     sector = NestedSectorSerializer(required=True, many=True)
     country = NestedCountrySerializer(required=True, many=True)
     auto_number_indicators = BooleanField(required=False)
+    organizations = IntegerField(source='organization_count')
+    program_users = IntegerField(source='program_users_count')
+    onlyOrganizationId = IntegerField(source='only_organization_id')
     _using_results_framework = IntegerField(required=False, allow_null=True)
 
     def validate_country(self, values):
@@ -261,6 +266,9 @@ class ProgramAdminSerializer(ModelSerializer):
             'description',
             'sector',
             'country',
+            'organizations',
+            'program_users',
+            'onlyOrganizationId',
             'auto_number_indicators',
             '_using_results_framework'
         )
@@ -269,18 +277,6 @@ class ProgramAdminSerializer(ModelSerializer):
         ret = super(ProgramAdminSerializer, self).to_representation(program)
         if not with_aggregates:
             return ret
-        # Some n+1 queries here. If this is slow, Fix in queryset either either with rawsql or remodel.
-        program_users = (
-            TolaUser.objects.filter(programs__id=program.id).select_related('organization')
-            | TolaUser.objects.filter(countries__program=program.id).select_related('organization')
-        ).distinct()
-
-        organizations = set(tu.organization_id for tu in program_users if tu.organization_id)
-        organization_count = len(organizations)
-
-        ret['program_users'] = len(program_users)
-        ret['organizations'] = organization_count
-        ret['onlyOrganizationId'] = organizations.pop() if organization_count == 1 else None
         if ret['_using_results_framework'] == Program.RF_ALWAYS:
             ret.pop('_using_results_framework')
         return ret
@@ -417,21 +413,115 @@ class ProgramAdminViewSet(viewsets.ModelViewSet):
     pagination_class = Paginator
     permission_classes = [permissions.IsAuthenticated, HasProgramAdminAccess]
 
+    @classmethod
+    def base_queryset(cls):
+        """this adds annotations for the "users" and "organizations" links using annotations
+        
+            For performance reasons, looking up every user with permission to see the program individually for
+            all 20+ in a paginated set was costly.  This annotates the same information in one spendy query
+        """
+        # start with the correctly annotated-for-rf queryset:
+        queryset = Program.rf_aware_objects.all()
+        queryset = queryset.annotate(
+            # this counts users who are not mercy corps users (partner access) who have been assigned:
+            program_access_users_count=models.functions.Coalesce( # coalesce so None is 0 (summable later)
+                models.Subquery(
+                    ProgramAccess.objects.filter(
+                        program=models.OuterRef('pk'),
+                        tolauser__organization_id__gt=1
+                    ).order_by().values('program').annotate(
+                        users_count=models.Count('tolauser', distinct=True)
+                    ).values('users_count')[:1],
+                    output_field=models.IntegerField()
+                ), 0
+            ),
+            # only mercy corps users can be given country-wide access, so count them with filters to minimize joins:
+            country_access_users_count=models.functions.Coalesce( # coalesce so None is 0 (summable later)
+                models.Sum( # sum because there may be multiple countries, each with a user count
+                    models.Subquery(
+                        CountryAccess.objects.filter(
+                            country=models.OuterRef('country'),
+                            tolauser__organization_id=1,
+                        ).order_by().values('country').annotate(
+                            users_count=models.Count('tolauser', distinct=True)
+                        ).values('users_count'),
+                    output_field=models.IntegerField()
+                    )
+                ), 0
+            )
+        ).annotate(
+            # program only users + country access users _should_ equal total users with access:
+            program_users_count=models.F('program_access_users_count') + models.F('country_access_users_count')
+        ).annotate(
+            # to add the number of organizations involved, first add one if there are MC users:
+            mc_org_count=models.Case(
+                models.When(
+                    country_access_users_count__gt=0,
+                    then=models.Value(1)
+                ),
+                default=models.Value(0),
+                output_field=models.IntegerField()
+            ),
+            # count the organizations of all non-mercy corps users (skip to 0 if none to count):
+            other_org_count=models.Case(
+                models.When(
+                    program_access_users_count=0,
+                    then=models.Value(0)
+                ),
+                default=models.Subquery(
+                    ProgramAccess.objects.filter(
+                        program=models.OuterRef('pk'),
+                        tolauser__organization_id__gt=1
+                    ).order_by().values('program').annotate(
+                        orgs_count=models.Count('tolauser__organization', distinct=True)
+                    ).values('orgs_count')[:1],
+                    output_field=models.IntegerField()
+                )
+            )
+        ).annotate(
+            # add the non MC org count with 1 if there is a single MC user:
+            organization_count=models.F('mc_org_count') + models.F('other_org_count')
+        ).annotate(
+            only_organization_id=models.Case(
+                # if only one org and it's mercy corps, return the mercy corps org id:
+                models.When(
+                    organization_count=1,
+                    mc_org_count=1,
+                    then=models.Value(1)
+                ),
+                # if only one org and it's NOT mercy corps (else from above, cases go in order) find that id:
+                models.When(
+                    organization_count=1,
+                    then=models.Subquery(
+                        ProgramAccess.objects.filter(
+                            program=models.OuterRef('pk'),
+                            tolauser__organization_id__gt=1
+                        ).order_by().values('tolauser__organization_id')[:1]
+                    ),
+                ),
+                # any other case (multiple or no orgs) should be value None:
+                default=models.Value(None),
+                output_field=models.IntegerField()
+            )
+        ).prefetch_related(
+            models.Prefetch(
+                'country',
+                queryset=Country.objects.select_related(None).order_by().only('id')
+            ),
+            models.Prefetch(
+                'sector',
+                queryset=Sector.objects.select_related(None).order_by().only('id')
+            )
+        )
+        return queryset
+
     def get_queryset(self):
         auth_user = self.request.user
         params = self.request.query_params
 
-        # We have to handle this explicitly in case there are some programs without a country
-        if auth_user.is_superuser:
-            queryset = Program.objects.all()
-        else:
-            queryset = Program.objects.all().filter(country__in=auth_user.tola_user.managed_countries)
-
+        queryset = self.base_queryset()
         if not auth_user.is_superuser:
-            tola_user = auth_user.tola_user
-            queryset = queryset.filter(
-                Q(user_access=tola_user) | Q(country__users=tola_user)
-            )
+            queryset = queryset.filter(country__in=auth_user.tola_user.managed_countries)
 
         programStatus = params.get('programStatus')
         if programStatus == 'Active':
@@ -454,16 +544,16 @@ class ProgramAdminViewSet(viewsets.ModelViewSet):
         usersFilter = params.getlist('users[]')
         if usersFilter:
             queryset = queryset.filter(
-                Q(user_access__id__in=usersFilter) | Q(country__in=Country.objects.filter(users__id__in=usersFilter))
+                models.Q(user_access__id__in=usersFilter) |
+                models.Q(country__in=Country.objects.filter(users__id__in=usersFilter))
             )
 
         organizationFilter = params.getlist('organizations[]')
         if organizationFilter:
             queryset = queryset.filter(
-                Q(user_access__organization__in=organizationFilter) |
-                Q(country__users__organization__in=organizationFilter)
+                models.Q(user_access__organization__in=organizationFilter) |
+                models.Q(country__users__organization__in=organizationFilter)
             )
-
         return queryset.distinct()
 
     @action(detail=False, methods=["get"])
@@ -471,12 +561,12 @@ class ProgramAdminViewSet(viewsets.ModelViewSet):
         """Provides a non paginated list of countries for the frontend filter"""
         auth_user = self.request.user
         params = self.request.query_params
-        queryset = Program.objects
+        queryset = Program.rf_aware_objects
 
         if not auth_user.is_superuser:
             tola_user = auth_user.tola_user
             queryset = queryset.filter(
-                Q(user_access=tola_user) | Q(country__users=tola_user)
+                models.Q(user_access=tola_user) | models.Q(country__users=tola_user)
             )
 
         countryFilter = params.getlist('countries[]')
