@@ -163,7 +163,7 @@ class TestDisaggregationReportEndpoint(EndpointTestBase, test.TestCase):
         self.run_post_tests()
 
 
-@test.tag('slow')
+@unittest.skip('endpoint being removed')
 class TestDisaggregationPrintReportEndpoint(EndpointTestBase, test.TestCase):
     url = 'disrepprint'
     url_kwargs = {'program': None}
