@@ -50,6 +50,15 @@ class CountryFactory(DjangoModelFactory):
     code = 'AF'
 
 
+# CountryFactory only creates one country and then just keeps returning it
+class NewCountryFactory(DjangoModelFactory):
+    class Meta:
+        model = CountryM
+
+    country = Sequence(lambda n: f'Country {chr(n+65)}')
+    code = Sequence(lambda n: f'{chr(n+65)}{chr(n+65)}')
+
+
 class CountryAccessFactory(DjangoModelFactory):
     class Meta:
         model = CountryAccessM
