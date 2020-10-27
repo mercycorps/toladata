@@ -151,6 +151,7 @@ export const IndexView = observer(
                                                     <EditDisaggregations
                                                         country_id={data.id}
                                                         countryName={data.country}
+                                                        programs={store.getCountryPrograms(data.id)}
                                                         disaggregations={store.editing_disaggregations_data}
                                                         addDisaggregation={() => store.addDisaggregation()}
                                                         assignLabelErrors={store.assignDisaggregationLabelErrors}

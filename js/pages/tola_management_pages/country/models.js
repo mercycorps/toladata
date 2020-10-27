@@ -76,6 +76,10 @@ export class CountryStore {
         }, {})
     }
 
+    getCountryPrograms(countryID) {
+        return this.allPrograms.filter((program) => program.country.includes(countryID))
+    }
+
     @action
     fetchCountries() {
         if(this.dirtyConfirm()) {
