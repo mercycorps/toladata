@@ -1,4 +1,5 @@
 import React from 'react'
+import { observable, runInAction } from 'mobx'
 import { observer } from "mobx-react"
 import { DragDropContext, Droppable, Draggable } from 'react-beautiful-dnd';
 import classNames from 'classnames'
@@ -166,50 +167,65 @@ const DisaggregationCategoryList = observer(
     )
 );
 
+let CheckBoxList = props => {
+    return props.checkBoxOptions.map(option => {
+        return <label key={option.id}>
+            <input
+                type="checkbox"
+                autoComplete="false"
+                name={option.name}
+                value={option.name}
+                data-id={option.id}
+                className="retro-program"
+                checked={option.checked ?? false}
+                onChange={(e) => props.onUpdate(option.id, e.target.checked)}/>
+            <span className="ml-2">{option.name}</span>
+        </label>
+    })
+}
 
-class Checklist extends React.Component {
+@observer
+class RetroProgramCheckBoxWrapper extends React.Component {
     constructor(props) {
-        super(props)
-        const {disaggregation} = this.props
-        this.state = {
-            ...disaggregation,
-            labels: this.orderLabels(disaggregation.labels)
-        };
-        this.labelsCreated = 0;
-        this.selectedByDefaultPopup = React.createRef();
+        super(props);
+        this.retroactiveAssignmentPopup = React.createRef();
+    }
+
+    componentDidMount() {
+        if (this.retroactiveAssignmentPopup.current) {
+            $(this.retroactiveAssignmentPopup.current).popover({
+                html: true
+            });
+        }
     }
 
     render() {
-        return (
-            <div className="form-check">
-                <input className="form-check-input" type="checkbox" checked={managed_data.selected_by_default}
-                       onChange={(e) => {
-                           this.updateSelectedByDefault(e.target.checked)
-                       }} id="selected-by-default-checkbox"
-                       disabled={disaggregation.is_archived}/>
-                <label className="form-check-label mr-2" htmlFor="selected-by-default-checkbox">
-                    {
-                        // # Translators: This labels a checkbox, when checked, it will make the associated item "on" (selected) for all new indicators
-                        gettext('Selected by default')
-                    }
-                </label>
-                <HelpPopover
-                    key={1}
-                    // # Translators: Help text for the "selected by default" checkbox on the disaggregation form
-                    content={`<p>${interpolate(gettext('When adding a new program indicator, this disaggregation will be selected by default for every program in %s. The disaggregation can be manually removed from an indicator on the indicator setup form.'), [gettext(this.props.countryName)])}</p>`}
-                    placement="right"
-                    innerRef={this.selectedByDefaultPopup}
-                    ariaText={gettext('More information on "selected by default"')}
-                />
+        let checkBoxOptions = Object.values(this.props.programs).sort((a, b) => a.name < b.name ? -1 : 1);
+        // # Translators: This is text provided when a user clicks a help link.  It allows users to select which elements they want to apply the changes to.
+        const helpText = gettext('<p>Select a program if you plan to disaggregate all or most of its indicators by these categories.</p><p><span class="text-danger">This bulk assignment cannot be undone.</span> But you can always manually remove the disaggregation from individual indicators.</p>')
+        return <div className="mt-3 ml-4">
+            {/* # Translators: This feature allows a user to apply changes to existing programs as well as ones created in the future */}
+            <span className="mr-1">{gettext("Assign new disaggregation to all indicators in a program")}</span>
+
+            <HelpPopover
+                key={1}
+                content={helpText}
+                placement="right"
+                innerRef={this.retroactiveAssignmentPopup}
+                // # Translators: this is alt text for a help icon
+                ariaText={gettext('More information on assigning disaggregations to existing indicators')}
+            />
+            <div className="mt-2 d-flex flex-column">
+                <CheckBoxList checkBoxOptions={checkBoxOptions} onUpdate={this.props.onRetroUpdate}/>
             </div>
-        )
+        </div>
     }
-
-
 }
 
 @observer
 class DisaggregationType extends React.Component {
+    @observable programsForRetro;
+
     constructor(props) {
         super(props)
         const {disaggregation} = this.props
@@ -217,6 +233,12 @@ class DisaggregationType extends React.Component {
             ...disaggregation,
             labels: this.orderLabels(disaggregation.labels)
         };
+        console.log('disagg id', disaggregation)
+        this.programsForRetro = props.programs.reduce((accum, program) => {
+            accum[program.id] = program
+            return accum
+        }, {})
+
         this.labelsCreated = 0;
         this.selectedByDefaultPopup = React.createRef();
     }
@@ -227,7 +249,11 @@ class DisaggregationType extends React.Component {
 
     hasUnsavedDataAction() {
         const labels = this.props.disaggregation.labels.map(x => ({...x}));
-        this.props.onIsDirtyChange(JSON.stringify(this.state) != JSON.stringify({...this.props.disaggregation, labels: [...labels]}))
+        this.props.onIsDirtyChange(JSON.stringify(this.state) !== JSON.stringify({
+            ...this.props.disaggregation,
+            labels: [...labels],
+
+        }))
     }
 
     componentDidUpdate = () => {
@@ -290,6 +316,13 @@ class DisaggregationType extends React.Component {
         }, () => this.hasUnsavedDataAction());
     }
 
+    updateRetroPrograms(id, checked) {
+        runInAction(() => {
+            this.programsForRetro[id]['checked'] = checked
+        })
+        this.hasUnsavedDataAction()
+    }
+
     updateLabel(labelIndex, updatedValues) {
         let labels = this.state.labels;
         labels[labelIndex] = { ...labels[labelIndex], ...updatedValues };
@@ -335,6 +368,10 @@ class DisaggregationType extends React.Component {
     render() {
         const {disaggregation, expanded, expandAction, deleteAction, archiveAction, unarchiveAction, errors} = this.props
         const managed_data = this.state
+        const retroPrograms = (managed_data.selected_by_default /*&& managed_data.id === "new"*/) ? <RetroProgramCheckBoxWrapper
+                programs={this.programsForRetro}
+                onRetroUpdate={this.updateRetroPrograms.bind(this)}/>
+            : null
         return (
             <div className="accordion-row">
                 <div className="accordion-row__content">
@@ -379,6 +416,7 @@ class DisaggregationType extends React.Component {
                                         ariaText={gettext('More information on "selected by default"')}
                                     />
                                 </div>
+                                {retroPrograms}
                             </div>
                             <div className="form-group" style={ {marginTop: '8px'} }    >
                                 <div className="row">
