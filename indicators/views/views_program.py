@@ -8,6 +8,7 @@ import csv
 import datetime
 import logging
 import openpyxl
+from openpyxl import styles, utils
 from django.contrib.auth.decorators import login_required
 from django.utils.translation import ugettext
 from django.http import HttpResponse, JsonResponse
@@ -350,3 +351,63 @@ def api_program_page(request, program):
         logger.warning('attempt to access program page ordering for bad pk {}'.format(program))
         return JsonResponse({'success': False, 'msg': 'bad Program PK'})
     return JsonResponse(data)
+
+
+@login_required
+@has_program_read_access
+def results_framework_export(request, program):
+    """Returns .XLSX containing program's results framework"""
+    program = Program.rf_aware_objects.get(pk=program)
+    wb = openpyxl.Workbook()
+    ws = wb.active
+    ws.cell(row=2, column=2).value = ugettext("Results Framework")
+    ws.cell(row=2, column=2).font = styles.Font(name='Calibri', size=18, bold=True)
+    ws.cell(row=3, column=2).value = program.name
+    ws.cell(row=3, column=2).font = styles.Font(name='Calibri', size=18)
+    level_span_style = styles.NamedStyle(name='level_span')
+    level_span_style.font = styles.Font(name='Calibri', size=12)
+    level_span_style.alignment = styles.Alignment(wrap_text=True, vertical='center', horizontal='center')
+    level_span_style.fill = styles.PatternFill('solid', 'E5E5E5')
+    wb.add_named_style(level_span_style)
+    level_single_style = styles.NamedStyle(name='level_no_span')
+    level_single_style.font = styles.Font(name='Calibri', size=12)
+    level_single_style.alignment = styles.Alignment(wrap_text=True, vertical='top', horizontal='left')
+    level_single_style.fill = styles.PatternFill('solid', 'E5E5E5')
+    wb.add_named_style(level_single_style)
+    bottom_tier = program.level_tiers.count()
+    def write_level(parent, start_row, start_column):
+        levels = program.levels.filter(parent=parent)
+        column = start_column
+        row = start_row
+        if not levels:
+            return column + 2
+        for level in levels:
+            current_column = column
+            cell = ws.cell(row=row, column=column)
+            cell.value = level.display_name
+            if level.level_depth == bottom_tier:
+                cell.style = 'level_no_span'
+                row = row + 2
+            else:
+                column = write_level(level, row+2, column)
+                if column - 2 <= current_column:
+                    cell.style = 'level_no_span'
+                else:
+                    cell.style = 'level_span'
+                    ws.merge_cells(start_row=row, end_row=row, start_column=current_column, end_column=column-2)
+        if parent and parent.level_depth == bottom_tier-1:
+            column = column + 2
+        if parent is None:
+            for column in range(column):
+                width = 21 if (column + 1) % 2 == 0 else 3
+                ws.column_dimensions[utils.get_column_letter(column + 1)].width = width
+            for r in range(3, ws.max_row+2):
+                if r % 2 == 0:
+                    ws.row_dimensions[r].height = 10
+        return column
+    write_level(None, 5, 2)
+    filename = "Results Framework.xlsx"
+    response = HttpResponse(content_type='application/ms-excel')
+    response['Content-Disposition'] = 'attachment; filename="{}"'.format(filename)
+    wb.save(response)
+    return response
