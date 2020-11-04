@@ -206,19 +206,27 @@ class TestCustomMultiTieredRFExport(test.TestCase, RFExportTests):
     @classmethod
     def setUpTestData(cls):
         cls.program = RFProgramFactory(tiers=[f"Tier {x}" for x in range(1, 9)], levels=1)
-        cls.goal_level = cls.program.levels.filter(parent=None).first()
-        cls.tier_2_level = cls.program.levels.filter(parent=cls.goal_level).first()
+        goal_levels = cls.program.levels.filter(parent=None)
+        assert goal_levels.count() == 1
+        cls.goal_level = goal_levels.first()
+        tier_2_levels = cls.program.levels.filter(parent=cls.goal_level)
+        assert tier_2_levels.count() == 1
+        cls.tier_2_level = tier_2_levels.first()
+        assert cls.tier_2_level.customsort == 1
         # add a second level at tier 3 with no children
         cls.orphan_tier_3_level = LevelFactory(
             program=cls.program, customsort=2, name="Orphan Tier 3 Level", parent=cls.tier_2_level)
+        assert cls.program.levels.filter(parent=cls.tier_2_level).count() == 2
         # add a second level at tier 5 with one child at tier 6 (but none at bottom tier)
         cls.tier_4_level = cls.program.levels.filter(parent__parent=cls.tier_2_level).first()
+        assert cls.tier_4_level.child_levels.count() == 1
+        assert cls.tier_4_level.child_levels.first().child_levels.count() == 1
+        cls.tier_6_level = cls.tier_4_level.child_levels.first().child_levels.first()
         cls.new_tier_5_level = LevelFactory(
             program=cls.program, customsort=2, name="Parent with Orphan Tier 6", parent=cls.tier_4_level)
         cls.orphan_tier_6_level = LevelFactory(
             program=cls.program, customsort=1, name="Orphaned Child at Tier 6", parent=cls.new_tier_5_level)
         # add a second tier 7 level (2nd from bottom):
-        cls.tier_6_level = cls.program.levels.filter(parent__parent=cls.tier_4_level).order_by('customsort').first()
         cls.new_tier_7_level = LevelFactory(
             program=cls.program, customsort=2, name="Bonus Tier 7", parent=cls.tier_6_level)
         # make the 2nd column longer than the first:
@@ -228,6 +236,7 @@ class TestCustomMultiTieredRFExport(test.TestCase, RFExportTests):
             LevelFactory(
                 program=cls.program, customsort=2, name="Child of Bonus Tier 7 2", parent=cls.new_tier_7_level)
         ]
+        assert cls.program.levels.count() == 14
         cls.superuser = NewTolaUserFactory(superadmin=True)
 
     def setUp(self):
