@@ -389,7 +389,7 @@ def results_framework_export(request, program):
             return max(height, ws.row_dimensions[row].height or 0, 30)
         return get_row_height_decorated
     def write_level(parent, start_row, start_column):
-        levels = program.levels.filter(parent=parent)
+        levels = program.levels.filter(parent=parent).order_by('customsort')
         column = start_column
         row = start_row
         if not levels:
