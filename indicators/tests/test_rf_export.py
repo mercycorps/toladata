@@ -179,7 +179,7 @@ class TestRFExportStandardMCTiers(test.TestCase):
         for merge_range in ['B5:H5', 'B7:D7', 'F7:H7']:
             self.assertIn(merge_range, worksheet.merged_cells)
         for column in ['B', 'D', 'F', 'H']:
-            self.assertEqual(worksheet.column_dimensions[column].width, 21)
+            self.assertEqual(worksheet.column_dimensions[column].width, 24)
         for column in ['A', 'C', 'E', 'G']:
             self.assertEqual(worksheet.column_dimensions[column].width, 3)
 
@@ -189,7 +189,7 @@ class RFExportTests:
         for merge_range in self.merged_cells:
             self.assertIn(merge_range, self.worksheet.merged_cells)
         for column in self.used_columns:
-            self.assertEqual(self.worksheet.column_dimensions[column].width, 21)
+            self.assertEqual(self.worksheet.column_dimensions[column].width, 24)
         for column in self.border_columns:
             self.assertEqual(self.worksheet.column_dimensions[column].width, 3)
         for row in range(3, self.max_row+1):
