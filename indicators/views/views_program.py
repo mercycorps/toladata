@@ -3,6 +3,7 @@
     Program views: logframe, program page api, etc.
 """
 
+import math
 from operator import itemgetter
 import csv
 import datetime
@@ -359,7 +360,8 @@ def results_framework_export(request, program):
     """Returns .XLSX containing program's results framework"""
     program = Program.rf_aware_objects.get(pk=program)
     wb = openpyxl.Workbook()
-    ws = wb.active
+    wb.remove(wb.active)
+    ws = wb.create_sheet(ugettext("Results Framework"))
     ws.cell(row=2, column=2).value = ugettext("Results Framework")
     ws.cell(row=2, column=2).font = styles.Font(name='Calibri', size=18, bold=True)
     ws.cell(row=3, column=2).value = program.name
@@ -385,21 +387,32 @@ def results_framework_export(request, program):
             current_column = column
             cell = ws.cell(row=row, column=column)
             cell.value = level.display_name
+            char_length = len(level.display_name)
+            def get_row_height(w):
+                lines = math.ceil(char_length / w)
+                height = 28 + lines * 13
+                if lines == 1:
+                    height = 30
+                return max(height, ws.row_dimensions[cell.row].height or 0, 30)
             if level.level_depth == bottom_tier:
                 cell.style = 'level_no_span'
                 row = row + 2
+                ws.row_dimensions[cell.row].height = get_row_height(26)
             else:
                 column = write_level(level, row+2, column)
                 if column - 2 <= current_column:
                     cell.style = 'level_no_span'
+                    ws.row_dimensions[cell.row].height = get_row_height(26)
                 else:
                     cell.style = 'level_span'
                     ws.merge_cells(start_row=row, end_row=row, start_column=current_column, end_column=column-2)
+                    width = 26 + 29 * ((column - 2 - current_column) / 2)
+                    ws.row_dimensions[cell.row].height = get_row_height(width)
         if parent and parent.level_depth == bottom_tier-1:
             column = column + 2
         if parent is None:
             for column in range(column):
-                width = 21 if (column + 1) % 2 == 0 else 3
+                width = 24 if (column + 1) % 2 == 0 else 3
                 ws.column_dimensions[utils.get_column_letter(column + 1)].width = width
             for r in range(3, ws.max_row+2):
                 if r % 2 == 0:
