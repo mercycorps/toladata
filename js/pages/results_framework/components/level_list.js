@@ -89,7 +89,10 @@ export class LevelListPanel  extends React.Component {
                             className="btn btn-sm btn-secondary"
                             onClick={ excelClickHandler }>
                             <i className="fas fa-download"></i>
-                            Excel
+                            {
+                                //  # Translators: a button to download a spreadsheet
+                                gettext('Excel')
+                            }
                         </button>
                     </div>
                 </div>;
