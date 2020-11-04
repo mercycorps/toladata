@@ -246,9 +246,9 @@ class ProgramAdminSerializer(ModelSerializer):
     sector = NestedSectorSerializer(required=True, many=True)
     country = NestedCountrySerializer(required=True, many=True)
     auto_number_indicators = BooleanField(required=False)
-    organizations = IntegerField(source='organization_count')
-    program_users = IntegerField(source='program_users_count')
-    onlyOrganizationId = IntegerField(source='only_organization_id')
+    organizations = IntegerField(source='organization_count', read_only=True)
+    program_users = IntegerField(source='program_users_count', read_only=True)
+    onlyOrganizationId = IntegerField(source='only_organization_id', read_only=True)
     _using_results_framework = IntegerField(required=False, allow_null=True)
 
     def validate_country(self, values):
