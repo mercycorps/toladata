@@ -379,11 +379,11 @@ def results_framework_export(request, program):
     wb.add_named_style(level_single_style)
     bottom_tier = program.level_tiers.count()
     def row_height_getter(cell):
-        char_length = len(cell.value)
+        lines_of_text = str(cell.value).splitlines()
         row = cell.row
         def get_row_height_decorated(w):
-            lines = math.ceil(char_length / w)
-            height = 28 + lines * 13
+            lines = sum([math.ceil(len(s)/w) or 1 for s in lines_of_text])
+            height = 26 + lines * 15
             if lines == 1:
                 height = 30
             return max(height, ws.row_dimensions[row].height or 0, 30)
@@ -402,22 +402,22 @@ def results_framework_export(request, program):
             if level.level_depth == bottom_tier:
                 cell.style = 'level_no_span'
                 row = row + 2
-                ws.row_dimensions[cell.row].height = get_row_height(26)
+                ws.row_dimensions[cell.row].height = get_row_height(24)
             else:
                 column = write_level(level, row+2, column)
                 if column - 2 <= current_column:
                     cell.style = 'level_no_span'
-                    ws.row_dimensions[cell.row].height = get_row_height(26)
+                    ws.row_dimensions[cell.row].height = get_row_height(24)
                 else:
                     cell.style = 'level_span'
                     ws.merge_cells(start_row=row, end_row=row, start_column=current_column, end_column=column-2)
-                    width = 26 + 29 * ((column - 2 - current_column) / 2)
+                    width = 24 + 29 * ((column - 2 - current_column) / 2)
                     ws.row_dimensions[cell.row].height = get_row_height(width)
         if parent and parent.level_depth == bottom_tier-1:
             column = column + 2
         if parent is None:
             for column in range(column):
-                width = 24 if (column + 1) % 2 == 0 else 3
+                width = 24.5 if (column + 1) % 2 == 0 else 3
                 ws.column_dimensions[utils.get_column_letter(column + 1)].width = width
             for r in range(3, ws.max_row+2):
                 if r % 2 == 0:
