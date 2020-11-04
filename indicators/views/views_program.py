@@ -362,21 +362,32 @@ def results_framework_export(request, program):
     wb = openpyxl.Workbook()
     wb.remove(wb.active)
     ws = wb.create_sheet(ugettext("Results Framework"))
+    get_font = lambda attrs: styles.Font(**{**{'name': 'Calibri', 'size': 12}, **attrs})
     ws.cell(row=2, column=2).value = ugettext("Results Framework")
-    ws.cell(row=2, column=2).font = styles.Font(name='Calibri', size=18, bold=True)
+    ws.cell(row=2, column=2).font = get_font({'size': 18, 'bold': True})
     ws.cell(row=3, column=2).value = program.name
-    ws.cell(row=3, column=2).font = styles.Font(name='Calibri', size=18)
+    ws.cell(row=3, column=2).font = get_font({'size': 18})
     level_span_style = styles.NamedStyle(name='level_span')
-    level_span_style.font = styles.Font(name='Calibri', size=12)
+    level_span_style.font = get_font({})
     level_span_style.alignment = styles.Alignment(wrap_text=True, vertical='center', horizontal='center')
     level_span_style.fill = styles.PatternFill('solid', 'E5E5E5')
     wb.add_named_style(level_span_style)
     level_single_style = styles.NamedStyle(name='level_no_span')
-    level_single_style.font = styles.Font(name='Calibri', size=12)
+    level_single_style.font = get_font({})
     level_single_style.alignment = styles.Alignment(wrap_text=True, vertical='top', horizontal='left')
     level_single_style.fill = styles.PatternFill('solid', 'E5E5E5')
     wb.add_named_style(level_single_style)
     bottom_tier = program.level_tiers.count()
+    def row_height_getter(cell):
+        char_length = len(cell.value)
+        row = cell.row
+        def get_row_height_decorated(w):
+            lines = math.ceil(char_length / w)
+            height = 28 + lines * 13
+            if lines == 1:
+                height = 30
+            return max(height, ws.row_dimensions[row].height or 0, 30)
+        return get_row_height_decorated
     def write_level(parent, start_row, start_column):
         levels = program.levels.filter(parent=parent)
         column = start_column
@@ -387,13 +398,7 @@ def results_framework_export(request, program):
             current_column = column
             cell = ws.cell(row=row, column=column)
             cell.value = level.display_name
-            char_length = len(level.display_name)
-            def get_row_height(w):
-                lines = math.ceil(char_length / w)
-                height = 28 + lines * 13
-                if lines == 1:
-                    height = 30
-                return max(height, ws.row_dimensions[cell.row].height or 0, 30)
+            get_row_height = row_height_getter(cell)
             if level.level_depth == bottom_tier:
                 cell.style = 'level_no_span'
                 row = row + 2
