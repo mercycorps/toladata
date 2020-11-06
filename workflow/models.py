@@ -52,6 +52,7 @@ class Sector(models.Model):
 
 
 class Organization(models.Model):
+    MERCY_CORPS_ID = 1
     name = models.CharField(_("Organization Name"), max_length=255, blank=False, default="TolaData")
     description = models.TextField(_("Description/Notes"), max_length=765, null=True, blank=True)
     organization_url = models.CharField(_("Organization url"), blank=True, null=True, max_length=255)
@@ -98,7 +99,7 @@ class Organization(models.Model):
 
     @classmethod
     def mercy_corps(cls):
-        return cls.objects.get(pk=1)
+        return cls.objects.get(pk=cls.MERCY_CORPS_ID)
 
 
 class OrganizationAdmin(admin.ModelAdmin):
@@ -519,6 +520,7 @@ class Program(models.Model):
 
     objects = models.Manager()
     rf_aware_objects = generate_queryset(ActiveProgramsMixin, RFProgramsMixin).as_manager()
+    rf_aware_all_objects = generate_queryset(RFProgramsMixin).as_manager()
     program_page_objects = generate_queryset(
         ActiveProgramsMixin,
         RFProgramsMixin,
