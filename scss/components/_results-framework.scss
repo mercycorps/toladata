@@ -118,6 +118,9 @@
 }
 .level-list--expandos {
     margin-bottom: $grid-gutter-width/2;
+    display: flex;
+    flex-flow: row nowrap;
+    justify-content: space-between;
 }
 // # from level_cards.js
 .level-card {
