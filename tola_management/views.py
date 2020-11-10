@@ -850,6 +850,8 @@ class OrganizationSerializer(ModelSerializer):
     primary_contact_email = CharField(required=True)
     primary_contact_phone = CharField(required=True)
     sectors = SectorSerializer(many=True)
+    programs_count = IntegerField(read_only=True)
+    users_count = IntegerField(read_only=True)
 
     def update(self, instance, validated_data):
         incoming_sectors = validated_data.pop('sectors')
@@ -895,7 +897,9 @@ class OrganizationSerializer(ModelSerializer):
             'primary_contact_phone',
             'mode_of_contact',
             'is_active',
-            'sectors'
+            'sectors',
+            'programs_count',
+            'users_count',
         )
 
 
@@ -918,9 +922,39 @@ class OrganizationAdminAuditLogSerializer(ModelSerializer):
 
 class OrganizationAdminViewSet(viewsets.ModelViewSet):
     serializer_class = OrganizationSerializer
-    queryset = Organization.objects.all()
     pagination_class = Paginator
     permission_classes = [permissions.IsAuthenticated, HasOrganizationAdminAccess]
+
+    @classmethod
+    def base_queryset(cls):
+        num_programs = Program.rf_aware_objects.count()
+        queryset = Organization.objects.all()
+        queryset = queryset.annotate(
+            users_count=models.Count('tolauser'),
+            programs_count=models.Case(
+                models.When(
+                    id=Organization.MERCY_CORPS_ID,
+                    then=models.Value(num_programs)
+                ),
+                default=models.functions.Coalesce( # coalesce so None is 0 (summable later)
+                    models.Subquery(
+                        ProgramAccess.objects.filter(
+                            tolauser__organization_id=models.OuterRef('pk')
+                        ).order_by().values('tolauser__organization').annotate(
+                            programs_count=models.Count('program', distinct=True)
+                        ).values('programs_count')[:1],
+                        output_field=models.IntegerField()
+                    ), 0
+                ),
+                output_field=models.IntegerField()
+            )
+        )
+        return queryset
+
+    def get_queryset(self):
+        request = self.request
+        queryset = self.base_queryset()
+        return queryset
 
     def get_listing_queryset(self):
         req = self.request

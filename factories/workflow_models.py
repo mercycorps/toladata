@@ -1,3 +1,4 @@
+import string
 import itertools
 import datetime
 from factory import (
@@ -12,7 +13,9 @@ from factory import (
     post_generation,
     Sequence,
     RelatedFactory,
-    Trait
+    Trait,
+    lazy_attribute_sequence,
+    fuzzy
 )
 from factories.django_models import UserFactory, UserOnlyFactory
 from workflow.models import (
@@ -46,8 +49,14 @@ class CountryFactory(DjangoModelFactory):
         model = CountryM
         django_get_or_create = ('code',)
 
-    country = 'Afghanistan'
-    code = 'AF'
+    country = fuzzy.FuzzyText()
+    description = Faker('paragraph')
+
+    @lazy_attribute_sequence
+    def code(self, n):
+        if n // 26 >= 26:
+            raise ValueError('Too many countries to store in ISO code, reached sequence {}'.format(n))
+        return '{}{}'.format(string.ascii_uppercase[n//26], string.ascii_uppercase[n % 26])
 
 
 class CountryAccessFactory(DjangoModelFactory):
@@ -59,7 +68,7 @@ class OrganizationFactory(DjangoModelFactory):
     class Meta:
         model = OrganizationM
 
-    name = 'MC Org'
+    name = Faker('company')
 
 
 class SiteProfileFactory(DjangoModelFactory):

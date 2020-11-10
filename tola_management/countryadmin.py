@@ -1,6 +1,6 @@
 from collections import OrderedDict
 import json
-from django.db import transaction
+from django.db import transaction, models
 from django.db.models import Q
 from rest_framework import viewsets
 from rest_framework.response import Response
@@ -17,6 +17,8 @@ from workflow.models import (
     Organization,
     Program,
     TolaUser,
+    ProgramAccess,
+    CountryAccess
 )
 from indicators.models import (
     StrategicObjective,
@@ -53,6 +55,11 @@ class CountryAdminSerializer(serializers.ModelSerializer):
     country = serializers.CharField(required=True, max_length=255)
     description = serializers.CharField(allow_blank=True, required=False)
     code = serializers.CharField(max_length=4, allow_blank=True, required=False)
+    programs_count = serializers.IntegerField(read_only=True)
+    # users_count = serializers.IntegerField(read_only=True)
+    # organizations_count = serializers.IntegerField(read_only=True)
+    users_count = serializers.SerializerMethodField()
+    organizations_count = serializers.SerializerMethodField()
 
     class Meta:
         model = Country
@@ -61,31 +68,25 @@ class CountryAdminSerializer(serializers.ModelSerializer):
             'country',
             'description',
             'code',
+            'programs_count',
+            'users_count',
+            'organizations_count'
         )
 
-    def to_representation(self, country, with_aggregates=True):
-        ret = super(CountryAdminSerializer, self).to_representation(country)
-        if not with_aggregates:
-            return ret
+    def _get_related_users(self, country):
+        if not hasattr(country, 'user_set'):
+                country.user_set = TolaUser.objects.filter(
+                models.Q(programaccess__country_id=country.id) |
+                models.Q(countryaccess__country_id=country.id) |
+                models.Q(user__is_superuser=True)
+            ).only('id', 'organization_id')
+        return country.user_set
 
-        # users to country by way of program access
-        country_users = (
-            TolaUser.objects.filter(programaccess__country_id=country.id).select_related('organization')
-            | TolaUser.objects.filter(countries__id=country.id).select_related('organization')
-            | TolaUser.objects.filter(country__id=country.id).select_related('organization')
-        ).distinct()
+    def get_users_count(self, country):
+        return len(set(t.pk for t in self._get_related_users(country)))
 
-        organizations = set([tu.organization_id for tu in country_users if tu.organization_id])
-
-        # This would be user directly associated with the country (base country users)
-        #user_count = TolaUser.objects.filter(country=country).count()
-
-        program_ids = [program.id for program in Program.objects.filter(country__pk=country.id)]
-        program_count = len(program_ids)
-        ret['programCount'] = program_count
-        ret['user_count'] = len(country_users)
-        ret['organizations'] = organizations
-        return ret
+    def get_organizations_count(self, country):
+        return len(set(t.organization_id for t in self._get_related_users(country)))
 
 
 class CountryAdminViewSet(viewsets.ModelViewSet):
@@ -93,15 +94,22 @@ class CountryAdminViewSet(viewsets.ModelViewSet):
     pagination_class = Paginator
     permission_classes = [permissions.IsAuthenticated, HasCountryAdminAccess]
 
+    @staticmethod
+    def annotate_queryset(queryset):
+        queryset = queryset.annotate(
+            programs_count=models.Count('program', distinct=True),
+        )
+        return queryset
+
     def get_queryset(self):
         auth_user = self.request.user
         tola_user = auth_user.tola_user
         params = self.request.query_params
 
         queryset = Country.objects.all()
-
         if not auth_user.is_superuser:
             queryset = tola_user.managed_countries
+        queryset = self.annotate_queryset(queryset)
 
         countryFilter = params.getlist('countries[]')
         if countryFilter:
