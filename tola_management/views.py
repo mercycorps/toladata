@@ -184,7 +184,7 @@ def get_program_page_context(request):
         } for organization in Organization.objects.all()
     }
 
-    program_queryset = Program.objects.filter(country__in=tola_user.managed_countries)
+    program_queryset = Program.rf_aware_objects.filter(country__in=tola_user.managed_countries).only('id', 'name')
     programs = [
         {
             'id': program.id,
@@ -240,9 +240,10 @@ def get_country_page_context(request):
         } for organization in Organization.objects.all()
     }
 
-    program_queryset = Program.objects.all()
     if not auth_user.is_superuser:
         program_queryset = tola_user.managed_programs
+    else:
+        program_queryset = Program.rf_aware_objects.all()
     programs = [
         {
             'id': program.id,

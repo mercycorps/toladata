@@ -70,6 +70,9 @@ export class LevelListPanel  extends React.Component {
             this.props.rootStore.uiStore.activeCard;
         let expandoDiv = null;
         if (this.props.rootStore.levelStore.levels.filter( l => l.id !== "new").length > 1){
+            const excelClickHandler = () => {
+                window.open(this.props.rootStore.levelStore.excelURL, '_blank')
+            }
             expandoDiv =
                 <div className="level-list--expandos">
                     <div className="btn-group">
@@ -80,7 +83,20 @@ export class LevelListPanel  extends React.Component {
                         isDisabled={isCollapseAllDisabled}
                         collapseFunc={this.props.rootStore.uiStore.collapseAllLevels} />
                     </div>
-                </div>
+                    <div className="level-list--action-buttons">
+                        <button
+                            type="button"
+                            className="btn btn-sm btn-secondary"
+                            onClick={ excelClickHandler }>
+                            <i className="fas fa-download"></i>
+                            {
+                                //  # Translators: a button to download a spreadsheet
+                                gettext('Excel')
+                            }
+                        </button>
+                    </div>
+                </div>;
+                
         }
         let panel = '';
         if (this.props.rootStore.levelStore.levels.length == 0) {

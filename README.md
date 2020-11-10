@@ -2,45 +2,45 @@
 
 **The build status of the dev branch is: [![Build Status](https://travis-ci.org/mercycorps/TolaActivity.svg?branch=dev)](https://travis-ci.org/mercycorps/TolaActivity)**
 
-[TolaActivity](http://www.github.com/toladata/TolaActivity) extends
-the functionality of [TolaData](https://www.toladata.com/) to include a
-set of forms and reports for managing project activities for a Program. It
-includes workflow for approving and completing projects as well as sharing
-the output data. TolaActivity functionality is intended to allow importing
-and exporting of project-specific data from 3rd party data sources or
-excel files.
+TolaActivity is a software tool that is used to track program performance
+of development work across the globe.  It includes the ability to set periodic
+targets for each program indicator, track those targets over time, and generate
+filterable IPTT reports on demand.  It also includes a flexible Results Framework
+builder to enable hierarchical organization of indicators.
 
 # Creating a local TolaActivity instance
 
-Running a local instance of TolaActivity makes development much faster and
-eliminates your dependence on access to any of MC's TolaActivity instances.
+Running a local instance of TolaActivity makes development much faster.
 These instructions should get you up and running with a minimum of fuss if
 you have [macOS](#macos) or one of the many [Ubunten](#ubuntu). If they do
 not, we accept pull requests updating it. :)
 
 Through all of these instructions, it is __very important__ that a plain-text editor is used to edit the text files.
-For instance, TextEdit or Notepad are fine, MS Word is emphatically not.  Even some plain-text editors default 
+For instance, TextEdit or Notepad are fine, MS Word is emphatically not.  Even some plain-text editors default
 to a rich text format, so make sure you are saving plain text.
 
 ## Install software dependencies
 
-TolaActivity requires Python 2. These instructions assume MySQL is being used as Django's datastore.
+At this itme, TolaActivity requires both Python 2 and Python 3. It has been thoroughly tested with versions
+2.7 and 3.6, and lightly tested with version 3.8.  Python 2 is necessary satisfy a dependency in a node module.
+These instructions assume MySQL is being used as Django's datastore.  Version 5.7 has been thoroughly tested, but version 8 should work as well.
 
 ### macOS
 
-On macOS, you can use Homebrew to install much of the software needed for TolaActivity.  
-To see if you have Homebrew installed, run `which brew` at the command line.  If you don't get a file path, 
+On macOS, you can use Homebrew to install much of the software needed for TolaActivity.
+To see if you have Homebrew installed, run `which brew` at the command line.  If you don't get a file path,
 it is not installed and you should run the following command from the command line.
 ```bash
 /usr/bin/ruby -e "$(curl -fsSL https://raw.githubusercontent.com/Homebrew/install/master/install)"
 ```
 
-Before starting the install process, you may also want to request a copy of the _settings.secret.yml_ file and 
-a dump of an existing TolaActivity database. 
+Before starting the install process, you may also want to request a copy of the _settings.secret.yml_ file and
+a dump of an existing TolaActivity database.
 
 
 At the Terminal command line:
 ```bash
+$ brew install python@3
 $ brew install python@2
 $ brew install mysql@5.7
 ```
@@ -70,37 +70,46 @@ You should now also start the mysql server:
 brew services start mysql
 ```
 
-Now you're ready to [install and configure the source files](#Install the source files).
+Now you're ready to [install and configure the source files](#Install and configure the TolaActivity source files).
 
 
 ### Windows
-For Windows installations, install the [Windows Subsystem for Linux](https://docs.microsoft.com/en-us/windows/wsl/install-win10) using a Ubuntu distribution as the base.  Once this has successfully been installed, launch a Powershell window and proceed with the Ubuntu instructions below. 
+For Windows installations, install the [Windows Subsystem for Linux](https://docs.microsoft.com/en-us/windows/wsl/install-win10) using a Ubuntu distribution as the base.  Once this has successfully been installed, launch a Powershell window and proceed with the Ubuntu instructions below.
 
 
 ### Ubuntu
 
-First check what python version you have installed.  Try these commands:
+You will need both Python2 and Python3 installed.  Python2 is required for an npm package that has not yet
+made the transition. TolaData has been tested on Python3.6 but should work on later versions as well.
 ```bash
-$ python --version
 $ python2 --version
+$ python3 --version
 ```
 
-If neither of those yield a Python 2 installation, you will need to install Python 2:
+If one of these doesn't yield a Python installation, install it.
 ```bash
-$ sudo apt-get update
-$ sudo apt-get install python
+$ sudo apt update
+$ sudo apt install python2
+$ sudo apt install python3
 ```
 
-Now if you try `python --version`, it should be pointed at Python 2.  Assuming it is, install some additional packages.
-
+Now install some other linux packages that will be needed later.
 ```bash
-$ sudo apt install mysql-server libmysqld-dev mysql-utilities mysql-client
-$ sudo apt install libsasl2-dev libldap2-dev libssl-dev
-$ sudo apt-get install python-dev libffi-dev
-$ sudo apt-get install libpq-dev libxml2-dev libxslt1-dev libldap2-dev libsasl2-dev
-$ sudo apt-get install libcairo2-dev
-$ sudo apt-get install libpango1.0-dev
+$ sudo apt install mysql-server libmysqlclient-dev mysql-client
+$ sudo apt install libsasl2-dev libssl-dev
+$ sudo apt-get install python3-dev libffi-dev
+$ sudo apt-get install libxml2-dev libxmlsec1-dev libxmlsec1-openssl pkg-config
+$ sudo apt-get install libcairo2-dev libpango1.0-dev
 $ sudo apt install virtualenv
+```
+
+Note that some users have had to manually build the libxml2 library, as mentioned in the [python-xmlsec documentation](https://xmlsec.readthedocs.io/en/latest/install.html).
+
+```bash
+wget http://xmlsoft.org/sources/libxml2-2.9.1.tar.gz
+tar -xvf libxml2-2.9.1.tar.gz
+cd libxml2-2.9.1
+./configure && make && make install
 ```
 
 You should now also start the mysql server:
@@ -108,7 +117,7 @@ You should now also start the mysql server:
 sudo service mysql start
 ```
 
-Now you're ready to [install and configure the source files](#Install the source files).
+Now you're ready to install and configure the TolaData source files.
 
 
 ##Install and configure the TolaActivity source files
@@ -116,38 +125,37 @@ Now you're ready to [install and configure the source files](#Install the source
 ###Install the source files and the python libraries
 All operating systems should now be ready to install TolaActivity source files and do some OS-independent installations.
 ```bash
-$ git clone https://github.com/mercycorps/TolaActivity.git
-$ cd TolaActivity
-$ virtualenv -p python2 --no-site-packages venv
+$ git clone https://github.com/mercycorps/toladata.git
+$ cd toladata
+$ virtualenv -p python3 venv
 $ source venv/bin/activate  # you should see '(venv)' appear on the left of your command prompt
 $ pip install -r requirements.txt
-$ pip install --upgrade google-api-python-client
 ```
 
 ###Modify the config file
-If you have a copy of the _settings.secret.yml_ file, place it in the TolaActivity/config 
+If you have a copy of the _settings.secret.yml_ file, place it in the TolaActivity/config
 directory.  In Windows, you will need to copy it from where the file is stored on your hard drive.  You may want to modify the file per the instructions below (not with an MS Office product!) before moving it to the TolaActivity folder.  To move the file, f the file is in your Downloads directory, you could use a command that looks something like this:
 ```bash
 $ cp /mnt/c/Users/<your_username>/Downloads/settings.secret.yml config
 ```
 
 If you don't have a copy of the settings.secret.py file, then copy the sample file thusly:
-``` 
+```
 $ cp config/sample-settings.secret.yml config/settings.secret.yml
 ```
 
 
 Open the _config/settings.secret.yml_ file with a plain-text editor.
- 
+
 1. Find the node named, "DATABASES" and set the
-database `PASSWORD` as appropriate. The result should resemble the following:
+database `NAME`, `USER`, and `PASSWORD` as appropriate. The result should resemble the following:
 
     ```yaml
     DATABASES:
       default:
         ENGINE: "django.db.backends.mysql"
-        NAME: "tola_activity"
-        USER: "tola"
+        NAME: "<db_name>"
+        USER: "<db_username>"
         PASSWORD: "SooperSekritWord"
         HOST: "localhost"
         PORT: ""
@@ -159,13 +167,7 @@ database `PASSWORD` as appropriate. The result should resemble the following:
     For example:
 
     ```yaml
-    LOGFILE: '/User/<username>/logs/django_error.log'
-    ```
-
-1. If they don't already exist, add the two lines below.  These let Django know which webpack bundles to use.
-    ```yaml
-    WEBPACK_STATS_FILE: 'webpack-stats.json'
-    WEBPACK_BUNDLE_DIR_NAME: 'dist/'
+    LOGFILE: '/home/<username>/logs/django_error.log'
     ```
 
 
@@ -173,22 +175,22 @@ database `PASSWORD` as appropriate. The result should resemble the following:
 
 ```bash
 $ mkdir /User/<username>/logs
-```    
+```
 
 ## Set up Django's MySQL backing store
-Log into mysql and create the database, create the user, and grant permissions. 
+Log into mysql and create the database, create the user, and grant permissions.
 ```sql
 $ mysql -u root  # Ubuntu users will need to use sudo for this line
-mysql> CREATE DATABASE tola_activity;
+mysql> CREATE DATABASE tola;
 mysql> CREATE USER 'tola'@'localhost' IDENTIFIED BY 'SooperSekritWord';
-mysql> GRANT ALL ON tola_activity.* TO 'tola'@'localhost';
+mysql> GRANT ALL ON tola.* TO 'tola'@'localhost';
 mysql> exit
 
 ```
 
 ## Set up Django
 
-If you have a copy of an existing Tola database, you can load through the mysql command.  When prompted, you should provide the database password (SooperSekritWord).
+If you have a copy of an existing Tola database, you can load through the mysql command.  When prompted, you should provide the database password.
 ```bash
 $ mysql -u tola -p tola_activity < /path/to/file.sql
 ```
@@ -244,46 +246,25 @@ Quit the server with CONTROL-C.
 
 ## Try launching Tola in your browser
 In your browser, navigate to `localhost:8000`.  You should see a TolaActivity login screen.  You should also be able
-login through the Google+ link. 
+login through the Google+ link.
 
 ## Creating a local user
 
-If you are not logging in through the Google+ link, you will need to create a local user so you can log in.
 The following commands will create a local superuser and add the additional data that is required.
-When the `createsuperuser` command asks for an email, you can just hit the Enter key to skip the question.
 
 ```bash
-$ python manage.py createsuperuser
-Username: myname
-Email address: 
-Password: 
-Password (again): 
-Superuser created successfully.
-
-``` 
-
-Now get the id of the record you just added to the auth.user table:
-
-```bash
-$ mysql -u tola -p tola_activity
-mysql> SELECT id,username FROM auth_user;
-+----+----------+
-| id | username |
-+----+----------+
-|  1 | myname    |
-+----+----------+
+$ ./manage.py shell
+>>> from django.contrib.auth.models import User
+>>> from workflow.models impot TolaUser
+>>> me = User.objects.create(username="<your_email>", email="<your_email">, is_superuser=True, is_staff=True)
+>>> me.set_password(<password>)
+>>> me.save()
+>>> TolaUser.objects.create(user=me, name="<first_last>")
+>>> exit()
 ```
 
-Note the value for `id` to use in the next step.
 
-Insert the `id` value from the `auth_user` table into the `user_id` field of the `workflow_tolauser` table:
-
-```bash
-mysql> INSERT INTO workflow_tolauser (name, privacy_disclaimer_accepted, user_id, language) VALUES ("My Name", 1,1, "en");
-mysql> exit
-```
-
-Restart the Tola Activity server
+Start the Tola Activity server
 
 ```bash
 $ python manage.py runserver
@@ -297,7 +278,7 @@ Quit the server with CONTROL-C.
 ```
 
 You should now be able to login using the username and password fields of the login screen.  Once you have logged in,
-you will be taken to the home page. 
+you will be taken to the home page.
 
 
 # For Developers
@@ -311,13 +292,13 @@ bundles available, and to re-generate the bundles if you modify any JS handled b
 Directions for installing `npm` can be found below. It can also be installed via homebrew on macOS
 
 ```bash
-$ brew install npm
+$ brew install npm (sudo apt install npm )
 ```
 
 ### Install all `node_module` package dependencies using `npm`
 
 ```bash
-$ npm install
+$ npm run install:dev
 ```
 
 Note: You made need to periodiclly run this after doing a `git pull` if `package.json` has been
