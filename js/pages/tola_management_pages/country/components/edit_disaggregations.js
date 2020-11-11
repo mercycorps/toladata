@@ -169,18 +169,18 @@ const DisaggregationCategoryList = observer(
 
 let CheckBoxList = props => {
     return props.checkBoxOptions.map(option => {
-        return <label key={option.id}>
-            <input
-                type="checkbox"
-                autoComplete="false"
-                name={option.name}
-                value={option.name}
-                data-id={option.id}
-                className="retro-program"
-                checked={option.checked ?? false}
-                onChange={(e) => props.onUpdate(option.id, e.target.checked)}/>
-            <span className="ml-2">{option.name}</span>
-        </label>
+        return (
+            <label className="mb-1" key={option.id}>
+                <input
+                    type="checkbox"
+                    autoComplete="false"
+                    name={option.name}
+                    value={option.name}
+                    checked={option.checked ?? false}
+                    onChange={(e) => props.onUpdate(option.id, e.target.checked)}/>
+                <span className="ml-2">{option.name}</span>
+            </label>
+        )
     })
 }
 
@@ -189,6 +189,7 @@ class RetroProgramCheckBoxWrapper extends React.Component {
     constructor(props) {
         super(props);
         this.retroactiveAssignmentPopup = React.createRef();
+        this.state = { programsExpanded: false}
     }
 
     componentDidMount() {
@@ -199,32 +200,42 @@ class RetroProgramCheckBoxWrapper extends React.Component {
         }
     }
 
+    expandPrograms() {
+        this.setState({programsExpanded: !this.state.programsExpanded})
+    }
+
     render() {
         let checkBoxOptions = Object.values(this.props.programs).sort((a, b) => a.name < b.name ? -1 : 1);
         // # Translators: This is text provided when a user clicks a help link.  It allows users to select which elements they want to apply the changes to.
         const helpText = gettext('<p>Select a program if you plan to disaggregate all or most of its indicators by these categories.</p><p><span class="text-danger">This bulk assignment cannot be undone.</span> But you can always manually remove the disaggregation from individual indicators.</p>')
-        return <div className="mt-3 ml-4">
-            {/* # Translators: This feature allows a user to apply changes to existing programs as well as ones created in the future */}
-            <span className="mr-1">{gettext("Assign new disaggregation to all indicators in a program")}</span>
+        return (
+            <div className="mt-3 ml-4">
+                 <a onClick={this.expandPrograms.bind(this)} className="btn accordion-row__btn btn-link" tabIndex='0'>
+                    <FontAwesomeIcon icon={this.state.programsExpanded ? 'caret-down' : 'caret-right'} />
+                    {/* # Translators: This feature allows a user to apply changes to existing programs as well as ones created in the future */}
+                    <span className="mr-1">{gettext("Assign new disaggregation to all indicators in a program")}</span>
+                </a>
 
-            <HelpPopover
-                key={1}
-                content={helpText}
-                placement="right"
-                innerRef={this.retroactiveAssignmentPopup}
-                // # Translators: this is alt text for a help icon
-                ariaText={gettext('More information on assigning disaggregations to existing indicators')}
-            />
-            <div className="mt-2 d-flex flex-column">
-                <CheckBoxList checkBoxOptions={checkBoxOptions} onUpdate={this.props.onRetroUpdate}/>
+                <HelpPopover
+                    key={1}
+                    content={helpText}
+                    placement="right"
+                    innerRef={this.retroactiveAssignmentPopup}
+                    // # Translators: this is alt text for a help icon
+                    ariaText={gettext('More information on assigning disaggregations to existing indicators')}
+                />
+
+                <div id="disagg-admin__programs" style={ {maxHeight: "12rem", overflow: "scroll"} } className="ml-2 mt-2 d-flex flex-column">
+                    <CheckBoxList checkBoxOptions={checkBoxOptions} onUpdate={this.props.onRetroUpdate}/>
+                </div>
+
             </div>
-        </div>
+        )
     }
 }
 
 @observer
 class DisaggregationType extends React.Component {
-    @observable programsForRetro;
 
     constructor(props) {
         super(props)
@@ -233,11 +244,10 @@ class DisaggregationType extends React.Component {
             ...disaggregation,
             labels: this.orderLabels(disaggregation.labels)
         };
-        console.log('disagg id', disaggregation)
-        this.programsForRetro = props.programs.reduce((accum, program) => {
-            accum[program.id] = program
+        this.programsForRetro = observable(props.programs.reduce( (accum, program) => {
+            accum[program.id] = {id: program.id, name: program.name, checked: false}
             return accum
-        }, {})
+        }, {}))
 
         this.labelsCreated = 0;
         this.selectedByDefaultPopup = React.createRef();
@@ -249,11 +259,12 @@ class DisaggregationType extends React.Component {
 
     hasUnsavedDataAction() {
         const labels = this.props.disaggregation.labels.map(x => ({...x}));
-        this.props.onIsDirtyChange(JSON.stringify(this.state) !== JSON.stringify({
+        const changedDisaggs = JSON.stringify(this.state) !== JSON.stringify({
             ...this.props.disaggregation,
             labels: [...labels],
-
-        }))
+        })
+        const changedRetro = Object.values(this.programsForRetro).some( programObj => programObj.checked)
+        this.props.onIsDirtyChange(changedDisaggs || changedRetro)
     }
 
     componentDidUpdate = () => {
@@ -362,7 +373,12 @@ class DisaggregationType extends React.Component {
     }
 
     save() {
-        this.props.saveDisaggregation(this.state)
+        let savedData = {...this.state}
+        const retroPrograms = Object.values(this.programsForRetro).filter( program => program.checked )
+        if (retroPrograms.length > 0) {
+            savedData['retroPrograms'] = retroPrograms.map(programObj => programObj.id)
+        }
+        this.props.saveDisaggregation(savedData)
     }
 
     render() {
@@ -377,7 +393,7 @@ class DisaggregationType extends React.Component {
                 <div className="accordion-row__content">
                     <a onClick={() => {expandAction(this.resetForm.bind(this));}} className="btn accordion-row__btn btn-link" tabIndex='0'>
                         <FontAwesomeIcon icon={expanded ? 'caret-down' : 'caret-right'} />
-                        {(disaggregation.id == 'new') ? "New disaggregation" : disaggregation.disaggregation_type}
+                        {(disaggregation.id === 'new') ? "New disaggregation" : disaggregation.disaggregation_type}
                     </a>
                     {disaggregation.is_archived && <span className="text-muted font-weight-bold ml-2">(Archived)</span>}
                     {expanded && (
