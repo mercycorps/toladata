@@ -1249,7 +1249,7 @@ class Indicator(SafeDeleteModel):
     )
 
     comments = models.TextField(
-        _("Comments"), max_length=255, null=True, blank=True, help_text=" "
+        _("Comments"), max_length=4000, null=True, blank=True, help_text=" "
     )
 
     program = models.ForeignKey(
