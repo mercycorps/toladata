@@ -265,9 +265,13 @@ class CountryDisaggregationSerializer(serializers.ModelSerializer):
 
         if 'retroPrograms' in self.context:
             country_program_ids = set(instance.country.program_set.all().values_list('pk', flat=True))
+
+            # We should never run into this case where the programs in the post are not linked to the country in the
+            # post, but just in case it does somehow happen...
             if not set(self.context['retroPrograms']).issubset(country_program_ids):
                 # Translators:  This is an error message when a user has submitted changes to something they don't have access to
                 raise serializers.ValidationError(_("Program list inconsistent with country access"))
+
             for program in Program.objects.filter(pk__in=self.context['retroPrograms']):
                 instance.indicator_set.add(*list(program.indicator_set.all()))
 

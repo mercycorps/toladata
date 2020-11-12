@@ -235,7 +235,7 @@ class RetroProgramCheckBoxWrapper extends React.Component {
 }
 
 @observer
-class DisaggregationType extends React.Component {
+export class DisaggregationType extends React.Component {
 
     constructor(props) {
         super(props)
@@ -572,35 +572,31 @@ export default class EditDisaggregations extends React.Component {
 
     onSaveChangesPress(data) {
         if ( this.state.origSelectedByDefault !== data.selected_by_default ){
-            if (data.selected_by_default) {
-                create_unified_changeset_notice({
-                    header: gettext("Warning"),
-                    show_icon: true,
-                    // # Translators:  This is a warning popup when the user tries to do something that has broader effects than they might anticipate
-                    preamble: interpolate(gettext("This disaggregation will be automatically selected for all new indicators in %s. Existing indicators will be unaffected."), [gettext(this.props.countryName)]),
-                    // # Translators: This is the prompt on a popup that has warned users about a change they are about to make that could have broad consequences
-                    message_text: gettext("Are you sure you want to continue?"),
-                    notice_type: 'notice',
-                    showCloser: true,
-                    on_submit: () => this.saveDisaggregation(data),
-                    on_cancel: () => {}
-                })
+            let preamble = ""
+            if (data.selected_by_default && data.hasOwnProperty('retroPrograms')) {
+                // # Translators:  This is a warning popup when the user tries to do something that has broader effects than they might anticipate
+                preamble = interpolate(gettext("This disaggregation will be automatically selected for all new indicators in %s and for existing indicators in %s programs."), [gettext(this.props.countryName), data.retroPrograms.length])
+            }
+            else if (data.selected_by_default) {
+                // # Translators:  This is a warning popup when the user tries to do something that has broader effects than they might anticipate
+                preamble = interpolate(gettext("This disaggregation will be automatically selected for all new indicators in %s. Existing indicators will be unaffected."), [gettext(this.props.countryName)])
             }
             else {
-                create_unified_changeset_notice({
-                    header: gettext("Warning"),
-                    show_icon: true,
-                    // # Translators:  This is a warning popup when the user tries to do something that has broader effects than they might anticipate
-                    preamble: interpolate(gettext("This disaggregation will no longer be automatically selected for all new indicators in %s. Existing indicators will be unaffected."), [this.props.countryName]),
-                    // # Translators: This is the prompt on a popup that has warned users about a change they are about to make that could have broad consequences
-                    message_text: gettext("Are you sure you want to continue?"),
-                    notice_type: "notice",
-                    showCloser: true,
-                    on_submit: () => this.saveDisaggregation(data),
-                    on_cancel:()=>{}
-                })
+                // # Translators:  This is a warning popup when the user tries to do something that has broader effects than they might anticipate
+                preamble = interpolate(gettext("This disaggregation will no longer be automatically selected for all new indicators in %s. Existing indicators will be unaffected."), [this.props.countryName])
             }
 
+            create_unified_changeset_notice({
+                header: gettext("Warning"),
+                show_icon: true,
+                preamble: preamble,
+                // # Translators: This is the prompt on a popup that has warned users about a change they are about to make that could have broad consequences
+                message_text: gettext("Are you sure you want to continue?"),
+                notice_type: "notice",
+                showCloser: true,
+                on_submit: () => this.saveDisaggregation(data),
+                on_cancel: () => {}
+            })
         }
         else{
             this.saveDisaggregation(data);
