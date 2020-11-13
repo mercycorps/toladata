@@ -83,10 +83,17 @@ class CountryAdminSerializer(serializers.ModelSerializer):
         return country.user_set
 
     def get_users_count(self, country):
-        return len(set(t.pk for t in self._get_related_users(country)))
+        return len(set(
+            [ca.tolauser_id for ca in country.country_users] + [pa.tolauser_id for pa in country.program_users]
+        )) + country.su_count
 
     def get_organizations_count(self, country):
-        return len(set(t.organization_id for t in self._get_related_users(country)))
+        org_ids = set(
+            [ca.tolauser.organization_id for ca in country.country_users] +
+            [pa.tolauser.organization_id for pa in country.program_users] +
+            ([1] if country.su_count else [])
+        )
+        return len(org_ids)
 
 
 class CountryAdminViewSet(viewsets.ModelViewSet):
@@ -96,8 +103,26 @@ class CountryAdminViewSet(viewsets.ModelViewSet):
 
     @staticmethod
     def annotate_queryset(queryset):
+        su_count = TolaUser.objects.filter(user__is_superuser=True).count()
         queryset = queryset.annotate(
             programs_count=models.Count('program', distinct=True),
+            su_count=models.Value(su_count, output_field=models.IntegerField())
+        )
+        queryset = queryset.prefetch_related(
+            models.Prefetch(
+                'countryaccess_set',
+                queryset=CountryAccess.objects.filter(
+                    tolauser__user__is_superuser=False
+                ).select_related('tolauser'),
+                to_attr='country_users'
+            ),
+            models.Prefetch(
+                'programaccess_set',
+                queryset=ProgramAccess.objects.filter(
+                    tolauser__user__is_superuser=False
+                    ).select_related('tolauser'),
+                to_attr='program_users'
+            )
         )
         return queryset
 
@@ -123,7 +148,8 @@ class CountryAdminViewSet(viewsets.ModelViewSet):
         organizationFilter = params.getlist('organizations[]')
         if organizationFilter:
             queryset = queryset.filter(
-                Q(program__user_access__organization__in=organizationFilter) | Q(users__organization__in=organizationFilter)
+                Q(program__user_access__organization__in=organizationFilter) |
+                Q(users__organization__in=organizationFilter)
             )
 
         return queryset.distinct()

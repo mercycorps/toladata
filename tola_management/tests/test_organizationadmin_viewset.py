@@ -80,8 +80,8 @@ class TestOrganizationBaseFields(test.TestCase):
         self.assertEqual(data['primary_contact_phone'], '555-555-5555')
         self.assertEqual(data['mode_of_contact'], "some mode")
         self.assertEqual(data['sectors'], [self.sector1.pk, self.sector2.pk])
-        self.assertEqual(data['users_count'], 24)
-        self.assertEqual(data['programs_count'], 3)
+        self.assertEqual(data['user_count'], 24)
+        self.assertEqual(data['program_count'], 3)
 
 
 class TestOrganizationFieldsStressTest(test.TestCase):
@@ -177,31 +177,173 @@ class TestOrganizationFieldsStressTest(test.TestCase):
     def test_mc_org(self):
         organization_qs = self.get_organization(1)
         data = self.get_data(organization_qs)
-        self.assertEqual(data['users_count'], 90)
+        self.assertEqual(data['user_count'], 90)
         users_data = self.get_users_filtered_data(1)
         self.assertEqual(users_data['count'], 90)
-        self.assertEqual(data['programs_count'], 42)
+        self.assertEqual(data['program_count'], 42)
         programs_data = self.get_programs_filtered_data(1)
         self.assertEqual(programs_data['count'], 42)
 
     def test_partner_orgs(self):
         data = self.get_data(self.get_organization(self.partner_org1.pk))
-        self.assertEqual(data['users_count'], 20)
+        self.assertEqual(data['user_count'], 20)
         self.assertEqual(self.get_users_filtered_data(self.partner_org1.pk)['count'], 20)
-        self.assertEqual(data['programs_count'], 5)
+        self.assertEqual(data['program_count'], 5)
         self.assertEqual(self.get_programs_filtered_data(self.partner_org1.pk)['count'], 5)
         data = self.get_data(self.get_organization(self.partner_org2.pk))
-        self.assertEqual(data['users_count'], 10)
+        self.assertEqual(data['user_count'], 10)
         self.assertEqual(self.get_users_filtered_data(self.partner_org2.pk)['count'], 10)
-        self.assertEqual(data['programs_count'], 2)
+        self.assertEqual(data['program_count'], 2)
         self.assertEqual(self.get_programs_filtered_data(self.partner_org2.pk)['count'], 2)
         data = self.get_data(self.get_organization(self.partner_org3.pk))
-        self.assertEqual(data['users_count'], 25)
+        self.assertEqual(data['user_count'], 25)
         self.assertEqual(self.get_users_filtered_data(self.partner_org3.pk)['count'], 25)
-        self.assertEqual(data['programs_count'], 5)
+        self.assertEqual(data['program_count'], 5)
         self.assertEqual(self.get_programs_filtered_data(self.partner_org3.pk)['count'], 5)
         data = self.get_data(self.get_organization(self.partner_org4.pk))
-        self.assertEqual(data['users_count'], 30)
+        self.assertEqual(data['user_count'], 30)
         self.assertEqual(self.get_users_filtered_data(self.partner_org4.pk)['count'], 30)
-        self.assertEqual(data['programs_count'], 10)
+        self.assertEqual(data['program_count'], 10)
         self.assertEqual(self.get_programs_filtered_data(self.partner_org4.pk)['count'], 10)
+
+
+class TestOrganizationsAdminFilters(test.TestCase):
+    @classmethod
+    def setUpTestData(cls):
+        cls.base_country = CountryFactory()
+        cls.country1 = CountryFactory()
+        cls.country2 = CountryFactory()
+        cls.country3 = CountryFactory()
+        cls.mc = OrganizationFactory(id=1)
+        cls.no_sector_org = OrganizationFactory()
+        cls.sector1 = SectorFactory()
+        cls.sector2 = SectorFactory()
+        cls.sector3 = SectorFactory()
+        cls.sector4 = SectorFactory()
+        cls.organization1 = OrganizationFactory(sectors=[cls.sector1])
+        cls.organization2 = OrganizationFactory(sectors=[cls.sector1, cls.sector2])
+        cls.organization3 = OrganizationFactory(sectors=[cls.sector2, cls.sector3])
+        cls.inactive_org = OrganizationFactory(is_active=False)
+        cls.program1 = RFProgramFactory(country=[cls.country1])
+        cls.program2 = RFProgramFactory(country=[cls.country2])
+        cls.program3 = RFProgramFactory(country=[cls.country1, cls.country2])
+        cls.program4 = RFProgramFactory(country=[cls.country3])
+        cls.superadmin = NewTolaUserFactory(country=cls.base_country, mc_staff=True, superadmin=True)
+        cls.user1 = NewTolaUserFactory(organization=cls.organization1, mc_staff=False)
+        grant_program_access(cls.user1, cls.program1, cls.country1, PROGRAM_ROLE_CHOICES[2][0])
+        cls.user2 = NewTolaUserFactory(organization=cls.organization2, mc_staff=False)
+        grant_program_access(cls.user2, cls.program2, cls.country2, PROGRAM_ROLE_CHOICES[1][0])
+        cls.user3 = NewTolaUserFactory(organization=cls.organization3, mc_staff=False)
+        grant_program_access(cls.user3, cls.program3, cls.country1, PROGRAM_ROLE_CHOICES[0][0])
+        cls.user4 = NewTolaUserFactory(organization=cls.organization3, mc_staff=False)
+        grant_program_access(cls.user4, cls.program3, cls.country2, PROGRAM_ROLE_CHOICES[1][0])
+        cls.mc_user1 = NewTolaUserFactory(mc_staff=True, superadmin=False)
+        grant_country_access(cls.mc_user1, cls.country3, COUNTRY_ROLE_CHOICES[1][0])
+        cls.mc_user2 = NewTolaUserFactory(mc_staff=True, superadmin=False)
+        grant_country_access(cls.mc_user2, cls.country2, COUNTRY_ROLE_CHOICES[0][0])
+
+    def setUp(self):
+        self.client = test.Client()
+        self.client.force_login(user=self.superadmin.user)
+
+    def tearDown(self):
+        self.client.logout()
+
+    def get_organization_data(self, **filters):
+        page = filters.pop('page', 1)
+        url = f'/api/tola_management/organization/?page={page}'
+        for key, value in filters.items():
+            if isinstance(value, list):
+                url += ''.join(f'&{key}[]={v}' for v in value)
+            else:
+                url += f'&{key}={value}'
+        response = self.client.get(url)
+        self.assertEqual(response.status_code, 200)
+        return response.json()
+
+    def test_no_filters_results(self):
+        data = self.get_organization_data()
+        self.assertEqual(data['count'], 6)
+        self.assertEqual(len(data['results']), 6)
+        org_ids = [result['id'] for result in data['results']]
+        for org in [self.mc, self.organization1, self.organization2, self.organization3,
+                    self.no_sector_org, self.inactive_org]:
+            self.assertIn(org.pk, org_ids)
+        # test pagination
+        full_page_orgs = OrganizationFactory.create_batch(20)
+        data = self.get_organization_data()
+        self.assertEqual(data['count'], 26)
+        self.assertEqual(data['page_count'], 2)
+        self.assertEqual(len(data['results']), 20)
+        [org.delete() for org in full_page_orgs]
+
+    def test_sector_filters(self):
+        data = self.get_organization_data(sectors=[self.sector1.pk])
+        self.assertEqual(data['count'], 2)
+        org_ids = [result['id'] for result in data['results']]
+        for org in [self.organization1, self.organization2]:
+            self.assertIn(org.pk, org_ids)
+        data = self.get_organization_data(sectors=[self.sector2.pk, self.sector3.pk])
+        self.assertEqual(data['count'], 2)
+        org_ids = [result['id'] for result in data['results']]
+        for org in [self.organization2, self.organization3]:
+            self.assertIn(org.pk, org_ids)
+        data = self.get_organization_data(sectors=[self.sector4.pk])
+        self.assertEqual(data['count'], 0)
+        self.assertEqual(len(data['results']), 0)
+
+    def test_program_filters(self):
+        # program access users:
+        data = self.get_organization_data(programs=[self.program1.pk])
+        self.assertEqual(data['count'], 2)
+        org_ids = [r['id'] for r in data['results']]
+        for org in [self.mc, self.organization1]:
+            self.assertIn(org.pk, org_ids)
+        # country access users:
+        data = self.get_organization_data(programs=[self.program4.pk])
+        self.assertEqual(data['count'], 1)
+        self.assertEqual(data['results'][0]['id'], 1)
+        # test both:
+        data = self.get_organization_data(programs=[self.program2.pk])
+        self.assertEqual(data['count'], 2)
+        org_ids = [r['id'] for r in data['results']]
+        for org in [self.mc, self.organization2]:
+            self.assertIn(org.pk, org_ids)
+        #  test multi country program:
+        data = self.get_organization_data(programs=[self.program3.pk])
+        self.assertEqual(data['count'], 2)
+        org_ids = [r['id'] for r in data['results']]
+        for org in [self.mc, self.organization3]:
+            self.assertIn(org.pk, org_ids)
+        # test multiple program filters
+        data = self.get_organization_data(programs=[self.program1.pk, self.program2.pk])
+        self.assertEqual(data['count'], 3)
+        org_ids = [r['id'] for r in data['results']]
+        for org in [self.mc, self.organization1, self.organization2]:
+            self.assertIn(org.pk, org_ids)
+
+    def test_countries_filters(self):
+        # one country:
+        data = self.get_organization_data(countries=[self.country1.pk])
+        self.assertEqual(data['count'], 2)
+        org_ids = [r['id'] for r in data['results']]
+        for org in [self.organization1, self.organization3]:
+            self.assertIn(org.pk, org_ids)
+        # multiple countries:
+        data = self.get_organization_data(countries=[self.country2.pk, self.country3.pk])
+        self.assertEqual(data['count'], 3)
+        org_ids = [r['id'] for r in data['results']]
+        for org in [self.mc, self.organization2, self.organization3]:
+            self.assertIn(org.pk, org_ids)
+
+    def test_status_filters(self):
+        # active:
+        data = self.get_organization_data(organization_status=1)
+        self.assertEqual(data['count'], 5)
+        org_ids = [result['id'] for result in data['results']]
+        for org in [self.mc, self.organization1, self.organization2, self.organization3, self.no_sector_org]:
+            self.assertIn(org.pk, org_ids)
+        # inactive:
+        data = self.get_organization_data(organization_status=0)
+        self.assertEqual(data['count'], 1)
+        self.assertEqual(data['results'][0]['id'], self.inactive_org.pk)

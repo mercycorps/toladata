@@ -70,6 +70,17 @@ class OrganizationFactory(DjangoModelFactory):
 
     name = Faker('company')
 
+    @post_generation
+    def sectors(self, create, extracted, **kwargs):
+        if not create:
+            # simple build, do nothing
+            return
+        if extracted:
+            if isinstance(extracted, SectorM):
+                extracted = [extracted]
+            for sector in extracted:
+                self.sectors.add(sector)
+
 
 class SiteProfileFactory(DjangoModelFactory):
     class Meta:

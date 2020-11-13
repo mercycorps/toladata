@@ -22,10 +22,10 @@ SPECIAL_CHARS = "Spécîål Chärs"
 
 class TestCountryAdminSerializer(test.TestCase):
     def get_serialized_data(self, pk):
-        with self.assertNumQueries(2):
+        with self.assertNumQueries(4): # 4 queries: 2 prefetches and one SU count
             qs = CountryAdminViewSet.annotate_queryset(Country.objects.filter(pk=pk))
             return CountryAdminSerializer(qs, many=True).data[0]
-        
+
     def test_basic_country_data(self):
         c = CountryFactory()
         data = self.get_serialized_data(c.pk)
@@ -177,3 +177,144 @@ class TestCountryAdminSerializer(test.TestCase):
         data = self.get_serialized_data(c.pk)
         self.assertEqual(data['users_count'], 2)
         self.assertEqual(data['organizations_count'], 2)
+
+
+class TestCountryAdminViewSetFilters(test.TestCase):
+    @classmethod
+    def setUpTestData(cls):
+        cls.base_country = CountryFactory(country="ZZZZ")
+        cls.mc = OrganizationFactory(id=1)
+        cls.superadmin = NewTolaUserFactory(mc_staff=True, superadmin=True, country=cls.base_country)
+        cls.first_page_countries = CountryFactory.create_batch(20)
+        cls.one_program_country = CountryFactory(country="YYYY")
+        cls.one_country_program = RFProgramFactory(country=[cls.one_program_country])
+        cls.multi_country_program_country1 = CountryFactory(country="XXXXX1")
+        cls.multi_country_program_country2 = CountryFactory(country="XXXXX2")
+        cls.multi_country_program = RFProgramFactory(
+            country=[cls.multi_country_program_country1, cls.multi_country_program_country2])
+        cls.one_organization_country = CountryFactory(country="VVVVV")
+        cls.partner_organization1 = OrganizationFactory()
+        partner_program = RFProgramFactory(country=[cls.one_organization_country])
+        partner_user = NewTolaUserFactory(mc_staff=False, organization=cls.partner_organization1)
+        grant_program_access(partner_user, partner_program, cls.one_organization_country, PROGRAM_ROLE_CHOICES[2][0])
+        cls.two_organization_country = CountryFactory(country="VVVVV")
+        cls.other_organization_country = CountryFactory(country="VVVVV2")
+        cls.partner_organization2 = OrganizationFactory()
+        partner_program2 = RFProgramFactory(country=[cls.two_organization_country])
+        partner_user2 = NewTolaUserFactory(mc_staff=False, organization=cls.partner_organization2)
+        grant_program_access(partner_user2, partner_program2, cls.two_organization_country, PROGRAM_ROLE_CHOICES[1][0])
+        cls.partner_organization3 = OrganizationFactory()
+        partner_program3 = RFProgramFactory(country=[cls.two_organization_country, cls.other_organization_country])
+        partner_user3 = NewTolaUserFactory(mc_staff=False, organization=cls.partner_organization3)
+        grant_program_access(partner_user3, partner_program3, cls.two_organization_country, PROGRAM_ROLE_CHOICES[1][0])
+        partner_user4 = NewTolaUserFactory(mc_staff=False, organization=cls.partner_organization3)
+        grant_program_access(partner_user4, partner_program3,
+                             cls.other_organization_country, PROGRAM_ROLE_CHOICES[0][0])
+
+
+    def setUp(self):
+        self.client = test.Client()
+        self.client.force_login(user=self.superadmin.user)
+
+    def tearDown(self):
+        self.client.logout()
+
+    def get_countries_data(self, **filters):
+        page = filters.pop('page', 1)
+        url = f'/api/tola_management/country/?page={page}'
+        for key, value in filters.items():
+            if isinstance(value, list):
+                url += ''.join(f'&{key}[]={v}' for v in value)
+            else:
+                url += f'&{key}={value}'
+        response = self.client.get(url)
+        self.assertEqual(response.status_code, 200)
+        return response.json()
+
+    def test_pagination(self):
+        data = self.get_countries_data()
+        self.assertEqual(data['count'], 31)
+        self.assertEqual(data['page_count'], 2)
+        self.assertEqual(len(data['results']), 20)
+
+    def test_one_program_programs_filter(self):
+        data = self.get_countries_data(programs=[self.one_country_program.pk])
+        self.assertEqual(data['count'], 1)
+        self.assertEqual(len(data['results']), 1)
+        result = data['results'][0]
+        self.assertEqual(result['id'], self.one_program_country.pk)
+        self.assertEqual(result['country'], "YYYY")
+        self.assertEqual(result['description'], self.one_program_country.description)
+        self.assertEqual(result['code'], self.one_program_country.code)
+        self.assertEqual(result['programs_count'], 1)
+        self.assertEqual(result['organizations_count'], 1)
+        self.assertEqual(result['users_count'], 1)
+
+    def test_multiple_country_program_programs_filter(self):
+        data = self.get_countries_data(programs=[self.multi_country_program.pk])
+        self.assertEqual(data['count'], 2)
+        self.assertEqual(len(data['results']), 2)
+        self.assertEqual(data['results'][0]['id'], self.multi_country_program_country1.pk)
+        self.assertEqual(data['results'][1]['id'], self.multi_country_program_country2.pk)
+
+    def test_multiple_programs_programs_filter(self):
+        data = self.get_countries_data(programs=[self.one_country_program.pk, self.multi_country_program.pk])
+        self.assertEqual(data['count'], 3)
+        self.assertEqual(len(data['results']), 3)
+        for c, country in enumerate([
+                self.multi_country_program_country1, self.multi_country_program_country2,
+                self.one_program_country]):
+            self.assertEqual(data['results'][c]['id'], country.pk)
+            self.assertEqual(data['results'][c]['country'], country.country)
+
+    def test_one_organization_organizations_filter(self):
+        data = self.get_countries_data(organizations=[self.partner_organization1.pk])
+        self.assertEqual(data['count'], 1)
+        self.assertEqual(len(data['results']), 1)
+        self.assertEqual(data['results'][0]['id'], self.one_organization_country.pk)
+        self.assertEqual(data['results'][0]['organizations_count'], 2)
+        self.assertEqual(data['results'][0]['users_count'], 2)
+        self.assertEqual(data['results'][0]['programs_count'], 1)
+
+    def test_two_organizations_organizations_filter(self):
+        data = self.get_countries_data(organizations=[self.partner_organization2.pk])
+        self.assertEqual(data['count'], 1)
+        self.assertEqual(len(data['results']), 1)
+        self.assertEqual(data['results'][0]['id'], self.two_organization_country.pk)
+        self.assertEqual(data['results'][0]['organizations_count'], 3)
+        self.assertEqual(data['results'][0]['users_count'], 3)
+        self.assertEqual(data['results'][0]['programs_count'], 2)
+        data = self.get_countries_data(organizations=[self.partner_organization3.pk])
+        self.assertEqual(data['count'], 2)
+        self.assertEqual(len(data['results']), 2)
+        self.assertEqual(data['results'][0]['id'], self.two_organization_country.pk)
+        self.assertEqual(data['results'][0]['organizations_count'], 3)
+        self.assertEqual(data['results'][0]['users_count'], 3)
+        self.assertEqual(data['results'][0]['programs_count'], 2)
+        self.assertEqual(data['results'][1]['id'], self.other_organization_country.pk)
+        self.assertEqual(data['results'][1]['organizations_count'], 2)
+        self.assertEqual(data['results'][1]['users_count'], 2)
+        self.assertEqual(data['results'][1]['programs_count'], 1)
+
+    def test_multiple_organizations_organizations_filter(self):
+        data = self.get_countries_data(organizations=[
+            self.partner_organization1.pk, self.partner_organization2.pk])
+        self.assertEqual(data['count'], 2)
+        self.assertEqual(len(data['results']), 2)
+        data = self.get_countries_data(organizations=[
+            self.partner_organization1.pk, self.partner_organization3.pk])
+        self.assertEqual(data['count'], 3)
+        self.assertEqual(len(data['results']), 3)
+
+    def test_one_country_countries_filter(self):
+        data = self.get_countries_data(countries=[self.one_program_country.pk])
+        self.assertEqual(data['count'], 1)
+        self.assertEqual(len(data['results']), 1)
+        self.assertEqual(data['results'][0]['id'], self.one_program_country.pk)
+
+    def test_many_country_countries_filter(self):
+        data = self.get_countries_data(
+            countries=[c.pk for c in self.first_page_countries[0:5]]
+        )
+        self.assertEqual(data['count'], 5)
+        self.assertEqual(len(data['results']), 5)

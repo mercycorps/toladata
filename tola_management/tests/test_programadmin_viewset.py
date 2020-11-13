@@ -243,7 +243,7 @@ class TestProgramFieldsStressTest(test.TestCase):
         self.assertEqual(data['organizations'], 2)
         self.assertEqual(data['program_users'], 20) # 5 admins 5 users per partner org + 10 superusers
         self.assertEqual(data['onlyOrganizationId'], None)
-        orgs_data = self.get_organizations_filtered_data(self.partner_org1.pk)
+        orgs_data = self.get_organizations_filtered_data(self.only_partner_program.pk)
         self.assertEqual(orgs_data['count'], 2, orgs_data)
 
     def test_two_org_program(self):

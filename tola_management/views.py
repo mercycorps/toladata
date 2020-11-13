@@ -850,8 +850,8 @@ class OrganizationSerializer(ModelSerializer):
     primary_contact_email = CharField(required=True)
     primary_contact_phone = CharField(required=True)
     sectors = SectorSerializer(many=True)
-    programs_count = IntegerField(read_only=True)
-    users_count = IntegerField(read_only=True)
+    program_count = IntegerField(read_only=True)
+    user_count = IntegerField(read_only=True)
 
     def update(self, instance, validated_data):
         incoming_sectors = validated_data.pop('sectors')
@@ -898,8 +898,8 @@ class OrganizationSerializer(ModelSerializer):
             'mode_of_contact',
             'is_active',
             'sectors',
-            'programs_count',
-            'users_count',
+            'program_count',
+            'user_count',
         )
 
 
@@ -920,6 +920,8 @@ class OrganizationAdminAuditLogSerializer(ModelSerializer):
         )
 
 
+from silk.profiling.profiler import silk_profile
+
 class OrganizationAdminViewSet(viewsets.ModelViewSet):
     serializer_class = OrganizationSerializer
     pagination_class = Paginator
@@ -930,206 +932,56 @@ class OrganizationAdminViewSet(viewsets.ModelViewSet):
         num_programs = Program.rf_aware_objects.count()
         queryset = Organization.objects.all()
         queryset = queryset.annotate(
-            users_count=models.Count('tolauser'),
-            programs_count=models.Case(
+            user_count=models.Count('tolauser'),
+            program_count=models.Case(
                 models.When(
                     id=Organization.MERCY_CORPS_ID,
                     then=models.Value(num_programs)
                 ),
-                default=models.functions.Coalesce( # coalesce so None is 0 (summable later)
-                    models.Subquery(
-                        ProgramAccess.objects.filter(
-                            tolauser__organization_id=models.OuterRef('pk')
-                        ).order_by().values('tolauser__organization').annotate(
-                            programs_count=models.Count('program', distinct=True)
-                        ).values('programs_count')[:1],
-                        output_field=models.IntegerField()
-                    ), 0
-                ),
+                # default=models.functions.Coalesce( # coalesce so None is 0 (summable later)
+                #     models.Subquery(
+                #         ProgramAccess.objects.filter(
+                #             tolauser__organization_id=models.OuterRef('pk')
+                #         ).order_by().values('tolauser__organization_id').annotate(
+                #             programs_count=models.Count('program', distinct=True)
+                #         ).values('programs_count')[:1],
+                #         output_field=models.IntegerField()
+                #     ), 0
+                # ),
+                default=models.Count('tolauser__programaccess__program_id', distinct=True),
                 output_field=models.IntegerField()
             )
         )
         return queryset
 
     def get_queryset(self):
-        request = self.request
         queryset = self.base_queryset()
         return queryset
 
-    def get_listing_queryset(self):
-        req = self.request
-
-        params = []
-
-        country_join = ''
-        country_where = ''
-        if req.GET.getlist('countries[]'):
-            params.extend(req.GET.getlist('countries[]'))
-
-            #create placeholders for multiple countries and strip the trailing comma
-            in_param_string = ('%s,'*len(req.GET.getlist('countries[]')))[:-1]
-
-            country_where = 'AND wcz.country_id IN ({})'.format(in_param_string)
-
-            country_join = """
-                INNER JOIN (
-                        SELECT
-                            wo.id AS organization_id,
-                            wtuc.country_id AS country_id
-                        FROM workflow_organization wo
-                        INNER JOIN workflow_tolauser wtu ON wtu.organization_id = wo.id
-                        INNER JOIN workflow_tolauser_countries wtuc ON wtuc.tolauser_id = wtu.id
-                    UNION DISTINCT
-                        SELECT
-                            wo.id AS organization_id,
-                            wpc.country_id AS country_id
-                        FROM workflow_organization wo
-                        INNER JOIN workflow_tolauser wtu ON wtu.organization_id = wo.id
-                        INNER JOIN workflow_program_user_access wpua ON wpua.tolauser_id = wtu.id
-                        INNER JOIN workflow_program_country wpc ON wpua.program_id = wpc.program_id
-                    UNION DISTINCT
-                        SELECT
-                            wo.id AS organization_id,
-                            wtu.country_id AS country_id
-                        FROM workflow_organization wo
-                        INNER JOIN workflow_tolauser wtu ON wtu.organization_id = wo.id
-                ) wcz ON wcz.organization_id = wo.id
-            """.format(country_where=country_where)
-
-        program_where = ''
-        program_join = ''
-        if req.GET.getlist('programs[]'):
-            params.extend(req.GET.getlist('programs[]'))
-
-            #create placeholders for multiple programs and strip the trailing comma
-            in_param_string = ('%s,'*len(req.GET.getlist('programs[]')))[:-1]
-
-            program_join = """
-                LEFT JOIN (
-                    SELECT
-                        wo.id AS organization_id,
-                        pz.program_id AS program_id
-                    FROM workflow_organization wo
-                    INNER JOIN workflow_tolauser wtu ON wo.id = wtu.organization_id
-                    INNER JOIN (
-                            SELECT
-                                wpua.tolauser_id AS tolauser_id,
-                                wpua.program_id AS program_id
-                            FROM workflow_program_user_access wpua
-                        UNION DISTINCT
-                            SELECT
-                                wtuc.tolauser_id AS tolauser_id,
-                                wpc.program_id AS program_id
-                            FROM workflow_tolauser_countries wtuc
-                            INNER JOIN workflow_program_country wpc ON wpc.country_id = wtuc.country_id
-                        UNION DISTINCT
-                            SELECT
-                                wu.id AS tolauser_id,
-                                wpc.program_id AS program_id
-                            FROM workflow_tolauser wu
-                            INNER JOIN workflow_program_country wpc ON wpc.country_id = wu.country_id
-                    ) pz ON pz.tolauser_id = wtu.id
-                    GROUP BY wo.id, pz.program_id
-                ) pzz ON pzz.organization_id = wo.id
-            """
-
-            program_where = 'AND (pzz.program_id IN ({}))'.format(in_param_string)
-
-        organization_where = ''
-        if req.GET.getlist('organizations[]'):
-            params.extend(req.GET.getlist('organizations[]'))
-
-            #create placeholders for multiple programs and strip the trailing comma
-            in_param_string = ('%s,'*len(req.GET.getlist('organizations[]')))[:-1]
-
-            organization_where = 'AND (wo.id IN ({}))'.format(in_param_string)
-
-        organization_status_where = ''
-        if req.GET.get('organization_status'):
-            params.append(req.GET.get('organization_status'))
-
-            organization_status_where = 'AND wo.is_active = %s'
-
-        sector_join = ''
-        sector_where = ''
-        if req.GET.get('sectors[]'):
-            params.extend(req.GET.getlist('sectors[]'))
-
-            #create placeholders for multiple programs and strip the trailing comma
-            in_param_string = ('%s,'*len(req.GET.getlist('sectors[]')))[:-1]
-            sector_join = 'INNER JOIN workflow_organization_sectors wos ON wos.organization_id = wo.id'
-
-            sector_where = 'AND (wos.sector_id IN ({}))'.format(in_param_string)
-
-        return Organization.objects.raw("""
-            SELECT
-                wo.id,
-                wo.name,
-                wo.primary_address,
-                wo.primary_contact_name,
-                wo.primary_contact_email,
-                wo.primary_contact_phone,
-                wo.mode_of_contact,
-                COUNT(DISTINCT wtu.id) AS user_count,
-                COUNT(DISTINCT pz.program_id) AS program_count,
-                wo.is_active
-            FROM workflow_organization wo
-            LEFT JOIN workflow_tolauser wtu ON wtu.organization_id = wo.id
-            {country_join}
-            LEFT JOIN (
-                SELECT
-                    wo.id AS organization_id,
-                    pz.program_id AS program_id
-                FROM workflow_organization wo
-                INNER JOIN workflow_tolauser wtu ON wo.id = wtu.organization_id
-                INNER JOIN (
-                    SELECT MAX(tu_p.tolauser_id) as tolauser_id, tu_p.program_id
-                    FROM (
-                            SELECT
-                                wpua.tolauser_id,
-                                wpua.program_id
-                            FROM workflow_program_user_access wpua
-                        UNION DISTINCT
-                            SELECT
-                                wtuc.tolauser_id,
-                                wpc.program_id
-                            FROM workflow_tolauser_countries wtuc
-                            INNER JOIN workflow_program_country wpc ON wpc.country_id = wtuc.country_id
-                    ) tu_p
-                    GROUP BY tu_p.program_id
-                ) pz ON pz.tolauser_id = wtu.id
-                GROUP BY wo.id, pz.program_id
-            ) pz ON pz.organization_id = wo.id
-            {program_join}
-            {sector_join}
-            WHERE
-                1=1
-                {country_where}
-                {program_where}
-                {organization_where}
-                {organization_status_where}
-                {sector_where}
-            GROUP BY wo.id
-            ORDER BY wo.name
-        """.format(
-            program_where=program_where,
-            program_join=program_join,
-            country_where=country_where,
-            country_join=country_join,
-            organization_where=organization_where,
-            organization_status_where=organization_status_where,
-            sector_join=sector_join,
-            sector_where=sector_where
-        ), params)
-
+    @silk_profile(name="List organizations")
     def list(self, request):
-        queryset = self.get_listing_queryset()
-
+        print("querying")
+        queryset = self.get_queryset()
+        if request.GET.getlist('sectors[]'):
+            queryset = queryset.filter(sectors__in=request.GET.getlist('sectors[]'))
+        if request.GET.getlist('programs[]'):
+            queryset = queryset.filter(
+                models.Q(tolauser__programaccess__program__in=request.GET.getlist('programs[]')) |
+                models.Q(tolauser__countryaccess__country__program__in=request.GET.getlist('programs[]')) |
+                models.Q(tolauser__user__is_superuser=True)
+            )
+        if request.GET.getlist('countries[]'):
+            queryset = queryset.filter(
+                models.Q(tolauser__programaccess__country_id__in=request.GET.getlist('countries[]')) |
+                models.Q(tolauser__countryaccess__country_id__in=request.GET.getlist('countries[]'))
+            )
+            print("querying countries query {}".format(queryset.query))
+        if request.GET.get('organization_status') is not None:
+            queryset = queryset.filter(is_active=request.GET.get('organization_status'))
         page = self.paginate_queryset(list(queryset))
         if page is not None:
             serializer = OrganizationAdminSerializer(page, many=True)
             return self.get_paginated_response(serializer.data)
-
         serializer = OrganizationAdminSerializer(queryset, many=True)
         return Response(serializer.data)
 
@@ -1142,6 +994,7 @@ class OrganizationAdminViewSet(viewsets.ModelViewSet):
 
     @action(detail=True, methods=['GET'])
     def aggregate_data(self, request, pk=None):
+        print("request {} pk {}".format(request, pk))
         if not pk:
             return Response({}, status=status.HTTP_400_BAD_REQUEST)
 
