@@ -167,7 +167,7 @@ const DisaggregationCategoryList = observer(
     )
 );
 
-let CheckBoxList = props => {
+export let CheckBoxList = props => {
     return props.checkBoxOptions.map(option => {
         return (
             <label className="mb-1" key={option.id}>
@@ -185,7 +185,7 @@ let CheckBoxList = props => {
 }
 
 @observer
-class RetroProgramCheckBoxWrapper extends React.Component {
+export class RetroProgramCheckBoxWrapper extends React.Component {
     constructor(props) {
         super(props);
         this.retroactiveAssignmentPopup = React.createRef();
@@ -225,7 +225,7 @@ class RetroProgramCheckBoxWrapper extends React.Component {
                     ariaText={gettext('More information on assigning disaggregations to existing indicators')}
                 />
 
-                <div id="disagg-admin__programs" style={ {maxHeight: "12rem", overflow: "scroll"} } className="ml-2 mt-2 d-flex flex-column">
+                <div id="disagg-admin__programs" className="ml-2 mt-2 d-flex flex-column disaggregation-programs">
                     <CheckBoxList checkBoxOptions={checkBoxOptions} onUpdate={this.props.onRetroUpdate}/>
                 </div>
 

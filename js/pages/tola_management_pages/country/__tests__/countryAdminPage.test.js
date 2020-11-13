@@ -2,7 +2,11 @@ import React from 'react';
 import { toJS } from 'mobx'
 import { shallow, mount } from "enzyme";
 import { CountryStore } from '../models'
-import EditDisaggregations, { DisaggregationType } from '../components/edit_disaggregations'
+import EditDisaggregations, {
+    CheckBoxList,
+    DisaggregationType,
+    RetroProgramCheckBoxWrapper
+} from '../components/edit_disaggregations'
 import { countryDisaggregationData } from '../__fixtures__/countryAdminFixtures'
 import api from '../api'
 jest.mock('../api');
@@ -89,25 +93,25 @@ describe("Country admin retroactive disagg features in store", () => {
     store.editing_disaggregations_data = countryDisaggregationData;
 
     it("trigger the correct notification when changed", () => {
-        let component = shallow(<EditDisaggregations disaggregations={store.editing_disaggregations_data}/>)
+        let wrapper = shallow(<EditDisaggregations disaggregations={store.editing_disaggregations_data}/>)
 
-        component.instance().state.origSelectedByDefault = true;
+        wrapper.instance().state.origSelectedByDefault = true;
         let data = {selected_by_default: false};
-        component.instance().onSaveChangesPress(data);
+        wrapper.instance().onSaveChangesPress(data);
         expect(create_unified_changeset_notice).toHaveBeenCalled();
         let preamble = create_unified_changeset_notice.mock.calls[0][0].preamble;
         expect(preamble.includes('will no longer be automatically') && preamble.includes('will be unaffected')).toBeTruthy();
 
-        component.instance().state.origSelectedByDefault = false;
+        wrapper.instance().state.origSelectedByDefault = false;
         data = {selected_by_default: true};
-        component.instance().onSaveChangesPress(data);
+        wrapper.instance().onSaveChangesPress(data);
         expect(create_unified_changeset_notice).toHaveBeenCalled();
         preamble = create_unified_changeset_notice.mock.calls[1][0].preamble;
         expect(preamble.includes('will be automatically') && preamble.includes('will be unaffected')).toBeTruthy();
 
-        component.instance().state.origSelectedByDefault = false;
+        wrapper.instance().state.origSelectedByDefault = false;
         data = {selected_by_default: true, retroPrograms: [3]};
-        component.instance().onSaveChangesPress(data);
+        wrapper.instance().onSaveChangesPress(data);
         expect(create_unified_changeset_notice).toHaveBeenCalled();
         preamble = create_unified_changeset_notice.mock.calls[2][0].preamble;
         expect(preamble.includes('will be automatically') && preamble.includes('and for existing')).toBeTruthy();
@@ -115,13 +119,14 @@ describe("Country admin retroactive disagg features in store", () => {
     });
 
     it("don't trigger notifications when not changed", () => {
-        let component = shallow(<EditDisaggregations disaggregations={store.editing_disaggregations_data}/>);
-        component.instance().saveDisaggregation = jest.fn()
-        component.instance().state.origSelectedByDefault = false;
+        create_unified_changeset_notice.mockClear()
+        let wrapper = shallow(<EditDisaggregations disaggregations={store.editing_disaggregations_data}/>);
+        wrapper.instance().saveDisaggregation = jest.fn()
+        wrapper.instance().state.origSelectedByDefault = false;
         let data = {selected_by_default: false};
-        component.instance().onSaveChangesPress(data);
-        expect(component.instance().saveDisaggregation).toHaveBeenCalled();
-
+        wrapper.instance().onSaveChangesPress(data);
+        expect(create_unified_changeset_notice).not.toHaveBeenCalled();
+        expect(wrapper.instance().saveDisaggregation).toHaveBeenCalled();
     });
 
     it("provide country-specific programs", () => {
@@ -143,16 +148,49 @@ describe("Country admin disagg presentation components", () => {
     let store = new CountryStore(api, {});
     store.editing_disaggregations_data = countryDisaggregationData;
     let saveDisaggregation = jest.fn()
-    // Passes but that's because the checed true/false value is always treated as false in the save() function
-    // when the test is run. Not sure why this is the case.
-    it("doesn't display programs on update", () => {
+
+    it("displays retro programs only on create and when selected by default is checked", () => {
+
+        const disaggregation = store.editing_disaggregations_data[0]
+        const programsForRetro = [
+            {id: 200, name: "Program 1", checked: false},
+            {id: 201, name: "Program 2", checked: false}
+        ]
+        disaggregation.id = "new"
+        disaggregation.disaggregation_type = "New Disagg"
+        let wrapper = shallow(<DisaggregationType
+            programs={programsForRetro}
+            disaggregation={disaggregation}
+            expanded={true}
+            errors={{}}
+        />);
+        expect(wrapper.containsMatchingElement(<RetroProgramCheckBoxWrapper />)).toEqual(false);
+        wrapper.setState({selected_by_default: true})
+        expect(wrapper.containsMatchingElement(<RetroProgramCheckBoxWrapper />)).toEqual(true);
+
+        disaggregation.id = "new"
+        wrapper = shallow(<DisaggregationType
+            programs={programsForRetro}
+            disaggregation={disaggregation}
+            expanded={true}
+            errors={{}}
+        />);
+        expect(wrapper.containsMatchingElement(<RetroProgramCheckBoxWrapper />)).toEqual(false);
     });
-    it("doesn't display programs on create if type not selected as default", () => {
-    });
-    it("only displays programs on create and if type selected as default", () => {
-    });
+
     it("displays programs in alpha order", () => {
+        const programsForRetro = [
+            {id: 201, name: "Program 2", checked: false},
+            {id: 200, name: "Program 1", checked: false}
+
+        ]
+        let wrapper = mount(<RetroProgramCheckBoxWrapper programs={programsForRetro}/>);
+        let checkBoxList = wrapper.find(CheckBoxList)
+        expect(checkBoxList.props().checkBoxOptions).toEqual(programsForRetro.reverse())
     });
+
+    // See note on next test about why this one is skipped.  Because that test isn't working right, this one
+    // probably isn't working right either, even though it's passing.
     it.skip("doesn't include programs in saved data when none are checked", () => {
         const programsForRetro = [
             {id: 200, name: "Program 1", checked: false},
@@ -160,17 +198,19 @@ describe("Country admin disagg presentation components", () => {
         ]
         const disaggregation = store.editing_disaggregations_data[0]
         disaggregation.id = "new"
-        let component = shallow(<DisaggregationType
+        let wrapper = shallow(<DisaggregationType
             programs={programsForRetro}
             disaggregation={disaggregation}
             saveDisaggregation={(data) => saveDisaggregation(data)}
         />)
-        component.instance().save()
+        wrapper.instance().save()
         expect(saveDisaggregation.mock.calls[0][0]).toEqual(disaggregation)
 
 
     });
-    // The true value on the Program 2 checked value is not picked up by the save() method what the test runs.
+    // Skipping because the value of the "checked" property of Program 2 in programsForRetro isn't being
+    // picked up when the save method is called.  An object with getter/setter values gets sent to the
+    // saveDisaggregation mock, instead of a plain object.  Could this be because it's a MobX observable?
     it.skip("includes programs in saved data when one or more are checked", () => {
         const programsForRetro = [
             {id: 200, name: "Program 1", checked: false},
@@ -180,12 +220,12 @@ describe("Country admin disagg presentation components", () => {
         disaggregation.selected_by_default = true;
         disaggregation.id = "new"
         disaggregation.disaggregation_type = "New Disagg"
-        let component = mount(<DisaggregationType
+        let wrapper = mount(<DisaggregationType
             programs={programsForRetro}
             disaggregation={disaggregation}
             saveDisaggregation={(data) => saveDisaggregation(data)}
         />)
-        component.instance().save()
+        wrapper.instance().save()
         let expectedValue = {...disaggregation}
         expectedValue.retroPrograms = [201]
         expect(saveDisaggregation.mock.calls[0][0]).toEqual(expectedValue)
