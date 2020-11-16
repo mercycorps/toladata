@@ -141,6 +141,13 @@
     }
 }
 
+.disaggregation-programs {
+    max-height: 12rem;
+    overflow: auto;
+    border: 1px solid $gray-400;
+    padding: .25rem;
+}
+
 // expand/collapse toggles
 // TODO: Lots of overlap here with other implementations
 .expando-toggle {

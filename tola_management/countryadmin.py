@@ -2,13 +2,9 @@ from collections import OrderedDict
 import json
 from django.db import transaction
 from django.db.models import Q
-from rest_framework import viewsets
+from django.utils.translation import ugettext_lazy as _
+from rest_framework import viewsets, status, serializers, permissions, pagination
 from rest_framework.response import Response
-from rest_framework import status
-
-from rest_framework import serializers
-from rest_framework import permissions
-from rest_framework import pagination
 from rest_framework.decorators import action
 
 
@@ -252,7 +248,6 @@ class CountryDisaggregationSerializer(serializers.ModelSerializer):
 
     @transaction.atomic
     def create(self, validated_data):
-
         labels = validated_data.pop('disaggregationlabel_set')
         instance = super(CountryDisaggregationSerializer, self).create(validated_data)
         for label in labels:
@@ -268,7 +263,20 @@ class CountryDisaggregationSerializer(serializers.ModelSerializer):
             new_entry=json.dumps(instance.logged_fields),
         )
 
+        if 'retroPrograms' in self.context:
+            country_program_ids = set(instance.country.program_set.all().values_list('pk', flat=True))
+
+            # We should never run into this case where the programs in the post are not linked to the country in the
+            # post, but just in case it does somehow happen...
+            if not set(self.context['retroPrograms']).issubset(country_program_ids):
+                # Translators:  This is an error message when a user has submitted changes to something they don't have access to
+                raise serializers.ValidationError(_("Program list inconsistent with country access"))
+
+            for program in Program.objects.filter(pk__in=self.context['retroPrograms']):
+                instance.indicator_set.add(*list(program.indicator_set.all()))
+
         return instance
+
 
 class CountryDisaggregationViewSet(viewsets.ModelViewSet):
     serializer_class = CountryDisaggregationSerializer
@@ -317,6 +325,10 @@ class CountryDisaggregationViewSet(viewsets.ModelViewSet):
     def get_serializer_context(self):
         context = super(CountryDisaggregationViewSet, self).get_serializer_context()
         context['tola_user'] = self.request.user.tola_user
+        try:
+            context['retroPrograms'] = self.request.data['retroPrograms']
+        except KeyError:
+            pass
         return context
 
 

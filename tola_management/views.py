@@ -220,6 +220,12 @@ def get_program_page_context(request):
     }
 
 
+class CountryProgramSerializer(ModelSerializer):
+    class Meta:
+        model = Program
+        fields = ['id', 'name', 'country']
+
+
 def get_country_page_context(request):
     auth_user = request.user
     tola_user = auth_user.tola_user
@@ -244,18 +250,12 @@ def get_country_page_context(request):
         program_queryset = tola_user.managed_programs
     else:
         program_queryset = Program.rf_aware_objects.all()
-    programs = [
-        {
-            'id': program.id,
-            'name': program.name,
-        } for program in program_queryset
-    ]
 
     return {
         'is_superuser': request.user.is_superuser,
         'countries': countries,
         'organizations': organizations,
-        'programs': programs,
+        'programs': CountryProgramSerializer(program_queryset, many=True).data,
     }
 
 

@@ -417,7 +417,7 @@ class ProgramAdminViewSet(viewsets.ModelViewSet):
     @classmethod
     def base_queryset(cls):
         """this adds annotations for the "users" and "organizations" links using annotations
-        
+
             For performance reasons, looking up every user with permission to see the program individually for
             all 20+ in a paginated set was costly.  This annotates the information in one (admittedly spendy) query
         """

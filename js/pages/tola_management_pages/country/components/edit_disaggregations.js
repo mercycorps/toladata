@@ -1,4 +1,5 @@
 import React from 'react'
+import { observable, runInAction } from 'mobx'
 import { observer } from "mobx-react"
 import { DragDropContext, Droppable, Draggable } from 'react-beautiful-dnd';
 import classNames from 'classnames'
@@ -166,9 +167,80 @@ const DisaggregationCategoryList = observer(
     )
 );
 
+export let CheckBoxList = props => {
+    return props.checkBoxOptions.map(option => {
+        return (
+            <label className="mb-1" key={option.id}>
+                <input
+                    type="checkbox"
+                    className="align-text-top"
+                    autoComplete="false"
+                    name={option.name}
+                    value={option.name}
+                    checked={option.checked ?? false}
+                    onChange={(e) => props.onUpdate(option.id, e.target.checked)}/>
+                <span className="ml-2">{option.name}</span>
+            </label>
+        )
+    })
+}
 
 @observer
-class DisaggregationType extends React.Component {
+export class RetroProgramCheckBoxWrapper extends React.Component {
+    constructor(props) {
+        super(props);
+        this.retroactiveAssignmentPopup = React.createRef();
+        this.state = { programsExpanded: false}
+    }
+
+    componentDidMount() {
+        if (this.retroactiveAssignmentPopup.current) {
+            $(this.retroactiveAssignmentPopup.current).popover({
+                html: true
+            });
+        }
+    }
+
+    expandPrograms() {
+        this.setState({programsExpanded: !this.state.programsExpanded})
+    }
+
+    render() {
+        let checkBoxOptions = Object.values(this.props.programs).sort((a, b) => a.name < b.name ? -1 : 1);
+        let checkBoxComponent = null;
+        if (this.state.programsExpanded) {
+            checkBoxComponent =
+                <div id="disagg-admin__programs" className="ml-2 mt-2 d-flex flex-column disaggregation-programs">
+                    <CheckBoxList checkBoxOptions={checkBoxOptions} onUpdate={this.props.onRetroUpdate}/>
+                </div>
+        }
+        // # Translators: This is text provided when a user clicks a help link.  It allows users to select which elements they want to apply the changes to.
+        const helpText = gettext('<p>Select a program if you plan to disaggregate all or most of its indicators by these categories.</p><p><span class="text-danger">This bulk assignment cannot be undone.</span> But you can always manually remove the disaggregation from individual indicators.</p>')
+        return (
+            <div className="mt-2 ml-4">
+                 <a onClick={this.expandPrograms.bind(this)} className="btn accordion-row__btn btn-link disaggregation--retro-programs__header" tabIndex='0'>
+                    <FontAwesomeIcon icon={this.state.programsExpanded ? 'caret-down' : 'caret-right'} />
+                    {/* # Translators: This feature allows a user to apply changes to existing programs as well as ones created in the future */}
+                    <span className="mr-1">{gettext("Assign new disaggregation to all indicators in a program")}</span>
+                </a>
+
+                <HelpPopover
+                    key={1}
+                    content={helpText}
+                    placement="right"
+                    innerRef={this.retroactiveAssignmentPopup}
+                    // # Translators: this is alt text for a help icon
+                    ariaText={gettext('More information on assigning disaggregations to existing indicators')}
+                />
+                { checkBoxComponent }
+            </div>
+        )
+    }
+}
+
+@observer
+export class DisaggregationType extends React.Component {
+
     constructor(props) {
         super(props)
         const {disaggregation} = this.props
@@ -176,6 +248,11 @@ class DisaggregationType extends React.Component {
             ...disaggregation,
             labels: this.orderLabels(disaggregation.labels)
         };
+        this.programsForRetro = observable(props.programs.reduce( (accum, program) => {
+            accum[program.id] = {id: program.id, name: program.name, checked: false}
+            return accum
+        }, {}))
+
         this.labelsCreated = 0;
         this.selectedByDefaultPopup = React.createRef();
     }
@@ -186,7 +263,12 @@ class DisaggregationType extends React.Component {
 
     hasUnsavedDataAction() {
         const labels = this.props.disaggregation.labels.map(x => ({...x}));
-        this.props.onIsDirtyChange(JSON.stringify(this.state) != JSON.stringify({...this.props.disaggregation, labels: [...labels]}))
+        const changedDisaggs = JSON.stringify(this.state) !== JSON.stringify({
+            ...this.props.disaggregation,
+            labels: [...labels],
+        })
+        const changedRetro = Object.values(this.programsForRetro).some( programObj => programObj.checked)
+        this.props.onIsDirtyChange(changedDisaggs || changedRetro)
     }
 
     componentDidUpdate = () => {
@@ -249,6 +331,13 @@ class DisaggregationType extends React.Component {
         }, () => this.hasUnsavedDataAction());
     }
 
+    updateRetroPrograms(id, checked) {
+        runInAction(() => {
+            this.programsForRetro[id]['checked'] = checked
+        })
+        this.hasUnsavedDataAction()
+    }
+
     updateLabel(labelIndex, updatedValues) {
         let labels = this.state.labels;
         labels[labelIndex] = { ...labels[labelIndex], ...updatedValues };
@@ -288,18 +377,27 @@ class DisaggregationType extends React.Component {
     }
 
     save() {
-        this.props.saveDisaggregation(this.state)
+        let savedData = {...this.state}
+        const retroPrograms = Object.values(this.programsForRetro).filter( program => program.checked )
+        if (retroPrograms.length > 0) {
+            savedData['retroPrograms'] = retroPrograms.map(programObj => programObj.id)
+        }
+        this.props.saveDisaggregation(savedData)
     }
 
     render() {
-        const {disaggregation, expanded, expandAction, deleteAction, archiveAction, unarchiveAction, errors} = this.props
-        const managed_data = this.state
+        const {disaggregation, expanded, expandAction, deleteAction, archiveAction, unarchiveAction, errors} = this.props;
+        const managed_data = this.state;
+        const retroPrograms = (managed_data.selected_by_default && managed_data.id === "new") ? <RetroProgramCheckBoxWrapper
+                programs={this.programsForRetro}
+                onRetroUpdate={this.updateRetroPrograms.bind(this)}/>
+            : null
         return (
             <div className="accordion-row">
                 <div className="accordion-row__content">
                     <a onClick={() => {expandAction(this.resetForm.bind(this));}} className="btn accordion-row__btn btn-link" tabIndex='0'>
                         <FontAwesomeIcon icon={expanded ? 'caret-down' : 'caret-right'} />
-                        {(disaggregation.id == 'new') ? "New disaggregation" : disaggregation.disaggregation_type}
+                        {(disaggregation.id === 'new') ? "New disaggregation" : disaggregation.disaggregation_type}
                     </a>
                     {disaggregation.is_archived && <span className="text-muted font-weight-bold ml-2">(Archived)</span>}
                     {expanded && (
@@ -323,7 +421,6 @@ class DisaggregationType extends React.Component {
                                     <input className="form-check-input" type="checkbox" checked={managed_data.selected_by_default}
                                            onChange={(e) => {this.updateSelectedByDefault(e.target.checked)}} id="selected-by-default-checkbox"
                                             disabled={disaggregation.is_archived} />
-                                    <nobr>
                                     <label className="form-check-label mr-2" htmlFor="selected-by-default-checkbox">
                                     {
                                         // # Translators: This labels a checkbox, when checked, it will make the associated item "on" (selected) for all new indicators
@@ -338,8 +435,8 @@ class DisaggregationType extends React.Component {
                                         innerRef={this.selectedByDefaultPopup}
                                         ariaText={gettext('More information on "selected by default"')}
                                     />
-                                    </nobr>
                                 </div>
+                                {retroPrograms}
                             </div>
                             <div className="form-group" style={ {marginTop: '8px'} }    >
                                 <div className="row">
@@ -412,6 +509,8 @@ class DisaggregationType extends React.Component {
 }
 
 
+
+
 @observer
 export default class EditDisaggregations extends React.Component {
     constructor(props) {
@@ -453,7 +552,7 @@ export default class EditDisaggregations extends React.Component {
                     origSelectedByDefault: selectedByDefault
                 });
             }
-            if(expanded_id == 'new') {
+            if(expanded_id === 'new') {
                 this.onDelete(expanded_id);
             }
             this.handleDirtyUpdate(false)
@@ -477,35 +576,36 @@ export default class EditDisaggregations extends React.Component {
 
     onSaveChangesPress(data) {
         if ( this.state.origSelectedByDefault !== data.selected_by_default ){
-            if (data.selected_by_default) {
-                create_unified_changeset_notice({
-                    header: gettext("Warning"),
-                    show_icon: true,
-                    // # Translators:  This is a warning popup when the user tries to do something that has broader effects than they might anticipate
-                    preamble: interpolate(gettext("This disaggregation will be automatically selected for all new indicators in %s. Existing indicators will be unaffected."), [gettext(this.props.countryName)]),
-                    // # Translators: This is the prompt on a popup that has warned users about a change they are about to make that could have broad consequences
-                    message_text: gettext("Are you sure you want to continue?"),
-                    notice_type: 'notice',
-                    showCloser: true,
-                    on_submit: () => this.saveDisaggregation(data),
-                    on_cancel: () => {}
-                })
+            let preamble = ""
+            if (data.selected_by_default && data.hasOwnProperty('retroPrograms')) {
+                // # Translators:  This is a warning popup when the user tries to do something that has broader effects than they might anticipate
+                preamble = interpolate(ngettext(
+                    // # Translators:  Warning message about how the new type of disaggregation the user has created will be applied to existing and new data
+                    "This disaggregation will be automatically selected for all new indicators in %s and for existing indicators in %s program.",
+                    "This disaggregation will be automatically selected for all new indicators in %s and for existing indicators in %s programs.",
+                    data.retroPrograms.length
+                ), [gettext(this.props.countryName), data.retroPrograms.length])
+            }
+            else if (data.selected_by_default) {
+                // # Translators:  This is a warning popup when the user tries to do something that has broader effects than they might anticipate
+                preamble = interpolate(gettext("This disaggregation will be automatically selected for all new indicators in %s. Existing indicators will be unaffected."), [gettext(this.props.countryName)])
             }
             else {
-                create_unified_changeset_notice({
-                    header: gettext("Warning"),
-                    show_icon: true,
-                    // # Translators:  This is a warning popup when the user tries to do something that has broader effects than they might anticipate
-                    preamble: interpolate(gettext("This disaggregation will no longer be automatically selected for all new indicators in %s. Existing indicators will be unaffected."), [this.props.countryName]),
-                    // # Translators: This is the prompt on a popup that has warned users about a change they are about to make that could have broad consequences
-                    message_text: gettext("Are you sure you want to continue?"),
-                    notice_type: "notice",
-                    showCloser: true,
-                    on_submit: () => this.saveDisaggregation(data),
-                    on_cancel:()=>{}
-                })
+                // # Translators:  This is a warning popup when the user tries to do something that has broader effects than they might anticipate
+                preamble = interpolate(gettext("This disaggregation will no longer be automatically selected for all new indicators in %s. Existing indicators will be unaffected."), [this.props.countryName])
             }
 
+            create_unified_changeset_notice({
+                header: gettext("Warning"),
+                show_icon: true,
+                preamble: preamble,
+                // # Translators: This is the prompt on a popup that has warned users about a change they are about to make that could have broad consequences
+                message_text: gettext("Are you sure you want to continue?"),
+                notice_type: "notice",
+                showCloser: true,
+                on_submit: () => this.saveDisaggregation(data),
+                on_cancel: () => {}
+            })
         }
         else{
             this.saveDisaggregation(data);
@@ -551,6 +651,7 @@ export default class EditDisaggregations extends React.Component {
                     <DisaggregationType
                         key={disaggregation.id}
                         disaggregation={disaggregation}
+                        programs={this.props.programs}
                         expanded={disaggregation.id==expanded_id}
                         assignLabelErrors={this.props.assignLabelErrors}
                         expandAction={(callback) => this.toggleExpand(disaggregation.id, callback)}

@@ -59,7 +59,6 @@ export class CountryStore {
         api,
         initialData,
     ) {
-        this
         this.api = api
         Object.assign(this, initialData)
         this.appliedFilters = {...this.filters}
@@ -75,6 +74,10 @@ export class CountryStore {
             }
             return xs
         }, {})
+    }
+
+    getCountryPrograms(countryID) {
+        return this.allPrograms.filter((program) => program.country.includes(countryID))
     }
 
     @action
@@ -196,8 +199,17 @@ export class CountryStore {
         }
     }
 
-    onSaveSuccessHandler() {
-        PNotify.success({text: gettext("Successfully saved"), delay: 5000});
+    onSaveSuccessHandler({retroProgramCount}={}) {
+        let message = gettext("Successfully saved")
+        if (retroProgramCount) {
+            message = interpolate(ngettext(
+                // # Translators: Success message shown to user when a new disaggregation has been saved and associated with existing data.
+                "Disaggregation saved and automatically selected for all indicators in %s program.",
+                "Disaggregation saved and automatically selected for all indicators in %s programs.",
+                retroProgramCount
+            ), [retroProgramCount])
+        }
+        PNotify.success({text: message, delay: 5000});
     }
 
     onSaveErrorHandler(message) {
@@ -545,11 +557,12 @@ export class CountryStore {
             this.saving = false;
             return Promise.reject("Validation failed") ;
         }
+        const retroProgramCount = data.hasOwnProperty('retroPrograms') ? data.retroPrograms.length : 0
 
         return this.api.createDisaggregation(data).then(response => {
             this.updateHistory(response.data.country);
             return runInAction(() => {
-                this.onSaveSuccessHandler();
+                this.onSaveSuccessHandler({retroProgramCount: retroProgramCount});
                 const newDisaggregation = response.data;
                 this.editing_history = history.data;
                 this.active_pane_is_dirty = false;
