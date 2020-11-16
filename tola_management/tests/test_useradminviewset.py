@@ -234,6 +234,11 @@ class TestUserAdminViewSet(test.TestCase):
         self.assertIn(admin_user2.pk, user_pks)
         self.assertIn(admin_user3.pk, user_pks)
         self.assertIn(self.superadmin.pk, user_pks)
+        response = self.get_response(**{'admin_role': 0})
+        user_pks = self.get_pks(response, count=3)
+        self.assertIn(non_admin1.pk, user_pks)
+        self.assertIn(non_admin2.pk, user_pks)
+        self.assertIn(non_admin3.pk, user_pks)
 
     def test_status_filter(self):
         active_user = self.get_user()

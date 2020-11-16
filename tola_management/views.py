@@ -560,7 +560,7 @@ class UserAdminViewSet(viewsets.ModelViewSet):
             queryset = queryset.filter(user__is_active=user_status)
 
         is_admin = req.GET.get('admin_role')
-        if is_admin:
+        if is_admin == '1' or is_admin == '0':
             queryset = queryset.annotate(
                 country_admin=models.Exists(
                     CountryAccess.objects.filter(
@@ -569,10 +569,16 @@ class UserAdminViewSet(viewsets.ModelViewSet):
                     )
                 )
             )
-            queryset = queryset.filter(
-                models.Q(user__is_superuser=True) |
-                models.Q(country_admin=True)
-            )
+            if is_admin == '1':
+                queryset = queryset.filter(
+                    models.Q(user__is_superuser=True) |
+                    models.Q(country_admin=True)
+                )
+            else:
+                queryset = queryset.filter(
+                    models.Q(user__is_superuser=False) &
+                    models.Q(country_admin=False)
+                )
 
         users = req.GET.getlist('users[]')
         if users:
