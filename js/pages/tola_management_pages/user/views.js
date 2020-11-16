@@ -340,10 +340,12 @@ export const IndexView = observer(
                                         {data.organization_name || "---"}
                                     </Col>
                                     <Col className="text-nowrap">
+                                    {data.user_programs ?
                                         <a href={`/tola_management/program/?users[]=${data.id}`}>
                                             <i className="fas fa-cubes"/>&nbsp;
                                             {data.user_programs} {gettext("programs")}
                                         </a>
+                                        : '---'}
                                     </Col>
                                     <Col size="0.25">{data.is_active?gettext('Active'):gettext('Inactive')}</Col>
                                 </Row>
