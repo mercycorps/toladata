@@ -2,18 +2,15 @@
 
 **The build status of the dev branch is: [![Build Status](https://travis-ci.org/mercycorps/TolaActivity.svg?branch=dev)](https://travis-ci.org/mercycorps/TolaActivity)**
 
-[TolaActivity](http://www.github.com/toladata/TolaActivity) extends
-the functionality of [TolaData](https://www.toladata.com/) to include a
-set of forms and reports for managing project activities for a Program. It
-includes workflow for approving and completing projects as well as sharing
-the output data. TolaActivity functionality is intended to allow importing
-and exporting of project-specific data from 3rd party data sources or
-excel files.
+TolaActivity is a software tool that is used to track program performance
+of development work across the globe.  It includes the ability to set periodic
+targets for each program indicator, track those targets over time, and generate
+filterable IPTT reports on demand.  It also includes a flexible Results Framework
+builder to enable hierarchical organization of indicators.
 
 # Creating a local TolaActivity instance
 
-Running a local instance of TolaActivity makes development much faster and
-eliminates your dependence on access to any of MC's TolaActivity instances.
+Running a local instance of TolaActivity makes development much faster.
 These instructions should get you up and running with a minimum of fuss if
 you have [macOS](#macos) or one of the many [Ubunten](#ubuntu). If they do
 not, we accept pull requests updating it. :)
@@ -24,7 +21,9 @@ to a rich text format, so make sure you are saving plain text.
 
 ## Install software dependencies
 
-TolaActivity requires Python 2. These instructions assume MySQL is being used as Django's datastore.
+At this itme, TolaActivity requires both Python 2 and Python 3. It has been thoroughly tested with versions
+2.7 and 3.6, and lightly tested with version 3.8.  Python 2 is necessary satisfy a dependency in a node module.
+These instructions assume MySQL is being used as Django's datastore.  Version 5.7 has been thoroughly tested, but version 8 should work as well.
 
 ### macOS
 
@@ -41,6 +40,7 @@ a dump of an existing TolaActivity database.
 
 At the Terminal command line:
 ```bash
+$ brew install python@3
 $ brew install python@2
 $ brew install mysql@5.7
 ```
@@ -70,7 +70,7 @@ You should now also start the mysql server:
 brew services start mysql
 ```
 
-Now you're ready to [install and configure the source files](#Install the source files).
+Now you're ready to [install and configure the source files](#Install and configure the TolaActivity source files).
 
 
 ### Windows
@@ -103,6 +103,15 @@ $ sudo apt-get install libcairo2-dev libpango1.0-dev
 $ sudo apt install virtualenv
 ```
 
+Note that some users have had to manually build the libxml2 library, as mentioned in the [python-xmlsec documentation](https://xmlsec.readthedocs.io/en/latest/install.html).
+
+```bash
+wget http://xmlsoft.org/sources/libxml2-2.9.1.tar.gz
+tar -xvf libxml2-2.9.1.tar.gz
+cd libxml2-2.9.1
+./configure && make && make install
+```
+
 Note that some users have had to manually build the libxml2 library, as mentioned in the [python-xmlsec documentation](https://xmlsec.readthedocs.io/en/latest/install.html)
 
 ```bash
@@ -117,7 +126,7 @@ You should now also start the mysql server:
 sudo service mysql start
 ```
 
-Now you're ready to [install and configure the source files](#Install the source files).
+Now you're ready to install and configure the TolaData source files.
 
 
 ## Install and configure the TolaActivity source files

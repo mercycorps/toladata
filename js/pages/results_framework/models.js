@@ -38,6 +38,7 @@ export class LevelStore {
         this.usingResultsFramework = usingResultsFramework;
         this.formErrors = {hasError: false};
         this.maxTiers = maxTiers;
+        this.excelURL = `/indicators/results_framework_export/${program.id}/`;
 
         this.tierTemplates = JSON.parse(tierTemplates);
         this.tierTemplates[this.customTierSetKey] = {name: gettext("Custom")};
