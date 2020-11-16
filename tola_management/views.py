@@ -927,6 +927,7 @@ class OrganizationAdminViewSet(viewsets.ModelViewSet):
 
     @classmethod
     def base_queryset(cls):
+        """Annotates an Organization queryset for user count and program count"""
         num_programs = Program.rf_aware_objects.count()
         queryset = Organization.objects.all()
         queryset = queryset.annotate(
@@ -943,17 +944,24 @@ class OrganizationAdminViewSet(viewsets.ModelViewSet):
         return queryset
 
     def get_queryset(self):
+        """kept separated to allow for testing dependency injection (getting just the base queryset as classmethod)"""
         queryset = self.base_queryset()
         return queryset
 
     def list(self, request):
+        """get the queryset with annotations, restrict based on filter params from request"""
         queryset = self.get_queryset()
+        # first three (simple) filters directly filter queryset:
         if request.GET.getlist('sectors[]'):
             queryset = queryset.filter(sectors__in=request.GET.getlist('sectors[]'))
         if request.GET.get('organization_status') is not None:
             queryset = queryset.filter(is_active=request.GET.get('organization_status'))
+        if request.GET.getlist('organizations[]'):
+            queryset = queryset.filter(id__in=request.GET.getlist('organizations[]'))
         program_pks = request.GET.getlist('programs[]')
         country_pks = request.GET.getlist('countries[]')
+        # to avoid bad join math, if program or country filters required, get a separate queryset with just IDs
+        # this keeps counts correct despite the outer joins to country- and program-access needed to filter:
         if program_pks or country_pks:
             program_access = ProgramAccess.objects.all()
             country_access = CountryAccess.objects.all()
@@ -968,8 +976,6 @@ class OrganizationAdminViewSet(viewsets.ModelViewSet):
             country_access_ids = country_access.values_list('tolauser__organization_id', flat=True)
             organization_ids = set(list(program_access_ids) + list(country_access_ids) + list(su_orgs))
             queryset = queryset.filter(id__in=organization_ids)
-        if request.GET.getlist('organizations[]'):
-            queryset = queryset.filter(id__in=request.GET.getlist('organizations[]'))
         page = self.paginate_queryset(list(queryset))
         if page is not None:
             serializer = OrganizationAdminSerializer(page, many=True)
@@ -986,7 +992,8 @@ class OrganizationAdminViewSet(viewsets.ModelViewSet):
 
     @action(detail=True, methods=['GET'])
     def aggregate_data(self, request, pk=None):
-        print("request {} pk {}".format(request, pk))
+        # Is this in use?  This does not appear to be called anywhere.  Marking deprecated, will remove
+        # after confirming
         if not pk:
             return Response({}, status=status.HTTP_400_BAD_REQUEST)
 

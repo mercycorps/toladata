@@ -56,8 +56,6 @@ class CountryAdminSerializer(serializers.ModelSerializer):
     description = serializers.CharField(allow_blank=True, required=False)
     code = serializers.CharField(max_length=4, allow_blank=True, required=False)
     programs_count = serializers.IntegerField(read_only=True)
-    # users_count = serializers.IntegerField(read_only=True)
-    # organizations_count = serializers.IntegerField(read_only=True)
     users_count = serializers.SerializerMethodField()
     organizations_count = serializers.SerializerMethodField()
 
@@ -74,15 +72,18 @@ class CountryAdminSerializer(serializers.ModelSerializer):
         )
 
     def get_users_count(self, country):
+        """These are prefetched so it isn't DB-expensive, but math done in Python to avoid bad join counts"""
         return len(set(
             [ca.tolauser_id for ca in country.country_users] + [pa.tolauser_id for pa in country.program_users]
         )) + country.su_count
 
     def get_organizations_count(self, country):
+        """As above: prefetched rows are counted in python to avoid join-math issues"""
         org_ids = set(
             [ca.tolauser.organization_id for ca in country.country_users] +
             [pa.tolauser.organization_id for pa in country.program_users] +
-            ([1] if country.su_count else [])
+            # if there are any superusers, then Mercy Corps is included in the count:
+            ([Organization.MERCY_CORPS_ID] if country.su_count else [])
         )
         return len(org_ids)
 
@@ -94,6 +95,7 @@ class CountryAdminViewSet(viewsets.ModelViewSet):
 
     @staticmethod
     def annotate_queryset(queryset):
+        """Annotates a queryset of Countries with program count and prefetches to calculate user count"""
         su_count = TolaUser.objects.filter(user__is_superuser=True).count()
         queryset = queryset.annotate(
             programs_count=models.Count('program', distinct=True),
@@ -118,6 +120,7 @@ class CountryAdminViewSet(viewsets.ModelViewSet):
         return queryset
 
     def get_queryset(self):
+        """Select countries user can manage, annotate queryset with counts, filter based on provided params"""
         auth_user = self.request.user
         tola_user = auth_user.tola_user
         params = self.request.query_params
@@ -160,7 +163,6 @@ class CountryAdminViewSet(viewsets.ModelViewSet):
 
 
 class CountryObjectiveSerializer(serializers.ModelSerializer):
-    #id = serializers.IntegerField(allow_null=True, required=False)
     country = serializers.PrimaryKeyRelatedField(queryset=Country.objects.all())
     name = serializers.CharField(required=True, allow_blank=False, max_length=135)
     description = serializers.CharField(max_length=765, allow_blank=True, required=False)

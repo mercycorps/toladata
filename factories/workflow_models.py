@@ -54,6 +54,7 @@ class CountryFactory(DjangoModelFactory):
 
     @lazy_attribute_sequence
     def code(self, n):
+        """Allows for 676 unique codes from AA to ZZ, call CountryFactory.reset_sequence() if you run out"""
         if n // 26 >= 26:
             raise ValueError('Too many countries to store in ISO code, reached sequence {}'.format(n))
         return '{}{}'.format(string.ascii_uppercase[n//26], string.ascii_uppercase[n % 26])
@@ -72,6 +73,7 @@ class OrganizationFactory(DjangoModelFactory):
 
     @post_generation
     def sectors(self, create, extracted, **kwargs):
+        """M2M fails unless this is explicitly called out as a post_generation hook"""
         if not create:
             # simple build, do nothing
             return

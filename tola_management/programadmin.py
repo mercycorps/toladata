@@ -530,6 +530,7 @@ class ProgramAdminViewSet(viewsets.ModelViewSet):
         return queryset
 
     def get_queryset(self):
+        """Get programs user has access to, annotate for counts, and filter based on provided params from request"""
         auth_user = self.request.user
         params = self.request.query_params
 
