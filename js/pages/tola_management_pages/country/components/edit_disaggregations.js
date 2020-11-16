@@ -580,6 +580,7 @@ export default class EditDisaggregations extends React.Component {
             if (data.selected_by_default && data.hasOwnProperty('retroPrograms')) {
                 // # Translators:  This is a warning popup when the user tries to do something that has broader effects than they might anticipate
                 preamble = interpolate(ngettext(
+                    // # Translators:  Warning message about how the new type of disaggregation the user has created will be applied to existing and new data
                     "This disaggregation will be automatically selected for all new indicators in %s and for existing indicators in %s program.",
                     "This disaggregation will be automatically selected for all new indicators in %s and for existing indicators in %s programs.",
                     data.retroPrograms.length

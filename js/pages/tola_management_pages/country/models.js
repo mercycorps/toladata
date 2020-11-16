@@ -203,6 +203,7 @@ export class CountryStore {
         let message = gettext("Successfully saved")
         if (retroProgramCount) {
             message = interpolate(ngettext(
+                // # Translators: Success message shown to user when a new disaggregation has been saved and associated with existing data.
                 "Disaggregation saved and automatically selected for all indicators in %s program.",
                 "Disaggregation saved and automatically selected for all indicators in %s programs.",
                 retroProgramCount
