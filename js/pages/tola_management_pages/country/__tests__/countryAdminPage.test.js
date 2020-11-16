@@ -190,8 +190,6 @@ describe("Country admin disagg presentation components", () => {
         expect(checkBoxList.props().checkBoxOptions).toEqual(programsForRetro.reverse());
     });
 
-    // See note on next test about why this one is skipped.  Because that test isn't working right, this one
-    // probably isn't working right either, even though it's passing.
     it("doesn't include programs in saved data when none are checked", () => {
         const programsForRetro = [
             {id: 200, name: "Program 1", checked: false},
@@ -212,9 +210,7 @@ describe("Country admin disagg presentation components", () => {
 
 
     });
-    // Skipping because the value of the "checked" property of Program 2 in programsForRetro isn't being
-    // picked up when the save method is called.  An object with getter/setter values gets sent to the
-    // saveDisaggregation mock, instead of a plain object.  Could this be because it's a MobX observable?
+
     it("includes programs in saved data when one or more are checked", () => {
         const programsForRetro = [
             {id: 200, name: "Program 1", checked: false},
