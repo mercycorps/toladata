@@ -135,29 +135,29 @@ describe("Country admin retroactive disagg features in store", () => {
             {id: 2, name: "Program 2", country: [2]},
             {id: 3, name: "Program 3", country: [1]},
         ];
-        let filteredPrograms = store.getCountryPrograms(1)
-        expect(filteredPrograms.length).toEqual(2)
-        filteredPrograms = store.getCountryPrograms(2)
-        expect(filteredPrograms).toEqual([{id: 2, name: "Program 2", country: [2]}])
-        filteredPrograms = store.getCountryPrograms(3)
-        expect(filteredPrograms).toEqual([])
+        let filteredPrograms = store.getCountryPrograms(1);
+        expect(filteredPrograms.length).toEqual(2);
+        filteredPrograms = store.getCountryPrograms(2);
+        expect(filteredPrograms).toEqual([{id: 2, name: "Program 2", country: [2]}]);
+        filteredPrograms = store.getCountryPrograms(3);
+        expect(filteredPrograms).toEqual([]);
     });
 });
 
 describe("Country admin disagg presentation components", () => {
     let store = new CountryStore(api, {});
     store.editing_disaggregations_data = countryDisaggregationData;
-    let saveDisaggregation = jest.fn()
+    let saveDisaggregation = jest.fn();
 
     it("displays retro programs only on create and when selected by default is checked", () => {
 
-        const disaggregation = store.editing_disaggregations_data[0]
+        const disaggregation = store.editing_disaggregations_data[0];
         const programsForRetro = [
             {id: 200, name: "Program 1", checked: false},
             {id: 201, name: "Program 2", checked: false}
-        ]
-        disaggregation.id = "new"
-        disaggregation.disaggregation_type = "New Disagg"
+        ];
+        disaggregation.id = "new";
+        disaggregation.disaggregation_type = "New Disagg";
         let wrapper = shallow(<DisaggregationType
             programs={programsForRetro}
             disaggregation={disaggregation}
@@ -165,10 +165,10 @@ describe("Country admin disagg presentation components", () => {
             errors={{}}
         />);
         expect(wrapper.containsMatchingElement(<RetroProgramCheckBoxWrapper />)).toEqual(false);
-        wrapper.setState({selected_by_default: true})
+        wrapper.setState({selected_by_default: true});
         expect(wrapper.containsMatchingElement(<RetroProgramCheckBoxWrapper />)).toEqual(true);
 
-        disaggregation.id = "new"
+        disaggregation.id = "new";
         wrapper = shallow(<DisaggregationType
             programs={programsForRetro}
             disaggregation={disaggregation}
@@ -183,51 +183,55 @@ describe("Country admin disagg presentation components", () => {
             {id: 201, name: "Program 2", checked: false},
             {id: 200, name: "Program 1", checked: false}
 
-        ]
+        ];
         let wrapper = mount(<RetroProgramCheckBoxWrapper programs={programsForRetro}/>);
-        let checkBoxList = wrapper.find(CheckBoxList)
-        expect(checkBoxList.props().checkBoxOptions).toEqual(programsForRetro.reverse())
+        wrapper.setState({programsExpanded: true});
+        let checkBoxList = wrapper.find(CheckBoxList);
+        expect(checkBoxList.props().checkBoxOptions).toEqual(programsForRetro.reverse());
     });
 
     // See note on next test about why this one is skipped.  Because that test isn't working right, this one
     // probably isn't working right either, even though it's passing.
-    it.skip("doesn't include programs in saved data when none are checked", () => {
+    it("doesn't include programs in saved data when none are checked", () => {
         const programsForRetro = [
             {id: 200, name: "Program 1", checked: false},
             {id: 201, name: "Program 2", checked: false}
-        ]
-        const disaggregation = store.editing_disaggregations_data[0]
-        disaggregation.id = "new"
+        ];
+        const disaggregation = {...store.editing_disaggregations_data[0]};
+        disaggregation.id = "new";
+        disaggregation.selected_by_default = true;
         let wrapper = shallow(<DisaggregationType
             programs={programsForRetro}
             disaggregation={disaggregation}
             saveDisaggregation={(data) => saveDisaggregation(data)}
-        />)
-        wrapper.instance().save()
-        expect(saveDisaggregation.mock.calls[0][0]).toEqual(disaggregation)
+        />);
+        wrapper.setState({selected_by_default: true});
+        wrapper.instance().programsForRetro = programsForRetro;
+        wrapper.instance().save();
+        expect(saveDisaggregation.mock.calls[0][0]).toEqual(disaggregation);
 
 
     });
     // Skipping because the value of the "checked" property of Program 2 in programsForRetro isn't being
     // picked up when the save method is called.  An object with getter/setter values gets sent to the
     // saveDisaggregation mock, instead of a plain object.  Could this be because it's a MobX observable?
-    it.skip("includes programs in saved data when one or more are checked", () => {
+    it("includes programs in saved data when one or more are checked", () => {
         const programsForRetro = [
             {id: 200, name: "Program 1", checked: false},
             {id: 201, name: "Program 2", checked: true}
         ]
         let disaggregation = {...store.editing_disaggregations_data[0]}
-        disaggregation.selected_by_default = true;
         disaggregation.id = "new"
-        disaggregation.disaggregation_type = "New Disagg"
-        let wrapper = mount(<DisaggregationType
+        disaggregation.selected_by_default = true;
+        let wrapper = shallow(<DisaggregationType
             programs={programsForRetro}
             disaggregation={disaggregation}
             saveDisaggregation={(data) => saveDisaggregation(data)}
-        />)
-        wrapper.instance().save()
-        let expectedValue = {...disaggregation}
-        expectedValue.retroPrograms = [201]
-        expect(saveDisaggregation.mock.calls[0][0]).toEqual(expectedValue)
+        />);
+        wrapper.setState({selected_by_default: true});
+        wrapper.instance().programsForRetro = programsForRetro;
+        wrapper.instance().save();
+        disaggregation.retroPrograms = [201];
+        expect(saveDisaggregation.mock.calls[1][0]).toEqual(disaggregation);
     });
 });

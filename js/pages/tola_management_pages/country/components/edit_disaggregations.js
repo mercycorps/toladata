@@ -206,11 +206,18 @@ export class RetroProgramCheckBoxWrapper extends React.Component {
 
     render() {
         let checkBoxOptions = Object.values(this.props.programs).sort((a, b) => a.name < b.name ? -1 : 1);
+        let checkBoxComponent = null;
+        if (this.state.programsExpanded) {
+            checkBoxComponent =
+                <div id="disagg-admin__programs" className="ml-2 mt-2 d-flex flex-column disaggregation-programs">
+                    <CheckBoxList checkBoxOptions={checkBoxOptions} onUpdate={this.props.onRetroUpdate}/>
+                </div>
+        }
         // # Translators: This is text provided when a user clicks a help link.  It allows users to select which elements they want to apply the changes to.
         const helpText = gettext('<p>Select a program if you plan to disaggregate all or most of its indicators by these categories.</p><p><span class="text-danger">This bulk assignment cannot be undone.</span> But you can always manually remove the disaggregation from individual indicators.</p>')
         return (
-            <div className="mt-3 ml-4">
-                 <a onClick={this.expandPrograms.bind(this)} className="btn accordion-row__btn btn-link" tabIndex='0'>
+            <div className="mt-2 ml-4">
+                 <a onClick={this.expandPrograms.bind(this)} className="btn accordion-row__btn btn-link disaggregation--retro-programs__header" tabIndex='0'>
                     <FontAwesomeIcon icon={this.state.programsExpanded ? 'caret-down' : 'caret-right'} />
                     {/* # Translators: This feature allows a user to apply changes to existing programs as well as ones created in the future */}
                     <span className="mr-1">{gettext("Assign new disaggregation to all indicators in a program")}</span>
@@ -224,11 +231,7 @@ export class RetroProgramCheckBoxWrapper extends React.Component {
                     // # Translators: this is alt text for a help icon
                     ariaText={gettext('More information on assigning disaggregations to existing indicators')}
                 />
-
-                <div id="disagg-admin__programs" className="ml-2 mt-2 d-flex flex-column disaggregation-programs">
-                    <CheckBoxList checkBoxOptions={checkBoxOptions} onUpdate={this.props.onRetroUpdate}/>
-                </div>
-
+                { checkBoxComponent }
             </div>
         )
     }
@@ -382,9 +385,9 @@ export class DisaggregationType extends React.Component {
     }
 
     render() {
-        const {disaggregation, expanded, expandAction, deleteAction, archiveAction, unarchiveAction, errors} = this.props
-        const managed_data = this.state
-        const retroPrograms = (managed_data.selected_by_default /*&& managed_data.id === "new"*/) ? <RetroProgramCheckBoxWrapper
+        const {disaggregation, expanded, expandAction, deleteAction, archiveAction, unarchiveAction, errors} = this.props;
+        const managed_data = this.state;
+        const retroPrograms = (managed_data.selected_by_default && managed_data.id === "new") ? <RetroProgramCheckBoxWrapper
                 programs={this.programsForRetro}
                 onRetroUpdate={this.updateRetroPrograms.bind(this)}/>
             : null
@@ -548,7 +551,7 @@ export default class EditDisaggregations extends React.Component {
                     origSelectedByDefault: selectedByDefault
                 });
             }
-            if(expanded_id == 'new') {
+            if(expanded_id === 'new') {
                 this.onDelete(expanded_id);
             }
             this.handleDirtyUpdate(false)
@@ -575,7 +578,11 @@ export default class EditDisaggregations extends React.Component {
             let preamble = ""
             if (data.selected_by_default && data.hasOwnProperty('retroPrograms')) {
                 // # Translators:  This is a warning popup when the user tries to do something that has broader effects than they might anticipate
-                preamble = interpolate(gettext("This disaggregation will be automatically selected for all new indicators in %s and for existing indicators in %s programs."), [gettext(this.props.countryName), data.retroPrograms.length])
+                preamble = interpolate(ngettext(
+                    "This disaggregation will be automatically selected for all new indicators in %s and for existing indicators in %s program.",
+                    "This disaggregation will be automatically selected for all new indicators in %s and for existing indicators in %s programs.",
+                    data.retroPrograms.length
+                ), [gettext(this.props.countryName), data.retroPrograms.length])
             }
             else if (data.selected_by_default) {
                 // # Translators:  This is a warning popup when the user tries to do something that has broader effects than they might anticipate
