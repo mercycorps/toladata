@@ -325,9 +325,9 @@ class TestOrganizationsAdminFilters(test.TestCase):
     def test_countries_filters(self):
         # one country:
         data = self.get_organization_data(countries=[self.country1.pk])
-        self.assertEqual(data['count'], 2)
+        self.assertEqual(data['count'], 3)
         org_ids = [r['id'] for r in data['results']]
-        for org in [self.organization1, self.organization3]:
+        for org in [self.mc, self.organization1, self.organization3]:
             self.assertIn(org.pk, org_ids)
         # multiple countries:
         data = self.get_organization_data(countries=[self.country2.pk, self.country3.pk])
