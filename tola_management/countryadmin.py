@@ -73,15 +73,6 @@ class CountryAdminSerializer(serializers.ModelSerializer):
             'organizations_count'
         )
 
-    def _get_related_users(self, country):
-        if not hasattr(country, 'user_set'):
-                country.user_set = TolaUser.objects.filter(
-                models.Q(programaccess__country_id=country.id) |
-                models.Q(countryaccess__country_id=country.id) |
-                models.Q(user__is_superuser=True)
-            ).only('id', 'organization_id')
-        return country.user_set
-
     def get_users_count(self, country):
         return len(set(
             [ca.tolauser_id for ca in country.country_users] + [pa.tolauser_id for pa in country.program_users]
@@ -147,9 +138,14 @@ class CountryAdminViewSet(viewsets.ModelViewSet):
 
         organizationFilter = params.getlist('organizations[]')
         if organizationFilter:
+            program_access = ProgramAccess.objects.filter(
+                tolauser__organization_id__in=organizationFilter
+            ).values_list('country_id', flat=True)
+            country_access = CountryAccess.objects.filter(
+                tolauser__organization_id__in=organizationFilter
+            ).values_list('country_id', flat=True)
             queryset = queryset.filter(
-                Q(program__user_access__organization__in=organizationFilter) |
-                Q(users__organization__in=organizationFilter)
+                id__in=set(list(program_access) + list(country_access))
             )
 
         return queryset.distinct()

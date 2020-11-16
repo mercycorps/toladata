@@ -920,8 +920,6 @@ class OrganizationAdminAuditLogSerializer(ModelSerializer):
         )
 
 
-from silk.profiling.profiler import silk_profile
-
 class OrganizationAdminViewSet(viewsets.ModelViewSet):
     serializer_class = OrganizationSerializer
     pagination_class = Paginator
@@ -938,16 +936,6 @@ class OrganizationAdminViewSet(viewsets.ModelViewSet):
                     id=Organization.MERCY_CORPS_ID,
                     then=models.Value(num_programs)
                 ),
-                # default=models.functions.Coalesce( # coalesce so None is 0 (summable later)
-                #     models.Subquery(
-                #         ProgramAccess.objects.filter(
-                #             tolauser__organization_id=models.OuterRef('pk')
-                #         ).order_by().values('tolauser__organization_id').annotate(
-                #             programs_count=models.Count('program', distinct=True)
-                #         ).values('programs_count')[:1],
-                #         output_field=models.IntegerField()
-                #     ), 0
-                # ),
                 default=models.Count('tolauser__programaccess__program_id', distinct=True),
                 output_field=models.IntegerField()
             )
@@ -958,26 +946,30 @@ class OrganizationAdminViewSet(viewsets.ModelViewSet):
         queryset = self.base_queryset()
         return queryset
 
-    @silk_profile(name="List organizations")
     def list(self, request):
-        print("querying")
         queryset = self.get_queryset()
         if request.GET.getlist('sectors[]'):
             queryset = queryset.filter(sectors__in=request.GET.getlist('sectors[]'))
-        if request.GET.getlist('programs[]'):
-            queryset = queryset.filter(
-                models.Q(tolauser__programaccess__program__in=request.GET.getlist('programs[]')) |
-                models.Q(tolauser__countryaccess__country__program__in=request.GET.getlist('programs[]')) |
-                models.Q(tolauser__user__is_superuser=True)
-            )
-        if request.GET.getlist('countries[]'):
-            queryset = queryset.filter(
-                models.Q(tolauser__programaccess__country_id__in=request.GET.getlist('countries[]')) |
-                models.Q(tolauser__countryaccess__country_id__in=request.GET.getlist('countries[]'))
-            )
-            print("querying countries query {}".format(queryset.query))
         if request.GET.get('organization_status') is not None:
             queryset = queryset.filter(is_active=request.GET.get('organization_status'))
+        program_pks = request.GET.getlist('programs[]')
+        country_pks = request.GET.getlist('countries[]')
+        if program_pks or country_pks:
+            program_access = ProgramAccess.objects.all()
+            country_access = CountryAccess.objects.all()
+            su_orgs = TolaUser.objects.filter(user__is_superuser=True).values_list('organization_id', flat=True)
+            if program_pks:
+                program_access = program_access.filter(program_id__in=program_pks)
+                country_access = country_access.filter(country__program__in=program_pks)
+            if country_pks:
+                program_access = program_access.filter(country_id__in=country_pks)
+                country_access = country_access.filter(country_id__in=country_pks)
+            program_access_ids = program_access.values_list('tolauser__organization_id', flat=True)
+            country_access_ids = country_access.values_list('tolauser__organization_id', flat=True)
+            organization_ids = set(list(program_access_ids) + list(country_access_ids) + list(su_orgs))
+            queryset = queryset.filter(id__in=organization_ids)
+        if request.GET.getlist('organizations[]'):
+            queryset = queryset.filter(id__in=request.GET.getlist('organizations[]'))
         page = self.paginate_queryset(list(queryset))
         if page is not None:
             serializer = OrganizationAdminSerializer(page, many=True)
