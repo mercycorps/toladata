@@ -173,6 +173,7 @@ export let CheckBoxList = props => {
             <label className="mb-1" key={option.id}>
                 <input
                     type="checkbox"
+                    className="align-text-top"
                     autoComplete="false"
                     name={option.name}
                     value={option.name}
