@@ -200,33 +200,41 @@ export const IndexView = observer(
                                             <a href={`/tola_management/organization/?countries[]=${data.id}`}>
                                                 <i className="fas fa-building"/>&nbsp;
                                                 {data.organizations_count} {
-                                                    // # Translators: preceded by a number > 1, i.e. "3 organizations"
-                                                    gettext("organizations")
+                                                    // # Translators: preceded by a number, i.e. "3 organizations" or "1 organization"
+                                                    interpolate(ngettext("%d organizations", "%d organization", data.organizations_count), [data.organizations_count])
                                                     }
                                             </a>
-                                        : <span><i className="fas fa-building"/>&nbsp;{`0 ${gettext("organizations")}`}</span>}
+                                        : <span><i className="fas fa-building"/>&nbsp;{
+                                            // # Translators: when no organizations are connected to the item
+                                            gettext("0 organizations")}</span>}
                                     </Col>
                                     <Col className="text-nowrap">
                                         { data.programs_count ?
                                             <a href={`/tola_management/program/?countries[]=${data.id}`}>
                                                 <i className="fas fa-cubes"/>&nbsp;
                                                 {data.programs_count} {
-                                                    // # Translators: preceded by a number > 1, i.e. "3 programs"
-                                                    gettext("programs")
+                                                    // # Translators: preceded by a number, i.e. "3 programs" or "1 program"
+                                                    interpolate(ngettext("%d programs", "%d program", data.programs_count), [data.programs_count])
                                                 }
                                             </a>
-                                        : <span><i className="fas fa-cubes"/>&nbsp;{`0 ${gettext("programs")}`}</span>}
+                                        : <span><i className="fas fa-cubes"/>&nbsp;{
+                                            // # Translators: when no programs are connected to the item
+                                            gettext("0 programs")
+                                            }</span>}
                                     </Col>
                                     <Col className="text-nowrap">
                                         { data.users_count ?
                                             <a href={`/tola_management/user/?countries[]=${data.id}`}>
                                                 <i className="fas fa-users"/>&nbsp;
                                                 {data.users_count} {
-                                                    // # Translators: preceded by a number > 1, i.e. "3 users"
-                                                    gettext("users")
+                                                    // # Translators: preceded by a number, i.e. "3 users" or "1 user"
+                                                    interpolate(ngettext("%d users", "%d user", data.users_count), [data.users_count])
                                                 }
                                             </a>
-                                        : <span><i className="fas fa-users"/>&nbsp;{`0 ${gettext("users")}`}</span>}
+                                        : <span><i className="fas fa-users"/>&nbsp;{
+                                            // # Translators: when no users are connected to the item
+                                            gettext("0 users")
+                                        }</span>}
                                     </Col>
                                 </Row>
                             }

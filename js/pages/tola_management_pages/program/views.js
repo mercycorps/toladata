@@ -290,7 +290,7 @@ export const IndexView = observer(
                                                 <div className="expando-toggle__label">
                                                     <i className="fas fa-cube"/>&nbsp;
                                                     {data.name ||
-                                                    // # Translators: Labels a freshly created program before the name is entered
+                                                    // # Translators: Label for a freshly created program before the name is entered
                                                     gettext("New Program")}
                                                 </div>
                                             </div>
@@ -303,7 +303,7 @@ export const IndexView = observer(
                                                 <div className="expando-toggle__label">
                                                     <i className="fas fa-cube"/>&nbsp;
                                                     {data.name ||
-                                                    // # Translators: Labels a freshly created program before the name is entered
+                                                    // # Translators: Label for a freshly created program before the name is entered
                                                     gettext("New Program")}
                                                 </div>
                                             </div>
@@ -316,9 +316,13 @@ export const IndexView = observer(
                                         {data.program_users ?
                                             <a href={`/tola_management/user/?programs[]=${data.id}`}>
                                                 <i className="fas fa-users"/>&nbsp;{data.program_users} {
-                                                    // # Translators: preceded by a number > 1, i.e. "3 users"
-                                                    gettext("users")}</a>
-                                    : <span><i className="fas fa-users" />&nbsp;{`0 ${gettext("users")}`}</span>}
+                                                    // # Translators: preceded by a number, i.e. "3 users" or "1 user"
+                                                    interpolate(ngettext("%d users", "%d user", data.program_users), [data.program_users])
+                                                }</a>
+                                    : <span><i className="fas fa-users" />&nbsp;{
+                                        // # Translators: when no users are connected to the item
+                                        gettext("0 users")
+                                    }</span>}
                                     </Col>
                                     <Col>{fundingStatusDisplayStr(data.funding_status)}</Col>
                                 </Row>

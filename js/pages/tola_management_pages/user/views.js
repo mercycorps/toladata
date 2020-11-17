@@ -344,11 +344,14 @@ export const IndexView = observer(
                                         <a href={`/tola_management/program/?users[]=${data.id}`}>
                                             <i className="fas fa-cubes"/>&nbsp;
                                             {data.user_programs} {
-                                                // # Translators: preceded by a number > 1, i.e. "3 programs"
-                                                gettext("programs")
+                                                // # Translators: preceded by a number, i.e. "3 programs" or "1 program"
+                                                interpolate(ngettext("%d programs", "%d program", data.user_programs), [data.user_programs])
                                             }
                                         </a>
-                                        : <span><i className="fas fa-cubes" />&nbsp;{`0 ${gettext("programs")}`}</span>}
+                                        : <span><i className="fas fa-cubes" />&nbsp;{
+                                            // # Translators: when no programs are connected to the item
+                                            gettext("0 programs")
+                                        }</span>}
                                     </Col>
                                     <Col size="0.25">{data.is_active?gettext('Active'):gettext('Inactive')}</Col>
                                 </Row>
