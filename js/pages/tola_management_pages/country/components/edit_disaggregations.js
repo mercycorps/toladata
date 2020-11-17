@@ -190,7 +190,6 @@ export class RetroProgramCheckBoxWrapper extends React.Component {
     constructor(props) {
         super(props);
         this.retroactiveAssignmentPopup = React.createRef();
-        this.state = { programsExpanded: false }
     }
 
     componentDidMount() {
@@ -201,14 +200,10 @@ export class RetroProgramCheckBoxWrapper extends React.Component {
         }
     }
 
-    expandPrograms() {
-        this.setState({programsExpanded: !this.state.programsExpanded})
-    }
-
     render() {
         let checkBoxOptions = Object.values(this.props.programs).sort((a, b) => a.name < b.name ? -1 : 1);
         let checkBoxComponent = null;
-        if (this.state.programsExpanded) {
+        if (this.props.programsExpanded) {
             checkBoxComponent =
                 <div id="disagg-admin__programs" className="ml-2 mt-2 d-flex flex-column disaggregation-programs">
                     <CheckBoxList checkBoxOptions={checkBoxOptions} onUpdate={this.props.onRetroUpdate}/>
@@ -220,10 +215,10 @@ export class RetroProgramCheckBoxWrapper extends React.Component {
         return (
             <div className="mt-2 ml-4 retro-programs">
                  <a
-                     onClick={this.expandPrograms.bind(this)}
+                     onClick={this.props.toggleProgramViz}
                      className={classNames('accordion-row__btn', 'btn', 'btn-link', 'disaggregation--programs__header', {disabled: this.props.disabled})}
                      tabIndex='0'>
-                    <FontAwesomeIcon icon={this.state.programsExpanded ? 'caret-down' : 'caret-right'} />
+                    <FontAwesomeIcon icon={this.props.programsExpanded ? 'caret-down' : 'caret-right'} />
                     {/* # Translators: This feature allows a user to apply changes to existing programs as well as ones created in the future */}
                     <span className="mr-1">{gettext("Assign new disaggregation to all indicators in a program")}</span>
                 </a>
@@ -250,7 +245,8 @@ export class DisaggregationType extends React.Component {
         const {disaggregation} = this.props
         this.state = {
             ...disaggregation,
-            labels: this.orderLabels(disaggregation.labels)
+            labels: this.orderLabels(disaggregation.labels),
+            programsExpanded: false
         };
         this.programsForRetro = observable(props.programs.reduce( (accum, program) => {
             accum[program.id] = {id: program.id, name: program.name, checked: false}
@@ -330,6 +326,10 @@ export class DisaggregationType extends React.Component {
     }
 
     updateSelectedByDefault(checked) {
+        if (checked !== true) {
+            this.clearCheckedPrograms();
+            this.togglePrograms();
+        }
         this.setState({
             selected_by_default: checked == true
         }, () => this.hasUnsavedDataAction());
@@ -340,6 +340,16 @@ export class DisaggregationType extends React.Component {
             this.programsForRetro[id]['checked'] = checked
         })
         this.hasUnsavedDataAction()
+    }
+
+    togglePrograms() {
+        this.setState({programsExpanded: !this.state.programsExpanded})
+    }
+
+    clearCheckedPrograms() {
+        for (const [key, value] of Object.entries(this.programsForRetro)) {
+            runInAction(() => value.checked = false )
+        }
     }
 
     updateLabel(labelIndex, updatedValues) {
@@ -381,12 +391,13 @@ export class DisaggregationType extends React.Component {
     }
 
     save() {
-        let savedData = {...this.state}
-        const retroPrograms = Object.values(this.programsForRetro).filter( program => program.checked )
+        let savedData = {...this.state};
+        delete savedData.programsExpanded;
+        const retroPrograms = Object.values(this.programsForRetro).filter( program => program.checked );
         if (retroPrograms.length > 0) {
-            savedData['retroPrograms'] = retroPrograms.map(programObj => programObj.id)
+            savedData['retroPrograms'] = retroPrograms.map(programObj => programObj.id);
         }
-        this.props.saveDisaggregation(savedData)
+        this.props.saveDisaggregation(savedData);
     }
 
     render() {
@@ -395,6 +406,8 @@ export class DisaggregationType extends React.Component {
         const retroPrograms = managed_data.id === "new" ? <RetroProgramCheckBoxWrapper
                 programs={this.programsForRetro}
                 disabled={this.state.selected_by_default !== true}
+                toggleProgramViz={this.togglePrograms.bind(this)}
+                programsExpanded={this.state.programsExpanded}
                 onRetroUpdate={this.updateRetroPrograms.bind(this)}/>
             : null
         return (

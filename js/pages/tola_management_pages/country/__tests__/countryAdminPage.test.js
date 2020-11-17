@@ -142,6 +142,34 @@ describe("Country admin retroactive disagg features in store", () => {
         filteredPrograms = store.getCountryPrograms(3);
         expect(filteredPrograms).toEqual([]);
     });
+
+    it("clears selected programs when selected by default is unchecked", () => {
+        const programsForRetro = [
+            {id: 200, name: "Program 1", checked: false},
+            {id: 201, name: "Program 2", checked: false}
+        ];
+        let expectedValues = {
+            200: {id: 200, name: "Program 1", checked: false},
+            201: {id: 201, name: "Program 2", checked: false}
+        }
+        const disaggregation = {...store.editing_disaggregations_data[0]};
+        disaggregation.id = "new";
+        disaggregation.selected_by_default = true;
+        let wrapper = shallow(<DisaggregationType
+            programs={programsForRetro}
+            disaggregation={disaggregation}
+        />);
+        wrapper.instance().hasUnsavedDataAction = jest.fn()
+        wrapper.instance().saveDisaggregation = jest.fn()
+        wrapper.setState({selected_by_default: true});
+        expect(toJS(wrapper.instance().programsForRetro)).toEqual(expectedValues)
+        wrapper.instance().updateRetroPrograms(200, true);
+        expectedValues[200]['checked'] = true;
+        expect(toJS(wrapper.instance().programsForRetro)).toEqual(expectedValues)
+        wrapper.instance().updateSelectedByDefault(false)
+        expectedValues[200]['checked'] = false;
+        expect(toJS(wrapper.instance().programsForRetro)).toEqual(expectedValues)
+    });
 });
 
 describe("Country admin disagg presentation components", () => {
@@ -186,8 +214,7 @@ describe("Country admin disagg presentation components", () => {
             {id: 200, name: "Program 1", checked: false}
 
         ];
-        let wrapper = mount(<RetroProgramCheckBoxWrapper programs={programsForRetro}/>);
-        wrapper.setState({programsExpanded: true});
+        let wrapper = mount(<RetroProgramCheckBoxWrapper programs={programsForRetro} programsExpanded={true}/>);
         let checkBoxList = wrapper.find(CheckBoxList);
         expect(checkBoxList.props().checkBoxOptions).toEqual(programsForRetro.reverse());
     });
@@ -209,8 +236,6 @@ describe("Country admin disagg presentation components", () => {
         wrapper.instance().programsForRetro = programsForRetro;
         wrapper.instance().save();
         expect(saveDisaggregation.mock.calls[0][0]).toEqual(disaggregation);
-
-
     });
 
     it("includes programs in saved data when one or more are checked", () => {
