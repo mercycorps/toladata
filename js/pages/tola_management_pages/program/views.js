@@ -289,7 +289,9 @@ export const IndexView = observer(
                                                 </div>
                                                 <div className="expando-toggle__label">
                                                     <i className="fas fa-cube"/>&nbsp;
-                                                    {data.name || "New Program"}
+                                                    {data.name ||
+                                                    // # Translators: Label for a freshly created program before the name is entered
+                                                    gettext("New Program")}
                                                 </div>
                                             </div>
                                         }
@@ -300,7 +302,9 @@ export const IndexView = observer(
                                                 </div>
                                                 <div className="expando-toggle__label">
                                                     <i className="fas fa-cube"/>&nbsp;
-                                                    {data.name || "New Program"}
+                                                    {data.name ||
+                                                    // # Translators: Label for a freshly created program before the name is entered
+                                                    gettext("New Program")}
                                                 </div>
                                             </div>
                                         }
@@ -309,7 +313,16 @@ export const IndexView = observer(
                                         { organizationColumn(data)}
                                     </Col>
                                     <Col className="text-nowrap">
-                                        {data.program_users ? <a href={`/tola_management/user/?programs[]=${data.id}`}><i className="fas fa-users"/>&nbsp;{data.program_users} {gettext("users")}</a> : '---'  }
+                                        {data.program_users ?
+                                            <a href={`/tola_management/user/?programs[]=${data.id}`}>
+                                                <i className="fas fa-users"/>&nbsp;{data.program_users} {
+                                                    // # Translators: preceded by a number, i.e. "3 users" or "1 user"
+                                                    interpolate(ngettext("%d user", "%d users", data.program_users), [data.program_users])
+                                                }</a>
+                                    : <span><i className="fas fa-users" />&nbsp;{
+                                        // # Translators: when no users are connected to the item
+                                        gettext("0 users")
+                                    }</span>}
                                     </Col>
                                     <Col>{fundingStatusDisplayStr(data.funding_status)}</Col>
                                 </Row>

@@ -98,8 +98,8 @@
                     <fieldset>
                         <div class="form-group" id="div_id_name">
                             <label for="id_name" class="label--required">{{ form.name.label }}</label>
+                            {% popover_helptext form.name.help_text %}
                             {% render_field form.name class+="form-control" %}
-                            <small class="form-text text-muted">{{ form.name.help_text }}</small>
                             <span id="validation_id_name" class="has-error"></span>
                         </div>
                         {% if form.number %}
@@ -121,12 +121,13 @@
                         </div>
                         <div class="form-group" id="div_id_sector">
                             <label for="id_sector" class="">{{ form.sector.label }} </label>
+                            {% popover_helptext form.sector.help_text %}
                             {% render_field form.sector class+="form-control" %}
-                            <small class="form-text text-muted">{{ form.sector.help_text }}</small>
                             <span id="validation_id_sector" class="has-error"></span>
                         </div>
                         <div class="form-group" id="div_id_level">
                             <label for="id_level" class="{% if form.level.field.required %}label--required{% endif %}">{{ form.level.label }}</label>
+                            {% popover_helptext form.level.help_text %}
                             {% render_field form.level class+="form-control" %}
                             <small class="form-text text-muted">{{ form.level.help_text }}</small>
                             <span id="validation_id_level" class="has-error"></span>
@@ -145,8 +146,8 @@
 
                         <div class="form-group" id="div_id_strategic_objectives">
                             <label for="id_strategic_objectives" class="">{{ form.strategic_objectives.label }} </label>
+                            {% popover_helptext form.strategic_objectives.help_text %}
                             {% render_field form.strategic_objectives class+="form-control" %}
-                            <small class="form-text text-muted">{{ form.strategic_objectives.help_text }}</small>
                             <span id="validation_id_strategic_objectives" class="has-error"></span>
                         </div>
 
@@ -179,22 +180,22 @@
 
                         <div class="form-group" id="div_id_source">
                             <label for="id_source" class="">{{ form.source.label }} </label>
+                            {% popover_helptext form.source.help_text %}
                             {% render_field form.source class+="form-control" %}
-                            <small class="form-text text-muted">{{ form.source.help_text }}</small>
                             <span id="validation_id_source" class="has-error"></span>
                         </div>
 
                         <div class="form-group" id="div_id_definition">
                             <label for="id_definition" class="">{{ form.definition.label }} </label>
+                            {% popover_helptext form.definition.help_text %}
                             {% render_field form.definition class+="form-control" %}
-                            <small class="form-text text-muted">{{ form.definition.help_text }}</small>
                             <span id="validation_id_definition" class="has-error"></span>
                         </div>
 
                         <div class="form-group" id="div_id_justification">
                             <label for="id_justification" class="">{{ form.justification.label }} </label>
+                            {% popover_helptext form.justification.help_text %}
                             {% render_field form.justification class+="form-control" %}
-                            <small class="form-text text-muted">{{ form.justification.help_text }}</small>
                             <span id="validation_id_justification" class="has-error"></span>
                         </div>
 
@@ -204,8 +205,8 @@
 
                         <div class="form-group" id="div_id_indicator_type">
                             <label for="id_indicator_type" class="">{{ form.indicator_type.label }} </label>
+                            {% popover_helptext form.indicator_type.help_text %}
                             {% render_field form.indicator_type class+="form-control" %}
-                            <small class="form-text text-muted">{{ form.indicator_type.help_text }}</small>
                             <span id="validation_id_indicator_type" class="has-error"></span>
                         </div>
 
@@ -230,11 +231,11 @@
                             <div id="fieldgroup_id_unit_of_measure">
 
                                 <div id="div_id_unit_of_measure">
+                                    {% popover_helptext form.unit_of_measure.help_text %}
                                     {% render_field form.unit_of_measure class+="form-control" %}
-                                    <small class="form-text text-muted">{{ form.unit_of_measure.help_text }}</small>
                                     <span id="validation_id_unit_of_measure" class="has-error"></span>
                                 </div>
-
+                                {% popover_helptext form.unit_of_measure_type.help_text %}
                                 {% for ut in form.unit_of_measure_type %}
                                     {% with id=form.unit_of_measure_type.auto_id %}
                                         <div class="form-check form-check-inline"
@@ -254,13 +255,14 @@
 
                         <div class="form-group" id="div_id_rationale_for_target">
                             <label for="id_rationale_for_target" class="">{{ form.rationale_for_target.label }} </label>
+                            {% popover_helptext form.rationale_for_target.help_text %}
                             {% render_field form.rationale_for_target class+="form-control" %}
-                            <small class="form-text text-muted">{{ form.rationale_for_target.help_text }}</small>
                             <span id="validation_id_rationale_for_target" class="has-error"></span>
                         </div>
 
                         <div class="form-group" id="div_id_baseline">
                             <label for="id_baseline" class="label--required">{{ form.baseline.label }} </label>
+                            {% popover_helptext form.baseline.help_text %}
                             <div class="" id="fieldgroup_id_baseline">
                                 <div id="div_id_baseline">
                                 <span id="span_{{ form.baseline.id_for_label }}">
@@ -274,7 +276,6 @@
                                            value="{{ form.baseline.value|stringformat:'s' }}"{% endif %}
                                            onblur="this.checkValidity();">
                                 </span>
-                                    <small class="form-text text-muted">{{ form.baseline.help_text }}</small>
                                     {{ form.baseline_na }} <label for="id_baseline_na"
                                                                   class=""> {{ form.baseline_na.label }}</label>
                                 </div>
@@ -285,6 +286,7 @@
                         <div class="form-group" id="parent_div_id_direction_of_change">
                             <div class="" id="fieldgroup_id_direction_of_change">
                                 <label for="id_direction_of_change">{{ form.direction_of_change.label }}</label>
+                                {% popover_helptext form.direction_of_change.help_text %}
                                 {% render_field form.direction_of_change class+="form-control" %}
                             </div>
                         </div>
@@ -292,8 +294,8 @@
                         <div class="form-group" id="div_id_target_frequency">
                             <label for="id_target_frequency"
                                    class="label--required">{{ form.target_frequency.label }}</label>
+                            {% popover_helptext form.target_frequency.help_text %}
                             {% render_field form.target_frequency class+="form-control" %}
-                            <small class="form-text text-muted">{{ form.target_frequency.help_text }}</small>
                             <span id="validation_id_target_frequency" class="has-error"></span>
                         </div>
 
@@ -309,38 +311,38 @@
                         <div class="form-group" id="div_id_means_of_verification">
                             <label for="id_means_of_verification"
                                    class="">{{ form.means_of_verification.label }} </label>
+                            {% popover_helptext form.means_of_verification.help_text %}
                             {% render_field form.means_of_verification class+="form-control" %}
-                            <small class="form-text text-muted">{{ form.means_of_verification.help_text }}</small>
                             <span id="validation_id_means_of_verification" class="has-error"></span>
                         </div>
 
                         <div class="form-group" id="div_id_data_collection_method">
                             <label for="id_data_collection_method"
                                    class="">{{ form.data_collection_method.label }} </label>
+                            {% popover_helptext form.data_collection_method.help_text %}
                             {% render_field form.data_collection_method class+="form-control" %}
-                            <small class="form-text text-muted">{{ form.data_collection_method.help_text }}</small>
                             <span id="validation_id_data_collection_method" class="has-error"></span>
                         </div>
 
                         <div class="form-group" id="div_id_data_collection_frequency">
                             <label for="id_data_collection_frequency"
                                    class="">{{ form.data_collection_frequency.label }} </label>
+                            {% popover_helptext form.data_collection_frequency.help_text %}
                             {% render_field form.data_collection_frequency class+="form-control" %}
-                            <small class="form-text text-muted">{{ form.data_collection_frequency.help_text }}</small>
                             <span id="validation_id_data_collection_frequency" class="has-error"></span>
                         </div>
 
                         <div class="form-group" id="div_id_data_points">
                             <label for="id_data_points" class="">{{ form.data_points.label }} </label>
+                            {% popover_helptext form.data_points.help_text %}
                             {% render_field form.data_points class+="form-control" %}
-                            <small class="form-text text-muted">{{ form.data_points.help_text }}</small>
                             <span id="validation_id_data_points" class="has-error"></span>
                         </div>
 
                         <div class="form-group" id="div_id_responsible_person">
                             <label for="id_responsible_person" class="">{{ form.responsible_person.label }} </label>
+                            {% popover_helptext form.responsible_person.help_text %}
                             {% render_field form.responsible_person class+="form-control" %}
-                            <small class="form-text text-muted">{{ form.responsible_person.help_text }}</small>
                             <span id="validation_id_responsible_person" class="has-error"></span>
                         </div>
 
@@ -351,36 +353,36 @@
                     <fieldset>
                         <div class="form-group" id="div_id_method_of_analysis">
                             <label for="id_method_of_analysis" class="">{{ form.method_of_analysis.label }} </label>
+                            {% popover_helptext form.method_of_analysis.help_text %}
                             {% render_field form.method_of_analysis class+="form-control" %}
-                            <small class="form-text text-muted">{{ form.method_of_analysis.help_text }}</small>
                             <span id="validation_id_method_of_analysis" class="has-error"></span>
                         </div>
 
                         <div class="form-group" id="div_id_information_use">
                             <label for="id_information_use" class="">{{ form.information_use.label }} </label>
+                            {% popover_helptext form.information_use.help_text %}
                             {% render_field form.information_use class+="form-control" %}
-                            <small class="form-text text-muted">{{ form.information_use.help_text }}</small>
                             <span id="validation_id_information_use" class="has-error"></span>
                         </div>
 
                         <div class="form-group" id="div_id_reporting_frequency">
                             <label for="id_reporting_frequency" class="">{{ form.reporting_frequency.label }} </label>
+                            {% popover_helptext form.reporting_frequency.help_text %}
                             {% render_field form.reporting_frequency class+="form-control" %}
-                            <small class="form-text text-muted">{{ form.reporting_frequency.help_text }}</small>
                             <span id="validation_id_reporting_frequency" class="has-error"></span>
                         </div>
 
                         <div class="form-group" id="div_id_quality_assurance">
                             <label for="id_quality_assurance" class="">{{ form.quality_assurance.label }} </label>
+                            {% popover_helptext form.quality_assurance.help_text %}
                             {% render_field form.quality_assurance class+="form-control" %}
-                            <small class="form-text text-muted">{{ form.quality_assurance.help_text }}</small>
                             <span id="validation_id_quality_assurance" class="has-error"></span>
                         </div>
 
                         <div class="form-group" id="div_id_data_issues">
                             <label for="id_data_issues" class="">{{ form.data_issues.label }} </label>
+                            {% popover_helptext form.data_issues.help_text %}
                             {% render_field form.data_issues class+="form-control" %}
-                            <small class="form-text text-muted">{{ form.data_issues.help_text }}</small>
                             <span id="validation_id_data_issues" class="has-error"></span>
                         </div>
 

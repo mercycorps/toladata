@@ -6,8 +6,8 @@ msgid ""
 msgstr ""
 "Project-Id-Version: \n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2020-11-16 16:55-0800\n"
-"PO-Revision-Date: 2020-11-16 11:20-0800\n"
+"POT-Creation-Date: 2020-11-17 12:39-0800\n"
+"PO-Revision-Date: 2020-11-17 12:40-0800\n"
 "Last-Translator: \n"
 "Language-Team: \n"
 "Language: es\n"
@@ -18,10 +18,8 @@ msgstr ""
 "X-Generator: Poedit 2.4.1\n"
 
 #: js/base.js:336
-#, fuzzy
-#| msgid "Success!"
 msgid "Success"
-msgstr "¡Éxito!"
+msgstr "Éxito"
 
 #: js/base.js:391 js/base.js:392
 msgid ""
@@ -1551,14 +1549,14 @@ msgstr "Propuesto"
 #: js/pages/tola_management_pages/country/components/edit_objectives.js:10
 #: js/pages/tola_management_pages/organization/components/edit_organization_history.js:9
 #: js/pages/tola_management_pages/organization/models.js:57
-#: js/pages/tola_management_pages/organization/views.js:177
+#: js/pages/tola_management_pages/organization/views.js:192
 #: js/pages/tola_management_pages/program/components/program_history.js:9
 #: js/pages/tola_management_pages/program/views.js:66
 #: js/pages/tola_management_pages/program/views.js:158
 #: js/pages/tola_management_pages/program/views.js:164
 #: js/pages/tola_management_pages/user/components/edit_user_history.js:8
 #: js/pages/tola_management_pages/user/models.js:75
-#: js/pages/tola_management_pages/user/views.js:348
+#: js/pages/tola_management_pages/user/views.js:356
 msgid "Active"
 msgstr "Activo"
 
@@ -1722,7 +1720,6 @@ msgstr "Ninguno/a Seleccionado"
 
 #: js/pages/tola_management_pages/country/views.js:30
 #: js/pages/tola_management_pages/country/views.js:95
-#: js/pages/tola_management_pages/country/views.js:202
 #: js/pages/tola_management_pages/organization/views.js:89
 #: js/pages/tola_management_pages/program/views.js:42
 #: js/pages/tola_management_pages/program/views.js:231
@@ -1731,7 +1728,6 @@ msgstr "Organizaciones"
 
 #: js/pages/tola_management_pages/country/views.js:42
 #: js/pages/tola_management_pages/country/views.js:96
-#: js/pages/tola_management_pages/country/views.js:210
 #: js/pages/tola_management_pages/organization/views.js:30
 #: js/pages/tola_management_pages/organization/views.js:111
 #: js/pages/tola_management_pages/program/views.js:206
@@ -1759,7 +1755,6 @@ msgid "Add Country"
 msgstr "Agregar País"
 
 #: js/pages/tola_management_pages/country/views.js:97
-#: js/pages/tola_management_pages/country/views.js:218
 #: js/pages/tola_management_pages/organization/views.js:112
 #: js/pages/tola_management_pages/program/views.js:18
 #: js/pages/tola_management_pages/program/views.js:232
@@ -1767,20 +1762,67 @@ msgstr "Agregar País"
 msgid "Users"
 msgstr "Usuarios"
 
-#: js/pages/tola_management_pages/country/views.js:228
+#. Translators: preceded by a number, i.e. "3 organizations" or "1 organization"
+#: js/pages/tola_management_pages/country/views.js:204
+#, python-format
+msgid "%d organization"
+msgid_plural "%d organizations"
+msgstr[0] "%d organización"
+msgstr[1] "%d organizaciones"
+
+#. Translators: when no organizations are connected to the item
+#: js/pages/tola_management_pages/country/views.js:209
+msgid "0 organizations"
+msgstr "0 organizaciones"
+
+#. Translators: preceded by a number, i.e. "3 programs" or "1 program"
+#: js/pages/tola_management_pages/country/views.js:217
+#: js/pages/tola_management_pages/organization/views.js:171
+#: js/pages/tola_management_pages/user/views.js:348
+#, python-format
+msgid "%d program"
+msgid_plural "%d programs"
+msgstr[0] "%d programa"
+msgstr[1] "%d programas"
+
+#. Translators: when no programs are connected to the item
+#: js/pages/tola_management_pages/country/views.js:222
+#: js/pages/tola_management_pages/organization/views.js:176
+#: js/pages/tola_management_pages/user/views.js:353
+msgid "0 programs"
+msgstr "0 programas"
+
+#. Translators: preceded by a number, i.e. "3 users" or "1 user"
+#: js/pages/tola_management_pages/country/views.js:231
+#: js/pages/tola_management_pages/organization/views.js:184
+#: js/pages/tola_management_pages/program/views.js:320
+#, python-format
+msgid "%d user"
+msgid_plural "%d users"
+msgstr[0] "%d usuario"
+msgstr[1] "%d usuarios"
+
+#. Translators: when no users are connected to the item
+#: js/pages/tola_management_pages/country/views.js:236
+#: js/pages/tola_management_pages/organization/views.js:189
+#: js/pages/tola_management_pages/program/views.js:324
+msgid "0 users"
+msgstr "0 usuarios"
+
+#: js/pages/tola_management_pages/country/views.js:245
 msgid "countries"
 msgstr "países"
 
 #: js/pages/tola_management_pages/organization/components/edit_organization_history.js:10
 #: js/pages/tola_management_pages/organization/models.js:58
-#: js/pages/tola_management_pages/organization/views.js:177
+#: js/pages/tola_management_pages/organization/views.js:192
 #: js/pages/tola_management_pages/program/components/program_history.js:10
 #: js/pages/tola_management_pages/program/views.js:67
 #: js/pages/tola_management_pages/program/views.js:159
 #: js/pages/tola_management_pages/program/views.js:164
 #: js/pages/tola_management_pages/user/components/edit_user_history.js:9
 #: js/pages/tola_management_pages/user/models.js:76
-#: js/pages/tola_management_pages/user/views.js:348
+#: js/pages/tola_management_pages/user/views.js:356
 msgid "Inactive"
 msgstr "Inactivo"
 
@@ -1845,19 +1887,7 @@ msgstr "Encontrar una Organización"
 msgid "Add Organization"
 msgstr "Agregar Organización"
 
-#: js/pages/tola_management_pages/organization/views.js:168
-#: js/pages/tola_management_pages/program/views.js:321
-#: js/pages/tola_management_pages/user/views.js:345
-msgid "programs"
-msgstr "programas"
-
-#: js/pages/tola_management_pages/organization/views.js:174
-#: js/pages/tola_management_pages/program/views.js:312
-#: js/pages/tola_management_pages/user/views.js:355
-msgid "users"
-msgstr "usuarios"
-
-#: js/pages/tola_management_pages/organization/views.js:184
+#: js/pages/tola_management_pages/organization/views.js:199
 msgid "organizations"
 msgstr "organizaciones"
 
@@ -1995,6 +2025,17 @@ msgstr "Definir estado del programa"
 #: js/pages/tola_management_pages/program/views.js:212
 msgid "Add Program"
 msgstr "Agregar Programa"
+
+#. Translators: Label for a freshly created program before the name is entered
+#: js/pages/tola_management_pages/program/views.js:294
+#: js/pages/tola_management_pages/program/views.js:307
+#, fuzzy
+msgid "New Program"
+msgstr "Sin programas"
+
+#: js/pages/tola_management_pages/program/views.js:334
+msgid "programs"
+msgstr "programas"
 
 #: js/pages/tola_management_pages/user/components/edit_user_history.js:61
 msgid "Resend Registration Email"
@@ -2147,6 +2188,10 @@ msgstr "Agregar Usuario"
 #: js/pages/tola_management_pages/user/views.js:334
 msgid "Super Admin"
 msgstr "Super Administrador"
+
+#: js/pages/tola_management_pages/user/views.js:363
+msgid "users"
+msgstr "usuarios"
 
 #~ msgid "This indicator has no targets."
 #~ msgstr "Este indicador no tiene objetivos."
@@ -3297,9 +3342,6 @@ msgstr "Super Administrador"
 
 #~ msgid "Reporting period"
 #~ msgstr "Período de información"
-
-#~ msgid "No Programs"
-#~ msgstr "Sin programas"
 
 #~ msgid "Are you sure?"
 #~ msgstr "¿Está seguro?"

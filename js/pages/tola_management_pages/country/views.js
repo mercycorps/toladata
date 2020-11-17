@@ -199,25 +199,42 @@ export const IndexView = observer(
                                         { data.organizations_count ?
                                             <a href={`/tola_management/organization/?countries[]=${data.id}`}>
                                                 <i className="fas fa-building"/>&nbsp;
-                                                {data.organizations_count} {gettext("Organizations")}
+                                                {data.organizations_count} {
+                                                    // # Translators: preceded by a number, i.e. "3 organizations" or "1 organization"
+                                                    interpolate(ngettext("%d organization", "%d organizations", data.organizations_count), [data.organizations_count])
+                                                    }
                                             </a>
-                                        : '---'}
+                                        : <span><i className="fas fa-building"/>&nbsp;{
+                                            // # Translators: when no organizations are connected to the item
+                                            gettext("0 organizations")}</span>}
                                     </Col>
                                     <Col className="text-nowrap">
                                         { data.programs_count ?
                                             <a href={`/tola_management/program/?countries[]=${data.id}`}>
                                                 <i className="fas fa-cubes"/>&nbsp;
-                                                {data.programs_count} {gettext("Programs")}
+                                                {data.programs_count} {
+                                                    // # Translators: preceded by a number, i.e. "3 programs" or "1 program"
+                                                    interpolate(ngettext("%d program", "%d programs", data.programs_count), [data.programs_count])
+                                                }
                                             </a>
-                                        : "---"}
+                                        : <span><i className="fas fa-cubes"/>&nbsp;{
+                                            // # Translators: when no programs are connected to the item
+                                            gettext("0 programs")
+                                            }</span>}
                                     </Col>
                                     <Col className="text-nowrap">
                                         { data.users_count ?
                                             <a href={`/tola_management/user/?countries[]=${data.id}`}>
                                                 <i className="fas fa-users"/>&nbsp;
-                                                {data.users_count} {gettext("Users")}
+                                                {data.users_count} {
+                                                    // # Translators: preceded by a number, i.e. "3 users" or "1 user"
+                                                    interpolate(ngettext("%d user", "%d users", data.users_count), [data.users_count])
+                                                }
                                             </a>
-                                        : '---'  }
+                                        : <span><i className="fas fa-users"/>&nbsp;{
+                                            // # Translators: when no users are connected to the item
+                                            gettext("0 users")
+                                        }</span>}
                                     </Col>
                                 </Row>
                             }
