@@ -317,7 +317,7 @@ export const IndexView = observer(
                                             <a href={`/tola_management/user/?programs[]=${data.id}`}>
                                                 <i className="fas fa-users"/>&nbsp;{data.program_users} {
                                                     // # Translators: preceded by a number, i.e. "3 users" or "1 user"
-                                                    interpolate(ngettext("%d users", "%d user", data.program_users), [data.program_users])
+                                                    interpolate(ngettext("%d user", "%d users", data.program_users), [data.program_users])
                                                 }</a>
                                     : <span><i className="fas fa-users" />&nbsp;{
                                         // # Translators: when no users are connected to the item

@@ -201,7 +201,7 @@ export const IndexView = observer(
                                                 <i className="fas fa-building"/>&nbsp;
                                                 {data.organizations_count} {
                                                     // # Translators: preceded by a number, i.e. "3 organizations" or "1 organization"
-                                                    interpolate(ngettext("%d organizations", "%d organization", data.organizations_count), [data.organizations_count])
+                                                    interpolate(ngettext("%d organization", "%d organizations", data.organizations_count), [data.organizations_count])
                                                     }
                                             </a>
                                         : <span><i className="fas fa-building"/>&nbsp;{
@@ -214,7 +214,7 @@ export const IndexView = observer(
                                                 <i className="fas fa-cubes"/>&nbsp;
                                                 {data.programs_count} {
                                                     // # Translators: preceded by a number, i.e. "3 programs" or "1 program"
-                                                    interpolate(ngettext("%d programs", "%d program", data.programs_count), [data.programs_count])
+                                                    interpolate(ngettext("%d program", "%d programs", data.programs_count), [data.programs_count])
                                                 }
                                             </a>
                                         : <span><i className="fas fa-cubes"/>&nbsp;{
@@ -228,7 +228,7 @@ export const IndexView = observer(
                                                 <i className="fas fa-users"/>&nbsp;
                                                 {data.users_count} {
                                                     // # Translators: preceded by a number, i.e. "3 users" or "1 user"
-                                                    interpolate(ngettext("%d users", "%d user", data.users_count), [data.users_count])
+                                                    interpolate(ngettext("%d user", "%d users", data.users_count), [data.users_count])
                                                 }
                                             </a>
                                         : <span><i className="fas fa-users"/>&nbsp;{

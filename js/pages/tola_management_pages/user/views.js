@@ -345,7 +345,7 @@ export const IndexView = observer(
                                             <i className="fas fa-cubes"/>&nbsp;
                                             {data.user_programs} {
                                                 // # Translators: preceded by a number, i.e. "3 programs" or "1 program"
-                                                interpolate(ngettext("%d programs", "%d program", data.user_programs), [data.user_programs])
+                                                interpolate(ngettext("%d program", "%d programs", data.user_programs), [data.user_programs])
                                             }
                                         </a>
                                         : <span><i className="fas fa-cubes" />&nbsp;{
