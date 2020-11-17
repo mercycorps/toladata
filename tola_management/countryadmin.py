@@ -70,16 +70,17 @@ class CountryAdminSerializer(serializers.ModelSerializer):
     def get_users_count(self, country):
         """These are prefetched so it isn't DB-expensive, but math done in Python to avoid bad join counts"""
         return len(set(
-            [ca.tolauser_id for ca in country.country_users] + [pa.tolauser_id for pa in country.program_users]
-        )) + country.su_count
+            [ca.tolauser_id for ca in getattr(country, 'country_users', [])] +
+            [pa.tolauser_id for pa in getattr(country, 'program_users', [])]
+        )) + getattr(country, 'su_count', 0)
 
     def get_organizations_count(self, country):
         """As above: prefetched rows are counted in python to avoid join-math issues"""
         org_ids = set(
-            [ca.tolauser.organization_id for ca in country.country_users] +
-            [pa.tolauser.organization_id for pa in country.program_users] +
+            [ca.tolauser.organization_id for ca in getattr(country, 'country_users', [])] +
+            [pa.tolauser.organization_id for pa in getattr(country, 'program_users', [])] +
             # if there are any superusers, then Mercy Corps is included in the count:
-            ([Organization.MERCY_CORPS_ID] if country.su_count else [])
+            ([Organization.MERCY_CORPS_ID] if getattr(country, 'su_count', 0) else [])
         )
         return len(org_ids)
 
