@@ -1,6 +1,6 @@
 from collections import OrderedDict
 import json
-from django.db import transaction
+from django.db import transaction, models
 from django.db.models import Q
 from django.utils.translation import ugettext_lazy as _
 from rest_framework import viewsets, status, serializers, permissions, pagination
@@ -13,6 +13,8 @@ from workflow.models import (
     Organization,
     Program,
     TolaUser,
+    ProgramAccess,
+    CountryAccess
 )
 from indicators.models import (
     StrategicObjective,
@@ -49,6 +51,9 @@ class CountryAdminSerializer(serializers.ModelSerializer):
     country = serializers.CharField(required=True, max_length=255)
     description = serializers.CharField(allow_blank=True, required=False)
     code = serializers.CharField(max_length=4, allow_blank=True, required=False)
+    programs_count = serializers.IntegerField(read_only=True)
+    users_count = serializers.SerializerMethodField()
+    organizations_count = serializers.SerializerMethodField()
 
     class Meta:
         model = Country
@@ -57,31 +62,26 @@ class CountryAdminSerializer(serializers.ModelSerializer):
             'country',
             'description',
             'code',
+            'programs_count',
+            'users_count',
+            'organizations_count'
         )
 
-    def to_representation(self, country, with_aggregates=True):
-        ret = super(CountryAdminSerializer, self).to_representation(country)
-        if not with_aggregates:
-            return ret
+    def get_users_count(self, country):
+        """These are prefetched so it isn't DB-expensive, but math done in Python to avoid bad join counts"""
+        return len(set(
+            [ca.tolauser_id for ca in country.country_users] + [pa.tolauser_id for pa in country.program_users]
+        )) + country.su_count
 
-        # users to country by way of program access
-        country_users = (
-            TolaUser.objects.filter(programaccess__country_id=country.id).select_related('organization')
-            | TolaUser.objects.filter(countries__id=country.id).select_related('organization')
-            | TolaUser.objects.filter(country__id=country.id).select_related('organization')
-        ).distinct()
-
-        organizations = set([tu.organization_id for tu in country_users if tu.organization_id])
-
-        # This would be user directly associated with the country (base country users)
-        #user_count = TolaUser.objects.filter(country=country).count()
-
-        program_ids = [program.id for program in Program.objects.filter(country__pk=country.id)]
-        program_count = len(program_ids)
-        ret['programCount'] = program_count
-        ret['user_count'] = len(country_users)
-        ret['organizations'] = organizations
-        return ret
+    def get_organizations_count(self, country):
+        """As above: prefetched rows are counted in python to avoid join-math issues"""
+        org_ids = set(
+            [ca.tolauser.organization_id for ca in country.country_users] +
+            [pa.tolauser.organization_id for pa in country.program_users] +
+            # if there are any superusers, then Mercy Corps is included in the count:
+            ([Organization.MERCY_CORPS_ID] if country.su_count else [])
+        )
+        return len(org_ids)
 
 
 class CountryAdminViewSet(viewsets.ModelViewSet):
@@ -89,15 +89,42 @@ class CountryAdminViewSet(viewsets.ModelViewSet):
     pagination_class = Paginator
     permission_classes = [permissions.IsAuthenticated, HasCountryAdminAccess]
 
+    @staticmethod
+    def annotate_queryset(queryset):
+        """Annotates a queryset of Countries with program count and prefetches to calculate user count"""
+        su_count = TolaUser.objects.filter(user__is_superuser=True).count()
+        queryset = queryset.annotate(
+            programs_count=models.Count('program', distinct=True),
+            su_count=models.Value(su_count, output_field=models.IntegerField())
+        )
+        queryset = queryset.prefetch_related(
+            models.Prefetch(
+                'countryaccess_set',
+                queryset=CountryAccess.objects.filter(
+                    tolauser__user__is_superuser=False
+                ).select_related('tolauser'),
+                to_attr='country_users'
+            ),
+            models.Prefetch(
+                'programaccess_set',
+                queryset=ProgramAccess.objects.filter(
+                    tolauser__user__is_superuser=False
+                    ).select_related('tolauser'),
+                to_attr='program_users'
+            )
+        )
+        return queryset
+
     def get_queryset(self):
+        """Select countries user can manage, annotate queryset with counts, filter based on provided params"""
         auth_user = self.request.user
         tola_user = auth_user.tola_user
         params = self.request.query_params
 
         queryset = Country.objects.all()
-
         if not auth_user.is_superuser:
             queryset = tola_user.managed_countries
+        queryset = self.annotate_queryset(queryset)
 
         countryFilter = params.getlist('countries[]')
         if countryFilter:
@@ -110,8 +137,14 @@ class CountryAdminViewSet(viewsets.ModelViewSet):
 
         organizationFilter = params.getlist('organizations[]')
         if organizationFilter:
+            program_access = ProgramAccess.objects.filter(
+                tolauser__organization_id__in=organizationFilter
+            ).values_list('country_id', flat=True)
+            country_access = CountryAccess.objects.filter(
+                tolauser__organization_id__in=organizationFilter
+            ).values_list('country_id', flat=True)
             queryset = queryset.filter(
-                Q(program__user_access__organization__in=organizationFilter) | Q(users__organization__in=organizationFilter)
+                id__in=set(list(program_access) + list(country_access))
             )
 
         return queryset.distinct()
@@ -126,7 +159,6 @@ class CountryAdminViewSet(viewsets.ModelViewSet):
 
 
 class CountryObjectiveSerializer(serializers.ModelSerializer):
-    #id = serializers.IntegerField(allow_null=True, required=False)
     country = serializers.PrimaryKeyRelatedField(queryset=Country.objects.all())
     name = serializers.CharField(required=True, allow_blank=False, max_length=135)
     description = serializers.CharField(max_length=765, allow_blank=True, required=False)

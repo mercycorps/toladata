@@ -196,26 +196,26 @@ export const IndexView = observer(
                                         </div>
                                     </Col>
                                     <Col className="text-nowrap">
-                                        { data.organizations.length ?
+                                        { data.organizations_count ?
                                             <a href={`/tola_management/organization/?countries[]=${data.id}`}>
                                                 <i className="fas fa-building"/>&nbsp;
-                                                {data.organizations.length} {gettext("Organizations")}
+                                                {data.organizations_count} {gettext("Organizations")}
                                             </a>
                                         : '---'}
                                     </Col>
                                     <Col className="text-nowrap">
-                                        { data.programCount ?
+                                        { data.programs_count ?
                                             <a href={`/tola_management/program/?countries[]=${data.id}`}>
                                                 <i className="fas fa-cubes"/>&nbsp;
-                                                {data.programCount} {gettext("Programs")}
+                                                {data.programs_count} {gettext("Programs")}
                                             </a>
                                         : "---"}
                                     </Col>
                                     <Col className="text-nowrap">
-                                        { data.user_count ?
+                                        { data.users_count ?
                                             <a href={`/tola_management/user/?countries[]=${data.id}`}>
                                                 <i className="fas fa-users"/>&nbsp;
-                                                {data.user_count} {gettext("Users")}
+                                                {data.users_count} {gettext("Users")}
                                             </a>
                                         : '---'  }
                                     </Col>
