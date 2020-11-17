@@ -141,11 +141,14 @@
     }
 }
 
-.retro-programs a.btn.disaggregation--programs__header.disabled {
-    opacity: 50%;
-    pointer-events: none;
+.retro-programs a.accordion-row__btn.btn.btn-link.disaggregation--programs__header {
     padding-right: 4px;
-    color: $link-color;
+
+    &.disabled {
+        opacity: 50%;
+        pointer-events: none;
+        color: $link-color;
+    }
 }
 
 .disaggregation-programs {
