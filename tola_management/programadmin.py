@@ -558,11 +558,18 @@ class ProgramAdminViewSet(viewsets.ModelViewSet):
 
         usersFilter = params.getlist('users[]')
         if usersFilter:
+            # some partner users have a base country assigned, so we need just MC users to filter on country:
+            mc_users = list(TolaUser.objects.filter(
+                organization_id=Organization.MERCY_CORPS_ID,
+                pk__in=usersFilter
+            ).values_list('pk', flat=True))
             queryset = queryset.filter(
                 models.Q(user_access__id__in=usersFilter) |
-                models.Q(country__in=Country.objects.filter(users__id__in=usersFilter))
+                models.Q(country__in=Country.objects.filter(
+                    models.Q(users__id__in=mc_users) |
+                    models.Q(tolauser__in=mc_users)
+                ))
             )
-
         organizationFilter = params.getlist('organizations[]')
         if organizationFilter:
             queryset = queryset.filter(

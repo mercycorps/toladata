@@ -310,4 +310,92 @@ class TestProgramFieldsStressTest(test.TestCase):
             self.assertEqual(results[pk]['onlyOrganizationId'], onlyOrganizationId)
             self.assertEqual(results[pk]['sector'], sectors)
             self.assertEqual(results[pk]['country'], countries)
-        
+
+class TestProgramAdminFilters(test.TestCase):
+    @classmethod
+    def setUpTestData(cls):
+        cls.out_country = CountryFactory()
+        cls.home_country = CountryFactory()
+        cls.home_country_program = RFProgramFactory(country=[cls.home_country])
+        cls.superadmin = NewTolaUserFactory(country=cls.out_country, mc_staff=True, superadmin=True)
+        cls.country1 = CountryFactory()
+        cls.program1 = RFProgramFactory(country=[cls.country1])
+        cls.country2 = CountryFactory()
+        cls.program2 = RFProgramFactory(country=[cls.country2])
+        cls.multi_country_program = RFProgramFactory(country=[cls.country1, cls.country2])
+        cls.admin_user_1 = NewTolaUserFactory(country=cls.out_country, mc_staff=True, superadmin=False)
+        grant_country_access(cls.admin_user_1, cls.country1, COUNTRY_ROLE_CHOICES[1][0])
+        cls.mc_user_1 = NewTolaUserFactory(country=cls.out_country, mc_staff=True, superadmin=False)
+        grant_country_access(cls.mc_user_1, cls.country1, COUNTRY_ROLE_CHOICES[0][0])
+        grant_country_access(cls.mc_user_1, cls.country2, COUNTRY_ROLE_CHOICES[0][0])
+        cls.home_country_user = NewTolaUserFactory(country=cls.home_country)
+        cls.partner_org1 = OrganizationFactory()
+        cls.partner_user1 = NewTolaUserFactory(country=cls.home_country, mc_staff=False, organization=cls.partner_org1)
+        grant_program_access(cls.partner_user1, cls.program1, cls.country1, PROGRAM_ROLE_CHOICES[1][0])
+        grant_program_access(cls.partner_user1, cls.multi_country_program, cls.country1, PROGRAM_ROLE_CHOICES[2][0])
+        cls.partner_org2 = OrganizationFactory()
+        cls.partner_user2 = NewTolaUserFactory(mc_staff=False, organization=cls.partner_org2)
+        grant_program_access(cls.partner_user2, cls.program2, cls.country2, PROGRAM_ROLE_CHOICES[0][0])
+
+    def get_filtered_data(self, **filters):
+        client = test.Client()
+        client.force_login(user=self.superadmin.user)
+        page = filters.pop('page', 1)
+        url = f'/api/tola_management/program/?page={page}'
+        for k, v in filters.items():
+            if isinstance(v, list):
+                url += ''.join(f'&{k}[]={item}' for item in v)
+            else:
+                url += f'&{k}={v}'
+        response = client.get(url)
+        self.assertEqual(response.status_code, 200)
+        response_json = response.json()
+        return response_json
+
+    def test_country_filters(self):
+        data = self.get_filtered_data(countries=[self.country1.pk])
+        self.assertEqual(data['count'], 2)
+        pks = [r['id'] for r in data['results']]
+        self.assertIn(self.program1.pk, pks)
+        self.assertIn(self.multi_country_program.pk, pks)
+        data = self.get_filtered_data(countries=[self.country1.pk, self.country2.pk])
+        self.assertEqual(data['count'], 3)
+        pks = [r['id'] for r in data['results']]
+        self.assertIn(self.program1.pk, pks)
+        self.assertIn(self.program2.pk, pks)
+        self.assertIn(self.multi_country_program.pk, pks)
+
+    def test_user_filters(self):
+        data = self.get_filtered_data(users=[self.admin_user_1.pk])
+        self.assertEqual(data['count'], 2)
+        pks = [r['id'] for r in data['results']]
+        self.assertIn(self.program1.pk, pks)
+        self.assertIn(self.multi_country_program.pk, pks)
+        data = self.get_filtered_data(users=[self.mc_user_1.pk])
+        self.assertEqual(data['count'], 3)
+        pks = [r['id'] for r in data['results']]
+        self.assertIn(self.program1.pk, pks)
+        self.assertIn(self.program2.pk, pks)
+        self.assertIn(self.multi_country_program.pk, pks)
+        data = self.get_filtered_data(users=[self.home_country_user.pk])
+        self.assertEqual(data['count'], 1)
+        pks = [r['id'] for r in data['results']]
+        self.assertIn(self.home_country_program.pk, pks)
+        data = self.get_filtered_data(users=[self.partner_user1.pk])
+        self.assertEqual(data['count'], 2)
+        pks = [r['id'] for r in data['results']]
+        self.assertIn(self.program1.pk, pks)
+        self.assertIn(self.multi_country_program.pk, pks)
+
+    def test_organization_filters(self):
+        data = self.get_filtered_data(organizations=[self.partner_org1.pk])
+        self.assertEqual(data['count'], 2)
+        pks = [r['id'] for r in data['results']]
+        self.assertIn(self.program1.pk, pks)
+        self.assertIn(self.multi_country_program.pk, pks)
+        data = self.get_filtered_data(organizations=[self.partner_org1.pk, self.partner_org2.pk])
+        self.assertEqual(data['count'], 3)
+        pks = [r['id'] for r in data['results']]
+        self.assertIn(self.program1.pk, pks)
+        self.assertIn(self.program2.pk, pks)
+        self.assertIn(self.multi_country_program.pk, pks)
