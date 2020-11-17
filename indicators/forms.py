@@ -39,17 +39,19 @@ class GroupCheckboxSelectMultipleWidget(forms.CheckboxSelectMultiple):
     template_name = 'forms/widgets/groupcheckbox_select.html'
     option_template_name = 'forms/widgets/groupcheckbox_option.html'
 
-    def __init__(self, attrs=None, title=None, order=0, choices=(), helptext=None, individual_disabled=None):
+    def __init__(self, attrs=None, title=None, order=0, choices=(), helptext=None, individual_disabled=None,
+                 group_helptext=None):
         self.title = title
         self.order = order
         self.helptext = helptext
+        self.group_helptext = group_helptext
         self.individual_disabled = individual_disabled
         super().__init__(attrs, choices)
 
     def get_context(self, *args):
         context = super().get_context(*args)
         context['widget'].update(
-            {'title': self.title, 'helptext': self.helptext}
+            {'title': self.title, 'helptext': self.helptext, 'group_helptext': self.group_helptext}
             )
         return context
 
@@ -77,12 +79,14 @@ class GroupedMultipleChoiceWidget(forms.MultiWidget):
     def __init__(self, groups, **kwargs):
         groups = [group for group in groups if group[1]]
         subwidget_attrs = kwargs.pop('subwidget_attrs', {})
+        group_helptext = kwargs.pop('group_helptext', None)
         self.values_map = [[option[0] for option in group[1]] for group in groups]
         widgets = [
             GroupCheckboxSelectMultipleWidget(
                 attrs=subwidget_attrs, title=group[0], choices=group[1], order=c,
                 helptext=(group[2] if (len(group) > 2 and group[2]) else None),
-                individual_disabled=(group[3] if (len(group) > 3 and group[3]) else None)
+                individual_disabled=(group[3] if (len(group) > 3 and group[3]) else None),
+                group_helptext=group_helptext
             ) for c, group in enumerate(groups)
         ]
         super().__init__(widgets, **kwargs)
@@ -107,10 +111,12 @@ class GroupedMultipleChoiceField(forms.Field):
     def __init__(self, groups, **kwargs):
         self.groups = groups
         subwidget_attrs = kwargs.pop('subwidget_attrs', {})
+        group_helptext = kwargs.pop('group_helptext', None)
         kwargs = {
             'required': False,
             **kwargs,
-            'widget': GroupedMultipleChoiceWidget(groups, subwidget_attrs=subwidget_attrs)
+            'widget': GroupedMultipleChoiceWidget(
+                groups, subwidget_attrs=subwidget_attrs, group_helptext=group_helptext)
         }
         super().__init__(**kwargs)
 
@@ -295,6 +301,10 @@ class IndicatorForm(forms.ModelForm):
                     _('This disaggregation cannot be unselected, because it was already used in submitted program results.')
                 )
             return helptext
+        disaggregation_group_helptext = _("Select all relevant disaggregations. Disaggregations are managed by the "
+                                          "TolaData country administrator. Mercy Corps required disaggregations (e.g. "
+                                          "SADD) are selected by default, but can be deselected when they are not "
+                                          "applicable to the indicator.")
         self.fields['grouped_disaggregations'] = GroupedMultipleChoiceField(
             # Translators:  disaggregation types that are available to all programs
             [(_('Global disaggregations'),
@@ -307,7 +317,8 @@ class IndicatorForm(forms.ModelForm):
               [get_helptext(disagg) for disagg in country_disaggs],
               [getattr(disagg, 'has_results') for disagg in country_disaggs])
                 for country_name, country_disaggs in countries_disaggs],
-            subwidget_attrs={'class': 'scroll-box-200 grouped-disaggregations'}
+            subwidget_attrs={'class': 'scroll-box-200 grouped-disaggregations'},
+            group_helptext=disaggregation_group_helptext
         )
         if indicator:
             self.fields['grouped_disaggregations'].initial = [
