@@ -313,7 +313,12 @@ export const IndexView = observer(
                                         { organizationColumn(data)}
                                     </Col>
                                     <Col className="text-nowrap">
-                                        {data.program_users ? <a href={`/tola_management/user/?programs[]=${data.id}`}><i className="fas fa-users"/>&nbsp;{data.program_users} {gettext("users")}</a> : '---'  }
+                                        {data.program_users ?
+                                            <a href={`/tola_management/user/?programs[]=${data.id}`}>
+                                                <i className="fas fa-users"/>&nbsp;{data.program_users} {
+                                                    // # Translators: preceded by a number > 1, i.e. "3 users"
+                                                    gettext("users")}</a>
+                                    : <span><i className="fas fa-users" />&nbsp;{`0 ${gettext("users")}`}</span>}
                                     </Col>
                                     <Col>{fundingStatusDisplayStr(data.funding_status)}</Col>
                                 </Row>

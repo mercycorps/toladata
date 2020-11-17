@@ -163,22 +163,26 @@ export const IndexView = observer(
                                         </div>
                                     </Col>
                                     <Col size="1" className="text-nowrap">
+                                    {data.program_count ?
                                         <a href={`/tola_management/program/?organizations[]=${data.id}`}>
                                             <i className="fas fa-cubes"/>&nbsp;
                                             {data.program_count} {
-                                                // # Translators: preceded by a number > 1, i.e. "3 Programs"
-                                                gettext("Programs")
+                                                // # Translators: preceded by a number > 1, i.e. "3 programs"
+                                                gettext("programs")
                                             }
-                                        </a>
+                                        </a> 
+                                        : <span><i className="fas fa-cubes"/>&nbsp;{`0 ${gettext("programs")}`}</span>}
                                     </Col>
                                     <Col size="1" className="text-nowrap">
+                                    { data.user_count ?
                                         <a href={`/tola_management/user/?organizations[]=${data.id}`}>
                                             <i className="fas fa-users"/>&nbsp;
                                             {data.user_count} {
-                                                // # Translators: preceded by a number > 1, i.e. "3 Users"
-                                                gettext("Users")
+                                                // # Translators: preceded by a number > 1, i.e. "3 users"
+                                                gettext("users")
                                             }
                                         </a>
+                                        : <span><i className="fas fa-users"/>&nbsp;{`0 ${gettext("users")}`}</span>}
                                     </Col>
                                     <Col size="0.25">{data.is_active ? gettext('Active') : gettext('Inactive')}</Col>
                                 </Row>

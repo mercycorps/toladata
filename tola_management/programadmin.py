@@ -421,6 +421,9 @@ class ProgramAdminViewSet(viewsets.ModelViewSet):
             For performance reasons, looking up every user with permission to see the program individually for
             all 20+ in a paginated set was costly.  This annotates the information in one (admittedly spendy) query
         """
+        # need a count of superusers to add to user count:
+        superusers_count = TolaUser.objects.filter(user__is_superuser=True).count()
+        add_mc_for_superusers = 1 if superusers_count else 0
         # start with the correctly annotated-for-rf queryset:
         queryset = Program.rf_aware_all_objects.all()
         queryset = queryset.annotate(
@@ -430,7 +433,8 @@ class ProgramAdminViewSet(viewsets.ModelViewSet):
                     ProgramAccess.objects.filter(
                         program=models.OuterRef('pk')
                     ).exclude(
-                        tolauser__organization_id=Organization.MERCY_CORPS_ID
+                        models.Q(tolauser__organization_id=Organization.MERCY_CORPS_ID) |
+                        models.Q(tolauser__user__is_superuser=True)
                     ).order_by().values('program').annotate(
                         users_count=models.Count('tolauser', distinct=True)
                     ).values('users_count')[:1],
@@ -443,7 +447,9 @@ class ProgramAdminViewSet(viewsets.ModelViewSet):
                     models.Subquery(
                         CountryAccess.objects.filter(
                             country=models.OuterRef('country'),
-                            tolauser__organization_id=Organization.MERCY_CORPS_ID,
+                            tolauser__organization_id=Organization.MERCY_CORPS_ID
+                        ).exclude(
+                            tolauser__user__is_superuser=True
                         ).order_by().values('country').annotate(
                             users_count=models.Count('tolauser', distinct=True)
                         ).values('users_count'),
@@ -453,7 +459,11 @@ class ProgramAdminViewSet(viewsets.ModelViewSet):
             )
         ).annotate(
             # program only users + country access users _should_ equal total users with access:
-            program_users_count=models.F('program_access_users_count') + models.F('country_access_users_count')
+            program_users_count=(
+                models.F('program_access_users_count') +
+                models.F('country_access_users_count') +
+                models.Value(superusers_count)
+            )
         ).annotate(
             # to add the number of organizations involved, first add one if there are MC users:
             mc_org_count=models.Case(
@@ -461,7 +471,7 @@ class ProgramAdminViewSet(viewsets.ModelViewSet):
                     country_access_users_count__gt=0,
                     then=models.Value(1)
                 ),
-                default=models.Value(0),
+                default=models.Value(add_mc_for_superusers),
                 output_field=models.IntegerField()
             ),
             # count the organizations of all non-mercy corps users (skip to 0 if none to count):
@@ -520,6 +530,7 @@ class ProgramAdminViewSet(viewsets.ModelViewSet):
         return queryset
 
     def get_queryset(self):
+        """Get programs user has access to, annotate for counts, and filter based on provided params from request"""
         auth_user = self.request.user
         params = self.request.query_params
 

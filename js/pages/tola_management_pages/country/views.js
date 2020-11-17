@@ -196,37 +196,37 @@ export const IndexView = observer(
                                         </div>
                                     </Col>
                                     <Col className="text-nowrap">
-                                        { data.organizations.length ?
+                                        { data.organizations_count ?
                                             <a href={`/tola_management/organization/?countries[]=${data.id}`}>
                                                 <i className="fas fa-building"/>&nbsp;
-                                                {data.organizations.length} {
-                                                    // # Translators: preceded by a number > 1, i.e. "3 Organizations"
-                                                    gettext("Organizations")
+                                                {data.organizations_count} {
+                                                    // # Translators: preceded by a number > 1, i.e. "3 organizations"
+                                                    gettext("organizations")
                                                     }
                                             </a>
-                                        : '---'}
+                                        : <span><i className="fas fa-building"/>&nbsp;{`0 ${gettext("organizations")}`}</span>}
                                     </Col>
                                     <Col className="text-nowrap">
-                                        { data.programCount ?
+                                        { data.programs_count ?
                                             <a href={`/tola_management/program/?countries[]=${data.id}`}>
                                                 <i className="fas fa-cubes"/>&nbsp;
-                                                {data.programCount} {
-                                                    // # Translators: preceded by a number > 1, i.e. "3 Programs"
-                                                    gettext("Programs")
+                                                {data.programs_count} {
+                                                    // # Translators: preceded by a number > 1, i.e. "3 programs"
+                                                    gettext("programs")
                                                 }
                                             </a>
-                                        : "---"}
+                                        : <span><i className="fas fa-cubes"/>&nbsp;{`0 ${gettext("programs")}`}</span>}
                                     </Col>
                                     <Col className="text-nowrap">
-                                        { data.user_count ?
+                                        { data.users_count ?
                                             <a href={`/tola_management/user/?countries[]=${data.id}`}>
                                                 <i className="fas fa-users"/>&nbsp;
-                                                {data.user_count} {
-                                                    // # Translators: preceded by a number > 1, i.e. "3 Users"
-                                                    gettext("Users")
+                                                {data.users_count} {
+                                                    // # Translators: preceded by a number > 1, i.e. "3 users"
+                                                    gettext("users")
                                                 }
                                             </a>
-                                        : '---'  }
+                                        : <span><i className="fas fa-users"/>&nbsp;{`0 ${gettext("users")}`}</span>}
                                     </Col>
                                 </Row>
                             }
