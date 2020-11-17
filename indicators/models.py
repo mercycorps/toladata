@@ -1074,6 +1074,47 @@ class Indicator(SafeDeleteModel):
         (6, 'Activity')
     ]
 
+    QUALITY_ASSURANCE_CHOICES = [
+        # Translators:  describes a user-selectable option in a list of things that users can do to ensure program quality
+        ('data_cleaning', _('Data cleaning and processing')),
+        # Translators:  describes a user-selectable option in a list of things that users can do to ensure program quality
+        ('data_collection', _('Data collection training and piloting')),
+        # Translators:  describes a user-selectable option in a list of things that users can do to ensure program quality
+        ('data_cross_checks', _('Data cross checks or triangulation')),
+        # Translators:  describes a user-selectable option in a list of things that users can do to ensure program quality
+        ('dqas', _('Data quality audits (DQAs)')),
+        # Translators:  describes a user-selectable option in a list of things that users can do to ensure program quality
+        ('data_spot_checks', _('Data spot checks')),
+        # Translators:  describes a user-selectable option in a list of things that users can do to ensure program quality
+        ('digital_data_collection', _('Digital data collection tools')),
+        # Translators:  describes a user-selectable option in a list of things that users can do to ensure program quality
+        ('participatory_data_analysis', _('Participatory data analysis validation')),
+        # Translators:  describes a user-selectable option in a list of things that users can do to ensure program quality
+        ('peer_reviews', _('Peer reviews or reproducibility checks')),
+        # Translators:  describes a user-selectable option in a list of things that users can do to ensure program quality
+        ('randomized_phone_calls', _('Randomized phone calls to respondents')),
+        # Translators:  describes a user-selectable option in a list of things that users can do to ensure program quality
+        ('randomized_visits', _('Randomized visits to respondents')),
+        # Translators:  describes a user-selectable option in a list of things that users can do to ensure program quality
+        ('regular_reviews', _('Regular indicator and data reviews')),
+        # Translators:  describes a user-selectable option in a list of things that users can do to ensure program quality
+        ('shadow_audits', _('Shadow audits')),
+        # Translators:  describes a user-selectable option in a list of things that users can do to ensure program quality
+        ('standardized_indicators', _('Standardized indicators')),
+        # Translators:  describes a user-selectable option in a list of things that users can do to ensure program quality
+        ('sops', _('Standard operating procedures (SOPs)')),
+    ]
+
+    INFORMATION_USE_CHOICES = [
+        # Translators:  describes a user-selectable option in a list of things that users plan to do with the information gathered while the program is running
+        ('donor_reporting', _('Donor and/or stakeholder reporting')),
+        # Translators:  describes a user-selectable option in a list of things that users plan to do with the information gathered while the program is running
+        ('internal_program_management', _('Internal program management and learning')),
+        # Translators:  describes a user-selectable option in a list of things that users plan to do with the information gathered while the program is running
+        ('participant_accountability', _('Participant accountability'))
+    ]
+
+
 
     indicator_key = models.UUIDField(
         default=uuid.uuid4, help_text=" ", verbose_name=_("Indicator key"))
