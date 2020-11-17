@@ -2,8 +2,8 @@ msgid ""
 msgstr ""
 "Project-Id-Version: \n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2020-11-16 11:26-0800\n"
-"PO-Revision-Date: 2020-11-16 11:26-0800\n"
+"POT-Creation-Date: 2020-11-17 10:59-0800\n"
+"PO-Revision-Date: 2020-11-17 11:02-0800\n"
 "Last-Translator: \n"
 "Language-Team: \n"
 "Language: fr\n"
@@ -14,10 +14,8 @@ msgstr ""
 "X-Generator: Poedit 2.4.1\n"
 
 #: js/base.js:336
-#, fuzzy
-#| msgid "Success!"
 msgid "Success"
-msgstr "Succès !"
+msgstr "Succès"
 
 #: js/base.js:391 js/base.js:392
 msgid ""
@@ -1558,14 +1556,14 @@ msgstr "Proposé"
 #: js/pages/tola_management_pages/country/components/edit_objectives.js:10
 #: js/pages/tola_management_pages/organization/components/edit_organization_history.js:9
 #: js/pages/tola_management_pages/organization/models.js:57
-#: js/pages/tola_management_pages/organization/views.js:177
+#: js/pages/tola_management_pages/organization/views.js:183
 #: js/pages/tola_management_pages/program/components/program_history.js:9
 #: js/pages/tola_management_pages/program/views.js:66
 #: js/pages/tola_management_pages/program/views.js:158
 #: js/pages/tola_management_pages/program/views.js:164
 #: js/pages/tola_management_pages/user/components/edit_user_history.js:8
 #: js/pages/tola_management_pages/user/models.js:75
-#: js/pages/tola_management_pages/user/views.js:348
+#: js/pages/tola_management_pages/user/views.js:351
 msgid "Active"
 msgstr "Actif"
 
@@ -1728,23 +1726,27 @@ msgstr "Trouver un Pays"
 msgid "None Selected"
 msgstr "Aucune sélection"
 
+#. Translators: preceded by a number > 1, i.e. "3 Organizations"
 #: js/pages/tola_management_pages/country/views.js:30
 #: js/pages/tola_management_pages/country/views.js:95
-#: js/pages/tola_management_pages/country/views.js:202
+#: js/pages/tola_management_pages/country/views.js:204
 #: js/pages/tola_management_pages/organization/views.js:89
 #: js/pages/tola_management_pages/program/views.js:42
 #: js/pages/tola_management_pages/program/views.js:231
 msgid "Organizations"
 msgstr "Sociétés"
 
+#. Translators: preceded by a number > 1, i.e. "3 Programs"
 #: js/pages/tola_management_pages/country/views.js:42
 #: js/pages/tola_management_pages/country/views.js:96
-#: js/pages/tola_management_pages/country/views.js:210
+#: js/pages/tola_management_pages/country/views.js:215
 #: js/pages/tola_management_pages/organization/views.js:30
 #: js/pages/tola_management_pages/organization/views.js:111
+#: js/pages/tola_management_pages/organization/views.js:170
 #: js/pages/tola_management_pages/program/views.js:206
 #: js/pages/tola_management_pages/user/views.js:59
 #: js/pages/tola_management_pages/user/views.js:262
+#: js/pages/tola_management_pages/user/views.js:347
 msgid "Programs"
 msgstr "Programmes"
 
@@ -1766,29 +1768,31 @@ msgstr "Pays"
 msgid "Add Country"
 msgstr "Ajouter un pays"
 
+#. Translators: preceded by a number > 1, i.e. "3 Users"
 #: js/pages/tola_management_pages/country/views.js:97
-#: js/pages/tola_management_pages/country/views.js:218
+#: js/pages/tola_management_pages/country/views.js:226
 #: js/pages/tola_management_pages/organization/views.js:112
+#: js/pages/tola_management_pages/organization/views.js:179
 #: js/pages/tola_management_pages/program/views.js:18
 #: js/pages/tola_management_pages/program/views.js:232
 #: js/pages/tola_management_pages/user/views.js:236
 msgid "Users"
 msgstr "Utilisateurs"
 
-#: js/pages/tola_management_pages/country/views.js:228
+#: js/pages/tola_management_pages/country/views.js:237
 msgid "countries"
 msgstr "pays"
 
 #: js/pages/tola_management_pages/organization/components/edit_organization_history.js:10
 #: js/pages/tola_management_pages/organization/models.js:58
-#: js/pages/tola_management_pages/organization/views.js:177
+#: js/pages/tola_management_pages/organization/views.js:183
 #: js/pages/tola_management_pages/program/components/program_history.js:10
 #: js/pages/tola_management_pages/program/views.js:67
 #: js/pages/tola_management_pages/program/views.js:159
 #: js/pages/tola_management_pages/program/views.js:164
 #: js/pages/tola_management_pages/user/components/edit_user_history.js:9
 #: js/pages/tola_management_pages/user/models.js:76
-#: js/pages/tola_management_pages/user/views.js:348
+#: js/pages/tola_management_pages/user/views.js:351
 msgid "Inactive"
 msgstr "Inactif"
 
@@ -1853,19 +1857,7 @@ msgstr "Trouver une Société"
 msgid "Add Organization"
 msgstr "Ajouter une société"
 
-#: js/pages/tola_management_pages/organization/views.js:168
-#: js/pages/tola_management_pages/program/views.js:321
-#: js/pages/tola_management_pages/user/views.js:345
-msgid "programs"
-msgstr "programmes"
-
-#: js/pages/tola_management_pages/organization/views.js:174
-#: js/pages/tola_management_pages/program/views.js:312
-#: js/pages/tola_management_pages/user/views.js:355
-msgid "users"
-msgstr "utilisateurs"
-
-#: js/pages/tola_management_pages/organization/views.js:184
+#: js/pages/tola_management_pages/organization/views.js:190
 msgid "organizations"
 msgstr "sociétés"
 
@@ -2006,6 +1998,23 @@ msgstr "Définir le statut du programme"
 #: js/pages/tola_management_pages/program/views.js:212
 msgid "Add Program"
 msgstr "Ajouter un programme"
+
+#. Translators: Labels a freshly created program before the name is entered
+#: js/pages/tola_management_pages/program/views.js:294
+#: js/pages/tola_management_pages/program/views.js:307
+#, fuzzy
+#| msgid "Program"
+msgid "New Program"
+msgstr "Programme"
+
+#: js/pages/tola_management_pages/program/views.js:316
+#: js/pages/tola_management_pages/user/views.js:358
+msgid "users"
+msgstr "utilisateurs"
+
+#: js/pages/tola_management_pages/program/views.js:325
+msgid "programs"
+msgstr "programmes"
 
 #: js/pages/tola_management_pages/user/components/edit_user_history.js:61
 msgid "Resend Registration Email"
