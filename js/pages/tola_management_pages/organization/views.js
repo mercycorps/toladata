@@ -165,10 +165,9 @@ export const IndexView = observer(
                                     <Col size="1" className="text-nowrap">
                                     {data.program_count ?
                                         <a href={`/tola_management/program/?organizations[]=${data.id}`}>
-                                            <i className="fas fa-cubes"/>&nbsp;
-                                            {data.program_count} {
+                                            <i className="fas fa-cubes"/>&nbsp;{
                                                 // # Translators: preceded by a number, i.e. "3 programs" or "1 program"
-                                                interpolate(ngettext("%d program", "%d programs", data.program_count), [data.program_count])
+                                                interpolate(ngettext("%s program", "%s programs", data.program_count), [data.program_count])
                                             }
                                         </a> 
                                         : <span><i className="fas fa-cubes"/>&nbsp;{
@@ -178,10 +177,9 @@ export const IndexView = observer(
                                     <Col size="1" className="text-nowrap">
                                     { data.user_count ?
                                         <a href={`/tola_management/user/?organizations[]=${data.id}`}>
-                                            <i className="fas fa-users"/>&nbsp;
-                                            {data.user_count} {
+                                            <i className="fas fa-users"/>&nbsp;{
                                                 // # Translators: preceded by a number, i.e. "3 users" or "1 user"
-                                                interpolate(ngettext("%d user", "%d users", data.user_count), [data.user_count])
+                                                interpolate(ngettext("%s user", "%s users", data.user_count), [data.user_count])
                                             }
                                         </a>
                                         : <span><i className="fas fa-users"/>&nbsp;{
