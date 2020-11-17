@@ -69,6 +69,8 @@ class CountryAdminSerializer(serializers.ModelSerializer):
 
     def get_users_count(self, country):
         """These are prefetched so it isn't DB-expensive, but math done in Python to avoid bad join counts"""
+        # note: getattr is so individual serializer instances (on save, update, etc.) don't fail for not being
+        # properly prepared with prefetches
         return len(set(
             [ca.tolauser_id for ca in getattr(country, 'country_users', [])] +
             [pa.tolauser_id for pa in getattr(country, 'program_users', [])]
@@ -76,6 +78,8 @@ class CountryAdminSerializer(serializers.ModelSerializer):
 
     def get_organizations_count(self, country):
         """As above: prefetched rows are counted in python to avoid join-math issues"""
+        # note: getattr is so individual serializer instances (on save, update, etc.) don't fail for not being
+        # properly prepared with prefetches
         org_ids = set(
             [ca.tolauser.organization_id for ca in getattr(country, 'country_users', [])] +
             [pa.tolauser.organization_id for pa in getattr(country, 'program_users', [])] +
