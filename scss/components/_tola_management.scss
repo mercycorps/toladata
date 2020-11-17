@@ -141,6 +141,16 @@
     }
 }
 
+.retro-programs a.accordion-row__btn.btn.btn-link.disaggregation--programs__header {
+    padding-right: 4px;
+
+    &.disabled {
+        opacity: 50%;
+        pointer-events: none;
+        color: $link-color;
+    }
+}
+
 .disaggregation-programs {
     max-height: 12rem;
     overflow: auto;

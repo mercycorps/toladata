@@ -190,7 +190,7 @@ export class RetroProgramCheckBoxWrapper extends React.Component {
     constructor(props) {
         super(props);
         this.retroactiveAssignmentPopup = React.createRef();
-        this.state = { programsExpanded: false}
+        this.state = { programsExpanded: false }
     }
 
     componentDidMount() {
@@ -215,10 +215,14 @@ export class RetroProgramCheckBoxWrapper extends React.Component {
                 </div>
         }
         // # Translators: This is text provided when a user clicks a help link.  It allows users to select which elements they want to apply the changes to.
-        const helpText = gettext('<p>Select a program if you plan to disaggregate all or most of its indicators by these categories.</p><p><span class="text-danger">This bulk assignment cannot be undone.</span> But you can always manually remove the disaggregation from individual indicators.</p>')
+        const helpText = gettext('<p>Select a program if you plan to disaggregate all or most of its indicators by these categories.</p><p><span class="text-danger"><strong>This bulk assignment cannot be undone.</strong></span> But you can always manually remove the disaggregation from individual indicators.</p>')
+
         return (
-            <div className="mt-2 ml-4">
-                 <a onClick={this.expandPrograms.bind(this)} className="btn accordion-row__btn btn-link disaggregation--retro-programs__header" tabIndex='0'>
+            <div className="mt-2 ml-4 retro-programs">
+                 <a
+                     onClick={this.expandPrograms.bind(this)}
+                     className={classNames('accordion-row__btn', 'btn', 'btn-link', 'disaggregation--programs__header', {disabled: this.props.disabled})}
+                     tabIndex='0'>
                     <FontAwesomeIcon icon={this.state.programsExpanded ? 'caret-down' : 'caret-right'} />
                     {/* # Translators: This feature allows a user to apply changes to existing programs as well as ones created in the future */}
                     <span className="mr-1">{gettext("Assign new disaggregation to all indicators in a program")}</span>
@@ -388,8 +392,9 @@ export class DisaggregationType extends React.Component {
     render() {
         const {disaggregation, expanded, expandAction, deleteAction, archiveAction, unarchiveAction, errors} = this.props;
         const managed_data = this.state;
-        const retroPrograms = (managed_data.selected_by_default && managed_data.id === "new") ? <RetroProgramCheckBoxWrapper
+        const retroPrograms = managed_data.id === "new" ? <RetroProgramCheckBoxWrapper
                 programs={this.programsForRetro}
+                disabled={this.state.selected_by_default !== true}
                 onRetroUpdate={this.updateRetroPrograms.bind(this)}/>
             : null
         return (

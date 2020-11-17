@@ -156,8 +156,7 @@ describe("Country admin disagg presentation components", () => {
             {id: 200, name: "Program 1", checked: false},
             {id: 201, name: "Program 2", checked: false}
         ];
-        disaggregation.id = "new";
-        disaggregation.disaggregation_type = "New Disagg";
+        disaggregation.id = "1";
         let wrapper = shallow(<DisaggregationType
             programs={programsForRetro}
             disaggregation={disaggregation}
@@ -165,17 +164,20 @@ describe("Country admin disagg presentation components", () => {
             errors={{}}
         />);
         expect(wrapper.containsMatchingElement(<RetroProgramCheckBoxWrapper />)).toEqual(false);
-        wrapper.setState({selected_by_default: true});
-        expect(wrapper.containsMatchingElement(<RetroProgramCheckBoxWrapper />)).toEqual(true);
 
         disaggregation.id = "new";
-        wrapper = shallow(<DisaggregationType
+        wrapper = mount(<DisaggregationType
             programs={programsForRetro}
             disaggregation={disaggregation}
             expanded={true}
             errors={{}}
         />);
-        expect(wrapper.containsMatchingElement(<RetroProgramCheckBoxWrapper />)).toEqual(false);
+        expect(wrapper.containsMatchingElement(<RetroProgramCheckBoxWrapper />)).toEqual(true);
+        expect(wrapper.find('.disaggregation--programs__header').hasClass('disabled')).toEqual(true);
+
+        wrapper.setState({selected_by_default: true});
+        expect(wrapper.containsMatchingElement(<RetroProgramCheckBoxWrapper />)).toEqual(true);
+        expect(wrapper.find('.disaggregation--programs__header').hasClass('disabled')).toEqual(false);
     });
 
     it("displays programs in alpha order", () => {
