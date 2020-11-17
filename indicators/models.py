@@ -1150,6 +1150,8 @@ class Indicator(SafeDeleteModel):
         help_text=_("This selection determines how results are calculated and displayed.")
     )
 
+    # this helptext is duplicated in forms.py because of the wacky way we currently do disaggregations, if
+    # you update the help_text, update in both places
     disaggregation = models.ManyToManyField(
         DisaggregationType, blank=True, verbose_name=_("Disaggregation"),
         help_text=_("Select all relevant disaggregations. Disaggregations are managed by the TolaData country "

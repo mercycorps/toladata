@@ -301,6 +301,8 @@ class IndicatorForm(forms.ModelForm):
                     _('This disaggregation cannot be unselected, because it was already used in submitted program results.')
                 )
             return helptext
+        # this is duplicated because of the wacky way we are handling disaggregations in the modal form
+        # if you need to update this, also update it in the indicator model
         disaggregation_group_helptext = _("Select all relevant disaggregations. Disaggregations are managed by the "
                                           "TolaData country administrator. Mercy Corps required disaggregations (e.g. "
                                           "SADD) are selected by default, but can be deselected when they are not "
