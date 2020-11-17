@@ -1082,6 +1082,7 @@ class Indicator(SafeDeleteModel):
     # TODO: make this a foreign key
     indicator_type = models.ManyToManyField(
         IndicatorType, blank=True, verbose_name=_("Indicator type"),
+        # Translators: this is help text for a field on an indicator setup form
         help_text=_("Classifying indicators by type allows us to filter and analyze related sets of indicators.")
     )
 
@@ -1089,6 +1090,7 @@ class Indicator(SafeDeleteModel):
     level = models.ForeignKey(
         Level, blank=True, null=True, verbose_name=_("Level"),
         on_delete=models.SET_NULL,
+        # Translators: this is help text for a drop down select menu on an indicator setup form
         help_text=_("Select the result this indicator is intended to measure.")
     )
 
@@ -1105,27 +1107,34 @@ class Indicator(SafeDeleteModel):
     strategic_objectives = models.ManyToManyField(
         StrategicObjective, verbose_name=_("Country Strategic Objective"),
         blank=True, related_name="strat_indicator",
+        # Translators: this is help text for a menu area on an indicator setup form where objectives are selected
         help_text=_("Identifying the country strategic objectives to which an indicator contributes, allows us to "
                     "filter and analyze related sets of indicators. Country strategic objectives are managed by the "
                     "TolaData country administrator.")
     )
 
     name = models.CharField(verbose_name=_("Name"), max_length=500, null=False,
+                            # Translators: this is help text for a field on an indicator setup form
                             help_text=_("Provide an indicator statement of the precise information needed "
                                         "to assess whether intended changes have occurred."))
 
     number = models.CharField(
+        # Translators: this is the label for a form field where the user enters the "number" identifying an indicator
         _("Number"), max_length=255, null=True, blank=True, help_text=" "
     )
 
     source = models.CharField(
+        # Translators: field label for entering which standardized list the indicator was chosen from
         _("Source"), max_length=255, null=True, blank=True,
+        # Translators: this is help text for a field on an indicator setup form
         help_text=_("Identify the source of this indicator (e.g. Mercy Corps DIG, EC, USAID, etc.) If the indicator "
                     "is brand new and created specifically for the program, enter \"Custom.\"")
     )
 
     definition = models.TextField(
+        # Translators: field label for entering the extended explanation of the indicator
         _("Definition"), null=True, blank=True,
+        # Translators: this is help text for a field on an indicator setup form
         help_text=_("Provide a long-form definition of the indicator and all key terms that need further detail for "
                     "precise and reliable measurement. Anyone reading the definition should understand exactly what "
                     "the indicator is measuring without any ambiguity.")
@@ -1134,12 +1143,14 @@ class Indicator(SafeDeleteModel):
     justification = models.TextField(
         max_length=500, null=True, blank=True,
         verbose_name=_("Rationale or justification for indicator"),
+        # Translators: this is help text for a field on an indicator setup form
         help_text=_("Explain why the indicator was chosen for this program.")
     )
 
     unit_of_measure = models.CharField(
         max_length=135, null=True, blank=True,
         verbose_name=_("Unit of measure"),
+        # Translators: this is help text for a field on an indicator setup form
         help_text=_("Enter a meaningful description of what the indicator uses as its standard unit "
                     "(e.g. households, kilograms, kits, participants, etc.)")
     )
@@ -1147,6 +1158,7 @@ class Indicator(SafeDeleteModel):
     unit_of_measure_type = models.IntegerField(
         blank=False, null=True, choices=UNIT_OF_MEASURE_TYPES,
         default=NUMBER, verbose_name=_("Unit Type"),
+        # Translators: this is help text for a user selecting "percentage" or "numeric" as the measurement type
         help_text=_("This selection determines how results are calculated and displayed.")
     )
 
@@ -1154,6 +1166,7 @@ class Indicator(SafeDeleteModel):
     # you update the help_text, update in both places
     disaggregation = models.ManyToManyField(
         DisaggregationType, blank=True, verbose_name=_("Disaggregation"),
+        # Translators: this is help text for a menu area where disaggregations (by age, gender, etc.) are selected
         help_text=_("Select all relevant disaggregations. Disaggregations are managed by the TolaData country "
                     "administrator. Mercy Corps required disaggregations (e.g. SADD) are selected by default, but "
                     "can be deselected when they are not applicable to the indicator.")
@@ -1161,6 +1174,7 @@ class Indicator(SafeDeleteModel):
 
     baseline = models.CharField(
         verbose_name=_("Baseline"), max_length=255, null=True, blank=True,
+        # Translators: this is help text for a field on an indicator setup form
         help_text=_("Enter a numeric value for the baseline. If a baseline is not yet known or not applicable, "
                     "enter a zero or select the \"Not applicable\" checkbox. The baseline can always be updated "
                     "at later point in time.")
@@ -1177,6 +1191,7 @@ class Indicator(SafeDeleteModel):
     direction_of_change = models.IntegerField(
         blank=False, null=True, choices=DIRECTION_OF_CHANGE,
         default=DIRECTION_OF_CHANGE_NONE, verbose_name=_("Direction of Change"),
+        # Translators: this is help text for a field on an indicator setup form
         help_text=_("Is your program trying to achieve an increase (+) or decrease (-) in the indicator's "
                     "unit of measure? This field is important for the accuracy of our \"indicators on track\" "
                     "metric. For example, if we are tracking a decrease in cases of malnutrition, we will have "
@@ -1189,6 +1204,7 @@ class Indicator(SafeDeleteModel):
 
     rationale_for_target = models.TextField(
         _("Rationale for target"), max_length=255, null=True, blank=True,
+        # Translators: this is help text for a field on an indicator setup form
         help_text=_("Provide an explanation for any target value/s assigned to this indicator. You might "
                     "include calculations and any historical or secondary data sources used to estimate targets.")
     )
@@ -1196,6 +1212,7 @@ class Indicator(SafeDeleteModel):
     target_frequency = models.IntegerField(
         blank=False, null=True, choices=TARGET_FREQUENCIES,
         verbose_name=_("Target frequency"),
+        # Translators: this is help text for a field on an indicator setup form
         help_text=_("This selection determines how the indicator's targets and results are organized and displayed. "
                     "Target frequencies will vary depending on how frequently the program needs indicator data to "
                     "properly manage and report on program progress.")
@@ -1220,12 +1237,14 @@ class Indicator(SafeDeleteModel):
 
     means_of_verification = models.TextField(
         max_length=1500, null=True, blank=True, verbose_name=_("Means of verification / data source"),
+        # Translators: this is help text for a field on an indicator setup form
         help_text=_("Identify the source of indicator data and the tools used to collect data (e.g., surveys, "
                     "checklists, etc.) Indicate whether these tools already exist or will need to be developed.")
     )
 
     data_collection_method = models.TextField(
         max_length=2500, null=True, blank=True, verbose_name=_("Data collection method"),
+        # Translators: this is help text for a field on an indicator setup form
         help_text=_("Explain the process used to collect data (e.g., population-based sampling with randomized "
                     "selection, review of partner records, etc.) Explain how the means of verification or data "
                     "sources will be collected. Describe the methodological approaches the indicator will apply "
@@ -1235,6 +1254,7 @@ class Indicator(SafeDeleteModel):
     data_collection_frequency = models.ForeignKey(
         DataCollectionFrequency, null=True, blank=True, on_delete=models.SET_NULL,
         verbose_name=_("Frequency of data collection"),
+        # Translators: this is help text for a field on an indicator setup form
         help_text=_("How frequently will you collect data for this indicator? The frequency and timing of data "
                     "collection should be based on how often data are needed for management purposes, the cost of "
                     "data collection, and the pace of change anticipated. If an indicator requires multiple data "
@@ -1244,6 +1264,7 @@ class Indicator(SafeDeleteModel):
 
     data_points = models.TextField(
         max_length=1000, null=True, blank=True, verbose_name=_("Data points"),
+        # Translators: this is help text for a field on an indicator setup form
         help_text=_("List all data points required for reporting. While some indicators require a single data point "
                     "(# of students attending training), others require multiple data points for calculation. "
                     "For example, to calculate the % of students graduated from a training course, the two data "
@@ -1252,18 +1273,21 @@ class Indicator(SafeDeleteModel):
 
     responsible_person = models.TextField(
         max_length=500, null=True, blank=True, verbose_name=_("Responsible person(s) and team"),
+        # Translators: this is help text for a field on an indicator setup form
         help_text=_("List the people or team(s) responsible for data collection. This can include community "
                     "volunteers, program team members, local partner(s), enumerators, consultants, etc.")
     )
 
     method_of_analysis = models.TextField(
         max_length=4000, null=True, blank=True, verbose_name=_("Method of analysis"),
+        # Translators: this is help text for a field on an indicator setup form
         help_text=_("The method of analysis should be detailed enough to allow an auditor or third party to "
                     "reproduce the analysis or calculation and generate the same result.")
     )
 
     information_use = models.TextField(
         max_length=500, null=True, blank=True, verbose_name=_("Information use"),
+        # Translators: this is help text for a field on an indicator setup form
         help_text=_("Select the primary uses of the indicator and its intended audience. This is the most important "
                     "field in an indicator plan, because it explains the utility of the indicator. If an indicator "
                     "has no clear informational purpose, then it should not be tracked or measured. By articulating "
@@ -1273,6 +1297,7 @@ class Indicator(SafeDeleteModel):
 
     reporting_frequency = models.ForeignKey(
         ReportingFrequency, null=True, blank=True, on_delete=models.SET_NULL, verbose_name=_("Frequency of reporting"),
+        # Translators: this is help text for a field on an indicator setup form
         help_text=_("This frequency should make sense in relation to the data collection frequency and target "
                     "frequency and should adhere to any requirements regarding program, stakeholder, and/or donor "
                     "accountability and reporting.")
@@ -1280,11 +1305,13 @@ class Indicator(SafeDeleteModel):
 
     quality_assurance = models.TextField(
         max_length=500, null=True, blank=True, verbose_name=_("Quality assurance measures"),
+        # Translators: this is help text for a field on an indicator setup form
         help_text=_("Select any quality assurance measures specific to this indicator.")
     )
 
     data_issues = models.TextField(
         max_length=500, null=True, blank=True, verbose_name=_("Data issues"),
+        # Translators: this is help text for a field on an indicator setup form
         help_text=_("List any limitations of the data used to calculate this indicator (e.g., issues with validity, "
                     "reliability, accuracy, precision, and/or potential for double counting.) Data issues can be "
                     "related to indicator design, data collection methods, and/or data analysis methods. Please be "
@@ -1307,6 +1334,7 @@ class Indicator(SafeDeleteModel):
 
     sector = models.ForeignKey(
         Sector, null=True, blank=True, on_delete=models.SET_NULL, verbose_name=_("Sector"),
+        # Translators: this is help text for a field on an indicator setup form where the user selects from a list
         help_text=_("Classifying indicators by sector allows us to filter and analyze related sets of indicators.")
     )
 

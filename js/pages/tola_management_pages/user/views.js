@@ -342,7 +342,10 @@ export const IndexView = observer(
                                     <Col className="text-nowrap">
                                         <a href={`/tola_management/program/?users[]=${data.id}`}>
                                             <i className="fas fa-cubes"/>&nbsp;
-                                            {data.user_programs} {gettext("programs")}
+                                            {data.user_programs} {
+                                                // # Translators: preceded by a number > 1, i.e. "3 Programs"
+                                                gettext("Programs")
+                                            }
                                         </a>
                                     </Col>
                                     <Col size="0.25">{data.is_active?gettext('Active'):gettext('Inactive')}</Col>

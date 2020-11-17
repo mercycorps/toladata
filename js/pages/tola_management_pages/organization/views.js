@@ -165,13 +165,19 @@ export const IndexView = observer(
                                     <Col size="1" className="text-nowrap">
                                         <a href={`/tola_management/program/?organizations[]=${data.id}`}>
                                             <i className="fas fa-cubes"/>&nbsp;
-                                            {data.program_count} {gettext("programs")}
+                                            {data.program_count} {
+                                                // # Translators: preceded by a number > 1, i.e. "3 Programs"
+                                                gettext("Programs")
+                                            }
                                         </a>
                                     </Col>
                                     <Col size="1" className="text-nowrap">
                                         <a href={`/tola_management/user/?organizations[]=${data.id}`}>
                                             <i className="fas fa-users"/>&nbsp;
-                                            {data.user_count} {gettext("users")}
+                                            {data.user_count} {
+                                                // # Translators: preceded by a number > 1, i.e. "3 Users"
+                                                gettext("Users")
+                                            }
                                         </a>
                                     </Col>
                                     <Col size="0.25">{data.is_active ? gettext('Active') : gettext('Inactive')}</Col>

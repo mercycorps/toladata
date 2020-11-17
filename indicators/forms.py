@@ -303,6 +303,7 @@ class IndicatorForm(forms.ModelForm):
             return helptext
         # this is duplicated because of the wacky way we are handling disaggregations in the modal form
         # if you need to update this, also update it in the indicator model
+        # Translators: this is help text for a menu area where disaggregations (by age, gender, etc.) are selected
         disaggregation_group_helptext = _("Select all relevant disaggregations. Disaggregations are managed by the "
                                           "TolaData country administrator. Mercy Corps required disaggregations (e.g. "
                                           "SADD) are selected by default, but can be deselected when they are not "

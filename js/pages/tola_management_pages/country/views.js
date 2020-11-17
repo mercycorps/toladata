@@ -199,7 +199,10 @@ export const IndexView = observer(
                                         { data.organizations.length ?
                                             <a href={`/tola_management/organization/?countries[]=${data.id}`}>
                                                 <i className="fas fa-building"/>&nbsp;
-                                                {data.organizations.length} {gettext("Organizations")}
+                                                {data.organizations.length} {
+                                                    // # Translators: preceded by a number > 1, i.e. "3 Organizations"
+                                                    gettext("Organizations")
+                                                    }
                                             </a>
                                         : '---'}
                                     </Col>
@@ -207,7 +210,10 @@ export const IndexView = observer(
                                         { data.programCount ?
                                             <a href={`/tola_management/program/?countries[]=${data.id}`}>
                                                 <i className="fas fa-cubes"/>&nbsp;
-                                                {data.programCount} {gettext("Programs")}
+                                                {data.programCount} {
+                                                    // # Translators: preceded by a number > 1, i.e. "3 Programs"
+                                                    gettext("Programs")
+                                                }
                                             </a>
                                         : "---"}
                                     </Col>
@@ -215,7 +221,10 @@ export const IndexView = observer(
                                         { data.user_count ?
                                             <a href={`/tola_management/user/?countries[]=${data.id}`}>
                                                 <i className="fas fa-users"/>&nbsp;
-                                                {data.user_count} {gettext("Users")}
+                                                {data.user_count} {
+                                                    // # Translators: preceded by a number > 1, i.e. "3 Users"
+                                                    gettext("Users")
+                                                }
                                             </a>
                                         : '---'  }
                                     </Col>

@@ -289,7 +289,9 @@ export const IndexView = observer(
                                                 </div>
                                                 <div className="expando-toggle__label">
                                                     <i className="fas fa-cube"/>&nbsp;
-                                                    {data.name || "New Program"}
+                                                    {data.name ||
+                                                    // # Translators: Labels a freshly created program before the name is entered
+                                                    gettext("New Program")}
                                                 </div>
                                             </div>
                                         }
@@ -300,7 +302,9 @@ export const IndexView = observer(
                                                 </div>
                                                 <div className="expando-toggle__label">
                                                     <i className="fas fa-cube"/>&nbsp;
-                                                    {data.name || "New Program"}
+                                                    {data.name ||
+                                                    // # Translators: Labels a freshly created program before the name is entered
+                                                    gettext("New Program")}
                                                 </div>
                                             </div>
                                         }
