@@ -198,10 +198,9 @@ export const IndexView = observer(
                                     <Col className="text-nowrap">
                                         { data.organizations_count ?
                                             <a href={`/tola_management/organization/?countries[]=${data.id}`}>
-                                                <i className="fas fa-building"/>&nbsp;
-                                                {data.organizations_count} {
+                                                <i className="fas fa-building"/>&nbsp;{
                                                     // # Translators: preceded by a number, i.e. "3 organizations" or "1 organization"
-                                                    interpolate(ngettext("%d organization", "%d organizations", data.organizations_count), [data.organizations_count])
+                                                    interpolate(ngettext("%s organization", "%s organizations", data.organizations_count), [data.organizations_count])
                                                     }
                                             </a>
                                         : <span><i className="fas fa-building"/>&nbsp;{
@@ -211,10 +210,9 @@ export const IndexView = observer(
                                     <Col className="text-nowrap">
                                         { data.programs_count ?
                                             <a href={`/tola_management/program/?countries[]=${data.id}`}>
-                                                <i className="fas fa-cubes"/>&nbsp;
-                                                {data.programs_count} {
+                                                <i className="fas fa-cubes"/>&nbsp;{
                                                     // # Translators: preceded by a number, i.e. "3 programs" or "1 program"
-                                                    interpolate(ngettext("%d program", "%d programs", data.programs_count), [data.programs_count])
+                                                    interpolate(ngettext("%s program", "%s programs", data.programs_count), [data.programs_count])
                                                 }
                                             </a>
                                         : <span><i className="fas fa-cubes"/>&nbsp;{
@@ -225,10 +223,9 @@ export const IndexView = observer(
                                     <Col className="text-nowrap">
                                         { data.users_count ?
                                             <a href={`/tola_management/user/?countries[]=${data.id}`}>
-                                                <i className="fas fa-users"/>&nbsp;
-                                                {data.users_count} {
+                                                <i className="fas fa-users"/>&nbsp;{
                                                     // # Translators: preceded by a number, i.e. "3 users" or "1 user"
-                                                    interpolate(ngettext("%d user", "%d users", data.users_count), [data.users_count])
+                                                    interpolate(ngettext("%s user", "%s users", data.users_count), [data.users_count])
                                                 }
                                             </a>
                                         : <span><i className="fas fa-users"/>&nbsp;{

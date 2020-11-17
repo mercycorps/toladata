@@ -342,10 +342,9 @@ export const IndexView = observer(
                                     <Col className="text-nowrap">
                                     {data.user_programs ?
                                         <a href={`/tola_management/program/?users[]=${data.id}`}>
-                                            <i className="fas fa-cubes"/>&nbsp;
-                                            {data.user_programs} {
+                                            <i className="fas fa-cubes"/>&nbsp;{
                                                 // # Translators: preceded by a number, i.e. "3 programs" or "1 program"
-                                                interpolate(ngettext("%d program", "%d programs", data.user_programs), [data.user_programs])
+                                                interpolate(ngettext("%s program", "%s programs", data.user_programs), [data.user_programs,])
                                             }
                                         </a>
                                         : <span><i className="fas fa-cubes" />&nbsp;{
