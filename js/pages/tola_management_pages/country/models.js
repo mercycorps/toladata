@@ -208,15 +208,17 @@ export class CountryStore {
                 retroProgramCount
             ), [retroProgramCount])
             create_unified_changeset_notice({
+                header: gettext("Successfully saved"),
                 message_text: message,
                 self_dismissing: true,
                 notice_type: 'success',
-                show_icon: false,
                 rationale_required: false,
                 confirm_text: null,
                 cancel_text: null,
             })
         }
+        // This should be changed eventually, but it has Country Admin-wide impact and so is being left in for now,
+        // to avoid having to QA more than just the main ticket that added the unified notice above.
         else {
             PNotify.success({text: gettext("Successfully saved"), delay: 5000});
         }
