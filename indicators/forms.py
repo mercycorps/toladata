@@ -209,6 +209,8 @@ class IndicatorForm(forms.ModelForm):
             'data_points': forms.Textarea(attrs={'rows': 4}),
             'responsible_person': forms.Textarea(attrs={'rows': 4}),
             'method_of_analysis': forms.Textarea(attrs={'rows': 4}),
+            'information_use': forms.SelectMultiple(),
+            'quality_assurance': forms.SelectMultiple(),
         }
 
     def __init__(self, *args, **kwargs):
