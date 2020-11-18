@@ -141,6 +141,23 @@
     }
 }
 
+.retro-programs a.accordion-row__btn.btn.btn-link.disaggregation--programs__header {
+    padding-right: 4px;
+
+    &.disabled {
+        opacity: 50%;
+        pointer-events: none;
+        color: $link-color;
+    }
+}
+
+.disaggregation-programs {
+    max-height: 12rem;
+    overflow: auto;
+    border: 1px solid $gray-400;
+    padding: .25rem;
+}
+
 // expand/collapse toggles
 // TODO: Lots of overlap here with other implementations
 .expando-toggle {

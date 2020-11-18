@@ -163,16 +163,29 @@ export const IndexView = observer(
                                         </div>
                                     </Col>
                                     <Col size="1" className="text-nowrap">
+                                    {data.program_count ?
                                         <a href={`/tola_management/program/?organizations[]=${data.id}`}>
-                                            <i className="fas fa-cubes"/>&nbsp;
-                                            {data.program_count} {gettext("programs")}
-                                        </a>
+                                            <i className="fas fa-cubes"/>&nbsp;{
+                                                // # Translators: preceded by a number, i.e. "3 programs" or "1 program"
+                                                interpolate(ngettext("%s program", "%s programs", data.program_count), [data.program_count])
+                                            }
+                                        </a> 
+                                        : <span><i className="fas fa-cubes"/>&nbsp;{
+                                            // # Translators: when no programs are connected to the item
+                                            gettext("0 programs")}</span>}
                                     </Col>
                                     <Col size="1" className="text-nowrap">
+                                    { data.user_count ?
                                         <a href={`/tola_management/user/?organizations[]=${data.id}`}>
-                                            <i className="fas fa-users"/>&nbsp;
-                                            {data.user_count} {gettext("users")}
+                                            <i className="fas fa-users"/>&nbsp;{
+                                                // # Translators: preceded by a number, i.e. "3 users" or "1 user"
+                                                interpolate(ngettext("%s user", "%s users", data.user_count), [data.user_count])
+                                            }
                                         </a>
+                                        : <span><i className="fas fa-users"/>&nbsp;{
+                                            // # Translators: when no users are connected to the item
+                                            gettext("0 users")
+                                        }</span>}
                                     </Col>
                                     <Col size="0.25">{data.is_active ? gettext('Active') : gettext('Inactive')}</Col>
                                 </Row>

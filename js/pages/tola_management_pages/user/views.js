@@ -340,10 +340,17 @@ export const IndexView = observer(
                                         {data.organization_name || "---"}
                                     </Col>
                                     <Col className="text-nowrap">
+                                    {data.user_programs ?
                                         <a href={`/tola_management/program/?users[]=${data.id}`}>
-                                            <i className="fas fa-cubes"/>&nbsp;
-                                            {data.user_programs} {gettext("programs")}
+                                            <i className="fas fa-cubes"/>&nbsp;{
+                                                // # Translators: preceded by a number, i.e. "3 programs" or "1 program"
+                                                interpolate(ngettext("%s program", "%s programs", data.user_programs), [data.user_programs,])
+                                            }
                                         </a>
+                                        : <span><i className="fas fa-cubes" />&nbsp;{
+                                            // # Translators: when no programs are connected to the item
+                                            gettext("0 programs")
+                                        }</span>}
                                     </Col>
                                     <Col size="0.25">{data.is_active?gettext('Active'):gettext('Inactive')}</Col>
                                 </Row>
