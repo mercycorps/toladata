@@ -163,6 +163,10 @@ a.accordion-row__btn.btn.btn-link {
         text-decoration: none !important;
     }
 }
+.accordion-popover {
+    // this counters the accordion padding to put the popover next to the accordion text:
+    margin-left: -7px;
+}
 
 // form-list-group: extends bootstrap list-group
 .form-list-group {

@@ -227,15 +227,14 @@
                         <div class="form-group" id="parent_div_id_unit_of_measure">
                             <label for="id_unit_of_measure"
                                    class="label--required">{{ form.unit_of_measure.label }}</label>
-
+                            {% popover_helptext form.unit_of_measure.help_text %}
                             <div id="fieldgroup_id_unit_of_measure">
 
                                 <div id="div_id_unit_of_measure">
-                                    {% popover_helptext form.unit_of_measure.help_text %}
+                                    
                                     {% render_field form.unit_of_measure class+="form-control" %}
                                     <span id="validation_id_unit_of_measure" class="has-error"></span>
                                 </div>
-                                {% popover_helptext form.unit_of_measure_type.help_text %}
                                 {% for ut in form.unit_of_measure_type %}
                                     {% with id=form.unit_of_measure_type.auto_id %}
                                         <div class="form-check form-check-inline"
@@ -249,7 +248,6 @@
                                     {% endwith %}
                                 {% endfor %}
                             </div><!--/#fieldgroup_id_unit_of_measure-->
-                            <small class="form-text text-muted">{{ form.unit_of_measure.help_text }}</small>
                             <span id="validation_id_unit_of_measure" class="has-error"></span>
                         </div>
 
