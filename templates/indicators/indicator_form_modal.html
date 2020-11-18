@@ -362,6 +362,7 @@
                             <label for="id_information_use" class="">{{ form.information_use.label }} </label>
                             {% popover_helptext form.information_use.help_text %}
                             {% render_field form.information_use class+="form-control" %}
+                            
                             <span id="validation_id_information_use" class="has-error"></span>
                         </div>
 
@@ -516,6 +517,19 @@
             if ($select.hasClass('disabled-select')) {
                 theseOptions.includeSelectAllOption = false;
             }
+            $select.multiselect(theseOptions);
+        }
+    });
+    var noFilterMultiselectOptions = {
+        includeSelectAllOption: false,
+        enableFiltering: false,
+        enableCaseInsensitiveFiltering: false
+    };
+    var noFilterMultiselects = ['#id_information_use', '#id_quality_assurance'];
+    noFilterMultiselects.forEach(function(selectID) {
+        let $select = $(selectID);
+        if ($select) {
+            let theseOptions = Object.assign({}, multiselectOptions, noFilterMultiselectOptions);
             $select.multiselect(theseOptions);
         }
     });

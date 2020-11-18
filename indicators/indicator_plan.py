@@ -180,7 +180,7 @@ COLUMNS = [
         'name': _('Information use'),
         'category': ANALYSES_AND_REPORTING,
         'cell_width': MEDIUM_CELL,
-        'field': 'information_use',
+        'field': 'get_information_use_display',
         'screen_width': 10,
     },
     {
@@ -194,7 +194,7 @@ COLUMNS = [
         'name': _('Quality assurance measures'),
         'category': ANALYSES_AND_REPORTING,
         'cell_width': MEDIUM_CELL,
-        'field': 'quality_assurance',
+        'field': 'get_quality_assurance_display',
         'screen_width': 10,
     },
     {

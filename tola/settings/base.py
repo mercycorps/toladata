@@ -265,6 +265,7 @@ THIRD_PARTY_APPS = (
     'safedelete',
     'django_mysql',
     'adminsortable2',
+    'multiselectfield'
 )
 
 # Apps specific for this project go here.
