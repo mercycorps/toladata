@@ -328,7 +328,7 @@ export class DisaggregationType extends React.Component {
     updateSelectedByDefault(checked) {
         if (checked !== true) {
             this.clearCheckedPrograms();
-            this.togglePrograms();
+            this.setState({programsExpanded: false})
         }
         this.setState({
             selected_by_default: checked == true
@@ -403,7 +403,7 @@ export class DisaggregationType extends React.Component {
     render() {
         const {disaggregation, expanded, expandAction, deleteAction, archiveAction, unarchiveAction, errors} = this.props;
         const managed_data = this.state;
-        const retroPrograms = managed_data.id === "new" ? <RetroProgramCheckBoxWrapper
+        const retroPrograms = managed_data.id === "new" && Object.values(this.programsForRetro).length > 0 ? <RetroProgramCheckBoxWrapper
                 programs={this.programsForRetro}
                 disabled={this.state.selected_by_default !== true}
                 toggleProgramViz={this.togglePrograms.bind(this)}
@@ -590,18 +590,14 @@ export default class EditDisaggregations extends React.Component {
         }
     }
 
-    toggleDisaggTypeFormDisabled() {
-        this.setState({disaggTypeFormDisabled: !this.state.disaggTypeFormDisabled})
-    }
-
     onDelete(id) {
         this.props.onDelete(id, () => {this.setState({is_dirty: false, expanded_id: null, formReset: null})});
         this.props.clearErrors();
     }
 
     onSaveChangesPress(data) {
-        this.toggleDisaggTypeFormDisabled()
         if ( this.state.origSelectedByDefault !== data.selected_by_default ){
+            this.setState({disaggTypeFormDisabled: true})
             let preamble = ""
             if (data.selected_by_default && data.hasOwnProperty('retroPrograms')) {
                 // # Translators:  This is a warning popup when the user tries to do something that has broader effects than they might anticipate
@@ -629,8 +625,11 @@ export default class EditDisaggregations extends React.Component {
                 message_text: gettext("Are you sure you want to continue?"),
                 notice_type: "notice",
                 showCloser: true,
-                on_submit: () => this.saveDisaggregation(data),
-                on_cancel: () => {this.toggleDisaggTypeFormDisabled()}
+                on_submit: () => {
+                    this.setState({disaggTypeFormDisabled: false});
+                    this.saveDisaggregation(data);
+                },
+                on_cancel: () => {this.setState({disaggTypeFormDisabled: false})}
             })
         }
         else{
@@ -639,7 +638,6 @@ export default class EditDisaggregations extends React.Component {
     }
 
     saveDisaggregation(data) {
-        this.toggleDisaggTypeFormDisabled()
         const withCountry = Object.assign(data, {country: this.props.country_id});
         if (data.id === 'new') {
             this.props.onCreate(withCountry).then(
