@@ -299,10 +299,11 @@ class IndicatorForm(forms.ModelForm):
                 )
             if getattr(disagg, 'has_results'):
                 helptext += '<br /><i>{}</i>'.format(
-                    _('This disaggregation cannot be unselected, because it was already used in submitted program results.')
+                    _("This disaggregation cannot be unselected, because it was already "
+                      "used in submitted program results.")
                 )
             return helptext
-        
+
         disaggregation_group_helptext = Indicator._meta.get_field('disaggregation').help_text
         self.fields['grouped_disaggregations'] = GroupedMultipleChoiceField(
             # Translators:  disaggregation types that are available to all programs
