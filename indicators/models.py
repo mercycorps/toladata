@@ -1169,7 +1169,7 @@ class Indicator(SafeDeleteModel):
         _("Source"), max_length=255, null=True, blank=True,
         # Translators: this is help text for a field on an indicator setup form
         help_text=_("Identify the source of this indicator (e.g. Mercy Corps DIG, EC, USAID, etc.) If the indicator "
-                    "is brand new and created specifically for the program, enter \"Custom.\"")
+                    "is brand new and created specifically for the program, enter &ldquo;Custom.&rdquo;")
     )
 
     definition = models.TextField(
@@ -1217,8 +1217,8 @@ class Indicator(SafeDeleteModel):
         verbose_name=_("Baseline"), max_length=255, null=True, blank=True,
         # Translators: this is help text for a field on an indicator setup form
         help_text=_("Enter a numeric value for the baseline. If a baseline is not yet known or not applicable, "
-                    "enter a zero or select the \"Not applicable\" checkbox. The baseline can always be updated "
-                    "at later point in time.")
+                    "enter a zero or select the &ldquo;Not applicable&rdquo; checkbox. The baseline can always "
+                    "be updated at later point in time.")
     )
 
     baseline_na = models.BooleanField(
@@ -1234,9 +1234,9 @@ class Indicator(SafeDeleteModel):
         default=DIRECTION_OF_CHANGE_NONE, verbose_name=_("Direction of Change"),
         # Translators: this is help text for a field on an indicator setup form
         help_text=_("Is your program trying to achieve an increase (+) or decrease (-) in the indicator's "
-                    "unit of measure? This field is important for the accuracy of our \"indicators on track\" "
-                    "metric. For example, if we are tracking a decrease in cases of malnutrition, we will have "
-                    "exceeded our indicator target when the result is lower than the target.")
+                    "unit of measure? This field is important for the accuracy of our &ldquo;indicators on "
+                    "track&rdquo; metric. For example, if we are tracking a decrease in cases of malnutrition, we "
+                    "will have exceeded our indicator target when the result is lower than the target.")
     )
 
     is_cumulative = models.NullBooleanField(
