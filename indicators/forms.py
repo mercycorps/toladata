@@ -197,6 +197,7 @@ class IndicatorForm(forms.ModelForm):
         widgets = {
             'definition': forms.Textarea(attrs={'rows': 4}),
             'justification': forms.Textarea(attrs={'rows': 4}),
+            'quality_assurance': forms.Textarea(attrs={'rows': 4}),
             'data_issues': forms.Textarea(attrs={'rows': 4}),
             'indicator_changes': forms.Textarea(attrs={'rows': 4}),
             'comments': forms.Textarea(attrs={'rows': 4}),
@@ -209,8 +210,7 @@ class IndicatorForm(forms.ModelForm):
             'data_points': forms.Textarea(attrs={'rows': 4}),
             'responsible_person': forms.Textarea(attrs={'rows': 4}),
             'method_of_analysis': forms.Textarea(attrs={'rows': 4}),
-            'information_use': forms.SelectMultiple(),
-            'quality_assurance': forms.SelectMultiple(),
+            'information_use': forms.Textarea(attrs={'rows': 4}),
         }
 
     def __init__(self, *args, **kwargs):

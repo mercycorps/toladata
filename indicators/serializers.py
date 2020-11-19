@@ -227,9 +227,9 @@ class IndicatorPlanIndicatorSerializerBase(serializers.ModelSerializer):
             'data_points',
             'responsible_person',
             'method_of_analysis',
-            'get_information_use_display',
+            'information_use',
             'reporting_frequency',
-            'get_quality_assurance_display',
+            'quality_assurance',
             'data_issues',
             'comments',
         ]

@@ -30,7 +30,6 @@ from safedelete.managers import SafeDeleteManager
 from safedelete.queryset import SafeDeleteQueryset
 from django_mysql.models import ListCharField
 from tola.util import usefully_normalize_decimal
-from multiselectfield import MultiSelectField
 
 from workflow.models import (
     Program, Sector, SiteProfile, Country, TolaUser
@@ -1327,8 +1326,8 @@ class Indicator(SafeDeleteModel):
                     "reproduce the analysis or calculation and generate the same result.")
     )
 
-    information_use = MultiSelectField(
-        null=True, blank=True, verbose_name=_("Information use"), choices=INFORMATION_USE_CHOICES,
+    information_use = models.TextField(
+        max_length=500, null=True, blank=True, verbose_name=_("Information use"),
         # Translators: this is help text for a field on an indicator setup form
         help_text=_("Select the primary uses of the indicator and its intended audience. This is the most important "
                     "field in an indicator plan, because it explains the utility of the indicator. If an indicator "
@@ -1345,8 +1344,8 @@ class Indicator(SafeDeleteModel):
                     "accountability and reporting.")
     )
 
-    quality_assurance = MultiSelectField(
-        null=True, blank=True, verbose_name=_("Quality assurance measures"), choices=QUALITY_ASSURANCE_CHOICES,
+    quality_assurance = models.TextField(
+        max_length=500, null=True, blank=True, verbose_name=_("Quality assurance measures"),
         # Translators: this is help text for a field on an indicator setup form
         help_text=_("Select any quality assurance measures specific to this indicator.")
     )

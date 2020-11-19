@@ -9,7 +9,6 @@ django-extensions
 django-leaflet
 django-localflavor
 django-mathfilters
-django-multiselectfield
 django-multiupload
 django-registration
 django-report-utils
