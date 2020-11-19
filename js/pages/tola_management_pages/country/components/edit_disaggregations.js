@@ -265,7 +265,7 @@ export class DisaggregationType extends React.Component {
         const labels = this.props.disaggregation.labels.map(x => ({...x}));
         let stateValues = {...this.state};
         delete stateValues.programsExpanded;
-        const changedDisaggs = JSON.stringify(this.state) !== JSON.stringify({
+        const changedDisaggs = JSON.stringify(stateValues) !== JSON.stringify({
             ...this.props.disaggregation,
             labels: [...labels],
         })
