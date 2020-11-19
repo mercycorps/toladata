@@ -407,7 +407,7 @@ export class DisaggregationType extends React.Component {
         const managed_data = this.state;
         const retroPrograms = managed_data.id === "new" && Object.values(this.programsForRetro).length > 0 ? <RetroProgramCheckBoxWrapper
                 programs={this.programsForRetro}
-                disabled={this.state.selected_by_default !== true}
+                disabled={this.state.selected_by_default !== true || this.props.formDisabled}
                 toggleProgramViz={this.togglePrograms.bind(this)}
                 programsExpanded={this.state.programsExpanded}
                 onRetroUpdate={this.updateRetroPrograms.bind(this)}/>
@@ -422,7 +422,7 @@ export class DisaggregationType extends React.Component {
                     {disaggregation.is_archived && <span className="text-muted font-weight-bold ml-2">(Archived)</span>}
                     {expanded && (
                         <form className="form card card-body bg-white">
-                            <fieldset disabled={this.props.formDisabled}>
+                            <fieldset className="disagg-form__fieldset" disabled={this.props.formDisabled}>
                                 <div className="form-group">
                                     <label className="label--required" htmlFor="disaggregation-type-input">
                                         {/* # Translators: Form field label for the disaggregation name.*/}

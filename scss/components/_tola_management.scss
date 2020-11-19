@@ -141,6 +141,7 @@
     }
 }
 
+// formatting the "Assign new disaggregation to all indicators" expando
 .retro-programs a.accordion-row__btn.btn.btn-link.disaggregation--programs__header {
     padding-right: 4px;
 
@@ -150,6 +151,12 @@
         color: $link-color;
     }
 }
+
+.disagg-form__fieldset:disabled a.btn.btn-link.btn-danger {
+    opacity: 50%;
+}
+
+
 
 .disaggregation-programs {
     max-height: 12rem;
