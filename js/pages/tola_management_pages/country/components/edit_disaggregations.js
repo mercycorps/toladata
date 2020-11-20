@@ -480,7 +480,7 @@ export class DisaggregationType extends React.Component {
                                     <DisaggregationCategoryList
                                         id={ disaggregation.id }
                                         categories={ this.state.labels }
-                                        disabled={ disaggregation.is_archived }
+                                        disabled={ disaggregation.is_archived || this.props.formDisabled}
                                         updateLabelOrder={ this.updateLabelOrder.bind(this) }
                                         updateLabel={ this.updateLabel.bind(this) }
                                         deleteLabel={ this.deleteLabel.bind(this) }
