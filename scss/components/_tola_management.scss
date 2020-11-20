@@ -142,13 +142,17 @@
 }
 
 // formatting the "Assign new disaggregation to all indicators" expando
-.retro-programs a.accordion-row__btn.btn.btn-link.disaggregation--programs__header {
-    padding-right: 4px;
+.retro-programs {
+    display: flex;
+    align-items: center;
+    a.accordion-row__btn.btn.btn-link.disaggregation--programs__header {
+        padding-right: 4px;
 
-    &.disabled {
-        opacity: 50%;
-        pointer-events: none;
-        color: $link-color;
+        &.disabled {
+            opacity: 50%;
+            pointer-events: none;
+            color: $link-color;
+        }
     }
 }
 
