@@ -213,26 +213,30 @@ export class RetroProgramCheckBoxWrapper extends React.Component {
         const helpText = gettext('<p>Select a program if you plan to disaggregate all or most of its indicators by these categories.</p><p><span class="text-danger"><strong>This bulk assignment cannot be undone.</strong></span> But you can always manually remove the disaggregation from individual indicators.</p>')
 
         return (
-            <div className="mt-2 ml-4 retro-programs">
-                 <a
-                     onClick={this.props.toggleProgramViz}
-                     className={classNames('accordion-row__btn', 'btn', 'btn-link', 'disaggregation--programs__header', {disabled: this.props.disabled})}
-                     tabIndex='0'>
-                    <FontAwesomeIcon icon={this.props.programsExpanded ? 'caret-down' : 'caret-right'} />
-                    {/* # Translators: This feature allows a user to apply changes to existing programs as well as ones created in the future */}
-                    <span className="mr-1">{gettext("Assign new disaggregation to all indicators in a program")}</span>
-                </a>
+            <React.Fragment>
+                <div className="mt-2 ml-4 retro-programs">
+                     <a
+                         onClick={this.props.toggleProgramViz}
+                         className={classNames('accordion-row__btn', 'btn', 'btn-link', 'disaggregation--programs__header', {disabled: this.props.disabled})}
+                         tabIndex='0'>
+                        <FontAwesomeIcon icon={this.props.programsExpanded ? 'caret-down' : 'caret-right'} />
+                        {/* # Translators: This feature allows a user to apply changes to existing programs as well as ones created in the future */}
+                        <span className="mr-1">{gettext("Assign new disaggregation to all indicators in a program")}</span>
+                    </a>
 
-                <HelpPopover
-                    key={1}
-                    content={helpText}
-                    placement="right"
-                    innerRef={this.retroactiveAssignmentPopup}
-                    // # Translators: this is alt text for a help icon
-                    ariaText={gettext('More information on assigning disaggregations to existing indicators')}
-                />
-                { checkBoxComponent }
-            </div>
+                    <HelpPopover
+                        key={1}
+                        content={helpText}
+                        placement="right"
+                        innerRef={this.retroactiveAssignmentPopup}
+                        // # Translators: this is alt text for a help icon
+                        ariaText={gettext('More information on assigning disaggregations to existing indicators')}
+                    />
+                </div>
+                <div>
+                    { checkBoxComponent }
+                </div>
+            </React.Fragment>
         )
     }
 }
