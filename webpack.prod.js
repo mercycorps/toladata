@@ -1,9 +1,9 @@
 const webpack = require('webpack');
-const merge = require('webpack-merge');
+const { merge } = require('webpack-merge');
 const common = require('./webpack.common.js');
 const BundleTracker = require('webpack-bundle-tracker');
 const UglifyJSPlugin = require('uglifyjs-webpack-plugin');
-const CleanWebpackPlugin = require('clean-webpack-plugin');
+const { CleanWebpackPlugin } = require('clean-webpack-plugin');
 
 
 module.exports = merge(common, {
@@ -13,7 +13,7 @@ module.exports = merge(common, {
         new BundleTracker({path: __dirname, filename: 'webpack-stats.json'}),
 
         // delete all files in build dir automatically
-        new CleanWebpackPlugin(['build/dist/']),
+        new CleanWebpackPlugin(),
 
         // make sure React strips out debug junk
         // Note: NODE_ENV=production in sh env doesn't trigger this
