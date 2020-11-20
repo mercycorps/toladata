@@ -152,8 +152,19 @@
     }
 }
 
-.disagg-form__fieldset:disabled a.btn.btn-link.btn-danger {
-    opacity: 50%;
+.disagg-form__fieldset:disabled {
+    a.btn.btn-link {
+        &.btn-danger {
+            opacity: 50%;
+        }
+        &.btn-add {
+            opacity: 50%;
+        }
+    }
+    .draggable-arrow {
+        opacity: 50%;
+    }
+
 }
 
 
