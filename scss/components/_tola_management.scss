@@ -139,6 +139,12 @@
     .right-buttons {
         margin-left: auto;
     }
+
+    a.btn.disabled{
+        opacity: 50%;
+        pointer-events: none;
+        color: $link-color;
+    }
 }
 
 // formatting the "Assign new disaggregation to all indicators" expando

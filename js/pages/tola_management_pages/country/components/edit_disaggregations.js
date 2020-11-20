@@ -503,7 +503,7 @@ export class DisaggregationType extends React.Component {
                                     </div>
                                     <div className="right-buttons">
                                     {(disaggregation.is_archived) ? (
-                                        <a tabIndex="0" onClick={unarchiveAction} className="btn btn-link">
+                                        <a tabIndex="0" onClick={unarchiveAction} className={classNames("btn", "btn-link", {disabled: this.props.formDisabled})}>
                                             <i className="fas fa-archive"/>{
                                                 // # Translators: this is a verb (on a button that archives the selected item)
                                                 gettext('Unarchive disaggregation')
@@ -515,7 +515,7 @@ export class DisaggregationType extends React.Component {
                                                 <i className="fas fa-trash"/>{gettext('Delete disaggregation')}
                                             </a>
                                             ) : (
-                                            <a tabIndex="0" onClick={archiveAction} className="btn btn-link">
+                                            <a tabIndex="0" onClick={archiveAction} className={classNames("btn", "btn-link", {disabled: this.props.formDisabled})}>
                                                 <i className="fas fa-archive"/>{
                                                     // # Translators: this is a verb (on a button that archives the selected item)
                                                     gettext('Archive disaggregation')
