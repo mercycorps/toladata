@@ -3,7 +3,7 @@ msgstr ""
 "Project-Id-Version: \n"
 "Report-Msgid-Bugs-To: \n"
 "POT-Creation-Date: 2020-11-23 15:00-0800\n"
-"PO-Revision-Date: 2020-11-23 15:01-0800\n"
+"PO-Revision-Date: 2020-11-23 15:31-0800\n"
 "Last-Translator: \n"
 "Language-Team: \n"
 "Language: fr\n"
@@ -93,7 +93,7 @@ msgstr "Changement"
 #. Translators: 'C' as in Cumulative and 'NC' as in Non Cumulative
 #: indicators/export_renderers.py:72 indicators/models.py:1243
 msgid "C / NC"
-msgstr "C/NC"
+msgstr "C / NC"
 
 #: indicators/export_renderers.py:77 indicators/forms.py:239
 #: indicators/models.py:1217 tola_management/models.py:398
@@ -527,7 +527,7 @@ msgstr "Résultat"
 #: indicators/models.py:323 indicators/models.py:335 indicators/models.py:363
 #: indicators/models.py:377 indicators/models.py:393
 msgid "Output"
-msgstr "Données de sortie"
+msgstr "Extrant"
 
 #. Translators: Below Output, the lowest organizing level to attach KPIs to.
 #. Translators: Below Result, the lowest organizing level to attach KPIs to.
