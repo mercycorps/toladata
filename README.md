@@ -112,6 +112,15 @@ cd libxml2-2.9.1
 ./configure && make && make install
 ```
 
+Note that some users have had to manually build the libxml2 library, as mentioned in the [python-xmlsec documentation](https://xmlsec.readthedocs.io/en/latest/install.html)
+
+```bash
+wget http://xmlsoft.org/sources/libxml2-2.9.1.tar.gz
+tar -xvf libxml2-2.9.1.tar.gz
+cd libxml2-2.9.1
+./configure && make && make install
+```
+
 You should now also start the mysql server:
 ```bash
 sudo service mysql start
@@ -120,9 +129,9 @@ sudo service mysql start
 Now you're ready to install and configure the TolaData source files.
 
 
-##Install and configure the TolaActivity source files
+## Install and configure the TolaActivity source files
 
-###Install the source files and the python libraries
+### Install the source files and the python libraries
 All operating systems should now be ready to install TolaActivity source files and do some OS-independent installations.
 ```bash
 $ git clone https://github.com/mercycorps/toladata.git

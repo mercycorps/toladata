@@ -17,6 +17,7 @@ class TestQAScript(test.TestCase):
     @classmethod
     def setUpClass(cls):
         super().setUpClass()
+        CountryFactory.reset_sequence()
         OrganizationFactory(pk=1, name="Mercy Corps")
         DisaggregationTypeFactory(pk=109, disaggregation_type="Sex and Age Disaggregated Data (SADD)")
         cls.indicator_type = IndicatorTypeFactory()
