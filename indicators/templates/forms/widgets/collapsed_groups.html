@@ -5,6 +5,17 @@
             aria-expanded="true" aria-controls="{{ widget.name }}_inputs_{{ forloop.counter0 }}">
             <i class="fas fa-caret-down"></i>{{ subwidget.title }}
         </a>
+        {% if subwidget.group_helptext %}
+        <a href="#"
+           class="accordion-popover"
+           tabindex="0"
+           data-toggle="popover"
+           data-placement="right"
+           data-trigger="focus"
+           data-content="{{ subwidget.group_helptext }}">
+            <i class="far fa-question-circle"></i>
+        </a>
+        {% endif %}
         <div class="collapse show" id="{{ widget.name }}_inputs_{{ forloop.counter0 }}">
             {% include subwidget.template_name with widget=subwidget %}
         </div>
