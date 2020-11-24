@@ -133,10 +133,12 @@ class TestUserAdminViewSet(test.TestCase):
         multi_country_user = self.get_user(country_user=[self.country1, self.country2])
         non_permissioned_user = self.get_user()
         response = self.get_response(**{'programs[]': [self.country1_program.pk]})
+        # 1 admin, 1 users, 1 multi-country user, 1 superadmin
         user_pks = self.get_pks(response, count=4)
         self.assertIn(user_level_user.pk, user_pks)
         self.assertIn(admin_level_user.pk, user_pks)
         self.assertIn(multi_country_user.pk, user_pks)
+        self.assertIn(self.superadmin.pk, user_pks)
         self.assertNotIn(user_level_user2.pk, user_pks)
         self.assertNotIn(non_permissioned_user.pk, user_pks)
         response = self.get_response(**{'programs[]': [self.country1_program.pk, self.country2_program.pk]})
@@ -145,6 +147,7 @@ class TestUserAdminViewSet(test.TestCase):
         self.assertIn(admin_level_user.pk, user_pks)
         self.assertIn(user_level_user2.pk, user_pks)
         self.assertIn(multi_country_user.pk, user_pks)
+        self.assertIn(self.superadmin.pk, user_pks)
         self.assertNotIn(non_permissioned_user.pk, user_pks)
         # program-specific users:
         user_level_user = self.get_user(mc_staff=False, program_user=[self.country1_program])
@@ -157,6 +160,7 @@ class TestUserAdminViewSet(test.TestCase):
         self.assertIn(user_level_user.pk, user_pks)
         self.assertIn(admin_level_user.pk, user_pks)
         self.assertIn(multi_program_user.pk, user_pks)
+        self.assertIn(self.superadmin.pk, user_pks)
         self.assertNotIn(user_level_user2.pk, user_pks)
         self.assertNotIn(non_permissioned_user.pk, user_pks)
         response = self.get_response(**{'programs[]': [self.country1_program.pk, self.country2_program.pk],
@@ -166,6 +170,7 @@ class TestUserAdminViewSet(test.TestCase):
         self.assertIn(admin_level_user.pk, user_pks)
         self.assertIn(multi_program_user.pk, user_pks)
         self.assertIn(user_level_user2.pk, user_pks)
+        self.assertIn(self.superadmin.pk, user_pks)
         self.assertNotIn(non_permissioned_user.pk, user_pks)
 
     def test_program_access_country_base_country_filters(self):
@@ -229,6 +234,11 @@ class TestUserAdminViewSet(test.TestCase):
         self.assertIn(admin_user2.pk, user_pks)
         self.assertIn(admin_user3.pk, user_pks)
         self.assertIn(self.superadmin.pk, user_pks)
+        response = self.get_response(**{'admin_role': 0})
+        user_pks = self.get_pks(response, count=3)
+        self.assertIn(non_admin1.pk, user_pks)
+        self.assertIn(non_admin2.pk, user_pks)
+        self.assertIn(non_admin3.pk, user_pks)
 
     def test_status_filter(self):
         active_user = self.get_user()
@@ -306,6 +316,7 @@ class TestUserAdminViewSet(test.TestCase):
         response = self.get_response(**{'base_countries[]': [self.base_country2.pk]})
         user_pks = self.get_pks(response, count=21)
         self.assertIn(first_user.pk, user_pks)
+        self.assertNotIn(twenty_first_user.pk, user_pks)
         for user in users:
             self.assertIn(user.pk, user_pks)
         response = self.get_response(**{'base_countries[]': [self.base_country2.pk], 'page': 2})
