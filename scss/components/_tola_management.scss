@@ -139,6 +139,49 @@
     .right-buttons {
         margin-left: auto;
     }
+
+    a.btn.disabled{
+        opacity: 50%;
+        pointer-events: none;
+        color: $link-color;
+    }
+}
+
+// formatting the "Assign new disaggregation to all indicators" expando
+.retro-programs {
+    display: flex;
+    align-items: center;
+    a.accordion-row__btn.btn.btn-link.disaggregation--programs__header {
+        padding-right: 4px;
+
+        &.disabled {
+            opacity: 50%;
+            pointer-events: none;
+            color: $link-color;
+        }
+    }
+}
+
+.disagg-form__fieldset:disabled {
+    a.btn.btn-link {
+        &.btn-danger {
+            opacity: 50%;
+        }
+        &.btn-add {
+            opacity: 50%;
+        }
+    }
+    .draggable-arrow {
+        opacity: 50%;
+    }
+
+}
+
+.disaggregation-programs {
+    max-height: 12rem;
+    overflow: auto;
+    border: 1px solid $gray-400;
+    padding: .25rem;
 }
 
 // expand/collapse toggles

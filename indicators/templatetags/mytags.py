@@ -6,6 +6,7 @@ from django.core.serializers import serialize
 from django import template
 from django.db.models import QuerySet
 from django.utils import formats
+from django.utils.html import format_html
 from django.utils.timezone import localdate
 from django.utils.translation import ugettext_lazy as _
 from django.utils.safestring import mark_safe
@@ -413,3 +414,14 @@ def program_complete_program_page(context, read_only=False):
         'program.percent_complete': program['percent_complete'],
         'read_only': 'true' if read_only else 'false',
     }
+
+@register.simple_tag
+def popover_helptext(help_text):
+    return format_html("""<a href="#"
+           tabindex="0"
+           data-toggle="popover"
+           data-placement="right"
+           data-trigger="focus"
+           data-content="{}">
+            <i class="far fa-question-circle"></i>
+        </a>""", mark_safe(help_text))
