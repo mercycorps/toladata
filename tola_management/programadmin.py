@@ -156,9 +156,9 @@ def get_audit_log_workbook(ws, program):
             if entry['name'] == "id":
                 continue
             elif entry['name'] == 'targets':
-                for _, target in entry['prev'].items():
+                for target in entry['prev'].values():
                     prev_string += str(target['name']) + ": " + str(target['value']) + "\r\n"
-                for _, target in entry['new'].items():
+                for target in entry['new'].values():
                     new_string += str(target['name']) + ": " + str(target['value']) + "\r\n"
             elif entry['name'] == 'disaggregation_values':
                 prev_string += _result_disaggregation_serializer(entry['prev']) + "\r\n"

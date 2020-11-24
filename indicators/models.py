@@ -1329,7 +1329,7 @@ class Indicator(SafeDeleteModel):
     information_use = models.TextField(
         max_length=500, null=True, blank=True, verbose_name=_("Information use"),
         # Translators: this is help text for a field on an indicator setup form
-        help_text=_("Select the primary uses of the indicator and its intended audience. This is the most important "
+        help_text=_("Describe the primary uses of the indicator and its intended audience. This is the most important "
                     "field in an indicator plan, because it explains the utility of the indicator. If an indicator "
                     "has no clear informational purpose, then it should not be tracked or measured. By articulating "
                     "who needs the indicator data, why and what they need it for, teams ensure that only useful "
@@ -1347,7 +1347,7 @@ class Indicator(SafeDeleteModel):
     quality_assurance = models.TextField(
         max_length=500, null=True, blank=True, verbose_name=_("Quality assurance measures"),
         # Translators: this is help text for a field on an indicator setup form
-        help_text=_("Select any quality assurance measures specific to this indicator.")
+        help_text=_("Describe any quality assurance measures specific to this indicator.")
     )
 
     data_issues = models.TextField(
