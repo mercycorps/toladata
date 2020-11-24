@@ -59,6 +59,7 @@ export class CountryStore {
         api,
         initialData,
     ) {
+        this
         this.api = api
         Object.assign(this, initialData)
         this.appliedFilters = {...this.filters}
@@ -74,10 +75,6 @@ export class CountryStore {
             }
             return xs
         }, {})
-    }
-
-    getCountryPrograms(countryID) {
-        return this.allPrograms.filter((program) => program.country.includes(countryID))
     }
 
     @action
@@ -199,30 +196,8 @@ export class CountryStore {
         }
     }
 
-    onSaveSuccessHandler({retroProgramCount}={}) {
-        if (retroProgramCount) {
-            const message = interpolate(ngettext(
-                // # Translators: Success message shown to user when a new disaggregation has been saved and associated with existing data.
-                "Disaggregation saved and automatically selected for all indicators in %s program.",
-                "Disaggregation saved and automatically selected for all indicators in %s programs.",
-                retroProgramCount
-            ), [retroProgramCount])
-            create_unified_changeset_notice({
-                header: gettext("Successfully saved"),
-                message_text: message,
-                self_dismissing: true,
-                notice_type: 'success',
-                rationale_required: false,
-                confirm_text: null,
-                cancel_text: null,
-            })
-        }
-        // This should be changed eventually, but it has Country Admin-wide impact and so is being left in for now,
-        // to avoid having to QA more than just the main ticket that added the unified notice above.
-        else {
-            PNotify.success({text: gettext("Successfully saved"), delay: 5000});
-        }
-
+    onSaveSuccessHandler() {
+        PNotify.success({text: gettext("Successfully saved"), delay: 5000});
     }
 
     onSaveErrorHandler(message) {
@@ -570,12 +545,11 @@ export class CountryStore {
             this.saving = false;
             return Promise.reject("Validation failed") ;
         }
-        const retroProgramCount = data.hasOwnProperty('retroPrograms') ? data.retroPrograms.length : 0
 
         return this.api.createDisaggregation(data).then(response => {
             this.updateHistory(response.data.country);
             return runInAction(() => {
-                this.onSaveSuccessHandler({retroProgramCount: retroProgramCount});
+                this.onSaveSuccessHandler();
                 const newDisaggregation = response.data;
                 this.editing_history = history.data;
                 this.active_pane_is_dirty = false;

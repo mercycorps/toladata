@@ -1,4 +1,3 @@
-import string
 import itertools
 import datetime
 from factory import (
@@ -13,9 +12,7 @@ from factory import (
     post_generation,
     Sequence,
     RelatedFactory,
-    Trait,
-    lazy_attribute_sequence,
-    fuzzy
+    Trait
 )
 from factories.django_models import UserFactory, UserOnlyFactory
 from workflow.models import (
@@ -49,24 +46,8 @@ class CountryFactory(DjangoModelFactory):
         model = CountryM
         django_get_or_create = ('code',)
 
-    country = fuzzy.FuzzyText()
-    description = Faker('paragraph')
-
-    @lazy_attribute_sequence
-    def code(self, n):
-        """Allows for 676 unique codes from AA to ZZ, call CountryFactory.reset_sequence() if you run out"""
-        if n // 26 >= 26:
-            raise ValueError('Too many countries to store in ISO code, reached sequence {}'.format(n))
-        return '{}{}'.format(string.ascii_uppercase[n//26], string.ascii_uppercase[n % 26])
-
-
-# CountryFactory only creates one country and then just keeps returning it
-class NewCountryFactory(DjangoModelFactory):
-    class Meta:
-        model = CountryM
-
-    country = Sequence(lambda n: f'Country {chr(n+65)}')
-    code = Sequence(lambda n: f'{chr(n+65)}{chr(n+65)}')
+    country = 'Afghanistan'
+    code = 'AF'
 
 
 class CountryAccessFactory(DjangoModelFactory):
@@ -78,19 +59,7 @@ class OrganizationFactory(DjangoModelFactory):
     class Meta:
         model = OrganizationM
 
-    name = Faker('company')
-
-    @post_generation
-    def sectors(self, create, extracted, **kwargs):
-        """M2M fails unless this is explicitly called out as a post_generation hook"""
-        if not create:
-            # simple build, do nothing
-            return
-        if extracted:
-            if isinstance(extracted, SectorM):
-                extracted = [extracted]
-            for sector in extracted:
-                self.sectors.add(sector)
+    name = 'MC Org'
 
 
 class SiteProfileFactory(DjangoModelFactory):
