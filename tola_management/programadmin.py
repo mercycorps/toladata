@@ -46,11 +46,11 @@ from tola_management.models import (
     ProgramAuditLog
 )
 
+from tola_management.permissions import HasProgramAdminAccess
+
 from tola.util import append_GAIT_dates
 
-from tola_management.permissions import (
-    HasProgramAdminAccess
-)
+
 
 
 def get_audit_log_workbook(ws, program):
@@ -156,9 +156,9 @@ def get_audit_log_workbook(ws, program):
             if entry['name'] == "id":
                 continue
             elif entry['name'] == 'targets':
-                for k, target in entry['prev'].items():
+                for target in entry['prev'].values():
                     prev_string += str(target['name']) + ": " + str(target['value']) + "\r\n"
-                for k, target in entry['new'].items():
+                for target in entry['new'].values():
                     new_string += str(target['name']) + ": " + str(target['value']) + "\r\n"
             elif entry['name'] == 'disaggregation_values':
                 prev_string += _result_disaggregation_serializer(entry['prev']) + "\r\n"
@@ -246,9 +246,12 @@ class ProgramAdminSerializer(ModelSerializer):
     sector = NestedSectorSerializer(required=True, many=True)
     country = NestedCountrySerializer(required=True, many=True)
     auto_number_indicators = BooleanField(required=False)
-    organizations = IntegerField(source='organization_count', read_only=True)
-    program_users = IntegerField(source='program_users_count', read_only=True)
-    onlyOrganizationId = IntegerField(source='only_organization_id', read_only=True)
+    #organizations = IntegerField(source='organization_count', read_only=True)
+    #program_users = IntegerField(source='program_users_count', read_only=True)
+    #onlyOrganizationId = IntegerField(source='only_organization_id', read_only=True)
+    organizations = SerializerMethodField()
+    program_users = SerializerMethodField()
+    onlyOrganizationId = SerializerMethodField()
     _using_results_framework = IntegerField(required=False, allow_null=True)
 
     def validate_country(self, values):
@@ -273,6 +276,35 @@ class ProgramAdminSerializer(ModelSerializer):
             'auto_number_indicators',
             '_using_results_framework'
         )
+
+    @staticmethod
+    def get_program_users(program):
+        tolauser_ids = set(
+            [ca.tolauser_id for country in getattr(program, 'country_with_users', [])
+             for ca in getattr(country, 'country_users', [])] +
+            [pa.tolauser_id for pa in getattr(program, 'program_users', [])]
+        )
+        return len(tolauser_ids) + getattr(program, 'su_count', 0)
+
+    @staticmethod
+    def _get_org_ids(program):
+        org_ids = set(
+            [ca.tolauser.organization_id for country in getattr(program, 'country_with_users', [])
+             for ca in getattr(country, 'country_users', [])] +
+            [pa.tolauser.organization_id for pa in getattr(program, 'program_users', [])] +
+            ([Organization.MERCY_CORPS_ID] if getattr(program, 'su_count', 0) else [])
+        )
+        return org_ids
+
+    def get_organizations(self, program):
+        org_ids = self._get_org_ids(program)
+        return len(org_ids)
+
+    def get_onlyOrganizationId(self, program):
+        org_ids = self._get_org_ids(program)
+        if len(org_ids) == 1:
+            return list(org_ids)[0]
+        return None
 
     def to_representation(self, program, with_aggregates=True):
         ret = super(ProgramAdminSerializer, self).to_representation(program)
@@ -364,7 +396,8 @@ class ProgramAuditLogLevelSerializer(ModelSerializer):
             'tier'
         )
 
-    def get_tier(self, obj):
+    @staticmethod
+    def get_tier(obj):
         return obj.leveltier.name
 
 class ProgramAuditLogSerializer(ModelSerializer):
@@ -420,111 +453,42 @@ class ProgramAdminViewSet(viewsets.ModelViewSet):
 
             For performance reasons, looking up every user with permission to see the program individually for
             all 20+ in a paginated set was costly.  This annotates the information in one (admittedly spendy) query
+            Note: prefetches here are to allow the serializer to rapidly loop through related objects without
+            returning to the db.  Sector and country prefetches are for nested serializers, and program_users
+            and country_with_users.country_users are for user and organization counts
         """
-        # need a count of superusers to add to user count:
         superusers_count = TolaUser.objects.filter(user__is_superuser=True).count()
-        add_mc_for_superusers = 1 if superusers_count else 0
-        # start with the correctly annotated-for-rf queryset:
         queryset = Program.rf_aware_all_objects.all()
         queryset = queryset.annotate(
-            # this counts users who are not mercy corps users (partner access) who have been assigned:
-            program_access_users_count=models.functions.Coalesce( # coalesce so None is 0 (summable later)
-                models.Subquery(
-                    ProgramAccess.objects.filter(
-                        program=models.OuterRef('pk')
-                    ).exclude(
-                        models.Q(tolauser__organization_id=Organization.MERCY_CORPS_ID) |
-                        models.Q(tolauser__user__is_superuser=True)
-                    ).order_by().values('program').annotate(
-                        users_count=models.Count('tolauser', distinct=True)
-                    ).values('users_count')[:1],
-                    output_field=models.IntegerField()
-                ), 0
-            ),
-            # only mercy corps users can be given country-wide access, so count them with filters to minimize joins:
-            country_access_users_count=models.functions.Coalesce( # coalesce so None is 0 (summable later)
-                models.Sum( # sum because there may be multiple countries, each with a user count
-                    models.Subquery(
-                        CountryAccess.objects.filter(
-                            country=models.OuterRef('country'),
-                            tolauser__organization_id=Organization.MERCY_CORPS_ID
-                        ).exclude(
-                            tolauser__user__is_superuser=True
-                        ).order_by().values('country').annotate(
-                            users_count=models.Count('tolauser', distinct=True)
-                        ).values('users_count'),
-                    output_field=models.IntegerField()
-                    )
-                ), 0
-            )
-        ).annotate(
-            # program only users + country access users _should_ equal total users with access:
-            program_users_count=(
-                models.F('program_access_users_count') +
-                models.F('country_access_users_count') +
-                models.Value(superusers_count)
-            )
-        ).annotate(
-            # to add the number of organizations involved, first add one if there are MC users:
-            mc_org_count=models.Case(
-                models.When(
-                    country_access_users_count__gt=0,
-                    then=models.Value(1)
-                ),
-                default=models.Value(add_mc_for_superusers),
-                output_field=models.IntegerField()
-            ),
-            # count the organizations of all non-mercy corps users (skip to 0 if none to count):
-            other_org_count=models.Case(
-                models.When(
-                    program_access_users_count=0,
-                    then=models.Value(0)
-                ),
-                default=models.Subquery(
-                    ProgramAccess.objects.filter(
-                        program=models.OuterRef('pk')
-                    ).exclude(
-                        tolauser__organization_id=Organization.MERCY_CORPS_ID
-                    ).order_by().values('program').annotate(
-                        orgs_count=models.Count('tolauser__organization', distinct=True)
-                    ).values('orgs_count')[:1],
-                    output_field=models.IntegerField()
-                )
-            )
-        ).annotate(
-            # add the non MC org count with 1 if there is a single MC user:
-            organization_count=models.F('mc_org_count') + models.F('other_org_count')
-        ).annotate(
-            only_organization_id=models.Case(
-                # if only one org and it's mercy corps, return the mercy corps org id:
-                models.When(
-                    organization_count=1,
-                    mc_org_count=1,
-                    then=models.Value(1)
-                ),
-                # if only one org and it's NOT mercy corps (else from above, cases go in order) find that id:
-                models.When(
-                    organization_count=1,
-                    then=models.Subquery(
-                        ProgramAccess.objects.filter(
-                            program=models.OuterRef('pk')
-                        ).exclude(
-                            tolauser__organization_id=Organization.MERCY_CORPS_ID
-                        ).order_by().values('tolauser__organization_id')[:1]
-                    ),
-                ),
-                # any other case (multiple or no orgs) should be value None:
-                default=models.Value(None),
-                output_field=models.IntegerField()
-            )
+            su_count=models.Value(superusers_count, output_field=models.IntegerField())
         ).prefetch_related(
+            models.Prefetch(
+                'sector',
+                queryset=Sector.objects.select_related(None).order_by().only('id')
+            ),
             models.Prefetch(
                 'country',
                 queryset=Country.objects.select_related(None).order_by().only('id')
             ),
             models.Prefetch(
-                'sector',
-                queryset=Sector.objects.select_related(None).order_by().only('id')
+                'programaccess_set',
+                queryset=ProgramAccess.objects.filter(
+                    tolauser__user__is_superuser=False
+                ).select_related('tolauser'),
+                to_attr='program_users'
+            ),
+            models.Prefetch(
+                'country',
+                queryset=Country.objects.select_related(None).order_by().prefetch_related(
+                    models.Prefetch(
+                        'countryaccess_set',
+                        queryset=CountryAccess.objects.filter(
+                            tolauser__user__is_superuser=False
+                        ).select_related('tolauser'),
+                        to_attr='country_users'
+                    ),
+                ),
+                to_attr='country_with_users'
             )
         )
         return queryset

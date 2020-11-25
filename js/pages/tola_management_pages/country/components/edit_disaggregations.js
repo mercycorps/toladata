@@ -213,26 +213,30 @@ export class RetroProgramCheckBoxWrapper extends React.Component {
         const helpText = gettext('<p>Select a program if you plan to disaggregate all or most of its indicators by these categories.</p><p><span class="text-danger"><strong>This bulk assignment cannot be undone.</strong></span> But you can always manually remove the disaggregation from individual indicators.</p>')
 
         return (
-            <div className="mt-2 ml-4 retro-programs">
-                 <a
-                     onClick={this.props.toggleProgramViz}
-                     className={classNames('accordion-row__btn', 'btn', 'btn-link', 'disaggregation--programs__header', {disabled: this.props.disabled})}
-                     tabIndex='0'>
-                    <FontAwesomeIcon icon={this.props.programsExpanded ? 'caret-down' : 'caret-right'} />
-                    {/* # Translators: This feature allows a user to apply changes to existing programs as well as ones created in the future */}
-                    <span className="mr-1">{gettext("Assign new disaggregation to all indicators in a program")}</span>
-                </a>
+            <React.Fragment>
+                <div className="mt-2 ml-4 retro-programs">
+                     <a
+                         onClick={this.props.toggleProgramViz}
+                         className={classNames('accordion-row__btn', 'btn', 'btn-link', 'disaggregation--programs__header', {disabled: this.props.disabled})}
+                         tabIndex='0'>
+                        <FontAwesomeIcon icon={this.props.programsExpanded ? 'caret-down' : 'caret-right'} />
+                        {/* # Translators: This feature allows a user to apply changes to existing programs as well as ones created in the future */}
+                        <span className="mr-1">{gettext("Assign new disaggregation to all indicators in a program")}</span>
+                    </a>
 
-                <HelpPopover
-                    key={1}
-                    content={helpText}
-                    placement="right"
-                    innerRef={this.retroactiveAssignmentPopup}
-                    // # Translators: this is alt text for a help icon
-                    ariaText={gettext('More information on assigning disaggregations to existing indicators')}
-                />
-                { checkBoxComponent }
-            </div>
+                    <HelpPopover
+                        key={1}
+                        content={helpText}
+                        placement="right"
+                        innerRef={this.retroactiveAssignmentPopup}
+                        // # Translators: this is alt text for a help icon
+                        ariaText={gettext('More information on assigning disaggregations to existing indicators')}
+                    />
+                </div>
+                <div>
+                    { checkBoxComponent }
+                </div>
+            </React.Fragment>
         )
     }
 }
@@ -263,7 +267,9 @@ export class DisaggregationType extends React.Component {
 
     hasUnsavedDataAction() {
         const labels = this.props.disaggregation.labels.map(x => ({...x}));
-        const changedDisaggs = JSON.stringify(this.state) !== JSON.stringify({
+        let stateValues = {...this.state};
+        delete stateValues.programsExpanded;
+        const changedDisaggs = JSON.stringify(stateValues) !== JSON.stringify({
             ...this.props.disaggregation,
             labels: [...labels],
         })
@@ -328,7 +334,7 @@ export class DisaggregationType extends React.Component {
     updateSelectedByDefault(checked) {
         if (checked !== true) {
             this.clearCheckedPrograms();
-            this.togglePrograms();
+            this.setState({programsExpanded: false})
         }
         this.setState({
             selected_by_default: checked == true
@@ -403,9 +409,9 @@ export class DisaggregationType extends React.Component {
     render() {
         const {disaggregation, expanded, expandAction, deleteAction, archiveAction, unarchiveAction, errors} = this.props;
         const managed_data = this.state;
-        const retroPrograms = managed_data.id === "new" ? <RetroProgramCheckBoxWrapper
+        const retroPrograms = managed_data.id === "new" && Object.values(this.programsForRetro).length > 0 ? <RetroProgramCheckBoxWrapper
                 programs={this.programsForRetro}
-                disabled={this.state.selected_by_default !== true}
+                disabled={this.state.selected_by_default !== true || this.props.formDisabled}
                 toggleProgramViz={this.togglePrograms.bind(this)}
                 programsExpanded={this.state.programsExpanded}
                 onRetroUpdate={this.updateRetroPrograms.bind(this)}/>
@@ -420,104 +426,106 @@ export class DisaggregationType extends React.Component {
                     {disaggregation.is_archived && <span className="text-muted font-weight-bold ml-2">(Archived)</span>}
                     {expanded && (
                         <form className="form card card-body bg-white">
-                            <div className="form-group">
-                                <label className="label--required" htmlFor="disaggregation-type-input">
-                                    {/* # Translators: Form field label for the disaggregation name.*/}
-                                    {gettext('Disaggregation')}
-                                </label>
-                                <input
-                                    id="disaggregation-type-input"
-                                    className={classNames('form-control', {'is-invalid':this.formErrors('disaggregation_type')})}
-                                    value={managed_data.disaggregation_type}
-                                    onChange={(e) => this.updateDisaggregationTypeField(e.target.value)}
-                                    type="text"
-                                    required
-                                    disabled={disaggregation.is_archived}
-                                />
-                                <ErrorFeedback errorMessages={this.formErrors('disaggregation_type')} />
-                                <div className="form-check" style={ {marginTop: '8px'} }>
-                                    <input className="form-check-input" type="checkbox" checked={managed_data.selected_by_default}
-                                           onChange={(e) => {this.updateSelectedByDefault(e.target.checked)}} id="selected-by-default-checkbox"
-                                            disabled={disaggregation.is_archived} />
-                                    <label className="form-check-label mr-2" htmlFor="selected-by-default-checkbox">
-                                    {
-                                        // # Translators: This labels a checkbox, when checked, it will make the associated item "on" (selected) for all new indicators
-                                        gettext('Selected by default')
-                                    }
+                            <fieldset className="disagg-form__fieldset" disabled={this.props.formDisabled}>
+                                <div className="form-group">
+                                    <label className="label--required" htmlFor="disaggregation-type-input">
+                                        {/* # Translators: Form field label for the disaggregation name.*/}
+                                        {gettext('Disaggregation')}
                                     </label>
-                                    <HelpPopover
-                                        key={1}
-                                        // # Translators: Help text for the "selected by default" checkbox on the disaggregation form
-                                        content={`<p>${interpolate(gettext('When adding a new program indicator, this disaggregation will be selected by default for every program in %s. The disaggregation can be manually removed from an indicator on the indicator setup form.'), [gettext(this.props.countryName)])}</p>`}
-                                        placement="right"
-                                        innerRef={this.selectedByDefaultPopup}
-                                        ariaText={gettext('More information on "selected by default"')}
+                                    <input
+                                        id="disaggregation-type-input"
+                                        className={classNames('form-control', {'is-invalid':this.formErrors('disaggregation_type')})}
+                                        value={managed_data.disaggregation_type}
+                                        onChange={(e) => this.updateDisaggregationTypeField(e.target.value)}
+                                        type="text"
+                                        required
+                                        disabled={disaggregation.is_archived}
                                     />
-                                </div>
-                                {retroPrograms}
-                            </div>
-                            <div className="form-group" style={ {marginTop: '8px'} }    >
-                                <div className="row">
-                                    <div className="col-md-7">
-                                        <h4>
-                                            {/* # Translators:  This is header text for a list of disaggregation categories*/}
-                                            {gettext('Categories')}
-                                        </h4>
+                                    <ErrorFeedback errorMessages={this.formErrors('disaggregation_type')} />
+                                    <div className="form-check" style={ {marginTop: '8px'} }>
+                                        <input className="form-check-input" type="checkbox" checked={managed_data.selected_by_default}
+                                               onChange={(e) => {this.updateSelectedByDefault(e.target.checked)}} id="selected-by-default-checkbox"
+                                                disabled={disaggregation.is_archived} />
+                                        <label className="form-check-label mr-2" htmlFor="selected-by-default-checkbox">
+                                        {
+                                            // # Translators: This labels a checkbox, when checked, it will make the associated item "on" (selected) for all new indicators
+                                            gettext('Selected by default')
+                                        }
+                                        </label>
+                                        <HelpPopover
+                                            key={1}
+                                            // # Translators: Help text for the "selected by default" checkbox on the disaggregation form
+                                            content={`<p>${interpolate(gettext('When adding a new program indicator, this disaggregation will be selected by default for every program in %s. The disaggregation can be manually removed from an indicator on the indicator setup form.'), [gettext(this.props.countryName)])}</p>`}
+                                            placement="right"
+                                            innerRef={this.selectedByDefaultPopup}
+                                            ariaText={gettext('More information on "selected by default"')}
+                                        />
                                     </div>
-                                    <div style={ {marginLeft: '38px'} }>
-                                    {/* Paul: I know this is gross, but trying to line up order with the fields below: */}
-                                    {/* # Translators:  This a column header that shows the sort order of the rows below*/}
-                                        <label>{gettext('Order')}</label>
+                                    {retroPrograms}
+                                </div>
+                                <div className="form-group" style={ {marginTop: '8px'} }    >
+                                    <div className="row">
+                                        <div className="col-md-7">
+                                            <h4>
+                                                {/* # Translators:  This is header text for a list of disaggregation categories*/}
+                                                {gettext('Categories')}
+                                            </h4>
+                                        </div>
+                                        <div style={ {marginLeft: '38px'} }>
+                                        {/* Paul: I know this is gross, but trying to line up order with the fields below: */}
+                                        {/* # Translators:  This a column header that shows the sort order of the rows below*/}
+                                            <label>{gettext('Order')}</label>
+                                        </div>
                                     </div>
-                                </div>
-                                <DisaggregationCategoryList
-                                    id={ disaggregation.id }
-                                    categories={ this.state.labels }
-                                    disabled={ disaggregation.is_archived }
-                                    updateLabelOrder={ this.updateLabelOrder.bind(this) }
-                                    updateLabel={ this.updateLabel.bind(this) }
-                                    deleteLabel={ this.deleteLabel.bind(this) }
-                                    errors={ errors }
-                                    />
-                                {!disaggregation.is_archived && <div style={ {marginTop: '-15px', marginLeft: '-5px'} }>
-                                    <a tabIndex="0" onClick={() => this.appendLabel()} className="btn btn-link btn-add">
-                                        {/* # Translators:  Button label.  Button allows users to add a disaggregation category to a list.  */}
-                                        <i className="fas fa-plus-circle"/>{gettext('Add a category')}
-                                    </a>
-                                </div>}
-                            </div>
-                            <div className="disaggregation-form-buttons">
-                                <div className="form-row btn-row">
-                                    <button className="btn btn-primary" onClick={(e) => this.save()}
-                                        disabled={disaggregation.is_archived} type="button">{gettext('Save Changes')}</button>
-                                    <button className="btn btn-reset" type="button" onClick={() => this.resetForm()}
-                                        // # Translators:  Button label.  Allows users to undo whatever changes they have made.
-                                        disabled={disaggregation.is_archived}>{gettext('Reset')}</button>
-                                </div>
-                                <div className="right-buttons">
-                                {(disaggregation.is_archived) ? (
-                                    <a tabIndex="0" onClick={unarchiveAction} className="btn btn-link">
-                                        <i className="fas fa-archive"/>{
-                                            // # Translators: this is a verb (on a button that archives the selected item)
-                                            gettext('Unarchive disaggregation')
-                                            }
-                                    </a>
-                                ) : ((disaggregation.id == 'new' || !disaggregation.has_indicators) ? (
-                                        <a tabIndex="0" onClick={deleteAction} className="btn btn-link btn-danger">
-                                            {/* # Translators:  Button text that allows users to delete a disaggregation */}
-                                            <i className="fas fa-trash"/>{gettext('Delete disaggregation')}
+                                    <DisaggregationCategoryList
+                                        id={ disaggregation.id }
+                                        categories={ this.state.labels }
+                                        disabled={ disaggregation.is_archived || this.props.formDisabled}
+                                        updateLabelOrder={ this.updateLabelOrder.bind(this) }
+                                        updateLabel={ this.updateLabel.bind(this) }
+                                        deleteLabel={ this.deleteLabel.bind(this) }
+                                        errors={ errors }
+                                        />
+                                    {!disaggregation.is_archived && <div style={ {marginTop: '-15px', marginLeft: '-5px'} }>
+                                        <a tabIndex="0" onClick={() => this.appendLabel()} className="btn btn-link btn-add">
+                                            {/* # Translators:  Button label.  Button allows users to add a disaggregation category to a list.  */}
+                                            <i className="fas fa-plus-circle"/>{gettext('Add a category')}
                                         </a>
-                                        ) : (
-                                        <a tabIndex="0" onClick={archiveAction} className="btn btn-link">
+                                    </div>}
+                                </div>
+                                <div className="disaggregation-form-buttons">
+                                    <div className="form-row btn-row">
+                                        <button className="btn btn-primary" onClick={(e) => this.save()}
+                                            disabled={disaggregation.is_archived} type="button">{gettext('Save Changes')}</button>
+                                        <button className="btn btn-reset" type="button" onClick={() => this.resetForm()}
+                                            // # Translators:  Button label.  Allows users to undo whatever changes they have made.
+                                            disabled={disaggregation.is_archived}>{gettext('Reset')}</button>
+                                    </div>
+                                    <div className="right-buttons">
+                                    {(disaggregation.is_archived) ? (
+                                        <a tabIndex="0" onClick={unarchiveAction} className={classNames("btn", "btn-link", {disabled: this.props.formDisabled})}>
                                             <i className="fas fa-archive"/>{
                                                 // # Translators: this is a verb (on a button that archives the selected item)
-                                                gettext('Archive disaggregation')
+                                                gettext('Unarchive disaggregation')
                                                 }
                                         </a>
-                                    )
-                                )}
+                                    ) : ((disaggregation.id == 'new' || !disaggregation.has_indicators) ? (
+                                            <a tabIndex="0" onClick={deleteAction} className="btn btn-link btn-danger">
+                                                {/* # Translators:  Button text that allows users to delete a disaggregation */}
+                                                <i className="fas fa-trash"/>{gettext('Delete disaggregation')}
+                                            </a>
+                                            ) : (
+                                            <a tabIndex="0" onClick={archiveAction} className={classNames("btn", "btn-link", {disabled: this.props.formDisabled})}>
+                                                <i className="fas fa-archive"/>{
+                                                    // # Translators: this is a verb (on a button that archives the selected item)
+                                                    gettext('Archive disaggregation')
+                                                    }
+                                            </a>
+                                        )
+                                    )}
+                                    </div>
                                 </div>
-                            </div>
+                            </fieldset>
                         </form>
                     )}
                 </div>
@@ -538,7 +546,8 @@ export default class EditDisaggregations extends React.Component {
             expanded_id: null,
             is_dirty: false,
             formReset: null,
-            origSelectedByDefault: false
+            origSelectedByDefault: false,
+            disaggTypeFormDisabled: false,
         }
     }
 
@@ -594,6 +603,7 @@ export default class EditDisaggregations extends React.Component {
 
     onSaveChangesPress(data) {
         if ( this.state.origSelectedByDefault !== data.selected_by_default ){
+            this.setState({disaggTypeFormDisabled: true})
             let preamble = ""
             if (data.selected_by_default && data.hasOwnProperty('retroPrograms')) {
                 // # Translators:  This is a warning popup when the user tries to do something that has broader effects than they might anticipate
@@ -621,8 +631,11 @@ export default class EditDisaggregations extends React.Component {
                 message_text: gettext("Are you sure you want to continue?"),
                 notice_type: "notice",
                 showCloser: true,
-                on_submit: () => this.saveDisaggregation(data),
-                on_cancel: () => {}
+                on_submit: () => {
+                    this.setState({disaggTypeFormDisabled: false});
+                    this.saveDisaggregation(data);
+                },
+                on_cancel: () => {this.setState({disaggTypeFormDisabled: false})}
             })
         }
         else{
@@ -682,6 +695,7 @@ export default class EditDisaggregations extends React.Component {
                         clearErrors={this.props.clearErrors}
                         onIsDirtyChange={(is_dirty) => this.handleDirtyUpdate(is_dirty)}
                         countryName={this.props.countryName}
+                        formDisabled={this.state.disaggTypeFormDisabled}
                     />
                 )}
             </div>

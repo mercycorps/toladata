@@ -237,6 +237,7 @@ class IndicatorForm(forms.ModelForm):
         self.fields['program_display'].disabled = True
         self.fields['program_display'].label = _('Program')
         self.fields['baseline'].label = _('Baseline')
+        self.fields['baseline'].help_text = Indicator._meta.get_field('baseline').help_text
 
         # level is here the new "result level" (RF) level option (FK to model Level)
         # Translators: This is a form field label that allows users to select which Level object to associate with the Result that's being entered into the form
@@ -298,16 +299,12 @@ class IndicatorForm(forms.ModelForm):
                 )
             if getattr(disagg, 'has_results'):
                 helptext += '<br /><i>{}</i>'.format(
-                    _('This disaggregation cannot be unselected, because it was already used in submitted program results.')
+                    _("This disaggregation cannot be unselected, because it was already "
+                      "used in submitted program results.")
                 )
             return helptext
-        # this is duplicated because of the wacky way we are handling disaggregations in the modal form
-        # if you need to update this, also update it in the indicator model
-        # Translators: this is help text for a menu area where disaggregations (by age, gender, etc.) are selected
-        disaggregation_group_helptext = _("Select all relevant disaggregations. Disaggregations are managed by the "
-                                          "TolaData country administrator. Mercy Corps required disaggregations (e.g. "
-                                          "SADD) are selected by default, but can be deselected when they are not "
-                                          "applicable to the indicator.")
+
+        disaggregation_group_helptext = Indicator._meta.get_field('disaggregation').help_text
         self.fields['grouped_disaggregations'] = GroupedMultipleChoiceField(
             # Translators:  disaggregation types that are available to all programs
             [(_('Global disaggregations'),

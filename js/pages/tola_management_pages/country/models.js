@@ -200,16 +200,29 @@ export class CountryStore {
     }
 
     onSaveSuccessHandler({retroProgramCount}={}) {
-        let message = gettext("Successfully saved")
         if (retroProgramCount) {
-            message = interpolate(ngettext(
+            const message = interpolate(ngettext(
                 // # Translators: Success message shown to user when a new disaggregation has been saved and associated with existing data.
                 "Disaggregation saved and automatically selected for all indicators in %s program.",
                 "Disaggregation saved and automatically selected for all indicators in %s programs.",
                 retroProgramCount
             ), [retroProgramCount])
+            create_unified_changeset_notice({
+                header: gettext("Successfully saved"),
+                message_text: message,
+                self_dismissing: true,
+                notice_type: 'success',
+                rationale_required: false,
+                confirm_text: null,
+                cancel_text: null,
+            })
         }
-        PNotify.success({text: message, delay: 5000});
+        // This should be changed eventually, but it has Country Admin-wide impact and so is being left in for now,
+        // to avoid having to QA more than just the main ticket that added the unified notice above.
+        else {
+            PNotify.success({text: gettext("Successfully saved"), delay: 5000});
+        }
+
     }
 
     onSaveErrorHandler(message) {
