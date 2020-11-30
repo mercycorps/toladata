@@ -95,7 +95,7 @@ const ChangeLogEntryRowBuilder = ({data}) => {
             allRows.push(<ChangeLogEntryRow previous={previousEntry} new={newEntry} id={"base_country"} key={"base_country"} />);
         }
         Object.entries(data.diff_list.countries).forEach( ([id, country]) => {
-            const key = `${id}_${country}`;
+            const key = `${id}_${country.name}`;
             const previousEntry = <React.Fragment>
                 <ChangeField name={gettext("Country")} data={country.prev.country} />
                 {/* # Translators:  Role references a user's permission level when accessing data (i.e. User or Admin) */}
@@ -109,7 +109,7 @@ const ChangeLogEntryRowBuilder = ({data}) => {
             allRows.push(<ChangeLogEntryRow previous={previousEntry} new={newEntry} id={key} key={key} />);
         });
         Object.entries(data.diff_list.programs).forEach(([id, program]) => {
-            const key = `${id}_${program}`;
+            const key = `${id}_${program.name}`;
             const previousEntry = <React.Fragment>
                 <ChangeField name={gettext("Program")} data={program.prev.program} />
                 <ChangeField name={gettext("Country")} data={program.prev.country} />
