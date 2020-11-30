@@ -1,7 +1,8 @@
-import React from 'react'
+import React from 'react';
 import { observer } from 'mobx-react';
-import {FontAwesomeIcon} from "@fortawesome/react-fontawesome"
-import { toJS } from 'mobx'
+import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
+import { faCaretDown, faCaretRight } from "@fortawesome/free-solid-svg-icons";
+import { toJS } from 'mobx';
 import { EM_DASH } from '../constants';
 
 
@@ -43,7 +44,7 @@ const ChangeLogEntryHeader = ({data, is_expanded, toggle_expando_cb}) => {
     // TODO: apply is-expanded dynamically
     return <tr className={is_expanded ? 'changelog__entry__header is-expanded' : 'changelog__entry__header'} onClick={() => toggle_expando_cb(data.id)}>
         <td className="text-nowrap text-action">
-            <FontAwesomeIcon icon={is_expanded ? 'caret-down' : 'caret-right'} />&nbsp;<strong>{data.date}</strong>
+            <FontAwesomeIcon icon={is_expanded ? faCaretDown : faCaretRight} />&nbsp;<strong>{data.date}</strong>
         </td>
         <td className="text-nowrap">{data.admin_user}</td>
         <td className="text-nowrap">{data.pretty_change_type}</td>
