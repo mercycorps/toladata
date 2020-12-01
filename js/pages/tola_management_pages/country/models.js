@@ -95,6 +95,8 @@ export class CountryStore {
                     this.next_page =results.next_page
                     this.previous_page = results.previous_page
                 })
+            }).catch(errors => {
+                // TODO: HANDLE THIS
             })
         }
 
@@ -169,7 +171,9 @@ export class CountryStore {
                         this.editing_disaggregations_data = disaggregations_resp.data;
                         this.updateHistory(id)
                     })
-                })
+                }).catch(errors => {
+                    //TODO : HANDLE THIS
+                });
             }
         }
     }
@@ -541,8 +545,8 @@ export class CountryStore {
             })
         }).catch((errors) => {
             this.saving = false;
-            this.editing_disaggregations_errors = errors.response.data;
-            this.onSaveErrorHandler();
+            this.editing_disaggregations_errors = errors.response.data
+            this.onSaveErrorHandler(errors.response.data.detail);
         })
     }
 
