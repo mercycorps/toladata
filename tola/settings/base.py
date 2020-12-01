@@ -251,7 +251,7 @@ THIRD_PARTY_APPS = (
     'rest_framework',
     'rest_framework.authtoken',
     'crispy_forms',
-    'django_extensions',
+    # 'django_extensions',
     'simplejson',
     'simple_history',
     #'user_language_middleware',
