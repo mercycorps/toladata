@@ -1,4 +1,5 @@
-from factory import DjangoModelFactory, lazy_attribute, RelatedFactory, Faker
+from factory.django import DjangoModelFactory
+from factory import lazy_attribute, RelatedFactory, Faker
 from django.template.defaultfilters import slugify
 
 
