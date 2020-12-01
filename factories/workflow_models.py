@@ -1,8 +1,8 @@
 import string
 import itertools
 import datetime
+from factory.django import DjangoModelFactory
 from factory import (
-    DjangoModelFactory,
     lazy_attribute,
     LazyAttribute,
     SelfAttribute,
