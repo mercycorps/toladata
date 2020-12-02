@@ -13,34 +13,45 @@ from tola_management.countryadmin import (
     CountryObjectiveViewset,
     CountryDisaggregationViewSet,
 )
-from django.urls import path
-from django.conf.urls import include, url
+
+from rest_framework import routers
+from rest_framework.authtoken import views as authtoken_views
+
+from tola import views as tolaviews
+from indicators.views import (
+    program_page,
+    old_program_page,
+    views_program
+)
+from indicators.views.views_results_framework import (
+    LevelViewSet,
+    insert_new_level,
+    save_leveltiers,
+    reorder_indicators,
+    save_custom_tiers,
+    save_custom_template,
+    indicator_list
+)
+from workflow.views import dated_target_info
+
+from django.urls import path, include
+
 # Import i18n_patterns
 from django.views.i18n import JavaScriptCatalog
 from django.views.generic import TemplateView
 from django.contrib import admin
 from django.conf import settings
 from django.conf.urls.static import static
-from rest_framework import routers
-from rest_framework.authtoken import views as authtoken_views
-
-
-from tola import views as tolaviews
-from indicators.views import program_page, old_program_page
-from indicators.views.views_results_framework import (
-    LevelViewSet, insert_new_level, save_leveltiers, reorder_indicators, save_custom_tiers, save_custom_template, indicator_list)
-from indicators.views import views_program
-from workflow.views import dated_target_info
 
 admin.autodiscover()
 admin.site.site_header = 'Tola Activity administration'
 
-#REST FRAMEWORK
+# REST FRAMEWORK
 router = routers.DefaultRouter()
 router.register(r'level', LevelViewSet)
 router.register(r'programtargetfrequencies', ProgramTargetFrequencies, basename='programtargetfrequencies')
 
-#tola admin
+# tola admin
 router.register(r'tola_management/user', UserAdminViewSet, basename='tolamanagementuser')
 router.register(r'tola_management/organization', OrganizationAdminViewSet, basename='tolamanagementorganization')
 router.register(r'tola_management/program', ProgramAdminViewSet, basename='tolamanagementprograms')
@@ -121,12 +132,11 @@ urlpatterns += [
     # Auth backend URL's
     path('accounts/invalid_user/', tolaviews.invalid_user_view, name='invalid_user'),
     path('accounts/invalid_user/okta/', TemplateView.as_view(template_name='registration/invalid_okta_user.html'),
-        name='invalid_user_okta'),
+         name='invalid_user_okta'),
     path('accounts/password_reset/', tolaviews.TolaPasswordResetView.as_view(), name='password_reset'),
     path('accounts/', include('django.contrib.auth.urls')),
     path('', include('social_django.urls', namespace='social')),
 
-    #url(r'^oauth/', include('social_django.urls', namespace='social')),
     # Site home page
     path('', tolaviews.index, name='index'),
 
