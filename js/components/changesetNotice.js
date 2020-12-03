@@ -67,6 +67,7 @@ const create_unified_changeset_notice = ({
     cancel_text = gettext('Cancel'),
     context = null,
     notice_type = 'notice', // possible values: error (danger/red), info (blue), success (green), notice (warning/yellow)
+    modal = false, // notice will act like a modal with the rest of the page inactive until the notice is responded to
     blocking = true,
     self_dismissing = false, // automatically hides the notice after 8000 ms (default). NOTE: this is the OPPOSITE behavior as default PNotify
     dismiss_delay = 8000, // also PNotify default
@@ -224,12 +225,13 @@ const create_unified_changeset_notice = ({
         type: notice_type,
         addClass: 'program-page__rationale-form',
         stack: {
-            'overlayClose': true,
+            'overlayClose': !modal,
             'dir1': 'right',
             'dir2': 'up',
             'firstpos1': 20,
             'firstpos2': 20,
-            'context': context
+            'context': context,
+            'modal': modal,
         },
         modules: {
             Buttons: {
