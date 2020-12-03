@@ -412,7 +412,7 @@ msgstr "Tout afficher"
 #: js/pages/iptt_quickstart/components/radios.js:49
 #: js/pages/iptt_report/components/sidebar/reportSelect.js:131
 msgid "Most recent"
-msgstr "Les plus récentes"
+msgstr "Plus récent"
 
 #: js/pages/iptt_quickstart/components/radios.js:56
 msgid "enter a number"
