@@ -7,8 +7,8 @@ msgid ""
 msgstr ""
 "Project-Id-Version: \n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2020-11-23 15:00-0800\n"
-"PO-Revision-Date: 2020-11-23 15:00-0800\n"
+"POT-Creation-Date: 2020-12-03 15:19-0800\n"
+"PO-Revision-Date: 2020-11-17 17:46-0800\n"
 "Last-Translator: \n"
 "Language-Team: \n"
 "Language: es\n"
@@ -16,7 +16,7 @@ msgstr ""
 "Content-Type: text/plain; charset=UTF-8\n"
 "Content-Transfer-Encoding: 8bit\n"
 "Plural-Forms: nplurals=2; plural=(n != 1);\n"
-"X-Generator: Poedit 2.4.2\n"
+"X-Generator: Eazy Po 0.9.5.3\n"
 
 #: indicators/admin.py:41
 msgid "Show all"
@@ -872,6 +872,11 @@ msgstr "Fuente"
 
 #. Translators: this is help text for a field on an indicator setup form
 #: indicators/models.py:1171
+#, fuzzy
+#| msgid ""
+#| "Identify the source of this indicator (e.g. Mercy Corps DIG, EC, USAID, "
+#| "etc.) If the indicator is brand new and created specifically for the "
+#| "program, enter \"Custom.\""
 msgid ""
 "Identify the source of this indicator (e.g. Mercy Corps DIG, EC, USAID, "
 "etc.) If the indicator is brand new and created specifically for the "
@@ -879,7 +884,7 @@ msgid ""
 msgstr ""
 "Identifique la fuente de este indicador (por ejemplo, Mercy Corps DIG, EC, "
 "USAID, etc.). Si el indicador es nuevo y fue creado específicamente para el "
-"programa, introduzca &ldquo;Personalizado.&rdquo;"
+"programa, introduzca \\\"Personalizado\\\"."
 
 #. Translators: field label for entering the extended explanation of the indicator
 #: indicators/models.py:1177 tola_management/models.py:412
@@ -943,6 +948,11 @@ msgstr ""
 
 #. Translators: this is help text for a field on an indicator setup form
 #: indicators/models.py:1219
+#, fuzzy
+#| msgid ""
+#| "Enter a numeric value for the baseline. If a baseline is not yet known or "
+#| "not applicable, enter a zero or select the \"Not applicable\" checkbox. "
+#| "The baseline can always be updated at later point in time."
 msgid ""
 "Enter a numeric value for the baseline. If a baseline is not yet known or "
 "not applicable, enter a zero or select the &ldquo;Not applicable&rdquo; "
@@ -950,7 +960,7 @@ msgid ""
 msgstr ""
 "Introduzca un valor numérico para la línea de base. Si una línea de base aún "
 "no se conoce o no es aplicable, introduzca un cero o seleccione la casilla "
-"de verificación &ldquo;No aplicable.&rdquo; La línea de base siempre puede "
+"de verificación \"No aplicable\". La línea de base siempre puede "
 "actualizarse más adelante."
 
 #: indicators/models.py:1230 templates/indicators/indicatortargets.html:89
@@ -964,6 +974,13 @@ msgstr "Dirección de cambio"
 
 #. Translators: this is help text for a field on an indicator setup form
 #: indicators/models.py:1236
+#, fuzzy
+#| msgid ""
+#| "Is your program trying to achieve an increase (+) or decrease (-) in the "
+#| "indicator's unit of measure? This field is important for the accuracy of "
+#| "our \"indicators on track\" metric. For example, if we are tracking a "
+#| "decrease in cases of malnutrition, we will have exceeded our indicator "
+#| "target when the result is lower than the target."
 msgid ""
 "Is your program trying to achieve an increase (+) or decrease (-) in the "
 "indicator's unit of measure? This field is important for the accuracy of our "
@@ -973,10 +990,10 @@ msgid ""
 msgstr ""
 "¿Su programa está tratando de lograr un aumento (+) o una disminución (-) en "
 "la unidad de medida del indicador? Este campo es importante para la "
-"precisión de nuestra métrica de &ldquo;indicadores encaminados.&rdquo; Por "
-"ejemplo, si estamos haciendo un seguimiento de una disminución en los casos "
-"de malnutrición, habremos superado el objetivo de nuestro indicador cuando "
-"el resultado sea inferior al objetivo."
+"precisión de nuestra métrica de \"indicadores encaminados\". Por ejemplo, si "
+"estamos haciendo un seguimiento de una disminución en los casos de "
+"malnutrición, habremos superado el objetivo de nuestro indicador cuando el "
+"resultado sea inferior al objetivo."
 
 #. Translators: this is help text for a field on an indicator setup form
 #: indicators/models.py:1249
@@ -1109,6 +1126,14 @@ msgstr ""
 
 #. Translators: this is help text for a field on an indicator setup form
 #: indicators/models.py:1332
+#, fuzzy
+#| msgid ""
+#| "Select the primary uses of the indicator and its intended audience. This "
+#| "is the most important field in an indicator plan, because it explains the "
+#| "utility of the indicator. If an indicator has no clear informational "
+#| "purpose, then it should not be tracked or measured. By articulating who "
+#| "needs the indicator data, why and what they need it for, teams ensure "
+#| "that only useful indicators are included in the program."
 msgid ""
 "Describe the primary uses of the indicator and its intended audience. This "
 "is the most important field in an indicator plan, because it explains the "
@@ -1117,12 +1142,12 @@ msgid ""
 "needs the indicator data, why and what they need it for, teams ensure that "
 "only useful indicators are included in the program."
 msgstr ""
-"Describa los usos primarios del indicador y su público objetivo. Este es el "
-"campo más importante en el plan de un indicador, porque explica su utilidad. "
-"Si un indicador no tiene un propósito informativo claro, entonces no debe "
-"ser rastreado o medido. Al expresar quién necesita los datos del indicador, "
-"por qué y para qué los necesita, los equipos se aseguran de que solo se "
-"incluyan indicadores útiles en el programa."
+"Seleccione los usos primarios del indicador y su público objetivo. Este es "
+"el campo más importante en el plan de un indicador, porque explica su "
+"utilidad. Si un indicador no tiene un propósito informativo claro, entonces "
+"no debe ser rastreado o medido. Al expresar quién necesita los datos del "
+"indicador, por qué y para qué los necesita, los equipos se aseguran de que "
+"solo se incluyan indicadores útiles en el programa."
 
 #. Translators: this is help text for a field on an indicator setup form
 #: indicators/models.py:1342
@@ -1138,9 +1163,11 @@ msgstr ""
 
 #. Translators: this is help text for a field on an indicator setup form
 #: indicators/models.py:1350
+#, fuzzy
+#| msgid "Select any quality assurance measures specific to this indicator."
 msgid "Describe any quality assurance measures specific to this indicator."
 msgstr ""
-"Describa cualquier medida de garantía de calidad específica para este "
+"Seleccione cualquier medida de garantía de calidad específica para este "
 "indicador."
 
 #. Translators: this is help text for a field on an indicator setup form
@@ -1197,7 +1224,7 @@ msgid ""
 "indicator %(indicator_program_id)d)"
 msgstr ""
 "Los identificadores de programa no coinciden con el nivel/indicador (nivel "
-"%(level_program_id)de indicador %(indicator_program_id)d)"
+"%(level_program_id)d e indicador %(indicator_program_id)d)"
 
 #: indicators/models.py:1543 indicators/templatetags/mytags.py:118
 msgid "#"
@@ -1578,7 +1605,7 @@ msgstr "¡Éxito, datos creados!"
 
 #: indicators/views/views_indicators.py:900
 msgid "Result updated."
-msgstr "Resultado actualizado."
+msgstr "Resultado actualizados."
 
 #: indicators/views/views_indicators.py:904
 msgid "Success, Data Updated!"
@@ -3550,8 +3577,8 @@ msgid ""
 "d/OIjwljwoihgIHOEies"
 msgstr ""
 "Advertencia: Esta dirección web podría tener un formato incorrecto. Debería "
-"ser algo como https://dominio.com/camino/al/archivo o https://docs.google."
-"com/spreadsheets/d/OIjwljwoihgIHOEies"
+"ser algo como ‘https://dominio.com/camino/al/archivo’ o ‘https://docs.google."
+"com/spreadsheets/d/OIjwljwoihgIHOEies’"
 
 #: templates/validation_js.html:26
 msgid ""
@@ -4092,7 +4119,7 @@ msgstr "Hogares"
 
 #: workflow/forms.py:154
 msgid "Land"
-msgstr "Tierra"
+msgstr "Tipo de tierra"
 
 #: workflow/forms.py:158
 msgid "Literacy"
