@@ -17,6 +17,6 @@ jobs:
             - [ ] Are unit tests written for all Python logic?
             - [ ] Are unit tests written for all React components/logic?
             - [ ] Are all user-facing strings marked for translation?
-            - [ ] Are all translation-marked strings given adequate context notes?
+            - [ ] Are all translation-marked strings given adequate context notes? [wiki](https://github.com/mercycorps/TolaActivity/wiki/Translation)
             - [ ] Is all rendered output ARIA/Accessibility friendly?`;
             await github.issues.createComment({ issue_number, owner, repo, body: body });
