@@ -1,0 +1,22 @@
+name: Code review
+on:
+  pull_request:
+    types:
+      - assigned
+      - review_requested
+jobs:
+  code_review_checklist:
+    name: Comment with code review checklist
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/github-script@v3
+        with:
+          script: |
+            const { issue: { number: issue_number }, repo: { owner, repo } } = context;
+            const body = `This is your code review checklist:
+            - [ ] Are unit tests written for all Python logic?
+            - [ ] Are unit tests written for all React components/logic?
+            - [ ] Are all user-facing strings marked for translation?
+            - [ ] Are all translation-marked strings given adequate context notes? [wiki](https://github.com/mercycorps/TolaActivity/wiki/Translation)
+            - [ ] Is all rendered output ARIA/Accessibility friendly?`;
+            await github.issues.createComment({ issue_number, owner, repo, body: body });
