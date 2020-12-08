@@ -3,7 +3,7 @@ msgstr ""
 "Project-Id-Version: \n"
 "Report-Msgid-Bugs-To: \n"
 "POT-Creation-Date: 2020-11-23 15:00-0800\n"
-"PO-Revision-Date: 2020-12-08 10:15-0800\n"
+"PO-Revision-Date: 2020-12-08 10:44-0800\n"
 "Last-Translator: \n"
 "Language-Team: \n"
 "Language: fr\n"
@@ -88,7 +88,7 @@ msgstr "Unité de mesure"
 #. Translators: this is short for "Direction of Change" as in + or -
 #: indicators/export_renderers.py:67
 msgid "Change"
-msgstr "Changement"
+msgstr "Modification"
 
 #. Translators: 'C' as in Cumulative and 'NC' as in Non Cumulative
 #: indicators/export_renderers.py:72 indicators/models.py:1243
@@ -162,7 +162,7 @@ msgstr "% Atteint"
 #: tola_management/models.py:165 tola_management/models.py:445
 #: tola_management/programadmin.py:180
 msgid "N/A"
-msgstr "S.O."
+msgstr "N/A"
 
 #: indicators/export_renderers.py:401
 #: templates/indicators/iptt_filter_form.html:141
@@ -211,7 +211,7 @@ msgid ""
 msgstr ""
 "Ce numéro s’affiche à la place du numéro de l’indicateur, automatiquement "
 "généré par le cadre de résultats. Un administrateur peut activer la "
-"numérotation automatique dans les paramètres du programme."
+"numérotation automatique dans les paramètres du programme"
 
 #. Translators:  Indicator objects are assigned to Levels, which are in a hierarchy.  We recently changed how we organize Levels. This is a field label for the indicator-associated Level in the old level system
 #: indicators/forms.py:277
@@ -341,7 +341,7 @@ msgstr "Collecte des données"
 #: indicators/indicator_plan.py:30
 #: templates/indicators/indicator_form_modal.html:92
 msgid "Analysis and Reporting"
-msgstr "Analyse et rapport"
+msgstr "Analyse et rapportage"
 
 #: indicators/indicator_plan.py:54
 msgid "Performance indicator"
@@ -357,7 +357,7 @@ msgstr "Définition de l’indicateur"
 
 #: indicators/indicator_plan.py:97
 msgid "# / %"
-msgstr "#/%"
+msgstr "# / %"
 
 #: indicators/indicator_plan.py:104
 msgid "Calculation"
@@ -414,7 +414,7 @@ msgstr "Utilisation de l’information"
 
 #: indicators/indicator_plan.py:187 indicators/models.py:1340
 msgid "Frequency of reporting"
-msgstr "Fréquence de rapport"
+msgstr "Fréquence de rapportage"
 
 #: indicators/indicator_plan.py:194 indicators/models.py:1348
 msgid "Quality assurance measures"
@@ -661,7 +661,7 @@ msgstr "Fréquence"
 
 #: indicators/models.py:645
 msgid "Reporting Frequency"
-msgstr "Fréquence de rapport"
+msgstr "Fréquence de rapportage"
 
 #: indicators/models.py:658
 msgid "Frequency in number of days"
@@ -1500,12 +1500,12 @@ msgstr "Aide"
 #. Translators: success message when an indicator was created
 #: indicators/views/views_indicators.py:258
 msgid "Success! Indicator created."
-msgstr "L’indicateur a bien été créé !"
+msgstr "Succès, indicateur créé !"
 
 #. Translators: success message when an indicator was updated
 #: indicators/views/views_indicators.py:261
 msgid "Success! Indicator updated."
-msgstr "L’indicateur a bien été mis à jour !"
+msgstr "Succès, indicateur mis à jour !"
 
 #. Translators: success message when an indicator was created,
 #. ex. "Indicator 2a was saved and linked to Outcome 2.2"
@@ -1532,7 +1532,7 @@ msgstr "Configuration de l’indicateur"
 
 #: indicators/views/views_indicators.py:624
 msgid "Success, Indicator Deleted!"
-msgstr "L’indicateur a bien été supprimé !"
+msgstr "Succès, indicateur supprimé !"
 
 #: indicators/views/views_indicators.py:634
 msgid "Reason for change is required."
@@ -1569,7 +1569,7 @@ msgstr "Résultat ajouté à %(level)s indicateur %(number)s."
 
 #: indicators/views/views_indicators.py:839
 msgid "Success, Data Created!"
-msgstr "Les données ont bien été créées !"
+msgstr "Succès, données créées !"
 
 #: indicators/views/views_indicators.py:900
 msgid "Result updated."
@@ -1577,7 +1577,7 @@ msgstr "Résultat mis à jour."
 
 #: indicators/views/views_indicators.py:904
 msgid "Success, Data Updated!"
-msgstr "Les données ont bien été mises à jour !"
+msgstr "Succès, données mises à jour !"
 
 #. Translators: a link to the logistical framework model
 #: indicators/views/views_program.py:94 indicators/views/views_program.py:100
@@ -1835,7 +1835,7 @@ msgstr "Pays"
 #: templates/base.html:138 templates/registration/profile.html:5
 #: templates/registration/profile.html:6
 msgid "Settings"
-msgstr "Réglages"
+msgstr "Paramètres"
 
 #: templates/base.html:139
 msgid "Log out"
@@ -3131,8 +3131,7 @@ msgid ""
 "                        "
 msgstr ""
 "\n"
-"                        <strong>%(on_scope)s%%</strong> sont sur la bonne "
-"voie\n"
+"                        <strong>%(on_scope)s%%</strong> sont en bonne voie\n"
 "                    "
 
 #. Translators: Help text explaining what an "on track" indicator is.
@@ -4271,7 +4270,7 @@ msgstr "Numéroter automatiquement les indicateurs d’après le cadre de résul
 
 #: workflow/models.py:518
 msgid "Group indicators according to the results framework"
-msgstr "Regrouper les indicateurs d’après le cadre de résultats"
+msgstr "Regrouper les indicateurs selon le cadre de résultats"
 
 #. Translators: this labels a filter to sort indicators, for example, "by Outcome chain":
 #. Translators: see note for %(tier)s chain, this is the same thing
