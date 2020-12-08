@@ -3,7 +3,7 @@ msgstr ""
 "Project-Id-Version: \n"
 "Report-Msgid-Bugs-To: \n"
 "POT-Creation-Date: 2020-11-23 15:00-0800\n"
-"PO-Revision-Date: 2020-11-23 15:31-0800\n"
+"PO-Revision-Date: 2020-12-08 10:15-0800\n"
 "Last-Translator: \n"
 "Language-Team: \n"
 "Language: fr\n"
@@ -731,12 +731,14 @@ msgstr "Nettoyage et traitement des données"
 #. Translators:  describes a user-selectable option in a list of things that users can do to ensure program quality
 #: indicators/models.py:1081
 msgid "Data collection training and piloting"
-msgstr "Formation et mise à l’essai de la collecte de données"
+msgstr "La formation et le pilotage de la collecte de données"
 
 #. Translators:  describes a user-selectable option in a list of things that users can do to ensure program quality
 #: indicators/models.py:1083
 msgid "Data cross checks or triangulation"
-msgstr "Vérification ou triangulation des données"
+msgstr ""
+"Les vérifications croisées des données ou la triangulation des sources de "
+"données"
 
 #. Translators:  describes a user-selectable option in a list of things that users can do to ensure program quality
 #: indicators/models.py:1085
@@ -746,7 +748,7 @@ msgstr "Audits de qualité des données (DQA)"
 #. Translators:  describes a user-selectable option in a list of things that users can do to ensure program quality
 #: indicators/models.py:1087
 msgid "Data spot checks"
-msgstr "Vérification des points de données"
+msgstr "Contrôles ponctuels des données"
 
 #. Translators:  describes a user-selectable option in a list of things that users can do to ensure program quality
 #: indicators/models.py:1089
@@ -761,17 +763,17 @@ msgstr "Validation de l’analyse des données participatives"
 #. Translators:  describes a user-selectable option in a list of things that users can do to ensure program quality
 #: indicators/models.py:1093
 msgid "Peer reviews or reproducibility checks"
-msgstr "Commentaires de pairs ou vérification de reproductibilité"
+msgstr "L’examen par les pairs ou les contrôles de reproductibilité"
 
 #. Translators:  describes a user-selectable option in a list of things that users can do to ensure program quality
 #: indicators/models.py:1095
 msgid "Randomized phone calls to respondents"
-msgstr "Appels téléphoniques aléatoires aux personnes interrogées"
+msgstr "Appels téléphoniques randomisés aux répondants"
 
 #. Translators:  describes a user-selectable option in a list of things that users can do to ensure program quality
 #: indicators/models.py:1097
 msgid "Randomized visits to respondents"
-msgstr "Visites aléatoires aux personnes interrogées"
+msgstr "Visites randomisées aux répondants"
 
 #. Translators:  describes a user-selectable option in a list of things that users can do to ensure program quality
 #: indicators/models.py:1099
@@ -781,7 +783,7 @@ msgstr "Examens réguliers des indicateurs et des données"
 #. Translators:  describes a user-selectable option in a list of things that users can do to ensure program quality
 #: indicators/models.py:1101
 msgid "Shadow audits"
-msgstr "Afficher tous les audits"
+msgstr "Audits supervisés"
 
 #. Translators:  describes a user-selectable option in a list of things that users can do to ensure program quality
 #: indicators/models.py:1103
@@ -791,12 +793,12 @@ msgstr "Indicateurs standardisés"
 #. Translators:  describes a user-selectable option in a list of things that users can do to ensure program quality
 #: indicators/models.py:1105
 msgid "Standard operating procedures (SOPs)"
-msgstr "Procédures opérationnelles permanentes (POP)"
+msgstr "Procédures opérationnelles standard (SOPs)"
 
 #. Translators:  describes a user-selectable option in a list of things that users plan to do with the information gathered while the program is running
 #: indicators/models.py:1110
 msgid "Donor and/or stakeholder reporting"
-msgstr "Rapport du donneur et/ou de la partie prenante"
+msgstr "Rapportage du donneur et/ou de la partie prenante"
 
 #. Translators:  describes a user-selectable option in a list of things that users plan to do with the information gathered while the program is running
 #: indicators/models.py:1112
@@ -806,7 +808,7 @@ msgstr "Gestion et apprentissage du programme interne"
 #. Translators:  describes a user-selectable option in a list of things that users plan to do with the information gathered while the program is running
 #: indicators/models.py:1114
 msgid "Participant accountability"
-msgstr "Responsabilité des participants"
+msgstr "Redevabilité des participants"
 
 #: indicators/models.py:1120
 msgid "Indicator key"
@@ -849,8 +851,8 @@ msgid ""
 "Provide an indicator statement of the precise information needed to assess "
 "whether intended changes have occurred."
 msgstr ""
-"Fournissez un indicateur de l’information requise pour déterminer si des "
-"modifications envisagées ont eu lieu."
+"Fournir un relevé d’indicateur des informations précises nécessaires pour "
+"évaluer si les changements prévus ont eu lieu."
 
 #. Translators: this is the label for a form field where the user enters the "number" identifying an indicator
 #: indicators/models.py:1164 templates/indicators/disaggregation_report.html:90
@@ -870,10 +872,9 @@ msgid ""
 "If the indicator is brand new and created specifically for the program, enter "
 "&ldquo;Custom.&rdquo;"
 msgstr ""
-"Identifiez la source de cet indicateur (par ex. : Mercy Corps DIG, la "
-"Commission européenne, USAID, etc.). S’il s’agit d’un nouvel indicateur ou "
-"qu’il a été créé spécifiquement pour le programme, veuillez saisir "
-"« Personnalisé »."
+"Identifiez la source de cet indicateur (par ex. : Mercy Corps DIG, EC, USAID, "
+"etc.). S’il s’agit d’un nouvel indicateur ou qu’il a été créé spécifiquement "
+"pour le programme, veuillez saisir « Personnalisé »."
 
 #. Translators: field label for entering the extended explanation of the indicator
 #: indicators/models.py:1177 tola_management/models.py:412
@@ -888,10 +889,10 @@ msgid ""
 "definition should understand exactly what the indicator is measuring without "
 "any ambiguity."
 msgstr ""
-"Renseignez la définition de l’indicateur dans son intégralité ainsi que "
-"l’ensemble des principaux termes nécessitant davantage d’explications pour "
-"une mesure précise et fiable. La définition doit être exempte d’ambiguïté et "
-"indiquer de façon claire et précise ce que l’indicateur mesure."
+"Fournir une définition détaillée de l’indicateur et de tous les termes clés "
+"qui nécessitent des précisions pour une mesure précise et fiable. Toute "
+"personne lisant la définition doit comprendre exactement ce que l’indicateur "
+"mesure sans aucune ambiguïté."
 
 #: indicators/models.py:1186
 msgid "Rationale or justification for indicator"
@@ -909,7 +910,7 @@ msgid ""
 "unit (e.g. households, kilograms, kits, participants, etc.)"
 msgstr ""
 "Veuillez fournir une description de l’unité standard utilisée par "
-"l’indicateur (par ex. : foyers, kilogrammes, kits, participants, etc.)."
+"l’indicateur (par ex. : menages, kilogrammes, kits, participants, etc.)"
 
 #: indicators/models.py:1201
 msgid "Unit Type"
@@ -979,9 +980,9 @@ msgid ""
 "might include calculations and any historical or secondary data sources used "
 "to estimate targets."
 msgstr ""
-"Fournissez une explication pour l’ensemble des valeurs cibles attribuées à "
-"cet indicateur. Vous pouvez ajouter les calculs ou les sources de données "
-"historiques ou secondaires utilisées pour évaluer les cibles."
+"Fournir une explication pour toute valeur(s) cible attribuée à cet "
+"indicateur. Vous pouvez inclure des calculs et toutes les sources de données "
+"historiques ou secondaires utilisées pour estimer les cibles."
 
 #. Translators: this is help text for a field on an indicator setup form
 #: indicators/models.py:1257
@@ -1086,9 +1087,9 @@ msgid ""
 "community volunteers, program team members, local partner(s), enumerators, "
 "consultants, etc."
 msgstr ""
-"Établissez une liste des personnes ou équipes responsables de la collecte de "
-"données. Il peut s’agir de bénévoles, de membres de l’équipe du programme, de "
-"partenaires locaux, de recenseurs ou encore de consultants."
+"Indiquez les personnes ou les équipes responsables de la collecte des "
+"données. Il peut s’agir de bénévoles de la communauté, de membres de l’équipe "
+"du programme, de partenaires locaux, d’enquêteurs, de consultants, etc."
 
 #. Translators: this is help text for a field on an indicator setup form
 #: indicators/models.py:1325
@@ -1096,9 +1097,9 @@ msgid ""
 "The method of analysis should be detailed enough to allow an auditor or third "
 "party to reproduce the analysis or calculation and generate the same result."
 msgstr ""
-"La méthode d’analyse doit contenir suffisamment d’informations pour permettre "
-"à un contrôleur de gestion ou à tout tiers de reproduire l’analyse ou les "
-"calculs et d’obtenir le même résultat."
+"La méthode d’analyse doit être suffisamment détaillée pour permettre à un "
+"auditeur ou à une tierce partie de reproduire l’analyse ou le calcul et de "
+"générer le même résultat."
 
 #. Translators: this is help text for a field on an indicator setup form
 #: indicators/models.py:1332
@@ -1125,10 +1126,10 @@ msgid ""
 "and target frequency and should adhere to any requirements regarding program, "
 "stakeholder, and/or donor accountability and reporting."
 msgstr ""
-"Cette fréquence doit être cohérente avec la fréquence cible ainsi que celle à "
-"laquelle les données sont recueillies. Elle doit également respecter toutes "
-"les exigences en matière de comptes à rendre et d’informations à communiquer "
-"en ce qui concerne les programmes, les parties prenantes et/ou les donateurs."
+"Cette fréquence devrait avoir un sens par rapport à la fréquence de collecte "
+"des données et à la fréquence cible, et elle devrait respecter toutes les "
+"exigences concernant la redevabilité et le reportage de programme, de parties "
+"prenantes et/ou de bailleur de fonds."
 
 #. Translators: this is help text for a field on an indicator setup form
 #: indicators/models.py:1350

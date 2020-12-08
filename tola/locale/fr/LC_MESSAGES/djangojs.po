@@ -3,7 +3,7 @@ msgstr ""
 "Project-Id-Version: \n"
 "Report-Msgid-Bugs-To: \n"
 "POT-Creation-Date: 2020-11-23 14:55-0800\n"
-"PO-Revision-Date: 2020-11-23 14:59-0800\n"
+"PO-Revision-Date: 2020-12-08 10:18-0800\n"
 "Last-Translator: \n"
 "Language-Team: \n"
 "Language: fr\n"
@@ -166,7 +166,7 @@ msgstr "sélectionné(s)"
 #: js/components/changesetNotice.js:253 js/components/selectWidgets.js:143
 #: js/components/selectWidgets.js:148
 msgid "None selected"
-msgstr "Aucune option sélectionnée"
+msgstr "Aucun sélectionné"
 
 #. Translators: placeholder text in a search box
 #: js/components/checkboxed-multi-select.js:120
@@ -1208,7 +1208,7 @@ msgstr "Personnalisé"
 #: js/pages/results_framework/models.js:244
 msgid "Changes to the results framework template were saved."
 msgstr ""
-"Les modifications apportées au modèle de cadre de résultat ont été "
+"Les modifications apportées au modèle de cadre de résultats ont été "
 "enregistrées."
 
 #. Translators: Notification to user that the deletion command that they issued was successful */
@@ -1436,7 +1436,8 @@ msgstr ""
 #: js/pages/tola_management_pages/country/components/edit_disaggregations.js:233
 msgid "More information on assigning disaggregations to existing indicators"
 msgstr ""
-"En savoir plus sur l'attribution de désagrégations aux indicateurs existants"
+"Plus d’informations sur l’affectation des désagrégations aux indicateurs "
+"existants"
 
 #. Translators: Form field label for the disaggregation name.*/}
 #: js/pages/tola_management_pages/country/components/edit_disaggregations.js:433
@@ -1724,7 +1725,7 @@ msgstr "Rechercher un pays"
 #: js/pages/tola_management_pages/user/components/edit_user_profile.js:204
 #: js/pages/tola_management_pages/user/views.js:16
 msgid "None Selected"
-msgstr "Aucune option sélectionnée"
+msgstr "Aucun sélectionné"
 
 #: js/pages/tola_management_pages/country/views.js:30
 #: js/pages/tola_management_pages/country/views.js:95
