@@ -192,6 +192,7 @@ const create_unified_changeset_notice = ({
     let cancel_button = {
         text: cancel_text,
         addClass: 'btn-sm',
+        promptTrigger: true,
         click: function (notice) {
             close = on_cancel()
             if(close === undefined) {
