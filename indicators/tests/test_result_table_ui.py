@@ -117,7 +117,7 @@ class TestResultUnassignedUITargetsMidlineEndline(test.TestCase):
         self.count = 1
         self.count += str(self.indicator.pk).count('42') * 2
         self.count += str(self.indicator.name).count('42')
-        self.count += str(self.result.pk).count('42')
+        self.count += str(self.result.pk).count('42') * 2
         self.user = UserFactory(first_name="FN", last_name="LN", username="tester", is_superuser=True)
         self.user.set_password('password')
         self.user.save()
@@ -170,7 +170,7 @@ class TestResultUnassignedUITargetsNotSetup(test.TestCase):
         self.count = 1
         self.count += str(self.indicator.pk).count('42') * 3
         self.count += str(self.indicator.name).count('42')
-        self.count += str(self.result.pk).count('42')
+        self.count += str(self.result.pk).count('42') * 2
         self.user = UserFactory(first_name="FN", last_name="LN", username="tester", is_superuser=True)
         self.user.set_password('password')
         self.user.save()
