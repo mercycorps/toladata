@@ -7,8 +7,8 @@ msgid ""
 msgstr ""
 "Project-Id-Version: \n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2020-11-23 15:00-0800\n"
-"PO-Revision-Date: 2020-11-23 15:00-0800\n"
+"POT-Creation-Date: 2020-12-09 15:29-0800\n"
+"PO-Revision-Date: 2020-12-09 15:31-0800\n"
 "Last-Translator: \n"
 "Language-Team: \n"
 "Language: es\n"
@@ -70,7 +70,7 @@ msgstr "Identificador del indicador"
 msgid "No."
 msgstr "No."
 
-#: indicators/export_renderers.py:58 indicators/forms.py:338
+#: indicators/export_renderers.py:58 indicators/forms.py:348
 #: indicators/models.py:1423 indicators/models.py:1796
 #: indicators/models.py:2089 indicators/views/views_program.py:134
 #: indicators/views/views_program.py:173
@@ -197,19 +197,22 @@ msgstr "Sin datos"
 msgid "Program"
 msgstr "Programa"
 
-#. Translators: This is a form field label that allows users to select which Level object to associate with the Result that's being entered into the form
+#. Translators: This is a form field label that allows users to select which Level object to associate with
+#. the Result that's being entered into the form
 #. Translators: Number of the indicator being shown
-#: indicators/forms.py:244 indicators/views/views_program.py:106
+#: indicators/forms.py:245 indicators/views/views_program.py:106
 #: tola_management/models.py:411 tola_management/programadmin.py:109
 msgid "Result level"
 msgstr "Nivel del resultado"
 
-#: indicators/forms.py:266
+#: indicators/forms.py:267
 msgid "Display number"
 msgstr "Número mostrado"
 
-#. Translators: a "number" in this context is a kind of label.  This is help text to explain why a user is seeing customized numbers instead of auto-generated ones that can derived from the indicator's place in the hierarchy
-#: indicators/forms.py:268
+#. Translators: a "number" in this context is a kind of label.  This is help text to explain why a user is
+#. seeing customized numbers instead of auto-generated ones that can derived from the indicator's place in
+#. the hierarchy
+#: indicators/forms.py:271
 msgid ""
 "This number is displayed in place of the indicator number automatically "
 "generated through the results framework.  An admin can turn on auto-"
@@ -219,16 +222,18 @@ msgstr ""
 "automáticamente a través del sistema de resultados.  Un administrador puede "
 "activar la numeración automática en la configuración del programa"
 
-#. Translators:  Indicator objects are assigned to Levels, which are in a hierarchy.  We recently changed how we organize Levels. This is a field label for the indicator-associated Level in the old level system
-#: indicators/forms.py:277
+#. Translators:  Indicator objects are assigned to Levels, which are in a hierarchy.  We recently changed
+#. how we organize Levels. This is a field label for the indicator-associated Level in the old level system
+#: indicators/forms.py:283
 msgid "Old indicator level"
 msgstr "Indicador de nivel anterior"
 
-#. Translators:  We recently changed how we organize Levels. The new system is called the "results framework". This is help text for users to let them know that they can use the new system now.
-#: indicators/forms.py:279
+#. Translators:  We recently changed how we organize Levels. The new system is called the "results
+#. framework". This is help text for users to let them know that they can use the new system now.
+#: indicators/forms.py:286
 msgid ""
 "Indicators are currently grouped by an older version of indicator levels. To "
-"group indicators according to the results framework, an admin will need to "
+"group indicators according to the results framework, admin will need to "
 "adjust program settings."
 msgstr ""
 "Los indicadores se encuentran agrupados actualmente según una versión "
@@ -236,7 +241,7 @@ msgstr ""
 "con el sistema de resultados, un administrador debe ajustar la configuración "
 "del programa."
 
-#: indicators/forms.py:302
+#: indicators/forms.py:311
 msgid ""
 "This disaggregation cannot be unselected, because it was already used in "
 "submitted program results."
@@ -245,33 +250,34 @@ msgstr ""
 "resultados de programa enviados."
 
 #. Translators:  disaggregation types that are available to all programs
-#: indicators/forms.py:310
+#: indicators/forms.py:319
 msgid "Global disaggregations"
 msgstr "Desagregaciones globales"
 
 #. Translators:  disaggregation types that are available only to a specific country
-#: indicators/forms.py:315
+#: indicators/forms.py:324
 #, python-format
 msgid "%(country_name)s disaggregations"
 msgstr "Desagregaciones de %(country_name)s"
 
 #. Translators: Label of a form field.  User specifies whether changes should increase or decrease.
-#: indicators/forms.py:344 indicators/indicator_plan.py:90
+#: indicators/forms.py:354 indicators/indicator_plan.py:90
 #: tola_management/models.py:396
 msgid "Direction of change"
 msgstr "Dirección de cambio"
 
-#: indicators/forms.py:362
+#: indicators/forms.py:372
 msgid "Multiple submissions detected"
 msgstr "Múltiples envíos detectados"
 
 #. Translators: Input form error message
-#: indicators/forms.py:371
+#: indicators/forms.py:381
 msgid "Please enter a number larger than zero."
 msgstr "Por favor ingrese un número mayor que cero."
 
-#. Translators: This is an error message that is returned when a user is trying to assign an indicator to the wrong hierarch of levels.
-#: indicators/forms.py:379
+#. Translators: This is an error message that is returned when a user is trying to assign an indicator
+#. to the wrong hierarch of levels.
+#: indicators/forms.py:390
 msgid ""
 "Level program ID %(l_p_id)d and indicator program ID (%i_p_id)d mismatched"
 msgstr ""
@@ -279,32 +285,33 @@ msgstr ""
 "programa (%i_p_id)d del indicador no concuerdan"
 
 #. Translators: This is a result that was actually achieved, versus one that was planned.
-#: indicators/forms.py:450
+#: indicators/forms.py:461
 #: templates/indicators/results/result_form_disaggregation_fields.html:62
 #: tola_management/models.py:406
 msgid "Actual value"
 msgstr "Valor real"
 
-#: indicators/forms.py:461 templates/workflow/siteprofile_form.html:3
+#: indicators/forms.py:472 templates/workflow/siteprofile_form.html:3
 #: templates/workflow/siteprofile_form.html:4
 #: templates/workflow/siteprofile_form.html:14
 msgid "Site"
 msgstr "Sitio"
 
-#. Translators: field label that identifies which of a set of a targets (e.g. monthly/annual) a result is being compared to
-#: indicators/forms.py:463 tola_management/models.py:405
+#. Translators: field label that identifies which of a set of a targets (e.g. monthly/annual) a result
+#. is being compared to
+#: indicators/forms.py:475 tola_management/models.py:405
 msgid "Measure against target"
 msgstr "Medida contra objetivo"
 
-#: indicators/forms.py:464
+#: indicators/forms.py:476
 msgid "Link to file or folder"
 msgstr "Enlace al archivo o carpeta"
 
-#: indicators/forms.py:478 tola_management/models.py:404
+#: indicators/forms.py:490 tola_management/models.py:404
 msgid "Result date"
 msgstr "Fecha del resultado"
 
-#: indicators/forms.py:535
+#: indicators/forms.py:547
 #, python-brace-format
 msgid ""
 "You can begin entering results on {program_start_date}, the program start "
@@ -313,7 +320,7 @@ msgstr ""
 "Puede comenzar a ingresar resultados el {program_start_date}, fecha de "
 "inicio del programa"
 
-#: indicators/forms.py:540
+#: indicators/forms.py:552
 #, python-brace-format
 msgid ""
 "Please select a date between {program_start_date} and {program_end_date}"
@@ -321,13 +328,13 @@ msgstr ""
 "Por favor seleccione una fecha entre {program_start_date} y "
 "{program_end_date}"
 
-#: indicators/forms.py:551
+#: indicators/forms.py:563
 #, python-brace-format
 msgid "Please select a date between {program_start_date} and {todays_date}"
 msgstr ""
 "Por favor seleccione una fecha entre {program_start_date} y {todays_date}"
 
-#: indicators/forms.py:564
+#: indicators/forms.py:576
 msgid "URL required if record name is set"
 msgstr "La URL es requerida si el nombre del registro está establecido"
 
@@ -2371,22 +2378,22 @@ msgid "Delete this indicator"
 msgstr "Eliminar este indicador"
 
 #. Translators: button label to save the item and then close a modal
-#: templates/indicators/indicator_form_modal.html:411
-#: templates/indicators/indicator_form_modal.html:418
+#: templates/indicators/indicator_form_modal.html:408
+#: templates/indicators/indicator_form_modal.html:415
 #: templates/indicators/result_form_modal.html:156
 #: templates/indicators/result_form_modal.html:158
 msgid "Save and close"
 msgstr "Guardar y cerrar"
 
 #. Translators: close a modal throwing away any changes to the form
-#: templates/indicators/indicator_form_modal.html:412
-#: templates/indicators/indicator_form_modal.html:425
+#: templates/indicators/indicator_form_modal.html:409
+#: templates/indicators/indicator_form_modal.html:422
 #: templates/indicators/result_form_modal.html:161 tola/forms.py:27
 msgid "Cancel"
 msgstr "Cancelar"
 
 #. Translators: button label to save the form and be redirected to a blank for to add another item
-#: templates/indicators/indicator_form_modal.html:422
+#: templates/indicators/indicator_form_modal.html:419
 #: templates/indicators/result_form_modal.html:159
 msgid "Save and add another"
 msgstr "Guardar y agregar otro"
