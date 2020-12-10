@@ -92,7 +92,7 @@ COLUMNS = {
         'Nº',
         'Indicateur',
         'Unité de mesure',
-        'Changement',
+        'Modification',
         'C / NC',
         '# / %',
         'Mesure de base'
