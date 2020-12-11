@@ -52,7 +52,10 @@ def index(request, selected_country=None):
     if active_country:
         active_country_id = active_country.id
         # get list of IDs to which user has access:
-        user_program_ids = user.available_programs.filter(country=active_country_id).values_list('id', flat=True)
+        user_program_ids = user.available_programs.filter(
+            country=active_country_id,
+            funding_status="Funded"
+        ).values_list('id', flat=True)
         # get annotated program queryset for those programs:
         programs_with_metrics = ProgramWithMetrics.home_page.with_annotations().filter(
             id__in=user_program_ids
