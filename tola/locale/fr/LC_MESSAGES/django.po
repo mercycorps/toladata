@@ -2,8 +2,8 @@ msgid ""
 msgstr ""
 "Project-Id-Version: \n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2020-12-15 10:16-0800\n"
-"PO-Revision-Date: 2020-12-15 10:16-0800\n"
+"POT-Creation-Date: 2020-12-15 12:51-0800\n"
+"PO-Revision-Date: 2020-12-15 12:52-0800\n"
 "Last-Translator: \n"
 "Language-Team: \n"
 "Language: fr\n"
@@ -47,7 +47,7 @@ msgstr "Catégories"
 #: indicators/models.py:496 indicators/models.py:596 indicators/models.py:1210
 #: templates/indicators/disaggregation_print.html:55
 #: templates/indicators/disaggregation_report.html:94
-#: tola_management/models.py:873 tola_management/models.py:881
+#: tola_management/models.py:874 tola_management/models.py:882
 msgid "Disaggregation"
 msgstr "Désagrégation"
 
@@ -64,7 +64,7 @@ msgstr "Identifiant de l’indicateur"
 msgid "No."
 msgstr "Nº"
 
-#: indicators/export_renderers.py:58 indicators/forms.py:349
+#: indicators/export_renderers.py:58 indicators/forms.py:355
 #: indicators/models.py:1432 indicators/models.py:1805 indicators/models.py:2098
 #: indicators/views/views_program.py:134 indicators/views/views_program.py:173
 #: templates/indicators/disaggregation_print.html:53
@@ -93,7 +93,7 @@ msgstr "Modification"
 msgid "C / NC"
 msgstr "C / NC"
 
-#: indicators/export_renderers.py:77 indicators/forms.py:240
+#: indicators/export_renderers.py:77 indicators/forms.py:241
 #: indicators/models.py:1218 tola_management/models.py:398
 msgid "Baseline"
 msgstr "Mesure de base"
@@ -184,7 +184,7 @@ msgstr "Non cumulatif"
 msgid "No data"
 msgstr "Pas de données"
 
-#: indicators/forms.py:239 indicators/models.py:103 indicators/models.py:1381
+#: indicators/forms.py:240 indicators/models.py:103 indicators/models.py:1381
 #: indicators/models.py:2105 workflow/forms.py:100 workflow/models.py:532
 msgid "Program"
 msgstr "Programme"
@@ -192,19 +192,19 @@ msgstr "Programme"
 #. Translators: This is a form field label that allows users to select which Level object to associate with
 #. the Result that's being entered into the form
 #. Translators: Number of the indicator being shown
-#: indicators/forms.py:246 indicators/views/views_program.py:106
+#: indicators/forms.py:247 indicators/views/views_program.py:106
 #: tola_management/models.py:411 tola_management/programadmin.py:109
 msgid "Result level"
 msgstr "Niveau de résultat"
 
-#: indicators/forms.py:268
+#: indicators/forms.py:269
 msgid "Display number"
 msgstr "Afficher le numéro"
 
 #. Translators: a "number" in this context is a kind of label.  This is help text to explain why a user is
 #. seeing customized numbers instead of auto-generated ones that can derived from the indicator's place in
 #. the hierarchy
-#: indicators/forms.py:272
+#: indicators/forms.py:273
 msgid ""
 "This number is displayed in place of the indicator number automatically "
 "generated through the results framework.  An admin can turn on auto-numbering "
@@ -216,13 +216,13 @@ msgstr ""
 
 #. Translators:  Indicator objects are assigned to Levels, which are in a hierarchy.  We recently changed
 #. how we organize Levels. This is a field label for the indicator-associated Level in the old level system
-#: indicators/forms.py:284
+#: indicators/forms.py:285
 msgid "Old indicator level"
 msgstr "Précédent niveau d’indicateur"
 
 #. Translators:  We recently changed how we organize Levels. The new system is called the "results
 #. framework". This is help text for users to let them know that they can use the new system now.
-#: indicators/forms.py:287
+#: indicators/forms.py:288
 msgid ""
 "Indicators are currently grouped by an older version of indicator levels. To "
 "group indicators according to the results framework, an admin will need to "
@@ -233,7 +233,7 @@ msgstr ""
 "résultats, les paramètres du programme devront être modifiés par un "
 "administrateur."
 
-#: indicators/forms.py:312
+#: indicators/forms.py:318
 msgid ""
 "This disaggregation cannot be unselected, because it was already used in "
 "submitted program results."
@@ -242,34 +242,34 @@ msgstr ""
 "envoyés, c'est pourquoi elle ne peut pas être désélectionnée."
 
 #. Translators:  disaggregation types that are available to all programs
-#: indicators/forms.py:320
+#: indicators/forms.py:326
 msgid "Global disaggregations"
 msgstr "Désagrégations globales"
 
 #. Translators:  disaggregation types that are available only to a specific country
-#: indicators/forms.py:325
+#: indicators/forms.py:331
 #, python-format
 msgid "%(country_name)s disaggregations"
 msgstr "Désagrégations %(country_name)s"
 
 #. Translators: Label of a form field.  User specifies whether changes should increase or decrease.
-#: indicators/forms.py:355 indicators/indicator_plan.py:90
+#: indicators/forms.py:361 indicators/indicator_plan.py:90
 #: tola_management/models.py:396
 msgid "Direction of change"
 msgstr "Direction du changement"
 
-#: indicators/forms.py:373
+#: indicators/forms.py:379
 msgid "Multiple submissions detected"
 msgstr "Plusieurs soumissions détectées"
 
 #. Translators: Input form error message
-#: indicators/forms.py:382
+#: indicators/forms.py:388
 msgid "Please enter a number larger than zero."
 msgstr "Veuillez entrer un nombre supérieur à zéro."
 
 #. Translators: This is an error message that is returned when a user is trying to assign an indicator
 #. to the wrong hierarch of levels.
-#: indicators/forms.py:391
+#: indicators/forms.py:397
 msgid ""
 "Level program ID %(l_p_id)d and indicator program ID (%i_p_id)d mismatched"
 msgstr ""
@@ -277,13 +277,13 @@ msgstr ""
 "du programme de l’indicateur sont incompatibles"
 
 #. Translators: This is a result that was actually achieved, versus one that was planned.
-#: indicators/forms.py:462
+#: indicators/forms.py:468
 #: templates/indicators/results/result_form_disaggregation_fields.html:62
 #: tola_management/models.py:406
 msgid "Actual value"
 msgstr "Valeur réelle"
 
-#: indicators/forms.py:473 templates/workflow/siteprofile_form.html:3
+#: indicators/forms.py:479 templates/workflow/siteprofile_form.html:3
 #: templates/workflow/siteprofile_form.html:4
 #: templates/workflow/siteprofile_form.html:14
 msgid "Site"
@@ -291,19 +291,19 @@ msgstr "Site"
 
 #. Translators: field label that identifies which of a set of a targets (e.g. monthly/annual) a result
 #. is being compared to
-#: indicators/forms.py:476 tola_management/models.py:405
+#: indicators/forms.py:482 tola_management/models.py:405
 msgid "Measure against target"
 msgstr "Mesurer par rapport à la cible"
 
-#: indicators/forms.py:477
+#: indicators/forms.py:483
 msgid "Link to file or folder"
 msgstr "Lien vers le fichier ou dossier"
 
-#: indicators/forms.py:491 tola_management/models.py:404
+#: indicators/forms.py:497 tola_management/models.py:404
 msgid "Result date"
 msgstr "Date de résultat"
 
-#: indicators/forms.py:548
+#: indicators/forms.py:554
 #, python-brace-format
 msgid ""
 "You can begin entering results on {program_start_date}, the program start date"
@@ -311,21 +311,21 @@ msgstr ""
 "Vous pouvez commencer à saisir des résultats le {program_start_date}, date de "
 "début du programme"
 
-#: indicators/forms.py:553
+#: indicators/forms.py:559
 #, python-brace-format
 msgid "Please select a date between {program_start_date} and {program_end_date}"
 msgstr ""
 "Veuillez sélectionner une date comprise entre le {program_start_date} et le "
 "{program_end_date}"
 
-#: indicators/forms.py:564
+#: indicators/forms.py:570
 #, python-brace-format
 msgid "Please select a date between {program_start_date} and {todays_date}"
 msgstr ""
 "Veuillez sélectionner une date entre le {program_start_date} et le "
 "{todays_date}"
 
-#: indicators/forms.py:577
+#: indicators/forms.py:583
 msgid "URL required if record name is set"
 msgstr "URL requise si un nom d’enregistrement est configuré"
 
@@ -450,7 +450,7 @@ msgstr "Type d’indicateur"
 
 #: indicators/models.py:63 indicators/models.py:83 indicators/models.py:104
 #: indicators/models.py:641 indicators/models.py:656
-#: tola_management/models.py:760 workflow/forms.py:134
+#: tola_management/models.py:761 workflow/forms.py:134
 msgid "Description"
 msgstr "Description"
 
@@ -479,7 +479,7 @@ msgstr "Type d’indicateur"
 #: indicators/models.py:81 indicators/models.py:102 indicators/models.py:123
 #: indicators/models.py:397 indicators/models.py:677 indicators/models.py:1158
 #: tola_management/models.py:133 tola_management/models.py:391
-#: tola_management/models.py:757 tola_management/models.py:813
+#: tola_management/models.py:758 tola_management/models.py:814
 msgid "Name"
 msgstr "Prénom"
 
@@ -645,7 +645,7 @@ msgid "Global (all programs, all countries)"
 msgstr "Général (tous les programmes, tous les pays)"
 
 #. Translators: Heading for list of disaggregation categories in a particular disaggregation type.
-#: indicators/models.py:499 tola_management/models.py:879
+#: indicators/models.py:499 tola_management/models.py:880
 msgid "Archived"
 msgstr "Archivé"
 
@@ -655,7 +655,7 @@ msgid "Label"
 msgstr "Étiquette"
 
 #. Translators: Heading for list of disaggregation categories in a particular disaggregation type.
-#: indicators/models.py:628 tola_management/models.py:875
+#: indicators/models.py:628 tola_management/models.py:876
 msgid "Disaggregation category"
 msgstr "Catégorie de désagrégation"
 
@@ -1585,7 +1585,7 @@ msgid "Reason for change is required"
 msgstr "Une justification pour la modification est requise"
 
 #: indicators/views/views_indicators.py:686
-#: indicators/views/views_indicators.py:748 tola_management/models.py:730
+#: indicators/views/views_indicators.py:748 tola_management/models.py:731
 msgid "No reason for change required."
 msgstr "Aucune justification pour la modification n’est requise."
 
@@ -1855,7 +1855,7 @@ msgid "Organizations"
 msgstr "Organisations"
 
 #: templates/base.html:106 templates/workflow/tags/program_menu.html:8
-#: tola_management/models.py:762 workflow/models.py:130
+#: tola_management/models.py:763 workflow/models.py:130
 msgid "Countries"
 msgstr "Pays"
 
@@ -2421,6 +2421,14 @@ msgstr "Annuler"
 #: templates/indicators/result_form_modal.html:159
 msgid "Save and add another"
 msgstr "Sauvegarder et continuer à ajouter"
+
+#: templates/indicators/indicator_form_modal.html:512
+msgid "selected"
+msgstr "sélectionné(s)"
+
+#: templates/indicators/indicator_form_modal.html:513
+msgid "None selected"
+msgstr "Aucun sélectionné"
 
 #: templates/indicators/indicator_list_modals.html:10
 msgid "Are you sure?"
@@ -3731,14 +3739,14 @@ msgid "Program list inconsistent with country access"
 msgstr "Liste des programmes incompatibles avec l’accès au pays"
 
 #: tola_management/models.py:106 tola_management/models.py:377
-#: tola_management/models.py:746 tola_management/models.py:803
-#: tola_management/models.py:861
+#: tola_management/models.py:747 tola_management/models.py:804
+#: tola_management/models.py:862
 msgid "Modification date"
 msgstr "Date de modification"
 
 #: tola_management/models.py:110 tola_management/models.py:382
-#: tola_management/models.py:749 tola_management/models.py:806
-#: tola_management/models.py:865
+#: tola_management/models.py:750 tola_management/models.py:807
+#: tola_management/models.py:866
 msgid "Modification type"
 msgstr "Type de modification"
 
@@ -3764,7 +3772,7 @@ msgid "Mode of address"
 msgstr "Prénom d’usage"
 
 #. Translators:  Form field capturing whether a user prefers to be contacted by phone, email, etc...
-#: tola_management/models.py:140 tola_management/models.py:818
+#: tola_management/models.py:140 tola_management/models.py:819
 msgid "Mode of contact"
 msgstr "Moyen de communication"
 
@@ -3781,7 +3789,7 @@ msgstr "E-mail"
 msgid "Organization"
 msgstr "Organisation"
 
-#: tola_management/models.py:144 tola_management/models.py:819
+#: tola_management/models.py:144 tola_management/models.py:820
 msgid "Is active"
 msgstr "Actif"
 
@@ -3899,86 +3907,86 @@ msgstr "Niveau de résultat modifié"
 msgid "Percentage"
 msgstr "Pourcentage (%)"
 
-#: tola_management/models.py:756
+#: tola_management/models.py:757
 msgid "GAIT ID"
 msgstr "ID GAIT"
 
-#: tola_management/models.py:758
+#: tola_management/models.py:759
 msgid "Funding status"
 msgstr "Statut de financement"
 
-#: tola_management/models.py:759
+#: tola_management/models.py:760
 msgid "Cost center"
 msgstr "Centre de coût"
 
-#: tola_management/models.py:761 tola_management/models.py:820
+#: tola_management/models.py:762 tola_management/models.py:821
 msgid "Sectors"
 msgstr "Secteurs"
 
-#: tola_management/models.py:768
+#: tola_management/models.py:769
 msgid "Program created"
 msgstr "Programme créé"
 
-#: tola_management/models.py:769
+#: tola_management/models.py:770
 msgid "Program updated"
 msgstr "Programme mis à jour"
 
-#: tola_management/models.py:814
+#: tola_management/models.py:815
 msgid "Primary address"
 msgstr "Adresse principale"
 
-#: tola_management/models.py:815
+#: tola_management/models.py:816
 msgid "Primary contact name"
 msgstr "Nom du contact principal"
 
-#: tola_management/models.py:816
+#: tola_management/models.py:817
 msgid "Primary contact email"
 msgstr "Adresse e-mail du contact principal"
 
-#: tola_management/models.py:817
+#: tola_management/models.py:818
 msgid "Primary contact phone"
 msgstr "Numéro de téléphone du contact principal"
 
-#: tola_management/models.py:826
+#: tola_management/models.py:827
 msgid "Organization created"
 msgstr "Société créée"
 
-#: tola_management/models.py:827
+#: tola_management/models.py:828
 msgid "Organization updated"
 msgstr "Société mise à jour"
 
 #. Translators: Heading for list of disaggregation categories in a particular disaggregation type.
-#: tola_management/models.py:877
+#: tola_management/models.py:878
 msgid "Disaggregation categories"
 msgstr "Catégories de désagrégation"
 
 #. Translators: Heading for data that tracks when a data disaggregation as been created for a country
-#: tola_management/models.py:888
+#: tola_management/models.py:889
 msgid "Country disaggregation created"
 msgstr "Désagrégation au niveau du pays créée"
 
 #. Translators: Heading for data that tracks when a data disaggregation assigned to a country has been changed.
-#: tola_management/models.py:890
+#: tola_management/models.py:891
 msgid "Country disaggregation updated"
 msgstr "Désagrégation au niveau du pays mise à jour"
 
 #. Translators: Heading for data that tracks when a data disaggregation assigned to a country has been deleted.
-#: tola_management/models.py:892
+#: tola_management/models.py:893
 msgid "Country disaggregation deleted"
 msgstr "Désagrégation au niveau du pays supprimée"
 
 #. Translators: Heading for data that tracks when a data disaggregation assigned to a country has been archived.
-#: tola_management/models.py:894
+#: tola_management/models.py:895
 msgid "Country disaggregation archived"
 msgstr "Désagrégation au niveau du pays archivée"
 
 #. Translators: Heading for data that tracks when a data disaggregation assigned to a country has been restored.
-#: tola_management/models.py:896
+#: tola_management/models.py:897
 msgid "Country disaggregation unarchived"
 msgstr "Désagrégation au niveau du pays non archivée"
 
 #. Translators: Heading for data that tracks when the categories of a data disaggregation that has been assigned to country have been updated.
-#: tola_management/models.py:898
+#: tola_management/models.py:899
 msgid "Country disaggregation categories updated"
 msgstr "Catégories de désagrégation au niveau du pays mises à jour"
 
