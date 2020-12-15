@@ -8,7 +8,7 @@ from django.core.serializers.json import DjangoJSONEncoder
 from django.core.mail import send_mail
 from django.contrib.auth.decorators import login_required
 from django.contrib.auth.tokens import default_token_generator
-from django.utils.translation import ugettext_lazy as _
+from django.utils.translation import gettext, ugettext_lazy as _
 from django.template import loader
 from django.shortcuts import render
 from django.utils.http import urlsafe_base64_encode
@@ -317,7 +317,7 @@ def audit_log_host_page(request, program_id):
                   {"bundle_name": "audit_log",
                    "js_context": json_context,
                    "report_wide": True,
-                   "page_title": program.name+" " + _("audit log") +" | "})
+                   "page_title": program.name+" " + gettext("audit log") +" | "})
 
 
 class AuthUserSerializer(ModelSerializer):
