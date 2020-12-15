@@ -285,16 +285,20 @@ def app_host_page(request, react_app_page):
     page_title = ""
     if react_app_page == 'user':
         js_context = get_user_page_context(request)
-        page_title = _("User Management")
+        # Translators: Page title for an administration page managing users of the application
+        page_title = _("Admin: Users")
     elif react_app_page == 'organization':
         js_context = get_organization_page_context(request)
-        page_title = _("Organization Management")
+        # Translators: Page title for an administration page managing organizations in the application
+        page_title = _("Admin: Organizations")
     elif react_app_page == 'program':
         js_context = get_program_page_context(request)
-        page_title = _("Program Management")
+        # Translators: Page title for an administration page managing Programs using the application
+        page_title = _("Admin: Programs")
     elif react_app_page == 'country':
         js_context = get_country_page_context(request)
-        page_title = _("Country Management")
+        # Translators: Page title for an administration page managing countries represented in the application
+        page_title = _("Admin: Countries")
 
     json_context = json.dumps(js_context, cls=DjangoJSONEncoder)
     return render(
@@ -317,7 +321,8 @@ def audit_log_host_page(request, program_id):
                   {"bundle_name": "audit_log",
                    "js_context": json_context,
                    "report_wide": True,
-                   "page_title": program.name+" " + gettext("audit log") +" | "})
+                   # Translators: Page title for a log of all changes to indicators over a program's history
+                   "page_title": program.name+": " + gettext("Indicator change log") +" | "})
 
 
 class AuthUserSerializer(ModelSerializer):
@@ -360,7 +365,7 @@ class UserAdminSerializer(ModelSerializer):
     # Validate that username and email are not duplicated, MC emails are not being entered manually for
     # email or username fields.
     def validate(self, data):
-        out_data = super(UserAdminSerializer, self).validate(data)
+        out_data = super().validate(data)
         validation_errors = {}
         if self.instance:
             others_username = list(User.objects.filter(username=data['user']['username']))
@@ -390,19 +395,28 @@ class UserAdminSerializer(ModelSerializer):
         org_name = Organization.objects.get(id=data['organization_id']).name
         email_domain_is_mc = re.search("@mercycorps.org$",  data["user"]["email"])
         if org_name == "Mercy Corps" and not email_domain_is_mc:
-            # Translators:  Error message given when an administrator tries to save a bad combination of organization and email
-            validation_errors.update({"email": _("Non-Mercy Corps emails should not be used with the Mercy Corps organization.")})
+            # Translators:  Error message given when an administrator tries to save a bad combination of
+            # organization and email
+            validation_errors.update(
+                {"email": _("Non-Mercy Corps emails should not be used with the Mercy Corps organization.")})
         elif org_name != "Mercy Corps" and email_domain_is_mc:
             if "email" in validation_errors:
-                # Translators:  Error message given when an administrator tries to save a bad combination of organization and email
-                validation_errors.update({"email": _("A user account with this email address already exists. Mercy Corps accounts are managed by Okta. Mercy Corps employees should log in using their Okta username and password.")})
+                # Translators:  Error message given when an administrator tries to save a bad combination of
+                # organization and email
+                validation_errors.update(
+                    {"email": _("A user account with this email address already exists. Mercy Corps accounts are "
+                                "managed by Okta. Mercy Corps employees should log in using their Okta username "
+                                "and password.")})
             else:
-                # Translators:  Error message given when an administrator tries to save a bad combination of organization and email
-                validation_errors.update({"email": _("Mercy Corps accounts are managed by Okta. Mercy Corps employees should log in using their Okta username and password.")})
+                # Translators:  Error message given when an administrator tries to save a bad combination of
+                # organization and email
+                validation_errors.update({"email": _("Mercy Corps accounts are managed by Okta. Mercy Corps employees "
+                                                     "should log in using their Okta username and password.")})
 
         if org_name != "Mercy Corps" and re.search("@mercycorps.org$", data['user']['username']):
             # Translators:  Error message given when an administrator tries to save an invalid username
-            validation_errors.update({"username": _("Mercy Corps accounts are managed by Okta. Mercy Corps employees should log in using their Okta username and password.")})
+            validation_errors.update({"username": _("Mercy Corps accounts are managed by Okta. Mercy Corps employees "
+                                                    "should log in using their Okta username and password.")})
 
         if len(validation_errors) > 0:
             raise ValidationError(validation_errors)
@@ -566,7 +580,7 @@ class UserAdminViewSet(viewsets.ModelViewSet):
             queryset = queryset.filter(user__is_active=user_status)
 
         is_admin = req.GET.get('admin_role')
-        if is_admin == '1' or is_admin == '0':
+        if is_admin in ['1', '0']:
             queryset = queryset.annotate(
                 country_admin=models.Exists(
                     CountryAccess.objects.filter(
@@ -614,7 +628,9 @@ class UserAdminViewSet(viewsets.ModelViewSet):
     @action(detail=True, methods=['GET'])
     def history(self, request, pk=None):
         user = TolaUser.objects.get(pk=pk)
-        queryset = UserManagementAuditLog.objects.filter(modified_user=user).select_related('admin_user').order_by('-date')
+        queryset = UserManagementAuditLog.objects.filter(
+            modified_user=user
+        ).select_related('admin_user').order_by('-date')
 
         serializer = UserManagementAuditLogSerializer(queryset, many=True)
         return Response(serializer.data)
@@ -709,7 +725,8 @@ class UserAdminViewSet(viewsets.ModelViewSet):
     def bulk_update_status(self, request):
 
         tola_users = TolaUser.objects.filter(pk__in=request.data["user_ids"])
-        User.objects.filter(pk__in=[t_user.user_id for t_user in tola_users]).update(is_active=bool(request.data["new_status"]))
+        User.objects.filter(pk__in=[t_user.user_id for t_user in tola_users]).update(
+            is_active=bool(request.data["new_status"]))
         updated = [{
             'id': tu.id,
             'is_active': tu.user.is_active,
@@ -728,7 +745,8 @@ class UserAdminViewSet(viewsets.ModelViewSet):
                     user = TolaUser.objects.get(id=user_id)
                     previous_entry = user.logged_program_fields
                     try:
-                        access = ProgramAccess.objects.get(tolauser_id=user_id, country_id=role["country"], program_id=role["program"])
+                        access = ProgramAccess.objects.get(
+                            tolauser_id=user_id, country_id=role["country"], program_id=role["program"])
                     except ObjectDoesNotExist:
                         access = ProgramAccess(
                             tolauser_id=user_id,
@@ -763,7 +781,8 @@ class UserAdminViewSet(viewsets.ModelViewSet):
                     user = TolaUser.objects.get(id=user_id)
                     previous_entry = user.logged_program_fields
                     try:
-                        access = ProgramAccess.objects.get(tolauser_id=user_id, country_id=role["country"], program_id=role["program"])
+                        access = ProgramAccess.objects.get(
+                            tolauser_id=user_id, country_id=role["country"], program_id=role["program"])
                         access.delete()
                     except ObjectDoesNotExist:
                         pass
@@ -874,7 +893,7 @@ class OrganizationSerializer(ModelSerializer):
         old = instance.logged_fields
         instance.sectors.add(*added_sectors)
         instance.sectors.remove(*removed_sectors)
-        updated_org = super(OrganizationSerializer, self).update(instance, validated_data)
+        updated_org = super().update(instance, validated_data)
 
         OrganizationAdminAuditLog.updated(
             organization=updated_org,
@@ -998,7 +1017,9 @@ class OrganizationAdminViewSet(viewsets.ModelViewSet):
     @action(detail=True, methods=['GET'])
     def history(self, request, pk=None):
         org = Organization.objects.get(pk=pk)
-        queryset = OrganizationAdminAuditLog.objects.filter(organization=org).select_related('admin_user').order_by('-date')
+        queryset = OrganizationAdminAuditLog.objects.filter(
+            organization=org
+        ).select_related('admin_user').order_by('-date')
         serializer = OrganizationAdminAuditLogSerializer(queryset, many=True)
         return Response(serializer.data)
 

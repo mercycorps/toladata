@@ -2,7 +2,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: \n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2020-11-23 14:55-0800\n"
+"POT-Creation-Date: 2020-12-15 13:16-0800\n"
 "PO-Revision-Date: 2020-12-08 10:46-0800\n"
 "Last-Translator: \n"
 "Language-Team: \n"
@@ -58,7 +58,7 @@ msgstr "OK"
 msgid "Cancel"
 msgstr "Annuler"
 
-#: js/base.js:462 js/components/changesetNotice.js:172
+#: js/base.js:462 js/components/changesetNotice.js:173
 msgid "A reason is required."
 msgstr "Une justification est nécessaire."
 
@@ -71,7 +71,7 @@ msgstr "Cette action est irréversible."
 #: js/base.js:530 js/base.js:625
 #: js/pages/results_framework/components/level_cards.js:86
 #: js/pages/results_framework/models.js:665
-#: js/pages/tola_management_pages/country/components/edit_disaggregations.js:627
+#: js/pages/tola_management_pages/country/components/edit_disaggregations.js:625
 #: js/pages/tola_management_pages/country/models.js:440
 #: js/pages/tola_management_pages/country/models.js:474
 #: js/pages/tola_management_pages/country/models.js:505
@@ -151,20 +151,20 @@ msgid "New Entry"
 msgstr "Nouvelle entrée"
 
 #. Translators: This is the label for a textbox where a user can provide details about their reason for selecting a particular option
-#: js/components/changesetNotice.js:118
+#: js/components/changesetNotice.js:119
 msgid "Details"
 msgstr "Détails"
 
 #. Translators: (preceded by a number) e.g. "4 options selected"
 #. Translators: prefixed with a number, as in "4 selected" displayed on a multi-select
-#: js/components/changesetNotice.js:251
+#: js/components/changesetNotice.js:254
 #: js/components/checkboxed-multi-select.js:106
 #: js/components/selectWidgets.js:153
 msgid "selected"
 msgstr "sélectionné(s)"
 
 #. Translators: for a dropdown menu with no options checked:
-#: js/components/changesetNotice.js:253 js/components/selectWidgets.js:143
+#: js/components/changesetNotice.js:256 js/components/selectWidgets.js:143
 #: js/components/selectWidgets.js:148
 msgid "None selected"
 msgstr "Aucun sélectionné"
@@ -1246,7 +1246,7 @@ msgstr ""
 #. Translators: This is a confirmation prompt to confirm a user wants to archive an item
 #. Translators: This is a confirmation prompt to confirm a user wants to unarchive an item
 #: js/pages/results_framework/models.js:668
-#: js/pages/tola_management_pages/country/components/edit_disaggregations.js:631
+#: js/pages/tola_management_pages/country/components/edit_disaggregations.js:629
 #: js/pages/tola_management_pages/country/models.js:479
 #: js/pages/tola_management_pages/country/models.js:510
 #: js/pages/tola_management_pages/program/models.js:281
@@ -1336,7 +1336,7 @@ msgid "Strategic Objectives"
 msgstr "Objectifs stratégiques"
 
 #: js/pages/tola_management_pages/country/components/country_editor.js:41
-#: js/pages/tola_management_pages/country/components/edit_disaggregations.js:672
+#: js/pages/tola_management_pages/country/components/edit_disaggregations.js:668
 msgid "Country Disaggregations"
 msgstr "Désagrégations du pays"
 
@@ -1497,7 +1497,7 @@ msgstr "Supprimer la désagrégation"
 msgid "Archive disaggregation"
 msgstr "Archiver la désagrégation"
 
-#: js/pages/tola_management_pages/country/components/edit_disaggregations.js:560
+#: js/pages/tola_management_pages/country/components/edit_disaggregations.js:559
 #: js/pages/tola_management_pages/country/components/edit_objectives.js:159
 #: js/pages/tola_management_pages/country/models.js:268
 #: js/pages/tola_management_pages/organization/models.js:113
@@ -1509,7 +1509,7 @@ msgstr ""
 "abandonner ?"
 
 #. Translators:  Warning message about how the new type of disaggregation the user has created will be applied to existing and new data
-#: js/pages/tola_management_pages/country/components/edit_disaggregations.js:612
+#: js/pages/tola_management_pages/country/components/edit_disaggregations.js:610
 #, python-format
 msgid ""
 "This disaggregation will be automatically selected for all new indicators in "
@@ -1526,7 +1526,7 @@ msgstr[1] ""
 "programmes."
 
 #. Translators:  This is a warning popup when the user tries to do something that has broader effects than they might anticipate
-#: js/pages/tola_management_pages/country/components/edit_disaggregations.js:619
+#: js/pages/tola_management_pages/country/components/edit_disaggregations.js:617
 #, python-format
 msgid ""
 "This disaggregation will be automatically selected for all new indicators in "
@@ -1536,7 +1536,7 @@ msgstr ""
 "indicateurs dans %s. Les indicateurs existants ne seront pas affectés."
 
 #. Translators:  This is a warning popup when the user tries to do something that has broader effects than they might anticipate
-#: js/pages/tola_management_pages/country/components/edit_disaggregations.js:623
+#: js/pages/tola_management_pages/country/components/edit_disaggregations.js:621
 #, python-format
 msgid ""
 "This disaggregation will no longer be automatically selected for all new "
@@ -1546,7 +1546,7 @@ msgstr ""
 "nouveaux indicateurs dans %s. Les indicateurs existants ne seront pas "
 "affectés."
 
-#: js/pages/tola_management_pages/country/components/edit_disaggregations.js:676
+#: js/pages/tola_management_pages/country/components/edit_disaggregations.js:672
 msgid "Add country disaggregation"
 msgstr "Ajouter une désagrégation de pays"
 
