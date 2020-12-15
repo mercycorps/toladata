@@ -8,7 +8,7 @@ from django.core.serializers.json import DjangoJSONEncoder
 from django.core.mail import send_mail
 from django.contrib.auth.decorators import login_required
 from django.contrib.auth.tokens import default_token_generator
-from django.utils.translation import ugettext_lazy as _
+from django.utils.translation import gettext, ugettext_lazy as _
 from django.template import loader
 from django.shortcuts import render
 from django.utils.http import urlsafe_base64_encode
@@ -285,16 +285,16 @@ def app_host_page(request, react_app_page):
     page_title = ""
     if react_app_page == 'user':
         js_context = get_user_page_context(request)
-        page_title = _("User Management")
+        page_title = _("Admin: Users")
     elif react_app_page == 'organization':
         js_context = get_organization_page_context(request)
-        page_title = _("Organization Management")
+        page_title = _("Admin: Organizations")
     elif react_app_page == 'program':
         js_context = get_program_page_context(request)
-        page_title = _("Program Management")
+        page_title = _("Admin: Programs")
     elif react_app_page == 'country':
         js_context = get_country_page_context(request)
-        page_title = _("Country Management")
+        page_title = _("Admin: Countries")
 
     json_context = json.dumps(js_context, cls=DjangoJSONEncoder)
     return render(
@@ -317,7 +317,7 @@ def audit_log_host_page(request, program_id):
                   {"bundle_name": "audit_log",
                    "js_context": json_context,
                    "report_wide": True,
-                   "page_title": program.name+" " + _("audit log") +" | "})
+                   "page_title": program.name+": " + gettext("Indicator change log") +" | "})
 
 
 class AuthUserSerializer(ModelSerializer):

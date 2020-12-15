@@ -7,8 +7,8 @@ msgid ""
 msgstr ""
 "Project-Id-Version: \n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2020-12-14 16:31-0800\n"
-"PO-Revision-Date: 2020-11-23 15:00-0800\n"
+"POT-Creation-Date: 2020-12-15 13:09-0800\n"
+"PO-Revision-Date: 2020-12-15 13:13-0800\n"
 "Last-Translator: \n"
 "Language-Team: \n"
 "Language: es\n"
@@ -3977,32 +3977,24 @@ msgid "Mercy Corps - Tola New Account Registration"
 msgstr "Este campo debe ser único"
 
 #: tola_management/views.py:288
-#, fuzzy
-#| msgid "Username"
-msgid "User Management"
-msgstr "Nombre de usuario"
+msgid "Admin: Users"
+msgstr "Administrador: Usuarios"
 
 #: tola_management/views.py:291
-#, fuzzy
-#| msgid "Organization Name"
-msgid "Organization Management"
-msgstr "Nombre de la organización"
+msgid "Admin: Organizations"
+msgstr "Administrador: Organizaciones"
 
 #: tola_management/views.py:294
-#, fuzzy
-#| msgid "Program page"
-msgid "Program Management"
-msgstr "Página del programa"
+msgid "Admin: Programs"
+msgstr "Administrador: Programas"
 
 #: tola_management/views.py:297
-#, fuzzy
-#| msgid "Country Name"
-msgid "Country Management"
-msgstr "Nombre del país"
+msgid "Admin: Countries"
+msgstr "Administrador: Países"
 
 #: tola_management/views.py:320
-msgid "audit log"
-msgstr ""
+msgid "Indicator change log"
+msgstr "Registro de cambios de indicadores"
 
 #. Translators: Error message given when an administrator tries to save a username that is already taken
 #: tola_management/views.py:372 tola_management/views.py:384
@@ -4596,6 +4588,26 @@ msgstr "Encontrar"
 #: workflow/widgets.py:133
 msgid "City, Country:"
 msgstr "Ciudad, País:"
+
+#, fuzzy
+#~| msgid "Username"
+#~ msgid "User Management"
+#~ msgstr "Nombre de usuario"
+
+#, fuzzy
+#~| msgid "Organization Name"
+#~ msgid "Organization Management"
+#~ msgstr "Nombre de la organización"
+
+#, fuzzy
+#~| msgid "Program page"
+#~ msgid "Program Management"
+#~ msgstr "Página del programa"
+
+#, fuzzy
+#~| msgid "Country Name"
+#~ msgid "Country Management"
+#~ msgstr "Nombre del país"
 
 #~ msgid ""
 #~ "To see program results, please update your periodic targets to match your "
