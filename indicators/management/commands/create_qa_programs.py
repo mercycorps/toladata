@@ -59,7 +59,7 @@ class Command(BaseCommand):
             else:
                 test_password = getpass(prompt="Enter the password to use for the test users: ")
 
-        org = Organization.objects.get(id=1)
+        org = Organization.mercy_corps()
         tolaland, created = Country.objects.get_or_create(
             country='Tolaland', defaults={
                 'latitude': 21.4, 'longitude': -158, 'zoom': 6, 'organization': org, 'code': 'TO'})

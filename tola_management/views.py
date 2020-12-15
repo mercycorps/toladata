@@ -412,7 +412,8 @@ class UserAdminSerializer(ModelSerializer):
     def create(self, validated_data):
         validated_data["is_active"] = True
 
-        if validated_data["organization_id"] == 1 and not self.context["request"].user.is_superuser:
+        if (validated_data["organization_id"] == Organization.MERCY_CORPS_ID and
+            not self.context["request"].user.is_superuser):
             raise PermissionDenied(_("Only superusers can create Mercy Corps staff profiles."))
 
         auth_user_data = validated_data.pop('user')
@@ -450,7 +451,8 @@ class UserAdminSerializer(ModelSerializer):
     def update(self, instance, validated_data):
         is_superuser = self.context["request"].user.is_superuser
 
-        if (instance.organization_id == 1 or validated_data['organization_id'] == 1) and not is_superuser:
+        if (instance.organization_id == Organization.MERCY_CORPS_ID or
+            validated_data['organization_id'] == Organization.MERCY_CORPS_ID) and not is_superuser:
             raise PermissionDenied(_("Only superusers can edit Mercy Corps staff profiles."))
 
         user = instance

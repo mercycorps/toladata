@@ -198,7 +198,7 @@ class TolaUser(models.Model):
 
     @property
     def countries_list(self):
-        if self.organization_id != 1:
+        if self.organization_id != Organization.MERCY_CORPS_ID:
             return Country.objects.none()
         return ', '.join([x.code for x in self.countries.all()])
 
@@ -257,7 +257,7 @@ class TolaUser(models.Model):
     def managed_countries(self):
         if self.user.is_superuser:
             return Country.objects.all()
-        elif self.organization_id != 1:
+        elif self.organization_id != Organization.MERCY_CORPS_ID:
             return Country.objects.none()
         else:
             return Country.objects.filter(
@@ -378,7 +378,7 @@ class CountryAccess(models.Model):
 
     def save(self, *args, **kwargs):
         #requirements that country access be given only to mercy corps users (id = 1)
-        if self.id is None and self.tolauser.organization_id != 1:
+        if self.id is None and self.tolauser.organization_id != Organization.MERCY_CORPS_ID:
             raise SuspiciousOperation(_("Only Mercy Corps users can be given country-level access"))
         super(CountryAccess, self).save(*args, **kwargs)
 
