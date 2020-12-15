@@ -15,7 +15,7 @@ Behavior:
 from django import test
 from tola.views import index
 from factories.workflow_models import (
-    NewTolaUserFactory,
+    TolaUserFactory,
     CountryFactory,
     RFProgramFactory,
     grant_program_access,
@@ -35,21 +35,21 @@ class TestIndexViewProgramList(test.TestCase):
         cls.country_c = CountryFactory(country="Atestcountry")
         cls.country_c_program = RFProgramFactory(country=[cls.country_c])
         cls.two_country_program = RFProgramFactory(country=[cls.country_b, cls.country_c])
-        cls.mc_user_all_admin = NewTolaUserFactory(mc_staff=True)
-        cls.mc_user_all_user = NewTolaUserFactory(mc_staff=True)
+        cls.mc_user_all_admin = TolaUserFactory(mc_staff=True)
+        cls.mc_user_all_user = TolaUserFactory(mc_staff=True)
         for country in [cls.country_a, cls.country_b, cls.country_c]:
             grant_country_access(cls.mc_user_all_admin, country, COUNTRY_ROLE_CHOICES[1][0])
             grant_country_access(cls.mc_user_all_user, country, COUNTRY_ROLE_CHOICES[0][0])
-        cls.mc_user_country_b = NewTolaUserFactory(mc_staff=True)
+        cls.mc_user_country_b = TolaUserFactory(mc_staff=True)
         grant_country_access(cls.mc_user_country_b, cls.country_b, COUNTRY_ROLE_CHOICES[0][0])
-        cls.partner_user_admin = NewTolaUserFactory(mc_staff=False)
+        cls.partner_user_admin = TolaUserFactory(mc_staff=False)
         grant_program_access(cls.partner_user_admin, cls.country_a_programs[0],
                              cls.country_a, PROGRAM_ROLE_CHOICES[2][0])
         grant_program_access(cls.partner_user_admin, cls.country_a_programs[2],
                              cls.country_a, PROGRAM_ROLE_CHOICES[2][0])
         grant_program_access(cls.partner_user_admin, cls.country_b_programs[0],
                              cls.country_b, PROGRAM_ROLE_CHOICES[2][0])
-        cls.partner_user_multi_country = NewTolaUserFactory(mc_staff=False)
+        cls.partner_user_multi_country = TolaUserFactory(mc_staff=False)
         grant_program_access(cls.partner_user_multi_country, cls.country_c_program,
                              cls.country_c, PROGRAM_ROLE_CHOICES[1][0])
         grant_program_access(cls.partner_user_multi_country, cls.two_country_program,
