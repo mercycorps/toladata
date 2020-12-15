@@ -230,6 +230,7 @@ class IndicatorPlanIndicatorSerializerBase(serializers.ModelSerializer):
             'information_use',
             'reporting_frequency',
             'quality_assurance',
+            'quality_assurance_techniques',
             'data_issues',
             'comments',
         ]
