@@ -211,6 +211,7 @@ class IndicatorForm(forms.ModelForm):
             'responsible_person': forms.Textarea(attrs={'rows': 4}),
             'method_of_analysis': forms.Textarea(attrs={'rows': 4}),
             'information_use': forms.Textarea(attrs={'rows': 4}),
+            'quality_assurance_techniques': forms.SelectMultiple(),
         }
 
     def __init__(self, *args, **kwargs):
