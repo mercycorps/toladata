@@ -241,7 +241,8 @@ class IndicatorForm(forms.ModelForm):
         self.fields['baseline'].help_text = Indicator._meta.get_field('baseline').help_text
 
         # level is here the new "result level" (RF) level option (FK to model Level)
-        # Translators: This is a form field label that allows users to select which Level object to associate with the Result that's being entered into the form
+        # Translators: This is a form field label that allows users to select which Level object to associate with
+        # the Result that's being entered into the form
         self.fields['level'].label = _('Result level')
         self.fields['level'].label_from_instance = lambda obj: obj.display_name
         # in cases where the user was sent here via CREATE from the RF BUILDER screen:
@@ -265,8 +266,12 @@ class IndicatorForm(forms.ModelForm):
         elif self.programval.results_framework:
             # in this case the number field gets this special help text (added as a popover):
             self.fields['number'].label = _('Display number')
-            # Translators: a "number" in this context is a kind of label.  This is help text to explain why a user is seeing customized numbers instead of auto-generated ones that can derived from the indicator's place in the hierarchy
-            self.fields['number'].help_text = _("This number is displayed in place of the indicator number automatically generated through the results framework.  An admin can turn on auto-numbering in program settings")
+            # Translators: a "number" in this context is a kind of label.  This is help text to explain why a user is
+            # seeing customized numbers instead of auto-generated ones that can derived from the indicator's place in
+            # the hierarchy
+            self.fields['number'].help_text = _("This number is displayed in place of the indicator number "
+                                                "automatically generated through the results framework.  "
+                                                "An admin can turn on auto-numbering in program settings")
         if self.programval.results_framework:
             # no need to update the old_level field if they are using the results framework:
             self.fields.pop('old_level')
@@ -274,10 +279,14 @@ class IndicatorForm(forms.ModelForm):
         else:
             # pre-migration to RF, all fields remain unchanged in this regard (still required):
             self.fields['old_level'].required = True
-            # Translators:  Indicator objects are assigned to Levels, which are in a hierarchy.  We recently changed how we organize Levels. This is a field label for the indicator-associated Level in the old level system
+            # Translators:  Indicator objects are assigned to Levels, which are in a hierarchy.  We recently changed
+            # how we organize Levels. This is a field label for the indicator-associated Level in the old level system
             self.fields['old_level'].label = _('Old indicator level')
-            # Translators:  We recently changed how we organize Levels. The new system is called the "results framework". This is help text for users to let them know that they can use the new system now.
-            self.fields['old_level'].help_text = _("Indicators are currently grouped by an older version of indicator levels. To group indicators according to the results framework, an admin will need to adjust program settings.")
+            # Translators:  We recently changed how we organize Levels. The new system is called the "results
+            # framework". This is help text for users to let them know that they can use the new system now.
+            self.fields['old_level'].help_text = _("Indicators are currently grouped by an older version of indicator "
+                                                   "levels. To group indicators according to the results framework, an "
+                                                   "admin will need to adjust program settings.")
 
         #countries = self.request.user.tola_user.available_countries
         allowed_countries = [
@@ -331,7 +340,8 @@ class IndicatorForm(forms.ModelForm):
                 [disagg.pk for country_name, country_disaggs in countries_disaggs
                  for disagg in country_disaggs if disagg.selected_by_default]
             )
-        if self.programval._using_results_framework == Program.NOT_MIGRATED and Objective.objects.filter(program_id=self.programval.id).exists():
+        if (self.programval._using_results_framework == Program.NOT_MIGRATED and
+            Objective.objects.filter(program_id=self.programval.id).exists()):
             self.fields['objectives'].queryset = Objective.objects.filter(program__id__in=[self.programval.id])
         else:
             self.fields.pop('objectives')
@@ -376,7 +386,8 @@ class IndicatorForm(forms.ModelForm):
         level = self.cleaned_data['level']
         if level and level.program_id != self.programval.pk:
             raise forms.ValidationError(
-                # Translators: This is an error message that is returned when a user is trying to assign an indicator to the wrong hierarch of levels.
+                # Translators: This is an error message that is returned when a user is trying to assign an indicator
+                # to the wrong hierarch of levels.
                 _('Level program ID %(l_p_id)d and indicator program ID (%i_p_id)d mismatched'),
                 code='foreign_key_mismatch',
                 params={
@@ -460,7 +471,8 @@ class ResultForm(forms.ModelForm):
         }
         labels = {
             'site': _('Site'),
-            # Translators: field label that identifies which of a set of a targets (e.g. monthly/annual) a result is being compared to
+            # Translators: field label that identifies which of a set of a targets (e.g. monthly/annual) a result
+            # is being compared to
             'periodic_target': _('Measure against target'),
             'evidence_url': _('Link to file or folder'),
         }

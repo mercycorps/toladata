@@ -104,13 +104,12 @@
                         </div>
                         {% if form.number %}
                             <div class="form-group" id="div_id_number">
-                                <label for="id_number" class="">{{ form.number.label }}
-                                    {% if form.number.help_text.strip %}
-                                    <a href="#" tabIndex="0" data-trigger="focus" data-toggle="popover" data-placement="bottom" data-content="{{ form.number.help_text }}">
-                                        <i class="far fa-question-circle"></i>
-                                    </a>
-                                    {% endif %}
-                                </label>
+                                <label for="id_number" class="">{{ form.number.label }}</label>
+                                {% comment %} number help text is only added in confusing "manual numbering" situation,
+                                otherwise show no help text popover {% endcomment %}
+                                {% if form.number.help_text.strip %}
+                                    {% popover_helptext form.number.help_text %}
+                                {% endif %}
                                 {% render_field form.number class+="form-control" %}
                                 <span id="validation_id_number" class="has-error"></span>
                             </div>
@@ -168,11 +167,8 @@
                     <fieldset>
                         {% if form.old_level %}
                         <div class="form-group" id="div_id_old_level">
-                            <label for="id_old_level" class="label--required">{{ form.old_level.label }}
-                             <a href="#" tabIndex="0" data-trigger="focus" data-toggle="popover" data-placement="bottom" data-content="{{ form.old_level.help_text }}">
-                                <i class="far fa-question-circle"></i>
-                                </a>
-                            </label>
+                            <label for="id_old_level" class="label--required">{{ form.old_level.label }}</label>
+                            {% popover_helptext form.old_level.help_text %}
                             {% render_field form.old_level class+="form-control" %}
                             <span id="validation_id_old_level" class="has-error"></span>
                         </div>
