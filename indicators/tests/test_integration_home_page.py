@@ -46,6 +46,7 @@ def get_programs_for_country(country):
 
 class TestHomepageViewContext(test.TestCase):
     def setUp(self):
+        w_factories.CountryFactory.reset_sequence()
         self.tola_user = w_factories.TolaUserFactory()
         self.client = test.Client()
         self.client.force_login(self.tola_user.user)
