@@ -1,4 +1,5 @@
 
+import operator
 import uuid
 import decimal
 from datetime import timedelta
@@ -288,7 +289,12 @@ class IndicatorForm(forms.ModelForm):
                                                    "levels. To group indicators according to the results framework, an "
                                                    "admin will need to adjust program settings.")
 
-        #countries = self.request.user.tola_user.available_countries
+        # sort choices alphabetically again (to provide choices sorted in translated language)
+        self.fields['quality_assurance_techniques'].choices = sorted(
+            self.fields['quality_assurance_techniques'].choices,
+            key=operator.itemgetter(1)
+        )
+
         allowed_countries = [
             *self.request.user.tola_user.access_data.get('countries', {}).keys(),
             *[programaccess['country'] for programaccess in self.request.user.tola_user.access_data.get('programs', [])
