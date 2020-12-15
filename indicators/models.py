@@ -961,11 +961,12 @@ class IndicatorTargetsMixin:
         )
 
     def annotate_most_recent_complete(self):
+        from indicators.queries import utils as query_utils
         return self.annotate(
             most_recent_completed_target_end_date=models.Subquery(
                 PeriodicTarget.objects.filter(
                     indicator=models.OuterRef('pk'),
-                    end_date__lt=date.today()
+                    end_date__lt=query_utils.UTCNow()
                 ).order_by('-end_date').values('end_date')[:1],
                 output_field=models.DateField()
             ),
