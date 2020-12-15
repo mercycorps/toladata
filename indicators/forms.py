@@ -211,6 +211,7 @@ class IndicatorForm(forms.ModelForm):
             'responsible_person': forms.Textarea(attrs={'rows': 4}),
             'method_of_analysis': forms.Textarea(attrs={'rows': 4}),
             'information_use': forms.Textarea(attrs={'rows': 4}),
+            'quality_assurance_techniques': forms.SelectMultiple(),
         }
 
     def __init__(self, *args, **kwargs):
@@ -284,7 +285,7 @@ class IndicatorForm(forms.ModelForm):
             # Translators:  We recently changed how we organize Levels. The new system is called the "results
             # framework". This is help text for users to let them know that they can use the new system now.
             self.fields['old_level'].help_text = _("Indicators are currently grouped by an older version of indicator "
-                                                   "levels. To group indicators according to the results framework, "
+                                                   "levels. To group indicators according to the results framework, an "
                                                    "admin will need to adjust program settings.")
 
         #countries = self.request.user.tola_user.available_countries

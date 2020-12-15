@@ -285,16 +285,16 @@ def app_host_page(request, react_app_page):
     page_title = ""
     if react_app_page == 'user':
         js_context = get_user_page_context(request)
-        page_title = "User Management"
+        page_title = _("User Management")
     elif react_app_page == 'organization':
         js_context = get_organization_page_context(request)
-        page_title = "Organization Management"
+        page_title = _("Organization Management")
     elif react_app_page == 'program':
         js_context = get_program_page_context(request)
-        page_title = "Program Management"
+        page_title = _("Program Management")
     elif react_app_page == 'country':
         js_context = get_country_page_context(request)
-        page_title = "Country Management"
+        page_title = _("Country Management")
 
     json_context = json.dumps(js_context, cls=DjangoJSONEncoder)
     return render(
@@ -313,7 +313,11 @@ def audit_log_host_page(request, program_id):
     json_context = json.dumps(js_context, cls=DjangoJSONEncoder)
     if not request.user.tola_user.available_programs.filter(id=program.id).exists():
         raise PermissionDenied
-    return render(request, 'react_app_base.html', {"bundle_name": "audit_log", "js_context": json_context, "report_wide": True, "page_title": program.name+" audit log | "})
+    return render(request, 'react_app_base.html',
+                  {"bundle_name": "audit_log",
+                   "js_context": json_context,
+                   "report_wide": True,
+                   "page_title": program.name+" " + _("audit log") +" | "})
 
 
 class AuthUserSerializer(ModelSerializer):
