@@ -7,7 +7,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: \n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2020-11-23 15:00-0800\n"
+"POT-Creation-Date: 2020-12-14 16:31-0800\n"
 "PO-Revision-Date: 2020-11-23 15:00-0800\n"
 "Last-Translator: \n"
 "Language-Team: \n"
@@ -66,7 +66,6 @@ msgstr "Identificador del indicador"
 
 #. Translators: "No." as in abbreviation for Number
 #: indicators/export_renderers.py:57 indicators/indicator_plan.py:48
-#: templates/indicators/iptt_indicators_varied_startdates.html:34
 msgid "No."
 msgstr "No."
 
@@ -76,7 +75,6 @@ msgstr "No."
 #: indicators/views/views_program.py:173
 #: templates/indicators/disaggregation_print.html:53
 #: templates/indicators/disaggregation_report.html:91
-#: templates/indicators/iptt_indicators_varied_startdates.html:35
 #: tola_management/programadmin.py:62 tola_management/programadmin.py:110
 msgid "Indicator"
 msgstr "Indicador"
@@ -384,7 +382,6 @@ msgid "Rationale for target"
 msgstr "Justificación del objetivo"
 
 #: indicators/indicator_plan.py:129 indicators/models.py:1255
-#: templates/indicators/iptt_indicators_varied_startdates.html:36
 msgid "Target frequency"
 msgstr "Frecuencia objetivo"
 
@@ -1263,7 +1260,6 @@ msgstr "Período"
 #: indicators/models.py:1809
 #: templates/indicators/indicator_reportingperiod_modal.html:41
 #: templates/indicators/indicator_reportingperiod_modal.html:61
-#: templates/indicators/iptt_indicators_varied_startdates.html:37
 #: tola_management/models.py:407
 msgid "Start date"
 msgstr "Fecha de inicio"
@@ -2645,21 +2641,11 @@ msgstr "Opciones de informe"
 msgid "Apply"
 msgstr "Aplicar"
 
-#: templates/indicators/iptt_indicators_varied_startdates.html:14
-#: templates/indicators/iptt_indicators_varied_startdates.html:31
 #: templates/indicators/iptt_quickstart.html:4
 #: templates/indicators/iptt_quickstart.html:5
 #: templates/indicators/iptt_report.html:6
 msgid "Indicator Performance Tracking Table"
 msgstr "Tabla de seguimiento del rendimiento del indicador"
-
-#: templates/indicators/iptt_indicators_varied_startdates.html:19
-msgid ""
-"To see program results, please update your periodic targets to match your "
-"reporting start and end dates:"
-msgstr ""
-"Para ver los resultados del programa, actualice sus objetivos periódicos "
-"para que coincidan con las fechas de inicio y finalización de sus informes:"
 
 #: templates/indicators/program_page.html:23
 msgid "Program details"
@@ -3691,11 +3677,11 @@ msgstr "Hubo un problema al conectarse al servidor GAIT."
 msgid "The GAIT ID {gait_id} could not be found."
 msgstr "El identificador GAIT {gait_id} no se encontró."
 
-#: tola/views.py:92
+#: tola/views.py:94
 msgid "You are not logged in."
 msgstr "No ha iniciado sesión."
 
-#: tola/views.py:136
+#: tola/views.py:138
 msgid "Your profile has been updated."
 msgstr "Su perfil se ha actualizado."
 
@@ -3990,19 +3976,47 @@ msgstr "Justificación del cambio"
 msgid "Mercy Corps - Tola New Account Registration"
 msgstr "Este campo debe ser único"
 
+#: tola_management/views.py:288
+#, fuzzy
+#| msgid "Username"
+msgid "User Management"
+msgstr "Nombre de usuario"
+
+#: tola_management/views.py:291
+#, fuzzy
+#| msgid "Organization Name"
+msgid "Organization Management"
+msgstr "Nombre de la organización"
+
+#: tola_management/views.py:294
+#, fuzzy
+#| msgid "Program page"
+msgid "Program Management"
+msgstr "Página del programa"
+
+#: tola_management/views.py:297
+#, fuzzy
+#| msgid "Country Name"
+msgid "Country Management"
+msgstr "Nombre del país"
+
+#: tola_management/views.py:320
+msgid "audit log"
+msgstr ""
+
 #. Translators: Error message given when an administrator tries to save a username that is already taken
-#: tola_management/views.py:368 tola_management/views.py:380
+#: tola_management/views.py:372 tola_management/views.py:384
 msgid "A user account with this username already exists."
 msgstr "Ya existe una cuenta de usuario con este nombre de usuario."
 
 #. Translators: Error message given when an administrator tries to save a email that is already taken
-#: tola_management/views.py:372 tola_management/views.py:384
+#: tola_management/views.py:376 tola_management/views.py:388
 msgid "A user account with this email address already exists."
 msgstr ""
 "Ya existe una cuenta de usuario con esta dirección de correo electrónico."
 
 #. Translators:  Error message given when an administrator tries to save a bad combination of organization and email
-#: tola_management/views.py:390
+#: tola_management/views.py:394
 msgid ""
 "Non-Mercy Corps emails should not be used with the Mercy Corps organization."
 msgstr ""
@@ -4010,7 +4024,7 @@ msgstr ""
 "la organización Mercy Corps."
 
 #. Translators:  Error message given when an administrator tries to save a bad combination of organization and email
-#: tola_management/views.py:394
+#: tola_management/views.py:398
 msgid ""
 "A user account with this email address already exists. Mercy Corps accounts "
 "are managed by Okta. Mercy Corps employees should log in using their Okta "
@@ -4023,7 +4037,7 @@ msgstr ""
 
 #. Translators:  Error message given when an administrator tries to save a bad combination of organization and email
 #. Translators:  Error message given when an administrator tries to save an invalid username
-#: tola_management/views.py:397 tola_management/views.py:401
+#: tola_management/views.py:401 tola_management/views.py:405
 msgid ""
 "Mercy Corps accounts are managed by Okta. Mercy Corps employees should log "
 "in using their Okta username and password."
@@ -4032,12 +4046,12 @@ msgstr ""
 "Mercy Corps deben iniciar sesión con su nombre de usuario y contraseña de "
 "Okta."
 
-#: tola_management/views.py:412
+#: tola_management/views.py:416
 msgid "Only superusers can create Mercy Corps staff profiles."
 msgstr ""
 "Solo los super-usuarios pueden crear perfiles de personal de Mercy Corps."
 
-#: tola_management/views.py:450
+#: tola_management/views.py:454
 msgid "Only superusers can edit Mercy Corps staff profiles."
 msgstr ""
 "Solo los super-usuarios pueden modificar perfiles de personal de Mercy Corps."
@@ -4582,6 +4596,14 @@ msgstr "Encontrar"
 #: workflow/widgets.py:133
 msgid "City, Country:"
 msgstr "Ciudad, País:"
+
+#~ msgid ""
+#~ "To see program results, please update your periodic targets to match your "
+#~ "reporting start and end dates:"
+#~ msgstr ""
+#~ "Para ver los resultados del programa, actualice sus objetivos periódicos "
+#~ "para que coincidan con las fechas de inicio y finalización de sus "
+#~ "informes:"
 
 #~ msgid "Data Collection Method"
 #~ msgstr "Método de recopilación de datos"
