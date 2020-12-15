@@ -6,7 +6,7 @@ from workflow.models import Country
 from factories.workflow_models import (
     CountryFactory,
     RFProgramFactory,
-    NewTolaUserFactory,
+    TolaUserFactory,
     OrganizationFactory,
     grant_program_access,
     grant_country_access,
@@ -65,28 +65,28 @@ class TestCountryAdminSerializer(test.TestCase):
         data = self.get_serialized_data(c.pk)
         self.assertEqual(data['users_count'], 0)
         # add one country access admin user:
-        admin = NewTolaUserFactory(mc_staff=True, superadmin=False)
+        admin = TolaUserFactory(mc_staff=True, superadmin=False)
         grant_country_access(admin, c, COUNTRY_ROLE_CHOICES[1][0])
         data = self.get_serialized_data(c.pk)
         self.assertEqual(data['users_count'], 1)
         # add one country access regualr user:
-        user = NewTolaUserFactory(mc_staff=True, superadmin=False)
+        user = TolaUserFactory(mc_staff=True, superadmin=False)
         grant_country_access(user, c, COUNTRY_ROLE_CHOICES[0][0])
         data = self.get_serialized_data(c.pk)
         self.assertEqual(data['users_count'], 2)
         # add one program with one partner access user:
         p = RFProgramFactory(country=[c])
-        partner_admin = NewTolaUserFactory(mc_staff=False, superadmin=False)
+        partner_admin = TolaUserFactory(mc_staff=False, superadmin=False)
         grant_program_access(partner_admin, p, c, PROGRAM_ROLE_CHOICES[1][0])
         data = self.get_serialized_data(c.pk)
         self.assertEqual(data['users_count'], 3)
         # add a partner access non-admin:
-        partner_user = NewTolaUserFactory(mc_staff=False, superadmin=False)
+        partner_user = TolaUserFactory(mc_staff=False, superadmin=False)
         grant_program_access(partner_user, p, c, PROGRAM_ROLE_CHOICES[0][0])
         data = self.get_serialized_data(c.pk)
         self.assertEqual(data['users_count'], 4)
         # add a superuser (access to programs in _all_ countries):
-        superadmin = NewTolaUserFactory(mc_staff=True, superadmin=True)
+        superadmin = TolaUserFactory(mc_staff=True, superadmin=True)
         data = self.get_serialized_data(c.pk)
         self.assertEqual(data['users_count'], 5)
 
@@ -99,42 +99,42 @@ class TestCountryAdminSerializer(test.TestCase):
         data = self.get_serialized_data(c.pk)
         self.assertEqual(data['organizations_count'], 0)
         # add one mc user (should count mc org now)
-        admin = NewTolaUserFactory(mc_staff=True, superadmin=False)
+        admin = TolaUserFactory(mc_staff=True, superadmin=False)
         grant_country_access(admin, c, COUNTRY_ROLE_CHOICES[1][0])
         data = self.get_serialized_data(c.pk)
         self.assertEqual(data['organizations_count'], 1)
         # add another mc user (should not increase)
-        user = NewTolaUserFactory(mc_staff=True, superadmin=False)
+        user = TolaUserFactory(mc_staff=True, superadmin=False)
         grant_country_access(user, c, COUNTRY_ROLE_CHOICES[0][0])
         data = self.get_serialized_data(c.pk)
         self.assertEqual(data['organizations_count'], 1)
         # add a superuser, should not increase (still mc)
-        superadmin = NewTolaUserFactory(mc_staff=True, superadmin=True)
+        superadmin = TolaUserFactory(mc_staff=True, superadmin=True)
         data = self.get_serialized_data(c.pk)
         self.assertEqual(data['organizations_count'], 1)
         # add a partner with one user, should add to count
         p = RFProgramFactory(country=[c])
-        partner_admin = NewTolaUserFactory(mc_staff=False, superadmin=False, organization=partner_org1)
+        partner_admin = TolaUserFactory(mc_staff=False, superadmin=False, organization=partner_org1)
         grant_program_access(partner_admin, p, c, PROGRAM_ROLE_CHOICES[1][0])
         data = self.get_serialized_data(c.pk)
         self.assertEqual(data['organizations_count'], 2)
         # second user, same org, shouldn't add:
-        partner_user = NewTolaUserFactory(mc_staff=False, superadmin=False, organization=partner_org1)
+        partner_user = TolaUserFactory(mc_staff=False, superadmin=False, organization=partner_org1)
         grant_program_access(partner_user, p, c, PROGRAM_ROLE_CHOICES[0][0])
         data = self.get_serialized_data(c.pk)
         self.assertEqual(data['organizations_count'], 2)
         # add a second org with a user, should add:
-        partner_user2 = NewTolaUserFactory(mc_staff=False, superadmin=False, organization=partner_org2)
+        partner_user2 = TolaUserFactory(mc_staff=False, superadmin=False, organization=partner_org2)
         grant_program_access(partner_user2, p, c, PROGRAM_ROLE_CHOICES[0][0])
         data = self.get_serialized_data(c.pk)
         self.assertEqual(data['organizations_count'], 3)
 
     def test_mc_user_with_program_access_edge_case(self):
         c = CountryFactory()
-        admin = NewTolaUserFactory(mc_staff=True, superadmin=False)
+        admin = TolaUserFactory(mc_staff=True, superadmin=False)
         grant_country_access(admin, c, COUNTRY_ROLE_CHOICES[1][0])
         p1 = RFProgramFactory(country=[c])
-        user = NewTolaUserFactory(mc_staff=True, superadmin=False)
+        user = TolaUserFactory(mc_staff=True, superadmin=False)
         grant_program_access(user, p1, c, PROGRAM_ROLE_CHOICES[0][0])
         data = self.get_serialized_data(c.pk)
         self.assertEqual(data['users_count'], 2)
@@ -142,9 +142,9 @@ class TestCountryAdminSerializer(test.TestCase):
 
     def test_superuser_with_country_access_edge_case(self):
         c = CountryFactory()
-        admin = NewTolaUserFactory(mc_staff=True, superadmin=False)
+        admin = TolaUserFactory(mc_staff=True, superadmin=False)
         grant_country_access(admin, c, COUNTRY_ROLE_CHOICES[1][0])
-        superadmin = NewTolaUserFactory(mc_staff=True, superadmin=True)
+        superadmin = TolaUserFactory(mc_staff=True, superadmin=True)
         grant_country_access(superadmin, c, COUNTRY_ROLE_CHOICES[1][0])
         data = self.get_serialized_data(c.pk)
         self.assertEqual(data['users_count'], 2)
@@ -152,10 +152,10 @@ class TestCountryAdminSerializer(test.TestCase):
 
     def test_mc_user_with_program_access_and_country_access_edge_case(self):
         c = CountryFactory()
-        admin = NewTolaUserFactory(mc_staff=True, superadmin=False)
+        admin = TolaUserFactory(mc_staff=True, superadmin=False)
         grant_country_access(admin, c, COUNTRY_ROLE_CHOICES[1][0])
         p = RFProgramFactory(country=[c])
-        user = NewTolaUserFactory(mc_staff=True, superadmin=False)
+        user = TolaUserFactory(mc_staff=True, superadmin=False)
         grant_country_access(user, c, COUNTRY_ROLE_CHOICES[0][0])
         grant_program_access(user, p, c, PROGRAM_ROLE_CHOICES[2][0])
         data = self.get_serialized_data(c.pk)
@@ -164,15 +164,15 @@ class TestCountryAdminSerializer(test.TestCase):
 
     def test_partner_user_in_same_program_different_country_edge_case(self):
         c = CountryFactory()
-        admin = NewTolaUserFactory(mc_staff=True, superadmin=False)
+        admin = TolaUserFactory(mc_staff=True, superadmin=False)
         grant_country_access(admin, c, COUNTRY_ROLE_CHOICES[1][0])
         d = CountryFactory()
         p = RFProgramFactory(country=[c, d])
         partner_org1 = OrganizationFactory()
-        partner_user1 = NewTolaUserFactory(mc_staff=False, superadmin=False, organization=partner_org1)
+        partner_user1 = TolaUserFactory(mc_staff=False, superadmin=False, organization=partner_org1)
         grant_program_access(partner_user1, p, c, PROGRAM_ROLE_CHOICES[2][0])
         partner_org2 = OrganizationFactory()
-        partner_user2 = NewTolaUserFactory(mc_staff=False, superadmin=False, organization=partner_org2)
+        partner_user2 = TolaUserFactory(mc_staff=False, superadmin=False, organization=partner_org2)
         grant_program_access(partner_user2, p, d, PROGRAM_ROLE_CHOICES[2][0])
         data = self.get_serialized_data(c.pk)
         self.assertEqual(data['users_count'], 2)
@@ -184,7 +184,7 @@ class TestCountryAdminViewSetFilters(test.TestCase):
     def setUpTestData(cls):
         cls.base_country = CountryFactory(country="ZZZZ")
         cls.mc = OrganizationFactory(id=1)
-        cls.superadmin = NewTolaUserFactory(mc_staff=True, superadmin=True, country=cls.base_country)
+        cls.superadmin = TolaUserFactory(mc_staff=True, superadmin=True, country=cls.base_country)
         cls.first_page_countries = CountryFactory.create_batch(20)
         cls.one_program_country = CountryFactory(country="YYYY")
         cls.one_country_program = RFProgramFactory(country=[cls.one_program_country])
@@ -195,19 +195,19 @@ class TestCountryAdminViewSetFilters(test.TestCase):
         cls.one_organization_country = CountryFactory(country="VVVVV")
         cls.partner_organization1 = OrganizationFactory()
         partner_program = RFProgramFactory(country=[cls.one_organization_country])
-        partner_user = NewTolaUserFactory(mc_staff=False, organization=cls.partner_organization1)
+        partner_user = TolaUserFactory(mc_staff=False, organization=cls.partner_organization1)
         grant_program_access(partner_user, partner_program, cls.one_organization_country, PROGRAM_ROLE_CHOICES[2][0])
         cls.two_organization_country = CountryFactory(country="VVVVV")
         cls.other_organization_country = CountryFactory(country="VVVVV2")
         cls.partner_organization2 = OrganizationFactory()
         partner_program2 = RFProgramFactory(country=[cls.two_organization_country])
-        partner_user2 = NewTolaUserFactory(mc_staff=False, organization=cls.partner_organization2)
+        partner_user2 = TolaUserFactory(mc_staff=False, organization=cls.partner_organization2)
         grant_program_access(partner_user2, partner_program2, cls.two_organization_country, PROGRAM_ROLE_CHOICES[1][0])
         cls.partner_organization3 = OrganizationFactory()
         partner_program3 = RFProgramFactory(country=[cls.two_organization_country, cls.other_organization_country])
-        partner_user3 = NewTolaUserFactory(mc_staff=False, organization=cls.partner_organization3)
+        partner_user3 = TolaUserFactory(mc_staff=False, organization=cls.partner_organization3)
         grant_program_access(partner_user3, partner_program3, cls.two_organization_country, PROGRAM_ROLE_CHOICES[1][0])
-        partner_user4 = NewTolaUserFactory(mc_staff=False, organization=cls.partner_organization3)
+        partner_user4 = TolaUserFactory(mc_staff=False, organization=cls.partner_organization3)
         grant_program_access(partner_user4, partner_program3,
                              cls.other_organization_country, PROGRAM_ROLE_CHOICES[0][0])
 

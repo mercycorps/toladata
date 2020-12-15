@@ -2,8 +2,8 @@ from itertools import chain
 from django.test import TestCase
 from factories.workflow_models import (
     ProgramFactory,
-    NewCountryFactory,
-    NewTolaUserFactory,
+    CountryFactory,
+    TolaUserFactory,
     OrganizationFactory,
     grant_program_access,
     grant_country_access
@@ -17,10 +17,10 @@ class TestTolaUserMethods(TestCase):
         super(TestTolaUserMethods, cls).setUpClass()
         cls.mc_organization = OrganizationFactory(pk=1, name='Mercy Corps')
         cls.non_mc_organization = OrganizationFactory()
-        cls.country1 = NewCountryFactory()
-        cls.country2 = NewCountryFactory()
-        cls.country3 = NewCountryFactory()
-        cls.tola_user = NewTolaUserFactory(country=cls.country1)
+        cls.country1 = CountryFactory()
+        cls.country2 = CountryFactory()
+        cls.country3 = CountryFactory()
+        cls.tola_user = TolaUserFactory(country=cls.country1)
         cls.program = ProgramFactory(countries=[cls.country2])
 
     def test_program_role_method(self):
@@ -43,8 +43,8 @@ class TestTolaUserMethods(TestCase):
 
 
     def test_managed_countries(self):
-        non_mc_user = NewTolaUserFactory(organization=self.non_mc_organization)
-        mc_tola_user = NewTolaUserFactory(organization=self.mc_organization)
+        non_mc_user = TolaUserFactory(organization=self.non_mc_organization)
+        mc_tola_user = TolaUserFactory(organization=self.mc_organization)
         program_country1 = ProgramFactory.create_batch(3, countries=[self.country1])
 
         self.assertEqual(len(non_mc_user.managed_countries), 0)
@@ -66,7 +66,7 @@ class TestTolaUserMethods(TestCase):
 
 
     def test_managed_programs(self):
-        mc_tola_user = NewTolaUserFactory(organization=self.mc_organization)
+        mc_tola_user = TolaUserFactory(organization=self.mc_organization)
         programs_country1 = ProgramFactory.create_batch(3, countries=[self.country1])
         programs_country2 = ProgramFactory.create_batch(
             3, countries=[self.country2])  # One already declared with class
@@ -81,4 +81,3 @@ class TestTolaUserMethods(TestCase):
             [p.id for p in chain.from_iterable([programs_country1, programs_country2])].sort())
         mc_tola_user.user.is_superuser = True
         self.assertEqual(len(mc_tola_user.managed_programs), Program.objects.count())
-
