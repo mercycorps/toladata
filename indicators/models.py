@@ -1082,13 +1082,17 @@ class Indicator(SafeDeleteModel):
         # Translators:  describes a user-selectable option in a list of things that users can do to ensure program quality
         ('data_collection', _('Data collection training and piloting')),
         # Translators:  describes a user-selectable option in a list of things that users can do to ensure program quality
-        ('data_cross_checks', _('Data cross checks or triangulation')),
+        ('data_cross_checks', _('Data cross checks or triangulation of data sources')),
         # Translators:  describes a user-selectable option in a list of things that users can do to ensure program quality
         ('dqas', _('Data quality audits (DQAs)')),
         # Translators:  describes a user-selectable option in a list of things that users can do to ensure program quality
         ('data_spot_checks', _('Data spot checks')),
         # Translators:  describes a user-selectable option in a list of things that users can do to ensure program quality
         ('digital_data_collection', _('Digital data collection tools')),
+        # Translators:  describes a user-selectable option in a list of things that users can do to ensure program quality
+        ('external_evaluator', _('External evaluator or consultant')),
+        # Translators:  describes a user-selectable option in a list of things that users can do to ensure program quality
+        ('mixed_methods', _('Mixed methods')),
         # Translators:  describes a user-selectable option in a list of things that users can do to ensure program quality
         ('participatory_data_analysis', _('Participatory data analysis validation')),
         # Translators:  describes a user-selectable option in a list of things that users can do to ensure program quality
@@ -1100,11 +1104,13 @@ class Indicator(SafeDeleteModel):
         # Translators:  describes a user-selectable option in a list of things that users can do to ensure program quality
         ('regular_reviews', _('Regular indicator and data reviews')),
         # Translators:  describes a user-selectable option in a list of things that users can do to ensure program quality
-        ('shadow_audits', _('Shadow audits')),
+        ('secure_data_storage', _('Secure data storage')),
+        # Translators:  describes a user-selectable option in a list of things that users can do to ensure program quality
+        ('shadow_audits', _('Shadow audits or accompanied supervision')),
         # Translators:  describes a user-selectable option in a list of things that users can do to ensure program quality
         ('standardized_indicators', _('Standardized indicators')),
         # Translators:  describes a user-selectable option in a list of things that users can do to ensure program quality
-        ('sops', _('Standard operating procedures (SOPs)')),
+        ('sops', _('Standard operating procedures (SOPs) or protocols')),
     ]
 
     INFORMATION_USE_CHOICES = [
