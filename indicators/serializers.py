@@ -239,7 +239,7 @@ class IndicatorPlanIndicatorSerializerBase(serializers.ModelSerializer):
     @staticmethod
     def get_quality_assurance_techniques(indicator):
         """returns the list of quality assurance techniques in alphabetical order in the display language"""
-        return ", ".join(sorted(indicator.get_quality_assurance_techniques_display().split(',')))
+        return ", ".join(sorted([x.strip() for x in indicator.get_quality_assurance_techniques_display().split(',')]))
 
     @staticmethod
     def get_lop_target(indicator):
