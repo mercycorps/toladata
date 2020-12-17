@@ -31,7 +31,7 @@ class ProgramFactory:
 
     def __init__(self, country):
         self.country = country
-        self.org = Organization.objects.get(id=1)
+        self.org = Organization.mercy_corps()
         self.default_start_date = (date.today() + relativedelta(months=-18)).replace(day=1)
         self.default_end_date = (self.default_start_date + relativedelta(months=+32)).replace(day=1) - timedelta(days=1)
 

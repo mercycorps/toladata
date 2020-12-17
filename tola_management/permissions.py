@@ -6,6 +6,7 @@ from django.shortcuts import get_object_or_404
 from workflow.models import (
     Program,
     Country,
+    Organization,
     SiteProfile,
     PROGRAM_ROLE_CHOICES,
     PROGRAM_ROLE_INT_MAP,
@@ -22,7 +23,7 @@ def user_has_basic_or_super_admin(user):
     return (
         user.is_superuser
         or (
-            user.tola_user.organization_id == 1
+            user.tola_user.organization_id == Organization.MERCY_CORPS_ID
             and user.tola_user.countryaccess_set.filter(
                 role='basic_admin'
             ).count() > 0

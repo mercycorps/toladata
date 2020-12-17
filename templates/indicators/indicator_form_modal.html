@@ -104,13 +104,12 @@
                         </div>
                         {% if form.number %}
                             <div class="form-group" id="div_id_number">
-                                <label for="id_number" class="">{{ form.number.label }}
-                                    {% if form.number.help_text.strip %}
-                                    <a href="#" tabIndex="0" data-trigger="focus" data-toggle="popover" data-placement="bottom" data-content="{{ form.number.help_text }}">
-                                        <i class="far fa-question-circle"></i>
-                                    </a>
-                                    {% endif %}
-                                </label>
+                                <label for="id_number" class="">{{ form.number.label }}</label>
+                                {% comment %} number help text is only added in confusing "manual numbering" situation,
+                                otherwise show no help text popover {% endcomment %}
+                                {% if form.number.help_text.strip %}
+                                    {% popover_helptext form.number.help_text %}
+                                {% endif %}
                                 {% render_field form.number class+="form-control" %}
                                 <span id="validation_id_number" class="has-error"></span>
                             </div>
@@ -168,11 +167,8 @@
                     <fieldset>
                         {% if form.old_level %}
                         <div class="form-group" id="div_id_old_level">
-                            <label for="id_old_level" class="label--required">{{ form.old_level.label }}
-                             <a href="#" tabIndex="0" data-trigger="focus" data-toggle="popover" data-placement="bottom" data-content="{{ form.old_level.help_text }}">
-                                <i class="far fa-question-circle"></i>
-                                </a>
-                            </label>
+                            <label for="id_old_level" class="label--required">{{ form.old_level.label }}</label>
+                            {% popover_helptext form.old_level.help_text %}
                             {% render_field form.old_level class+="form-control" %}
                             <span id="validation_id_old_level" class="has-error"></span>
                         </div>
@@ -231,7 +227,7 @@
                             <div id="fieldgroup_id_unit_of_measure">
 
                                 <div id="div_id_unit_of_measure">
-                                    
+
                                     {% render_field form.unit_of_measure class+="form-control" %}
                                     <span id="validation_id_unit_of_measure" class="has-error"></span>
                                 </div>
@@ -370,6 +366,13 @@
                             <span id="validation_id_reporting_frequency" class="has-error"></span>
                         </div>
 
+                        <div class="form-group" id="div_id_quality_assurance_techniques">
+                            <label for="id_quality_assurance_techniques" class="">{{ form.quality_assurance_techniques.label }} </label>
+                            {% popover_helptext form.quality_assurance_techniques.help_text %}
+                            {% render_field form.quality_assurance_techniques class+="form-control" %}
+                            <span id="validation_id_quality_assurance_techniques" class="has-error"></span>
+                        </div>
+
                         <div class="form-group" id="div_id_quality_assurance">
                             <label for="id_quality_assurance" class="">{{ form.quality_assurance.label }} </label>
                             {% popover_helptext form.quality_assurance.help_text %}
@@ -504,7 +507,9 @@
         templates: {
             filter: '<li class="multiselect-item filter"><div class="input-group"><input class="form-control multiselect-search" type="text"></div></li>',
             filterClearBtn: '<span class="input-group-btn"><button class="btn btn-default multiselect-clear-filter" type="button"><i class="fas fa-times-circle"></i></button></span>',
-        }
+        },
+        nSelectedText: ' {% trans "selected" %}',
+        nonSelectedText: '{% trans "None selected" %}'
     };
     var multiselects = ['#id_objectives', '#id_strategic_objectives', '#id_indicator_type'];
     multiselects.forEach(function(selectID) {
@@ -514,6 +519,20 @@
             if ($select.hasClass('disabled-select')) {
                 theseOptions.includeSelectAllOption = false;
             }
+            $select.multiselect(theseOptions);
+        }
+    });
+
+    var noFilterMultiselectOptions = {
+        includeSelectAllOption: false,
+        enableFiltering: false,
+        enableCaseInsensitiveFiltering: false
+    };
+    var noFilterMultiselects = ['#id_quality_assurance_techniques'];
+    noFilterMultiselects.forEach(function(selectID) {
+        let $select = $(selectID);
+        if ($select) {
+            let theseOptions = Object.assign({}, multiselectOptions, noFilterMultiselectOptions);
             $select.multiselect(theseOptions);
         }
     });

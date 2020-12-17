@@ -224,7 +224,7 @@ class UserManagementAuditLog(models.Model, DiffableLog):
 
             countries_diff = access_diff(p["countries"], n["countries"])
             programs_diff = access_diff(p["programs"], n["programs"])
-            
+
 
             return {
                 "base_country": base_country_diff,
@@ -643,7 +643,8 @@ class ProgramAuditLog(models.Model, DiffableLog):
                 raise ValidationError("Rationale required when 'Other' selected")
             if not rationale and not rationale_selections.selected_options:
                 logger.error(
-                    "No rationale provided, expected new json:\n{}\nto match old json:\n{}".format(new_entry_json, previous_entry_json)
+                    "No rationale provided, expected new json:\n{}\nto match old json:\n{}".format(
+                        new_entry_json, previous_entry_json)
                 )
                 raise ValidationError("Rationale required when no options selected")
             new_program_log_entry = ProgramAuditLog(

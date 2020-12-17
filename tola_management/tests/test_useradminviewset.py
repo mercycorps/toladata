@@ -7,7 +7,7 @@ from factories.workflow_models import (
     CountryFactory,
     OrganizationFactory,
     TolaUserFactory,
-    NewTolaUserFactory,
+    TolaUserFactory,
     grant_program_access,
     grant_country_access
 )
@@ -32,7 +32,7 @@ class TestUserAdminViewSet(test.TestCase):
         cls.country3_program1 = RFProgramFactory(active=True, country=[cls.country3])
         cls.country3_program2 = RFProgramFactory(active=True, country=[cls.country3])
         cls.factory = drf_test.APIRequestFactory()
-        cls.superadmin = NewTolaUserFactory(
+        cls.superadmin = TolaUserFactory(
             country=cls.base_country,
             superadmin=True
         )
@@ -62,7 +62,7 @@ class TestUserAdminViewSet(test.TestCase):
         country_user = kwargs.pop('country_user', [])
         program_admin = kwargs.pop('program_admin', [])
         program_user = kwargs.pop('program_user', [])
-        user = NewTolaUserFactory(country=country, **kwargs)
+        user = TolaUserFactory(country=country, **kwargs)
         for country in country_admin:
             grant_country_access(user, country, COUNTRY_ROLE_CHOICES[1][0])
         for country in country_user:
@@ -322,4 +322,3 @@ class TestUserAdminViewSet(test.TestCase):
         response = self.get_response(**{'base_countries[]': [self.base_country2.pk], 'page': 2})
         user_pks = self.get_pks(response, count=21)
         self.assertIn(twenty_first_user.pk, user_pks)
-        
