@@ -85,7 +85,7 @@ urlpatterns += [
     path('datedtargetinfo/<int:pk>/', dated_target_info, name='datedtargetinfo'),
 
     # internationalization
-    path('^i18n/', include('django.conf.urls.i18n')),
+    path('i18n/', include('django.conf.urls.i18n')),
 
     path('tola_management/', include('tola_management.urls')),
     path('saml_metadata/', tolaviews.saml_metadata_view, name="saml_metadata"),
