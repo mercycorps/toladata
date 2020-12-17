@@ -10,6 +10,7 @@ import EditObjectives from './components/edit_objectives'
 import LoadingSpinner from 'components/loading-spinner'
 import FoldingSidebar from 'components/folding-sidebar'
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome'
+import { faCaretDown, faCaretRight } from "@fortawesome/free-solid-svg-icons";
 import CountryHistory from "./components/country_history";
 import {sortObjectListByValue} from "../../../general_utilities";
 
@@ -187,7 +188,7 @@ export const IndexView = observer(
                                     <Col size="2" className="td--stretch">
                                         <div className="expando-toggle icon__clickable" onClick={() => store.toggleEditingTarget(data.id)} >
                                             <div className="expando-toggle__icon">
-                                                <FontAwesomeIcon icon={(store.editing_target == data.id) ? 'caret-down' : 'caret-right'} />
+                                                <FontAwesomeIcon icon={(store.editing_target == data.id) ? faCaretDown : faCaretRight} />
                                             </div>
                                             <div className="expando-toggle__label">
                                                 <i className="fas fa-globe"/>&nbsp;

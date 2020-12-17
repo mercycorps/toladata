@@ -114,36 +114,6 @@ export default class EditUserPrograms extends React.Component {
         }
     }
 
-    componentWillReceiveProps(next_props) {
-        const {store} = next_props
-        const countries_obj = create_country_objects(store.countries, store)
-        const programs_obj = create_program_objects(store.programs, store)
-
-        const filtered_countries = apply_country_filter(
-            countries_obj,
-            this.countryStore.selectedCountries
-        )
-
-        const {countries, programs}= apply_program_filter(
-            programs_obj,
-            filtered_countries,
-            this.state.program_filter
-        )
-
-        // callback for determining if a country is expanded based on filter state:
-        const isExpanded = this.isExpanded.bind(this, this.state.program_filter);
-
-        this.setState({
-            countries: countries_obj,
-            programs: programs_obj,
-            filtered_countries: countries,
-            filtered_programs: programs,
-            ordered_country_ids: store.ordered_country_ids,
-            flattened_programs: flattened_listing(store.ordered_country_ids.filter(id => id in countries).map(id => countries[id]), programs, isExpanded),
-            original_user_program_access: create_user_access(store.editing_target_data.access),
-            user_program_access: create_user_access(store.editing_target_data.access)
-        }, () => this.hasUnsavedDataAction())
-    }
 
     saveForm() {
         //marshal the data back into the format we received it
