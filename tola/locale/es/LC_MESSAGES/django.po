@@ -7,7 +7,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: \n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2020-12-16 11:56-0800\n"
+"POT-Creation-Date: 2020-12-18 11:12-0800\n"
 "PO-Revision-Date: 2020-12-16 13:40-0800\n"
 "Last-Translator: \n"
 "Language-Team: \n"
@@ -1344,8 +1344,7 @@ msgstr "Nombre del registro"
 msgid "Evidence URL"
 msgstr "URL de la Evidencia"
 
-#: indicators/models.py:2126 templates/indicators/program_page.html:45
-#: templates/workflow/site_indicatordata.html:5
+#: indicators/models.py:2126 templates/workflow/site_indicatordata.html:5
 #: templates/workflow/site_profile_list.html:5
 #: templates/workflow/site_profile_list.html:6
 #: templates/workflow/site_profile_list.html:164
@@ -2719,31 +2718,18 @@ msgid "View program in GAIT"
 msgstr "Ver programa en GAIT"
 
 #: templates/indicators/program_page.html:48
-msgid "View program sites"
-msgstr "Ver sitios del programa"
-
-#: templates/indicators/program_page.html:50
-msgid "There are no program sites."
-msgstr "No existen sitios del programa."
-
-#: templates/indicators/program_page.html:53
-#: templates/workflow/site_profile_list.html:31
-msgid "Add site"
-msgstr "Agregar sitio"
-
-#: templates/indicators/program_page.html:58
 msgid "Pinned reports"
 msgstr "Informes fijados"
 
-#: templates/indicators/program_page.html:64
+#: templates/indicators/program_page.html:54
 msgid "IPTT:"
 msgstr "IPTT:"
 
-#: templates/indicators/program_page.html:77
+#: templates/indicators/program_page.html:67
 msgid "Create an IPTT report"
 msgstr "Crear un informe de IPTT"
 
-#: templates/indicators/program_page.html:81
+#: templates/indicators/program_page.html:71
 msgid "Reports will be available after the program start date."
 msgstr ""
 "Los informes estarán disponibles a partir de la fecha de inicio del programa."
@@ -3636,6 +3622,10 @@ msgstr "Logrado"
 #: templates/workflow/site_indicatordata.html:36
 msgid "There is no indicator data for this site."
 msgstr "No hay datos de indicadores para este sitio."
+
+#: templates/workflow/site_profile_list.html:31
+msgid "Add site"
+msgstr "Agregar sitio"
 
 #: templates/workflow/site_profile_list.html:39
 msgid "Site Profile Map and List"
@@ -4641,6 +4631,12 @@ msgstr "Encontrar"
 #: workflow/widgets.py:133
 msgid "City, Country:"
 msgstr "Ciudad, País:"
+
+#~ msgid "View program sites"
+#~ msgstr "Ver sitios del programa"
+
+#~ msgid "There are no program sites."
+#~ msgstr "No existen sitios del programa."
 
 #~ msgid "Shadow audits"
 #~ msgstr "Auditorías de sombra"
