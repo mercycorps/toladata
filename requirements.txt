@@ -20,12 +20,13 @@ django-admin-sortable2==0.7.6  # via -r requirements.in
 django-crispy-forms==1.9.2  # via -r requirements.in
 django-import-export==2.3.0  # via -r requirements.in
 django-localflavor==3.0.1  # via -r requirements.in
+django-multiselectfield==0.1.12  # via -r requirements.in
 django-mysql==3.7.1       # via -r requirements.in
 django-safedelete==0.5.5  # via -r requirements.in
 django-simple-history==2.11.0  # via -r requirements.in
 django-webpack-loader==0.7.0  # via -r requirements.in
 django-widget-tweaks==1.4.8  # via -r requirements.in
-django==2.2.14            # via -r requirements.in, django-admin-sortable2, django-import-export, django-localflavor, django-mysql, django-safedelete, djangorestframework
+django==2.2.14            # via -r requirements.in, django-admin-sortable2, django-import-export, django-localflavor, django-multiselectfield, django-mysql, django-safedelete, djangorestframework
 djangorestframework==3.11.0  # via -r requirements.in
 et-xmlfile==1.0.1         # via openpyxl
 factory-boy==3.1.0        # via -r requirements.in
