@@ -1015,6 +1015,7 @@ class IndicatorMetricsMixin:
         )
 
     def annotate_kpi(self):
+        """annotation to replace the former key_performance_indicator field to avoid extra lookups"""
         return self.annotate(
             is_key_performance_indicator=models.Exists(
                 IndicatorType.objects.filter(
