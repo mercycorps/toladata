@@ -296,6 +296,11 @@ class IndicatorForm(forms.ModelForm):
             key=lambda choice: str_without_diacritics(choice[1])
         )
 
+        self.fields['indicator_type'].choices = sorted(
+            self.fields['indicator_type'].choices,
+            key=lambda choice: str_without_diacritics(choice[1])
+        )
+
         allowed_countries = [
             *self.request.user.tola_user.access_data.get('countries', {}).keys(),
             *[programaccess['country'] for programaccess in self.request.user.tola_user.access_data.get('programs', [])
