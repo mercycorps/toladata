@@ -52,7 +52,7 @@ class NumberWithTierIndicatorMixin:
 class ProgramPageIndicatorMixin:
     """Indicator serializer component to add all Program Page information to a given indicator set"""
     was_just_created = serializers.BooleanField(source="just_created")
-    is_key_performance_indicator = serializers.BooleanField(source="key_performance_indicator")
+    is_key_performance_indicator = serializers.BooleanField()
     is_reporting = serializers.BooleanField(source="reporting")
     over_under = serializers.IntegerField()
     has_all_targets_defined = serializers.BooleanField()
@@ -102,7 +102,7 @@ class ProgramPageIndicatorMixin:
     @classmethod
     def _get_query_fields(cls):
         return super()._get_query_fields() + [
-            'key_performance_indicator', 'create_date', 'level_order'
+            'create_date', 'level_order'
         ]
 
     @classmethod
