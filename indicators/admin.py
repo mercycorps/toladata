@@ -108,9 +108,8 @@ class IndicatorListFilter(admin.SimpleListFilter):
 
 class IndicatorAdmin(ImportExportModelAdmin, SimpleHistoryAdmin):
     resource_class = IndicatorResource
-    list_display = ('indicator_types', 'name', 'sector', 'key_performance_indicator')
+    list_display = ('indicator_types', 'name', 'sector')
     search_fields = ('name', 'number', 'program__name')
-    # ('program', 'key_performance_indicator', 'sector')
     list_filter = (IndicatorListFilter, 'sector')
     display = 'Indicators'
     filter_horizontal = ('objectives', 'strategic_objectives', 'disaggregation')
