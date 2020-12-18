@@ -70,7 +70,7 @@ class Command(BaseCommand):
 
         named_testers = {
             'Alex': 'atran@mercycorps.org',
-            'Barbara': 'bwillett@mercycorps.org',
+            'André': 'anthomas@mercycorps.org',
             'Cameron': 'cmcfee@mercycorps.org',
             'Carly': 'colenick@mercycorps.org',
             'Jenny': 'jmarx@mercycorps.org',
