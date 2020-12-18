@@ -15,7 +15,7 @@
     // this variable is set to TRUE meaning by default any modal that attempts to close can close
     // in the Indicator Form Open function it is set to false to allow validation to proceed normally
     let allowModalToClose = true;  // Can the create modal be closed without prompting the user?
-    
+
     /* These are mostly unused but not removed because the JS is scattered atm.  As we move to the
      * unified changeset notice it should be easier to consolidate these in constants.js (for use by the changeset
      * function) or in-place trans tags
@@ -345,7 +345,7 @@
                                 updateLopTargetDisplay();
                             }
                         });
-                    
+
                 })(url, row)
             });
         }
@@ -995,6 +995,25 @@
         }
     }
 
+    function validateIndicatorType() {
+        const indicatorType = $('#id_indicator_type');
+        let errMsg = null;
+
+        if (!indicatorType.val() || indicatorType.val().length == 0) {
+            {# Translators: On a form, displayed when the user clicks submit without filling out a required field #}
+            errMsg = "{% trans 'Please complete this field' %}";
+        }
+        if (errMsg) {
+            indicatorType.addClass('is-invalid');
+            $("#validation_id_indicator_type").html(`<small>${errMsg}</small>`);
+            return false;
+        } else {
+            indicatorType.removeClass('is-invalid');
+            $('#validation_id_indicator_type').html("");
+            return true;
+        }
+    }
+
     function validateForEmptyField(fieldName) {
         var field = $("#" + fieldName);
         if (fieldName == 'id_level') {
@@ -1174,7 +1193,9 @@
             validation_msgs['summary'] = '{% trans "Please complete all required fields in the Summary tab."|escapejs %}';
         }
 
-
+        if (validateIndicatorType() === false) {
+            validationsPerformanceTab = false;
+        }
 
         if (validateForEmptyField("id_old_level") === false) {
             validationsPerformanceTab = false;

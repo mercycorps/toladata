@@ -165,6 +165,13 @@
 
                 <div role="tabpanel" class="tab-pane" id="performanceTab" name="Performance tab">
                     <fieldset>
+                        <div class="form-group" id="div_id_indicator_type">
+                            <label for="id_indicator_type" class="label--required">{{ form.indicator_type.label }} </label>
+                            {% popover_helptext form.indicator_type.help_text %}
+                            {% render_field form.indicator_type class+="form-control" %}
+                            <span id="validation_id_indicator_type" class="has-error"></span>
+                        </div>
+
                         {% if form.old_level %}
                         <div class="form-group" id="div_id_old_level">
                             <label for="id_old_level" class="label--required">{{ form.old_level.label }}</label>
@@ -197,13 +204,6 @@
 
                         <div class="form-group grouped-disaggregations-list" id="div_id_grouped_disaggregations">
                             {{ form.grouped_disaggregations }}
-                        </div>
-
-                        <div class="form-group" id="div_id_indicator_type">
-                            <label for="id_indicator_type" class="">{{ form.indicator_type.label }} </label>
-                            {% popover_helptext form.indicator_type.help_text %}
-                            {% render_field form.indicator_type class+="form-control" %}
-                            <span id="validation_id_indicator_type" class="has-error"></span>
                         </div>
 
                         <div class="form-group" id="div_id_key_performance_indicator">
