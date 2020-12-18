@@ -4,6 +4,7 @@ beautifulsoup4              # used in testing to parse html response data
 django-admin-sortable2      # used in Django admin for sortable indicators
 django-crispy-forms         # used in old (siteprofile/formlibrary) forms - deprecated
 django-localflavor          # provides localization support for numbers/dates/formatting
+django-multiselectfield     # used in indicator model for multiselect string option fields (e.g. information use)
 django-safedelete           # provides a soft delete model (used for historical records throughout)
 django-simple-history       # provides historical records attached to user from request (used only on SiteProfile)
 django-widget-tweaks        # used in many templates to provide render_field and other shortcuts
