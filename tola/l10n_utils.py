@@ -2,6 +2,7 @@
 
 """
 
+import unicodedata
 from django.utils import formats
 import six
 import decimal
@@ -59,3 +60,13 @@ def l10n_number(value):
         except ValueError:
             return value
     return value
+
+def str_without_diacritics(s):
+    """Key function for sorting strings that may contain accent characters, sorting as though there were no accents"""
+    return ''.join(
+        # normalize to form NFKD: all diacritics broken into combining character (i.e. "é" -> ´ and e)
+        # all identical characters replaced with simplest equivalents (i.e. Roman Numeral I and capital I)
+        c for c in unicodedata.normalize('NFKD', str(s))
+        # combining returns true for a combining diacritic such as ´ or ¨
+        if not unicodedata.combining(c)
+    )
