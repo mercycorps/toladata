@@ -85,7 +85,7 @@ class IndicatorResource(resources.ModelResource):
                   'data_collection_frequency', 'data_points', 'responsible_person',
                   'method_of_analysis', 'information_use', 'reporting_frequency', 'quality_assurance',
                   'data_issues', 'indicator_changes', 'comments', 'disaggregation', 'sector',
-                  'program', 'key_performance_indicator')
+                  'program')
 
 
 class IndicatorListFilter(admin.SimpleListFilter):
@@ -111,7 +111,7 @@ class IndicatorAdmin(ImportExportModelAdmin, SimpleHistoryAdmin):
     list_display = ('indicator_types', 'name', 'sector', 'key_performance_indicator')
     search_fields = ('name', 'number', 'program__name')
     # ('program', 'key_performance_indicator', 'sector')
-    list_filter = (IndicatorListFilter, 'key_performance_indicator', 'sector')
+    list_filter = (IndicatorListFilter, 'sector')
     display = 'Indicators'
     filter_horizontal = ('objectives', 'strategic_objectives', 'disaggregation')
 
