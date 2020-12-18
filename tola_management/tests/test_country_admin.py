@@ -1,8 +1,8 @@
 from django.test import TestCase, RequestFactory
 from factories.workflow_models import (
     ProgramFactory,
-    NewCountryFactory,
-    NewTolaUserFactory,
+    CountryFactory,
+    TolaUserFactory,
     OrganizationFactory,
     grant_country_access
 )
@@ -15,9 +15,9 @@ class TestCountryAdminViewSet(TestCase):
     def setUpClass(cls):
         super().setUpClass()
         cls.mc_org = OrganizationFactory(id=1, name="MC")
-        cls.base_country = NewCountryFactory(country="Base Country", code="BC")
+        cls.base_country = CountryFactory(country="Base Country", code="BC")
         ProgramFactory.create_batch(2, countries=[cls.base_country])
-        cls.superadmin = NewTolaUserFactory(
+        cls.superadmin = TolaUserFactory(
             country=cls.base_country,
             superadmin=True
         )
@@ -28,7 +28,7 @@ class TestCountryAdminViewSet(TestCase):
         self.request = request_factory.get('/api/tola_management/country/')
 
     def test_get_country_page_context(self):
-        countries = NewCountryFactory.create_batch(3)
+        countries = CountryFactory.create_batch(3)
         ProgramFactory.create_batch(4, countries=[countries[0]])
         ProgramFactory(countries=countries[:2])
         OrganizationFactory.create_batch(4)
@@ -40,7 +40,7 @@ class TestCountryAdminViewSet(TestCase):
         self.assertEqual(len(response['organizations']), Organization.objects.count())
         self.assertEqual(len(response['programs']), Program.objects.count())
 
-        non_superuser = NewTolaUserFactory(organization=self.mc_org, country=self.base_country)
+        non_superuser = TolaUserFactory(organization=self.mc_org, country=self.base_country)
         self.request.user = non_superuser.user
 
         grant_country_access(non_superuser, countries[0], COUNTRY_ROLE_CHOICES[1][0])
@@ -56,8 +56,3 @@ class TestCountryAdminViewSet(TestCase):
         multi_country_items = [p for p in response['programs'] if len(p['country']) > 1]
         self.assertEqual(len(multi_country_items), 1)
         self.assertEqual(multi_country_items[0]['country'], [countries[0].id, countries[1].id])
-
-
-
-
-

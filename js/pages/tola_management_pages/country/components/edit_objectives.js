@@ -3,6 +3,7 @@ import { observer } from "mobx-react"
 import Select from 'react-select'
 import classNames from 'classnames'
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome'
+import { faCaretDown, faCaretRight } from "@fortawesome/free-solid-svg-icons";
 
 
 const statusOptions = [
@@ -68,7 +69,7 @@ class StrategicObjectiveForm extends React.Component {
         <div className="accordion-row">
             <div className="accordion-row__content">
                 <a onClick={expandAction} className="btn accordion-row__btn btn-link" tabIndex="0">
-                    <FontAwesomeIcon icon={expanded ? 'caret-down' : 'caret-right'} />
+                    <FontAwesomeIcon icon={expanded ? faCaretDown : faCaretRight} />
                     { /* # Translators: This is a section header for when a user is creating a new strategic objective for a country */ }
                     {(objective.id == 'new')? gettext("New Strategic Objective") : objective.name}
                 </a>

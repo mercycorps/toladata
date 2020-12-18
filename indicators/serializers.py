@@ -201,6 +201,7 @@ class IndicatorPlanIndicatorSerializerBase(serializers.ModelSerializer):
     lop_target = serializers.SerializerMethodField()
     data_collection_frequency = serializers.StringRelatedField()
     reporting_frequency = serializers.StringRelatedField()
+    quality_assurance_techniques = serializers.SerializerMethodField()
 
     class Meta:
         model = Indicator
@@ -230,32 +231,42 @@ class IndicatorPlanIndicatorSerializerBase(serializers.ModelSerializer):
             'information_use',
             'reporting_frequency',
             'quality_assurance',
+            'quality_assurance_techniques',
             'data_issues',
             'comments',
         ]
 
-    def get_lop_target(self, obj):
-        return obj.calculated_lop_target
+    @staticmethod
+    def get_quality_assurance_techniques(indicator):
+        """returns the list of quality assurance techniques in alphabetical order in the display language"""
+        return ", ".join(sorted([x.strip() for x in indicator.get_quality_assurance_techniques_display().split(',')]))
 
-    def get_tier_name_only(self, obj):
-        if obj.results_framework and obj.level and obj.level.leveltier:
-            return obj.level.leveltier.name
-        elif not obj.results_framework and obj.old_level:
-            return obj.old_level
+    @staticmethod
+    def get_lop_target(indicator):
+        return indicator.calculated_lop_target
+
+    @staticmethod
+    def get_tier_name_only(indicator):
+        if indicator.results_framework and indicator.level and indicator.level.leveltier:
+            return indicator.level.leveltier.name
+        elif not indicator.results_framework and indicator.old_level:
+            return indicator.old_level
         return None
 
-    def get_is_cumulative(self, obj):
-        if obj.target_frequency == Indicator.LOP:
+    @staticmethod
+    def get_is_cumulative(indicator):
+        if indicator.target_frequency == Indicator.LOP:
             return None
-        return obj.is_cumulative
+        return indicator.is_cumulative
 
-    def get_baseline(self, obj):
-        if obj.baseline_na:
+    @staticmethod
+    def get_baseline(indicator):
+        if indicator.baseline_na:
             return None
-        return obj.baseline
+        return indicator.baseline
 
     def to_representation(self, instance):
-        data = super(IndicatorPlanIndicatorSerializerBase, self).to_representation(instance)
+        data = super().to_representation(instance)
         for field in data:
             data[field] = self.render_value(field, instance, data)
         return data

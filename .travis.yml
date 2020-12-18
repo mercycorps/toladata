@@ -3,7 +3,7 @@ matrix:
         -   language: python
 
             python:
-              - 3.7.3
+              - 3.8.6
 
             services: mysql
 
@@ -23,7 +23,7 @@ matrix:
         -   language: node_js
             sudo: false
             node_js:
-                - '10.1.0'
+                - '12.20.0'
             before_install:
             - npm update
             install:

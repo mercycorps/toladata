@@ -1,80 +1,76 @@
 """URLS for the Indicators app in the Tola project"""
 from indicators import views
-from django.conf.urls import url, include
+from django.urls import path, include
 
 apipatterns = [
     # results table html string for one indicator (Program Page and IPTT):
-    url(r'^result_table/(?P<indicator>\d+)/', views.result_view, name='result_view'),
+    path('result_table/<int:indicator>/', views.result_view, name='result_view'),
     # program-wide ordering update (program page):
-    url(r'^program/ordering/(?P<program>\d+)/', views.api_program_ordering, name='program_ordering'),
+    path('program/ordering/<int:program>/', views.api_program_ordering, name='program_ordering'),
     # program by-level ordering update (IPTT):
-    url(r'^program/level_ordering/(?P<program>\d+)/', views.api_program_ordering, name='level_ordering'),
+    path('program/level_ordering/<int:program>/', views.api_program_ordering, name='level_ordering'),
     # program page indicator update (with included orderin update):
-    url(r'^program_page/indicator/(?P<pk>\d+)/',
-        views.api_program_page_indicator, name='program_page_indicator'),
+    path('program_page/indicator/<int:pk>/', views.api_program_page_indicator, name='program_page_indicator'),
     # program page all indicators update:
-    url(r'^program_page/(?P<program>\d+)/', views.api_program_page, name='api_program_page'),
-    url(r'^iptt/(?P<program>\d+)/filter_data/', views.api_iptt_filter_data, name='api_iptt_filter_data'),
-    url(r'^iptt/(?P<program>\d+)/report_data/', views.api_iptt_report_data, name='api_iptt_report_data'),
+    path('program_page/<int:program>/', views.api_program_page, name='api_program_page'),
+    path('iptt/<int:program>/filter_data/', views.api_iptt_filter_data, name='api_iptt_filter_data'),
+    path('iptt/<int:program>/report_data/', views.api_iptt_report_data, name='api_iptt_report_data'),
     # indicator update (program page):
-    url(r'^indicator/(?P<indicator>\d+)', views.api_indicator_view, name='api_indicator_view'),
+    path('indicator/<int:indicator>', views.api_indicator_view, name='api_indicator_view'),
     # all indicators update (program page):
-    url(r'^indicators/(?P<program>\d+)', views.api_indicators_list, name='api_indicators_list'),
-    url(r'^pinned_report/$', views.create_pinned_report, name='create_pinned_report')
+    path('indicators/<int:program>', views.api_indicators_list, name='api_indicators_list'),
+    path('pinned_report/', views.create_pinned_report, name='create_pinned_report')
 ]
 
 urlpatterns = [
-    url(r'^periodic_targets_form/(?P<program>\d+)/$', views.periodic_targets_form, name='periodic_targets_form'),
+    path('periodic_targets_form/<int:program>/', views.periodic_targets_form, name='periodic_targets_form'),
 
-    url(r'^indicator_create/(?P<program>\d+)/$', views.IndicatorCreate.as_view(), name='indicator_create'),
+    path('indicator_create/<int:program>/', views.IndicatorCreate.as_view(), name='indicator_create'),
 
-    url(r'^indicator_update/(?P<pk>\d+)/$', views.IndicatorUpdate.as_view(), name='indicator_update'),
+    path('indicator_update/<int:pk>/', views.IndicatorUpdate.as_view(), name='indicator_update'),
 
-    url(r'^indicator_delete/(?P<pk>\d+)/$', views.IndicatorDelete.as_view(), name='indicator_delete'),
+    path('indicator_delete/<int:pk>/', views.IndicatorDelete.as_view(), name='indicator_delete'),
 
-    url(r'^periodic_target_delete/(?P<pk>\d+)/$', views.PeriodicTargetDeleteView.as_view(), name='pt_delete'),  # delete event
+    path('periodic_target_delete/<int:pk>/', views.PeriodicTargetDeleteView.as_view(), name='pt_delete'),# delete event
 
-    url(r'^periodic_target_deleteall/(?P<indicator>\d+)/$',  # delete all targets button
-        views.PeriodicTargetDeleteAllView.as_view(), name='pt_deleteall'),
+    path('periodic_target_deleteall/<int:indicator>/',  # delete all targets button
+         views.PeriodicTargetDeleteAllView.as_view(), name='pt_deleteall'),
 
-    url(r'^result_add/(?P<indicator>\d+)/$', views.ResultCreate.as_view(), name='result_add'),
+    path('result_add/<int:indicator>/', views.ResultCreate.as_view(), name='result_add'),
 
-    url(r'^result_update/(?P<pk>\d+)/$', views.ResultUpdate.as_view(), name='result_update'),
+    path('result_update/<int:pk>/', views.ResultUpdate.as_view(), name='result_update'),
 
-    url(r'^result_delete/(?P<pk>\d+)/$', views.ResultDelete.as_view(), name='result_delete'),
+    path('result_delete/<int:pk>/', views.ResultDelete.as_view(), name='result_delete'),
 
-    url(r'^disrep_quickstart/$', views.DisaggregationReportQuickstart.as_view(), name='disrep_quickstart'),
-    url(r'^disrep/(?P<program>\d+)/$', views.DisaggregationReport.as_view(), name='disrep'),
+    path('disrep_quickstart/', views.DisaggregationReportQuickstart.as_view(), name='disrep_quickstart'),
+    path('disrep/<int:program>/', views.DisaggregationReport.as_view(), name='disrep'),
 
-    url(r'^disrepprint/(?P<program>\d+)/$', views.DisaggregationPrint.as_view(), name='disrepprint'),
+    path('disrepprint/<int:program>/', views.DisaggregationPrint.as_view(), name='disrepprint'),
 
-    url(r'^indicator_plan/(?P<program>\d+)/$', views.indicator_plan, name='indicator_plan'),
+    path('indicator_plan/<int:program>/', views.indicator_plan, name='indicator_plan'),
 
-    url(r'^indicator_plan/export/(?P<program>\d+)/$',
-        views.IndicatorExport.as_view(), name='indicator_export'),
+    path('indicator_plan/export/<int:program>/', views.IndicatorExport.as_view(), name='indicator_export'),
 
-    url(r'^service/(?P<service>[-\w]+)/service_json/', views.service_json, name='service_json'),
+    path('service/<str:service>/service_json/', views.service_json, name='service_json'),
 
-    url(r'^iptt_quickstart/', views.IPTTQuickstart.as_view(), name='iptt_quickstart'),
-    url(r'^iptt_report/(?P<program>\d+)/(?P<reporttype>\w+)/$', views.IPTTReport.as_view(), name='iptt_report'),
-    #url(r'^iptt_report_data/$', views.IPTTReportData.as_view(), name='iptt_ajax'),
-    url(r'iptt_api/iptt_excel/$', views.IPTTExcelReport.as_view(), name='iptt_excel'),
+    path('iptt_quickstart/', views.IPTTQuickstart.as_view(), name='iptt_quickstart'),
+    path('iptt_report/<int:program>/<str:reporttype>/', views.IPTTReport.as_view(), name='iptt_report'),
+    path('iptt_api/iptt_excel/', views.IPTTExcelReport.as_view(), name='iptt_excel'),
 
     # JSON endpoint (still in Alpha) GH ticket: #1854
-    url(r'^programs_rollup_export/$', views.programs_rollup_export, name='programs_rollup_export'),
+    path('programs_rollup_export/', views.programs_rollup_export, name='programs_rollup_export'),
 
     # CSV endpoint (still in Alpha)
-    url(r'^programs_rollup_export_csv/$', views.programs_rollup_export_csv, name='programs_rollup_export_csv'),
+    path('programs_rollup_export_csv/', views.programs_rollup_export_csv, name='programs_rollup_export_csv'),
 
-    #url(r'^pinned_report/$', views.create_pinned_report, name='create_pinned_report'),
-    url(r'^pinned_report/delete/$', views.delete_pinned_report, name='delete_pinned_report'),
+    path('pinned_report/delete/', views.delete_pinned_report, name='delete_pinned_report'),
 
     # Results framework builder
-    url(r'^results_framework_builder/(?P<program_id>\d+)', views.ResultsFrameworkBuilder.as_view(),
-        name='results_framework_builder'),
+    path('results_framework_builder/<int:program_id>', views.ResultsFrameworkBuilder.as_view(),
+         name='results_framework_builder'),
 
-    url(r'^results_framework_export/(?P<program>\d+)', views.results_framework_export, name='rf_export'),
+    path('results_framework_export/<int:program>', views.results_framework_export, name='rf_export'),
 
     # API (serializer-based) calls for program page / IPTT
-    url(r'^api/', include(apipatterns)),
+    path('api/', include(apipatterns)),
 ]

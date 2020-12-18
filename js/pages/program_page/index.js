@@ -9,6 +9,7 @@ import { ProgramMetrics } from './components/program_metrics';
 import ProgramPageRootStore from './models/programPageRootStore';
 import { reloadPageIfCached } from '../../general_utilities';
 import { IndicatorFilterType } from '../../constants';
+import SitesList from './components/sitesList';
 
 import setupPinningDelete from './pinned_reports';
 
@@ -75,6 +76,9 @@ ReactDOM.render(<IndicatorList rootStore={rootStore} uiStore={uiStore} />,
 
 ReactDOM.render(<ProgramMetrics rootStore={rootStore} uiStore={uiStore} />,
     document.querySelector('#program-metrics-react-component'));
+
+ReactDOM.render(<SitesList rootStore={rootStore} />,
+                document.querySelector('#sites-sidebar'));
 
 
 /*

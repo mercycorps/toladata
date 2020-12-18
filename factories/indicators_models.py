@@ -4,9 +4,9 @@ import itertools
 import datetime
 import faker
 from django.utils import timezone
+from factory.django import DjangoModelFactory
 from factory import (
     Faker,
-    DjangoModelFactory,
     post_generation,
     SubFactory,
     RelatedFactory,

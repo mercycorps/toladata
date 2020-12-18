@@ -1,4 +1,5 @@
-
+import sys
+import io
 import uuid
 from django import test
 from django.core import management
@@ -22,7 +23,9 @@ class TestQAScript(test.TestCase):
         DisaggregationTypeFactory(pk=109, disaggregation_type="Sex and Age Disaggregated Data (SADD)")
         cls.indicator_type = IndicatorTypeFactory()
         SectorFactory.create_batch(size=5)
+        sys.stdout = io.StringIO()
         management.call_command('create_qa_programs', names='test_program', named_only=True)
+        sys.stdout = sys.__stdout__
         cls.program = Program.objects.filter(name__contains="QA program")[0]
         cls.tolaland = Country.objects.get(country="Tolaland")
         cls.tola_user = TolaUserFactory(country=cls.tolaland)
@@ -34,6 +37,11 @@ class TestQAScript(test.TestCase):
 
     def setUp(self):
         self.client.force_login(user=self.tola_user.user)
+        suppress_text = io.StringIO()
+        sys.stdout = suppress_text
+
+    def tearDown(self):
+        sys.stdout = sys.__stdout__
 
     def test_null_values(self):
         qa_indicator = self.program.indicator_set.first()
@@ -62,7 +70,3 @@ class TestQAScript(test.TestCase):
         mc_high_access = ProgramAccess.objects.get(
             country=self.tolaland, program=self.program, tolauser=mc_high)
         self.assertEqual(mc_high_access.role, 'high', 'mc-high should have high permission on all Tolaland programs')
-
-
-
-

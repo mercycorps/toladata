@@ -25,7 +25,7 @@ from indicators.serializers_new import (
 )
 from tola.model_utils import get_serializer
 from tola.l10n_utils import l10n_date_medium
-from workflow.models import Program
+from workflow.models import Program, SiteProfile
 from workflow.serializers_new.base_program_serializers import (
     ProgramBaseSerializerMixin,
     ProgramReportingPeriodMixin,
@@ -146,13 +146,15 @@ class ProgramPageUpdateMixin:
             ProgramPageIndicatorUpdateSerializer.load_for_pk(program_pk)
     """
     indicator = serializers.SerializerMethodField()
+    site_count = serializers.SerializerMethodField()
 
     class Meta:
         purpose = "IndicatorUpdate"
-        fields = ['indicator']
+        fields = ['indicator', 'site_count']
         _related_serializers = {
             'indicators': ProgramPageIndicatorOrderingSerializer
         }
+
 
     # class methods for instantiation with minimal queries
     @classmethod
@@ -174,6 +176,9 @@ class ProgramPageUpdateMixin:
     # serializer method fields:
     def get_indicator(self, program):
         return self.context.get('indicator', None)
+
+    def get_site_count(self, program):
+        return SiteProfile.objects.filter(result__indicator__program=program).distinct().count()
 
 
 ProgramPageIndicatorUpdateSerializer = get_serializer(

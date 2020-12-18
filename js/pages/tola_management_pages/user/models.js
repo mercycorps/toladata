@@ -248,7 +248,9 @@ export class UserStore {
                     this.next_page = results.next_page
                     this.previous_page = results.previous_page
                 })
-            })
+            }).catch(errors => {
+                // TODO: handle this?
+            });
         }
     }
 

@@ -251,12 +251,7 @@ THIRD_PARTY_APPS = (
     'rest_framework',
     'rest_framework.authtoken',
     'crispy_forms',
-    'django_extensions',
-    'mathfilters',
-    'import_export',
-    'django_wysiwyg',
-    'ckeditor',
-    'ckeditor_uploader',
+    # 'django_extensions',
     'simplejson',
     'simple_history',
     #'user_language_middleware',
@@ -342,18 +337,6 @@ WSGI_APPLICATION = '%s.wsgi.application' % SITE_NAME
 
 CRISPY_TEMPLATE_PACK = 'bootstrap3'
 
-
-#wysiwyg settings
-DJANGO_WYSIWYG_FLAVOR = "ckeditor"
-CKEDITOR_UPLOAD_PATH = "media/uploads/"
-
-CKEDITOR_CONFIGS = {
-    'default': {
-        'toolbar': 'full',
-        'height': 300,
-        'width': 300,
-    },
-}
 
 SESSION_EXPIRE_AT_BROWSER_CLOSE = True
 

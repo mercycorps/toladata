@@ -191,7 +191,14 @@ COLUMNS = [
         'screen_width': 10,
     },
     {
-        'name': _('Quality assurance measures'),
+        'name': _('Data quality assurance techniques'),
+        'category': ANALYSES_AND_REPORTING,
+        'cell_width': MEDIUM_CELL,
+        'field': 'quality_assurance_techniques',
+        'screen_width': 10,
+    },
+    {
+        'name': _('Data quality assurance details'),
         'category': ANALYSES_AND_REPORTING,
         'cell_width': MEDIUM_CELL,
         'field': 'quality_assurance',
@@ -492,4 +499,3 @@ def create_non_rf_workbook(indicators):
     update_borders(wb)
 
     return wb
-

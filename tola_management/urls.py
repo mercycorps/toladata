@@ -1,10 +1,11 @@
-from .views import *
+from tola_management.views import (
+    audit_log_host_page,
+    app_host_page
+)
 
-from django.conf.urls import *
-
-# place app url patterns here
+from django.urls import path
 
 urlpatterns = [
-    url(r'^audit_log/(?P<program_id>\d+)/$', audit_log_host_page, name="tola_management_audit_log"),
-    url(r'^(?P<react_app_page>\w+)/$', app_host_page, name="tola_management"),
+    path('audit_log/<int:program_id>/', audit_log_host_page, name="tola_management_audit_log"),
+    path('<str:react_app_page>/', app_host_page, name="tola_management"),
 ]

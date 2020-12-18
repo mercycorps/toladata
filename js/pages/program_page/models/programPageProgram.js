@@ -42,6 +42,9 @@ export const forProgramPage = (
                             let indicator = ProgramPageIndicator(results.indicator);
                             this.indicators.set(indicator.pk, indicator);
                         }
+                        if (results.site_count !== undefined) {
+                            this.siteCount = results.site_count;
+                        }
                         return results;
                     }).then(this._applyOrderUpdate.bind(this));
         }),
@@ -55,7 +58,7 @@ export const forProgramPage = (
         deleteIndicator: action(function(indicatorPk) {
             return this.updateOrder().then(success => this.indicators.delete(parseInt(indicatorPk)));
         }),
-        
+        siteCount: programJSON.site_count || null
     });
 
 export default getProgram(withReportingPeriod, withProgramLevelOrdering, forProgramPage);

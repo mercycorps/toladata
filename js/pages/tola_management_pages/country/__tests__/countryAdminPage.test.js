@@ -13,11 +13,43 @@ jest.mock('../api');
 import {create_unified_changeset_notice} from '../../../../components/changesetNotice';
 jest.mock('../../../../components/changesetNotice')
 
+// called on init of countrystore every time:
 api.fetchCountries.mockResolvedValue([
         {id: 100, country: "First Country"},
         {id: 101, country: "Second Country"},
     ]);
-api.updateDisaggregation.mockResolvedValue(() => ({data: []}));
+// code in models.js compares received id with sent id to validate save, this ensures it has the right id:
+api.updateDisaggregation.mockImplementation((id, disaggregation_data) => {
+    return Promise.resolve({
+        data: {
+            id: id,
+            ...disaggregation_data
+        }
+    });
+});
+// this just needs to be mocked so the call doesn't throw
+api.fetchCountryHistory.mockResolvedValue(() => ({data: []}));
+
+/* This mock prevents react-beautiful-dnd warnings in test (comes from mounting
+ * without a root dom node, this mock silences them but doesn't allow testing of
+ * drag-and-drop functionality
+ */
+jest.mock('react-beautiful-dnd', () => ({
+    Droppable: ({ children }) => children({
+    draggableProps: {
+      style: {},
+    },
+    innerRef: jest.fn(),
+  }, {}),
+  Draggable: ({ children }) => children({
+    draggableProps: {
+      style: {},
+    },
+    innerRef: jest.fn(),
+  }, {}),
+  DragDropContext: ({ children }) => children,
+}));
+
 
 describe("Country admin update/create methods ", () => {
     let store = new CountryStore(api, {});
@@ -75,13 +107,14 @@ describe("Country admin update/create methods ", () => {
         expect(api.updateDisaggregation).toHaveBeenCalled();
     });
     it("prevent creation of disagg types of same name in same country", () => {
-        store.createDisaggregation(
+        // this _should_ reject with a "validation failed" message:
+        expect(store.createDisaggregation(
             {
                 disaggregation_type: "C1 Second Disaggregation",
                 labels: [{label: "First"}, {label: "Second"}],
                 country: 100
             }
-        );
+        )).rejects.toBe('Validation failed');
         expect(api.createDisaggregation).not.toHaveBeenCalled();
     });
 

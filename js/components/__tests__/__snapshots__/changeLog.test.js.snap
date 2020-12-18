@@ -43,6 +43,23 @@ exports[`Change log should display all  Organization change log entries 1`] = `
       <td
         className="text-nowrap text-action"
       >
+        <svg
+          aria-hidden="true"
+          className="svg-inline--fa fa-caret-down fa-w-10 "
+          data-icon="caret-down"
+          data-prefix="fas"
+          focusable="false"
+          role="img"
+          style={Object {}}
+          viewBox="0 0 320 512"
+          xmlns="http://www.w3.org/2000/svg"
+        >
+          <path
+            d="M31.3 192h257.3c17.8 0 26.7 21.5 14.1 34.1L174.1 354.8c-7.8 7.8-20.5 7.8-28.3 0L17.2 226.1C4.6 213.5 13.5 192 31.3 192z"
+            fill="currentColor"
+            style={Object {}}
+          />
+        </svg>
          
         <strong>
           2020-01-29 11:24:34
@@ -268,6 +285,23 @@ exports[`Change log should display all  Organization change log entries 1`] = `
       <td
         className="text-nowrap text-action"
       >
+        <svg
+          aria-hidden="true"
+          className="svg-inline--fa fa-caret-down fa-w-10 "
+          data-icon="caret-down"
+          data-prefix="fas"
+          focusable="false"
+          role="img"
+          style={Object {}}
+          viewBox="0 0 320 512"
+          xmlns="http://www.w3.org/2000/svg"
+        >
+          <path
+            d="M31.3 192h257.3c17.8 0 26.7 21.5 14.1 34.1L174.1 354.8c-7.8 7.8-20.5 7.8-28.3 0L17.2 226.1C4.6 213.5 13.5 192 31.3 192z"
+            fill="currentColor"
+            style={Object {}}
+          />
+        </svg>
          
         <strong>
           2020-01-29 11:24:09
@@ -725,6 +759,23 @@ exports[`Change log should display all  Program change log entries 1`] = `
       <td
         className="text-nowrap text-action"
       >
+        <svg
+          aria-hidden="true"
+          className="svg-inline--fa fa-caret-down fa-w-10 "
+          data-icon="caret-down"
+          data-prefix="fas"
+          focusable="false"
+          role="img"
+          style={Object {}}
+          viewBox="0 0 320 512"
+          xmlns="http://www.w3.org/2000/svg"
+        >
+          <path
+            d="M31.3 192h257.3c17.8 0 26.7 21.5 14.1 34.1L174.1 354.8c-7.8 7.8-20.5 7.8-28.3 0L17.2 226.1C4.6 213.5 13.5 192 31.3 192z"
+            fill="currentColor"
+            style={Object {}}
+          />
+        </svg>
          
         <strong>
           2020-01-29 11:20:35
@@ -901,6 +952,23 @@ exports[`Change log should display all  Program change log entries 1`] = `
       <td
         className="text-nowrap text-action"
       >
+        <svg
+          aria-hidden="true"
+          className="svg-inline--fa fa-caret-down fa-w-10 "
+          data-icon="caret-down"
+          data-prefix="fas"
+          focusable="false"
+          role="img"
+          style={Object {}}
+          viewBox="0 0 320 512"
+          xmlns="http://www.w3.org/2000/svg"
+        >
+          <path
+            d="M31.3 192h257.3c17.8 0 26.7 21.5 14.1 34.1L174.1 354.8c-7.8 7.8-20.5 7.8-28.3 0L17.2 226.1C4.6 213.5 13.5 192 31.3 192z"
+            fill="currentColor"
+            style={Object {}}
+          />
+        </svg>
          
         <strong>
           2020-01-29 11:19:58
@@ -1309,6 +1377,23 @@ exports[`Change log should display all  User change log entries 1`] = `
       <td
         className="text-nowrap text-action"
       >
+        <svg
+          aria-hidden="true"
+          className="svg-inline--fa fa-caret-down fa-w-10 "
+          data-icon="caret-down"
+          data-prefix="fas"
+          focusable="false"
+          role="img"
+          style={Object {}}
+          viewBox="0 0 320 512"
+          xmlns="http://www.w3.org/2000/svg"
+        >
+          <path
+            d="M31.3 192h257.3c17.8 0 26.7 21.5 14.1 34.1L174.1 354.8c-7.8 7.8-20.5 7.8-28.3 0L17.2 226.1C4.6 213.5 13.5 192 31.3 192z"
+            fill="currentColor"
+            style={Object {}}
+          />
+        </svg>
          
         <strong>
           2020-01-29 10:48:56
@@ -1605,6 +1690,23 @@ exports[`Change log should display all  User change log entries 1`] = `
       <td
         className="text-nowrap text-action"
       >
+        <svg
+          aria-hidden="true"
+          className="svg-inline--fa fa-caret-down fa-w-10 "
+          data-icon="caret-down"
+          data-prefix="fas"
+          focusable="false"
+          role="img"
+          style={Object {}}
+          viewBox="0 0 320 512"
+          xmlns="http://www.w3.org/2000/svg"
+        >
+          <path
+            d="M31.3 192h257.3c17.8 0 26.7 21.5 14.1 34.1L174.1 354.8c-7.8 7.8-20.5 7.8-28.3 0L17.2 226.1C4.6 213.5 13.5 192 31.3 192z"
+            fill="currentColor"
+            style={Object {}}
+          />
+        </svg>
          
         <strong>
           2020-01-27 15:53:28
@@ -1732,6 +1834,23 @@ exports[`Change log should display all  User change log entries 1`] = `
       <td
         className="text-nowrap text-action"
       >
+        <svg
+          aria-hidden="true"
+          className="svg-inline--fa fa-caret-down fa-w-10 "
+          data-icon="caret-down"
+          data-prefix="fas"
+          focusable="false"
+          role="img"
+          style={Object {}}
+          viewBox="0 0 320 512"
+          xmlns="http://www.w3.org/2000/svg"
+        >
+          <path
+            d="M31.3 192h257.3c17.8 0 26.7 21.5 14.1 34.1L174.1 354.8c-7.8 7.8-20.5 7.8-28.3 0L17.2 226.1C4.6 213.5 13.5 192 31.3 192z"
+            fill="currentColor"
+            style={Object {}}
+          />
+        </svg>
          
         <strong>
           2020-01-27 15:53:09
@@ -1846,6 +1965,23 @@ exports[`Country change log lists all changes 1`] = `
       <td
         className="text-nowrap text-action"
       >
+        <svg
+          aria-hidden="true"
+          className="svg-inline--fa fa-caret-down fa-w-10 "
+          data-icon="caret-down"
+          data-prefix="fas"
+          focusable="false"
+          role="img"
+          style={Object {}}
+          viewBox="0 0 320 512"
+          xmlns="http://www.w3.org/2000/svg"
+        >
+          <path
+            d="M31.3 192h257.3c17.8 0 26.7 21.5 14.1 34.1L174.1 354.8c-7.8 7.8-20.5 7.8-28.3 0L17.2 226.1C4.6 213.5 13.5 192 31.3 192z"
+            fill="currentColor"
+            style={Object {}}
+          />
+        </svg>
          
         <strong>
           2020-01-28 16:00:00

@@ -444,3 +444,15 @@ class TestProgramPageSerializersFunctional(test.TestCase):
                 full_data['indicators'][indicator_pk]['number'],
                 data['indicators'][indicator_pk]['number']
                 )
+
+    def test_site_count_in_update(self):
+        """Site count should be included in update serializer to supply reactive sites list with count"""
+        p = RFProgramFactory()
+        i = RFIndicatorFactory(program=p, targets=1000, results=True)
+        data = self.get_update_indicator_data(p.pk, i.pk)
+        self.assertEqual(data['site_count'], 0)
+        r1 = i.result_set.first()
+        r1.site.add(SiteProfileFactory())
+        r1.save()
+        data = self.get_update_indicator_data(p.pk, i.pk)
+        self.assertEqual(data['site_count'], 1)

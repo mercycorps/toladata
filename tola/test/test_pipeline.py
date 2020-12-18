@@ -1,7 +1,7 @@
 from unittest import mock
 from django.test import TestCase
 
-from factories.workflow_models import CountryFactory, OrganizationFactory, NewTolaUserFactory
+from factories.workflow_models import CountryFactory, OrganizationFactory, TolaUserFactory
 from tola_management.models import UserManagementAuditLog as UM
 from workflow.models import TolaUser
 
@@ -128,7 +128,7 @@ class ImportIndicatorTests(TestCase):
     def test_updates_audit_log_appropriately(self):
         banana_country = CountryFactory(country="BananaTown", code="BT")
         cat_country = CountryFactory(country="CatLand", code="XT")
-        tola_user = NewTolaUserFactory(country=self.country)
+        tola_user = TolaUserFactory(country=self.country)
         count = UM.objects.count()
         # doesn't update audit log with no changes:
         with mock.patch('tola.pipeline.logger') as log_mock:
@@ -261,4 +261,3 @@ class ImportIndicatorTests(TestCase):
             self.assertTrue(um2.system_generated_update)
         del tu_reload
         count = UM.objects.count()
-            

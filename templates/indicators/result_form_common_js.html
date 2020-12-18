@@ -116,16 +116,20 @@
 
     function validate_achieved() {
         const actual = $("#id_achieved").numericVal();
-        // Can't test for !actual because it evaluates to true when value is 0.  isNumeric should be sufficient
-        if (!$.isNumeric(actual) || actual < 0) {
+        if ($.isEmptyObject($('#id_achieved').val())) {
             $("#div_id_achieved").addClass('has-error');
             $("#id_achieved").addClass('is-invalid');
-            $("#hint_id_achieved").text("{% trans 'Please enter a number with no letters or symbols.'|escapejs %}");
+            $("#validation_id_achieved").html("<small>{% trans 'Please complete this field.'|escapejs %}</small>");
+        // Can't test for !actual because it evaluates to true when value is 0.  isNumeric should be sufficient
+        } else if (!$.isNumeric(actual) || actual < 0) {
+            $("#div_id_achieved").addClass('has-error');
+            $("#id_achieved").addClass('is-invalid');
+            $("#validation_id_achieved").text("{% trans 'Please enter a number with no letters or symbols.'|escapejs %}");
             return false;
         } else {
             $("#div_id_achieved").removeClass('has-error');
             $("#id_achieved").removeClass('is-invalid');
-            $("#hint_id_achieved").text(" ");
+            $("#validation_id_achieved").text(" ");
             return true;
         }
     }
@@ -487,7 +491,7 @@
             return Promise.reject('failed_validation')
         }
     }
-    
+
     function createSaveAndCloseHandler(e) {
         // user clicks "save and close" on create form first prevent default submit:
         e.preventDefault();
@@ -500,7 +504,7 @@
             $('#indicator_results_div').modal('hide');
         }).catch(() => {});
     }
-    
+
     function createSaveAndAddAnotherHandler(e) {
         // user clicks "save and add another" on create form first prevent default submit:
         e.preventDefault();
@@ -554,9 +558,9 @@
     }
 
     function cancelHandler(e) {
-        $('#indicator_results_div').modal('hide');        
+        $('#indicator_results_div').modal('hide');
     }
-    
+
     function addFormActionButtonHandlers() {
         // called on document load to add handlers to buttons
         $('#result-submit-update').on('click', updateSaveChangesHandler);

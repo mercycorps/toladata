@@ -1,0 +1,140 @@
+// Jest Snapshot v1, https://goo.gl/fbAQLP
+
+exports[`Sites List shows add site button 1`] = `
+Array [
+  <h3>
+    Sites
+  </h3>,
+  <ul
+    className="list-unstyled"
+  >
+    <li>
+      <a
+        href="/workflow/siteprofile_list/undefined/0/"
+      >
+        View program sites
+      </a>
+    </li>
+    <li
+      className="pt-2"
+    >
+      <a
+        className="btn-link text-success"
+        href="/workflow/siteprofile_add/"
+      >
+        <svg
+          aria-hidden="true"
+          className="svg-inline--fa fa-plus-circle fa-w-16 "
+          data-icon="plus-circle"
+          data-prefix="fas"
+          focusable="false"
+          role="img"
+          style={Object {}}
+          viewBox="0 0 512 512"
+          xmlns="http://www.w3.org/2000/svg"
+        >
+          <path
+            d="M256 8C119 8 8 119 8 256s111 248 248 248 248-111 248-248S393 8 256 8zm144 276c0 6.6-5.4 12-12 12h-92v92c0 6.6-5.4 12-12 12h-56c-6.6 0-12-5.4-12-12v-92h-92c-6.6 0-12-5.4-12-12v-56c0-6.6 5.4-12 12-12h92v-92c0-6.6 5.4-12 12-12h56c6.6 0 12 5.4 12 12v92h92c6.6 0 12 5.4 12 12v56z"
+            fill="currentColor"
+            style={Object {}}
+          />
+        </svg>
+         
+        Add site
+      </a>
+    </li>
+  </ul>,
+]
+`;
+
+exports[`Sites List shows no sites message when there are no sites 1`] = `
+Array [
+  <h3>
+    Sites
+  </h3>,
+  <ul
+    className="list-unstyled"
+  >
+    <li
+      className="text-muted"
+    >
+      There are no program sites.
+    </li>
+    <li
+      className="pt-2"
+    >
+      <a
+        className="btn-link text-success"
+        href="/workflow/siteprofile_add/"
+      >
+        <svg
+          aria-hidden="true"
+          className="svg-inline--fa fa-plus-circle fa-w-16 "
+          data-icon="plus-circle"
+          data-prefix="fas"
+          focusable="false"
+          role="img"
+          style={Object {}}
+          viewBox="0 0 512 512"
+          xmlns="http://www.w3.org/2000/svg"
+        >
+          <path
+            d="M256 8C119 8 8 119 8 256s111 248 248 248 248-111 248-248S393 8 256 8zm144 276c0 6.6-5.4 12-12 12h-92v92c0 6.6-5.4 12-12 12h-56c-6.6 0-12-5.4-12-12v-92h-92c-6.6 0-12-5.4-12-12v-56c0-6.6 5.4-12 12-12h92v-92c0-6.6 5.4-12 12-12h56c6.6 0 12 5.4 12 12v92h92c6.6 0 12 5.4 12 12v56z"
+            fill="currentColor"
+            style={Object {}}
+          />
+        </svg>
+         
+        Add site
+      </a>
+    </li>
+  </ul>,
+]
+`;
+
+exports[`Sites List shows view sites link when there are sites 1`] = `
+Array [
+  <h3>
+    Sites
+  </h3>,
+  <ul
+    className="list-unstyled"
+  >
+    <li>
+      <a
+        href="/workflow/siteprofile_list/undefined/0/"
+      >
+        View program sites
+      </a>
+    </li>
+    <li
+      className="pt-2"
+    >
+      <a
+        className="btn-link text-success"
+        href="/workflow/siteprofile_add/"
+      >
+        <svg
+          aria-hidden="true"
+          className="svg-inline--fa fa-plus-circle fa-w-16 "
+          data-icon="plus-circle"
+          data-prefix="fas"
+          focusable="false"
+          role="img"
+          style={Object {}}
+          viewBox="0 0 512 512"
+          xmlns="http://www.w3.org/2000/svg"
+        >
+          <path
+            d="M256 8C119 8 8 119 8 256s111 248 248 248 248-111 248-248S393 8 256 8zm144 276c0 6.6-5.4 12-12 12h-92v92c0 6.6-5.4 12-12 12h-56c-6.6 0-12-5.4-12-12v-92h-92c-6.6 0-12-5.4-12-12v-56c0-6.6 5.4-12 12-12h92v-92c0-6.6 5.4-12 12-12h56c6.6 0 12 5.4 12 12v92h92c6.6 0 12 5.4 12 12v56z"
+            fill="currentColor"
+            style={Object {}}
+          />
+        </svg>
+         
+        Add site
+      </a>
+    </li>
+  </ul>,
+]
+`;

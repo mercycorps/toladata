@@ -1,8 +1,8 @@
 const webpack = require('webpack');
-const merge = require('webpack-merge');
+const { merge } = require('webpack-merge');
 const common = require('./webpack.common.js');
 const BundleTracker = require('webpack-bundle-tracker');
-const CleanWebpackPlugin = require('clean-webpack-plugin');
+const { CleanWebpackPlugin } = require('clean-webpack-plugin');
 const path = require('path');
 
 
@@ -22,7 +22,7 @@ module.exports = merge(common, {
         new BundleTracker({path: __dirname, filename: 'webpack-stats-dev.json'}),
 
         // delete all files in build dir automatically
-        new CleanWebpackPlugin(['build/dev-dist/']),
+        new CleanWebpackPlugin(),
 
     ],
 
