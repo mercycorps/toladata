@@ -41,18 +41,8 @@
             {% endif %}
             </ul>
         </section>
-        <section class="sidebar__detail">
-            <h3>{% trans "Sites" %}</h3>
-            <ul class="list-unstyled">
-                {% if program.site_count > 0 %}
-                    <li><a href="{% url 'siteprofile_list' program.pk 0 %}">{% trans "View program sites" %}</a></li>
-                {% else %}
-                    <li class="text-muted">{% trans "There are no program sites." %}</li>
-                {% endif %}
-                {% if not readonly %}
-                    <li class="pt-2"><a href="{% url 'siteprofile_add' %}" class="btn-link text-success"><i class="fas fa-plus-circle"></i> {% trans "Add site" %}</a></li>
-                {% endif %}
-            </ul>
+        <section class="sidebar__detail" id="sites-sidebar">
+            {# this is a react mount point for a reactive sites list #}
         </section>
         <section class="sidebar__detail">
             <h3>{% trans "Pinned reports" %}</h3>

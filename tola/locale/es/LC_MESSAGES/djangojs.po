@@ -6,8 +6,8 @@ msgid ""
 msgstr ""
 "Project-Id-Version: \n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2020-12-15 13:16-0800\n"
-"PO-Revision-Date: 2020-11-23 14:38+0100\n"
+"POT-Creation-Date: 2020-12-18 11:12-0800\n"
+"PO-Revision-Date: 2020-12-18 11:17-0800\n"
 "Last-Translator: \n"
 "Language-Team: \n"
 "Language: es\n"
@@ -15,7 +15,7 @@ msgstr ""
 "Content-Type: text/plain; charset=UTF-8\n"
 "Content-Transfer-Encoding: 8bit\n"
 "Plural-Forms: nplurals=2; plural=(n != 1);\n"
-"X-Generator: Eazy Po 0.9.5.3\n"
+"X-Generator: Poedit 2.4.2\n"
 
 #: js/base.js:336
 msgid "Success"
@@ -614,7 +614,9 @@ msgid "Hide columns"
 msgstr "Ocultar columnas"
 
 #. Translators: labels sites that a data could be collected at */
+#. Translators: heading for actions related to Sites as in locations connected to results
 #: js/pages/iptt_report/components/sidebar/reportFilter.js:72
+#: js/pages/program_page/components/sitesList.js:12
 msgid "Sites"
 msgstr "Sitios"
 
@@ -1030,6 +1032,21 @@ msgstr "Agregar objetivos"
 #: js/pages/program_page/components/resultsTable.js:318
 msgid "Add result"
 msgstr "Agregar resultado"
+
+#. Translators: a link that leads to a list of all sites (locations) associated with a program
+#: js/pages/program_page/components/sitesList.js:19
+msgid "View program sites"
+msgstr "Ver sitios del programa"
+
+#. Translators: indicates that no sites (locations) are associated with a program
+#: js/pages/program_page/components/sitesList.js:25
+msgid "There are no program sites."
+msgstr "No existen sitios del programa."
+
+#. Translators: a link to add a new site (location)
+#: js/pages/program_page/components/sitesList.js:33
+msgid "Add site"
+msgstr "Agregar sitio"
 
 #: js/pages/program_page/pinned_reports.js:9
 msgid ""
@@ -3468,12 +3485,6 @@ msgstr "usuarios"
 #~ "Para ver los resultados del programa, actualice sus objetivos periódicos "
 #~ "para que coincidan con las fechas de inicio y finalización de sus "
 #~ "informes:"
-
-#~ msgid "View program documents"
-#~ msgstr "Ver documentos del programa"
-
-#~ msgid "There are no program sites."
-#~ msgstr "No existen sitios del programa."
 
 #~ msgid "Pinned reports"
 #~ msgstr "Informes fijados"

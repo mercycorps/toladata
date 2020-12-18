@@ -2,8 +2,8 @@ msgid ""
 msgstr ""
 "Project-Id-Version: \n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2020-12-15 13:16-0800\n"
-"PO-Revision-Date: 2020-12-08 10:46-0800\n"
+"POT-Creation-Date: 2020-12-18 11:12-0800\n"
+"PO-Revision-Date: 2020-12-18 11:16-0800\n"
 "Last-Translator: \n"
 "Language-Team: \n"
 "Language: fr\n"
@@ -611,7 +611,9 @@ msgid "Hide columns"
 msgstr "Masquer les colonnes"
 
 #. Translators: labels sites that a data could be collected at */
+#. Translators: heading for actions related to Sites as in locations connected to results
 #: js/pages/iptt_report/components/sidebar/reportFilter.js:72
+#: js/pages/program_page/components/sitesList.js:12
 msgid "Sites"
 msgstr "Sites"
 
@@ -1029,6 +1031,21 @@ msgstr "Ajouter des cibles"
 #: js/pages/program_page/components/resultsTable.js:318
 msgid "Add result"
 msgstr "Ajouter un résultat"
+
+#. Translators: a link that leads to a list of all sites (locations) associated with a program
+#: js/pages/program_page/components/sitesList.js:19
+msgid "View program sites"
+msgstr "Afficher les sites du programme"
+
+#. Translators: indicates that no sites (locations) are associated with a program
+#: js/pages/program_page/components/sitesList.js:25
+msgid "There are no program sites."
+msgstr "Il n’y a aucun site pour le programme."
+
+#. Translators: a link to add a new site (location)
+#: js/pages/program_page/components/sitesList.js:33
+msgid "Add site"
+msgstr "Ajouter un site"
 
 #: js/pages/program_page/pinned_reports.js:9
 msgid ""
