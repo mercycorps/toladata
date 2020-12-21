@@ -83,8 +83,6 @@ export const forProgramPage = (
         let fullName = '';
         if (this.level) {
             fullName += this.level + ' ';
-        } else if (this.oldLevelDisplay) {
-            fullName += this.oldLevelDisplay + ' ';
         }
         if (this.number) {
             fullName += this.number + ' ';
