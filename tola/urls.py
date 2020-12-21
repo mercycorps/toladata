@@ -14,7 +14,7 @@ from tola_management.countryadmin import (
     CountryDisaggregationViewSet,
 )
 from django.conf.urls import include, url
-# Import i18n_patterns
+
 from django.views.i18n import JavaScriptCatalog
 from django.views.generic import TemplateView
 from django.contrib import admin

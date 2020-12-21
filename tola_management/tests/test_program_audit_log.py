@@ -1,4 +1,5 @@
 import json
+import logging
 from datetime import date
 from decimal import Decimal
 from django import test
@@ -272,7 +273,7 @@ class TestIndicatorAuditLog(test.TestCase):
         cls.country = w_factories.CountryFactory(country="Test Country", code="TC")
         cls.program = w_factories.RFProgramFactory(name="Test Program")
         cls.program.country.add(cls.country)
-        cls.tola_user = w_factories.NewTolaUserFactory(country=cls.country)
+        cls.tola_user = w_factories.TolaUserFactory(country=cls.country)
         w_factories.grant_country_access(cls.tola_user, cls.country, COUNTRY_ROLE_CHOICES[1][0])
 
     def test_indicator_create_is_logged(self):
@@ -406,6 +407,8 @@ class TestIndicatorAuditLog(test.TestCase):
         old_indicator_values = indicator.logged_fields
         indicator.is_cumulative = False
         indicator.save()
+        # silence logging for validation errors:
+        logging.disable(logging.CRITICAL)
         with self.assertRaises(ValidationError) as ve:
             ProgramAuditLog.log_indicator_updated(
                 self.tola_user.user,
@@ -423,6 +426,8 @@ class TestIndicatorAuditLog(test.TestCase):
                 indicator.logged_fields,
             )
         self.assertEqual(ve2.exception.messages, ["Rationale required when no options selected"])
+        # re-enable logging:
+        logging.disable(logging.NOTSET)
 
     def test_audit_log_options_display(self):
         options = ProgramAuditLog.reason_for_change_options()
@@ -455,7 +460,8 @@ class TestIndicatorAuditLog(test.TestCase):
         self.assertContains(response, 'reason_for_change_options')
 
     def test_audit_log_captures_event_name_change(self):
-        indicator = i_factories.RFIndicatorFactory(program=self.program, target_frequency=Indicator.EVENT, targets=True)
+        indicator = i_factories.RFIndicatorFactory(program=self.program, target_frequency=Indicator.EVENT,
+                                                   targets=True)
         prev_entry = indicator.logged_fields
         target = indicator.periodictargets.all().first()
         target.period = "Different event name"
@@ -484,7 +490,7 @@ class TestAuditLogRationaleSelectionsDisplay(test.TestCase):
         cls.country = w_factories.CountryFactory(country="Test Country", code="TC")
         cls.program = w_factories.RFProgramFactory(name="Test Program")
         cls.program.country.add(cls.country)
-        cls.tola_user = w_factories.NewTolaUserFactory(country=cls.country)
+        cls.tola_user = w_factories.TolaUserFactory(country=cls.country)
         w_factories.grant_country_access(cls.tola_user, cls.country, COUNTRY_ROLE_CHOICES[1][0])
 
     def setUp(self):

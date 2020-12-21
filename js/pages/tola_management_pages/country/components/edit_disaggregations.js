@@ -411,7 +411,7 @@ export class DisaggregationType extends React.Component {
         const managed_data = this.state;
         const retroPrograms = managed_data.id === "new" && Object.values(this.programsForRetro).length > 0 ? <RetroProgramCheckBoxWrapper
                 programs={this.programsForRetro}
-                disabled={this.state.selected_by_default !== true || this.props.formDisabled}
+                disabled={this.state.selected_by_default !== true}
                 toggleProgramViz={this.togglePrograms.bind(this)}
                 programsExpanded={this.state.programsExpanded}
                 onRetroUpdate={this.updateRetroPrograms.bind(this)}/>
@@ -426,7 +426,7 @@ export class DisaggregationType extends React.Component {
                     {disaggregation.is_archived && <span className="text-muted font-weight-bold ml-2">(Archived)</span>}
                     {expanded && (
                         <form className="form card card-body bg-white">
-                            <fieldset className="disagg-form__fieldset" disabled={this.props.formDisabled}>
+                            <fieldset className="disagg-form__fieldset">
                                 <div className="form-group">
                                     <label className="label--required" htmlFor="disaggregation-type-input">
                                         {/* # Translators: Form field label for the disaggregation name.*/}
@@ -480,7 +480,7 @@ export class DisaggregationType extends React.Component {
                                     <DisaggregationCategoryList
                                         id={ disaggregation.id }
                                         categories={ this.state.labels }
-                                        disabled={ disaggregation.is_archived || this.props.formDisabled}
+                                        disabled={ disaggregation.is_archived}
                                         updateLabelOrder={ this.updateLabelOrder.bind(this) }
                                         updateLabel={ this.updateLabel.bind(this) }
                                         deleteLabel={ this.deleteLabel.bind(this) }
@@ -503,7 +503,7 @@ export class DisaggregationType extends React.Component {
                                     </div>
                                     <div className="right-buttons">
                                     {(disaggregation.is_archived) ? (
-                                        <a tabIndex="0" onClick={unarchiveAction} className={classNames("btn", "btn-link", {disabled: this.props.formDisabled})}>
+                                        <a tabIndex="0" onClick={unarchiveAction} className="btn btn-link">
                                             <i className="fas fa-archive"/>{
                                                 // # Translators: this is a verb (on a button that archives the selected item)
                                                 gettext('Unarchive disaggregation')
@@ -515,7 +515,7 @@ export class DisaggregationType extends React.Component {
                                                 <i className="fas fa-trash"/>{gettext('Delete disaggregation')}
                                             </a>
                                             ) : (
-                                            <a tabIndex="0" onClick={archiveAction} className={classNames("btn", "btn-link", {disabled: this.props.formDisabled})}>
+                                            <a tabIndex="0" onClick={archiveAction} className="btn btn-link">
                                                 <i className="fas fa-archive"/>{
                                                     // # Translators: this is a verb (on a button that archives the selected item)
                                                     gettext('Archive disaggregation')
@@ -547,7 +547,6 @@ export default class EditDisaggregations extends React.Component {
             is_dirty: false,
             formReset: null,
             origSelectedByDefault: false,
-            disaggTypeFormDisabled: false,
         }
     }
 
@@ -603,7 +602,6 @@ export default class EditDisaggregations extends React.Component {
 
     onSaveChangesPress(data) {
         if ( this.state.origSelectedByDefault !== data.selected_by_default ){
-            this.setState({disaggTypeFormDisabled: true})
             let preamble = ""
             if (data.selected_by_default && data.hasOwnProperty('retroPrograms')) {
                 // # Translators:  This is a warning popup when the user tries to do something that has broader effects than they might anticipate
@@ -631,11 +629,9 @@ export default class EditDisaggregations extends React.Component {
                 message_text: gettext("Are you sure you want to continue?"),
                 notice_type: "notice",
                 showCloser: true,
-                on_submit: () => {
-                    this.setState({disaggTypeFormDisabled: false});
-                    this.saveDisaggregation(data);
-                },
-                on_cancel: () => {this.setState({disaggTypeFormDisabled: false})}
+                modal: true,
+                on_submit: () => this.saveDisaggregation(data),
+                // on_cancel: () => {}
             })
         }
         else{
@@ -695,7 +691,6 @@ export default class EditDisaggregations extends React.Component {
                         clearErrors={this.props.clearErrors}
                         onIsDirtyChange={(is_dirty) => this.handleDirtyUpdate(is_dirty)}
                         countryName={this.props.countryName}
-                        formDisabled={this.state.disaggTypeFormDisabled}
                     />
                 )}
             </div>

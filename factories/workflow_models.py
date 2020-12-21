@@ -49,7 +49,7 @@ class CountryFactory(DjangoModelFactory):
         model = CountryM
         django_get_or_create = ('code',)
 
-    country = fuzzy.FuzzyText()
+    country = Sequence(lambda n: f'Country {n}')
     description = Faker('paragraph')
 
     @lazy_attribute_sequence
@@ -58,15 +58,6 @@ class CountryFactory(DjangoModelFactory):
         if n // 26 >= 26:
             raise ValueError('Too many countries to store in ISO code, reached sequence {}'.format(n))
         return '{}{}'.format(string.ascii_uppercase[n//26], string.ascii_uppercase[n % 26])
-
-
-# CountryFactory only creates one country and then just keeps returning it
-class NewCountryFactory(DjangoModelFactory):
-    class Meta:
-        model = CountryM
-
-    country = Sequence(lambda n: f'Country {chr(n+65)}')
-    code = Sequence(lambda n: f'{chr(n+65)}{chr(n+65)}')
 
 
 class CountryAccessFactory(DjangoModelFactory):
@@ -106,32 +97,22 @@ class TolaUserFactory(DjangoModelFactory):
         model = TolaUserM
         django_get_or_create = ('user',)
 
-    user = SubFactory(UserFactory)
-    name = LazyAttribute(lambda o: o.user.first_name + " " + o.user.last_name)
-    organization = SubFactory(OrganizationFactory, id=1)
-    country = SubFactory(CountryFactory, country='United States', code='US')
-
-
-class NewTolaUserFactory(DjangoModelFactory):
-    class Meta:
-        model = TolaUserM
-
     class Params:
         mc_staff = True
         superadmin = False
         active = True
 
     name = Sequence(lambda n: f"tola_user_{n}")
-    organization = Maybe(
-        'mc_staff',
-        yes_declaration=SubFactory(OrganizationFactory, id=1, name="MC Org"),
-        no_declaration=SubFactory(OrganizationFactory, name=Faker('company'))
-    )
     user = SubFactory(
         UserOnlyFactory,
         username=SelfAttribute('..name'),
         is_superuser=SelfAttribute('..superadmin'),
         is_active=SelfAttribute('..active')
+    )
+    organization = Maybe(
+        'mc_staff',
+        yes_declaration=SubFactory(OrganizationFactory, id=1, name="MC Org"),
+        no_declaration=SubFactory(OrganizationFactory, name=Faker('company'))
     )
     country = SubFactory(CountryFactory)
 

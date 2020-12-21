@@ -7,7 +7,7 @@ from django.urls import reverse
 from factories.workflow_models import (
     RFProgramFactory,
     CountryFactory,
-    NewTolaUserFactory,
+    TolaUserFactory,
     grant_program_access,
     grant_country_access,
     PROGRAM_ROLE_CHOICES,
@@ -42,32 +42,32 @@ class TestRFExportDownloadPermissions(test.TestCase):
         out_program = RFProgramFactory()
         out_program.country.set([country])
         # superuser should have access:
-        superuser = NewTolaUserFactory(superadmin=True)
+        superuser = TolaUserFactory(superadmin=True)
         self.client.force_login(superuser.user)
         response = self.client.get(get_export_url(program))
         self.assertEqual(response.status_code, 200)
         self.client.logout()
         # users with permission should have access:
-        user_1 = NewTolaUserFactory(mc_staff=True, superadmin=False)
+        user_1 = TolaUserFactory(mc_staff=True, superadmin=False)
         grant_country_access(user_1, country, role=COUNTRY_ROLE_CHOICES[0][0])
-        user_2 = NewTolaUserFactory(mc_staff=True, superadmin=False)
+        user_2 = TolaUserFactory(mc_staff=True, superadmin=False)
         grant_country_access(user_2, country, role=COUNTRY_ROLE_CHOICES[1][0])
-        user_3 = NewTolaUserFactory(mc_staff=False, superadmin=False)
+        user_3 = TolaUserFactory(mc_staff=False, superadmin=False)
         grant_program_access(user_3, program, country, role=PROGRAM_ROLE_CHOICES[0][0])
-        user_4 = NewTolaUserFactory(mc_staff=False, superadmin=False)
+        user_4 = TolaUserFactory(mc_staff=False, superadmin=False)
         grant_program_access(user_4, program, country, role=PROGRAM_ROLE_CHOICES[1][0])
-        user_5 = NewTolaUserFactory(mc_staff=False, superadmin=False)
+        user_5 = TolaUserFactory(mc_staff=False, superadmin=False)
         grant_program_access(user_5, program, country, role=PROGRAM_ROLE_CHOICES[2][0])
         for user in [user_1, user_2, user_3, user_4, user_5]:
             self.client.force_login(user.user)
             response = self.client.get(get_export_url(program))
             self.assertEqual(response.status_code, 200)
             self.client.logout()
-        out_user_1 = NewTolaUserFactory(mc_staff=True, superadmin=False)
+        out_user_1 = TolaUserFactory(mc_staff=True, superadmin=False)
         grant_country_access(out_user_1, out_country, role=COUNTRY_ROLE_CHOICES[0][0])
-        out_user_2 = NewTolaUserFactory(mc_staff=True, superadmin=False)
+        out_user_2 = TolaUserFactory(mc_staff=True, superadmin=False)
         grant_country_access(out_user_1, out_country, role=COUNTRY_ROLE_CHOICES[1][0])
-        out_user_3 = NewTolaUserFactory(mc_staff=False, superadmin=False)
+        out_user_3 = TolaUserFactory(mc_staff=False, superadmin=False)
         grant_program_access(out_user_3, out_program, country, role=PROGRAM_ROLE_CHOICES[0][0])
         for user in [out_user_1, out_user_2, out_user_3]:
             self.client.force_login(user.user)
@@ -80,6 +80,7 @@ class TestRFExportStandardMCTiers(test.TestCase):
 
     @classmethod
     def setUpTestData(cls):
+        CountryFactory.reset_sequence()
         cls.program_name = "Standard Program Name"
         cls.program = RFProgramFactory(tiers=True, levels=False, name=cls.program_name)
         cls.goal_level = LevelFactory(program=cls.program, parent=None, name="Goal Level", customsort=1)
@@ -107,7 +108,7 @@ class TestRFExportStandardMCTiers(test.TestCase):
             LevelFactory(program=cls.program, parent=cls.output_levels[3], name="Eleventh Activity", customsort=2),
             LevelFactory(program=cls.program, parent=cls.output_levels[3], name="Twelfth Activity", customsort=3),
         ]
-        cls.superuser = NewTolaUserFactory(superadmin=True)
+        cls.superuser = TolaUserFactory(superadmin=True)
 
     def setUp(self):
         self.client.force_login(user=self.superuser.user)
@@ -237,7 +238,7 @@ class TestCustomMultiTieredRFExport(test.TestCase, RFExportTests):
                 program=cls.program, customsort=2, name="Child of Bonus Tier 7 2", parent=cls.new_tier_7_level)
         ]
         assert cls.program.levels.count() == 14
-        cls.superuser = NewTolaUserFactory(superadmin=True)
+        cls.superuser = TolaUserFactory(superadmin=True)
 
     def setUp(self):
         self.client.force_login(user=self.superuser.user)
@@ -273,7 +274,7 @@ class TestShortTierListExport(test.TestCase, RFExportTests):
     @classmethod
     def setUpTestData(cls):
         cls.program = RFProgramFactory(tiers=[f"Tîér {x}" for x in range(1, 4)], levels=2)
-        cls.superuser = NewTolaUserFactory(superadmin=True)
+        cls.superuser = TolaUserFactory(superadmin=True)
 
     def setUp(self):
         self.client.force_login(user=self.superuser.user)
@@ -306,9 +307,9 @@ class TestTranslations(test.TestCase):
     @classmethod
     def setUpTestData(cls):
         cls.program = RFProgramFactory(tiers=True, levels=2)
-        cls.user_en = NewTolaUserFactory(superadmin=True)
-        cls.user_es = NewTolaUserFactory(superadmin=True, language='es')
-        cls.user_fr = NewTolaUserFactory(superadmin=True, language='fr')
+        cls.user_en = TolaUserFactory(superadmin=True)
+        cls.user_es = TolaUserFactory(superadmin=True, language='es')
+        cls.user_fr = TolaUserFactory(superadmin=True, language='fr')
 
     def setUp(self):
         self.client.force_login(user=self.user_en.user)
