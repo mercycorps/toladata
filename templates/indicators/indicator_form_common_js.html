@@ -1028,6 +1028,7 @@
             const $div = $(`#div_id_${fieldName}`);
             let errMsg = null;
             if ($field.val().length > thisLength) {
+                {# Translators: on a form field, as a warning when a user has entered too much text.  %s replaced with a number (e.g. 500) #}
                 errMsg = interpolate("{% trans 'Please enter fewer than %s characters.'|escapejs %}", [thisLength]);
             }
             if (errMsg) {
