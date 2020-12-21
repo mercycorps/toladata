@@ -30,6 +30,7 @@ from safedelete.managers import SafeDeleteManager
 from safedelete.queryset import SafeDeleteQueryset
 from django_mysql.models import ListCharField
 from tola.util import usefully_normalize_decimal
+from multiselectfield import MultiSelectField
 
 from workflow.models import (
     Program, Sector, SiteProfile, Country, TolaUser
@@ -960,11 +961,12 @@ class IndicatorTargetsMixin:
         )
 
     def annotate_most_recent_complete(self):
+        from indicators.queries import utils as query_utils
         return self.annotate(
             most_recent_completed_target_end_date=models.Subquery(
                 PeriodicTarget.objects.filter(
                     indicator=models.OuterRef('pk'),
-                    end_date__lt=date.today()
+                    end_date__lt=query_utils.UTCNow()
                 ).order_by('-end_date').values('end_date')[:1],
                 output_field=models.DateField()
             ),
@@ -1080,13 +1082,17 @@ class Indicator(SafeDeleteModel):
         # Translators:  describes a user-selectable option in a list of things that users can do to ensure program quality
         ('data_collection', _('Data collection training and piloting')),
         # Translators:  describes a user-selectable option in a list of things that users can do to ensure program quality
-        ('data_cross_checks', _('Data cross checks or triangulation')),
+        ('data_cross_checks', _('Data cross checks or triangulation of data sources')),
         # Translators:  describes a user-selectable option in a list of things that users can do to ensure program quality
         ('dqas', _('Data quality audits (DQAs)')),
         # Translators:  describes a user-selectable option in a list of things that users can do to ensure program quality
         ('data_spot_checks', _('Data spot checks')),
         # Translators:  describes a user-selectable option in a list of things that users can do to ensure program quality
         ('digital_data_collection', _('Digital data collection tools')),
+        # Translators:  describes a user-selectable option in a list of things that users can do to ensure program quality
+        ('external_evaluator', _('External evaluator or consultant')),
+        # Translators:  describes a user-selectable option in a list of things that users can do to ensure program quality
+        ('mixed_methods', _('Mixed methods')),
         # Translators:  describes a user-selectable option in a list of things that users can do to ensure program quality
         ('participatory_data_analysis', _('Participatory data analysis validation')),
         # Translators:  describes a user-selectable option in a list of things that users can do to ensure program quality
@@ -1098,11 +1104,13 @@ class Indicator(SafeDeleteModel):
         # Translators:  describes a user-selectable option in a list of things that users can do to ensure program quality
         ('regular_reviews', _('Regular indicator and data reviews')),
         # Translators:  describes a user-selectable option in a list of things that users can do to ensure program quality
-        ('shadow_audits', _('Shadow audits')),
+        ('secure_data_storage', _('Secure data storage')),
+        # Translators:  describes a user-selectable option in a list of things that users can do to ensure program quality
+        ('shadow_audits', _('Shadow audits or accompanied supervision')),
         # Translators:  describes a user-selectable option in a list of things that users can do to ensure program quality
         ('standardized_indicators', _('Standardized indicators')),
         # Translators:  describes a user-selectable option in a list of things that users can do to ensure program quality
-        ('sops', _('Standard operating procedures (SOPs)')),
+        ('sops', _('Standard operating procedures (SOPs) or protocols')),
     ]
 
     INFORMATION_USE_CHOICES = [
@@ -1345,9 +1353,17 @@ class Indicator(SafeDeleteModel):
     )
 
     quality_assurance = models.TextField(
-        max_length=500, null=True, blank=True, verbose_name=_("Quality assurance measures"),
+        max_length=500, null=True, blank=True, verbose_name=_("Data quality assurance details"),
         # Translators: this is help text for a field on an indicator setup form
-        help_text=_("Describe any quality assurance measures specific to this indicator.")
+        help_text=_("Provide any additional details about how data quality will be ensured for this specific "
+                    "indicator. Additional details may include specific roles and responsibilities of team members "
+                    "for ensuring data quality and/or specific data sources to be verified, reviewed, or "
+                    "triangulated, for example.")
+    )
+
+    quality_assurance_techniques = MultiSelectField(
+        null=True, blank=True, verbose_name=_("Data quality assurance techniques"), choices=QUALITY_ASSURANCE_CHOICES,
+        help_text=_("Select the data quality assurance techniques that will be applied to this specific indicator.")
     )
 
     data_issues = models.TextField(
