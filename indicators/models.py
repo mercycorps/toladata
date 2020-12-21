@@ -1263,7 +1263,7 @@ class Indicator(SafeDeleteModel):
     )
 
     rationale_for_target = models.TextField(
-        _("Rationale for target"), max_length=255, null=True, blank=True,
+        _("Rationale for target"), max_length=500, null=True, blank=True,
         # Translators: this is help text for a field on an indicator setup form
         help_text=_("Provide an explanation for any target value/s assigned to this indicator. You might "
                     "include calculations and any historical or secondary data sources used to estimate targets.")
