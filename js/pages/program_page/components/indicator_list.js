@@ -113,7 +113,7 @@ export class IndicatorFilter extends React.Component{
         const indicatorSelectOptions = this.props.rootStore.allIndicators.map(i => {
             return {
                 value: i.pk,
-                label: i.name,
+                label: i.fullName,
             }
         });
 
