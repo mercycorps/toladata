@@ -980,7 +980,7 @@ class IndicatorTargetsMixin:
 
 class IndicatorMetricsMixin:
     qs_name = 'MetricsAnnotated'
-    annotate_methods = ['annotate_reporting', 'annotate_scope', 'annotate_counts', 'annotate_metrics']
+    annotate_methods = ['annotate_reporting', 'annotate_scope', 'annotate_counts', 'annotate_metrics', 'annotate_kpi']
 
     def annotate_reporting(self):
         from indicators.queries import utils as query_utils
@@ -1012,6 +1012,17 @@ class IndicatorMetricsMixin:
             has_all_targets_defined=query_utils.indicator_all_targets_defined_annotation(),
             lop_actual=query_utils.indicator_lop_actual_annotation(),
             lop_percent_met=query_utils.indicator_lop_percent_met_annotation()
+        )
+
+    def annotate_kpi(self):
+        """annotation to replace the former key_performance_indicator field to avoid extra lookups"""
+        return self.annotate(
+            is_key_performance_indicator=models.Exists(
+                IndicatorType.objects.filter(
+                    indicator=models.OuterRef('pk'),
+                    indicator_type="Key Performance Indicator (KPI)"
+                )
+            )
         )
 
 class Indicator(SafeDeleteModel):
@@ -1395,11 +1406,6 @@ class Indicator(SafeDeleteModel):
         help_text=_("Classifying indicators by sector allows us to filter and analyze related sets of indicators.")
     )
 
-    key_performance_indicator = models.BooleanField(
-        verbose_name=_("Key Performance Indicator for this program?"),
-        default=False, help_text=" "
-    )
-
     external_service_record = models.ForeignKey(
         ExternalServiceRecord, verbose_name=_("External Service ID"),
         blank=True, null=True, on_delete=models.SET_NULL, help_text=" "
@@ -1500,6 +1506,11 @@ class Indicator(SafeDeleteModel):
     def disaggregations(self):
         disaggregations = self.disaggregation.all()
         return self.SEPARATOR.join([x.disaggregation_type for x in disaggregations])
+
+    @property
+    def key_performance_indicator(self):
+        """transition method for key_performance_indicator field removal - may cause unnecessary db calls"""
+        return self.indicator_type.filter(indicator_type="Key Performance Indicator (KPI)").exists()
 
     @property
     def logged_fields(self):

@@ -449,6 +449,7 @@ export class CountryStore {
             include_rationale: false,
             rationale_required: false,
             showCloser: true,
+            modal: true,
             notice_type: 'error',
             on_submit: () => {
                 if (id=='new') {
@@ -484,6 +485,7 @@ export class CountryStore {
             include_rationale: false,
             rationale_required: false,
             notice_type: 'notice',
+            modal: true,
             showCloser: true,
             on_submit: () => {
                 this.api.deleteDisaggregation(id).then(response => {
@@ -513,6 +515,7 @@ export class CountryStore {
             // # Translators: This is a confirmation prompt to confirm a user wants to unarchive an item
             message_text: gettext("Are you sure you want to continue?"),
             notice_type: 'notice',
+            modal: true,
             showCloser: true,
             on_submit: () => {
                 this.api.partialUpdateDisaggregation(id, {is_archived: false}).then(response => {

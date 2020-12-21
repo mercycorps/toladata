@@ -235,6 +235,9 @@ export class IndicatorListTable extends React.Component {
                                 <FontAwesomeIcon icon={program.isExpanded(indicator.pk) ? 'caret-down' : 'caret-right'} />
                                 <strong>{ indicator.number ? indicator.number + ':' : '' }</strong>&nbsp;
                                 <span className="indicator_name">{ indicator.name }</span>
+                            {indicator.isKeyPerformanceIndicator &&
+                            <span className="kpi-badge badge badge-pill">KPI</span>
+                            }
                             </a>
                             {displayUnassignedWarning &&
                                 <span className="text-danger ml-3"><i className="fas fa-bullseye"/> {
@@ -248,9 +251,7 @@ export class IndicatorListTable extends React.Component {
                                         gettext('Indicator missing targets')
                                 }</span>
                             }
-                            {indicator.isKeyPerformanceIndicator &&
-                            <span className="badge">KPI</span>
-                            }
+
 
                             {targetPeriodLastEndDate && program.reportingPeriodEnd > targetPeriodLastEndDate &&
                             <a href={`/indicators/indicator_update/${indicator.pk}/`}

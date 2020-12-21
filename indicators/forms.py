@@ -11,6 +11,7 @@ from workflow.models import (
     Sector,
 )
 from tola.util import getCountry
+from tola.l10n_utils import str_without_diacritics
 from tola.forms import NonLocalizedDecimalField
 from tola_management.models import AuditLogRationaleSelection
 
@@ -292,7 +293,12 @@ class IndicatorForm(forms.ModelForm):
         # sort choices alphabetically again (to provide choices sorted in translated language)
         self.fields['quality_assurance_techniques'].choices = sorted(
             self.fields['quality_assurance_techniques'].choices,
-            key=operator.itemgetter(1)
+            key=lambda choice: str_without_diacritics(choice[1])
+        )
+
+        self.fields['indicator_type'].choices = sorted(
+            self.fields['indicator_type'].choices,
+            key=lambda choice: str_without_diacritics(choice[1])
         )
 
         allowed_countries = [
