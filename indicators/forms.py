@@ -226,10 +226,19 @@ class IndicatorForm(forms.ModelForm):
             lop_stripped = lop_stripped.rstrip('0').rstrip('.') if '.' in lop_stripped else lop_stripped
             kwargs['initial']['lop_target'] = lop_stripped
 
+
         self.programval = kwargs.pop('program')
         self.prefilled_level = kwargs.pop('level') if 'level' in kwargs else False
 
         super(IndicatorForm, self).__init__(*args, **kwargs)
+
+        # per mercycorps/TolaActivity#2452 remove textarea max length validation to provide a more
+        # user-friendly js-based validation (these textarea checks aren't enforced at db-level anyway)
+        for field in ['name', 'definition', 'justification', 'rationale_for_target',
+                      'means_of_verification', 'data_collection_method', 'data_points',
+                      'responsible_person', 'method_of_analysis', 'information_use',
+                      'quality_assurance', 'data_issues', 'indicator_changes', 'comments']:
+            self.fields[field].widget.attrs.pop('maxlength', None)
 
         # program_display here is to display the program without interfering in the logic that
         # assigns a program to an indicator (and doesn't update it) - but it looks like other fields
