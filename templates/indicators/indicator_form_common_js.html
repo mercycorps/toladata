@@ -1014,6 +1014,12 @@
         }
     }
 
+    /*
+     * Higher-order function to automate validation internals for a length-validated textarea
+     * Takes the field name (i.e. "justification") and max length (i.e. 400) and returns a validator for
+     * that field, which when called adds invalid classes/markings/labels, and returns false if not valid
+     * called both on the keyup event listeners below, and as part of whole-form validation
+     */
     function getTextAreaLengthValidator(fieldName, length) {
         function validateField(e) {
             const thisLength = length;
@@ -1378,6 +1384,11 @@
     $("#indicator_modal_content").on("keyup", "#id_data_issues", getTextAreaLengthValidator('data_issues', 500));
     $("#indicator_modal_content").on("keyup", "#id_indicator_changes", getTextAreaLengthValidator('indicator_changes', 500));
     $("#indicator_modal_content").on("keyup", "#id_comments", getTextAreaLengthValidator('comments', 4000));
+
+    $("#indicator_modal_content").on("change", "#id_indicator_type", function(e){
+        validateIndicatorType();
+    });
+
 
     $("#indicator_modal_content").on("change", "#id_baseline_na", function(e){
         $("#id_baseline").val('');
