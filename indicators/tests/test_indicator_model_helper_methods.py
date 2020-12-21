@@ -2,7 +2,12 @@ import datetime
 
 from django.test import TestCase
 
-from factories.indicators_models import IndicatorFactory, PeriodicTargetFactory
+from factories.indicators_models import (
+    IndicatorFactory,
+    PeriodicTargetFactory,
+    RFIndicatorFactory,
+    IndicatorTypeFactory
+)
 
 from indicators.models import Indicator
 from tola.test.base_classes import TestBase
@@ -57,3 +62,35 @@ class TestIndicatorGetCurrentPeriodicTarget(TestBase, TestCase):
 
     def test_current_periodic_target_accessor_none(self):
         self.assertIsNone(self.indicator.current_periodic_target(datetime.date(2016, 4, 15)))
+
+
+class TestIndicatorKPIHelperMethod(TestCase):
+    """
+    Test that if an indicator has an indicator type with a specific name, indicator.key_performance_indicator = True
+    """
+
+    def test_indicator_without_kpi_returns_false(self):
+        # verify kpi is false
+        indicator = RFIndicatorFactory()
+        self.assertFalse(indicator.key_performance_indicator)
+        # even with some unrelated indicator type it should still be falkse:
+        it = IndicatorTypeFactory(indicator_type="Test Indicator Type")
+        indicator.indicator_type.add(it)
+        indicator.save()
+        indicator.refresh_from_db()
+        self.assertFalse(indicator.key_performance_indicator)
+
+    def test_indicator_with_kpi_returns_true(self):
+        # assign the correectly named KPI type and verify kpi is true
+        indicator = RFIndicatorFactory()
+        kpi_it = IndicatorTypeFactory(indicator_type="Key Performance Indicator (KPI)")
+        indicator.indicator_type.add(kpi_it)
+        indicator.save()
+        indicator.refresh_from_db()
+        self.assertTrue(indicator.key_performance_indicator)
+        # verify even if there are other indicator types to confuse us
+        it = IndicatorTypeFactory(indicator_type="Test Indicator Type")
+        indicator.indicator_type.add(it)
+        indicator.save()
+        indicator.refresh_from_db()
+        self.assertTrue(indicator.key_performance_indicator)
