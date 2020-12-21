@@ -502,7 +502,7 @@
         nSelectedText: ' {% trans "selected" %}',
         nonSelectedText: '{% trans "None selected" %}'
     };
-    var multiselects = ['#id_objectives', '#id_strategic_objectives', '#id_indicator_type'];
+    var multiselects = ['#id_objectives', '#id_strategic_objectives'];
     multiselects.forEach(function(selectID) {
         let $select = $(selectID);
         if ($select) {
@@ -513,6 +513,17 @@
             $select.multiselect(theseOptions);
         }
     });
+
+    var noSelectAllMultiselects = ['#id_indicator_type'];
+
+    noSelectAllMultiselects.forEach(function(selectID) {
+        let $select = $(selectID);
+        if ($select) {
+            let theseOptions = Object.assign({}, multiselectOptions, {includeSelectAllOption: false});
+            $select.multiselect(theseOptions);
+        }
+    });
+
 
     var noFilterMultiselectOptions = {
         includeSelectAllOption: false,
