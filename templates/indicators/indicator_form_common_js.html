@@ -1014,6 +1014,33 @@
         }
     }
 
+    function getTextAreaLengthValidator(fieldName, length) {
+        function validateField(e) {
+            const thisLength = length;
+            const $field = $(`#id_${fieldName}`);
+            const $validation = $(`#validation_id_${fieldName}`);
+            const $div = $(`#div_id_${fieldName}`);
+            let errMsg = null;
+            if ($field.val().length > thisLength) {
+                errMsg = interpolate("{% trans 'Please enter fewer than %s characters.'|escapejs %}", [thisLength]);
+            }
+            if (errMsg) {
+                $div.removeClass("mb-3");
+                $div.addClass("marginbottom-225");
+                $field.addClass('is-invalid');
+                $validation.html(errMsg);
+                return false;
+            } else {
+                $field.removeClass('is-invalid');
+                $validation.html("");
+                $div.addClass("mb-3");
+                $div.removeClass("marginbottom-225");
+                return true;
+            }
+        }
+        return validateField;
+    }
+
     function validateForEmptyField(fieldName) {
         var field = $("#" + fieldName);
         if (fieldName == 'id_level') {
@@ -1146,6 +1173,8 @@
         var validationsTargetTab = true;
         var validationsSummaryTab = true;
         var validationsPerformanceTab = true;
+        var validationsDataTab = true;
+        var validationsAnalysisTab = true;
         var noMessageValidations = true;
 
         if  (validate_baseline() === false ) {
@@ -1175,7 +1204,12 @@
             validationsTargetTab = false;
         }
 
+        if (getTextAreaLengthValidator('rationale_for_target', 500)() === false) {
+            validationsTargetTab = false;
+        }
+
         if (validationsTargetTab === false) {
+            {# Translators: a message indicating which tab a user should navigate to in order to finish filling out a form #}
             validation_msgs['target'] = '{% trans "Please complete all required fields in the Targets tab."|escapejs %}';
         }
 
@@ -1190,23 +1224,72 @@
         }
 
         if (validationsSummaryTab === false) {
+            {# Translators: a message indicating which tab a user should navigate to in order to finish filling out a form #}
             validation_msgs['summary'] = '{% trans "Please complete all required fields in the Summary tab."|escapejs %}';
         }
 
         if (validateIndicatorType() === false) {
             validationsPerformanceTab = false;
         }
+        if (getTextAreaLengthValidator('definition', 4000)() === false) {
+            validationsPerformanceTab = false;
+        }
+        if (getTextAreaLengthValidator('justification', 500)() === false) {
+            validationsPerformanceTab = false;
+        }
+
 
         if (validateForEmptyField("id_old_level") === false) {
             validationsPerformanceTab = false;
         }
 
         if (validationsPerformanceTab === false) {
+            {# Translators: a message indicating which tab a user should navigate to in order to finish filling out a form #}
             validation_msgs['performance'] = '{% trans "Please complete all required fields in the Performance tab."|escapejs %}';
         }
 
+        if (getTextAreaLengthValidator('means_of_verification', 1500)() === false) {
+            validationsDataTab = false;
+        }
+        if (getTextAreaLengthValidator('data_collection_method', 2500)() === false) {
+            validationsDataTab = false;
+        }
+        if (getTextAreaLengthValidator('data_points', 500)() === false) {
+            validationsDataTab = false;
+        }
+        if (getTextAreaLengthValidator('responsible_person', 500)() === false) {
+            validationsDataTab = false;
+        }
+        if (validationsDataTab === false) {
+            {# Translators: a message indicating which tab a user should navigate to in order to finish filling out a form #}
+            validation_msgs['data'] = '{% trans "Please complete all required fields in the Data Acquisition tab."|escapejs %}';
+        }
+
+        if (getTextAreaLengthValidator('method_of_analysis', 4000)() === false) {
+            validationsAnalysisTab = false;
+        }
+        if (getTextAreaLengthValidator('information_use', 500)() === false) {
+            validationsAnalysisTab = false;
+        }
+        if (getTextAreaLengthValidator('quality_assurance', 500)() === false) {
+            validationsAnalysisTab = false;
+        }
+        if (getTextAreaLengthValidator('data_issues', 500)() === false) {
+            validationsAnalysisTab = false;
+        }
+        if (getTextAreaLengthValidator('indicator_changes', 500)() === false) {
+            validationsAnalysisTab = false;
+        }
+        if (getTextAreaLengthValidator('comments', 4000)() === false) {
+            validationsAnalysisTab = false;
+        }
+        if (validationsAnalysisTab === false) {
+            {# Translators: a message indicating which tab a user should navigate to in order to finish filling out a form #}
+            validation_msgs['analysis'] = '{% trans "Please complete all required fields in the Analysis and Reporting tab."|escapejs %}';
+        }
+
         // return all tab validations
-        return validationsTargetTab && validationsSummaryTab && validationsPerformanceTab && noMessageValidations;
+        return validationsTargetTab && validationsSummaryTab && validationsPerformanceTab && validationsDataTab && validationsAnalysisTab && noMessageValidations;
     }
 
     $("#indicator_modal_content").on("keypress", "input[type=number]", function(e){
@@ -1281,6 +1364,20 @@
     $("#indicator_modal_content").on("input", "#id_baseline", function(e){
         $("#id_baseline_na").prop('checked', false);
     });
+
+    $("#indicator_modal_content").on("keyup", "#id_definition", getTextAreaLengthValidator('definition', 4000));
+    $("#indicator_modal_content").on("keyup", "#id_justification", getTextAreaLengthValidator('justification', 500));
+    $("#indicator_modal_content").on("keyup", "#id_rationale_for_target", getTextAreaLengthValidator('rationale_for_target', 500));
+    $("#indicator_modal_content").on("keyup", "#id_means_of_verification", getTextAreaLengthValidator('means_of_verification', 1500));
+    $("#indicator_modal_content").on("keyup", "#id_data_collection_method", getTextAreaLengthValidator('data_collection_method', 2500));
+    $("#indicator_modal_content").on("keyup", "#id_data_points", getTextAreaLengthValidator('data_points', 500));
+    $("#indicator_modal_content").on("keyup", "#id_responsible_person", getTextAreaLengthValidator('responsible_person', 500));
+    $("#indicator_modal_content").on("keyup", "#id_method_of_analysis", getTextAreaLengthValidator('method_of_analysis', 4000));
+    $("#indicator_modal_content").on("keyup", "#id_information_use", getTextAreaLengthValidator('information_use', 500));
+    $("#indicator_modal_content").on("keyup", "#id_quality_assurance", getTextAreaLengthValidator('quality_assurance', 500));
+    $("#indicator_modal_content").on("keyup", "#id_data_issues", getTextAreaLengthValidator('data_issues', 500));
+    $("#indicator_modal_content").on("keyup", "#id_indicator_changes", getTextAreaLengthValidator('indicator_changes', 500));
+    $("#indicator_modal_content").on("keyup", "#id_comments", getTextAreaLengthValidator('comments', 4000));
 
     $("#indicator_modal_content").on("change", "#id_baseline_na", function(e){
         $("#id_baseline").val('');
