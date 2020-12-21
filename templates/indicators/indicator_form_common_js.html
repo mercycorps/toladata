@@ -1282,6 +1282,10 @@
         $("#id_baseline_na").prop('checked', false);
     });
 
+    $("#indicator_modal_content").on("change", "#id_indicator_type", function(e){
+        validateIndicatorType();
+    });
+
     $("#indicator_modal_content").on("change", "#id_baseline_na", function(e){
         $("#id_baseline").val('');
         if (!$(this).is(':checked')){
