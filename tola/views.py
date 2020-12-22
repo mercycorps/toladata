@@ -40,15 +40,10 @@ def index(request, selected_country=None):
         active_country = Country.objects.filter(id=selected_country)[0]
         user.update_active_country(active_country)
     else:
-        try:
-            # default to first country in user's accessible countries if there is no active country or the user
-            # no longer has access to their active country
-            active_country = user.active_country \
-                if user.active_country and user.active_country in user_countries else user_countries[0]
-        except IndexError:
-            # ... or failing that, to their "home" country
-            active_country = user.country
-            # ... failing all of this, the homepage will be blank. Sorry!
+        active_country = user.active_country \
+            if user.active_country and user.active_country in user_countries else user.country
+        if active_country != user.active_country:
+            user.update_active_country(active_country)
 
     if active_country:
         active_country_id = active_country.id

@@ -99,10 +99,10 @@ class TestIndexViewProgramList(test.TestCase):
         programs = self.get_index_view_program_pks(self.mc_user_all_user)
         self.assertEqual(programs, {p.pk for p in self.country_b_programs} | {self.two_country_program.pk})
 
-    def test_shows_first_country_with_access_for_base_url_if_no_active_country(self):
+    def test_shows_home_country_for_base_url_if_no_active_country(self):
         self.mc_user_all_user.active_country = None
+        self.mc_user_all_user.country=self.country_c
         self.mc_user_all_user.save()
-        self.assertEqual(self.mc_user_all_user.available_countries[0].pk, self.country_c.pk)
         programs = self.get_index_view_program_pks(self.mc_user_all_user)
         self.assertEqual(programs, {self.country_c_program.pk, self.two_country_program.pk})
 
@@ -118,62 +118,23 @@ class TestIndexViewProgramList(test.TestCase):
         self.mc_user_all_user.refresh_from_db()
         self.assertEqual(self.mc_user_all_user.active_country.pk, self.country_c.pk)
 
+    def test_uses_home_country_if_active_country_is_stale(self):
+        self.mc_user_all_user.country = self.country_a
+        self.mc_user_all_user.active_country = self.country_b
+        self.mc_user_all_user.countries.remove(self.country_b)
+        self.mc_user_all_user.save()
+        programs = self.get_index_view_program_pks(self.mc_user_all_user)
+        self.assertEqual(programs, {p.pk for p in self.country_a_programs})
+        self.mc_user_all_user.refresh_from_db()
+        self.assertEqual(self.mc_user_all_user.active_country.pk, self.country_a.pk)
+
+        self.mc_user_all_user.active_country = self.country_b
+        self.mc_user_all_user.countries.clear()
+        self.mc_user_all_user.save()
+        programs = self.get_index_view_program_pks(self.mc_user_all_user)
+        self.assertEqual(programs, {p.pk for p in self.country_a_programs})
+        self.mc_user_all_user.refresh_from_db()
+        self.assertEqual(self.mc_user_all_user.active_country.pk, self.country_a.pk)
+
     def test_permission_is_denied_for_no_country_access(self):
         self.assertTrue(self.get_index_view_permission_denied(self.mc_user_country_b, pk=self.country_a.pk))
-
-
-class TestCountrySelection(test.TestCase):
-
-    def test_correct_country_selected(self):
-        countries = CountryFactory.create_batch(4)
-        tola_user = TolaUserFactory(country=None)
-        client = test.Client()
-        client.force_login(tola_user.user)
-
-        response = client.get('/')
-        self.assertEqual(
-            len(response.context['user_countries']), 0,
-            'countries should empty if user does not have a country assignment')
-        self.assertIsNone(
-            response.context['active_country'],
-            'active country should be None if user does not have a country assignment')
-
-        response = client.get(f'/{countries[0].pk}/')
-        self.assertEqual(
-            response.status_code, 403,
-            'response should error if user tries to navigate to a country they do not have access to')
-        tola_user.country = countries[0]
-        tola_user.save()
-
-        response = client.get(f'/{countries[0].pk}/')
-        tola_user.refresh_from_db()
-        self.assertEqual(
-            len(response.context['user_countries']), 1, 'correct country count should be provided in context')
-        self.assertEqual(response.context['active_country'], countries[0], 'active country should reflect query param')
-        self.assertEqual(tola_user.active_country, countries[0], 'user active country should be set on navigation')
-
-        tola_user.countries.add(countries[1])
-        response = client.get('/')
-        self.assertEqual(
-            len(response.context['user_countries']), 2, 'correct country count should be provided in context')
-        self.assertEqual(
-            response.context['active_country'], countries[0], 'active country should be taken from user property')
-
-        tola_user.country = countries[2]
-        tola_user.save()
-        response = client.get('/')
-        self.assertEqual(
-            len(response.context['user_countries']), 2, 'correct country count should be provided in context')
-        self.assertEqual(
-            # available countries merges, in order TolaUser.countries, countries available from program permissions
-            # and TolaUser.country.  This means the first TolaUser.countries object will be chosen to be active.
-            response.context['active_country'], countries[1],
-            'user active country property should be discarded if it is stale')
-
-        tola_user.countries.clear()
-        tola_user.active_country = countries[0]
-        tola_user.save()
-        response = client.get('/')
-        self.assertEqual(
-            response.context['active_country'], countries[2],
-            'user active should default to country assignment if active_country property is stale')
