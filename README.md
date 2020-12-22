@@ -149,7 +149,7 @@ $ pip install -r requirements.txt
 ```
 
 You may need to perform additional installations if you receive an error installing the requirements.txt. For example:
-* _Failed building wheel for xmlsec_. Run command `brew insatll libxmlsec1`
+* _Failed building wheel for xmlsec_. Run command `brew install libxmlsec1`
 
 ### Modify the config file
 If you have a copy of the _settings.secret.yml_ file, place it in the TolaActivity/config
@@ -173,9 +173,9 @@ database `NAME`, `USER`, and `PASSWORD` as appropriate. If you have a dump of an
     DATABASES:
       default:
         ENGINE: "django.db.backends.mysql"
-        NAME: "tola_activity"
-        USER: "<db_username>"
-        PASSWORD: "SooperSekritWord"
+        NAME: "<db_name>" # "tola_activity"
+        USER: "<db_username>" # "tola"
+        PASSWORD: "<password>" # "SooperSekritWord"
         HOST: "localhost"
         PORT: ""
     ```
@@ -187,7 +187,7 @@ database `NAME`, `USER`, and `PASSWORD` as appropriate. If you have a dump of an
     $ mkdir /User/<username>/logs
     ```
     
-    Modify the LOGFILE entry so it points to a file in the _logs_ directory you just created.
+    Modify the LOGFILE entry so it points to the file in the _logs_ directory you just created.
     For example:
     ```yaml
     LOGFILE: '/home/<username>/logs/django_error.log'
@@ -195,7 +195,7 @@ database `NAME`, `USER`, and `PASSWORD` as appropriate. If you have a dump of an
 
 
 ## Set up Django's MySQL backing store
-Log into mysql and create the database, create the user, and grant permissions with the following commands using the same database Name, User, and Password used in the _settings.secret.yml_ file.
+Log into mysql and create the database, create the user, and grant permissions with the following commands using the same database `Name`, `User`, and `Password` used in the _settings.secret.yml_ file.
 ```sql
 $ mysql -u root  # Ubuntu users will need to use sudo for this line
 mysql> CREATE DATABASE tola_activty;
@@ -298,11 +298,11 @@ Log into MySQL and get the id of the record you just added from the auth.user ta
 
 ```bash
 $ mysql -u tola -p tola_activity
-mysql> SELECT id,username FROM auth_user ORDER BY id DESC LIMIT 5;
+mysql> SELECT id, username FROM auth_user ORDER BY id DESC LIMIT 5;
 +----+----------+
 | id | username |
 +----+----------+
-|  1 | myname    |
+|  1 | myname   |
 +----+----------+
 ```
 
@@ -311,7 +311,7 @@ Note the value for `id` to use in the next step.
 Insert the `id` value from the `auth_user` table into the `user_id` field of the `workflow_tolauser` table (Name can be first and/or last name, username, or anything else):
 
 ```bash
-mysql> INSERT INTO workflow_tolauser (name, privacy_disclaimer_accepted, user_id, language) VALUES ("<My Name>", 1,"<id>", "en");
+mysql> INSERT INTO workflow_tolauser (name, privacy_disclaimer_accepted, user_id, language) VALUES ("<My Name>", 1, "<id>", "en");
 mysql> exit
 ```
 
