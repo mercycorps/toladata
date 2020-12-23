@@ -297,7 +297,7 @@
             var base_url = "{% url 'reportingperiod_update' 0 %}";
             base_url = base_url.slice(0,-1);
             $("input[name=program_id]").val(source_data['program']);
-            $("#reportingperiod_update_form").attr("action", base_url + source_data['program']);
+            $("#reportingperiod_update_form").attr("action", base_url + source_data['program'] + "/");
             var testDate = "";
             if ((testDate = new Date(source_data['progstart'])) == "Invalid Date"){
                 // # Translators: Data is currently unavailable to display (i.e. system error)
