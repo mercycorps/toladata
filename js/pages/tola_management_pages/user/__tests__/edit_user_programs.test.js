@@ -4,10 +4,10 @@ import { shallow, render } from 'enzyme';
 import UserProgramsEditor from '../components/edit_user_programs';
 
 const storeBase = {
-    regions: {42: {id: 42, name: "TestRegion"}},
-    countries: {1: {id: 1, name: "TestLand", region: 42, programs: [2, 3]}},
-    ordered_country_ids: [1],
-    programs: {2: {id: 2, name: "TestProgram2"}, 3: {id: 3, name: "TestProgram3"}},
+    regions: [],
+    countries: [],
+    ordered_country_ids: [],
+    programs: [],
     country_role_choices: [],
     editing_target_data: {
         access: {
