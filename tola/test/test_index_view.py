@@ -99,10 +99,10 @@ class TestIndexViewProgramList(test.TestCase):
         programs = self.get_index_view_program_pks(self.mc_user_all_user)
         self.assertEqual(programs, {p.pk for p in self.country_b_programs} | {self.two_country_program.pk})
 
-    def test_shows_first_country_with_access_for_base_url_if_no_active_country(self):
+    def test_shows_home_country_for_base_url_if_no_active_country(self):
         self.mc_user_all_user.active_country = None
+        self.mc_user_all_user.country=self.country_c
         self.mc_user_all_user.save()
-        self.assertEqual(self.mc_user_all_user.available_countries[0].pk, self.country_c.pk)
         programs = self.get_index_view_program_pks(self.mc_user_all_user)
         self.assertEqual(programs, {self.country_c_program.pk, self.two_country_program.pk})
 
@@ -117,6 +117,24 @@ class TestIndexViewProgramList(test.TestCase):
         self.assertEqual(programs, {self.two_country_program.pk, self.country_c_program.pk})
         self.mc_user_all_user.refresh_from_db()
         self.assertEqual(self.mc_user_all_user.active_country.pk, self.country_c.pk)
+
+    def test_uses_home_country_if_active_country_is_stale(self):
+        self.mc_user_all_user.country = self.country_a
+        self.mc_user_all_user.active_country = self.country_b
+        self.mc_user_all_user.countries.remove(self.country_b)
+        self.mc_user_all_user.save()
+        programs = self.get_index_view_program_pks(self.mc_user_all_user)
+        self.assertEqual(programs, {p.pk for p in self.country_a_programs})
+        self.mc_user_all_user.refresh_from_db()
+        self.assertEqual(self.mc_user_all_user.active_country.pk, self.country_a.pk)
+
+        self.mc_user_all_user.active_country = self.country_b
+        self.mc_user_all_user.countries.clear()
+        self.mc_user_all_user.save()
+        programs = self.get_index_view_program_pks(self.mc_user_all_user)
+        self.assertEqual(programs, {p.pk for p in self.country_a_programs})
+        self.mc_user_all_user.refresh_from_db()
+        self.assertEqual(self.mc_user_all_user.active_country.pk, self.country_a.pk)
 
     def test_permission_is_denied_for_no_country_access(self):
         self.assertTrue(self.get_index_view_permission_denied(self.mc_user_country_b, pk=self.country_a.pk))
