@@ -69,7 +69,7 @@ urlpatterns = [
     path('results_framework_builder/<int:program_id>', views.ResultsFrameworkBuilder.as_view(),
          name='results_framework_builder'),
 
-    path('results_framework_export/<int:program>', views.results_framework_export, name='rf_export'),
+    path('results_framework_export/<int:program>/', views.results_framework_export, name='rf_export'),
 
     # API (serializer-based) calls for program page / IPTT
     path('api/', include(apipatterns)),
