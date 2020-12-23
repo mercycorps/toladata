@@ -429,15 +429,6 @@ export default class EditUserPrograms extends React.Component {
                     // modified by this user
                     !this.props.store.access.countries[data.country_id]
                     || this.props.store.access.countries[data.country_id].role != 'basic_admin'
-                    /*|| (
-                        !(
-                            this.state.user_program_access.programs[data.id]
-                            && this.state.user_program_access.programs[data.id].has_access
-                        ) && !(
-                            this.state.user_program_access.countries[data.country_id]
-                            && this.state.user_program_access.countries[data.country_id].has_access
-                        )
-                    )*/
                 )
             }
         }
@@ -457,7 +448,6 @@ export default class EditUserPrograms extends React.Component {
                 // program role dropdown
                 const program_access = this.state.user_program_access.programs
                 if(!program_access[data.id]) {
-                    //return this.props.store.program_role_choices[0].value
                     // if no access, show "No Access" option:
                     return 'none';
                 } else {
