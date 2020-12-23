@@ -312,6 +312,7 @@ def save_custom_template(request):
     new_template = LevelTierTemplateSerializer(LevelTierTemplate.objects.filter(program=program), many=True)
     return JsonResponse(new_template.data, safe=False)
 
+# Is this being used?
 @api_view(http_method_names=['POST'])
 def save_custom_tiers(request):
     program = Program.objects.get(id=request.data['program_id'])
