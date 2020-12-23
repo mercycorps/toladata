@@ -7,6 +7,7 @@ import browserPlugin from 'router5-plugin-browser';
 import {reloadPageIfCached} from '../../general_utilities';
 import {LevelListPanel} from './components/level_list';
 import {LevelTierPicker} from './components/leveltier_picker';
+import MiniRFDiagram from './components/mini_diagram';
 import {RootStore} from './models';
 
 /*
@@ -22,6 +23,7 @@ ReactDOM.render(
     <Provider rootStore={rootStore}>
         <React.Fragment>
             <LevelTierPicker />
+            <MiniRFDiagram />
             <LevelListPanel />
         </React.Fragment>
     </Provider>,
