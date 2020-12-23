@@ -4,6 +4,7 @@ import { observer } from "mobx-react"
 import { DragDropContext, Droppable, Draggable } from 'react-beautiful-dnd';
 import classNames from 'classnames'
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome'
+import { faCaretDown, faCaretRight } from "@fortawesome/free-solid-svg-icons";
 import HelpPopover from "../../../../components/helpPopover";
 import { toJS } from 'mobx';
 import {create_unified_changeset_notice} from '../../../../components/changesetNotice';
@@ -219,7 +220,7 @@ export class RetroProgramCheckBoxWrapper extends React.Component {
                          onClick={this.props.toggleProgramViz}
                          className={classNames('accordion-row__btn', 'btn', 'btn-link', 'disaggregation--programs__header', {disabled: this.props.disabled})}
                          tabIndex='0'>
-                        <FontAwesomeIcon icon={this.props.programsExpanded ? 'caret-down' : 'caret-right'} />
+                        <FontAwesomeIcon icon={this.props.programsExpanded ? faCaretDown : faCaretRight } />
                         {/* # Translators: This feature allows a user to apply changes to existing programs as well as ones created in the future */}
                         <span className="mr-1">{gettext("Assign new disaggregation to all indicators in a program")}</span>
                     </a>
@@ -420,7 +421,7 @@ export class DisaggregationType extends React.Component {
             <div className="accordion-row">
                 <div className="accordion-row__content">
                     <a onClick={() => {expandAction(this.resetForm.bind(this));}} className="btn accordion-row__btn btn-link" tabIndex='0'>
-                        <FontAwesomeIcon icon={expanded ? 'caret-down' : 'caret-right'} />
+                        <FontAwesomeIcon icon={expanded ? faCaretDown : faCaretRight } />
                         {(disaggregation.id === 'new') ? "New disaggregation" : disaggregation.disaggregation_type}
                     </a>
                     {disaggregation.is_archived && <span className="text-muted font-weight-bold ml-2">(Archived)</span>}
