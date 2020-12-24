@@ -90,6 +90,44 @@ export class LevelStore {
         return levelProperties
     }
 
+    @computed get goalLevel() {
+        if (this.levels && this.levels.length > 0) {
+            let goalLevel = this.levels.filter(l => (l.parent === 'root' || !l.parent));
+            if (goalLevel) {
+                return goalLevel[0];
+            }
+            return false;
+        }
+    }
+
+    @computed get levelTreeData() {
+        if (!this.goalLevel) {
+            return {};
+        }
+        let levelTree = {name: '', attributes: {tier: this.levelProperties[this.goalLevel.id].tierName}};
+        levelTree.children = this.getTreeChildren(this.goalLevel.id);
+        return levelTree;
+    }
+
+    getTreeChildren = levelId => {
+        let children = [];
+        let first = true;
+        (this.getChildLevels(levelId) || []).forEach(level => {
+            let child = {name: this.levelProperties[level.id].ontologyLabel, attributes: {}};
+            if (first === true) {
+                child.attributes.tier = this.levelProperties[level.id].tierName;
+                first = false;
+            }
+            if (this.rootStore.uiStore.activeCard && this.rootStore.uiStore.activeCard == level.id) {
+                child.attributes.selected = true;
+            }
+            child.children = this.getTreeChildren(level.id);
+            children.push(child);
+        });
+        return children;
+    }
+
+
     @computed get chosenTierSetName () {
         return this.tierTemplates[this.chosenTierSetKey]['name'];
     }

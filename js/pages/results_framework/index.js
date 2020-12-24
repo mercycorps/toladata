@@ -6,8 +6,7 @@ import createRouter from 'router5';
 import browserPlugin from 'router5-plugin-browser';
 import {reloadPageIfCached} from '../../general_utilities';
 import {LevelListPanel} from './components/level_list';
-import {LevelTierPicker} from './components/leveltier_picker';
-import MiniRFDiagram from './components/mini_diagram';
+import SidePanel from './components/side_panel';
 import {RootStore} from './models';
 
 /*
@@ -22,8 +21,7 @@ const rootStore = new RootStore(program, levels, indicators, levelTiers, tierTem
 ReactDOM.render(
     <Provider rootStore={rootStore}>
         <React.Fragment>
-            <LevelTierPicker />
-            <MiniRFDiagram />
+            <SidePanel />
             <LevelListPanel />
         </React.Fragment>
     </Provider>,

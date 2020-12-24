@@ -60,13 +60,22 @@
     text-align: right;
 }
 
-// component LevelTierPicker
-.leveltier-picker {
+// side panel (containing leveltierpicker and minirfdiagram)
+.rf-builder-side-panel {
     flex-basis: 1%;
     flex-grow: 0;
     flex-shrink: 1;
     margin-right: $grid-gutter-width;
+    display: flex;
+    flex-flow: column nowrap;
+    justify-content: flex-start;
+    align-items: flex-start;
+}
+
+// component LevelTierPicker
+.leveltier-picker {
     min-width: 20rem;
+    flex-grow: 0;
 }
 .leveltier-picker__panel {
     border: 1px solid $gray-400;
@@ -74,6 +83,14 @@
 .leveltier-picker__change-log-link-box {
     margin-top: 1rem;
 }
+
+// component minirfdiagram
+.mini-rf-diagram {
+    flex-grow: 1;
+    min-height: 400px;
+    min-width: 25rem;
+}
+
 
 // component Picker
 .leveltier-picker__selectbox {
