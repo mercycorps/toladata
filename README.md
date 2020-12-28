@@ -159,7 +159,7 @@ $ cp config/sample-settings.secret.yml config/settings.secret.yml
 Open the _config/settings.secret.yml_ file with a plain-text editor.
 
 1. Find the node named, "DATABASES" and set the
-database `NAME`, `USER`, and `PASSWORD` as appropriate. The result should resemble the following:
+database `NAME`, `USER`, and `PASSWORD` as appropriate. If you have a dump of an existing TolaActivity database, set the `NAME` to "tola_activty". The result should resemble the following:
 
     ```yaml
     DATABASES:
