@@ -21,8 +21,8 @@ to a rich text format, so make sure you are saving plain text.
 
 ## Install software dependencies
 
-At this itme, TolaActivity requires both Python 2 and Python 3. It has been thoroughly tested with versions
-2.7 and 3.6, and lightly tested with version 3.8.  Python 2 is necessary satisfy a dependency in a node module.
+At this itme, TolaActivity requires Python 3. It has been thoroughly tested with versions
+3.6, and lightly tested with version 3.8.
 These instructions assume MySQL is being used as Django's datastore.  Version 5.7 has been thoroughly tested, but version 8 should work as well.
 
 ### macOS
@@ -92,7 +92,6 @@ $ python3 --version
 If one of these doesn't yield a Python installation, install it.
 ```bash
 $ sudo apt update
-$ sudo apt install python2
 $ sudo apt install python3
 ```
 
