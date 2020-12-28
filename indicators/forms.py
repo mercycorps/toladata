@@ -371,7 +371,9 @@ class IndicatorForm(forms.ModelForm):
         self.fields['name'].required = True
         self.fields['name'].widget = forms.Textarea(attrs={'rows': 3})
         self.fields['unit_of_measure'].required = True
-        self.fields['unit_of_measure'].widget = forms.TextInput(attrs={'autocomplete':'off'})
+        self.fields['unit_of_measure'].widget = forms.TextInput(
+            attrs={'autocomplete':'off',
+                   'maxlength': Indicator._meta.get_field('unit_of_measure').max_length})
         # Translators: Label of a form field.  User specifies whether changes should increase or decrease.
         self.fields['direction_of_change'].label = _("Direction of change")
         self.fields['target_frequency'].required = True
