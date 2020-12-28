@@ -25,15 +25,31 @@ const create_country_objects = (countries, store) => Object.entries(countries)
                                                         }
                                                     }),{})
 
-const create_program_objects = (programs, store) => Object.entries(programs)
-                                                           .reduce((programs, [id, program]) => ({
-                                                               ...programs,
-                                                               [id]: {
-                                                                   ...program,
-                                                                   type: 'program',
-                                                                   options: [{label: NO_ACCESS, value: 'none'}, ...store.program_role_choices],
-                                                               }
-                                                           }),{})
+// generates the programs objects for the virtualized table, with appropriate menu options
+const create_program_objects = (programs, store) => {
+    // first get a list of programs to which the user has country-level access to:
+    const programsWithCountryAccess = Object.entries(store.editing_target_data.access.countries)
+            // only count objects with 'user' or 'basic_admin' access (should be only options, this is future-proofing)
+            .filter(([countryId, country]) => country.role == 'basic_admin' || country.role == 'user')
+            // filter out any that aren't in the country store for whatever reason (bug catcher)
+            .filter(([countryId, country]) => store.countries[countryId])
+            // just get the programs list for each country:
+            .map(([countryId, country]) => store.countries[countryId].programs)
+            .flat();
+    return Object.entries(programs)
+        .reduce((programs, [id, program]) => ({
+            ...programs,
+            [id]: {
+                ...program,
+                type: 'program',
+                options: (programsWithCountryAccess.includes(parseInt(id)) ?
+                            // if given country level access, do not include "no access" choice:
+                            [...store.program_role_choices] :
+                            // otherwise "no access" is a choice:
+                            [{label: NO_ACCESS, value: 'none'}, ...store.program_role_choices]),
+            }
+        }),{});
+}
 
 /**
  * This function returns countries and programs as a flat ordered list as they will be displayed in the virtualized table.
@@ -100,9 +116,9 @@ export default class EditUserPrograms extends React.Component {
         const {store} = props
 
         const countries = create_country_objects(store.countries, store)
-        const programs = create_program_objects(store.programs, store)
         this.countryStore = new CountryStore(store.regions, store.countries);
 
+        const programs = create_program_objects(store.programs, store)
         // callback for determining if a country is expanded based on filter state (initial program filter of ''):
         const isExpanded = this.isExpanded.bind(this, '');
         this.state = {
@@ -258,8 +274,6 @@ export default class EditUserPrograms extends React.Component {
     changeProgramRole(program_key, new_val) {
         const [country_id, program_id] = program_key.split('_')
         const access = this.state.user_program_access
-
-
         const new_program_access = (() => {
             if(access[country_id] && access[country_id].has_access && new_val == 'none') {
                 return {
@@ -446,6 +460,7 @@ export default class EditUserPrograms extends React.Component {
                 }
             } else {
                 // program role dropdown
+
                 const program_access = this.state.user_program_access.programs
                 if(!program_access[data.id]) {
                     // if no access, show "No Access" option:
