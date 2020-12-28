@@ -22,7 +22,7 @@ to a rich text format, so make sure you are saving plain text.
 ## Install software dependencies
 
 At this itme, TolaActivity requires Python 3. It has been thoroughly tested with versions
-3.6, and lightly tested with version 3.8.
+3.6, and lightly tested with version 3.8. It is suggested that Developers use Python 3.8 or greater.
 These instructions assume MySQL is being used as Django's datastore.  Version 5.7 has been thoroughly tested, but version 8 should work as well.
 
 ### macOS
