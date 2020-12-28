@@ -104,25 +104,22 @@ export class LevelStore {
         if (!this.goalLevel) {
             return {};
         }
-        let levelTree = {name: '', attributes: {tier: this.levelProperties[this.goalLevel.id].tierName}};
+        let levelTree = {name: '', attributes: {id: this.goalLevel.id, selected: this.rootStore.uiStore.activeCard && this.rootStore.uiStore.activeCard == this.goalLevel.id}};
         levelTree.children = this.getTreeChildren(this.goalLevel.id);
         return levelTree;
     }
 
     getTreeChildren = levelId => {
         let children = [];
-        let first = true;
         (this.getChildLevels(levelId) || []).forEach(level => {
-            let child = {name: this.levelProperties[level.id].ontologyLabel, attributes: {}};
-            if (first === true) {
-                child.attributes.tier = this.levelProperties[level.id].tierName;
-                first = false;
-            }
-            if (this.rootStore.uiStore.activeCard && this.rootStore.uiStore.activeCard == level.id) {
-                child.attributes.selected = true;
-            }
-            child.children = this.getTreeChildren(level.id);
-            children.push(child);
+            children.push({
+                name: this.levelProperties[level.id].ontologyLabel,
+                attributes: {
+                    id: level.id,
+                    selected: (this.rootStore.uiStore.activeCard && this.rootStore.uiStore.activeCard == level.id)
+                    },
+                children: this.getTreeChildren(level.id)
+            })
         });
         return children;
     }
