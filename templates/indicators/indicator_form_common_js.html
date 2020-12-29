@@ -916,7 +916,7 @@
         if (!$nameField.val() || $nameField.val().length == 0) {
             errMsg = "{% trans 'Please complete this field.'|escapejs %}";
         } else if ($nameField.val().length > 500) {
-            errMsg = "{% trans 'Please enter an indicator with fewer than 500 characters.'|escapejs %}";
+            errMsg = interpolate("{% trans 'Please enter fewer than %s characters.'|escapejs %}", [500]);
         }
         if (errMsg) {
             $("#div_id_name").removeClass("mb-3");

@@ -7,7 +7,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: \n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2020-12-23 11:42-0800\n"
+"POT-Creation-Date: 2020-12-29 12:57-0800\n"
 "PO-Revision-Date: 2020-12-23 11:27-0800\n"
 "Last-Translator: \n"
 "Language-Team: \n"
@@ -259,23 +259,23 @@ msgid "%(country_name)s disaggregations"
 msgstr "Desagregaciones de %(country_name)s"
 
 #. Translators: Label of a form field.  User specifies whether changes should increase or decrease.
-#: indicators/forms.py:376 indicators/indicator_plan.py:90
+#: indicators/forms.py:378 indicators/indicator_plan.py:90
 #: tola_management/models.py:396
 msgid "Direction of change"
 msgstr "Dirección de cambio"
 
-#: indicators/forms.py:394
+#: indicators/forms.py:396
 msgid "Multiple submissions detected"
 msgstr "Múltiples envíos detectados"
 
 #. Translators: Input form error message
-#: indicators/forms.py:403
+#: indicators/forms.py:405
 msgid "Please enter a number larger than zero."
 msgstr "Por favor ingrese un número mayor que cero."
 
 #. Translators: This is an error message that is returned when a user is trying to assign an indicator
 #. to the wrong hierarch of levels.
-#: indicators/forms.py:412
+#: indicators/forms.py:414
 msgid ""
 "Level program ID %(l_p_id)d and indicator program ID (%i_p_id)d mismatched"
 msgstr ""
@@ -283,13 +283,13 @@ msgstr ""
 "programa (%i_p_id)d del indicador no concuerdan"
 
 #. Translators: This is a result that was actually achieved, versus one that was planned.
-#: indicators/forms.py:483
+#: indicators/forms.py:485
 #: templates/indicators/results/result_form_disaggregation_fields.html:62
 #: tola_management/models.py:406
 msgid "Actual value"
 msgstr "Valor real"
 
-#: indicators/forms.py:494 templates/workflow/siteprofile_form.html:3
+#: indicators/forms.py:496 templates/workflow/siteprofile_form.html:3
 #: templates/workflow/siteprofile_form.html:4
 #: templates/workflow/siteprofile_form.html:14
 msgid "Site"
@@ -297,19 +297,19 @@ msgstr "Sitio"
 
 #. Translators: field label that identifies which of a set of a targets (e.g. monthly/annual) a result
 #. is being compared to
-#: indicators/forms.py:497 tola_management/models.py:405
+#: indicators/forms.py:499 tola_management/models.py:405
 msgid "Measure against target"
 msgstr "Medida contra objetivo"
 
-#: indicators/forms.py:498
+#: indicators/forms.py:500
 msgid "Link to file or folder"
 msgstr "Enlace al archivo o carpeta"
 
-#: indicators/forms.py:512 tola_management/models.py:404
+#: indicators/forms.py:514 tola_management/models.py:404
 msgid "Result date"
 msgstr "Fecha del resultado"
 
-#: indicators/forms.py:569
+#: indicators/forms.py:571
 #, python-brace-format
 msgid ""
 "You can begin entering results on {program_start_date}, the program start "
@@ -318,7 +318,7 @@ msgstr ""
 "Puede comenzar a ingresar resultados el {program_start_date}, fecha de "
 "inicio del programa"
 
-#: indicators/forms.py:574
+#: indicators/forms.py:576
 #, python-brace-format
 msgid ""
 "Please select a date between {program_start_date} and {program_end_date}"
@@ -326,13 +326,13 @@ msgstr ""
 "Por favor seleccione una fecha entre {program_start_date} y "
 "{program_end_date}"
 
-#: indicators/forms.py:585
+#: indicators/forms.py:587
 #, python-brace-format
 msgid "Please select a date between {program_start_date} and {todays_date}"
 msgstr ""
 "Por favor seleccione una fecha entre {program_start_date} y {todays_date}"
 
-#: indicators/forms.py:598
+#: indicators/forms.py:600
 msgid "URL required if record name is set"
 msgstr "La URL es requerida si el nombre del registro está establecido"
 
@@ -499,7 +499,7 @@ msgstr "Nombre"
 msgid "Country"
 msgstr "País"
 
-#: indicators/models.py:84 templates/workflow/site_profile_list.html:50
+#: indicators/models.py:84 templates/workflow/site_profile_list.html:52
 msgid "Status"
 msgstr "Estado"
 
@@ -976,8 +976,8 @@ msgstr ""
 "de verificación &ldquo;No aplicable.&rdquo; La línea de base siempre puede "
 "actualizarse más adelante."
 
-#: indicators/models.py:1249 templates/indicators/indicatortargets.html:89
-#: templates/indicators/indicatortargets.html:192
+#: indicators/models.py:1249 templates/indicators/indicatortargets.html:91
+#: templates/indicators/indicatortargets.html:194
 msgid "Life of Program (LoP) target"
 msgstr "Objetivo de Vida del Programa (LoP)"
 
@@ -1343,7 +1343,7 @@ msgstr "URL de la Evidencia"
 #: indicators/models.py:2137 templates/workflow/site_indicatordata.html:5
 #: templates/workflow/site_profile_list.html:5
 #: templates/workflow/site_profile_list.html:6
-#: templates/workflow/site_profile_list.html:164
+#: templates/workflow/site_profile_list.html:166
 #: templates/workflow/siteprofile_form.html:10
 #: templates/workflow/siteprofile_form.html:12 tola_management/models.py:410
 msgid "Sites"
@@ -1590,7 +1590,7 @@ msgstr "El indicador se ha eliminado satisfactoriamente."
 #. Translators: Text of an error message that appears when a user hasn't provided a justification for the change they are making to some data
 #: indicators/views/views_indicators.py:682
 #: indicators/views/views_indicators.py:741
-#: indicators/views/views_indicators.py:925 workflow/views.py:299
+#: indicators/views/views_indicators.py:925 workflow/views.py:309
 msgid "Reason for change is required"
 msgstr "Se requiere justificación para el cambio"
 
@@ -2100,7 +2100,7 @@ msgstr ""
 "    </p>\n"
 "    "
 
-#: templates/home.html:203 templates/workflow/site_profile_list.html:172
+#: templates/home.html:203 templates/workflow/site_profile_list.html:174
 msgid "Site with result"
 msgstr "Sitio con resultados"
 
@@ -2303,12 +2303,12 @@ msgid "Enter event name"
 msgstr "Ingrese el nombre del evento"
 
 #: templates/indicators/indicator_form_common_js.html:561
-#: templates/indicators/indicatortargets.html:79
+#: templates/indicators/indicatortargets.html:81
 msgid "Enter target"
 msgstr "Ingrese el objetivo"
 
 #: templates/indicators/indicator_form_common_js.html:765
-#: templates/indicators/indicatortargets.html:124
+#: templates/indicators/indicatortargets.html:126
 msgid "Options for number (#) indicators"
 msgstr "Opciones para indicadores de número (#)"
 
@@ -2347,9 +2347,12 @@ msgstr ""
 msgid "Please complete this field."
 msgstr "Por favor complete este campo."
 
+#. Translators: on a form field, as a warning when a user has entered too much text.  %s replaced with a number (e.g. 500)
 #: templates/indicators/indicator_form_common_js.html:919
-msgid "Please enter an indicator with fewer than 500 characters."
-msgstr "Por favor, introduzca un indicador de menos de 500 caracteres."
+#: templates/indicators/indicator_form_common_js.html:1032
+#, python-format
+msgid "Please enter fewer than %%s characters."
+msgstr "Por favor, introduzca menos de %%s caracteres."
 
 #: templates/indicators/indicator_form_common_js.html:954
 #: templates/indicators/indicator_form_common_js.html:956
@@ -2368,12 +2371,6 @@ msgstr "Por favor, introduzca un objetivo."
 #: templates/indicators/indicator_form_common_js.html:1004
 msgid "Please complete this field"
 msgstr "Por favor complete este campo"
-
-#. Translators: on a form field, as a warning when a user has entered too much text.  %s replaced with a number (e.g. 500)
-#: templates/indicators/indicator_form_common_js.html:1032
-#, python-format
-msgid "Please enter fewer than %%s characters."
-msgstr "Por favor, introduzca menos de %%s caracteres."
 
 #: templates/indicators/indicator_form_common_js.html:1133
 msgid ""
@@ -2430,31 +2427,31 @@ msgid "Delete this indicator"
 msgstr "Eliminar este indicador"
 
 #. Translators: button label to save the item and then close a modal
-#: templates/indicators/indicator_form_modal.html:406
-#: templates/indicators/indicator_form_modal.html:413
+#: templates/indicators/indicator_form_modal.html:407
+#: templates/indicators/indicator_form_modal.html:414
 #: templates/indicators/result_form_modal.html:156
 #: templates/indicators/result_form_modal.html:158
 msgid "Save and close"
 msgstr "Guardar y cerrar"
 
 #. Translators: close a modal throwing away any changes to the form
-#: templates/indicators/indicator_form_modal.html:407
-#: templates/indicators/indicator_form_modal.html:420
+#: templates/indicators/indicator_form_modal.html:408
+#: templates/indicators/indicator_form_modal.html:421
 #: templates/indicators/result_form_modal.html:161 tola/forms.py:27
 msgid "Cancel"
 msgstr "Cancelar"
 
 #. Translators: button label to save the form and be redirected to a blank for to add another item
-#: templates/indicators/indicator_form_modal.html:417
+#: templates/indicators/indicator_form_modal.html:418
 #: templates/indicators/result_form_modal.html:159
 msgid "Save and add another"
 msgstr "Guardar y agregar otro"
 
-#: templates/indicators/indicator_form_modal.html:503
+#: templates/indicators/indicator_form_modal.html:504
 msgid "selected"
 msgstr "seleccionado"
 
-#: templates/indicators/indicator_form_modal.html:504
+#: templates/indicators/indicator_form_modal.html:505
 msgid "None selected"
 msgstr "Ninguno/a seleccionado/a"
 
@@ -2637,15 +2634,15 @@ msgstr ""
 "            Objetivos %(get_target_frequency_label)s\n"
 "            "
 
-#: templates/indicators/indicatortargets.html:105
+#: templates/indicators/indicatortargets.html:107
 msgid "Add an event"
 msgstr "Agregar un evento"
 
-#: templates/indicators/indicatortargets.html:112
+#: templates/indicators/indicatortargets.html:114
 msgid "Remove all targets"
 msgstr "Eliminar todos los objetivos"
 
-#: templates/indicators/indicatortargets.html:142
+#: templates/indicators/indicatortargets.html:144
 msgid ""
 "\n"
 "                    <strong>Non-cumulative (NC):</strong> Target period "
@@ -2660,7 +2657,7 @@ msgstr ""
 "suma de los valores del período objetivo.\n"
 "                    "
 
-#: templates/indicators/indicatortargets.html:161
+#: templates/indicators/indicatortargets.html:163
 msgid ""
 "\n"
 "                    <strong>Cumulative (C):</strong> Target period results "
@@ -2674,7 +2671,7 @@ msgstr ""
 "resultado de vida del programa refleja el último valor del período.\n"
 "                    "
 
-#: templates/indicators/indicatortargets.html:168
+#: templates/indicators/indicatortargets.html:170
 msgid ""
 "\n"
 "                    <strong>Cumulative (C):</strong> The Life of Program "
@@ -2689,7 +2686,7 @@ msgstr ""
 "                    "
 
 #. Translators: This is a label for a numeric value field. The variable will be replaced with a frequency e.g. quarterly targets
-#: templates/indicators/indicatortargets.html:182
+#: templates/indicators/indicatortargets.html:184
 #, python-format
 msgid ""
 "\n"
@@ -2700,7 +2697,7 @@ msgstr ""
 "            Objetivos %(get_target_frequency_label)s\n"
 "            "
 
-#: templates/indicators/indicatortargets.html:217
+#: templates/indicators/indicatortargets.html:220
 msgid "Remove target"
 msgstr "Eliminar objetivo"
 
@@ -3646,48 +3643,48 @@ msgstr "Logrado"
 msgid "There is no indicator data for this site."
 msgstr "No hay datos de indicadores para este sitio."
 
-#: templates/workflow/site_profile_list.html:31
+#: templates/workflow/site_profile_list.html:32
 msgid "Add site"
 msgstr "Agregar sitio"
 
-#: templates/workflow/site_profile_list.html:39
+#: templates/workflow/site_profile_list.html:41
 msgid "Site Profile Map and List"
 msgstr "Mapa y lista de perfil del sitio"
 
-#: templates/workflow/site_profile_list.html:48
+#: templates/workflow/site_profile_list.html:50
 msgid "Date created"
 msgstr "Fecha de creación"
 
-#: templates/workflow/site_profile_list.html:49
+#: templates/workflow/site_profile_list.html:51
 msgid "Site name"
 msgstr "Nombre del sitio"
 
-#: templates/workflow/site_profile_list.html:51
+#: templates/workflow/site_profile_list.html:53
 msgid "Site type"
 msgstr "Tipo de Sitio"
 
-#: templates/workflow/site_profile_list.html:64
+#: templates/workflow/site_profile_list.html:66
 msgid "Active"
 msgstr "Activo"
 
-#: templates/workflow/site_profile_list.html:68
+#: templates/workflow/site_profile_list.html:70
 msgid "Inactive"
 msgstr "Inactivo"
 
-#: templates/workflow/site_profile_list.html:73
+#: templates/workflow/site_profile_list.html:75
 msgid "Delete site"
 msgstr "Borrar sitio"
 
-#: templates/workflow/site_profile_list.html:76
+#: templates/workflow/site_profile_list.html:78
 msgid "Indicator data"
 msgstr "Datos del indicador"
 
-#: templates/workflow/site_profile_list.html:83
+#: templates/workflow/site_profile_list.html:85
 msgid "No Site Profiles yet."
 msgstr "No hay Perfiles de Sitio todavía."
 
 #. Translators: Shows the user how many results will be listed on each page of the results list
-#: templates/workflow/site_profile_list.html:127
+#: templates/workflow/site_profile_list.html:129
 msgid "results per page:"
 msgstr "resultados por página:"
 
@@ -4616,11 +4613,11 @@ msgstr "Informe del IPTT TvA"
 msgid "IPTT TvA full program report"
 msgstr "Informe completo del programa del IPTT TvA"
 
-#: workflow/views.py:304
+#: workflow/views.py:314
 msgid "Reporting period must start on the first of the month"
 msgstr "El período de informe debe comenzar el primero de mes"
 
-#: workflow/views.py:311
+#: workflow/views.py:321
 msgid ""
 "Reporting period start date cannot be changed while time-aware periodic "
 "targets are in place"
@@ -4628,21 +4625,21 @@ msgstr ""
 "La fecha de inicio del período de informe no puede ser cambiada mientras "
 "haya objetivos periódicos basados en tiempo"
 
-#: workflow/views.py:319
+#: workflow/views.py:329
 msgid "Reporting period must end on the last day of the month"
 msgstr "El período de informe debe terminar el último día de mes"
 
-#: workflow/views.py:326
+#: workflow/views.py:336
 msgid "Reporting period must end after the start of the last target period"
 msgstr ""
 "El período de informe debe terminar después del inicio del último período "
 "objetivo"
 
-#: workflow/views.py:332
+#: workflow/views.py:342
 msgid "Reporting period must start before reporting period ends"
 msgstr "El período de informe debe comenzar antes que su fecha de finalización"
 
-#: workflow/views.py:337
+#: workflow/views.py:347
 msgid "You must select a reporting period end date"
 msgstr "Debe seleccionar una fecha de finalización para el período de informe"
 
@@ -4654,6 +4651,9 @@ msgstr "Encontrar"
 #: workflow/widgets.py:133
 msgid "City, Country:"
 msgstr "Ciudad, País:"
+
+#~ msgid "Please enter an indicator with fewer than 500 characters."
+#~ msgstr "Por favor, introduzca un indicador de menos de 500 caracteres."
 
 #~ msgid "Key Performance Indicator for this program?"
 #~ msgstr "¿Indicador clave de rendimiento para este programa?"

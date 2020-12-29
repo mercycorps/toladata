@@ -2,7 +2,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: \n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2020-12-23 11:42-0800\n"
+"POT-Creation-Date: 2020-12-29 12:57-0800\n"
 "PO-Revision-Date: 2020-12-23 12:29-0800\n"
 "Last-Translator: \n"
 "Language-Team: \n"
@@ -1043,7 +1043,7 @@ msgid "There are no program sites."
 msgstr "Il n’y a aucun site pour le programme."
 
 #. Translators: a link to add a new site (location)
-#: js/pages/program_page/components/sitesList.js:33
+#: js/pages/program_page/components/sitesList.js:34
 msgid "Add site"
 msgstr "Ajouter un site"
 
@@ -2115,44 +2115,44 @@ msgstr "Programmes individuels uniquement"
 msgid "No access"
 msgstr "N’a pas accès"
 
-#: js/pages/tola_management_pages/user/components/edit_user_programs.js:461
+#: js/pages/tola_management_pages/user/components/edit_user_programs.js:476
 #: js/pages/tola_management_pages/user/components/user_editor.js:32
 msgid "Programs and Roles"
 msgstr "Programmes et rôles"
 
 #. Translators: link to learn more about permissions-granting roles a user can be assigned
-#: js/pages/tola_management_pages/user/components/edit_user_programs.js:465
+#: js/pages/tola_management_pages/user/components/edit_user_programs.js:480
 msgid "More information on Program Roles"
 msgstr "En savoir plus sur les rôles de programmes"
 
 #. Translators: This is placeholder text on a dropdown of countries which limit the displayed programs
-#: js/pages/tola_management_pages/user/components/edit_user_programs.js:472
+#: js/pages/tola_management_pages/user/components/edit_user_programs.js:487
 msgid "Filter countries"
 msgstr "Filtrer les pays"
 
 #. Translators: this is placeholder text on a dropdown of programs which limit the displayed results
-#: js/pages/tola_management_pages/user/components/edit_user_programs.js:478
+#: js/pages/tola_management_pages/user/components/edit_user_programs.js:493
 msgid "Filter programs"
 msgstr "Filtrer les programmes"
 
 #. Translators: Column header for a checkbox indicating if a user has access to a program */
-#: js/pages/tola_management_pages/user/components/edit_user_programs.js:503
+#: js/pages/tola_management_pages/user/components/edit_user_programs.js:518
 msgid "Has access?"
 msgstr "A accès ?"
 
-#: js/pages/tola_management_pages/user/components/edit_user_programs.js:522
+#: js/pages/tola_management_pages/user/components/edit_user_programs.js:537
 msgid "Deselect All"
 msgstr "Tout déselectionner"
 
-#: js/pages/tola_management_pages/user/components/edit_user_programs.js:522
+#: js/pages/tola_management_pages/user/components/edit_user_programs.js:537
 msgid "Select All"
 msgstr "Tout sélectionner"
 
-#: js/pages/tola_management_pages/user/components/edit_user_programs.js:532
+#: js/pages/tola_management_pages/user/components/edit_user_programs.js:547
 msgid "Countries and Programs"
 msgstr "Pays et programmes"
 
-#: js/pages/tola_management_pages/user/components/edit_user_programs.js:561
+#: js/pages/tola_management_pages/user/components/edit_user_programs.js:576
 msgid "Roles and Permissions"
 msgstr "Rôles et autorisations"
 
