@@ -663,61 +663,42 @@ window.create_no_rationale_changeset_notice = ({
 
 import { create_unified_changeset_notice } from 'components/changesetNotice.js';
 window.create_unified_changeset_notice = create_unified_changeset_notice;
-
-
-const createPnotifyAlert = (passedInConfig) => {
-    let config = {
-        textTrusted: true,
-        icon: false,
-        width: '350px',
-        hide: true,
-        delay: 2000,
-        type: 'alert',
+window.unified_success_message = (message_text=null, config={}) => {
+    const success_defaults = {
+        header: gettext('Success'),
+        show_icon: true,
+        preamble: null,
+        include_rationale: false,
+        message_text: null,
+        showCloser: true,
+        confirm_text: null,
+        cancel_text: null,
+        context: null,
+        notice_type: 'success',
+        blocking: false,
+        dismiss_delay: 3000,
+        self_dismissing: true
     };
-    Object.assign(config, passedInConfig);
-
-    let faClass = "fa-exclamation-triangle";
-    if (config.type == "success"){
-        faClass = "fa-check-circle";
-    }
-
-    const inner = `
-        <div class="row">
-            <div class="col">
-                <h2 class="pnotify--header"><i class="fas ${faClass}"></i>${gettext("Success!")}</h2>
-            </div>
-        </div>
-        <div class="row">
-            <div class="col">
-                <span class='text-success'>
-                    ${config.preamble}
-                </span>
-            </div>
-        </div>
-        <div class="row">
-            <div class="col">
-                <span>
-                    ${config.message_text}
-                </span>
-            </div>
-        </div>
-    `;
-
-    config.text = $(`<div><form action="" method="post" class="form container">${inner}</form></div>`).html();
-    PNotify.alert(config);
+    return create_unified_changeset_notice({...success_defaults, ...config, preamble: message_text});
+}
+window.unified_notice_message = (config={}) => {
+    const notice_defaults = {
+        header: gettext('Warning'),
+        show_icon: true,
+        preamble: null,
+        message_text: null,
+        include_rationale: false,
+        showCloser: true,
+        confirm_text: null,
+        cancel_text: null,
+        context: null,
+        notice_type: 'notice',
+        blocking: true,
+        self_dismissing: false
+    };
+    return create_unified_changeset_notice({...notice_defaults, ...config})
 };
 
-window.success_notice = (userConfig) =>{
-    let config = {
-        message_text: "Update successful.",
-        preamble: "",
-        animation: "fade",
-        type: "success",
-    }
-    Object.assign(config, userConfig);
-
-    createPnotifyAlert(config);
-};
 
 
 /*

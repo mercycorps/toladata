@@ -269,7 +269,7 @@ const create_unified_changeset_notice = ({
         }});
     }
 
-    // END CRIBBED CODE
+    return notice;
 
 }
 
