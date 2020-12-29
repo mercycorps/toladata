@@ -42,8 +42,7 @@ const create_rfc_dropdown = ({
 }
 
 /*
-* Consider using this notification function rather than the more specific ones above.  It should be able to
-* everything they can do. The configurable parameters are for the 4 sections of the notification and
+* Unified pNotify entry point: The configurable parameters are for the 4 sections of the notification and
 * for other visual and functional elements. Leave any of these null or false to omit them.
 * There is NO DEFAULT TEXT. You must explicitly provide text to text elements.
 */
@@ -132,13 +131,6 @@ const create_unified_changeset_notice = ({
         ${rfc_section}
         ${rationale_section}
     `;
-
-
-    // IMPORTANT TODO
-    // **************
-    // Following code cribs from create_changeset_notice
-    // I left create_changeset_notice untouched to avoid lots of regressions
-    // I think we should deprecate create_changeset_notice entirely
 
     let confirm_button = {
         text: confirm_text,
