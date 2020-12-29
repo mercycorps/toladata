@@ -141,17 +141,8 @@ export class LevelStore {
             const result = this.saveLevelTiersToDB();
             result.then(result => {
                 if (this.chosenTierSetKey !== this.customTierSetKey && this.levels.filter(level=>level.id !== "new").length > 0 ) {
-                    success_notice({
-                        // # Translators: Notification to user that the an update was successful
-                        message_text: gettext("Changes to the results framework template were saved."),
-                        addClass: 'program-page__rationale-form',
-                        stack: {
-                            dir1: 'up',
-                            dir2: 'right',
-                            firstpos1: 20,
-                            firstpos2: 20,
-                        }
-                    })
+                    // # Translators: Notification to user that the an update was successful
+                    window.unified_success_message(gettext("Changes to the results framework template were saved."))
                 }
             }).catch(error => {
                 // Ok, I know this is dumb, but we're in the middle of a revamp of the alerts and I don't
@@ -239,17 +230,8 @@ export class LevelStore {
             .then(response => {
                 // Only notify of success if the tiers have changed.
                 if (shouldAlert) {
-                    success_notice({
-                        /* # Translators: Notification to user that the update they initiated was successful */
-                        message_text: gettext("Changes to the results framework template were saved."),
-                        addClass: 'program-page__rationale-form',
-                        stack: {
-                            dir1: 'up',
-                            dir2: 'right',
-                            firstpos1: 20,
-                            firstpos2: 20,
-                        }
-                    });
+                    /* # Translators: Notification to user that the update they initiated was successful */
+                    window.unified_success_message(gettext("Changes to the results framework template were saved."));
                 }
                 if (addTier) {
                     // Protect against "Add level" button smashing by checking if the last value of the tier set is an empty string.
@@ -371,17 +353,8 @@ export class LevelStore {
                 if (this.levels.length == 0){
                     this.createFirstLevel()
                 }
-                success_notice({
-                    /* # Translators: Notification to user that the deletion command that they issued was successful */
-                    message_text: interpolate(gettext("%s was deleted."), [level_label]),
-                    addClass: 'program-page__rationale-form',
-                    stack: {
-                        dir1: 'up',
-                        dir2: 'right',
-                        firstpos1: 20,
-                        firstpos2: 20,
-                    }
-                })
+                /* # Translators: Notification to user that the deletion command that they issued was successful */
+                window.unified_success_message(interpolate(gettext("%s was deleted."), [level_label]));
             })
             .catch(error => console.log('error', error))
 
@@ -415,17 +388,8 @@ export class LevelStore {
                     runInAction(() => {
                         this.levels.replace(response.data['all_data'])
                     });
-                    success_notice({
-                        // # Translators: This is a confirmation message that confirms that change has been successfully saved to the DB.
-                        message_text: interpolate(gettext("%s saved."), [level_label]),
-                        addClass: 'program-page__rationale-form',
-                        stack: {
-                            dir1: 'up',
-                            dir2: 'right',
-                            firstpos1: 20,
-                            firstpos2: 20,
-                        }
-                    });
+                    // # Translators: This is a confirmation message that confirms that change has been successfully saved to the DB.
+                    window.unified_success_message(interpolate(gettext("%s saved."), [level_label]));
 
                     const newId = response.data["new_level"]["id"];
                     this.rootStore.uiStore.activeCard = null;
@@ -449,17 +413,8 @@ export class LevelStore {
             api.put(`/level/${levelId}/`, levelToSave)
                 .then(response => {
                     if (levelDataWasUpdated || indicatorWasUpdated) {
-                        success_notice({
-                            // # Translators:  Confirmation message that user-supplied updates were successfully applied.
-                            message_text: interpolate(gettext("%s updated."), [level_label]),
-                            addClass: 'program-page__rationale-form',
-                            stack: {
-                                dir1: 'up',
-                                dir2: 'right',
-                                firstpos1: 20,
-                                firstpos2: 20,
-                            }
-                        });
+                           // # Translators:  Confirmation message that user-supplied updates were successfully applied.
+                        window.unified_success_message(interpolate(gettext("%s updated."), [level_label]));
                     }
                     runInAction( () => {
                         Object.assign(targetLevel, response.data);
