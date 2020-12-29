@@ -250,6 +250,7 @@ export default class EditUserPrograms extends React.Component {
     }
 
     changeCountryRole(country_id, new_val) {
+        // user's country-level permissions have changed, first update the country access (actual DB value to be changed):
         const country = {...this.state.user_program_access.countries[country_id]}
         const new_country_access = (() => {
             if(new_val != 'none') {
@@ -258,7 +259,33 @@ export default class EditUserPrograms extends React.Component {
                 return {...country, role: new_val, has_access: false}
             }
         })()
-
+        /* next update the program role options (if they have country-level access, do not show NO ACCESS option,
+         * but if they do not have country level access, _show_ the NO ACCESS option)
+         * Due to the weird way options are stored (duplicated as a list on every single program object
+         * in the global stateless "programs" variable) we have to modify the state listing from
+         * programs through filtered_programs to flattened_programs to ensure this isn't undone by the next
+         * change.  Refactoring idea: options listing should be a bound method that checks for country
+         * access and dynamically generates options - requires associating country with program (and
+         * dealing with multi-country program edge cases?)
+         */
+        // start with copy of state programs (don't modify state in place):
+        let statePrograms = this.state.programs;
+        this.state.countries[country_id].programs.forEach(programId =>
+            // for each program in this country, set the options
+            statePrograms[programId].options = new_val == 'none' ?
+                // if no country level access, NO ACCESS is an option:
+                [{label: NO_ACCESS, value: 'none'}, ...this.props.store.program_role_choices] :
+                // if country level access, just the base program role choices:
+                [...this.props.store.program_role_choices]
+        );
+        // re-apply unchanged filter (to avoid clearing filter results):
+        const {countries, programs} = apply_program_filter(
+            statePrograms,
+            this.state.filtered_countries,
+            this.state.program_filter
+        );
+        // this is neeeded by flattened_listing to determine if programs are shown:
+        const isExpanded = this.isExpanded.bind(this, this.state.program_filter);
         this.setState({
             user_program_access: {
                 ...this.state.user_program_access,
@@ -267,6 +294,8 @@ export default class EditUserPrograms extends React.Component {
                     [country_id]: new_country_access
                 }
             },
+            filtered_programs: programs,
+            flattened_programs: flattened_listing(this.state.ordered_country_ids.filter(id => id in countries).map(id => countries[id]), programs, isExpanded)
         }, () => this.hasUnsavedDataAction())
 
     }
@@ -395,37 +424,34 @@ export default class EditUserPrograms extends React.Component {
             // consumes rowData, returns whether editor "has access?" checkbox should be checked:
             const access = this.state.user_program_access
             if(data.type == 'country') {
-                // country access checkbox:
+                // country access checkbox (not currently used):
                 return (access.countries[data.id] && access.countries[data.id].has_access) || false
             } else {
                 // program access checkbox:
-                if(this.state.user_program_access.countries[data.country_id] && this.state.user_program_access.countries[data.country_id].has_access) {
+                if (this.state.user_program_access.countries?.[data.country_id]?.has_access) {
+                    // if the user has access to the country level, they have access to the program:
                     return true
                 }
-                return (access.programs[data.id] && access.programs[data.id].has_access) || false
+                // otherwise if the user has access to the program directly:
+                return access.programs?.[data.id]?.has_access || false
             }
         }
 
         const is_check_disabled = (data) => {
             // consumes rowData, returns whether editor "has access?" checkbox should be disabled:
             if(data.type == 'country') {
-                // country access checkbox:
+                // country "checkbox" is now a select all button, so disable if there are no programs to select:
                 return !(this.state.countries[data.id].programs.size > 0)
-                    || !(
-                        this.props.store.access.countries[data.id]
-                        && this.props.store.access.countries[data.id].role == 'basic_admin'
-                    )
-                    || (
-                        this.state.user_program_access.countries[data.id]
-                        && this.state.user_program_access.countries[data.id].has_access
-                    )
-
+                    // or the operating user is not a basic admin for this country:
+                    || 'basic_admin' != this.props.store.access.countries?.[data.id]?.role
+                    // or the user has access to the country level (cannot select all if all already selected)
+                    || this.state.user_program_access.countries?.[data.id]?.has_access
             } else {
                 // program access checkbox:
-                if(this.state.user_program_access.countries[data.country_id] && this.state.user_program_access.countries[data.country_id].has_access) {
+                if(this.state.user_program_access.countries?.[data.country_id]?.has_access) {
                     return true
                 }
-                return !this.props.store.access.countries[data.country_id] || this.props.store.access.countries[data.country_id].role != 'basic_admin'
+                return 'basic_admin' != this.props.store.access.countries?.[data.country_id]?.role;
             }
         }
 
