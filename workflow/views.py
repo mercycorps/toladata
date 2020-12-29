@@ -99,14 +99,6 @@ class SiteProfileList(ListView):
         countries = request.user.tola_user.available_countries
         getPrograms = request.user.tola_user.available_programs.all() # or filter(funding_status="Funded") ?
 
-        # does user have high access anywhere (whether to show "add site" button):
-        has_high_access_somewhere = (
-            # any managed countries (basic admin role on the country):
-            request.user.tola_user.managed_countries.exists() or
-            # any high-level access assignment to a program:
-            request.user.tola_user.programaccess_set.filter(role='high').exists()
-        )
-
         #this date, 3 months ago, a site is considered inactive
         inactiveSite = timezone.now() - relativedelta(months=3)
 
@@ -160,9 +152,7 @@ class SiteProfileList(ListView):
             'getPrograms':getPrograms,
             'form': FilterForm(),
             'helper': FilterForm.helper,
-            'user_list': user_list,
-            'can_add_sites': has_high_access_somewhere
-            })
+            'user_list': user_list})
 
 
 @method_decorator(login_required, name='dispatch')
@@ -369,3 +359,5 @@ def dated_target_info(request, pk):
     return Response({
         'max_start_date': Program.objects.filter(id=pk).annotate(
             ptd=Max('indicator__periodictargets__start_date')).values_list('ptd', flat=True)[0]})
+
+
