@@ -259,45 +259,39 @@ export default class EditUserPrograms extends React.Component {
                 return {...country, role: new_val, has_access: false}
             }
         })()
-        /* next update the program role options (if they have country-level access, do not show NO ACCESS option,
-         * but if they do not have country level access, _show_ the NO ACCESS option)
-         * Due to the weird way options are stored (duplicated as a list on every single program object
-         * in the global stateless "programs" variable) we have to modify the state listing from
-         * programs through filtered_programs to flattened_programs to ensure this isn't undone by the next
-         * change.  Refactoring idea: options listing should be a bound method that checks for country
-         * access and dynamically generates options - requires associating country with program (and
-         * dealing with multi-country program edge cases?)
-         */
-        // start with copy of state programs (don't modify state in place):
-        let statePrograms = this.state.programs;
-        this.state.countries[country_id].programs.forEach(programId =>
+        // using the form of setstate that receives the previous state/props as an argument, as we need
+        // to update the programs (based on current state programs list and new country value)
+        this.setState((state, props) => {
+            // this is a reference to the _old_ state programs, so it's safe to modify:
+            let statePrograms = state.programs;
+            state.countries[country_id].programs.forEach(programId =>
             // for each program in this country, set the options
             statePrograms[programId].options = new_val == 'none' ?
                 // if no country level access, NO ACCESS is an option:
-                [{label: NO_ACCESS, value: 'none'}, ...this.props.store.program_role_choices] :
+                [{label: NO_ACCESS, value: 'none'}, ...props.store.program_role_choices] :
                 // if country level access, just the base program role choices:
-                [...this.props.store.program_role_choices]
-        );
-        // re-apply unchanged filter (to avoid clearing filter results):
-        const {countries, programs} = apply_program_filter(
-            statePrograms,
-            this.state.filtered_countries,
-            this.state.program_filter
-        );
-        // this is neeeded by flattened_listing to determine if programs are shown:
-        const isExpanded = this.isExpanded.bind(this, this.state.program_filter);
-        this.setState({
-            user_program_access: {
-                ...this.state.user_program_access,
-                countries: {
-                    ...this.state.user_program_access.countries,
-                    [country_id]: new_country_access
-                }
-            },
-            filtered_programs: programs,
-            flattened_programs: flattened_listing(this.state.ordered_country_ids.filter(id => id in countries).map(id => countries[id]), programs, isExpanded)
-        }, () => this.hasUnsavedDataAction())
+                [...props.store.program_role_choices]
+            );
+            // re-apply unchanged filter (to avoid clearing filter results):
+            const {countries, programs} = apply_program_filter(
+                statePrograms,
+                state.filtered_countries,
+                state.program_filter
+            );
+            const isExpanded = this.isExpanded.bind(this, state.program_filter);
+            return {
+                user_program_access: {
+                    ...this.state.user_program_access,
+                    countries: {
+                        ...this.state.user_program_access.countries,
+                        [country_id]: new_country_access
+                    }
+                },
+                filtered_programs: programs,
+                flattened_programs: flattened_listing(state.ordered_country_ids.filter(id => id in countries).map(id => countries[id]), programs, isExpanded)
+            };
 
+        }, () => this.hasUnsavedDataAction());
     }
 
     changeProgramRole(program_key, new_val) {
