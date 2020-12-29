@@ -431,7 +431,7 @@
                     suppressErrors: true
                 }).done(() => {
                     {# Translators: This is the text of an alert that is triggered upon a successful change to the the start and end dates of the reporting period #}
-                    PNotify.success("{% trans 'Reporting period updated' %}")
+                    window.unified_success_message("{% trans 'Reporting period updated' %}");
                 }).fail(function(data) {
                     let msg = "{% trans 'There was a problem saving your changes.'|escapejs %}";
                     if (data.responseJSON) {

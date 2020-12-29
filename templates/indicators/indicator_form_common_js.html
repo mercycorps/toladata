@@ -53,27 +53,7 @@
     ]);
 
     function showSuccessNotifiction(message) {
-        PNotify.success({
-            title: "{% trans 'Success' %}",
-            text: message,
-            type: 'success',
-            width: '350px',
-            minHeight: '150px',
-            delay: 3000,
-            stack: {
-                'dir1': 'right',
-                'dir2': 'up',
-                'firstpos1': 0,
-                'firstpos2': 0
-            },
-            modules: {
-                Buttons: {
-                    closer: true,
-                    closerHover: false,
-                    sticker: false
-                }
-            }
-        });
+        window.unified_success_message(message);
     }
 
     // Open the modal with a create form (as opposed to an update form)
