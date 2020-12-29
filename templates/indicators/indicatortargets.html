@@ -51,6 +51,7 @@
                                        name="{{ pt.period }}"
                                        value="{{ pt.period }}"
                                        class="form-control input-text target-label"
+                                       maxlength="255"
                                        {% if readonly %}disabled="disabled"{% endif %}>
                                 <span style="" class="help-block"> </span>
                             </div>
@@ -71,6 +72,7 @@
                                     type="text"
                                     id="pt-{{ pt.id }}"
                                     name="{{ pt.period }}"
+                                    maxlength="15"
                                     value="{{ pt.target|trailingzero }}"
                                     {% if readonly %}disabled="disabled"{% endif %}
                                     data-periodictarget="pt"
@@ -198,6 +200,7 @@
                                    id="id_lop_target"
                                    class="form-control input-value periodic-target-input"
                                    min="1"
+                                   maxlength="15"
                                    {% if readonly %}disabled="disabled"{% endif %}
                                    {% if indicator.lop_target != None %}
                                    value="{{ indicator.lop_target_stripped }}"
