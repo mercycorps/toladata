@@ -1,11 +1,11 @@
 {% extends "base.html" %}
 {% load i18n %}
 
-{% block title %}Login{% endblock %}
+{% block title %}Login {% endblock %}
 
 {% block content %}
 
-<div class="login">
+<div class="login" id="login_div">
 
     <header class="page-title">
         {% blocktrans %}
@@ -76,4 +76,18 @@
     </section>
 
 </div>
+{% endblock %}
+
+{% block extra_js_in_header %}
+<script>
+    $(function() {
+        // check if we are loading the login div _inside_ a modal, and if so redirect to login, with the
+        // ?next parameter (currently unused, but future feature) set to current url
+        if ($('#login_div').parents('.modal')?.length !== 0) {
+            let currentUrl = new URL(window.location.href);
+            let url = `{% url "login" %}?next=${currentUrl.pathname}`;
+            window.location.href = url;
+        }
+    });
+</script>
 {% endblock %}
