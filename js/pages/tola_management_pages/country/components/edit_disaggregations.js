@@ -223,7 +223,7 @@ export class RetroProgramCheckBoxWrapper extends React.Component {
                             tabIndex='0'>
                             <FontAwesomeIcon icon={this.props.programsExpanded ? 'caret-down' : 'caret-right'} />
                             {/* # Translators: This feature allows a user to apply changes to existing programs as well as ones created in the future */}
-                            <span className="mr-1">{gettext("Assign new disaggregation to all indicators in a program")}</span>
+                            <span>{gettext("Assign new disaggregation to all indicators in a program")}</span>
                         </span>
                         <HelpPopover
                             key={1}
@@ -456,6 +456,7 @@ export class DisaggregationType extends React.Component {
                                         </label>
                                         <HelpPopover
                                             key={1}
+                                            className=""
                                             // # Translators: Help text for the "selected by default" checkbox on the disaggregation form
                                             content={`<p>${interpolate(gettext('When adding a new program indicator, this disaggregation will be selected by default for every program in %s. The disaggregation can be manually removed from an indicator on the indicator setup form.'), [gettext(this.props.countryName)])}</p>`}
                                             placement="right"
