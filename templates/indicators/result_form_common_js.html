@@ -84,7 +84,8 @@
                         // Close modal
                         $('#indicator_results_div').modal('hide');
                         $('#indicator_results_div').trigger('save.tola.result_form');
-                        PNotify.success("Result deleted")
+                        // # Translators: this is a success message after a user has requested to delete a result
+                        window.unified_success_message(gettext("Result deleted"));
                     })
                 .fail(function(error){
                     createAlert("danger", "{% trans 'Could not save form.'|escapejs %}"  + error, true, "#modalmessages");
@@ -378,20 +379,17 @@
             let displayEvidenceWarning = (evidenceURL && URLValidationResult.valid == 'warn');
             const successHandler = (response, status, jqXHR) => {
                 // save successful! initial message from back-end to include translated indicator level/number:
-                let message = response.success_message;
                 if (displayEvidenceWarning) {
                     // hinky URL means save, but add warning and don't auto-dismiss the success noti:
-                    message += "  {% trans 'However, there may be a problem with the evidence URL.' %}";
-                    message += ' <a href="#" id="warning_review">{% trans "Review warning." %}</a>';
-                    noticeType = 'notice';
-                    hide = false;
-                } else {
-                    // URL is fine, message doesn't need additions and should auto-dismiss
-                    noticeType = 'success';
-                    hide = true;
-                }
-                let notice = window.autoDismissingNotification({type: noticeType, message: message, hide: hide, textTrusted: true});
-                if (displayEvidenceWarning) {
+                    // # Translators: after "success!" this indicates there are additional issues that optionally warrant attention
+                    let message_text = "{% trans 'However, there may be a problem with the evidence URL.' %}";
+                    // # Translators: this is a button a user can click to see warnings with a previously submitted form
+                    message_text += ' <a href="#" id="warning_review">{% trans "Review warning." %}</a>';
+                    let notice = window.unified_notice_message({
+                        header: gettext("Success"),
+                        preamble: response.success_message,
+                        message_text: message_text
+                    });
                     // if the evidence warning is being displayed, add trigger on "review warning" click to reopen form
                     let warningCB = (e) => {
                         e.preventDefault();
@@ -404,6 +402,9 @@
                     }
                     // pNotify API: this accesses the container of the notice (to add click-handler):
                     $(notice.refs.elem).find('#warning_review').on('click', warningCB);
+                } else {
+                    // URL is fine, message doesn't need additions and should auto-dismiss
+                    let notice = window.unified_success_message(response.success_message);
                 }
                 // resolve promise to trigger next "then" in promise chain (see createsave/updatesave)
                 resolve();
