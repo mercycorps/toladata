@@ -149,12 +149,13 @@
 
 // formatting the "Assign new disaggregation to all indicators" expando
 .retro-programs {
-    display: flex;
-    align-items: center;
-    a.accordion-row__btn.btn.btn-link.disaggregation--programs__header {
-        padding-right: 4px;
-
-        &.disabled {
+    div.accordion-row__btn.btn.btn-link.disaggregation--programs__header {
+        
+        &:hover {
+            text-decoration: none;
+        }
+        
+        > span.disabled {
             opacity: 50%;
             pointer-events: none;
             color: $link-color;
