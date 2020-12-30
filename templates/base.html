@@ -33,7 +33,7 @@
 
         <!-- bootstrap multiselect -->
         <script type="text/javascript" src="{% static "js/bootstrap-multiselect.js" %}?q=gp1116"></script>
-        
+
         <!-- GLOBALS -->
         <script>
             var JS_GLOBALS = (typeof JS_GLOBALS === 'undefined') ? {} : JS_GLOBALS;
@@ -276,7 +276,12 @@
         <!-- End JQuery UI language files -->
 
         <script>
-            let js_context = {
+            // checking if it's defined (in some cases this errors out javascript and prevents our
+            // modal detection script from reloading the page)
+            if (!js_context || typeof(js_context) == 'undefined') {
+                var js_context;
+            }
+            js_context = {
                 strings: {
                     serverError: '{% trans "Server Error" %}',
                     networkError: '{% trans "Network Error" %}',
