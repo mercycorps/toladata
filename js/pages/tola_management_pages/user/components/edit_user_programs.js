@@ -263,10 +263,9 @@ export default class EditUserPrograms extends React.Component {
         // to update the programs (based on current state programs list and new country value)
         this.setState((state, props) => {
             // this is a reference to the _old_ state programs, so it's safe to modify:
-            let statePrograms = state.programs;
             state.countries[country_id].programs.forEach(programId =>
             // for each program in this country, set the options
-            statePrograms[programId].options = new_val == 'none' ?
+            state.programs[programId].options = new_val == 'none' ?
                 // if no country level access, NO ACCESS is an option:
                 [{label: NO_ACCESS, value: 'none'}, ...props.store.program_role_choices] :
                 // if country level access, just the base program role choices:
@@ -274,7 +273,7 @@ export default class EditUserPrograms extends React.Component {
             );
             // re-apply unchanged filter (to avoid clearing filter results):
             const {countries, programs} = apply_program_filter(
-                statePrograms,
+                state.programs,
                 state.filtered_countries,
                 state.program_filter
             );
