@@ -89,7 +89,7 @@ class IPTTReport(LoginRequiredMixin, TemplateView):
 
     def get(self, request, *args, **kwargs):
         program_id = kwargs.get('program')
-        programs = request.user.tola_user.available_programs.annotate(
+        programs = request.user.tola_user.available_active_programs.annotate(
             indicators_count=models.Count('indicator'),
             targets_exist=models.Exists(
                 PeriodicTarget.objects.filter(
@@ -104,9 +104,7 @@ class IPTTReport(LoginRequiredMixin, TemplateView):
                 output_field=models.IntegerField()
             )
         ).filter(
-            funding_status="Funded",
             targets_exist=True,
-            reporting_period_start__isnull=False,
             reporting_period_end__isnull=False,
             indicators_count__gt=0
         ).order_by('name').values_list('pk', 'name', 'tva_indicators_count')
