@@ -247,7 +247,7 @@ def get_country_page_context(request):
     }
 
     if not auth_user.is_superuser:
-        program_queryset = tola_user.managed_programs
+        program_queryset = tola_user.managed_programs.filter(funding_status__iexact="funded")
     else:
         program_queryset = Program.rf_aware_objects.all()
 
