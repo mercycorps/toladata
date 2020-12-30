@@ -250,6 +250,7 @@ export default class EditUserPrograms extends React.Component {
     }
 
     changeCountryRole(country_id, new_val) {
+        // user's country-level permissions have changed, first update the country access (actual DB value to be changed):
         const country = {...this.state.user_program_access.countries[country_id]}
         const new_country_access = (() => {
             if(new_val != 'none') {
@@ -258,17 +259,38 @@ export default class EditUserPrograms extends React.Component {
                 return {...country, role: new_val, has_access: false}
             }
         })()
+        // using the form of setstate that receives the previous state/props as an argument, as we need
+        // to update the programs (based on current state programs list and new country value)
+        this.setState((state, props) => {
+            // this is a reference to the _old_ state programs, so it's safe to modify:
+            state.countries[country_id].programs.forEach(programId =>
+            // for each program in this country, set the options
+            state.programs[programId].options = new_val == 'none' ?
+                // if no country level access, NO ACCESS is an option:
+                [{label: NO_ACCESS, value: 'none'}, ...props.store.program_role_choices] :
+                // if country level access, just the base program role choices:
+                [...props.store.program_role_choices]
+            );
+            // re-apply unchanged filter (to avoid clearing filter results):
+            const {countries, programs} = apply_program_filter(
+                state.programs,
+                state.filtered_countries,
+                state.program_filter
+            );
+            const isExpanded = this.isExpanded.bind(this, state.program_filter);
+            return {
+                user_program_access: {
+                    ...this.state.user_program_access,
+                    countries: {
+                        ...this.state.user_program_access.countries,
+                        [country_id]: new_country_access
+                    }
+                },
+                filtered_programs: programs,
+                flattened_programs: flattened_listing(state.ordered_country_ids.filter(id => id in countries).map(id => countries[id]), programs, isExpanded)
+            };
 
-        this.setState({
-            user_program_access: {
-                ...this.state.user_program_access,
-                countries: {
-                    ...this.state.user_program_access.countries,
-                    [country_id]: new_country_access
-                }
-            },
-        }, () => this.hasUnsavedDataAction())
-
+        }, () => this.hasUnsavedDataAction());
     }
 
     changeProgramRole(program_key, new_val) {
@@ -395,37 +417,34 @@ export default class EditUserPrograms extends React.Component {
             // consumes rowData, returns whether editor "has access?" checkbox should be checked:
             const access = this.state.user_program_access
             if(data.type == 'country') {
-                // country access checkbox:
+                // country access checkbox (not currently used):
                 return (access.countries[data.id] && access.countries[data.id].has_access) || false
             } else {
                 // program access checkbox:
-                if(this.state.user_program_access.countries[data.country_id] && this.state.user_program_access.countries[data.country_id].has_access) {
+                if (this.state.user_program_access.countries?.[data.country_id]?.has_access) {
+                    // if the user has access to the country level, they have access to the program:
                     return true
                 }
-                return (access.programs[data.id] && access.programs[data.id].has_access) || false
+                // otherwise if the user has access to the program directly:
+                return access.programs?.[data.id]?.has_access || false
             }
         }
 
         const is_check_disabled = (data) => {
             // consumes rowData, returns whether editor "has access?" checkbox should be disabled:
             if(data.type == 'country') {
-                // country access checkbox:
+                // country "checkbox" is now a select all button, so disable if there are no programs to select:
                 return !(this.state.countries[data.id].programs.size > 0)
-                    || !(
-                        this.props.store.access.countries[data.id]
-                        && this.props.store.access.countries[data.id].role == 'basic_admin'
-                    )
-                    || (
-                        this.state.user_program_access.countries[data.id]
-                        && this.state.user_program_access.countries[data.id].has_access
-                    )
-
+                    // or the operating user is not a basic admin for this country:
+                    || 'basic_admin' != this.props.store.access.countries?.[data.id]?.role
+                    // or the user has access to the country level (cannot select all if all already selected)
+                    || this.state.user_program_access.countries?.[data.id]?.has_access
             } else {
                 // program access checkbox:
-                if(this.state.user_program_access.countries[data.country_id] && this.state.user_program_access.countries[data.country_id].has_access) {
+                if(this.state.user_program_access.countries?.[data.country_id]?.has_access) {
                     return true
                 }
-                return !this.props.store.access.countries[data.country_id] || this.props.store.access.countries[data.country_id].role != 'basic_admin'
+                return 'basic_admin' != this.props.store.access.countries?.[data.country_id]?.role;
             }
         }
 
