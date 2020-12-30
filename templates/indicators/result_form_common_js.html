@@ -84,7 +84,8 @@
                         // Close modal
                         $('#indicator_results_div').modal('hide');
                         $('#indicator_results_div').trigger('save.tola.result_form');
-                        window.unified_success_message("Result deleted");
+                        // # Translators: this is a success message after a user has requested to delete a result
+                        window.unified_success_message(gettext("Result deleted"));
                     })
                 .fail(function(error){
                     createAlert("danger", "{% trans 'Could not save form.'|escapejs %}"  + error, true, "#modalmessages");
@@ -380,7 +381,9 @@
                 // save successful! initial message from back-end to include translated indicator level/number:
                 if (displayEvidenceWarning) {
                     // hinky URL means save, but add warning and don't auto-dismiss the success noti:
+                    // # Translators: after "success!" this indicates there are additional issues that optionally warrant attention
                     let message_text = "{% trans 'However, there may be a problem with the evidence URL.' %}";
+                    // # Translators: this is a button a user can click to see warnings with a previously submitted form
                     message_text += ' <a href="#" id="warning_review">{% trans "Review warning." %}</a>';
                     let notice = window.unified_notice_message({
                         header: gettext("Success"),
