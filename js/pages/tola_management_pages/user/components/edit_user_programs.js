@@ -481,7 +481,7 @@ export default class EditUserPrograms extends React.Component {
                 // program role dropdown
 
                 const program_access = this.state.user_program_access.programs
-                if(!program_access[data.id]) {
+                if(!program_access?.[data.id]?.has_access) {
                     // if no access, show "No Access" option:
                     return 'none';
                 } else {
