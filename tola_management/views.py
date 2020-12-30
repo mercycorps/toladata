@@ -28,7 +28,8 @@ from rest_framework.serializers import (
     BooleanField,
     DateTimeField,
     EmailField,
-    ValidationError
+    ValidationError,
+    SerializerMethodField
 )
 from rest_framework.response import Response
 from rest_framework import viewsets, pagination, status, permissions
@@ -221,10 +222,14 @@ def get_program_page_context(request):
 
 
 class CountryProgramSerializer(ModelSerializer):
+    active = SerializerMethodField()
     class Meta:
         model = Program
-        fields = ['id', 'name', 'country']
+        fields = ['id', 'name', 'country', 'active']
 
+    @staticmethod
+    def get_active(program):
+        return program.funding_status.lower() == 'funded'
 
 def get_country_page_context(request):
     auth_user = request.user
@@ -247,9 +252,9 @@ def get_country_page_context(request):
     }
 
     if not auth_user.is_superuser:
-        program_queryset = tola_user.managed_programs.filter(funding_status__iexact="funded")
+        program_queryset = tola_user.managed_programs
     else:
-        program_queryset = Program.rf_aware_objects.all()
+        program_queryset = Program.objects.all()
 
     return {
         'is_superuser': request.user.is_superuser,
