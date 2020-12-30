@@ -286,7 +286,7 @@ class TolaUser(models.Model):
                 ).distinct()
 
     @property
-    def available_active_programs(self):
+    def available_active_started_programs(self):
         """Returns programs that are active, started, and a user has some level of access to"""
         from indicators.queries import utils
         programs = Program.rf_aware_objects.filter(

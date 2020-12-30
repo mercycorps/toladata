@@ -78,7 +78,7 @@ class IPTTQSMixin:
     @classmethod
     def load_for_user(cls, user):
         """Entry point for class that loads quickstart data for all programs available to a given user"""
-        return cls.load_for_pks(user.tola_user.available_active_programs.annotate(
+        return cls.load_for_pks(user.tola_user.available_active_started_programs.annotate(
             targets_exist=models.Exists(PeriodicTarget.objects.filter(indicator__program=models.OuterRef('pk')))
         ).filter(
             funding_status="Funded",

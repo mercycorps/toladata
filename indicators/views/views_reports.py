@@ -89,7 +89,7 @@ class IPTTReport(LoginRequiredMixin, TemplateView):
 
     def get(self, request, *args, **kwargs):
         program_id = kwargs.get('program')
-        programs = request.user.tola_user.available_active_programs.annotate(
+        programs = request.user.tola_user.available_active_started_programs.annotate(
             indicators_count=models.Count('indicator'),
             targets_exist=models.Exists(
                 PeriodicTarget.objects.filter(
