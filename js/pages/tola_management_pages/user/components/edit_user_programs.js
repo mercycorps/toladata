@@ -19,34 +19,19 @@ const create_country_objects = (countries, store) => Object.entries(countries)
                                                         [id]: {
                                                             ...country,
                                                             type: 'country',
-                                                            options: [{label: INDIVIDUAL_PROGRAM_ACCESS, value: 'none'}, ...store.country_role_choices],
                                                             admin_access: store.is_superuser,
-                                                            programs: new Set(country.programs)
+                                                            programs: new Set(country.programs),
                                                         }
                                                     }),{})
 
 // generates the programs objects for the virtualized table, with appropriate menu options
 const create_program_objects = (programs, store) => {
-    // first get a list of programs to which the user has country-level access to:
-    const programsWithCountryAccess = Object.entries(store.editing_target_data.access.countries)
-            // only count objects with 'user' or 'basic_admin' access (should be only options, this is future-proofing)
-            .filter(([countryId, country]) => country.role == 'basic_admin' || country.role == 'user')
-            // filter out any that aren't in the country store for whatever reason (bug catcher)
-            .filter(([countryId, country]) => store.countries[countryId])
-            // just get the programs list for each country:
-            .map(([countryId, country]) => store.countries[countryId].programs)
-            .flat();
     return Object.entries(programs)
         .reduce((programs, [id, program]) => ({
             ...programs,
             [id]: {
                 ...program,
                 type: 'program',
-                options: (programsWithCountryAccess.includes(parseInt(id)) ?
-                            // if given country level access, do not include "no access" choice:
-                            [...store.program_role_choices] :
-                            // otherwise "no access" is a choice:
-                            [{label: NO_ACCESS, value: 'none'}, ...store.program_role_choices]),
             }
         }),{});
 }
@@ -65,7 +50,11 @@ const flattened_listing = (countries, programs, isExpanded) => countries.flatMap
                                                             country, // country object itself displays, followed by programs
                                                             ...(isExpanded(country.id) ? Array.from(country.programs) //only show programs if country is expanded
                                                                 .filter(program_id => programs[program_id]) // don't include programs we don't have information for (filtered out)
-                                                                .map(program_id => ({...programs[program_id], id: `${country.id}_${program_id}`, country_id: country.id})) : [])
+                                                                .map(program_id => (
+                                                                    {...programs[program_id],
+                                                                    id: `${country.id}_${program_id}`,
+                                                                    country_id: country.id,
+                                                                    })) : [])
                                                         ]
                                                     )
 
@@ -172,7 +161,6 @@ export default class EditUserPrograms extends React.Component {
 
     toggleProgramAccess(program_key) {
         const current_program_access = this.state.user_program_access.programs
-        console.log(current_program_access[program_key]);
         const updated_program_access = (() => {
             if(current_program_access[program_key] && current_program_access[program_key].has_access) {
                 // user has had their access removed, set the role to "none":
@@ -259,37 +247,14 @@ export default class EditUserPrograms extends React.Component {
                 return {...country, role: new_val, has_access: false}
             }
         })()
-        // using the form of setstate that receives the previous state/props as an argument, as we need
-        // to update the programs (based on current state programs list and new country value)
-        this.setState((state, props) => {
-            // this is a reference to the _old_ state programs, so it's safe to modify:
-            state.countries[country_id].programs.forEach(programId =>
-            // for each program in this country, set the options
-            state.programs[programId].options = new_val == 'none' ?
-                // if no country level access, NO ACCESS is an option:
-                [{label: NO_ACCESS, value: 'none'}, ...props.store.program_role_choices] :
-                // if country level access, just the base program role choices:
-                [...props.store.program_role_choices]
-            );
-            // re-apply unchanged filter (to avoid clearing filter results):
-            const {countries, programs} = apply_program_filter(
-                state.programs,
-                state.filtered_countries,
-                state.program_filter
-            );
-            const isExpanded = this.isExpanded.bind(this, state.program_filter);
-            return {
-                user_program_access: {
-                    ...this.state.user_program_access,
-                    countries: {
-                        ...this.state.user_program_access.countries,
-                        [country_id]: new_country_access
-                    }
-                },
-                filtered_programs: programs,
-                flattened_programs: flattened_listing(state.ordered_country_ids.filter(id => id in countries).map(id => countries[id]), programs, isExpanded)
-            };
-
+        this.setState({
+            user_program_access: {
+                ...this.state.user_program_access,
+                countries: {
+                    ...this.state.user_program_access.countries,
+                    [country_id]: new_country_access
+                }
+            },
         }, () => this.hasUnsavedDataAction());
     }
 
@@ -410,6 +375,24 @@ export default class EditUserPrograms extends React.Component {
         return this.countryStore.isExpanded(countryId);
     }
 
+    getRoleOptions(data) {
+        // role options dynamically generated to match both country and program current access state
+        if (data.type == 'country') {
+            // currently country options are always these same three (access / disabling of menu is controlled in is_role_disabled)
+            return [{label: INDIVIDUAL_PROGRAM_ACCESS, value: 'none'}, ...this.props.store.country_role_choices];
+        } else {
+            // if the user being edited (not the administrator using the admin) has access to the country this program
+            // is in, then they should not have the NO ACCESS option.  But if they do not have user or basic_admin access
+            // the NO ACCESS role is an option.
+            const countryRole = this.state.user_program_access.countries?.[data.country_id]?.role;
+            if (countryRole == 'basic_admin' || countryRole == 'user') {
+                return [...this.props.store.program_role_choices];
+            } else {
+                return [{label: NO_ACCESS, value: 'none'}, ...this.props.store.program_role_choices];
+            }
+        }
+    }
+
     render() {
         const {user, onSave} = this.props
 
@@ -444,7 +427,8 @@ export default class EditUserPrograms extends React.Component {
                 if(this.state.user_program_access.countries?.[data.country_id]?.has_access) {
                     return true
                 }
-                return 'basic_admin' != this.props.store.access.countries?.[data.country_id]?.role;
+                return !('basic_admin' == this.props.store.access.countries?.[data.country_id]?.role ||
+                        this.props.store.is_superuser)
             }
         }
 
@@ -456,12 +440,12 @@ export default class EditUserPrograms extends React.Component {
                 return !this.props.store.is_superuser
             } else {
                 // program access role dropdown
-                return (
+                return !(
                     // if the operating user (not the user being modified) does not have access to the
                     // country or their access isn't 'basic_admin' then the checkbox cannot be
                     // modified by this user
-                    !this.props.store.access.countries[data.country_id]
-                    || this.props.store.access.countries[data.country_id].role != 'basic_admin'
+                    'basic_admin' == this.props.store.access.countries?.[data.country_id]?.role ||
+                    this.props.store.is_superuser
                 )
             }
         }
@@ -597,7 +581,7 @@ export default class EditUserPrograms extends React.Component {
                                     id: rowData.id,
                                     disabled: is_role_disabled(rowData),
                                     type: rowData.type,
-                                    options: rowData.options,
+                                    options: this.getRoleOptions.call(this, rowData),
                                     action: (rowData.type == "country")?this.changeCountryRole.bind(this):this.changeProgramRole.bind(this)
                                 })}
                                 cellRenderer={({cellData}) =>
