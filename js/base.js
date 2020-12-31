@@ -384,6 +384,7 @@ import { create_unified_changeset_notice } from 'components/changesetNotice.js';
 window.create_unified_changeset_notice = create_unified_changeset_notice;
 window.unified_success_message = (message_text=null, config={}) => {
     const success_defaults = {
+        // # Translators: the header of an alert after an action completed successfully
         header: gettext('Success'),
         show_icon: true,
         preamble: null,
@@ -402,6 +403,7 @@ window.unified_success_message = (message_text=null, config={}) => {
 }
 window.unified_notice_message = (config={}) => {
     const notice_defaults = {
+        // # Translators: the header of an alert where additional warning info is provided
         header: gettext('Warning'),
         show_icon: true,
         preamble: null,
@@ -417,7 +419,25 @@ window.unified_notice_message = (config={}) => {
     };
     return create_unified_changeset_notice({...notice_defaults, ...config})
 };
-
+window.unified_error_message = (message_text=null, config={}) => {
+    const error_defaults = {
+        // # Translators: the header of an alert after an action failed for some reason
+        header: gettext('Error'),
+        show_icon: true,
+        preamble: null,
+        no_preamble: true,
+        message_text: null,
+        include_rationale: false,
+        showCloser: true,
+        confirm_text: null,
+        cancel_text: null,
+        context: null,
+        notice_type: 'error',
+        blocking: true,
+        self_dismissing: false
+    };
+    return create_unified_changeset_notice({...error_defaults, ...config, preamble: message_text});
+}
 
 
 /*
