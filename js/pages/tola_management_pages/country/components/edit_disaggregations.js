@@ -200,9 +200,10 @@ export class RetroProgramCheckBoxWrapper extends React.Component {
         }
     }
 
-    enterPressed(event) {
-        let code = event.keyCode || event.which;
-        if (code === 13) {
+    keyboardPress(e) {
+        e.preventDefault();
+        let code = e.keyCode || e.which;
+        if (!this.props.disabled & (code === 32 || code === 13)) {
             this.props.toggleProgramViz();
         }
     }
@@ -227,7 +228,7 @@ export class RetroProgramCheckBoxWrapper extends React.Component {
                         <span 
                             className={classNames({disabled: this.props.disabled})} 
                             onClick={this.props.toggleProgramViz} 
-                            onKeyPress={this.enterPressed.bind(this)}
+                            onKeyPress={this.keyboardPress.bind(this)}
                             tabIndex='0'>
                             <FontAwesomeIcon icon={this.props.programsExpanded ? 'caret-down' : 'caret-right'} />
                             {/* # Translators: This feature allows a user to apply changes to existing programs as well as ones created in the future */}
