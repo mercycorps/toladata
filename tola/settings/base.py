@@ -251,6 +251,7 @@ THIRD_PARTY_APPS = (
     'rest_framework',
     'rest_framework.authtoken',
     'crispy_forms',
+    'import_export', # used by some django-admin pages
     # 'django_extensions',
     'simplejson',
     'simple_history',
