@@ -223,7 +223,7 @@ export class CountryStore {
 
     onSaveErrorHandler(message) {
         // # Translators: Saving to the server failed
-        window.unified_error_message(message || gettext('Saving Failed'), {dir1: 'left', dir2: 'down'});
+        window.unified_error_message(message || gettext('Saving Failed'), {self_dismissing: true, dismiss_delay: 3000, dir1: 'left', dir2: 'down'});
     }
 
     onDeleteSuccessHandler() {
@@ -243,14 +243,15 @@ export class CountryStore {
 
     onDuplicatedDisaggLabelMessage(message) {
         // # Translators: error message generated when item names are duplicated but are required to be unqiue.
-        window.unified_error_message(message || gettext("Saving failed: Disaggregation categories should be unique within a disaggregation."), {dir1: 'left', dir2: 'down'});
+        window.unified_error_message(message || gettext("Saving failed: Disaggregation categories should be unique within a disaggregation."),
+                                     {self_dismissing: true, dismiss_delay: 3000, dir1: 'left', dir2: 'down'});
     }
 
     onDuplicatedDisaggTypeMessage(message) {
         window.unified_error_message(message ||
             // # Translators: error message generated when item names are duplicated but are required to be unqiue.
             gettext("Saving failed: disaggregation names should be unique within a country."),
-            {dir1: 'left', dir2: 'down'});
+            {self_dismissing: true, dismiss_delay: 3000, dir1: 'left', dir2: 'down'});
     }
 
     @observable active_editor_pane = 'profile'
