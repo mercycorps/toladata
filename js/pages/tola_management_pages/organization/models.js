@@ -102,11 +102,13 @@ export class OrganizationStore {
     }
 
     onSaveErrorHandler() {
-        PNotify.error({text: gettext('Saving Failed'), delay: 5000});
+        // # Translators: Saving to the server failed
+        window.unified_error_message(gettext('Saving failed'), {dir1: 'left', dir2: 'down'});
     }
 
     onSaveSuccessHandler() {
-        PNotify.success({text: gettext('Successfully Saved'), delay: 5000})
+        // # Translators: Saving to the server succeeded
+        window.unified_success_message(gettext('Successfully saved'))
     }
 
     dirtyConfirm() {

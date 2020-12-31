@@ -70,6 +70,8 @@ const create_unified_changeset_notice = ({
     blocking = true,
     self_dismissing = false, // automatically hides the notice after 8000 ms (default). NOTE: this is the OPPOSITE behavior as default PNotify
     dismiss_delay = 8000, // also PNotify default
+    dir1 = 'right', // notice will start on the left side
+    dir2 = 'up' // notice will start on the bottom
 } = {}) => {
     let header_icons = {
         'error': 'fa-exclamation-triangle',
@@ -219,8 +221,8 @@ const create_unified_changeset_notice = ({
         addClass: 'program-page__rationale-form',
         stack: {
             'overlayClose': !modal,
-            'dir1': 'right',
-            'dir2': 'up',
+            'dir1': dir1,
+            'dir2': dir2,
             'firstpos1': 20,
             'firstpos2': 20,
             'context': context,
