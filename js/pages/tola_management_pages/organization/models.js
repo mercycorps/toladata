@@ -103,7 +103,7 @@ export class OrganizationStore {
 
     onSaveErrorHandler() {
         // # Translators: Saving to the server failed
-        window.unified_error_message(gettext('Saving failed'), {dir1: 'left', dir2: 'down'});
+        window.unified_error_message(gettext('Saving failed'), {self_dismissing: true, dismiss_delay: 3000, dir1: 'left', dir2: 'down'});
     }
 
     onSaveSuccessHandler() {
