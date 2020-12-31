@@ -229,6 +229,7 @@ export class RetroProgramCheckBoxWrapper extends React.Component {
                             className={classNames({disabled: this.props.disabled})} 
                             onClick={this.props.toggleProgramViz} 
                             onKeyPress={this.keyboardPress.bind(this)}
+                            onKeyPress={(e) => this.keyboardPress(e)}
                             tabIndex='0'>
                             <FontAwesomeIcon icon={this.props.programsExpanded ? 'caret-down' : 'caret-right'} />
                             {/* # Translators: This feature allows a user to apply changes to existing programs as well as ones created in the future */}
@@ -454,9 +455,13 @@ export class DisaggregationType extends React.Component {
                                     />
                                     <ErrorFeedback errorMessages={this.formErrors('disaggregation_type')} />
                                     <div className="form-check" style={ {marginTop: '8px'} }>
-                                        <input className="form-check-input" type="checkbox" checked={managed_data.selected_by_default}
-                                               onChange={(e) => {this.updateSelectedByDefault(e.target.checked)}} id="selected-by-default-checkbox"
-                                                disabled={disaggregation.is_archived} />
+                                        <input 
+                                            className="form-check-input" 
+                                            id="selected-by-default-checkbox"
+                                            type="checkbox" 
+                                            checked={managed_data.selected_by_default}
+                                            onChange={(e) => {this.updateSelectedByDefault(e.target.checked)}} 
+                                            disabled={disaggregation.is_archived} />
                                         <label className="form-check-label mr-2" htmlFor="selected-by-default-checkbox">
                                         {
                                             // # Translators: This labels a checkbox, when checked, it will make the associated item "on" (selected) for all new indicators
