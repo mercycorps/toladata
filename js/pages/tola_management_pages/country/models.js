@@ -333,7 +333,6 @@ export class CountryStore {
                     this.updateHistory(id);
                 }))
             .catch((errors) => {
-                console.log(errors);
                 runInAction(() => {
                     this.saving = false;
                     this.editing_errors = errors.response?.data;
