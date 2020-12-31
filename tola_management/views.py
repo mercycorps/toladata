@@ -398,7 +398,7 @@ class UserAdminSerializer(ModelSerializer):
                 validation_errors.update({"email": _('A user account with this email address already exists.')})
 
         org_name = Organization.objects.get(id=data['organization_id']).name
-        email_domain_is_mc = re.search("@mercycorps.org$",  data["user"]["email"])
+        email_domain_is_mc = re.search("@mercycorps.org$",  data["user"]["email"], re.IGNORECASE)
         if org_name == "Mercy Corps" and not email_domain_is_mc:
             # Translators:  Error message given when an administrator tries to save a bad combination of
             # organization and email
