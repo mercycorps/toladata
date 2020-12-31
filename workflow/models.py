@@ -10,7 +10,7 @@ import uuid
 from django.utils.translation import ugettext_lazy as _
 
 from django.conf import settings
-from django.db.models import Count, Min, Subquery, OuterRef
+from django.db.models import Count, Min, Subquery, OuterRef, Q
 from django.db.models.signals import post_save
 from django.dispatch import receiver
 from rest_framework.authtoken.models import Token
@@ -286,7 +286,32 @@ class TolaUser(models.Model):
                 ).distinct()
 
     @property
+    def available_active_started_programs(self):
+        """Returns programs that are active, started, and a user has some level of access to"""
+        from indicators.queries import utils
+        programs = Program.rf_aware_objects.filter(
+            reporting_period_start__lte=utils.UTCNow()
+        )
+        if self.user.is_superuser:
+            return programs
+        else:
+            if self.country is not None:
+                return programs.filter(
+                    Q(country__in=self.countries.all()) |
+                    Q(programaccess__tolauser=self) |
+                    Q(country=self.country)
+                ).distinct()
+            else:
+                return programs.filter(
+                    Q(country__in=self.countries.all()) |
+                    Q(programaccess__tolauser=self)
+                ).distinct()
+
+    @property
     def available_programs(self):
+        """Deprecated - shows all programs, regardless of active status or future start dates
+
+        Consider using available_active_programs instead"""
         if self.user.is_superuser:
             return Program.objects.all()
         else:
