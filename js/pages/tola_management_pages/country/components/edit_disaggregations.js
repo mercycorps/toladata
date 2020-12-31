@@ -253,7 +253,7 @@ export class DisaggregationType extends React.Component {
             labels: this.orderLabels(disaggregation.labels),
             programsExpanded: false
         };
-        this.programsForRetro = observable(props.programs.reduce( (accum, program) => {
+        this.programsForRetro = observable(props.programs.filter(program => program.active).reduce( (accum, program) => {
             accum[program.id] = {id: program.id, name: program.name, checked: false}
             return accum
         }, {}))
