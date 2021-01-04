@@ -237,7 +237,7 @@ export class RetroProgramCheckBoxWrapper extends React.Component {
                         aria-controls="disagg-admin__programs"
                         className={classNames('accordion-row__btn', 'btn', 'btn-link', 'disaggregation--programs__header')}>
                         <span 
-                            className={classNames({disabled: this.props.disabled})} 
+                            className={classNames('disaggregation--programs__header-text',{disabled: this.props.disabled})} 
                             onClick={this.props.toggleProgramViz} 
                             onKeyPress={this.keyboardPress.bind(this)}
                             onKeyPress={(e) => this.keyboardPress(e)}
