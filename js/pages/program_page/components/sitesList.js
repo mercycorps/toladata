@@ -26,12 +26,14 @@ export default observer(({rootStore, ...props}) => {
                 }
             </li>
         }
-        <li className="pt-2">
-            <a href="/workflow/siteprofile_add/" className="btn-link text-success">
-            <FontAwesomeIcon icon={ faPlusCircle } />&nbsp;{
-                // # Translators: a link to add a new site (location)
-                gettext("Add site")
-            }</a></li>
+        { !rootStore.readOnly &&
+            <li className="pt-2">
+                <a href="/workflow/siteprofile_add/" className="btn-link text-success">
+                <FontAwesomeIcon icon={ faPlusCircle } />&nbsp;{
+                    // # Translators: a link to add a new site (location)
+                    gettext("Add site")
+                }</a></li>
+        }
         </ul>
         </React.Fragment>
     );

@@ -40,8 +40,17 @@ def index(request, selected_country=None):
         active_country = Country.objects.filter(id=selected_country)[0]
         user.update_active_country(active_country)
     else:
-        active_country = user.active_country \
-            if user.active_country and user.active_country in user_countries else user.country
+        # If the user's active country is stale, we should default to their home country or any country they have
+        # access to (if they're not an MC user).
+        if user.active_country and user.active_country in user_countries:
+            active_country = user.active_country
+        elif user.country:
+            active_country = user.country
+        elif len(user_countries) > 0:
+            active_country = user_countries[0]
+        else:
+            active_country = None
+
         if active_country != user.active_country:
             user.update_active_country(active_country)
 

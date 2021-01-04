@@ -104,12 +104,12 @@ urlpatterns += [
     path('program/<int:program>/logframe_excel/', views_program.logframe_excel_view, name='logframe_excel'),
 
     # Results framework builder
-    path('api/insert_new_level', insert_new_level, name='insert_new_level'),
-    path('api/save_leveltiers', save_leveltiers, name='save_leveltiers'),
-    path('api/reorder_indicators', reorder_indicators, name='reorder_indicators'),
+    path('api/insert_new_level/', insert_new_level, name='insert_new_level'),
+    path('api/save_leveltiers/', save_leveltiers, name='save_leveltiers'),
+    path('api/reorder_indicators/', reorder_indicators, name='reorder_indicators'),
     path('api/indicator_list/<int:program_id>/', indicator_list, name='indicator_list'),
     path('api/save_custom_tiers', save_custom_tiers, name='save_custom_tiers'),
-    path('api/save_custom_template', save_custom_template, name='save_custom_template'),
+    path('api/save_custom_template/', save_custom_template, name='save_custom_template'),
 
     # url redirect for people with old bookmarks
     path('program/<int:program_id>/<int:indicator_id>/<int:indicator_type_id>/',

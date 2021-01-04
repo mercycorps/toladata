@@ -211,57 +211,47 @@ export class CountryStore {
                 "Disaggregation saved and automatically selected for all indicators in %s programs.",
                 retroProgramCount
             ), [retroProgramCount])
-            create_unified_changeset_notice({
-                header: gettext("Successfully saved"),
-                message_text: message,
-                self_dismissing: true,
-                notice_type: 'success',
-                rationale_required: false,
-                confirm_text: null,
-                cancel_text: null,
-            })
+            // # Translators: Saving to the server succeeded
+            window.unified_success_message(gettext("Successfully saved"), {message_text: message});
         }
-        // This should be changed eventually, but it has Country Admin-wide impact and so is being left in for now,
-        // to avoid having to QA more than just the main ticket that added the unified notice above.
         else {
-            PNotify.success({text: gettext("Successfully saved"), delay: 5000});
+           // # Translators: Saving to the server succeeded
+            window.unified_success_message(gettext('Successfully Saved'))
         }
 
     }
 
     onSaveErrorHandler(message) {
-        PNotify.error({text: message || gettext("Saving failed"), delay: 5000})
+        // # Translators: Saving to the server failed
+        window.unified_error_message(message || gettext('Saving Failed'), {self_dismissing: true, dismiss_delay: 3000, dir1: 'left', dir2: 'down'});
     }
 
     onDeleteSuccessHandler() {
         // # Translators: Notification that a user has been able to delete a disaggregation
-        PNotify.success({text: gettext("Successfully deleted"), delay: 5000})
+        window.unified_success_message(gettext('Successfully deleted'))
     }
 
     onArchiveSuccessHandler() {
         // # Translators: Notification that a user has been able to disable a disaggregation
-        PNotify.success({text: gettext("Successfully archived"), delay: 5000})
+        window.unified_success_message(gettext('Successfully archived'))
     }
 
     onUnarchiveSuccessHandler() {
         // # Translators: Notification that a user has been able to reactivate a disaggregation
-        PNotify.success({text: gettext("Successfully unarchived"), delay: 5000})
+        window.unified_success_message(gettext('Successfully unarchived'))
     }
 
     onDuplicatedDisaggLabelMessage(message) {
-        PNotify.error({text: message ||
-            // # Translators: error message generated when item names are duplicated but are required to be unqiue.
-            gettext("Saving failed: Disaggregation categories should be unique within a disaggregation."),
-            delay: 5000
-        });
+        // # Translators: error message generated when item names are duplicated but are required to be unqiue.
+        window.unified_error_message(message || gettext("Saving failed: Disaggregation categories should be unique within a disaggregation."),
+                                     {self_dismissing: true, dismiss_delay: 3000, dir1: 'left', dir2: 'down'});
     }
 
     onDuplicatedDisaggTypeMessage(message) {
-        PNotify.error({text: message ||
+        window.unified_error_message(message ||
             // # Translators: error message generated when item names are duplicated but are required to be unqiue.
             gettext("Saving failed: disaggregation names should be unique within a country."),
-            delay: 5000
-        });
+            {self_dismissing: true, dismiss_delay: 3000, dir1: 'left', dir2: 'down'});
     }
 
     @observable active_editor_pane = 'profile'
@@ -325,8 +315,8 @@ export class CountryStore {
         }).catch(errors => {
             runInAction(()=> {
                 this.saving = false;
-                this.editing_errors = errors.response.data;
-                this.onSaveErrorHandler(errors.response.data.detail);
+                this.editing_errors = errors.response?.data;
+                this.onSaveErrorHandler(errors.response?.data?.detail);
             })
         })
     }
@@ -346,8 +336,8 @@ export class CountryStore {
             .catch((errors) => {
                 runInAction(() => {
                     this.saving = false;
-                    this.editing_errors = errors.response.data;
-                    this.onSaveErrorHandler(errors.response.data.detail);
+                    this.editing_errors = errors.response?.data;
+                    this.onSaveErrorHandler(errors.response?.data?.detail);
                 })
             })
     }
@@ -657,4 +647,3 @@ export class CountryStore {
     };
 
 }
-

@@ -191,16 +191,18 @@ export class ProgramStore {
     }
 
     onSaveSuccessHandler() {
-        PNotify.success({text: gettext("Successfully saved"), delay: 5000})
+        // # Translators: Saving to the server succeeded
+        window.unified_success_message(gettext("Successfully saved"))
     }
 
     onSaveErrorHandler() {
-        PNotify.error({text: gettext("Saving failed"), delay: 5000})
+        // # Translators: Saving to the server failed
+        window.unified_error_message(gettext('Saving failed'), {self_dismissing: true, dismiss_delay: 3000, dir1: 'left', dir2: 'down'});
     }
 
     onGAITDatesSyncSuccess() {
         // # Translators: Notify user that the program start and end date were successfully retrieved from the GAIT service and added to the newly saved Program
-        PNotify.success({text: gettext("Successfully synced GAIT program start and end dates"), delay: 5000})
+        window.unified_success_message(gettext("Successfully synced GAIT program start and end dates"))
     }
 
     onGAITDatesSyncFailure(reason, program_id) {

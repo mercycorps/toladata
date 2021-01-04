@@ -4,6 +4,7 @@ import { observer } from "mobx-react"
 import { DragDropContext, Droppable, Draggable } from 'react-beautiful-dnd';
 import classNames from 'classnames'
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome'
+import { faCaretDown, faCaretRight } from "@fortawesome/free-solid-svg-icons";
 import HelpPopover from "../../../../components/helpPopover";
 import { toJS } from 'mobx';
 import {create_unified_changeset_notice} from '../../../../components/changesetNotice';
@@ -275,7 +276,7 @@ export class DisaggregationType extends React.Component {
             labels: this.orderLabels(disaggregation.labels),
             programsExpanded: false
         };
-        this.programsForRetro = observable(props.programs.reduce( (accum, program) => {
+        this.programsForRetro = observable(props.programs.filter(program => program.active).reduce( (accum, program) => {
             accum[program.id] = {id: program.id, name: program.name, checked: false}
             return accum
         }, {}))
@@ -443,7 +444,7 @@ export class DisaggregationType extends React.Component {
             <div className="accordion-row">
                 <div className="accordion-row__content">
                     <a onClick={() => {expandAction(this.resetForm.bind(this));}} className="btn accordion-row__btn btn-link" tabIndex='0'>
-                        <FontAwesomeIcon icon={expanded ? 'caret-down' : 'caret-right'} />
+                        <FontAwesomeIcon icon={expanded ? faCaretDown : faCaretRight } />
                         {(disaggregation.id === 'new') ? "New disaggregation" : disaggregation.disaggregation_type}
                     </a>
                     {disaggregation.is_archived && <span className="text-muted font-weight-bold ml-2">(Archived)</span>}

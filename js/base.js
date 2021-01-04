@@ -330,41 +330,6 @@ function notifyError(title, msg) {
 }
 window.notifyError = notifyError;
 
-function autoDismissingNotification({
-    message = '',
-    type = 'success',
-    title = gettext("Success"),
-    hide = true,
-    textTrusted = false
-} = {}) {
-    const notice = PNotify.alert({
-        title: title,
-        text: message,
-        type: type,
-        hide: hide,
-        textTrusted: textTrusted,
-        width: '350px',
-        minHeight: '150px',
-        delay: 3000,
-        stack: {
-            'dir1': 'right',
-            'dir2': 'up',
-            'firstpos1': 0,
-            'firstpos2': 0
-        },
-        modules: {
-            Buttons: {
-                closer: true,
-                closerHover: false,
-                sticker: false
-            }
-        }
-    });
-    return notice;
-}
-
-window.autoDismissingNotification = autoDismissingNotification;
-
 $(document).ready(function() {
     $(document).on('hidden.bs.modal', '.modal', function () {
         if ($('.modal:visible').length) {
@@ -408,252 +373,6 @@ const target_with_results_text = (numResults) => {
 window.target_with_results_text = target_with_results_text;
 
 
-const create_changeset_notice = ({
-    on_submit = () => {},
-    on_cancel = () => {},
-    // # Translators: Button to approve a form
-    confirm_text = gettext('Ok'),
-    // # Translators: Button to cancel a form submission
-    cancel_text = gettext('Cancel'),
-    type = 'notice',
-    inner = '',
-    context = null,
-    rationale_required = true,
-    showCloser = false,
-} = {}) => {
-    var notice = PNotify.alert({
-        text: $(`<div><form action="" method="post" class="form">${inner}</form></div>`).html(),
-        textTrusted: true,
-        icon: false,
-        width: '350px',
-        hide: false,
-        type: type,
-        addClass: 'program-page__rationale-form',
-        stack: {
-            'overlayClose': true,
-            'dir1': 'right',
-            'dir2': 'up',
-            'firstpos1': 20,
-            'firstpos2': 20,
-            'context': context
-        },
-        modules: {
-            Buttons: {
-                closer: showCloser,
-                closerHover: false,
-                sticker: false
-            },
-            Confirm: {
-                confirm: true,
-                buttons: [
-                    {
-                        text: confirm_text,
-                        primary: true,
-                        addClass:(type == 'error')?'btn-danger':'',
-                        click: function (notice) {
-                            var close = true;
-                            var textarea = $(notice.refs.elem).find('textarea[name="rationale"]')
-                            var rationale = textarea.val();
-                            textarea.parent().find('.invalid-feedback').remove();
-                            if(!rationale && rationale_required) {
-                                textarea.addClass('is-invalid');
-                                textarea.parent().append(
-                                    '<div class="invalid-feedback">'
-                                    + gettext('A reason is required.')
-                                    + '</div>'
-                                );
-                                return false;
-                            } else {
-                                textarea.removeClass('is-invalid');
-                            }
-                            if(on_submit) {
-                                close = on_submit(rationale);
-                                if(close === undefined) {
-                                    close = true;
-                                }
-                            }
-                            if(close) {
-                                document.getElementById('notification_blocking_div').style.display='none';
-                                notice.close();
-                            }
-                        }
-                    },
-                    {
-                        text: cancel_text,
-                        click: function (notice) {
-                            close = on_cancel()
-                            if(close === undefined) {
-                                close = true;
-                            }
-
-                            if(close) {
-                                document.getElementById('notification_blocking_div').style.display='none';
-                                notice.close();
-                            }
-                        }
-                    }
-                ]
-            }
-        }
-    });
-    if (on_cancel) {
-        notice.on('click', function(e) {
-            if ($(e.target).is('.ui-pnotify-closer *')) {
-                let close = on_cancel();
-                if (close || close === undefined) {
-                    document.getElementById('notification_blocking_div').style.display='none';
-                    notice.close();
-                }
-        }});
-    }
-}
-
-// Consider using the create_unified_changeset_notice instead of this one
-window.create_destructive_changeset_notice = ({
-    message_text = DEFAULT_DESTRUCTIVE_MESSAGE,
-    on_submit = () => {},
-    on_cancel = () => {},
-    // # Translators: Button to approve a form
-    confirm_text = gettext('Ok'),
-    // # Translators: Button to cancel a form submission
-    cancel_text = gettext('Cancel'),
-    context = null,
-    no_preamble = false,
-    showCloser = false,
-    preamble = false
-} = {}) => {
-    if(!message_text) {message_text = DEFAULT_DESTRUCTIVE_MESSAGE}
-    if (!preamble) { preamble = (no_preamble)?'':`<span class='text-danger'>${gettext("This action cannot be undone.")}</span>`}
-    const inner = `
-        <div class="row">
-            <div class="col">
-                <h2 class="text-danger">${gettext("Warning")}</h2>
-            </div>
-        </div>
-        <div class="row">
-            <div class="col">
-                ${preamble}
-                ${message_text}
-            </div>
-        </div>
-        <div class="row">
-            <div class="col">
-                <div class="form-group">
-                    <textarea class="form-control" name="rationale"></textarea>
-                </div>
-            </div>
-        </div>
-    `;
-    return create_changeset_notice({
-        message_text: message_text,
-        on_submit: on_submit,
-        on_cancel: on_cancel,
-        confirm_text: confirm_text,
-        cancel_text: cancel_text,
-        type: 'error',
-        inner: inner,
-        context: context,
-        showCloser: showCloser
-    })
-}
-
-// Consider using the create_unified_changeset_notice instead of this one
-window.create_nondestructive_changeset_notice = ({
-    message_text = DEFAULT_NONDESTRUCTIVE_MESSAGE,
-    on_submit = () => {},
-    on_cancel = () => {},
-    // # Translators: Button to approve a form
-    confirm_text = gettext('Ok'),
-    // # Translators: Button to cancel a form submission
-    cancel_text = gettext('Cancel'),
-    context = null
-} = {}) => {
-    if(!message_text) {message_text = DEFAULT_NONDESTRUCTIVE_MESSAGE}
-    const inner = `
-        <div class="row">
-            <div class="col">
-                <h2>${gettext("Reason for change")}</h2>
-            </div>
-        </div>
-        <div class="row">
-            <div class="col">
-                ${message_text}
-            </div>
-        </div>
-        <div class="row">
-            <div class="col">
-                <div class="form-group">
-                    <textarea class="form-control" name="rationale"></textarea>
-                </div>
-            </div>
-        </div>
-    `;
-    return create_changeset_notice({
-        message_text: message_text,
-        on_submit: on_submit,
-        on_cancel: on_cancel,
-        confirm_text: confirm_text,
-        cancel_text: cancel_text,
-        type: 'notice',
-        inner: inner,
-        context: context
-    })
-}
-
-// Consider using the create_unified_changeset_notice instead of this one
-window.create_no_rationale_changeset_notice = ({
-    message_text = DEFAULT_NO_RATIONALE_TEXT,
-    on_submit = () => {},
-    on_cancel = () => {},
-    // # Translators: Button to approve a form
-    confirm_text = gettext('Ok'),
-    // # Translators: Button to cancel a form submission
-    cancel_text = gettext('Cancel'),
-    context = null,
-    type = 'error',
-    preamble = false,
-    blocking = false
-} = {}) => {
-    if (blocking) {
-        document.getElementById('notification_blocking_div').style.display='block';
-    }
-    if (!message_text) {message_text = DEFAULT_NO_RATIONALE_TEXT}
-    if (!preamble) {preamble = gettext("This action cannot be undone.")};
-    const inner = `
-        <div class="row">
-            <div class="col">
-                <h2 class="pnotify--header"><i class="fas fa-exclamation-triangle"></i>${gettext("Warning")}</h2>
-            </div>
-        </div>
-        <div class="row">
-            <div class="col">
-                <span class='text-danger'>
-                    ${preamble}
-                </span>
-            </div>
-        </div>
-        <div class="row">
-            <div class="col">
-                <span>
-                    ${message_text}
-                </span>
-            </div>
-        </div>
-    `;
-    return create_changeset_notice({
-        message_text: message_text,
-        on_submit: on_submit,
-        on_cancel: on_cancel,
-        confirm_text: confirm_text,
-        cancel_text: cancel_text,
-        type: type,
-        inner: inner,
-        context: context,
-        rationale_required: false,
-        showCloser: true
-    });
-}
-
 /*
 * Consider using this notification function rather than the more specific ones above.  It should be able to
 * everything they can do. The configurable parameters are for the 4 sections of the notification and
@@ -663,61 +382,62 @@ window.create_no_rationale_changeset_notice = ({
 
 import { create_unified_changeset_notice } from 'components/changesetNotice.js';
 window.create_unified_changeset_notice = create_unified_changeset_notice;
-
-
-const createPnotifyAlert = (passedInConfig) => {
-    let config = {
-        textTrusted: true,
-        icon: false,
-        width: '350px',
-        hide: true,
-        delay: 2000,
-        type: 'alert',
+window.unified_success_message = (message_text=null, config={}) => {
+    const success_defaults = {
+        // # Translators: the header of an alert after an action completed successfully
+        header: gettext('Success'),
+        show_icon: true,
+        preamble: null,
+        include_rationale: false,
+        message_text: null,
+        showCloser: true,
+        confirm_text: null,
+        cancel_text: null,
+        context: null,
+        notice_type: 'success',
+        blocking: false,
+        dismiss_delay: 3000,
+        self_dismissing: true
     };
-    Object.assign(config, passedInConfig);
-
-    let faClass = "fa-exclamation-triangle";
-    if (config.type == "success"){
-        faClass = "fa-check-circle";
-    }
-
-    const inner = `
-        <div class="row">
-            <div class="col">
-                <h2 class="pnotify--header"><i class="fas ${faClass}"></i>${gettext("Success!")}</h2>
-            </div>
-        </div>
-        <div class="row">
-            <div class="col">
-                <span class='text-success'>
-                    ${config.preamble}
-                </span>
-            </div>
-        </div>
-        <div class="row">
-            <div class="col">
-                <span>
-                    ${config.message_text}
-                </span>
-            </div>
-        </div>
-    `;
-
-    config.text = $(`<div><form action="" method="post" class="form container">${inner}</form></div>`).html();
-    PNotify.alert(config);
+    return create_unified_changeset_notice({...success_defaults, ...config, preamble: message_text});
+}
+window.unified_notice_message = (config={}) => {
+    const notice_defaults = {
+        // # Translators: the header of an alert where additional warning info is provided
+        header: gettext('Warning'),
+        show_icon: true,
+        preamble: null,
+        message_text: null,
+        include_rationale: false,
+        showCloser: true,
+        confirm_text: null,
+        cancel_text: null,
+        context: null,
+        notice_type: 'notice',
+        blocking: true,
+        self_dismissing: false
+    };
+    return create_unified_changeset_notice({...notice_defaults, ...config})
 };
-
-window.success_notice = (userConfig) =>{
-    let config = {
-        message_text: "Update successful.",
-        preamble: "",
-        animation: "fade",
-        type: "success",
-    }
-    Object.assign(config, userConfig);
-
-    createPnotifyAlert(config);
-};
+window.unified_error_message = (message_text=null, config={}) => {
+    const error_defaults = {
+        // # Translators: the header of an alert after an action failed for some reason
+        header: gettext('Error'),
+        show_icon: true,
+        preamble: null,
+        no_preamble: true,
+        message_text: null,
+        include_rationale: false,
+        showCloser: true,
+        confirm_text: null,
+        cancel_text: null,
+        context: null,
+        notice_type: 'error',
+        blocking: true,
+        self_dismissing: false
+    };
+    return create_unified_changeset_notice({...error_defaults, ...config, preamble: message_text});
+}
 
 
 /*
@@ -896,4 +616,3 @@ window.normalizeNumber = function (value) {
         return parseFloat(value).toString();
     }
 };
-
