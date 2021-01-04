@@ -213,7 +213,12 @@ export class RetroProgramCheckBoxWrapper extends React.Component {
         let checkBoxComponent = null;
         if (this.props.programsExpanded) {
             checkBoxComponent =
-                <div id="disagg-admin__programs" className="ml-2 mt-2 d-flex flex-column disaggregation-programs">
+                <div 
+                    id="disagg-admin__programs" 
+                    aria-labelledby="disagg-admin__programs-header"
+                    className="ml-2 mt-2 d-flex flex-column disaggregation-programs"
+                    hidden={!this.props.programsExpanded} 
+                    >
                     <CheckBoxList checkBoxOptions={checkBoxOptions} onUpdate={this.props.onRetroUpdate}/>
                 </div>
         }
@@ -222,8 +227,14 @@ export class RetroProgramCheckBoxWrapper extends React.Component {
 
         return (
             <React.Fragment>
-                <div className="mt-2 ml-4 retro-programs">
+                <div 
+                role="heading"
+                className="mt-2 ml-4 retro-programs">
                      <div
+                        id="disagg-admin__programs-header"
+                        role="button"
+                        aria-expanded={this.props.programsExpanded}
+                        aria-controls="disagg-admin__programs"
                         className={classNames('accordion-row__btn', 'btn', 'btn-link', 'disaggregation--programs__header')}>
                         <span 
                             className={classNames({disabled: this.props.disabled})} 
