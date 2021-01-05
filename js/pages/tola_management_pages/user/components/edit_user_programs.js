@@ -473,7 +473,6 @@ export default class EditUserPrograms extends React.Component {
                 }
             }
         }
-
         return (
             <div className="tab-pane--react edit-user-programs">
                 <h2 className="no-bold">{user.name?user.name+': ':''}{gettext("Programs and Roles")}
@@ -482,7 +481,13 @@ export default class EditUserPrograms extends React.Component {
                             // # Translators: link to learn more about permissions-granting roles a user can be assigned
                             gettext('More information on Program Roles')} className="far fa-question-circle" />
                 </a></sup></h2>
-
+                {user.is_super ?
+                    <div className="edit-user-programs__superuser-notice"><strong className="text-danger">{
+                        // # Translators: A message explaining why the roles and options menu is not displayed for the current user
+                        gettext("Program and role options are not displayed because Super Admin permissions override all available settings.")
+                    }
+                    </strong></div> :
+                <React.Fragment>
                 <div className="edit-user-programs__filter-form">
                     <div className="edit-user-programs__country-filter form-group react-multiselect-checkbox">
                         <CheckboxedMultiSelect placeholder={
@@ -602,6 +607,7 @@ export default class EditUserPrograms extends React.Component {
                     <button type="button" className="btn btn-primary" onClick={() => this.saveForm()}>Save Changes</button>
                     <button type="button" className="btn btn-reset" onClick={() => this.resetForm()}>Reset</button>
                 </div>
+                </React.Fragment>}
 
             </div>
         )

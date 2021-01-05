@@ -2,8 +2,8 @@ msgid ""
 msgstr ""
 "Project-Id-Version: \n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2021-01-05 11:54-0800\n"
-"PO-Revision-Date: 2021-01-05 11:57-0800\n"
+"POT-Creation-Date: 2021-01-05 12:50-0800\n"
+"PO-Revision-Date: 2021-01-05 12:50-0800\n"
 "Last-Translator: \n"
 "Language-Team: \n"
 "Language: fr\n"
@@ -1638,19 +1638,20 @@ msgstr[1] ""
 
 #. Translators: Saving to the server succeeded
 #: js/pages/tola_management_pages/country/models.js:215
-#: js/pages/tola_management_pages/country/models.js:219
 #: js/pages/tola_management_pages/organization/models.js:111
 #: js/pages/tola_management_pages/program/models.js:195
 #: js/pages/tola_management_pages/user/models.js:208
 msgid "Successfully saved"
 msgstr "Enregistré avec succès"
 
+#. Translators: Saving to the server succeeded
+#: js/pages/tola_management_pages/country/models.js:219
+msgid "Successfully Saved"
+msgstr "Enregistré avec succès"
+
 #. Translators: Saving to the server failed
 #: js/pages/tola_management_pages/country/models.js:226
-#: js/pages/tola_management_pages/organization/models.js:106
-#: js/pages/tola_management_pages/program/models.js:200
-#: js/pages/tola_management_pages/user/models.js:203
-msgid "Saving failed"
+msgid "Saving Failed"
 msgstr "Échec de l’enregistrement"
 
 #. Translators: Notification that a user has been able to delete a disaggregation
@@ -1671,18 +1672,18 @@ msgstr "Désarchivée avec succès"
 #. Translators: error message generated when item names are duplicated but are required to be unqiue.
 #: js/pages/tola_management_pages/country/models.js:246
 msgid ""
-"Saving failed. Disaggregation categories should be unique within a "
+"Saving failed: Disaggregation categories should be unique within a "
 "disaggregation."
 msgstr ""
-"Échec de l’enregistrement. Les catégories de désagrégation doivent être "
+"Échec de l’enregistrement : les catégories de désagrégation doivent être "
 "uniques au sein d’une même désagrégation."
 
 #. Translators: error message generated when item names are duplicated but are required to be unqiue.
 #: js/pages/tola_management_pages/country/models.js:253
-msgid "Saving failed. Disaggregation names should be unique within a country."
+msgid "Saving failed: disaggregation names should be unique within a country."
 msgstr ""
-"Échec de l’enregistrement. Les noms de désagrégation doivent être uniques au "
-"sein d’un même pays."
+"Échec de l’enregistrement : les noms de désagrégation doivent être uniques "
+"au sein d’un même pays."
 
 #. Translators: This is a confirmation prompt to confirm a user wants to delete an item
 #: js/pages/tola_management_pages/country/models.js:438
@@ -1899,6 +1900,13 @@ msgstr "Enregistrer et ajouter un autre"
 msgid "Status and History"
 msgstr "Statut et historique"
 
+#. Translators: Saving to the server failed
+#: js/pages/tola_management_pages/organization/models.js:106
+#: js/pages/tola_management_pages/program/models.js:200
+#: js/pages/tola_management_pages/user/models.js:203
+msgid "Saving failed"
+msgstr "Échec de l’enregistrement"
+
 #: js/pages/tola_management_pages/organization/views.js:42
 msgid "Find an Organization"
 msgstr "Rechercher une organisation"
@@ -2108,44 +2116,53 @@ msgstr "Programmes individuels uniquement"
 msgid "No access"
 msgstr "N’a pas accès"
 
-#: js/pages/tola_management_pages/user/components/edit_user_programs.js:479
+#: js/pages/tola_management_pages/user/components/edit_user_programs.js:478
 #: js/pages/tola_management_pages/user/components/user_editor.js:32
 msgid "Programs and Roles"
 msgstr "Programmes et rôles"
 
 #. Translators: link to learn more about permissions-granting roles a user can be assigned
-#: js/pages/tola_management_pages/user/components/edit_user_programs.js:483
+#: js/pages/tola_management_pages/user/components/edit_user_programs.js:482
 msgid "More information on Program Roles"
 msgstr "En savoir plus sur les rôles de programmes"
 
+#. Translators: A message explaining why the roles and options menu is not displayed for the current user
+#: js/pages/tola_management_pages/user/components/edit_user_programs.js:487
+msgid ""
+"Program and role options are not displayed because Super Admin permissions "
+"override all available settings."
+msgstr ""
+"Les options de programme et de rôle ne sont pas affichées car les "
+"autorisations de Super Admin annulent tous les paramètres disponibles."
+
 #. Translators: This is placeholder text on a dropdown of countries which limit the displayed programs
-#: js/pages/tola_management_pages/user/components/edit_user_programs.js:490
+#: js/pages/tola_management_pages/user/components/edit_user_programs.js:495
 msgid "Filter countries"
 msgstr "Filtrer les pays"
 
 #. Translators: this is placeholder text on a dropdown of programs which limit the displayed results
-#: js/pages/tola_management_pages/user/components/edit_user_programs.js:496
+#: js/pages/tola_management_pages/user/components/edit_user_programs.js:501
 msgid "Filter programs"
 msgstr "Filtrer les programmes"
 
 #. Translators: Column header for a checkbox indicating if a user has access to a program */
-#: js/pages/tola_management_pages/user/components/edit_user_programs.js:521
+#: js/pages/tola_management_pages/user/components/edit_user_programs.js:526
 msgid "Has access?"
 msgstr "A accès ?"
 
-#: js/pages/tola_management_pages/user/components/edit_user_programs.js:540
+#: js/pages/tola_management_pages/user/components/edit_user_programs.js:545
 msgid "Deselect All"
 msgstr "Tout déselectionner"
 
-#: js/pages/tola_management_pages/user/components/edit_user_programs.js:540
+#: js/pages/tola_management_pages/user/components/edit_user_programs.js:545
 msgid "Select All"
 msgstr "Tout sélectionner"
 
-#: js/pages/tola_management_pages/user/components/edit_user_programs.js:550
+#: js/pages/tola_management_pages/user/components/edit_user_programs.js:555
 msgid "Countries and Programs"
 msgstr "Pays et programmes"
 
-#: js/pages/tola_management_pages/user/components/edit_user_programs.js:579
+#: js/pages/tola_management_pages/user/components/edit_user_programs.js:584
 msgid "Roles and Permissions"
 msgstr "Rôles et autorisations"
 
@@ -2217,12 +2234,6 @@ msgstr "Super administrateur"
 #: js/pages/tola_management_pages/user/views.js:362
 msgid "users"
 msgstr "utilisateurs"
-
-#~ msgid "Successfully Saved"
-#~ msgstr "Enregistré avec succès"
-
-#~ msgid "Saving Failed"
-#~ msgstr "Échec de l’enregistrement"
 
 #~ msgid "Success!"
 #~ msgstr "Succès !"
