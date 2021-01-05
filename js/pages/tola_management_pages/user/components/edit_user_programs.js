@@ -484,7 +484,7 @@ export default class EditUserPrograms extends React.Component {
                 {user.is_super ?
                     <div className="edit-user-programs__superuser-notice"><strong className="text-danger">{
                         // # Translators: A message explaining why the roles and options menu is not displayed for the current user
-                        gettext("Program and role options are not displayed because Super Admin permissions override all available settings")
+                        gettext("Program and role options are not displayed because Super Admin permissions override all available settings.")
                     }
                     </strong></div> :
                 <React.Fragment>
