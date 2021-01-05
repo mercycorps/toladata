@@ -7,7 +7,7 @@ msgstr ""
 "Project-Id-Version: \n"
 "Report-Msgid-Bugs-To: \n"
 "POT-Creation-Date: 2021-01-05 10:45-0800\n"
-"PO-Revision-Date: 2021-01-05 10:45-0800\n"
+"PO-Revision-Date: 2021-01-05 11:15-0800\n"
 "Last-Translator: \n"
 "Language-Team: \n"
 "Language: es\n"
@@ -62,10 +62,8 @@ msgstr "Advertencia"
 
 #. Translators: the header of an alert after an action failed for some reason
 #: js/base.js:425
-#, fuzzy
-#| msgid "Form Errors"
 msgid "Error"
-msgstr "Errores en el Formulario"
+msgstr "Error"
 
 #. Translators: button label to show the details of all items in a list */}
 #. Translators: button label to show the details of all rows in a list */}
