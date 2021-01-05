@@ -19,7 +19,7 @@ from indicators.models import (
     DisaggregationType,
     DisaggregationLabel,
 )
-from workflow.models import Program, Country, Organization, TolaUser, CountryAccess, ProgramAccess, SiteProfile
+from workflow.models import Program, Country, Organization, TolaUser, CountryAccess, ProgramAccess, SiteProfile, Region
 from .qa_program_widgets.qa_widgets import Cleaner, ProgramFactory, IndicatorFactory, user_profiles, standard_countries
 
 
@@ -60,9 +60,11 @@ class Command(BaseCommand):
                 test_password = getpass(prompt="Enter the password to use for the test users: ")
 
         org = Organization.mercy_corps()
+        hq_region, _ = Region.objects.get_or_create(gait_region_id=99, defaults={'name': 'HQ Managed'})
         tolaland, created = Country.objects.get_or_create(
             country='Tolaland', defaults={
-                'latitude': 21.4, 'longitude': -158, 'zoom': 6, 'organization': org, 'code': 'TO'})
+                'latitude': 21.4, 'longitude': -158, 'zoom': 6, 'organization': org, 'code': 'TO', 'region': hq_region
+            })
         if created:
             self.create_disaggregations(tolaland)
 

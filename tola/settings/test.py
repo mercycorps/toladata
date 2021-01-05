@@ -26,13 +26,13 @@ PASSWORD_HASHERS = (
 DATABASES = {
     "default": {
         "ENGINE": "django.db.backends.mysql",
-        "NAME": "tola_activity",
+        "NAME": "tola",
         "OPTIONS": {
             'charset': 'utf8mb4',
         },
-        "HOST": "localhost",
+        "HOST": "127.0.0.1",
         "USER": "root",
-        "PORT": "",
+        "PORT": "3306",
     },
 }
 
