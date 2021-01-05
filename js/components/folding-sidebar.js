@@ -62,12 +62,15 @@ class FoldingSidebar extends React.Component {
         const overflow = (this.state.folded || this.state.folding) ? "hidden" : "visible";
         return (
         <div className={"folding-sidebar "+(className || '')} {...props}>
-            <div className={"folding-sidebar__contents"}
-                 onTransitionEnd={() => this.foldComplete()}
-                 ref={this.contentsContainer}
-                style={{width: width, overflow: overflow }}
-            >
-                <React.Fragment>{this.props.children}</React.Fragment>
+            <div className={"folding-sidebar__container"} 
+                style={{maxHeight: (window.innerHeight - 125) + "px" , overflow: "auto"}}>
+                <div className={"folding-sidebar__contents"}
+                    onTransitionEnd={() => this.foldComplete()}
+                    ref={this.contentsContainer}
+                    style={{width: width, overflow: overflow }}
+                >
+                    <React.Fragment>{this.props.children}</React.Fragment>
+                </div>
             </div>
             <div className="folding-sidebar__trigger" onClick={() => this.toggleFolded()}>
                 <i key={icon}><span className={"fa "+icon}></span></i>
