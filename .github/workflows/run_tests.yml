@@ -1,0 +1,61 @@
+
+name: Run Tests
+on: [push, pull_request]
+jobs:
+    run_python_tests:
+        runs-on: ubuntu-18.04
+        strategy:
+            max-parallel: 4
+            matrix:
+                # This can be used to test other python versions in Parallel, if we're thinking about upgrading.
+                python-version: [3.8]
+        services:
+            # This creates a MySQL docker container.  Many of the directives in this section are from a docker config
+            # file, so if further refinements are required, it's possible that regular docker directives could be used.
+            mysql:
+                image: mysql:5.7
+                env:
+                    MYSQL_ALLOW_EMPTY_PASSWORD: 'yes'
+                    MYSQL_DATABASE: tola
+                ports:
+                    # Maps port 3306 of the MySQL container to 3308 of the host container that's running the tests.
+                    - 3306:3306
+                # This tests whether the MySQL container is fully spun up (takes about 20-30 seconds) and that MySQL is
+                # running properly.  Important because without it, the workflow would proceed to the next step,
+                # before the MySQL was fully spun, up and would then fail because the database connection was down.
+                options: --health-cmd="mysqladmin ping" --health-interval=10s --health-timeout=5s --health-retries=3
+        steps:
+            - name: Verify MySQL
+              # Needs to be '127.0.0.1';  using 'localhost' will result in an attempt to connect to a .sock file, which will fail
+              run: |
+                mysql -uroot -h 127.0.0.1 --port 3306 -e "SHOW DATABASES"
+            - name: Install linux dependencies
+              run: |
+                sudo apt-get install -y libxmlsec1-dev
+            - name: Checkout repo
+              uses: actions/checkout@v2
+            - name: Set up Python ${{ matrix.python-version }}
+              uses: actions/setup-python@v2
+              with:
+                python-version: ${{ matrix.python-version }}
+            - name: Install Dependencies
+              run: |
+                python -m pip install --upgrade pip
+                pip install -r requirements.txt
+            - name: Run Tests
+              run: |
+                python manage.py test
+
+    run_js_tests:
+        runs-on: ubuntu-18.04
+        strategy:
+            matrix:
+                node-version: [ 12.x ]
+        steps:
+            - uses: actions/checkout@v2
+            - name: Use Node.js ${{ matrix.node-version }}
+              uses: actions/setup-node@v1
+              with:
+                node-version: ${{ matrix.node-version }}
+            - run: npm ci
+            - run: npm test
