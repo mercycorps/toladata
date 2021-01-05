@@ -2,8 +2,8 @@ msgid ""
 msgstr ""
 "Project-Id-Version: \n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2021-01-05 10:45-0800\n"
-"PO-Revision-Date: 2020-12-23 12:29-0800\n"
+"POT-Creation-Date: 2021-01-05 11:54-0800\n"
+"PO-Revision-Date: 2021-01-05 11:57-0800\n"
 "Last-Translator: \n"
 "Language-Team: \n"
 "Language: fr\n"
@@ -60,7 +60,7 @@ msgstr "Attention"
 #. Translators: the header of an alert after an action failed for some reason
 #: js/base.js:425
 msgid "Error"
-msgstr ""
+msgstr "Erreur"
 
 #. Translators: button label to show the details of all items in a list */}
 #. Translators: button label to show the details of all rows in a list */}
@@ -1638,20 +1638,19 @@ msgstr[1] ""
 
 #. Translators: Saving to the server succeeded
 #: js/pages/tola_management_pages/country/models.js:215
+#: js/pages/tola_management_pages/country/models.js:219
 #: js/pages/tola_management_pages/organization/models.js:111
 #: js/pages/tola_management_pages/program/models.js:195
 #: js/pages/tola_management_pages/user/models.js:208
 msgid "Successfully saved"
 msgstr "Enregistré avec succès"
 
-#. Translators: Saving to the server succeeded
-#: js/pages/tola_management_pages/country/models.js:219
-msgid "Successfully Saved"
-msgstr "Enregistré avec succès"
-
 #. Translators: Saving to the server failed
 #: js/pages/tola_management_pages/country/models.js:226
-msgid "Saving Failed"
+#: js/pages/tola_management_pages/organization/models.js:106
+#: js/pages/tola_management_pages/program/models.js:200
+#: js/pages/tola_management_pages/user/models.js:203
+msgid "Saving failed"
 msgstr "Échec de l’enregistrement"
 
 #. Translators: Notification that a user has been able to delete a disaggregation
@@ -1672,18 +1671,18 @@ msgstr "Désarchivée avec succès"
 #. Translators: error message generated when item names are duplicated but are required to be unqiue.
 #: js/pages/tola_management_pages/country/models.js:246
 msgid ""
-"Saving failed: Disaggregation categories should be unique within a "
+"Saving failed. Disaggregation categories should be unique within a "
 "disaggregation."
 msgstr ""
-"Échec de l’enregistrement : les catégories de désagrégation doivent être "
+"Échec de l’enregistrement. Les catégories de désagrégation doivent être "
 "uniques au sein d’une même désagrégation."
 
 #. Translators: error message generated when item names are duplicated but are required to be unqiue.
 #: js/pages/tola_management_pages/country/models.js:253
-msgid "Saving failed: disaggregation names should be unique within a country."
+msgid "Saving failed. Disaggregation names should be unique within a country."
 msgstr ""
-"Échec de l’enregistrement : les noms de désagrégation doivent être uniques "
-"au sein d’un même pays."
+"Échec de l’enregistrement. Les noms de désagrégation doivent être uniques au "
+"sein d’un même pays."
 
 #. Translators: This is a confirmation prompt to confirm a user wants to delete an item
 #: js/pages/tola_management_pages/country/models.js:438
@@ -1899,13 +1898,6 @@ msgstr "Enregistrer et ajouter un autre"
 #: js/pages/tola_management_pages/user/components/user_editor.js:38
 msgid "Status and History"
 msgstr "Statut et historique"
-
-#. Translators: Saving to the server failed
-#: js/pages/tola_management_pages/organization/models.js:106
-#: js/pages/tola_management_pages/program/models.js:200
-#: js/pages/tola_management_pages/user/models.js:203
-msgid "Saving failed"
-msgstr "Échec de l’enregistrement"
 
 #: js/pages/tola_management_pages/organization/views.js:42
 msgid "Find an Organization"
@@ -2225,6 +2217,12 @@ msgstr "Super administrateur"
 #: js/pages/tola_management_pages/user/views.js:362
 msgid "users"
 msgstr "utilisateurs"
+
+#~ msgid "Successfully Saved"
+#~ msgstr "Enregistré avec succès"
+
+#~ msgid "Saving Failed"
+#~ msgstr "Échec de l’enregistrement"
 
 #~ msgid "Success!"
 #~ msgstr "Succès !"
