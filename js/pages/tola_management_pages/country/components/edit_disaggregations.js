@@ -241,9 +241,8 @@ export class RetroProgramCheckBoxWrapper extends React.Component {
                             className={classNames('disaggregation--programs__header-text',{disabled: this.props.disabled})} 
                             onClick={this.props.toggleProgramViz} 
                             onKeyPress={this.keyboardPress.bind(this)}
-                            onKeyPress={(e) => this.keyboardPress(e)}
                             tabIndex='0'>
-                            <FontAwesomeIcon icon={this.props.programsExpanded ? 'caret-down' : 'caret-right'} />
+                            <FontAwesomeIcon icon={this.props.programsExpanded ? faCaretDown : faCaretRight } />
                             {/* # Translators: This feature allows a user to apply changes to existing programs as well as ones created in the future */}
                             <span>{gettext("Assign new disaggregation to all indicators in a program")}</span>
                         </span>
