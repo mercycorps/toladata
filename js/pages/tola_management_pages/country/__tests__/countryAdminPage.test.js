@@ -234,11 +234,11 @@ describe("Country admin disagg presentation components", () => {
             errors={{}}
         />);
         expect(wrapper.containsMatchingElement(<RetroProgramCheckBoxWrapper />)).toEqual(true);
-        expect(wrapper.find('.disaggregation--programs__header').hasClass('disabled')).toEqual(true);
+        expect(wrapper.find('.disaggregation--programs__header').find('.disaggregation--programs__header-text').hasClass('disabled')).toEqual(true);
 
         wrapper.setState({selected_by_default: true});
         expect(wrapper.containsMatchingElement(<RetroProgramCheckBoxWrapper />)).toEqual(true);
-        expect(wrapper.find('.disaggregation--programs__header').hasClass('disabled')).toEqual(false);
+        expect(wrapper.find('.disaggregation--programs__header').find('.disaggregation--programs__header-text').hasClass('disabled')).toEqual(false);
     });
 
     it("displays programs in alpha order", () => {
