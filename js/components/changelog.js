@@ -6,9 +6,9 @@ import { toJS } from 'mobx';
 import { EM_DASH } from '../constants';
 
 
-export const ChangeField = ({name, data, extraTitleText=null}) => {
+export const ChangeField = ({name, data, extraTitleText=null, change_type=''}) => {
     const extraTitle = extraTitleText ? <h4 className="disagg-type__title, text-small" >{extraTitleText}</h4> : null;
-    if (name==="Disaggregation categories" && typeof data === 'object' && data !== null) {
+    if (change_type.indexOf('country_disaggregation') >= 0 && typeof data === 'object' && data !== null) {
         const sorted_labels = Object.values(data).sort((a,b) => a.custom_sort - b.custom_sort);
         return <React.Fragment>
             <strong>{name}: </strong>
@@ -91,7 +91,7 @@ const ChangeLogEntryRowBuilder = ({data}) => {
         if (data.diff_list.base_country) {
             const previousEntry = <ChangeField name={data.diff_list.base_country.pretty_name} data={data.diff_list.base_country.prev} />
             const newEntry = <ChangeField name={data.diff_list.base_country.pretty_name} data={data.diff_list.base_country.new} />
-                
+
             allRows.push(<ChangeLogEntryRow previous={previousEntry} new={newEntry} id={"base_country"} key={"base_country"} />);
         }
         Object.entries(data.diff_list.countries).forEach( ([id, country]) => {
@@ -128,7 +128,7 @@ const ChangeLogEntryRowBuilder = ({data}) => {
     else {
         let extraTitleText = null;
         let skipDisaggType = false;
-        if (data.pretty_change_type === "Country disaggregation updated") {
+        if (data.change_type.indexOf('country_disaggregation') >= 0) {
             const diff_list = data.diff_list;
             const disaggType = diff_list.filter((diff) => diff.name === "disaggregation_type");
             if (disaggType[0].prev === disaggType[0].new) {
@@ -142,11 +142,11 @@ const ChangeLogEntryRowBuilder = ({data}) => {
             if (!(changeSet.name === "disaggregation_type" && skipDisaggType)) {
                 const previousEntry = <React.Fragment>
                     <ChangeField key={id} name={changeSet.pretty_name} data={changeSet.prev} id={id}
-                                 extraTitleText={extraTitleText}/>
+                                 extraTitleText={extraTitleText} change_type={data.change_type}/>
                 </React.Fragment>;
                 const newEntry = <React.Fragment>
                     <ChangeField key={id} name={changeSet.pretty_name} data={changeSet.new} id={id}
-                                 extraTitleText={extraTitleText}/>
+                                 extraTitleText={extraTitleText} change_type={data.change_type}/>
                 </React.Fragment>;
 
                 allRows.push(<ChangeLogEntryRow previous={previousEntry} new={newEntry} id={key} key={key}/>);
