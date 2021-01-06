@@ -3,6 +3,7 @@
 {% load render_bundle from webpack_loader %}
 {% block title %}{{ program.name }} | {% endblock %}
 {% block page_title %}{{ program.name }}{% endblock %}
+{% block site_area %}program page{% endblock %}
 {% block header_extras %}
     {% program_complete_program_page readonly %}
 {% endblock %}

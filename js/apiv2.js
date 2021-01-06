@@ -71,6 +71,11 @@ const api = {
                     .catch(this.logFailure);
     },
     savePinnedReport(reportData) {
+        window.sendGoogleAnalyticsEvent({
+            category: "IPTT",
+            action: "Pin",
+            label: qs.stringify(reportData)
+        });
         return this.formPostInstance.post(`/pinned_report/`, qs.stringify(reportData))
                     .catch(this.logFailure);
     },
@@ -79,7 +84,7 @@ const api = {
                     .then(response => response.data)
                     .catch(this.logFailure);
     }
-    
+
 };
 
 

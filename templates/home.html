@@ -3,6 +3,7 @@
 {% load render_bundle from webpack_loader %}
 {# Translators: Page title if the user has not selected country #}
 {% block title %}{{ active_country|default:_("No available programs") }} | {% endblock %}
+{% block site_area %}country page{% endblock %}
 {% block page_title %}{{ active_country|default:_("No available programs") }}{% endblock %}
 
 {% block bodyclasses %}home{% endblock %}
