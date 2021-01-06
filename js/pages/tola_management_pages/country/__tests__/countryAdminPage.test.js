@@ -178,8 +178,8 @@ describe("Country admin retroactive disagg features in store", () => {
 
     it("clears selected programs when selected by default is unchecked", () => {
         const programsForRetro = [
-            {id: 200, name: "Program 1", checked: false},
-            {id: 201, name: "Program 2", checked: false}
+            {id: 200, name: "Program 1", checked: false, active: true},
+            {id: 201, name: "Program 2", checked: false, active: true}
         ];
         let expectedValues = {
             200: {id: 200, name: "Program 1", checked: false},
@@ -214,8 +214,8 @@ describe("Country admin disagg presentation components", () => {
 
         const disaggregation = store.editing_disaggregations_data[0];
         const programsForRetro = [
-            {id: 200, name: "Program 1", checked: false},
-            {id: 201, name: "Program 2", checked: false}
+            {id: 200, name: "Program 1", checked: false, active: true},
+            {id: 201, name: "Program 2", checked: false, active: true}
         ];
         disaggregation.id = "1";
         let wrapper = shallow(<DisaggregationType
