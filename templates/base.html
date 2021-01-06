@@ -29,6 +29,11 @@
         {% block extra_js_in_header %}
         {# TODO: this should be in at least two separate blocks #}
         {% endblock %}
+        <script>
+            // this initializes a variable to the site area defined in different templates, for google analytics tracking.
+            // base value is in this (base.html) block, different site areas should define the variable as needed
+            var siteArea = "{% block site_area %}main{% endblock %}";
+        </script>
 
 
         <!-- bootstrap multiselect -->
@@ -295,7 +300,7 @@
         </script>
 
 
-        {% if GOOGLE_ANALYTICS_PROPERTY_ID %}
+        {% if GOOGLE_ANALYTICS_PROPERTY_ID and "tola-activity.mercycorps.org" in request.build_absolute_uri %}
             {% include "google_analytics.html" %}
         {% endif %}
 
