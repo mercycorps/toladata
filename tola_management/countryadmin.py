@@ -384,7 +384,8 @@ class CountryAdminAuditLogSerializer(serializers.ModelSerializer):
             "disaggregation_type",
             "disaggregation_type_name",
             "pretty_change_type",
-            "diff_list"
+            "diff_list",
+            "change_type"
         ]
 
     def get_disaggregation_type(self, obj):
