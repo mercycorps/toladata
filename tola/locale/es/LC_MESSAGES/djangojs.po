@@ -6,8 +6,8 @@ msgid ""
 msgstr ""
 "Project-Id-Version: \n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2021-01-05 12:50-0800\n"
-"PO-Revision-Date: 2021-01-05 12:50-0800\n"
+"POT-Creation-Date: 2021-01-05 15:02-0800\n"
+"PO-Revision-Date: 2021-01-05 15:03-0800\n"
 "Last-Translator: \n"
 "Language-Team: \n"
 "Language: es\n"
@@ -1630,21 +1630,20 @@ msgstr[1] ""
 
 #. Translators: Saving to the server succeeded
 #: js/pages/tola_management_pages/country/models.js:215
+#: js/pages/tola_management_pages/country/models.js:219
 #: js/pages/tola_management_pages/organization/models.js:111
 #: js/pages/tola_management_pages/program/models.js:195
 #: js/pages/tola_management_pages/user/models.js:208
 msgid "Successfully saved"
 msgstr "Guardado exitosamente"
 
-#. Translators: Saving to the server succeeded
-#: js/pages/tola_management_pages/country/models.js:219
-msgid "Successfully Saved"
-msgstr "Guardado Exitosamente"
-
 #. Translators: Saving to the server failed
 #: js/pages/tola_management_pages/country/models.js:226
-msgid "Saving Failed"
-msgstr "Falló Operación de Guardado"
+#: js/pages/tola_management_pages/organization/models.js:106
+#: js/pages/tola_management_pages/program/models.js:200
+#: js/pages/tola_management_pages/user/models.js:203
+msgid "Saving failed"
+msgstr "Falló operación de guardado"
 
 #. Translators: Notification that a user has been able to delete a disaggregation
 #: js/pages/tola_management_pages/country/models.js:231
@@ -1664,17 +1663,17 @@ msgstr "Desarchivado con éxito"
 #. Translators: error message generated when item names are duplicated but are required to be unqiue.
 #: js/pages/tola_management_pages/country/models.js:246
 msgid ""
-"Saving failed: Disaggregation categories should be unique within a "
+"Saving failed. Disaggregation categories should be unique within a "
 "disaggregation."
 msgstr ""
-"Error al guardar: Las categorías de desagregación deben ser únicas dentro de "
+"Error al guardar. Las categorías de desagregación deben ser únicas dentro de "
 "la desagregación."
 
 #. Translators: error message generated when item names are duplicated but are required to be unqiue.
 #: js/pages/tola_management_pages/country/models.js:253
-msgid "Saving failed: disaggregation names should be unique within a country."
+msgid "Saving failed. Disaggregation names should be unique within a country."
 msgstr ""
-"Error al guardar: Los nombres desagregados deben ser únicos dentro del país."
+"Error al guardar. Los nombres desagregados deben ser únicos dentro del país."
 
 #. Translators: This is a confirmation prompt to confirm a user wants to delete an item
 #: js/pages/tola_management_pages/country/models.js:438
@@ -1890,13 +1889,6 @@ msgstr "Guardar y Agregar otro"
 #: js/pages/tola_management_pages/user/components/user_editor.js:38
 msgid "Status and History"
 msgstr "Estado e Historial"
-
-#. Translators: Saving to the server failed
-#: js/pages/tola_management_pages/organization/models.js:106
-#: js/pages/tola_management_pages/program/models.js:200
-#: js/pages/tola_management_pages/user/models.js:203
-msgid "Saving failed"
-msgstr "Falló operación de guardado"
 
 #: js/pages/tola_management_pages/organization/views.js:42
 msgid "Find an Organization"
@@ -2225,6 +2217,12 @@ msgstr "Super Administrador"
 #: js/pages/tola_management_pages/user/views.js:362
 msgid "users"
 msgstr "usuarios"
+
+#~ msgid "Successfully Saved"
+#~ msgstr "Guardado Exitosamente"
+
+#~ msgid "Saving Failed"
+#~ msgstr "Falló Operación de Guardado"
 
 #~ msgid "Success!"
 #~ msgstr "¡Éxito!"

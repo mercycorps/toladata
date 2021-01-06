@@ -2,7 +2,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: \n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2020-12-29 12:57-0800\n"
+"POT-Creation-Date: 2021-01-05 15:01-0800\n"
 "PO-Revision-Date: 2020-12-23 11:28-0800\n"
 "Last-Translator: \n"
 "Language-Team: \n"
@@ -186,7 +186,7 @@ msgid "No data"
 msgstr "Pas de données"
 
 #: indicators/forms.py:250 indicators/models.py:103 indicators/models.py:1399
-#: indicators/models.py:2123 workflow/forms.py:100 workflow/models.py:532
+#: indicators/models.py:2123 workflow/forms.py:100 workflow/models.py:557
 msgid "Program"
 msgstr "Programme"
 
@@ -490,8 +490,8 @@ msgstr "Type d’indicateur"
 msgid "Name"
 msgstr "Prénom"
 
-#: indicators/models.py:82 workflow/models.py:165 workflow/models.py:499
-#: workflow/models.py:881
+#: indicators/models.py:82 workflow/models.py:165 workflow/models.py:524
+#: workflow/models.py:906
 msgid "Country"
 msgstr "Pays"
 
@@ -1201,7 +1201,7 @@ msgstr ""
 msgid "Changes to indicator"
 msgstr "Changements apportés à l’indicateur"
 
-#: indicators/models.py:1404 workflow/models.py:39 workflow/models.py:495
+#: indicators/models.py:1404 workflow/models.py:39 workflow/models.py:520
 msgid "Sector"
 msgstr "Secteur"
 
@@ -1399,8 +1399,8 @@ msgid "Categories for disaggregation %(disagg)s"
 msgstr "Catégories de la désagrégation %(disagg)s"
 
 #: indicators/templatetags/mytags.py:52 indicators/templatetags/mytags.py:74
-#: templates/indicators/result_form_common_js.html:173
-#: templates/indicators/result_form_common_js.html:181
+#: templates/indicators/result_form_common_js.html:174
+#: templates/indicators/result_form_common_js.html:182
 msgid "and"
 msgstr "et"
 
@@ -1891,28 +1891,28 @@ msgstr "FAQ"
 msgid "Feedback"
 msgstr "Retour d’information"
 
-#: templates/base.html:281
+#: templates/base.html:286
 msgid "Server Error"
 msgstr "Erreur serveur"
 
-#: templates/base.html:282
+#: templates/base.html:287
 msgid "Network Error"
 msgstr "Erreur réseau"
 
-#: templates/base.html:283
+#: templates/base.html:288
 msgid "Please check your network connection and try again"
 msgstr "Veuillez vérifier votre connexion réseau et réessayer"
 
-#: templates/base.html:284
+#: templates/base.html:289
 msgid "Unknown network request error"
 msgstr "Erreur de requête réseau inconnue"
 
-#: templates/base.html:285
+#: templates/base.html:290
 msgid "Sorry, you do not have permission to perform this action."
 msgstr ""
 "Nous sommes désolés, vous n’êtes pas autorisé à réaliser cette opération."
 
-#: templates/base.html:286
+#: templates/base.html:291
 msgid "You can request permission from your TolaData administrator."
 msgstr ""
 "Vous pouvez demander l’autorisation auprès de votre administrateur TolaData."
@@ -2146,7 +2146,7 @@ msgstr "Global"
 
 #: templates/indicators/disaggregation_print.html:58
 #: templates/indicators/disaggregation_report.html:97
-#: templates/indicators/disaggregation_report.html:145 workflow/models.py:833
+#: templates/indicators/disaggregation_report.html:145 workflow/models.py:858
 msgid "Type"
 msgstr "Type"
 
@@ -2287,53 +2287,49 @@ msgstr ""
 msgid "Are you sure you want to continue?"
 msgstr "Souhaitez-vous vraiment continuer ?"
 
-#: templates/indicators/indicator_form_common_js.html:57
-msgid "Success"
-msgstr "Succès"
-
-#: templates/indicators/indicator_form_common_js.html:411
-#: templates/indicators/indicator_form_common_js.html:429
-#: templates/indicators/indicator_form_common_js.html:448
+#: templates/indicators/indicator_form_common_js.html:391
+#: templates/indicators/indicator_form_common_js.html:409
+#: templates/indicators/indicator_form_common_js.html:428
 #: templates/indicators/indicator_list_modals.html:7
 msgid "Warning"
 msgstr "Attention"
 
-#: templates/indicators/indicator_form_common_js.html:413
+#: templates/indicators/indicator_form_common_js.html:393
 msgid "Modifying target values will affect program metrics for this indicator."
 msgstr ""
 "La modification des valeurs cibles affectera les statistiques du programme "
 "pour cet indicateur."
 
-#: templates/indicators/indicator_form_common_js.html:414
-#: templates/indicators/indicator_form_common_js.html:431
-#: templates/indicators/indicator_form_common_js.html:450
+#: templates/indicators/indicator_form_common_js.html:394
+#: templates/indicators/indicator_form_common_js.html:411
+#: templates/indicators/indicator_form_common_js.html:430
 msgid "Your changes will be recorded in a change log."
 msgstr ""
 "Vos modifications seront enregistrées dans un journal des modifications."
 
-#: templates/indicators/indicator_form_common_js.html:551
+#: templates/indicators/indicator_form_common_js.html:531
 #: templates/indicators/indicatortargets.html:50
 msgid "Enter event name"
 msgstr "Saisir le nom de l’événement"
 
-#: templates/indicators/indicator_form_common_js.html:561
+#: templates/indicators/indicator_form_common_js.html:541
 #: templates/indicators/indicatortargets.html:81
 msgid "Enter target"
 msgstr "Saisir la cible"
 
-#: templates/indicators/indicator_form_common_js.html:765
+#: templates/indicators/indicator_form_common_js.html:745
 #: templates/indicators/indicatortargets.html:126
 msgid "Options for number (#) indicators"
 msgstr "Options pour les numéros (#) indicateurs"
 
 #. Translators: This is the title of some informational text describing what it means when an indicator is being measured as a percentage e.g. % of population with access to water
-#: templates/indicators/indicator_form_common_js.html:771
+#: templates/indicators/indicator_form_common_js.html:751
 #, python-format
 msgid "Percentage (%%) indicators"
 msgstr "Indicateurs en pourcentage (%%)"
 
 #. Translators: warning to user that manually entered in value doesn't match computed value, %s is a number or percentage
-#: templates/indicators/indicator_form_common_js.html:896
+#: templates/indicators/indicator_form_common_js.html:876
 #, python-format
 msgid ""
 "Life of Program (LoP) targets are now automatically displayed. The current "
@@ -2345,7 +2341,7 @@ msgstr ""
 "%%s. Il se peut que vos valeurs cibles nécessitent une mise à jour."
 
 #. Translators: warning to user that manually entered in value doesn't match computed value, %s is a number or percentage
-#: templates/indicators/indicator_form_common_js.html:901
+#: templates/indicators/indicator_form_common_js.html:881
 #, python-format
 msgid ""
 "This program previously had a LoP target of %%s. Life of Program (LoP) "
@@ -2354,76 +2350,76 @@ msgstr ""
 "Ce programme possédait autrefois une cible LoP de %%s. Les cibles de vie du "
 "programme (LoP) s’affichent désormais automatiquement."
 
-#: templates/indicators/indicator_form_common_js.html:917
-#: templates/indicators/indicator_form_common_js.html:1065
-#: templates/indicators/result_form_common_js.html:122
-#: templates/indicators/result_form_common_js.html:153
+#: templates/indicators/indicator_form_common_js.html:897
+#: templates/indicators/indicator_form_common_js.html:1045
+#: templates/indicators/result_form_common_js.html:123
+#: templates/indicators/result_form_common_js.html:154
 msgid "Please complete this field."
 msgstr "Veuillez compléter ce champ."
 
 #. Translators: on a form field, as a warning when a user has entered too much text.  %s replaced with a number (e.g. 500)
-#: templates/indicators/indicator_form_common_js.html:919
-#: templates/indicators/indicator_form_common_js.html:1032
+#: templates/indicators/indicator_form_common_js.html:899
+#: templates/indicators/indicator_form_common_js.html:1012
 #, python-format
 msgid "Please enter fewer than %%s characters."
 msgstr "Veuillez saisir moins de %%s caractères."
 
-#: templates/indicators/indicator_form_common_js.html:954
-#: templates/indicators/indicator_form_common_js.html:956
+#: templates/indicators/indicator_form_common_js.html:934
+#: templates/indicators/indicator_form_common_js.html:936
 msgid "Please enter a number greater than or equal to zero."
 msgstr "Veuillez entrer un nombre supérieur ou égal à zéro."
 
-#: templates/indicators/indicator_form_common_js.html:982
+#: templates/indicators/indicator_form_common_js.html:962
 msgid "The Life of Program (LoP) target cannot be zero."
 msgstr "La valeur de la cible LoP ne peut être zéro."
 
-#: templates/indicators/indicator_form_common_js.html:985
+#: templates/indicators/indicator_form_common_js.html:965
 msgid "Please enter a target."
 msgstr "Veuillez entrer une cible."
 
 #. Translators: On a form, displayed when the user clicks submit without filling out a required field
-#: templates/indicators/indicator_form_common_js.html:1004
+#: templates/indicators/indicator_form_common_js.html:984
 msgid "Please complete this field"
 msgstr "Veuillez compléter ce champ"
 
-#: templates/indicators/indicator_form_common_js.html:1133
+#: templates/indicators/indicator_form_common_js.html:1113
 msgid ""
 "The Life of Program (LoP) target cannot be zero.  Please update targets."
 msgstr ""
 "La valeur de la cible LoP ne peut être zéro. Veuillez mettre à jour les "
 "cibles."
 
-#: templates/indicators/indicator_form_common_js.html:1144
+#: templates/indicators/indicator_form_common_js.html:1124
 msgid "Please complete all event names and targets."
 msgstr "Veuillez remplir tous les noms d'événements et de cibles."
 
-#: templates/indicators/indicator_form_common_js.html:1147
+#: templates/indicators/indicator_form_common_js.html:1127
 msgid "Please complete targets."
 msgstr "Veuillez compléter les cibles."
 
 #. Translators: a message indicating which tab a user should navigate to in order to finish filling out a form
-#: templates/indicators/indicator_form_common_js.html:1220
+#: templates/indicators/indicator_form_common_js.html:1200
 msgid "Please complete all required fields in the Targets tab."
 msgstr "Veuillez compléter tous les champs requis dans l’onglet Cibles."
 
 #. Translators: a message indicating which tab a user should navigate to in order to finish filling out a form
-#: templates/indicators/indicator_form_common_js.html:1235
+#: templates/indicators/indicator_form_common_js.html:1215
 msgid "Please complete all required fields in the Summary tab."
 msgstr "Veuillez remplir tous les champs obligatoires dans l’onglet Résumé."
 
 #. Translators: a message indicating which tab a user should navigate to in order to finish filling out a form
-#: templates/indicators/indicator_form_common_js.html:1255
+#: templates/indicators/indicator_form_common_js.html:1235
 msgid "Please complete all required fields in the Performance tab."
 msgstr "Veuillez compléter tous les champs requis dans l’onglet Performance."
 
 #. Translators: a message indicating which tab a user should navigate to in order to finish filling out a form
-#: templates/indicators/indicator_form_common_js.html:1272
+#: templates/indicators/indicator_form_common_js.html:1252
 msgid "Please complete all required fields in the Data Acquisition tab."
 msgstr ""
 "Veuillez compléter tous les champs requis dans l’onglet Collecte des données."
 
 #. Translators: a message indicating which tab a user should navigate to in order to finish filling out a form
-#: templates/indicators/indicator_form_common_js.html:1295
+#: templates/indicators/indicator_form_common_js.html:1275
 msgid "Please complete all required fields in the Analysis and Reporting tab."
 msgstr ""
 "Veuillez compléter tous les champs requis dans l’onglet Analyse et "
@@ -2863,50 +2859,50 @@ msgstr ""
 "supprimées définitivement. À titre de référence, veuillez fournir une "
 "justification pour la suppression de ce résultat."
 
-#: templates/indicators/result_form_common_js.html:90
-#: templates/indicators/result_form_common_js.html:413
+#: templates/indicators/result_form_common_js.html:91
+#: templates/indicators/result_form_common_js.html:414
 msgid "Could not save form."
 msgstr "Impossible d’enregistrer le formulaire."
 
-#: templates/indicators/result_form_common_js.html:127
+#: templates/indicators/result_form_common_js.html:128
 msgid "Please enter a number with no letters or symbols."
 msgstr "Veuillez saisir un nombre sans lettre ni symbole."
 
-#: templates/indicators/result_form_common_js.html:159
+#: templates/indicators/result_form_common_js.html:160
 msgid "Please enter a valid date."
 msgstr "Veuillez entrer une date valide."
 
-#: templates/indicators/result_form_common_js.html:166
+#: templates/indicators/result_form_common_js.html:167
 msgid "You can begin entering results on"
 msgstr "Vous pouvez commencer à saisir des résultats le"
 
-#: templates/indicators/result_form_common_js.html:173
-#: templates/indicators/result_form_common_js.html:181
+#: templates/indicators/result_form_common_js.html:174
+#: templates/indicators/result_form_common_js.html:182
 msgid "Please select a date between"
 msgstr "Veuillez sélectionner une date entre"
 
-#: templates/indicators/result_form_common_js.html:267
+#: templates/indicators/result_form_common_js.html:268
 msgid "A link must be included along with the record name."
 msgstr "Un lien doit être inclus avec le nom de l’enregistrement."
 
-#: templates/indicators/result_form_common_js.html:384
+#: templates/indicators/result_form_common_js.html:385
 msgid "However, there may be a problem with the evidence URL."
 msgstr "Cependant, il peut y avoir un problème avec l’URL de preuve."
 
-#: templates/indicators/result_form_common_js.html:385
+#: templates/indicators/result_form_common_js.html:387
 msgid "Review warning."
 msgstr "Vérifiez l’avertissement."
 
-#: templates/indicators/result_form_common_js.html:426
+#: templates/indicators/result_form_common_js.html:427
 #: templates/indicators/results/result_form_disaggregation_fields.html:72
 msgid "The sum of disaggregated values does not match the actual value."
 msgstr "La somme des valeurs désagrégées ne correspond pas à la valeur réelle."
 
-#: templates/indicators/result_form_common_js.html:427
+#: templates/indicators/result_form_common_js.html:428
 msgid "For future reference, please share your reason for these variations."
 msgstr "À titre d'information, veuillez partager la raison de ces variations."
 
-#: templates/indicators/result_form_common_js.html:428
+#: templates/indicators/result_form_common_js.html:429
 msgid ""
 "Modifying results will affect program metrics for this indicator and should "
 "only be done to correct a data entry error. For future reference, please "
@@ -2917,8 +2913,8 @@ msgstr ""
 "d’entrée de données. À titre de référence, veuillez justifier la "
 "modification de ce résultat."
 
-#: templates/indicators/result_form_common_js.html:487
-#: templates/indicators/result_form_common_js.html:554
+#: templates/indicators/result_form_common_js.html:488
+#: templates/indicators/result_form_common_js.html:555
 msgid "One or more fields needs attention."
 msgstr "Un ou plusieurs champs requièrent votre attention."
 
@@ -3761,11 +3757,11 @@ msgstr "Un problème est survenu lors de la connexion au serveur GAIT."
 msgid "The GAIT ID {gait_id} could not be found."
 msgstr "Impossible de trouver l’ID GAIT {gait_id}."
 
-#: tola/views.py:90
+#: tola/views.py:99
 msgid "You are not logged in."
 msgstr "Vous n’êtes pas connecté."
 
-#: tola/views.py:134
+#: tola/views.py:143
 msgid "Your profile has been updated."
 msgstr "Votre profil a été mis à jour."
 
@@ -4056,53 +4052,53 @@ msgstr "Nouvelle entrée"
 msgid "Rationale"
 msgstr "Justification"
 
-#: tola_management/views.py:270
+#: tola_management/views.py:275
 msgid "Mercy Corps - Tola New Account Registration"
 msgstr "Enregistrement d’un nouveau compte Mercy Corps - Tola"
 
 #. Translators: Page title for an administration page managing users of the application
-#: tola_management/views.py:289
+#: tola_management/views.py:294
 msgid "Admin: Users"
 msgstr "Administrateur : Utilisateurs"
 
 #. Translators: Page title for an administration page managing organizations in the application
-#: tola_management/views.py:293
+#: tola_management/views.py:298
 msgid "Admin: Organizations"
 msgstr "Administrateur : Organisations"
 
 #. Translators: Page title for an administration page managing Programs using the application
-#: tola_management/views.py:297
+#: tola_management/views.py:302
 msgid "Admin: Programs"
 msgstr "Administrateur : Programmes"
 
 #. Translators: Page title for an administration page managing countries represented in the application
-#: tola_management/views.py:301
+#: tola_management/views.py:306
 msgid "Admin: Countries"
 msgstr "Administrateur : Pays"
 
 #. Translators: Page title for a log of all changes to indicators over a program's history
-#: tola_management/views.py:325
+#: tola_management/views.py:330
 msgid "Indicator change log"
 msgstr "Journal des modifications des indicateurs"
 
 #. Translators: Error message given when an administrator tries to save a username that is already taken
-#: tola_management/views.py:377 tola_management/views.py:389
+#: tola_management/views.py:382 tola_management/views.py:394
 msgid "A user account with this username already exists."
 msgstr "Un compte utilisateur avec ce nom d’utilisateur existe déjà."
 
 #. Translators: Error message given when an administrator tries to save a email that is already taken
-#: tola_management/views.py:381 tola_management/views.py:393
+#: tola_management/views.py:386 tola_management/views.py:398
 msgid "A user account with this email address already exists."
 msgstr "Un compte utilisateur avec cette adresse e-mail existe déjà."
 
-#: tola_management/views.py:401
+#: tola_management/views.py:406
 msgid ""
 "Non-Mercy Corps emails should not be used with the Mercy Corps organization."
 msgstr ""
 "Les adresses e-mails qui ne sont pas relatives à Mercy Corps ne doivent pas "
 "être utilisées avec l’organisation Mercy Corps."
 
-#: tola_management/views.py:407
+#: tola_management/views.py:412
 msgid ""
 "A user account with this email address already exists. Mercy Corps accounts "
 "are managed by Okta. Mercy Corps employees should log in using their Okta "
@@ -4115,7 +4111,7 @@ msgstr ""
 #. Translators:  Error message given when an administrator tries to save a bad combination of
 #. organization and email
 #. Translators:  Error message given when an administrator tries to save an invalid username
-#: tola_management/views.py:413 tola_management/views.py:418
+#: tola_management/views.py:418 tola_management/views.py:423
 msgid ""
 "Mercy Corps accounts are managed by Okta. Mercy Corps employees should log "
 "in using their Okta username and password."
@@ -4124,12 +4120,12 @@ msgstr ""
 "doivent se connecter en utilisant leur nom d’utilisateur et leur mot de "
 "passe Okta."
 
-#: tola_management/views.py:431
+#: tola_management/views.py:436
 msgid "Only superusers can create Mercy Corps staff profiles."
 msgstr ""
 "Seuls les super-utilisateurs peuvent créer des profils d’équipe Mercy Corps."
 
-#: tola_management/views.py:470
+#: tola_management/views.py:475
 msgid "Only superusers can edit Mercy Corps staff profiles."
 msgstr ""
 "Seuls les super-utilisateurs peuvent modifier des profils d’équipe Mercy "
@@ -4195,7 +4191,7 @@ msgstr "Alphabétisation"
 msgid "Demographic Info Data Source"
 msgstr "Source de données d’informations démographiques"
 
-#: workflow/forms.py:181 workflow/models.py:835
+#: workflow/forms.py:181 workflow/models.py:860
 msgid "Date of First Contact"
 msgstr "Date du premier contact"
 
@@ -4287,328 +4283,328 @@ msgstr "Pays accessibles"
 msgid "Tola User"
 msgstr "Utilisateur de Tola"
 
-#: workflow/models.py:316
+#: workflow/models.py:341
 msgid "No Organization for this user"
 msgstr "Aucune Organisation pour cet utilisateur"
 
-#: workflow/models.py:370
+#: workflow/models.py:395
 msgid "User (all programs)"
 msgstr "Utilisateur (tous les programmes)"
 
-#: workflow/models.py:371
+#: workflow/models.py:396
 msgid "Basic Admin (all programs)"
 msgstr "Administrateur de base (tous les programmes)"
 
-#: workflow/models.py:382
+#: workflow/models.py:407
 msgid "Only Mercy Corps users can be given country-level access"
 msgstr ""
 "Seuls les utilisateurs Mercy Corps peuvent bénéficier d’un accès au pays"
 
-#: workflow/models.py:490
+#: workflow/models.py:515
 msgid "ID"
 msgstr "Identifiant"
 
-#: workflow/models.py:491
+#: workflow/models.py:516
 msgid "Program Name"
 msgstr "Nom du programme"
 
-#: workflow/models.py:492
+#: workflow/models.py:517
 msgid "Funding Status"
 msgstr "Statut de financement"
 
-#: workflow/models.py:493
+#: workflow/models.py:518
 msgid "Fund Code"
 msgstr "Code du fonds"
 
-#: workflow/models.py:494
+#: workflow/models.py:519
 msgid "Program Description"
 msgstr "Description du programme"
 
-#: workflow/models.py:498
+#: workflow/models.py:523
 msgid "Enable Approval Authority"
 msgstr "Activer l’autorité d’approbation"
 
-#: workflow/models.py:507
+#: workflow/models.py:532
 msgid "Enable Public Dashboard"
 msgstr "Activer le tableau de bord public"
 
-#: workflow/models.py:508
+#: workflow/models.py:533
 msgid "Program Start Date"
 msgstr "Date de début du programme"
 
-#: workflow/models.py:509
+#: workflow/models.py:534
 msgid "Program End Date"
 msgstr "Date de fin du programme"
 
-#: workflow/models.py:510
+#: workflow/models.py:535
 msgid "Reporting Period Start Date"
 msgstr "Date de début de la période de déclaration"
 
-#: workflow/models.py:511
+#: workflow/models.py:536
 msgid "Reporting Period End Date"
 msgstr "Date de fin de la période de déclaration"
 
 #. Translators: This is an option that users can select to use the new "results framework" option to organize their indicators.
-#: workflow/models.py:514
+#: workflow/models.py:539
 msgid "Auto-number indicators according to the results framework"
 msgstr ""
 "Numéroter automatiquement les indicateurs d’après le cadre de résultats"
 
-#: workflow/models.py:518
+#: workflow/models.py:543
 msgid "Group indicators according to the results framework"
 msgstr "Regrouper les indicateurs selon le cadre de résultats"
 
 #. Translators: this labels a filter to sort indicators, for example, "by Outcome chain":
 #. Translators: see note for %(tier)s chain, this is the same thing
-#: workflow/models.py:717 workflow/serializers.py:178
+#: workflow/models.py:742 workflow/serializers.py:178
 #, python-format
 msgid "by %(level_name)s chain"
 msgstr "par chaîne %(level_name)s"
 
 #. Translators: this labels a filter to sort indicators, for example, "by Outcome chain":
-#: workflow/models.py:728
+#: workflow/models.py:753
 #, python-format
 msgid "%(level_name)s chains"
 msgstr "chaînes de %(level_name)s"
 
 #. Translators: Refers to a user permission role with limited access to view data only
-#: workflow/models.py:747
+#: workflow/models.py:772
 msgid "Low (view only)"
 msgstr "Faible (visionnage uniquement)"
 
 #. Translators: Refers to a user permission role with limited access to add or edit result data
-#: workflow/models.py:749
+#: workflow/models.py:774
 msgid "Medium (add and edit results)"
 msgstr "Moyen (ajout et modification des résultats)"
 
 #. Translators: Refers to a user permission role with access to edit any data
-#: workflow/models.py:751
+#: workflow/models.py:776
 msgid "High (edit anything)"
 msgstr "Élevé (modification de n’importe quelle donnée)"
 
-#: workflow/models.py:773 workflow/models.py:778
+#: workflow/models.py:798 workflow/models.py:803
 msgid "Profile Type"
 msgstr "Type de profil"
 
-#: workflow/models.py:800
+#: workflow/models.py:825
 msgid "Land Classification"
 msgstr "Classification des terres"
 
-#: workflow/models.py:800
+#: workflow/models.py:825
 msgid "Rural, Urban, Peri-Urban"
 msgstr "Rural, Urbain, Périurbain"
 
-#: workflow/models.py:805
+#: workflow/models.py:830
 msgid "Land Type"
 msgstr "Type de terrain"
 
-#: workflow/models.py:832
+#: workflow/models.py:857
 msgid "Site Name"
 msgstr "Nom du site"
 
-#: workflow/models.py:834
+#: workflow/models.py:859
 msgid "Contact Name"
 msgstr "Nom du contact"
 
-#: workflow/models.py:836
+#: workflow/models.py:861
 msgid "Contact Number"
 msgstr "Numéro de contact"
 
-#: workflow/models.py:837
+#: workflow/models.py:862
 msgid "Number of Members"
 msgstr "Nombre de membres"
 
-#: workflow/models.py:838
+#: workflow/models.py:863
 msgid "Data Source"
 msgstr "Source de données"
 
-#: workflow/models.py:839
+#: workflow/models.py:864
 msgid "Total # Households"
 msgstr "Nombre total de ménages"
 
-#: workflow/models.py:840
+#: workflow/models.py:865
 msgid "Average Household Size"
 msgstr "Taille moyenne du ménage"
 
-#: workflow/models.py:841
+#: workflow/models.py:866
 msgid "Male age 0-5"
 msgstr "Homme de 0-5 ans"
 
-#: workflow/models.py:842
+#: workflow/models.py:867
 msgid "Female age 0-5"
 msgstr "Femme de 0-5 ans"
 
-#: workflow/models.py:843
+#: workflow/models.py:868
 msgid "Male age 6-9"
 msgstr "Homme de 6-9 ans"
 
-#: workflow/models.py:844
+#: workflow/models.py:869
 msgid "Female age 6-9"
 msgstr "Femme de 6-9 ans"
 
-#: workflow/models.py:845
+#: workflow/models.py:870
 msgid "Male age 10-14"
 msgstr "Homme de 10-14 ans"
 
-#: workflow/models.py:846
+#: workflow/models.py:871
 msgid "Female age 10-14"
 msgstr "Femme de 10-14 ans"
 
-#: workflow/models.py:847
+#: workflow/models.py:872
 msgid "Male age 15-19"
 msgstr "Homme de 15-19 ans"
 
-#: workflow/models.py:848
+#: workflow/models.py:873
 msgid "Female age 15-19"
 msgstr "Femme de 15-19 ans"
 
-#: workflow/models.py:849
+#: workflow/models.py:874
 msgid "Male age 20-24"
 msgstr "Homme de 20-24 ans"
 
-#: workflow/models.py:850
+#: workflow/models.py:875
 msgid "Female age 20-24"
 msgstr "Femme de 20-24 ans"
 
-#: workflow/models.py:851
+#: workflow/models.py:876
 msgid "Male age 25-34"
 msgstr "Homme de 25-34 ans"
 
-#: workflow/models.py:852
+#: workflow/models.py:877
 msgid "Female age 25-34"
 msgstr "Femme de 25-34 ans"
 
-#: workflow/models.py:853
+#: workflow/models.py:878
 msgid "Male age 35-49"
 msgstr "Homme de 35-49 ans"
 
-#: workflow/models.py:854
+#: workflow/models.py:879
 msgid "Female age 35-49"
 msgstr "Femme de 35-49 ans"
 
-#: workflow/models.py:855
+#: workflow/models.py:880
 msgid "Male Over 50"
 msgstr "Homme de plus de 50 ans"
 
-#: workflow/models.py:856
+#: workflow/models.py:881
 msgid "Female Over 50"
 msgstr "Femme de plus de 50 ans"
 
-#: workflow/models.py:857
+#: workflow/models.py:882
 msgid "Total population"
 msgstr "Population totale"
 
-#: workflow/models.py:858
+#: workflow/models.py:883
 msgid "Total male"
 msgstr "Total masculin"
 
-#: workflow/models.py:859
+#: workflow/models.py:884
 msgid "Total female"
 msgstr "Total féminin"
 
-#: workflow/models.py:861
+#: workflow/models.py:886
 msgid "Classify land"
 msgstr "Classer les terres"
 
-#: workflow/models.py:862
+#: workflow/models.py:887
 msgid "Total Land"
 msgstr "Total des terres"
 
-#: workflow/models.py:864
+#: workflow/models.py:889
 msgid "Total Agricultural Land"
 msgstr "Total terres agricoles"
 
-#: workflow/models.py:866
+#: workflow/models.py:891
 msgid "Total Rain-fed Land"
 msgstr "Total des terres irriguées"
 
-#: workflow/models.py:868
+#: workflow/models.py:893
 msgid "Total Horticultural Land"
 msgstr "Total des terres horticoles"
 
-#: workflow/models.py:869
+#: workflow/models.py:894
 msgid "Total Literate People"
 msgstr "Total des personnes alphabètes"
 
-#: workflow/models.py:870
+#: workflow/models.py:895
 #, python-format
 msgid "% of Literate Males"
 msgstr "% d’hommes alphabètes"
 
-#: workflow/models.py:871
+#: workflow/models.py:896
 #, python-format
 msgid "% of Literate Females"
 msgstr "% de femmes alphabètes"
 
-#: workflow/models.py:872
+#: workflow/models.py:897
 msgid "Literacy Rate (%)"
 msgstr "Taux d’alphabétisation (%)"
 
-#: workflow/models.py:873
+#: workflow/models.py:898
 msgid "Households Owning Land"
 msgstr "Ménages propriétaires de terres"
 
-#: workflow/models.py:875
+#: workflow/models.py:900
 msgid "Average Landholding Size"
 msgstr "Taille moyenne des terres"
 
-#: workflow/models.py:876
+#: workflow/models.py:901
 msgid "In hectares/jeribs"
 msgstr "En hectares/jeribs"
 
-#: workflow/models.py:878
+#: workflow/models.py:903
 msgid "Households Owning Livestock"
 msgstr "Ménages possédant du bétail"
 
-#: workflow/models.py:880
+#: workflow/models.py:905
 msgid "Animal Types"
 msgstr "Types d’animaux"
 
-#: workflow/models.py:880
+#: workflow/models.py:905
 msgid "List Animal Types"
 msgstr "Liste des types d’animaux"
 
-#: workflow/models.py:883
+#: workflow/models.py:908
 msgid "Latitude (Decimal Coordinates)"
 msgstr "Latitude (coordonnées décimales)"
 
-#: workflow/models.py:885
+#: workflow/models.py:910
 msgid "Longitude (Decimal Coordinates)"
 msgstr "Longitude (coordonnées décimales)"
 
-#: workflow/models.py:886
+#: workflow/models.py:911
 msgid "Site Active"
 msgstr "Site actif"
 
-#: workflow/models.py:887
+#: workflow/models.py:912
 msgid "Approval"
 msgstr "Approbation"
 
-#: workflow/models.py:887
+#: workflow/models.py:912
 msgid "in progress"
 msgstr "en cours"
 
-#: workflow/models.py:889
+#: workflow/models.py:914
 msgid "This is the Provincial Line Manager"
 msgstr "Ceci est le gestionnaire de ligne provincial"
 
-#: workflow/models.py:890
+#: workflow/models.py:915
 msgid "Approved by"
 msgstr "Approuvé par"
 
-#: workflow/models.py:892
+#: workflow/models.py:917
 msgid "This is the originator"
 msgstr "C’est l’auteur"
 
-#: workflow/models.py:893
+#: workflow/models.py:918
 msgid "Filled by"
 msgstr "Rempli par"
 
-#: workflow/models.py:895
+#: workflow/models.py:920
 msgid "This should be GIS Manager"
 msgstr "Cela devrait être GIS Manager"
 
-#: workflow/models.py:896
+#: workflow/models.py:921
 msgid "Location verified by"
 msgstr "Lieu vérifié par"
 
@@ -4679,6 +4675,9 @@ msgstr "Rechercher"
 #: workflow/widgets.py:133
 msgid "City, Country:"
 msgstr "Ville, Pays :"
+
+#~ msgid "Success"
+#~ msgstr "Succès"
 
 #~ msgid "Please enter an indicator with fewer than 500 characters."
 #~ msgstr "Veuillez saisir un indicateur de moins de 500 caractères."
