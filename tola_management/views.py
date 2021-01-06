@@ -292,23 +292,28 @@ def app_host_page(request, react_app_page):
         js_context = get_user_page_context(request)
         # Translators: Page title for an administration page managing users of the application
         page_title = _("Admin: Users")
+        site_area = "admin lite - users"
     elif react_app_page == 'organization':
         js_context = get_organization_page_context(request)
         # Translators: Page title for an administration page managing organizations in the application
         page_title = _("Admin: Organizations")
+        site_area = "admin lite - organizations"
     elif react_app_page == 'program':
         js_context = get_program_page_context(request)
         # Translators: Page title for an administration page managing Programs using the application
         page_title = _("Admin: Programs")
+        site_area = "admin lite - programs"
     elif react_app_page == 'country':
         js_context = get_country_page_context(request)
         # Translators: Page title for an administration page managing countries represented in the application
         page_title = _("Admin: Countries")
+        site_area = "admin lite - countries"
 
     json_context = json.dumps(js_context, cls=DjangoJSONEncoder)
     return render(
         request, 'react_app_base.html',
-        {"bundle_name": "tola_management_"+react_app_page, "js_context": json_context, "page_title": page_title+" | "}
+        {"bundle_name": "tola_management_"+react_app_page, "js_context": json_context,
+         "page_title": page_title+" | ", "site_area": site_area}
     )
 
 
@@ -325,6 +330,7 @@ def audit_log_host_page(request, program_id):
     return render(request, 'react_app_base.html',
                   {"bundle_name": "audit_log",
                    "js_context": json_context,
+                   "site_area": "audit log",
                    "report_wide": True,
                    # Translators: Page title for a log of all changes to indicators over a program's history
                    "page_title": program.name+": " + gettext("Indicator change log") +" | "})

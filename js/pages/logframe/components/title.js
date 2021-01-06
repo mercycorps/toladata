@@ -4,7 +4,14 @@ import { inject } from 'mobx-react';
 const ExcelButton = inject('filterStore')(
     ({ filterStore }) => {
         const clickHandler = filterStore.excelUrl ?
-            () => { window.open(filterStore.excelUrl, '_blank') } :
+            () => {
+                window.sendGoogleAnalyticsEvent({
+                    category: "LogFrame",
+                    action: "Export",
+                    label: `Program ${filterStore.programId}`
+                });
+                window.open(filterStore.excelUrl, '_blank')
+            } :
             (e) => { e.preventDefault(); };
         return (
             <button type="button"

@@ -32,6 +32,29 @@ function getCookie(name) {
     return cookieValue;
 }
 
+/*
+ * Google analytics event sender to track exports and other non-pageview interactions
+ */
+function sendGoogleAnalyticsEvent({
+    category = "event",
+    action = "click",
+    label = null,
+    value =  null
+} = {}) {
+    var ga = window[window['GoogleAnalyticsObject'] || 'ga'];
+    let params = [category, action];
+    if (label !== null) {
+        params.push(label);
+        if (value !== null) {
+            params.push(value);
+        }
+    }
+    if (typeof ga == 'function') {
+        ga('send', 'event', ...params);
+    }
+}
+window.sendGoogleAnalyticsEvent = sendGoogleAnalyticsEvent;
+
 function csrfSafeMethod(method) {
     // these HTTP methods do not require CSRF protection
     return (/^(GET|HEAD|OPTIONS|TRACE)$/.test(method));
