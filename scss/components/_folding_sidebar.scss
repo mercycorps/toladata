@@ -5,7 +5,7 @@
     position: relative;
     margin-right: $trigger_width;
     @include media-breakpoint-down(lg) {
-        position: fixed;
+        position: absolute;
         z-index: $zindex-modal;
     }
     &__trigger {
