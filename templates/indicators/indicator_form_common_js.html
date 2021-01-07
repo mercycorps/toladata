@@ -53,27 +53,7 @@
     ]);
 
     function showSuccessNotifiction(message) {
-        PNotify.success({
-            title: "{% trans 'Success' %}",
-            text: message,
-            type: 'success',
-            width: '350px',
-            minHeight: '150px',
-            delay: 3000,
-            stack: {
-                'dir1': 'right',
-                'dir2': 'up',
-                'firstpos1': 0,
-                'firstpos2': 0
-            },
-            modules: {
-                Buttons: {
-                    closer: true,
-                    closerHover: false,
-                    sticker: false
-                }
-            }
-        });
+        window.unified_success_message(message);
     }
 
     // Open the modal with a create form (as opposed to an update form)
@@ -916,7 +896,7 @@
         if (!$nameField.val() || $nameField.val().length == 0) {
             errMsg = "{% trans 'Please complete this field.'|escapejs %}";
         } else if ($nameField.val().length > 500) {
-            errMsg = "{% trans 'Please enter an indicator with fewer than 500 characters.'|escapejs %}";
+            errMsg = interpolate("{% trans 'Please enter fewer than %s characters.'|escapejs %}", [500]);
         }
         if (errMsg) {
             $("#div_id_name").removeClass("mb-3");

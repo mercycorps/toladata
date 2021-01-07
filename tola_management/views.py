@@ -28,7 +28,8 @@ from rest_framework.serializers import (
     BooleanField,
     DateTimeField,
     EmailField,
-    ValidationError
+    ValidationError,
+    SerializerMethodField
 )
 from rest_framework.response import Response
 from rest_framework import viewsets, pagination, status, permissions
@@ -221,10 +222,14 @@ def get_program_page_context(request):
 
 
 class CountryProgramSerializer(ModelSerializer):
+    active = SerializerMethodField()
     class Meta:
         model = Program
-        fields = ['id', 'name', 'country']
+        fields = ['id', 'name', 'country', 'active']
 
+    @staticmethod
+    def get_active(program):
+        return program.funding_status.lower() == 'funded'
 
 def get_country_page_context(request):
     auth_user = request.user
@@ -249,7 +254,7 @@ def get_country_page_context(request):
     if not auth_user.is_superuser:
         program_queryset = tola_user.managed_programs
     else:
-        program_queryset = Program.rf_aware_objects.all()
+        program_queryset = Program.objects.all()
 
     return {
         'is_superuser': request.user.is_superuser,
@@ -287,23 +292,28 @@ def app_host_page(request, react_app_page):
         js_context = get_user_page_context(request)
         # Translators: Page title for an administration page managing users of the application
         page_title = _("Admin: Users")
+        site_area = "admin lite - users"
     elif react_app_page == 'organization':
         js_context = get_organization_page_context(request)
         # Translators: Page title for an administration page managing organizations in the application
         page_title = _("Admin: Organizations")
+        site_area = "admin lite - organizations"
     elif react_app_page == 'program':
         js_context = get_program_page_context(request)
         # Translators: Page title for an administration page managing Programs using the application
         page_title = _("Admin: Programs")
+        site_area = "admin lite - programs"
     elif react_app_page == 'country':
         js_context = get_country_page_context(request)
         # Translators: Page title for an administration page managing countries represented in the application
         page_title = _("Admin: Countries")
+        site_area = "admin lite - countries"
 
     json_context = json.dumps(js_context, cls=DjangoJSONEncoder)
     return render(
         request, 'react_app_base.html',
-        {"bundle_name": "tola_management_"+react_app_page, "js_context": json_context, "page_title": page_title+" | "}
+        {"bundle_name": "tola_management_"+react_app_page, "js_context": json_context,
+         "page_title": page_title+" | ", "site_area": site_area}
     )
 
 
@@ -320,6 +330,7 @@ def audit_log_host_page(request, program_id):
     return render(request, 'react_app_base.html',
                   {"bundle_name": "audit_log",
                    "js_context": json_context,
+                   "site_area": "audit log",
                    "report_wide": True,
                    # Translators: Page title for a log of all changes to indicators over a program's history
                    "page_title": program.name+": " + gettext("Indicator change log") +" | "})
@@ -393,7 +404,7 @@ class UserAdminSerializer(ModelSerializer):
                 validation_errors.update({"email": _('A user account with this email address already exists.')})
 
         org_name = Organization.objects.get(id=data['organization_id']).name
-        email_domain_is_mc = re.search("@mercycorps.org$",  data["user"]["email"])
+        email_domain_is_mc = re.search("@mercycorps.org$",  data["user"]["email"], re.IGNORECASE)
         if org_name == "Mercy Corps" and not email_domain_is_mc:
             # Translators:  Error message given when an administrator tries to save a bad combination of
             # organization and email

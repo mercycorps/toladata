@@ -257,6 +257,7 @@
                                            id="{{ form.baseline.id_for_label }}"
                                            class="form-control"
                                            min="0"
+                                           maxlength="20"
                                         {% if form.baseline.value != None %}
                                            value="{{ form.baseline.value|stringformat:'s' }}"{% endif %}
                                            onblur="this.checkValidity();">

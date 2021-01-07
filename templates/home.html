@@ -3,6 +3,7 @@
 {% load render_bundle from webpack_loader %}
 {# Translators: Page title if the user has not selected country #}
 {% block title %}{{ active_country|default:_("No available programs") }} | {% endblock %}
+{% block site_area %}country page{% endblock %}
 {% block page_title %}{{ active_country|default:_("No available programs") }}{% endblock %}
 
 {% block bodyclasses %}home{% endblock %}
@@ -241,20 +242,20 @@
             userCountryCodes: userCountryCodes
         };
         let reloadPage = false;
-    
+
         // Open indicator form modal if no RF and no indicators present on program
         $("a[data-add-indicator]").click((e) => {
             e.preventDefault();
             let programId = $(e.target).data('addIndicator');
             openCreateIndicatorFormModal({programId});
         });
-    
+
         // when indicator creation modal form completes a save
         $('#indicator_modal_div').on('created.tola.indicator.save', (e, params) => {
             // Only set a bool instead of reloading to support "create and add another..." functionality
             reloadPage = true;
         });
-    
+
         $('#indicator_modal_div').on('hidden.bs.modal', (e) => {
             if (reloadPage) {
                 location.reload(true);

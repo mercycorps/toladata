@@ -21,8 +21,8 @@ to a rich text format, so make sure you are saving plain text.
 
 ## Install software dependencies
 
-At this itme, TolaActivity requires both Python 2 and Python 3. It has been thoroughly tested with versions
-2.7 and 3.6, and lightly tested with version 3.8.  Python 2 is necessary satisfy a dependency in a node module.
+At this itme, TolaActivity requires Python 3. It has been thoroughly tested with versions
+3.6, and lightly tested with version 3.8. It is suggested that Developers use Python 3.8 or greater.
 These instructions assume MySQL is being used as Django's datastore.  Version 5.7 has been thoroughly tested, but version 8 should work as well.
 
 ### macOS
@@ -38,10 +38,15 @@ Before starting the install process, you may also want to request a copy of the 
 a dump of an existing TolaActivity database.
 
 
-At the Terminal command line:
+To see if you have Python 3 or MySQL installed, run the following commands:
+```bash
+$ python3 --version
+$ mysql --version
+```
+
+At the Terminal command line, run the following commands to install:
 ```bash
 $ brew install python@3
-$ brew install python@2
 $ brew install mysql@5.7
 ```
 
@@ -62,15 +67,15 @@ Back at the command line:
 $ source ~/.bash_profile
 $ brew install mysql-utilities
 $ brew install py2cairo pango
-$ pip install virtualenv
+$ pip3 install virtualenv
 ```
 
 You should now also start the mysql server:
 ```bash
-brew services start mysql
+brew services start mysql@5.7
 ```
 
-Now you're ready to [install and configure the source files](#Install and configure the TolaActivity source files).
+Now that you've installed the necessary macOS software dependencies, you can move down to the section __Install and configure the TolaActivity source files__.
 
 
 ### Windows
@@ -79,17 +84,14 @@ For Windows installations, install the [Windows Subsystem for Linux](https://doc
 
 ### Ubuntu
 
-You will need both Python2 and Python3 installed.  Python2 is required for an npm package that has not yet
-made the transition. TolaData has been tested on Python3.6 but should work on later versions as well.
+You will need Python3 installed. TolaData has been tested on Python 3.6 but should work on later versions as well.
 ```bash
-$ python2 --version
 $ python3 --version
 ```
 
 If one of these doesn't yield a Python installation, install it.
 ```bash
 $ sudo apt update
-$ sudo apt install python2
 $ sudo apt install python3
 ```
 
@@ -104,15 +106,6 @@ $ sudo apt install virtualenv
 ```
 
 Note that some users have had to manually build the libxml2 library, as mentioned in the [python-xmlsec documentation](https://xmlsec.readthedocs.io/en/latest/install.html).
-
-```bash
-wget http://xmlsoft.org/sources/libxml2-2.9.1.tar.gz
-tar -xvf libxml2-2.9.1.tar.gz
-cd libxml2-2.9.1
-./configure && make && make install
-```
-
-Note that some users have had to manually build the libxml2 library, as mentioned in the [python-xmlsec documentation](https://xmlsec.readthedocs.io/en/latest/install.html)
 
 ```bash
 wget http://xmlsoft.org/sources/libxml2-2.9.1.tar.gz
@@ -136,14 +129,22 @@ All operating systems should now be ready to install TolaActivity source files a
 ```bash
 $ git clone https://github.com/mercycorps/toladata.git
 $ cd toladata
-$ virtualenv -p python3 venv
+$ virtualenv -p python3.8 venv
 $ source venv/bin/activate  # you should see '(venv)' appear on the left of your command prompt
-$ pip install -r requirements.txt
 ```
 
-###Modify the config file
+Install `pip-tools` and use the `pip-sync` command to install, upgrade, and uninstall your virtual environment with the necessary dependencies to match the `requirements.txt` and `dev-requirements.txt` contents.
+```bash
+$ pip install pip-tools
+$ pip-sync requirements.txt dev-requirements.txt
+```
+
+You may need to perform additional installations if you receive an error installing the requirements.txt. For example:
+* _Failed building wheel for xmlsec_. Run command `brew install libxmlsec1`
+
+### Modify the config file
 If you have a copy of the _settings.secret.yml_ file, place it in the TolaActivity/config
-directory.  In Windows, you will need to copy it from where the file is stored on your hard drive.  You may want to modify the file per the instructions below (not with an MS Office product!) before moving it to the TolaActivity folder.  To move the file, f the file is in your Downloads directory, you could use a command that looks something like this:
+directory.  In Windows, you will need to copy it from where the file is stored on your hard drive.  You may want to modify the file per the instructions below (not with an MS Office product!) before moving it to the TolaActivity folder.  To move the file, if the file is in your Downloads directory, you could use a command that looks something like this:
 ```bash
 $ cp /mnt/c/Users/<your_username>/Downloads/settings.secret.yml config
 ```
@@ -157,54 +158,52 @@ $ cp config/sample-settings.secret.yml config/settings.secret.yml
 Open the _config/settings.secret.yml_ file with a plain-text editor.
 
 1. Find the node named, "DATABASES" and set the
-database `NAME`, `USER`, and `PASSWORD` as appropriate. The result should resemble the following:
+database `NAME`, `USER`, and `PASSWORD` as appropriate. If you have a dump of an existing TolaActivity database, set the `NAME` to "tola_activty". The result should resemble the following:
 
     ```yaml
     DATABASES:
       default:
         ENGINE: "django.db.backends.mysql"
-        NAME: "<db_name>"
-        USER: "<db_username>"
-        PASSWORD: "SooperSekritWord"
+        NAME: "<db_name>" # "myDatabaseName"
+        USER: "<db_username>" # "myUsername"
+        PASSWORD: "<password>" # "SooperSekritWord"
         HOST: "localhost"
         PORT: ""
     ```
 
-    The rest of the instructions assume that you've used the values above.
+    The rest of the instructions uses the values commented above.
 
-1. Modify the LOGFILE entry so it points to a file in the _logs_ directory you just created.
+1. Create the log directory
+    ```bash
+    $ mkdir /User/<username>/logs
+    ```
+    
+    Modify the LOGFILE entry so it points to the file in the _logs_ directory you just created.
     For example:
-
     ```yaml
     LOGFILE: '/home/<username>/logs/django_error.log'
     ```
 
 
-## Create the log directory
-
-```bash
-$ mkdir /User/<username>/logs
-```
-
 ## Set up Django's MySQL backing store
-Log into mysql and create the database, create the user, and grant permissions.
+Log into mysql and create the database, create the user, and grant permissions with the following commands using the same database `Name`, `User`, and `Password` used in the _settings.secret.yml_ file. The commands below uses the example values commented in the previous section.
 ```sql
 $ mysql -u root  # Ubuntu users will need to use sudo for this line
-mysql> CREATE DATABASE tola;
-mysql> CREATE USER 'tola'@'localhost' IDENTIFIED BY 'SooperSekritWord';
-mysql> GRANT ALL ON tola.* TO 'tola'@'localhost';
+mysql> CREATE DATABASE myDatabaseName; 
+mysql> CREATE USER 'myUsername'@'localhost' IDENTIFIED BY 'SooperSekritWord';
+mysql> GRANT ALL ON myDatabaseName.* TO 'myUsername'@'localhost';
 mysql> exit
 
 ```
 
 ## Set up Django
 
-If you have a copy of an existing Tola database, you can load through the mysql command.  When prompted, you should provide the database password.
+If you have a copy of an existing Tola database, you can load through the mysql command using the path to the .sql file.  When prompted, you should provide the database password.
 ```bash
 $ mysql -u tola -p tola_activity < /path/to/file.sql
 ```
-Run the database migrations, even if you just uploaded the .sql file.
 
+Run the database migrations, even if you just uploaded the .sql file.
 ```bash
 $ python manage.py migrate
 ```
@@ -240,8 +239,9 @@ $ python manage.py migrate
 ```
 
 
-Start the server:
+## Start the server:
 
+Start the Django development server with the `runserver` command.
 ```bash
 $ python manage.py runserver
 Performing system checks...
@@ -258,9 +258,10 @@ In your browser, navigate to `localhost:8000`.  You should see a TolaActivity lo
 login through the Google+ link.
 
 ## Creating a local user
+If you are not logging in through the Google+ link, you will need to create a local user so you can log in.
+You can use the Python Shell or MySQL to create a local superuser and add the additional data that is required.
 
-The following commands will create a local superuser and add the additional data that is required.
-
+### Using Python Shell
 ```bash
 $ ./manage.py shell
 >>> from django.contrib.auth.models import User
@@ -272,8 +273,40 @@ $ ./manage.py shell
 >>> exit()
 ```
 
+### Using MySQL
+Use the `createsuperuser` command and enter in a username and password to be used to login. When it asks for an email, you can just hit the Enter key to skip the question (email not needed to login).
+```bash
+$ python manage.py createsuperuser
+Username: <my_username>
+Email address: 
+Password: <my_password>
+Password (again): <my_password>
+Superuser created successfully.
 
-Start the Tola Activity server
+``` 
+
+Log into MySQL and get the id of the record you just added from the auth.user table using the following query:
+
+```bash
+$ mysql -u tola -p tola_activity
+mysql> SELECT id, username FROM auth_user ORDER BY id DESC LIMIT 5;
++----+----------+
+| id | username |
++----+----------+
+|  1 | myname   |
++----+----------+
+```
+
+Note the value for `id` to use in the next step.
+
+Insert the `id` value from the `auth_user` table into the `user_id` field of the `workflow_tolauser` table (Name can be first and/or last name, username, or anything else):
+
+```bash
+mysql> INSERT INTO workflow_tolauser (name, privacy_disclaimer_accepted, user_id, language) VALUES ("<My Name>", 1, "<id>", "en");
+mysql> exit
+```
+
+Restart the Tola Activity server
 
 ```bash
 $ python manage.py runserver

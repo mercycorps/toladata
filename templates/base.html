@@ -29,11 +29,16 @@
         {% block extra_js_in_header %}
         {# TODO: this should be in at least two separate blocks #}
         {% endblock %}
+        <script>
+            // this initializes a variable to the site area defined in different templates, for google analytics tracking.
+            // base value is in this (base.html) block, different site areas should define the variable as needed
+            var siteArea = "{% block site_area %}main{% endblock %}";
+        </script>
 
 
         <!-- bootstrap multiselect -->
         <script type="text/javascript" src="{% static "js/bootstrap-multiselect.js" %}?q=gp1116"></script>
-        
+
         <!-- GLOBALS -->
         <script>
             var JS_GLOBALS = (typeof JS_GLOBALS === 'undefined') ? {} : JS_GLOBALS;
@@ -276,7 +281,12 @@
         <!-- End JQuery UI language files -->
 
         <script>
-            let js_context = {
+            // checking if it's defined (in some cases this errors out javascript and prevents our
+            // modal detection script from reloading the page)
+            if (!js_context || typeof(js_context) == 'undefined') {
+                var js_context;
+            }
+            js_context = {
                 strings: {
                     serverError: '{% trans "Server Error" %}',
                     networkError: '{% trans "Network Error" %}',
@@ -290,7 +300,7 @@
         </script>
 
 
-        {% if GOOGLE_ANALYTICS_PROPERTY_ID %}
+        {% if GOOGLE_ANALYTICS_PROPERTY_ID and "tola-activity.mercycorps.org" in request.build_absolute_uri %}
             {% include "google_analytics.html" %}
         {% endif %}
 
