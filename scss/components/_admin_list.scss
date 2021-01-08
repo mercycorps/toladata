@@ -1,6 +1,9 @@
 // management lists
 // Appears alongside sidebar
 .admin-list { // was: .list-section; provides page layout to admin list tables
+    @include media-breakpoint-down(lg) {
+        margin-left: 40px;
+    }
 }
 .admin-list__controls { // was: .list-controls; contains add button & bulk actions
     display: flex;
