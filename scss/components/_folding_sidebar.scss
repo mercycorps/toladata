@@ -6,6 +6,7 @@
     margin-right: $trigger_width;
     @include media-breakpoint-down(lg) {
         position: absolute;
+        height: 100%;
         z-index: $zindex-modal;
     }
     &__trigger {
@@ -24,6 +25,15 @@
     &__contents {
         will-change: width;
         @include alltransitions (all, 0.2s, ease);
+        &__container {
+            overflow-y: auto;
+            max-height: 100vh;
+        }
+    }
+    &__container {
+        position: -webkit-sticky; /* Safari */
+        position: sticky;
+        top: 0;
     }
 }
 
