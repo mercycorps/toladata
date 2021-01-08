@@ -560,6 +560,7 @@ class Cleaner:
     def clean_tolaland():
         try:
             country = Country.objects.get(country='Tolaland')
+            print("Deleting country: {}".format(country))
             disaggregations = DisaggregationType.objects.filter(country=country)
             disaggregations.delete()
             country.delete()

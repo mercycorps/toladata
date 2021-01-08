@@ -36,16 +36,16 @@ class FilterStore {
             gettext('Assumptions')
         ];
     }
-    
+
     @computed get programId() {
         let state = this.router.getState();
         return state.params.programId || null;
     }
-    
+
     updateState = ({ route, prevRoute }) => {
         this.groupBy = route.params.groupby;
     }
-    
+
     setGroupBy(groupBy) {
         groupBy = parseInt(groupBy);
         let { name, params } = this.router.getState();
@@ -54,10 +54,15 @@ class FilterStore {
         }
         this.router.navigate(name, params, {reload: true});
     }
-    
+
     @computed get excelUrl() {
         let { name, params } = this.router.getState();
         return this.router.buildUrl('logframe-excel', params);
+    }
+
+    @computed get programId() {
+        let { name, params } = this.router.getState();
+        return params.programId || null;
     }
 }
 

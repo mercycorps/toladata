@@ -71,6 +71,11 @@ export class LevelListPanel  extends React.Component {
         let expandoDiv = null;
         if (this.props.rootStore.levelStore.levels.filter( l => l.id !== "new").length > 1){
             const excelClickHandler = () => {
+                window.sendGoogleAnalyticsEvent({
+                    category: "Results Framework Builder",
+                    action: "Export",
+                    label: `Program ${this.props.rootStore.levelStore.program_id}`
+                });
                 window.open(this.props.rootStore.levelStore.excelURL, '_blank')
             }
             expandoDiv =
@@ -96,7 +101,7 @@ export class LevelListPanel  extends React.Component {
                         </button>
                     </div>
                 </div>;
-                
+
         }
         let panel = '';
         if (this.props.rootStore.levelStore.levels.length == 0) {
@@ -118,4 +123,3 @@ export class LevelListPanel  extends React.Component {
         return panel
     }
 }
-
