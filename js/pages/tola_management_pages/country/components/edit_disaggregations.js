@@ -93,13 +93,14 @@ class CategoryForm extends React.Component {
                         value={category.customsort}
                         onChange={ (e) => props.updateLabelOrder(index, e.target.value - 1) }
                         className="form-control" disabled={props.disabled}
+                        style={{minWidth: "max-content"}}
                     >
                         {
                             Array.from(Array(listLength).keys()).map(value => <option value={value+1} key={value}>{value+1}</option>)
                         }
                     </select>
                 </div>
-                <div className="form-group">
+                <div className="form-group col-md-auto">
                     {deletionElement}
                 </div>
             </React.Fragment>
@@ -448,7 +449,9 @@ export class DisaggregationType extends React.Component {
                     </a>
                     {disaggregation.is_archived && <span className="text-muted font-weight-bold ml-2">(Archived)</span>}
                     {expanded && (
-                        <form className="form card card-body bg-white">
+                        <form className="form card card-body bg-white" 
+                        style={{minWidth: "max-content"}}
+                        >
                             <fieldset className="disagg-form__fieldset">
                                 <div className="form-group">
                                     <label className="label--required" htmlFor="disaggregation-type-input">
