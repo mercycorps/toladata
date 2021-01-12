@@ -1,11 +1,10 @@
 import React from 'react'
 import { observable, runInAction } from 'mobx'
-import { inject, observer } from "mobx-react"
+import { observer } from "mobx-react"
 import { DragDropContext, Droppable, Draggable } from 'react-beautiful-dnd';
 import classNames from 'classnames'
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome'
-import { faCaretDown, faCaretRight, faArrowsAlt } from "@fortawesome/free-solid-svg-icons";
-import {sortableContainer, sortableElement, sortableHandle} from 'react-sortable-hoc';
+import { faCaretDown, faCaretRight } from "@fortawesome/free-solid-svg-icons";
 import HelpPopover from "../../../../components/helpPopover";
 import { toJS } from 'mobx';
 import {create_unified_changeset_notice} from '../../../../components/changesetNotice';
