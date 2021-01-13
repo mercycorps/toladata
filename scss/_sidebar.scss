@@ -5,7 +5,12 @@
 #sidebar {
     flex-basis: 1;
     // (commenting out while working on react)overflow: hidden;
+    overflow-y: auto;
+    height: 100vh;
     z-index: 3;
+    &::-webkit-scrollbar{
+        width: 0px;
+    }
     .list-group {
         min-width: 400px;
         background-color: $gray-800;
@@ -73,7 +78,8 @@
 
 @include media-breakpoint-down(md) {
     .iptt_table_wrapper {
-        padding-left: 0;
+        padding-left: 15px;
+        margin-left: 40px;
     }
     #id_span_iptt_date_range {
         display: block;
@@ -81,8 +87,14 @@
     }
     .sidebar_wrapper {
         padding-right: 40px;
-        position: fixed;
         z-index: $zindex-fixed;
+        position: -webkit-sticky; /* Safari */
+        position: sticky;
+        top: 0;
+    }
+    .sidebar_container {
+        height: 100%;
+        position: absolute;
     }
     .sidebar-toggle {
         position: absolute;
@@ -104,7 +116,6 @@
         &,
         & .list-group {
             min-width: 35px;
-            overflow: visible;
         }
         .list-group {
             // overlay sub levels on small screens
@@ -126,6 +137,10 @@
             }
         }
     }
+    #filter-extra {
+        background-color: $gray-300;
+    }
+    
 }
 
 // Collapse/Collapsing states
@@ -156,7 +171,15 @@
 .sidebar_wrapper {
     // see breakpoint mixin above
     display: flex;
+    position: -webkit-sticky; /* Safari */
+    position: sticky;
+    top: 0;
 }
+
+.sidebar_container {
+    // height: 100vh;
+}
+
 .sidebar-toggle {
     display: block;
     height: 42px;
