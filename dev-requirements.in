@@ -1,0 +1,9 @@
+# dev requirements for TolaActivity - packages for local serving/development
+# to generate dev-requirements.txt: pip-compile dev-requirements.in
+# to install (sync) requirements for development: pip-sync requirements.txt dev-requirements.txt
+-c requirements.txt
+
+django-silk # Request-based query explainer, profiling, speed checking
+django-debug-toolbar  # In-page query explainer, profiling, template debug
+django-extensions # shell plus and other helpful tools
+pip-tools # used to produce requirements.txt

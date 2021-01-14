@@ -297,7 +297,7 @@
             var base_url = "{% url 'reportingperiod_update' 0 %}";
             base_url = base_url.slice(0,-1);
             $("input[name=program_id]").val(source_data['program']);
-            $("#reportingperiod_update_form").attr("action", base_url + source_data['program']);
+            $("#reportingperiod_update_form").attr("action", base_url + source_data['program'] + "/");
             var testDate = "";
             if ((testDate = new Date(source_data['progstart'])) == "Invalid Date"){
                 // # Translators: Data is currently unavailable to display (i.e. system error)
@@ -431,7 +431,7 @@
                     suppressErrors: true
                 }).done(() => {
                     {# Translators: This is the text of an alert that is triggered upon a successful change to the the start and end dates of the reporting period #}
-                    PNotify.success("{% trans 'Reporting period updated' %}")
+                    window.unified_success_message("{% trans 'Reporting period updated' %}");
                 }).fail(function(data) {
                     let msg = "{% trans 'There was a problem saving your changes.'|escapejs %}";
                     if (data.responseJSON) {

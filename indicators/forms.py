@@ -226,10 +226,19 @@ class IndicatorForm(forms.ModelForm):
             lop_stripped = lop_stripped.rstrip('0').rstrip('.') if '.' in lop_stripped else lop_stripped
             kwargs['initial']['lop_target'] = lop_stripped
 
+
         self.programval = kwargs.pop('program')
         self.prefilled_level = kwargs.pop('level') if 'level' in kwargs else False
 
         super(IndicatorForm, self).__init__(*args, **kwargs)
+
+        # per mercycorps/TolaActivity#2452 remove textarea max length validation to provide a more
+        # user-friendly js-based validation (these textarea checks aren't enforced at db-level anyway)
+        for field in ['name', 'definition', 'justification', 'rationale_for_target',
+                      'means_of_verification', 'data_collection_method', 'data_points',
+                      'responsible_person', 'method_of_analysis', 'information_use',
+                      'quality_assurance', 'data_issues', 'indicator_changes', 'comments']:
+            self.fields[field].widget.attrs.pop('maxlength', None)
 
         # program_display here is to display the program without interfering in the logic that
         # assigns a program to an indicator (and doesn't update it) - but it looks like other fields
@@ -296,6 +305,11 @@ class IndicatorForm(forms.ModelForm):
             key=lambda choice: str_without_diacritics(choice[1])
         )
 
+        self.fields['indicator_type'].choices = sorted(
+            self.fields['indicator_type'].choices,
+            key=lambda choice: str_without_diacritics(choice[1])
+        )
+
         allowed_countries = [
             *self.request.user.tola_user.access_data.get('countries', {}).keys(),
             *[programaccess['country'] for programaccess in self.request.user.tola_user.access_data.get('programs', [])
@@ -357,7 +371,9 @@ class IndicatorForm(forms.ModelForm):
         self.fields['name'].required = True
         self.fields['name'].widget = forms.Textarea(attrs={'rows': 3})
         self.fields['unit_of_measure'].required = True
-        self.fields['unit_of_measure'].widget = forms.TextInput(attrs={'autocomplete':'off'})
+        self.fields['unit_of_measure'].widget = forms.TextInput(
+            attrs={'autocomplete':'off',
+                   'maxlength': Indicator._meta.get_field('unit_of_measure').max_length})
         # Translators: Label of a form field.  User specifies whether changes should increase or decrease.
         self.fields['direction_of_change'].label = _("Direction of change")
         self.fields['target_frequency'].required = True

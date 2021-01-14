@@ -40,15 +40,20 @@ def index(request, selected_country=None):
         active_country = Country.objects.filter(id=selected_country)[0]
         user.update_active_country(active_country)
     else:
-        try:
-            # default to first country in user's accessible countries
-            active_country = user.active_country if user.active_country else user_countries[0]
-        except IndexError:
-            # ... or failing that, to their "home" country
+        # If the user's active country is stale, we should default to their home country or any country they have
+        # access to (if they're not an MC user).
+        if user.active_country and user.active_country in user_countries:
+            active_country = user.active_country
+        elif user.country:
             active_country = user.country
-            # ... failing all of this, the homepage will be blank. Sorry!
+        elif len(user_countries) > 0:
+            active_country = user_countries[0]
+        else:
+            active_country = None
 
-    active_country_id = None
+        if active_country != user.active_country:
+            user.update_active_country(active_country)
+
     if active_country:
         active_country_id = active_country.id
         # get list of IDs to which user has access:

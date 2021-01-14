@@ -33,7 +33,7 @@ export default class ProgramPageRootStore {
         }
         return this.program.indicatorsInLevelOrder;
     }
-    
+
     @computed
     get getIndicatorsNeedingTargets() {
         return this._sortedIndicators.filter(i => !i.hasAllTargetsDefined);
@@ -66,17 +66,17 @@ export default class ProgramPageRootStore {
     get getIndicatorsReporting() {
         return this._sortedIndicators.filter(i => i.isReporting);
     }
-    
+
     @computed
     get getTotalResultsCount() {
         return this.allIndicators.reduce((acc, i) => acc + i.resultsCount, 0);
     }
-    
+
     @computed
     get getTotalResultsWithEvidenceCount() {
         return this.allIndicators.reduce((acc, i) => acc + i.resultsWithEvidenceCount, 0);
     }
-    
+
     @computed
     get indicators() {
         return this.filterIndicators(this.uiStore.currentIndicatorFilter, this.uiStore.selectedIndicatorId);
@@ -91,12 +91,12 @@ export default class ProgramPageRootStore {
     get allCollapsed() {
         return this.indicators.every(indicator => !this.program.isExpanded(indicator.pk));
     }
-    
+
     @computed
     get allIndicators() {
         return this._sortedIndicators;
     }
-    
+
     filterIndicators(filterType, indicatorPk=null) {
         let indicators;
 
@@ -126,11 +126,11 @@ export default class ProgramPageRootStore {
             default:
                 indicators = this._sortedIndicators;
         }
-        
+
         if (indicatorPk && !isNaN(parseInt(indicatorPk))) {
             indicators = indicators.filter(i => i.pk == parseInt(indicatorPk))
         }
         return indicators
     }
-    
+
 }

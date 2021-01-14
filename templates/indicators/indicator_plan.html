@@ -3,6 +3,19 @@
 
 {% block title %}{% trans "Indicator Plan" %} | {% endblock %}
 
+{% block site_area %}indicator plan{% endblock %}
+{% block extra_js_in_header %}
+<script type="text/javascript">
+    function downloadExport() {
+        window.sendGoogleAnalyticsEvent({
+            category: "Indicator Plan",
+            action: "Export",
+            label: "Program {{ program.id }}"
+        });
+        window.open('/indicators/indicator_plan/export/{{ program.id }}/{% if ordering %}?orderby={{ordering}}{% endif %}', "_blank");
+    }
+</script>
+{% endblock %}
 {% block bodyclasses %}indicator-plan{% endblock %}
 
 {% block mainclasses %}region--full-width{% endblock %}
@@ -11,7 +24,7 @@
 <h1 class="page-title h2">
     <a href="{{ program.program_page_url }}">
     {% if program.gaitid %}
-        {{ program.gaitid }} - 
+        {{ program.gaitid }} -
     {% endif %}
     {{ program.name }}:</a>
     <span class="font-weight-normal text-muted text-nowrap">
@@ -19,7 +32,7 @@
         <small><i class="fas fa-th"></i></small>
     </span>
 </h1>
-<button type="submit" class="btn btn-sm btn-secondary" onClick="location.href='/indicators/indicator_plan/export/{{ program.id }}/{% if ordering %}?orderby={{ordering}}{% endif %}'"><i class="fas fa-download"></i> Excel {# Excel (brand name) not translated #}</button>
+<button type="submit" class="btn btn-sm btn-secondary" onClick="downloadExport()"><i class="fas fa-download"></i> Excel {# Excel (brand name) not translated #}</button>
 
 {% endblock %}
 

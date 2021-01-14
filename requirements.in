@@ -1,39 +1,25 @@
-Django>=2.2,<3
-dateparser
-beautifulsoup4
-django-admin-sortable2
-django-ckeditor
-django-crispy-forms
-django-daterange-filter
-django-extensions
-django-leaflet
-django-localflavor
-django-mathfilters
-django-multiselectfield
-django-multiupload
-django-registration
-django-report-utils
-django-safedelete
-django-silk
-django-simple-history
-django-uuidfield
-django-widget-tweaks
-django-wysiwyg
-django-webpack-loader
-djangorestframework
-django-import-export
-django-mysql
-factory-boy
-google-api-python-client
-google-auth
-google-auth-httplib2
-mysqlclient
-openpyxl
-pbr
-pip-tools
-python3-saml
-pyyaml
-simplejson
-social-auth-app-django
-WeasyPrint
-webencodings
+Django>=2.2,<3              # 2.2 LTS, supported until Apr 2022
+dateparser                  # used in indicators to translate date strings to date objects
+beautifulsoup4              # used in testing to parse html response data
+django-admin-sortable2      # used in Django admin for sortable indicators
+django-crispy-forms         # used in old (siteprofile/formlibrary) forms - deprecated
+django-localflavor          # provides localization support for numbers/dates/formatting
+django-multiselectfield     # used in indicator model for multiselect string option fields (e.g. information use)
+django-safedelete           # provides a soft delete model (used for historical records throughout)
+django-simple-history       # provides historical records attached to user from request (used only on SiteProfile)
+django-widget-tweaks        # used in many templates to provide render_field and other shortcuts
+django-webpack-loader       # used to inject webpack bundle into django templates
+djangorestframework~=3.11   # DRF - base for our RESTful API serializers/routers
+django-import-export        # used in legacy Django admin code to export indicators data (deprecated)
+django-mysql~=3.7           # used explicitly in indicators.models (LevelTierTemplate) - provides other helpers
+factory-boy~=3.1            # used in testing - provides model factories to quickly spin up fixtures
+google-auth                 # potentially used in OAuth flow?  Can't find explicit calls to this
+google-auth-httplib2        # used by above package to assist in migrating to google-auth - unknown if used
+mysqlclient                 # C bindings for mysql, required for Django to operate over mysql
+openpyxl~=3.0               # Excel read/write wrapper for python
+pbr                         # potentially used to manage git versions/manifest/tags?  unclear
+python3-saml                # potentially a dependency?  Not called directly in code
+pyyaml~=5.3                 # python bindings to read YAML files
+simplejson~=3.17            # used in template tags to serialize to json
+social-auth-app-django~=4.0 # core of social auth (Okta and Google) in tola auth pipeline
+WeasyPrint                  # deprecated - only used in legacy (deprecated) disaggregation report (makes PDFs)

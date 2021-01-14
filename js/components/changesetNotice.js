@@ -42,8 +42,7 @@ const create_rfc_dropdown = ({
 }
 
 /*
-* Consider using this notification function rather than the more specific ones above.  It should be able to
-* everything they can do. The configurable parameters are for the 4 sections of the notification and
+* Unified pNotify entry point: The configurable parameters are for the 4 sections of the notification and
 * for other visual and functional elements. Leave any of these null or false to omit them.
 * There is NO DEFAULT TEXT. You must explicitly provide text to text elements.
 */
@@ -71,6 +70,8 @@ const create_unified_changeset_notice = ({
     blocking = true,
     self_dismissing = false, // automatically hides the notice after 8000 ms (default). NOTE: this is the OPPOSITE behavior as default PNotify
     dismiss_delay = 8000, // also PNotify default
+    dir1 = 'right', // notice will start on the left side
+    dir2 = 'up' // notice will start on the bottom
 } = {}) => {
     let header_icons = {
         'error': 'fa-exclamation-triangle',
@@ -132,13 +133,6 @@ const create_unified_changeset_notice = ({
         ${rfc_section}
         ${rationale_section}
     `;
-
-
-    // IMPORTANT TODO
-    // **************
-    // Following code cribs from create_changeset_notice
-    // I left create_changeset_notice untouched to avoid lots of regressions
-    // I think we should deprecate create_changeset_notice entirely
 
     let confirm_button = {
         text: confirm_text,
@@ -227,8 +221,8 @@ const create_unified_changeset_notice = ({
         addClass: 'program-page__rationale-form',
         stack: {
             'overlayClose': !modal,
-            'dir1': 'right',
-            'dir2': 'up',
+            'dir1': dir1,
+            'dir2': dir2,
             'firstpos1': 20,
             'firstpos2': 20,
             'context': context,
@@ -269,7 +263,7 @@ const create_unified_changeset_notice = ({
         }});
     }
 
-    // END CRIBBED CODE
+    return notice;
 
 }
 

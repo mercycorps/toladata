@@ -6,8 +6,8 @@ msgid ""
 msgstr ""
 "Project-Id-Version: \n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2020-12-15 13:16-0800\n"
-"PO-Revision-Date: 2020-11-23 14:38+0100\n"
+"POT-Creation-Date: 2021-01-05 15:02-0800\n"
+"PO-Revision-Date: 2021-01-05 15:03-0800\n"
 "Last-Translator: \n"
 "Language-Team: \n"
 "Language: es\n"
@@ -15,13 +15,9 @@ msgstr ""
 "Content-Type: text/plain; charset=UTF-8\n"
 "Content-Transfer-Encoding: 8bit\n"
 "Plural-Forms: nplurals=2; plural=(n != 1);\n"
-"X-Generator: Eazy Po 0.9.5.3\n"
+"X-Generator: Poedit 2.4.2\n"
 
-#: js/base.js:336
-msgid "Success"
-msgstr "Éxito"
-
-#: js/base.js:391 js/base.js:392
+#: js/base.js:356 js/base.js:357
 msgid ""
 "Your changes will be recorded in a change log. For future reference, please "
 "share your reason for these changes."
@@ -29,11 +25,11 @@ msgstr ""
 "Sus cambios serán guardados en un registro de cambios. Para referencia "
 "futura, indique la justificación para estos cambios."
 
-#: js/base.js:393
+#: js/base.js:358
 msgid "This action cannot be undone"
 msgstr "Advertencia: esta acción no se puede deshacer"
 
-#: js/base.js:403
+#: js/base.js:368
 #, python-format
 msgid ""
 "Removing this target means that %s result will no longer have targets "
@@ -48,50 +44,26 @@ msgstr[1] ""
 "Eliminar este objetivo implica que %s resultados no tedrán más objetivos "
 "asociados."
 
-#. Translators: Button to approve a form
-#: js/base.js:415 js/base.js:517 js/base.js:566 js/base.js:609
-#: js/components/changesetNotice.js:65
-msgid "Ok"
-msgstr "OK"
+#. Translators: the header of an alert after an action completed successfully
+#: js/base.js:388
+msgid "Success"
+msgstr "Éxito"
 
-#. Translators: Button to cancel a form submission
-#: js/base.js:417 js/base.js:519 js/base.js:568 js/base.js:611
-#: js/components/changesetNotice.js:67
-#: js/pages/results_framework/components/level_cards.js:578
-msgid "Cancel"
-msgstr "Cancelar"
-
-#: js/base.js:462 js/components/changesetNotice.js:173
-msgid "A reason is required."
-msgstr "Se requiere una justificación."
-
-#: js/base.js:526 js/base.js:621
-#: js/pages/results_framework/components/level_cards.js:89
-#: js/pages/tola_management_pages/country/models.js:442
-msgid "This action cannot be undone."
-msgstr "Advertencia: esta acción no se puede deshacer."
-
-#: js/base.js:530 js/base.js:625
-#: js/pages/results_framework/components/level_cards.js:86
-#: js/pages/results_framework/models.js:665
-#: js/pages/tola_management_pages/country/components/edit_disaggregations.js:625
-#: js/pages/tola_management_pages/country/models.js:440
-#: js/pages/tola_management_pages/country/models.js:474
-#: js/pages/tola_management_pages/country/models.js:505
-#: js/pages/tola_management_pages/program/models.js:277
+#. Translators: the header of an alert where additional warning info is provided
+#: js/base.js:407 js/pages/results_framework/components/level_cards.js:86
+#: js/pages/results_framework/models.js:620
+#: js/pages/tola_management_pages/country/components/edit_disaggregations.js:626
+#: js/pages/tola_management_pages/country/models.js:434
+#: js/pages/tola_management_pages/country/models.js:469
+#: js/pages/tola_management_pages/country/models.js:501
+#: js/pages/tola_management_pages/program/models.js:279
 msgid "Warning"
 msgstr "Advertencia"
 
-#. Translators: This is a label for a dropdown that presents several possible justifications for changing a value
-#: js/base.js:575 js/components/changesetNotice.js:19
-#: js/pages/results_framework/components/level_cards.js:404
-#: js/pages/tola_management_pages/audit_log/views.js:235
-msgid "Reason for change"
-msgstr "Razón para el cambio"
-
-#: js/base.js:687
-msgid "Success!"
-msgstr "¡Éxito!"
+#. Translators: the header of an alert after an action failed for some reason
+#: js/base.js:425
+msgid "Error"
+msgstr "Error"
 
 #. Translators: button label to show the details of all items in a list */}
 #. Translators: button label to show the details of all rows in a list */}
@@ -109,23 +81,23 @@ msgstr "Expandir todos"
 msgid "Collapse all"
 msgstr "Colapsar todos"
 
-#: js/components/changelog.js:80
+#: js/components/changelog.js:81
 msgid "No differences found"
 msgstr "No se encontraron diferencias"
 
-#: js/components/changelog.js:99 js/components/changelog.js:104
-#: js/components/changelog.js:114 js/components/changelog.js:119
-#: js/pages/tola_management_pages/country/views.js:94
+#: js/components/changelog.js:100 js/components/changelog.js:105
+#: js/components/changelog.js:115 js/components/changelog.js:120
+#: js/pages/tola_management_pages/country/views.js:95
 msgid "Country"
 msgstr "País"
 
 #. Translators:  Role references a user's permission level when accessing data (i.e. User or Admin) */}
-#: js/components/changelog.js:101 js/components/changelog.js:105
-#: js/components/changelog.js:115 js/components/changelog.js:120
+#: js/components/changelog.js:102 js/components/changelog.js:106
+#: js/components/changelog.js:116 js/components/changelog.js:121
 msgid "Role"
 msgstr "Función"
 
-#: js/components/changelog.js:113 js/components/changelog.js:118
+#: js/components/changelog.js:114 js/components/changelog.js:119
 #: js/pages/iptt_quickstart/components/selects.js:22
 #: js/pages/iptt_quickstart/components/selects.js:39
 #: js/pages/iptt_report/components/sidebar/reportSelect.js:14
@@ -133,41 +105,63 @@ msgstr "Función"
 msgid "Program"
 msgstr "Programa"
 
-#: js/components/changelog.js:180
+#: js/components/changelog.js:181
 msgid "Date"
 msgstr "Fecha"
 
-#: js/components/changelog.js:181
+#: js/components/changelog.js:182
 msgid "Admin"
 msgstr "Administrador"
 
-#: js/components/changelog.js:182
+#: js/components/changelog.js:183
 msgid "Change Type"
 msgstr "Tipo de Cambio"
 
-#: js/components/changelog.js:183
+#: js/components/changelog.js:184
 msgid "Previous Entry"
 msgstr "Valor Anterior"
 
-#: js/components/changelog.js:184
+#: js/components/changelog.js:185
 msgid "New Entry"
 msgstr "Nuevo Valor"
 
+#. Translators: This is a label for a dropdown that presents several possible justifications for changing a value
+#: js/components/changesetNotice.js:19
+#: js/pages/results_framework/components/level_cards.js:404
+#: js/pages/tola_management_pages/audit_log/views.js:235
+msgid "Reason for change"
+msgstr "Razón para el cambio"
+
+#. Translators: Button to approve a form
+#: js/components/changesetNotice.js:64
+msgid "Ok"
+msgstr "OK"
+
+#. Translators: Button to cancel a form submission
+#: js/components/changesetNotice.js:66
+#: js/pages/results_framework/components/level_cards.js:578
+msgid "Cancel"
+msgstr "Cancelar"
+
 #. Translators: This is the label for a textbox where a user can provide details about their reason for selecting a particular option
-#: js/components/changesetNotice.js:119
+#: js/components/changesetNotice.js:120
 msgid "Details"
 msgstr "Detalles"
 
+#: js/components/changesetNotice.js:167
+msgid "A reason is required."
+msgstr "Se requiere una justificación."
+
 #. Translators: (preceded by a number) e.g. "4 options selected"
 #. Translators: prefixed with a number, as in "4 selected" displayed on a multi-select
-#: js/components/changesetNotice.js:254
+#: js/components/changesetNotice.js:248
 #: js/components/checkboxed-multi-select.js:106
 #: js/components/selectWidgets.js:153
 msgid "selected"
 msgstr "seleccionado"
 
 #. Translators: for a dropdown menu with no options checked:
-#: js/components/changesetNotice.js:256 js/components/selectWidgets.js:143
+#: js/components/changesetNotice.js:250 js/components/selectWidgets.js:143
 #: js/components/selectWidgets.js:148
 msgid "None selected"
 msgstr "Ninguno/a seleccionado/a"
@@ -359,7 +353,7 @@ msgstr "Proyecto"
 
 #: js/pages/document_list/components/document_list.js:175
 #: js/pages/results_framework/components/level_cards.js:213
-#: js/pages/tola_management_pages/country/components/edit_objectives.js:130
+#: js/pages/tola_management_pages/country/components/edit_objectives.js:131
 msgid "Delete"
 msgstr "Eliminar"
 
@@ -563,7 +557,7 @@ msgstr "Base"
 #: js/pages/iptt_report/components/report/tableRows.js:258
 #: js/pages/iptt_report/components/report/tableRows.js:259
 #: js/pages/iptt_report/components/report/tableRows.js:261
-#: js/pages/program_page/components/indicator_list.js:273
+#: js/pages/program_page/components/indicator_list.js:274
 #: js/pages/program_page/components/resultsTable.js:9
 #: js/pages/tola_management_pages/audit_log/views.js:157
 #: js/pages/tola_management_pages/audit_log/views.js:194
@@ -614,7 +608,9 @@ msgid "Hide columns"
 msgstr "Ocultar columnas"
 
 #. Translators: labels sites that a data could be collected at */
+#. Translators: heading for actions related to Sites as in locations connected to results
 #: js/pages/iptt_report/components/sidebar/reportFilter.js:72
+#: js/pages/program_page/components/sitesList.js:12
 msgid "Sites"
 msgstr "Sitios"
 
@@ -783,21 +779,21 @@ msgid "Group indicators:"
 msgstr "Indicadores de grupo:"
 
 #. Translators: Warning provided when a result is not longer associated with any target.  It is a warning about state rather than an action.  The full sentence might read "There are results not assigned to targets" rather than "Results have been unassigned from targets. */
-#: js/pages/program_page/components/indicator_list.js:242
+#: js/pages/program_page/components/indicator_list.js:245
 msgid "Results unassigned to targets"
 msgstr "Resultados sin asignar a los objetivos"
 
 #. Translators: Warning message displayed when a critical piece of information (targets) have not been created for an indicator.
-#: js/pages/program_page/components/indicator_list.js:248
+#: js/pages/program_page/components/indicator_list.js:251
 msgid "Indicator missing targets"
 msgstr "Indicador sin objetivos"
 
 #. Translators: Adj: labels this indicator as one which is missing one or more targets */
-#: js/pages/program_page/components/indicator_list.js:262
+#: js/pages/program_page/components/indicator_list.js:263
 msgid "Missing targets"
 msgstr "No hay objetivos"
 
-#: js/pages/program_page/components/indicator_list.js:326
+#: js/pages/program_page/components/indicator_list.js:327
 msgid ""
 "Some indicators have missing targets. To enter these values, click the "
 "target icon near the indicator name."
@@ -1031,6 +1027,21 @@ msgstr "Agregar objetivos"
 msgid "Add result"
 msgstr "Agregar resultado"
 
+#. Translators: a link that leads to a list of all sites (locations) associated with a program
+#: js/pages/program_page/components/sitesList.js:19
+msgid "View program sites"
+msgstr "Ver sitios del programa"
+
+#. Translators: indicates that no sites (locations) are associated with a program
+#: js/pages/program_page/components/sitesList.js:25
+msgid "There are no program sites."
+msgstr "No existen sitios del programa."
+
+#. Translators: a link to add a new site (location)
+#: js/pages/program_page/components/sitesList.js:34
+msgid "Add site"
+msgstr "Agregar sitio"
+
 #: js/pages/program_page/pinned_reports.js:9
 msgid ""
 "Warning: This action cannot be undone. Are you sure you want to delete this "
@@ -1054,6 +1065,11 @@ msgstr ""
 "Importar texto desde un Objetivo de Programa. <strong class='program-"
 "objective-import__popover-strong-text'>Asegúrese de eliminar niveles y "
 "números de su texto ya que los mismos se muestran automáticamente.</strong>"
+
+#: js/pages/results_framework/components/level_cards.js:89
+#: js/pages/tola_management_pages/country/models.js:436
+msgid "This action cannot be undone."
+msgstr "Advertencia: esta acción no se puede deshacer."
 
 #. Translators:  This is a confirmation prompt that is triggered by clicking on a delete button. The code is a reference to the name of the specific item being deleted.  Only one item can be deleted at a time. */
 #: js/pages/results_framework/components/level_cards.js:91
@@ -1089,7 +1105,7 @@ msgstr ""
 #. Translators: This is a validation message given to the user when the user-editable name field has been deleted or omitted. */
 #. Translators: This is a warning messages when a user has entered duplicate names for two different objects and those names contain only white spaces, both of which are not permitted. */
 #: js/pages/results_framework/components/level_cards.js:441
-#: js/pages/results_framework/models.js:752
+#: js/pages/results_framework/models.js:707
 msgid "Please complete this field."
 msgstr "Por favor complete este campo."
 
@@ -1158,7 +1174,7 @@ msgstr "Sobresalir"
 #. Translators: this refers to an imperative verb on a button ("Apply filters")*/}
 #: js/pages/results_framework/components/level_tier_lists.js:32
 #: js/pages/results_framework/components/level_tier_lists.js:219
-#: js/pages/tola_management_pages/country/views.js:65
+#: js/pages/tola_management_pages/country/views.js:66
 #: js/pages/tola_management_pages/organization/views.js:83
 #: js/pages/tola_management_pages/program/views.js:143
 #: js/pages/tola_management_pages/program/views.js:200
@@ -1204,30 +1220,30 @@ msgstr "Personalizado"
 
 #. Translators: Notification to user that the an update was successful
 #. Translators: Notification to user that the update they initiated was successful */
-#: js/pages/results_framework/models.js:146
-#: js/pages/results_framework/models.js:244
+#: js/pages/results_framework/models.js:145
+#: js/pages/results_framework/models.js:234
 msgid "Changes to the results framework template were saved."
 msgstr "Se guardaron los cambios en la plantilla del sistema de resultados."
 
 #. Translators: Notification to user that the deletion command that they issued was successful */
-#: js/pages/results_framework/models.js:376
+#: js/pages/results_framework/models.js:357
 #, python-format
 msgid "%s was deleted."
 msgstr "%s fue eliminado."
 
 #. Translators: This is a confirmation message that confirms that change has been successfully saved to the DB.
-#: js/pages/results_framework/models.js:420
+#: js/pages/results_framework/models.js:392
 #, python-format
 msgid "%s saved."
 msgstr "%s guardado."
 
 #. Translators:  Confirmation message that user-supplied updates were successfully applied.
-#: js/pages/results_framework/models.js:454
+#: js/pages/results_framework/models.js:417
 #, python-format
 msgid "%s updated."
 msgstr "%s actualizado."
 
-#: js/pages/results_framework/models.js:611
+#: js/pages/results_framework/models.js:566
 msgid ""
 "<strong class=\"text-danger\">Choose your results framework template "
 "carefully!</strong> Once you begin building your framework, it will not be "
@@ -1242,27 +1258,27 @@ msgstr ""
 #. Translators: This is the prompt on a popup that has warned users about a change they are about to make that could have broad consequences
 #. Translators: This is a confirmation prompt to confirm a user wants to archive an item
 #. Translators: This is a confirmation prompt to confirm a user wants to unarchive an item
-#: js/pages/results_framework/models.js:668
-#: js/pages/tola_management_pages/country/components/edit_disaggregations.js:629
-#: js/pages/tola_management_pages/country/models.js:479
-#: js/pages/tola_management_pages/country/models.js:510
-#: js/pages/tola_management_pages/program/models.js:281
+#: js/pages/results_framework/models.js:623
+#: js/pages/tola_management_pages/country/components/edit_disaggregations.js:630
+#: js/pages/tola_management_pages/country/models.js:474
+#: js/pages/tola_management_pages/country/models.js:506
+#: js/pages/tola_management_pages/program/models.js:283
 msgid "Are you sure you want to continue?"
 msgstr "¿Está seguro que quiere continuar?"
 
 #. Translators:  This is a warning provided to the user when they try to cancel the editing of something they have already modified.  */
-#: js/pages/results_framework/models.js:670
+#: js/pages/results_framework/models.js:625
 #, python-format
 msgid "Changes to this %s will not be saved"
 msgstr "Los cambios a este/a %s no serán guardados"
 
 #. Translators: This is a warning messages when a user has entered duplicate names for two different objects */
-#: js/pages/results_framework/models.js:757
+#: js/pages/results_framework/models.js:712
 msgid "Result levels should not contain commas."
 msgstr "Los niveles de resultados no pueden contener comas."
 
 #. Translators: This is a warning messages when a user has a comma in a name that shouldn't contain commas */
-#: js/pages/results_framework/models.js:762
+#: js/pages/results_framework/models.js:717
 msgid "Result levels must have unique names."
 msgstr "Los niveles de resultados deben tener nombres únicos."
 
@@ -1328,12 +1344,12 @@ msgid "Profile"
 msgstr "Perfil"
 
 #: js/pages/tola_management_pages/country/components/country_editor.js:32
-#: js/pages/tola_management_pages/country/components/edit_objectives.js:215
+#: js/pages/tola_management_pages/country/components/edit_objectives.js:216
 msgid "Strategic Objectives"
 msgstr "Objetivos estratégicos"
 
 #: js/pages/tola_management_pages/country/components/country_editor.js:41
-#: js/pages/tola_management_pages/country/components/edit_disaggregations.js:668
+#: js/pages/tola_management_pages/country/components/edit_disaggregations.js:669
 msgid "Country Disaggregations"
 msgstr "Desagregación del País"
 
@@ -1347,7 +1363,7 @@ msgid "Country name"
 msgstr "Nombre del país"
 
 #: js/pages/tola_management_pages/country/components/edit_country_profile.js:80
-#: js/pages/tola_management_pages/country/components/edit_objectives.js:93
+#: js/pages/tola_management_pages/country/components/edit_objectives.js:94
 #: js/pages/tola_management_pages/program/components/edit_program_profile.js:108
 msgid "Description"
 msgstr "Descripción"
@@ -1358,9 +1374,9 @@ msgstr "Código del País"
 
 #: js/pages/tola_management_pages/country/components/edit_country_profile.js:101
 #: js/pages/tola_management_pages/country/components/edit_country_profile.js:108
-#: js/pages/tola_management_pages/country/components/edit_disaggregations.js:499
-#: js/pages/tola_management_pages/country/components/edit_objectives.js:119
-#: js/pages/tola_management_pages/country/components/edit_objectives.js:124
+#: js/pages/tola_management_pages/country/components/edit_disaggregations.js:500
+#: js/pages/tola_management_pages/country/components/edit_objectives.js:120
+#: js/pages/tola_management_pages/country/components/edit_objectives.js:125
 #: js/pages/tola_management_pages/organization/components/edit_organization_history.js:69
 #: js/pages/tola_management_pages/organization/components/edit_organization_profile.js:210
 #: js/pages/tola_management_pages/organization/components/edit_organization_profile.js:217
@@ -1375,9 +1391,9 @@ msgstr "Guardar cambios"
 #. Translators:  Button label.  Allows users to undo whatever changes they have made.
 #: js/pages/tola_management_pages/country/components/edit_country_profile.js:103
 #: js/pages/tola_management_pages/country/components/edit_country_profile.js:109
-#: js/pages/tola_management_pages/country/components/edit_disaggregations.js:502
-#: js/pages/tola_management_pages/country/components/edit_objectives.js:125
-#: js/pages/tola_management_pages/country/views.js:66
+#: js/pages/tola_management_pages/country/components/edit_disaggregations.js:503
+#: js/pages/tola_management_pages/country/components/edit_objectives.js:126
+#: js/pages/tola_management_pages/country/views.js:67
 #: js/pages/tola_management_pages/organization/components/edit_organization_history.js:70
 #: js/pages/tola_management_pages/organization/components/edit_organization_profile.js:212
 #: js/pages/tola_management_pages/organization/components/edit_organization_profile.js:218
@@ -1394,11 +1410,11 @@ msgstr "Guardar cambios"
 msgid "Reset"
 msgstr "Reiniciar"
 
-#: js/pages/tola_management_pages/country/components/edit_disaggregations.js:53
+#: js/pages/tola_management_pages/country/components/edit_disaggregations.js:54
 msgid "Remove"
 msgstr "Eliminar"
 
-#: js/pages/tola_management_pages/country/components/edit_disaggregations.js:62
+#: js/pages/tola_management_pages/country/components/edit_disaggregations.js:63
 msgid ""
 "This category cannot be edited or removed because it was used to "
 "disaggregate a result."
@@ -1406,12 +1422,12 @@ msgstr ""
 "Esta categoría no se puede editar o eliminar porque se utilizó para "
 "desglosar un resultado."
 
-#: js/pages/tola_management_pages/country/components/edit_disaggregations.js:68
+#: js/pages/tola_management_pages/country/components/edit_disaggregations.js:69
 msgid "Explanation for absence of delete button"
 msgstr "Explicación de la ausencia de un botón de eliminación"
 
 #. Translators: This is text provided when a user clicks a help link.  It allows users to select which elements they want to apply the changes to.
-#: js/pages/tola_management_pages/country/components/edit_disaggregations.js:213
+#: js/pages/tola_management_pages/country/components/edit_disaggregations.js:214
 msgid ""
 "<p>Select a program if you plan to disaggregate all or most of its "
 "indicators by these categories.</p><p><span class=\"text-danger"
@@ -1419,35 +1435,35 @@ msgid ""
 "can always manually remove the disaggregation from individual indicators.</p>"
 msgstr ""
 "<p>Seleccione un programa si planea desagregar todos o la mayoría de sus "
-"indicadores por estas categorías.</p><p> <span class=\\\\\\\"text-danger\\\\"
-"\\\"><strong> Esta asignación masiva no se puede deshacer.</strong></span> "
+"indicadores por estas categorías.</p><p> <span class=\"text-danger"
+"\"><strong> Esta asignación masiva no se puede deshacer.</strong></span> "
 "Pero siempre puede eliminar manualmente la desagregación de los indicadores "
 "individuales.</p>"
 
 #. Translators: This feature allows a user to apply changes to existing programs as well as ones created in the future */}
-#: js/pages/tola_management_pages/country/components/edit_disaggregations.js:224
+#: js/pages/tola_management_pages/country/components/edit_disaggregations.js:225
 msgid "Assign new disaggregation to all indicators in a program"
 msgstr "Asignar una nueva desagregación a todos los indicadores de un programa"
 
 #. Translators: this is alt text for a help icon
-#: js/pages/tola_management_pages/country/components/edit_disaggregations.js:233
+#: js/pages/tola_management_pages/country/components/edit_disaggregations.js:234
 msgid "More information on assigning disaggregations to existing indicators"
 msgstr ""
 "Más información sobre la asignación de desagregaciones a indicadores "
 "existentes"
 
 #. Translators: Form field label for the disaggregation name.*/}
-#: js/pages/tola_management_pages/country/components/edit_disaggregations.js:433
+#: js/pages/tola_management_pages/country/components/edit_disaggregations.js:434
 msgid "Disaggregation"
 msgstr "Desagregación"
 
 #. Translators: This labels a checkbox, when checked, it will make the associated item "on" (selected) for all new indicators
-#: js/pages/tola_management_pages/country/components/edit_disaggregations.js:452
+#: js/pages/tola_management_pages/country/components/edit_disaggregations.js:453
 msgid "Selected by default"
 msgstr "Selección por defecto"
 
 #. Translators: Help text for the "selected by default" checkbox on the disaggregation form
-#: js/pages/tola_management_pages/country/components/edit_disaggregations.js:458
+#: js/pages/tola_management_pages/country/components/edit_disaggregations.js:459
 #, python-format
 msgid ""
 "When adding a new program indicator, this disaggregation will be selected by "
@@ -1459,51 +1475,51 @@ msgstr ""
 "desagregación se puede eliminar manualmente de un indicador en el formulario "
 "de configuración del indicador."
 
-#: js/pages/tola_management_pages/country/components/edit_disaggregations.js:461
+#: js/pages/tola_management_pages/country/components/edit_disaggregations.js:462
 msgid "More information on \"selected by default\""
 msgstr "Más información sobre \"selección por defecto\""
 
 #. Translators:  This is header text for a list of disaggregation categories*/}
-#: js/pages/tola_management_pages/country/components/edit_disaggregations.js:471
+#: js/pages/tola_management_pages/country/components/edit_disaggregations.js:472
 msgid "Categories"
 msgstr "Categorías"
 
 #. Translators:  This a column header that shows the sort order of the rows below*/}
-#: js/pages/tola_management_pages/country/components/edit_disaggregations.js:477
+#: js/pages/tola_management_pages/country/components/edit_disaggregations.js:478
 msgid "Order"
 msgstr "Orden"
 
 #. Translators:  Button label.  Button allows users to add a disaggregation category to a list.  */}
-#: js/pages/tola_management_pages/country/components/edit_disaggregations.js:492
+#: js/pages/tola_management_pages/country/components/edit_disaggregations.js:493
 msgid "Add a category"
 msgstr "Agregar una categoría"
 
 #. Translators: this is a verb (on a button that archives the selected item)
-#: js/pages/tola_management_pages/country/components/edit_disaggregations.js:509
+#: js/pages/tola_management_pages/country/components/edit_disaggregations.js:510
 msgid "Unarchive disaggregation"
 msgstr "Desarchivar desagregación"
 
 #. Translators:  Button text that allows users to delete a disaggregation */}
-#: js/pages/tola_management_pages/country/components/edit_disaggregations.js:515
+#: js/pages/tola_management_pages/country/components/edit_disaggregations.js:516
 msgid "Delete disaggregation"
 msgstr "Eliminar desagregación"
 
 #. Translators: this is a verb (on a button that archives the selected item)
-#: js/pages/tola_management_pages/country/components/edit_disaggregations.js:521
+#: js/pages/tola_management_pages/country/components/edit_disaggregations.js:522
 msgid "Archive disaggregation"
 msgstr "Archivar desagregación"
 
-#: js/pages/tola_management_pages/country/components/edit_disaggregations.js:559
-#: js/pages/tola_management_pages/country/components/edit_objectives.js:159
-#: js/pages/tola_management_pages/country/models.js:268
-#: js/pages/tola_management_pages/organization/models.js:113
+#: js/pages/tola_management_pages/country/components/edit_disaggregations.js:560
+#: js/pages/tola_management_pages/country/components/edit_objectives.js:160
+#: js/pages/tola_management_pages/country/models.js:262
+#: js/pages/tola_management_pages/organization/models.js:115
 #: js/pages/tola_management_pages/program/models.js:73
 #: js/pages/tola_management_pages/user/models.js:192
 msgid "You have unsaved changes. Are you sure you want to discard them?"
 msgstr "Tiene cambios sin guardar. ¿Está seguro que desea descartarlos?"
 
 #. Translators:  Warning message about how the new type of disaggregation the user has created will be applied to existing and new data
-#: js/pages/tola_management_pages/country/components/edit_disaggregations.js:610
+#: js/pages/tola_management_pages/country/components/edit_disaggregations.js:611
 #, python-format
 msgid ""
 "This disaggregation will be automatically selected for all new indicators in "
@@ -1519,7 +1535,7 @@ msgstr[1] ""
 "indicadores nuevos en %s y para los indicadores existentes en %s programas."
 
 #. Translators:  This is a warning popup when the user tries to do something that has broader effects than they might anticipate
-#: js/pages/tola_management_pages/country/components/edit_disaggregations.js:617
+#: js/pages/tola_management_pages/country/components/edit_disaggregations.js:618
 #, python-format
 msgid ""
 "This disaggregation will be automatically selected for all new indicators in "
@@ -1529,7 +1545,7 @@ msgstr ""
 "indicadores en %s. Los indicadores existentes no se verán afectados."
 
 #. Translators:  This is a warning popup when the user tries to do something that has broader effects than they might anticipate
-#: js/pages/tola_management_pages/country/components/edit_disaggregations.js:621
+#: js/pages/tola_management_pages/country/components/edit_disaggregations.js:622
 #, python-format
 msgid ""
 "This disaggregation will no longer be automatically selected for all new "
@@ -1538,15 +1554,15 @@ msgstr ""
 "Esta desagregación ya no se seleccionará automáticamente para todos los "
 "nuevos indicadores en %s. Los indicadores existentes no se verán afectados."
 
-#: js/pages/tola_management_pages/country/components/edit_disaggregations.js:672
+#: js/pages/tola_management_pages/country/components/edit_disaggregations.js:673
 msgid "Add country disaggregation"
 msgstr "Agregar desagregación del país"
 
-#: js/pages/tola_management_pages/country/components/edit_objectives.js:9
+#: js/pages/tola_management_pages/country/components/edit_objectives.js:10
 msgid "Proposed"
 msgstr "Propuesto"
 
-#: js/pages/tola_management_pages/country/components/edit_objectives.js:10
+#: js/pages/tola_management_pages/country/components/edit_objectives.js:11
 #: js/pages/tola_management_pages/organization/components/edit_organization_history.js:9
 #: js/pages/tola_management_pages/organization/models.js:57
 #: js/pages/tola_management_pages/organization/views.js:190
@@ -1560,21 +1576,21 @@ msgstr "Propuesto"
 msgid "Active"
 msgstr "Activo"
 
-#: js/pages/tola_management_pages/country/components/edit_objectives.js:11
+#: js/pages/tola_management_pages/country/components/edit_objectives.js:12
 msgid "Achieved"
 msgstr "Logrado"
 
 #. Translators: This is a section header for when a user is creating a new strategic objective for a country */ }
-#: js/pages/tola_management_pages/country/components/edit_objectives.js:73
+#: js/pages/tola_management_pages/country/components/edit_objectives.js:74
 msgid "New Strategic Objective"
 msgstr "Objetivo estratégico Nuevo"
 
-#: js/pages/tola_management_pages/country/components/edit_objectives.js:79
+#: js/pages/tola_management_pages/country/components/edit_objectives.js:80
 msgid "Short name"
 msgstr "Nombre corto"
 
 #. Translators: Label for column identifying "active" or "inactive" user status */}
-#: js/pages/tola_management_pages/country/components/edit_objectives.js:106
+#: js/pages/tola_management_pages/country/components/edit_objectives.js:107
 #: js/pages/tola_management_pages/organization/components/edit_organization_history.js:59
 #: js/pages/tola_management_pages/organization/views.js:73
 #: js/pages/tola_management_pages/organization/views.js:113
@@ -1587,17 +1603,17 @@ msgstr "Nombre corto"
 msgid "Status"
 msgstr "Estado"
 
-#: js/pages/tola_management_pages/country/components/edit_objectives.js:192
+#: js/pages/tola_management_pages/country/components/edit_objectives.js:193
 msgid "Delete Strategic Objective?"
 msgstr "¿Eliminar Objetivo Estratégico?"
 
 #. Translators: This is a button that allows the user to add a strategic objective. */}
-#: js/pages/tola_management_pages/country/components/edit_objectives.js:234
+#: js/pages/tola_management_pages/country/components/edit_objectives.js:235
 msgid "Add strategic objective"
 msgstr "Agregar objetivo estratégico"
 
 #. Translators: Success message shown to user when a new disaggregation has been saved and associated with existing data.
-#: js/pages/tola_management_pages/country/models.js:206
+#: js/pages/tola_management_pages/country/models.js:210
 #, python-format
 msgid ""
 "Disaggregation saved and automatically selected for all indicators in %s "
@@ -1612,54 +1628,60 @@ msgstr[1] ""
 "Desagregación guardada y seleccionada automáticamente para todos los "
 "indicadores en %s programas."
 
-#: js/pages/tola_management_pages/country/models.js:211
-#: js/pages/tola_management_pages/country/models.js:223
-#: js/pages/tola_management_pages/program/models.js:194
+#. Translators: Saving to the server succeeded
+#: js/pages/tola_management_pages/country/models.js:215
+#: js/pages/tola_management_pages/country/models.js:219
+#: js/pages/tola_management_pages/organization/models.js:111
+#: js/pages/tola_management_pages/program/models.js:195
+#: js/pages/tola_management_pages/user/models.js:208
 msgid "Successfully saved"
 msgstr "Guardado exitosamente"
 
-#: js/pages/tola_management_pages/country/models.js:229
-#: js/pages/tola_management_pages/program/models.js:198
+#. Translators: Saving to the server failed
+#: js/pages/tola_management_pages/country/models.js:226
+#: js/pages/tola_management_pages/organization/models.js:106
+#: js/pages/tola_management_pages/program/models.js:200
+#: js/pages/tola_management_pages/user/models.js:203
 msgid "Saving failed"
 msgstr "Falló operación de guardado"
 
 #. Translators: Notification that a user has been able to delete a disaggregation
-#: js/pages/tola_management_pages/country/models.js:234
+#: js/pages/tola_management_pages/country/models.js:231
 msgid "Successfully deleted"
 msgstr "Eliminado con éxito"
 
 #. Translators: Notification that a user has been able to disable a disaggregation
-#: js/pages/tola_management_pages/country/models.js:239
+#: js/pages/tola_management_pages/country/models.js:236
 msgid "Successfully archived"
 msgstr "Guardado con éxito"
 
 #. Translators: Notification that a user has been able to reactivate a disaggregation
-#: js/pages/tola_management_pages/country/models.js:244
+#: js/pages/tola_management_pages/country/models.js:241
 msgid "Successfully unarchived"
 msgstr "Desarchivado con éxito"
 
 #. Translators: error message generated when item names are duplicated but are required to be unqiue.
-#: js/pages/tola_management_pages/country/models.js:250
+#: js/pages/tola_management_pages/country/models.js:246
 msgid ""
-"Saving failed: Disaggregation categories should be unique within a "
+"Saving failed. Disaggregation categories should be unique within a "
 "disaggregation."
 msgstr ""
-"Error al guardar: Las categorías de desagregación deben ser únicas dentro de "
+"Error al guardar. Las categorías de desagregación deben ser únicas dentro de "
 "la desagregación."
 
 #. Translators: error message generated when item names are duplicated but are required to be unqiue.
-#: js/pages/tola_management_pages/country/models.js:258
-msgid "Saving failed: disaggregation names should be unique within a country."
+#: js/pages/tola_management_pages/country/models.js:253
+msgid "Saving failed. Disaggregation names should be unique within a country."
 msgstr ""
-"Error al guardar: Los nombres desagregados deben ser únicos dentro del país."
+"Error al guardar. Los nombres desagregados deben ser únicos dentro del país."
 
 #. Translators: This is a confirmation prompt to confirm a user wants to delete an item
-#: js/pages/tola_management_pages/country/models.js:444
+#: js/pages/tola_management_pages/country/models.js:438
 msgid "Are you sure you want to delete this disaggregation?"
 msgstr "¿Está seguro de que quiere eliminar esta desagregación?"
 
 #. Translators: This is part of a confirmation prompt to archive a type of disaggregation (e.g. "gender" or "age")
-#: js/pages/tola_management_pages/country/models.js:477
+#: js/pages/tola_management_pages/country/models.js:472
 msgid ""
 "New programs will be unable to use this disaggregation. (Programs already "
 "using the disaggregation will be unaffected.)"
@@ -1668,13 +1690,13 @@ msgstr ""
 "ya usan la desagregación no se verán afectados)."
 
 #. Translators: This is part of a confirmation prompt to unarchive a type of disaggregation (e.g. "gender" or "age")
-#: js/pages/tola_management_pages/country/models.js:508
+#: js/pages/tola_management_pages/country/models.js:504
 #, python-format
 msgid "All programs in %s will be able to use this disaggregation."
 msgstr "Todos los programas de %s podrán usar esta desagregación."
 
 #. Translators:  This error message appears underneath a user-input name if it appears more than once in a set of names.  Only unique names are allowed.
-#: js/pages/tola_management_pages/country/models.js:611
+#: js/pages/tola_management_pages/country/models.js:608
 #, python-format
 msgid ""
 "There is already a disaggregation type called \"%(newDisagg)s\" in "
@@ -1684,24 +1706,24 @@ msgstr ""
 "Por favor, elija un nombre único."
 
 #. Translators:  This error message appears underneath user-input labels that appear more than once in a set of labels.  Only unique labels are allowed.
-#: js/pages/tola_management_pages/country/models.js:629
+#: js/pages/tola_management_pages/country/models.js:626
 msgid "Categories must not be blank."
 msgstr "Las categorías no pueden estar en blanco."
 
 #. Translators:  This error message appears underneath user-input labels that appear more than once in a set of labels.  Only unique labels are allowed.
-#: js/pages/tola_management_pages/country/models.js:633
+#: js/pages/tola_management_pages/country/models.js:630
 msgid "Categories must have unique names."
 msgstr "Las categorías deben tener nombres únicos."
 
-#: js/pages/tola_management_pages/country/views.js:18
+#: js/pages/tola_management_pages/country/views.js:19
 msgid "Find a Country"
 msgstr "Encontrar un País"
 
 #. Translators: This is the default option for a dropdown menu
 #. Translators: Nothing selected by user
-#: js/pages/tola_management_pages/country/views.js:23
-#: js/pages/tola_management_pages/country/views.js:35
-#: js/pages/tola_management_pages/country/views.js:47
+#: js/pages/tola_management_pages/country/views.js:24
+#: js/pages/tola_management_pages/country/views.js:36
+#: js/pages/tola_management_pages/country/views.js:48
 #: js/pages/tola_management_pages/organization/components/edit_organization_profile.js:137
 #: js/pages/tola_management_pages/organization/views.js:23
 #: js/pages/tola_management_pages/organization/views.js:35
@@ -1719,16 +1741,16 @@ msgstr "Encontrar un País"
 msgid "None Selected"
 msgstr "Ninguno/a seleccionado/a"
 
-#: js/pages/tola_management_pages/country/views.js:30
-#: js/pages/tola_management_pages/country/views.js:95
+#: js/pages/tola_management_pages/country/views.js:31
+#: js/pages/tola_management_pages/country/views.js:96
 #: js/pages/tola_management_pages/organization/views.js:89
 #: js/pages/tola_management_pages/program/views.js:42
 #: js/pages/tola_management_pages/program/views.js:231
 msgid "Organizations"
 msgstr "Organizaciones"
 
-#: js/pages/tola_management_pages/country/views.js:42
-#: js/pages/tola_management_pages/country/views.js:96
+#: js/pages/tola_management_pages/country/views.js:43
+#: js/pages/tola_management_pages/country/views.js:97
 #: js/pages/tola_management_pages/organization/views.js:30
 #: js/pages/tola_management_pages/organization/views.js:111
 #: js/pages/tola_management_pages/program/views.js:206
@@ -1737,25 +1759,25 @@ msgstr "Organizaciones"
 msgid "Programs"
 msgstr "Programas"
 
-#: js/pages/tola_management_pages/country/views.js:71
+#: js/pages/tola_management_pages/country/views.js:72
 #: js/pages/tola_management_pages/organization/views.js:89
 #: js/pages/tola_management_pages/program/views.js:206
 #: js/pages/tola_management_pages/user/views.js:236
 msgid "Admin:"
 msgstr "Administrador:"
 
-#: js/pages/tola_management_pages/country/views.js:71
+#: js/pages/tola_management_pages/country/views.js:72
 #: js/pages/tola_management_pages/organization/views.js:18
 #: js/pages/tola_management_pages/program/components/edit_program_profile.js:118
 #: js/pages/tola_management_pages/program/views.js:30
 msgid "Countries"
 msgstr "Países"
 
-#: js/pages/tola_management_pages/country/views.js:80
+#: js/pages/tola_management_pages/country/views.js:81
 msgid "Add Country"
 msgstr "Agregar País"
 
-#: js/pages/tola_management_pages/country/views.js:97
+#: js/pages/tola_management_pages/country/views.js:98
 #: js/pages/tola_management_pages/organization/views.js:112
 #: js/pages/tola_management_pages/program/views.js:18
 #: js/pages/tola_management_pages/program/views.js:232
@@ -1764,7 +1786,7 @@ msgid "Users"
 msgstr "Usuarios"
 
 #. Translators: preceded by a number, i.e. "3 organizations" or "1 organization"
-#: js/pages/tola_management_pages/country/views.js:203
+#: js/pages/tola_management_pages/country/views.js:204
 #, python-format
 msgid "%s organization"
 msgid_plural "%s organizations"
@@ -1772,12 +1794,12 @@ msgstr[0] "%s organización"
 msgstr[1] "%s organizaciones"
 
 #. Translators: when no organizations are connected to the item
-#: js/pages/tola_management_pages/country/views.js:208
+#: js/pages/tola_management_pages/country/views.js:209
 msgid "0 organizations"
 msgstr "0 organizaciones"
 
 #. Translators: preceded by a number, i.e. "3 programs" or "1 program"
-#: js/pages/tola_management_pages/country/views.js:215
+#: js/pages/tola_management_pages/country/views.js:216
 #: js/pages/tola_management_pages/organization/views.js:170
 #: js/pages/tola_management_pages/user/views.js:347
 #, python-format
@@ -1787,14 +1809,14 @@ msgstr[0] "%s programa"
 msgstr[1] "%s programas"
 
 #. Translators: when no programs are connected to the item
-#: js/pages/tola_management_pages/country/views.js:220
+#: js/pages/tola_management_pages/country/views.js:221
 #: js/pages/tola_management_pages/organization/views.js:175
 #: js/pages/tola_management_pages/user/views.js:352
 msgid "0 programs"
 msgstr "0 programas"
 
 #. Translators: preceded by a number, i.e. "3 users" or "1 user"
-#: js/pages/tola_management_pages/country/views.js:228
+#: js/pages/tola_management_pages/country/views.js:229
 #: js/pages/tola_management_pages/organization/views.js:182
 #: js/pages/tola_management_pages/program/views.js:320
 #, python-format
@@ -1804,13 +1826,13 @@ msgstr[0] "%s usuario"
 msgstr[1] "%s usuarios"
 
 #. Translators: when no users are connected to the item
-#: js/pages/tola_management_pages/country/views.js:233
+#: js/pages/tola_management_pages/country/views.js:234
 #: js/pages/tola_management_pages/organization/views.js:187
 #: js/pages/tola_management_pages/program/views.js:324
 msgid "0 users"
 msgstr "0 usuarios"
 
-#: js/pages/tola_management_pages/country/views.js:242
+#: js/pages/tola_management_pages/country/views.js:243
 msgid "countries"
 msgstr "países"
 
@@ -1867,18 +1889,6 @@ msgstr "Guardar y Agregar otro"
 #: js/pages/tola_management_pages/user/components/user_editor.js:38
 msgid "Status and History"
 msgstr "Estado e Historial"
-
-#. Translators: Saving to the server failed
-#: js/pages/tola_management_pages/organization/models.js:105
-#: js/pages/tola_management_pages/user/models.js:204
-msgid "Saving Failed"
-msgstr "Falló Operación de Guardado"
-
-#. Translators: Saving to the server succeeded
-#: js/pages/tola_management_pages/organization/models.js:109
-#: js/pages/tola_management_pages/user/models.js:211
-msgid "Successfully Saved"
-msgstr "Guardado Exitosamente"
 
 #: js/pages/tola_management_pages/organization/views.js:42
 msgid "Find an Organization"
@@ -1963,40 +1973,40 @@ msgstr ""
 "los indicadores; su único fin es ser mostrados."
 
 #. Translators: Notify user that the program start and end date were successfully retrieved from the GAIT service and added to the newly saved Program
-#: js/pages/tola_management_pages/program/models.js:203
+#: js/pages/tola_management_pages/program/models.js:205
 msgid "Successfully synced GAIT program start and end dates"
 msgstr ""
 "Se sincronizaron satisfactoriamente las fechas de inicio y fin del programa "
 "desde el servicio GAIT"
 
 #. Translators: Notify user that the program start and end date failed to be retrieved from the GAIT service with a specific reason appended after the :
-#: js/pages/tola_management_pages/program/models.js:209
+#: js/pages/tola_management_pages/program/models.js:211
 msgid "Failed to sync GAIT program start and end dates: "
 msgstr ""
 "Hubo un fallo en la sincronización de las fechas de inicio y fin del "
 "programa desde el servicio GAIT: "
 
 #. Translators: A request failed, ask the user if they want to try the request again
-#: js/pages/tola_management_pages/program/models.js:217
+#: js/pages/tola_management_pages/program/models.js:219
 msgid "Retry"
 msgstr "Reintentar"
 
 #. Translators: button label - ignore the current warning modal on display
-#: js/pages/tola_management_pages/program/models.js:226
+#: js/pages/tola_management_pages/program/models.js:228
 msgid "Ignore"
 msgstr "Ignorar"
 
-#: js/pages/tola_management_pages/program/models.js:273
+#: js/pages/tola_management_pages/program/models.js:275
 msgid "The GAIT ID for this program is shared with at least one other program."
 msgstr ""
 "El ID GAIT para este programa está compartido con al menos un programa más."
 
-#: js/pages/tola_management_pages/program/models.js:274
+#: js/pages/tola_management_pages/program/models.js:276
 msgid "View programs with this ID in GAIT."
 msgstr "Ver programas con este ID en GAIT."
 
 #. Translators: error message when trying to connect to the server
-#: js/pages/tola_management_pages/program/models.js:314
+#: js/pages/tola_management_pages/program/models.js:316
 msgid "There was a network or server connection error."
 msgstr "Hubo un error de red o conectividad con el servidor."
 
@@ -2079,48 +2089,63 @@ msgstr "Guardar cambios"
 msgid "Save And Add Another"
 msgstr "Guardar y Agregar otro"
 
-#: js/pages/tola_management_pages/user/components/edit_user_programs.js:18
+#. Translators: an option in a list of country-level access settings, indicating no default access to the country's programs, but individually set access to individual programs within
+#: js/pages/tola_management_pages/user/components/edit_user_programs.js:10
 msgid "Individual programs only"
 msgstr "Solo programas individuales"
 
-#: js/pages/tola_management_pages/user/components/edit_user_programs.js:469
+#. Translators: An option for access level to a program, when no access is granted
+#: js/pages/tola_management_pages/user/components/edit_user_programs.js:13
+msgid "No access"
+msgstr "No tiene acceso"
+
+#: js/pages/tola_management_pages/user/components/edit_user_programs.js:478
 #: js/pages/tola_management_pages/user/components/user_editor.js:32
 msgid "Programs and Roles"
 msgstr "Programas y Roles"
 
 #. Translators: link to learn more about permissions-granting roles a user can be assigned
-#: js/pages/tola_management_pages/user/components/edit_user_programs.js:473
+#: js/pages/tola_management_pages/user/components/edit_user_programs.js:482
 msgid "More information on Program Roles"
 msgstr "Más Información sobre los Roles en los Programas"
 
+#. Translators: A message explaining why the roles and options menu is not displayed for the current user
+#: js/pages/tola_management_pages/user/components/edit_user_programs.js:487
+msgid ""
+"Program and role options are not displayed because Super Admin permissions "
+"override all available settings."
+msgstr ""
+"Las opciones de programa y rol no se muestran porque los permisos de Super "
+"Admin anulan todas las configuraciones disponibles."
+
 #. Translators: This is placeholder text on a dropdown of countries which limit the displayed programs
-#: js/pages/tola_management_pages/user/components/edit_user_programs.js:480
+#: js/pages/tola_management_pages/user/components/edit_user_programs.js:495
 msgid "Filter countries"
 msgstr "Filtrar países"
 
 #. Translators: this is placeholder text on a dropdown of programs which limit the displayed results
-#: js/pages/tola_management_pages/user/components/edit_user_programs.js:486
+#: js/pages/tola_management_pages/user/components/edit_user_programs.js:501
 msgid "Filter programs"
 msgstr "Filtrar programas"
 
 #. Translators: Column header for a checkbox indicating if a user has access to a program */
-#: js/pages/tola_management_pages/user/components/edit_user_programs.js:511
+#: js/pages/tola_management_pages/user/components/edit_user_programs.js:526
 msgid "Has access?"
 msgstr "¿Tiene acceso?"
 
-#: js/pages/tola_management_pages/user/components/edit_user_programs.js:530
+#: js/pages/tola_management_pages/user/components/edit_user_programs.js:545
 msgid "Deselect All"
 msgstr "Deseleccionar todo"
 
-#: js/pages/tola_management_pages/user/components/edit_user_programs.js:530
+#: js/pages/tola_management_pages/user/components/edit_user_programs.js:545
 msgid "Select All"
 msgstr "Seleccionar todo"
 
-#: js/pages/tola_management_pages/user/components/edit_user_programs.js:540
+#: js/pages/tola_management_pages/user/components/edit_user_programs.js:555
 msgid "Countries and Programs"
 msgstr "Países y Programas"
 
-#: js/pages/tola_management_pages/user/components/edit_user_programs.js:569
+#: js/pages/tola_management_pages/user/components/edit_user_programs.js:584
 msgid "Roles and Permissions"
 msgstr "Roles y Permisos"
 
@@ -2133,17 +2158,17 @@ msgid "No"
 msgstr "No"
 
 #. Translators: An email was sent to the user to verify that the email address is valid
-#: js/pages/tola_management_pages/user/models.js:454
+#: js/pages/tola_management_pages/user/models.js:453
 msgid "Verification email sent"
 msgstr "Correo electrónico de verificación enviado"
 
 #. Translators: Sending an email to the user did not work
-#: js/pages/tola_management_pages/user/models.js:458
+#: js/pages/tola_management_pages/user/models.js:457
 msgid "Verification email send failed"
 msgstr "Falló el envío de correo electrónico de verificación"
 
 #. Translators: a list of groups of countries (i.e. "Asia")
-#: js/pages/tola_management_pages/user/models.js:713
+#: js/pages/tola_management_pages/user/models.js:712
 msgid "Regions"
 msgstr "Regiones"
 
@@ -2192,6 +2217,15 @@ msgstr "Super Administrador"
 #: js/pages/tola_management_pages/user/views.js:362
 msgid "users"
 msgstr "usuarios"
+
+#~ msgid "Successfully Saved"
+#~ msgstr "Guardado Exitosamente"
+
+#~ msgid "Saving Failed"
+#~ msgstr "Falló Operación de Guardado"
+
+#~ msgid "Success!"
+#~ msgstr "¡Éxito!"
 
 #~ msgid "This indicator has no targets."
 #~ msgstr "Este indicador no tiene objetivos."
@@ -3469,12 +3503,6 @@ msgstr "usuarios"
 #~ "para que coincidan con las fechas de inicio y finalización de sus "
 #~ "informes:"
 
-#~ msgid "View program documents"
-#~ msgstr "Ver documentos del programa"
-
-#~ msgid "There are no program sites."
-#~ msgstr "No existen sitios del programa."
-
 #~ msgid "Pinned reports"
 #~ msgstr "Informes fijados"
 
@@ -3869,9 +3897,6 @@ msgstr "usuarios"
 
 #~ msgid "Important dates"
 #~ msgstr "Fechas importantes"
-
-#~ msgid "Form Errors"
-#~ msgstr "Errores en el Formulario"
 
 #~ msgid "English"
 #~ msgstr "Inglés"

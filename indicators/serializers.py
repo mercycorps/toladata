@@ -109,6 +109,7 @@ class IndicatorSerializer(serializers.ModelSerializer):
     lop_target_active = serializers.FloatField()
     old_level = serializers.SerializerMethodField()
     old_level_pk = serializers.IntegerField(read_only=True)
+    key_performance_indicator = serializers.BooleanField()
 
     class Meta:
         model = Indicator
