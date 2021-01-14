@@ -59,11 +59,6 @@ class FilterStore {
         let { name, params } = this.router.getState();
         return this.router.buildUrl('logframe-excel', params);
     }
-
-    @computed get programId() {
-        let { name, params } = this.router.getState();
-        return params.programId || null;
-    }
 }
 
 export default FilterStore;
