@@ -70,6 +70,14 @@ export default (
         _indicatorFilters: {},
         _hiddenColumns: [],
         _hiddenCategories: false,
+        _pulse: "",
+        pulse(){
+            this._pulse="pulse";
+            setTimeout(() => {
+                this._pulse = "";
+            }, 1000)
+            // this._glow = this._glow ? "" : "filter-glow"
+        },
         get isTVA() {
             return this._reportType === TVA;
         },

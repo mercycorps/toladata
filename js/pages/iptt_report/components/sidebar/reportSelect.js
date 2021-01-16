@@ -14,7 +14,7 @@ const ProgramSelect = inject('filterStore')(
                 label={ gettext('Program') }
                 options={ filterStore.programOptions }
                 value={ filterStore.selectedProgramOption }
-                update={ selected => { filterStore.selectedProgramOption = selected } }
+                update={ selected => { filterStore.selectedProgramOption = selected, filterStore.pulse();} }
             />
         );
     })
@@ -37,7 +37,7 @@ const FrequencySelect = inject('filterStore')(
                 options={ filterStore.frequencyOptions }
                 disabled={ filterStore.frequencyDisabled }
                 value={ filterStore.selectedFrequencyOption }
-                update={ selected => { filterStore.selectedFrequencyOption = selected; } }
+                update={ selected => { filterStore.selectedFrequencyOption = selected, filterStore.pulse(); } }
             />
         );
     })
@@ -103,7 +103,7 @@ class TimeframeRadio extends React.Component {
                             <input type="radio"
                                    checked={ !this.state.focus && this.props.filterStore.showAll }
                                    disabled={ this.props.filterStore.periodsDisabled }
-                                   onChange={ e => { this.props.filterStore.showAll = true } }
+                                   onChange={ e => { this.props.filterStore.showAll = true, this.props.filterStore.pulse(); } }
                                    />
                         </span>
                         <label onClick={ e => {this.props.filterStore.showAll = true} }
