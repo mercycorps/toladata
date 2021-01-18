@@ -88,6 +88,8 @@ const ChangeLogLink = ({programId}) => {
     </div>
 };
 
+export { ChangeLogLink };
+
 export const LevelTierPicker = inject("rootStore")(observer(function (props) {
     let tierListType = <StaticLevelTierList />;
     if (this.props.rootStore.levelStore.chosenTierSetKey == this.props.rootStore.levelStore.customTierSetKey &&
@@ -102,8 +104,6 @@ export const LevelTierPicker = inject("rootStore")(observer(function (props) {
                 <Picker />
                 {tierListType}
             </div>
-
-            <ChangeLogLink programId={props.rootStore.levelStore.program_id} />
         </div>
     )
 }));

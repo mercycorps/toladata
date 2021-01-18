@@ -6,6 +6,7 @@ import { faCaretDown, faCaretRight, faSitemap } from '@fortawesome/free-solid-sv
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome'
 import {LevelCardCollapsed, LevelCardExpanded} from "./level_cards";
 import {ExpandAllButton, CollapseAllButton} from "../../../components/actionButtons";
+import { ChangeLogLink } from './leveltier_picker';
 
 library.add(faCaretDown, faCaretRight, faSitemap);
 
@@ -118,6 +119,9 @@ export class LevelListPanel  extends React.Component {
                 <div id="level-list" style={{flexGrow: "2"}}>
                     {expandoDiv}
                     <LevelList renderList='initial'/>
+                    { (this.props.rootStore.levelStore.levels?.length || 0) > 1 &&
+                        <ChangeLogLink programId={this.props.rootStore.levelStore.program_id} />
+                    }
                 </div>
         }
         return panel
