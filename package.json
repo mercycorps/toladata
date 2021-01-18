@@ -87,7 +87,6 @@
         "react-beautiful-dnd": "^12.0.0",
         "react-bootstrap-table-next": "^2.0.0",
         "react-bootstrap-table2-paginator": "^2.0.0",
-        "react-d3-tree": "^2.0.0",
         "react-dom": "^16.14.0",
         "react-fast-compare": "^2.0.4",
         "react-icons": "^3.11.0",
