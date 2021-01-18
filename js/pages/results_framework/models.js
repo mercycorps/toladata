@@ -9,6 +9,7 @@ export class RootStore {
     }
 }
 
+
 export class LevelStore {
     @observable levels = [];
     @observable indicators = [];
@@ -100,28 +101,64 @@ export class LevelStore {
         }
     }
 
-    @computed get levelTreeData() {
-        if (!this.goalLevel) {
-            return {};
+    @computed get selectedLevel() {
+        if (this.rootStore.uiStore.activeCard) {
+            return [this.levels.filter(level => level.id == this.rootStore.uiStore.activeCard)[0], true];
+        } else {
+            let level = this.goalLevel;
+            let children = this.getChildLevels(level.id);
+            while (children && children.length >= 1) {
+                level = children[0];
+                children = this.getChildLevels(level.id);
+            }
+            return [level, false];
         }
-        let levelTree = {name: '', attributes: {id: this.goalLevel.id, selected: this.rootStore.uiStore.activeCard && this.rootStore.uiStore.activeCard == this.goalLevel.id}};
-        levelTree.children = this.getTreeChildren(this.goalLevel.id);
-        return levelTree;
     }
 
-    getTreeChildren = levelId => {
-        let children = [];
-        (this.getChildLevels(levelId) || []).forEach(level => {
-            children.push({
-                name: this.levelProperties[level.id].ontologyLabel,
-                attributes: {
-                    id: level.id,
-                    selected: (this.rootStore.uiStore.activeCard && this.rootStore.uiStore.activeCard == level.id)
-                    },
-                children: this.getTreeChildren(level.id)
-            })
-        });
-        return children;
+    getTierNodes(selectedLevel, isSelected=false) {
+        const levelLabel = (selectedLevel.parent && selectedLevel.parent !== 'root') ? selectedLevel.customsort.toString() : "";
+        let levelData = {label: levelLabel, selected: isSelected, id: selectedLevel.id};
+        let parent = this.getParentLevel(selectedLevel);
+        let siblings = this.getChildLevels(parent.id);
+        if (siblings && siblings?.length > 0) {
+            let previousLevels = siblings.filter(level => level.customsort < selectedLevel.customsort) || [];
+            if (previousLevels?.length > 0) {
+                let previousLevel = previousLevels.pop();
+                levelData.prevNode = {
+                    label: previousLevel.customsort.toString(),
+                    id: previousLevel.id,
+                    more: (previousLevels.length > 0),
+                    children: this.getChildLevels(previousLevel.id)?.length > 0
+                }
+            }
+            let nextLevels = siblings.filter(level => level.customsort > selectedLevel.customsort) || [];
+            if (nextLevels?.length > 0) {
+                let nextLevel = nextLevels.shift();
+                levelData.nextNode = {
+                    label: nextLevel.customsort.toString(),
+                    id: nextLevel.id,
+                    more: (nextLevels.length > 0),
+                    children: this.getChildLevels(nextLevel.id)?.length > 0
+                }
+            }
+        }
+        return levelData;
+    }
+
+    @computed get levelTreeData() {
+        if (!this.levels || (this.levels?.length || 0) < 2) {
+            return false;
+        }
+        let [selectedLevel, isSelected] = this.selectedLevel;
+        var treeData = [];
+        while (selectedLevel) {
+            let levelData = this.getTierNodes(selectedLevel, isSelected);
+            treeData.unshift(levelData);
+            selectedLevel = this.getParentLevel(selectedLevel)
+            isSelected = false;
+        }
+        treeData = treeData.map((tierData, index) => ({...tierData, tier: this.chosenTierSet[index]}));
+        return treeData;
     }
 
 
@@ -554,6 +591,8 @@ export class LevelStore {
     };
 
     getChildLevels = levelId => this.levels.filter( l => l.parent == levelId);
+
+    getParentLevel = level => this.levels.filter( l => l.id == level.parent)?.[0] || false;
 
     getLevelIndicators = levelId => this.indicators.filter( i => i.level == levelId);
 
