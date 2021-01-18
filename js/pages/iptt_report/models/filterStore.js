@@ -70,13 +70,21 @@ export default (
         _indicatorFilters: {},
         _hiddenColumns: [],
         _hiddenCategories: false,
+        _glow: "",
         _pulse: "",
+        _trace: "",
         pulse(){
             this._pulse="pulse";
             setTimeout(() => {
                 this._pulse = "";
             }, 1000)
             // this._glow = this._glow ? "" : "filter-glow"
+        },
+        trace(){
+            this._trace="trace";
+            setTimeout(() => {
+                this._trace = "";
+            }, 1000)
         },
         get isTVA() {
             return this._reportType === TVA;

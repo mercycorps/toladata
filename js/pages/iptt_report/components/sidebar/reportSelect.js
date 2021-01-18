@@ -162,8 +162,9 @@ const StartDateSelect = inject('filterStore')(
                     }
                     disabled={ filterStore.periodsDisabled }
                     value={ filterStore.startPeriodValue || '' }
-                    update={ e => {filterStore.startPeriodValue = e.target.value;} }
+                    update={ e => {filterStore.startPeriodValue = e.target.value, filterStore.trace();} }
                     options={ filterStore.startOptions }
+                    animation={filterStore._trace}
                 />
     })
 );

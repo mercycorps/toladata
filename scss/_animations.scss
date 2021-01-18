@@ -32,3 +32,34 @@
         box-shadow: 0 0 0 0 rgba(0, 164, 159, 0), 0 0 0 -20px rgba(0, 164, 159, 0);
     }
 }
+
+.trace {
+    padding: 2px;
+    background-color: #00a49f; /* teal */
+    /* Single pixel data uri image http://jsfiddle.net/LPxrT/ 
+    /* background-image: teal, teal, white */
+    background-image: 
+        url('data:image/gif;base64,R0lGODlhAQABAPAAAACkn////yH5BAAAAAAALAAAAAABAAEAAAICRAEAOw=='), 
+        url('data:image/gif;base64,R0lGODlhAQABAPAAAACkn////yH5BAAAAAAALAAAAAABAAEAAAICRAEAOw=='),
+        url('data:image/gif;base64,R0lGODlhAQABAPAAADQ4QP///yH5BAAAAAAALAAAAAABAAEAAAICRAEAOw==');
+    background-repeat: no-repeat;
+    background-size: 2% 0, 0 0, 0% 2%;
+    background-position: center left, center left, center right;
+    animation: drawBorderFromLeft 1s ease-in-out;
+    
+  }
+  
+  @keyframes drawBorderFromLeft {
+      0% {
+        background-size: 2% 0, 0 0, 100% 100%;
+      }
+      20% {
+        background-size: 2% 98%, 0 100%, 100% 100%;
+      }
+      66% {
+        background-size: 2% 98%, 98% 100%, 100% 100%;
+      }
+      99% {
+        background-size: 2% 98%, 98% 100%, 2% 0;
+      }
+  }

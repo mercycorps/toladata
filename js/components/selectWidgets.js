@@ -60,14 +60,16 @@ export const DateSelect = ( props ) => {
                 className="col-form-label text-uppercase">
                     { props.label }
             </label>
-            <select
-                className="form-control"
-                id={ selectId }
-                value={ props.value }
-                onChange = { props.update }
-                disabled = { props.disabled }>
-                { formattedOptions }
-            </select>
+            <div className={props.animation ? props.animation: null}>
+                <select
+                    className="form-control"
+                    id={ selectId }
+                    value={ props.value }
+                    onChange = { props.update }
+                    disabled = { props.disabled }>
+                    { formattedOptions }
+                </select>
+            </div>
         </div>
     );
 }
