@@ -34,6 +34,23 @@ describe("Country change log", () => {
             <ChangeField
                 name={logEntryData.pretty_name}
                 data={logEntryData.prev}
+                change_type='country_disaggregation_created'
+            />
+        );
+        const labelObjs = component.toJSON().filter( c => c.type === 'ul')[0].children;
+        expect(labelObjs[0].children[0]).toBe("category 1");
+        expect(labelObjs[1].children[0]).toBe("category 3");
+        expect(labelObjs[2].children[0]).toBe("category 2");
+    });
+
+    it("displays lists of changes when label is in French", () => {
+        let logEntryData =  JSON.parse(JSON.stringify(countryDisaggLabelsChanged));
+
+        let component = renderer.create(
+            <ChangeField
+                name='Catégories de désagrégation'
+                data={logEntryData.prev}
+                change_type='country_disaggregation_created'
             />
         );
         const labelObjs = component.toJSON().filter( c => c.type === 'ul')[0].children;

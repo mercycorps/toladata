@@ -4,9 +4,9 @@ import itertools
 import datetime
 import faker
 from django.utils import timezone
+from factory.django import DjangoModelFactory
 from factory import (
     Faker,
-    DjangoModelFactory,
     post_generation,
     SubFactory,
     RelatedFactory,
@@ -100,13 +100,17 @@ class RFIndicatorFactory(DjangoModelFactory):
     class Meta:
         model = IndicatorM
 
-    class Params:
-        asftargets = False
-
     name = Faker('company')
     target_frequency = IndicatorM.ANNUAL
     lop_target = 1400
     unit_of_measure = FuzzyChoice(['cats', 'bananas', 'tennis rackets', 'dollars'])
+
+    @post_generation
+    def key_performance_indicator(self, created, extracted, **kwargs):
+        """KPI is moved to an indicator type, this keeps the same calling signature"""
+        if extracted and extracted is True:
+            kpi_it = IndicatorTypeFactory(indicator_type="Key Performance Indicator (KPI)")
+            self.indicator_type.add(kpi_it)
 
     @post_generation
     def targets(self, create, extracted, **kwargs):

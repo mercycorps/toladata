@@ -199,16 +199,13 @@ export class UserStore {
     }
 
     onSaveErrorHandler(message) {
-        PNotify.error({
-            // # Translators: Saving to the server failed
-            text: message || gettext('Saving Failed'),
-            delay: 5000
-        });
+        // # Translators: Saving to the server failed
+        window.unified_error_message(message || gettext('Saving failed'), {self_dismissing: true, dismiss_delay: 3000, dir1: 'left', dir2: 'down'});
     }
 
     onSaveSuccessHandler(message) {
         // # Translators: Saving to the server succeeded
-        PNotify.success({text: message || gettext('Successfully Saved'), delay: 5000})
+        window.unified_success_message(message || gettext('Successfully saved'))
     }
 
     createProgramSelections(programs) {
@@ -248,7 +245,9 @@ export class UserStore {
                     this.next_page = results.next_page
                     this.previous_page = results.previous_page
                 })
-            })
+            }).catch(errors => {
+                // TODO: handle this?
+            });
         }
     }
 

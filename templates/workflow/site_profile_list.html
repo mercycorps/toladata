@@ -7,6 +7,7 @@
 {% block bread_crumb %}
 {% endblock %}
 
+{% block site_area %}sites{% endblock %}
 
 {% block content %}
 
@@ -28,7 +29,9 @@
         {% endfor %}
     </div>
 </div>
-<a href="/workflow/siteprofile_add" class="btn btn-link btn-add"><i class="fas fa-plus-circle"></i> {% trans "Add site" %}</a>
+{% if can_add_sites %}
+<a href="{% url 'siteprofile_add' %}" class="btn btn-link btn-add"><i class="fas fa-plus-circle"></i> {% trans "Add site" %}</a>
+{% endif %}
 
 <br><br>
 <style>
@@ -40,7 +43,7 @@
 
     <div id="country_map"></div>
 
-    
+
 
  <!-- Display site profiles & projects -->
 <table class="table table-sm table-hover table-striped">
@@ -188,4 +191,3 @@
 </script>
 {% render_bundle 'home_country_map' %}
 {% endblock %}
-

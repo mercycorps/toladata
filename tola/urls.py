@@ -13,33 +13,45 @@ from tola_management.countryadmin import (
     CountryObjectiveViewset,
     CountryDisaggregationViewSet,
 )
-from django.conf.urls import include, url
 
+from rest_framework import routers
+from rest_framework.authtoken import views as authtoken_views
+
+from tola import views as tolaviews
+from indicators.views import (
+    program_page,
+    old_program_page,
+    views_program
+)
+from indicators.views.views_results_framework import (
+    LevelViewSet,
+    insert_new_level,
+    save_leveltiers,
+    reorder_indicators,
+    save_custom_tiers,
+    save_custom_template,
+    indicator_list
+)
+from workflow.views import dated_target_info
+
+from django.urls import path, include
+
+# Import i18n_patterns
 from django.views.i18n import JavaScriptCatalog
 from django.views.generic import TemplateView
 from django.contrib import admin
 from django.conf import settings
 from django.conf.urls.static import static
-from rest_framework import routers
-from rest_framework.authtoken import views as authtoken_views
-
-
-from tola import views as tolaviews
-from indicators.views import program_page, old_program_page
-from indicators.views.views_results_framework import (
-    LevelViewSet, insert_new_level, save_leveltiers, reorder_indicators, save_custom_tiers, save_custom_template, indicator_list)
-from indicators.views import views_program
-from workflow.views import dated_target_info
 
 admin.autodiscover()
 admin.site.site_header = 'Tola Activity administration'
 
-#REST FRAMEWORK
+# REST FRAMEWORK
 router = routers.DefaultRouter()
 router.register(r'level', LevelViewSet)
 router.register(r'programtargetfrequencies', ProgramTargetFrequencies, basename='programtargetfrequencies')
 
-#tola admin
+# tola admin
 router.register(r'tola_management/user', UserAdminViewSet, basename='tolamanagementuser')
 router.register(r'tola_management/organization', OrganizationAdminViewSet, basename='tolamanagementorganization')
 router.register(r'tola_management/program', ProgramAdminViewSet, basename='tolamanagementprograms')
@@ -52,91 +64,81 @@ router.register(r'tola_management/countrydisaggregation', CountryDisaggregationV
 urlpatterns = []
 if hasattr(settings, 'SILK_ENABLED') and settings.SILK_ENABLED:
     urlpatterns += [
-        url(r'^silk/', include('silk.urls', namespace='silk')),
+        path('silk/', include('silk.urls', namespace='silk')),
     ]
 
 urlpatterns += [
-    url(r'^jsi18n/$', JavaScriptCatalog.as_view(), name='javascript-catalog'),
-
-    # pnotify prototype
-    # TODO: remove before merging into dev
-    url(r'^pnotify-prototype/', TemplateView.as_view(template_name='prototypes/pnotify-prototype.html')),
+    path('jsi18n/', JavaScriptCatalog.as_view(), name='javascript-catalog'),
 
     # rest framework
-    url(r'^api/', include(router.urls)),
-    url(r'^api-auth/', include('rest_framework.urls', namespace='rest_framework')),
-    url(r'^api-token-auth/', authtoken_views.obtain_auth_token),
-
-    # enable the admin:
-    url(r'^admin/', admin.site.urls),
+    path('api/', include(router.urls)),
+    path('api-auth/', include('rest_framework.urls', namespace='rest_framework')),
+    path('api-token-auth/', authtoken_views.obtain_auth_token),
 
     # enable admin documentation:
-    url(r'^admin/doc/', include('django.contrib.admindocs.urls')),
+    path('admin/doc/', include('django.contrib.admindocs.urls')),
+
+    # enable the admin:
+    path('admin/', admin.site.urls),
 
     # api used  by reporting period modal
-    url(r'^datedtargetinfo/(?P<pk>\w+)/$', dated_target_info, name='datedtargetinfo'),
+    path('datedtargetinfo/<int:pk>/', dated_target_info, name='datedtargetinfo'),
 
     # internationalization
-    url(r'^i18n/', include('django.conf.urls.i18n')),
+    path('i18n/', include('django.conf.urls.i18n')),
 
-    url(r'^tola_management/', include('tola_management.urls')),
-    url(r'^saml_metadata/$', tolaviews.saml_metadata_view, name="saml_metadata"),
+    path('tola_management/', include('tola_management.urls')),
+    path('saml_metadata/', tolaviews.saml_metadata_view, name="saml_metadata"),
 
     # Session Variable updates:
-    url(r'^update_user_session/$', tolaviews.update_user_session, name='update_user_session'),
+    path('update_user_session/', tolaviews.update_user_session, name='update_user_session'),
 
     # Site home page filtered by country
-    url(r'^(?P<selected_country>\w+)/$', tolaviews.index, name='index'),
+    path('<str:selected_country>/', tolaviews.index, name='index'),
 
     # Program page
-    url(r'^program/(?P<program>\d+)/$', program_page, name='program_page'),
+    path('program/<int:program>/', program_page, name='program_page'),
 
-    url(r'^program/(?P<program>\d+)/logframe/$',
-        views_program.logframe_view, name='logframe'),
+    path('program/<int:program>/logframe/', views_program.logframe_view, name='logframe'),
 
-    url(r'^program/(?P<program>\d+)/logframe_excel/$',
-        views_program.logframe_excel_view, name='logframe_excel'),
+    path('program/<int:program>/logframe_excel/', views_program.logframe_excel_view, name='logframe_excel'),
 
     # Results framework builder
-    url(r'^api/insert_new_level', insert_new_level, name='insert_new_level'),
-    url(r'^api/save_leveltiers', save_leveltiers, name='save_leveltiers'),
-    url(r'^api/reorder_indicators', reorder_indicators, name='reorder_indicators'),
-    url(r'^api/indicator_list/(?P<program_id>\d+)/$', indicator_list, name='indicator_list'),
-    url(r'^api/save_custom_tiers', save_custom_tiers, name='save_custom_tiers'),
-    url(r'^api/save_custom_template', save_custom_template, name='save_custom_template'),
-
+    path('api/insert_new_level/', insert_new_level, name='insert_new_level'),
+    path('api/save_leveltiers/', save_leveltiers, name='save_leveltiers'),
+    path('api/reorder_indicators/', reorder_indicators, name='reorder_indicators'),
+    path('api/indicator_list/<int:program_id>/', indicator_list, name='indicator_list'),
+    path('api/save_custom_tiers', save_custom_tiers, name='save_custom_tiers'),
+    path('api/save_custom_template/', save_custom_template, name='save_custom_template'),
 
     # url redirect for people with old bookmarks
-    url(r'^program/(?P<program_id>\d+)/(?P<indicator_id>\d+)/(?P<indicator_type_id>\d+)/$',
-        old_program_page, name='old_program_page'),
+    path('program/<int:program_id>/<int:indicator_id>/<int:indicator_type_id>/',
+         old_program_page, name='old_program_page'),
 
     # app include of workflow urls
-    url(r'^workflow/', include('workflow.urls')),
+    path('workflow/', include('workflow.urls')),
 
     # app include of indicator urls
-    url(r'^indicators/', include('indicators.urls')),
-
-
+    path('indicators/', include('indicators.urls')),
 
     # local login
-    url(r'^login/$', tolaviews.TolaLoginView.as_view(), name='login'),
-    url(r'^accounts/login/$', tolaviews.TolaLoginView.as_view(), name='login'),
-    url(r'^accounts/logout/$', tolaviews.logout_view, name='logout'),
+    path('login/', tolaviews.TolaLoginView.as_view(), name='login'),
+    path('accounts/login/', tolaviews.TolaLoginView.as_view(), name='login'),
+    path('accounts/logout/', tolaviews.logout_view, name='logout'),
 
     # accounts
-    url(r'^accounts/profile/$', tolaviews.profile, name='profile'),
+    path('accounts/profile/', tolaviews.profile, name='profile'),
 
     # Auth backend URL's
-    url(r'^accounts/invalid_user/$', tolaviews.invalid_user_view, name='invalid_user'),
-    url(r'^accounts/invalid_user/okta/$', TemplateView.as_view(template_name='registration/invalid_okta_user.html'),
-        name='invalid_user_okta'),
-    url(r'^accounts/password_reset/$', tolaviews.TolaPasswordResetView.as_view(), name='password_reset'),
-    url(r'accounts/', include('django.contrib.auth.urls')),
-    url('', include('social_django.urls', namespace='social')),
+    path('accounts/invalid_user/', tolaviews.invalid_user_view, name='invalid_user'),
+    path('accounts/invalid_user/okta/', TemplateView.as_view(template_name='registration/invalid_okta_user.html'),
+         name='invalid_user_okta'),
+    path('accounts/password_reset/', tolaviews.TolaPasswordResetView.as_view(), name='password_reset'),
+    path('accounts/', include('django.contrib.auth.urls')),
+    path('', include('social_django.urls', namespace='social')),
 
-    #url(r'^oauth/', include('social_django.urls', namespace='social')),
     # Site home page
-    url(r'^$', tolaviews.index, name='index'),
+    path('', tolaviews.index, name='index'),
 
 
     ] + static(settings.MEDIA_URL, document_root=settings.MEDIA_ROOT)
@@ -144,8 +146,8 @@ urlpatterns += [
 
 if settings.DEBUG:
     urlpatterns = [
-        url(r'^400/', TemplateView.as_view(template_name='400.html')),
-        url(r'^403/', TemplateView.as_view(template_name='403.html')),
-        url(r'^404/', TemplateView.as_view(template_name='404.html')),
-        url(r'^500/', TemplateView.as_view(template_name='500.html')),
+        path('400/', TemplateView.as_view(template_name='400.html')),
+        path('403/', TemplateView.as_view(template_name='403.html')),
+        path('404/', TemplateView.as_view(template_name='404.html')),
+        path('500/', TemplateView.as_view(template_name='500.html')),
     ] + urlpatterns

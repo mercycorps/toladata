@@ -99,7 +99,7 @@
     display: flex;
     align-items: center;
     justify-content: space-between;
-    
+
     .expand-collapse-buttons .btn {
         background-color: white;
         border: none;
@@ -112,4 +112,12 @@
             margin-right: 0px;
         }
     }
+}
+
+.kpi-badge {
+    display: inline;
+    color: white;
+    background-color: $link-color;
+    margin-left: 5px;
+    border-radius: 6px;
 }

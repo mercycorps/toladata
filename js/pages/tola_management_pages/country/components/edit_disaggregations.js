@@ -4,6 +4,7 @@ import { observer } from "mobx-react"
 import { DragDropContext, Droppable, Draggable } from 'react-beautiful-dnd';
 import classNames from 'classnames'
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome'
+import { faCaretDown, faCaretRight } from "@fortawesome/free-solid-svg-icons";
 import HelpPopover from "../../../../components/helpPopover";
 import { toJS } from 'mobx';
 import {create_unified_changeset_notice} from '../../../../components/changesetNotice';
@@ -92,13 +93,14 @@ class CategoryForm extends React.Component {
                         value={category.customsort}
                         onChange={ (e) => props.updateLabelOrder(index, e.target.value - 1) }
                         className="form-control" disabled={props.disabled}
+                        style={{minWidth: "max-content"}}
                     >
                         {
                             Array.from(Array(listLength).keys()).map(value => <option value={value+1} key={value}>{value+1}</option>)
                         }
                     </select>
                 </div>
-                <div className="form-group">
+                <div className="form-group col-md-auto">
                     {deletionElement}
                 </div>
             </React.Fragment>
@@ -200,12 +202,25 @@ export class RetroProgramCheckBoxWrapper extends React.Component {
         }
     }
 
+    keyboardPress(e) {
+        e.preventDefault();
+        let code = e.keyCode || e.which;
+        if (!this.props.disabled & (code === 32 || code === 13)) {
+            this.props.toggleProgramViz();
+        }
+    }
+
     render() {
         let checkBoxOptions = Object.values(this.props.programs).sort((a, b) => a.name < b.name ? -1 : 1);
         let checkBoxComponent = null;
         if (this.props.programsExpanded) {
             checkBoxComponent =
-                <div id="disagg-admin__programs" className="ml-2 mt-2 d-flex flex-column disaggregation-programs">
+                <div 
+                    id="disagg-admin__programs" 
+                    aria-labelledby="disagg-admin__programs-header"
+                    className="ml-2 mt-2 d-flex flex-column disaggregation-programs"
+                    hidden={!this.props.programsExpanded} 
+                    >
                     <CheckBoxList checkBoxOptions={checkBoxOptions} onUpdate={this.props.onRetroUpdate}/>
                 </div>
         }
@@ -214,24 +229,33 @@ export class RetroProgramCheckBoxWrapper extends React.Component {
 
         return (
             <React.Fragment>
-                <div className="mt-2 ml-4 retro-programs">
-                     <a
-                         onClick={this.props.toggleProgramViz}
-                         className={classNames('accordion-row__btn', 'btn', 'btn-link', 'disaggregation--programs__header', {disabled: this.props.disabled})}
-                         tabIndex='0'>
-                        <FontAwesomeIcon icon={this.props.programsExpanded ? 'caret-down' : 'caret-right'} />
-                        {/* # Translators: This feature allows a user to apply changes to existing programs as well as ones created in the future */}
-                        <span className="mr-1">{gettext("Assign new disaggregation to all indicators in a program")}</span>
-                    </a>
-
-                    <HelpPopover
-                        key={1}
-                        content={helpText}
-                        placement="right"
-                        innerRef={this.retroactiveAssignmentPopup}
-                        // # Translators: this is alt text for a help icon
-                        ariaText={gettext('More information on assigning disaggregations to existing indicators')}
-                    />
+                <div 
+                role="heading"
+                className="mt-2 ml-4 retro-programs">
+                     <div
+                        id="disagg-admin__programs-header"
+                        role="button"
+                        aria-expanded={this.props.programsExpanded}
+                        aria-controls="disagg-admin__programs"
+                        className="accordion-row__btn btn btn-link disaggregation--programs__header">
+                        <span 
+                            className={classNames('disaggregation--programs__header-text',{disabled: this.props.disabled})} 
+                            onClick={this.props.toggleProgramViz} 
+                            onKeyPress={this.keyboardPress.bind(this)}
+                            tabIndex='0'>
+                            <FontAwesomeIcon icon={this.props.programsExpanded ? faCaretDown : faCaretRight } />
+                            {/* # Translators: This feature allows a user to apply changes to existing programs as well as ones created in the future */}
+                            <span>{gettext("Assign new disaggregation to all indicators in a program")}</span>
+                        </span>
+                        <HelpPopover
+                            key={1}
+                            content={helpText}
+                            placement="right"
+                            innerRef={this.retroactiveAssignmentPopup}
+                            // # Translators: this is alt text for a help icon
+                            ariaText={gettext('More information on assigning disaggregations to existing indicators')}
+                        />
+                    </div>
                 </div>
                 <div>
                     { checkBoxComponent }
@@ -252,7 +276,7 @@ export class DisaggregationType extends React.Component {
             labels: this.orderLabels(disaggregation.labels),
             programsExpanded: false
         };
-        this.programsForRetro = observable(props.programs.reduce( (accum, program) => {
+        this.programsForRetro = observable(props.programs.filter(program => program.active).reduce( (accum, program) => {
             accum[program.id] = {id: program.id, name: program.name, checked: false}
             return accum
         }, {}))
@@ -420,12 +444,14 @@ export class DisaggregationType extends React.Component {
             <div className="accordion-row">
                 <div className="accordion-row__content">
                     <a onClick={() => {expandAction(this.resetForm.bind(this));}} className="btn accordion-row__btn btn-link" tabIndex='0'>
-                        <FontAwesomeIcon icon={expanded ? 'caret-down' : 'caret-right'} />
+                        <FontAwesomeIcon icon={expanded ? faCaretDown : faCaretRight } />
                         {(disaggregation.id === 'new') ? "New disaggregation" : disaggregation.disaggregation_type}
                     </a>
                     {disaggregation.is_archived && <span className="text-muted font-weight-bold ml-2">(Archived)</span>}
                     {expanded && (
-                        <form className="form card card-body bg-white">
+                        <form className="form card card-body bg-white" 
+                        style={{minWidth: "max-content"}}
+                        >
                             <fieldset className="disagg-form__fieldset">
                                 <div className="form-group">
                                     <label className="label--required" htmlFor="disaggregation-type-input">
@@ -443,9 +469,13 @@ export class DisaggregationType extends React.Component {
                                     />
                                     <ErrorFeedback errorMessages={this.formErrors('disaggregation_type')} />
                                     <div className="form-check" style={ {marginTop: '8px'} }>
-                                        <input className="form-check-input" type="checkbox" checked={managed_data.selected_by_default}
-                                               onChange={(e) => {this.updateSelectedByDefault(e.target.checked)}} id="selected-by-default-checkbox"
-                                                disabled={disaggregation.is_archived} />
+                                        <input 
+                                            className="form-check-input" 
+                                            id="selected-by-default-checkbox"
+                                            type="checkbox" 
+                                            checked={managed_data.selected_by_default}
+                                            onChange={(e) => {this.updateSelectedByDefault(e.target.checked)}} 
+                                            disabled={disaggregation.is_archived} />
                                         <label className="form-check-label mr-2" htmlFor="selected-by-default-checkbox">
                                         {
                                             // # Translators: This labels a checkbox, when checked, it will make the associated item "on" (selected) for all new indicators
@@ -454,6 +484,7 @@ export class DisaggregationType extends React.Component {
                                         </label>
                                         <HelpPopover
                                             key={1}
+                                            className=""
                                             // # Translators: Help text for the "selected by default" checkbox on the disaggregation form
                                             content={`<p>${interpolate(gettext('When adding a new program indicator, this disaggregation will be selected by default for every program in %s. The disaggregation can be manually removed from an indicator on the indicator setup form.'), [gettext(this.props.countryName)])}</p>`}
                                             placement="right"
