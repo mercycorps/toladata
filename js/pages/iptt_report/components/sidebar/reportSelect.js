@@ -103,7 +103,7 @@ class TimeframeRadio extends React.Component {
                             <input type="radio"
                                    checked={ !this.state.focus && this.props.filterStore.showAll }
                                    disabled={ this.props.filterStore.periodsDisabled }
-                                   onChange={ e => { this.props.filterStore.showAll = true, this.props.filterStore.pulse(); } }
+                                   onChange={ e => { this.props.filterStore.showAll = true, this.props.filterStore.shine(); } }
                                    />
                         </span>
                         <label onClick={ e => {this.props.filterStore.showAll = true} }
@@ -182,7 +182,7 @@ const EndDateSelect = inject('filterStore')(
                     }
                     disabled={ filterStore.periodsDisabled }
                     value={ filterStore.endPeriodValue || '' }
-                    update={ e => {filterStore.endPeriodValue = e.target.value;} }
+                    update={ e => {filterStore.endPeriodValue = e.target.value, filterStore.shine();} }
                     options={ filterStore.endOptions }
                 />
     })
@@ -197,7 +197,8 @@ const GroupingSelect = inject('filterStore')(
         return <GroupBySelect
                     chainLabel={ filterStore.resultChainFilterLabel }
                     value={ filterStore.groupBy }
-                    update={ e => { filterStore.groupBy = e.target.value;} }
+                    update={ e => { filterStore.groupBy = e.target.value, filterStore.glow();} }
+                    animation={filterStore._glow}
                 />
     })
 );

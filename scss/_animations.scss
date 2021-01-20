@@ -1,18 +1,23 @@
 .glow {
-    animation: glowing 3s ease-in-out;
+    animation: glowing 2s ease-out;
 }
 @keyframes glowing {
     0% {
-      box-shadow: 20px 0 30px $teal-500;
+      box-shadow: 0 0 0 0 $teal-400;
     }
-    40% {
-      box-shadow: 20px 0 50px $teal-500;
+    25% {
+      box-shadow: 0 0 30px 5px $teal-400;
+    }
+    50% {
+      box-shadow: 0 0 30px 1px $teal-600;
+    }
+    75% {
+      box-shadow: 0 0 30px 5px $teal-400;
     }
     100% {
-      box-shadow: 0 0 0px $teal-500;
+      box-shadow: 0 0 0 0 $teal-400;
     }
   }
-
 
 .pulse {
     animation: pulse 3s linear;
@@ -41,12 +46,11 @@
     background-image: 
         url('data:image/gif;base64,R0lGODlhAQABAPAAAACkn////yH5BAAAAAAALAAAAAABAAEAAAICRAEAOw=='), 
         url('data:image/gif;base64,R0lGODlhAQABAPAAAACkn////yH5BAAAAAAALAAAAAABAAEAAAICRAEAOw=='),
-        url('data:image/gif;base64,R0lGODlhAQABAPAAADQ4QP///yH5BAAAAAAALAAAAAABAAEAAAICRAEAOw==');
+        url('data:image/gif;base64,R0lGODlhAQABAPAAAFRYWv///yH5BAAAAAAALAAAAAABAAEAAAICRAEAOw==');
     background-repeat: no-repeat;
     background-size: 2% 0, 0 0, 0% 2%;
     background-position: center left, center left, center right;
     animation: drawBorderFromLeft 1s ease-in-out;
-    
   }
   
   @keyframes drawBorderFromLeft {
@@ -62,4 +66,50 @@
       99% {
         background-size: 2% 98%, 98% 100%, 2% 0;
       }
+  }
+
+.shine-wrapper {
+  padding-top: 10px;
+  width: auto;
+  min-height: 650px;
+  margin: 0 auto;
+  position: relative;
+  overflow: hidden;
+}
+.shine-element {
+  position: absolute;
+  top: 1%;
+  left: 1%;
+  display: block;
+  height: 98%;
+  width: 98%;
+  margin: auto;
+  align-self: center;
+  background: #fff;
+  border: none;
+  z-index: 1;
+}
+.shine-border {
+  position: absolute;
+  display: block;
+  top: -50%;
+  left: -50%;
+  z-index: -9;
+  height: 200%;
+  width: 300%;
+  transform: rotate(-135deg);
+  overflow: hidden;
+  background: $gray-700;
+  &-on {
+    @extend .shine-border;
+    background: linear-gradient(to right, #54585a 20%, #54585a 40%, #c8102e 50%, #00a49f 55%, #54585a 70%, #54585a 100%);
+    animation: shine 2s linear infinite;
+    background-size: 200% auto;
+  }
+}
+
+@keyframes shine {
+    to {
+      background-position: 200% center;
+    }
   }

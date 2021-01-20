@@ -73,6 +73,13 @@ export default (
         _glow: "",
         _pulse: "",
         _trace: "",
+        _shine: "",
+        glow(){
+            this._glow="glow";
+            setTimeout(() => {
+                this._glow = "";
+            }, 3000)
+        },
         pulse(){
             this._pulse="pulse";
             setTimeout(() => {
@@ -85,6 +92,12 @@ export default (
             setTimeout(() => {
                 this._trace = "";
             }, 1000)
+        },
+        shine(){
+            this._shine="shine";
+            setTimeout(() => {
+                this._shine = "";
+            }, 2000)
         },
         get isTVA() {
             return this._reportType === TVA;

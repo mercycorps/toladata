@@ -86,14 +86,16 @@ export const SingleSelect = ( props ) => {
                 className={ labelClass }>
                     { props.label }
             </label>
-            <select
-                onChange={ props.update }
-                value={ props.value }
-                id={ selectId }
-                className={ selectClass }
-                disabled={ props.disabled }>
-                { props.options }
-            </select>
+            <div className={ props.animation ? props.animation: null }>
+                <select
+                    onChange={ props.update }
+                    value={ props.value }
+                    id={ selectId }
+                    className={ selectClass }
+                    disabled={ props.disabled }>
+                    { props.options }
+                </select>
+            </div>
         </div>
     );
 }
