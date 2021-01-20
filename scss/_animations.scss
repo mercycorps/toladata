@@ -117,15 +117,12 @@
 }
 @keyframes shade {
   0% {
-    // opacity: 1.0;
-    background: rgba(4, 108, 105, 0);
+    opacity: 1.0;
   }
   50% {
-    // opacity: 0.5;
-    background: rgba(4, 108, 105, .2);
+    opacity: 0.4;
   }
   100% {
-    // opacity: 1.0;
-    background: rgba(4, 108, 105, 0);
+    opacity: 1.0;
   }
 }
