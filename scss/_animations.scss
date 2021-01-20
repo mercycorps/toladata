@@ -50,10 +50,9 @@
     background-repeat: no-repeat;
     background-size: 2% 0, 0 0, 0% 2%;
     background-position: center left, center left, center right;
-    animation: drawBorderFromLeft 1s ease-in-out;
+    animation: trace 1s ease-in-out;
   }
-  
-  @keyframes drawBorderFromLeft {
+  @keyframes trace {
       0% {
         background-size: 2% 0, 0 0, 100% 100%;
       }
@@ -71,7 +70,7 @@
 .shine-wrapper {
   padding-top: 10px;
   width: auto;
-  min-height: 650px;
+  min-height: 800px;
   margin: 0 auto;
   position: relative;
   overflow: hidden;
@@ -96,20 +95,37 @@
   left: -50%;
   z-index: -9;
   height: 200%;
-  width: 300%;
+  width: 400%;
   transform: rotate(-135deg);
   overflow: hidden;
   background: $gray-700;
   &-on {
     @extend .shine-border;
     background: linear-gradient(to right, #54585a 20%, #54585a 40%, #c8102e 50%, #00a49f 55%, #54585a 70%, #54585a 100%);
-    animation: shine 2s linear infinite;
+    animation: shine 3s linear infinite;
     background-size: 200% auto;
   }
 }
-
 @keyframes shine {
     to {
       background-position: 200% center;
     }
+}
+
+.shade {
+  animation: shade 1s ease;
+}
+@keyframes shade {
+  0% {
+    // opacity: 1.0;
+    background: rgba(4, 108, 105, 0);
   }
+  50% {
+    // opacity: 0.5;
+    background: rgba(4, 108, 105, .2);
+  }
+  100% {
+    // opacity: 1.0;
+    background: rgba(4, 108, 105, 0);
+  }
+}
