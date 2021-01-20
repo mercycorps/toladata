@@ -145,12 +145,22 @@ export class PinButton extends BootstrapPopoverButton {
 class ExcelPopover extends React.Component {
     getCurrent = () => {
         if (this.props.excelUrl) {
+            window.sendGoogleAnalyticsEvent({
+                category: "IPTT",
+                action: "Export",
+                label: this.props.excelUrl
+            });
             window.open(this.props.excelUrl, '_blank');
         }
     }
 
     getAll = () => {
         if (this.props.fullExcelUrl) {
+            window.sendGoogleAnalyticsEvent({
+                category: "IPTT",
+                action: "Export",
+                label: this.props.fullExcelUrl
+            });
             window.open(this.props.fullExcelUrl, '_blank');
         }
     }
@@ -202,6 +212,11 @@ export class ExcelPopoverButton extends BootstrapPopoverButton {
 export class ExcelButton extends React.Component {
      handleClick = () => {
         if (this.props.excelUrl) {
+           window.sendGoogleAnalyticsEvent({
+                category: "IPTT",
+                action: "Export",
+                label: this.props.excelUrl
+            });
             window.open(this.props.excelUrl, '_blank');
         }
     }

@@ -78,6 +78,17 @@ export const forProgramPage = (
         if (updateJSON.pk && !isNaN(parseInt(updateJSON.pk)) && parseInt(updateJSON.pk) === this.pk) {
             this.number = updateJSON.number || false;
         }
+    },
+    get fullName() {
+        let fullName = '';
+        if (this.level) {
+            fullName += this.level + ' ';
+        }
+        if (this.number) {
+            fullName += this.number + ' ';
+        }
+        fullName += this.name;
+        return fullName;
     }
 });
 

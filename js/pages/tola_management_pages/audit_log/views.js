@@ -196,6 +196,14 @@ const ResultLevel = ({indicator, level}) => {
 
 export const IndexView = observer(
     ({store}) => {
+        const exportAuditLog = () => {
+            window.sendGoogleAnalyticsEvent({
+                category: "Audit Log",
+                action: "Export",
+                label: `Program ${store.program_id}`
+            });
+            window.open(`/api/tola_management/program/${store.program_id}/export_audit_log`, "_blank");
+        }
         return <div id="audit-log-index-view">
             <header className="page-title">
                 <h1 className="page-title h2">
@@ -211,7 +219,7 @@ export const IndexView = observer(
                     </div>
                 </div>
                 <div className="controls__buttons">
-                    <a className="btn btn-secondary btn-sm" href={`/api/tola_management/program/${store.program_id}/export_audit_log`}>
+                    <a className="btn btn-secondary btn-sm" onClick={exportAuditLog}>
                         <i className="fas fa-download" />
                         {gettext("Excel")}
                     </a>

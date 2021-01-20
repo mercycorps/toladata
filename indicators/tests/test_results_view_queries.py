@@ -22,10 +22,12 @@ from indicators.models import Indicator
 from indicators.queries import ResultsIndicator, MetricsIndicator
 from django import test
 
+THIS_YEAR = datetime.date.today().year
+
 def get_open_program():
     return w_factories.ProgramFactory(
-        reporting_period_start=datetime.date(2018, 1, 1),
-        reporting_period_end=datetime.date(2021, 12, 31)
+        reporting_period_start=datetime.date(THIS_YEAR - 2, 1, 1),
+        reporting_period_end=datetime.date(THIS_YEAR + 1, 12, 31)
     )
 
 def get_annual_indicator(program, lop_target, is_cumulative):
@@ -156,7 +158,6 @@ class TestAnnualCumulativeNumeric(TestAnnualNoncumulativeNumeric):
     result_values = [8, 25, 45]
     expected_results_values = [8, 33, 78, None]
     expected_percent_mets = [0.8, 1.65, 1.56, None]
-    complete = [True, True, False, False, False]
 
 
 class TestMidEndPercent(test.TestCase):
@@ -380,7 +381,7 @@ class TestAnnualIncreasePercentage(test.TestCase, ResultsTestBase, ScenarioBuild
     target_values = [50, 0, 90, 20]
     result_values = [45, 5, 0]
     expected_result_values = [45, 5, 0]
-    # expected_lop_target = 30 
+    # expected_lop_target = 30
     expected_lop_target = 20 # new value based on calculated lop target
     expected_lop_actual = 0
     expected_lop_percent_met = 0

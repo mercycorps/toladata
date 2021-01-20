@@ -96,8 +96,8 @@ describe("Indicator List elements", () => {
         });
         it("renders indicator options", () => {
             const indicatorOptions = [
-                {pk: 1, name: 'one'},
-                {pk: 2, name: 'two'}
+                {pk: 1, fullName: 'one'},
+                {pk: 2, fullName: 'two'}
             ];
             const expectedOptions = [
                 {value: 1, label: 'one'},

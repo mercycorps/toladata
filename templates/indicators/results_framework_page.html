@@ -1,8 +1,9 @@
 {% extends "base.html" %}
-{% load i18n mathfilters mytags static %}
+{% load i18n mytags static %}
 {% load render_bundle from webpack_loader %}
 {# Translators: title of the Results framework page #}
 {% block title %}{{ program.name }}: {% trans "Results framework" %} |{% endblock %}
+{% block site_area %}results framework builder{% endblock %}
 
 {% block extra_page_title_classes %}h2{% endblock %}
 {% block page_title %}
@@ -45,7 +46,7 @@
     <div id="indicator_modal_div" class="modal fade" role="dialog" aria-labelledby="myLargeModalLabel">
       <div class="modal-dialog modal-lg" role="document">
         <div class="modal-content" id="indicator_modal_content" iptt-modal="true">
-    
+
         </div> <!-- modal content -->
       </div>
     </div>

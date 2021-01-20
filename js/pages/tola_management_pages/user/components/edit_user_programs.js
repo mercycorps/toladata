@@ -6,7 +6,11 @@ import { CountryStore } from '../models';
 import CheckboxedMultiSelect from 'components/checkboxed-multi-select';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 
+// # Translators: an option in a list of country-level access settings, indicating no default access to the country's programs, but individually set access to individual programs within
+const INDIVIDUAL_PROGRAM_ACCESS = gettext('Individual programs only');
 
+// # Translators: An option for access level to a program, when no access is granted
+const NO_ACCESS = gettext('No access');
 
 //we need a pretty peculiar structure to accommodate the virtualized table
 const create_country_objects = (countries, store) => Object.entries(countries)
@@ -15,21 +19,22 @@ const create_country_objects = (countries, store) => Object.entries(countries)
                                                         [id]: {
                                                             ...country,
                                                             type: 'country',
-                                                            options: [{label: gettext('Individual programs only'), value: 'none'}, ...store.country_role_choices],
                                                             admin_access: store.is_superuser,
-                                                            programs: new Set(country.programs)
+                                                            programs: new Set(country.programs),
                                                         }
                                                     }),{})
 
-const create_program_objects = (programs, store) => Object.entries(programs)
-                                                           .reduce((programs, [id, program]) => ({
-                                                               ...programs,
-                                                               [id]: {
-                                                                   ...program,
-                                                                   type: 'program',
-                                                                   options: store.program_role_choices,
-                                                               }
-                                                           }),{})
+// generates the programs objects for the virtualized table, with appropriate menu options
+const create_program_objects = (programs, store) => {
+    return Object.entries(programs)
+        .reduce((programs, [id, program]) => ({
+            ...programs,
+            [id]: {
+                ...program,
+                type: 'program',
+            }
+        }),{});
+}
 
 /**
  * This function returns countries and programs as a flat ordered list as they will be displayed in the virtualized table.
@@ -45,7 +50,11 @@ const flattened_listing = (countries, programs, isExpanded) => countries.flatMap
                                                             country, // country object itself displays, followed by programs
                                                             ...(isExpanded(country.id) ? Array.from(country.programs) //only show programs if country is expanded
                                                                 .filter(program_id => programs[program_id]) // don't include programs we don't have information for (filtered out)
-                                                                .map(program_id => ({...programs[program_id], id: `${country.id}_${program_id}`, country_id: country.id})) : [])
+                                                                .map(program_id => (
+                                                                    {...programs[program_id],
+                                                                    id: `${country.id}_${program_id}`,
+                                                                    country_id: country.id,
+                                                                    })) : [])
                                                         ]
                                                     )
 
@@ -96,9 +105,9 @@ export default class EditUserPrograms extends React.Component {
         const {store} = props
 
         const countries = create_country_objects(store.countries, store)
-        const programs = create_program_objects(store.programs, store)
         this.countryStore = new CountryStore(store.regions, store.countries);
-        
+
+        const programs = create_program_objects(store.programs, store)
         // callback for determining if a country is expanded based on filter state (initial program filter of ''):
         const isExpanded = this.isExpanded.bind(this, '');
         this.state = {
@@ -114,36 +123,6 @@ export default class EditUserPrograms extends React.Component {
         }
     }
 
-    componentWillReceiveProps(next_props) {
-        const {store} = next_props
-        const countries_obj = create_country_objects(store.countries, store)
-        const programs_obj = create_program_objects(store.programs, store)
-
-        const filtered_countries = apply_country_filter(
-            countries_obj,
-            this.countryStore.selectedCountries
-        )
-
-        const {countries, programs}= apply_program_filter(
-            programs_obj,
-            filtered_countries,
-            this.state.program_filter
-        )
-
-        // callback for determining if a country is expanded based on filter state:
-        const isExpanded = this.isExpanded.bind(this, this.state.program_filter);
-
-        this.setState({
-            countries: countries_obj,
-            programs: programs_obj,
-            filtered_countries: countries,
-            filtered_programs: programs,
-            ordered_country_ids: store.ordered_country_ids,
-            flattened_programs: flattened_listing(store.ordered_country_ids.filter(id => id in countries).map(id => countries[id]), programs, isExpanded),
-            original_user_program_access: create_user_access(store.editing_target_data.access),
-            user_program_access: create_user_access(store.editing_target_data.access)
-        }, () => this.hasUnsavedDataAction())
-    }
 
     saveForm() {
         //marshal the data back into the format we received it
@@ -183,12 +162,20 @@ export default class EditUserPrograms extends React.Component {
     toggleProgramAccess(program_key) {
         const current_program_access = this.state.user_program_access.programs
         const updated_program_access = (() => {
-            if(current_program_access[program_key]) {
-                return {...current_program_access[program_key], has_access: !current_program_access[program_key].has_access}
+            if(current_program_access[program_key] && current_program_access[program_key].has_access) {
+                // user has had their access removed, set the role to "none":
+                return {...current_program_access[program_key], role: 'none', has_access: false};
+            } else if (current_program_access[program_key] && current_program_access[program_key].role === 'none') {
+                // user has had their access instated, assume default initial role of low:
+                return {...current_program_access[program_key], role: 'low', has_access: true};
+            } else if (current_program_access[program_key]) {
+                // this state should be unreachable, but this was the default before the above modifications and will present
+                // slightly unexpected but not buggy/crashing behavior in case this state is reachable by some combination of actions:
+                return {...current_program_access[program_key], has_access: !(current_program_access[program_key].has_access)};
             } else {
                 //TODO: want to find a more resilient way to handle a compound key
-                const [country, program] = program_key.split('_')
-                return {country, program, role: 'low', has_access: true}
+                const [country, program] = program_key.split('_');
+                return {country, program, role: 'low', has_access: true};
             }
         })()
 
@@ -251,6 +238,7 @@ export default class EditUserPrograms extends React.Component {
     }
 
     changeCountryRole(country_id, new_val) {
+        // user's country-level permissions have changed, first update the country access (actual DB value to be changed):
         const country = {...this.state.user_program_access.countries[country_id]}
         const new_country_access = (() => {
             if(new_val != 'none') {
@@ -259,7 +247,6 @@ export default class EditUserPrograms extends React.Component {
                 return {...country, role: new_val, has_access: false}
             }
         })()
-
         this.setState({
             user_program_access: {
                 ...this.state.user_program_access,
@@ -268,17 +255,14 @@ export default class EditUserPrograms extends React.Component {
                     [country_id]: new_country_access
                 }
             },
-        }, () => this.hasUnsavedDataAction())
-
+        }, () => this.hasUnsavedDataAction());
     }
 
     changeProgramRole(program_key, new_val) {
         const [country_id, program_id] = program_key.split('_')
         const access = this.state.user_program_access
-
-
         const new_program_access = (() => {
-            if(access[country_id] && access[country_id].has_access && new_val == 'low') {
+            if(access[country_id] && access[country_id].has_access && new_val == 'none') {
                 return {
                     program: program_id,
                     country: country_id,
@@ -290,7 +274,7 @@ export default class EditUserPrograms extends React.Component {
                     program: program_id,
                     country: country_id,
                     role: new_val,
-                    has_access: true
+                    has_access: !(new_val === 'none')
                 }
             }
         })()
@@ -391,79 +375,104 @@ export default class EditUserPrograms extends React.Component {
         return this.countryStore.isExpanded(countryId);
     }
 
+    getRoleOptions(data) {
+        // role options dynamically generated to match both country and program current access state
+        if (data.type == 'country') {
+            // currently country options are always these same three (access / disabling of menu is controlled in is_role_disabled)
+            return [{label: INDIVIDUAL_PROGRAM_ACCESS, value: 'none'}, ...this.props.store.country_role_choices];
+        } else {
+            // if the user being edited (not the administrator using the admin) has access to the country this program
+            // is in, then they should not have the NO ACCESS option.  But if they do not have user or basic_admin access
+            // the NO ACCESS role is an option.
+            const countryRole = this.state.user_program_access.countries?.[data.country_id]?.role;
+            if (countryRole == 'basic_admin' || countryRole == 'user') {
+                return [...this.props.store.program_role_choices];
+            } else {
+                return [{label: NO_ACCESS, value: 'none'}, ...this.props.store.program_role_choices];
+            }
+        }
+    }
+
     render() {
         const {user, onSave} = this.props
 
         const is_checked = (data) => {
+            // consumes rowData, returns whether editor "has access?" checkbox should be checked:
             const access = this.state.user_program_access
             if(data.type == 'country') {
+                // country access checkbox (not currently used):
                 return (access.countries[data.id] && access.countries[data.id].has_access) || false
             } else {
-                if(this.state.user_program_access.countries[data.country_id] && this.state.user_program_access.countries[data.country_id].has_access) {
+                // program access checkbox:
+                if (this.state.user_program_access.countries?.[data.country_id]?.has_access) {
+                    // if the user has access to the country level, they have access to the program:
                     return true
                 }
-                return (access.programs[data.id] && access.programs[data.id].has_access) || false
+                // otherwise if the user has access to the program directly:
+                return access.programs?.[data.id]?.has_access || false
             }
         }
 
         const is_check_disabled = (data) => {
+            // consumes rowData, returns whether editor "has access?" checkbox should be disabled:
             if(data.type == 'country') {
+                // country "checkbox" is now a select all button, so disable if there are no programs to select:
                 return !(this.state.countries[data.id].programs.size > 0)
-                    || !(
-                        this.props.store.access.countries[data.id]
-                        && this.props.store.access.countries[data.id].role == 'basic_admin'
-                    )
-                    || (
-                        this.state.user_program_access.countries[data.id]
-                        && this.state.user_program_access.countries[data.id].has_access
-                    )
-
+                    // or the operating user is not a basic admin for this country:
+                    || 'basic_admin' != this.props.store.access.countries?.[data.id]?.role
+                    // or the user has access to the country level (cannot select all if all already selected)
+                    || this.state.user_program_access.countries?.[data.id]?.has_access
             } else {
-                if(this.state.user_program_access.countries[data.country_id] && this.state.user_program_access.countries[data.country_id].has_access) {
+                // program access checkbox:
+                if(this.state.user_program_access.countries?.[data.country_id]?.has_access) {
                     return true
                 }
-                return !this.props.store.access.countries[data.country_id] || this.props.store.access.countries[data.country_id].role != 'basic_admin'
+                return !('basic_admin' == this.props.store.access.countries?.[data.country_id]?.role ||
+                        this.props.store.is_superuser)
             }
         }
 
         const is_role_disabled = (data) => {
+            // consumes rowData, returns whether row-selector is disabled
             if(data.type == 'country') {
+                // country role (none = individual programs only, user or admin) can only be modified
+                // by a superuser:
                 return !this.props.store.is_superuser
             } else {
-                return (
-                    !this.props.store.access.countries[data.country_id]
-                    || this.props.store.access.countries[data.country_id].role != 'basic_admin'
-                    || (
-                        !(
-                            this.state.user_program_access.programs[data.id]
-                            && this.state.user_program_access.programs[data.id].has_access
-                        ) && !(
-                            this.state.user_program_access.countries[data.country_id]
-                            && this.state.user_program_access.countries[data.country_id].has_access
-                        )
-                    )
+                // program access role dropdown
+                return !(
+                    // if the operating user (not the user being modified) does not have access to the
+                    // country or their access isn't 'basic_admin' then the checkbox cannot be
+                    // modified by this user
+                    'basic_admin' == this.props.store.access.countries?.[data.country_id]?.role ||
+                    this.props.store.is_superuser
                 )
             }
         }
 
         const get_role = (data) => {
+            // consumes rowData, returns the role currently assigned to a user (for role dropdown)
             if(data.type == 'country') {
+                // country role dropdown ('none' = individual programs only, 'user', or 'basic_admin')
                 const country_access = this.state.user_program_access.countries
                 if(!country_access[data.id]) {
+                    // none is the default (if they have no access) displays as "individual programs only"
                     return 'none'
                 } else {
                     return country_access[data.id].role
                 }
             } else {
+                // program role dropdown
+
                 const program_access = this.state.user_program_access.programs
-                if(!program_access[data.id]) {
-                    return this.props.store.program_role_choices[0].value
+                if(!program_access?.[data.id]?.has_access) {
+                    // if no access, show "No Access" option:
+                    return 'none';
                 } else {
                     return program_access[data.id].role
                 }
             }
         }
-
         return (
             <div className="tab-pane--react edit-user-programs">
                 <h2 className="no-bold">{user.name?user.name+': ':''}{gettext("Programs and Roles")}
@@ -472,7 +481,13 @@ export default class EditUserPrograms extends React.Component {
                             // # Translators: link to learn more about permissions-granting roles a user can be assigned
                             gettext('More information on Program Roles')} className="far fa-question-circle" />
                 </a></sup></h2>
-
+                {user.is_super ?
+                    <div className="edit-user-programs__superuser-notice"><strong className="text-danger">{
+                        // # Translators: A message explaining why the roles and options menu is not displayed for the current user
+                        gettext("Program and role options are not displayed because Super Admin permissions override all available settings.")
+                    }
+                    </strong></div> :
+                <React.Fragment>
                 <div className="edit-user-programs__filter-form">
                     <div className="edit-user-programs__country-filter form-group react-multiselect-checkbox">
                         <CheckboxedMultiSelect placeholder={
@@ -571,7 +586,7 @@ export default class EditUserPrograms extends React.Component {
                                     id: rowData.id,
                                     disabled: is_role_disabled(rowData),
                                     type: rowData.type,
-                                    options: rowData.options,
+                                    options: this.getRoleOptions.call(this, rowData),
                                     action: (rowData.type == "country")?this.changeCountryRole.bind(this):this.changeProgramRole.bind(this)
                                 })}
                                 cellRenderer={({cellData}) =>
@@ -592,6 +607,7 @@ export default class EditUserPrograms extends React.Component {
                     <button type="button" className="btn btn-primary" onClick={() => this.saveForm()}>Save Changes</button>
                     <button type="button" className="btn btn-reset" onClick={() => this.resetForm()}>Reset</button>
                 </div>
+                </React.Fragment>}
 
             </div>
         )

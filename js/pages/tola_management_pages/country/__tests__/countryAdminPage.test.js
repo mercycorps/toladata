@@ -13,11 +13,43 @@ jest.mock('../api');
 import {create_unified_changeset_notice} from '../../../../components/changesetNotice';
 jest.mock('../../../../components/changesetNotice')
 
+// called on init of countrystore every time:
 api.fetchCountries.mockResolvedValue([
         {id: 100, country: "First Country"},
         {id: 101, country: "Second Country"},
     ]);
-api.updateDisaggregation.mockResolvedValue(() => ({data: []}));
+// code in models.js compares received id with sent id to validate save, this ensures it has the right id:
+api.updateDisaggregation.mockImplementation((id, disaggregation_data) => {
+    return Promise.resolve({
+        data: {
+            id: id,
+            ...disaggregation_data
+        }
+    });
+});
+// this just needs to be mocked so the call doesn't throw
+api.fetchCountryHistory.mockResolvedValue(() => ({data: []}));
+
+/* This mock prevents react-beautiful-dnd warnings in test (comes from mounting
+ * without a root dom node, this mock silences them but doesn't allow testing of
+ * drag-and-drop functionality
+ */
+jest.mock('react-beautiful-dnd', () => ({
+    Droppable: ({ children }) => children({
+    draggableProps: {
+      style: {},
+    },
+    innerRef: jest.fn(),
+  }, {}),
+  Draggable: ({ children }) => children({
+    draggableProps: {
+      style: {},
+    },
+    innerRef: jest.fn(),
+  }, {}),
+  DragDropContext: ({ children }) => children,
+}));
+
 
 describe("Country admin update/create methods ", () => {
     let store = new CountryStore(api, {});
@@ -75,13 +107,14 @@ describe("Country admin update/create methods ", () => {
         expect(api.updateDisaggregation).toHaveBeenCalled();
     });
     it("prevent creation of disagg types of same name in same country", () => {
-        store.createDisaggregation(
+        // this _should_ reject with a "validation failed" message:
+        expect(store.createDisaggregation(
             {
                 disaggregation_type: "C1 Second Disaggregation",
                 labels: [{label: "First"}, {label: "Second"}],
                 country: 100
             }
-        );
+        )).rejects.toBe('Validation failed');
         expect(api.createDisaggregation).not.toHaveBeenCalled();
     });
 
@@ -145,8 +178,8 @@ describe("Country admin retroactive disagg features in store", () => {
 
     it("clears selected programs when selected by default is unchecked", () => {
         const programsForRetro = [
-            {id: 200, name: "Program 1", checked: false},
-            {id: 201, name: "Program 2", checked: false}
+            {id: 200, name: "Program 1", checked: false, active: true},
+            {id: 201, name: "Program 2", checked: false, active: true}
         ];
         let expectedValues = {
             200: {id: 200, name: "Program 1", checked: false},
@@ -181,8 +214,8 @@ describe("Country admin disagg presentation components", () => {
 
         const disaggregation = store.editing_disaggregations_data[0];
         const programsForRetro = [
-            {id: 200, name: "Program 1", checked: false},
-            {id: 201, name: "Program 2", checked: false}
+            {id: 200, name: "Program 1", checked: false, active: true},
+            {id: 201, name: "Program 2", checked: false, active: true}
         ];
         disaggregation.id = "1";
         let wrapper = shallow(<DisaggregationType
@@ -201,11 +234,11 @@ describe("Country admin disagg presentation components", () => {
             errors={{}}
         />);
         expect(wrapper.containsMatchingElement(<RetroProgramCheckBoxWrapper />)).toEqual(true);
-        expect(wrapper.find('.disaggregation--programs__header').hasClass('disabled')).toEqual(true);
+        expect(wrapper.find('.disaggregation--programs__header').find('.disaggregation--programs__header-text').hasClass('disabled')).toEqual(true);
 
         wrapper.setState({selected_by_default: true});
         expect(wrapper.containsMatchingElement(<RetroProgramCheckBoxWrapper />)).toEqual(true);
-        expect(wrapper.find('.disaggregation--programs__header').hasClass('disabled')).toEqual(false);
+        expect(wrapper.find('.disaggregation--programs__header').find('.disaggregation--programs__header-text').hasClass('disabled')).toEqual(false);
     });
 
     it("displays programs in alpha order", () => {

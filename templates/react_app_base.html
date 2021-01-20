@@ -3,6 +3,7 @@
 {% load render_bundle from webpack_loader %}
 {% block title %}{{page_title}}{% endblock %}
 {% block page_title %}{% endblock %}
+{% block site_area %}{% if site_area %}{{site_area}}{% else %}react undefined{% endif %}{% endblock %}
 
 {% block mainclasses %}region--full-width{% endblock %}
 {% block region_header %}{% endblock %}
