@@ -66,7 +66,7 @@ const create_unified_changeset_notice = ({
     cancel_text = gettext('Cancel'),
     context = null,
     notice_type = 'notice', // possible values: error (danger/red), info (blue), success (green), notice (warning/yellow)
-    modal = false, // if set to true, notice will act like a modal with the rest of the page inactive until the notice is responded to
+    modal = null, // Default behavior is to use a modal if confirm_text is truthy and modal is null.  User can pass in true or false to override default.
     blocking = true,
     self_dismissing = false, // automatically hides the notice after 8000 ms (default). NOTE: this is the OPPOSITE behavior as default PNotify
     dismiss_delay = 8000, // also PNotify default
@@ -210,6 +210,10 @@ const create_unified_changeset_notice = ({
         changeset_buttons.push(cancel_button)
     }
 
+    if (confirm_text && modal === null){
+        modal = true;
+    }
+
     var notice = PNotify.alert({
         text: $(`<div><form action="" method="post" class="form">${inner}</form></div>`).html(),
         textTrusted: true,
@@ -250,7 +254,23 @@ const create_unified_changeset_notice = ({
         nonSelectedText: gettext('None selected')
     });
 
+    /*
+    PNotify uses scrollwidth rather than e.g. offsetWidth to determine the size of the grey modal overlay.  This
+    is good for full page modals but ca lead to the wrong sizing when there is already a modal active, e.g. the
+    results form.  SetTimeout is used to ensure the overlay is mounted before adjusting its width and height.
+    Even with a delay of 100, the overlay wasn't consistently mounted, which is why the delay is set so high.
+    Unfortunately, this does lead to a slight flash of the default overlay.
 
+    This might be done with a pnotify:X event if we upgrade to PNotify v5.
+     */
+    window.setTimeout(() => {
+        let overlayNode = $('.ui-pnotify-modal-overlay')
+        let overlayWidth = context?.offsetWidth || null;
+        if (overlayNode.length > 0 && overlayWidth) {
+            $('.ui-pnotify-modal-overlay').css('width', context.offsetWidth-3)
+            $('.ui-pnotify-modal-overlay').css('height', context.offsetHeight-1)
+        }
+    }, 200)
 
     if (on_cancel) {
         notice.on('click', function(e) {

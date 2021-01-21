@@ -74,7 +74,7 @@
             message_text: DELETE_RESULT_MESSAGE,
             include_rationale: true,
             rationale_required: true,
-            context: document.getElementById('result_update_form'),
+            context: document.getElementById('indicator_modal_body'),
             notice_type: 'error',
             on_submit: (rationale) => {
                 // Mark the record being changed so results table is reloaded on modal close
@@ -456,7 +456,7 @@
             window.create_unified_changeset_notice({
                 preamble: preambleText,
                 message_text: messageText,
-                context: document.getElementById('result_update_form'),
+                context: document.getElementById('indicator_results_content'),
                 on_submit: (rationale) => {resolve(rationale);},
                 on_cancel: () => {reject('cancel')},
                 notice_type: "notice",
