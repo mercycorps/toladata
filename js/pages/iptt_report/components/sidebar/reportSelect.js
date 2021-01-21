@@ -14,7 +14,7 @@ const ProgramSelect = inject('filterStore')(
                 label={ gettext('Program') }
                 options={ filterStore.programOptions }
                 value={ filterStore.selectedProgramOption }
-                update={ selected => { filterStore.selectedProgramOption = selected, filterStore.pulse();} }
+                update={ selected => { filterStore.selectedProgramOption = selected;} }
             />
         );
     })
@@ -37,7 +37,7 @@ const FrequencySelect = inject('filterStore')(
                 options={ filterStore.frequencyOptions }
                 disabled={ filterStore.frequencyDisabled }
                 value={ filterStore.selectedFrequencyOption }
-                update={ selected => { filterStore.selectedFrequencyOption = selected, filterStore.pulse(); } }
+                update={ selected => { filterStore.selectedFrequencyOption = selected;} }
             />
         );
     })
@@ -101,10 +101,10 @@ class TimeframeRadio extends React.Component {
                     <div className="form-check form-check-inline pt-1">
                         <span className="form-check-input">
                             <input type="radio"
-                                   checked={ !this.state.focus && this.props.filterStore.showAll }
-                                   disabled={ this.props.filterStore.periodsDisabled }
-                                   onChange={ e => { this.props.filterStore.showAll = true, this.props.filterStore.shine(); } }
-                                   />
+                                checked={ !this.state.focus && this.props.filterStore.showAll }
+                                disabled={ this.props.filterStore.periodsDisabled }
+                                onChange={ e => { this.props.filterStore.showAll = true;} }
+                            />
                         </span>
                         <label onClick={ e => {this.props.filterStore.showAll = true} }
                                className="form-check-label text-nowrap">
@@ -162,9 +162,8 @@ const StartDateSelect = inject('filterStore')(
                     }
                     disabled={ filterStore.periodsDisabled }
                     value={ filterStore.startPeriodValue || '' }
-                    update={ e => {filterStore.startPeriodValue = e.target.value, filterStore.trace();} }
+                    update={ e => {filterStore.startPeriodValue = e.target.value;} }
                     options={ filterStore.startOptions }
-                    animation={filterStore._trace}
                 />
     })
 );
@@ -182,7 +181,7 @@ const EndDateSelect = inject('filterStore')(
                     }
                     disabled={ filterStore.periodsDisabled }
                     value={ filterStore.endPeriodValue || '' }
-                    update={ e => {filterStore.endPeriodValue = e.target.value, filterStore.shine();} }
+                    update={ e => {filterStore.endPeriodValue = e.target.value;} }
                     options={ filterStore.endOptions }
                 />
     })
@@ -197,8 +196,7 @@ const GroupingSelect = inject('filterStore')(
         return <GroupBySelect
                     chainLabel={ filterStore.resultChainFilterLabel }
                     value={ filterStore.groupBy }
-                    update={ e => { filterStore.groupBy = e.target.value, filterStore.glow();} }
-                    animation={filterStore._glow}
+                    update={ e => { filterStore.groupBy = e.target.value;} }
                 />
     })
 );

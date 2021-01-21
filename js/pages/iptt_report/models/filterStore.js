@@ -312,9 +312,11 @@ export default (
             startPeriod = !isNaN(parseInt(startPeriod)) ? parseInt(startPeriod) : 0;
             if (this._lastPeriod !== null) {
                 this._start = Math.max(0, Math.min(this._lastPeriod, startPeriod));
+                !this.showAll ? this.shade() : null;
             }
             if (this.endPeriodValue && this.startPeriodValue > this.endPeriodValue) {
                 this.endPeriodValue = this.startPeriodValue;
+                !this.showAll ? this.shade() : null;
             }
         },
         get endPeriod() {
@@ -332,6 +334,7 @@ export default (
             endPeriod = !isNaN(parseInt(endPeriod)) ? parseInt(endPeriod) : this._lastPeriod;
             if (this._lastPeriod !== null) {
                 this._end = Math.max((this.startPeriodValue || 0), Math.min(this._lastPeriod, endPeriod));
+                !this.showAll ? this.shade() : null;
             }
         },
         setTimeframe({mostRecent = null, showAll = null} = {}) {
@@ -364,6 +367,7 @@ export default (
             return this.resultsFramework ? this._groupBy : null;
         },
         set groupBy(groupBy) {
+            this.shade();
             this._groupBy = parseInt(groupBy) === GROUP_BY_LEVEL ? GROUP_BY_LEVEL : GROUP_BY_CHAIN;
         },
         get allLevels() {
