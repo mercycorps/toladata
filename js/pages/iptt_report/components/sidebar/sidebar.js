@@ -3,9 +3,7 @@ import IPTTFilterForm from './filterForm';
 
 export default () => {
     return (
-        <div className="sidebar_container" 
-        // style={{height: "100vh"}}
-        >
+        <div className="sidebar_container">
             <div className="sidebar_wrapper">
                 <div className="collapse width show" id="sidebar">
                     <IPTTFilterForm />
