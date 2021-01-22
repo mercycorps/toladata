@@ -1,24 +1,20 @@
-.glow {
-    animation: glowing 2s ease-out;
+// Shade animation to lighten compnonent 
+.shade {
+animation: shade 1s ease;
 }
-@keyframes glowing {
-    0% {
-      box-shadow: 0 0 0 0 $teal-400;
-    }
-    25% {
-      box-shadow: 0 0 30px 5px $teal-400;
-    }
-    50% {
-      box-shadow: 0 0 30px 1px $teal-600;
-    }
-    75% {
-      box-shadow: 0 0 30px 5px $teal-400;
-    }
-    100% {
-      box-shadow: 0 0 0 0 $teal-400;
-    }
-  }
+@keyframes shade {
+0% {
+  opacity: 1.0;
+}
+50% {
+  opacity: 0.3;
+}
+100% {
+  opacity: 1.0;
+}
+}
 
+// Teal Pulse animation moving to the right
 .pulse {
     animation: pulse 3s linear;
     animation-iteration-count: 1;
@@ -38,35 +34,7 @@
     }
 }
 
-.trace {
-    padding: 2px;
-    background-color: #00a49f; /* teal */
-    /* Single pixel data uri image http://jsfiddle.net/LPxrT/ 
-    /* background-image: teal, teal, white */
-    background-image: 
-        url('data:image/gif;base64,R0lGODlhAQABAPAAAACkn////yH5BAAAAAAALAAAAAABAAEAAAICRAEAOw=='), 
-        url('data:image/gif;base64,R0lGODlhAQABAPAAAACkn////yH5BAAAAAAALAAAAAABAAEAAAICRAEAOw=='),
-        url('data:image/gif;base64,R0lGODlhAQABAPAAAFRYWv///yH5BAAAAAAALAAAAAABAAEAAAICRAEAOw==');
-    background-repeat: no-repeat;
-    background-size: 2% 0, 0 0, 0% 2%;
-    background-position: center left, center left, center right;
-    animation: trace 1s ease-in-out;
-  }
-  @keyframes trace {
-      0% {
-        background-size: 2% 0, 0 0, 100% 100%;
-      }
-      20% {
-        background-size: 2% 98%, 0 100%, 100% 100%;
-      }
-      66% {
-        background-size: 2% 98%, 98% 100%, 100% 100%;
-      }
-      99% {
-        background-size: 2% 98%, 98% 100%, 2% 0;
-      }
-  }
-
+// Red and teal animation around a component. 
 .shine-wrapper {
   padding-top: 10px;
   width: auto;
@@ -107,22 +75,7 @@
   }
 }
 @keyframes shine {
-    to {
-      background-position: 200% center;
-    }
-}
-
-.shade {
-  animation: shade 1s ease;
-}
-@keyframes shade {
-  0% {
-    opacity: 1.0;
-  }
-  50% {
-    opacity: 0.3;
-  }
-  100% {
-    opacity: 1.0;
+  to {
+    background-position: 200% center;
   }
 }

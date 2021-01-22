@@ -40,16 +40,13 @@ const IPTTFilterForm = inject('filterStore')(
     observer(({ filterStore }) => {
         return (
             <nav id="id_iptt_report_filter">
-                <div className="shine-wrapper">
-                    <div className={("shine-border").concat(filterStore._shine ? "-on" : "")}></div>
-                    <div className="shine-element p-3 " id="filter-top">
-                        <h3 className="filter-title text-title-case">
-                            {
-                            /* # Translators: Labels a set of filters to select which data to show */
-                            gettext('Report Options') }
-                        </h3>
-                        <FilterTop />
-                    </div>
+                <div className="p-3 " id="filter-top">
+                    <h3 className="filter-title text-title-case">
+                        {
+                        /* # Translators: Labels a set of filters to select which data to show */
+                        gettext('Report Options') }
+                    </h3>
+                    <FilterTop />
                 </div>
                 <div id="filter-middle" className="px-3 pt-3 pb-2">
                     <FilterMiddle />
@@ -63,15 +60,15 @@ const IPTTFilterForm = inject('filterStore')(
                         action={ filterStore.clearFilters.bind(filterStore) }
                         isDisabled={ !filterStore.filtersActive }
                     />
-              </div>
-              { filterStore.programFilterData && (
-              <div id="filter-extra" className=" d-flex justify-content-between no-gutters p-3">
-                  <a href={ `/tola_management/audit_log/${filterStore.selectedProgramId}/` }
-                      className="btn-link">
-                      <i className="fas fa-history"></i> {gettext("Change log")}
-                  </a>
-              </div>
-              )}
+                </div>
+                { filterStore.programFilterData && (
+                    <div id="filter-extra" className=" d-flex justify-content-between no-gutters p-3">
+                        <a href={ `/tola_management/audit_log/${filterStore.selectedProgramId}/` }
+                            className="btn-link">
+                            <i className="fas fa-history"></i> {gettext("Change log")}
+                        </a>
+                    </div>
+                )}
             </nav>
         );
     })

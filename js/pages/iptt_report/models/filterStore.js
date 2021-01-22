@@ -70,35 +70,7 @@ export default (
         _indicatorFilters: {},
         _hiddenColumns: [],
         _hiddenCategories: false,
-        _glow: "",
-        _pulse: "",
-        _trace: "",
-        _shine: "",
         _shade: "",
-        glow(){
-            this._glow="glow";
-            setTimeout(() => {
-                this._glow = "";
-            }, 3000)
-        },
-        pulse(){
-            this._pulse="pulse";
-            setTimeout(() => {
-                this._pulse = "";
-            }, 1000)
-        },
-        trace(){
-            this._trace="trace";
-            setTimeout(() => {
-                this._trace = "";
-            }, 1000)
-        },
-        shine(){
-            this._shine="shine";
-            setTimeout(() => {
-                this._shine = "";
-            }, 3000)
-        },
         shade(){
             this._shade="shade";
             setTimeout(() => {
@@ -312,11 +284,11 @@ export default (
             startPeriod = !isNaN(parseInt(startPeriod)) ? parseInt(startPeriod) : 0;
             if (this._lastPeriod !== null) {
                 this._start = Math.max(0, Math.min(this._lastPeriod, startPeriod));
-                !this.showAll ? this.shade() : null;
+                this.shade();
             }
             if (this.endPeriodValue && this.startPeriodValue > this.endPeriodValue) {
                 this.endPeriodValue = this.startPeriodValue;
-                !this.showAll ? this.shade() : null;
+                this.shade();
             }
         },
         get endPeriod() {
@@ -335,6 +307,7 @@ export default (
             if (this._lastPeriod !== null) {
                 this._end = Math.max((this.startPeriodValue || 0), Math.min(this._lastPeriod, endPeriod));
                 !this.showAll ? this.shade() : null;
+                this.shade();
             }
         },
         setTimeframe({mostRecent = null, showAll = null} = {}) {
