@@ -49,8 +49,13 @@ class Command(BaseCommand):
         prog_logs_with_deleted_fields = ProgramAdminAuditLog.objects \
             .filter(Q(admin_user__isnull=True) | Q(program__isnull=True))
 
+        # Look for missing fields as long as they're not
         user_logs_with_deleted_fields = UserManagementAuditLog.objects \
-            .filter(Q(admin_user__isnull=True) | Q(modified_user__isnull=True))
+            .filter(
+                (Q(admin_user__isnull=True) | Q(modified_user__isnull=True))
+                & ~Q(change_type='user_created')
+                & ~Q(previous_entry='[]')
+            )
 
         # todo: do a weekly and daily
         # todo: counts top, detail at bottom
