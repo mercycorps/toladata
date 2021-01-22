@@ -119,7 +119,7 @@
                 header: gettext('Warning'),
                 preamble: CLOSE_BEFORE_SAVING_WARNING_PREAMBLE,
                 message_text: CLOSE_BEFORE_SAVING_WARNING_MESSAGE,
-                context: document.getElementById('indicator_update_form'),
+                context: document.getElementById('indicator_modal_content'),
                 rationale_required: false,
                 notice_type: 'error',
                 on_submit: () => {
@@ -195,7 +195,7 @@
                 header: gettext('Warning'),
                 preamble: [DESTRUCTIVE_PREAMBLE, DELETE_INDICATOR_PREAMBLE].join(' '),
                 message_text: DELETE_INDICATOR_NO_RATIONALE,
-                context: document.getElementById('indicator_update_form'),
+                context: document.getElementById('indicator_modal_content'),
                 rationale_required: false,
                 notice_type: 'error',
                 on_submit: delete_indicator
@@ -208,7 +208,7 @@
                 rationale_required: true,
                 include_rationale: true,
                 message_text: DELETE_INDICATOR_MESSAGE,
-                context: document.getElementById('indicator_update_form'),
+                context: document.getElementById('indicator_modal_content'),
                 on_submit: delete_indicator,
                 notice_type: 'error',
             });
@@ -265,7 +265,7 @@
                 show_icon: true,
                 preamble: DESTRUCTIVE_PREAMBLE,
                 message_text: DELETE_TARGET_NO_RATIONALE,
-                context: document.getElementById('indicator_update_form'),
+                context: document.getElementById('indicator_modal_content'),
                 rationale_required: false,
                 include_rationale: false,
                 notice_type: 'error',
@@ -282,7 +282,7 @@
                 show_icon: true,
                 preamble: DESTRUCTIVE_PREAMBLE,
                 message_text: DELETE_TARGET_NO_RATIONALE,
-                context: document.getElementById('indicator_update_form'),
+                context: document.getElementById('indicator_modal_content'),
                 rationale_required: false,
                 include_rationale: false,
                 notice_type: 'error',
@@ -308,7 +308,7 @@
                 show_icon: true,
                 preamble: numResultsLinkedToEventTarget === 0 ? DESTRUCTIVE_PREAMBLE : window.target_with_results_text(numResultsLinkedToEventTarget),
                 message_text: DELETE_TARGET_MESSAGE,
-                context: document.getElementById('indicator_update_form'),
+                context: document.getElementById('indicator_modal_content'),
                 rationale_required: true,
                 include_rationale: true,
                 notice_type: 'error',
@@ -353,7 +353,7 @@
                 header: gettext('Warning'),
                 preamble: DESTRUCTIVE_PREAMBLE,
                 message_text: DELETE_ALL_TARGETS_MESSAGE,
-                context: document.getElementById('indicator_update_form'),
+                context: document.getElementById('indicator_modal_content'),
                 include_rationale: true,
                 rationale_required: true,
                 on_submit: actionCb,
@@ -366,7 +366,7 @@
                 show_icon: true,
                 preamble: DESTRUCTIVE_PREAMBLE,
                 message_text: DELETE_TARGETS_NO_RATIONALE,
-                context: document.getElementById('indicator_update_form'),
+                context: document.getElementById('indicator_modal_content'),
                 notice_type: 'error',
                 rationale_required: false,
                 on_submit: actionCb
@@ -397,7 +397,7 @@
                     rfc_required: true,
                     rfc_options: true,
                     validation_type: 1,
-                    context: document.getElementById('indicator_update_form'),
+                    context: document.getElementById('indicator_modal_content'),
                     notice_type: 'error',
                     on_submit: (rationale, reasons_for_change, validation_type) => {
                         submitFormUpdate(rationale, reasons_for_change, validation_type);
@@ -414,7 +414,7 @@
                     rfc_required: true,
                     rfc_options: true,
                     validation_type: 1,
-                    context: document.getElementById('indicator_update_form'),
+                    context: document.getElementById('indicator_modal_content'),
                     on_submit: (rationale, reasons_for_change, validation_type) => {
                         submitFormUpdate(rationale, reasons_for_change, validation_type);
                     }
@@ -433,7 +433,7 @@
                 rfc_required: true,
                 rfc_options: true,
                 validation_type: 1,
-                context: document.getElementById('indicator_update_form'),
+                context: document.getElementById('indicator_modal_content'),
                 on_submit: (rationale, reasons_for_change, validation_type) => {
                     submitFormUpdate(rationale, reasons_for_change, validation_type);
                 }
