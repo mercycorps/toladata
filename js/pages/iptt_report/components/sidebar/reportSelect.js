@@ -101,10 +101,10 @@ class TimeframeRadio extends React.Component {
                     <div className="form-check form-check-inline pt-1">
                         <span className="form-check-input">
                             <input type="radio"
-                                   checked={ !this.state.focus && this.props.filterStore.showAll }
-                                   disabled={ this.props.filterStore.periodsDisabled }
-                                   onChange={ e => { this.props.filterStore.showAll = true } }
-                                   />
+                                checked={ !this.state.focus && this.props.filterStore.showAll }
+                                disabled={ this.props.filterStore.periodsDisabled }
+                                onChange={ e => { this.props.filterStore.showAll = true;} }
+                            />
                         </span>
                         <label onClick={ e => {this.props.filterStore.showAll = true} }
                                className="form-check-label text-nowrap">

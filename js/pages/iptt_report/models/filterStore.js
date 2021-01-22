@@ -70,6 +70,13 @@ export default (
         _indicatorFilters: {},
         _hiddenColumns: [],
         _hiddenCategories: false,
+        _shade: "",
+        shade(){
+            this._shade="shade";
+            setTimeout(() => {
+                this._shade = "";
+            }, 1000)
+        },
         get isTVA() {
             return this._reportType === TVA;
         },
@@ -277,9 +284,11 @@ export default (
             startPeriod = !isNaN(parseInt(startPeriod)) ? parseInt(startPeriod) : 0;
             if (this._lastPeriod !== null) {
                 this._start = Math.max(0, Math.min(this._lastPeriod, startPeriod));
+                this.shade();
             }
             if (this.endPeriodValue && this.startPeriodValue > this.endPeriodValue) {
                 this.endPeriodValue = this.startPeriodValue;
+                this.shade();
             }
         },
         get endPeriod() {
@@ -297,6 +306,7 @@ export default (
             endPeriod = !isNaN(parseInt(endPeriod)) ? parseInt(endPeriod) : this._lastPeriod;
             if (this._lastPeriod !== null) {
                 this._end = Math.max((this.startPeriodValue || 0), Math.min(this._lastPeriod, endPeriod));
+                this.shade();
             }
         },
         setTimeframe({mostRecent = null, showAll = null} = {}) {
@@ -329,6 +339,7 @@ export default (
             return this.resultsFramework ? this._groupBy : null;
         },
         set groupBy(groupBy) {
+            this.shade();
             this._groupBy = parseInt(groupBy) === GROUP_BY_LEVEL ? GROUP_BY_LEVEL : GROUP_BY_CHAIN;
         },
         get allLevels() {
@@ -405,6 +416,7 @@ export default (
             this._indicatorFilters.tiers = this.resultsFramework ? tiers : [];
             this._indicatorFilters.levels = this.resultsFramework ? levels : [];
             this._indicatorFilters.oldLevels = this.resultsFramework ? [] : oldLevels;
+            this.shade();
         },
         get sectorOptions() {
             let sectorPks = [...new Set(this.getAllIndicators('sectors')
@@ -422,6 +434,7 @@ export default (
         },
         set sectorFilters(sectorFilterValues = []) {
             this._indicatorFilters.sectors = sectorFilterValues.map(v => parseInt(v));
+            this.shade();
         },
         get siteOptions() {
             let sitePks = [...new Set(this.getAllIndicators('sites').map(
@@ -439,6 +452,7 @@ export default (
         },
         set siteFilters(siteFilterValues = []) {
             this._indicatorFilters.sites = siteFilterValues.map(v => parseInt(v));
+            this.shade();
         },
         get disaggregationOptions() {
             let disaggregationPks = [...new Set(this.getAllIndicators('disaggregations').map(
@@ -490,6 +504,7 @@ export default (
         set disaggregationFilters(disaggregationFilterValues = []) {
             this._indicatorFilters.disaggregations = disaggregationFilterValues.filter(v => (v != 'hide-categories' && v != 'NaN' && !isNaN(parseInt(v)))).map(v => parseInt(v));
             this._hiddenCategories = disaggregationFilterValues.includes('hide-categories');
+            this.shade();
         },
         get indicatorTypeOptions() {
             let typePks = [...new Set(this.getAllIndicators('types').map(
@@ -507,6 +522,7 @@ export default (
         },
         set indicatorTypeFilters(indicatorTypeFilterValues = []) {
             this._indicatorFilters.indicatorTypes = indicatorTypeFilterValues.map(v => parseInt(v));
+            this.shade();
         },
         _filterFrequency(indicators) {
             indicators = indicators || [];
@@ -668,6 +684,7 @@ export default (
         },
         set indicatorFilters(indicatorFilterValues = []) {
             this._indicatorFilters.indicators = indicatorFilterValues.map(v => parseInt(v));
+            this.shade();
         },
         clearFilters() {
             this._indicatorFilters = {
@@ -681,6 +698,7 @@ export default (
                 indicators: []
             };
             this._hiddenCategories = false;
+            this.shade();
         },
         get filtersActive() {
             return Object.values(this._indicatorFilters).reduce((a, b) => a + b.length, 0) > 0 || this._hiddenCategories;
@@ -699,6 +717,7 @@ export default (
         },
         set hiddenColumns(hiddenColumnOptions = []) {
             this._hiddenColumns = hiddenColumnOptions.map(v => parseInt(v));
+            this.shade();
         },
         get pathParams() {
             let params = {
