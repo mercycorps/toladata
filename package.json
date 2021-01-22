@@ -28,6 +28,7 @@
         "cpx-pnotify-core-js": "cpx \"node_modules/pnotify/dist/iife/PNotify.{js,js.map}\" $npm_package_config_js",
         "cpx-pnotify-buttons-js": "cpx \"node_modules/pnotify/dist/iife/PNotifyButtons.{js,js.map}\" $npm_package_config_js",
         "cpx-pnotify-confirm-js": "cpx \"node_modules/pnotify/dist/iife/PNotifyConfirm.{js,js.map}\" $npm_package_config_js",
+        "cpx-pnotify-callbacks-js": "cpx \"node_modules/pnotify/dist/iife/PNotifyCallbacks.{js,js.map}\" $npm_package_config_js",
         "copy": "npm-run-all cpx-*",
         "build": "npm run build:prod; npm run build:dev",
         "build:prod": "./node_modules/.bin/webpack --config webpack.prod.js --mode production",

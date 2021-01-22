@@ -224,7 +224,7 @@ const create_unified_changeset_notice = ({
         type: notice_type,
         addClass: 'program-page__rationale-form',
         stack: {
-            'overlayClose': !modal,
+            'overlayClose': false, // Set to false because clicking on the overlay doesn't seem to trigger the on_cancel function, which is necessary in some cases
             'dir1': dir1,
             'dir2': dir2,
             'firstpos1': 20,
@@ -242,6 +242,9 @@ const create_unified_changeset_notice = ({
                 align: 'flex-start',
                 confirm: true,
                 buttons: changeset_buttons
+            },
+            Callbacks: {
+                afterOpen: expandOverlay
             }
         }
     });
@@ -254,23 +257,6 @@ const create_unified_changeset_notice = ({
         nonSelectedText: gettext('None selected')
     });
 
-    /*
-    PNotify uses scrollwidth rather than e.g. offsetWidth to determine the size of the grey modal overlay.  This
-    is good for full page modals but ca lead to the wrong sizing when there is already a modal active, e.g. the
-    results form.  SetTimeout is used to ensure the overlay is mounted before adjusting its width and height.
-    Even with a delay of 100, the overlay wasn't consistently mounted, which is why the delay is set so high.
-    Unfortunately, this does lead to a slight flash of the default overlay.
-
-    This might be done with a pnotify:X event if we upgrade to PNotify v5.
-     */
-    window.setTimeout(() => {
-        let overlayNode = $('.ui-pnotify-modal-overlay')
-        let overlayWidth = context?.offsetWidth || null;
-        if (overlayNode.length > 0 && overlayWidth) {
-            $('.ui-pnotify-modal-overlay').css('width', context.offsetWidth-3)
-            $('.ui-pnotify-modal-overlay').css('height', context.offsetHeight-1)
-        }
-    }, 200)
 
     if (on_cancel) {
         notice.on('click', function(e) {
@@ -285,6 +271,37 @@ const create_unified_changeset_notice = ({
 
     return notice;
 
+}
+
+/*
+Ran into a few issues to be aware of related to modal notices.
+
+PNotify uses scrollWidth rather than e.g. offsetWidth to determine the size of the grey modal overlay.  This
+is fine for full page modals but can lead to the wrong sizing when there is already a modal active, e.g. the
+results form.  In addition, when the overlay is the same size as the underlying modal, once the PNotify is
+active, there is a modal on top of a modal, and if you click on the grey overlay of the lower modal,
+all modals close.  Then, when the base modal is reopened, the confirmation notification is still there
+because it never received a close signal.  This is why the overlay is being changed to fill the whole screen, so
+any click outside of the PNotify will apply to the notice, not to the underlying modal.
+
+Another issue was that trying to resize the overlay right after the the notice was created sometimes didn't work,
+presumably because the overlay hadn't been created yet.  Even when using the afterOpen callback, a small
+setTimeout is needed to ensure the overlay is mounted before adjusting its width and height.
+ */
+function expandOverlay (n) {
+    setTimeout(() => {
+        let overlayNode = $('.ui-pnotify-modal-overlay')
+        if (overlayNode.length > 0) {
+            setTimeout(() => {
+                overlayNode.css({
+                    'position': 'fixed',
+                    'top': 0,
+                    'bottom': 0,
+                    'height': window.innerHeight,
+                    'width': window.innerWidth})
+            })
+        }
+    }, 50)
 }
 
 export { create_unified_changeset_notice };
