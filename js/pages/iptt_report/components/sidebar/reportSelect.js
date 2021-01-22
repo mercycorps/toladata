@@ -14,7 +14,7 @@ const ProgramSelect = inject('filterStore')(
                 label={ gettext('Program') }
                 options={ filterStore.programOptions }
                 value={ filterStore.selectedProgramOption }
-                update={ selected => { filterStore.selectedProgramOption = selected;} }
+                update={ selected => { filterStore.selectedProgramOption = selected } }
             />
         );
     })
@@ -37,7 +37,7 @@ const FrequencySelect = inject('filterStore')(
                 options={ filterStore.frequencyOptions }
                 disabled={ filterStore.frequencyDisabled }
                 value={ filterStore.selectedFrequencyOption }
-                update={ selected => { filterStore.selectedFrequencyOption = selected;} }
+                update={ selected => { filterStore.selectedFrequencyOption = selected; } }
             />
         );
     })

@@ -60,16 +60,14 @@ export const DateSelect = ( props ) => {
                 className="col-form-label text-uppercase">
                     { props.label }
             </label>
-            <div className={props.animation ? props.animation: null}>
-                <select
-                    className="form-control"
-                    id={ selectId }
-                    value={ props.value }
-                    onChange = { props.update }
-                    disabled = { props.disabled }>
-                    { formattedOptions }
-                </select>
-            </div>
+            <select
+                className="form-control"
+                id={ selectId }
+                value={ props.value }
+                onChange = { props.update }
+                disabled = { props.disabled }>
+                { formattedOptions }
+            </select>
         </div>
     );
 }
@@ -86,16 +84,14 @@ export const SingleSelect = ( props ) => {
                 className={ labelClass }>
                     { props.label }
             </label>
-            <div className={ props.animation ? props.animation: null }>
-                <select
-                    onChange={ props.update }
-                    value={ props.value }
-                    id={ selectId }
-                    className={ selectClass }
-                    disabled={ props.disabled }>
-                    { props.options }
-                </select>
-            </div>
+            <select
+                onChange={ props.update }
+                value={ props.value }
+                id={ selectId }
+                className={ selectClass }
+                disabled={ props.disabled }>
+                { props.options }
+            </select>
         </div>
     );
 }

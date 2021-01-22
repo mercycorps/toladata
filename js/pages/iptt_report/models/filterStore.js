@@ -306,7 +306,6 @@ export default (
             endPeriod = !isNaN(parseInt(endPeriod)) ? parseInt(endPeriod) : this._lastPeriod;
             if (this._lastPeriod !== null) {
                 this._end = Math.max((this.startPeriodValue || 0), Math.min(this._lastPeriod, endPeriod));
-                !this.showAll ? this.shade() : null;
                 this.shade();
             }
         },

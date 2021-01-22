@@ -57,7 +57,7 @@ const HiddenColumnSelect = inject('filterStore')(
                     }
                     options={ filterStore.hideColumnOptions }
                     value={ filterStore.hiddenColumns }
-                    update={ selected => {filterStore.hiddenColumns = selected.map(s => s.value), filterStore.shade();} }
+                    update={ selected => {filterStore.hiddenColumns = selected.map(s => s.value);} }
                 />;
     })
 );

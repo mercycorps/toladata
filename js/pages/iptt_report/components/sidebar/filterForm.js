@@ -40,7 +40,7 @@ const IPTTFilterForm = inject('filterStore')(
     observer(({ filterStore }) => {
         return (
             <nav id="id_iptt_report_filter">
-                <div className="p-3 " id="filter-top">
+                <div className="p-3" id="filter-top">
                     <h3 className="filter-title text-title-case">
                         {
                         /* # Translators: Labels a set of filters to select which data to show */
