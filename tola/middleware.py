@@ -36,6 +36,8 @@ class FailModeMiddleware(object):
 
     def __call__(self, request):
         response = self.get_response(request)
+        if not request.user or not request.user.is_superuser:
+            return response
         if (not request.is_ajax() and 'application/json' not in request.META['HTTP_ACCEPT']):
             return response
         if not settings.DEBUG:
