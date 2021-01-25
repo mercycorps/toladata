@@ -305,6 +305,8 @@ export class CountryStore {
                 this.saving = false;
                 this.editing_errors = {};
                 this.editing_target = response.data.id;
+                this.editing_disaggregations_data = [];
+                this.editing_objectives_data = [];
                 this.active_pane_is_dirty = false;
                 this.countries.shift();
                 this.countries.unshift(response.data);
