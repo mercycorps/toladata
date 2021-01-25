@@ -46,7 +46,7 @@ class FailModeMiddleware(object):
             return response
         # fail mode isn't supposed to interrupt regular page loads, only ajax / json requests:
         if (not request.is_ajax() and
-            'application/json' not in getattr(getattr(request, 'META', {}), 'HTTP_ACCEPT', [])):
+            'application/json' not in getattr(request, 'META', {}).get('HTTP_ACCEPT', [])):
             return response
         # if they haven't activated fail mode, don't fail:
         if not request.session.get('fail_mode', False):

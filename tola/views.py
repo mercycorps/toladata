@@ -213,6 +213,8 @@ def fail_mode_toggle(request):
     uri = request.get_host()
     if not any(["qa" in uri, "127." in uri, "local" in uri]):
         return JsonResponse({'success': False, 'error': 'Invalid environment'})
+    if not request.user.is_superuser:
+        return JsonResponse({'success': False, 'error': 'Insufficient permissions'})
     fail_mode = request.session.get('fail_mode', False)
     request.session['fail_mode'] = not fail_mode
     return JsonResponse({'success': True, 'fail_mode': not fail_mode})
