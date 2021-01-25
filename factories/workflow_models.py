@@ -116,6 +116,12 @@ class TolaUserFactory(DjangoModelFactory):
     )
     country = SubFactory(CountryFactory)
 
+    @post_generation
+    def password(obj, create, extracted, **kwargs):
+        if extracted:
+            obj.user.set_password(extracted)
+            obj.user.save()
+
 
 class ProgramFactory(DjangoModelFactory):
     class Meta:
