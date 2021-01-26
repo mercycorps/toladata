@@ -476,7 +476,7 @@
             // form is valid, first get rationale if necessary or '' otherwise:
             let posting = getRationale(false)
             // pass rationale into form submit (with empty failure handler in case user cancels):
-             .then((rationale) => {return submitResultForm(rationale)}, () => {})
+             .then((rationale) => {return submitResultForm(rationale)})
              // after all promises resolve (whether save was successful or not) undisable submit buttons:
              .finally(function(data) {
                 $('#result-submit-create').removeAttr('disabled');
