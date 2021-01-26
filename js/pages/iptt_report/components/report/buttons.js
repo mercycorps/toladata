@@ -28,10 +28,13 @@ class PinPopover extends React.Component {
         this.props.rootStore.pinAPI.savePin({
             name: this.state.reportName,
             ...this.props.rootStore.pinParams
-        }).then( () => {
+        }).then( (response) => {
             this.setState({status: this.SENT});
             this.props.updatePosition();
-        }).catch( () => {
+        }).catch( (err) => {
+            // TO DO: make this handle case where err=="DUPLICATE" to update box with the red strings from the ticket
+            // Note: the code below is the old "assume this failure was unexpected" handler, we should leave it in
+            // for cases where err != "DUPLICATE"
             this.setState({status: this.FAILED});
             console.log("ajax error:", ev);
         });
