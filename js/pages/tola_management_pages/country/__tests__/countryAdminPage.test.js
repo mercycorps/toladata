@@ -27,7 +27,7 @@ describe("Country admin new country create ", () => {
         expect(Object.keys(store.editing_disaggregations_errors).length).toBeGreaterThan(0);
         store.addCountry();
         expect(store.editing_objectives_data.length).toEqual(0);
-        expect(store.editing_objectives_data.length).toEqual(0);
+        expect(store.editing_disaggregations_data.length).toEqual(0);
         expect(Object.keys(store.editing_errors).length).toEqual(0);
         expect(Object.keys(store.editing_disaggregations_errors).length).toEqual(0);
     });
