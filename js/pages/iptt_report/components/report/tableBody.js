@@ -6,7 +6,7 @@ import { LevelGroup, IndicatorRow } from './tableRows';
 const ReportTableBody = inject('rootStore', 'filterStore')(
     observer(({ rootStore, filterStore }) => {
         return (
-        <tbody className={filterStore?._shade}>
+        <tbody className={rootStore._mounted ? (filterStore?._shade) : null}>
             {
                 rootStore.levelRows ?
                     rootStore.levelRows.map(

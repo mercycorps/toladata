@@ -15,6 +15,7 @@ export default (
         get filterStore() {return this._filterStore},
         _reportStore: getReportStore(reactContext.report || {}),
         _expandoRows: [],
+        _mounted: false,
         expandAllRows() {
             this._expandoRows.forEach(row => {row.expandRow()});
         },

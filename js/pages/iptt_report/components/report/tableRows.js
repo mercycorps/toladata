@@ -202,6 +202,9 @@ class IndicatorRow extends React.Component {
 
     componentDidMount() {
         this.props.rootStore._expandoRows.push(this);
+        setTimeout( () => 
+            this.props.rootStore._mounted = true
+        ,1500)
     }
 
     componentWillUnmount() {

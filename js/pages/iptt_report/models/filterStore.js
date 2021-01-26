@@ -339,8 +339,8 @@ export default (
             return this.resultsFramework ? this._groupBy : null;
         },
         set groupBy(groupBy) {
-            this.shade();
             this._groupBy = parseInt(groupBy) === GROUP_BY_LEVEL ? GROUP_BY_LEVEL : GROUP_BY_CHAIN;
+            this.shade();
         },
         get allLevels() {
             return (this.resultsFramework ?
