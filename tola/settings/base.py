@@ -370,13 +370,6 @@ LOGGING = {
             'class': 'logging.FileHandler',
             'filename': 'error.log',
             'formatter': 'standard'
-        },
-        'login_file': {
-            'level': 'DEBUG',
-            'class': 'logging.handlers.TimedRotatingFileHandler',
-            'filename': 'login.log',
-            'when': 'midnight',
-            'formatter': 'standard',
         }
     },
     'loggers': {
@@ -400,10 +393,5 @@ LOGGING = {
             'level': 'ERROR',
             'propagate': True,
         },
-        'login': {
-            'handlers': ['login_file'],
-            'level': 'DEBUG',
-            'propagate': True
-        }
     },
 }

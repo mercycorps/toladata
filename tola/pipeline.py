@@ -10,7 +10,7 @@ from workflow.models import TolaUser, Organization, Country
 from tola_management.models import UserManagementAuditLog
 
 logger = logging.getLogger('django')
-login_logger = logging.getLogger('login')
+
 
 def domains_allowed(backend, details, response, *args, **kwargs):
     if 'email' in details and details['email'] and len(details['email'].split('@')) > 1 and \
@@ -20,10 +20,11 @@ def domains_allowed(backend, details, response, *args, **kwargs):
             # redirects user to okta login if they are in OKTA domains
             return HttpResponseRedirect('/login/saml/?idp=okta')
 
+
 def create_user_okta(backend, details, user, response, *args, **kwargs):
     if backend.name == 'saml' and response.get('idp_name') == 'okta':
-        #annoyingly the attributes are coming back as arrays, so let's flatten them
-        attributes = {k: v[0] if len(v) > 0 else None for k,v in response['attributes'].items()}
+        # annoyingly the attributes are coming back as arrays, so let's flatten them
+        attributes = {k: v[0] if len(v) > 0 else None for k, v in response['attributes'].items()}
         savepoint = transaction.savepoint()
         created = False
         email = attributes['email']
@@ -52,10 +53,6 @@ def create_user_okta(backend, details, user, response, *args, **kwargs):
 
         if hasattr(user, 'tola_user'):
             tola_user = user.tola_user
-            login_logger.info(
-                "found user id %s for email %s with tola_user id %s",
-                user.id, email, tola_user.id
-            )
             previous_profile = tola_user.logged_fields
             previous_permissions = tola_user.logged_program_fields
         else:
@@ -109,11 +106,7 @@ def create_user_okta(backend, details, user, response, *args, **kwargs):
             transaction.savepoint_rollback(savepoint)
             logger.error("Exception while saving the TolaUser country of {}".format(email), e)
             return HttpResponseRedirect(reverse("invalid_user_okta"))
-        
-        login_logger.info(
-            "updated user id %s with first name %s and last name %s, returning from create_user_okta",
-            user.id, first_name, last_name
-        )
+
         return None
     else:
         return None
@@ -125,17 +118,9 @@ def associate_email_or_redirect(backend, details, user=None, *args, **kwargs):
         return None
     else:
         associated_user = associate_by_email(backend, details, user, *args, **kwargs)
-        login_logger.info(
-            "associate by email for details %s for user %s returned %s",
-            details, user, associated_user
-        )
         if associated_user is not None:
             return associated_user
         else:
-            login_logger.info(
-                'backend %s failed to find user %s with details %s',
-                backend.name, user, details
-            )
             return HttpResponseRedirect(reverse("invalid_user"))
 
 
@@ -151,11 +136,7 @@ def social_user_tola(backend, uid, user=None, *args, **kwargs):
             user = None
     # call the original social_user now that we know bad data has been expunged:
     social = social_user(backend, uid, user, *args, **kwargs)
-    login_logger.info(
-        '%s social_user for uid %s returned %s',
-        provider, uid,
-        str(list(social.items()))
-    )
+
     return social
 
 
