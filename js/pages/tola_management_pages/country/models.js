@@ -293,6 +293,10 @@ export class CountryStore {
             }
             this.countries.unshift(new_country_data)
             this.editing_target = 'new'
+            this.editing_disaggregations_data = [];
+            this.editing_objectives_data = [];
+            this.editing_errors = {};
+            this.editing_disaggregations_errors = {};
         }
     }
 
