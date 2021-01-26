@@ -8,12 +8,11 @@ export default class EditUserProfile extends React.Component {
     constructor(props) {
         super(props)
         const {userData} = props
-        const filtered_orgs = props.organizations.filter(o => o.value != 1 || props.is_superuser)
         let organization_listing = []
-        for (let org of filtered_orgs) {
+        for (let org of props.organizations) {
             let org_js = toJS(org);
             if (org_js.label === "Mercy Corps"){
-                // # Translators: This is an deactivated menu item visible to users, indicating that assignment of this option is manaaged by another system.
+                // # Translators: This is an deactivated menu item visible to users, indicating that assignment of this option is managed by another system.
                 org_js.label = gettext("Mercy Corps -- managed by Okta");
                 org_js.isDisabled = true;
             }
