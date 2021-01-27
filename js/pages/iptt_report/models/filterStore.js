@@ -71,11 +71,14 @@ export default (
         _hiddenColumns: [],
         _hiddenCategories: false,
         _shade: "",
+        _mounted: false,
         shade(){
             this._shade="shade";
-            setTimeout(() => {
-                this._shade = "";
-            }, 1000)
+            setTimeout(() => this._shade = "", 1000)
+        },
+        mounting(){
+            this._mounted = false;
+            setTimeout(() => this._mounted = true, 2000)
         },
         get isTVA() {
             return this._reportType === TVA;
@@ -123,6 +126,7 @@ export default (
         },
         set selectedProgramOption(option) {
             this.setProgramId(option.value);
+            this.mounting()
         },
         get programFilterData() {
             return this._programFilterDataStore.getProgramFilterData(this.selectedProgramId);
@@ -339,8 +343,8 @@ export default (
             return this.resultsFramework ? this._groupBy : null;
         },
         set groupBy(groupBy) {
-            this.shade();
             this._groupBy = parseInt(groupBy) === GROUP_BY_LEVEL ? GROUP_BY_LEVEL : GROUP_BY_CHAIN;
+            this.shade();
         },
         get allLevels() {
             return (this.resultsFramework ?
