@@ -14,7 +14,8 @@ class PinPopover extends React.Component {
         super(props);
         this.state = {
             reportName: '',
-            status: this.NOT_SENT
+            status: this.NOT_SENT,
+            error: "",
         };
     }
     handleChange = (e) => {
@@ -35,7 +36,10 @@ class PinPopover extends React.Component {
             // TO DO: make this handle case where err=="DUPLICATE" to update box with the red strings from the ticket
             // Note: the code below is the old "assume this failure was unexpected" handler, we should leave it in
             // for cases where err != "DUPLICATE"
-            this.setState({status: this.FAILED});
+            this.setState({
+                status: this.FAILED, 
+                error: err,
+            });
             console.log("ajax error:", ev);
         });
     }
@@ -50,7 +54,7 @@ class PinPopover extends React.Component {
                             <p><span>
 
                                 {/* # Translators: The user has successfully "pinned" a report link to a program page for quick access to the report */}
-                                {gettext('Success!  This report is now pinned to the program page')}
+                                {gettext('Success!  This report is now pinned to the program page.')}
 
                             </span></p>
                             <p><a href={ this.props.rootStore.pinAPI.programPageUrl }>
@@ -64,11 +68,21 @@ class PinPopover extends React.Component {
                 case this.FAILED:
                     return (
                         <div className="form-group">
-                            <p><span>
-                                {
-                                    gettext('Something went wrong when attempting to pin this report')
-                                }
-                            </span></p>
+                            { this.state.error === "DUPLICATE" ?
+                                <p><span className="text-danger">
+
+                                    {/* # Translators: An error occured because a report has already been pinned with that same name */}
+                                    {gettext('A pin with this name already exists.')}
+
+                                </span></p>
+                            :
+                                <p><span>
+
+                                    {/* # Translators: Some error occured when trying to pin the report*/}
+                                    {gettext('Something went wrong when attempting to pin this report.')}
+                                    
+                                </span></p>
+                            }
                         </div>
                     );
                 case this.NOT_SENT:
@@ -83,6 +97,7 @@ class PinPopover extends React.Component {
                                 </label>
                                 <input type="text" className="form-control"
                                      value={ this.state.reportName }
+                                     maxLength="50"
                                      onChange={ this.handleChange }
                                      disabled={ this.state.sending }/>
                             </div>
