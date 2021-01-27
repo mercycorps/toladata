@@ -91,18 +91,18 @@ class PinPopover extends React.Component {
                                      maxLength="50"
                                      onChange={ this.handleChange }
                                      disabled={ this.state.sending }/>
-                            </div>
-                            <div className="text-danger text-center">
-                                { this.state.error === "DUPLICATE" ?
-                                    <p><span>
+                                <div className="has-error">
+                                    { this.state.error === "DUPLICATE" ?
+                                        <span><small>
 
-                                        {/* # Translators: An error occured because a report has already been pinned with that same name */}
-                                        {gettext('A pin with this name already exists.')}
+                                            {/* # Translators: An error occured because a report has already been pinned with that same name */}
+                                            {gettext('A pin with this name already exists.')}
 
-                                    </span></p>
-                                    :
-                                    null
-                                }
+                                        </small></span>
+                                        :
+                                        null
+                                    }
+                                </div>
                             </div>
                             <button type="button"
                                         onClick={ this.handleClick }
