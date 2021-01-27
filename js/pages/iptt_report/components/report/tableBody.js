@@ -15,7 +15,6 @@ export default class ReportTableBody extends React.Component {
     }
 
     render() {
-        console.log("Shade:", this.props.filterStore._shade, "Mounted:", this.props.filterStore._mounted)
         return (
             <tbody className={this.props.filterStore._mounted ? (this.props.filterStore?._shade) : null}>
                 {
