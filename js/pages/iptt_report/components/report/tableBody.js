@@ -3,31 +3,40 @@ import { observer, inject } from 'mobx-react';
 
 import { LevelGroup, IndicatorRow } from './tableRows';
 
-const ReportTableBody = inject('rootStore', 'filterStore')(
-    observer(({ rootStore, filterStore }) => {
-        return (
-        <tbody className={rootStore._mounted ? (filterStore?._shade) : null}>
-            {
-                rootStore.levelRows ?
-                    rootStore.levelRows.map(
-                        (levelRow, index) => (
-                            <LevelGroup
-                                level={ levelRow.level }
-                                indicators={ levelRow.indicators }
-                                key={ index } />
-                        )
-                    )
-                :
-                    rootStore.indicatorRows.map(
-                        (indicator, index) => (
-                            <IndicatorRow indicator={ indicator } key={ index } />
-                                            
-                        )
-                    )
-            }
-        </tbody>
-        );
-    })
-);
+@inject('rootStore', 'filterStore')
+@observer
+export default class ReportTableBody extends React.Component {
+    constructor(props) {
+        super(props)
+    }
 
-export default ReportTableBody;
+    componentDidMount() {
+        this.props.filterStore.mounting();
+    }
+
+    render() {
+        console.log("Shade:", this.props.filterStore._shade, "Mounted:", this.props.filterStore._mounted)
+        return (
+            <tbody className={this.props.filterStore._mounted ? (this.props.filterStore?._shade) : null}>
+                {
+                    this.props.rootStore.levelRows ?
+                        this.props.rootStore.levelRows.map(
+                            (levelRow, index) => (
+                                <LevelGroup
+                                    level={ levelRow.level }
+                                    indicators={ levelRow.indicators }
+                                    key={ index } />
+                            )
+                        )
+                    :
+                        this.props.rootStore.indicatorRows.map(
+                            (indicator, index) => (
+                                <IndicatorRow indicator={ indicator } key={ index } />
+                                                
+                            )
+                        )
+                }
+            </tbody>
+        );
+    }
+}
