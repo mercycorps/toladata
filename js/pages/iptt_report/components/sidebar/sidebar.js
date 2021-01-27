@@ -1,7 +1,21 @@
-import React from 'react';
+import React, { useEffect, useState } from 'react';
 import IPTTFilterForm from './filterForm';
 
-export default () => {
+export default ({bottom}) => {
+
+    const [starting, setStarting] = useState(null);
+
+    if (starting && bottom && bottom <= starting) {
+        let sidebarElement = document.querySelector("#sidebar");
+        sidebarElement.scrollTop = starting - bottom;
+    }
+
+    useEffect(() => {
+        let sidebarElement = document.querySelector("#sidebar");
+        let start = sidebarElement.scrollHeight - sidebarElement.clientHeight;
+        setStarting(start)
+    }, [])
+    
     return (
         <div className="sidebar_container">
             <div className="sidebar_wrapper">
