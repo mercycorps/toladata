@@ -37,7 +37,7 @@ class PinPopover extends React.Component {
             // Note: the code below is the old "assume this failure was unexpected" handler, we should leave it in
             // for cases where err != "DUPLICATE"
             this.setState({
-                status: this.FAILED, 
+                status: err === "DUPLICATE" ? this.NOT_SENT : this.FAILED, 
                 error: err,
             });
             console.log("ajax error:", ev);
@@ -68,21 +68,12 @@ class PinPopover extends React.Component {
                 case this.FAILED:
                     return (
                         <div className="form-group">
-                            { this.state.error === "DUPLICATE" ?
-                                <p><span className="text-danger">
-
-                                    {/* # Translators: An error occured because a report has already been pinned with that same name */}
-                                    {gettext('A pin with this name already exists.')}
-
-                                </span></p>
-                            :
                                 <p><span>
 
                                     {/* # Translators: Some error occured when trying to pin the report*/}
                                     {gettext('Something went wrong when attempting to pin this report.')}
                                     
                                 </span></p>
-                            }
                         </div>
                     );
                 case this.NOT_SENT:
@@ -100,6 +91,18 @@ class PinPopover extends React.Component {
                                      maxLength="50"
                                      onChange={ this.handleChange }
                                      disabled={ this.state.sending }/>
+                            </div>
+                            <div className="text-danger text-center">
+                                { this.state.error === "DUPLICATE" ?
+                                    <p><span>
+
+                                        {/* # Translators: An error occured because a report has already been pinned with that same name */}
+                                        {gettext('A pin with this name already exists.')}
+
+                                    </span></p>
+                                    :
+                                    null
+                                }
                             </div>
                             <button type="button"
                                       onClick={ this.handleClick }
