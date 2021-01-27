@@ -4,13 +4,13 @@ import ReportTableHeader from './tableHeader';
 import ReportTableBody from './tableBody';
 
 
-export default ({ setBottom }) => {
+export default ({ setBottomScrolling }) => {
 
     useEffect(() => {
         window.addEventListener('scroll', () => {
             let footer = document.querySelector("#footer").offsetHeight;
             let scrollable = document.documentElement.scrollHeight - window.innerHeight - footer;
-            setBottom(scrollable - window.scrollY) // Where the sidebar should match scrolling
+            setBottomScrolling(scrollable - window.scrollY) // Where the sidebar should match scrolling
         })
     }, []);
 

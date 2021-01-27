@@ -1,19 +1,19 @@
 import React, { useEffect, useState } from 'react';
 import IPTTFilterForm from './filterForm';
 
-export default ({bottom}) => {
+export default ({bottomScrolling}) => {
 
-    const [starting, setStarting] = useState(null);
+    const [startScroll, setStartScroll] = useState(null);
 
-    if (starting && bottom && bottom <= starting) {
+    if (startScroll && bottomScrolling && bottomScrolling <= startScroll) {
         let sidebarElement = document.querySelector("#sidebar");
-        sidebarElement.scrollTop = starting - bottom;
+        sidebarElement.scrollTop = startScroll - bottomScrolling;
     }
 
     useEffect(() => {
         let sidebarElement = document.querySelector("#sidebar");
         let start = sidebarElement.scrollHeight - sidebarElement.clientHeight;
-        setStarting(start)
+        setStartScroll(start)
     }, [])
     
     return (
