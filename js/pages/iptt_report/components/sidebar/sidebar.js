@@ -1,7 +1,23 @@
-import React from 'react';
+import React, { useEffect, useState } from 'react';
 import IPTTFilterForm from './filterForm';
 
-export default () => {
+export default ({bottomScrolling}) => {
+
+    const [startScroll, setStartScroll] = useState(null);
+
+    /* At the bottom of the page, if the amount of space left for a user to scroll the IPTT report is less than or equal to the amount of the sidebar that is not visible, the sidebar scroll position will be set to match the scroll position of the page creating a sync scrolling effect. */
+    if (startScroll && bottomScrolling && bottomScrolling <= startScroll) {
+        let sidebarElement = document.querySelector("#sidebar");
+        sidebarElement.scrollTop = startScroll - bottomScrolling;
+    }
+
+    // Calculate how much of the sidebar is not visible and can be scrolled.
+    useEffect(() => {
+        let sidebarElement = document.querySelector("#sidebar");
+        let start = sidebarElement.scrollHeight - sidebarElement.clientHeight;
+        setStartScroll(start)
+    }, [])
+    
     return (
         <div className="sidebar_container">
             <div className="sidebar_wrapper">
