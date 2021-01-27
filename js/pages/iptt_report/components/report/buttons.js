@@ -59,8 +59,8 @@ class PinPopover extends React.Component {
                             </span></p>
                             <p><a href={ this.props.rootStore.pinAPI.programPageUrl }>
 
-                                    {/* # Translators: This is not really an imperative, it's an option that is available once you have pinned a report to a certain web page */}
-                                    {gettext('Visit the program page now.')}
+                                {/* # Translators: This is not really an imperative, it's an option that is available once you have pinned a report to a certain web page */}
+                                {gettext('Visit the program page now.')}
 
                             </a></p>
                         </div>
@@ -105,9 +105,9 @@ class PinPopover extends React.Component {
                                 }
                             </div>
                             <button type="button"
-                                      onClick={ this.handleClick }
-                                      disabled={ this.isDisabled() }
-                                      className="btn btn-primary btn-block">
+                                        onClick={ this.handleClick }
+                                        disabled={ this.isDisabled() }
+                                        className="btn btn-primary btn-block">
                                         {
                                             gettext('Pin to program page')
                                         }
@@ -219,10 +219,10 @@ export class ExcelPopoverButton extends BootstrapPopoverButton {
         return (
             <React.Fragment>
                 <button type="button"
-                     className="btn btn-sm btn-secondary"
-                     ref="target">
-                     <i className="fas fa-download"></i> Excel
-                     </button>
+                    className="btn btn-sm btn-secondary"
+                    ref="target">
+                    <i className="fas fa-download"></i> Excel
+                    </button>
             </React.Fragment>
         );
     }
@@ -231,9 +231,9 @@ export class ExcelPopoverButton extends BootstrapPopoverButton {
 
 @observer
 export class ExcelButton extends React.Component {
-     handleClick = () => {
+    handleClick = () => {
         if (this.props.excelUrl) {
-           window.sendGoogleAnalyticsEvent({
+            window.sendGoogleAnalyticsEvent({
                 category: "IPTT",
                 action: "Export",
                 label: this.props.excelUrl
@@ -246,10 +246,10 @@ export class ExcelButton extends React.Component {
         return (
             <React.Fragment>
                 <button type="button"
-                     className="btn btn-sm btn-secondary"
-                     onClick={this.handleClick }>
-                     <i className="fas fa-download"></i> Excel
-                     </button>
+                    className="btn btn-sm btn-secondary"
+                    onClick={this.handleClick }>
+                    <i className="fas fa-download"></i> Excel
+                </button>
             </React.Fragment>
         );
     }
