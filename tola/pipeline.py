@@ -34,9 +34,10 @@ def create_user_okta(backend, details, user, response, *args, **kwargs):
             country = Country.objects.get(code=attributes["mcCountryCode"])
         except Country.DoesNotExist:
             country = None
-            logger.error("In trying to log in {}, could not retrieve Country object for {}.".format(
-                attributes['email'], attributes.get("mcCountryCode")
-            ))
+            if attributes["mcCountryCode"] != "EDINBURGH,DC=UK":
+                logger.error("In trying to log in {}, could not retrieve Country object for {}.".format(
+                    attributes['email'], attributes.get("mcCountryCode")
+                ))
         user_count = User.objects.filter(email=email).count()
         if user_count > 1:
             logger.error("Found too many users for {}".format(email))
