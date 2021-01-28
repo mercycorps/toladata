@@ -15,6 +15,7 @@ class PinPopover extends React.Component {
         this.state = {
             reportName: '',
             status: this.NOT_SENT,
+            loading: false,
             error: "",
         };
     }
@@ -25,14 +26,28 @@ class PinPopover extends React.Component {
         return !this.props.rootStore.pinAPI.pinReady || !this.state.reportName;
     }
     handleClick = () => {
-        this.setState({status: this.SENDING});
+        // If it takes longer that 1.5s to get a response, then show the loading spinner for atleast 0.5s.
+        let spinner = setTimeout(() => {
+            this.setState({status: this.SENDING});
+            this.setState({loading: true})
+        }, 1500)
+        
         this.props.rootStore.pinAPI.savePin({
             name: this.state.reportName,
             ...this.props.rootStore.pinParams
         }).then( (response) => {
-            this.setState({status: this.SENT});
-            this.props.updatePosition();
+            if (!this.state.loading) {
+                clearTimeout(spinner);
+            }
+
+            setTimeout(() => {
+                this.setState({status: this.SENT, loading: false});
+                this.props.updatePosition();
+            }, spinner ? 500 : 0);
         }).catch( (err) => {
+            if (!this.state.loading) {
+                clearTimeout(spinner);
+            }
             // TO DO: make this handle case where err=="DUPLICATE" to update box with the red strings from the ticket
             // Note: the code below is the old "assume this failure was unexpected" handler, we should leave it in
             // for cases where err != "DUPLICATE"
@@ -42,9 +57,11 @@ class PinPopover extends React.Component {
                 this.setState({
                     status: err === "DUPLICATE" ? this.NOT_SENT : this.FAILED, 
                     error: err,
+                    loading: false,
                 })
-            }, 500)
-            console.log("ajax error:", ev);
+            }, spinner ? 500 : 0)
+
+            err !== "DUPLICATE" ? console.log("ajax error:", ev) : null;
         });
     }
     render() {
@@ -120,9 +137,8 @@ class PinPopover extends React.Component {
                     );
                 case this.SENDING:
                     return (
-                        <div className="btn btn-primary" disabled>
+                        <div className="btn btn-primary popover-loader" disabled>
                             <img src='/static/img/ajax-loader.gif' />&nbsp;
-                                { gettext('Sending') }
                         </div>
                     );
                 }
