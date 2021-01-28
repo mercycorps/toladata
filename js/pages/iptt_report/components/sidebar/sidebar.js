@@ -5,7 +5,7 @@ export default ({bottomScrolling, extend}) => {
 
     const [startScroll, setStartScroll] = useState(null);
 
-    /* At the bottom of the page, if the amount of space left for a user to scroll the IPTT report is less than or equal to the amount of the sidebar that is not visible, the sidebar scroll position will be set to match the scroll position of the page creating a sync scrolling effect. */
+    /* At the bottom of the page, if the amount of space left for a user to scroll the IPTT report is less than or equal to the amount of the sidebar that is not visible, the sidebar scroll position will be set to match the scroll position of the page creating a sync scrolling effect. The extender divs account for the footers height and pushes down the sidebar and toggle to keep them visible and not have the top of them cut off when scrolled to very bottom.*/
     if (startScroll && bottomScrolling && bottomScrolling <= startScroll) {
         let sidebarElement = document.querySelector("#sidebar");
         sidebarElement.scrollTop = startScroll - bottomScrolling;
