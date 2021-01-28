@@ -4,14 +4,19 @@ import ReportTableHeader from './tableHeader';
 import ReportTableBody from './tableBody';
 
 
-export default ({ setBottomScrolling }) => {
+export default ({ setBottomScrolling, setExtend }) => {
 
     useEffect(() => {
         /* Adding a listener to track the position on page scrolling. Scrollable is the visible area a user can scroll the page calculated by the total height of page minus height of the visible window minus height of the footer. */
         window.addEventListener('scroll', () => {
             let footer = document.querySelector("#footer").offsetHeight;
             let scrollable = document.documentElement.scrollHeight - window.innerHeight - footer;
-            setBottomScrolling(scrollable - window.scrollY) // Setting how much space left a user can scroll to reach the bottom.
+
+            // Setting how much space left a user can scroll to reach the bottom.
+            setBottomScrolling(scrollable - window.scrollY) 
+
+            // Setting the offset height of the footer to extend the sidebar content.
+            setExtend(parseInt(footer - (document.documentElement.scrollHeight - window.innerHeight - window.scrollY)))
         })
     }, []);
 

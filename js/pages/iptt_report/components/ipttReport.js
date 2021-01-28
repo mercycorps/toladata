@@ -5,11 +5,12 @@ import IPTTReportBody from './report/reportBody';
 export default () => {
 
     const [bottomScrolling, setBottomScrolling] = useState("");
+    const [extend, setExtend] = useState("");
 
     return (
         <React.Fragment>
-            <IPTTSidebar bottomScrolling={bottomScrolling}/>
-            <IPTTReportBody setBottomScrolling={setBottomScrolling}/>
+            <IPTTSidebar bottomScrolling={bottomScrolling} extend={extend}/>
+            <IPTTReportBody setBottomScrolling={setBottomScrolling} setExtend={setExtend}/>
         </React.Fragment>
     );
 }
