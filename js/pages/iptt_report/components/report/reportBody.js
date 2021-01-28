@@ -11,9 +11,12 @@ export default ({ setBottomScrolling, setExtend }) => {
         window.addEventListener('scroll', () => {
             let footer = document.querySelector("#footer").offsetHeight;
             let scrollable = document.documentElement.scrollHeight - window.innerHeight - footer;
-            setBottomScrolling(scrollable - window.scrollY) // Setting how much space left a user can scroll to reach the bottom.
+
+            // Setting how much space left a user can scroll to reach the bottom.
+            setBottomScrolling(scrollable - window.scrollY) 
+
+            // Setting the offset height of the footer to extend the sidebar content.
             setExtend(parseInt(footer - (document.documentElement.scrollHeight - window.innerHeight - window.scrollY)))
-            // console.log("extend", parseInt(footer - (document.documentElement.scrollHeight - window.innerHeight - window.scrollY)))
         })
     }, []);
 
