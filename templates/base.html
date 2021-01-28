@@ -135,7 +135,7 @@
                                 {% if user.is_superuser %}
                                     {% if "qa" in request.build_absolute_uri or "local" in request.build_absolute_uri or "127." in request.build_absolute_uri %}
                                     <li class="nav-item">
-                                        <span id="fail_mode_skull" class="nav-link p-0" style="display: {% if request.session.fail_mode %} block {% else %} none {% endif %};">
+                                        <span id="fail_mode_skull" class="nav-link px-2 py-0" style="display: {% if request.session.fail_mode %} block {% else %} none {% endif %};">
                                             <i class="fas fa-skull fa-2x text-warning"></i>
                                         </span>
                                     </li>
