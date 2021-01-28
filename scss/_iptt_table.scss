@@ -34,6 +34,9 @@ body.page_iptt_table { // body element for extra specificity
     .page-title {
         display: none;
     }
+    small {
+        font-size: 13.6px;
+    }
 }
 .iptt_table_wrapper {
     // See breakpoint mixin below
