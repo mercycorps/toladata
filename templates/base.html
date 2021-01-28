@@ -134,9 +134,15 @@
                             {% if user.is_authenticated  %}
                                 {% if user.is_superuser %}
                                     {% if "qa" in request.build_absolute_uri or "local" in request.build_absolute_uri or "127." in request.build_absolute_uri %}
+                                    <li class="nav-item">
+                                        <span id="fail_mode_skull" class="nav-link px-2 py-0" style="display: {% if request.session.fail_mode %} block {% else %} none {% endif %};">
+                                            <i class="fas fa-skull fa-2x text-warning"></i>
+                                        </span>
+                                    </li>
                                     <li class="nav-item dropdown">
                                         <a class="nav-link dropdown-toggle" href="#" data-toggle="dropdown" aria-haspop="true" aria-expanded="false" id="failmodeDropdown">
                                             <span class="badge badge-danger text-uppercase">Super admin</span>
+
                                         </a>
                                         <div class="dropdown-menu" aria-labelledby="failmodeDropdown">
                                             <script type="text/javascript">
@@ -149,8 +155,10 @@
                                                         if (data.success === true) {
                                                             if (data.fail_mode === true) {
                                                                 $('#fail_mode_toggle').text('De-activate API Fail Mode');
+                                                                $('#fail_mode_skull').show();
                                                             } else {
                                                                 $('#fail_mode_toggle').text('Activate API Fail Mode');
+                                                                $('#fail_mode_skull').hide();
                                                             }
                                                         }
                                                      })
