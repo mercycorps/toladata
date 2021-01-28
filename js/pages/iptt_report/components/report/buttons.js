@@ -14,7 +14,8 @@ class PinPopover extends React.Component {
         super(props);
         this.state = {
             reportName: '',
-            status: this.NOT_SENT
+            status: this.NOT_SENT,
+            error: "",
         };
     }
     handleChange = (e) => {
@@ -28,11 +29,17 @@ class PinPopover extends React.Component {
         this.props.rootStore.pinAPI.savePin({
             name: this.state.reportName,
             ...this.props.rootStore.pinParams
-        }).then( () => {
+        }).then( (response) => {
             this.setState({status: this.SENT});
             this.props.updatePosition();
-        }).catch( () => {
-            this.setState({status: this.FAILED});
+        }).catch( (err) => {
+            // TO DO: make this handle case where err=="DUPLICATE" to update box with the red strings from the ticket
+            // Note: the code below is the old "assume this failure was unexpected" handler, we should leave it in
+            // for cases where err != "DUPLICATE"
+            this.setState({
+                status: err === "DUPLICATE" ? this.NOT_SENT : this.FAILED, 
+                error: err,
+            });
             console.log("ajax error:", ev);
         });
     }
@@ -47,13 +54,13 @@ class PinPopover extends React.Component {
                             <p><span>
 
                                 {/* # Translators: The user has successfully "pinned" a report link to a program page for quick access to the report */}
-                                {gettext('Success!  This report is now pinned to the program page')}
+                                {gettext('Success!  This report is now pinned to the program page.')}
 
                             </span></p>
                             <p><a href={ this.props.rootStore.pinAPI.programPageUrl }>
 
-                                    {/* # Translators: This is not really an imperative, it's an option that is available once you have pinned a report to a certain web page */}
-                                    {gettext('Visit the program page now.')}
+                                {/* # Translators: This is not really an imperative, it's an option that is available once you have pinned a report to a certain web page */}
+                                {gettext('Visit the program page now.')}
 
                             </a></p>
                         </div>
@@ -61,11 +68,12 @@ class PinPopover extends React.Component {
                 case this.FAILED:
                     return (
                         <div className="form-group">
-                            <p><span>
-                                {
-                                    gettext('Something went wrong when attempting to pin this report')
-                                }
-                            </span></p>
+                                <p><span>
+
+                                    {/* # Translators: Some error occured when trying to pin the report*/}
+                                    {gettext('Something went wrong when attempting to pin this report.')}
+                                    
+                                </span></p>
                         </div>
                     );
                 case this.NOT_SENT:
@@ -80,13 +88,26 @@ class PinPopover extends React.Component {
                                 </label>
                                 <input type="text" className="form-control"
                                      value={ this.state.reportName }
+                                     maxLength="50"
                                      onChange={ this.handleChange }
                                      disabled={ this.state.sending }/>
+                                <div className="has-error">
+                                    { this.state.error === "DUPLICATE" ?
+                                        <span><small>
+
+                                            {/* # Translators: An error occured because a report has already been pinned with that same name */}
+                                            {gettext('A pin with this name already exists.')}
+
+                                        </small></span>
+                                        :
+                                        null
+                                    }
+                                </div>
                             </div>
                             <button type="button"
-                                      onClick={ this.handleClick }
-                                      disabled={ this.isDisabled() }
-                                      className="btn btn-primary btn-block">
+                                        onClick={ this.handleClick }
+                                        disabled={ this.isDisabled() }
+                                        className="btn btn-primary btn-block">
                                         {
                                             gettext('Pin to program page')
                                         }
@@ -198,10 +219,10 @@ export class ExcelPopoverButton extends BootstrapPopoverButton {
         return (
             <React.Fragment>
                 <button type="button"
-                     className="btn btn-sm btn-secondary"
-                     ref="target">
-                     <i className="fas fa-download"></i> Excel
-                     </button>
+                    className="btn btn-sm btn-secondary"
+                    ref="target">
+                    <i className="fas fa-download"></i> Excel
+                    </button>
             </React.Fragment>
         );
     }
@@ -210,9 +231,9 @@ export class ExcelPopoverButton extends BootstrapPopoverButton {
 
 @observer
 export class ExcelButton extends React.Component {
-     handleClick = () => {
+    handleClick = () => {
         if (this.props.excelUrl) {
-           window.sendGoogleAnalyticsEvent({
+            window.sendGoogleAnalyticsEvent({
                 category: "IPTT",
                 action: "Export",
                 label: this.props.excelUrl
@@ -225,10 +246,10 @@ export class ExcelButton extends React.Component {
         return (
             <React.Fragment>
                 <button type="button"
-                     className="btn btn-sm btn-secondary"
-                     onClick={this.handleClick }>
-                     <i className="fas fa-download"></i> Excel
-                     </button>
+                    className="btn btn-sm btn-secondary"
+                    onClick={this.handleClick }>
+                    <i className="fas fa-download"></i> Excel
+                </button>
             </React.Fragment>
         );
     }
