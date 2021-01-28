@@ -57,6 +57,7 @@ class PinPopover extends React.Component {
                 this.setState({
                     status: err === "DUPLICATE" ? this.NOT_SENT : this.FAILED, 
                     error: err,
+                    loading: false,
                 })
             }, spinner ? 500 : 0)
 
