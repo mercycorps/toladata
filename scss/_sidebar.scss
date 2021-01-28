@@ -205,11 +205,11 @@
         &[aria-expanded=false] svg {
             transform: rotate(-180deg); // TODO: ideally do this via JS
         }
-    }
-    .extender {
-        &[aria-expanded=true] {
-            &-toggle {
-                height: 0px !important;
+        &[aria-expanded=false] {
+            .extender  {
+                &-toggle{
+                    height: 0px !important;
+                }
             }
         }
     }
