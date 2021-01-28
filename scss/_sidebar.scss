@@ -101,6 +101,11 @@
         top: 0;
         right: 0;
     }
+    .extender  {
+        &-main, &-toggle{
+            height: 0px !important;
+        }
+    }
     #sidebar {
         width: 330px;
         overflow-y: auto;
@@ -176,6 +181,15 @@
     top: 0;
 }
 
+.extender {
+    &-main {
+        background-color: $gray-700;
+    }
+    &-toggle {
+        background-color: $teal-500;
+    }
+}
+
 .sidebar-toggle {
     display: block;
     height: 42px;
@@ -190,6 +204,13 @@
 
         &[aria-expanded=false] svg {
             transform: rotate(-180deg); // TODO: ideally do this via JS
+        }
+    }
+    .extender {
+        &[aria-expanded=true] {
+            &-toggle {
+                height: 0px !important;
+            }
         }
     }
 }
