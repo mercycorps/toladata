@@ -36,10 +36,14 @@ class PinPopover extends React.Component {
             // TO DO: make this handle case where err=="DUPLICATE" to update box with the red strings from the ticket
             // Note: the code below is the old "assume this failure was unexpected" handler, we should leave it in
             // for cases where err != "DUPLICATE"
-            this.setState({
-                status: err === "DUPLICATE" ? this.NOT_SENT : this.FAILED, 
-                error: err,
-            });
+
+            // Delayed response to prevent visible flash of the loading spinner.
+            setTimeout(() => {
+                this.setState({
+                    status: err === "DUPLICATE" ? this.NOT_SENT : this.FAILED, 
+                    error: err,
+                })
+            }, 500)
             console.log("ajax error:", ev);
         });
     }
