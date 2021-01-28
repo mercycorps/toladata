@@ -38,6 +38,12 @@ body.page_iptt_table { // body element for extra specificity
         font-size: 13.6px;
     }
 }
+.popover-loader {
+    width: 200px;
+    img {
+        margin: 10px auto;
+    }
+}
 .iptt_table_wrapper {
     // See breakpoint mixin below
     width: 100%;
