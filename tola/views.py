@@ -7,7 +7,7 @@ from django.contrib import messages
 from django.contrib.auth import logout
 from django.contrib.auth import views as authviews
 from django.contrib.auth.decorators import login_required
-from django.http import HttpResponseRedirect, HttpResponse
+from django.http import HttpResponseRedirect, HttpResponse, JsonResponse
 from django.shortcuts import render, get_object_or_404
 from django.urls import reverse_lazy, reverse
 from django.db.models import Q
@@ -206,3 +206,15 @@ def update_user_session(request):
         request.method, "AJAX" if request.is_ajax() else "synchronous", request.body
     )
     return HttpResponseRedirect("/")
+
+
+@login_required
+def fail_mode_toggle(request):
+    uri = request.get_host()
+    if not any(["qa" in uri, "127." in uri, "local" in uri]):
+        return JsonResponse({'success': False, 'error': 'Invalid environment'})
+    if not request.user.is_superuser:
+        return JsonResponse({'success': False, 'error': 'Insufficient permissions'})
+    fail_mode = request.session.get('fail_mode', False)
+    request.session['fail_mode'] = not fail_mode
+    return JsonResponse({'success': True, 'fail_mode': not fail_mode})

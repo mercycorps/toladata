@@ -606,6 +606,13 @@ class PinnedReportForm(forms.ModelForm):
         model = PinnedReport
         exclude = ('tola_user',)
 
+    def validate_uniqueness(self, tola_user):
+        """Helper method for validating uniqueness (called after form validation, as it is a multi-field validate)"""
+        data = self.cleaned_data
+        if PinnedReport.objects.filter(name=data['name'], program=data['program'], tola_user=tola_user).exists():
+            return False
+        return True
+
 
 class BaseDisaggregatedValueFormSet(forms.BaseFormSet):
     disaggregation = None

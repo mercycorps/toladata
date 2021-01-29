@@ -132,11 +132,57 @@
                                   </span>
                             </li>
                             {% if user.is_authenticated  %}
+                                {% if user.is_superuser %}
+                                    {% if "qa" in request.build_absolute_uri or "local" in request.build_absolute_uri or "127." in request.build_absolute_uri %}
+                                    <li class="nav-item">
+                                        <span id="fail_mode_skull" class="nav-link px-2 py-0" style="display: {% if request.session.fail_mode %} block {% else %} none {% endif %};">
+                                            <i class="fas fa-skull fa-2x text-warning"></i>
+                                        </span>
+                                    </li>
+                                    <li class="nav-item dropdown">
+                                        <a class="nav-link dropdown-toggle" href="#" data-toggle="dropdown" aria-haspop="true" aria-expanded="false" id="failmodeDropdown">
+                                            <span class="badge badge-danger text-uppercase">Super admin</span>
+
+                                        </a>
+                                        <div class="dropdown-menu" aria-labelledby="failmodeDropdown">
+                                            <script type="text/javascript">
+                                                // this script is nested in the if block to avoid loading extra JS if
+                                                // the client is not on QA/local and a superuser
+                                                function toggleFailMode() {
+                                                    console.log("fail mode toggle")
+                                                    $.post("{% url 'fail_mode_toggle' %}")
+                                                     .done(function(data) {
+                                                        if (data.success === true) {
+                                                            if (data.fail_mode === true) {
+                                                                $('#fail_mode_toggle').text('De-activate API Fail Mode');
+                                                                $('#fail_mode_skull').show();
+                                                            } else {
+                                                                $('#fail_mode_toggle').text('Activate API Fail Mode');
+                                                                $('#fail_mode_skull').hide();
+                                                            }
+                                                        }
+                                                     })
+                                                }
+                                            </script>
+                                            <a class="dropdown-item" href="#" id="fail_mode_toggle" onclick="toggleFailMode()">
+                                                {% if request.session.fail_mode %}
+                                                    De-activate API Fail Mode
+                                                {% else %}
+                                                    Activate API Fail Mode
+                                                {% endif %}
+                                            </a>
+                                        </div>
+                                    </li>
+                                    {% else %}
+                                        <li class="nav-item">
+                                            <span class="nav-link">
+                                                <span class="badge badge-danger text-uppercase">Super admin</span>
+                                            </span>
+                                        </li>
+                                    {% endif %}
+                                {% endif %}
                                 <li class="nav-item dropdown">
                                     <a class="nav-link dropdown-toggle" href="#" data-toggle="dropdown" aria-haspop="true" aria-expanded="false" id="navbarUserDropdown">
-                                        {% if user.is_superuser %}
-                                              <span class="badge badge-danger text-uppercase">Super admin</span>
-                                        {% endif %}
                                         {% firstof user.tola_user.name user.username %}
                                     </a>
                                     <div class="dropdown-menu" aria-labelledby="navbarUserDropdown">
@@ -269,6 +315,7 @@
         <script type="text/javascript" src="{% static "js/PNotify.js" %}"></script>
         <script type="text/javascript" src="{% static "js/PNotifyButtons.js" %}"></script>
         <script type="text/javascript" src="{% static "js/PNotifyConfirm.js" %}"></script>
+        <script type="text/javascript" src="{% static "js/PNotifyCallbacks.js" %}"></script>
 
         <script type="text/javascript">
             // This is now referenced in other JS, not just here in the date picker!

@@ -2227,6 +2227,9 @@ class PinnedReport(models.Model):
 
     class Meta:
         ordering = ['-creation_date']
+        constraints = [
+            models.UniqueConstraint(fields=['name', 'tola_user', 'program'], name='unique_pinned_report_name')
+        ]
 
     def parse_query_string(self):
         return QueryDict(self.query_string)

@@ -66,7 +66,7 @@ const create_unified_changeset_notice = ({
     cancel_text = gettext('Cancel'),
     context = null,
     notice_type = 'notice', // possible values: error (danger/red), info (blue), success (green), notice (warning/yellow)
-    modal = false, // if set to true, notice will act like a modal with the rest of the page inactive until the notice is responded to
+    modal = null, // Default behavior is to use a modal if confirm_text is truthy and modal is null.  User can pass in true or false to override default.
     blocking = true,
     self_dismissing = false, // automatically hides the notice after 8000 ms (default). NOTE: this is the OPPOSITE behavior as default PNotify
     dismiss_delay = 8000, // also PNotify default
@@ -210,6 +210,10 @@ const create_unified_changeset_notice = ({
         changeset_buttons.push(cancel_button)
     }
 
+    if (confirm_text && modal === null){
+        modal = true;
+    }
+
     var notice = PNotify.alert({
         text: $(`<div><form action="" method="post" class="form">${inner}</form></div>`).html(),
         textTrusted: true,
@@ -220,7 +224,7 @@ const create_unified_changeset_notice = ({
         type: notice_type,
         addClass: 'program-page__rationale-form',
         stack: {
-            'overlayClose': !modal,
+            'overlayClose': false, // Set to false because clicking on the overlay doesn't seem to trigger the on_cancel function, which is necessary in some cases
             'dir1': dir1,
             'dir2': dir2,
             'firstpos1': 20,
@@ -238,6 +242,9 @@ const create_unified_changeset_notice = ({
                 align: 'flex-start',
                 confirm: true,
                 buttons: changeset_buttons
+            },
+            Callbacks: {
+                afterOpen: postOpenAdjustments
             }
         }
     });
@@ -249,7 +256,6 @@ const create_unified_changeset_notice = ({
         // # Translators: for a dropdown menu with no options checked:
         nonSelectedText: gettext('None selected')
     });
-
 
 
     if (on_cancel) {
@@ -265,6 +271,50 @@ const create_unified_changeset_notice = ({
 
     return notice;
 
+}
+
+/*
+Ran into a few issues to be aware of related to modal notices and post-mount actions.
+
+PNotify uses scrollWidth rather than e.g. offsetWidth to determine the size of the grey modal overlay.  This
+is fine for full page modals but can lead to the wrong sizing when there is already a modal active, e.g. the
+results form.  In addition, when the overlay is the same size as the underlying modal, once the PNotify is
+active, there is a modal on top of a modal, and if you click on the grey overlay of the lower modal,
+all modals close.  Then, when the base modal is reopened, the confirmation notification is still there
+because it never received a close signal.  This is why the overlay is being changed to fill the whole screen, so
+any click outside of the PNotify will apply to the notice, not to the underlying modal.
+
+Another issue was that trying to resize the overlay right after the the notice was created sometimes didn't work,
+presumably because the overlay hadn't been created yet.  Even when using the afterOpen callback, a small
+setTimeout is needed to ensure the overlay is mounted before adjusting its width and height.  The same is true for
+the change in focus.  The native focusing on the Cancel button takes some time after the notification is
+mounted, which needs to be accounted for by a timeout if the focus is being shifted to a different element.
+
+ */
+function postOpenAdjustments (n) {
+    setTimeout( () => {
+        if ($(".pnotify__reason-for-change button").length > 0) {
+            $(".pnotify__reason-for-change button")[0].focus();
+        }
+        else if ($('.pnotify__rationale textarea').length > 0){
+            $('.pnotify__rationale textarea')[0].focus();
+
+        }
+    }, 500);
+
+    setTimeout(() => {
+        let overlayNode = $('.ui-pnotify-modal-overlay')
+        if (overlayNode.length > 0) {
+            setTimeout(() => {
+                overlayNode.css({
+                    'position': 'fixed',
+                    'top': 0,
+                    'bottom': 0,
+                    'height': window.innerHeight,
+                    'width': window.innerWidth})
+            })
+        }
+    }, 100)
 }
 
 export { create_unified_changeset_notice };

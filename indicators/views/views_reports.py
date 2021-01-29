@@ -47,9 +47,13 @@ def create_pinned_report(request):
     verify_program_access_level(request, request.POST.get('program'), 'low', super_admin_override=True)
     form = PinnedReportForm(request.POST)
     if form.is_valid():
-        pr = form.save(commit=False)
-        pr.tola_user = request.user.tola_user
-        pr.save()
+        # validate that this user hasn't created a pin with this name on this program:
+        if form.validate_uniqueness(request.user.tola_user):
+            pr = form.save(commit=False)
+            pr.tola_user = request.user.tola_user
+            pr.save()
+        else:
+            return JsonResponse({'success': False, 'error_code': 'DUPLICATE'}, status=400)
     else:
         return HttpResponseBadRequest(str(form.errors.items()))
 

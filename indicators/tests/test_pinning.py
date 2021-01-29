@@ -54,7 +54,6 @@ class TestUrlCreationFromPinnedReport(TestCase):
 
         self.assertEquals(url_str, expected)
 
-
 class TestCreatePinnedReport(PinnedReportTestCase):
     """
     Test AJAX call for creating a pinned report
@@ -94,6 +93,28 @@ class TestCreatePinnedReport(PinnedReportTestCase):
 
         self.assertEqual(response.status_code, 400)
         self.assertEquals(models.PinnedReport.objects.count(), 0)
+
+    def test_duplicate_name_create(self):
+        report_name = 'Test report name unique'
+        report_type = 'reporttype'
+        query_string = 'level=3&level=2&timeframe=1&numrecentperiods=&indicators=5476&targetperiods=1'
+        data = {
+            'name': report_name,
+            'program': self.program.id,
+            'report_type': report_type,
+            'query_string': query_string,
+        }
+        path = reverse('create_pinned_report')
+        # create report initially: should succeed
+        response = self.client.post(path, data=data)
+        self.assertEqual(response.status_code, 200)
+
+        # create report with same name, should fail:
+        response = self.client.post(path, data=data)
+        self.assertEqual(response.status_code, 400)
+        self.assertEqual(response.json()['success'], False)
+        self.assertEqual(response.json()['error_code'], 'DUPLICATE')
+
 
 
 class TestPinnedReportDateStrings(TestCase):
