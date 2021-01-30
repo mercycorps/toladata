@@ -370,26 +370,30 @@ LOGGING = {
             'class': 'logging.FileHandler',
             'filename': 'error.log',
             'formatter': 'standard'
+        },
+        'admin_email': {
+            'level': 'ERROR',
+            'class': 'logging.StreamHandler',
         }
     },
     'loggers': {
         'django': {
-            'handlers': ['file'],
+            'handlers': ['file', 'admin_email'],
             'level': 'ERROR',
             'propagate': True,
         },
         'workflow': {
-            'handlers': ['file'],
+            'handlers': ['file', 'admin_email'],
             'level': 'ERROR',
             'propagate': True,
         },
         'indicators': {
-            'handlers': ['file'],
+            'handlers': ['file', 'admin_email'],
             'level': 'ERROR',
             'propagate': True,
         },
         'tola': {
-            'handlers': ['file'],
+            'handlers': ['file', 'admin_email'],
             'level': 'ERROR',
             'propagate': True,
         },
