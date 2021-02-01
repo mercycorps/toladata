@@ -15,8 +15,49 @@ export default (
         get filterStore() {return this._filterStore},
         _reportStore: getReportStore(reactContext.report || {}),
         _expandoRows: [],
-        expandAllRows() {
-            this._expandoRows.forEach(row => {row.expandRow()});
+        expandAllRows(section) {
+            let top = this._expandoRows.slice(0, 15);
+            let remaining = this._expandoRows.slice(15);
+
+            let first = new Promise((resolve, reject) => {
+                top.forEach((row,i) => {
+                    console.log("Top: ", i)
+                    row.expandRow()
+                resolve()
+                })
+            })
+
+            first.then(() => {
+                setTimeout(() => {
+                remaining.forEach((row,i) => {
+                    console.log("Remaining: ", i)
+                    row.expandRow()
+                })
+                },1)
+            })
+
+
+            // top.forEach((row,i) => {
+            //     console.log("Top: ", i)
+            //     row.expandRow()
+            // })
+            // setTimeout(() => {
+            //     remaining.forEach((row,i) => {
+            //         console.log("Remaining: ", i)
+            //         row.expandRow()
+            //     })
+            // }, 1000)
+
+
+
+
+
+            // this._expandoRows.forEach((row, i) => {
+            //     if (i <= 10) {
+            //         console.log("Row: ", i)
+            //         row.expandRow() 
+            //     }
+            // });
         },
         get allExpanded() {
             return this._expandoRows.every(row => row.state.expanded);
