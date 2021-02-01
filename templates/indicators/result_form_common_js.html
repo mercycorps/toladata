@@ -74,7 +74,7 @@
             message_text: DELETE_RESULT_MESSAGE,
             include_rationale: true,
             rationale_required: true,
-            context: document.getElementById('result_update_form'),
+            context: document.getElementById('indicator_modal_body'),
             notice_type: 'error',
             on_submit: (rationale) => {
                 // Mark the record being changed so results table is reloaded on modal close
@@ -456,7 +456,7 @@
             window.create_unified_changeset_notice({
                 preamble: preambleText,
                 message_text: messageText,
-                context: document.getElementById('result_update_form'),
+                context: document.getElementById('indicator_results_content'),
                 on_submit: (rationale) => {resolve(rationale);},
                 on_cancel: () => {reject('cancel')},
                 notice_type: "notice",
@@ -476,7 +476,7 @@
             // form is valid, first get rationale if necessary or '' otherwise:
             let posting = getRationale(false)
             // pass rationale into form submit (with empty failure handler in case user cancels):
-             .then((rationale) => {return submitResultForm(rationale)}, () => {})
+             .then((rationale) => {return submitResultForm(rationale)})
              // after all promises resolve (whether save was successful or not) undisable submit buttons:
              .finally(function(data) {
                 $('#result-submit-create').removeAttr('disabled');
@@ -540,14 +540,14 @@
             // get appropriate rationale:
             let posting = getRationale(true);
             // feed rationale to submit form (with empty failure handler for user cancelling):
-            posting.then((rationale) => {return submitResultForm(rationale);}, () => {})
-             .then(() => {
+            posting.then((rationale) => {return submitResultForm(rationale)})
+            .then(() => {
                 // submission (save) successful, trigger update on indicator list
                 $('#indicator_results_div').trigger('save.tola.result_form');
                 // hide result form (save and close):
                 $('#indicator_results_div').modal('hide');
-            }).finally(() => {
-                // undisable button whether failed or not:
+            }).catch(() => {
+                // undisable button if failed because modal will still be open
                 $('#result-submit-update').removeAttr('disabled');
             });
         } else {

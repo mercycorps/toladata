@@ -1,0 +1,81 @@
+// Shade animation to lighten compnonent 
+.shade {
+animation: shade 1s ease;
+}
+@keyframes shade {
+0% {
+  opacity: 1.0;
+}
+50% {
+  opacity: 0.3;
+}
+100% {
+  opacity: 1.0;
+}
+}
+
+// Teal Pulse animation moving to the right
+.pulse {
+    animation: pulse 3s linear;
+    animation-iteration-count: 1;
+}
+@keyframes pulse {
+    0% {
+        box-shadow: 0 0 0 0 rgba(0, 164, 159, .7), 0 0 0 0 rgba(0, 164, 159, .7);
+    }
+    40% {
+        box-shadow: 40px 0 0 5px rgba(0, 164, 159, 0), 0 0 0 0 rgba(0, 164, 159, .7);
+    }
+    80% {
+        box-shadow: 20px 0 0 -10px rgba(0, 164, 159, 0), 0 0 0 -20px rgba(0, 164, 159, 0);
+    }
+    100% {
+        box-shadow: 0 0 0 0 rgba(0, 164, 159, 0), 0 0 0 -20px rgba(0, 164, 159, 0);
+    }
+}
+
+// Red and teal animation around a component. 
+.shine-wrapper {
+  padding-top: 10px;
+  width: auto;
+  min-height: 800px;
+  margin: 0 auto;
+  position: relative;
+  overflow: hidden;
+}
+.shine-element {
+  position: absolute;
+  top: 1%;
+  left: 1%;
+  display: block;
+  height: 98%;
+  width: 98%;
+  margin: auto;
+  align-self: center;
+  background: #fff;
+  border: none;
+  z-index: 1;
+}
+.shine-border {
+  position: absolute;
+  display: block;
+  top: -50%;
+  left: -50%;
+  z-index: -9;
+  height: 200%;
+  width: 400%;
+  transform: rotate(-135deg);
+  overflow: hidden;
+  background: $gray-700;
+  &-on {
+    @extend .shine-border;
+    background: linear-gradient(to right, #54585a 20%, #54585a 40%, #c8102e 50%, #00a49f 55%, #54585a 70%, #54585a 100%);
+    animation: shine 3s linear infinite;
+    background-size: 200% auto;
+  }
+}
+@keyframes shine {
+  to {
+    background-position: 200% center;
+  }
+}

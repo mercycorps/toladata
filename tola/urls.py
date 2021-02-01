@@ -121,6 +121,9 @@ urlpatterns += [
     # app include of indicator urls
     path('indicators/', include('indicators.urls')),
 
+    # url for updating fail mode api
+    path('fail_mode_toggle', tolaviews.fail_mode_toggle, name='fail_mode_toggle'),
+
     # local login
     path('login/', tolaviews.TolaLoginView.as_view(), name='login'),
     path('accounts/login/', tolaviews.TolaLoginView.as_view(), name='login'),
