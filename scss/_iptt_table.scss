@@ -15,7 +15,7 @@
 body.page_iptt_table { // body element for extra specificity
     margin-bottom: 0;
     & .popover {
-        max-width: 200px;
+        max-width: 250px;
     }
 }
 .page_iptt_table {
@@ -33,6 +33,15 @@ body.page_iptt_table { // body element for extra specificity
     #id_div_breadcrumb,
     .page-title {
         display: none;
+    }
+    small {
+        font-size: 13.6px;
+    }
+}
+.popover-loader {
+    width: 200px;
+    img {
+        margin: 10px auto;
     }
 }
 .iptt_table_wrapper {

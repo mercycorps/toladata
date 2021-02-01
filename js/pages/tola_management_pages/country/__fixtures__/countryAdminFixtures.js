@@ -37,4 +37,12 @@ export const countryDisaggregationData = [
     },
 ]
 
-
+export const strategicObjectiveData = [
+    {
+        country: 100,
+        description: "Description of Strategic Objective 1",
+        id: 200,
+        name: "Strategic Objective 1",
+        status: ""
+    }
+]

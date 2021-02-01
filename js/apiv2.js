@@ -77,7 +77,15 @@ const api = {
             label: qs.stringify(reportData)
         });
         return this.formPostInstance.post(`/pinned_report/`, qs.stringify(reportData))
-                    .catch(this.logFailure);
+                    .catch(err => {
+                        if (err?.response?.data?.error_code == 'DUPLICATE') {
+                            // this error is expectecd - throw it so it gets handled by the catch on the other side
+                                throw 'DUPLICATE';
+                        } else {
+                            // this error is unexpected, log it and go
+                            this.logFailure(err);
+                        }
+                    });
     },
     updateIPTTIndicator(indicatorPk) {
         return this.apiInstance.get(`/iptt/indicator/${indicatorPk}/`)

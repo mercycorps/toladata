@@ -14,7 +14,9 @@ class PinPopover extends React.Component {
         super(props);
         this.state = {
             reportName: '',
-            status: this.NOT_SENT
+            status: this.NOT_SENT,
+            loading: false,
+            error: "",
         };
     }
     handleChange = (e) => {
@@ -24,16 +26,42 @@ class PinPopover extends React.Component {
         return !this.props.rootStore.pinAPI.pinReady || !this.state.reportName;
     }
     handleClick = () => {
-        this.setState({status: this.SENDING});
+        // If it takes longer that 1.5s to get a response, then show the loading spinner for atleast 0.5s.
+        let spinner = setTimeout(() => {
+            this.setState({status: this.SENDING});
+            this.setState({loading: true})
+        }, 1500)
+        
         this.props.rootStore.pinAPI.savePin({
             name: this.state.reportName,
             ...this.props.rootStore.pinParams
-        }).then( () => {
-            this.setState({status: this.SENT});
-            this.props.updatePosition();
-        }).catch( () => {
-            this.setState({status: this.FAILED});
-            console.log("ajax error:", ev);
+        }).then( (response) => {
+            if (!this.state.loading) {
+                clearTimeout(spinner);
+            }
+
+            setTimeout(() => {
+                this.setState({status: this.SENT, loading: false});
+                this.props.updatePosition();
+            }, spinner ? 500 : 0);
+        }).catch( (err) => {
+            if (!this.state.loading) {
+                clearTimeout(spinner);
+            }
+            // TO DO: make this handle case where err=="DUPLICATE" to update box with the red strings from the ticket
+            // Note: the code below is the old "assume this failure was unexpected" handler, we should leave it in
+            // for cases where err != "DUPLICATE"
+
+            // Delayed response to prevent visible flash of the loading spinner.
+            setTimeout(() => {
+                this.setState({
+                    status: err === "DUPLICATE" ? this.NOT_SENT : this.FAILED, 
+                    error: err,
+                    loading: false,
+                })
+            }, spinner ? 500 : 0)
+
+            err !== "DUPLICATE" ? console.log("ajax error:", ev) : null;
         });
     }
     render() {
@@ -47,13 +75,13 @@ class PinPopover extends React.Component {
                             <p><span>
 
                                 {/* # Translators: The user has successfully "pinned" a report link to a program page for quick access to the report */}
-                                {gettext('Success!  This report is now pinned to the program page')}
+                                {gettext('Success!  This report is now pinned to the program page.')}
 
                             </span></p>
                             <p><a href={ this.props.rootStore.pinAPI.programPageUrl }>
 
-                                    {/* # Translators: This is not really an imperative, it's an option that is available once you have pinned a report to a certain web page */}
-                                    {gettext('Visit the program page now.')}
+                                {/* # Translators: This is not really an imperative, it's an option that is available once you have pinned a report to a certain web page */}
+                                {gettext('Visit the program page now.')}
 
                             </a></p>
                         </div>
@@ -61,11 +89,12 @@ class PinPopover extends React.Component {
                 case this.FAILED:
                     return (
                         <div className="form-group">
-                            <p><span>
-                                {
-                                    gettext('Something went wrong when attempting to pin this report')
-                                }
-                            </span></p>
+                                <p><span>
+
+                                    {/* # Translators: Some error occured when trying to pin the report*/}
+                                    {gettext('Something went wrong when attempting to pin this report.')}
+                                    
+                                </span></p>
                         </div>
                     );
                 case this.NOT_SENT:
@@ -80,13 +109,26 @@ class PinPopover extends React.Component {
                                 </label>
                                 <input type="text" className="form-control"
                                      value={ this.state.reportName }
+                                     maxLength="50"
                                      onChange={ this.handleChange }
                                      disabled={ this.state.sending }/>
+                                <div className="has-error">
+                                    { this.state.error === "DUPLICATE" ?
+                                        <span><small>
+
+                                            {/* # Translators: An error occured because a report has already been pinned with that same name */}
+                                            {gettext('A pin with this name already exists.')}
+
+                                        </small></span>
+                                        :
+                                        null
+                                    }
+                                </div>
                             </div>
                             <button type="button"
-                                      onClick={ this.handleClick }
-                                      disabled={ this.isDisabled() }
-                                      className="btn btn-primary btn-block">
+                                        onClick={ this.handleClick }
+                                        disabled={ this.isDisabled() }
+                                        className="btn btn-primary btn-block">
                                         {
                                             gettext('Pin to program page')
                                         }
@@ -95,9 +137,8 @@ class PinPopover extends React.Component {
                     );
                 case this.SENDING:
                     return (
-                        <div className="btn btn-primary" disabled>
+                        <div className="btn btn-primary popover-loader" disabled>
                             <img src='/static/img/ajax-loader.gif' />&nbsp;
-                                { gettext('Sending') }
                         </div>
                     );
                 }
@@ -198,10 +239,10 @@ export class ExcelPopoverButton extends BootstrapPopoverButton {
         return (
             <React.Fragment>
                 <button type="button"
-                     className="btn btn-sm btn-secondary"
-                     ref="target">
-                     <i className="fas fa-download"></i> Excel
-                     </button>
+                    className="btn btn-sm btn-secondary"
+                    ref="target">
+                    <i className="fas fa-download"></i> Excel
+                    </button>
             </React.Fragment>
         );
     }
@@ -210,9 +251,9 @@ export class ExcelPopoverButton extends BootstrapPopoverButton {
 
 @observer
 export class ExcelButton extends React.Component {
-     handleClick = () => {
+    handleClick = () => {
         if (this.props.excelUrl) {
-           window.sendGoogleAnalyticsEvent({
+            window.sendGoogleAnalyticsEvent({
                 category: "IPTT",
                 action: "Export",
                 label: this.props.excelUrl
@@ -225,10 +266,10 @@ export class ExcelButton extends React.Component {
         return (
             <React.Fragment>
                 <button type="button"
-                     className="btn btn-sm btn-secondary"
-                     onClick={this.handleClick }>
-                     <i className="fas fa-download"></i> Excel
-                     </button>
+                    className="btn btn-sm btn-secondary"
+                    onClick={this.handleClick }>
+                    <i className="fas fa-download"></i> Excel
+                </button>
             </React.Fragment>
         );
     }

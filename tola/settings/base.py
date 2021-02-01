@@ -202,6 +202,7 @@ MIDDLEWARE = (
     'simple_history.middleware.HistoryRequestMiddleware',
     'social_django.middleware.SocialAuthExceptionMiddleware',
     'tola_management.middleware.GlobalConstantsMiddleware',
+    'tola.middleware.FailModeMiddleware',
     #'debug_toolbar.middleware.DebugToolbarMiddleware',
 )
 ########## END MIDDLEWARE CONFIGURATION
@@ -369,13 +370,6 @@ LOGGING = {
             'class': 'logging.FileHandler',
             'filename': 'error.log',
             'formatter': 'standard'
-        },
-        'login_file': {
-            'level': 'DEBUG',
-            'class': 'logging.handlers.TimedRotatingFileHandler',
-            'filename': 'login.log',
-            'when': 'midnight',
-            'formatter': 'standard',
         }
     },
     'loggers': {
@@ -399,10 +393,5 @@ LOGGING = {
             'level': 'ERROR',
             'propagate': True,
         },
-        'login': {
-            'handlers': ['login_file'],
-            'level': 'DEBUG',
-            'propagate': True
-        }
     },
 }
