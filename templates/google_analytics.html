@@ -24,10 +24,14 @@
     'storeGac': false,
     'allowAdFeatures': false
   };
-  ga('create', '{{ GOOGLE_ANALYTICS_PROPERTY_ID }}', gaConfig);
-  ga('set', 'dimension1', userType);
-  ga('set', 'dimension2', userCountry);
-  ga('set', 'dimension3', thisSiteArea);
-  ga('send', 'pageview');
+  try {
+      ga('create', '{{ GOOGLE_ANALYTICS_PROPERTY_ID }}', gaConfig);
+      ga('set', 'dimension1', userType);
+      ga('set', 'dimension2', userCountry);
+      ga('set', 'dimension3', thisSiteArea);
+      ga('send', 'pageview');
+  } catch {
+      console.log('Google analytics has been blocked')
+  }
 
 </script>

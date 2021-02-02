@@ -41,16 +41,24 @@ function sendGoogleAnalyticsEvent({
     label = null,
     value =  null
 } = {}) {
-    var ga = window[window['GoogleAnalyticsObject'] || 'ga'];
-    let params = [category, action];
-    if (label !== null) {
-        params.push(label);
-        if (value !== null) {
-            params.push(value);
-        }
+    try {
+        var ga = window[window['GoogleAnalyticsObject'] || 'ga'];
+    } catch {
+        console.log('Google analytics failed to load')
     }
-    if (typeof ga == 'function') {
-        ga('send', 'event', ...params);
+    try{
+        let params = [category, action];
+        if (label !== null) {
+            params.push(label);
+            if (value !== null) {
+                params.push(value);
+            }
+        }
+        if (typeof ga == 'function') {
+            ga('send', 'event', ...params);
+        }
+    } catch {
+        console.log("Google analytics failed to run")
     }
 }
 window.sendGoogleAnalyticsEvent = sendGoogleAnalyticsEvent;

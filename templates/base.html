@@ -346,8 +346,8 @@
             }
         </script>
 
-
-        {% if GOOGLE_ANALYTICS_PROPERTY_ID and "tola-activity.mercycorps.org" in request.build_absolute_uri %}
+        {# Allows activation of GA on dev servers if needed. #}
+        {% if GOOGLE_ANALYTICS_PROPERTY_ID and "mercycorps.org" in request.build_absolute_uri %}
             {% include "google_analytics.html" %}
         {% endif %}
 
