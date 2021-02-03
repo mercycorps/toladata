@@ -359,6 +359,11 @@ WEBPACK_LOADER = {
 LOGGING = {
     'version': 1,
     'disable_existing_loggers': False,
+    'filters': {
+        'require_debug_false': {
+            '()': 'django.utils.log.RequireDebugFalse',
+        }
+    },
     'formatters': {
         'standard': {
             'format': '%(asctime)s %(levelname)-8s %(name)-12s %(message)s',
@@ -373,7 +378,8 @@ LOGGING = {
         },
         'admin_email': {
             'level': 'ERROR',
-            'class': 'logging.StreamHandler',
+            'class': 'django.utils.log.AdminEmailHandler',
+            'filters': ['require_debug_false']
         }
     },
     'loggers': {

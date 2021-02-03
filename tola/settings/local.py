@@ -121,8 +121,6 @@ GOOGLE_ANALYTICS_DOMAIN = app_settings.get('GOOGLE_ANALYTICS_DOMAIN', None)
 SECRET_KEY = app_settings['SECRET_KEY']
 
 LOGGING['handlers']['file']['filename'] = app_settings['LOGFILE']
-LOGGING['handlers']['admin_email']['class'] = app_settings.get(
-    'LOGGING_ADMIN_EMAIL_HANDLER_CLASS', 'logging.StreamHandler')
 
 # use webpack dev server
 WEBPACK_LOADER = {
