@@ -24,7 +24,7 @@ export default ({ setBottomScrolling, setExtend, setTableHeight }) => {
             setExtend(parseInt(footer - (document.documentElement.scrollHeight - window.innerHeight - window.scrollY)));
         }
 
-        // Event listerers for page scrolling and resizing
+        // Event listeners for page scrolling and resizing
         window.onresize = scrollEventHandler;
         window.onscroll = scrollEventHandler;
     }, []);
