@@ -5,6 +5,7 @@ import getReportStore from './reportStore';
 
 import { TVA, TIMEPERIODS } from '../../../constants';
 import api from '../../../apiv2';
+import { data } from 'jquery';
 
 
 export default (
@@ -16,48 +17,14 @@ export default (
         _reportStore: getReportStore(reactContext.report || {}),
         _expandoRows: [],
         expandAllRows(section) {
-            let top = this._expandoRows.slice(0, 15);
-            let remaining = this._expandoRows.slice(15);
+            let top = this._expandoRows.slice(0, 20);
+            let remaining = this._expandoRows.slice(20);
 
-            let first = new Promise((resolve, reject) => {
-                top.forEach((row,i) => {
-                    console.log("Top: ", i)
-                    row.expandRow()
-                resolve()
-                })
-            })
+            top.forEach(row => {row.expandRow()})
 
-            first.then(() => {
-                setTimeout(() => {
-                remaining.forEach((row,i) => {
-                    console.log("Remaining: ", i)
-                    row.expandRow()
-                })
-                },1)
-            })
-
-
-            // top.forEach((row,i) => {
-            //     console.log("Top: ", i)
-            //     row.expandRow()
-            // })
-            // setTimeout(() => {
-            //     remaining.forEach((row,i) => {
-            //         console.log("Remaining: ", i)
-            //         row.expandRow()
-            //     })
-            // }, 1000)
-
-
-
-
-
-            // this._expandoRows.forEach((row, i) => {
-            //     if (i <= 10) {
-            //         console.log("Row: ", i)
-            //         row.expandRow() 
-            //     }
-            // });
+            setTimeout(() => {
+                remaining.forEach(row => {row.expandRow()})
+            }, 1000)
         },
         get allExpanded() {
             return this._expandoRows.every(row => row.state.expanded);
