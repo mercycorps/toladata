@@ -47,6 +47,8 @@
 .subheader__actions {
     margin-left: $grid-gutter-width/4;
     margin-right: $grid-gutter-width/4;
+    position: sticky;
+    right: 7px;
 }
 
 .page-footer__actions {
