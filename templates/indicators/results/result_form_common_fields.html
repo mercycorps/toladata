@@ -34,8 +34,10 @@
            {% elif indicator.is_mid_end_target_frequency %}
            data-content="{% trans 'You can measure this result against the Midline or Endline target.' %}">
            {% elif indicator.is_event_target_frequency %}
+           {# Translators: Text of a help popup.  Tells users what kind of target they will be applying a result against #}
            data-content="{% trans 'You can measure this result against an Event target.' %}">
            {% else %}
+           {# Translators: Text of a help popup. Tells users that there is no target against which to apply the result they are trying to enter #}
            data-content="{% trans 'Indicator missing targets.' %}">
            {% endif %}
 

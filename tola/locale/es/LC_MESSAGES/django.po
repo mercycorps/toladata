@@ -7,7 +7,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: \n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2021-02-03 15:40-0800\n"
+"POT-Creation-Date: 2021-02-04 14:51-0800\n"
 "PO-Revision-Date: 2021-02-03 15:45-0800\n"
 "Last-Translator: \n"
 "Language-Team: \n"
@@ -3054,16 +3054,18 @@ msgstr ""
 msgid "You can measure this result against the Midline or Endline target."
 msgstr "Puede medir este resultado contra el objetivo de línea media o final."
 
-#: templates/indicators/results/result_form_common_fields.html:37
+#. Translators: Text of a help popup.  Tells users what kind of target they will be applying a result against
+#: templates/indicators/results/result_form_common_fields.html:38
 msgid "You can measure this result against an Event target."
 msgstr "Puede medir este resultado contra un objetivo de evento."
 
-#: templates/indicators/results/result_form_common_fields.html:39
+#. Translators: Text of a help popup. Tells users that there is no target against which to apply the result they are trying to enter
+#: templates/indicators/results/result_form_common_fields.html:41
 msgid "Indicator missing targets."
 msgstr "Indicadores sin objetivos."
 
 #. Translators: On a form input for "actual values" - warns user that they will be rounded.
-#: templates/indicators/results/result_form_common_fields.html:57
+#: templates/indicators/results/result_form_common_fields.html:59
 msgid "Actual values are rounded to two decimal places."
 msgstr "Los valores reales se redondean a dos decimales."
 
