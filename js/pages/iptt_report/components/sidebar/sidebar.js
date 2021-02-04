@@ -1,21 +1,24 @@
 import React, { useEffect, useState } from 'react';
 import IPTTFilterForm from './filterForm';
 
-export default ({bottomScrolling, extend}) => {
+export default ({bottomScrolling, extend, tableHeight}) => {
+    const [startScroll, setStartScroll] = useState(0);
 
-    const [startScroll, setStartScroll] = useState(null);
+    /* At the bottom of the page, if the amount of space left for a user to scroll the IPTT report is less than or equal to the amount of the sidebar that is not visible, the sidebar scroll position will be set to match the scroll position of the page creating a sync scrolling effect. The extender divs account for the footers height and pushes down the sidebar and toggle to keep them visible and not have the top of them cut off when scrolled to very bottom. 
 
-    /* At the bottom of the page, if the amount of space left for a user to scroll the IPTT report is less than or equal to the amount of the sidebar that is not visible, the sidebar scroll position will be set to match the scroll position of the page creating a sync scrolling effect. The extender divs account for the footers height and pushes down the sidebar and toggle to keep them visible and not have the top of them cut off when scrolled to very bottom.*/
+    However, if the table is too shorter than the length of the sidebar. The sidebar will not automatically scrolll but rather stay sticky at the top.
+    */
     if (startScroll && bottomScrolling && bottomScrolling <= startScroll) {
         let sidebarElement = document.querySelector("#sidebar");
-        sidebarElement.scrollTop = startScroll - bottomScrolling;
+        sidebarElement.scrollTop = tableHeight <= startScroll ? 0 : startScroll - bottomScrolling;
     }
+
     // Calculate how much of the sidebar is not visible and can be scrolled.
     useEffect(() => {
         let sidebarElement = document.querySelector("#sidebar");
-        let start = sidebarElement.scrollHeight - sidebarElement.clientHeight;
-        setStartScroll(start)
-    }, [])
+        let start = sidebarElement.scrollHeight - sidebarElement.clientHeight - 300;
+        setStartScroll(start);
+    })
     
     return (
         <div className="sidebar_container">
