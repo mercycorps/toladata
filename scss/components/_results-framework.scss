@@ -158,6 +158,7 @@
 .actions__top, .actions__bottom {
     display: flex;
     justify-content: flex-end;
+    flex-wrap: wrap-reverse;
 }
 // popover links to iptt on collapsed cards
 .level-card--iptt-links {
