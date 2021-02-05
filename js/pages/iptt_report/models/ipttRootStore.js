@@ -16,7 +16,14 @@ export default (
         _reportStore: getReportStore(reactContext.report || {}),
         _expandoRows: [],
         expandAllRows() {
-            this._expandoRows.forEach(row => {row.expandRow()});
+            let top = this._expandoRows.slice(0, 20);
+            let remaining = this._expandoRows.slice(20);
+
+            top.forEach(row => {row.expandRow()});
+
+            setTimeout(() => {
+                remaining.forEach(row => {row.expandRow()});
+            }, 1000)
         },
         get allExpanded() {
             return this._expandoRows.every(row => row.state.expanded);
