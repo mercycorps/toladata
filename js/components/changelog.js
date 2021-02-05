@@ -40,13 +40,14 @@ export const ChangeField = ({name, data, extraTitleText=null, change_type=''}) =
     }
 };
 
-const ChangeLogEntryHeader = ({data, is_expanded, toggle_expando_cb}) => {
+export const ChangeLogEntryHeader = ({data, is_expanded, toggle_expando_cb}) => {
     // TODO: apply is-expanded dynamically
     return <tr className={is_expanded ? 'changelog__entry__header is-expanded' : 'changelog__entry__header'} onClick={() => toggle_expando_cb(data.id)}>
         <td className="text-nowrap text-action">
             <FontAwesomeIcon icon={is_expanded ? faCaretDown : faCaretRight} />&nbsp;<strong>{data.date}</strong>
         </td>
-        <td className="text-nowrap">{data.admin_user}</td>
+        {/* # Translators: This is shown in a table where the cell would usually have a username.  This value is used when there is no username to show.  */}
+        <td className="text-nowrap">{data.admin_user ?? gettext("Unavailable -- user deleted")}</td>
         <td className="text-nowrap">{data.pretty_change_type}</td>
         <td></td>
         <td></td>
