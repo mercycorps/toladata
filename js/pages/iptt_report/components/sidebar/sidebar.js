@@ -44,15 +44,15 @@ export default ({bottomScrolling, extend, tableHeight}) => {
         } else {
 
             // If the difference of where the sidebar should be and where it actual is is larger the 15px, apply the scroll effect with smooth scrolling to catch back up smoothly and prevent the sidebar from jumping awkwardly. This happens when in the sync scrolling zone and the user manually scrolls the sidebar out of sync. It will catch back up smoothly.
-            if (Math.abs((startScroll - bottomScrolling) - sidebarElement.scrollTop) < 15) {
-                sidebarElement.scrollTop = startScroll - bottomScrolling;
-
-            // Otherwise apply the sync scrolling to match the rate of the table scrolling.
-            } else {
+            if (Math.abs((startScroll - bottomScrolling) - sidebarElement.scrollTop) > 15) {
                 sidebarElement.scroll({
                     top: startScroll - bottomScrolling,
                     behavior: 'smooth',
                 });
+                
+                // Otherwise apply the sync scrolling to match the rate of the table scrolling.
+            } else {
+                sidebarElement.scrollTop = startScroll - bottomScrolling;
             }
         }
     }
