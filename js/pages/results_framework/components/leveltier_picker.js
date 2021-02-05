@@ -4,7 +4,8 @@ import { toJS } from "mobx";
 
 import Select from 'react-select';
 import HelpPopover from "../../../components/helpPopover";
-import { EditableLevelTierList, StaticLevelTierList } from './level_tier_lists'
+import { EditableLevelTierList } from './level_tier_lists'
+import MiniRFDiagram from './mini_diagram';
 
 @inject('rootStore')
 @observer
@@ -91,7 +92,7 @@ const ChangeLogLink = ({programId}) => {
 export { ChangeLogLink };
 
 export const LevelTierPicker = inject("rootStore")(observer(function (props) {
-    let tierListType = <StaticLevelTierList />;
+    let tierListType = <MiniRFDiagram width={ props.pickerWidth} />;
     if (this.props.rootStore.levelStore.chosenTierSetKey == this.props.rootStore.levelStore.customTierSetKey &&
         !this.props.rootStore.levelStore.useStaticTierList &&
         this.props.rootStore.levelStore.hasEditPermissions){

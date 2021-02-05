@@ -6,9 +6,14 @@ import 'jest-styled-components';
 
 const ACTIVE_NODE_FILL = '#FFF';
 const ACTIVE_NODE_STROKE = '#000';
+const ACTIVE_NODE_LABLES = '#000';
 const SELECTED_NODE_FILL = '#CCEFEE';
 const INACTIVE_NODE_FILL = '#FFF';
 const INACTIVE_NODE_STROKE = '#71757b';
+const UNUSED_NODE_FILL = '#EDEEEE';
+const UNUSED_NODE_STROKE = '#EDEEEE';
+const UNUSED_NODE_LABELS = '#94979C';
+
 
 const ViewBox = ({children}) => (
     <svg>{children}</svg>
@@ -80,7 +85,7 @@ describe("TreeNode", () => {
         });
     });
     describe("given an inactive status with children", () => {
-        const props = {width: 40, height: 40, label: "1", inactive: true, inactiveWithChildren: true}
+        const props = {width: 40, height: 40, label: "1", inactive: true, inactiveWithChildren: true};
         test("returns elements with inactive styling and an arrowhead underneath", () => {
             const tree = renderer.create(<StyledTreeNode {...props} />).toJSON();
             expect(tree).toHaveStyleRule('fill', INACTIVE_NODE_FILL, {modifier: 'rect'});
@@ -96,6 +101,16 @@ describe("TreeNode", () => {
             expect(descendantsNode.attr('marker-end')).toEqual("url(#arrowhead)");
         });
     });
+        describe("given an unused status", () => {
+            const props = {width: 40, heigh: 40, unused: true};
+            test("returns a node with unused styling", () => {
+                const tree = renderer.create(<StyledTreeNode {...props} />).toJSON();
+                expect(tree).toHaveStyleRule('fill', UNUSED_NODE_FILL, {modifier: 'rect'});
+                expect(tree).toHaveStyleRule('stroke', UNUSED_NODE_STROKE, {modifier: 'rect'});
+                expect(tree).toHaveStyleRule('opacity', '0.5', {modifier: 'rect'});
+                expect(tree).toHaveStyleRule('stroke-width', "2", {modifier: 'rect'});
+            });
+        })
 });
 
 /**
@@ -246,14 +261,14 @@ describe('TreeTier', () => {
 
 describe("TierLabels", () => {
     describe("Given one label", () => {
-        test("should not show any labels", () => {
-            const props = {centerline: 55, nodeHeight: 40, tiers: ["Goal"]};
+        test("should show one label", () => {
+            const props = {centerline: 55, nodeHeight: 40, tiers: [["Goal"], []]};
             const wrapper = render(<ViewBox><TierLabels {...props} /></ViewBox>);
-            expect(wrapper.find('text').length).toBe(0);
+            expect(wrapper.find('text').length).toBe(1);
         });
     });
-    describe("Given two labels", () => {
-        const props = {centerline: 55, nodeHeight: 40, tiers: ["Goal", "Outcome"]};
+    describe("Given two used labels", () => {
+        const props = {centerline: 55, nodeHeight: 40, tiers: [["Goal", "Outcome"], []]};
         const wrapper = render(<ViewBox><TierLabels {...props} /></ViewBox>);
         test("should show both labels", () => {
             expect(wrapper.find('text').length).toBe(2);
@@ -272,7 +287,7 @@ describe("TierLabels", () => {
         });
     });
     describe("Given a very long title", () => {
-        const props = {centerline: 55, nodeHeight: 40, tiers: ["Goal", "Tier with an extremely long title", "Tier with extremely really long title"]};
+        const props = {centerline: 55, nodeHeight: 40, tiers: [["Goal", "Tier with an extremely long title", "Tier with extremely really long title"], []]};
         const wrapper = render(<ViewBox><TierLabels {...props} /></ViewBox>);
         const secondLabel = wrapper.find('text').eq(1);
         // should be split into two:
@@ -292,5 +307,13 @@ describe("TierLabels", () => {
         expect(secondSpan2.text()).toBe("really long title");
         expect(secondSpan2.attr('x')).toBe("0");
         expect(secondSpan2.attr('dy')).toBe("15");
+    })
+    describe("Given a mix of active and inactive tiers", () => {
+        const props = {centerline: 55, nodeHeight: 40, tiers: [["Goal", "Output"], ["Outcome", "Activity"]]};
+        const wrapper = render(<ViewBox><TierLabels {...props} /></ViewBox>);
+        const thirdLabel = wrapper.find('text').eq(2);
+        expect(thirdLabel.find('tspan').length).toBe(1);
+        expect(thirdLabel.find('tspan').first().text()).toBe("Outcome");
+        expect(wrapper.find('text').eq(3).find('tspan').first().text()).toBe("Activity");
     })
 })

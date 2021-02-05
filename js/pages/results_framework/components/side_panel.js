@@ -7,8 +7,7 @@ export default (props) => {
     const [width, containerRef] = useCenteredTree();
     return (
         <div className="rf-builder-side-panel" ref={ containerRef }>
-            <LevelTierPicker />
-            <MiniRFDiagram width={ width } />
+            <LevelTierPicker pickerWidth = { width } />
         </div>
     )
 }

@@ -18,8 +18,8 @@ const INACTIVE_GRAY = '#71757b';
 const TreeNode = ({className, width, height, clickHandler, ...props}) => {
     return (
             <g className={className} transform={`translate(${props.translate}, 0)`}>
-                <rect width={width} height={height} x={-Math.floor(width/2)} y={0} onClick={ clickHandler }/>
-                {props.label && <text dy={Math.floor(height/2) + 5} onClick={ clickHandler }>{props.label}</text>}
+                <rect width={width} height={height} x={-Math.floor(width/2)} y={0} onClick={props.unused ? undefined : clickHandler }/>
+                {(!props.unused && props.label) && <text dy={Math.floor(height/2) + 5} onClick={ clickHandler }>{props.label}</text>}
                 {props.inactive && props.inactiveWithChildren &&
                 <line stroke={ INACTIVE_GRAY } opacity="0.5" x1="0" x2="0" y1={height} y2={Math.floor(height*5/4)} markerEnd="url(#arrowhead)" />
                 }
@@ -32,6 +32,7 @@ TreeNode.defaultProps = {
     height: 40,
     label: false,
     inactive: false,
+    unused: false,
     inactiveWithChildren: false,
     translate: 0
 };
@@ -47,9 +48,9 @@ TreeNode.propTypes = {
 
 export const StyledTreeNode = styled(TreeNode)`
     rect {
-        fill: ${props => props.selected ? '#CCEFEE' : '#FFF'};
-        stroke: ${props => props.inactive ? INACTIVE_GRAY : '#000'};
-        opacity: ${props => props.inactive ? '0.5' : '1'};
+        fill: ${props => props.selected ? '#CCEFEE' : (props.unused ? '#EDEEEE' : '#FFF')};
+        stroke: ${props => props.inactive ? INACTIVE_GRAY : (props.unused ? '#EDEEEE' : '#000')};
+        opacity: ${props => (props.inactive || props.unused) ? '0.5' : '1'};
         stroke-width: 2;
         cursor: ${props => props.selected ? 'default' : 'pointer'};
     }
@@ -110,7 +111,7 @@ const TreeTier = ({className, nodeHeight, nodeWidth, tierDepth, node, prevNode, 
                 <line className="path__active" x1="0" x2="0" y1={ -Math.floor(1.5 * nodeHeight) } y2="0" />
             }
             <StyledTreeNode width={nodeWidth} height={nodeHeight} selected={node.selected} label={node?.label}
-                            clickHandler={ node.onclick } />
+                            unused={node.unused} clickHandler={ node.onclick } />
         </g>
     );
 }
@@ -167,7 +168,7 @@ export const StyledTreeTier = styled(TreeTier)`
     }
 `;
 
-const TierLabel = ({className, tier, ...props}) => {
+const TierLabel = ({className, tier, active, ...props}) => {
     // Arbitrary length after which we split into two spans (this might need to be expanded upon to handle even longer
     // custom tier names, for now it's just 1 line if less than this const, 2 lines if more)
     const MAX_LENGTH = 20;
@@ -202,6 +203,11 @@ const TierLabel = ({className, tier, ...props}) => {
     );
 };
 
+TierLabel.defaultProps = {
+    tier: '',
+    active: true
+}
+
 // styling per ticket copies style of "2 indicators" label bottom right of level cards:
 const StyledLabel = styled(TierLabel)`
     text-anchor: middle;
@@ -211,7 +217,7 @@ const StyledLabel = styled(TierLabel)`
 `;
 
 
-const TierLabels = ({centerline, nodeHeight, tiers, ...props}) => {
+const TierLabels = ({centerline, nodeHeight, tiers: [activeTiers, inactiveTiers], ...props}) => {
     // helper function for getting the y translate for each tier:
     const getHeightToCenter = (depth) => {
         // tier height to top of node boxes is defined as h * (2.5 * depth - 2) + half node height to hit center
@@ -220,9 +226,16 @@ const TierLabels = ({centerline, nodeHeight, tiers, ...props}) => {
     return (
         <g className="tierLabels" transform={`translate(${centerline}, 0)`}>
             {
-                tiers?.length > 1 && tiers.map((tier, depth) =>
+                activeTiers.map((tier, depth) =>
                     <g key={`${tier}_${depth}`} transform={`translate(0, ${getHeightToCenter(depth)})`}>
-                        <StyledLabel tier={tier} />
+                        <StyledLabel tier={tier} active={true} />
+                    </g>
+                )
+            }
+            {
+                inactiveTiers.map((tier, depth) =>
+                    <g key={`${tier}_${depth + activeTiers.length}`} transform={`translate(0, ${getHeightToCenter(depth + activeTiers.length)})`}>
+                        <StyledLabel tier={tier} active={false} />
                     </g>
                 )
             }
@@ -246,13 +259,13 @@ TierLabels.propTypes = {
 export { TierLabels };
 
 
-const RFTreeDiagram = ({levelTreeData, containerWidth, maxHeight, nodeHeight, nodeWidth, clickHandlerGetter, ...props}) => {
+const RFTreeDiagram = ({levelTreeData, inactiveTiers, containerWidth, maxHeight, nodeHeight, nodeWidth, clickHandlerGetter, ...props}) => {
     if (!levelTreeData || !levelTreeData?.length > 1) {
         console.log(levelTreeData);
         return <svg />;
     }
     const containerHeight = Math.floor((2 + 2.5*(levelTreeData.length - 1)) * nodeHeight);
-    const tiers = levelTreeData.map(treeTierData => treeTierData.tier);
+    const activeTiers = levelTreeData.map(treeTierData => treeTierData.tier);
     const tierTreeProps = levelTreeData.map((treeTierData, index) => ({
         nodeHeight: nodeHeight,
         nodeWidth: nodeWidth,
@@ -272,7 +285,7 @@ const RFTreeDiagram = ({levelTreeData, containerWidth, maxHeight, nodeHeight, no
                     <polygon points="0 0, 3.5 1.5, 0 3" stroke={ INACTIVE_GRAY } fill={ INACTIVE_GRAY }  />
                 </marker>
             </defs>
-            <TierLabels centerline={ Math.floor(containerWidth/6) } nodeHeight={ nodeHeight } tiers={ tiers } />
+            <TierLabels centerline={ Math.floor(containerWidth/6) } nodeHeight={ nodeHeight } tiers={ [activeTiers, inactiveTiers] } />
             <g className="treeNodes" transform={`translate(${2 * Math.floor(containerWidth/3)}, 0)`}>
                 {tierTreeProps.map(tierProps => <StyledTreeTier key={tierProps.tierDepth} {...tierProps} />)}
             </g>
@@ -314,11 +327,10 @@ export default inject('rootStore')(observer(({rootStore, width, height, ...props
         // timeout because the scroll won't work without letting the active card set first:
         setTimeout(() => $(`#level-card-${id}`)[0].scrollIntoView({behavior: 'smooth'}), 40);
     }
-    if (rootStore.levelStore.levelTreeData === false) {
-        return null;
-    }
+    //if (rootStore.levelStore.levelTreeData === false) {
+    //    return null;
+    //}
     return (
-        <RFTreeDiagram levelTreeData={rootStore.levelStore.levelTreeData} clickHandlerGetter={getClickHandler} containerWidth={ width } />
+        <RFTreeDiagram levelTreeData={rootStore.levelStore.levelTreeData} inactiveTiers={rootStore.levelStore.inactiveTiers} clickHandlerGetter={getClickHandler} containerWidth={ width } />
     );
 }));
-
