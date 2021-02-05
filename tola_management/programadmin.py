@@ -611,7 +611,7 @@ class ProgramAdminViewSet(viewsets.ModelViewSet):
         ws = workbook.create_sheet(_('Change log'))
         get_audit_log_workbook(ws, program)
         response = HttpResponse(content_type='application/ms-excel')
-        filename = '{} Audit Log {}.xlsx'.format(program.name, timezone.now().strftime('%b %d, %Y'))
+        filename = '{} Program Change Log {}.xlsx'.format(program.name, timezone.now().strftime('%b %d, %Y'))
         response['Content-Disposition'] = 'attachment; filename="{}"'.format(filename)
         workbook.save(response)
         return response
