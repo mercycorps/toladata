@@ -5,7 +5,6 @@ import getReportStore from './reportStore';
 
 import { TVA, TIMEPERIODS } from '../../../constants';
 import api from '../../../apiv2';
-import { data } from 'jquery';
 
 
 export default (
@@ -20,10 +19,10 @@ export default (
             let top = this._expandoRows.slice(0, 20);
             let remaining = this._expandoRows.slice(20);
 
-            top.forEach(row => {row.expandRow()})
+            top.forEach(row => {row.expandRow()});
 
             setTimeout(() => {
-                remaining.forEach(row => {row.expandRow()})
+                remaining.forEach(row => {row.expandRow()});
             }, 1000)
         },
         get allExpanded() {
