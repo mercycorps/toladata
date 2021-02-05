@@ -15,7 +15,7 @@ export default (
         get filterStore() {return this._filterStore},
         _reportStore: getReportStore(reactContext.report || {}),
         _expandoRows: [],
-        expandAllRows(section) {
+        expandAllRows() {
             let top = this._expandoRows.slice(0, 20);
             let remaining = this._expandoRows.slice(20);
 
