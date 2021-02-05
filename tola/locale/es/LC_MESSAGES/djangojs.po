@@ -6,8 +6,8 @@ msgid ""
 msgstr ""
 "Project-Id-Version: \n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2021-01-27 12:19-0800\n"
-"PO-Revision-Date: 2021-01-27 12:26-0800\n"
+"POT-Creation-Date: 2021-02-05 13:04-0800\n"
+"PO-Revision-Date: 2021-02-05 13:12-0800\n"
 "Last-Translator: \n"
 "Language-Team: \n"
 "Language: es\n"
@@ -180,13 +180,13 @@ msgid "None available"
 msgstr "Ninguno disponible"
 
 #. Translators: refers to grouping the report by the level of the indicator */
-#: js/components/selectWidgets.js:196
+#: js/components/selectWidgets.js:198
 #: js/pages/program_page/models/programPageUIStore.js:53
 msgid "by Level"
 msgstr "por Nivel"
 
 #. Translators: menu for selecting how rows are grouped in a report */
-#: js/components/selectWidgets.js:202
+#: js/components/selectWidgets.js:204
 msgid "Group indicators"
 msgstr "Agrupar indicadores"
 
@@ -422,50 +422,46 @@ msgid "Target periods"
 msgstr "Periodos objetivo"
 
 #. Translators: The user has successfully "pinned" a report link to a program page for quick access to the report */}
-#: js/pages/iptt_report/components/report/buttons.js:57
+#: js/pages/iptt_report/components/report/buttons.js:78
 msgid "Success!  This report is now pinned to the program page."
 msgstr "¡Éxito! Este informe ahora está anclado en la página del programa."
 
 #. Translators: This is not really an imperative, it's an option that is available once you have pinned a report to a certain web page */}
-#: js/pages/iptt_report/components/report/buttons.js:63
+#: js/pages/iptt_report/components/report/buttons.js:84
 msgid "Visit the program page now."
 msgstr "Visitar la página del programa ahora."
 
 #. Translators: Some error occured when trying to pin the report*/}
-#: js/pages/iptt_report/components/report/buttons.js:74
+#: js/pages/iptt_report/components/report/buttons.js:95
 msgid "Something went wrong when attempting to pin this report."
 msgstr "Algo salió mal al intentar anclar este informe."
 
 #. Translators: a field where users can name their newly created report */
-#: js/pages/iptt_report/components/report/buttons.js:86
+#: js/pages/iptt_report/components/report/buttons.js:107
 msgid "Report name"
 msgstr "Nombre del informe"
 
 #. Translators: An error occured because a report has already been pinned with that same name */}
-#: js/pages/iptt_report/components/report/buttons.js:100
+#: js/pages/iptt_report/components/report/buttons.js:120
 msgid "A pin with this name already exists."
 msgstr "Ya existe un informe fijo con este nombre."
 
-#: js/pages/iptt_report/components/report/buttons.js:112
+#: js/pages/iptt_report/components/report/buttons.js:133
 msgid "Pin to program page"
 msgstr "Anclar a la página del programa"
 
-#: js/pages/iptt_report/components/report/buttons.js:121
-msgid "Sending"
-msgstr "Enviando"
-
 #. Translators: a button that lets a user "pin" (verb) a report to their home page */
-#: js/pages/iptt_report/components/report/buttons.js:156
+#: js/pages/iptt_report/components/report/buttons.js:176
 msgid "Pin"
 msgstr "Fijar"
 
 #. Translators: a download button for a report containing just the data currently displayed */
-#: js/pages/iptt_report/components/report/buttons.js:194
+#: js/pages/iptt_report/components/report/buttons.js:214
 msgid "Current view"
 msgstr "Vista actual"
 
 #. Translators: a download button for a report containing all available data */
-#: js/pages/iptt_report/components/report/buttons.js:200
+#: js/pages/iptt_report/components/report/buttons.js:220
 msgid "All program data"
 msgstr "Todos los datos del programa"
 
@@ -592,7 +588,7 @@ msgstr "Opciones del Informe"
 msgid "Clear filters"
 msgstr "Limpiar filtros"
 
-#: js/pages/iptt_report/components/sidebar/filterForm.js:68
+#: js/pages/iptt_report/components/sidebar/filterForm.js:72
 #: js/pages/results_framework/components/leveltier_picker.js:86
 msgid "Change log"
 msgstr "Registro de cambios"
@@ -654,7 +650,7 @@ msgid "End"
 msgstr "Fin"
 
 #. Translators: A toggle button that hides a sidebar of filter options */
-#: js/pages/iptt_report/components/sidebar/sidebar.js:15
+#: js/pages/iptt_report/components/sidebar/sidebar.js:73
 msgid "Show/Hide Filters"
 msgstr "Mostrar/Ocultar filtros"
 
@@ -1298,8 +1294,8 @@ msgid "Result date:"
 msgstr "Fecha del resultado:"
 
 #: js/pages/tola_management_pages/audit_log/views.js:210
-msgid "Indicator change log"
-msgstr "Registro de cambios de indicadores"
+msgid "Program change log"
+msgstr "Registro de cambios de programa"
 
 #: js/pages/tola_management_pages/audit_log/views.js:234
 msgid "Date and time"
@@ -2224,6 +2220,12 @@ msgstr "Super Administrador"
 msgid "users"
 msgstr "usuarios"
 
+#~ msgid "Sending"
+#~ msgstr "Enviando"
+
+#~ msgid "Indicator change log"
+#~ msgstr "Registro de cambios de indicadores"
+
 #~ msgid "Successfully Saved"
 #~ msgstr "Guardado Exitosamente"
 
@@ -2890,9 +2892,6 @@ msgstr "usuarios"
 
 #~ msgid "%(no_programs)s active programs"
 #~ msgstr "%(no_programs)s programas activos"
-
-#~ msgid "Program page"
-#~ msgstr "Página del programa"
 
 #~ msgid "Recent progress report"
 #~ msgstr "Informe de progreso reciente"

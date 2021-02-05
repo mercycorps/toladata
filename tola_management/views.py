@@ -333,7 +333,7 @@ def audit_log_host_page(request, program_id):
                    "site_area": "audit log",
                    "report_wide": True,
                    # Translators: Page title for a log of all changes to indicators over a program's history
-                   "page_title": program.name+": " + gettext("Indicator change log") +" | "})
+                   "page_title": program.name+": " + gettext("Program change log") +" | "})
 
 
 class AuthUserSerializer(ModelSerializer):
