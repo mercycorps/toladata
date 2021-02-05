@@ -32,8 +32,29 @@ export default ({bottomScrolling, extend, tableHeight}) => {
     if (startScroll && bottomScrolling && bottomScrolling <= startScroll) {
        let sidebarElement = document.querySelector("#sidebar");
        
-        // The scrollTop attribute sets how much the sidebar has scrolled by setting at what height the top of the sidebar should be at. However, if the table is shorter than the total length of the sidebar. The sidebar will not automatically scrolll but rather stay sticky at the top.
-        sidebarElement.scrollTop = tableHeight <= startScroll ? 0 : startScroll - bottomScrolling;
+        // The scrollTop attribute sets how much the sidebar has scrolled by setting at what height the top of the sidebar should be at. If the table is shorter than the total length of the sidebar. The sidebar will not automatically scroll but rather stay sticky at the top.
+        if (tableHeight <= startScroll ) {
+
+            // If the sidebar had been scrolled down, apply a smooth scroll back to the top instead of jumping back up.
+            sidebarElement.scroll({
+                top: 0,
+                behavior: 'smooth',
+            });
+
+        } else {
+
+            // If the difference of where the sidebar should be and where it actual is is larger the 15px, apply the scroll effect with smooth scrolling to catch back up smoothly and prevent the sidebar from jumping awkwardly. This happens when in the sync scrolling zone and the user manually scrolls the sidebar out of sync. It will catch back up smoothly.
+            if (Math.abs((startScroll - bottomScrolling) - sidebarElement.scrollTop) > 15) {
+                sidebarElement.scroll({
+                    top: startScroll - bottomScrolling,
+                    behavior: 'smooth',
+                });
+                
+                // Otherwise apply the sync scrolling to match the rate of the table scrolling.
+            } else {
+                sidebarElement.scrollTop = startScroll - bottomScrolling;
+            }
+        }
     }
 
 
