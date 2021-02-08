@@ -154,6 +154,7 @@
     display: flex;
     flex-direction: column;
     justify-content: space-between;
+    align-items: flex-end;
 }
 .actions__top, .actions__bottom {
     display: flex;
