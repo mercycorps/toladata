@@ -392,7 +392,7 @@ class CountryAdminAuditLogSerializer(serializers.ModelSerializer):
         try:
             return obj.admin_user.name
         except AttributeError:
-            return None
+            return ''
 
     def get_disaggregation_type(self, obj):
         if obj.disaggregation_type:

@@ -185,15 +185,17 @@ class TestCountryAdminAuditLogSerializer(test.TestCase):
     def test_handles_empty_admin_user(self):
         log_entry = CountryAdminAuditLogFactory()
         serialized_log = CountryAdminAuditLogSerializer(log_entry)
-        self.assertIsNotNone(serialized_log.data['admin_user'])
+        self.assertNotEqual(serialized_log.data['admin_user'], '')
 
         log_entry.admin_user = None
         log_entry.save()
+        log_entry.refresh_from_db
         serialized_log = CountryAdminAuditLogSerializer(log_entry)
-        self.assertIsNone(serialized_log.data['admin_user'])
+        self.assertEqual(serialized_log.data['admin_user'], '')
 
         log_entry.disaggregation_type = None
         log_entry.save()
+        log_entry.refresh_from_db
         serialized_log = CountryAdminAuditLogSerializer(log_entry)
         self.assertEqual(serialized_log.data['disaggregation_type'], '')
 

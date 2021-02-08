@@ -346,7 +346,7 @@ class AuthUserSerializer(ModelSerializer):
 
 class UserManagementAuditLogSerializer(ModelSerializer):
     id = IntegerField(allow_null=True, required=False)
-    admin_user = CharField(source="admin_user_display", max_length=255)
+    admin_user = SerializerMethodField()
     date = DateTimeField(format="%Y-%m-%d %H:%M:%S")
 
     class Meta:
@@ -360,6 +360,12 @@ class UserManagementAuditLogSerializer(ModelSerializer):
             'diff_list',
             'pretty_change_type',
         )
+
+    def get_admin_user(self, obj):
+        try:
+            return obj.admin_user.name[:255]
+        except AttributeError:
+            return ''
 
 
 class UserAdminSerializer(ModelSerializer):
@@ -947,7 +953,7 @@ class OrganizationSerializer(ModelSerializer):
 
 class OrganizationAdminAuditLogSerializer(ModelSerializer):
     id = IntegerField(allow_null=True, required=False)
-    admin_user = CharField(source="admin_user.name", max_length=255)
+    admin_user = SerializerMethodField()
     date = DateTimeField(format="%Y-%m-%d %H:%M:%S")
 
     class Meta:
@@ -960,6 +966,12 @@ class OrganizationAdminAuditLogSerializer(ModelSerializer):
             'diff_list',
             'pretty_change_type',
         )
+
+    def get_admin_user(self, obj):
+        try:
+            return obj.admin_user.name[:255]
+        except AttributeError:
+            return ''
 
 
 class OrganizationAdminViewSet(viewsets.ModelViewSet):

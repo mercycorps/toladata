@@ -47,7 +47,7 @@ export const ChangeLogEntryHeader = ({data, is_expanded, toggle_expando_cb}) => 
             <FontAwesomeIcon icon={is_expanded ? faCaretDown : faCaretRight} />&nbsp;<strong>{data.date}</strong>
         </td>
         {/* # Translators: This is shown in a table where the cell would usually have a username.  This value is used when there is no username to show.  */}
-        <td className="text-nowrap">{data.admin_user ?? gettext("Unavailable -- user deleted")}</td>
+        <td className="text-nowrap">{data.admin_user || gettext("Unavailable -- user deleted")}</td>
         <td className="text-nowrap">{data.pretty_change_type}</td>
         <td></td>
         <td></td>

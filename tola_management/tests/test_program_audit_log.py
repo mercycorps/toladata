@@ -7,7 +7,8 @@ from django.urls import reverse
 from django.core.exceptions import ValidationError
 from factories import (
     workflow_models as w_factories,
-    indicators_models as i_factories
+    indicators_models as i_factories,
+    tola_management_models as tm_factories
 )
 from tola_management.models import ProgramAuditLog
 from tola_management.programadmin import ProgramAuditLogSerializer
@@ -565,3 +566,17 @@ class TestAuditLogRationaleSelectionsDisplay(test.TestCase):
         self.assertEqual(result['pretty_change_type'], 'Indicator changed')
         self.assertEqual(result['rationale'], 'Test rationale')
         self.assertEqual(result['rationale_selected_options'], ['COVID-19', 'Other (please specify)'])
+
+
+class TestAuditLogMissingValues(test.TestCase):
+    def test_audit_log_serializer_handles_missing_values(self):
+        audit_log = tm_factories.ProgramAuditLogFactory()
+        self.assertNotEqual(ProgramAuditLogSerializer(audit_log).data['user'], '')
+
+        audit_log.user = None
+        audit_log.organization = None
+        audit_log.save()
+        audit_log.refresh_from_db()
+        self.assertEqual(ProgramAuditLogSerializer(audit_log).data['user'], '')
+        self.assertEqual(ProgramAuditLogSerializer(audit_log).data['organization'], '')
+

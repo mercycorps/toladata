@@ -245,6 +245,8 @@ export const IndexView = observer(
                         </thead>
                         {store.log_rows.map(data => {
                                 let is_expanded = store.expando_rows.has(data.id);
+                                const userName = data.user || gettext("Unavailable -- user deleted");
+                                const orgName = data.organization || gettext("Unavailable -- organization deleted")
                                 return <tbody key={data.id}>
                                 <tr
                                     className={is_expanded ? 'changelog__entry__header is-expanded' : 'changelog__entry__header'}
@@ -255,8 +257,8 @@ export const IndexView = observer(
                                     </td>
                                     <td><ResultLevel indicator={data.indicator} level={data.level} /></td>
                                     <td>{<IndicatorNameSpan indicator={data.indicator} result_info={data.result_info} />}</td>
-                                    <td>{data.user}</td>
-                                    <td>{data.organization}</td>
+                                    <td>{userName}</td>
+                                    <td>{orgName}</td>
                                     <td className="text-nowrap">{data.pretty_change_type}</td>
                                     <td className="text-action">{is_expanded ? '' : '...'}</td>
                                     <td className="text-action">{is_expanded ? '' : '...'}</td>
