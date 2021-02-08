@@ -121,6 +121,7 @@ def get_audit_log_workbook(ws, program):
         Cell(ws, value=_('Rationale'))
     ]
 
+    # Translators: Page title for a log of all changes to indicators over a program's history
     title = Cell(ws, value=_("Program change log"))
     title.font = Font(size=18)
     ws.append([title,])
@@ -608,6 +609,7 @@ class ProgramAdminViewSet(viewsets.ModelViewSet):
         program = Program.objects.get(pk=pk)
         workbook = Workbook()
         workbook.remove(workbook.active)
+        # Translators: Sheet title for a log of all changes to indicators over a program's history
         ws = workbook.create_sheet(_('Program change log'))
         get_audit_log_workbook(ws, program)
         response = HttpResponse(content_type='application/ms-excel')
