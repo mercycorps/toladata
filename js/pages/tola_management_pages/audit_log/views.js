@@ -207,7 +207,7 @@ export const IndexView = observer(
         return <div id="audit-log-index-view">
             <header className="page-title">
                 <h1 className="page-title h2">
-                    <a href={`/program/${store.program_id}/`}>{store.program_name}</a>: <span className="font-weight-normal text-muted text-nowrap">{gettext("Indicator change log")}&nbsp;<small><i className="fa fa-history" /></small></span>
+                    <a href={`/program/${store.program_id}/`}>{store.program_name}</a>: <span className="font-weight-normal text-muted text-nowrap">{gettext("Program change log")}&nbsp;<small><i className="fa fa-history" /></small></span>
                 </h1>
             </header>
 
