@@ -52,7 +52,7 @@ msgstr "Éxito"
 #. Translators: the header of an alert where additional warning info is provided
 #: js/base.js:430 js/pages/results_framework/components/level_cards.js:86
 #: js/pages/results_framework/models.js:620
-#: js/pages/tola_management_pages/country/components/edit_disaggregations.js:656
+#: js/pages/tola_management_pages/country/components/edit_disaggregations.js:657
 #: js/pages/tola_management_pages/country/models.js:438
 #: js/pages/tola_management_pages/country/models.js:473
 #: js/pages/tola_management_pages/country/models.js:505
@@ -81,23 +81,29 @@ msgstr "Expandir todos"
 msgid "Collapse all"
 msgstr "Colapsar todos"
 
-#: js/components/changelog.js:81
+#. Translators: This is shown in a table where the cell would usually have a username.  This value is used when there is no username to show.  */}
+#: js/components/changelog.js:48
+#: js/pages/tola_management_pages/audit_log/views.js:249
+msgid "Unavailable — user deleted"
+msgstr "No disponible: usuario eliminado"
+
+#: js/components/changelog.js:80
 msgid "No differences found"
 msgstr "No se encontraron diferencias"
 
-#: js/components/changelog.js:100 js/components/changelog.js:105
-#: js/components/changelog.js:115 js/components/changelog.js:120
+#: js/components/changelog.js:99 js/components/changelog.js:104
+#: js/components/changelog.js:114 js/components/changelog.js:119
 #: js/pages/tola_management_pages/country/views.js:95
 msgid "Country"
 msgstr "País"
 
 #. Translators:  Role references a user's permission level when accessing data (i.e. User or Admin) */}
-#: js/components/changelog.js:102 js/components/changelog.js:106
-#: js/components/changelog.js:116 js/components/changelog.js:121
+#: js/components/changelog.js:101 js/components/changelog.js:105
+#: js/components/changelog.js:115 js/components/changelog.js:120
 msgid "Role"
 msgstr "Función"
 
-#: js/components/changelog.js:114 js/components/changelog.js:119
+#: js/components/changelog.js:113 js/components/changelog.js:118
 #: js/pages/iptt_quickstart/components/selects.js:22
 #: js/pages/iptt_quickstart/components/selects.js:39
 #: js/pages/iptt_report/components/sidebar/reportSelect.js:14
@@ -105,23 +111,23 @@ msgstr "Función"
 msgid "Program"
 msgstr "Programa"
 
-#: js/components/changelog.js:181
+#: js/components/changelog.js:178
 msgid "Date"
 msgstr "Fecha"
 
-#: js/components/changelog.js:182
+#: js/components/changelog.js:179
 msgid "Admin"
 msgstr "Administrador"
 
-#: js/components/changelog.js:183
+#: js/components/changelog.js:180
 msgid "Change Type"
 msgstr "Tipo de Cambio"
 
-#: js/components/changelog.js:184
+#: js/components/changelog.js:181
 msgid "Previous Entry"
 msgstr "Valor Anterior"
 
-#: js/components/changelog.js:185
+#: js/components/changelog.js:182
 msgid "New Entry"
 msgstr "Nuevo Valor"
 
@@ -1261,7 +1267,7 @@ msgstr ""
 #. Translators: This is a confirmation prompt to confirm a user wants to archive an item
 #. Translators: This is a confirmation prompt to confirm a user wants to unarchive an item
 #: js/pages/results_framework/models.js:623
-#: js/pages/tola_management_pages/country/components/edit_disaggregations.js:660
+#: js/pages/tola_management_pages/country/components/edit_disaggregations.js:661
 #: js/pages/tola_management_pages/country/models.js:478
 #: js/pages/tola_management_pages/country/models.js:510
 #: js/pages/tola_management_pages/program/models.js:283
@@ -1331,7 +1337,12 @@ msgstr "Valor anterior"
 msgid "New entry"
 msgstr "Nuevo valor"
 
-#: js/pages/tola_management_pages/audit_log/views.js:305
+#. Translators: This is shown in a table where the cell would usually have an organization name.  This value is used when there is no organization to show.  */}
+#: js/pages/tola_management_pages/audit_log/views.js:251
+msgid "Unavailable — organization deleted"
+msgstr "No disponible: organización eliminada"
+
+#: js/pages/tola_management_pages/audit_log/views.js:309
 msgid "entries"
 msgstr "ítems"
 
@@ -1351,7 +1362,7 @@ msgid "Strategic Objectives"
 msgstr "Objetivos estratégicos"
 
 #: js/pages/tola_management_pages/country/components/country_editor.js:41
-#: js/pages/tola_management_pages/country/components/edit_disaggregations.js:699
+#: js/pages/tola_management_pages/country/components/edit_disaggregations.js:700
 msgid "Country Disaggregations"
 msgstr "Desagregación del País"
 
@@ -1521,23 +1532,25 @@ msgid "You have unsaved changes. Are you sure you want to discard them?"
 msgstr "Tiene cambios sin guardar. ¿Está seguro que desea descartarlos?"
 
 #. Translators:  Warning message about how the new type of disaggregation the user has created will be applied to existing and new data
-#: js/pages/tola_management_pages/country/components/edit_disaggregations.js:641
+#: js/pages/tola_management_pages/country/components/edit_disaggregations.js:642
 #, python-format
 msgid ""
 "This disaggregation will be automatically selected for all new indicators in "
-"%s and for existing indicators in %s program."
+"%(countryName)s and for existing indicators in %(retroCount)s program."
 msgid_plural ""
 "This disaggregation will be automatically selected for all new indicators in "
-"%s and for existing indicators in %s programs."
+"%(countryName)s and for existing indicators in %(retroCount)s programs."
 msgstr[0] ""
 "Esta desagregación se seleccionará automáticamente para todos los "
-"indicadores nuevos en %s y para los indicadores existentes en %s programa."
+"indicadores nuevos en %(countryName)s y para los indicadores existentes en "
+"%(retroCount)s programa."
 msgstr[1] ""
 "Esta desagregación se seleccionará automáticamente para todos los "
-"indicadores nuevos en %s y para los indicadores existentes en %s programas."
+"indicadores nuevos en %(countryName)s y para los indicadores existentes en "
+"%(retroCount)s programas."
 
 #. Translators:  This is a warning popup when the user tries to do something that has broader effects than they might anticipate
-#: js/pages/tola_management_pages/country/components/edit_disaggregations.js:648
+#: js/pages/tola_management_pages/country/components/edit_disaggregations.js:649
 #, python-format
 msgid ""
 "This disaggregation will be automatically selected for all new indicators in "
@@ -1547,7 +1560,7 @@ msgstr ""
 "indicadores en %s. Los indicadores existentes no se verán afectados."
 
 #. Translators:  This is a warning popup when the user tries to do something that has broader effects than they might anticipate
-#: js/pages/tola_management_pages/country/components/edit_disaggregations.js:652
+#: js/pages/tola_management_pages/country/components/edit_disaggregations.js:653
 #, python-format
 msgid ""
 "This disaggregation will no longer be automatically selected for all new "
@@ -1556,7 +1569,7 @@ msgstr ""
 "Esta desagregación ya no se seleccionará automáticamente para todos los "
 "nuevos indicadores en %s. Los indicadores existentes no se verán afectados."
 
-#: js/pages/tola_management_pages/country/components/edit_disaggregations.js:703
+#: js/pages/tola_management_pages/country/components/edit_disaggregations.js:704
 msgid "Add country disaggregation"
 msgstr "Agregar desagregación del país"
 
@@ -2448,9 +2461,6 @@ msgstr "usuarios"
 
 #~ msgid "Filter by indicator"
 #~ msgstr "Filtrar por indicador"
-
-#~ msgid "Unavailable until results are reported"
-#~ msgstr "No disponible hasta que se informen los resultados"
 
 #~ msgid "Program metrics"
 #~ msgstr "Indicadores claves del programa"

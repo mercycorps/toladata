@@ -245,8 +245,10 @@ export const IndexView = observer(
                         </thead>
                         {store.log_rows.map(data => {
                                 let is_expanded = store.expando_rows.has(data.id);
-                                const userName = data.user || gettext("Unavailable -- user deleted");
-                                const orgName = data.organization || gettext("Unavailable -- organization deleted")
+                                {/* # Translators: This is shown in a table where the cell would usually have a username.  This value is used when there is no username to show.  */}
+                                const userName = data.user || gettext('Unavailable — user deleted');
+                                {/* # Translators: This is shown in a table where the cell would usually have an organization name.  This value is used when there is no organization to show.  */}
+                                const orgName = data.organization || gettext('Unavailable — organization deleted')
                                 return <tbody key={data.id}>
                                 <tr
                                     className={is_expanded ? 'changelog__entry__header is-expanded' : 'changelog__entry__header'}

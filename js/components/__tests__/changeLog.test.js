@@ -105,7 +105,7 @@ describe("Change log", () => {
                     toggle_expando_cb={function (){}}
                 />
             );
-            expect(wrapper.text()).toContain("Unavailable -- user deleted")
+            expect(wrapper.text()).toContain(`Unavailable — user deleted`)
 
         })
 });
