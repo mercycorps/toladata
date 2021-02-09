@@ -7,7 +7,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: \n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2021-02-04 14:51-0800\n"
+"POT-Creation-Date: 2021-02-09 10:53-0800\n"
 "PO-Revision-Date: 2021-02-03 15:45-0800\n"
 "Last-Translator: \n"
 "Language-Team: \n"
@@ -171,12 +171,11 @@ msgstr "N/A"
 #: indicators/export_renderers.py:401
 #: templates/indicators/iptt_filter_form.html:141
 #: templates/indicators/program_page.html:37
-#: tola_management/programadmin.py:124 tola_management/programadmin.py:611
 msgid "Change log"
 msgstr "Registro de Cambios"
 
 #. Translators: referring to an indicator whose results accumulate over time
-#: indicators/export_renderers.py:426 indicators/models.py:1589
+#: indicators/export_renderers.py:425 indicators/models.py:1589
 msgid "Cumulative"
 msgstr "Acumulativo"
 
@@ -4069,30 +4068,25 @@ msgstr "Administrador: Programas"
 msgid "Admin: Countries"
 msgstr "Administrador: Países"
 
-#. Translators: Page title for a log of all changes to indicators over a program's history
-#: tola_management/views.py:336
-msgid "Indicator change log"
-msgstr "Registro de cambios de indicadores"
-
 #. Translators: Error message given when an administrator tries to save a username that is already taken
-#: tola_management/views.py:388 tola_management/views.py:400
+#: tola_management/views.py:394 tola_management/views.py:406
 msgid "A user account with this username already exists."
 msgstr "Ya existe una cuenta de usuario con este nombre de usuario."
 
 #. Translators: Error message given when an administrator tries to save a email that is already taken
-#: tola_management/views.py:392 tola_management/views.py:404
+#: tola_management/views.py:398 tola_management/views.py:410
 msgid "A user account with this email address already exists."
 msgstr ""
 "Ya existe una cuenta de usuario con esta dirección de correo electrónico."
 
-#: tola_management/views.py:412
+#: tola_management/views.py:418
 msgid ""
 "Non-Mercy Corps emails should not be used with the Mercy Corps organization."
 msgstr ""
 "Los correos electrónicos que no pertenecen a Mercy Corps no deben usarse con "
 "la organización Mercy Corps."
 
-#: tola_management/views.py:418
+#: tola_management/views.py:424
 msgid ""
 "A user account with this email address already exists. Mercy Corps accounts "
 "are managed by Okta. Mercy Corps employees should log in using their Okta "
@@ -4106,7 +4100,7 @@ msgstr ""
 #. Translators:  Error message given when an administrator tries to save a bad combination of
 #. organization and email
 #. Translators:  Error message given when an administrator tries to save an invalid username
-#: tola_management/views.py:424 tola_management/views.py:429
+#: tola_management/views.py:430 tola_management/views.py:435
 msgid ""
 "Mercy Corps accounts are managed by Okta. Mercy Corps employees should log "
 "in using their Okta username and password."
@@ -4115,12 +4109,12 @@ msgstr ""
 "Mercy Corps deben iniciar sesión con su nombre de usuario y contraseña de "
 "Okta."
 
-#: tola_management/views.py:442
+#: tola_management/views.py:448
 msgid "Only superusers can create Mercy Corps staff profiles."
 msgstr ""
 "Solo los super-usuarios pueden crear perfiles de personal de Mercy Corps."
 
-#: tola_management/views.py:481
+#: tola_management/views.py:487
 msgid "Only superusers can edit Mercy Corps staff profiles."
 msgstr ""
 "Solo los super-usuarios pueden modificar perfiles de personal de Mercy Corps."

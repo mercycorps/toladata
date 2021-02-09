@@ -6,7 +6,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: \n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2021-02-08 15:28-0800\n"
+"POT-Creation-Date: 2021-02-09 10:53-0800\n"
 "PO-Revision-Date: 2021-02-05 13:12-0800\n"
 "Last-Translator: \n"
 "Language-Team: \n"
@@ -82,28 +82,28 @@ msgid "Collapse all"
 msgstr "Colapsar todos"
 
 #. Translators: This is shown in a table where the cell would usually have a username.  This value is used when there is no username to show.  */}
-#: js/components/changelog.js:48
+#: js/components/changelog.js:53
 #: js/pages/tola_management_pages/audit_log/views.js:249
 msgid "Unavailable — user deleted"
 msgstr "No disponible: usuario eliminado"
 
-#: js/components/changelog.js:80
+#: js/components/changelog.js:85
 msgid "No differences found"
 msgstr "No se encontraron diferencias"
 
-#: js/components/changelog.js:99 js/components/changelog.js:104
-#: js/components/changelog.js:114 js/components/changelog.js:119
+#: js/components/changelog.js:104 js/components/changelog.js:109
+#: js/components/changelog.js:119 js/components/changelog.js:124
 #: js/pages/tola_management_pages/country/views.js:95
 msgid "Country"
 msgstr "País"
 
 #. Translators:  Role references a user's permission level when accessing data (i.e. User or Admin) */}
-#: js/components/changelog.js:101 js/components/changelog.js:105
-#: js/components/changelog.js:115 js/components/changelog.js:120
+#: js/components/changelog.js:106 js/components/changelog.js:110
+#: js/components/changelog.js:120 js/components/changelog.js:125
 msgid "Role"
 msgstr "Función"
 
-#: js/components/changelog.js:113 js/components/changelog.js:118
+#: js/components/changelog.js:118 js/components/changelog.js:123
 #: js/pages/iptt_quickstart/components/selects.js:22
 #: js/pages/iptt_quickstart/components/selects.js:39
 #: js/pages/iptt_report/components/sidebar/reportSelect.js:14
@@ -111,23 +111,23 @@ msgstr "Función"
 msgid "Program"
 msgstr "Programa"
 
-#: js/components/changelog.js:178
+#: js/components/changelog.js:194
 msgid "Date"
 msgstr "Fecha"
 
-#: js/components/changelog.js:179
+#: js/components/changelog.js:195
 msgid "Admin"
 msgstr "Administrador"
 
-#: js/components/changelog.js:180
+#: js/components/changelog.js:196
 msgid "Change Type"
 msgstr "Tipo de Cambio"
 
-#: js/components/changelog.js:181
+#: js/components/changelog.js:197
 msgid "Previous Entry"
 msgstr "Valor Anterior"
 
-#: js/components/changelog.js:182
+#: js/components/changelog.js:198
 msgid "New Entry"
 msgstr "Nuevo Valor"
 
