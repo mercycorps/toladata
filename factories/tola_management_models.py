@@ -20,6 +20,9 @@ class AuditLogRationaleSelectionFactory(DjangoModelFactory):
     class Meta:
         model = AuditLogRationaleSelection
 
+    # The AuditLogRationalSelection model is a one-to-one with ProgramAuditLog and allows us to tag each log entry
+    # with one or more rationale types, with one field per type.  This is meant to cycle through all of the current
+    # rationale types as each factory log entry is created.
     other = Iterator([1,0,0,0,0,0,0,0])
     adaptive_management = Iterator([0,1,0,0,0,0,0,0])
     budget_realignment = Iterator([0,0,1,0,0,0,0,0])
