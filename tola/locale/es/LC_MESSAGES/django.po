@@ -164,7 +164,7 @@ msgstr "% Cumplido"
 
 #: indicators/export_renderers.py:242 indicators/templatetags/mytags.py:93
 #: tola_management/models.py:165 tola_management/models.py:445
-#: tola_management/programadmin.py:180
+#: tola_management/programadmin.py:181
 msgid "N/A"
 msgstr "N/A"
 
@@ -181,12 +181,12 @@ msgid "Cumulative"
 msgstr "Acumulativo"
 
 #. Translators: referring to an indicator whose results do not accumulate over time
-#: indicators/export_renderers.py:428
+#: indicators/export_renderers.py:427
 msgid "Non-cumulative"
 msgstr "No acumulativo"
 
 #. Translators: This is the title of a spreadsheet tab that shows do data has been found for the user's query.
-#: indicators/export_renderers.py:445
+#: indicators/export_renderers.py:444
 msgid "No data"
 msgstr "Sin datos"
 
@@ -4037,6 +4037,14 @@ msgstr "Nuevos Datos"
 msgid "Rationale"
 msgstr "Justificación del cambio"
 
+#. Translators: Page title for a log of all changes to indicators over a program's history
+#. Translators: Sheet title for a log of all changes to indicators over a program's history
+#. Translators: Page title for a log of all changes to indicators over a program's history
+#: tola_management/programadmin.py:125 tola_management/programadmin.py:620
+#: tola_management/views.py:336
+msgid "Program change log"
+msgstr "Registro de cambios de programa"
+
 #: tola_management/views.py:275
 msgid "Mercy Corps - Tola New Account Registration"
 msgstr "Este campo debe ser único"
@@ -4657,6 +4665,9 @@ msgstr "Encontrar"
 #: workflow/widgets.py:133
 msgid "City, Country:"
 msgstr "Ciudad, País:"
+
+#~ msgid "Indicator change log"
+#~ msgstr "Registro de cambios de indicadores"
 
 #~ msgid "Success"
 #~ msgstr "¡Éxito!"

@@ -19,21 +19,21 @@ from factory import (
 from factory.fuzzy import FuzzyChoice, FuzzyInteger
 
 from indicators.models import (
-    Result as ResultM,
-    ExternalService as ExternalServiceM,
-    ReportingFrequency as ReportingFrequencyM,
-    Indicator as IndicatorM,
-    IndicatorType as IndicatorTypeM,
-    Level as LevelM,
-    LevelTier as LevelTierM,
-    Objective as ObjectiveM,
-    PeriodicTarget as PeriodicTargetM,
-    StrategicObjective as StrategicObjectiveM,
-    PinnedReport as PinnedReportM,
-    DisaggregationType as DisaggregationTypeM,
-    DisaggregationLabel as DisaggregationLabelM,
-    DisaggregatedValue as DisaggregatedValueM,
-    DataCollectionFrequency as DataCollectionFrequencyM
+    Result,
+    ExternalService,
+    ReportingFrequency,
+    Indicator,
+    IndicatorType,
+    Level,
+    LevelTier,
+    Objective,
+    PeriodicTarget,
+    StrategicObjective,
+    PinnedReport,
+    DisaggregationType,
+    DisaggregationLabel,
+    DisaggregatedValue,
+    DataCollectionFrequency
 )
 from factories.workflow_models import OrganizationFactory, ProgramFactory, CountryFactory
 
@@ -43,7 +43,7 @@ FAKER = faker.Faker(locale='en_US')
 
 class ReportingFrequency(DjangoModelFactory):
     class Meta:
-        model = ReportingFrequencyM
+        model = ReportingFrequency
 
     frequency = 'Bi-weekly'
     description = 'Every two weeks'
@@ -52,7 +52,7 @@ class ReportingFrequency(DjangoModelFactory):
 
 class RandomIndicatorFactory(DjangoModelFactory):
     class Meta:
-        model = IndicatorM
+        model = Indicator
 
     name = lazy_attribute(lambda n: FAKER.sentence(nb_words=8))
     number = lazy_attribute(
@@ -62,13 +62,13 @@ class RandomIndicatorFactory(DjangoModelFactory):
 
 class IndicatorFactory(DjangoModelFactory):
     class Meta:
-        model = IndicatorM
+        model = Indicator
         django_get_or_create = ('name',)
 
     class Params:
         lop_indicator = Trait(
             lop_target=1000,
-            target_frequency=IndicatorM.LOP,
+            target_frequency=Indicator.LOP,
             periodic_target=RelatedFactory(
                 'factories.indicators_models.PeriodicTargetFactory',
                 'indicator',
@@ -87,10 +87,10 @@ class DefinedIndicatorFactory(IndicatorFactory):
     definition = "indicator definition"
     justification = "rationale or justification"
     unit_of_measure = "a unit of measure"
-    unit_of_measure_type = IndicatorM.NUMBER
+    unit_of_measure_type = Indicator.NUMBER
     baseline = 100
     lop_target = 1000
-    target_frequency = IndicatorM.QUARTERLY
+    target_frequency = Indicator.QUARTERLY
     means_of_verification = "some means of verifying"
     data_collection_method = "some method of collecting data"
     data_collection_frequency = SubFactory('factories.indicators_models.DataCollectionFrequencyFactory')
@@ -98,10 +98,10 @@ class DefinedIndicatorFactory(IndicatorFactory):
 
 class RFIndicatorFactory(DjangoModelFactory):
     class Meta:
-        model = IndicatorM
+        model = Indicator
 
     name = Faker('company')
-    target_frequency = IndicatorM.ANNUAL
+    target_frequency = Indicator.ANNUAL
     lop_target = 1400
     unit_of_measure = FuzzyChoice(['cats', 'bananas', 'tennis rackets', 'dollars'])
 
@@ -122,7 +122,7 @@ class RFIndicatorFactory(DjangoModelFactory):
                 (if list is shorter than available periods, remaining targets are blank)
             targets=True - will assign the lop_target value split among all available periods"""
         if extracted and self.target_frequency:
-            if self.target_frequency == IndicatorM.EVENT:
+            if self.target_frequency == Indicator.EVENT:
                 def event_generator(start, end):
                     for c in range(2):
                         yield {
@@ -134,7 +134,7 @@ class RFIndicatorFactory(DjangoModelFactory):
                         }
                 period_generator = event_generator
             else:
-                period_generator = PeriodicTargetM.generate_for_frequency(self.target_frequency)
+                period_generator = PeriodicTarget.generate_for_frequency(self.target_frequency)
             if self.program:
                 periods = period_generator(
                     self.program.reporting_period_start, self.program.reporting_period_end
@@ -220,26 +220,26 @@ class RFIndicatorFactory(DjangoModelFactory):
 
 class Objective(DjangoModelFactory):
     class Meta:
-        model = ObjectiveM
+        model = Objective
 
     name = 'Get Tola rocking!'
 
 
 class LevelFactory(DjangoModelFactory):
     class Meta:
-        model = LevelM
+        model = Level
 
     name = Sequence(lambda n: 'Level: {0}'.format(n))
 
 
 class LevelTierFactory(DjangoModelFactory):
     class Meta:
-        model = LevelTierM
+        model = LevelTier
 
     class Params:
         mc_template = Trait(
             name=Sequence(
-                lambda n: LevelTierM.get_templates()['mc_standard']['tiers'][n]
+                lambda n: LevelTier.get_templates()['mc_standard']['tiers'][n]
             )
         )
 
@@ -250,13 +250,13 @@ class LevelTierFactory(DjangoModelFactory):
     def build_mc_template(cls, program):
         return [
             cls(program=program, name=name, tier_depth=count+1)
-            for count, name in enumerate(LevelTierM.get_templates()['mc_standard']['tiers'])
+            for count, name in enumerate(LevelTier.get_templates()['mc_standard']['tiers'])
             ]
 
 
 class ResultFactory(DjangoModelFactory):
     class Meta:
-        model = ResultM
+        model = Result
 
     program = SubFactory(ProgramFactory)
     indicator = SubFactory(IndicatorFactory)
@@ -277,7 +277,7 @@ class ResultFactory(DjangoModelFactory):
 
 class IndicatorTypeFactory(DjangoModelFactory):
     class Meta:
-        model = IndicatorTypeM
+        model = IndicatorType
         django_get_or_create = ('indicator_type',)
 
     indicator_type = Sequence(lambda n: 'Indicator Type {0}'.format(n))
@@ -285,21 +285,21 @@ class IndicatorTypeFactory(DjangoModelFactory):
 
 class ExternalServiceFactory(DjangoModelFactory):
     class Meta:
-        model = ExternalServiceM
+        model = ExternalService
 
     name = Sequence(lambda n: 'External Service {0}'.format(n))
 
 
 class StrategicObjective(DjangoModelFactory):
     class Meta:
-        model = StrategicObjectiveM
+        model = StrategicObjective
 
     name = Sequence(lambda n: 'Stratigic Objective {0}'.format(n))
 
 
 class PeriodicTargetFactory(DjangoModelFactory):
     class Meta:
-        model = PeriodicTargetM
+        model = PeriodicTarget
 
     target = 0
     period = lazy_attribute(
@@ -309,7 +309,7 @@ class PeriodicTargetFactory(DjangoModelFactory):
 
 class PinnedReportFactory(DjangoModelFactory):
     class Meta:
-        model = PinnedReportM
+        model = PinnedReport
 
     name = Sequence(lambda n: 'Test pinned report: {0}'.format(n))
     report_type = FuzzyChoice(['timeperiods', 'targetperiods'])
@@ -317,7 +317,7 @@ class PinnedReportFactory(DjangoModelFactory):
 
 class DisaggregationTypeFactory(DjangoModelFactory):
     class Meta:
-        model = DisaggregationTypeM
+        model = DisaggregationType
 
     standard = False
     disaggregation_type = Sequence(lambda n: "disagg type {0}".format(n))
@@ -337,7 +337,7 @@ class DisaggregationTypeFactory(DjangoModelFactory):
 
 class DisaggregationLabelFactory(DjangoModelFactory):
     class Meta:
-        model = DisaggregationLabelM
+        model = DisaggregationLabel
 
     disaggregation_type = SubFactory(DisaggregationTypeFactory)
     label = Sequence(lambda n: "disagg label {}".format(n))
@@ -346,7 +346,7 @@ class DisaggregationLabelFactory(DjangoModelFactory):
 
 class DisaggregatedValueFactory(DjangoModelFactory):
     class Meta:
-        model = DisaggregatedValueM
+        model = DisaggregatedValue
 
     category = SubFactory(DisaggregationLabelFactory)
     value = FuzzyInteger(10, 100)
@@ -354,7 +354,7 @@ class DisaggregatedValueFactory(DjangoModelFactory):
 
 class DataCollectionFrequencyFactory(DjangoModelFactory):
     class Meta:
-        model = DataCollectionFrequencyM
+        model = DataCollectionFrequency
 
     frequency = "some reasonable frequency"
     description = "a description of how frequent this is"

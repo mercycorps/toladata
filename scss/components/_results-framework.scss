@@ -150,13 +150,15 @@
 .level-card--collapsed__title {} // unused?
 .level-card--collapsed__actions {
     // contains: actions__*
-    min-width: 150px;
+    min-width: 125px;
     display: flex;
     flex-direction: column;
     justify-content: space-between;
+    align-items: flex-end;
 }
 .actions__top, .actions__bottom {
     display: flex;
+    flex-direction: column-reverse;
     justify-content: flex-end;
 }
 // popover links to iptt on collapsed cards
