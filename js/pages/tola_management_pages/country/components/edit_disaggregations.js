@@ -215,11 +215,11 @@ export class RetroProgramCheckBoxWrapper extends React.Component {
         let checkBoxComponent = null;
         if (this.props.programsExpanded) {
             checkBoxComponent =
-                <div 
-                    id="disagg-admin__programs" 
+                <div
+                    id="disagg-admin__programs"
                     aria-labelledby="disagg-admin__programs-header"
                     className="ml-2 mt-2 d-flex flex-column disaggregation-programs"
-                    hidden={!this.props.programsExpanded} 
+                    hidden={!this.props.programsExpanded}
                     >
                     <CheckBoxList checkBoxOptions={checkBoxOptions} onUpdate={this.props.onRetroUpdate}/>
                 </div>
@@ -229,7 +229,7 @@ export class RetroProgramCheckBoxWrapper extends React.Component {
 
         return (
             <React.Fragment>
-                <div 
+                <div
                 role="heading"
                 className="mt-2 ml-4 retro-programs">
                      <div
@@ -238,9 +238,9 @@ export class RetroProgramCheckBoxWrapper extends React.Component {
                         aria-expanded={this.props.programsExpanded}
                         aria-controls="disagg-admin__programs"
                         className="accordion-row__btn btn btn-link disaggregation--programs__header">
-                        <span 
-                            className={classNames('disaggregation--programs__header-text',{disabled: this.props.disabled})} 
-                            onClick={this.props.toggleProgramViz} 
+                        <span
+                            className={classNames('disaggregation--programs__header-text',{disabled: this.props.disabled})}
+                            onClick={this.props.toggleProgramViz}
                             onKeyPress={this.keyboardPress.bind(this)}
                             tabIndex='0'>
                             <FontAwesomeIcon icon={this.props.programsExpanded ? faCaretDown : faCaretRight } />
@@ -449,7 +449,7 @@ export class DisaggregationType extends React.Component {
                     </a>
                     {disaggregation.is_archived && <span className="text-muted font-weight-bold ml-2">(Archived)</span>}
                     {expanded && (
-                        <form className="form card card-body bg-white" 
+                        <form className="form card card-body bg-white"
                         style={{minWidth: "max-content"}}
                         >
                             <fieldset className="disagg-form__fieldset">
@@ -469,12 +469,12 @@ export class DisaggregationType extends React.Component {
                                     />
                                     <ErrorFeedback errorMessages={this.formErrors('disaggregation_type')} />
                                     <div className="form-check" style={ {marginTop: '8px'} }>
-                                        <input 
-                                            className="form-check-input" 
+                                        <input
+                                            className="form-check-input"
                                             id="selected-by-default-checkbox"
-                                            type="checkbox" 
+                                            type="checkbox"
                                             checked={managed_data.selected_by_default}
-                                            onChange={(e) => {this.updateSelectedByDefault(e.target.checked)}} 
+                                            onChange={(e) => {this.updateSelectedByDefault(e.target.checked)}}
                                             disabled={disaggregation.is_archived} />
                                         <label className="form-check-label mr-2" htmlFor="selected-by-default-checkbox">
                                         {
@@ -634,14 +634,15 @@ export default class EditDisaggregations extends React.Component {
     onSaveChangesPress(data) {
         if ( this.state.origSelectedByDefault !== data.selected_by_default ){
             let preamble = ""
+            // console.log('vals data', data.selected_by_default, data.hasOwnProperty('retroPrograms'))
             if (data.selected_by_default && data.hasOwnProperty('retroPrograms')) {
                 // # Translators:  This is a warning popup when the user tries to do something that has broader effects than they might anticipate
                 preamble = interpolate(ngettext(
                     // # Translators:  Warning message about how the new type of disaggregation the user has created will be applied to existing and new data
-                    "This disaggregation will be automatically selected for all new indicators in %s and for existing indicators in %s program.",
-                    "This disaggregation will be automatically selected for all new indicators in %s and for existing indicators in %s programs.",
+                    "This disaggregation will be automatically selected for all new indicators in %(countryName)s and for existing indicators in %(retroCount)s program.",
+                    "This disaggregation will be automatically selected for all new indicators in %(countryName)s and for existing indicators in %(retroCount)s programs.",
                     data.retroPrograms.length
-                ), [gettext(this.props.countryName), data.retroPrograms.length])
+                ), {countryName: gettext(this.props.countryName), retroCount: data.retroPrograms.length}, true)
             }
             else if (data.selected_by_default) {
                 // # Translators:  This is a warning popup when the user tries to do something that has broader effects than they might anticipate

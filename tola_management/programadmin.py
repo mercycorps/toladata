@@ -405,8 +405,8 @@ class ProgramAuditLogSerializer(ModelSerializer):
     id = IntegerField(allow_null=True, required=False)
     indicator = ProgramAuditLogIndicatorSerializer()
     level = ProgramAuditLogLevelSerializer()
-    user = CharField(source='user.name', read_only=True)
-    organization = CharField(source='organization.name', read_only=True)
+    user = CharField(source='user.name', default='', read_only=True)
+    organization = CharField(source='organization.name', default='', read_only=True)
     date = DateTimeField(format="%Y-%m-%d %H:%M:%S", default_timezone=pytz.timezone("UTC"))
 
     class Meta:
@@ -426,9 +426,10 @@ class ProgramAuditLogSerializer(ModelSerializer):
             'level',
         )
 
+
 class ProgramAdminAuditLogSerializer(ModelSerializer):
     id = IntegerField(allow_null=True, required=False)
-    admin_user = CharField(source="admin_user.name", max_length=255)
+    admin_user = SerializerMethodField()
     date = DateTimeField(format="%Y-%m-%d %H:%M:%S")
 
     class Meta:
@@ -441,6 +442,12 @@ class ProgramAdminAuditLogSerializer(ModelSerializer):
             'diff_list',
             'pretty_change_type',
         )
+
+    def get_admin_user(self, obj):
+        try:
+            return obj.admin_user.name
+        except AttributeError:
+            return ''
 
 
 class ProgramAdminViewSet(viewsets.ModelViewSet):
