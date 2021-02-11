@@ -46,14 +46,14 @@
 .item--event {
     .item__label {
         display: flex;
+        align-items: inherit;
     }
 }
 
 // .periodic-target .input-value - needed as you can't @extend nested selectors
 %pt-input {
-    padding-right: 10px;
+    padding-left: 10px;
     text-align: right;
-    width: 150px;
     display: table-cell;
     .input-text {
         padding-right: 2px;
@@ -68,8 +68,23 @@
 
 // Don't define border property here.  Assigning here prevents red border from
 // being applied when there is no value
-.periodic-target .input-value {
-    @extend %pt-input;
+.periodic-target {
+    // Styles for the red x delete button icon to center properly in this table
+    .event-target-delete-button {
+        svg {
+            margin: 0 7.5px 0 0;
+        }
+    }
+    // Overwriting inherited padding, reducing padding from 20px to 10px to prevent cutting off of helper text
+    .input-text {
+        &.target-label {
+            padding-right: 10px;
+        }
+    }
+    // Styles for the text input field, used to enter target value
+    .input-value {
+        @extend %pt-input;
+    }
 }
 
 // This exists as .periodic-target is used for selection in JS

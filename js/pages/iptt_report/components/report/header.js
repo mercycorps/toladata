@@ -12,14 +12,15 @@ const IPTTHeader = inject('filterStore', 'rootStore')(
                             gettext('Indicator Performance Tracking Table')
                         }</h2>
                         <h4>{ (filterStore.startPeriod && filterStore.endPeriod)
-                                               ? filterStore.startPeriod.startLabel + " - " + filterStore.endPeriod.endLabel
-                                               : "" }</h4>
+                            ? filterStore.startPeriod.startLabel + " - " + filterStore.endPeriod.endLabel
+                            : "" }
+                        </h4>
                     </div>
                     <div className="subheader__actions">
                         <div className="btn-row">
                             <PinButton />
                             {filterStore.isTVA ? <ExcelPopoverButton { ...rootStore.excelAPI }/> :
-                                <ExcelButton excelUrl={ rootStore.excelAPI.excelUrl } />}
+                            <ExcelButton excelUrl={ rootStore.excelAPI.excelUrl } />}
                         </div>
                     </div>
                 </div>

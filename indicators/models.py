@@ -1477,6 +1477,14 @@ class Indicator(SafeDeleteModel):
         return self.target_frequency == self.LOP
 
     @property
+    def is_event_target_frequency(self):
+        return self.target_frequency == self.EVENT
+
+    @property
+    def is_mid_end_target_frequency(self):
+        return self.target_frequency == self.MID_END
+
+    @property
     def just_created(self):
         if self.create_date >= timezone.now() - timedelta(minutes=5):
             return True
