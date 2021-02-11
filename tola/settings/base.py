@@ -359,11 +359,6 @@ WEBPACK_LOADER = {
 LOGGING = {
     'version': 1,
     'disable_existing_loggers': False,
-    'filters': {
-        'require_debug_false': {
-            '()': 'django.utils.log.RequireDebugFalse',
-        }
-    },
     'formatters': {
         'standard': {
             'format': '%(asctime)s %(levelname)-8s %(name)-12s %(message)s',
@@ -375,31 +370,26 @@ LOGGING = {
             'class': 'logging.FileHandler',
             'filename': 'error.log',
             'formatter': 'standard'
-        },
-        'admin_email': {
-            'level': 'ERROR',
-            'class': 'django.utils.log.AdminEmailHandler',
-            'filters': ['require_debug_false']
         }
     },
     'loggers': {
         'django': {
-            'handlers': ['file', 'admin_email'],
+            'handlers': ['file'],
             'level': 'ERROR',
             'propagate': True,
         },
         'workflow': {
-            'handlers': ['file', 'admin_email'],
+            'handlers': ['file'],
             'level': 'ERROR',
             'propagate': True,
         },
         'indicators': {
-            'handlers': ['file', 'admin_email'],
+            'handlers': ['file'],
             'level': 'ERROR',
             'propagate': True,
         },
         'tola': {
-            'handlers': ['file', 'admin_email'],
+            'handlers': ['file'],
             'level': 'ERROR',
             'propagate': True,
         },

@@ -7,9 +7,8 @@ import {
     organizationChangeLog,
     programChangeLog,
 } from '../__fixtures__/changeLogFixtures';
-import ChangeLog, { ChangeField, ChangeLogEntryHeader } from '../changelog'
+import ChangeLog, { ChangeField } from '../changelog'
 import renderer from 'react-test-renderer';
-import { render } from 'enzyme';
 
 describe("Country change log", () => {
 
@@ -85,27 +84,4 @@ describe("Change log", () => {
             expect(component.toJSON().children.filter( c => c.type === "tbody").length).toBe(logEntries.length)
         })
     })
-
-    it("should handle a null admin_user value ", () => {
-            let logEntry =  JSON.parse(programChangeLog);
-            let wrapper = render(
-                <ChangeLogEntryHeader
-                    data={logEntry[0]}
-                    is_expanded={false}
-                    toggle_expando_cb={function (){}}
-                />
-            );
-            expect(wrapper.text()).toContain("Pat Jones")
-
-            logEntry[0].admin_user = null;
-            wrapper = render(
-                <ChangeLogEntryHeader
-                    data={logEntry[0]}
-                    is_expanded={false}
-                    toggle_expando_cb={function (){}}
-                />
-            );
-            expect(wrapper.text()).toContain(`Unavailable — user deleted`)
-
-        })
 });

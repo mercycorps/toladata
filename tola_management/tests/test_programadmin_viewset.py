@@ -4,8 +4,7 @@
 import unittest
 from django import test
 from django.db import models
-from tola_management.programadmin import ProgramAdminSerializer, ProgramAdminViewSet, ProgramAdminAuditLogSerializer
-from factories.tola_management_models import ProgramAdminAuditLogFactory
+from tola_management.programadmin import ProgramAdminSerializer, ProgramAdminViewSet
 from factories.workflow_models import (
     RFProgramFactory,
     OrganizationFactory,
@@ -395,16 +394,3 @@ class TestProgramAdminFilters(test.TestCase):
         self.assertIn(self.program1.pk, pks)
         self.assertIn(self.program2.pk, pks)
         self.assertIn(self.multi_country_program.pk, pks)
-
-
-class TestProgramAuditLogSerializer(test.TestCase):
-    def test_handles_empty_admin_user(self):
-        log_entry = ProgramAdminAuditLogFactory()
-        serialized_log = ProgramAdminAuditLogSerializer(log_entry)
-        self.assertNotEqual(serialized_log.data['admin_user'], '')
-
-        log_entry.admin_user = None
-        log_entry.save()
-        log_entry.refresh_from_db
-        serialized_log = ProgramAdminAuditLogSerializer(log_entry)
-        self.assertEqual(serialized_log.data['admin_user'], '')

@@ -317,7 +317,7 @@ class TestIPTTExcelExports(test.TestCase):
                 "Tri-annual",
                 "Quarterly",
                 "Monthly",
-                "Program Change log"
+                "Change log"
             ])
         for sheet in tva_full_report.worksheets[:-1]:
             self.assert_iptt_title_cells(sheet)
@@ -331,7 +331,7 @@ class TestIPTTExcelExports(test.TestCase):
         for col, period in enumerate(["Midline", "Endline"]):
             self.assert_period_tva_header_cells(midend, period, 13+3*col)
         change_log = tva_full_report.worksheets[-1]
-        self.assertEqual(change_log.cell(row=1, column=1).value, "Program Change log")
+        self.assertEqual(change_log.cell(row=1, column=1).value, "Change log")
         self.assertEqual(change_log.cell(row=2, column=1).value, self.scenario.program_name)
         for column, header in enumerate(
             ['Date and time', 'Result level', 'Indicator', 'User', 'Organization', 'Change type',

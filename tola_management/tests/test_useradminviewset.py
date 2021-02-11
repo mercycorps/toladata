@@ -2,7 +2,6 @@ import unittest
 import json
 from rest_framework import test as drf_test
 from django import test
-from factories.tola_management_models import UserManagementAuditLogFactory
 from factories.workflow_models import (
     RFProgramFactory,
     CountryFactory,
@@ -13,7 +12,7 @@ from factories.workflow_models import (
     grant_country_access
 )
 from workflow.models import COUNTRY_ROLE_CHOICES, PROGRAM_ROLE_INT_MAP, PROGRAM_ROLE_CHOICES
-from tola_management.views import UserAdminViewSet, UserManagementAuditLogSerializer
+from tola_management.views import UserAdminViewSet
 
 
 class TestUserAdminViewSet(test.TestCase):
@@ -323,16 +322,3 @@ class TestUserAdminViewSet(test.TestCase):
         response = self.get_response(**{'base_countries[]': [self.base_country2.pk], 'page': 2})
         user_pks = self.get_pks(response, count=21)
         self.assertIn(twenty_first_user.pk, user_pks)
-
-
-class TestUserManagementAuditLogSerializer(test.TestCase):
-    def test_handles_empty_admin_user(self):
-        log_entry = UserManagementAuditLogFactory()
-        serialized_log = UserManagementAuditLogSerializer(log_entry)
-        self.assertNotEqual(serialized_log.data['admin_user'], '')
-
-        log_entry.admin_user = None
-        log_entry.save()
-        log_entry.refresh_from_db
-        serialized_log = UserManagementAuditLogSerializer(log_entry)
-        self.assertEqual(serialized_log.data['admin_user'], '')

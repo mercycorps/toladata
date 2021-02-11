@@ -2,8 +2,8 @@ msgid ""
 msgstr ""
 "Project-Id-Version: \n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2021-02-09 10:53-0800\n"
-"PO-Revision-Date: 2021-02-05 13:07-0800\n"
+"POT-Creation-Date: 2021-01-27 12:19-0800\n"
+"PO-Revision-Date: 2021-01-27 12:27-0800\n"
 "Last-Translator: \n"
 "Language-Team: \n"
 "Language: fr\n"
@@ -49,7 +49,7 @@ msgstr "Succès"
 #. Translators: the header of an alert where additional warning info is provided
 #: js/base.js:430 js/pages/results_framework/components/level_cards.js:86
 #: js/pages/results_framework/models.js:620
-#: js/pages/tola_management_pages/country/components/edit_disaggregations.js:657
+#: js/pages/tola_management_pages/country/components/edit_disaggregations.js:656
 #: js/pages/tola_management_pages/country/models.js:438
 #: js/pages/tola_management_pages/country/models.js:473
 #: js/pages/tola_management_pages/country/models.js:505
@@ -78,29 +78,23 @@ msgstr "Tout afficher"
 msgid "Collapse all"
 msgstr "Tout masquer"
 
-#. Translators: This is shown in a table where the cell would usually have a username.  This value is used when there is no username to show.  */}
-#: js/components/changelog.js:53
-#: js/pages/tola_management_pages/audit_log/views.js:249
-msgid "Unavailable — user deleted"
-msgstr "Indisponible - utilisateur supprimé"
-
-#: js/components/changelog.js:85
+#: js/components/changelog.js:81
 msgid "No differences found"
 msgstr "Aucune différence trouvée"
 
-#: js/components/changelog.js:104 js/components/changelog.js:109
-#: js/components/changelog.js:119 js/components/changelog.js:124
+#: js/components/changelog.js:100 js/components/changelog.js:105
+#: js/components/changelog.js:115 js/components/changelog.js:120
 #: js/pages/tola_management_pages/country/views.js:95
 msgid "Country"
 msgstr "Pays"
 
 #. Translators:  Role references a user's permission level when accessing data (i.e. User or Admin) */}
-#: js/components/changelog.js:106 js/components/changelog.js:110
-#: js/components/changelog.js:120 js/components/changelog.js:125
+#: js/components/changelog.js:102 js/components/changelog.js:106
+#: js/components/changelog.js:116 js/components/changelog.js:121
 msgid "Role"
 msgstr "Rôle"
 
-#: js/components/changelog.js:118 js/components/changelog.js:123
+#: js/components/changelog.js:114 js/components/changelog.js:119
 #: js/pages/iptt_quickstart/components/selects.js:22
 #: js/pages/iptt_quickstart/components/selects.js:39
 #: js/pages/iptt_report/components/sidebar/reportSelect.js:14
@@ -108,23 +102,23 @@ msgstr "Rôle"
 msgid "Program"
 msgstr "Programme"
 
-#: js/components/changelog.js:194
+#: js/components/changelog.js:181
 msgid "Date"
 msgstr "Date"
 
-#: js/components/changelog.js:195
+#: js/components/changelog.js:182
 msgid "Admin"
 msgstr "Administrateur"
 
-#: js/components/changelog.js:196
+#: js/components/changelog.js:183
 msgid "Change Type"
 msgstr "Type de modification"
 
-#: js/components/changelog.js:197
+#: js/components/changelog.js:184
 msgid "Previous Entry"
 msgstr "Entrée précédente"
 
-#: js/components/changelog.js:198
+#: js/components/changelog.js:185
 msgid "New Entry"
 msgstr "Nouvelle entrée"
 
@@ -183,13 +177,13 @@ msgid "None available"
 msgstr "Aucun disponible"
 
 #. Translators: refers to grouping the report by the level of the indicator */
-#: js/components/selectWidgets.js:198
+#: js/components/selectWidgets.js:196
 #: js/pages/program_page/models/programPageUIStore.js:53
 msgid "by Level"
 msgstr "par Niveau"
 
 #. Translators: menu for selecting how rows are grouped in a report */
-#: js/components/selectWidgets.js:204
+#: js/components/selectWidgets.js:202
 msgid "Group indicators"
 msgstr "Regrouper les indicateurs"
 
@@ -425,46 +419,50 @@ msgid "Target periods"
 msgstr "Périodes cibles"
 
 #. Translators: The user has successfully "pinned" a report link to a program page for quick access to the report */}
-#: js/pages/iptt_report/components/report/buttons.js:78
+#: js/pages/iptt_report/components/report/buttons.js:57
 msgid "Success!  This report is now pinned to the program page."
 msgstr "Succès ! Ce rapport est désormais épinglé à la page du programme."
 
 #. Translators: This is not really an imperative, it's an option that is available once you have pinned a report to a certain web page */}
-#: js/pages/iptt_report/components/report/buttons.js:84
+#: js/pages/iptt_report/components/report/buttons.js:63
 msgid "Visit the program page now."
 msgstr "Consulter la page du programme."
 
 #. Translators: Some error occured when trying to pin the report*/}
-#: js/pages/iptt_report/components/report/buttons.js:95
+#: js/pages/iptt_report/components/report/buttons.js:74
 msgid "Something went wrong when attempting to pin this report."
 msgstr "Une erreur est survenue lors de l’épinglage de ce rapport."
 
 #. Translators: a field where users can name their newly created report */
-#: js/pages/iptt_report/components/report/buttons.js:107
+#: js/pages/iptt_report/components/report/buttons.js:86
 msgid "Report name"
 msgstr "Nom du rapport"
 
 #. Translators: An error occured because a report has already been pinned with that same name */}
-#: js/pages/iptt_report/components/report/buttons.js:120
+#: js/pages/iptt_report/components/report/buttons.js:100
 msgid "A pin with this name already exists."
 msgstr "Une épingle avec ce nom existe déjà."
 
-#: js/pages/iptt_report/components/report/buttons.js:133
+#: js/pages/iptt_report/components/report/buttons.js:112
 msgid "Pin to program page"
 msgstr "Épingler à la page du programme"
 
+#: js/pages/iptt_report/components/report/buttons.js:121
+msgid "Sending"
+msgstr "Envoi en cours"
+
 #. Translators: a button that lets a user "pin" (verb) a report to their home page */
-#: js/pages/iptt_report/components/report/buttons.js:176
+#: js/pages/iptt_report/components/report/buttons.js:156
 msgid "Pin"
 msgstr "Épingler"
 
 #. Translators: a download button for a report containing just the data currently displayed */
-#: js/pages/iptt_report/components/report/buttons.js:214
+#: js/pages/iptt_report/components/report/buttons.js:194
 msgid "Current view"
 msgstr "Affichage actuel"
 
 #. Translators: a download button for a report containing all available data */
-#: js/pages/iptt_report/components/report/buttons.js:220
+#: js/pages/iptt_report/components/report/buttons.js:200
 msgid "All program data"
 msgstr "Toutes les données du programme"
 
@@ -591,7 +589,7 @@ msgstr "Options de rapport"
 msgid "Clear filters"
 msgstr "Effacer les filtres"
 
-#: js/pages/iptt_report/components/sidebar/filterForm.js:72
+#: js/pages/iptt_report/components/sidebar/filterForm.js:68
 #: js/pages/results_framework/components/leveltier_picker.js:86
 msgid "Change log"
 msgstr "Journal des modifications"
@@ -653,7 +651,7 @@ msgid "End"
 msgstr "Fin"
 
 #. Translators: A toggle button that hides a sidebar of filter options */
-#: js/pages/iptt_report/components/sidebar/sidebar.js:73
+#: js/pages/iptt_report/components/sidebar/sidebar.js:15
 msgid "Show/Hide Filters"
 msgstr "Afficher/masquer les filtres"
 
@@ -1270,7 +1268,7 @@ msgstr ""
 #. Translators: This is a confirmation prompt to confirm a user wants to archive an item
 #. Translators: This is a confirmation prompt to confirm a user wants to unarchive an item
 #: js/pages/results_framework/models.js:623
-#: js/pages/tola_management_pages/country/components/edit_disaggregations.js:661
+#: js/pages/tola_management_pages/country/components/edit_disaggregations.js:660
 #: js/pages/tola_management_pages/country/models.js:478
 #: js/pages/tola_management_pages/country/models.js:510
 #: js/pages/tola_management_pages/program/models.js:283
@@ -1303,8 +1301,8 @@ msgid "Result date:"
 msgstr "Date de résultat :"
 
 #: js/pages/tola_management_pages/audit_log/views.js:210
-msgid "Program change log"
-msgstr "Journal des modifications de programme"
+msgid "Indicator change log"
+msgstr "Journal des modifications des indicateurs"
 
 #: js/pages/tola_management_pages/audit_log/views.js:234
 msgid "Date and time"
@@ -1340,12 +1338,7 @@ msgstr "Entrée précédente"
 msgid "New entry"
 msgstr "Nouvelle entrée"
 
-#. Translators: This is shown in a table where the cell would usually have an organization name.  This value is used when there is no organization to show.  */}
-#: js/pages/tola_management_pages/audit_log/views.js:251
-msgid "Unavailable — organization deleted"
-msgstr "Indisponible - organisation supprimée"
-
-#: js/pages/tola_management_pages/audit_log/views.js:309
+#: js/pages/tola_management_pages/audit_log/views.js:305
 msgid "entries"
 msgstr "entrées"
 
@@ -1365,7 +1358,7 @@ msgid "Strategic Objectives"
 msgstr "Objectifs stratégiques"
 
 #: js/pages/tola_management_pages/country/components/country_editor.js:41
-#: js/pages/tola_management_pages/country/components/edit_disaggregations.js:700
+#: js/pages/tola_management_pages/country/components/edit_disaggregations.js:699
 msgid "Country Disaggregations"
 msgstr "Désagrégations du pays"
 
@@ -1538,25 +1531,24 @@ msgstr ""
 "abandonner ?"
 
 #. Translators:  Warning message about how the new type of disaggregation the user has created will be applied to existing and new data
-#: js/pages/tola_management_pages/country/components/edit_disaggregations.js:642
+#: js/pages/tola_management_pages/country/components/edit_disaggregations.js:641
 #, python-format
 msgid ""
 "This disaggregation will be automatically selected for all new indicators in "
-"%(countryName)s and for existing indicators in %(retroCount)s program."
+"%s and for existing indicators in %s program."
 msgid_plural ""
 "This disaggregation will be automatically selected for all new indicators in "
-"%(countryName)s and for existing indicators in %(retroCount)s programs."
+"%s and for existing indicators in %s programs."
 msgstr[0] ""
 "Cette désagrégation sera automatiquement sélectionnée pour tous les nouveaux "
-"indicateurs dans %(countryName)s et pour les indicateurs existants dans "
-"%(retroCount)s programme."
+"indicateurs dans %s et pour les indicateurs existants dans %s programme."
 msgstr[1] ""
 "Ces désagrégations seront automatiquement sélectionnées pour tous les "
-"nouveaux indicateurs dans %(countryName)s et pour les indicateurs existants "
-"dans %(retroCount)s programmes."
+"nouveaux indicateurs dans %s et pour les indicateurs existants dans %s "
+"programmes."
 
 #. Translators:  This is a warning popup when the user tries to do something that has broader effects than they might anticipate
-#: js/pages/tola_management_pages/country/components/edit_disaggregations.js:649
+#: js/pages/tola_management_pages/country/components/edit_disaggregations.js:648
 #, python-format
 msgid ""
 "This disaggregation will be automatically selected for all new indicators in "
@@ -1566,7 +1558,7 @@ msgstr ""
 "indicateurs dans %s. Les indicateurs existants ne seront pas affectés."
 
 #. Translators:  This is a warning popup when the user tries to do something that has broader effects than they might anticipate
-#: js/pages/tola_management_pages/country/components/edit_disaggregations.js:653
+#: js/pages/tola_management_pages/country/components/edit_disaggregations.js:652
 #, python-format
 msgid ""
 "This disaggregation will no longer be automatically selected for all new "
@@ -1576,7 +1568,7 @@ msgstr ""
 "nouveaux indicateurs dans %s. Les indicateurs existants ne seront pas "
 "affectés."
 
-#: js/pages/tola_management_pages/country/components/edit_disaggregations.js:704
+#: js/pages/tola_management_pages/country/components/edit_disaggregations.js:703
 msgid "Add country disaggregation"
 msgstr "Ajouter une désagrégation de pays"
 
@@ -2240,9 +2232,6 @@ msgstr "Super administrateur"
 #: js/pages/tola_management_pages/user/views.js:362
 msgid "users"
 msgstr "utilisateurs"
-
-#~ msgid "Sending"
-#~ msgstr "Envoi en cours"
 
 #~ msgid "Successfully Saved"
 #~ msgstr "Enregistré avec succès"

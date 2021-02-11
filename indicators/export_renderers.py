@@ -407,6 +407,7 @@ class IPTTExcelRenderer(ExcelRendererBase):
     TITLE_START_COLUMN = 3 # 2 rows currently hidden at start, title starts at column C
     INDICATOR_NAME_CELL = openpyxl.styles.NamedStyle(
         name="indicator_name",
+        font=openpyxl.styles.Font(underline='single'),
         alignment=openpyxl.styles.Alignment(wrap_text=True)
     )
     DISAGGREGATION_CELL = openpyxl.styles.NamedStyle(

@@ -333,7 +333,7 @@ def audit_log_host_page(request, program_id):
                    "site_area": "audit log",
                    "report_wide": True,
                    # Translators: Page title for a log of all changes to indicators over a program's history
-                   "page_title": program.name+": " + gettext("Program change log") +" | "})
+                   "page_title": program.name+": " + gettext("Indicator change log") +" | "})
 
 
 class AuthUserSerializer(ModelSerializer):
@@ -346,7 +346,7 @@ class AuthUserSerializer(ModelSerializer):
 
 class UserManagementAuditLogSerializer(ModelSerializer):
     id = IntegerField(allow_null=True, required=False)
-    admin_user = SerializerMethodField()
+    admin_user = CharField(source="admin_user_display", max_length=255)
     date = DateTimeField(format="%Y-%m-%d %H:%M:%S")
 
     class Meta:
@@ -360,12 +360,6 @@ class UserManagementAuditLogSerializer(ModelSerializer):
             'diff_list',
             'pretty_change_type',
         )
-
-    def get_admin_user(self, obj):
-        try:
-            return obj.admin_user.name[:255]
-        except AttributeError:
-            return ''
 
 
 class UserAdminSerializer(ModelSerializer):
@@ -953,7 +947,7 @@ class OrganizationSerializer(ModelSerializer):
 
 class OrganizationAdminAuditLogSerializer(ModelSerializer):
     id = IntegerField(allow_null=True, required=False)
-    admin_user = SerializerMethodField()
+    admin_user = CharField(source="admin_user.name", max_length=255)
     date = DateTimeField(format="%Y-%m-%d %H:%M:%S")
 
     class Meta:
@@ -966,12 +960,6 @@ class OrganizationAdminAuditLogSerializer(ModelSerializer):
             'diff_list',
             'pretty_change_type',
         )
-
-    def get_admin_user(self, obj):
-        try:
-            return obj.admin_user.name[:255]
-        except AttributeError:
-            return ''
 
 
 class OrganizationAdminViewSet(viewsets.ModelViewSet):
