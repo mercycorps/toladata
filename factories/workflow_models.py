@@ -19,15 +19,15 @@ from factory import (
 )
 from factories.django_models import UserFactory, UserOnlyFactory
 from workflow.models import (
-    Country as CountryM,
-    Organization as OrganizationM,
-    ProfileType as ProfileTypeM,
-    Sector as SectorM,
-    SiteProfile as SiteProfileM,
-    TolaUser as TolaUserM,
-    Program as ProgramM,
-    CountryAccess as CountryAccessM,
-    ProgramAccess as ProgramAccessM,
+    Country,
+    Organization,
+    ProfileType,
+    Sector,
+    SiteProfile,
+    TolaUser,
+    Program,
+    CountryAccess,
+    ProgramAccess,
     PROGRAM_ROLE_CHOICES,
     COUNTRY_ROLE_CHOICES
 )
@@ -46,7 +46,7 @@ def custom_level_generator(tier_set):
 
 class CountryFactory(DjangoModelFactory):
     class Meta:
-        model = CountryM
+        model = Country
         django_get_or_create = ('code',)
 
     country = Sequence(lambda n: f'Country {n}')
@@ -62,12 +62,12 @@ class CountryFactory(DjangoModelFactory):
 
 class CountryAccessFactory(DjangoModelFactory):
     class Meta:
-        model = CountryAccessM
+        model = CountryAccess
 
 
 class OrganizationFactory(DjangoModelFactory):
     class Meta:
-        model = OrganizationM
+        model = Organization
 
     name = Faker('company')
 
@@ -78,7 +78,7 @@ class OrganizationFactory(DjangoModelFactory):
             # simple build, do nothing
             return
         if extracted:
-            if isinstance(extracted, SectorM):
+            if isinstance(extracted, Sector):
                 extracted = [extracted]
             for sector in extracted:
                 self.sectors.add(sector)
@@ -86,7 +86,7 @@ class OrganizationFactory(DjangoModelFactory):
 
 class SiteProfileFactory(DjangoModelFactory):
     class Meta:
-        model = SiteProfileM
+        model = SiteProfile
 
     name = Sequence(lambda n: 'Site Profile {0}'.format(n))
     country = SubFactory(CountryFactory, country='United States', code='US')
@@ -94,7 +94,7 @@ class SiteProfileFactory(DjangoModelFactory):
 
 class TolaUserFactory(DjangoModelFactory):
     class Meta:
-        model = TolaUserM
+        model = TolaUser
         django_get_or_create = ('user',)
 
     class Params:
@@ -125,13 +125,13 @@ class TolaUserFactory(DjangoModelFactory):
 
 class ProgramFactory(DjangoModelFactory):
     class Meta:
-        model = ProgramM
+        model = Program
         django_get_or_create = ('gaitid',)
 
     class Params:
         active = True
         old_levels = Trait(
-            _using_results_framework=ProgramM.NOT_MIGRATED
+            _using_results_framework=Program.NOT_MIGRATED
         )
         has_rf = Trait(
             generate_levels=PostGeneration(generate_mc_levels)
@@ -141,7 +141,7 @@ class ProgramFactory(DjangoModelFactory):
     gaitid = Sequence(lambda n: "%0030d" % n)
     country = RelatedFactory(CountryFactory, country='United States', code='US')
     funding_status = LazyAttribute(lambda o: "funded" if o.active else "Inactive")
-    _using_results_framework = ProgramM.RF_ALWAYS
+    _using_results_framework = Program.RF_ALWAYS
     auto_number_indicators = True
     generate_levels = None
 
@@ -167,7 +167,7 @@ class ProgramFactory(DjangoModelFactory):
 
 class RFProgramFactory(DjangoModelFactory):
     class Meta:
-        model = ProgramM
+        model = Program
 
     class Params:
         active = True
@@ -179,7 +179,7 @@ class RFProgramFactory(DjangoModelFactory):
     name = Faker('company')
     funding_status = LazyAttribute(lambda o: "Funded" if o.active else "Inactive")
     _using_results_framework = LazyAttribute(
-        lambda o: ProgramM.RF_ALWAYS if o.migrated is None else ProgramM.MIGRATED if o.migrated else ProgramM.NOT_MIGRATED
+        lambda o: Program.RF_ALWAYS if o.migrated is None else Program.MIGRATED if o.migrated else Program.NOT_MIGRATED
     )
 
     @lazy_attribute
@@ -335,20 +335,20 @@ class RFProgramFactory(DjangoModelFactory):
 
 class SectorFactory(DjangoModelFactory):
     class Meta:
-        model = SectorM
+        model = Sector
 
     sector = Sequence(lambda n: 'Sector {0}'.format(n))
 
 
 class ProfileType(DjangoModelFactory):
     class Meta:
-        model = ProfileTypeM
+        model = ProfileType
 
     profile = 'Distribution Center'
 
 
 def grant_program_access(tolauser, program, country, role=PROGRAM_ROLE_CHOICES[0][0]):
-    access_object, _ = ProgramAccessM.objects.get_or_create(
+    access_object, _ = ProgramAccess.objects.get_or_create(
         program=program,
         tolauser=tolauser,
         country=country
@@ -357,7 +357,7 @@ def grant_program_access(tolauser, program, country, role=PROGRAM_ROLE_CHOICES[0
     access_object.save()
 
 def grant_country_access(tolauser, country, role=COUNTRY_ROLE_CHOICES[0][0]):
-    access_object, _ = CountryAccessM.objects.get_or_create(
+    access_object, _ = CountryAccess.objects.get_or_create(
         country=country,
         tolauser=tolauser
     )

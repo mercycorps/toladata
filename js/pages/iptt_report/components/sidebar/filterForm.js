@@ -62,11 +62,15 @@ const IPTTFilterForm = inject('filterStore')(
                     />
                 </div>
                 { filterStore.programFilterData && (
-                    <div id="filter-extra" className=" d-flex justify-content-between no-gutters p-3">
-                        <a href={ `/tola_management/audit_log/${filterStore.selectedProgramId}/` }
-                            className="btn-link">
-                            <i className="fas fa-history"></i> {gettext("Change log")}
-                        </a>
+                    <div 
+                        id="filter-extra" 
+                        className=" d-flex justify-content-between no-gutters p-3" 
+                        style={{height: "350px"}} /* Increased height to add extra blank space. This prevents lower dropdowns from being cut off and allows the sidebar to more freely scroll. */
+                        >
+                            <a href={ `/tola_management/audit_log/${filterStore.selectedProgramId}/` }
+                                className="btn-link">
+                                <i className="fas fa-history"></i> {gettext("Change log")}
+                            </a>
                     </div>
                 )}
             </nav>
