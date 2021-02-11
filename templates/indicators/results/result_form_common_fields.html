@@ -31,14 +31,8 @@
            data-content="{% trans 'All results for this indicator will be measured against the Life of Program (LoP) target.' %}">
            {% elif indicator.is_target_frequency_time_aware %}
            data-content="{% trans 'The target is automatically determined by the result date.' %}">
-           {% elif indicator.is_mid_end_target_frequency %}
-           data-content="{% trans 'You can measure this result against the Midline or Endline target.' %}">
-           {% elif indicator.is_event_target_frequency %}
-           {# Translators: Text of a help popup.  Tells users what kind of target they will be applying a result against #}
-           data-content="{% trans 'You can measure this result against an Event target.' %}">
            {% else %}
-           {# Translators: Text of a help popup. Tells users that there is no target against which to apply the result they are trying to enter #}
-           data-content="{% trans 'Indicator missing targets.' %}">
+           data-content="{% trans 'You can measure this result against the Midline or Endline target.' %}">
            {% endif %}
 
             <i class="far fa-question-circle"></i>
@@ -68,7 +62,7 @@
         <span id="validation_id_achieved" class="has-error"></span>
     </div>
     {% include 'indicators/results/result_form_disaggregation_fields.html' %}
-
+    
     <div class="form-group mt-2" id="div_id_site">
         <label for="id_site">{{ form.site.label }}</label>
         <div class="select2-wrapper"> {# extra div to provide width to child select2 widget #}

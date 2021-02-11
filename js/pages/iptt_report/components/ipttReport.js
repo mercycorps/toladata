@@ -6,12 +6,11 @@ export default () => {
 
     const [bottomScrolling, setBottomScrolling] = useState("");
     const [extend, setExtend] = useState("");
-    const [tableHeight, setTableHeight] = useState("");
 
     return (
         <React.Fragment>
-            <IPTTSidebar bottomScrolling={bottomScrolling} extend={extend} tableHeight={tableHeight}/>
-            <IPTTReportBody setBottomScrolling={setBottomScrolling} setExtend={setExtend} setTableHeight={setTableHeight}/>
+            <IPTTSidebar bottomScrolling={bottomScrolling} extend={extend}/>
+            <IPTTReportBody setBottomScrolling={setBottomScrolling} setExtend={setExtend}/>
         </React.Fragment>
     );
 }
