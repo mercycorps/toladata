@@ -161,6 +161,10 @@ export class LevelStore {
         return treeData;
     }
 
+    @computed get inactiveTiers() {
+        let tiers = 
+    }
+
 
     @computed get chosenTierSetName () {
         return this.tierTemplates[this.chosenTierSetKey]['name'];
