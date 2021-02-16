@@ -97,16 +97,17 @@ const ColumnHeaderRow = inject('rootStore')(
                     } />
                 <HeaderCells.HeaderCell
                     className='base-column'
+                    colSpan={2}
+                    // empty cell above gear widget column
+                    />
+                <HeaderCells.HeaderCell
+                    className='base-column'
                     styleWidth={600}
                     colSpan={2}
                     label={
                         /* # Translators: Column header for indicator Name column */
                         gettext('Indicator')
                     } />
-                <HeaderCells.HeaderCell
-                    className='base-column'
-                    // empty cell above gear widget column
-                    />
                 { !rootStore.filterStore.resultsFramework && <HeaderCells.HeaderCell
                     className='base-column'
                     styleWidth={90}
@@ -117,13 +118,15 @@ const ColumnHeaderRow = inject('rootStore')(
                 }
                 { rootStore.hasUOMColumn && <HeaderCells.HeaderCell
                     className='base-column'
-                    styleWidth={250}
+                    styleWidth={150}
                     label={
                         /* # Translators: Column header */
                         gettext('Unit of measure')
                     } /> }
                 { rootStore.hasChangeColumn && <HeaderCells.HeaderCell
                     className='base-column'
+                    textAlign={'center'}
+                    styleWidth={150}
                     label={
                         /* # Translators: Column header for "direction of change" column (increasing/decreasing) */
                         gettext('Change')
@@ -137,6 +140,7 @@ const ColumnHeaderRow = inject('rootStore')(
                     } /> }
                 { rootStore.hasUOMTypeColumn && <HeaderCells.HeaderCell
                     className='base-column'
+                    textAlign={'center'}
                     styleWidth={50}
                     label={
                         /* # Translators: Column header, numeric or percentage type indicator */

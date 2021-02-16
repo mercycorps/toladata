@@ -178,6 +178,9 @@ td.indicator-edit-modal-cell {
 td.indicator-result-modal-cell {
 }
 td.indicator-cell {
+    &.center-cell {
+        text-align: center
+    }
 }
 .result-cell {
     @extend %right-aligned-cell;

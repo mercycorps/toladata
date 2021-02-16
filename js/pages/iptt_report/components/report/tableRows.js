@@ -40,7 +40,7 @@ const IndicatorEditModalCell = inject('rootStore')(
         }
         return (
             <td className="indicator-edit-modal-cell ">
-                <button type="button" className="btn btn-link p-1 float-right"
+                <button type="button" className="btn btn-link px-1 pt-0 float-right"
                         onClick={ loadModal }>
                     <i className="fas fa-cog"></i>
                 </button>
@@ -58,7 +58,7 @@ const IndicatorResultModalCell = inject("rootStore")(
         }
         return (
             <td className="indicator-result-modal-cell ">
-                <button type="button" className="btn btn-link p-1 indicator-ajax-popup indicator-data"
+                <button type="button" className="btn btn-link px-1 pt-0 indicator-ajax-popup indicator-data"
                         onClick={ loadModal }>
                     <i className="fas fa-table"></i>
                 </button>
@@ -248,6 +248,7 @@ class IndicatorRow extends React.Component {
                     <IndicatorCell className="indicator-cell " value={ displayNumber } />
                     }
                     <IndicatorResultModalCell indicator={ indicator } />
+                    <IndicatorEditModalCell indicator={ indicator } />
                     {rootStore.indicatorHasActiveDisaggregations(indicator) ?
                     <IndicatorNameExpandoCell value={ indicator.name } expanded={ this.state.expanded } clickHandler={ this.handleExpandoClick } /> :
                     <IndicatorCell className="indicator-cell " value={ indicator.name } />
@@ -255,9 +256,9 @@ class IndicatorRow extends React.Component {
                     <IndicatorEditModalCell indicator={ indicator } />
                     { !rootStore.resultsFramework && <IndicatorCell className="indicator-cell " value={ indicator.oldLevelDisplay } /> }
                     { rootStore.hasUOMColumn && <IndicatorCell className="indicator-cell " value={ indicator.unitOfMeasure } /> }
-                    { rootStore.hasChangeColumn && <IndicatorCell className="indicator-cell " value={ indicator.directionOfChange || gettext('N/A') } /> }
+                    { rootStore.hasChangeColumn && <IndicatorCell className="indicator-cell center-cell" value={ indicator.directionOfChange || gettext('N/A') } /> }
                     { rootStore.hasCNCColumn && <IndicatorCell className="indicator-cell " value={ cumulative || gettext('N/A') } /> }
-                    { rootStore.hasUOMTypeColumn && <IndicatorCell className="indicator-cell is-percent-column " value={ indicator.isPercent ? '%' : '#' } /> }
+                    { rootStore.hasUOMTypeColumn && <IndicatorCell className="indicator-cell is-percent-column center-cell" value={ indicator.isPercent ? '%' : '#' } /> }
                     { rootStore.hasBaselineColumn && (indicator.baseline === null ? <IndicatorCell className="indicator-cell baseline-column" value={ gettext('N/A') } /> : <ValueCell value={ indicator.baseline } className="lop-column" /> ) }
                     { reportData && (
                     <React.Fragment>
