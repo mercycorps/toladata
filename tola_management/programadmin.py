@@ -121,7 +121,8 @@ def get_audit_log_workbook(ws, program):
         Cell(ws, value=_('Rationale'))
     ]
 
-    title = Cell(ws, value=_("Change log"))
+    # Translators: Page title for a log of all changes to indicators over a program's history
+    title = Cell(ws, value=_("Program change log"))
     title.font = Font(size=18)
     ws.append([title,])
     ws.merge_cells(start_row=1, end_row=1, start_column=1, end_column=len(header))
@@ -404,8 +405,8 @@ class ProgramAuditLogSerializer(ModelSerializer):
     id = IntegerField(allow_null=True, required=False)
     indicator = ProgramAuditLogIndicatorSerializer()
     level = ProgramAuditLogLevelSerializer()
-    user = CharField(source='user.name', read_only=True)
-    organization = CharField(source='organization.name', read_only=True)
+    user = CharField(source='user.name', default='', read_only=True)
+    organization = CharField(source='organization.name', default='', read_only=True)
     date = DateTimeField(format="%Y-%m-%d %H:%M:%S", default_timezone=pytz.timezone("UTC"))
 
     class Meta:
@@ -425,9 +426,10 @@ class ProgramAuditLogSerializer(ModelSerializer):
             'level',
         )
 
+
 class ProgramAdminAuditLogSerializer(ModelSerializer):
     id = IntegerField(allow_null=True, required=False)
-    admin_user = CharField(source="admin_user.name", max_length=255)
+    admin_user = SerializerMethodField()
     date = DateTimeField(format="%Y-%m-%d %H:%M:%S")
 
     class Meta:
@@ -440,6 +442,12 @@ class ProgramAdminAuditLogSerializer(ModelSerializer):
             'diff_list',
             'pretty_change_type',
         )
+
+    def get_admin_user(self, obj):
+        try:
+            return obj.admin_user.name
+        except AttributeError:
+            return ''
 
 
 class ProgramAdminViewSet(viewsets.ModelViewSet):
@@ -608,10 +616,11 @@ class ProgramAdminViewSet(viewsets.ModelViewSet):
         program = Program.objects.get(pk=pk)
         workbook = Workbook()
         workbook.remove(workbook.active)
-        ws = workbook.create_sheet(_('Change log'))
+        # Translators: Sheet title for a log of all changes to indicators over a program's history
+        ws = workbook.create_sheet(_('Program change log'))
         get_audit_log_workbook(ws, program)
         response = HttpResponse(content_type='application/ms-excel')
-        filename = '{} Audit Log {}.xlsx'.format(program.name, timezone.now().strftime('%b %d, %Y'))
+        filename = '{} Program Change Log {}.xlsx'.format(program.name, timezone.now().strftime('%b %d, %Y'))
         response['Content-Disposition'] = 'attachment; filename="{}"'.format(filename)
         workbook.save(response)
         return response
