@@ -1,10 +1,9 @@
 """Tests for the organizations admin viewset ensuring query counts remain O(n) and all fields are accurate"""
 
 
-import unittest
 from django import test
-from django.db import models
-from tola_management.views import OrganizationAdminViewSet, OrganizationSerializer
+from tola_management.views import OrganizationAdminViewSet, OrganizationSerializer, OrganizationAdminAuditLogSerializer
+from factories.tola_management_models import OrganizationAdminAuditLogFactory
 from factories.workflow_models import (
     RFProgramFactory,
     OrganizationFactory,
@@ -16,7 +15,6 @@ from factories.workflow_models import (
     PROGRAM_ROLE_CHOICES,
     COUNTRY_ROLE_CHOICES
 )
-from workflow.models import Program, TolaUser, Organization
 
 SPECIAL_CHARS = "Spécîal Chåracters"
 
@@ -347,3 +345,16 @@ class TestOrganizationsAdminFilters(test.TestCase):
         data = self.get_organization_data(organization_status=0)
         self.assertEqual(data['count'], 1)
         self.assertEqual(data['results'][0]['id'], self.inactive_org.pk)
+
+
+class TestOrganizationAuditLogSerializer(test.TestCase):
+    def test_handles_empty_admin_user(self):
+        log_entry = OrganizationAdminAuditLogFactory()
+        serialized_log = OrganizationAdminAuditLogSerializer(log_entry)
+        self.assertNotEqual(serialized_log.data['admin_user'], '')
+
+        log_entry.admin_user = None
+        log_entry.save()
+        log_entry.refresh_from_db
+        serialized_log = OrganizationAdminAuditLogSerializer(log_entry)
+        self.assertEqual(serialized_log.data['admin_user'], '')

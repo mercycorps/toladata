@@ -67,12 +67,13 @@ EMAIL_BACKEND = 'django.core.mail.backends.console.EmailBackend'
 EMAIL_USE_TLS = True
 EMAIL_HOST = 'smtp.gmail.com'
 EMAIL_PORT = 587
-EMAIL_HOST_USER = 'test@test.com'
+EMAIL_HOST_USER = 'test@example.com'
 EMAIL_HOST_PASSWORD = ''
-DEFAULT_FROM_EMAIL = 'test@test.com'
-SERVER_EMAIL = "test@test.com"
-EMAIL_BACKEND = 'django.core.mail.backends.smtp.EmailBackend'
-#DEFAULT_TO_EMAIL = 'to email'
+DEFAULT_FROM_EMAIL = 'test@example.com'
+SERVER_EMAIL = "test@example.com"
+# Django's test runner automatically uses locmem for testing, which seems like a good option.
+# Use an EMAIL_BACKEND setting like the one below in the test_local.py file if you want something different
+# EMAIL_BACKEND = 'django.core.mail.backends.filebased.EmailBackend'
 
 ########## END EMAIL SETTINGS
 
