@@ -1,4 +1,4 @@
-/* Sample comment to start the PR */
+/* Filter (sidebar) state store for the IPTT page */
 
 import { observable, runInAction, reaction } from 'mobx';
 import IPTTProgram from './ipttProgram';
@@ -9,6 +9,12 @@ import { TVA, TIMEPERIODS, BLANK_OPTION, TIME_AWARE_FREQUENCIES, IRREGULAR_FREQU
     TVA_FREQUENCY_LABELS, TIMEPERIODS_FREQUENCY_LABELS, GROUP_BY_LEVEL, GROUP_BY_CHAIN } from '../../../constants';
 
 
+/*
+ * React Context provided at initialization includes all programs the user could switch to (context.programs_list)
+ * (generated on server in indicators.views_reports.IPTTReport)
+ * this returns an observable (may not be necessary for it to be observable) object with helper methods for
+ * returning subsets of that list of program data
+ */
 const getProgramsList = (
     programsList = []
 ) => observable.object({
@@ -29,6 +35,12 @@ const getProgramsList = (
 });
 
 
+/*
+ *  helper for storing, serving, and adding to the list of IPTTProgram objects, containing data needed
+ *    to construct filters (periods, indicator types, etc)
+ *    initially populated with react_context.program_data for the currently selected program,
+ *    on update this calls for the filter data for a new program selected (if it isn't already stored)
+ */
 const getProgramsFilterData = (
     programData = {}
 ) => {
@@ -54,6 +66,13 @@ const getProgramsFilterData = (
 }
 
 
+/*
+ * Main filter store model
+ *  initialized with the complete react context data structure
+ *  provides methods to populate filter items and react to their changes
+ *  Note this is a function which creates, modifies, and returns an observable object
+ *  The modifications happen at the end (after creating the object and declaring methods)
+ */
 export default (
     reactContext = {}
 ) => {
@@ -773,6 +792,7 @@ export default (
             return this.selectedProgramId ? this._router.getFullExcelUrl(this.pathParams) : false;
         },
     });
+    // now that we've created a filterStore object, initialize it with data from the router (populates from URL):
     filterStore._reportType = filterStore._router.isTVA ? TVA : TIMEPERIODS;
     filterStore._selectedProgramId = filterStore._router.programId;
     filterStore._selectedFrequency = filterStore._router.frequency;
@@ -796,6 +816,10 @@ export default (
         tiers: filterStore._router.tiers,
         oldLevels: filterStore._router.levels,
     };
+    /* now that we've hydrated the filterstore with data from the URL, all subsequent changes to filterStore data
+     * should also update the URL so that it stays accurate.  This reaction updates the URL displayed in the
+     * browser whenever URL-displayed parameters change
+     */
     const _updateRouter = reaction(
         () => filterStore.pathParams,
         params => filterStore.updateParams(params),
