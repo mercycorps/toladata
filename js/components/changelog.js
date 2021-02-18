@@ -7,6 +7,9 @@ import { EM_DASH } from '../constants';
 
 
 export const ChangeField = ({name, data, extraTitleText=null, change_type=''}) => {
+    // extraTitle is used as a subheading.  Current use is for changed disaggregations.  If a category has been
+    // changed, but the type hasn't, only the labels will be listed, which doesn't provide context about which
+    // type is being modified.  extraTitle provides the disagg type for the categories that were modified.
     const extraTitle = extraTitleText ? <h4 className="disagg-type__title, text-small" >{extraTitleText}</h4> : null;
     if (change_type.indexOf('country_disaggregation') >= 0 && typeof data === 'object' && data !== null) {
         const sorted_labels = Object.values(data).sort((a,b) => a.custom_sort - b.custom_sort);
@@ -40,13 +43,14 @@ export const ChangeField = ({name, data, extraTitleText=null, change_type=''}) =
     }
 };
 
-const ChangeLogEntryHeader = ({data, is_expanded, toggle_expando_cb}) => {
+export const ChangeLogEntryHeader = ({data, is_expanded, toggle_expando_cb}) => {
     // TODO: apply is-expanded dynamically
     return <tr className={is_expanded ? 'changelog__entry__header is-expanded' : 'changelog__entry__header'} onClick={() => toggle_expando_cb(data.id)}>
         <td className="text-nowrap text-action">
             <FontAwesomeIcon icon={is_expanded ? faCaretDown : faCaretRight} />&nbsp;<strong>{data.date}</strong>
         </td>
-        <td className="text-nowrap">{data.admin_user}</td>
+        {/* # Translators: This is shown in a table where the cell would usually have a username.  This value is used when there is no username to show.  */}
+        <td className="text-nowrap">{data.admin_user || gettext('Unavailable — user deleted')}</td>
         <td className="text-nowrap">{data.pretty_change_type}</td>
         <td></td>
         <td></td>
@@ -126,17 +130,26 @@ const ChangeLogEntryRowBuilder = ({data}) => {
 
     }
     else {
+        // See the ChangeField component for an explanation of why extraTitleText is necessary
         let extraTitleText = null;
         let skipDisaggType = false;
         if (data.change_type.indexOf('country_disaggregation') >= 0) {
             const diff_list = data.diff_list;
             const disaggType = diff_list.filter((diff) => diff.name === "disaggregation_type");
+            // See below for why this test is being done.
             if (disaggType[0].prev === disaggType[0].new) {
                 extraTitleText = disaggType[0].prev;
                 skipDisaggType = true;
             }
 
         }
+        /*
+        Disaggregation logs get special handling.  If both the disagg type name and at least one of its category names
+        have been changed, separate rows will appear for type and categories.  If only category names have been changed
+        the disaggregation type is used a a subheading of the main row heading and the disaggregation type row is
+        not displayed.  The code above sets the subheading text and sets a flag that is used to determine whether
+        or not to skip displaying the disaggregation type row.
+         */
         data.diff_list.forEach((changeSet, id) => {
             const key = `${id}_${changeSet.pretty_name}`;
             if (!(changeSet.name === "disaggregation_type" && skipDisaggType)) {
