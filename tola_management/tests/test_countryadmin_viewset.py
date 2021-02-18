@@ -13,9 +13,11 @@ from factories.workflow_models import (
     PROGRAM_ROLE_CHOICES,
     COUNTRY_ROLE_CHOICES
 )
+from factories.tola_management_models import CountryAdminAuditLogFactory
 from tola_management.countryadmin import (
     CountryAdminViewSet,
-    CountryAdminSerializer
+    CountryAdminSerializer,
+    CountryAdminAuditLogSerializer
 )
 
 SPECIAL_CHARS = "Spécîål Chärs"
@@ -177,6 +179,26 @@ class TestCountryAdminSerializer(test.TestCase):
         data = self.get_serialized_data(c.pk)
         self.assertEqual(data['users_count'], 2)
         self.assertEqual(data['organizations_count'], 2)
+
+
+class TestCountryAdminAuditLogSerializer(test.TestCase):
+    def test_handles_empty_admin_user(self):
+        log_entry = CountryAdminAuditLogFactory()
+        serialized_log = CountryAdminAuditLogSerializer(log_entry)
+        self.assertNotEqual(serialized_log.data['admin_user'], '')
+
+        log_entry.admin_user = None
+        log_entry.save()
+        log_entry.refresh_from_db
+        serialized_log = CountryAdminAuditLogSerializer(log_entry)
+        self.assertEqual(serialized_log.data['admin_user'], '')
+
+        log_entry.disaggregation_type = None
+        log_entry.save()
+        log_entry.refresh_from_db
+        serialized_log = CountryAdminAuditLogSerializer(log_entry)
+        self.assertEqual(serialized_log.data['disaggregation_type'], '')
+
 
 
 class TestCountryAdminViewSetFilters(test.TestCase):
