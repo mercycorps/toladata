@@ -17,6 +17,8 @@ class TPReportPeriodSerializer(serializers.Serializer):
             period_dict['count'] = period_dict.get('count', None)
             self.__dict__ = period_dict
 
+    # Is this an override of a parent method?  If not, I can't find its use anywhere.  Is it used?  If not can this
+    # and the PeriodObject above can be deleted maybe?
     @classmethod
     def from_dict(cls, period_dict, context=None):
         if context is None:
