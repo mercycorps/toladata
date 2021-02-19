@@ -99,15 +99,21 @@ const ColumnHeaderRow = inject('rootStore')(
                     className='base-column'
                     colSpan={2}
                     // empty cell above gear widget column
-                    />
+                />
                 <HeaderCells.HeaderCell
                     className='base-column'
                     styleWidth={600}
-                    colSpan={2}
+                    colSpan={1}
                     label={
                         /* # Translators: Column header for indicator Name column */
                         gettext('Indicator')
                     } />
+                <HeaderCells.HeaderCell
+                    className='base-column'
+                    styleWidth={200}
+                    colSpan={1}
+                    // empty cell above gear widget column
+                />
                 { !rootStore.filterStore.resultsFramework && <HeaderCells.HeaderCell
                     className='base-column'
                     styleWidth={90}

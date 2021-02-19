@@ -177,6 +177,13 @@ td.indicator-edit-modal-cell {
 }
 td.indicator-result-modal-cell {
 }
+td.indicator-add-results-modal-cell {
+    display: flex;
+    justify-content: center;
+    button {
+        min-width: max-content;
+    }
+}
 td.indicator-cell {
     &.center-cell {
         text-align: center

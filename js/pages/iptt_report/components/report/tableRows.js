@@ -2,7 +2,7 @@ import React from 'react';
 import { inject, observer } from 'mobx-react';
 import { library } from '@fortawesome/fontawesome-svg-core';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
-import { faCaretDown, faCaretRight } from '@fortawesome/free-solid-svg-icons';
+import { faCaretDown, faCaretRight, faPlusCircle } from '@fortawesome/free-solid-svg-icons';
 import {BLANK_TABLE_CELL} from '../../../../constants';
 
 library.add(faCaretDown, faCaretRight);
@@ -49,6 +49,43 @@ const IndicatorEditModalCell = inject('rootStore')(
     })
 );
 
+const IndicatorAddResults = inject("rootStore", "filterStore")(
+    observer(({ indicator, rootStore, filterStore }) => {
+        const loadModal = (e) => {
+            e.preventDefault();
+            let url = `/indicators/result_add/${indicator.pk}/?modal=true`;
+            $("#indicator_modal_content").empty();
+            $("#modalmessages").empty();
+            $("#indicator_modal_content").addClass("modal-body");
+            $("#indicator_modal_content").load(url);
+            $("#indicator_modal_div").modal('show')
+        }
+        console.log(filterStore.programFilterData)
+        return (
+            <td className="indicator-add-results-modal-cell">
+                <div id="id_periodic_target"></div>
+                <a 
+                    id={`id_link_reporting_period_${filterStore._selectedProgramId}`}
+                    className=""
+                    href="#"
+                    data-toggle="modal"
+                    data-program={filterStore._selectedProgramId}
+                    data-rptstart={filterStore.programFilterData.reportingPeriodStart.toISODate()}
+                    data-rptend={filterStore.programFilterData.reportingPeriodEnd.toISODate()}
+                    data-indicator_count={filterStore.programFilterData.indicators.size}
+                    ></a>
+                <button type="button" className={"btn btn-link px-1 pt-0 mx-auto"}
+                    onClick={ loadModal }>
+                    <FontAwesomeIcon icon={ faPlusCircle } />
+                        {
+                            // # Translators: a button that lets the user add a `new result
+                            gettext('Add result')
+                        }
+                </button>
+            </td>
+        )
+    })
+)
 
 const IndicatorResultModalCell = inject("rootStore")(
     observer(({ indicator, rootStore }) => {
@@ -253,7 +290,7 @@ class IndicatorRow extends React.Component {
                     <IndicatorNameExpandoCell value={ indicator.name } expanded={ this.state.expanded } clickHandler={ this.handleExpandoClick } /> :
                     <IndicatorCell className="indicator-cell " value={ indicator.name } />
                     }
-                    <IndicatorEditModalCell indicator={ indicator } />
+                    <IndicatorAddResults indicator={ indicator } />
                     { !rootStore.resultsFramework && <IndicatorCell className="indicator-cell " value={ indicator.oldLevelDisplay } /> }
                     { rootStore.hasUOMColumn && <IndicatorCell className="indicator-cell " value={ indicator.unitOfMeasure } /> }
                     { rootStore.hasChangeColumn && <IndicatorCell className="indicator-cell center-cell" value={ indicator.directionOfChange || gettext('N/A') } /> }
