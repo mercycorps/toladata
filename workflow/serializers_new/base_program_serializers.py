@@ -130,6 +130,10 @@ class ProgramRFOrderingMixin:
     # Class method used to instantiate serializer with required context (to minimize queries)
     @classmethod
     def _get_context(cls, **kwargs):
+        """extensible method to populate serializer context (and context of nested serializers)
+
+            minimizes db calls as child serializers can fetch in memory objects from context instead of another db call
+        """
         context = super()._get_context(**kwargs)
         program_pk = context['program_pk']
         context['tiers'] = cls.related_serializers['tiers'].load_for_program(program_pk, context=context).data
