@@ -67,10 +67,12 @@ class IPTTQSMixin:
 
     @classmethod
     def _get_query_fields(cls):
+        """All query fields necessary for rendering programs for the IPTT Quickstart page"""
         return ['pk', 'name', 'reporting_period_start', 'reporting_period_end', 'start_date', 'end_date']
 
     @classmethod
     def _get_context(cls, *args, **kwargs):
+        """Extends context to include the date for determining number of "most recent" periods"""
         context = super()._get_context(*args, **kwargs)
         context['now'] = timezone.now().date()
         return context
@@ -118,6 +120,7 @@ class IPTTQSMixin:
         }
 
 
+# IPTT Quickstart page Program Serializer:
 IPTTQSProgramSerializer = get_serializer(
     IPTTQSMixin,
     ProgramReportingPeriodMixin,
@@ -219,6 +222,7 @@ class IPTTExcelMixin:
     # Class methods to instantiate serializer with required context (adjusts given context):
     @classmethod
     def load_for_pk(cls, program_pk, **kwargs):
+        """Main entry point - loads a program with prefetched context for rendering Excel export of IPTT"""
         context = kwargs.get('context', {})
         context['tiers'] = cls.related_serializers['tiers'](
             context.get('tier_objects', []), context=context, many=True
@@ -240,6 +244,7 @@ class IPTTExcelMixin:
         return self._get_levels_chain_order(program)
 
 
+# Main serializer for the Excel export of an IPTT:
 IPTTExcelProgramSerializer = get_serializer(
     IPTTExcelMixin,
     ProgramRFOrderingMixin,
