@@ -176,6 +176,7 @@ class ProgramSerializer(serializers.ModelSerializer):
 
 
 class ProgramObjectiveSerializer(serializers.ModelSerializer):
+    """Lightweight serializer for program Objectives for use in the RF Builder"""
 
     class Meta:
         model = Objective
@@ -192,8 +193,10 @@ class ProgramObjectiveSerializer(serializers.ModelSerializer):
 
 
 class IndicatorPlanIndicatorSerializerBase(serializers.ModelSerializer):
-    """
-    Serializer for the indicator plan page and excel export
+    """Serializer for the indicator plan page and excel export
+
+       Requires a formatter derived from the IndicatorFormatterMixin to render values appropriately for web/excel
+       Note: the formatting behavior occurs in to_representation
     """
     tier_name_only = serializers.SerializerMethodField()
     disaggregation = serializers.StringRelatedField(many=True)
@@ -267,6 +270,7 @@ class IndicatorPlanIndicatorSerializerBase(serializers.ModelSerializer):
         return indicator.baseline
 
     def to_representation(self, instance):
+        """Overrides to_representation to attempt to render (format) data for web/excel as needed"""
         data = super().to_representation(instance)
         for field in data:
             data[field] = self.render_value(field, instance, data)
@@ -274,25 +278,38 @@ class IndicatorPlanIndicatorSerializerBase(serializers.ModelSerializer):
 
 
 class IndicatorFormatsMixin:
+    """Base class for a formatter mixin to output web/excel data differently"""
+
+    # field names which should be (attempted) translated
     translateable_fields = (
         'tier_name_only',
         'get_direction_of_change_display',
         'get_unit_of_measure_type_display',
     )
+
+    # field names for which a custom formatter method is required:
     method_fields = (
         'is_cumulative',
         'disaggregation',
     )
+
+    # fields which should be rendered as a bulleted list
     bullet_list_fields = (
         'disaggregation',
     )
+
+    # fields which should be rendered as an output-appropriate number
     numeric_fields = (
         'baseline',
         'lop_target',
     )
+
+    # fields for which an empty value should be rendered as "–"
     em_dash_fields = (
         'results_aware_number',
     )
+
+    # fields for which an empty value should be rendered as "N/A"
     not_applicable_fields = (
         'baseline',
         'is_cumulative',
@@ -308,12 +325,18 @@ class IndicatorFormatsMixin:
         return value
 
     def format_disaggregation(self, value, **kwargs):
+        """Disaggregations should (attempt to be) translated individually"""
         return [self.get_translated(v) for v in value] if value else None
 
     def format_list(self, value):
+        """returns a bulleted list"""
         return value if value is None else "\n".join(u'-{}'.format(item) for item in value)
 
     def render_value(self, field, instance, data):
+        """formatter workhorse - called in to_representation, uses class property field lists to apply custom
+
+            formatting to different fields as needed
+        """
         value = data.get(field, None)
         if value == '' or value is False or value == []:
             value = None
@@ -334,15 +357,21 @@ class IndicatorFormatsMixin:
             elif field in self.not_applicable_fields:
                 value = self.get_translated('N/A')
             else:
-                value = u''
+                value = ''
         return value
 
 
 class IndicatorWebMixin(IndicatorFormatsMixin):
-    def get_translated(self, value):
+    """An implemetnation of the IndicatorFormatsMixin appropriate for web JSON output"""
+
+    @staticmethod
+    def get_translated(value):
+        """For web, translation should be lazy, for performance reasons"""
         return value if value is None else ugettext_lazy(value)
 
-    def format_numeric(self, value, indicator, decimal_places=2):
+    @staticmethod
+    def format_numeric(value, indicator, decimal_places=2):
+        """For web, use formats.number_format locale-aware formatter to produce a unicode string formatted correctly"""
         if value is None:
             return value
         try:
@@ -353,15 +382,20 @@ class IndicatorWebMixin(IndicatorFormatsMixin):
         else:
             value = formats.number_format(f_value, use_l10n=True, force_grouping=True)
             if indicator.unit_of_measure_type == indicator.PERCENTAGE:
-                value = u'{}%'.format(value)
+                value = '{}%'.format(value)
             return value
 
 
 class IndicatorExcelMixin(IndicatorFormatsMixin):
-    def get_translated(self, value):
+    """An implementation of the IndicatorFormatsMixin appropriate for providing data to an Excel renderer"""
+
+    @staticmethod
+    def get_translated(value):
+        """For excel, translation must be non-lazy so Excel renderer recognizes it as a string"""
         return value if value is None else ugettext(value)
 
     def format_numeric(self, value, indicator, decimal_places=2):
+        """For excel, produce rounded {value: number_format:} dict for Excel to format in place"""
         if value is None:
             return value
         if indicator.unit_of_measure_type == indicator.PERCENTAGE:
@@ -385,7 +419,9 @@ class IndicatorExcelMixin(IndicatorFormatsMixin):
         except ValueError:
             return value
 
-    def format_percentage(self, value, indicator, decimal_places=2):
+    @staticmethod
+    def format_percentage(value, indicator, decimal_places=2):
+        """For excel, produce rounded {value: numberformat:} dict for Excel to format as percentage in place"""
         if value is None:
             return value
         try:
@@ -408,7 +444,8 @@ class IndicatorExcelMixin(IndicatorFormatsMixin):
             return value
 
     def render_value(self, field, instance, data):
-        value = super(IndicatorExcelMixin, self).render_value(field, instance, data)
+        """Overrides render_value to handle special cases (dicts and Nones) and add 'field': field in case of dict"""
+        value = super().render_value(field, instance, data)
         if type(value) == dict and 'value' in value:
             pass
         elif value is None:
@@ -427,10 +464,11 @@ class IndicatorExcelMixin(IndicatorFormatsMixin):
         return value
 
 
+# Combination of IP base serializer with the web (JSON) output formatter:
 class IndicatorPlanIndicatorWebSerializer(IndicatorWebMixin, IndicatorPlanIndicatorSerializerBase):
     pass
 
-
+# combination of IP base serializer with the Excel output formatter:
 class IndicatorPlanIndicatorExcelSerializer(IndicatorExcelMixin, IndicatorPlanIndicatorSerializerBase):
     pass
 
@@ -449,21 +487,21 @@ class IndicatorPlanLevelSerializerBase(serializers.ModelSerializer):
             'indicator_set'
         ]
 
-
-    def get_display_name(self, obj):
-        tier = ugettext(obj.leveltier.name) if obj.leveltier else u''
-        ontology = obj.display_ontology if obj.display_ontology else u''
-        name = str(obj.name)
-        #return u' '.join([w for w in [tier, ontology, name] if w is not None])
-        return u'{tier}{tier_space}{ontology}{colon}{name}'.format(
+    @staticmethod
+    def get_display_name(level):
+        tier = ugettext(level.leveltier.name) if level.leveltier else u''
+        ontology = level.display_ontology if level.display_ontology else u''
+        name = str(level.name)
+        return '{tier}{tier_space}{ontology}{colon}{name}'.format(
             tier=tier,
-            tier_space=u' ' if tier and ontology else u'',
+            tier_space=' ' if tier and ontology else '',
             ontology=ontology,
-            colon=u': ' if (tier or ontology) else u'',
+            colon=': ' if (tier or ontology) else '',
             name=name
         )
 
 
+# the only difference between the web and excel LEVEL serializer is which child indicator serializer is used:
 class IndicatorPlanLevelWebSerializer(IndicatorPlanLevelSerializerBase):
     indicator_set = IndicatorPlanIndicatorWebSerializer(many=True, read_only=True)
 
