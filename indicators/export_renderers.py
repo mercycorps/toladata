@@ -398,7 +398,7 @@ class ExcelRendererBase:
             )
 
     def add_change_log(self, program_pk):
-        sheet = self.wb.create_sheet(ugettext('Change log'))
+        sheet = self.wb.create_sheet(ugettext('Program change log'))
         program = Program.rf_aware_objects.get(pk=program_pk)
         get_audit_log_workbook(sheet, program)
 
