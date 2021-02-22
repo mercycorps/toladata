@@ -49,6 +49,7 @@ const IndicatorEditModalCell = inject('rootStore')(
     })
 );
 
+// **** Component to add results from the IPTT ****
 const IndicatorAddResults = inject("rootStore", "filterStore")(
     observer(({ indicator, rootStore, filterStore }) => {
         const loadModal = (e) => {
@@ -59,12 +60,16 @@ const IndicatorAddResults = inject("rootStore", "filterStore")(
             $("#indicator_modal_content").addClass("modal-body");
             $("#indicator_modal_content").load(url);
             $("#indicator_modal_div").modal('show')
+            // TODO: Add the needed functionality to save the entered results
+
         }
-        console.log(filterStore.programFilterData)
+
+        console.log('Program Filter Data:', filterStore.programFilterData)
         return (
             <td className="indicator-add-results-modal-cell">
                 <div id="id_periodic_target"></div>
-                <a 
+                
+                <a //Added this element to mimic the Program Page. It seemed like the template was pulling some data from this element. 
                     id={`id_link_reporting_period_${filterStore._selectedProgramId}`}
                     className=""
                     href="#"
@@ -74,6 +79,8 @@ const IndicatorAddResults = inject("rootStore", "filterStore")(
                     data-rptend={filterStore.programFilterData.reportingPeriodEnd.toISODate()}
                     data-indicator_count={filterStore.programFilterData.indicators.size}
                     ></a>
+
+                    
                 <button type="button" className={"btn btn-link px-1 pt-0 mx-auto"}
                     onClick={ loadModal }>
                     <FontAwesomeIcon icon={ faPlusCircle } />
