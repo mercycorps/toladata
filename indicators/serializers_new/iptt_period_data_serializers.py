@@ -31,6 +31,7 @@ class TPReportPeriodSerializer(serializers.Serializer):
         """
         if context is None:
             context = {}
+        # serializer won't accept a raw dict, so the dict is being wrapped in a class
         period_obj = cls.PeriodObject(period_dict)
         return cls(period_obj, context=context)
 
