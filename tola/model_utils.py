@@ -135,7 +135,9 @@ def get_serializer(*serializer_classes):
                 purpose: (optional) purpose of this mixin (i.e. "RFAware")
                 model (required for exactly one of the composed classes): a django model
                 fields: list of fields corresponding to fields defined on the parent class or base model fields
-                override_fields: boolean - ignore all other mixins' "fields" attributes (deprecated)
+                override_fields: boolean - ignore all other mixins' "fields" attributes
+                    Note: override_fields applied to more than one mixin in the composition can lead to unexpected
+                        behavior and probably indicates a different composition structure
 
     Returns:
         Serializer: a serializer with the fields composed from the provided mixins
