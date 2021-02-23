@@ -135,7 +135,7 @@ def get_serializer(*serializer_classes):
                 purpose: (optional) purpose of this mixin (i.e. "RFAware")
                 model (required for exactly one of the composed classes): a django model
                 fields: list of fields corresponding to fields defined on the parent class or base model fields
-                override_fields: boolean - ignore all other mixins' "fields" attributes (deprecarted)
+                override_fields: boolean - ignore all other mixins' "fields" attributes (deprecated)
 
     Returns:
         Serializer: a serializer with the fields composed from the provided mixins
@@ -156,6 +156,11 @@ def get_serializer(*serializer_classes):
                 # logic here
 
         YourModelExtendedSerializer = get_serializer(YourModelExtensionMixin, YourModelBaseMixin)
+
+    The general approach for these serializers is to sequentially load serialized child data into context and
+    to use that the values in context to power downstream serialization.  This last bit is mostly done through
+    SerializerMethod fields. This approach avoids requerying data that has already been queried once by storing it
+    in context for later use.
     """
     class_metas = [base_class for base_class in serializer_classes if hasattr(base_class, 'Meta')][::-1]
     overrides = [base_class for base_class in class_metas if getattr(base_class.Meta, 'override_fields', False)]

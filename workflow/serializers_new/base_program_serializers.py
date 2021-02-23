@@ -20,6 +20,8 @@ class ProgramBaseSerializerMixin:
     JSON output corresponds to js/models/bareProgram
     """
 
+    # 'using_results_framework' is an annotation provided by the non-standard Program queryset
+    # managers (e.g. rf_aware_objects) defined on the Program model.
     results_framework = serializers.BooleanField(source='using_results_framework')
 
     class Meta:
@@ -40,7 +42,7 @@ class ProgramBaseSerializerMixin:
 
     @classmethod
     def get_queryset(cls, **kwargs):
-        """Returns the specific queryset used to load this serializer for a speficic program or programs
+        """Returns the specific queryset used to load this serializer for a specific program or programs
 
             Args:
                 pk: pk in order to load for a specific program

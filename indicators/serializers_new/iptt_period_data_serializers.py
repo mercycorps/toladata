@@ -22,8 +22,6 @@ class TPReportPeriodSerializer(serializers.Serializer):
             period_dict['count'] = period_dict.get('count', None)
             self.__dict__ = period_dict
 
-    # Is this an override of a parent method?  If not, I can't find its use anywhere.  Is it used?  If not can this
-    # and the PeriodObject above can be deleted maybe?
     @classmethod
     def from_dict(cls, period_dict, context=None):
         """instances a serializable object from the provided dict, and serializes it
@@ -33,6 +31,7 @@ class TPReportPeriodSerializer(serializers.Serializer):
         """
         if context is None:
             context = {}
+        # serializer won't accept a raw dict, so the dict is being wrapped in a class
         period_obj = cls.PeriodObject(period_dict)
         return cls(period_obj, context=context)
 
