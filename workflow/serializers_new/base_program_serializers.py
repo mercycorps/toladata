@@ -101,7 +101,9 @@ class ProgramReportingPeriodMixin:
             'reporting_period_end'
         ]
 
-
+# Why are both of these necessary:  1)levels with associated indicators in two different sort orders and
+# 2) indicators sorted by their associated level in two different sort orders. One seems to cover the other and
+# vice versa.
 class ProgramRFOrderingMixin:
     """Program Serializer component which serializes level and indicator pks in RF-aware order"""
     level_pks_level_order = serializers.SerializerMethodField()
