@@ -57,19 +57,20 @@ const IndicatorAddResults = inject("rootStore", "filterStore")(
             let url = `/indicators/result_add/${indicator.pk}/?modal=true`;
             $("#indicator_modal_content").empty();
             $("#modalmessages").empty();
-            $("#indicator_modal_content").addClass("modal-body");
-            $("#indicator_modal_content").load(url);
-            $("#indicator_modal_div").modal('show')
-            // TODO: Add the needed functionality to save the entered results
-
+            $("#indicator_results_modal_content").load(url);
+            $("#indicator_results_div").modal('show')
+                .on('save.tola.result_form', () => rootStore.indicatorUpdate(e, {indicatorId: indicator.pk}))
+                .on('hidden.bs.modal', (ev) => {
+                    $(ev.target).off('.tola.save');
+                })
         }
 
-        console.log('Program Filter Data:', filterStore.programFilterData)
         return (
             <td className="indicator-add-results-modal-cell">
                 <div id="id_periodic_target"></div>
                 
-                <a //Added this element to mimic the Program Page. It seemed like the template was pulling some data from this element. 
+                <div //Added this element to mimic the Program Page. It seemed like the template was pulling some data from this element. 
+                    style={{ visibility: 'hidden'}}
                     id={`id_link_reporting_period_${filterStore._selectedProgramId}`}
                     className=""
                     href="#"
@@ -78,9 +79,8 @@ const IndicatorAddResults = inject("rootStore", "filterStore")(
                     data-rptstart={filterStore.programFilterData.reportingPeriodStart.toISODate()}
                     data-rptend={filterStore.programFilterData.reportingPeriodEnd.toISODate()}
                     data-indicator_count={filterStore.programFilterData.indicators.size}
-                    ></a>
+                ></div>
 
-                    
                 <button type="button" className={"btn btn-link px-1 pt-0 mx-auto"}
                     onClick={ loadModal }>
                     <FontAwesomeIcon icon={ faPlusCircle } />
