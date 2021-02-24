@@ -101,9 +101,7 @@ class ProgramReportingPeriodMixin:
             'reporting_period_end'
         ]
 
-# Why are both of these necessary:  1)levels with associated indicators in two different sort orders and
-# 2) indicators sorted by their associated level in two different sort orders. One seems to cover the other and
-# vice versa.
+
 class ProgramRFOrderingMixin:
     """Program Serializer component which serializes level and indicator pks in RF-aware order"""
     level_pks_level_order = serializers.SerializerMethodField()
@@ -149,9 +147,11 @@ class ProgramRFOrderingMixin:
     # Serializer Method Field methods (populate fields for serializer):
 
     def get_level_pks_level_order(self, program):
+        """Levels in level order is for the IPTT which first places levels, then indicators under them"""
         return [l['pk'] for l in self._get_levels_level_order(program)]
 
     def get_level_pks_chain_order(self, program):
+        """Levels in chain order is for the IPTT which first places levels, then indicators under them"""
         return [l['pk'] for l in self._get_levels_chain_order(program)]
 
     def get_indicator_pks_for_level(self, program):
@@ -165,7 +165,10 @@ class ProgramRFOrderingMixin:
         return [i['pk'] for i in self._sorted_indicators_for_level(program, None)]
 
     def get_indicator_pks_level_order(self, program):
-        """returns a list of pks, sorted by level in level order then indicator level_order (if RF) otherwise manual"""
+        """returns a list of pks, sorted by level in level order then indicator level_order (if RF) otherwise manual
+
+            For the Program Page, which only sorts indicators, to simplify the JS sorting algorithm
+        """
         levels = self._get_levels_level_order(program) if program.results_framework else []
         indicator_pks = [i['pk'] for level in levels
                          for i in self._sorted_indicators_for_level(program, level)]
@@ -173,7 +176,10 @@ class ProgramRFOrderingMixin:
         return indicator_pks
 
     def get_indicator_pks_chain_order(self, program):
-        """returns a list of pks, sorted by level in chain order then indicator level_order (if RF) otherwise manual"""
+        """returns a list of pks, sorted by level in chain order then indicator level_order (if RF) otherwise manual
+
+            For the Program Page, which only sorts indicators, to simplify the JS sorting algorithm
+        """
         levels = self._get_levels_chain_order(program) if program.results_framework else []
         indicator_pks = [i['pk'] for level in levels
                          for i in self._sorted_indicators_for_level(program, level)]
