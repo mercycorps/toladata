@@ -2,7 +2,7 @@ import IPTTLevel, { forIPTT } from '../models/ipttLevel';
 
 describe("bare iptt level", () => {
     const Level = forIPTT;
-    
+
     it("returns a tier pk", () => {
         let level = Level({tier_pk: 24});
         expect(level.tierPk).toBe(24);
@@ -35,7 +35,7 @@ describe("bare iptt level", () => {
 
 describe("full iptt level", () => {
     const Level = IPTTLevel;
-    
+
     it("returns a full set of information", () => {
         let level = Level({
             pk: 12,
@@ -51,4 +51,21 @@ describe("full iptt level", () => {
         expect(level.showForTier(114)).toBeFalsy();
         expect(level.tierName).toBe("Test tier name");
     });
+    it("handles empty values for manual numbering of levels", () => {
+        let level = Level({
+            tier_name: null,
+            ontology: '1.1',
+        });
+        expect(level.tierNumber).toBe("1.1");
+        level = Level({
+            tier_name: 'Test the name',
+            ontology: '1.1',
+        });
+        expect(level.tierNumber).toBe("Test the name 1.1");
+        level = Level({
+            tier_name: 'Test the name',
+            ontology: '',
+        });
+        expect(level.tierNumber).toBe("Test the name");
+    })
 })
