@@ -2,9 +2,9 @@ import React from 'react';
 import { FaRegQuestionCircle } from 'react-icons/fa';
 
 const HeaderCell = ( props ) => {
-    let style = props.styleWidth ? {
-        minWidth: `${props.styleWidth}px`
-    } : {};
+    let style = {};
+    style.minWidth = props.styleWidth ? `${props.styleWidth}px` : {};
+    style.textAlign = props.textAlign ? props.textAlign : {};
     return (
         <th
             scope="col"

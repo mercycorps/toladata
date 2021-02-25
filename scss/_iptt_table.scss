@@ -126,6 +126,7 @@ td.iptt-level-row, td.ip-level-row {
 }
 
 td.expando-cell {
+    min-width: 125px;
     color: $blue;
     cursor: pointer;
     border-right: none;
@@ -177,7 +178,17 @@ td.indicator-edit-modal-cell {
 }
 td.indicator-result-modal-cell {
 }
+td.indicator-add-results-modal-cell {
+    display: flex;
+    justify-content: center;
+    button {
+        min-width: max-content;
+    }
+}
 td.indicator-cell {
+    &.center-cell {
+        text-align: center
+    }
 }
 .result-cell {
     @extend %right-aligned-cell;

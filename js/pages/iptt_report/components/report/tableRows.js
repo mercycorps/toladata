@@ -2,7 +2,7 @@ import React from 'react';
 import { inject, observer } from 'mobx-react';
 import { library } from '@fortawesome/fontawesome-svg-core';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
-import { faCaretDown, faCaretRight } from '@fortawesome/free-solid-svg-icons';
+import { faCaretDown, faCaretRight, faPlusCircle } from '@fortawesome/free-solid-svg-icons';
 import {BLANK_TABLE_CELL} from '../../../../constants';
 
 library.add(faCaretDown, faCaretRight);
@@ -22,7 +22,7 @@ function ipttRound(value, percent) {
     }
     return null;
 }
-
+// Component to update indicators from the IPTT in a modal
 const IndicatorEditModalCell = inject('rootStore')(
     observer(({ rootStore, indicator }) => {
         const loadModal = (e) => {
@@ -40,7 +40,7 @@ const IndicatorEditModalCell = inject('rootStore')(
         }
         return (
             <td className="indicator-edit-modal-cell ">
-                <button type="button" className="btn btn-link p-1 float-right"
+                <button type="button" className="btn btn-link px-1 pt-0 float-right"
                         onClick={ loadModal }>
                     <i className="fas fa-cog"></i>
                 </button>
@@ -49,7 +49,57 @@ const IndicatorEditModalCell = inject('rootStore')(
     })
 );
 
+// Component to add results from the IPTT in a modal
+const IndicatorAddResults = inject("rootStore", "filterStore")(
+    observer(({ indicator, rootStore, filterStore }) => {
+        const loadModal = (e) => {
+            e.preventDefault();
+            // Url for the form located at templates/indicators/result_form_modal.html
+            let url = `/indicators/result_add/${indicator.pk}/?modal=true`;
+            $("#indicator_modal_content").empty();
+            $("#modalmessages").empty();
+            $("#indicator_results_modal_content").load(url);
+            $("#indicator_results_div").modal('show')
+                .on('save.tola.result_form', () => rootStore.indicatorUpdate(e, {indicatorId: indicator.pk}))
+                // Handles PNotifys evidence link warning, brings the modal back up for users to double check.
+                .on('review.tola.results.warning', (e, params) => {
+                    let url = params.url;
+                    $("#indicator_results_modal_content").load(url);
+                    $("#indicator_results_div").modal('show');
+                })
+                .on('hidden.bs.modal', (ev) => {
+                    $(ev.target).off('.tola.save');
+                })
+        }
 
+        return (
+            <td className="indicator-add-results-modal-cell">
+                
+                <div //Added this element to mimic the Program Page. Template is pulling some of this data for the form. 
+                    style={{ visibility: 'hidden'}}
+                    id={`id_link_reporting_period_${filterStore._selectedProgramId}`}
+                    className=""
+                    href="#"
+                    data-toggle="modal"
+                    data-program={filterStore._selectedProgramId}
+                    data-rptstart={filterStore.programFilterData.reportingPeriodStart.toISODate()}
+                    data-rptend={filterStore.programFilterData.reportingPeriodEnd.toISODate()}
+                    data-indicator_count={filterStore.programFilterData.indicators.size}
+                ></div>
+
+                <button type="button" className={"btn btn-link px-1 pt-0 mx-auto"}
+                    onClick={ loadModal }>
+                    <FontAwesomeIcon icon={ faPlusCircle } />
+                        {
+                            // # Translators: a button that lets the user add a `new result
+                            gettext('Add result')
+                        }
+                </button>
+            </td>
+        )
+    })
+)
+// Component to view results from the IPTT in a modal
 const IndicatorResultModalCell = inject("rootStore")(
     observer(({ indicator, rootStore }) => {
         const loadModal = (e) => {
@@ -58,7 +108,7 @@ const IndicatorResultModalCell = inject("rootStore")(
         }
         return (
             <td className="indicator-result-modal-cell ">
-                <button type="button" className="btn btn-link p-1 indicator-ajax-popup indicator-data"
+                <button type="button" className="btn btn-link px-1 pt-0 indicator-ajax-popup indicator-data"
                         onClick={ loadModal }>
                     <i className="fas fa-table"></i>
                 </button>
@@ -248,16 +298,17 @@ class IndicatorRow extends React.Component {
                     <IndicatorCell className="indicator-cell " value={ displayNumber } />
                     }
                     <IndicatorResultModalCell indicator={ indicator } />
+                    <IndicatorEditModalCell indicator={ indicator } />
                     {rootStore.indicatorHasActiveDisaggregations(indicator) ?
                     <IndicatorNameExpandoCell value={ indicator.name } expanded={ this.state.expanded } clickHandler={ this.handleExpandoClick } /> :
                     <IndicatorCell className="indicator-cell " value={ indicator.name } />
                     }
-                    <IndicatorEditModalCell indicator={ indicator } />
+                    <IndicatorAddResults indicator={ indicator } />
                     { !rootStore.resultsFramework && <IndicatorCell className="indicator-cell " value={ indicator.oldLevelDisplay } /> }
                     { rootStore.hasUOMColumn && <IndicatorCell className="indicator-cell " value={ indicator.unitOfMeasure } /> }
-                    { rootStore.hasChangeColumn && <IndicatorCell className="indicator-cell " value={ indicator.directionOfChange || gettext('N/A') } /> }
+                    { rootStore.hasChangeColumn && <IndicatorCell className="indicator-cell center-cell" value={ indicator.directionOfChange || gettext('N/A') } /> }
                     { rootStore.hasCNCColumn && <IndicatorCell className="indicator-cell " value={ cumulative || gettext('N/A') } /> }
-                    { rootStore.hasUOMTypeColumn && <IndicatorCell className="indicator-cell is-percent-column " value={ indicator.isPercent ? '%' : '#' } /> }
+                    { rootStore.hasUOMTypeColumn && <IndicatorCell className="indicator-cell is-percent-column center-cell" value={ indicator.isPercent ? '%' : '#' } /> }
                     { rootStore.hasBaselineColumn && (indicator.baseline === null ? <IndicatorCell className="indicator-cell baseline-column" value={ gettext('N/A') } /> : <ValueCell value={ indicator.baseline } className="lop-column" /> ) }
                     { reportData && (
                     <React.Fragment>

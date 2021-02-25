@@ -89,24 +89,30 @@ const ColumnHeaderRow = inject('rootStore')(
         return (
             <tr>
                 <HeaderCells.HeaderCell
-                    styleWidth={110}
                     className='base-column'
                     label={
                         /* # Translators: Abbreviation as column header for "number" column */
                         gettext('No.')
                     } />
+                <HeaderCells.HeaderCell // Blank Header for the Indicator Update and Gear icons
+                    className='base-column'
+                    colSpan={2}
+                    // empty cell above gear widget column
+                />
                 <HeaderCells.HeaderCell
                     className='base-column'
                     styleWidth={600}
-                    colSpan={2}
+                    colSpan={1}
                     label={
                         /* # Translators: Column header for indicator Name column */
                         gettext('Indicator')
                     } />
-                <HeaderCells.HeaderCell
+                <HeaderCells.HeaderCell // Blank Header for the Add Result button
                     className='base-column'
+                    styleWidth={200}
+                    colSpan={1}
                     // empty cell above gear widget column
-                    />
+                />
                 { !rootStore.filterStore.resultsFramework && <HeaderCells.HeaderCell
                     className='base-column'
                     styleWidth={90}
@@ -117,13 +123,15 @@ const ColumnHeaderRow = inject('rootStore')(
                 }
                 { rootStore.hasUOMColumn && <HeaderCells.HeaderCell
                     className='base-column'
-                    styleWidth={250}
+                    styleWidth={150}
                     label={
                         /* # Translators: Column header */
                         gettext('Unit of measure')
                     } /> }
                 { rootStore.hasChangeColumn && <HeaderCells.HeaderCell
                     className='base-column'
+                    textAlign={'center'}
+                    styleWidth={150}
                     label={
                         /* # Translators: Column header for "direction of change" column (increasing/decreasing) */
                         gettext('Change')
@@ -137,6 +145,7 @@ const ColumnHeaderRow = inject('rootStore')(
                     } /> }
                 { rootStore.hasUOMTypeColumn && <HeaderCells.HeaderCell
                     className='base-column'
+                    textAlign={'center'}
                     styleWidth={50}
                     label={
                         /* # Translators: Column header, numeric or percentage type indicator */
