@@ -126,6 +126,7 @@ td.iptt-level-row, td.ip-level-row {
 }
 
 td.expando-cell {
+    min-width: 125px;
     color: $blue;
     cursor: pointer;
     border-right: none;
