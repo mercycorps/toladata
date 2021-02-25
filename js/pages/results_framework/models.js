@@ -162,7 +162,7 @@ export class LevelStore {
     }
 
     @computed get inactiveTiers() {
-        let tiers = 
+        let tiers = null // Return all tiers below the most recently completed level
     }
 
 
