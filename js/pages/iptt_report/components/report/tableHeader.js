@@ -89,13 +89,12 @@ const ColumnHeaderRow = inject('rootStore')(
         return (
             <tr>
                 <HeaderCells.HeaderCell
-                    styleWidth={110}
                     className='base-column'
                     label={
                         /* # Translators: Abbreviation as column header for "number" column */
                         gettext('No.')
                     } />
-                <HeaderCells.HeaderCell
+                <HeaderCells.HeaderCell // Blank Header for the Indicator Update and Gear icons
                     className='base-column'
                     colSpan={2}
                     // empty cell above gear widget column
@@ -108,7 +107,7 @@ const ColumnHeaderRow = inject('rootStore')(
                         /* # Translators: Column header for indicator Name column */
                         gettext('Indicator')
                     } />
-                <HeaderCells.HeaderCell
+                <HeaderCells.HeaderCell // Blank Header for the Add Result button
                     className='base-column'
                     styleWidth={200}
                     colSpan={1}

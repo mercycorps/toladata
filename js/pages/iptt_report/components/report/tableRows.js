@@ -22,7 +22,7 @@ function ipttRound(value, percent) {
     }
     return null;
 }
-
+// Component to update indicators from the IPTT in a modal
 const IndicatorEditModalCell = inject('rootStore')(
     observer(({ rootStore, indicator }) => {
         const loadModal = (e) => {
@@ -49,7 +49,7 @@ const IndicatorEditModalCell = inject('rootStore')(
     })
 );
 
-// **** Component to add results from the IPTT ****
+// Component to add results from the IPTT in a modal
 const IndicatorAddResults = inject("rootStore", "filterStore")(
     observer(({ indicator, rootStore, filterStore }) => {
         const loadModal = (e) => {
@@ -99,7 +99,7 @@ const IndicatorAddResults = inject("rootStore", "filterStore")(
         )
     })
 )
-
+// Component to view results from the IPTT in a modal
 const IndicatorResultModalCell = inject("rootStore")(
     observer(({ indicator, rootStore }) => {
         const loadModal = (e) => {
