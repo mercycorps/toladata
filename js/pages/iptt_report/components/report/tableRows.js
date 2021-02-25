@@ -54,12 +54,19 @@ const IndicatorAddResults = inject("rootStore", "filterStore")(
     observer(({ indicator, rootStore, filterStore }) => {
         const loadModal = (e) => {
             e.preventDefault();
+            // Url for the form located at templates/indicators/result_form_modal.html
             let url = `/indicators/result_add/${indicator.pk}/?modal=true`;
             $("#indicator_modal_content").empty();
             $("#modalmessages").empty();
             $("#indicator_results_modal_content").load(url);
             $("#indicator_results_div").modal('show')
                 .on('save.tola.result_form', () => rootStore.indicatorUpdate(e, {indicatorId: indicator.pk}))
+                // Handles PNotifys evidence link warning, brings the modal back up for users to double check.
+                .on('review.tola.results.warning', (e, params) => {
+                    let url = params.url;
+                    $("#indicator_results_modal_content").load(url);
+                    $("#indicator_results_div").modal('show');
+                })
                 .on('hidden.bs.modal', (ev) => {
                     $(ev.target).off('.tola.save');
                 })
@@ -67,9 +74,8 @@ const IndicatorAddResults = inject("rootStore", "filterStore")(
 
         return (
             <td className="indicator-add-results-modal-cell">
-                <div id="id_periodic_target"></div>
                 
-                <div //Added this element to mimic the Program Page. It seemed like the template was pulling some data from this element. 
+                <div //Added this element to mimic the Program Page. Template is pulling some of this data for the form. 
                     style={{ visibility: 'hidden'}}
                     id={`id_link_reporting_period_${filterStore._selectedProgramId}`}
                     className=""
