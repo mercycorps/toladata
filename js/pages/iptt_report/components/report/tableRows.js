@@ -131,8 +131,10 @@ const ExpandoCell = observer(({ value, expanded, clickHandler, ...props }) => {
     const displayValue = (value || value === 0) ? value : <span className="empty-value">{BLANK_TABLE_CELL}</span>;
     return (
         <td className="expando-cell " { ...props } onClick={ clickHandler }>
-            <FontAwesomeIcon icon={expanded ? 'caret-down' : 'caret-right'} />&nbsp;
-            { displayValue }
+            <div>
+                <FontAwesomeIcon icon={expanded ? 'caret-down' : 'caret-right'} />&nbsp;
+                { displayValue }
+            </div>
         </td>
     );
 })
