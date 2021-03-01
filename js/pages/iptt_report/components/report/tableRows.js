@@ -129,9 +129,13 @@ const IndicatorCell = ({ value, resultCell, ...props }) => {
 
 const ExpandoCell = observer(({ value, expanded, clickHandler, ...props }) => {
     const displayValue = (value || value === 0) ? value : <span className="empty-value">{BLANK_TABLE_CELL}</span>;
+    let handleKeyPress = (e) => {
+        e.preventDefault();
+        e.key === "Enter" || e.key === " " ? clickHandler() : null;
+    }
     return (
-        <td className="expando-cell " { ...props } onClick={ clickHandler }>
-            <div>
+        <td className="expando-cell " { ...props } onClick={ clickHandler } role="heading" tabIndex="0" onKeyPress={ (e) => handleKeyPress(e) }>
+            <div role="button"  aria-expanded={ expanded }>
                 <FontAwesomeIcon icon={expanded ? 'caret-down' : 'caret-right'} />&nbsp;
                 { displayValue }
             </div>
