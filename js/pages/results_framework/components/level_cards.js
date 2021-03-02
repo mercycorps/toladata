@@ -4,7 +4,7 @@ import { observer, inject } from "mobx-react"
 import { toJS, extendObservable, action } from 'mobx';
 import { library } from '@fortawesome/fontawesome-svg-core'
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome'
-import { faCaretRight, faCaretDown, faArrowsAlt } from '@fortawesome/free-solid-svg-icons'
+import { faCaretRight, faCaretDown, faArrowsAlt, faMarsStrokeH } from '@fortawesome/free-solid-svg-icons'
 import { SingleReactSelect } from "../../../components/selectWidgets";
 import { AddIndicatorButton, UpdateIndicatorButton } from '../../../components/indicatorModalComponents';
 import {sortableContainer, sortableElement, sortableHandle} from 'react-sortable-hoc';
@@ -603,6 +603,13 @@ class LevelButton extends React.Component {
 @inject('rootStore')
 class IndicatorList extends React.Component {
 
+    constructor(props) {
+        super(props);
+        this.state = {
+            width: 0,
+        }
+    }
+
     componentDidMount() {
         // Enable popovers after update (they break otherwise)
         $('*[data-toggle="popover"]').popover({
@@ -610,24 +617,30 @@ class IndicatorList extends React.Component {
         });
 
         $('*[data-toggle="tooltip"]').tooltip()
+
+        this.setState({
+            width: Math.floor((($(".sortable-list__item__label").width() - $(".sortable-list__item__select").width() - 50) * 0.125) * 2)
+        })
     }
 
     componentDidUpdate() {
         $('*[data-toggle="tooltip"]').tooltip()
     }
-
+    
     render() {
 
         // Create the list of indicators and the dropdowns for setting the indicator order
         let options = this.props.indicators.map( (entry, index) => {return {value: index+1, label: index+1}});
+
+        console.log('State Width:', this.state.width);
 
         let indicatorMarkup = this.props.indicators.map ( (indicator) => {
             // let options = this.props.indicators.map( (entry, index) => <option value={index+1}>{index+1}</option>);
             const tipTemplate = '<div class="tooltip sortable-list__item__tooltip" role="tooltip"><div class="arrow"></div><div class="tooltip-inner"></div></div>';
             const indicator_label =
                 <span data-toggle="tooltip" data-delay={900} data-template={tipTemplate} title={indicator.name}>
-                    {/* <span>{indicator.name.replace(/(.{100})..+/, "$1...")}</span> */}
-                    <div className="indicator_label_overflow">{indicator.name}</div>
+                    {/* <span className="indicator_label_truncate">{indicator.name.replace(/(.{100})..+/, "$1...")}</span> */}
+                    <span className="indicator_label_truncate">{indicator.name.slice(0, this.state.width).concat("...")}</span>
                 </span>
             return (
                 <React.Fragment>
