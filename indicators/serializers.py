@@ -330,7 +330,7 @@ class IndicatorFormatsMixin:
 
     def format_list(self, value):
         """returns a bulleted list"""
-        return value if value is None else "\n".join(u'-{}'.format(item) for item in value)
+        return value if value is None else "\n".join('-{}'.format(item) for item in value)
 
     def render_value(self, field, instance, data):
         """formatter workhorse - called in to_representation, uses class property field lists to apply custom
@@ -450,7 +450,7 @@ class IndicatorExcelMixin(IndicatorFormatsMixin):
             pass
         elif value is None:
             value = {
-                'value': u'',
+                'value': '',
                 'number_format': 'General'
             }
         else:
@@ -489,8 +489,8 @@ class IndicatorPlanLevelSerializerBase(serializers.ModelSerializer):
 
     @staticmethod
     def get_display_name(level):
-        tier = ugettext(level.leveltier.name) if level.leveltier else u''
-        ontology = level.display_ontology if level.display_ontology else u''
+        tier = ugettext(level.leveltier.name) if level.leveltier else ''
+        ontology = level.display_ontology if level.display_ontology else ''
         name = str(level.name)
         return '{tier}{tier_space}{ontology}{colon}{name}'.format(
             tier=tier,
