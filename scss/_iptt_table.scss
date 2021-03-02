@@ -133,6 +133,9 @@ td.expando-cell {
         display: flex;
         min-width: max-content;
     }
+    svg { // Center caret icon vertically
+        margin: auto 0;
+    }
 }
 
 tr.expando-table-row {
