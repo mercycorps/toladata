@@ -134,7 +134,7 @@ export default (
             return this.filterStore._hiddenCategories === true;
         },
         get baseColumns() {
-            return 8 + (this.filterStore.resultsFramework ? 0 : 1) - (this.filterStore._hiddenColumns.length);
+            return 9 + (this.filterStore.resultsFramework ? 0 : 1) - (this.filterStore._hiddenColumns.length);
         },
         get reportColumnWidth() {
             return this.baseColumns + (!this.resultsFramework && 1) + 3 + (this.reportPeriods.length) * (this.isTVA ? 3 : 1);
