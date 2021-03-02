@@ -133,6 +133,7 @@ export default (
         get hiddenCategories() {
             return this.filterStore._hiddenCategories === true;
         },
+        // Used to align the column headers with the data.
         get baseColumns() {
             return 9 + (this.filterStore.resultsFramework ? 0 : 1) - (this.filterStore._hiddenColumns.length);
         },
