@@ -626,7 +626,8 @@ class IndicatorList extends React.Component {
             const tipTemplate = '<div class="tooltip sortable-list__item__tooltip" role="tooltip"><div class="arrow"></div><div class="tooltip-inner"></div></div>';
             const indicator_label =
                 <span data-toggle="tooltip" data-delay={900} data-template={tipTemplate} title={indicator.name}>
-                    <span>{indicator.name.replace(/(.{55})..+/, "$1...")}</span>
+                    {/* <span>{indicator.name.replace(/(.{100})..+/, "$1...")}</span> */}
+                    <div className="indicator_label_overflow">{indicator.name}</div>
                 </span>
             return (
                 <React.Fragment>
