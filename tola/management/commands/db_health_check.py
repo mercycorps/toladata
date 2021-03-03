@@ -1,4 +1,4 @@
-
+import json
 from django.conf import settings
 from django.core.management.base import BaseCommand
 from django.core.mail import send_mail
@@ -6,10 +6,12 @@ from django.contrib.auth.models import User
 from django.db.models.deletion import Collector
 from django.db.models import Q, prefetch_related_objects
 
-from workflow.models import TolaUser
-from indicators.models import Result, Indicator
+from workflow.models import TolaUser, Program
+from indicators.models import Result, Indicator, LevelTierTemplate, LevelTier
 from tola_management.models import (
     CountryAdminAuditLog, OrganizationAdminAuditLog, ProgramAdminAuditLog, UserManagementAuditLog)
+from django.db import connection
+from django.db.models import F
 
 
 class Command(BaseCommand):
@@ -24,6 +26,27 @@ class Command(BaseCommand):
             help='Default: False.  Send an email of the report output, assuming the health check fails in some way')
 
     def handle(self, *args, **options):
+
+        # Get mismatched tiers and custom templates (e.g. LevelTierTemplate.names != list of Program.level_tiers)
+        standard_tiers = [
+            json.dumps([str(tier) for tier in template['tiers']]) for template in LevelTier.get_templates().values()]
+        programs = Program.rf_aware_all_objects\
+            .filter(using_results_framework=True)\
+            .prefetch_related('level_tier_templates')\
+            .annotate(custom_tiers=F('level_tier_templates__names'))
+
+        template_mismatches = []
+        for program in programs:
+            # custom_template = LevelTierTemplate.objects.filter(program=program)
+            if not program.custom_tiers:
+                continue
+
+            tiers = list(program.level_tiers.values_list('name', flat=True))
+            if json.dumps(tiers) in standard_tiers:
+                continue
+
+            if program.custom_tiers != tiers:
+                template_mismatches.append((program, tiers))
 
         # Get missing auth users and tola users
         auth_users_no_tola = User.objects.filter(tola_user__isnull=True).order_by('date_joined')
@@ -118,6 +141,15 @@ class Command(BaseCommand):
             report += str([entry.pk for entry in user_logs_with_deleted_fields]) + "\n"
         else:
             report += "\nNo problems were found with the User Management Audit Log\n"
+
+        if len(template_mismatches) > 0:
+            report += "\nMismatched custom templates and LevelTiers: "
+            report += '\n'.join(
+                [f'{program.name} ({program.id})\ntiers: {tiers}\ncustom template tiers: {program.custom_tiers}'
+                 for program, tiers in template_mismatches]) + "\n"
+        else:
+            report += "\nNo problems with mismatched custom tiers\n"
+
 
         if settings.NOTIFICATION_RECIPIENT:
             send_mail(
