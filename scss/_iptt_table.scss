@@ -126,10 +126,16 @@ td.iptt-level-row, td.ip-level-row {
 }
 
 td.expando-cell {
-    min-width: 125px;
     color: $blue;
     cursor: pointer;
     border-right: none;
+    div { // Will adjust the width be long enough to fit text on one line.
+        display: flex;
+        min-width: max-content;
+    }
+    svg { // Center caret icon vertically
+        margin: auto 0;
+    }
 }
 
 tr.expando-table-row {
