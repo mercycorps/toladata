@@ -606,7 +606,7 @@ class IndicatorList extends React.Component {
     constructor(props) {
         super(props);
         this.state = {
-            width: 0,
+            textLength: 0,
         }
     }
 
@@ -619,7 +619,7 @@ class IndicatorList extends React.Component {
         $('*[data-toggle="tooltip"]').tooltip()
 
         this.setState({
-            width: Math.floor((($(".sortable-list__item__label").width() - $(".sortable-list__item__select").width() - 50) * 0.125) * 2)
+            textLength: Math.floor((($(".sortable-list__item__label").width() - $(".sortable-list__item__select").width() - 64) * 0.125) * 2)
         })
     }
 
@@ -632,7 +632,7 @@ class IndicatorList extends React.Component {
         // Create the list of indicators and the dropdowns for setting the indicator order
         let options = this.props.indicators.map( (entry, index) => {return {value: index+1, label: index+1}});
 
-        console.log('State Width:', this.state.width);
+        console.log('State textLength:', this.state.textLength);
 
         let indicatorMarkup = this.props.indicators.map ( (indicator) => {
             // let options = this.props.indicators.map( (entry, index) => <option value={index+1}>{index+1}</option>);
@@ -640,7 +640,7 @@ class IndicatorList extends React.Component {
             const indicator_label =
                 <span data-toggle="tooltip" data-delay={900} data-template={tipTemplate} title={indicator.name}>
                     {/* <span className="indicator_label_truncate">{indicator.name.replace(/(.{100})..+/, "$1...")}</span> */}
-                    <span className="indicator_label_truncate">{indicator.name.slice(0, this.state.width).concat("...")}</span>
+                    <span className="indicator_label_truncate">{indicator.name.slice(0, this.state.textLength).concat("...")}</span>
                 </span>
             return (
                 <React.Fragment>
