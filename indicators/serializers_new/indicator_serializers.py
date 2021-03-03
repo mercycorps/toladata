@@ -35,6 +35,7 @@ class IndicatorBaseSerializerMixin:
 
     @classmethod
     def get_queryset(cls, **kwargs):
+        """based on required fields and filters kwarg, returns queryset of bare indicator objects in simplest query"""
         filters = kwargs.get('filters', {})
         return Indicator.rf_aware_objects.select_related(None).prefetch_related(None).only(
             *cls._get_query_fields()
@@ -49,7 +50,10 @@ class IndicatorBaseSerializerMixin:
 
     @classmethod
     def load_for_program(cls, program_pk, **kwargs):
-        """loads this serializer for all indicators associated with a certain program"""
+        """loads this serializer for all indicators associated with a certain program
+
+            just a helper method for load_for_filters that automates filtering to program id
+        """
         filters = kwargs.pop('filters', {})
         kwargs['filters'] = {**filters, 'program_id': program_pk}
         return cls.load_for_filters(**kwargs)
@@ -58,12 +62,16 @@ class IndicatorBaseSerializerMixin:
 
     @staticmethod
     def get_old_level_name(indicator):
+        """for unmigrated programs, returns the old (text string on indicator model) level name"""
         if not indicator.results_framework and indicator.old_level:
             return _(indicator.old_level)
         return None
 
     @staticmethod
     def get_level_pk(indicator):
+        """returns either level pk for migrated-program indicators or dummy old_level_pk for
+            unmigrated-program indicators
+        """
         if indicator.results_framework:
             return indicator.level_id
         return getattr(indicator, 'old_level_pk', None)
@@ -105,11 +113,16 @@ class IndicatorOrderingMixin:
 
     @classmethod
     def _get_query_fields(cls):
+        """additional fields required for this serializer to return data without querying database again"""
         return super()._get_query_fields() + ['number', 'level_order']
 
     # serializer method fields (populate fields on serializer):
 
     def get_level_order(self, indicator):
+        """for migrated-program auto-number indicators, returns level order, otherwise sort order
+
+            sort order determined by sort_numbers in IndicatorOrderingMixin.many_init class method
+        """
         if indicator.results_framework and indicator.level_id is not None:
             return indicator.level_order
         return self.context.get('sort_numbers', {}).get(indicator.pk, None)
@@ -179,6 +192,7 @@ class IndicatorMeasurementMixin:
 
     @classmethod
     def _get_query_fields(cls):
+        """additional fields required for this serializer to return data without querying database again"""
         return super()._get_query_fields() + [
             'target_frequency', 'unit_of_measure', 'unit_of_measure_type', 'is_cumulative',
             'direction_of_change', 'baseline', 'baseline_na'

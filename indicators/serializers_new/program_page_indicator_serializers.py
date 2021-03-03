@@ -30,7 +30,13 @@ class NumberWithTierIndicatorMixin:
 
     # Helper fields for serializer method fields:
     def get_long_number(self, indicator):
-        """overrides parent method to include tier if manually numbering"""
+        """overrides parent method to include tier if manually numbering
+
+            parent method is indicator_serializers.IndicatorOrderingMixin.get_long_number, which returns
+            just the number (i.e. "1.1") in the case of manually numbered programs.  Program Page
+            requires the tier (i.e. "Activity 1.1") for a manually numbered, rf-aware program, and requires
+            the old level name (i.e. "Output 1.1") for a manually numbered, rf-unaware program
+        """
         number = super().get_long_number(indicator)
         if not indicator.using_results_framework:
             level_name = self.get_old_level_name(indicator)
@@ -101,12 +107,14 @@ class ProgramPageIndicatorMixin:
 
     @classmethod
     def _get_query_fields(cls):
+        """additional fields required for this serializer to return data without querying database again"""
         return super()._get_query_fields() + [
             'create_date', 'level_order'
         ]
 
     @classmethod
     def get_queryset(cls, **kwargs):
+        """based on required fields and filters kwarg, returns queryset of indicators with targets and results"""
         filters = kwargs.get('filters', {})
         return Indicator.program_page_objects.select_related('program').prefetch_related(
             models.Prefetch( # prefetch all targets WITH their results for result table data
@@ -157,11 +165,16 @@ class ProgramPageIndicatorMixin:
 
     @staticmethod
     def get_periodic_targets(indicator):
+        """Returns serializer of targets with their assigned results for creating the results table"""
         targets = indicator.prefetch_targets
         return ProgramPageTargetSerializer(targets, context={'indicator': indicator}, many=True).data
 
     @staticmethod
     def get_no_target_results(indicator):
+        """Returns only results unassigned to targets for creating the results table
+
+            (these are displayed below the table, in red)
+        """
         return ProgramPageResultSerializer(indicator.prefetch_no_target_results, many=True).data
 
 

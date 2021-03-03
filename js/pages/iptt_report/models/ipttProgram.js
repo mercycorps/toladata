@@ -43,6 +43,10 @@ const IPTTPeriodDateRange = getPeriodDateRange(forIPTTDateRange);
  *   frequencies [int]
  *   period_date_ranges (IPTTPeriodDateRange)
  * @return {Object}
+ *
+ *  Corresponds to workflow.serializers_new.iptt_program_serializers.IPTTProgramSerializer
+ *  Supplies labeling and filtering helpers as well as maintains a list of indicators from which to compose an iptt report
+ *      (includes ordering logic based on level/chain, as well as a list of all indicators from which to filter a report)
  */
 
 export const forIPTT = (

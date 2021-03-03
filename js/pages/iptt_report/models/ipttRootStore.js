@@ -7,6 +7,14 @@ import { TVA, TIMEPERIODS } from '../../../constants';
 import api from '../../../apiv2';
 
 
+/*
+ * Main logic store for the IPTT page
+ * this function constructs a root store (which in turn constructs a filter store and report store)
+ * provides some global methods (related to pinning / excel download / results table / indicator form)
+ * routes information between filter store and report store (use filters selected in filter store to determine
+ * subset of indicators/periods/columns to display in report store)
+ */
+
 export default (
     reactContext = {}
 ) => {
@@ -197,6 +205,7 @@ export default (
             this.filterStore.programFilterData.deleteIndicator(indicatorId);
         },
     });
+    // with model created, add reaction so that whenever a program and frequency are selected, attempt to load a report for them
     const _updateReportData = reaction(
         () => [rootStore.filterStore.selectedProgramId, rootStore.filterStore.selectedFrequency],
         ([programId, frequency]) => {

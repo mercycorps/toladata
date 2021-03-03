@@ -7,7 +7,11 @@ from django.utils import timezone
 from django.utils.translation import ugettext as _
 
 
-class BasePeriod:
+class IPTTExcelPeriod:
+    """Serializable object holding data about a specific period for IPTT Excel export renderer
+
+        contains TvA/actuals-only, header labels, date (subheader) display labels, and count
+    """
     non_standard_naming_frequencies = [Indicator.LOP, Indicator.MID_END, Indicator.MONTHLY]
 
     @classmethod
@@ -18,7 +22,7 @@ class BasePeriod:
 
     def __init__(self, frequency, period, tva=False):
         self.frequency = int(frequency)
-        self.period = period
+        self.period = period # dict of period-specific data provided by indicators.models.PeriodicTarget
         self.tva = tva
 
     @property
@@ -35,6 +39,7 @@ class BasePeriod:
             return [self.target_column, self.actual_column, self.met_column]
         return [self.actual_column]
 
+    # format here dictated by indicators.export_renderers report-specific renderers:
     @property
     def target_column(self):
         return {
@@ -75,45 +80,17 @@ class BasePeriod:
             return self.period['name']
         return self.period['label']
 
-
-class WebIPTTPeriod(BasePeriod):
-    @property
-    def target_column(self):
-        return {**super().target_column, **{
-            'attribute': (
-                'lop_target_real' if self.is_lop else f"frequency_{self.ferquency}_period_{self.period_count}_target"
-                ),
-            'disaggregation_attribute': None
-        }}
-
-    @property
-    def actual_column(self):
-        return {**super().actual_column, **{
-            'attribute': (
-                'lop_actual' if self.is_lop else f"frequency_{self.ferquency}_period_{self.period_count}"
-                ),
-            'disaggregation_attribute': (
-                'disaggregation_{}_lop_actual' if self.is_lop else
-                "disaggregation_{}_" + f"frequency_{self.frequency}_period_{self.period_count}"
-                ),
-        }}
-
-    @property
-    def met_column(self):
-        return {**super().met_column, **{
-            'attribute': (
-                'lop_met_target_decimal' if self.is_lop else None
-                ),
-            'disaggregation_attribute': None
-        }}
-
-class IPTTExcelPeriod(BasePeriod):
     @property
     def count(self):
         return None if self.is_lop else self.period_count
 
 
 class QSPeriodDateRangeSerializer(serializers.Serializer):
+    """Serializer for JSON output for IPTT Web (React) QuickStart page
+
+        only needed for "number of most recent periods" logic (is this period 'past' or not?)
+        Used by IPTTQSProgramSerializer
+    """
     past = serializers.SerializerMethodField()
 
     def get_past(self, period):
@@ -121,6 +98,11 @@ class QSPeriodDateRangeSerializer(serializers.Serializer):
 
 
 class PeriodDateRangeSerializer(serializers.Serializer):
+    """Serializer for JSON output for IPTT Web (React) Report page
+
+        needed for labeling columns and providing date input to assemble header/subheader displays
+        also used for calculating which periods to show using filters
+    """
     start = serializers.DateField()
     end = serializers.DateField()
     name = serializers.SerializerMethodField()
@@ -140,7 +122,7 @@ class PeriodDateRangeSerializer(serializers.Serializer):
         return period['start'] < timezone.now().date()
 
     def get_name(self, period):
-        if self.context.get('frequency') == 7:
+        if self.context.get('frequency') == 7: # monthly frequency means columns are named month names
             return l10n_monthname(period['start'], decode=True)
         return _(period['name'])
 

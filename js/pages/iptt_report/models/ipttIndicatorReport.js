@@ -4,6 +4,7 @@ import { observable } from 'mobx';
 /*
  * Take an array [{index: #, actual: #},] and fill in all indices from 0 to max with actual: null
  * Uncompresses serialized report data for IPTT
+ * (this lets us gather and transmit fewer values from the backend with implied nulls)
  */
 const impliedNullValuesMapper = (values) => {
     // map of existing (non-null) indices to their actual value
@@ -15,6 +16,9 @@ const impliedNullValuesMapper = (values) => {
     return valuesArray;
 }
 
+/*
+ * formatter/validator (pks -> int) for disaggregated period data
+ */
 function getPeriodData ({target = null, actual = null, met = null, disaggregations = {}} = {}) {
     let disaggregatedPeriodData = new Map(Object.entries(disaggregations).map(
                     ([disaggregationPk, disaggregationJSON]) => [parseInt(disaggregationPk),
@@ -22,6 +26,12 @@ function getPeriodData ({target = null, actual = null, met = null, disaggregatio
     return {target: target, actual: actual, met: met, disaggregations: disaggregatedPeriodData};
 }
 
+
+/*
+ * Model for an indicator x frequency (either its own frequency for TvA or any periodic frequency for TP)
+ * corresponds to indicators.serializers_new.iptt_indicator_serializers.IPTTJSONTPReportIndicatorSerializer / IPTTJSONTVAReportIndicatorSerializer
+ * formats and helper methods for hydrating the iptt report with provided JSON data
+ */
 const getIndicatorReport = (
     frequency,
     indicatorReportJSON = {}
@@ -53,7 +63,7 @@ const getIndicatorReport = (
     disaggregatedPeriodValues(disaggregationPk) {
         return !isNaN(parseInt(disaggregationPk)) ? this.periodValues.map(period => period.disaggregations.get(parseInt(disaggregationPk))) : [];
     }
-    
+
 });
 
 

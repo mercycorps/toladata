@@ -7,6 +7,8 @@ import { getLevel } from '../../../models/level';
  * JSON params:
  *    tier_pk int
  *    chain_pk int
+ *
+ * Corresponds to indicators.serializers_new.tier_and_level_serializers.IPTTLevelSerializer
  */
 
 export const forIPTT = (

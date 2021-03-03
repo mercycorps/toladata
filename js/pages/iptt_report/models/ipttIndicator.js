@@ -8,6 +8,8 @@ import { getIndicator, withMeasurement } from '../../../models/indicator';
  *    sector_pk int
  *    indicator_type_pks  [int]
  *    site_pks [int]
+ *
+ * Corresponds to indicators.serializers_new.iptt_indicator_serializers.IPTTJSONIndicatorLabelsSerializer
  */
 
 export const forIPTT = (
