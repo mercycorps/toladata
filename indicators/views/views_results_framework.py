@@ -294,17 +294,11 @@ def save_custom_template(request):
         LevelTierTemplate.objects.filter(program=program).delete()
         return JsonResponse({'message': 'update successful'}, status=200)
 
+    tiers = [tier.strip() for tier in request.data['tiers']]
     try:
-        # Replace both the template and the program-associated level tiers, since there is only
-        # one form and it does both.  May need to split this later if custom template creation and
-        # tierset saving is split.
         with transaction.atomic():
             LevelTierTemplate.objects.filter(program=program).delete()
-            LevelTierTemplate.objects.create(
-                program=program,
-                names=request.data['tiers']
-            )
-
+            LevelTierTemplate.objects.create(program=program, names=tiers)
     except Exception:
         logger.exception("Trouble in RF template paradise")
         return JsonResponse({'message': _('Your request could not be processed.')}, status=400)
