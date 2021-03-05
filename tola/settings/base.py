@@ -376,6 +376,12 @@ LOGGING = {
             'filename': 'error.log',
             'formatter': 'standard'
         },
+        'info_file': {
+            'level': 'INFO',
+            'class': 'logging.FileHandler',
+            'filename': 'django_info.log',
+            'formatter': 'standard'
+        },
         'admin_email': {
             'level': 'ERROR',
             'class': 'django.utils.log.AdminEmailHandler',
@@ -402,6 +408,11 @@ LOGGING = {
             'handlers': ['file', 'admin_email'],
             'level': 'ERROR',
             'propagate': True,
+        },
+        'request_locale': {
+            'handlers': ['info_file'],
+            'level': 'INFO',
+            'propagate': False,
         },
     },
 }
