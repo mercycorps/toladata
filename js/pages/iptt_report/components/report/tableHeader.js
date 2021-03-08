@@ -107,12 +107,13 @@ const ColumnHeaderRow = inject('rootStore')(
                         /* # Translators: Column header for indicator Name column */
                         gettext('Indicator')
                     } />
-                <HeaderCells.HeaderCell // Blank Header for the Add Result button
+                { !rootStore._readOnly && <HeaderCells.HeaderCell // Blank Header for the Add Result button
                     className='base-column'
                     styleWidth={200}
                     colSpan={1}
-                    // empty cell above gear widget column
-                />
+                    // empty cell above Add Result button column
+                    />
+                }
                 { !rootStore.filterStore.resultsFramework && <HeaderCells.HeaderCell
                     className='base-column'
                     styleWidth={90}

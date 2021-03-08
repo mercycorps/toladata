@@ -14,6 +14,7 @@ export default (
         _filterStore: getFilterStore(reactContext),
         get filterStore() {return this._filterStore},
         _reportStore: getReportStore(reactContext.report || {}),
+        _readOnly: reactContext.read_only,
         _expandoRows: [],
         expandAllRows() {
             let top = this._expandoRows.slice(0, 20);
@@ -135,7 +136,7 @@ export default (
         },
         // Used to align the column headers with the data.
         get baseColumns() {
-            return 9 + (this.filterStore.resultsFramework ? 0 : 1) - (this.filterStore._hiddenColumns.length);
+            return 8 + (this._readOnly ? 0 : 1) + (this.filterStore.resultsFramework ? 0 : 1) - (this.filterStore._hiddenColumns.length);
         },
         get reportColumnWidth() {
             return this.baseColumns + (!this.resultsFramework && 1) + 3 + (this.reportPeriods.length) * (this.isTVA ? 3 : 1);

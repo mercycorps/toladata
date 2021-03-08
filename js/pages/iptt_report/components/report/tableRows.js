@@ -309,7 +309,7 @@ class IndicatorRow extends React.Component {
                     <IndicatorNameExpandoCell value={ indicator.name } expanded={ this.state.expanded } clickHandler={ this.handleExpandoClick } /> :
                     <IndicatorCell className="indicator-cell " value={ indicator.name } />
                     }
-                    <IndicatorAddResults indicator={ indicator } />
+                    { !rootStore._readOnly && <IndicatorAddResults indicator={ indicator } /> }
                     { !rootStore.resultsFramework && <IndicatorCell className="indicator-cell " value={ indicator.oldLevelDisplay } /> }
                     { rootStore.hasUOMColumn && <IndicatorCell className="indicator-cell " value={ indicator.unitOfMeasure } /> }
                     { rootStore.hasChangeColumn && <IndicatorCell className="indicator-cell center-cell" value={ indicator.directionOfChange || gettext('N/A') } /> }
