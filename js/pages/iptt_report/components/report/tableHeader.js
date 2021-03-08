@@ -111,7 +111,7 @@ const ColumnHeaderRow = inject('rootStore')(
                     className='base-column'
                     styleWidth={200}
                     colSpan={1}
-                    // empty cell above gear widget column
+                    // empty cell above Add Result button column
                     />
                 }
                 { !rootStore.filterStore.resultsFramework && <HeaderCells.HeaderCell
