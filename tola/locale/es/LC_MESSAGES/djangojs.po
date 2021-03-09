@@ -6,8 +6,8 @@ msgid ""
 msgstr ""
 "Project-Id-Version: \n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2021-02-09 10:53-0800\n"
-"PO-Revision-Date: 2021-02-05 13:12-0800\n"
+"POT-Creation-Date: 2021-03-08 16:56-0800\n"
+"PO-Revision-Date: 2021-03-08 16:59-0800\n"
 "Last-Translator: \n"
 "Language-Team: \n"
 "Language: es\n"
@@ -483,7 +483,7 @@ msgstr "Todos los valores de este informe se redondean a dos decimales."
 #. Translators: Column header for a target value column */
 #. Translators: Header for a column listing values defined as targets for each row
 #: js/pages/iptt_report/components/report/headerCells.js:63
-#: js/pages/iptt_report/components/report/tableHeader.js:156
+#: js/pages/iptt_report/components/report/tableHeader.js:166
 #: js/pages/program_page/components/indicator_list.js:199
 #: js/pages/program_page/components/resultsTable.js:253
 msgid "Target"
@@ -491,7 +491,7 @@ msgstr "Objetivo"
 
 #. Translators: Column header for an "actual" or achieved/real value column */
 #: js/pages/iptt_report/components/report/headerCells.js:77
-#: js/pages/iptt_report/components/report/tableHeader.js:163
+#: js/pages/iptt_report/components/report/tableHeader.js:173
 msgctxt "report (long) header"
 msgid "Actual"
 msgstr "Real"
@@ -499,7 +499,7 @@ msgstr "Real"
 #. Translators: Column header for a percent-met column */
 #. Translators: Header for a column listing the progress towards the target value
 #: js/pages/iptt_report/components/report/headerCells.js:91
-#: js/pages/iptt_report/components/report/tableHeader.js:170
+#: js/pages/iptt_report/components/report/tableHeader.js:180
 #: js/pages/program_page/components/resultsTable.js:261
 msgid "% Met"
 msgstr "% Cumplido"
@@ -510,12 +510,12 @@ msgid "Life of program"
 msgstr "Vida del programa"
 
 #. Translators: Abbreviation as column header for "number" column */
-#: js/pages/iptt_report/components/report/tableHeader.js:96
+#: js/pages/iptt_report/components/report/tableHeader.js:95
 msgid "No."
 msgstr "No."
 
 #. Translators: Column header for indicator Name column */
-#: js/pages/iptt_report/components/report/tableHeader.js:104
+#: js/pages/iptt_report/components/report/tableHeader.js:108
 #: js/pages/logframe/components/table.js:30
 #: js/pages/program_page/components/indicator_list.js:195
 #: js/pages/tola_management_pages/audit_log/views.js:109
@@ -525,36 +525,36 @@ msgid "Indicator"
 msgstr "Indicador"
 
 #. Translators: Column header for indicator Level name column */
-#: js/pages/iptt_report/components/report/tableHeader.js:115
+#: js/pages/iptt_report/components/report/tableHeader.js:122
 msgid "Level"
 msgstr "Nivel"
 
 #. Translators: Column header */
-#: js/pages/iptt_report/components/report/tableHeader.js:123
+#: js/pages/iptt_report/components/report/tableHeader.js:130
 #: js/pages/iptt_report/models/filterStore.js:712
 #: js/pages/program_page/components/indicator_list.js:197
 msgid "Unit of measure"
 msgstr "Unidad de medida"
 
 #. Translators: Column header for "direction of change" column (increasing/decreasing) */
-#: js/pages/iptt_report/components/report/tableHeader.js:129
+#: js/pages/iptt_report/components/report/tableHeader.js:138
 #: js/pages/iptt_report/models/filterStore.js:713
 msgid "Change"
 msgstr "Cambio"
 
 #. Translators: Column header, stands for "Cumulative"/"Non-cumulative" */
-#: js/pages/iptt_report/components/report/tableHeader.js:136
+#: js/pages/iptt_report/components/report/tableHeader.js:145
 #: js/pages/iptt_report/models/filterStore.js:714
 msgid "C / NC"
 msgstr "C / NC"
 
 #. Translators: Column header, numeric or percentage type indicator */
-#: js/pages/iptt_report/components/report/tableHeader.js:143
+#: js/pages/iptt_report/components/report/tableHeader.js:153
 msgid "# / %"
 msgstr "# / %"
 
 #. Translators: Column header */
-#: js/pages/iptt_report/components/report/tableHeader.js:149
+#: js/pages/iptt_report/components/report/tableHeader.js:159
 #: js/pages/iptt_report/models/filterStore.js:716
 #: js/pages/program_page/components/indicator_list.js:198
 msgid "Baseline"
@@ -562,9 +562,9 @@ msgstr "Base"
 
 #. Translators: short for Not Applicable
 #: js/pages/iptt_report/components/report/tableRows.js:11
-#: js/pages/iptt_report/components/report/tableRows.js:258
-#: js/pages/iptt_report/components/report/tableRows.js:259
-#: js/pages/iptt_report/components/report/tableRows.js:261
+#: js/pages/iptt_report/components/report/tableRows.js:327
+#: js/pages/iptt_report/components/report/tableRows.js:328
+#: js/pages/iptt_report/components/report/tableRows.js:330
 #: js/pages/program_page/components/indicator_list.js:274
 #: js/pages/program_page/components/resultsTable.js:9
 #: js/pages/tola_management_pages/audit_log/views.js:157
@@ -572,15 +572,28 @@ msgstr "Base"
 msgid "N/A"
 msgstr "N/A"
 
-#: js/pages/iptt_report/components/report/tableRows.js:236
+#. Translators: A message that lets the user know that they cannot add a result to this indicator because it has no target.
+#: js/pages/iptt_report/components/report/tableRows.js:76
+msgid "Results cannot be added because the indicator is missing targets."
+msgstr ""
+"Los resultados no se pueden añadir porque el indicador no hay objetivos."
+
+#. Translators: a button that lets the user add a `new result
+#. Translators: a button that lets the user add a new result
+#: js/pages/iptt_report/components/report/tableRows.js:104
+#: js/pages/program_page/components/resultsTable.js:318
+msgid "Add result"
+msgstr "Agregar resultado"
+
+#: js/pages/iptt_report/components/report/tableRows.js:302
 msgid "Cumulative"
 msgstr "Acumulativo"
 
-#: js/pages/iptt_report/components/report/tableRows.js:237
+#: js/pages/iptt_report/components/report/tableRows.js:303
 msgid "Non-cumulative"
 msgstr "No acumulativo"
 
-#: js/pages/iptt_report/components/report/tableRows.js:316
+#: js/pages/iptt_report/components/report/tableRows.js:385
 msgid "Indicators unassigned to a results framework level"
 msgstr "Indicadores sin asignar a un nivel del sistema de resultados"
 
@@ -1029,11 +1042,6 @@ msgstr "Evidencia"
 #: js/pages/program_page/components/resultsTable.js:304
 msgid "Add targets"
 msgstr "Agregar objetivos"
-
-#. Translators: a button that lets the user add a new result
-#: js/pages/program_page/components/resultsTable.js:318
-msgid "Add result"
-msgstr "Agregar resultado"
 
 #. Translators: a link that leads to a list of all sites (locations) associated with a program
 #: js/pages/program_page/components/sitesList.js:19
