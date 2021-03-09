@@ -51,7 +51,7 @@ const IndicatorEditModalCell = inject('rootStore')(
 
 // Component to add results from the IPTT in a modal
 const IndicatorAddResults = inject("rootStore", "filterStore")(
-    observer(({ indicator, rootStore, filterStore }) => {
+    observer(({ indicator, rootStore, filterStore, noTargets }) => {
         const loadModal = (e) => {
             e.preventDefault();
             // Url for the form located at templates/indicators/result_form_modal.html
@@ -71,6 +71,10 @@ const IndicatorAddResults = inject("rootStore", "filterStore")(
                     $(ev.target).off('.tola.save');
                 })
         }
+        let text = noTargets ? 
+            // # Translators: A message that lets the user know that they cannot add a result to this indicator because it has no target.
+            gettext('Results cannot be added because the indicator is missing targets.' )
+        : "";
 
         return (
             <td className="indicator-add-results-modal-cell">
@@ -87,14 +91,20 @@ const IndicatorAddResults = inject("rootStore", "filterStore")(
                     data-indicator_count={filterStore.programFilterData.indicators.size}
                 ></div>
 
-                <button type="button" className={"btn btn-link px-1 pt-0 mx-auto"}
-                    onClick={ loadModal }>
-                    <FontAwesomeIcon icon={ faPlusCircle } />
-                        {
-                            // # Translators: a button that lets the user add a `new result
-                            gettext('Add result')
-                        }
-                </button>
+                <div role="tooltip" tabIndex="0" data-toggle="popover" data-placement="top" data-trigger="focus hover" data-content={text}>
+                    <button 
+                        type="button" 
+                        className={"btn btn-link px-1 pt-0 mx-auto"}
+                        disabled ={noTargets}
+                        onClick={ loadModal }
+                    >
+                        <FontAwesomeIcon icon={ faPlusCircle } />
+                            {
+                                // # Translators: a button that lets the user add a `new result
+                                gettext('Add result')
+                            }
+                    </button>
+                </div> 
             </td>
         )
     })
@@ -296,6 +306,8 @@ class IndicatorRow extends React.Component {
             displayNumber = displayNumber.slice(0, -1);
         }
         let reportData = rootStore.getReportData(indicator.pk);
+        let noTargets = reportData.lopTarget === null ? true: false;
+
         return (
             <React.Fragment>
                 <tr>
@@ -309,7 +321,7 @@ class IndicatorRow extends React.Component {
                     <IndicatorNameExpandoCell value={ indicator.name } expanded={ this.state.expanded } clickHandler={ this.handleExpandoClick } /> :
                     <IndicatorCell className="indicator-cell " value={ indicator.name } />
                     }
-                    { !rootStore._readOnly && <IndicatorAddResults indicator={ indicator } /> }
+                    { !rootStore._readOnly && <IndicatorAddResults indicator={ indicator } noTargets={ noTargets } /> }
                     { !rootStore.resultsFramework && <IndicatorCell className="indicator-cell " value={ indicator.oldLevelDisplay } /> }
                     { rootStore.hasUOMColumn && <IndicatorCell className="indicator-cell " value={ indicator.unitOfMeasure } /> }
                     { rootStore.hasChangeColumn && <IndicatorCell className="indicator-cell center-cell" value={ indicator.directionOfChange || gettext('N/A') } /> }

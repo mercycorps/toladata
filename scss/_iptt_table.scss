@@ -188,7 +188,17 @@ td.indicator-add-results-modal-cell {
     text-align: center;
     button {
         min-width: max-content;
+        
+        &:disabled {
+            color: $link-color;
+            pointer-events: none;
+        }
     }
+    // .no-targets {
+    //     button {
+    //         min-width: max-content;
+    //     }
+    // }
 }
 td.indicator-cell {
     &.center-cell {
