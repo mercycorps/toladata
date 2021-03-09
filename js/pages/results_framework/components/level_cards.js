@@ -4,7 +4,7 @@ import { observer, inject } from "mobx-react"
 import { toJS, extendObservable, action } from 'mobx';
 import { library } from '@fortawesome/fontawesome-svg-core'
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome'
-import { faCaretRight, faCaretDown, faArrowsAlt, faMarsStrokeH } from '@fortawesome/free-solid-svg-icons'
+import { faCaretRight, faCaretDown, faArrowsAlt } from '@fortawesome/free-solid-svg-icons'
 import { SingleReactSelect } from "../../../components/selectWidgets";
 import { AddIndicatorButton, UpdateIndicatorButton } from '../../../components/indicatorModalComponents';
 import {sortableContainer, sortableElement, sortableHandle} from 'react-sortable-hoc';
@@ -635,6 +635,7 @@ class IndicatorList extends React.Component {
         let truncatedArr = [];
         let remainingArr = text.split(' ');
 
+        // Return full string or truncate to max length
         if (text.length < maxLength) {
             return text;
         } else {
@@ -642,6 +643,8 @@ class IndicatorList extends React.Component {
                 truncatedArr.push(remainingArr.shift());
             }
         }
+        
+        // Return truncated string before or after last word.
         if (truncatedArr.join(' ').concat('...').length < maxLength) {
             return truncatedArr.join(' ').concat('...');
         } else {
