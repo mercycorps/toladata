@@ -71,7 +71,7 @@ const IndicatorAddResults = inject("rootStore", "filterStore")(
                     $(ev.target).off('.tola.save');
                 })
         }
-        let text = noTargets ? 
+        let missingTargetText = noTargets ? 
             // # Translators: A message that lets the user know that they cannot add a result to this indicator because it has no target.
             gettext('Results cannot be added because the indicator is missing targets.' )
         : "";
@@ -91,7 +91,7 @@ const IndicatorAddResults = inject("rootStore", "filterStore")(
                     data-indicator_count={filterStore.programFilterData.indicators.size}
                 ></div>
 
-                <div role="tooltip" tabIndex="0" data-toggle="popover" data-placement="top" data-trigger="focus hover" data-content={text}>
+                <div role="tooltip" tabIndex="0" data-toggle="popover" data-placement="top" data-trigger="focus hover" data-content={missingTargetText}>
                     <button 
                         type="button" 
                         className={"btn btn-link px-1 pt-0 mx-auto"}

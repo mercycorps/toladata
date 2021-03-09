@@ -186,6 +186,7 @@ td.indicator-result-modal-cell {
 }
 td.indicator-add-results-modal-cell {
     text-align: center;
+    
     button {
         min-width: max-content;
         
@@ -194,11 +195,6 @@ td.indicator-add-results-modal-cell {
             pointer-events: none;
         }
     }
-    // .no-targets {
-    //     button {
-    //         min-width: max-content;
-    //     }
-    // }
 }
 td.indicator-cell {
     &.center-cell {
