@@ -100,7 +100,7 @@ const IndicatorAddResults = inject("rootStore", "filterStore")(
                     >
                         <FontAwesomeIcon icon={ faPlusCircle } />
                             {
-                                // # Translators: a button that lets the user add a `new result
+                                // # Translators: a button that lets the user add a new result
                                 gettext('Add result')
                             }
                     </button>
@@ -306,7 +306,7 @@ class IndicatorRow extends React.Component {
             displayNumber = displayNumber.slice(0, -1);
         }
         let reportData = rootStore.getReportData(indicator.pk);
-        let noTargets = reportData.lopTarget === null ? true: false;
+        let noTargets = reportData.lopTarget === null ? true : false;
 
         return (
             <React.Fragment>
