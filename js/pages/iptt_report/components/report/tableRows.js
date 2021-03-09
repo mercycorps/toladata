@@ -91,7 +91,7 @@ const IndicatorAddResults = inject("rootStore", "filterStore")(
                     data-indicator_count={filterStore.programFilterData.indicators.size}
                 ></div>
 
-                <div role="tooltip" tabIndex="0" data-toggle="popover" data-placement="top" data-trigger="focus hover" data-content={missingTargetText}>
+                <div role="tooltip" data-animation="true" tabIndex="0" data-toggle="popover" data-placement="top" data-trigger="focus hover" data-content={missingTargetText}>
                     <button 
                         type="button" 
                         className={"btn btn-link px-1 pt-0 mx-auto"}
