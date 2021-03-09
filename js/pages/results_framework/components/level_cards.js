@@ -619,12 +619,35 @@ class IndicatorList extends React.Component {
         $('*[data-toggle="tooltip"]').tooltip()
 
         this.setState({
-            textLength: Math.floor((($(".sortable-list__item__label").width() - $(".sortable-list__item__select").width() - 64) * 0.125) * 2)
+            // Set the width avalable for the indicator name by taking the label element width and 
+            // subtracting the ordering dropdowns width and also subtracting margin/padding. 
+            // Then convert the width to number of characters by dividing by 8.
+            textLength: Math.floor((($(".sortable-list__item__label").width() - $(".sortable-list__item__select").width() - 49) / 8))
         })
     }
 
     componentDidUpdate() {
         $('*[data-toggle="tooltip"]').tooltip()
+    }
+
+    handleTruncate(text, lineLength, lineCount = 2) {
+        let maxLength = lineLength * lineCount; 
+        let truncatedArr = [];
+        let remainingArr = text.split(' ');
+
+        if (text.length < maxLength) {
+            return text;
+        } else {
+            while (truncatedArr.join(' ').concat('...').length < maxLength) {
+                truncatedArr.push(remainingArr.shift());
+            }
+        }
+        if (truncatedArr.join(' ').concat('...').length < maxLength) {
+            return truncatedArr.join(' ').concat('...');
+        } else {
+            remainingArr.unshift(truncatedArr.pop());
+            return truncatedArr.join(' ').concat('...');
+        }
     }
     
     render() {
@@ -632,15 +655,12 @@ class IndicatorList extends React.Component {
         // Create the list of indicators and the dropdowns for setting the indicator order
         let options = this.props.indicators.map( (entry, index) => {return {value: index+1, label: index+1}});
 
-        console.log('State textLength:', this.state.textLength);
-
         let indicatorMarkup = this.props.indicators.map ( (indicator) => {
             // let options = this.props.indicators.map( (entry, index) => <option value={index+1}>{index+1}</option>);
             const tipTemplate = '<div class="tooltip sortable-list__item__tooltip" role="tooltip"><div class="arrow"></div><div class="tooltip-inner"></div></div>';
             const indicator_label =
                 <span data-toggle="tooltip" data-delay={900} data-template={tipTemplate} title={indicator.name}>
-                    {/* <span className="indicator_label_truncate">{indicator.name.replace(/(.{100})..+/, "$1...")}</span> */}
-                    <span className="indicator_label_truncate">{indicator.name.slice(0, this.state.textLength).concat("...")}</span>
+                    <span>{this.handleTruncate(indicator.name, this.state.textLength, 2)}</span>
                 </span>
             return (
                 <React.Fragment>
