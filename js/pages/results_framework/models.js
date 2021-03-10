@@ -158,10 +158,15 @@ export class LevelStore {
     };
 
     @action
+    trimTiers = () => {
+        this.tierTemplates[this.customTierSetKey]['tiers'] = this.tierTemplates[this.customTierSetKey]['tiers'].map((tier)=>tier.trim());
+    };
+
+    @action
     addCustomTier = () => {
+        this.trimTiers();
         this.rootStore.uiStore.setAddLevelButtonLockedStatus(true);
         this.saveCustomTemplateToDB({addTier: true});
-
     };
 
     @action
@@ -186,6 +191,7 @@ export class LevelStore {
 
     @action
     applyTierSet = (event=null) => {
+        this.trimTiers();
         if (event) {
             event.preventDefault();
         }
@@ -697,7 +703,7 @@ export class UIStore {
             let commaError = tierName.indexOf(",") !== -1;
 
             tiersToTest.forEach( otherTierName => {
-                if (otherTierName == tierName){
+                if (otherTierName.trim() == tierName.trim()){
                     duplicateErrors += 1;
                 }
             });

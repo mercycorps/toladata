@@ -317,7 +317,7 @@ class TestIPTTExcelExports(test.TestCase):
                 "Tri-annual",
                 "Quarterly",
                 "Monthly",
-                "Program Change log"
+                "Program change log"
             ])
         for sheet in tva_full_report.worksheets[:-1]:
             self.assert_iptt_title_cells(sheet)
@@ -331,7 +331,7 @@ class TestIPTTExcelExports(test.TestCase):
         for col, period in enumerate(["Midline", "Endline"]):
             self.assert_period_tva_header_cells(midend, period, 13+3*col)
         change_log = tva_full_report.worksheets[-1]
-        self.assertEqual(change_log.cell(row=1, column=1).value, "Program Change log")
+        self.assertEqual(change_log.cell(row=1, column=1).value, "Program change log")
         self.assertEqual(change_log.cell(row=2, column=1).value, self.scenario.program_name)
         for column, header in enumerate(
             ['Date and time', 'Result level', 'Indicator', 'User', 'Organization', 'Change type',
@@ -656,7 +656,7 @@ class TestIPTTExcelExports(test.TestCase):
             self.assertTrue(sheet.row_dimensions[row_num+2].hidden)
         self.assertEqual(sheet.cell(row=14, column=3).value, FOOTNOTE[ENGLISH])
         self.assertIsNone(sheet.cell(row=15, column=3).value)
-        
+
 
     def test_tp_annual_report_headers_columns_missing(self):
         tp_annual_report = self.get_tp_report(frequency=Indicator.ANNUAL, columns=['1', '2', '4'])

@@ -116,6 +116,7 @@ class IPTTReport(LoginRequiredMixin, TemplateView):
         react_data = {
             'programs_list': list(programs),
             'program_data': program_data,
+            'read_only': not request.has_medium_access
         }
         return self.render_to_response({'react_context': react_data})
 

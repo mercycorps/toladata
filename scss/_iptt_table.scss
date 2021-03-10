@@ -129,6 +129,13 @@ td.expando-cell {
     color: $blue;
     cursor: pointer;
     border-right: none;
+    div { // Will adjust the width be long enough to fit text on one line.
+        display: flex;
+        min-width: max-content;
+    }
+    svg { // Center caret icon vertically
+        margin: auto 0;
+    }
 }
 
 tr.expando-table-row {
@@ -177,7 +184,22 @@ td.indicator-edit-modal-cell {
 }
 td.indicator-result-modal-cell {
 }
+td.indicator-add-results-modal-cell {
+    text-align: center;
+    
+    button {
+        min-width: max-content;
+        
+        &:disabled {
+            color: $link-color;
+            pointer-events: none;
+        }
+    }
+}
 td.indicator-cell {
+    &.center-cell {
+        text-align: center
+    }
 }
 .result-cell {
     @extend %right-aligned-cell;
