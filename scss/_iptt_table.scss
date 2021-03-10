@@ -186,8 +186,14 @@ td.indicator-result-modal-cell {
 }
 td.indicator-add-results-modal-cell {
     text-align: center;
+    
     button {
         min-width: max-content;
+        
+        &:disabled {
+            color: $link-color;
+            pointer-events: none;
+        }
     }
 }
 td.indicator-cell {
