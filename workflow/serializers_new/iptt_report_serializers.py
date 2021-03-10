@@ -28,6 +28,7 @@ from tola.l10n_utils import l10n_date_medium
 
 
 class IPTTReport:
+    """Dummy object to provide a serializable object with IPTT Report qualities (title, name, etc.)"""
     def __init__(self, context):
         self.report_title = _('Indicator Performance Tracking Report')
         self.program_name = context['program']['name']
@@ -43,7 +44,16 @@ class IPTTReport:
 
 
 class IPTTReportSerializer(serializers.Serializer):
-    """Serializer for an entire IPTT Report - contains report-level data and methods to instance sub-serializers"""
+    """Serializer for an entire IPTT Report - contains report-level data and methods to instance sub-serializers
+
+        Is meant to be abstract and overridden for TP/TvA/Full TvA use cases
+        Currently only used by Excel exports (JSON serialization is handled by
+            workflow.serializers_new.iptt_program_serializers and
+            indicators.serializers_new.iptt_indicator_serializers &c. to allow portions of the Reactive IPTT
+            to be updated individually.  These globular singular serializers for an entire (up to Full TvA) report
+            are for excel only)
+    """
+
     report_title = serializers.CharField()
     program_name = serializers.CharField()
     results_framework = serializers.BooleanField()
@@ -52,10 +62,6 @@ class IPTTReportSerializer(serializers.Serializer):
     lop_period = serializers.SerializerMethodField()
     periods = serializers.SerializerMethodField()
     level_rows = serializers.SerializerMethodField()
-
-    is_tva = False
-    full_tva = False
-    report_serializer = IPTTExcelTPReportIndicatorSerializer
 
     class Meta:
         purpose = "IPTTReport"
@@ -95,6 +101,7 @@ class IPTTReportSerializer(serializers.Serializer):
 
     @classmethod
     def _get_serializer_context(cls, program_pk, frequencies, filters):
+        """Portion of the context (fetched objects to simplify serialization) related to the whole report"""
         frequencies = [int(frequency) for frequency in frequencies]
         time_aware_frequencies = list(set(frequencies) & set(Indicator.REGULAR_TARGET_FREQUENCIES))
         return {
@@ -108,6 +115,10 @@ class IPTTReportSerializer(serializers.Serializer):
 
     @staticmethod
     def _get_rf_context(context):
+        """Portion of the context (fetched objects to simplify serialization) related to the Resuls Framework
+
+            (for some reason it's model objects and not serialized objects, I can't remember why - cameron)
+        """
         return {
             'levels': list(Level.objects.select_related(None).only(
                 'pk', 'name', 'parent_id', 'customsort', 'program_id'
@@ -119,6 +130,7 @@ class IPTTReportSerializer(serializers.Serializer):
 
     @staticmethod
     def _get_program_context(context):
+        """Loads the serialized Program object directly into the context for use by other nested serializers"""
         program_context = {
             'tier_objects': context.get('tiers', []),
             'level_objects': context.get('levels', []),
@@ -130,6 +142,7 @@ class IPTTReportSerializer(serializers.Serializer):
 
     @staticmethod
     def _get_filter_context(context):
+        """Portion of the context (fetched objects to simplify serialization) containing filters from the request"""
         filters = context.get('filters')
         if not filters or not isinstance(filters, dict):
             return {}
@@ -204,9 +217,14 @@ class IPTTReportSerializer(serializers.Serializer):
 
     @classmethod
     def load_report_data(cls, context):
+        """Portion of context containing indicator x frequency report data, serialized"""
         report_data_contexts = cls._report_data_context(context)
         filters = {'pk__in': [indicator['pk'] for indicator in context['indicators']]}
-        report_indicators = list(cls.load_report_indicators(filters))
+        report_indicators = list(
+            Indicator.rf_aware_objects.select_related(None).prefetch_related(None).only(
+                'pk', 'program_id', 'target_frequency', 'unit_of_measure_type',
+                'is_cumulative', 'level_id', 'lop_target').filter(**filters).order_by().distinct()
+            )
         report_data = {}
         for frequency in context['frequencies']:
             report_context = report_data_contexts[frequency]
@@ -218,14 +236,8 @@ class IPTTReportSerializer(serializers.Serializer):
         return report_data
 
     @staticmethod
-    def load_report_indicators(filters):
-        return Indicator.rf_aware_objects.select_related(None).prefetch_related(None).only(
-            'pk', 'program_id', 'target_frequency', 'unit_of_measure_type', 'is_cumulative', 'level_id', 'lop_target',
-        ).filter(**filters).order_by().distinct()
-
-
-    @staticmethod
     def _report_data_context(context):
+        """Loads frequency-specific context information for each frequency in the report"""
         filters = context.get('filters', {})
         reporting_period = (
             dateutil.parser.isoparse(context['program']['reporting_period_start_iso']).date(),
@@ -277,7 +289,6 @@ class IPTTReportSerializer(serializers.Serializer):
             dateutil.parser.isoparse(self.context['program']['reporting_period_start_iso']).date(),
             dateutil.parser.isoparse(self.context['program']['reporting_period_end_iso']).date()
         )
-
 
     def _get_frequency_periods(self, frequency):
         """Returns all periods serialized as period headers for a given frequency"""
@@ -390,16 +401,23 @@ class IPTTReportSerializer(serializers.Serializer):
 
 
 class IPTTTPReportSerializer(IPTTReportSerializer):
+    """Implementation of base IPTT Report Serializer for Excel TP Exports"""
+
+    is_tva = False
+    full_tva = False
+    report_serializer = IPTTExcelTPReportIndicatorSerializer
+
     @property
     def report_name(self):
         return _("IPTT Actuals only report")
 
     @classmethod
     def load_report(cls, program_pk, **kwargs):
+        """Main entry point for producing a fully serialized report"""
         frequency = kwargs.get('frequency', Indicator.MONTHLY)
         filters = kwargs.get('filters', {})
         context = cls.get_context(program_pk, [frequency,], filters=filters)
-        report = IPTTReport(context)
+        report = IPTTReport(context) # dummy object to provide a "serializable" object
         return cls(report, context=context)
 
     def _fetch_frequency_indicators(self, frequency, level_pk=None):
@@ -420,10 +438,11 @@ class IPTTTVAReportSerializer(IPTTReportSerializer):
 
     @classmethod
     def load_report(cls, program_pk, **kwargs):
+        """Main entry point for producing a fully serialized report"""
         frequency = kwargs.get('frequency', Indicator.LOP)
         filters = kwargs.get('filters', {})
         context = cls.get_context(program_pk, [frequency,], filters=filters)
-        report = IPTTReport(context)
+        report = IPTTReport(context) # dummy object to provide a "serializable" object
         return cls(report, context=context)
 
 
@@ -434,7 +453,7 @@ class IPTTFullReportSerializer(IPTTReportSerializer):
 
     all_frequencies = [
         frequency for frequency, name in Indicator.TARGET_FREQUENCIES
-        if frequency is not Indicator.EVENT
+        if frequency is not Indicator.EVENT # EVENT frequency is not currently IPTT export-able
     ]
 
     @property
@@ -443,7 +462,8 @@ class IPTTFullReportSerializer(IPTTReportSerializer):
 
     @classmethod
     def load_report(cls, program_pk, **kwargs):
+        """Main entry point for producing a fully serialized report"""
         filters = kwargs.get('filters', {})
         context = cls.get_context(program_pk, cls.all_frequencies, filters=filters)
-        report = IPTTReport(context)
+        report = IPTTReport(context) # dummy object to provide a "serializable" object
         return cls(report, context=context)

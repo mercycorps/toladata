@@ -20,6 +20,8 @@ class ProgramBaseSerializerMixin:
     JSON output corresponds to js/models/bareProgram
     """
 
+    # 'using_results_framework' is an annotation provided by the non-standard Program queryset
+    # managers (e.g. rf_aware_objects) defined on the Program model.
     results_framework = serializers.BooleanField(source='using_results_framework')
 
     class Meta:
@@ -40,7 +42,7 @@ class ProgramBaseSerializerMixin:
 
     @classmethod
     def get_queryset(cls, **kwargs):
-        """Returns the specific queryset used to load this serializer for a speficic program or programs
+        """Returns the specific queryset used to load this serializer for a specific program or programs
 
             Args:
                 pk: pk in order to load for a specific program
@@ -130,6 +132,10 @@ class ProgramRFOrderingMixin:
     # Class method used to instantiate serializer with required context (to minimize queries)
     @classmethod
     def _get_context(cls, **kwargs):
+        """extensible method to populate serializer context (and context of nested serializers)
+
+            minimizes db calls as child serializers can fetch in memory objects from context instead of another db call
+        """
         context = super()._get_context(**kwargs)
         program_pk = context['program_pk']
         context['tiers'] = cls.related_serializers['tiers'].load_for_program(program_pk, context=context).data
@@ -141,9 +147,11 @@ class ProgramRFOrderingMixin:
     # Serializer Method Field methods (populate fields for serializer):
 
     def get_level_pks_level_order(self, program):
+        """Levels in level order is for the IPTT which first places levels, then indicators under them"""
         return [l['pk'] for l in self._get_levels_level_order(program)]
 
     def get_level_pks_chain_order(self, program):
+        """Levels in chain order is for the IPTT which first places levels, then indicators under them"""
         return [l['pk'] for l in self._get_levels_chain_order(program)]
 
     def get_indicator_pks_for_level(self, program):
@@ -157,7 +165,10 @@ class ProgramRFOrderingMixin:
         return [i['pk'] for i in self._sorted_indicators_for_level(program, None)]
 
     def get_indicator_pks_level_order(self, program):
-        """returns a list of pks, sorted by level in level order then indicator level_order (if RF) otherwise manual"""
+        """returns a list of pks, sorted by level in level order then indicator level_order (if RF) otherwise manual
+
+            For the Program Page, which only sorts indicators, to simplify the JS sorting algorithm
+        """
         levels = self._get_levels_level_order(program) if program.results_framework else []
         indicator_pks = [i['pk'] for level in levels
                          for i in self._sorted_indicators_for_level(program, level)]
@@ -165,7 +176,10 @@ class ProgramRFOrderingMixin:
         return indicator_pks
 
     def get_indicator_pks_chain_order(self, program):
-        """returns a list of pks, sorted by level in chain order then indicator level_order (if RF) otherwise manual"""
+        """returns a list of pks, sorted by level in chain order then indicator level_order (if RF) otherwise manual
+
+            For the Program Page, which only sorts indicators, to simplify the JS sorting algorithm
+        """
         levels = self._get_levels_chain_order(program) if program.results_framework else []
         indicator_pks = [i['pk'] for level in levels
                          for i in self._sorted_indicators_for_level(program, level)]

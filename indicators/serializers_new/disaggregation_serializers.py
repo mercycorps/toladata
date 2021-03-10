@@ -56,6 +56,11 @@ class IPTTDisaggregationJSONMixin:
 
     @classmethod
     def load_for_program(cls, program_pk):
+        """Loads all disaggregations for a program
+
+            used to inject disaggregation types into context for all the child serializers of a given program
+            to minimize repeat queries (pulling disaggregation type objects for each indicator assigned them)
+        """
         queryset = DisaggregationType.objects.select_related('country').filter(
             indicator__program_id=program_pk, is_archived=False
         ).order_by('standard', 'disaggregation_type').distinct().prefetch_related(models.Prefetch(

@@ -121,6 +121,7 @@ GOOGLE_ANALYTICS_DOMAIN = app_settings.get('GOOGLE_ANALYTICS_DOMAIN', None)
 SECRET_KEY = app_settings['SECRET_KEY']
 
 LOGGING['handlers']['file']['filename'] = app_settings['LOGFILE']
+LOGGING['handlers']['info_file']['filename'] = os.path.join(dirname(app_settings['LOGFILE']), 'django_info.log')
 
 # use webpack dev server
 WEBPACK_LOADER = {

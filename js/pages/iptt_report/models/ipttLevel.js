@@ -7,6 +7,8 @@ import { getLevel } from '../../../models/level';
  * JSON params:
  *    tier_pk int
  *    chain_pk int
+ *
+ * Corresponds to indicators.serializers_new.tier_and_level_serializers.IPTTLevelSerializer
  */
 
 export const forIPTT = (
@@ -26,12 +28,13 @@ export const forIPTT = (
         return this.chainPk && this.chainPk == this.pk;
     },
     get tierNumber() {
-        return `${this.tierName}` + (this.ontology ? ` ${this.ontology}` : ``);
+        // Would have used falsy test but 0 might be a legit label.  All this just to avoid extra spaces.
+        return [this.tierName, this.ontology].filter(elem => elem!=null && elem!=='').join(' ');
     },
     get resultChainLabel() {
         /* # Translators: this labels a filter option for a label as including subordinate levels */
         let labelStr = gettext('%(this_level_number)s and sub-levels: %(this_level_full_name)s');
-        return interpolate(labelStr, {this_level_number: this.tierNumber, this_level_full_name: this.name}, true); 
+        return interpolate(labelStr, {this_level_number: this.tierNumber, this_level_full_name: this.name}, true);
     }
 });
 
