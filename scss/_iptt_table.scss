@@ -136,6 +136,10 @@ td.expando-cell {
     svg { // Center caret icon vertically
         margin: auto 0;
     }
+
+    &:hover, &:focus {
+        outline: none;
+    }
 }
 
 tr.expando-table-row {
@@ -193,6 +197,12 @@ td.indicator-add-results-modal-cell {
         &:disabled {
             color: $link-color;
             pointer-events: none;
+        }
+    }
+
+    & > * {
+        &:hover, &:focus {
+            outline: none;
         }
     }
 }
