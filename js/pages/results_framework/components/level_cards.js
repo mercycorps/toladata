@@ -619,10 +619,10 @@ class IndicatorList extends React.Component {
         $('*[data-toggle="tooltip"]').tooltip()
 
         this.setState({
-            // Set the width avalable for the indicator name by taking the label element width and 
-            // subtracting the ordering dropdowns width and also subtracting margin/padding. 
-            // Then convert the width to number of characters by dividing by 8.
-            textLength: Math.floor((($(".sortable-list__item__label").width() - $(".sortable-list__item__select").width() - 49) / 8))
+            // Set the width avalable for the indicator name by taking the sortable list group width and 
+            // subtracting the drag handler, ordering dropdowns width, settings action button,
+            // and also subtracting all margin/padding which adds up to 250px.
+            textLength: Math.floor((($(".sortable-list-group").width() - 250) / 8)) 
         })
     }
 
