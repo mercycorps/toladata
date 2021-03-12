@@ -332,7 +332,6 @@ def reportingperiod_update(request, pk):
             pass
         elif (program.last_time_aware_indicator_start_date and
               reporting_period_end.date() < program.last_time_aware_indicator_start_date):
-            print('last start date', program.last_time_aware_indicator_start_date)
             success = False
             failmsg.append(_('Reporting period must end after the start of the last target period'))
             failfields.append('reporting_period_end')
