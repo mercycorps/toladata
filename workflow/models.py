@@ -10,7 +10,7 @@ import uuid
 from django.utils.translation import ugettext_lazy as _
 
 from django.conf import settings
-from django.db.models import Count, Min, Subquery, OuterRef, Q
+from django.db.models import Count, Max, Min, Subquery, OuterRef, Q
 from django.db.models.signals import post_save
 from django.dispatch import receiver
 from rest_framework.authtoken.models import Token
@@ -684,12 +684,8 @@ class Program(models.Model):
     def last_time_aware_indicator_start_date(self):
         """returns None if no time aware indicators, otherwise returns the most recent start date of all targets for
         indicators with a time-aware frequency - used in program reporting period date validation"""
-        most_recent = PeriodicTarget.objects.filter(
-            indicator__program=self,
-            indicator__target_frequency__in=Indicator.REGULAR_TARGET_FREQUENCIES
-        ).order_by('-start_date').first()
-        return most_recent if most_recent is None else most_recent.start_date
-
+        max_start = Indicator.objects.filter(program__id=self.pk).aggregate(max_date=Max('periodictargets__start_date'))
+        return max_start['max_date']
 
     def get_periods_for_frequency(self, frequency):
         period_generator = PeriodicTarget.generate_for_frequency(frequency)

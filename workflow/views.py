@@ -332,6 +332,7 @@ def reportingperiod_update(request, pk):
             pass
         elif (program.last_time_aware_indicator_start_date and
               reporting_period_end.date() < program.last_time_aware_indicator_start_date):
+            print('last start date', program.last_time_aware_indicator_start_date)
             success = False
             failmsg.append(_('Reporting period must end after the start of the last target period'))
             failfields.append('reporting_period_end')
@@ -366,5 +367,4 @@ def reportingperiod_update(request, pk):
 @api_view(['GET'])
 def dated_target_info(request, pk):
     verify_program_access_level(request, pk, 'low')
-    max_start = Indicator.objects.filter(program__id=pk).aggregate(max_date=Max('periodictargets__start_date'))
-    return Response({'max_start_date': max_start['max_date']})
+    return Response({'max_start_date': Program.objects.get(pk=pk).last_time_aware_indicator_start_date})
