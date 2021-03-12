@@ -17,7 +17,7 @@ from workflow.forms import (
     FilterForm,
 )
 
-from indicators.models import Result
+from indicators.models import Result, Indicator
 
 from django.utils.translation import gettext as _
 from django.views.generic.list import ListView
@@ -366,6 +366,5 @@ def reportingperiod_update(request, pk):
 @api_view(['GET'])
 def dated_target_info(request, pk):
     verify_program_access_level(request, pk, 'low')
-    return Response({
-        'max_start_date': Program.objects.filter(id=pk).annotate(
-            ptd=Max('indicator__periodictargets__start_date')).values_list('ptd', flat=True)[0]})
+    max_start = Indicator.objects.filter(program__id=pk).aggregate(max_date=Max('periodictargets__start_date'))
+    return Response({'max_start_date': max_start['max_date']})
