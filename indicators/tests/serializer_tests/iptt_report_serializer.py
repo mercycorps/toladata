@@ -65,7 +65,9 @@ def get_result(indicator, achieved, target_period=0, days=1, date=None):
         date_collected = indicator.program.reporting_period_start + datetime.timedelta(days=days)
     else:
         periodic_target = indicator.periodictargets.all()[target_period]
-        date_collected = periodic_target.start_date + datetime.timedelta(days=days)
+        start_date = periodic_target.start_date \
+            if periodic_target.start_date else periodic_target.indicator.program.reporting_period_start
+        date_collected = start_date + datetime.timedelta(days=days)
     return ResultFactory(
         indicator=indicator,
         periodic_target=periodic_target,
