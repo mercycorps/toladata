@@ -64,6 +64,10 @@ export class LevelListPanel  extends React.Component {
         return {__html: this.props.rootStore.uiStore.splashWarning }
     };
 
+    hideBanner = () => {
+        sessionStorage.setItem("hide_bulk_import_alert", true);
+    }
+
     render() {
         const isCollapseAllDisabled = this.props.rootStore.uiStore.hasVisibleChildren.length === 0 ||
             this.props.rootStore.uiStore.disableCardActions ||
@@ -119,11 +123,12 @@ export class LevelListPanel  extends React.Component {
                         </span>
                     </div>
                 </div>
-                <button type="button" className="close" data-dismiss="alert" aria-label="Close">
+                <button type="button" className="close" data-dismiss="alert" aria-label="Close" onClick={ this.hideBanner }>
                     <span aria-hidden="true" className="x-modal">&times;</span>
                 </button>
             </div>
         
+        let hideBanner = sessionStorage.getItem('hide_bulk_import_alert');
         let panel = '';
         if (this.props.rootStore.levelStore.levels.length == 0) {
             panel =
@@ -138,7 +143,7 @@ export class LevelListPanel  extends React.Component {
             panel =
                 <div id="level-list" style={{flexGrow: "2"}}>
                     {expandoDiv}
-                    {this.props.rootStore.levelStore.accessLevel === 'high' ? bulkImportBanner : null}
+                    {!hideBanner ?? this.props.rootStore.levelStore.accessLevel === 'high' ? bulkImportBanner : null}
                     <LevelList renderList='initial'/>
                 </div>
         }
