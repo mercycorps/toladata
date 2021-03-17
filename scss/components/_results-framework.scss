@@ -258,9 +258,11 @@
 
 // component Bulk Import Banner Alert
 #bulk-import-banner-alert {
-    background-color: $teal-100;
     display: flex;
     flex-direction: column;
+    background-color: $teal-100;
+    border: 1px solid $gray-400;
+
     
     .bulk-alert-message {
         display: flex;
@@ -274,7 +276,8 @@
     }
     
     .bulk-alert-text {
-        margin: 0 10px 0 15px;
+        margin-left: $grid-gutter-width/3;
+        margin-right: $grid-gutter-width/2;
     }
 
     .close {
