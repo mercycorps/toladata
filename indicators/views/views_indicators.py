@@ -74,6 +74,7 @@ from tola_management.permissions import (
 
 
 logger = logging.getLogger(__name__)
+request_logger = logging.getLogger('request_locale')
 
 
 # INDICATOR VIEWS:
@@ -150,7 +151,7 @@ class IndicatorFormMixin:
     def form_invalid(self, form):
         return JsonResponse(form.errors, status=400)
 
-    def normalize_periodic_target_client_json_dates(self, pt_json):
+    def normalize_periodic_target_client_json_dates(self, pt_json, request=None):
         """
         The JSON containing periodic targets sent by the client contains dates as: 'Dec 31, 2018'
         The rest of the code expects them to be: '2018-12-31'
@@ -162,7 +163,8 @@ class IndicatorFormMixin:
             pk = int(pt.get('id'))
             if pk == 0:
                 pk = None
-
+            if request:
+                request_logger.info(f'lang: {request.LANGUAGE_CODE}, user: {request.user}\n{request.POST}\n')
             try:
                 start_date = dateparser.parse(pt.get('start_date', None))
                 start_date = datetime.strftime(start_date, '%Y-%m-%d')
@@ -331,7 +333,7 @@ class IndicatorCreate(IndicatorFormMixin, CreateView):
             # now create/update periodic targets
             pt_json = json.loads(periodic_targets)
 
-            normalized_pt_json = self.normalize_periodic_target_client_json_dates(pt_json)
+            normalized_pt_json = self.normalize_periodic_target_client_json_dates(pt_json, request=self.request)
 
             self.validate_periodic_target_json_from_client(
                 normalized_pt_json, indicator.program, indicator.target_frequency
@@ -536,7 +538,7 @@ class IndicatorUpdate(IndicatorFormMixin, UpdateView):
             # now create/update periodic targets (will be empty u'[]' for LoP)
             pt_json = json.loads(periodic_targets)
 
-            normalized_pt_json = self.normalize_periodic_target_client_json_dates(pt_json)
+            normalized_pt_json = self.normalize_periodic_target_client_json_dates(pt_json, request=self.request)
 
             self.validate_periodic_target_json_from_client(
                 normalized_pt_json, old_indicator.program, new_target_frequency

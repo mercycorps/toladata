@@ -13,21 +13,38 @@ class TPReportPeriodSerializer(serializers.Serializer):
     disaggregations = serializers.SerializerMethodField()
 
     class PeriodObject:
+        """Dummy object for serializing period data that is otherwise kept in dict form
+
+            DRF does not serialize dicts well.  This dummy object matches our period_data dict
+            (see models.PeriodicTarget) and is serializable
+        """
         def __init__(self, period_dict):
             period_dict['count'] = period_dict.get('count', None)
             self.__dict__ = period_dict
 
     @classmethod
     def from_dict(cls, period_dict, context=None):
+        """instances a serializable object from the provided dict, and serializes it
+
+            period data is usually provided in dict form, which is unserializable, this helper method both converts
+            it to a serializable object (ensuring it has a 'count' entry even if not provided) and serializes it
+        """
         if context is None:
             context = {}
+        # serializer won't accept a raw dict, so the dict is being wrapped in a class
         period_obj = cls.PeriodObject(period_dict)
         return cls(period_obj, context=context)
 
     def to_representation(self, instance):
+        """The excel and JSON formats for numeric report values vary.
+
+            This prevents needing separate serializers for each.  The differences are in the field signature above
+        """
         rep = super().to_representation(instance)
+        # pop values not needed when serialized
         actual_json = rep.pop('actual_json', None)
         actual_excel = rep.pop('actual_excel', None)
+        # context['coerce_to_string'] is the key that this is JSON (string) output (Decimal output for excel)
         if self.context.get('coerce_to_string', False):
             rep['actual'] = actual_json
         else:
@@ -57,7 +74,18 @@ class TVAReportPeriodSerializer(TPReportPeriodSerializer):
     target_excel = DecimalDisplayField(localize=False, coerce_to_string=False, source='target')
 
     class PeriodObject:
+        """Dummy object for serializing period data that is otherwise kept in dict form
+
+            DRF does not serialize dicts well.  This dummy object matches our period_data dict
+            (see models.PeriodicTarget) and is serializable
+        """
+
         def __init__(self, period_dict):
+            """instances a serializable object from the provided dict, and serializes it
+
+            period data is usually provided in dict form, which is unserializable, this helper method both converts
+            it to a serializable object (ensuring it has a 'count' entry), finds 'met' if possible, and serializes it
+        """
             period_dict['count'] = period_dict.get('count', None)
             target = period_dict.get('target', None)
             actual = period_dict.get('actual', None)
@@ -72,11 +100,17 @@ class TVAReportPeriodSerializer(TPReportPeriodSerializer):
             self.__dict__ = period_dict
 
     def to_representation(self, instance):
+        """The excel and JSON formats for numeric report values vary.
+
+            This prevents needing separate serializers for each.  The differences are in the field signature above
+        """
         rep = super().to_representation(instance)
+        # pop values that are not needed when serialization is complete:
         target_json = rep.pop('target_json', None)
         target_excel = rep.pop('target_excel', None)
         met_json = rep.pop('met_json', None)
         met_excel = rep.pop('met_excel', None)
+        # context['coerce_to_string'] is the key that this is JSON (string) output (Decimal output for excel)
         if self.context.get('coerce_to_string', False):
             rep['target'] = target_json
             rep['met'] = met_json

@@ -122,17 +122,28 @@ class RFIndicatorFactory(DjangoModelFactory):
                 (if list is shorter than available periods, remaining targets are blank)
             targets=True - will assign the lop_target value split among all available periods"""
         if extracted and self.target_frequency:
-            if self.target_frequency == Indicator.EVENT:
-                def event_generator(start, end):
+            if self.target_frequency in (Indicator.EVENT, Indicator.MID_END):
+                mid_end_labels = ("Mindline", "Endline")
+                def non_time_aware_generator(start, end):
                     for c in range(2):
                         yield {
                             'customsort': c,
-                            'start': start,
-                            'end': end,
-                            'name': f"Event {c+1}",
-                            'label': f"Event {c+1} label?",
+                            'start': None,
+                            'end': None,
+                            'name': f"Event {c+1}" if self.target_frequency == Indicator.EVENT else mid_end_labels[c],
+                            'label': f"Event {c+1} label?" if self.target_frequency == Indicator.EVENT else mid_end_labels[c],
                         }
-                period_generator = event_generator
+                period_generator = non_time_aware_generator
+            elif self.target_frequency == Indicator.LOP:
+                def lop_generator(start, end):
+                    yield {
+                        'customsort': 0,
+                        'start': None,
+                        'end': None,
+                        'name': "Life of Program (LoP) only",
+                        'label': None,
+                    }
+                period_generator = lop_generator
             else:
                 period_generator = PeriodicTarget.generate_for_frequency(self.target_frequency)
             if self.program:
@@ -209,13 +220,15 @@ class RFIndicatorFactory(DjangoModelFactory):
                     achieved = [achieved]
                 for j, this_achieved in enumerate(achieved):
                     if this_achieved is not None:
+                        start_date = target.start_date \
+                            if target.start_date else target.indicator.program.reporting_period_start
                         ResultFactory(
                             periodic_target=target,
                             achieved=this_achieved,
                             indicator=self,
                             program=self.program,
                             evidence_url=evidence,
-                            date_collected=target.start_date + datetime.timedelta(days=1+j+c%count)
+                            date_collected=start_date + datetime.timedelta(days=1+j+c%count)
                         )
 
 class Objective(DjangoModelFactory):

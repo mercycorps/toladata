@@ -1547,4 +1547,11 @@
     function hasLevelBeenInitiallySet() {
         return !initialLevelFormValue && (initialLevelFormValue != getLevelFormValue());
     }
+
+    // close modal on escape key press
+    $(document).keydown(function(event) {
+        if(event.keyCode === 27) {
+            $('#indicator_modal_div').modal('hide');
+        }
+    })
 </script>

@@ -3,8 +3,12 @@ import browserPlugin from 'router5-plugin-browser';
 import { observable } from 'mobx';
 import { TVA, TIMEPERIODS } from '../../constants';
 
-const goodQueryParams = ['frequency', 'start', 'end', 'levels', 'types', 'sites', 'disaggregations',    
+
+// Building these in place to allow for the fact that these change semi-frequently as new filters are added:
+// these are the parameters we expect in queries built in the Reaact paradigm:
+const goodQueryParams = ['frequency', 'start', 'end', 'levels', 'types', 'sites', 'disaggregations',
                          'sectors', 'indicators', 'tiers', 'groupby', 'mr', 'columns'];
+// these are still accepted for backwards compatibility with our previous static IPTT queries (could be pinned, bookmarked, etc.)
 const oldQueryParams = ['timeframe', 'numrecentperiods', 'numrecentcount', 'start_period', 'end_period'];
 
 const queryParams = '?' + [...goodQueryParams, ...oldQueryParams].join('&');
@@ -30,6 +34,7 @@ const routes =  [
     }
 ];
 
+// helper function for making sure the parameter read out of the URL is provided in a format expected by the domain stores:
 const parseArrayParams = (param) => {
     if (typeof param === 'string' || param instanceof String) {
         return [parseInt(param)];
@@ -43,8 +48,14 @@ const parseArrayParams = (param) => {
     return [];
 }
 
+/*
+ * Constructs a router wrapper which provides helper methods acting on the underlying router5 router specific to the IPTT
+ * Used to extract information from the initial URL and hydrate the filter store, and for updating the URL as the filter store
+ * is interacted with by the user
+ */
 export default () => {
     const router = createRouter(routes, {trailingSlashMode: 'always'});
+    // this marks all query params above as available:
     router.setRootPath(queryParams);
     router.usePlugin(browserPlugin({useHash: false, base: '/indicators'}));
     router.start();
@@ -78,11 +89,13 @@ export default () => {
             return false;
         },
         get mr() {
+            // this param was added for when Most Recent <x> periods is the same data as show all, to make sure "most recent" is checked
             return this._router.getState().params.mr == 1;
         },
         get groupBy() {
             return this._router.getState().params.groupby;
         },
+        // the following all refer to filters (i.e. indicators is 'indicator pks we are filtering to')
         get levels() {
             return parseArrayParams(this._router.getState().params.levels);
         },

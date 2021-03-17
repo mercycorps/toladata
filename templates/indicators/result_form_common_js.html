@@ -515,14 +515,30 @@
             // save was successful, trigger update on indicator list:
             $('#indicator_results_div').trigger('save.tola.result_form');
             // reset form fields (to add another) - if LoP then reset to LoP when form is reset:
-            let $lopSelect = $('#id_periodic_target');
-            if ($lopSelect.attr('readonly') && $lopSelect.find('option:not([disabled])').length == 1) {
-                let val = $lopSelect.val();
-                $('#result_update_form').trigger('reset');
-                $lopSelect.val(val);
-            } else {
-                $('#result_update_form').trigger('reset');
+            let $target_select = $('#id_periodic_target');
+            let $pt_options = $('#id_periodic_target option')
+            const isLop = $target_select.attr('readonly') && $pt_options.length === 2;
+            let lopVal = $target_select.val();
+            if (!isLop && $pt_options.last().attr('disabled')){ // This means it's a time-aware target
+                $pt_options.attr({disabled: true, selected: false});
+                $pt_options.first().attr({disabled: false, selected: true});
+                $target_select.val($pt_options.first().val());
+                $pt_options.first().prop('selected', true);
             }
+            else { // Midline/Endline or Event targets
+                $pt_options.attr({selected: false});
+                $pt_options.first().attr({selected: true});
+                $target_select.val($pt_options.first().val());
+                $pt_options.first().prop('selected', true);
+            }
+
+            $('#result_update_form').trigger('reset');
+            $('[id*="disaggregations_toggle"]').not(".collapsed").trigger('click');
+            $('#id_site').val(null).trigger('change');
+            if (isLop) {
+                $target_select.val(lopVal);
+            }
+
             // remove any lingering validation warnings on evidence field:
             validateEvidence();
             // scroll to top to start form over
