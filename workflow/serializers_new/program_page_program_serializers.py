@@ -45,6 +45,7 @@ class ProgramPageIndicatorDataMixin:
         }
 
     def get_indicators(self, program):
+        """Program Page JSON output requires indicators to be a map by pk"""
         return {
             serialized_indicator['pk']: serialized_indicator
             for serialized_indicator in self._get_program_indicators(program)
@@ -79,6 +80,7 @@ class ProgramPageMixin:
 
     @classmethod
     def get_queryset(cls, **kwargs):
+        """Loads program with annotations specific for program page display (note program_page_objects manager)"""
         queryset = Program.program_page_objects.select_related(None).prefetch_related().only(
             *cls._get_query_fields()
         ).annotate(num_sites=models.Count('indicator__result__site', distinct=True))
@@ -97,7 +99,10 @@ class ProgramPageMixin:
 
     def get_target_period_info(self, program):
         """Returns a dict mapping irregular frequencies to indicator count and the most recently completed target
-        end date in isoformat for regular frequencies"""
+        end date in isoformat for regular frequencies
+
+        Used in helptext popups on program page metrics
+        """
         indicators = self._get_program_indicators(program)
         irregulars = {
             frequency: len([i['pk'] for i in indicators
@@ -159,6 +164,7 @@ class ProgramPageUpdateMixin:
     # class methods for instantiation with minimal queries
     @classmethod
     def _get_context(cls, *args, **kwargs):
+        """Extends the parent context to include a single indicator's data (the updated indicator)"""
         indicator_pk = kwargs.pop('indicator_pk', None)
         context = super()._get_context(*args, **kwargs)
         if indicator_pk:
@@ -169,7 +175,7 @@ class ProgramPageUpdateMixin:
 
     @classmethod
     def load_for_indicator_and_program(cls, indicator_pk, program_pk):
-        """returns the serializer instantiated with program data"""
+        """Main entry point, returns the serializer instantiated with program data"""
         return cls(cls.get_queryset(pk=program_pk),
                    context=cls._get_context(program_pk=program_pk, indicator_pk=indicator_pk))
 
@@ -177,7 +183,8 @@ class ProgramPageUpdateMixin:
     def get_indicator(self, program):
         return self.context.get('indicator', None)
 
-    def get_site_count(self, program):
+    @staticmethod
+    def get_site_count(program):
         return SiteProfile.objects.filter(result__indicator__program=program).distinct().count()
 
 

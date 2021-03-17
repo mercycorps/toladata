@@ -603,6 +603,13 @@ class LevelButton extends React.Component {
 @inject('rootStore')
 class IndicatorList extends React.Component {
 
+    constructor(props) {
+        super(props);
+        this.state = {
+            textLength: 0,
+        }
+    }
+
     componentDidMount() {
         // Enable popovers after update (they break otherwise)
         $('*[data-toggle="popover"]').popover({
@@ -610,12 +617,42 @@ class IndicatorList extends React.Component {
         });
 
         $('*[data-toggle="tooltip"]').tooltip()
+
+        this.setState({
+            // Set the width avalable for the indicator name by taking the sortable list group width and 
+            // subtracting the drag handler, ordering dropdowns width, settings action button,
+            // and also subtracting all margin/padding which adds up to 250px.
+            textLength: Math.floor((($(".sortable-list-group").width() - 250) / 8)) 
+        })
     }
 
     componentDidUpdate() {
         $('*[data-toggle="tooltip"]').tooltip()
     }
 
+    handleTruncate(text, lineLength, lineCount = 2) {
+        let maxLength = lineLength * lineCount; 
+        let truncatedArr = [];
+        let remainingArr = text.split(' ');
+
+        // Return full string or truncate to max length
+        if (text.length < maxLength) {
+            return text;
+        } else {
+            while (truncatedArr.join(' ').concat('...').length < maxLength) {
+                truncatedArr.push(remainingArr.shift());
+            }
+        }
+        
+        // Return truncated string before or after last word.
+        if (truncatedArr.join(' ').concat('...').length < maxLength) {
+            return truncatedArr.join(' ').concat('...');
+        } else {
+            remainingArr.unshift(truncatedArr.pop());
+            return truncatedArr.join(' ').concat('...');
+        }
+    }
+    
     render() {
 
         // Create the list of indicators and the dropdowns for setting the indicator order
@@ -626,7 +663,7 @@ class IndicatorList extends React.Component {
             const tipTemplate = '<div class="tooltip sortable-list__item__tooltip" role="tooltip"><div class="arrow"></div><div class="tooltip-inner"></div></div>';
             const indicator_label =
                 <span data-toggle="tooltip" data-delay={900} data-template={tipTemplate} title={indicator.name}>
-                    <span>{indicator.name.replace(/(.{55})..+/, "$1...")}</span>
+                    <span>{this.handleTruncate(indicator.name, this.state.textLength, 2)}</span>
                 </span>
             return (
                 <React.Fragment>

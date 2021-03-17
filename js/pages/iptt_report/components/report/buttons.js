@@ -1,3 +1,5 @@
+/* Buttons for use in the IPTT Report page (non-sidebar portion) */
+
 import React from 'react';
 import ReactDOM from 'react-dom';
 import { inject, observer } from 'mobx-react';
@@ -31,7 +33,7 @@ class PinPopover extends React.Component {
             this.setState({status: this.SENDING});
             this.setState({loading: true})
         }, 1500)
-        
+
         this.props.rootStore.pinAPI.savePin({
             name: this.state.reportName,
             ...this.props.rootStore.pinParams
@@ -55,7 +57,7 @@ class PinPopover extends React.Component {
             // Delayed response to prevent visible flash of the loading spinner.
             setTimeout(() => {
                 this.setState({
-                    status: err === "DUPLICATE" ? this.NOT_SENT : this.FAILED, 
+                    status: err === "DUPLICATE" ? this.NOT_SENT : this.FAILED,
                     error: err,
                     loading: false,
                 })
@@ -93,7 +95,7 @@ class PinPopover extends React.Component {
 
                                     {/* # Translators: Some error occured when trying to pin the report*/}
                                     {gettext('Something went wrong when attempting to pin this report.')}
-                                    
+
                                 </span></p>
                         </div>
                     );

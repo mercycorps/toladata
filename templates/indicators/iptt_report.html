@@ -25,7 +25,21 @@
       </div>
     </div>
 
+    <div id="indicator_results_div" class="modal fade" role="dialog" aria-labelledby="myLargeModalLabel">
+      <div class="modal-dialog modal-lg" role="document">
+          <div class="modal-content" id="indicator_results_content">
+              <div class="modal-body" id="indicator_modal_body" style="">
+                  <button type="button" class="close" data-dismiss="modal" aria-label="Close"><span aria-hidden="true">&times;</span></button>
+                  <span id = "modalmessages"></span>
+                  <div id="indicator_results_modal_content"></div>
+              </div>
+          </div>
+      </div>
+  </div>
+
     {% include 'indicators/indicator_form_common_js.html' %}
+
+    {% include "indicators/result_form_common_js.html" %}
   <script>
     let reactContext = {{ react_context|js }};
   </script>
