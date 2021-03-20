@@ -16,9 +16,7 @@ from indicators.models import (
     Level,
     LevelTier,
     LevelTierTemplate,
-    PeriodicTarget,
     Objective,
-    DisaggregationLabel
 )
 from indicators.queries import IPTTIndicator
 from indicators.export_renderers import EM_DASH
@@ -203,8 +201,8 @@ class IndicatorPlanIndicatorSerializerBase(serializers.ModelSerializer):
     is_cumulative = serializers.SerializerMethodField()
     baseline = serializers.SerializerMethodField()
     lop_target = serializers.SerializerMethodField()
-    data_collection_frequency = serializers.StringRelatedField()
-    reporting_frequency = serializers.StringRelatedField()
+    data_collection_frequency = serializers.SerializerMethodField()
+    reporting_frequency = serializers.SerializerMethodField()
     quality_assurance_techniques = serializers.SerializerMethodField()
 
     class Meta:
@@ -244,6 +242,23 @@ class IndicatorPlanIndicatorSerializerBase(serializers.ModelSerializer):
     def get_quality_assurance_techniques(indicator):
         """returns the list of quality assurance techniques in alphabetical order in the display language"""
         return ", ".join(sorted([x.strip() for x in indicator.get_quality_assurance_techniques_display().split(',')]))
+
+    @staticmethod
+    def get_reporting_frequency(indicator):
+        """returns a string with a comma separated list of reporting frequencies"""
+        if indicator.reporting_frequencies.exists():
+            return ", ".join(sorted(
+                [x for x in indicator.reporting_frequencies.all().values_list('frequency', flat=True)]
+            ))
+        return None
+
+    @staticmethod
+    def get_data_collection_frequency(indicator):
+        """returns a string with a comma separated list of data collection frequencies"""
+        if indicator.data_collection_frequencies.exists():
+            return ", ".join(sorted(
+                [x for x in indicator.data_collection_frequencies.all().values_list('frequency', flat=True)]))
+        return None
 
     @staticmethod
     def get_lop_target(indicator):
