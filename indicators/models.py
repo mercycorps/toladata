@@ -1385,11 +1385,6 @@ class Indicator(SafeDeleteModel):
                     "specific and explain how data issues were addressed.")
     )
 
-    indicator_changes = models.TextField(
-        max_length=500, null=True, blank=True,
-        verbose_name=_("Changes to indicator"), help_text=" "
-    )
-
     comments = models.TextField(
         _("Comments"), max_length=4000, null=True, blank=True, help_text=" "
     )

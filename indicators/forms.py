@@ -202,7 +202,6 @@ class IndicatorForm(forms.ModelForm):
             'justification': forms.Textarea(attrs={'rows': 4}),
             'quality_assurance': forms.Textarea(attrs={'rows': 4}),
             'data_issues': forms.Textarea(attrs={'rows': 4}),
-            'indicator_changes': forms.Textarea(attrs={'rows': 4}),
             'comments': forms.Textarea(attrs={'rows': 4}),
             'rationale_for_target': forms.Textarea(attrs={'rows': 4}),
             'objectives': ShowOnDisabledMultiSelect,
@@ -240,7 +239,7 @@ class IndicatorForm(forms.ModelForm):
         for field in ['name', 'definition', 'justification', 'rationale_for_target',
                       'means_of_verification', 'data_collection_method', 'data_points',
                       'responsible_person', 'method_of_analysis', 'information_use',
-                      'quality_assurance', 'data_issues', 'indicator_changes', 'comments']:
+                      'quality_assurance', 'data_issues', 'comments']:
             self.fields[field].widget.attrs.pop('maxlength', None)
 
         # program_display here is to display the program without interfering in the logic that
