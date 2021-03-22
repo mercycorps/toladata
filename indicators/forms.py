@@ -25,8 +25,9 @@ from indicators.models import (
     DisaggregationLabel,
     DisaggregatedValue,
     Level,
-    IndicatorType,
     PinnedReport,
+    ReportingFrequency,
+    DataCollectionFrequency
 )
 from indicators.widgets import DataAttributesSelect, DatePicker
 
@@ -207,6 +208,8 @@ class IndicatorForm(forms.ModelForm):
             'objectives': ShowOnDisabledMultiSelect,
             'strategic_objectives': ShowOnDisabledMultiSelect,
             'indicator_type': ShowOnDisabledMultiSelect,
+            'data_collection_frequencies': ShowOnDisabledMultiSelect,
+            'reporting_frequencies': ShowOnDisabledMultiSelect,
             'means_of_verification': forms.Textarea(attrs={'rows': 4}),
             'data_collection_method': forms.Textarea(attrs={'rows': 4}),
             'data_points': forms.Textarea(attrs={'rows': 4}),
@@ -308,6 +311,14 @@ class IndicatorForm(forms.ModelForm):
         self.fields['indicator_type'].choices = sorted(
             self.fields['indicator_type'].choices,
             key=lambda choice: str_without_diacritics(choice[1])
+        )
+
+        self.fields['reporting_frequencies'].choices = list(
+            ReportingFrequency.objects.order_by('sort_order').values_list('pk', 'frequency')
+        )
+
+        self.fields['data_collection_frequencies'].choices = list(
+            DataCollectionFrequency.objects.order_by('sort_order').values_list('pk', 'frequency')
         )
 
         allowed_countries = [

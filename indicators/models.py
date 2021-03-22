@@ -636,10 +636,11 @@ class DisaggregatedValue(models.Model):
 
 class ReportingFrequency(models.Model):
     frequency = models.CharField(
-        _("Frequency"), max_length=135, blank=True)
+        _("Frequency"), max_length=135, unique=True)
     description = models.CharField(
         _("Description"), max_length=765, blank=True)
     create_date = models.DateTimeField(_("Create date"), null=True, blank=True)
+    sort_order = models.IntegerField(unique=True)
     edit_date = models.DateTimeField(_("Edit date"), null=True, blank=True)
 
     class Meta:
@@ -651,13 +652,10 @@ class ReportingFrequency(models.Model):
 
 class DataCollectionFrequency(models.Model):
     frequency = models.CharField(
-        _("Frequency"), max_length=135, blank=True, null=True)
+        _("Frequency"), max_length=135, unique=True)
     description = models.CharField(
         _("Description"), max_length=255, blank=True, null=True)
-    numdays = models.PositiveIntegerField(
-        default=0,
-        verbose_name=_("Frequency in number of days")
-    )
+    sort_order = models.IntegerField(unique=True)
     create_date = models.DateTimeField(_("Create date"), null=True, blank=True)
     edit_date = models.DateTimeField(_("Edit date"), null=True, blank=True)
 
@@ -1311,8 +1309,8 @@ class Indicator(SafeDeleteModel):
                     "for data collection.")
     )
 
-    data_collection_frequency = models.ForeignKey(
-        DataCollectionFrequency, null=True, blank=True, on_delete=models.SET_NULL,
+    data_collection_frequencies = models.ManyToManyField(
+        DataCollectionFrequency, related_name='indicators', blank=True,
         verbose_name=_("Frequency of data collection"),
         # Translators: this is help text for a field on an indicator setup form
         help_text=_("How frequently will you collect data for this indicator? The frequency and timing of data "
@@ -1355,8 +1353,9 @@ class Indicator(SafeDeleteModel):
                     "indicators are included in the program.")
     )
 
-    reporting_frequency = models.ForeignKey(
-        ReportingFrequency, null=True, blank=True, on_delete=models.SET_NULL, verbose_name=_("Frequency of reporting"),
+    reporting_frequencies = models.ManyToManyField(
+        ReportingFrequency, related_name='indicators', blank=True,
+        verbose_name=_("Frequency of reporting"),
         # Translators: this is help text for a field on an indicator setup form
         help_text=_("This frequency should make sense in relation to the data collection frequency and target "
                     "frequency and should adhere to any requirements regarding program, stakeholder, and/or donor "

@@ -310,12 +310,12 @@
                             <span id="validation_id_data_collection_method" class="has-error"></span>
                         </div>
 
-                        <div class="form-group" id="div_id_data_collection_frequency">
-                            <label for="id_data_collection_frequency"
-                                   class="">{{ form.data_collection_frequency.label }} </label>
-                            {% popover_helptext form.data_collection_frequency.help_text %}
-                            {% render_field form.data_collection_frequency class+="form-control" %}
-                            <span id="validation_id_data_collection_frequency" class="has-error"></span>
+                        <div class="form-group" id="div_id_data_collection_frequencies">
+                            <label for="id_data_collection_frequencies"
+                                   class="">{{ form.data_collection_frequencies.label }} </label>
+                            {% popover_helptext form.data_collection_frequencies.help_text %}
+                            {% render_field form.data_collection_frequencies class+="form-control" %}
+                            <span id="validation_id_data_collection_frequencies" class="has-error"></span>
                         </div>
 
                         <div class="form-group" id="div_id_data_points">
@@ -351,11 +351,11 @@
                             <span id="validation_id_information_use" class="has-error"></span>
                         </div>
 
-                        <div class="form-group" id="div_id_reporting_frequency">
-                            <label for="id_reporting_frequency" class="">{{ form.reporting_frequency.label }} </label>
-                            {% popover_helptext form.reporting_frequency.help_text %}
-                            {% render_field form.reporting_frequency class+="form-control" %}
-                            <span id="validation_id_reporting_frequency" class="has-error"></span>
+                        <div class="form-group" id="div_id_reporting_frequencies">
+                            <label for="id_reporting_frequencies" class="">{{ form.reporting_frequencies.label }} </label>
+                            {% popover_helptext form.reporting_frequencies.help_text %}
+                            {% render_field form.reporting_frequencies class+="form-control" %}
+                            <span id="validation_id_reporting_frequencies" class="has-error"></span>
                         </div>
 
                         <div class="form-group" id="div_id_quality_assurance_techniques">
@@ -515,7 +515,8 @@
         }
     });
 
-    var noSelectAllMultiselects = ['#id_indicator_type'];
+    var noSelectAllMultiselects = [
+            '#id_indicator_type', '#id_reporting_frequencies', '#id_data_collection_frequencies'];
 
     noSelectAllMultiselects.forEach(function(selectID) {
         let $select = $(selectID);
