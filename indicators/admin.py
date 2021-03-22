@@ -84,7 +84,7 @@ class IndicatorResource(resources.ModelResource):
                   'rationale_for_target', 'means_of_verification', 'data_collection_method',
                   'data_collection_frequency', 'data_points', 'responsible_person',
                   'method_of_analysis', 'information_use', 'reporting_frequency', 'quality_assurance',
-                  'data_issues', 'indicator_changes', 'comments', 'disaggregation', 'sector',
+                  'data_issues', 'comments', 'disaggregation', 'sector',
                   'program')
 
 
