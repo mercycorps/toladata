@@ -64,7 +64,7 @@ export class LevelListPanel  extends React.Component {
         return {__html: this.props.rootStore.uiStore.splashWarning }
     };
 
-    hideBanner = () => {
+    handleHideBanner = () => {
         sessionStorage.setItem("hide_bulk_import_alert", true);
     }
 
@@ -123,7 +123,7 @@ export class LevelListPanel  extends React.Component {
                         </span>
                     </div>
                 </div>
-                <button type="button" className="close" data-dismiss="alert" aria-label="Close" onClick={ this.hideBanner }>
+                <button type="button" className="close" data-dismiss="alert" aria-label="Close" onClick={ this.handleHideBanner }>
                     <span aria-hidden="true" className="x-modal">&times;</span>
                 </button>
             </div>
