@@ -14,7 +14,7 @@ describe ('Test for when there is no RF level saved', function() {
         rootStore = new RootStore(program, levels, indicators, levelTiers, JSON.stringify(tierTemplates), JSON.stringify(englishTemplates), customTemplates, programObjectives, accessLevel, usingResultsFramework, maxTiers);
     })
 
-    it('Users see Choose RF Template Carefully warning', function() {
+    it('Users should see Choose RF Template Carefully warning', function() {
         let wrapper = shallow(<LevelListPanel.wrappedComponent rootStore={rootStore}/>);
         expect(wrapper.exists('.level-list-panel')).toBe(true);
         expect(wrapper.exists('.level-list-panel__dingbat')).toBe(true);
@@ -35,7 +35,7 @@ describe ('Test for when there is no RF level saved', function() {
         let wrapper = shallow(<LevelListPanel.wrappedComponent rootStore={rootStore}/>);
         expect(wrapper.exists('#bulk-import-banner-alert')).toBe(false);
     })
-    it('Users with High Access should see Bulk Import Banner', function() {
+    it('Users with High Access should not see Bulk Import Banner', function() {
         rootStore.levelStore.accessLevel = "high"
         let wrapper = shallow(<LevelListPanel.wrappedComponent rootStore={rootStore}/>);
         expect(wrapper.exists('#bulk-import-banner-alert')).toBe(false);
