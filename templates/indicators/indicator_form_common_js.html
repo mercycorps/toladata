@@ -1264,9 +1264,6 @@
         if (getTextAreaLengthValidator('data_issues', 500)() === false) {
             validationsAnalysisTab = false;
         }
-        if (getTextAreaLengthValidator('indicator_changes', 500)() === false) {
-            validationsAnalysisTab = false;
-        }
         if (getTextAreaLengthValidator('comments', 4000)() === false) {
             validationsAnalysisTab = false;
         }
@@ -1363,7 +1360,6 @@
     $("#indicator_modal_content").on("keyup", "#id_information_use", getTextAreaLengthValidator('information_use', 500));
     $("#indicator_modal_content").on("keyup", "#id_quality_assurance", getTextAreaLengthValidator('quality_assurance', 500));
     $("#indicator_modal_content").on("keyup", "#id_data_issues", getTextAreaLengthValidator('data_issues', 500));
-    $("#indicator_modal_content").on("keyup", "#id_indicator_changes", getTextAreaLengthValidator('indicator_changes', 500));
     $("#indicator_modal_content").on("keyup", "#id_comments", getTextAreaLengthValidator('comments', 4000));
 
     $("#indicator_modal_content").on("change", "#id_indicator_type", function(e){

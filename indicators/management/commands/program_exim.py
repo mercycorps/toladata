@@ -292,7 +292,7 @@ class IndicatorNameSerializer(serializers.ModelSerializer):
         model = Indicator
 
         all_fields = set([f.name for f in Indicator._meta.get_fields()])
-        skipped_fields = {'result', 'id', 'program', 'indicator_changes'}
+        skipped_fields = {'result', 'id', 'program'}
         extra_fields = ['periodictargets', 'result_set']
         fields = list(all_fields - skipped_fields) + extra_fields
 
