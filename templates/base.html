@@ -188,10 +188,9 @@
                                     <div class="dropdown-menu" aria-labelledby="navbarUserDropdown">
                                         // 
                                         <script type="text/javascript">
-                                            // Clears Session Storage when users clicks to logout
-                                            // i.e. Clears bulk import alert banner hide status
+                                            // Clears bulk import alert banner hide status in Session Storage on logout
                                             function clearSessions() {
-                                                window.sessionStorage.clear();
+                                                window.sessionStorage.removeItem('hide_bulk_import_alert');
                                             }
                                         </script>
                                         <a class="dropdown-item" href="{% url 'profile' %}">{% trans "Settings" %}</a>
