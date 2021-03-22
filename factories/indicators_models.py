@@ -93,7 +93,7 @@ class DefinedIndicatorFactory(IndicatorFactory):
     target_frequency = Indicator.QUARTERLY
     means_of_verification = "some means of verifying"
     data_collection_method = "some method of collecting data"
-    data_collection_frequency = SubFactory('factories.indicators_models.DataCollectionFrequencyFactory')
+    data_collection_frequencies = SubFactory('factories.indicators_models.DataCollectionFrequencyFactory')
 
 
 class RFIndicatorFactory(DjangoModelFactory):
