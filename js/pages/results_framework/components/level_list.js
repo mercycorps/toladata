@@ -117,7 +117,7 @@ export class LevelListPanel  extends React.Component {
                     <div className="bulk-alert-text">
                         <span>
                             {
-                                // # Translator: TODO: ADD NOTES
+                                // # Translators: A alert to let users know that instead of entering indicators one at a time, they can use an Excel template to enter multiple indicators at the same time. First step is to build the result framework below, then click the 'Import indicators' button above
                                 gettext('Instead of entering indicators one at a time, use an Excel template to import multiple indicators! First, build your result framework below. Next, click the “Import indicators” button above.')
                             }
                         </span>
