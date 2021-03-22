@@ -14,6 +14,17 @@ describe ('Test for when there is no RF level saved', function() {
         rootStore = new RootStore(program, levels, indicators, levelTiers, JSON.stringify(tierTemplates), JSON.stringify(englishTemplates), customTemplates, programObjectives, accessLevel, usingResultsFramework, maxTiers);
     })
 
+    it('Users see Choose RF Template Carefully warning', function() {
+        let wrapper = shallow(<LevelListPanel.wrappedComponent rootStore={rootStore}/>);
+        expect(wrapper.exists('.level-list-panel')).toBe(true);
+        expect(wrapper.exists('.level-list-panel__dingbat')).toBe(true);
+        expect(wrapper.exists('.level-list-panel__text')).toBe(true);
+    })
+    it('Users should not see the level list component', function() {
+        let wrapper = shallow(<LevelListPanel.wrappedComponent rootStore={rootStore}/>);
+        expect(wrapper.exists('#level-list')).toBe(false);
+    })
+
     it('Users with Low Access should not see Bulk Import Banner', function() {
         rootStore.levelStore.accessLevel = "low"
         let wrapper = shallow(<LevelListPanel.wrappedComponent rootStore={rootStore}/>);
@@ -38,6 +49,17 @@ describe ('Test for when there is at least one RF level saved', function() {
     let rootStore;
     beforeEach(() => {
         rootStore = new RootStore(program, levels, indicators, levelTiers, JSON.stringify(tierTemplates), JSON.stringify(englishTemplates), customTemplates, programObjectives, accessLevel, usingResultsFramework, maxTiers);
+    })
+
+    it('Users should not see Choose RF Template Carefully warning', function() {
+        let wrapper = shallow(<LevelListPanel.wrappedComponent rootStore={rootStore}/>);
+        expect(wrapper.exists('.level-list-panel')).toBe(false);
+        expect(wrapper.exists('.level-list-panel__dingbat')).toBe(false);
+        expect(wrapper.exists('.level-list-panel__text')).toBe(false);
+    })
+    it('Users should see the level list component', function() {
+        let wrapper = shallow(<LevelListPanel.wrappedComponent rootStore={rootStore}/>);
+        expect(wrapper.exists('#level-list')).toBe(true);
     })
 
     it('Users with Low Access should not see Bulk Import Banner', function() {
@@ -69,6 +91,7 @@ describe ('Test for when there is at least one RF level saved', function() {
 
 });
 
+// (these tests are a template) 
 xdescribe('IndicatorStore', () => {
 
     const indicators = jsContext.indicators;
