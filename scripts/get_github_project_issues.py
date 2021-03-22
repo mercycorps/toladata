@@ -77,7 +77,7 @@ columns_url = columns_template % project_id
 response = requests.get(columns_url, headers=headers, auth=auth)
 cols_to_fetch = ['Done', 'Ready for Deploy']
 if args.column:
-    cols_to_fetch = [args.column]
+    cols_to_fetch = args.column.split(",")
 
 column_ids = [col['id'] for col in json.loads(response.text) if col['name'] in cols_to_fetch]
 issues = []
