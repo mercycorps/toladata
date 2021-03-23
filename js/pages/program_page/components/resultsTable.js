@@ -288,11 +288,11 @@ const ResultsTableTable = ({indicator, editable, ...props}) => {
  *      Messages:
  *          - "This indicator has no targets" - shown if true
  */
-const ResultsTableActions = ({indicator, editable, resultEditable, ...props}) => {
+const ResultsTableActions = ({indicator, editable, resultEditable, displayMissingTargetsWarning, ...props}) => {
     return (
         <div className="results-table__actions">
             <div className="cd-actions__message">
-            {indicator.noTargets &&
+            {(indicator.noTargets || displayMissingTargetsWarning) &&
                 <div className="text-danger">
 
                     { editable &&
@@ -339,7 +339,7 @@ export default class ResultsTable extends React.Component {
                     <ResultsTableTable indicator={this.props.indicator} editable={this.props.editable} />
                 }
                 <ResultsTableActions indicator={this.props.indicator} editable={this.props.editable}
-                    resultEditable={ this.props.resultEditable } />
+                    resultEditable={ this.props.resultEditable } displayMissingTargetsWarning={this.props.displayMissingTargetsWarning} />
             </div>
         );
     }
