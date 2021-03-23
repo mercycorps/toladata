@@ -64,6 +64,10 @@ export class LevelListPanel  extends React.Component {
         return {__html: this.props.rootStore.uiStore.splashWarning }
     };
 
+    handleHideBanner = () => {
+        sessionStorage.setItem("hide_bulk_import_alert", true);
+    }
+
     render() {
         const isCollapseAllDisabled = this.props.rootStore.uiStore.hasVisibleChildren.length === 0 ||
             this.props.rootStore.uiStore.disableCardActions ||
@@ -103,6 +107,28 @@ export class LevelListPanel  extends React.Component {
                 </div>;
 
         }
+        
+        let bulkImportBanner = 
+            <div id="bulk-import-banner-alert" className="alert fade show" role="alert">
+                <div className="bulk-alert-message">
+                    <div className="bulk-alert-icon">
+                        <i className="fas fa-bullhorn"></i>
+                    </div>
+                    <div className="bulk-alert-text">
+                        <span>
+                            {
+                                // # Translators: A alert to let users know that instead of entering indicators one at a time, they can use an Excel template to enter multiple indicators at the same time. First step is to build the result framework below, then click the 'Import indicators' button above
+                                gettext('Instead of entering indicators one at a time, use an Excel template to import multiple indicators! First, build your result framework below. Next, click the “Import indicators” button above.')
+                            }
+                        </span>
+                    </div>
+                </div>
+                <button type="button" className="close" data-dismiss="alert" aria-label="Close" onClick={ this.handleHideBanner }>
+                    <span aria-hidden="true" className="x-modal">&times;</span>
+                </button>
+            </div>
+        
+        let hideBanner = sessionStorage.getItem('hide_bulk_import_alert');
         let panel = '';
         if (this.props.rootStore.levelStore.levels.length == 0) {
             panel =
@@ -117,6 +143,7 @@ export class LevelListPanel  extends React.Component {
             panel =
                 <div id="level-list" style={{flexGrow: "2"}}>
                     {expandoDiv}
+                    {!hideBanner && this.props.rootStore.levelStore.accessLevel === 'high' ? bulkImportBanner : null}
                     <LevelList renderList='initial'/>
                 </div>
         }

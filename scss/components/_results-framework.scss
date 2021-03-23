@@ -255,3 +255,34 @@
 #logframe_link a {
     margin-left: 5px;
 }
+
+// component Bulk Import Banner Alert
+#bulk-import-banner-alert {
+    display: flex;
+    flex-direction: column;
+    background-color: $teal-100;
+    border: 1px solid $gray-400;
+
+    .bulk-alert-message {
+        display: flex;
+        align-items: center;
+        font-size: 15px;
+    }
+    
+    .bulk-alert-icon {
+        font-size: 3rem;
+        color: $teal;
+    }
+    
+    .bulk-alert-text {
+        margin-left: $grid-gutter-width/3;
+        margin-right: $grid-gutter-width/2;
+    }
+
+    .close {
+        position: absolute;
+        top: 0;
+        right: 6px;
+        color: $teal;
+    }
+}

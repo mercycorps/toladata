@@ -186,8 +186,14 @@
                                         {% firstof user.tola_user.name user.username %}
                                     </a>
                                     <div class="dropdown-menu" aria-labelledby="navbarUserDropdown">
+                                        <script type="text/javascript">
+                                            // Clears bulk import alert banner hide status in Session Storage on logout
+                                            function clearSessions() {
+                                                window.sessionStorage.removeItem('hide_bulk_import_alert');
+                                            }
+                                        </script>
                                         <a class="dropdown-item" href="{% url 'profile' %}">{% trans "Settings" %}</a>
-                                        <a class="dropdown-item" href="{% url 'logout' %}">{% trans "Log out" %}</a>
+                                        <a class="dropdown-item" href="{% url 'logout' %}" onclick="clearSessions()">{% trans "Log out" %}</a>
                                     </div>
                                 </li>
                             {% endif %}
