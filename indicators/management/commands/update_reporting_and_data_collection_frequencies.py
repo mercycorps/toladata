@@ -46,6 +46,7 @@ class Command(BaseCommand):
                     obj, created = model.objects.get_or_create(
                         frequency=freq_name, defaults={'sort_order': i})
                     if not created:
+                        obj.frequency = obj.frequency.strip()
                         obj.sort_order = i
                         obj.save()
 
