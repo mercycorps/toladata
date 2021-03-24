@@ -69,6 +69,7 @@ export class LevelListPanel  extends React.Component {
     }
 
     render() {
+        console.log(this.props.rootStore.levelStore.accessLevel);
         const isCollapseAllDisabled = this.props.rootStore.uiStore.hasVisibleChildren.length === 0 ||
             this.props.rootStore.uiStore.disableCardActions ||
             this.props.rootStore.uiStore.activeCard;
@@ -93,6 +94,20 @@ export class LevelListPanel  extends React.Component {
                         collapseFunc={this.props.rootStore.uiStore.collapseAllLevels} />
                     </div>
                     <div className="level-list--action-buttons">
+                        {
+                            this.props.rootStore.levelStore.accessLevel === "high" ?
+                                <button
+                                    type="button"
+                                    className="btn btn-sm btn-primary mx-2"
+                                    onClick={ () => alert("Bulk Import Indicator Button Clicked") }>
+                                    <i className="fas fa-download"></i>
+                                    {
+                                        //  # Translators: a button to download a spreadsheet
+                                        gettext('Import Indicators')
+                                    }
+                                </button>
+                                : null
+                        }
                         <button
                             type="button"
                             className="btn btn-sm btn-secondary"
