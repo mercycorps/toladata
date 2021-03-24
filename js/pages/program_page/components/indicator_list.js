@@ -220,7 +220,7 @@ export class IndicatorListTable extends React.Component {
                     return displayFunc(val);
                 }
                 const displayUnassignedWarning = indicator.noTargetResults.length > 0 && indicator.periodicTargets.length > 0
-                const displayMissingTargetsWarning = indicator.periodicTargets.length === 0
+                const displayMissingTargetsWarning = indicator.periodicTargets.length === 0 || (targetPeriodLastEndDate && program.reportingPeriodEnd > targetPeriodLastEndDate)
                 return <React.Fragment key={indicator.pk}>
                     <tr className={classNames("indicators-list__row", "indicators-list__indicator-header", {
                         "is-highlighted": indicator.wasJustCreated,
@@ -251,19 +251,7 @@ export class IndicatorListTable extends React.Component {
                                         gettext('Indicator missing targets')
                                 }</span>
                             }
-
-
-                            {targetPeriodLastEndDate && program.reportingPeriodEnd > targetPeriodLastEndDate &&
-                            <a href={`/indicators/indicator_update/${indicator.pk}/`}
-                               className="indicator-link color-red missing_targets"
-                               data-toggle="modal" data-target="#indicator_modal_div"
-                               data-tab="targets">
-                                <i className="fas fa-bullseye"/> {
-                                    /* # Translators: Adj: labels this indicator as one which is missing one or more targets */
-                                    gettext('Missing targets')
-                                }
-                            </a>
-                            }
+                            
                         </td>
                         <td>
                             <a href="#" className="indicator-link"
@@ -279,7 +267,12 @@ export class IndicatorListTable extends React.Component {
                     <tr className="indicators-list__row indicators-list__indicator-body">
                         <td colSpan="6">
                             {/* result_table.html container */}
-                                <ResultsTable indicator={ indicator } editable={editable} resultEditable={ resultEditable }/>
+                                <ResultsTable 
+                                    indicator={ indicator } 
+                                    editable={ editable } 
+                                    resultEditable={ resultEditable } 
+                                    displayMissingTargetsWarning={ displayMissingTargetsWarning }
+                                />
                         </td>
                     </tr>
                     }
