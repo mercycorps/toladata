@@ -143,7 +143,13 @@ export class LevelListPanel  extends React.Component {
             panel =
                 <div id="level-list" style={{flexGrow: "2"}}>
                     {expandoDiv}
-                    {!hideBanner && this.props.rootStore.levelStore.accessLevel === 'high' && this.props.rootStore.levelStore.levels[0].id !== 'new' ? bulkImportBanner : null}
+                    {
+                        !hideBanner && 
+                        this.props.rootStore.levelStore.accessLevel === 'high' && 
+                        this.props.rootStore.levelStore.levels[0].id !== 'new' 
+                        ? bulkImportBanner 
+                        : null
+                    }
                     <LevelList renderList='initial'/>
                 </div>
         }
