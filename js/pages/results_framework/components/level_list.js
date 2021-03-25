@@ -65,7 +65,7 @@ export class LevelListPanel  extends React.Component {
     };
 
     handleHideBanner = () => {
-        sessionStorage.setItem("hide_bulk_import_alert", true);
+        localStorage.setItem("hide_bulk_import_alert", true);
     }
 
     render() {
@@ -128,7 +128,7 @@ export class LevelListPanel  extends React.Component {
                 </button>
             </div>
         
-        let hideBanner = sessionStorage.getItem('hide_bulk_import_alert');
+        let hideBanner = localStorage.getItem('hide_bulk_import_alert');
         let panel = '';
         if (this.props.rootStore.levelStore.levels.length == 0) {
             panel =
@@ -143,7 +143,7 @@ export class LevelListPanel  extends React.Component {
             panel =
                 <div id="level-list" style={{flexGrow: "2"}}>
                     {expandoDiv}
-                    {!hideBanner && this.props.rootStore.levelStore.accessLevel === 'high' ? bulkImportBanner : null}
+                    {!hideBanner && this.props.rootStore.levelStore.accessLevel === 'high' && this.props.rootStore.levelStore.levels[0].id !== 'new' ? bulkImportBanner : null}
                     <LevelList renderList='initial'/>
                 </div>
         }
