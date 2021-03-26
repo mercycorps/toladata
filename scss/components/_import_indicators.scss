@@ -1,0 +1,13 @@
+.import-text {
+    padding-left: 20px;
+}
+
+
+.import-buttons {
+    display: flex;
+    flex-direction: column;
+
+    button {
+        margin: .25rem;
+    }
+}
