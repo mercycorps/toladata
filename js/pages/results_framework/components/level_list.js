@@ -141,7 +141,7 @@ export class LevelListPanel  extends React.Component {
                 role="alert" 
                 id="bulk-import-banner-alert" 
                 className="alert fade show" 
-                hidden={this.state.show_import_banner === false} // Hide alert Bulk Import Banner if stored as false in Django's Session Storage
+                hidden={this.state.show_import_banner === false} // Hide Bulk Import Banner if stored as false in Django's Session Storage
             >
                 <div className="bulk-alert-message">
                     <div className="bulk-alert-icon">
