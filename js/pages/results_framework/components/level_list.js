@@ -63,7 +63,7 @@ export class LevelListPanel  extends React.Component {
     constructor(props) {
         super(props);
         this.state = {
-            show_import_banner: null
+            show_import_banner: false
         };
     }
 
@@ -71,7 +71,7 @@ export class LevelListPanel  extends React.Component {
         return {__html: this.props.rootStore.uiStore.splashWarning }
     };
 
-    // Handles showing the Bulk Import Banner using Django's Session Storage
+    // Handles getting the show/hide flag for the Bulk Import Banner in Django's Session Storage
     componentDidMount = () => {
         $.ajax({
             type: "GET",
@@ -87,14 +87,9 @@ export class LevelListPanel  extends React.Component {
                 })
             },
             error: (error) => {
-                console.log('Error:', error);
+                console.log('Error:', error.statusText);
             }
         })
-    }
-    
-    // Handles displaying the Bulk Import Banner using the browser's Local Storage
-    handleDisplayBanner = () => {
-        localStorage.setItem("display_bulk_import_alert", false);
     }
 
     render() {
@@ -141,7 +136,7 @@ export class LevelListPanel  extends React.Component {
                 role="alert" 
                 id="bulk-import-banner-alert" 
                 className="alert fade show" 
-                hidden={this.state.show_import_banner === false} // Hide Bulk Import Banner if stored as false in Django's Session Storage
+                hidden={this.state.show_import_banner !== true} // Hides Bulk Import Banner if stored as false in Django's Session Storage
             >
                 <div className="bulk-alert-message">
                     <div className="bulk-alert-icon">
@@ -156,10 +151,11 @@ export class LevelListPanel  extends React.Component {
                         </span>
                     </div>
                 </div>
-                <button type="button" className="close" data-dismiss="alert" aria-label="Close" onClick={ this.handleDisplayBanner }>
+                <button type="button" className="close" data-dismiss="alert" aria-label="Close" >
                     <span aria-hidden="true" className="x-modal">&times;</span>
                 </button>
             </div>
+
         let panel = '';
         if (this.props.rootStore.levelStore.levels.length == 0) {
             panel =
@@ -171,12 +167,10 @@ export class LevelListPanel  extends React.Component {
                          dangerouslySetInnerHTML={this.getWarningText()}/>
                 </div>
         } else {
-            let displayBanner = localStorage.getItem('display_bulk_import_alert') || true;
             panel =
                 <div id="level-list" style={{flexGrow: "2"}}>
                     {expandoDiv}
                     {
-                        displayBanner === true && // Does not display Bulk Import Banner if stored as false in the Browser's Local Storage
                         this.props.rootStore.levelStore.accessLevel === 'high' && 
                         this.props.rootStore.levelStore.levels[0].id !== 'new' 
                         ? bulkImportBanner 
