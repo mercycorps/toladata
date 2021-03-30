@@ -309,7 +309,7 @@ const ResultsTableActions = ({indicator, editable, resultEditable, displayMissin
             }
             </div>
             {resultEditable &&
-                <div className={indicator.noTargets ? "cd-actions__button disable-span" : "cd-actions__button"}>
+                <div className={(indicator.noTargets || displayMissingTargetsWarning) ? "cd-actions__button disable-span" : "cd-actions__button"}>
                     <a href={`/indicators/result_add/${indicator.pk}/`}
                         className="btn-link btn-add results__link">
                         <FontAwesomeIcon icon={ faPlusCircle } />
