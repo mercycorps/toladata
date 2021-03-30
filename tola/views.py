@@ -201,6 +201,18 @@ def update_user_session(request):
             logger.error(error)
             return HttpResponse(error, status=500)
         return HttpResponse(status=204)
+    if request.is_ajax() and request.method == "GET": 
+        error = None
+        try:
+            query = request.GET["query"]
+            dump = json.dumps({"result": request.session.get(query)})
+            return HttpResponse(dump, content_type='application/json', status=200)
+        except:
+            error = "Error getting session variables (request params {0})".format(query)
+        if error is not None:
+            logger.error(error)
+            return HttpResponse(error, status=500)
+        return HttpResponse(status=204)
     logger.warning(
         "Attempted to access update_user_session with method: %s / %s, and payload: %s",
         request.method, "AJAX" if request.is_ajax() else "synchronous", request.body
