@@ -2,8 +2,8 @@ msgid ""
 msgstr ""
 "Project-Id-Version: \n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2021-03-24 14:50-0700\n"
-"PO-Revision-Date: 2021-03-24 14:57-0700\n"
+"POT-Creation-Date: 2021-03-25 17:03-0700\n"
+"PO-Revision-Date: 2021-03-25 18:10-0700\n"
 "Last-Translator: \n"
 "Language-Team: \n"
 "Language: fr\n"
@@ -201,11 +201,15 @@ msgstr "Vie du programme (LoP) seulement"
 msgid "Midline and endline"
 msgstr "Mesure de mi-parcours et mesure de fin de programme"
 
+#. Translators: One of several options for specifying how often data is collected or reported on over the life of a program
 #: js/constants.js:39 js/pages/iptt_quickstart/models/ipttQSRootStore.js:32
+#: tola/db_translations.js:14
 msgid "Annual"
 msgstr "Annuel"
 
+#. Translators: One of several options for specifying how often data is collected or reported on over the life of a program
 #: js/constants.js:40 js/pages/iptt_quickstart/models/ipttQSRootStore.js:33
+#: tola/db_translations.js:8
 msgid "Semi-annual"
 msgstr "Semestriel"
 
@@ -213,11 +217,15 @@ msgstr "Semestriel"
 msgid "Tri-annual"
 msgstr "Quadrimestriel"
 
+#. Translators: One of several options for specifying how often data is collected or reported on over the life of a program
 #: js/constants.js:42 js/pages/iptt_quickstart/models/ipttQSRootStore.js:35
+#: tola/db_translations.js:22
 msgid "Quarterly"
 msgstr "Trimestriel"
 
+#. Translators: One of several options for specifying how often data is collected or reported on over the life of a program
 #: js/constants.js:43 js/pages/iptt_quickstart/models/ipttQSRootStore.js:36
+#: tola/db_translations.js:2
 msgid "Monthly"
 msgstr "Mensuel"
 
@@ -551,9 +559,11 @@ msgid "# / %"
 msgstr "# / %"
 
 #. Translators: Column header */
+#. Translators: One of several options for specifying how often data is collected or reported on over the life of a program
 #: js/pages/iptt_report/components/report/tableHeader.js:159
 #: js/pages/iptt_report/models/filterStore.js:737
 #: js/pages/program_page/components/indicator_list.js:198
+#: tola/db_translations.js:26
 msgid "Baseline"
 msgstr "Mesure de base"
 
@@ -1236,7 +1246,8 @@ msgstr ""
 msgid "Results framework template"
 msgstr "Modèle de cadre de résultats"
 
-#: js/pages/results_framework/models.js:44
+#. Translators: One of several choices for specifying what type of Indicator is being created.  An Indicator is a performance measure e.g. "We will distrubute 1000 food packs over the next two months"
+#: js/pages/results_framework/models.js:44 tola/db_translations.js:120
 msgid "Custom"
 msgstr "Personnalisé"
 
@@ -2253,6 +2264,388 @@ msgstr "Super administrateur"
 #: js/pages/tola_management_pages/user/views.js:362
 msgid "users"
 msgstr "utilisateurs"
+
+#. Translators: One of several options for specifying how often data is collected or reported on over the life of a program
+#: tola/db_translations.js:4
+msgid "By batch"
+msgstr "Lorem ipsum"
+
+#. Translators: One of several options for specifying how often data is collected or reported on over the life of a program
+#: tola/db_translations.js:6
+msgid "Weekly"
+msgstr "Lorem ipsum"
+
+#. Translators: One of several options for specifying how often data is collected or reported on over the life of a program
+#: tola/db_translations.js:10
+#, fuzzy
+#| msgid "Most recent"
+msgid "By event"
+msgstr "Plus récent"
+
+#. Translators: One of several options for specifying how often data is collected or reported on over the life of a program
+#: tola/db_translations.js:12
+msgid "Midline"
+msgstr "Lorem ipsum"
+
+#. Translators: One of several options for specifying how often data is collected or reported on over the life of a program
+#: tola/db_translations.js:16
+msgid "Endline"
+msgstr "Lorem ipsum"
+
+#. Translators: One of several options for specifying how often data is collected or reported on over the life of a program
+#: tola/db_translations.js:18
+msgid "By distribution"
+msgstr "Lorem ipsum"
+
+#. Translators: One of several options for specifying how often data is collected or reported on over the life of a program
+#: tola/db_translations.js:20
+msgid "Post shock"
+msgstr "Lorem ipsum"
+
+#. Translators: One of several options for specifying how often data is collected or reported on over the life of a program
+#: tola/db_translations.js:24
+msgid "By training"
+msgstr "Lorem ipsum"
+
+#. Translators: One of several choices for what sector (i.e. development domain) a program is most closely associated with
+#: tola/db_translations.js:28
+msgid "Agribusiness"
+msgstr "Lorem ipsum"
+
+#. Translators: One of several choices for what sector (i.e. development domain) a program is most closely associated with
+#: tola/db_translations.js:30
+msgid "Agriculture"
+msgstr "Lorem ipsum dolor sit amet  dolor sit amet"
+
+#. Translators: One of several choices for what sector (i.e. development domain) a program is most closely associated with
+#: tola/db_translations.js:32
+msgid "Agriculture and Food Security"
+msgstr "Lorem ipsum dolor sit amet  dolor sit amet"
+
+#. Translators: One of several choices for what sector (i.e. development domain) a program is most closely associated with
+#: tola/db_translations.js:34
+msgid "Basic Needs"
+msgstr "Lorem ipsum dolor sit amet  dolor sit amet"
+
+#. Translators: One of several choices for what sector (i.e. development domain) a program is most closely associated with
+#: tola/db_translations.js:36
+msgid "Capacity development"
+msgstr "Lorem ipsum dolor sit amet  dolor sit amet"
+
+#. Translators: One of several choices for what sector (i.e. development domain) a program is most closely associated with
+#: tola/db_translations.js:38
+msgid "Child Health & Nutrition"
+msgstr "Lorem ipsum dolor sit amet  dolor sit amet"
+
+#. Translators: One of several choices for what sector (i.e. development domain) a program is most closely associated with
+#: tola/db_translations.js:40
+msgid "Climate Change Adaptation & Disaster Risk Reduction"
+msgstr "Lorem ipsum dolor sit amet  dolor sit amet"
+
+#. Translators: One of several choices for what sector (i.e. development domain) a program is most closely associated with
+#: tola/db_translations.js:42
+msgid "Conflict Management"
+msgstr "Lorem ipsum dolor sit amet  dolor sit amet"
+
+#. Translators: One of several choices for what sector (i.e. development domain) a program is most closely associated with
+#: tola/db_translations.js:44
+msgid "Early Economic Recovery"
+msgstr "Lorem ipsum dolor sit amet  dolor sit amet"
+
+#. Translators: One of several choices for what sector (i.e. development domain) a program is most closely associated with
+#: tola/db_translations.js:46
+msgid "Economic and Market Development"
+msgstr "Lorem ipsum dolor sit amet  dolor sit amet"
+
+#. Translators: One of several choices for what sector (i.e. development domain) a program is most closely associated with
+#: tola/db_translations.js:48
+msgid "Economic Recovery and Market Systems"
+msgstr "Lorem ipsum dolor sit amet  dolor sit amet"
+
+#. Translators: One of several choices for what sector (i.e. development domain) a program is most closely associated with
+#: tola/db_translations.js:50
+msgid "Education Support"
+msgstr "Lorem ipsum"
+
+#. Translators: One of several choices for what sector (i.e. development domain) a program is most closely associated with
+#: tola/db_translations.js:52
+msgid "Emergency"
+msgstr "Lorem ipsum"
+
+#. Translators: One of several choices for what sector (i.e. development domain) a program is most closely associated with
+#: tola/db_translations.js:54
+msgid "Employment/Entrepreneurship"
+msgstr "Lorem ipsum dolor sit amet  dolor sit amet"
+
+#. Translators: One of several choices for what sector (i.e. development domain) a program is most closely associated with
+#: tola/db_translations.js:56
+msgid "Energy Access"
+msgstr "Lorem ipsum"
+
+#. Translators: One of several choices for what sector (i.e. development domain) a program is most closely associated with
+#: tola/db_translations.js:58
+msgid "Energy and Natural Resources"
+msgstr "Lorem ipsum dolor sit amet  dolor sit amet"
+
+#. Translators: One of several choices for what sector (i.e. development domain) a program is most closely associated with
+#: tola/db_translations.js:60
+msgid "Environment Disaster/Risk Reduction"
+msgstr "Lorem ipsum dolor sit amet  dolor sit amet"
+
+#. Translators: One of several choices for what sector (i.e. development domain) a program is most closely associated with
+#: tola/db_translations.js:62
+msgid "Financial Inclusion"
+msgstr "Lorem ipsum dolor sit amet  dolor sit amet"
+
+#. Translators: One of several choices for what sector (i.e. development domain) a program is most closely associated with
+#: tola/db_translations.js:64
+msgid "Food"
+msgstr "Lorem ipsum"
+
+#. Translators: One of several choices for what sector (i.e. development domain) a program is most closely associated with
+#: tola/db_translations.js:66
+msgid "Food Security"
+msgstr "Lorem ipsum"
+
+#. Translators: One of several choices for what sector (i.e. development domain) a program is most closely associated with
+#: tola/db_translations.js:68
+msgid "Gender"
+msgstr "Lorem ipsum"
+
+#. Translators: One of several choices for what sector (i.e. development domain) a program is most closely associated with
+#: tola/db_translations.js:70
+msgid "Governance"
+msgstr "Lorem ipsum"
+
+#. Translators: One of several choices for what sector (i.e. development domain) a program is most closely associated with
+#: tola/db_translations.js:72
+msgid "Governance & Partnerships"
+msgstr "Lorem ipsum dolor sit amet  dolor sit amet"
+
+#. Translators: One of several choices for what sector (i.e. development domain) a program is most closely associated with
+#: tola/db_translations.js:74
+msgid "Governance and Conflict Resolution"
+msgstr "Lorem ipsum dolor sit amet  dolor sit amet"
+
+#. Translators: One of several choices for what sector (i.e. development domain) a program is most closely associated with
+#: tola/db_translations.js:76
+msgid "Health"
+msgstr "Lorem ipsum"
+
+#. Translators: One of several choices for what sector (i.e. development domain) a program is most closely associated with
+#: tola/db_translations.js:78
+msgid "Humanitaria Intervention Readiness"
+msgstr "Lorem ipsum dolor sit amet  dolor sit amet"
+
+#. Translators: One of several choices for what sector (i.e. development domain) a program is most closely associated with
+#: tola/db_translations.js:80
+msgid "Hygiene Promotion"
+msgstr "Lorem ipsum"
+
+#. Translators: One of several choices for what sector (i.e. development domain) a program is most closely associated with
+#: tola/db_translations.js:82
+msgid "Information Dissemination"
+msgstr "Lorem ipsum dolor sit amet  dolor sit amet"
+
+#. Translators: One of several choices for what sector (i.e. development domain) a program is most closely associated with
+#: tola/db_translations.js:84
+msgid "Knowledge Management "
+msgstr "Lorem ipsum dolor sit amet  dolor sit amet"
+
+#. Translators: One of several choices for what sector (i.e. development domain) a program is most closely associated with
+#: tola/db_translations.js:86
+msgid "Livelihoods"
+msgstr "Lorem ipsum"
+
+#. Translators: One of several choices for what sector (i.e. development domain) a program is most closely associated with
+#: tola/db_translations.js:88
+msgid "Market Systems Development"
+msgstr "Lorem ipsum dolor sit amet  dolor sit amet"
+
+#. Translators: One of several choices for what sector (i.e. development domain) a program is most closely associated with
+#: tola/db_translations.js:90
+msgid "Maternal Health & Nutrition"
+msgstr "Lorem ipsum dolor sit amet  dolor sit amet"
+
+#. Translators: One of several choices for what sector (i.e. development domain) a program is most closely associated with
+#: tola/db_translations.js:92
+msgid "Non food Items (NFIs)"
+msgstr "Lorem ipsum dolor sit amet  dolor sit amet"
+
+#. Translators: One of several choices for what sector (i.e. development domain) a program is most closely associated with
+#: tola/db_translations.js:94
+msgid "Nutrition Sensitive"
+msgstr "Lorem ipsum dolor sit amet  dolor sit amet"
+
+#. Translators: One of several choices for what sector (i.e. development domain) a program is most closely associated with
+#: tola/db_translations.js:96
+msgid "Project Monitoring"
+msgstr "Lorem ipsum dolor sit amet  dolor sit amet"
+
+#. Translators: One of several choices for what sector (i.e. development domain) a program is most closely associated with
+#: tola/db_translations.js:98
+msgid "Protection"
+msgstr "Lorem ipsum dolor sit amet  dolor sit amet"
+
+#. Translators: One of several choices for what sector (i.e. development domain) a program is most closely associated with
+#: tola/db_translations.js:100
+msgid "Psychosocial"
+msgstr "Lorem ipsum dolor sit amet  dolor sit amet"
+
+#. Translators: One of several choices for what sector (i.e. development domain) a program is most closely associated with
+#: tola/db_translations.js:102
+msgid "Public Health"
+msgstr "Lorem ipsum dolor sit amet  dolor sit amet"
+
+#. Translators: One of several choices for what sector (i.e. development domain) a program is most closely associated with
+#: tola/db_translations.js:104
+msgid "Resilience"
+msgstr "Lorem ipsum dolor sit amet  dolor sit amet"
+
+#. Translators: One of several choices for what sector (i.e. development domain) a program is most closely associated with
+#: tola/db_translations.js:106
+msgid "Sanitation Infrastructure"
+msgstr "Lorem ipsum dolor sit amet  dolor sit amet"
+
+#. Translators: One of several choices for what sector (i.e. development domain) a program is most closely associated with
+#: tola/db_translations.js:108
+msgid "Skills and Training"
+msgstr "Lorem ipsum dolor sit amet  dolor sit amet"
+
+#. Translators: One of several choices for what sector (i.e. development domain) a program is most closely associated with
+#: tola/db_translations.js:110
+msgid "Urban Issues"
+msgstr "Lorem ipsum"
+
+#. Translators: One of several choices for what sector (i.e. development domain) a program is most closely associated with
+#: tola/db_translations.js:112
+msgid "WASH"
+msgstr "Lorem ipsum"
+
+#. Translators: One of several choices for what sector (i.e. development domain) a program is most closely associated with
+#: tola/db_translations.js:114
+msgid "Water Supply Infrastructure"
+msgstr "Lorem ipsum dolor sit amet  dolor sit amet"
+
+#. Translators: One of several choices for what sector (i.e. development domain) a program is most closely associated with
+#: tola/db_translations.js:116
+msgid "Workforce Development"
+msgstr "Lorem ipsum dolor sit amet  dolor sit amet"
+
+#. Translators: One of several choices for what sector (i.e. development domain) a program is most closely associated with
+#: tola/db_translations.js:118
+msgid "Youth"
+msgstr "Lorem ipsum"
+
+#. Translators: One of several choices for specifying what type of Indicator is being created.  An Indicator is a performance measure e.g. "We will distrubute 1000 food packs over the next two months"
+#: tola/db_translations.js:122
+msgid "Donor"
+msgstr "Lorem ipsum"
+
+#. Translators: One of several choices for specifying what type of Indicator is being created.  An Indicator is a performance measure e.g. "We will distrubute 1000 food packs over the next two months"
+#: tola/db_translations.js:124
+msgid "DIG - Standard"
+msgstr "Lorem ipsum"
+
+#. Translators: One of several choices for specifying what type of Indicator is being created.  An Indicator is a performance measure e.g. "We will distrubute 1000 food packs over the next two months"
+#: tola/db_translations.js:126
+msgid "DIG - Alpha"
+msgstr "Lorem ipsum"
+
+#. Translators: One of several choices for specifying what type of Indicator is being created.  An Indicator is a performance measure e.g. "We will distrubute 1000 food packs over the next two months"
+#: tola/db_translations.js:128
+msgid "DIG - Testing"
+msgstr "Lorem ipsum"
+
+#. Translators: One of several choices for specifying what type of Indicator is being created.  An Indicator is a performance measure e.g. "We will distrubute 1000 food packs over the next two months"
+#: tola/db_translations.js:130
+msgid "Performance"
+msgstr "Lorem ipsum"
+
+#. Translators: One of several choices for specifying what type of Indicator is being created.  An Indicator is a performance measure e.g. "We will distrubute 1000 food packs over the next two months"
+#: tola/db_translations.js:132
+msgid "Process / Management"
+msgstr "Lorem ipsum dolor sit amet  dolor sit amet"
+
+#. Translators: One of several choices for specifying what type of Indicator is being created.  An Indicator is a performance measure e.g. "We will distrubute 1000 food packs over the next two months"
+#: tola/db_translations.js:134
+msgid "Context / Trigger"
+msgstr "Lorem ipsum dolor sit amet  dolor sit amet"
+
+#. Translators: One of several choices for specifying what type of Indicator is being created.  An Indicator is a performance measure e.g. "We will distrubute 1000 food packs over the next two months"
+#: tola/db_translations.js:136
+msgid "Key Performance Indicator (KPI)"
+msgstr "Lorem ipsum dolor sit amet  dolor sit amet"
+
+#, fuzzy
+#~| msgid "Semi-annual"
+#~ msgid "Semi Annually"
+#~ msgstr "Semestriel"
+
+#, fuzzy
+#~| msgid "Quarterly"
+#~ msgid "Quarterly "
+#~ msgstr "Trimestriel"
+
+#, fuzzy
+#~| msgid "Midline and endline"
+#~ msgid "Midline, Endline"
+#~ msgstr "Mesure de mi-parcours et mesure de fin de programme"
+
+#, fuzzy
+#~| msgid "Quarterly"
+#~ msgid "Monthly & Quarterly"
+#~ msgstr "Trimestriel"
+
+#, fuzzy
+#~| msgid "Midline and endline"
+#~ msgid "Baseline and Endline"
+#~ msgstr "Mesure de mi-parcours et mesure de fin de programme"
+
+#, fuzzy
+#~| msgid "Midline and endline"
+#~ msgid "Baseline, Midline and Endline"
+#~ msgstr "Mesure de mi-parcours et mesure de fin de programme"
+
+#, fuzzy
+#~| msgid "Semi-annual"
+#~ msgid "Semi-annually"
+#~ msgstr "Semestriel"
+
+#, fuzzy
+#~| msgid "Program name"
+#~ msgid "Program End"
+#~ msgstr "Nom du programme"
+
+#, fuzzy
+#~| msgid "Monthly"
+#~ msgid "Monthly "
+#~ msgstr "Mensuel"
+
+#, fuzzy
+#~| msgid "Annual"
+#~ msgid "Annually"
+#~ msgstr "Annuel"
+
+#, fuzzy
+#~| msgid "Most recent"
+#~ msgid "Post Event"
+#~ msgstr "Plus récent"
+
+#, fuzzy
+#~| msgid "Midline and endline"
+#~ msgid "Baseline, Midline, Endline"
+#~ msgstr "Mesure de mi-parcours et mesure de fin de programme"
+
+#, fuzzy
+#~| msgid "Quarterly"
+#~ msgid "Quarterly, Annually"
+#~ msgstr "Trimestriel"
+
+#, fuzzy
+#~| msgid "Baseline"
+#~ msgid "Baseline, Endline"
+#~ msgstr "Mesure de base"
 
 #~ msgid "Missing targets"
 #~ msgstr "Cibles manquantes"

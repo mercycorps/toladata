@@ -312,9 +312,10 @@ class IndicatorForm(forms.ModelForm):
             key=lambda choice: str_without_diacritics(choice[1])
         )
 
-        self.fields['reporting_frequencies'].choices = list(
+        english_reporting_frequencies = list(
             ReportingFrequency.objects.order_by('sort_order').values_list('pk', 'frequency')
         )
+        self.fields['reporting_frequencies'].choices = [(pk, _(freq)) for pk, freq in english_reporting_frequencies]
 
         self.fields['data_collection_frequencies'].choices = list(
             DataCollectionFrequency.objects.order_by('sort_order').values_list('pk', 'frequency')
