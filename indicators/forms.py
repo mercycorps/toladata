@@ -312,14 +312,14 @@ class IndicatorForm(forms.ModelForm):
             key=lambda choice: str_without_diacritics(choice[1])
         )
 
-        english_reporting_frequencies = list(
-            ReportingFrequency.objects.order_by('sort_order').values_list('pk', 'frequency')
-        )
-        self.fields['reporting_frequencies'].choices = [(pk, _(freq)) for pk, freq in english_reporting_frequencies]
+        reporting_frequencies = list(
+            ReportingFrequency.objects.order_by('sort_order').values_list('pk', 'frequency'))
+        self.fields['reporting_frequencies'].choices = [(pk, _(freq)) for pk, freq in reporting_frequencies]
 
-        self.fields['data_collection_frequencies'].choices = list(
-            DataCollectionFrequency.objects.order_by('sort_order').values_list('pk', 'frequency')
-        )
+        data_collection_frequencies = list(
+            DataCollectionFrequency.objects.order_by('sort_order').values_list('pk', 'frequency'))
+        self.fields['data_collection_frequencies'].choices = [
+            (pk, _(freq)) for pk, freq in data_collection_frequencies]
 
         allowed_countries = [
             *self.request.user.tola_user.access_data.get('countries', {}).keys(),
