@@ -168,12 +168,16 @@ class IPTTProgramFilterItemsMixin:
         context['indicator_types'] = list(IndicatorType.objects.select_related(None).prefetch_related(None).filter(
             indicator__program_id=program_pk
         ).order_by('indicator_type').distinct().values('pk', name=models.F('indicator_type')))
+        for indicator_type in context['indicator_types']:
+            indicator_type['name'] = _(indicator_type['name'])
         context['sites'] = list(SiteProfile.objects.select_related(None).prefetch_related(None).filter(
             result__indicator__program_id=program_pk
         ).order_by('name').distinct().values('pk', 'name'))
         context['sectors'] = list(Sector.objects.select_related(None).prefetch_related(None).filter(
             indicator__program_id=program_pk
         ).order_by('sector').distinct().values('pk', name=models.F('sector')))
+        for sector in context['sectors']:
+            sector['name'] = _(sector['name'])
         context['disaggregations'] = IPTTJSONDisaggregationSerializer.load_for_program(program_pk).data
         context['now'] = timezone.now().date()
         return context
