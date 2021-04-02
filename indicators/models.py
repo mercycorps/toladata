@@ -1448,7 +1448,7 @@ class Indicator(SafeDeleteModel):
         self.edit_date = timezone.now()
         if self.level and self.level.program_id != self.program_id:
             raise ValidationError(
-                # Translators: This is an error message that is returned when a user is trying to assign an indicator to the wrong hierarch of levels.
+                # Translators: This is an error message that is returned when a user is trying to assign an indicator to the wrong hierarchy of levels.
                 _('Level/Indicator mismatched program IDs ' +
                   '(level %(level_program_id)d and indicator %(indicator_program_id)d)'),
                 code='foreign_key_constraint',
