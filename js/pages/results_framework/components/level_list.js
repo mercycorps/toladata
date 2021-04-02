@@ -63,7 +63,7 @@ export class LevelListPanel  extends React.Component {
     constructor(props) {
         super(props);
         this.state = {
-            show_import_banner: false
+            show_import_banner: null
         };
     }
 
@@ -73,23 +73,54 @@ export class LevelListPanel  extends React.Component {
 
     // Handles getting the show/hide flag for the Bulk Import Banner in Django's Session Storage
     componentDidMount = () => {
-        $.ajax({
-            type: "GET",
-            url: "/update_user_session/",
-            contentType: "application/json",
-            data: {
-                query: "show_import_banner"
-            }
-            ,
-            success: (data) => {
+        let mounted = true;
+
+        let checkSessions = async () => {
+            const response = await $.ajax({
+                type: "GET",
+                url: this.props.url || "/update_user_session/",
+                contentType: "application/json",
+                data: {
+                    query: "show_import_banner"
+                }
+                ,
+                success: (data) => {
+                    console.log("DATA: ", data.result);
+                    return data
+                    // this.setState({
+                    //     show_import_banner: data.result
+                    // })
+                },
+                error: (error) => {
+                    console.log('Error:', error.statusText);
+                }
+            })
+            console.log(this.state.show_import_banner);
+            if (mounted) {
+                console.log('response', response.result);
                 this.setState({
-                    show_import_banner: data.result
+                    show_import_banner: response.result
                 })
-            },
-            error: (error) => {
-                console.log('Error:', error.statusText);
+
+
+
+                $('#bulk-import-banner-alert').on('close.bs.alert', function() {
+                    console.log("Send update");
+                    let ajaxSettings = {
+                        type: 'PUT',
+                        url: '/update_user_session/',
+                        contentType: 'application/json',
+                        data: JSON.stringify({show_import_banner: false}),
+                        processData: false
+                    };
+                    let updateRequest = $.ajax(ajaxSettings);
+                });
             }
-        })
+        }
+        checkSessions();
+        return () => {
+            mounted = false;
+        }
     }
 
     render() {
@@ -136,7 +167,6 @@ export class LevelListPanel  extends React.Component {
                 role="alert" 
                 id="bulk-import-banner-alert" 
                 className="alert fade show" 
-                hidden={this.state.show_import_banner !== true} // Hides Bulk Import Banner if stored as false in Django's Session Storage
             >
                 <div className="bulk-alert-message">
                     <div className="bulk-alert-icon">
@@ -171,6 +201,7 @@ export class LevelListPanel  extends React.Component {
                 <div id="level-list" style={{flexGrow: "2"}}>
                     {expandoDiv}
                     {
+                        this.state.show_import_banner && // Hides Bulk Import Banner if stored as false in Django's Session Storage
                         this.props.rootStore.levelStore.accessLevel === 'high' && 
                         this.props.rootStore.levelStore.levels[0].id !== 'new' 
                         ? bulkImportBanner 
