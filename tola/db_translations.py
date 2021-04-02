@@ -1,33 +1,33 @@
 from django.utils.translation import ugettext_lazy as _
 
 # Translators: One of several options for specifying how often data is collected or reported on over the life of a program
-string0 = _("Quarterly")
+string0 = _("Annual")
 # Translators: One of several options for specifying how often data is collected or reported on over the life of a program
-string1 = _("By batch")
+string1 = _("Quarterly")
 # Translators: One of several options for specifying how often data is collected or reported on over the life of a program
-string2 = _("Midline")
+string2 = _("Endline")
 # Translators: One of several options for specifying how often data is collected or reported on over the life of a program
-string3 = _("Final evaluation")
+string3 = _("Midline")
 # Translators: One of several options for specifying how often data is collected or reported on over the life of a program
-string4 = _("Endline")
+string4 = _("Weekly")
 # Translators: One of several options for specifying how often data is collected or reported on over the life of a program
-string5 = _("By event")
+string5 = _("By training")
 # Translators: One of several options for specifying how often data is collected or reported on over the life of a program
-string6 = _("By training")
+string6 = _("Semi-annual")
 # Translators: One of several options for specifying how often data is collected or reported on over the life of a program
-string7 = _("Semi-annual")
+string7 = _("By distribution")
 # Translators: One of several options for specifying how often data is collected or reported on over the life of a program
-string8 = _("Weekly")
+string8 = _("By batch")
 # Translators: One of several options for specifying how often data is collected or reported on over the life of a program
-string9 = _("Annual")
+string9 = _("Post shock")
 # Translators: One of several options for specifying how often data is collected or reported on over the life of a program
-string10 = _("By distribution")
+string10 = _("By event")
 # Translators: One of several options for specifying how often data is collected or reported on over the life of a program
-string11 = _("Post shock")
+string11 = _("Monthly")
 # Translators: One of several options for specifying how often data is collected or reported on over the life of a program
-string12 = _("Baseline")
+string12 = _("Final evaluation")
 # Translators: One of several options for specifying how often data is collected or reported on over the life of a program
-string13 = _("Monthly")
+string13 = _("Baseline")
 # Translators: One of several choices for what sector (i.e. development domain) a program is most closely associated with
 string14 = _("Agribusiness")
 # Translators: One of several choices for what sector (i.e. development domain) a program is most closely associated with

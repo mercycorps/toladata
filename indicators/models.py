@@ -19,7 +19,7 @@ from django.dispatch import receiver
 from django.http import QueryDict
 from django.urls import reverse
 from django.utils import formats, timezone
-from django.utils.translation import ugettext_lazy as _
+from django.utils.translation import gettext_lazy as _
 from django.contrib import admin
 from django.utils.functional import cached_property
 import django.template.defaultfilters
@@ -1986,7 +1986,7 @@ class PeriodicTarget(models.Model):
         It's unclear how some of these ''.format() works, as some params are gettext_lazy() (unicode) values containing
         non-ASCII chars being plugged into a non-unicode string. This normally crashes but for some reason it works here.
 
-        An example of something that crashes in the REPL but seemingly works here when using ugettext_lazy():
+        An example of something that crashes in the REPL but seemingly works here when using gettext_lazy():
 
             '{year}'.format(year=u'Año')
 

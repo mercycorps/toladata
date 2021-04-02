@@ -13,8 +13,17 @@ class Command(BaseCommand):
     py_filename = 'db_translations.py'
 
     def handle(self, *args, **options):
-        create_translated_db_items(
-            self.js_filename, self.py_filename, root_path=settings.DJANGO_ROOT, *args, **options)
+        print("\nRunning this command could demolish some of your translations if you are not careful.  All values "
+              "in your database for Sector, Indicator type, Reporting frequency, and Data collection frequency "
+              "models should be valid.  If they are not, running this management command could lead to the "
+              "elimination of menu item translations.\n\n")
+        response = input('Please type "YES" to proceed: ')
+        if response == 'YES':
+            create_translated_db_items(
+                self.js_filename, self.py_filename, root_path=settings.DJANGO_ROOT, *args, **options)
+            print(f'\nDummy strings have been written to {self.py_filename} and {self.js_filename}.  Done.')
+        else:
+            print("\nOperation cancelled.")
 
 
 def create_translated_db_items(js_filename, py_filename, root_path=settings.DJANGO_ROOT, *args, **options):

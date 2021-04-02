@@ -34,7 +34,7 @@ from indicators.widgets import DataAttributesSelect, DatePicker
 from django.core.exceptions import ValidationError
 from django.db.models import Q
 from django import forms
-from django.utils.translation import ugettext_lazy as _
+from django.utils.translation import gettext, ugettext_lazy as _
 from django.utils import formats, translation, timezone
 
 
@@ -307,8 +307,15 @@ class IndicatorForm(forms.ModelForm):
             key=lambda choice: str_without_diacritics(choice[1])
         )
 
+        indicator_type_choices = [(id, gettext(i_type)) for id, i_type in self.fields['indicator_type'].choices]
         self.fields['indicator_type'].choices = sorted(
-            self.fields['indicator_type'].choices,
+            indicator_type_choices,
+            key=lambda choice: str_without_diacritics(choice[1])
+        )
+
+        sector_choices = [(id, gettext(sector)) for id, sector in self.fields['sector'].choices]
+        self.fields['sector'].choices = sorted(
+            sector_choices,
             key=lambda choice: str_without_diacritics(choice[1])
         )
 
