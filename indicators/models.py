@@ -645,6 +645,7 @@ class ReportingFrequency(models.Model):
 
     class Meta:
         verbose_name = _("Reporting Frequency")
+        ordering = ['sort_order']
 
     def __str__(self):
         return self.frequency
@@ -661,6 +662,7 @@ class DataCollectionFrequency(models.Model):
 
     class Meta:
         verbose_name = _("Data Collection Frequency")
+        ordering = ['sort_order']
 
     def __str__(self):
         return self.frequency

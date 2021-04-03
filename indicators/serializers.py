@@ -247,7 +247,7 @@ class IndicatorPlanIndicatorSerializerBase(serializers.ModelSerializer):
     def get_reporting_frequency(indicator):
         """returns a string with a comma separated list of reporting frequencies"""
         if indicator.reporting_frequencies.exists():
-            frequency_list = indicator.reporting_frequencies.all().order_by('sort_order').values_list('frequency', flat=True)
+            frequency_list = indicator.reporting_frequencies.all().values_list('frequency', flat=True)
             return ", ".join([gettext(frequency) for frequency in frequency_list])
         return None
 
@@ -255,8 +255,7 @@ class IndicatorPlanIndicatorSerializerBase(serializers.ModelSerializer):
     def get_data_collection_frequency(indicator):
         """returns a string with a comma separated list of data collection frequencies"""
         if indicator.data_collection_frequencies.exists():
-            frequency_list = indicator.data_collection_frequencies\
-                .all().order_by('sort_order').values_list('frequency', flat=True)
+            frequency_list = indicator.data_collection_frequencies.all().values_list('frequency', flat=True)
             return ", ".join([gettext(frequency) for frequency in frequency_list])
         return None
 
