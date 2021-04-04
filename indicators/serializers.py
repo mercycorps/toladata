@@ -6,7 +6,7 @@
 from operator import attrgetter
 from rest_framework import serializers
 from django.utils import timezone, formats
-from django.utils.translation import ugettext, ugettext_lazy
+from django.utils.translation import gettext, gettext_lazy
 
 from tola.l10n_utils import l10n_date_medium
 
@@ -146,7 +146,7 @@ class IndicatorSerializer(serializers.ModelSerializer):
         return obj.number
 
     def get_old_level(self, obj):
-        return ugettext(obj.old_level) if obj.old_level else None
+        return gettext(obj.old_level) if obj.old_level else None
 
 
 
@@ -247,17 +247,17 @@ class IndicatorPlanIndicatorSerializerBase(serializers.ModelSerializer):
     def get_reporting_frequency(indicator):
         """returns a string with a comma separated list of reporting frequencies"""
         if indicator.reporting_frequencies.exists():
-            return ", ".join(sorted(
-                [x for x in indicator.reporting_frequencies.all().values_list('frequency', flat=True)]
-            ))
+            frequency_list = indicator.reporting_frequencies.all().order_by('sort_order').values_list('frequency', flat=True)
+            return ", ".join([gettext(frequency) for frequency in frequency_list])
         return None
 
     @staticmethod
     def get_data_collection_frequency(indicator):
         """returns a string with a comma separated list of data collection frequencies"""
         if indicator.data_collection_frequencies.exists():
-            return ", ".join(sorted(
-                [x for x in indicator.data_collection_frequencies.all().values_list('frequency', flat=True)]))
+            frequency_list = indicator.data_collection_frequencies\
+                .all().order_by('sort_order').values_list('frequency', flat=True)
+            return ", ".join([gettext(frequency) for frequency in frequency_list])
         return None
 
     @staticmethod
@@ -382,7 +382,7 @@ class IndicatorWebMixin(IndicatorFormatsMixin):
     @staticmethod
     def get_translated(value):
         """For web, translation should be lazy, for performance reasons"""
-        return value if value is None else ugettext_lazy(value)
+        return value if value is None else gettext_lazy(value)
 
     @staticmethod
     def format_numeric(value, indicator, decimal_places=2):
@@ -407,7 +407,7 @@ class IndicatorExcelMixin(IndicatorFormatsMixin):
     @staticmethod
     def get_translated(value):
         """For excel, translation must be non-lazy so Excel renderer recognizes it as a string"""
-        return value if value is None else ugettext(value)
+        return value if value is None else gettext(value)
 
     def format_numeric(self, value, indicator, decimal_places=2):
         """For excel, produce rounded {value: number_format:} dict for Excel to format in place"""
@@ -504,7 +504,7 @@ class IndicatorPlanLevelSerializerBase(serializers.ModelSerializer):
 
     @staticmethod
     def get_display_name(level):
-        tier = ugettext(level.leveltier.name) if level.leveltier else ''
+        tier = gettext(level.leveltier.name) if level.leveltier else ''
         ontology = level.display_ontology if level.display_ontology else ''
         name = str(level.name)
         return '{tier}{tier_space}{ontology}{colon}{name}'.format(
