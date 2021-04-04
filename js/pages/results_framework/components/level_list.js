@@ -6,6 +6,7 @@ import { faCaretDown, faCaretRight, faSitemap } from '@fortawesome/free-solid-sv
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome'
 import {LevelCardCollapsed, LevelCardExpanded} from "./level_cards";
 import {ExpandAllButton, CollapseAllButton} from "../../../components/actionButtons";
+import api from "../../../apiv2"
 
 library.add(faCaretDown, faCaretRight, faSitemap);
 
@@ -71,56 +72,21 @@ export class LevelListPanel  extends React.Component {
         return {__html: this.props.rootStore.uiStore.splashWarning }
     };
 
-    // Handles getting the show/hide flag for the Bulk Import Banner in Django's Session Storage
     componentDidMount = () => {
-        let mounted = true;
-
-        let checkSessions = async () => {
-            const response = await $.ajax({
-                type: "GET",
-                url: this.props.url || "/update_user_session/",
-                contentType: "application/json",
-                data: {
-                    query: "show_import_banner"
-                }
-                ,
-                success: (data) => {
-                    console.log("DATA: ", data.result);
-                    return data
-                    // this.setState({
-                    //     show_import_banner: data.result
-                    // })
-                },
-                error: (error) => {
-                    console.log('Error:', error.statusText);
-                }
-            })
-            console.log(this.state.show_import_banner);
-            if (mounted) {
-                console.log('response', response.result);
+        // Handles getting the show/hide flag for the Bulk Import Banner in Django's Session Storage
+        api.checkSessions("show_import_banner")
+        .then((response) => {
+            if (response) {
                 this.setState({
-                    show_import_banner: response.result
+                    show_import_banner: response.data
                 })
-
-
-
-                $('#bulk-import-banner-alert').on('close.bs.alert', function() {
-                    console.log("Send update");
-                    let ajaxSettings = {
-                        type: 'PUT',
-                        url: '/update_user_session/',
-                        contentType: 'application/json',
-                        data: JSON.stringify({show_import_banner: false}),
-                        processData: false
-                    };
-                    let updateRequest = $.ajax(ajaxSettings);
-                });
             }
-        }
-        checkSessions();
-        return () => {
-            mounted = false;
-        }
+        })
+    }
+
+    // Handles sending flags update to Django's Session Storage on banner close
+    handleClose = () => {
+        api.updateSessions({show_import_banner: false})
     }
 
     render() {
@@ -181,7 +147,7 @@ export class LevelListPanel  extends React.Component {
                         </span>
                     </div>
                 </div>
-                <button type="button" className="close" data-dismiss="alert" aria-label="Close" >
+                <button type="button" className="close" data-dismiss="alert" aria-label="Close" onClick={this.handleClose}>
                     <span aria-hidden="true" className="x-modal">&times;</span>
                 </button>
             </div>

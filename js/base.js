@@ -291,11 +291,6 @@ $(function() {
     $('#covid-banner-alert').on('close.bs.alert', function() {
         sendSessionVariableUpdate({show_covid_banner: false});
     });
-
-    // Sends request to hide the bulk import banner in Django's Session Storage
-    $('#bulk-import-banner-alert').on('close.bs.alert', function() {
-        sendSessionVariableUpdate({show_import_banner: false});
-    });
 });
 
 
