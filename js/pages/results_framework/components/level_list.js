@@ -85,7 +85,7 @@ export class LevelListPanel  extends React.Component {
     }
 
     // Handles sending flags update to Django's Session Storage on banner close
-    handleClose = () => {
+    handleBannerClose = () => {
         api.updateSessions({show_import_banner: false})
     }
 
@@ -147,7 +147,7 @@ export class LevelListPanel  extends React.Component {
                         </span>
                     </div>
                 </div>
-                <button type="button" className="close" data-dismiss="alert" aria-label="Close" onClick={this.handleClose}>
+                <button type="button" className="close" data-dismiss="alert" aria-label="Close" onClick={this.handleBannerClose}>
                     <span aria-hidden="true" className="x-modal">&times;</span>
                 </button>
             </div>

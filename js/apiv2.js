@@ -111,6 +111,7 @@ const api = {
         .then(response => response.data)
         .catch(this.logFailure)
     }
+    
 };
 
 

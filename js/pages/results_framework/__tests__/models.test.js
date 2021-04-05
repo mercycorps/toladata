@@ -1,5 +1,5 @@
 import React from 'react';
-import { shallow, mount } from 'enzyme';
+import { shallow } from 'enzyme';
 import jsContext from './fixtures/jsContext.json';
 import { LevelListPanel } from '../components/level_list';
 import { RootStore } from '../models';
