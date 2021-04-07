@@ -3,8 +3,8 @@ msgid ""
 msgstr ""
 "Project-Id-Version: \n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2021-03-30 19:00-0700\n"
-"PO-Revision-Date: 2021-02-03 15:52-0800\n"
+"POT-Creation-Date: 2021-04-06 17:45-0700\n"
+"PO-Revision-Date: 2021-04-05 14:21-0700\n"
 "Last-Translator: \n"
 "Language-Team: \n"
 "Language: fr\n"
@@ -69,7 +69,7 @@ msgstr "Identifiant de l’indicateur"
 msgid "No."
 msgstr "Nº"
 
-#: indicators/export_renderers.py:58 indicators/forms.py:381
+#: indicators/export_renderers.py:58 indicators/forms.py:388
 #: indicators/models.py:1439 indicators/models.py:1825
 #: indicators/models.py:2118 indicators/views/views_program.py:134
 #: indicators/views/views_program.py:173
@@ -102,7 +102,7 @@ msgstr "C / NC"
 #. Translators: One of several options for specifying how often data is
 #. collected or reported on over the life of a program
 #: indicators/export_renderers.py:77 indicators/forms.py:253
-#: indicators/models.py:1234 tola/db_translations.py:28
+#: indicators/models.py:1234 tola/db_translations.py:22
 #: tola_management/models.py:398
 msgid "Baseline"
 msgstr "Mesure de base"
@@ -122,14 +122,14 @@ msgstr "Mesure de mi-parcours et mesure de fin de programme"
 #. collected or reported on over the life of a program
 #: indicators/export_renderers.py:84 indicators/models.py:1038
 #: templates/indicators/program_target_period_info_helptext.html:16
-#: tola/db_translations.py:22
+#: tola/db_translations.py:24
 msgid "Annual"
 msgstr "Annuel"
 
 #. Translators: One of several options for specifying how often data is
 #. collected or reported on over the life of a program
 #: indicators/export_renderers.py:85 indicators/models.py:1039
-#: tola/db_translations.py:18
+#: tola/db_translations.py:20
 msgid "Semi-annual"
 msgstr "Semestriel"
 
@@ -144,7 +144,7 @@ msgstr "Quadrimestriel"
 #. collected or reported on over the life of a program
 #: indicators/export_renderers.py:88 indicators/models.py:1041
 #: templates/indicators/program_target_period_info_helptext.html:22
-#: tola/db_translations.py:4
+#: tola/db_translations.py:10
 msgid "Quarterly"
 msgstr "Trimestriel"
 
@@ -154,7 +154,7 @@ msgstr "Trimestriel"
 #. collected or reported on over the life of a program
 #: indicators/export_renderers.py:89 indicators/models.py:1042
 #: templates/indicators/program_target_period_info_helptext.html:24
-#: tola/db_translations.py:30
+#: tola/db_translations.py:26
 msgid "Monthly"
 msgstr "Mensuel"
 
@@ -271,7 +271,7 @@ msgstr ""
 "résultats, les paramètres du programme devront être modifiés par un "
 "administrateur."
 
-#: indicators/forms.py:344
+#: indicators/forms.py:351
 msgid ""
 "This disaggregation cannot be unselected, because it was already used in "
 "submitted program results."
@@ -280,37 +280,37 @@ msgstr ""
 "envoyés, c'est pourquoi elle ne peut pas être désélectionnée."
 
 #. Translators:  disaggregation types that are available to all programs
-#: indicators/forms.py:352
+#: indicators/forms.py:359
 msgid "Global disaggregations"
 msgstr "Désagrégations globales"
 
 #. Translators:  disaggregation types that are available only to a specific
 #. country
-#: indicators/forms.py:357
+#: indicators/forms.py:364
 #, python-format
 msgid "%(country_name)s disaggregations"
 msgstr "Désagrégations %(country_name)s"
 
 #. Translators: Label of a form field.  User specifies whether changes should
 #. increase or decrease.
-#: indicators/forms.py:389 indicators/indicator_plan.py:90
+#: indicators/forms.py:396 indicators/indicator_plan.py:90
 #: tola_management/models.py:396
 msgid "Direction of change"
 msgstr "Direction du changement"
 
-#: indicators/forms.py:407
+#: indicators/forms.py:414
 msgid "Multiple submissions detected"
 msgstr "Plusieurs soumissions détectées"
 
 #. Translators: Input form error message
-#: indicators/forms.py:416
+#: indicators/forms.py:423
 msgid "Please enter a number larger than zero."
 msgstr "Veuillez entrer un nombre supérieur à zéro."
 
 #. Translators: This is an error message that is returned when a user is
 #. trying to assign an indicator
 #. to the wrong hierarch of levels.
-#: indicators/forms.py:425
+#: indicators/forms.py:432
 msgid ""
 "Level program ID %(l_p_id)d and indicator program ID (%i_p_id)d mismatched"
 msgstr ""
@@ -319,13 +319,13 @@ msgstr ""
 
 #. Translators: This is a result that was actually achieved, versus one that
 #. was planned.
-#: indicators/forms.py:496
+#: indicators/forms.py:503
 #: templates/indicators/results/result_form_disaggregation_fields.html:62
 #: tola_management/models.py:406
 msgid "Actual value"
 msgstr "Valeur réelle"
 
-#: indicators/forms.py:507 templates/workflow/siteprofile_form.html:3
+#: indicators/forms.py:514 templates/workflow/siteprofile_form.html:3
 #: templates/workflow/siteprofile_form.html:5
 #: templates/workflow/siteprofile_form.html:15
 msgid "Site"
@@ -334,19 +334,19 @@ msgstr "Site"
 #. Translators: field label that identifies which of a set of a targets (e.g.
 #. monthly/annual) a result
 #. is being compared to
-#: indicators/forms.py:510 tola_management/models.py:405
+#: indicators/forms.py:517 tola_management/models.py:405
 msgid "Measure against target"
 msgstr "Mesurer par rapport à la cible"
 
-#: indicators/forms.py:511
+#: indicators/forms.py:518
 msgid "Link to file or folder"
 msgstr "Lien vers le fichier ou dossier"
 
-#: indicators/forms.py:525 tola_management/models.py:404
+#: indicators/forms.py:532 tola_management/models.py:404
 msgid "Result date"
 msgstr "Date de résultat"
 
-#: indicators/forms.py:582
+#: indicators/forms.py:589
 #, python-brace-format
 msgid ""
 "You can begin entering results on {program_start_date}, the program start "
@@ -355,7 +355,7 @@ msgstr ""
 "Vous pouvez commencer à saisir des résultats le {program_start_date}, date "
 "de début du programme"
 
-#: indicators/forms.py:587
+#: indicators/forms.py:594
 #, python-brace-format
 msgid ""
 "Please select a date between {program_start_date} and {program_end_date}"
@@ -363,14 +363,14 @@ msgstr ""
 "Veuillez sélectionner une date comprise entre le {program_start_date} et le "
 "{program_end_date}"
 
-#: indicators/forms.py:598
+#: indicators/forms.py:605
 #, python-brace-format
 msgid "Please select a date between {program_start_date} and {todays_date}"
 msgstr ""
 "Veuillez sélectionner une date entre le {program_start_date} et le "
 "{todays_date}"
 
-#: indicators/forms.py:611
+#: indicators/forms.py:618
 msgid "URL required if record name is set"
 msgstr "URL requise si un nom d’enregistrement est configuré"
 
@@ -1319,7 +1319,7 @@ msgid "Old Level"
 msgstr "Niveau précédent"
 
 #. Translators: This is an error message that is returned when a user is
-#. trying to assign an indicator to the wrong hierarch of levels.
+#. trying to assign an indicator to the wrong hierarchy of levels.
 #: indicators/models.py:1452
 #, python-format
 msgid ""
@@ -1365,13 +1365,13 @@ msgstr "La vie du programme"
 
 #. Translators: One of several options for specifying how often data is
 #. collected or reported on over the life of a program
-#: indicators/models.py:1816 tola/db_translations.py:8
+#: indicators/models.py:1816 tola/db_translations.py:28
 msgid "Midline"
 msgstr "Mesure de mi-parcours"
 
 #. Translators: One of several options for specifying how often data is
 #. collected or reported on over the life of a program
-#: indicators/models.py:1817 tola/db_translations.py:12
+#: indicators/models.py:1817 tola/db_translations.py:6
 msgid "Endline"
 msgstr "Mesure de fin de programme"
 
@@ -1904,6 +1904,12 @@ msgid "Log in"
 msgstr "Se connecter"
 
 #: templates/admin/login.html:70
+#| msgid ""
+#| "\n"
+#| "    Are you a TolaData admin having trouble logging in? As part of our Partner Access release, we incorporated\n"
+#| "    new and improved administration tools into TolaData itself. Please visit TolaData and look for a section\n"
+#| "    called Admin.\n"
+#| "    "
 msgid ""
 "\n"
 "    Are you a TolaActivity admin having trouble logging in? As part of our Partner Access release, we incorporated\n"
@@ -1912,9 +1918,9 @@ msgid ""
 "    "
 msgstr ""
 "\n"
-"   Avez-vous des difficultés à vous connecter à votre compte administrateur TolaActivity ? Nous avons intégré, dans le cadre de notre mise à jour Partner Access,\n"
-" de nouveaux outils d’administration améliorés au sein de TolaActivity. Veuillez accéder à TolaActivity et rechercher la section\n"
-" Administrateur.\n"
+"    ÁTranslated Are you a TolaActivity admin having trouble logging in? As part of our Partner Access release, we incorporated\n"
+"    new and improved administration tools into TolaActivity itself. Please visit TolaActivity and look for a section\n"
+"    called Admin.\n"
 "    "
 
 #: templates/base.html:60
@@ -2600,6 +2606,12 @@ msgstr ""
 "statistiques du programme"
 
 #: templates/indicators/indicator_reportingperiod_modal.html:22
+#| msgid ""
+#| "The program period is used in the setup of periodic targets and in Indicator"
+#| " Performance Tracking Tables (IPTT). TolaData initially sets the program "
+#| "period to include the program’s official start and end dates, as recorded in"
+#| " the Grant and Award Information Tracker (GAIT) system. The program period "
+#| "may be adjusted to align with the program’s indicator plan."
 msgid ""
 "The program period is used in the setup of periodic targets and in Indicator"
 " Performance Tracking Tables (IPTT). TolaActivity initially sets the program"
@@ -2607,14 +2619,11 @@ msgid ""
 "in the Grant and Award Information Tracker (GAIT) system. The program period"
 " may be adjusted to align with the program’s indicator plan."
 msgstr ""
-"La période de déclaration du programme est utilisée dans l’établissement des"
-" cibles périodiques et dans les tableaux de suivi des performances des "
-"indicateurs (IPTT). TolaActivity définit initialement la période de "
-"déclaration pour inclure les dates de début et de fin officielles du "
-"programme, telles qu’elles sont enregistrées dans le système de suivi des "
-"informations sur les subventions et les récompenses (GAIT). La période de "
-"déclaration peut être ajustée pour s’harmoniser avec le plan d’indicateurs "
-"du programme."
+"éTranslated The program period is used in the setup of periodic targets and "
+"in Indicator Performance Tracking Tables (IPTT). TolaActivity initially sets"
+" the program period to include the program’s official start and end dates, "
+"as recorded in the Grant and Award Information Tracker (GAIT) system. The "
+"program period may be adjusted to align with the program’s indicator plan."
 
 #: templates/indicators/indicator_reportingperiod_modal.html:36
 msgid "GAIT program dates"
@@ -3172,17 +3181,21 @@ msgid "Update actual value"
 msgstr "Mettre à jour la valeur réelle"
 
 #: templates/indicators/results/result_form_evidence_fields.html:13
+#| msgid ""
+#| "Provide a link to a file or folder in Google Drive or another shared network"
+#| " drive. Please be aware that TolaData does not store a copy of your record, "
+#| "<i>so you should not link to something on your personal computer, as no one "
+#| "else will be able to access it.</i>"
 msgid ""
 "Provide a link to a file or folder in Google Drive or another shared network"
 " drive. Please be aware that TolaActivity does not store a copy of your "
 "record, <i>so you should not link to something on your personal computer, as"
 " no one else will be able to access it.</i>"
 msgstr ""
-"Fournissez un lien vers un fichier ou un dossier dans Google Drive ou un "
-"autre service de partage en ligne. Veuillez noter que TolaActivity ne "
-"conserve pas de copie de votre enregistrement. <i>Vous ne pouvez donc pas "
-"créer de lien vers un élément présent sur votre ordinateur personnel puisque"
-" personne ne pourrait y accéder.</i>"
+"Translated Provide a link to a file or folder in Google Drive or another "
+"shared network drive. Please be aware that TolaActivity does not store a "
+"copy of your record, <i>so you should not link to something on your personal"
+" computer, as no one else will be able to access it.</i>"
 
 #: templates/indicators/results/result_form_evidence_fields.html:19
 msgid "view"
@@ -3387,10 +3400,12 @@ msgstr ""
 "    "
 
 #: templates/registration/invalid_user.html:6
+#| msgid ""
+#| "This Gmail address is not associated with a TolaData user account."
 msgid "This Gmail address is not associated with a TolaActivity user account."
 msgstr ""
-"Cette adresse Gmail n’est associée à aucun compte d’utilisateur "
-"TolaActivity."
+"Translated This Gmail address is not associated with a TolaActivity user "
+"account."
 
 #: templates/registration/invalid_user.html:11
 msgid "You can request an account from your TolaData administrator."
@@ -3399,14 +3414,18 @@ msgstr ""
 "TolaData."
 
 #: templates/registration/login.html:11
+#| msgid ""
+#| "\n"
+#| "        <h1><small>Welcome to</small> TolaData</h1>\n"
+#| "        "
 msgid ""
 "\n"
 "        <h1><small>Welcome to</small> TolaActivity</h1>\n"
 "        "
 msgstr ""
 "\n"
-"        <h1><small>Bienvenue sur</small> TolaActivity</h1>\n"
-"    "
+"        <h1>ŹTranslated <small>Welcome to</small> TolaActivity</h1>\n"
+"        "
 
 #. Translators: a button directing Mercy Corps users to log in
 #: templates/registration/login.html:18
@@ -3494,6 +3513,24 @@ msgstr "E-mail de confirmation de réinitialisation de mot de passe envoyé"
 
 #: templates/registration/password_reset_done.html:12
 #, python-format
+#| msgid ""
+#| "\n"
+#| "    <p>We’ve sent an email to the address you’ve provided.</p>\n"
+#| "\n"
+#| "    <h4>If you didn’t receive an email, please try the following:</h4>\n"
+#| "\n"
+#| "    <ul>\n"
+#| "        <li>Check your spam or junk mail folder.</li>\n"
+#| "        <li>Verify that you entered your email address correctly.</li>\n"
+#| "        <li>Verify that you entered the email address associated with your TolaData account.</li>\n"
+#| "    </ul>\n"
+#| "\n"
+#| "    <h4>If you are using a mercycorps.org address to log in:</h4>\n"
+#| "    <p>Return to the <a href=\"%(login_url)s\">log in page</a> and click <strong>Log in with a mercycorps.org email address.</strong></p>\n"
+#| "\n"
+#| "    <h4>If you are using a Gmail address to log in:</h4>\n"
+#| "    <p>Return to the <a href=\"%(login_url)s\">log in page</a> and click <strong>Log in with Gmail.</strong> <em>We cannot reset your Gmail password.</em></p>\n"
+#| "    "
 msgid ""
 "\n"
 "    <p>We’ve sent an email to the address you’ve provided.</p>\n"
@@ -3514,21 +3551,21 @@ msgid ""
 "    "
 msgstr ""
 "\n"
-"    <p>Nous avons envoyé un e-mail à l’adresse que vous nous avez indiquée.</p>\n"
+"    <p>ÁTranslated We’ve sent an email to the address you’ve provided.</p>\n"
 "\n"
-"    <h4>Si vous n’avez pas reçu d’e-mail, veuillez suivre la procédure suivante :</h4>\n"
+"    <h4>If you didn’t receive an email, please try the following:</h4>\n"
 "\n"
 "    <ul>\n"
-"        <li>Sur votre compte e-mail, vérifiez les dossiers Spams ou Courrier indésirable.</li>\n"
-"        <li>Assurez-vous d’avoir correctement saisi votre adresse e-mail.</li>\n"
-"        <li>Assurez-vous d’avoir saisi l’adresse e-mail associée à votre compte TolaActivity.</li>\n"
+"        <li>Check your spam or junk mail folder.</li>\n"
+"        <li>Verify that you entered your email address correctly.</li>\n"
+"        <li>Verify that you entered the email address associated with your TolaActivity account.</li>\n"
 "    </ul>\n"
 "\n"
-"    <h4>Si vous vous connectez à l’aide d’une adresse e-mail mercycorps.org :</h4>\n"
-"    <p>Retournez sur la <a href=\"%(login_url)s\">page de connexion</a> et cliquez sur <strong>Se connecter avec une adresse e-mail mercycorps.org.</strong></p>\n"
+"    <h4>If you are using a mercycorps.org address to log in:</h4>\n"
+"    <p>Return to the <a href=\"%(login_url)s\">log in page</a> and click <strong>Log in with a mercycorps.org email address.</strong></p>\n"
 "\n"
-"    <h4>Si vous vous connectez à l’aide d’une adresse e-mail Gmail :</h4>\n"
-"    <p>Retournez sur la <a href=\"%(login_url)s\">page de connexion</a> et cliquez sur <strong>Se connecter avec Gmail.</strong> <em>Nous ne pouvons pas réinitialiser votre mot de passe Gmail.</em></p>\n"
+"    <h4>If you are using a Gmail address to log in:</h4>\n"
+"    <p>Return to the <a href=\"%(login_url)s\">log in page</a> and click <strong>Log in with Gmail.</strong> <em>We cannot reset your Gmail password.</em></p>\n"
 "    "
 
 #: templates/registration/password_reset_email.html:2
@@ -3791,52 +3828,52 @@ msgstr "Dates importantes"
 
 #. Translators: One of several options for specifying how often data is
 #. collected or reported on over the life of a program
-#: tola/db_translations.py:6
-msgid "By batch"
-msgstr "Translated By batch"
+#: tola/db_translations.py:4
+msgid "By distribution"
+msgstr "ÁTranslated By distribution"
 
 #. Translators: One of several options for specifying how often data is
 #. collected or reported on over the life of a program
-#: tola/db_translations.py:10
-msgid "Final evaluation"
-msgstr "Translated Final evaluation"
+#: tola/db_translations.py:8
+msgid "Post shock"
+msgstr "éTranslated Post shock"
 
 #. Translators: One of several options for specifying how often data is
 #. collected or reported on over the life of a program
-#: tola/db_translations.py:14
-#| msgid "Event"
-msgid "By event"
-msgstr "Translated By event"
-
-#. Translators: One of several options for specifying how often data is
-#. collected or reported on over the life of a program
-#: tola/db_translations.py:16
+#: tola/db_translations.py:12
 msgid "By training"
 msgstr "Translated By training"
 
 #. Translators: One of several options for specifying how often data is
 #. collected or reported on over the life of a program
-#: tola/db_translations.py:20
+#: tola/db_translations.py:14
+msgid "Final evaluation"
+msgstr "Translated Final evaluation"
+
+#. Translators: One of several options for specifying how often data is
+#. collected or reported on over the life of a program
+#: tola/db_translations.py:16
+msgid "By batch"
+msgstr "ŹTranslated By batch"
+
+#. Translators: One of several options for specifying how often data is
+#. collected or reported on over the life of a program
+#: tola/db_translations.py:18
 msgid "Weekly"
-msgstr "Translated Weekly"
+msgstr "ÁTranslated Weekly"
 
 #. Translators: One of several options for specifying how often data is
 #. collected or reported on over the life of a program
-#: tola/db_translations.py:24
-msgid "By distribution"
-msgstr "Translated By distribution"
-
-#. Translators: One of several options for specifying how often data is
-#. collected or reported on over the life of a program
-#: tola/db_translations.py:26
-msgid "Post shock"
-msgstr "Translated Post shock"
+#: tola/db_translations.py:30
+#| msgid "Event"
+msgid "By event"
+msgstr "éTranslated By event"
 
 #. Translators: One of several choices for what sector (i.e. development
 #. domain) a program is most closely associated with
 #: tola/db_translations.py:32
 msgid "Agribusiness"
-msgstr "Translated Agribusiness"
+msgstr "éTranslated Agribusiness"
 
 #. Translators: One of several choices for what sector (i.e. development
 #. domain) a program is most closely associated with
@@ -3853,7 +3890,6 @@ msgstr "Translated Agriculture and Food Security"
 #. Translators: One of several choices for what sector (i.e. development
 #. domain) a program is most closely associated with
 #: tola/db_translations.py:38
-#: workflow/serializers_new/iptt_program_serializers.py:182
 #| msgid "Basic Admin"
 msgid "Basic Needs"
 msgstr "Translated Basic Needs"
@@ -3862,23 +3898,24 @@ msgstr "Translated Basic Needs"
 #. domain) a program is most closely associated with
 #: tola/db_translations.py:40
 msgid "Capacity development"
-msgstr "Translated Capacity development"
+msgstr "ŹTranslated Capacity development"
 
 #. Translators: One of several choices for what sector (i.e. development
 #. domain) a program is most closely associated with
 #: tola/db_translations.py:42
 msgid "Child Health & Nutrition"
-msgstr "Translated Child Health & Nutrition"
+msgstr "ÁTranslated Child Health & Nutrition"
 
 #. Translators: One of several choices for what sector (i.e. development
 #. domain) a program is most closely associated with
 #: tola/db_translations.py:44
 msgid "Climate Change Adaptation & Disaster Risk Reduction"
-msgstr "Translated Climate Change Adaptation & Disaster Risk Reduction"
+msgstr "éTranslated Climate Change Adaptation & Disaster Risk Reduction"
 
 #. Translators: One of several choices for what sector (i.e. development
 #. domain) a program is most closely associated with
 #: tola/db_translations.py:46
+#| msgid "Country Name"
 msgid "Conflict Management"
 msgstr "Translated Conflict Management"
 
@@ -3898,19 +3935,19 @@ msgstr "Translated Economic and Market Development"
 #. domain) a program is most closely associated with
 #: tola/db_translations.py:52
 msgid "Economic Recovery and Market Systems"
-msgstr "Translated Economic Recovery and Market Systems"
+msgstr "ŹTranslated Economic Recovery and Market Systems"
 
 #. Translators: One of several choices for what sector (i.e. development
 #. domain) a program is most closely associated with
 #: tola/db_translations.py:54
 msgid "Education Support"
-msgstr "Translated Education Support"
+msgstr "ÁTranslated Education Support"
 
 #. Translators: One of several choices for what sector (i.e. development
 #. domain) a program is most closely associated with
 #: tola/db_translations.py:56
 msgid "Emergency"
-msgstr "Translated Emergency"
+msgstr "éTranslated Emergency"
 
 #. Translators: One of several choices for what sector (i.e. development
 #. domain) a program is most closely associated with
@@ -3928,19 +3965,19 @@ msgstr "Translated Energy Access"
 #. domain) a program is most closely associated with
 #: tola/db_translations.py:62
 msgid "Energy and Natural Resources"
-msgstr "Translated Energy and Natural Resources"
+msgstr "ŹTranslated Energy and Natural Resources"
 
 #. Translators: One of several choices for what sector (i.e. development
 #. domain) a program is most closely associated with
 #: tola/db_translations.py:64
 msgid "Environment Disaster/Risk Reduction"
-msgstr "Translated Environment Disaster/Risk Reduction"
+msgstr "ÁTranslated Environment Disaster/Risk Reduction"
 
 #. Translators: One of several choices for what sector (i.e. development
 #. domain) a program is most closely associated with
 #: tola/db_translations.py:66
 msgid "Financial Inclusion"
-msgstr "Translated Financial Inclusion"
+msgstr "éTranslated Financial Inclusion"
 
 #. Translators: One of several choices for what sector (i.e. development
 #. domain) a program is most closely associated with
@@ -3958,19 +3995,19 @@ msgstr "Translated Food Security"
 #. domain) a program is most closely associated with
 #: tola/db_translations.py:72
 msgid "Gender"
-msgstr "Translated Gender"
+msgstr "ŹTranslated Gender"
 
 #. Translators: One of several choices for what sector (i.e. development
 #. domain) a program is most closely associated with
 #: tola/db_translations.py:74
 msgid "Governance"
-msgstr "Translated Governance"
+msgstr "ÁTranslated Governance"
 
 #. Translators: One of several choices for what sector (i.e. development
 #. domain) a program is most closely associated with
 #: tola/db_translations.py:76
 msgid "Governance & Partnerships"
-msgstr "Translated Governance & Partnerships"
+msgstr "éTranslated Governance & Partnerships"
 
 #. Translators: One of several choices for what sector (i.e. development
 #. domain) a program is most closely associated with
@@ -3988,32 +4025,33 @@ msgstr "Translated Health"
 #. domain) a program is most closely associated with
 #: tola/db_translations.py:82
 msgid "Humanitaria Intervention Readiness"
-msgstr "Translated Humanitaria Intervention Readiness"
+msgstr "ŹTranslated Humanitaria Intervention Readiness"
 
 #. Translators: One of several choices for what sector (i.e. development
 #. domain) a program is most closely associated with
 #: tola/db_translations.py:84
 msgid "Hygiene Promotion"
-msgstr "Translated Hygiene Promotion"
+msgstr "ÁTranslated Hygiene Promotion"
 
 #. Translators: One of several choices for what sector (i.e. development
 #. domain) a program is most closely associated with
 #: tola/db_translations.py:86
 #| msgid "Information use"
 msgid "Information Dissemination"
-msgstr "Translated Information Dissemination"
+msgstr "ŹTranslated Information Dissemination"
 
 #. Translators: One of several choices for what sector (i.e. development
 #. domain) a program is most closely associated with
 #: tola/db_translations.py:88
+#| msgid "Username"
 msgid "Knowledge Management "
-msgstr "Translated Knowledge Management "
+msgstr "ÁTranslated Knowledge Management "
 
 #. Translators: One of several choices for what sector (i.e. development
 #. domain) a program is most closely associated with
 #: tola/db_translations.py:90
 msgid "Livelihoods"
-msgstr "Translated Livelihoods"
+msgstr "éTranslated Livelihoods"
 
 #. Translators: One of several choices for what sector (i.e. development
 #. domain) a program is most closely associated with
@@ -4031,20 +4069,20 @@ msgstr "Translated Maternal Health & Nutrition"
 #. domain) a program is most closely associated with
 #: tola/db_translations.py:96
 msgid "Non food Items (NFIs)"
-msgstr "Translated Non food Items (NFIs)"
+msgstr "ŹTranslated Non food Items (NFIs)"
 
 #. Translators: One of several choices for what sector (i.e. development
 #. domain) a program is most closely associated with
 #: tola/db_translations.py:98
 msgid "Nutrition Sensitive"
-msgstr "Translated Nutrition Sensitive"
+msgstr "ÁTranslated Nutrition Sensitive"
 
 #. Translators: One of several choices for what sector (i.e. development
 #. domain) a program is most closely associated with
 #: tola/db_translations.py:100
 #| msgid "Project Initiation"
 msgid "Project Monitoring"
-msgstr "Translated Project Monitoring"
+msgstr "éTranslated Project Monitoring"
 
 #. Translators: One of several choices for what sector (i.e. development
 #. domain) a program is most closely associated with
@@ -4057,7 +4095,7 @@ msgstr "Translated Protection"
 #. domain) a program is most closely associated with
 #: tola/db_translations.py:104
 msgid "Psychosocial"
-msgstr "Translated Psychosocial"
+msgstr "éTranslated Psychosocial"
 
 #. Translators: One of several choices for what sector (i.e. development
 #. domain) a program is most closely associated with
@@ -4075,13 +4113,13 @@ msgstr "Translated Resilience"
 #. domain) a program is most closely associated with
 #: tola/db_translations.py:110
 msgid "Sanitation Infrastructure"
-msgstr "Translated Sanitation Infrastructure"
+msgstr "ŹTranslated Sanitation Infrastructure"
 
 #. Translators: One of several choices for what sector (i.e. development
 #. domain) a program is most closely associated with
 #: tola/db_translations.py:112
 msgid "Skills and Training"
-msgstr "Translated Skills and Training"
+msgstr "ÁTranslated Skills and Training"
 
 #. Translators: One of several choices for what sector (i.e. development
 #. domain) a program is most closely associated with
@@ -4094,7 +4132,7 @@ msgstr "Translated Urban Issues"
 #. domain) a program is most closely associated with
 #: tola/db_translations.py:116
 msgid "WASH"
-msgstr "Translated WASH"
+msgstr "éTranslated WASH"
 
 #. Translators: One of several choices for what sector (i.e. development
 #. domain) a program is most closely associated with
@@ -4112,7 +4150,7 @@ msgstr "Translated Workforce Development"
 #. domain) a program is most closely associated with
 #: tola/db_translations.py:122
 msgid "Youth"
-msgstr "Translated Youth"
+msgstr "ŹTranslated Youth"
 
 #. Translators: One of several choices for specifying what type of Indicator
 #. is being created.  An Indicator is a performance measure e.g. "We will
@@ -4120,21 +4158,21 @@ msgstr "Translated Youth"
 #: tola/db_translations.py:124
 #| msgid "Customsort"
 msgid "Custom"
-msgstr "Translated Custom"
+msgstr "ŹTranslated Custom"
 
 #. Translators: One of several choices for specifying what type of Indicator
 #. is being created.  An Indicator is a performance measure e.g. "We will
 #. distrubute 1000 food packs over the next two months"
 #: tola/db_translations.py:126
 msgid "Donor"
-msgstr "Translated Donor"
+msgstr "ÁTranslated Donor"
 
 #. Translators: One of several choices for specifying what type of Indicator
 #. is being created.  An Indicator is a performance measure e.g. "We will
 #. distrubute 1000 food packs over the next two months"
 #: tola/db_translations.py:128
 msgid "DIG - Standard"
-msgstr "Translated DIG - Standard"
+msgstr "éTranslated DIG - Standard"
 
 #. Translators: One of several choices for specifying what type of Indicator
 #. is being created.  An Indicator is a performance measure e.g. "We will
@@ -4154,15 +4192,16 @@ msgstr "Translated DIG - Testing"
 #. is being created.  An Indicator is a performance measure e.g. "We will
 #. distrubute 1000 food packs over the next two months"
 #: tola/db_translations.py:136
+#| msgid "Program page"
 msgid "Process / Management"
-msgstr "Translated Process / Management"
+msgstr "ÁTranslated Process / Management"
 
 #. Translators: One of several choices for specifying what type of Indicator
 #. is being created.  An Indicator is a performance measure e.g. "We will
 #. distrubute 1000 food packs over the next two months"
 #: tola/db_translations.py:138
 msgid "Context / Trigger"
-msgstr "Translated Context / Trigger"
+msgstr "ŹTranslated Context / Trigger"
 
 #. Translators: One of several choices for specifying what type of Indicator
 #. is being created.  An Indicator is a performance measure e.g. "We will
@@ -4170,7 +4209,7 @@ msgstr "Translated Context / Trigger"
 #: tola/db_translations.py:140
 #| msgid "Performance Indicator"
 msgid "Key Performance Indicator (KPI)"
-msgstr "Translated Key Performance Indicator (KPI)"
+msgstr "éTranslated Key Performance Indicator (KPI)"
 
 #: tola/forms.py:43
 msgid "Form Errors"
@@ -5084,7 +5123,7 @@ msgstr "Lieu vérifié par"
 msgid "by %(tier)s chain"
 msgstr "par chaîne %(tier)s"
 
-#: workflow/serializers_new/iptt_program_serializers.py:194
+#: workflow/serializers_new/iptt_program_serializers.py:191
 #, python-format
 msgid "%(tier)s Chain"
 msgstr "Chaîne %(tier)s"
