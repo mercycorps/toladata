@@ -107,7 +107,7 @@ const api = {
     },
     updateSessions (sessionVarsToUpdate) {
         return this.apiSession.put('/update_user_session/', sessionVarsToUpdate)
-            .then(response => response.data)
+            .then(response => response.statusText)
             .catch(this.logFailure)
     }
 };
