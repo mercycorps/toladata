@@ -6,6 +6,7 @@ import { faCaretDown, faCaretRight, faSitemap } from '@fortawesome/free-solid-sv
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome'
 import {LevelCardCollapsed, LevelCardExpanded} from "./level_cards";
 import {ExpandAllButton, CollapseAllButton} from "../../../components/actionButtons";
+import api from "../../../apiv2"
 
 library.add(faCaretDown, faCaretRight, faSitemap);
 
@@ -60,12 +61,32 @@ class LevelList extends React.Component {
 @observer
 export class LevelListPanel  extends React.Component {
 
+    constructor(props) {
+        super(props);
+        this.state = {
+            show_import_banner: null
+        };
+    }
+
     getWarningText = () => {
         return {__html: this.props.rootStore.uiStore.splashWarning }
     };
 
-    handleHideBanner = () => {
-        sessionStorage.setItem("hide_bulk_import_alert", true);
+    componentDidMount = () => {
+        // Handles getting the show/hide flag for the Bulk Import Banner in Django's Session Storage
+        api.checkSessions("show_import_banner")
+        .then((response) => {
+            if (response) {
+                this.setState({
+                    show_import_banner: response.data
+                })
+            }
+        })
+    }
+
+    // Handles sending flags update to Django's Session Storage on banner close
+    handleBannerClose = () => {
+        api.updateSessions({show_import_banner: false})
     }
 
     render() {
@@ -107,9 +128,12 @@ export class LevelListPanel  extends React.Component {
                 </div>;
 
         }
-        
         let bulkImportBanner = 
-            <div id="bulk-import-banner-alert" className="alert fade show" role="alert">
+            <div 
+                role="alert" 
+                id="bulk-import-banner-alert" 
+                className="alert fade show" 
+            >
                 <div className="bulk-alert-message">
                     <div className="bulk-alert-icon">
                         <i className="fas fa-bullhorn"></i>
@@ -123,12 +147,11 @@ export class LevelListPanel  extends React.Component {
                         </span>
                     </div>
                 </div>
-                <button type="button" className="close" data-dismiss="alert" aria-label="Close" onClick={ this.handleHideBanner }>
+                <button type="button" className="close" data-dismiss="alert" aria-label="Close" onClick={this.handleBannerClose}>
                     <span aria-hidden="true" className="x-modal">&times;</span>
                 </button>
             </div>
-        
-        let hideBanner = sessionStorage.getItem('hide_bulk_import_alert');
+
         let panel = '';
         if (this.props.rootStore.levelStore.levels.length == 0) {
             panel =
@@ -143,7 +166,13 @@ export class LevelListPanel  extends React.Component {
             panel =
                 <div id="level-list" style={{flexGrow: "2"}}>
                     {expandoDiv}
-                    {!hideBanner && this.props.rootStore.levelStore.accessLevel === 'high' ? bulkImportBanner : null}
+                    {
+                        this.state.show_import_banner && // Hides Bulk Import Banner if stored as false in Django's Session Storage
+                        this.props.rootStore.levelStore.accessLevel === 'high' && 
+                        this.props.rootStore.levelStore.levels[0].id !== 'new' 
+                        ? bulkImportBanner 
+                        : null
+                    }
                     <LevelList renderList='initial'/>
                 </div>
         }
