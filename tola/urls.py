@@ -44,7 +44,7 @@ from django.conf import settings
 from django.conf.urls.static import static
 
 admin.autodiscover()
-admin.site.site_header = 'Tola Activity administration'
+admin.site.site_header = 'TolaData administration'
 
 # REST FRAMEWORK
 router = routers.DefaultRouter()
