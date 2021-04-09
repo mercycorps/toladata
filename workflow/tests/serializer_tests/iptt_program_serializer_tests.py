@@ -1,5 +1,9 @@
 import datetime
+from os import path, makedirs
+import shutil
+import polib
 from django import test
+from django.conf import settings
 from factories.workflow_models import (
     RFProgramFactory,
     SectorFactory,
@@ -13,7 +17,7 @@ from factories.indicators_models import (
     DisaggregationTypeFactory
 )
 from tola.test.utils import SPECIAL_CHARS, lang_context
-from indicators.models import Indicator
+from indicators.models import Indicator, IndicatorType, Sector
 from workflow.serializers_new import IPTTProgramSerializer
 
 LONG_NAME = 'Long '*26
@@ -58,11 +62,27 @@ def get_program_data(**kwargs):
 
 class TestIPTTProgramSerializerFilterData(test.TestCase):
     @classmethod
+    def setUpClass(cls):
+        super().setUpClass()
+        cls.test_lang = 'fr'
+        cls.test_translation_root_dir = path.join(settings.DJANGO_ROOT, 'test/locale/')
+        cls.test_translation_file_stub = path.join(cls.test_translation_root_dir, f'{cls.test_lang}/LC_MESSAGES/django')
+        makedirs(path.dirname(cls.test_translation_file_stub))
+
+    @classmethod
     def setUpTestData(cls):
         super().setUpTestData()
         cls.empty_program = RFProgramFactory()
         RFIndicatorFactory(program=cls.empty_program)
         cls.country = CountryFactory(country="TestTown", code="TT")
+
+    @classmethod
+    def tearDownClass(cls):
+        super().tearDownClass()
+        shutil.rmtree(cls.test_translation_root_dir)
+
+
+
 
     ### TIERS ###
 
@@ -504,3 +524,39 @@ class TestIPTTProgramSerializerFilterData(test.TestCase):
         monthly_period = data['period_date_ranges'][Indicator.MONTHLY][7]
         self.assertEqual(monthly_period['name'], u'août')
         self.assertEqual(monthly_period['label'], None)
+
+    def test_translated_menu_order(self):
+        """Check the sorting order of both English and "translated" characters with diacritics."""
+        program = RFProgramFactory(indicators=3)
+        indicators = program.indicator_set.all()
+
+        # Create the .po and .mo files with the English and "translated" values
+        menu_strings = [('Banana', 'Banana'), ('Apple', 'ŽApple'), ('Cherry', 'áCherry')]
+        po_file = polib.POFile()
+        po_file.metadata = {"Content-Type": "text/plain; charset=UTF-8"}
+        for i, menu_string in enumerate(menu_strings):
+            po_entry = polib.POEntry(msgid=menu_string[0], msgstr=menu_string[1])
+            po_file.append(po_entry)
+        po_file.save(self.test_translation_file_stub + '.po')
+        po_file.save_as_mofile(self.test_translation_file_stub + '.mo')
+
+        # Add indicator type values and sector values in English
+        for i, menu_string in enumerate(menu_strings):
+            i_type = IndicatorType.objects.create(indicator_type=menu_string[0])
+            indicators[i].indicator_type.add(i_type)
+
+            sector = Sector.objects.create(sector=menu_string[0])
+            indicator = indicators[i]
+            indicator.sector = sector
+            indicator.save()
+
+        # Serialize the data and check the filter menu order
+        serialized_data = IPTTProgramSerializer.load_for_pk(program.pk).data
+        english_menu_sorted = ['Apple', 'Banana', 'Cherry']
+        self.assertEqual([i_type['name'] for i_type in serialized_data['indicator_types']], english_menu_sorted)
+        self.assertEqual([sector['name'] for sector in serialized_data['sectors']], english_menu_sorted)
+        with lang_context(self.test_lang):
+            translated_menu_sorted = ['áCherry', 'Banana', 'ŽApple']
+            serialized_data = IPTTProgramSerializer.load_for_pk(program.pk).data
+            self.assertEqual([i_type['name'] for i_type in serialized_data['indicator_types']], translated_menu_sorted)
+            self.assertEqual([sector['name'] for sector in serialized_data['sectors']], translated_menu_sorted)

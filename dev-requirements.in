@@ -7,4 +7,4 @@ django-silk # Request-based query explainer, profiling, speed checking
 django-debug-toolbar  # In-page query explainer, profiling, template debug
 django-extensions # shell plus and other helpful tools
 pip-tools # used to produce requirements.txt
-polib # used in a management command to create placeholder translations
+polib # used in a management command to create placeholder translations, also used in tests
