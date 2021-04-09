@@ -539,6 +539,20 @@ class TestIPTTProgramSerializerFilterData(test.TestCase):
             po_file.append(po_entry)
         po_file.save(self.test_translation_file_stub + '.po')
         po_file.save_as_mofile(self.test_translation_file_stub + '.mo')
+        from django.utils import translation
+
+        # Reset gettext.GNUTranslation cache.
+        translation.gettext._translations = {}
+
+            # Reset Django by-language translation cache.
+        translation.trans_real._translations = {}
+
+        # Delete Django current language translation cache.
+        translation.trans_real._default = None
+
+        # Delete translation cache for the current thread,
+        # and re-activate the currently selected language (if any)
+        translation.activate(translation.get_language())
 
         # Add indicator type values and sector values in English
         for i, menu_string in enumerate(menu_strings):
