@@ -541,14 +541,18 @@ class TestIPTTProgramSerializerFilterData(test.TestCase):
         po_file.save_as_mofile(self.test_translation_file_stub + '.mo')
         from django.utils import translation
 
-        # # Reset gettext.GNUTranslation cache.
-        # translation.gettext._translations = {}
-        #
-        # # Reset Django by-language translation cache.
-        # translation.trans_real._translations = {}
-        #
-        # # Delete Django current language translation cache.
-        # translation.trans_real._default = None
+        # Because we've just created po/mo files, we need to dump the translation cache if we want it to find the
+        # translations in the file we just created.  In retrospect, mocking gettext might be a better way
+        # to do this, but I've already spent enough time on this test.
+
+        # Reset gettext.GNUTranslation cache.
+        translation.gettext._translations = {}
+
+        # Reset Django by-language translation cache.
+        translation.trans_real._translations = {}
+
+        # Delete Django current language translation cache.
+        translation.trans_real._default = None
 
         # Delete translation cache for the current thread,
         # and re-activate the currently selected language (if any)
