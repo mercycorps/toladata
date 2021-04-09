@@ -1,5 +1,6 @@
 from tola.settings.base import *
 import sys
+from os import path
 
 TESTING = len(sys.argv) > 1 and sys.argv[1] == 'test'
 
@@ -36,34 +37,15 @@ DATABASES = {
     },
 }
 
-"""Development settings and globals."""
-
-
-########## MANAGER CONFIGURATION
-# See: https://docs.djangoproject.com/en/dev/ref/settings/#admins
 ADMINS = (
     ('test', 'test@test.com'),
 )
 
-# See: https://docs.djangoproject.com/en/dev/ref/settings/#managers
 MANAGERS = ADMINS
-########## END MANAGER CONFIGURATION
 
-
-########## DEBUG CONFIGURATION
-# See: https://docs.djangoproject.com/en/dev/ref/settings/#debug
 DEBUG = False
 
-########## END DEBUG CONFIGURATION
-
-
-########## EMAIL CONFIGURATION
-# See: https://docs.djangoproject.com/en/dev/ref/settings/#email-backend
 EMAIL_BACKEND = 'django.core.mail.backends.console.EmailBackend'
-########## END EMAIL CONFIGURATION
-
-########## EMAIL SETTINGS
-
 EMAIL_USE_TLS = True
 EMAIL_HOST = 'smtp.gmail.com'
 EMAIL_PORT = 587
@@ -75,25 +57,13 @@ SERVER_EMAIL = "test@example.com"
 # Use an EMAIL_BACKEND setting like the one below in the test_local.py file if you want something different
 # EMAIL_BACKEND = 'django.core.mail.backends.filebased.EmailBackend'
 
-########## END EMAIL SETTINGS
-
-
-########## MongoDB Connect
-
-#connect('feeds')
-
-########## END DATABASE CONFIGURATION
-
-########## GOOGLE CLIENT CONFIG ###########
-
-########## CACHE CONFIGURATION
-# See: https://docs.djangoproject.com/en/dev/ref/settings/#caches
 CACHES = {
     'default': {
         'BACKEND': 'django.core.cache.backends.locmem.LocMemCache',
     }
 }
-########## END CACHE CONFIGURATION
+
+LOCALE_PATHS = [path.join(DJANGO_ROOT, 'test/locale')]
 
 try:
     from tola.settings.test_local import *

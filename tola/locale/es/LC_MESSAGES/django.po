@@ -3862,7 +3862,7 @@ msgstr "éTranslated Agribusiness"
 #. domain) a program is most closely associated with
 #: tola/db_translations.py:34
 msgid "Agriculture"
-msgstr "Translated Agriculture"
+msgstr "ŽTranslated Agriculture"
 
 #. Translators: One of several choices for what sector (i.e. development
 #. domain) a program is most closely associated with
