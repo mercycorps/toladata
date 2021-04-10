@@ -1,6 +1,6 @@
 # Tola Activity
 
-**The build status of the dev branch is: [![Build Status](https://travis-ci.org/mercycorps/TolaActivity.svg?branch=dev)](https://travis-ci.org/mercycorps/TolaActivity)**
+**The build status of the dev branch is: ![workflow](https://github.com/mercycorps/toladata/actions/workflows/run_tests.yml/badge.svg)
 
 TolaActivity is a software tool that is used to track program performance
 of development work across the globe.  It includes the ability to set periodic
@@ -177,7 +177,7 @@ database `NAME`, `USER`, and `PASSWORD` as appropriate. If you have a dump of an
     ```bash
     $ mkdir /User/<username>/logs
     ```
-    
+
     Modify the LOGFILE entry so it points to the file in the _logs_ directory you just created.
     For example:
     ```yaml
@@ -189,7 +189,7 @@ database `NAME`, `USER`, and `PASSWORD` as appropriate. If you have a dump of an
 Log into mysql and create the database, create the user, and grant permissions with the following commands using the same database `Name`, `User`, and `Password` used in the _settings.secret.yml_ file. The commands below uses the example values commented in the previous section.
 ```sql
 $ mysql -u root  # Ubuntu users will need to use sudo for this line
-mysql> CREATE DATABASE myDatabaseName; 
+mysql> CREATE DATABASE myDatabaseName;
 mysql> CREATE USER 'myUsername'@'localhost' IDENTIFIED BY 'SooperSekritWord';
 mysql> GRANT ALL ON myDatabaseName.* TO 'myUsername'@'localhost';
 mysql> exit
@@ -278,12 +278,12 @@ Use the `createsuperuser` command and enter in a username and password to be use
 ```bash
 $ python manage.py createsuperuser
 Username: <my_username>
-Email address: 
+Email address:
 Password: <my_password>
 Password (again): <my_password>
 Superuser created successfully.
 
-``` 
+```
 
 Log into MySQL and get the id of the record you just added from the auth.user table using the following query:
 
