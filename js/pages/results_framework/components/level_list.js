@@ -93,7 +93,7 @@ export class LevelListPanel  extends React.Component {
                         isDisabled={isCollapseAllDisabled}
                         collapseFunc={this.props.rootStore.uiStore.collapseAllLevels} />
                     </div>
-                    <div className="level-list--action-buttons">
+                    <div className="level-list--action-buttons" style={{display: "flex"}}>
                         {
                             this.props.rootStore.levelStore.accessLevel === "high" ?
                                     <ImportIndicatorPopover />

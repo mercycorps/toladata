@@ -1,7 +1,17 @@
-.import-text {
-    padding-left: 20px;
+.importIndicators {
+    &-body {
+        display: none;
+    }
+    &-title {
+        display: none;
+    }
 }
 
+.import-text {
+    ol {
+        padding-left: 20px;
+    }
+}
 
 .import-buttons {
     display: flex;
