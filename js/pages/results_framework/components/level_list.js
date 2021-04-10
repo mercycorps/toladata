@@ -148,7 +148,7 @@ export class LevelListPanel  extends React.Component {
                     </div>
                 </div>
                 <button type="button" className="close" data-dismiss="alert" aria-label="Close" onClick={this.handleBannerClose}>
-                    <span aria-hidden="true" className="x-modal">&times;</span>
+                    <span aria-hidden="true" >&times;</span>
                 </button>
             </div>
 
