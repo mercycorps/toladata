@@ -1,6 +1,6 @@
 # Tola Activity
 
-**The build status of the dev branch is: ![workflow](https://github.com/mercycorps/toladata/actions/workflows/run_tests.yml/badge.svg)
+**The build status of the dev branch is: ![workflow](https://github.com/mercycorps/toladata/actions/workflows/run_tests.yml/badge.svg)**
 
 TolaActivity is a software tool that is used to track program performance
 of development work across the globe.  It includes the ability to set periodic
