@@ -14,6 +14,7 @@ from .models import (
     OrganizationAdmin,
     ProgramAccess,
     TolaUserAdmin,
+    Region
 )
 
 
@@ -28,6 +29,19 @@ class CountryAdmin(ImportExportModelAdmin):
     resource_class = CountryResource
     list_display = ('country','code','organization','create_date', 'edit_date')
     list_filter = ('country','organization__name')
+
+
+class CountryInLineAdmin(admin.StackedInline):
+    model = Country
+    fields = ['country']
+    readonly_fields = ['country']
+    can_delete = False
+    extra = 0
+    classes = ['hide-inline-header']
+    max_num = 0  # eliminates option to add country from the region page
+
+    class Media:
+        css = {"all": ("css/admin/inline_forms.css",)}
 
 
 # Resource for CSV export
@@ -84,6 +98,12 @@ class ProgramAdmin(admin.ModelAdmin):
             messages.add_message(request, messages.ERROR, message)
 
         super(ProgramAdmin, self).save_model(request, obj, form, change)
+
+
+@admin.register(Region)
+class RegionAdmin(admin.ModelAdmin):
+    list_display = ['name', 'gait_region_id']
+    inlines = [CountryInLineAdmin]
 
 
 admin.site.register(Organization, OrganizationAdmin)
