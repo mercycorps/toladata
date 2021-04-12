@@ -19,7 +19,7 @@ mysqlclient                 # C bindings for mysql, required for Django to opera
 openpyxl~=3.0               # Excel read/write wrapper for python
 pbr                         # potentially used to manage git versions/manifest/tags?  unclear
 python3-saml                # potentially a dependency?  Not called directly in code
-pyyaml~=5.3                 # python bindings to read YAML files
+pyyaml~=5.4                 # python bindings to read YAML files
 simplejson~=3.17            # used in template tags to serialize to json
 social-auth-app-django~=4.0 # core of social auth (Okta and Google) in tola auth pipeline
 WeasyPrint                  # deprecated - only used in legacy (deprecated) disaggregation report (makes PDFs)
