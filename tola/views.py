@@ -186,7 +186,7 @@ def update_user_session(request):
         - updates the user's currently active session with the new values
         - returns 202 "Accepted" on success
     """
-    if request.is_ajax() and request.method == "PUT":
+    if request.method == "PUT":
         error = None
         try:
             body = json.loads(request.body)
@@ -201,6 +201,15 @@ def update_user_session(request):
             logger.error(error)
             return HttpResponse(error, status=500)
         return HttpResponse(status=204)
+    if  request.method == "GET": 
+        try:
+            query = request.GET["query"]
+            dump = json.dumps({"data": request.session.get(query)})
+            return HttpResponse(dump, content_type='application/json', status=200)
+        except:
+            error = "Error getting session variables (request params {0})".format(query)
+            logger.error(error)
+            return HttpResponse(error, status=500)
     logger.warning(
         "Attempted to access update_user_session with method: %s / %s, and payload: %s",
         request.method, "AJAX" if request.is_ajax() else "synchronous", request.body

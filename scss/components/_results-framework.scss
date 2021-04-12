@@ -281,8 +281,9 @@
 
     .close {
         position: absolute;
-        top: 0;
-        right: 6px;
+        top: 2px;
+        right: 8px;
         color: $teal;
+        opacity: 1;
     }
 }

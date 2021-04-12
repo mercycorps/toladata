@@ -2,11 +2,13 @@
 Updates data collection and reporting frequency values to match new schema.
 """
 
+from datetime import datetime
 import collections
 
 from django.core.management.base import BaseCommand
 from django.db import transaction
 from django.db.models import Q
+from django.utils import timezone
 
 from indicators.models import DataCollectionFrequency, ReportingFrequency, Indicator
 
@@ -28,8 +30,9 @@ class Command(BaseCommand):
                 'By batch', 'By distribution', 'By event', 'By training', 'Post shock']
 
             reporting_frequency_order = [
-                'Baseline', 'Midline', 'Endline', 'Annual', 'Semi-annual', 'Quarterly', 'Monthly', 'By batch',
-                'By distribution', 'By event', 'Post shock']
+                'Baseline', 'Midline', 'Endline', 'Final evaluation', 'Annual', 'Semi-annual', 'Quarterly',
+                'Monthly', 'By batch', 'By distribution', 'By event', 'Post shock']
+            tz = timezone.get_current_timezone()
 
             # Get clear the normal sort order range to make way for the new values.  Anything with a sort-order
             # value of greater than 100 will be deleted at the bottom of the script because they aren't used any more.
@@ -44,7 +47,9 @@ class Command(BaseCommand):
                 (ReportingFrequency, reporting_frequency_order)]:
                 for i, freq_name in enumerate(freq_list):
                     obj, created = model.objects.get_or_create(
-                        frequency=freq_name, defaults={'sort_order': i})
+                        frequency=freq_name,
+                        defaults={
+                            'sort_order': i, 'create_date': datetime.now(tz=tz), 'edit_date': datetime.now(tz=tz)})
                     if not created:
                         obj.frequency = obj.frequency.strip()
                         obj.sort_order = i
@@ -65,7 +70,7 @@ class Command(BaseCommand):
                 'Baseline': ['Baseline'],
                 'After each visit': ['By event'],
                 'Once per Semester/Batch': ['By batch'],
-                'Once per 3 Years': ['Annual'],
+                'Once per 3 Years': ['By event'],
                 'Once in the beginning of Year 1': ['By event'],
                 'Once per Semester/Batch 2': ['By batch'],
                 'Once in the Beginning of Year 2': ['By event'],
@@ -92,6 +97,7 @@ class Command(BaseCommand):
                 'Before and After training session': ['By event'],
                 'Weekly': ['By event'],
                 'Bi-Weekly': ['By event'],
+                'Final': ['Final evaluation']
             }
 
             # Create a map of old value id to a list of new values, using the name maps above
@@ -106,9 +112,9 @@ class Command(BaseCommand):
                         object_map[old_name_id].append(
                             model.objects.get(frequency=new_name))
 
-            # Now reassign the frequency values to the indicators
+                # Now reassign the frequency values to the indicators
             for indicator in Indicator.objects.all_with_deleted()\
-                    .filter(Q(reporting_frequencies__isnull=False) or Q(data_collection_frequencies__isnull=False))\
+                    .filter(Q(reporting_frequencies__isnull=False) | Q(data_collection_frequencies__isnull=False))\
                     .prefetch_related('data_collection_frequencies', 'reporting_frequencies'):
                 if indicator.reporting_frequencies.exists():
                     old_reporting_freq_id = indicator.reporting_frequencies.first().id
@@ -121,5 +127,11 @@ class Command(BaseCommand):
                     indicator.data_collection_frequencies.add(
                         *data_collection_old_to_new_objs[old_data_collection_freq_id])
 
-            DataCollectionFrequency.objects.filter(sort_order__gte=100).delete()
-            ReportingFrequency.objects.filter(sort_order__gte=100).delete()
+            old_freqs = Indicator.objects.filter(data_collection_frequencies__sort_order__gte=100).count()
+            old_freqs += Indicator.objects.filter(reporting_frequencies__sort_order__gte=100).count()
+            if old_freqs > 0:
+                print('Still some old values being used')
+                raise NotImplementedError
+            else:
+                DataCollectionFrequency.objects.filter(sort_order__gte=100).delete()
+                ReportingFrequency.objects.filter(sort_order__gte=100).delete()

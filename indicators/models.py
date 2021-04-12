@@ -19,7 +19,7 @@ from django.dispatch import receiver
 from django.http import QueryDict
 from django.urls import reverse
 from django.utils import formats, timezone
-from django.utils.translation import ugettext_lazy as _
+from django.utils.translation import gettext_lazy as _
 from django.contrib import admin
 from django.utils.functional import cached_property
 import django.template.defaultfilters
@@ -645,6 +645,7 @@ class ReportingFrequency(models.Model):
 
     class Meta:
         verbose_name = _("Reporting Frequency")
+        ordering = ['sort_order']
 
     def __str__(self):
         return self.frequency
@@ -661,6 +662,7 @@ class DataCollectionFrequency(models.Model):
 
     class Meta:
         verbose_name = _("Data Collection Frequency")
+        ordering = ['sort_order']
 
     def __str__(self):
         return self.frequency
@@ -1448,7 +1450,7 @@ class Indicator(SafeDeleteModel):
         self.edit_date = timezone.now()
         if self.level and self.level.program_id != self.program_id:
             raise ValidationError(
-                # Translators: This is an error message that is returned when a user is trying to assign an indicator to the wrong hierarch of levels.
+                # Translators: This is an error message that is returned when a user is trying to assign an indicator to the wrong hierarchy of levels.
                 _('Level/Indicator mismatched program IDs ' +
                   '(level %(level_program_id)d and indicator %(indicator_program_id)d)'),
                 code='foreign_key_constraint',
@@ -1986,7 +1988,7 @@ class PeriodicTarget(models.Model):
         It's unclear how some of these ''.format() works, as some params are gettext_lazy() (unicode) values containing
         non-ASCII chars being plugged into a non-unicode string. This normally crashes but for some reason it works here.
 
-        An example of something that crashes in the REPL but seemingly works here when using ugettext_lazy():
+        An example of something that crashes in the REPL but seemingly works here when using gettext_lazy():
 
             '{year}'.format(year=u'Año')
 
