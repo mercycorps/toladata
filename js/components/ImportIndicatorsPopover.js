@@ -1,6 +1,7 @@
 import React from 'react'
+import {BootstrapPopoverButton} from './helpPopover' 
 
-export default class ImportIndicatorsPopover extends React.Component {
+export class xImportIndicatorsPopover extends React.Component {
     constructor(props) {
         super(props);
     }
@@ -38,7 +39,7 @@ export default class ImportIndicatorsPopover extends React.Component {
                             gettext('Import Indicators')
                         }
                 </button>
-    
+                        
     
                 <div className="importIndicators-body">
                     <div className="import-text">
@@ -91,4 +92,27 @@ export default class ImportIndicatorsPopover extends React.Component {
             </div>
         )
     }
+}
+
+export class ImportIndicatorsPopover extends BootstrapPopoverButton {
+    popoverName = "importIndicators"
+
+    getPopoverContent = () => {
+        return (
+            <ExcelPopover { ...this.props } />
+            );
+    }
+
+    render() {
+        return (
+            <React.Fragment>
+                <button type="button"
+                    className="btn btn-sm btn-secondary"
+                    ref="target">
+                    <i className="fas fa-download"></i> Excel
+                    </button>
+            </React.Fragment>
+        );
+    }
+
 }
