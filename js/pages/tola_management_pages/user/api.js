@@ -36,7 +36,7 @@ export const createUser = (new_user_data) => api.post(`/tola_management/user/`, 
     return response.data
 })
 
-export const resendRegistrationEmail = (user_id) => api.post(`/tola_management/user/${user_id}/resend_registration_email/`, {}).then(response => response.data)
+export const resendRegistrationEmail = (user_id) => api.get(`/tola_management/user/${user_id}/resend_registration_email/`, {}).then(response => response.data)
 
 export const bulkUpdateUserStatus = (user_ids, new_status) => api.post(`/tola_management/user/bulk_update_status/`, {user_ids, new_status}).then(response => response.data)
 export const bulkAddPrograms = (user_ids, added_programs) => api.post(`/tola_management/user/bulk_add_programs/`, {user_ids, added_programs}).then(response => response.data)
