@@ -6,7 +6,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: \n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2021-03-08 17:17-0800\n"
+"POT-Creation-Date: 2021-04-05 14:02-0700\n"
 "PO-Revision-Date: 2021-03-08 16:59-0800\n"
 "Last-Translator: \n"
 "Language-Team: \n"
@@ -51,7 +51,7 @@ msgstr "Éxito"
 
 #. Translators: the header of an alert where additional warning info is provided
 #: js/base.js:430 js/pages/results_framework/components/level_cards.js:86
-#: js/pages/results_framework/models.js:620
+#: js/pages/results_framework/models.js:626
 #: js/pages/tola_management_pages/country/components/edit_disaggregations.js:657
 #: js/pages/tola_management_pages/country/models.js:438
 #: js/pages/tola_management_pages/country/models.js:473
@@ -428,46 +428,46 @@ msgid "Target periods"
 msgstr "Periodos objetivo"
 
 #. Translators: The user has successfully "pinned" a report link to a program page for quick access to the report */}
-#: js/pages/iptt_report/components/report/buttons.js:78
+#: js/pages/iptt_report/components/report/buttons.js:80
 msgid "Success!  This report is now pinned to the program page."
 msgstr "¡Éxito! Este informe ahora está anclado en la página del programa."
 
 #. Translators: This is not really an imperative, it's an option that is available once you have pinned a report to a certain web page */}
-#: js/pages/iptt_report/components/report/buttons.js:84
+#: js/pages/iptt_report/components/report/buttons.js:86
 msgid "Visit the program page now."
 msgstr "Visitar la página del programa ahora."
 
 #. Translators: Some error occured when trying to pin the report*/}
-#: js/pages/iptt_report/components/report/buttons.js:95
+#: js/pages/iptt_report/components/report/buttons.js:97
 msgid "Something went wrong when attempting to pin this report."
 msgstr "Algo salió mal al intentar anclar este informe."
 
 #. Translators: a field where users can name their newly created report */
-#: js/pages/iptt_report/components/report/buttons.js:107
+#: js/pages/iptt_report/components/report/buttons.js:109
 msgid "Report name"
 msgstr "Nombre del informe"
 
 #. Translators: An error occured because a report has already been pinned with that same name */}
-#: js/pages/iptt_report/components/report/buttons.js:120
+#: js/pages/iptt_report/components/report/buttons.js:122
 msgid "A pin with this name already exists."
 msgstr "Ya existe un informe fijo con este nombre."
 
-#: js/pages/iptt_report/components/report/buttons.js:133
+#: js/pages/iptt_report/components/report/buttons.js:135
 msgid "Pin to program page"
 msgstr "Anclar a la página del programa"
 
 #. Translators: a button that lets a user "pin" (verb) a report to their home page */
-#: js/pages/iptt_report/components/report/buttons.js:176
+#: js/pages/iptt_report/components/report/buttons.js:178
 msgid "Pin"
 msgstr "Fijar"
 
 #. Translators: a download button for a report containing just the data currently displayed */
-#: js/pages/iptt_report/components/report/buttons.js:214
+#: js/pages/iptt_report/components/report/buttons.js:216
 msgid "Current view"
 msgstr "Vista actual"
 
 #. Translators: a download button for a report containing all available data */
-#: js/pages/iptt_report/components/report/buttons.js:220
+#: js/pages/iptt_report/components/report/buttons.js:222
 msgid "All program data"
 msgstr "Todos los datos del programa"
 
@@ -531,20 +531,20 @@ msgstr "Nivel"
 
 #. Translators: Column header */
 #: js/pages/iptt_report/components/report/tableHeader.js:130
-#: js/pages/iptt_report/models/filterStore.js:712
+#: js/pages/iptt_report/models/filterStore.js:733
 #: js/pages/program_page/components/indicator_list.js:197
 msgid "Unit of measure"
 msgstr "Unidad de medida"
 
 #. Translators: Column header for "direction of change" column (increasing/decreasing) */
 #: js/pages/iptt_report/components/report/tableHeader.js:138
-#: js/pages/iptt_report/models/filterStore.js:713
+#: js/pages/iptt_report/models/filterStore.js:734
 msgid "Change"
 msgstr "Cambio"
 
 #. Translators: Column header, stands for "Cumulative"/"Non-cumulative" */
 #: js/pages/iptt_report/components/report/tableHeader.js:145
-#: js/pages/iptt_report/models/filterStore.js:714
+#: js/pages/iptt_report/models/filterStore.js:735
 msgid "C / NC"
 msgstr "C / NC"
 
@@ -555,7 +555,7 @@ msgstr "# / %"
 
 #. Translators: Column header */
 #: js/pages/iptt_report/components/report/tableHeader.js:159
-#: js/pages/iptt_report/models/filterStore.js:716
+#: js/pages/iptt_report/models/filterStore.js:737
 #: js/pages/program_page/components/indicator_list.js:198
 msgid "Baseline"
 msgstr "Base"
@@ -618,7 +618,7 @@ msgstr "Niveles"
 #. Translators: labels categories that  data could be disaggregated into */
 #. Translators: A list of disaggregation types follows this header. */
 #: js/pages/iptt_report/components/sidebar/reportFilter.js:42
-#: js/pages/iptt_report/models/filterStore.js:483
+#: js/pages/iptt_report/models/filterStore.js:504
 msgid "Disaggregations"
 msgstr "Desagregaciones"
 
@@ -673,23 +673,23 @@ msgid "Show/Hide Filters"
 msgstr "Mostrar/Ocultar filtros"
 
 #. Translators: User-selectable option that filters out rows from a table where the disaggregation category has not been used (i.e. avoids showing lots of blank rows. */
-#: js/pages/iptt_report/models/filterStore.js:475
+#: js/pages/iptt_report/models/filterStore.js:496
 msgid "Only show categories with results"
 msgstr "Mostrar solo categorías con resultados"
 
 #. Translators: filter that allows users to select only those disaggregation types that are available across the globe (i.e. across the agency). */
-#: js/pages/iptt_report/models/filterStore.js:478
+#: js/pages/iptt_report/models/filterStore.js:499
 msgid "Global disaggregations"
 msgstr "Desagregaciones globales"
 
 #. Translators: Allows users to filter an indicator list for indicators that are unassigned. */
-#: js/pages/iptt_report/models/filterStore.js:658
+#: js/pages/iptt_report/models/filterStore.js:679
 #: js/pages/logframe/components/table.js:110
 msgid "Indicators unassigned to  a results framework level"
 msgstr "Indicadores sin asignar a un nivel del sistema de resultados"
 
 #. Translators: this labels a filter option for a label as including subordinate levels */
-#: js/pages/iptt_report/models/ipttLevel.js:33
+#: js/pages/iptt_report/models/ipttLevel.js:36
 #, python-format
 msgid "%(this_level_number)s and sub-levels: %(this_level_full_name)s"
 msgstr "%(this_level_number)s y subniveles: %(this_level_full_name)s"
@@ -1120,7 +1120,7 @@ msgstr ""
 #. Translators: This is a validation message given to the user when the user-editable name field has been deleted or omitted. */
 #. Translators: This is a warning messages when a user has entered duplicate names for two different objects and those names contain only white spaces, both of which are not permitted. */
 #: js/pages/results_framework/components/level_cards.js:441
-#: js/pages/results_framework/models.js:707
+#: js/pages/results_framework/models.js:713
 msgid "Please complete this field."
 msgstr "Por favor complete este campo."
 
@@ -1146,8 +1146,8 @@ msgstr "Guardar y vincular %s"
 msgid "Save and close"
 msgstr "Guardar y cerrar"
 
-#: js/pages/results_framework/components/level_cards.js:648
-#: js/pages/results_framework/components/level_cards.js:690
+#: js/pages/results_framework/components/level_cards.js:685
+#: js/pages/results_framework/components/level_cards.js:727
 #: js/pages/results_framework/components/level_tier_lists.js:48
 #: js/pages/tola_management_pages/program/components/program_editor.js:33
 #: js/pages/tola_management_pages/program/components/program_settings.js:64
@@ -1155,7 +1155,7 @@ msgid "Settings"
 msgstr "Ajustes"
 
 #. Translators: Popover for help link telling users how to associate an Indicator not yet linked to a Level */
-#: js/pages/results_framework/components/level_cards.js:660
+#: js/pages/results_framework/components/level_cards.js:697
 msgid ""
 "To link an already saved indicator to your results framework: Open the "
 "indicator from the program page and use the “Result level” menu on the "
@@ -1166,7 +1166,7 @@ msgstr ""
 "\" en la pestaña Resumen."
 
 #. Translators: Popover for help link, tell user how to disassociate an Indicator from the Level they are currently editing. */
-#: js/pages/results_framework/components/level_cards.js:662
+#: js/pages/results_framework/components/level_cards.js:699
 msgid ""
 "To remove an indicator: Click “Settings”, where you can reassign the "
 "indicator to a different level or delete it."
@@ -1175,7 +1175,7 @@ msgstr ""
 "reasignar el indicador a un nivel diferente o eliminarlo."
 
 #. Translators: Title for a section that lists the Indicators associated with whatever this.props.tiername is. */}
-#: js/pages/results_framework/components/level_cards.js:678
+#: js/pages/results_framework/components/level_cards.js:715
 #, python-format
 msgid "Indicators linked to this %s"
 msgstr "Indicadores vinculados a este %s"
@@ -1236,29 +1236,29 @@ msgstr "Personalizado"
 #. Translators: Notification to user that the an update was successful
 #. Translators: Notification to user that the update they initiated was successful */
 #: js/pages/results_framework/models.js:145
-#: js/pages/results_framework/models.js:234
+#: js/pages/results_framework/models.js:240
 msgid "Changes to the results framework template were saved."
 msgstr "Se guardaron los cambios en la plantilla del sistema de resultados."
 
 #. Translators: Notification to user that the deletion command that they issued was successful */
-#: js/pages/results_framework/models.js:357
+#: js/pages/results_framework/models.js:363
 #, python-format
 msgid "%s was deleted."
 msgstr "%s fue eliminado."
 
 #. Translators: This is a confirmation message that confirms that change has been successfully saved to the DB.
-#: js/pages/results_framework/models.js:392
+#: js/pages/results_framework/models.js:398
 #, python-format
 msgid "%s saved."
 msgstr "%s guardado."
 
 #. Translators:  Confirmation message that user-supplied updates were successfully applied.
-#: js/pages/results_framework/models.js:417
+#: js/pages/results_framework/models.js:423
 #, python-format
 msgid "%s updated."
 msgstr "%s actualizado."
 
-#: js/pages/results_framework/models.js:566
+#: js/pages/results_framework/models.js:572
 msgid ""
 "<strong class=\"text-danger\">Choose your results framework template "
 "carefully!</strong> Once you begin building your framework, it will not be "
@@ -1273,7 +1273,7 @@ msgstr ""
 #. Translators: This is the prompt on a popup that has warned users about a change they are about to make that could have broad consequences
 #. Translators: This is a confirmation prompt to confirm a user wants to archive an item
 #. Translators: This is a confirmation prompt to confirm a user wants to unarchive an item
-#: js/pages/results_framework/models.js:623
+#: js/pages/results_framework/models.js:629
 #: js/pages/tola_management_pages/country/components/edit_disaggregations.js:661
 #: js/pages/tola_management_pages/country/models.js:478
 #: js/pages/tola_management_pages/country/models.js:510
@@ -1282,18 +1282,18 @@ msgid "Are you sure you want to continue?"
 msgstr "¿Está seguro que quiere continuar?"
 
 #. Translators:  This is a warning provided to the user when they try to cancel the editing of something they have already modified.  */
-#: js/pages/results_framework/models.js:625
+#: js/pages/results_framework/models.js:631
 #, python-format
 msgid "Changes to this %s will not be saved"
 msgstr "Los cambios a este/a %s no serán guardados"
 
 #. Translators: This is a warning messages when a user has entered duplicate names for two different objects */
-#: js/pages/results_framework/models.js:712
+#: js/pages/results_framework/models.js:718
 msgid "Result levels should not contain commas."
 msgstr "Los niveles de resultados no pueden contener comas."
 
 #. Translators: This is a warning messages when a user has a comma in a name that shouldn't contain commas */
-#: js/pages/results_framework/models.js:717
+#: js/pages/results_framework/models.js:723
 msgid "Result levels must have unique names."
 msgstr "Los niveles de resultados deben tener nombres únicos."
 
