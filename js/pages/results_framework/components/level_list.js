@@ -6,7 +6,7 @@ import { faCaretDown, faCaretRight, faSitemap } from '@fortawesome/free-solid-sv
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome'
 import {LevelCardCollapsed, LevelCardExpanded} from "./level_cards";
 import {ExpandAllButton, CollapseAllButton} from "../../../components/actionButtons";
-import ImportIndicatorPopover from "../../../components/ImportIndicatorsPopover"
+import {ImportIndicatorsButton} from "../../../components/ImportIndicatorsPopover"
 
 library.add(faCaretDown, faCaretRight, faSitemap);
 
@@ -96,7 +96,7 @@ export class LevelListPanel  extends React.Component {
                     <div className="level-list--action-buttons" style={{display: "flex"}}>
                         {
                             this.props.rootStore.levelStore.accessLevel === "high" ?
-                                    <ImportIndicatorPopover />
+                                    <ImportIndicatorsButton />
                                 : null
                         }
                         <button
