@@ -220,7 +220,7 @@ def update_user_session(request):
 @login_required
 def fail_mode_toggle(request):
     uri = request.get_host()
-    if not any(["qa" in uri, "127." in uri, "local" in uri]):
+    if not any(["dev" in uri, "dev2" in uri, "qa" in uri, "127." in uri, "local" in uri]):
         return JsonResponse({'success': False, 'error': 'Invalid environment'})
     if not request.user.is_superuser:
         return JsonResponse({'success': False, 'error': 'Insufficient permissions'})
