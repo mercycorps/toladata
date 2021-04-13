@@ -6,11 +6,8 @@ import { faCaretDown, faCaretRight, faSitemap } from '@fortawesome/free-solid-sv
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome'
 import {LevelCardCollapsed, LevelCardExpanded} from "./level_cards";
 import {ExpandAllButton, CollapseAllButton} from "../../../components/actionButtons";
-<<<<<<< HEAD
 import {ImportIndicatorsButton} from "../../../components/ImportIndicatorsPopover"
-=======
 import api from "../../../apiv2"
->>>>>>> hatchling
 
 library.add(faCaretDown, faCaretRight, faSitemap);
 
@@ -64,11 +61,16 @@ class LevelList extends React.Component {
 @inject('rootStore')
 @observer
 export class LevelListPanel  extends React.Component {
-
+    EMPTY = 0
+    NEW = 1;
+    FIRST = 2;
+    EXISTING = 3;
     constructor(props) {
         super(props);
         this.state = {
-            show_import_banner: null
+            show_import_banner: null,
+            levelsString: "",
+            level_status: this.EMPTY,
         };
     }
 
@@ -77,6 +79,11 @@ export class LevelListPanel  extends React.Component {
     };
 
     componentDidMount = () => {
+        this.setState({
+            level_status: this.setLevelStatus(),
+            levelsString: JSON.stringify(this.props.rootStore.levelStore.levels),
+        })
+
         // Handles getting the show/hide flag for the Bulk Import Banner in Django's Session Storage
         api.checkSessions("show_import_banner")
         .then((response) => {
@@ -86,6 +93,29 @@ export class LevelListPanel  extends React.Component {
                 })
             }
         })
+    }
+
+    componentDidUpdate = (prevProps, prevState) => {
+        if( this.state.levelsString !== JSON.stringify(this.props.rootStore.levelStore.levels) ) {
+            this.setState({
+                level_status: this.setLevelStatus(),
+                levelsString: JSON.stringify(this.props.rootStore.levelStore.levels),
+            })
+        }
+    }
+    
+    setLevelStatus = () => {
+        if (this.props.rootStore.levelStore.levels.length === 0) {
+            return this.EMPTY;
+        } else {
+            if (this.props.rootStore.levelStore.levels.filter( l => l.id !== "new").length > 1) {
+                return this.EXISTING;
+            } else if(this.props.rootStore.levelStore.levels.filter( l => l.id !== "new").length === 1) {
+                return this.FIRST;
+            } else {
+                return this.NEW
+            }
+        }
     }
 
     // Handles sending flags update to Django's Session Storage on banner close
@@ -136,6 +166,17 @@ export class LevelListPanel  extends React.Component {
                     </div>
                 </div>;
 
+        } else if (this.props.rootStore.levelStore.levels.length > 0) {
+            if (this.props.rootStore.levelStore.levels[0].id !== 'new') {
+                expandoDiv = 
+                <div className="level-list--expandos" style={{flexDirection: "row-reverse"}}>
+                    {
+                        this.props.rootStore.levelStore.accessLevel === "high" ?
+                                <ImportIndicatorsButton />
+                            : null
+                    }            
+                </div>
+            }
         }
         let bulkImportBanner = 
             <div 

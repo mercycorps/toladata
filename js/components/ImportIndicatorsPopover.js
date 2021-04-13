@@ -44,7 +44,7 @@ class ImportIndicatorsPopover extends React.Component {
                                             </li>
                                         </ol>
                                     </div>
-                    
+
                                     <div className="import-buttons">
                                         <button
                                             type="button"
