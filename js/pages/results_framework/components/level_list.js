@@ -127,57 +127,55 @@ export class LevelListPanel  extends React.Component {
         const isCollapseAllDisabled = this.props.rootStore.uiStore.hasVisibleChildren.length === 0 ||
             this.props.rootStore.uiStore.disableCardActions ||
             this.props.rootStore.uiStore.activeCard;
-        let expandoDiv = null;
-        if (this.props.rootStore.levelStore.levels.filter( l => l.id !== "new").length > 1){
-            const excelClickHandler = () => {
-                window.sendGoogleAnalyticsEvent({
-                    category: "Results Framework Builder",
-                    action: "Export",
-                    label: `Program ${this.props.rootStore.levelStore.program_id}`
-                });
-                window.open(this.props.rootStore.levelStore.excelURL, '_blank')
-            }
-            expandoDiv =
-                <div className="level-list--expandos">
-                    <div className="btn-group">
-                        <ExpandAllButton
-                        isDisabled={this.props.rootStore.uiStore.isExpandAllDisabled}
-                        expandFunc={this.props.rootStore.uiStore.expandAllLevels} />
-                        <CollapseAllButton
-                        isDisabled={isCollapseAllDisabled}
-                        collapseFunc={this.props.rootStore.uiStore.collapseAllLevels} />
-                    </div>
-                    <div className="level-list--action-buttons" style={{display: "flex"}}>
-                        {
-                            this.props.rootStore.levelStore.accessLevel === "high" ?
-                                    <ImportIndicatorsButton />
-                                : null
-                        }
-                        <button
-                            type="button"
-                            className="btn btn-sm btn-secondary"
-                            onClick={ excelClickHandler }>
-                            <i className="fas fa-download"></i>
-                            {
-                                //  # Translators: a button to download a spreadsheet
-                                gettext('Excel')
-                            }
-                        </button>
-                    </div>
-                </div>;
-
-        } else if (this.props.rootStore.levelStore.levels.length > 0) {
-            if (this.props.rootStore.levelStore.levels[0].id !== 'new') {
-                expandoDiv = 
-                <div className="level-list--expandos" style={{flexDirection: "row-reverse"}}>
-                    {
-                        this.props.rootStore.levelStore.accessLevel === "high" ?
-                                <ImportIndicatorsButton />
-                            : null
-                    }            
-                </div>
-            }
+        const excelClickHandler = () => {
+            window.sendGoogleAnalyticsEvent({
+                category: "Results Framework Builder",
+                action: "Export",
+                label: `Program ${this.props.rootStore.levelStore.program_id}`
+            });
+            window.open(this.props.rootStore.levelStore.excelURL, '_blank')
         }
+        let expandoDiv = (() => {
+            switch(this.state.level_status) {
+                case this.EMPTY || this.NEW:
+                    return (
+                        null
+                    );
+                case this.FIRST:
+                    return (
+                        <div className="level-list--expandos" style={{flexDirection: "row-reverse"}}>
+                            { this.props.rootStore.levelStore.accessLevel === "high" ? <ImportIndicatorsButton /> : null }            
+                        </div>
+                    );
+                case this.EXISTING:
+                    return (
+                        <div className="level-list--expandos">
+                            <div className="btn-group">
+                                <ExpandAllButton
+                                isDisabled={this.props.rootStore.uiStore.isExpandAllDisabled}
+                                expandFunc={this.props.rootStore.uiStore.expandAllLevels} />
+                                <CollapseAllButton
+                                isDisabled={isCollapseAllDisabled}
+                                collapseFunc={this.props.rootStore.uiStore.collapseAllLevels} />
+                            </div>
+                            <div className="level-list--action-buttons" style={{display: "flex"}}>
+                                { this.props.rootStore.levelStore.accessLevel === "high" ? <ImportIndicatorsButton /> : null }            
+                                <button
+                                    type="button"
+                                    className="btn btn-sm btn-secondary"
+                                    onClick={ excelClickHandler }>
+                                    <i className="fas fa-download"></i>
+                                    {
+                                        //  # Translators: a button to download a spreadsheet
+                                        gettext('Excel')
+                                    }
+                                </button>
+                            </div>
+                        </div>
+                    );
+            }
+        })();
+
         let bulkImportBanner = 
             <div 
                 role="alert" 
@@ -219,9 +217,9 @@ export class LevelListPanel  extends React.Component {
                     {
                         this.state.show_import_banner && // Hides Bulk Import Banner if stored as false in Django's Session Storage
                         this.props.rootStore.levelStore.accessLevel === 'high' && 
-                        this.props.rootStore.levelStore.levels[0].id !== 'new' 
-                        ? bulkImportBanner 
-                        : null
+                        this.state.level_status !== 1
+                            ? bulkImportBanner 
+                            : null
                     }
                     <LevelList renderList='initial'/>
                 </div>
