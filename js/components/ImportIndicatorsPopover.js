@@ -1,5 +1,6 @@
-import React from 'react'
-import {BootstrapPopoverButton} from './helpPopover' 
+import React from 'react';
+import { BootstrapPopoverButton } from './helpPopover';
+import api from '../apiv2';
 
 class ImportIndicatorsPopover extends React.Component {
     ONE = 0;
@@ -13,11 +14,19 @@ class ImportIndicatorsPopover extends React.Component {
 
     handleDownload = () => {
         console.log("Download Clicked");
-        alert('Download Clicked')
+        api.downloadTemplate()
+            .then(response => {
+                console.log("Reponse:", response);
+                alert("DONWLOAD TEMPLATE")
+            })
     }
     handleUpload = () => {
         console.log("Upload Clicked");
-        alert('Upload Clicked')
+        api.uploadTemplate()
+        .then(response => {
+            console.log("Reponse:", response);
+            alert("UPLOAD TEMPLATE")
+        })
     }
 
     render() {
