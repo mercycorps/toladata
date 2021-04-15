@@ -55,7 +55,7 @@ class FailModeMiddleware(object):
             return response
         # if we aren't on qa or local, fail mode doesn't even apply:
         uri = request.get_host()
-        if not any(["qa" in uri, "127." in uri, "local" in uri]):
+        if not any(["dev" in uri, "dev2" in uri, "qa" in uri, "127." in uri, "local" in uri]):
             return response
         # fail mode isn't supposed to interrupt regular page loads, only ajax / json requests:
         if (not request.is_ajax() and

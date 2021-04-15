@@ -111,6 +111,9 @@ class Region(models.Model):
     name = models.CharField(_("Region Name"), max_length=255)
     gait_region_id = models.PositiveIntegerField(blank=True, null=True)
 
+    def __str__(self):
+        return self.name
+
 
 class Country(models.Model):
     country = models.CharField(_("Country Name"), max_length=255, blank=True)
