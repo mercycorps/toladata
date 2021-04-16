@@ -3,12 +3,16 @@ import { BootstrapPopoverButton } from './helpPopover';
 import api from '../apiv2';
 
 class ImportIndicatorsPopover extends React.Component {
-    ONE = 0;
-    TWO = 1;
+    // These define the different cases/views of the Popover to switch between.
+    DOWNLOAD_UPLOAD = 0;
+    FEEDBACK = 1;
+    CONFIRM = 2;
+    SUCCESS = 3;
+
     constructor(props) {
         super(props);
         this.state = {
-            status: this.ONE
+            status: this.DOWNLOAD_UPLOAD
         }
     }
 
@@ -34,21 +38,22 @@ class ImportIndicatorsPopover extends React.Component {
             <React.Fragment>
                 {(() => {
                     switch(this.state.status) {
-                        case this.ONE:
+                        // View for downloading and uploading the template
+                        case this.DOWNLOAD_UPLOAD:
                             return (
                                 <div className="importIndicators-body">
                                     <div className="import-text">
                                         <ol>
                                             <li>
                                                 {
-                                                    // # Translators: TODO
+                                                    // # Translators: Instructions for users to download the template, open it in Excel, and then fill in indicators information.
                                                     gettext("Download the template, open it in Excel, and enter indicators.")
                                                 }
                                             </li>
                                             <li>
                                                 {
-                                                    // # Translators: TODO
-                                                    gettext("Upload the template and follow instructions to complete the proocess.")
+                                                    // # Translators: Instruction for users to upload their filled in template and then follow the instructions to complete the import process.
+                                                    gettext("Upload the template and follow instructions to complete the process.")
                                                 }
                                             </li>
                                         </ol>
@@ -61,7 +66,7 @@ class ImportIndicatorsPopover extends React.Component {
                                             onClick={() => this.handleDownload()}
                                             >
                                             {
-                                                // # Translators: TODO
+                                                // # Translators: Button to download a template
                                                 gettext("Download template")
                                             }
                                         </button>
@@ -71,17 +76,32 @@ class ImportIndicatorsPopover extends React.Component {
                                             onClick={() => this.handleUpload()}
                                         >
                                             {
-                                                // # Translators: TODO
+                                                // # Translators: Button to upload a template
                                                 gettext("Upload template")
                                             }
                                         </button>
                                     </div>
                                 </div> 
                             );
-                        case this.TWO:
+                        // View to provide error feedback on their uploaded template
+                        case this.FEEDBACK:
                             return (
                                 <div>
-                                    EMPTY
+                                    Error Feedback
+                                </div>
+                            )
+                        // View to ask users to confirm the upload
+                        case this.CONFIRM:
+                            return (
+                                <div>
+                                    Confrim Import
+                                </div>
+                            )
+                        // View for a successful upload (May or may not be needed if using PNotify)
+                        case this.SUCCESS:
+                            return (
+                                <div>
+                                    Successful Import
                                 </div>
                             )
                     }

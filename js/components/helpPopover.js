@@ -34,7 +34,7 @@ export default class HelpPopover extends React.Component {
 
 export class BootstrapPopoverButton extends React.Component {
     popoverName = 'base';
-    popoverTitle = '';
+    popoverTitle = ''; // By default, an empty string to produce no title for popovers. Can be overwrittien in instances of this class.
 
     componentDidMount = () => {
         // make a cancelable (class method) function so clicking out of the popover will close it:

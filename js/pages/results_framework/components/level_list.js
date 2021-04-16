@@ -61,16 +61,21 @@ class LevelList extends React.Component {
 @inject('rootStore')
 @observer
 export class LevelListPanel  extends React.Component {
+    // These define the cases/views of the RF Builder's main panel component. 
+    // These different views determine when the expandos, excel, and import buttons are shown.
+    // Empty for when there is no RF level at all. New for when the first RF level is started but not yet saved.
+    // First for when theres only one RF level saved. Existing for when there are multiply RF levels saved
     EMPTY = 0
     NEW = 1;
     FIRST = 2;
     EXISTING = 3;
+
     constructor(props) {
         super(props);
         this.state = {
             show_import_banner: null,
-            levelsString: "",
-            level_status: this.EMPTY,
+            levelsString: "", // State used to store the prev RF levels in a string to determine when there is a change and triggers an componentDidUpdate.
+            level_status: this.EMPTY, // State used to switch cases/views of the main RF Level panel component
         };
     }
 
@@ -104,6 +109,7 @@ export class LevelListPanel  extends React.Component {
         }
     }
     
+    // Method used to change the views when starting to add the first levels to the RF Builder.
     setLevelStatus = () => {
         if (this.props.rootStore.levelStore.levels.length === 0) {
             return this.EMPTY;
