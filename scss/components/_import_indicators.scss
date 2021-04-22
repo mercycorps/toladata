@@ -1,14 +1,69 @@
+.popover-header {
+    background-color: transparent;
+    border: none;
+}
+
+.popover-body {
+    padding: 0;
+}
+
+
 .import-text {
+    padding: 0.5rem 0.75rem;
+
     ol {
-        padding-left: 20px;
+        padding-left: 1rem;
     }
 }
 
 .import-buttons {
     display: flex;
     flex-direction: column;
+    margin-top: 1rem;
+    padding: 0.5rem 0.75rem;
+    background-color: $gray-300;
+    border-top: 1px solid $gray-500;
 
     button {
         margin: .25rem;
     }
+}
+
+.advanced-button {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    color: $action;
+    font-weight: bold;
+
+    :hover {
+        color: $action;
+    }
+}
+
+.advanced-text {
+    padding: 0.5rem 0.75rem;
+
+}
+
+.advanced-levels{
+    display: flex;
+    justify-content: space-between;
+    align-self: center;
+    width: auto;
+    margin: 6px 12px;
+}
+
+.advanced-options {
+    padding: 5px 15px;
+}
+
+.temp-view {
+    display: flex;
+    justify-content: center;
+    align-self: center;
+    min-height: 60px;
+    border: 1px solid black;
+    border-radius: 5px;
+    padding: 5px;
 }
