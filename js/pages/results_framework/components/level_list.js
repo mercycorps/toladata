@@ -168,7 +168,7 @@ export class LevelListPanel  extends React.Component {
                                 { this.props.rootStore.levelStore.accessLevel === "high" ? <ImportIndicatorsButton levelStore={this.props.rootStore.levelStore} /> : null }            
                                 <button
                                     type="button"
-                                    className="btn btn-sm btn-secondary"
+                                    className="btn btn-sm btn-secondary ml-2"
                                     onClick={ excelClickHandler }>
                                     <i className="fas fa-download"></i>
                                     {
