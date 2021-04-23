@@ -6,7 +6,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: \n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2021-04-06 17:45-0700\n"
+"POT-Creation-Date: 2021-04-23 11:19-0700\n"
 "PO-Revision-Date: 2021-03-08 16:59-0800\n"
 "Last-Translator: \n"
 "Language-Team: \n"
@@ -65,6 +65,38 @@ msgstr "Advertencia"
 #: js/base.js:448
 msgid "Error"
 msgstr "Error"
+
+#. Translators: Instructions for users to download the template, open it in
+#. Excel, and then fill in indicators information.
+#: js/components/ImportIndicatorsPopover.js:50
+msgid "Download the template, open it in Excel, and enter indicators."
+msgstr ""
+"ÁTranslated Download the template, open it in Excel, and enter indicators."
+
+#. Translators: Instruction for users to upload their filled in template and
+#. then follow the instructions to complete the import process.
+#: js/components/ImportIndicatorsPopover.js:56
+msgid "Upload the template and follow instructions to complete the process."
+msgstr ""
+"éTranslated Upload the template and follow instructions to complete the "
+"process."
+
+#. Translators: Button to download a template
+#: js/components/ImportIndicatorsPopover.js:70
+msgid "Download template"
+msgstr "Translated Download template"
+
+#. Translators: Button to upload a template
+#: js/components/ImportIndicatorsPopover.js:80
+#| msgid "Template"
+msgid "Upload template"
+msgstr "ÁTranslated Upload template"
+
+#. Translators: a button to download a spreadsheet
+#: js/components/ImportIndicatorsPopover.js:135
+#| msgid "program indicator"
+msgid "Import indicators"
+msgstr "éTranslated Import indicators"
 
 #. Translators: button label to show the details of all items in a list */}
 #. Translators: button label to show the details of all rows in a list */}
@@ -1265,7 +1297,7 @@ msgid "Indicators linked to this %s"
 msgstr "Indicadores vinculados a este %s"
 
 #. Translators: a button to download a spreadsheet
-#: js/pages/results_framework/components/level_list.js:103
+#: js/pages/results_framework/components/level_list.js:176
 #: js/pages/tola_management_pages/audit_log/views.js:224
 msgid "Excel"
 msgstr "Sobresalir"
@@ -1274,14 +1306,18 @@ msgstr "Sobresalir"
 #. one at a time, they can use an Excel template to enter multiple indicators
 #. at the same time. First step is to build the result framework below, then
 #. click the 'Import indicators' button above
-#: js/pages/results_framework/components/level_list.js:121
+#: js/pages/results_framework/components/level_list.js:199
+#| msgid ""
+#| "Instead of entering indicators one at a time, use an Excel template to "
+#| "import multiple indicators! First, build your result framework below. Next, "
+#| "click the “Import indicators” button above."
 msgid ""
 "Instead of entering indicators one at a time, use an Excel template to "
-"import multiple indicators! First, build your result framework below. Next, "
-"click the “Import indicators” button above."
+"import multiple indicators! First, build your results framework below. Next,"
+" click the “Import indicators” button above."
 msgstr ""
-"ÁTranslated Instead of entering indicators one at a time, use an Excel "
-"template to import multiple indicators! First, build your result framework "
+"Translated Instead of entering indicators one at a time, use an Excel "
+"template to import multiple indicators! First, build your results framework "
 "below. Next, click the “Import indicators” button above."
 
 #. Translators: this refers to an imperative verb on a button ("Apply
@@ -2355,7 +2391,7 @@ msgid "Verification email send failed"
 msgstr "Falló el envío de correo electrónico de verificación"
 
 #. Translators: a list of groups of countries (i.e. "Asia")
-#: js/pages/tola_management_pages/user/models.js:712
+#: js/pages/tola_management_pages/user/models.js:715
 msgid "Regions"
 msgstr "Regiones"
 
@@ -2432,7 +2468,6 @@ msgstr "Translated By training"
 #. Translators: One of several options for specifying how often data is
 #. collected or reported on over the life of a program
 #: tola/db_translations.js:12
-#| msgid "Find an Organization"
 msgid "Final evaluation"
 msgstr "ÁTranslated Final evaluation"
 
@@ -2457,7 +2492,6 @@ msgstr "Línea media"
 #. Translators: One of several options for specifying how often data is
 #. collected or reported on over the life of a program
 #: tola/db_translations.js:28
-#| msgid "Event"
 msgid "By event"
 msgstr "éTranslated By event"
 
@@ -2506,7 +2540,6 @@ msgstr "Translated Climate Change Adaptation & Disaster Risk Reduction"
 #. Translators: One of several choices for what sector (i.e. development
 #. domain) a program is most closely associated with
 #: tola/db_translations.js:44
-#| msgid "Community Involvement"
 msgid "Conflict Management"
 msgstr "Translated Conflict Management"
 
@@ -2627,7 +2660,6 @@ msgstr "éTranslated Hygiene Promotion"
 #. Translators: One of several choices for what sector (i.e. development
 #. domain) a program is most closely associated with
 #: tola/db_translations.js:84
-#| msgid "Information Use"
 msgid "Information Dissemination"
 msgstr "Translated Information Dissemination"
 
@@ -2670,14 +2702,12 @@ msgstr "Translated Nutrition Sensitive"
 #. Translators: One of several choices for what sector (i.e. development
 #. domain) a program is most closely associated with
 #: tola/db_translations.js:98
-#| msgid "Project Initiation"
 msgid "Project Monitoring"
 msgstr "ŹTranslated Project Monitoring"
 
 #. Translators: One of several choices for what sector (i.e. development
 #. domain) a program is most closely associated with
 #: tola/db_translations.js:100
-#| msgid "Project Description"
 msgid "Protection"
 msgstr "ÁTranslated Protection"
 
@@ -2690,7 +2720,6 @@ msgstr "Translated Psychosocial"
 #. Translators: One of several choices for what sector (i.e. development
 #. domain) a program is most closely associated with
 #: tola/db_translations.js:104
-#| msgid "Public Dashboards"
 msgid "Public Health"
 msgstr "éTranslated Public Health"
 
@@ -2715,7 +2744,6 @@ msgstr "éTranslated Skills and Training"
 #. Translators: One of several choices for what sector (i.e. development
 #. domain) a program is most closely associated with
 #: tola/db_translations.js:112
-#| msgid "Data issues"
 msgid "Urban Issues"
 msgstr "Translated Urban Issues"
 
@@ -2796,7 +2824,6 @@ msgstr "éTranslated Context / Trigger"
 #. is being created.  An Indicator is a performance measure e.g. "We will
 #. distrubute 1000 food packs over the next two months"
 #: tola/db_translations.js:138
-#| msgid "Key Performance Indicators"
 msgid "Key Performance Indicator (KPI)"
 msgstr "Translated Key Performance Indicator (KPI)"
 
@@ -4768,9 +4795,6 @@ msgstr "Translated Key Performance Indicator (KPI)"
 #~ msgid "Type (File or URL)"
 #~ msgstr "Tipo (archivo o URL)"
 
-#~ msgid "Template"
-#~ msgstr "Modelo"
-
 #~ msgid "Stakeholder/Organization Name"
 #~ msgstr "Nombre de parte interesada/organización"
 
@@ -5163,9 +5187,6 @@ msgstr "Translated Key Performance Indicator (KPI)"
 #, fuzzy
 #~ msgid "Quarter %s"
 #~ msgstr "Trimestre %s"
-
-#~ msgid "program indicator"
-#~ msgstr "indicador de programa"
 
 #, fuzzy
 #~ msgid "feedback form"
