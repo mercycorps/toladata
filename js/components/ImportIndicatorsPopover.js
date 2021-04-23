@@ -127,7 +127,7 @@ export class ImportIndicatorsButton extends BootstrapPopoverButton {
                 <button
                 type="button"
                 ref="target"
-                className="btn btn-sm btn-primary mx-2 pl-2"
+                className="btn btn-sm btn-primary pl-2"
                 >
                     <i className="fas fa-download"></i>
                         {
