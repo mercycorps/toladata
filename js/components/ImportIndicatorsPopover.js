@@ -14,17 +14,15 @@ export class ImportIndicatorsButton extends BootstrapPopoverButton {
         this.state = {
             levelStore: this.props.levelStore, 
             chosenTier: this.props.levelStore.tierTemplates[this.props.levelStore.chosenTierSetKey].tiers, // State containing a list of tier levels names of the chosen RF framework tier template
-            tierLevels: [], // State to hold the tier levels name and the desired number of rows for the excel template
-            setTierLevels: this.setTierLevels, // Method used to update the number of row per tier level
+            tierLevelsRows: [], // State to hold the tier levels name and the desired number of rows for the excel template
+            setTierLevelsRows: this.setTierLevelsRows, // Method used to update the number of row per tier level
         }
     }
 
-    setTierLevels = (i, tier, value) => {
-        let update = this.state.tierLevels;
-        update[i] = {[tier] : value};
-        this.setState({
-            tierLevels: update
-        });
+    setTierLevelsRows = (i, tier, value) => {
+        let updatedTiers = this.state.tierLevelsRows;
+        updatedTiers[i] = {[tier] : value};
+        this.setState({ tierLevelsRows: updatedTiers });
     }
 
     getPopoverContent = () => {
@@ -56,7 +54,7 @@ export class ImportIndicatorsButton extends BootstrapPopoverButton {
 }
 
 const ImportIndicatorsPopover = (props) => {
-    const { levelStore, chosenTier, tierLevels } = useContext(ImportIndicatorsContext);
+    const { levelStore, chosenTier, tierLevelsRows } = useContext(ImportIndicatorsContext);
 
     // These define the different cases/views of the Popover to switch between.
     let INITIAL = 0;
@@ -68,16 +66,16 @@ const ImportIndicatorsPopover = (props) => {
     const [views, setViews] = useState(INITIAL);
 
     // Download template file providing the program ID and number of rows per tier level
-    let handleDownload = (e) => {
+    let handleDownload = () => {
         console.log("Download Clicked");
         let data = {
             program_id: levelStore.program_id,
-            tierLevels: tierLevels,
+            tierLevelsRows: tierLevelsRows,
         }
         api.downloadTemplate(data)
             .then(response => {
-                console.log("Reponse:", response, tierLevels);
-                alert(`DONWLOAD TEMPLATE, ${JSON.stringify(tierLevels)}`);
+                console.log("Reponse:", response, tierLevelsRows);
+                alert(`DONWLOAD TEMPLATE, ${JSON.stringify(tierLevelsRows)}`);
                 // window.open(response); //TODO: Open template file
             })
     }
@@ -103,7 +101,7 @@ const ImportIndicatorsPopover = (props) => {
 
     // Creates the default number of rows for the Tier Levels
     chosenTier.map((tier, i) => {
-        tierLevels[i] = { [tier]: i < chosenTier.length - 2 ? 10 : 20 };
+        tierLevelsRows[i] = { [tier]: i < chosenTier.length - 2 ? 10 : 20 };
     });
 
     return (
@@ -124,7 +122,7 @@ const ImportIndicatorsPopover = (props) => {
                                         </li>
                                         <li>
                                             {
-                                                // # Translators: Instruction for users to upload their filled in template and then follow the instructions to complete the import process.
+                                                // # Translators: Instructions for users to upload their filled in template and then follow the instructions to complete the import process.
                                                 gettext("Upload the template and follow instructions to complete the process.")
                                             }
                                         </li>
@@ -138,7 +136,7 @@ const ImportIndicatorsPopover = (props) => {
                                         role="button"
                                         type="button"
                                         className="btn btn-sm btn-primary btn-download"
-                                        onClick={(e) => handleDownload(e)}
+                                        onClick={ () => handleDownload() }
                                         >
                                         {
                                             // # Translators: Button to download a template
@@ -147,9 +145,9 @@ const ImportIndicatorsPopover = (props) => {
                                     </button>
                                     <button
                                         role="button"
-                                        type="file"
+                                        type="button"
                                         className="btn btn-sm btn-primary btn-upload"
-                                        onClick={() => uploadClick()}
+                                        onClick={ () => uploadClick() }
                                     >
                                         {
                                             // # Translators: Button to upload a template
@@ -160,7 +158,7 @@ const ImportIndicatorsPopover = (props) => {
                                         id="fileUpload" 
                                         type="file" 
                                         style={{ display: "none" }} 
-                                        onChange={(e) => handleUpload(e)}
+                                        onChange={ (e) => handleUpload(e) }
                                     />
                                 </div>                              
                             </div> 
@@ -174,7 +172,7 @@ const ImportIndicatorsPopover = (props) => {
                                 </div>
                                 <br/>
                                 <a type="submit" value="submit" href="#">Download a copy of your template with errors highlighted</a>
-                                <button className="btn btn-sm btn-primary" onClick={() => setViews(CONFIRM)}>Upload</button>
+                                <button className="btn btn-sm btn-primary" onClick={ () => setViews(CONFIRM) }>Upload</button>
                             </div>
                         )
                     // TODO: View to ask users to confirm the upload
@@ -185,7 +183,7 @@ const ImportIndicatorsPopover = (props) => {
                                     Confirm Import View
                                 </div>
                                 <br/>
-                                <button className="btn btn-sm btn-primary" onClick={() => setViews(SUCCESS)}>Complete Import</button>
+                                <button className="btn btn-sm btn-primary" onClick={ () => setViews(SUCCESS) }>Complete Import</button>
                             </div>
                         )
                     // TODO: View for a successful upload (May or may not be needed if using PNotify)
@@ -214,7 +212,7 @@ const ImportIndicatorsPopover = (props) => {
 
 
 const AdvancedImport = () => {
-    const { chosenTier, tierLevels, setTierLevels } = useContext(ImportIndicatorsContext);
+    const { chosenTier, tierLevelsRows, setTierLevelsRows } = useContext(ImportIndicatorsContext);
     let options = [0, 5, 10, 15, 20, 25];
     const [expanded, setExpanded] = useState(false);
     const [update, triggerUpdate] =  useState(false);
@@ -223,18 +221,18 @@ const AdvancedImport = () => {
         triggerUpdate(false);
     },[update]);
 
-    let advancedOptions = chosenTier.map((levelName, order ) => {
+    let advancedOptions = chosenTier.map((levelName, i ) => {
         return (
-            <div key={order} className="advanced-levels"> 
-                <label htmlFor={levelName} >{levelName}</label>
+            <div key={ i } className="advanced-levels"> 
+                <label htmlFor={ levelName }> { levelName } </label>
                 <select 
-                    id={levelName}
+                    id={ levelName }
                     className="advanced-options"
-                    value={ tierLevels[order][levelName] }
-                    onChange={(event) => {setTierLevels(order, levelName, parseInt(event.target.value)), triggerUpdate(true)}}
+                    value={ tierLevelsRows[i][levelName] }
+                    onChange={ (event) => { setTierLevelsRows(i, levelName, parseInt(event.target.value)), triggerUpdate(true) }}
                     >
                     {options.map((option) => (
-                        <option key={option} value={option}>{option}</option>
+                        <option key={ option } value={ option }> { option } </option>
                     ))}
                 </select>
             </div>
@@ -249,9 +247,9 @@ const AdvancedImport = () => {
                     data-toggle="collapse" 
                     href="#optionsForm" 
                     role="button" 
-                    aria-expanded={expanded} 
+                    aria-expanded={ expanded } 
                     aria-controls="optionsForm" 
-                    onClick={() => setExpanded(!expanded)}
+                    onClick={ () => setExpanded(!expanded) }
                     >
                         {
                             // # Translators: Click to view the Advanced Option section
@@ -266,7 +264,7 @@ const AdvancedImport = () => {
                         gettext('By default, the template will include 10 or 20 indicator rows per result level. Adjust the numbers if you need more or fewer rows.')
                     }
                 </p>
-                {advancedOptions}
+                { advancedOptions }
             </div>
         </div>
     )
