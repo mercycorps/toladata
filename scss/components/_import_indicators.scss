@@ -7,12 +7,11 @@
     padding: 0;
 }
 
-
 .import-text {
     padding: 0.5rem 0.75rem;
 
     ol {
-        padding-left: 20px;
+        padding-left: 1rem;
         
         li {
             margin-bottom: 0.75rem;
@@ -39,10 +38,6 @@
     align-items: center;
     color: $action;
     font-weight: bold;
-
-    :hover {
-        color: $action;
-    }
 }
 
 .advanced-text {
@@ -50,7 +45,7 @@
 
 }
 
-.advanced-levels{
+.advanced-levels {
     display: flex;
     justify-content: space-between;
     align-self: center;
@@ -67,11 +62,7 @@
     justify-content: center;
     align-self: center;
     min-height: 60px;
+    padding: 5px;
     border: 1px solid black;
     border-radius: 5px;
-    padding: 5px;
-}
-.popover-header {
-    background-color: transparent;
-    border: none;
 }

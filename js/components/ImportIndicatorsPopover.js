@@ -7,7 +7,7 @@ export const ImportIndicatorsContext = React.createContext();
 
 export class ImportIndicatorsButton extends BootstrapPopoverButton {
     popoverName = "importIndicators"
-    popoverTitle = "Import Indicators"
+    popoverTitle = "Import indicators"
 
     constructor(props) {
         super(props);
@@ -42,12 +42,12 @@ export class ImportIndicatorsButton extends BootstrapPopoverButton {
                     role="button"
                     type="button"
                     ref="target"
-                    className="btn btn-sm btn-primary mx-2 pl-2"
+                    className="btn btn-sm btn-primary pl-2"
                     >
                         <i className="fas fa-download"></i>
                             {
                                 //  # Translators: a button to download a spreadsheet
-                                gettext('Import Indicators')
+                                gettext('Import indicators')
                             }
                     </button>
                 </React.Fragment>
@@ -78,7 +78,7 @@ const ImportIndicatorsPopover = (props) => {
             .then(response => {
                 console.log("Reponse:", response, tierLevels);
                 alert(`DONWLOAD TEMPLATE, ${JSON.stringify(tierLevels)}`);
-                window.open(response);
+                // window.open(response); //TODO: Open template file
             })
     }
     // Upload template file and send api request
