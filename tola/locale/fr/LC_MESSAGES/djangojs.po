@@ -3,7 +3,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: \n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2021-04-23 11:19-0700\n"
+"POT-Creation-Date: 2021-04-23 12:35-0700\n"
 "PO-Revision-Date: 2021-03-08 16:58-0800\n"
 "Last-Translator: \n"
 "Language-Team: \n"
@@ -64,36 +64,52 @@ msgstr "Attention"
 msgid "Error"
 msgstr "Erreur"
 
+#. Translators: a button to download a spreadsheet
+#: js/components/ImportIndicatorsPopover.js:50
+msgid "Import indicators"
+msgstr "ÁTranslated Import indicators"
+
 #. Translators: Instructions for users to download the template, open it in
 #. Excel, and then fill in indicators information.
-#: js/components/ImportIndicatorsPopover.js:50
+#: js/components/ImportIndicatorsPopover.js:122
 msgid "Download the template, open it in Excel, and enter indicators."
 msgstr ""
 "ÁTranslated Download the template, open it in Excel, and enter indicators."
 
 #. Translators: Instruction for users to upload their filled in template and
 #. then follow the instructions to complete the import process.
-#: js/components/ImportIndicatorsPopover.js:56
+#: js/components/ImportIndicatorsPopover.js:128
 msgid "Upload the template and follow instructions to complete the process."
 msgstr ""
 "éTranslated Upload the template and follow instructions to complete the "
 "process."
 
 #. Translators: Button to download a template
-#: js/components/ImportIndicatorsPopover.js:70
+#: js/components/ImportIndicatorsPopover.js:145
 msgid "Download template"
 msgstr "Translated Download template"
 
 #. Translators: Button to upload a template
-#: js/components/ImportIndicatorsPopover.js:80
+#: js/components/ImportIndicatorsPopover.js:156
 msgid "Upload template"
 msgstr "Translated Upload template"
 
-#. Translators: a button to download a spreadsheet
-#: js/components/ImportIndicatorsPopover.js:135
-#| msgid "Indicators"
-msgid "Import indicators"
-msgstr "ÁTranslated Import indicators"
+#. Translators: Click to view the Advanced Option section
+#: js/components/ImportIndicatorsPopover.js:258
+#| msgid "Add another option"
+msgid "Advanced options"
+msgstr "ÁTranslated Advanced options"
+
+#. Translators: Details explaining that by default the template will include
+#. 10 or 20 rows per result level. You can adjust the number if you need more
+#. or less rows.
+#: js/components/ImportIndicatorsPopover.js:266
+msgid ""
+"By default, the template will include 10 or 20 indicator rows per result "
+"level. Adjust the numbers if you need more or fewer rows."
+msgstr ""
+"ÁTranslated By default, the template will include 10 or 20 indicator rows "
+"per result level. Adjust the numbers if you need more or fewer rows."
 
 #. Translators: button label to show the details of all items in a list */}
 #. Translators: button label to show the details of all rows in a list */}
@@ -1307,10 +1323,6 @@ msgstr "Excel"
 #. at the same time. First step is to build the result framework below, then
 #. click the 'Import indicators' button above
 #: js/pages/results_framework/components/level_list.js:199
-#| msgid ""
-#| "Instead of entering indicators one at a time, use an Excel template to "
-#| "import multiple indicators! First, build your result framework below. Next, "
-#| "click the “Import indicators” button above."
 msgid ""
 "Instead of entering indicators one at a time, use an Excel template to "
 "import multiple indicators! First, build your results framework below. Next,"
@@ -2895,9 +2907,6 @@ msgstr "Translated Key Performance Indicator (KPI)"
 
 #~ msgid "Result Level"
 #~ msgstr "Niveau de résultat"
-
-#~ msgid "Add another option"
-#~ msgstr "Ajouter une autre option"
 
 #~ msgid "and sub-levels:"
 #~ msgstr "et sous-niveau:"
