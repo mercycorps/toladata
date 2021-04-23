@@ -113,7 +113,7 @@ class ImportIndicatorsPopover extends React.Component {
 
 export class ImportIndicatorsButton extends BootstrapPopoverButton {
     popoverName = "importIndicators"
-    popoverTitle = "Import Indicators"
+    popoverTitle = "Import indicators"
 
     getPopoverContent = () => {
         return (
@@ -132,7 +132,7 @@ export class ImportIndicatorsButton extends BootstrapPopoverButton {
                     <i className="fas fa-download"></i>
                         {
                             //  # Translators: a button to download a spreadsheet
-                            gettext('Import Indicators')
+                            gettext('Import indicators')
                         }
                 </button>
             </React.Fragment>

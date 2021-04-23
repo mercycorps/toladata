@@ -1,6 +1,10 @@
 .import-text {
     ol {
         padding-left: 20px;
+        
+        li {
+            margin-bottom: 0.75rem;
+        }
     }
 }
 
@@ -11,4 +15,9 @@
     button {
         margin: .25rem;
     }
+}
+
+.popover-header {
+    background-color: transparent;
+    border: none;
 }
