@@ -225,7 +225,7 @@ class IPTTExcelIndicatorFiltersMixin:
         if ontology is None:
             ontology = []
         if level.parent_id is None:
-            return depth, u'.'.join(ontology)
+            return depth, '.'.join(ontology)
         ontology = [str(level.customsort)] + ontology
         parent = [l for l in level_set if l.pk == level.parent_id][0]
         return self._get_level_depth_ontology(parent, level_set, depth+1, ontology)
@@ -246,10 +246,10 @@ class IPTTExcelIndicatorFiltersMixin:
             'tiers', indicator.program.level_tiers.all()
             ) if t.tier_depth == level_depth]
         if not leveltier:
-            leveltier_name = u''
+            leveltier_name = ''
         else:
-            leveltier_name = u'{} '.format(_(leveltier[0].name))
-        return u"{}{}{}".format(
+            leveltier_name = '{} '.format(_(leveltier[0].name))
+        return "{}{}{}".format(
             leveltier_name, display_ontology, self._get_level_order_display(indicator)
         )
 

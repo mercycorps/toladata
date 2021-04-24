@@ -1138,8 +1138,6 @@ class Indicator(SafeDeleteModel):
     indicator_key = models.UUIDField(
         default=uuid.uuid4, help_text=" ", verbose_name=_("Indicator key"))
 
-    # i.e. Alpha, Donor, Standard
-    # TODO: make this a foreign key
     indicator_type = models.ManyToManyField(
         IndicatorType, blank=True, verbose_name=_("Indicator type"),
         # Translators: this is help text for a field on an indicator setup form

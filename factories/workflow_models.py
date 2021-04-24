@@ -300,6 +300,7 @@ class RFProgramFactory(DjangoModelFactory):
 
     @post_generation
     def indicators(self, create, extracted, **kwargs):
+        """To assign indicators to levels, pass 'indicators__levels=True' to the class when creating the program """
         if extracted:
             from factories.indicators_models import RFIndicatorFactory
             if kwargs and kwargs.get('levels'):
