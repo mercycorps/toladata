@@ -3,7 +3,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: \n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2021-04-23 11:19-0700\n"
+"POT-Creation-Date: 2021-04-23 18:24-0700\n"
 "PO-Revision-Date: 2021-03-08 16:58-0800\n"
 "Last-Translator: \n"
 "Language-Team: \n"
@@ -90,8 +90,8 @@ msgid "Upload template"
 msgstr "Translated Upload template"
 
 #. Translators: a button to download a spreadsheet
+#: js/components/ImportIndicatorsPopover.js:116
 #: js/components/ImportIndicatorsPopover.js:135
-#| msgid "Indicators"
 msgid "Import indicators"
 msgstr "ÁTranslated Import indicators"
 
@@ -1307,10 +1307,6 @@ msgstr "Excel"
 #. at the same time. First step is to build the result framework below, then
 #. click the 'Import indicators' button above
 #: js/pages/results_framework/components/level_list.js:199
-#| msgid ""
-#| "Instead of entering indicators one at a time, use an Excel template to "
-#| "import multiple indicators! First, build your result framework below. Next, "
-#| "click the “Import indicators” button above."
 msgid ""
 "Instead of entering indicators one at a time, use an Excel template to "
 "import multiple indicators! First, build your results framework below. Next,"
