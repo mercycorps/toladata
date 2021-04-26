@@ -1,12 +1,9 @@
 from rest_framework import serializers
-from workflow.serializers_new.iptt_program_serializers import (
-    IPTTExcelMixin, ProgramBaseSerializerMixin, ProgramRFOrderingMixin, ProgramReportingPeriodMixin)
+from workflow.serializers_new.iptt_program_serializers import (ProgramBaseSerializerMixin, ProgramRFOrderingMixin)
 from indicators.serializers_new.tier_and_level_serializers import LevelBaseSerializerMixin
 from tola.model_utils import get_serializer
 from indicators.models import Indicator, Level
 from workflow.models import Program
-
-
 
 
 BulkImportTemplateSerializer = get_serializer(
@@ -50,7 +47,6 @@ class BulkImportIndicatorSerializer(serializers.ModelSerializer):
         return obj.level_display_ontology
 
 
-
 class BulkImportProgramSerializer(serializers.ModelSerializer):
     indicator_set = BulkImportIndicatorSerializer(many=True)
 
@@ -70,7 +66,6 @@ class BulkImportSerializer(serializers.ModelSerializer):
     tier_name = serializers.SerializerMethodField()
     ontology = serializers.SerializerMethodField()
     display_ontology = serializers.SerializerMethodField()
-    # program = BulkImportProgramSerializer()
     level_name = serializers.CharField(source='name')
     indicator_set = BulkImportIndicatorSerializer(many=True)
 
@@ -79,7 +74,6 @@ class BulkImportSerializer(serializers.ModelSerializer):
         fields = [
             'level_name',
             'tier_name',
-            # 'program',
             'customsort',
             'indicator_set',
             'ontology',
@@ -87,7 +81,8 @@ class BulkImportSerializer(serializers.ModelSerializer):
 
         ]
 
-    def get_tier_name(self, obj):
+    @staticmethod
+    def get_tier_name(obj):
         return obj.leveltier.name
 
     @staticmethod
@@ -97,10 +92,3 @@ class BulkImportSerializer(serializers.ModelSerializer):
     @staticmethod
     def get_display_ontology(obj):
         return obj.display_ontology
-
-    # def get_tier_name(self, obj):
-    #     try:
-    #         tier = self.context['tiers'][obj.level_depth - 1].name
-    #     except IndexError:
-    #         tier = None
-    #     return tier
