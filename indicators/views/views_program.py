@@ -11,6 +11,7 @@ import logging
 import openpyxl
 import json
 from openpyxl import styles, utils
+from django.conf import settings
 from django.contrib.auth.decorators import login_required
 from django.contrib.auth.mixins import UserPassesTestMixin, LoginRequiredMixin, AccessMixin
 from django.utils.translation import gettext
@@ -302,7 +303,13 @@ class BulkImportIndicatorsView(LoginRequiredMixin, UserPassesTestMixin, AccessMi
 
         levels = Level.objects.filter(program=program).select_related().prefetch_related('indicator_set', 'program', 'parent__program__level_tiers')
         serialized_levels = BulkImportSerializer(levels, many=True)
-        return HttpResponse('I owe you an Excel template')
+
+        wb = openpyxl.load_workbook(filename=f'{settings.SITE_ROOT}/indicators/BulkImportTemplate.xlsx')
+        filename = "BulkIndicatorImport.xlsx"
+        response = HttpResponse(content_type='application/ms-excel')
+        response['Content-Disposition'] = 'attachment; filename="{}"'.format(filename)
+        wb.save(response)
+        return response
 
 
 # API views:

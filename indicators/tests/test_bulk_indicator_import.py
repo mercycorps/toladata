@@ -36,6 +36,11 @@ class TestBulkImportTemplateCreation(test.TestCase):
         w_factories.grant_program_access(self.tola_user, self.program, self.country, role='high')
         response = self.client.get(reverse('bulk_import_indicators', args=[self.program.pk]))
         self.assertEqual(response.status_code, 200)
+        self.assertEquals(
+            response.get('Content-Disposition'),
+            "attachment; filename=BulkIndicatorImport.xlsx"
+        )
+
 
 
 
