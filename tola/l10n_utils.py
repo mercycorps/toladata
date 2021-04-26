@@ -66,7 +66,7 @@ def str_without_diacritics(s):
     return ''.join(
         # normalize to form NFKD: all diacritics broken into combining character (i.e. "é" -> ´ and e)
         # all identical characters replaced with simplest equivalents (i.e. Roman Numeral I and capital I)
-        c for c in unicodedata.normalize('NFKD', str(s))
+        c.lower() for c in unicodedata.normalize('NFKD', str(s))
         # combining returns true for a combining diacritic such as ´ or ¨
         if not unicodedata.combining(c)
     )

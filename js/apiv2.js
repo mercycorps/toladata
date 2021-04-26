@@ -28,6 +28,20 @@ const api = {
             'content-type': 'application/x-www-form-urlencoded'
         },
     }),
+    apiSession: axios.create({
+        withCredentials: true,
+        responseType: 'json',
+        headers: {
+            "X-CSRFToken": document.cookie.replace(/(?:(?:^|.*;\s*)csrftoken\s*\=\s*([^;]*).*$)|^.*$/, "$1")
+        }
+    }),
+    templatesInstance: axios.create({
+        withCredentials: true,
+        responseType: 'json',
+        headers: {
+            "X-CSRFToken": document.cookie.replace(/(?:(?:^|.*;\s*)csrftoken\s*\=\s*([^;]*).*$)|^.*$/, "$1")
+        }
+    }),
     logFailure(failureMsg) {
         console.log("api call failed:", failureMsg);
     },
@@ -91,8 +105,34 @@ const api = {
         return this.apiInstance.get(`/iptt/indicator/${indicatorPk}/`)
                     .then(response => response.data)
                     .catch(this.logFailure);
+    },
+    async checkSessions (query) {
+        return await this.apiSession.get('/update_user_session/',
+            {params: {query: query}})
+        .then(response => response.data)
+        .catch(this.logFailure)
+    },
+    updateSessions (sessionVarsToUpdate) {
+        return this.apiSession.put('/update_user_session/', sessionVarsToUpdate)
+            .then(response => response.statusText)
+            .catch(this.logFailure)
+    },
+    async downloadTemplate () {
+        // TODO
+            // return await this.templatesInstance.get('/')
+        console.log("API request to get Templates");
+        return await Promise.resolve({data: "EXCEL TEMPLATE"})
+            .then(response => response.data)
+            .catch(this.logFailure);
+    },
+    async uploadTemplate(data) {
+        // TODO
+            // return this.templatesInstance.put('/', data)
+        console.log("API request to send Templates");
+        return await Promise.resolve( {statusText: "OK"} )
+            .then(response => response.statusText)
+            .catch(this.logFailure)
     }
-
 };
 
 

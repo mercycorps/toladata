@@ -200,7 +200,7 @@ export class UserStore {
 
     onSaveErrorHandler(message) {
         // # Translators: Saving to the server failed
-        window.unified_error_message(message || gettext('Saving failed'), {self_dismissing: true, dismiss_delay: 3000, dir1: 'left', dir2: 'down'});
+        window.unified_error_message(message || gettext('Saving failed'), {self_dismissing: true});
     }
 
     onSaveSuccessHandler(message) {
@@ -454,7 +454,10 @@ export class UserStore {
             })
         }).catch(() => {
             // # Translators: Sending an email to the user did not work
-            this.onSaveSuccessHandler(gettext("Verification email send failed"))
+            this.onSaveErrorHandler(gettext("Verification email send failed"))
+            runInAction(() => {
+                this.saving_user_profile = false
+            })
         })
     }
 

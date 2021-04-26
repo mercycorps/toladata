@@ -5,3 +5,15 @@ fieldset.inline-fieldset > div.form-row:not(.is_hidden) {
 fieldset.inline-fieldset > div.form-row:not(.is_hidden) > div.field-box {
     margin-right: 30px;
 }
+
+.hide-inline-header .inline-related h3 {
+    display: none;
+}
+
+.hide-inline-header .form-row div div {
+    margin-left: 0;
+}
+
+.hide-inline-header .form-row label {
+    display: none;
+}

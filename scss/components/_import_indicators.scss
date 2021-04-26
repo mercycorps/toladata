@@ -1,0 +1,27 @@
+.import-text {
+    ol {
+        padding-left: 20px;
+        
+        li {
+            margin-bottom: 0.75rem;
+        }
+    }
+}
+
+.import-buttons {
+    display: flex;
+    flex-direction: column;
+
+    button {
+        margin: .25rem;
+    }
+}
+
+.popover-header {
+    background-color: transparent;
+    border: none;
+    padding: 1rem 1rem 0;
+}
+.popover-body {
+    padding: 1rem;
+}

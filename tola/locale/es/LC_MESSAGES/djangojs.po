@@ -6,8 +6,8 @@ msgid ""
 msgstr ""
 "Project-Id-Version: \n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2021-03-30 19:01-0700\n"
-"PO-Revision-Date: 2021-03-24 14:56-0700\n"
+"POT-Creation-Date: 2021-04-23 18:24-0700\n"
+"PO-Revision-Date: 2021-03-08 16:59-0800\n"
 "Last-Translator: \n"
 "Language-Team: \n"
 "Language: es\n"
@@ -65,6 +65,37 @@ msgstr "Advertencia"
 #: js/base.js:448
 msgid "Error"
 msgstr "Error"
+
+#. Translators: Instructions for users to download the template, open it in
+#. Excel, and then fill in indicators information.
+#: js/components/ImportIndicatorsPopover.js:50
+msgid "Download the template, open it in Excel, and enter indicators."
+msgstr ""
+"ÁTranslated Download the template, open it in Excel, and enter indicators."
+
+#. Translators: Instruction for users to upload their filled in template and
+#. then follow the instructions to complete the import process.
+#: js/components/ImportIndicatorsPopover.js:56
+msgid "Upload the template and follow instructions to complete the process."
+msgstr ""
+"éTranslated Upload the template and follow instructions to complete the "
+"process."
+
+#. Translators: Button to download a template
+#: js/components/ImportIndicatorsPopover.js:70
+msgid "Download template"
+msgstr "Translated Download template"
+
+#. Translators: Button to upload a template
+#: js/components/ImportIndicatorsPopover.js:80
+msgid "Upload template"
+msgstr "ÁTranslated Upload template"
+
+#. Translators: a button to download a spreadsheet
+#: js/components/ImportIndicatorsPopover.js:116
+#: js/components/ImportIndicatorsPopover.js:135
+msgid "Import indicators"
+msgstr "éTranslated Import indicators"
 
 #. Translators: button label to show the details of all items in a list */}
 #. Translators: button label to show the details of all rows in a list */}
@@ -213,14 +244,14 @@ msgstr "Línea media y línea final"
 #. Translators: One of several options for specifying how often data is
 #. collected or reported on over the life of a program
 #: js/constants.js:39 js/pages/iptt_quickstart/models/ipttQSRootStore.js:32
-#: tola/db_translations.js:20
+#: tola/db_translations.js:22
 msgid "Annual"
 msgstr "Anual"
 
 #. Translators: One of several options for specifying how often data is
 #. collected or reported on over the life of a program
 #: js/constants.js:40 js/pages/iptt_quickstart/models/ipttQSRootStore.js:33
-#: tola/db_translations.js:16
+#: tola/db_translations.js:18
 msgid "Semi-annual"
 msgstr "Semestral"
 
@@ -231,14 +262,14 @@ msgstr "Trienal"
 #. Translators: One of several options for specifying how often data is
 #. collected or reported on over the life of a program
 #: js/constants.js:42 js/pages/iptt_quickstart/models/ipttQSRootStore.js:35
-#: tola/db_translations.js:2
+#: tola/db_translations.js:8
 msgid "Quarterly"
 msgstr "Trimestral"
 
 #. Translators: One of several options for specifying how often data is
 #. collected or reported on over the life of a program
 #: js/constants.js:43 js/pages/iptt_quickstart/models/ipttQSRootStore.js:36
-#: tola/db_translations.js:28
+#: tola/db_translations.js:24
 msgid "Monthly"
 msgstr "Mensual"
 
@@ -588,7 +619,7 @@ msgstr "# / %"
 #: js/pages/iptt_report/components/report/tableHeader.js:159
 #: js/pages/iptt_report/models/filterStore.js:737
 #: js/pages/program_page/components/indicator_list.js:198
-#: tola/db_translations.js:26
+#: tola/db_translations.js:20
 msgid "Baseline"
 msgstr "Base"
 
@@ -1265,7 +1296,7 @@ msgid "Indicators linked to this %s"
 msgstr "Indicadores vinculados a este %s"
 
 #. Translators: a button to download a spreadsheet
-#: js/pages/results_framework/components/level_list.js:103
+#: js/pages/results_framework/components/level_list.js:176
 #: js/pages/tola_management_pages/audit_log/views.js:224
 msgid "Excel"
 msgstr "Sobresalir"
@@ -1274,14 +1305,15 @@ msgstr "Sobresalir"
 #. one at a time, they can use an Excel template to enter multiple indicators
 #. at the same time. First step is to build the result framework below, then
 #. click the 'Import indicators' button above
-#: js/pages/results_framework/components/level_list.js:121
+#: js/pages/results_framework/components/level_list.js:199
 msgid ""
 "Instead of entering indicators one at a time, use an Excel template to "
-"import multiple indicators! First, build your result framework below. Next, "
-"click the “Import indicators” button above."
+"import multiple indicators! First, build your results framework below. Next,"
+" click the “Import indicators” button above."
 msgstr ""
-"Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod "
-"tempor incididunt ut labore et dolore magna aliqua."
+"Translated Instead of entering indicators one at a time, use an Excel "
+"template to import multiple indicators! First, build your results framework "
+"below. Next, click the “Import indicators” button above."
 
 #. Translators: this refers to an imperative verb on a button ("Apply
 #. filters")*/}
@@ -2354,7 +2386,7 @@ msgid "Verification email send failed"
 msgstr "Falló el envío de correo electrónico de verificación"
 
 #. Translators: a list of groups of countries (i.e. "Asia")
-#: js/pages/tola_management_pages/user/models.js:712
+#: js/pages/tola_management_pages/user/models.js:715
 msgid "Regions"
 msgstr "Regiones"
 
@@ -2406,65 +2438,63 @@ msgstr "usuarios"
 
 #. Translators: One of several options for specifying how often data is
 #. collected or reported on over the life of a program
+#: tola/db_translations.js:2
+msgid "By distribution"
+msgstr "éTranslated By distribution"
+
+#. Translators: One of several options for specifying how often data is
+#. collected or reported on over the life of a program
 #: tola/db_translations.js:4
-msgid "By batch"
-msgstr "Translated By batch"
-
-#. Translators: One of several options for specifying how often data is
-#. collected or reported on over the life of a program
-#: tola/db_translations.js:6
-msgid "Midline"
-msgstr "Línea media"
-
-#. Translators: One of several options for specifying how often data is
-#. collected or reported on over the life of a program
-#: tola/db_translations.js:8
-#| msgid "Find an Organization"
-msgid "Final evaluation"
-msgstr "Translated Final evaluation"
-
-#. Translators: One of several options for specifying how often data is
-#. collected or reported on over the life of a program
-#: tola/db_translations.js:10
 msgid "Endline"
 msgstr "Línea final"
 
 #. Translators: One of several options for specifying how often data is
 #. collected or reported on over the life of a program
-#: tola/db_translations.js:12
-#| msgid "Event"
-msgid "By event"
-msgstr "Translated By event"
+#: tola/db_translations.js:6
+msgid "Post shock"
+msgstr "Translated Post shock"
 
 #. Translators: One of several options for specifying how often data is
 #. collected or reported on over the life of a program
-#: tola/db_translations.js:14
+#: tola/db_translations.js:10
 msgid "By training"
 msgstr "Translated By training"
 
 #. Translators: One of several options for specifying how often data is
 #. collected or reported on over the life of a program
-#: tola/db_translations.js:18
+#: tola/db_translations.js:12
+msgid "Final evaluation"
+msgstr "ÁTranslated Final evaluation"
+
+#. Translators: One of several options for specifying how often data is
+#. collected or reported on over the life of a program
+#: tola/db_translations.js:14
+msgid "By batch"
+msgstr "ŹTranslated By batch"
+
+#. Translators: One of several options for specifying how often data is
+#. collected or reported on over the life of a program
+#: tola/db_translations.js:16
 msgid "Weekly"
-msgstr "Translated Weekly"
+msgstr "ÁTranslated Weekly"
 
 #. Translators: One of several options for specifying how often data is
 #. collected or reported on over the life of a program
-#: tola/db_translations.js:22
-msgid "By distribution"
-msgstr "Translated By distribution"
+#: tola/db_translations.js:26
+msgid "Midline"
+msgstr "Línea media"
 
 #. Translators: One of several options for specifying how often data is
 #. collected or reported on over the life of a program
-#: tola/db_translations.js:24
-msgid "Post shock"
-msgstr "Translated Post shock"
+#: tola/db_translations.js:28
+msgid "By event"
+msgstr "éTranslated By event"
 
 #. Translators: One of several choices for what sector (i.e. development
 #. domain) a program is most closely associated with
 #: tola/db_translations.js:30
 msgid "Agribusiness"
-msgstr "Translated Agribusiness"
+msgstr "éTranslated Agribusiness"
 
 #. Translators: One of several choices for what sector (i.e. development
 #. domain) a program is most closely associated with
@@ -2482,19 +2512,19 @@ msgstr "Translated Agriculture and Food Security"
 #. domain) a program is most closely associated with
 #: tola/db_translations.js:36
 msgid "Basic Needs"
-msgstr "Translated Basic Needs"
+msgstr "ŹTranslated Basic Needs"
 
 #. Translators: One of several choices for what sector (i.e. development
 #. domain) a program is most closely associated with
 #: tola/db_translations.js:38
 msgid "Capacity development"
-msgstr "Translated Capacity development"
+msgstr "ÁTranslated Capacity development"
 
 #. Translators: One of several choices for what sector (i.e. development
 #. domain) a program is most closely associated with
 #: tola/db_translations.js:40
 msgid "Child Health & Nutrition"
-msgstr "Translated Child Health & Nutrition"
+msgstr "éTranslated Child Health & Nutrition"
 
 #. Translators: One of several choices for what sector (i.e. development
 #. domain) a program is most closely associated with
@@ -2505,7 +2535,6 @@ msgstr "Translated Climate Change Adaptation & Disaster Risk Reduction"
 #. Translators: One of several choices for what sector (i.e. development
 #. domain) a program is most closely associated with
 #: tola/db_translations.js:44
-#| msgid "Community Involvement"
 msgid "Conflict Management"
 msgstr "Translated Conflict Management"
 
@@ -2519,19 +2548,19 @@ msgstr "Translated Early Economic Recovery"
 #. domain) a program is most closely associated with
 #: tola/db_translations.js:48
 msgid "Economic and Market Development"
-msgstr "Translated Economic and Market Development"
+msgstr "ŹTranslated Economic and Market Development"
 
 #. Translators: One of several choices for what sector (i.e. development
 #. domain) a program is most closely associated with
 #: tola/db_translations.js:50
 msgid "Economic Recovery and Market Systems"
-msgstr "Translated Economic Recovery and Market Systems"
+msgstr "ÁTranslated Economic Recovery and Market Systems"
 
 #. Translators: One of several choices for what sector (i.e. development
 #. domain) a program is most closely associated with
 #: tola/db_translations.js:52
 msgid "Education Support"
-msgstr "Translated Education Support"
+msgstr "éTranslated Education Support"
 
 #. Translators: One of several choices for what sector (i.e. development
 #. domain) a program is most closely associated with
@@ -2549,19 +2578,19 @@ msgstr "Translated Employment/Entrepreneurship"
 #. domain) a program is most closely associated with
 #: tola/db_translations.js:58
 msgid "Energy Access"
-msgstr "Translated Energy Access"
+msgstr "ŹTranslated Energy Access"
 
 #. Translators: One of several choices for what sector (i.e. development
 #. domain) a program is most closely associated with
 #: tola/db_translations.js:60
 msgid "Energy and Natural Resources"
-msgstr "Translated Energy and Natural Resources"
+msgstr "ÁTranslated Energy and Natural Resources"
 
 #. Translators: One of several choices for what sector (i.e. development
 #. domain) a program is most closely associated with
 #: tola/db_translations.js:62
 msgid "Environment Disaster/Risk Reduction"
-msgstr "Translated Environment Disaster/Risk Reduction"
+msgstr "éTranslated Environment Disaster/Risk Reduction"
 
 #. Translators: One of several choices for what sector (i.e. development
 #. domain) a program is most closely associated with
@@ -2579,19 +2608,19 @@ msgstr "Translated Food"
 #. domain) a program is most closely associated with
 #: tola/db_translations.js:68
 msgid "Food Security"
-msgstr "Translated Food Security"
+msgstr "ŹTranslated Food Security"
 
 #. Translators: One of several choices for what sector (i.e. development
 #. domain) a program is most closely associated with
 #: tola/db_translations.js:70
 msgid "Gender"
-msgstr "Translated Gender"
+msgstr "ÁTranslated Gender"
 
 #. Translators: One of several choices for what sector (i.e. development
 #. domain) a program is most closely associated with
 #: tola/db_translations.js:72
 msgid "Governance"
-msgstr "Translated Governance"
+msgstr "éTranslated Governance"
 
 #. Translators: One of several choices for what sector (i.e. development
 #. domain) a program is most closely associated with
@@ -2609,24 +2638,23 @@ msgstr "Translated Governance and Conflict Resolution"
 #. domain) a program is most closely associated with
 #: tola/db_translations.js:78
 msgid "Health"
-msgstr "Translated Health"
+msgstr "ŹTranslated Health"
 
 #. Translators: One of several choices for what sector (i.e. development
 #. domain) a program is most closely associated with
 #: tola/db_translations.js:80
 msgid "Humanitaria Intervention Readiness"
-msgstr "Translated Humanitaria Intervention Readiness"
+msgstr "ÁTranslated Humanitaria Intervention Readiness"
 
 #. Translators: One of several choices for what sector (i.e. development
 #. domain) a program is most closely associated with
 #: tola/db_translations.js:82
 msgid "Hygiene Promotion"
-msgstr "Translated Hygiene Promotion"
+msgstr "éTranslated Hygiene Promotion"
 
 #. Translators: One of several choices for what sector (i.e. development
 #. domain) a program is most closely associated with
 #: tola/db_translations.js:84
-#| msgid "Information Use"
 msgid "Information Dissemination"
 msgstr "Translated Information Dissemination"
 
@@ -2646,19 +2674,19 @@ msgstr "Translated Livelihoods"
 #. domain) a program is most closely associated with
 #: tola/db_translations.js:90
 msgid "Market Systems Development"
-msgstr "Translated Market Systems Development"
+msgstr "ŹTranslated Market Systems Development"
 
 #. Translators: One of several choices for what sector (i.e. development
 #. domain) a program is most closely associated with
 #: tola/db_translations.js:92
 msgid "Maternal Health & Nutrition"
-msgstr "Translated Maternal Health & Nutrition"
+msgstr "ÁTranslated Maternal Health & Nutrition"
 
 #. Translators: One of several choices for what sector (i.e. development
 #. domain) a program is most closely associated with
 #: tola/db_translations.js:94
 msgid "Non food Items (NFIs)"
-msgstr "Translated Non food Items (NFIs)"
+msgstr "éTranslated Non food Items (NFIs)"
 
 #. Translators: One of several choices for what sector (i.e. development
 #. domain) a program is most closely associated with
@@ -2669,16 +2697,14 @@ msgstr "Translated Nutrition Sensitive"
 #. Translators: One of several choices for what sector (i.e. development
 #. domain) a program is most closely associated with
 #: tola/db_translations.js:98
-#| msgid "Project Initiation"
 msgid "Project Monitoring"
-msgstr "Translated Project Monitoring"
+msgstr "ŹTranslated Project Monitoring"
 
 #. Translators: One of several choices for what sector (i.e. development
 #. domain) a program is most closely associated with
 #: tola/db_translations.js:100
-#| msgid "Project Description"
 msgid "Protection"
-msgstr "Translated Protection"
+msgstr "ÁTranslated Protection"
 
 #. Translators: One of several choices for what sector (i.e. development
 #. domain) a program is most closely associated with
@@ -2689,32 +2715,30 @@ msgstr "Translated Psychosocial"
 #. Translators: One of several choices for what sector (i.e. development
 #. domain) a program is most closely associated with
 #: tola/db_translations.js:104
-#| msgid "Public Dashboards"
 msgid "Public Health"
-msgstr "Translated Public Health"
+msgstr "éTranslated Public Health"
 
 #. Translators: One of several choices for what sector (i.e. development
 #. domain) a program is most closely associated with
 #: tola/db_translations.js:106
 msgid "Resilience"
-msgstr "Translated Resilience"
+msgstr "ŹTranslated Resilience"
 
 #. Translators: One of several choices for what sector (i.e. development
 #. domain) a program is most closely associated with
 #: tola/db_translations.js:108
 msgid "Sanitation Infrastructure"
-msgstr "Translated Sanitation Infrastructure"
+msgstr "ÁTranslated Sanitation Infrastructure"
 
 #. Translators: One of several choices for what sector (i.e. development
 #. domain) a program is most closely associated with
 #: tola/db_translations.js:110
 msgid "Skills and Training"
-msgstr "Translated Skills and Training"
+msgstr "éTranslated Skills and Training"
 
 #. Translators: One of several choices for what sector (i.e. development
 #. domain) a program is most closely associated with
 #: tola/db_translations.js:112
-#| msgid "Data issues"
 msgid "Urban Issues"
 msgstr "Translated Urban Issues"
 
@@ -2734,20 +2758,20 @@ msgstr "Translated Water Supply Infrastructure"
 #. domain) a program is most closely associated with
 #: tola/db_translations.js:118
 msgid "Workforce Development"
-msgstr "Translated Workforce Development"
+msgstr "ŹTranslated Workforce Development"
 
 #. Translators: One of several choices for what sector (i.e. development
 #. domain) a program is most closely associated with
 #: tola/db_translations.js:120
 msgid "Youth"
-msgstr "Translated Youth"
+msgstr "ÁTranslated Youth"
 
 #. Translators: One of several choices for specifying what type of Indicator
 #. is being created.  An Indicator is a performance measure e.g. "We will
 #. distrubute 1000 food packs over the next two months"
 #: tola/db_translations.js:124
 msgid "Donor"
-msgstr "Translated Donor"
+msgstr "éTranslated Donor"
 
 #. Translators: One of several choices for specifying what type of Indicator
 #. is being created.  An Indicator is a performance measure e.g. "We will
@@ -2768,7 +2792,7 @@ msgstr "Translated DIG - Alpha"
 #. distrubute 1000 food packs over the next two months"
 #: tola/db_translations.js:130
 msgid "DIG - Testing"
-msgstr "Translated DIG - Testing"
+msgstr "ŹTranslated DIG - Testing"
 
 #. Translators: One of several choices for specifying what type of Indicator
 #. is being created.  An Indicator is a performance measure e.g. "We will
@@ -2782,20 +2806,19 @@ msgstr "Rendimiento"
 #. distrubute 1000 food packs over the next two months"
 #: tola/db_translations.js:134
 msgid "Process / Management"
-msgstr "Translated Process / Management"
+msgstr "ÁTranslated Process / Management"
 
 #. Translators: One of several choices for specifying what type of Indicator
 #. is being created.  An Indicator is a performance measure e.g. "We will
 #. distrubute 1000 food packs over the next two months"
 #: tola/db_translations.js:136
 msgid "Context / Trigger"
-msgstr "Translated Context / Trigger"
+msgstr "éTranslated Context / Trigger"
 
 #. Translators: One of several choices for specifying what type of Indicator
 #. is being created.  An Indicator is a performance measure e.g. "We will
 #. distrubute 1000 food packs over the next two months"
 #: tola/db_translations.js:138
-#| msgid "Key Performance Indicators"
 msgid "Key Performance Indicator (KPI)"
 msgstr "Translated Key Performance Indicator (KPI)"
 
@@ -4767,9 +4790,6 @@ msgstr "Translated Key Performance Indicator (KPI)"
 #~ msgid "Type (File or URL)"
 #~ msgstr "Tipo (archivo o URL)"
 
-#~ msgid "Template"
-#~ msgstr "Modelo"
-
 #~ msgid "Stakeholder/Organization Name"
 #~ msgstr "Nombre de parte interesada/organización"
 
@@ -5162,9 +5182,6 @@ msgstr "Translated Key Performance Indicator (KPI)"
 #, fuzzy
 #~ msgid "Quarter %s"
 #~ msgstr "Trimestre %s"
-
-#~ msgid "program indicator"
-#~ msgstr "indicador de programa"
 
 #, fuzzy
 #~ msgid "feedback form"
