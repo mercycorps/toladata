@@ -38,7 +38,7 @@ class TestBulkImportTemplateCreation(test.TestCase):
         self.assertEqual(response.status_code, 200)
         self.assertEquals(
             response.get('Content-Disposition'),
-            "attachment; filename=BulkIndicatorImport.xlsx"
+            'attachment; filename="BulkIndicatorImport.xlsx"'
         )
 
 
