@@ -74,7 +74,7 @@ urlpatterns = [
     # API (serializer-based) calls for program page / IPTT
     path('api/', include(apipatterns)),
 
-    path('bulk_import_indicators/<int:program_id>',
+    path('bulk_import_indicators/<int:program_id>/',
          views.views_program.BulkImportIndicatorsView.as_view(),
          name='bulk_import_indicators')
 ]

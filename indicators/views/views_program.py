@@ -290,7 +290,8 @@ class BulkImportIndicatorsView(LoginRequiredMixin, UserPassesTestMixin, AccessMi
 
     def test_func(self):
         program_id = self.request.resolver_match.kwargs.get('program_id')
-        return user_has_program_roles(self.request.user, [program_id], ['high'])
+        return user_has_program_roles(self.request.user, [program_id], ['high']) \
+               or self.request.user.is_superuser == True
 
 
     def get(self, request, *args, **kwargs):
