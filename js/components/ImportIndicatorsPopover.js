@@ -17,12 +17,20 @@ class ImportIndicatorsPopover extends React.Component {
     }
 
     handleDownload = () => {
-        console.log("Download Clicked");
-        api.downloadTemplate()
-            .then(response => {
-                console.log("Reponse:", response);
-                alert("DONWLOAD TEMPLATE")
-            })
+        try {
+            // This doesn't fail very gracefully if there's a server error, it opens a new browser tab and
+            // provides an error page there. Cursory search didn't yield anything better though, so punting.
+            window.open(`/indicators/bulk_import_indicators/${this.props.program_id}/`, '_blank')
+        } catch (error) {
+            alert("Could not download import template")
+        }
+
+        // api.downloadTemplate(this.props.program_id)
+        //     .then(response => {
+        //         window.open(response)
+                // console.log("Reponse:", response);
+                // alert("DONWLOAD TEMPLATE")
+            // })
     }
     handleUpload = () => {
         console.log("Upload Clicked");
@@ -81,7 +89,7 @@ class ImportIndicatorsPopover extends React.Component {
                                             }
                                         </button>
                                     </div>
-                                </div> 
+                                </div>
                             );
                         // View to provide error feedback on their uploaded template
                         case this.FEEDBACK:
@@ -112,12 +120,16 @@ class ImportIndicatorsPopover extends React.Component {
 }
 
 export class ImportIndicatorsButton extends BootstrapPopoverButton {
-    popoverName = "importIndicators"
-    popoverTitle = gettext("Import indicators")    
+    popoverName = "importIndicators";
+    popoverTitle = gettext("Import indicators");
+
+    constructor(props) {
+        super(props);
+    }
 
     getPopoverContent = () => {
         return (
-            <ImportIndicatorsPopover />
+            <ImportIndicatorsPopover program_id={this.props.program_id}/>
             );
     }
 

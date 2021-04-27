@@ -45,13 +45,13 @@ class Command(BaseCommand):
     # The intent is to ask the user which object to use for the related field.  Because this hasn't
     # been needed yet, it hasn't really been tested or even tried, so more development work will be required.
     def chooseFromMulti(self, choices, fields):
-        print 'Select the number of the option you want and hit enter'
+        print('Select the number of the option you want and hit enter')
         for index, choice in enumerate(choices):
             choice_labels = []
             for field in fields:
-                choice_labels.append('%s: %s' % (field, unicode(getattr(choice, field))))
-            print '%s. %s' % (index + 1, ' - '.join(choice_labels))
-        selection = raw_input("Number: ")
+                choice_labels.append('%s: %s' % (field, getattr(choice, field)))
+            print('%s. %s' % (index + 1, ' - '.join(choice_labels)))
+        selection = input("Number: ")
         return choices[int(selection)-1]
 
     def save_program(self, program_json):
@@ -70,7 +70,6 @@ class Command(BaseCommand):
         for objective_data in objectives_json:
             program.objective_set.add(Objective(**objective_data), bulk=False)
 
-        program.fund_code.add(*fund_codes)
         program.sector.add(*sectors)
         program.country.add(*countries)
 
@@ -184,13 +183,13 @@ class Command(BaseCommand):
         try:
             model_obj = target_model.objects.get(**{name_field: target_name})
         except ObjectDoesNotExist:
-            print 'Could not find a {} named {}.  Skipping.'.format(target_model, target_name)
+            print('Could not find a {} named {}.  Skipping.'.format(target_model, target_name))
             return
         except MultipleObjectsReturned:
             # TODO: finish working on this interactive element
             # The intent is to ask the user which object to use for the related field.  Because this hasn't
             # been needed yet, it hasn't really been tested or even tried, so more development work will be required.
-            print 'There were multiple {}s with the name `{}`'.format(target_model, target_name.encode('utf-8'))
+            print('There were multiple {}s with the name `{}`'.format(target_model, target_name.encode('utf-8')))
             model_obj = self.chooseFromMulti(target_model.objects.filter(**{name_field: target_name}), label_fields)
         if return_obj:
             return model_obj
@@ -317,5 +316,5 @@ class ProgramSerializer(serializers.ModelSerializer):
             'beneficiary', 'programaccess', 'documentation', 'distribution', 'objective', 'trainingattendance',
             'i_program', 'pinned_reports', 'id',
         }
-        extra_fields = ['sector', 'country', 'fund_code', 'indicator_set', 'objective_set']
+        extra_fields = ['sector', 'country', 'indicator_set', 'objective_set']
         fields = list(all_fields - skipped_fields) + extra_fields

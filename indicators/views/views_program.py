@@ -9,26 +9,31 @@ import csv
 import datetime
 import logging
 import openpyxl
+import json
 from openpyxl import styles, utils
+from django.conf import settings
 from django.contrib.auth.decorators import login_required
-from django.utils.translation import ugettext
+from django.contrib.auth.mixins import UserPassesTestMixin, LoginRequiredMixin, AccessMixin
+from django.utils.translation import gettext
 from django.http import HttpResponse, JsonResponse
 from django.shortcuts import render, reverse, redirect, get_object_or_404
+from django.views import View
 
 from indicators.queries import ProgramWithMetrics
 from indicators.xls_export_utils import TAN, apply_title_styling, apply_label_styling
-from indicators.models import Indicator, PinnedReport
+from indicators.models import Indicator, PinnedReport, Level, LevelTier
 from workflow.models import Program
 from workflow.serializers import LogframeProgramSerializer
 from workflow.serializers_new import (
     ProgramPageProgramSerializer,
     ProgramPageIndicatorUpdateSerializer,
+    BulkImportSerializer,
 )
-
 from tola_management.permissions import (
     has_program_read_access,
     indicator_pk_adapter,
-    has_indicator_read_access
+    has_indicator_read_access,
+    user_has_program_roles
 )
 
 
@@ -42,12 +47,14 @@ LEVEL_ROW_FILL = openpyxl.styles.PatternFill('solid', TAN)
 BLACK_BORDER = openpyxl.styles.Side(border_style="thin", color="000000")
 BORDER_TOP = openpyxl.styles.Border(top=BLACK_BORDER)
 
+
 def add_title_cell(ws, row, column, value):
     cell = ws.cell(row=row, column=column)
     cell.value = value
     cell.font = TITLE_FONT
     apply_title_styling(cell)
     return cell
+
 
 def add_header_cell(ws, row, column, value):
     cell = ws.cell(row=row, column=column)
@@ -56,11 +63,13 @@ def add_header_cell(ws, row, column, value):
     ws.row_dimensions[row].height = 30
     return cell
 
+
 def get_child_levels(level, levels_by_pk):
     levels = [level]
     for child_pk in level['child_levels']:
         levels += get_child_levels(levels_by_pk[child_pk], levels_by_pk)
     return levels
+
 
 def clean_unicode(value):
     if value is None or value is False:
@@ -68,6 +77,7 @@ def clean_unicode(value):
     if isinstance(value, str):
         return value.encode('utf-8')
     return value
+
 
 @login_required
 @has_program_read_access
@@ -91,25 +101,25 @@ def logframe_excel_view(request, program):
     program = LogframeProgramSerializer.load(program).data
     wb = openpyxl.Workbook()
     wb.remove(wb.active)
-    ws = wb.create_sheet(ugettext('Logframe'))
+    ws = wb.create_sheet(gettext('Logframe'))
     add_title_cell(ws, 1, 1, clean_unicode(program['name']))
     ws.merge_cells(
         start_row=1, end_row=1,
         start_column=1, end_column=4
     )
-    add_title_cell(ws, 2, 1, ugettext('Logframe'))
+    add_title_cell(ws, 2, 1, gettext('Logframe'))
     ws.merge_cells(
         start_row=2, end_row=2,
         start_column=1, end_column=4
     )
     for col, name in enumerate([
-            ugettext('Result level'),
-            ugettext('Indicators'),
-            ugettext('Means of verification'),
-            ugettext('Assumptions')
+            gettext('Result level'),
+            gettext('Indicators'),
+            gettext('Means of verification'),
+            gettext('Assumptions')
         ]):
-        add_header_cell(ws, 3, col+1, name)
-        ws.column_dimensions[openpyxl.utils.get_column_letter(col + 1)].width = 50
+            add_header_cell(ws, 3, col+1, name)
+            ws.column_dimensions[openpyxl.utils.get_column_letter(col + 1)].width = 50
     levels = program['levels']
     if request.GET.get('groupby') == "2":
         sorted_levels = sorted(levels, key=itemgetter('level_depth', 'ontology'))
@@ -131,7 +141,7 @@ def logframe_excel_view(request, program):
         cell.alignment = TOP_LEFT_ALIGN_WRAP
         for indicator in sorted(level['indicators'], key=itemgetter('level_order')):
             cell = ws.cell(row=row, column=2)
-            value = ugettext('Indicator')
+            value = gettext('Indicator')
             if program['manual_numbering']:
                 value += u' {}'.format(indicator['number']) if indicator['number'] else u''
             elif indicator['level_order_display'] or level['display_ontology']:
@@ -165,12 +175,12 @@ def logframe_excel_view(request, program):
     if program['unassigned_indicators']:
         merge_start = row
         cell = ws.cell(row=row, column=1)
-        cell.value = ugettext('Indicators unassigned to a results framework level')
+        cell.value = gettext('Indicators unassigned to a results framework level')
         cell.alignment = TOP_LEFT_ALIGN_WRAP
         cell.fill = LEVEL_ROW_FILL
         for indicator in program['unassigned_indicators']:
             cell = ws.cell(row=row, column=2)
-            value = ugettext('Indicator')
+            value = gettext('Indicator')
             if program['manual_numbering']:
                 value += u' {}'.format(indicator['number']) if indicator['number'] else u''
             cell.value = u'{}: {}'.format(value, clean_unicode(indicator['name']))
@@ -200,7 +210,7 @@ def logframe_excel_view(request, program):
         cell.border = BORDER_TOP
     response = HttpResponse(content_type="application/ms-excel")
     response['Content-Disposition'] = u'attachment; filename="{}"'.format(
-        u'{} - {}.xlsx'.format(program['name'], ugettext('Logframe'))
+        u'{} - {}.xlsx'.format(program['name'], gettext('Logframe'))
     )
     wb.save(response)
     return response
@@ -271,10 +281,39 @@ def programs_rollup_export_csv(request):
         row = [str(s) for s in row]
         writer.writerow(row)
     return response
-        
+
+
+class BulkImportIndicatorsView(LoginRequiredMixin, UserPassesTestMixin, AccessMixin, View):
+    """Returns bulk import .xlsx file"""
+
+    redirect_field_name = None
+
+    def test_func(self):
+        program_id = self.request.resolver_match.kwargs.get('program_id')
+        return user_has_program_roles(self.request.user, [program_id], ['high']) \
+            or self.request.user.is_superuser == True
+
+    def get(self, request, *args, **kwargs):
+        program_id = kwargs['program_id']
+
+        try:
+            program = Program.objects.get(pk=program_id)
+        except Program.DoesNotExist:
+            return JsonResponse({'error': 'Program not found'}, status=404)
+
+        levels = Level.objects.filter(program=program).select_related().prefetch_related('indicator_set', 'program', 'parent__program__level_tiers')
+        serialized_levels = BulkImportSerializer(levels, many=True)
+
+        wb = openpyxl.load_workbook(filename=f'{settings.SITE_ROOT}/indicators/BulkImportTemplate.xlsx')
+        filename = "BulkIndicatorImport.xlsx"
+        response = HttpResponse(content_type='application/ms-excel')
+        response['Content-Disposition'] = 'attachment; filename="{}"'.format(filename)
+        wb.save(response)
+        return response
 
 
 # API views:
+
 
 @login_required
 @has_program_read_access
@@ -361,9 +400,9 @@ def results_framework_export(request, program):
     program = Program.rf_aware_objects.get(pk=program)
     wb = openpyxl.Workbook()
     wb.remove(wb.active)
-    ws = wb.create_sheet(ugettext("Results Framework"))
+    ws = wb.create_sheet(gettext("Results Framework"))
     get_font = lambda attrs: styles.Font(**{**{'name': 'Calibri', 'size': 12}, **attrs})
-    ws.cell(row=2, column=2).value = ugettext("Results Framework")
+    ws.cell(row=2, column=2).value = gettext("Results Framework")
     ws.cell(row=2, column=2).font = get_font({'size': 18, 'bold': True})
     ws.cell(row=3, column=2).value = program.name
     ws.cell(row=3, column=2).font = get_font({'size': 18})
@@ -378,9 +417,11 @@ def results_framework_export(request, program):
     level_single_style.fill = styles.PatternFill('solid', 'E5E5E5')
     wb.add_named_style(level_single_style)
     bottom_tier = program.level_tiers.count()
+
     def row_height_getter(cell):
         lines_of_text = str(cell.value).splitlines()
         row = cell.row
+
         def get_row_height_decorated(w):
             lines = sum([math.ceil(len(s)/w) or 1 for s in lines_of_text])
             height = 26 + lines * 15
@@ -388,6 +429,7 @@ def results_framework_export(request, program):
                 height = 30
             return max(height, ws.row_dimensions[row].height or 0, 30)
         return get_row_height_decorated
+
     def write_level(parent, start_row, start_column):
         levels = program.levels.filter(parent=parent).order_by('customsort')
         column = start_column

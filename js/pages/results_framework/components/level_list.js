@@ -61,7 +61,7 @@ class LevelList extends React.Component {
 @inject('rootStore')
 @observer
 export class LevelListPanel  extends React.Component {
-    // These define the cases/views of the RF Builder's main panel component. 
+    // These define the cases/views of the RF Builder's main panel component.
     // These different views determine when the expandos, excel, and import buttons are shown.
     // Empty for when there is no RF level at all. New for when the first RF level is started but not yet saved.
     // First for when theres only one RF level saved. Existing for when there are multiply RF levels saved
@@ -108,7 +108,7 @@ export class LevelListPanel  extends React.Component {
             })
         }
     }
-    
+
     // Method used to change the views when starting to add the first levels to the RF Builder.
     setLevelStatus = () => {
         if (this.props.rootStore.levelStore.levels.length === 0) {
@@ -144,13 +144,12 @@ export class LevelListPanel  extends React.Component {
         let expandoDiv = (() => {
             switch(this.state.level_status) {
                 case this.EMPTY || this.NEW:
-                    return (
-                        null
-                    );
+                    return null;
                 case this.FIRST:
                     return (
                         <div className="level-list--expandos" style={{flexDirection: "row-reverse"}}>
-                            { this.props.rootStore.levelStore.accessLevel === "high" ? <ImportIndicatorsButton /> : null }            
+                            { this.props.rootStore.levelStore.accessLevel === "high" ?
+                                <ImportIndicatorsButton program_id={this.props.rootStore.levelStore.program_id} /> : null }
                         </div>
                     );
                 case this.EXISTING:
@@ -165,7 +164,8 @@ export class LevelListPanel  extends React.Component {
                                 collapseFunc={this.props.rootStore.uiStore.collapseAllLevels} />
                             </div>
                             <div className="level-list--action-buttons" style={{display: "flex"}}>
-                                { this.props.rootStore.levelStore.accessLevel === "high" ? <ImportIndicatorsButton /> : null }            
+                                { this.props.rootStore.levelStore.accessLevel === "high" ?
+                                    <ImportIndicatorsButton program_id={this.props.rootStore.levelStore.program_id}/> : null }
                                 <button
                                     type="button"
                                     className="btn btn-sm btn-secondary ml-2"
@@ -182,11 +182,11 @@ export class LevelListPanel  extends React.Component {
             }
         })();
 
-        let bulkImportBanner = 
-            <div 
-                role="alert" 
-                id="bulk-import-banner-alert" 
-                className="alert fade show" 
+        let bulkImportBanner =
+            <div
+                role="alert"
+                id="bulk-import-banner-alert"
+                className="alert fade show"
             >
                 <div className="bulk-alert-message">
                     <div className="bulk-alert-icon">
@@ -222,9 +222,9 @@ export class LevelListPanel  extends React.Component {
                     {expandoDiv}
                     {
                         this.state.show_import_banner && // Hides Bulk Import Banner if stored as false in Django's Session Storage
-                        this.props.rootStore.levelStore.accessLevel === 'high' && 
+                        this.props.rootStore.levelStore.accessLevel === 'high' &&
                         this.state.level_status !== 1
-                            ? bulkImportBanner 
+                            ? bulkImportBanner
                             : null
                     }
                     <LevelList renderList='initial'/>
