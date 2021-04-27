@@ -1,14 +1,15 @@
 .popover-header {
     background-color: transparent;
     border: none;
+    padding: 1rem 1rem 0;
 }
 
-.popover-body {
-    padding: 0;
-}
+// .popover-body {
+//     padding: 0;
+// }
 
 .import-text {
-    padding: 0.5rem 0.75rem;
+    padding: 0.5rem 1rem;
 
     ol {
         padding-left: 1rem;
@@ -41,7 +42,7 @@
 }
 
 .advanced-text {
-    padding: 0.5rem 0.75rem;
+    padding: 0.25rem 1rem;
 
 }
 
@@ -50,7 +51,7 @@
     justify-content: space-between;
     align-self: center;
     width: auto;
-    margin: 0.25rem 0.75rem;
+    margin: 0.25rem 1rem;
 }
 
 .advanced-options {
@@ -65,11 +66,4 @@
     padding: 0.25rem;
     border: 1px solid black;
     border-radius: 0.25rem;
-.popover-header {
-    background-color: transparent;
-    border: none;
-    padding: 1rem 1rem 0;
-}
-.popover-body {
-    padding: 1rem;
 }

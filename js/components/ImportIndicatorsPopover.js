@@ -6,31 +6,21 @@ import api from '../apiv2';
 export const ImportIndicatorsContext = React.createContext();
 
 export class ImportIndicatorsButton extends BootstrapPopoverButton {
-    popoverName = "importIndicators"
-    popoverTitle = "Import indicators"
+    // Overwritting variables in the BootstrapPopoverButton
+    popoverName = "importIndicators";
+    popoverTitle = "Import indicators";
 
     constructor(props) {
         super(props);
-        this.state = {
-            levelStore: this.props.levelStore, 
-            chosenTier: this.props.levelStore.tierTemplates[this.props.levelStore.chosenTierSetKey].tiers, // State containing a list of tier levels names of the chosen RF framework tier template
-            tierLevelsRows: [], // State to hold the tier levels name and the desired number of rows for the excel template
-            setTierLevelsRows: this.setTierLevelsRows, // Method used to update the number of row per tier level
-        }
     }
 
-    setTierLevelsRows = (i, tier, value) => {
-        let updatedTiers = this.state.tierLevelsRows;
-        updatedTiers[i] = {[tier] : value};
-        this.setState({ tierLevelsRows: updatedTiers });
-    }
-
+    // Overwritting a method in the BootstrapPopoverButton and provides the content for when the Import indicators button is clicked
     getPopoverContent = () => {
+        let program_id = this.props.levelStore.program_id; 
+        let chosenTier = [...this.props.levelStore.tierTemplates[this.props.levelStore.chosenTierSetKey].tiers];
         return (
-            <ImportIndicatorsContext.Provider value={ this.state }>
-                <ImportIndicatorsPopover />
-            </ImportIndicatorsContext.Provider>
-            );
+                <ImportIndicatorsPopover program_id={ program_id } chosenTier={ chosenTier } />
+        );
     }
 
     render() {
@@ -44,7 +34,7 @@ export class ImportIndicatorsButton extends BootstrapPopoverButton {
                     >
                         <i className="fas fa-download"></i>
                             {
-                                //  # Translators: a button to download a spreadsheet
+                                //  # Translators: a button to open the import indicators popover
                                 gettext('Import indicators')
                             }
                     </button>
@@ -53,8 +43,7 @@ export class ImportIndicatorsButton extends BootstrapPopoverButton {
     }
 }
 
-const ImportIndicatorsPopover = (props) => {
-    const { levelStore, chosenTier, tierLevelsRows } = useContext(ImportIndicatorsContext);
+const ImportIndicatorsPopover = ({ program_id, chosenTier }) => {
 
     // These define the different cases/views of the Popover to switch between.
     let INITIAL = 0;
@@ -62,14 +51,23 @@ const ImportIndicatorsPopover = (props) => {
     let CONFIRM = 2;
     let SUCCESS = 3;
     let ERROR = 4;
-
     const [views, setViews] = useState(INITIAL);
+
+    // State to hold the tier levels name and the desired number of rows for the excel template. Default values of 10 or 20 is set on mount.
+    const [tierLevelsRows, setTierLevelsRows] = useState([]); 
+    useEffect(() => {
+        let row = [];
+        chosenTier.map((level, i) => {
+            row[i] =  { [level]: i < chosenTier.length - 2 ? 10 : 20 };
+        })
+        setTierLevelsRows(row);
+    }, [])
 
     // Download template file providing the program ID and number of rows per tier level
     let handleDownload = () => {
-        console.log("Download Clicked");
+        console.log("Download Clicked", program_id);
         let data = {
-            program_id: levelStore.program_id,
+            program_id: program_id,
             tierLevelsRows: tierLevelsRows,
         }
         api.downloadTemplate(data)
@@ -99,11 +97,6 @@ const ImportIndicatorsPopover = (props) => {
         document.getElementById("fileUpload").click();
     }
 
-    // Creates the default number of rows for the Tier Levels
-    chosenTier.map((tier, i) => {
-        tierLevelsRows[i] = { [tier]: i < chosenTier.length - 2 ? 10 : 20 };
-    });
-
     return (
         <React.Fragment>
             {(() => {
@@ -129,7 +122,9 @@ const ImportIndicatorsPopover = (props) => {
                                     </ol>
                                 </div>
 
-                                <AdvancedImport />
+                                    <ImportIndicatorsContext.Provider value={ { tierLevelsRows: tierLevelsRows, setTierLevelsRows: setTierLevelsRows }}>
+                                        <AdvancedImport />
+                                    </ImportIndicatorsContext.Provider>    
 
                                 <div className="import-buttons">
                                     <button
@@ -210,34 +205,10 @@ const ImportIndicatorsPopover = (props) => {
     )
 }
 
-
 const AdvancedImport = () => {
-    const { chosenTier, tierLevelsRows, setTierLevelsRows } = useContext(ImportIndicatorsContext);
-    let options = [0, 5, 10, 15, 20, 25];
-    const [expanded, setExpanded] = useState(false);
-    const [update, triggerUpdate] =  useState(false);
-    
-    useEffect(() => {
-        triggerUpdate(false);
-    },[update]);
+    const {tierLevelsRows } = useContext(ImportIndicatorsContext);
 
-    let advancedOptions = chosenTier.map((levelName, i ) => {
-        return (
-            <div key={ i } className="advanced-levels"> 
-                <label htmlFor={ levelName }> { levelName } </label>
-                <select 
-                    id={ levelName }
-                    className="advanced-options"
-                    value={ tierLevelsRows[i][levelName] }
-                    onChange={ (event) => { setTierLevelsRows(i, levelName, parseInt(event.target.value)), triggerUpdate(true) }}
-                    >
-                    {options.map((option) => (
-                        <option key={ option } value={ option }> { option } </option>
-                    ))}
-                </select>
-            </div>
-        )
-    })
+    const [expanded, setExpanded] = useState(false);
 
     return (
         <div>
@@ -264,8 +235,39 @@ const AdvancedImport = () => {
                         gettext('By default, the template will include 10 or 20 indicator rows per result level. Adjust the numbers if you need more or fewer rows.')
                     }
                 </p>
-                { advancedOptions }
+                {tierLevelsRows.map((level, i) => <AdvancedOptions key={i} level={level} i={i} />)}
             </div>
+        </div>
+    )
+}
+
+const AdvancedOptions = ({ level, i }) => {
+    const {tierLevelsRows, setTierLevelsRows } = useContext(ImportIndicatorsContext);
+
+    let options = [0, 5, 10, 15, 20, 25];
+    let levelName = Object.keys(level)[0];
+    const [levelValue, setLevelValue] = useState(Object.values(level)[0]);
+
+    let handleSelect = (event) => {
+        setLevelValue(parseInt(event.target.value));
+        let updatedTiers = [...tierLevelsRows];
+            updatedTiers[i][levelName] = parseInt(event.target.value);
+        setTierLevelsRows(updatedTiers);
+    }
+
+    return (
+        <div key={ i } className="advanced-levels"> 
+            <label htmlFor={ levelName }> { levelName } </label>
+            <select 
+                id={ levelName }
+                className="advanced-options"
+                value={ levelValue }
+                onChange={ (event) => { handleSelect(event) }}
+                >
+                {options.map((option) => (
+                    <option key={ option } value={ option }> { option } </option>
+                ))}
+            </select>
         </div>
     )
 }
