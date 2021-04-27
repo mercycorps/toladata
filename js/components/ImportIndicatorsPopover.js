@@ -43,7 +43,7 @@ export class ImportIndicatorsButton extends BootstrapPopoverButton {
     }
 }
 
-const ImportIndicatorsPopover = ({ program_id, chosenTier }) => {
+export const ImportIndicatorsPopover = ({ program_id, chosenTier }) => {
 
     // These define the different cases/views of the Popover to switch between.
     let INITIAL = 0;
