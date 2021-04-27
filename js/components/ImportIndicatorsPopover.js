@@ -8,6 +8,7 @@ class ImportIndicatorsPopover extends React.Component {
     FEEDBACK = 1;
     CONFIRM = 2;
     SUCCESS = 3;
+    ERROR = 4;
 
     constructor(props) {
         super(props);
@@ -17,20 +18,12 @@ class ImportIndicatorsPopover extends React.Component {
     }
 
     handleDownload = () => {
-        try {
-            // This doesn't fail very gracefully if there's a server error, it opens a new browser tab and
-            // provides an error page there. Cursory search didn't yield anything better though, so punting.
-            window.open(`/indicators/bulk_import_indicators/${this.props.program_id}/`, '_blank')
-        } catch (error) {
-            alert("Could not download import template")
-        }
-
-        // api.downloadTemplate(this.props.program_id)
-        //     .then(response => {
-        //         window.open(response)
-                // console.log("Reponse:", response);
-                // alert("DONWLOAD TEMPLATE")
-            // })
+        api.downloadTemplate(this.props.program_id)
+            .then(response => {
+                if (response = Error){
+                    this.setState({status: this.ERROR});
+                } 
+            })
     }
     handleUpload = () => {
         console.log("Upload Clicked");
@@ -110,6 +103,16 @@ class ImportIndicatorsPopover extends React.Component {
                             return (
                                 <div>
                                     Successful Import
+                                </div>
+                            )
+                        // TODO: View for when an API call fails 
+                        case this.ERROR:
+                            return (
+                                <div>
+                                    <div className="temp-view">
+                                        <h3>Error occured!!!</h3>
+                                        <button className="btn btn-sm btn-primary" onClick={() => this.setState({status: this.DOWNLOAD_UPLOAD})}>Try Again</button>
+                                    </div>
                                 </div>
                             )
                     }
