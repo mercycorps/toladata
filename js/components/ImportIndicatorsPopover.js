@@ -206,14 +206,14 @@ export const ImportIndicatorsPopover = ({ program_id, chosenTier }) => {
 }
 
 const AdvancedImport = () => {
-    const {tierLevelsRows } = useContext(ImportIndicatorsContext);
+    const { tierLevelsRows } = useContext(ImportIndicatorsContext);
 
     const [expanded, setExpanded] = useState(false);
 
     return (
         <div>
             <div className="advanced-button">
-                <FontAwesomeIcon icon={expanded ? 'caret-down' : 'caret-right'} /> &nbsp;
+                <FontAwesomeIcon icon={ expanded ? 'caret-down' : 'caret-right' } /> &nbsp;
                 <a 
                     data-toggle="collapse" 
                     href="#optionsForm" 
@@ -242,7 +242,7 @@ const AdvancedImport = () => {
 }
 
 const AdvancedOptions = ({ level, i }) => {
-    const {tierLevelsRows, setTierLevelsRows } = useContext(ImportIndicatorsContext);
+    const { tierLevelsRows, setTierLevelsRows } = useContext(ImportIndicatorsContext);
 
     let options = [0, 5, 10, 15, 20, 25];
     let levelName = Object.keys(level)[0];
