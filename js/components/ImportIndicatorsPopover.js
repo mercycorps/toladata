@@ -70,11 +70,11 @@ export const ImportIndicatorsPopover = ({ program_id, chosenTier }) => {
             program_id: program_id,
             tierLevelsRows: tierLevelsRows,
         }
-        api.downloadTemplate(data)
+        api.downloadTemplate(program_id, tierLevelsRows)
             .then(response => {
-                console.log("Reponse:", response, tierLevelsRows);
-                alert(`DONWLOAD TEMPLATE, ${JSON.stringify(tierLevelsRows)}`);
-                // window.open(response); //TODO: Open template file
+                if (response = Error) {
+                    setViews(ERROR);
+                } 
             })
     }
     // Upload template file and send api request
@@ -84,11 +84,11 @@ export const ImportIndicatorsPopover = ({ program_id, chosenTier }) => {
         reader.readAsDataURL(files[0]);
         reader.onload = (e) => {
             api.uploadTemplate(e.target.result)
-            .then(response => {
-                console.log("Reponse:", response);
-                alert("UPLOAD TEMPLATE");
-                setViews(FEEDBACK);
-            })
+                .then(response => {
+                    console.log("Reponse:", response);
+                    alert("UPLOAD TEMPLATE");
+                    setViews(FEEDBACK);
+                })
         }
     }
     // Triggers the file upload from the Upload button
@@ -177,6 +177,7 @@ export const ImportIndicatorsPopover = ({ program_id, chosenTier }) => {
                                 <div className="temp-view">
                                     Confirm Import View
                                 </div>
+
                                 <br/>
                                 <button className="btn btn-sm btn-primary" onClick={ () => setViews(SUCCESS) }>Complete Import</button>
                             </div>
@@ -193,10 +194,14 @@ export const ImportIndicatorsPopover = ({ program_id, chosenTier }) => {
                     // TODO: View for when an API call fails 
                     case ERROR:
                         return (
-                            <div>
-                                <div className="temp-view">
-                                    Error occured, Try Again.
-                                </div>
+                            <div className="import-error">
+                                <p className="text-secondary px-1 my-auto">
+                                    {   
+                                        // #Translators: Notification for a error that happend on the web server.
+                                        gettext('There was a server-related problem')
+                                    }    
+                                </p>
+                                <button className="btn btn-sm btn-primary" onClick={() => setViews(INITIAL) }>Try again</button>
                             </div>
                         )
                 }

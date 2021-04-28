@@ -48,6 +48,14 @@
     padding: 0.25rem 1rem;
 }
 
+.import-error {
+    display: flex;
+    flex-direction: column;
+    justify-content: space-between;
+    margin: 0.25rem 1rem 0.75rem;
+    height: 100px;
+}
+
 .temp-view {
     display: flex;
     justify-content: center;
