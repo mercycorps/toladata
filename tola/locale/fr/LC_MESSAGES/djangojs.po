@@ -3,7 +3,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: \n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2021-04-26 23:07-0700\n"
+"POT-Creation-Date: 2021-04-27 19:47-0700\n"
 "PO-Revision-Date: 2021-03-08 16:58-0800\n"
 "Last-Translator: \n"
 "Language-Team: \n"
@@ -71,28 +71,33 @@ msgstr "ÁTranslated Import indicators"
 
 #. Translators: Instructions for users to download the template, open it in
 #. Excel, and then fill in indicators information.
-#: js/components/ImportIndicatorsPopover.js:113
+#: js/components/ImportIndicatorsPopover.js:108
 msgid "Download the template, open it in Excel, and enter indicators."
 msgstr ""
 "ÁTranslated Download the template, open it in Excel, and enter indicators."
 
 #. Translators: Instructions for users to upload their filled in template and
 #. then follow the instructions to complete the import process.
-#: js/components/ImportIndicatorsPopover.js:119
+#: js/components/ImportIndicatorsPopover.js:114
 msgid "Upload the template and follow instructions to complete the process."
 msgstr ""
 "éTranslated Upload the template and follow instructions to complete the "
 "process."
 
 #. Translators: Button to download a template
-#: js/components/ImportIndicatorsPopover.js:138
+#: js/components/ImportIndicatorsPopover.js:133
 msgid "Download template"
 msgstr "Translated Download template"
 
 #. Translators: Button to upload a template
-#: js/components/ImportIndicatorsPopover.js:149
+#: js/components/ImportIndicatorsPopover.js:144
 msgid "Upload template"
 msgstr "Translated Upload template"
+
+#. Translators: Notification for a error that happend on the web server.
+#: js/components/ImportIndicatorsPopover.js:196
+msgid "There was a server-related problem"
+msgstr "ÁTranslated There was a server-related problem"
 
 #. Translators: Click to view the Advanced Option section
 #: js/components/ImportIndicatorsPopover.js:227
@@ -1312,7 +1317,7 @@ msgid "Indicators linked to this %s"
 msgstr "Indicateurs liés à %s"
 
 #. Translators: a button to download a spreadsheet
-#: js/pages/results_framework/components/level_list.js:176
+#: js/pages/results_framework/components/level_list.js:174
 #: js/pages/tola_management_pages/audit_log/views.js:224
 msgid "Excel"
 msgstr "Excel"
@@ -1321,7 +1326,7 @@ msgstr "Excel"
 #. one at a time, they can use an Excel template to enter multiple indicators
 #. at the same time. First step is to build the result framework below, then
 #. click the 'Import indicators' button above
-#: js/pages/results_framework/components/level_list.js:199
+#: js/pages/results_framework/components/level_list.js:197
 msgid ""
 "Instead of entering indicators one at a time, use an Excel template to "
 "import multiple indicators! First, build your results framework below. Next,"
