@@ -13,14 +13,14 @@ describe('Import Indicators test suite', () => {
         },
         chosenTierSetKey: "mc_standard"
     }
-    let chosenTier = ["Goal", "Outcome", "Output", "Activity"];
+    let chosenTiers = ["Goal", "Outcome", "Output", "Activity"];
 
     it('The Import indicators button should contain the right components', () => {
-        let wrapper = mount(<ImportIndicatorsPopover program_id={123} chosenTier={chosenTier} />)
+        let wrapper = mount(<ImportIndicatorsPopover program_id={123} chosenTiers={chosenTiers} />)
         expect(wrapper.exists('.importIndicators-body')).toBe(true);
         expect(wrapper.exists('.btn-upload')).toBe(true);
         expect(wrapper.exists('.btn-download')).toBe(true);
-        expect(wrapper.exists('.advanced-levels')).toBe(true);
-        expect(wrapper.exists('.advanced-options')).toBe(true);
+        expect(wrapper.exists('.level-count-row')).toBe(true);
+        expect(wrapper.exists('.level-count-options')).toBe(true);
     });
 })

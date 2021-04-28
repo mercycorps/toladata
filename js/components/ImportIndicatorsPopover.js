@@ -91,7 +91,7 @@ export const ImportIndicatorsPopover = ({ program_id, chosenTiers }) => {
         console.log("Upload Clicked");
         document.getElementById("fileUpload").click();
     }
-    console.log(tierLevelsRows);
+
     return (
         <React.Fragment>
             {(() => {
