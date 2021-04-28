@@ -65,11 +65,6 @@ export const ImportIndicatorsPopover = ({ program_id, chosenTier }) => {
 
     // Download template file providing the program ID and number of rows per tier level
     let handleDownload = () => {
-        console.log("Download Clicked", program_id);
-        let data = {
-            program_id: program_id,
-            tierLevelsRows: tierLevelsRows,
-        }
         api.downloadTemplate(program_id, tierLevelsRows)
             .then(response => {
                 if (response = Error) {
