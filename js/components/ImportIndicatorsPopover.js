@@ -6,7 +6,7 @@ import api from '../apiv2';
 export const ImportIndicatorsContext = React.createContext();
 
 export class ImportIndicatorsButton extends BootstrapPopoverButton {
-    // Overwritting variables in the BootstrapPopoverButton
+    // Overriding variables in the BootstrapPopoverButton
     popoverName = "importIndicators";
     popoverTitle = "Import indicators";
 
@@ -14,12 +14,12 @@ export class ImportIndicatorsButton extends BootstrapPopoverButton {
         super(props);
     }
 
-    // Overwritting a method in the BootstrapPopoverButton and provides the content for when the Import indicators button is clicked
+    // Overriding a method in the BootstrapPopoverButton and provides the content for when the Import indicators button is clicked
     getPopoverContent = () => {
         let program_id = this.props.levelStore.program_id; 
-        let chosenTier = [...this.props.levelStore.tierTemplates[this.props.levelStore.chosenTierSetKey].tiers];
+        let chosenTiers = [...this.props.levelStore.tierTemplates[this.props.levelStore.chosenTierSetKey].tiers];
         return (
-                <ImportIndicatorsPopover program_id={ program_id } chosenTier={ chosenTier } />
+                <ImportIndicatorsPopover program_id={ program_id } chosenTiers={ chosenTiers } />
         );
     }
 
@@ -43,7 +43,7 @@ export class ImportIndicatorsButton extends BootstrapPopoverButton {
     }
 }
 
-export const ImportIndicatorsPopover = ({ program_id, chosenTier }) => {
+export const ImportIndicatorsPopover = ({ program_id, chosenTiers }) => {
 
     // These define the different cases/views of the Popover to switch between.
     let INITIAL = 0;
@@ -57,8 +57,8 @@ export const ImportIndicatorsPopover = ({ program_id, chosenTier }) => {
     const [tierLevelsRows, setTierLevelsRows] = useState([]); 
     useEffect(() => {
         let row = [];
-        chosenTier.map((level, i) => {
-            row[i] =  { [level]: i < chosenTier.length - 2 ? 10 : 20 };
+        chosenTiers.map((level, i) => {
+            row[i] =  { [level]: i < chosenTiers.length - 2 ? 10 : 20 };
         })
         setTierLevelsRows(row);
     }, [])
@@ -91,7 +91,7 @@ export const ImportIndicatorsPopover = ({ program_id, chosenTier }) => {
         console.log("Upload Clicked");
         document.getElementById("fileUpload").click();
     }
-
+    console.log(tierLevelsRows);
     return (
         <React.Fragment>
             {(() => {
@@ -192,7 +192,7 @@ export const ImportIndicatorsPopover = ({ program_id, chosenTier }) => {
                             <div className="import-error">
                                 <p className="text-secondary px-1 my-auto">
                                     {   
-                                        // #Translators: Notification for a error that happend on the web server.
+                                        // # Translators: Notification for a error that happend on the web server.
                                         gettext('There was a server-related problem')
                                     }    
                                 </p>
@@ -235,32 +235,31 @@ const AdvancedImport = () => {
                         gettext('By default, the template will include 10 or 20 indicator rows per result level. Adjust the numbers if you need more or fewer rows.')
                     }
                 </p>
-                {tierLevelsRows.map((level, i) => <AdvancedOptions key={i} level={level} i={i} />)}
+                {tierLevelsRows.map((level, i) => <LevelIndicatorCount key={i} level={level} i={i} />)}
             </div>
         </div>
     )
 }
 
-const AdvancedOptions = ({ level, i }) => {
+const LevelIndicatorCount = ({ level, i }) => {
     const { tierLevelsRows, setTierLevelsRows } = useContext(ImportIndicatorsContext);
 
     let options = [0, 5, 10, 15, 20, 25];
     let levelName = Object.keys(level)[0];
-    const [levelValue, setLevelValue] = useState(Object.values(level)[0]);
+    let levelValue = tierLevelsRows[i][levelName];
 
     let handleSelect = (event) => {
-        setLevelValue(parseInt(event.target.value));
         let updatedTiers = [...tierLevelsRows];
-            updatedTiers[i][levelName] = parseInt(event.target.value);
+            updatedTiers[i] = {[levelName]: parseInt(event.target.value)}
         setTierLevelsRows(updatedTiers);
     }
 
     return (
-        <div key={ i } className="advanced-levels"> 
+        <div key={ i } className="level-count-row"> 
             <label htmlFor={ levelName }> { levelName } </label>
             <select 
                 id={ levelName }
-                className="advanced-options"
+                className="level-count-options"
                 value={ levelValue }
                 onChange={ (event) => { handleSelect(event) }}
                 >
