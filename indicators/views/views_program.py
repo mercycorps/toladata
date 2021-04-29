@@ -301,7 +301,7 @@ class BulkImportIndicatorsView(LoginRequiredMixin, UserPassesTestMixin, AccessMi
         {"name": "Number (#) or percentage (%)", "required": True, 'validation': 'uom_type_validation', 'field_name': 'uom_type'},
         {"name": "Rationale for target", "required": False, 'field_name': 'rationale_for_target'},
         {"name": "Baseline", "required": True, 'field_name': 'baseline'},
-        {"name": "Direction of change", "required": False, 'validation': 'doc_validation', 'field_name': 'direction_of_change'},
+        {"name": "Direction of change", "required": False, 'validation': 'dir_change_validation', 'field_name': 'direction_of_change'},
         {"name": "Target frequency", "required": True, 'field_name': 'target_frequency'},
         {"name": "Means of verification / data source", "required": False, 'field_name': 'means_of_verification'},
         {"name": "Data collection method", "required": False, 'field_name': 'data_collection_method'},
@@ -349,14 +349,28 @@ class BulkImportIndicatorsView(LoginRequiredMixin, UserPassesTestMixin, AccessMi
             'indicator_set', 'program', 'parent__program__level_tiers')
         serialized_levels = sorted(BulkImportSerializer(levels, many=True).data, key=lambda level: level['ontology'])
 
-        # uom_type_options = ['Number (#)', 'Percentage (%)']
-        # uom_type_validation = DataValidation(type="list", formula1=f'"{",".join(uom_type_options)}"', allow_blank=True)
-        #
-        # for dv in [uom_type_validation]:
-        #     dv.error = 'Your entry is not in the list'
-        #     dv.errorTitle = 'Invalid Entry'
-        #     dv.prompt = 'Please select from the list'
-        #     dv.promptTitle = 'List Selection'
+        validation_map = {}
+        uom_type_options = ['Number (#)', 'Percentage (%)']
+        uom_type_validation = DataValidation(
+            type="list", formula1=f'"{",".join(uom_type_options)}"', allow_blank=False)
+        validation_map["Number (#) or percentage (%)"] = uom_type_validation
+
+        dir_change_options = ['N/A', 'Increase (+)', 'Decrease (-)']
+        dir_change_validation = DataValidation(
+            type="list", formula1=f'"{",".join(dir_change_options)}"', allow_blank=True)
+        validation_map["Direction of change"] = dir_change_validation
+
+        target_freq_options = [str(freq[1]) for freq in Indicator.TARGET_FREQUENCIES]
+        target_freq_validation = DataValidation(
+            type="list", formula1=f'"{",".join(target_freq_options)}"', allow_blank=False)
+        validation_map["Target frequency"] = target_freq_validation
+
+
+        for dv in [uom_type_validation]:
+            dv.error = 'Your entry is not in the list'
+            dv.errorTitle = 'Invalid Entry'
+            dv.prompt = 'Please select from the list'
+            dv.promptTitle = 'List Selection'
 
 
         wb = openpyxl.load_workbook(filename=f'{settings.SITE_ROOT}/indicators/BulkImportTemplate.xlsx')
@@ -366,7 +380,9 @@ class BulkImportIndicatorsView(LoginRequiredMixin, UserPassesTestMixin, AccessMi
         wb.add_named_style(self.indicator_row_style)
         wb.add_named_style(self.optional_header_style)
         wb.add_named_style(self.required_header_style)
-        # ws.add_data_validation(uom_type_validation)
+        ws.add_data_validation(uom_type_validation)
+        ws.add_data_validation(dir_change_validation)
+        ws.add_data_validation(target_freq_validation)
 
         first_used_column = 2
         last_used_column = first_used_column + len(self.COLUMNS) - 1
@@ -400,7 +416,6 @@ class BulkImportIndicatorsView(LoginRequiredMixin, UserPassesTestMixin, AccessMi
 
         current_row_index = 7
         for level in serialized_levels:
-            print('level in loop', level)
             ws.cell(current_row_index, first_used_column).value = f'{level["tier_name"]}: {level["level_name"]} ({level["ontology"]})'
             ws.merge_cells(
                 start_row=current_row_index,
@@ -410,11 +425,8 @@ class BulkImportIndicatorsView(LoginRequiredMixin, UserPassesTestMixin, AccessMi
             ws.cell(current_row_index, first_used_column).style = 'level_header_style'
             current_row_index += 1
 
-            # dv.add(ws.cell(10, 10))
-            print('ind count', len(level['indicator_set']))
             for indicator in level['indicator_set']:
                 current_column_index = first_used_column
-                print('current_row', current_row_index, level['tier_name'], indicator['name'])
                 ws.cell(current_row_index, current_column_index).value = level['tier_name']
                 current_column_index += 1
                 for column in self.COLUMNS[1:]:
@@ -424,10 +436,12 @@ class BulkImportIndicatorsView(LoginRequiredMixin, UserPassesTestMixin, AccessMi
                             level['display_ontology'] + indicator['display_ontology_letter']
                         active_cell.font = Font(bold=True)
                     else:
-                        print('active cell', active_cell.coordinate)
                         active_cell.value = \
                             indicator.get(column['field_name'], None)
                         active_cell.font = Font(bold=False)
+                        if column['name'] in validation_map.keys():
+                            validator = validation_map[column['name']]
+                            validator.add(active_cell)
                     current_column_index += 1
                 current_row_index += 1
             current_row_index += 1
