@@ -56,6 +56,30 @@
     height: 100px;
 }
 
+.import-confirm {
+    display: flex;
+    flex-direction: column;
+    margin: 0.25rem 1rem 0.75rem;
+
+    &-text {
+        display: flex;
+        margin: 0.5rem 0;
+        align-items: flex-start;
+        
+        & > .fa-check-circle {
+            color: green;
+        }
+        & > div {
+            margin-left: 1rem;
+        }
+    }
+
+    &-buttons {
+        display: flex;
+        flex-direction: column;
+    }
+}
+
 .temp-view {
     display: flex;
     justify-content: center;
