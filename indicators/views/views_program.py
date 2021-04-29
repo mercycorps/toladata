@@ -11,6 +11,8 @@ import logging
 import openpyxl
 import json
 from openpyxl import styles, utils
+from openpyxl.styles import PatternFill, Border, Side, Alignment, Protection, Font, NamedStyle
+from openpyxl.worksheet.datavalidation import DataValidation
 from django.conf import settings
 from django.contrib.auth.decorators import login_required
 from django.contrib.auth.mixins import UserPassesTestMixin, LoginRequiredMixin, AccessMixin
@@ -285,8 +287,51 @@ def programs_rollup_export_csv(request):
 
 class BulkImportIndicatorsView(LoginRequiredMixin, UserPassesTestMixin, AccessMixin, View):
     """Returns bulk import .xlsx file"""
-
     redirect_field_name = None
+
+    COLUMNS = [
+        {"name": "Level", "required": True},
+        {"name": "No.", "required": True},
+        {"name": "Indicator", "required": True, 'field_name': 'name'},
+        {"name": "Sector", "required": False, 'field_name': 'sector'},
+        {"name": "Source", "required": False, 'field_name': 'source'},
+        {"name": "Definition", "required": False, 'field_name': 'definition'},
+        {"name": "Rationale or justification for indicator", "required": False, 'field_name': 'rationale'},
+        {"name": "Unit of measure", "required": True, 'field_name': 'unit_of_measure'},
+        {"name": "Number (#) or percentage (%)", "required": True, 'validation': 'uom_type_validation', 'field_name': 'uom_type'},
+        {"name": "Rationale for target", "required": False, 'field_name': 'rationale_for_target'},
+        {"name": "Baseline", "required": True, 'field_name': 'baseline'},
+        {"name": "Direction of change", "required": False, 'validation': 'doc_validation', 'field_name': 'direction_of_change'},
+        {"name": "Target frequency", "required": True, 'field_name': 'target_frequency'},
+        {"name": "Means of verification / data source", "required": False, 'field_name': 'means_of_verification'},
+        {"name": "Data collection method", "required": False, 'field_name': 'data_collection_method'},
+        {"name": "Data points", "required": False, 'field_name': 'data_points'},
+        {"name": "Responsible person(s) and team", "required": False, 'field_name': 'responsible_person'},
+        {"name": "Method of analysis", "required": False, 'field_name': 'method_of_analysis'},
+        {"name": "Information use", "required": False, 'field_name': 'information_use'},
+        {"name": "Data quality assurance details", "required": False, 'field_name': 'quality_assurance'},
+        {"name": "Data issues", "required": False, 'field_name': 'data_issues'},
+        {"name": "Comments", "required": False, 'field_name': 'comments'}
+    ]
+
+    title_style = NamedStyle('title_style')
+    title_style.font = Font(name='Calibri', size=18)
+
+    required_header_style = NamedStyle('required_header_style')
+    required_header_style.font = Font(name='Calibri', size=11, color='FFFFFFFF')
+    required_header_style.fill = PatternFill('solid', fgColor='00000000')
+
+    optional_header_style = NamedStyle('optional_header_style')
+    optional_header_style.font = Font(name='Calibri', size=11, color='00000000')
+    optional_header_style.fill = PatternFill('solid', fgColor='FFF2F2F2')
+
+    level_header_style = NamedStyle('level_header_style')
+    level_header_style.fill = PatternFill('solid', fgColor='FFDBDCDE')
+    level_header_style.font = Font(name='Calibri', size=11)
+
+    indicator_row_style = NamedStyle('indicator_row_style')
+    indicator_row_style.font = Font(name='Calibri', size=11)
+
 
     def test_func(self):
         program_id = self.request.resolver_match.kwargs.get('program_id')
@@ -295,16 +340,102 @@ class BulkImportIndicatorsView(LoginRequiredMixin, UserPassesTestMixin, AccessMi
 
     def get(self, request, *args, **kwargs):
         program_id = kwargs['program_id']
-
         try:
             program = Program.objects.get(pk=program_id)
         except Program.DoesNotExist:
             return JsonResponse({'error': 'Program not found'}, status=404)
 
-        levels = Level.objects.filter(program=program).select_related().prefetch_related('indicator_set', 'program', 'parent__program__level_tiers')
-        serialized_levels = BulkImportSerializer(levels, many=True)
+        levels = Level.objects.filter(program=program).select_related().prefetch_related(
+            'indicator_set', 'program', 'parent__program__level_tiers')
+        serialized_levels = sorted(BulkImportSerializer(levels, many=True).data, key=lambda level: level['ontology'])
+
+        # uom_type_options = ['Number (#)', 'Percentage (%)']
+        # uom_type_validation = DataValidation(type="list", formula1=f'"{",".join(uom_type_options)}"', allow_blank=True)
+        #
+        # for dv in [uom_type_validation]:
+        #     dv.error = 'Your entry is not in the list'
+        #     dv.errorTitle = 'Invalid Entry'
+        #     dv.prompt = 'Please select from the list'
+        #     dv.promptTitle = 'List Selection'
+
 
         wb = openpyxl.load_workbook(filename=f'{settings.SITE_ROOT}/indicators/BulkImportTemplate.xlsx')
+        ws = wb.worksheets[0]
+        wb.add_named_style(self.title_style)
+        wb.add_named_style(self.level_header_style)
+        wb.add_named_style(self.indicator_row_style)
+        wb.add_named_style(self.optional_header_style)
+        wb.add_named_style(self.required_header_style)
+        # ws.add_data_validation(uom_type_validation)
+
+        first_used_column = 2
+        last_used_column = first_used_column + len(self.COLUMNS) - 1
+        # Translators: Heading placed in the cell of a spreadsheet that allows users to upload Indicators in bulk
+        ws.cell(1, first_used_column).value = gettext("Import indicators")
+        ws.cell(2, first_used_column).value = program.name
+        ws.cell(2, first_used_column).style = 'title_style'
+        # Translators: Instructions provided as part of an Excel template that allows users to upload Indicators
+        ws.cell(4, first_used_column).value = gettext(
+            "INSTRUCTIONS\n"
+            "1. Indicator rows are provided for each result level. You can delete indicator rows you do not need. You can also leave them empty and they will be ignored.\n"
+            "2. Required columns are highlighted with a dark  background and an asterisk (*) in the header row. You can delete columns you don't need, as long as they are not required.\n"
+            "3. When youare done, upload the template to the results framework or program page."
+        )
+        # ws.merge_cells(
+        #     start_row=4,
+        #     start_column=first_used_column,
+        #     end_row=4,
+        #     end_column=10)
+        # Translators: Section header of an Excel template that allows users to upload Indicators.  This section is where users will add their own information.
+        ws.cell(5, first_used_column).value = gettext("Enter indicators")
+
+        for i, header in enumerate(self.COLUMNS):
+            header_cell = ws.cell(6, i+2)
+            if header['required']:
+                header_cell.value = gettext(header['name']) + "*"
+                header_cell.style = 'required_header_style'
+            else:
+                header_cell.value = gettext(header['name'])
+                header_cell.style = 'optional_header_style'
+
+        current_row_index = 7
+        for level in serialized_levels:
+            print('level in loop', level)
+            ws.cell(current_row_index, first_used_column).value = f'{level["tier_name"]}: {level["level_name"]} ({level["ontology"]})'
+            ws.merge_cells(
+                start_row=current_row_index,
+                start_column=first_used_column,
+                end_row=current_row_index,
+                end_column=last_used_column)
+            ws.cell(current_row_index, first_used_column).style = 'level_header_style'
+            current_row_index += 1
+
+            # dv.add(ws.cell(10, 10))
+            print('ind count', len(level['indicator_set']))
+            for indicator in level['indicator_set']:
+                current_column_index = first_used_column
+                print('current_row', current_row_index, level['tier_name'], indicator['name'])
+                ws.cell(current_row_index, current_column_index).value = level['tier_name']
+                current_column_index += 1
+                for column in self.COLUMNS[1:]:
+                    active_cell = ws.cell(current_row_index, current_column_index)
+                    if column['name'] == 'No.':
+                        active_cell.value = \
+                            level['display_ontology'] + indicator['display_ontology_letter']
+                        active_cell.font = Font(bold=True)
+                    else:
+                        print('active cell', active_cell.coordinate)
+                        active_cell.value = \
+                            indicator.get(column['field_name'], None)
+                        active_cell.font = Font(bold=False)
+                    current_column_index += 1
+                current_row_index += 1
+            current_row_index += 1
+
+
+
+
+
         filename = "BulkIndicatorImport.xlsx"
         response = HttpResponse(content_type='application/ms-excel')
         response['Content-Disposition'] = 'attachment; filename="{}"'.format(filename)
