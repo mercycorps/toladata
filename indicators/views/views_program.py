@@ -317,22 +317,32 @@ class BulkImportIndicatorsView(LoginRequiredMixin, UserPassesTestMixin, AccessMi
 
     title_style = NamedStyle('title_style')
     title_style.font = Font(name='Calibri', size=18)
+    title_style.protection = Protection(locked=True)
 
     required_header_style = NamedStyle('required_header_style')
     required_header_style.font = Font(name='Calibri', size=11, color='FFFFFFFF')
     required_header_style.fill = PatternFill('solid', fgColor='00000000')
+    required_header_style.protection = Protection(locked=True)
 
     optional_header_style = NamedStyle('optional_header_style')
     optional_header_style.font = Font(name='Calibri', size=11, color='00000000')
     optional_header_style.fill = PatternFill('solid', fgColor='FFF2F2F2')
+    optional_header_style.protection = Protection(locked=False)
 
     level_header_style = NamedStyle('level_header_style')
     level_header_style.fill = PatternFill('solid', fgColor='FFDBDCDE')
     level_header_style.font = Font(name='Calibri', size=11)
+    level_header_style.protection = Protection(locked=True)
 
-    indicator_row_style = NamedStyle('indicator_row_style')
-    indicator_row_style.font = Font(name='Calibri', size=11)
-    indicator_row_style.alignment = Alignment(vertical='top')
+    protected_indicator_style = NamedStyle('protected_indicator_style')
+    protected_indicator_style.font = Font(name='Calibri', size=11)
+    protected_indicator_style.alignment = Alignment(vertical='top')
+    protected_indicator_style.protection = Protection(locked=True)
+
+    unprotected_indicator_style = NamedStyle('unprotected_indicator_style')
+    unprotected_indicator_style.font = Font(name='Calibri', size=11)
+    unprotected_indicator_style.alignment = Alignment(vertical='top')
+    unprotected_indicator_style.protection = Protection(locked=False)
 
 
     def test_func(self):
@@ -379,7 +389,8 @@ class BulkImportIndicatorsView(LoginRequiredMixin, UserPassesTestMixin, AccessMi
         ws = wb.worksheets[0]
         wb.add_named_style(self.title_style)
         wb.add_named_style(self.level_header_style)
-        wb.add_named_style(self.indicator_row_style)
+        wb.add_named_style(self.protected_indicator_style)
+        wb.add_named_style(self.unprotected_indicator_style)
         wb.add_named_style(self.optional_header_style)
         wb.add_named_style(self.required_header_style)
         ws.add_data_validation(uom_type_validation)
@@ -442,7 +453,7 @@ class BulkImportIndicatorsView(LoginRequiredMixin, UserPassesTestMixin, AccessMi
                     else:
                         active_cell.value = \
                             indicator.get(column['field_name'], None)
-                        active_cell.style = 'indicator_row_style'
+                        active_cell.style = 'protected_indicator_style'
                         if column['name'] in validation_map.keys():
                             validator = validation_map[column['name']]
                             validator.add(active_cell)
@@ -461,16 +472,13 @@ class BulkImportIndicatorsView(LoginRequiredMixin, UserPassesTestMixin, AccessMi
 
                 ws.cell(current_row_index, first_used_column).value = level['tier_name']
                 ws.cell(current_row_index, first_used_column + 1).value = level['display_ontology'] + i_letter
-
+                for col_index in range(first_used_column, last_used_column + 1):
+                    ws.cell(current_row_index, col_index).style = 'unprotected_indicator_style'
                 current_row_index += 1
 
             current_row_index += 1
 
-
-
-
-
-
+        ws.protection.enable()
         filename = "BulkIndicatorImport.xlsx"
         response = HttpResponse(content_type='application/ms-excel')
         response['Content-Disposition'] = 'attachment; filename="{}"'.format(filename)
