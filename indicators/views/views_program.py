@@ -9,6 +9,7 @@ import csv
 import datetime
 import logging
 import openpyxl
+import string
 import json
 from openpyxl import styles, utils
 from openpyxl.styles import PatternFill, Border, Side, Alignment, Protection, Font, NamedStyle
@@ -331,6 +332,7 @@ class BulkImportIndicatorsView(LoginRequiredMixin, UserPassesTestMixin, AccessMi
 
     indicator_row_style = NamedStyle('indicator_row_style')
     indicator_row_style.font = Font(name='Calibri', size=11)
+    indicator_row_style.alignment = Alignment(vertical='top')
 
 
     def test_func(self):
@@ -428,7 +430,9 @@ class BulkImportIndicatorsView(LoginRequiredMixin, UserPassesTestMixin, AccessMi
             for indicator in level['indicator_set']:
                 current_column_index = first_used_column
                 ws.cell(current_row_index, current_column_index).value = level['tier_name']
+                ws.cell(current_row_index, current_column_index).font = Font(bold=True)
                 current_column_index += 1
+                ws.row_dimensions[current_row_index].height = 16
                 for column in self.COLUMNS[1:]:
                     active_cell = ws.cell(current_row_index, current_column_index)
                     if column['name'] == 'No.':
@@ -438,13 +442,30 @@ class BulkImportIndicatorsView(LoginRequiredMixin, UserPassesTestMixin, AccessMi
                     else:
                         active_cell.value = \
                             indicator.get(column['field_name'], None)
-                        active_cell.font = Font(bold=False)
+                        active_cell.style = 'indicator_row_style'
                         if column['name'] in validation_map.keys():
                             validator = validation_map[column['name']]
                             validator.add(active_cell)
                     current_column_index += 1
                 current_row_index += 1
+
+            letter_index = len(level['indicator_set'])
+            for i in range(20):
+                ws.row_dimensions[current_row_index].height = 16
+                letter_index += 1
+                i_letter = ''
+                if letter_index < 26:
+                    i_letter = string.ascii_lowercase[letter_index]
+                elif letter_index >= 26:
+                    i_letter = string.ascii_lowercase[letter_index // 26 - 1] + string.ascii_lowercase[letter_index % 26]
+
+                ws.cell(current_row_index, first_used_column).value = level['tier_name']
+                ws.cell(current_row_index, first_used_column + 1).value = level['display_ontology'] + i_letter
+
+                current_row_index += 1
+
             current_row_index += 1
+
 
 
 
