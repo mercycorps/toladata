@@ -1,6 +1,8 @@
 .import-text {
+    padding: 0.5rem 1rem;
+
     ol {
-        padding-left: 20px;
+        padding-left: 1rem;
         
         li {
             margin-bottom: 0.75rem;
@@ -11,17 +13,55 @@
 .import-buttons {
     display: flex;
     flex-direction: column;
+    margin-top: 1rem;
+    padding: 0.5rem 0.75rem;
+    background-color: $gray-300;
+    border-top: 1px solid $gray-500;
 
     button {
-        margin: .25rem;
+        margin: 0.25rem;
     }
 }
 
-.popover-header {
-    background-color: transparent;
-    border: none;
-    padding: 1rem 1rem 0;
+.advanced-button {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    color: $action;
+    font-weight: bold;
 }
-.popover-body {
-    padding: 1rem;
+
+.advanced-text {
+    padding: 0.25rem 1rem;
+
+}
+
+.level-count-row {
+    display: flex;
+    justify-content: space-between;
+    align-self: center;
+    width: auto;
+    margin: 0.25rem 1rem;
+}
+
+.level-count-options {
+    padding: 0.25rem 1rem;
+}
+
+.import-error {
+    display: flex;
+    flex-direction: column;
+    justify-content: space-between;
+    margin: 0.25rem 1rem 0.75rem;
+    height: 100px;
+}
+
+.temp-view {
+    display: flex;
+    justify-content: center;
+    align-self: center;
+    min-height: 60px;
+    padding: 0.25rem;
+    border: 1px solid black;
+    border-radius: 0.25rem;
 }
