@@ -51,7 +51,7 @@ export const ImportIndicatorsPopover = ({ program_id, chosenTiers }) => {
     let CONFIRM = 2;
     let SUCCESS = 3;
     let ERROR = 4;
-    const [views, setViews] = useState(CONFIRM);
+    const [views, setViews] = useState(INITIAL);
 
     // State to hold the tier levels name and the desired number of rows for the excel template. Default values of 10 or 20 is set on mount.
     const [tierLevelsRows, setTierLevelsRows] = useState([]); 
@@ -195,9 +195,24 @@ export const ImportIndicatorsPopover = ({ program_id, chosenTiers }) => {
                     // TODO: View for a successful upload (May or may not be needed if using PNotify)
                     case SUCCESS:
                         return (
-                            <div>
-                                <div className="temp-view">
-                                    Successful Import View
+                            <div className="import-success">
+                                    {/* <span>{indicatorCount}</span>&nbsp; */}
+                                <div  className="import-success-text">
+                                    {
+                                        // # Translators: 
+                                        interpolate(ngettext(
+                                            "%s indicator is ready to be imported. Are you ready to complete the import process? (This action cannot be undone.)",
+                                            "%s indicators are ready to be imported. Are you ready to complete the import process? (This action cannot be undone.)", 
+                                            indicatorCount
+                                        ), [indicatorCount])
+                                        // gettext("indicators are ready to be imported. Are you ready to complete the import process? (This action cannot be undone.)")
+                                    }
+                                    <a href={ api.getProgramPageUrl(program_id)}>
+                                        {
+                                            // # Translators:
+                                            gettext("Visit the program page to complete setup of these indicators.")
+                                        }
+                                    </a> 
                                 </div>
                             </div>
                         )

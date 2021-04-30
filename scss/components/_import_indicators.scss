@@ -80,6 +80,22 @@
     }
 }
 
+.import-success {
+    display: flex;
+    margin: 0.25rem 1rem 0.75rem;
+
+    &-text {
+        display: flex;
+        flex-direction: column;
+
+        & > a {
+            color: $action;
+            font-weight: bold;
+            margin-top: 1rem;
+        }
+    }
+}
+
 .temp-view {
     display: flex;
     justify-content: center;
