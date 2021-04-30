@@ -101,8 +101,8 @@ export const ImportIndicatorsPopover = ({ program_id, chosenTiers }) => {
                     // View for downloading and uploading the template
                     case INITIAL:
                         return (
-                            <div className="importIndicators-body">
-                                <div className="import-text">
+                            <div className="import-initial">
+                                <div className="import-initial-text">
                                     <ol>
                                         <li>
                                             {
@@ -123,7 +123,7 @@ export const ImportIndicatorsPopover = ({ program_id, chosenTiers }) => {
                                         <AdvancedImport />
                                     </ImportIndicatorsContext.Provider>    
 
-                                <div className="import-buttons">
+                                <div className="import-initial-buttons">
                                     <button
                                         role="button"
                                         type="button"
@@ -242,7 +242,7 @@ const AdvancedImport = () => {
 
     return (
         <div>
-            <div className="advanced-button">
+            <div className="import-advanced-button">
                 <FontAwesomeIcon icon={ expanded ? 'caret-down' : 'caret-right' } /> &nbsp;
                 <a 
                     data-toggle="collapse" 
@@ -259,7 +259,7 @@ const AdvancedImport = () => {
                     </a>
             </div>
             <div id="optionsForm" className="collapse">
-                <p className="advanced-text">
+                <p className="import-advanced-text">
                     {
                         // # Translators: Details explaining that by default the template will include 10 or 20 rows per result level. You can adjust the number if you need more or less rows.
                         gettext('By default, the template will include 10 or 20 indicator rows per result level. Adjust the numbers if you need more or fewer rows.')

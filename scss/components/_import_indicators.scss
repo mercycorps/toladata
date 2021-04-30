@@ -1,4 +1,5 @@
-.import-text {
+// ***** Initial View Styling *****
+.import-initial-text {
     padding: 0.5rem 1rem;
 
     ol {
@@ -10,7 +11,7 @@
     }
 }
 
-.import-buttons {
+.import-initial-buttons {
     display: flex;
     flex-direction: column;
     margin-top: 1rem;
@@ -23,7 +24,8 @@
     }
 }
 
-.advanced-button {
+// ***** Advanced Import Component Styling *****
+.import-advanced-button {
     display: flex;
     justify-content: center;
     align-items: center;
@@ -31,7 +33,7 @@
     font-weight: bold;
 }
 
-.advanced-text {
+.import-advanced-text {
     padding: 0.25rem 1rem;
 
 }
@@ -48,14 +50,7 @@
     padding: 0.25rem 1rem;
 }
 
-.import-error {
-    display: flex;
-    flex-direction: column;
-    justify-content: space-between;
-    margin: 0.25rem 1rem 0.75rem;
-    height: 100px;
-}
-
+// ***** Confirmation View Styling *****
 .import-confirm {
     display: flex;
     flex-direction: column;
@@ -80,6 +75,7 @@
     }
 }
 
+// ***** Successfull View Styling *****
 .import-success {
     display: flex;
     margin: 0.25rem 1rem 0.75rem;
@@ -94,6 +90,15 @@
             margin-top: 1rem;
         }
     }
+}
+
+// ***** Error View Styling *****
+.import-error {
+    display: flex;
+    flex-direction: column;
+    justify-content: space-between;
+    margin: 0.25rem 1rem 0.75rem;
+    height: 100px;
 }
 
 .temp-view {
