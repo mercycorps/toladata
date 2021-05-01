@@ -1,5 +1,6 @@
 import React, { useState, useContext, useEffect } from 'react';
-import { FontAwesomeIcon } from '@fortawesome/react-fontawesome'
+import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
+import Select from 'react-select';
 import { BootstrapPopoverButton } from './helpPopover';
 import api from '../apiv2';
 
@@ -91,7 +92,6 @@ export const ImportIndicatorsPopover = ({ program_id, chosenTiers }) => {
             api.uploadTemplate(e.target.result)
                 .then(response => {
                     console.log("Reponse:", response);
-                    alert("UPLOAD TEMPLATE");
                     setViews(FEEDBACK);
                 })
         }
@@ -254,30 +254,60 @@ const AdvancedImport = () => {
 const LevelIndicatorCount = ({ level, i }) => {
     const { chosenTiers, tierLevelsRows, setTierLevelsRows } = useContext(ImportIndicatorsContext);
 
-    let options = [0, 5, 10, 15, 20, 25];
-
-    let handleSelect = (event, i) => {
-        let updatedTiers = [...tierLevelsRows];
+    let choices = [0, 5, 10, 15, 20, 25];
+    let options = [];
+    choices.map((choice, i) => {
+        options[i] = {
+            label: choice,
+            value: choice,
+        }
+    })
+    let handleSelect = (event) => {
+        let updatedTiers = $.extend(true, [], tierLevelsRows);
         updatedTiers[i] = {
             name: level.name,
-            rows: parseInt(event.target.value)
+            rows: event.value
         };
         setTierLevelsRows(updatedTiers);
     }
+
+    const customStyles = {
+        control: base => ({
+          ...base,
+          height: 30,
+          minHeight: 30,
+          padding: "0 auto"
+        }),
+        valueContainer: base => ({
+          ...base,
+          height: 25,
+          minHeight: 25,
+        }),
+        indicatorsContainer: base => ({
+            ...base,
+            height: 25,
+            minHeight: 25,
+        }),
+        indicatorSeparator: base => ({
+          ...base,
+          height: 15,
+          minHeight: 15,
+        }),
+      };
+
     return (
         <div key={ i } className="level-count-row"> 
             <label htmlFor={ level.name }> { level.name } </label>
-            <select 
+            <Select 
                 id={ level.name }
                 className="level-count-options"
-                value={ level.rows }
-                disabled={!chosenTiers[i].used}
-                onChange={ (event) => { handleSelect(event, i) }}
+                options={options}
+                value={ {value: level.rows, label: level.rows} }
+                isDisabled={!chosenTiers[i].used}
+                onChange={ (event) => handleSelect(event) }
+                styles={customStyles}
                 >
-                {options.map((option) => (
-                    <option key={ option } value={ option }> { option } </option>
-                ))}
-            </select>
+            </Select>
         </div>
     )
 }
