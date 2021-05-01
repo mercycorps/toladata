@@ -17,7 +17,17 @@ export class ImportIndicatorsButton extends BootstrapPopoverButton {
     // Overriding a method in the BootstrapPopoverButton and provides the content for when the Import indicators button is clicked
     getPopoverContent = () => {
         let program_id = this.props.levelStore.program_id; 
-        let chosenTiers = [...this.props.levelStore.tierTemplates[this.props.levelStore.chosenTierSetKey].tiers];
+        let chosenTierTemplate = [...this.props.levelStore.tierTemplates[this.props.levelStore.chosenTierSetKey].tiers];
+        let chosenTiers = [];
+        chosenTierTemplate.map((tier, i) => {
+            chosenTiers[i] = {
+                name: tier,
+                used: false,
+            }
+        })
+        this.props.levelStore.levels.map((level) => {
+            chosenTiers[level.level_depth - 1].used = true;
+        })
         return (
                 <ImportIndicatorsPopover program_id={ program_id } chosenTiers={ chosenTiers } />
         );
@@ -56,16 +66,16 @@ export const ImportIndicatorsPopover = ({ program_id, chosenTiers }) => {
     // State to hold the tier levels name and the desired number of rows for the excel template. Default values of 10 or 20 is set on mount.
     const [tierLevelsRows, setTierLevelsRows] = useState([]); 
     useEffect(() => {
-        let row = [];
-        chosenTiers.map((level, i) => {
-            row[i] =  { [level]: i < chosenTiers.length - 2 ? 10 : 20 };
+        let level = [];
+        chosenTiers.map((tier, i) => {
+            level[i] =  { name: tier.name, rows: i < chosenTiers.length - 2 ? 10 : 20 };
         })
-        setTierLevelsRows(row);
+        setTierLevelsRows(level);
     }, [])
-
-    // Download template file providing the program ID and number of rows per tier level
+    // Download template file providing the program ID, number of rows per tier level and if the level is used
     let handleDownload = () => {
-        api.downloadTemplate(program_id, tierLevelsRows)
+        let query = $.extend(true, {}, tierLevelsRows, chosenTiers)
+        api.downloadTemplate(program_id, query)
             .then(response => {
                 if (response = Error) {
                     setViews(ERROR);
@@ -117,7 +127,7 @@ export const ImportIndicatorsPopover = ({ program_id, chosenTiers }) => {
                                     </ol>
                                 </div>
 
-                                    <ImportIndicatorsContext.Provider value={ { tierLevelsRows: tierLevelsRows, setTierLevelsRows: setTierLevelsRows }}>
+                                    <ImportIndicatorsContext.Provider value={{ chosenTiers: chosenTiers, tierLevelsRows: tierLevelsRows, setTierLevelsRows: setTierLevelsRows }}>
                                         <AdvancedImport />
                                     </ImportIndicatorsContext.Provider>    
 
@@ -242,26 +252,27 @@ const AdvancedImport = () => {
 }
 
 const LevelIndicatorCount = ({ level, i }) => {
-    const { tierLevelsRows, setTierLevelsRows } = useContext(ImportIndicatorsContext);
+    const { chosenTiers, tierLevelsRows, setTierLevelsRows } = useContext(ImportIndicatorsContext);
 
     let options = [0, 5, 10, 15, 20, 25];
-    let levelName = Object.keys(level)[0];
-    let levelValue = tierLevelsRows[i][levelName];
 
-    let handleSelect = (event) => {
+    let handleSelect = (event, i) => {
         let updatedTiers = [...tierLevelsRows];
-            updatedTiers[i] = {[levelName]: parseInt(event.target.value)}
+        updatedTiers[i] = {
+            name: level.name,
+            rows: parseInt(event.target.value)
+        };
         setTierLevelsRows(updatedTiers);
     }
-
     return (
         <div key={ i } className="level-count-row"> 
-            <label htmlFor={ levelName }> { levelName } </label>
+            <label htmlFor={ level.name }> { level.name } </label>
             <select 
-                id={ levelName }
+                id={ level.name }
                 className="level-count-options"
-                value={ levelValue }
-                onChange={ (event) => { handleSelect(event) }}
+                value={ level.rows }
+                disabled={!chosenTiers[i].used}
+                onChange={ (event) => { handleSelect(event, i) }}
                 >
                 {options.map((option) => (
                     <option key={ option } value={ option }> { option } </option>
