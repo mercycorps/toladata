@@ -1,5 +1,6 @@
 import React, { useState, useContext, useEffect } from 'react';
-import { FontAwesomeIcon } from '@fortawesome/react-fontawesome'
+import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
+import Select from 'react-select';
 import { BootstrapPopoverButton } from './helpPopover';
 import api from '../apiv2';
 
@@ -16,10 +17,18 @@ export class ImportIndicatorsButton extends BootstrapPopoverButton {
 
     // Overriding a method in the BootstrapPopoverButton and provides the content for when the Import indicators button is clicked
     getPopoverContent = () => {
-        let program_id = this.props.levelStore.program_id; 
-        let chosenTiers = [...this.props.levelStore.tierTemplates[this.props.levelStore.chosenTierSetKey].tiers];
+        let tierLevelsUsed = [];
+        this.props.chosenTiers.map((tier, i) => {
+            tierLevelsUsed[i] = {
+                name: tier,
+                used: false,
+            }
+        })
+        this.props.levels.map((level) => {
+            tierLevelsUsed[level.level_depth - 1].used = true;
+        })
         return (
-                <ImportIndicatorsPopover program_id={ program_id } chosenTiers={ chosenTiers } />
+                <ImportIndicatorsPopover program_id={ this.props.program_id } tierLevelsUsed={ tierLevelsUsed } />
         );
     }
 
@@ -43,7 +52,7 @@ export class ImportIndicatorsButton extends BootstrapPopoverButton {
     }
 }
 
-export const ImportIndicatorsPopover = ({ program_id, chosenTiers }) => {
+export const ImportIndicatorsPopover = ({ program_id, tierLevelsUsed }) => {
 
     // These define the different cases/views of the Popover to switch between.
     let INITIAL = 0;
@@ -56,13 +65,12 @@ export const ImportIndicatorsPopover = ({ program_id, chosenTiers }) => {
     // State to hold the tier levels name and the desired number of rows for the excel template. Default values of 10 or 20 is set on mount.
     const [tierLevelsRows, setTierLevelsRows] = useState([]); 
     useEffect(() => {
-        let row = [];
-        chosenTiers.map((level, i) => {
-            row[i] =  { [level]: i < chosenTiers.length - 2 ? 10 : 20 };
+        let level = [];
+        tierLevelsUsed.map((tier, i) => {
+            level[i] =  { name: tier.name, rows: i < tierLevelsUsed.length - 2 ? 10 : 20 };
         })
-        setTierLevelsRows(row);
+        setTierLevelsRows(level);
     }, [])
-
     // Download template file providing the program ID and number of rows per tier level
     let handleDownload = () => {
         api.downloadTemplate(program_id, tierLevelsRows)
@@ -81,7 +89,6 @@ export const ImportIndicatorsPopover = ({ program_id, chosenTiers }) => {
             api.uploadTemplate(e.target.result)
                 .then(response => {
                     console.log("Reponse:", response);
-                    alert("UPLOAD TEMPLATE");
                     setViews(FEEDBACK);
                 })
         }
@@ -119,7 +126,7 @@ export const ImportIndicatorsPopover = ({ program_id, chosenTiers }) => {
                                     </ol>
                                 </div>
 
-                                    <ImportIndicatorsContext.Provider value={ { tierLevelsRows: tierLevelsRows, setTierLevelsRows: setTierLevelsRows }}>
+                                    <ImportIndicatorsContext.Provider value={{ tierLevelsUsed: tierLevelsUsed, tierLevelsRows: tierLevelsRows, setTierLevelsRows: setTierLevelsRows }}>
                                         <AdvancedImport />
                                     </ImportIndicatorsContext.Provider>    
 
@@ -272,31 +279,61 @@ const AdvancedImport = () => {
 }
 
 const LevelIndicatorCount = ({ level, i }) => {
-    const { tierLevelsRows, setTierLevelsRows } = useContext(ImportIndicatorsContext);
+    const { tierLevelsUsed, tierLevelsRows, setTierLevelsRows } = useContext(ImportIndicatorsContext);
 
-    let options = [0, 5, 10, 15, 20, 25];
-    let levelName = Object.keys(level)[0];
-    let levelValue = tierLevelsRows[i][levelName];
-
+    let choices = [0, 5, 10, 15, 20, 25];
+    let options = [];
+    choices.map((choice, i) => {
+        options[i] = {
+            label: choice,
+            value: choice,
+        }
+    })
     let handleSelect = (event) => {
-        let updatedTiers = [...tierLevelsRows];
-            updatedTiers[i] = {[levelName]: parseInt(event.target.value)}
+        let updatedTiers = $.extend(true, [], tierLevelsRows);
+        updatedTiers[i] = {
+            name: level.name,
+            rows: event.value
+        };
         setTierLevelsRows(updatedTiers);
     }
 
+    const customStyles = {
+        control: base => ({
+            ...base,
+            height: 30,
+            minHeight: 30,
+        }),
+        valueContainer: base => ({
+            ...base,
+            height: 25,
+            minHeight: 25,
+        }),
+        indicatorsContainer: base => ({
+            ...base,
+            height: 25,
+            minHeight: 25,
+        }),
+        indicatorSeparator: base => ({
+            ...base,
+            height: 15,
+            minHeight: 15,
+        }),
+      };
+
     return (
         <div key={ i } className="level-count-row"> 
-            <label htmlFor={ levelName }> { levelName } </label>
-            <select 
-                id={ levelName }
+            <label htmlFor={ level.name }> { level.name } </label>
+            <Select 
+                id={ level.name }
                 className="level-count-options"
-                value={ levelValue }
-                onChange={ (event) => { handleSelect(event) }}
+                options={options}
+                value={ {value: level.rows, label: level.rows} }
+                isDisabled={!tierLevelsUsed[i].used}
+                onChange={ (event) => handleSelect(event) }
+                styles={customStyles}
                 >
-                {options.map((option) => (
-                    <option key={ option } value={ option }> { option } </option>
-                ))}
-            </select>
+            </Select>
         </div>
     )
 }

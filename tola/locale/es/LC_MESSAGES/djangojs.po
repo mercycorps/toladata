@@ -6,7 +6,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: \n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2021-04-28 11:05-0700\n"
+"POT-Creation-Date: 2021-05-03 10:05-0700\n"
 "PO-Revision-Date: 2021-03-08 16:59-0800\n"
 "Last-Translator: \n"
 "Language-Team: \n"
@@ -67,49 +67,49 @@ msgid "Error"
 msgstr "Error"
 
 #. Translators: a button to open the import indicators popover
-#: js/components/ImportIndicatorsPopover.js:38
+#: js/components/ImportIndicatorsPopover.js:49
 msgid "Import indicators"
 msgstr "éTranslated Import indicators"
 
 #. Translators: Instructions for users to download the template, open it in
 #. Excel, and then fill in indicators information.
-#: js/components/ImportIndicatorsPopover.js:108
+#: js/components/ImportIndicatorsPopover.js:118
 msgid "Download the template, open it in Excel, and enter indicators."
 msgstr ""
 "ÁTranslated Download the template, open it in Excel, and enter indicators."
 
 #. Translators: Instructions for users to upload their filled in template and
 #. then follow the instructions to complete the import process.
-#: js/components/ImportIndicatorsPopover.js:114
+#: js/components/ImportIndicatorsPopover.js:124
 msgid "Upload the template and follow instructions to complete the process."
 msgstr ""
 "éTranslated Upload the template and follow instructions to complete the "
 "process."
 
 #. Translators: Button to download a template
-#: js/components/ImportIndicatorsPopover.js:133
+#: js/components/ImportIndicatorsPopover.js:143
 msgid "Download template"
 msgstr "Translated Download template"
 
 #. Translators: Button to upload a template
-#: js/components/ImportIndicatorsPopover.js:144
+#: js/components/ImportIndicatorsPopover.js:154
 msgid "Upload template"
 msgstr "ÁTranslated Upload template"
 
 #. Translators: Notification for a error that happend on the web server.
-#: js/components/ImportIndicatorsPopover.js:196
+#: js/components/ImportIndicatorsPopover.js:206
 msgid "There was a server-related problem"
 msgstr "ÁTranslated There was a server-related problem"
 
 #. Translators: Click to view the Advanced Option section
-#: js/components/ImportIndicatorsPopover.js:227
+#: js/components/ImportIndicatorsPopover.js:237
 msgid "Advanced options"
 msgstr "ÁTranslated Advanced options"
 
 #. Translators: Details explaining that by default the template will include
 #. 10 or 20 rows per result level. You can adjust the number if you need more
 #. or less rows.
-#: js/components/ImportIndicatorsPopover.js:235
+#: js/components/ImportIndicatorsPopover.js:245
 msgid ""
 "By default, the template will include 10 or 20 indicator rows per result "
 "level. Adjust the numbers if you need more or fewer rows."
