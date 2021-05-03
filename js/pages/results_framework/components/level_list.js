@@ -148,7 +148,13 @@ export class LevelListPanel  extends React.Component {
                 case this.FIRST:
                     return (
                         <div className="level-list--expandos" style={{flexDirection: "row-reverse"}}>
-                            { this.props.rootStore.levelStore.accessLevel === "high" ? <ImportIndicatorsButton levelStore={this.props.rootStore.levelStore} /> : null }            
+                            { this.props.rootStore.levelStore.accessLevel === "high" ? 
+                                <ImportIndicatorsButton 
+                                    program_id={ this.props.rootStore.levelStore.program_id }
+                                    chosenTierTemplate={ this.props.rootStore.levelStore.tierTemplates[this.props.rootStore.levelStore.chosenTierSetKey].tiers }
+                                    levels={ this.props.rootStore.levelStore.levels }
+                                /> 
+                            : null }            
                         </div>
                     );
                 case this.EXISTING:
@@ -163,7 +169,13 @@ export class LevelListPanel  extends React.Component {
                                 collapseFunc={this.props.rootStore.uiStore.collapseAllLevels} />
                             </div>
                             <div className="level-list--action-buttons" style={{display: "flex"}}>
-                                { this.props.rootStore.levelStore.accessLevel === "high" ? <ImportIndicatorsButton levelStore={this.props.rootStore.levelStore} /> : null }            
+                                { this.props.rootStore.levelStore.accessLevel === "high" ? 
+                                    <ImportIndicatorsButton 
+                                        program_id={ this.props.rootStore.levelStore.program_id }
+                                        chosenTierTemplate={ this.props.rootStore.levelStore.tierTemplates[this.props.rootStore.levelStore.chosenTierSetKey].tiers }
+                                        levels={ this.props.rootStore.levelStore.levels }
+                                    /> 
+                                : null }                                  
                                 <button
                                     type="button"
                                     className="btn btn-sm btn-secondary ml-2"

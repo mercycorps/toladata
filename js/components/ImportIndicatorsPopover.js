@@ -17,20 +17,18 @@ export class ImportIndicatorsButton extends BootstrapPopoverButton {
 
     // Overriding a method in the BootstrapPopoverButton and provides the content for when the Import indicators button is clicked
     getPopoverContent = () => {
-        let program_id = this.props.levelStore.program_id; 
-        let chosenTierTemplate = $.extend(true, [], this.props.levelStore.tierTemplates[this.props.levelStore.chosenTierSetKey].tiers);
         let chosenTiers = [];
-        chosenTierTemplate.map((tier, i) => {
+        this.props.chosenTierTemplate.map((tier, i) => {
             chosenTiers[i] = {
                 name: tier,
                 used: false,
             }
         })
-        this.props.levelStore.levels.map((level) => {
+        this.props.levels.map((level) => {
             chosenTiers[level.level_depth - 1].used = true;
         })
         return (
-                <ImportIndicatorsPopover program_id={ program_id } chosenTiers={ chosenTiers } />
+                <ImportIndicatorsPopover program_id={ this.props.program_id } chosenTiers={ chosenTiers } />
         );
     }
 
@@ -73,10 +71,9 @@ export const ImportIndicatorsPopover = ({ program_id, chosenTiers }) => {
         })
         setTierLevelsRows(level);
     }, [])
-    // Download template file providing the program ID, number of rows per tier level and if the level is used
+    // Download template file providing the program ID and number of rows per tier level
     let handleDownload = () => {
-        let query = $.extend(true, [], tierLevelsRows, chosenTiers)
-        api.downloadTemplate(program_id, query)
+        api.downloadTemplate(program_id, tierLevelsRows)
             .then(response => {
                 if (response = Error) {
                     setViews(ERROR);
