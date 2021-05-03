@@ -80,6 +80,10 @@ export const ImportIndicatorsPopover = ({ program_id, tierLevelsUsed }) => {
                 } 
             })
     }
+
+    const [validIndicatorsCount, setvalidIndicatorsCount] = useState(0);
+    const [invalidIndicatorsCount, setInvalidIndicatorsCount] = useState(0);
+
     // Upload template file and send api request
     let handleUpload = (e) => {
         let files = e.target.files;
@@ -88,6 +92,8 @@ export const ImportIndicatorsPopover = ({ program_id, tierLevelsUsed }) => {
         reader.onload = (e) => {
             api.uploadTemplate(e.target.result)
                 .then(response => {
+                    setvalidIndicatorsCount(16)
+                    setInvalidIndicatorsCount(4)
                     console.log("Reponse:", response);
                     setViews(FEEDBACK);
                 })
@@ -98,8 +104,6 @@ export const ImportIndicatorsPopover = ({ program_id, tierLevelsUsed }) => {
         console.log("Upload Clicked");
         document.getElementById("fileUpload").click();
     }
-
-    const [indicatorCount, setIndicatorCount] = useState(11);
 
     return (
         <React.Fragment>
@@ -181,14 +185,13 @@ export const ImportIndicatorsPopover = ({ program_id, tierLevelsUsed }) => {
                                 <div className="import-confirm-text">
                                     {/* <i className="fas fa-check-circle"/> */}
                                     <div>
-                                        {/* <span>{indicatorCount}</span>&nbsp; */}
                                         {
                                             // # Translators: 
                                             interpolate(ngettext(
                                                 "%s indicator is ready to be imported. Are you ready to complete the import process? (This action cannot be undone.)",
                                                 "%s indicators are ready to be imported. Are you ready to complete the import process? (This action cannot be undone.)", 
-                                                indicatorCount
-                                            ), [indicatorCount])
+                                                validIndicatorsCount
+                                            ), [validIndicatorsCount])
                                             // gettext("indicators are ready to be imported. Are you ready to complete the import process? (This action cannot be undone.)")
                                         }
                                     </div>
