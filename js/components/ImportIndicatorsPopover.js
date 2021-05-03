@@ -273,15 +273,14 @@ const LevelIndicatorCount = ({ level, i }) => {
 
     const customStyles = {
         control: base => ({
-          ...base,
-          height: 30,
-          minHeight: 30,
-          padding: "0 auto"
+            ...base,
+            height: 30,
+            minHeight: 30,
         }),
         valueContainer: base => ({
-          ...base,
-          height: 25,
-          minHeight: 25,
+            ...base,
+            height: 25,
+            minHeight: 25,
         }),
         indicatorsContainer: base => ({
             ...base,
@@ -289,9 +288,9 @@ const LevelIndicatorCount = ({ level, i }) => {
             minHeight: 25,
         }),
         indicatorSeparator: base => ({
-          ...base,
-          height: 15,
-          minHeight: 15,
+            ...base,
+            height: 15,
+            minHeight: 15,
         }),
       };
 
