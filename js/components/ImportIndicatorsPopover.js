@@ -17,18 +17,18 @@ export class ImportIndicatorsButton extends BootstrapPopoverButton {
 
     // Overriding a method in the BootstrapPopoverButton and provides the content for when the Import indicators button is clicked
     getPopoverContent = () => {
-        let chosenTiers = [];
-        this.props.chosenTierTemplate.map((tier, i) => {
-            chosenTiers[i] = {
+        let tierLevelsUsed = [];
+        this.props.chosenTiers.map((tier, i) => {
+            tierLevelsUsed[i] = {
                 name: tier,
                 used: false,
             }
         })
         this.props.levels.map((level) => {
-            chosenTiers[level.level_depth - 1].used = true;
+            tierLevelsUsed[level.level_depth - 1].used = true;
         })
         return (
-                <ImportIndicatorsPopover program_id={ this.props.program_id } chosenTiers={ chosenTiers } />
+                <ImportIndicatorsPopover program_id={ this.props.program_id } tierLevelsUsed={ tierLevelsUsed } />
         );
     }
 
@@ -52,7 +52,7 @@ export class ImportIndicatorsButton extends BootstrapPopoverButton {
     }
 }
 
-export const ImportIndicatorsPopover = ({ program_id, chosenTiers }) => {
+export const ImportIndicatorsPopover = ({ program_id, tierLevelsUsed }) => {
 
     // These define the different cases/views of the Popover to switch between.
     let INITIAL = 0;
@@ -66,8 +66,8 @@ export const ImportIndicatorsPopover = ({ program_id, chosenTiers }) => {
     const [tierLevelsRows, setTierLevelsRows] = useState([]); 
     useEffect(() => {
         let level = [];
-        chosenTiers.map((tier, i) => {
-            level[i] =  { name: tier.name, rows: i < chosenTiers.length - 2 ? 10 : 20 };
+        tierLevelsUsed.map((tier, i) => {
+            level[i] =  { name: tier.name, rows: i < tierLevelsUsed.length - 2 ? 10 : 20 };
         })
         setTierLevelsRows(level);
     }, [])
@@ -124,7 +124,7 @@ export const ImportIndicatorsPopover = ({ program_id, chosenTiers }) => {
                                     </ol>
                                 </div>
 
-                                    <ImportIndicatorsContext.Provider value={{ chosenTiers: chosenTiers, tierLevelsRows: tierLevelsRows, setTierLevelsRows: setTierLevelsRows }}>
+                                    <ImportIndicatorsContext.Provider value={{ tierLevelsUsed: tierLevelsUsed, tierLevelsRows: tierLevelsRows, setTierLevelsRows: setTierLevelsRows }}>
                                         <AdvancedImport />
                                     </ImportIndicatorsContext.Provider>    
 
@@ -249,7 +249,7 @@ const AdvancedImport = () => {
 }
 
 const LevelIndicatorCount = ({ level, i }) => {
-    const { chosenTiers, tierLevelsRows, setTierLevelsRows } = useContext(ImportIndicatorsContext);
+    const { tierLevelsUsed, tierLevelsRows, setTierLevelsRows } = useContext(ImportIndicatorsContext);
 
     let choices = [0, 5, 10, 15, 20, 25];
     let options = [];
@@ -299,7 +299,7 @@ const LevelIndicatorCount = ({ level, i }) => {
                 className="level-count-options"
                 options={options}
                 value={ {value: level.rows, label: level.rows} }
-                isDisabled={!chosenTiers[i].used}
+                isDisabled={!tierLevelsUsed[i].used}
                 onChange={ (event) => handleSelect(event) }
                 styles={customStyles}
                 >

@@ -151,7 +151,7 @@ export class LevelListPanel  extends React.Component {
                             { this.props.rootStore.levelStore.accessLevel === "high" ? 
                                 <ImportIndicatorsButton 
                                     program_id={ this.props.rootStore.levelStore.program_id }
-                                    chosenTierTemplate={ this.props.rootStore.levelStore.tierTemplates[this.props.rootStore.levelStore.chosenTierSetKey].tiers }
+                                    chosenTiers={ this.props.rootStore.levelStore.tierTemplates[this.props.rootStore.levelStore.chosenTierSetKey].tiers }
                                     levels={ this.props.rootStore.levelStore.levels }
                                 /> 
                             : null }            
@@ -172,7 +172,7 @@ export class LevelListPanel  extends React.Component {
                                 { this.props.rootStore.levelStore.accessLevel === "high" ? 
                                     <ImportIndicatorsButton 
                                         program_id={ this.props.rootStore.levelStore.program_id }
-                                        chosenTierTemplate={ this.props.rootStore.levelStore.tierTemplates[this.props.rootStore.levelStore.chosenTierSetKey].tiers }
+                                        chosenTiers={ this.props.rootStore.levelStore.tierTemplates[this.props.rootStore.levelStore.chosenTierSetKey].tiers }
                                         levels={ this.props.rootStore.levelStore.levels }
                                     /> 
                                 : null }                                  
