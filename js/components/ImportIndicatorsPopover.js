@@ -18,7 +18,7 @@ export class ImportIndicatorsButton extends BootstrapPopoverButton {
     // Overriding a method in the BootstrapPopoverButton and provides the content for when the Import indicators button is clicked
     getPopoverContent = () => {
         let program_id = this.props.levelStore.program_id; 
-        let chosenTierTemplate = [...this.props.levelStore.tierTemplates[this.props.levelStore.chosenTierSetKey].tiers];
+        let chosenTierTemplate = $.extend(true, [], this.props.levelStore.tierTemplates[this.props.levelStore.chosenTierSetKey].tiers);
         let chosenTiers = [];
         chosenTierTemplate.map((tier, i) => {
             chosenTiers[i] = {
