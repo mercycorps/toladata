@@ -1,8 +1,9 @@
 .import-text {
-    padding: 0.5rem 1rem;
+    padding: 0.5rem 1rem 0;
 
     ol {
         padding-left: 1rem;
+        margin-bottom: 0;
         
         li {
             margin-bottom: 0.75rem;
@@ -32,8 +33,9 @@
 }
 
 .advanced-text {
+    margin-bottom: 0.25rem;
     padding: 0.25rem 1rem;
-
+    font-size: small;
 }
 
 .level-count-row {
@@ -41,11 +43,17 @@
     justify-content: space-between;
     align-self: center;
     width: auto;
-    margin: 0.25rem 1rem;
+    margin: 0.125rem 1rem;
+    
+    & > label {
+        margin: auto 0;
+        font-size: small;
+    }
 }
-
 .level-count-options {
     padding: 0.25rem 1rem;
+    width: 7rem;
+    font-size: small;   
 }
 
 .import-error {

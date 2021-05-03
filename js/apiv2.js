@@ -118,11 +118,7 @@ const api = {
             .catch(this.logFailure)
     },
     async downloadTemplate (program_id, tierLevelsRows) {
-            return await this.templatesInstance.get(`/indicators/bulk_import_indicators/${program_id}/`, {
-                params: {
-                    tierLevelsRows: tierLevelsRows
-                }
-            })
+            return await this.templatesInstance.get(`/indicators/bulk_import_indicators/${program_id}/`, { params: {tierLevelsRows: tierLevelsRows} })
             .then(response => {
                 const url = window.URL.createObjectURL(new Blob([response.data]));
                 const link = document.createElement('a');
