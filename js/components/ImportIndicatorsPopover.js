@@ -75,7 +75,7 @@ export const ImportIndicatorsPopover = ({ program_id, chosenTiers }) => {
     }, [])
     // Download template file providing the program ID, number of rows per tier level and if the level is used
     let handleDownload = () => {
-        let query = $.extend(true, {}, tierLevelsRows, chosenTiers)
+        let query = $.extend(true, [], tierLevelsRows, chosenTiers)
         api.downloadTemplate(program_id, query)
             .then(response => {
                 if (response = Error) {
