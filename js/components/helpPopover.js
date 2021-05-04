@@ -62,7 +62,8 @@ export class BootstrapPopoverButton extends React.Component {
             content: `<div id="${this.popoverName}_popover_content"></div>`,
             title: this.popoverTitle ? `<div>${this.popoverTitle}</div>` : "",
             html: true,
-            placement: 'bottom'
+            placement: 'bottom',
+            boundary: 'viewport',
         }).on('shown.bs.popover', shownFn);
     }
 
