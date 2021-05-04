@@ -156,7 +156,7 @@ class IndicatorOrderingMixin:
             return str(string.ascii_lowercase[indicator.level_order])
         if indicator.level_id and indicator.level_order and indicator.level_order >= 26:
             return str(
-                string.ascii_lowercase[indicator.level_order/26 - 1] +
+                string.ascii_lowercase[indicator.level_order // 26 - 1] +
                 string.ascii_lowercase[indicator.level_order % 26]
                 )
         return None

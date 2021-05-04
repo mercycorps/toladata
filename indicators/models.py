@@ -1704,7 +1704,7 @@ class Indicator(SafeDeleteModel):
         if self.level and self.level_order is not None and self.level_order < 26:
             return string.ascii_lowercase[int(self.level_order)]
         elif self.level and self.level_order and self.level_order >= 26:
-            return string.ascii_lowercase[self.level_order // 26 - 1] + string.lowercase[self.level_order % 26]
+            return string.ascii_lowercase[self.level_order // 26 - 1] + string.ascii_lowercase[self.level_order % 26]
         return ''
 
     @cached_property
