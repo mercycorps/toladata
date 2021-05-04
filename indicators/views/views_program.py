@@ -326,7 +326,7 @@ class BulkImportIndicatorsView(LoginRequiredMixin, UserPassesTestMixin, AccessMi
 
     optional_header_style = NamedStyle('optional_header_style')
     optional_header_style.font = Font(name='Calibri', size=11, color='00000000')
-    optional_header_style.fill = PatternFill('solid', fgColor='FFF2F2F2')
+    optional_header_style.fill = PatternFill('solid', fgColor='FFF5F5F5')
     optional_header_style.protection = Protection(locked=False)
 
     level_header_style = NamedStyle('level_header_style')
@@ -407,14 +407,10 @@ class BulkImportIndicatorsView(LoginRequiredMixin, UserPassesTestMixin, AccessMi
         ws.cell(4, first_used_column).value = gettext(
             "INSTRUCTIONS\n"
             "1. Indicator rows are provided for each result level. You can delete indicator rows you do not need. You can also leave them empty and they will be ignored.\n"
-            "2. Required columns are highlighted with a dark  background and an asterisk (*) in the header row. You can delete columns you don't need, as long as they are not required.\n"
-            "3. When youare done, upload the template to the results framework or program page."
+            "2. Required columns are highlighted with a dark background and an asterisk (*) in the header row. Columns you are not using should be left empty.\n"
+            "3. When you are done, upload the template to the results framework or program page."
         )
-        # ws.merge_cells(
-        #     start_row=4,
-        #     start_column=first_used_column,
-        #     end_row=4,
-        #     end_column=10)
+
         # Translators: Section header of an Excel template that allows users to upload Indicators.  This section is where users will add their own information.
         ws.cell(5, first_used_column).value = gettext("Enter indicators")
 
