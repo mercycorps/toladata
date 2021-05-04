@@ -14,13 +14,13 @@ BulkImportTemplateSerializer = get_serializer(
 
 
 class BulkImportIndicatorSerializer(serializers.ModelSerializer):
-    level_display_ontology = serializers.SerializerMethodField()
+    display_ontology_letter = serializers.SerializerMethodField()
 
     class Meta:
         model = Indicator
         fields = [
             'name',
-            'level_display_ontology',
+            'display_ontology_letter',
             'sector',
             'source',
             'definition',
@@ -43,8 +43,8 @@ class BulkImportIndicatorSerializer(serializers.ModelSerializer):
         ]
 
     @staticmethod
-    def get_level_display_ontology(obj):
-        return obj.level_display_ontology
+    def get_display_ontology_letter(obj):
+        return obj.level_order_display
 
 
 class BulkImportProgramSerializer(serializers.ModelSerializer):
