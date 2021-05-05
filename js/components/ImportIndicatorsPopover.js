@@ -3,6 +3,7 @@ import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import Select from 'react-select';
 import { BootstrapPopoverButton } from './helpPopover';
 import api from '../apiv2';
+import LoadingSpinner from './loading-spinner';
 
 export const ImportIndicatorsContext = React.createContext();
 
@@ -60,7 +61,9 @@ export const ImportIndicatorsPopover = ({ program_id, tierLevelsUsed }) => {
     let CONFIRM = 2;
     let SUCCESS = 3;
     let ERROR = 4;
+    let SENDING = 5;
     const [views, setViews] = useState(INITIAL);
+    const [loading, setLoading] = useState(true);
 
     // State to hold the tier levels name and the desired number of rows for the excel template. Default values of 10 or 20 is set on mount.
     const [tierLevelsRows, setTierLevelsRows] = useState([]); 
@@ -86,17 +89,21 @@ export const ImportIndicatorsPopover = ({ program_id, tierLevelsUsed }) => {
 
     // Upload template file and send api request
     let handleUpload = (e) => {
+        setLoading(true);
         let files = e.target.files;
         let reader = new FileReader();
         reader.readAsDataURL(files[0]);
         reader.onload = (e) => {
-            api.uploadTemplate(e.target.result)
-                .then(response => {
-                    setvalidIndicatorsCount(16)
-                    setInvalidIndicatorsCount(4)
-                    console.log("Reponse:", response);
-                    setViews(FEEDBACK);
-                })
+            setTimeout(() => {
+                api.uploadTemplate(e.target.result)
+                    .then(response => {
+                        setLoading(false)
+                        setvalidIndicatorsCount(16)
+                        setInvalidIndicatorsCount(4)
+                        console.log("Reponse:", response);
+                        setViews(FEEDBACK);
+                    })
+            }, 5000)
         }
     }
     // Triggers the file upload from the Upload button
@@ -113,6 +120,7 @@ export const ImportIndicatorsPopover = ({ program_id, tierLevelsUsed }) => {
                     case INITIAL:
                         return (
                             <div className="import-initial">
+                                <LoadingSpinner isLoading={loading}>
                                 <div className="import-initial-text">
                                     <ol>
                                         <li>
@@ -129,6 +137,7 @@ export const ImportIndicatorsPopover = ({ program_id, tierLevelsUsed }) => {
                                         </li>
                                     </ol>
                                 </div>
+                                </LoadingSpinner>
 
                                     <ImportIndicatorsContext.Provider value={{ tierLevelsUsed: tierLevelsUsed, tierLevelsRows: tierLevelsRows, setTierLevelsRows: setTierLevelsRows }}>
                                         <AdvancedImport />
@@ -239,6 +248,12 @@ export const ImportIndicatorsPopover = ({ program_id, tierLevelsUsed }) => {
                                 <button className="btn btn-sm btn-primary" onClick={() => setViews(INITIAL) }>Try again</button>
                             </div>
                         )
+                    case SENDING:
+                        return (
+                            <div className="btn btn-primary popover-loader" disabled>
+                                <img src='/static/img/ajax-loader.gif' />&nbsp;
+                            </div>
+                        );
                 }
             })()}      
         </React.Fragment>
