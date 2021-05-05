@@ -218,7 +218,7 @@ const AdvancedImport = () => {
     const [expanded, setExpanded] = useState(false);
 
     return (
-        <div>
+        <div className="import-advanced">
             <div className="advanced-button">
                 <FontAwesomeIcon icon={ expanded ? 'caret-down' : 'caret-right' } /> &nbsp;
                 <a 
@@ -288,7 +288,12 @@ const LevelIndicatorCount = ({ level, i }) => {
             ...base,
             height: 15,
             minHeight: 15,
+            marginTop: 6,
         }),
+        singleValue: base => ({
+            ...base,
+            paddingBottom: 2,
+        })
       };
 
     return (
