@@ -63,7 +63,7 @@ export const ImportIndicatorsPopover = ({ program_id, tierLevelsUsed }) => {
     let ERROR = 4;
     let SENDING = 5;
     const [views, setViews] = useState(INITIAL);
-    const [loading, setLoading] = useState(true);
+    const [loading, setLoading] = useState(false);
 
     // State to hold the tier levels name and the desired number of rows for the excel template. Default values of 10 or 20 is set on mount.
     const [tierLevelsRows, setTierLevelsRows] = useState([]); 
@@ -89,7 +89,8 @@ export const ImportIndicatorsPopover = ({ program_id, tierLevelsUsed }) => {
 
     // Upload template file and send api request
     let handleUpload = (e) => {
-        setLoading(true);
+        // setLoading(true);
+        setViews(SENDING)
         let files = e.target.files;
         let reader = new FileReader();
         reader.readAsDataURL(files[0]);
@@ -97,7 +98,7 @@ export const ImportIndicatorsPopover = ({ program_id, tierLevelsUsed }) => {
             setTimeout(() => {
                 api.uploadTemplate(e.target.result)
                     .then(response => {
-                        setLoading(false)
+                        // setLoading(false)
                         setvalidIndicatorsCount(16)
                         setInvalidIndicatorsCount(4)
                         console.log("Reponse:", response);
@@ -119,8 +120,8 @@ export const ImportIndicatorsPopover = ({ program_id, tierLevelsUsed }) => {
                     // View for downloading and uploading the template
                     case INITIAL:
                         return (
+                            <LoadingSpinner isLoading={loading}>
                             <div className="import-initial">
-                                <LoadingSpinner isLoading={loading}>
                                 <div className="import-initial-text">
                                     <ol>
                                         <li>
@@ -137,7 +138,6 @@ export const ImportIndicatorsPopover = ({ program_id, tierLevelsUsed }) => {
                                         </li>
                                     </ol>
                                 </div>
-                                </LoadingSpinner>
 
                                     <ImportIndicatorsContext.Provider value={{ tierLevelsUsed: tierLevelsUsed, tierLevelsRows: tierLevelsRows, setTierLevelsRows: setTierLevelsRows }}>
                                         <AdvancedImport />
@@ -173,7 +173,8 @@ export const ImportIndicatorsPopover = ({ program_id, tierLevelsUsed }) => {
                                         onChange={ (e) => handleUpload(e) }
                                     />
                                 </div>                              
-                            </div> 
+                            </div>
+                            </LoadingSpinner>
                         );
                     // TODO: View to provide error feedback on their uploaded template
                     case FEEDBACK:
@@ -266,7 +267,7 @@ const AdvancedImport = () => {
     const [expanded, setExpanded] = useState(false);
 
     return (
-        <div>
+        <div className="import-advanced">
             <div className="import-advanced-button">
                 <FontAwesomeIcon icon={ expanded ? 'caret-down' : 'caret-right' } /> &nbsp;
                 <a 
@@ -336,7 +337,12 @@ const LevelIndicatorCount = ({ level, i }) => {
             ...base,
             height: 15,
             minHeight: 15,
+            marginTop: 6,
         }),
+        singleValue: base => ({
+            ...base,
+            paddingBottom: 2,
+        })
       };
 
     return (
