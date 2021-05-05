@@ -13,8 +13,10 @@ class TestBulkImportTemplateCreation(test.TestCase):
     def setUpClass(cls):
         super().setUpClass()
         cls.country = w_factories.CountryFactory()
+        # cls.program = w_factories.RFProgramFactory(
+        #     country=[cls.country], tiers=True, levels=6, indicators=150, indicators__levels=True)
         cls.program = w_factories.RFProgramFactory(
-            country=[cls.country], tiers=True, levels=6, indicators=150, indicators__levels=True)
+            country=[cls.country], tiers=True, levels=2, indicators=5, indicators__levels=True)
         cls.tola_user = w_factories.TolaUserFactory()
         cls.client = test.client
 
@@ -40,9 +42,3 @@ class TestBulkImportTemplateCreation(test.TestCase):
             response.get('Content-Disposition'),
             'attachment; filename="BulkIndicatorImport.xlsx"'
         )
-
-
-
-
-
-
