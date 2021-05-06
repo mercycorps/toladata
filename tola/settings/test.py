@@ -63,8 +63,6 @@ CACHES = {
     }
 }
 
-LOCALE_PATHS = [path.join(DJANGO_ROOT, 'test/locale')]
-
 try:
     from tola.settings.test_local import *
 except ImportError:
