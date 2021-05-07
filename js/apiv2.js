@@ -130,23 +130,46 @@ const api = {
             })
             .catch((error) => {
                 this.logFailure(error)
-                return error;
+                return {error};
             })
     },
     async uploadTemplate(data) {
         // TODO
-            // return this.templatesInstance.put('/', data)
+            // Send to backend
         console.log("API request to send Templates");
             return await Promise.resolve( {statusText: "OK", data: {valid: 16, invalid: 0}} )
                 .then(response => new Promise( resolve => {
+                    let timeOptions = [500, 900, 1000, 2000, 3000]
+                    let delay = timeOptions[Math.floor(Math.random() * 5)]
+                    console.log('delay', delay);
                     setTimeout(() => {
                         console.log('api', response);
                         resolve( response.data )
-                    }, 900);
-                })
-                )
-                
-                .catch(this.logFailure)
+                    }, delay);
+                }))
+                .catch((error) => {
+                    this.logFailure(error)
+                    return {error};
+                })    
+    },
+    async confirmUpload() {
+        // TODO
+            // Send to backend
+        console.log("API request to Confirm");
+        return await Promise.resolve( {statusText: "OK"} )
+            .then(response => new Promise( resolve => {
+                let timeOptions = [500, 900, 1000, 2000, 3000]
+                let delay = timeOptions[Math.floor(Math.random() * 5)]
+                console.log('delay', delay);
+                setTimeout(() => {
+                    console.log('api', response);
+                    resolve( response.statusText )
+                }, delay);
+            }))
+            .catch((error) => {
+                this.logFailure(error);
+                return {error};
+            })    
     }
 };
 

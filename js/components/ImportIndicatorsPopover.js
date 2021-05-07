@@ -61,7 +61,7 @@ export const ImportIndicatorsPopover = ({ program_id, tierLevelsUsed }) => {
     let SUCCESS = 3;
     let ERROR = 4;
     let LOADING = 5;
-    const [views, setViews] = useState(CONFIRM);
+    const [views, setViews] = useState(INITIAL);
 
     // State to hold the tier levels name and the desired number of rows for the excel template. Default values of 10 or 20 is set on mount.
     const [tierLevelsRows, setTierLevelsRows] = useState([]); 
@@ -76,19 +76,19 @@ export const ImportIndicatorsPopover = ({ program_id, tierLevelsUsed }) => {
     let handleDownload = () => {
         api.downloadTemplate(program_id, tierLevelsRows)
             .then(response => {
-                if (response = Error) {
+                if (response.error) {
                     setViews(ERROR);
                 } 
             })
     }
 
-    const [validIndicatorsCount, setvalidIndicatorsCount] = useState(20);
+    const [validIndicatorsCount, setvalidIndicatorsCount] = useState(0);
     const [invalidIndicatorsCount, setInvalidIndicatorsCount] = useState(0);
 
     // Upload template file and send api request
     let handleUpload = (e) => {
         let loading = false;
-        let t = setTimeout(() => {
+        let loadingTimer = setTimeout(() => {
             console.log('LOADING');
             setViews(LOADING)
             loading = true;
@@ -100,18 +100,22 @@ export const ImportIndicatorsPopover = ({ program_id, tierLevelsUsed }) => {
         api.uploadTemplate(e.target.result)
                 .then(response => {
                     let handleResponse = () => {
-                        setvalidIndicatorsCount(response.valid)
-                        setInvalidIndicatorsCount(response.invalid)
-                        console.log("Valid:", response.valid, "Invalid:", response.invalid);
-                        response.invalid > 0 ? setViews(FEEDBACK) : setViews(CONFIRM)
+                        if (!response.error) {
+                            setvalidIndicatorsCount(response.valid);
+                            setInvalidIndicatorsCount(response.invalid);
+                            console.log("Valid:", response.valid, "Invalid:", response.invalid);
+                            response.invalid > 0 ? setViews(FEEDBACK) : setViews(CONFIRM);
+                        } else {
+                            setViews(ERROR)
+                        }
                     }
                     if (loading) {
                         setTimeout(() => {
-                            handleResponse()
+                            handleResponse();
                         }, 1000)
                     } else {
-                        clearTimeout(t);
-                        handleResponse()
+                        clearTimeout(loadingTimer);
+                        handleResponse();
                     }
                 })
         }
@@ -120,6 +124,38 @@ export const ImportIndicatorsPopover = ({ program_id, tierLevelsUsed }) => {
     let uploadClick = () => {
         console.log("Upload Clicked");
         document.getElementById("fileUpload").click();
+    }
+
+    // Handle confirm and complete importing indicators
+    let handleConfirm = () => {
+        let loading = false;
+        let loadingTimer = setTimeout(() => {
+            setViews(LOADING)
+            loading = true;
+        }, 1000)
+        api.confirmUpload()
+            .then(response => {
+                let handleResponse = () => {
+                    if (!response.error) {
+                        setViews(SUCCESS);
+                    } else {
+                        setViews(ERROR);
+                    }
+                }
+                if (loading) {
+                    setTimeout(() => {
+                        handleResponse();
+                    }, 1000)
+                } else {
+                    clearTimeout(loadingTimer);
+                    handleResponse();
+                }
+            })
+    }
+    // Handle clicking cancel and closing the popover
+    let handleCancel = () => {
+        console.log('cancel', validIndicatorsCount);
+        $('.popover').popover('hide')
     }
 
     return (
@@ -214,8 +250,8 @@ export const ImportIndicatorsPopover = ({ program_id, tierLevelsUsed }) => {
                                     </div>
                                 </div>
                                 <div className="import-confirm-buttons">
-                                    <button className="btn btn-sm btn-primary" onClick={ () => setViews(SUCCESS) }>Complete Import</button>
-                                    <button className="btn btn-sm import-confirm-buttons-cancel" onClick={ () => setViews(INITIAL) }>Cancel</button>
+                                    <button className="btn btn-sm btn-primary" onClick={ () => handleConfirm() }>Complete Import</button>
+                                    <button className="btn btn-sm import-confirm-buttons-cancel" onClick={ () => handleCancel() }>Cancel</button>
                                 </div>
                             </div>
                         )
