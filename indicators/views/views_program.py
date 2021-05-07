@@ -299,10 +299,12 @@ class BulkImportIndicatorsView(LoginRequiredMixin, UserPassesTestMixin, AccessMi
         {"name": "Definition", "required": False, 'field_name': 'definition'},
         {"name": "Rationale or justification for indicator", "required": False, 'field_name': 'rationale'},
         {"name": "Unit of measure", "required": True, 'field_name': 'unit_of_measure'},
-        {"name": "Number (#) or percentage (%)", "required": True, 'validation': 'uom_type_validation', 'field_name': 'uom_type'},
+        {"name": "Number (#) or percentage (%)", "required": True, 'validation': 'uom_type_validation',
+            'field_name': 'uom_type'},
         {"name": "Rationale for target", "required": False, 'field_name': 'rationale_for_target'},
         {"name": "Baseline", "required": True, 'field_name': 'baseline'},
-        {"name": "Direction of change", "required": False, 'validation': 'dir_change_validation', 'field_name': 'direction_of_change'},
+        {"name": "Direction of change", "required": False, 'validation': 'dir_change_validation',
+            'field_name': 'direction_of_change'},
         {"name": "Target frequency", "required": True, 'field_name': 'target_frequency'},
         {"name": "Means of verification / data source", "required": False, 'field_name': 'means_of_verification'},
         {"name": "Data collection method", "required": False, 'field_name': 'data_collection_method'},
@@ -314,6 +316,10 @@ class BulkImportIndicatorsView(LoginRequiredMixin, UserPassesTestMixin, AccessMi
         {"name": "Data issues", "required": False, 'field_name': 'data_issues'},
         {"name": "Comments", "required": False, 'field_name': 'comments'}
     ]
+
+    first_used_column = 2
+    data_start_row = 7
+    program_name_row = 2
 
     title_style = NamedStyle('title_style')
     title_style.font = Font(name='Calibri', size=18)
@@ -344,11 +350,10 @@ class BulkImportIndicatorsView(LoginRequiredMixin, UserPassesTestMixin, AccessMi
     unprotected_indicator_style.alignment = Alignment(vertical='top')
     unprotected_indicator_style.protection = Protection(locked=False)
 
-
     def test_func(self):
         program_id = self.request.resolver_match.kwargs.get('program_id')
         return user_has_program_roles(self.request.user, [program_id], ['high']) \
-            or self.request.user.is_superuser == True
+            or self.request.user.is_superuser is True
 
     def get(self, request, *args, **kwargs):
         program_id = kwargs['program_id']
@@ -377,13 +382,11 @@ class BulkImportIndicatorsView(LoginRequiredMixin, UserPassesTestMixin, AccessMi
             type="list", formula1=f'"{",".join(target_freq_options)}"', allow_blank=False)
         validation_map["Target frequency"] = target_freq_validation
 
-
         for dv in [uom_type_validation]:
             dv.error = 'Your entry is not in the list'
             dv.errorTitle = 'Invalid Entry'
             dv.prompt = 'Please select from the list'
             dv.promptTitle = 'List Selection'
-
 
         wb = openpyxl.load_workbook(filename=f'{settings.SITE_ROOT}/indicators/BulkImportTemplate.xlsx')
         ws = wb.worksheets[0]
@@ -397,14 +400,13 @@ class BulkImportIndicatorsView(LoginRequiredMixin, UserPassesTestMixin, AccessMi
         ws.add_data_validation(dir_change_validation)
         ws.add_data_validation(target_freq_validation)
 
-        first_used_column = 2
-        last_used_column = first_used_column + len(self.COLUMNS) - 1
+        last_used_column = self.first_used_column + len(self.COLUMNS) - 1
         # Translators: Heading placed in the cell of a spreadsheet that allows users to upload Indicators in bulk
-        ws.cell(1, first_used_column).value = gettext("Import indicators")
-        ws.cell(2, first_used_column).value = program.name
-        ws.cell(2, first_used_column).style = 'title_style'
+        ws.cell(1, self.first_used_column).value = gettext("Import indicators")
+        ws.cell(self.program_name_row, self.first_used_column).value = program.name
+        ws.cell(2, self.first_used_column).style = 'title_style'
         # Translators: Instructions provided as part of an Excel template that allows users to upload Indicators
-        ws.cell(4, first_used_column).value = gettext(
+        ws.cell(4, self.first_used_column).value = gettext(
             "INSTRUCTIONS\n"
             "1. Indicator rows are provided for each result level. You can delete indicator rows you do not need. You can also leave them empty and they will be ignored.\n"
             "2. Required columns are highlighted with a dark background and an asterisk (*) in the header row. Unrequired columns can be left empty but cannot be deleted.\n"
@@ -412,7 +414,7 @@ class BulkImportIndicatorsView(LoginRequiredMixin, UserPassesTestMixin, AccessMi
         )
 
         # Translators: Section header of an Excel template that allows users to upload Indicators.  This section is where users will add their own information.
-        ws.cell(5, first_used_column).value = gettext("Enter indicators")
+        ws.cell(5, self.first_used_column).value = gettext("Enter indicators")
 
         for i, header in enumerate(self.COLUMNS):
             header_cell = ws.cell(6, i+2)
@@ -423,19 +425,20 @@ class BulkImportIndicatorsView(LoginRequiredMixin, UserPassesTestMixin, AccessMi
                 header_cell.value = gettext(header['name'])
                 header_cell.style = 'optional_header_style'
 
-        current_row_index = 7
+        current_row_index = self.data_start_row
         for level in serialized_levels:
-            ws.cell(current_row_index, first_used_column).value = f'{level["tier_name"]}: {level["level_name"]} ({level["ontology"]})'
+            ws.cell(current_row_index, self.first_used_column)\
+                .value = f'{level["tier_name"]}: {level["level_name"]} ({level["ontology"]})'
             ws.merge_cells(
                 start_row=current_row_index,
-                start_column=first_used_column,
+                start_column=self.first_used_column,
                 end_row=current_row_index,
                 end_column=last_used_column)
-            ws.cell(current_row_index, first_used_column).style = 'level_header_style'
+            ws.cell(current_row_index, self.first_used_column).style = 'level_header_style'
             current_row_index += 1
 
             for indicator in level['indicator_set']:
-                current_column_index = first_used_column
+                current_column_index = self.first_used_column
                 ws.cell(current_row_index, current_column_index).value = level['tier_name']
                 ws.cell(current_row_index, current_column_index).font = Font(bold=True)
                 current_column_index += 1
@@ -447,8 +450,7 @@ class BulkImportIndicatorsView(LoginRequiredMixin, UserPassesTestMixin, AccessMi
                             level['display_ontology'] + indicator['display_ontology_letter']
                         active_cell.font = Font(bold=True)
                     else:
-                        active_cell.value = \
-                            indicator.get(column['field_name'], None)
+                        active_cell.value = str(indicator.get(column['field_name'], None))
                         active_cell.style = 'protected_indicator_style'
                         if column['name'] in validation_map.keys():
                             validator = validation_map[column['name']]
@@ -464,11 +466,12 @@ class BulkImportIndicatorsView(LoginRequiredMixin, UserPassesTestMixin, AccessMi
                 if letter_index < 26:
                     i_letter = string.ascii_lowercase[letter_index]
                 elif letter_index >= 26:
-                    i_letter = string.ascii_lowercase[letter_index // 26 - 1] + string.ascii_lowercase[letter_index % 26]
+                    i_letter = string.ascii_lowercase[
+                        letter_index // 26 - 1] + string.ascii_lowercase[letter_index % 26]
 
-                ws.cell(current_row_index, first_used_column).value = level['tier_name']
-                ws.cell(current_row_index, first_used_column + 1).value = level['display_ontology'] + i_letter
-                for col_index in range(first_used_column, last_used_column + 1):
+                ws.cell(current_row_index, self.first_used_column).value = level['tier_name']
+                ws.cell(current_row_index, self.first_used_column + 1).value = level['display_ontology'] + i_letter
+                for col_index in range(self.first_used_column, last_used_column + 1):
                     ws.cell(current_row_index, col_index).style = 'unprotected_indicator_style'
                 current_row_index += 1
 
@@ -481,9 +484,18 @@ class BulkImportIndicatorsView(LoginRequiredMixin, UserPassesTestMixin, AccessMi
         wb.save(response)
         return response
 
+    def post(self, request, *args, **kwargs):
+        program_id = kwargs['program_id']
+        program = Program.objects.get(pk=program_id)
+        wb = openpyxl.load_workbook(request.FILES['file'])
+        ws = wb.get_sheet_by_name('Template')
+        if ws.cell(self.program_name_row, self.first_used_column).value != program.name:
+            return JsonResponse({'error_message': 'mismatched programs'}, status=400)
+
+        return JsonResponse({'message': 'yep'}, status=200)
+
 
 # API views:
-
 
 @login_required
 @has_program_read_access
