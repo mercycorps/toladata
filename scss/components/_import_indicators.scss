@@ -69,37 +69,48 @@
 
     &-text {
         display: flex;
-        margin: 0.5rem 0;
+        margin-top: 0.5rem;
+        margin-bottom: 1rem;
         align-items: flex-start;
         
-        & > .fa-check-circle {
+        & > div > .fa-check-circle {
+            margin-top: 4px;
+            margin-right: 0.25rem;
             color: green;
-        }
-        & > div {
-            margin-left: 1rem;
         }
     }
 
     &-buttons {
         display: flex;
         flex-direction: column;
+
+        &-cancel {
+            color: $gray-600;
+        }
     }
 }
 
 // ***** Successfull View Styling *****
 .import-success {
     display: flex;
+    flex-direction: column;
     margin: 0.25rem 1rem 0.75rem;
 
     &-text {
         display: flex;
-        flex-direction: column;
+        margin-top: 0.5rem;
+        margin-bottom: 1rem;
 
-        & > a {
-            color: $action;
-            font-weight: bold;
-            margin-top: 1rem;
+        & > div > .fa-check-circle {
+            margin-top: 4px;
+            margin-right: 0.25rem;
+            color: green;
         }
+
+    }
+    & > a {
+        color: $action;
+        font-weight: bold;
     }
 }
 
@@ -120,4 +131,28 @@
     padding: 0.25rem;
     border: 1px solid black;
     border-radius: 0.25rem;
+}
+
+.import-loading {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    width: 100%;
+    height: 100px;
+
+    img {
+        height: inherit;
+    }
+}
+
+.importLoading {
+    .loading-spinner__overlay {
+        display: flex;
+        justify-content: start;
+        align-items: baseline;
+    }
+    .loading-spinner__spinner {
+        top: 80px !important;
+        left: 140px !important;
+    }
 }

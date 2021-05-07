@@ -137,9 +137,16 @@ const api = {
         // TODO
             // return this.templatesInstance.put('/', data)
         console.log("API request to send Templates");
-        return await Promise.resolve( {statusText: "OK"} )
-            .then(response => response.statusText)
-            .catch(this.logFailure)
+            return await Promise.resolve( {statusText: "OK", data: {valid: 16, invalid: 0}} )
+                .then(response => new Promise( resolve => {
+                    setTimeout(() => {
+                        console.log('api', response);
+                        resolve( response.data )
+                    }, 900);
+                })
+                )
+                
+                .catch(this.logFailure)
     }
 };
 

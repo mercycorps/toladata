@@ -3,7 +3,6 @@ import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import Select from 'react-select';
 import { BootstrapPopoverButton } from './helpPopover';
 import api from '../apiv2';
-import LoadingSpinner from './loading-spinner';
 
 export const ImportIndicatorsContext = React.createContext();
 
@@ -61,9 +60,8 @@ export const ImportIndicatorsPopover = ({ program_id, tierLevelsUsed }) => {
     let CONFIRM = 2;
     let SUCCESS = 3;
     let ERROR = 4;
-    let SENDING = 5;
-    const [views, setViews] = useState(INITIAL);
-    const [loading, setLoading] = useState(false);
+    let LOADING = 5;
+    const [views, setViews] = useState(CONFIRM);
 
     // State to hold the tier levels name and the desired number of rows for the excel template. Default values of 10 or 20 is set on mount.
     const [tierLevelsRows, setTierLevelsRows] = useState([]); 
@@ -84,27 +82,38 @@ export const ImportIndicatorsPopover = ({ program_id, tierLevelsUsed }) => {
             })
     }
 
-    const [validIndicatorsCount, setvalidIndicatorsCount] = useState(0);
+    const [validIndicatorsCount, setvalidIndicatorsCount] = useState(20);
     const [invalidIndicatorsCount, setInvalidIndicatorsCount] = useState(0);
 
     // Upload template file and send api request
     let handleUpload = (e) => {
-        // setLoading(true);
-        setViews(SENDING)
+        let loading = false;
+        let t = setTimeout(() => {
+            console.log('LOADING');
+            setViews(LOADING)
+            loading = true;
+        }, 1000)
         let files = e.target.files;
         let reader = new FileReader();
         reader.readAsDataURL(files[0]);
         reader.onload = (e) => {
-            setTimeout(() => {
-                api.uploadTemplate(e.target.result)
-                    .then(response => {
-                        // setLoading(false)
-                        setvalidIndicatorsCount(16)
-                        setInvalidIndicatorsCount(4)
-                        console.log("Reponse:", response);
-                        setViews(FEEDBACK);
-                    })
-            }, 5000)
+        api.uploadTemplate(e.target.result)
+                .then(response => {
+                    let handleResponse = () => {
+                        setvalidIndicatorsCount(response.valid)
+                        setInvalidIndicatorsCount(response.invalid)
+                        console.log("Valid:", response.valid, "Invalid:", response.invalid);
+                        response.invalid > 0 ? setViews(FEEDBACK) : setViews(CONFIRM)
+                    }
+                    if (loading) {
+                        setTimeout(() => {
+                            handleResponse()
+                        }, 1000)
+                    } else {
+                        clearTimeout(t);
+                        handleResponse()
+                    }
+                })
         }
     }
     // Triggers the file upload from the Upload button
@@ -120,7 +129,6 @@ export const ImportIndicatorsPopover = ({ program_id, tierLevelsUsed }) => {
                     // View for downloading and uploading the template
                     case INITIAL:
                         return (
-                            <LoadingSpinner isLoading={loading}>
                             <div className="import-initial">
                                 <div className="import-initial-text">
                                     <ol>
@@ -174,7 +182,6 @@ export const ImportIndicatorsPopover = ({ program_id, tierLevelsUsed }) => {
                                     />
                                 </div>                              
                             </div>
-                            </LoadingSpinner>
                         );
                     // TODO: View to provide error feedback on their uploaded template
                     case FEEDBACK:
@@ -193,7 +200,7 @@ export const ImportIndicatorsPopover = ({ program_id, tierLevelsUsed }) => {
                         return (
                             <div className="import-confirm">
                                 <div className="import-confirm-text">
-                                    {/* <i className="fas fa-check-circle"/> */}
+                                    {views === CONFIRM ? <div><i className="fas fa-check-circle"/></div> : null}
                                     <div>
                                         {
                                             // # Translators: 
@@ -208,7 +215,7 @@ export const ImportIndicatorsPopover = ({ program_id, tierLevelsUsed }) => {
                                 </div>
                                 <div className="import-confirm-buttons">
                                     <button className="btn btn-sm btn-primary" onClick={ () => setViews(SUCCESS) }>Complete Import</button>
-                                    <button className="btn btn-sm" onClick={ () => setViews(INITIAL) }>Cancel</button>
+                                    <button className="btn btn-sm import-confirm-buttons-cancel" onClick={ () => setViews(INITIAL) }>Cancel</button>
                                 </div>
                             </div>
                         )
@@ -216,24 +223,24 @@ export const ImportIndicatorsPopover = ({ program_id, tierLevelsUsed }) => {
                     case SUCCESS:
                         return (
                             <div className="import-success">
-                                    {/* <span>{indicatorCount}</span>&nbsp; */}
                                 <div  className="import-success-text">
+                                    {views === SUCCESS ? <div><i className="fas fa-check-circle"/></div> : null}
                                     {
                                         // # Translators: 
                                         interpolate(ngettext(
-                                            "%s indicator is ready to be imported. Are you ready to complete the import process? (This action cannot be undone.)",
-                                            "%s indicators are ready to be imported. Are you ready to complete the import process? (This action cannot be undone.)", 
-                                            indicatorCount
-                                        ), [indicatorCount])
+                                            "%s indicator was successfully imported, but require additional details before results can be submitted.",
+                                            "%s indicators were successfully imported, but require additional details before results can be submitted.",
+                                            validIndicatorsCount
+                                        ), [validIndicatorsCount])
                                         // gettext("indicators are ready to be imported. Are you ready to complete the import process? (This action cannot be undone.)")
                                     }
-                                    <a href={ api.getProgramPageUrl(program_id)}>
-                                        {
-                                            // # Translators:
-                                            gettext("Visit the program page to complete setup of these indicators.")
-                                        }
-                                    </a> 
                                 </div>
+                                <a href={ api.getProgramPageUrl(program_id)}>
+                                    {
+                                        // # Translators:
+                                        gettext("Visit the program page to complete setup of these indicators.")
+                                    }
+                                </a> 
                             </div>
                         )
                     // TODO: View for when an API call fails 
@@ -249,10 +256,12 @@ export const ImportIndicatorsPopover = ({ program_id, tierLevelsUsed }) => {
                                 <button className="btn btn-sm btn-primary" onClick={() => setViews(INITIAL) }>Try again</button>
                             </div>
                         )
-                    case SENDING:
+                    case LOADING:
                         return (
-                            <div className="btn btn-primary popover-loader" disabled>
-                                <img src='/static/img/ajax-loader.gif' />&nbsp;
+                            <div className="import-loading" disabled>
+                                <img src='/static/img/duck.gif' />&nbsp;
+                                {/* <img src='/static/img/paint_spinner.gif' />&nbsp; */}
+                                {/* <img src='/static/img/ajax-loader.gif' />&nbsp; */}
                             </div>
                         );
                 }
