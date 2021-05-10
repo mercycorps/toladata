@@ -104,7 +104,7 @@ export const ImportIndicatorsPopover = ({ program_id, tierLevelsUsed }) => {
                         if (!response.error) {
                             setvalidIndicatorsCount(response.valid);
                             setInvalidIndicatorsCount(response.invalid);
-                            response.invalid > 0 ? setViews(FEEDBACK) : setViews(CONFIRM);
+                            response.invalid === 0 ? setViews(CONFIRM) : setViews(FEEDBACK);
                         } else {
                             setViews(ERROR)
                         }
@@ -206,7 +206,7 @@ export const ImportIndicatorsPopover = ({ program_id, tierLevelsUsed }) => {
                                         onClick={ () => uploadClick() }
                                     >
                                         {
-                                            // # Translators: Button to upload a template
+                                            // # Translators: Button to upload the import indicators template
                                             gettext("Upload template")
                                         }
                                     </button>
@@ -233,7 +233,7 @@ export const ImportIndicatorsPopover = ({ program_id, tierLevelsUsed }) => {
                                     role="button"
                                     href="#">
                                         {
-                                            // # Translators:
+                                            // # Translators: Download an excel template with errors that need fixing highlighted
                                             gettext("Download a copy of your template with errors highlighted")
                                         }
                                 </a>
@@ -243,7 +243,7 @@ export const ImportIndicatorsPopover = ({ program_id, tierLevelsUsed }) => {
                                     className="btn btn-sm btn-primary" 
                                     onClick={ () => setViews(CONFIRM) }>
                                         {
-                                            // # Translators:
+                                            // # Translators: Button to upload the import indicators template
                                             gettext("Upload")
                                         }
                                 </button>
@@ -305,7 +305,6 @@ export const ImportIndicatorsPopover = ({ program_id, tierLevelsUsed }) => {
                                             "%s indicators were successfully imported, but require additional details before results can be submitted.",
                                             validIndicatorsCount
                                         ), [validIndicatorsCount])
-                                        // gettext("indicators are ready to be imported. Are you ready to complete the import process? (This action cannot be undone.)")
                                     }
                                 </div>
                                 <a role="link" href={ api.getProgramPageUrl(program_id) }>
@@ -333,7 +332,7 @@ export const ImportIndicatorsPopover = ({ program_id, tierLevelsUsed }) => {
                     case LOADING:
                         return (
                             <div className="import-loading" disabled>
-                                <img src='/static/img/duck.gif' />&nbsp;
+                                <img src='/static/img/duck.gif' />&nbsp; 
                                 {/* <img src='/static/img/paint_spinner.gif'/>&nbsp; */}
                                 {/* <img src='/static/img/ajax-loader.gif' />&nbsp; */}
                             </div>
