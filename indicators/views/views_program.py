@@ -11,7 +11,7 @@ import logging
 import openpyxl
 from openpyxl import styles, utils
 from django.contrib.auth.decorators import login_required
-from django.utils.translation import ugettext
+from django.utils.translation import gettext
 from django.http import HttpResponse, JsonResponse
 from django.shortcuts import render, reverse, redirect, get_object_or_404
 
@@ -62,12 +62,6 @@ def get_child_levels(level, levels_by_pk):
         levels += get_child_levels(levels_by_pk[child_pk], levels_by_pk)
     return levels
 
-def clean_unicode(value):
-    if value is None or value is False:
-        return u''
-    if isinstance(value, str):
-        return value.encode('utf-8')
-    return value
 
 @login_required
 @has_program_read_access
@@ -91,22 +85,22 @@ def logframe_excel_view(request, program):
     program = LogframeProgramSerializer.load(program).data
     wb = openpyxl.Workbook()
     wb.remove(wb.active)
-    ws = wb.create_sheet(ugettext('Logframe'))
-    add_title_cell(ws, 1, 1, clean_unicode(program['name']))
+    ws = wb.create_sheet(gettext('Logframe'))
+    add_title_cell(ws, 1, 1, program['name'])
     ws.merge_cells(
         start_row=1, end_row=1,
         start_column=1, end_column=4
     )
-    add_title_cell(ws, 2, 1, ugettext('Logframe'))
+    add_title_cell(ws, 2, 1, gettext('Logframe'))
     ws.merge_cells(
         start_row=2, end_row=2,
         start_column=1, end_column=4
     )
     for col, name in enumerate([
-            ugettext('Result level'),
-            ugettext('Indicators'),
-            ugettext('Means of verification'),
-            ugettext('Assumptions')
+            gettext('Result level'),
+            gettext('Indicators'),
+            gettext('Means of verification'),
+            gettext('Assumptions')
         ]):
         add_header_cell(ws, 3, col+1, name)
         ws.column_dimensions[openpyxl.utils.get_column_letter(col + 1)].width = 50
@@ -123,24 +117,24 @@ def logframe_excel_view(request, program):
     for level in sorted_levels:
         merge_start = row
         cell = ws.cell(row=row, column=1)
-        cell.value = clean_unicode(level['display_name'])
+        cell.value = level['display_name']
         cell.alignment = TOP_LEFT_ALIGN_WRAP
         cell.fill = LEVEL_ROW_FILL
         cell = ws.cell(row=row, column=4)
-        cell.value = clean_unicode(level['assumptions'])
+        cell.value = level['assumptions']
         cell.alignment = TOP_LEFT_ALIGN_WRAP
         for indicator in sorted(level['indicators'], key=itemgetter('level_order')):
             cell = ws.cell(row=row, column=2)
-            value = ugettext('Indicator')
+            value = gettext('Indicator')
             if program['manual_numbering']:
-                value += u' {}'.format(indicator['number']) if indicator['number'] else u''
+                value += ' {}'.format(indicator['number']) if indicator['number'] else ''
             elif indicator['level_order_display'] or level['display_ontology']:
-                value += u' {}{}'.format(level['display_ontology'], indicator['level_order_display'])
-            value += u': {}'.format(clean_unicode(indicator['name']))
+                value += ' {}{}'.format(level['display_ontology'], indicator['level_order_display'])
+            value += ': {}'.format(indicator['name'])
             cell.value = value
             cell.alignment = TOP_LEFT_ALIGN_WRAP
             cell = ws.cell(row=row, column=3)
-            cell.value = clean_unicode(indicator['means_of_verification'])
+            cell.value = indicator['means_of_verification']
             cell.alignment = TOP_LEFT_ALIGN_WRAP
             row += 1
         if merge_start == row:
@@ -165,18 +159,18 @@ def logframe_excel_view(request, program):
     if program['unassigned_indicators']:
         merge_start = row
         cell = ws.cell(row=row, column=1)
-        cell.value = ugettext('Indicators unassigned to a results framework level')
+        cell.value = gettext('Indicators unassigned to a results framework level')
         cell.alignment = TOP_LEFT_ALIGN_WRAP
         cell.fill = LEVEL_ROW_FILL
         for indicator in program['unassigned_indicators']:
             cell = ws.cell(row=row, column=2)
-            value = ugettext('Indicator')
+            value = gettext('Indicator')
             if program['manual_numbering']:
-                value += u' {}'.format(indicator['number']) if indicator['number'] else u''
-            cell.value = u'{}: {}'.format(value, clean_unicode(indicator['name']))
+                value += ' {}'.format(indicator['number']) if indicator['number'] else ''
+            cell.value = '{}: {}'.format(value, indicator['name'])
             cell.alignment = TOP_LEFT_ALIGN_WRAP
             cell = ws.cell(row=row, column=3)
-            cell.value = clean_unicode(indicator['means_of_verification'])
+            cell.value = indicator['means_of_verification']
             cell.alignment = TOP_LEFT_ALIGN_WRAP
             row += 1
         if merge_start == row:
@@ -199,8 +193,8 @@ def logframe_excel_view(request, program):
         cell = ws.cell(row=merge_start, column=4)
         cell.border = BORDER_TOP
     response = HttpResponse(content_type="application/ms-excel")
-    response['Content-Disposition'] = u'attachment; filename="{}"'.format(
-        u'{} - {}.xlsx'.format(program['name'], ugettext('Logframe'))
+    response['Content-Disposition'] = 'attachment; filename="{}"'.format(
+        '{} - {}.xlsx'.format(program['name'], gettext('Logframe'))
     )
     wb.save(response)
     return response
@@ -271,7 +265,7 @@ def programs_rollup_export_csv(request):
         row = [str(s) for s in row]
         writer.writerow(row)
     return response
-        
+
 
 
 # API views:
@@ -361,9 +355,9 @@ def results_framework_export(request, program):
     program = Program.rf_aware_objects.get(pk=program)
     wb = openpyxl.Workbook()
     wb.remove(wb.active)
-    ws = wb.create_sheet(ugettext("Results Framework"))
+    ws = wb.create_sheet(gettext("Results Framework"))
     get_font = lambda attrs: styles.Font(**{**{'name': 'Calibri', 'size': 12}, **attrs})
-    ws.cell(row=2, column=2).value = ugettext("Results Framework")
+    ws.cell(row=2, column=2).value = gettext("Results Framework")
     ws.cell(row=2, column=2).font = get_font({'size': 18, 'bold': True})
     ws.cell(row=3, column=2).value = program.name
     ws.cell(row=3, column=2).font = get_font({'size': 18})
