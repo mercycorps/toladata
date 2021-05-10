@@ -91,7 +91,6 @@ export const ImportIndicatorsPopover = ({ program_id, tierLevelsUsed }) => {
     let handleUpload = (e) => {
         let loading = false;
         let loadingTimer = setTimeout(() => {
-            console.log('LOADING');
             setViews(LOADING)
             loading = true;
         }, 1000)
@@ -105,7 +104,6 @@ export const ImportIndicatorsPopover = ({ program_id, tierLevelsUsed }) => {
                         if (!response.error) {
                             setvalidIndicatorsCount(response.valid);
                             setInvalidIndicatorsCount(response.invalid);
-                            console.log("Valid:", response.valid, "Invalid:", response.invalid);
                             response.invalid > 0 ? setViews(FEEDBACK) : setViews(CONFIRM);
                         } else {
                             setViews(ERROR)
@@ -125,7 +123,6 @@ export const ImportIndicatorsPopover = ({ program_id, tierLevelsUsed }) => {
 
     // Triggers the file upload from the Upload button
     let uploadClick = () => {
-        console.log("Upload Clicked");
         document.getElementById("fileUpload").click();
     }
 

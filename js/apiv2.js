@@ -141,9 +141,7 @@ const api = {
                 .then(response => new Promise( resolve => {
                     let timeOptions = [500, 900, 1000, 2000, 3000]
                     let delay = timeOptions[Math.floor(Math.random() * 5)]
-                    console.log('delay', delay);
                     setTimeout(() => {
-                        console.log('api', response);
                         resolve( response.data )
                     }, delay);
                 }))
@@ -160,9 +158,7 @@ const api = {
             .then(response => new Promise( resolve => {
                 let timeOptions = [500, 900, 1000, 2000, 3000]
                 let delay = timeOptions[Math.floor(Math.random() * 5)]
-                console.log('delay', delay);
                 setTimeout(() => {
-                    console.log('api', response);
                     resolve( response.statusText )
                 }, delay);
             }))
