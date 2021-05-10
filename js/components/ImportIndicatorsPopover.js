@@ -9,7 +9,7 @@ export const ImportIndicatorsContext = React.createContext();
 export class ImportIndicatorsButton extends BootstrapPopoverButton {
     // Overriding variables in the BootstrapPopoverButton
     popoverName = "importIndicators";
-    popoverTitle = "Import indicators";
+    popoverTitle = gettext("Import indicators");
 
     constructor(props) {
         super(props);
@@ -122,6 +122,7 @@ export const ImportIndicatorsPopover = ({ program_id, tierLevelsUsed }) => {
                 })
         }
     }
+
     // Triggers the file upload from the Upload button
     let uploadClick = () => {
         console.log("Upload Clicked");
@@ -154,6 +155,7 @@ export const ImportIndicatorsPopover = ({ program_id, tierLevelsUsed }) => {
                 }
             })
     }
+
     // Handle clicking cancel and closing the popover
     let handleClose = () => {
         $('.popover').popover('hide')
