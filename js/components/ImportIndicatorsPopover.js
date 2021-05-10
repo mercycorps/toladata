@@ -61,10 +61,14 @@ export const ImportIndicatorsPopover = ({ program_id, tierLevelsUsed }) => {
     let SUCCESS = 3;
     let ERROR = 4;
     let LOADING = 5;
-    const [views, setViews] = useState(INITIAL);
 
-    // State to hold the tier levels name and the desired number of rows for the excel template. Default values of 10 or 20 is set on mount.
-    const [tierLevelsRows, setTierLevelsRows] = useState([]); 
+    // State Variables
+    const [views, setViews] = useState(INITIAL); // View of the Popover
+    const [validIndicatorsCount, setvalidIndicatorsCount] = useState(0); // Number of indicators that have passed validation and are ready to import
+    const [invalidIndicatorsCount, setInvalidIndicatorsCount] = useState(0); // Number of indicators that have failed validation and needs fixing
+    const [tierLevelsRows, setTierLevelsRows] = useState([]); // State to hold the tier levels name and the desired number of rows for the excel template
+
+    // Default number of rows per level is set to 10 or 20 on mount.
     useEffect(() => {
         let level = [];
         tierLevelsUsed.map((tier, i) => {
@@ -72,6 +76,7 @@ export const ImportIndicatorsPopover = ({ program_id, tierLevelsUsed }) => {
         })
         setTierLevelsRows(level);
     }, [])
+
     // Download template file providing the program ID and number of rows per tier level
     let handleDownload = () => {
         api.downloadTemplate(program_id, tierLevelsRows)
@@ -81,9 +86,6 @@ export const ImportIndicatorsPopover = ({ program_id, tierLevelsUsed }) => {
                 } 
             })
     }
-
-    const [validIndicatorsCount, setvalidIndicatorsCount] = useState(0);
-    const [invalidIndicatorsCount, setInvalidIndicatorsCount] = useState(0);
 
     // Upload template file and send api request
     let handleUpload = (e) => {
@@ -153,8 +155,7 @@ export const ImportIndicatorsPopover = ({ program_id, tierLevelsUsed }) => {
             })
     }
     // Handle clicking cancel and closing the popover
-    let handleCancel = () => {
-        console.log('cancel', validIndicatorsCount);
+    let handleClose = () => {
         $('.popover').popover('hide')
     }
 
@@ -227,11 +228,29 @@ export const ImportIndicatorsPopover = ({ program_id, tierLevelsUsed }) => {
                                     Error Feedback View
                                 </div>
                                 <br/>
-                                <a type="submit" value="submit" href="#">Download a copy of your template with errors highlighted</a>
-                                <button className="btn btn-sm btn-primary" onClick={ () => setViews(CONFIRM) }>Upload</button>
+                                <a 
+                                    type="submit" 
+                                    value="submit" 
+                                    role="button"
+                                    href="#">
+                                        {
+                                            // # Translators:
+                                            gettext("Download a copy of your template with errors highlighted")
+                                        }
+                                </a>
+                                <button 
+                                    role="button"
+                                    type="button"
+                                    className="btn btn-sm btn-primary" 
+                                    onClick={ () => setViews(CONFIRM) }>
+                                        {
+                                            // # Translators:
+                                            gettext("Upload")
+                                        }
+                                </button>
                             </div>
                         )
-                    // TODO: View to ask users to confirm the upload
+                    // View to ask users to confirm the upload
                     case CONFIRM:
                         return (
                             <div className="import-confirm">
@@ -239,30 +258,49 @@ export const ImportIndicatorsPopover = ({ program_id, tierLevelsUsed }) => {
                                     {views === CONFIRM ? <div><i className="fas fa-check-circle"/></div> : null}
                                     <div>
                                         {
-                                            // # Translators: 
+                                            // # Translators: The count of indicators that have passed validation and are ready to be imported to complete the process. This cannot be undone after completing. 
                                             interpolate(ngettext(
                                                 "%s indicator is ready to be imported. Are you ready to complete the import process? (This action cannot be undone.)",
                                                 "%s indicators are ready to be imported. Are you ready to complete the import process? (This action cannot be undone.)", 
                                                 validIndicatorsCount
                                             ), [validIndicatorsCount])
-                                            // gettext("indicators are ready to be imported. Are you ready to complete the import process? (This action cannot be undone.)")
                                         }
                                     </div>
                                 </div>
                                 <div className="import-confirm-buttons">
-                                    <button className="btn btn-sm btn-primary" onClick={ () => handleConfirm() }>Complete Import</button>
-                                    <button className="btn btn-sm import-confirm-buttons-cancel" onClick={ () => handleCancel() }>Cancel</button>
+                                    <button 
+                                        role="button"
+                                        type="button"
+                                        className="btn btn-sm btn-primary" 
+                                        onClick={ () => handleConfirm() }
+                                    >
+                                        {
+                                            // # Translators: Button to confirm and complete the import process
+                                            gettext("Complete import")
+                                        }
+                                    </button>
+                                    <button 
+                                        role="button"
+                                        type="button"
+                                        className="btn btn-sm import-confirm-buttons-cancel" 
+                                        onClick={ () => handleClose() }
+                                    >
+                                        {
+                                            // # Translators: Button to cancel the import process and close the popover
+                                            gettext("Cancel")
+                                        }
+                                    </button>
                                 </div>
                             </div>
                         )
-                    // TODO: View for a successful upload (May or may not be needed if using PNotify)
+                    // View for a successful upload (May or may not be needed if using PNotify)
                     case SUCCESS:
                         return (
                             <div className="import-success">
                                 <div  className="import-success-text">
                                     {views === SUCCESS ? <div><i className="fas fa-check-circle"/></div> : null}
                                     {
-                                        // # Translators: 
+                                        // # Translators: Message with the count of indicators that were successfully imported but they require additional details before they can be submitted.
                                         interpolate(ngettext(
                                             "%s indicator was successfully imported, but require additional details before results can be submitted.",
                                             "%s indicators were successfully imported, but require additional details before results can be submitted.",
@@ -271,9 +309,9 @@ export const ImportIndicatorsPopover = ({ program_id, tierLevelsUsed }) => {
                                         // gettext("indicators are ready to be imported. Are you ready to complete the import process? (This action cannot be undone.)")
                                     }
                                 </div>
-                                <a href={ api.getProgramPageUrl(program_id)}>
+                                <a role="link" href={ api.getProgramPageUrl(program_id) }>
                                     {
-                                        // # Translators:
+                                        // # Translators: A link to the program page to add the addition setup information for the imported indicators.
                                         gettext("Visit the program page to complete setup of these indicators.")
                                     }
                                 </a> 
@@ -292,11 +330,12 @@ export const ImportIndicatorsPopover = ({ program_id, tierLevelsUsed }) => {
                                 <button className="btn btn-sm btn-primary" onClick={() => setViews(INITIAL) }>Try again</button>
                             </div>
                         )
+                    // TODO: View for when waiting for an API calls response
                     case LOADING:
                         return (
                             <div className="import-loading" disabled>
                                 <img src='/static/img/duck.gif' />&nbsp;
-                                {/* <img src='/static/img/paint_spinner.gif' />&nbsp; */}
+                                {/* <img src='/static/img/paint_spinner.gif'/>&nbsp; */}
                                 {/* <img src='/static/img/ajax-loader.gif' />&nbsp; */}
                             </div>
                         );
@@ -316,6 +355,7 @@ const AdvancedImport = () => {
             <div className="import-advanced-button">
                 <FontAwesomeIcon icon={ expanded ? 'caret-down' : 'caret-right' } /> &nbsp;
                 <a 
+                    className="import-advanced-button-toggle"
                     data-toggle="collapse" 
                     href="#optionsForm" 
                     role="button" 
@@ -353,6 +393,8 @@ const LevelIndicatorCount = ({ level, i }) => {
             value: choice,
         }
     })
+
+    // Handles updating state when an option is selected from the dropdown.
     let handleSelect = (event) => {
         let updatedTiers = $.extend(true, [], tierLevelsRows);
         updatedTiers[i] = {
@@ -362,6 +404,7 @@ const LevelIndicatorCount = ({ level, i }) => {
         setTierLevelsRows(updatedTiers);
     }
 
+    // Custom styling to reduce height and veritically center the dropdown
     const customStyles = {
         control: base => ({
             ...base,
