@@ -21,12 +21,17 @@ describe('Import Indicators test suite', () => {
         {name: "Activity", used: false},
     ]
 
-    it('The Import indicators button should contain the right components', () => {
+    it('Should contain the right components in the initial view', () => {
         let wrapper = mount(<ImportIndicatorsPopover program_id={123} tierLevelsUsed={tierLevelsUsed} />)
-        expect(wrapper.exists('.importIndicators-body')).toBe(true);
+        expect(wrapper.exists('.import-initial')).toBe(true);
         expect(wrapper.exists('.btn-upload')).toBe(true);
         expect(wrapper.exists('.btn-download')).toBe(true);
         expect(wrapper.exists('.level-count-row')).toBe(true);
         expect(wrapper.exists('.level-count-options')).toBe(true);
     });
+
+    it('Should have same number of rows as provided tier levels', () => {
+        let wrapper = mount(<ImportIndicatorsPopover program_id={123} tierLevelsUsed={tierLevelsUsed} />)
+        expect(wrapper.find(".level-count-row").length).toBe(tierLevelsUsed.length);
+    })
 })
