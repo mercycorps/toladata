@@ -1,7 +1,7 @@
 import datetime
 from os import path, makedirs
 import shutil
-import polib
+from unittest.mock import patch
 from django import test
 from django.conf import settings
 from factories.workflow_models import (
@@ -530,33 +530,7 @@ class TestIPTTProgramSerializerFilterData(test.TestCase):
         program = RFProgramFactory(indicators=3)
         indicators = program.indicator_set.all()
 
-        # Create the .po and .mo files with the English and "translated" values
         menu_strings = [('Banana', 'Banana'), ('Apple', 'ŽApple'), ('Cherry', 'áCherry')]
-        po_file = polib.POFile()
-        po_file.metadata = {"Content-Type": "text/plain; charset=UTF-8"}
-        for i, menu_string in enumerate(menu_strings):
-            po_entry = polib.POEntry(msgid=menu_string[0], msgstr=menu_string[1])
-            po_file.append(po_entry)
-        po_file.save(self.test_translation_file_stub + '.po')
-        po_file.save_as_mofile(self.test_translation_file_stub + '.mo')
-        from django.utils import translation
-
-        # Because we've just created po/mo files, we need to dump the translation cache if we want it to find the
-        # translations in the file we just created.  In retrospect, mocking gettext might be a better way
-        # to do this, but I've already spent enough time on this test.
-
-        # Reset gettext.GNUTranslation cache.
-        translation.gettext._translations = {}
-
-        # Reset Django by-language translation cache.
-        translation.trans_real._translations = {}
-
-        # Delete Django current language translation cache.
-        translation.trans_real._default = None
-
-        # Delete translation cache for the current thread,
-        # and re-activate the currently selected language (if any)
-        translation.activate(translation.get_language())
 
         # Add indicator type values and sector values in English
         for i, menu_string in enumerate(menu_strings):
@@ -568,13 +542,18 @@ class TestIPTTProgramSerializerFilterData(test.TestCase):
             indicator.sector = sector
             indicator.save()
 
+        def mock_translate(english_word):
+            lookup = {'Apple': 'ŽApple', 'Banana': 'Banana', 'Cherry': 'áCherry'}
+            return lookup[english_word]
+
         # Serialize the data and check the filter menu order
         serialized_data = IPTTProgramSerializer.load_for_pk(program.pk).data
         english_menu_sorted = ['Apple', 'Banana', 'Cherry']
         self.assertEqual([i_type['name'] for i_type in serialized_data['indicator_types']], english_menu_sorted)
         self.assertEqual([sector['name'] for sector in serialized_data['sectors']], english_menu_sorted)
-        with lang_context(self.test_lang):
-            translated_menu_sorted = ['áCherry', 'Banana', 'ŽApple']
-            serialized_data = IPTTProgramSerializer.load_for_pk(program.pk).data
-            self.assertEqual([i_type['name'] for i_type in serialized_data['indicator_types']], translated_menu_sorted)
-            self.assertEqual([sector['name'] for sector in serialized_data['sectors']], translated_menu_sorted)
+        with patch('workflow.serializers_new.iptt_program_serializers._', side_effect=mock_translate):
+            with lang_context(self.test_lang):
+                translated_menu_sorted = ['áCherry', 'Banana', 'ŽApple']
+                serialized_data = IPTTProgramSerializer.load_for_pk(program.pk).data
+                self.assertEqual([i_type['name'] for i_type in serialized_data['indicator_types']], translated_menu_sorted)
+                self.assertEqual([sector['name'] for sector in serialized_data['sectors']], translated_menu_sorted)
