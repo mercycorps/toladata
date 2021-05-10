@@ -1,6 +1,7 @@
 from datetime import date
 
 from django.core.management.base import BaseCommand
+from django.db import transaction
 
 from indicators.models import Indicator, Level, LevelTier, IndicatorType, PeriodicTarget
 from workflow.models import Country, Program, Organization
@@ -14,6 +15,7 @@ class Command(BaseCommand):
     def add_arguments(self, parser):
         parser.add_argument('--clean_option3_indicators', action='store_true')
 
+    @transaction.atomic
     def handle(self, *args, **options):
         option1_country_names = ['Lebanon', 'Palestine (West Bank / Gaza)', 'Indonesia']
         option3_countries = {'Liberia': 7, 'Mali': 6}
@@ -34,14 +36,15 @@ class Command(BaseCommand):
 
         # First do option1 - an indicator in each real program in each real country in the option 1 list.
         for country_name in option1_country_names:
-            for program in Program.objects.filter(country__country=country_name, funding_status='Funded'):
+            country = Country.objects.get(country=country_name)
+            for program in Program.objects.filter(country=country, funding_status='Funded'):
                 try:
                     top_level = Level.objects.get(parent=None, program=program)
                 except Level.DoesNotExist:
                     print(f"Could not add indicator to {country_name}: {program.name} because RF doesn't exist.")
                     continue
                 indicator_name = 'Number of people reached in fiscal year'
-                i_created = self.create_indicator(indicator_name, program, top_level, 1)
+                i_created = self.create_indicator(indicator_name, program, top_level, 1, country)
                 if i_created:
                     try:
                         metrics['indicator_created'][country_name] += 1
@@ -55,7 +58,6 @@ class Command(BaseCommand):
 
         # Now do option3 - a dummy country with one dummy program per participating country and an
         # indicator for each program in that country.
-
         pc_country, created = Country.objects.get_or_create(country=pc_country_name, defaults={
             'organization': mc_org,
             'code': "ZZ"
@@ -95,7 +97,7 @@ class Command(BaseCommand):
 
             for i in range(indicator_count):
                 indicator_name = 'Number of people reached in fiscal year in <<insert program name>>'
-                i_created = self.create_indicator(indicator_name, dummy_program, top_level, 3)
+                i_created = self.create_indicator(indicator_name, dummy_program, top_level, 3, pc_country)
                 if i_created:
                     try:
                         metrics['indicator_created'][country] += 1
@@ -117,7 +119,7 @@ class Command(BaseCommand):
             print(f"{metrics['indicator_existed'][country_name]} indicators already existed in {country_name}.")
 
     @staticmethod
-    def create_indicator(name, program, top_level, option_number):
+    def create_indicator(name, program, top_level, option_number, country):
         definition_text = (
             "Participants are defined as “all people who have received tangible benefit – directly "
             "or indirectly from the project.” We distinguish between direct and indirect:\n\n"
@@ -170,6 +172,8 @@ class Command(BaseCommand):
                     period='FY2021', target=1, customsort=0, indicator=indicator)
                 PeriodicTarget.objects.get_or_create(
                     period='FY2022', target=1, customsort=1, indicator=indicator)
+            indicator.disaggregation.add(
+                *country.disaggregationtype_set.filter(disaggregation_type__startswith="Participant count"))
             return created
 
         if option_number == 3:
@@ -179,6 +183,8 @@ class Command(BaseCommand):
                 program=program,
                 **other_defaults
             )
+
+            indicator.disaggregation.add(*list(country.disaggregationtype_set.all()))
 
             indicator.indicator_type.add(IndicatorType.objects.get(indicator_type="Custom"))
             indicator.target_frequency = 3
