@@ -13,6 +13,7 @@ class Command(BaseCommand):
         """
 
     def add_arguments(self, parser):
+        parser.add_argument('--clean_option1_indicators', action='store_true')
         parser.add_argument('--clean_option3_indicators', action='store_true')
 
     @transaction.atomic
@@ -21,7 +22,6 @@ class Command(BaseCommand):
         option3_countries = {'Liberia': 7, 'Mali': 6}
         option3_program_name_template = 'Participant Count {}'
 
-        country_programs = {}
         pc_country_name = 'Mapping Our Reach'
         program_start_date = date(2020, 7, 1)
         program_end_date = date(2022, 6, 30)
@@ -31,6 +31,8 @@ class Command(BaseCommand):
             'dates_created': 0, 'rf_created': 0
         }
 
+        if options['clean_option1_indicators']:
+            self.clean_option1(option1_country_names)
         if options['clean_option3_indicators']:
             self.clean_option3(option3_countries, option3_program_name_template)
 
@@ -212,3 +214,17 @@ class Command(BaseCommand):
                 continue
             for indicator in program.indicator_set.all():
                 indicator.delete()
+
+    @staticmethod
+    def clean_option1(country_names):
+        for country in Country.objects.filter(country__in=country_names):
+            deleted_count = 0
+            for program  in Program.objects.filter(country=country):
+                try:
+                    indicator = Indicator.objects.get(program=program, name="Number of people reached in fiscal year")
+                    indicator.delete()
+                    deleted_count += 1
+                except Indicator.DoesNotExist:
+                    pass
+            print(f'Option1 indicators deleted for {country.country}: {deleted_count}')
+
