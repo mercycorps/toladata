@@ -139,6 +139,7 @@ const api = {
         console.log("API request to send Templates");
             return await Promise.resolve( {statusText: "OK", data: {valid: 16, invalid: 0}} )
                 .then(response => new Promise( resolve => {
+                    // Mock varied delayed response from the backend to see variation of the loading spinner. Will be removed once it is actually connected to the backend
                     let timeOptions = [500, 900, 1000, 2000, 3000]
                     let delay = timeOptions[Math.floor(Math.random() * 5)]
                     setTimeout(() => {
@@ -156,6 +157,7 @@ const api = {
         console.log("API request to Confirm");
         return await Promise.resolve( {statusText: "OK"} )
             .then(response => new Promise( resolve => {
+                // Mock varied delayed response from the backend to see variation of the loading spinner. Will be removed once it is actually connected to the backend
                 let timeOptions = [500, 900, 1000, 2000, 3000]
                 let delay = timeOptions[Math.floor(Math.random() * 5)]
                 setTimeout(() => {
