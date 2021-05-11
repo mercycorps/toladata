@@ -118,7 +118,7 @@ const api = {
             .catch(this.logFailure)
     },
     async downloadTemplate (program_id, tierLevelsRows) {
-            return await this.templatesInstance.get(`/indicators/bulk_import_indicators/${program_id}/`, { params: {tierLevelsRows: tierLevelsRows} })
+        return await this.templatesInstance.get(`/indicators/bulk_import_indicators/${program_id}/`, { params: {tierLevelsRows: tierLevelsRows} })
             .then(response => {
                 const url = window.URL.createObjectURL(new Blob([response.data]));
                 const link = document.createElement('a');
@@ -130,16 +130,44 @@ const api = {
             })
             .catch((error) => {
                 this.logFailure(error)
-                return error;
+                return {error};
             })
     },
     async uploadTemplate(data) {
         // TODO
-            // return this.templatesInstance.put('/', data)
+            // Send to backend
         console.log("API request to send Templates");
+            return await Promise.resolve( {statusText: "OK", data: {valid: 16, invalid: 0}} )
+                .then(response => new Promise( resolve => {
+                    // Mock varied delayed response from the backend to see variation of the loading spinner. Will be removed once it is actually connected to the backend
+                    let timeOptions = [500, 900, 1000, 2000, 3000]
+                    let delay = timeOptions[Math.floor(Math.random() * 5)]
+                    setTimeout(() => {
+                        resolve( response.data )
+                    }, delay);
+                }))
+                .catch((error) => {
+                    this.logFailure(error)
+                    return {error};
+                })    
+    },
+    async confirmUpload() {
+        // TODO
+            // Send to backend
+        console.log("API request to Confirm");
         return await Promise.resolve( {statusText: "OK"} )
-            .then(response => response.statusText)
-            .catch(this.logFailure)
+            .then(response => new Promise( resolve => {
+                // Mock varied delayed response from the backend to see variation of the loading spinner. Will be removed once it is actually connected to the backend
+                let timeOptions = [500, 900, 1000, 2000, 3000]
+                let delay = timeOptions[Math.floor(Math.random() * 5)]
+                setTimeout(() => {
+                    resolve( response.statusText )
+                }, delay);
+            }))
+            .catch((error) => {
+                this.logFailure(error);
+                return {error};
+            })    
     }
 };
 
