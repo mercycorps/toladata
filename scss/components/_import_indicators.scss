@@ -61,6 +61,43 @@
     width: 7rem;
 }
 
+// ***** Feedback View Styling *****
+.import-feedback {
+    display: flex;
+    flex-direction: column;
+    margin: 0.25rem 1rem 0.75rem;
+
+
+    &-valid {
+        display: flex;
+        margin-top: 0.5rem;
+        margin-bottom: 0.5rem;
+
+        & > div > .fa-check-circle {
+            margin-top: 4px;
+            margin-right: 0.5rem;
+            color: $green;
+        }
+    }
+
+    &-invalid {
+        display: flex;
+        margin-bottom: 1rem;
+
+        & > div > .fa-exclamation-triangle {
+            margin-top: 4px;
+            margin-right: 0.5rem;
+            color: $red;
+        }
+    }
+    
+    &-download {
+        padding-left: 1.5rem;
+        font-weight: bold;
+        color: $action;
+    }
+}
+
 // ***** Confirmation View Styling *****
 .import-confirm {
     display: flex;
@@ -76,7 +113,7 @@
         & > div > .fa-check-circle {
             margin-top: 4px;
             margin-right: 0.25rem;
-            color: green;
+            color: $green;
         }
     }
 
@@ -104,7 +141,7 @@
         & > div > .fa-check-circle {
             margin-top: 4px;
             margin-right: 0.25rem;
-            color: green;
+            color: $green;
         }
     }
     
