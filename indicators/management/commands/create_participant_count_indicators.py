@@ -127,7 +127,10 @@ class Command(BaseCommand):
             "either as the actual program participants or the intended recipients of the program benefits. "
             "This means individuals or communities.\n\n"
             "Indirect participants – are those who received a tangible benefit through their proximity to "
-            "or contact with program participants or activities.")
+            "or contact with program participants or activities.\n\n"
+            "** Add Direct Participants definition **\n\n"
+            "** Add Indirect Participants definition **"
+        )
         indicator_justification = (
             "Participant reach is crucial to take decisions on the program implementation.It provides insights "
             "into the intended and unintended targeted individuals and provides insights into the scale of the "
