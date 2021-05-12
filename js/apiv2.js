@@ -137,7 +137,10 @@ const api = {
         // TODO
             // Send to backend
         console.log("API request to send Templates");
-            return await Promise.resolve( {statusText: "OK", data: {valid: 16, invalid: 0}} )
+            let valid = Math.ceil(Math.random() * 10); // Mock valid indicators for testing
+            let invalid = Math.floor(Math.random() * 2); // Mock invalid indicators for testing
+            console.log('Valid:', valid, "Invalid:", invalid);
+            return await Promise.resolve( {statusText: "OK", data: {valid: valid, invalid: invalid}} )
                 .then(response => new Promise( resolve => {
                     // Mock varied delayed response from the backend to see variation of the loading spinner. Will be removed once it is actually connected to the backend
                     let timeOptions = [500, 900, 1000, 2000, 3000]
