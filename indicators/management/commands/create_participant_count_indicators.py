@@ -134,7 +134,7 @@ class Command(BaseCommand):
             "** Add Indirect Participants definition **"
         )
         indicator_justification = (
-            "Participant reach is crucial to take decisions on the program implementation.It provides insights "
+            "Participant reach is crucial to take decisions on the program implementation. It provides insights "
             "into the intended and unintended targeted individuals and provides insights into the scale of the "
             "program.\n\n"
             "This aggregate participant number is used all over the agency in our boilerplate, capacity "
