@@ -130,7 +130,7 @@ const api = {
             })
             .catch((error) => {
                 this.logFailure(error)
-                return {error : error, code: 1};
+                return {error : error, code: 100};
             })
     },
     async uploadTemplate(data) {
@@ -139,7 +139,6 @@ const api = {
         console.log("API request to send Templates");
             let valid = Math.ceil(Math.random() * 10); // Mock valid indicators for testing
             let invalid = Math.floor(Math.random() * 2); // Mock invalid indicators for testing
-            console.log('Valid:', valid, "Invalid:", invalid);
             return await Promise.resolve( {statusText: "OK", data: {valid: valid, invalid: invalid}} )
                 .then(response => new Promise( resolve => {
                     // Mock varied delayed response from the backend to see variation of the loading spinner. Will be removed once it is actually connected to the backend

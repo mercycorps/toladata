@@ -83,7 +83,7 @@ export const ImportIndicatorsPopover = ({ program_id, tierLevelsUsed }) => {
             .then(response => {
                 if (response.error) {
                     console.log("code:", response.code);
-                    if (response.code === 1) {
+                    if (response.code === 100) {
                         setInitialViewError(response.code);
                     } else {
                         setViews(ERROR);
@@ -199,7 +199,7 @@ export const ImportIndicatorsPopover = ({ program_id, tierLevelsUsed }) => {
                                     {intialViewError ?
                                         <div className="import-initial-text-error">
                                             {
-                                                // # Translators: TODO
+                                                // # Translators: Message to user that we cannot import the their file. This is because of it being the wrong file or the structure of the file was changed.
                                                 gettext("Sorry, we can’t import indicators from this file. This can happen if the wrong file is selected or the template structure was modified.")
                                             }
                                         </div>
