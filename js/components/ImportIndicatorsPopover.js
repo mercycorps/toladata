@@ -67,7 +67,7 @@ export const ImportIndicatorsPopover = ({ program_id, tierLevelsUsed }) => {
     const [validIndicatorsCount, setvalidIndicatorsCount] = useState(0); // Number of indicators that have passed validation and are ready to import
     const [invalidIndicatorsCount, setInvalidIndicatorsCount] = useState(0); // Number of indicators that have failed validation and needs fixing
     const [tierLevelsRows, setTierLevelsRows] = useState([]); // State to hold the tier levels name and the desired number of rows for the excel template
-
+    const [intialViewError, setInitialViewError] = useState(null);
     // Default number of rows per level is set to 10 or 20 on mount.
     useEffect(() => {
         let level = [];
@@ -82,8 +82,13 @@ export const ImportIndicatorsPopover = ({ program_id, tierLevelsUsed }) => {
         api.downloadTemplate(program_id, tierLevelsRows)
             .then(response => {
                 if (response.error) {
-                    setViews(ERROR);
-                } 
+                    console.log("code:", response.code);
+                    if (response.code === 1) {
+                        setInitialViewError(response.code);
+                    } else {
+                        setViews(ERROR);
+                    }
+                }
             })
     }
 
@@ -191,11 +196,19 @@ export const ImportIndicatorsPopover = ({ program_id, tierLevelsUsed }) => {
                                             }
                                         </li>
                                     </ol>
+                                    {intialViewError ?
+                                        <div className="import-initial-text-error">
+                                            {
+                                                // # Translators: TODO
+                                                gettext("Sorry, we can’t import indicators from this file. This can happen if the wrong file is selected or the template structure was modified.")
+                                            }
+                                        </div>
+                                    : null }
                                 </div>
 
-                                    <ImportIndicatorsContext.Provider value={{ tierLevelsUsed: tierLevelsUsed, tierLevelsRows: tierLevelsRows, setTierLevelsRows: setTierLevelsRows }}>
-                                        <AdvancedImport />
-                                    </ImportIndicatorsContext.Provider>    
+                                <ImportIndicatorsContext.Provider value={{ tierLevelsUsed: tierLevelsUsed, tierLevelsRows: tierLevelsRows, setTierLevelsRows: setTierLevelsRows }}>
+                                    <AdvancedImport />
+                                </ImportIndicatorsContext.Provider>    
 
                                 <div className="import-initial-buttons">
                                     <button
@@ -264,7 +277,7 @@ export const ImportIndicatorsPopover = ({ program_id, tierLevelsUsed }) => {
 
                                         {
                                             // # Translators: Download an excel template with errors that need fixing highlighted
-                                            gettext("Download a copy of your template with errors highlighted")
+                                            gettext("Download a copy of your template with errors highlighted.")
                                         }
                                 </a>
                             </div>

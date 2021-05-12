@@ -130,7 +130,7 @@ const api = {
             })
             .catch((error) => {
                 this.logFailure(error)
-                return {error};
+                return {error : error, code: 1};
             })
     },
     async uploadTemplate(data) {
