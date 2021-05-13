@@ -20,7 +20,7 @@ export class ImportIndicatorsButton extends BootstrapPopoverButton {
         let tierLevelsUsed = [];
         this.props.chosenTiers.map((tier, i) => {
             tierLevelsUsed[i] = {
-                name: tier,
+                name: tier.name || tier,
                 used: false,
             }
         })
@@ -28,7 +28,7 @@ export class ImportIndicatorsButton extends BootstrapPopoverButton {
             tierLevelsUsed[level.level_depth - 1].used = true;
         })
         return (
-                <ImportIndicatorsPopover program_id={ this.props.program_id } tierLevelsUsed={ tierLevelsUsed } />
+                <ImportIndicatorsPopover program_id={ this.props.program_id } tierLevelsUsed={ tierLevelsUsed } page={ this.props.page } />
         );
     }
 
@@ -39,9 +39,9 @@ export class ImportIndicatorsButton extends BootstrapPopoverButton {
                     role="button"
                     type="button"
                     ref="target"
-                    className="btn btn-sm btn-primary pl-2"
+                    className={"btn btn-sm pl-2 " + (this.props.page === "resutsFramework" ? "btn-primary" : "btn-add")}
                     >
-                        <i className="fas fa-download"></i>
+                        <i className="fas fa-download mr-2"></i>
                             {
                                 //  # Translators: a button to open the import indicators popover
                                 gettext('Import indicators')
