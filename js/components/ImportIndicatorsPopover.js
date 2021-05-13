@@ -67,7 +67,7 @@ export const ImportIndicatorsPopover = ({ program_id, tierLevelsUsed }) => {
     const [validIndicatorsCount, setvalidIndicatorsCount] = useState(0); // Number of indicators that have passed validation and are ready to import
     const [invalidIndicatorsCount, setInvalidIndicatorsCount] = useState(0); // Number of indicators that have failed validation and needs fixing
     const [tierLevelsRows, setTierLevelsRows] = useState([]); // State to hold the tier levels name and the desired number of rows for the excel template
-
+    const [intialViewError, setInitialViewError] = useState(null);
     // Default number of rows per level is set to 10 or 20 on mount.
     useEffect(() => {
         let level = [];
@@ -82,8 +82,13 @@ export const ImportIndicatorsPopover = ({ program_id, tierLevelsUsed }) => {
         api.downloadTemplate(program_id, tierLevelsRows)
             .then(response => {
                 if (response.error) {
-                    setViews(ERROR);
-                } 
+                    console.log("code:", response.code);
+                    if (response.code === 100) {
+                        setInitialViewError(response.code);
+                    } else {
+                        setViews(ERROR);
+                    }
+                }
             })
     }
 
@@ -124,6 +129,16 @@ export const ImportIndicatorsPopover = ({ program_id, tierLevelsUsed }) => {
     // Triggers the file upload from the Upload button
     let uploadClick = () => {
         document.getElementById("fileUpload").click();
+    }
+
+    // Handle download the error feedback file
+    let handleFeedback = () => {
+        api.downloadFeedback(program_id)
+        .then(response => {
+            if (response.error) {
+                setViews(ERROR);
+            } 
+        })
     }
 
     // Handle confirm and complete importing indicators
@@ -181,11 +196,19 @@ export const ImportIndicatorsPopover = ({ program_id, tierLevelsUsed }) => {
                                             }
                                         </li>
                                     </ol>
+                                    {intialViewError ?
+                                        <div className="import-initial-text-error">
+                                            {
+                                                // # Translators: Message to user that we cannot import the their file. This is because of it being the wrong file or the structure of the file was changed.
+                                                gettext("Sorry, we can’t import indicators from this file. This can happen if the wrong file is selected or the template structure was modified.")
+                                            }
+                                        </div>
+                                    : null }
                                 </div>
 
-                                    <ImportIndicatorsContext.Provider value={{ tierLevelsUsed: tierLevelsUsed, tierLevelsRows: tierLevelsRows, setTierLevelsRows: setTierLevelsRows }}>
-                                        <AdvancedImport />
-                                    </ImportIndicatorsContext.Provider>    
+                                <ImportIndicatorsContext.Provider value={{ tierLevelsUsed: tierLevelsUsed, tierLevelsRows: tierLevelsRows, setTierLevelsRows: setTierLevelsRows }}>
+                                    <AdvancedImport />
+                                </ImportIndicatorsContext.Provider>    
 
                                 <div className="import-initial-buttons">
                                     <button
@@ -219,34 +242,44 @@ export const ImportIndicatorsPopover = ({ program_id, tierLevelsUsed }) => {
                                 </div>                              
                             </div>
                         );
-                    // TODO: View to provide error feedback on their uploaded template
+                    // View to provide error feedback on their uploaded template
                     case FEEDBACK:
                         return (
-                            <div>
-                                <div className="temp-view">
-                                    Error Feedback View
+                            <div className="import-feedback">
+                                <div className="import-feedback-valid">
+                                    {views === FEEDBACK ? <div><i className="fas fa-check-circle"/></div> : null}
+                                    {
+                                        // # Translators: The count of indicators that have passed validation and are ready to be imported to complete the process. This cannot be undone after completing. 
+                                        interpolate(ngettext(
+                                            "%s indicator is ready to be imported.",
+                                            "%s indicators are ready to be imported.", 
+                                            validIndicatorsCount
+                                        ), [validIndicatorsCount])
+                                    }
                                 </div>
-                                <br/>
-                                <a 
-                                    type="submit" 
-                                    value="submit" 
+                                <div className="import-feedback-invalid">
+                                    {views === FEEDBACK ? <div><i className="fas fa-exclamation-triangle"/></div> : null}
+                                    {
+                                        // # Translators: The count of indicators that have passed validation and are ready to be imported to complete the process. This cannot be undone after completing. 
+                                        interpolate(ngettext(
+                                            "%s indicator has missing or invalid information. Please update your indicator template and upload again.",
+                                            "%s indicators have missing or invalid information. Please update your indicator template and upload again.",
+                                            invalidIndicatorsCount
+                                        ), [invalidIndicatorsCount])
+                                    }
+                                </div>
+                                <a
+                                    className="import-feedback-download"
                                     role="button"
-                                    href="#">
+                                    href="#"
+                                    onClick={ () => handleFeedback() }
+                                >
+
                                         {
                                             // # Translators: Download an excel template with errors that need fixing highlighted
-                                            gettext("Download a copy of your template with errors highlighted")
+                                            gettext("Download a copy of your template with errors highlighted.")
                                         }
                                 </a>
-                                <button 
-                                    role="button"
-                                    type="button"
-                                    className="btn btn-sm btn-primary" 
-                                    onClick={ () => setViews(CONFIRM) }>
-                                        {
-                                            // # Translators: Button to upload the import indicators template
-                                            gettext("Upload")
-                                        }
-                                </button>
                             </div>
                         )
                     // View to ask users to confirm the upload
