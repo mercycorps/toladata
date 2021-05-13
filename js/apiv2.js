@@ -130,14 +130,16 @@ const api = {
             })
             .catch((error) => {
                 this.logFailure(error)
-                return {error};
+                return {error : error, code: 100};
             })
     },
     async uploadTemplate(data) {
         // TODO
             // Send to backend
         console.log("API request to send Templates");
-            return await Promise.resolve( {statusText: "OK", data: {valid: 16, invalid: 0}} )
+            let valid = Math.ceil(Math.random() * 10); // Mock valid indicators for testing
+            let invalid = Math.floor(Math.random() * 2); // Mock invalid indicators for testing
+            return await Promise.resolve( {statusText: "OK", data: {valid: valid, invalid: invalid}} )
                 .then(response => new Promise( resolve => {
                     // Mock varied delayed response from the backend to see variation of the loading spinner. Will be removed once it is actually connected to the backend
                     let timeOptions = [500, 900, 1000, 2000, 3000]
@@ -150,6 +152,23 @@ const api = {
                     this.logFailure(error)
                     return {error};
                 })    
+    },
+    async downloadFeedback(program_id) {
+        // TODO: Update the URL for the feedback template file
+        return await this.templatesInstance.get(`/indicators/bulk_import_indicators/${program_id}/`)
+            .then(response => {
+                const url = window.URL.createObjectURL(new Blob([response.data]));
+                const link = document.createElement('a');
+                link.href = url;
+                link.setAttribute('download', 'BulkIndicatorImport.xlsx');
+                document.body.appendChild(link);
+                link.click();
+                return response;
+            })
+            .catch((error) => {
+                this.logFailure(error)
+                return {error};
+            })    
     },
     async confirmUpload() {
         // TODO
