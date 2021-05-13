@@ -10,9 +10,9 @@ import datetime
 import logging
 import openpyxl
 import string
-import json
+import re
 from openpyxl import styles, utils
-from openpyxl.styles import PatternFill, Border, Side, Alignment, Protection, Font, NamedStyle
+from openpyxl.styles import PatternFill, Alignment, Protection, Font, NamedStyle
 from openpyxl.worksheet.datavalidation import DataValidation
 from django.conf import settings
 from django.contrib.auth.decorators import login_required
@@ -24,13 +24,14 @@ from django.views import View
 
 from indicators.queries import ProgramWithMetrics
 from indicators.xls_export_utils import TAN, apply_title_styling, apply_label_styling
-from indicators.models import Indicator, PinnedReport, Level, LevelTier
+from indicators.models import Indicator, PinnedReport, Level, Sector
 from workflow.models import Program
 from workflow.serializers import LogframeProgramSerializer
 from workflow.serializers_new import (
     ProgramPageProgramSerializer,
     ProgramPageIndicatorUpdateSerializer,
     BulkImportSerializer,
+    BulkImportIndicatorSerializer,
 )
 from tola_management.permissions import (
     has_program_read_access,
@@ -290,9 +291,10 @@ class BulkImportIndicatorsView(LoginRequiredMixin, UserPassesTestMixin, AccessMi
     """Returns bulk import .xlsx file"""
     redirect_field_name = None
 
+    # TODO: move bulk import settings out of Indicator model into Bulk import model
     COLUMNS = [
         {"name": "Level", "required": True},
-        {"name": "No.", "required": True},
+        {"name": "No.", "required": True, "field_name": 'number'},
         {"name": "Indicator", "required": True, 'field_name': 'name'},
         {"name": "Sector", "required": False, 'field_name': 'sector'},
         {"name": "Source", "required": False, 'field_name': 'source'},
@@ -300,7 +302,7 @@ class BulkImportIndicatorsView(LoginRequiredMixin, UserPassesTestMixin, AccessMi
         {"name": "Rationale or justification for indicator", "required": False, 'field_name': 'rationale'},
         {"name": "Unit of measure", "required": True, 'field_name': 'unit_of_measure'},
         {"name": "Number (#) or percentage (%)", "required": True, 'validation': 'uom_type_validation',
-            'field_name': 'uom_type'},
+            'field_name': 'unit_of_measure_type'},
         {"name": "Rationale for target", "required": False, 'field_name': 'rationale_for_target'},
         {"name": "Baseline", "required": True, 'field_name': 'baseline'},
         {"name": "Direction of change", "required": False, 'validation': 'dir_change_validation',
@@ -316,10 +318,22 @@ class BulkImportIndicatorsView(LoginRequiredMixin, UserPassesTestMixin, AccessMi
         {"name": "Data issues", "required": False, 'field_name': 'data_issues'},
         {"name": "Comments", "required": False, 'field_name': 'comments'}
     ]
+    EMPTY_SECTOR = "---------"
+    ERROR_MISMATCHED_PROGRAM = 100
+    ERROR_NO_NEW_INDICATORS = 101
+    ERROR_UNDETERMINED_LEVEL = 102
+    ERROR_INVALID_LEVEL_HEADER = 200
 
-    first_used_column = 2
-    data_start_row = 7
-    program_name_row = 2
+
+    first_used_column = Indicator.BULK_IMPORT_SETTINGS['first_used_column']
+    data_start_row = Indicator.BULK_IMPORT_SETTINGS['data_start_row']
+    program_name_row = Indicator.BULK_IMPORT_SETTINGS['program_name_row']
+
+
+
+    reverse_field_name_map = {'unit_of_measure_type': {str(name): value for value, name in Indicator.UNIT_OF_MEASURE_TYPES}}
+    reverse_field_name_map['direction_of_change'] = {str(name): value for value, name in Indicator.DIRECTION_OF_CHANGE}
+    reverse_field_name_map['target_frequency'] = {str(name): value for value, name in Indicator.TARGET_FREQUENCIES}
 
     title_style = NamedStyle('title_style')
     title_style.font = Font(name='Calibri', size=18)
@@ -355,6 +369,11 @@ class BulkImportIndicatorsView(LoginRequiredMixin, UserPassesTestMixin, AccessMi
         return user_has_program_roles(self.request.user, [program_id], ['high']) \
             or self.request.user.is_superuser is True
 
+    def _row_is_empty(self, ws, row_index):
+        # Don't test the first two columns (level and number) because they are pre-filled in a blank template
+        return not any([ws.cell(row_index, self.first_used_column + 2 + col).value
+                        for col in range(len(self.COLUMNS) - 2)])
+
     def get(self, request, *args, **kwargs):
         program_id = kwargs['program_id']
         try:
@@ -365,19 +384,19 @@ class BulkImportIndicatorsView(LoginRequiredMixin, UserPassesTestMixin, AccessMi
         levels = Level.objects.filter(program=program).select_related().prefetch_related(
             'indicator_set', 'program', 'parent__program__level_tiers')
         serialized_levels = sorted(BulkImportSerializer(levels, many=True).data, key=lambda level: level['ontology'])
-
+        # TODO ensure Sector has a blank option
         validation_map = {}
-        uom_type_options = ['Number (#)', 'Percentage (%)']
+        uom_type_options = list(self.reverse_field_name_map['unit_of_measure_type'].keys())
         uom_type_validation = DataValidation(
             type="list", formula1=f'"{",".join(uom_type_options)}"', allow_blank=False)
         validation_map["Number (#) or percentage (%)"] = uom_type_validation
 
-        dir_change_options = ['N/A', 'Increase (+)', 'Decrease (-)']
+        dir_change_options = list(self.reverse_field_name_map['direction_of_change'].keys())
         dir_change_validation = DataValidation(
             type="list", formula1=f'"{",".join(dir_change_options)}"', allow_blank=True)
         validation_map["Direction of change"] = dir_change_validation
 
-        target_freq_options = [str(freq[1]) for freq in Indicator.TARGET_FREQUENCIES]
+        target_freq_options = list(self.reverse_field_name_map['target_frequency'].keys())
         target_freq_validation = DataValidation(
             type="list", formula1=f'"{",".join(target_freq_options)}"', allow_blank=False)
         validation_map["Target frequency"] = target_freq_validation
@@ -439,18 +458,26 @@ class BulkImportIndicatorsView(LoginRequiredMixin, UserPassesTestMixin, AccessMi
 
             for indicator in level['indicator_set']:
                 current_column_index = self.first_used_column
-                ws.cell(current_row_index, current_column_index).value = level['tier_name']
-                ws.cell(current_row_index, current_column_index).font = Font(bold=True)
+                first_indicator_cell = ws.cell(current_row_index, current_column_index)
+                first_indicator_cell.value = level['tier_name']
+                first_indicator_cell.style = 'protected_indicator_style'
+                first_indicator_cell.font = Font(bold=True)
+
                 current_column_index += 1
                 ws.row_dimensions[current_row_index].height = 16
                 for column in self.COLUMNS[1:]:
                     active_cell = ws.cell(current_row_index, current_column_index)
-                    if column['name'] == 'No.':
+                    # TODO: this will need to accommodate manually numbered fields
+                    if column['field_name'] == 'number':
                         active_cell.value = \
                             level['display_ontology'] + indicator['display_ontology_letter']
+                        active_cell.style = 'protected_indicator_style'
                         active_cell.font = Font(bold=True)
                     else:
-                        active_cell.value = str(indicator.get(column['field_name'], None))
+                        raw_value = indicator.get(column['field_name'], None)
+                        # These are potentially translated objects that need to be resolved, but converting None
+                        # to a string does results in a cell value of "None" rather than an empty cell.
+                        active_cell.value = raw_value if raw_value is None else str(raw_value)
                         active_cell.style = 'protected_indicator_style'
                         if column['name'] in validation_map.keys():
                             validator = validation_map[column['name']]
@@ -489,10 +516,87 @@ class BulkImportIndicatorsView(LoginRequiredMixin, UserPassesTestMixin, AccessMi
         program = Program.objects.get(pk=program_id)
         wb = openpyxl.load_workbook(request.FILES['file'])
         ws = wb.get_sheet_by_name('Template')
-        if ws.cell(self.program_name_row, self.first_used_column).value != program.name:
-            return JsonResponse({'error_message': 'mismatched programs'}, status=400)
 
-        return JsonResponse({'message': 'yep'}, status=200)
+        if ws.cell(self.program_name_row, self.first_used_column).value != program.name:
+            return JsonResponse({'error_code': self.ERROR_MISMATCHED_PROGRAM}, status=400)
+
+        workbook_errors = []
+        level_refs = {}
+        for level in program.levels.all():
+            level_refs[level.name] = level
+        current_level = None
+        new_indicators_data = []
+
+        for current_row_index in range(self.data_start_row, ws.max_row):
+            first_cell = ws.cell(current_row_index, self.first_used_column)
+
+            # If this is a level header row, parse the level name out of the header string
+            # TODO: do we need to compare the ontology to the name?
+            if first_cell.style == 'level_header_style':
+                matches = re.match(r'^[^:]+:?\s?(.*)\((\d(?:\.\d)+)', first_cell.value)
+                if not matches or matches.group(1).strip() not in level_refs:
+                    workbook_errors.append({'error_code': self.ERROR_INVALID_LEVEL_HEADER, 'row': current_row_index})
+                    continue
+                else:
+                    current_level = level_refs[matches.group(1).strip()]
+
+            if self._row_is_empty(ws, current_row_index):
+                continue
+
+            if ws.cell(current_row_index, self.first_used_column).style == 'protected_indicator_style':
+                # skip indicator that's already in the system
+                continue
+
+            # Getting to this point (which shouldn't happen) without a parsed level header means
+            # something has gone wrong
+            if not current_level:
+                workbook_errors.append({'error_code': self.ERROR_UNDETERMINED_LEVEL})
+                continue
+
+            # We can skip the "No." column if
+            indicator_data = {}
+            for i, column in enumerate(self.COLUMNS[1:]):
+                cell_value = ws.cell(current_row_index, self.first_used_column + i + 1).value
+                # Get None values out of the way first so we don't have to test for them in the dropdown fields
+                if cell_value is None:
+                    indicator_data[column['field_name']] = cell_value
+                # Number field is used only if auto-number is turned of for the program
+                elif column['field_name'] == 'number':
+                    if not program.auto_number_indicators:
+                        indicator_data[column['field_name']] = cell_value
+                # The values for these the three fields in the reverse field map are kept in code, so they can
+                # be defined at the class level without fear of a change in value over the life of the class
+                elif column['field_name'] in self.reverse_field_name_map.keys():
+                    indicator_data[column['field_name']] =\
+                        self.reverse_field_name_map[column['field_name']][cell_value]
+                # The Sector values are in the db, which means they can change between when the template is
+                # created and when it is uploaded. So we need to pull a fresh set to convert the string from the
+                # template into an id.
+                elif column['field_name'] == 'sector':
+                    if cell_value is None or cell_value in [self.EMPTY_SECTOR, '', 'None']:
+                        indicator_data['sector'] = None
+                        continue
+                    # TODO: Write Unit Test to see if this works with a bad sector
+                    try:
+                        sector = Sector.objects.get(sector=cell_value)
+                        indicator_data['sector'] = sector.pk
+                    except:
+                        # Set a value that will fail upon deserialization, so the error is attached to the
+                        # indicator itself, rather than the workbook
+                        indicator_data['sector'] = -1
+                else:
+                    indicator_data[column['field_name']] = cell_value
+            indicator_data['level'] = current_level.id
+
+            new_indicators_data.append(indicator_data)
+
+        if len(new_indicators_data) == 0:
+            return JsonResponse({'error_code': self.ERROR_NO_NEW_INDICATORS}, status=400)
+
+        if len(workbook_errors) > 0:
+            return JsonResponse({'errors': workbook_errors}, status=400)
+        else:
+            return JsonResponse({'message': 'success'}, status=200)
 
 
 # API views:

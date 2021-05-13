@@ -17,6 +17,8 @@ class BulkImportIndicatorSerializer(serializers.ModelSerializer):
     display_ontology_letter = serializers.SerializerMethodField()
     direction_of_change = serializers.SerializerMethodField()
     target_frequency = serializers.SerializerMethodField()
+    unit_of_measure_type = serializers.SerializerMethodField()
+    sector = serializers.SerializerMethodField()
 
     class Meta:
         model = Indicator
@@ -55,6 +57,14 @@ class BulkImportIndicatorSerializer(serializers.ModelSerializer):
     @staticmethod
     def get_target_frequency(obj):
         return dict(Indicator.TARGET_FREQUENCIES)[obj.target_frequency]
+
+    @staticmethod
+    def get_unit_of_measure_type(obj):
+        return dict(Indicator.UNIT_OF_MEASURE_TYPES)[obj.unit_of_measure_type]
+
+    @staticmethod
+    def get_sector(obj):
+        return None if not obj.sector else obj.sector.sector
 
 
 class BulkImportProgramSerializer(serializers.ModelSerializer):

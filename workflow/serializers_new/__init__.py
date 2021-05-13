@@ -21,4 +21,4 @@ from .iptt_report_serializers import (
     IPTTTPReportSerializer
 )
 
-from .bulk_indicator_import_serializers import BulkImportSerializer
+from .bulk_indicator_import_serializers import BulkImportSerializer, BulkImportIndicatorSerializer

@@ -1133,6 +1133,12 @@ class Indicator(SafeDeleteModel):
         ('participant_accountability', _('Participant accountability'))
     ]
 
+    BULK_IMPORT_SETTINGS = {
+        'first_used_column': 2,
+        'data_start_row': 7,
+        'program_name_row': 2,
+    }
+
 
 
     indicator_key = models.UUIDField(
