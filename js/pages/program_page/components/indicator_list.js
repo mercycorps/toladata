@@ -287,8 +287,7 @@ export class IndicatorListTable extends React.Component {
 
 
 const IndicatorListTableButtons = observer(function ({program, rootStore, ...props}) {
-    let chosenTiers = [];
-    rootStore.levelTiers.map((level, i) => chosenTiers[i] = level.name ); 
+    let chosenTiers = rootStore.levelTiers.map(( level ) => level.name );
     return (
         <div className="indicator-list__buttons-row">
             <div className="expand-collapse-buttons">
