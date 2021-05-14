@@ -75,6 +75,6 @@ urlpatterns = [
     path('api/', include(apipatterns)),
 
     path('bulk_import_indicators/<int:program_id>/',
-         views.views_program.BulkImportIndicatorsView.as_view(),
+         views.BulkImportIndicatorsView.as_view(),
          name='bulk_import_indicators')
 ]

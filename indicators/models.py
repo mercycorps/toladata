@@ -3,6 +3,7 @@ import re
 import collections
 import string
 import uuid
+import os
 from datetime import timedelta, date
 from decimal import Decimal
 import dateparser
@@ -11,6 +12,7 @@ from functools import total_ordering
 from tola.l10n_utils import l10n_date_medium
 from tola.model_utils import generate_safedelete_queryset
 
+from django.conf import settings
 from django.core.validators import MinValueValidator
 from django.core.exceptions import ValidationError
 from django.db import models
@@ -1025,6 +1027,7 @@ class IndicatorMetricsMixin:
             )
         )
 
+
 class Indicator(SafeDeleteModel):
     LOP = 1
     MID_END = 2
@@ -1814,6 +1817,17 @@ def reorder_former_level_on_update(sender, update_fields, created, instance, **k
     elif instance.deleted and instance.level:
         # indicator is being deleted, reorder it's levels
         instance.level.update_level_order()
+
+
+class BulkIndicatorImportFile(models.Model):
+    FILE_STORAGE_PATH = 'indicators/bulk_import_files'
+
+    uuid = models.CharField(max_length=500)
+    file_path = models.FilePathField(path=os.path.join(settings.SITE_ROOT, FILE_STORAGE_PATH))
+    program = models.ForeignKey(Program, on_delete=models.CASCADE, related_name='bulk_indicator_import_files')
+    user = models.ForeignKey(
+        TolaUser, on_delete=models.SET_NULL, related_name='bulk_indicator_import_files', null=True)
+    create_date = models.DateTimeField(auto_now=True)
 
 
 class PeriodicTarget(models.Model):
