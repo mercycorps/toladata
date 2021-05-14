@@ -26,11 +26,17 @@ const ExcelButton = inject('filterStore')(
 
 const TitleBar = inject('dataStore')(
     ({ dataStore }) => {
+        console.log(dataStore);
         return (
         <React.Fragment>
             <div className="logframe--header">
                 <h1 className="page-title h2">
-                    <a href={ dataStore.program_page_url }>{ dataStore.name }:</a>
+                    {
+                        dataStore._levelsByChain.length > 0 ?
+                            <a href={ dataStore.program_page_url }>{ dataStore.name }:</a>
+                        :
+                            <span>{dataStore.name}:</span>
+                    }
                     &nbsp;
                     <span className="font-weight-normal text-muted text-nowrap">
                         {
