@@ -33,7 +33,7 @@ const TitleBar = inject('dataStore')(
                     {dataStore._levelsByChain.length > 0 ?
                         <a href={ dataStore.program_page_url }>{ dataStore.name }:</a>
                     :
-                        <span>{dataStore.name}:</span>
+                        <span>{ dataStore.name }:</span>
                     }
                     &nbsp;
                     <span className="font-weight-normal text-muted text-nowrap">
