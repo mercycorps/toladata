@@ -28,7 +28,7 @@ export class ImportIndicatorsButton extends BootstrapPopoverButton {
             tierLevelsUsed[level.level_depth - 1].used = true;
         })
         return (
-                <ImportIndicatorsPopover program_id={ this.props.program_id } tierLevelsUsed={ tierLevelsUsed } />
+                <ImportIndicatorsPopover program_id={ this.props.program_id } tierLevelsUsed={ tierLevelsUsed } page={ this.props.page } />
         );
     }
 
@@ -39,9 +39,9 @@ export class ImportIndicatorsButton extends BootstrapPopoverButton {
                     role="button"
                     type="button"
                     ref="target"
-                    className="btn btn-sm btn-primary pl-2"
+                    className={"btn btn-sm pl-2 " + (this.props.page === "resultsFramework" ? "btn-primary" : "btn-add")}
                     >
-                        <i className="fas fa-download"></i>
+                        <i className="fas fa-download mr-2"></i>
                             {
                                 //  # Translators: a button to open the import indicators popover
                                 gettext('Import indicators')
@@ -52,7 +52,7 @@ export class ImportIndicatorsButton extends BootstrapPopoverButton {
     }
 }
 
-export const ImportIndicatorsPopover = ({ program_id, tierLevelsUsed }) => {
+export const ImportIndicatorsPopover = ({ program_id, tierLevelsUsed, page }) => {
 
     // These define the different cases/views of the Popover to switch between.
     let INITIAL = 0;
@@ -340,12 +340,14 @@ export const ImportIndicatorsPopover = ({ program_id, tierLevelsUsed }) => {
                                         ), [validIndicatorsCount])
                                     }
                                 </div>
-                                <a role="link" href={ api.getProgramPageUrl(program_id) }>
-                                    {
-                                        // # Translators: A link to the program page to add the addition setup information for the imported indicators.
-                                        gettext("Visit the program page to complete setup of these indicators.")
-                                    }
-                                </a> 
+                                { page === "resultsFramework" &&
+                                    <a role="link" href={ api.getProgramPageUrl(program_id) }>
+                                        {
+                                            // # Translators: A link to the program page to add the addition setup information for the imported indicators.
+                                            gettext("Visit the program page to complete setup of these indicators.")
+                                        }
+                                    </a> 
+                                }
                             </div>
                         )
                     // TODO: View for when an API call fails 

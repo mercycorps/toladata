@@ -3,6 +3,7 @@ import classNames from 'classnames';
 import { observer } from "mobx-react";
 import eventBus from '../../../eventbus';
 import { AddIndicatorButton, ExpandAllButton, CollapseAllButton } from '../../../components/indicatorModalComponents';
+import {ImportIndicatorsButton} from "../../../components/ImportIndicatorsPopover"
 import ResultsTable from './resultsTable';
 import { library } from '@fortawesome/fontawesome-svg-core'
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome'
@@ -286,17 +287,26 @@ export class IndicatorListTable extends React.Component {
 
 
 const IndicatorListTableButtons = observer(function ({program, rootStore, ...props}) {
+    let chosenTiers = rootStore.levelTiers.map(( level ) => level.name );
     return (
         <div className="indicator-list__buttons-row">
             <div className="expand-collapse-buttons">
                 <ExpandAllButton clickHandler={ () => { program.expandAll(); }} disabled={ rootStore.allExpanded } />
-                <CollapseAllButton clickHandler={ () => {program.collapseAll(); }} disabled={ rootStore.allCollapsed } />
+                <CollapseAllButton clickHandler={ () => { program.collapseAll(); }} disabled={ rootStore.allCollapsed } />
             </div>
-            <div className="indicator-list__add-indicator-button">
-                {!rootStore.readOnly &&
-                <AddIndicatorButton readonly={rootStore.readOnly} programId={program.pk}/>
-                }
-            </div>
+            {!rootStore.readOnly &&
+                <div className="indicator-list__add-indicator-button">
+                    {rootStore.levels.length > 0 &&
+                        <ImportIndicatorsButton 
+                            program_id={ program.pk }
+                            chosenTiers={ chosenTiers }
+                            levels={ rootStore.levels }
+                            page={ "programPage" }
+                        /> 
+                    }
+                    <AddIndicatorButton readonly={ rootStore.readOnly } programId={ program.pk }/>
+                </div>
+            }
         </div>
     );
 })
