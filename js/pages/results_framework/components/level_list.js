@@ -153,6 +153,7 @@ export class LevelListPanel  extends React.Component {
                                     program_id={ this.props.rootStore.levelStore.program_id }
                                     chosenTiers={ this.props.rootStore.levelStore.tierTemplates[this.props.rootStore.levelStore.chosenTierSetKey].tiers }
                                     levels={ this.props.rootStore.levelStore.levels }
+                                    page={ "resultsFramework" }
                                 /> 
                             : null }            
                         </div>
