@@ -3,6 +3,8 @@ import openpyxl
 import string
 import re
 import os
+import json
+from datetime import datetime
 from openpyxl.styles import PatternFill, Alignment, Protection, Font, NamedStyle
 from openpyxl.worksheet.datavalidation import DataValidation
 from django.conf import settings
@@ -18,51 +20,54 @@ from workflow.serializers_new import BulkImportSerializer, BulkImportIndicatorSe
 from tola_management.permissions import user_has_program_roles
 
 COLUMNS = [
-    {"name": "Level", "required": True},
-    {"name": "No.", "required": True, "field_name": 'number'},
-    {"name": "Indicator", "required": True, 'field_name': 'name'},
-    {"name": "Sector", "required": False, 'field_name': 'sector'},
-    {"name": "Source", "required": False, 'field_name': 'source'},
-    {"name": "Definition", "required": False, 'field_name': 'definition'},
-    {"name": "Rationale or justification for indicator", "required": False, 'field_name': 'rationale'},
-    {"name": "Unit of measure", "required": True, 'field_name': 'unit_of_measure'},
-    {"name": "Number (#) or percentage (%)", "required": True, 'validation': 'uom_type_validation',
+    {'name': 'Level', 'required': True, 'field_name': 'level'},
+    {'name': 'No.', 'required': True, 'field_name': 'number'},
+    {'name': 'Indicator', 'required': True, 'field_name': 'name'},
+    {'name': 'Sector', 'required': False, 'field_name': 'sector'},
+    {'name': 'Source', 'required': False, 'field_name': 'source'},
+    {'name': 'Definition', 'required': False, 'field_name': 'definition'},
+    {'name': 'Rationale or justification for indicator', 'required': False, 'field_name': 'rationale'},
+    {'name': 'Unit of measure', 'required': True, 'field_name': 'unit_of_measure'},
+    {'name': 'Number (#) or percentage (%)', 'required': True, 'validation': 'uom_type_validation',
      'field_name': 'unit_of_measure_type'},
-    {"name": "Rationale for target", "required": False, 'field_name': 'rationale_for_target'},
-    {"name": "Baseline", "required": True, 'field_name': 'baseline'},
-    {"name": "Direction of change", "required": False, 'validation': 'dir_change_validation',
+    {'name': 'Rationale for target', 'required': False, 'field_name': 'rationale_for_target'},
+    {'name': 'Baseline', 'required': True, 'field_name': 'baseline'},
+    {'name': 'Direction of change', 'required': False, 'validation': 'dir_change_validation',
      'field_name': 'direction_of_change'},
-    {"name": "Target frequency", "required": True, 'field_name': 'target_frequency'},
-    {"name": "Means of verification / data source", "required": False, 'field_name': 'means_of_verification'},
-    {"name": "Data collection method", "required": False, 'field_name': 'data_collection_method'},
-    {"name": "Data points", "required": False, 'field_name': 'data_points'},
-    {"name": "Responsible person(s) and team", "required": False, 'field_name': 'responsible_person'},
-    {"name": "Method of analysis", "required": False, 'field_name': 'method_of_analysis'},
-    {"name": "Information use", "required": False, 'field_name': 'information_use'},
-    {"name": "Data quality assurance details", "required": False, 'field_name': 'quality_assurance'},
-    {"name": "Data issues", "required": False, 'field_name': 'data_issues'},
-    {"name": "Comments", "required": False, 'field_name': 'comments'}
+    {'name': 'Target frequency', 'required': True, 'field_name': 'target_frequency'},
+    {'name': 'Means of verification / data source', 'required': False, 'field_name': 'means_of_verification'},
+    {'name': 'Data collection method', 'required': False, 'field_name': 'data_collection_method'},
+    {'name': 'Data points', 'required': False, 'field_name': 'data_points'},
+    {'name': 'Responsible person(s) and team', 'required': False, 'field_name': 'responsible_person'},
+    {'name': 'Method of analysis', 'required': False, 'field_name': 'method_of_analysis'},
+    {'name': 'Information use', 'required': False, 'field_name': 'information_use'},
+    {'name': 'Data quality assurance details', 'required': False, 'field_name': 'quality_assurance'},
+    {'name': 'Data issues', 'required': False, 'field_name': 'data_issues'},
+    {'name': 'Comments', 'required': False, 'field_name': 'comments'}
 ]
 
 BASE_TEMPLATE_NAME = 'BulkImportTemplate.xlsx'
+TEMPLATE_SHEET_NAME = 'Template'
+
+FIRST_USED_COLUMN = 2
+DATA_START_ROW = 7
+PROGRAM_NAME_ROW = 2
 
 ERROR_MISMATCHED_PROGRAM = 100
 ERROR_NO_NEW_INDICATORS = 101
 ERROR_UNDETERMINED_LEVEL = 102
 ERROR_INVALID_LEVEL_HEADER = 200
 
-EMPTY_SECTOR = "---------"
+EMPTY_CHOICE = '---------'
 
 
 class BulkImportIndicatorsView(LoginRequiredMixin, UserPassesTestMixin, AccessMixin, View):
     """Returns bulk import .xlsx file"""
     redirect_field_name = None
 
-    first_used_column = Indicator.BULK_IMPORT_SETTINGS['first_used_column']
-    data_start_row = Indicator.BULK_IMPORT_SETTINGS['data_start_row']
-    program_name_row = Indicator.BULK_IMPORT_SETTINGS['program_name_row']
-
-
+    first_used_column = FIRST_USED_COLUMN
+    data_start_row = DATA_START_ROW
+    program_name_row = PROGRAM_NAME_ROW
 
     reverse_field_name_map = {'unit_of_measure_type': {str(name): value for value, name in Indicator.UNIT_OF_MEASURE_TYPES}}
     reverse_field_name_map['direction_of_change'] = {str(name): value for value, name in Indicator.DIRECTION_OF_CHANGE}
@@ -277,8 +282,8 @@ class BulkImportIndicatorsView(LoginRequiredMixin, UserPassesTestMixin, AccessMi
             if self._row_is_empty(ws, current_row_index):
                 continue
 
+            # skip indicators that are already in the system
             if ws.cell(current_row_index, self.first_used_column).style == 'protected_indicator_style':
-                # skip indicator that's already in the system
                 continue
 
             # Getting to this point (which shouldn't happen) without a parsed level header means
@@ -287,27 +292,22 @@ class BulkImportIndicatorsView(LoginRequiredMixin, UserPassesTestMixin, AccessMi
                 workbook_errors.append({'error_code': ERROR_UNDETERMINED_LEVEL})
                 continue
 
-            # We can skip the "No." column if
             indicator_data = {}
             for i, column in enumerate(COLUMNS[1:]):
                 cell_value = ws.cell(current_row_index, self.first_used_column + i + 1).value
                 # Get None values out of the way first so we don't have to test for them in the dropdown fields
                 if cell_value is None:
                     indicator_data[column['field_name']] = cell_value
-                # Number field is used only if auto-number is turned of for the program
                 elif column['field_name'] == 'number':
                     if not program.auto_number_indicators:
                         indicator_data[column['field_name']] = cell_value
-                # The values for these the three fields in the reverse field map are kept in code, so they can
-                # be defined at the class level without fear of a change in value over the life of the class
+                # Convert dropdown text into numerical value
                 elif column['field_name'] in self.reverse_field_name_map.keys():
                     indicator_data[column['field_name']] =\
                         self.reverse_field_name_map[column['field_name']][cell_value]
-                # The Sector values are in the db, which means they can change between when the template is
-                # created and when it is uploaded. So we need to pull a fresh set to convert the string from the
-                # template into an id.
+                # Convert text in dropdown to sector pk
                 elif column['field_name'] == 'sector':
-                    if cell_value is None or cell_value in [EMPTY_SECTOR, '', 'None']:
+                    if cell_value is None or cell_value in [EMPTY_CHOICE, '', 'None']:
                         indicator_data['sector'] = None
                         continue
                     # TODO: Write Unit Test to see if this works with a bad sector
@@ -329,7 +329,40 @@ class BulkImportIndicatorsView(LoginRequiredMixin, UserPassesTestMixin, AccessMi
 
         if len(workbook_errors) > 0:
             return JsonResponse({'errors': workbook_errors}, status=400)
+
+        deserialized_indicators = BulkImportIndicatorSerializer(data=new_indicators_data, many=True)
+        deserialized_indicators.is_valid()
+        error_count = sum([len(error_dict) for error_dict in deserialized_indicators.errors])
+
+        if error_count > 0:
+            return JsonResponse({
+                'indicators_with_errors': error_count,
+                'indicators_without_errors': len(deserialized_indicators.errors) - error_count
+            }
+            , status=400)
         else:
+            try:
+                old_file_obj = BulkIndicatorImportFile.objects.get(
+                    user=request.user.tola_user,
+                    program=program,
+                    file_type=BulkIndicatorImportFile.INDICATOR_DATA_TYPE)
+                old_file_path = os.path.join(
+                    settings.SITE_ROOT, BulkIndicatorImportFile.FILE_STORAGE_PATH, old_file_obj.file_name)
+                os.remove(old_file_path)
+                old_file_obj.delete()
+            except BulkIndicatorImportFile.DoesNotExist:
+                pass
+
+            file_name = f'{datetime.strftime(datetime.now(), "%Y%m%d-%H%M%S")}-{request.user.id}-{program.pk}.json'
+            with open(os.path.join(
+                    settings.SITE_ROOT, BulkIndicatorImportFile.FILE_STORAGE_PATH, file_name), 'w') as fh:
+                fh.write(json.dumps(new_indicators_data))
+            BulkIndicatorImportFile.objects.create(
+                user=request.user.tola_user,
+                program=program,
+                file_name=file_name,
+                file_type=BulkIndicatorImportFile.INDICATOR_DATA_TYPE)
+
             return JsonResponse({'message': 'success'}, status=200)
 
 

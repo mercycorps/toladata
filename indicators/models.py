@@ -1136,14 +1136,6 @@ class Indicator(SafeDeleteModel):
         ('participant_accountability', _('Participant accountability'))
     ]
 
-    BULK_IMPORT_SETTINGS = {
-        'first_used_column': 2,
-        'data_start_row': 7,
-        'program_name_row': 2,
-    }
-
-
-
     indicator_key = models.UUIDField(
         default=uuid.uuid4, help_text=" ", verbose_name=_("Indicator key"))
 
@@ -1821,13 +1813,19 @@ def reorder_former_level_on_update(sender, update_fields, created, instance, **k
 
 class BulkIndicatorImportFile(models.Model):
     FILE_STORAGE_PATH = 'indicators/bulk_import_files'
+    INDICATOR_DATA_TYPE = 1
+    ERROR_TEMPLATE_TYPE = 2
+    FILE_TYPE_CHOICES = ((INDICATOR_DATA_TYPE, 'Indicator data'), (ERROR_TEMPLATE_TYPE, 'Error template'))
 
-    uuid = models.CharField(max_length=500)
-    file_path = models.FilePathField(path=os.path.join(settings.SITE_ROOT, FILE_STORAGE_PATH))
+    file_type = models.IntegerField(choices=FILE_TYPE_CHOICES)
+    file_name = models.CharField(max_length=100)
     program = models.ForeignKey(Program, on_delete=models.CASCADE, related_name='bulk_indicator_import_files')
     user = models.ForeignKey(
         TolaUser, on_delete=models.SET_NULL, related_name='bulk_indicator_import_files', null=True)
     create_date = models.DateTimeField(auto_now=True)
+
+    def __str__(self):
+        return self.file_name
 
 
 class PeriodicTarget(models.Model):
