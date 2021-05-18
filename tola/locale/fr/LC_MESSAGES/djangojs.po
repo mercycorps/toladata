@@ -3,7 +3,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: \n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2021-05-03 10:05-0700\n"
+"POT-Creation-Date: 2021-05-10 15:22-0700\n"
 "PO-Revision-Date: 2021-03-08 16:58-0800\n"
 "Last-Translator: \n"
 "Language-Team: \n"
@@ -65,49 +65,110 @@ msgid "Error"
 msgstr "Erreur"
 
 #. Translators: a button to open the import indicators popover
-#: js/components/ImportIndicatorsPopover.js:49
+#: js/components/ImportIndicatorsPopover.js:12
+#: js/components/ImportIndicatorsPopover.js:47
 msgid "Import indicators"
 msgstr "ÁTranslated Import indicators"
 
 #. Translators: Instructions for users to download the template, open it in
 #. Excel, and then fill in indicators information.
-#: js/components/ImportIndicatorsPopover.js:118
+#: js/components/ImportIndicatorsPopover.js:177
 msgid "Download the template, open it in Excel, and enter indicators."
 msgstr ""
 "ÁTranslated Download the template, open it in Excel, and enter indicators."
 
 #. Translators: Instructions for users to upload their filled in template and
 #. then follow the instructions to complete the import process.
-#: js/components/ImportIndicatorsPopover.js:124
+#: js/components/ImportIndicatorsPopover.js:183
 msgid "Upload the template and follow instructions to complete the process."
 msgstr ""
 "éTranslated Upload the template and follow instructions to complete the "
 "process."
 
 #. Translators: Button to download a template
-#: js/components/ImportIndicatorsPopover.js:143
+#: js/components/ImportIndicatorsPopover.js:202
 msgid "Download template"
 msgstr "Translated Download template"
 
 #. Translators: Button to upload a template
-#: js/components/ImportIndicatorsPopover.js:154
+#: js/components/ImportIndicatorsPopover.js:213
 msgid "Upload template"
 msgstr "Translated Upload template"
 
+#. Translators:
+#: js/components/ImportIndicatorsPopover.js:240
+msgid "Download a copy of your template with errors highlighted"
+msgstr "ÁTranslated Download a copy of your template with errors highlighted"
+
+#. Translators:
+#: js/components/ImportIndicatorsPopover.js:250
+msgid "Upload"
+msgstr "éTranslated Upload"
+
+#: js/components/ImportIndicatorsPopover.js:265
+#, python-format
+msgid ""
+"%s indicator is ready to be imported. Are you ready to complete the import "
+"process? (This action cannot be undone.)"
+msgid_plural ""
+"%s indicators are ready to be imported. Are you ready to complete the import"
+" process? (This action cannot be undone.)"
+msgstr[0] ""
+msgstr[1] ""
+
+#. Translators: Button to confirm and complete the import process
+#: js/components/ImportIndicatorsPopover.js:281
+msgid "Complete import"
+msgstr "Translated Complete import"
+
+#. Translators: Button to cancel the import process and close the popover
+#. Translators: Button to cancel a form submission
+#: js/components/ImportIndicatorsPopover.js:292
+#: js/components/changesetNotice.js:66
+#: js/pages/results_framework/components/level_cards.js:578
+msgid "Cancel"
+msgstr "Annuler"
+
+#: js/components/ImportIndicatorsPopover.js:307
+#, python-format
+msgid ""
+"%s indicator was successfully imported, but require additional details "
+"before results can be submitted."
+msgid_plural ""
+"%s indicators were successfully imported, but require additional details "
+"before results can be submitted."
+msgstr[0] ""
+msgstr[1] ""
+
+#: js/components/ImportIndicatorsPopover.js:311
+msgid ""
+"indicators are ready to be imported. Are you ready to complete the import "
+"process? (This action cannot be undone.)"
+msgstr ""
+"ÁTranslated indicators are ready to be imported. Are you ready to complete "
+"the import process? (This action cannot be undone.)"
+
+#. Translators: A link to the program page to add the addition setup
+#. information for the imported indicators.
+#: js/components/ImportIndicatorsPopover.js:317
+msgid "Visit the program page to complete setup of these indicators."
+msgstr ""
+"éTranslated Visit the program page to complete setup of these indicators."
+
 #. Translators: Notification for a error that happend on the web server.
-#: js/components/ImportIndicatorsPopover.js:206
+#: js/components/ImportIndicatorsPopover.js:329
 msgid "There was a server-related problem"
 msgstr "ÁTranslated There was a server-related problem"
 
 #. Translators: Click to view the Advanced Option section
-#: js/components/ImportIndicatorsPopover.js:237
+#: js/components/ImportIndicatorsPopover.js:370
 msgid "Advanced options"
 msgstr "ÁTranslated Advanced options"
 
 #. Translators: Details explaining that by default the template will include
 #. 10 or 20 rows per result level. You can adjust the number if you need more
 #. or less rows.
-#: js/components/ImportIndicatorsPopover.js:245
+#: js/components/ImportIndicatorsPopover.js:378
 msgid ""
 "By default, the template will include 10 or 20 indicator rows per result "
 "level. Adjust the numbers if you need more or fewer rows."
@@ -195,12 +256,6 @@ msgstr "Raison du changement"
 #: js/components/changesetNotice.js:64
 msgid "Ok"
 msgstr "OK"
-
-#. Translators: Button to cancel a form submission
-#: js/components/changesetNotice.js:66
-#: js/pages/results_framework/components/level_cards.js:578
-msgid "Cancel"
-msgstr "Annuler"
 
 #. Translators: This is the label for a textbox where a user can provide
 #. details about their reason for selecting a particular option
@@ -1317,7 +1372,7 @@ msgid "Indicators linked to this %s"
 msgstr "Indicateurs liés à %s"
 
 #. Translators: a button to download a spreadsheet
-#: js/pages/results_framework/components/level_list.js:174
+#: js/pages/results_framework/components/level_list.js:186
 #: js/pages/tola_management_pages/audit_log/views.js:224
 msgid "Excel"
 msgstr "Excel"
@@ -1326,7 +1381,7 @@ msgstr "Excel"
 #. one at a time, they can use an Excel template to enter multiple indicators
 #. at the same time. First step is to build the result framework below, then
 #. click the 'Import indicators' button above
-#: js/pages/results_framework/components/level_list.js:197
+#: js/pages/results_framework/components/level_list.js:209
 msgid ""
 "Instead of entering indicators one at a time, use an Excel template to "
 "import multiple indicators! First, build your results framework below. Next,"

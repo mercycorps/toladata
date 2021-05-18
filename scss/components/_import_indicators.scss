@@ -1,4 +1,13 @@
-.import-text {
+.page_result_framework > .popover {
+    min-width: 300px;
+    max-width: 340px;
+}
+.page_program_page > .popover {
+    min-width: 300px;
+    max-width: 340px;
+}
+// ***** Initial View Styling *****
+.import-initial-text {
     padding: 0.5rem 1rem 0;
 
     ol {
@@ -9,9 +18,14 @@
             margin-bottom: 0.75rem;
         }
     }
+
+    &-error {
+        color: $red;
+        margin-bottom: 0.75rem;
+    }
 }
 
-.import-buttons {
+.import-initial-buttons {
     display: flex;
     flex-direction: column;
     margin-top: 1rem;
@@ -24,7 +38,8 @@
     }
 }
 
-.advanced-button {
+// ***** Advanced Import Component Styling *****
+.import-advanced-button {
     display: flex;
     justify-content: center;
     align-items: center;
@@ -32,10 +47,9 @@
     font-weight: bold;
 }
 
-.advanced-text {
+.import-advanced-text {
     margin-bottom: 0.25rem;
     padding: 0.25rem 1rem;
-    font-size: small;
 }
 
 .level-count-row {
@@ -47,15 +61,106 @@
     
     & > label {
         margin: auto 0;
-        font-size: small;
+        padding-left: 1rem;
+        padding-bottom: 2px;
     }
 }
 .level-count-options {
     padding: 0.25rem 1rem;
     width: 7rem;
-    font-size: small;   
 }
 
+// ***** Feedback View Styling *****
+.import-feedback {
+    display: flex;
+    flex-direction: column;
+    margin: 0.25rem 1rem 0.75rem;
+
+
+    &-valid {
+        display: flex;
+        margin-top: 0.5rem;
+        margin-bottom: 0.5rem;
+
+        & > div > .fa-check-circle {
+            margin-top: 4px;
+            margin-right: 0.5rem;
+            color: $green;
+        }
+    }
+
+    &-invalid {
+        display: flex;
+        margin-bottom: 1rem;
+
+        & > div > .fa-exclamation-triangle {
+            margin-top: 4px;
+            margin-right: 0.5rem;
+            color: $red;
+        }
+    }
+
+    &-download {
+        padding-left: 1.5rem;
+        font-weight: bold;
+        color: $action;
+    }
+}
+
+// ***** Confirmation View Styling *****
+.import-confirm {
+    display: flex;
+    flex-direction: column;
+    margin: 0.25rem 1rem 0.75rem;
+
+    &-text {
+        display: flex;
+        margin-top: 0.5rem;
+        margin-bottom: 1rem;
+        align-items: flex-start;
+        
+        & > div > .fa-check-circle {
+            margin-top: 4px;
+            margin-right: 0.25rem;
+            color: $green;
+        }
+    }
+
+    &-buttons {
+        display: flex;
+        flex-direction: column;
+
+        &-cancel {
+            color: $gray-600;
+        }
+    }
+}
+
+// ***** Successfull View Styling *****
+.import-success {
+    display: flex;
+    flex-direction: column;
+    margin: 0.25rem 1rem 0.75rem;
+
+    &-text {
+        display: flex;
+        margin-top: 0.5rem;
+        margin-bottom: 1rem;
+
+        & > div > .fa-check-circle {
+            margin-top: 4px;
+            margin-right: 0.25rem;
+            color: $green;
+        }
+    }
+    
+    & > a {
+        color: $action;
+        font-weight: bold;
+    }
+}
+
+// ***** Error View Styling *****
 .import-error {
     display: flex;
     flex-direction: column;
@@ -72,4 +177,28 @@
     padding: 0.25rem;
     border: 1px solid black;
     border-radius: 0.25rem;
+}
+
+.import-loading {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    width: 100%;
+    height: 100px;
+
+    img {
+        height: inherit;
+    }
+}
+
+.importLoading {
+    .loading-spinner__overlay {
+        display: flex;
+        justify-content: start;
+        align-items: baseline;
+    }
+    .loading-spinner__spinner {
+        top: 80px !important;
+        left: 140px !important;
+    }
 }

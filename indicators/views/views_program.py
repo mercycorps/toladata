@@ -14,6 +14,10 @@ from django.utils.translation import gettext
 from django.http import HttpResponse, JsonResponse
 from django.shortcuts import render, reverse, redirect, get_object_or_404
 
+from indicators.serializers import (
+    LevelSerializer,
+    LevelTierSerializer,
+)
 from indicators.queries import ProgramWithMetrics
 from indicators.xls_export_utils import TAN, apply_title_styling, apply_label_styling
 from indicators.models import Indicator, PinnedReport, Level, Sector
@@ -295,6 +299,8 @@ def program_page(request, program):
             'indicators/program_setup_incomplete.html',
             {'program': program, 'redirect_url': request.path}
         )
+    levels = Level.objects.filter(program=program)
+    tiers = LevelTier.objects.filter(program=program)
     context = {
         'program': ProgramPageProgramSerializer.load_for_pk(program.pk).data,
         'pinned_reports': list(PinnedReport.objects.filter(
@@ -302,6 +308,8 @@ def program_page(request, program):
             )) + [PinnedReport.default_report(program.pk)],
         'delete_pinned_report_url': reverse('delete_pinned_report'),
         'indicator_on_scope_margin': Indicator.ONSCOPE_MARGIN,
+        'levels': LevelSerializer(levels, many=True).data,
+        'levelTiers': LevelTierSerializer(tiers, many=True).data,
         'readonly': not request.has_write_access,
         'result_readonly': not request.has_medium_access
     }
