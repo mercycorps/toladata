@@ -41,7 +41,7 @@ export class ImportIndicatorsButton extends BootstrapPopoverButton {
                     ref="target"
                     className={"btn btn-sm pl-2 " + (this.props.page === "resultsFramework" ? "btn-primary" : "btn-add")}
                     >
-                        <i className="fas fa-download mr-2"></i>
+                        <i className="fas fa-upload mr-2"></i>
                             {
                                 //  # Translators: a button to open the import indicators popover
                                 gettext('Import indicators')
