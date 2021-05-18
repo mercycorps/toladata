@@ -26,11 +26,17 @@ const ExcelButton = inject('filterStore')(
 
 const TitleBar = inject('dataStore')(
     ({ dataStore }) => {
+        let hasIndicators = false;
+        Object.keys(dataStore._levelsByPk).map((level) => {
+            if ( dataStore._levelsByPk[level].indicators.length > 0) {
+                hasIndicators = true;
+            }
+        });
         return (
         <React.Fragment>
             <div className="logframe--header">
                 <h1 className="page-title h2">
-                    {dataStore._levelsByChain.length > 0 ?
+                    { hasIndicators ?
                         <a href={ dataStore.program_page_url }>{ dataStore.name }:</a>
                     :
                         <span>{ dataStore.name }:</span>
