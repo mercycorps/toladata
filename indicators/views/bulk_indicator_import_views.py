@@ -7,11 +7,12 @@ import json
 from datetime import datetime
 from openpyxl.styles import PatternFill, Alignment, Protection, Font, NamedStyle
 from openpyxl.worksheet.datavalidation import DataValidation
-from django.conf import settings
+from django.contrib.auth.decorators import login_required
 from django.contrib.auth.mixins import UserPassesTestMixin, LoginRequiredMixin, AccessMixin
 from django.utils.translation import gettext
 from django.http import HttpResponse, JsonResponse
 from django.views import View
+from django.views.decorators.http import require_POST, require_GET
 
 from indicators.models import Indicator, Level, Sector, BulkIndicatorImportFile
 from workflow.models import Program
@@ -56,7 +57,10 @@ PROGRAM_NAME_ROW = 2
 ERROR_MISMATCHED_PROGRAM = 100
 ERROR_NO_NEW_INDICATORS = 101
 ERROR_UNDETERMINED_LEVEL = 102
+ERROR_TEMPLATE_NOT_FOUND = 103
+ERROR_INDICATOR_DATA_NOT_FOUND = 104
 ERROR_INVALID_LEVEL_HEADER = 200
+ERROR_MALFORMED_INDICATOR = 201
 
 EMPTY_CHOICE = '---------'
 
@@ -145,8 +149,7 @@ class BulkImportIndicatorsView(LoginRequiredMixin, UserPassesTestMixin, AccessMi
             dv.prompt = 'Please select from the list'
             dv.promptTitle = 'List Selection'
 
-        wb = openpyxl.load_workbook(filename=os.path.join(
-            settings.SITE_ROOT, BulkIndicatorImportFile.FILE_STORAGE_PATH, BASE_TEMPLATE_NAME))
+        wb = openpyxl.load_workbook(filename=BulkIndicatorImportFile.get_file_path(BASE_TEMPLATE_NAME))
         ws = wb.worksheets[0]
         wb.add_named_style(self.title_style)
         wb.add_named_style(self.level_header_style)
@@ -335,34 +338,93 @@ class BulkImportIndicatorsView(LoginRequiredMixin, UserPassesTestMixin, AccessMi
         error_count = sum([len(error_dict) for error_dict in deserialized_indicators.errors])
 
         if error_count > 0:
+            try:
+                old_file_obj = BulkIndicatorImportFile.objects.get(
+                    user=request.user.tola_user,
+                    program=program,
+                    file_type=BulkIndicatorImportFile.INDICATOR_DATA_TYPE)
+                os.remove(old_file_obj.file_path)
+                old_file_obj.delete()
+            except BulkIndicatorImportFile.DoesNotExist:
+                pass
+
+            file_name = f'{datetime.strftime(datetime.now(), "%Y%m%d-%H%M%S")}-{request.user.id}-{program.pk}.xlsx'
+            file_obj = BulkIndicatorImportFile.objects.create(
+                user=request.user.tola_user,
+                program=program,
+                file_name=file_name,
+                file_type=BulkIndicatorImportFile.INDICATOR_TEMPLATE_TYPE)
+            with open(file_obj.file_path, 'w') as fh:
+                wb.save(file_obj.file_path)
             return JsonResponse({
                 'indicators_with_errors': error_count,
-                'indicators_without_errors': len(deserialized_indicators.errors) - error_count
-            }
-            , status=400)
+                'indicators_without_errors': len(deserialized_indicators.errors) - error_count,
+                'error_code': ERROR_MALFORMED_INDICATOR
+            }, status=400)
         else:
             try:
                 old_file_obj = BulkIndicatorImportFile.objects.get(
                     user=request.user.tola_user,
                     program=program,
                     file_type=BulkIndicatorImportFile.INDICATOR_DATA_TYPE)
-                old_file_path = os.path.join(
-                    settings.SITE_ROOT, BulkIndicatorImportFile.FILE_STORAGE_PATH, old_file_obj.file_name)
-                os.remove(old_file_path)
+                os.remove(old_file_obj.file_path)
                 old_file_obj.delete()
             except BulkIndicatorImportFile.DoesNotExist:
                 pass
 
             file_name = f'{datetime.strftime(datetime.now(), "%Y%m%d-%H%M%S")}-{request.user.id}-{program.pk}.json'
-            with open(os.path.join(
-                    settings.SITE_ROOT, BulkIndicatorImportFile.FILE_STORAGE_PATH, file_name), 'w') as fh:
-                fh.write(json.dumps(new_indicators_data))
-            BulkIndicatorImportFile.objects.create(
+            file_obj = BulkIndicatorImportFile.objects.create(
                 user=request.user.tola_user,
                 program=program,
                 file_name=file_name,
                 file_type=BulkIndicatorImportFile.INDICATOR_DATA_TYPE)
+            with open(file_obj.file_path, 'w') as fh:
+                fh.write(json.dumps(new_indicators_data))
+            # BulkIndicatorImportFile.objects.create(
+            #     user=request.user.tola_user,
+            #     program=program,
+            #     file_name=file_name,
+            #     file_type=BulkIndicatorImportFile.INDICATOR_DATA_TYPE)
 
             return JsonResponse({'message': 'success'}, status=200)
 
 
+@login_required()
+@require_POST
+def save_bulk_import_data(request, *args, **kwargs):
+    try:
+        file_entry = BulkIndicatorImportFile.objects.get(
+            user=request.user.tola_user,
+            program_id=kwargs['program_id'],
+            file_type=BulkIndicatorImportFile.INDICATOR_DATA_TYPE)
+    except BulkIndicatorImportFile.DoesNotExist:
+        bf = BulkIndicatorImportFile.objects.get(user=request.user.tola_user)
+        return JsonResponse({'error_code': ERROR_INDICATOR_DATA_NOT_FOUND})
+
+    with open(file_entry.file_path, 'r') as fh:
+        indicator_data = json.loads(fh.read())
+
+    deserialized_entries = BulkImportIndicatorSerializer(data=indicator_data, many=True)
+    validated_flag = deserialized_entries.is_valid()
+    if not validated_flag:
+        return JsonResponse({'error_code': ERROR_INDICATOR_DATA_NOT_FOUND})
+    deserialized_entries.save()
+    return JsonResponse({'message': 'success'}, status=200)
+
+
+@login_required()
+@require_GET
+def get_redlined_bulk_import_template(request, *args, **kwargs):
+    try:
+        file_entry = BulkIndicatorImportFile.objects.get(
+            user=request.user.tola_user,
+            program_id=kwargs['program_id'],
+            file_type=BulkIndicatorImportFile.INDICATOR_TEMPLATE_TYPE)
+    except BulkIndicatorImportFile.DoesNotExist:
+        return JsonResponse({'error_code': ERROR_TEMPLATE_NOT_FOUND}, status=400)
+
+    with open(file_entry.file_path, 'rb') as fh:
+        template_file = fh.read()
+    response = HttpResponse(template_file, content_type='application/ms-excel')
+    response['Content-Disposition'] = 'attachment; filename="{}"'.format('Marked-up-template.xlsx')
+    return response

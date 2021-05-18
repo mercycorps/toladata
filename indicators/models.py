@@ -1814,8 +1814,8 @@ def reorder_former_level_on_update(sender, update_fields, created, instance, **k
 class BulkIndicatorImportFile(models.Model):
     FILE_STORAGE_PATH = 'indicators/bulk_import_files'
     INDICATOR_DATA_TYPE = 1
-    ERROR_TEMPLATE_TYPE = 2
-    FILE_TYPE_CHOICES = ((INDICATOR_DATA_TYPE, 'Indicator data'), (ERROR_TEMPLATE_TYPE, 'Error template'))
+    INDICATOR_TEMPLATE_TYPE = 2
+    FILE_TYPE_CHOICES = ((INDICATOR_DATA_TYPE, 'Indicator data'), (INDICATOR_TEMPLATE_TYPE, 'Error template'))
 
     file_type = models.IntegerField(choices=FILE_TYPE_CHOICES)
     file_name = models.CharField(max_length=100)
@@ -1823,6 +1823,14 @@ class BulkIndicatorImportFile(models.Model):
     user = models.ForeignKey(
         TolaUser, on_delete=models.SET_NULL, related_name='bulk_indicator_import_files', null=True)
     create_date = models.DateTimeField(auto_now=True)
+
+    @classmethod
+    def get_file_path(cls, file_name):
+        return os.path.join(settings.SITE_ROOT, cls.FILE_STORAGE_PATH, file_name)
+
+    @property
+    def file_path(self):
+        return os.path.join(settings.SITE_ROOT, self.FILE_STORAGE_PATH, self.file_name)
 
     def __str__(self):
         return self.file_name
