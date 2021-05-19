@@ -20,7 +20,7 @@ from indicators.serializers import (
 )
 from indicators.queries import ProgramWithMetrics
 from indicators.xls_export_utils import TAN, apply_title_styling, apply_label_styling
-from indicators.models import Indicator, PinnedReport, Level, Sector
+from indicators.models import Indicator, PinnedReport, Level, LevelTier
 from workflow.models import Program
 from workflow.serializers import LogframeProgramSerializer
 from workflow.serializers_new import (

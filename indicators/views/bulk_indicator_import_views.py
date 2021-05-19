@@ -357,8 +357,8 @@ class BulkImportIndicatorsView(LoginRequiredMixin, UserPassesTestMixin, AccessMi
             with open(file_obj.file_path, 'w') as fh:
                 wb.save(file_obj.file_path)
             return JsonResponse({
-                'indicators_with_errors': error_count,
-                'indicators_without_errors': len(deserialized_indicators.errors) - error_count,
+                'invalid': error_count,
+                'valid': len(deserialized_indicators.errors) - error_count,
                 'error_code': ERROR_MALFORMED_INDICATOR
             }, status=400)
         else:
@@ -380,13 +380,7 @@ class BulkImportIndicatorsView(LoginRequiredMixin, UserPassesTestMixin, AccessMi
                 file_type=BulkIndicatorImportFile.INDICATOR_DATA_TYPE)
             with open(file_obj.file_path, 'w') as fh:
                 fh.write(json.dumps(new_indicators_data))
-            # BulkIndicatorImportFile.objects.create(
-            #     user=request.user.tola_user,
-            #     program=program,
-            #     file_name=file_name,
-            #     file_type=BulkIndicatorImportFile.INDICATOR_DATA_TYPE)
-
-            return JsonResponse({'message': 'success'}, status=200)
+            return JsonResponse({'message': 'success', 'valid': len(new_indicators_data), 'invalid': 0}, status=200)
 
 
 @login_required()
@@ -407,6 +401,7 @@ def save_bulk_import_data(request, *args, **kwargs):
     deserialized_entries = BulkImportIndicatorSerializer(data=indicator_data, many=True)
     validated_flag = deserialized_entries.is_valid()
     if not validated_flag:
+        # This shouldn't really happen since the entries have just been validated, but we should check anyway
         return JsonResponse({'error_code': ERROR_INDICATOR_DATA_NOT_FOUND})
     deserialized_entries.save()
     return JsonResponse({'message': 'success'}, status=200)

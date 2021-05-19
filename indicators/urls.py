@@ -23,9 +23,9 @@ apipatterns = [
     path('bulk_import_indicators/<int:program_id>/',
          views.BulkImportIndicatorsView.as_view(),
          name='bulk_import_indicators'),
-    path('get_redlined_bulk_import_template/<int:program_id>/',
+    path('get_feedback_bulk_import_template/<int:program_id>/',
          views.get_redlined_bulk_import_template,
-         name='get_redlined_bulk_import_template'),
+         name='get_feedback_bulk_import_template'),
     path('save_bulk_import_data/<int:program_id>/',
          views.save_bulk_import_data,
          name='save_bulk_import_data')

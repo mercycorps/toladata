@@ -195,7 +195,7 @@ class TestBulkImportTemplateProcessing(test.TestCase):
         self.client.post(reverse('save_bulk_import_data', args=[self.program.id]))
         self.assertEqual(Indicator.objects.count(), 7)
 
-    def test_retrieving_redlined_template(self):
+    def test_retrieving_feedback_template(self):
         self.client.force_login(user=self.tola_user.user)
         w_factories.grant_program_access(self.tola_user, self.program, self.country, role='high')
         wb = openpyxl.load_workbook(self.get_template())
@@ -204,7 +204,7 @@ class TestBulkImportTemplateProcessing(test.TestCase):
         self.fill_worksheet_row(ws, DATA_START_ROW + 2, {'name': None})
         self.fill_worksheet_row(ws, DATA_START_ROW + 3)
         self.post_template(wb)
-        response = self.client.get(reverse('get_redlined_bulk_import_template', args=[self.program.id]))
+        response = self.client.get(reverse('get_feedback_bulk_import_template', args=[self.program.id]))
         self.assertEqual(response.get('Content-Disposition'),'attachment; filename="Marked-up-template.xlsx"')
 
 
