@@ -118,7 +118,7 @@ const api = {
             .catch(this.logFailure)
     },
     async downloadTemplate (program_id, tierLevelsRows) {
-        return await this.templatesInstance.get(`/indicators/bulk_import_indicators/${program_id}/`, { params: {tierLevelsRows: tierLevelsRows} })
+        return await this.templatesInstance.get(`/indicators/api/bulk_import_indicators/${program_id}/`, { params: {tierLevelsRows: tierLevelsRows} })
             .then(response => {
                 const url = window.URL.createObjectURL(new Blob([response.data]));
                 const link = document.createElement('a');
@@ -133,29 +133,39 @@ const api = {
                 return {error : error, code: 100};
             })
     },
-    async uploadTemplate(data) {
-        // TODO
-            // Send to backend
-        console.log("API request to send Templates");
-            let valid = Math.ceil(Math.random() * 10); // Mock valid indicators for testing
-            let invalid = Math.floor(Math.random() * 2); // Mock invalid indicators for testing
-            return await Promise.resolve( {statusText: "OK", data: {valid: valid, invalid: invalid}} )
-                .then(response => new Promise( resolve => {
-                    // Mock varied delayed response from the backend to see variation of the loading spinner. Will be removed once it is actually connected to the backend
-                    let timeOptions = [500, 900, 1000, 2000, 3000]
-                    let delay = timeOptions[Math.floor(Math.random() * 5)]
-                    setTimeout(() => {
-                        resolve( response.data )
-                    }, delay);
-                }))
-                .catch((error) => {
-                    this.logFailure(error)
-                    return {error};
-                })    
+    async uploadTemplate(program_id, file) {
+        // // TODO
+        //     // Send to backend
+        // console.log("API request to send Templates");
+        //     let valid = Math.ceil(Math.random() * 10); // Mock valid indicators for testing
+        //     let invalid = Math.floor(Math.random() * 2); // Mock invalid indicators for testing
+        //     return await Promise.resolve( {statusText: "OK", data: {valid: valid, invalid: invalid}} )
+        //         .then(response => new Promise( resolve => {
+        //             // Mock varied delayed response from the backend to see variation of the loading spinner. Will be removed once it is actually connected to the backend
+        //             let timeOptions = [500, 900, 1000, 2000, 3000]
+        //             let delay = timeOptions[Math.floor(Math.random() * 5)]
+        //             setTimeout(() => {
+        //                 resolve( response.data )
+        //             }, delay);
+        //         }))
+        //         .catch((error) => {
+        //             this.logFailure(error)
+        //             return {error};
+        //         })
+        let formData = new FormData()
+        formData.append('file', file)
+        return await this.apiSession.post(`/indicators/api/bulk_import_indicators/${program_id}/`,
+                formData, {headers: {'Content-Type': 'multipart/form-data'}}
+            )
+            .then(response => response.data)
+            .catch(error => {
+                this.logFailure(error);
+                return {error};
+            })
     },
     async downloadFeedback(program_id) {
         // TODO: Update the URL for the feedback template file
-        return await this.templatesInstance.get(`/indicators/bulk_import_indicators/${program_id}/`)
+        return await this.templatesInstance.get(`/indicators/api/get_feedback_bulk_import_template/${program_id}/`)
             .then(response => {
                 const url = window.URL.createObjectURL(new Blob([response.data]));
                 const link = document.createElement('a');
@@ -168,26 +178,30 @@ const api = {
             .catch((error) => {
                 this.logFailure(error)
                 return {error};
-            })    
+            })
     },
-    async confirmUpload() {
-        // TODO
-            // Send to backend
-        console.log("API request to Confirm");
-        return await Promise.resolve( {statusText: "OK"} )
-            .then(response => new Promise( resolve => {
-                // Mock varied delayed response from the backend to see variation of the loading spinner. Will be removed once it is actually connected to the backend
-                let timeOptions = [500, 900, 1000, 2000, 3000]
-                let delay = timeOptions[Math.floor(Math.random() * 5)]
-                setTimeout(() => {
-                    resolve( response.statusText )
-                }, delay);
-            }))
-            .catch((error) => {
-                this.logFailure(error);
-                return {error};
-            })    
-    }
+    async confirmUpload(program_id) {
+        // // TODO
+        //     // Send to backend
+        // console.log("API request to Confirm");
+        // return await Promise.resolve( {statusText: "OK"} )
+        //     .then(response => new Promise( resolve => {
+        //         // Mock varied delayed response from the backend to see variation of the loading spinner. Will be removed once it is actually connected to the backend
+        //         let timeOptions = [500, 900, 1000, 2000, 3000]
+        //         let delay = timeOptions[Math.floor(Math.random() * 5)]
+        //         setTimeout(() => {
+        //             resolve( response.statusText )
+        //         }, delay);
+        //     }))
+        //     .catch((error) => {
+        //         this.logFailure(error);
+        //         return {error};
+        //     })
+
+        return await this.apiInstance.post(`/save_bulk_import_data/${program_id}/`)
+            .then(response => response.data)
+            .catch(this.logFailure);
+    },
 };
 
 

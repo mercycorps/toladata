@@ -3,6 +3,7 @@ import re
 import collections
 import string
 import uuid
+import os
 from datetime import timedelta, date
 from decimal import Decimal
 import dateparser
@@ -11,6 +12,7 @@ from functools import total_ordering
 from tola.l10n_utils import l10n_date_medium
 from tola.model_utils import generate_safedelete_queryset
 
+from django.conf import settings
 from django.core.validators import MinValueValidator
 from django.core.exceptions import ValidationError
 from django.db import models
@@ -1025,6 +1027,7 @@ class IndicatorMetricsMixin:
             )
         )
 
+
 class Indicator(SafeDeleteModel):
     LOP = 1
     MID_END = 2
@@ -1132,8 +1135,6 @@ class Indicator(SafeDeleteModel):
         # Translators:  describes a user-selectable option in a list of things that users plan to do with the information gathered while the program is running
         ('participant_accountability', _('Participant accountability'))
     ]
-
-
 
     indicator_key = models.UUIDField(
         default=uuid.uuid4, help_text=" ", verbose_name=_("Indicator key"))
@@ -1808,6 +1809,31 @@ def reorder_former_level_on_update(sender, update_fields, created, instance, **k
     elif instance.deleted and instance.level:
         # indicator is being deleted, reorder it's levels
         instance.level.update_level_order()
+
+
+class BulkIndicatorImportFile(models.Model):
+    FILE_STORAGE_PATH = 'indicators/bulk_import_files'
+    INDICATOR_DATA_TYPE = 1
+    INDICATOR_TEMPLATE_TYPE = 2
+    FILE_TYPE_CHOICES = ((INDICATOR_DATA_TYPE, 'Indicator data'), (INDICATOR_TEMPLATE_TYPE, 'Error template'))
+
+    file_type = models.IntegerField(choices=FILE_TYPE_CHOICES)
+    file_name = models.CharField(max_length=100)
+    program = models.ForeignKey(Program, on_delete=models.CASCADE, related_name='bulk_indicator_import_files')
+    user = models.ForeignKey(
+        TolaUser, on_delete=models.SET_NULL, related_name='bulk_indicator_import_files', null=True)
+    create_date = models.DateTimeField(auto_now=True)
+
+    @classmethod
+    def get_file_path(cls, file_name):
+        return os.path.join(settings.SITE_ROOT, cls.FILE_STORAGE_PATH, file_name)
+
+    @property
+    def file_path(self):
+        return os.path.join(settings.SITE_ROOT, self.FILE_STORAGE_PATH, self.file_name)
+
+    def __str__(self):
+        return self.file_name
 
 
 class PeriodicTarget(models.Model):
