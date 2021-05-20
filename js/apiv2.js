@@ -118,7 +118,12 @@ const api = {
             .catch(this.logFailure)
     },
     async downloadTemplate (program_id, tierLevelsRows) {
-        return await this.templatesInstance.get(`/indicators/api/bulk_import_indicators/${program_id}/`, { params: {tierLevelsRows: tierLevelsRows} })
+        let flatTierLevelsRows = tierLevelsRows.reduce((accumulator, currentValue) => {
+            accumulator[currentValue.name] = currentValue.rows;
+            return accumulator
+        }, {})
+
+        return await this.templatesInstance.get(`/indicators/api/bulk_import_indicators/${program_id}/`, { params: flatTierLevelsRows })
             .then(response => {
                 const url = window.URL.createObjectURL(new Blob([response.data]));
                 const link = document.createElement('a');

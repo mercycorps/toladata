@@ -47,6 +47,6 @@ from indicators.views.views_program import (
 
 from indicators.views.bulk_indicator_import_views import (
     BulkImportIndicatorsView,
-    get_redlined_bulk_import_template,
+    get_feedback_bulk_import_template,
     save_bulk_import_data,
 )
