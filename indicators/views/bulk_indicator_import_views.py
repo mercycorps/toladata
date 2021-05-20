@@ -14,10 +14,10 @@ from django.http import HttpResponse, JsonResponse
 from django.views import View
 from django.views.decorators.http import require_POST, require_GET
 
-from indicators.models import Indicator, Level, Sector, BulkIndicatorImportFile
+from indicators.models import Indicator, Level, LevelTier, Sector, BulkIndicatorImportFile
 from workflow.models import Program
 from workflow.serializers_new import BulkImportSerializer, BulkImportIndicatorSerializer
-
+from tola.l10n_utils import str_without_diacritics
 from tola_management.permissions import user_has_program_roles
 
 VALIDATION_KEY_UOM_TYPE = 'uom_type_validation'
@@ -82,10 +82,6 @@ class BulkImportIndicatorsView(LoginRequiredMixin, UserPassesTestMixin, AccessMi
     data_start_row = DATA_START_ROW
     program_name_row = PROGRAM_NAME_ROW
 
-    reverse_field_name_map = {'unit_of_measure_type': {str(name): value for value, name in Indicator.UNIT_OF_MEASURE_TYPES}}
-    reverse_field_name_map['direction_of_change'] = {str(name): value for value, name in Indicator.DIRECTION_OF_CHANGE}
-    reverse_field_name_map['target_frequency'] = {str(name): value for value, name in Indicator.TARGET_FREQUENCIES}
-
     title_style = NamedStyle('title_style')
     title_style.font = Font(name='Calibri', size=18)
     title_style.protection = Protection(locked=True)
@@ -136,9 +132,9 @@ class BulkImportIndicatorsView(LoginRequiredMixin, UserPassesTestMixin, AccessMi
             'indicator_set', 'program', 'parent__program__level_tiers')
         serialized_levels = sorted(BulkImportSerializer(levels, many=True).data, key=lambda level: level['ontology'])
 
-        serialized_leveltier_names = sorted(list(set(level['tier_name'] for level in serialized_levels)))
+        leveltiers_in_db = [gettext(tier.name) for tier in LevelTier.objects.filter(program=program).order_by('name')]
         request_leveltier_names = sorted(request.GET.keys())
-        if serialized_leveltier_names != request_leveltier_names:
+        if leveltiers_in_db != request_leveltier_names:
             return JsonResponse({'error_code': ERROR_MISMATCHED_TIERS}, status=400)
 
         wb = openpyxl.load_workbook(filename=BulkIndicatorImportFile.get_file_path(BASE_TEMPLATE_NAME))
@@ -147,18 +143,25 @@ class BulkImportIndicatorsView(LoginRequiredMixin, UserPassesTestMixin, AccessMi
 
         # Handle the edge case where a user submits "0" rows for all tiers.  Not only does the  dropdown creation Data validation is only put on cells that are empty, so if there are no empty rows, we can skip the
         # creation of dropdowns entirely.
+        reverse_field_name_map = {
+            'unit_of_measure_type': {str(name): value for value, name in Indicator.UNIT_OF_MEASURE_TYPES}}
+        reverse_field_name_map['direction_of_change'] = {
+            str(name): value for value, name in Indicator.DIRECTION_OF_CHANGE}
+        reverse_field_name_map['target_frequency'] = {
+            str(name): value for value, name in Indicator.TARGET_FREQUENCIES}
+
         validation_map = {}
-        uom_type_options = list(self.reverse_field_name_map['unit_of_measure_type'].keys())
+        uom_type_options = list(reverse_field_name_map['unit_of_measure_type'].keys())
         uom_type_validation = DataValidation(
             type="list", formula1=f'"{",".join(uom_type_options)}"', allow_blank=False)
         validation_map[VALIDATION_KEY_UOM_TYPE] = uom_type_validation
 
-        dir_change_options = list(self.reverse_field_name_map['direction_of_change'].keys())
+        dir_change_options = list(reverse_field_name_map['direction_of_change'].keys())
         dir_change_validation = DataValidation(
             type="list", formula1=f'"{",".join(dir_change_options)}"', allow_blank=True)
         validation_map[VALIDATION_KEY_DIR_CHANGE] = dir_change_validation
 
-        target_freq_options = list(self.reverse_field_name_map['target_frequency'].keys())
+        target_freq_options = list(reverse_field_name_map['target_frequency'].keys())
         target_freq_validation = DataValidation(
             type="list", formula1=f'"{",".join(target_freq_options)}"', allow_blank=False)
         validation_map[VALIDATION_KEY_TARGET_FREQ] = target_freq_validation
@@ -166,7 +169,9 @@ class BulkImportIndicatorsView(LoginRequiredMixin, UserPassesTestMixin, AccessMi
         # Can't do sector the same way as the others because there are too many.  There is a 256 char limit
         # on putting options directly into the validation config.  Instead, the options will be referenced
         # from a hidden sheet.
-        sector_options = [EMPTY_CHOICE] + [gettext(sector.sector) for sector in Sector.objects.order_by('sector')]
+        sector_options = [EMPTY_CHOICE] + sorted(
+            [gettext(sector.sector) for sector in Sector.objects.all()],
+            key=lambda choice: str_without_diacritics(choice))
         sectors_col = 'A'
         sectors_start_row = 2
         sectors_end_row = sectors_start_row + len(sector_options) - 1
@@ -308,6 +313,13 @@ class BulkImportIndicatorsView(LoginRequiredMixin, UserPassesTestMixin, AccessMi
         current_level = None
         new_indicators_data = []
 
+        reverse_field_name_map = {
+            'unit_of_measure_type': {str(name): value for value, name in Indicator.UNIT_OF_MEASURE_TYPES}}
+        reverse_field_name_map['direction_of_change'] = {
+            str(name): value for value, name in Indicator.DIRECTION_OF_CHANGE}
+        reverse_field_name_map['target_frequency'] = {
+            str(name): value for value, name in Indicator.TARGET_FREQUENCIES}
+
         for current_row_index in range(self.data_start_row, ws.max_row):
             first_cell = ws.cell(current_row_index, self.first_used_column)
 
@@ -344,9 +356,9 @@ class BulkImportIndicatorsView(LoginRequiredMixin, UserPassesTestMixin, AccessMi
                     if not program.auto_number_indicators:
                         indicator_data[column['field_name']] = cell_value
                 # Convert dropdown text into numerical value
-                elif column['field_name'] in self.reverse_field_name_map.keys():
+                elif column['field_name'] in reverse_field_name_map.keys():
                     indicator_data[column['field_name']] =\
-                        self.reverse_field_name_map[column['field_name']][cell_value]
+                        reverse_field_name_map[column['field_name']][cell_value]
                 # Convert text in dropdown to sector pk
                 elif column['field_name'] == 'sector':
                     if cell_value is None or cell_value in [EMPTY_CHOICE, '', 'None']:
