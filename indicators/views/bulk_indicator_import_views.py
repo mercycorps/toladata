@@ -132,7 +132,7 @@ class BulkImportIndicatorsView(LoginRequiredMixin, UserPassesTestMixin, AccessMi
             'indicator_set', 'program', 'parent__program__level_tiers')
         serialized_levels = sorted(BulkImportSerializer(levels, many=True).data, key=lambda level: level['ontology'])
 
-        leveltiers_in_db = [gettext(tier.name) for tier in LevelTier.objects.filter(program=program).order_by('name')]
+        leveltiers_in_db = sorted([gettext(tier.name) for tier in LevelTier.objects.filter(program=program)])
         request_leveltier_names = sorted(request.GET.keys())
         if leveltiers_in_db != request_leveltier_names:
             return JsonResponse({'error_code': ERROR_MISMATCHED_TIERS}, status=400)
@@ -232,7 +232,7 @@ class BulkImportIndicatorsView(LoginRequiredMixin, UserPassesTestMixin, AccessMi
         current_row_index = self.data_start_row
         for level in serialized_levels:
             ws.cell(current_row_index, self.first_used_column)\
-                .value = f'{level["tier_name"]}: {level["level_name"]} ({level["ontology"]})'
+                .value = f'{gettext(level["tier_name"])}: {level["level_name"]} ({level["ontology"]})'
             ws.merge_cells(
                 start_row=current_row_index,
                 start_column=self.first_used_column,
@@ -244,7 +244,7 @@ class BulkImportIndicatorsView(LoginRequiredMixin, UserPassesTestMixin, AccessMi
             for indicator in level['indicator_set']:
                 current_column_index = self.first_used_column
                 first_indicator_cell = ws.cell(current_row_index, current_column_index)
-                first_indicator_cell.value = level['tier_name']
+                first_indicator_cell.value = gettext(level['tier_name'])
                 first_indicator_cell.style = 'protected_indicator_style'
                 first_indicator_cell.font = Font(bold=True)
 
@@ -268,7 +268,7 @@ class BulkImportIndicatorsView(LoginRequiredMixin, UserPassesTestMixin, AccessMi
                 current_row_index += 1
 
             letter_index = len(level['indicator_set'])
-            empty_row_count = int(request.GET[level['tier_name']])
+            empty_row_count = int(request.GET[gettext(level['tier_name'])])
             for i in range(empty_row_count):
                 ws.row_dimensions[current_row_index].height = 16
                 letter_index += 1
@@ -279,7 +279,7 @@ class BulkImportIndicatorsView(LoginRequiredMixin, UserPassesTestMixin, AccessMi
                     i_letter = string.ascii_lowercase[
                         letter_index // 26 - 1] + string.ascii_lowercase[letter_index % 26]
 
-                ws.cell(current_row_index, self.first_used_column).value = level['tier_name']
+                ws.cell(current_row_index, self.first_used_column).value = gettext(level['tier_name'])
                 ws.cell(current_row_index, self.first_used_column + 1).value = level['display_ontology'] + i_letter
                 for col_n, column in enumerate(COLUMNS):
                     active_cell = ws.cell(current_row_index, self.first_used_column + col_n)
