@@ -130,7 +130,7 @@ class BulkImportIndicatorsView(LoginRequiredMixin, UserPassesTestMixin, AccessMi
         try:
             program = Program.objects.get(pk=program_id)
         except Program.DoesNotExist:
-            return JsonResponse({'error': 'Program not found'}, status=404)
+            return JsonResponse({'error_code': ERROR_MISMATCHED_PROGRAM}, status=404)
 
         levels = Level.objects.filter(program=program).select_related().prefetch_related(
             'indicator_set', 'program', 'parent__program__level_tiers')
