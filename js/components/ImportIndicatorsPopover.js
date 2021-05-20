@@ -81,13 +81,14 @@ export const ImportIndicatorsPopover = ({ program_id, tierLevelsUsed, page }) =>
     let handleDownload = () => {
         api.downloadTemplate(program_id, tierLevelsRows)
             .then(response => {
-                if (response.error) {
-                    console.log("code:", response.code);
-                    if (response.code === 100) {
-                        setInitialViewError(response.code);
-                    } else {
-                        setViews(ERROR);
-                    }
+                let levelOne = /^[1][0-9][0-9]$/i;
+                let levelTwo = /^[2][0-9][0-9]$/i;
+                if (levelOne.test(response.error_code) ) {
+                    setInitialViewError(response.error_code);
+                } else if (levelTwo.test(response.error_code) ) {
+                    setViews(ERROR);
+                } else if (response.error) {
+                    setViews(ERROR);
                 }
             })
     }

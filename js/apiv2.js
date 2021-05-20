@@ -130,7 +130,7 @@ const api = {
             })
             .catch((error) => {
                 this.logFailure(error)
-                return {error : error, code: 100};
+                return error; // expecting {error_code: 100};
             })
     },
     async uploadTemplate(program_id, file) {
