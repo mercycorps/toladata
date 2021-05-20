@@ -56,7 +56,7 @@ class BulkImportIndicatorSerializer(serializers.ModelSerializer):
 
     @staticmethod
     def get_target_frequency(obj):
-        return dict(Indicator.TARGET_FREQUENCIES)[obj.target_frequency]
+        return None if obj.target_frequency is None else dict(Indicator.TARGET_FREQUENCIES)[obj.target_frequency]
 
     @staticmethod
     def get_unit_of_measure_type(obj):
