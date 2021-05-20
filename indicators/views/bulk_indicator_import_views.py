@@ -67,7 +67,7 @@ ERROR_NO_NEW_INDICATORS = 101
 ERROR_UNDETERMINED_LEVEL = 102
 ERROR_TEMPLATE_NOT_FOUND = 103
 ERROR_MISMATCHED_TIERS = 104
-ERROR_INDICATOR_DATA_NOT_FOUND = 104
+ERROR_INDICATOR_DATA_NOT_FOUND = 105
 ERROR_INVALID_LEVEL_HEADER = 200
 ERROR_MALFORMED_INDICATOR = 201
 
@@ -164,7 +164,7 @@ class BulkImportIndicatorsView(LoginRequiredMixin, UserPassesTestMixin, AccessMi
         validation_map[VALIDATION_KEY_TARGET_FREQ] = target_freq_validation
 
         # Can't do sector the same way as the others because there are too many.  There is a 256 char limit
-        # on putting options directly into the validation config.  Inst4ad, the options will be referenced
+        # on putting options directly into the validation config.  Instead, the options will be referenced
         # from a hidden sheet.
         sector_options = [EMPTY_CHOICE] + [gettext(sector.sector) for sector in Sector.objects.order_by('sector')]
         sectors_col = 'A'
