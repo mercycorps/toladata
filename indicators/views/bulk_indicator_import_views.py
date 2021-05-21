@@ -5,6 +5,7 @@ import re
 import os
 import json
 from datetime import datetime
+from openpyxl.comments import Comment
 from openpyxl.styles import PatternFill, Alignment, Protection, Font, NamedStyle
 from openpyxl.worksheet.datavalidation import DataValidation
 from openpyxl.utils import get_column_letter
@@ -34,7 +35,7 @@ COLUMNS = [
      'validation': VALIDATION_KEY_SECTOR},
     {'name': 'Source', 'required': False, 'field_name': 'source'},
     {'name': 'Definition', 'required': False, 'field_name': 'definition'},
-    {'name': 'Rationale or justification for indicator', 'required': False, 'field_name': 'rationale'},
+    {'name': 'Rationale or justification for indicator', 'required': False, 'field_name': 'justification'},
     {'name': 'Unit of measure', 'required': True, 'field_name': 'unit_of_measure'},
     {'name': 'Number (#) or percentage (%)', 'required': True, 'field_name': 'unit_of_measure_type',
      'validation': VALIDATION_KEY_UOM_TYPE},
@@ -235,13 +236,34 @@ class BulkImportIndicatorsView(LoginRequiredMixin, UserPassesTestMixin, AccessMi
         ws.merge_cells(start_row=4, start_column=2, end_row=4, end_column=max_merge_col_index)
 
         for i, header in enumerate(COLUMNS):
-            header_cell = ws.cell(6, i+2)
+            column_index = i+2
+            header_cell = ws.cell(6, column_index)
             if header['required']:
                 header_cell.value = gettext(header['name']) + "*"
                 header_cell.style = 'required_header_style'
             else:
                 header_cell.value = gettext(header['name'])
                 header_cell.style = 'optional_header_style'
+
+            # Add notes to header row cells
+            if header['field_name'] != 'comments':
+                help_text = Indicator._meta.get_field(header['field_name']).help_text
+                comment = Comment(help_text, '')
+                comment.width = 300
+                comment.height = 15 + len(help_text) * .5
+                header_cell.comment = comment
+
+            if header['field_name'] == 'sector':
+                col_width = max(len(option) for option in sector_options)
+                ws.column_dimensions[get_column_letter(column_index)].width = col_width
+            elif header['field_name'] == 'rationale_for_target':
+                ws.column_dimensions[get_column_letter(column_index)].width = 30
+            elif 7 < column_index < 15:
+                col_width = len(header_cell.value)
+                ws.column_dimensions[get_column_letter(column_index)].width = col_width
+            elif column_index >= 15:
+                col_width = max(len(option) for option in target_freq_options)
+                ws.column_dimensions[get_column_letter(column_index)].width = col_width
 
         current_row_index = self.data_start_row
         for level in serialized_levels:
@@ -328,11 +350,10 @@ class BulkImportIndicatorsView(LoginRequiredMixin, UserPassesTestMixin, AccessMi
         new_indicators_data = []
 
         reverse_field_name_map = {
-            'unit_of_measure_type': {str(name): value for value, name in Indicator.UNIT_OF_MEASURE_TYPES}}
-        reverse_field_name_map['direction_of_change'] = {
-            str(name): value for value, name in Indicator.DIRECTION_OF_CHANGE}
-        reverse_field_name_map['target_frequency'] = {
-            str(name): value for value, name in Indicator.TARGET_FREQUENCIES}
+            'unit_of_measure_type': {str(name): value for value, name in Indicator.UNIT_OF_MEASURE_TYPES},
+            'direction_of_change': {str(name): value for value, name in Indicator.DIRECTION_OF_CHANGE},
+            'target_frequency': {str(name): value for value, name in Indicator.TARGET_FREQUENCIES}
+        }
 
         for current_row_index in range(self.data_start_row, ws.max_row):
             first_cell = ws.cell(current_row_index, self.first_used_column)
