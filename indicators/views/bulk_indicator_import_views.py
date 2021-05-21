@@ -141,14 +141,12 @@ class BulkImportIndicatorsView(LoginRequiredMixin, UserPassesTestMixin, AccessMi
         ws = wb.worksheets[0]
         hidden_ws = wb.get_sheet_by_name('Hidden')
 
-        # Handle the edge case where a user submits "0" rows for all tiers.  Not only does the  dropdown creation Data validation is only put on cells that are empty, so if there are no empty rows, we can skip the
-        # creation of dropdowns entirely.
+        # Create data validations
         reverse_field_name_map = {
-            'unit_of_measure_type': {str(name): value for value, name in Indicator.UNIT_OF_MEASURE_TYPES}}
-        reverse_field_name_map['direction_of_change'] = {
-            str(name): value for value, name in Indicator.DIRECTION_OF_CHANGE}
-        reverse_field_name_map['target_frequency'] = {
-            str(name): value for value, name in Indicator.TARGET_FREQUENCIES}
+            'unit_of_measure_type': {str(name): value for value, name in Indicator.UNIT_OF_MEASURE_TYPES},
+            'direction_of_change':  {str(name): value for value, name in Indicator.DIRECTION_OF_CHANGE},
+            'target_frequency': {str(name): value for value, name in Indicator.TARGET_FREQUENCIES}
+        }
 
         validation_map = {}
         uom_type_options = list(reverse_field_name_map['unit_of_measure_type'].keys())

@@ -8,16 +8,16 @@ from django import test
 from django.conf import settings
 from django.core.files.base import ContentFile
 from django.urls import reverse
-from django.utils.translation import gettext
+from django.utils.translation import gettext, activate
 from factories import (
     workflow_models as w_factories,
     indicators_models as i_factories
 )
 from indicators.models import Indicator, Level, LevelTier, BulkIndicatorImportFile
 from indicators.views.bulk_indicator_import_views import (
-    COLUMNS, FIRST_USED_COLUMN, DATA_START_ROW, PROGRAM_NAME_ROW, TEMPLATE_SHEET_NAME, BASE_TEMPLATE_NAME,
-    ERROR_INDICATOR_DATA_NOT_FOUND, ERROR_TEMPLATE_NOT_FOUND, ERROR_MISMATCHED_PROGRAM, ERROR_NO_NEW_INDICATORS,
-    ERROR_UNDETERMINED_LEVEL, ERROR_INVALID_LEVEL_HEADER, ERROR_MALFORMED_INDICATOR
+    COLUMNS, FIRST_USED_COLUMN, DATA_START_ROW, PROGRAM_NAME_ROW, TEMPLATE_SHEET_NAME, HIDDEN_SHEET_NAME,
+    BASE_TEMPLATE_NAME, ERROR_INDICATOR_DATA_NOT_FOUND, ERROR_TEMPLATE_NOT_FOUND, ERROR_MISMATCHED_PROGRAM,
+    ERROR_NO_NEW_INDICATORS, ERROR_UNDETERMINED_LEVEL, ERROR_INVALID_LEVEL_HEADER, ERROR_MALFORMED_INDICATOR
 )
 
 
@@ -39,7 +39,7 @@ class TestBulkImportTemplateCreation(test.TestCase):
         cls.program_name_row = PROGRAM_NAME_ROW
 
     def get_template(self):
-        request_params = dict([(tier.name, 10) for tier in LevelTier.objects.filter(program=self.program)])
+        request_params = dict([(gettext(tier.name), 10) for tier in LevelTier.objects.filter(program=self.program)])
         response = self.client.get(reverse('bulk_import_indicators', args=[self.program.pk]), data=request_params)
         return ContentFile(response.content)
 
@@ -71,6 +71,26 @@ class TestBulkImportTemplateCreation(test.TestCase):
         self.assertEqual(
             ws.cell(self.data_start_row, self.first_used_column).value,
             f'Goal: {self.ordered_levels[0].name} ({self.ordered_levels[0].ontology})')
+
+    def test_non_english_template_create(self):
+        self.client.force_login(self.tola_user.user)
+        self.tola_user.language = 'fr'
+        self.tola_user.save()
+        activate('fr')
+        for sector in ['Agriculture', 'Conflict Management', 'Agribusiness']:
+            w_factories.SectorFactory(sector=sector)
+        w_factories.grant_program_access(self.tola_user, self.program, self.country, role='high')
+
+        wb = openpyxl.load_workbook(self.get_template())
+        ws = wb.get_sheet_by_name(TEMPLATE_SHEET_NAME)
+        first_level_header = ws.cell(DATA_START_ROW, FIRST_USED_COLUMN).value
+        self.assertEqual(first_level_header[:3], 'But')
+        hidden_ws = wb.get_sheet_by_name(HIDDEN_SHEET_NAME)
+        self.assertEqual(hidden_ws['A3'].value, 'éTranslated Agribusiness')
+
+        activate('en')
+        self.tola_user.language = 'en'
+        self.tola_user.save()
 
     @unittest.skip
     def test_data_validation(self):
