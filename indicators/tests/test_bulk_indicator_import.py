@@ -1,6 +1,7 @@
 import json
 import time
 import os
+import unittest
 from tempfile import NamedTemporaryFile
 import openpyxl
 from django import test
@@ -12,7 +13,7 @@ from factories import (
     workflow_models as w_factories,
     indicators_models as i_factories
 )
-from indicators.models import Indicator, Level, BulkIndicatorImportFile
+from indicators.models import Indicator, Level, LevelTier, BulkIndicatorImportFile
 from indicators.views.bulk_indicator_import_views import (
     COLUMNS, FIRST_USED_COLUMN, DATA_START_ROW, PROGRAM_NAME_ROW, TEMPLATE_SHEET_NAME, BASE_TEMPLATE_NAME,
     ERROR_INDICATOR_DATA_NOT_FOUND, ERROR_TEMPLATE_NOT_FOUND, ERROR_MISMATCHED_PROGRAM, ERROR_NO_NEW_INDICATORS,
@@ -38,7 +39,8 @@ class TestBulkImportTemplateCreation(test.TestCase):
         cls.program_name_row = PROGRAM_NAME_ROW
 
     def get_template(self):
-        response = self.client.get(reverse('bulk_import_indicators', args=[self.program.pk]))
+        request_params = dict([(tier.name, 10) for tier in LevelTier.objects.filter(program=self.program)])
+        response = self.client.get(reverse('bulk_import_indicators', args=[self.program.pk]), data=request_params)
         return ContentFile(response.content)
 
     def test_permissions(self):
@@ -51,13 +53,15 @@ class TestBulkImportTemplateCreation(test.TestCase):
         response = self.client.get(reverse('bulk_import_indicators', args=[self.program.pk]))
         self.assertEqual(response.status_code, 403)
         w_factories.grant_program_access(self.tola_user, self.program, self.country, role='high')
-        response = self.client.get(reverse('bulk_import_indicators', args=[self.program.pk]))
+        request_params = dict([(tier.name, 10) for tier in LevelTier.objects.filter(program=self.program)])
+        response = self.client.get(reverse('bulk_import_indicators', args=[self.program.pk]), data=request_params)
         self.assertEqual(response.status_code, 200)
 
     def test_template_create(self):
         self.client.force_login(self.tola_user.user)
         w_factories.grant_program_access(self.tola_user, self.program, self.country, role='high')
-        response = self.client.get(reverse('bulk_import_indicators', args=[self.program.pk]))
+        request_params = dict([(tier.name, 10) for tier in LevelTier.objects.filter(program=self.program)])
+        response = self.client.get(reverse('bulk_import_indicators', args=[self.program.pk]), data=request_params)
         self.assertEqual(response.status_code, 200)
         self.assertEquals(response.get('Content-Disposition'), 'attachment; filename="BulkIndicatorImport.xlsx"')
         wb = openpyxl.load_workbook(self.get_template())
@@ -67,6 +71,13 @@ class TestBulkImportTemplateCreation(test.TestCase):
         self.assertEqual(
             ws.cell(self.data_start_row, self.first_used_column).value,
             f'Goal: {self.ordered_levels[0].name} ({self.ordered_levels[0].ontology})')
+
+    @unittest.skip
+    def test_data_validation(self):
+        # openpyxl apparently does not allow you to read validations from a spreadsheet, only create new ones.
+        # So for now, testing of validations is being deferred until openpyxl allows read and/or another package is
+        # used.
+        pass
 
 
 class TestBulkImportTemplateProcessing(test.TestCase):
@@ -94,7 +105,8 @@ class TestBulkImportTemplateProcessing(test.TestCase):
                 os.remove(file_path)
 
     def get_template(self):
-        response = self.client.get(reverse('bulk_import_indicators', args=[self.program.pk]))
+        request_params = dict([(tier.name, 10) for tier in LevelTier.objects.filter(program=self.program)])
+        response = self.client.get(reverse('bulk_import_indicators', args=[self.program.pk]), data=request_params)
         return ContentFile(response.content)
 
     def post_template(self, wb):

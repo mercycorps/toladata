@@ -20,22 +20,29 @@ from workflow.serializers_new import BulkImportSerializer, BulkImportIndicatorSe
 
 from tola_management.permissions import user_has_program_roles
 
+VALIDATION_KEY_UOM_TYPE = 'uom_type_validation'
+VALIDATION_KEY_DIR_CHANGE = 'dir_change_validation'
+VALIDATION_KEY_TARGET_FREQ = 'target_frequency_validation'
+VALIDATION_KEY_SECTOR = 'sector_validation'
+
 COLUMNS = [
     {'name': 'Level', 'required': True, 'field_name': 'level'},
     {'name': 'No.', 'required': True, 'field_name': 'number'},
     {'name': 'Indicator', 'required': True, 'field_name': 'name'},
-    {'name': 'Sector', 'required': False, 'field_name': 'sector'},
+    {'name': 'Sector', 'required': False, 'field_name': 'sector',
+     'validation': VALIDATION_KEY_SECTOR},
     {'name': 'Source', 'required': False, 'field_name': 'source'},
     {'name': 'Definition', 'required': False, 'field_name': 'definition'},
     {'name': 'Rationale or justification for indicator', 'required': False, 'field_name': 'rationale'},
     {'name': 'Unit of measure', 'required': True, 'field_name': 'unit_of_measure'},
-    {'name': 'Number (#) or percentage (%)', 'required': True, 'validation': 'uom_type_validation',
-     'field_name': 'unit_of_measure_type'},
+    {'name': 'Number (#) or percentage (%)', 'required': True, 'field_name': 'unit_of_measure_type',
+     'validation': VALIDATION_KEY_UOM_TYPE},
     {'name': 'Rationale for target', 'required': False, 'field_name': 'rationale_for_target'},
     {'name': 'Baseline', 'required': True, 'field_name': 'baseline'},
-    {'name': 'Direction of change', 'required': False, 'validation': 'dir_change_validation',
-     'field_name': 'direction_of_change'},
-    {'name': 'Target frequency', 'required': True, 'field_name': 'target_frequency'},
+    {'name': 'Direction of change', 'required': False, 'field_name': 'direction_of_change',
+     'validation': VALIDATION_KEY_DIR_CHANGE},
+    {'name': 'Target frequency', 'required': True, 'field_name': 'target_frequency',
+     'validation': VALIDATION_KEY_TARGET_FREQ},
     {'name': 'Means of verification / data source', 'required': False, 'field_name': 'means_of_verification'},
     {'name': 'Data collection method', 'required': False, 'field_name': 'data_collection_method'},
     {'name': 'Data points', 'required': False, 'field_name': 'data_points'},
@@ -49,6 +56,7 @@ COLUMNS = [
 
 BASE_TEMPLATE_NAME = 'BulkImportTemplate.xlsx'
 TEMPLATE_SHEET_NAME = 'Template'
+HIDDEN_SHEET_NAME = 'Hidden'
 
 FIRST_USED_COLUMN = 2
 DATA_START_ROW = 7
@@ -58,7 +66,8 @@ ERROR_MISMATCHED_PROGRAM = 100
 ERROR_NO_NEW_INDICATORS = 101
 ERROR_UNDETERMINED_LEVEL = 102
 ERROR_TEMPLATE_NOT_FOUND = 103
-ERROR_INDICATOR_DATA_NOT_FOUND = 104
+ERROR_MISMATCHED_TIERS = 104
+ERROR_INDICATOR_DATA_NOT_FOUND = 105
 ERROR_INVALID_LEVEL_HEADER = 200
 ERROR_MALFORMED_INDICATOR = 201
 
@@ -121,45 +130,74 @@ class BulkImportIndicatorsView(LoginRequiredMixin, UserPassesTestMixin, AccessMi
         try:
             program = Program.objects.get(pk=program_id)
         except Program.DoesNotExist:
-            return JsonResponse({'error': 'Program not found'}, status=404)
+            return JsonResponse({'error_code': ERROR_MISMATCHED_PROGRAM}, status=404)
 
         levels = Level.objects.filter(program=program).select_related().prefetch_related(
             'indicator_set', 'program', 'parent__program__level_tiers')
         serialized_levels = sorted(BulkImportSerializer(levels, many=True).data, key=lambda level: level['ontology'])
-        # TODO ensure Sector has a blank option
+
+        serialized_leveltier_names = sorted(list(set(level['tier_name'] for level in serialized_levels)))
+        request_leveltier_names = sorted(request.GET.keys())
+        if serialized_leveltier_names != request_leveltier_names:
+            return JsonResponse({'error_code': ERROR_MISMATCHED_TIERS}, status=400)
+
+        wb = openpyxl.load_workbook(filename=BulkIndicatorImportFile.get_file_path(BASE_TEMPLATE_NAME))
+        ws = wb.worksheets[0]
+        hidden_ws = wb.get_sheet_by_name('Hidden')
+
+        # Handle the edge case where a user submits "0" rows for all tiers.  Not only does the  dropdown creation Data validation is only put on cells that are empty, so if there are no empty rows, we can skip the
+        # creation of dropdowns entirely.
         validation_map = {}
         uom_type_options = list(self.reverse_field_name_map['unit_of_measure_type'].keys())
         uom_type_validation = DataValidation(
             type="list", formula1=f'"{",".join(uom_type_options)}"', allow_blank=False)
-        validation_map["Number (#) or percentage (%)"] = uom_type_validation
+        validation_map[VALIDATION_KEY_UOM_TYPE] = uom_type_validation
 
         dir_change_options = list(self.reverse_field_name_map['direction_of_change'].keys())
         dir_change_validation = DataValidation(
             type="list", formula1=f'"{",".join(dir_change_options)}"', allow_blank=True)
-        validation_map["Direction of change"] = dir_change_validation
+        validation_map[VALIDATION_KEY_DIR_CHANGE] = dir_change_validation
 
         target_freq_options = list(self.reverse_field_name_map['target_frequency'].keys())
         target_freq_validation = DataValidation(
             type="list", formula1=f'"{",".join(target_freq_options)}"', allow_blank=False)
-        validation_map["Target frequency"] = target_freq_validation
+        validation_map[VALIDATION_KEY_TARGET_FREQ] = target_freq_validation
 
-        for dv in [uom_type_validation]:
-            dv.error = 'Your entry is not in the list'
-            dv.errorTitle = 'Invalid Entry'
-            dv.prompt = 'Please select from the list'
-            dv.promptTitle = 'List Selection'
+        # Can't do sector the same way as the others because there are too many.  There is a 256 char limit
+        # on putting options directly into the validation config.  Instead, the options will be referenced
+        # from a hidden sheet.
+        sector_options = [EMPTY_CHOICE] + [gettext(sector.sector) for sector in Sector.objects.order_by('sector')]
+        sectors_col = 'A'
+        sectors_start_row = 2
+        sectors_end_row = sectors_start_row + len(sector_options) - 1
+        for i, sector in enumerate(sector_options):
+            hidden_ws[f'{sectors_col}{i+2}'].value = sector
+        sector_range = f'${sectors_col}${sectors_start_row}:${sectors_col}${sectors_end_row}'
+        sector_validation = DataValidation(
+            type="list", formula1=f'{HIDDEN_SHEET_NAME}!{sector_range}', allow_blank=True)
+        validation_map[VALIDATION_KEY_SECTOR] = sector_validation
 
-        wb = openpyxl.load_workbook(filename=BulkIndicatorImportFile.get_file_path(BASE_TEMPLATE_NAME))
-        ws = wb.worksheets[0]
+        for dv in validation_map.values():
+            # Translators: Error message shown to a user when they have entered a value that is not in a list of approved values
+            dv.error = gettext('Your entry is not in the list')
+            # Translators:  Title of a popup box that informs the user they have entered an invalid value
+            dv.errorTitle = gettext('Invalid Entry')
+
+        # Spreadsheet loads as corrupted when validation is added to a sheet but no cells are assigned to the
+        # validation.
+        if sum(int(row_count) for row_count in request.GET.values()) > 0:
+            ws.add_data_validation(uom_type_validation)
+            ws.add_data_validation(dir_change_validation)
+            ws.add_data_validation(target_freq_validation)
+            ws.add_data_validation(sector_validation)
+
+
         wb.add_named_style(self.title_style)
         wb.add_named_style(self.level_header_style)
         wb.add_named_style(self.protected_indicator_style)
         wb.add_named_style(self.unprotected_indicator_style)
         wb.add_named_style(self.optional_header_style)
         wb.add_named_style(self.required_header_style)
-        ws.add_data_validation(uom_type_validation)
-        ws.add_data_validation(dir_change_validation)
-        ws.add_data_validation(target_freq_validation)
 
         last_used_column = self.first_used_column + len(COLUMNS) - 1
         # Translators: Heading placed in the cell of a spreadsheet that allows users to upload Indicators in bulk
@@ -221,14 +259,12 @@ class BulkImportIndicatorsView(LoginRequiredMixin, UserPassesTestMixin, AccessMi
                         # to a string does results in a cell value of "None" rather than an empty cell.
                         active_cell.value = raw_value if raw_value is None else str(raw_value)
                         active_cell.style = 'protected_indicator_style'
-                        if column['name'] in validation_map.keys():
-                            validator = validation_map[column['name']]
-                            validator.add(active_cell)
                     current_column_index += 1
                 current_row_index += 1
 
             letter_index = len(level['indicator_set'])
-            for i in range(20):
+            empty_row_count = int(request.GET[level['tier_name']])
+            for i in range(empty_row_count):
                 ws.row_dimensions[current_row_index].height = 16
                 letter_index += 1
                 i_letter = ''
@@ -240,10 +276,13 @@ class BulkImportIndicatorsView(LoginRequiredMixin, UserPassesTestMixin, AccessMi
 
                 ws.cell(current_row_index, self.first_used_column).value = level['tier_name']
                 ws.cell(current_row_index, self.first_used_column + 1).value = level['display_ontology'] + i_letter
-                for col_index in range(self.first_used_column, last_used_column + 1):
-                    ws.cell(current_row_index, col_index).style = 'unprotected_indicator_style'
+                for col_n, column in enumerate(COLUMNS):
+                    active_cell = ws.cell(current_row_index, self.first_used_column + col_n)
+                    active_cell.style = 'unprotected_indicator_style'
+                    if 'validation' in column:
+                        validator = validation_map[column['validation']]
+                        validator.add(active_cell)
                 current_row_index += 1
-
             current_row_index += 1
 
         ws.protection.enable()
@@ -317,7 +356,7 @@ class BulkImportIndicatorsView(LoginRequiredMixin, UserPassesTestMixin, AccessMi
                     try:
                         sector = Sector.objects.get(sector=cell_value)
                         indicator_data['sector'] = sector.pk
-                    except:
+                    except Sector.DoesNotExist:
                         # Set a value that will fail upon deserialization, so the error is attached to the
                         # indicator itself, rather than the workbook
                         indicator_data['sector'] = -1
@@ -392,7 +431,6 @@ def save_bulk_import_data(request, *args, **kwargs):
             program_id=kwargs['program_id'],
             file_type=BulkIndicatorImportFile.INDICATOR_DATA_TYPE)
     except BulkIndicatorImportFile.DoesNotExist:
-        bf = BulkIndicatorImportFile.objects.get(user=request.user.tola_user)
         return JsonResponse({'error_code': ERROR_INDICATOR_DATA_NOT_FOUND})
 
     with open(file_entry.file_path, 'r') as fh:
@@ -409,7 +447,7 @@ def save_bulk_import_data(request, *args, **kwargs):
 
 @login_required()
 @require_GET
-def get_redlined_bulk_import_template(request, *args, **kwargs):
+def get_feedback_bulk_import_template(request, *args, **kwargs):
     try:
         file_entry = BulkIndicatorImportFile.objects.get(
             user=request.user.tola_user,
