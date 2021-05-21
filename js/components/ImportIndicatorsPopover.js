@@ -199,8 +199,7 @@ export const ImportIndicatorsPopover = ({ program_id, tierLevelsUsed, page }) =>
                                     {intialViewError ?
                                         <div className="import-initial-text-error">
                                             {
-                                                // # Translators: Message to user that we cannot import the their file. This is because of it being the wrong file or the structure of the file was changed.
-                                                gettext("Sorry, we can’t import indicators from this file. This can happen if the wrong file is selected or the template structure was modified.")
+                                                errorCodes[intialViewError].message
                                             }
                                         </div>
                                     : null }
@@ -481,4 +480,32 @@ const LevelIndicatorCount = ({ level, i }) => {
             </Select>
         </div>
     )
+}
+
+// TODO: Add/Update error codes
+let errorCodes = {
+    100 : {
+        condition: "Program doesn't match",
+        message: 
+            // # Translators: Message to user that we cannot import the their file. This is because of it being the wrong file or the structure of the file was changed.
+            gettext("Sorry, we can’t import indicators from this file. This can happen if the wrong file is selected or the template structure was modified.")
+    },
+    101 : {
+        condition: "No new indicators",
+        message: 
+            // # Translators: Message to user that we cannot import the their file. This is because of it being the wrong file or the structure of the file was changed.
+            gettext("Sorry, we can’t import indicators from this file. This can happen if the wrong file is selected or the template structure was modified.")
+    },
+    102 : {
+        condition: "Undertermined Level",
+        message: 
+            // # Translators: Message to user that we cannot import the their file. This is because of it being the wrong file or the structure of the file was changed.
+            gettext("Sorry, we can’t import indicators from this file. This can happen if the wrong file is selected or the template structure was modified.")
+    },
+    103 : {
+        condition: "Template not found",
+        message: 
+            // # Translators: Message to user that we cannot import the their file. This is because of it being the wrong file or the structure of the file was changed.
+            gettext("Sorry, we can’t import indicators from this file. This can happen if the wrong file is selected or the template structure was modified.")
+    },
 }
