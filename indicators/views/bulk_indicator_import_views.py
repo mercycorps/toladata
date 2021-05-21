@@ -7,6 +7,7 @@ import json
 from datetime import datetime
 from openpyxl.styles import PatternFill, Alignment, Protection, Font, NamedStyle
 from openpyxl.worksheet.datavalidation import DataValidation
+from openpyxl.utils import get_column_letter
 from django.contrib.auth.decorators import login_required
 from django.contrib.auth.mixins import UserPassesTestMixin, LoginRequiredMixin, AccessMixin
 from django.utils.translation import gettext
@@ -82,6 +83,9 @@ class BulkImportIndicatorsView(LoginRequiredMixin, UserPassesTestMixin, AccessMi
     data_start_row = DATA_START_ROW
     program_name_row = PROGRAM_NAME_ROW
 
+    VERY_LIGHT_GRAY = 'FFF5F5F5'
+    LIGHT_GRAY = 'FFDBDCDE'
+
     title_style = NamedStyle('title_style')
     title_style.font = Font(name='Calibri', size=18)
     title_style.protection = Protection(locked=True)
@@ -93,11 +97,11 @@ class BulkImportIndicatorsView(LoginRequiredMixin, UserPassesTestMixin, AccessMi
 
     optional_header_style = NamedStyle('optional_header_style')
     optional_header_style.font = Font(name='Calibri', size=11, color='00000000')
-    optional_header_style.fill = PatternFill('solid', fgColor='FFF5F5F5')
+    optional_header_style.fill = PatternFill('solid', fgColor=VERY_LIGHT_GRAY)
     optional_header_style.protection = Protection(locked=False)
 
     level_header_style = NamedStyle('level_header_style')
-    level_header_style.fill = PatternFill('solid', fgColor='FFDBDCDE')
+    level_header_style.fill = PatternFill('solid', fgColor=LIGHT_GRAY)
     level_header_style.font = Font(name='Calibri', size=11)
     level_header_style.protection = Protection(locked=True)
 
@@ -208,15 +212,27 @@ class BulkImportIndicatorsView(LoginRequiredMixin, UserPassesTestMixin, AccessMi
         ws.cell(self.program_name_row, self.first_used_column).value = program.name
         ws.cell(2, self.first_used_column).style = 'title_style'
         # Translators: Instructions provided as part of an Excel template that allows users to upload Indicators
-        ws.cell(4, self.first_used_column).value = gettext(
+        instructions = gettext(
             "INSTRUCTIONS\n"
             "1. Indicator rows are provided for each result level. You can delete indicator rows you do not need. You can also leave them empty and they will be ignored.\n"
             "2. Required columns are highlighted with a dark background and an asterisk (*) in the header row. Unrequired columns can be left empty but cannot be deleted.\n"
             "3. When you are done, upload the template to the results framework or program page."
         )
 
+        ws.cell(4, self.first_used_column).value = instructions
+        ws.cell(4, self.first_used_column).fill = PatternFill('solid', fgColor=self.LIGHT_GRAY)
         # Translators: Section header of an Excel template that allows users to upload Indicators.  This section is where users will add their own information.
         ws.cell(5, self.first_used_column).value = gettext("Enter indicators")
+
+        # Need to make sure the instructions are covered by merged cells
+        max_line_width = max([len(line) for line in instructions.split('\n')])
+        required_width = .7 * max_line_width
+        merged_width = 0
+        max_merge_col_index = 1
+        while merged_width < required_width:
+            merged_width += ws.column_dimensions[get_column_letter(max_merge_col_index)].width
+            max_merge_col_index += 1
+        ws.merge_cells(start_row=4, start_column=2, end_row=4, end_column=max_merge_col_index)
 
         for i, header in enumerate(COLUMNS):
             header_cell = ws.cell(6, i+2)
