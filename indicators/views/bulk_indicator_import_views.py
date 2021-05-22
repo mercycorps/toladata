@@ -6,7 +6,7 @@ import os
 import json
 from datetime import datetime
 from openpyxl.comments import Comment
-from openpyxl.styles import PatternFill, Alignment, Protection, Font, NamedStyle
+from openpyxl.styles import PatternFill, Alignment, Protection, Font, NamedStyle, Border, Side
 from openpyxl.worksheet.datavalidation import DataValidation
 from openpyxl.utils import get_column_letter
 from django.contrib.auth.decorators import login_required
@@ -84,8 +84,11 @@ class BulkImportIndicatorsView(LoginRequiredMixin, UserPassesTestMixin, AccessMi
     data_start_row = DATA_START_ROW
     program_name_row = PROGRAM_NAME_ROW
 
-    VERY_LIGHT_GRAY = 'FFF5F5F5'
-    LIGHT_GRAY = 'FFDBDCDE'
+    GRAY_LIGHTEST = 'FFF5F5F5'
+    GRAY_LIGHTER = 'FFDBDCDE'
+    GRAY_DARK = 'FF54585A'
+
+    default_border = Side(border_style='thin', color=GRAY_LIGHTER)
 
     title_style = NamedStyle('title_style')
     title_style.font = Font(name='Calibri', size=18)
@@ -98,16 +101,19 @@ class BulkImportIndicatorsView(LoginRequiredMixin, UserPassesTestMixin, AccessMi
 
     optional_header_style = NamedStyle('optional_header_style')
     optional_header_style.font = Font(name='Calibri', size=11, color='00000000')
-    optional_header_style.fill = PatternFill('solid', fgColor=VERY_LIGHT_GRAY)
+    optional_header_style.fill = PatternFill('solid', fgColor=GRAY_LIGHTEST)
     optional_header_style.protection = Protection(locked=False)
 
     level_header_style = NamedStyle('level_header_style')
-    level_header_style.fill = PatternFill('solid', fgColor=LIGHT_GRAY)
+    level_header_style.fill = PatternFill('solid', fgColor=GRAY_LIGHTER)
     level_header_style.font = Font(name='Calibri', size=11)
     level_header_style.protection = Protection(locked=True)
 
     protected_indicator_style = NamedStyle('protected_indicator_style')
-    protected_indicator_style.font = Font(name='Calibri', size=11)
+    protected_indicator_style.fill = PatternFill('solid', fgColor=GRAY_LIGHTEST)
+    protected_indicator_style.font = Font(name='Calibri', size=11, color=GRAY_DARK)
+    protected_indicator_style.border = Border(
+        left=default_border, right=default_border, top=default_border, bottom=default_border)
     protected_indicator_style.alignment = Alignment(vertical='top')
     protected_indicator_style.protection = Protection(locked=True)
 
@@ -221,19 +227,9 @@ class BulkImportIndicatorsView(LoginRequiredMixin, UserPassesTestMixin, AccessMi
         )
 
         ws.cell(4, self.first_used_column).value = instructions
-        ws.cell(4, self.first_used_column).fill = PatternFill('solid', fgColor=self.LIGHT_GRAY)
+        ws.cell(4, self.first_used_column).fill = PatternFill('solid', fgColor=self.GRAY_LIGHTER)
         # Translators: Section header of an Excel template that allows users to upload Indicators.  This section is where users will add their own information.
         ws.cell(5, self.first_used_column).value = gettext("Enter indicators")
-
-        # Need to make sure the instructions are covered by merged cells
-        max_line_width = max([len(line) for line in instructions.split('\n')])
-        required_width = .7 * max_line_width
-        merged_width = 0
-        max_merge_col_index = 1
-        while merged_width < required_width:
-            merged_width += ws.column_dimensions[get_column_letter(max_merge_col_index)].width
-            max_merge_col_index += 1
-        ws.merge_cells(start_row=4, start_column=2, end_row=4, end_column=max_merge_col_index)
 
         for i, header in enumerate(COLUMNS):
             column_index = i+2
@@ -265,6 +261,18 @@ class BulkImportIndicatorsView(LoginRequiredMixin, UserPassesTestMixin, AccessMi
                 col_width = max(len(option) for option in target_freq_options)
                 ws.column_dimensions[get_column_letter(column_index)].width = col_width
 
+        # Need to make sure the instructions are covered by merged cells and that cell widths are cacluated
+        # after the individual header cells have been styled
+        max_line_width = max([len(line) for line in instructions.split('\n')])
+        required_width = .8 * max_line_width
+        merged_width = 0
+        max_merge_col_index = 2
+        while merged_width < required_width:
+            merged_width += ws.column_dimensions[get_column_letter(max_merge_col_index)].width
+            max_merge_col_index += 1
+        ws.merge_cells(start_row=4, start_column=2, end_row=4, end_column=max_merge_col_index - 1)
+
+
         current_row_index = self.data_start_row
         for level in serialized_levels:
             ws.cell(current_row_index, self.first_used_column)\
@@ -282,24 +290,25 @@ class BulkImportIndicatorsView(LoginRequiredMixin, UserPassesTestMixin, AccessMi
                 first_indicator_cell = ws.cell(current_row_index, current_column_index)
                 first_indicator_cell.value = gettext(level['tier_name'])
                 first_indicator_cell.style = 'protected_indicator_style'
-                first_indicator_cell.font = Font(bold=True)
+                first_indicator_cell.border = Border(
+                    left=None, right=self.default_border, top=self.default_border, bottom=self.default_border)
 
                 current_column_index += 1
                 ws.row_dimensions[current_row_index].height = 16
                 for column in COLUMNS[1:]:
                     active_cell = ws.cell(current_row_index, current_column_index)
-                    # TODO: this will need to accommodate manually numbered fields
                     if column['field_name'] == 'number':
-                        active_cell.value = \
-                            level['display_ontology'] + indicator['display_ontology_letter']
-                        active_cell.style = 'protected_indicator_style'
-                        active_cell.font = Font(bold=True)
+                        if program.auto_number_indicators:
+                            active_cell.value = \
+                                level['display_ontology'] + indicator['display_ontology_letter']
+                        else:
+                            active_cell.value = indicator['number']
                     else:
                         raw_value = indicator.get(column['field_name'], None)
                         # These are potentially translated objects that need to be resolved, but converting None
                         # to a string does results in a cell value of "None" rather than an empty cell.
                         active_cell.value = raw_value if raw_value is None else str(raw_value)
-                        active_cell.style = 'protected_indicator_style'
+                    active_cell.style = 'protected_indicator_style'
                     current_column_index += 1
                 current_row_index += 1
 
@@ -307,16 +316,17 @@ class BulkImportIndicatorsView(LoginRequiredMixin, UserPassesTestMixin, AccessMi
             empty_row_count = int(request.GET[gettext(level['tier_name'])])
             for i in range(empty_row_count):
                 ws.row_dimensions[current_row_index].height = 16
-                letter_index += 1
-                i_letter = ''
-                if letter_index < 26:
-                    i_letter = string.ascii_lowercase[letter_index]
-                elif letter_index >= 26:
-                    i_letter = string.ascii_lowercase[
-                        letter_index // 26 - 1] + string.ascii_lowercase[letter_index % 26]
-
                 ws.cell(current_row_index, self.first_used_column).value = gettext(level['tier_name'])
-                ws.cell(current_row_index, self.first_used_column + 1).value = level['display_ontology'] + i_letter
+                if program.auto_number_indicators:
+                    letter_index += 1
+                    i_letter = ''
+                    if letter_index < 26:
+                        i_letter = string.ascii_lowercase[letter_index]
+                    elif letter_index >= 26:
+                        i_letter = string.ascii_lowercase[
+                            letter_index // 26 - 1] + string.ascii_lowercase[letter_index % 26]
+                    ws.cell(current_row_index, self.first_used_column + 1).value = level['display_ontology'] + i_letter
+
                 for col_n, column in enumerate(COLUMNS):
                     active_cell = ws.cell(current_row_index, self.first_used_column + col_n)
                     active_cell.style = 'unprotected_indicator_style'
