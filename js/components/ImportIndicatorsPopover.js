@@ -6,6 +6,9 @@ import api from '../apiv2';
 
 export const ImportIndicatorsContext = React.createContext();
 
+// **********************************************
+// ***** Import Indicators Button Component *****
+// **********************************************
 export class ImportIndicatorsButton extends BootstrapPopoverButton {
     // Overriding variables in the BootstrapPopoverButton
     popoverName = "importIndicators";
@@ -13,6 +16,17 @@ export class ImportIndicatorsButton extends BootstrapPopoverButton {
 
     constructor(props) {
         super(props);
+        this.state = {
+            tierLevelsUsed: [],
+            storedTierLevelsRows: [], // TODO: Clear this state after inactive times out
+            setStoredTierLevelsRows: this.setStoredTierLevelsRows,
+        }
+    }
+
+    setStoredTierLevelsRows = (updatedTierLevelsRow) => {
+        this.setState({
+            storedTierLevelsRows: updatedTierLevelsRow
+        })
     }
 
     // Overriding a method in the BootstrapPopoverButton and provides the content for when the Import indicators button is clicked
@@ -28,7 +42,13 @@ export class ImportIndicatorsButton extends BootstrapPopoverButton {
             tierLevelsUsed[level.level_depth - 1].used = true;
         })
         return (
-                <ImportIndicatorsPopover program_id={ this.props.program_id } tierLevelsUsed={ tierLevelsUsed } page={ this.props.page } />
+                <ImportIndicatorsPopover 
+                    page={ this.props.page } 
+                    program_id={ this.props.program_id } 
+                    tierLevelsUsed={ tierLevelsUsed } 
+                    storedTierLevelsRows={ this.state.storedTierLevelsRows }
+                    setStoredTierLevelsRows={ this.state.setStoredTierLevelsRows }
+                />
         );
     }
 
@@ -36,6 +56,7 @@ export class ImportIndicatorsButton extends BootstrapPopoverButton {
         return (
                 <React.Fragment>
                     <button
+                    id="importButton"
                     role="button"
                     type="button"
                     ref="target"
@@ -52,8 +73,10 @@ export class ImportIndicatorsButton extends BootstrapPopoverButton {
     }
 }
 
-export const ImportIndicatorsPopover = ({ program_id, tierLevelsUsed, page }) => {
-
+// ***************************************
+// ***** Import Indicators Component *****
+// ***************************************
+export const ImportIndicatorsPopover = ({ page, program_id, tierLevelsUsed, storedTierLevelsRows, setStoredTierLevelsRows }) => {
     // These define the different cases/views of the Popover to switch between.
     let INITIAL = 0;
     let FEEDBACK = 1;
@@ -68,14 +91,25 @@ export const ImportIndicatorsPopover = ({ program_id, tierLevelsUsed, page }) =>
     const [invalidIndicatorsCount, setInvalidIndicatorsCount] = useState(0); // Number of indicators that have failed validation and needs fixing
     const [tierLevelsRows, setTierLevelsRows] = useState([]); // State to hold the tier levels name and the desired number of rows for the excel template
     const [intialViewError, setInitialViewError] = useState(null);
-    // Default number of rows per level is set to 10 or 20 on mount.
+
     useEffect(() => {
-        let level = [];
-        tierLevelsUsed.map((tier, i) => {
-            level[i] =  { name: tier.name, rows: i < tierLevelsUsed.length - 2 ? 10 : 20 };
-        })
-        setTierLevelsRows(level);
+        if (storedTierLevelsRows.length > 0) {
+            // Use stored tier levels rows count if selected previously and still available/active
+            setTierLevelsRows(storedTierLevelsRows);
+            $('#optionsForm').collapse('show') // Open Advanced optio
+        } else {
+            let defaultTierLevelRows = [];
+            tierLevelsUsed.map((tier, i) => {
+                // Default number of rows per level is set to 10 or 20 on mount.
+                defaultTierLevelRows[i] =  { name: tier.name, rows: i < tierLevelsUsed.length - 2 ? 10 : 20 };
+            })
+            setTierLevelsRows(defaultTierLevelRows);
+        }
     }, [])
+
+    useEffect(() => {
+        setStoredTierLevelsRows(tierLevelsRows);
+    }, [tierLevelsRows])
 
     // Download template file providing the program ID and number of rows per tier level
     let handleDownload = () => {
@@ -198,14 +232,17 @@ export const ImportIndicatorsPopover = ({ program_id, tierLevelsUsed, page }) =>
                                     </ol>
                                     {intialViewError ?
                                         <div className="import-initial-text-error">
-                                            {
-                                                errorCodes[intialViewError].message
-                                            }
+                                            { errorCodes[intialViewError].message }
                                         </div>
                                     : null }
                                 </div>
 
-                                <ImportIndicatorsContext.Provider value={{ tierLevelsUsed: tierLevelsUsed, tierLevelsRows: tierLevelsRows, setTierLevelsRows: setTierLevelsRows }}>
+                                <ImportIndicatorsContext.Provider 
+                                    value={{ 
+                                        tierLevelsUsed: tierLevelsUsed, 
+                                        tierLevelsRows: tierLevelsRows, 
+                                        setTierLevelsRows: setTierLevelsRows,
+                                    }}>
                                     <AdvancedImport />
                                 </ImportIndicatorsContext.Provider>
 
@@ -376,11 +413,22 @@ export const ImportIndicatorsPopover = ({ program_id, tierLevelsUsed, page }) =>
         </React.Fragment>
     )
 }
-
+// *************************************
+// ***** Advanced Import Component *****
+// *************************************
 const AdvancedImport = () => {
     const { tierLevelsRows } = useContext(ImportIndicatorsContext);
 
     const [expanded, setExpanded] = useState(false);
+
+    useEffect(() => {
+        $('#optionsForm').on('show.bs.collapse', function() {
+            setExpanded(true)
+        })
+        $('#optionsForm').on('hide.bs.collapse', function() {
+            setExpanded(false)
+        })
+    }, [])
 
     return (
         <div className="import-advanced">
@@ -393,7 +441,6 @@ const AdvancedImport = () => {
                     role="button"
                     aria-expanded={ expanded }
                     aria-controls="optionsForm"
-                    onClick={ () => setExpanded(!expanded) }
                     >
                         {
                             // # Translators: Click to view the Advanced Option section
@@ -414,6 +461,9 @@ const AdvancedImport = () => {
     )
 }
 
+// **************************************
+// ***** LeveL Indicator Count Rows *****
+// **************************************
 const LevelIndicatorCount = ({ level, i }) => {
     const { tierLevelsUsed, tierLevelsRows, setTierLevelsRows } = useContext(ImportIndicatorsContext);
 
@@ -472,7 +522,7 @@ const LevelIndicatorCount = ({ level, i }) => {
                 id={ level.name }
                 className="level-count-options"
                 options={options}
-                value={ {value: level.rows, label: level.rows} }
+                defaultValue={ {value: level.rows, label: level.rows} }
                 isDisabled={!tierLevelsUsed[i].used}
                 onChange={ (event) => handleSelect(event) }
                 styles={customStyles}
@@ -481,31 +531,64 @@ const LevelIndicatorCount = ({ level, i }) => {
         </div>
     )
 }
-
+// *******************************
+// ***** Error Code Messages *****
+// *******************************
 // TODO: Add/Update error codes
 let errorCodes = {
     100 : {
-        condition: "Program doesn't match",
+        type: "Program doesn't match",
         message: 
             // # Translators: Message to user that we cannot import the their file. This is because of it being the wrong file or the structure of the file was changed.
             gettext("Sorry, we can’t import indicators from this file. This can happen if the wrong file is selected or the template structure was modified.")
     },
     101 : {
-        condition: "No new indicators",
+        type: "No new indicators",
         message: 
-            // # Translators: Message to user that we cannot import the their file. This is because of it being the wrong file or the structure of the file was changed.
-            gettext("Sorry, we can’t import indicators from this file. This can happen if the wrong file is selected or the template structure was modified.")
+            // # Translators: Messsage to user that there aren't any new indicators in the uploaded file.
+            gettext("Sorry, we can’t find any indicators in this file.")
     },
     102 : {
-        condition: "Undertermined Level",
+        type: "Undertermined Level",
         message: 
             // # Translators: Message to user that we cannot import the their file. This is because of it being the wrong file or the structure of the file was changed.
             gettext("Sorry, we can’t import indicators from this file. This can happen if the wrong file is selected or the template structure was modified.")
     },
     103 : {
-        condition: "Template not found",
+        type: "Template not found",
         message: 
             // # Translators: Message to user that we cannot import the their file. This is because of it being the wrong file or the structure of the file was changed.
             gettext("Sorry, we can’t import indicators from this file. This can happen if the wrong file is selected or the template structure was modified.")
     },
+    104 : {
+        type: "Mismatch tiers",
+        message: 
+            // # Translators: Message to user that we cannot import the their file. This is because of it being the wrong file or the structure of the file was changed.
+            gettext("Sorry, we can’t import indicators from this file. This can happen if the wrong file is selected or the template structure was modified.")
+    },
+    105 : {
+        type: "Indicator data not found",
+        message: 
+            // # Translators: Message to user that we cannot import the their file. This is because of it being the wrong file or the structure of the file was changed.
+            gettext("Sorry, we can’t import indicators from this file. This can happen if the wrong file is selected or the template structure was modified.")
+    },
+    200 : {
+        type: "Invalid level header",
+        message: 
+            // # Translators: Message to user that we cannot import the their file. This is because of it being the wrong file or the structure of the file was changed.
+            gettext("Sorry, we can’t import indicators from this file. This can happen if the wrong file is selected or the template structure was modified.")
+    },
+    201 : {
+        type: "Malformed indicator",
+        message: 
+            // # Translators: Message to user that we cannot import the their file. This is because of it being the wrong file or the structure of the file was changed.
+            gettext("Sorry, we can’t import indicators from this file. This can happen if the wrong file is selected or the template structure was modified.")
+    },
+    202 : {
+        type: "Indicators out of order",
+        message: 
+            // # Translators: Message to user that we cannot import the their file. This is because there is one or more indicators that are out of order. Users should visit the results framework page and rearrange indicators.
+            gettext("Sorry, we can't import indicators from this file. One or more indicators is out of order. To rearrange saved indicators, please visit the results framework.")
+    },
+
 }
