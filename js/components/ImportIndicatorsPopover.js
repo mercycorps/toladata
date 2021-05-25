@@ -5,7 +5,7 @@ import { BootstrapPopoverButton } from './helpPopover';
 import api from '../apiv2';
 
 export const ImportIndicatorsContext = React.createContext();
-
+let inactiveTimer
 // **********************************************
 // ***** Import Indicators Button Component *****
 // **********************************************
@@ -24,9 +24,15 @@ export class ImportIndicatorsButton extends BootstrapPopoverButton {
     }
 
     setStoredTierLevelsRows = (updatedTierLevelsRow) => {
+        clearTimeout(inactiveTimer);
         this.setState({
             storedTierLevelsRows: updatedTierLevelsRow
         })
+        inactiveTimer = setTimeout(() => {
+            this.setState({
+                storedTierLevelsRows: []
+            })
+        }, 60000)
     }
 
     // Overriding a method in the BootstrapPopoverButton and provides the content for when the Import indicators button is clicked
