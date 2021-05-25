@@ -61,7 +61,7 @@ export class ImportIndicatorsButton extends React.Component {
                     storedView: {},
                     storedTierLevelsRows: [],
                 })
-            }, 10000)
+            }, 60000)
         })
 
         // Clear inactive timer if popover is opened before time runs out
