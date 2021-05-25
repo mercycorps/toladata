@@ -5,7 +5,7 @@ import Select from 'react-select';
 import api from '../apiv2';
 
 export const ImportIndicatorsContext = React.createContext();
-let inactiveTimer
+
 // **********************************************
 // ***** Import Indicators Button Component *****
 // **********************************************
@@ -16,6 +16,7 @@ export class ImportIndicatorsButton extends React.Component {
     constructor(props) {
         super(props);
         this.state = {
+            inactiveTimer: null,
             tierLevelsUsed: [],
             storedView: {},
             setStoredView: this.setStoredView,
@@ -56,17 +57,19 @@ export class ImportIndicatorsButton extends React.Component {
 
         // Clear stored state if time runs out
         $(this.refs.target).on('hide.bs.popover', () => {
-            inactiveTimer = setTimeout(() => {
-                this.setState({
-                    storedView: {},
-                    storedTierLevelsRows: [],
-                })
-            }, 60000)
+            this.setState({
+                inactiveTimer: setTimeout(() => {
+                    this.setState({
+                        storedView: {},
+                        storedTierLevelsRows: [],
+                    })
+                }, 60000)
+            })
         })
 
         // Clear inactive timer if popover is opened before time runs out
         $(this.refs.target).on('show.bs.popover', () => {
-            clearTimeout(inactiveTimer);
+            clearTimeout(this.state.inactiveTimer);
         })
     }
     // Method to store the current popover view and valid/invalid row counts if available
