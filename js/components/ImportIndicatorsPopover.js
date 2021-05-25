@@ -1,7 +1,7 @@
 import React, { useState, useContext, useEffect } from 'react';
+import ReactDOM from 'react-dom';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import Select from 'react-select';
-import { BootstrapPopoverButton } from './helpPopover';
 import api from '../apiv2';
 
 export const ImportIndicatorsContext = React.createContext();
@@ -9,8 +9,7 @@ let inactiveTimer
 // **********************************************
 // ***** Import Indicators Button Component *****
 // **********************************************
-export class ImportIndicatorsButton extends BootstrapPopoverButton {
-    // Overriding variables in the BootstrapPopoverButton
+export class ImportIndicatorsButton extends React.Component {
     popoverName = "importIndicators";
     popoverTitle = gettext("Import indicators");
 
@@ -20,30 +19,70 @@ export class ImportIndicatorsButton extends BootstrapPopoverButton {
             tierLevelsUsed: [],
             storedView: {},
             setStoredView: this.setStoredView,
-            storedTierLevelsRows: [], // TODO: Clear this state after inactive times out
+            storedTierLevelsRows: [],
             setStoredTierLevelsRows: this.setStoredTierLevelsRows,
         }
     }
 
+    componentDidMount = () => {
+        // make a cancelable (class method) function so clicking out of the popover will close it:
+        this.bodyClickHandler = (ev) => {
+            if ($(`#${this.popoverName}_popover_content`).parent().find($(ev.target)).length == 0) {
+                $(this.refs.target).popover('hide');
+            }
+        }
+        const popoverOpenHandler = () => {
+            // first make it so any click outside of the popover will hide it:
+            $('body').on('click', this.bodyClickHandler);
+            // update position (it's had content loaded):
+            $(this.refs.target).popover('update')
+                //when it hides destroy the body clickhandler:
+                .on('hide.bs.popover', () => {$('body').off('click', this.bodyClickHandler);});
+        };
+        const shownFn = (ev) => {
+            ReactDOM.render(
+                this.getPopoverContent(),
+                document.querySelector(`#${this.popoverName}_popover_content`),
+                popoverOpenHandler
+            );
+        };
+        $(this.refs.target).popover({
+            content: `<div id="${this.popoverName}_popover_content"></div>`,
+            title: this.popoverTitle ? `<div>${this.popoverTitle}</div>` : "",
+            html: true,
+            placement: 'bottom',
+            boundary: 'viewport',
+        }).on('shown.bs.popover', shownFn);
+
+        // Clear stored state if time runs out
+        $(this.refs.target).on('hide.bs.popover', () => {
+            inactiveTimer = setTimeout(() => {
+                this.setState({
+                    storedView: {},
+                    storedTierLevelsRows: [],
+                })
+            }, 10000)
+        })
+
+        // Clear inactive timer if popover is opened before time runs out
+        $(this.refs.target).on('show.bs.popover', () => {
+            clearTimeout(inactiveTimer);
+        })
+    }
+    // Method to store the current popover view and valid/invalid row counts if available
     setStoredView = (view) => {
         this.setState({
             storedView: view
         })
     }
-
+    // Method to store the selected desired number of tier level rows
     setStoredTierLevelsRows = (updatedTierLevelsRow) => {
-        clearTimeout(inactiveTimer);
         this.setState({
             storedTierLevelsRows: updatedTierLevelsRow
         })
-        inactiveTimer = setTimeout(() => {
-            this.setState({
-                storedTierLevelsRows: []
-            })
-        }, 60000)
     }
 
-    // Overriding a method in the BootstrapPopoverButton and provides the content for when the Import indicators button is clicked
+    // Provides the content for when the Import indicators button is clicked
     getPopoverContent = () => {
         let tierLevelsUsed = [];
         this.props.chosenTiers.map((tier, i) => {
@@ -119,19 +158,18 @@ export const ImportIndicatorsPopover = ({ page, program_id, tierLevelsUsed, stor
             defaultTierLevelRows[i] =  { name: tier.name, rows: i < tierLevelsUsed.length - 2 ? 10 : 20 };
         })
 
-        // Use stored tier levels rows count if selected previously and still available/active
-        if (storedTierLevelsRows.length > 0) {
+        // Use stored tier levels rows count if it was selected previously before closing and is still available/active
+        if (storedTierLevelsRows.length > 0 && JSON.stringify(storedTierLevelsRows) !== JSON.stringify(defaultTierLevelRows)) {
             setTierLevelsRows(storedTierLevelsRows);
-            $('#optionsForm').collapse('show') // Open Advanced option
+            $('#optionsForm').collapse('show') // Open Advanced option collapsible because the row count is different than the default row count
         } else {
             setTierLevelsRows(defaultTierLevelRows);
         }
     }, [])
 
+    // Store the tier level row count when selections are made
     useEffect(() => {
-        if (storedTierLevelsRows.length === 0) {
-            setStoredTierLevelsRows(tierLevelsRows);
-        }
+        setStoredTierLevelsRows(tierLevelsRows);
     }, [tierLevelsRows])
 
     // Download template file providing the program ID and number of rows per tier level
@@ -240,7 +278,7 @@ export const ImportIndicatorsPopover = ({ page, program_id, tierLevelsUsed, stor
         <React.Fragment>
             {(() => {
                 switch(views) {
-                    // View for downloading and uploading the template
+                    // ***** View for downloading and uploading the template *****
                     case INITIAL:
                         return (
                             <div className="import-initial">
@@ -307,7 +345,7 @@ export const ImportIndicatorsPopover = ({ page, program_id, tierLevelsUsed, stor
                                 </div>
                             </div>
                         );
-                    // View to provide error feedback on their uploaded template
+                    // ***** View to provide error feedback on their uploaded template *****
                     case FEEDBACK:
                         return (
                             <div className="import-feedback">
@@ -347,7 +385,7 @@ export const ImportIndicatorsPopover = ({ page, program_id, tierLevelsUsed, stor
                                 </a>
                             </div>
                         )
-                    // View to ask users to confirm the upload
+                    // ***** View to ask users to confirm the upload *****
                     case CONFIRM:
                         return (
                             <div className="import-confirm">
@@ -390,7 +428,7 @@ export const ImportIndicatorsPopover = ({ page, program_id, tierLevelsUsed, stor
                                 </div>
                             </div>
                         )
-                    // View for a successful upload (May or may not be needed if using PNotify)
+                    // ***** View for a successful upload *****
                     case SUCCESS:
                         return (
                             <div className="import-success">
@@ -415,7 +453,7 @@ export const ImportIndicatorsPopover = ({ page, program_id, tierLevelsUsed, stor
                                 }
                             </div>
                         )
-                    // TODO: View for when an API call fails
+                    // TODO: ***** View for when an API call fails *****
                     case ERROR:
                         return (
                             <div className="import-error">
@@ -601,6 +639,12 @@ let errorCodes = {
             // # Translators: Message to user that we cannot import the their file. This is because of it being the wrong file or the structure of the file was changed.
             gettext("Sorry, we can’t import indicators from this file. This can happen if the wrong file is selected or the template structure was modified.")
     },
+    106 : {
+        type: "Someone else uploaded a template in the last 24 hours",
+        message: 
+            // # Translators: Message to user that someone else has uploaded a template in the last 24 hours and may be in the process of importing indicators to this program. You can view the program change log to see more details.
+            gettext("Someone else uploaded a template in the last 24 hours, and may be in the process of adding indicators to this program. View the program change log for more details.")
+    },
     200 : {
         type: "Invalid level header",
         message: 
@@ -618,11 +662,5 @@ let errorCodes = {
         message: 
             // # Translators: Message to user that we cannot import the their file. This is because there is one or more indicators that are out of order. Users should visit the results framework page and rearrange indicators.
             gettext("Sorry, we can't import indicators from this file. One or more indicators is out of order. To rearrange saved indicators, please visit the results framework.")
-    },
-    300 : {
-        type: "Someone else uploaded a template in the last 24 hours",
-        message: 
-            // # Translators: Message to user that someone else has uploaded a template in the last 24 hours and may be in the process of importing indicators to this program. You can view the program change log to see more details.
-            gettext("Someone else uploaded a template in the last 24 hours, and may be in the process of adding indicators to this program. View the program change log for more details.")
     },
 }
