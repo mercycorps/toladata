@@ -18,9 +18,17 @@ export class ImportIndicatorsButton extends BootstrapPopoverButton {
         super(props);
         this.state = {
             tierLevelsUsed: [],
+            storedView: {},
+            setStoredView: this.setStoredView,
             storedTierLevelsRows: [], // TODO: Clear this state after inactive times out
             setStoredTierLevelsRows: this.setStoredTierLevelsRows,
         }
+    }
+
+    setStoredView = (view) => {
+        this.setState({
+            storedView: view
+        })
     }
 
     setStoredTierLevelsRows = (updatedTierLevelsRow) => {
@@ -52,6 +60,8 @@ export class ImportIndicatorsButton extends BootstrapPopoverButton {
                     page={ this.props.page } 
                     program_id={ this.props.program_id } 
                     tierLevelsUsed={ tierLevelsUsed } 
+                    storedView={ this.state.storedView }
+                    setStoredView={ this.state.setStoredView }
                     storedTierLevelsRows={ this.state.storedTierLevelsRows }
                     setStoredTierLevelsRows={ this.state.setStoredTierLevelsRows }
                 />
@@ -82,7 +92,7 @@ export class ImportIndicatorsButton extends BootstrapPopoverButton {
 // ***************************************
 // ***** Import Indicators Component *****
 // ***************************************
-export const ImportIndicatorsPopover = ({ page, program_id, tierLevelsUsed, storedTierLevelsRows, setStoredTierLevelsRows }) => {
+export const ImportIndicatorsPopover = ({ page, program_id, tierLevelsUsed, storedTierLevelsRows, setStoredTierLevelsRows, storedView, setStoredView }) => {
     // These define the different cases/views of the Popover to switch between.
     let INITIAL = 0;
     let FEEDBACK = 1;
@@ -98,23 +108,30 @@ export const ImportIndicatorsPopover = ({ page, program_id, tierLevelsUsed, stor
     const [tierLevelsRows, setTierLevelsRows] = useState([]); // State to hold the tier levels name and the desired number of rows for the excel template
     const [intialViewError, setInitialViewError] = useState(null);
 
+    let defaultTierLevelRows = [];
     useEffect(() => {
+        storedView.view ? setViews(storedView.view) : null;
+        storedView.valid ? setvalidIndicatorsCount(storedView.valid) : null;
+        storedView.invalid ? setInvalidIndicatorsCount(storedView.invalid) : null;
+
+        tierLevelsUsed.map((tier, i) => {
+            // Default number of rows per level is set to 10 or 20 on mount.
+            defaultTierLevelRows[i] =  { name: tier.name, rows: i < tierLevelsUsed.length - 2 ? 10 : 20 };
+        })
+
+        // Use stored tier levels rows count if selected previously and still available/active
         if (storedTierLevelsRows.length > 0) {
-            // Use stored tier levels rows count if selected previously and still available/active
             setTierLevelsRows(storedTierLevelsRows);
-            $('#optionsForm').collapse('show') // Open Advanced optio
+            $('#optionsForm').collapse('show') // Open Advanced option
         } else {
-            let defaultTierLevelRows = [];
-            tierLevelsUsed.map((tier, i) => {
-                // Default number of rows per level is set to 10 or 20 on mount.
-                defaultTierLevelRows[i] =  { name: tier.name, rows: i < tierLevelsUsed.length - 2 ? 10 : 20 };
-            })
             setTierLevelsRows(defaultTierLevelRows);
         }
     }, [])
 
     useEffect(() => {
-        setStoredTierLevelsRows(tierLevelsRows);
+        if (storedTierLevelsRows.length === 0) {
+            setStoredTierLevelsRows(tierLevelsRows);
+        }
     }, [tierLevelsRows])
 
     // Download template file providing the program ID and number of rows per tier level
@@ -150,7 +167,13 @@ export const ImportIndicatorsPopover = ({ page, program_id, tierLevelsUsed, stor
                         if (!response.error) {
                             setvalidIndicatorsCount(response.valid);
                             setInvalidIndicatorsCount(response.invalid);
-                            response.invalid === 0 ? setViews(CONFIRM) : setViews(FEEDBACK);
+                            if (response.invalid === 0) {
+                                setViews(CONFIRM);
+                                setStoredView({view: CONFIRM, valid: response.valid});
+                            } else {
+                                setViews(FEEDBACK);
+                                setStoredView({view: FEEDBACK, valid: response.valid, invalid: response.invalid});
+                            }
                         } else {
                             setViews(ERROR)
                         }
@@ -596,5 +619,10 @@ let errorCodes = {
             // # Translators: Message to user that we cannot import the their file. This is because there is one or more indicators that are out of order. Users should visit the results framework page and rearrange indicators.
             gettext("Sorry, we can't import indicators from this file. One or more indicators is out of order. To rearrange saved indicators, please visit the results framework.")
     },
-
+    300 : {
+        type: "Someone else uploaded a template in the last 24 hours",
+        message: 
+            // # Translators: Message to user that someone else has uploaded a template in the last 24 hours and may be in the process of importing indicators to this program. You can view the program change log to see more details.
+            gettext("Someone else uploaded a template in the last 24 hours, and may be in the process of adding indicators to this program. View the program change log for more details.")
+    },
 }
