@@ -75,6 +75,13 @@ ERROR_MALFORMED_INDICATOR = 201
 
 EMPTY_CHOICE = '---------'
 
+TITLE_STYLE = 'title_style'
+REQUIRED_HEADER_STYLE = 'required_header_style'
+OPTIONAL_HEADER_STYLE = 'optional_header_style'
+LEVEL_HEADER_STYLE = 'level_header_style'
+PROTECTED_INDICATOR_STYLE = 'protected_indicator_style'
+UNPROTECTED_INDICATOR_STYLE = 'unprotected_indicator_style'
+
 
 class BulkImportIndicatorsView(LoginRequiredMixin, UserPassesTestMixin, AccessMixin, View):
     """Returns bulk import .xlsx file"""
@@ -90,26 +97,26 @@ class BulkImportIndicatorsView(LoginRequiredMixin, UserPassesTestMixin, AccessMi
 
     default_border = Side(border_style='thin', color=GRAY_LIGHTER)
 
-    title_style = NamedStyle('title_style')
+    title_style = NamedStyle(TITLE_STYLE)
     title_style.font = Font(name='Calibri', size=18)
     title_style.protection = Protection(locked=True)
 
-    required_header_style = NamedStyle('required_header_style')
+    required_header_style = NamedStyle(REQUIRED_HEADER_STYLE)
     required_header_style.font = Font(name='Calibri', size=11, color='FFFFFFFF')
     required_header_style.fill = PatternFill('solid', fgColor='00000000')
     required_header_style.protection = Protection(locked=True)
 
-    optional_header_style = NamedStyle('optional_header_style')
+    optional_header_style = NamedStyle(OPTIONAL_HEADER_STYLE)
     optional_header_style.font = Font(name='Calibri', size=11, color='00000000')
     optional_header_style.fill = PatternFill('solid', fgColor=GRAY_LIGHTEST)
     optional_header_style.protection = Protection(locked=False)
 
-    level_header_style = NamedStyle('level_header_style')
+    level_header_style = NamedStyle(LEVEL_HEADER_STYLE)
     level_header_style.fill = PatternFill('solid', fgColor=GRAY_LIGHTER)
     level_header_style.font = Font(name='Calibri', size=11)
     level_header_style.protection = Protection(locked=True)
 
-    protected_indicator_style = NamedStyle('protected_indicator_style')
+    protected_indicator_style = NamedStyle(PROTECTED_INDICATOR_STYLE)
     protected_indicator_style.fill = PatternFill('solid', fgColor=GRAY_LIGHTEST)
     protected_indicator_style.font = Font(name='Calibri', size=11, color=GRAY_DARK)
     protected_indicator_style.border = Border(
@@ -117,7 +124,7 @@ class BulkImportIndicatorsView(LoginRequiredMixin, UserPassesTestMixin, AccessMi
     protected_indicator_style.alignment = Alignment(vertical='top')
     protected_indicator_style.protection = Protection(locked=True)
 
-    unprotected_indicator_style = NamedStyle('unprotected_indicator_style')
+    unprotected_indicator_style = NamedStyle(UNPROTECTED_INDICATOR_STYLE)
     unprotected_indicator_style.font = Font(name='Calibri', size=11)
     unprotected_indicator_style.alignment = Alignment(vertical='top')
     unprotected_indicator_style.protection = Protection(locked=False)
@@ -217,7 +224,7 @@ class BulkImportIndicatorsView(LoginRequiredMixin, UserPassesTestMixin, AccessMi
         # Translators: Heading placed in the cell of a spreadsheet that allows users to upload Indicators in bulk
         ws.cell(1, self.first_used_column).value = gettext("Import indicators")
         ws.cell(self.program_name_row, self.first_used_column).value = program.name
-        ws.cell(2, self.first_used_column).style = 'title_style'
+        ws.cell(2, self.first_used_column).style = TITLE_STYLE
         # Translators: Instructions provided as part of an Excel template that allows users to upload Indicators
         instructions = gettext(
             "INSTRUCTIONS\n"
@@ -236,10 +243,10 @@ class BulkImportIndicatorsView(LoginRequiredMixin, UserPassesTestMixin, AccessMi
             header_cell = ws.cell(6, column_index)
             if header['required']:
                 header_cell.value = gettext(header['name']) + "*"
-                header_cell.style = 'required_header_style'
+                header_cell.style = REQUIRED_HEADER_STYLE
             else:
                 header_cell.value = gettext(header['name'])
-                header_cell.style = 'optional_header_style'
+                header_cell.style = OPTIONAL_HEADER_STYLE
 
             # Add notes to header row cells
             if header['field_name'] != 'comments':
@@ -281,14 +288,14 @@ class BulkImportIndicatorsView(LoginRequiredMixin, UserPassesTestMixin, AccessMi
                 start_column=self.first_used_column,
                 end_row=current_row_index,
                 end_column=last_used_column)
-            ws.cell(current_row_index, self.first_used_column).style = 'level_header_style'
+            ws.cell(current_row_index, self.first_used_column).style = LEVEL_HEADER_STYLE
             current_row_index += 1
 
             for indicator in level['indicator_set']:
                 current_column_index = self.first_used_column
                 first_indicator_cell = ws.cell(current_row_index, current_column_index)
                 first_indicator_cell.value = gettext(level['tier_name'])
-                first_indicator_cell.style = 'protected_indicator_style'
+                first_indicator_cell.style = PROTECTED_INDICATOR_STYLE
                 first_indicator_cell.border = Border(
                     left=None, right=self.default_border, top=self.default_border, bottom=self.default_border)
 
@@ -307,7 +314,7 @@ class BulkImportIndicatorsView(LoginRequiredMixin, UserPassesTestMixin, AccessMi
                         # These are potentially translated objects that need to be resolved, but converting None
                         # to a string does results in a cell value of "None" rather than an empty cell.
                         active_cell.value = raw_value if raw_value is None else str(raw_value)
-                    active_cell.style = 'protected_indicator_style'
+                    active_cell.style = PROTECTED_INDICATOR_STYLE
                     current_column_index += 1
                 current_row_index += 1
 
@@ -328,7 +335,7 @@ class BulkImportIndicatorsView(LoginRequiredMixin, UserPassesTestMixin, AccessMi
 
                 for col_n, column in enumerate(COLUMNS):
                     active_cell = ws.cell(current_row_index, self.first_used_column + col_n)
-                    active_cell.style = 'unprotected_indicator_style'
+                    active_cell.style = UNPROTECTED_INDICATOR_STYLE
                     if 'validation' in column:
                         validator = validation_map[column['validation']]
                         validator.add(active_cell)
@@ -372,7 +379,7 @@ class BulkImportIndicatorsView(LoginRequiredMixin, UserPassesTestMixin, AccessMi
             # TODO: do we need to check the number if auto-number is on but they use bad or badly sorted numbers?
             # TODO: Check column names and order
             # TODO: if level can't be parsed, highlight level as an error along with it's indicators
-            if first_cell.style == 'level_header_style':
+            if first_cell.style == LEVEL_HEADER_STYLE:
                 matches = re.match(r'^[^:]+:?\s?(.*)\((\d(?:\.\d)+)', first_cell.value)
                 if not matches or matches.group(1).strip() not in level_refs:
                     workbook_errors.append({'error_code': ERROR_INVALID_LEVEL_HEADER, 'row': current_row_index})
@@ -384,7 +391,7 @@ class BulkImportIndicatorsView(LoginRequiredMixin, UserPassesTestMixin, AccessMi
                 continue
 
             # skip indicators that are already in the system
-            if ws.cell(current_row_index, self.first_used_column).style == 'protected_indicator_style':
+            if ws.cell(current_row_index, self.first_used_column).style == PROTECTED_INDICATOR_STYLE:
                 continue
 
             # Getting to this point (which shouldn't happen) without a parsed level header means

@@ -3,6 +3,7 @@ import string
 import time
 import os
 import unittest
+import copy
 from tempfile import NamedTemporaryFile
 import openpyxl
 from openpyxl.cell import MergedCell
@@ -19,7 +20,8 @@ from indicators.models import Indicator, Level, LevelTier, BulkIndicatorImportFi
 from indicators.views.bulk_indicator_import_views import (
     COLUMNS, FIRST_USED_COLUMN, DATA_START_ROW, PROGRAM_NAME_ROW, TEMPLATE_SHEET_NAME, HIDDEN_SHEET_NAME,
     BASE_TEMPLATE_NAME, ERROR_INDICATOR_DATA_NOT_FOUND, ERROR_TEMPLATE_NOT_FOUND, ERROR_MISMATCHED_PROGRAM,
-    ERROR_NO_NEW_INDICATORS, ERROR_UNDETERMINED_LEVEL, ERROR_INVALID_LEVEL_HEADER, ERROR_MALFORMED_INDICATOR
+    ERROR_NO_NEW_INDICATORS, ERROR_UNDETERMINED_LEVEL, ERROR_INVALID_LEVEL_HEADER, ERROR_MALFORMED_INDICATOR,
+    LEVEL_HEADER_STYLE, PROTECTED_INDICATOR_STYLE, UNPROTECTED_INDICATOR_STYLE
 )
 
 
@@ -41,7 +43,6 @@ class TestBulkImportTemplateCreation(test.TestCase):
         cls.program_name_row = PROGRAM_NAME_ROW
         cls.letters = list(string.ascii_lowercase) + [f'a{letter}' for letter in list(string.ascii_lowercase)]
 
-
     def get_template(self, program=None, request_params=None):
         if not program:
             program = self.program
@@ -59,8 +60,7 @@ class TestBulkImportTemplateCreation(test.TestCase):
             expected_numbers.append([f'{display_ontology}{letter}' for letter in self.letters[:row_count]])
         return expected_numbers
 
-    @staticmethod
-    def process_indicator_rows(wb):
+    def process_indicator_rows(self, wb):
         ws = wb.get_sheet_by_name(TEMPLATE_SHEET_NAME)
         counts = {'level_headers': 0, 'existing_indicators': [], 'new_indicators': []}
         level_names = []
@@ -75,12 +75,19 @@ class TestBulkImportTemplateCreation(test.TestCase):
                 counts['existing_indicators'].append(0)
                 counts['new_indicators'].append(0)
                 level_index += 1
+                self.assertEqual(ws.cell(row_index, FIRST_USED_COLUMN).style, LEVEL_HEADER_STYLE)
             elif ws.cell(row_index, FIRST_USED_COLUMN + 2).value is not None:
                 counts['existing_indicators'][level_index] += 1
                 indicator_numbers[-1].append(ws.cell(row_index, FIRST_USED_COLUMN + 1).value)
+                are_protected = [ws.cell(row_index, col).style == PROTECTED_INDICATOR_STYLE
+                                for col in range(FIRST_USED_COLUMN, len(COLUMNS) )]
+                self.assertTrue(all(are_protected))
             elif ws.cell(row_index, FIRST_USED_COLUMN + 1).value is not None:
                 counts['new_indicators'][level_index] += 1
                 indicator_numbers[-1].append(ws.cell(row_index, FIRST_USED_COLUMN + 1).value)
+                are_unprotected = [ws.cell(row_index, col).style == UNPROTECTED_INDICATOR_STYLE
+                                 for col in range(FIRST_USED_COLUMN, len(COLUMNS))]
+                self.assertTrue(all(are_unprotected))
         return counts, level_names, indicator_numbers
 
     def compare_ws_lines(self, wb, expected_counts, expected_level_names, expected_indicator_numbers):
@@ -127,10 +134,10 @@ class TestBulkImportTemplateCreation(test.TestCase):
         self.client.force_login(self.tola_user.user)
         small_program = w_factories.RFProgramFactory(country=[self.country], tiers=True)
         w_factories.grant_program_access(self.tola_user, small_program, self.country, role='high')
-        default_request_params = {}
+        request_params = {}
         tiers = self.program.level_tiers.all()
         for i, tier in enumerate(tiers):
-            default_request_params[tier.name] = 10 if i < len(tiers) -2 else 20
+            request_params[tier.name] = 10 if i < len(tiers) - 2 else 20
 
         parent_level = None
         for i, level in enumerate(level_config[:4]):
@@ -143,10 +150,10 @@ class TestBulkImportTemplateCreation(test.TestCase):
             parent_level = level_obj
 
         # Test the defaults
-        wb = openpyxl.load_workbook(self.get_template(program=small_program, request_params=default_request_params))
+        wb = openpyxl.load_workbook(self.get_template(program=small_program, request_params=request_params))
         expected_counts = {'level_headers': 4, 'existing_indicators': [0] * 4, 'new_indicators': [10, 10, 20, 20]}
         expected_level_names = [f"{item['tier']}: {item['name']} ({item['ontology']})" for item in level_config[:4]]
-        expected_indicator_numbers = self.get_expected_indicator_numbers(level_config[:4], default_request_params)
+        expected_indicator_numbers = self.get_expected_indicator_numbers(level_config[:4], request_params)
         self.compare_ws_lines(wb, expected_counts, expected_level_names, expected_indicator_numbers)
 
         # Test with additional levels
@@ -160,11 +167,11 @@ class TestBulkImportTemplateCreation(test.TestCase):
             level_config[i]['level_obj'] = level_obj
             parent_level = level_obj
 
-        wb = openpyxl.load_workbook(self.get_template(program=small_program, request_params=default_request_params))
+        wb = openpyxl.load_workbook(self.get_template(program=small_program, request_params=request_params))
         expected_counts = {
             'level_headers': 7, 'existing_indicators': [0] * 7, 'new_indicators': [10, 10, 20, 20, 10, 20, 20]}
         expected_level_names = [f"{item['tier']}: {item['name']} ({item['ontology']})" for item in level_config]
-        expected_indicator_numbers = self.get_expected_indicator_numbers(level_config, default_request_params)
+        expected_indicator_numbers = self.get_expected_indicator_numbers(level_config, request_params)
         self.compare_ws_lines(wb, expected_counts, expected_level_names, expected_indicator_numbers)
 
         # Add some indicators
@@ -172,17 +179,80 @@ class TestBulkImportTemplateCreation(test.TestCase):
             if level_dict['indicators'] > 0:
                 i_factories.IndicatorFactory.create_batch(
                     level_dict['indicators'], program=small_program, level=level_dict['level_obj'])
-        wb = openpyxl.load_workbook(self.get_template(program=small_program, request_params=default_request_params))
-        expected_indicator_counts = [l['indicators'] for l in level_config]
+        wb = openpyxl.load_workbook(self.get_template(program=small_program, request_params=request_params))
+        expected_indicator_counts = [conf['indicators'] for conf in level_config]
         expected_counts = {
             'level_headers': 7,
             'existing_indicators': expected_indicator_counts,
             'new_indicators': [10, 10, 20, 20, 10, 20, 20]}
         expected_level_names = [f"{item['tier']}: {item['name']} ({item['ontology']})" for item in level_config]
         expected_indicator_numbers = self.get_expected_indicator_numbers(
-            level_config, default_request_params, has_indicators=True)
+            level_config, request_params, has_indicators=True)
         self.compare_ws_lines(wb, expected_counts, expected_level_names, expected_indicator_numbers)
 
+        # Do some other request params
+        for i, tier in enumerate(tiers):
+            request_params[tier.name] = 5 if i < len(tiers) - 2 else 30
+        wb = openpyxl.load_workbook(self.get_template(program=small_program, request_params=request_params))
+        expected_counts = {
+            'level_headers': 7,
+            'existing_indicators': expected_indicator_counts,
+            'new_indicators': [5, 5, 30, 30, 5, 30, 30]}
+        expected_level_names = [f"{item['tier']}: {item['name']} ({item['ontology']})" for item in level_config]
+        expected_indicator_numbers = self.get_expected_indicator_numbers(
+            level_config, request_params, has_indicators=True)
+        self.compare_ws_lines(wb, expected_counts, expected_level_names, expected_indicator_numbers)
+
+        for i, tier in enumerate(tiers):
+            request_params[tier.name] = 5 if i < len(tiers) - 2 else 0
+        wb = openpyxl.load_workbook(self.get_template(program=small_program, request_params=request_params))
+        expected_counts = {
+            'level_headers': 7,
+            'existing_indicators': expected_indicator_counts,
+            'new_indicators': [5, 5, 0, 0, 5, 0, 0]}
+        expected_level_names = [f"{item['tier']}: {item['name']} ({item['ontology']})" for item in level_config]
+        expected_indicator_numbers = self.get_expected_indicator_numbers(
+            level_config, request_params, has_indicators=True)
+        self.compare_ws_lines(wb, expected_counts, expected_level_names, expected_indicator_numbers)
+
+        for i, tier in enumerate(tiers):
+            request_params[tier.name] = 0
+        wb = openpyxl.load_workbook(self.get_template(program=small_program, request_params=request_params))
+        expected_counts = {
+            'level_headers': 7,
+            'existing_indicators': expected_indicator_counts,
+            'new_indicators': ([0] * 7)}
+        expected_level_names = [f"{item['tier']}: {item['name']} ({item['ontology']})" for item in level_config]
+        expected_indicator_numbers = self.get_expected_indicator_numbers(
+            level_config, request_params, has_indicators=True)
+        self.compare_ws_lines(wb, expected_counts, expected_level_names, expected_indicator_numbers)
+
+        # Check a custom set of tiers
+        level_obj=i_factories.LevelFactory(
+            program=small_program,
+            name='SubActivity 1',
+            parent=level_config[-1]['level_obj'],
+            customsort=1)
+        i_factories.LevelTierFactory(program=small_program, name='SubActivity', tier_depth=5)
+        i_factories.IndicatorFactory.create_batch(2, program=small_program, level=level_obj)
+        new_tiers = LevelTier.objects.filter(program=small_program)
+        new_level_config = copy.deepcopy(level_config)
+        for conf in new_level_config:
+            conf['ontology'] += '.0'
+        new_level_config.append(
+            {'name': 'SubActivity 1', 'indicators': 2, 'ontology': '1.2.1.1.1',
+             'customsort': 1, 'tier': 'SubActivity'})
+        for i, tier in enumerate(new_tiers):
+            request_params[tier.name] = 10 if i < len(new_tiers) - 2 else 20
+        wb = openpyxl.load_workbook(self.get_template(program=small_program, request_params=request_params))
+        expected_counts = {
+            'level_headers': 8,
+            'existing_indicators': expected_indicator_counts + [2],
+            'new_indicators': [10, 10, 10, 20, 10, 10, 20, 20]}
+        expected_level_names = [f"{item['tier']}: {item['name']} ({item['ontology']})" for item in new_level_config]
+        expected_indicator_numbers = self.get_expected_indicator_numbers(
+            new_level_config, request_params, has_indicators=True)
+        self.compare_ws_lines(wb, expected_counts, expected_level_names, expected_indicator_numbers)
 
     def test_non_english_template_create(self):
         self.client.force_login(self.tola_user.user)
