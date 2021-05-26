@@ -136,6 +136,7 @@ const api = {
             .catch((error) => {
                 this.logFailure(error)
                 return error; // expecting {error_code: 100};
+                // return {error_code: 106};
             })
     },
     async uploadTemplate(program_id, file) {
@@ -165,7 +166,8 @@ const api = {
             .then(response => response.data)
             .catch(error => {
                 this.logFailure(error);
-                return {error};
+                return {error}; // expecting {error_code: 100};
+                // return {error_code: 106};
             })
     },
     async downloadFeedback(program_id) {

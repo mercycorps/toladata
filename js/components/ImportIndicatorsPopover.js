@@ -143,6 +143,10 @@ export const ImportIndicatorsPopover = ({ page, program_id, tierLevelsUsed, stor
     let ERROR = 4;
     let LOADING = 5;
 
+    // Error Code Levels
+    let levelOne = /^[1][0-9][0-9]$/i;
+    let levelTwo = /^[2][0-9][0-9]$/i;
+
     // State Variables
     const [views, setViews] = useState(INITIAL); // View of the Popover
     const [validIndicatorsCount, setvalidIndicatorsCount] = useState(0); // Number of indicators that have passed validation and are ready to import
@@ -179,8 +183,6 @@ export const ImportIndicatorsPopover = ({ page, program_id, tierLevelsUsed, stor
     let handleDownload = () => {
         api.downloadTemplate(program_id, tierLevelsRows)
             .then(response => {
-                let levelOne = /^[1][0-9][0-9]$/i;
-                let levelTwo = /^[2][0-9][0-9]$/i;
                 if (levelOne.test(response.error_code) ) {
                     setInitialViewError(response.error_code);
                 } else if (levelTwo.test(response.error_code) ) {
@@ -205,7 +207,7 @@ export const ImportIndicatorsPopover = ({ page, program_id, tierLevelsUsed, stor
         api.uploadTemplate(program_id, e.target.files[0])
                 .then(response => {
                     let handleResponse = () => {
-                        if (!response.error) {
+                        if (!response.error_code) {
                             setvalidIndicatorsCount(response.valid);
                             setInvalidIndicatorsCount(response.invalid);
                             if (response.invalid === 0) {
@@ -216,7 +218,13 @@ export const ImportIndicatorsPopover = ({ page, program_id, tierLevelsUsed, stor
                                 setStoredView({view: FEEDBACK, valid: response.valid, invalid: response.invalid});
                             }
                         } else {
-                            setViews(ERROR)
+                            if (levelOne.test(response.error_code) ) {
+                                setInitialViewError(response.error_code);
+                            } else if (levelTwo.test(response.error_code) ) {
+                                setViews(ERROR);
+                            } else if (response.error) {
+                                setViews(ERROR);
+                            }
                         }
                     }
                     if (loading) {
@@ -279,6 +287,56 @@ export const ImportIndicatorsPopover = ({ page, program_id, tierLevelsUsed, stor
         setStoredTierLevelsRows([])
     }
 
+    let multipleUploadWarning = 
+        <div className="import-initial-text">
+            <div className="import-initial-text-error">
+                <span>
+                    {errorCodes[106].message}&nbsp;
+                    <a 
+                        className="import-initial-text-error-link"
+                        role="link"
+                        href={ `/tola_management/audit_log/${program_id}/` }
+                        target="_blank"
+                    >
+                        {
+                            // # Translators: Link to the program change log to view more details.
+                            gettext("View the program change log for more details.")
+                        }
+                    </a>
+                </span>
+            </div>
+            <div className="import-initial-text-error-confirm">
+                {
+                    // # Translators: Confirrm the user wants to continue.
+                    gettext("Are you sure you want to continue?")
+                }
+            </div>
+            <div className="import-initial-text-error-buttons">
+                <button
+                    role="button"
+                    type="button"
+                    className="btn btn-sm btn-primary"
+                    // onClick={ (e) => handleUpload(e) } //TODO: Determine how to handle this scenario, send files again or just send a confirm to continue
+                >
+                    {
+                        // # Translators: Button to continue and upload the template
+                        gettext("Continue")
+                    }
+                </button>
+                <button
+                    role="button"
+                    type="button"
+                    className="btn btn-sm"
+                    onClick={ () => handleClose() }
+                >
+                    {
+                        // # Translators: Button to cancel the import process and close the popover
+                        gettext("Cancel")
+                    }
+                </button>
+            </div>
+        </div>
+
     return (
         <React.Fragment>
             {(() => {
@@ -302,52 +360,57 @@ export const ImportIndicatorsPopover = ({ page, program_id, tierLevelsUsed, stor
                                             }
                                         </li>
                                     </ol>
-                                    {intialViewError ?
+                                    {(intialViewError && intialViewError !== 106) &&
                                         <div className="import-initial-text-error">
                                             { errorCodes[intialViewError].message }
                                         </div>
-                                    : null }
+                                    }
                                 </div>
+                                {intialViewError === 106 ? 
+                                    multipleUploadWarning
+                                :
+                                <React.Fragment> 
+                                    <ImportIndicatorsContext.Provider 
+                                        value={{ 
+                                            tierLevelsUsed: tierLevelsUsed, 
+                                            tierLevelsRows: tierLevelsRows, 
+                                            setTierLevelsRows: setTierLevelsRows,
+                                        }}>
+                                        <AdvancedImport />
+                                    </ImportIndicatorsContext.Provider>
 
-                                <ImportIndicatorsContext.Provider 
-                                    value={{ 
-                                        tierLevelsUsed: tierLevelsUsed, 
-                                        tierLevelsRows: tierLevelsRows, 
-                                        setTierLevelsRows: setTierLevelsRows,
-                                    }}>
-                                    <AdvancedImport />
-                                </ImportIndicatorsContext.Provider>
-
-                                <div className="import-initial-buttons">
-                                    <button
-                                        role="button"
-                                        type="button"
-                                        className="btn btn-sm btn-primary btn-download"
-                                        onClick={ () => handleDownload() }
+                                    <div className="import-initial-buttons">
+                                        <button
+                                            role="button"
+                                            type="button"
+                                            className="btn btn-sm btn-primary btn-download"
+                                            onClick={ () => handleDownload() }
+                                            >
+                                            {
+                                                // # Translators: Button to download a template
+                                                gettext("Download template")
+                                            }
+                                        </button>
+                                        <button
+                                            role="button"
+                                            type="button"
+                                            className="btn btn-sm btn-primary btn-upload"
+                                            onClick={ () => uploadClick() }
                                         >
-                                        {
-                                            // # Translators: Button to download a template
-                                            gettext("Download template")
-                                        }
-                                    </button>
-                                    <button
-                                        role="button"
-                                        type="button"
-                                        className="btn btn-sm btn-primary btn-upload"
-                                        onClick={ () => uploadClick() }
-                                    >
-                                        {
-                                            // # Translators: Button to upload the import indicators template
-                                            gettext("Upload template")
-                                        }
-                                    </button>
-                                    <input
-                                        id="fileUpload"
-                                        type="file"
-                                        style={{ display: "none" }}
-                                        onChange={ (e) => handleUpload(e) }
-                                    />
-                                </div>
+                                            {
+                                                // # Translators: Button to upload the import indicators template
+                                                gettext("Upload template")
+                                            }
+                                        </button>
+                                        <input
+                                            id="fileUpload"
+                                            type="file"
+                                            style={{ display: "none" }}
+                                            onChange={ (e) => handleUpload(e) }
+                                        />
+                                    </div>
+                                </React.Fragment>
+                                }
                             </div>
                         );
                     // ***** View to provide error feedback on their uploaded template *****
@@ -648,7 +711,7 @@ let errorCodes = {
         type: "Someone else uploaded a template in the last 24 hours",
         message: 
             // # Translators: Message to user that someone else has uploaded a template in the last 24 hours and may be in the process of importing indicators to this program. You can view the program change log to see more details.
-            gettext("Someone else uploaded a template in the last 24 hours, and may be in the process of adding indicators to this program. View the program change log for more details.")
+            gettext("Someone else uploaded a template in the last 24 hours, and may be in the process of adding indicators to this program.")
     },
     200 : {
         type: "Invalid level header",
