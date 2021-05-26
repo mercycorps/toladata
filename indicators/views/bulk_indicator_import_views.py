@@ -66,11 +66,11 @@ PROGRAM_NAME_ROW = 2
 
 ERROR_MISMATCHED_PROGRAM = 100
 ERROR_NO_NEW_INDICATORS = 101
-ERROR_UNDETERMINED_LEVEL = 102
+ERROR_UNDETERMINED_LEVEL = 102  # When the first level header row is missing and the level hasnt' been set
 ERROR_TEMPLATE_NOT_FOUND = 103
 ERROR_MISMATCHED_TIERS = 104
 ERROR_INDICATOR_DATA_NOT_FOUND = 105
-ERROR_INVALID_LEVEL_HEADER = 200
+ERROR_INVALID_LEVEL_HEADER = 200  # When the level header doesn't contain an identifiable level
 ERROR_MALFORMED_INDICATOR = 201
 
 EMPTY_CHOICE = '---------'
@@ -272,7 +272,6 @@ class BulkImportIndicatorsView(LoginRequiredMixin, UserPassesTestMixin, AccessMi
             max_merge_col_index += 1
         ws.merge_cells(start_row=4, start_column=2, end_row=4, end_column=max_merge_col_index - 1)
 
-
         current_row_index = self.data_start_row
         for level in serialized_levels:
             ws.cell(current_row_index, self.first_used_column)\
@@ -312,7 +311,7 @@ class BulkImportIndicatorsView(LoginRequiredMixin, UserPassesTestMixin, AccessMi
                     current_column_index += 1
                 current_row_index += 1
 
-            letter_index = len(level['indicator_set'])
+            letter_index = len(level['indicator_set']) - 1
             empty_row_count = int(request.GET[gettext(level['tier_name'])])
             for i in range(empty_row_count):
                 ws.row_dimensions[current_row_index].height = 16
@@ -370,6 +369,9 @@ class BulkImportIndicatorsView(LoginRequiredMixin, UserPassesTestMixin, AccessMi
 
             # If this is a level header row, parse the level name out of the header string
             # TODO: do we need to compare the ontology to the name?
+            # TODO: do we need to check the number if auto-number is on but they use bad or badly sorted numbers?
+            # TODO: Check column names and order
+            # TODO: if level can't be parsed, highlight level as an error along with it's indicators
             if first_cell.style == 'level_header_style':
                 matches = re.match(r'^[^:]+:?\s?(.*)\((\d(?:\.\d)+)', first_cell.value)
                 if not matches or matches.group(1).strip() not in level_refs:
