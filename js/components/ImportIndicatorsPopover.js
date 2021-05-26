@@ -275,6 +275,8 @@ export const ImportIndicatorsPopover = ({ page, program_id, tierLevelsUsed, stor
     // Handle clicking cancel and closing the popover
     let handleClose = () => {
         $('.popover').popover('hide')
+        setStoredView({})
+        setStoredTierLevelsRows([])
     }
 
     return (
