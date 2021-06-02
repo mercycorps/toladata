@@ -8,6 +8,8 @@ from django import test
 
 from factories import ProgramFactory, LevelFactory, LevelTierFactory
 
+from indicators.models import Level
+
 
 class TestLevelProperties(test.TestCase):
     """
@@ -65,6 +67,10 @@ class TestLevelProperties(test.TestCase):
         self.assertEqual(self.level1_2_3.ontology, '1.2.3.0')
         self.assertEqual(self.level1_2_3_1.ontology, '1.2.3.1')
 
-
+    def test_truncate_ontology(self):
+        self.assertEqual(Level.truncate_ontology('1.0.0.0'), '')
+        self.assertEqual(Level.truncate_ontology('1.1.0.0'), '1')
+        self.assertEqual(Level.truncate_ontology('1.2.1.0'), '2.1')
+        self.assertEqual(Level.truncate_ontology('1.1.3.2'), '1.3.2')
 
 
