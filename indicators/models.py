@@ -151,6 +151,12 @@ class Level(models.Model):
             depth = self.parent.get_level_depth(depth)
         return depth
 
+    @staticmethod
+    def truncate_ontology(full_ontology):
+        """Truncates the leading 1 and trailing 0's of an ontology"""
+        parts = full_ontology[2:].split('.')
+        return '.'.join([part for part in parts if int(part) != 0])
+
     @cached_property
     def level_depth(self):
         return self.get_level_depth()

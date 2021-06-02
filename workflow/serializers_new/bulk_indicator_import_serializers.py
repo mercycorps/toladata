@@ -24,6 +24,7 @@ class BulkImportIndicatorSerializer(serializers.ModelSerializer):
         model = Indicator
         fields = [
             'name',
+            'number',
             'display_ontology_letter',
             'sector',
             'source',
