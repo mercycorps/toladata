@@ -3,26 +3,34 @@ import { shallow, mount } from 'enzyme';
 import  {ImportIndicatorsButton, ImportIndicatorsPopover} from "../ImportIndicatorsPopover";
 
 describe('Import Indicators test suite', () => {
-    let levelStore = {
-        program_id: 123,
-        tierTemplates: {
-            mc_standard: {
-                name: "Mercy Corps",
-                tiers: ["Goal", "Outcome", "Output", "Activity"],
-            }
-        },
-        chosenTierSetKey: "mc_standard",
-    }
-    let chosenTiers = ["Goal", "Outcome", "Output", "Activity"];
+    let page = "resultsFramework";
+    let program_id = 123;
     let tierLevelsUsed = [
         {name: "Goal", used: true}, 
         {name: "Outcome", used: true}, 
         {name: "Output", used: true}, 
         {name: "Activity", used: false},
-    ]
+    ];
+    let storedTierLevelsRows = [];
+    let storedView = {};
+    let setStoredTierLevelsRows = () => {};
+    let setStoredView = () => {};
+
+    let wrapper;
+    beforeEach(() => {
+        wrapper = mount(
+            <ImportIndicatorsPopover 
+                page={ page }
+                program_id={ program_id }
+                tierLevelsUsed={ tierLevelsUsed }
+                storedTierLevelsRows={ storedTierLevelsRows }
+                storedView={ storedView }
+                setStoredTierLevelsRows={ setStoredTierLevelsRows }
+                setStoredView={ setStoredView }
+            />)
+    })
 
     it('Should contain the right components in the initial view', () => {
-        let wrapper = mount(<ImportIndicatorsPopover program_id={123} tierLevelsUsed={tierLevelsUsed} />)
         expect(wrapper.exists('.import-initial')).toBe(true);
         expect(wrapper.exists('.btn-upload')).toBe(true);
         expect(wrapper.exists('.btn-download')).toBe(true);
@@ -31,7 +39,6 @@ describe('Import Indicators test suite', () => {
     });
 
     it('Should have same number of rows as provided tier levels', () => {
-        let wrapper = mount(<ImportIndicatorsPopover program_id={123} tierLevelsUsed={tierLevelsUsed} />)
         expect(wrapper.find(".level-count-row").length).toBe(tierLevelsUsed.length);
     })
 })
