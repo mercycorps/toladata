@@ -123,7 +123,7 @@ const api = {
             return accumulator
         }, {})
 
-        return await this.templatesInstance.get(`/indicators/api/bulk_import_indicators/${program_id}/`, { params: flatTierLevelsRows })
+        return await this.templatesInstance.get(`/1indicators/api/bulk_import_indicators/${program_id}/`, { params: flatTierLevelsRows })
             .then(response => {
                 const url = window.URL.createObjectURL(new Blob([response.data]));
                 const link = document.createElement('a');
@@ -166,7 +166,7 @@ const api = {
             .then(response => response.data)
             .catch(error => {
                 this.logFailure(error);
-                return {error}; // expecting {error_code: 100};
+                return error; // expecting {error_code: 100};
                 // return {error_code: 106};
             })
     },
@@ -184,7 +184,7 @@ const api = {
             })
             .catch((error) => {
                 this.logFailure(error)
-                return {error};
+                return error;
             })
     },
     async confirmUpload(program_id) {

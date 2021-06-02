@@ -18,9 +18,9 @@ export class ImportIndicatorsButton extends React.Component {
         this.state = {
             inactiveTimer: null,
             tierLevelsUsed: [],
-            storedView: {},
+            storedView: {}, // Store the current popover view, valid, and/or invalid rows to reopen where left off if closed
             setStoredView: this.setStoredView,
-            storedTierLevelsRows: [],
+            storedTierLevelsRows: [], // Store the popover's desired tier level row counts to reopen where left off if closed
             setStoredTierLevelsRows: this.setStoredTierLevelsRows,
         }
     }
@@ -55,7 +55,8 @@ export class ImportIndicatorsButton extends React.Component {
             boundary: 'viewport',
         }).on('shown.bs.popover', shownFn);
 
-        // Clear stored state if time runs out
+        // Handling Incactive Time Outs
+        // Clear stored views and tier level rows counts states if time runs out
         $(this.refs.target).on('hide.bs.popover', () => {
             this.setState({
                 inactiveTimer: setTimeout(() => {
@@ -67,11 +68,12 @@ export class ImportIndicatorsButton extends React.Component {
             })
         })
 
-        // Clear inactive timer if popover is opened before time runs out
+        // Clear inactive timer if popover is re-opened before time runs out
         $(this.refs.target).on('show.bs.popover', () => {
             clearTimeout(this.state.inactiveTimer);
         })
     }
+
     // Method to store the current popover view and valid/invalid row counts if available
     setStoredView = (view) => {
         this.setState({
@@ -87,7 +89,9 @@ export class ImportIndicatorsButton extends React.Component {
 
     // Provides the content for when the Import indicators button is clicked
     getPopoverContent = () => {
-        let tierLevelsUsed = [];
+
+        // Determine what tier levels have been created/used in the Results Framework
+        let tierLevelsUsed = []; 
         this.props.chosenTiers.map((tier, i) => {
             tierLevelsUsed[i] = {
                 name: tier,
@@ -97,6 +101,7 @@ export class ImportIndicatorsButton extends React.Component {
         this.props.levels.map((level) => {
             tierLevelsUsed[level.level_depth - 1].used = true;
         })
+
         return (
                 <ImportIndicatorsPopover 
                     page={ this.props.page } 
@@ -143,7 +148,7 @@ export const ImportIndicatorsPopover = ({ page, program_id, tierLevelsUsed, stor
     let ERROR = 4;
     let LOADING = 5;
 
-    // Error Code Levels
+    // Error Code Levels RegEx
     let levelOne = /^[1][0-9][0-9]$/i;
     let levelTwo = /^[2][0-9][0-9]$/i;
 
@@ -287,6 +292,7 @@ export const ImportIndicatorsPopover = ({ page, program_id, tierLevelsUsed, stor
         setStoredTierLevelsRows([])
     }
 
+    // TODO/IN-WORK: Need to determine how to handle continue button for downloading and uploading. Structure and Styles are in place.
     let multipleUploadWarning = 
         <div className="import-initial-text">
             <div className="import-initial-text-error">
