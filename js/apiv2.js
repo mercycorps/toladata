@@ -123,7 +123,7 @@ const api = {
             return accumulator
         }, {})
 
-        return await this.templatesInstance.get(`/1indicators/api/bulk_import_indicators/${program_id}/`, { params: flatTierLevelsRows })
+        return await this.templatesInstance.get(`/indicators/api/bulk_import_indicators/${program_id}/`, { params: flatTierLevelsRows })
             .then(response => {
                 const url = window.URL.createObjectURL(new Blob([response.data]));
                 const link = document.createElement('a');
