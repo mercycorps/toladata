@@ -29,7 +29,7 @@ VALIDATION_KEY_SECTOR = 'sector_validation'
 
 COLUMNS = [
     {'name': 'Level', 'required': True, 'field_name': 'level'},
-    {'name': 'No.', 'required': True, 'field_name': 'number'},
+    {'name': 'No.', 'required': False, 'field_name': 'number'},
     {'name': 'Indicator', 'required': True, 'field_name': 'name'},
     {'name': 'Sector', 'required': False, 'field_name': 'sector',
      'validation': VALIDATION_KEY_SECTOR},
@@ -37,7 +37,10 @@ COLUMNS = [
     {'name': 'Definition', 'required': False, 'field_name': 'definition'},
     {'name': 'Rationale or justification for indicator', 'required': False, 'field_name': 'justification'},
     {'name': 'Unit of measure', 'required': True, 'field_name': 'unit_of_measure'},
-    {'name': 'Number (#) or percentage (%)', 'required': True, 'field_name': 'unit_of_measure_type',
+    # Note:  this lone string is being translated here because it's not the standard name for the field.
+    # Translators:  Column header for the column that specifies whether the data in the row is expressed
+    # as a number or a percent
+    {'name': gettext('Number (#) or percentage (%)'), 'required': True, 'field_name': 'unit_of_measure_type',
      'validation': VALIDATION_KEY_UOM_TYPE},
     {'name': 'Rationale for target', 'required': False, 'field_name': 'rationale_for_target'},
     {'name': 'Baseline', 'required': True, 'field_name': 'baseline'},
@@ -57,7 +60,7 @@ COLUMNS = [
 ]
 
 BASE_TEMPLATE_NAME = 'BulkImportTemplate.xlsx'
-TEMPLATE_SHEET_NAME = 'Template'
+TEMPLATE_SHEET_NAME = 'Import indicators'
 HIDDEN_SHEET_NAME = 'Hidden'
 
 FIRST_USED_COLUMN = 2
@@ -105,11 +108,15 @@ class BulkImportIndicatorsView(LoginRequiredMixin, UserPassesTestMixin, AccessMi
     required_header_style.font = Font(name='Calibri', size=11, color='FFFFFFFF')
     required_header_style.fill = PatternFill('solid', fgColor='00000000')
     required_header_style.protection = Protection(locked=True)
+    required_header_style.border = Border(
+        left=default_border, right=default_border, top=default_border, bottom=default_border)
 
     optional_header_style = NamedStyle(OPTIONAL_HEADER_STYLE)
     optional_header_style.font = Font(name='Calibri', size=11, color='00000000')
     optional_header_style.fill = PatternFill('solid', fgColor=GRAY_LIGHTEST)
     optional_header_style.protection = Protection(locked=False)
+    optional_header_style.border = Border(
+        left=default_border, right=default_border, top=default_border, bottom=default_border)
 
     level_header_style = NamedStyle(LEVEL_HEADER_STYLE)
     level_header_style.fill = PatternFill('solid', fgColor=GRAY_LIGHTER)
@@ -121,12 +128,12 @@ class BulkImportIndicatorsView(LoginRequiredMixin, UserPassesTestMixin, AccessMi
     protected_indicator_style.font = Font(name='Calibri', size=11, color=GRAY_DARK)
     protected_indicator_style.border = Border(
         left=default_border, right=default_border, top=default_border, bottom=default_border)
-    protected_indicator_style.alignment = Alignment(vertical='top')
+    protected_indicator_style.alignment = Alignment(vertical='top', wrap_text=True)
     protected_indicator_style.protection = Protection(locked=True)
 
     unprotected_indicator_style = NamedStyle(UNPROTECTED_INDICATOR_STYLE)
     unprotected_indicator_style.font = Font(name='Calibri', size=11)
-    unprotected_indicator_style.alignment = Alignment(vertical='top')
+    unprotected_indicator_style.alignment = Alignment(vertical='top', wrap_text=True)
     unprotected_indicator_style.protection = Protection(locked=False)
 
     def test_func(self):
@@ -250,7 +257,16 @@ class BulkImportIndicatorsView(LoginRequiredMixin, UserPassesTestMixin, AccessMi
 
             # Add notes to header row cells
             if header['field_name'] != 'comments':
-                help_text = Indicator._meta.get_field(header['field_name']).help_text
+                if header['field_name'] == 'number' and not program.auto_number_indicators:
+                    # Translators: This is help text for a form field that gets filled in automatically
+                    help_text = gettext('This number is automatically generated through the results framework.')
+                elif header['field_name'] == 'baseline':
+                    # Translators: This is help text for a form field
+                    help_text = gettext('Enter a numeric value for the baseline. If a baseline is not yet known '
+                                        'or not applicable, enter a zero or type "N/A". The baseline can always '
+                                        'be updated at a later point in time.')
+                else:
+                    help_text = Indicator._meta.get_field(header['field_name']).help_text
                 comment = Comment(help_text, '')
                 comment.width = 300
                 comment.height = 15 + len(help_text) * .5
@@ -353,7 +369,7 @@ class BulkImportIndicatorsView(LoginRequiredMixin, UserPassesTestMixin, AccessMi
         program_id = kwargs['program_id']
         program = Program.objects.get(pk=program_id)
         wb = openpyxl.load_workbook(request.FILES['file'])
-        ws = wb.get_sheet_by_name('Template')
+        ws = wb.get_sheet_by_name(TEMPLATE_SHEET_NAME)
 
         if ws.cell(self.program_name_row, self.first_used_column).value != program.name:
             return JsonResponse({'error_code': ERROR_MISMATCHED_PROGRAM}, status=400)
