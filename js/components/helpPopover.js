@@ -40,14 +40,14 @@ export class BootstrapPopoverButton extends React.Component {
         // make a cancelable (class method) function so clicking out of the popover will close it:
         this.bodyClickHandler = (ev) => {
             if ($(`#${this.popoverName}_popover_content`).parent().find($(ev.target)).length == 0) {
-                $(this.refs.target).popover('hide');
+                $(this.myRef.current).popover('hide');
             }
         }
         const popoverOpenHandler = () => {
             // first make it so any click outside of the popover will hide it:
             $('body').on('click', this.bodyClickHandler);
             // update position (it's had content loaded):
-            $(this.refs.target).popover('update')
+            $(this.myRef.current).popover('update')
                 //when it hides destroy the body clickhandler:
                 .on('hide.bs.popover', () => {$('body').off('click', this.bodyClickHandler);});
         };
@@ -58,7 +58,7 @@ export class BootstrapPopoverButton extends React.Component {
                 popoverOpenHandler
             );
         };
-        $(this.refs.target).popover({
+        $(this.myRef.current).popover({
             content: `<div id="${this.popoverName}_popover_content"></div>`,
             title: this.popoverTitle ? `<div>${this.popoverTitle}</div>` : "",
             html: true,
