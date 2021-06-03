@@ -15,6 +15,7 @@ export class ImportIndicatorsButton extends React.Component {
 
     constructor(props) {
         super(props);
+        this.myRef = React.createRef();
         this.state = {
             inactiveTimer: null,
             tierLevelsUsed: [],
@@ -29,14 +30,14 @@ export class ImportIndicatorsButton extends React.Component {
         // make a cancelable (class method) function so clicking out of the popover will close it:
         this.bodyClickHandler = (ev) => {
             if ($(`#${this.popoverName}_popover_content`).parent().find($(ev.target)).length == 0) {
-                $(this.refs.target).popover('hide');
+                $(this.myRef.current).popover('hide');
             }
         }
         const popoverOpenHandler = () => {
             // first make it so any click outside of the popover will hide it:
             $('body').on('click', this.bodyClickHandler);
             // update position (it's had content loaded):
-            $(this.refs.target).popover('update')
+            $(this.myRef.current).popover('update')
                 //when it hides destroy the body clickhandler:
                 .on('hide.bs.popover', () => {$('body').off('click', this.bodyClickHandler);});
         };
@@ -47,7 +48,7 @@ export class ImportIndicatorsButton extends React.Component {
                 popoverOpenHandler
             );
         };
-        $(this.refs.target).popover({
+        $(this.myRef.current).popover({
             content: `<div id="${this.popoverName}_popover_content"></div>`,
             title: this.popoverTitle ? `<div>${this.popoverTitle}</div>` : "",
             html: true,
@@ -57,7 +58,7 @@ export class ImportIndicatorsButton extends React.Component {
 
         // Handling Incactive Time Outs
         // Clear stored views and tier level rows counts states if time runs out
-        $(this.refs.target).on('hide.bs.popover', () => {
+        $(this.myRef.current).on('hide.bs.popover', () => {
             this.setState({
                 inactiveTimer: setTimeout(() => {
                     this.setState({
@@ -69,7 +70,7 @@ export class ImportIndicatorsButton extends React.Component {
         })
 
         // Clear inactive timer if popover is re-opened before time runs out
-        $(this.refs.target).on('show.bs.popover', () => {
+        $(this.myRef.current).on('show.bs.popover', () => {
             clearTimeout(this.state.inactiveTimer);
         })
     }
@@ -122,7 +123,7 @@ export class ImportIndicatorsButton extends React.Component {
                     id="importButton"
                     role="button"
                     type="button"
-                    ref="target"
+                    ref={this.myRef}
                     className={"btn btn-sm pl-2 " + (this.props.page === "resultsFramework" ? "btn-primary" : "btn-add")}
                     >
                         <i className="fas fa-upload mr-2"></i>
