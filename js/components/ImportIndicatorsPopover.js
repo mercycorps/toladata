@@ -20,9 +20,7 @@ export class ImportIndicatorsButton extends React.Component {
             inactiveTimer: null,
             tierLevelsUsed: [],
             storedView: {}, // Store the current popover view, valid, and/or invalid rows to reopen where left off if closed
-            setStoredView: this.setStoredView,
             storedTierLevelsRows: [], // Store the popover's desired tier level row counts to reopen where left off if closed
-            setStoredTierLevelsRows: this.setStoredTierLevelsRows,
         }
     }
 
@@ -109,9 +107,9 @@ export class ImportIndicatorsButton extends React.Component {
                     program_id={ this.props.program_id } 
                     tierLevelsUsed={ tierLevelsUsed } 
                     storedView={ this.state.storedView }
-                    setStoredView={ this.state.setStoredView }
+                    setStoredView={ this.setStoredView }
                     storedTierLevelsRows={ this.state.storedTierLevelsRows }
-                    setStoredTierLevelsRows={ this.state.setStoredTierLevelsRows }
+                    setStoredTierLevelsRows={ this.setStoredTierLevelsRows }
                 />
         );
     }
@@ -149,10 +147,6 @@ export const ImportIndicatorsPopover = ({ page, program_id, tierLevelsUsed, stor
     let ERROR = 4;
     let LOADING = 5;
 
-    // Error Code Levels RegEx
-    let levelOne = /^[1][0-9][0-9]$/i;
-    let levelTwo = /^[2][0-9][0-9]$/i;
-
     // State Variables
     const [views, setViews] = useState(INITIAL); // View of the Popover
     const [validIndicatorsCount, setvalidIndicatorsCount] = useState(0); // Number of indicators that have passed validation and are ready to import
@@ -189,12 +183,12 @@ export const ImportIndicatorsPopover = ({ page, program_id, tierLevelsUsed, stor
     let handleDownload = () => {
         api.downloadTemplate(program_id, tierLevelsRows)
             .then(response => {
-                if (levelOne.test(response.error_code) ) {
-                    setInitialViewError(response.error_code);
-                } else if (levelTwo.test(response.error_code) ) {
-                    setViews(ERROR);
-                } else if (response.error) {
-                    setViews(ERROR);
+                if (response.status !== 200) {
+                    if (response.error_code && response.error_code.toString().slice(0, 1) === "1" ) {
+                        setInitialViewError(response.error_code);
+                    } else {
+                        setViews(ERROR);
+                    }
                 }
             })
     }
@@ -213,7 +207,7 @@ export const ImportIndicatorsPopover = ({ page, program_id, tierLevelsUsed, stor
         api.uploadTemplate(program_id, e.target.files[0])
                 .then(response => {
                     let handleResponse = () => {
-                        if (!response.error_code) {
+                        if ((response.valid >= 0)) {
                             setvalidIndicatorsCount(response.valid);
                             setInvalidIndicatorsCount(response.invalid);
                             if (response.invalid === 0) {
@@ -224,11 +218,9 @@ export const ImportIndicatorsPopover = ({ page, program_id, tierLevelsUsed, stor
                                 setStoredView({view: FEEDBACK, valid: response.valid, invalid: response.invalid});
                             }
                         } else {
-                            if (levelOne.test(response.error_code) ) {
+                            if (response.error_code && response.error_code.toString().slice(0, 1) === "1" ) {
                                 setInitialViewError(response.error_code);
-                            } else if (levelTwo.test(response.error_code) ) {
-                                setViews(ERROR);
-                            } else if (response.error) {
+                            } else {
                                 setViews(ERROR);
                             }
                         }
