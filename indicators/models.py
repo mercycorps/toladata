@@ -1248,7 +1248,7 @@ class Indicator(SafeDeleteModel):
         # Translators: this is help text for a field on an indicator setup form
         help_text=_("Enter a numeric value for the baseline. If a baseline is not yet known or not applicable, "
                     "enter a zero or select the &ldquo;Not applicable&rdquo; checkbox. The baseline can always "
-                    "be updated at later point in time.")
+                    "be updated at a later point in time.")
     )
 
     baseline_na = models.BooleanField(

@@ -260,6 +260,11 @@ class BulkImportIndicatorsView(LoginRequiredMixin, UserPassesTestMixin, AccessMi
                 if header['field_name'] == 'number' and not program.auto_number_indicators:
                     # Translators: This is help text for a form field that gets filled in automatically
                     help_text = gettext('This number is automatically generated through the results framework')
+                elif header['field_name'] == 'baseline':
+                    # Translators: This is help text for a form field
+                    help_text = gettext('Enter a numeric value for the baseline. If a baseline is not yet known '
+                                        'or not applicable, enter a zero or type "N/A". The baseline can always '
+                                        'be updated at a later point in time.')
                 else:
                     help_text = Indicator._meta.get_field(header['field_name']).help_text
                 comment = Comment(help_text, '')
