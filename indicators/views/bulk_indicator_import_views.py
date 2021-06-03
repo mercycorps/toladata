@@ -37,7 +37,7 @@ COLUMNS = [
     {'name': 'Definition', 'required': False, 'field_name': 'definition'},
     {'name': 'Rationale or justification for indicator', 'required': False, 'field_name': 'justification'},
     {'name': 'Unit of measure', 'required': True, 'field_name': 'unit_of_measure'},
-    # Note:  this lone string is being translated here because it's not the
+    # Note:  this lone string is being translated here because it's not the standard name for the field.
     # Translators:  Column header for the column that specifies whether the data in the row is expressed
     # as a number or a percent
     {'name': gettext('Number (#) or percentage (%)'), 'required': True, 'field_name': 'unit_of_measure_type',
@@ -259,7 +259,7 @@ class BulkImportIndicatorsView(LoginRequiredMixin, UserPassesTestMixin, AccessMi
             if header['field_name'] != 'comments':
                 if header['field_name'] == 'number' and not program.auto_number_indicators:
                     # Translators: This is help text for a form field that gets filled in automatically
-                    help_text = gettext('This number is automatically generated through the results framework')
+                    help_text = gettext('This number is automatically generated through the results framework.')
                 elif header['field_name'] == 'baseline':
                     # Translators: This is help text for a form field
                     help_text = gettext('Enter a numeric value for the baseline. If a baseline is not yet known '

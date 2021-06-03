@@ -7,7 +7,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: \n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2021-06-03 15:44-0700\n"
+"POT-Creation-Date: 2021-06-03 16:39-0700\n"
 "PO-Revision-Date: 2021-04-05 14:19-0700\n"
 "Last-Translator: \n"
 "Language-Team: \n"
@@ -1589,10 +1589,10 @@ msgstr "Translated Enter indicators"
 
 #. Translators: This is help text for a form field that gets filled in automatically
 #: indicators/views/bulk_indicator_import_views.py:262
-msgid "This number is automatically generated through the results framework"
+msgid "This number is automatically generated through the results framework."
 msgstr ""
 "ŹTranslated This number is automatically generated through the results "
-"framework"
+"framework."
 
 #. Translators: This is help text for a form field
 #: indicators/views/bulk_indicator_import_views.py:265
