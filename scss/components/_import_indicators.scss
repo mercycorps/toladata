@@ -121,8 +121,11 @@
 
     &-download {
         padding-left: 1.5rem;
-        font-weight: bold;
-        color: $action;
+        
+        a {
+            font-weight: bold;
+            color: $action;
+        }
     }
 }
 

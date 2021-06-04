@@ -438,18 +438,23 @@ export const ImportIndicatorsPopover = ({ page, program_id, tierLevelsUsed, stor
                                         ), [invalidIndicatorsCount])
                                     }
                                 </div>
-                                <a
-                                    className="import-feedback-download"
-                                    role="button"
-                                    href="#"
-                                    onClick={ () => handleFeedback() }
-                                >
+                                <div className="import-feedback-download">
+                                    <a
+                                        role="button"
+                                        href="#"
+                                        onClick={ () => handleFeedback() }
+                                    >
 
-                                        {
-                                            // # Translators: Download an excel template with errors that need fixing highlighted
-                                            gettext("Download a copy of your template with errors highlighted.")
-                                        }
-                                </a>
+                                            {
+                                                // # Translators: Download an excel template with errors that need fixing highlighted
+                                                gettext("Download a copy of your template with errors highlighted")
+                                            }
+                                    </a>
+                                    {
+                                        // # Translators: Fix the errors from the feedback file and upload the excel template again.
+                                        gettext(", fix the errors, and upload again.")
+                                    }
+                                </div>
                             </div>
                         )
                     // ***** View to ask users to confirm the upload *****
