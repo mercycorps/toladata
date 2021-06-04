@@ -67,6 +67,22 @@ class BulkImportIndicatorSerializer(serializers.ModelSerializer):
     def get_sector(obj):
         return None if not obj.sector else obj.sector.sector
 
+    def to_internal_value(self, data):
+        """Convert `username` to lowercase."""
+        values = super().to_internal_value(data)
+        baseline = values['baseline']
+        try:
+            baseline = int(baseline)
+        except ValueError:
+            null_equivalents = ['n/a', 'na', 'not applicable']
+            if baseline.lower in null_equivalents:
+                baseline = None
+            else:
+                raise serializers.ValidationError({'baseline': ['Baseline should be a number or N/A']})
+        values['baseline'] = baseline
+
+        return values
+
 
 class BulkImportProgramSerializer(serializers.ModelSerializer):
     indicator_set = BulkImportIndicatorSerializer(many=True)
