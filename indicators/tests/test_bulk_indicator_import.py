@@ -56,8 +56,7 @@ class TestBulkImportTemplateCreation(test.TestCase):
         for level_conf in config:
             row_count = request_params[level_conf['tier']]
             row_count += level_conf['indicators'] if has_indicators else 0
-            display_ontology = Level.truncate_ontology(level_conf['ontology'])
-            expected_numbers.append([f'{display_ontology}{letter}' for letter in self.letters[:row_count]])
+            expected_numbers.append([f"{level_conf['ontology']}{letter}" for letter in self.letters[:row_count]])
         return expected_numbers
 
     def process_indicator_rows(self, wb):
@@ -119,17 +118,17 @@ class TestBulkImportTemplateCreation(test.TestCase):
         ws = wb.get_sheet_by_name(TEMPLATE_SHEET_NAME)
         self.assertEqual(
             ws.cell(self.data_start_row, self.first_used_column).value,
-            f'Goal: {self.ordered_levels[0].name} ({self.ordered_levels[0].ontology})')
+            f'Goal: {self.ordered_levels[0].name}')
 
     def test_row_counts(self):
         level_config = [
-            {'name': 'Goal level', 'indicators': 2, 'ontology': '1.0.0.0', 'customsort': 1, 'tier': 'Goal'},
-            {'name': 'Outcome level 1', 'indicators': 0, 'ontology': '1.1.0.0', 'customsort': 1, 'tier': 'Outcome'},
-            {'name': 'Output level 1', 'indicators': 2, 'ontology': '1.1.1.0', 'customsort': 1, 'tier': 'Output'},
-            {'name': 'Activity level 1', 'indicators': 0, 'ontology': '1.1.1.1', 'customsort': 1, 'tier': 'Activity'},
-            {'name': 'Outcome level 2', 'indicators': 3, 'ontology': '1.2.0.0', 'customsort': 2, 'tier': 'Outcome'},
-            {'name': 'Output level 2', 'indicators': 0, 'ontology': '1.2.1.0', 'customsort': 1, 'tier': 'Output'},
-            {'name': 'Activity level 2', 'indicators': 3, 'ontology': '1.2.1.1', 'customsort': 1, 'tier': 'Activity'},
+            {'name': 'Goal level', 'indicators': 2, 'ontology': '', 'customsort': 1, 'tier': 'Goal'},
+            {'name': 'Outcome level 1', 'indicators': 0, 'ontology': '1', 'customsort': 1, 'tier': 'Outcome'},
+            {'name': 'Output level 1', 'indicators': 2, 'ontology': '1.1', 'customsort': 1, 'tier': 'Output'},
+            {'name': 'Activity level 1', 'indicators': 0, 'ontology': '1.1.1', 'customsort': 1, 'tier': 'Activity'},
+            {'name': 'Outcome level 2', 'indicators': 3, 'ontology': '2', 'customsort': 2, 'tier': 'Outcome'},
+            {'name': 'Output level 2', 'indicators': 0, 'ontology': '2.1', 'customsort': 1, 'tier': 'Output'},
+            {'name': 'Activity level 2', 'indicators': 3, 'ontology': '2.1.1', 'customsort': 1, 'tier': 'Activity'},
         ]
         self.client.force_login(self.tola_user.user)
         small_program = w_factories.RFProgramFactory(country=[self.country], tiers=True)
@@ -152,7 +151,8 @@ class TestBulkImportTemplateCreation(test.TestCase):
         # Test the defaults
         wb = openpyxl.load_workbook(self.get_template(program=small_program, request_params=request_params))
         expected_counts = {'level_headers': 4, 'existing_indicators': [0] * 4, 'new_indicators': [10, 10, 20, 20]}
-        expected_level_names = [f"{item['tier']}: {item['name']} ({item['ontology']})" for item in level_config[:4]]
+        expected_level_names = [f"{item['tier']}{' ' + item['ontology'] if item['ontology'] else ''}: {item['name']}"
+                                for item in level_config[:4]]
         expected_indicator_numbers = self.get_expected_indicator_numbers(level_config[:4], request_params)
         self.compare_ws_lines(wb, expected_counts, expected_level_names, expected_indicator_numbers)
 
@@ -170,7 +170,8 @@ class TestBulkImportTemplateCreation(test.TestCase):
         wb = openpyxl.load_workbook(self.get_template(program=small_program, request_params=request_params))
         expected_counts = {
             'level_headers': 7, 'existing_indicators': [0] * 7, 'new_indicators': [10, 10, 20, 20, 10, 20, 20]}
-        expected_level_names = [f"{item['tier']}: {item['name']} ({item['ontology']})" for item in level_config]
+        expected_level_names = [f"{item['tier']}{' ' + item['ontology'] if item['ontology'] else ''}: {item['name']}"
+                                for item in level_config]
         expected_indicator_numbers = self.get_expected_indicator_numbers(level_config, request_params)
         self.compare_ws_lines(wb, expected_counts, expected_level_names, expected_indicator_numbers)
 
@@ -185,7 +186,8 @@ class TestBulkImportTemplateCreation(test.TestCase):
             'level_headers': 7,
             'existing_indicators': expected_indicator_counts,
             'new_indicators': [10, 10, 20, 20, 10, 20, 20]}
-        expected_level_names = [f"{item['tier']}: {item['name']} ({item['ontology']})" for item in level_config]
+        expected_level_names = [f"{item['tier']}{' ' + item['ontology'] if item['ontology'] else ''}: {item['name']}"
+                                for item in level_config]
         expected_indicator_numbers = self.get_expected_indicator_numbers(
             level_config, request_params, has_indicators=True)
         self.compare_ws_lines(wb, expected_counts, expected_level_names, expected_indicator_numbers)
@@ -198,7 +200,8 @@ class TestBulkImportTemplateCreation(test.TestCase):
             'level_headers': 7,
             'existing_indicators': expected_indicator_counts,
             'new_indicators': [5, 5, 30, 30, 5, 30, 30]}
-        expected_level_names = [f"{item['tier']}: {item['name']} ({item['ontology']})" for item in level_config]
+        expected_level_names = [f"{item['tier']}{' ' + item['ontology'] if item['ontology'] else ''}: {item['name']}"
+                                for item in level_config]
         expected_indicator_numbers = self.get_expected_indicator_numbers(
             level_config, request_params, has_indicators=True)
         self.compare_ws_lines(wb, expected_counts, expected_level_names, expected_indicator_numbers)
@@ -210,7 +213,8 @@ class TestBulkImportTemplateCreation(test.TestCase):
             'level_headers': 7,
             'existing_indicators': expected_indicator_counts,
             'new_indicators': [5, 5, 0, 0, 5, 0, 0]}
-        expected_level_names = [f"{item['tier']}: {item['name']} ({item['ontology']})" for item in level_config]
+        expected_level_names = [f"{item['tier']}{' ' + item['ontology'] if item['ontology'] else ''}: {item['name']}"
+                                for item in level_config]
         expected_indicator_numbers = self.get_expected_indicator_numbers(
             level_config, request_params, has_indicators=True)
         self.compare_ws_lines(wb, expected_counts, expected_level_names, expected_indicator_numbers)
@@ -222,7 +226,8 @@ class TestBulkImportTemplateCreation(test.TestCase):
             'level_headers': 7,
             'existing_indicators': expected_indicator_counts,
             'new_indicators': ([0] * 7)}
-        expected_level_names = [f"{item['tier']}: {item['name']} ({item['ontology']})" for item in level_config]
+        expected_level_names = [f"{item['tier']}{' ' + item['ontology'] if item['ontology'] else ''}: {item['name']}"
+                                for item in level_config]
         expected_indicator_numbers = self.get_expected_indicator_numbers(
             level_config, request_params, has_indicators=True)
         self.compare_ws_lines(wb, expected_counts, expected_level_names, expected_indicator_numbers)
@@ -237,10 +242,8 @@ class TestBulkImportTemplateCreation(test.TestCase):
         i_factories.IndicatorFactory.create_batch(2, program=small_program, level=level_obj)
         new_tiers = LevelTier.objects.filter(program=small_program)
         new_level_config = copy.deepcopy(level_config)
-        for conf in new_level_config:
-            conf['ontology'] += '.0'
         new_level_config.append(
-            {'name': 'SubActivity 1', 'indicators': 2, 'ontology': '1.2.1.1.1',
+            {'name': 'SubActivity 1', 'indicators': 2, 'ontology': '2.1.1.1',
              'customsort': 1, 'tier': 'SubActivity'})
         for i, tier in enumerate(new_tiers):
             request_params[tier.name] = 10 if i < len(new_tiers) - 2 else 20
@@ -249,7 +252,8 @@ class TestBulkImportTemplateCreation(test.TestCase):
             'level_headers': 8,
             'existing_indicators': expected_indicator_counts + [2],
             'new_indicators': [10, 10, 10, 20, 10, 10, 20, 20]}
-        expected_level_names = [f"{item['tier']}: {item['name']} ({item['ontology']})" for item in new_level_config]
+        expected_level_names = [f"{item['tier']}{' ' + item['ontology'] if item['ontology'] else ''}: {item['name']}"
+                                for item in new_level_config]
         expected_indicator_numbers = self.get_expected_indicator_numbers(
             new_level_config, request_params, has_indicators=True)
         self.compare_ws_lines(wb, expected_counts, expected_level_names, expected_indicator_numbers)

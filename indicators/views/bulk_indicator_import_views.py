@@ -143,8 +143,9 @@ class BulkImportIndicatorsView(LoginRequiredMixin, UserPassesTestMixin, AccessMi
 
     def _row_is_empty(self, ws, row_index):
         # Don't test the first two columns (level and number) because they are pre-filled in a blank template
-        return not any([ws.cell(row_index, self.first_used_column + 2 + col).value
-                        for col in range(len(COLUMNS) - 2)])
+        filled_cells = len([1 for col in range(len(COLUMNS) - 2)
+                       if ws.cell(row_index, self.first_used_column + 2 + col).value])
+        return filled_cells <= 2
 
     def get(self, request, *args, **kwargs):
         program_id = kwargs['program_id']
@@ -297,8 +298,9 @@ class BulkImportIndicatorsView(LoginRequiredMixin, UserPassesTestMixin, AccessMi
 
         current_row_index = self.data_start_row
         for level in serialized_levels:
+            displayed_ontology = ' ' + level['display_ontology'] if len(level['display_ontology']) > 0 else ''
             ws.cell(current_row_index, self.first_used_column)\
-                .value = f"{gettext(level['tier_name'])} {level['display_ontology']}: {level['level_name']}"
+                .value = f"{gettext(level['tier_name'])}{displayed_ontology}: {level['level_name']}"
             ws.merge_cells(
                 start_row=current_row_index,
                 start_column=self.first_used_column,
@@ -398,7 +400,7 @@ class BulkImportIndicatorsView(LoginRequiredMixin, UserPassesTestMixin, AccessMi
             # TODO: Check column names and order
             # TODO: if level can't be parsed, highlight level as an error along with it's indicators
             if first_cell.style == LEVEL_HEADER_STYLE:
-                matches = re.match(r'^[^:]+:?\s?(.*)\((\d(?:\.\d)+)', first_cell.value)
+                matches = re.match(r'^[^:]+:?\s?(.*)$', first_cell.value)
                 if not matches or matches.group(1).strip() not in level_refs:
                     workbook_errors.append({'error_code': ERROR_INVALID_LEVEL_HEADER, 'row': current_row_index})
                     continue
