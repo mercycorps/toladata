@@ -41,11 +41,11 @@ COLUMNS = [
     # Translators:  Column header for the column that specifies whether the data in the row is expressed
     # as a number or a percent
     {'name': gettext('Number (#) or percentage (%)'), 'required': True, 'field_name': 'unit_of_measure_type',
-     'validation': VALIDATION_KEY_UOM_TYPE},
+     'validation': VALIDATION_KEY_UOM_TYPE, 'default': 'Number (#)'},
     {'name': 'Rationale for target', 'required': False, 'field_name': 'rationale_for_target'},
     {'name': 'Baseline', 'required': True, 'field_name': 'baseline'},
-    {'name': 'Direction of change', 'required': False, 'field_name': 'direction_of_change',
-     'validation': VALIDATION_KEY_DIR_CHANGE},
+    {'name': 'Direction of change', 'required': True, 'field_name': 'direction_of_change',
+     'validation': VALIDATION_KEY_DIR_CHANGE, 'default': 'Not applicable'},
     {'name': 'Target frequency', 'required': True, 'field_name': 'target_frequency',
      'validation': VALIDATION_KEY_TARGET_FREQ},
     {'name': 'Means of verification / data source', 'required': False, 'field_name': 'means_of_verification'},
@@ -157,7 +157,7 @@ class BulkImportIndicatorsView(LoginRequiredMixin, UserPassesTestMixin, AccessMi
             'indicator_set', 'program', 'parent__program__level_tiers')
         serialized_levels = sorted(BulkImportSerializer(levels, many=True).data, key=lambda level: level['ontology'])
 
-        leveltiers_in_db = sorted([gettext(tier.name) for tier in LevelTier.objects.filter(program=program)])
+        leveltiers_in_db = sorted([tier.name for tier in LevelTier.objects.filter(program=program)])
         request_leveltier_names = sorted(request.GET.keys())
         if leveltiers_in_db != request_leveltier_names:
             return JsonResponse({'error_code': ERROR_MISMATCHED_TIERS}, status=400)
@@ -257,7 +257,7 @@ class BulkImportIndicatorsView(LoginRequiredMixin, UserPassesTestMixin, AccessMi
 
             # Add notes to header row cells
             if header['field_name'] != 'comments':
-                if header['field_name'] == 'number' and not program.auto_number_indicators:
+                if header['field_name'] == 'number' and program.auto_number_indicators:
                     # Translators: This is help text for a form field that gets filled in automatically
                     help_text = gettext('This number is automatically generated through the results framework.')
                 elif header['field_name'] == 'baseline':
@@ -298,7 +298,7 @@ class BulkImportIndicatorsView(LoginRequiredMixin, UserPassesTestMixin, AccessMi
         current_row_index = self.data_start_row
         for level in serialized_levels:
             ws.cell(current_row_index, self.first_used_column)\
-                .value = f'{gettext(level["tier_name"])}: {level["level_name"]} ({level["ontology"]})'
+                .value = f"{gettext(level['tier_name'])} {level['display_ontology']}: {level['level_name']}"
             ws.merge_cells(
                 start_row=current_row_index,
                 start_column=self.first_used_column,
@@ -355,6 +355,8 @@ class BulkImportIndicatorsView(LoginRequiredMixin, UserPassesTestMixin, AccessMi
                     if 'validation' in column:
                         validator = validation_map[column['validation']]
                         validator.add(active_cell)
+                    if 'default' in column:
+                        active_cell.value = column['default']
                 current_row_index += 1
             current_row_index += 1
 
