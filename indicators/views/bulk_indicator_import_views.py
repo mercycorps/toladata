@@ -120,7 +120,7 @@ class BulkImportIndicatorsView(LoginRequiredMixin, UserPassesTestMixin, AccessMi
 
     level_header_style = NamedStyle(LEVEL_HEADER_STYLE)
     level_header_style.fill = PatternFill('solid', fgColor=GRAY_LIGHTER)
-    level_header_style.font = Font(name='Calibri', size=11)
+    level_header_style.font = Font(name='Calibri', size=11, bold=True)
     level_header_style.protection = Protection(locked=True)
 
     protected_indicator_style = NamedStyle(PROTECTED_INDICATOR_STYLE)
@@ -245,6 +245,7 @@ class BulkImportIndicatorsView(LoginRequiredMixin, UserPassesTestMixin, AccessMi
         # Translators: Section header of an Excel template that allows users to upload Indicators.  This section is where users will add their own information.
         ws.cell(5, self.first_used_column).value = gettext("Enter indicators")
 
+        # Output column header row
         for i, header in enumerate(COLUMNS):
             column_index = i+2
             header_cell = ws.cell(6, column_index)
@@ -275,16 +276,15 @@ class BulkImportIndicatorsView(LoginRequiredMixin, UserPassesTestMixin, AccessMi
             if header['field_name'] == 'sector':
                 col_width = max(len(option) for option in sector_options)
                 ws.column_dimensions[get_column_letter(column_index)].width = col_width
-            elif header['field_name'] == 'rationale_for_target':
-                ws.column_dimensions[get_column_letter(column_index)].width = 30
+            elif header['field_name'] in ['source', 'definition', 'unit_of_measure', 'rationale_for_target']:
+                ws.column_dimensions[get_column_letter(column_index)].width = 40
             elif 7 < column_index < 15:
                 col_width = len(header_cell.value)
                 ws.column_dimensions[get_column_letter(column_index)].width = col_width
             elif column_index >= 15:
-                col_width = max(len(option) for option in target_freq_options)
-                ws.column_dimensions[get_column_letter(column_index)].width = col_width
+                ws.column_dimensions[get_column_letter(column_index)].width = 40
 
-        # Need to make sure the instructions are covered by merged cells and that cell widths are cacluated
+        # Need to make sure the instructions are covered by merged cells and that cell widths are calculated
         # after the individual header cells have been styled
         max_line_width = max([len(line) for line in instructions.split('\n')])
         required_width = .8 * max_line_width
