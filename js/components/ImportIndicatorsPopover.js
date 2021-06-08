@@ -153,6 +153,7 @@ export const ImportIndicatorsPopover = ({ page, program_id, tierLevelsUsed, stor
     const [invalidIndicatorsCount, setInvalidIndicatorsCount] = useState(0); // Number of indicators that have failed validation and needs fixing
     const [tierLevelsRows, setTierLevelsRows] = useState([]); // State to hold the tier levels name and the desired number of rows for the excel template
     const [intialViewError, setInitialViewError] = useState(null);
+    const [downloadOrUpload, setDownloadOrUpload] = useState(null);
 
     let defaultTierLevelRows = [];
     useEffect(() => {
@@ -181,6 +182,7 @@ export const ImportIndicatorsPopover = ({ page, program_id, tierLevelsUsed, stor
 
     // Download template file providing the program ID and number of rows per tier level
     let handleDownload = () => {
+        setDownloadOrUpload("download")
         api.downloadTemplate(program_id, tierLevelsRows)
             .then(response => {
                 if (response.status !== 200) {
@@ -195,6 +197,7 @@ export const ImportIndicatorsPopover = ({ page, program_id, tierLevelsUsed, stor
 
     // Upload template file and send api request
     let handleUpload = (e) => {
+        setDownloadOrUpload("upload")
         let loading = false;
         let loadingTimer = setTimeout(() => {
             setViews(LOADING)
@@ -278,6 +281,17 @@ export const ImportIndicatorsPopover = ({ page, program_id, tierLevelsUsed, stor
             })
     }
 
+    // Handle Continue when there are multiple downloaders or uploaders
+    let handleContinue = () => {
+        if (downloadOrUpload === "download") {
+            handleDownload();
+        } else {
+            // TODO: Update for when the users clicks to continue to upload when theres multiple uploaders
+            console.log("Continue Upload");
+            // handleUpload();
+        }
+    }
+
     // Handle clicking cancel and closing the popover
     let handleClose = () => {
         $('.popover').popover('hide')
@@ -315,7 +329,7 @@ export const ImportIndicatorsPopover = ({ page, program_id, tierLevelsUsed, stor
                     role="button"
                     type="button"
                     className="btn btn-sm btn-primary"
-                    // onClick={ (e) => handleUpload(e) } //TODO: Determine how to handle this scenario, send files again or just send a confirm to continue
+                    onClick={ () => handleContinue() }
                 >
                     {
                         // # Translators: Button to continue and upload the template
