@@ -95,6 +95,7 @@ export class ImportIndicatorsButton extends React.Component {
             tierLevelsUsed[i] = {
                 name: tier,
                 used: false,
+                english: this.props.englishChosenTiers[i],
             }
         })
         this.props.levels.map((level) => {
@@ -162,7 +163,7 @@ export const ImportIndicatorsPopover = ({ page, program_id, tierLevelsUsed, stor
 
         tierLevelsUsed.map((tier, i) => {
             // Default number of rows per level is set to 10 or 20 on mount.
-            defaultTierLevelRows[i] =  { name: tier.name, rows: i < tierLevelsUsed.length - 2 ? 10 : 20 };
+            defaultTierLevelRows[i] =  { name: tier.name, english: tier.english, rows: i < tierLevelsUsed.length - 2 ? 10 : 20 };
         })
 
         // Use stored tier levels rows count if it was selected previously before closing and is still available/active
@@ -615,7 +616,8 @@ const LevelIndicatorCount = ({ level, i }) => {
         let updatedTiers = $.extend(true, [], tierLevelsRows);
         updatedTiers[i] = {
             name: level.name,
-            rows: event.value
+            english: level.english,
+            rows: event.value,
         };
         setTierLevelsRows(updatedTiers);
     }
