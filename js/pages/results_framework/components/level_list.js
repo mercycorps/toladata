@@ -141,14 +141,14 @@ export class LevelListPanel  extends React.Component {
             });
             window.open(this.props.rootStore.levelStore.excelURL, '_blank')
         }
-        let importButton =
-            (<ImportIndicatorsButton 
-                program_id={ this.props.rootStore.levelStore.program_id }
-                chosenTiers={ this.props.rootStore.levelStore.tierTemplates[this.props.rootStore.levelStore.chosenTierSetKey].tiers }
-                englishChosenTiers={ this.props.rootStore.levelStore.englishTierTemlates[this.props.rootStore.levelStore.chosenTierSetKey].tiers }
-                levels={ this.props.rootStore.levelStore.levels }
-                page={ "resultsFramework" }
-            />)
+        let importButton = (
+            <ImportIndicatorsButton 
+            program_id={ this.props.rootStore.levelStore.program_id }
+            chosenTiers={ this.props.rootStore.levelStore.tierTemplates[this.props.rootStore.levelStore.chosenTierSetKey].tiers }
+            englishChosenTiers={ this.props.rootStore.levelStore.englishTierTemlates[this.props.rootStore.levelStore.chosenTierSetKey].tiers }
+            levels={ this.props.rootStore.levelStore.levels }
+            page={ "resultsFramework" }
+        />)
         let expandoDiv = (() => {
             switch(this.state.level_status) {
                 case this.EMPTY || this.NEW:
@@ -156,7 +156,7 @@ export class LevelListPanel  extends React.Component {
                 case this.FIRST:
                     return (
                         <div className="level-list--expandos" style={{flexDirection: "row-reverse"}}>
-                            { this.props.rootStore.levelStore.accessLevel === "high" && importButton }
+                            { this.props.rootStore.levelStore.accessLevel === "high" && importButton }                               
                         </div>
                     );
                 case this.EXISTING:
@@ -171,7 +171,7 @@ export class LevelListPanel  extends React.Component {
                                 collapseFunc={this.props.rootStore.uiStore.collapseAllLevels} />
                             </div>
                             <div className="level-list--action-buttons" style={{display: "flex"}}>
-                                { this.props.rootStore.levelStore.accessLevel === "high" && importButton }
+                                { this.props.rootStore.levelStore.accessLevel === "high" && importButton }                               
                                 <button
                                     type="button"
                                     className="btn btn-sm btn-secondary ml-2"
