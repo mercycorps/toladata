@@ -45,10 +45,11 @@ export class ImportIndicatorsButton extends React.Component {
                 document.querySelector(`#${this.popoverName}_popover_content`),
                 popoverOpenHandler
             );
+            $(`#${this.popoverName}_popover_content`).parent().parent().addClass('importPopover');
         };
         $(this.myRef.current).popover({
             content: `<div id="${this.popoverName}_popover_content"></div>`,
-            title: this.popoverTitle ? `<div>${this.popoverTitle}</div>` : "",
+            title: `<div>${this.popoverTitle}</div>`,
             html: true,
             placement: 'bottom',
             boundary: 'viewport',
