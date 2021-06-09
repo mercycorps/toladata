@@ -47,7 +47,7 @@ class TestBulkImportTemplateCreation(test.TestCase):
         if not program:
             program = self.program
         if not request_params:
-            request_params = dict([(gettext(tier.name), 10) for tier in LevelTier.objects.filter(program=program)])
+            request_params = dict([(tier.name, 10) for tier in LevelTier.objects.filter(program=program)])
         response = self.client.get(reverse('bulk_import_indicators', args=[program.pk]), data=request_params)
         return ContentFile(response.content)
 

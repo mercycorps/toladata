@@ -339,7 +339,7 @@ class BulkImportIndicatorsView(LoginRequiredMixin, UserPassesTestMixin, AccessMi
                 current_row_index += 1
 
             letter_index = len(level['indicator_set']) - 1
-            empty_row_count = int(request.GET[gettext(level['tier_name'])])
+            empty_row_count = int(request.GET[level['tier_name']])
             for i in range(empty_row_count):
                 ws.row_dimensions[current_row_index].height = 16
                 ws.cell(current_row_index, self.first_used_column).value = gettext(level['tier_name'])
