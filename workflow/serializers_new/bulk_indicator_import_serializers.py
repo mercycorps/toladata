@@ -68,8 +68,12 @@ class BulkImportIndicatorSerializer(serializers.ModelSerializer):
         return None if not obj.sector else obj.sector.sector
 
     def to_internal_value(self, data):
-        """Convert `username` to lowercase."""
+        """Handle special values of indicator fields"""
         values = super().to_internal_value(data)
+
+        if 'baseline' not in values or values['baseline'] is None:
+            return values
+
         baseline = values['baseline']
         try:
             baseline = int(baseline)
@@ -82,6 +86,9 @@ class BulkImportIndicatorSerializer(serializers.ModelSerializer):
         values['baseline'] = baseline
 
         return values
+
+    def create(self, validated_data):
+        return Indicator.objects.create(**validated_data)
 
 
 class BulkImportProgramSerializer(serializers.ModelSerializer):
