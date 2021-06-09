@@ -91,9 +91,9 @@ export class ImportIndicatorsButton extends React.Component {
 
         // Determine what tier levels have been created/used in the Results Framework
         let tierLevelsUsed = []; 
-        this.props.chosenTiers.map((tier, i) => {
+        this.props.levelTiers.map((tier, i) => {
             tierLevelsUsed[i] = {
-                name: tier,
+                name: tier.name,
                 used: false,
             }
         })
@@ -615,7 +615,7 @@ const LevelIndicatorCount = ({ level, i }) => {
         let updatedTiers = $.extend(true, [], tierLevelsRows);
         updatedTiers[i] = {
             name: level.name,
-            rows: event.value
+            rows: event.value,
         };
         setTierLevelsRows(updatedTiers);
     }
@@ -647,11 +647,11 @@ const LevelIndicatorCount = ({ level, i }) => {
             ...base,
             paddingBottom: 2,
         })
-      };
+    };
 
     return (
         <div key={ i } className="level-count-row">
-            <label htmlFor={ level.name }> { level.name } </label>
+            <label htmlFor={ level.name }> { gettext(level.name) } </label>
             <Select
                 id={ level.name }
                 className="level-count-options"
