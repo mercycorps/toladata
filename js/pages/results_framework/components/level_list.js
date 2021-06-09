@@ -144,8 +144,7 @@ export class LevelListPanel  extends React.Component {
         let importButton = (
             <ImportIndicatorsButton 
             program_id={ this.props.rootStore.levelStore.program_id }
-            chosenTiers={ this.props.rootStore.levelStore.tierTemplates[this.props.rootStore.levelStore.chosenTierSetKey].tiers }
-            englishChosenTiers={ this.props.rootStore.levelStore.englishTierTemlates[this.props.rootStore.levelStore.chosenTierSetKey].tiers }
+            levelTiers={ this.props.rootStore.levelStore.levelTiers }
             levels={ this.props.rootStore.levelStore.levels }
             page={ "resultsFramework" }
         />)

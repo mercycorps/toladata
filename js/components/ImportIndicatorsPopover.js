@@ -91,11 +91,10 @@ export class ImportIndicatorsButton extends React.Component {
 
         // Determine what tier levels have been created/used in the Results Framework
         let tierLevelsUsed = []; 
-        this.props.chosenTiers.map((tier, i) => {
+        this.props.levelTiers.map((tier, i) => {
             tierLevelsUsed[i] = {
-                name: tier,
+                name: tier.name,
                 used: false,
-                english: this.props.englishChosenTiers[i],
             }
         })
         this.props.levels.map((level) => {
@@ -163,7 +162,7 @@ export const ImportIndicatorsPopover = ({ page, program_id, tierLevelsUsed, stor
 
         tierLevelsUsed.map((tier, i) => {
             // Default number of rows per level is set to 10 or 20 on mount.
-            defaultTierLevelRows[i] =  { name: tier.name, english: tier.english, rows: i < tierLevelsUsed.length - 2 ? 10 : 20 };
+            defaultTierLevelRows[i] =  { name: tier.name, rows: i < tierLevelsUsed.length - 2 ? 10 : 20 };
         })
 
         // Use stored tier levels rows count if it was selected previously before closing and is still available/active
@@ -616,7 +615,6 @@ const LevelIndicatorCount = ({ level, i }) => {
         let updatedTiers = $.extend(true, [], tierLevelsRows);
         updatedTiers[i] = {
             name: level.name,
-            english: level.english,
             rows: event.value,
         };
         setTierLevelsRows(updatedTiers);
@@ -649,11 +647,11 @@ const LevelIndicatorCount = ({ level, i }) => {
             ...base,
             paddingBottom: 2,
         })
-      };
+    };
 
     return (
         <div key={ i } className="level-count-row">
-            <label htmlFor={ level.name }> { level.name } </label>
+            <label htmlFor={ level.name }> { gettext(level.name) } </label>
             <Select
                 id={ level.name }
                 className="level-count-options"

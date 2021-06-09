@@ -119,7 +119,7 @@ const api = {
     },
     async downloadTemplate (program_id, tierLevelsRows) {
         let flatTierLevelsRows = tierLevelsRows.reduce((accumulator, currentValue) => {
-            accumulator[currentValue.english] = currentValue.rows;
+            accumulator[currentValue.name] = currentValue.rows;
             return accumulator
         }, {})
         return await this.templatesInstance.get(`/indicators/api/bulk_import_indicators/${program_id}/`, { params: flatTierLevelsRows })

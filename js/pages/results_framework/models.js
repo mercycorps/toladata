@@ -28,6 +28,7 @@ export class LevelStore {
         this.rootStore = rootStore;
         this.levels = levels;
         this.indicators = indicators;
+        this.levelTiers = levelTiers
         this.englishTierTemlates = JSON.parse(englishTemplates);
         this.defaultTemplateKey = "mc_standard";
         this.customTierSetKey = "custom";
