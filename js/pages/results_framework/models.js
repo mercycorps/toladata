@@ -42,7 +42,9 @@ export class LevelStore {
 
         this.tierTemplates = JSON.parse(tierTemplates);
         this.tierTemplates[this.customTierSetKey] = {name: gettext("Custom")};
+        this.englishTierTemlates[this.customTierSetKey] = {name: gettext("Custom")};
         this.tierTemplates[this.customTierSetKey]['tiers'] = customTemplates.names || [""];
+        this.englishTierTemlates[this.customTierSetKey]['tiers'] = customTemplates.names || [""];
 
         // Set the stored tier set key and the values, if they exist.  Use the default if they don't.
         if (levelTiers.length > 0) {

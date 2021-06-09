@@ -1,4 +1,4 @@
-import { observable, action, computed } from 'mobx';
+import { observable, action, computed, toJS } from 'mobx';
 import React from 'react';
 import ReactDOM from 'react-dom';
 import getProgramStore from './programPageProgram';
@@ -18,6 +18,9 @@ export default class ProgramPageRootStore {
             resultReadOnly = true,
             levels = [],
             levelTiers = [],
+            tierTemplates = [],
+            englishTemplates = [],
+            customTemplates = [],
         } = {}
     ) {
         this.readOnly = readOnly;
@@ -27,8 +30,43 @@ export default class ProgramPageRootStore {
         this.program = getProgramStore(programJSON);
         this.uiStore = new ProgramPageUIStore(this);
         this.levels = levels;
-        this.levelTiers = levelTiers;
+        this.customTierSetKey = "custom";
+        this.tierTemplates = JSON.parse(tierTemplates);
+        this.englishTierTemplates = JSON.parse(englishTemplates);
+        
+        this.tierTemplates[this.customTierSetKey] = {name: gettext("Custom")};
+        this.englishTierTemplates[this.customTierSetKey] = {name: gettext("Custom")};
+        this.tierTemplates[this.customTierSetKey]['tiers'] = customTemplates.names || [""];
+        this.englishTierTemplates[this.customTierSetKey]['tiers'] = customTemplates.names || [""];
+
+        // Set the stored tier set key and the values, if they exist.  Use the default if they don't.
+        if (levelTiers.length > 0) {
+            const origLevelTiers = levelTiers.map( t => t.name);
+            this.chosenTierSetKey = this.deriveTemplateKey(origLevelTiers);
+        }
+        else {
+            this.chosenTierSetKey = this.defaultTemplateKey;
+        }
     }
+
+    deriveTemplateKey = (origLevelTiers) => {
+        // Check each tier set in the templates to see if the tier order and content are exactly the same
+        // If they are, return the template key
+        const levelTierStr = JSON.stringify(toJS(origLevelTiers));
+        for (let templateKey in this.englishTierTemplates){
+            // not an eligable template if the key is inherited or if the lengths of the tier sets don't match.
+            if (!this.englishTierTemplates.hasOwnProperty(templateKey) ||
+                origLevelTiers.length != this.englishTierTemplates[templateKey]['tiers'].length) {
+                continue;
+            }
+            const templateValuesStr = JSON.stringify(this.englishTierTemplates[templateKey]['tiers']);
+            if (levelTierStr == templateValuesStr) {
+                return templateKey;
+            }
+        }
+        // If this has been reached, the db has stored tiers but they're not a match to a template
+        return this.customTierSetKey;
+    };
 
     @computed
     get _sortedIndicators() {

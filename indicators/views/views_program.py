@@ -2,6 +2,7 @@
     Program views: logframe, program page api, etc.
 """
 
+import json
 import math
 from operator import itemgetter
 import csv
@@ -14,13 +15,19 @@ from django.utils.translation import gettext
 from django.http import HttpResponse, JsonResponse
 from django.shortcuts import render, reverse, redirect, get_object_or_404
 
+from django.utils import translation
+from django.utils.functional import Promise
+from django.utils.encoding import force_text
+from django.core.serializers.json import DjangoJSONEncoder
+
 from indicators.serializers import (
     LevelSerializer,
     LevelTierSerializer,
+    LevelTierTemplateSerializer,
 )
 from indicators.queries import ProgramWithMetrics
 from indicators.xls_export_utils import TAN, apply_title_styling, apply_label_styling
-from indicators.models import Indicator, PinnedReport, Level, LevelTier
+from indicators.models import Indicator, PinnedReport, Level, LevelTier, LevelTierTemplate
 from workflow.models import Program
 from workflow.serializers import LogframeProgramSerializer
 from workflow.serializers_new import (
@@ -280,6 +287,11 @@ def programs_rollup_export_csv(request):
     return response
 
 # API views:
+class LazyEncoder(DjangoJSONEncoder):
+    def default(self, obj):
+        if isinstance(obj, Promise):
+            return force_text(obj)
+        return super(LazyEncoder, self).default(obj)
 
 @login_required
 @has_program_read_access
@@ -299,8 +311,17 @@ def program_page(request, program):
             'indicators/program_setup_incomplete.html',
             {'program': program, 'redirect_url': request.path}
         )
+    try:
+        custom_tiers = LevelTierTemplate.objects.get(program=program)
+    except LevelTierTemplate.DoesNotExist:
+        custom_tiers = None
     levels = Level.objects.filter(program=program)
     tiers = LevelTier.objects.filter(program=program)
+    translated_templates = json.dumps(LevelTier.get_templates(), cls=LazyEncoder)
+    old_lang = translation.get_language()
+    translation.activate('en')
+    untranslated_templates = json.dumps(LevelTier.get_templates(), cls=LazyEncoder)
+    translation.activate(old_lang)
     context = {
         'program': ProgramPageProgramSerializer.load_for_pk(program.pk).data,
         'pinned_reports': list(PinnedReport.objects.filter(
@@ -310,6 +331,9 @@ def program_page(request, program):
         'indicator_on_scope_margin': Indicator.ONSCOPE_MARGIN,
         'levels': LevelSerializer(levels, many=True).data,
         'levelTiers': LevelTierSerializer(tiers, many=True).data,
+        'tierTemplates': translated_templates,
+        'englishTemplates': untranslated_templates,
+        'customTemplates': LevelTierTemplateSerializer(custom_tiers).data,
         'readonly': not request.has_write_access,
         'result_readonly': not request.has_medium_access
     }
