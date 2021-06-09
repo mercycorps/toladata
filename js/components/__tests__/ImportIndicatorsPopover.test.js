@@ -31,14 +31,14 @@ describe('Import Indicators test suite', () => {
     })
 
     it('Should contain the right components in the initial view', () => {
-        expect(wrapper.exists('.import-initial')).toBe(true);
+        expect(wrapper.exists('.import__initial')).toBe(true);
         expect(wrapper.exists('.btn-upload')).toBe(true);
         expect(wrapper.exists('.btn-download')).toBe(true);
-        expect(wrapper.exists('.level-count-row')).toBe(true);
-        expect(wrapper.exists('.level-count-options')).toBe(true);
+        expect(wrapper.exists('.import__advanced__form__level-count-row')).toBe(true);
+        expect(wrapper.exists('.import__advanced__form__level-count-row__options')).toBe(true);
     });
 
     it('Should have same number of rows as provided tier levels', () => {
-        expect(wrapper.find(".level-count-row").length).toBe(tierLevelsUsed.length);
+        expect(wrapper.find(".import__advanced__form__level-count-row").length).toBe(tierLevelsUsed.length);
     })
 })
