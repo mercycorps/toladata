@@ -29,7 +29,7 @@ VALIDATION_KEY_SECTOR = 'sector_validation'
 
 COLUMNS = [
     {'name': 'Level', 'required': True, 'field_name': 'level'},
-    {'name': 'No.', 'required': True, 'field_name': 'number'},
+    {'name': 'No.', 'required': False, 'field_name': 'number'},
     {'name': 'Indicator', 'required': True, 'field_name': 'name'},
     {'name': 'Sector', 'required': False, 'field_name': 'sector',
      'validation': VALIDATION_KEY_SECTOR},
@@ -37,12 +37,15 @@ COLUMNS = [
     {'name': 'Definition', 'required': False, 'field_name': 'definition'},
     {'name': 'Rationale or justification for indicator', 'required': False, 'field_name': 'justification'},
     {'name': 'Unit of measure', 'required': True, 'field_name': 'unit_of_measure'},
-    {'name': 'Number (#) or percentage (%)', 'required': True, 'field_name': 'unit_of_measure_type',
-     'validation': VALIDATION_KEY_UOM_TYPE},
+    # Note:  this lone string is being translated here because it's not the standard name for the field.
+    # Translators:  Column header for the column that specifies whether the data in the row is expressed
+    # as a number or a percent
+    {'name': gettext('Number (#) or percentage (%)'), 'required': True, 'field_name': 'unit_of_measure_type',
+     'validation': VALIDATION_KEY_UOM_TYPE, 'default': 'Number (#)'},
     {'name': 'Rationale for target', 'required': False, 'field_name': 'rationale_for_target'},
     {'name': 'Baseline', 'required': True, 'field_name': 'baseline'},
-    {'name': 'Direction of change', 'required': False, 'field_name': 'direction_of_change',
-     'validation': VALIDATION_KEY_DIR_CHANGE},
+    {'name': 'Direction of change', 'required': True, 'field_name': 'direction_of_change',
+     'validation': VALIDATION_KEY_DIR_CHANGE, 'default': 'Not applicable'},
     {'name': 'Target frequency', 'required': True, 'field_name': 'target_frequency',
      'validation': VALIDATION_KEY_TARGET_FREQ},
     {'name': 'Means of verification / data source', 'required': False, 'field_name': 'means_of_verification'},
@@ -57,7 +60,7 @@ COLUMNS = [
 ]
 
 BASE_TEMPLATE_NAME = 'BulkImportTemplate.xlsx'
-TEMPLATE_SHEET_NAME = 'Template'
+TEMPLATE_SHEET_NAME = 'Import indicators'
 HIDDEN_SHEET_NAME = 'Hidden'
 
 FIRST_USED_COLUMN = 2
@@ -105,15 +108,19 @@ class BulkImportIndicatorsView(LoginRequiredMixin, UserPassesTestMixin, AccessMi
     required_header_style.font = Font(name='Calibri', size=11, color='FFFFFFFF')
     required_header_style.fill = PatternFill('solid', fgColor='00000000')
     required_header_style.protection = Protection(locked=True)
+    required_header_style.border = Border(
+        left=default_border, right=default_border, top=default_border, bottom=default_border)
 
     optional_header_style = NamedStyle(OPTIONAL_HEADER_STYLE)
     optional_header_style.font = Font(name='Calibri', size=11, color='00000000')
     optional_header_style.fill = PatternFill('solid', fgColor=GRAY_LIGHTEST)
     optional_header_style.protection = Protection(locked=False)
+    optional_header_style.border = Border(
+        left=default_border, right=default_border, top=default_border, bottom=default_border)
 
     level_header_style = NamedStyle(LEVEL_HEADER_STYLE)
     level_header_style.fill = PatternFill('solid', fgColor=GRAY_LIGHTER)
-    level_header_style.font = Font(name='Calibri', size=11)
+    level_header_style.font = Font(name='Calibri', size=11, bold=True)
     level_header_style.protection = Protection(locked=True)
 
     protected_indicator_style = NamedStyle(PROTECTED_INDICATOR_STYLE)
@@ -121,12 +128,12 @@ class BulkImportIndicatorsView(LoginRequiredMixin, UserPassesTestMixin, AccessMi
     protected_indicator_style.font = Font(name='Calibri', size=11, color=GRAY_DARK)
     protected_indicator_style.border = Border(
         left=default_border, right=default_border, top=default_border, bottom=default_border)
-    protected_indicator_style.alignment = Alignment(vertical='top')
+    protected_indicator_style.alignment = Alignment(vertical='top', wrap_text=True)
     protected_indicator_style.protection = Protection(locked=True)
 
     unprotected_indicator_style = NamedStyle(UNPROTECTED_INDICATOR_STYLE)
     unprotected_indicator_style.font = Font(name='Calibri', size=11)
-    unprotected_indicator_style.alignment = Alignment(vertical='top')
+    unprotected_indicator_style.alignment = Alignment(vertical='top', wrap_text=True)
     unprotected_indicator_style.protection = Protection(locked=False)
 
     def test_func(self):
@@ -136,8 +143,9 @@ class BulkImportIndicatorsView(LoginRequiredMixin, UserPassesTestMixin, AccessMi
 
     def _row_is_empty(self, ws, row_index):
         # Don't test the first two columns (level and number) because they are pre-filled in a blank template
-        return not any([ws.cell(row_index, self.first_used_column + 2 + col).value
-                        for col in range(len(COLUMNS) - 2)])
+        filled_cells = len([1 for col in range(len(COLUMNS) - 2)
+                       if ws.cell(row_index, self.first_used_column + 2 + col).value])
+        return filled_cells <= 2
 
     def get(self, request, *args, **kwargs):
         program_id = kwargs['program_id']
@@ -150,7 +158,7 @@ class BulkImportIndicatorsView(LoginRequiredMixin, UserPassesTestMixin, AccessMi
             'indicator_set', 'program', 'parent__program__level_tiers')
         serialized_levels = sorted(BulkImportSerializer(levels, many=True).data, key=lambda level: level['ontology'])
 
-        leveltiers_in_db = sorted([gettext(tier.name) for tier in LevelTier.objects.filter(program=program)])
+        leveltiers_in_db = sorted([tier.name for tier in LevelTier.objects.filter(program=program)])
         request_leveltier_names = sorted(request.GET.keys())
         if leveltiers_in_db != request_leveltier_names:
             return JsonResponse({'error_code': ERROR_MISMATCHED_TIERS}, status=400)
@@ -238,6 +246,7 @@ class BulkImportIndicatorsView(LoginRequiredMixin, UserPassesTestMixin, AccessMi
         # Translators: Section header of an Excel template that allows users to upload Indicators.  This section is where users will add their own information.
         ws.cell(5, self.first_used_column).value = gettext("Enter indicators")
 
+        # Output column header row
         for i, header in enumerate(COLUMNS):
             column_index = i+2
             header_cell = ws.cell(6, column_index)
@@ -250,7 +259,16 @@ class BulkImportIndicatorsView(LoginRequiredMixin, UserPassesTestMixin, AccessMi
 
             # Add notes to header row cells
             if header['field_name'] != 'comments':
-                help_text = Indicator._meta.get_field(header['field_name']).help_text
+                if header['field_name'] == 'number' and program.auto_number_indicators:
+                    # Translators: This is help text for a form field that gets filled in automatically
+                    help_text = gettext('This number is automatically generated through the results framework.')
+                elif header['field_name'] == 'baseline':
+                    # Translators: This is help text for a form field
+                    help_text = gettext('Enter a numeric value for the baseline. If a baseline is not yet known '
+                                        'or not applicable, enter a zero or type "N/A". The baseline can always '
+                                        'be updated at a later point in time.')
+                else:
+                    help_text = Indicator._meta.get_field(header['field_name']).help_text
                 comment = Comment(help_text, '')
                 comment.width = 300
                 comment.height = 15 + len(help_text) * .5
@@ -259,16 +277,17 @@ class BulkImportIndicatorsView(LoginRequiredMixin, UserPassesTestMixin, AccessMi
             if header['field_name'] == 'sector':
                 col_width = max(len(option) for option in sector_options)
                 ws.column_dimensions[get_column_letter(column_index)].width = col_width
-            elif header['field_name'] == 'rationale_for_target':
-                ws.column_dimensions[get_column_letter(column_index)].width = 30
+            elif header['field_name'] == 'definition':
+                ws.column_dimensions[get_column_letter(column_index)].width = 50
+            elif header['field_name'] in ['source', 'definition', 'unit_of_measure', 'rationale_for_target']:
+                ws.column_dimensions[get_column_letter(column_index)].width = 40
             elif 7 < column_index < 15:
                 col_width = len(header_cell.value)
                 ws.column_dimensions[get_column_letter(column_index)].width = col_width
             elif column_index >= 15:
-                col_width = max(len(option) for option in target_freq_options)
-                ws.column_dimensions[get_column_letter(column_index)].width = col_width
+                ws.column_dimensions[get_column_letter(column_index)].width = 40
 
-        # Need to make sure the instructions are covered by merged cells and that cell widths are cacluated
+        # Need to make sure the instructions are covered by merged cells and that cell widths are calculated
         # after the individual header cells have been styled
         max_line_width = max([len(line) for line in instructions.split('\n')])
         required_width = .8 * max_line_width
@@ -281,8 +300,9 @@ class BulkImportIndicatorsView(LoginRequiredMixin, UserPassesTestMixin, AccessMi
 
         current_row_index = self.data_start_row
         for level in serialized_levels:
+            displayed_ontology = ' ' + level['display_ontology'] if len(level['display_ontology']) > 0 else ''
             ws.cell(current_row_index, self.first_used_column)\
-                .value = f'{gettext(level["tier_name"])}: {level["level_name"]} ({level["ontology"]})'
+                .value = f"{gettext(level['tier_name'])}{displayed_ontology}: {level['level_name']}"
             ws.merge_cells(
                 start_row=current_row_index,
                 start_column=self.first_used_column,
@@ -319,7 +339,7 @@ class BulkImportIndicatorsView(LoginRequiredMixin, UserPassesTestMixin, AccessMi
                 current_row_index += 1
 
             letter_index = len(level['indicator_set']) - 1
-            empty_row_count = int(request.GET[gettext(level['tier_name'])])
+            empty_row_count = int(request.GET[level['tier_name']])
             for i in range(empty_row_count):
                 ws.row_dimensions[current_row_index].height = 16
                 ws.cell(current_row_index, self.first_used_column).value = gettext(level['tier_name'])
@@ -339,6 +359,8 @@ class BulkImportIndicatorsView(LoginRequiredMixin, UserPassesTestMixin, AccessMi
                     if 'validation' in column:
                         validator = validation_map[column['validation']]
                         validator.add(active_cell)
+                    if 'default' in column:
+                        active_cell.value = column['default']
                 current_row_index += 1
             current_row_index += 1
 
@@ -353,7 +375,7 @@ class BulkImportIndicatorsView(LoginRequiredMixin, UserPassesTestMixin, AccessMi
         program_id = kwargs['program_id']
         program = Program.objects.get(pk=program_id)
         wb = openpyxl.load_workbook(request.FILES['file'])
-        ws = wb.get_sheet_by_name('Template')
+        ws = wb.get_sheet_by_name(TEMPLATE_SHEET_NAME)
 
         if ws.cell(self.program_name_row, self.first_used_column).value != program.name:
             return JsonResponse({'error_code': ERROR_MISMATCHED_PROGRAM}, status=400)
@@ -380,7 +402,7 @@ class BulkImportIndicatorsView(LoginRequiredMixin, UserPassesTestMixin, AccessMi
             # TODO: Check column names and order
             # TODO: if level can't be parsed, highlight level as an error along with it's indicators
             if first_cell.style == LEVEL_HEADER_STYLE:
-                matches = re.match(r'^[^:]+:?\s?(.*)\((\d(?:\.\d)+)', first_cell.value)
+                matches = re.match(r'^[^:]+:?\s?(.*)$', first_cell.value)
                 if not matches or matches.group(1).strip() not in level_refs:
                     workbook_errors.append({'error_code': ERROR_INVALID_LEVEL_HEADER, 'row': current_row_index})
                     continue

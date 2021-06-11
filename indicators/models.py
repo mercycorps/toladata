@@ -1185,7 +1185,13 @@ class Indicator(SafeDeleteModel):
 
     number = models.CharField(
         # Translators: this is the label for a form field where the user enters the "number" identifying an indicator
-        _("Number"), max_length=255, null=True, blank=True, help_text=" "
+        _("Number"), max_length=255, null=True, blank=True,
+        # Translators: a "number" in this context is a kind of label.  This is help text to explain why a user is
+        # seeing customized numbers instead of auto-generated ones that can derived from the indicator's place in
+        # the hierarchy
+        help_text=_("This number is displayed in place of the indicator number "
+                    "automatically generated through the results framework. "
+                    "An admin can turn on auto-numbering in program settings.")
     )
 
     source = models.CharField(
@@ -1242,7 +1248,7 @@ class Indicator(SafeDeleteModel):
         # Translators: this is help text for a field on an indicator setup form
         help_text=_("Enter a numeric value for the baseline. If a baseline is not yet known or not applicable, "
                     "enter a zero or select the &ldquo;Not applicable&rdquo; checkbox. The baseline can always "
-                    "be updated at later point in time.")
+                    "be updated at a later point in time.")
     )
 
     baseline_na = models.BooleanField(
