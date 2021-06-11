@@ -85,6 +85,15 @@ export class ImportIndicatorsButton extends React.Component {
             storedTierLevelsRows: updatedTierLevelsRow
         })
     }
+    componentDidUpdate(prevProps) {
+        // If the user changes the RF template(tier levels), empty the stored states
+        if (this.props.levelTiers !== prevProps.levelTiers) {
+            this.setState({
+                storedView: {},
+                storedTierLevelsRows: [],
+            })
+        }
+    }
 
     // Provides the content for when the Import indicators button is clicked
     getPopoverContent = () => {
