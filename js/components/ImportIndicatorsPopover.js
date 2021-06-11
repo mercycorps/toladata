@@ -263,11 +263,8 @@ export const ImportIndicatorsPopover = ({ page, program_id, tierLevelsUsed, stor
         }, 1000)
         api.confirmUpload(program_id)
             .then(response => {
-                console.log(response);
-                console.log(Object.keys(response));
-                console.log(Object.values(response));
                 let handleResponse = () => {
-                    if (response.error_code === 200) {
+                    if (response.status === 200) {
                         setViews(SUCCESS);
                     } else {
                         setViews(ERROR);
