@@ -248,7 +248,7 @@ export const ImportIndicatorsPopover = ({ page, program_id, tierLevelsUsed, stor
     let handleFeedback = () => {
         api.downloadFeedback(program_id)
         .then(response => {
-            if (response.error) {
+            if (response.error_code) {
                 setViews(ERROR);
             }
         })
@@ -263,8 +263,11 @@ export const ImportIndicatorsPopover = ({ page, program_id, tierLevelsUsed, stor
         }, 1000)
         api.confirmUpload(program_id)
             .then(response => {
+                console.log(response);
+                console.log(Object.keys(response));
+                console.log(Object.values(response));
                 let handleResponse = () => {
-                    if (!response.error) {
+                    if (response.error_code === 200) {
                         setViews(SUCCESS);
                     } else {
                         setViews(ERROR);
@@ -281,7 +284,7 @@ export const ImportIndicatorsPopover = ({ page, program_id, tierLevelsUsed, stor
             })
     }
 
-    // Handle Continue when there are multiple downloaders or uploaders
+    // TODO: Handle Continue when there are multiple downloaders or uploaders
     let handleContinue = () => {
         if (downloadOrUpload === "download") {
             handleDownload();
@@ -549,7 +552,15 @@ export const ImportIndicatorsPopover = ({ page, program_id, tierLevelsUsed, stor
                                         gettext('There was a server-related problem')
                                     }
                                 </p>
-                                <button className="btn btn-sm btn-primary" onClick={() => setViews(INITIAL) }>Try again</button>
+                                <button 
+                                    className="btn btn-sm btn-primary" 
+                                    onClick={() => setViews(INITIAL) }
+                                >
+                                    {
+                                        // # Translators: A button to try import over after a error occurred.
+                                        gettext('Try again')
+                                    }
+                                </button>
                             </div>
                         )
                     // TODO: View for when waiting for an API calls response
