@@ -327,6 +327,8 @@ class TestBulkImportTemplateProcessing(test.TestCase):
             if column['field_name'] in custom_values:
                 current_cell.value = custom_values[column['field_name']]
                 continue
+            if column['field_name'] == 'number':
+                continue
             if column['field_name'] == 'unit_of_measure_type':
                 current_cell.value = str(Indicator.UNIT_OF_MEASURE_TYPES[0][1])
             elif column['field_name'] == 'direction_of_change':
@@ -353,11 +355,12 @@ class TestBulkImportTemplateProcessing(test.TestCase):
         ws.cell(self.program_name_row, self.first_used_column).value = "Wrong program name"
         response = self.post_template(wb)
         self.assertEqual(response.status_code, 400)
-        self.assertEqual(json.loads(response.content)['error_code'], ERROR_MISMATCHED_PROGRAM)
+
+        self.assertEqual(json.loads(response.content)['error_codes'], [ERROR_MISMATCHED_PROGRAM])
         ws.cell(self.program_name_row, self.first_used_column).value = self.program.name
         response = self.post_template(wb)
         self.assertEqual(response.status_code, 400)
-        self.assertEqual(json.loads(response.content)['error_code'], ERROR_NO_NEW_INDICATORS)
+        self.assertEqual(json.loads(response.content)['error_codes'], [ERROR_NO_NEW_INDICATORS])
 
     def test_template_import(self):
         self.client.force_login(user=self.tola_user.user)
@@ -388,10 +391,10 @@ class TestBulkImportTemplateProcessing(test.TestCase):
         self.assertEqual(
             len(os.listdir(self.template_file_path)), 2, 'Old indicator json file should have been deleted.')
 
-        self.fill_worksheet_row(ws, first_blank_goal_row, {'name': None})
+        self.fill_worksheet_row(ws, first_blank_goal_row, custom_values={'name': None})
         response = self.post_template(wb)
         self.assertEqual(response.status_code, 400)
-        self.assertEqual(json.loads(response.content)['error_code'], ERROR_MALFORMED_INDICATOR)
+        self.assertEqual(json.loads(response.content)['error_codes'], [ERROR_MALFORMED_INDICATOR])
         self.fill_worksheet_row(ws, first_blank_goal_row, {'name': 'Indicator name'})
 
         # TODO: fix this test
@@ -405,6 +408,7 @@ class TestBulkImportTemplateProcessing(test.TestCase):
     def test_manually_numbered_indicators(self):
         pass
 
+    # TODO: Write Unit Test to see if this works with a bad sector
     def test_saving_indicators(self):
         self.client.force_login(user=self.tola_user.user)
         w_factories.grant_program_access(self.tola_user, self.program, self.country, role='high')

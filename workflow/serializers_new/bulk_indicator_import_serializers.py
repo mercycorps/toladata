@@ -15,9 +15,10 @@ BulkImportTemplateSerializer = get_serializer(
 
 class BulkImportIndicatorSerializer(serializers.ModelSerializer):
     display_ontology_letter = serializers.SerializerMethodField()
+    unit_of_measure = serializers.CharField(required=True)
+    unit_of_measure_type = serializers.SerializerMethodField()
     direction_of_change = serializers.SerializerMethodField()
     target_frequency = serializers.SerializerMethodField()
-    unit_of_measure_type = serializers.SerializerMethodField()
     sector = serializers.SerializerMethodField()
 
     class Meta:
@@ -72,7 +73,7 @@ class BulkImportIndicatorSerializer(serializers.ModelSerializer):
         values = super().to_internal_value(data)
 
         if 'baseline' not in values or values['baseline'] is None:
-            return values
+            raise serializers.ValidationError({'baseline': ['Baseline should be a number or N/A']})
 
         baseline = values['baseline']
         try:

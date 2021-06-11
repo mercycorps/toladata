@@ -18,6 +18,7 @@ from django.views import View
 from django.views.decorators.http import require_POST, require_GET
 
 from indicators.models import Indicator, Level, LevelTier, Sector, BulkIndicatorImportFile
+from indicators.views.view_utils import indicator_letter_generator
 from workflow.models import Program
 from workflow.serializers_new import BulkImportSerializer, BulkImportIndicatorSerializer
 from tola.l10n_utils import str_without_diacritics
@@ -76,8 +77,12 @@ ERROR_UNDETERMINED_LEVEL = 102  # When the first level header row is missing and
 ERROR_TEMPLATE_NOT_FOUND = 103
 ERROR_MISMATCHED_TIERS = 104
 ERROR_INDICATOR_DATA_NOT_FOUND = 105
+ERROR_MISMATCHED_LEVEL_COUNT = 106
+ERROR_MISMATCHED_HEADERS = 107
 ERROR_INVALID_LEVEL_HEADER = 200  # When the level header doesn't contain an identifiable level
 ERROR_MALFORMED_INDICATOR = 201
+ERROR_UNEXPECTED_INDICATOR_NUMBER = 202
+ERROR_INTERVENING_BLANK_ROW = 203
 
 EMPTY_CHOICE = '---------'
 
@@ -87,7 +92,7 @@ OPTIONAL_HEADER_STYLE = 'optional_header_style'
 LEVEL_HEADER_STYLE = 'level_header_style'
 PROTECTED_INDICATOR_STYLE = 'protected_indicator_style'
 UNPROTECTED_INDICATOR_STYLE = 'unprotected_indicator_style'
-UNPROTECTED_INDICATOR_ERROR_STYLE = 'unprotected_indicator_error_style'
+UNPROTECTED_ERROR_STYLE = 'unprotected_indicator_error_style'
 
 
 class BulkImportIndicatorsView(LoginRequiredMixin, UserPassesTestMixin, AccessMixin, View):
@@ -141,29 +146,37 @@ class BulkImportIndicatorsView(LoginRequiredMixin, UserPassesTestMixin, AccessMi
     unprotected_indicator_style.alignment = Alignment(vertical='top', wrap_text=True)
     unprotected_indicator_style.protection = Protection(locked=False)
 
-    unprotected_indicator_error_style = NamedStyle(UNPROTECTED_INDICATOR_ERROR_STYLE)
-    unprotected_indicator_error_style.fill = PatternFill('solid', fgColor=RED_ERROR)
-    unprotected_indicator_error_style.font = Font(name='Calibri', size=11)
-    unprotected_indicator_error_style.alignment = Alignment(vertical='top', wrap_text=True)
-    unprotected_indicator_error_style.protection = Protection(locked=False)
+    unprotected_error_style = NamedStyle(UNPROTECTED_ERROR_STYLE)
+    unprotected_error_style.fill = PatternFill('solid', fgColor=RED_ERROR)
+    unprotected_error_style.font = Font(name='Calibri', size=11)
+    unprotected_error_style.alignment = Alignment(vertical='top', wrap_text=True)
+    unprotected_error_style.protection = Protection(locked=False)
 
     def test_func(self):
         program_id = self.request.resolver_match.kwargs.get('program_id')
         return user_has_program_roles(self.request.user, [program_id], ['high']) \
             or self.request.user.is_superuser is True
 
-    def _row_is_empty(self, ws, row_index):
-        # Don't test the first two columns (level and number) because they are pre-filled in a blank template
-        filled_cells = len([1 for col in range(len(COLUMNS) - 2)
-                       if ws.cell(row_index, self.first_used_column + 2 + col).value])
-        return filled_cells <= 2
+    def _row_is_blank_or_spacer(self, ws, row_index):
+        # Blank rows are rows that are are configured to contain data (i.e. they contain pre-filled level, number,
+        # etc....  In this case there will be four pre-filled cells. Spacer rows are completely blank and
+        # should only precede a level header.
+        pre_filled_indexes = [index for index, col in enumerate(COLUMNS)
+                              if col['field_name'] in ['level', 'number', 'unit_of_measure_type', 'direction_of_change']]
+        row_filled_indexes = [index for index, col in enumerate(COLUMNS)
+                        if ws.cell(row_index, self.first_used_column + index).value]
+        if pre_filled_indexes == row_filled_indexes:
+            return 'blank'
+        if len(row_filled_indexes) == 0:
+            return 'spacer'
+        return False
 
     def get(self, request, *args, **kwargs):
         program_id = kwargs['program_id']
         try:
             program = Program.objects.get(pk=program_id)
         except Program.DoesNotExist:
-            return JsonResponse({'error_code': ERROR_MISMATCHED_PROGRAM}, status=404)
+            return JsonResponse({'error_codes': [ERROR_MISMATCHED_PROGRAM]}, status=404)
 
         levels = Level.objects.filter(program=program).select_related().prefetch_related(
             'indicator_set', 'program', 'parent__program__level_tiers')
@@ -172,7 +185,7 @@ class BulkImportIndicatorsView(LoginRequiredMixin, UserPassesTestMixin, AccessMi
         leveltiers_in_db = sorted([tier.name for tier in LevelTier.objects.filter(program=program)])
         request_leveltier_names = sorted(request.GET.keys())
         if leveltiers_in_db != request_leveltier_names:
-            return JsonResponse({'error_code': ERROR_MISMATCHED_TIERS}, status=400)
+            return JsonResponse({'error_codes': ERROR_MISMATCHED_TIERS}, status=400)
 
         wb = openpyxl.load_workbook(filename=BulkIndicatorImportFile.get_file_path(BASE_TEMPLATE_NAME))
         ws = wb.worksheets[0]
@@ -231,12 +244,11 @@ class BulkImportIndicatorsView(LoginRequiredMixin, UserPassesTestMixin, AccessMi
             ws.add_data_validation(target_freq_validation)
             ws.add_data_validation(sector_validation)
 
-
         wb.add_named_style(self.title_style)
         wb.add_named_style(self.level_header_style)
         wb.add_named_style(self.protected_indicator_style)
         wb.add_named_style(self.unprotected_indicator_style)
-        wb.add_named_style(self.unprotected_indicator_error_style)
+        wb.add_named_style(self.unprotected_error_style)
         wb.add_named_style(self.optional_header_style)
         wb.add_named_style(self.required_header_style)
 
@@ -350,20 +362,14 @@ class BulkImportIndicatorsView(LoginRequiredMixin, UserPassesTestMixin, AccessMi
                     current_column_index += 1
                 current_row_index += 1
 
-            letter_index = len(level['indicator_set']) - 1
+            letter_gen = indicator_letter_generator(len(level['indicator_set']) + 1)
             empty_row_count = int(request.GET[level['tier_name']])
             for i in range(empty_row_count):
                 ws.row_dimensions[current_row_index].height = 16
                 ws.cell(current_row_index, self.first_used_column).value = gettext(level['tier_name'])
                 if program.auto_number_indicators:
-                    letter_index += 1
-                    i_letter = ''
-                    if letter_index < 26:
-                        i_letter = string.ascii_lowercase[letter_index]
-                    elif letter_index >= 26:
-                        i_letter = string.ascii_lowercase[
-                            letter_index // 26 - 1] + string.ascii_lowercase[letter_index % 26]
-                    ws.cell(current_row_index, self.first_used_column + 1).value = level['display_ontology'] + i_letter
+                    ws.cell(current_row_index, self.first_used_column + 1).value = \
+                        level['display_ontology'] + next(letter_gen)
 
                 for col_n, column in enumerate(COLUMNS):
                     active_cell = ws.cell(current_row_index, self.first_used_column + col_n)
@@ -390,50 +396,77 @@ class BulkImportIndicatorsView(LoginRequiredMixin, UserPassesTestMixin, AccessMi
         ws = wb.get_sheet_by_name(TEMPLATE_SHEET_NAME)
 
         if ws.cell(self.program_name_row, self.first_used_column).value != program.name:
-            return JsonResponse({'error_code': ERROR_MISMATCHED_PROGRAM}, status=400)
+            return JsonResponse({'error_codes': [ERROR_MISMATCHED_PROGRAM]}, status=400)
+
+        for col_index, col in enumerate(COLUMNS):
+            cell_value = ws.cell(DATA_START_ROW - 1, FIRST_USED_COLUMN + col_index).value.strip('*')
+            if cell_value != col['name']:
+                return JsonResponse({'error_codes': [ERROR_MISMATCHED_HEADERS]}, status=400)
 
         benign_errors = []  # Errors that can be highlighted on a spreadsheet and get sent back to the user
         malignant_errors = []  # So bad that it's not possible to highlight a spreadsheet and send it back to the suer
         level_refs = {}
         for level in program.levels.all():
-            level_refs[level.name] = level
+            ontology = f' {level.display_ontology}' if len(level.display_ontology) > 0 else ''
+            level_refs[f'{level.leveltier}{ontology}'] = level
         current_level = None
         new_indicators_data = []
         indicator_status = {'valid': 0, 'invalid': 0}
-
         reverse_field_name_map = {
             'unit_of_measure_type': {str(name): value for value, name in Indicator.UNIT_OF_MEASURE_TYPES},
             'direction_of_change': {str(name): value for value, name in Indicator.DIRECTION_OF_CHANGE},
             'target_frequency': {str(name): value for value, name in Indicator.TARGET_FREQUENCIES}
         }
+        letter_gen = None
+        pattern = r'^([^:]+)'
+        level_finder = re.compile(pattern)
+        ws_level_count = 0
+        passed_blank_row = False
 
         for current_row_index in range(self.data_start_row, ws.max_row):
             first_cell = ws.cell(current_row_index, self.first_used_column)
             # If this is a level header row, parse the level name out of the header string
-            # TODO: do we need to compare the ontology to the name?
-            # TODO: do we need to check the number if auto-number is on but they use bad or badly sorted numbers?
-            # TODO: Check column names and order
-            # TODO: if level can't be parsed, highlight level as an error along with it's indicators
-            # TODO: Write Unit Test to see if this works with a bad sector
             if first_cell.style == LEVEL_HEADER_STYLE:
-                matches = re.match(r'^[^:]+:?\s?(.*)$', first_cell.value)
-                if not matches or matches.group(1).strip() not in level_refs:
-                    malignant_errors.append({'error_code': ERROR_INVALID_LEVEL_HEADER, 'row': current_row_index})
+                matches = level_finder.match(first_cell.value)
+                if not matches or matches.group(1).strip() not in level_refs.keys():
+                    malignant_errors.append(ERROR_INVALID_LEVEL_HEADER)
                     continue
                 else:
                     current_level = level_refs[matches.group(1).strip()]
-
-            if self._row_is_empty(ws, current_row_index):
-                continue
+                    letter_gen = indicator_letter_generator()
+                    ws_level_count += 1
+                    passed_blank_row = False
+                    continue
 
             # skip indicators that are already in the system
             if ws.cell(current_row_index, self.first_used_column).style == PROTECTED_INDICATOR_STYLE:
+                next(letter_gen)
                 continue
+
+            # Skip blank rows but if there was an intervening blank row, give it error highlighting
+            if blank_type := self._row_is_blank_or_spacer(ws, current_row_index):
+                if blank_type == 'blank':
+                    next(letter_gen)
+                passed_blank_row = True
+                continue
+            elif passed_blank_row:
+                benign_errors.append(ERROR_INTERVENING_BLANK_ROW)
+                for c in range(len(COLUMNS)):
+                    ws.cell(current_row_index - 1, self.first_used_column + c).style = UNPROTECTED_ERROR_STYLE
+                passed_blank_row = False
+
+            # Check if auto-numbered indicator numbers match what's expected
+            number_cell = ws.cell(current_row_index, self.first_used_column + 1)
+            if program.auto_number_indicators and number_cell.value is not None:
+                expected_ind_number = f'{current_level.display_ontology}{next(letter_gen)}'
+                if number_cell.value != expected_ind_number:
+                    number_cell.style = UNPROTECTED_ERROR_STYLE
+                    benign_errors.append(ERROR_UNEXPECTED_INDICATOR_NUMBER)
 
             # Getting to this point (which shouldn't happen) without a parsed level header means
             # something has gone wrong
             if not current_level:
-                malignant_errors.append({'error_code': ERROR_UNDETERMINED_LEVEL})
+                malignant_errors.append(ERROR_UNDETERMINED_LEVEL)
                 continue
 
             indicator_data = {}
@@ -455,6 +488,7 @@ class BulkImportIndicatorsView(LoginRequiredMixin, UserPassesTestMixin, AccessMi
                         validation_errors[column['field_name']].append(required_field_error)
                     except KeyError:
                         validation_errors[column['field_name']] = [required_field_error]
+                    benign_errors.append(ERROR_MALFORMED_INDICATOR)
 
             # handle indicator number field
             if program.auto_number_indicators:
@@ -471,13 +505,11 @@ class BulkImportIndicatorsView(LoginRequiredMixin, UserPassesTestMixin, AccessMi
                 if cell_value is None:
                     pass
                 else:
-                    # print('field', field, 'cols by field', col_number, 'value', cell_value)
-                    # print('types', reverse_field_name_map[field])
                     additional_field_data[field] = reverse_field_name_map[field][cell_value]
 
             # Convert text in sector dropdown to sector pk
             col_number = self.first_used_column + COLUMNS_FIELD_INDEXES['sector']
-            cell_value = ws.cell(current_row_index, col_number + 1).value
+            cell_value = ws.cell(current_row_index, col_number).value
             if cell_value is None or cell_value in [EMPTY_CHOICE, '', 'None']:
                 pass
             else:
@@ -485,8 +517,12 @@ class BulkImportIndicatorsView(LoginRequiredMixin, UserPassesTestMixin, AccessMi
                     sector = Sector.objects.get(sector=cell_value)
                     additional_field_data['sector'] = sector.pk
                 except Sector.DoesNotExist:
-                    if 'sector' in validation_errors:
-                        validation_errors['sector'].append('Could not fid matching sector')
+                    # Translators:  Error message indicating that the value the user has selected for the sector field is not in the list of valid options
+                    error_string = 'Could not find matching sector'
+                    try:
+                        validation_errors['sector'].append(error_string)
+                    except KeyError:
+                        validation_errors['sector'] = [error_string]
                     benign_errors.append(ERROR_MALFORMED_INDICATOR)
 
             if len(validation_errors) == 0:
@@ -499,14 +535,14 @@ class BulkImportIndicatorsView(LoginRequiredMixin, UserPassesTestMixin, AccessMi
                 ws.cell(current_row_index, FIRST_USED_COLUMN).style = 'unprotected_indicator_error_style'
                 indicator_status['invalid'] += 1
 
-        if len(malignant_errors) > 0:
-            return JsonResponse({'errors': malignant_errors}, status=400)
+        if len(level_refs) != ws_level_count:
+            return JsonResponse({'errors_codes': [ERROR_MISMATCHED_LEVEL_COUNT]}, status=400)
 
-        # deserialized_indicators = BulkImportIndicatorSerializer(data=new_indicators_data, many=True)
-        # deserialized_indicators.is_valid()
-        # error_count = sum([len(error_dict) for error_dict in deserialized_indicators.errors])
-        # print('indicator status', indicator_status)
-        if indicator_status['invalid'] > 0:
+        if len(malignant_errors) > 0:
+            pruned_malignant = sorted(list(set(malignant_errors)))
+            return JsonResponse({'error_codes': pruned_malignant}, status=400)
+
+        if indicator_status['invalid'] > 0 or len(benign_errors) > 0:
             try:
                 old_file_obj = BulkIndicatorImportFile.objects.get(
                     user=request.user.tola_user,
@@ -518,6 +554,7 @@ class BulkImportIndicatorsView(LoginRequiredMixin, UserPassesTestMixin, AccessMi
                 pass
 
             file_name = f'{datetime.strftime(datetime.now(), "%Y%m%d-%H%M%S")}-{request.user.id}-{program.pk}.xlsx'
+            pruned_benign = sorted(list(set(benign_errors)))
             file_obj = BulkIndicatorImportFile.objects.create(
                 user=request.user.tola_user,
                 program=program,
@@ -528,11 +565,11 @@ class BulkImportIndicatorsView(LoginRequiredMixin, UserPassesTestMixin, AccessMi
             return JsonResponse({
                 'invalid': indicator_status['invalid'],
                 'valid': indicator_status['valid'],
-                'error_code': ERROR_MALFORMED_INDICATOR
+                'error_codes': pruned_benign
             }, status=400)
 
         if len(new_indicators_data) == 0:
-            return JsonResponse({'error_code': ERROR_NO_NEW_INDICATORS}, status=400)
+            return JsonResponse({'error_codes': [ERROR_NO_NEW_INDICATORS]}, status=400)
 
         try:
             old_file_obj = BulkIndicatorImportFile.objects.get(
@@ -566,7 +603,7 @@ def save_bulk_import_data(request, *args, **kwargs):
             program_id=kwargs['program_id'],
             file_type=BulkIndicatorImportFile.INDICATOR_DATA_TYPE)
     except BulkIndicatorImportFile.DoesNotExist:
-        return JsonResponse({'error_code': ERROR_INDICATOR_DATA_NOT_FOUND})
+        return JsonResponse({'error_codes': [ERROR_INDICATOR_DATA_NOT_FOUND]})
 
     with open(file_entry.file_path, 'r') as fh:
         saved_indicator_data = json.loads(fh.read())
@@ -579,8 +616,11 @@ def save_bulk_import_data(request, *args, **kwargs):
 
         if not validated_flag:
             # This shouldn't really happen since the entries have just been validated, but we should check anyway
-            return JsonResponse({'error_code': ERROR_INDICATOR_DATA_NOT_FOUND})
+            return JsonResponse({'error_codes': [ERROR_INDICATOR_DATA_NOT_FOUND]})
 
+        sector_id = combined_data['additional_field_data']['sector']
+        sector = Sector.objects.get(id=sector_id)
+        combined_data['additional_field_data']['sector'] = sector
         deserialized_entry.save(**combined_data['additional_field_data'])
     return JsonResponse({'message': 'success'}, status=200)
 
@@ -594,7 +634,7 @@ def get_feedback_bulk_import_template(request, *args, **kwargs):
             program_id=kwargs['program_id'],
             file_type=BulkIndicatorImportFile.INDICATOR_TEMPLATE_TYPE)
     except BulkIndicatorImportFile.DoesNotExist:
-        return JsonResponse({'error_code': ERROR_TEMPLATE_NOT_FOUND}, status=400)
+        return JsonResponse({'error_codes': [ERROR_TEMPLATE_NOT_FOUND]}, status=400)
 
     with open(file_entry.file_path, 'rb') as fh:
         template_file = fh.read()
