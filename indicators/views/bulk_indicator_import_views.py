@@ -1,10 +1,9 @@
 
 import openpyxl
-import string
 import re
 import os
 import json
-import copy
+import logging
 from datetime import datetime
 from openpyxl.comments import Comment
 from openpyxl.styles import PatternFill, Alignment, Protection, Font, NamedStyle, Border, Side
@@ -94,6 +93,7 @@ PROTECTED_INDICATOR_STYLE = 'protected_indicator_style'
 UNPROTECTED_INDICATOR_STYLE = 'unprotected_indicator_style'
 UNPROTECTED_ERROR_STYLE = 'unprotected_indicator_error_style'
 
+logger = logging.getLogger('__name__')
 
 class BulkImportIndicatorsView(LoginRequiredMixin, UserPassesTestMixin, AccessMixin, View):
     """Returns bulk import .xlsx file"""
@@ -390,6 +390,11 @@ class BulkImportIndicatorsView(LoginRequiredMixin, UserPassesTestMixin, AccessMi
         return response
 
     def post(self, request, *args, **kwargs):
+        # Translators: Message provided to user when they have failed to enter a required field on a form.
+        VALIDATION_MSG_REQUIRED = gettext('Please complete this field')
+        # Translators: Message provided to user when they have not chosen from a pre-selected list of options.
+        VALIDATION_MSG_CHOICE = gettext('Please choose from one of the options in the dropdown menu')
+
         program_id = kwargs['program_id']
         program = Program.objects.get(pk=program_id)
         wb = openpyxl.load_workbook(request.FILES['file'])
@@ -472,31 +477,48 @@ class BulkImportIndicatorsView(LoginRequiredMixin, UserPassesTestMixin, AccessMi
             indicator_data = {}
             for i, column in enumerate(COLUMNS[1:]):
                 indicator_data[column['field_name']] = ws.cell(current_row_index, self.first_used_column + i + 1).value
-            deserialized_indicator = BulkImportIndicatorSerializer(data=indicator_data)
-            deserialized_indicator.is_valid()
 
-            # The serializer will drop fk and m2m fields so we need to accumulate them manually
-            additional_field_data = {}
-            validation_errors = copy.deepcopy(deserialized_indicator.errors)
+            validation_errors = {}
+            # TODO: validate level column
+            deserialized_data = BulkImportIndicatorSerializer(data=indicator_data)
+
+            deserialized_data.is_valid()
+            for field_name, error_list in deserialized_data.errors.items():
+                for error in error_list:
+                    if error.code == 'null':
+                        # We're checking for all required fields later, so counting them here would be duplicative
+                        continue
+                    else:
+                        validation_errors[field_name] = []
+                    if error.code == 'max_length':
+                        # System generated error message is 'Ensure this field has no more than 500 characters.'
+                        matches = re.search(r'more than (\d+) characters', str(error))
+                        if matches:
+                            # Translators: Error message provided when user has exceeded the character limit on a form
+                            msg = gettext(f'This field should have no more than {matches.group(1)} characters.')
+                            validation_errors[field_name].append(msg)
+                        else:
+
+                            validation_errors[field_name].append(
+                                # Translators: Error message provided when user has exceeded the character limit on a form
+                                gettext("You have exceeded the character limit of this field"))
+                            logger.error(f'New validation string of code "{error.code}" found.\n{str(error)}')
+                    else:
+                        logger.error(f'New validation string of code {error.code} found.\n{str(error)}')
+                        validation_errors[field_name].append(str(error))
+
+
 
             for i, column in enumerate(COLUMNS):
                 cell_value = ws.cell(current_row_index, FIRST_USED_COLUMN + i).value
                 if column['required'] and cell_value is None:
                     # Translators: Error message on a form indicating that user has not entered a required field.
-                    required_field_error = gettext("Please complete this field")
+                    required_field_error = VALIDATION_MSG_REQUIRED
                     try:
                         validation_errors[column['field_name']].append(required_field_error)
                     except KeyError:
                         validation_errors[column['field_name']] = [required_field_error]
                     benign_errors.append(ERROR_MALFORMED_INDICATOR)
-
-            # handle indicator number field
-            if program.auto_number_indicators:
-                # TODO: add check for malformed numbers
-                pass
-            else:
-                col_number = self.first_used_column + COLUMNS_FIELD_INDEXES['number']
-                additional_field_data['number'] = ws.cell(current_row_index, col_number).value
 
             # Convert enumerated fields into numerical ids
             for field in reverse_field_name_map.keys():
@@ -505,7 +527,14 @@ class BulkImportIndicatorsView(LoginRequiredMixin, UserPassesTestMixin, AccessMi
                 if cell_value is None:
                     pass
                 else:
-                    additional_field_data[field] = reverse_field_name_map[field][cell_value]
+                    try:
+                        indicator_data[field] = reverse_field_name_map[field][cell_value]
+                    except KeyError:
+                        if field in validation_errors:
+                            validation_errors[field].append(VALIDATION_MSG_CHOICE)
+                        else:
+                            validation_errors[field] = [VALIDATION_MSG_CHOICE]
+                        benign_errors.append(ERROR_MALFORMED_INDICATOR)
 
             # Convert text in sector dropdown to sector pk
             col_number = self.first_used_column + COLUMNS_FIELD_INDEXES['sector']
@@ -515,9 +544,10 @@ class BulkImportIndicatorsView(LoginRequiredMixin, UserPassesTestMixin, AccessMi
             else:
                 try:
                     sector = Sector.objects.get(sector=cell_value)
-                    additional_field_data['sector'] = sector.pk
+                    indicator_data['sector'] = sector.pk
                 except Sector.DoesNotExist:
-                    # Translators:  Error message indicating that the value the user has selected for the sector field is not in the list of valid options
+                    # Translators:  Error message indicating that the value the user has selected for the
+                    # sector field is not in the list of valid options
                     error_string = 'Could not find matching sector'
                     try:
                         validation_errors['sector'].append(error_string)
@@ -526,10 +556,7 @@ class BulkImportIndicatorsView(LoginRequiredMixin, UserPassesTestMixin, AccessMi
                     benign_errors.append(ERROR_MALFORMED_INDICATOR)
 
             if len(validation_errors) == 0:
-                new_indicators_data.append({
-                    'indicator_data': indicator_data,
-                    'additional_field_data': additional_field_data
-                })
+                new_indicators_data.append(indicator_data)
                 indicator_status['valid'] += 1
             else:
                 ws.cell(current_row_index, FIRST_USED_COLUMN).style = 'unprotected_indicator_error_style'
@@ -609,19 +636,11 @@ def save_bulk_import_data(request, *args, **kwargs):
         saved_indicator_data = json.loads(fh.read())
     # Todo: wrap in a transaction
 
-    for combined_data in saved_indicator_data:
-
-        deserialized_entry = BulkImportIndicatorSerializer(data=combined_data['indicator_data'])
-        validated_flag = deserialized_entry.is_valid()
-
-        if not validated_flag:
-            # This shouldn't really happen since the entries have just been validated, but we should check anyway
-            return JsonResponse({'error_codes': [ERROR_INDICATOR_DATA_NOT_FOUND]})
-
-        sector_id = combined_data['additional_field_data']['sector']
+    for indicator_data in saved_indicator_data:
+        sector_id = indicator_data['sector']
         sector = Sector.objects.get(id=sector_id)
-        combined_data['additional_field_data']['sector'] = sector
-        deserialized_entry.save(**combined_data['additional_field_data'])
+        indicator_data['sector'] = sector
+        Indicator.objects.create(**indicator_data)
     return JsonResponse({'message': 'success'}, status=200)
 
 

@@ -19,7 +19,8 @@ from factories import (
 from indicators.models import Indicator, Level, LevelTier, BulkIndicatorImportFile
 from indicators.views.bulk_indicator_import_views import (
     COLUMNS, FIRST_USED_COLUMN, DATA_START_ROW, PROGRAM_NAME_ROW, TEMPLATE_SHEET_NAME, HIDDEN_SHEET_NAME,
-    BASE_TEMPLATE_NAME, ERROR_INDICATOR_DATA_NOT_FOUND, ERROR_TEMPLATE_NOT_FOUND, ERROR_MISMATCHED_PROGRAM,
+    BASE_TEMPLATE_NAME, ERROR_INDICATOR_DATA_NOT_FOUND, ERROR_TEMPLATE_NOT_FOUND, ERROR_UNEXPECTED_INDICATOR_NUMBER,
+    ERROR_MISMATCHED_PROGRAM, ERROR_MISMATCHED_HEADERS, ERROR_INTERVENING_BLANK_ROW,
     ERROR_NO_NEW_INDICATORS, ERROR_UNDETERMINED_LEVEL, ERROR_INVALID_LEVEL_HEADER, ERROR_MALFORMED_INDICATOR,
     LEVEL_HEADER_STYLE, PROTECTED_INDICATOR_STYLE, UNPROTECTED_INDICATOR_STYLE
 )
@@ -369,7 +370,6 @@ class TestBulkImportTemplateProcessing(test.TestCase):
         existing_goal_indicator_count = Indicator.objects.filter(level__parent=None).count()
         first_blank_goal_row = DATA_START_ROW + existing_goal_indicator_count + 1
         ws = wb.get_sheet_by_name(TEMPLATE_SHEET_NAME)
-        ws.cell(PROGRAM_NAME_ROW, FIRST_USED_COLUMN).value = self.program.name
         self.fill_worksheet_row(ws, first_blank_goal_row)
         self.fill_worksheet_row(ws, first_blank_goal_row + 1)
         response = self.post_template(wb)
@@ -391,11 +391,23 @@ class TestBulkImportTemplateProcessing(test.TestCase):
         self.assertEqual(
             len(os.listdir(self.template_file_path)), 2, 'Old indicator json file should have been deleted.')
 
-        self.fill_worksheet_row(ws, first_blank_goal_row, custom_values={'name': None})
+    def test_template_import_errors(self):
+        self.client.force_login(user=self.tola_user.user)
+        w_factories.grant_program_access(self.tola_user, self.program, self.country, role='high')
+        wb = openpyxl.load_workbook(self.get_template())
+        existing_goal_indicator_count = Indicator.objects.filter(level__parent=None).count()
+        first_blank_goal_row = DATA_START_ROW + existing_goal_indicator_count + 1
+        ws = wb.get_sheet_by_name(TEMPLATE_SHEET_NAME)
+        self.fill_worksheet_row(ws, first_blank_goal_row, custom_values={
+            'name': None, 'direction_of_change': 'bad medicine'})
+        self.fill_worksheet_row(ws, first_blank_goal_row + 1, {'name': 'Lorem ipsum ' * 100})
+        self.fill_worksheet_row(ws, first_blank_goal_row + 1, {'number': 'bad number'})
+        self.fill_worksheet_row(ws, first_blank_goal_row + 4)
         response = self.post_template(wb)
         self.assertEqual(response.status_code, 400)
-        self.assertEqual(json.loads(response.content)['error_codes'], [ERROR_MALFORMED_INDICATOR])
-        self.fill_worksheet_row(ws, first_blank_goal_row, {'name': 'Indicator name'})
+        self.assertEqual(
+            json.loads(response.content)['error_codes'],
+            sorted([ERROR_MALFORMED_INDICATOR, ERROR_INTERVENING_BLANK_ROW, ERROR_UNEXPECTED_INDICATOR_NUMBER]))
 
         # TODO: fix this test
         # orig_level_string = ws.cell(self.data_start_row, self.first_used_column).value
