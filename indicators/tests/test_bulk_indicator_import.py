@@ -18,11 +18,23 @@ from factories import (
 )
 from indicators.models import Indicator, Level, LevelTier, BulkIndicatorImportFile
 from indicators.views.bulk_indicator_import_views import (
-    COLUMNS, FIRST_USED_COLUMN, DATA_START_ROW, PROGRAM_NAME_ROW, TEMPLATE_SHEET_NAME, HIDDEN_SHEET_NAME,
-    BASE_TEMPLATE_NAME, ERROR_INDICATOR_DATA_NOT_FOUND, ERROR_TEMPLATE_NOT_FOUND, ERROR_UNEXPECTED_INDICATOR_NUMBER,
-    ERROR_MISMATCHED_PROGRAM, ERROR_MISMATCHED_HEADERS, ERROR_INTERVENING_BLANK_ROW,
-    ERROR_NO_NEW_INDICATORS, ERROR_UNDETERMINED_LEVEL, ERROR_INVALID_LEVEL_HEADER, ERROR_MALFORMED_INDICATOR,
-    LEVEL_HEADER_STYLE, PROTECTED_INDICATOR_STYLE, UNPROTECTED_INDICATOR_STYLE
+    COLUMNS, FIRST_USED_COLUMN, DATA_START_ROW, PROGRAM_NAME_ROW, COLUMN_HEADER_ROW,
+    TEMPLATE_SHEET_NAME, HIDDEN_SHEET_NAME, BASE_TEMPLATE_NAME, LEVEL_HEADER_STYLE,
+    PROTECTED_INDICATOR_STYLE, UNPROTECTED_INDICATOR_STYLE,
+    ERROR_MISMATCHED_PROGRAM,
+    ERROR_NO_NEW_INDICATORS,
+    ERROR_UNDETERMINED_LEVEL,
+    ERROR_TEMPLATE_NOT_FOUND,
+    ERROR_MISMATCHED_TIERS,
+    ERROR_INDICATOR_DATA_NOT_FOUND,
+    ERROR_MISMATCHED_LEVEL_COUNT,
+    ERROR_MISMATCHED_HEADERS,
+    ERROR_SAVE_VALIDATION,
+    ERROR_INVALID_LEVEL_HEADER,
+    ERROR_MALFORMED_INDICATOR,
+    ERROR_UNEXPECTED_INDICATOR_NUMBER,
+    ERROR_INTERVENING_BLANK_ROW,
+    ERROR_UNEXPECTED_LEVEL,
 )
 
 
@@ -50,7 +62,10 @@ class TestBulkImportTemplateCreation(test.TestCase):
         if not request_params:
             request_params = dict([(tier.name, 10) for tier in LevelTier.objects.filter(program=program)])
         response = self.client.get(reverse('bulk_import_indicators', args=[program.pk]), data=request_params)
-        return ContentFile(response.content)
+        if response.status_code != 200:
+            return response.content
+        else:
+            return ContentFile(response.content)
 
     def get_expected_indicator_numbers(self, config, request_params, has_indicators=False):
         expected_numbers = []
@@ -120,6 +135,10 @@ class TestBulkImportTemplateCreation(test.TestCase):
         self.assertEqual(
             ws.cell(self.data_start_row, self.first_used_column).value,
             f'Goal: {self.ordered_levels[0].name}')
+
+        request_params = {'bad tier 1': 10, 'bad tier 2': 80}
+        response_content = self.get_template(request_params=request_params)
+        self.assertEqual(json.loads(response_content)['error_codes'], [ERROR_MISMATCHED_TIERS])
 
     def test_row_counts(self):
         level_config = [
@@ -234,7 +253,7 @@ class TestBulkImportTemplateCreation(test.TestCase):
         self.compare_ws_lines(wb, expected_counts, expected_level_names, expected_indicator_numbers)
 
         # Check a custom set of tiers
-        level_obj=i_factories.LevelFactory(
+        level_obj = i_factories.LevelFactory(
             program=small_program,
             name='SubActivity 1',
             parent=level_config[-1]['level_obj'],
@@ -328,7 +347,8 @@ class TestBulkImportTemplateProcessing(test.TestCase):
             if column['field_name'] in custom_values:
                 current_cell.value = custom_values[column['field_name']]
                 continue
-            if column['field_name'] == 'number':
+            if column['field_name'] in ['level', 'number']:
+                # These are pre-filled in the template so we can skip them
                 continue
             if column['field_name'] == 'unit_of_measure_type':
                 current_cell.value = str(Indicator.UNIT_OF_MEASURE_TYPES[0][1])
@@ -356,14 +376,13 @@ class TestBulkImportTemplateProcessing(test.TestCase):
         ws.cell(self.program_name_row, self.first_used_column).value = "Wrong program name"
         response = self.post_template(wb)
         self.assertEqual(response.status_code, 400)
-
         self.assertEqual(json.loads(response.content)['error_codes'], [ERROR_MISMATCHED_PROGRAM])
         ws.cell(self.program_name_row, self.first_used_column).value = self.program.name
         response = self.post_template(wb)
         self.assertEqual(response.status_code, 400)
         self.assertEqual(json.loads(response.content)['error_codes'], [ERROR_NO_NEW_INDICATORS])
 
-    def test_template_import(self):
+    def test_successful_template_import(self):
         self.client.force_login(user=self.tola_user.user)
         w_factories.grant_program_access(self.tola_user, self.program, self.country, role='high')
         wb = openpyxl.load_workbook(self.get_template())
@@ -391,7 +410,7 @@ class TestBulkImportTemplateProcessing(test.TestCase):
         self.assertEqual(
             len(os.listdir(self.template_file_path)), 2, 'Old indicator json file should have been deleted.')
 
-    def test_template_import_errors(self):
+    def test_non_fatal_import_errors(self):
         self.client.force_login(user=self.tola_user.user)
         w_factories.grant_program_access(self.tola_user, self.program, self.country, role='high')
         wb = openpyxl.load_workbook(self.get_template())
@@ -401,24 +420,75 @@ class TestBulkImportTemplateProcessing(test.TestCase):
         self.fill_worksheet_row(ws, first_blank_goal_row, custom_values={
             'name': None, 'direction_of_change': 'bad medicine'})
         self.fill_worksheet_row(ws, first_blank_goal_row + 1, {'name': 'Lorem ipsum ' * 100})
-        self.fill_worksheet_row(ws, first_blank_goal_row + 1, {'number': 'bad number'})
-        self.fill_worksheet_row(ws, first_blank_goal_row + 4)
+        self.fill_worksheet_row(ws, first_blank_goal_row + 2, {'number': 'bad number'})
+        self.fill_worksheet_row(ws, first_blank_goal_row + 3, {'level': 'bad level'})
+        self.fill_worksheet_row(ws, first_blank_goal_row + 5)
         response = self.post_template(wb)
         self.assertEqual(response.status_code, 400)
         self.assertEqual(
             json.loads(response.content)['error_codes'],
-            sorted([ERROR_MALFORMED_INDICATOR, ERROR_INTERVENING_BLANK_ROW, ERROR_UNEXPECTED_INDICATOR_NUMBER]))
+            sorted([
+                ERROR_MALFORMED_INDICATOR, ERROR_INTERVENING_BLANK_ROW, ERROR_UNEXPECTED_INDICATOR_NUMBER,
+                ERROR_UNEXPECTED_LEVEL
+            ]))
 
-        # TODO: fix this test
-        # orig_level_string = ws.cell(self.data_start_row, self.first_used_column).value
-        # ws.cell(self.data_start_row, self.first_used_column).value = "Bad level name"
-        # response = self.post_template(wb)
-        # self.assertEqual(response.status_code, 400)
-        # self.assertEqual(json.loads(response.content)['error_code'], ERROR_INVALID_LEVEL_HEADER)
-        # ws.cell(self.data_start_row, self.first_used_column).value = orig_level_string
+        wb = openpyxl.load_workbook(self.get_template())
+        existing_goal_indicator_count = Indicator.objects.filter(level__parent=None).count()
+        first_blank_goal_row = DATA_START_ROW + existing_goal_indicator_count + 1
+        ws = wb.get_sheet_by_name(TEMPLATE_SHEET_NAME)
+        self.fill_worksheet_row(ws, first_blank_goal_row, custom_values={
+            'sector': 'bad sector name'})
+        response = self.post_template(wb)
+        self.assertEqual(response.status_code, 400)
+        self.assertEqual(json.loads(response.content)['error_codes'], [ERROR_MALFORMED_INDICATOR])
 
-    def test_manually_numbered_indicators(self):
-        pass
+    def test_fatal_import_errors(self):
+        self.client.force_login(user=self.tola_user.user)
+        w_factories.grant_program_access(self.tola_user, self.program, self.country, role='high')
+        wb = openpyxl.load_workbook(self.get_template())
+        existing_goal_indicator_count = Indicator.objects.filter(level__parent=None).count()
+        first_blank_goal_row = DATA_START_ROW + existing_goal_indicator_count + 1
+        ws = wb.get_sheet_by_name(TEMPLATE_SHEET_NAME)
+
+        ws.cell(self.program_name_row, self.first_used_column).value = "bad program name"
+        response = self.post_template(wb)
+        self.assertEqual(response.status_code, 400)
+        self.assertEqual(json.loads(response.content)['error_codes'], [ERROR_MISMATCHED_PROGRAM])
+        ws.cell(self.program_name_row, self.first_used_column).value = self.program.name
+
+        response = self.post_template(wb)
+        self.assertEqual(response.status_code, 400)
+        self.assertEqual(json.loads(response.content)['error_codes'], [ERROR_NO_NEW_INDICATORS])
+
+        header_cell = ws.cell(COLUMN_HEADER_ROW, self.first_used_column)
+        orig_header_value = header_cell.value
+        header_cell.value = "bad column header"
+        response = self.post_template(wb)
+        self.assertEqual(response.status_code, 400)
+        self.assertEqual(json.loads(response.content)['error_codes'], [ERROR_MISMATCHED_HEADERS])
+        header_cell.value = orig_header_value
+
+        should_be_indicator = ws.cell(first_blank_goal_row + 6, self.first_used_column)
+        orig_style = should_be_indicator.style
+        should_be_indicator.value = 'bad_level_name'
+        should_be_indicator.style = LEVEL_HEADER_STYLE
+        response = self.post_template(wb)
+        self.assertEqual(response.status_code, 400)
+        self.assertEqual(json.loads(response.content)['error_codes'], [ERROR_INVALID_LEVEL_HEADER])
+        should_be_indicator.style = orig_style
+
+        second_level_header = ws.cell(first_blank_goal_row + 11, self.first_used_column)
+        second_level_header.value = 'bad_level_name'
+        response = self.post_template(wb)
+        self.assertEqual(response.status_code, 400)
+        self.assertEqual(json.loads(response.content)['error_codes'], [ERROR_MISMATCHED_LEVEL_COUNT])
+
+        ws.cell(DATA_START_ROW, FIRST_USED_COLUMN).value = 'bad level name'
+        self.fill_worksheet_row(ws, first_blank_goal_row)
+        response = self.post_template(wb)
+        self.assertEqual(response.status_code, 400)
+        self.assertEqual(
+            json.loads(response.content)['error_codes'],[ERROR_UNDETERMINED_LEVEL])
 
     # TODO: Write Unit Test to see if this works with a bad sector
     def test_saving_indicators(self):
@@ -433,6 +503,21 @@ class TestBulkImportTemplateProcessing(test.TestCase):
         self.assertEqual(Indicator.objects.count(), 5)
         self.client.post(reverse('save_bulk_import_data', args=[self.program.id]))
         self.assertEqual(Indicator.objects.count(), 7)
+        response = self.client.post(reverse('save_bulk_import_data', args=[self.program.id]))
+        self.assertEqual(json.loads(response.content)['error_codes'], [ERROR_INDICATOR_DATA_NOT_FOUND])
+
+        self.post_template(wb)
+        bulk_import_json = BulkIndicatorImportFile.objects.get(user=self.tola_user, program=self.program)
+        with open(bulk_import_json.file_path, 'r+') as fh:
+            indicator_data = json.loads(fh.read())
+            indicator_data[0].pop('program_id')
+            fh.seek(0)
+            fh.write(json.dumps(indicator_data))
+            fh.truncate()
+        response = self.client.post(reverse('save_bulk_import_data', args=[self.program.id]))
+        self.assertEqual(response.status_code, 400)
+        self.assertEqual(json.loads(response.content)['error_codes'], [ERROR_SAVE_VALIDATION])
+        self.assertEqual(Indicator.objects.count(), 7)
 
     def test_retrieving_feedback_template(self):
         self.client.force_login(user=self.tola_user.user)
@@ -446,4 +531,7 @@ class TestBulkImportTemplateProcessing(test.TestCase):
         response = self.client.get(reverse('get_feedback_bulk_import_template', args=[self.program.id]))
         self.assertEqual(response.get('Content-Disposition'),'attachment; filename="Marked-up-template.xlsx"')
 
+        response = self.client.get(reverse('get_feedback_bulk_import_template', args=[self.program.id]))
+        self.assertEqual(
+            json.loads(response.content)['error_codes'], [ERROR_TEMPLATE_NOT_FOUND])
 
