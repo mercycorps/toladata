@@ -15,9 +15,10 @@ BulkImportTemplateSerializer = get_serializer(
 
 class BulkImportIndicatorSerializer(serializers.ModelSerializer):
     display_ontology_letter = serializers.SerializerMethodField()
+    unit_of_measure = serializers.CharField(required=True)
+    unit_of_measure_type = serializers.SerializerMethodField()
     direction_of_change = serializers.SerializerMethodField()
     target_frequency = serializers.SerializerMethodField()
-    unit_of_measure_type = serializers.SerializerMethodField()
     sector = serializers.SerializerMethodField()
 
     class Meta:
@@ -66,6 +67,29 @@ class BulkImportIndicatorSerializer(serializers.ModelSerializer):
     @staticmethod
     def get_sector(obj):
         return None if not obj.sector else obj.sector.sector
+
+    def to_internal_value(self, data):
+        """Handle special values of indicator fields"""
+        values = super().to_internal_value(data)
+
+        if 'baseline' not in values or values['baseline'] is None:
+            raise serializers.ValidationError({'baseline': ['Baseline should be a number or N/A']})
+
+        baseline = values['baseline']
+        try:
+            baseline = int(baseline)
+        except ValueError:
+            null_equivalents = ['n/a', 'na', 'not applicable']
+            if baseline.lower in null_equivalents:
+                baseline = None
+            else:
+                raise serializers.ValidationError({'baseline': ['Baseline should be a number or N/A']})
+        values['baseline'] = baseline
+
+        return values
+
+    def create(self, validated_data):
+        return Indicator.objects.create(**validated_data)
 
 
 class BulkImportProgramSerializer(serializers.ModelSerializer):

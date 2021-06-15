@@ -1,5 +1,6 @@
 import logging
 import requests
+import string
 
 from indicators.models import (
     Indicator,
@@ -117,3 +118,18 @@ def dictfetchall(cursor):
         for row in cursor.fetchall()
     ]
 
+
+def indicator_letter_generator(start_letter=1):
+    """
+    Generates letters for indicator numbering.  A start_letter value of 1 corresponds to the letter a.
+    When z is reached the next "letter" generated will be aa.
+    """
+    current_index = start_letter - 1
+
+    while True:
+        if current_index < 26:
+            yield string.ascii_lowercase[current_index]
+        else:
+            yield string.ascii_lowercase[current_index // 26 - 1] + \
+                       string.ascii_lowercase[current_index % 26]
+        current_index += 1
