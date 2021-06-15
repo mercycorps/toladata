@@ -313,7 +313,7 @@ export const ImportIndicatorsPopover = ({ page, program_id, tierLevelsUsed, stor
         <div className="import-initial-text">
             <div className="import-initial-text-error">
                 <span>
-                    {errorCodes[106].message}&nbsp;
+                    {errorMessages[errorCodes[106].message]}&nbsp;
                     <a 
                         className="import-initial-text-error-link"
                         role="link"
@@ -384,7 +384,7 @@ export const ImportIndicatorsPopover = ({ page, program_id, tierLevelsUsed, stor
                                     </ol>
                                     {(intialViewError && intialViewError !== 106) &&
                                         <div className="import-initial-text-error">
-                                            { errorCodes[intialViewError].message }
+                                            { errorMessages[errorCodes[intialViewError].message] }
                                         </div>
                                     }
                                 </div>
@@ -708,62 +708,57 @@ const LevelIndicatorCount = ({ level, i }) => {
 let errorCodes = {
     100 : {
         type: "Program doesn't match",
-        message: 
-            // # Translators: Message to user that we cannot import the their file. This is because of it being the wrong file or the structure of the file was changed.
-            gettext("Sorry, we can’t import indicators from this file. This can happen if the wrong file is selected or the template structure was modified.")
+        message: 1,
     },
     101 : {
         type: "No new indicators",
-        message: 
-            // # Translators: Messsage to user that there aren't any new indicators in the uploaded file.
-            gettext("Sorry, we can’t find any indicators in this file.")
+        message: 2,
     },
     102 : {
         type: "Undertermined Level",
-        message: 
-            // # Translators: Message to user that we cannot import the their file. This is because of it being the wrong file or the structure of the file was changed.
-            gettext("Sorry, we can’t import indicators from this file. This can happen if the wrong file is selected or the template structure was modified.")
+        message: 1,
     },
     103 : {
         type: "Template not found",
-        message: 
-            // # Translators: Message to user that we cannot import the their file. This is because of it being the wrong file or the structure of the file was changed.
-            gettext("Sorry, we can’t import indicators from this file. This can happen if the wrong file is selected or the template structure was modified.")
+        message: 1,
     },
     104 : {
         type: "Mismatch tiers",
-        message: 
-            // # Translators: Message to user that we cannot import the their file. This is because of it being the wrong file or the structure of the file was changed.
-            gettext("Sorry, we can’t import indicators from this file. This can happen if the wrong file is selected or the template structure was modified.")
+        message: 1,
     },
     105 : {
         type: "Indicator data not found",
-        message: 
-            // # Translators: Message to user that we cannot import the their file. This is because of it being the wrong file or the structure of the file was changed.
-            gettext("Sorry, we can’t import indicators from this file. This can happen if the wrong file is selected or the template structure was modified.")
+        message: 1,
     },
     106 : {
         type: "Someone else uploaded a template in the last 24 hours",
-        message: 
-            // # Translators: Message to user that someone else has uploaded a template in the last 24 hours and may be in the process of importing indicators to this program. You can view the program change log to see more details.
-            gettext("Someone else uploaded a template in the last 24 hours, and may be in the process of adding indicators to this program.")
+        message: 3,
     },
     200 : {
         type: "Invalid level header",
-        message: 
-            // # Translators: Message to user that we cannot import the their file. This is because of it being the wrong file or the structure of the file was changed.
-            gettext("Sorry, we can’t import indicators from this file. This can happen if the wrong file is selected or the template structure was modified.")
+        message: 1,
     },
     201 : {
         type: "Malformed indicator",
-        message: 
-            // # Translators: Message to user that we cannot import the their file. This is because of it being the wrong file or the structure of the file was changed.
-            gettext("Sorry, we can’t import indicators from this file. This can happen if the wrong file is selected or the template structure was modified.")
+        message: 1,
     },
     202 : {
         type: "Indicators out of order",
-        message: 
-            // # Translators: Message to user that we cannot import the their file. This is because there is one or more indicators that are out of order. Users should visit the results framework page and rearrange indicators.
-            gettext("Sorry, we can't import indicators from this file. One or more indicators is out of order. To rearrange saved indicators, please visit the results framework.")
+        message: 4,
     },
+}
+
+let errorMessages = {
+    1 : 
+        // # Translators: Message to user that we cannot import the their file. This is because of it being the wrong file or the structure of the file was changed.
+        gettext("Sorry, we can’t import indicators from this file. This can happen if the wrong file is selected or the template structure was modified."),
+    2 : 
+        // # Translators: Messsage to user that there aren't any new indicators in the uploaded file.
+        gettext("Sorry, we can’t find any indicators in this file."),
+    3 :
+        // # Translators: Message to user that someone else has uploaded a template in the last 24 hours and may be in the process of importing indicators to this program. You can view the program change log to see more details.
+        gettext("Someone else uploaded a template in the last 24 hours, and may be in the process of adding indicators to this program."),
+    4 :
+        // # Translators: Message to user that we cannot import the their file. This is because there is one or more indicators that are out of order. Users should visit the results framework page and rearrange indicators.
+        gettext("Sorry, we can't import indicators from this file. One or more indicators is out of order. To rearrange saved indicators, please visit the results framework."),
 }
