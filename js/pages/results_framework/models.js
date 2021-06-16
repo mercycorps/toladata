@@ -701,6 +701,7 @@ export class UIStore {
             let whitespaceError = tierName.length === 0 || (regex.test(tierName) && tierName.length > 0)
             let duplicateErrors = 0; // There will be at least 1 for the self-match.
             let commaError = tierName.indexOf(",") !== -1;
+            let colonError = tierName.indexOf(":") !== -1;
 
             tiersToTest.forEach( otherTierName => {
                 if (otherTierName.trim() == tierName.trim()){
@@ -714,12 +715,17 @@ export class UIStore {
             }
             else if (commaError){
                 hasErrors = true;
-                /* # Translators: This is a warning messages when a user has entered duplicate names for two different objects */
+                /* # Translators: This is a warning messages when a user has a comma in a name that shouldn't contain commas */
                 return {hasError: true, msg: gettext("Result levels should not contain commas.")}
+            }
+            else if (colonError){
+                hasErrors = true;
+                /* # Translators: This is a warning messages when a user has a colon in a name that shouldn't contain colons */
+                return {hasError: true, msg: gettext("Result levels should not contain colons.")}
             }
             else if (duplicateErrors > 1){
                 hasErrors = true;
-                /* # Translators: This is a warning messages when a user has a comma in a name that shouldn't contain commas */
+                /* # Translators: This is a warning messages when a user has entered duplicate names for two different objects */
                 return {hasError: true, msg: gettext("Result levels must have unique names.")}
             }
             else{
