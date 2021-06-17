@@ -589,10 +589,9 @@ const AdvancedImport = () => {
 
     return (
         <div className="advanced">
-            <div className="advanced__button">
+            <div className="advanced__toggle">
                 <FontAwesomeIcon icon={ expanded ? 'caret-down' : 'caret-right' } /> &nbsp;
                 <a
-                    className="advanced-button__toggle"
                     data-toggle="collapse"
                     href="#optionsForm"
                     role="button"
