@@ -86,6 +86,15 @@ export class ImportIndicatorsButton extends React.Component {
             storedTierLevelsRows: updatedTierLevelsRow
         })
     }
+    componentDidUpdate(prevProps) {
+        // If the user changes the RF template(tier levels), empty the stored states
+        if (this.props.levelTiers !== prevProps.levelTiers) {
+            this.setState({
+                storedView: {},
+                storedTierLevelsRows: [],
+            })
+        }
+    }
 
     // Provides the content for when the Import indicators button is clicked
     getPopoverContent = () => {
@@ -153,7 +162,7 @@ export const ImportIndicatorsPopover = ({ page, program_id, tierLevelsUsed, stor
     const [validIndicatorsCount, setvalidIndicatorsCount] = useState(0); // Number of indicators that have passed validation and are ready to import
     const [invalidIndicatorsCount, setInvalidIndicatorsCount] = useState(0); // Number of indicators that have failed validation and needs fixing
     const [tierLevelsRows, setTierLevelsRows] = useState([]); // State to hold the tier levels name and the desired number of rows for the excel template
-    const [intialViewError, setInitialViewError] = useState(null);
+    const [initialViewError, setInitialViewError] = useState([]);
 
     let defaultTierLevelRows = [];
     useEffect(() => {
@@ -208,7 +217,7 @@ export const ImportIndicatorsPopover = ({ page, program_id, tierLevelsUsed, stor
         api.uploadTemplate(program_id, e.target.files[0])
                 .then(response => {
                     let handleResponse = () => {
-                        if ((response.valid >= 0)) {
+                        if ((response.status === 200)) {
                             setvalidIndicatorsCount(response.valid);
                             setInvalidIndicatorsCount(response.invalid);
                             if (response.invalid === 0) {
@@ -219,9 +228,15 @@ export const ImportIndicatorsPopover = ({ page, program_id, tierLevelsUsed, stor
                                 setStoredView({view: FEEDBACK, valid: response.valid, invalid: response.invalid});
                             }
                         } else {
-                            if (response.error_code && response.error_code.toString().slice(0, 1) === "1" ) {
-                                setInitialViewError(response.error_code);
+                            if ( (response.data.error_codes.filter(code => code.toString().slice(0, 1) === "1")).length > 0 ) {
+                                // Reduce the array of errors from the server to remove duplicate messaging
+                                let reducer = (accumulator, code) => {
+                                    accumulator.indexOf(errorCodes[code].message) === -1 && accumulator.push(errorCodes[code].message);
+                                    return accumulator;
+                                };
+                                setInitialViewError(response.data.error_codes.reduce(reducer, []));
                             } else {
+                                // TODO: handle non 100 level errors
                                 setViews(ERROR);
                             }
                         }
@@ -292,7 +307,7 @@ export const ImportIndicatorsPopover = ({ page, program_id, tierLevelsUsed, stor
         <div className="import__initial__text">
             <div className="import__initial__text__error">
                 <span>
-                    {errorCodes[106].message}&nbsp;
+                    {errorMessages[errorCodes[106].message]}&nbsp;
                     <a 
                         className="import__initial__text__error__link"
                         role="link"
@@ -361,13 +376,19 @@ export const ImportIndicatorsPopover = ({ page, program_id, tierLevelsUsed, stor
                                             }
                                         </li>
                                     </ol>
-                                    {(intialViewError && intialViewError !== 106) &&
-                                        <div className="import__initial__text__error">
-                                            { errorCodes[intialViewError].message }
-                                        </div>
+                                    {initialViewError.indexOf(3) === -1 &&
+                                        initialViewError.map((message_id, i) => {
+                                            // If more than one different error messages, display them in a numbered list. If just one, just display that one message.
+                                            return (
+                                                <div key={message_id} className="import__initial__text__error">
+                                                    {initialViewError.length > 1 && `${i + 1}. `}{ errorMessages[message_id] }
+                                                </div>
+                                            )
+                                        })
                                     }
                                 </div>
-                                {intialViewError === 106 ? 
+                                {/* TODO: Update to handle multiply downloaders/uploaders scenarios */}
+                                {initialViewError.indexOf(3) >= 0 ? 
                                     multipleUploadWarning
                                 :
                                 <React.Fragment> 
@@ -674,62 +695,57 @@ const LevelIndicatorCount = ({ level, i }) => {
 let errorCodes = {
     100 : {
         type: "Program doesn't match",
-        message: 
-            // # Translators: Message to user that we cannot import the their file. This is because of it being the wrong file or the structure of the file was changed.
-            gettext("Sorry, we can’t import indicators from this file. This can happen if the wrong file is selected or the template structure was modified.")
+        message: 1,
     },
     101 : {
         type: "No new indicators",
-        message: 
-            // # Translators: Messsage to user that there aren't any new indicators in the uploaded file.
-            gettext("Sorry, we can’t find any indicators in this file.")
+        message: 2,
     },
     102 : {
         type: "Undertermined Level",
-        message: 
-            // # Translators: Message to user that we cannot import the their file. This is because of it being the wrong file or the structure of the file was changed.
-            gettext("Sorry, we can’t import indicators from this file. This can happen if the wrong file is selected or the template structure was modified.")
+        message: 1,
     },
     103 : {
         type: "Template not found",
-        message: 
-            // # Translators: Message to user that we cannot import the their file. This is because of it being the wrong file or the structure of the file was changed.
-            gettext("Sorry, we can’t import indicators from this file. This can happen if the wrong file is selected or the template structure was modified.")
+        message: 1,
     },
     104 : {
         type: "Mismatch tiers",
-        message: 
-            // # Translators: Message to user that we cannot import the their file. This is because of it being the wrong file or the structure of the file was changed.
-            gettext("Sorry, we can’t import indicators from this file. This can happen if the wrong file is selected or the template structure was modified.")
+        message: 1,
     },
     105 : {
         type: "Indicator data not found",
-        message: 
-            // # Translators: Message to user that we cannot import the their file. This is because of it being the wrong file or the structure of the file was changed.
-            gettext("Sorry, we can’t import indicators from this file. This can happen if the wrong file is selected or the template structure was modified.")
+        message: 1,
     },
     106 : {
         type: "Someone else uploaded a template in the last 24 hours",
-        message: 
-            // # Translators: Message to user that someone else has uploaded a template in the last 24 hours and may be in the process of importing indicators to this program. You can view the program change log to see more details.
-            gettext("Someone else uploaded a template in the last 24 hours, and may be in the process of adding indicators to this program.")
+        message: 3,
     },
     200 : {
         type: "Invalid level header",
-        message: 
-            // # Translators: Message to user that we cannot import the their file. This is because of it being the wrong file or the structure of the file was changed.
-            gettext("Sorry, we can’t import indicators from this file. This can happen if the wrong file is selected or the template structure was modified.")
+        message: 1,
     },
     201 : {
         type: "Malformed indicator",
-        message: 
-            // # Translators: Message to user that we cannot import the their file. This is because of it being the wrong file or the structure of the file was changed.
-            gettext("Sorry, we can’t import indicators from this file. This can happen if the wrong file is selected or the template structure was modified.")
+        message: 1,
     },
     202 : {
         type: "Indicators out of order",
-        message: 
-            // # Translators: Message to user that we cannot import the their file. This is because there is one or more indicators that are out of order. Users should visit the results framework page and rearrange indicators.
-            gettext("Sorry, we can't import indicators from this file. One or more indicators is out of order. To rearrange saved indicators, please visit the results framework.")
+        message: 4,
     },
+}
+
+let errorMessages = {
+    1 : 
+        // # Translators: Message to user that we cannot import the their file. This is because of it being the wrong file or the structure of the file was changed.
+        gettext("Sorry, we can’t import indicators from this file. This can happen if the wrong file is selected or the template structure was modified."),
+    2 : 
+        // # Translators: Messsage to user that there aren't any new indicators in the uploaded file.
+        gettext("Sorry, we can’t find any indicators in this file."),
+    3 :
+        // # Translators: Message to user that someone else has uploaded a template in the last 24 hours and may be in the process of importing indicators to this program. You can view the program change log to see more details.
+        gettext("Someone else uploaded a template in the last 24 hours, and may be in the process of adding indicators to this program."),
+    4 :
+        // # Translators: Message to user that we cannot import the their file. This is because there is one or more indicators that are out of order. Users should visit the results framework page and rearrange indicators.
+        gettext("Sorry, we can't import indicators from this file. One or more indicators is out of order. To rearrange saved indicators, please visit the results framework."),
 }
