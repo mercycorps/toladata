@@ -162,7 +162,7 @@ const api = {
         return await this.apiSession.post(`/indicators/api/bulk_import_indicators/${program_id}/`,
                 formData, {headers: {'Content-Type': 'multipart/form-data'}}
             )
-            .then(response => response.data)
+            .then(response => response)
             .catch(error => {
                 this.logFailure(error);
                 return error.response;

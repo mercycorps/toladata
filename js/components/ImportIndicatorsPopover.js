@@ -218,14 +218,14 @@ export const ImportIndicatorsPopover = ({ page, program_id, tierLevelsUsed, stor
                 .then(response => {
                     let handleResponse = () => {
                         if ((response.status === 200)) {
-                            setvalidIndicatorsCount(response.valid);
-                            setInvalidIndicatorsCount(response.invalid);
-                            if (response.invalid === 0) {
+                            setvalidIndicatorsCount(response.data.valid ? response.data.valid : 0);
+                            setInvalidIndicatorsCount(response.data.invalid ? response.data.invalid : 0);
+                            if (!response.data.invalid || response.data.invalid === 0) {
                                 setViews(CONFIRM);
-                                setStoredView({view: CONFIRM, valid: response.valid});
+                                setStoredView({view: CONFIRM, valid: response.data.valid});
                             } else {
                                 setViews(FEEDBACK);
-                                setStoredView({view: FEEDBACK, valid: response.valid, invalid: response.invalid});
+                                setStoredView({view: FEEDBACK, valid: response.data.valid, invalid: response.data.invalid});
                             }
                         } else {
                             if ( (response.data.error_codes.filter(code => code.toString().slice(0, 1) === "1")).length > 0 ) {
@@ -304,12 +304,12 @@ export const ImportIndicatorsPopover = ({ page, program_id, tierLevelsUsed, stor
 
     // TODO/IN-WORK: Need to determine how to handle continue button for downloading and uploading. Structure and Styles are in place.
     let multipleUploadWarning = 
-        <div className="import__initial__text">
-            <div className="import__initial__text__error">
+        <div className="initial__text--multi-user-error">
+            <div className="multi-user-error__text--error">
                 <span>
                     {errorMessages[errorCodes[106].message]}&nbsp;
                     <a 
-                        className="import__initial__text__error__link"
+                        className="text-error__link"
                         role="link"
                         href={ `/tola_management/audit_log/${program_id}/` }
                         target="_blank"
@@ -321,13 +321,13 @@ export const ImportIndicatorsPopover = ({ page, program_id, tierLevelsUsed, stor
                     </a>
                 </span>
             </div>
-            <div className="import__initial__text__error__confirm">
+            <div className="multi-user-error__text--confirm">
                 {
                     // # Translators: Confirrm the user wants to continue.
                     gettext("Are you sure you want to continue?")
                 }
             </div>
-            <div className="import__initial__text__error__buttons">
+            <div className="multi-user-error__buttons">
                 <button
                     role="button"
                     type="button"
@@ -360,8 +360,8 @@ export const ImportIndicatorsPopover = ({ page, program_id, tierLevelsUsed, stor
                     // ***** View for downloading and uploading the template *****
                     case INITIAL:
                         return (
-                            <div className="import__initial">
-                                <div className="import__initial__text">
+                            <div className="import__popover--initial">
+                                <div className="initial__text">
                                     <ol>
                                         <li>
                                             {
@@ -380,8 +380,8 @@ export const ImportIndicatorsPopover = ({ page, program_id, tierLevelsUsed, stor
                                         initialViewError.map((message_id, i) => {
                                             // If more than one different error messages, display them in a numbered list. If just one, just display that one message.
                                             return (
-                                                <div key={message_id} className="import__initial__text__error">
-                                                    {initialViewError.length > 1 && `${i + 1}. `}{ errorMessages[message_id] }
+                                                <div key={message_id} className="initial__text--error">
+                                                    { errorMessages[message_id] }
                                                 </div>
                                             )
                                         })
@@ -401,7 +401,7 @@ export const ImportIndicatorsPopover = ({ page, program_id, tierLevelsUsed, stor
                                         <AdvancedImport />
                                     </ImportIndicatorsContext.Provider>
 
-                                    <div className="import__initial__buttons">
+                                    <div className="initial__buttons">
                                         <button
                                             role="button"
                                             type="button"
@@ -438,8 +438,8 @@ export const ImportIndicatorsPopover = ({ page, program_id, tierLevelsUsed, stor
                     // ***** View to provide error feedback on their uploaded template *****
                     case FEEDBACK:
                         return (
-                            <div className="import__feedback">
-                                <div className="import__feedback__valid">
+                            <div className="import__popover--feedback">
+                                <div className="feedback__text--valid">
                                     {views === FEEDBACK ? <div><i className="fas fa-check-circle"/></div> : null}
                                     {
                                         // # Translators: The count of indicators that have passed validation and are ready to be imported to complete the process. This cannot be undone after completing.
@@ -450,7 +450,7 @@ export const ImportIndicatorsPopover = ({ page, program_id, tierLevelsUsed, stor
                                         ), [validIndicatorsCount])
                                     }
                                 </div>
-                                <div className="import__feedback__invalid">
+                                <div className="feedback__text--invalid">
                                     {views === FEEDBACK ? <div><i className="fas fa-exclamation-triangle"/></div> : null}
                                     {
                                         // # Translators: The count of indicators that have passed validation and are ready to be imported to complete the process. This cannot be undone after completing.
@@ -462,7 +462,7 @@ export const ImportIndicatorsPopover = ({ page, program_id, tierLevelsUsed, stor
                                     }
                                 </div>
                                 <a
-                                    className="import__feedback__download"
+                                    className="feedback__text--download"
                                     role="button"
                                     href="#"
                                     onClick={ () => handleFeedback() }
@@ -478,8 +478,8 @@ export const ImportIndicatorsPopover = ({ page, program_id, tierLevelsUsed, stor
                     // ***** View to ask users to confirm the upload *****
                     case CONFIRM:
                         return (
-                            <div className="import__confirm">
-                                <div className="import__confirm__text">
+                            <div className="import__popover--confirm">
+                                <div className="confirm__text">
                                     {views === CONFIRM ? <div><i className="fas fa-check-circle"/></div> : null}
                                     <div>
                                         {
@@ -492,7 +492,7 @@ export const ImportIndicatorsPopover = ({ page, program_id, tierLevelsUsed, stor
                                         }
                                     </div>
                                 </div>
-                                <div className="import__confirm__buttons">
+                                <div className="confirm__buttons">
                                     <button
                                         role="button"
                                         type="button"
@@ -507,7 +507,7 @@ export const ImportIndicatorsPopover = ({ page, program_id, tierLevelsUsed, stor
                                     <button
                                         role="button"
                                         type="button"
-                                        className="btn btn-sm import__confirm__buttons__cancel"
+                                        className="btn btn-sm confirm-buttons__button--cancel"
                                         onClick={ () => handleClose() }
                                     >
                                         {
@@ -521,8 +521,8 @@ export const ImportIndicatorsPopover = ({ page, program_id, tierLevelsUsed, stor
                     // ***** View for a successful upload *****
                     case SUCCESS:
                         return (
-                            <div className="import__success">
-                                <div  className="import__success__text">
+                            <div className="import__popover--success">
+                                <div  className="success__text">
                                     {views === SUCCESS ? <div><i className="fas fa-check-circle"/></div> : null}
                                     {
                                         // # Translators: Message with the count of indicators that were successfully imported but they require additional details before they can be submitted.
@@ -534,7 +534,7 @@ export const ImportIndicatorsPopover = ({ page, program_id, tierLevelsUsed, stor
                                     }
                                 </div>
                                 { page === "resultsFramework" &&
-                                    <a role="link" href={ api.getProgramPageUrl(program_id) }>
+                                    <a role="link" className="success__link" href={ api.getProgramPageUrl(program_id) }>
                                         {
                                             // # Translators: A link to the program page to add the addition setup information for the imported indicators.
                                             gettext("Visit the program page to complete setup of these indicators.")
@@ -546,7 +546,7 @@ export const ImportIndicatorsPopover = ({ page, program_id, tierLevelsUsed, stor
                     // TODO: ***** View for when an API call fails *****
                     case ERROR:
                         return (
-                            <div className="import__error">
+                            <div className="import__popover--error">
                                 <p className="text-secondary px-1 my-auto">
                                     {
                                         // # Translators: Notification for a error that happend on the web server.
@@ -559,7 +559,7 @@ export const ImportIndicatorsPopover = ({ page, program_id, tierLevelsUsed, stor
                     // TODO: View for when waiting for an API calls response
                     case LOADING:
                         return (
-                            <div className="import__loading" disabled>
+                            <div className="import__popover--loading" disabled>
                                 <img src='/static/img/duck.gif' />&nbsp;
                                 {/* <img src='/static/img/paint_spinner.gif'/>&nbsp; */}
                                 {/* <img src='/static/img/ajax-loader.gif' />&nbsp; */}
@@ -588,11 +588,11 @@ const AdvancedImport = () => {
     }, [])
 
     return (
-        <div className="import__advanced">
-            <div className="import__advanced__button">
+        <div className="advanced">
+            <div className="advanced__button">
                 <FontAwesomeIcon icon={ expanded ? 'caret-down' : 'caret-right' } /> &nbsp;
                 <a
-                    className="import__advanced__button__toggle"
+                    className="advanced-button__toggle"
                     data-toggle="collapse"
                     href="#optionsForm"
                     role="button"
@@ -605,8 +605,8 @@ const AdvancedImport = () => {
                         }
                     </a>
             </div>
-            <div id="optionsForm" className="collapse import__advanced__form">
-                <p className="import__advanced__form__text">
+            <div id="optionsForm" className="collapse advanced__form">
+                <p className="advanced-form__text">
                     {
                         // # Translators: Details explaining that by default the template will include 10 or 20 rows per result level. You can adjust the number if you need more or less rows.
                         gettext('By default, the template will include 10 or 20 indicator rows per result level. Adjust the numbers if you need more or fewer rows.')
@@ -673,11 +673,11 @@ const LevelIndicatorCount = ({ level, i }) => {
     };
 
     return (
-        <div key={ i } className="import__advanced__form__level-count-row">
+        <div key={ i } className="advanced-form__row--level-count">
             <label htmlFor={ level.name }> { gettext(level.name) } </label>
             <Select
                 id={ level.name }
-                className="import__advanced__form__level-count-row__options"
+                className="level-count__options"
                 options={options}
                 defaultValue={ {value: level.rows, label: level.rows} }
                 isDisabled={!tierLevelsUsed[i].used}

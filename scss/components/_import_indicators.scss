@@ -7,16 +7,15 @@
     border: none;
     padding: 1rem 1rem 0;
     }
-
     .popover-body {
         padding: 0;
     }
 } 
 
-.import {
+.import__popover {
     // ***** Initial View Styling *****
-    &__initial {
-        &__text {
+    &--initial {
+        .initial__text {
             padding: 0.5rem 1rem 0;
     
             ol {
@@ -27,30 +26,42 @@
                     margin-bottom: 0.75rem;
                 }
             }
-    
-            &__error {
+            &--error {
                 color: $red;
-                margin-bottom: 0.75rem;
-    
-                &__link {
-                    color: $action;
-                }
-                &__confirm {
-                    color: $red;
-                    font-weight: bold;
-                }
-                &__buttons {
-                    display: flex;
-                    flex-direction: column;
-                    margin-top: 1rem;
-    
-                    button {
-                        padding: 0.5rem 0.75rem;
+                margin-bottom: 0.75rem;  
+            }
+            &--multi-user-error {
+                padding: 0.5rem 1rem 0;
+
+                .multi-user-error {
+                    &__text {
+                        &--error {
+                            color: $red;
+                            margin-bottom: 0.75rem;
+                            
+                            .text-error__link {
+                                color: $action;
+                            }
+                        }
+                        &--confirm {
+                            color: $red;
+                            font-weight: bold;
+                        }
+                    }
+                    &__buttons {
+                        display: flex;
+                        flex-direction: column;
+                        margin-top: 1rem;
+                
+                        button {
+                            padding: 0.5rem 0.75rem;
+                        }
                     }
                 }
             }
         }
-        &__buttons {
+
+        .initial__buttons {
             display: flex;
             flex-direction: column;
             margin-top: 1rem;
@@ -62,135 +73,140 @@
                 margin: 0.25rem;
             }
         }
-    }
     
-    // ***** Advanced Import Component Styling *****
-    &__advanced {
-        &__button {
-        display: flex;
-        justify-content: center;
-        align-items: center;
-        color: $action;
-        font-weight: bold;
-        }
-        &__form {
-            &__text {
-                margin-bottom: 0.25rem;
-                padding: 0.25rem 1rem;
-            }
-            &__level-count-row {
-                display: flex;
-                justify-content: space-between;
-                align-self: center;
-                width: auto;
-                margin: 0.125rem 1rem;
-                
-                & > label {
-                    margin: auto 0;
-                    padding-left: 1rem;
-                    padding-bottom: 2px;
-                }
-                &__options {
-                    padding: 0.25rem 1rem;
-                    width: 7rem;
-                }
-            }
-        }
-    }
-    
-    
-    // ***** Feedback View Styling *****
-    &__feedback {
-        display: flex;
-        flex-direction: column;
-        margin: 0.25rem 1rem 0.75rem;
-    
-    
-        &__valid {
+        // ***** Advanced Import Component Styling *****
+        .advanced {
+            &__button {
             display: flex;
-            margin-top: 0.5rem;
-            margin-bottom: 0.5rem;
-    
-            & > div > .fa-check-circle {
-                margin-top: 4px;
-                margin-right: 0.5rem;
-                color: $green;
-            }
-        }
-    
-        &__invalid {
-            display: flex;
-            margin-bottom: 1rem;
-    
-            & > div > .fa-exclamation-triangle {
-                margin-top: 4px;
-                margin-right: 0.5rem;
-                color: $red;
-            }
-        }
-    
-        &__download {
-            padding-left: 1.5rem;
-            font-weight: bold;
+            justify-content: center;
+            align-items: center;
             color: $action;
+            font-weight: bold;
+            }
+
+            &__form {
+                .advanced-form {
+                    &__text {
+                        margin-bottom: 0.25rem;
+                        padding: 0.25rem 1rem;
+                    }
+                    &__row--level-count {
+                        display: flex;
+                        justify-content: space-between;
+                        align-self: center;
+                        width: auto;
+                        margin: 0.125rem 1rem;
+                        
+                        & > label {
+                            margin: auto 0;
+                            padding-left: 1rem;
+                            padding-bottom: 2px;
+                        }
+                        .level-count__options {
+                            padding: 0.25rem 1rem;
+                            width: 7rem;
+                        }
+                        
+                    }
+                }
+            }
         }
     }
-    
-    // ***** Confirmation View Styling *****
-    &__confirm {
-        display: flex;
-        flex-direction: column;
-        margin: 0.25rem 1rem 0.75rem;
-    
-        &__text {
-            display: flex;
-            margin-top: 0.5rem;
-            margin-bottom: 1rem;
-            align-items: flex-start;
-            
-            & > div > .fa-check-circle {
-                margin-top: 4px;
-                margin-right: 0.25rem;
-                color: $green;
-            }
-        }
-    
-        &__buttons {
-            display: flex;
-            flex-direction: column;
-    
-            &__cancel {
-                color: $gray-600;
-            }
-        }
-    }
-    
-    // ***** Successfull View Styling *****
-    &__success {
-        display: flex;
-        flex-direction: column;
-        margin: 0.25rem 1rem 0.75rem;
-    
-        &__text {
-            display: flex;
-            margin-top: 0.5rem;
-            margin-bottom: 1rem;
-    
-            & > div > .fa-check-circle {
-                margin-top: 4px;
-                margin-right: 0.25rem;
-                color: $green;
-            }
-        }
         
-        & > a {
-            color: $action;
-            font-weight: bold;
+        
+    // ***** Feedback View Styling *****
+    &--feedback {
+        display: flex;
+        flex-direction: column;
+        margin: 0.25rem 1rem 0.75rem;
+    
+        .feedback__text {
+            &--valid {
+                display: flex;
+                margin-top: 0.5rem;
+                margin-bottom: 0.5rem;
+        
+                & > div > .fa-check-circle {
+                    margin-top: 4px;
+                    margin-right: 0.5rem;
+                    color: $green;
+                }
+            }
+            &--invalid {
+                display: flex;
+                margin-bottom: 1rem;
+        
+                & > div > .fa-exclamation-triangle {
+                    margin-top: 4px;
+                    margin-right: 0.5rem;
+                    color: $red;
+                }
+            }
+            &--download {
+                padding-left: 1.5rem;
+                font-weight: bold;
+                color: $action;
+            }
         }
     }
+        
+    // ***** Confirmation View Styling *****
+    &--confirm {
+        display: flex;
+        flex-direction: column;
+        margin: 0.25rem 1rem 0.75rem;
     
+        .confirm {
+            &__text {
+                display: flex;
+                margin-top: 0.5rem;
+                margin-bottom: 1rem;
+                align-items: flex-start;
+                
+                & > div > .fa-check-circle {
+                    margin-top: 4px;
+                    margin-right: 0.25rem;
+                    color: $green;
+                }
+            }
+            &__buttons {
+                display: flex;
+                flex-direction: column;
+        
+                .confirm-buttons__button--cancel {
+                    color: $gray-600;
+                }
+            }
+        }
+    }
+        
+    // ***** Successfull View Styling *****
+    &--success {
+        display: flex;
+        flex-direction: column;
+        margin: 0.25rem 1rem 0.75rem;
+    
+        .success {
+            &__text {
+                display: flex;
+                margin-top: 0.5rem;
+                margin-bottom: 1rem;
+        
+                & > div > .fa-check-circle {
+                    margin-top: 4px;
+                    margin-right: 0.25rem;
+                    color: $green;
+                }
+            }
+            &__link {
+                color: $action;
+                font-weight: bold;
+            }
+        }
+    }
+        
     // ***** Error View Styling *****
-    &__error {
+    &--error {
         display: flex;
         flex-direction: column;
         justify-content: space-between;
@@ -198,7 +214,7 @@
         height: 100px;
     }
     
-    &__loading {
+    &--loading {
         display: flex;
         justify-content: center;
         align-items: center;
@@ -209,5 +225,4 @@
             height: inherit;
         }
     }
-
 }
