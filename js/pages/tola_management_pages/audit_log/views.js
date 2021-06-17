@@ -127,6 +127,8 @@ class ChangesetEntry extends React.Component {
         switch(type) {
             case 'indicator_changed':
             case 'indicator_created':
+            case 'indicator_imported':
+            case 'template_uploaded':
             case 'indicator_deleted':
                 return <IndicatorChangeset data={data} name={name} pretty_name={pretty_name} indicator={indicator} level={level}/>
                 break

@@ -4,6 +4,7 @@ import re
 import os
 import json
 import logging
+from decimal import Decimal
 from datetime import datetime
 from openpyxl.comments import Comment
 from openpyxl.styles import PatternFill, Alignment, Protection, Font, NamedStyle, Border, Side
@@ -22,7 +23,9 @@ from indicators.views.view_utils import indicator_letter_generator
 from workflow.models import Program
 from workflow.serializers_new import BulkImportSerializer, BulkImportIndicatorSerializer
 from tola.l10n_utils import str_without_diacritics
+from tola.util import usefully_normalize_decimal
 from tola_management.permissions import user_has_program_roles
+from tola_management.models import ProgramAuditLog
 
 VALIDATION_KEY_UOM_TYPE = 'uom_type_validation'
 VALIDATION_KEY_DIR_CHANGE = 'dir_change_validation'
@@ -423,6 +426,8 @@ class BulkImportIndicatorsView(LoginRequiredMixin, UserPassesTestMixin, AccessMi
 
         program_id = kwargs['program_id']
         program = Program.objects.get(pk=program_id)
+        ProgramAuditLog.log_template_uploaded(request.user, program)
+
         wb = openpyxl.load_workbook(request.FILES['file'])
         ws = wb.get_sheet_by_name(TEMPLATE_SHEET_NAME)
 
@@ -590,12 +595,16 @@ class BulkImportIndicatorsView(LoginRequiredMixin, UserPassesTestMixin, AccessMi
                         validation_errors['sector'] = [error_string]
                     non_fatal_errors.append(ERROR_MALFORMED_INDICATOR)
 
+            # Final data manipulation and updates
             indicator_data['level_id'] = current_level.pk
             indicator_data['program_id'] = program.id
             # The number order has already been checked if program is autonumbered, so we don't need the numbers
             # any more
             if program.auto_number_indicators:
                 indicator_data.pop('number')
+            if indicator_data['baseline']:
+                indicator_data['baseline'] = str(usefully_normalize_decimal(
+                    Decimal(indicator_data['baseline']).quantize(Decimal('.01'))))
 
             if len(validation_errors) == 0:
                 new_indicators_data.append(indicator_data)
@@ -681,7 +690,8 @@ def save_bulk_import_data(request, *args, **kwargs):
     try:
         with transaction.atomic():
             for indicator_data in stored_indicators:
-                Indicator.objects.create(**indicator_data)
+                indicator = Indicator.objects.create(**indicator_data)
+                ProgramAuditLog.log_indicator_imported(request.user, indicator, 'N/A')
     except django.core.exceptions.ValidationError:
         return JsonResponse({'error_codes': [ERROR_SAVE_VALIDATION]}, status=400)
     return JsonResponse({'message': 'success'}, status=200)

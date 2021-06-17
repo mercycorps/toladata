@@ -16,6 +16,7 @@ from factories import (
     workflow_models as w_factories,
     indicators_models as i_factories
 )
+from tola_management.models import ProgramAuditLog
 from indicators.models import Indicator, Level, LevelTier, BulkIndicatorImportFile
 from indicators.views.bulk_indicator_import_views import (
     COLUMNS, FIRST_USED_COLUMN, DATA_START_ROW, PROGRAM_NAME_ROW, COLUMN_HEADER_ROW,
@@ -95,13 +96,13 @@ class TestBulkImportTemplateCreation(test.TestCase):
                 counts['existing_indicators'][level_index] += 1
                 indicator_numbers[-1].append(ws.cell(row_index, FIRST_USED_COLUMN + 1).value)
                 are_protected = [ws.cell(row_index, col).style == PROTECTED_INDICATOR_STYLE
-                                for col in range(FIRST_USED_COLUMN, len(COLUMNS) )]
+                                for col in range(FIRST_USED_COLUMN, len(COLUMNS))]
                 self.assertTrue(all(are_protected))
             elif ws.cell(row_index, FIRST_USED_COLUMN + 1).value is not None:
                 counts['new_indicators'][level_index] += 1
                 indicator_numbers[-1].append(ws.cell(row_index, FIRST_USED_COLUMN + 1).value)
                 are_unprotected = [ws.cell(row_index, col).style == UNPROTECTED_INDICATOR_STYLE
-                                 for col in range(FIRST_USED_COLUMN, len(COLUMNS))]
+                                   for col in range(FIRST_USED_COLUMN, len(COLUMNS))]
                 self.assertTrue(all(are_unprotected))
         return counts, level_names, indicator_numbers
 
@@ -375,14 +376,18 @@ class TestBulkImportTemplateProcessing(test.TestCase):
 
         ws.cell(self.program_name_row, self.first_used_column).value = "Wrong program name"
         response = self.post_template(wb)
+        self.assertEqual(ProgramAuditLog.objects.count(), 1)
+        self.assertEqual(ProgramAuditLog.objects.last().change_type, 'template_uploaded')
         self.assertEqual(response.status_code, 400)
         self.assertEqual(json.loads(response.content)['error_codes'], [ERROR_MISMATCHED_PROGRAM])
         ws.cell(self.program_name_row, self.first_used_column).value = self.program.name
         response = self.post_template(wb)
+        self.assertEqual(ProgramAuditLog.objects.count(), 2)
+        self.assertEqual(ProgramAuditLog.objects.last().change_type, 'template_uploaded')
         self.assertEqual(response.status_code, 400)
         self.assertEqual(json.loads(response.content)['error_codes'], [ERROR_NO_NEW_INDICATORS])
 
-    def test_successful_template_import(self):
+    def test_successful_template_upload(self):
         self.client.force_login(user=self.tola_user.user)
         w_factories.grant_program_access(self.tola_user, self.program, self.country, role='high')
         wb = openpyxl.load_workbook(self.get_template())
@@ -392,6 +397,8 @@ class TestBulkImportTemplateProcessing(test.TestCase):
         self.fill_worksheet_row(ws, first_blank_goal_row)
         self.fill_worksheet_row(ws, first_blank_goal_row + 1)
         response = self.post_template(wb)
+        self.assertEqual(ProgramAuditLog.objects.count(), 1)
+        self.assertEqual(ProgramAuditLog.objects.last().change_type, 'template_uploaded')
         self.assertEqual(response.status_code, 200)
         bulk_upload_objs = BulkIndicatorImportFile.objects.filter(
             program=self.program, user=self.tola_user, file_type=BulkIndicatorImportFile.INDICATOR_DATA_TYPE)
@@ -424,6 +431,8 @@ class TestBulkImportTemplateProcessing(test.TestCase):
         self.fill_worksheet_row(ws, first_blank_goal_row + 3, {'level': 'bad level'})
         self.fill_worksheet_row(ws, first_blank_goal_row + 5)
         response = self.post_template(wb)
+        self.assertEqual(ProgramAuditLog.objects.count(), 1)
+        self.assertEqual(ProgramAuditLog.objects.last().change_type, 'template_uploaded')
         self.assertEqual(response.status_code, 400)
         self.assertEqual(
             json.loads(response.content)['error_codes'],
@@ -439,6 +448,7 @@ class TestBulkImportTemplateProcessing(test.TestCase):
         self.fill_worksheet_row(ws, first_blank_goal_row, custom_values={
             'sector': 'bad sector name'})
         response = self.post_template(wb)
+        self.assertEqual(ProgramAuditLog.objects.count(), 2)
         self.assertEqual(response.status_code, 400)
         self.assertEqual(json.loads(response.content)['error_codes'], [ERROR_MALFORMED_INDICATOR])
 
@@ -452,6 +462,8 @@ class TestBulkImportTemplateProcessing(test.TestCase):
 
         ws.cell(self.program_name_row, self.first_used_column).value = "bad program name"
         response = self.post_template(wb)
+        self.assertEqual(ProgramAuditLog.objects.count(), 1)
+        self.assertEqual(ProgramAuditLog.objects.last().change_type, 'template_uploaded')
         self.assertEqual(response.status_code, 400)
         self.assertEqual(json.loads(response.content)['error_codes'], [ERROR_MISMATCHED_PROGRAM])
         ws.cell(self.program_name_row, self.first_used_column).value = self.program.name
@@ -500,8 +512,12 @@ class TestBulkImportTemplateProcessing(test.TestCase):
         self.fill_worksheet_row(ws, DATA_START_ROW + 2)
         self.fill_worksheet_row(ws, DATA_START_ROW + 3)
         self.post_template(wb)
+        self.assertEqual(ProgramAuditLog.objects.count(), 1)
+        self.assertEqual(ProgramAuditLog.objects.last().change_type, 'template_uploaded')
         self.assertEqual(Indicator.objects.count(), 5)
         self.client.post(reverse('save_bulk_import_data', args=[self.program.id]))
+        self.assertEqual(ProgramAuditLog.objects.count(), 3)
+        self.assertEqual(ProgramAuditLog.objects.last().change_type, 'indicator_imported')
         self.assertEqual(Indicator.objects.count(), 7)
         response = self.client.post(reverse('save_bulk_import_data', args=[self.program.id]))
         self.assertEqual(json.loads(response.content)['error_codes'], [ERROR_INDICATOR_DATA_NOT_FOUND])
