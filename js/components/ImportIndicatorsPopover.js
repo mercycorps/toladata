@@ -162,6 +162,7 @@ export const ImportIndicatorsPopover = ({ page, program_id, tierLevelsUsed, stor
     const [invalidIndicatorsCount, setInvalidIndicatorsCount] = useState(0); // Number of indicators that have failed validation and needs fixing
     const [tierLevelsRows, setTierLevelsRows] = useState([]); // State to hold the tier levels name and the desired number of rows for the excel template
     const [intialViewError, setInitialViewError] = useState(null);
+    const [confirmViewError, setConfirmViewError] = useState(null);
     const [downloadOrUpload, setDownloadOrUpload] = useState(null);
 
     let defaultTierLevelRows = [];
@@ -276,7 +277,7 @@ export const ImportIndicatorsPopover = ({ page, program_id, tierLevelsUsed, stor
                     if (response.status === 200) {
                         setViews(SUCCESS);
                     } else {
-                        setViews(ERROR);
+                        setConfirmViewError(true)
                     }
                 }
                 if (loading) {
@@ -485,19 +486,31 @@ export const ImportIndicatorsPopover = ({ page, program_id, tierLevelsUsed, stor
                         return (
                             <div className="import-confirm">
                                 <div className="import-confirm-text">
-                                    {views === CONFIRM ? <div><i className="fas fa-check-circle"/></div> : null}
-                                    <div>
-                                        {
-                                            // # Translators: The count of indicators that have passed validation and are ready to be imported to complete the process. This cannot be undone after completing.
-                                            interpolate(ngettext(
-                                                "%s indicator is ready to be imported. Are you ready to complete the import process? (This action cannot be undone.)",
-                                                "%s indicators are ready to be imported. Are you ready to complete the import process? (This action cannot be undone.)",
-                                                validIndicatorsCount
-                                            ), [validIndicatorsCount])
-                                        }
-                                    </div>
+                                    {!confirmViewError ?
+                                        <React.Fragment>
+                                            {/* {!confirmViewError && views === CONFIRM ? <div><i className="fas fa-check-circle"/></div> : null} */}
+                                            <div>
+                                                {
+                                                    // # Translators: The count of indicators that have passed validation and are ready to be imported to complete the process. This cannot be undone after completing.
+                                                    interpolate(ngettext(
+                                                        "%s indicator is ready to be imported. Are you ready to complete the import process? (This action cannot be undone.)",
+                                                        "%s indicators are ready to be imported. Are you ready to complete the import process? (This action cannot be undone.)",
+                                                        validIndicatorsCount
+                                                    ), [validIndicatorsCount])
+                                                }
+                                            </div>
+                                        </React.Fragment>
+                                        :
+                                        <div>
+                                            {
+                                                // # Translators: We could not complete the import indicators process. To find out why the process could not be completed, upload your import template again below.
+                                                gettext("Sorry, we couldn’t complete the import process. To figure out what went wrong, please upload your template again.")
+                                            }
+                                        </div>
+                                    }
                                 </div>
                                 <div className="import-confirm-buttons">
+                                    {!confirmViewError ? 
                                     <button
                                         role="button"
                                         type="button"
@@ -509,6 +522,20 @@ export const ImportIndicatorsPopover = ({ page, program_id, tierLevelsUsed, stor
                                             gettext("Complete import")
                                         }
                                     </button>
+                                    :
+                                    <button
+                                        role="button"
+                                        type="button"
+                                        className="btn btn-sm btn-primary"
+                                        onClick={ () => handleConfirm() }
+                                    >
+                                        {
+                                            // # Translators: Button to confirm and complete the import process
+                                            gettext("Upload Template")
+                                        }
+                                    </button>
+
+                                    }
                                     <button
                                         role="button"
                                         type="button"
