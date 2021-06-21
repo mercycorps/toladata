@@ -1,11 +1,17 @@
-.page_result_framework > .popover {
+.indicator-import__popover {
     min-width: 300px;
     max-width: 345px;
+
+    .popover-header {
+        background-color: transparent;
+        border: none;
+        padding: 1rem 1rem 0;
+    }
+    .popover-body {
+        padding: 0;
+    }
 }
-.page_program_page > .popover {
-    min-width: 300px;
-    max-width: 340px;
-}
+
 // ***** Initial View Styling *****
 .import-initial-text {
     padding: 0.5rem 1rem 0;
