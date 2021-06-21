@@ -295,59 +295,16 @@ def save_custom_template(request):
         return JsonResponse({'message': 'update successful'}, status=200)
 
     tiers = [tier.strip() for tier in request.data['tiers']]
+    joined_tiers = ''.join(tiers)
+    if ':' in joined_tiers or ',' in joined_tiers:
+        return JsonResponse({'message': _('Your request could not be processed.')}, status=400)
+
     try:
         with transaction.atomic():
             LevelTierTemplate.objects.filter(program=program).delete()
             LevelTierTemplate.objects.create(program=program, names=tiers)
-    except Exception:
-        logger.exception("Trouble in RF template paradise")
-        return JsonResponse({'message': _('Your request could not be processed.')}, status=400)
-
-    new_template = LevelTierTemplateSerializer(LevelTierTemplate.objects.filter(program=program), many=True)
-    return JsonResponse(new_template.data, safe=False)
-
-# Is this being used?
-@api_view(http_method_names=['POST'])
-def save_custom_tiers(request):
-    program = Program.objects.get(id=request.data['program_id'])
-    role = request.user.tola_user.program_role(program.id)
-    if request.user.is_anonymous or role != 'high':
-        return HttpResponseRedirect('/')
-    try:
-        # Replace both the template and the program-associated level tiers, since there is only
-        # one form and it does both.  May need to split this later if custom template creation and
-        # tierset saving is split.
-        with transaction.atomic():
-            LevelTierTemplate.objects.filter(program=program).delete()
-            LevelTier.objects.filter(program=program).delete()
-
-            tier_count = len(request.data['tiers'])
-            if tier_count != len(set(request.data['tiers'])):
-                raise NotImplementedError(_("Result levels must have unique names."))
-
-            if Level.objects.filter(level_depth=tier_count) > 0:
-                raise NotImplementedError(_("This level is being used in the results framework."))
-
-            for n, template_tier in enumerate(request.data['tiers']):
-                if not template_tier:
-                    # Translators:  This is a warning message when users have left an input field blank.
-                    raise NotImplementedError(_("Level names should not be blank"))
-
-                LevelTier.objects.create(
-                    program=program,
-                    tier_depth=n+1,
-                    name=template_tier
-                )
-            LevelTierTemplate.objects.create(
-                program=program,
-                names=request.data['tiers']
-            )
-
-    except NotImplementedError as e:
-        logger.exception("Trouble in RF Tier saving paradise")
-        return JsonResponse({'message': e.message}, status=400)
     except Exception as e:
-        logger.exception("Trouble in RF Tier saving paradise")
+        logger.exception(f"Trouble in RF template paradise. Exception:\n{e}")
         return JsonResponse({'message': _('Your request could not be processed.')}, status=400)
 
     new_template = LevelTierTemplateSerializer(LevelTierTemplate.objects.filter(program=program), many=True)

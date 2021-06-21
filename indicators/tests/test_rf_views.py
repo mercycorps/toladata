@@ -38,6 +38,22 @@ class TestSaveCustomTemplateView(test.TestCase):
         # Note that the extra white space on either side of the tier should be trimmed before saving.
         self.assertEqual(LevelTierTemplate.objects.get(program=self.program).names, ['this', 'tha t'])
 
+    def test_illegal_chars(self):
+        self.client.force_login(self.tola_user.user)
+
+        # Test comma
+        response = self.client.post(
+            reverse('save_custom_template'),
+            {'program_id': self.program.id, 'tiers': ['this, ', ' that']},
+            content_type="application/json")
+        self.assertEqual(response.status_code, 400)
+
+        # Test colon
+        response = self.client.post(
+            reverse('save_custom_template'),
+            {'program_id': self.program.id, 'tiers': ['this: ', ' that']},
+            content_type="application/json")
+        self.assertEqual(response.status_code, 400)
 
 
 
