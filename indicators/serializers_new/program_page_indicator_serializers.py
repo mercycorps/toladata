@@ -77,6 +77,7 @@ class ProgramPageIndicatorMixin:
     reporting_period = serializers.SerializerMethodField()
     periodic_targets = serializers.SerializerMethodField()
     no_target_results = serializers.SerializerMethodField()
+    indicator_type_count = serializers.IntegerField()
 
     class Meta:
         purpose = "ProgramPage"
@@ -100,7 +101,9 @@ class ProgramPageIndicatorMixin:
             'lop_met_progress',
             'reporting_period',
             'periodic_targets',
-            'no_target_results'
+            'no_target_results',
+            'indicator_type_count',
+            'create_date'
         ]
 
     # class methods to instantiate serializer with minimal queries:

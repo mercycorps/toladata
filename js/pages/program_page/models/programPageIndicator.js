@@ -74,6 +74,7 @@ export const forProgramPage = (
     periodicTargets: (indicatorJSON.periodic_targets || []).map(targetJSON => programPageTarget(targetJSON)),
     noTargetResults: (indicatorJSON.no_target_results || []).map(resultJSON => programPageResult(resultJSON)),
     get noTargets() { return !(this.frequency && this.periodicTargets && this.periodicTargets.length > 0)},
+    incompleteImport: indicatorJSON.indicator_type_count < 1 && indicatorJSON.create_date >= '2021-06-01',
     updateData(updateJSON) {
         if (updateJSON.pk && !isNaN(parseInt(updateJSON.pk)) && parseInt(updateJSON.pk) === this.pk) {
             this.number = updateJSON.number || false;
