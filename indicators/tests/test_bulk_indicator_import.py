@@ -21,7 +21,7 @@ from indicators.models import Indicator, Level, LevelTier, BulkIndicatorImportFi
 from indicators.views.bulk_indicator_import_views import (
     COLUMNS, FIRST_USED_COLUMN, DATA_START_ROW, PROGRAM_NAME_ROW, COLUMN_HEADER_ROW,
     TEMPLATE_SHEET_NAME, HIDDEN_SHEET_NAME, BASE_TEMPLATE_NAME, LEVEL_HEADER_STYLE,
-    PROTECTED_INDICATOR_STYLE, UNPROTECTED_INDICATOR_STYLE,
+    EXISTING_INDICATOR_STYLE, UNPROTECTED_NEW_INDICATOR_STYLE, PROTECTED_NEW_INDICATOR_STYLE,
     ERROR_MISMATCHED_PROGRAM,
     ERROR_NO_NEW_INDICATORS,
     ERROR_UNDETERMINED_LEVEL,
@@ -68,15 +68,18 @@ class TestBulkImportTemplateCreation(test.TestCase):
         else:
             return ContentFile(response.content)
 
-    def get_expected_indicator_numbers(self, config, request_params, has_indicators=False):
+    def get_expected_indicator_numbers(self, config, request_params, has_indicators=False, auto_number=True):
         expected_numbers = []
         for level_conf in config:
             row_count = request_params[level_conf['tier']]
             row_count += level_conf['indicators'] if has_indicators else 0
-            expected_numbers.append([f"{level_conf['ontology']}{letter}" for letter in self.letters[:row_count]])
+            if auto_number:
+                expected_numbers.append([f"{level_conf['ontology']}{letter}" for letter in self.letters[:row_count]])
+            else:
+                expected_numbers.append([None for i in range(row_count)])
         return expected_numbers
 
-    def process_indicator_rows(self, wb):
+    def process_indicator_rows(self, wb, program):
         ws = wb.get_sheet_by_name(TEMPLATE_SHEET_NAME)
         counts = {'level_headers': 0, 'existing_indicators': [], 'new_indicators': []}
         level_names = []
@@ -94,20 +97,32 @@ class TestBulkImportTemplateCreation(test.TestCase):
                 self.assertEqual(ws.cell(row_index, FIRST_USED_COLUMN).style, LEVEL_HEADER_STYLE)
             elif ws.cell(row_index, FIRST_USED_COLUMN + 2).value is not None:
                 counts['existing_indicators'][level_index] += 1
-                indicator_numbers[-1].append(ws.cell(row_index, FIRST_USED_COLUMN + 1).value)
-                are_protected = [ws.cell(row_index, col).style == PROTECTED_INDICATOR_STYLE
+                if program.auto_number_indicators:
+                    indicator_numbers[-1].append(ws.cell(row_index, FIRST_USED_COLUMN + 1).value)
+                else:
+                    indicator_numbers[-1].append(None)
+                are_protected = [ws.cell(row_index, col).style == EXISTING_INDICATOR_STYLE
                                 for col in range(FIRST_USED_COLUMN, len(COLUMNS))]
                 self.assertTrue(all(are_protected))
-            elif ws.cell(row_index, FIRST_USED_COLUMN + 1).value is not None:
+            elif ws.cell(row_index, FIRST_USED_COLUMN).value is not None:
                 counts['new_indicators'][level_index] += 1
-                indicator_numbers[-1].append(ws.cell(row_index, FIRST_USED_COLUMN + 1).value)
-                are_unprotected = [ws.cell(row_index, col).style == UNPROTECTED_INDICATOR_STYLE
-                                   for col in range(FIRST_USED_COLUMN, len(COLUMNS))]
+                if program.auto_number_indicators:
+                    indicator_numbers[-1].append(ws.cell(row_index, FIRST_USED_COLUMN + 1).value)
+                else:
+                    indicator_numbers[-1].append(None)
+                # The first two columns are level and number, which have different protection than the rest of the row
+                self.assertEqual(ws.cell(row_index, FIRST_USED_COLUMN).style, PROTECTED_NEW_INDICATOR_STYLE)
+                expected_number_style = PROTECTED_NEW_INDICATOR_STYLE \
+                    if program.auto_number_indicators else UNPROTECTED_NEW_INDICATOR_STYLE
+                self.assertEqual(ws.cell(row_index, FIRST_USED_COLUMN + 1).style, expected_number_style)
+                are_unprotected = [ws.cell(row_index, col).style == UNPROTECTED_NEW_INDICATOR_STYLE
+                                   for col in range(FIRST_USED_COLUMN + 2, len(COLUMNS))]
                 self.assertTrue(all(are_unprotected))
         return counts, level_names, indicator_numbers
 
-    def compare_ws_lines(self, wb, expected_counts, expected_level_names, expected_indicator_numbers):
-        actual_counts, actual_level_names, actual_indicator_numbers = self.process_indicator_rows(wb)
+    def compare_ws_lines(self, wb, expected_counts, expected_level_names, expected_indicator_numbers, program=None):
+        program = program if program else self.program
+        actual_counts, actual_level_names, actual_indicator_numbers = self.process_indicator_rows(wb, program)
         self.assertEqual(actual_counts, expected_counts)
         self.assertEqual(actual_level_names, expected_level_names)
         self.assertEqual(actual_indicator_numbers, expected_indicator_numbers)
@@ -176,6 +191,20 @@ class TestBulkImportTemplateCreation(test.TestCase):
                                 for item in level_config[:4]]
         expected_indicator_numbers = self.get_expected_indicator_numbers(level_config[:4], request_params)
         self.compare_ws_lines(wb, expected_counts, expected_level_names, expected_indicator_numbers)
+
+        # Test protection of number column adjusts to program autonumber
+        small_program.auto_number_indicators = False
+        small_program.save()
+        wb = openpyxl.load_workbook(self.get_template(program=small_program, request_params=request_params))
+        expected_counts = {'level_headers': 4, 'existing_indicators': [0] * 4, 'new_indicators': [10, 10, 20, 20]}
+        expected_level_names = [f"{item['tier']}{' ' + item['ontology'] if item['ontology'] else ''}: {item['name']}"
+                                for item in level_config[:4]]
+        expected_indicator_numbers = self.get_expected_indicator_numbers(
+            level_config[:4], request_params, auto_number=small_program.auto_number_indicators)
+        self.compare_ws_lines(
+            wb, expected_counts, expected_level_names, expected_indicator_numbers, program=small_program)
+        small_program.auto_number_indicators = True
+        small_program.save()
 
         # Test with additional levels
         parent_level = level_config[0]['level_obj']
