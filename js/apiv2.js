@@ -164,7 +164,7 @@ const api = {
             )
             .then(response => response.data)
             .catch(error => {
-                // this.logFailure(error);
+                this.logFailure(error);
                 return error.response;
                 // return {status: 400, data: {error_codes: [100, 101]}}; // Used for Errors testing
                 // return {status: 200, valid: 5, invalid: 2}; // Used for Success testing

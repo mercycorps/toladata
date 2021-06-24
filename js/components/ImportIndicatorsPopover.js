@@ -235,6 +235,7 @@ export const ImportIndicatorsPopover = ({ page, program_id, tierLevelsUsed, stor
                                     return accumulator;
                                 };
                                 setInitialViewError(response.data.error_codes.reduce(reducer, []));
+                                setViews(INITIAL);
                             } else {
                                 // TODO: handle non 100 level errors
                                 setViews(ERROR);
