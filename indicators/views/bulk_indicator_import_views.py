@@ -31,6 +31,7 @@ VALIDATION_KEY_UOM_TYPE = 'uom_type_validation'
 VALIDATION_KEY_DIR_CHANGE = 'dir_change_validation'
 VALIDATION_KEY_TARGET_FREQ = 'target_frequency_validation'
 VALIDATION_KEY_SECTOR = 'sector_validation'
+VALIDATION_KEY_BASELINE = 'baseline_validation'
 
 COLUMNS = [
     {'name': 'Level', 'required': True, 'field_name': 'level'},
@@ -48,7 +49,8 @@ COLUMNS = [
     {'name': gettext('Number (#) or percentage (%)'), 'required': True, 'field_name': 'unit_of_measure_type',
      'validation': VALIDATION_KEY_UOM_TYPE, 'default': 'Number (#)'},
     {'name': 'Rationale for target', 'required': False, 'field_name': 'rationale_for_target'},
-    {'name': 'Baseline', 'required': True, 'field_name': 'baseline'},
+    {'name': 'Baseline', 'required': True, 'field_name': 'baseline',
+     'validation': VALIDATION_KEY_BASELINE},
     {'name': 'Direction of change', 'required': True, 'field_name': 'direction_of_change',
      'validation': VALIDATION_KEY_DIR_CHANGE, 'default': 'Not applicable'},
     {'name': 'Target frequency', 'required': True, 'field_name': 'target_frequency',
@@ -84,7 +86,7 @@ ERROR_INDICATOR_DATA_NOT_FOUND = 105  # When a template has been successfully up
 ERROR_MISMATCHED_LEVEL_COUNT = 106  # The number of level header rows doesn't match the number of levels in the program
 ERROR_MISMATCHED_HEADERS = 107  # The column headers don't match the standard template headers
 ERROR_SAVE_VALIDATION = 108  # This could happen if e.g. someone adds an indicator
-ERROR_INVALID_LEVEL_HEADER = 200  # When the level header doesn't contain an identifiable level
+ERROR_INVALID_LEVEL_HEADER = 109  # When the level header doesn't contain an identifiable level
 ERROR_MALFORMED_INDICATOR = 201  # A catch-all for problems with an indicator that don't fall into other non-fatal categories
 ERROR_UNEXPECTED_INDICATOR_NUMBER = 202  # The indicator number is not sequential in auto-numbered programs
 ERROR_INTERVENING_BLANK_ROW = 203  # Indicators are separated by an empty row would cause the indicator numbers to be wrong for auto-numbered programs
@@ -96,8 +98,9 @@ TITLE_STYLE = 'title_style'
 REQUIRED_HEADER_STYLE = 'required_header_style'
 OPTIONAL_HEADER_STYLE = 'optional_header_style'
 LEVEL_HEADER_STYLE = 'level_header_style'
-PROTECTED_INDICATOR_STYLE = 'protected_indicator_style'
-UNPROTECTED_INDICATOR_STYLE = 'unprotected_indicator_style'
+EXISTING_INDICATOR_STYLE = 'existing_indicator_style'
+UNPROTECTED_NEW_INDICATOR_STYLE = 'unprotected_new_indicator_style'
+PROTECTED_NEW_INDICATOR_STYLE = 'protected_new_indicator_style'
 UNPROTECTED_ERROR_STYLE = 'unprotected_indicator_error_style'
 
 logger = logging.getLogger('__name__')
@@ -162,18 +165,23 @@ class BulkImportIndicatorsView(LoginRequiredMixin, UserPassesTestMixin, AccessMi
     level_header_style.font = Font(name='Calibri', size=11, bold=True)
     level_header_style.protection = Protection(locked=True)
 
-    protected_indicator_style = NamedStyle(PROTECTED_INDICATOR_STYLE)
-    protected_indicator_style.fill = PatternFill('solid', fgColor=GRAY_LIGHTEST)
-    protected_indicator_style.font = Font(name='Calibri', size=11, color=GRAY_DARK)
-    protected_indicator_style.border = Border(
+    existing_indicator_style = NamedStyle(EXISTING_INDICATOR_STYLE)
+    existing_indicator_style.fill = PatternFill('solid', fgColor=GRAY_LIGHTEST)
+    existing_indicator_style.font = Font(name='Calibri', size=11, color=GRAY_DARK)
+    existing_indicator_style.border = Border(
         left=default_border, right=default_border, top=default_border, bottom=default_border)
-    protected_indicator_style.alignment = Alignment(vertical='top', wrap_text=True)
-    protected_indicator_style.protection = Protection(locked=True)
+    existing_indicator_style.alignment = Alignment(vertical='top', wrap_text=True)
+    existing_indicator_style.protection = Protection(locked=True)
 
-    unprotected_indicator_style = NamedStyle(UNPROTECTED_INDICATOR_STYLE)
-    unprotected_indicator_style.font = Font(name='Calibri', size=11)
-    unprotected_indicator_style.alignment = Alignment(vertical='top', wrap_text=True)
-    unprotected_indicator_style.protection = Protection(locked=False)
+    unprotected_new_indicator_style = NamedStyle(UNPROTECTED_NEW_INDICATOR_STYLE)
+    unprotected_new_indicator_style.font = Font(name='Calibri', size=11)
+    unprotected_new_indicator_style.alignment = Alignment(vertical='top', wrap_text=True)
+    unprotected_new_indicator_style.protection = Protection(locked=False)
+
+    protected_new_indicator_style = NamedStyle(PROTECTED_NEW_INDICATOR_STYLE)
+    protected_new_indicator_style.font = Font(name='Calibri', size=11)
+    protected_new_indicator_style.alignment = Alignment(vertical='top', wrap_text=True)
+    protected_new_indicator_style.protection = Protection(locked=True)
 
     unprotected_error_style = NamedStyle(UNPROTECTED_ERROR_STYLE)
     unprotected_error_style.fill = PatternFill('solid', fgColor=RED_ERROR)
@@ -256,7 +264,7 @@ class BulkImportIndicatorsView(LoginRequiredMixin, UserPassesTestMixin, AccessMi
             hidden_ws[f'{sectors_col}{i+2}'].value = sector
         sector_range = f'${sectors_col}${sectors_start_row}:${sectors_col}${sectors_end_row}'
         sector_validation = DataValidation(
-            type="list", formula1=f'{HIDDEN_SHEET_NAME}!{sector_range}', allow_blank=True)
+            type='list', formula1=f'{HIDDEN_SHEET_NAME}!{sector_range}', allow_blank=True)
         validation_map[VALIDATION_KEY_SECTOR] = sector_validation
 
         for dv in validation_map.values():
@@ -265,6 +273,14 @@ class BulkImportIndicatorsView(LoginRequiredMixin, UserPassesTestMixin, AccessMi
             # Translators:  Title of a popup box that informs the user they have entered an invalid value
             dv.errorTitle = gettext('Invalid Entry')
 
+        # Adding this validation after the others because the error messages will be different.
+        baseline_validation = DataValidation(type='decimal')
+        # Translators: Error message shown to a user when they have entered a value for a numeric field that isn't a number.
+        baseline_validation.error = gettext('Please enter a number')
+        # Translators:  Title of a popup box that informs the user they have entered an invalid value
+        baseline_validation.errorTitle = gettext('Invalid Entry')
+        validation_map[VALIDATION_KEY_BASELINE] = baseline_validation
+
         # Spreadsheet loads as corrupted when validation is added to a sheet but no cells are assigned to the
         # validation.
         if sum(int(row_count) for row_count in request.GET.values()) > 0:
@@ -272,11 +288,13 @@ class BulkImportIndicatorsView(LoginRequiredMixin, UserPassesTestMixin, AccessMi
             ws.add_data_validation(dir_change_validation)
             ws.add_data_validation(target_freq_validation)
             ws.add_data_validation(sector_validation)
+            ws.add_data_validation(baseline_validation)
 
         wb.add_named_style(self.title_style)
         wb.add_named_style(self.level_header_style)
-        wb.add_named_style(self.protected_indicator_style)
-        wb.add_named_style(self.unprotected_indicator_style)
+        wb.add_named_style(self.existing_indicator_style)
+        wb.add_named_style(self.unprotected_new_indicator_style)
+        wb.add_named_style(self.protected_new_indicator_style)
         wb.add_named_style(self.unprotected_error_style)
         wb.add_named_style(self.optional_header_style)
         wb.add_named_style(self.required_header_style)
@@ -368,7 +386,7 @@ class BulkImportIndicatorsView(LoginRequiredMixin, UserPassesTestMixin, AccessMi
                 current_column_index = self.first_used_column
                 first_indicator_cell = ws.cell(current_row_index, current_column_index)
                 first_indicator_cell.value = gettext(level['tier_name'])
-                first_indicator_cell.style = PROTECTED_INDICATOR_STYLE
+                first_indicator_cell.style = EXISTING_INDICATOR_STYLE
                 first_indicator_cell.border = Border(
                     left=None, right=self.default_border, top=self.default_border, bottom=self.default_border)
 
@@ -387,7 +405,7 @@ class BulkImportIndicatorsView(LoginRequiredMixin, UserPassesTestMixin, AccessMi
                         # These are potentially translated objects that need to be resolved, but converting None
                         # to a string does results in a cell value of "None" rather than an empty cell.
                         active_cell.value = raw_value if raw_value is None else str(raw_value)
-                    active_cell.style = PROTECTED_INDICATOR_STYLE
+                    active_cell.style = EXISTING_INDICATOR_STYLE
                     current_column_index += 1
                 current_row_index += 1
 
@@ -402,7 +420,11 @@ class BulkImportIndicatorsView(LoginRequiredMixin, UserPassesTestMixin, AccessMi
 
                 for col_n, column in enumerate(COLUMNS):
                     active_cell = ws.cell(current_row_index, self.first_used_column + col_n)
-                    active_cell.style = UNPROTECTED_INDICATOR_STYLE
+                    if column['field_name'] == 'level' or \
+                            (column['field_name'] == 'number' and program.auto_number_indicators):
+                        active_cell.style = PROTECTED_NEW_INDICATOR_STYLE
+                    else:
+                        active_cell.style = UNPROTECTED_NEW_INDICATOR_STYLE
                     if 'validation' in column:
                         validator = validation_map[column['validation']]
                         validator.add(active_cell)
@@ -484,7 +506,7 @@ class BulkImportIndicatorsView(LoginRequiredMixin, UserPassesTestMixin, AccessMi
                 return JsonResponse({'error_codes': [ERROR_UNDETERMINED_LEVEL]}, status=400)
 
             # skip indicators that are already in the system
-            if ws.cell(current_row_index, self.first_used_column).style == PROTECTED_INDICATOR_STYLE:
+            if ws.cell(current_row_index, self.first_used_column).style == EXISTING_INDICATOR_STYLE:
                 next(letter_gen)
                 continue
 
