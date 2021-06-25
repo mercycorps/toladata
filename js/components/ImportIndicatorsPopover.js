@@ -206,10 +206,14 @@ export const ImportIndicatorsPopover = ({ page, program_id, tierLevelsUsed, stor
     // Upload template file and send api request
     let handleUpload = (e) => {
         let loading = false;
+        let stopLoading;
         let loadingTimer = setTimeout(() => {
-            setViews(LOADING)
+            setViews(LOADING);
             loading = true;
-        }, 1000)
+            stopLoading = setTimeout(() => { // Prevents the forever spinner situation
+                setViews(INITIAL);
+            }, 60000);
+        }, 1000);
         // let files = e.target.files;
         // let reader = new FileReader();
         // reader.readAsDataURL(files[0]);
@@ -218,26 +222,31 @@ export const ImportIndicatorsPopover = ({ page, program_id, tierLevelsUsed, stor
                 .then(response => {
                     let handleResponse = () => {
                         if ((response.status === 200)) {
-                            setvalidIndicatorsCount(response.valid);
-                            setInvalidIndicatorsCount(response.invalid);
-                            if (response.invalid === 0) {
+                            setvalidIndicatorsCount(response.data.valid);
+                            setInvalidIndicatorsCount(response.data.invalid);
+                            if (response.data.invalid === 0) {
                                 setViews(CONFIRM);
-                                setStoredView({view: CONFIRM, valid: response.valid});
+                                setStoredView({view: CONFIRM, valid: response.data.valid});
                             } else {
                                 setViews(FEEDBACK);
-                                setStoredView({view: FEEDBACK, valid: response.valid, invalid: response.invalid});
+                                setStoredView({view: FEEDBACK, valid: response.data.valid, invalid: response.data.invalid});
                             }
                         } else {
-                            if ( (response.data.error_codes.filter(code => code.toString().slice(0, 1) === "1")).length > 0 ) {
-                                // Reduce the array of errors from the server to remove duplicate messaging
+                            if (response.data.error_codes) {
+                                // Reduce the array of errors to remove duplicate messaging
                                 let reducer = (accumulator, code) => {
-                                    accumulator.indexOf(errorCodes[code].message) === -1 && accumulator.push(errorCodes[code].message);
+                                    errorCodes[code] && accumulator.indexOf(errorCodes[code].message) === -1 && accumulator.push(errorCodes[code].message);
                                     return accumulator;
                                 };
-                                setInitialViewError(response.data.error_codes.reduce(reducer, []));
-                                setViews(INITIAL);
+                                let errorsMessagesToDisplay = response.data.error_codes.reduce(reducer, []);
+                                if (errorsMessagesToDisplay.length > 0) {
+                                    setInitialViewError(errorsMessagesToDisplay);
+                                    setViews(INITIAL);
+                                } else {
+                                    setViews(ERROR);
+                                }
                             } else {
-                                // TODO: handle non 100 level errors
+                                // Handles when there are no error codes or ones we do not have messaging for
                                 setViews(ERROR);
                             }
                         }
@@ -245,10 +254,11 @@ export const ImportIndicatorsPopover = ({ page, program_id, tierLevelsUsed, stor
                     if (loading) {
                         setTimeout(() => {
                             handleResponse();
+                            clearTimeout(stopLoading);
                         }, 1000)
                     } else {
-                        clearTimeout(loadingTimer);
                         handleResponse();
+                        clearTimeout(loadingTimer);
                     }
                 })
     }
@@ -381,7 +391,7 @@ export const ImportIndicatorsPopover = ({ page, program_id, tierLevelsUsed, stor
                                             // If more than one different error messages, display them in a numbered list. If just one, just display that one message.
                                             return (
                                                 <div key={message_id} className="import-initial-text-error">
-                                                    {initialViewError.length > 1 && `${i + 1}. `}{ errorMessages[message_id] }
+                                                    { errorMessages[message_id] }
                                                 </div>
                                             )
                                         })
