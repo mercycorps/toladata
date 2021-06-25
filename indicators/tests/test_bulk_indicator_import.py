@@ -318,7 +318,7 @@ class TestBulkImportTemplateCreation(test.TestCase):
         w_factories.grant_program_access(self.tola_user, self.program, self.country, role='high')
 
         wb = openpyxl.load_workbook(self.get_template())
-        ws = wb.get_sheet_by_name(TEMPLATE_SHEET_NAME)
+        ws = wb.worksheets[0]
         first_level_header = ws.cell(DATA_START_ROW, FIRST_USED_COLUMN).value
         self.assertEqual(first_level_header[:3], 'But')
         hidden_ws = wb.get_sheet_by_name(HIDDEN_SHEET_NAME)

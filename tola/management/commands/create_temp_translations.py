@@ -36,19 +36,19 @@ class Command(BaseCommand):
         untranslated_entries = [entry for entry in po_file_obj.untranslated_entries() if not entry.obsolete]
         if untranslated_entries:
             print(f'Creating {len(untranslated_entries)} temporary strings for untranslated entries')
-            self.update_entries(untranslated_entries)
+            self.update_entries(untranslated_entries, fuzzy=False)
         else:
             print('No untranslated strings found')
 
         fuzzy_entries = [entry for entry in po_file_obj.fuzzy_entries() if not entry.obsolete]
         if fuzzy_entries:
             print(f'Creating {len(fuzzy_entries)} temporary strings for fuzzy entries')
-            self.update_entries(fuzzy_entries)
+            self.update_entries(fuzzy_entries, fuzzy=True)
         else:
             print('No fuzzy strings found')
         po_file_obj.save()
 
-    def update_entries(self, entries):
+    def update_entries(self, entries, fuzzy=False):
         for entry in entries:
             template = '{space_or_tag}{diacritic}Translated {body}'
             if entry.msgid_plural:
@@ -70,3 +70,5 @@ class Command(BaseCommand):
                     diacritic=next(self.diacritic_cycle),
                     body=matches.group(2))
 
+            if fuzzy:
+                entry.flags.remove('fuzzy')

@@ -68,7 +68,7 @@ COLUMNS = [
 
 COLUMNS_FIELD_INDEXES = {col['field_name']: i for i, col in enumerate(COLUMNS)}
 
-BASE_TEMPLATE_NAME = 'BulkImportTemplate.xlsx'
+BASE_TEMPLATE_NAME = 'BulkIndicatorImportTemplate.xlsx'
 TEMPLATE_SHEET_NAME = 'Import indicators'
 HIDDEN_SHEET_NAME = 'Hidden'
 
@@ -282,8 +282,9 @@ class BulkImportIndicatorsView(LoginRequiredMixin, UserPassesTestMixin, AccessMi
         validation_map[VALIDATION_KEY_BASELINE] = baseline_validation
 
         # Spreadsheet loads as corrupted when validation is added to a sheet but no cells are assigned to the
-        # validation.
-        if sum(int(row_count) for row_count in request.GET.values()) > 0:
+        # validation. So we'll check that there is at least one blank row that will be created.
+        blank_row_count = sum([int(request.GET[level['tier_name']]) for level in serialized_levels])
+        if blank_row_count > 0:
             ws.add_data_validation(uom_type_validation)
             ws.add_data_validation(dir_change_validation)
             ws.add_data_validation(target_freq_validation)
@@ -434,9 +435,9 @@ class BulkImportIndicatorsView(LoginRequiredMixin, UserPassesTestMixin, AccessMi
             current_row_index += 1
 
         ws.protection.enable()
-        filename = "BulkIndicatorImport.xlsx"
+        ws.title = gettext(TEMPLATE_SHEET_NAME)
         response = HttpResponse(content_type='application/ms-excel')
-        response['Content-Disposition'] = 'attachment; filename="{}"'.format(filename)
+        response['Content-Disposition'] = 'attachment; filename="{}"'.format(BASE_TEMPLATE_NAME)
         wb.save(response)
         return response
 
@@ -451,7 +452,7 @@ class BulkImportIndicatorsView(LoginRequiredMixin, UserPassesTestMixin, AccessMi
         ProgramAuditLog.log_template_uploaded(request.user, program)
 
         wb = openpyxl.load_workbook(request.FILES['file'])
-        ws = wb.get_sheet_by_name(TEMPLATE_SHEET_NAME)
+        ws = wb.worksheets[0]
 
         if ws.cell(self.program_name_row, self.first_used_column).value != program.name:
             return JsonResponse({'error_codes': [ERROR_MISMATCHED_PROGRAM]}, status=400)

@@ -7,7 +7,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: \n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2021-06-25 11:19-0700\n"
+"POT-Creation-Date: 2021-06-25 15:42-0700\n"
 "PO-Revision-Date: 2021-04-05 14:19-0700\n"
 "Last-Translator: \n"
 "Language-Team: \n"
@@ -1546,27 +1546,27 @@ msgid "Number (#) or percentage (%)"
 msgstr "ÁTranslated Number (#) or percentage (%)"
 
 #. Translators: Error message shown to a user when they have entered a value that is not in a list of approved values
-#: indicators/views/bulk_indicator_import_views.py:272
+#: indicators/views/bulk_indicator_import_views.py:273
 msgid "Your entry is not in the list"
 msgstr "ÁTranslated Your entry is not in the list"
 
 #. Translators:  Title of a popup box that informs the user they have entered an invalid value
-#: indicators/views/bulk_indicator_import_views.py:274
-#: indicators/views/bulk_indicator_import_views.py:281
+#: indicators/views/bulk_indicator_import_views.py:275
+#: indicators/views/bulk_indicator_import_views.py:282
 msgid "Invalid Entry"
 msgstr "éTranslated Invalid Entry"
 
 #. Translators: Error message shown to a user when they have entered a value for a numeric field that isn't a number.
-#: indicators/views/bulk_indicator_import_views.py:279
+#: indicators/views/bulk_indicator_import_views.py:280
 msgid "Please enter a number"
 msgstr "ÁTranslated Please enter a number"
 
 #. Translators: Heading placed in the cell of a spreadsheet that allows users to upload Indicators in bulk
-#: indicators/views/bulk_indicator_import_views.py:304
+#: indicators/views/bulk_indicator_import_views.py:306
 msgid "Import indicators"
 msgstr "Translated Import indicators"
 
-#: indicators/views/bulk_indicator_import_views.py:309
+#: indicators/views/bulk_indicator_import_views.py:311
 msgid ""
 "INSTRUCTIONS\n"
 "1. Indicator rows are provided for each result level. You can delete "
@@ -1589,19 +1589,19 @@ msgstr ""
 "program page."
 
 #. Translators: Section header of an Excel template that allows users to upload Indicators.  This section is where users will add their own information.
-#: indicators/views/bulk_indicator_import_views.py:318
+#: indicators/views/bulk_indicator_import_views.py:320
 msgid "Enter indicators"
 msgstr "Translated Enter indicators"
 
 #. Translators: This is help text for a form field that gets filled in automatically
-#: indicators/views/bulk_indicator_import_views.py:335
+#: indicators/views/bulk_indicator_import_views.py:337
 msgid "This number is automatically generated through the results framework."
 msgstr ""
 "ŹTranslated This number is automatically generated through the results "
 "framework."
 
 #. Translators: This is help text for a form field
-#: indicators/views/bulk_indicator_import_views.py:338
+#: indicators/views/bulk_indicator_import_views.py:340
 msgid ""
 "Enter a numeric value for the baseline. If a baseline is not yet known or "
 "not applicable, enter a zero or type \"N/A\". The baseline can always be "
@@ -1613,25 +1613,25 @@ msgstr ""
 
 #. Translators: Message provided to user when they have failed to enter a required field on a form.
 #. Translators: On a form, displayed when the user clicks submit without filling out a required field
-#: indicators/views/bulk_indicator_import_views.py:445
+#: indicators/views/bulk_indicator_import_views.py:447
 #: templates/indicators/indicator_form_common_js.html:984
 msgid "Please complete this field"
 msgstr "Por favor complete este campo"
 
 #. Translators: Message provided to user when they have not chosen from a pre-selected list of options.
-#: indicators/views/bulk_indicator_import_views.py:447
+#: indicators/views/bulk_indicator_import_views.py:449
 msgid "Please choose from one of the options in the dropdown menu"
 msgstr "ÁTranslated Please choose from one of the options in the dropdown menu"
 
 #. Translators: Error message provided when user has exceeded the character limit on a form
-#: indicators/views/bulk_indicator_import_views.py:560
+#: indicators/views/bulk_indicator_import_views.py:562
 msgid "This field should have no more than {matches.group(1)} characters."
 msgstr ""
 "éTranslated This field should have no more than {matches.group(1)} "
 "characters."
 
 #. Translators: Error message provided when user has exceeded the character limit on a form
-#: indicators/views/bulk_indicator_import_views.py:566
+#: indicators/views/bulk_indicator_import_views.py:568
 msgid "You have exceeded the character limit of this field"
 msgstr "Translated You have exceeded the character limit of this field"
 
