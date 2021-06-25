@@ -1,3 +1,4 @@
+# -*- coding: utf-8 -*-
 """
     Program views: logframe, program page api, etc.
 """
@@ -99,7 +100,7 @@ def logframe_excel_view(request, program):
     wb = openpyxl.Workbook()
     wb.remove(wb.active)
     ws = wb.create_sheet(gettext('Logframe'))
-    add_title_cell(ws, 1, 1, clean_unicode(program['name']))
+    add_title_cell(ws, 1, 1, program['name'])
     ws.merge_cells(
         start_row=1, end_row=1,
         start_column=1, end_column=4
@@ -115,8 +116,8 @@ def logframe_excel_view(request, program):
             gettext('Means of verification'),
             gettext('Assumptions')
         ]):
-            add_header_cell(ws, 3, col+1, name)
-            ws.column_dimensions[openpyxl.utils.get_column_letter(col + 1)].width = 50
+        add_header_cell(ws, 3, col+1, name)
+        ws.column_dimensions[openpyxl.utils.get_column_letter(col + 1)].width = 50
     levels = program['levels']
     if request.GET.get('groupby') == "2":
         sorted_levels = sorted(levels, key=itemgetter('level_depth', 'ontology'))
@@ -130,24 +131,24 @@ def logframe_excel_view(request, program):
     for level in sorted_levels:
         merge_start = row
         cell = ws.cell(row=row, column=1)
-        cell.value = clean_unicode(level['display_name'])
+        cell.value = level['display_name']
         cell.alignment = TOP_LEFT_ALIGN_WRAP
         cell.fill = LEVEL_ROW_FILL
         cell = ws.cell(row=row, column=4)
-        cell.value = clean_unicode(level['assumptions'])
+        cell.value = level['assumptions']
         cell.alignment = TOP_LEFT_ALIGN_WRAP
         for indicator in sorted(level['indicators'], key=itemgetter('level_order')):
             cell = ws.cell(row=row, column=2)
             value = gettext('Indicator')
             if program['manual_numbering']:
-                value += u' {}'.format(indicator['number']) if indicator['number'] else u''
+                value += ' {}'.format(indicator['number']) if indicator['number'] else ''
             elif indicator['level_order_display'] or level['display_ontology']:
-                value += u' {}{}'.format(level['display_ontology'], indicator['level_order_display'])
-            value += u': {}'.format(clean_unicode(indicator['name']))
+                value += ' {}{}'.format(level['display_ontology'], indicator['level_order_display'])
+            value += ': {}'.format(indicator['name'])
             cell.value = value
             cell.alignment = TOP_LEFT_ALIGN_WRAP
             cell = ws.cell(row=row, column=3)
-            cell.value = clean_unicode(indicator['means_of_verification'])
+            cell.value = indicator['means_of_verification']
             cell.alignment = TOP_LEFT_ALIGN_WRAP
             row += 1
         if merge_start == row:
@@ -179,11 +180,11 @@ def logframe_excel_view(request, program):
             cell = ws.cell(row=row, column=2)
             value = gettext('Indicator')
             if program['manual_numbering']:
-                value += u' {}'.format(indicator['number']) if indicator['number'] else u''
-            cell.value = u'{}: {}'.format(value, clean_unicode(indicator['name']))
+                value += ' {}'.format(indicator['number']) if indicator['number'] else ''
+            cell.value = '{}: {}'.format(value, indicator['name'])
             cell.alignment = TOP_LEFT_ALIGN_WRAP
             cell = ws.cell(row=row, column=3)
-            cell.value = clean_unicode(indicator['means_of_verification'])
+            cell.value = indicator['means_of_verification']
             cell.alignment = TOP_LEFT_ALIGN_WRAP
             row += 1
         if merge_start == row:
@@ -206,8 +207,8 @@ def logframe_excel_view(request, program):
         cell = ws.cell(row=merge_start, column=4)
         cell.border = BORDER_TOP
     response = HttpResponse(content_type="application/ms-excel")
-    response['Content-Disposition'] = u'attachment; filename="{}"'.format(
-        u'{} - {}.xlsx'.format(program['name'], gettext('Logframe'))
+    response['Content-Disposition'] = 'attachment; filename="{}"'.format(
+        '{} - {}.xlsx'.format(program['name'], gettext('Logframe'))
     )
     wb.save(response)
     return response
