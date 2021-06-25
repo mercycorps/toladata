@@ -3,7 +3,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: \n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2021-06-24 14:04-0700\n"
+"POT-Creation-Date: 2021-06-25 11:19-0700\n"
 "PO-Revision-Date: 2021-04-05 14:21-0700\n"
 "Last-Translator: \n"
 "Language-Team: \n"
@@ -67,8 +67,8 @@ msgstr "Nº"
 
 #: indicators/export_renderers.py:58 indicators/forms.py:381
 #: indicators/models.py:1452 indicators/models.py:1863
-#: indicators/models.py:2156 indicators/views/views_program.py:141
-#: indicators/views/views_program.py:180
+#: indicators/models.py:2156 indicators/views/views_program.py:142
+#: indicators/views/views_program.py:181
 #: templates/indicators/disaggregation_print.html:53
 #: templates/indicators/disaggregation_report.html:91
 #: tola_management/programadmin.py:62 tola_management/programadmin.py:110
@@ -205,7 +205,7 @@ msgstr "Programme"
 #. Translators: This is a form field label that allows users to select which Level object to associate with
 #. the Result that's being entered into the form
 #. Translators: Number of the indicator being shown
-#: indicators/forms.py:259 indicators/views/views_program.py:113
+#: indicators/forms.py:259 indicators/views/views_program.py:114
 #: tola_management/models.py:411 tola_management/programadmin.py:109
 msgid "Result level"
 msgstr "Niveau de résultat"
@@ -387,7 +387,7 @@ msgstr "Justification de la cible"
 msgid "Target frequency"
 msgstr "Fréquence de la cible"
 
-#: indicators/indicator_plan.py:137 indicators/views/views_program.py:115
+#: indicators/indicator_plan.py:137 indicators/views/views_program.py:116
 #: tola_management/models.py:413
 msgid "Means of verification"
 msgstr "Moyens de vérification"
@@ -440,7 +440,7 @@ msgid "Comments"
 msgstr "Commentaires"
 
 #: indicators/indicator_plan.py:304 indicators/indicator_plan.py:437
-#: indicators/views/views_program.py:175
+#: indicators/views/views_program.py:176
 #: workflow/serializers_new/iptt_report_serializers.py:355
 msgid "Indicators unassigned to a results framework level"
 msgstr "Indicateurs non affectés à un niveau de cadre de résultats"
@@ -506,7 +506,7 @@ msgstr "Objectifs stratégiques du pays"
 msgid "Program Objective"
 msgstr "Objectif du programme"
 
-#: indicators/models.py:126 indicators/views/views_program.py:116
+#: indicators/models.py:126 indicators/views/views_program.py:117
 #: tola_management/models.py:409
 msgid "Assumptions"
 msgstr "Hypothèses"
@@ -1719,19 +1719,19 @@ msgid "Success, Data Updated!"
 msgstr "Succès, données mises à jour !"
 
 #. Translators: a link to the logistical framework model
-#: indicators/views/views_program.py:101 indicators/views/views_program.py:107
-#: indicators/views/views_program.py:210
+#: indicators/views/views_program.py:102 indicators/views/views_program.py:108
+#: indicators/views/views_program.py:211
 #: templates/indicators/logframe/logframe.html:5
 #: templates/indicators/program_page.html:32
 msgid "Logframe"
 msgstr "Cadre logique"
 
-#: indicators/views/views_program.py:114
+#: indicators/views/views_program.py:115
 #: templates/indicators/disaggregation_report.html:141
 msgid "Indicators"
 msgstr "Indicateurs"
 
-#: indicators/views/views_program.py:373 indicators/views/views_program.py:375
+#: indicators/views/views_program.py:374 indicators/views/views_program.py:376
 msgid "Results Framework"
 msgstr "Cadre de résultats"
 

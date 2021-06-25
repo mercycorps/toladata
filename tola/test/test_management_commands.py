@@ -1,11 +1,12 @@
 import os
+import re
 from django import test
-from tola.management.commands.makemessagesdb import create_translated_db_items, Command
-from django.core import mail
-from factories.workflow_models import TolaUserFactory, RFProgramFactory, SectorFactory
+
+from factories.workflow_models import SectorFactory
 from factories.indicators_models import (
-    RFIndicatorFactory, ReportingFrequencyFactory, DataCollectionFrequencyFactory, IndicatorTypeFactory)
-from indicators.models import IndicatorType
+    ReportingFrequencyFactory, DataCollectionFrequencyFactory, IndicatorTypeFactory)
+from tola.management.commands.makemessagesdb import create_translated_db_items, Command
+from tola.management.commands.create_temp_translations import WHITESPACE_REGEX
 
 
 class TestMakemessagesDB(test.TestCase):
@@ -21,7 +22,7 @@ class TestMakemessagesDB(test.TestCase):
         os.remove(os.path.join(cls.root_path, Command.py_filename))
         super().tearDownClass()
 
-    def test_command_contains_new_values(self):
+    def test_makemessagedb_contains_new_values(self):
 
         # Check when values created
         string_values = ['test sector', 'test type', 'test reporting freq', 'test data collection freq']
@@ -53,4 +54,22 @@ class TestMakemessagesDB(test.TestCase):
                 file_contents = fh.read()
             for string_val in string_values:
                 self.assertTrue(string_val in file_contents)
+
+
+class TestTempTranslations(test.TestCase):
+
+    def run_match(self, test_string, g1, g2):
+        matches = WHITESPACE_REGEX.match(test_string)
+        self.assertEqual(matches.group(1), g1)
+        self.assertEqual(matches.group(2), g2)
+
+    def test_regex(self):
+        self.run_match('I am', '', 'I am')
+        self.run_match('I am\nreally', '', 'I am\nreally')
+        self.run_match('  I am', '  ', 'I am')
+        self.run_match('\n I am', '\n ', 'I am')
+        self.run_match('\n<p>I am</p><p>hungry</p>', '\n<p>', 'I am</p><p>hungry</p>')
+        self.run_match(' <p><strong>I am</strong></p><p>hungry</p>', ' <p><strong>', 'I am</strong></p><p>hungry</p>')
+
+
 
