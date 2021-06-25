@@ -127,7 +127,7 @@ const api = {
                 const url = window.URL.createObjectURL(new Blob([response.data]));
                 const link = document.createElement('a');
                 link.href = url;
-                link.setAttribute('download', 'BulkIndicatorImport.xlsx');
+                link.setAttribute('download', gettext('Import indicators.xlsx'));
                 document.body.appendChild(link);
                 link.click();
                 return response;
@@ -176,7 +176,7 @@ const api = {
                 const url = window.URL.createObjectURL(new Blob([response.data]));
                 const link = document.createElement('a');
                 link.href = url;
-                link.setAttribute('download', 'BulkIndicatorImport.xlsx');
+                link.setAttribute('download', gettext('Import indicators.xlsx'));
                 document.body.appendChild(link);
                 link.click();
                 return response;
