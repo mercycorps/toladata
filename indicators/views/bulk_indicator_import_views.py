@@ -1,9 +1,10 @@
-
+import django.core.exceptions
 import openpyxl
 import re
 import os
 import json
 import logging
+from decimal import Decimal
 from datetime import datetime
 from openpyxl.comments import Comment
 from openpyxl.styles import PatternFill, Alignment, Protection, Font, NamedStyle, Border, Side
@@ -11,6 +12,7 @@ from openpyxl.worksheet.datavalidation import DataValidation
 from openpyxl.utils import get_column_letter
 from django.contrib.auth.decorators import login_required
 from django.contrib.auth.mixins import UserPassesTestMixin, LoginRequiredMixin, AccessMixin
+from django.db import transaction
 from django.utils.translation import gettext
 from django.http import HttpResponse, JsonResponse
 from django.views import View
@@ -21,12 +23,15 @@ from indicators.views.view_utils import indicator_letter_generator
 from workflow.models import Program
 from workflow.serializers_new import BulkImportSerializer, BulkImportIndicatorSerializer
 from tola.l10n_utils import str_without_diacritics
+from tola.util import usefully_normalize_decimal
 from tola_management.permissions import user_has_program_roles
+from tola_management.models import ProgramAuditLog
 
 VALIDATION_KEY_UOM_TYPE = 'uom_type_validation'
 VALIDATION_KEY_DIR_CHANGE = 'dir_change_validation'
 VALIDATION_KEY_TARGET_FREQ = 'target_frequency_validation'
 VALIDATION_KEY_SECTOR = 'sector_validation'
+VALIDATION_KEY_BASELINE = 'baseline_validation'
 
 COLUMNS = [
     {'name': 'Level', 'required': True, 'field_name': 'level'},
@@ -44,7 +49,8 @@ COLUMNS = [
     {'name': gettext('Number (#) or percentage (%)'), 'required': True, 'field_name': 'unit_of_measure_type',
      'validation': VALIDATION_KEY_UOM_TYPE, 'default': 'Number (#)'},
     {'name': 'Rationale for target', 'required': False, 'field_name': 'rationale_for_target'},
-    {'name': 'Baseline', 'required': True, 'field_name': 'baseline'},
+    {'name': 'Baseline', 'required': True, 'field_name': 'baseline',
+     'validation': VALIDATION_KEY_BASELINE},
     {'name': 'Direction of change', 'required': True, 'field_name': 'direction_of_change',
      'validation': VALIDATION_KEY_DIR_CHANGE, 'default': 'Not applicable'},
     {'name': 'Target frequency', 'required': True, 'field_name': 'target_frequency',
@@ -67,21 +73,24 @@ TEMPLATE_SHEET_NAME = 'Import indicators'
 HIDDEN_SHEET_NAME = 'Hidden'
 
 FIRST_USED_COLUMN = 2
-DATA_START_ROW = 7
 PROGRAM_NAME_ROW = 2
+COLUMN_HEADER_ROW = 6
+DATA_START_ROW = 7
 
-ERROR_MISMATCHED_PROGRAM = 100
-ERROR_NO_NEW_INDICATORS = 101
-ERROR_UNDETERMINED_LEVEL = 102  # When the first level header row is missing and the level hasnt' been set
-ERROR_TEMPLATE_NOT_FOUND = 103
-ERROR_MISMATCHED_TIERS = 104
-ERROR_INDICATOR_DATA_NOT_FOUND = 105
-ERROR_MISMATCHED_LEVEL_COUNT = 106
-ERROR_MISMATCHED_HEADERS = 107
-ERROR_INVALID_LEVEL_HEADER = 200  # When the level header doesn't contain an identifiable level
-ERROR_MALFORMED_INDICATOR = 201
-ERROR_UNEXPECTED_INDICATOR_NUMBER = 202
-ERROR_INTERVENING_BLANK_ROW = 203
+ERROR_MISMATCHED_PROGRAM = 100  # The program name taken from the Excel template doesn't match the current program being used by the user
+ERROR_NO_NEW_INDICATORS = 101  # There aren't any new indicators in the template
+ERROR_UNDETERMINED_LEVEL = 102  # When the first level header row not parsable into a level
+ERROR_TEMPLATE_NOT_FOUND = 103  # Triggered when the system can't find the feedback template associated with the user/program
+ERROR_MISMATCHED_TIERS = 104  # The tier names submitted when requesting a template don't match what is in the database
+ERROR_INDICATOR_DATA_NOT_FOUND = 105  # When a template has been successfully uploaded but then the temp file can't be found when the save request is made
+ERROR_MISMATCHED_LEVEL_COUNT = 106  # The number of level header rows doesn't match the number of levels in the program
+ERROR_MISMATCHED_HEADERS = 107  # The column headers don't match the standard template headers
+ERROR_SAVE_VALIDATION = 108  # This could happen if e.g. someone adds an indicator
+ERROR_INVALID_LEVEL_HEADER = 109  # When the level header doesn't contain an identifiable level
+ERROR_MALFORMED_INDICATOR = 201  # A catch-all for problems with an indicator that don't fall into other non-fatal categories
+ERROR_UNEXPECTED_INDICATOR_NUMBER = 202  # The indicator number is not sequential in auto-numbered programs
+ERROR_INTERVENING_BLANK_ROW = 203  # Indicators are separated by an empty row would cause the indicator numbers to be wrong for auto-numbered programs
+ERROR_UNEXPECTED_LEVEL = 204  # The level text in the level column doesn't match the tier name used in the level header
 
 EMPTY_CHOICE = '---------'
 
@@ -89,14 +98,37 @@ TITLE_STYLE = 'title_style'
 REQUIRED_HEADER_STYLE = 'required_header_style'
 OPTIONAL_HEADER_STYLE = 'optional_header_style'
 LEVEL_HEADER_STYLE = 'level_header_style'
-PROTECTED_INDICATOR_STYLE = 'protected_indicator_style'
-UNPROTECTED_INDICATOR_STYLE = 'unprotected_indicator_style'
+EXISTING_INDICATOR_STYLE = 'existing_indicator_style'
+UNPROTECTED_NEW_INDICATOR_STYLE = 'unprotected_new_indicator_style'
+PROTECTED_NEW_INDICATOR_STYLE = 'protected_new_indicator_style'
 UNPROTECTED_ERROR_STYLE = 'unprotected_indicator_error_style'
 
 logger = logging.getLogger('__name__')
 
 class BulkImportIndicatorsView(LoginRequiredMixin, UserPassesTestMixin, AccessMixin, View):
-    """Returns bulk import .xlsx file"""
+    """
+    This view is used for the template download and upload process.
+
+    For the download process, it checks the request to see how many rows each tier is configured for and then returns
+    a template with the appropriate structure and fillable row numbers.
+
+    For the upload process, it runs though lots of checks to validate the data.  If the validation passes, a json
+    file is kept on the file system and a new instance  of the BulkIndicatorImportFile that points to the json
+    file.  When the user confirms that they want to save the indicators, a different view is used to retrieve the
+    json file and create the Indicator model instances.
+
+    If the validation checks fail, the errors are divded into fatal and non-fatal categories.  Non-fatal errors are
+    generally problems with individual indicators that can be highlighted on a spreadsheet and returned to the user.
+    In this case, a feedback template is saved to the file system and a new instance of the
+    BulkIndicatorImportFile is created that points to the Excel file.  When the user requests the Excel file, it is
+    provided to them by a different view.
+
+    Fatal errors prevent meaningful processing of the template and are generally structural problems with the
+    template (and shouldn't occur if the user hasn't messed with the spreadsheet protection).  If fatal errors
+    occur, no feedback template is saved and a error response is sent with the codes that represent which kind
+    of errors occurred.
+
+    """
     redirect_field_name = None
 
     first_used_column = FIRST_USED_COLUMN
@@ -133,18 +165,23 @@ class BulkImportIndicatorsView(LoginRequiredMixin, UserPassesTestMixin, AccessMi
     level_header_style.font = Font(name='Calibri', size=11, bold=True)
     level_header_style.protection = Protection(locked=True)
 
-    protected_indicator_style = NamedStyle(PROTECTED_INDICATOR_STYLE)
-    protected_indicator_style.fill = PatternFill('solid', fgColor=GRAY_LIGHTEST)
-    protected_indicator_style.font = Font(name='Calibri', size=11, color=GRAY_DARK)
-    protected_indicator_style.border = Border(
+    existing_indicator_style = NamedStyle(EXISTING_INDICATOR_STYLE)
+    existing_indicator_style.fill = PatternFill('solid', fgColor=GRAY_LIGHTEST)
+    existing_indicator_style.font = Font(name='Calibri', size=11, color=GRAY_DARK)
+    existing_indicator_style.border = Border(
         left=default_border, right=default_border, top=default_border, bottom=default_border)
-    protected_indicator_style.alignment = Alignment(vertical='top', wrap_text=True)
-    protected_indicator_style.protection = Protection(locked=True)
+    existing_indicator_style.alignment = Alignment(vertical='top', wrap_text=True)
+    existing_indicator_style.protection = Protection(locked=True)
 
-    unprotected_indicator_style = NamedStyle(UNPROTECTED_INDICATOR_STYLE)
-    unprotected_indicator_style.font = Font(name='Calibri', size=11)
-    unprotected_indicator_style.alignment = Alignment(vertical='top', wrap_text=True)
-    unprotected_indicator_style.protection = Protection(locked=False)
+    unprotected_new_indicator_style = NamedStyle(UNPROTECTED_NEW_INDICATOR_STYLE)
+    unprotected_new_indicator_style.font = Font(name='Calibri', size=11)
+    unprotected_new_indicator_style.alignment = Alignment(vertical='top', wrap_text=True)
+    unprotected_new_indicator_style.protection = Protection(locked=False)
+
+    protected_new_indicator_style = NamedStyle(PROTECTED_NEW_INDICATOR_STYLE)
+    protected_new_indicator_style.font = Font(name='Calibri', size=11)
+    protected_new_indicator_style.alignment = Alignment(vertical='top', wrap_text=True)
+    protected_new_indicator_style.protection = Protection(locked=True)
 
     unprotected_error_style = NamedStyle(UNPROTECTED_ERROR_STYLE)
     unprotected_error_style.fill = PatternFill('solid', fgColor=RED_ERROR)
@@ -185,7 +222,7 @@ class BulkImportIndicatorsView(LoginRequiredMixin, UserPassesTestMixin, AccessMi
         leveltiers_in_db = sorted([tier.name for tier in LevelTier.objects.filter(program=program)])
         request_leveltier_names = sorted(request.GET.keys())
         if leveltiers_in_db != request_leveltier_names:
-            return JsonResponse({'error_codes': ERROR_MISMATCHED_TIERS}, status=400)
+            return JsonResponse({'error_codes': [ERROR_MISMATCHED_TIERS]}, status=400)
 
         wb = openpyxl.load_workbook(filename=BulkIndicatorImportFile.get_file_path(BASE_TEMPLATE_NAME))
         ws = wb.worksheets[0]
@@ -227,7 +264,7 @@ class BulkImportIndicatorsView(LoginRequiredMixin, UserPassesTestMixin, AccessMi
             hidden_ws[f'{sectors_col}{i+2}'].value = sector
         sector_range = f'${sectors_col}${sectors_start_row}:${sectors_col}${sectors_end_row}'
         sector_validation = DataValidation(
-            type="list", formula1=f'{HIDDEN_SHEET_NAME}!{sector_range}', allow_blank=True)
+            type='list', formula1=f'{HIDDEN_SHEET_NAME}!{sector_range}', allow_blank=True)
         validation_map[VALIDATION_KEY_SECTOR] = sector_validation
 
         for dv in validation_map.values():
@@ -236,6 +273,14 @@ class BulkImportIndicatorsView(LoginRequiredMixin, UserPassesTestMixin, AccessMi
             # Translators:  Title of a popup box that informs the user they have entered an invalid value
             dv.errorTitle = gettext('Invalid Entry')
 
+        # Adding this validation after the others because the error messages will be different.
+        baseline_validation = DataValidation(type='decimal')
+        # Translators: Error message shown to a user when they have entered a value for a numeric field that isn't a number.
+        baseline_validation.error = gettext('Please enter a number')
+        # Translators:  Title of a popup box that informs the user they have entered an invalid value
+        baseline_validation.errorTitle = gettext('Invalid Entry')
+        validation_map[VALIDATION_KEY_BASELINE] = baseline_validation
+
         # Spreadsheet loads as corrupted when validation is added to a sheet but no cells are assigned to the
         # validation.
         if sum(int(row_count) for row_count in request.GET.values()) > 0:
@@ -243,11 +288,13 @@ class BulkImportIndicatorsView(LoginRequiredMixin, UserPassesTestMixin, AccessMi
             ws.add_data_validation(dir_change_validation)
             ws.add_data_validation(target_freq_validation)
             ws.add_data_validation(sector_validation)
+            ws.add_data_validation(baseline_validation)
 
         wb.add_named_style(self.title_style)
         wb.add_named_style(self.level_header_style)
-        wb.add_named_style(self.protected_indicator_style)
-        wb.add_named_style(self.unprotected_indicator_style)
+        wb.add_named_style(self.existing_indicator_style)
+        wb.add_named_style(self.unprotected_new_indicator_style)
+        wb.add_named_style(self.protected_new_indicator_style)
         wb.add_named_style(self.unprotected_error_style)
         wb.add_named_style(self.optional_header_style)
         wb.add_named_style(self.required_header_style)
@@ -339,7 +386,7 @@ class BulkImportIndicatorsView(LoginRequiredMixin, UserPassesTestMixin, AccessMi
                 current_column_index = self.first_used_column
                 first_indicator_cell = ws.cell(current_row_index, current_column_index)
                 first_indicator_cell.value = gettext(level['tier_name'])
-                first_indicator_cell.style = PROTECTED_INDICATOR_STYLE
+                first_indicator_cell.style = EXISTING_INDICATOR_STYLE
                 first_indicator_cell.border = Border(
                     left=None, right=self.default_border, top=self.default_border, bottom=self.default_border)
 
@@ -358,7 +405,7 @@ class BulkImportIndicatorsView(LoginRequiredMixin, UserPassesTestMixin, AccessMi
                         # These are potentially translated objects that need to be resolved, but converting None
                         # to a string does results in a cell value of "None" rather than an empty cell.
                         active_cell.value = raw_value if raw_value is None else str(raw_value)
-                    active_cell.style = PROTECTED_INDICATOR_STYLE
+                    active_cell.style = EXISTING_INDICATOR_STYLE
                     current_column_index += 1
                 current_row_index += 1
 
@@ -373,7 +420,11 @@ class BulkImportIndicatorsView(LoginRequiredMixin, UserPassesTestMixin, AccessMi
 
                 for col_n, column in enumerate(COLUMNS):
                     active_cell = ws.cell(current_row_index, self.first_used_column + col_n)
-                    active_cell.style = UNPROTECTED_INDICATOR_STYLE
+                    if column['field_name'] == 'level' or \
+                            (column['field_name'] == 'number' and program.auto_number_indicators):
+                        active_cell.style = PROTECTED_NEW_INDICATOR_STYLE
+                    else:
+                        active_cell.style = UNPROTECTED_NEW_INDICATOR_STYLE
                     if 'validation' in column:
                         validator = validation_map[column['validation']]
                         validator.add(active_cell)
@@ -397,6 +448,8 @@ class BulkImportIndicatorsView(LoginRequiredMixin, UserPassesTestMixin, AccessMi
 
         program_id = kwargs['program_id']
         program = Program.objects.get(pk=program_id)
+        ProgramAuditLog.log_template_uploaded(request.user, program)
+
         wb = openpyxl.load_workbook(request.FILES['file'])
         ws = wb.get_sheet_by_name(TEMPLATE_SHEET_NAME)
 
@@ -408,13 +461,14 @@ class BulkImportIndicatorsView(LoginRequiredMixin, UserPassesTestMixin, AccessMi
             if cell_value != col['name']:
                 return JsonResponse({'error_codes': [ERROR_MISMATCHED_HEADERS]}, status=400)
 
-        benign_errors = []  # Errors that can be highlighted on a spreadsheet and get sent back to the user
-        malignant_errors = []  # So bad that it's not possible to highlight a spreadsheet and send it back to the suer
+        non_fatal_errors = []  # Errors that can be highlighted on a spreadsheet and get sent back to the user
+        fatal_errors = []  # So bad that it's not possible to highlight a spreadsheet and send it back to the suer
         level_refs = {}
         for level in program.levels.all():
             ontology = f' {level.display_ontology}' if len(level.display_ontology) > 0 else ''
             level_refs[f'{level.leveltier}{ontology}'] = level
         current_level = None
+        current_tier = None
         new_indicators_data = []
         indicator_status = {'valid': 0, 'invalid': 0}
         reverse_field_name_map = {
@@ -434,17 +488,25 @@ class BulkImportIndicatorsView(LoginRequiredMixin, UserPassesTestMixin, AccessMi
             if first_cell.style == LEVEL_HEADER_STYLE:
                 matches = level_finder.match(first_cell.value)
                 if not matches or matches.group(1).strip() not in level_refs.keys():
-                    malignant_errors.append(ERROR_INVALID_LEVEL_HEADER)
+                    fatal_errors.append(ERROR_INVALID_LEVEL_HEADER)
                     continue
                 else:
-                    current_level = level_refs[matches.group(1).strip()]
+                    tier_label = matches.group(1).strip()
+                    current_level = level_refs[tier_label]
+                    tier_matches = re.search(r'(.+)\s?[\d\.]*$', tier_label)
+                    current_tier = tier_matches.group(1)
                     letter_gen = indicator_letter_generator()
                     ws_level_count += 1
                     passed_blank_row = False
                     continue
 
+            # Getting to this point without a parsed level header (which shouldn't happen)
+            # means something has gone wrong
+            if not current_level:
+                return JsonResponse({'error_codes': [ERROR_UNDETERMINED_LEVEL]}, status=400)
+
             # skip indicators that are already in the system
-            if ws.cell(current_row_index, self.first_used_column).style == PROTECTED_INDICATOR_STYLE:
+            if ws.cell(current_row_index, self.first_used_column).style == EXISTING_INDICATOR_STYLE:
                 next(letter_gen)
                 continue
 
@@ -455,7 +517,7 @@ class BulkImportIndicatorsView(LoginRequiredMixin, UserPassesTestMixin, AccessMi
                 passed_blank_row = True
                 continue
             elif passed_blank_row:
-                benign_errors.append(ERROR_INTERVENING_BLANK_ROW)
+                non_fatal_errors.append(ERROR_INTERVENING_BLANK_ROW)
                 for c in range(len(COLUMNS)):
                     ws.cell(current_row_index - 1, self.first_used_column + c).style = UNPROTECTED_ERROR_STYLE
                 passed_blank_row = False
@@ -466,22 +528,22 @@ class BulkImportIndicatorsView(LoginRequiredMixin, UserPassesTestMixin, AccessMi
                 expected_ind_number = f'{current_level.display_ontology}{next(letter_gen)}'
                 if number_cell.value != expected_ind_number:
                     number_cell.style = UNPROTECTED_ERROR_STYLE
-                    benign_errors.append(ERROR_UNEXPECTED_INDICATOR_NUMBER)
+                    non_fatal_errors.append(ERROR_UNEXPECTED_INDICATOR_NUMBER)
 
-            # Getting to this point (which shouldn't happen) without a parsed level header means
-            # something has gone wrong
-            if not current_level:
-                malignant_errors.append(ERROR_UNDETERMINED_LEVEL)
-                continue
+            # Check if the value of the Level column matches the one used in the level header
+            level_cell = ws.cell(current_row_index, FIRST_USED_COLUMN)
+            if level_cell.value != current_tier:
+                level_cell.style = UNPROTECTED_ERROR_STYLE
+                non_fatal_errors.append(ERROR_UNEXPECTED_LEVEL)
 
             indicator_data = {}
             for i, column in enumerate(COLUMNS[1:]):
                 indicator_data[column['field_name']] = ws.cell(current_row_index, self.first_used_column + i + 1).value
 
             validation_errors = {}
-            # TODO: validate level column
-            deserialized_data = BulkImportIndicatorSerializer(data=indicator_data)
 
+            # Use the serializer to check for character length and any other field issues that it handles
+            deserialized_data = BulkImportIndicatorSerializer(data=indicator_data)
             deserialized_data.is_valid()
             for field_name, error_list in deserialized_data.errors.items():
                 for error in error_list:
@@ -507,8 +569,7 @@ class BulkImportIndicatorsView(LoginRequiredMixin, UserPassesTestMixin, AccessMi
                         logger.error(f'New validation string of code {error.code} found.\n{str(error)}')
                         validation_errors[field_name].append(str(error))
 
-
-
+            # Check for missing required fields
             for i, column in enumerate(COLUMNS):
                 cell_value = ws.cell(current_row_index, FIRST_USED_COLUMN + i).value
                 if column['required'] and cell_value is None:
@@ -518,7 +579,7 @@ class BulkImportIndicatorsView(LoginRequiredMixin, UserPassesTestMixin, AccessMi
                         validation_errors[column['field_name']].append(required_field_error)
                     except KeyError:
                         validation_errors[column['field_name']] = [required_field_error]
-                    benign_errors.append(ERROR_MALFORMED_INDICATOR)
+                    non_fatal_errors.append(ERROR_MALFORMED_INDICATOR)
 
             # Convert enumerated fields into numerical ids
             for field in reverse_field_name_map.keys():
@@ -534,7 +595,7 @@ class BulkImportIndicatorsView(LoginRequiredMixin, UserPassesTestMixin, AccessMi
                             validation_errors[field].append(VALIDATION_MSG_CHOICE)
                         else:
                             validation_errors[field] = [VALIDATION_MSG_CHOICE]
-                        benign_errors.append(ERROR_MALFORMED_INDICATOR)
+                        non_fatal_errors.append(ERROR_MALFORMED_INDICATOR)
 
             # Convert text in sector dropdown to sector pk
             col_number = self.first_used_column + COLUMNS_FIELD_INDEXES['sector']
@@ -544,7 +605,8 @@ class BulkImportIndicatorsView(LoginRequiredMixin, UserPassesTestMixin, AccessMi
             else:
                 try:
                     sector = Sector.objects.get(sector=cell_value)
-                    indicator_data['sector'] = sector.pk
+                    indicator_data['sector_id'] = sector.pk
+                    indicator_data.pop('sector')
                 except Sector.DoesNotExist:
                     # Translators:  Error message indicating that the value the user has selected for the
                     # sector field is not in the list of valid options
@@ -553,7 +615,18 @@ class BulkImportIndicatorsView(LoginRequiredMixin, UserPassesTestMixin, AccessMi
                         validation_errors['sector'].append(error_string)
                     except KeyError:
                         validation_errors['sector'] = [error_string]
-                    benign_errors.append(ERROR_MALFORMED_INDICATOR)
+                    non_fatal_errors.append(ERROR_MALFORMED_INDICATOR)
+
+            # Final data manipulation and updates
+            indicator_data['level_id'] = current_level.pk
+            indicator_data['program_id'] = program.id
+            # The number order has already been checked if program is autonumbered, so we don't need the numbers
+            # any more
+            if program.auto_number_indicators:
+                indicator_data.pop('number')
+            if indicator_data['baseline']:
+                indicator_data['baseline'] = str(usefully_normalize_decimal(
+                    Decimal(indicator_data['baseline']).quantize(Decimal('.01'))))
 
             if len(validation_errors) == 0:
                 new_indicators_data.append(indicator_data)
@@ -563,13 +636,14 @@ class BulkImportIndicatorsView(LoginRequiredMixin, UserPassesTestMixin, AccessMi
                 indicator_status['invalid'] += 1
 
         if len(level_refs) != ws_level_count:
-            return JsonResponse({'errors_codes': [ERROR_MISMATCHED_LEVEL_COUNT]}, status=400)
+            return JsonResponse({'error_codes': [ERROR_MISMATCHED_LEVEL_COUNT]}, status=400)
 
-        if len(malignant_errors) > 0:
-            pruned_malignant = sorted(list(set(malignant_errors)))
-            return JsonResponse({'error_codes': pruned_malignant}, status=400)
+        if len(fatal_errors) > 0:
+            pruned_fatal = sorted(list(set(fatal_errors)))
+            return JsonResponse({'error_codes': pruned_fatal}, status=400)
 
-        if indicator_status['invalid'] > 0 or len(benign_errors) > 0:
+        if indicator_status['invalid'] > 0 or len(non_fatal_errors) > 0:
+            # Clean out any existing temp Excel file reference, since we're about to replace it
             try:
                 old_file_obj = BulkIndicatorImportFile.objects.get(
                     user=request.user.tola_user,
@@ -581,7 +655,7 @@ class BulkImportIndicatorsView(LoginRequiredMixin, UserPassesTestMixin, AccessMi
                 pass
 
             file_name = f'{datetime.strftime(datetime.now(), "%Y%m%d-%H%M%S")}-{request.user.id}-{program.pk}.xlsx'
-            pruned_benign = sorted(list(set(benign_errors)))
+            pruned_non_fatal = sorted(list(set(non_fatal_errors)))
             file_obj = BulkIndicatorImportFile.objects.create(
                 user=request.user.tola_user,
                 program=program,
@@ -592,7 +666,7 @@ class BulkImportIndicatorsView(LoginRequiredMixin, UserPassesTestMixin, AccessMi
             return JsonResponse({
                 'invalid': indicator_status['invalid'],
                 'valid': indicator_status['valid'],
-                'error_codes': pruned_benign
+                'error_codes': pruned_non_fatal
             }, status=400)
 
         if len(new_indicators_data) == 0:
@@ -619,8 +693,6 @@ class BulkImportIndicatorsView(LoginRequiredMixin, UserPassesTestMixin, AccessMi
         return JsonResponse({'message': 'success', 'valid': len(new_indicators_data), 'invalid': 0}, status=200)
 
 
-
-
 @login_required()
 @require_POST
 def save_bulk_import_data(request, *args, **kwargs):
@@ -633,14 +705,17 @@ def save_bulk_import_data(request, *args, **kwargs):
         return JsonResponse({'error_codes': [ERROR_INDICATOR_DATA_NOT_FOUND]})
 
     with open(file_entry.file_path, 'r') as fh:
-        saved_indicator_data = json.loads(fh.read())
-    # Todo: wrap in a transaction
+        stored_indicators = json.loads(fh.read())
+    os.remove(file_entry.file_path)
+    file_entry.delete()
 
-    for indicator_data in saved_indicator_data:
-        sector_id = indicator_data['sector']
-        sector = Sector.objects.get(id=sector_id)
-        indicator_data['sector'] = sector
-        Indicator.objects.create(**indicator_data)
+    try:
+        with transaction.atomic():
+            for indicator_data in stored_indicators:
+                indicator = Indicator.objects.create(**indicator_data)
+                ProgramAuditLog.log_indicator_imported(request.user, indicator, 'N/A')
+    except django.core.exceptions.ValidationError:
+        return JsonResponse({'error_codes': [ERROR_SAVE_VALIDATION]}, status=400)
     return JsonResponse({'message': 'success'}, status=200)
 
 
@@ -657,6 +732,8 @@ def get_feedback_bulk_import_template(request, *args, **kwargs):
 
     with open(file_entry.file_path, 'rb') as fh:
         template_file = fh.read()
+    os.remove(file_entry.file_path)
+    file_entry.delete()
     response = HttpResponse(template_file, content_type='application/ms-excel')
     response['Content-Disposition'] = 'attachment; filename="{}"'.format('Marked-up-template.xlsx')
     return response

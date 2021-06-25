@@ -226,12 +226,3 @@ td.indicator-cell {
 .baseline-column {
     @extend %right-aligned-cell;
 }
-
-// Pin Popover Styling
-#pin_popover_content {
-    padding: 0.5rem 0.75rem;
-}
-// Excel Popover Styling
-#excel_popover_content {
-    padding: 0.5rem 0.75rem;
-}

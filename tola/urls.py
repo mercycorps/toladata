@@ -28,7 +28,6 @@ from indicators.views.views_results_framework import (
     insert_new_level,
     save_leveltiers,
     reorder_indicators,
-    save_custom_tiers,
     save_custom_template,
     indicator_list
 )
@@ -108,7 +107,6 @@ urlpatterns += [
     path('api/save_leveltiers/', save_leveltiers, name='save_leveltiers'),
     path('api/reorder_indicators/', reorder_indicators, name='reorder_indicators'),
     path('api/indicator_list/<int:program_id>/', indicator_list, name='indicator_list'),
-    path('api/save_custom_tiers', save_custom_tiers, name='save_custom_tiers'),
     path('api/save_custom_template/', save_custom_template, name='save_custom_template'),
 
     # url redirect for people with old bookmarks

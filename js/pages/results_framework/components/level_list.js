@@ -142,7 +142,8 @@ export class LevelListPanel  extends React.Component {
             window.open(this.props.rootStore.levelStore.excelURL, '_blank')
         }
         // Create the RF Tier levels array expected in the bulk import popover component
-        let levelTiers = this.props.rootStore.levelStore.tierTemplates[this.props.rootStore.levelStore.chosenTierSetKey].tiers.map(tier => ({name: tier}));
+        let levelTiers = this.props.rootStore.levelStore.chosenTierSetKey === "custom" ? this.props.rootStore.levelStore.tierTemplates["custom"].tiers : this.props.rootStore.levelStore.englishTierTemlates[this.props.rootStore.levelStore.chosenTierSetKey].tiers
+        levelTiers = levelTiers.map((tier) => {return {name: tier}})
         let importButton = (
             <ImportIndicatorsButton 
             program_id={ this.props.rootStore.levelStore.program_id }

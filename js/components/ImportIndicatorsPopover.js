@@ -45,6 +45,7 @@ export class ImportIndicatorsButton extends React.Component {
                 document.querySelector(`#${this.popoverName}_popover_content`),
                 popoverOpenHandler
             );
+            $(`#${this.popoverName}_popover_content`).parent().parent().addClass('indicator-import__popover');
         };
         $(this.myRef.current).popover({
             content: `<div id="${this.popoverName}_popover_content"></div>`,
@@ -161,7 +162,7 @@ export const ImportIndicatorsPopover = ({ page, program_id, tierLevelsUsed, stor
     const [validIndicatorsCount, setvalidIndicatorsCount] = useState(0); // Number of indicators that have passed validation and are ready to import
     const [invalidIndicatorsCount, setInvalidIndicatorsCount] = useState(0); // Number of indicators that have failed validation and needs fixing
     const [tierLevelsRows, setTierLevelsRows] = useState([]); // State to hold the tier levels name and the desired number of rows for the excel template
-    const [intialViewError, setInitialViewError] = useState(null);
+    const [intialViewError, setInitialViewError] = useState([]);
     const [confirmViewError, setConfirmViewError] = useState(null);
     const [downloadOrUpload, setDownloadOrUpload] = useState(null);
 
@@ -209,10 +210,14 @@ export const ImportIndicatorsPopover = ({ page, program_id, tierLevelsUsed, stor
     let handleUpload = (e) => {
         setDownloadOrUpload("upload")
         let loading = false;
+        let stopLoading;
         let loadingTimer = setTimeout(() => {
-            setViews(LOADING)
+            setViews(LOADING);
             loading = true;
-        }, 1000)
+            stopLoading = setTimeout(() => { // Prevents the forever spinner situation
+                setViews(INITIAL);
+            }, 60000);
+        }, 1000);
         // let files = e.target.files;
         // let reader = new FileReader();
         // reader.readAsDataURL(files[0]);
@@ -220,20 +225,32 @@ export const ImportIndicatorsPopover = ({ page, program_id, tierLevelsUsed, stor
         api.uploadTemplate(program_id, e.target.files[0])
                 .then(response => {
                     let handleResponse = () => {
-                        if ((response.valid >= 0)) {
-                            setvalidIndicatorsCount(response.valid);
-                            setInvalidIndicatorsCount(response.invalid);
-                            if (response.invalid === 0) {
+                        if ((response.status === 200)) {
+                            setvalidIndicatorsCount(response.data.valid);
+                            setInvalidIndicatorsCount(response.data.invalid);
+                            if (response.data.invalid === 0) {
                                 setViews(CONFIRM);
-                                setStoredView({view: CONFIRM, valid: response.valid});
+                                setStoredView({view: CONFIRM, valid: response.data.valid});
                             } else {
                                 setViews(FEEDBACK);
-                                setStoredView({view: FEEDBACK, valid: response.valid, invalid: response.invalid});
+                                setStoredView({view: FEEDBACK, valid: response.data.valid, invalid: response.data.invalid});
                             }
                         } else {
-                            if (response.error_code && response.error_code.toString().slice(0, 1) === "1" ) {
-                                setInitialViewError(response.error_code);
+                            if (response.data.error_codes) {
+                                // Reduce the array of errors to remove duplicate messaging
+                                let reducer = (accumulator, code) => {
+                                    errorCodes[code] && accumulator.indexOf(errorCodes[code].message) === -1 && accumulator.push(errorCodes[code].message);
+                                    return accumulator;
+                                };
+                                let errorsMessagesToDisplay = response.data.error_codes.reduce(reducer, []);
+                                if (errorsMessagesToDisplay.length > 0) {
+                                    setInitialViewError(errorsMessagesToDisplay);
+                                    setViews(INITIAL);
+                                } else {
+                                    setViews(ERROR);
+                                }
                             } else {
+                                // Handles when there are no error codes or ones we do not have messaging for
                                 setViews(ERROR);
                             }
                         }
@@ -241,10 +258,11 @@ export const ImportIndicatorsPopover = ({ page, program_id, tierLevelsUsed, stor
                     if (loading) {
                         setTimeout(() => {
                             handleResponse();
+                            clearTimeout(stopLoading);
                         }, 1000)
                     } else {
-                        clearTimeout(loadingTimer);
                         handleResponse();
+                        clearTimeout(loadingTimer);
                     }
                 })
     }
@@ -383,13 +401,18 @@ export const ImportIndicatorsPopover = ({ page, program_id, tierLevelsUsed, stor
                                             }
                                         </li>
                                     </ol>
-                                    {(intialViewError && intialViewError !== 106) &&
-                                        <div className="import-initial-text-error">
-                                            { errorMessages[errorCodes[intialViewError].message] }
-                                        </div>
+                                    {initialViewError.indexOf(5) === -1 &&
+                                        initialViewError.map(message_id => {
+                                            return (
+                                                <div key={message_id} className="import-initial-text-error">
+                                                    { errorMessages[message_id] }
+                                                </div>
+                                            )
+                                        })
                                     }
                                 </div>
-                                {intialViewError === 106 ? 
+                                {/* TODO: Update to handle multiply downloaders/uploaders scenarios */}
+                                {initialViewError.indexOf(5) >= 0 ? 
                                     multipleUploadWarning
                                 :
                                 <React.Fragment> 
@@ -747,7 +770,7 @@ let errorCodes = {
     },
     103 : {
         type: "Template not found",
-        message: 1,
+        message: 3,
     },
     104 : {
         type: "Mismatch tiers",
@@ -755,37 +778,44 @@ let errorCodes = {
     },
     105 : {
         type: "Indicator data not found",
-        message: 1,
+        message: 4,
     },
     106 : {
-        type: "Someone else uploaded a template in the last 24 hours",
-        message: 3,
+        type: "Mismatch level count",
+        message: 1,
     },
-    200 : {
+    107 : {
+        type: "Mismatch headers",
+        message: 1,
+    },
+    108 : {
+        type: "Save validation error",
+        message: 4,
+    },
+    109 : {
         type: "Invalid level header",
         message: 1,
     },
-    201 : {
-        type: "Malformed indicator",
-        message: 1,
-    },
-    202 : {
-        type: "Indicators out of order",
-        message: 4,
+    110 : {
+        type: "Someone else uploaded a template in the last 24 hours",
+        message: 5,
     },
 }
 
 let errorMessages = {
     1 : 
-        // # Translators: Message to user that we cannot import the their file. This is because of it being the wrong file or the structure of the file was changed.
-        gettext("Sorry, we can’t import indicators from this file. This can happen if the wrong file is selected or the template structure was modified."),
+        // # Translators: Message to user that we cannot import the their file. This could be caused by the wrong file being selected, or the structure of the file was changed, or the results framework was updated and does not match the template anymore.
+        gettext("We can’t import indicators from this file. This can happen if the wrong file is selected, the template structure is modified, or the results framework was updated and no longer matches the template."),
     2 : 
         // # Translators: Messsage to user that there aren't any new indicators in the uploaded file.
-        gettext("Sorry, we can’t find any indicators in this file."),
+        gettext("We can't find any indicators in this file."),
     3 :
+        // # Translators: Message to user that the import indicator process could not be completed. If the problem continues, contact your TolaData administrator.
+        gettext("Sorry, we couldn’t complete the import process. If the problem persists, please contact your TolaData administrator."),
+    4 :
+        // # Translators: Message to user that the import could not be completed and to find out the reason, upload the import template again. 
+        gettext("Sorry, we couldn’t complete the import process. To figure out what went wrong, please upload your template again."),
+    5 :
         // # Translators: Message to user that someone else has uploaded a template in the last 24 hours and may be in the process of importing indicators to this program. You can view the program change log to see more details.
         gettext("Someone else uploaded a template in the last 24 hours, and may be in the process of adding indicators to this program."),
-    4 :
-        // # Translators: Message to user that we cannot import the their file. This is because there is one or more indicators that are out of order. Users should visit the results framework page and rearrange indicators.
-        gettext("Sorry, we can't import indicators from this file. One or more indicators is out of order. To rearrange saved indicators, please visit the results framework."),
 }
