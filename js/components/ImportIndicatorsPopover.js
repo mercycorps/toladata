@@ -162,8 +162,7 @@ export const ImportIndicatorsPopover = ({ page, program_id, tierLevelsUsed, stor
     const [validIndicatorsCount, setvalidIndicatorsCount] = useState(0); // Number of indicators that have passed validation and are ready to import
     const [invalidIndicatorsCount, setInvalidIndicatorsCount] = useState(0); // Number of indicators that have failed validation and needs fixing
     const [tierLevelsRows, setTierLevelsRows] = useState([]); // State to hold the tier levels name and the desired number of rows for the excel template
-    const [initialViewError, setInitialViewError] = useState([]);
-    const [confirmViewError, setConfirmViewError] = useState(null);
+    const [displayError, setDisplayError] = useState({view: null, error: []}); // ie {view: INITIAL, error: []}
     const [downloadOrUpload, setDownloadOrUpload] = useState(null);
 
     let defaultTierLevelRows = [];
@@ -196,15 +195,26 @@ export const ImportIndicatorsPopover = ({ page, program_id, tierLevelsUsed, stor
         setDownloadOrUpload("download")
         api.downloadTemplate(program_id, tierLevelsRows)
             .then(response => {
+                console.log(response);
                 if (response.status !== 200) {
-                    if (response.error_code && response.error_code.toString().slice(0, 1) === "1" ) {
-                        setInitialViewError(response.error_code);
+                    if (response.data.error_codes && response.data.error_codes.toString().slice(0, 1) === "1" ) {
+                        let errorsMessagesToDisplay = reduceErrorCodes(response.data.error_codes)
+                        setDisplayError({view: INITIAL, error: errorsMessagesToDisplay});
                     } else {
                         setViews(ERROR);
                     }
                 }
             })
     }
+
+    // Reduce the array of errors to remove duplicate messaging
+    let reduceErrorCodes = (codes) => {
+        let reducer = (accumulator, code) => {
+            errorCodes[code] && accumulator.indexOf(errorCodes[code].message) === -1 && accumulator.push(errorCodes[code].message);
+            return accumulator;
+        };
+        return codes.reduce(reducer, []);
+    };
 
     // Upload template file and send api request
     let handleUpload = (e) => {
@@ -218,10 +228,7 @@ export const ImportIndicatorsPopover = ({ page, program_id, tierLevelsUsed, stor
                 setViews(INITIAL);
             }, 60000);
         }, 1000);
-        // let files = e.target.files;
-        // let reader = new FileReader();
-        // reader.readAsDataURL(files[0]);
-        // reader.onload = (e) => {
+
         api.uploadTemplate(program_id, e.target.files[0])
                 .then(response => {
                     let handleResponse = () => {
@@ -237,14 +244,9 @@ export const ImportIndicatorsPopover = ({ page, program_id, tierLevelsUsed, stor
                             }
                         } else {
                             if (response.data.error_codes) {
-                                // Reduce the array of errors to remove duplicate messaging
-                                let reducer = (accumulator, code) => {
-                                    errorCodes[code] && accumulator.indexOf(errorCodes[code].message) === -1 && accumulator.push(errorCodes[code].message);
-                                    return accumulator;
-                                };
-                                let errorsMessagesToDisplay = response.data.error_codes.reduce(reducer, []);
+                                let errorsMessagesToDisplay = reduceErrorCodes(response.data.error_codes)
                                 if (errorsMessagesToDisplay.length > 0) {
-                                    setInitialViewError(errorsMessagesToDisplay);
+                                    setDisplayError({view: INITIAL, error: errorsMessagesToDisplay})
                                     setViews(INITIAL);
                                 } else {
                                     setViews(ERROR);
@@ -295,7 +297,8 @@ export const ImportIndicatorsPopover = ({ page, program_id, tierLevelsUsed, stor
                     if (response.status === 200) {
                         setViews(SUCCESS);
                     } else {
-                        setConfirmViewError(true)
+                        let errorsMessagesToDisplay = reduceErrorCodes(response.data.error_codes)
+                        setDisplayError({view: CONFIRM, error: errorsMessagesToDisplay})
                     }
                 }
                 if (loading) {
@@ -401,8 +404,8 @@ export const ImportIndicatorsPopover = ({ page, program_id, tierLevelsUsed, stor
                                             }
                                         </li>
                                     </ol>
-                                    {initialViewError.indexOf(5) === -1 &&
-                                        initialViewError.map(message_id => {
+                                    {displayError.view === INITIAL && displayError.error.indexOf(5) === -1 &&
+                                        displayError.error.map(message_id => {
                                             return (
                                                 <div key={message_id} className="import-initial-text-error">
                                                     { errorMessages[message_id] }
@@ -410,9 +413,18 @@ export const ImportIndicatorsPopover = ({ page, program_id, tierLevelsUsed, stor
                                             )
                                         })
                                     }
-                                </div>
+                                    {/* {initialViewError.indexOf(5) === -1 &&
+                                        initialViewError.map(message_id => {
+                                            return (
+                                                <div key={message_id} className="import-initial-text-error">
+                                                    { errorMessages[message_id] }
+                                                </div>
+                                            )
+                                        })
+                                    } */}
+                                </div> 
                                 {/* TODO: Update to handle multiply downloaders/uploaders scenarios */}
-                                {initialViewError.indexOf(5) >= 0 ? 
+                                {displayError.error.indexOf(5) >= 0 ? 
                                     multipleUploadWarning
                                 :
                                 <React.Fragment> 
@@ -509,7 +521,7 @@ export const ImportIndicatorsPopover = ({ page, program_id, tierLevelsUsed, stor
                         return (
                             <div className="import-confirm">
                                 <div className="import-confirm-text">
-                                    {!confirmViewError ?
+                                    {displayError.view !== CONFIRM ?
                                         <React.Fragment>
                                             {/* {!confirmViewError && views === CONFIRM ? <div><i className="fas fa-check-circle"/></div> : null} */}
                                             <div>
@@ -525,15 +537,26 @@ export const ImportIndicatorsPopover = ({ page, program_id, tierLevelsUsed, stor
                                         </React.Fragment>
                                         :
                                         <div>
-                                            {
+                                            {/* {
                                                 // # Translators: We could not complete the import indicators process. To find out why the process could not be completed, upload your import template again below.
                                                 gettext("Sorry, we couldn’t complete the import process. To figure out what went wrong, please upload your template again.")
+                                            } */}
+                                            {displayError.view === CONFIRM && displayError.error.indexOf(5) === -1 &&
+                                                displayError.error.map(message_id => {
+                                                    console.log(displayError);
+
+                                                    return (
+                                                        <div key={message_id} className="import-initial-text-error">
+                                                            { errorMessages[message_id] }
+                                                        </div>
+                                                    )
+                                                })
                                             }
                                         </div>
                                     }
                                 </div>
                                 <div className="import-confirm-buttons">
-                                    {!confirmViewError ? 
+                                {displayError.view !== CONFIRM ?
                                     <button
                                         role="button"
                                         type="button"
