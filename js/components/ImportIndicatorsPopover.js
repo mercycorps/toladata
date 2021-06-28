@@ -162,7 +162,7 @@ export const ImportIndicatorsPopover = ({ page, program_id, tierLevelsUsed, stor
     const [validIndicatorsCount, setvalidIndicatorsCount] = useState(0); // Number of indicators that have passed validation and are ready to import
     const [invalidIndicatorsCount, setInvalidIndicatorsCount] = useState(0); // Number of indicators that have failed validation and needs fixing
     const [tierLevelsRows, setTierLevelsRows] = useState([]); // State to hold the tier levels name and the desired number of rows for the excel template
-    const [intialViewError, setInitialViewError] = useState([]);
+    const [initialViewError, setInitialViewError] = useState([]);
     const [confirmViewError, setConfirmViewError] = useState(null);
     const [downloadOrUpload, setDownloadOrUpload] = useState(null);
 
