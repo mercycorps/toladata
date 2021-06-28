@@ -23,6 +23,7 @@ from indicators.views.view_utils import indicator_letter_generator
 from workflow.models import Program
 from workflow.serializers_new import BulkImportSerializer, BulkImportIndicatorSerializer
 from tola.l10n_utils import str_without_diacritics
+from tola.serializers import make_quantized_decimal
 from tola.util import usefully_normalize_decimal
 from tola_management.permissions import user_has_program_roles
 from tola_management.models import ProgramAuditLog
@@ -274,9 +275,9 @@ class BulkImportIndicatorsView(LoginRequiredMixin, UserPassesTestMixin, AccessMi
             dv.errorTitle = gettext('Invalid Entry')
 
         # Adding this validation after the others because the error messages will be different.
-        baseline_validation = DataValidation(type='decimal')
-        # Translators: Error message shown to a user when they have entered a value for a numeric field that isn't a number.
-        baseline_validation.error = gettext('Please enter a number')
+        baseline_validation = DataValidation(type='decimal', operator="greaterThan", formula1=0)
+        # Translators: Error message shown to a user when they have entered a value for a numeric field that isn't a number or is negative.
+        baseline_validation.error = gettext('Please enter a positive number')
         # Translators:  Title of a popup box that informs the user they have entered an invalid value
         baseline_validation.errorTitle = gettext('Invalid Entry')
         validation_map[VALIDATION_KEY_BASELINE] = baseline_validation
@@ -346,13 +347,20 @@ class BulkImportIndicatorsView(LoginRequiredMixin, UserPassesTestMixin, AccessMi
                 comment.height = 15 + len(help_text) * .5
                 header_cell.comment = comment
 
-            if header['field_name'] == 'sector':
+            # Add other column-specific styling
+            if header['field_name'] == 'number':
+                header_cell.alignment = Alignment(horizontal='right')
+            elif header['field_name'] == 'sector':
                 col_width = max(len(option) for option in sector_options)
                 ws.column_dimensions[get_column_letter(column_index)].width = col_width
             elif header['field_name'] == 'definition':
                 ws.column_dimensions[get_column_letter(column_index)].width = 50
-            elif header['field_name'] in ['source', 'definition', 'unit_of_measure', 'rationale_for_target']:
+            elif header['field_name'] in ['source', 'justification', 'unit_of_measure', 'rationale_for_target']:
                 ws.column_dimensions[get_column_letter(column_index)].width = 40
+            elif header['field_name'] == 'baseline':
+                ws.column_dimensions[get_column_letter(column_index)].width = 30
+                header_cell.alignment = Alignment(horizontal='right')
+                # header_cell.number_format = '0.00'
             elif 7 < column_index < 15:
                 col_width = len(header_cell.value)
                 ws.column_dimensions[get_column_letter(column_index)].width = col_width
@@ -403,10 +411,17 @@ class BulkImportIndicatorsView(LoginRequiredMixin, UserPassesTestMixin, AccessMi
                             active_cell.value = indicator['number']
                     else:
                         raw_value = indicator.get(column['field_name'], None)
+                        if column['field_name'] == 'baseline':
+                            raw_value = make_quantized_decimal(raw_value)
                         # These are potentially translated objects that need to be resolved, but converting None
-                        # to a string does results in a cell value of "None" rather than an empty cell.
+                        # to a string results in a cell value of "None" rather than an empty cell.
                         active_cell.value = raw_value if raw_value is None else str(raw_value)
                     active_cell.style = EXISTING_INDICATOR_STYLE
+                    if column['field_name'] == 'number':
+                        active_cell.alignment = Alignment(horizontal='right')
+                    if column['field_name'] == 'baseline':
+                        active_cell.alignment = Alignment(horizontal='right')
+                        active_cell.number_format = '0.00'
                     current_column_index += 1
                 current_row_index += 1
 
@@ -431,6 +446,11 @@ class BulkImportIndicatorsView(LoginRequiredMixin, UserPassesTestMixin, AccessMi
                         validator.add(active_cell)
                     if 'default' in column:
                         active_cell.value = column['default']
+                    if column['field_name'] == 'number':
+                        active_cell.alignment = Alignment(horizontal='right')
+                    if column['field_name'] == 'baseline':
+                        active_cell.alignment = Alignment(horizontal='right')
+                        active_cell.number_format = '0.00'
                 current_row_index += 1
             current_row_index += 1
 
