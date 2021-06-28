@@ -6,7 +6,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: \n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2021-06-25 11:19-0700\n"
+"POT-Creation-Date: 2021-06-25 15:42-0700\n"
 "PO-Revision-Date: 2021-06-16 11:35-0700\n"
 "Last-Translator: \n"
 "Language-Team: \n"
@@ -16,6 +16,20 @@ msgstr ""
 "Content-Transfer-Encoding: 8bit\n"
 "Plural-Forms: nplurals=2; plural=(n != 1);\n"
 "X-Generator: Poedit 2.4.2\n"
+
+#: js/apiv2.js:130 js/apiv2.js:182
+msgid "Import indicators.xlsx"
+msgstr "ÁTranslated Import indicators.xlsx"
+
+#. Translators: Column header for indicator Name column */
+#: js/apiv2.js:132 js/pages/iptt_report/components/report/tableHeader.js:108
+#: js/pages/logframe/components/table.js:30
+#: js/pages/program_page/components/indicator_list.js:196
+#: js/pages/tola_management_pages/audit_log/views.js:109
+#: js/pages/tola_management_pages/audit_log/views.js:164
+#: js/pages/tola_management_pages/audit_log/views.js:168
+msgid "Indicator"
+msgstr "Indicador"
 
 #: js/base.js:379 js/base.js:380
 msgid ""
@@ -72,7 +86,7 @@ msgid "Import indicators"
 msgstr "éTranslated Import indicators"
 
 #. Translators: Link to the program change log to view more details.
-#: js/components/ImportIndicatorsPopover.js:319
+#: js/components/ImportIndicatorsPopover.js:329
 msgid "View the program change log for more details."
 msgstr "ÁTranslated View the program change log for more details."
 
@@ -81,7 +95,7 @@ msgstr "ÁTranslated View the program change log for more details."
 #. Translators: This is the prompt on a popup that has warned users about a change they are about to make that could have broad consequences
 #. Translators: This is a confirmation prompt to confirm a user wants to archive an item
 #. Translators: This is a confirmation prompt to confirm a user wants to unarchive an item
-#: js/components/ImportIndicatorsPopover.js:327
+#: js/components/ImportIndicatorsPopover.js:337
 #: js/pages/results_framework/models.js:629
 #: js/pages/tola_management_pages/country/components/edit_disaggregations.js:661
 #: js/pages/tola_management_pages/country/models.js:478
@@ -91,53 +105,50 @@ msgid "Are you sure you want to continue?"
 msgstr "¿Está seguro que quiere continuar?"
 
 #. Translators: Button to continue and upload the template
-#: js/components/ImportIndicatorsPopover.js:339
-#, fuzzy
-#| msgid "Contributor"
+#: js/components/ImportIndicatorsPopover.js:349
 msgid "Continue"
 msgstr "éTranslated Continue"
 
 #. Translators: Button to cancel the import process and close the popover
 #. Translators: Button to cancel a form submission
-#: js/components/ImportIndicatorsPopover.js:350
-#: js/components/ImportIndicatorsPopover.js:515
+#: js/components/ImportIndicatorsPopover.js:360
+#: js/components/ImportIndicatorsPopover.js:525
 #: js/components/changesetNotice.js:66
 #: js/pages/results_framework/components/level_cards.js:578
 msgid "Cancel"
 msgstr "Cancelar"
 
 #. Translators: Instructions for users to download the template, open it in Excel, and then fill in indicators information.
-#: js/components/ImportIndicatorsPopover.js:369
+#: js/components/ImportIndicatorsPopover.js:379
 msgid "Download the template, open it in Excel, and enter indicators."
 msgstr ""
 "ÁTranslated Download the template, open it in Excel, and enter indicators."
 
 #. Translators: Instructions for users to upload their filled in template and then follow the instructions to complete the import process.
-#: js/components/ImportIndicatorsPopover.js:375
+#: js/components/ImportIndicatorsPopover.js:385
 msgid "Upload the template and follow instructions to complete the process."
 msgstr ""
 "éTranslated Upload the template and follow instructions to complete the "
 "process."
 
 #. Translators: Button to download a template
-#: js/components/ImportIndicatorsPopover.js:413
+#: js/components/ImportIndicatorsPopover.js:423
 msgid "Download template"
 msgstr "Translated Download template"
 
 #. Translators: Button to upload the import indicators template
-#: js/components/ImportIndicatorsPopover.js:424
+#: js/components/ImportIndicatorsPopover.js:434
 msgid "Upload template"
 msgstr "ÁTranslated Upload template"
 
-#: js/components/ImportIndicatorsPopover.js:447
-#, fuzzy, python-format
-#| msgid "Indicator Disaggregation Report"
+#: js/components/ImportIndicatorsPopover.js:457
+#, python-format
 msgid "%s indicator is ready to be imported."
 msgid_plural "%s indicators are ready to be imported."
 msgstr[0] "Translated %s indicator is ready to be imported."
 msgstr[1] "öTranslated %s indicators are ready to be imported."
 
-#: js/components/ImportIndicatorsPopover.js:458
+#: js/components/ImportIndicatorsPopover.js:468
 #, python-format
 msgid ""
 "%s indicator has missing or invalid information. Please update your "
@@ -153,13 +164,11 @@ msgstr[1] ""
 "your indicator template and upload again."
 
 #. Translators: Download an excel template with errors that need fixing highlighted
-#: js/components/ImportIndicatorsPopover.js:473
-#, fuzzy
-#| msgid "Download a copy of your template with errors highlighted"
+#: js/components/ImportIndicatorsPopover.js:483
 msgid "Download a copy of your template with errors highlighted."
 msgstr "ŹTranslated Download a copy of your template with errors highlighted."
 
-#: js/components/ImportIndicatorsPopover.js:488
+#: js/components/ImportIndicatorsPopover.js:498
 #, python-format
 msgid ""
 "%s indicator is ready to be imported. Are you ready to complete the import "
@@ -175,11 +184,11 @@ msgstr[1] ""
 "complete the import process? (This action cannot be undone.)"
 
 #. Translators: Button to confirm and complete the import process
-#: js/components/ImportIndicatorsPopover.js:504
+#: js/components/ImportIndicatorsPopover.js:514
 msgid "Complete import"
 msgstr "ÁTranslated Complete import"
 
-#: js/components/ImportIndicatorsPopover.js:530
+#: js/components/ImportIndicatorsPopover.js:540
 #, python-format
 msgid ""
 "%s indicator was successfully imported, but require additional details "
@@ -195,23 +204,23 @@ msgstr[1] ""
 "details before results can be submitted."
 
 #. Translators: A link to the program page to add the addition setup information for the imported indicators.
-#: js/components/ImportIndicatorsPopover.js:540
+#: js/components/ImportIndicatorsPopover.js:550
 msgid "Visit the program page to complete setup of these indicators."
 msgstr ""
 "éTranslated Visit the program page to complete setup of these indicators."
 
 #. Translators: Notification for a error that happend on the web server.
-#: js/components/ImportIndicatorsPopover.js:553
+#: js/components/ImportIndicatorsPopover.js:563
 msgid "There was a server-related problem"
 msgstr "ÁTranslated There was a server-related problem"
 
 #. Translators: Click to view the Advanced Option section
-#: js/components/ImportIndicatorsPopover.js:604
+#: js/components/ImportIndicatorsPopover.js:614
 msgid "Advanced options"
 msgstr "ÁTranslated Advanced options"
 
 #. Translators: Details explaining that by default the template will include 10 or 20 rows per result level. You can adjust the number if you need more or less rows.
-#: js/components/ImportIndicatorsPopover.js:612
+#: js/components/ImportIndicatorsPopover.js:622
 msgid ""
 "By default, the template will include 10 or 20 indicator rows per result "
 "level. Adjust the numbers if you need more or fewer rows."
@@ -219,39 +228,48 @@ msgstr ""
 "ÁTranslated By default, the template will include 10 or 20 indicator rows "
 "per result level. Adjust the numbers if you need more or fewer rows."
 
-#. Translators: Message to user that we cannot import the their file. This is because of it being the wrong file or the structure of the file was changed.
-#: js/components/ImportIndicatorsPopover.js:741
+#. Translators: Message to user that we cannot import the their file. This could be caused by the wrong file being selected, or the structure of the file was changed, or the results framework was updated and does not match the template anymore.
+#: js/components/ImportIndicatorsPopover.js:755
 msgid ""
-"Sorry, we can’t import indicators from this file. This can happen if the "
-"wrong file is selected or the template structure was modified."
+"We can’t import indicators from this file. This can happen if the wrong file "
+"is selected, the template structure is modified, or the results framework "
+"was updated and no longer matches the template."
 msgstr ""
-"Translated Sorry, we can’t import indicators from this file. This can happen "
-"if the wrong file is selected or the template structure was modified."
+"ÁTranslated We can’t import indicators from this file. This can happen if "
+"the wrong file is selected, the template structure is modified, or the "
+"results framework was updated and no longer matches the template."
 
 #. Translators: Messsage to user that there aren't any new indicators in the uploaded file.
-#: js/components/ImportIndicatorsPopover.js:744
-msgid "Sorry, we can’t find any indicators in this file."
-msgstr "öTranslated Sorry, we can’t find any indicators in this file."
+#: js/components/ImportIndicatorsPopover.js:758
+msgid "We can't find any indicators in this file."
+msgstr "éTranslated We can't find any indicators in this file."
+
+#. Translators: Message to user that the import indicator process could not be completed. If the problem continues, contact your TolaData administrator.
+#: js/components/ImportIndicatorsPopover.js:761
+msgid ""
+"Sorry, we couldn’t complete the import process. If the problem persists, "
+"please contact your TolaData administrator."
+msgstr ""
+"öTranslated Sorry, we couldn’t complete the import process. If the problem "
+"persists, please contact your TolaData administrator."
+
+#. Translators: Message to user that the import could not be completed and to find out the reason, upload the import template again.
+#: js/components/ImportIndicatorsPopover.js:764
+msgid ""
+"Sorry, we couldn’t complete the import process. To figure out what went "
+"wrong, please upload your template again."
+msgstr ""
+"ŹTranslated Sorry, we couldn’t complete the import process. To figure out "
+"what went wrong, please upload your template again."
 
 #. Translators: Message to user that someone else has uploaded a template in the last 24 hours and may be in the process of importing indicators to this program. You can view the program change log to see more details.
-#: js/components/ImportIndicatorsPopover.js:747
+#: js/components/ImportIndicatorsPopover.js:767
 msgid ""
 "Someone else uploaded a template in the last 24 hours, and may be in the "
 "process of adding indicators to this program."
 msgstr ""
 "ŹTranslated Someone else uploaded a template in the last 24 hours, and may "
 "be in the process of adding indicators to this program."
-
-#. Translators: Message to user that we cannot import the their file. This is because there is one or more indicators that are out of order. Users should visit the results framework page and rearrange indicators.
-#: js/components/ImportIndicatorsPopover.js:750
-msgid ""
-"Sorry, we can't import indicators from this file. One or more indicators is "
-"out of order. To rearrange saved indicators, please visit the results "
-"framework."
-msgstr ""
-"ÁTranslated Sorry, we can't import indicators from this file. One or more "
-"indicators is out of order. To rearrange saved indicators, please visit the "
-"results framework."
 
 #. Translators: button label to show the details of all items in a list */}
 #. Translators: button label to show the details of all rows in a list */}
@@ -703,16 +721,6 @@ msgstr "Vida del programa"
 #: js/pages/iptt_report/components/report/tableHeader.js:95
 msgid "No."
 msgstr "No."
-
-#. Translators: Column header for indicator Name column */
-#: js/pages/iptt_report/components/report/tableHeader.js:108
-#: js/pages/logframe/components/table.js:30
-#: js/pages/program_page/components/indicator_list.js:196
-#: js/pages/tola_management_pages/audit_log/views.js:109
-#: js/pages/tola_management_pages/audit_log/views.js:164
-#: js/pages/tola_management_pages/audit_log/views.js:168
-msgid "Indicator"
-msgstr "Indicador"
 
 #. Translators: Column header for indicator Level name column */
 #: js/pages/iptt_report/components/report/tableHeader.js:122
@@ -2746,6 +2754,15 @@ msgstr "éTranslated Context / Trigger"
 #: tola/db_translations.js:138
 msgid "Key Performance Indicator (KPI)"
 msgstr "Translated Key Performance Indicator (KPI)"
+
+#~ msgid ""
+#~ "Sorry, we can't import indicators from this file. One or more indicators "
+#~ "is out of order. To rearrange saved indicators, please visit the results "
+#~ "framework."
+#~ msgstr ""
+#~ "ÁTranslated Sorry, we can't import indicators from this file. One or more "
+#~ "indicators is out of order. To rearrange saved indicators, please visit "
+#~ "the results framework."
 
 #~ msgid "Upload"
 #~ msgstr "éTranslated Upload"
