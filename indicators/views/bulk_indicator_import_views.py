@@ -13,7 +13,7 @@ from openpyxl.utils import get_column_letter
 from django.contrib.auth.decorators import login_required
 from django.contrib.auth.mixins import UserPassesTestMixin, LoginRequiredMixin, AccessMixin
 from django.db import transaction
-from django.utils.translation import gettext
+from django.utils.translation import gettext, get_language, override
 from django.http import HttpResponse, JsonResponse
 from django.views import View
 from django.views.decorators.http import require_POST, require_GET
@@ -114,11 +114,11 @@ class BulkImportIndicatorsView(LoginRequiredMixin, UserPassesTestMixin, AccessMi
     a template with the appropriate structure and fillable row numbers.
 
     For the upload process, it runs though lots of checks to validate the data.  If the validation passes, a json
-    file is kept on the file system and a new instance  of the BulkIndicatorImportFile that points to the json
-    file.  When the user confirms that they want to save the indicators, a different view is used to retrieve the
-    json file and create the Indicator model instances.
+    file is kept on the file system and a new instance of a BulkIndicatorImportFile model object is created
+     that points to the json file.  When the user confirms that they want to save the indicators,
+     a different view is used to retrieve the json file and create the Indicator model instances.
 
-    If the validation checks fail, the errors are divded into fatal and non-fatal categories.  Non-fatal errors are
+    If the validation checks fail, the errors are divided into fatal and non-fatal categories.  Non-fatal errors are
     generally problems with individual indicators that can be highlighted on a spreadsheet and returned to the user.
     In this case, a feedback template is saved to the file system and a new instance of the
     BulkIndicatorImportFile is created that points to the Excel file.  When the user requests the Excel file, it is
@@ -195,14 +195,17 @@ class BulkImportIndicatorsView(LoginRequiredMixin, UserPassesTestMixin, AccessMi
         return user_has_program_roles(self.request.user, [program_id], ['high']) \
             or self.request.user.is_superuser is True
 
-    def _row_is_blank_or_spacer(self, ws, row_index):
-        # Blank rows are rows that are are configured to contain data (i.e. they contain pre-filled level, number,
-        # etc....  In this case there will be four pre-filled cells. Spacer rows are completely blank and
-        # should only precede a level header.
+    def _row_is_blank_or_spacer(self, ws, row_index, program):
+        # Blank rows are rows that are are configured to contain data but don't have any (i.e. they contain
+        # pre-filled level, number, etc....  In this case there will be four pre-filled cells.
+        # Spacer rows are completely blank and should only precede a level header.  The number
+        # field is being ignored on purpose.  If it's the only thing filled in for a row (in addition to the
+        # other three fields), the row id considered blank.
+        pre_filled_field_names = ['level', 'unit_of_measure_type', 'direction_of_change']
         pre_filled_indexes = [index for index, col in enumerate(COLUMNS)
-                              if col['field_name'] in ['level', 'number', 'unit_of_measure_type', 'direction_of_change']]
+            if col['field_name'] in pre_filled_field_names]
         row_filled_indexes = [index for index, col in enumerate(COLUMNS)
-                        if ws.cell(row_index, self.first_used_column + index).value]
+            if ws.cell(row_index, self.first_used_column + index).value and col['field_name'] != 'number']
         if pre_filled_indexes == row_filled_indexes:
             return 'blank'
         if len(row_filled_indexes) == 0:
@@ -277,7 +280,7 @@ class BulkImportIndicatorsView(LoginRequiredMixin, UserPassesTestMixin, AccessMi
         # Adding this validation after the others because the error messages will be different.
         baseline_validation = DataValidation(type='decimal', operator="greaterThan", formula1=0)
         # Translators: Error message shown to a user when they have entered a value for a numeric field that isn't a number or is negative.
-        baseline_validation.error = gettext('Please enter a positive number')
+        baseline_validation.error = gettext('Enter a numeric value for the baseline. If a baseline is not yet known or not applicable, enter a zero or type "N/A". The baseline can always be updated at a later point in time.')
         # Translators:  Title of a popup box that informs the user they have entered an invalid value
         baseline_validation.errorTitle = gettext('Invalid Entry')
         validation_map[VALIDATION_KEY_BASELINE] = baseline_validation
@@ -463,7 +466,7 @@ class BulkImportIndicatorsView(LoginRequiredMixin, UserPassesTestMixin, AccessMi
 
     def post(self, request, *args, **kwargs):
         # Translators: Message provided to user when they have failed to enter a required field on a form.
-        VALIDATION_MSG_REQUIRED = gettext('Please complete this field')
+        VALIDATION_MSG_REQUIRED = gettext('This information is required.')
         # Translators: Message provided to user when they have not chosen from a pre-selected list of options.
         VALIDATION_MSG_CHOICE = gettext('Please choose from one of the options in the dropdown menu')
 
@@ -475,193 +478,214 @@ class BulkImportIndicatorsView(LoginRequiredMixin, UserPassesTestMixin, AccessMi
         ws = wb.worksheets[0]
 
         if ws.cell(self.program_name_row, self.first_used_column).value != program.name:
-            return JsonResponse({'error_codes': [ERROR_MISMATCHED_PROGRAM]}, status=400)
+            return JsonResponse({'error_codes': [ERROR_MISMATCHED_PROGRAM]}, status=406)
 
-        for col_index, col in enumerate(COLUMNS):
-            cell_value = ws.cell(DATA_START_ROW - 1, FIRST_USED_COLUMN + col_index).value.strip('*')
-            if cell_value != col['name']:
-                return JsonResponse({'error_codes': [ERROR_MISMATCHED_HEADERS]}, status=400)
+        # The template could be any language so we're going to kill two birds with one stone by using the
+        # column headers to figure out what the template language is.  If the headers don't match any of the
+        # translated header sets, we know we've got a problem with the headers.  If they do match one of the
+        # language sets, we'll know which language the template is in.
+        headers_by_lang = {}
+        language_codes = ['en', 'fr', 'es']
+        template_headers = [ws.cell(DATA_START_ROW - 1, FIRST_USED_COLUMN + i).value.strip('*')
+                            for i in range(len(COLUMNS))]
+        template_language = None
+        for lang_code in language_codes:
+            with override(lang_code):
+                for col_index, col in enumerate(COLUMNS):
+                    try:
+                        headers_by_lang[lang_code].append(gettext(col['name']))
+                    except KeyError:
+                        headers_by_lang[lang_code] = [gettext(col['name'])]
+        for lang_code in language_codes:
+            if template_headers == headers_by_lang[lang_code]:
+                template_language = lang_code
+                break
+        if not template_language:
+            return JsonResponse({'error_codes': [ERROR_MISMATCHED_HEADERS]}, status=406)
 
-        non_fatal_errors = []  # Errors that can be highlighted on a spreadsheet and get sent back to the user
-        fatal_errors = []  # So bad that it's not possible to highlight a spreadsheet and send it back to the suer
-        level_refs = {}
-        for level in program.levels.all():
-            ontology = f' {level.display_ontology}' if len(level.display_ontology) > 0 else ''
-            level_refs[f'{level.leveltier}{ontology}'] = level
-        current_level = None
-        current_tier = None
-        new_indicators_data = []
-        indicator_status = {'valid': 0, 'invalid': 0}
-        reverse_field_name_map = {
-            'unit_of_measure_type': {str(name): value for value, name in Indicator.UNIT_OF_MEASURE_TYPES},
-            'direction_of_change': {str(name): value for value, name in Indicator.DIRECTION_OF_CHANGE},
-            'target_frequency': {str(name): value for value, name in Indicator.TARGET_FREQUENCIES}
-        }
-        letter_gen = None
-        pattern = r'^([^:]+)'
-        level_finder = re.compile(pattern)
-        ws_level_count = 0
-        passed_blank_row = False
+        # Set the language for template processing so the in-Excel error messages will match the original language.
+        with override(template_language):
+            level_refs = {}
+            for level in program.levels.all():
+                ontology = f' {level.display_ontology}' if len(level.display_ontology) > 0 else ''
+                level_refs[f'{gettext(str(level.leveltier))}{ontology}'] = level
 
-        for current_row_index in range(self.data_start_row, ws.max_row):
-            first_cell = ws.cell(current_row_index, self.first_used_column)
-            # If this is a level header row, parse the level name out of the header string
-            if first_cell.style == LEVEL_HEADER_STYLE:
-                matches = level_finder.match(first_cell.value)
-                if not matches or matches.group(1).strip() not in level_refs.keys():
-                    fatal_errors.append(ERROR_INVALID_LEVEL_HEADER)
-                    continue
-                else:
-                    tier_label = matches.group(1).strip()
-                    current_level = level_refs[tier_label]
-                    tier_matches = re.search(r'(.+)\s?[\d\.]*$', tier_label)
-                    current_tier = tier_matches.group(1)
-                    letter_gen = indicator_letter_generator()
-                    ws_level_count += 1
-                    passed_blank_row = False
-                    continue
+            non_fatal_errors = []  # Errors that can be highlighted on a spreadsheet and get sent back to the user
+            fatal_errors = []  # So bad that it's not possible to highlight a spreadsheet and send it back to the suer
+            current_level = None
+            current_tier = None
+            new_indicators_data = []
+            indicator_status = {'valid': 0, 'invalid': 0}
+            reverse_field_name_map = {
+                'unit_of_measure_type': {str(name): value for value, name in Indicator.UNIT_OF_MEASURE_TYPES},
+                'direction_of_change': {str(name): value for value, name in Indicator.DIRECTION_OF_CHANGE},
+                'target_frequency': {str(name): value for value, name in Indicator.TARGET_FREQUENCIES}
+            }
+            letter_gen = None
+            pattern = r'^([^:]+)'
+            level_finder = re.compile(pattern)
+            ws_level_count = 0
+            passed_blank_row = False
 
-            # Getting to this point without a parsed level header (which shouldn't happen)
-            # means something has gone wrong
-            if not current_level:
-                return JsonResponse({'error_codes': [ERROR_UNDETERMINED_LEVEL]}, status=400)
-
-            # skip indicators that are already in the system
-            if ws.cell(current_row_index, self.first_used_column).style == EXISTING_INDICATOR_STYLE:
-                next(letter_gen)
-                continue
-
-            # Skip blank rows but if there was an intervening blank row, give it error highlighting
-            if blank_type := self._row_is_blank_or_spacer(ws, current_row_index):
-                if blank_type == 'blank':
-                    next(letter_gen)
-                passed_blank_row = True
-                continue
-            elif passed_blank_row:
-                non_fatal_errors.append(ERROR_INTERVENING_BLANK_ROW)
-                for c in range(len(COLUMNS)):
-                    ws.cell(current_row_index - 1, self.first_used_column + c).style = UNPROTECTED_ERROR_STYLE
-                passed_blank_row = False
-
-            # Check if auto-numbered indicator numbers match what's expected
-            number_cell = ws.cell(current_row_index, self.first_used_column + 1)
-            if program.auto_number_indicators and number_cell.value is not None:
-                expected_ind_number = f'{current_level.display_ontology}{next(letter_gen)}'
-                if number_cell.value != expected_ind_number:
-                    number_cell.style = UNPROTECTED_ERROR_STYLE
-                    non_fatal_errors.append(ERROR_UNEXPECTED_INDICATOR_NUMBER)
-
-            # Check if the value of the Level column matches the one used in the level header
-            level_cell = ws.cell(current_row_index, FIRST_USED_COLUMN)
-            if level_cell.value != current_tier:
-                level_cell.style = UNPROTECTED_ERROR_STYLE
-                non_fatal_errors.append(ERROR_UNEXPECTED_LEVEL)
-
-            indicator_data = {}
-            for i, column in enumerate(COLUMNS[1:]):
-                indicator_data[column['field_name']] = ws.cell(current_row_index, self.first_used_column + i + 1).value
-
-            validation_errors = {}
-
-            # Use the serializer to check for character length and any other field issues that it handles
-            deserialized_data = BulkImportIndicatorSerializer(data=indicator_data)
-            deserialized_data.is_valid()
-            for field_name, error_list in deserialized_data.errors.items():
-                for error in error_list:
-                    if error.code == 'null':
-                        # We're checking for all required fields later, so counting them here would be duplicative
+            for current_row_index in range(self.data_start_row, ws.max_row):
+                first_cell = ws.cell(current_row_index, self.first_used_column)
+                # If this is a level header row, parse the level name out of the header string
+                if first_cell.style == LEVEL_HEADER_STYLE:
+                    matches = level_finder.match(first_cell.value)
+                    if not matches or matches.group(1).strip() not in level_refs.keys():
+                        fatal_errors.append(ERROR_INVALID_LEVEL_HEADER)
                         continue
                     else:
-                        validation_errors[field_name] = []
-                    if error.code == 'max_length':
-                        # System generated error message is 'Ensure this field has no more than 500 characters.'
-                        matches = re.search(r'more than (\d+) characters', str(error))
-                        if matches:
-                            # Translators: Error message provided when user has exceeded the character limit on a form
-                            msg = gettext(f'This field should have no more than {matches.group(1)} characters.')
-                            validation_errors[field_name].append(msg)
+                        tier_label = matches.group(1).strip()
+                        current_level = level_refs[tier_label]
+                        current_tier = tier_label
+                        if tier_matches := re.search(r'(.*)(\s[\d\.]+$)', tier_label):  # Separate tier name from ontology
+                            current_tier = tier_matches.group(1).strip()
+                        letter_gen = indicator_letter_generator()
+                        ws_level_count += 1
+                        passed_blank_row = False
+                        continue
+
+                # Getting to this point without a parsed level header means something has gone wrong
+                if not current_level:
+                    return JsonResponse({'error_codes': fatal_errors}, status=406)
+
+                # skip indicators that are already in the system
+                if ws.cell(current_row_index, self.first_used_column).style == EXISTING_INDICATOR_STYLE:
+                    next(letter_gen)
+                    continue
+
+                # Skip blank rows but if there was an intervening blank row, give it error highlighting
+                if blank_type := self._row_is_blank_or_spacer(ws, current_row_index, program):
+                    if blank_type == 'blank':
+                        next(letter_gen)
+                    passed_blank_row = True
+                    continue
+                elif passed_blank_row:
+                    non_fatal_errors.append(ERROR_INTERVENING_BLANK_ROW)
+                    for c in range(len(COLUMNS)):
+                        ws.cell(current_row_index - 1, self.first_used_column + c).style = UNPROTECTED_ERROR_STYLE
+                    passed_blank_row = False
+
+                # Check if auto-numbered indicator numbers match what's expected
+                number_cell = ws.cell(current_row_index, self.first_used_column + 1)
+                if program.auto_number_indicators and number_cell.value is not None:
+                    expected_ind_number = f'{current_level.display_ontology}{next(letter_gen)}'
+                    if number_cell.value != expected_ind_number:
+                        number_cell.style = UNPROTECTED_ERROR_STYLE
+                        non_fatal_errors.append(ERROR_UNEXPECTED_INDICATOR_NUMBER)
+
+                # Check if the value of the Level column matches the one used in the level header
+                level_cell = ws.cell(current_row_index, FIRST_USED_COLUMN)
+                if level_cell.value != current_tier:
+                    level_cell.style = UNPROTECTED_ERROR_STYLE
+                    non_fatal_errors.append(ERROR_UNEXPECTED_LEVEL)
+
+                indicator_data = {}
+                for i, column in enumerate(COLUMNS[1:]):
+                    indicator_data[column['field_name']] = ws.cell(current_row_index, self.first_used_column + i + 1).value
+
+                validation_errors = {}
+
+                # Use the serializer to check for character length and any other field issues that it handles
+                deserialized_data = BulkImportIndicatorSerializer(data=indicator_data)
+                deserialized_data.is_valid()
+                for field_name, error_list in deserialized_data.errors.items():
+                    for error in error_list:
+                        if error.code == 'null':
+                            # We're checking for all required fields later, so counting them here would be duplicative
+                            continue
                         else:
-
-                            validation_errors[field_name].append(
+                            validation_errors[field_name] = []
+                        if error.code == 'max_length':
+                            # System generated error message is 'Ensure this field has no more than 500 characters.'
+                            matches = re.search(r'more than (\d+) characters', str(error))
+                            if matches:
                                 # Translators: Error message provided when user has exceeded the character limit on a form
-                                gettext("You have exceeded the character limit of this field"))
-                            logger.error(f'New validation string of code "{error.code}" found.\n{str(error)}')
+                                msg = gettext(f'This field should have no more than {matches.group(1)} characters.')
+                                validation_errors[field_name].append(msg)
+                            else:
+
+                                validation_errors[field_name].append(
+                                    # Translators: Error message provided when user has exceeded the character limit on a form
+                                    gettext("You have exceeded the character limit of this field"))
+                                logger.error(f'New validation string of code "{error.code}" found.\n{str(error)}')
+                        else:
+                            logger.error(f'New validation string of code {error.code} found.\n{str(error)}')
+                            validation_errors[field_name].append(str(error))
+
+                # Check for missing required fields
+                for i, column in enumerate(COLUMNS):
+                    cell_value = ws.cell(current_row_index, FIRST_USED_COLUMN + i).value
+                    if column['required'] and cell_value is None:
+                        # Translators: Error message on a form indicating that user has not entered a required field.
+                        required_field_error = VALIDATION_MSG_REQUIRED
+                        try:
+                            validation_errors[column['field_name']].append(required_field_error)
+                        except KeyError:
+                            validation_errors[column['field_name']] = [required_field_error]
+                        non_fatal_errors.append(ERROR_MALFORMED_INDICATOR)
+
+                # Convert enumerated fields into numerical ids
+                for field in reverse_field_name_map.keys():
+                    col_number = self.first_used_column + COLUMNS_FIELD_INDEXES[field]
+                    cell_value = ws.cell(current_row_index, col_number).value
+                    if cell_value is None:
+                        pass
                     else:
-                        logger.error(f'New validation string of code {error.code} found.\n{str(error)}')
-                        validation_errors[field_name].append(str(error))
+                        try:
+                            indicator_data[field] = reverse_field_name_map[field][cell_value]
+                        except KeyError:
+                            if field in validation_errors:
+                                validation_errors[field].append(VALIDATION_MSG_CHOICE)
+                            else:
+                                validation_errors[field] = [VALIDATION_MSG_CHOICE]
+                            non_fatal_errors.append(ERROR_MALFORMED_INDICATOR)
 
-            # Check for missing required fields
-            for i, column in enumerate(COLUMNS):
-                cell_value = ws.cell(current_row_index, FIRST_USED_COLUMN + i).value
-                if column['required'] and cell_value is None:
-                    # Translators: Error message on a form indicating that user has not entered a required field.
-                    required_field_error = VALIDATION_MSG_REQUIRED
-                    try:
-                        validation_errors[column['field_name']].append(required_field_error)
-                    except KeyError:
-                        validation_errors[column['field_name']] = [required_field_error]
-                    non_fatal_errors.append(ERROR_MALFORMED_INDICATOR)
-
-            # Convert enumerated fields into numerical ids
-            for field in reverse_field_name_map.keys():
-                col_number = self.first_used_column + COLUMNS_FIELD_INDEXES[field]
+                # Convert text in sector dropdown to sector pk
+                col_number = self.first_used_column + COLUMNS_FIELD_INDEXES['sector']
                 cell_value = ws.cell(current_row_index, col_number).value
-                if cell_value is None:
+                if cell_value is None or cell_value in [EMPTY_CHOICE, '', 'None']:
                     pass
                 else:
                     try:
-                        indicator_data[field] = reverse_field_name_map[field][cell_value]
-                    except KeyError:
-                        if field in validation_errors:
-                            validation_errors[field].append(VALIDATION_MSG_CHOICE)
-                        else:
-                            validation_errors[field] = [VALIDATION_MSG_CHOICE]
+                        sector = Sector.objects.get(sector=cell_value)
+                        indicator_data['sector_id'] = sector.pk
+                        indicator_data.pop('sector')
+                    except Sector.DoesNotExist:
+                        # Translators:  Error message indicating that the value the user has selected for the
+                        # sector field is not in the list of valid options
+                        error_string = 'Could not find matching sector'
+                        try:
+                            validation_errors['sector'].append(error_string)
+                        except KeyError:
+                            validation_errors['sector'] = [error_string]
                         non_fatal_errors.append(ERROR_MALFORMED_INDICATOR)
 
-            # Convert text in sector dropdown to sector pk
-            col_number = self.first_used_column + COLUMNS_FIELD_INDEXES['sector']
-            cell_value = ws.cell(current_row_index, col_number).value
-            if cell_value is None or cell_value in [EMPTY_CHOICE, '', 'None']:
-                pass
-            else:
-                try:
-                    sector = Sector.objects.get(sector=cell_value)
-                    indicator_data['sector_id'] = sector.pk
-                    indicator_data.pop('sector')
-                except Sector.DoesNotExist:
-                    # Translators:  Error message indicating that the value the user has selected for the
-                    # sector field is not in the list of valid options
-                    error_string = 'Could not find matching sector'
-                    try:
-                        validation_errors['sector'].append(error_string)
-                    except KeyError:
-                        validation_errors['sector'] = [error_string]
-                    non_fatal_errors.append(ERROR_MALFORMED_INDICATOR)
+                # Final data manipulation and updates
+                indicator_data['level_id'] = current_level.pk
+                indicator_data['program_id'] = program.id
+                # The number order has already been checked if program is autonumbered, so we don't need the numbers
+                # any more
+                if program.auto_number_indicators:
+                    indicator_data.pop('number')
+                if indicator_data['baseline']:
+                    indicator_data['baseline'] = str(usefully_normalize_decimal(
+                        Decimal(indicator_data['baseline']).quantize(Decimal('.01'))))
 
-            # Final data manipulation and updates
-            indicator_data['level_id'] = current_level.pk
-            indicator_data['program_id'] = program.id
-            # The number order has already been checked if program is autonumbered, so we don't need the numbers
-            # any more
-            if program.auto_number_indicators:
-                indicator_data.pop('number')
-            if indicator_data['baseline']:
-                indicator_data['baseline'] = str(usefully_normalize_decimal(
-                    Decimal(indicator_data['baseline']).quantize(Decimal('.01'))))
+                if len(validation_errors) == 0:
+                    new_indicators_data.append(indicator_data)
+                    indicator_status['valid'] += 1
+                else:
+                    ws.cell(current_row_index, FIRST_USED_COLUMN).style = 'unprotected_indicator_error_style'
+                    indicator_status['invalid'] += 1
 
-            if len(validation_errors) == 0:
-                new_indicators_data.append(indicator_data)
-                indicator_status['valid'] += 1
-            else:
-                ws.cell(current_row_index, FIRST_USED_COLUMN).style = 'unprotected_indicator_error_style'
-                indicator_status['invalid'] += 1
+            if len(level_refs) != ws_level_count:
+                return JsonResponse({'error_codes': [ERROR_MISMATCHED_LEVEL_COUNT]}, status=406)
 
-        if len(level_refs) != ws_level_count:
-            return JsonResponse({'error_codes': [ERROR_MISMATCHED_LEVEL_COUNT]}, status=400)
-
-        if len(fatal_errors) > 0:
-            pruned_fatal = sorted(list(set(fatal_errors)))
-            return JsonResponse({'error_codes': pruned_fatal}, status=400)
+            if len(fatal_errors) > 0:
+                pruned_fatal = sorted(list(set(fatal_errors)))
+                return JsonResponse({'error_codes': pruned_fatal}, status=406)
 
         if indicator_status['invalid'] > 0 or len(non_fatal_errors) > 0:
             # Clean out any existing temp Excel file reference, since we're about to replace it
@@ -691,7 +715,7 @@ class BulkImportIndicatorsView(LoginRequiredMixin, UserPassesTestMixin, AccessMi
             }, status=400)
 
         if len(new_indicators_data) == 0:
-            return JsonResponse({'error_codes': [ERROR_NO_NEW_INDICATORS]}, status=400)
+            return JsonResponse({'error_codes': [ERROR_NO_NEW_INDICATORS]}, status=406)
 
         try:
             old_file_obj = BulkIndicatorImportFile.objects.get(
