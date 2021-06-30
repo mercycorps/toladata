@@ -45,7 +45,9 @@ from indicators.views.view_utils import (
     generate_periodic_targets,
     dictfetchall
 )
-from indicators.forms import IndicatorForm, ResultForm, PTFormInputsForm, get_disaggregated_result_formset
+from indicators.forms import (
+    IndicatorForm, IndicatorCompleteForm, ResultForm, PTFormInputsForm, get_disaggregated_result_formset
+)
 from indicators.models import (
     Indicator,
     PeriodicTarget,
@@ -135,9 +137,9 @@ class PeriodicTargetJsonValidationError(Exception):
     pass
 
 
-class IndicatorFormMixin:
+class BaseIndicatorViewMixin:
     model = Indicator
-    form_class = IndicatorForm
+    form_class = None
 
     def __init__(self):
         self.guidance = None
@@ -146,7 +148,7 @@ class IndicatorFormMixin:
         self.guidance = None
 
     def get_template_names(self):
-        return 'indicators/indicator_form_modal.html'
+        raise NotImplementedError()
 
     def form_invalid(self, form):
         return JsonResponse(form.errors, status=400)
@@ -244,6 +246,16 @@ class IndicatorFormMixin:
                     server_period_dates, client_period_dates))
 
     def _save_success_msg(self, indicator, created=True, level_changed=False):
+        raise NotImplementedError()
+
+
+class IndicatorViewMixin(BaseIndicatorViewMixin):
+    form_class = IndicatorForm
+
+    def get_template_names(self):
+        return 'indicators/indicator_form_modal.html'
+
+    def _save_success_msg(self, indicator, created=True, level_changed=False):
         """
         Returns the growl of success string for display on the client
 
@@ -280,7 +292,18 @@ class IndicatorFormMixin:
             return _('Indicator {indicator_number} updated.').format(indicator_number=indicator_number)
 
 
-class IndicatorCreate(IndicatorFormMixin, CreateView):
+class IndicatorCompleteViewMixin(BaseIndicatorViewMixin):
+    form_class = IndicatorCompleteForm
+
+    def get_template_names(self):
+        return 'indicators/indicator_form_modal_complete.html'
+
+    def _save_success_msg(self, indicator, created=True, level_changed=False):
+        # Translators: success message when an indicator that was incompletely set up is completed by a user
+        return _('Success! Indicator created.')
+
+
+class IndicatorCreate(IndicatorViewMixin, CreateView):
 
     @method_decorator(login_required)
     @method_decorator(has_indicator_write_access)
@@ -367,7 +390,7 @@ class IndicatorCreate(IndicatorFormMixin, CreateView):
         })
 
 
-class IndicatorUpdate(IndicatorFormMixin, UpdateView):
+class IndicatorUpdate(IndicatorViewMixin, UpdateView):
     """
     Update and Edit Indicators.
     url: indicator_update/<pk>
@@ -493,6 +516,246 @@ class IndicatorUpdate(IndicatorFormMixin, UpdateView):
     # add the request to the kwargs
     def get_form_kwargs(self):
         kwargs = super(IndicatorUpdate, self).get_form_kwargs()
+        kwargs['request'] = self.request
+        program = Program.rf_aware_objects.get(pk=self.object.program_id)
+        kwargs['program'] = program
+        return kwargs
+
+    def form_valid(self, form, **kwargs):
+        periodic_targets = self.request.POST.get('periodic_targets')
+        old_indicator = Indicator.objects.get(pk=self.kwargs.get('pk'))
+        existing_target_frequency = old_indicator.target_frequency
+        new_target_frequency = form.cleaned_data.get('target_frequency')
+        lop = form.cleaned_data.get('lop_target')
+        rationale = form.cleaned_data.get('rationale')
+        reasons_for_change = form.cleaned_data.get('reasons_for_change')
+        old_indicator_values = old_indicator.logged_fields
+        prev_level = old_indicator.level  # previous value of "new" level (not to be confused with Indicator.old_level)
+
+        # if existing_target_frequency != new_target_frequency
+        # then either existing_target_frequency is None or LoP
+        # It shouldn't be anything else as the user should have to delete all targets first
+
+        # Disassociate existing records and delete old PeriodicTargets
+        if existing_target_frequency != new_target_frequency:
+            PeriodicTarget.objects.filter(indicator=old_indicator).delete()
+
+        # Save completed PeriodicTargets to the DB)
+        if new_target_frequency == Indicator.LOP:
+            # assume only 1 PT at this point
+            lop_pt, created = PeriodicTarget.objects.update_or_create(
+                indicator=old_indicator,
+                defaults={
+                    'target': lop,
+                    'period': PeriodicTarget.LOP_PERIOD,
+                }
+            )
+
+            if created:
+                lop_pt.create_date = timezone.now()
+                lop_pt.save()
+
+                # Redirect results to new LoP target
+                Result.objects.filter(indicator=old_indicator).update(periodic_target=lop_pt)
+        else:
+            # now create/update periodic targets (will be empty u'[]' for LoP)
+            pt_json = json.loads(periodic_targets)
+
+            normalized_pt_json = self.normalize_periodic_target_client_json_dates(pt_json, request=self.request)
+
+            self.validate_periodic_target_json_from_client(
+                normalized_pt_json, old_indicator.program, new_target_frequency
+            )
+
+            generated_pt_ids = []
+            for i, pt in enumerate(normalized_pt_json):
+                defaults = {
+                    'period': pt.get('period', ''),
+                    'target': pt.get('target', 0),
+                    'customsort': i,
+                    'start_date': pt['start_date'],
+                    'end_date': pt['end_date'],
+                    'edit_date': timezone.now()
+                }
+
+                periodic_target, created = PeriodicTarget.objects \
+                    .update_or_create(indicator=old_indicator, id=pt['id'], defaults=defaults)
+
+                if created:
+                    periodic_target.create_date = timezone.now()
+                    periodic_target.save()
+                    generated_pt_ids.append(periodic_target.id)
+
+            # Reassign results to newly created PTs
+            if generated_pt_ids:
+                pts = PeriodicTarget.objects.filter(indicator=old_indicator, pk__in=generated_pt_ids)
+                for pt in pts:
+                    Result.objects.filter(
+                        indicator=old_indicator,
+                        date_collected__range=[pt.start_date, pt.end_date]
+                    ).update(periodic_target=pt)
+
+
+        # save the indicator form
+        form.save()
+        self.object.refresh_from_db()
+
+        # Write to audit log if results attached or special case of RF level reassignment
+        results_count = Result.objects.filter(indicator=self.object).count()
+        if (results_count and results_count > 0) or old_indicator.level_id != self.object.level_id:
+            ProgramAuditLog.log_indicator_updated(
+                self.request.user,
+                self.object,
+                old_indicator_values,
+                self.object.logged_fields,
+                rationale=rationale,
+                rationale_options=reasons_for_change
+            )
+
+        # refresh the periodic targets form such that pkids of new PeriodicTargets are submitted in the future
+        content = render_to_string('indicators/indicatortargets.html', {
+            'indicator': self.object,
+            'periodic_targets': PeriodicTarget.objects.filter(indicator=self.object).annotate(num_data=Count('result'))
+        })
+
+        return JsonResponse({
+            'content': content,
+            'title_str': self._form_title_display_str,
+            'subtitle_str': self._form_subtitle_display_str,
+            'save_success_msg': self._save_success_msg(
+                self.object,
+                created=False,
+                level_changed=(self.object.level != prev_level)
+            ),
+        })
+
+
+class IndicatorComplete(IndicatorCompleteViewMixin, UpdateView):
+    """
+    Complete Indicators that have been bulk imported.
+    url: indicator_complete/<pk>
+    """
+
+    @method_decorator(login_required)
+    @method_decorator(group_excluded('ViewOnly', url='workflow/permission'))
+    @method_decorator(indicator_pk_adapter(has_indicator_write_access))
+    @transaction.atomic
+    def dispatch(self, request, *args, **kwargs):
+        if request.method == 'GET':
+            # If target_frequency is set but not targets are saved then
+            # unset target_frequency too.
+            indicator = self.get_object()
+            reset_indicator_target_frequency(indicator)
+
+        self.set_form_guidance()
+
+        return super(IndicatorComplete, self).dispatch(request, *args, **kwargs)
+
+    @property
+    def _form_title_display_str(self):
+        """
+        The header of the form when updating - composed here instead of in the template
+        such that it can also be used via AJAX
+        """
+        if self.object.results_framework and self.object.auto_number_indicators:
+            if self.object.level_display_ontology:
+                return u'{} {} {}{}'.format(
+                    self.object.leveltier_name,
+                    _('indicator'),
+                    self.object.level_display_ontology,
+                    self.object.level_order_display,
+                )
+            else:
+                return _('Indicator setup')
+        elif self.object.results_framework and self.object.number:
+            return u'{} {}'.format(_('indicator'), self.object.number)
+        elif self.object.results_framework:
+            return _('Indicator setup')
+        elif self.object.old_level:
+            return u'{} {}'.format(
+                str(ugettext(self.object.old_level)),
+                str(_('indicator')),
+            )
+        else:
+            return _('Indicator setup')
+
+    @property
+    def _form_subtitle_display_str(self):
+        return truncatechars(self.object.name, 300)
+
+    def get_context_data(self, **kwargs):
+        context = super(IndicatorComplete, self).get_context_data(**kwargs)
+        indicator = self.object
+        program = indicator.program
+
+        context['program'] = program
+
+        pts = PeriodicTarget.objects.filter(indicator=indicator) \
+            .annotate(num_data=Count('result')).order_by('customsort', 'create_date', 'period')
+
+        ptargets = []
+        for pt in pts:
+            ptargets.append({
+                'id': pt.pk,
+                'num_data': pt.num_data,
+                'start_date': pt.start_date,
+                'end_date': pt.end_date,
+                'period': pt.period, # period is deprecated, this should move to .period_name
+                'period_name': pt.period_name,
+                'target': pt.target
+            })
+
+        # if the modal is loaded (not submitted) and the indicator frequency is a periodic
+        if self.request.method == 'GET' and indicator.target_frequency in Indicator.REGULAR_TARGET_FREQUENCIES:
+            latest_pt_end_date = indicator.periodictargets.aggregate(lastpt=Max('end_date'))['lastpt']
+
+            if latest_pt_end_date is None or latest_pt_end_date == 'None':
+                latest_pt_end_date = program.reporting_period_start
+            else:
+                latest_pt_end_date += timedelta(days=1)
+
+            target_frequency_num_periods = len(
+                [p for p in PeriodicTarget.generate_for_frequency(
+                    indicator.target_frequency)(latest_pt_end_date, program.reporting_period_end)])
+            # target_frequency_num_periods = IPTT_ReportView._get_num_periods(
+            #     latest_pt_end_date, program.reporting_period_end, indicator.target_frequency)
+
+            num_existing_targets = pts.count()
+            event_name = ''
+
+            generated_targets = generate_periodic_targets(
+                indicator.target_frequency, latest_pt_end_date, target_frequency_num_periods, event_name,
+                num_existing_targets)
+
+            # combine the list of existing periodic_targets with the newly generated placeholder for missing targets
+            ptargets += generated_targets
+
+        context['periodic_targets'] = ptargets
+
+        # redirect user to certain tabs of the form given GET params
+        if self.request.GET.get('targetsactive') == 'true':
+            context['targetsactive'] = True
+
+        context['readonly'] = not self.request.has_write_access
+
+        context['title_str'] = self._form_title_display_str
+        context['subtitle_str'] = self._form_subtitle_display_str
+
+        return context
+
+    def get_initial(self):
+        target_frequency_num_periods = self.get_object().target_frequency_num_periods
+        if not target_frequency_num_periods:
+            target_frequency_num_periods = 1
+
+        initial = {
+            'target_frequency_num_periods': target_frequency_num_periods
+        }
+        return initial
+
+    # add the request to the kwargs
+    def get_form_kwargs(self):
+        kwargs = super(IndicatorComplete, self).get_form_kwargs()
         kwargs['request'] = self.request
         program = Program.rf_aware_objects.get(pk=self.object.program_id)
         kwargs['program'] = program

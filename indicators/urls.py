@@ -38,6 +38,8 @@ urlpatterns = [
 
     path('indicator_update/<int:pk>/', views.IndicatorUpdate.as_view(), name='indicator_update'),
 
+    path('indicator_complete/<int:pk>/', views.IndicatorComplete.as_view(), name='indicator_complete'),
+
     path('indicator_delete/<int:pk>/', views.IndicatorDelete.as_view(), name='indicator_delete'),
 
     path('periodic_target_delete/<int:pk>/', views.PeriodicTargetDeleteView.as_view(), name='pt_delete'),# delete event

@@ -1,6 +1,7 @@
 from indicators.views.views_indicators import (
     IndicatorCreate,
     IndicatorUpdate,
+    IndicatorComplete,
     IndicatorDelete,
     PeriodicTargetDeleteAllView,
     PeriodicTargetDeleteView,

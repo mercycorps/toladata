@@ -166,6 +166,7 @@ export class IndicatorListTable extends React.Component {
         super(props);
 
         this.onIndicatorUpdateClick = this.onIndicatorUpdateClick.bind(this);
+        this.onIndicatorCompleteClick = this.onIndicatorCompleteClick.bind(this);
         this.onIndicatorResultsToggleClick = this.onIndicatorResultsToggleClick.bind(this);
     }
 
@@ -173,6 +174,12 @@ export class IndicatorListTable extends React.Component {
         e.preventDefault();
 
         eventBus.emit('open-indicator-update-modal', indicatorPk);
+    }
+
+    onIndicatorCompleteClick(e, indicatorPk) {
+        e.preventDefault();
+
+        eventBus.emit('open-indicator-complete-modal', indicatorPk);
     }
 
     onIndicatorResultsToggleClick(e, indicatorPk) {
@@ -183,11 +190,6 @@ export class IndicatorListTable extends React.Component {
         } else {
             this.props.program.expand(indicatorPk);
         }
-    }
-
-    onCompleteImportClick(e) {
-        e.preventDefault()
-        console.log('e is', e)
     }
 
     render() {
@@ -251,7 +253,7 @@ export class IndicatorListTable extends React.Component {
                                     {/* # Translators: Full message will be Imported indicators: Complete setup now.  This is a notification to the user that they have imported some indicators but that the indicator setup is not yet complete.   */
                                     gettext("Imported indicator: ")}
                                     {/* # Translators: Message that gets attached to each indicator element after a successful import of indicator data. It is not possible to import all data that an indicator requires to be complete. The "Complete setup now" is a link that allows users to access a form window where they can complete the required fields.   */}
-                                    <u><a href="" onClick={this.onCompleteImportClick} className={"text-success"}>{gettext("Complete setup now")}</a></u>
+                                    <u><a href="" onClick={(e) => this.onIndicatorCompleteClick(e, indicator.pk)} className={"text-success"}>{gettext("Complete setup now")}</a></u>
                                 </span>
                             }
                             {displayUnassignedWarning &&
