@@ -434,7 +434,7 @@ class BulkImportIndicatorsView(LoginRequiredMixin, UserPassesTestMixin, AccessMi
                 ws.row_dimensions[current_row_index].height = 16
                 ws.cell(current_row_index, self.first_used_column).value = gettext(level['tier_name'])
                 if program.auto_number_indicators:
-                    ws.cell(current_row_index, self.first_used_column + 1).value = \
+                    ws.cell(current_row_index, FIRST_USED_COLUMN + COLUMNS_FIELD_INDEXES['number']).value = \
                         level['display_ontology'] + next(letter_gen)
 
                 for col_n, column in enumerate(COLUMNS):
@@ -525,7 +525,7 @@ class BulkImportIndicatorsView(LoginRequiredMixin, UserPassesTestMixin, AccessMi
             pattern = r'^([^:]+)'
             level_finder = re.compile(pattern)
             ws_level_count = 0
-            passed_blank_row = False
+            skipped_row_indexes = []
 
             for current_row_index in range(self.data_start_row, ws.max_row):
                 first_cell = ws.cell(current_row_index, self.first_used_column)
@@ -543,7 +543,7 @@ class BulkImportIndicatorsView(LoginRequiredMixin, UserPassesTestMixin, AccessMi
                             current_tier = tier_matches.group(1).strip()
                         letter_gen = indicator_letter_generator()
                         ws_level_count += 1
-                        passed_blank_row = False
+                        skipped_row_indexes = []
                         continue
 
                 # Getting to this point without a parsed level header means something has gone wrong
@@ -559,13 +559,16 @@ class BulkImportIndicatorsView(LoginRequiredMixin, UserPassesTestMixin, AccessMi
                 if blank_type := self._row_is_blank_or_spacer(ws, current_row_index, program):
                     if blank_type == 'blank':
                         next(letter_gen)
-                    passed_blank_row = True
+                    skipped_row_indexes.append(current_row_index)
                     continue
-                elif passed_blank_row:
+                elif len(skipped_row_indexes) > 0:
                     non_fatal_errors.append(ERROR_INTERVENING_BLANK_ROW)
-                    for c in range(len(COLUMNS)):
-                        ws.cell(current_row_index - 1, self.first_used_column + c).style = UNPROTECTED_ERROR_STYLE
-                    passed_blank_row = False
+                    for skipped_row_index in skipped_row_indexes:
+                        # Need to skip protected level column and potentially protected number column.
+                        skip_cols = 2 if program.auto_number_indicators else 1
+                        for col_index in range(self.first_used_column + skip_cols, self.first_used_column + len(COLUMNS)):
+                            ws.cell(skipped_row_index, col_index).style = UNPROTECTED_ERROR_STYLE
+                    skipped_row_indexes = []
 
                 # Check if auto-numbered indicator numbers match what's expected
                 number_cell = ws.cell(current_row_index, self.first_used_column + 1)
@@ -677,7 +680,7 @@ class BulkImportIndicatorsView(LoginRequiredMixin, UserPassesTestMixin, AccessMi
                     new_indicators_data.append(indicator_data)
                     indicator_status['valid'] += 1
                 else:
-                    ws.cell(current_row_index, FIRST_USED_COLUMN).style = 'unprotected_indicator_error_style'
+                    ws.cell(current_row_index, FIRST_USED_COLUMN).style = UNPROTECTED_ERROR_STYLE
                     indicator_status['invalid'] += 1
 
             if len(level_refs) != ws_level_count:

@@ -19,12 +19,11 @@ from factories import (
 from tola_management.models import ProgramAuditLog
 from indicators.models import Indicator, Level, LevelTier, BulkIndicatorImportFile
 from indicators.views.bulk_indicator_import_views import (
-    COLUMNS, FIRST_USED_COLUMN, DATA_START_ROW, PROGRAM_NAME_ROW, COLUMN_HEADER_ROW,
+    COLUMNS, COLUMNS_FIELD_INDEXES, FIRST_USED_COLUMN, DATA_START_ROW, PROGRAM_NAME_ROW, COLUMN_HEADER_ROW,
     HIDDEN_SHEET_NAME, BASE_TEMPLATE_NAME, LEVEL_HEADER_STYLE, EXISTING_INDICATOR_STYLE,
-    UNPROTECTED_NEW_INDICATOR_STYLE, PROTECTED_NEW_INDICATOR_STYLE,
+    UNPROTECTED_NEW_INDICATOR_STYLE, PROTECTED_NEW_INDICATOR_STYLE, UNPROTECTED_ERROR_STYLE,
     ERROR_MISMATCHED_PROGRAM,
     ERROR_NO_NEW_INDICATORS,
-    ERROR_UNDETERMINED_LEVEL,
     ERROR_TEMPLATE_NOT_FOUND,
     ERROR_MISMATCHED_TIERS,
     ERROR_INDICATOR_DATA_NOT_FOUND,
@@ -458,7 +457,7 @@ class TestBulkImportTemplateProcessing(test.TestCase):
         self.fill_worksheet_row(ws, first_blank_goal_row + 1, {'name': 'Lorem ipsum ' * 100})
         self.fill_worksheet_row(ws, first_blank_goal_row + 2, {'number': 'bad number'})
         self.fill_worksheet_row(ws, first_blank_goal_row + 3, {'level': 'bad level'})
-        self.fill_worksheet_row(ws, first_blank_goal_row + 5)
+        self.fill_worksheet_row(ws, first_blank_goal_row + 6)
         response = self.post_template(wb)
         self.assertEqual(ProgramAuditLog.objects.count(), 1)
         self.assertEqual(ProgramAuditLog.objects.last().change_type, 'template_uploaded')
@@ -469,6 +468,28 @@ class TestBulkImportTemplateProcessing(test.TestCase):
                 ERROR_MALFORMED_INDICATOR, ERROR_INTERVENING_BLANK_ROW, ERROR_UNEXPECTED_INDICATOR_NUMBER,
                 ERROR_UNEXPECTED_LEVEL
             ]))
+        response = self.client.get(reverse('get_feedback_bulk_import_template', args=[self.program.id]))
+        self.assertEqual(response.get('Content-Disposition'), 'attachment; filename="Marked-up-template.xlsx"')
+        feedback_wb = openpyxl.load_workbook(ContentFile(response.content))
+        feedback_ws = feedback_wb.worksheets[0]
+        self.assertEqual(
+            feedback_ws.cell(first_blank_goal_row + 2, self.first_used_column + COLUMNS_FIELD_INDEXES['number']).style,
+            UNPROTECTED_ERROR_STYLE)
+        self.assertEqual(
+            feedback_ws.cell(first_blank_goal_row + 3, self.first_used_column + COLUMNS_FIELD_INDEXES['level']).style,
+            UNPROTECTED_ERROR_STYLE)
+
+        # Make sure entire skipped rows are highlighted
+        for row_index in [first_blank_goal_row + 4, first_blank_goal_row + 5]:
+            collector = []
+            col_loop_range = range(self.first_used_column + 2, self.first_used_column + len(COLUMNS))
+            errors_are_highlighted = [feedback_ws.cell(row_index, col_index).style == UNPROTECTED_ERROR_STYLE for col_index in col_loop_range]
+            for col_index in col_loop_range:
+                collector.append(feedback_ws.cell(row_index, col_index).style == UNPROTECTED_ERROR_STYLE)
+            self.assertTrue(all(errors_are_highlighted))
+        self.assertEqual(
+            feedback_ws.cell(first_blank_goal_row + 4, self.first_used_column + COLUMNS_FIELD_INDEXES['name']).style,
+            UNPROTECTED_ERROR_STYLE)
 
         wb = openpyxl.load_workbook(self.get_template())
         existing_goal_indicator_count = Indicator.objects.filter(level__parent=None).count()
@@ -592,6 +613,7 @@ class TestBulkImportTemplateProcessing(test.TestCase):
         response = self.client.get(reverse('get_feedback_bulk_import_template', args=[self.program.id]))
         self.assertEqual(response.get('Content-Disposition'),'attachment; filename="Marked-up-template.xlsx"')
 
+        # Make sure feedback template was deleted by the first request in this test.
         response = self.client.get(reverse('get_feedback_bulk_import_template', args=[self.program.id]))
         self.assertEqual(
             json.loads(response.content)['error_codes'], [ERROR_TEMPLATE_NOT_FOUND])
