@@ -190,23 +190,6 @@ export const ImportIndicatorsPopover = ({ page, program_id, tierLevelsUsed, stor
         setStoredTierLevelsRows(tierLevelsRows);
     }, [tierLevelsRows])
 
-    // Download template file providing the program ID and number of rows per tier level
-    let handleDownload = () => {
-        setDownloadOrUpload("download")
-        api.downloadTemplate(program_id, tierLevelsRows)
-            .then(response => {
-                console.log(response);
-                if (response.status !== 200) {
-                    if (response.data.error_codes && response.data.error_codes.toString().slice(0, 1) === "1" ) {
-                        let errorsMessagesToDisplay = reduceErrorCodes(response.data.error_codes)
-                        setDisplayError({view: INITIAL, error: errorsMessagesToDisplay});
-                    } else {
-                        setViews(ERROR);
-                    }
-                }
-            })
-    }
-
     // Reduce the array of errors to remove duplicate messaging
     let reduceErrorCodes = (codes) => {
         let reducer = (accumulator, code) => {
@@ -215,6 +198,26 @@ export const ImportIndicatorsPopover = ({ page, program_id, tierLevelsUsed, stor
         };
         return codes.reduce(reducer, []);
     };
+
+    // Download template file providing the program ID and number of rows per tier level
+    let handleDownload = () => {
+        setDownloadOrUpload("download");
+        api.downloadTemplate(program_id, tierLevelsRows)
+            .then(response => {
+                if (response.status === 404) {
+                    setViews(ERROR);
+                } else {
+                    if (response.status !== 200) {
+                        if (response.data.error_codes && response.data.error_codes.toString().slice(0, 1) === "1" ) {
+                            let errorsMessagesToDisplay = reduceErrorCodes(response.data.error_codes);
+                            setDisplayError({view: INITIAL, error: errorsMessagesToDisplay});
+                        } else {
+                            setViews(ERROR);
+                        }
+                    }
+                }
+            })
+    }
 
     // Upload template file and send api request
     let handleUpload = (e) => {
@@ -232,18 +235,17 @@ export const ImportIndicatorsPopover = ({ page, program_id, tierLevelsUsed, stor
         api.uploadTemplate(program_id, e.target.files[0])
                 .then(response => {
                     let handleResponse = () => {
-                        if ((response.status === 200)) {
-                            setvalidIndicatorsCount(response.data.valid);
-                            setInvalidIndicatorsCount(response.data.invalid);
-                            if (response.data.invalid === 0) {
+                        if (response.status === 404) {
+                            setViews(ERROR);
+                        } else {
+                            setvalidIndicatorsCount(response.data.valid || 0);
+                            setInvalidIndicatorsCount(response.data.invalid || 0);
+                            // Successful upload with no errors and all rows valid
+                            if (response.status === 200) { 
                                 setViews(CONFIRM);
                                 setStoredView({view: CONFIRM, valid: response.data.valid});
-                            } else {
-                                setViews(FEEDBACK);
-                                setStoredView({view: FEEDBACK, valid: response.data.valid, invalid: response.data.invalid});
-                            }
-                        } else {
-                            if (response.data.error_codes) {
+                            // Unsuccessful upload with fatal errors
+                            } else if ( response.status === 406 ) { 
                                 let errorsMessagesToDisplay = reduceErrorCodes(response.data.error_codes)
                                 if (errorsMessagesToDisplay.length > 0) {
                                     setDisplayError({view: INITIAL, error: errorsMessagesToDisplay})
@@ -251,9 +253,13 @@ export const ImportIndicatorsPopover = ({ page, program_id, tierLevelsUsed, stor
                                 } else {
                                     setViews(ERROR);
                                 }
+                            // Unsuccessful upload with errors and/or invalid rows
+                            } else if (response.status.toString().slice(0, 1) === "4") { 
+                                setViews(FEEDBACK);
+                                setStoredView({view: FEEDBACK, valid: response.data.valid, invalid: response.data.invalid});
+                            // Handles any other error/problem
                             } else {
-                                // Handles when there are no error codes or ones we do not have messaging for
-                                setViews(ERROR);
+                                setViews(ERROR); 
                             }
                         }
                     }
@@ -278,7 +284,7 @@ export const ImportIndicatorsPopover = ({ page, program_id, tierLevelsUsed, stor
     let handleFeedback = () => {
         api.downloadFeedback(program_id)
         .then(response => {
-            if (response.error_code) {
+            if (response.status !== 200) {
                 setViews(ERROR);
             }
         })
@@ -287,23 +293,32 @@ export const ImportIndicatorsPopover = ({ page, program_id, tierLevelsUsed, stor
     // Handle confirm and complete importing indicators
     let handleConfirm = () => {
         let loading = false;
+        let stopLoading;
         let loadingTimer = setTimeout(() => {
-            setViews(LOADING)
+            setViews(LOADING);
             loading = true;
+            stopLoading = setTimeout(() => { // Prevents the forever spinner situation
+                setViews(CONFIRM);
+            }, 60000);
         }, 1000)
         api.confirmUpload(program_id)
             .then(response => {
                 let handleResponse = () => {
-                    if (response.status === 200) {
-                        setViews(SUCCESS);
+                    if (response.status === 404) {
+                        setViews(ERROR);
                     } else {
-                        let errorsMessagesToDisplay = reduceErrorCodes(response.data.error_codes)
-                        setDisplayError({view: CONFIRM, error: errorsMessagesToDisplay})
+                        if (response.status === 200) {
+                            setViews(SUCCESS);
+                        } else {
+                            let errorsMessagesToDisplay = reduceErrorCodes(response.data.error_codes);
+                            setDisplayError({view: CONFIRM, error: errorsMessagesToDisplay});
+                        }
                     }
                 }
                 if (loading) {
                     setTimeout(() => {
                         handleResponse();
+                        clearTimeout(stopLoading);
                     }, 1000)
                 } else {
                     clearTimeout(loadingTimer);
@@ -312,7 +327,14 @@ export const ImportIndicatorsPopover = ({ page, program_id, tierLevelsUsed, stor
             })
     }
 
-    // TODO: Handle Continue when there are multiple downloaders or uploaders
+    // Handle clicking cancel and closing the popover
+    let handleClose = () => {
+        $('.popover').popover('hide');
+        setStoredView({});
+        setStoredTierLevelsRows([]);
+    }
+
+    // TODO/IN-WORK: Handle Continue when there are multiple downloaders or uploaders
     let handleContinue = () => {
         if (downloadOrUpload === "download") {
             handleDownload();
@@ -321,13 +343,6 @@ export const ImportIndicatorsPopover = ({ page, program_id, tierLevelsUsed, stor
             console.log("Continue Upload");
             // handleUpload();
         }
-    }
-
-    // Handle clicking cancel and closing the popover
-    let handleClose = () => {
-        $('.popover').popover('hide')
-        setStoredView({})
-        setStoredTierLevelsRows([])
     }
 
     // TODO/IN-WORK: Need to determine how to handle continue button for downloading and uploading. Structure and Styles are in place.
@@ -413,15 +428,6 @@ export const ImportIndicatorsPopover = ({ page, program_id, tierLevelsUsed, stor
                                             )
                                         })
                                     }
-                                    {/* {initialViewError.indexOf(5) === -1 &&
-                                        initialViewError.map(message_id => {
-                                            return (
-                                                <div key={message_id} className="import-initial-text-error">
-                                                    { errorMessages[message_id] }
-                                                </div>
-                                            )
-                                        })
-                                    } */}
                                 </div> 
                                 {/* TODO: Update to handle multiply downloaders/uploaders scenarios */}
                                 {displayError.error.indexOf(5) >= 0 ? 
@@ -523,7 +529,9 @@ export const ImportIndicatorsPopover = ({ page, program_id, tierLevelsUsed, stor
                                 <div className="import-confirm-text">
                                     {displayError.view !== CONFIRM ?
                                         <React.Fragment>
-                                            {/* {!confirmViewError && views === CONFIRM ? <div><i className="fas fa-check-circle"/></div> : null} */}
+                                            <React.Fragment>
+                                                {!displayError.view && views === CONFIRM ? <div><i className="fas fa-check-circle"/></div> : null}
+                                            </React.Fragment>
                                             <div>
                                                 {
                                                     // # Translators: The count of indicators that have passed validation and are ready to be imported to complete the process. This cannot be undone after completing.
@@ -537,14 +545,8 @@ export const ImportIndicatorsPopover = ({ page, program_id, tierLevelsUsed, stor
                                         </React.Fragment>
                                         :
                                         <div>
-                                            {/* {
-                                                // # Translators: We could not complete the import indicators process. To find out why the process could not be completed, upload your import template again below.
-                                                gettext("Sorry, we couldn’t complete the import process. To figure out what went wrong, please upload your template again.")
-                                            } */}
                                             {displayError.view === CONFIRM && displayError.error.indexOf(5) === -1 &&
                                                 displayError.error.map(message_id => {
-                                                    console.log(displayError);
-
                                                     return (
                                                         <div key={message_id} className="import-initial-text-error">
                                                             { errorMessages[message_id] }
@@ -569,17 +571,25 @@ export const ImportIndicatorsPopover = ({ page, program_id, tierLevelsUsed, stor
                                         }
                                     </button>
                                     :
-                                    <button
-                                        role="button"
-                                        type="button"
-                                        className="btn btn-sm btn-primary"
-                                        onClick={ () => handleConfirm() }
-                                    >
-                                        {
-                                            // # Translators: Button to confirm and complete the import process
-                                            gettext("Upload Template")
-                                        }
-                                    </button>
+                                    <React.Fragment>
+                                        <button
+                                            role="button"
+                                            type="button"
+                                            className="btn btn-sm btn-primary"
+                                            onClick={ () => uploadClick() }
+                                        >
+                                            {
+                                                // # Translators: Button to confirm and complete the import process
+                                                gettext("Upload Template")
+                                            }
+                                        </button>
+                                        <input
+                                            id="fileUpload"
+                                            type="file"
+                                            style={{ display: "none" }}
+                                            onChange={ (e) => handleUpload(e) }
+                                        />
+                                    </React.Fragment>
 
                                     }
                                     <button

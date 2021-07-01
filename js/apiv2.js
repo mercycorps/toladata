@@ -133,9 +133,8 @@ const api = {
                 return response;
             })
             .catch((error) => {
-                this.logFailure(error)
-                return error.response; // expecting {status: 400, data: {error_code: [100] }};
-                // return {status: 400, data: {error_codes: [110] }};
+                this.logFailure(error);
+                return error.response;
             })
     },
     async uploadTemplate(program_id, file) {
@@ -163,10 +162,8 @@ const api = {
             )
             .then(response => response.data)
             .catch(error => {
-                this.logFailure(error + ' / Error Code: ' + error.response.data.error_codes);
-                // return error.response;
-                // return {status: 400, data: {error_codes: [100, 101]}}; // Used for Errors testing
-                return {status: 200, data: {valid: 5, invalid: 4}}; // Used for Success testing
+                this.logFailure(error);
+                return error.response;
             })
     },
     async downloadFeedback(program_id) {
@@ -182,8 +179,8 @@ const api = {
                 return response;
             })
             .catch((error) => {
-                this.logFailure(error)
-                return error;
+                this.logFailure(error);
+                return error.response;
             })
     },
     async confirmUpload(program_id) {
@@ -204,13 +201,11 @@ const api = {
         //         return {error};
         //     })
 
-        return await this.apiInstance.post(`/1save_bulk_import_data/${program_id}/`)
+        return await this.apiInstance.post(`/save_bulk_import_data/${program_id}/`)
             .then(response => response.data)
             .catch((error) => {
-                this.logFailure(error)
-                // return error.response;
-                return {status: 400, data: {error_codes: [108]}}; // Used for Errors testing
-                // return {status: 200, data: {valid: 5, invalid: 0}}; // Used for Success testing
+                this.logFailure(error);
+                return error.response;
             })    
         },
 };
