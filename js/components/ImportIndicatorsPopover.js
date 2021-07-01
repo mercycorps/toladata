@@ -548,7 +548,7 @@ export const ImportIndicatorsPopover = ({ page, program_id, tierLevelsUsed, stor
                                             {displayError.view === CONFIRM && displayError.error.indexOf(5) === -1 &&
                                                 displayError.error.map(message_id => {
                                                     return (
-                                                        <div key={message_id} className="import-initial-text-error">
+                                                        <div key={message_id} className="import-confirm-text-error">
                                                             { errorMessages[message_id] }
                                                         </div>
                                                     )
