@@ -20,8 +20,8 @@ from tola_management.models import ProgramAuditLog
 from indicators.models import Indicator, Level, LevelTier, BulkIndicatorImportFile
 from indicators.views.bulk_indicator_import_views import (
     COLUMNS, FIRST_USED_COLUMN, DATA_START_ROW, PROGRAM_NAME_ROW, COLUMN_HEADER_ROW,
-    TEMPLATE_SHEET_NAME, HIDDEN_SHEET_NAME, BASE_TEMPLATE_NAME, LEVEL_HEADER_STYLE,
-    EXISTING_INDICATOR_STYLE, UNPROTECTED_NEW_INDICATOR_STYLE, PROTECTED_NEW_INDICATOR_STYLE,
+    HIDDEN_SHEET_NAME, BASE_TEMPLATE_NAME, LEVEL_HEADER_STYLE, EXISTING_INDICATOR_STYLE,
+    UNPROTECTED_NEW_INDICATOR_STYLE, PROTECTED_NEW_INDICATOR_STYLE,
     ERROR_MISMATCHED_PROGRAM,
     ERROR_NO_NEW_INDICATORS,
     ERROR_UNDETERMINED_LEVEL,
@@ -80,7 +80,7 @@ class TestBulkImportTemplateCreation(test.TestCase):
         return expected_numbers
 
     def process_indicator_rows(self, wb, program):
-        ws = wb.get_sheet_by_name(TEMPLATE_SHEET_NAME)
+        ws = wb.worksheets[0]
         counts = {'level_headers': 0, 'existing_indicators': [], 'new_indicators': []}
         level_names = []
         indicator_numbers = []
@@ -147,7 +147,7 @@ class TestBulkImportTemplateCreation(test.TestCase):
         request_params = dict([(tier.name, 10) for tier in LevelTier.objects.filter(program=self.program)])
         response = self.get_template(request_params=request_params)
         wb = openpyxl.load_workbook(response)
-        ws = wb.get_sheet_by_name(TEMPLATE_SHEET_NAME)
+        ws = wb.worksheets[0]
         self.assertEqual(
             ws.cell(self.data_start_row, self.first_used_column).value,
             f'Goal: {self.ordered_levels[0].name}')
@@ -401,19 +401,19 @@ class TestBulkImportTemplateProcessing(test.TestCase):
         self.assertEqual(Indicator.objects.count(), 5)
 
         wb = openpyxl.load_workbook(self.get_template())
-        ws = wb.get_sheet_by_name(TEMPLATE_SHEET_NAME)
+        ws = wb.worksheets[0]
 
         ws.cell(self.program_name_row, self.first_used_column).value = "Wrong program name"
         response = self.post_template(wb)
         self.assertEqual(ProgramAuditLog.objects.count(), 1)
         self.assertEqual(ProgramAuditLog.objects.last().change_type, 'template_uploaded')
-        self.assertEqual(response.status_code, 400)
+        self.assertEqual(response.status_code, 406)
         self.assertEqual(json.loads(response.content)['error_codes'], [ERROR_MISMATCHED_PROGRAM])
         ws.cell(self.program_name_row, self.first_used_column).value = self.program.name
         response = self.post_template(wb)
         self.assertEqual(ProgramAuditLog.objects.count(), 2)
         self.assertEqual(ProgramAuditLog.objects.last().change_type, 'template_uploaded')
-        self.assertEqual(response.status_code, 400)
+        self.assertEqual(response.status_code, 406)
         self.assertEqual(json.loads(response.content)['error_codes'], [ERROR_NO_NEW_INDICATORS])
 
     def test_successful_template_upload(self):
@@ -422,7 +422,7 @@ class TestBulkImportTemplateProcessing(test.TestCase):
         wb = openpyxl.load_workbook(self.get_template())
         existing_goal_indicator_count = Indicator.objects.filter(level__parent=None).count()
         first_blank_goal_row = DATA_START_ROW + existing_goal_indicator_count + 1
-        ws = wb.get_sheet_by_name(TEMPLATE_SHEET_NAME)
+        ws = wb.worksheets[0]
         self.fill_worksheet_row(ws, first_blank_goal_row)
         self.fill_worksheet_row(ws, first_blank_goal_row + 1)
         response = self.post_template(wb)
@@ -452,7 +452,7 @@ class TestBulkImportTemplateProcessing(test.TestCase):
         wb = openpyxl.load_workbook(self.get_template())
         existing_goal_indicator_count = Indicator.objects.filter(level__parent=None).count()
         first_blank_goal_row = DATA_START_ROW + existing_goal_indicator_count + 1
-        ws = wb.get_sheet_by_name(TEMPLATE_SHEET_NAME)
+        ws = wb.worksheets[0]
         self.fill_worksheet_row(ws, first_blank_goal_row, custom_values={
             'name': None, 'direction_of_change': 'bad medicine'})
         self.fill_worksheet_row(ws, first_blank_goal_row + 1, {'name': 'Lorem ipsum ' * 100})
@@ -473,7 +473,7 @@ class TestBulkImportTemplateProcessing(test.TestCase):
         wb = openpyxl.load_workbook(self.get_template())
         existing_goal_indicator_count = Indicator.objects.filter(level__parent=None).count()
         first_blank_goal_row = DATA_START_ROW + existing_goal_indicator_count + 1
-        ws = wb.get_sheet_by_name(TEMPLATE_SHEET_NAME)
+        ws = wb.worksheets[0]
         self.fill_worksheet_row(ws, first_blank_goal_row, custom_values={
             'sector': 'bad sector name'})
         response = self.post_template(wb)
@@ -481,31 +481,47 @@ class TestBulkImportTemplateProcessing(test.TestCase):
         self.assertEqual(response.status_code, 400)
         self.assertEqual(json.loads(response.content)['error_codes'], [ERROR_MALFORMED_INDICATOR])
 
+    def test_non_english_imports(self):
+        self.tola_user.language = 'fr'
+        self.tola_user.save()
+        self.client.force_login(user=self.tola_user.user)
+        w_factories.grant_program_access(self.tola_user, self.program, self.country, role='high')
+        wb = openpyxl.load_workbook(self.get_template())
+        existing_goal_indicator_count = Indicator.objects.filter(level__parent=None).count()
+        first_blank_goal_row = DATA_START_ROW + existing_goal_indicator_count + 1
+        ws = wb.worksheets[0]
+        self.fill_worksheet_row(ws, first_blank_goal_row)
+        response = self.post_template(wb)
+        self.assertEqual(response.status_code, 200)
+        self.assertEqual(json.loads(response.content), {'message': 'success', 'valid': 1, 'invalid': 0})
+        self.tola_user.language = 'en'
+        self.tola_user.save()
+
     def test_fatal_import_errors(self):
         self.client.force_login(user=self.tola_user.user)
         w_factories.grant_program_access(self.tola_user, self.program, self.country, role='high')
         wb = openpyxl.load_workbook(self.get_template())
         existing_goal_indicator_count = Indicator.objects.filter(level__parent=None).count()
         first_blank_goal_row = DATA_START_ROW + existing_goal_indicator_count + 1
-        ws = wb.get_sheet_by_name(TEMPLATE_SHEET_NAME)
+        ws = wb.worksheets[0]
 
         ws.cell(self.program_name_row, self.first_used_column).value = "bad program name"
         response = self.post_template(wb)
         self.assertEqual(ProgramAuditLog.objects.count(), 1)
         self.assertEqual(ProgramAuditLog.objects.last().change_type, 'template_uploaded')
-        self.assertEqual(response.status_code, 400)
+        self.assertEqual(response.status_code, 406)
         self.assertEqual(json.loads(response.content)['error_codes'], [ERROR_MISMATCHED_PROGRAM])
         ws.cell(self.program_name_row, self.first_used_column).value = self.program.name
 
         response = self.post_template(wb)
-        self.assertEqual(response.status_code, 400)
+        self.assertEqual(response.status_code, 406)
         self.assertEqual(json.loads(response.content)['error_codes'], [ERROR_NO_NEW_INDICATORS])
 
         header_cell = ws.cell(COLUMN_HEADER_ROW, self.first_used_column)
         orig_header_value = header_cell.value
         header_cell.value = "bad column header"
         response = self.post_template(wb)
-        self.assertEqual(response.status_code, 400)
+        self.assertEqual(response.status_code, 406)
         self.assertEqual(json.loads(response.content)['error_codes'], [ERROR_MISMATCHED_HEADERS])
         header_cell.value = orig_header_value
 
@@ -514,29 +530,29 @@ class TestBulkImportTemplateProcessing(test.TestCase):
         should_be_indicator.value = 'bad_level_name'
         should_be_indicator.style = LEVEL_HEADER_STYLE
         response = self.post_template(wb)
-        self.assertEqual(response.status_code, 400)
+        self.assertEqual(response.status_code, 406)
         self.assertEqual(json.loads(response.content)['error_codes'], [ERROR_INVALID_LEVEL_HEADER])
         should_be_indicator.style = orig_style
 
         second_level_header = ws.cell(first_blank_goal_row + 11, self.first_used_column)
         second_level_header.value = 'bad_level_name'
         response = self.post_template(wb)
-        self.assertEqual(response.status_code, 400)
+        self.assertEqual(response.status_code, 406)
         self.assertEqual(json.loads(response.content)['error_codes'], [ERROR_MISMATCHED_LEVEL_COUNT])
 
         ws.cell(DATA_START_ROW, FIRST_USED_COLUMN).value = 'bad level name'
         self.fill_worksheet_row(ws, first_blank_goal_row)
         response = self.post_template(wb)
-        self.assertEqual(response.status_code, 400)
+        self.assertEqual(response.status_code, 406)
         self.assertEqual(
-            json.loads(response.content)['error_codes'],[ERROR_UNDETERMINED_LEVEL])
+            json.loads(response.content)['error_codes'],[ERROR_INVALID_LEVEL_HEADER])
 
     # TODO: Write Unit Test to see if this works with a bad sector
     def test_saving_indicators(self):
         self.client.force_login(user=self.tola_user.user)
         w_factories.grant_program_access(self.tola_user, self.program, self.country, role='high')
         wb = openpyxl.load_workbook(self.get_template())
-        ws = wb.get_sheet_by_name(TEMPLATE_SHEET_NAME)
+        ws = wb.worksheets[0]
         ws.cell(PROGRAM_NAME_ROW, FIRST_USED_COLUMN).value = self.program.name
         self.fill_worksheet_row(ws, DATA_START_ROW + 2)
         self.fill_worksheet_row(ws, DATA_START_ROW + 3)
@@ -568,7 +584,7 @@ class TestBulkImportTemplateProcessing(test.TestCase):
         self.client.force_login(user=self.tola_user.user)
         w_factories.grant_program_access(self.tola_user, self.program, self.country, role='high')
         wb = openpyxl.load_workbook(self.get_template())
-        ws = wb.get_sheet_by_name(TEMPLATE_SHEET_NAME)
+        ws = wb.worksheets[0]
         ws.cell(PROGRAM_NAME_ROW, FIRST_USED_COLUMN).value = self.program.name
         self.fill_worksheet_row(ws, DATA_START_ROW + 2, {'name': None})
         self.fill_worksheet_row(ws, DATA_START_ROW + 3)
