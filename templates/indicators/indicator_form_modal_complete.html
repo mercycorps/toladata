@@ -37,7 +37,8 @@
 
     <form
             action="{% url 'indicator_complete' indicator.id %}"
-            id="indicator_complete_form"
+            id="indicator_update_form"
+            data-type="completion"
             class="form-horizontal"
             method="post"
             autocomplete="off"
@@ -51,6 +52,8 @@
             {% for hidden_field in form.hidden_fields %}
                 {{ hidden_field }}
             {% endfor %}
+            <input type="hidden" id="name" name="name" value="{{ form.name.value }}">
+            <input type="hidden" id="level" name="level" value="{{ form.level.value }}">
 
             <ul class="nav nav-tabs" id="indicatorTabs" role="tablist">
                 <li class="nav-item">

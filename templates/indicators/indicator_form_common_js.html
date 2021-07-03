@@ -380,7 +380,7 @@
 
     // Button click handler for UPDATE form
     $("#indicator_modal_content").on("click", "#id_update_indicator_btn", function(e){
-        isCompletionForm = e.target.form.id === 'indicator_complete_form';
+        const isCompletionForm = e.target.form.hasAttribute('data-type') && e.target.form.dataset.type === 'completion';
         if (validateForm({isCompletionForm: isCompletionForm}) === false) {
             showValidations("#modalmessages");
             return;
