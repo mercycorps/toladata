@@ -128,7 +128,6 @@
                             <label for="id_level" class="{% if form.level.field.required %}label--required{% endif %}">{{ form.level.label }}</label>
                             {% popover_helptext form.level.help_text %}
                             {% render_field form.level class+="form-control" %}
-                            <small class="form-text text-muted">{{ form.level.help_text }}</small>
                             <span id="validation_id_level" class="has-error"></span>
                         </div>
                         {% if form.level.field.disabled %}
