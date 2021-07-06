@@ -635,12 +635,15 @@ export const ImportIndicatorsPopover = ({ page, program_id, tierLevelsUsed, stor
                     case ERROR:
                         return (
                             <div className="import-error">
-                                <p className="text-secondary px-1 my-auto">
-                                    {
-                                        // # Translators: Notification for a error that happend on the web server.
-                                        gettext('There was a server-related problem')
-                                    }
-                                </p>
+                                <div className="import-error__text">
+                                    {views === ERROR ? <div><i className="fas fa-exclamation-triangle"/></div> : null}
+                                    <p className="text-secondary px-1 my-auto">
+                                        {
+                                            // # Translators: Notification for a error that happend on the web server.
+                                            gettext('There was a server-related problem.')
+                                        }
+                                    </p>
+                                </div>
                                 <button 
                                     className="btn btn-sm btn-primary" 
                                     onClick={() => setViews(INITIAL) }

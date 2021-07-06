@@ -200,6 +200,18 @@
     justify-content: space-between;
     margin: 0.25rem 1rem 0.75rem;
     height: 100px;
+    
+    &__text {
+        display: flex;
+        justify-content: space-between;
+        margin: 1rem 0;
+        color: inherit;
+
+        & > div > .fa-exclamation-triangle {
+            font-size: larger;
+            color: $yellow;
+        }
+    }
 }
 
 .temp-view {
