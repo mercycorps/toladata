@@ -278,7 +278,7 @@ class BulkImportIndicatorsView(LoginRequiredMixin, UserPassesTestMixin, AccessMi
             dv.errorTitle = gettext('Invalid Entry')
 
         # Adding this validation after the others because the error messages will be different.
-        baseline_validation = DataValidation(type='decimal', operator="greaterThan", formula1=0)
+        baseline_validation = DataValidation(type='decimal', operator="greaterThanOrEqual", formula1=0)
         # Translators: Error message shown to a user when they have entered a value for a numeric field that isn't a number or is negative.
         baseline_validation.error = gettext('Enter a numeric value for the baseline. If a baseline is not yet known or not applicable, enter a zero or type "N/A". The baseline can always be updated at a later point in time.')
         # Translators:  Title of a popup box that informs the user they have entered an invalid value
