@@ -361,7 +361,7 @@ class BulkImportIndicatorsView(LoginRequiredMixin, UserPassesTestMixin, AccessMi
             elif header['field_name'] in ['source', 'justification', 'unit_of_measure', 'rationale_for_target']:
                 ws.column_dimensions[get_column_letter(column_index)].width = 40
             elif header['field_name'] == 'baseline':
-                ws.column_dimensions[get_column_letter(column_index)].width = 30
+                ws.column_dimensions[get_column_letter(column_index)].width = 20
                 header_cell.alignment = Alignment(horizontal='right')
                 # header_cell.number_format = '0.00'
             elif 7 < column_index < 15:
