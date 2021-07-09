@@ -151,7 +151,6 @@ class IndicatorFormMixin:
         else:
             return 'indicators/indicator_form_modal.html'
 
-
     def form_invalid(self, form):
         return JsonResponse(form.errors, status=400)
 
@@ -398,23 +397,29 @@ class IndicatorUpdate(IndicatorFormMixin, UpdateView):
         The header of the form when updating - composed here instead of in the template
         such that it can also be used via AJAX
         """
-        if self.object.results_framework and self.object.auto_number_indicators:
-            if self.object.level_display_ontology:
-                return u'{} {} {}{}'.format(
-                    self.object.leveltier_name,
-                    _('indicator'),
-                    self.object.level_display_ontology,
-                    self.object.level_order_display,
-                )
-            else:
-                return _('Indicator setup')
-        elif self.object.results_framework and self.object.number:
-            return u'{} {}'.format(_('indicator'), self.object.number)
-        elif self.object.results_framework:
-            return _('Indicator setup')
+
+        is_completion_form = True if 'indicator_complete' in self.request.path else False
+        # Translators: a fragment of a larger string that will be a title for a form.  The full string might be e.g. Complete setup of Outcome indicator 1.1a.
+        completion_title_prefix = _('Complete setup of ') if is_completion_form else ''
+        if self.object.auto_number_indicators:
+            indicator_number = self.object.level_order_display
+            ontology = self.object.level_display_ontology
+        else:
+            indicator_number = self.object.number or ''
+            ontology = ''
+
+        if self.object.results_framework:
+            return '{}{} {} {}{}'.format(
+                completion_title_prefix,
+                self.object.leveltier_name,
+                _('indicator'),
+                ontology,
+                indicator_number,
+            )
+
         elif self.object.old_level:
-            return u'{} {}'.format(
-                str(ugettext(self.object.old_level)),
+            return '{} {}'.format(
+                str(_(self.object.old_level)),
                 str(_('indicator')),
             )
         else:
