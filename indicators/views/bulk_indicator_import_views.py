@@ -356,9 +356,9 @@ class BulkImportIndicatorsView(LoginRequiredMixin, UserPassesTestMixin, AccessMi
             elif header['field_name'] == 'sector':
                 col_width = max(len(option) for option in sector_options)
                 ws.column_dimensions[get_column_letter(column_index)].width = col_width
-            elif header['field_name'] in ['definition', 'justification']:
+            elif header['field_name'] == 'definition':
                 ws.column_dimensions[get_column_letter(column_index)].width = 50
-            elif header['field_name'] in ['source', 'unit_of_measure', 'rationale_for_target']:
+            elif header['field_name'] in ['source', 'justification', 'unit_of_measure', 'rationale_for_target']:
                 ws.column_dimensions[get_column_letter(column_index)].width = 40
             elif header['field_name'] == 'baseline':
                 ws.column_dimensions[get_column_letter(column_index)].width = 20
