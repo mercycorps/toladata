@@ -50,8 +50,7 @@ COLUMNS = [
     {'name': gettext('Number (#) or percentage (%)'), 'required': True, 'field_name': 'unit_of_measure_type',
      'validation': VALIDATION_KEY_UOM_TYPE, 'default': 'Number (#)'},
     {'name': 'Rationale for target', 'required': False, 'field_name': 'rationale_for_target'},
-    {'name': 'Baseline', 'required': True, 'field_name': 'baseline',
-     'validation': VALIDATION_KEY_BASELINE},
+    {'name': 'Baseline', 'required': True, 'field_name': 'baseline'},
     {'name': 'Direction of change', 'required': True, 'field_name': 'direction_of_change',
      'validation': VALIDATION_KEY_DIR_CHANGE, 'default': 'Not applicable'},
     {'name': 'Target frequency', 'required': True, 'field_name': 'target_frequency',
@@ -94,6 +93,7 @@ ERROR_INTERVENING_BLANK_ROW = 203  # Indicators are separated by an empty row wo
 ERROR_UNEXPECTED_LEVEL = 204  # The level text in the level column doesn't match the tier name used in the level header
 
 EMPTY_CHOICE = '---------'
+NULL_EQUIVALENTS = ['N/A', 'NA', 'Not applicable']
 
 TITLE_STYLE = 'title_style'
 REQUIRED_HEADER_STYLE = 'required_header_style'
@@ -448,10 +448,27 @@ class BulkImportIndicatorsView(LoginRequiredMixin, UserPassesTestMixin, AccessMi
                         validator = validation_map[column['validation']]
                         validator.add(active_cell)
                     if 'default' in column:
-                        active_cell.value = column['default']
+                        active_cell.value = gettext(column['default'])
                     if column['field_name'] == 'number':
                         active_cell.alignment = Alignment(horizontal='right')
                     if column['field_name'] == 'baseline':
+
+                        # Have to add a separate validation for each cell
+                        cell_coord = active_cell.coordinate
+                        null_check_strings = [f'lower({cell_coord})=lower("{ne}")' for ne in NULL_EQUIVALENTS]
+                        active_language = get_language()
+                        if active_language != 'en':
+                            null_check_strings.extend(
+                                [f'lower({cell_coord})=lower("{gettext(ne)}")' for ne in NULL_EQUIVALENTS])
+                        formula = f'OR(AND(ISNUMBER({cell_coord}), {cell_coord}>=0), {",".join(null_check_strings)})'
+                        validator = DataValidation(type='custom', formula1=formula)
+                        # Translators: Error message shown to a user when they have entered a value for a numeric field that isn't a number or is negative.
+                        validator.error = gettext('Enter a numeric value for the baseline. If a baseline is not yet known or not applicable, enter a zero or type "N/A". The baseline can always be updated at a later point in time.')
+                        # Translators:  Title of a popup box that informs the user they have entered an invalid value
+                        validator.errorTitle = gettext('Invalid Entry')
+                        ws.add_data_validation(validator)
+                        validator.add(active_cell)
+
                         active_cell.alignment = Alignment(horizontal='right')
                         active_cell.number_format = '0.00'
                 current_row_index += 1
@@ -583,13 +600,15 @@ class BulkImportIndicatorsView(LoginRequiredMixin, UserPassesTestMixin, AccessMi
 
                 indicator_data = {}
                 for i, column in enumerate(COLUMNS[1:]):
-                    indicator_data[column['field_name']] = ws.cell(current_row_index, self.first_used_column + i + 1).value
+                    indicator_data[column['field_name']] = \
+                        ws.cell(current_row_index, self.first_used_column + i + 1).value
 
                 validation_errors = {}
-
                 # Use the serializer to check for character length and any other field issues that it handles
                 deserialized_data = BulkImportIndicatorSerializer(data=indicator_data)
                 deserialized_data.is_valid()
+                indicator_data['baseline'] = deserialized_data.data['baseline']
+
                 for field_name, error_list in deserialized_data.errors.items():
                     for error in error_list:
                         if error.code == 'null':
