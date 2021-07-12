@@ -36,7 +36,8 @@ VALIDATION_KEY_BASELINE = 'baseline_validation'
 
 COLUMNS = [
     {'name': 'Level', 'required': True, 'field_name': 'level'},
-    {'name': 'No.', 'required': False, 'field_name': 'number'},
+    {'name': 'No.', 'required': False, 'field_name': 'number',
+     'align': 'right'},
     {'name': 'Indicator', 'required': True, 'field_name': 'name'},
     {'name': 'Sector', 'required': False, 'field_name': 'sector',
      'validation': VALIDATION_KEY_SECTOR},
@@ -47,10 +48,11 @@ COLUMNS = [
     # Note:  this lone string is being translated here because it's not the standard name for the field.
     # Translators:  Column header for the column that specifies whether the data in the row is expressed
     # as a number or a percent
-    {'name': gettext('Number (#) or percentage (%)'), 'required': True, 'field_name': 'unit_of_measure_type',
+    {'name': 'Number (#) or percentage (%)', 'required': True, 'field_name': 'unit_of_measure_type',
      'validation': VALIDATION_KEY_UOM_TYPE, 'default': 'Number (#)'},
     {'name': 'Rationale for target', 'required': False, 'field_name': 'rationale_for_target'},
-    {'name': 'Baseline', 'required': True, 'field_name': 'baseline'},
+    {'name': 'Baseline', 'required': True, 'field_name': 'baseline',
+     'align': 'right'},
     {'name': 'Direction of change', 'required': True, 'field_name': 'direction_of_change',
      'validation': VALIDATION_KEY_DIR_CHANGE, 'default': 'Not applicable'},
     {'name': 'Target frequency', 'required': True, 'field_name': 'target_frequency',
@@ -87,6 +89,7 @@ ERROR_MISMATCHED_LEVEL_COUNT = 106  # The number of level header rows doesn't ma
 ERROR_MISMATCHED_HEADERS = 107  # The column headers don't match the standard template headers
 ERROR_SAVE_VALIDATION = 108  # This could happen if e.g. someone adds an indicator
 ERROR_INVALID_LEVEL_HEADER = 109  # When the level header doesn't contain an identifiable level
+ERROR_MULTIPLE_FEEDBACK_TEMPLATES = 110  # When there are multiple entries for the feedback template, usually happens if there's an error in a prior upload attempt
 ERROR_MALFORMED_INDICATOR = 201  # A catch-all for problems with an indicator that don't fall into other non-fatal categories
 ERROR_UNEXPECTED_INDICATOR_NUMBER = 202  # The indicator number is not sequential in auto-numbered programs
 ERROR_INTERVENING_BLANK_ROW = 203  # Indicators are separated by an empty row would cause the indicator numbers to be wrong for auto-numbered programs
@@ -102,7 +105,6 @@ LEVEL_HEADER_STYLE = 'level_header_style'
 EXISTING_INDICATOR_STYLE = 'existing_indicator_style'
 UNPROTECTED_NEW_INDICATOR_STYLE = 'unprotected_new_indicator_style'
 PROTECTED_NEW_INDICATOR_STYLE = 'protected_new_indicator_style'
-UNPROTECTED_ERROR_STYLE = 'unprotected_indicator_error_style'
 
 logger = logging.getLogger('__name__')
 
@@ -139,7 +141,7 @@ class BulkImportIndicatorsView(LoginRequiredMixin, UserPassesTestMixin, AccessMi
     GRAY_LIGHTEST = 'FFF5F5F5'
     GRAY_LIGHTER = 'FFDBDCDE'
     GRAY_DARK = 'FF54585A'
-    RED_ERROR = '88ED8090'
+    RED_ERROR = '66FFE3E7'
 
     default_border = Side(border_style='thin', color=GRAY_LIGHTER)
 
@@ -183,12 +185,6 @@ class BulkImportIndicatorsView(LoginRequiredMixin, UserPassesTestMixin, AccessMi
     protected_new_indicator_style.font = Font(name='Calibri', size=11)
     protected_new_indicator_style.alignment = Alignment(vertical='top', wrap_text=True)
     protected_new_indicator_style.protection = Protection(locked=True)
-
-    unprotected_error_style = NamedStyle(UNPROTECTED_ERROR_STYLE)
-    unprotected_error_style.fill = PatternFill('solid', fgColor=RED_ERROR)
-    unprotected_error_style.font = Font(name='Calibri', size=11)
-    unprotected_error_style.alignment = Alignment(vertical='top', wrap_text=True)
-    unprotected_error_style.protection = Protection(locked=False)
 
     def test_func(self):
         program_id = self.request.resolver_match.kwargs.get('program_id')
@@ -300,7 +296,6 @@ class BulkImportIndicatorsView(LoginRequiredMixin, UserPassesTestMixin, AccessMi
         wb.add_named_style(self.existing_indicator_style)
         wb.add_named_style(self.unprotected_new_indicator_style)
         wb.add_named_style(self.protected_new_indicator_style)
-        wb.add_named_style(self.unprotected_error_style)
         wb.add_named_style(self.optional_header_style)
         wb.add_named_style(self.required_header_style)
 
@@ -323,47 +318,47 @@ class BulkImportIndicatorsView(LoginRequiredMixin, UserPassesTestMixin, AccessMi
         ws.cell(5, self.first_used_column).value = gettext("Enter indicators")
 
         # Output column header row
-        for i, header in enumerate(COLUMNS):
+        for i, col in enumerate(COLUMNS):
             column_index = i+2
             header_cell = ws.cell(6, column_index)
-            if header['required']:
-                header_cell.value = gettext(header['name']) + "*"
+            if col['required']:
+                header_cell.value = gettext(col['name']) + "*"
                 header_cell.style = REQUIRED_HEADER_STYLE
             else:
-                header_cell.value = gettext(header['name'])
+                header_cell.value = gettext(col['name'])
                 header_cell.style = OPTIONAL_HEADER_STYLE
 
             # Add notes to header row cells
-            if header['field_name'] != 'comments':
-                if header['field_name'] == 'number' and program.auto_number_indicators:
+            if col['field_name'] != 'comments':
+                if col['field_name'] == 'number' and program.auto_number_indicators:
                     # Translators: This is help text for a form field that gets filled in automatically
                     help_text = gettext('This number is automatically generated through the results framework.')
-                elif header['field_name'] == 'baseline':
+                elif col['field_name'] == 'baseline':
                     # Translators: This is help text for a form field
                     help_text = gettext('Enter a numeric value for the baseline. If a baseline is not yet known '
                                         'or not applicable, enter a zero or type "N/A". The baseline can always '
                                         'be updated at a later point in time.')
                 else:
-                    help_text = Indicator._meta.get_field(header['field_name']).help_text
+                    help_text = Indicator._meta.get_field(col['field_name']).help_text
                 comment = Comment(help_text, '')
                 comment.width = 300
                 comment.height = 15 + len(help_text) * .5
                 header_cell.comment = comment
 
-            # Add other column-specific styling
-            if header['field_name'] == 'number':
+            # Apply specified alignment
+            if 'align' in col.keys():
                 header_cell.alignment = Alignment(horizontal='right')
-            elif header['field_name'] == 'sector':
+
+            # Add other column-specific styling
+            if col['field_name'] == 'sector':
                 col_width = max(len(option) for option in sector_options)
                 ws.column_dimensions[get_column_letter(column_index)].width = col_width
-            elif header['field_name'] == 'definition':
+            elif col['field_name'] == 'definition':
                 ws.column_dimensions[get_column_letter(column_index)].width = 50
-            elif header['field_name'] in ['source', 'justification', 'unit_of_measure', 'rationale_for_target']:
+            elif col['field_name'] in ['source', 'justification', 'unit_of_measure', 'rationale_for_target']:
                 ws.column_dimensions[get_column_letter(column_index)].width = 40
-            elif header['field_name'] == 'baseline':
+            elif col['field_name'] == 'baseline':
                 ws.column_dimensions[get_column_letter(column_index)].width = 20
-                header_cell.alignment = Alignment(horizontal='right')
-                # header_cell.number_format = '0.00'
             elif 7 < column_index < 15:
                 col_width = len(header_cell.value)
                 ws.column_dimensions[get_column_letter(column_index)].width = col_width
@@ -420,10 +415,9 @@ class BulkImportIndicatorsView(LoginRequiredMixin, UserPassesTestMixin, AccessMi
                         # to a string results in a cell value of "None" rather than an empty cell.
                         active_cell.value = raw_value if raw_value is None else str(raw_value)
                     active_cell.style = EXISTING_INDICATOR_STYLE
-                    if column['field_name'] == 'number':
+                    if 'align' in column.keys():
                         active_cell.alignment = Alignment(horizontal='right')
                     if column['field_name'] == 'baseline':
-                        active_cell.alignment = Alignment(horizontal='right')
                         active_cell.number_format = '0.00'
                     current_column_index += 1
                 current_row_index += 1
@@ -542,7 +536,7 @@ class BulkImportIndicatorsView(LoginRequiredMixin, UserPassesTestMixin, AccessMi
             pattern = r'^([^:]+)'
             level_finder = re.compile(pattern)
             ws_level_count = 0
-            passed_blank_row = False
+            passed_blank_rows = 0
 
             for current_row_index in range(self.data_start_row, ws.max_row):
                 first_cell = ws.cell(current_row_index, self.first_used_column)
@@ -560,7 +554,7 @@ class BulkImportIndicatorsView(LoginRequiredMixin, UserPassesTestMixin, AccessMi
                             current_tier = tier_matches.group(1).strip()
                         letter_gen = indicator_letter_generator()
                         ws_level_count += 1
-                        passed_blank_row = False
+                        passed_blank_rows = 0
                         continue
 
                 # Getting to this point without a parsed level header means something has gone wrong
@@ -572,30 +566,36 @@ class BulkImportIndicatorsView(LoginRequiredMixin, UserPassesTestMixin, AccessMi
                     next(letter_gen)
                     continue
 
+                # Remove existing error highlighting, in case they've upload a feedback template
+                for c in range(len(COLUMNS)):
+                    ws.cell(current_row_index, self.first_used_column + c).fill = PatternFill(fill_type=None)
+
                 # Skip blank rows but if there was an intervening blank row, give it error highlighting
                 if blank_type := self._row_is_blank_or_spacer(ws, current_row_index, program):
                     if blank_type == 'blank':
                         next(letter_gen)
-                    passed_blank_row = True
+                        passed_blank_rows += 1
                     continue
-                elif passed_blank_row:
+                elif passed_blank_rows > 0:
                     non_fatal_errors.append(ERROR_INTERVENING_BLANK_ROW)
-                    for c in range(len(COLUMNS)):
-                        ws.cell(current_row_index - 1, self.first_used_column + c).style = UNPROTECTED_ERROR_STYLE
-                    passed_blank_row = False
+                    for passed_row_index in range(passed_blank_rows):
+                        for c in range(len(COLUMNS)):
+                            ws.cell(current_row_index - (1 + passed_row_index), self.first_used_column + c).fill = \
+                                PatternFill('solid', fgColor=self.RED_ERROR)
+                        passed_blank_rows = 0
 
                 # Check if auto-numbered indicator numbers match what's expected
                 number_cell = ws.cell(current_row_index, self.first_used_column + 1)
                 if program.auto_number_indicators and number_cell.value is not None:
                     expected_ind_number = f'{current_level.display_ontology}{next(letter_gen)}'
                     if number_cell.value != expected_ind_number:
-                        number_cell.style = UNPROTECTED_ERROR_STYLE
+                        number_cell.fill = PatternFill('solid', fgColor=self.RED_ERROR)
                         non_fatal_errors.append(ERROR_UNEXPECTED_INDICATOR_NUMBER)
 
                 # Check if the value of the Level column matches the one used in the level header
                 level_cell = ws.cell(current_row_index, FIRST_USED_COLUMN)
                 if level_cell.value != current_tier:
-                    level_cell.style = UNPROTECTED_ERROR_STYLE
+                    level_cell.fill = PatternFill('solid', fgColor=self.RED_ERROR)
                     non_fatal_errors.append(ERROR_UNEXPECTED_LEVEL)
 
                 indicator_data = {}
@@ -709,12 +709,13 @@ class BulkImportIndicatorsView(LoginRequiredMixin, UserPassesTestMixin, AccessMi
         if indicator_status['invalid'] > 0 or len(non_fatal_errors) > 0:
             # Clean out any existing temp Excel file reference, since we're about to replace it
             try:
-                old_file_obj = BulkIndicatorImportFile.objects.get(
+                old_file_objs = BulkIndicatorImportFile.objects.filter(
                     user=request.user.tola_user,
                     program=program,
-                    file_type=BulkIndicatorImportFile.INDICATOR_DATA_TYPE)
-                os.remove(old_file_obj.file_path)
-                old_file_obj.delete()
+                    file_type=BulkIndicatorImportFile.INDICATOR_TEMPLATE_TYPE)
+                for old_file_obj in old_file_objs:
+                    os.remove(old_file_obj.file_path)
+                    old_file_obj.delete()
             except BulkIndicatorImportFile.DoesNotExist:
                 pass
 
@@ -793,6 +794,14 @@ def get_feedback_bulk_import_template(request, *args, **kwargs):
             file_type=BulkIndicatorImportFile.INDICATOR_TEMPLATE_TYPE)
     except BulkIndicatorImportFile.DoesNotExist:
         return JsonResponse({'error_codes': [ERROR_TEMPLATE_NOT_FOUND]}, status=400)
+    except BulkIndicatorImportFile.MultipleObjectsReturned:
+        file_entries = BulkIndicatorImportFile.objects.filter(
+            user=request.user.tola_user,
+            program_id=kwargs['program_id'],
+            file_type=BulkIndicatorImportFile.INDICATOR_TEMPLATE_TYPE)
+        file_entries.delete()
+        return JsonResponse({'error_codes': [ERROR_MULTIPLE_FEEDBACK_TEMPLATES]}, status=400)
+
 
     with open(file_entry.file_path, 'rb') as fh:
         template_file = fh.read()
