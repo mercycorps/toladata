@@ -47,7 +47,7 @@ class BulkImportIndicatorSerializer(serializers.ModelSerializer):
             'information_use',
             'quality_assurance',
             'data_issues',
-            'comments'
+            'comments',
         ]
 
     # These methods are testing for what type of object is being passed so the same serializer can be used
@@ -126,7 +126,7 @@ class BulkImportSerializer(serializers.ModelSerializer):
     ontology = serializers.SerializerMethodField()
     display_ontology = serializers.SerializerMethodField()
     level_name = serializers.CharField(source='name')
-    indicator_set = BulkImportIndicatorSerializer(many=True)
+    indicator_set = serializers.SerializerMethodField()
 
     class Meta:
         model = Level
@@ -151,3 +151,8 @@ class BulkImportSerializer(serializers.ModelSerializer):
     @staticmethod
     def get_display_ontology(obj):
         return obj.display_ontology
+
+    @staticmethod
+    def get_indicator_set(obj):
+        indicators = obj.indicator_set.all().order_by('level_order')
+        return BulkImportIndicatorSerializer(indicators, many=True).data
