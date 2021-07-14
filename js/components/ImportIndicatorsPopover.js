@@ -19,7 +19,7 @@ export class ImportIndicatorsButton extends React.Component {
         this.state = {
             inactiveTimer: null,
             tierLevelsUsed: [],
-            storedView: {}, // Store the current popover view, valid, and/or invalid rows to reopen where left off if closed
+            storedView: {view: 0}, // Store the current popover view, valid, and/or invalid rows to reopen where left off if closed
             storedTierLevelsRows: [], // Store the popover's desired tier level row counts to reopen where left off if closed
         }
     }
@@ -61,7 +61,7 @@ export class ImportIndicatorsButton extends React.Component {
             this.setState({
                 inactiveTimer: setTimeout(() => {
                     this.setState({
-                        storedView: {},
+                        storedView: {view: 0},
                         storedTierLevelsRows: [],
                     })
                 }, 60000)
@@ -86,11 +86,11 @@ export class ImportIndicatorsButton extends React.Component {
             storedTierLevelsRows: updatedTierLevelsRow
         })
     }
-    componentDidUpdate(prevProps) {
+    componentDidUpdate(prevProps, ) {
         // If the user changes the RF template(tier levels), empty the stored states
         if (this.props.levelTiers !== prevProps.levelTiers) {
             this.setState({
-                storedView: {},
+                storedView: {view: 0},
                 storedTierLevelsRows: [],
             })
         }
@@ -112,15 +112,15 @@ export class ImportIndicatorsButton extends React.Component {
         })
 
         return (
-                <ImportIndicatorsPopover 
-                    page={ this.props.page } 
-                    program_id={ this.props.program_id } 
-                    tierLevelsUsed={ tierLevelsUsed } 
-                    storedView={ this.state.storedView }
-                    setStoredView={ this.setStoredView }
-                    storedTierLevelsRows={ this.state.storedTierLevelsRows }
-                    setStoredTierLevelsRows={ this.setStoredTierLevelsRows }
-                />
+            <ImportIndicatorsPopover 
+                page={ this.props.page } 
+                program_id={ this.props.program_id } 
+                tierLevelsUsed={ tierLevelsUsed } 
+                storedView={ this.state.storedView }
+                setStoredView={ this.setStoredView }
+                storedTierLevelsRows={ this.state.storedTierLevelsRows }
+                setStoredTierLevelsRows={ this.setStoredTierLevelsRows }
+            />
         );
     }
 
@@ -167,7 +167,7 @@ export const ImportIndicatorsPopover = ({ page, program_id, tierLevelsUsed, stor
 
     let defaultTierLevelRows = [];
     useEffect(() => {
-        storedView.view ? setViews(storedView.view) : null;
+        storedView.view !== 0 ? setViews(storedView.view) : null;
         storedView.valid ? setvalidIndicatorsCount(storedView.valid) : null;
         storedView.invalid ? setInvalidIndicatorsCount(storedView.invalid) : null;
 
@@ -238,12 +238,12 @@ export const ImportIndicatorsPopover = ({ page, program_id, tierLevelsUsed, stor
                         if (response.status === 404) {
                             setViews(ERROR);
                         } else {
-                            setvalidIndicatorsCount(response.data.valid || 0);
-                            setInvalidIndicatorsCount(response.data.invalid || 0);
+                            setvalidIndicatorsCount(response.data ? response.data.valid : 0);
+                            setInvalidIndicatorsCount(response.data ? response.data.invalid : 0);
                             // Successful upload with no errors and all rows valid
                             if (response.status === 200) { 
-                                setViews(CONFIRM);
                                 setStoredView({view: CONFIRM, valid: response.data.valid});
+                                setViews(CONFIRM);
                             // Unsuccessful upload with fatal errors
                             } else if ( response.status === 406 ) { 
                                 let errorsMessagesToDisplay = reduceErrorCodes(response.data.error_codes)
@@ -254,9 +254,9 @@ export const ImportIndicatorsPopover = ({ page, program_id, tierLevelsUsed, stor
                                     setViews(ERROR);
                                 }
                             // Unsuccessful upload with errors and/or invalid rows
-                            } else if (response.status.toString().slice(0, 1) === "4") { 
-                                setViews(FEEDBACK);
+                            } else if (response.status.toString().slice(0, 1) === "4") {
                                 setStoredView({view: FEEDBACK, valid: response.data.valid, invalid: response.data.invalid});
+                                setViews(FEEDBACK);
                             // Handles any other error/problem
                             } else {
                                 setViews(ERROR); 
@@ -504,9 +504,8 @@ export const ImportIndicatorsPopover = ({ page, program_id, tierLevelsUsed, stor
                                     }
                                 </div>
                                 <div className="import-feedback-download">
-                                    <a
+                                    <span
                                         role="button"
-                                        href="#"
                                         onClick={ () => handleFeedback() }
                                     >
 
@@ -514,7 +513,7 @@ export const ImportIndicatorsPopover = ({ page, program_id, tierLevelsUsed, stor
                                                 // # Translators: Download an excel template with errors that need fixing highlighted
                                                 gettext("Download a copy of your template with errors highlighted")
                                             }
-                                    </a>
+                                    </span>
                                     {
                                         // # Translators: Fix the errors from the feedback file and upload the excel template again.
                                         gettext(", fix the errors, and upload again.")
@@ -636,7 +635,9 @@ export const ImportIndicatorsPopover = ({ page, program_id, tierLevelsUsed, stor
                         return (
                             <div className="import-error">
                                 <div className="import-error__text">
-                                    {views === ERROR ? <div><i className="fas fa-exclamation-triangle"/></div> : null}
+                                    <React.Fragment>
+                                        {views === ERROR ? <div><i className="fas fa-exclamation-triangle server-error"/></div> : null}
+                                    </React.Fragment>
                                     <p className="text-secondary px-1 my-auto">
                                         {
                                             // # Translators: Notification for a error that happend on the web server.
@@ -646,7 +647,7 @@ export const ImportIndicatorsPopover = ({ page, program_id, tierLevelsUsed, stor
                                 </div>
                                 <button 
                                     className="btn btn-sm btn-primary" 
-                                    onClick={() => setViews(INITIAL) }
+                                    onClick={() => setViews(storedView.view ? storedView.view : INITIAL)}
                                 >
                                     {
                                         // # Translators: A button to try import over after a error occurred.
