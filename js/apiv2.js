@@ -160,9 +160,11 @@ const api = {
         return await this.apiSession.post(`/indicators/api/bulk_import_indicators/${program_id}/`,
                 formData, {headers: {'Content-Type': 'multipart/form-data'}}
             )
-            .then(response => response.data)
+            .then(response => response)
             .catch(error => {
+                console.log({error});
                 this.logFailure(error);
+                // return {status: 400, data: {valid: 0, invalid: 1, error_codes: [101]}}
                 return error.response;
             })
     },
@@ -180,7 +182,8 @@ const api = {
             })
             .catch((error) => {
                 this.logFailure(error);
-                return error.response;
+                return {status: 500};
+                // return error.response;
             })
     },
     async confirmUpload(program_id) {

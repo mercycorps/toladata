@@ -164,6 +164,7 @@ export const ImportIndicatorsPopover = ({ page, program_id, tierLevelsUsed, stor
     const [tierLevelsRows, setTierLevelsRows] = useState([]); // State to hold the tier levels name and the desired number of rows for the excel template
     const [displayError, setDisplayError] = useState({view: null, error: []}); // ie {view: INITIAL, error: []}
     const [downloadOrUpload, setDownloadOrUpload] = useState(null);
+    const [prevView, setPrevView] = useState({view: 0, valid: 0, invalid: 0});
 
     let defaultTierLevelRows = [];
     useEffect(() => {
@@ -256,6 +257,7 @@ export const ImportIndicatorsPopover = ({ page, program_id, tierLevelsUsed, stor
                             // Unsuccessful upload with errors and/or invalid rows
                             } else if (response.status.toString().slice(0, 1) === "4") {
                                 setStoredView({view: FEEDBACK, valid: response.data.valid, invalid: response.data.invalid});
+                                setPrevView({view: FEEDBACK, valid: response.data.valid, invalid: response.data.invalid});
                                 setViews(FEEDBACK);
                             // Handles any other error/problem
                             } else {
@@ -647,7 +649,8 @@ export const ImportIndicatorsPopover = ({ page, program_id, tierLevelsUsed, stor
                                 </div>
                                 <button 
                                     className="btn btn-sm btn-primary" 
-                                    onClick={() => setViews(storedView.view ? storedView.view : INITIAL)}
+                                    onClick={() => setViews(prevView.view)}
+                                    // onClick={() => setViews(storedView.view ? storedView.view : INITIAL)}
                                 >
                                     {
                                         // # Translators: A button to try import over after a error occurred.
