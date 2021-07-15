@@ -133,9 +133,8 @@ const api = {
                 return response;
             })
             .catch((error) => {
-                this.logFailure(error)
-                return error; // expecting {error_code: 100};
-                // return {error_code: 106};
+                this.logFailure(error);
+                return error.response;
             })
     },
     async uploadTemplate(program_id, file) {
@@ -161,12 +160,10 @@ const api = {
         return await this.apiSession.post(`/indicators/api/bulk_import_indicators/${program_id}/`,
                 formData, {headers: {'Content-Type': 'multipart/form-data'}}
             )
-            .then(response => response.data)
+            .then(response => response)
             .catch(error => {
                 this.logFailure(error);
                 return error.response;
-                // return {status: 400, data: {error_codes: [100, 101]}}; // Used for Errors testing
-                // return {status: 200, data: {valid: 5, invalid: 2}}; // Used for Success testing
             })
     },
     async downloadFeedback(program_id) {
@@ -182,8 +179,8 @@ const api = {
                 return response;
             })
             .catch((error) => {
-                this.logFailure(error)
-                return error;
+                this.logFailure(error);
+                return error.response;
             })
     },
     async confirmUpload(program_id) {
@@ -205,9 +202,12 @@ const api = {
         //     })
 
         return await this.apiInstance.post(`/save_bulk_import_data/${program_id}/`)
-            .then(response => response.data)
-            .catch(this.logFailure);
-    },
+            .then(response => response)
+            .catch((error) => {
+                this.logFailure(error);
+                return error.response;
+            })    
+        },
 };
 
 

@@ -7,7 +7,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: \n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2021-06-25 15:42-0700\n"
+"POT-Creation-Date: 2021-07-14 23:20-0700\n"
 "PO-Revision-Date: 2021-04-05 14:19-0700\n"
 "Last-Translator: \n"
 "Language-Team: \n"
@@ -1539,34 +1539,36 @@ msgstr ""
 msgid "Help"
 msgstr "Ayuda"
 
-#. Translators:  Column header for the column that specifies whether the data in the row is expressed
-#. as a number or a percent
-#: indicators/views/bulk_indicator_import_views.py:49
-msgid "Number (#) or percentage (%)"
-msgstr "ÁTranslated Number (#) or percentage (%)"
+#. Translators: Error message shown to a user when they have entered a value for a numeric field that isn't a number or is negative.
+#. Translators: This is help text for a form field
+#: indicators/views/bulk_indicator_import_views.py:149
+#: indicators/views/bulk_indicator_import_views.py:367
+msgid ""
+"Enter a numeric value for the baseline. If a baseline is not yet known or "
+"not applicable, enter a zero or type \"N/A\". The baseline can always be "
+"updated at a later point in time."
+msgstr ""
+"ÁTranslated Enter a numeric value for the baseline. If a baseline is not yet "
+"known or not applicable, enter a zero or type \"N/A\". The baseline can "
+"always be updated at a later point in time."
 
 #. Translators: Error message shown to a user when they have entered a value that is not in a list of approved values
-#: indicators/views/bulk_indicator_import_views.py:273
+#: indicators/views/bulk_indicator_import_views.py:236
 msgid "Your entry is not in the list"
 msgstr "ÁTranslated Your entry is not in the list"
 
 #. Translators:  Title of a popup box that informs the user they have entered an invalid value
-#: indicators/views/bulk_indicator_import_views.py:275
-#: indicators/views/bulk_indicator_import_views.py:282
+#: indicators/views/bulk_indicator_import_views.py:238
+#: indicators/views/bulk_indicator_import_views.py:272
 msgid "Invalid Entry"
 msgstr "éTranslated Invalid Entry"
 
-#. Translators: Error message shown to a user when they have entered a value for a numeric field that isn't a number.
-#: indicators/views/bulk_indicator_import_views.py:280
-msgid "Please enter a number"
-msgstr "ÁTranslated Please enter a number"
-
 #. Translators: Heading placed in the cell of a spreadsheet that allows users to upload Indicators in bulk
-#: indicators/views/bulk_indicator_import_views.py:306
+#: indicators/views/bulk_indicator_import_views.py:333
 msgid "Import indicators"
 msgstr "Translated Import indicators"
 
-#: indicators/views/bulk_indicator_import_views.py:311
+#: indicators/views/bulk_indicator_import_views.py:338
 msgid ""
 "INSTRUCTIONS\n"
 "1. Indicator rows are provided for each result level. You can delete "
@@ -1589,49 +1591,41 @@ msgstr ""
 "program page."
 
 #. Translators: Section header of an Excel template that allows users to upload Indicators.  This section is where users will add their own information.
-#: indicators/views/bulk_indicator_import_views.py:320
+#: indicators/views/bulk_indicator_import_views.py:347
 msgid "Enter indicators"
 msgstr "Translated Enter indicators"
 
 #. Translators: This is help text for a form field that gets filled in automatically
-#: indicators/views/bulk_indicator_import_views.py:337
+#: indicators/views/bulk_indicator_import_views.py:364
 msgid "This number is automatically generated through the results framework."
 msgstr ""
 "ŹTranslated This number is automatically generated through the results "
 "framework."
 
-#. Translators: This is help text for a form field
-#: indicators/views/bulk_indicator_import_views.py:340
-msgid ""
-"Enter a numeric value for the baseline. If a baseline is not yet known or "
-"not applicable, enter a zero or type \"N/A\". The baseline can always be "
-"updated at a later point in time."
-msgstr ""
-"ÁTranslated Enter a numeric value for the baseline. If a baseline is not yet "
-"known or not applicable, enter a zero or type \"N/A\". The baseline can "
-"always be updated at a later point in time."
-
 #. Translators: Message provided to user when they have failed to enter a required field on a form.
-#. Translators: On a form, displayed when the user clicks submit without filling out a required field
-#: indicators/views/bulk_indicator_import_views.py:447
-#: templates/indicators/indicator_form_common_js.html:984
-msgid "Please complete this field"
-msgstr "Por favor complete este campo"
+#: indicators/views/bulk_indicator_import_views.py:486
+#, fuzzy
+#| msgid "Reason for change is required."
+msgid "This information is required."
+msgstr "Se requiere justificación para el cambio."
 
 #. Translators: Message provided to user when they have not chosen from a pre-selected list of options.
-#: indicators/views/bulk_indicator_import_views.py:449
-msgid "Please choose from one of the options in the dropdown menu"
-msgstr "ÁTranslated Please choose from one of the options in the dropdown menu"
-
-#. Translators: Error message provided when user has exceeded the character limit on a form
-#: indicators/views/bulk_indicator_import_views.py:562
-msgid "This field should have no more than {matches.group(1)} characters."
+#: indicators/views/bulk_indicator_import_views.py:488
+#, python-brace-format
+msgid ""
+"The {field_name} you selected is unavailable. Please select a different "
+"{field_name}."
 msgstr ""
-"éTranslated This field should have no more than {matches.group(1)} "
-"characters."
 
 #. Translators: Error message provided when user has exceeded the character limit on a form
-#: indicators/views/bulk_indicator_import_views.py:568
+#: indicators/views/bulk_indicator_import_views.py:648
+#, fuzzy
+#| msgid "Please enter fewer than %%s characters."
+msgid "Please enter {matches.group(1)} or fewer characters."
+msgstr "Por favor, introduzca menos de %%s caracteres."
+
+#. Translators: Error message provided when user has exceeded the character limit on a form
+#: indicators/views/bulk_indicator_import_views.py:654
 msgid "You have exceeded the character limit of this field"
 msgstr "Translated You have exceeded the character limit of this field"
 
@@ -2452,6 +2446,11 @@ msgstr "El objetivo de Vida del Programa (LoP) no puede ser cero."
 msgid "Please enter a target."
 msgstr "Por favor, introduzca un objetivo."
 
+#. Translators: On a form, displayed when the user clicks submit without filling out a required field
+#: templates/indicators/indicator_form_common_js.html:984
+msgid "Please complete this field"
+msgstr "Por favor complete este campo"
+
 #: templates/indicators/indicator_form_common_js.html:1113
 msgid ""
 "The Life of Program (LoP) target cannot be zero.  Please update targets."
@@ -2504,36 +2503,36 @@ msgstr "Resumen"
 msgid "Performance"
 msgstr "Rendimiento"
 
-#: templates/indicators/indicator_form_modal.html:159
+#: templates/indicators/indicator_form_modal.html:158
 msgid "Delete this indicator"
 msgstr "Eliminar este indicador"
 
 #. Translators: button label to save the item and then close a modal
-#: templates/indicators/indicator_form_modal.html:400
-#: templates/indicators/indicator_form_modal.html:407
+#: templates/indicators/indicator_form_modal.html:399
+#: templates/indicators/indicator_form_modal.html:406
 #: templates/indicators/result_form_modal.html:162
 #: templates/indicators/result_form_modal.html:164
 msgid "Save and close"
 msgstr "Guardar y cerrar"
 
 #. Translators: close a modal throwing away any changes to the form
-#: templates/indicators/indicator_form_modal.html:401
-#: templates/indicators/indicator_form_modal.html:414
+#: templates/indicators/indicator_form_modal.html:400
+#: templates/indicators/indicator_form_modal.html:413
 #: templates/indicators/result_form_modal.html:167 tola/forms.py:27
 msgid "Cancel"
 msgstr "Cancelar"
 
 #. Translators: button label to save the form and be redirected to a blank for to add another item
-#: templates/indicators/indicator_form_modal.html:411
+#: templates/indicators/indicator_form_modal.html:410
 #: templates/indicators/result_form_modal.html:165
 msgid "Save and add another"
 msgstr "Guardar y agregar otro"
 
-#: templates/indicators/indicator_form_modal.html:497
+#: templates/indicators/indicator_form_modal.html:496
 msgid "selected"
 msgstr "seleccionado"
 
-#: templates/indicators/indicator_form_modal.html:498
+#: templates/indicators/indicator_form_modal.html:497
 msgid "None selected"
 msgstr "Ninguno/a seleccionado/a"
 
@@ -5049,6 +5048,21 @@ msgstr "Encontrar"
 #: workflow/widgets.py:133
 msgid "City, Country:"
 msgstr "Ciudad, País:"
+
+#~ msgid "Number (#) or percentage (%)"
+#~ msgstr "ÁTranslated Number (#) or percentage (%)"
+
+#~ msgid "Please enter a number"
+#~ msgstr "ÁTranslated Please enter a number"
+
+#~ msgid "Please choose from one of the options in the dropdown menu"
+#~ msgstr ""
+#~ "ÁTranslated Please choose from one of the options in the dropdown menu"
+
+#~ msgid "This field should have no more than {matches.group(1)} characters."
+#~ msgstr ""
+#~ "éTranslated This field should have no more than {matches.group(1)} "
+#~ "characters."
 
 #~ msgid "Result levels must have unique names."
 #~ msgstr "Los niveles de resultados deben tener nombres únicos."

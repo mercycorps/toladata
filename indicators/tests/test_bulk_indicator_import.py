@@ -21,9 +21,10 @@ from indicators.models import Indicator, Level, LevelTier, BulkIndicatorImportFi
 from indicators.views.bulk_indicator_import_views import (
     COLUMNS, COLUMNS_FIELD_INDEXES, FIRST_USED_COLUMN, DATA_START_ROW, PROGRAM_NAME_ROW, COLUMN_HEADER_ROW,
     HIDDEN_SHEET_NAME, BASE_TEMPLATE_NAME, LEVEL_HEADER_STYLE, EXISTING_INDICATOR_STYLE,
-    UNPROTECTED_NEW_INDICATOR_STYLE, PROTECTED_NEW_INDICATOR_STYLE, UNPROTECTED_ERROR_STYLE,
+    UNPROTECTED_NEW_INDICATOR_STYLE, PROTECTED_NEW_INDICATOR_STYLE,
     ERROR_MISMATCHED_PROGRAM,
     ERROR_NO_NEW_INDICATORS,
+    ERROR_UNDETERMINED_LEVEL,
     ERROR_TEMPLATE_NOT_FOUND,
     ERROR_MISMATCHED_TIERS,
     ERROR_INDICATOR_DATA_NOT_FOUND,
@@ -455,19 +456,15 @@ class TestBulkImportTemplateProcessing(test.TestCase):
         self.fill_worksheet_row(ws, first_blank_goal_row, custom_values={
             'name': None, 'direction_of_change': 'bad medicine'})
         self.fill_worksheet_row(ws, first_blank_goal_row + 1, {'name': 'Lorem ipsum ' * 100})
-        self.fill_worksheet_row(ws, first_blank_goal_row + 2, {'number': 'bad number'})
-        self.fill_worksheet_row(ws, first_blank_goal_row + 3, {'level': 'bad level'})
-        self.fill_worksheet_row(ws, first_blank_goal_row + 6)
+        self.fill_worksheet_row(ws, first_blank_goal_row + 3)
         response = self.post_template(wb)
         self.assertEqual(ProgramAuditLog.objects.count(), 1)
         self.assertEqual(ProgramAuditLog.objects.last().change_type, 'template_uploaded')
         self.assertEqual(response.status_code, 400)
         self.assertEqual(
             json.loads(response.content)['error_codes'],
-            sorted([
-                ERROR_MALFORMED_INDICATOR, ERROR_INTERVENING_BLANK_ROW, ERROR_UNEXPECTED_INDICATOR_NUMBER,
-                ERROR_UNEXPECTED_LEVEL
-            ]))
+            sorted([ERROR_MALFORMED_INDICATOR, ERROR_INTERVENING_BLANK_ROW]))
+
         response = self.client.get(reverse('get_feedback_bulk_import_template', args=[self.program.id]))
         self.assertEqual(response.get('Content-Disposition'), 'attachment; filename="Marked-up-template.xlsx"')
         feedback_wb = openpyxl.load_workbook(ContentFile(response.content))
@@ -556,17 +553,39 @@ class TestBulkImportTemplateProcessing(test.TestCase):
         should_be_indicator.style = orig_style
 
         second_level_header = ws.cell(first_blank_goal_row + 11, self.first_used_column)
+        orig_value = second_level_header.value
         second_level_header.value = 'bad_level_name'
         response = self.post_template(wb)
         self.assertEqual(response.status_code, 406)
         self.assertEqual(json.loads(response.content)['error_codes'], [ERROR_MISMATCHED_LEVEL_COUNT])
+        second_level_header.value = orig_value
 
-        ws.cell(DATA_START_ROW, FIRST_USED_COLUMN).value = 'bad level name'
+        first_header_cell = ws.cell(DATA_START_ROW, FIRST_USED_COLUMN)
+        orig_header_value = first_header_cell.value
+        first_header_cell.value = 'bad level name'
         self.fill_worksheet_row(ws, first_blank_goal_row)
         response = self.post_template(wb)
         self.assertEqual(response.status_code, 406)
         self.assertEqual(
-            json.loads(response.content)['error_codes'],[ERROR_INVALID_LEVEL_HEADER])
+            json.loads(response.content)['error_codes'],[ERROR_INVALID_LEVEL_HEADER, ERROR_UNDETERMINED_LEVEL])
+        first_header_cell.value = orig_header_value
+
+        number_cell = ws.cell(first_blank_goal_row + 2, FIRST_USED_COLUMN + COLUMNS_FIELD_INDEXES['number'])
+        orig_value = number_cell.value
+        self.fill_worksheet_row(ws, first_blank_goal_row + 2, {'number': 'bad number'})
+        response = self.post_template(wb)
+        self.assertEqual(response.status_code, 406)
+        self.assertEqual(
+            json.loads(response.content)['error_codes'], [ERROR_UNEXPECTED_INDICATOR_NUMBER])
+        number_cell.value = orig_value
+
+        self.fill_worksheet_row(ws, first_blank_goal_row + 3, {'level': 'bad level'})
+        response = self.post_template(wb)
+        self.assertEqual(response.status_code, 406)
+        self.assertEqual(
+            json.loads(response.content)['error_codes'], [ERROR_UNEXPECTED_LEVEL])
+        self.fill_worksheet_row(ws, first_blank_goal_row + 3)
+
 
     # TODO: Write Unit Test to see if this works with a bad sector
     def test_saving_indicators(self):
