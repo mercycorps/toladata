@@ -837,6 +837,18 @@ let errorCodes = {
         message: 1,
     },
     110 : {
+        type: "Multiple feedback templates found",
+        message: 4,
+    },
+    111 : {
+        type: "Invalid level column value",
+        message: 1,
+    },
+    112 : {
+        type: "Autonumbered program has indicator numbers that are out of their expected sequence",
+        message: 1,
+    },
+    120 : {
         type: "Someone else uploaded a template in the last 24 hours",
         message: 5,
     },

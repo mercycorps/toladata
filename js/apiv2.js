@@ -205,7 +205,7 @@ const api = {
         //     })
 
         return await this.apiInstance.post(`/save_bulk_import_data/${program_id}/`)
-            .then(response => response.data)
+            .then(response => response)
             .catch((error) => {
                 this.logFailure(error);
                 return error.response;
