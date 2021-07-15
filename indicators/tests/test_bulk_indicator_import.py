@@ -469,24 +469,21 @@ class TestBulkImportTemplateProcessing(test.TestCase):
         self.assertEqual(response.get('Content-Disposition'), 'attachment; filename="Marked-up-template.xlsx"')
         feedback_wb = openpyxl.load_workbook(ContentFile(response.content))
         feedback_ws = feedback_wb.worksheets[0]
-        self.assertEqual(
-            feedback_ws.cell(first_blank_goal_row + 2, self.first_used_column + COLUMNS_FIELD_INDEXES['number']).style,
-            UNPROTECTED_ERROR_STYLE)
-        self.assertEqual(
-            feedback_ws.cell(first_blank_goal_row + 3, self.first_used_column + COLUMNS_FIELD_INDEXES['level']).style,
-            UNPROTECTED_ERROR_STYLE)
+        self.assertIsNotNone(
+            feedback_ws.cell(first_blank_goal_row + 2, self.first_used_column + COLUMNS_FIELD_INDEXES['number']).fill)
+        self.assertIsNotNone(
+            feedback_ws.cell(first_blank_goal_row + 3, self.first_used_column + COLUMNS_FIELD_INDEXES['level']).fill)
 
         # Make sure entire skipped rows are highlighted
         for row_index in [first_blank_goal_row + 4, first_blank_goal_row + 5]:
             collector = []
             col_loop_range = range(self.first_used_column + 2, self.first_used_column + len(COLUMNS))
-            errors_are_highlighted = [feedback_ws.cell(row_index, col_index).style == UNPROTECTED_ERROR_STYLE for col_index in col_loop_range]
+            errors_are_highlighted = [feedback_ws.cell(row_index, col_index).fill is not None for col_index in col_loop_range]
             for col_index in col_loop_range:
-                collector.append(feedback_ws.cell(row_index, col_index).style == UNPROTECTED_ERROR_STYLE)
+                collector.append(feedback_ws.cell(row_index, col_index).fill is not None)
             self.assertTrue(all(errors_are_highlighted))
-        self.assertEqual(
-            feedback_ws.cell(first_blank_goal_row + 4, self.first_used_column + COLUMNS_FIELD_INDEXES['name']).style,
-            UNPROTECTED_ERROR_STYLE)
+        self.assertIsNotNone(
+            feedback_ws.cell(first_blank_goal_row + 4, self.first_used_column + COLUMNS_FIELD_INDEXES['name']).fill)
 
         wb = openpyxl.load_workbook(self.get_template())
         existing_goal_indicator_count = Indicator.objects.filter(level__parent=None).count()
