@@ -3,7 +3,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: \n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2021-07-14 23:20-0700\n"
+"POT-Creation-Date: 2021-07-15 10:49-0700\n"
 "PO-Revision-Date: 2021-06-16 11:33-0700\n"
 "Last-Translator: \n"
 "Language-Team: \n"
@@ -236,7 +236,7 @@ msgstr ""
 "per result level. Adjust the numbers if you need more or fewer rows."
 
 #. Translators: Message to user that we cannot import the their file. This could be caused by the wrong file being selected, or the structure of the file was changed, or the results framework was updated and does not match the template anymore.
-#: js/components/ImportIndicatorsPopover.js:841
+#: js/components/ImportIndicatorsPopover.js:853
 msgid ""
 "We can’t import indicators from this file. This can happen if the wrong file "
 "is selected, the template structure is modified, or the results framework "
@@ -247,12 +247,12 @@ msgstr ""
 "results framework was updated and no longer matches the template."
 
 #. Translators: Messsage to user that there aren't any new indicators in the uploaded file.
-#: js/components/ImportIndicatorsPopover.js:844
+#: js/components/ImportIndicatorsPopover.js:856
 msgid "We can't find any indicators in this file."
 msgstr "Translated We can't find any indicators in this file."
 
 #. Translators: Message to user that the import indicator process could not be completed. If the problem continues, contact your TolaData administrator.
-#: js/components/ImportIndicatorsPopover.js:847
+#: js/components/ImportIndicatorsPopover.js:859
 msgid ""
 "Sorry, we couldn’t complete the import process. If the problem persists, "
 "please contact your TolaData administrator."
@@ -261,7 +261,7 @@ msgstr ""
 "persists, please contact your TolaData administrator."
 
 #. Translators: Message to user that the import could not be completed and to find out the reason, upload the import template again.
-#: js/components/ImportIndicatorsPopover.js:850
+#: js/components/ImportIndicatorsPopover.js:862
 msgid ""
 "Sorry, we couldn’t complete the import process. To figure out what went "
 "wrong, please upload your template again."
@@ -270,7 +270,7 @@ msgstr ""
 "what went wrong, please upload your template again."
 
 #. Translators: Message to user that someone else has uploaded a template in the last 24 hours and may be in the process of importing indicators to this program. You can view the program change log to see more details.
-#: js/components/ImportIndicatorsPopover.js:853
+#: js/components/ImportIndicatorsPopover.js:865
 msgid ""
 "Someone else uploaded a template in the last 24 hours, and may be in the "
 "process of adding indicators to this program."
