@@ -717,8 +717,8 @@ class BulkImportIndicatorsView(LoginRequiredMixin, UserPassesTestMixin, AccessMi
                         sector = Sector.objects.get(sector=sector_translation_map[cell_value])
                         indicator_data['sector_id'] = sector.pk
                         indicator_data.pop('sector')
-                    except Sector.DoesNotExist:
-                        error_string = VALIDATION_MSG_CHOICE.format(field_name='Sector')
+                    except (Sector.DoesNotExist, KeyError):
+                        error_string = VALIDATION_MSG_CHOICE.format(field_name=gettext('Sector'))
                         try:
                             validation_errors['sector'].append(error_string)
                         except KeyError:
