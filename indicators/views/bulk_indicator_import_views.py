@@ -4,6 +4,7 @@ import re
 import os
 import json
 import logging
+import decimal
 from datetime import datetime
 from openpyxl.comments import Comment
 from openpyxl.styles import PatternFill, Alignment, Protection, Font, NamedStyle, Border, Side
@@ -11,8 +12,9 @@ from openpyxl.worksheet.datavalidation import DataValidation
 from openpyxl.utils import get_column_letter
 from django.contrib.auth.decorators import login_required
 from django.contrib.auth.mixins import UserPassesTestMixin, LoginRequiredMixin, AccessMixin
+from django.core.serializers.json import DjangoJSONEncoder
 from django.db import transaction
-from django.utils.translation import gettext, get_language, override
+from django.utils.translation import gettext, gettext_noop, get_language, override
 from django.http import HttpResponse, JsonResponse
 from django.views import View
 from django.views.decorators.http import require_POST, require_GET
@@ -88,10 +90,12 @@ ERROR_MISMATCHED_HEADERS = 107  # The column headers don't match the standard te
 ERROR_SAVE_VALIDATION = 108  # This could happen if e.g. someone adds an indicator
 ERROR_INVALID_LEVEL_HEADER = 109  # When the level header doesn't contain an identifiable level
 ERROR_MULTIPLE_FEEDBACK_TEMPLATES = 110  # When there are multiple entries for the feedback template, usually happens if there's an error in a prior upload attempt
+ERROR_UNEXPECTED_LEVEL = 111  # When the tier in the level column doesn't match what's in the level header
+ERROR_UNEXPECTED_INDICATOR_NUMBER = 112  # The indicator number is not sequential in auto-numbered programs
 ERROR_MALFORMED_INDICATOR = 201  # A catch-all for problems with an indicator that don't fall into other non-fatal categories
-ERROR_UNEXPECTED_INDICATOR_NUMBER = 202  # The indicator number is not sequential in auto-numbered programs
+
 ERROR_INTERVENING_BLANK_ROW = 203  # Indicators are separated by an empty row would cause the indicator numbers to be wrong for auto-numbered programs
-ERROR_UNEXPECTED_LEVEL = 204  # The level text in the level column doesn't match the tier name used in the level header
+
 
 EMPTY_CHOICE = '---------'
 NULL_EQUIVALENTS = ['N/A', 'NA', 'Not applicable']
@@ -140,6 +144,9 @@ class BulkImportIndicatorsView(LoginRequiredMixin, UserPassesTestMixin, AccessMi
     GRAY_LIGHTER = 'FFDBDCDE'
     GRAY_DARK = 'FF54585A'
     RED_ERROR = '66FFE3E7'
+
+    # Translators: Error message shown to a user when they have entered a value for a numeric field that isn't a number or is negative.
+    VALIDATION_MSG_BASELINE_NA = gettext_noop('Enter a numeric value for the baseline. If a baseline is not yet known or not applicable, enter a zero or type "N/A". The baseline can always be updated at a later point in time.')
 
     default_border = Side(border_style='thin', color=GRAY_LIGHTER)
 
@@ -207,7 +214,29 @@ class BulkImportIndicatorsView(LoginRequiredMixin, UserPassesTestMixin, AccessMi
         return False
 
     @staticmethod
-    def set_sector_validation(hidden_ws):
+    def setup_validations(hidden_ws):
+        validation_map = {}
+        uom_type_options = [str(option[1]) for option in Indicator.UNIT_OF_MEASURE_TYPES]
+        uom_type_validation = DataValidation(
+            type="list", formula1=f'"{",".join(uom_type_options)}"', allow_blank=False)
+        validation_map[VALIDATION_KEY_UOM_TYPE] = uom_type_validation
+
+        dir_change_options = [str(option[1]) for option in Indicator.DIRECTION_OF_CHANGE]
+        dir_change_validation = DataValidation(
+            type="list", formula1=f'"{",".join(dir_change_options)}"', allow_blank=True)
+        validation_map[VALIDATION_KEY_DIR_CHANGE] = dir_change_validation
+
+        target_freq_options = [str(option[1]) for option in Indicator.TARGET_FREQUENCIES]
+        target_freq_validation = DataValidation(
+            type="list", formula1=f'"{",".join(target_freq_options)}"', allow_blank=False)
+        validation_map[VALIDATION_KEY_TARGET_FREQ] = target_freq_validation
+
+        for dv in validation_map.values():
+            # Translators: Error message shown to a user when they have entered a value that is not in a list of approved values
+            dv.error = gettext('Your entry is not in the list')
+            # Translators:  Title of a popup box that informs the user they have entered an invalid value
+            dv.errorTitle = gettext('Invalid Entry')
+
         sector_options = [EMPTY_CHOICE] + sorted(
             [gettext(sector.sector) for sector in Sector.objects.all()],
             key=lambda choice: str_without_diacritics(choice))
@@ -219,7 +248,33 @@ class BulkImportIndicatorsView(LoginRequiredMixin, UserPassesTestMixin, AccessMi
         sector_range = f'${sectors_col}${sectors_start_row}:${sectors_col}${sectors_end_row}'
         sector_validation = DataValidation(
             type='list', formula1=f'{HIDDEN_SHEET_NAME}!{sector_range}', allow_blank=True)
-        return sector_validation, sector_options
+        validation_map[VALIDATION_KEY_SECTOR] = sector_validation
+        return validation_map, sector_options
+
+    def apply_validations_to_row(self, ws, row_index, validation_map):
+        # TODO: limit character count of cells with max_length
+        for col_num, col in enumerate(COLUMNS):
+            active_cell = ws.cell(row_index, FIRST_USED_COLUMN + col_num)
+            if 'validation' in col.keys():
+                validation_map[col['validation']].add(active_cell)
+
+            if col['field_name'] == 'baseline':
+                cell_coord = active_cell.coordinate
+                null_check_strings = [f'lower({cell_coord})=lower("{ne}")' for ne in NULL_EQUIVALENTS]
+                active_language = get_language()
+                if active_language != 'en':
+                    null_check_strings.extend(
+                        [f'lower({cell_coord})=lower("{gettext(ne)}")' for ne in NULL_EQUIVALENTS])
+                formula = f'OR(AND(ISNUMBER({cell_coord}), {cell_coord}>=0), {",".join(null_check_strings)})'
+                validator = DataValidation(type='custom', formula1=formula)
+                validator.error = gettext(self.VALIDATION_MSG_BASELINE_NA)
+                # Translators:  Title of a popup box that informs the user they have entered an invalid value
+                validator.errorTitle = gettext('Invalid Entry')
+                ws.add_data_validation(validator)
+                validator.add(active_cell)
+
+                active_cell.alignment = Alignment(horizontal='right')
+                active_cell.number_format = '0.00'
 
     @staticmethod
     def get_comment_obj(help_text):
@@ -255,51 +310,15 @@ class BulkImportIndicatorsView(LoginRequiredMixin, UserPassesTestMixin, AccessMi
             'target_frequency': {str(name): value for value, name in Indicator.TARGET_FREQUENCIES}
         }
 
-        validation_map = {}
-        uom_type_options = list(reverse_field_name_map['unit_of_measure_type'].keys())
-        uom_type_validation = DataValidation(
-            type="list", formula1=f'"{",".join(uom_type_options)}"', allow_blank=False)
-        validation_map[VALIDATION_KEY_UOM_TYPE] = uom_type_validation
 
-        dir_change_options = list(reverse_field_name_map['direction_of_change'].keys())
-        dir_change_validation = DataValidation(
-            type="list", formula1=f'"{",".join(dir_change_options)}"', allow_blank=True)
-        validation_map[VALIDATION_KEY_DIR_CHANGE] = dir_change_validation
-
-        target_freq_options = list(reverse_field_name_map['target_frequency'].keys())
-        target_freq_validation = DataValidation(
-            type="list", formula1=f'"{",".join(target_freq_options)}"', allow_blank=False)
-        validation_map[VALIDATION_KEY_TARGET_FREQ] = target_freq_validation
-
-        # # Can't do sector the same way as the others because there are too many.  There is a 256 char limit
-        # # on putting options directly into the validation config.  Instead, the options will be referenced
-        # # from a hidden sheet.
-        sector_validation, sector_options = self.set_sector_validation(hidden_ws)
-        validation_map[VALIDATION_KEY_SECTOR] = sector_validation
-
-        for dv in validation_map.values():
-            # Translators: Error message shown to a user when they have entered a value that is not in a list of approved values
-            dv.error = gettext('Your entry is not in the list')
-            # Translators:  Title of a popup box that informs the user they have entered an invalid value
-            dv.errorTitle = gettext('Invalid Entry')
-
-        # Adding this validation after the others because the error messages will be different.
-        baseline_validation = DataValidation(type='decimal', operator="greaterThanOrEqual", formula1=0)
-        # Translators: Error message shown to a user when they have entered a value for a numeric field that isn't a number or is negative.
-        baseline_validation.error = gettext('Enter a numeric value for the baseline. If a baseline is not yet known or not applicable, enter a zero or type "N/A". The baseline can always be updated at a later point in time.')
-        # Translators:  Title of a popup box that informs the user they have entered an invalid value
-        baseline_validation.errorTitle = gettext('Invalid Entry')
-        validation_map[VALIDATION_KEY_BASELINE] = baseline_validation
+        validation_map, sector_options = self.setup_validations(hidden_ws)
 
         # Spreadsheet loads as corrupted when validation is added to a sheet but no cells are assigned to the
         # validation. So we'll check that there is at least one blank row that will be created.
         blank_row_count = sum([int(request.GET[level['tier_name']]) for level in serialized_levels])
         if blank_row_count > 0:
-            ws.add_data_validation(uom_type_validation)
-            ws.add_data_validation(dir_change_validation)
-            ws.add_data_validation(target_freq_validation)
-            ws.add_data_validation(sector_validation)
-            ws.add_data_validation(baseline_validation)
+            for  validation in validation_map.values():
+                ws.add_data_validation(validation)
 
         wb.add_named_style(self.title_style)
         wb.add_named_style(self.level_header_style)
@@ -432,6 +451,7 @@ class BulkImportIndicatorsView(LoginRequiredMixin, UserPassesTestMixin, AccessMi
             letter_gen = indicator_letter_generator(len(level['indicator_set']) + 1)
             empty_row_count = int(request.GET[level['tier_name']])
             for i in range(empty_row_count):
+                self.apply_validations_to_row(ws, current_row_index, validation_map)
                 ws.row_dimensions[current_row_index].height = 16
                 ws.cell(current_row_index, self.first_used_column).value = gettext(level['tier_name'])
                 if program.auto_number_indicators:
@@ -445,35 +465,14 @@ class BulkImportIndicatorsView(LoginRequiredMixin, UserPassesTestMixin, AccessMi
                         active_cell.style = PROTECTED_NEW_INDICATOR_STYLE
                     else:
                         active_cell.style = UNPROTECTED_NEW_INDICATOR_STYLE
-                    if 'validation' in column:
-                        validator = validation_map[column['validation']]
-                        validator.add(active_cell)
+
                     if 'default' in column:
                         active_cell.value = gettext(column['default'])
                     if column['field_name'] == 'number':
                         active_cell.alignment = Alignment(horizontal='right')
-                    if column['field_name'] == 'baseline':
 
-                        # Have to add a separate validation for each cell
-                        cell_coord = active_cell.coordinate
-                        null_check_strings = [f'lower({cell_coord})=lower("{ne}")' for ne in NULL_EQUIVALENTS]
-                        active_language = get_language()
-                        if active_language != 'en':
-                            null_check_strings.extend(
-                                [f'lower({cell_coord})=lower("{gettext(ne)}")' for ne in NULL_EQUIVALENTS])
-                        formula = f'OR(AND(ISNUMBER({cell_coord}), {cell_coord}>=0), {",".join(null_check_strings)})'
-                        validator = DataValidation(type='custom', formula1=formula)
-                        # Translators: Error message shown to a user when they have entered a value for a numeric field that isn't a number or is negative.
-                        validator.error = gettext('Enter a numeric value for the baseline. If a baseline is not yet known or not applicable, enter a zero or type "N/A". The baseline can always be updated at a later point in time.')
-                        # Translators:  Title of a popup box that informs the user they have entered an invalid value
-                        validator.errorTitle = gettext('Invalid Entry')
-                        ws.add_data_validation(validator)
-                        validator.add(active_cell)
-
-                        active_cell.alignment = Alignment(horizontal='right')
-                        active_cell.number_format = '0.00'
                 current_row_index += 1
-            current_row_index += 1
+            current_row_index += 1  # Leave one row blank at the end of each level section
 
         ws.protection.enable()
         ws.title = gettext(TEMPLATE_SHEET_NAME)
@@ -545,10 +544,14 @@ class BulkImportIndicatorsView(LoginRequiredMixin, UserPassesTestMixin, AccessMi
             ws_level_count = 0
             passed_blank_rows = 0
 
-            # Need to add back sector validation because it is not supported by openpyxl when reading .xlsx files
+            # Need to wipe all validations and re-add them just in case user has modified or deleted them.
+            # openpyxl doesn't make it easy to identify which validation is which, so it's easier just to wipe and
+            # recreate
+            ws.data_validations = openpyxl.worksheet.datavalidation.DataValidationList()  # wipes existing validations
             hidden_ws = wb.get_sheet_by_name('Hidden')
-            sector_validation, _ = self.set_sector_validation(hidden_ws)
-            ws.add_data_validation(sector_validation)
+            validation_map, sector_options = self.setup_validations(hidden_ws)
+            for validation in validation_map.values():
+                ws.add_data_validation(validation)
 
             for current_row_index in range(self.data_start_row, ws.max_row):
                 first_cell = ws.cell(current_row_index, self.first_used_column)
@@ -571,6 +574,7 @@ class BulkImportIndicatorsView(LoginRequiredMixin, UserPassesTestMixin, AccessMi
 
                 # Getting to this point without a parsed level header means something has gone wrong
                 if not current_level:
+                    fatal_errors.append(ERROR_UNDETERMINED_LEVEL)
                     return JsonResponse({'error_codes': fatal_errors}, status=406)
 
                 # skip indicators that are already in the system
@@ -585,14 +589,10 @@ class BulkImportIndicatorsView(LoginRequiredMixin, UserPassesTestMixin, AccessMi
                     cell_to_clean.fill = PatternFill(fill_type=None)
                     cell_to_clean.comment = None
 
-                # Need to reset the validation on sector because it openpyxl doesn't support reading for this type of valdiation
-                sector_col = self.first_used_column + COLUMNS_FIELD_INDEXES['sector']
-                sector_cell = ws.cell(current_row_index, sector_col)
-                sector_validation.add(sector_cell)
-
                 # Skip blank rows but if there was an intervening blank row, give it error highlighting
                 if blank_type := self._row_is_blank_or_spacer(ws, current_row_index, program):
                     if blank_type == 'blank':
+                        self.apply_validations_to_row(ws, current_row_index, validation_map)
                         next(letter_gen)
                         passed_blank_rows += 1
                     continue
@@ -605,19 +605,22 @@ class BulkImportIndicatorsView(LoginRequiredMixin, UserPassesTestMixin, AccessMi
                                 PatternFill('solid', fgColor=self.RED_ERROR)
                         passed_blank_rows = 0
 
+                self.apply_validations_to_row(ws, current_row_index, validation_map)
+
+
                 # Check if auto-numbered indicator numbers match what's expected
                 number_cell = ws.cell(current_row_index, self.first_used_column + 1)
                 if program.auto_number_indicators and number_cell.value is not None:
                     expected_ind_number = f'{current_level.display_ontology}{next(letter_gen)}'
                     if number_cell.value != expected_ind_number:
                         number_cell.fill = PatternFill('solid', fgColor=self.RED_ERROR)
-                        non_fatal_errors.append(ERROR_UNEXPECTED_INDICATOR_NUMBER)
+                        fatal_errors.append(ERROR_UNEXPECTED_INDICATOR_NUMBER)
 
                 # Check if the value of the Level column matches the one used in the level header
                 level_cell = ws.cell(current_row_index, FIRST_USED_COLUMN)
                 if level_cell.value != current_tier:
                     level_cell.fill = PatternFill('solid', fgColor=self.RED_ERROR)
-                    non_fatal_errors.append(ERROR_UNEXPECTED_LEVEL)
+                    fatal_errors.append(ERROR_UNEXPECTED_LEVEL)
 
                 indicator_data = {}
                 for i, column in enumerate(COLUMNS[1:]):
@@ -639,10 +642,10 @@ class BulkImportIndicatorsView(LoginRequiredMixin, UserPassesTestMixin, AccessMi
                             validation_errors[field_name] = []
                         if error.code == 'max_length':
                             # System generated error message is 'Ensure this field has no more than 500 characters.'
-                            matches = re.search(r'more than (\d+) characters', str(error))
+                            matches = re.search(r'(\d+)', str(error))
                             if matches:
                                 # Translators: Error message provided when user has exceeded the character limit on a form
-                                msg = gettext(f'This field should have no more than {matches.group(1)} characters.')
+                                msg = gettext(f'Please enter {matches.group(1)} or fewer characters.')
                                 validation_errors[field_name].append(msg)
                             else:
 
@@ -654,16 +657,34 @@ class BulkImportIndicatorsView(LoginRequiredMixin, UserPassesTestMixin, AccessMi
                             logger.error(f'New validation string of code {error.code} found.\n{str(error)}')
                             validation_errors[field_name].append(str(error))
 
-                # Check for missing required fields
+                # Check for missing required fields and tinker with baseline field
                 for i, column in enumerate(COLUMNS):
-                    cell_value = ws.cell(current_row_index, FIRST_USED_COLUMN + i).value
-                    if column['required'] and cell_value is None:
-                        # Translators: Error message on a form indicating that user has not entered a required field.
-                        required_field_error = VALIDATION_MSG_REQUIRED
+                    active_cell = ws.cell(current_row_index, FIRST_USED_COLUMN + i)
+                    if column['field_name'] == 'baseline':
+                        if 'baseline' in validation_errors:  # Means it's either None or a text string
+                            null_equivalents_with_translations = [ne.lower() for ne in NULL_EQUIVALENTS] + \
+                                [gettext(ne).lower() for ne in NULL_EQUIVALENTS]
+                            if active_cell.value is None:  # This means no value in cell, which is not ok
+                                validation_errors['baseline'] = [VALIDATION_MSG_REQUIRED]
+                                non_fatal_errors.append(ERROR_MALFORMED_INDICATOR)
+                            elif active_cell.value.lower() in null_equivalents_with_translations:
+                                validation_errors.pop('baseline')
+                                active_cell.value = None
+                            else:  # cell value is not None or one of the acceptable null equivalaent values
+                                validation_errors['baseline'] = [gettext(self.VALIDATION_MSG_BASELINE_NA)]
+                                non_fatal_errors.append(ERROR_MALFORMED_INDICATOR)
+                        else:
+                            try:
+                                indicator_data['baseline'] = make_quantized_decimal(active_cell.value)
+                            except (ValueError, decimal.InvalidOperation):
+                                # User may have copied a bad value in to the cell
+                                validation_errors['baseline'] = [VALIDATION_MSG_REQUIRED]
+                                non_fatal_errors.append(ERROR_MALFORMED_INDICATOR)
+                    elif column['required'] and active_cell.value is None:
                         try:
-                            validation_errors[column['field_name']].append(required_field_error)
+                            validation_errors[column['field_name']].append(VALIDATION_MSG_REQUIRED)
                         except KeyError:
-                            validation_errors[column['field_name']] = [required_field_error]
+                            validation_errors[column['field_name']] = [VALIDATION_MSG_REQUIRED]
                         non_fatal_errors.append(ERROR_MALFORMED_INDICATOR)
 
                 # Convert enumerated fields into numerical ids
@@ -691,7 +712,9 @@ class BulkImportIndicatorsView(LoginRequiredMixin, UserPassesTestMixin, AccessMi
                     pass
                 else:
                     try:
-                        sector = Sector.objects.get(sector=cell_value)
+                        sector_translation_map = {str(gettext(sector.sector)): sector.sector
+                            for sector in Sector.objects.all()}
+                        sector = Sector.objects.get(sector=sector_translation_map[cell_value])
                         indicator_data['sector_id'] = sector.pk
                         indicator_data.pop('sector')
                     except Sector.DoesNotExist:
@@ -705,7 +728,6 @@ class BulkImportIndicatorsView(LoginRequiredMixin, UserPassesTestMixin, AccessMi
                 # Final data manipulation and updates
                 indicator_data['level_id'] = current_level.pk
                 indicator_data['program_id'] = program.id
-
                 # The number order has already been checked if program is autonumbered, so we don't need the numbers
                 # any more
                 if program.auto_number_indicators:
@@ -777,7 +799,7 @@ class BulkImportIndicatorsView(LoginRequiredMixin, UserPassesTestMixin, AccessMi
             file_name=file_name,
             file_type=BulkIndicatorImportFile.INDICATOR_DATA_TYPE)
         with open(file_obj.file_path, 'w') as fh:
-            fh.write(json.dumps(new_indicators_data))
+            fh.write(json.dumps(new_indicators_data, cls=DjangoJSONEncoder))
         return JsonResponse({'message': 'success', 'valid': len(new_indicators_data), 'invalid': 0}, status=200)
 
 

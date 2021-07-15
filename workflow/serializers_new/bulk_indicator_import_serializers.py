@@ -1,9 +1,8 @@
+import decimal
 from rest_framework import serializers
-from django.utils.translation import gettext
 from indicators.serializers_new.tier_and_level_serializers import LevelBaseSerializerMixin
 from indicators.models import Indicator, Level
 from tola.model_utils import get_serializer
-from tola.serializers import make_quantized_decimal
 from workflow.models import Program
 from workflow.serializers_new.iptt_program_serializers import (ProgramBaseSerializerMixin, ProgramRFOrderingMixin)
 
@@ -79,28 +78,12 @@ class BulkImportIndicatorSerializer(serializers.ModelSerializer):
         else:
             return None
 
-    def to_internal_value(self, data):
-        """Handle special values of indicator fields"""
-        from indicators.views.bulk_indicator_import_views import NULL_EQUIVALENTS  # Avoid circular import
-        null_equivalents_with_translations = [ne.lower() for ne in NULL_EQUIVALENTS] + \
-            [gettext(ne).lower() for ne in NULL_EQUIVALENTS]
-        values = super().to_internal_value(data)
-
-        if 'baseline' not in values or values['baseline'] is None:
-            # Translators:  The is an error message presented to users when they have entered an invalid value in a form field that takes only numbers or some version of "Not applcable"
-            raise serializers.ValidationError({'baseline': [gettext('Baseline should be a number or N/A')]})
-        elif values['baseline'].lower() in null_equivalents_with_translations:
-            values['baseline'] = None
-        else:
-            try:
-                values['baseline'] = make_quantized_decimal(values['baseline'])
-            except ValueError:
-                raise serializers.ValidationError({'baseline': [gettext('Baseline should be a number or N/A')]})
-            if values['baseline'] is None:
-                # Translators:  This is a fallback error message provided to users when, for some unknown reason, the value they entered in a form can't be processed
-                raise serializers.ValidationError({'baseline': [gettext('Could not process baseline value')]})
-
-        return values
+    def validate_baseline(self, value):
+        try:
+            decimal.Decimal(value)
+        except (TypeError, decimal.InvalidOperation):
+            raise serializers.ValidationError('not_a_number')
+        return value
 
     def create(self, validated_data):
         return Indicator.objects.create(**validated_data)
