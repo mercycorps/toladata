@@ -455,7 +455,7 @@ class BulkImportIndicatorsView(LoginRequiredMixin, UserPassesTestMixin, AccessMi
                 ws.row_dimensions[current_row_index].height = 16
                 ws.cell(current_row_index, self.first_used_column).value = gettext(level['tier_name'])
                 if program.auto_number_indicators:
-                    ws.cell(current_row_index, self.first_used_column + 1).value = \
+                    ws.cell(current_row_index, FIRST_USED_COLUMN + COLUMNS_FIELD_INDEXES['number']).value = \
                         level['display_ontology'] + next(letter_gen)
 
                 for col_n, column in enumerate(COLUMNS):
@@ -486,6 +486,8 @@ class BulkImportIndicatorsView(LoginRequiredMixin, UserPassesTestMixin, AccessMi
         VALIDATION_MSG_REQUIRED = gettext('This information is required.')
         # Translators: Message provided to user when they have not chosen from a pre-selected list of options.
         VALIDATION_MSG_CHOICE = gettext('The {field_name} you selected is unavailable. Please select a different {field_name}.')
+        FIRST_CELL_ERROR_VALUE = r"⚠️"
+        PATTERN_FILL_ERROR = PatternFill('solid', fgColor=self.RED_ERROR)
 
         program_id = kwargs['program_id']
         program = Program.objects.get(pk=program_id)
@@ -542,7 +544,7 @@ class BulkImportIndicatorsView(LoginRequiredMixin, UserPassesTestMixin, AccessMi
             pattern = r'^([^:]+)'
             level_finder = re.compile(pattern)
             ws_level_count = 0
-            passed_blank_rows = 0
+            skipped_row_indexes = []
 
             # Need to wipe all validations and re-add them just in case user has modified or deleted them.
             # openpyxl doesn't make it easy to identify which validation is which, so it's easier just to wipe and
@@ -552,6 +554,7 @@ class BulkImportIndicatorsView(LoginRequiredMixin, UserPassesTestMixin, AccessMi
             validation_map, sector_options = self.setup_validations(hidden_ws)
             for validation in validation_map.values():
                 ws.add_data_validation(validation)
+
 
             for current_row_index in range(self.data_start_row, ws.max_row):
                 first_cell = ws.cell(current_row_index, self.first_used_column)
@@ -569,7 +572,7 @@ class BulkImportIndicatorsView(LoginRequiredMixin, UserPassesTestMixin, AccessMi
                             current_tier = tier_matches.group(1).strip()
                         letter_gen = indicator_letter_generator()
                         ws_level_count += 1
-                        passed_blank_rows = 0
+                        skipped_row_indexes = []
                         continue
 
                 # Getting to this point without a parsed level header means something has gone wrong
@@ -584,8 +587,9 @@ class BulkImportIndicatorsView(LoginRequiredMixin, UserPassesTestMixin, AccessMi
 
                 # Remove existing error highlighting and comments, in case user has upload a feedback template
                 # Also add back dropdowns if they are missing.
-                for c in range(len(COLUMNS)):
-                    cell_to_clean = ws.cell(current_row_index, self.first_used_column + c)
+                ws.cell(current_row_index, 1).value = None
+                for c in range(1, len(COLUMNS) + 1):
+                    cell_to_clean = ws.cell(current_row_index, c)
                     cell_to_clean.fill = PatternFill(fill_type=None)
                     cell_to_clean.comment = None
 
@@ -594,26 +598,27 @@ class BulkImportIndicatorsView(LoginRequiredMixin, UserPassesTestMixin, AccessMi
                     if blank_type == 'blank':
                         self.apply_validations_to_row(ws, current_row_index, validation_map)
                         next(letter_gen)
-                        passed_blank_rows += 1
+                    skipped_row_indexes.append(current_row_index)
                     continue
-                elif passed_blank_rows > 0:
+                elif len(skipped_row_indexes) > 0:
                     non_fatal_errors.append(ERROR_INTERVENING_BLANK_ROW)
-                    col_offset = 2 if program.auto_number_indicators else 1
-                    for passed_row_index in range(passed_blank_rows):
-                        for c in range(self.first_used_column + col_offset, self.first_used_column + len(COLUMNS)):
-                            ws.cell(current_row_index - (1 + passed_row_index), c).fill = \
-                                PatternFill('solid', fgColor=self.RED_ERROR)
-                        passed_blank_rows = 0
+                    for skipped_row_index in skipped_row_indexes:
+                        first_cell = ws.cell(skipped_row_index, 1)
+                        # Translators: Error message provided to users when they are entering data into Excel and they skip a row
+                        first_cell.comment = self.get_comment_obj(gettext('Indicator rows cannot be skipped.'))
+                        first_cell.value = FIRST_CELL_ERROR_VALUE
+                        for col_index in range(1, self.first_used_column + len(COLUMNS)):
+                            ws.cell(skipped_row_index, col_index).fill = PATTERN_FILL_ERROR
+                    skipped_row_indexes = []
 
                 self.apply_validations_to_row(ws, current_row_index, validation_map)
-
 
                 # Check if auto-numbered indicator numbers match what's expected
                 number_cell = ws.cell(current_row_index, self.first_used_column + 1)
                 if program.auto_number_indicators and number_cell.value is not None:
                     expected_ind_number = f'{current_level.display_ontology}{next(letter_gen)}'
                     if number_cell.value != expected_ind_number:
-                        number_cell.fill = PatternFill('solid', fgColor=self.RED_ERROR)
+                        number_cell.fill = PATTERN_FILL_ERROR
                         fatal_errors.append(ERROR_UNEXPECTED_INDICATOR_NUMBER)
 
                 # Check if the value of the Level column matches the one used in the level header
@@ -740,8 +745,10 @@ class BulkImportIndicatorsView(LoginRequiredMixin, UserPassesTestMixin, AccessMi
                     for field, error_strings in validation_errors.items():
                         column_index = self.first_used_column + COLUMNS_FIELD_INDEXES[field]
                         error_cell = ws.cell(current_row_index, column_index)
-                        error_cell.fill = PatternFill('solid', fgColor=self.RED_ERROR)
+                        error_cell.fill = PATTERN_FILL_ERROR
                         error_cell.comment = self.get_comment_obj('\n'.join(error_strings))
+                        ws.cell(current_row_index, 1).value = FIRST_CELL_ERROR_VALUE
+                        ws.cell(current_row_index, 1).fill = PATTERN_FILL_ERROR
                     indicator_status['invalid'] += 1
 
             if len(level_refs) != ws_level_count:
@@ -789,7 +796,7 @@ class BulkImportIndicatorsView(LoginRequiredMixin, UserPassesTestMixin, AccessMi
                 file_type=BulkIndicatorImportFile.INDICATOR_DATA_TYPE)
             os.remove(old_file_obj.file_path)
             old_file_obj.delete()
-        except BulkIndicatorImportFile.DoesNotExist:
+        except (BulkIndicatorImportFile.DoesNotExist, FileNotFoundError):
             pass
 
         file_name = f'{datetime.strftime(datetime.now(), "%Y%m%d-%H%M%S")}-{request.user.id}-{program.pk}.json'

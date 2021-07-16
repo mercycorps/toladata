@@ -465,6 +465,26 @@ class TestBulkImportTemplateProcessing(test.TestCase):
             json.loads(response.content)['error_codes'],
             sorted([ERROR_MALFORMED_INDICATOR, ERROR_INTERVENING_BLANK_ROW]))
 
+        response = self.client.get(reverse('get_feedback_bulk_import_template', args=[self.program.id]))
+        self.assertEqual(response.get('Content-Disposition'), 'attachment; filename="Marked-up-template.xlsx"')
+        feedback_wb = openpyxl.load_workbook(ContentFile(response.content))
+        feedback_ws = feedback_wb.worksheets[0]
+        self.assertIsNotNone(
+            feedback_ws.cell(first_blank_goal_row + 2, self.first_used_column + COLUMNS_FIELD_INDEXES['number']).fill)
+        self.assertIsNotNone(
+            feedback_ws.cell(first_blank_goal_row + 3, self.first_used_column + COLUMNS_FIELD_INDEXES['level']).fill)
+
+        # Make sure entire skipped rows are highlighted
+        for row_index in [first_blank_goal_row + 4, first_blank_goal_row + 5]:
+            collector = []
+            col_loop_range = range(self.first_used_column + 2, self.first_used_column + len(COLUMNS))
+            errors_are_highlighted = [feedback_ws.cell(row_index, col_index).fill is not None for col_index in col_loop_range]
+            for col_index in col_loop_range:
+                collector.append(feedback_ws.cell(row_index, col_index).fill is not None)
+            self.assertTrue(all(errors_are_highlighted))
+        self.assertIsNotNone(
+            feedback_ws.cell(first_blank_goal_row + 4, self.first_used_column + COLUMNS_FIELD_INDEXES['name']).fill)
+
         wb = openpyxl.load_workbook(self.get_template())
         existing_goal_indicator_count = Indicator.objects.filter(level__parent=None).count()
         first_blank_goal_row = DATA_START_ROW + existing_goal_indicator_count + 1
@@ -609,6 +629,7 @@ class TestBulkImportTemplateProcessing(test.TestCase):
         response = self.client.get(reverse('get_feedback_bulk_import_template', args=[self.program.id]))
         self.assertEqual(response.get('Content-Disposition'),'attachment; filename="Marked-up-template.xlsx"')
 
+        # Make sure feedback template was deleted by the first request in this test.
         response = self.client.get(reverse('get_feedback_bulk_import_template', args=[self.program.id]))
         self.assertEqual(
             json.loads(response.content)['error_codes'], [ERROR_TEMPLATE_NOT_FOUND])
