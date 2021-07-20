@@ -7,7 +7,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: \n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2021-07-16 15:56-0700\n"
+"POT-Creation-Date: 2021-07-19 17:42-0700\n"
 "PO-Revision-Date: 2020-11-23 15:00-0800\n"
 "Last-Translator: \n"
 "Language-Team: \n"
@@ -185,10 +185,8 @@ msgstr "N/A"
 #. Translators: Page title for a log of all changes to indicators over a program's history
 #: indicators/export_renderers.py:401 tola_management/programadmin.py:125
 #: tola_management/programadmin.py:620 tola_management/views.py:336
-#, fuzzy
-#| msgid "Program page"
 msgid "Program change log"
-msgstr "Página del programa"
+msgstr "ÁTranslated Program change log"
 
 #. Translators: referring to an indicator whose results accumulate over time
 #: indicators/export_renderers.py:425 indicators/models.py:1599
@@ -431,17 +429,13 @@ msgstr "Frecuencia de informes"
 
 #. Translators: This is the title of a form field.
 #: indicators/indicator_plan.py:194 indicators/models.py:1390
-#, fuzzy
-#| msgid "Quality assurance measures"
 msgid "Data quality assurance techniques"
-msgstr "Medidas de aseguramiento de la calidad"
+msgstr "éTranslated Data quality assurance techniques"
 
 #. Translators: This is the title of a form field.
 #: indicators/indicator_plan.py:201 indicators/models.py:1380
-#, fuzzy
-#| msgid "Quality assurance measures"
 msgid "Data quality assurance details"
-msgstr "Medidas de aseguramiento de la calidad"
+msgstr "Translated Data quality assurance details"
 
 #: indicators/indicator_plan.py:208 indicators/models.py:1396
 msgid "Data issues"
@@ -756,10 +750,8 @@ msgstr "Capacitación y ensayo para recopilación de datos"
 
 #. Translators:  describes a user-selectable option in a list of things that users can do to ensure program quality
 #: indicators/models.py:1105
-#, fuzzy
-#| msgid "Data cross checks or triangulation"
 msgid "Data cross checks or triangulation of data sources"
-msgstr "Comprobación y triangulación de datos cruzados"
+msgstr "öTranslated Data cross checks or triangulation of data sources"
 
 #. Translators:  describes a user-selectable option in a list of things that users can do to ensure program quality
 #: indicators/models.py:1107
@@ -779,12 +771,12 @@ msgstr "Herramientas de recopilación de datos digitales"
 #. Translators:  describes a user-selectable option in a list of things that users can do to ensure program quality
 #: indicators/models.py:1113
 msgid "External evaluator or consultant"
-msgstr ""
+msgstr "ŹTranslated External evaluator or consultant"
 
 #. Translators:  describes a user-selectable option in a list of things that users can do to ensure program quality
 #: indicators/models.py:1115
 msgid "Mixed methods"
-msgstr ""
+msgstr "ÁTranslated Mixed methods"
 
 #. Translators:  describes a user-selectable option in a list of things that users can do to ensure program quality
 #: indicators/models.py:1117
@@ -814,12 +806,12 @@ msgstr "Revisiones periódicas de indicadores y datos"
 #. Translators:  describes a user-selectable option in a list of things that users can do to ensure program quality
 #: indicators/models.py:1127
 msgid "Secure data storage"
-msgstr ""
+msgstr "éTranslated Secure data storage"
 
 #. Translators:  describes a user-selectable option in a list of things that users can do to ensure program quality
 #: indicators/models.py:1129
 msgid "Shadow audits or accompanied supervision"
-msgstr ""
+msgstr "Translated Shadow audits or accompanied supervision"
 
 #. Translators:  describes a user-selectable option in a list of things that users can do to ensure program quality
 #: indicators/models.py:1131
@@ -828,10 +820,8 @@ msgstr " Indicadores estandarizados"
 
 #. Translators:  describes a user-selectable option in a list of things that users can do to ensure program quality
 #: indicators/models.py:1133
-#, fuzzy
-#| msgid "Standard operating procedures (SOPs)"
 msgid "Standard operating procedures (SOPs) or protocols"
-msgstr "Procedimientos operativos estándar (SOP)"
+msgstr "ŹTranslated Standard operating procedures (SOPs) or protocols"
 
 #. Translators:  describes a user-selectable option in a list of things that users plan to do with the information gathered while the program is running
 #: indicators/models.py:1138
@@ -902,19 +892,14 @@ msgstr "Número"
 #. seeing customized numbers instead of auto-generated ones that can derived from the indicator's place in
 #. the hierarchy.  The "numbers" look something like "1.1" or "1.2.1a"
 #: indicators/models.py:1192
-#, fuzzy
-#| msgid ""
-#| "This number is displayed in place of the indicator number automatically "
-#| "generated through the results framework.  An admin can turn on auto-"
-#| "numbering in program settings"
 msgid ""
 "This number is displayed in place of the indicator number automatically "
 "generated through the results framework. An admin can turn on auto-numbering "
 "in program settings."
 msgstr ""
-"Este número se visualiza en lugar del número de indicador generado "
-"automáticamente a través del sistema de resultados.  Un administrador puede "
-"activar la numeración automática en la configuración del programa"
+"ÁTranslated This number is displayed in place of the indicator number "
+"automatically generated through the results framework. An admin can turn on "
+"auto-numbering in program settings."
 
 #. Translators: field label for entering which standardized list the indicator was chosen from
 #: indicators/models.py:1199
@@ -994,20 +979,15 @@ msgstr ""
 
 #. Translators: this is help text for a field on an indicator setup form
 #: indicators/models.py:1249
-#, fuzzy
-#| msgid ""
-#| "Enter a numeric value for the baseline. If a baseline is not yet known or "
-#| "not applicable, enter a zero or select the &ldquo;Not applicable&rdquo; "
-#| "checkbox. The baseline can always be updated at later point in time."
 msgid ""
 "Enter a numeric value for the baseline. If a baseline is not yet known or "
 "not applicable, enter a zero or select the &ldquo;Not applicable&rdquo; "
 "checkbox. The baseline can always be updated at a later point in time."
 msgstr ""
-"Introduzca un valor numérico para la línea de base. Si una línea de base aún "
-"no se conoce o no es aplicable, introduzca un cero o seleccione la casilla "
-"de verificación &ldquo;No aplicable.&rdquo; La línea de base siempre puede "
-"actualizarse más adelante."
+"éTranslated Enter a numeric value for the baseline. If a baseline is not yet "
+"known or not applicable, enter a zero or select the &ldquo;Not "
+"applicable&rdquo; checkbox. The baseline can always be updated at a later "
+"point in time."
 
 #: indicators/models.py:1260 templates/indicators/indicatortargets.html:91
 #: templates/indicators/indicatortargets.html:194
@@ -1200,17 +1180,19 @@ msgid ""
 "responsibilities of team members for ensuring data quality and/or specific "
 "data sources to be verified, reviewed, or triangulated, for example."
 msgstr ""
+"öTranslated Provide any additional details about how data quality will be "
+"ensured for this specific indicator. Additional details may include specific "
+"roles and responsibilities of team members for ensuring data quality and/or "
+"specific data sources to be verified, reviewed, or triangulated, for example."
 
 #. Translators: this is help text for a field on an indicator setup form
 #: indicators/models.py:1392
-#, fuzzy
-#| msgid "Describe any quality assurance measures specific to this indicator."
 msgid ""
 "Select the data quality assurance techniques that will be applied to this "
 "specific indicator."
 msgstr ""
-"Describa cualquier medida de garantía de calidad específica para este "
-"indicador."
+"Translated Select the data quality assurance techniques that will be applied "
+"to this specific indicator."
 
 #. Translators: this is help text for a field on an indicator setup form
 #: indicators/models.py:1398
@@ -1567,49 +1549,37 @@ msgstr "Ayuda"
 
 #. Translators: An alternate form of N/A or Not applicable
 #: indicators/views/bulk_indicator_import_views.py:105
-#, fuzzy
-#| msgid "N/A"
 msgid "NA"
-msgstr "N/A"
+msgstr "öTranslated NA"
 
 #. Translators: Error message shown to a user when they have entered a value for a numeric field that isn't a number or is negative.
 #. Translators: This is help text for a form field
 #: indicators/views/bulk_indicator_import_views.py:156
 #: indicators/views/bulk_indicator_import_views.py:370
-#, fuzzy
-#| msgid ""
-#| "Enter a numeric value for the baseline. If a baseline is not yet known or "
-#| "not applicable, enter a zero or select the &ldquo;Not applicable&rdquo; "
-#| "checkbox. The baseline can always be updated at later point in time."
 msgid ""
 "Enter a numeric value for the baseline. If a baseline is not yet known or "
 "not applicable, enter a zero or type \"N/A\". The baseline can always be "
 "updated at a later point in time."
 msgstr ""
-"Introduzca un valor numérico para la línea de base. Si una línea de base aún "
-"no se conoce o no es aplicable, introduzca un cero o seleccione la casilla "
-"de verificación &ldquo;No aplicable.&rdquo; La línea de base siempre puede "
-"actualizarse más adelante."
+"ŹTranslated Enter a numeric value for the baseline. If a baseline is not yet "
+"known or not applicable, enter a zero or type \"N/A\". The baseline can "
+"always be updated at a later point in time."
 
 #. Translators: Error message shown to a user when they have entered a value that is not in a list of approved values
 #: indicators/views/bulk_indicator_import_views.py:243
 msgid "Your entry is not in the list"
-msgstr ""
+msgstr "ŹTranslated Your entry is not in the list"
 
 #. Translators:  Title of a popup box that informs the user they have entered an invalid value
 #: indicators/views/bulk_indicator_import_views.py:245
 #: indicators/views/bulk_indicator_import_views.py:279
-#, fuzzy
-#| msgid "Invalid Form"
 msgid "Invalid Entry"
-msgstr "Forma inválida"
+msgstr "ÁTranslated Invalid Entry"
 
 #. Translators: Heading placed in the cell of a spreadsheet that allows users to upload Indicators in bulk
 #: indicators/views/bulk_indicator_import_views.py:337
-#, fuzzy
-#| msgid "program indicators"
 msgid "Import indicators"
-msgstr "indicadores de programa"
+msgstr "éTranslated Import indicators"
 
 #. Translators: Instructions provided as part of an Excel template that allows users to upload Indicators
 #: indicators/views/bulk_indicator_import_views.py:341
@@ -1624,28 +1594,32 @@ msgid ""
 "3. When you are done, upload the template to the results framework or "
 "program page."
 msgstr ""
+"ÁTranslated INSTRUCTIONS\n"
+"1. Indicator rows are provided for each result level. You can delete "
+"indicator rows you do not need. You can also leave them empty and they will "
+"be ignored.\n"
+"2. Required columns are highlighted with a dark background and an asterisk "
+"(*) in the header row. Unrequired columns can be left empty but cannot be "
+"deleted.\n"
+"3. When you are done, upload the template to the results framework or "
+"program page."
 
 #. Translators: Section header of an Excel template that allows users to upload Indicators.  This section is where users will add their own information.
 #: indicators/views/bulk_indicator_import_views.py:350
-#, fuzzy
-#| msgid "Group indicators"
 msgid "Enter indicators"
-msgstr "Agrupar indicadores"
+msgstr "Translated Enter indicators"
 
 #. Translators: This is help text for a form field that gets filled in automatically
 #: indicators/views/bulk_indicator_import_views.py:367
-#, fuzzy
-#| msgid "The target is automatically determined by the result date."
 msgid "This number is automatically generated through the results framework."
 msgstr ""
-"El objetivo se determina automáticamente en base a la fecha del resultado."
+"öTranslated This number is automatically generated through the results "
+"framework."
 
 #. Translators: Message provided to user when they have failed to enter a required field on a form.
 #: indicators/views/bulk_indicator_import_views.py:491
-#, fuzzy
-#| msgid "Reason for change is required."
 msgid "This information is required."
-msgstr "Se requiere justificación para el cambio."
+msgstr "ŹTranslated This information is required."
 
 #. Translators: Message provided to user when they have not chosen from a pre-selected list of options.
 #: indicators/views/bulk_indicator_import_views.py:493
@@ -1654,25 +1628,23 @@ msgid ""
 "The {field_name} you selected is unavailable. Please select a different "
 "{field_name}."
 msgstr ""
+"éTranslated The {field_name} you selected is unavailable. Please select a "
+"different {field_name}."
 
 #. Translators: Error message provided to users when they are entering data into Excel and they skip a row
 #: indicators/views/bulk_indicator_import_views.py:613
-#, fuzzy
-#| msgid "Indicator created"
 msgid "Indicator rows cannot be skipped."
-msgstr "Indicador creado"
+msgstr "ÁTranslated Indicator rows cannot be skipped."
 
 #. Translators: Error message provided when user has exceeded the character limit on a form
 #: indicators/views/bulk_indicator_import_views.py:658
-#, fuzzy
-#| msgid "Please enter an indicator with fewer than 500 characters."
 msgid "Please enter {matches.group(1)} or fewer characters."
-msgstr "Por favor, introduzca un indicador de menos de 500 caracteres."
+msgstr "éTranslated Please enter {matches.group(1)} or fewer characters."
 
 #. Translators: Error message provided when user has exceeded the character limit on a form
 #: indicators/views/bulk_indicator_import_views.py:663
 msgid "You have exceeded the character limit of this field"
-msgstr ""
+msgstr "Translated You have exceeded the character limit of this field"
 
 #. Translators: success message when an indicator was created
 #: indicators/views/views_indicators.py:260
@@ -1935,15 +1907,6 @@ msgid "Log in"
 msgstr "Iniciar sesión"
 
 #: templates/admin/login.html:70
-#, fuzzy
-#| msgid ""
-#| "\n"
-#| "    Are you a TolaActivity admin having trouble logging in? As part of "
-#| "our Partner Access release, we incorporated\n"
-#| "    new and improved administration tools into TolaActivity itself. "
-#| "Please visit TolaActivity and look for a section\n"
-#| "    called Admin.\n"
-#| "    "
 msgid ""
 "\n"
 "    Are you a TolaData admin having trouble logging in? As part of our "
@@ -1954,10 +1917,11 @@ msgid ""
 "    "
 msgstr ""
 "\n"
-"    ¿Es administrador de TolaActivity y tiene problemas para iniciar sesión? "
-"Hemos incorporado herramientas de administración nuevas y mejoradas  \n"
-"      dentro de TolaActivity como parte de nuestro lanzamiento de Acceso de "
-"Socios. Visite TolaActivity y busque la sección Administración.\n"
+"    Translated Are you a TolaData admin having trouble logging in? As part "
+"of our Partner Access release, we incorporated\n"
+"    new and improved administration tools into TolaData itself. Please visit "
+"TolaData and look for a section\n"
+"    called Admin.\n"
 "    "
 
 #: templates/base.html:60
@@ -2482,10 +2446,9 @@ msgstr "Por favor complete este campo."
 #. Translators: on a form field, as a warning when a user has entered too much text.  %s replaced with a number (e.g. 500)
 #: templates/indicators/indicator_form_common_js.html:899
 #: templates/indicators/indicator_form_common_js.html:1012
-#, fuzzy, python-format
-#| msgid "Please enter an indicator with fewer than 500 characters."
+#, python-format
 msgid "Please enter fewer than %%s characters."
-msgstr "Por favor, introduzca un indicador de menos de 500 caracteres."
+msgstr "öTranslated Please enter fewer than %%s characters."
 
 #: templates/indicators/indicator_form_common_js.html:934
 #: templates/indicators/indicator_form_common_js.html:936
@@ -2537,17 +2500,16 @@ msgstr "Complete todos los campos obligatorios en la pestaña Rendimiento."
 
 #. Translators: a message indicating which tab a user should navigate to in order to finish filling out a form
 #: templates/indicators/indicator_form_common_js.html:1252
-#, fuzzy
-#| msgid "Please complete all required fields in the Targets tab."
 msgid "Please complete all required fields in the Data Acquisition tab."
-msgstr "Complete todos los campos obligatorios en la pestaña Objetivos."
+msgstr ""
+"ŹTranslated Please complete all required fields in the Data Acquisition tab."
 
 #. Translators: a message indicating which tab a user should navigate to in order to finish filling out a form
 #: templates/indicators/indicator_form_common_js.html:1272
-#, fuzzy
-#| msgid "Please complete all required fields in the Targets tab."
 msgid "Please complete all required fields in the Analysis and Reporting tab."
-msgstr "Complete todos los campos obligatorios en la pestaña Objetivos."
+msgstr ""
+"ÁTranslated Please complete all required fields in the Analysis and "
+"Reporting tab."
 
 #: templates/indicators/indicator_form_modal.html:77
 msgid "Summary"
@@ -2586,15 +2548,13 @@ msgstr "Guardar y agregar otro"
 
 #. Translators: The full text will be e.g. "9 selected", which is a display of how many elements the user has selected.
 #: templates/indicators/indicator_form_modal.html:497
-#, fuzzy
-#| msgid "Date collected"
 msgid "selected"
-msgstr "Fecha de recoplicación"
+msgstr "éTranslated selected"
 
 #. Translators: Indicates to the user that they have not selected any of the options available to them.
 #: templates/indicators/indicator_form_modal.html:499
 msgid "None selected"
-msgstr ""
+msgstr "öTranslated None selected"
 
 #: templates/indicators/indicator_list_modals.html:10
 msgid "Are you sure?"
@@ -2632,13 +2592,6 @@ msgstr ""
 "programa"
 
 #: templates/indicators/indicator_reportingperiod_modal.html:22
-#, fuzzy
-#| msgid ""
-#| "The program period is used in the setup of periodic targets and in "
-#| "Indicator Performance Tracking Tables (IPTT). TolaActivity initially sets "
-#| "the program period to include the program’s official start and end dates, "
-#| "as recorded in the Grant and Award Information Tracker (GAIT) system. The "
-#| "program period may be adjusted to align with the program’s indicator plan."
 msgid ""
 "The program period is used in the setup of periodic targets and in Indicator "
 "Performance Tracking Tables (IPTT). TolaData initially sets the program "
@@ -2646,13 +2599,11 @@ msgid ""
 "the Grant and Award Information Tracker (GAIT) system. The program period "
 "may be adjusted to align with the program’s indicator plan."
 msgstr ""
-"El período del programa se usa en la configuración de objetivos periódicos y "
-"en las tablas de seguimiento del rendimiento del indicador (IPTT). "
-"TolaActivity establece inicialmente el período del programa para incluir las "
-"fechas de inicio y finalización oficiales del mismo, tal como se registra en "
-"el sistema de rastreo de información de concesiones y adjudicaciones (GAIT). "
-"El período del programa puede ajustarse para alinearse con el plan de "
-"indicadores del programa."
+"Translated The program period is used in the setup of periodic targets and "
+"in Indicator Performance Tracking Tables (IPTT). TolaData initially sets the "
+"program period to include the program’s official start and end dates, as "
+"recorded in the Grant and Award Information Tracker (GAIT) system. The "
+"program period may be adjusted to align with the program’s indicator plan."
 
 #: templates/indicators/indicator_reportingperiod_modal.html:36
 msgid "GAIT program dates"
@@ -3213,17 +3164,13 @@ msgstr "Puede medir este resultado contra el objetivo de línea media o final."
 
 #. Translators: Text of a help popup.  Tells users what kind of target they will be applying a result against
 #: templates/indicators/results/result_form_common_fields.html:38
-#, fuzzy
-#| msgid "You can measure this result against the Midline or Endline target."
 msgid "You can measure this result against an Event target."
-msgstr "Puede medir este resultado contra el objetivo de línea media o final."
+msgstr "öTranslated You can measure this result against an Event target."
 
 #. Translators: Text of a help popup. Tells users that there is no target against which to apply the result they are trying to enter
 #: templates/indicators/results/result_form_common_fields.html:41
-#, fuzzy
-#| msgid "Indicators missing targets"
 msgid "Indicator missing targets."
-msgstr "Indicadores sin objetivos"
+msgstr "ŹTranslated Indicator missing targets."
 
 #. Translators: On a form input for "actual values" - warns user that they will be rounded.
 #: templates/indicators/results/result_form_common_fields.html:59
@@ -3245,22 +3192,16 @@ msgid "Update actual value"
 msgstr "Actualizar valor real"
 
 #: templates/indicators/results/result_form_evidence_fields.html:13
-#, fuzzy
-#| msgid ""
-#| "Provide a link to a file or folder in Google Drive or another shared "
-#| "network drive. Please be aware that TolaActivity does not store a copy of "
-#| "your record, <i>so you should not link to something on your personal "
-#| "computer, as no one else will be able to access it.</i>"
 msgid ""
 "Provide a link to a file or folder in Google Drive or another shared network "
 "drive. Please be aware that TolaData does not store a copy of your record, "
 "<i>so you should not link to something on your personal computer, as no one "
 "else will be able to access it.</i>"
 msgstr ""
-"Facilite un enlace a un archivo o carpeta en Google Drive o algún otro "
-"recurso compartido en la red. Tenga en cuenta que TolaActivity no almacena "
-"copias de su registro, <i>por ello no debería referenciar algo en su "
-"computadora personal, ya que nadie más podría accederlo.</i>"
+"ÁTranslated Provide a link to a file or folder in Google Drive or another "
+"shared network drive. Please be aware that TolaData does not store a copy of "
+"your record, <i>so you should not link to something on your personal "
+"computer, as no one else will be able to access it.</i>"
 
 #: templates/indicators/results/result_form_evidence_fields.html:19
 msgid "view"
@@ -3472,31 +3413,23 @@ msgstr ""
 "      "
 
 #: templates/registration/invalid_user.html:6
-#, fuzzy
-#| msgid ""
-#| "This Gmail address is not associated with a TolaActivity user account."
 msgid "This Gmail address is not associated with a TolaData user account."
 msgstr ""
-"Esta dirección de Gmail no está asociada con una cuenta de usuario de "
-"TolaActivity."
+"éTranslated This Gmail address is not associated with a TolaData user "
+"account."
 
 #: templates/registration/invalid_user.html:11
 msgid "You can request an account from your TolaData administrator."
 msgstr "Puede solicitar una cuenta a su administrador TolaData."
 
 #: templates/registration/login.html:11
-#, fuzzy
-#| msgid ""
-#| "\n"
-#| "        <h1><small>Welcome to</small> TolaActivity</h1>\n"
-#| "        "
 msgid ""
 "\n"
 "        <h1><small>Welcome to</small> TolaData</h1>\n"
 "        "
 msgstr ""
 "\n"
-"        <h1><small>Bienvenido a</small> TolaActivity</h1>\n"
+"        <h1><small>Translated Welcome to</small> TolaData</h1>\n"
 "        "
 
 #. Translators: a button directing Mercy Corps users to log in
@@ -3596,29 +3529,7 @@ msgid "Password reset email sent"
 msgstr "Correo electrónico de restauración de contraseña enviado"
 
 #: templates/registration/password_reset_done.html:12
-#, fuzzy, python-format
-#| msgid ""
-#| "\n"
-#| "    <p>We’ve sent an email to the address you’ve provided.</p>\n"
-#| "\n"
-#| "    <h4>If you didn’t receive an email, please try the following:</h4>\n"
-#| "\n"
-#| "    <ul>\n"
-#| "        <li>Check your spam or junk mail folder.</li>\n"
-#| "        <li>Verify that you entered your email address correctly.</li>\n"
-#| "        <li>Verify that you entered the email address associated with "
-#| "your TolaActivity account.</li>\n"
-#| "    </ul>\n"
-#| "\n"
-#| "    <h4>If you are using a mercycorps.org address to log in:</h4>\n"
-#| "    <p>Return to the <a href=\"%(login_url)s\">log in page</a> and click "
-#| "<strong>Log in with a mercycorps.org email address.</strong></p>\n"
-#| "\n"
-#| "    <h4>If you are using a Gmail address to log in:</h4>\n"
-#| "    <p>Return to the <a href=\"%(login_url)s\">log in page</a> and click "
-#| "<strong>Log in with Gmail.</strong> <em>We cannot reset your Gmail "
-#| "password.</em></p>\n"
-#| "    "
+#, python-format
 msgid ""
 "\n"
 "    <p>We’ve sent an email to the address you’ve provided.</p>\n"
@@ -3643,42 +3554,29 @@ msgid ""
 "    "
 msgstr ""
 "\n"
-"    <p>Hemos enviado un correo electrónico a la dirección que nos ha "
-"proporcionado.</p>\n"
+"    <p>öTranslated We’ve sent an email to the address you’ve provided.</p>\n"
 "\n"
-"    <h4>Si no ha recibido el correo, intente lo siguiente:</h4>\n"
+"    <h4>If you didn’t receive an email, please try the following:</h4>\n"
 "\n"
 "    <ul>\n"
-"        <li>Revise su carpeta de Spam o Correo No Deseado.</li>\n"
-"        <li>Verifique haber ingresado su dirección de correo electrónico "
-"correctamente.</li>\n"
-"        <li>Verifique haber ingresado la dirección de correo electrónico "
-"asociada a su cuenta TolaActivity.</li>\n"
+"        <li>Check your spam or junk mail folder.</li>\n"
+"        <li>Verify that you entered your email address correctly.</li>\n"
+"        <li>Verify that you entered the email address associated with your "
+"TolaData account.</li>\n"
 "    </ul>\n"
 "\n"
-"    <h4>Si utiliza una dirección mercycorps.org para ingresar:</h4>\n"
-"    <p>Regrese a la <a href=\"%(login_url)s\">página de inicio de sesión</a> "
-"y haga clic en <strong>Ingresar con una dirección de correo electrónico de "
-"mercycorps.org.</strong></p>\n"
+"    <h4>If you are using a mercycorps.org address to log in:</h4>\n"
+"    <p>Return to the <a href=\"%(login_url)s\">log in page</a> and click "
+"<strong>Log in with a mercycorps.org email address.</strong></p>\n"
 "\n"
-"    <h4>Si utiliza una dirección de Gmail para ingresar:</h4>\n"
-"    <p>Regrese a la <a href=\"%(login_url)s\">página de inicio de sesión</a> "
-"y haga clic en <strong>Iniciar con Gmail.</strong> <em>No podemos restaurar "
-"su contraseña de Gmail.</em></p>\n"
+"    <h4>If you are using a Gmail address to log in:</h4>\n"
+"    <p>Return to the <a href=\"%(login_url)s\">log in page</a> and click "
+"<strong>Log in with Gmail.</strong> <em>We cannot reset your Gmail password."
+"</em></p>\n"
 "    "
 
 #: templates/registration/password_reset_email.html:2
-#, fuzzy, python-format
-#| msgid ""
-#| "\n"
-#| "Someone has requested that you change the password associated with the "
-#| "username %(user)s on the Mercy Corps Tola Activity application. This "
-#| "usually happens when you click the “forgot password” link.\n"
-#| "\n"
-#| "If you did not request a new password, you can ignore this email.\n"
-#| "\n"
-#| "If you want to change your password, please click the following link and "
-#| "choose a new password:\n"
+#, python-format
 msgid ""
 "\n"
 "Someone has requested that you change the password associated with the "
@@ -3691,15 +3589,14 @@ msgid ""
 "choose a new password:\n"
 msgstr ""
 "\n"
-"Alguien ha solicitado restaurar la contraseña asociada al usuario %(user)s "
-"de la aplicación Tola Activity de Mercy Corps. Esto sucede cuando hace clic "
-"en el link \"Olvidé mi contraseña\".\n"
+"ŹTranslated Someone has requested that you change the password associated "
+"with the username %(user)s on the Mercy Corps TolaData application. This "
+"usually happens when you click the “forgot password” link.\n"
 "\n"
-"Si usted no solicitó restaurar la contraseña, puede ignorar este correo "
-"electrónico.\n"
+"If you did not request a new password, you can ignore this email.\n"
 "\n"
-"Si desea restaurar su contraseña, siga este enlace para elegir una nueva "
-"contraseña:\n"
+"If you want to change your password, please click the following link and "
+"choose a new password:\n"
 
 #: templates/registration/password_reset_email.html:12
 msgid ""
@@ -3933,329 +3830,307 @@ msgstr "Fechas importantes"
 #. Translators: One of several options for specifying how often data is collected or reported on over the life of a program
 #: tola/db_translations.py:4
 msgid "By distribution"
-msgstr ""
+msgstr "ŹTranslated By distribution"
 
 #. Translators: One of several options for specifying how often data is collected or reported on over the life of a program
 #: tola/db_translations.py:8
 msgid "Post shock"
-msgstr ""
+msgstr "ÁTranslated Post shock"
 
 #. Translators: One of several options for specifying how often data is collected or reported on over the life of a program
 #: tola/db_translations.py:12
 msgid "By training"
-msgstr ""
+msgstr "éTranslated By training"
 
 #. Translators: One of several options for specifying how often data is collected or reported on over the life of a program
 #: tola/db_translations.py:14
 msgid "Final evaluation"
-msgstr ""
+msgstr "Translated Final evaluation"
 
 #. Translators: One of several options for specifying how often data is collected or reported on over the life of a program
 #: tola/db_translations.py:16
 msgid "By batch"
-msgstr ""
+msgstr "öTranslated By batch"
 
 #. Translators: One of several options for specifying how often data is collected or reported on over the life of a program
 #: tola/db_translations.py:18
 msgid "Weekly"
-msgstr ""
+msgstr "ŹTranslated Weekly"
 
 #. Translators: One of several options for specifying how often data is collected or reported on over the life of a program
 #: tola/db_translations.py:30
-#, fuzzy
-#| msgid "Event"
 msgid "By event"
-msgstr "Evento"
+msgstr "ÁTranslated By event"
 
 #. Translators: One of several choices for what sector (i.e. development domain) a program is most closely associated with
 #: tola/db_translations.py:32
 msgid "Agribusiness"
-msgstr ""
+msgstr "ÁTranslated Agribusiness"
 
 #. Translators: One of several choices for what sector (i.e. development domain) a program is most closely associated with
 #: tola/db_translations.py:34
 msgid "Agriculture"
-msgstr ""
+msgstr "éTranslated Agriculture"
 
 #. Translators: One of several choices for what sector (i.e. development domain) a program is most closely associated with
 #: tola/db_translations.py:36
 msgid "Agriculture and Food Security"
-msgstr ""
+msgstr "Translated Agriculture and Food Security"
 
 #. Translators: One of several choices for what sector (i.e. development domain) a program is most closely associated with
 #: tola/db_translations.py:38
-#, fuzzy
-#| msgid "Basic Admin"
 msgid "Basic Needs"
-msgstr "Administrador Básico"
+msgstr "éTranslated Basic Needs"
 
 #. Translators: One of several choices for what sector (i.e. development domain) a program is most closely associated with
 #: tola/db_translations.py:40
 msgid "Capacity development"
-msgstr ""
+msgstr "öTranslated Capacity development"
 
 #. Translators: One of several choices for what sector (i.e. development domain) a program is most closely associated with
 #: tola/db_translations.py:42
 msgid "Child Health & Nutrition"
-msgstr ""
+msgstr "ŹTranslated Child Health & Nutrition"
 
 #. Translators: One of several choices for what sector (i.e. development domain) a program is most closely associated with
 #: tola/db_translations.py:44
 msgid "Climate Change Adaptation & Disaster Risk Reduction"
-msgstr ""
+msgstr "ÁTranslated Climate Change Adaptation & Disaster Risk Reduction"
 
 #. Translators: One of several choices for what sector (i.e. development domain) a program is most closely associated with
 #: tola/db_translations.py:46
-#, fuzzy
-#| msgid "Community Involvement"
 msgid "Conflict Management"
-msgstr "Participación de la comunidad"
+msgstr "Translated Conflict Management"
 
 #. Translators: One of several choices for what sector (i.e. development domain) a program is most closely associated with
 #: tola/db_translations.py:48
 msgid "Early Economic Recovery"
-msgstr ""
+msgstr "éTranslated Early Economic Recovery"
 
 #. Translators: One of several choices for what sector (i.e. development domain) a program is most closely associated with
 #: tola/db_translations.py:50
 msgid "Economic and Market Development"
-msgstr ""
+msgstr "Translated Economic and Market Development"
 
 #. Translators: One of several choices for what sector (i.e. development domain) a program is most closely associated with
 #: tola/db_translations.py:52
 msgid "Economic Recovery and Market Systems"
-msgstr ""
+msgstr "öTranslated Economic Recovery and Market Systems"
 
 #. Translators: One of several choices for what sector (i.e. development domain) a program is most closely associated with
 #: tola/db_translations.py:54
 msgid "Education Support"
-msgstr ""
+msgstr "ŹTranslated Education Support"
 
 #. Translators: One of several choices for what sector (i.e. development domain) a program is most closely associated with
 #: tola/db_translations.py:56
 msgid "Emergency"
-msgstr ""
+msgstr "ÁTranslated Emergency"
 
 #. Translators: One of several choices for what sector (i.e. development domain) a program is most closely associated with
 #: tola/db_translations.py:58
 msgid "Employment/Entrepreneurship"
-msgstr ""
+msgstr "éTranslated Employment/Entrepreneurship"
 
 #. Translators: One of several choices for what sector (i.e. development domain) a program is most closely associated with
 #: tola/db_translations.py:60
 msgid "Energy Access"
-msgstr ""
+msgstr "Translated Energy Access"
 
 #. Translators: One of several choices for what sector (i.e. development domain) a program is most closely associated with
 #: tola/db_translations.py:62
 msgid "Energy and Natural Resources"
-msgstr ""
+msgstr "öTranslated Energy and Natural Resources"
 
 #. Translators: One of several choices for what sector (i.e. development domain) a program is most closely associated with
 #: tola/db_translations.py:64
 msgid "Environment Disaster/Risk Reduction"
-msgstr ""
+msgstr "ŹTranslated Environment Disaster/Risk Reduction"
 
 #. Translators: One of several choices for what sector (i.e. development domain) a program is most closely associated with
 #: tola/db_translations.py:66
 msgid "Financial Inclusion"
-msgstr ""
+msgstr "ÁTranslated Financial Inclusion"
 
 #. Translators: One of several choices for what sector (i.e. development domain) a program is most closely associated with
 #: tola/db_translations.py:68
 msgid "Food"
-msgstr ""
+msgstr "éTranslated Food"
 
 #. Translators: One of several choices for what sector (i.e. development domain) a program is most closely associated with
 #: tola/db_translations.py:70
 msgid "Food Security"
-msgstr ""
+msgstr "Translated Food Security"
 
 #. Translators: One of several choices for what sector (i.e. development domain) a program is most closely associated with
 #: tola/db_translations.py:72
 msgid "Gender"
-msgstr ""
+msgstr "öTranslated Gender"
 
 #. Translators: One of several choices for what sector (i.e. development domain) a program is most closely associated with
 #: tola/db_translations.py:74
 msgid "Governance"
-msgstr ""
+msgstr "ŹTranslated Governance"
 
 #. Translators: One of several choices for what sector (i.e. development domain) a program is most closely associated with
 #: tola/db_translations.py:76
 msgid "Governance & Partnerships"
-msgstr ""
+msgstr "ÁTranslated Governance & Partnerships"
 
 #. Translators: One of several choices for what sector (i.e. development domain) a program is most closely associated with
 #: tola/db_translations.py:78
 msgid "Governance and Conflict Resolution"
-msgstr ""
+msgstr "éTranslated Governance and Conflict Resolution"
 
 #. Translators: One of several choices for what sector (i.e. development domain) a program is most closely associated with
 #: tola/db_translations.py:80
 msgid "Health"
-msgstr ""
+msgstr "Translated Health"
 
 #. Translators: One of several choices for what sector (i.e. development domain) a program is most closely associated with
 #: tola/db_translations.py:82
 msgid "Humanitaria Intervention Readiness"
-msgstr ""
+msgstr "öTranslated Humanitaria Intervention Readiness"
 
 #. Translators: One of several choices for what sector (i.e. development domain) a program is most closely associated with
 #: tola/db_translations.py:84
 msgid "Hygiene Promotion"
-msgstr ""
+msgstr "ŹTranslated Hygiene Promotion"
 
 #. Translators: One of several choices for what sector (i.e. development domain) a program is most closely associated with
 #: tola/db_translations.py:86
-#, fuzzy
-#| msgid "Information use"
 msgid "Information Dissemination"
-msgstr "Uso de información"
+msgstr "öTranslated Information Dissemination"
 
 #. Translators: One of several choices for what sector (i.e. development domain) a program is most closely associated with
 #: tola/db_translations.py:88
-#, fuzzy
-#| msgid "Adaptive management"
 msgid "Knowledge Management "
-msgstr "Gestión adaptativa"
+msgstr "ŹTranslated Knowledge Management "
 
 #. Translators: One of several choices for what sector (i.e. development domain) a program is most closely associated with
 #: tola/db_translations.py:90
 msgid "Livelihoods"
-msgstr ""
+msgstr "ÁTranslated Livelihoods"
 
 #. Translators: One of several choices for what sector (i.e. development domain) a program is most closely associated with
 #: tola/db_translations.py:92
 msgid "Market Systems Development"
-msgstr ""
+msgstr "éTranslated Market Systems Development"
 
 #. Translators: One of several choices for what sector (i.e. development domain) a program is most closely associated with
 #: tola/db_translations.py:94
 msgid "Maternal Health & Nutrition"
-msgstr ""
+msgstr "Translated Maternal Health & Nutrition"
 
 #. Translators: One of several choices for what sector (i.e. development domain) a program is most closely associated with
 #: tola/db_translations.py:96
 msgid "Non food Items (NFIs)"
-msgstr ""
+msgstr "öTranslated Non food Items (NFIs)"
 
 #. Translators: One of several choices for what sector (i.e. development domain) a program is most closely associated with
 #: tola/db_translations.py:98
 msgid "Nutrition Sensitive"
-msgstr ""
+msgstr "ŹTranslated Nutrition Sensitive"
 
 #. Translators: One of several choices for what sector (i.e. development domain) a program is most closely associated with
 #: tola/db_translations.py:100
-#, fuzzy
-#| msgid "Project Initiation"
 msgid "Project Monitoring"
-msgstr "Iniciación de proyecto"
+msgstr "ÁTranslated Project Monitoring"
 
 #. Translators: One of several choices for what sector (i.e. development domain) a program is most closely associated with
 #: tola/db_translations.py:102
-#, fuzzy
-#| msgid "Project Description"
 msgid "Protection"
-msgstr "Descripción del proyecto"
+msgstr "éTranslated Protection"
 
 #. Translators: One of several choices for what sector (i.e. development domain) a program is most closely associated with
 #: tola/db_translations.py:104
 msgid "Psychosocial"
-msgstr ""
+msgstr "ÁTranslated Psychosocial"
 
 #. Translators: One of several choices for what sector (i.e. development domain) a program is most closely associated with
 #: tola/db_translations.py:106
-#, fuzzy
-#| msgid "Public Dashboards"
 msgid "Public Health"
-msgstr "Tableros públicos"
+msgstr "Translated Public Health"
 
 #. Translators: One of several choices for what sector (i.e. development domain) a program is most closely associated with
 #: tola/db_translations.py:108
 msgid "Resilience"
-msgstr ""
+msgstr "éTranslated Resilience"
 
 #. Translators: One of several choices for what sector (i.e. development domain) a program is most closely associated with
 #: tola/db_translations.py:110
 msgid "Sanitation Infrastructure"
-msgstr ""
+msgstr "Translated Sanitation Infrastructure"
 
 #. Translators: One of several choices for what sector (i.e. development domain) a program is most closely associated with
 #: tola/db_translations.py:112
 msgid "Skills and Training"
-msgstr ""
+msgstr "öTranslated Skills and Training"
 
 #. Translators: One of several choices for what sector (i.e. development domain) a program is most closely associated with
 #: tola/db_translations.py:114
-#, fuzzy
-#| msgid "Data issues"
 msgid "Urban Issues"
-msgstr "Problemas de datos"
+msgstr "öTranslated Urban Issues"
 
 #. Translators: One of several choices for what sector (i.e. development domain) a program is most closely associated with
 #: tola/db_translations.py:116
 msgid "WASH"
-msgstr ""
+msgstr "ŹTranslated WASH"
 
 #. Translators: One of several choices for what sector (i.e. development domain) a program is most closely associated with
 #: tola/db_translations.py:118
 msgid "Water Supply Infrastructure"
-msgstr ""
+msgstr "ÁTranslated Water Supply Infrastructure"
 
 #. Translators: One of several choices for what sector (i.e. development domain) a program is most closely associated with
 #: tola/db_translations.py:120
 msgid "Workforce Development"
-msgstr ""
+msgstr "éTranslated Workforce Development"
 
 #. Translators: One of several choices for what sector (i.e. development domain) a program is most closely associated with
 #: tola/db_translations.py:122
 msgid "Youth"
-msgstr ""
+msgstr "Translated Youth"
 
 #. Translators: One of several choices for specifying what type of Indicator is being created.  An Indicator is a performance measure e.g. "We will distrubute 1000 food packs over the next two months"
 #: tola/db_translations.py:124
-#, fuzzy
-#| msgid "Customsort"
 msgid "Custom"
-msgstr "Customsort"
+msgstr "ŹTranslated Custom"
 
 #. Translators: One of several choices for specifying what type of Indicator is being created.  An Indicator is a performance measure e.g. "We will distrubute 1000 food packs over the next two months"
 #: tola/db_translations.py:126
 msgid "Donor"
-msgstr ""
+msgstr "öTranslated Donor"
 
 #. Translators: One of several choices for specifying what type of Indicator is being created.  An Indicator is a performance measure e.g. "We will distrubute 1000 food packs over the next two months"
 #: tola/db_translations.py:128
 msgid "DIG - Standard"
-msgstr ""
+msgstr "ŹTranslated DIG - Standard"
 
 #. Translators: One of several choices for specifying what type of Indicator is being created.  An Indicator is a performance measure e.g. "We will distrubute 1000 food packs over the next two months"
 #: tola/db_translations.py:130
 msgid "DIG - Alpha"
-msgstr ""
+msgstr "ÁTranslated DIG - Alpha"
 
 #. Translators: One of several choices for specifying what type of Indicator is being created.  An Indicator is a performance measure e.g. "We will distrubute 1000 food packs over the next two months"
 #: tola/db_translations.py:132
 msgid "DIG - Testing"
-msgstr ""
+msgstr "éTranslated DIG - Testing"
 
 #. Translators: One of several choices for specifying what type of Indicator is being created.  An Indicator is a performance measure e.g. "We will distrubute 1000 food packs over the next two months"
 #: tola/db_translations.py:136
 msgid "Process / Management"
-msgstr ""
+msgstr "Translated Process / Management"
 
 #. Translators: One of several choices for specifying what type of Indicator is being created.  An Indicator is a performance measure e.g. "We will distrubute 1000 food packs over the next two months"
 #: tola/db_translations.py:138
 msgid "Context / Trigger"
-msgstr ""
+msgstr "öTranslated Context / Trigger"
 
 #. Translators: One of several choices for specifying what type of Indicator is being created.  An Indicator is a performance measure e.g. "We will distrubute 1000 food packs over the next two months"
 #: tola/db_translations.py:140
-#, fuzzy
-#| msgid "Key Performance Indicators"
 msgid "Key Performance Indicator (KPI)"
-msgstr "Indicadores clave de rendimiento"
+msgstr "ÁTranslated Key Performance Indicator (KPI)"
 
 #: tola/forms.py:43
 msgid "Form Errors"
@@ -4428,17 +4303,13 @@ msgstr "Indicador creado"
 
 #. Translators: this is a value in a change log that tells a user what type of change was made.  This value indicates that there was a succesful upload.
 #: tola_management/models.py:423
-#, fuzzy
-#| msgid "Indicator created"
 msgid "Indicator imported"
-msgstr "Indicador creado"
+msgstr "éTranslated Indicator imported"
 
 #. Translators: this is a value in a change log that tells a user what type of change was made.  This value indicates that an attempt was made to upload a template but doesn't specify whether the upload was successful or not
 #: tola_management/models.py:425
-#, fuzzy
-#| msgid "Indicator created"
 msgid "Indicator import template uploaded"
-msgstr "Indicador creado"
+msgstr "Translated Indicator import template uploaded"
 
 #: tola_management/models.py:426
 msgid "Indicator changed"
@@ -4592,28 +4463,22 @@ msgstr "Este campo debe ser único"
 #. Translators: Page title for an administration page managing users of the application
 #: tola_management/views.py:294
 msgid "Admin: Users"
-msgstr ""
+msgstr "ŹTranslated Admin: Users"
 
 #. Translators: Page title for an administration page managing organizations in the application
 #: tola_management/views.py:299
-#, fuzzy
-#| msgid "Organizations"
 msgid "Admin: Organizations"
-msgstr "Organizaciones"
+msgstr "öTranslated Admin: Organizations"
 
 #. Translators: Page title for an administration page managing Programs using the application
 #: tola_management/views.py:304
-#, fuzzy
-#| msgid "Programs"
 msgid "Admin: Programs"
-msgstr "Programas"
+msgstr "ŹTranslated Admin: Programs"
 
 #. Translators: Page title for an administration page managing countries represented in the application
 #: tola_management/views.py:309
-#, fuzzy
-#| msgid "Countries"
 msgid "Admin: Countries"
-msgstr "Países"
+msgstr "ÁTranslated Admin: Countries"
 
 #. Translators: Error message given when an administrator tries to save a username that is already taken
 #: tola_management/views.py:394 tola_management/views.py:406
@@ -6125,10 +5990,6 @@ msgstr "Ciudad, País:"
 #~ msgstr "Elemento de la lista de verificación"
 
 #, fuzzy
-#~| msgid ""
-#~| "\n"
-#~| "            %(get_target_frequency_label)s targets\n"
-#~| "            "
 #~ msgid "%(get_target_frequency_label)s targets"
 #~ msgstr ""
 #~ "\n"
@@ -6501,7 +6362,6 @@ msgstr "Ciudad, País:"
 #~ msgid "Your username is:"
 #~ msgstr "Su nombre de usuario es:"
 
-#~| msgid "Tola Sites"
 #~ msgid "The Tola team"
 #~ msgstr "El equipo Tola"
 
@@ -6652,7 +6512,6 @@ msgstr "Ciudad, País:"
 #~ msgid "Tola Bookmarks"
 #~ msgstr "Marcadores de Tola"
 
-#~| msgid "Approval submitted by"
 #~ msgid "Submitted by"
 #~ msgstr "Presentado por"
 
@@ -6828,7 +6687,6 @@ msgstr "Ciudad, País:"
 #~ msgstr ""
 #~ "Por favor ingrese un valor objetivo. Su valor objetivo puede ser cero."
 
-#~| msgid "Add indicator"
 #~ msgid "Add an indicator."
 #~ msgstr "Agregar un indicador."
 
@@ -6919,12 +6777,10 @@ msgstr "Ciudad, País:"
 #~ msgstr "Objetivo de vida del programa (LoP) *"
 
 #, fuzzy
-#~| msgid "Most recent"
 #~ msgid "Most recent {} {}"
 #~ msgstr "Más reciente"
 
 #, fuzzy
-#~| msgid "Show all"
 #~ msgid "Show all {}"
 #~ msgstr "Mostrar todo"
 
@@ -6938,22 +6794,18 @@ msgstr "Ciudad, País:"
 #~ msgstr "Distrito:"
 
 #, fuzzy
-#~| msgid "Years"
 #~ msgid "Year %s"
 #~ msgstr "Año %s"
 
 #, fuzzy
-#~| msgid "Semi-annual periods"
 #~ msgid "Semi-annual period %s"
 #~ msgstr "Periodos semestral %s"
 
 #, fuzzy
-#~| msgid "Tri-annual periods"
 #~ msgid "Tri-annual period %s"
 #~ msgstr "Períodos trienal %s"
 
 #, fuzzy
-#~| msgid "Quarters"
 #~ msgid "Quarter %s"
 #~ msgstr "Trimestre %s"
 
@@ -6961,7 +6813,6 @@ msgstr "Ciudad, País:"
 #~ msgstr "indicador de programa"
 
 #, fuzzy
-#~| msgid "Feedback"
 #~ msgid "feedback form"
 #~ msgstr "Realimentación"
 
