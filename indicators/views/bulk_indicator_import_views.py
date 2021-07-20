@@ -98,7 +98,14 @@ ERROR_INTERVENING_BLANK_ROW = 203  # Indicators are separated by an empty row wo
 
 
 EMPTY_CHOICE = '---------'
-NULL_EQUIVALENTS = ['N/A', 'NA', 'Not applicable']
+
+# Translators: Not applicable. A value that can be entered into a form field when the field doesn't apply in a particular situation.
+na = gettext_noop('N/A')
+# Translators: An alternate form of N/A or Not applicable
+na_alt = gettext_noop('NA')
+# Translators: A value that can be entered into a form field when the field doesn't apply in a particular situation.
+not_applicable = gettext_noop('Not applicable')
+NULL_EQUIVALENTS = [na, na_alt, not_applicable]
 
 TITLE_STYLE = 'title_style'
 REQUIRED_HEADER_STYLE = 'required_header_style'
@@ -273,9 +280,6 @@ class BulkImportIndicatorsView(LoginRequiredMixin, UserPassesTestMixin, AccessMi
                 ws.add_data_validation(validator)
                 validator.add(active_cell)
 
-                active_cell.alignment = Alignment(horizontal='right')
-                active_cell.number_format = '0.00'
-
     @staticmethod
     def get_comment_obj(help_text):
         comment = Comment(help_text, '')
@@ -334,8 +338,7 @@ class BulkImportIndicatorsView(LoginRequiredMixin, UserPassesTestMixin, AccessMi
         ws.cell(self.program_name_row, self.first_used_column).value = program.name
         ws.cell(2, self.first_used_column).style = TITLE_STYLE
         # Translators: Instructions provided as part of an Excel template that allows users to upload Indicators
-        instructions = gettext(
-            "INSTRUCTIONS\n"
+        instructions = gettext("INSTRUCTIONS\n"
             "1. Indicator rows are provided for each result level. You can delete indicator rows you do not need. You can also leave them empty and they will be ignored.\n"
             "2. Required columns are highlighted with a dark background and an asterisk (*) in the header row. Unrequired columns can be left empty but cannot be deleted.\n"
             "3. When you are done, upload the template to the results framework or program page."
@@ -468,8 +471,10 @@ class BulkImportIndicatorsView(LoginRequiredMixin, UserPassesTestMixin, AccessMi
 
                     if 'default' in column:
                         active_cell.value = gettext(column['default'])
-                    if column['field_name'] == 'number':
+                    if column['field_name'] in ['number', 'baseline']:
                         active_cell.alignment = Alignment(horizontal='right')
+                    if column['field_name'] == 'baseline':
+                        active_cell.number_format = '0.00'
 
                 current_row_index += 1
             current_row_index += 1  # Leave one row blank at the end of each level section
@@ -653,7 +658,6 @@ class BulkImportIndicatorsView(LoginRequiredMixin, UserPassesTestMixin, AccessMi
                                 msg = gettext(f'Please enter {matches.group(1)} or fewer characters.')
                                 validation_errors[field_name].append(msg)
                             else:
-
                                 validation_errors[field_name].append(
                                     # Translators: Error message provided when user has exceeded the character limit on a form
                                     gettext("You have exceeded the character limit of this field"))
