@@ -170,7 +170,7 @@ const api = {
     },
     async downloadFeedback(program_id) {
         // TODO: Update the URL for the feedback template file
-        return await this.templatesInstance.get(`/indicators/api/get_feedback_bulk_import_template/${program_id}/`)
+        return await this.templatesInstance.get(`/1indicators/api/get_feedback_bulk_import_template/${program_id}/`)
             .then(response => {
                 const url = window.URL.createObjectURL(new Blob([response.data]));
                 const link = document.createElement('a');
@@ -204,11 +204,12 @@ const api = {
         //         return {error};
         //     })
 
-        return await this.apiInstance.post(`/save_bulk_import_data/${program_id}/`)
+        return await this.apiInstance.post(`/1save_bulk_import_data/${program_id}/`)
             .then(response => response)
             .catch((error) => {
                 this.logFailure(error);
-                return error.response;
+                // return error.response;
+                return {status: 400, data: {valid: 2, error_codes: [108]}}
             })    
         },
 };

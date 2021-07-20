@@ -168,6 +168,7 @@ export const ImportIndicatorsPopover = ({ page, program_id, tierLevelsUsed, stor
 
     let defaultTierLevelRows = [];
     useEffect(() => {
+        console.log(storedView);
         storedView.view !== 0 ? setViews(storedView.view) : null;
         storedView.valid ? setvalidIndicatorsCount(storedView.valid) : null;
         storedView.invalid ? setInvalidIndicatorsCount(storedView.invalid) : null;
@@ -198,6 +199,14 @@ export const ImportIndicatorsPopover = ({ page, program_id, tierLevelsUsed, stor
             return accumulator;
         };
         return codes.reduce(reducer, []);
+    };
+
+    // Handles view changes
+    let viewChange = (before, after, valid = 0, invalid = 0) => {
+        console.log('viewchange', valid, invalid);
+        setPrevView({view: before, valid: valid, invalid: invalid})
+        setViews(after)
+        setStoredView({view: after, valid: valid, invalid: invalid})
     };
 
     // Download template file providing the program ID and number of rows per tier level
@@ -237,31 +246,40 @@ export const ImportIndicatorsPopover = ({ page, program_id, tierLevelsUsed, stor
                 .then(response => {
                     let handleResponse = () => {
                         if (response.status === 404) {
-                            setViews(ERROR);
+                            // setViews(ERROR);
+                            viewChange(INITIAL, ERROR)
                         } else {
-                            setvalidIndicatorsCount(response.data ? response.data.valid : 0);
-                            setInvalidIndicatorsCount(response.data ? response.data.invalid : 0);
+                            let validCount = response.data ? response.data.valid : 0;
+                            let invalidCount = response.data ? response.data.invalid : 0;
+                            setvalidIndicatorsCount(validCount);
+                            setInvalidIndicatorsCount(invalidCount);
                             // Successful upload with no errors and all rows valid
                             if (response.status === 200) { 
-                                setStoredView({view: CONFIRM, valid: response.data.valid});
-                                setViews(CONFIRM);
+                                // setStoredView({view: CONFIRM, valid: response.data.valid});
+                                // setViews(CONFIRM);
+                                viewChange(INITIAL, CONFIRM, validCount);
                             // Unsuccessful upload with fatal errors
                             } else if ( response.status === 406 ) { 
                                 let errorsMessagesToDisplay = reduceErrorCodes(response.data.error_codes)
                                 if (errorsMessagesToDisplay.length > 0) {
                                     setDisplayError({view: INITIAL, error: errorsMessagesToDisplay})
-                                    setViews(INITIAL);
+                                    // setViews(INITIAL);
+                                    viewChange(INITIAL, INITIAL)
                                 } else {
-                                    setViews(ERROR);
+                                    // setViews(ERROR);
+                                    viewChange(INITIAL, ERROR)
                                 }
                             // Unsuccessful upload with errors and/or invalid rows
                             } else if (response.status.toString().slice(0, 1) === "4") {
-                                setStoredView({view: FEEDBACK, valid: response.data.valid, invalid: response.data.invalid});
-                                setPrevView({view: FEEDBACK, valid: response.data.valid, invalid: response.data.invalid});
-                                setViews(FEEDBACK);
+                                // setStoredView({view: FEEDBACK, valid: response.data.valid, invalid: response.data.invalid});
+                                // setPrevView({view: FEEDBACK, valid: response.data.valid, invalid: response.data.invalid});
+                                // setViews(FEEDBACK);
+                                console.log('400', validCount, invalidCount);
+                                viewChange(INITIAL, FEEDBACK, validCount, invalidCount);
                             // Handles any other error/problem
                             } else {
-                                setViews(ERROR); 
+                                // setViews(ERROR); 
+                                viewChange(INITIAL, ERROR, validCount, invalidCount)
                             }
                         }
                     }
@@ -287,7 +305,8 @@ export const ImportIndicatorsPopover = ({ page, program_id, tierLevelsUsed, stor
         api.downloadFeedback(program_id)
         .then(response => {
             if (response.status !== 200) {
-                setViews(ERROR);
+                // setViews(ERROR);
+                viewChange(FEEDBACK, ERROR, validIndicatorsCount, invalidIndicatorsCount)
             }
         })
     }
@@ -307,10 +326,12 @@ export const ImportIndicatorsPopover = ({ page, program_id, tierLevelsUsed, stor
             .then(response => {
                 let handleResponse = () => {
                     if (response.status === 404) {
-                        setViews(ERROR);
+                        // setViews(ERROR);
+                        viewChange(CONFIRM, ERROR, validIndicatorsCount)
                     } else {
                         if (response.status === 200) {
                             setViews(SUCCESS);
+                            viewChange(CONFIRM, SUCCESS, validIndicatorsCount)
                         } else {
                             let errorsMessagesToDisplay = reduceErrorCodes(response.data.error_codes);
                             setDisplayError({view: CONFIRM, error: errorsMessagesToDisplay});
@@ -332,7 +353,7 @@ export const ImportIndicatorsPopover = ({ page, program_id, tierLevelsUsed, stor
     // Handle clicking cancel and closing the popover
     let handleClose = () => {
         $('.popover').popover('hide');
-        setStoredView({});
+        setStoredView({view: 0});
         setStoredTierLevelsRows([]);
     }
 
@@ -634,6 +655,7 @@ export const ImportIndicatorsPopover = ({ page, program_id, tierLevelsUsed, stor
                         )
                     // TODO: ***** View for when an API call fails *****
                     case ERROR:
+                        console.log("Error View", prevView);
                         return (
                             <div className="import-error">
                                 <div className="import-error__text">
@@ -649,7 +671,8 @@ export const ImportIndicatorsPopover = ({ page, program_id, tierLevelsUsed, stor
                                 </div>
                                 <button 
                                     className="btn btn-sm btn-primary" 
-                                    onClick={() => setViews(prevView.view)}
+                                    // onClick={() => setViews(prevView.view)}
+                                    onClick={() => viewChange(ERROR, prevView.view, prevView.valid, prevView.invalid)}
                                     // onClick={() => setViews(storedView.view ? storedView.view : INITIAL)}
                                 >
                                     {
