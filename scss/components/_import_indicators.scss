@@ -1,11 +1,17 @@
-.page_result_framework > .popover {
+.indicator-import__popover {
     min-width: 300px;
     max-width: 345px;
+
+    .popover-header {
+        background-color: transparent;
+        border: none;
+        padding: 1rem 1rem 0;
+    }
+    .popover-body {
+        padding: 0;
+    }
 }
-.page_program_page > .popover {
-    min-width: 300px;
-    max-width: 340px;
-}
+
 // ***** Initial View Styling *****
 .import-initial-text {
     padding: 0.5rem 1rem 0;
@@ -121,8 +127,11 @@
 
     &-download {
         padding-left: 1.5rem;
-        font-weight: bold;
-        color: $action;
+        
+        a {
+            font-weight: bold;
+            color: $action;
+        }
     }
 }
 
@@ -137,6 +146,11 @@
         margin-top: 0.5rem;
         margin-bottom: 1rem;
         align-items: flex-start;
+
+        &-error {
+            color: $red;
+            margin-bottom: 0.75rem;
+        }
         
         & > div > .fa-check-circle {
             margin-top: 4px;

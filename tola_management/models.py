@@ -419,7 +419,9 @@ class ProgramAuditLog(models.Model, DiffableLog):
     def change_type_map(self):
         return {
             "indicator_created": _("Indicator created"),
+            # Translators: this is a value in a change log that tells a user what type of change was made.  This value indicates that there was a succesful upload.
             "indicator_imported": _("Indicator imported"),
+            # Translators: this is a value in a change log that tells a user what type of change was made.  This value indicates that an attempt was made to upload a template but doesn't specify whether the upload was successful or not
             "template_uploaded": _("Indicator import template uploaded"),
             "indicator_changed": _('Indicator changed'),
             "indicator_deleted": _('Indicator deleted'),

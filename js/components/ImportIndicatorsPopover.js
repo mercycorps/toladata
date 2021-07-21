@@ -45,6 +45,7 @@ export class ImportIndicatorsButton extends React.Component {
                 document.querySelector(`#${this.popoverName}_popover_content`),
                 popoverOpenHandler
             );
+            $(`#${this.popoverName}_popover_content`).parent().parent().addClass('indicator-import__popover');
         };
         $(this.myRef.current).popover({
             content: `<div id="${this.popoverName}_popover_content"></div>`,
@@ -99,7 +100,7 @@ export class ImportIndicatorsButton extends React.Component {
     getPopoverContent = () => {
 
         // Determine what tier levels have been created/used in the Results Framework
-        let tierLevelsUsed = []; 
+        let tierLevelsUsed = [];
         this.props.levelTiers.map((tier, i) => {
             tierLevelsUsed[i] = {
                 name: tier.name,
@@ -111,10 +112,10 @@ export class ImportIndicatorsButton extends React.Component {
         })
 
         return (
-                <ImportIndicatorsPopover 
-                    page={ this.props.page } 
-                    program_id={ this.props.program_id } 
-                    tierLevelsUsed={ tierLevelsUsed } 
+                <ImportIndicatorsPopover
+                    page={ this.props.page }
+                    program_id={ this.props.program_id }
+                    tierLevelsUsed={ tierLevelsUsed }
                     storedView={ this.state.storedView }
                     setStoredView={ this.setStoredView }
                     storedTierLevelsRows={ this.state.storedTierLevelsRows }
@@ -161,7 +162,8 @@ export const ImportIndicatorsPopover = ({ page, program_id, tierLevelsUsed, stor
     const [validIndicatorsCount, setvalidIndicatorsCount] = useState(0); // Number of indicators that have passed validation and are ready to import
     const [invalidIndicatorsCount, setInvalidIndicatorsCount] = useState(0); // Number of indicators that have failed validation and needs fixing
     const [tierLevelsRows, setTierLevelsRows] = useState([]); // State to hold the tier levels name and the desired number of rows for the excel template
-    const [initialViewError, setInitialViewError] = useState([]);
+    const [displayError, setDisplayError] = useState({view: null, error: []}); // ie {view: INITIAL, error: []}
+    const [downloadOrUpload, setDownloadOrUpload] = useState(null);
 
     let defaultTierLevelRows = [];
     useEffect(() => {
@@ -188,15 +190,30 @@ export const ImportIndicatorsPopover = ({ page, program_id, tierLevelsUsed, stor
         setStoredTierLevelsRows(tierLevelsRows);
     }, [tierLevelsRows])
 
+    // Reduce the array of errors to remove duplicate messaging
+    let reduceErrorCodes = (codes) => {
+        let reducer = (accumulator, code) => {
+            errorCodes[code] && accumulator.indexOf(errorCodes[code].message) === -1 && accumulator.push(errorCodes[code].message);
+            return accumulator;
+        };
+        return codes.reduce(reducer, []);
+    };
+
     // Download template file providing the program ID and number of rows per tier level
     let handleDownload = () => {
+        setDownloadOrUpload("download");
         api.downloadTemplate(program_id, tierLevelsRows)
             .then(response => {
-                if (response.status !== 200) {
-                    if (response.error_code && response.error_code.toString().slice(0, 1) === "1" ) {
-                        setInitialViewError(response.error_code);
-                    } else {
-                        setViews(ERROR);
+                if (response.status === 404) {
+                    setViews(ERROR);
+                } else {
+                    if (response.status !== 200) {
+                        if (response.data.error_codes && response.data.error_codes.toString().slice(0, 1) === "1" ) {
+                            let errorsMessagesToDisplay = reduceErrorCodes(response.data.error_codes);
+                            setDisplayError({view: INITIAL, error: errorsMessagesToDisplay});
+                        } else {
+                            setViews(ERROR);
+                        }
                     }
                 }
             })
@@ -204,38 +221,44 @@ export const ImportIndicatorsPopover = ({ page, program_id, tierLevelsUsed, stor
 
     // Upload template file and send api request
     let handleUpload = (e) => {
+        setDownloadOrUpload("upload")
         let loading = false;
+        let stopLoading;
         let loadingTimer = setTimeout(() => {
-            setViews(LOADING)
+            setViews(LOADING);
             loading = true;
-        }, 1000)
-        // let files = e.target.files;
-        // let reader = new FileReader();
-        // reader.readAsDataURL(files[0]);
-        // reader.onload = (e) => {
+            stopLoading = setTimeout(() => { // Prevents the forever spinner situation
+                setViews(INITIAL);
+            }, 60000);
+        }, 1000);
+
         api.uploadTemplate(program_id, e.target.files[0])
                 .then(response => {
                     let handleResponse = () => {
-                        if ((response.status === 200)) {
-                            setvalidIndicatorsCount(response.valid);
-                            setInvalidIndicatorsCount(response.invalid);
-                            if (response.invalid === 0) {
-                                setViews(CONFIRM);
-                                setStoredView({view: CONFIRM, valid: response.valid});
-                            } else {
-                                setViews(FEEDBACK);
-                                setStoredView({view: FEEDBACK, valid: response.valid, invalid: response.invalid});
-                            }
+                        if (response.status === 404) {
+                            setViews(ERROR);
                         } else {
-                            if ( (response.data.error_codes.filter(code => code.toString().slice(0, 1) === "1")).length > 0 ) {
-                                // Reduce the array of errors from the server to remove duplicate messaging
-                                let reducer = (accumulator, code) => {
-                                    accumulator.indexOf(errorCodes[code].message) === -1 && accumulator.push(errorCodes[code].message);
-                                    return accumulator;
-                                };
-                                setInitialViewError(response.data.error_codes.reduce(reducer, []));
+                            setvalidIndicatorsCount(response.data.valid || 0);
+                            setInvalidIndicatorsCount(response.data.invalid || 0);
+                            // Successful upload with no errors and all rows valid
+                            if (response.status === 200) {
+                                setViews(CONFIRM);
+                                setStoredView({view: CONFIRM, valid: response.data.valid});
+                            // Unsuccessful upload with fatal errors
+                            } else if ( response.status === 406 ) {
+                                let errorsMessagesToDisplay = reduceErrorCodes(response.data.error_codes)
+                                if (errorsMessagesToDisplay.length > 0) {
+                                    setDisplayError({view: INITIAL, error: errorsMessagesToDisplay})
+                                    setViews(INITIAL);
+                                } else {
+                                    setViews(ERROR);
+                                }
+                            // Unsuccessful upload with errors and/or invalid rows
+                            } else if (response.status.toString().slice(0, 1) === "4") {
+                                setViews(FEEDBACK);
+                                setStoredView({view: FEEDBACK, valid: response.data.valid, invalid: response.data.invalid});
+                            // Handles any other error/problem
                             } else {
-                                // TODO: handle non 100 level errors
                                 setViews(ERROR);
                             }
                         }
@@ -243,10 +266,11 @@ export const ImportIndicatorsPopover = ({ page, program_id, tierLevelsUsed, stor
                     if (loading) {
                         setTimeout(() => {
                             handleResponse();
+                            clearTimeout(stopLoading);
                         }, 1000)
                     } else {
-                        clearTimeout(loadingTimer);
                         handleResponse();
+                        clearTimeout(loadingTimer);
                     }
                 })
     }
@@ -260,7 +284,7 @@ export const ImportIndicatorsPopover = ({ page, program_id, tierLevelsUsed, stor
     let handleFeedback = () => {
         api.downloadFeedback(program_id)
         .then(response => {
-            if (response.error) {
+            if (response.status !== 200) {
                 setViews(ERROR);
             }
         })
@@ -269,22 +293,32 @@ export const ImportIndicatorsPopover = ({ page, program_id, tierLevelsUsed, stor
     // Handle confirm and complete importing indicators
     let handleConfirm = () => {
         let loading = false;
+        let stopLoading;
         let loadingTimer = setTimeout(() => {
-            setViews(LOADING)
+            setViews(LOADING);
             loading = true;
+            stopLoading = setTimeout(() => { // Prevents the forever spinner situation
+                setViews(CONFIRM);
+            }, 60000);
         }, 1000)
         api.confirmUpload(program_id)
             .then(response => {
                 let handleResponse = () => {
-                    if (!response.error) {
-                        setViews(SUCCESS);
-                    } else {
+                    if (response.status === 404) {
                         setViews(ERROR);
+                    } else {
+                        if (response.status === 200) {
+                            setViews(SUCCESS);
+                        } else {
+                            let errorsMessagesToDisplay = reduceErrorCodes(response.data.error_codes);
+                            setDisplayError({view: CONFIRM, error: errorsMessagesToDisplay});
+                        }
                     }
                 }
                 if (loading) {
                     setTimeout(() => {
                         handleResponse();
+                        clearTimeout(stopLoading);
                     }, 1000)
                 } else {
                     clearTimeout(loadingTimer);
@@ -295,18 +329,29 @@ export const ImportIndicatorsPopover = ({ page, program_id, tierLevelsUsed, stor
 
     // Handle clicking cancel and closing the popover
     let handleClose = () => {
-        $('.popover').popover('hide')
-        setStoredView({})
-        setStoredTierLevelsRows([])
+        $('.popover').popover('hide');
+        setStoredView({});
+        setStoredTierLevelsRows([]);
+    }
+
+    // TODO/IN-WORK: Handle Continue when there are multiple downloaders or uploaders
+    let handleContinue = () => {
+        if (downloadOrUpload === "download") {
+            handleDownload();
+        } else {
+            // TODO: Update for when the users clicks to continue to upload when theres multiple uploaders
+            console.log("Continue Upload");
+            // handleUpload();
+        }
     }
 
     // TODO/IN-WORK: Need to determine how to handle continue button for downloading and uploading. Structure and Styles are in place.
-    let multipleUploadWarning = 
+    let multipleUploadWarning =
         <div className="import-initial-text">
             <div className="import-initial-text-error">
                 <span>
                     {errorMessages[errorCodes[106].message]}&nbsp;
-                    <a 
+                    <a
                         className="import-initial-text-error-link"
                         role="link"
                         href={ `/tola_management/audit_log/${program_id}/` }
@@ -330,7 +375,7 @@ export const ImportIndicatorsPopover = ({ page, program_id, tierLevelsUsed, stor
                     role="button"
                     type="button"
                     className="btn btn-sm btn-primary"
-                    // onClick={ (e) => handleUpload(e) } //TODO: Determine how to handle this scenario, send files again or just send a confirm to continue
+                    onClick={ () => handleContinue() }
                 >
                     {
                         // # Translators: Button to continue and upload the template
@@ -374,26 +419,25 @@ export const ImportIndicatorsPopover = ({ page, program_id, tierLevelsUsed, stor
                                             }
                                         </li>
                                     </ol>
-                                    {initialViewError.indexOf(3) === -1 &&
-                                        initialViewError.map((message_id, i) => {
-                                            // If more than one different error messages, display them in a numbered list. If just one, just display that one message.
+                                    {displayError.view === INITIAL && displayError.error.indexOf(5) === -1 &&
+                                        displayError.error.map(message_id => {
                                             return (
                                                 <div key={message_id} className="import-initial-text-error">
-                                                    {initialViewError.length > 1 && `${i + 1}. `}{ errorMessages[message_id] }
+                                                    { errorMessages[message_id] }
                                                 </div>
                                             )
                                         })
                                     }
                                 </div>
                                 {/* TODO: Update to handle multiply downloaders/uploaders scenarios */}
-                                {initialViewError.indexOf(3) >= 0 ? 
+                                {displayError.error.indexOf(5) >= 0 ?
                                     multipleUploadWarning
                                 :
-                                <React.Fragment> 
-                                    <ImportIndicatorsContext.Provider 
-                                        value={{ 
-                                            tierLevelsUsed: tierLevelsUsed, 
-                                            tierLevelsRows: tierLevelsRows, 
+                                <React.Fragment>
+                                    <ImportIndicatorsContext.Provider
+                                        value={{
+                                            tierLevelsUsed: tierLevelsUsed,
+                                            tierLevelsRows: tierLevelsRows,
                                             setTierLevelsRows: setTierLevelsRows,
                                         }}>
                                         <AdvancedImport />
@@ -441,8 +485,7 @@ export const ImportIndicatorsPopover = ({ page, program_id, tierLevelsUsed, stor
                                     {views === FEEDBACK ? <div><i className="fas fa-check-circle"/></div> : null}
                                     {
                                         // # Translators: The count of indicators that have passed validation and are ready to be imported to complete the process. This cannot be undone after completing.
-                                        interpolate(ngettext(
-                                            "%s indicator is ready to be imported.",
+                                        interpolate(ngettext("%s indicator is ready to be imported.",
                                             "%s indicators are ready to be imported.",
                                             validIndicatorsCount
                                         ), [validIndicatorsCount])
@@ -452,25 +495,29 @@ export const ImportIndicatorsPopover = ({ page, program_id, tierLevelsUsed, stor
                                     {views === FEEDBACK ? <div><i className="fas fa-exclamation-triangle"/></div> : null}
                                     {
                                         // # Translators: The count of indicators that have passed validation and are ready to be imported to complete the process. This cannot be undone after completing.
-                                        interpolate(ngettext(
-                                            "%s indicator has missing or invalid information. Please update your indicator template and upload again.",
+                                        interpolate(ngettext("%s indicator has missing or invalid information. Please update your indicator template and upload again.",
                                             "%s indicators have missing or invalid information. Please update your indicator template and upload again.",
                                             invalidIndicatorsCount
                                         ), [invalidIndicatorsCount])
                                     }
                                 </div>
-                                <a
-                                    className="import-feedback-download"
-                                    role="button"
-                                    href="#"
-                                    onClick={ () => handleFeedback() }
-                                >
+                                <div className="import-feedback-download">
+                                    <a
+                                        role="button"
+                                        href="#"
+                                        onClick={ () => handleFeedback() }
+                                    >
 
-                                        {
-                                            // # Translators: Download an excel template with errors that need fixing highlighted
-                                            gettext("Download a copy of your template with errors highlighted.")
-                                        }
-                                </a>
+                                            {
+                                                // # Translators: Download an excel template with errors that need fixing highlighted
+                                                gettext("Download a copy of your template with errors highlighted")
+                                            }
+                                    </a>
+                                    {
+                                        // # Translators: Fix the errors from the feedback file and upload the excel template again.
+                                        gettext(", fix the errors, and upload again.")
+                                    }
+                                </div>
                             </div>
                         )
                     // ***** View to ask users to confirm the upload *****
@@ -478,19 +525,37 @@ export const ImportIndicatorsPopover = ({ page, program_id, tierLevelsUsed, stor
                         return (
                             <div className="import-confirm">
                                 <div className="import-confirm-text">
-                                    {views === CONFIRM ? <div><i className="fas fa-check-circle"/></div> : null}
-                                    <div>
-                                        {
-                                            // # Translators: The count of indicators that have passed validation and are ready to be imported to complete the process. This cannot be undone after completing.
-                                            interpolate(ngettext(
-                                                "%s indicator is ready to be imported. Are you ready to complete the import process? (This action cannot be undone.)",
-                                                "%s indicators are ready to be imported. Are you ready to complete the import process? (This action cannot be undone.)",
-                                                validIndicatorsCount
-                                            ), [validIndicatorsCount])
-                                        }
-                                    </div>
+                                    {displayError.view !== CONFIRM ?
+                                        <React.Fragment>
+                                            <React.Fragment>
+                                                {!displayError.view && views === CONFIRM ? <div><i className="fas fa-check-circle"/></div> : null}
+                                            </React.Fragment>
+                                            <div>
+                                                {
+                                                    // # Translators: The count of indicators that have passed validation and are ready to be imported to complete the process. This cannot be undone after completing.
+                                                    interpolate(ngettext("%s indicator is ready to be imported. Are you ready to complete the import process? (This action cannot be undone.)",
+                                                        "%s indicators are ready to be imported. Are you ready to complete the import process? (This action cannot be undone.)",
+                                                        validIndicatorsCount
+                                                    ), [validIndicatorsCount])
+                                                }
+                                            </div>
+                                        </React.Fragment>
+                                        :
+                                        <div>
+                                            {displayError.view === CONFIRM && displayError.error.indexOf(5) === -1 &&
+                                                displayError.error.map(message_id => {
+                                                    return (
+                                                        <div key={message_id} className="import-confirm-text-error">
+                                                            { errorMessages[message_id] }
+                                                        </div>
+                                                    )
+                                                })
+                                            }
+                                        </div>
+                                    }
                                 </div>
                                 <div className="import-confirm-buttons">
+                                {displayError.view !== CONFIRM ?
                                     <button
                                         role="button"
                                         type="button"
@@ -502,6 +567,28 @@ export const ImportIndicatorsPopover = ({ page, program_id, tierLevelsUsed, stor
                                             gettext("Complete import")
                                         }
                                     </button>
+                                    :
+                                    <React.Fragment>
+                                        <button
+                                            role="button"
+                                            type="button"
+                                            className="btn btn-sm btn-primary"
+                                            onClick={ () => uploadClick() }
+                                        >
+                                            {
+                                                // # Translators: Button to confirm and complete the import process
+                                                gettext("Upload Template")
+                                            }
+                                        </button>
+                                        <input
+                                            id="fileUpload"
+                                            type="file"
+                                            style={{ display: "none" }}
+                                            onChange={ (e) => handleUpload(e) }
+                                        />
+                                    </React.Fragment>
+
+                                    }
                                     <button
                                         role="button"
                                         type="button"
@@ -524,8 +611,7 @@ export const ImportIndicatorsPopover = ({ page, program_id, tierLevelsUsed, stor
                                     {views === SUCCESS ? <div><i className="fas fa-check-circle"/></div> : null}
                                     {
                                         // # Translators: Message with the count of indicators that were successfully imported but they require additional details before they can be submitted.
-                                        interpolate(ngettext(
-                                            "%s indicator was successfully imported, but require additional details before results can be submitted.",
+                                        interpolate(ngettext("%s indicator was successfully imported, but require additional details before results can be submitted.",
                                             "%s indicators were successfully imported, but require additional details before results can be submitted.",
                                             validIndicatorsCount
                                         ), [validIndicatorsCount])
@@ -551,7 +637,15 @@ export const ImportIndicatorsPopover = ({ page, program_id, tierLevelsUsed, stor
                                         gettext('There was a server-related problem')
                                     }
                                 </p>
-                                <button className="btn btn-sm btn-primary" onClick={() => setViews(INITIAL) }>Try again</button>
+                                <button
+                                    className="btn btn-sm btn-primary"
+                                    onClick={() => setViews(INITIAL) }
+                                >
+                                    {
+                                        // # Translators: A button to try import over after a error occurred.
+                                        gettext('Try again')
+                                    }
+                                </button>
                             </div>
                         )
                     // TODO: View for when waiting for an API calls response
@@ -705,7 +799,7 @@ let errorCodes = {
     },
     103 : {
         type: "Template not found",
-        message: 1,
+        message: 3,
     },
     104 : {
         type: "Mismatch tiers",
@@ -713,37 +807,56 @@ let errorCodes = {
     },
     105 : {
         type: "Indicator data not found",
-        message: 1,
+        message: 4,
     },
     106 : {
-        type: "Someone else uploaded a template in the last 24 hours",
-        message: 3,
+        type: "Mismatch level count",
+        message: 1,
     },
-    200 : {
+    107 : {
+        type: "Mismatch headers",
+        message: 1,
+    },
+    108 : {
+        type: "Save validation error",
+        message: 4,
+    },
+    109 : {
         type: "Invalid level header",
         message: 1,
     },
-    201 : {
-        type: "Malformed indicator",
+    110 : {
+        type: "Multiple feedback templates found",
+        message: 4,
+    },
+    111 : {
+        type: "Invalid level column value",
         message: 1,
     },
-    202 : {
-        type: "Indicators out of order",
-        message: 4,
+    112 : {
+        type: "Autonumbered program has indicator numbers that are out of their expected sequence",
+        message: 1,
+    },
+    120 : {
+        type: "Someone else uploaded a template in the last 24 hours",
+        message: 5,
     },
 }
 
 let errorMessages = {
-    1 : 
-        // # Translators: Message to user that we cannot import the their file. This is because of it being the wrong file or the structure of the file was changed.
-        gettext("Sorry, we can’t import indicators from this file. This can happen if the wrong file is selected or the template structure was modified."),
-    2 : 
+    1 :
+        // # Translators: Message to user that we cannot import the their file. This could be caused by the wrong file being selected, or the structure of the file was changed, or the results framework was updated and does not match the template anymore.
+        gettext("We can’t import indicators from this file. This can happen if the wrong file is selected, the template structure is modified, or the results framework was updated and no longer matches the template."),
+    2 :
         // # Translators: Messsage to user that there aren't any new indicators in the uploaded file.
-        gettext("Sorry, we can’t find any indicators in this file."),
+        gettext("We can't find any indicators in this file."),
     3 :
+        // # Translators: Message to user that the import indicator process could not be completed. If the problem continues, contact your TolaData administrator.
+        gettext("Sorry, we couldn’t complete the import process. If the problem persists, please contact your TolaData administrator."),
+    4 :
+        // # Translators: Message to user that the import could not be completed and to find out the reason, upload the import template again.
+        gettext("Sorry, we couldn’t complete the import process. To figure out what went wrong, please upload your template again."),
+    5 :
         // # Translators: Message to user that someone else has uploaded a template in the last 24 hours and may be in the process of importing indicators to this program. You can view the program change log to see more details.
         gettext("Someone else uploaded a template in the last 24 hours, and may be in the process of adding indicators to this program."),
-    4 :
-        // # Translators: Message to user that we cannot import the their file. This is because there is one or more indicators that are out of order. Users should visit the results framework page and rearrange indicators.
-        gettext("Sorry, we can't import indicators from this file. One or more indicators is out of order. To rearrange saved indicators, please visit the results framework."),
 }

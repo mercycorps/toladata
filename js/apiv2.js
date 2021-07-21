@@ -127,47 +127,44 @@ const api = {
                 const url = window.URL.createObjectURL(new Blob([response.data]));
                 const link = document.createElement('a');
                 link.href = url;
-                link.setAttribute('download', 'BulkIndicatorImport.xlsx');
+                // # Translators: This is the file name of an Excel template that will be used for batch imports
+                link.setAttribute('download', gettext('Import indicators.xlsx'));
                 document.body.appendChild(link);
                 link.click();
                 return response;
             })
             .catch((error) => {
-                this.logFailure(error)
-                return error; // expecting {error_code: 100};
-                // return {error_code: 106};
+                this.logFailure(error);
+                return error.response;
             })
     },
     async uploadTemplate(program_id, file) {
-        // // TODO
-        //     // Send to backend
-        // console.log("API request to send Templates");
-        //     let valid = Math.ceil(Math.random() * 10); // Mock valid indicators for testing
-        //     let invalid = Math.floor(Math.random() * 2); // Mock invalid indicators for testing
-        //     return await Promise.resolve( {statusText: "OK", data: {valid: valid, invalid: invalid}} )
-        //         .then(response => new Promise( resolve => {
-        //             // Mock varied delayed response from the backend to see variation of the loading spinner. Will be removed once it is actually connected to the backend
-        //             let timeOptions = [500, 900, 1000, 2000, 3000]
-        //             let delay = timeOptions[Math.floor(Math.random() * 5)]
-        //             setTimeout(() => {
-        //                 resolve( response.data )
-        //             }, delay);
-        //         }))
-        //         .catch((error) => {
-        //             this.logFailure(error)
-        //             return {error};
-        //         })
+        // USED FOR TESTING
+        // let valid = Math.ceil(Math.random() * 10); // Mock valid indicators for testing
+        // let invalid = Math.floor(Math.random() * 2); // Mock invalid indicators for testing
+        // return await Promise.resolve( { status: 400,  data: {error_codes: [100, 101], valid: valid, invalid: invalid}} ) // Change status code to test success or failure scenarios
+        //     .then(response => new Promise( resolve => {
+        //         // Mock varied delayed response from the backend to see variation of the loading spinner. Will be removed once it is actually connected to the backend
+        //         let timeOptions = [500, 900, 1000, 2000, 3000]
+        //         let delay = timeOptions[Math.floor(Math.random() * 5)]
+        //         setTimeout(() => {
+        //             resolve( response )
+        //         }, delay);
+        //     }))
+        //     .catch((error) => {
+        //         this.logFailure(error)
+        //         return {error};
+        //     })
+
         let formData = new FormData()
         formData.append('file', file)
         return await this.apiSession.post(`/indicators/api/bulk_import_indicators/${program_id}/`,
                 formData, {headers: {'Content-Type': 'multipart/form-data'}}
             )
-            .then(response => response.data)
+            .then(response => response)
             .catch(error => {
                 this.logFailure(error);
                 return error.response;
-                // return {status: 400, data: {error_codes: [100, 101]}}; // Used for Errors testing
-                // return {status: 200, valid: 5, invalid: 2}; // Used for Success testing
             })
     },
     async downloadFeedback(program_id) {
@@ -177,14 +174,14 @@ const api = {
                 const url = window.URL.createObjectURL(new Blob([response.data]));
                 const link = document.createElement('a');
                 link.href = url;
-                link.setAttribute('download', 'BulkIndicatorImport.xlsx');
+                link.setAttribute('download', gettext('Import indicators.xlsx'));
                 document.body.appendChild(link);
                 link.click();
                 return response;
             })
             .catch((error) => {
-                this.logFailure(error)
-                return error;
+                this.logFailure(error);
+                return error.response;
             })
     },
     async confirmUpload(program_id) {
@@ -206,9 +203,12 @@ const api = {
         //     })
 
         return await this.apiInstance.post(`/save_bulk_import_data/${program_id}/`)
-            .then(response => response.data)
-            .catch(this.logFailure);
-    },
+            .then(response => response)
+            .catch((error) => {
+                this.logFailure(error);
+                return error.response;
+            })
+        },
 };
 
 

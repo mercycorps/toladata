@@ -3,8 +3,8 @@ msgid ""
 msgstr ""
 "Project-Id-Version: \n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2021-06-16 11:28-0700\n"
-"PO-Revision-Date: 2021-06-16 11:33-0700\n"
+"POT-Creation-Date: 2021-07-16 15:56-0700\n"
+"PO-Revision-Date: 2020-12-08 10:46-0800\n"
 "Last-Translator: \n"
 "Language-Team: \n"
 "Language: fr\n"
@@ -13,6 +13,13 @@ msgstr ""
 "Content-Transfer-Encoding: 8bit\n"
 "Plural-Forms: nplurals=2; plural=(n > 1);\n"
 "X-Generator: Poedit 2.4.2\n"
+
+#. Translators: This is the file name of an Excel template that will be used
+#. for batch imports
+#: js/apiv2.js:131 js/apiv2.js:177
+#| msgid "Group indicators"
+msgid "Import indicators.xlsx"
+msgstr "Translated Import indicators.xlsx"
 
 #: js/base.js:379 js/base.js:380
 msgid ""
@@ -47,7 +54,8 @@ msgstr[1] ""
 msgid "Success"
 msgstr "Succès"
 
-#. Translators: the header of an alert where additional warning info is provided
+#. Translators: the header of an alert where additional warning info is
+#. provided
 #: js/base.js:430 js/pages/results_framework/components/level_cards.js:86
 #: js/pages/results_framework/models.js:626
 #: js/pages/tola_management_pages/country/components/edit_disaggregations.js:657
@@ -61,25 +69,30 @@ msgstr "Attention"
 #. Translators: the header of an alert after an action failed for some reason
 #: js/base.js:448
 msgid "Error"
-msgstr "Erreur"
+msgstr "Translated Error"
 
 #. Translators: a button to open the import indicators popover
 #: js/components/ImportIndicatorsPopover.js:14
-#: js/components/ImportIndicatorsPopover.js:139
+#: js/components/ImportIndicatorsPopover.js:140
+#| msgid "Indicators"
 msgid "Import indicators"
-msgstr "ÁTranslated Import indicators"
+msgstr "öTranslated Import indicators"
 
 #. Translators: Link to the program change log to view more details.
-#: js/components/ImportIndicatorsPopover.js:317
+#: js/components/ImportIndicatorsPopover.js:362
 msgid "View the program change log for more details."
-msgstr ""
+msgstr "öTranslated View the program change log for more details."
 
 #. Translators: Confirrm the user wants to continue.
-#. Translators:  This is a confirmation prompt that is triggered by clicking on a cancel button.  */
-#. Translators: This is the prompt on a popup that has warned users about a change they are about to make that could have broad consequences
-#. Translators: This is a confirmation prompt to confirm a user wants to archive an item
-#. Translators: This is a confirmation prompt to confirm a user wants to unarchive an item
-#: js/components/ImportIndicatorsPopover.js:325
+#. Translators:  This is a confirmation prompt that is triggered by clicking
+#. on a cancel button.  */
+#. Translators: This is the prompt on a popup that has warned users about a
+#. change they are about to make that could have broad consequences
+#. Translators: This is a confirmation prompt to confirm a user wants to
+#. archive an item
+#. Translators: This is a confirmation prompt to confirm a user wants to
+#. unarchive an item
+#: js/components/ImportIndicatorsPopover.js:370
 #: js/pages/results_framework/models.js:629
 #: js/pages/tola_management_pages/country/components/edit_disaggregations.js:661
 #: js/pages/tola_management_pages/country/models.js:478
@@ -89,52 +102,60 @@ msgid "Are you sure you want to continue?"
 msgstr "Voulez-vous vraiment continuer ?"
 
 #. Translators: Button to continue and upload the template
-#: js/components/ImportIndicatorsPopover.js:337
+#: js/components/ImportIndicatorsPopover.js:382
 msgid "Continue"
-msgstr ""
+msgstr "ŹTranslated Continue"
 
 #. Translators: Button to cancel the import process and close the popover
 #. Translators: Button to cancel a form submission
-#: js/components/ImportIndicatorsPopover.js:348
-#: js/components/ImportIndicatorsPopover.js:513
+#: js/components/ImportIndicatorsPopover.js:393
+#: js/components/ImportIndicatorsPopover.js:600
 #: js/components/changesetNotice.js:66
 #: js/pages/results_framework/components/level_cards.js:578
 msgid "Cancel"
 msgstr "Annuler"
 
-#. Translators: Instructions for users to download the template, open it in Excel, and then fill in indicators information.
-#: js/components/ImportIndicatorsPopover.js:367
+#. Translators: Instructions for users to download the template, open it in
+#. Excel, and then fill in indicators information.
+#: js/components/ImportIndicatorsPopover.js:412
 msgid "Download the template, open it in Excel, and enter indicators."
 msgstr ""
 "ÁTranslated Download the template, open it in Excel, and enter indicators."
 
-#. Translators: Instructions for users to upload their filled in template and then follow the instructions to complete the import process.
-#: js/components/ImportIndicatorsPopover.js:373
+#. Translators: Instructions for users to upload their filled in template and
+#. then follow the instructions to complete the import process.
+#: js/components/ImportIndicatorsPopover.js:418
 msgid "Upload the template and follow instructions to complete the process."
 msgstr ""
 "éTranslated Upload the template and follow instructions to complete the "
 "process."
 
 #. Translators: Button to download a template
-#: js/components/ImportIndicatorsPopover.js:411
+#: js/components/ImportIndicatorsPopover.js:455
 msgid "Download template"
 msgstr "Translated Download template"
 
 #. Translators: Button to upload the import indicators template
-#: js/components/ImportIndicatorsPopover.js:422
+#: js/components/ImportIndicatorsPopover.js:466
 msgid "Upload template"
-msgstr "Translated Upload template"
+msgstr "öTranslated Upload template"
 
-#: js/components/ImportIndicatorsPopover.js:445
-#, fuzzy, python-format
+#. Translators: The count of indicators that have passed validation and are
+#. ready to be imported to complete the process. This cannot be undone after
+#. completing.
+#: js/components/ImportIndicatorsPopover.js:488
+#, python-format
 #| msgid "%s indicator is >15% above target"
 #| msgid_plural "%s indicators are >15% above target"
 msgid "%s indicator is ready to be imported."
 msgid_plural "%s indicators are ready to be imported."
-msgstr[0] "%s indicateur est >15% au-dessus de la cible"
-msgstr[1] "%s indicateurs sont >15% au-dessus de la cible"
+msgstr[0] "ŹTranslated %s indicator is ready to be imported."
+msgstr[1] "ÁTranslated %s indicators are ready to be imported."
 
-#: js/components/ImportIndicatorsPopover.js:456
+#. Translators: The count of indicators that have passed validation and are
+#. ready to be imported to complete the process. This cannot be undone after
+#. completing.
+#: js/components/ImportIndicatorsPopover.js:498
 #, python-format
 msgid ""
 "%s indicator has missing or invalid information. Please update your "
@@ -143,32 +164,55 @@ msgid_plural ""
 "%s indicators have missing or invalid information. Please update your "
 "indicator template and upload again."
 msgstr[0] ""
+"ŹTranslated %s indicator has missing or invalid information. Please update "
+"your indicator template and upload again."
 msgstr[1] ""
+"ÁTranslated %s indicators have missing or invalid information. Please update"
+" your indicator template and upload again."
 
-#. Translators: Download an excel template with errors that need fixing highlighted
-#: js/components/ImportIndicatorsPopover.js:471
-#, fuzzy
-#| msgid "Download a copy of your template with errors highlighted"
-msgid "Download a copy of your template with errors highlighted."
-msgstr "ÁTranslated Download a copy of your template with errors highlighted"
+#. Translators: Download an excel template with errors that need fixing
+#. highlighted
+#: js/components/ImportIndicatorsPopover.js:513
+msgid "Download a copy of your template with errors highlighted"
+msgstr "éTranslated Download a copy of your template with errors highlighted"
 
-#: js/components/ImportIndicatorsPopover.js:486
+#. Translators: Fix the errors from the feedback file and upload the excel
+#. template again.
+#: js/components/ImportIndicatorsPopover.js:518
+msgid ", fix the errors, and upload again."
+msgstr "Translated , fix the errors, and upload again."
+
+#. Translators: The count of indicators that have passed validation and are
+#. ready to be imported to complete the process. This cannot be undone after
+#. completing.
+#: js/components/ImportIndicatorsPopover.js:536
 #, python-format
 msgid ""
 "%s indicator is ready to be imported. Are you ready to complete the import "
 "process? (This action cannot be undone.)"
 msgid_plural ""
-"%s indicators are ready to be imported. Are you ready to complete the import "
-"process? (This action cannot be undone.)"
+"%s indicators are ready to be imported. Are you ready to complete the import"
+" process? (This action cannot be undone.)"
 msgstr[0] ""
+"öTranslated %s indicator is ready to be imported. Are you ready to complete "
+"the import process? (This action cannot be undone.)"
 msgstr[1] ""
+"ŹTranslated %s indicators are ready to be imported. Are you ready to "
+"complete the import process? (This action cannot be undone.)"
 
 #. Translators: Button to confirm and complete the import process
-#: js/components/ImportIndicatorsPopover.js:502
+#: js/components/ImportIndicatorsPopover.js:567
 msgid "Complete import"
-msgstr "Translated Complete import"
+msgstr "ÁTranslated Complete import"
 
-#: js/components/ImportIndicatorsPopover.js:528
+#. Translators: Button to confirm and complete the import process
+#: js/components/ImportIndicatorsPopover.js:580
+msgid "Upload Template"
+msgstr "éTranslated Upload Template"
+
+#. Translators: Message with the count of indicators that were successfully
+#. imported but they require additional details before they can be submitted.
+#: js/components/ImportIndicatorsPopover.js:614
 #, python-format
 msgid ""
 "%s indicator was successfully imported, but require additional details "
@@ -177,59 +221,96 @@ msgid_plural ""
 "%s indicators were successfully imported, but require additional details "
 "before results can be submitted."
 msgstr[0] ""
+"Translated %s indicator was successfully imported, but require additional "
+"details before results can be submitted."
 msgstr[1] ""
+"öTranslated %s indicators were successfully imported, but require additional"
+" details before results can be submitted."
 
-#. Translators: A link to the program page to add the addition setup information for the imported indicators.
-#: js/components/ImportIndicatorsPopover.js:538
+#. Translators: A link to the program page to add the addition setup
+#. information for the imported indicators.
+#: js/components/ImportIndicatorsPopover.js:624
 msgid "Visit the program page to complete setup of these indicators."
 msgstr ""
-"éTranslated Visit the program page to complete setup of these indicators."
+"ŹTranslated Visit the program page to complete setup of these indicators."
 
 #. Translators: Notification for a error that happend on the web server.
-#: js/components/ImportIndicatorsPopover.js:551
+#: js/components/ImportIndicatorsPopover.js:637
 msgid "There was a server-related problem"
 msgstr "ÁTranslated There was a server-related problem"
 
-#. Translators: Click to view the Advanced Option section
-#: js/components/ImportIndicatorsPopover.js:602
-msgid "Advanced options"
-msgstr "ÁTranslated Advanced options"
+#. Translators: A button to try import over after a error occurred.
+#: js/components/ImportIndicatorsPopover.js:646
+msgid "Try again"
+msgstr "éTranslated Try again"
 
-#. Translators: Details explaining that by default the template will include 10 or 20 rows per result level. You can adjust the number if you need more or less rows.
-#: js/components/ImportIndicatorsPopover.js:610
+#. Translators: Click to view the Advanced Option section
+#: js/components/ImportIndicatorsPopover.js:696
+#| msgid "Add another option"
+msgid "Advanced options"
+msgstr "éTranslated Advanced options"
+
+#. Translators: Details explaining that by default the template will include
+#. 10 or 20 rows per result level. You can adjust the number if you need more
+#. or less rows.
+#: js/components/ImportIndicatorsPopover.js:704
 msgid ""
 "By default, the template will include 10 or 20 indicator rows per result "
 "level. Adjust the numbers if you need more or fewer rows."
 msgstr ""
-"ÁTranslated By default, the template will include 10 or 20 indicator rows "
-"per result level. Adjust the numbers if you need more or fewer rows."
+"Translated By default, the template will include 10 or 20 indicator rows per"
+" result level. Adjust the numbers if you need more or fewer rows."
 
-#. Translators: Message to user that we cannot import the their file. This is because of it being the wrong file or the structure of the file was changed.
-#: js/components/ImportIndicatorsPopover.js:739
+#. Translators: Message to user that we cannot import the their file. This
+#. could be caused by the wrong file being selected, or the structure of the
+#. file was changed, or the results framework was updated and does not match
+#. the template anymore.
+#: js/components/ImportIndicatorsPopover.js:849
 msgid ""
-"Sorry, we can’t import indicators from this file. This can happen if the "
-"wrong file is selected or the template structure was modified."
+"We can’t import indicators from this file. This can happen if the wrong file"
+" is selected, the template structure is modified, or the results framework "
+"was updated and no longer matches the template."
 msgstr ""
+"öTranslated We can’t import indicators from this file. This can happen if "
+"the wrong file is selected, the template structure is modified, or the "
+"results framework was updated and no longer matches the template."
 
-#. Translators: Messsage to user that there aren't any new indicators in the uploaded file.
-#: js/components/ImportIndicatorsPopover.js:742
-msgid "Sorry, we can’t find any indicators in this file."
+#. Translators: Messsage to user that there aren't any new indicators in the
+#. uploaded file.
+#: js/components/ImportIndicatorsPopover.js:852
+msgid "We can't find any indicators in this file."
+msgstr "ŹTranslated We can't find any indicators in this file."
+
+#. Translators: Message to user that the import indicator process could not be
+#. completed. If the problem continues, contact your TolaData administrator.
+#: js/components/ImportIndicatorsPopover.js:855
+msgid ""
+"Sorry, we couldn’t complete the import process. If the problem persists, "
+"please contact your TolaData administrator."
 msgstr ""
+"ÁTranslated Sorry, we couldn’t complete the import process. If the problem "
+"persists, please contact your TolaData administrator."
 
-#. Translators: Message to user that someone else has uploaded a template in the last 24 hours and may be in the process of importing indicators to this program. You can view the program change log to see more details.
-#: js/components/ImportIndicatorsPopover.js:745
+#. Translators: Message to user that the import could not be completed and to
+#. find out the reason, upload the import template again.
+#: js/components/ImportIndicatorsPopover.js:858
+msgid ""
+"Sorry, we couldn’t complete the import process. To figure out what went "
+"wrong, please upload your template again."
+msgstr ""
+"éTranslated Sorry, we couldn’t complete the import process. To figure out "
+"what went wrong, please upload your template again."
+
+#. Translators: Message to user that someone else has uploaded a template in
+#. the last 24 hours and may be in the process of importing indicators to this
+#. program. You can view the program change log to see more details.
+#: js/components/ImportIndicatorsPopover.js:861
 msgid ""
 "Someone else uploaded a template in the last 24 hours, and may be in the "
 "process of adding indicators to this program."
 msgstr ""
-
-#. Translators: Message to user that we cannot import the their file. This is because there is one or more indicators that are out of order. Users should visit the results framework page and rearrange indicators.
-#: js/components/ImportIndicatorsPopover.js:748
-msgid ""
-"Sorry, we can't import indicators from this file. One or more indicators is "
-"out of order. To rearrange saved indicators, please visit the results "
-"framework."
-msgstr ""
+"Translated Someone else uploaded a template in the last 24 hours, and may be"
+" in the process of adding indicators to this program."
 
 #. Translators: button label to show the details of all items in a list */}
 #. Translators: button label to show the details of all rows in a list */}
@@ -247,11 +328,12 @@ msgstr "Tout afficher"
 msgid "Collapse all"
 msgstr "Tout masquer"
 
-#. Translators: This is shown in a table where the cell would usually have a username.  This value is used when there is no username to show.  */}
+#. Translators: This is shown in a table where the cell would usually have a
+#. username.  This value is used when there is no username to show.  */}
 #: js/components/changelog.js:53
-#: js/pages/tola_management_pages/audit_log/views.js:249
+#: js/pages/tola_management_pages/audit_log/views.js:252
 msgid "Unavailable — user deleted"
-msgstr "Indisponible - utilisateur supprimé"
+msgstr "öTranslated Unavailable — user deleted"
 
 #: js/components/changelog.js:85
 msgid "No differences found"
@@ -263,7 +345,8 @@ msgstr "Aucune différence trouvée"
 msgid "Country"
 msgstr "Pays"
 
-#. Translators:  Role references a user's permission level when accessing data (i.e. User or Admin) */}
+#. Translators:  Role references a user's permission level when accessing data
+#. (i.e. User or Admin) */}
 #: js/components/changelog.js:106 js/components/changelog.js:110
 #: js/components/changelog.js:120 js/components/changelog.js:125
 msgid "Role"
@@ -297,10 +380,11 @@ msgstr "Entrée précédente"
 msgid "New Entry"
 msgstr "Nouvelle entrée"
 
-#. Translators: This is a label for a dropdown that presents several possible justifications for changing a value
+#. Translators: This is a label for a dropdown that presents several possible
+#. justifications for changing a value
 #: js/components/changesetNotice.js:19
 #: js/pages/results_framework/components/level_cards.js:404
-#: js/pages/tola_management_pages/audit_log/views.js:243
+#: js/pages/tola_management_pages/audit_log/views.js:246
 msgid "Reason for change"
 msgstr "Raison du changement"
 
@@ -309,7 +393,8 @@ msgstr "Raison du changement"
 msgid "Ok"
 msgstr "OK"
 
-#. Translators: This is the label for a textbox where a user can provide details about their reason for selecting a particular option
+#. Translators: This is the label for a textbox where a user can provide
+#. details about their reason for selecting a particular option
 #: js/components/changesetNotice.js:120
 msgid "Details"
 msgstr "Détails"
@@ -319,7 +404,8 @@ msgid "A reason is required."
 msgstr "Une justification est nécessaire."
 
 #. Translators: (preceded by a number) e.g. "4 options selected"
-#. Translators: prefixed with a number, as in "4 selected" displayed on a multi-select
+#. Translators: prefixed with a number, as in "4 selected" displayed on a
+#. multi-select
 #: js/components/changesetNotice.js:255
 #: js/components/checkboxed-multi-select.js:106
 #: js/components/selectWidgets.js:153
@@ -364,13 +450,15 @@ msgstr "Vie du programme (LoP) seulement"
 msgid "Midline and endline"
 msgstr "Mesure de mi-parcours et mesure de fin de programme"
 
-#. Translators: One of several options for specifying how often data is collected or reported on over the life of a program
+#. Translators: One of several options for specifying how often data is
+#. collected or reported on over the life of a program
 #: js/constants.js:39 js/pages/iptt_quickstart/models/ipttQSRootStore.js:32
 #: tola/db_translations.js:22
 msgid "Annual"
 msgstr "Annuel"
 
-#. Translators: One of several options for specifying how often data is collected or reported on over the life of a program
+#. Translators: One of several options for specifying how often data is
+#. collected or reported on over the life of a program
 #: js/constants.js:40 js/pages/iptt_quickstart/models/ipttQSRootStore.js:33
 #: tola/db_translations.js:18
 msgid "Semi-annual"
@@ -380,13 +468,15 @@ msgstr "Semestriel"
 msgid "Tri-annual"
 msgstr "Quadrimestriel"
 
-#. Translators: One of several options for specifying how often data is collected or reported on over the life of a program
+#. Translators: One of several options for specifying how often data is
+#. collected or reported on over the life of a program
 #: js/constants.js:42 js/pages/iptt_quickstart/models/ipttQSRootStore.js:35
 #: tola/db_translations.js:8
 msgid "Quarterly"
 msgstr "Trimestriel"
 
-#. Translators: One of several options for specifying how often data is collected or reported on over the life of a program
+#. Translators: One of several options for specifying how often data is
+#. collected or reported on over the life of a program
 #: js/constants.js:43 js/pages/iptt_quickstart/models/ipttQSRootStore.js:36
 #: tola/db_translations.js:24
 msgid "Monthly"
@@ -571,8 +661,8 @@ msgid ""
 "View the most recent two months of results. (You can customize your time "
 "periods.) This report does not include periodic targets"
 msgstr ""
-"Afficher les résultats des deux derniers mois (vous pouvez personnaliser les "
-"périodes). Ce rapport n’inclut pas des cibles périodiques"
+"Afficher les résultats des deux derniers mois (vous pouvez personnaliser les"
+" périodes). Ce rapport n’inclut pas des cibles périodiques"
 
 #. Translators: option to show all periods for the report */
 #: js/pages/iptt_quickstart/components/radios.js:33
@@ -595,46 +685,54 @@ msgstr "veuillez saisir un nombre"
 msgid "Target periods"
 msgstr "Périodes cibles"
 
-#. Translators: The user has successfully "pinned" a report link to a program page for quick access to the report */}
+#. Translators: The user has successfully "pinned" a report link to a program
+#. page for quick access to the report */}
 #: js/pages/iptt_report/components/report/buttons.js:80
+#| msgid "Success!  This report is now pinned to the program page"
 msgid "Success!  This report is now pinned to the program page."
-msgstr "Succès ! Ce rapport est désormais épinglé à la page du programme."
+msgstr "Translated Success!  This report is now pinned to the program page."
 
-#. Translators: This is not really an imperative, it's an option that is available once you have pinned a report to a certain web page */}
+#. Translators: This is not really an imperative, it's an option that is
+#. available once you have pinned a report to a certain web page */}
 #: js/pages/iptt_report/components/report/buttons.js:86
 msgid "Visit the program page now."
 msgstr "Consulter la page du programme."
 
 #. Translators: Some error occured when trying to pin the report*/}
 #: js/pages/iptt_report/components/report/buttons.js:97
+#| msgid "Something went wrong when attempting to pin this report"
 msgid "Something went wrong when attempting to pin this report."
-msgstr "Une erreur est survenue lors de l’épinglage de ce rapport."
+msgstr "öTranslated Something went wrong when attempting to pin this report."
 
 #. Translators: a field where users can name their newly created report */
 #: js/pages/iptt_report/components/report/buttons.js:109
 msgid "Report name"
 msgstr "Nom du rapport"
 
-#. Translators: An error occured because a report has already been pinned with that same name */}
+#. Translators: An error occured because a report has already been pinned with
+#. that same name */}
 #: js/pages/iptt_report/components/report/buttons.js:122
 msgid "A pin with this name already exists."
-msgstr "Une épingle avec ce nom existe déjà."
+msgstr "ŹTranslated A pin with this name already exists."
 
 #: js/pages/iptt_report/components/report/buttons.js:135
 msgid "Pin to program page"
 msgstr "Épingler à la page du programme"
 
-#. Translators: a button that lets a user "pin" (verb) a report to their home page */
+#. Translators: a button that lets a user "pin" (verb) a report to their home
+#. page */
 #: js/pages/iptt_report/components/report/buttons.js:182
 msgid "Pin"
 msgstr "Épingler"
 
-#. Translators: a download button for a report containing just the data currently displayed */
+#. Translators: a download button for a report containing just the data
+#. currently displayed */
 #: js/pages/iptt_report/components/report/buttons.js:220
 msgid "Current view"
 msgstr "Affichage actuel"
 
-#. Translators: a download button for a report containing all available data */
+#. Translators: a download button for a report containing all available data
+#. */
 #: js/pages/iptt_report/components/report/buttons.js:226
 msgid "All program data"
 msgstr "Toutes les données du programme"
@@ -643,13 +741,15 @@ msgstr "Toutes les données du programme"
 msgid "Indicator Performance Tracking Table"
 msgstr "Tableau de suivi des performances de l’indicateur"
 
-#. Translators: label on a report, column header for a column of values that have been rounded
+#. Translators: label on a report, column header for a column of values that
+#. have been rounded
 #: js/pages/iptt_report/components/report/headerCells.js:22
 msgid "All values in this report are rounded to two decimal places."
 msgstr "Toutes les valeurs de ce rapport sont arrondies à deux décimales."
 
 #. Translators: Column header for a target value column */
-#. Translators: Header for a column listing values defined as targets for each row
+#. Translators: Header for a column listing values defined as targets for each
+#. row
 #: js/pages/iptt_report/components/report/headerCells.js:63
 #: js/pages/iptt_report/components/report/tableHeader.js:166
 #: js/pages/program_page/components/indicator_list.js:200
@@ -665,14 +765,16 @@ msgid "Actual"
 msgstr "Réelle"
 
 #. Translators: Column header for a percent-met column */
-#. Translators: Header for a column listing the progress towards the target value
+#. Translators: Header for a column listing the progress towards the target
+#. value
 #: js/pages/iptt_report/components/report/headerCells.js:91
 #: js/pages/iptt_report/components/report/tableHeader.js:180
 #: js/pages/program_page/components/resultsTable.js:261
 msgid "% Met"
 msgstr "% Atteint"
 
-#. Translators: header for a group of columns showing totals over the life of the program */
+#. Translators: header for a group of columns showing totals over the life of
+#. the program */
 #: js/pages/iptt_report/components/report/tableHeader.js:70
 msgid "Life of program"
 msgstr "Vie du programme"
@@ -687,8 +789,8 @@ msgstr "N°"
 #: js/pages/logframe/components/table.js:30
 #: js/pages/program_page/components/indicator_list.js:196
 #: js/pages/tola_management_pages/audit_log/views.js:109
-#: js/pages/tola_management_pages/audit_log/views.js:162
-#: js/pages/tola_management_pages/audit_log/views.js:166
+#: js/pages/tola_management_pages/audit_log/views.js:164
+#: js/pages/tola_management_pages/audit_log/views.js:168
 msgid "Indicator"
 msgstr "Indicateur"
 
@@ -704,7 +806,8 @@ msgstr "Niveau"
 msgid "Unit of measure"
 msgstr "Unité de mesure"
 
-#. Translators: Column header for "direction of change" column (increasing/decreasing) */
+#. Translators: Column header for "direction of change" column
+#. (increasing/decreasing) */
 #: js/pages/iptt_report/components/report/tableHeader.js:138
 #: js/pages/iptt_report/models/filterStore.js:734
 msgid "Change"
@@ -722,7 +825,8 @@ msgid "# / %"
 msgstr "# / %"
 
 #. Translators: Column header */
-#. Translators: One of several options for specifying how often data is collected or reported on over the life of a program
+#. Translators: One of several options for specifying how often data is
+#. collected or reported on over the life of a program
 #: js/pages/iptt_report/components/report/tableHeader.js:159
 #: js/pages/iptt_report/models/filterStore.js:737
 #: js/pages/program_page/components/indicator_list.js:199
@@ -737,17 +841,18 @@ msgstr "Mesure de base"
 #: js/pages/iptt_report/components/report/tableRows.js:330
 #: js/pages/program_page/components/indicator_list.js:263
 #: js/pages/program_page/components/resultsTable.js:9
-#: js/pages/tola_management_pages/audit_log/views.js:157
-#: js/pages/tola_management_pages/audit_log/views.js:194
+#: js/pages/tola_management_pages/audit_log/views.js:159
+#: js/pages/tola_management_pages/audit_log/views.js:196
 msgid "N/A"
 msgstr "N/A"
 
-#. Translators: A message that lets the user know that they cannot add a result to this indicator because it has no target.
+#. Translators: A message that lets the user know that they cannot add a
+#. result to this indicator because it has no target.
 #: js/pages/iptt_report/components/report/tableRows.js:76
 msgid "Results cannot be added because the indicator is missing targets."
 msgstr ""
-"Les résultats ne peuvent pas être ajoutés parce que l’indicateur manque de "
-"cibles."
+"ÁTranslated Results cannot be added because the indicator is missing "
+"targets."
 
 #. Translators: a button that lets the user add a new result
 #: js/pages/iptt_report/components/report/tableRows.js:104
@@ -799,7 +904,8 @@ msgid "Hide columns"
 msgstr "Masquer les colonnes"
 
 #. Translators: labels sites that a data could be collected at */
-#. Translators: heading for actions related to Sites as in locations connected to results
+#. Translators: heading for actions related to Sites as in locations connected
+#. to results
 #: js/pages/iptt_report/components/sidebar/reportFilter.js:72
 #: js/pages/program_page/components/sitesList.js:12
 msgid "Sites"
@@ -810,7 +916,8 @@ msgstr "Sites"
 msgid "Types"
 msgstr "Types"
 
-#. Translators: labels sectors (i.e. 'Food Security') that an indicator can be categorized as */
+#. Translators: labels sectors (i.e. 'Food Security') that an indicator can be
+#. categorized as */
 #: js/pages/iptt_report/components/sidebar/reportFilter.js:106
 #: js/pages/tola_management_pages/organization/views.js:54
 #: js/pages/tola_management_pages/program/components/edit_program_profile.js:129
@@ -843,23 +950,28 @@ msgstr "Fin"
 msgid "Show/Hide Filters"
 msgstr "Afficher/masquer les filtres"
 
-#. Translators: User-selectable option that filters out rows from a table where the disaggregation category has not been used (i.e. avoids showing lots of blank rows. */
+#. Translators: User-selectable option that filters out rows from a table
+#. where the disaggregation category has not been used (i.e. avoids showing
+#. lots of blank rows. */
 #: js/pages/iptt_report/models/filterStore.js:496
 msgid "Only show categories with results"
 msgstr "Afficher uniquement les catégories avec des résultats"
 
-#. Translators: filter that allows users to select only those disaggregation types that are available across the globe (i.e. across the agency). */
+#. Translators: filter that allows users to select only those disaggregation
+#. types that are available across the globe (i.e. across the agency). */
 #: js/pages/iptt_report/models/filterStore.js:499
 msgid "Global disaggregations"
 msgstr "Désagrégations globales"
 
-#. Translators: Allows users to filter an indicator list for indicators that are unassigned. */
+#. Translators: Allows users to filter an indicator list for indicators that
+#. are unassigned. */
 #: js/pages/iptt_report/models/filterStore.js:679
 #: js/pages/logframe/components/table.js:110
 msgid "Indicators unassigned to  a results framework level"
 msgstr "Indicateurs non affectés à un niveau de cadre de résultats"
 
-#. Translators: this labels a filter option for a label as including subordinate levels */
+#. Translators: this labels a filter option for a label as including
+#. subordinate levels */
 #: js/pages/iptt_report/models/ipttLevel.js:36
 #, python-format
 msgid "%(this_level_number)s and sub-levels: %(this_level_full_name)s"
@@ -875,7 +987,7 @@ msgid "Logframe"
 msgstr "Cadre logique"
 
 #: js/pages/logframe/models/filterStore.js:33
-#: js/pages/tola_management_pages/audit_log/views.js:235
+#: js/pages/tola_management_pages/audit_log/views.js:238
 msgid "Result level"
 msgstr "Niveau de résultat"
 
@@ -888,7 +1000,8 @@ msgstr "Moyens de vérification"
 msgid "Assumptions"
 msgstr "Hypothèses"
 
-#. Translators: The number of indicators that do not have targets defined on them
+#. Translators: The number of indicators that do not have targets defined on
+#. them
 #: js/pages/program_page/components/indicator_list.js:23
 #, python-format
 msgid "%s indicator has missing targets"
@@ -896,7 +1009,8 @@ msgid_plural "%s indicators have missing targets"
 msgstr[0] "%s indicateur a des cibles manquantes"
 msgstr[1] "%s indicateurs ont des cibles manquantes"
 
-#. Translators: The number of indicators that no one has entered in any results for
+#. Translators: The number of indicators that no one has entered in any
+#. results for
 #: js/pages/program_page/components/indicator_list.js:27
 #, python-format
 msgid "%s indicator has missing results"
@@ -904,7 +1018,8 @@ msgid_plural "%s indicators have missing results"
 msgstr[0] "%s indicateur a des résultats manquants"
 msgstr[1] "%s indicateurs ont des résultats manquants"
 
-#. Translators: The number of indicators that contain results that are not backed up with evidence
+#. Translators: The number of indicators that contain results that are not
+#. backed up with evidence
 #: js/pages/program_page/components/indicator_list.js:31
 #, python-format
 msgid "%s indicator has missing evidence"
@@ -912,21 +1027,24 @@ msgid_plural "%s indicators have missing evidence"
 msgstr[0] "%s indicateur a des preuves manquantes"
 msgstr[1] "%s indicateurs ont des preuves manquantes"
 
-#. Translators: shows what number of indicators are a certain percentage above target. Example: 3 indicators are >15% above target
+#. Translators: shows what number of indicators are a certain percentage above
+#. target. Example: 3 indicators are >15% above target
 #: js/pages/program_page/components/indicator_list.js:35
 msgid "%s indicator is >15% above target"
 msgid_plural "%s indicators are >15% above target"
 msgstr[0] "%s indicateur est >15% au-dessus de la cible"
 msgstr[1] "%s indicateurs sont >15% au-dessus de la cible"
 
-#. Translators: shows what number of indicators are a certain percentage below target. Example: 3 indicators are >15% below target
+#. Translators: shows what number of indicators are a certain percentage below
+#. target. Example: 3 indicators are >15% below target
 #: js/pages/program_page/components/indicator_list.js:39
 msgid "%s indicator is >15% below target"
 msgid_plural "%s indicators are >15% below target"
 msgstr[0] "%s indicateur est >15% en dessous de la cible"
 msgstr[1] "%s indicateurs sont >15% en dessous de la cible"
 
-#. Translators: shows what number of indicators are within a set range of target. Example: 3 indicators are on track
+#. Translators: shows what number of indicators are within a set range of
+#. target. Example: 3 indicators are on track
 #: js/pages/program_page/components/indicator_list.js:43
 #, python-format
 msgid "%s indicator is on track"
@@ -934,7 +1052,8 @@ msgid_plural "%s indicators are on track"
 msgstr[0] "%s indicateur est en bonne voie"
 msgstr[1] "%s Indicateurs sont en bonne voie"
 
-#. Translators: shows what number of indicators that for various reasons are not being reported for program metrics
+#. Translators: shows what number of indicators that for various reasons are
+#. not being reported for program metrics
 #: js/pages/program_page/components/indicator_list.js:47
 #, python-format
 msgid "%s indicator is unavailable"
@@ -943,7 +1062,8 @@ msgstr[0] "%s indicateur n'est pas disponible"
 msgstr[1] "%s indicateurs ne sont pas disponibles"
 
 #. Translators: the number of indicators in a list. Example: 3 indicators
-#. Translators: This is a count of indicators associated with another object */
+#. Translators: This is a count of indicators associated with another object
+#. */
 #: js/pages/program_page/components/indicator_list.js:52
 #: js/pages/results_framework/components/level_cards.js:173
 #, python-format
@@ -952,7 +1072,8 @@ msgid_plural "%s indicators"
 msgstr[0] "%s indicateur"
 msgstr[1] "%s indicateurs"
 
-#. Translators: A link that shows all the indicators, some of which are currently filtered from view
+#. Translators: A link that shows all the indicators, some of which are
+#. currently filtered from view
 #: js/pages/program_page/components/indicator_list.js:87
 msgid "Show all indicators"
 msgstr "Afficher tous les indicateurs"
@@ -969,12 +1090,16 @@ msgstr "Aucun"
 msgid "Group indicators:"
 msgstr "Regrouper les indicateurs :"
 
-#. Translators: Warning provided when a result is not longer associated with any target.  It is a warning about state rather than an action.  The full sentence might read "There are results not assigned to targets" rather than "Results have been unassigned from targets. */
+#. Translators: Warning provided when a result is not longer associated with
+#. any target.  It is a warning about state rather than an action.  The full
+#. sentence might read "There are results not assigned to targets" rather than
+#. "Results have been unassigned from targets. */
 #: js/pages/program_page/components/indicator_list.js:246
 msgid "Results unassigned to targets"
 msgstr "Résultats non affectés aux cibles"
 
-#. Translators: Warning message displayed when a critical piece of information (targets) have not been created for an indicator.
+#. Translators: Warning message displayed when a critical piece of information
+#. (targets) have not been created for an indicator.
 #: js/pages/program_page/components/indicator_list.js:252
 msgid "Indicator missing targets"
 msgstr "Cibles de l’indicateur manquantes"
@@ -992,19 +1117,21 @@ msgstr ""
 msgid "Indicators on track"
 msgstr "Indicateurs en bonne voie"
 
-#. Translators: variable %s shows what percentage of indicators have no targets reporting data. Example: 31% unavailable */
+#. Translators: variable %s shows what percentage of indicators have no
+#. targets reporting data. Example: 31% unavailable */
 #: js/pages/program_page/components/program_metrics.js:152
 msgid "%(percentNonReporting)s% unavailable"
 msgstr "%(percentNonReporting)s% indisponible"
 
-#. Translators: help text for the percentage of indicators with no targets reporting data. */
+#. Translators: help text for the percentage of indicators with no targets
+#. reporting data. */
 #: js/pages/program_page/components/program_metrics.js:163
 msgid ""
 "The indicator has no targets, no completed target periods, or no results "
 "reported."
 msgstr ""
-"L’indicateur n’a pas de cibles, de périodes cibles terminées ni de résultats "
-"rapportés."
+"L’indicateur n’a pas de cibles, de périodes cibles terminées ni de résultats"
+" rapportés."
 
 #. Translators: Help text explaining what an "on track" indicator is. */
 #: js/pages/program_page/components/program_metrics.js:187
@@ -1012,11 +1139,11 @@ msgid ""
 "The actual value matches the target value, plus or minus 15%. So if your "
 "target is 100 and your result is 110, the indicator is 10% above target and "
 "on track.  <br><br>Please note that if your indicator has a decreasing "
-"direction of change, then “above” and “below” are switched. In that case, if "
-"your target is 100 and your result is 200, your indicator is 50% below "
-"target and not on track.<br><br><a href='https://docs.google.com/document/"
-"d/1Gl9bxJJ6hdhCXeoOCoR1mnVKZa2FlEOhaJcjexiHzY0' target='_blank'>See our "
-"documentation for more information.</a>"
+"direction of change, then “above” and “below” are switched. In that case, if"
+" your target is 100 and your result is 200, your indicator is 50% below "
+"target and not on track.<br><br><a "
+"href='https://docs.google.com/document/d/1Gl9bxJJ6hdhCXeoOCoR1mnVKZa2FlEOhaJcjexiHzY0'"
+" target='_blank'>See our documentation for more information.</a>"
 msgstr ""
 "La valeur réelle correspond à la valeur cible à 15 % près. Ainsi, si votre "
 "cible est 100 et votre résultat 110, l’indicateur est 10 % au-dessus de la "
@@ -1025,30 +1152,36 @@ msgstr ""
 "dessus » et « en dessous » sont alors inversés. Dans ce cas, si votre cible "
 "est 100 et votre résultat 200, votre indicateur est 50 % en dessous de la "
 "cible, ce qui veut dire qu’il n’est pas sur la bonne voie.<br><br><a "
-"href='https://docs.google.com/document/"
-"d/1Gl9bxJJ6hdhCXeoOCoR1mnVKZa2FlEOhaJcjexiHzY0' target='_blank'>Consultez "
-"notre documentation pour plus d’informations.</a>"
+"href='https://docs.google.com/document/d/1Gl9bxJJ6hdhCXeoOCoR1mnVKZa2FlEOhaJcjexiHzY0'"
+" target='_blank'>Consultez notre documentation pour plus d’informations.</a>"
 
-#. Translators: variable %(percentHigh)s shows what percentage of indicators are a certain percentage above target percent %(marginPercent)s. Example: 31% are >15% above target */
+#. Translators: variable %(percentHigh)s shows what percentage of indicators
+#. are a certain percentage above target percent %(marginPercent)s. Example:
+#. 31% are >15% above target */
 #: js/pages/program_page/components/program_metrics.js:206
 msgid "<strong>%(percentHigh)s%</strong> are >%(marginPercent)s% above target"
 msgstr ""
 "<strong>%(percentHigh)s%</strong> sont >%(marginPercent)s% au-dessus de la "
 "cible"
 
-#. Translators: variable %s shows what percentage of indicators are within a set range of target. Example: 31%  are on track */
+#. Translators: variable %s shows what percentage of indicators are within a
+#. set range of target. Example: 31%  are on track */
 #: js/pages/program_page/components/program_metrics.js:212
 msgid "<strong>%s%</strong> are on track"
 msgstr "<strong>%s%</strong> sont en bonne voie"
 
-#. Translators: variable %(percentBelow)s shows what percentage of indicators are a certain percentage below target. The variable %(marginPercent)s is that percentage. Example: 31% are >15% below target */
+#. Translators: variable %(percentBelow)s shows what percentage of indicators
+#. are a certain percentage below target. The variable %(marginPercent)s is
+#. that percentage. Example: 31% are >15% below target */
 #: js/pages/program_page/components/program_metrics.js:218
-msgid "<strong>%(percentBelow)s%</strong> are >%(marginPercent)s% below target"
+msgid ""
+"<strong>%(percentBelow)s%</strong> are >%(marginPercent)s% below target"
 msgstr ""
-"<strong>%(percentBelow)s%</strong> sont >%(marginPercent)s% en dessous de la "
-"cible"
+"<strong>%(percentBelow)s%</strong> sont >%(marginPercent)s% en dessous de la"
+" cible"
 
-#. Translators: message describing why this display does not show any data. # */}
+#. Translators: message describing why this display does not show any data. #
+#. */}
 #: js/pages/program_page/components/program_metrics.js:240
 msgid "Unavailable until the first target period ends with results reported."
 msgstr ""
@@ -1070,7 +1203,8 @@ msgstr "ont des cibles"
 msgid "no targets"
 msgstr "pas de cibles"
 
-#. Translators: a link that displays a filtered list of indicators which are missing targets */
+#. Translators: a link that displays a filtered list of indicators which are
+#. missing targets */
 #: js/pages/program_page/components/program_metrics.js:270
 msgid "Indicators missing targets"
 msgstr "Indicateurs avec cibles manquantes"
@@ -1094,7 +1228,8 @@ msgstr "ont des résultats"
 msgid "no results"
 msgstr "aucun résultat"
 
-#. Translators: a link that displays a filtered list of indicators which are missing results */
+#. Translators: a link that displays a filtered list of indicators which are
+#. missing results */
 #: js/pages/program_page/components/program_metrics.js:286
 msgid "Indicators missing results"
 msgstr "Indicateurs avec résultats manquants"
@@ -1118,7 +1253,8 @@ msgstr "ont des preuves"
 msgid "no evidence"
 msgstr "aucune preuve"
 
-#. Translators: a link that displays a filtered list of indicators which are missing evidence */
+#. Translators: a link that displays a filtered list of indicators which are
+#. missing evidence */
 #: js/pages/program_page/components/program_metrics.js:302
 msgid "Indicators missing evidence"
 msgstr "Indicateurs avec preuves manquantes"
@@ -1127,18 +1263,19 @@ msgstr "Indicateurs avec preuves manquantes"
 msgid "No evidence"
 msgstr "Aucune preuve"
 
-#. Translators: Explains how performance is categorized as close to the target or not close to the target
+#. Translators: Explains how performance is categorized as close to the target
+#. or not close to the target
 #: js/pages/program_page/components/resultsTable.js:38
 msgid ""
 "<p><strong>The actual value is %(percent)s of the target value.</strong> An "
-"indicator is on track if the result is no less than 85% of the target and no "
-"more than 115% of the target.</p><p><em>Remember to consider your direction "
-"of change when thinking about whether the indicator is on track.</em></p>"
+"indicator is on track if the result is no less than 85% of the target and no"
+" more than 115% of the target.</p><p><em>Remember to consider your direction"
+" of change when thinking about whether the indicator is on track.</em></p>"
 msgstr ""
-"<p><strong>La valeur réelle représente %(percent)s de la valeur cible.</"
-"strong> Un indicateur est sur la bonne voie si le résultat n’est ni "
-"inférieur à 85 % de la cible, ni supérieur à 115 % de la cible. </"
-"p><p><em>Pensez à prendre en compte la direction du changement souhaité "
+"<p><strong>La valeur réelle représente %(percent)s de la valeur "
+"cible.</strong> Un indicateur est sur la bonne voie si le résultat n’est ni "
+"inférieur à 85 % de la cible, ni supérieur à 115 % de la cible. "
+"</p><p><em>Pensez à prendre en compte la direction du changement souhaité "
 "lorsque vous réfléchissez au statut d’un indicateur.</em></p>"
 
 #. Translators: Label for an indicator that is within a target range
@@ -1161,30 +1298,34 @@ msgstr "Aucun résultat rapporté"
 msgid "Program to date"
 msgstr "Programme à cette date"
 
-#. Translators: explanation of the summing rules for the totals row on a list of results
+#. Translators: explanation of the summing rules for the totals row on a list
+#. of results
 #: js/pages/program_page/components/resultsTable.js:207
 msgid ""
-"Results are cumulative. The Life of Program result mirrors the latest period "
-"result."
+"Results are cumulative. The Life of Program result mirrors the latest period"
+" result."
 msgstr ""
-"Les résultats sont cumulatifs. Le résultat de la vie du programme reflète le "
-"dernier résultat de période."
+"Les résultats sont cumulatifs. Le résultat de la vie du programme reflète le"
+" dernier résultat de période."
 
-#. Translators: explanation of the summing rules for the totals row on a list of results
+#. Translators: explanation of the summing rules for the totals row on a list
+#. of results
 #: js/pages/program_page/components/resultsTable.js:210
 msgid ""
 "Results are non-cumulative. The Life of Program result is the sum of target "
 "period results."
 msgstr ""
-"Les résultats sont non cumulatifs. Le résultat de la vie du programme est la "
-"somme des résultats des périodes cibles."
+"Les résultats sont non cumulatifs. Le résultat de la vie du programme est la"
+" somme des résultats des périodes cibles."
 
-#. Translators: identifies a results row as summative for the entire life of the program
+#. Translators: identifies a results row as summative for the entire life of
+#. the program
 #: js/pages/program_page/components/resultsTable.js:216
 msgid "Life of Program"
 msgstr "Vie du programme"
 
-#. Translators: Header for a column listing periods in which results are grouped
+#. Translators: Header for a column listing periods in which results are
+#. grouped
 #: js/pages/program_page/components/resultsTable.js:249
 msgid "Target period"
 msgstr "Période cible"
@@ -1205,33 +1346,38 @@ msgstr "Résultats"
 msgid "Evidence"
 msgstr "Preuve"
 
-#. Translators: Button label which opens a form to add targets to a given indicator
+#. Translators: Button label which opens a form to add targets to a given
+#. indicator
 #: js/pages/program_page/components/resultsTable.js:304
 msgid "Add targets"
 msgstr "Ajouter des cibles"
 
-#. Translators: a link that leads to a list of all sites (locations) associated with a program
+#. Translators: a link that leads to a list of all sites (locations)
+#. associated with a program
 #: js/pages/program_page/components/sitesList.js:19
+#| msgid "Set program status"
 msgid "View program sites"
-msgstr "Afficher les sites du programme"
+msgstr "ŹTranslated View program sites"
 
-#. Translators: indicates that no sites (locations) are associated with a program
+#. Translators: indicates that no sites (locations) are associated with a
+#. program
 #: js/pages/program_page/components/sitesList.js:25
 msgid "There are no program sites."
-msgstr "Il n’y a aucun site pour le programme."
+msgstr "éTranslated There are no program sites."
 
 #. Translators: a link to add a new site (location)
 #: js/pages/program_page/components/sitesList.js:34
+#| msgid "Add user"
 msgid "Add site"
-msgstr "Ajouter un site"
+msgstr "ÁTranslated Add site"
 
 #: js/pages/program_page/pinned_reports.js:9
 msgid ""
 "Warning: This action cannot be undone. Are you sure you want to delete this "
 "pinned report?"
 msgstr ""
-"Attention : cette action est irréversible. Voulez-vous vraiment supprimer ce "
-"rapport épinglé ?"
+"Attention : cette action est irréversible. Voulez-vous vraiment supprimer ce"
+" rapport épinglé ?"
 
 #. Translators: Take the text of a program objective and import it for editing
 #: js/pages/results_framework/components/level_cards.js:51
@@ -1246,66 +1392,79 @@ msgid ""
 "your text, because they are automatically displayed.</strong>"
 msgstr ""
 "Importer le texte d’un objectif de programme. <strong class='program-"
-"objective-import__popover-strong-text'>Assurez-vous de supprimer les niveaux "
-"et nombres de votre texte car ils s’affichent automatiquement.</strong>"
+"objective-import__popover-strong-text'>Assurez-vous de supprimer les niveaux"
+" et nombres de votre texte car ils s’affichent automatiquement.</strong>"
 
 #: js/pages/results_framework/components/level_cards.js:89
 #: js/pages/tola_management_pages/country/models.js:440
 msgid "This action cannot be undone."
 msgstr "Cette action est irréversible."
 
-#. Translators:  This is a confirmation prompt that is triggered by clicking on a delete button. The code is a reference to the name of the specific item being deleted.  Only one item can be deleted at a time. */
+#. Translators:  This is a confirmation prompt that is triggered by clicking
+#. on a delete button. The code is a reference to the name of the specific
+#. item being deleted.  Only one item can be deleted at a time. */
 #: js/pages/results_framework/components/level_cards.js:91
 #, python-format
 msgid "Are you sure you want to delete %s?"
 msgstr "Êtes-vous sûr de vouloir supprimer %s ?"
 
-#. Translators: this link opens a view of all indicators linked to (associated with) a particular level (level name replaces %s) */
+#. Translators: this link opens a view of all indicators linked to (associated
+#. with) a particular level (level name replaces %s) */
 #: js/pages/results_framework/components/level_cards.js:135
 #, python-format
 msgid "All indicators linked to %s"
 msgstr "Tous les indicateurs liés à %s"
 
-#. Translators: this link opens a view of all indicators linked to (associated with) a particular level and its child levels (level name replaces %s) */
+#. Translators: this link opens a view of all indicators linked to (associated
+#. with) a particular level and its child levels (level name replaces %s) */
 #: js/pages/results_framework/components/level_cards.js:147
 #, python-format
 msgid "All indicators linked to %s and sub-levels"
 msgstr "Tous les indicateurs liés à %s et aux sous-niveaux"
 
-#. Translators: this is the title of a button to open a popup with indicator performance metrics*/
+#. Translators: this is the title of a button to open a popup with indicator
+#. performance metrics*/
 #: js/pages/results_framework/components/level_cards.js:235
 msgid "Track indicator performance"
 msgstr "Suivre la performance de l’indicateur"
 
 #: js/pages/results_framework/components/level_cards.js:406
 msgid ""
-"Your changes will be recorded in a change log.  For future reference, please "
-"share your reason for these changes."
+"Your changes will be recorded in a change log.  For future reference, please"
+" share your reason for these changes."
 msgstr ""
 "Vos modifications seront enregistrées dans un journal des modifications. À "
 "titre de référence, veuillez partager votre justification pour ces "
 "modifications."
 
-#. Translators: This is a validation message given to the user when the user-editable name field has been deleted or omitted. */
-#. Translators: This is a warning messages when a user has entered duplicate names for two different objects and those names contain only white spaces, both of which are not permitted. */
+#. Translators: This is a validation message given to the user when the user-
+#. editable name field has been deleted or omitted. */
+#. Translators: This is a warning messages when a user has entered duplicate
+#. names for two different objects and those names contain only white spaces,
+#. both of which are not permitted. */
 #: js/pages/results_framework/components/level_cards.js:441
 #: js/pages/results_framework/models.js:714
 msgid "Please complete this field."
 msgstr "Veuillez compléter ce champ."
 
-#. Translators: This is button text that allows users to save their work and unlock the ability to add indicators */ }
+#. Translators: This is button text that allows users to save their work and
+#. unlock the ability to add indicators */ }
 #: js/pages/results_framework/components/level_cards.js:477
 #, python-format
 msgid "Save %s and add indicators"
 msgstr "Enregistrer %s et ajouter des indicateurs"
 
-#. Translators: On a button, with a tiered set of objects, save current object and add another one in the same tier, e.g. "Save and add another Outcome" when the user is editing an Outcome */}
+#. Translators: On a button, with a tiered set of objects, save current object
+#. and add another one in the same tier, e.g. "Save and add another Outcome"
+#. when the user is editing an Outcome */}
 #: js/pages/results_framework/components/level_cards.js:561
 #, python-format
 msgid "Save and add another %s"
 msgstr "Enregistrer et ajouter un autre %s"
 
-#. Translators: On a button, with a tiered set of objects, save current object and add another one in the next lower tier, e.g. "Save and add another Activity" when the user is editing a Goal */}
+#. Translators: On a button, with a tiered set of objects, save current object
+#. and add another one in the next lower tier, e.g. "Save and add another
+#. Activity" when the user is editing a Goal */}
 #: js/pages/results_framework/components/level_cards.js:570
 #, python-format
 msgid "Save and link %s"
@@ -1323,7 +1482,8 @@ msgstr "Enregistrer et fermer"
 msgid "Settings"
 msgstr "Paramètres"
 
-#. Translators: Popover for help link telling users how to associate an Indicator not yet linked to a Level */
+#. Translators: Popover for help link telling users how to associate an
+#. Indicator not yet linked to a Level */
 #: js/pages/results_framework/components/level_cards.js:697
 msgid ""
 "To link an already saved indicator to your results framework: Open the "
@@ -1334,7 +1494,8 @@ msgstr ""
 "l’indicateur depuis la page du programme et utilisez le menu « Niveau de "
 "résultat » dans l’onglet Résumé."
 
-#. Translators: Popover for help link, tell user how to disassociate an Indicator from the Level they are currently editing. */
+#. Translators: Popover for help link, tell user how to disassociate an
+#. Indicator from the Level they are currently editing. */
 #: js/pages/results_framework/components/level_cards.js:699
 msgid ""
 "To remove an indicator: Click “Settings”, where you can reassign the "
@@ -1343,30 +1504,35 @@ msgstr ""
 "Pour supprimer un indicateur : cliquez sur « Réglages » pour pouvoir "
 "réaffecter l’indicateur à un autre niveau ou le supprimer."
 
-#. Translators: Title for a section that lists the Indicators associated with whatever this.props.tiername is. */}
+#. Translators: Title for a section that lists the Indicators associated with
+#. whatever this.props.tiername is. */}
 #: js/pages/results_framework/components/level_cards.js:715
 #, python-format
 msgid "Indicators linked to this %s"
 msgstr "Indicateurs liés à %s"
 
 #. Translators: a button to download a spreadsheet
-#: js/pages/results_framework/components/level_list.js:183
-#: js/pages/tola_management_pages/audit_log/views.js:224
+#: js/pages/results_framework/components/level_list.js:184
+#: js/pages/tola_management_pages/audit_log/views.js:227
 msgid "Excel"
 msgstr "Excel"
 
-#. Translators: A alert to let users know that instead of entering indicators one at a time, they can use an Excel template to enter multiple indicators at the same time. First step is to build the result framework below, then click the 'Import indicators' button above
-#: js/pages/results_framework/components/level_list.js:206
+#. Translators: A alert to let users know that instead of entering indicators
+#. one at a time, they can use an Excel template to enter multiple indicators
+#. at the same time. First step is to build the result framework below, then
+#. click the 'Import indicators' button above
+#: js/pages/results_framework/components/level_list.js:207
 msgid ""
 "Instead of entering indicators one at a time, use an Excel template to "
-"import multiple indicators! First, build your results framework below. Next, "
-"click the “Import indicators” button above."
+"import multiple indicators! First, build your results framework below. Next,"
+" click the “Import indicators” button above."
 msgstr ""
-"éTranslated Instead of entering indicators one at a time, use an Excel "
+"Translated Instead of entering indicators one at a time, use an Excel "
 "template to import multiple indicators! First, build your results framework "
 "below. Next, click the “Import indicators” button above."
 
-#. Translators: this refers to an imperative verb on a button ("Apply filters")*/}
+#. Translators: this refers to an imperative verb on a button ("Apply
+#. filters")*/}
 #: js/pages/results_framework/components/level_tier_lists.js:32
 #: js/pages/results_framework/components/level_tier_lists.js:219
 #: js/pages/tola_management_pages/country/views.js:66
@@ -1378,30 +1544,34 @@ msgstr ""
 msgid "Apply"
 msgstr "Appliquer"
 
-#. Translators: This is the help text of an icon that indicates that this element can't be deleted */
+#. Translators: This is the help text of an icon that indicates that this
+#. element can't be deleted */
 #: js/pages/results_framework/components/level_tier_lists.js:125
 msgid "This level is being used in the results framework"
 msgstr "Ce niveau est utilisé dans le cadre de résultats"
 
-#. Translators: This is one of several user modifiable fields, e.g. "Level 1", "Level 2", etc... Level 1 is the top of the hierarchy, Level six is the bottom.*/
+#. Translators: This is one of several user modifiable fields, e.g. "Level 1",
+#. "Level 2", etc... Level 1 is the top of the hierarchy, Level six is the
+#. bottom.*/
 #: js/pages/results_framework/components/level_tier_lists.js:137
 #, python-format
 msgid "Level %s"
 msgstr "Niveau %s"
 
-#. Translators: Warning message displayed to users explaining why they can't change a setting they could change before.
+#. Translators: Warning message displayed to users explaining why they can't
+#. change a setting they could change before.
 #: js/pages/results_framework/components/leveltier_picker.js:31
 #, python-format
 msgid ""
-"<span class=\"text-danger\"><strong>The results framework template is locked "
-"as soon as the first %(secondTier)s is saved.</strong></span> To change "
+"<span class=\"text-danger\"><strong>The results framework template is locked"
+" as soon as the first %(secondTier)s is saved.</strong></span> To change "
 "templates, all saved levels must be deleted except for the original "
 "%(firstTier)s. A level can only be deleted when it has no sub-levels and no "
 "linked indicators."
 msgstr ""
 "<span class=\"text-danger\"><strong>Le modèle de cadre de résultats se "
-"verrouille dès que le premier %(secondTier)s est enregistré.</strong></span> "
-"Pour modifier les modèles, tous les niveaux enregistrés doivent être "
+"verrouille dès que le premier %(secondTier)s est enregistré.</strong></span>"
+" Pour modifier les modèles, tous les niveaux enregistrés doivent être "
 "supprimés, à l'exception du %(firstTier)s original. Un niveau peut "
 "uniquement être supprimé lorsqu'il ne dispose d'aucun sous-niveau ni "
 "d'indicateur associé."
@@ -1410,13 +1580,16 @@ msgstr ""
 msgid "Results framework template"
 msgstr "Modèle de cadre de résultats"
 
-#. Translators: One of several choices for specifying what type of Indicator is being created.  An Indicator is a performance measure e.g. "We will distrubute 1000 food packs over the next two months"
+#. Translators: One of several choices for specifying what type of Indicator
+#. is being created.  An Indicator is a performance measure e.g. "We will
+#. distrubute 1000 food packs over the next two months"
 #: js/pages/results_framework/models.js:44 tola/db_translations.js:122
 msgid "Custom"
 msgstr "Personnalisé"
 
 #. Translators: Notification to user that the an update was successful
-#. Translators: Notification to user that the update they initiated was successful */
+#. Translators: Notification to user that the update they initiated was
+#. successful */
 #: js/pages/results_framework/models.js:145
 #: js/pages/results_framework/models.js:240
 msgid "Changes to the results framework template were saved."
@@ -1424,19 +1597,22 @@ msgstr ""
 "Les modifications apportées au modèle de cadre de résultats ont été "
 "enregistrées."
 
-#. Translators: Notification to user that the deletion command that they issued was successful */
+#. Translators: Notification to user that the deletion command that they
+#. issued was successful */
 #: js/pages/results_framework/models.js:363
 #, python-format
 msgid "%s was deleted."
 msgstr "%s a été supprimé(e)."
 
-#. Translators: This is a confirmation message that confirms that change has been successfully saved to the DB.
+#. Translators: This is a confirmation message that confirms that change has
+#. been successfully saved to the DB.
 #: js/pages/results_framework/models.js:398
 #, python-format
 msgid "%s saved."
 msgstr "%s a été enregistré(e)."
 
-#. Translators:  Confirmation message that user-supplied updates were successfully applied.
+#. Translators:  Confirmation message that user-supplied updates were
+#. successfully applied.
 #: js/pages/results_framework/models.js:423
 #, python-format
 msgid "%s updated."
@@ -1449,27 +1625,32 @@ msgid ""
 "possible to change templates without first deleting saved levels."
 msgstr ""
 "<strong class=\"text-danger\">Choisissez bien votre modèle de cadre de "
-"résultats !</strong> Lorsque vous commencez à concevoir votre cadre, vous ne "
-"pourrez pas modifier les modèles sans avoir préalablement supprimé tous les "
-"niveaux enregistrés."
+"résultats !</strong> Lorsque vous commencez à concevoir votre cadre, vous ne"
+" pourrez pas modifier les modèles sans avoir préalablement supprimé tous les"
+" niveaux enregistrés."
 
-#. Translators:  This is a warning provided to the user when they try to cancel the editing of something they have already modified.  */
+#. Translators:  This is a warning provided to the user when they try to
+#. cancel the editing of something they have already modified.  */
 #: js/pages/results_framework/models.js:631
 #, python-format
 msgid "Changes to this %s will not be saved"
 msgstr "Les modifications apportés à %s ne seront pas enregistrées"
 
-#. Translators: This is a warning messages when a user has a comma in a name that shouldn't contain commas */
+#. Translators: This is a warning messages when a user has a comma in a name
+#. that shouldn't contain commas */
 #: js/pages/results_framework/models.js:719
 msgid "Result levels should not contain commas."
 msgstr "Les niveaux de résultats ne doivent pas contenir de virgules."
 
-#. Translators: This is a warning messages when a user has a colon in a name that shouldn't contain colons */
+#. Translators: This is a warning messages when a user has a colon in a name
+#. that shouldn't contain colons */
 #: js/pages/results_framework/models.js:724
+#| msgid "Result levels should not contain commas."
 msgid "Result levels should not contain colons."
-msgstr "Les niveaux de résultats ne doivent pas contenir de deux points."
+msgstr "éTranslated Result levels should not contain colons."
 
-#. Translators: This is a warning messages when a user has entered duplicate names for two different objects */
+#. Translators: This is a warning messages when a user has entered duplicate
+#. names for two different objects */
 #: js/pages/results_framework/models.js:729
 msgid "Result levels must have unique names."
 msgstr "Les niveaux de résultats doivent posséder des noms uniques."
@@ -1478,30 +1659,35 @@ msgstr "Les niveaux de résultats doivent posséder des noms uniques."
 msgid "Targets changed"
 msgstr "Cibles modifiées"
 
-#. Translators: This is part of a change log.  The result date of the Result that has been changed is being shown
-#: js/pages/tola_management_pages/audit_log/views.js:171
+#. Translators: This is part of a change log.  The result date of the Result
+#. that has been changed is being shown
+#: js/pages/tola_management_pages/audit_log/views.js:173
 msgid "Result date:"
 msgstr "Date de résultat :"
 
-#: js/pages/tola_management_pages/audit_log/views.js:210
+#. Translators: This a title of page where all of the changes to a program are
+#. listed
+#: js/pages/tola_management_pages/audit_log/views.js:213
+#| msgid "Indicator change log"
 msgid "Program change log"
-msgstr "Journal des modifications de programme"
+msgstr "Translated Program change log"
 
-#: js/pages/tola_management_pages/audit_log/views.js:234
+#: js/pages/tola_management_pages/audit_log/views.js:237
 msgid "Date and time"
 msgstr "Date et heure"
 
-#. Translators: This is a column heading. The column is in a change log and identifies the entities being changed. */}
-#: js/pages/tola_management_pages/audit_log/views.js:237
+#. Translators: This is a column heading. The column is in a change log and
+#. identifies the entities being changed. */}
+#: js/pages/tola_management_pages/audit_log/views.js:240
 msgid "Indicators and results"
 msgstr "Indicateurs et résultats"
 
-#: js/pages/tola_management_pages/audit_log/views.js:238
+#: js/pages/tola_management_pages/audit_log/views.js:241
 #: js/pages/tola_management_pages/user/views.js:260
 msgid "User"
 msgstr "Utilisateur"
 
-#: js/pages/tola_management_pages/audit_log/views.js:239
+#: js/pages/tola_management_pages/audit_log/views.js:242
 #: js/pages/tola_management_pages/organization/views.js:110
 #: js/pages/tola_management_pages/user/components/edit_user_profile.js:195
 #: js/pages/tola_management_pages/user/views.js:202
@@ -1509,24 +1695,26 @@ msgstr "Utilisateur"
 msgid "Organization"
 msgstr "Organisation"
 
-#: js/pages/tola_management_pages/audit_log/views.js:240
+#: js/pages/tola_management_pages/audit_log/views.js:243
 msgid "Change type"
 msgstr "Type de modification"
 
-#: js/pages/tola_management_pages/audit_log/views.js:241
+#: js/pages/tola_management_pages/audit_log/views.js:244
 msgid "Previous entry"
 msgstr "Entrée précédente"
 
-#: js/pages/tola_management_pages/audit_log/views.js:242
+#: js/pages/tola_management_pages/audit_log/views.js:245
 msgid "New entry"
 msgstr "Nouvelle entrée"
 
-#. Translators: This is shown in a table where the cell would usually have an organization name.  This value is used when there is no organization to show.  */}
-#: js/pages/tola_management_pages/audit_log/views.js:251
+#. Translators: This is shown in a table where the cell would usually have an
+#. organization name.  This value is used when there is no organization to
+#. show.  */}
+#: js/pages/tola_management_pages/audit_log/views.js:254
 msgid "Unavailable — organization deleted"
-msgstr "Indisponible - organisation supprimée"
+msgstr "öTranslated Unavailable — organization deleted"
 
-#: js/pages/tola_management_pages/audit_log/views.js:309
+#: js/pages/tola_management_pages/audit_log/views.js:312
 msgid "entries"
 msgstr "entrées"
 
@@ -1585,7 +1773,8 @@ msgstr "Code pays"
 msgid "Save Changes"
 msgstr "Enregistrer les modifications"
 
-#. Translators:  Button label.  Allows users to undo whatever changes they have made.
+#. Translators:  Button label.  Allows users to undo whatever changes they
+#. have made.
 #: js/pages/tola_management_pages/country/components/edit_country_profile.js:103
 #: js/pages/tola_management_pages/country/components/edit_country_profile.js:109
 #: js/pages/tola_management_pages/country/components/edit_disaggregations.js:533
@@ -1623,21 +1812,24 @@ msgstr ""
 msgid "Explanation for absence of delete button"
 msgstr "Explication justifiant l'absence d'un bouton de suppression"
 
-#. Translators: This is text provided when a user clicks a help link.  It allows users to select which elements they want to apply the changes to.
+#. Translators: This is text provided when a user clicks a help link.  It
+#. allows users to select which elements they want to apply the changes to.
 #: js/pages/tola_management_pages/country/components/edit_disaggregations.js:228
 msgid ""
 "<p>Select a program if you plan to disaggregate all or most of its "
-"indicators by these categories.</p><p><span class=\"text-danger"
-"\"><strong>This bulk assignment cannot be undone.</strong></span> But you "
-"can always manually remove the disaggregation from individual indicators.</p>"
+"indicators by these categories.</p><p><span class=\"text-"
+"danger\"><strong>This bulk assignment cannot be undone.</strong></span> But "
+"you can always manually remove the disaggregation from individual "
+"indicators.</p>"
 msgstr ""
-"<p>Sélectionnez un programme si vous souhaitez désagréger tous ou la plupart "
-"de ses indicateurs en fonction de ces catégories.</p><p><span class=\"text-"
+"<p>Sélectionnez un programme si vous souhaitez désagréger tous ou la plupart"
+" de ses indicateurs en fonction de ces catégories.</p><p><span class=\"text-"
 "danger\"><strong>Ce bloc ne peut être annulé.</strong></span> Cependant, "
 "vous pouvez supprimer manuellement la désagrégation à partir d'indicateurs "
 "individuels.</p>"
 
-#. Translators: This feature allows a user to apply changes to existing programs as well as ones created in the future */}
+#. Translators: This feature allows a user to apply changes to existing
+#. programs as well as ones created in the future */}
 #: js/pages/tola_management_pages/country/components/edit_disaggregations.js:248
 msgid "Assign new disaggregation to all indicators in a program"
 msgstr ""
@@ -1655,39 +1847,44 @@ msgstr ""
 msgid "Disaggregation"
 msgstr "Désagrégation"
 
-#. Translators: This labels a checkbox, when checked, it will make the associated item "on" (selected) for all new indicators
+#. Translators: This labels a checkbox, when checked, it will make the
+#. associated item "on" (selected) for all new indicators
 #: js/pages/tola_management_pages/country/components/edit_disaggregations.js:482
 msgid "Selected by default"
 msgstr "Sélectionné(e) par défaut"
 
-#. Translators: Help text for the "selected by default" checkbox on the disaggregation form
+#. Translators: Help text for the "selected by default" checkbox on the
+#. disaggregation form
 #: js/pages/tola_management_pages/country/components/edit_disaggregations.js:489
 #, python-format
 msgid ""
-"When adding a new program indicator, this disaggregation will be selected by "
-"default for every program in %s. The disaggregation can be manually removed "
-"from an indicator on the indicator setup form."
+"When adding a new program indicator, this disaggregation will be selected by"
+" default for every program in %s. The disaggregation can be manually removed"
+" from an indicator on the indicator setup form."
 msgstr ""
 "Lors de l’ajout d’un nouvel indicateur de programme, cette désagrégation "
-"sera sélectionnée par défaut pour chaque programme dans %s. La désagrégation "
-"pourra être supprimée manuellement d’un indicateur à partir du formulaire de "
-"configuration de l’indicateur."
+"sera sélectionnée par défaut pour chaque programme dans %s. La désagrégation"
+" pourra être supprimée manuellement d’un indicateur à partir du formulaire "
+"de configuration de l’indicateur."
 
 #: js/pages/tola_management_pages/country/components/edit_disaggregations.js:492
 msgid "More information on \"selected by default\""
 msgstr "Plus d’informations sur « sélectionnée par défaut »"
 
-#. Translators:  This is header text for a list of disaggregation categories*/}
+#. Translators:  This is header text for a list of disaggregation
+#. categories*/}
 #: js/pages/tola_management_pages/country/components/edit_disaggregations.js:502
 msgid "Categories"
 msgstr "Catégories"
 
-#. Translators:  This a column header that shows the sort order of the rows below*/}
+#. Translators:  This a column header that shows the sort order of the rows
+#. below*/}
 #: js/pages/tola_management_pages/country/components/edit_disaggregations.js:508
 msgid "Order"
 msgstr "Classement"
 
-#. Translators:  Button label.  Button allows users to add a disaggregation category to a list.  */}
+#. Translators:  Button label.  Button allows users to add a disaggregation
+#. category to a list.  */}
 #: js/pages/tola_management_pages/country/components/edit_disaggregations.js:523
 msgid "Add a category"
 msgstr "Ajouter une catégorie"
@@ -1718,35 +1915,44 @@ msgstr ""
 "Vos modifications n’ont pas été enregistrées. Voulez-vous vraiment les "
 "abandonner ?"
 
-#. Translators:  Warning message about how the new type of disaggregation the user has created will be applied to existing and new data
+#. Translators:  Warning message about how the new type of disaggregation the
+#. user has created will be applied to existing and new data
 #: js/pages/tola_management_pages/country/components/edit_disaggregations.js:642
 #, python-format
+#| msgid ""
+#| "This disaggregation will be automatically selected for all new indicators in"
+#| " %s and for existing indicators in %s program."
+#| msgid_plural ""
+#| "This disaggregation will be automatically selected for all new indicators in"
+#| " %s and for existing indicators in %s programs."
 msgid ""
-"This disaggregation will be automatically selected for all new indicators in "
-"%(countryName)s and for existing indicators in %(retroCount)s program."
+"This disaggregation will be automatically selected for all new indicators in"
+" %(countryName)s and for existing indicators in %(retroCount)s program."
 msgid_plural ""
-"This disaggregation will be automatically selected for all new indicators in "
-"%(countryName)s and for existing indicators in %(retroCount)s programs."
+"This disaggregation will be automatically selected for all new indicators in"
+" %(countryName)s and for existing indicators in %(retroCount)s programs."
 msgstr[0] ""
-"Cette désagrégation sera automatiquement sélectionnée pour tous les nouveaux "
-"indicateurs dans %(countryName)s et pour les indicateurs existants dans "
-"%(retroCount)s programme."
+"öTranslated This disaggregation will be automatically selected for all new "
+"indicators in %(countryName)s and for existing indicators in %(retroCount)s "
+"program."
 msgstr[1] ""
-"Ces désagrégations seront automatiquement sélectionnées pour tous les "
-"nouveaux indicateurs dans %(countryName)s et pour les indicateurs existants "
-"dans %(retroCount)s programmes."
+"ŹTranslated This disaggregation will be automatically selected for all new "
+"indicators in %(countryName)s and for existing indicators in %(retroCount)s "
+"programs."
 
-#. Translators:  This is a warning popup when the user tries to do something that has broader effects than they might anticipate
+#. Translators:  This is a warning popup when the user tries to do something
+#. that has broader effects than they might anticipate
 #: js/pages/tola_management_pages/country/components/edit_disaggregations.js:649
 #, python-format
 msgid ""
-"This disaggregation will be automatically selected for all new indicators in "
-"%s. Existing indicators will be unaffected."
+"This disaggregation will be automatically selected for all new indicators in"
+" %s. Existing indicators will be unaffected."
 msgstr ""
-"Cette désagrégation sera automatiquement sélectionnée pour tous les nouveaux "
-"indicateurs dans %s. Les indicateurs existants ne seront pas affectés."
+"Cette désagrégation sera automatiquement sélectionnée pour tous les nouveaux"
+" indicateurs dans %s. Les indicateurs existants ne seront pas affectés."
 
-#. Translators:  This is a warning popup when the user tries to do something that has broader effects than they might anticipate
+#. Translators:  This is a warning popup when the user tries to do something
+#. that has broader effects than they might anticipate
 #: js/pages/tola_management_pages/country/components/edit_disaggregations.js:653
 #, python-format
 msgid ""
@@ -1783,7 +1989,8 @@ msgstr "Actif"
 msgid "Achieved"
 msgstr "Effectué"
 
-#. Translators: This is a section header for when a user is creating a new strategic objective for a country */ }
+#. Translators: This is a section header for when a user is creating a new
+#. strategic objective for a country */ }
 #: js/pages/tola_management_pages/country/components/edit_objectives.js:74
 msgid "New Strategic Objective"
 msgstr "Nouvel objectif stratégique"
@@ -1792,7 +1999,8 @@ msgstr "Nouvel objectif stratégique"
 msgid "Short name"
 msgstr "Nom court"
 
-#. Translators: Label for column identifying "active" or "inactive" user status */}
+#. Translators: Label for column identifying "active" or "inactive" user
+#. status */}
 #: js/pages/tola_management_pages/country/components/edit_objectives.js:107
 #: js/pages/tola_management_pages/organization/components/edit_organization_history.js:59
 #: js/pages/tola_management_pages/organization/views.js:73
@@ -1810,12 +2018,14 @@ msgstr "Statut"
 msgid "Delete Strategic Objective?"
 msgstr "Supprimer l’objectif stratégique ?"
 
-#. Translators: This is a button that allows the user to add a strategic objective. */}
+#. Translators: This is a button that allows the user to add a strategic
+#. objective. */}
 #: js/pages/tola_management_pages/country/components/edit_objectives.js:235
 msgid "Add strategic objective"
 msgstr "Ajouter un objectif stratégique"
 
-#. Translators: Success message shown to user when a new disaggregation has been saved and associated with existing data.
+#. Translators: Success message shown to user when a new disaggregation has
+#. been saved and associated with existing data.
 #: js/pages/tola_management_pages/country/models.js:210
 #, python-format
 msgid ""
@@ -1848,43 +2058,55 @@ msgstr "Enregistré avec succès"
 msgid "Saving failed"
 msgstr "Échec de l’enregistrement"
 
-#. Translators: Notification that a user has been able to delete a disaggregation
+#. Translators: Notification that a user has been able to delete a
+#. disaggregation
 #: js/pages/tola_management_pages/country/models.js:231
 msgid "Successfully deleted"
 msgstr "Supprimée avec succès"
 
-#. Translators: Notification that a user has been able to disable a disaggregation
+#. Translators: Notification that a user has been able to disable a
+#. disaggregation
 #: js/pages/tola_management_pages/country/models.js:236
 msgid "Successfully archived"
 msgstr "Archivée avec succès"
 
-#. Translators: Notification that a user has been able to reactivate a disaggregation
+#. Translators: Notification that a user has been able to reactivate a
+#. disaggregation
 #: js/pages/tola_management_pages/country/models.js:241
 msgid "Successfully unarchived"
 msgstr "Désarchivée avec succès"
 
-#. Translators: error message generated when item names are duplicated but are required to be unqiue.
+#. Translators: error message generated when item names are duplicated but are
+#. required to be unqiue.
 #: js/pages/tola_management_pages/country/models.js:246
+#| msgid ""
+#| "Saving failed: Disaggregation categories should be unique within a "
+#| "disaggregation."
 msgid ""
 "Saving failed. Disaggregation categories should be unique within a "
 "disaggregation."
 msgstr ""
-"Échec de l’enregistrement. Les catégories de désagrégation doivent être "
-"uniques au sein d’une même désagrégation."
+"ÁTranslated Saving failed. Disaggregation categories should be unique within"
+" a disaggregation."
 
-#. Translators: error message generated when item names are duplicated but are required to be unqiue.
+#. Translators: error message generated when item names are duplicated but are
+#. required to be unqiue.
 #: js/pages/tola_management_pages/country/models.js:253
+#| msgid ""
+#| "Saving failed: disaggregation names should be unique within a country."
 msgid "Saving failed. Disaggregation names should be unique within a country."
 msgstr ""
-"Échec de l’enregistrement. Les noms de désagrégation doivent être uniques au "
-"sein d’un même pays."
+"éTranslated Saving failed. Disaggregation names should be unique within a "
+"country."
 
-#. Translators: This is a confirmation prompt to confirm a user wants to delete an item
+#. Translators: This is a confirmation prompt to confirm a user wants to
+#. delete an item
 #: js/pages/tola_management_pages/country/models.js:442
 msgid "Are you sure you want to delete this disaggregation?"
 msgstr "Êtes-vous sûr de vouloir supprimer cette désagrégation ?"
 
-#. Translators: This is part of a confirmation prompt to archive a type of disaggregation (e.g. "gender" or "age")
+#. Translators: This is part of a confirmation prompt to archive a type of
+#. disaggregation (e.g. "gender" or "age")
 #: js/pages/tola_management_pages/country/models.js:476
 msgid ""
 "New programs will be unable to use this disaggregation. (Programs already "
@@ -1893,13 +2115,15 @@ msgstr ""
 "Les nouveaux programmes ne pourront pas utiliser cette désagrégation (ceux "
 "qui l’utilisent déjà ne seront pas affectés)."
 
-#. Translators: This is part of a confirmation prompt to unarchive a type of disaggregation (e.g. "gender" or "age")
+#. Translators: This is part of a confirmation prompt to unarchive a type of
+#. disaggregation (e.g. "gender" or "age")
 #: js/pages/tola_management_pages/country/models.js:508
 #, python-format
 msgid "All programs in %s will be able to use this disaggregation."
 msgstr "Les programmes situés dans %s pourront utiliser cette désagrégation."
 
-#. Translators:  This error message appears underneath a user-input name if it appears more than once in a set of names.  Only unique names are allowed.
+#. Translators:  This error message appears underneath a user-input name if it
+#. appears more than once in a set of names.  Only unique names are allowed.
 #: js/pages/tola_management_pages/country/models.js:612
 #, python-format
 msgid ""
@@ -1909,12 +2133,14 @@ msgstr ""
 "Un type de désagrégation nommé «  %(newDisagg)s » existe déjà pour "
 "%(country)s. Veuillez choisir un nom unique."
 
-#. Translators:  This error message appears underneath user-input labels that appear more than once in a set of labels.  Only unique labels are allowed.
+#. Translators:  This error message appears underneath user-input labels that
+#. appear more than once in a set of labels.  Only unique labels are allowed.
 #: js/pages/tola_management_pages/country/models.js:630
 msgid "Categories must not be blank."
 msgstr "Les catégories ne peuvent pas être vides."
 
-#. Translators:  This error message appears underneath user-input labels that appear more than once in a set of labels.  Only unique labels are allowed.
+#. Translators:  This error message appears underneath user-input labels that
+#. appear more than once in a set of labels.  Only unique labels are allowed.
 #: js/pages/tola_management_pages/country/models.js:634
 msgid "Categories must have unique names."
 msgstr "Les catégories doivent avoir des noms uniques."
@@ -1989,7 +2215,8 @@ msgstr "Ajouter un pays"
 msgid "Users"
 msgstr "Utilisateurs"
 
-#. Translators: preceded by a number, i.e. "3 organizations" or "1 organization"
+#. Translators: preceded by a number, i.e. "3 organizations" or "1
+#. organization"
 #: js/pages/tola_management_pages/country/views.js:204
 #, python-format
 msgid "%s organization"
@@ -2129,12 +2356,12 @@ msgstr "Regrouper les indicateurs selon le cadre de résultats"
 #: js/pages/tola_management_pages/program/components/program_settings.js:82
 msgid ""
 "After you have set a results framework for this program and assigned "
-"indicators to it, select this option to retire the original indicator levels "
-"and view indicators grouped by results framework levels instead.  This "
+"indicators to it, select this option to retire the original indicator levels"
+" and view indicators grouped by results framework levels instead.  This "
 "setting affects the program page, indicator plan, and IPTT reports."
 msgstr ""
-"Une fois que vous avez défini un cadre de résultats pour ce programme et que "
-"des indicateurs lui ont été attribués, sélectionnez cette option pour "
+"Une fois que vous avez défini un cadre de résultats pour ce programme et que"
+" des indicateurs lui ont été attribués, sélectionnez cette option pour "
 "retirer les niveaux d’indicateurs originaux et afficher les indicateurs en "
 "fonction des niveaux du cadre de résultats. Ce réglage affecte la page du "
 "programme, le plan des indicateurs et les rapports IPTT."
@@ -2154,7 +2381,7 @@ msgid ""
 "assignments."
 msgstr ""
 "La numérotation des indicateurs est automatiquement déterminée par "
-"l’affectation au cadre de résultats."
+"l’affectation au cadre de résultats"
 
 #: js/pages/tola_management_pages/program/components/program_settings.js:122
 msgid "Manually number indicators"
@@ -2177,20 +2404,25 @@ msgstr ""
 "lequel les indicateurs sont listés. Ils sont uniquement utilisés à des fins "
 "d’affichage."
 
-#. Translators: Notify user that the program start and end date were successfully retrieved from the GAIT service and added to the newly saved Program
+#. Translators: Notify user that the program start and end date were
+#. successfully retrieved from the GAIT service and added to the newly saved
+#. Program
 #: js/pages/tola_management_pages/program/models.js:205
 msgid "Successfully synced GAIT program start and end dates"
 msgstr ""
 "Les dates de début et de fin du programme GAIT ont été synchronisées avec "
 "succès"
 
-#. Translators: Notify user that the program start and end date failed to be retrieved from the GAIT service with a specific reason appended after the :
+#. Translators: Notify user that the program start and end date failed to be
+#. retrieved from the GAIT service with a specific reason appended after the :
 #: js/pages/tola_management_pages/program/models.js:211
 msgid "Failed to sync GAIT program start and end dates: "
 msgstr ""
-"Échec de la synchronisation des dates de début et de fin du programme GAIT : "
+"Échec de la synchronisation des dates de début et de fin du programme GAIT :"
+" "
 
-#. Translators: A request failed, ask the user if they want to try the request again
+#. Translators: A request failed, ask the user if they want to try the request
+#. again
 #: js/pages/tola_management_pages/program/models.js:219
 msgid "Retry"
 msgstr "Réessayer"
@@ -2201,7 +2433,8 @@ msgid "Ignore"
 msgstr "Ignorer"
 
 #: js/pages/tola_management_pages/program/models.js:275
-msgid "The GAIT ID for this program is shared with at least one other program."
+msgid ""
+"The GAIT ID for this program is shared with at least one other program."
 msgstr ""
 "L’ID GAIT de ce programme est partagé avec au moins un autre programme."
 
@@ -2255,7 +2488,8 @@ msgstr "programmes"
 msgid "Resend Registration Email"
 msgstr "Renvoyer l’e-mail d’inscription"
 
-#. Translators: This is an deactivated menu item visible to users, indicating that assignment of this option is managed by another system.
+#. Translators: This is an deactivated menu item visible to users, indicating
+#. that assignment of this option is managed by another system.
 #: js/pages/tola_management_pages/user/components/edit_user_profile.js:16
 msgid "Mercy Corps -- managed by Okta"
 msgstr "Mercy Corps — géré par Okta"
@@ -2293,46 +2527,55 @@ msgstr "Enregistrer les modifications"
 msgid "Save And Add Another"
 msgstr "Enregistrer et ajouter un autre"
 
-#. Translators: an option in a list of country-level access settings, indicating no default access to the country's programs, but individually set access to individual programs within
+#. Translators: an option in a list of country-level access settings,
+#. indicating no default access to the country's programs, but individually
+#. set access to individual programs within
 #: js/pages/tola_management_pages/user/components/edit_user_programs.js:10
 msgid "Individual programs only"
 msgstr "Programmes individuels uniquement"
 
-#. Translators: An option for access level to a program, when no access is granted
+#. Translators: An option for access level to a program, when no access is
+#. granted
 #: js/pages/tola_management_pages/user/components/edit_user_programs.js:13
+#| msgid "Has access?"
 msgid "No access"
-msgstr "N’a pas accès"
+msgstr "Translated No access"
 
 #: js/pages/tola_management_pages/user/components/edit_user_programs.js:478
 #: js/pages/tola_management_pages/user/components/user_editor.js:32
 msgid "Programs and Roles"
 msgstr "Programmes et rôles"
 
-#. Translators: link to learn more about permissions-granting roles a user can be assigned
+#. Translators: link to learn more about permissions-granting roles a user can
+#. be assigned
 #: js/pages/tola_management_pages/user/components/edit_user_programs.js:482
 msgid "More information on Program Roles"
 msgstr "En savoir plus sur les rôles de programmes"
 
-#. Translators: A message explaining why the roles and options menu is not displayed for the current user
+#. Translators: A message explaining why the roles and options menu is not
+#. displayed for the current user
 #: js/pages/tola_management_pages/user/components/edit_user_programs.js:487
 msgid ""
 "Program and role options are not displayed because Super Admin permissions "
 "override all available settings."
 msgstr ""
-"Les options de programme et de rôle ne sont pas affichées car les "
-"autorisations de Super Admin annulent tous les paramètres disponibles."
+"ŹTranslated Program and role options are not displayed because Super Admin "
+"permissions override all available settings."
 
-#. Translators: This is placeholder text on a dropdown of countries which limit the displayed programs
+#. Translators: This is placeholder text on a dropdown of countries which
+#. limit the displayed programs
 #: js/pages/tola_management_pages/user/components/edit_user_programs.js:495
 msgid "Filter countries"
 msgstr "Filtrer les pays"
 
-#. Translators: this is placeholder text on a dropdown of programs which limit the displayed results
+#. Translators: this is placeholder text on a dropdown of programs which limit
+#. the displayed results
 #: js/pages/tola_management_pages/user/components/edit_user_programs.js:501
 msgid "Filter programs"
 msgstr "Filtrer les programmes"
 
-#. Translators: Column header for a checkbox indicating if a user has access to a program */
+#. Translators: Column header for a checkbox indicating if a user has access
+#. to a program */
 #: js/pages/tola_management_pages/user/components/edit_user_programs.js:526
 msgid "Has access?"
 msgstr "A accès ?"
@@ -2361,7 +2604,8 @@ msgstr "Oui"
 msgid "No"
 msgstr "Non"
 
-#. Translators: An email was sent to the user to verify that the email address is valid
+#. Translators: An email was sent to the user to verify that the email address
+#. is valid
 #: js/pages/tola_management_pages/user/models.js:453
 msgid "Verification email sent"
 msgstr "E-mail de vérification a été envoyé"
@@ -2422,345 +2666,407 @@ msgstr "Super administrateur"
 msgid "users"
 msgstr "utilisateurs"
 
-#. Translators: One of several options for specifying how often data is collected or reported on over the life of a program
+#. Translators: One of several options for specifying how often data is
+#. collected or reported on over the life of a program
 #: tola/db_translations.js:2
 msgid "By distribution"
-msgstr "éTranslated By distribution"
+msgstr "ÁTranslated By distribution"
 
-#. Translators: One of several options for specifying how often data is collected or reported on over the life of a program
+#. Translators: One of several options for specifying how often data is
+#. collected or reported on over the life of a program
 #: tola/db_translations.js:4
 msgid "Endline"
-msgstr "Translated Endline"
+msgstr "éTranslated Endline"
 
-#. Translators: One of several options for specifying how often data is collected or reported on over the life of a program
+#. Translators: One of several options for specifying how often data is
+#. collected or reported on over the life of a program
 #: tola/db_translations.js:6
 msgid "Post shock"
 msgstr "Translated Post shock"
 
-#. Translators: One of several options for specifying how often data is collected or reported on over the life of a program
+#. Translators: One of several options for specifying how often data is
+#. collected or reported on over the life of a program
 #: tola/db_translations.js:10
 msgid "By training"
-msgstr "ŹTranslated By training"
+msgstr "öTranslated By training"
 
-#. Translators: One of several options for specifying how often data is collected or reported on over the life of a program
+#. Translators: One of several options for specifying how often data is
+#. collected or reported on over the life of a program
 #: tola/db_translations.js:12
+#| msgid "Find an Organization"
 msgid "Final evaluation"
-msgstr "ÁTranslated Final evaluation"
+msgstr "öTranslated Final evaluation"
 
-#. Translators: One of several options for specifying how often data is collected or reported on over the life of a program
+#. Translators: One of several options for specifying how often data is
+#. collected or reported on over the life of a program
 #: tola/db_translations.js:14
 msgid "By batch"
-msgstr "ÁTranslated By batch"
+msgstr "ŹTranslated By batch"
 
-#. Translators: One of several options for specifying how often data is collected or reported on over the life of a program
+#. Translators: One of several options for specifying how often data is
+#. collected or reported on over the life of a program
 #: tola/db_translations.js:16
 msgid "Weekly"
-msgstr "éTranslated Weekly"
+msgstr "ÁTranslated Weekly"
 
-#. Translators: One of several options for specifying how often data is collected or reported on over the life of a program
+#. Translators: One of several options for specifying how often data is
+#. collected or reported on over the life of a program
 #: tola/db_translations.js:26
 msgid "Midline"
-msgstr "Translated Midline"
+msgstr "éTranslated Midline"
 
-#. Translators: One of several options for specifying how often data is collected or reported on over the life of a program
+#. Translators: One of several options for specifying how often data is
+#. collected or reported on over the life of a program
 #: tola/db_translations.js:28
 msgid "By event"
 msgstr "Translated By event"
 
-#. Translators: One of several choices for what sector (i.e. development domain) a program is most closely associated with
+#. Translators: One of several choices for what sector (i.e. development
+#. domain) a program is most closely associated with
 #: tola/db_translations.js:30
 msgid "Agribusiness"
-msgstr "ŹTranslated Agribusiness"
+msgstr "öTranslated Agribusiness"
 
-#. Translators: One of several choices for what sector (i.e. development domain) a program is most closely associated with
+#. Translators: One of several choices for what sector (i.e. development
+#. domain) a program is most closely associated with
 #: tola/db_translations.js:32
 msgid "Agriculture"
-msgstr "ÁTranslated Agriculture"
+msgstr "ŹTranslated Agriculture"
 
-#. Translators: One of several choices for what sector (i.e. development domain) a program is most closely associated with
+#. Translators: One of several choices for what sector (i.e. development
+#. domain) a program is most closely associated with
 #: tola/db_translations.js:34
 msgid "Agriculture and Food Security"
-msgstr "éTranslated Agriculture and Food Security"
+msgstr "ÁTranslated Agriculture and Food Security"
 
-#. Translators: One of several choices for what sector (i.e. development domain) a program is most closely associated with
+#. Translators: One of several choices for what sector (i.e. development
+#. domain) a program is most closely associated with
 #: tola/db_translations.js:36
 msgid "Basic Needs"
-msgstr "Translated Basic Needs"
+msgstr "éTranslated Basic Needs"
 
-#. Translators: One of several choices for what sector (i.e. development domain) a program is most closely associated with
+#. Translators: One of several choices for what sector (i.e. development
+#. domain) a program is most closely associated with
 #: tola/db_translations.js:38
 msgid "Capacity development"
 msgstr "Translated Capacity development"
 
-#. Translators: One of several choices for what sector (i.e. development domain) a program is most closely associated with
+#. Translators: One of several choices for what sector (i.e. development
+#. domain) a program is most closely associated with
 #: tola/db_translations.js:40
 msgid "Child Health & Nutrition"
-msgstr "ŹTranslated Child Health & Nutrition"
+msgstr "öTranslated Child Health & Nutrition"
 
-#. Translators: One of several choices for what sector (i.e. development domain) a program is most closely associated with
+#. Translators: One of several choices for what sector (i.e. development
+#. domain) a program is most closely associated with
 #: tola/db_translations.js:42
 msgid "Climate Change Adaptation & Disaster Risk Reduction"
-msgstr "ÁTranslated Climate Change Adaptation & Disaster Risk Reduction"
+msgstr "ŹTranslated Climate Change Adaptation & Disaster Risk Reduction"
 
-#. Translators: One of several choices for what sector (i.e. development domain) a program is most closely associated with
+#. Translators: One of several choices for what sector (i.e. development
+#. domain) a program is most closely associated with
 #: tola/db_translations.js:44
 msgid "Conflict Management"
-msgstr "éTranslated Conflict Management"
+msgstr "ÁTranslated Conflict Management"
 
-#. Translators: One of several choices for what sector (i.e. development domain) a program is most closely associated with
+#. Translators: One of several choices for what sector (i.e. development
+#. domain) a program is most closely associated with
 #: tola/db_translations.js:46
 msgid "Early Economic Recovery"
-msgstr "Translated Early Economic Recovery"
+msgstr "éTranslated Early Economic Recovery"
 
-#. Translators: One of several choices for what sector (i.e. development domain) a program is most closely associated with
+#. Translators: One of several choices for what sector (i.e. development
+#. domain) a program is most closely associated with
 #: tola/db_translations.js:48
 msgid "Economic and Market Development"
 msgstr "Translated Economic and Market Development"
 
-#. Translators: One of several choices for what sector (i.e. development domain) a program is most closely associated with
+#. Translators: One of several choices for what sector (i.e. development
+#. domain) a program is most closely associated with
 #: tola/db_translations.js:50
 msgid "Economic Recovery and Market Systems"
-msgstr "ŹTranslated Economic Recovery and Market Systems"
+msgstr "öTranslated Economic Recovery and Market Systems"
 
-#. Translators: One of several choices for what sector (i.e. development domain) a program is most closely associated with
+#. Translators: One of several choices for what sector (i.e. development
+#. domain) a program is most closely associated with
 #: tola/db_translations.js:52
 msgid "Education Support"
-msgstr "ÁTranslated Education Support"
+msgstr "ŹTranslated Education Support"
 
-#. Translators: One of several choices for what sector (i.e. development domain) a program is most closely associated with
+#. Translators: One of several choices for what sector (i.e. development
+#. domain) a program is most closely associated with
 #: tola/db_translations.js:54
 msgid "Emergency"
-msgstr "éTranslated Emergency"
+msgstr "ÁTranslated Emergency"
 
-#. Translators: One of several choices for what sector (i.e. development domain) a program is most closely associated with
+#. Translators: One of several choices for what sector (i.e. development
+#. domain) a program is most closely associated with
 #: tola/db_translations.js:56
 msgid "Employment/Entrepreneurship"
-msgstr "Translated Employment/Entrepreneurship"
+msgstr "éTranslated Employment/Entrepreneurship"
 
-#. Translators: One of several choices for what sector (i.e. development domain) a program is most closely associated with
+#. Translators: One of several choices for what sector (i.e. development
+#. domain) a program is most closely associated with
 #: tola/db_translations.js:58
 msgid "Energy Access"
 msgstr "Translated Energy Access"
 
-#. Translators: One of several choices for what sector (i.e. development domain) a program is most closely associated with
+#. Translators: One of several choices for what sector (i.e. development
+#. domain) a program is most closely associated with
 #: tola/db_translations.js:60
 msgid "Energy and Natural Resources"
-msgstr "ŹTranslated Energy and Natural Resources"
+msgstr "öTranslated Energy and Natural Resources"
 
-#. Translators: One of several choices for what sector (i.e. development domain) a program is most closely associated with
+#. Translators: One of several choices for what sector (i.e. development
+#. domain) a program is most closely associated with
 #: tola/db_translations.js:62
 msgid "Environment Disaster/Risk Reduction"
-msgstr "ÁTranslated Environment Disaster/Risk Reduction"
+msgstr "ŹTranslated Environment Disaster/Risk Reduction"
 
-#. Translators: One of several choices for what sector (i.e. development domain) a program is most closely associated with
+#. Translators: One of several choices for what sector (i.e. development
+#. domain) a program is most closely associated with
 #: tola/db_translations.js:64
 msgid "Financial Inclusion"
-msgstr "éTranslated Financial Inclusion"
+msgstr "ÁTranslated Financial Inclusion"
 
-#. Translators: One of several choices for what sector (i.e. development domain) a program is most closely associated with
+#. Translators: One of several choices for what sector (i.e. development
+#. domain) a program is most closely associated with
 #: tola/db_translations.js:66
 msgid "Food"
-msgstr "Translated Food"
+msgstr "éTranslated Food"
 
-#. Translators: One of several choices for what sector (i.e. development domain) a program is most closely associated with
+#. Translators: One of several choices for what sector (i.e. development
+#. domain) a program is most closely associated with
 #: tola/db_translations.js:68
 msgid "Food Security"
 msgstr "Translated Food Security"
 
-#. Translators: One of several choices for what sector (i.e. development domain) a program is most closely associated with
+#. Translators: One of several choices for what sector (i.e. development
+#. domain) a program is most closely associated with
 #: tola/db_translations.js:70
 msgid "Gender"
-msgstr "ŹTranslated Gender"
+msgstr "öTranslated Gender"
 
-#. Translators: One of several choices for what sector (i.e. development domain) a program is most closely associated with
+#. Translators: One of several choices for what sector (i.e. development
+#. domain) a program is most closely associated with
 #: tola/db_translations.js:72
 msgid "Governance"
-msgstr "ÁTranslated Governance"
+msgstr "ŹTranslated Governance"
 
-#. Translators: One of several choices for what sector (i.e. development domain) a program is most closely associated with
+#. Translators: One of several choices for what sector (i.e. development
+#. domain) a program is most closely associated with
 #: tola/db_translations.js:74
 msgid "Governance & Partnerships"
-msgstr "éTranslated Governance & Partnerships"
+msgstr "ÁTranslated Governance & Partnerships"
 
-#. Translators: One of several choices for what sector (i.e. development domain) a program is most closely associated with
+#. Translators: One of several choices for what sector (i.e. development
+#. domain) a program is most closely associated with
 #: tola/db_translations.js:76
 msgid "Governance and Conflict Resolution"
-msgstr "Translated Governance and Conflict Resolution"
+msgstr "éTranslated Governance and Conflict Resolution"
 
-#. Translators: One of several choices for what sector (i.e. development domain) a program is most closely associated with
+#. Translators: One of several choices for what sector (i.e. development
+#. domain) a program is most closely associated with
 #: tola/db_translations.js:78
 msgid "Health"
 msgstr "Translated Health"
 
-#. Translators: One of several choices for what sector (i.e. development domain) a program is most closely associated with
+#. Translators: One of several choices for what sector (i.e. development
+#. domain) a program is most closely associated with
 #: tola/db_translations.js:80
 msgid "Humanitaria Intervention Readiness"
-msgstr "ŹTranslated Humanitaria Intervention Readiness"
+msgstr "öTranslated Humanitaria Intervention Readiness"
 
-#. Translators: One of several choices for what sector (i.e. development domain) a program is most closely associated with
+#. Translators: One of several choices for what sector (i.e. development
+#. domain) a program is most closely associated with
 #: tola/db_translations.js:82
 msgid "Hygiene Promotion"
-msgstr "ÁTranslated Hygiene Promotion"
+msgstr "ŹTranslated Hygiene Promotion"
 
-#. Translators: One of several choices for what sector (i.e. development domain) a program is most closely associated with
+#. Translators: One of several choices for what sector (i.e. development
+#. domain) a program is most closely associated with
 #: tola/db_translations.js:84
 msgid "Information Dissemination"
-msgstr "éTranslated Information Dissemination"
+msgstr "ÁTranslated Information Dissemination"
 
-#. Translators: One of several choices for what sector (i.e. development domain) a program is most closely associated with
+#. Translators: One of several choices for what sector (i.e. development
+#. domain) a program is most closely associated with
 #: tola/db_translations.js:86
 msgid "Knowledge Management "
-msgstr "Translated Knowledge Management "
+msgstr "éTranslated Knowledge Management "
 
-#. Translators: One of several choices for what sector (i.e. development domain) a program is most closely associated with
+#. Translators: One of several choices for what sector (i.e. development
+#. domain) a program is most closely associated with
 #: tola/db_translations.js:88
 msgid "Livelihoods"
 msgstr "Translated Livelihoods"
 
-#. Translators: One of several choices for what sector (i.e. development domain) a program is most closely associated with
+#. Translators: One of several choices for what sector (i.e. development
+#. domain) a program is most closely associated with
 #: tola/db_translations.js:90
 msgid "Market Systems Development"
-msgstr "ŹTranslated Market Systems Development"
+msgstr "öTranslated Market Systems Development"
 
-#. Translators: One of several choices for what sector (i.e. development domain) a program is most closely associated with
+#. Translators: One of several choices for what sector (i.e. development
+#. domain) a program is most closely associated with
 #: tola/db_translations.js:92
 msgid "Maternal Health & Nutrition"
-msgstr "ÁTranslated Maternal Health & Nutrition"
+msgstr "ŹTranslated Maternal Health & Nutrition"
 
-#. Translators: One of several choices for what sector (i.e. development domain) a program is most closely associated with
+#. Translators: One of several choices for what sector (i.e. development
+#. domain) a program is most closely associated with
 #: tola/db_translations.js:94
 msgid "Non food Items (NFIs)"
-msgstr "éTranslated Non food Items (NFIs)"
+msgstr "ÁTranslated Non food Items (NFIs)"
 
-#. Translators: One of several choices for what sector (i.e. development domain) a program is most closely associated with
+#. Translators: One of several choices for what sector (i.e. development
+#. domain) a program is most closely associated with
 #: tola/db_translations.js:96
 msgid "Nutrition Sensitive"
-msgstr "Translated Nutrition Sensitive"
+msgstr "éTranslated Nutrition Sensitive"
 
-#. Translators: One of several choices for what sector (i.e. development domain) a program is most closely associated with
+#. Translators: One of several choices for what sector (i.e. development
+#. domain) a program is most closely associated with
 #: tola/db_translations.js:98
 msgid "Project Monitoring"
 msgstr "Translated Project Monitoring"
 
-#. Translators: One of several choices for what sector (i.e. development domain) a program is most closely associated with
+#. Translators: One of several choices for what sector (i.e. development
+#. domain) a program is most closely associated with
 #: tola/db_translations.js:100
 msgid "Protection"
-msgstr "ŹTranslated Protection"
+msgstr "öTranslated Protection"
 
-#. Translators: One of several choices for what sector (i.e. development domain) a program is most closely associated with
+#. Translators: One of several choices for what sector (i.e. development
+#. domain) a program is most closely associated with
 #: tola/db_translations.js:102
 msgid "Psychosocial"
-msgstr "ÁTranslated Psychosocial"
+msgstr "ŹTranslated Psychosocial"
 
-#. Translators: One of several choices for what sector (i.e. development domain) a program is most closely associated with
+#. Translators: One of several choices for what sector (i.e. development
+#. domain) a program is most closely associated with
 #: tola/db_translations.js:104
 msgid "Public Health"
-msgstr "éTranslated Public Health"
+msgstr "ÁTranslated Public Health"
 
-#. Translators: One of several choices for what sector (i.e. development domain) a program is most closely associated with
+#. Translators: One of several choices for what sector (i.e. development
+#. domain) a program is most closely associated with
 #: tola/db_translations.js:106
 msgid "Resilience"
-msgstr "Translated Resilience"
+msgstr "éTranslated Resilience"
 
-#. Translators: One of several choices for what sector (i.e. development domain) a program is most closely associated with
+#. Translators: One of several choices for what sector (i.e. development
+#. domain) a program is most closely associated with
 #: tola/db_translations.js:108
 msgid "Sanitation Infrastructure"
 msgstr "Translated Sanitation Infrastructure"
 
-#. Translators: One of several choices for what sector (i.e. development domain) a program is most closely associated with
+#. Translators: One of several choices for what sector (i.e. development
+#. domain) a program is most closely associated with
 #: tola/db_translations.js:110
 msgid "Skills and Training"
-msgstr "ŹTranslated Skills and Training"
+msgstr "öTranslated Skills and Training"
 
-#. Translators: One of several choices for what sector (i.e. development domain) a program is most closely associated with
+#. Translators: One of several choices for what sector (i.e. development
+#. domain) a program is most closely associated with
 #: tola/db_translations.js:112
 msgid "Urban Issues"
-msgstr "ÁTranslated Urban Issues"
+msgstr "ŹTranslated Urban Issues"
 
-#. Translators: One of several choices for what sector (i.e. development domain) a program is most closely associated with
+#. Translators: One of several choices for what sector (i.e. development
+#. domain) a program is most closely associated with
 #: tola/db_translations.js:114
 msgid "WASH"
-msgstr "éTranslated WASH"
+msgstr "ÁTranslated WASH"
 
-#. Translators: One of several choices for what sector (i.e. development domain) a program is most closely associated with
+#. Translators: One of several choices for what sector (i.e. development
+#. domain) a program is most closely associated with
 #: tola/db_translations.js:116
 msgid "Water Supply Infrastructure"
-msgstr "Translated Water Supply Infrastructure"
+msgstr "éTranslated Water Supply Infrastructure"
 
-#. Translators: One of several choices for what sector (i.e. development domain) a program is most closely associated with
+#. Translators: One of several choices for what sector (i.e. development
+#. domain) a program is most closely associated with
 #: tola/db_translations.js:118
 msgid "Workforce Development"
 msgstr "Translated Workforce Development"
 
-#. Translators: One of several choices for what sector (i.e. development domain) a program is most closely associated with
+#. Translators: One of several choices for what sector (i.e. development
+#. domain) a program is most closely associated with
 #: tola/db_translations.js:120
 msgid "Youth"
-msgstr "ŹTranslated Youth"
+msgstr "öTranslated Youth"
 
-#. Translators: One of several choices for specifying what type of Indicator is being created.  An Indicator is a performance measure e.g. "We will distrubute 1000 food packs over the next two months"
+#. Translators: One of several choices for specifying what type of Indicator
+#. is being created.  An Indicator is a performance measure e.g. "We will
+#. distrubute 1000 food packs over the next two months"
 #: tola/db_translations.js:124
 msgid "Donor"
-msgstr "ÁTranslated Donor"
+msgstr "ŹTranslated Donor"
 
-#. Translators: One of several choices for specifying what type of Indicator is being created.  An Indicator is a performance measure e.g. "We will distrubute 1000 food packs over the next two months"
+#. Translators: One of several choices for specifying what type of Indicator
+#. is being created.  An Indicator is a performance measure e.g. "We will
+#. distrubute 1000 food packs over the next two months"
 #: tola/db_translations.js:126
 msgid "DIG - Standard"
-msgstr "éTranslated DIG - Standard"
+msgstr "ÁTranslated DIG - Standard"
 
-#. Translators: One of several choices for specifying what type of Indicator is being created.  An Indicator is a performance measure e.g. "We will distrubute 1000 food packs over the next two months"
+#. Translators: One of several choices for specifying what type of Indicator
+#. is being created.  An Indicator is a performance measure e.g. "We will
+#. distrubute 1000 food packs over the next two months"
 #: tola/db_translations.js:128
 msgid "DIG - Alpha"
-msgstr "Translated DIG - Alpha"
+msgstr "éTranslated DIG - Alpha"
 
-#. Translators: One of several choices for specifying what type of Indicator is being created.  An Indicator is a performance measure e.g. "We will distrubute 1000 food packs over the next two months"
+#. Translators: One of several choices for specifying what type of Indicator
+#. is being created.  An Indicator is a performance measure e.g. "We will
+#. distrubute 1000 food packs over the next two months"
 #: tola/db_translations.js:130
 msgid "DIG - Testing"
 msgstr "Translated DIG - Testing"
 
-#. Translators: One of several choices for specifying what type of Indicator is being created.  An Indicator is a performance measure e.g. "We will distrubute 1000 food packs over the next two months"
+#. Translators: One of several choices for specifying what type of Indicator
+#. is being created.  An Indicator is a performance measure e.g. "We will
+#. distrubute 1000 food packs over the next two months"
 #: tola/db_translations.js:132
 msgid "Performance"
-msgstr "ŹTranslated Performance"
+msgstr "öTranslated Performance"
 
-#. Translators: One of several choices for specifying what type of Indicator is being created.  An Indicator is a performance measure e.g. "We will distrubute 1000 food packs over the next two months"
+#. Translators: One of several choices for specifying what type of Indicator
+#. is being created.  An Indicator is a performance measure e.g. "We will
+#. distrubute 1000 food packs over the next two months"
 #: tola/db_translations.js:134
 msgid "Process / Management"
-msgstr "ÁTranslated Process / Management"
+msgstr "ŹTranslated Process / Management"
 
-#. Translators: One of several choices for specifying what type of Indicator is being created.  An Indicator is a performance measure e.g. "We will distrubute 1000 food packs over the next two months"
+#. Translators: One of several choices for specifying what type of Indicator
+#. is being created.  An Indicator is a performance measure e.g. "We will
+#. distrubute 1000 food packs over the next two months"
 #: tola/db_translations.js:136
 msgid "Context / Trigger"
-msgstr "éTranslated Context / Trigger"
+msgstr "ÁTranslated Context / Trigger"
 
-#. Translators: One of several choices for specifying what type of Indicator is being created.  An Indicator is a performance measure e.g. "We will distrubute 1000 food packs over the next two months"
+#. Translators: One of several choices for specifying what type of Indicator
+#. is being created.  An Indicator is a performance measure e.g. "We will
+#. distrubute 1000 food packs over the next two months"
 #: tola/db_translations.js:138
 msgid "Key Performance Indicator (KPI)"
-msgstr "Translated Key Performance Indicator (KPI)"
+msgstr "éTranslated Key Performance Indicator (KPI)"
 
-#~ msgid "Upload"
-#~ msgstr "éTranslated Upload"
-
-#~ msgid ""
-#~ "indicators are ready to be imported. Are you ready to complete the import "
-#~ "process? (This action cannot be undone.)"
-#~ msgstr ""
-#~ "ÁTranslated indicators are ready to be imported. Are you ready to "
-#~ "complete the import process? (This action cannot be undone.)"
-
-#~ msgid "Missing targets"
-#~ msgstr "Cibles manquantes"
+#~ msgid "Success!"
+#~ msgstr "Succès !"
 
 #~ msgid "Sending"
 #~ msgstr "Envoi en cours"
 
-#~ msgid "Successfully Saved"
-#~ msgstr "Enregistré avec succès"
+#~ msgid "Missing targets"
+#~ msgstr "Cibles manquantes"
 
 #~ msgid "Saving Failed"
 #~ msgstr "Échec de l’enregistrement"
 
-#~ msgid "Success!"
-#~ msgstr "Succès !"
+#~ msgid "Successfully Saved"
+#~ msgstr "Enregistré avec succès"
 
 #~ msgid "This indicator has no targets."
 #~ msgstr "Cet indicateur n’a pas de cible."
@@ -2779,10 +3085,9 @@ msgstr "Translated Key Performance Indicator (KPI)"
 #~ "enregistrées"
 
 #~ msgid ""
-#~ "<span class=\"text-danger\"><strong>Choose your results framework "
-#~ "template carefully!</strong></span> Once you begin building your "
-#~ "framework, it will not be possible to change templates without first "
-#~ "deleting all saved levels."
+#~ "<span class=\"text-danger\"><strong>Choose your results framework template "
+#~ "carefully!</strong></span> Once you begin building your framework, it will "
+#~ "not be possible to change templates without first deleting all saved levels."
 #~ msgstr ""
 #~ "<span class=\"text-danger\"><strong>Choisissez bien la structure de votre "
 #~ "cadre de résultats !</strong></span> Lorsque vous commencez à concevoir "
@@ -2814,8 +3119,8 @@ msgstr "Translated Key Performance Indicator (KPI)"
 
 #~ msgid ""
 #~ "<strong className=\"text-danger\">Choose your results framework template "
-#~ "carefully!</strong> Once you begin building your framework, it will not "
-#~ "be possible to change templates without first deleting all saved levels."
+#~ "carefully!</strong> Once you begin building your framework, it will not be "
+#~ "possible to change templates without first deleting all saved levels."
 #~ msgstr ""
 #~ "<strong className=\"text-danger\">Choisissez bien la structure de votre "
 #~ "cadre de résultats !</strong> Lorsque vous commencez à concevoir votre "
@@ -2823,26 +3128,18 @@ msgstr "Translated Key Performance Indicator (KPI)"
 #~ "niveaux enregistrés au préalable."
 
 #~ msgid ""
-#~ "If we make these changes, %s data record will no longer be associated "
-#~ "with the Life of Program target, and will need to be reassigned to a new "
-#~ "target.\n"
+#~ "If we make these changes, %s data record will no longer be associated with the Life of Program target, and will need to be reassigned to a new target.\n"
 #~ "\n"
 #~ " Proceed anyway?"
 #~ msgid_plural ""
-#~ "If we make these changes, %s data records will no longer be associated "
-#~ "with the Life of Program target, and will need to be reassigned to new "
-#~ "targets.\n"
+#~ "If we make these changes, %s data records will no longer be associated with the Life of Program target, and will need to be reassigned to new targets.\n"
 #~ "\n"
 #~ " Proceed anyway?"
 #~ msgstr[0] ""
-#~ "Si nous apportons ces modifications, %s enregistrement de données ne sera "
-#~ "plus associé à la cible de durée de vie du programme et devra être "
-#~ "réassigné à de nouvelles cibles.\n"
+#~ "Si nous apportons ces modifications, %s enregistrement de données ne sera plus associé à la cible de durée de vie du programme et devra être réassigné à de nouvelles cibles.\n"
 #~ "\n"
 #~ " Continuer quand même ?"
 #~ msgstr[1] ""
-#~ "Si nous apportons ces modifications, %s enregistrements de données ne "
-#~ "seront plus associés à la cible de durée de vie du programme et devront "
-#~ "être réassignés à de nouvelles cibles.\n"
+#~ "Si nous apportons ces modifications, %s enregistrements de données ne seront plus associés à la cible de durée de vie du programme et devront être réassignés à de nouvelles cibles.\n"
 #~ "\n"
 #~ " Continuer quand même ?"
