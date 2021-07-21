@@ -107,6 +107,11 @@ na_alt = gettext_noop('NA')
 not_applicable = gettext_noop('Not applicable')
 NULL_EQUIVALENTS = [na, na_alt, not_applicable]
 
+GRAY_LIGHTEST = 'FFF5F5F5'
+GRAY_LIGHTER = 'FFDBDCDE'
+GRAY_DARK = 'FF54585A'
+RED_ERROR = '66FFE3E7'
+
 TITLE_STYLE = 'title_style'
 REQUIRED_HEADER_STYLE = 'required_header_style'
 OPTIONAL_HEADER_STYLE = 'optional_header_style'
@@ -146,11 +151,6 @@ class BulkImportIndicatorsView(LoginRequiredMixin, UserPassesTestMixin, AccessMi
     first_used_column = FIRST_USED_COLUMN
     data_start_row = DATA_START_ROW
     program_name_row = PROGRAM_NAME_ROW
-
-    GRAY_LIGHTEST = 'FFF5F5F5'
-    GRAY_LIGHTER = 'FFDBDCDE'
-    GRAY_DARK = 'FF54585A'
-    RED_ERROR = '66FFE3E7'
 
     # Translators: Error message shown to a user when they have entered a value for a numeric field that isn't a number or is negative.
     VALIDATION_MSG_BASELINE_NA = gettext_noop('Enter a numeric value for the baseline. If a baseline is not yet known or not applicable, enter a zero or type "N/A". The baseline can always be updated at a later point in time.')
@@ -345,7 +345,7 @@ class BulkImportIndicatorsView(LoginRequiredMixin, UserPassesTestMixin, AccessMi
         )
 
         ws.cell(4, self.first_used_column).value = instructions
-        ws.cell(4, self.first_used_column).fill = PatternFill('solid', fgColor=self.GRAY_LIGHTER)
+        ws.cell(4, self.first_used_column).fill = PatternFill('solid', fgColor=GRAY_LIGHTER)
         # Translators: Section header of an Excel template that allows users to upload Indicators.  This section is where users will add their own information.
         ws.cell(5, self.first_used_column).value = gettext("Enter indicators")
 
@@ -492,7 +492,7 @@ class BulkImportIndicatorsView(LoginRequiredMixin, UserPassesTestMixin, AccessMi
         # Translators: Message provided to user when they have not chosen from a pre-selected list of options.
         VALIDATION_MSG_CHOICE = gettext('The {field_name} you selected is unavailable. Please select a different {field_name}.')
         FIRST_CELL_ERROR_VALUE = r"⚠️"
-        PATTERN_FILL_ERROR = PatternFill('solid', fgColor=self.RED_ERROR)
+        PATTERN_FILL_ERROR = PatternFill('solid', fgColor=RED_ERROR)
 
         program_id = kwargs['program_id']
         program = Program.objects.get(pk=program_id)
@@ -560,7 +560,6 @@ class BulkImportIndicatorsView(LoginRequiredMixin, UserPassesTestMixin, AccessMi
             for validation in validation_map.values():
                 ws.add_data_validation(validation)
 
-
             for current_row_index in range(self.data_start_row, ws.max_row):
                 first_cell = ws.cell(current_row_index, self.first_used_column)
                 # If this is a level header row, parse the level name out of the header string
@@ -623,13 +622,12 @@ class BulkImportIndicatorsView(LoginRequiredMixin, UserPassesTestMixin, AccessMi
                 if program.auto_number_indicators and number_cell.value is not None:
                     expected_ind_number = f'{current_level.display_ontology}{next(letter_gen)}'
                     if number_cell.value != expected_ind_number:
-                        number_cell.fill = PATTERN_FILL_ERROR
                         fatal_errors.append(ERROR_UNEXPECTED_INDICATOR_NUMBER)
 
                 # Check if the value of the Level column matches the one used in the level header
                 level_cell = ws.cell(current_row_index, FIRST_USED_COLUMN)
                 if level_cell.value != current_tier:
-                    level_cell.fill = PatternFill('solid', fgColor=self.RED_ERROR)
+                    level_cell.fill = PatternFill('solid', fgColor=RED_ERROR)
                     fatal_errors.append(ERROR_UNEXPECTED_LEVEL)
 
                 indicator_data = {}
@@ -643,6 +641,7 @@ class BulkImportIndicatorsView(LoginRequiredMixin, UserPassesTestMixin, AccessMi
                 deserialized_data.is_valid()
                 indicator_data['baseline'] = deserialized_data.data['baseline']
 
+                # Capture validation problems from the deserialization process
                 for field_name, error_list in deserialized_data.errors.items():
                     for error in error_list:
                         if error.code == 'null':
@@ -662,6 +661,9 @@ class BulkImportIndicatorsView(LoginRequiredMixin, UserPassesTestMixin, AccessMi
                                     # Translators: Error message provided when user has exceeded the character limit on a form
                                     gettext("You have exceeded the character limit of this field"))
                                 logger.error(f'New validation string of code "{error.code}" found.\n{str(error)}')
+                        elif str(error) == 'not_a_number' and error.code == 'invalid':
+                            # This means the baseline value may not be valid.  The baseline value is handled further along in the process.
+                            pass
                         else:
                             logger.error(f'New validation string of code {error.code} found.\n{str(error)}')
                             validation_errors[field_name].append(str(error))
@@ -679,7 +681,7 @@ class BulkImportIndicatorsView(LoginRequiredMixin, UserPassesTestMixin, AccessMi
                             elif active_cell.value.lower() in null_equivalents_with_translations:
                                 validation_errors.pop('baseline')
                                 active_cell.value = None
-                            else:  # cell value is not None or one of the acceptable null equivalaent values
+                            else:  # cell value is not None or one of the acceptable null equivalent values
                                 validation_errors['baseline'] = [gettext(self.VALIDATION_MSG_BASELINE_NA)]
                                 non_fatal_errors.append(ERROR_MALFORMED_INDICATOR)
                         else:
