@@ -21,7 +21,7 @@ from indicators.models import Indicator, Level, LevelTier, BulkIndicatorImportFi
 from indicators.views.bulk_indicator_import_views import (
     COLUMNS, COLUMNS_FIELD_INDEXES, FIRST_USED_COLUMN, DATA_START_ROW, PROGRAM_NAME_ROW, COLUMN_HEADER_ROW,
     HIDDEN_SHEET_NAME, BASE_TEMPLATE_NAME, LEVEL_HEADER_STYLE, EXISTING_INDICATOR_STYLE,
-    UNPROTECTED_NEW_INDICATOR_STYLE, PROTECTED_NEW_INDICATOR_STYLE,
+    UNPROTECTED_NEW_INDICATOR_STYLE, PROTECTED_NEW_INDICATOR_STYLE, RED_ERROR,
     ERROR_MISMATCHED_PROGRAM,
     ERROR_NO_NEW_INDICATORS,
     ERROR_UNDETERMINED_LEVEL,
@@ -395,6 +395,16 @@ class TestBulkImportTemplateProcessing(test.TestCase):
             else:
                 current_cell.value = 'Lorem ipsum ' + column['field_name']
 
+    def check_row_highlights(self, ws, row_index, highlighted_cols=None):
+        if highlighted_cols is None:
+            highlighted_cols = []
+        for col_index in range(1, len(COLUMNS) + 2):
+            current_cell_fill = ws.cell(row_index, col_index).fill
+            if col_index in highlighted_cols:
+                self.assertEqual(current_cell_fill.fgColor.rgb, RED_ERROR)
+            else:
+                self.assertTrue(current_cell_fill is None or current_cell_fill.fgColor.rgb != RED_ERROR)
+
     def test_template_import_with_structural_problems(self):
         self.client.force_login(user=self.tola_user.user)
         w_factories.grant_program_access(self.tola_user, self.program, self.country, role='high')
@@ -450,40 +460,70 @@ class TestBulkImportTemplateProcessing(test.TestCase):
         self.client.force_login(user=self.tola_user.user)
         w_factories.grant_program_access(self.tola_user, self.program, self.country, role='high')
         wb = openpyxl.load_workbook(self.get_template())
+        goal_level = Level.objects.get(parent=None)
         existing_goal_indicator_count = Indicator.objects.filter(level__parent=None).count()
+        existing_outcome_indicator_count = Indicator.objects.filter(level__parent=goal_level).count()
         first_blank_goal_row = DATA_START_ROW + existing_goal_indicator_count + 1
+        first_blank_outcome_row = first_blank_goal_row + 12 + existing_outcome_indicator_count
         ws = wb.worksheets[0]
-        self.fill_worksheet_row(ws, first_blank_goal_row, custom_values={
-            'name': None, 'direction_of_change': 'bad medicine'})
-        self.fill_worksheet_row(ws, first_blank_goal_row + 1, {'name': 'Lorem ipsum ' * 100})
-        self.fill_worksheet_row(ws, first_blank_goal_row + 3)
+
+        # Make sure we got the outcome row calc right
+        self.assertEqual(ws.cell(
+            first_blank_outcome_row - existing_outcome_indicator_count - 1,
+            FIRST_USED_COLUMN
+        ).style,  LEVEL_HEADER_STYLE)
+
+        # Create one row for each required column where the column value is missing
+        expected_errors = {}
+        current_row_index = first_blank_goal_row + 1
+        for required_col_index, col in enumerate(COLUMNS):
+            if col['required'] and col['field_name'] != 'level':
+                self.fill_worksheet_row(ws, current_row_index, custom_values={col['field_name']: None})
+                expected_errors[current_row_index] = col['field_name']
+                current_row_index += 1
+
+        # Fill the next row with bad values for all of the validated fields
+        validated_fields_bad_values = {
+            'sector': 'bad sector',
+            'unit_of_measure_type': 'therbligs',
+            'direction_of_change': 'north by northwest',
+            'target_frequency': 'whats the frequency kenneth',
+        }
+        self.fill_worksheet_row(ws, current_row_index, validated_fields_bad_values)
+        bad_values_row = current_row_index
+
+        # In the first outcome section, skip a couple of rows and then add valid data
+        self.fill_worksheet_row(ws, first_blank_outcome_row + 2)
+
+        # Check if upload was logged
         response = self.post_template(wb)
         self.assertEqual(ProgramAuditLog.objects.count(), 1)
         self.assertEqual(ProgramAuditLog.objects.last().change_type, 'template_uploaded')
         self.assertEqual(response.status_code, 400)
         self.assertEqual(
             json.loads(response.content)['error_codes'],
-            sorted([ERROR_MALFORMED_INDICATOR, ERROR_INTERVENING_BLANK_ROW]))
+            [ERROR_MALFORMED_INDICATOR, ERROR_INTERVENING_BLANK_ROW])
 
+        # Get the feedback template and see if it looks right
         response = self.client.get(reverse('get_feedback_bulk_import_template', args=[self.program.id]))
         self.assertEqual(response.get('Content-Disposition'), 'attachment; filename="Marked-up-template.xlsx"')
         feedback_wb = openpyxl.load_workbook(ContentFile(response.content))
         feedback_ws = feedback_wb.worksheets[0]
-        self.assertIsNotNone(
-            feedback_ws.cell(first_blank_goal_row + 2, self.first_used_column + COLUMNS_FIELD_INDEXES['number']).fill)
-        self.assertIsNotNone(
-            feedback_ws.cell(first_blank_goal_row + 3, self.first_used_column + COLUMNS_FIELD_INDEXES['level']).fill)
 
-        # Make sure entire skipped rows are highlighted
-        for row_index in [first_blank_goal_row + 4, first_blank_goal_row + 5]:
-            collector = []
-            col_loop_range = range(self.first_used_column + 2, self.first_used_column + len(COLUMNS))
-            errors_are_highlighted = [feedback_ws.cell(row_index, col_index).fill is not None for col_index in col_loop_range]
-            for col_index in col_loop_range:
-                collector.append(feedback_ws.cell(row_index, col_index).fill is not None)
-            self.assertTrue(all(errors_are_highlighted))
-        self.assertIsNotNone(
-            feedback_ws.cell(first_blank_goal_row + 4, self.first_used_column + COLUMNS_FIELD_INDEXES['name']).fill)
+        for required_row_index, field_name in expected_errors.items():
+            self.check_row_highlights(
+                feedback_ws,
+                required_row_index,
+                highlighted_cols=[1, self.first_used_column + COLUMNS_FIELD_INDEXES[field_name]]
+            )
+
+        highlighted_cols = [1] + [self.first_used_column + COLUMNS_FIELD_INDEXES[field_name]
+            for field_name in validated_fields_bad_values.keys()]
+        self.check_row_highlights(feedback_ws, bad_values_row, highlighted_cols)
+
+        self.check_row_highlights(feedback_ws, first_blank_outcome_row, list(range(1, 2+len(COLUMNS))))
+        self.check_row_highlights(feedback_ws, first_blank_outcome_row + 1, list(range(1, 2 + len(COLUMNS))))
+        self.check_row_highlights(feedback_ws, first_blank_outcome_row + 2, [])
 
         wb = openpyxl.load_workbook(self.get_template())
         existing_goal_indicator_count = Indicator.objects.filter(level__parent=None).count()
