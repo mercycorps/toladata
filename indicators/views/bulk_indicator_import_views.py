@@ -45,10 +45,11 @@ COLUMNS = [
     {'name': 'Definition', 'required': False, 'field_name': 'definition'},
     {'name': 'Rationale or justification for indicator', 'required': False, 'field_name': 'justification'},
     {'name': 'Unit of measure', 'required': True, 'field_name': 'unit_of_measure'},
-    # Note:  this lone string is being translated here because it's not the standard name for the field.
+    # Note:  this lone string is being marked for translation here because it's not the standard name for the field.
+    # It's noop because we shouldn't be actually translating in a class variable.
     # Translators:  Column header for the column that specifies whether the data in the row is expressed
     # as a number or a percent
-    {'name': 'Number (#) or percentage (%)', 'required': True, 'field_name': 'unit_of_measure_type',
+    {'name': gettext_noop('Number (#) or percentage (%)'), 'required': True, 'field_name': 'unit_of_measure_type',
      'validation': VALIDATION_KEY_UOM_TYPE, 'default': 'Number (#)'},
     {'name': 'Rationale for target', 'required': False, 'field_name': 'rationale_for_target'},
     {'name': 'Baseline', 'required': True, 'field_name': 'baseline',
@@ -650,7 +651,7 @@ class BulkImportIndicatorsView(LoginRequiredMixin, UserPassesTestMixin, AccessMi
                 # Use the serializer to check for character length and any other field issues that it handles
                 deserialized_data = BulkImportIndicatorSerializer(data=indicator_data)
                 deserialized_data.is_valid()
-                indicator_data['baseline'] = deserialized_data.data['baseline']
+                # indicator_data['baseline'] = deserialized_data.data['baseline']
 
                 # Capture validation problems from the deserialization process
                 for field_name, error_list in deserialized_data.errors.items():
@@ -691,7 +692,7 @@ class BulkImportIndicatorsView(LoginRequiredMixin, UserPassesTestMixin, AccessMi
                                 non_fatal_errors.append(ERROR_MALFORMED_INDICATOR)
                             elif active_cell.value.lower() in null_equivalents_with_translations:
                                 validation_errors.pop('baseline')
-                                active_cell.value = None
+                                indicator_data['baseline'] = None
                             else:  # cell value is not None or one of the acceptable null equivalent values
                                 validation_errors['baseline'] = [gettext(self.VALIDATION_MSG_BASELINE_NA)]
                                 non_fatal_errors.append(ERROR_MALFORMED_INDICATOR)

@@ -7,7 +7,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: \n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2021-07-14 23:20-0700\n"
+"POT-Creation-Date: 2021-07-21 12:06-0700\n"
 "PO-Revision-Date: 2021-04-05 14:19-0700\n"
 "Last-Translator: \n"
 "Language-Team: \n"
@@ -1204,7 +1204,9 @@ msgstr ""
 "de datos o los métodos de análisis de datos. Por favor, sea específico y "
 "explique cómo se abordaron los problemas de los datos."
 
-#: indicators/models.py:1411 workflow/models.py:39 workflow/models.py:523
+#: indicators/models.py:1411
+#: indicators/views/bulk_indicator_import_views.py:747 workflow/models.py:39
+#: workflow/models.py:523
 msgid "Sector"
 msgstr "Sector"
 
@@ -1539,10 +1541,16 @@ msgstr ""
 msgid "Help"
 msgstr "Ayuda"
 
+#. Translators:  Column header for the column that specifies whether the data in the row is expressed
+#. as a number or a percent
+#: indicators/views/bulk_indicator_import_views.py:52
+msgid "Number (#) or percentage (%)"
+msgstr "ÁTranslated Number (#) or percentage (%)"
+
 #. Translators: Error message shown to a user when they have entered a value for a numeric field that isn't a number or is negative.
 #. Translators: This is help text for a form field
-#: indicators/views/bulk_indicator_import_views.py:149
-#: indicators/views/bulk_indicator_import_views.py:367
+#: indicators/views/bulk_indicator_import_views.py:150
+#: indicators/views/bulk_indicator_import_views.py:368
 msgid ""
 "Enter a numeric value for the baseline. If a baseline is not yet known or "
 "not applicable, enter a zero or type \"N/A\". The baseline can always be "
@@ -1553,22 +1561,22 @@ msgstr ""
 "always be updated at a later point in time."
 
 #. Translators: Error message shown to a user when they have entered a value that is not in a list of approved values
-#: indicators/views/bulk_indicator_import_views.py:236
+#: indicators/views/bulk_indicator_import_views.py:237
 msgid "Your entry is not in the list"
 msgstr "ÁTranslated Your entry is not in the list"
 
 #. Translators:  Title of a popup box that informs the user they have entered an invalid value
-#: indicators/views/bulk_indicator_import_views.py:238
-#: indicators/views/bulk_indicator_import_views.py:272
+#: indicators/views/bulk_indicator_import_views.py:239
+#: indicators/views/bulk_indicator_import_views.py:273
 msgid "Invalid Entry"
 msgstr "éTranslated Invalid Entry"
 
 #. Translators: Heading placed in the cell of a spreadsheet that allows users to upload Indicators in bulk
-#: indicators/views/bulk_indicator_import_views.py:333
+#: indicators/views/bulk_indicator_import_views.py:334
 msgid "Import indicators"
 msgstr "Translated Import indicators"
 
-#: indicators/views/bulk_indicator_import_views.py:338
+#: indicators/views/bulk_indicator_import_views.py:339
 msgid ""
 "INSTRUCTIONS\n"
 "1. Indicator rows are provided for each result level. You can delete "
@@ -1591,41 +1599,48 @@ msgstr ""
 "program page."
 
 #. Translators: Section header of an Excel template that allows users to upload Indicators.  This section is where users will add their own information.
-#: indicators/views/bulk_indicator_import_views.py:347
+#: indicators/views/bulk_indicator_import_views.py:348
 msgid "Enter indicators"
 msgstr "Translated Enter indicators"
 
 #. Translators: This is help text for a form field that gets filled in automatically
-#: indicators/views/bulk_indicator_import_views.py:364
+#: indicators/views/bulk_indicator_import_views.py:365
 msgid "This number is automatically generated through the results framework."
 msgstr ""
 "ŹTranslated This number is automatically generated through the results "
 "framework."
 
 #. Translators: Message provided to user when they have failed to enter a required field on a form.
-#: indicators/views/bulk_indicator_import_views.py:486
+#: indicators/views/bulk_indicator_import_views.py:487
 #, fuzzy
 #| msgid "Reason for change is required."
 msgid "This information is required."
 msgstr "Se requiere justificación para el cambio."
 
 #. Translators: Message provided to user when they have not chosen from a pre-selected list of options.
-#: indicators/views/bulk_indicator_import_views.py:488
+#: indicators/views/bulk_indicator_import_views.py:489
 #, python-brace-format
 msgid ""
 "The {field_name} you selected is unavailable. Please select a different "
 "{field_name}."
 msgstr ""
 
+#. Translators: Error message provided to users when they are entering data into Excel and they skip a row
+#: indicators/views/bulk_indicator_import_views.py:627
+#, fuzzy
+#| msgid "Indicator created"
+msgid "Indicator rows cannot be skipped."
+msgstr "Indicador creado"
+
 #. Translators: Error message provided when user has exceeded the character limit on a form
-#: indicators/views/bulk_indicator_import_views.py:648
+#: indicators/views/bulk_indicator_import_views.py:672
 #, fuzzy
 #| msgid "Please enter fewer than %%s characters."
 msgid "Please enter {matches.group(1)} or fewer characters."
 msgstr "Por favor, introduzca menos de %%s caracteres."
 
 #. Translators: Error message provided when user has exceeded the character limit on a form
-#: indicators/views/bulk_indicator_import_views.py:654
+#: indicators/views/bulk_indicator_import_views.py:677
 msgid "You have exceeded the character limit of this field"
 msgstr "Translated You have exceeded the character limit of this field"
 
@@ -5048,9 +5063,6 @@ msgstr "Encontrar"
 #: workflow/widgets.py:133
 msgid "City, Country:"
 msgstr "Ciudad, País:"
-
-#~ msgid "Number (#) or percentage (%)"
-#~ msgstr "ÁTranslated Number (#) or percentage (%)"
 
 #~ msgid "Please enter a number"
 #~ msgstr "ÁTranslated Please enter a number"
