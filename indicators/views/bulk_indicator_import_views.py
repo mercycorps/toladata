@@ -493,6 +493,18 @@ class BulkImportIndicatorsView(LoginRequiredMixin, UserPassesTestMixin, AccessMi
         program = Program.objects.get(pk=program_id)
         ProgramAuditLog.log_template_uploaded(request.user, program)
 
+        # We can delete the temp files associated with this user and program now that there is another upload in progress.
+        temp_template_files = BulkIndicatorImportFile.objects.filter(
+            user=request.user.tola_user,
+            program_id=kwargs['program_id'],
+            file_type=BulkIndicatorImportFile.INDICATOR_TEMPLATE_TYPE)
+        temp_template_files.delete()
+        temp_data_files = BulkIndicatorImportFile.objects.filter(
+            user=request.user.tola_user,
+            program_id=kwargs['program_id'],
+            file_type=BulkIndicatorImportFile.INDICATOR_DATA_TYPE)
+        temp_data_files.delete()
+
         wb = openpyxl.load_workbook(request.FILES['file'])
         ws = wb.worksheets[0]
 
@@ -791,12 +803,13 @@ class BulkImportIndicatorsView(LoginRequiredMixin, UserPassesTestMixin, AccessMi
             return JsonResponse({'error_codes': [ERROR_NO_NEW_INDICATORS]}, status=406)
 
         try:
-            old_file_obj = BulkIndicatorImportFile.objects.get(
+            old_file_objs = BulkIndicatorImportFile.objects.filter(
                 user=request.user.tola_user,
                 program=program,
                 file_type=BulkIndicatorImportFile.INDICATOR_DATA_TYPE)
-            os.remove(old_file_obj.file_path)
-            old_file_obj.delete()
+            for old_file in old_file_objs:
+                os.remove(old_file.file_path)
+            old_file_objs.delete()
         except (BulkIndicatorImportFile.DoesNotExist, FileNotFoundError):
             pass
 
