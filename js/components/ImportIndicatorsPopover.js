@@ -100,7 +100,7 @@ export class ImportIndicatorsButton extends React.Component {
     getPopoverContent = () => {
 
         // Determine what tier levels have been created/used in the Results Framework
-        let tierLevelsUsed = []; 
+        let tierLevelsUsed = [];
         this.props.levelTiers.map((tier, i) => {
             tierLevelsUsed[i] = {
                 name: tier.name,
@@ -112,10 +112,10 @@ export class ImportIndicatorsButton extends React.Component {
         })
 
         return (
-                <ImportIndicatorsPopover 
-                    page={ this.props.page } 
-                    program_id={ this.props.program_id } 
-                    tierLevelsUsed={ tierLevelsUsed } 
+                <ImportIndicatorsPopover
+                    page={ this.props.page }
+                    program_id={ this.props.program_id }
+                    tierLevelsUsed={ tierLevelsUsed }
                     storedView={ this.state.storedView }
                     setStoredView={ this.setStoredView }
                     storedTierLevelsRows={ this.state.storedTierLevelsRows }
@@ -241,11 +241,11 @@ export const ImportIndicatorsPopover = ({ page, program_id, tierLevelsUsed, stor
                             setvalidIndicatorsCount(response.data.valid || 0);
                             setInvalidIndicatorsCount(response.data.invalid || 0);
                             // Successful upload with no errors and all rows valid
-                            if (response.status === 200) { 
+                            if (response.status === 200) {
                                 setViews(CONFIRM);
                                 setStoredView({view: CONFIRM, valid: response.data.valid});
                             // Unsuccessful upload with fatal errors
-                            } else if ( response.status === 406 ) { 
+                            } else if ( response.status === 406 ) {
                                 let errorsMessagesToDisplay = reduceErrorCodes(response.data.error_codes)
                                 if (errorsMessagesToDisplay.length > 0) {
                                     setDisplayError({view: INITIAL, error: errorsMessagesToDisplay})
@@ -254,12 +254,12 @@ export const ImportIndicatorsPopover = ({ page, program_id, tierLevelsUsed, stor
                                     setViews(ERROR);
                                 }
                             // Unsuccessful upload with errors and/or invalid rows
-                            } else if (response.status.toString().slice(0, 1) === "4") { 
+                            } else if (response.status.toString().slice(0, 1) === "4") {
                                 setViews(FEEDBACK);
                                 setStoredView({view: FEEDBACK, valid: response.data.valid, invalid: response.data.invalid});
                             // Handles any other error/problem
                             } else {
-                                setViews(ERROR); 
+                                setViews(ERROR);
                             }
                         }
                     }
@@ -346,12 +346,12 @@ export const ImportIndicatorsPopover = ({ page, program_id, tierLevelsUsed, stor
     }
 
     // TODO/IN-WORK: Need to determine how to handle continue button for downloading and uploading. Structure and Styles are in place.
-    let multipleUploadWarning = 
+    let multipleUploadWarning =
         <div className="import-initial-text">
             <div className="import-initial-text-error">
                 <span>
                     {errorMessages[errorCodes[106].message]}&nbsp;
-                    <a 
+                    <a
                         className="import-initial-text-error-link"
                         role="link"
                         href={ `/tola_management/audit_log/${program_id}/` }
@@ -428,16 +428,16 @@ export const ImportIndicatorsPopover = ({ page, program_id, tierLevelsUsed, stor
                                             )
                                         })
                                     }
-                                </div> 
+                                </div>
                                 {/* TODO: Update to handle multiply downloaders/uploaders scenarios */}
-                                {displayError.error.indexOf(5) >= 0 ? 
+                                {displayError.error.indexOf(5) >= 0 ?
                                     multipleUploadWarning
                                 :
-                                <React.Fragment> 
-                                    <ImportIndicatorsContext.Provider 
-                                        value={{ 
-                                            tierLevelsUsed: tierLevelsUsed, 
-                                            tierLevelsRows: tierLevelsRows, 
+                                <React.Fragment>
+                                    <ImportIndicatorsContext.Provider
+                                        value={{
+                                            tierLevelsUsed: tierLevelsUsed,
+                                            tierLevelsRows: tierLevelsRows,
                                             setTierLevelsRows: setTierLevelsRows,
                                         }}>
                                         <AdvancedImport />
@@ -485,8 +485,7 @@ export const ImportIndicatorsPopover = ({ page, program_id, tierLevelsUsed, stor
                                     {views === FEEDBACK ? <div><i className="fas fa-check-circle"/></div> : null}
                                     {
                                         // # Translators: The count of indicators that have passed validation and are ready to be imported to complete the process. This cannot be undone after completing.
-                                        interpolate(ngettext(
-                                            "%s indicator is ready to be imported.",
+                                        interpolate(ngettext("%s indicator is ready to be imported.",
                                             "%s indicators are ready to be imported.",
                                             validIndicatorsCount
                                         ), [validIndicatorsCount])
@@ -496,8 +495,7 @@ export const ImportIndicatorsPopover = ({ page, program_id, tierLevelsUsed, stor
                                     {views === FEEDBACK ? <div><i className="fas fa-exclamation-triangle"/></div> : null}
                                     {
                                         // # Translators: The count of indicators that have passed validation and are ready to be imported to complete the process. This cannot be undone after completing.
-                                        interpolate(ngettext(
-                                            "%s indicator has missing or invalid information. Please update your indicator template and upload again.",
+                                        interpolate(ngettext("%s indicator has missing or invalid information. Please update your indicator template and upload again.",
                                             "%s indicators have missing or invalid information. Please update your indicator template and upload again.",
                                             invalidIndicatorsCount
                                         ), [invalidIndicatorsCount])
@@ -535,8 +533,7 @@ export const ImportIndicatorsPopover = ({ page, program_id, tierLevelsUsed, stor
                                             <div>
                                                 {
                                                     // # Translators: The count of indicators that have passed validation and are ready to be imported to complete the process. This cannot be undone after completing.
-                                                    interpolate(ngettext(
-                                                        "%s indicator is ready to be imported. Are you ready to complete the import process? (This action cannot be undone.)",
+                                                    interpolate(ngettext("%s indicator is ready to be imported. Are you ready to complete the import process? (This action cannot be undone.)",
                                                         "%s indicators are ready to be imported. Are you ready to complete the import process? (This action cannot be undone.)",
                                                         validIndicatorsCount
                                                     ), [validIndicatorsCount])
@@ -614,8 +611,7 @@ export const ImportIndicatorsPopover = ({ page, program_id, tierLevelsUsed, stor
                                     {views === SUCCESS ? <div><i className="fas fa-check-circle"/></div> : null}
                                     {
                                         // # Translators: Message with the count of indicators that were successfully imported but they require additional details before they can be submitted.
-                                        interpolate(ngettext(
-                                            "%s indicator was successfully imported, but require additional details before results can be submitted.",
+                                        interpolate(ngettext("%s indicator was successfully imported, but require additional details before results can be submitted.",
                                             "%s indicators were successfully imported, but require additional details before results can be submitted.",
                                             validIndicatorsCount
                                         ), [validIndicatorsCount])
@@ -641,8 +637,8 @@ export const ImportIndicatorsPopover = ({ page, program_id, tierLevelsUsed, stor
                                         gettext('There was a server-related problem')
                                     }
                                 </p>
-                                <button 
-                                    className="btn btn-sm btn-primary" 
+                                <button
+                                    className="btn btn-sm btn-primary"
                                     onClick={() => setViews(INITIAL) }
                                 >
                                     {
@@ -848,17 +844,17 @@ let errorCodes = {
 }
 
 let errorMessages = {
-    1 : 
+    1 :
         // # Translators: Message to user that we cannot import the their file. This could be caused by the wrong file being selected, or the structure of the file was changed, or the results framework was updated and does not match the template anymore.
         gettext("We can’t import indicators from this file. This can happen if the wrong file is selected, the template structure is modified, or the results framework was updated and no longer matches the template."),
-    2 : 
+    2 :
         // # Translators: Messsage to user that there aren't any new indicators in the uploaded file.
         gettext("We can't find any indicators in this file."),
     3 :
         // # Translators: Message to user that the import indicator process could not be completed. If the problem continues, contact your TolaData administrator.
         gettext("Sorry, we couldn’t complete the import process. If the problem persists, please contact your TolaData administrator."),
     4 :
-        // # Translators: Message to user that the import could not be completed and to find out the reason, upload the import template again. 
+        // # Translators: Message to user that the import could not be completed and to find out the reason, upload the import template again.
         gettext("Sorry, we couldn’t complete the import process. To figure out what went wrong, please upload your template again."),
     5 :
         // # Translators: Message to user that someone else has uploaded a template in the last 24 hours and may be in the process of importing indicators to this program. You can view the program change log to see more details.

@@ -1188,7 +1188,7 @@ class Indicator(SafeDeleteModel):
         _("Number"), max_length=255, null=True, blank=True,
         # Translators: a "number" in this context is a kind of label.  This is help text to explain why a user is
         # seeing customized numbers instead of auto-generated ones that can derived from the indicator's place in
-        # the hierarchy
+        # the hierarchy.  The "numbers" look something like "1.1" or "1.2.1a"
         help_text=_("This number is displayed in place of the indicator number "
                     "automatically generated through the results framework. "
                     "An admin can turn on auto-numbering in program settings.")
@@ -1376,6 +1376,7 @@ class Indicator(SafeDeleteModel):
     )
 
     quality_assurance = models.TextField(
+        # Translators: This is the title of a form field.
         max_length=500, null=True, blank=True, verbose_name=_("Data quality assurance details"),
         # Translators: this is help text for a field on an indicator setup form
         help_text=_("Provide any additional details about how data quality will be ensured for this specific "
@@ -1385,7 +1386,9 @@ class Indicator(SafeDeleteModel):
     )
 
     quality_assurance_techniques = MultiSelectField(
+        # Translators: This is the title of a form field.
         null=True, blank=True, verbose_name=_("Data quality assurance techniques"), choices=QUALITY_ASSURANCE_CHOICES,
+        # Translators: this is help text for a field on an indicator setup form
         help_text=_("Select the data quality assurance techniques that will be applied to this specific indicator.")
     )
 
