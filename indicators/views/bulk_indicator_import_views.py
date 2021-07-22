@@ -505,14 +505,16 @@ class BulkImportIndicatorsView(LoginRequiredMixin, UserPassesTestMixin, AccessMi
             program_id=kwargs['program_id'],
             file_type=BulkIndicatorImportFile.INDICATOR_TEMPLATE_TYPE)
         for file_entry in temp_template_files:
-            os.remove(file_entry.file_path)
+            if os.path.isfile(file_entry.file_path):
+                os.remove(file_entry.file_path)
         temp_template_files.delete()
         temp_data_files = BulkIndicatorImportFile.objects.filter(
             user=request.user.tola_user,
             program_id=kwargs['program_id'],
             file_type=BulkIndicatorImportFile.INDICATOR_DATA_TYPE)
         for file_entry in temp_data_files:
-            os.remove(file_entry.file_path)
+            if os.path.isfile(file_entry.file_path):
+                os.remove(file_entry.file_path)
         temp_data_files.delete()
 
         wb = openpyxl.load_workbook(request.FILES['file'])
