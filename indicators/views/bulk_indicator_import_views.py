@@ -791,7 +791,8 @@ class BulkImportIndicatorsView(LoginRequiredMixin, UserPassesTestMixin, AccessMi
                     program=program,
                     file_type=BulkIndicatorImportFile.INDICATOR_TEMPLATE_TYPE)
                 for old_file_obj in old_file_objs:
-                    os.remove(old_file_obj.file_path)
+                    if os.path.isfile(old_file_obj.file_path):
+                        os.remove(old_file_obj.file_path)
                     old_file_obj.delete()
             except BulkIndicatorImportFile.DoesNotExist:
                 pass
@@ -819,8 +820,9 @@ class BulkImportIndicatorsView(LoginRequiredMixin, UserPassesTestMixin, AccessMi
                 user=request.user.tola_user,
                 program=program,
                 file_type=BulkIndicatorImportFile.INDICATOR_DATA_TYPE)
-            for old_file in old_file_objs:
-                os.remove(old_file.file_path)
+            for old_file_obj in old_file_objs:
+                if os.path.isfile(old_file_obj.file_path):
+                    os.remove(old_file_obj.file_path)
             old_file_objs.delete()
         except (BulkIndicatorImportFile.DoesNotExist, FileNotFoundError):
             pass
