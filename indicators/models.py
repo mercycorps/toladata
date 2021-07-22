@@ -988,7 +988,9 @@ class IndicatorTargetsMixin:
 
 class IndicatorMetricsMixin:
     qs_name = 'MetricsAnnotated'
-    annotate_methods = ['annotate_reporting', 'annotate_scope', 'annotate_counts', 'annotate_metrics', 'annotate_kpi']
+    annotate_methods = [
+        'annotate_reporting', 'annotate_scope', 'annotate_counts', 'annotate_metrics', 'annotate_kpi',
+        'annotate_indicator_type_count']
 
     def annotate_reporting(self):
         from indicators.queries import utils as query_utils
@@ -1032,6 +1034,16 @@ class IndicatorMetricsMixin:
                 )
             )
         )
+
+    def annotate_indicator_type_count(self):
+        """
+        Indicator type count will be used in conjunction with the create date to identify
+        indicators that were imported and still have incomplete data.  Indicator type is a required field
+        after Jan 2021, so any indicator created after that date with no associated indicator types
+        represents and incomplete import.
+        """
+        from indicators.queries import utils as query_utils
+        return self.annotate(indicator_type_count=query_utils.indicator_type_count_annotation())
 
 
 class Indicator(SafeDeleteModel):

@@ -166,6 +166,7 @@ export class IndicatorListTable extends React.Component {
         super(props);
 
         this.onIndicatorUpdateClick = this.onIndicatorUpdateClick.bind(this);
+        this.onIndicatorCompleteClick = this.onIndicatorCompleteClick.bind(this);
         this.onIndicatorResultsToggleClick = this.onIndicatorResultsToggleClick.bind(this);
     }
 
@@ -173,6 +174,12 @@ export class IndicatorListTable extends React.Component {
         e.preventDefault();
 
         eventBus.emit('open-indicator-update-modal', indicatorPk);
+    }
+
+    onIndicatorCompleteClick(e, indicatorPk) {
+        e.preventDefault();
+
+        eventBus.emit('open-indicator-complete-modal', indicatorPk);
     }
 
     onIndicatorResultsToggleClick(e, indicatorPk) {
@@ -220,8 +227,9 @@ export class IndicatorListTable extends React.Component {
                     }
                     return displayFunc(val);
                 }
-                const displayUnassignedWarning = indicator.noTargetResults.length > 0 && indicator.periodicTargets.length > 0
-                const displayMissingTargetsWarning = indicator.periodicTargets.length === 0 || (targetPeriodLastEndDate && program.reportingPeriodEnd > targetPeriodLastEndDate)
+
+                const displayUnassignedWarning = !indicator.incompleteImport && indicator.noTargetResults.length > 0 && indicator.periodicTargets.length > 0
+                const displayMissingTargetsWarning = !indicator.incompleteImport && (indicator.periodicTargets.length === 0 || (targetPeriodLastEndDate && program.reportingPeriodEnd > targetPeriodLastEndDate))
                 return <React.Fragment key={indicator.pk}>
                     <tr className={classNames("indicators-list__row", "indicators-list__indicator-header", {
                         "is-highlighted": indicator.wasJustCreated,
@@ -240,6 +248,14 @@ export class IndicatorListTable extends React.Component {
                             <span className="kpi-badge badge badge-pill">KPI</span>
                             }
                             </a>
+                            {indicator.incompleteImport &&
+                            <span className="text-success ml-4"><i className="fas fa-check-circle mr-1"/>
+                                    {/* # Translators: Full message will be Imported indicators: Complete setup now.  This is a notification to the user that they have imported some indicators but that the indicator setup is not yet complete.   */
+                                    gettext("Imported indicator: ")}
+                                    {/* # Translators: Message that gets attached to each indicator element after a successful import of indicator data. It is not possible to import all data that an indicator requires to be complete. The "Complete setup now" is a link that allows users to access a form window where they can complete the required fields.   */}
+                                    <u><a href="" onClick={(e) => this.onIndicatorCompleteClick(e, indicator.pk)} className={"text-success"}>{gettext("Complete setup now")}</a></u>
+                                </span>
+                            }
                             {displayUnassignedWarning &&
                                 <span className="text-danger ml-4"><i className="fas fa-bullseye"/> {
                                     /* # Translators: Warning provided when a result is not longer associated with any target.  It is a warning about state rather than an action.  The full sentence might read "There are results not assigned to targets" rather than "Results have been unassigned from targets. */
@@ -252,7 +268,7 @@ export class IndicatorListTable extends React.Component {
                                         gettext('Indicator missing targets')
                                 }</span>
                             }
-                            
+
                         </td>
                         <td>
                             <a href="#" className="indicator-link"
@@ -268,10 +284,10 @@ export class IndicatorListTable extends React.Component {
                     <tr className="indicators-list__row indicators-list__indicator-body">
                         <td colSpan="6">
                             {/* result_table.html container */}
-                                <ResultsTable 
-                                    indicator={ indicator } 
-                                    editable={ editable } 
-                                    resultEditable={ resultEditable } 
+                                <ResultsTable
+                                    indicator={ indicator }
+                                    editable={ editable }
+                                    resultEditable={ resultEditable }
                                     displayMissingTargetsWarning={ displayMissingTargetsWarning }
                                 />
                         </td>
@@ -296,12 +312,12 @@ const IndicatorListTableButtons = observer(function ({program, rootStore, ...pro
             {!rootStore.readOnly &&
                 <div className="indicator-list__add-indicator-button">
                     {rootStore.levels.length > 0 &&
-                        <ImportIndicatorsButton 
+                        <ImportIndicatorsButton
                             program_id={ program.pk }
                             levelTiers={ rootStore.levelTiers}
                             levels={ rootStore.levels }
                             page={ "programPage" }
-                        /> 
+                        />
                     }
                     <AddIndicatorButton readonly={ rootStore.readOnly } programId={ program.pk }/>
                 </div>
