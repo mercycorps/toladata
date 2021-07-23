@@ -101,6 +101,17 @@
         $("#indicator_modal_content").load(url);
     }
 
+    // reload the completion form (modal remains open)
+    function reloadCompleteIndicatorForm() {
+
+        next_indicator_pk = parseInt($('#nextIndicatorPk').text())
+
+        let url = `/indicators/indicator_complete/${next_indicator_pk}/`;
+
+        $("#modalmessages").empty();
+        $("#indicator_modal_content").load(url);
+        $("#indicator_modal_div").animate({ scrollTop: 0 }, 'slow');
+    }
 
     $("#indicator_modal_div").on('shown.bs.modal', function() {
 
@@ -470,6 +481,18 @@
         });
     });
 
+    $("#indicator_modal_content").on("click", "#id_save_and_complete_another_indicator_btn", function(e){
+        if (validateForm({isCompletionForm: true}) === false) {
+            showValidations("#modalmessages");
+            return;
+        }
+
+        submitFormComplete().done(() => {
+            reloadCompleteIndicatorForm();
+        })
+
+    });
+
     // Cancel button
     $("#indicator_modal_content").on("click", "#id_cancel_btn", closeIndicatorFormModal);
 
@@ -633,6 +656,26 @@
 
             // this is our new base state
             //recordTrackedFieldsSnapshot();
+        });
+    }
+
+    function submitFormComplete(validation_type='') {
+        return submitForm().done((data) => {
+            $('#indicator_modal_div').trigger('updated.tola.indicator.save', saveEventParams());
+
+            // remember such that the user can close the modal without a prompt
+            allowModalToClose = true;
+
+            // Clear any validation error messages
+            let alertElement = "#modalmessages";
+            $(alertElement).html('');
+
+            // update the header
+            $('#id_title').text(data.title_str);
+            $('#id_subtitle').text(data.subtitle_str);
+
+            // success msg
+            showSuccessNotifiction(data.save_success_msg);
         });
     }
 

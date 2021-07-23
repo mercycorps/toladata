@@ -433,8 +433,20 @@ class IndicatorUpdate(IndicatorFormMixin, UpdateView):
         context = super(IndicatorUpdate, self).get_context_data(**kwargs)
         indicator = self.object
         program = indicator.program
-
         context['program'] = program
+
+        if 'indicator_complete' in self.request.path:
+            incomplete_indicators = program.indicator_set\
+                .annotate(itype_count=Count('indicator_type'))\
+                .filter(create_date__gte='2021-03-01')\
+                .filter(itype_count=0)\
+                .exclude(pk=indicator.pk)\
+                .order_by('pk')
+
+            if len(incomplete_indicators) == 0:
+                context['next_indicator_pk'] = None
+            else:
+                context['next_indicator_pk'] = incomplete_indicators[0].pk
 
         pts = PeriodicTarget.objects.filter(indicator=indicator) \
             .annotate(num_data=Count('result')).order_by('customsort', 'create_date', 'period')
