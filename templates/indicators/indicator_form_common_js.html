@@ -938,7 +938,7 @@
         if (errMsg){
             baseline.addClass('is-invalid');
             // baseline_na.addClass('is-invalid');
-            $("#validation_id_baseline").html(`<small>${errMsg}</small>`);
+            $("#validation_id_baseline").html(errMsg);
             return false;
         } else {
             reset_baseline_errors();
@@ -985,7 +985,7 @@
         }
         if (errMsg) {
             indicatorType.addClass('is-invalid');
-            $("#validation_id_indicator_type").html(`<small>${errMsg}</small>`);
+            $("#validation_id_indicator_type").html(errMsg);
             return false;
         } else {
             indicatorType.removeClass('is-invalid');
