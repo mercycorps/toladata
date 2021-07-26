@@ -127,7 +127,7 @@
 
             // prompt the user if they actually want to close
             window.create_unified_changeset_notice({
-                header: gettext('Warning'),
+                header: '{% trans 'Warning' %}',
                 preamble: CLOSE_BEFORE_SAVING_WARNING_PREAMBLE,
                 message_text: CLOSE_BEFORE_SAVING_WARNING_MESSAGE,
                 context: document.getElementById('indicator_modal_content'),
@@ -203,7 +203,7 @@
     function confirmAndRedirect(delete_indicator) {
         if(! indicatorHasResults()) {
             window.create_unified_changeset_notice({
-                header: gettext('Warning'),
+                header: '{% trans 'Warning' %}',
                 preamble: [DESTRUCTIVE_PREAMBLE, DELETE_INDICATOR_PREAMBLE].join(' '),
                 message_text: DELETE_INDICATOR_NO_RATIONALE,
                 context: document.getElementById('indicator_modal_content'),
@@ -213,7 +213,7 @@
             });
         } else {
             window.create_unified_changeset_notice({
-                header: gettext('Warning'),
+                header: '{% trans 'Warning' %}',
                 preamble: DESTRUCTIVE_PREAMBLE,
                 show_icon: true,
                 rationale_required: true,
@@ -272,7 +272,7 @@
         if (url === '#') {
             //This is a new event target (not yet saved), just confirm and remove:
             window.create_unified_changeset_notice({
-                header: gettext('Warning'),
+                header: '{% trans 'Warning' %}',
                 show_icon: true,
                 preamble: DESTRUCTIVE_PREAMBLE,
                 message_text: DELETE_TARGET_NO_RATIONALE,
@@ -289,7 +289,7 @@
         } else if (!indicatorHasResults()) {
             //This indicator has no results, just confirm and then post removal:
             window.create_unified_changeset_notice({
-                header: gettext('Warning'),
+                header: '{% trans 'Warning' %}',
                 show_icon: true,
                 preamble: DESTRUCTIVE_PREAMBLE,
                 message_text: DELETE_TARGET_NO_RATIONALE,
@@ -315,7 +315,7 @@
         } else {
             //This is an existing, saved event target on an indicator that has results (rationale required):
             window.create_unified_changeset_notice({
-                header: gettext('Warning'),
+                header: '{% trans 'Warning' %}',
                 show_icon: true,
                 preamble: numResultsLinkedToEventTarget === 0 ? DESTRUCTIVE_PREAMBLE : window.target_with_results_text(numResultsLinkedToEventTarget),
                 message_text: DELETE_TARGET_MESSAGE,
@@ -361,7 +361,7 @@
             };
         if(indicatorHasResults()) {
             window.create_unified_changeset_notice({
-                header: gettext('Warning'),
+                header: '{% trans 'Warning' %}',
                 preamble: DESTRUCTIVE_PREAMBLE,
                 message_text: DELETE_ALL_TARGETS_MESSAGE,
                 context: document.getElementById('indicator_modal_content'),
@@ -373,7 +373,7 @@
             scrollToIndicatorFormBottom();
         } else {
             window.create_unified_changeset_notice({
-                header: gettext('Warning'),
+                header: '{% trans 'Warning' %}',
                 show_icon: true,
                 preamble: DESTRUCTIVE_PREAMBLE,
                 message_text: DELETE_TARGETS_NO_RATIONALE,
@@ -1204,20 +1204,20 @@
 
         var passingValidation = {
             {# Translators: This single word is part of this longer sentence: :Please complete all required fields in the Sector tab." #}
-            summary: {tabName: gettext('Summary'), isValid: true, forCompletionForm: false},
+            summary: {tabName: "{% trans 'Summary' %}", isValid: true, forCompletionForm: false},
             {# Translators: This single word is part of this longer sentence: :Please complete all required fields in the Target tab." #}
-            target: {tabName: gettext('Target'), isValid: true, forCompletionForm: false},
+            target: {tabName: "{% trans 'Target' %}", isValid: true, forCompletionForm: false},
             {# Translators: This single word is part of this longer sentence: :Please complete all required fields in the Performance tab." #}
-            performance: {tabName: gettext('Performance'), isValid: true, forCompletionForm: false},
+            performance: {tabName: "{% trans 'Performance' %}", isValid: true, forCompletionForm: false},
             {# Translators: This single word is part of this longer sentence: :Please complete all required fields in the Data tab." #}
-            data: {tabName: gettext('Data'), isValid: true, forCompletionForm: false},
+            data: {tabName: "{% trans 'Data' %}", isValid: true, forCompletionForm: false},
             {# Translators: This single word is part of this longer sentence: :Please complete all required fields in the Analysis tab." #}
-            analysis: {tabName: gettext('Analysis'), isValid: true, forCompletionForm: false},
+            analysis: {tabName: "{% trans 'Analysis' %}", isValid: true, forCompletionForm: false},
             noMessage: {tabName: null, isValid: true, forCompletionForm: false},
             {# Translators: This single word is part of this longer sentence: :Please complete all required fields in the Required tab." #}
-            required: {tabName: gettext('Required'), isValid: true, forCompletionForm: true},
+            required: {tabName: "{% trans 'Required' %}", isValid: true, forCompletionForm: true},
             {# Translators: This single word is part of this longer sentence: :Please complete all required fields in the Optional tab." #}
-            optional: {tabName: gettext('Optional'), isValid: true, forCompletionForm: true},
+            optional: {tabName: "{% trans 'Optional' %}", isValid: true, forCompletionForm: true},
         };
 
         /* These are the fields that the Creation, Update, and Complete modals all share */
@@ -1339,8 +1339,7 @@
                 returnVal = false;
                 if (passingValidation[key]['tabName'] !== null) {
                     {# Translators: a message indicating which tab a user should navigate to in order to finish filling out a form #}
-                    validation_msgs[key] = interpolate(
-                        gettext("Please complete all required fields in the %(tabName)s tab."),
+                    validation_msgs[key] = interpolate("{% trans "Please complete all required fields in the %(tabName)s tab." %}",
                         {tabName: passingValidation[key]['tabName']},
                         true);
                 }
