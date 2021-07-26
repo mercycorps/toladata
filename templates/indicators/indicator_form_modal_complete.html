@@ -17,7 +17,10 @@
 <div class="modal-header" style="border-bottom:none;">
     <div id="indicator_modal_header" style="width:100%" class="modal-title">
         <h2 id="id_title" class="indicator_name">
-            {{ title_str }}
+            <div style="display: flex; align-items: center">
+                {{ title_str }}
+                <span style="font-size:70%;" class="ml-3">{% popover_helptext form.unit_of_measure.help_text %}</span>
+            </div>
         </h2>
         <h3 id="id_subtitle" class="no-bold indicator_name">
             {{ subtitle_str }}
@@ -187,6 +190,15 @@
                         <div class="form-group grouped-disaggregations-list" id="div_id_grouped_disaggregations">
                             {{ form.grouped_disaggregations }}
                         </div>
+                        {% if not readonly and indicator %}
+                            <div class="form-group text-right" id="div_id_remove_indicator">
+                                <a href="/indicators/indicator_delete/{{ indicator.id }}/"
+                                   id="id_delete_indicator_btn"
+                                   class="btn btn-sm btn-link btn-danger">
+                                    <i class="fas fa-trash-alt"></i> {% trans "Delete this indicator" %}</a>
+                                </a>
+                            </div>
+                        {% endif %}
                     </fieldset>
                 </div><!--/#optionalTab-->
 

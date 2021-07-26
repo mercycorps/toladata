@@ -497,6 +497,11 @@ class IndicatorUpdate(IndicatorFormMixin, UpdateView):
 
         context['title_str'] = self._form_title_display_str
         context['subtitle_str'] = self._form_subtitle_display_str
+        # title_helptext only used on the indicator completion modal
+        context['title_helptext'] = _(
+            'This indicator was imported from an Excel template. Some fields could not be included in the template,'
+            'including targets that are required before results can be reported.')
+
 
         return context
 
