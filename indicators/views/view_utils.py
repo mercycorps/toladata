@@ -5,11 +5,9 @@ import string
 from indicators.models import (
     Indicator,
     PeriodicTarget,
-    Result,
     ExternalService
 )
 from dateutil.relativedelta import relativedelta
-from django.utils import timezone
 
 logger = logging.getLogger(__name__)
 

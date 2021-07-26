@@ -251,12 +251,6 @@
 
         togglePercentSymbol(unit_of_measure_type);
 
-        // Compute LoP based on PTs
-        validatePeriodicTargets();
-        updateLopTargetDisplay();
-
-        warnIfLopTargetDoesNotMatchComputed();
-
         // used for tracking if changes were made to the form
         // see indicator_form_common_js.html for def
         recordTrackedFieldsSnapshot(true);

@@ -170,4 +170,3 @@ class GenerateNewPeriodicTargetsWithExisting(test.TestCase):
             self.assertEqual(result[0]['period'][-1], '3',
                              "third {0} target period name should end with 3, got {1}".format(
                                  tf, result[0]['period']))
-
