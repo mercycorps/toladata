@@ -4,7 +4,7 @@
 
 <script type="text/javascript">
     $("#id_indicator_data_span_count_" + `{{indicator.id}}`).text("{% trans 'Results'|escapejs %} ({{ indicator.cached_data_count|default:0 }})" );
-    
+
     // close modal on escape key press
     $(document).keydown(function(event) {
         if(event.keyCode === 27) {
@@ -203,7 +203,7 @@
         {% endfor %}{# for result in indicator.results_without_targets #}
 
         {% if indicator.results_without_targets.count %}
-            {% if indicator.target_frequency == None %}
+            {% if periodictargets.count == 0 %}
                 {% assign err 'Error_1' %}
             {% elif indicator.target_frequency == 2 or indicator.target_frequency == 8 %}
                 {% assign err 'Error_2' %}
