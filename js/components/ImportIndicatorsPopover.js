@@ -77,7 +77,7 @@ export class ImportIndicatorsButton extends React.Component {
     // Method to store the current popover view and valid/invalid row counts if available
     setStoredView = (view) => {
         this.setState({
-            storedView: view
+            storedView: view.view !== 3 ? view : {view: 0}
         })
     }
     // Method to store the selected desired number of tier level rows
@@ -159,16 +159,16 @@ export const ImportIndicatorsPopover = ({ page, program_id, tierLevelsUsed, stor
 
     // State Variables
     const [views, setViews] = useState(INITIAL); // View of the Popover
+    const [prevView, setPrevView] = useState({view: 0, valid: 0, invalid: 0}); // Last view/values of the Popover to return to if theres an error
     const [validIndicatorsCount, setvalidIndicatorsCount] = useState(0); // Number of indicators that have passed validation and are ready to import
     const [invalidIndicatorsCount, setInvalidIndicatorsCount] = useState(0); // Number of indicators that have failed validation and needs fixing
     const [tierLevelsRows, setTierLevelsRows] = useState([]); // State to hold the tier levels name and the desired number of rows for the excel template
     const [displayError, setDisplayError] = useState({view: null, error: []}); // ie {view: INITIAL, error: []}
-    const [downloadOrUpload, setDownloadOrUpload] = useState(null);
-    const [prevView, setPrevView] = useState({view: 0, valid: 0, invalid: 0});
+    const [downloadOrUpload, setDownloadOrUpload] = useState(null); // TODO: used for handling mulitple downloaders/uploaders
 
     let defaultTierLevelRows = [];
     useEffect(() => {
-        console.log(storedView);
+        // When popover opens (after closing for a short period) if there are stored views, valid, and invalid values, make them appear to continue from where the user left off
         storedView.view !== 0 ? setViews(storedView.view) : null;
         storedView.valid ? setvalidIndicatorsCount(storedView.valid) : null;
         storedView.invalid ? setInvalidIndicatorsCount(storedView.invalid) : null;
@@ -203,26 +203,25 @@ export const ImportIndicatorsPopover = ({ page, program_id, tierLevelsUsed, stor
 
     // Handles view changes
     let viewChange = (before, after, valid = 0, invalid = 0) => {
-        console.log('viewchange', valid, invalid);
-        setPrevView({view: before, valid: valid, invalid: invalid})
-        setViews(after)
-        setStoredView({view: after, valid: valid, invalid: invalid})
+        setPrevView({view: before, valid: valid, invalid: invalid}); // Store last view/values if needing to go back a step
+        setStoredView({view: after, valid: valid, invalid: invalid}); // Store view/values if popover is closed
+        setViews(after); // Switch view to the next step
     };
 
     // Download template file providing the program ID and number of rows per tier level
     let handleDownload = () => {
-        setDownloadOrUpload("download");
+        setDownloadOrUpload("download"); // TODO: Multi downloaders
         api.downloadTemplate(program_id, tierLevelsRows)
             .then(response => {
                 if (response.status === 404) {
-                    setViews(ERROR);
+                    viewChange(INITIAL, ERROR);
                 } else {
                     if (response.status !== 200) {
                         if (response.data.error_codes && response.data.error_codes.toString().slice(0, 1) === "1" ) {
                             let errorsMessagesToDisplay = reduceErrorCodes(response.data.error_codes);
                             setDisplayError({view: INITIAL, error: errorsMessagesToDisplay});
                         } else {
-                            setViews(ERROR);
+                            viewChange(INITIAL, ERROR);
                         }
                     }
                 }
@@ -231,7 +230,7 @@ export const ImportIndicatorsPopover = ({ page, program_id, tierLevelsUsed, stor
 
     // Upload template file and send api request
     let handleUpload = (e) => {
-        setDownloadOrUpload("upload")
+        setDownloadOrUpload("upload") // TODO: Multi uploaders
         let loading = false;
         let stopLoading;
         let loadingTimer = setTimeout(() => {
@@ -246,8 +245,7 @@ export const ImportIndicatorsPopover = ({ page, program_id, tierLevelsUsed, stor
                 .then(response => {
                     let handleResponse = () => {
                         if (response.status === 404) {
-                            // setViews(ERROR);
-                            viewChange(INITIAL, ERROR)
+                            viewChange(INITIAL, ERROR);
                         } else {
                             let validCount = response.data ? response.data.valid : 0;
                             let invalidCount = response.data ? response.data.invalid : 0;
@@ -255,30 +253,21 @@ export const ImportIndicatorsPopover = ({ page, program_id, tierLevelsUsed, stor
                             setInvalidIndicatorsCount(invalidCount);
                             // Successful upload with no errors and all rows valid
                             if (response.status === 200) { 
-                                // setStoredView({view: CONFIRM, valid: response.data.valid});
-                                // setViews(CONFIRM);
                                 viewChange(INITIAL, CONFIRM, validCount);
                             // Unsuccessful upload with fatal errors
                             } else if ( response.status === 406 ) {
                                 let errorsMessagesToDisplay = reduceErrorCodes(response.data.error_codes)
                                 if (errorsMessagesToDisplay.length > 0) {
                                     setDisplayError({view: INITIAL, error: errorsMessagesToDisplay})
-                                    // setViews(INITIAL);
                                     viewChange(INITIAL, INITIAL)
                                 } else {
-                                    // setViews(ERROR);
                                     viewChange(INITIAL, ERROR)
                                 }
                             // Unsuccessful upload with errors and/or invalid rows
                             } else if (response.status.toString().slice(0, 1) === "4") {
-                                // setStoredView({view: FEEDBACK, valid: response.data.valid, invalid: response.data.invalid});
-                                // setPrevView({view: FEEDBACK, valid: response.data.valid, invalid: response.data.invalid});
-                                // setViews(FEEDBACK);
-                                console.log('400', validCount, invalidCount);
                                 viewChange(INITIAL, FEEDBACK, validCount, invalidCount);
                             // Handles any other error/problem
                             } else {
-                                // setViews(ERROR); 
                                 viewChange(INITIAL, ERROR, validCount, invalidCount)
                             }
                         }
@@ -305,7 +294,6 @@ export const ImportIndicatorsPopover = ({ page, program_id, tierLevelsUsed, stor
         api.downloadFeedback(program_id)
         .then(response => {
             if (response.status !== 200) {
-                // setViews(ERROR);
                 viewChange(FEEDBACK, ERROR, validIndicatorsCount, invalidIndicatorsCount)
             }
         })
@@ -326,15 +314,15 @@ export const ImportIndicatorsPopover = ({ page, program_id, tierLevelsUsed, stor
             .then(response => {
                 let handleResponse = () => {
                     if (response.status === 404) {
-                        // setViews(ERROR);
+                        console.log(displayError);
                         viewChange(CONFIRM, ERROR, validIndicatorsCount)
                     } else {
                         if (response.status === 200) {
-                            setViews(SUCCESS);
                             viewChange(CONFIRM, SUCCESS, validIndicatorsCount)
                         } else {
                             let errorsMessagesToDisplay = reduceErrorCodes(response.data.error_codes);
                             setDisplayError({view: CONFIRM, error: errorsMessagesToDisplay});
+                            viewChange(CONFIRM, CONFIRM, validIndicatorsCount);
                         }
                     }
                 }
@@ -518,8 +506,8 @@ export const ImportIndicatorsPopover = ({ page, program_id, tierLevelsUsed, stor
                                     {views === FEEDBACK ? <div><i className="fas fa-exclamation-triangle"/></div> : null}
                                     {
                                         // # Translators: The count of indicators that have passed validation and are ready to be imported to complete the process. This cannot be undone after completing.
-                                        interpolate(ngettext("%s indicator has missing or invalid information. Please update your indicator template and upload again.",
-                                            "%s indicators have missing or invalid information. Please update your indicator template and upload again.",
+                                        interpolate(ngettext("%s indicator has missing or invalid information.",
+                                            "%s indicators have missing or invalid information.",
                                             invalidIndicatorsCount
                                         ), [invalidIndicatorsCount])
                                     }
@@ -547,22 +535,7 @@ export const ImportIndicatorsPopover = ({ page, program_id, tierLevelsUsed, stor
                         return (
                             <div className="import-confirm">
                                 <div className="import-confirm-text">
-                                    {displayError.view !== CONFIRM ?
-                                        <React.Fragment>
-                                            <React.Fragment>
-                                                {!displayError.view && views === CONFIRM ? <div><i className="fas fa-check-circle"/></div> : null}
-                                            </React.Fragment>
-                                            <div>
-                                                {
-                                                    // # Translators: The count of indicators that have passed validation and are ready to be imported to complete the process. This cannot be undone after completing.
-                                                    interpolate(ngettext("%s indicator is ready to be imported. Are you ready to complete the import process? (This action cannot be undone.)",
-                                                        "%s indicators are ready to be imported. Are you ready to complete the import process? (This action cannot be undone.)",
-                                                        validIndicatorsCount
-                                                    ), [validIndicatorsCount])
-                                                }
-                                            </div>
-                                        </React.Fragment>
-                                        :
+                                    {displayError.view === CONFIRM ?
                                         <div>
                                             {displayError.view === CONFIRM && displayError.error.indexOf(5) === -1 &&
                                                 displayError.error.map(message_id => {
@@ -574,6 +547,21 @@ export const ImportIndicatorsPopover = ({ page, program_id, tierLevelsUsed, stor
                                                 })
                                             }
                                         </div>
+                                        :
+                                        <React.Fragment>
+                                            <React.Fragment>
+                                                {views === CONFIRM ? <div><i className="fas fa-check-circle"/></div> : null}
+                                            </React.Fragment>
+                                            <div>
+                                                {
+                                                    // # Translators: The count of indicators that have passed validation and are ready to be imported to complete the process. This cannot be undone after completing.
+                                                    interpolate(ngettext("%s indicator is ready to be imported. Are you ready to complete the import process? (This action cannot be undone.)",
+                                                        "%s indicators are ready to be imported. Are you ready to complete the import process? (This action cannot be undone.)",
+                                                        validIndicatorsCount
+                                                    ), [validIndicatorsCount])
+                                                }
+                                            </div>
+                                        </React.Fragment>
                                     }
                                 </div>
                                 <div className="import-confirm-buttons">
@@ -606,7 +594,10 @@ export const ImportIndicatorsPopover = ({ page, program_id, tierLevelsUsed, stor
                                             id="fileUpload"
                                             type="file"
                                             style={{ display: "none" }}
-                                            onChange={ (e) => handleUpload(e) }
+                                            onChange={ (e) => {
+                                                handleUpload(e);
+                                                setDisplayError({view: null, error: []});
+                                            } }
                                         />
                                     </React.Fragment>
 
@@ -630,7 +621,9 @@ export const ImportIndicatorsPopover = ({ page, program_id, tierLevelsUsed, stor
                         return (
                             <div className="import-success">
                                 <div  className="import-success-text">
-                                    {views === SUCCESS ? <div><i className="fas fa-check-circle"/></div> : null}
+                                    <React.Fragment>
+                                        {views === SUCCESS ? <div><i className="fas fa-check-circle"/></div> : null}
+                                    </React.Fragment>
                                     {
                                         // # Translators: Message with the count of indicators that were successfully imported but they require additional details before they can be submitted.
                                         interpolate(ngettext("%s indicator was successfully imported, but require additional details before results can be submitted.",
@@ -651,7 +644,6 @@ export const ImportIndicatorsPopover = ({ page, program_id, tierLevelsUsed, stor
                         )
                     // TODO: ***** View for when an API call fails *****
                     case ERROR:
-                        console.log("Error View", prevView);
                         return (
                             <div className="import-error">
                                 <div className="import-error__text">
@@ -667,9 +659,7 @@ export const ImportIndicatorsPopover = ({ page, program_id, tierLevelsUsed, stor
                                 </div>
                                 <button 
                                     className="btn btn-sm btn-primary" 
-                                    // onClick={() => setViews(prevView.view)}
                                     onClick={() => viewChange(ERROR, prevView.view, prevView.valid, prevView.invalid)}
-                                    // onClick={() => setViews(storedView.view ? storedView.view : INITIAL)}
                                 >
                                     {
                                         // # Translators: A button to try import over after a error occurred.
