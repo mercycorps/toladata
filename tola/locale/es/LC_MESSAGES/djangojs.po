@@ -6,7 +6,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: \n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2021-07-16 15:56-0700\n"
+"POT-Creation-Date: 2021-07-26 13:26-0700\n"
 "PO-Revision-Date: 2020-11-23 14:38+0100\n"
 "Last-Translator: \n"
 "Language-Team: \n"
@@ -20,7 +20,6 @@ msgstr ""
 #. Translators: This is the file name of an Excel template that will be used
 #. for batch imports
 #: js/apiv2.js:131 js/apiv2.js:177
-#| msgid "program indicator"
 msgid "Import indicators.xlsx"
 msgstr "Translated Import indicators.xlsx"
 
@@ -70,14 +69,12 @@ msgstr "Advertencia"
 
 #. Translators: the header of an alert after an action failed for some reason
 #: js/base.js:448
-#| msgid "Form Errors"
 msgid "Error"
 msgstr "öTranslated Error"
 
 #. Translators: a button to open the import indicators popover
 #: js/components/ImportIndicatorsPopover.js:14
 #: js/components/ImportIndicatorsPopover.js:140
-#| msgid "program indicator"
 msgid "Import indicators"
 msgstr "ŹTranslated Import indicators"
 
@@ -106,7 +103,6 @@ msgstr "¿Está seguro que quiere continuar?"
 
 #. Translators: Button to continue and upload the template
 #: js/components/ImportIndicatorsPopover.js:382
-#| msgid "Contributor"
 msgid "Continue"
 msgstr "ÁTranslated Continue"
 
@@ -141,7 +137,6 @@ msgstr "ŹTranslated Download template"
 
 #. Translators: Button to upload the import indicators template
 #: js/components/ImportIndicatorsPopover.js:466
-#| msgid "Template"
 msgid "Upload template"
 msgstr "éTranslated Upload template"
 
@@ -150,7 +145,6 @@ msgstr "éTranslated Upload template"
 #. completing.
 #: js/components/ImportIndicatorsPopover.js:488
 #, python-format
-#| msgid "Indicator Disaggregation Report"
 msgid "%s indicator is ready to be imported."
 msgid_plural "%s indicators are ready to be imported."
 msgstr[0] "Translated %s indicator is ready to be imported."
@@ -206,13 +200,11 @@ msgstr[1] ""
 
 #. Translators: Button to confirm and complete the import process
 #: js/components/ImportIndicatorsPopover.js:567
-#| msgid "Completed"
 msgid "Complete import"
 msgstr "ŹTranslated Complete import"
 
 #. Translators: Button to confirm and complete the import process
 #: js/components/ImportIndicatorsPopover.js:580
-#| msgid "Template"
 msgid "Upload Template"
 msgstr "ÁTranslated Upload Template"
 
@@ -236,7 +228,6 @@ msgstr[1] ""
 #. Translators: A link to the program page to add the addition setup
 #. information for the imported indicators.
 #: js/components/ImportIndicatorsPopover.js:624
-#| msgid "Targets are not set up for this indicator."
 msgid "Visit the program page to complete setup of these indicators."
 msgstr ""
 "éTranslated Visit the program page to complete setup of these indicators."
@@ -253,7 +244,6 @@ msgstr "ŹTranslated Try again"
 
 #. Translators: Click to view the Advanced Option section
 #: js/components/ImportIndicatorsPopover.js:696
-#| msgid "Add another option"
 msgid "Advanced options"
 msgstr "Translated Advanced options"
 
@@ -339,7 +329,6 @@ msgstr "Colapsar todos"
 #. username.  This value is used when there is no username to show.  */}
 #: js/components/changelog.js:53
 #: js/pages/tola_management_pages/audit_log/views.js:252
-#| msgid "Unavailable until results are reported"
 msgid "Unavailable — user deleted"
 msgstr "öTranslated Unavailable — user deleted"
 
@@ -696,7 +685,6 @@ msgstr "Periodos objetivo"
 #. Translators: The user has successfully "pinned" a report link to a program
 #. page for quick access to the report */}
 #: js/pages/iptt_report/components/report/buttons.js:80
-#| msgid "Success!  This report is now pinned to the program page"
 msgid "Success!  This report is now pinned to the program page."
 msgstr "ŹTranslated Success!  This report is now pinned to the program page."
 
@@ -708,7 +696,6 @@ msgstr "Visitar la página del programa ahora."
 
 #. Translators: Some error occured when trying to pin the report*/}
 #: js/pages/iptt_report/components/report/buttons.js:97
-#| msgid "Something went wrong when attempting to pin this report"
 msgid "Something went wrong when attempting to pin this report."
 msgstr "ÁTranslated Something went wrong when attempting to pin this report."
 
@@ -760,7 +747,7 @@ msgstr "Todos los valores de este informe se redondean a dos decimales."
 #. row
 #: js/pages/iptt_report/components/report/headerCells.js:63
 #: js/pages/iptt_report/components/report/tableHeader.js:166
-#: js/pages/program_page/components/indicator_list.js:200
+#: js/pages/program_page/components/indicator_list.js:207
 #: js/pages/program_page/components/resultsTable.js:253
 msgid "Target"
 msgstr "Objetivo"
@@ -795,7 +782,7 @@ msgstr "No."
 #. Translators: Column header for indicator Name column */
 #: js/pages/iptt_report/components/report/tableHeader.js:108
 #: js/pages/logframe/components/table.js:30
-#: js/pages/program_page/components/indicator_list.js:196
+#: js/pages/program_page/components/indicator_list.js:203
 #: js/pages/tola_management_pages/audit_log/views.js:109
 #: js/pages/tola_management_pages/audit_log/views.js:164
 #: js/pages/tola_management_pages/audit_log/views.js:168
@@ -810,7 +797,7 @@ msgstr "Nivel"
 #. Translators: Column header */
 #: js/pages/iptt_report/components/report/tableHeader.js:130
 #: js/pages/iptt_report/models/filterStore.js:733
-#: js/pages/program_page/components/indicator_list.js:198
+#: js/pages/program_page/components/indicator_list.js:205
 msgid "Unit of measure"
 msgstr "Unidad de medida"
 
@@ -837,7 +824,7 @@ msgstr "# / %"
 #. collected or reported on over the life of a program
 #: js/pages/iptt_report/components/report/tableHeader.js:159
 #: js/pages/iptt_report/models/filterStore.js:737
-#: js/pages/program_page/components/indicator_list.js:199
+#: js/pages/program_page/components/indicator_list.js:206
 #: tola/db_translations.js:20
 msgid "Baseline"
 msgstr "Base"
@@ -847,7 +834,7 @@ msgstr "Base"
 #: js/pages/iptt_report/components/report/tableRows.js:327
 #: js/pages/iptt_report/components/report/tableRows.js:328
 #: js/pages/iptt_report/components/report/tableRows.js:330
-#: js/pages/program_page/components/indicator_list.js:263
+#: js/pages/program_page/components/indicator_list.js:279
 #: js/pages/program_page/components/resultsTable.js:9
 #: js/pages/tola_management_pages/audit_log/views.js:159
 #: js/pages/tola_management_pages/audit_log/views.js:196
@@ -1097,21 +1084,39 @@ msgstr "Ninguno"
 msgid "Group indicators:"
 msgstr "Indicadores de grupo:"
 
+#. Translators: Full message will be Imported indicators: Complete setup now.
+#. This is a notification to the user that they have imported some indicators
+#. but that the indicator setup is not yet complete.   */
+#: js/pages/program_page/components/indicator_list.js:254
+#| msgid "Import indicators"
+msgid "Imported indicator: "
+msgstr "Translated Imported indicator: "
+
+#. Translators: Message that gets attached to each indicator element after a
+#. successful import of indicator data. It is not possible to import all data
+#. that an indicator requires to be complete. The "Complete setup now" is a
+#. link that allows users to access a form window where they can complete the
+#. required fields.   */}
+#: js/pages/program_page/components/indicator_list.js:256
+#| msgid "Complete import"
+msgid "Complete setup now"
+msgstr "öTranslated Complete setup now"
+
 #. Translators: Warning provided when a result is not longer associated with
 #. any target.  It is a warning about state rather than an action.  The full
 #. sentence might read "There are results not assigned to targets" rather than
 #. "Results have been unassigned from targets. */
-#: js/pages/program_page/components/indicator_list.js:246
+#: js/pages/program_page/components/indicator_list.js:262
 msgid "Results unassigned to targets"
 msgstr "Resultados sin asignar a los objetivos"
 
 #. Translators: Warning message displayed when a critical piece of information
 #. (targets) have not been created for an indicator.
-#: js/pages/program_page/components/indicator_list.js:252
+#: js/pages/program_page/components/indicator_list.js:268
 msgid "Indicator missing targets"
 msgstr "Indicador sin objetivos"
 
-#: js/pages/program_page/components/indicator_list.js:329
+#: js/pages/program_page/components/indicator_list.js:345
 msgid ""
 "Some indicators have missing targets. To enter these values, click the "
 "target icon near the indicator name."
@@ -1361,7 +1366,6 @@ msgstr "Agregar objetivos"
 #. Translators: a link that leads to a list of all sites (locations)
 #. associated with a program
 #: js/pages/program_page/components/sitesList.js:19
-#| msgid "View program documents"
 msgid "View program sites"
 msgstr "éTranslated View program sites"
 
@@ -1373,7 +1377,6 @@ msgstr "No existen sitios del programa."
 
 #. Translators: a link to add a new site (location)
 #: js/pages/program_page/components/sitesList.js:34
-#| msgid "Add user"
 msgid "Add site"
 msgstr "Translated Add site"
 
@@ -1647,7 +1650,6 @@ msgstr "Los niveles de resultados no pueden contener comas."
 #. Translators: This is a warning messages when a user has a colon in a name
 #. that shouldn't contain colons */
 #: js/pages/results_framework/models.js:724
-#| msgid "Result levels should not contain commas."
 msgid "Result levels should not contain colons."
 msgstr "öTranslated Result levels should not contain colons."
 
@@ -1670,7 +1672,6 @@ msgstr "Fecha del resultado:"
 #. Translators: This a title of page where all of the changes to a program are
 #. listed
 #: js/pages/tola_management_pages/audit_log/views.js:213
-#| msgid "Program page"
 msgid "Program change log"
 msgstr "ŹTranslated Program change log"
 
@@ -1919,12 +1920,6 @@ msgstr "Tiene cambios sin guardar. ¿Está seguro que desea descartarlos?"
 #. user has created will be applied to existing and new data
 #: js/pages/tola_management_pages/country/components/edit_disaggregations.js:642
 #, python-format
-#| msgid ""
-#| "This disaggregation will be automatically selected for all new indicators in"
-#| " %s and for existing indicators in %s program."
-#| msgid_plural ""
-#| "This disaggregation will be automatically selected for all new indicators in"
-#| " %s and for existing indicators in %s programs."
 msgid ""
 "This disaggregation will be automatically selected for all new indicators in"
 " %(countryName)s and for existing indicators in %(retroCount)s program."
@@ -2078,9 +2073,6 @@ msgstr "Desarchivado con éxito"
 #. Translators: error message generated when item names are duplicated but are
 #. required to be unqiue.
 #: js/pages/tola_management_pages/country/models.js:246
-#| msgid ""
-#| "Saving failed: Disaggregation categories should be unique within a "
-#| "disaggregation."
 msgid ""
 "Saving failed. Disaggregation categories should be unique within a "
 "disaggregation."
@@ -2091,8 +2083,6 @@ msgstr ""
 #. Translators: error message generated when item names are duplicated but are
 #. required to be unqiue.
 #: js/pages/tola_management_pages/country/models.js:253
-#| msgid ""
-#| "Saving failed: disaggregation names should be unique within a country."
 msgid "Saving failed. Disaggregation names should be unique within a country."
 msgstr ""
 "öTranslated Saving failed. Disaggregation names should be unique within a "
@@ -2535,7 +2525,6 @@ msgstr "Solo programas individuales"
 #. Translators: An option for access level to a program, when no access is
 #. granted
 #: js/pages/tola_management_pages/user/components/edit_user_programs.js:13
-#| msgid "Has access?"
 msgid "No access"
 msgstr "ŹTranslated No access"
 
@@ -2691,7 +2680,6 @@ msgstr "öTranslated By training"
 #. Translators: One of several options for specifying how often data is
 #. collected or reported on over the life of a program
 #: tola/db_translations.js:12
-#| msgid "Find an Organization"
 msgid "Final evaluation"
 msgstr "ÁTranslated Final evaluation"
 
@@ -2716,7 +2704,6 @@ msgstr "Línea media"
 #. Translators: One of several options for specifying how often data is
 #. collected or reported on over the life of a program
 #: tola/db_translations.js:28
-#| msgid "Event"
 msgid "By event"
 msgstr "éTranslated By event"
 
@@ -2765,7 +2752,6 @@ msgstr "Translated Climate Change Adaptation & Disaster Risk Reduction"
 #. Translators: One of several choices for what sector (i.e. development
 #. domain) a program is most closely associated with
 #: tola/db_translations.js:44
-#| msgid "Community Involvement"
 msgid "Conflict Management"
 msgstr "Translated Conflict Management"
 
@@ -2886,7 +2872,6 @@ msgstr "éTranslated Hygiene Promotion"
 #. Translators: One of several choices for what sector (i.e. development
 #. domain) a program is most closely associated with
 #: tola/db_translations.js:84
-#| msgid "Information Use"
 msgid "Information Dissemination"
 msgstr "öTranslated Information Dissemination"
 
@@ -2929,14 +2914,12 @@ msgstr "Translated Nutrition Sensitive"
 #. Translators: One of several choices for what sector (i.e. development
 #. domain) a program is most closely associated with
 #: tola/db_translations.js:98
-#| msgid "Project Initiation"
 msgid "Project Monitoring"
 msgstr "ŹTranslated Project Monitoring"
 
 #. Translators: One of several choices for what sector (i.e. development
 #. domain) a program is most closely associated with
 #: tola/db_translations.js:100
-#| msgid "Project Description"
 msgid "Protection"
 msgstr "ÁTranslated Protection"
 
@@ -2949,7 +2932,6 @@ msgstr "öTranslated Psychosocial"
 #. Translators: One of several choices for what sector (i.e. development
 #. domain) a program is most closely associated with
 #: tola/db_translations.js:104
-#| msgid "Public Dashboards"
 msgid "Public Health"
 msgstr "éTranslated Public Health"
 
@@ -2974,7 +2956,6 @@ msgstr "éTranslated Skills and Training"
 #. Translators: One of several choices for what sector (i.e. development
 #. domain) a program is most closely associated with
 #: tola/db_translations.js:112
-#| msgid "Data issues"
 msgid "Urban Issues"
 msgstr "Translated Urban Issues"
 
@@ -3055,7 +3036,6 @@ msgstr "éTranslated Context / Trigger"
 #. is being created.  An Indicator is a performance measure e.g. "We will
 #. distrubute 1000 food packs over the next two months"
 #: tola/db_translations.js:138
-#| msgid "Key Performance Indicators"
 msgid "Key Performance Indicator (KPI)"
 msgstr "öTranslated Key Performance Indicator (KPI)"
 

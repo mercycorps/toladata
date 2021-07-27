@@ -10,6 +10,7 @@ from openpyxl.cell import MergedCell
 from django import test
 from django.conf import settings
 from django.core.files.base import ContentFile
+from django.core.serializers.json import DjangoJSONEncoder
 from django.urls import reverse
 from django.utils.translation import gettext, activate
 from factories import (
@@ -37,6 +38,17 @@ from indicators.views.bulk_indicator_import_views import (
     ERROR_INTERVENING_BLANK_ROW,
     ERROR_UNEXPECTED_LEVEL,
 )
+
+SAMPLE_INDICATOR_DATA = {
+    'name': 'Lorem ipsum name', 'source': 'Lorem ipsum source', 'definition': 'Lorem ipsum definition',
+    'justification': 'Lorem ipsum justification', 'unit_of_measure': 'Lorem ipsum unit_of_measure',
+    'unit_of_measure_type': 1, 'rationale_for_target': 'Lorem ipsum rationale_for_target', 'baseline': '3.00',
+    'direction_of_change': 1, 'target_frequency': 1, 'means_of_verification': 'Lorem ipsum means_of_verification',
+    'data_collection_method': 'Lorem ipsum data_collection_method', 'data_points': 'Lorem ipsum data_points',
+    'responsible_person': 'Lorem ipsum responsible_person', 'method_of_analysis': 'Lorem ipsum method_of_analysis',
+    'information_use': 'Lorem ipsum information_use', 'quality_assurance': 'Lorem ipsum quality_assurance',
+    'data_issues': 'Lorem ipsum data_issues', 'comments': 'Lorem ipsum comments', 'sector_id': 4, 'level_id': None,
+    'program_id': None}
 
 
 class TestBulkImportTemplateCreation(test.TestCase):
@@ -656,6 +668,24 @@ class TestBulkImportTemplateProcessing(test.TestCase):
         self.assertEqual(response.status_code, 400)
         self.assertEqual(json.loads(response.content)['error_codes'], [ERROR_SAVE_VALIDATION])
         self.assertEqual(Indicator.objects.count(), 7)
+
+    def test_bad_lookup_values(self):
+        self.client.force_login(user=self.tola_user.user)
+        w_factories.grant_program_access(self.tola_user, self.program, self.country, role='high')
+        indicator_data = copy.deepcopy(SAMPLE_INDICATOR_DATA)
+        indicator_data['program_id'] = self.program.pk
+        indicator_data['sector_id'] = 9999
+        indicator_data = [indicator_data]
+        file_obj = BulkIndicatorImportFile.objects.create(
+            user=self.tola_user,
+            program=self.program,
+            file_name='test_file',
+            file_type=BulkIndicatorImportFile.INDICATOR_DATA_TYPE)
+        with open(file_obj.file_path, 'w') as fh:
+            fh.write(json.dumps(indicator_data, cls=DjangoJSONEncoder))
+        from django.db.utils import IntegrityError
+        with self.assertRaises(IntegrityError):
+            self.client.post(reverse('save_bulk_import_data', args=[self.program.id]))
 
     def test_retrieving_feedback_template(self):
         self.client.force_login(user=self.tola_user.user)

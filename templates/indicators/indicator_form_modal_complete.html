@@ -10,13 +10,17 @@
 <div id="programId" style="display:none;">{{ program.id }}</div>
 <div id="initialLopTarget" style="display:none;">{{ object.lop_target|default_if_none:'' }}</div>
 <div id="initialLevelId" style="display:none;">{{ initial_level_id|default_if_none:'' }}</div>  {# only set on create #}
+<div id="nextIndicatorPk" style="display:none;">{{ next_indicator_pk|default_if_none:'' }}</div>
 
 {# This template gets shoved into #indicator_modal_div in indicator_list_modals.html #}
 
 <div class="modal-header" style="border-bottom:none;">
     <div id="indicator_modal_header" style="width:100%" class="modal-title">
         <h2 id="id_title" class="indicator_name">
-            {{ title_str }}
+            <div style="display: flex; align-items: center">
+                {{ title_str }}
+                <span style="font-size:70%;" class="ml-3">{% popover_helptext title_helptext %}</span>
+            </div>
         </h2>
         <h3 id="id_subtitle" class="no-bold indicator_name">
             {{ subtitle_str }}
@@ -186,6 +190,15 @@
                         <div class="form-group grouped-disaggregations-list" id="div_id_grouped_disaggregations">
                             {{ form.grouped_disaggregations }}
                         </div>
+                        {% if not readonly and indicator %}
+                            <div class="form-group text-right" id="div_id_remove_indicator">
+                                <a href="/indicators/indicator_delete/{{ indicator.id }}/"
+                                   id="id_delete_indicator_btn"
+                                   class="btn btn-sm btn-link btn-danger">
+                                    <i class="fas fa-trash-alt"></i> {% trans "Delete this indicator" %}</a>
+                                </a>
+                            </div>
+                        {% endif %}
                     </fieldset>
                 </div><!--/#optionalTab-->
 
@@ -194,25 +207,18 @@
         </div> <!-- /#indicator_modal_body -->
         {% if not readonly %}
         <div class="form-actions">
-            {% if indicator %}
-                <div>
-                    <button type="button" id="id_update_indicator_btn" class="btn btn-primary">{% trans 'Save and close' %}</button>
-                    <button type="button" id="id_cancel_btn" class="btn btn-reset">{% trans 'Cancel' %}</button>
-                </div>
-            {% else %}
-                <div>
-                    <button type="button" id="id_save_and_close_indicator_btn" class="btn btn-primary">
-                        {# Translators: button label to save the item and then close a modal #}
-                        {% trans 'Save and close' %}
+
+            <div>
+                <button type="button" id="id_update_indicator_btn" class="btn btn-primary">{% trans 'Save and close' %}</button>
+                {% if next_indicator_pk %}
+                    <button type="button" id="id_save_and_complete_another_indicator_btn" class="btn btn-secondary">
+                        {# Translators: button label to complete a partially filled-in form and be redirected to the next partially filled-in form #}
+                        {% trans 'Save and complete next indicator' %}
                     </button>
-                    <button type="button" id="id_save_and_add_another_indicator_btn" class="btn btn-secondary">
-                        {# Translators: button label to save the form and be redirected to a blank for to add another item #}
-                        {% trans 'Save and add another' %}
-                    </button>
-                    {# Translators: close a modal throwing away any changes to the form #}
-                    <button type="button" id="id_cancel_btn" class="btn btn-reset">{% trans 'Cancel' %}</button>
-                </div>
                 {% endif %}
+                <button type="button" id="id_cancel_btn" class="btn btn-reset">{% trans 'Cancel' %}</button>
+            </div>
+
             {% form_guidance form %}
             </div>
         {% endif %}
@@ -256,12 +262,6 @@
         }
 
         togglePercentSymbol(unit_of_measure_type);
-
-        // Compute LoP based on PTs
-        validatePeriodicTargets();
-        updateLopTargetDisplay();
-
-        warnIfLopTargetDoesNotMatchComputed();
 
         // used for tracking if changes were made to the form
         // see indicator_form_common_js.html for def

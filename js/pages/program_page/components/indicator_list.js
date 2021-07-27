@@ -232,28 +232,42 @@ export class IndicatorListTable extends React.Component {
                 const displayMissingTargetsWarning = !indicator.incompleteImport && (indicator.periodicTargets.length === 0 || (targetPeriodLastEndDate && program.reportingPeriodEnd > targetPeriodLastEndDate))
                 return <React.Fragment key={indicator.pk}>
                     <tr className={classNames("indicators-list__row", "indicators-list__indicator-header", {
-                        "is-highlighted": indicator.wasJustCreated,
+                        "is-highlighted": indicator.wasJustCreated && !indicator.incompleteImport,
                         "is-expanded": program.isExpanded(indicator.pk)
                     })}>
                         <td>
-                            <a href="#"
-                               className="indicator_results_toggle btn text-action text-left"
-                               tabIndex="0"
-                               onClick={(e) => this.onIndicatorResultsToggleClick(e, indicator.pk)}
-                            >
-                                <FontAwesomeIcon icon={program.isExpanded(indicator.pk) ? 'caret-down' : 'caret-right'} />
-                                <strong>{ indicator.number ? indicator.number + ':' : '' }</strong>&nbsp;
-                                <span className="indicator_name">{ indicator.name }</span>
-                            {indicator.isKeyPerformanceIndicator &&
-                            <span className="kpi-badge badge badge-pill">KPI</span>
+                            {indicator.incompleteImport ?
+                                <div style={{marginLeft: "22px"}}>
+                                    <strong>{ indicator.number ? indicator.number + ':' : '' }</strong>
+                                    <span className="indicator_name">{ indicator.name }</span>
+                                    {indicator.isKeyPerformanceIndicator &&
+                                    <span className="kpi-badge badge badge-pill">KPI</span>
+                                    }
+                                </div>
+                            :
+                                <div>
+                                    <a href="#"
+                                       className="indicator_results_toggle btn text-action text-left"
+                                       tabIndex="0"
+                                       onClick={(e) => this.onIndicatorResultsToggleClick(e, indicator.pk)}
+                                    >
+
+                                    <FontAwesomeIcon icon={program.isExpanded(indicator.pk) ? 'caret-down' : 'caret-right'} />
+                                    <strong>{ indicator.number ? indicator.number + ':' : '' }</strong>&nbsp;
+                                    <span className="indicator_name">{ indicator.name }</span>
+                                    {indicator.isKeyPerformanceIndicator &&
+                                    <span className="kpi-badge badge badge-pill">KPI</span>
+                                    }
+                                    </a>
+                                </div>
                             }
-                            </a>
+
                             {indicator.incompleteImport &&
-                            <span className="text-success ml-4"><i className="fas fa-check-circle mr-1"/>
+                            <span className="ml-4 btn-add"><i className="fas fa-check-circle mr-1"/>
                                     {/* # Translators: Full message will be Imported indicators: Complete setup now.  This is a notification to the user that they have imported some indicators but that the indicator setup is not yet complete.   */
                                     gettext("Imported indicator: ")}
                                     {/* # Translators: Message that gets attached to each indicator element after a successful import of indicator data. It is not possible to import all data that an indicator requires to be complete. The "Complete setup now" is a link that allows users to access a form window where they can complete the required fields.   */}
-                                    <u><a href="" onClick={(e) => this.onIndicatorCompleteClick(e, indicator.pk)} className={"text-success"}>{gettext("Complete setup now")}</a></u>
+                                    <u><a href="" onClick={(e) => this.onIndicatorCompleteClick(e, indicator.pk)} className={"btn-add"}>{gettext("Complete setup now")}</a></u>
                                 </span>
                             }
                             {displayUnassignedWarning &&
