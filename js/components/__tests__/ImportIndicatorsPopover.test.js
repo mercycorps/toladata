@@ -12,7 +12,7 @@ describe('Import Indicators test suite', () => {
         {name: "Activity", used: false},
     ];
     let storedTierLevelsRows = [];
-    let storedView = {};
+    let storedView = {view: 0};
     let setStoredTierLevelsRows = () => {};
     let setStoredView = () => {};
 

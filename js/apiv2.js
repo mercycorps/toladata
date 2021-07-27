@@ -1,6 +1,6 @@
 import axios from 'axios';
 import qs from 'qs';
-let x = 0
+
 const api = {
     apiInstance: axios.create({
         withCredentials: true,

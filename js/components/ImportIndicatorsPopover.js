@@ -113,9 +113,9 @@ export class ImportIndicatorsButton extends React.Component {
 
         return (
             <ImportIndicatorsPopover 
-                page={ this.props.page } 
-                program_id={ this.props.program_id } 
-                tierLevelsUsed={ tierLevelsUsed } 
+                page={ this.props.page }
+                program_id={ this.props.program_id }
+                tierLevelsUsed={ tierLevelsUsed }
                 storedView={ this.state.storedView }
                 setStoredView={ this.setStoredView }
                 storedTierLevelsRows={ this.state.storedTierLevelsRows }
@@ -247,8 +247,8 @@ export const ImportIndicatorsPopover = ({ page, program_id, tierLevelsUsed, stor
                         if (response.status === 404) {
                             viewChange(INITIAL, ERROR);
                         } else {
-                            let validCount = response.data ? response.data.valid : 0;
-                            let invalidCount = response.data ? response.data.invalid : 0;
+                            let validCount = response.data.valid ? response.data.valid : 0;
+                            let invalidCount = response.data.invalid ? response.data.invalid : 0;
                             setvalidIndicatorsCount(validCount);
                             setInvalidIndicatorsCount(invalidCount);
                             // Successful upload with no errors and all rows valid
@@ -314,7 +314,6 @@ export const ImportIndicatorsPopover = ({ page, program_id, tierLevelsUsed, stor
             .then(response => {
                 let handleResponse = () => {
                     if (response.status === 404) {
-                        console.log(displayError);
                         viewChange(CONFIRM, ERROR, validIndicatorsCount)
                     } else {
                         if (response.status === 200) {
@@ -597,7 +596,7 @@ export const ImportIndicatorsPopover = ({ page, program_id, tierLevelsUsed, stor
                                             onChange={ (e) => {
                                                 handleUpload(e);
                                                 setDisplayError({view: null, error: []});
-                                            } }
+                                            }}
                                         />
                                     </React.Fragment>
 
