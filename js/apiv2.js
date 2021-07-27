@@ -172,7 +172,7 @@ const api = {
             .catch((error) => {
                 this.logFailure(error);
                 return error.response;
-            })    
+            })
         },
 };
 

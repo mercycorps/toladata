@@ -258,17 +258,17 @@ export const ImportIndicatorsPopover = ({ page, program_id, tierLevelsUsed, stor
                             } else if ( response.status === 406 ) {
                                 let errorsMessagesToDisplay = reduceErrorCodes(response.data.error_codes)
                                 if (errorsMessagesToDisplay.length > 0) {
-                                    setDisplayError({view: INITIAL, error: errorsMessagesToDisplay})
-                                    viewChange(INITIAL, INITIAL)
+                                    setDisplayError({view: INITIAL, error: errorsMessagesToDisplay});
+                                    viewChange(INITIAL, INITIAL);
                                 } else {
-                                    viewChange(INITIAL, ERROR)
+                                    viewChange(INITIAL, ERROR);
                                 }
                             // Unsuccessful upload with errors and/or invalid rows
                             } else if (response.status.toString().slice(0, 1) === "4") {
                                 viewChange(INITIAL, FEEDBACK, validCount, invalidCount);
                             // Handles any other error/problem
                             } else {
-                                viewChange(INITIAL, ERROR, validCount, invalidCount)
+                                viewChange(INITIAL, ERROR, validCount, invalidCount);
                             }
                         }
                     }
@@ -294,7 +294,7 @@ export const ImportIndicatorsPopover = ({ page, program_id, tierLevelsUsed, stor
         api.downloadFeedback(program_id)
         .then(response => {
             if (response.status !== 200) {
-                viewChange(FEEDBACK, ERROR, validIndicatorsCount, invalidIndicatorsCount)
+                viewChange(FEEDBACK, ERROR, validIndicatorsCount, invalidIndicatorsCount);
             }
         })
     }
@@ -317,7 +317,7 @@ export const ImportIndicatorsPopover = ({ page, program_id, tierLevelsUsed, stor
                         viewChange(CONFIRM, ERROR, validIndicatorsCount)
                     } else {
                         if (response.status === 200) {
-                            viewChange(CONFIRM, SUCCESS, validIndicatorsCount)
+                            viewChange(CONFIRM, SUCCESS, validIndicatorsCount);
                         } else {
                             let errorsMessagesToDisplay = reduceErrorCodes(response.data.error_codes);
                             setDisplayError({view: CONFIRM, error: errorsMessagesToDisplay});
