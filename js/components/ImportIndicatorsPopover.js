@@ -75,9 +75,9 @@ export class ImportIndicatorsButton extends React.Component {
     }
 
     // Method to store the current popover view and valid/invalid row counts if available
-    setStoredView = (view) => {
+    setStoredView = (currentView) => {
         this.setState({
-            storedView: view.view !== 3 ? view : {view: 0}
+            storedView: currentView.view !== 3 ? currentView : {view: 0}
         })
     }
     // Method to store the selected desired number of tier level rows
@@ -247,8 +247,8 @@ export const ImportIndicatorsPopover = ({ page, program_id, tierLevelsUsed, stor
                         if (response.status === 404) {
                             viewChange(INITIAL, ERROR);
                         } else {
-                            let validCount = response.data.valid ? response.data.valid : 0;
-                            let invalidCount = response.data.invalid ? response.data.invalid : 0;
+                            let validCount = response.data.valid || 0;
+                            let invalidCount = response.data.invalid || 0;
                             setvalidIndicatorsCount(validCount);
                             setInvalidIndicatorsCount(invalidCount);
                             // Successful upload with no errors and all rows valid
@@ -536,7 +536,8 @@ export const ImportIndicatorsPopover = ({ page, program_id, tierLevelsUsed, stor
                                 <div className="import-confirm-text">
                                     {displayError.view === CONFIRM ?
                                         <div>
-                                            {displayError.view === CONFIRM && displayError.error.indexOf(5) === -1 &&
+                                            {
+                                            // displayError.error.indexOf(5) === -1 && // TODO: Display error 5 is the error message for the mulitple uploaders scenario. Will update when working on that scenario
                                                 displayError.error.map(message_id => {
                                                     return (
                                                         <div key={message_id} className="import-confirm-text-error">
