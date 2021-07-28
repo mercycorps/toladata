@@ -238,7 +238,7 @@ export class IndicatorListTable extends React.Component {
                         <td>
                             {indicator.incompleteImport ?
                                 <div style={{marginLeft: "22px"}}>
-                                    <strong>{ indicator.number ? indicator.number + ':' : '' }</strong>
+                                    <strong>{ indicator.number ? indicator.number + ':' : '' }</strong>&nbsp;
                                     <span className="indicator_name">{ indicator.name }</span>
                                     {indicator.isKeyPerformanceIndicator &&
                                     <span className="kpi-badge badge badge-pill">KPI</span>

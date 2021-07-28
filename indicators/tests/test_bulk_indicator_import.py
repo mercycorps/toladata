@@ -18,6 +18,7 @@ from factories import (
     indicators_models as i_factories
 )
 from tola_management.models import ProgramAuditLog
+from tola.serializers import make_quantized_decimal
 from indicators.models import Indicator, Level, LevelTier, BulkIndicatorImportFile
 from indicators.views.bulk_indicator_import_views import (
     COLUMNS, COLUMNS_FIELD_INDEXES, FIRST_USED_COLUMN, DATA_START_ROW, PROGRAM_NAME_ROW, COLUMN_HEADER_ROW,
@@ -643,8 +644,16 @@ class TestBulkImportTemplateProcessing(test.TestCase):
         wb = openpyxl.load_workbook(self.get_template())
         ws = wb.worksheets[0]
         ws.cell(PROGRAM_NAME_ROW, FIRST_USED_COLUMN).value = self.program.name
-        self.fill_worksheet_row(ws, DATA_START_ROW + 2)
-        self.fill_worksheet_row(ws, DATA_START_ROW + 3)
+        self.fill_worksheet_row(ws, DATA_START_ROW + 2, custom_values={
+            'name': 'Test Number',
+            'unit_of_measure_type': str(dict(Indicator.UNIT_OF_MEASURE_TYPES)[Indicator.NUMBER]),
+            'baseline': .3
+        })
+        self.fill_worksheet_row(ws, DATA_START_ROW + 3, custom_values={
+            'name': 'Test Percent',
+            'unit_of_measure_type': str(dict(Indicator.UNIT_OF_MEASURE_TYPES)[Indicator.PERCENTAGE]),
+            'baseline': .3
+        })
         self.post_template(wb)
         self.assertEqual(ProgramAuditLog.objects.count(), 1)
         self.assertEqual(ProgramAuditLog.objects.last().change_type, 'template_uploaded')
@@ -668,6 +677,11 @@ class TestBulkImportTemplateProcessing(test.TestCase):
         self.assertEqual(response.status_code, 400)
         self.assertEqual(json.loads(response.content)['error_codes'], [ERROR_SAVE_VALIDATION])
         self.assertEqual(Indicator.objects.count(), 7)
+
+        i_number = Indicator.objects.get(name="Test Number")
+        self.assertEqual(make_quantized_decimal(i_number.baseline), make_quantized_decimal(.3))
+        i_percent = Indicator.objects.get(name="Test Percent")
+        self.assertEqual(make_quantized_decimal(i_percent.baseline), make_quantized_decimal(30))
 
     def test_bad_lookup_values(self):
         self.client.force_login(user=self.tola_user.user)
