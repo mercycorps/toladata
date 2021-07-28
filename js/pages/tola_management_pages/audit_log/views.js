@@ -278,19 +278,25 @@ export const IndexView = observer(
                                     <td></td>
                                     <td></td>
                                     <td className="changelog__change--prev">
-                                        {data.diff_list.map(changeset => {
-                                            return <ChangesetEntry key={changeset.name} name={changeset.name}
-                                                                   pretty_name={changeset.pretty_name}
-                                                                   type={data.change_type} data={changeset.prev}
-                                                                   indicator={data.indicator} level={data.level}/>
-                                        })}
+                                        {data.diff_list.length === 0 ?
+                                            <span>{gettext("N/A")}</span>
+                                            :
+                                            data.diff_list.map(changeset => {
+                                                return <ChangesetEntry key={changeset.name} name={changeset.name}
+                                                                       pretty_name={changeset.pretty_name}
+                                                                       type={data.change_type} data={changeset.prev}
+                                                                       indicator={data.indicator} level={data.level}/>})
+                                        }
                                     </td>
                                     <td className="changelog__change--new">
-                                        {data.diff_list.map(changeset => {
-                                            return <ChangesetEntry key={changeset.name} name={changeset.name}
-                                                                   pretty_name={changeset.pretty_name}
-                                                                   type={data.change_type} data={changeset.new}
-                                                                   indicator={data.indicator} level={data.level}/>
+                                        {data.diff_list.length === 0 ?
+                                            <span>{gettext("N/A")}</span>
+                                            :
+                                            data.diff_list.map(changeset => {
+                                                return <ChangesetEntry key={changeset.name} name={changeset.name}
+                                                                       pretty_name={changeset.pretty_name}
+                                                                       type={data.change_type} data={changeset.new}
+                                                                       indicator={data.indicator} level={data.level}/>
                                         })}
                                     </td>
                                     <td className="changelog__change--rationale">
