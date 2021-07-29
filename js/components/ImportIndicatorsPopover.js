@@ -611,7 +611,7 @@ export const ImportIndicatorsPopover = ({ page, program_id, tierLevelsUsed, stor
                                     {views === SUCCESS ? <div><i className="fas fa-check-circle"/></div> : null}
                                     {
                                         // # Translators: Message with the count of indicators that were successfully imported but they require additional details before they can be submitted.
-                                        interpolate(ngettext("%s indicator was successfully imported, but require additional details before results can be submitted.",
+                                        interpolate(ngettext("%s indicator was successfully imported, but requires additional details before results can be submitted.",
                                             "%s indicators were successfully imported, but require additional details before results can be submitted.",
                                             validIndicatorsCount
                                         ), [validIndicatorsCount])
@@ -621,7 +621,7 @@ export const ImportIndicatorsPopover = ({ page, program_id, tierLevelsUsed, stor
                                     <a role="link" href={ api.getProgramPageUrl(program_id) }>
                                         {
                                             // # Translators: A link to the program page to add the addition setup information for the imported indicators.
-                                            gettext("Visit the program page to complete setup of these indicators.")
+                                            gettext("Visit the program page to complete indicator setup.")
                                         }
                                     </a>
                                 }
