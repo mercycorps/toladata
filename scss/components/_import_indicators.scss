@@ -1,6 +1,6 @@
 .indicator-import__popover {
     min-width: 300px;
-    max-width: 345px;
+    max-width: 370px;
 
     .popover-header {
         background-color: transparent;
@@ -128,7 +128,7 @@
     &-download {
         padding-left: 1.5rem;
         
-        a {
+        span {
             font-weight: bold;
             color: $action;
         }
@@ -200,6 +200,18 @@
     justify-content: space-between;
     margin: 0.25rem 1rem 0.75rem;
     height: 100px;
+    
+    &__text {
+        display: flex;
+        margin: 1rem 0;
+        color: inherit;
+
+        .server-error {
+            margin-right: 0.25rem;
+            font-size: larger;
+            color: $red;
+        }
+    }
 }
 
 .temp-view {
