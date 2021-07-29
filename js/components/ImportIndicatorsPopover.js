@@ -247,8 +247,9 @@ export const ImportIndicatorsPopover = ({ page, program_id, tierLevelsUsed, stor
                         if (response.status === 404) {
                             viewChange(INITIAL, ERROR);
                         } else {
-                            let validCount = response.data.valid || 0;
-                            let invalidCount = response.data.invalid || 0;
+                            // Used ternary operator to prevent failue for a invalid upload file 500 error.
+                            let validCount = response.data ? response.data.valid : 0;
+                            let invalidCount = response.data ? response.data.invalid : 0;
                             setvalidIndicatorsCount(validCount);
                             setInvalidIndicatorsCount(invalidCount);
                             // Successful upload with no errors and all rows valid
