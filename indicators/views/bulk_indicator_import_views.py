@@ -658,7 +658,6 @@ class BulkImportIndicatorsView(LoginRequiredMixin, UserPassesTestMixin, AccessMi
                 # Use the serializer to check for character length and any other field issues that it handles
                 deserialized_data = BulkImportIndicatorSerializer(data=indicator_data)
                 deserialized_data.is_valid()
-                # indicator_data['baseline'] = deserialized_data.data['baseline']
 
                 # Capture validation problems from the deserialization process
                 for field_name, error_list in deserialized_data.errors.items():
@@ -758,6 +757,9 @@ class BulkImportIndicatorsView(LoginRequiredMixin, UserPassesTestMixin, AccessMi
                 # Final data manipulation and updates
                 indicator_data['level_id'] = current_level.pk
                 indicator_data['program_id'] = program.id
+                if indicator_data['unit_of_measure_type'] == Indicator.PERCENTAGE:
+                    indicator_data['baseline'] *= 100
+
                 # The number order has already been checked if program is autonumbered, so we don't need the numbers
                 # any more
                 if program.auto_number_indicators:
