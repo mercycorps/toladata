@@ -3,7 +3,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: \n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2021-07-26 13:26-0700\n"
+"POT-Creation-Date: 2021-07-30 15:47-0700\n"
 "PO-Revision-Date: 2021-04-05 14:21-0700\n"
 "Last-Translator: \n"
 "Language-Team: \n"
@@ -187,7 +187,7 @@ msgstr "% Atteint"
 #. Translators: Not applicable. A value that can be entered into a form field
 #. when the field doesn't apply in a particular situation.
 #: indicators/export_renderers.py:242 indicators/templatetags/mytags.py:93
-#: indicators/views/bulk_indicator_import_views.py:104
+#: indicators/views/bulk_indicator_import_views.py:111
 #: tola_management/models.py:165 tola_management/models.py:449
 #: tola_management/programadmin.py:181
 msgid "N/A"
@@ -788,7 +788,7 @@ msgstr "Pourcentage (%)"
 #. Translators: A value that can be entered into a form field when the field
 #. doesn't apply in a particular situation.
 #: indicators/models.py:1094 indicators/models.py:1267
-#: indicators/views/bulk_indicator_import_views.py:108
+#: indicators/views/bulk_indicator_import_views.py:115
 msgid "Not applicable"
 msgstr "Non applicable"
 
@@ -1307,7 +1307,7 @@ msgstr ""
 "précis possible et expliquer comment ces problèmes ont été abordés."
 
 #: indicators/models.py:1426
-#: indicators/views/bulk_indicator_import_views.py:751 workflow/models.py:39
+#: indicators/views/bulk_indicator_import_views.py:771 workflow/models.py:39
 #: workflow/models.py:523
 msgid "Sector"
 msgstr "Secteur"
@@ -1664,16 +1664,29 @@ msgstr "Aide"
 msgid "Number (#) or percentage (%)"
 msgstr "ÁTranslated Number (#) or percentage (%)"
 
+#. Translators:  Error message provided when the name a user has provided for
+#. the indicator has already been used by another indicator.
+#: indicators/views/bulk_indicator_import_views.py:103
+#| msgid "Result levels must have unique names."
+msgid "Indicators must have unique names."
+msgstr "éTranslated Indicators must have unique names."
+
+#. Translators:  Error message provided when the name a user tries to upload
+#. multiple Indicators with the same name as one another.
+#: indicators/views/bulk_indicator_import_views.py:105
+msgid "Please give this indicator a unique name."
+msgstr "ÁTranslated Please give this indicator a unique name."
+
 #. Translators: An alternate form of N/A or Not applicable
-#: indicators/views/bulk_indicator_import_views.py:106
+#: indicators/views/bulk_indicator_import_views.py:113
 msgid "NA"
 msgstr "ÁTranslated NA"
 
 #. Translators: Error message shown to a user when they have entered a value
 #. for a numeric field that isn't a number or is negative.
 #. Translators: This is help text for a form field
-#: indicators/views/bulk_indicator_import_views.py:157
-#: indicators/views/bulk_indicator_import_views.py:371
+#: indicators/views/bulk_indicator_import_views.py:164
+#: indicators/views/bulk_indicator_import_views.py:383
 msgid ""
 "Enter a numeric value for the baseline. If a baseline is not yet known or "
 "not applicable, enter a zero or type \"N/A\". The baseline can always be "
@@ -1685,26 +1698,26 @@ msgstr ""
 
 #. Translators: Error message shown to a user when they have entered a value
 #. that is not in a list of approved values
-#: indicators/views/bulk_indicator_import_views.py:244
+#: indicators/views/bulk_indicator_import_views.py:251
 msgid "Your entry is not in the list"
 msgstr "ÁTranslated Your entry is not in the list"
 
 #. Translators:  Title of a popup box that informs the user they have entered
 #. an invalid value
-#: indicators/views/bulk_indicator_import_views.py:246
-#: indicators/views/bulk_indicator_import_views.py:280
+#: indicators/views/bulk_indicator_import_views.py:253
+#: indicators/views/bulk_indicator_import_views.py:286
 msgid "Invalid Entry"
 msgstr "Translated Invalid Entry"
 
 #. Translators: Heading placed in the cell of a spreadsheet that allows users
 #. to upload Indicators in bulk
-#: indicators/views/bulk_indicator_import_views.py:338
+#: indicators/views/bulk_indicator_import_views.py:350
 msgid "Import indicators"
 msgstr "öTranslated Import indicators"
 
 #. Translators: Instructions provided as part of an Excel template that allows
 #. users to upload Indicators
-#: indicators/views/bulk_indicator_import_views.py:342
+#: indicators/views/bulk_indicator_import_views.py:354
 msgid ""
 "INSTRUCTIONS\n"
 "1. Indicator rows are provided for each result level. You can delete indicator rows you do not need. You can also leave them empty and they will be ignored.\n"
@@ -1719,13 +1732,13 @@ msgstr ""
 #. Translators: Section header of an Excel template that allows users to
 #. upload Indicators.  This section is where users will add their own
 #. information.
-#: indicators/views/bulk_indicator_import_views.py:351
+#: indicators/views/bulk_indicator_import_views.py:363
 msgid "Enter indicators"
 msgstr "ŹTranslated Enter indicators"
 
 #. Translators: This is help text for a form field that gets filled in
 #. automatically
-#: indicators/views/bulk_indicator_import_views.py:368
+#: indicators/views/bulk_indicator_import_views.py:380
 msgid "This number is automatically generated through the results framework."
 msgstr ""
 "ÁTranslated This number is automatically generated through the results "
@@ -1733,13 +1746,13 @@ msgstr ""
 
 #. Translators: Message provided to user when they have failed to enter a
 #. required field on a form.
-#: indicators/views/bulk_indicator_import_views.py:492
+#: indicators/views/bulk_indicator_import_views.py:504
 msgid "This information is required."
 msgstr "éTranslated This information is required."
 
 #. Translators: Message provided to user when they have not chosen from a pre-
 #. selected list of options.
-#: indicators/views/bulk_indicator_import_views.py:494
+#: indicators/views/bulk_indicator_import_views.py:506
 #, python-brace-format
 msgid ""
 "The {field_name} you selected is unavailable. Please select a different "
@@ -1750,19 +1763,19 @@ msgstr ""
 
 #. Translators: Error message provided to users when they are entering data
 #. into Excel and they skip a row
-#: indicators/views/bulk_indicator_import_views.py:631
+#: indicators/views/bulk_indicator_import_views.py:652
 msgid "Indicator rows cannot be skipped."
 msgstr "Translated Indicator rows cannot be skipped."
 
 #. Translators: Error message provided when user has exceeded the character
 #. limit on a form
-#: indicators/views/bulk_indicator_import_views.py:676
+#: indicators/views/bulk_indicator_import_views.py:696
 msgid "Please enter {matches.group(1)} or fewer characters."
 msgstr "öTranslated Please enter {matches.group(1)} or fewer characters."
 
 #. Translators: Error message provided when user has exceeded the character
 #. limit on a form
-#: indicators/views/bulk_indicator_import_views.py:681
+#: indicators/views/bulk_indicator_import_views.py:701
 msgid "You have exceeded the character limit of this field"
 msgstr "öTranslated You have exceeded the character limit of this field"
 
@@ -1797,7 +1810,6 @@ msgstr "Indicateur {indicator_number} mis à jour."
 #. Translators: a fragment of a larger string that will be a title for a form.
 #. The full string might be e.g. Complete setup of Outcome indicator 1.1a.
 #: indicators/views/views_indicators.py:394
-#| msgid "Complete"
 msgid "Complete setup of "
 msgstr "ŹTranslated Complete setup of "
 
@@ -2636,14 +2648,12 @@ msgstr "Performance"
 #. Translators: This single word is part of this longer sentence: :Please
 #. complete all required fields in the Data tab."
 #: templates/indicators/indicator_form_common_js.html:1213
-#| msgid "Data key"
 msgid "Data"
 msgstr "ÁTranslated Data"
 
 #. Translators: This single word is part of this longer sentence: :Please
 #. complete all required fields in the Analysis tab."
 #: templates/indicators/indicator_form_common_js.html:1215
-#| msgid "Method of Analysis"
 msgid "Analysis"
 msgstr "éTranslated Analysis"
 
@@ -2656,7 +2666,6 @@ msgstr "éTranslated Required"
 #. Translators: This single word is part of this longer sentence: :Please
 #. complete all required fields in the Optional tab."
 #: templates/indicators/indicator_form_common_js.html:1220
-#| msgid "Rationale"
 msgid "Optional"
 msgstr "Translated Optional"
 
@@ -2664,7 +2673,6 @@ msgstr "Translated Optional"
 #. order to finish filling out a form
 #: templates/indicators/indicator_form_common_js.html:1342
 #, python-format
-#| msgid "Please complete all required fields in the Targets tab."
 msgid "Please complete all required fields in the %%(tabName)s tab."
 msgstr ""
 "öTranslated Please complete all required fields in the %%(tabName)s tab."
@@ -2723,7 +2731,6 @@ msgstr "öTranslated Optional fields"
 #. Translators: button label to complete a partially filled-in form and be
 #. redirected to the next partially filled-in form
 #: templates/indicators/indicator_form_modal_complete.html:216
-#| msgid "Delete this indicator"
 msgid "Save and complete next indicator"
 msgstr "ŹTranslated Save and complete next indicator"
 
@@ -5338,9 +5345,6 @@ msgstr "Ville, Pays :"
 
 #~ msgid "Key Performance Indicator for this program?"
 #~ msgstr "Indicateur de performance clé pour ce programme ?"
-
-#~ msgid "Result levels must have unique names."
-#~ msgstr "Les niveaux de résultats doivent posséder des noms uniques."
 
 #~ msgid "This level is being used in the results framework."
 #~ msgstr "Ce niveau est utilisé dans le cadre de résultats."
