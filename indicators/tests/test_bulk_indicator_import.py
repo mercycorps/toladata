@@ -23,7 +23,8 @@ from indicators.models import Indicator, Level, LevelTier, BulkIndicatorImportFi
 from indicators.views.bulk_indicator_import_views import (
     COLUMNS, COLUMNS_FIELD_INDEXES, FIRST_USED_COLUMN, DATA_START_ROW, PROGRAM_NAME_ROW, COLUMN_HEADER_ROW,
     HIDDEN_SHEET_NAME, BASE_TEMPLATE_NAME, LEVEL_HEADER_STYLE, EXISTING_INDICATOR_STYLE,
-    UNPROTECTED_NEW_INDICATOR_STYLE, PROTECTED_NEW_INDICATOR_STYLE, RED_ERROR,
+    UNPROTECTED_NEW_INDICATOR_STYLE, PROTECTED_NEW_INDICATOR_STYLE, RED_ERROR, ERROR_MSG_NAME_DUPLICATED,
+    ERROR_MSG_NAME_IN_DB,
     ERROR_MISMATCHED_PROGRAM,
     ERROR_NO_NEW_INDICATORS,
     ERROR_UNDETERMINED_LEVEL,
@@ -366,6 +367,7 @@ class TestBulkImportTemplateProcessing(test.TestCase):
         cls.program_name_row = PROGRAM_NAME_ROW
         cls.sector = w_factories.SectorFactory()
         cls.template_file_path = os.path.join(settings.SITE_ROOT, BulkIndicatorImportFile.FILE_STORAGE_PATH)
+        cls.name_sequence = 0
 
     def tearDown(self):
         for file_entry in os.scandir(self.template_file_path):
@@ -384,6 +386,7 @@ class TestBulkImportTemplateProcessing(test.TestCase):
             return self.client.post(reverse('bulk_import_indicators', args=[self.program.id]), {'file': temp_file})
 
     def fill_worksheet_row(self, ws, row_index, custom_values=None):
+        self.name_sequence += 1
         custom_values = [] if custom_values is None else custom_values
         for i, column in enumerate(COLUMNS):
             current_cell = ws.cell(row_index, FIRST_USED_COLUMN + i)
@@ -393,7 +396,9 @@ class TestBulkImportTemplateProcessing(test.TestCase):
             if column['field_name'] in ['level', 'number']:
                 # These are pre-filled in the template so we can skip them
                 continue
-            if column['field_name'] == 'unit_of_measure_type':
+            if column['field_name'] == 'name':
+                current_cell.value = f'Lorem ipsum name {self.name_sequence}'
+            elif column['field_name'] == 'unit_of_measure_type':
                 current_cell.value = str(Indicator.UNIT_OF_MEASURE_TYPES[0][1])
             elif column['field_name'] == 'direction_of_change':
                 current_cell.value = str(Indicator.DIRECTION_OF_CHANGE[0][1])
@@ -473,7 +478,7 @@ class TestBulkImportTemplateProcessing(test.TestCase):
         self.client.force_login(user=self.tola_user.user)
         w_factories.grant_program_access(self.tola_user, self.program, self.country, role='high')
         wb = openpyxl.load_workbook(self.get_template())
-        goal_level = Level.objects.get(parent=None)
+        goal_level = Level.objects.get(parent=None, program=self.program)
         existing_goal_indicator_count = Indicator.objects.filter(level__parent=None).count()
         existing_outcome_indicator_count = Indicator.objects.filter(level__parent=goal_level).count()
         first_blank_goal_row = DATA_START_ROW + existing_goal_indicator_count + 1
@@ -636,8 +641,6 @@ class TestBulkImportTemplateProcessing(test.TestCase):
             json.loads(response.content)['error_codes'], [ERROR_UNEXPECTED_LEVEL])
         self.fill_worksheet_row(ws, first_blank_goal_row + 3)
 
-
-    # TODO: Write Unit Test to see if this works with a bad sector
     def test_saving_indicators(self):
         self.client.force_login(user=self.tola_user.user)
         w_factories.grant_program_access(self.tola_user, self.program, self.country, role='high')
@@ -655,33 +658,107 @@ class TestBulkImportTemplateProcessing(test.TestCase):
             'baseline': .3
         })
         self.post_template(wb)
-        self.assertEqual(ProgramAuditLog.objects.count(), 1)
-        self.assertEqual(ProgramAuditLog.objects.last().change_type, 'template_uploaded')
-        self.assertEqual(Indicator.objects.count(), 5)
+        self.assertEqual(ProgramAuditLog.objects.count(), 1, 'After upload, there should be a single audit log record')
+        self.assertEqual(
+            ProgramAuditLog.objects.last().change_type,
+            'template_uploaded',
+            'The audit log record should be of the right type')
+        self.assertEqual(Indicator.objects.count(), 5, 'We should be starting with the expected number of indicators')
         self.client.post(reverse('save_bulk_import_data', args=[self.program.id]))
-        self.assertEqual(ProgramAuditLog.objects.count(), 3)
+        self.assertEqual(
+            ProgramAuditLog.objects.count(),
+            3,
+            'There should be two audit log records for the indicator saves and one for the upload')
         self.assertEqual(ProgramAuditLog.objects.last().change_type, 'indicator_imported')
-        self.assertEqual(Indicator.objects.count(), 7)
-        response = self.client.post(reverse('save_bulk_import_data', args=[self.program.id]))
-        self.assertEqual(json.loads(response.content)['error_codes'], [ERROR_INDICATOR_DATA_NOT_FOUND])
+        self.assertEqual(Indicator.objects.count(), 7, 'There should be two more indicators than before')
+        i_number = Indicator.objects.get(name="Test Number")
+        self.assertEqual(
+            make_quantized_decimal(i_number.baseline),
+            make_quantized_decimal(.3),
+            "The number value should be saved in its raw form")
+        i_percent = Indicator.objects.get(name="Test Percent")
+        self.assertEqual(
+            make_quantized_decimal(i_percent.baseline),
+            make_quantized_decimal(30),
+            "The percent value should be saved as 100 x its input form, since its a percent")
 
-        self.post_template(wb)
-        bulk_import_json = BulkIndicatorImportFile.objects.get(user=self.tola_user, program=self.program)
-        with open(bulk_import_json.file_path, 'r+') as fh:
-            indicator_data = json.loads(fh.read())
-            indicator_data[0].pop('program_id')
-            fh.seek(0)
-            fh.write(json.dumps(indicator_data))
-            fh.truncate()
         response = self.client.post(reverse('save_bulk_import_data', args=[self.program.id]))
-        self.assertEqual(response.status_code, 400)
+        self.assertEqual(
+            json.loads(response.content)['error_codes'],
+            [ERROR_INDICATOR_DATA_NOT_FOUND],
+            'Hitting the save endpoint should error because the stored json data has been deleted by the prior save')
+
+        bulk_import_json = BulkIndicatorImportFile.objects.create(
+            user=self.tola_user, program=self.program, file_type=BulkIndicatorImportFile.INDICATOR_DATA_TYPE,
+            file_name='test.json')
+        indicator_data = copy.deepcopy(SAMPLE_INDICATOR_DATA)
+        indicator_data.pop('program_id')
+        indicator_data.pop('sector_id')
+        with open(bulk_import_json.file_path, 'w+') as fh:
+            fh.write(json.dumps([indicator_data]))
+        response = self.client.post(reverse('save_bulk_import_data', args=[self.program.id]))
+        self.assertEqual(
+            response.status_code, 400, "If the json file fails to save properly, it should produce and error")
         self.assertEqual(json.loads(response.content)['error_codes'], [ERROR_SAVE_VALIDATION])
         self.assertEqual(Indicator.objects.count(), 7)
 
-        i_number = Indicator.objects.get(name="Test Number")
-        self.assertEqual(make_quantized_decimal(i_number.baseline), make_quantized_decimal(.3))
-        i_percent = Indicator.objects.get(name="Test Percent")
-        self.assertEqual(make_quantized_decimal(i_percent.baseline), make_quantized_decimal(30))
+    def test_duplicated_names(self):
+        self.client.force_login(user=self.tola_user.user)
+        w_factories.grant_program_access(self.tola_user, self.program, self.country, role='high')
+
+        # Now make sure we have two existing indicators that have the same name
+        goal_level = Level.objects.get(parent=None, program=self.program)
+        target_indicator = Indicator.objects.filter(program=self.program, level=goal_level).first()
+        i_factories.RFIndicatorFactory(program=self.program, level=goal_level, name=target_indicator.name)
+
+        wb = openpyxl.load_workbook(self.get_template())
+        ws = wb.worksheets[0]
+        ws.cell(PROGRAM_NAME_ROW, FIRST_USED_COLUMN).value = self.program.name
+
+        name_column = FIRST_USED_COLUMN + COLUMNS_FIELD_INDEXES['name']
+        existing_goal_indicator_count = Indicator.objects.filter(level__parent=None).count()
+        last_goal_row = DATA_START_ROW + existing_goal_indicator_count
+
+        self.fill_worksheet_row(ws, last_goal_row + 1, custom_values={'name': 'Unique Name'})
+        response = self.post_template(wb)
+        self.assertEqual(
+            response.status_code,
+            200,
+            "Template should have been submitted successfully even though two existing indicators have the same name")
+
+        last_goal_row_name = ws.cell(last_goal_row, name_column).value
+        self.fill_worksheet_row(ws, last_goal_row + 1, custom_values={'name': last_goal_row_name})
+        self.fill_worksheet_row(ws, last_goal_row + 2, custom_values={'name': last_goal_row_name})
+        response = self.post_template(wb)
+        self.assertEqual(response.status_code, 400)
+        response = self.client.get(reverse('get_feedback_bulk_import_template', args=[self.program.id]))
+        feedback_wb = openpyxl.load_workbook(ContentFile(response.content))
+        feedback_ws = feedback_wb.worksheets[0]
+        self.assertEqual(
+            feedback_ws.cell(last_goal_row + 1, name_column).comment.text,
+            ERROR_MSG_NAME_IN_DB,
+            'Indicator name already in DB, comment should reflect appropriate error message')
+        self.assertEqual(
+            feedback_ws.cell(last_goal_row + 2, name_column).comment.text,
+            ERROR_MSG_NAME_IN_DB,
+            'Indicator name already in DB, comment should reflect appropriate error message')
+
+        self.fill_worksheet_row(ws, last_goal_row + 1, custom_values={'name': 'Duplicate name'})
+        self.fill_worksheet_row(ws, last_goal_row + 2, custom_values={'name': 'Duplicate name'})
+        response = self.post_template(wb)
+        self.assertEqual(response.status_code, 400)
+        response = self.client.get(reverse('get_feedback_bulk_import_template', args=[self.program.id]))
+        feedback_wb = openpyxl.load_workbook(ContentFile(response.content))
+        feedback_ws = feedback_wb.worksheets[0]
+        self.assertEqual(
+            feedback_ws.cell(last_goal_row + 1, name_column).comment.text,
+            ERROR_MSG_NAME_DUPLICATED,
+            "Duplicate indicator names should cause duplicate name comment to be shown on cell")
+        self.assertEqual(
+            feedback_ws.cell(last_goal_row + 2, name_column).comment.text,
+            ERROR_MSG_NAME_DUPLICATED,
+            "Duplicate indicator names should cause duplicate name comment to be shown on cell")
+
 
     def test_bad_lookup_values(self):
         self.client.force_login(user=self.tola_user.user)
@@ -697,9 +774,10 @@ class TestBulkImportTemplateProcessing(test.TestCase):
             file_type=BulkIndicatorImportFile.INDICATOR_DATA_TYPE)
         with open(file_obj.file_path, 'w') as fh:
             fh.write(json.dumps(indicator_data, cls=DjangoJSONEncoder))
-        from django.db.utils import IntegrityError
-        with self.assertRaises(IntegrityError):
-            self.client.post(reverse('save_bulk_import_data', args=[self.program.id]))
+        response = self.client.post(reverse('save_bulk_import_data', args=[self.program.id]))
+        self.assertEqual(
+            response.status_code, 400, "If the json file fails to save properly, it should produce and error")
+        self.assertEqual(json.loads(response.content)['error_codes'], [ERROR_SAVE_VALIDATION])
 
     def test_retrieving_feedback_template(self):
         self.client.force_login(user=self.tola_user.user)
