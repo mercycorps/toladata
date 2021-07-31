@@ -657,6 +657,10 @@ class TestBulkImportTemplateProcessing(test.TestCase):
             'unit_of_measure_type': str(dict(Indicator.UNIT_OF_MEASURE_TYPES)[Indicator.PERCENTAGE]),
             'baseline': .3
         })
+        self.fill_worksheet_row(ws, DATA_START_ROW + 4, custom_values={
+            'name': 'Test Baseline NA',
+            'baseline': 'NA'
+        })
         self.post_template(wb)
         self.assertEqual(ProgramAuditLog.objects.count(), 1, 'After upload, there should be a single audit log record')
         self.assertEqual(
@@ -667,10 +671,10 @@ class TestBulkImportTemplateProcessing(test.TestCase):
         self.client.post(reverse('save_bulk_import_data', args=[self.program.id]))
         self.assertEqual(
             ProgramAuditLog.objects.count(),
-            3,
-            'There should be two audit log records for the indicator saves and one for the upload')
+            4,
+            'There should be three audit log records for the indicator saves and one for the upload')
         self.assertEqual(ProgramAuditLog.objects.last().change_type, 'indicator_imported')
-        self.assertEqual(Indicator.objects.count(), 7, 'There should be two more indicators than before')
+        self.assertEqual(Indicator.objects.count(), 8, 'There should be two more indicators than before')
         i_number = Indicator.objects.get(name="Test Number")
         self.assertEqual(
             make_quantized_decimal(i_number.baseline),
@@ -681,6 +685,9 @@ class TestBulkImportTemplateProcessing(test.TestCase):
             make_quantized_decimal(i_percent.baseline),
             make_quantized_decimal(30),
             "The percent value should be saved as 100 x its input form, since its a percent")
+        self.assertFalse(i_percent.baseline_na, "The baseline_na field should be set to False")
+        i_baselinena = Indicator.objects.get(name="Test Baseline NA")
+        self.assertTrue(i_baselinena.baseline_na, "The baseline_na field should be set to True")
 
         response = self.client.post(reverse('save_bulk_import_data', args=[self.program.id]))
         self.assertEqual(
@@ -700,7 +707,7 @@ class TestBulkImportTemplateProcessing(test.TestCase):
         self.assertEqual(
             response.status_code, 400, "If the json file fails to save properly, it should produce and error")
         self.assertEqual(json.loads(response.content)['error_codes'], [ERROR_SAVE_VALIDATION])
-        self.assertEqual(Indicator.objects.count(), 7)
+        self.assertEqual(Indicator.objects.count(), 8)
 
     def test_duplicated_names(self):
         self.client.force_login(user=self.tola_user.user)

@@ -689,7 +689,6 @@
 
     function disable_target_frequency_field(lock = false) {
         // set the text for the 'create new target' button.
-        console.log('here', $('#id_target_frequency').attr('readonly'), 'lock=', lock)
         if (lock || $('#id_target_frequency').attr('readonly')) {
             $("#id_target_frequency option:not(:selected)").attr("disabled", true);
             $("#id_target_frequency").attr("readonly", true);

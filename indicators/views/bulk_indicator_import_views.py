@@ -720,6 +720,7 @@ class BulkImportIndicatorsView(LoginRequiredMixin, UserPassesTestMixin, AccessMi
                             elif active_cell.value.lower() in null_equivalents_with_translations:
                                 validation_errors.pop('baseline')
                                 indicator_data['baseline'] = None
+                                indicator_data['baseline_na'] = True
                             else:  # cell value is not None or one of the acceptable null equivalent values
                                 validation_errors['baseline'] = [gettext(self.VALIDATION_MSG_BASELINE_NA)]
                                 non_fatal_errors.append(ERROR_MALFORMED_INDICATOR)
