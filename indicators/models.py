@@ -1211,7 +1211,7 @@ class Indicator(SafeDeleteModel):
         _("Source"), max_length=255, null=True, blank=True,
         # Translators: this is help text for a field on an indicator setup form
         help_text=_("Identify the source of this indicator (e.g. Mercy Corps DIG, EC, USAID, etc.) If the indicator "
-                    "is brand new and created specifically for the program, enter &ldquo;Custom.&rdquo;")
+                    "is brand new and created specifically for the program, enter &ldquo;Custom&rdquo;.")
     )
 
     definition = models.TextField(
