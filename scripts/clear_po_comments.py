@@ -4,6 +4,7 @@ that got into the files from an ill-advised use of pofilter.  If you're reading 
 to delete
 """
 import os
+import re
 import argparse
 
 
@@ -17,10 +18,10 @@ def main():
 
         with open(os.path.join(args.langdir, 'LC_MESSAGES', file_name + '.po'), 'r') as fh:
             lines = fh.readlines()
-        print(len(lines))
         with open(os.path.join(args.langdir, 'LC_MESSAGES', file_name + '_clean.po'), 'w') as fh:
             for line in lines:
-                if line[:2] != '# ':
+                match = re.search(r'^\#\n', line)
+                if line[:2] != '# ' and match is None:
                     fh.write(line)
                 else:
                     print('Omitting', line)
