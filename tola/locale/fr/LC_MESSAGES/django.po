@@ -1,8 +1,9 @@
+#
 msgid ""
 msgstr ""
 "Project-Id-Version: \n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2021-07-30 21:34-0700\n"
+"POT-Creation-Date: 2021-07-31 10:24-0700\n"
 "PO-Revision-Date: 2021-07-30 21:30-0700\n"
 "Last-Translator: \n"
 "Language-Team: \n"
@@ -166,7 +167,7 @@ msgstr "*Toutes les valeurs de ce rapport sont arrondies à deux décimales."
 #. Translators: This single word is part of this longer sentence: :Please
 #. complete all required fields in the Target tab."
 #: indicators/export_renderers.py:157 indicators/models.py:1887
-#: templates/indicators/indicator_form_common_js.html:1209
+#: templates/indicators/indicator_form_common_js.html:1207
 #: templates/indicators/result_table.html:32
 #: workflow/serializers_new/period_serializers.py:46
 msgid "Target"
@@ -1308,7 +1309,7 @@ msgstr ""
 "précis possible et expliquer comment ces problèmes ont été abordés."
 
 #: indicators/models.py:1426
-#: indicators/views/bulk_indicator_import_views.py:771 workflow/models.py:39
+#: indicators/views/bulk_indicator_import_views.py:772 workflow/models.py:39
 #: workflow/models.py:523
 msgid "Sector"
 msgstr "Secteur"
@@ -1662,14 +1663,12 @@ msgstr "Aide"
 #. in the row is expressed
 #. as a number or a percent
 #: indicators/views/bulk_indicator_import_views.py:52
-#| msgid "Percentage (%)"
 msgid "Number (#) or percentage (%)"
 msgstr "éTranslated Number (#) or percentage (%)"
 
 #. Translators:  Error message provided when the name a user has provided for
 #. the indicator has already been used by another indicator.
 #: indicators/views/bulk_indicator_import_views.py:103
-#| msgid "Result levels must have unique names."
 msgid "Indicators must have unique names."
 msgstr "Translated Indicators must have unique names."
 
@@ -2496,54 +2495,54 @@ msgid ""
 msgstr "À titre de référence, veuillez justifier la suppression de la cible."
 
 #: templates/indicators/indicator_form_common_js.html:34
-msgid "This indicator is missing required details and cannot be saved."
-msgstr ""
-"Cet indicateur nécessite davantage de détails et ne peut être enregistré."
+#| msgid "All details about this indicator will be permanently removed."
+msgid "Changes to this indicator will not be saved."
+msgstr "ÁTranslated Changes to this indicator will not be saved."
 
 #: templates/indicators/indicator_form_common_js.html:35
 msgid "Are you sure you want to continue?"
 msgstr "Voulez-vous vraiment continuer ?"
 
 #: templates/indicators/indicator_form_common_js.html:130
-#: templates/indicators/indicator_form_common_js.html:206
-#: templates/indicators/indicator_form_common_js.html:216
-#: templates/indicators/indicator_form_common_js.html:275
-#: templates/indicators/indicator_form_common_js.html:292
-#: templates/indicators/indicator_form_common_js.html:318
-#: templates/indicators/indicator_form_common_js.html:364
-#: templates/indicators/indicator_form_common_js.html:376
-#: templates/indicators/indicator_form_common_js.html:403
-#: templates/indicators/indicator_form_common_js.html:421
-#: templates/indicators/indicator_form_common_js.html:440
+#: templates/indicators/indicator_form_common_js.html:205
+#: templates/indicators/indicator_form_common_js.html:215
+#: templates/indicators/indicator_form_common_js.html:274
+#: templates/indicators/indicator_form_common_js.html:291
+#: templates/indicators/indicator_form_common_js.html:317
+#: templates/indicators/indicator_form_common_js.html:363
+#: templates/indicators/indicator_form_common_js.html:375
+#: templates/indicators/indicator_form_common_js.html:402
+#: templates/indicators/indicator_form_common_js.html:420
+#: templates/indicators/indicator_form_common_js.html:439
 #: templates/indicators/indicator_list_modals.html:7
 msgid "Warning"
 msgstr "Attention"
 
-#: templates/indicators/indicator_form_common_js.html:405
+#: templates/indicators/indicator_form_common_js.html:404
 msgid ""
 "Modifying target values will affect program metrics for this indicator."
 msgstr ""
 "La modification des valeurs cibles affectera les statistiques du programme "
 "pour cet indicateur."
 
-#: templates/indicators/indicator_form_common_js.html:406
-#: templates/indicators/indicator_form_common_js.html:423
-#: templates/indicators/indicator_form_common_js.html:442
+#: templates/indicators/indicator_form_common_js.html:405
+#: templates/indicators/indicator_form_common_js.html:422
+#: templates/indicators/indicator_form_common_js.html:441
 msgid "Your changes will be recorded in a change log."
 msgstr ""
 "Vos modifications seront enregistrées dans un journal des modifications."
 
-#: templates/indicators/indicator_form_common_js.html:555
+#: templates/indicators/indicator_form_common_js.html:554
 #: templates/indicators/indicatortargets.html:50
 msgid "Enter event name"
 msgstr "Saisir le nom de l’événement"
 
-#: templates/indicators/indicator_form_common_js.html:565
+#: templates/indicators/indicator_form_common_js.html:564
 #: templates/indicators/indicatortargets.html:81
 msgid "Enter target"
 msgstr "Saisir la cible"
 
-#: templates/indicators/indicator_form_common_js.html:790
+#: templates/indicators/indicator_form_common_js.html:788
 #: templates/indicators/indicatortargets.html:126
 msgid "Options for number (#) indicators"
 msgstr "Options pour les numéros (#) indicateurs"
@@ -2551,14 +2550,14 @@ msgstr "Options pour les numéros (#) indicateurs"
 #. Translators: This is the title of some informational text describing what
 #. it means when an indicator is being measured as a percentage e.g. % of
 #. population with access to water
-#: templates/indicators/indicator_form_common_js.html:796
+#: templates/indicators/indicator_form_common_js.html:794
 #, python-format
 msgid "Percentage (%%) indicators"
 msgstr "Indicateurs en pourcentage (%%)"
 
 #. Translators: warning to user that manually entered in value doesn't match
 #. computed value, %s is a number or percentage
-#: templates/indicators/indicator_form_common_js.html:921
+#: templates/indicators/indicator_form_common_js.html:919
 #, python-format
 msgid ""
 "Life of Program (LoP) targets are now automatically displayed. The current "
@@ -2571,7 +2570,7 @@ msgstr ""
 
 #. Translators: warning to user that manually entered in value doesn't match
 #. computed value, %s is a number or percentage
-#: templates/indicators/indicator_form_common_js.html:926
+#: templates/indicators/indicator_form_common_js.html:924
 #, python-format
 msgid ""
 "This program previously had a LoP target of %%s. Life of Program (LoP) "
@@ -2580,8 +2579,8 @@ msgstr ""
 "Ce programme possédait autrefois une cible LoP de %%s. Les cibles de vie du "
 "programme (LoP) s’affichent désormais automatiquement."
 
-#: templates/indicators/indicator_form_common_js.html:942
-#: templates/indicators/indicator_form_common_js.html:1090
+#: templates/indicators/indicator_form_common_js.html:940
+#: templates/indicators/indicator_form_common_js.html:1088
 #: templates/indicators/result_form_common_js.html:123
 #: templates/indicators/result_form_common_js.html:154
 msgid "Please complete this field."
@@ -2589,49 +2588,49 @@ msgstr "Veuillez compléter ce champ."
 
 #. Translators: on a form field, as a warning when a user has entered too much
 #. text.  %s replaced with a number (e.g. 500)
-#: templates/indicators/indicator_form_common_js.html:944
-#: templates/indicators/indicator_form_common_js.html:1057
+#: templates/indicators/indicator_form_common_js.html:942
+#: templates/indicators/indicator_form_common_js.html:1055
 #, python-format
 msgid "Please enter fewer than %%s characters."
 msgstr "Veuillez saisir moins de %%s caractères."
 
+#: templates/indicators/indicator_form_common_js.html:977
 #: templates/indicators/indicator_form_common_js.html:979
-#: templates/indicators/indicator_form_common_js.html:981
 msgid "Please enter a number greater than or equal to zero."
 msgstr "Veuillez entrer un nombre supérieur ou égal à zéro."
 
-#: templates/indicators/indicator_form_common_js.html:1007
+#: templates/indicators/indicator_form_common_js.html:1005
 msgid "The Life of Program (LoP) target cannot be zero."
 msgstr "La valeur de la cible LoP ne peut être zéro."
 
-#: templates/indicators/indicator_form_common_js.html:1010
+#: templates/indicators/indicator_form_common_js.html:1008
 msgid "Please enter a target."
 msgstr "Veuillez entrer une cible."
 
 #. Translators: On a form, displayed when the user clicks submit without
 #. filling out a required field
-#: templates/indicators/indicator_form_common_js.html:1029
+#: templates/indicators/indicator_form_common_js.html:1027
 msgid "Please complete this field"
 msgstr "Veuillez compléter ce champ"
 
-#: templates/indicators/indicator_form_common_js.html:1158
+#: templates/indicators/indicator_form_common_js.html:1156
 msgid ""
 "The Life of Program (LoP) target cannot be zero.  Please update targets."
 msgstr ""
 "La valeur de la cible LoP ne peut être zéro. Veuillez mettre à jour les "
 "cibles."
 
-#: templates/indicators/indicator_form_common_js.html:1169
+#: templates/indicators/indicator_form_common_js.html:1167
 msgid "Please complete all event names and targets."
 msgstr "Veuillez remplir tous les noms d'événements et de cibles."
 
-#: templates/indicators/indicator_form_common_js.html:1172
+#: templates/indicators/indicator_form_common_js.html:1170
 msgid "Please complete targets."
 msgstr "Veuillez compléter les cibles."
 
 #. Translators: This single word is part of this longer sentence: :Please
 #. complete all required fields in the Sector tab."
-#: templates/indicators/indicator_form_common_js.html:1207
+#: templates/indicators/indicator_form_common_js.html:1205
 #: templates/indicators/indicator_form_modal.html:77
 msgid "Summary"
 msgstr "Résumé"
@@ -2641,7 +2640,7 @@ msgstr "Résumé"
 #. Translators: One of several choices for specifying what type of Indicator
 #. is being created.  An Indicator is a performance measure e.g. "We will
 #. distrubute 1000 food packs over the next two months"
-#: templates/indicators/indicator_form_common_js.html:1211
+#: templates/indicators/indicator_form_common_js.html:1209
 #: templates/indicators/indicator_form_modal.html:81
 #: tola/db_translations.py:134
 msgid "Performance"
@@ -2649,36 +2648,32 @@ msgstr "Performance"
 
 #. Translators: This single word is part of this longer sentence: :Please
 #. complete all required fields in the Data tab."
-#: templates/indicators/indicator_form_common_js.html:1213
-#| msgid "Data key"
+#: templates/indicators/indicator_form_common_js.html:1211
 msgid "Data"
 msgstr "öTranslated Data"
 
 #. Translators: This single word is part of this longer sentence: :Please
 #. complete all required fields in the Analysis tab."
-#: templates/indicators/indicator_form_common_js.html:1215
-#| msgid "Method of Analysis"
+#: templates/indicators/indicator_form_common_js.html:1213
 msgid "Analysis"
 msgstr "ŹTranslated Analysis"
 
 #. Translators: This single word is part of this longer sentence: :Please
 #. complete all required fields in the Required tab."
-#: templates/indicators/indicator_form_common_js.html:1218
+#: templates/indicators/indicator_form_common_js.html:1216
 msgid "Required"
 msgstr "Translated Required"
 
 #. Translators: This single word is part of this longer sentence: :Please
 #. complete all required fields in the Optional tab."
-#: templates/indicators/indicator_form_common_js.html:1220
-#| msgid "Rationale"
+#: templates/indicators/indicator_form_common_js.html:1218
 msgid "Optional"
 msgstr "ÁTranslated Optional"
 
 #. Translators: a message indicating which tab a user should navigate to in
 #. order to finish filling out a form
-#: templates/indicators/indicator_form_common_js.html:1342
+#: templates/indicators/indicator_form_common_js.html:1340
 #, python-format
-#| msgid "Please complete all required fields in the Targets tab."
 msgid "Please complete all required fields in the %%(tabName)s tab."
 msgstr ""
 "éTranslated Please complete all required fields in the %%(tabName)s tab."
@@ -2716,7 +2711,6 @@ msgstr "Sauvegarder et continuer à ajouter"
 #. how many elements the user has selected.
 #: templates/indicators/indicator_form_modal.html:497
 #: templates/indicators/indicator_form_modal_complete.html:296
-#| msgid "Date collected"
 msgid "selected"
 msgstr "Translated selected"
 
@@ -2738,7 +2732,6 @@ msgstr "ÁTranslated Optional fields"
 #. Translators: button label to complete a partially filled-in form and be
 #. redirected to the next partially filled-in form
 #: templates/indicators/indicator_form_modal_complete.html:216
-#| msgid "Delete this indicator"
 msgid "Save and complete next indicator"
 msgstr "öTranslated Save and complete next indicator"
 
@@ -4288,7 +4281,6 @@ msgstr "Jeunesse"
 #. is being created.  An Indicator is a performance measure e.g. "We will
 #. distrubute 1000 food packs over the next two months"
 #: tola/db_translations.py:124
-#| msgid "Customsort"
 msgid "Custom"
 msgstr "ŹTranslated Custom"
 
@@ -5327,6 +5319,10 @@ msgstr "Rechercher"
 #: workflow/widgets.py:133
 msgid "City, Country:"
 msgstr "Ville, Pays :"
+
+#~ msgid "This indicator is missing required details and cannot be saved."
+#~ msgstr ""
+#~ "Cet indicateur nécessite davantage de détails et ne peut être enregistré."
 
 #~ msgid "Please complete all required fields in the Summary tab."
 #~ msgstr "Veuillez remplir tous les champs obligatoires dans l’onglet Résumé."

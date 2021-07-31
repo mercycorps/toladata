@@ -31,7 +31,7 @@
     const DELETE_TARGET_NO_RATIONALE = "{% trans 'Are you sure you want to remove this target?' %}"
     const DELETE_TARGET_MESSAGE = "{% trans 'For future reference, please provide a reason for deleting this target.' %}"
 
-    const CLOSE_BEFORE_SAVING_WARNING_PREAMBLE = "{% trans 'This indicator is missing required details and cannot be saved.' %}";
+    const CLOSE_BEFORE_SAVING_WARNING_PREAMBLE = "{% trans 'Changes to this indicator will not be saved.' %}";
     const CLOSE_BEFORE_SAVING_WARNING_MESSAGE = "{% trans 'Are you sure you want to continue?' %}";
 
     // Indicator fields tracked in the admin changelog, which require prompting for a rationale if modified
@@ -121,7 +121,7 @@
     $("#indicator_modal_div").on('hide.bs.modal', function(e) {
 
         // Prompt user if closing a create form without saving
-        if (isCreateForm() && ! allowModalToClose) {
+        if (! allowModalToClose) {
             // prevent the modal from actually closing
             e.preventDefault();
 
@@ -132,7 +132,6 @@
                 message_text: CLOSE_BEFORE_SAVING_WARNING_MESSAGE,
                 context: document.getElementById('indicator_modal_content'),
                 rationale_required: false,
-                notice_type: 'error',
                 on_submit: () => {
                     allowModalToClose = true;
                     closeIndicatorFormModal();
