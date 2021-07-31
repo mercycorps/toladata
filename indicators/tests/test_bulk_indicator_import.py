@@ -324,9 +324,9 @@ class TestBulkImportTemplateCreation(test.TestCase):
 
     def test_non_english_template_create(self):
         self.client.force_login(self.tola_user.user)
-        self.tola_user.language = 'fr'
+        self.tola_user.language = 'es'
         self.tola_user.save()
-        activate('fr')
+        activate('es')
         for sector in ['Agriculture', 'Conflict Management', 'Agribusiness']:
             w_factories.SectorFactory(sector=sector)
         w_factories.grant_program_access(self.tola_user, self.program, self.country, role='high')
@@ -334,9 +334,9 @@ class TestBulkImportTemplateCreation(test.TestCase):
         wb = openpyxl.load_workbook(self.get_template())
         ws = wb.worksheets[0]
         first_level_header = ws.cell(DATA_START_ROW, FIRST_USED_COLUMN).value
-        self.assertEqual(first_level_header[:3], 'But')
+        self.assertEqual(first_level_header[:3], 'Obj')
         hidden_ws = wb.get_sheet_by_name(HIDDEN_SHEET_NAME)
-        self.assertEqual(hidden_ws['A3'].value, 'éTranslated Agribusiness')
+        self.assertEqual(hidden_ws['A3'].value, 'Agricultura')
 
         activate('en')
         self.tola_user.language = 'en'
