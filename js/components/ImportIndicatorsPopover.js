@@ -314,16 +314,17 @@ export const ImportIndicatorsPopover = ({ page, program_id, tierLevelsUsed, stor
         api.confirmUpload(program_id)
             .then(response => {
                 let handleResponse = () => {
-                    if (response.status === 404) {
-                        viewChange(CONFIRM, ERROR, validIndicatorsCount)
+                    if (response.status === 200) {
+                        viewChange(CONFIRM, SUCCESS, validIndicatorsCount);
+                        setTimeout(() => {
+                            window.location.reload();
+                        }, 2000)
+                    } else if (response.status === 406){
+                        let errorsMessagesToDisplay = reduceErrorCodes(response.data.error_codes);
+                        setDisplayError({view: CONFIRM, error: errorsMessagesToDisplay});
+                        viewChange(CONFIRM, CONFIRM, validIndicatorsCount);
                     } else {
-                        if (response.status === 200) {
-                            viewChange(CONFIRM, SUCCESS, validIndicatorsCount);
-                        } else {
-                            let errorsMessagesToDisplay = reduceErrorCodes(response.data.error_codes);
-                            setDisplayError({view: CONFIRM, error: errorsMessagesToDisplay});
-                            viewChange(CONFIRM, CONFIRM, validIndicatorsCount);
-                        }
+                        viewChange(CONFIRM, ERROR, validIndicatorsCount)
                     }
                 }
                 if (loading) {
