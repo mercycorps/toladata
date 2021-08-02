@@ -294,7 +294,9 @@ export const ImportIndicatorsPopover = ({ page, program_id, tierLevelsUsed, stor
     let handleFeedback = () => {
         api.downloadFeedback(program_id)
         .then(response => {
-            if (response.status !== 200) {
+            if (response.status === 200) {
+                handleClose();
+            } else {
                 viewChange(FEEDBACK, ERROR, validIndicatorsCount, invalidIndicatorsCount);
             }
         })
@@ -551,9 +553,7 @@ export const ImportIndicatorsPopover = ({ page, program_id, tierLevelsUsed, stor
                                         </div>
                                         :
                                         <React.Fragment>
-                                            <React.Fragment>
-                                                {views === CONFIRM ? <div><i className="fas fa-check-circle"/></div> : null}
-                                            </React.Fragment>
+                                            {views === CONFIRM ? <div><i className="fas fa-check-circle"/></div> : null}
                                             <div>
                                                 {
                                                     // # Translators: The count of indicators that have passed validation and are ready to be imported to complete the process. This cannot be undone after completing.
