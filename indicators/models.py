@@ -1171,9 +1171,7 @@ class Indicator(SafeDeleteModel):
     )
 
     # Method used to create this indicator
-    indicator_created_by = models.IntegerField(
-    choices=CREATED_BY_TYPES, default=FORM, help_text="The method this indicator was created by.", verbose_name=_("Created by type")
-    )
+    was_bulk_imported = models.BooleanField(default=False, verbose_name=_("Bulk Imported"))
 
     # the Log Frame level (i.e. Goal, Output, Outcome, etc.)
     level = models.ForeignKey(

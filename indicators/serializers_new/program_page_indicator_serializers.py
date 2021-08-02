@@ -58,6 +58,7 @@ class NumberWithTierIndicatorMixin:
 class ProgramPageIndicatorMixin:
     """Indicator serializer component to add all Program Page information to a given indicator set"""
     was_just_created = serializers.BooleanField(source="just_created")
+    was_bulk_imported = serializers.BooleanField()
     is_key_performance_indicator = serializers.BooleanField()
     is_reporting = serializers.BooleanField(source="reporting")
     over_under = serializers.IntegerField()
@@ -83,6 +84,7 @@ class ProgramPageIndicatorMixin:
         purpose = "ProgramPage"
         fields = [
             'was_just_created',
+            'was_bulk_imported',
             'is_key_performance_indicator',
             'is_reporting',
             'over_under',
