@@ -1066,6 +1066,13 @@ class Indicator(SafeDeleteModel):
         (EVENT, _('Event'))
     )
 
+    FORM = 1
+    IMPORT = 2
+    CREATED_BY_TYPES = (
+        (FORM, _('Form')),
+        (IMPORT, _('Import')),
+    )
+
     REGULAR_TARGET_FREQUENCIES = (
         ANNUAL,
         SEMI_ANNUAL,
@@ -1161,6 +1168,11 @@ class Indicator(SafeDeleteModel):
         IndicatorType, blank=True, verbose_name=_("Indicator type"),
         # Translators: this is help text for a field on an indicator setup form
         help_text=_("Classifying indicators by type allows us to filter and analyze related sets of indicators.")
+    )
+
+    # Method used to create this indicator
+    indicator_created_by = models.IntegerField(
+    choices=CREATED_BY_TYPES, default=FORM, help_text="The method this indicator was created by.", verbose_name=_("Created by type")
     )
 
     # the Log Frame level (i.e. Goal, Output, Outcome, etc.)
