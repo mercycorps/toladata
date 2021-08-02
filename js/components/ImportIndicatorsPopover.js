@@ -539,21 +539,25 @@ export const ImportIndicatorsPopover = ({ page, program_id, tierLevelsUsed, stor
                             <div className="import-confirm">
                                 <div className="import-confirm-text">
                                     {displayError.view === CONFIRM ?
-                                        <div>
-                                            {
-                                            // displayError.error.indexOf(5) === -1 && // TODO: Display error 5 is the error message for the mulitple uploaders scenario. Will update when working on that scenario
-                                                displayError.error.map(message_id => {
-                                                    return (
-                                                        <div key={message_id} className="import-confirm-text-error">
-                                                            { errorMessages[message_id] }
-                                                        </div>
-                                                    )
-                                                })
-                                            }
-                                        </div>
+                                        <React.Fragment>
+                                            {/* Need this following conditional to remove the fa-check-circle icon when displaying a fatal error in the same CONFIRM view*/}
+                                            {displayError.view !== CONFIRM ? <div><i className="fas fa-check-circle"/></div> : null}
+                                            <div>
+                                                {
+                                                // displayError.error.indexOf(5) === -1 && // TODO: Display error 5 is the error message for the mulitple uploaders scenario. Will update when working on that scenario
+                                                    displayError.error.map(message_id => {
+                                                        return (
+                                                            <div key={message_id} className="import-confirm-text-error">
+                                                                { errorMessages[message_id] }
+                                                            </div>
+                                                        )
+                                                    })
+                                                }
+                                            </div>
+                                        </React.Fragment>
                                         :
                                         <React.Fragment>
-                                            {views === CONFIRM ? <div><i className="fas fa-check-circle"/></div> : null}
+                                            {displayError.view !== CONFIRM ? <div><i className="fas fa-check-circle"/></div> : null}
                                             <div>
                                                 {
                                                     // # Translators: The count of indicators that have passed validation and are ready to be imported to complete the process. This cannot be undone after completing.
