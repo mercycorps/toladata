@@ -24,6 +24,7 @@ class IndicatorBaseSerializerMixin:
             'level_pk',
             'old_level_name',
             'means_of_verification',
+            'was_bulk_imported'
         ]
 
     # class methods to instantiate serializer and minimize queries:
@@ -31,7 +32,7 @@ class IndicatorBaseSerializerMixin:
     @classmethod
     def _get_query_fields(cls):
         """fields required for this serializer to return data without querying database again"""
-        return ['program_id', 'pk', 'name', 'level_id', 'old_level', 'means_of_verification']
+        return ['program_id', 'pk', 'name', 'level_id', 'old_level', 'means_of_verification', 'was_bulk_imported']
 
     @classmethod
     def get_queryset(cls, **kwargs):
@@ -188,7 +189,6 @@ class IndicatorMeasurementMixin:
             'is_cumulative',
             'direction_of_change',
             'baseline',
-            'was_bulk_imported'  # Not really for measurement.  Put here to avoid triggering another query.
         ]
 
     @classmethod
@@ -196,7 +196,7 @@ class IndicatorMeasurementMixin:
         """additional fields required for this serializer to return data without querying database again"""
         return super()._get_query_fields() + [
             'target_frequency', 'unit_of_measure', 'unit_of_measure_type', 'is_cumulative',
-            'direction_of_change', 'baseline', 'baseline_na', 'was_bulk_imported'
+            'direction_of_change', 'baseline', 'baseline_na',
         ]
 
     # serializer method fields:
