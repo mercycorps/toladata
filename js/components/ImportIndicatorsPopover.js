@@ -58,6 +58,11 @@ export class ImportIndicatorsButton extends React.Component {
         // Handling Incactive Time Outs
         // Clear stored views and tier level rows counts states if time runs out
         $(this.myRef.current).on('hide.bs.popover', () => {
+            // Refresh the page after a successful import and popover is closed
+            if (this.state.storedView.view === 3) {
+                window.location.reload();
+            }
+            // Reset stored values if popover is not re-opened within 60 seconds
             this.setState({
                 inactiveTimer: setTimeout(() => {
                     this.setState({
@@ -77,7 +82,7 @@ export class ImportIndicatorsButton extends React.Component {
     // Method to store the current popover view and valid/invalid row counts if available
     setStoredView = (currentView) => {
         this.setState({
-            storedView: currentView.view !== 3 ? currentView : {view: 0}
+            storedView: currentView
         })
     }
     // Method to store the selected desired number of tier level rows
@@ -318,9 +323,6 @@ export const ImportIndicatorsPopover = ({ page, program_id, tierLevelsUsed, stor
                 let handleResponse = () => {
                     if (response.status === 200) {
                         viewChange(CONFIRM, SUCCESS, validIndicatorsCount);
-                        setTimeout(() => {
-                            window.location.reload();
-                        }, 2000)
                     } else if (response.status === 406){
                         let errorsMessagesToDisplay = reduceErrorCodes(response.data.error_codes);
                         setDisplayError({view: CONFIRM, error: errorsMessagesToDisplay});
