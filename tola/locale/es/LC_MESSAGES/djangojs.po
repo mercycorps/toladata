@@ -1,8 +1,9 @@
+#
 msgid ""
 msgstr ""
 "Project-Id-Version: \n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2021-08-03 16:16-0700\n"
+"POT-Creation-Date: 2021-08-03 16:19-0700\n"
 "PO-Revision-Date: 2021-08-03 15:50-0700\n"
 "Last-Translator: \n"
 "Language-Team: \n"
@@ -137,11 +138,11 @@ msgstr[1] "Los indicadores %s están listos para su importación."
 
 #. Translators: The count of indicators that have passed validation and are ready to be imported to complete the process. This cannot be undone after completing.
 #: js/components/ImportIndicatorsPopover.js:514
-#, fuzzy, python-format
+#, python-format
 msgid "%s indicator has missing or invalid information."
 msgid_plural "%s indicators have missing or invalid information."
-msgstr[0] "%s indicador no tiene evidencias"
-msgstr[1] "%s indicadores no tienen evidencias"
+msgstr[0] "öTranslated %s indicator has missing or invalid information."
+msgstr[1] "ŹTranslated %s indicators have missing or invalid information."
 
 #. Translators: Download an excel template with errors that need fixing highlighted
 #: js/components/ImportIndicatorsPopover.js:528
@@ -274,6 +275,7 @@ msgstr ""
 #: js/components/ImportIndicatorsPopover.js:896
 msgid "We don’t recognize this file type. Please upload an Excel file."
 msgstr ""
+"Translated We don’t recognize this file type. Please upload an Excel file."
 
 #. Translators: button label to show the details of all items in a list */}
 #. Translators: button label to show the details of all rows in a list */}
@@ -1016,15 +1018,13 @@ msgstr "Indicadores de grupo:"
 
 #. Translators: Full message will be Imported indicators: Complete setup now.  This is a notification to the user that they have imported some indicators but that the indicator setup is not yet complete.   */
 #: js/pages/program_page/components/indicator_list.js:268
-#, fuzzy
 msgid "Imported indicator: "
-msgstr "Indicadores de importación"
+msgstr "ÁTranslated Imported indicator: "
 
 #. Translators: Message that gets attached to each indicator element after a successful import of indicator data. It is not possible to import all data that an indicator requires to be complete. The "Complete setup now" is a link that allows users to access a form window where they can complete the required fields.   */}
 #: js/pages/program_page/components/indicator_list.js:270
-#, fuzzy
 msgid "Complete setup now"
-msgstr "Completar la importación"
+msgstr "éTranslated Complete setup now"
 
 #. Translators: Warning provided when a result is not longer associated with any target.  It is a warning about state rather than an action.  The full sentence might read "There are results not assigned to targets" rather than "Results have been unassigned from targets. */
 #: js/pages/program_page/components/indicator_list.js:276
@@ -7872,7 +7872,6 @@ msgstr "Indicador clave de rendimiento (KPI)"
 #~ msgid "Your username is:"
 #~ msgstr "Su nombre de usuario es:"
 
-#~| msgid "Tola Sites"
 #~ msgid "The Tola team"
 #~ msgstr "El equipo Tola"
 
@@ -7897,7 +7896,6 @@ msgstr "Indicador clave de rendimiento (KPI)"
 #~ msgid "Success, Bookmark Deleted!"
 #~ msgstr "¡El Marcador se ha eliminado exitosamente!"
 
-#~| msgid "Approval submitted by"
 #~ msgid "Submitted by"
 #~ msgstr "Presentado por"
 

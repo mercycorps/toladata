@@ -1,8 +1,9 @@
+#
 msgid ""
 msgstr ""
 "Project-Id-Version: \n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2021-08-03 16:16-0700\n"
+"POT-Creation-Date: 2021-08-03 16:19-0700\n"
 "PO-Revision-Date: 2021-08-03 16:13-0700\n"
 "Last-Translator: \n"
 "Language-Team: \n"
@@ -854,7 +855,7 @@ msgstr ""
 
 #: indicators/models.py:1165
 msgid "Bulk Imported"
-msgstr ""
+msgstr "ÁTranslated Bulk Imported"
 
 #. Translators: this is help text for a drop down select menu on an indicator setup form
 #: indicators/models.py:1172
@@ -1558,21 +1559,18 @@ msgstr "Aide"
 #. Translators:  Column header for the column that specifies whether the data in the row is expressed
 #. as a number or a percent
 #: indicators/views/bulk_indicator_import_views.py:52
-#, fuzzy
 msgid "Number (#) or percentage (%)"
-msgstr "Pourcentage (%)"
+msgstr "éTranslated Number (#) or percentage (%)"
 
 #. Translators:  Error message provided when the name a user has provided for the indicator has already been used by another indicator.
 #: indicators/views/bulk_indicator_import_views.py:103
-#, fuzzy
 msgid "Indicators must have unique names."
-msgstr "Les catégories doivent avoir des noms uniques."
+msgstr "Translated Indicators must have unique names."
 
 #. Translators:  Error message provided when the name a user tries to upload multiple Indicators with the same name as one another.
 #: indicators/views/bulk_indicator_import_views.py:105
-#, fuzzy
 msgid "Please give this indicator a unique name."
-msgstr "Les catégories doivent avoir des noms uniques."
+msgstr "öTranslated Please give this indicator a unique name."
 
 #. Translators: An alternate form of N/A or Not applicable
 #: indicators/views/bulk_indicator_import_views.py:113
@@ -1702,9 +1700,8 @@ msgstr "Indicateur {indicator_number} mis à jour."
 
 #. Translators: a fragment of a larger string that will be a title for a form.  The full string might be e.g. Complete setup of Outcome indicator 1.1a.
 #: indicators/views/views_indicators.py:394
-#, fuzzy
 msgid "Complete setup of "
-msgstr "Finaliser l’importation"
+msgstr "ŹTranslated Complete setup of "
 
 #: indicators/views/views_indicators.py:417
 msgid "Indicator setup"
@@ -2419,9 +2416,8 @@ msgid "For future reference, please provide a reason for deleting this target."
 msgstr "À titre de référence, veuillez justifier la suppression de la cible."
 
 #: templates/indicators/indicator_form_common_js.html:34
-#, fuzzy
 msgid "Changes to this indicator will not be saved."
-msgstr "Les modifications apportés à %s ne seront pas enregistrées"
+msgstr "ÁTranslated Changes to this indicator will not be saved."
 
 #: templates/indicators/indicator_form_common_js.html:35
 msgid "Are you sure you want to continue?"
@@ -2561,15 +2557,13 @@ msgstr "Performance"
 
 #. Translators: This single word is part of this longer sentence: :Please complete all required fields in the Data tab."
 #: templates/indicators/indicator_form_common_js.html:1211
-#, fuzzy
 msgid "Data"
-msgstr "Clé de données"
+msgstr "éTranslated Data"
 
 #. Translators: This single word is part of this longer sentence: :Please complete all required fields in the Analysis tab."
 #: templates/indicators/indicator_form_common_js.html:1213
-#, fuzzy
 msgid "Analysis"
-msgstr "Méthode d’analyse"
+msgstr "Translated Analysis"
 
 #. Translators: This single word is part of this longer sentence: :Please complete all required fields in the Required tab."
 #: templates/indicators/indicator_form_common_js.html:1216
@@ -2578,15 +2572,15 @@ msgstr "Translated Required"
 
 #. Translators: This single word is part of this longer sentence: :Please complete all required fields in the Optional tab."
 #: templates/indicators/indicator_form_common_js.html:1218
-#, fuzzy
 msgid "Optional"
-msgstr "Justification"
+msgstr "öTranslated Optional"
 
 #. Translators: a message indicating which tab a user should navigate to in order to finish filling out a form
 #: templates/indicators/indicator_form_common_js.html:1340
-#, fuzzy, python-format
+#, python-format
 msgid "Please complete all required fields in the %%(tabName)s tab."
-msgstr "Veuillez compléter tous les champs requis dans l’onglet Cibles."
+msgstr ""
+"ŹTranslated Please complete all required fields in the %%(tabName)s tab."
 
 #: templates/indicators/indicator_form_modal.html:158
 #: templates/indicators/indicator_form_modal_complete.html:198
@@ -2638,9 +2632,8 @@ msgstr "ÁTranslated Optional fields"
 
 #. Translators: button label to complete a partially filled-in form and be redirected to the next partially filled-in form
 #: templates/indicators/indicator_form_modal_complete.html:216
-#, fuzzy
 msgid "Save and complete next indicator"
-msgstr "Enregistrer %s et ajouter des indicateurs"
+msgstr "ÁTranslated Save and complete next indicator"
 
 #: templates/indicators/indicator_list_modals.html:10
 msgid "Are you sure?"
