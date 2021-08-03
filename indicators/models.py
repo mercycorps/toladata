@@ -1037,10 +1037,8 @@ class IndicatorMetricsMixin:
 
     def annotate_indicator_type_count(self):
         """
-        Indicator type count will be used in conjunction with the create date to identify
-        indicators that were imported and still have incomplete data.  Indicator type is a required field
-        after Jan 2021, so any indicator created after that date with no associated indicator types
-        represents and incomplete import.
+        Indicator type count will be used in conjunction with the was_bulk_imported field to identify
+        indicators that were imported and still have incomplete data.
         """
         from indicators.queries import utils as query_utils
         return self.annotate(indicator_type_count=query_utils.indicator_type_count_annotation())

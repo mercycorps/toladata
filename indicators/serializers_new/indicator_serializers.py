@@ -187,7 +187,8 @@ class IndicatorMeasurementMixin:
             'is_percent',
             'is_cumulative',
             'direction_of_change',
-            'baseline'
+            'baseline',
+            'was_bulk_imported'  # Not really for measurement.  Put here to avoid triggering another query.
         ]
 
     @classmethod
@@ -195,7 +196,7 @@ class IndicatorMeasurementMixin:
         """additional fields required for this serializer to return data without querying database again"""
         return super()._get_query_fields() + [
             'target_frequency', 'unit_of_measure', 'unit_of_measure_type', 'is_cumulative',
-            'direction_of_change', 'baseline', 'baseline_na'
+            'direction_of_change', 'baseline', 'baseline_na', 'was_bulk_imported'
         ]
 
     # serializer method fields:
