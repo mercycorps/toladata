@@ -213,7 +213,7 @@ class IPTTExcelIndicatorFiltersMixin:
         queryset = Indicator.rf_aware_objects.select_related('program').prefetch_related(None).only(
             'pk', 'name', 'deleted', 'program_id', 'means_of_verification', 'level_id', 'level_order',
             'number', 'target_frequency', 'unit_of_measure', 'unit_of_measure_type', 'baseline', 'baseline_na',
-            'direction_of_change', 'is_cumulative', 'old_level',
+            'direction_of_change', 'is_cumulative', 'old_level', 'was_bulk_imported',
             'create_date', 'sector_id'
         ).filter(**cls._get_queryset_filters(context)).order_by().distinct()
         return cls(queryset, context=context, many=True)

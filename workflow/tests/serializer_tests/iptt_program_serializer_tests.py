@@ -33,7 +33,7 @@ SPANISH = 3
 
 LOP = {
     ENGLISH: 'Life of Program',
-    FRENCH: 'La vie du programme',
+    FRENCH: 'Vie du programme',
     SPANISH: 'Vida del programa'
 }
 
