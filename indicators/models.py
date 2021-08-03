@@ -1064,13 +1064,6 @@ class Indicator(SafeDeleteModel):
         (EVENT, _('Event'))
     )
 
-    FORM = 1
-    IMPORT = 2
-    CREATED_BY_TYPES = (
-        (FORM, _('Form')),
-        (IMPORT, _('Import')),
-    )
-
     REGULAR_TARGET_FREQUENCIES = (
         ANNUAL,
         SEMI_ANNUAL,
