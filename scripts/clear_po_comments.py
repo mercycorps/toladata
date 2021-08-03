@@ -10,21 +10,19 @@ import argparse
 
 def main():
     parser = argparse.ArgumentParser(description='Deletes comments from .po files.')
-    parser.add_argument('langdir', help='Relative directory path to a language in the locale directory')
+    parser.add_argument('filepath', help='Relative path to po file')
     parser.add_argument('--force', action='store_true', help='Without this flag, running the script will be a dry run.')
     args = parser.parse_args()
-
-    for file_name in ['django', 'djangojs']:
-
-        with open(os.path.join(args.langdir, 'LC_MESSAGES', file_name + '.po'), 'r') as fh:
-            lines = fh.readlines()
-        with open(os.path.join(args.langdir, 'LC_MESSAGES', file_name + '_clean.po'), 'w') as fh:
-            for line in lines:
-                match = re.search(r'^\#\n', line)
-                if line[:2] != '# ' and match is None:
-                    fh.write(line)
-                else:
-                    print('Omitting', line)
+    print('args', args)
+    with open(args.filepath, 'r') as fh:
+        lines = fh.readlines()
+    with open(args.filepath.replace('.po', '_Xcomments.po'), 'w') as fh:
+        for line in lines:
+            match = re.search(r'^\#\n', line)
+            if line[:2] != '# ' and match is None:
+                fh.write(line)
+            else:
+                print('Omitting', line)
 
 
 
