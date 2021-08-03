@@ -865,6 +865,10 @@ let errorCodes = {
         type: "Autonumbered program has indicator numbers that are out of their expected sequence",
         message: 1,
     },
+    113 : {
+        type: "Unrecognized file type",
+        message: 6,
+    },
     120 : {
         type: "Someone else uploaded a template in the last 24 hours",
         message: 5,
@@ -887,4 +891,7 @@ let errorMessages = {
     5 :
         // # Translators: Message to user that someone else has uploaded a template in the last 24 hours and may be in the process of importing indicators to this program. You can view the program change log to see more details.
         gettext("Someone else uploaded a template in the last 24 hours, and may be in the process of adding indicators to this program."),
+    6 :
+        // # Translators: Message to user that the type of file that was uploaded was not an Excel file and they should upload a Excel file.
+        gettext("We don’t recognize this file type. Please upload an Excel file."),
 }
