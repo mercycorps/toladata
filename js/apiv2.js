@@ -139,16 +139,21 @@ const api = {
             })
     },
     async uploadTemplate(program_id, file) {
-        let formData = new FormData()
-        formData.append('file', file)
-        return await this.apiSession.post(`/indicators/api/bulk_import_indicators/${program_id}/`,
-                formData, {headers: {'Content-Type': 'multipart/form-data'}}
-            )
-            .then(response => response)
-            .catch(error => {
-                this.logFailure(error);
-                return error.response;
-            })
+        if (file && (file.type.startsWith('application/vnd.ms-excel') || file.type.startsWith('application/vnd.openxmlformats-officedocument.spreadsheetml.sheet'))) {
+            let formData = new FormData()
+            formData.append('file', file)
+            return await this.apiSession.post(`/indicators/api/bulk_import_indicators/${program_id}/`,
+                    formData, {headers: {'Content-Type': 'multipart/form-data'}}
+                )
+                .then(response => response)
+                .catch(error => {
+                    console.log(error);
+                    this.logFailure(error);
+                    return error.response;
+                })
+        } else {
+            return {status: 406, data: {error_codes: [113]}}
+        }
     },
     async downloadFeedback(program_id) {
         return await this.templatesInstance.get(`/indicators/api/get_feedback_bulk_import_template/${program_id}/`)

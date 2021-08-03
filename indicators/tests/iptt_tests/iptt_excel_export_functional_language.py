@@ -115,7 +115,7 @@ REPORT_TITLE = {
 
 LOP_PERIOD = {
     ENGLISH: "Life of Program*",
-    FRENCH: "La vie du programme*",
+    FRENCH: "Vie du programme*",
     SPANISH: "Vida del programa*",
 }
 

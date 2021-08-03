@@ -58,6 +58,11 @@ export class ImportIndicatorsButton extends React.Component {
         // Handling Incactive Time Outs
         // Clear stored views and tier level rows counts states if time runs out
         $(this.myRef.current).on('hide.bs.popover', () => {
+            // Refresh the page after a successful import and popover is closed
+            if (this.state.storedView.view === 3) {
+                window.location.reload();
+            }
+            // Reset stored values if popover is not re-opened within 60 seconds
             this.setState({
                 inactiveTimer: setTimeout(() => {
                     this.setState({
@@ -77,7 +82,7 @@ export class ImportIndicatorsButton extends React.Component {
     // Method to store the current popover view and valid/invalid row counts if available
     setStoredView = (currentView) => {
         this.setState({
-            storedView: currentView.view !== 3 ? currentView : {view: 0}
+            storedView: currentView
         })
     }
     // Method to store the selected desired number of tier level rows
@@ -247,8 +252,9 @@ export const ImportIndicatorsPopover = ({ page, program_id, tierLevelsUsed, stor
                         if (response.status === 404) {
                             viewChange(INITIAL, ERROR);
                         } else {
-                            let validCount = response.data.valid || 0;
-                            let invalidCount = response.data.invalid || 0;
+                            // Used ternary operator to prevent failue for a invalid upload file 500 error.
+                            let validCount = response.data ? response.data.valid : 0;
+                            let invalidCount = response.data ? response.data.invalid : 0;
                             setvalidIndicatorsCount(validCount);
                             setInvalidIndicatorsCount(invalidCount);
                             // Successful upload with no errors and all rows valid
@@ -293,7 +299,9 @@ export const ImportIndicatorsPopover = ({ page, program_id, tierLevelsUsed, stor
     let handleFeedback = () => {
         api.downloadFeedback(program_id)
         .then(response => {
-            if (response.status !== 200) {
+            if (response.status === 200) {
+                handleClose();
+            } else {
                 viewChange(FEEDBACK, ERROR, validIndicatorsCount, invalidIndicatorsCount);
             }
         })
@@ -313,16 +321,14 @@ export const ImportIndicatorsPopover = ({ page, program_id, tierLevelsUsed, stor
         api.confirmUpload(program_id)
             .then(response => {
                 let handleResponse = () => {
-                    if (response.status === 404) {
-                        viewChange(CONFIRM, ERROR, validIndicatorsCount)
+                    if (response.status === 200) {
+                        viewChange(CONFIRM, SUCCESS, validIndicatorsCount);
+                    } else if (response.status === 406){
+                        let errorsMessagesToDisplay = reduceErrorCodes(response.data.error_codes);
+                        setDisplayError({view: CONFIRM, error: errorsMessagesToDisplay});
+                        viewChange(CONFIRM, CONFIRM, validIndicatorsCount);
                     } else {
-                        if (response.status === 200) {
-                            viewChange(CONFIRM, SUCCESS, validIndicatorsCount);
-                        } else {
-                            let errorsMessagesToDisplay = reduceErrorCodes(response.data.error_codes);
-                            setDisplayError({view: CONFIRM, error: errorsMessagesToDisplay});
-                            viewChange(CONFIRM, CONFIRM, validIndicatorsCount);
-                        }
+                        viewChange(CONFIRM, ERROR, validIndicatorsCount)
                     }
                 }
                 if (loading) {
@@ -535,23 +541,25 @@ export const ImportIndicatorsPopover = ({ page, program_id, tierLevelsUsed, stor
                             <div className="import-confirm">
                                 <div className="import-confirm-text">
                                     {displayError.view === CONFIRM ?
-                                        <div>
-                                            {
-                                            // displayError.error.indexOf(5) === -1 && // TODO: Display error 5 is the error message for the mulitple uploaders scenario. Will update when working on that scenario
-                                                displayError.error.map(message_id => {
-                                                    return (
-                                                        <div key={message_id} className="import-confirm-text-error">
-                                                            { errorMessages[message_id] }
-                                                        </div>
-                                                    )
-                                                })
-                                            }
-                                        </div>
+                                        <React.Fragment>
+                                            {/* Need this following conditional to remove the fa-check-circle icon when displaying a fatal error in the same CONFIRM view*/}
+                                            {displayError.view !== CONFIRM ? <div><i className="fas fa-check-circle"/></div> : null}
+                                            <div>
+                                                {
+                                                // displayError.error.indexOf(5) === -1 && // TODO: Display error 5 is the error message for the mulitple uploaders scenario. Will update when working on that scenario
+                                                    displayError.error.map(message_id => {
+                                                        return (
+                                                            <div key={message_id} className="import-confirm-text-error">
+                                                                { errorMessages[message_id] }
+                                                            </div>
+                                                        )
+                                                    })
+                                                }
+                                            </div>
+                                        </React.Fragment>
                                         :
                                         <React.Fragment>
-                                            <React.Fragment>
-                                                {views === CONFIRM ? <div><i className="fas fa-check-circle"/></div> : null}
-                                            </React.Fragment>
+                                            {displayError.view !== CONFIRM ? <div><i className="fas fa-check-circle"/></div> : null}
                                             <div>
                                                 {
                                                     // # Translators: The count of indicators that have passed validation and are ready to be imported to complete the process. This cannot be undone after completing.
@@ -857,6 +865,10 @@ let errorCodes = {
         type: "Autonumbered program has indicator numbers that are out of their expected sequence",
         message: 1,
     },
+    113 : {
+        type: "Unrecognized file type",
+        message: 6,
+    },
     120 : {
         type: "Someone else uploaded a template in the last 24 hours",
         message: 5,
@@ -879,4 +891,7 @@ let errorMessages = {
     5 :
         // # Translators: Message to user that someone else has uploaded a template in the last 24 hours and may be in the process of importing indicators to this program. You can view the program change log to see more details.
         gettext("Someone else uploaded a template in the last 24 hours, and may be in the process of adding indicators to this program."),
+    6 :
+        // # Translators: Message to user that the type of file that was uploaded was not an Excel file and they should upload a Excel file.
+        gettext("We don’t recognize this file type. Please upload an Excel file."),
 }

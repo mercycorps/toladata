@@ -209,7 +209,7 @@ export const IndexView = observer(
         return <div id="audit-log-index-view">
             <header className="page-title">
                 <h1 className="page-title h2">
-                    // # Translators: This a title of page where all of the changes to a program are listed
+                    {/* # Translators: This a title of page where all of the changes to a program are listed */}
                     <a href={`/program/${store.program_id}/`}>{store.program_name}</a>: <span className="font-weight-normal text-muted text-nowrap">{gettext("Program change log")}&nbsp;<small><i className="fa fa-history" /></small></span>
                 </h1>
             </header>

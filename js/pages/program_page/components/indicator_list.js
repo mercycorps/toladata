@@ -263,12 +263,12 @@ export class IndicatorListTable extends React.Component {
                             }
 
                             {indicator.incompleteImport &&
-                            <span className="ml-4 btn-add"><i className="fas fa-check-circle mr-1"/>
+                            <div className="color-green-600 ml-4"><i className="fas fa-check-circle mr-1"/>
                                     {/* # Translators: Full message will be Imported indicators: Complete setup now.  This is a notification to the user that they have imported some indicators but that the indicator setup is not yet complete.   */
                                     gettext("Imported indicator: ")}
                                     {/* # Translators: Message that gets attached to each indicator element after a successful import of indicator data. It is not possible to import all data that an indicator requires to be complete. The "Complete setup now" is a link that allows users to access a form window where they can complete the required fields.   */}
                                     <u><a href="" onClick={(e) => this.onIndicatorCompleteClick(e, indicator.pk)} className={"btn-add"}>{gettext("Complete setup now")}</a></u>
-                                </span>
+                                </div>
                             }
                             {displayUnassignedWarning &&
                                 <span className="text-danger ml-4"><i className="fas fa-bullseye"/> {
