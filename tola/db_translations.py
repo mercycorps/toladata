@@ -1,33 +1,33 @@
 from django.utils.translation import ugettext_lazy as _
 
 # Translators: One of several options for specifying how often data is collected or reported on over the life of a program
-string0 = _("By distribution")
+string0 = _("Endline")
 # Translators: One of several options for specifying how often data is collected or reported on over the life of a program
-string1 = _("Endline")
+string1 = _("By distribution")
 # Translators: One of several options for specifying how often data is collected or reported on over the life of a program
-string2 = _("Post shock")
+string2 = _("Annual")
 # Translators: One of several options for specifying how often data is collected or reported on over the life of a program
-string3 = _("Quarterly")
+string3 = _("Final evaluation")
 # Translators: One of several options for specifying how often data is collected or reported on over the life of a program
-string4 = _("By training")
+string4 = _("Weekly")
 # Translators: One of several options for specifying how often data is collected or reported on over the life of a program
-string5 = _("Final evaluation")
+string5 = _("Semi-annual")
 # Translators: One of several options for specifying how often data is collected or reported on over the life of a program
 string6 = _("By batch")
 # Translators: One of several options for specifying how often data is collected or reported on over the life of a program
-string7 = _("Weekly")
+string7 = _("Post shock")
 # Translators: One of several options for specifying how often data is collected or reported on over the life of a program
-string8 = _("Semi-annual")
+string8 = _("Monthly")
 # Translators: One of several options for specifying how often data is collected or reported on over the life of a program
-string9 = _("Baseline")
+string9 = _("Quarterly")
 # Translators: One of several options for specifying how often data is collected or reported on over the life of a program
-string10 = _("Annual")
+string10 = _("By training")
 # Translators: One of several options for specifying how often data is collected or reported on over the life of a program
-string11 = _("Monthly")
+string11 = _("By event")
 # Translators: One of several options for specifying how often data is collected or reported on over the life of a program
 string12 = _("Midline")
 # Translators: One of several options for specifying how often data is collected or reported on over the life of a program
-string13 = _("By event")
+string13 = _("Baseline")
 # Translators: One of several choices for what sector (i.e. development domain) a program is most closely associated with
 string14 = _("Agribusiness")
 # Translators: One of several choices for what sector (i.e. development domain) a program is most closely associated with
@@ -79,7 +79,7 @@ string37 = _("Governance and Conflict Resolution")
 # Translators: One of several choices for what sector (i.e. development domain) a program is most closely associated with
 string38 = _("Health")
 # Translators: One of several choices for what sector (i.e. development domain) a program is most closely associated with
-string39 = _("Humanitaria Intervention Readiness")
+string39 = _("Humanitarian Intervention Readiness")
 # Translators: One of several choices for what sector (i.e. development domain) a program is most closely associated with
 string40 = _("Hygiene Promotion")
 # Translators: One of several choices for what sector (i.e. development domain) a program is most closely associated with
@@ -121,20 +121,20 @@ string58 = _("Workforce Development")
 # Translators: One of several choices for what sector (i.e. development domain) a program is most closely associated with
 string59 = _("Youth")
 # Translators: One of several choices for specifying what type of Indicator is being created.  An Indicator is a performance measure e.g. "We will distrubute 1000 food packs over the next two months"
-string60 = _("Custom")
+string60 = _("Context / Trigger")
 # Translators: One of several choices for specifying what type of Indicator is being created.  An Indicator is a performance measure e.g. "We will distrubute 1000 food packs over the next two months"
-string61 = _("Donor")
+string61 = _("Custom")
 # Translators: One of several choices for specifying what type of Indicator is being created.  An Indicator is a performance measure e.g. "We will distrubute 1000 food packs over the next two months"
-string62 = _("DIG - Standard")
+string62 = _("DIG - Alpha")
 # Translators: One of several choices for specifying what type of Indicator is being created.  An Indicator is a performance measure e.g. "We will distrubute 1000 food packs over the next two months"
-string63 = _("DIG - Alpha")
+string63 = _("DIG - Standard")
 # Translators: One of several choices for specifying what type of Indicator is being created.  An Indicator is a performance measure e.g. "We will distrubute 1000 food packs over the next two months"
 string64 = _("DIG - Testing")
 # Translators: One of several choices for specifying what type of Indicator is being created.  An Indicator is a performance measure e.g. "We will distrubute 1000 food packs over the next two months"
-string65 = _("Performance")
+string65 = _("Donor")
 # Translators: One of several choices for specifying what type of Indicator is being created.  An Indicator is a performance measure e.g. "We will distrubute 1000 food packs over the next two months"
-string66 = _("Process / Management")
+string66 = _("Key Performance Indicator (KPI)")
 # Translators: One of several choices for specifying what type of Indicator is being created.  An Indicator is a performance measure e.g. "We will distrubute 1000 food packs over the next two months"
-string67 = _("Context / Trigger")
+string67 = _("Performance")
 # Translators: One of several choices for specifying what type of Indicator is being created.  An Indicator is a performance measure e.g. "We will distrubute 1000 food packs over the next two months"
-string68 = _("Key Performance Indicator (KPI)")
+string68 = _("Process / Management")

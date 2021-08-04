@@ -16,7 +16,8 @@ class Command(BaseCommand):
         print("\nRunning this command could demolish some of your translations if you are not careful.  All values "
               "in your database for Sector, Indicator type, Reporting frequency, and Data collection frequency "
               "models should be valid.  If they are not, running this management command could lead to the "
-              "elimination of menu item translations.\n\n")
+              "elimination of menu item translations.  For instance, if you updated the db, ran this script,"
+              "refreshed from production, and ran this script again, your original changes will be lost.\n\n")
         response = input('Please type "YES" to proceed: ')
         if response == 'YES':
             create_translated_db_items(
@@ -39,11 +40,11 @@ def create_translated_db_items(js_filename, py_filename, root_path=settings.DJAN
 
     frequency_strings_to_translate = set()
     for model, field in frequency_models:
-        frequency_strings_to_translate |= set(model.objects.values_list(field, flat=True))
+        frequency_strings_to_translate |= set(model.objects.order_by(field).values_list(field, flat=True))
     all_strings_to_translate = [(string, frequency_translator_comment) for string in frequency_strings_to_translate]
 
     for model, field, translator_comment in other_models:
-        strings_to_translate = list(model.objects.values_list(field, flat=True))
+        strings_to_translate = list(model.objects.order_by(field).values_list(field, flat=True))
         all_strings_to_translate += [(string, translator_comment) for string in strings_to_translate]
 
     string_num = 0

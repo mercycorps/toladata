@@ -45,10 +45,11 @@ COLUMNS = [
     {'name': 'Definition', 'required': False, 'field_name': 'definition'},
     {'name': 'Rationale or justification for indicator', 'required': False, 'field_name': 'justification'},
     {'name': 'Unit of measure', 'required': True, 'field_name': 'unit_of_measure'},
-    # Note:  this lone string is being translated here because it's not the standard name for the field.
+    # Note:  this lone string is being marked for translation here because it's not the standard name for the field.
+    # It's noop because we shouldn't be actually translating in a class variable.
     # Translators:  Column header for the column that specifies whether the data in the row is expressed
     # as a number or a percent
-    {'name': 'Number (#) or percentage (%)', 'required': True, 'field_name': 'unit_of_measure_type',
+    {'name': gettext_noop('Number (#) or percentage (%)'), 'required': True, 'field_name': 'unit_of_measure_type',
      'validation': VALIDATION_KEY_UOM_TYPE, 'default': 'Number (#)'},
     {'name': 'Rationale for target', 'required': False, 'field_name': 'rationale_for_target'},
     {'name': 'Baseline', 'required': True, 'field_name': 'baseline',
@@ -95,7 +96,14 @@ ERROR_UNEXPECTED_INDICATOR_NUMBER = 112  # The indicator number is not sequentia
 ERROR_MALFORMED_INDICATOR = 201  # A catch-all for problems with an indicator that don't fall into other non-fatal categories
 
 ERROR_INTERVENING_BLANK_ROW = 203  # Indicators are separated by an empty row would cause the indicator numbers to be wrong for auto-numbered programs
+ERROR_NAME_IN_DB = 204  # Indicators are separated by an empty row would cause the indicator numbers to be wrong for auto-numbered programs
+ERROR_DUPLICATED_NAME = 205  # Indicators are separated by an empty row would cause the indicator numbers to be wrong for auto-numbered programs
 
+# Translators:  Error message provided when the name a user has provided for the indicator has already been used by another indicator.
+ERROR_MSG_NAME_IN_DB = gettext_noop("Indicators must have unique names.")
+# Translators:  Error message provided when the name a user tries to upload multiple Indicators with the same name as one another.
+ERROR_MSG_NAME_DUPLICATED = gettext_noop("Please give this indicator a unique name.")
+FIRST_CELL_ERROR_VALUE = r"⚠️"
 
 EMPTY_CHOICE = '---------'
 
@@ -259,7 +267,6 @@ class BulkImportIndicatorsView(LoginRequiredMixin, UserPassesTestMixin, AccessMi
         return validation_map, sector_options
 
     def apply_validations_to_row(self, ws, row_index, validation_map):
-        # TODO: limit character count of cells with max_length
         for col_num, col in enumerate(COLUMNS):
             active_cell = ws.cell(row_index, FIRST_USED_COLUMN + col_num)
             if 'validation' in col.keys():
@@ -286,6 +293,12 @@ class BulkImportIndicatorsView(LoginRequiredMixin, UserPassesTestMixin, AccessMi
         comment.width = 300
         comment.height = 15 + len(help_text) * .5
         return comment
+
+    def format_error_cell(self, error_cell, first_cell, fill, error_strings):
+        error_cell.fill = fill
+        error_cell.comment = self.get_comment_obj('\n'.join(error_strings))
+        first_cell.value = FIRST_CELL_ERROR_VALUE
+        first_cell.fill = fill
 
     def get(self, request, *args, **kwargs):
         program_id = kwargs['program_id']
@@ -491,12 +504,29 @@ class BulkImportIndicatorsView(LoginRequiredMixin, UserPassesTestMixin, AccessMi
         VALIDATION_MSG_REQUIRED = gettext('This information is required.')
         # Translators: Message provided to user when they have not chosen from a pre-selected list of options.
         VALIDATION_MSG_CHOICE = gettext('The {field_name} you selected is unavailable. Please select a different {field_name}.')
-        FIRST_CELL_ERROR_VALUE = r"⚠️"
         PATTERN_FILL_ERROR = PatternFill('solid', fgColor=RED_ERROR)
 
         program_id = kwargs['program_id']
         program = Program.objects.get(pk=program_id)
         ProgramAuditLog.log_template_uploaded(request.user, program)
+
+        # We can delete the temp files associated with this user and program now that there is another upload in progress.
+        temp_template_files = BulkIndicatorImportFile.objects.filter(
+            user=request.user.tola_user,
+            program_id=kwargs['program_id'],
+            file_type=BulkIndicatorImportFile.INDICATOR_TEMPLATE_TYPE)
+        for file_entry in temp_template_files:
+            if os.path.isfile(file_entry.file_path):
+                os.remove(file_entry.file_path)
+        temp_template_files.delete()
+        temp_data_files = BulkIndicatorImportFile.objects.filter(
+            user=request.user.tola_user,
+            program_id=kwargs['program_id'],
+            file_type=BulkIndicatorImportFile.INDICATOR_DATA_TYPE)
+        for file_entry in temp_data_files:
+            if os.path.isfile(file_entry.file_path):
+                os.remove(file_entry.file_path)
+        temp_data_files.delete()
 
         wb = openpyxl.load_workbook(request.FILES['file'])
         ws = wb.worksheets[0]
@@ -550,6 +580,16 @@ class BulkImportIndicatorsView(LoginRequiredMixin, UserPassesTestMixin, AccessMi
             level_finder = re.compile(pattern)
             ws_level_count = 0
             skipped_row_indexes = []
+
+            # Once all rows have been processed, we'll need to check for duplicated indicator names.
+            # Seeding the name_index tracker here to make sure we account for all names in the database.  This
+            # will prevent users from importing the same workbook twice.  If we didn't pull directly from the
+            # database to start with, we would miss capturing existing indicators that weren't marked as such
+            # because the user is re-uploading the same workbook (which only has the original indicators marked
+            # as pre-existing.  We can get away with using a dummy index because the formatting of these rows won't
+            # change if the name is duplicated.
+            db_indicator_names = list(Indicator.objects.filter(program=program).values_list('name', flat=True))
+            name_indexes = {name: [{'index': [0], 'is_new_name': False}] for name in db_indicator_names}
 
             # Need to wipe all validations and re-add them just in case user has modified or deleted them.
             # openpyxl doesn't make it easy to identify which validation is which, so it's easier just to wipe and
@@ -639,7 +679,6 @@ class BulkImportIndicatorsView(LoginRequiredMixin, UserPassesTestMixin, AccessMi
                 # Use the serializer to check for character length and any other field issues that it handles
                 deserialized_data = BulkImportIndicatorSerializer(data=indicator_data)
                 deserialized_data.is_valid()
-                indicator_data['baseline'] = deserialized_data.data['baseline']
 
                 # Capture validation problems from the deserialization process
                 for field_name, error_list in deserialized_data.errors.items():
@@ -680,7 +719,8 @@ class BulkImportIndicatorsView(LoginRequiredMixin, UserPassesTestMixin, AccessMi
                                 non_fatal_errors.append(ERROR_MALFORMED_INDICATOR)
                             elif active_cell.value.lower() in null_equivalents_with_translations:
                                 validation_errors.pop('baseline')
-                                active_cell.value = None
+                                indicator_data['baseline'] = None
+                                indicator_data['baseline_na'] = True
                             else:  # cell value is not None or one of the acceptable null equivalent values
                                 validation_errors['baseline'] = [gettext(self.VALIDATION_MSG_BASELINE_NA)]
                                 non_fatal_errors.append(ERROR_MALFORMED_INDICATOR)
@@ -718,14 +758,14 @@ class BulkImportIndicatorsView(LoginRequiredMixin, UserPassesTestMixin, AccessMi
 
                 # Convert text in sector dropdown to sector pk
                 col_number = self.first_used_column + COLUMNS_FIELD_INDEXES['sector']
-                cell_value = ws.cell(current_row_index, col_number).value
-                if cell_value is None or cell_value in [EMPTY_CHOICE, '', 'None']:
+                sector_value = ws.cell(current_row_index, col_number).value
+                if sector_value is None or sector_value in [EMPTY_CHOICE, '', 'None']:
                     pass
                 else:
                     try:
                         sector_translation_map = {str(gettext(sector.sector)): sector.sector
                             for sector in Sector.objects.all()}
-                        sector = Sector.objects.get(sector=sector_translation_map[cell_value])
+                        sector = Sector.objects.get(sector=sector_translation_map[sector_value])
                         indicator_data['sector_id'] = sector.pk
                         indicator_data.pop('sector')
                     except (Sector.DoesNotExist, KeyError):
@@ -736,9 +776,16 @@ class BulkImportIndicatorsView(LoginRequiredMixin, UserPassesTestMixin, AccessMi
                             validation_errors['sector'] = [error_string]
                         non_fatal_errors.append(ERROR_MALFORMED_INDICATOR)
 
-                # Final data manipulation and updates
+                # Final data manipulation, updates, and checks
+                if indicator_data['name'] in name_indexes.keys():
+                    name_indexes[indicator_data['name']].append({'index': current_row_index, 'is_new_name': True})
+                else:
+                    name_indexes[indicator_data['name']] = [{'index': current_row_index, 'is_new_name': True}]
                 indicator_data['level_id'] = current_level.pk
                 indicator_data['program_id'] = program.id
+                if indicator_data['unit_of_measure_type'] == Indicator.PERCENTAGE:
+                    indicator_data['baseline'] *= 100
+
                 # The number order has already been checked if program is autonumbered, so we don't need the numbers
                 # any more
                 if program.auto_number_indicators:
@@ -764,6 +811,33 @@ class BulkImportIndicatorsView(LoginRequiredMixin, UserPassesTestMixin, AccessMi
                 pruned_fatal = sorted(list(set(fatal_errors)))
                 return JsonResponse({'error_codes': pruned_fatal}, status=406)
 
+            # We can now process the potential name duplicates since we've worked through all the rows.
+            # name_data will contain a list of dicts representing the row index and type (existing
+            # indicator or new) for each name.  If a new indicator duplicates a name for an existing indicator,
+            # it gets a different message than if it is just duplicating another new indicator.
+            for name, name_data in name_indexes.items():
+                column_index = self.first_used_column + COLUMNS_FIELD_INDEXES['name']
+                if all(nd['is_new_name'] for nd in name_data) and len(name_data) > 1:
+                    non_fatal_errors.append(ERROR_DUPLICATED_NAME)
+                    for row in name_data:
+                        if row['is_new_name']:
+                            name_cell = ws.cell(row['index'], column_index)
+                            first_cell = ws.cell(row['index'], 1)
+                            self.format_error_cell(
+                                name_cell, first_cell, PATTERN_FILL_ERROR, [ERROR_MSG_NAME_DUPLICATED])
+                            indicator_status['invalid'] += 1
+                            indicator_status['valid'] -= 1
+                elif any(nd['is_new_name'] for nd in name_data) and len(name_data) > 1:
+                    non_fatal_errors.append(ERROR_NAME_IN_DB)
+                    for row in name_data:
+                        if row['is_new_name']:
+                            name_cell = ws.cell(row['index'], column_index)
+                            first_cell = ws.cell(row['index'], 1)
+                            self.format_error_cell(
+                                name_cell, first_cell, PATTERN_FILL_ERROR, [ERROR_MSG_NAME_IN_DB])
+                            indicator_status['invalid'] += 1
+                            indicator_status['valid'] -= 1
+
         if indicator_status['invalid'] > 0 or len(non_fatal_errors) > 0:
             # Clean out any existing temp Excel file reference, since we're about to replace it
             try:
@@ -772,7 +846,8 @@ class BulkImportIndicatorsView(LoginRequiredMixin, UserPassesTestMixin, AccessMi
                     program=program,
                     file_type=BulkIndicatorImportFile.INDICATOR_TEMPLATE_TYPE)
                 for old_file_obj in old_file_objs:
-                    os.remove(old_file_obj.file_path)
+                    if os.path.isfile(old_file_obj.file_path):
+                        os.remove(old_file_obj.file_path)
                     old_file_obj.delete()
             except BulkIndicatorImportFile.DoesNotExist:
                 pass
@@ -796,12 +871,14 @@ class BulkImportIndicatorsView(LoginRequiredMixin, UserPassesTestMixin, AccessMi
             return JsonResponse({'error_codes': [ERROR_NO_NEW_INDICATORS]}, status=406)
 
         try:
-            old_file_obj = BulkIndicatorImportFile.objects.get(
+            old_file_objs = BulkIndicatorImportFile.objects.filter(
                 user=request.user.tola_user,
                 program=program,
                 file_type=BulkIndicatorImportFile.INDICATOR_DATA_TYPE)
-            os.remove(old_file_obj.file_path)
-            old_file_obj.delete()
+            for old_file_obj in old_file_objs:
+                if os.path.isfile(old_file_obj.file_path):
+                    os.remove(old_file_obj.file_path)
+            old_file_objs.delete()
         except (BulkIndicatorImportFile.DoesNotExist, FileNotFoundError):
             pass
 
@@ -837,7 +914,7 @@ def save_bulk_import_data(request, *args, **kwargs):
             for indicator_data in stored_indicators:
                 indicator = Indicator.objects.create(**indicator_data)
                 ProgramAuditLog.log_indicator_imported(request.user, indicator, 'N/A')
-    except django.core.exceptions.ValidationError:
+    except (django.core.exceptions.ValidationError, django.db.utils.IntegrityError):
         return JsonResponse({'error_codes': [ERROR_SAVE_VALIDATION]}, status=400)
     return JsonResponse({'message': 'success'}, status=200)
 

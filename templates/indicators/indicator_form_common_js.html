@@ -31,7 +31,7 @@
     const DELETE_TARGET_NO_RATIONALE = "{% trans 'Are you sure you want to remove this target?' %}"
     const DELETE_TARGET_MESSAGE = "{% trans 'For future reference, please provide a reason for deleting this target.' %}"
 
-    const CLOSE_BEFORE_SAVING_WARNING_PREAMBLE = "{% trans 'This indicator is missing required details and cannot be saved.' %}";
+    const CLOSE_BEFORE_SAVING_WARNING_PREAMBLE = "{% trans 'Changes to this indicator will not be saved.' %}";
     const CLOSE_BEFORE_SAVING_WARNING_MESSAGE = "{% trans 'Are you sure you want to continue?' %}";
 
     // Indicator fields tracked in the admin changelog, which require prompting for a rationale if modified
@@ -101,6 +101,17 @@
         $("#indicator_modal_content").load(url);
     }
 
+    // reload the completion form (modal remains open)
+    function reloadCompleteIndicatorForm() {
+
+        next_indicator_pk = parseInt($('#nextIndicatorPk').text())
+
+        let url = `/indicators/indicator_complete/${next_indicator_pk}/`;
+
+        $("#modalmessages").empty();
+        $("#indicator_modal_content").load(url);
+        $("#indicator_modal_div").animate({ scrollTop: 0 }, 'slow');
+    }
 
     $("#indicator_modal_div").on('shown.bs.modal', function() {
 
@@ -110,18 +121,17 @@
     $("#indicator_modal_div").on('hide.bs.modal', function(e) {
 
         // Prompt user if closing a create form without saving
-        if (isCreateForm() && ! allowModalToClose) {
+        if (! allowModalToClose) {
             // prevent the modal from actually closing
             e.preventDefault();
 
             // prompt the user if they actually want to close
             window.create_unified_changeset_notice({
-                header: gettext('Warning'),
+                header: '{% trans 'Warning' %}',
                 preamble: CLOSE_BEFORE_SAVING_WARNING_PREAMBLE,
                 message_text: CLOSE_BEFORE_SAVING_WARNING_MESSAGE,
                 context: document.getElementById('indicator_modal_content'),
                 rationale_required: false,
-                notice_type: 'error',
                 on_submit: () => {
                     allowModalToClose = true;
                     closeIndicatorFormModal();
@@ -192,7 +202,7 @@
     function confirmAndRedirect(delete_indicator) {
         if(! indicatorHasResults()) {
             window.create_unified_changeset_notice({
-                header: gettext('Warning'),
+                header: '{% trans 'Warning' %}',
                 preamble: [DESTRUCTIVE_PREAMBLE, DELETE_INDICATOR_PREAMBLE].join(' '),
                 message_text: DELETE_INDICATOR_NO_RATIONALE,
                 context: document.getElementById('indicator_modal_content'),
@@ -202,7 +212,7 @@
             });
         } else {
             window.create_unified_changeset_notice({
-                header: gettext('Warning'),
+                header: '{% trans 'Warning' %}',
                 preamble: DESTRUCTIVE_PREAMBLE,
                 show_icon: true,
                 rationale_required: true,
@@ -223,6 +233,7 @@
         var delete_indicator = (rationale) => {
             $.post(url, {rationale: rationale})
              .done(function(data, textStatus, jqXHR){
+                 allowModalToClose = true;
                  if (data.status == "success") {
                     showSuccessNotifiction(data.msg);
 
@@ -261,7 +272,7 @@
         if (url === '#') {
             //This is a new event target (not yet saved), just confirm and remove:
             window.create_unified_changeset_notice({
-                header: gettext('Warning'),
+                header: '{% trans 'Warning' %}',
                 show_icon: true,
                 preamble: DESTRUCTIVE_PREAMBLE,
                 message_text: DELETE_TARGET_NO_RATIONALE,
@@ -278,7 +289,7 @@
         } else if (!indicatorHasResults()) {
             //This indicator has no results, just confirm and then post removal:
             window.create_unified_changeset_notice({
-                header: gettext('Warning'),
+                header: '{% trans 'Warning' %}',
                 show_icon: true,
                 preamble: DESTRUCTIVE_PREAMBLE,
                 message_text: DELETE_TARGET_NO_RATIONALE,
@@ -304,7 +315,7 @@
         } else {
             //This is an existing, saved event target on an indicator that has results (rationale required):
             window.create_unified_changeset_notice({
-                header: gettext('Warning'),
+                header: '{% trans 'Warning' %}',
                 show_icon: true,
                 preamble: numResultsLinkedToEventTarget === 0 ? DESTRUCTIVE_PREAMBLE : window.target_with_results_text(numResultsLinkedToEventTarget),
                 message_text: DELETE_TARGET_MESSAGE,
@@ -350,7 +361,7 @@
             };
         if(indicatorHasResults()) {
             window.create_unified_changeset_notice({
-                header: gettext('Warning'),
+                header: '{% trans 'Warning' %}',
                 preamble: DESTRUCTIVE_PREAMBLE,
                 message_text: DELETE_ALL_TARGETS_MESSAGE,
                 context: document.getElementById('indicator_modal_content'),
@@ -362,7 +373,7 @@
             scrollToIndicatorFormBottom();
         } else {
             window.create_unified_changeset_notice({
-                header: gettext('Warning'),
+                header: '{% trans 'Warning' %}',
                 show_icon: true,
                 preamble: DESTRUCTIVE_PREAMBLE,
                 message_text: DELETE_TARGETS_NO_RATIONALE,
@@ -380,7 +391,8 @@
 
     // Button click handler for UPDATE form
     $("#indicator_modal_content").on("click", "#id_update_indicator_btn", function(e){
-        if (validateForm() === false) {
+        const isCompletionForm = e.target.form.hasAttribute('data-type') && e.target.form.dataset.type === 'completion';
+        if (validateForm({isCompletionForm: isCompletionForm}) === false) {
             showValidations("#modalmessages");
             return;
         }
@@ -467,6 +479,18 @@
         submitFormCreate().done(() => {
             reloadCreateIndicatorForm();
         });
+    });
+
+    $("#indicator_modal_content").on("click", "#id_save_and_complete_another_indicator_btn", function(e){
+        if (validateForm({isCompletionForm: true}) === false) {
+            showValidations("#modalmessages");
+            return;
+        }
+
+        submitFormComplete().done(() => {
+            reloadCompleteIndicatorForm();
+        })
+
     });
 
     // Cancel button
@@ -624,6 +648,9 @@
             $('#id_title').text(data.title_str);
             $('#id_subtitle').text(data.subtitle_str);
 
+            // remember such that the user can close the modal without a prompt
+            allowModalToClose = true;
+
             // success msg
             showSuccessNotifiction(data.save_success_msg);
 
@@ -632,6 +659,26 @@
 
             // this is our new base state
             //recordTrackedFieldsSnapshot();
+        });
+    }
+
+    function submitFormComplete(validation_type='') {
+        return submitForm().done((data) => {
+            $('#indicator_modal_div').trigger('updated.tola.indicator.save', saveEventParams());
+
+            // remember such that the user can close the modal without a prompt
+            allowModalToClose = true;
+
+            // Clear any validation error messages
+            let alertElement = "#modalmessages";
+            $(alertElement).html('');
+
+            // update the header
+            $('#id_title').text(data.title_str);
+            $('#id_subtitle').text(data.subtitle_str);
+
+            // success msg
+            showSuccessNotifiction(data.save_success_msg);
         });
     }
 
@@ -853,7 +900,7 @@
 
     /*
      * If the manually entered in LoP target of an indicator currently saved in the DB
-     * does not matched the computed LoP target, based on periodic target values
+     * does not match the computed LoP target, based on periodic target values
      * then show a warning to the user
      */
     function warnIfLopTargetDoesNotMatchComputed() {
@@ -1153,127 +1200,155 @@
         validation_msgs = {};
     }
 
-    function validateForm() {
+    function validateForm({isCompletionForm = false} = {}) {
         // Clear any existing messages
         validation_msgs = {};
 
-        var validationsTargetTab = true;
-        var validationsSummaryTab = true;
-        var validationsPerformanceTab = true;
-        var validationsDataTab = true;
-        var validationsAnalysisTab = true;
-        var noMessageValidations = true;
+        var passingValidation = {
+            {# Translators: This single word is part of this longer sentence: :Please complete all required fields in the Sector tab." #}
+            summary: {tabName: "{% trans 'Summary' %}", isValid: true, forCompletionForm: false},
+            {# Translators: This single word is part of this longer sentence: :Please complete all required fields in the Target tab." #}
+            target: {tabName: "{% trans 'Target' %}", isValid: true, forCompletionForm: false},
+            {# Translators: This single word is part of this longer sentence: :Please complete all required fields in the Performance tab." #}
+            performance: {tabName: "{% trans 'Performance' %}", isValid: true, forCompletionForm: false},
+            {# Translators: This single word is part of this longer sentence: :Please complete all required fields in the Data tab." #}
+            data: {tabName: "{% trans 'Data' %}", isValid: true, forCompletionForm: false},
+            {# Translators: This single word is part of this longer sentence: :Please complete all required fields in the Analysis tab." #}
+            analysis: {tabName: "{% trans 'Analysis' %}", isValid: true, forCompletionForm: false},
+            noMessage: {tabName: null, isValid: true, forCompletionForm: false},
+            {# Translators: This single word is part of this longer sentence: :Please complete all required fields in the Required tab." #}
+            required: {tabName: "{% trans 'Required' %}", isValid: true, forCompletionForm: true},
+            {# Translators: This single word is part of this longer sentence: :Please complete all required fields in the Optional tab." #}
+            optional: {tabName: "{% trans 'Optional' %}", isValid: true, forCompletionForm: true},
+        };
 
+        /* These are the fields that the Creation, Update, and Complete modals all share */
+        /* validate field that appears on the performance and required tabs */
+        if (validateIndicatorType() === false) {
+            passingValidation['performance']['isValid'] = false;
+            passingValidation['required']['isValid'] = false;
+        }
+
+        /* validate fields from the targets and required tabs */
         if  (validate_baseline() === false ) {
-            validationsTargetTab = false
+            passingValidation['target']['isValid'] = false;
+            passingValidation['required']['isValid'] = false;
         }
         if (validateForEmptyField("id_unit_of_measure") === false ) {
-            validationsTargetTab = false;
+            passingValidation['target']['isValid'] = false;
+            passingValidation['required']['isValid'] = false;
         }
         if (validateForEmptyField("id_target_frequency") === false) {
-            validationsTargetTab = false;
+            passingValidation['target']['isValid'] = false;
+            passingValidation['required']['isValid'] = false;
             $("#div_id_target_frequency").addClass("marginbottom-225");
             $("#div_id_target_frequency").removeClass("mb-3")
         }
         var periodicTargetsValidated = true;
         if (validatePeriodicTargets() === false) {
             periodicTargetsValidated = false;
-            validationsTargetTab = false;
+            passingValidation['target']['isValid'] = false;
+            passingValidation['required']['isValid'] = false;
         }
         if (periodicTargetsValidated && validateComputedLopTarget() === false) {
-            validationsTargetTab = false;
+            passingValidation['target']['isValid'] = false
+            passingValidation['required']['isValid'] = false;
         }
         if (validate_loptarget() === false ) {
-            validationsTargetTab = false;
+            passingValidation['target']['isValid'] = false;
+            passingValidation['required']['isValid'] = false;
         }
-        // validate periodic targets
         if ($("#id_div_periodic_tables_placeholder input").hasClass('is-invalid')) {
-            validationsTargetTab = false;
+            passingValidation['target']['isValid'] = false;
+            passingValidation['required']['isValid'] = false;
         }
 
-        if (getTextAreaLengthValidator('rationale_for_target', 500)() === false) {
-            validationsTargetTab = false;
-        }
+        if (!isCompletionForm) {
 
-        if (validationsTargetTab === false) {
-            {# Translators: a message indicating which tab a user should navigate to in order to finish filling out a form #}
-            validation_msgs['target'] = '{% trans "Please complete all required fields in the Targets tab."|escapejs %}';
-        }
+            /* validate fields from the target tab */
+            if (getTextAreaLengthValidator('rationale_for_target', 500)() === false) {
+                passingValidation['target']['isValid'] = false;
+            }
 
-        /* validate fields from the summary tab */
-        if (validateName() === false) {
-            noMessageValidations = false;
-        }
+            /* validate fields from the summary tab */
+            if (validateName() === false) {
+                passingValidation['noMessage']['isValid'] = false;
+            }
 
-        /* validate fields from the Performance tab */
-        if (validateForEmptyField("id_level") === false) {
-            validationsSummaryTab = false;
-        }
+            if (validateForEmptyField("id_level") === false) {
+                passingValidation['summary']['isValid'] = false;
+            }
 
-        if (validationsSummaryTab === false) {
-            {# Translators: a message indicating which tab a user should navigate to in order to finish filling out a form #}
-            validation_msgs['summary'] = '{% trans "Please complete all required fields in the Summary tab."|escapejs %}';
-        }
+            /* validate fields from the performance tab */
+            if (getTextAreaLengthValidator('definition', 4000)() === false) {
+                passingValidation['performance']['isValid'] = false;
+            }
+            if (getTextAreaLengthValidator('justification', 500)() === false) {
+                passingValidation['performance']['isValid'] = false;
+            }
 
-        if (validateIndicatorType() === false) {
-            validationsPerformanceTab = false;
-        }
-        if (getTextAreaLengthValidator('definition', 4000)() === false) {
-            validationsPerformanceTab = false;
-        }
-        if (getTextAreaLengthValidator('justification', 500)() === false) {
-            validationsPerformanceTab = false;
-        }
+            // TODO: is this right? performance tab?
+            if (validateForEmptyField("id_old_level") === false) {
+                passingValidation['performance']['isValid'] = false;
+            }
 
 
-        if (validateForEmptyField("id_old_level") === false) {
-            validationsPerformanceTab = false;
+            /* validate fields from the data tab */
+            if (getTextAreaLengthValidator('means_of_verification', 1500)() === false) {
+                passingValidation['data']['isValid'] = false;
+            }
+            if (getTextAreaLengthValidator('data_collection_method', 2500)() === false) {
+                passingValidation['data']['isValid'] = false;
+            }
+            if (getTextAreaLengthValidator('data_points', 500)() === false) {
+                passingValidation['data']['isValid'] = false;
+            }
+            if (getTextAreaLengthValidator('responsible_person', 500)() === false) {
+                passingValidation['data']['isValid'] = false;
+            }
+
+            /* validate fields from the analysis tab */
+            if (getTextAreaLengthValidator('method_of_analysis', 4000)() === false) {
+                passingValidation['analysis']['isValid'] = false;
+            }
+            if (getTextAreaLengthValidator('information_use', 500)() === false) {
+                passingValidation['analysis']['isValid'] = false;
+            }
+            if (getTextAreaLengthValidator('quality_assurance', 500)() === false) {
+                passingValidation['analysis']['isValid'] = false;
+            }
+            if (getTextAreaLengthValidator('data_issues', 500)() === false) {
+                passingValidation['analysis']['isValid'] = false;
+            }
+            if (getTextAreaLengthValidator('comments', 4000)() === false) {
+                passingValidation['analysis']['isValid'] = false;
+            }
         }
 
-        if (validationsPerformanceTab === false) {
-            {# Translators: a message indicating which tab a user should navigate to in order to finish filling out a form #}
-            validation_msgs['performance'] = '{% trans "Please complete all required fields in the Performance tab."|escapejs %}';
+
+        /* Different tabs will need to be checked depending on which modal form is being used. */
+        let tabsToValidate = null;
+        if (isCompletionForm) {
+            tabsToValidate = Object.keys(passingValidation).filter((key)=>passingValidation[key]['forCompletionForm'])
+        }
+        else {
+            tabsToValidate = Object.keys(passingValidation).filter((key)=>!passingValidation[key]['forCompletionForm'])
         }
 
-        if (getTextAreaLengthValidator('means_of_verification', 1500)() === false) {
-            validationsDataTab = false;
-        }
-        if (getTextAreaLengthValidator('data_collection_method', 2500)() === false) {
-            validationsDataTab = false;
-        }
-        if (getTextAreaLengthValidator('data_points', 500)() === false) {
-            validationsDataTab = false;
-        }
-        if (getTextAreaLengthValidator('responsible_person', 500)() === false) {
-            validationsDataTab = false;
-        }
-        if (validationsDataTab === false) {
-            {# Translators: a message indicating which tab a user should navigate to in order to finish filling out a form #}
-            validation_msgs['data'] = '{% trans "Please complete all required fields in the Data Acquisition tab."|escapejs %}';
-        }
+        let returnVal = true;
+        for (let key in passingValidation) {
+            if (passingValidation[key]['isValid'] === false && tabsToValidate.includes(key)) {
+                returnVal = false;
+                if (passingValidation[key]['tabName'] !== null) {
+                    {# Translators: a message indicating which tab a user should navigate to in order to finish filling out a form #}
+                    validation_msgs[key] = interpolate("{% trans "Please complete all required fields in the %(tabName)s tab." %}",
+                        {tabName: passingValidation[key]['tabName']},
+                        true);
+                }
+            }
 
-        if (getTextAreaLengthValidator('method_of_analysis', 4000)() === false) {
-            validationsAnalysisTab = false;
         }
-        if (getTextAreaLengthValidator('information_use', 500)() === false) {
-            validationsAnalysisTab = false;
-        }
-        if (getTextAreaLengthValidator('quality_assurance', 500)() === false) {
-            validationsAnalysisTab = false;
-        }
-        if (getTextAreaLengthValidator('data_issues', 500)() === false) {
-            validationsAnalysisTab = false;
-        }
-        if (getTextAreaLengthValidator('comments', 4000)() === false) {
-            validationsAnalysisTab = false;
-        }
-        if (validationsAnalysisTab === false) {
-            {# Translators: a message indicating which tab a user should navigate to in order to finish filling out a form #}
-            validation_msgs['analysis'] = '{% trans "Please complete all required fields in the Analysis and Reporting tab."|escapejs %}';
-        }
-
-        // return all tab validations
-        return validationsTargetTab && validationsSummaryTab && validationsPerformanceTab && validationsDataTab && validationsAnalysisTab && noMessageValidations;
+        return returnVal
     }
 
     $("#indicator_modal_content").on("keypress", "input[type=number]", function(e){

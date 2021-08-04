@@ -89,6 +89,7 @@ class IndicatorSerializerMinimal(serializers.ModelSerializer):
             'level',
             'level_order',
             'number',
+            'was_bulk_imported'
         ]
 
 
