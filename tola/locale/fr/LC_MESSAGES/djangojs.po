@@ -3,8 +3,8 @@ msgid ""
 msgstr ""
 "Project-Id-Version: \n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2021-07-31 10:32-0700\n"
-"PO-Revision-Date: 2021-07-30 21:17-0700\n"
+"POT-Creation-Date: 2021-08-03 16:43-0700\n"
+"PO-Revision-Date: 2021-08-03 16:43-0700\n"
 "Last-Translator: \n"
 "Language-Team: \n"
 "Language: fr\n"
@@ -15,7 +15,7 @@ msgstr ""
 "X-Generator: Poedit 3.0\n"
 
 #. Translators: This is the file name of an Excel template that will be used for batch imports
-#: js/apiv2.js:131 js/apiv2.js:159
+#: js/apiv2.js:131 js/apiv2.js:164
 msgid "Import indicators.xlsx"
 msgstr "Import indicators.xlsx"
 
@@ -70,12 +70,12 @@ msgstr "Erreur"
 
 #. Translators: a button to open the import indicators popover
 #: js/components/ImportIndicatorsPopover.js:14
-#: js/components/ImportIndicatorsPopover.js:140
+#: js/components/ImportIndicatorsPopover.js:145
 msgid "Import indicators"
 msgstr "Importer des indicateurs"
 
 #. Translators: Link to the program change log to view more details.
-#: js/components/ImportIndicatorsPopover.js:373
+#: js/components/ImportIndicatorsPopover.js:378
 msgid "View the program change log for more details."
 msgstr ""
 "Consultez le journal des modifications du programme pour en savoir plus."
@@ -85,7 +85,7 @@ msgstr ""
 #. Translators: This is the prompt on a popup that has warned users about a change they are about to make that could have broad consequences
 #. Translators: This is a confirmation prompt to confirm a user wants to archive an item
 #. Translators: This is a confirmation prompt to confirm a user wants to unarchive an item
-#: js/components/ImportIndicatorsPopover.js:381
+#: js/components/ImportIndicatorsPopover.js:386
 #: js/pages/results_framework/models.js:629
 #: js/pages/tola_management_pages/country/components/edit_disaggregations.js:661
 #: js/pages/tola_management_pages/country/models.js:478
@@ -95,43 +95,43 @@ msgid "Are you sure you want to continue?"
 msgstr "Voulez-vous vraiment continuer ?"
 
 #. Translators: Button to continue and upload the template
-#: js/components/ImportIndicatorsPopover.js:393
+#: js/components/ImportIndicatorsPopover.js:398
 msgid "Continue"
 msgstr "Continuer"
 
 #. Translators: Button to cancel the import process and close the popover
 #. Translators: Button to cancel a form submission
-#: js/components/ImportIndicatorsPopover.js:404
-#: js/components/ImportIndicatorsPopover.js:614
+#: js/components/ImportIndicatorsPopover.js:409
+#: js/components/ImportIndicatorsPopover.js:621
 #: js/components/changesetNotice.js:66
 #: js/pages/results_framework/components/level_cards.js:578
 msgid "Cancel"
 msgstr "Annuler"
 
 #. Translators: Instructions for users to download the template, open it in Excel, and then fill in indicators information.
-#: js/components/ImportIndicatorsPopover.js:423
+#: js/components/ImportIndicatorsPopover.js:428
 msgid "Download the template, open it in Excel, and enter indicators."
 msgstr ""
 "Téléchargez le modèle, ouvrez-le dans Excel et saisissez des indicateurs."
 
 #. Translators: Instructions for users to upload their filled in template and then follow the instructions to complete the import process.
-#: js/components/ImportIndicatorsPopover.js:429
+#: js/components/ImportIndicatorsPopover.js:434
 msgid "Upload the template and follow instructions to complete the process."
 msgstr ""
 "Chargez le modèle et suivez les instructions pour finaliser le processus."
 
 #. Translators: Button to download a template
-#: js/components/ImportIndicatorsPopover.js:466
+#: js/components/ImportIndicatorsPopover.js:471
 msgid "Download template"
 msgstr "Télécharger le modèle"
 
 #. Translators: Button to upload the import indicators template
-#: js/components/ImportIndicatorsPopover.js:477
+#: js/components/ImportIndicatorsPopover.js:482
 msgid "Upload template"
 msgstr "Charger le modèle"
 
 #. Translators: The count of indicators that have passed validation and are ready to be imported to complete the process. This cannot be undone after completing.
-#: js/components/ImportIndicatorsPopover.js:499
+#: js/components/ImportIndicatorsPopover.js:504
 #, python-format
 msgid "%s indicator is ready to be imported."
 msgid_plural "%s indicators are ready to be imported."
@@ -139,25 +139,25 @@ msgstr[0] "%s indicateur est prêt à être importé."
 msgstr[1] "%s indicateurs sont prêts à être importés."
 
 #. Translators: The count of indicators that have passed validation and are ready to be imported to complete the process. This cannot be undone after completing.
-#: js/components/ImportIndicatorsPopover.js:509
+#: js/components/ImportIndicatorsPopover.js:514
 #, python-format
 msgid "%s indicator has missing or invalid information."
 msgid_plural "%s indicators have missing or invalid information."
-msgstr[0] "ÁTranslated %s indicator has missing or invalid information."
-msgstr[1] "éTranslated %s indicators have missing or invalid information."
+msgstr[0] "Translated %s indicator has missing or invalid information."
+msgstr[1] "öTranslated %s indicators have missing or invalid information."
 
 #. Translators: Download an excel template with errors that need fixing highlighted
-#: js/components/ImportIndicatorsPopover.js:523
+#: js/components/ImportIndicatorsPopover.js:528
 msgid "Download a copy of your template with errors highlighted"
 msgstr "Téléchargez une copie de votre modèle et surlignez les erreurs"
 
 #. Translators: Fix the errors from the feedback file and upload the excel template again.
-#: js/components/ImportIndicatorsPopover.js:528
+#: js/components/ImportIndicatorsPopover.js:533
 msgid ", fix the errors, and upload again."
 msgstr ", corrigez les erreur et chargez à nouveau le fichier."
 
 #. Translators: The count of indicators that have passed validation and are ready to be imported to complete the process. This cannot be undone after completing.
-#: js/components/ImportIndicatorsPopover.js:559
+#: js/components/ImportIndicatorsPopover.js:566
 #, python-format
 msgid ""
 "%s indicator is ready to be imported. Are you ready to complete the import "
@@ -173,17 +173,17 @@ msgstr[1] ""
 "processus d’importation ? Cette action est irréversible."
 
 #. Translators: Button to confirm and complete the import process
-#: js/components/ImportIndicatorsPopover.js:578
+#: js/components/ImportIndicatorsPopover.js:585
 msgid "Complete import"
 msgstr "Finaliser l’importation"
 
 #. Translators: Button to confirm and complete the import process
-#: js/components/ImportIndicatorsPopover.js:591
+#: js/components/ImportIndicatorsPopover.js:598
 msgid "Upload Template"
 msgstr "Charger le modèle"
 
 #. Translators: Message with the count of indicators that were successfully imported but they require additional details before they can be submitted.
-#: js/components/ImportIndicatorsPopover.js:630
+#: js/components/ImportIndicatorsPopover.js:637
 #, python-format
 msgid ""
 "%s indicator was successfully imported, but require additional details "
@@ -201,29 +201,29 @@ msgstr[1] ""
 "envoyés."
 
 #. Translators: A link to the program page to add the addition setup information for the imported indicators.
-#: js/components/ImportIndicatorsPopover.js:640
+#: js/components/ImportIndicatorsPopover.js:647
 msgid "Visit the program page to complete setup of these indicators."
 msgstr ""
 "Consultez la page du programme pour finaliser la configuration de ces "
 "indicateurs."
 
 #. Translators: Notification for a error that happend on the web server.
-#: js/components/ImportIndicatorsPopover.js:657
+#: js/components/ImportIndicatorsPopover.js:664
 msgid "There was a server-related problem."
-msgstr "ÁTranslated There was a server-related problem."
+msgstr "Un problème lié au serveur est survenu."
 
 #. Translators: A button to try import over after a error occurred.
-#: js/components/ImportIndicatorsPopover.js:667
+#: js/components/ImportIndicatorsPopover.js:674
 msgid "Try again"
 msgstr "Réessayer"
 
 #. Translators: Click to view the Advanced Option section
-#: js/components/ImportIndicatorsPopover.js:717
+#: js/components/ImportIndicatorsPopover.js:724
 msgid "Advanced options"
 msgstr "Options avancées"
 
 #. Translators: Details explaining that by default the template will include 10 or 20 rows per result level. You can adjust the number if you need more or less rows.
-#: js/components/ImportIndicatorsPopover.js:725
+#: js/components/ImportIndicatorsPopover.js:732
 msgid ""
 "By default, the template will include 10 or 20 indicator rows per result "
 "level. Adjust the numbers if you need more or fewer rows."
@@ -233,7 +233,7 @@ msgstr ""
 "de vos besoins."
 
 #. Translators: Message to user that we cannot import the their file. This could be caused by the wrong file being selected, or the structure of the file was changed, or the results framework was updated and does not match the template anymore.
-#: js/components/ImportIndicatorsPopover.js:870
+#: js/components/ImportIndicatorsPopover.js:881
 msgid ""
 "We can’t import indicators from this file. This can happen if the wrong file "
 "is selected, the template structure is modified, or the results framework "
@@ -245,12 +245,12 @@ msgstr ""
 "jour et ne correspond plus au modèle."
 
 #. Translators: Messsage to user that there aren't any new indicators in the uploaded file.
-#: js/components/ImportIndicatorsPopover.js:873
+#: js/components/ImportIndicatorsPopover.js:884
 msgid "We can't find any indicators in this file."
 msgstr "Aucun indicateur n’a été trouvé dans ce fichier."
 
 #. Translators: Message to user that the import indicator process could not be completed. If the problem continues, contact your TolaData administrator.
-#: js/components/ImportIndicatorsPopover.js:876
+#: js/components/ImportIndicatorsPopover.js:887
 msgid ""
 "Sorry, we couldn’t complete the import process. If the problem persists, "
 "please contact your TolaData administrator."
@@ -259,7 +259,7 @@ msgstr ""
 "persiste, veuillez contacter votre administrateur TolaData."
 
 #. Translators: Message to user that the import could not be completed and to find out the reason, upload the import template again.
-#: js/components/ImportIndicatorsPopover.js:879
+#: js/components/ImportIndicatorsPopover.js:890
 msgid ""
 "Sorry, we couldn’t complete the import process. To figure out what went "
 "wrong, please upload your template again."
@@ -269,13 +269,19 @@ msgstr ""
 "modèle."
 
 #. Translators: Message to user that someone else has uploaded a template in the last 24 hours and may be in the process of importing indicators to this program. You can view the program change log to see more details.
-#: js/components/ImportIndicatorsPopover.js:882
+#: js/components/ImportIndicatorsPopover.js:893
 msgid ""
 "Someone else uploaded a template in the last 24 hours, and may be in the "
 "process of adding indicators to this program."
 msgstr ""
 "Un autre utilisateur a chargé un modèle au cours des dernières 24 heures. Il "
 "se peut donc qu’il soit en train d’ajouter des indicateurs à ce programme."
+
+#. Translators: Message to user that the type of file that was uploaded was not an Excel file and they should upload a Excel file.
+#: js/components/ImportIndicatorsPopover.js:896
+msgid "We don’t recognize this file type. Please upload an Excel file."
+msgstr ""
+"éTranslated We don’t recognize this file type. Please upload an Excel file."
 
 #. Translators: button label to show the details of all items in a list */}
 #. Translators: button label to show the details of all rows in a list */}
@@ -412,13 +418,13 @@ msgstr "Mesure de mi-parcours et mesure de fin de programme"
 
 #. Translators: One of several options for specifying how often data is collected or reported on over the life of a program
 #: js/constants.js:39 js/pages/iptt_quickstart/models/ipttQSRootStore.js:32
-#: tola/db_translations.js:22
+#: tola/db_translations.js:20
 msgid "Annual"
 msgstr "Annuel"
 
 #. Translators: One of several options for specifying how often data is collected or reported on over the life of a program
 #: js/constants.js:40 js/pages/iptt_quickstart/models/ipttQSRootStore.js:33
-#: tola/db_translations.js:18
+#: tola/db_translations.js:22
 msgid "Semi-annual"
 msgstr "Semestriel"
 
@@ -428,13 +434,13 @@ msgstr "Quadrimestriel"
 
 #. Translators: One of several options for specifying how often data is collected or reported on over the life of a program
 #: js/constants.js:42 js/pages/iptt_quickstart/models/ipttQSRootStore.js:35
-#: tola/db_translations.js:8
+#: tola/db_translations.js:16
 msgid "Quarterly"
 msgstr "Trimestriel"
 
 #. Translators: One of several options for specifying how often data is collected or reported on over the life of a program
 #: js/constants.js:43 js/pages/iptt_quickstart/models/ipttQSRootStore.js:36
-#: tola/db_translations.js:24
+#: tola/db_translations.js:28
 msgid "Monthly"
 msgstr "Mensuel"
 
@@ -772,7 +778,7 @@ msgstr "# / %"
 #: js/pages/iptt_report/components/report/tableHeader.js:159
 #: js/pages/iptt_report/models/filterStore.js:737
 #: js/pages/program_page/components/indicator_list.js:206
-#: tola/db_translations.js:20
+#: tola/db_translations.js:10
 msgid "Baseline"
 msgstr "Mesure de base"
 
@@ -1020,12 +1026,12 @@ msgstr "Regrouper les indicateurs :"
 #. Translators: Full message will be Imported indicators: Complete setup now.  This is a notification to the user that they have imported some indicators but that the indicator setup is not yet complete.   */
 #: js/pages/program_page/components/indicator_list.js:268
 msgid "Imported indicator: "
-msgstr "Importer des indicateurs: "
+msgstr "ŹTranslated Imported indicator: "
 
 #. Translators: Message that gets attached to each indicator element after a successful import of indicator data. It is not possible to import all data that an indicator requires to be complete. The "Complete setup now" is a link that allows users to access a form window where they can complete the required fields.   */}
 #: js/pages/program_page/components/indicator_list.js:270
 msgid "Complete setup now"
-msgstr "Translated Complete setup now"
+msgstr "ÁTranslated Complete setup now"
 
 #. Translators: Warning provided when a result is not longer associated with any target.  It is a warning about state rather than an action.  The full sentence might read "There are results not assigned to targets" rather than "Results have been unassigned from targets. */
 #: js/pages/program_page/components/indicator_list.js:276
@@ -1271,17 +1277,17 @@ msgstr "Ajouter des cibles"
 #. Translators: a link that leads to a list of all sites (locations) associated with a program
 #: js/pages/program_page/components/sitesList.js:19
 msgid "View program sites"
-msgstr "öTranslated View program sites"
+msgstr "Afficher les sites du programme"
 
 #. Translators: indicates that no sites (locations) are associated with a program
 #: js/pages/program_page/components/sitesList.js:25
 msgid "There are no program sites."
-msgstr "éTranslated There are no program sites."
+msgstr "Il n’y a aucun site pour le programme."
 
 #. Translators: a link to add a new site (location)
 #: js/pages/program_page/components/sitesList.js:34
 msgid "Add site"
-msgstr "ŹTranslated Add site"
+msgstr "Ajouter un site"
 
 #: js/pages/program_page/pinned_reports.js:9
 msgid ""
@@ -2485,48 +2491,48 @@ msgstr "utilisateurs"
 
 #. Translators: One of several options for specifying how often data is collected or reported on over the life of a program
 #: tola/db_translations.js:2
-msgid "By distribution"
-msgstr "Par répartition"
-
-#. Translators: One of several options for specifying how often data is collected or reported on over the life of a program
-#: tola/db_translations.js:4
-msgid "Endline"
-msgstr "Translated Endline"
-
-#. Translators: One of several options for specifying how often data is collected or reported on over the life of a program
-#: tola/db_translations.js:6
-msgid "Post shock"
-msgstr "Après impact"
-
-#. Translators: One of several options for specifying how often data is collected or reported on over the life of a program
-#: tola/db_translations.js:10
-msgid "By training"
-msgstr "Par formation"
-
-#. Translators: One of several options for specifying how often data is collected or reported on over the life of a program
-#: tola/db_translations.js:12
-msgid "Final evaluation"
-msgstr "Évaluation finale"
-
-#. Translators: One of several options for specifying how often data is collected or reported on over the life of a program
-#: tola/db_translations.js:14
 msgid "By batch"
 msgstr "Par lot"
 
 #. Translators: One of several options for specifying how often data is collected or reported on over the life of a program
-#: tola/db_translations.js:16
+#: tola/db_translations.js:4
+msgid "By event"
+msgstr "Par événement"
+
+#. Translators: One of several options for specifying how often data is collected or reported on over the life of a program
+#: tola/db_translations.js:6
+msgid "Endline"
+msgstr "Mesure de fin de programme"
+
+#. Translators: One of several options for specifying how often data is collected or reported on over the life of a program
+#: tola/db_translations.js:8
+msgid "Final evaluation"
+msgstr "Évaluation finale"
+
+#. Translators: One of several options for specifying how often data is collected or reported on over the life of a program
+#: tola/db_translations.js:12
 msgid "Weekly"
 msgstr "Hebdomadaire"
 
 #. Translators: One of several options for specifying how often data is collected or reported on over the life of a program
-#: tola/db_translations.js:26
-msgid "Midline"
-msgstr "öTranslated Midline"
+#: tola/db_translations.js:14
+msgid "By training"
+msgstr "Par formation"
 
 #. Translators: One of several options for specifying how often data is collected or reported on over the life of a program
-#: tola/db_translations.js:28
-msgid "By event"
-msgstr "Par événement"
+#: tola/db_translations.js:18
+msgid "Midline"
+msgstr "Mesure de mi-parcours"
+
+#. Translators: One of several options for specifying how often data is collected or reported on over the life of a program
+#: tola/db_translations.js:24
+msgid "By distribution"
+msgstr "Par répartition"
+
+#. Translators: One of several options for specifying how often data is collected or reported on over the life of a program
+#: tola/db_translations.js:26
+msgid "Post shock"
+msgstr "Après impact"
 
 #. Translators: One of several choices for what sector (i.e. development domain) a program is most closely associated with
 #: tola/db_translations.js:30
@@ -2656,7 +2662,7 @@ msgstr "Santé"
 
 #. Translators: One of several choices for what sector (i.e. development domain) a program is most closely associated with
 #: tola/db_translations.js:80
-msgid "Humanitaria Intervention Readiness"
+msgid "Humanitarian Intervention Readiness"
 msgstr "Volonté d’intervention humanitaire"
 
 #. Translators: One of several choices for what sector (i.e. development domain) a program is most closely associated with
@@ -2767,22 +2773,22 @@ msgstr "Donateur"
 #. Translators: One of several choices for specifying what type of Indicator is being created.  An Indicator is a performance measure e.g. "We will distrubute 1000 food packs over the next two months"
 #: tola/db_translations.js:126
 msgid "DIG - Standard"
-msgstr "DIG - Standard"
+msgstr "DIG - de l’agence"
 
 #. Translators: One of several choices for specifying what type of Indicator is being created.  An Indicator is a performance measure e.g. "We will distrubute 1000 food packs over the next two months"
 #: tola/db_translations.js:128
 msgid "DIG - Alpha"
-msgstr "DIG - Alpha"
+msgstr "DIG - alpha"
 
 #. Translators: One of several choices for specifying what type of Indicator is being created.  An Indicator is a performance measure e.g. "We will distrubute 1000 food packs over the next two months"
 #: tola/db_translations.js:130
 msgid "DIG - Testing"
-msgstr "DIG - Testing"
+msgstr "DIG - en cours de validation"
 
 #. Translators: One of several choices for specifying what type of Indicator is being created.  An Indicator is a performance measure e.g. "We will distrubute 1000 food packs over the next two months"
 #: tola/db_translations.js:132
 msgid "Performance"
-msgstr "ŹTranslated Performance"
+msgstr "Performance"
 
 #. Translators: One of several choices for specifying what type of Indicator is being created.  An Indicator is a performance measure e.g. "We will distrubute 1000 food packs over the next two months"
 #: tola/db_translations.js:134
@@ -3058,3 +3064,4020 @@ msgstr "Indicateur clé de performance"
 
 #~ msgid "Admin: Countries"
 #~ msgstr "Administrateur : Pays"
+
+#~ msgid "status"
+#~ msgstr "statut"
+
+#~ msgid "Active (not archived)"
+#~ msgstr "Actif (non archivé)"
+
+#~ msgid "Inactive (archived)"
+#~ msgstr "Inactif (archivé)"
+
+#~ msgid "Category"
+#~ msgstr "Catégorie"
+
+#~ msgid "Program ID"
+#~ msgstr "Identifiant du programme"
+
+#~ msgid "Indicator ID"
+#~ msgstr "Identifiant de l’indicateur"
+
+#~ msgid "*All values in this report are rounded to two decimal places."
+#~ msgstr "*Toutes les valeurs de ce rapport sont arrondies à deux décimales."
+
+#~ msgid "Actual"
+#~ msgstr "Réel"
+
+#~ msgid "No data"
+#~ msgstr "Pas de données"
+
+#~ msgid "Display number"
+#~ msgstr "Afficher le numéro"
+
+#~ msgid "Old indicator level"
+#~ msgstr "Précédent niveau d’indicateur"
+
+#~ msgid ""
+#~ "Indicators are currently grouped by an older version of indicator levels. "
+#~ "To group indicators according to the results framework, an admin will "
+#~ "need to adjust program settings."
+#~ msgstr ""
+#~ "Les indicateurs sont actuellement regroupés selon une précédente version "
+#~ "de niveaux d’indicateur. Afin de regrouper les indicateurs selon le cadre "
+#~ "de résultats, les paramètres du programme devront être modifiés par un "
+#~ "administrateur."
+
+#~ msgid ""
+#~ "This disaggregation cannot be unselected, because it was already used in "
+#~ "submitted program results."
+#~ msgstr ""
+#~ "Cette désagrégation a déjà été utilisée au sein des résultats du "
+#~ "programme envoyés, c'est pourquoi elle ne peut pas être désélectionnée."
+
+#, python-format
+#~ msgid "%(country_name)s disaggregations"
+#~ msgstr "Désagrégations %(country_name)s"
+
+#~ msgid "Direction of change"
+#~ msgstr "Direction du changement"
+
+#~ msgid "Multiple submissions detected"
+#~ msgstr "Plusieurs soumissions détectées"
+
+#~ msgid "Please enter a number larger than zero."
+#~ msgstr "Veuillez entrer un nombre supérieur à zéro."
+
+#~ msgid ""
+#~ "Level program ID %(l_p_id)d and indicator program ID (%i_p_id)d mismatched"
+#~ msgstr ""
+#~ "L’identifiant %(l_p_id)d du programme de niveau et l’identifiant "
+#~ "(%i_p_id)d du programme de l’indicateur sont incompatibles"
+
+#~ msgid "Actual value"
+#~ msgstr "Valeur réelle"
+
+#~ msgid "Site"
+#~ msgstr "Site"
+
+#~ msgid "Measure against target"
+#~ msgstr "Mesurer par rapport à la cible"
+
+#~ msgid "Link to file or folder"
+#~ msgstr "Lien vers le fichier ou dossier"
+
+#~ msgid "Result date"
+#~ msgstr "Date de résultat"
+
+#, python-brace-format
+#~ msgid ""
+#~ "You can begin entering results on {program_start_date}, the program start "
+#~ "date"
+#~ msgstr ""
+#~ "Vous pouvez commencer à saisir des résultats le {program_start_date}, "
+#~ "date de début du programme"
+
+#, python-brace-format
+#~ msgid ""
+#~ "Please select a date between {program_start_date} and {program_end_date}"
+#~ msgstr ""
+#~ "Veuillez sélectionner une date comprise entre le {program_start_date} et "
+#~ "le {program_end_date}"
+
+#, python-brace-format
+#~ msgid "Please select a date between {program_start_date} and {todays_date}"
+#~ msgstr ""
+#~ "Veuillez sélectionner une date entre le {program_start_date} et le "
+#~ "{todays_date}"
+
+#~ msgid "URL required if record name is set"
+#~ msgstr "URL requise si un nom d’enregistrement est configuré"
+
+#~ msgid "Performance Indicator"
+#~ msgstr "Indicateur de performance"
+
+#~ msgid "Targets"
+#~ msgstr "Cibles"
+
+#~ msgid "Data Acquisition"
+#~ msgstr "Collecte des données"
+
+#~ msgid "Analysis and Reporting"
+#~ msgstr "Analyse et rapportage"
+
+#~ msgid "Performance indicator"
+#~ msgstr "Indicateur de performance"
+
+#~ msgid "Indicator source"
+#~ msgstr "Source de l’indicateur"
+
+#~ msgid "Indicator definition"
+#~ msgstr "Définition de l’indicateur"
+
+#~ msgid "Calculation"
+#~ msgstr "Calcul"
+
+#~ msgid "Baseline value"
+#~ msgstr "Valeur de base"
+
+#~ msgid "LOP target"
+#~ msgstr "Cible de LoP"
+
+#~ msgid "Rationale for target"
+#~ msgstr "Justification de la cible"
+
+#~ msgid "Target frequency"
+#~ msgstr "Fréquence de la cible"
+
+#~ msgid "Data collection method"
+#~ msgstr "Méthode de collecte de données"
+
+#~ msgid "Frequency of data collection"
+#~ msgstr "Fréquence de collecte de données"
+
+#~ msgid "Data points"
+#~ msgstr "Points de données"
+
+#~ msgid "Responsible person(s) & team"
+#~ msgstr "Personne(s) responsable(s) et équipe"
+
+#~ msgid "Method of analysis"
+#~ msgstr "Méthode d’analyse"
+
+#~ msgid "Information use"
+#~ msgstr "Utilisation de l’information"
+
+#~ msgid "Frequency of reporting"
+#~ msgstr "Fréquence de rapportage"
+
+#~ msgid "Data quality assurance techniques"
+#~ msgstr "Techniques d’assurance de la qualité des données"
+
+#~ msgid "Data quality assurance details"
+#~ msgstr "Détails sur l’assurance de la qualité des données"
+
+#~ msgid "Data issues"
+#~ msgstr "Problèmes liés aux données"
+
+#~ msgid "Comments"
+#~ msgstr "Commentaires"
+
+#~ msgid "Indicator plan"
+#~ msgstr "Plan d’indicateur"
+
+#~ msgid "Indicator type"
+#~ msgstr "Type d’indicateur"
+
+#~ msgid "Create date"
+#~ msgstr "Créer un rendez-vous"
+
+#~ msgid "Edit date"
+#~ msgstr "Date d’édition"
+
+#~ msgid "Indicator Type"
+#~ msgstr "Type d’indicateur"
+
+#~ msgid "Name"
+#~ msgstr "Prénom"
+
+#~ msgid "Country Strategic Objectives"
+#~ msgstr "Objectifs stratégiques du pays"
+
+#~ msgid "Program Objective"
+#~ msgstr "Objectif du programme"
+
+#~ msgid "Sort order"
+#~ msgstr "Ordre de classement"
+
+#~ msgid "Level Tier depth"
+#~ msgstr "Profondeur de l’échelon"
+
+#~ msgid "Level Tier"
+#~ msgstr "Échelon"
+
+#~ msgid "Level tier templates"
+#~ msgstr "Modèles d'échelons"
+
+#~ msgid "Global (all programs, all countries)"
+#~ msgstr "Général (tous les programmes, tous les pays)"
+
+#~ msgid "Archived"
+#~ msgstr "Archivé"
+
+#~ msgid "Label"
+#~ msgstr "Étiquette"
+
+#~ msgid "Disaggregation category"
+#~ msgstr "Catégorie de désagrégation"
+
+#~ msgid "Frequency"
+#~ msgstr "Fréquence"
+
+#~ msgid "Reporting Frequency"
+#~ msgstr "Fréquence de rapportage"
+
+#~ msgid "Data Collection Frequency"
+#~ msgstr "Fréquence de collecte de données"
+
+#~ msgid "URL"
+#~ msgstr "URL"
+
+#~ msgid "Feed URL"
+#~ msgstr "URL du flux"
+
+#~ msgid "External Service"
+#~ msgstr "Service externe"
+
+#~ msgid "External service"
+#~ msgstr "Service externe"
+
+#~ msgid "Full URL"
+#~ msgstr "URL complète"
+
+#~ msgid "Unique ID"
+#~ msgstr "Identifiant unique"
+
+#~ msgid "External Service Record"
+#~ msgstr "Enregistrement de service externe"
+
+#~ msgid "Event"
+#~ msgstr "Événement"
+
+#~ msgid "Number (#)"
+#~ msgstr "Nombre (#)"
+
+#~ msgid "Percentage (%)"
+#~ msgstr "Pourcentage (%)"
+
+#~ msgid "Not applicable"
+#~ msgstr "Non applicable"
+
+#~ msgid "Increase (+)"
+#~ msgstr "Augmenter (+)"
+
+#~ msgid "Decrease (-)"
+#~ msgstr "Diminuer (-)"
+
+#~ msgid "Data cleaning and processing"
+#~ msgstr "Nettoyage et traitement des données"
+
+#~ msgid "Data collection training and piloting"
+#~ msgstr "La formation et le pilotage de la collecte de données"
+
+#~ msgid "Data quality audits (DQAs)"
+#~ msgstr "Audits de qualité des données (DQA)"
+
+#~ msgid "Data spot checks"
+#~ msgstr "Contrôles ponctuels des données"
+
+#~ msgid "Digital data collection tools"
+#~ msgstr "Outils numériques de collecte de données"
+
+#~ msgid "Participatory data analysis validation"
+#~ msgstr "Validation de l’analyse des données participatives"
+
+#~ msgid "Peer reviews or reproducibility checks"
+#~ msgstr "L’examen par les pairs ou les contrôles de reproductibilité"
+
+#~ msgid "Randomized phone calls to respondents"
+#~ msgstr "Appels téléphoniques randomisés aux répondants"
+
+#~ msgid "Randomized visits to respondents"
+#~ msgstr "Visites randomisées aux répondants"
+
+#~ msgid "Regular indicator and data reviews"
+#~ msgstr "Examens réguliers des indicateurs et des données"
+
+#~ msgid "Standardized indicators"
+#~ msgstr "Indicateurs standardisés"
+
+#~ msgid "Donor and/or stakeholder reporting"
+#~ msgstr "Rapportage du donneur et/ou de la partie prenante"
+
+#~ msgid "Internal program management and learning"
+#~ msgstr "Gestion et apprentissage du programme interne"
+
+#~ msgid "Participant accountability"
+#~ msgstr "Redevabilité des participants"
+
+#~ msgid "Indicator key"
+#~ msgstr "Clé d’indicateur"
+
+#~ msgid ""
+#~ "Classifying indicators by type allows us to filter and analyze related "
+#~ "sets of indicators."
+#~ msgstr ""
+#~ "Classer les indicateurs par type nous permet de filtrer et analyser les "
+#~ "ensembles d’indicateurs liés."
+
+#~ msgid "Select the result this indicator is intended to measure."
+#~ msgstr "Sélectionnez le résultat que cet indicateur doit mesurer."
+
+#~ msgid "Country Strategic Objective"
+#~ msgstr "Objectif stratégique du pays"
+
+#~ msgid ""
+#~ "Identifying the country strategic objectives to which an indicator "
+#~ "contributes, allows us to filter and analyze related sets of indicators. "
+#~ "Country strategic objectives are managed by the TolaData country "
+#~ "administrator."
+#~ msgstr ""
+#~ "Identifier les objectifs stratégiques du pays auquel un indicateur "
+#~ "contribue nous permet de filtrer et d’analyser les ensembles "
+#~ "d’indicateurs liés. Les objectifs stratégiques du pays sont gérés par "
+#~ "l’administrateur de pays TolaData."
+
+#~ msgid ""
+#~ "Provide an indicator statement of the precise information needed to "
+#~ "assess whether intended changes have occurred."
+#~ msgstr ""
+#~ "Fournir un relevé d’indicateur des informations précises nécessaires pour "
+#~ "évaluer si les changements prévus ont eu lieu."
+
+#~ msgid "Number"
+#~ msgstr "Nombre"
+
+#~ msgid ""
+#~ "This number is displayed in place of the indicator number automatically "
+#~ "generated through the results framework. An admin can turn on auto-"
+#~ "numbering in program settings."
+#~ msgstr ""
+#~ "Ce numéro s’affiche à la place du numéro de l’indicateur, automatiquement "
+#~ "généré par le cadre de résultats. Un administrateur peut activer la "
+#~ "numérotation automatique dans les paramètres du programme."
+
+#~ msgid "Source"
+#~ msgstr "Source"
+
+#~ msgid ""
+#~ "Identify the source of this indicator (e.g. Mercy Corps DIG, EC, USAID, "
+#~ "etc.) If the indicator is brand new and created specifically for the "
+#~ "program, enter &ldquo;Custom.&rdquo;"
+#~ msgstr ""
+#~ "Identifiez la source de cet indicateur (par ex. : Mercy Corps DIG, EC, "
+#~ "USAID, etc.). S’il s’agit d’un nouvel indicateur ou qu’il a été créé "
+#~ "spécifiquement pour le programme, veuillez saisir « Personnalisé »."
+
+#~ msgid "Definition"
+#~ msgstr "Définition"
+
+#~ msgid ""
+#~ "Provide a long-form definition of the indicator and all key terms that "
+#~ "need further detail for precise and reliable measurement. Anyone reading "
+#~ "the definition should understand exactly what the indicator is measuring "
+#~ "without any ambiguity."
+#~ msgstr ""
+#~ "Fournir une définition détaillée de l’indicateur et de tous les termes "
+#~ "clés qui nécessitent des précisions pour une mesure précise et fiable. "
+#~ "Toute personne lisant la définition doit comprendre exactement ce que "
+#~ "l’indicateur mesure sans aucune ambiguïté."
+
+#~ msgid "Rationale or justification for indicator"
+#~ msgstr "Logique ou justification de l’indicateur"
+
+#~ msgid "Explain why the indicator was chosen for this program."
+#~ msgstr "Expliquez pourquoi cet indicateur a été choisi pour ce programme."
+
+#~ msgid ""
+#~ "Enter a meaningful description of what the indicator uses as its standard "
+#~ "unit (e.g. households, kilograms, kits, participants, etc.)"
+#~ msgstr ""
+#~ "Veuillez fournir une description de l’unité standard utilisée par "
+#~ "l’indicateur (par ex. : menages, kilogrammes, kits, participants, etc.)"
+
+#~ msgid "Unit Type"
+#~ msgstr "Type d’unité"
+
+#~ msgid "This selection determines how results are calculated and displayed."
+#~ msgstr ""
+#~ "Cette sélection détermine la façon dont les résultats sont calculés et "
+#~ "affichés."
+
+#~ msgid ""
+#~ "Select all relevant disaggregations. Disaggregations are managed by the "
+#~ "TolaData country administrator. Mercy Corps required disaggregations (e."
+#~ "g. SADD) are selected by default, but can be deselected when they are not "
+#~ "applicable to the indicator."
+#~ msgstr ""
+#~ "Sélectionnez toutes les désagrégations pertinentes. Les désagrégations "
+#~ "sont gérées par l’administrateur de pays TolaData. Les désagrégations "
+#~ "requises par Mercy Corps (comme les données désagrégées par sexe et âge) "
+#~ "sont sélectionnées par défaut. Elles peuvent toutefois être "
+#~ "désélectionnées si elles ne s’appliquent pas à l’indicateur."
+
+#~ msgid ""
+#~ "Enter a numeric value for the baseline. If a baseline is not yet known or "
+#~ "not applicable, enter a zero or select the &ldquo;Not applicable&rdquo; "
+#~ "checkbox. The baseline can always be updated at a later point in time."
+#~ msgstr ""
+#~ "Veuillez saisir une valeur numérique pour la mesure de base. Si vous ne "
+#~ "connaissez pas encore la mesure de base ou si elle n’est pas applicable, "
+#~ "veuillez saisir un zéro ou cocher la case « Non applicable ». La mesure "
+#~ "de base pourra être modifiée plus tard."
+
+#~ msgid "Life of Program (LoP) target"
+#~ msgstr "Cible de la vie du programme (LoP)"
+
+#~ msgid "Direction of Change"
+#~ msgstr "Direction du changement"
+
+#~ msgid ""
+#~ "Is your program trying to achieve an increase (+) or decrease (-) in the "
+#~ "indicator's unit of measure? This field is important for the accuracy of "
+#~ "our &ldquo;indicators on track&rdquo; metric. For example, if we are "
+#~ "tracking a decrease in cases of malnutrition, we will have exceeded our "
+#~ "indicator target when the result is lower than the target."
+#~ msgstr ""
+#~ "L’objectif de votre programme est-il d’augmenter (+) ou de diminuer (-) "
+#~ "l’unité de mesure de l’indicateur ? Ce champ est important pour "
+#~ "l’exactitude de nos statistiques « indicateurs en bonne voie ». Ainsi, si "
+#~ "nous cherchons à diminuer le nombre de cas de malnutrition, nous aurons "
+#~ "atteint notre objectif lorsque le résultat de l’indicateur sera inférieur "
+#~ "à la cible."
+
+#~ msgid ""
+#~ "Provide an explanation for any target value/s assigned to this indicator. "
+#~ "You might include calculations and any historical or secondary data "
+#~ "sources used to estimate targets."
+#~ msgstr ""
+#~ "Fournir une explication pour toute valeur(s) cible attribuée à cet "
+#~ "indicateur. Vous pouvez inclure des calculs et toutes les sources de "
+#~ "données historiques ou secondaires utilisées pour estimer les cibles."
+
+#~ msgid ""
+#~ "This selection determines how the indicator's targets and results are "
+#~ "organized and displayed. Target frequencies will vary depending on how "
+#~ "frequently the program needs indicator data to properly manage and report "
+#~ "on program progress."
+#~ msgstr ""
+#~ "Cette sélection détermine la façon dont les cibles et résultats de "
+#~ "l’indicateur sont organisés et affichés. Les fréquences cibles dépendront "
+#~ "de la fréquence à laquelle le programme aura besoin de données de "
+#~ "l’indicateur pour gérer et rendre compte de l’avancement du programme."
+
+#~ msgid "First event name"
+#~ msgstr "Premier nom de l’événement"
+
+#~ msgid "First target period begins*"
+#~ msgstr "La première période cible commence*"
+
+#~ msgid "Number of target periods*"
+#~ msgstr "Nombre de périodes cibles*"
+
+#~ msgid "Means of verification / data source"
+#~ msgstr "Moyens de vérification/Source de données"
+
+#~ msgid ""
+#~ "Identify the source of indicator data and the tools used to collect data "
+#~ "(e.g., surveys, checklists, etc.) Indicate whether these tools already "
+#~ "exist or will need to be developed."
+#~ msgstr ""
+#~ "Identifiez la source des données de l’indicateur ainsi que les outils "
+#~ "utilisés pour recueillir ces données (par ex. : enquêtes, listes de "
+#~ "contrôle, etc.). Veuillez indiquer si ces outils existent déjà ou s’ils "
+#~ "devront être développés."
+
+#~ msgid ""
+#~ "Explain the process used to collect data (e.g., population-based sampling "
+#~ "with randomized selection, review of partner records, etc.) Explain how "
+#~ "the means of verification or data sources will be collected. Describe the "
+#~ "methodological approaches the indicator will apply for data collection."
+#~ msgstr ""
+#~ "Expliquez le processus utilisé pour recueillir les données (par ex. : "
+#~ "échantillonnage de la population avec une répartition aléatoire, "
+#~ "évaluation des registres de partenaires, etc.) ainsi que la façon dont "
+#~ "vous justifierez leur collection. Décrivez méthodiquement les approches "
+#~ "utilisées par l’indicateur pour la collecte de données."
+
+#~ msgid ""
+#~ "How frequently will you collect data for this indicator? The frequency "
+#~ "and timing of data collection should be based on how often data are "
+#~ "needed for management purposes, the cost of data collection, and the pace "
+#~ "of change anticipated. If an indicator requires multiple data sources "
+#~ "collected at varying frequencies, then it is recommended to select the "
+#~ "frequency at which all data will be collected for calculation."
+#~ msgstr ""
+#~ "À quelle fréquence comptez-vous recueillir des données pour cet "
+#~ "indicateur ? Établissez votre calendrier de collecte des données en "
+#~ "fonction de la fréquence à laquelle vous en aurez besoin à des fins de "
+#~ "gestion, du coût d’une telle collecte et de la vitesse à laquelle vous "
+#~ "estimez que ces données évolueront. Si un indicateur requiert plusieurs "
+#~ "sources de données recueillies à différents intervalles, nous vous "
+#~ "recommandons de sélectionner la fréquence à laquelle toutes les données "
+#~ "seront collectées et traitées."
+
+#, python-format
+#~ msgid ""
+#~ "List all data points required for reporting. While some indicators "
+#~ "require a single data point (# of students attending training), others "
+#~ "require multiple data points for calculation. For example, to calculate "
+#~ "the % of students graduated from a training course, the two data points "
+#~ "would be # of students graduated (numerator) and # of students enrolled "
+#~ "(denominator)."
+#~ msgstr ""
+#~ "Établissez une liste de tous les points de données nécessaires à la "
+#~ "présentation du rapport. Bien que certains indicateurs ne requirent qu’un "
+#~ "seul point de données (comme le nombre d’étudiants qui participent à une "
+#~ "formation), d’autres ne peuvent être calculés qu’à l’aide de plusieurs "
+#~ "points de données. Par exemple, pour calculer le % d’étudiants ayant "
+#~ "obtenu leur diplôme après avoir suivi une formation, les deux points de "
+#~ "données nécessaires seraient le nombre d’étudiants ayant obtenu leur "
+#~ "diplôme (numérateur) et le nombre d’étudiants inscrits à la formation "
+#~ "(dénominateur)."
+
+#~ msgid "Responsible person(s) and team"
+#~ msgstr "Personne(s) responsable(s) et équipe"
+
+#~ msgid ""
+#~ "List the people or team(s) responsible for data collection. This can "
+#~ "include community volunteers, program team members, local partner(s), "
+#~ "enumerators, consultants, etc."
+#~ msgstr ""
+#~ "Indiquez les personnes ou les équipes responsables de la collecte des "
+#~ "données. Il peut s’agir de bénévoles de la communauté, de membres de "
+#~ "l’équipe du programme, de partenaires locaux, d’enquêteurs, de "
+#~ "consultants, etc."
+
+#~ msgid ""
+#~ "The method of analysis should be detailed enough to allow an auditor or "
+#~ "third party to reproduce the analysis or calculation and generate the "
+#~ "same result."
+#~ msgstr ""
+#~ "La méthode d’analyse doit être suffisamment détaillée pour permettre à un "
+#~ "auditeur ou à une tierce partie de reproduire l’analyse ou le calcul et "
+#~ "de générer le même résultat."
+
+#~ msgid ""
+#~ "Describe the primary uses of the indicator and its intended audience. "
+#~ "This is the most important field in an indicator plan, because it "
+#~ "explains the utility of the indicator. If an indicator has no clear "
+#~ "informational purpose, then it should not be tracked or measured. By "
+#~ "articulating who needs the indicator data, why and what they need it for, "
+#~ "teams ensure that only useful indicators are included in the program."
+#~ msgstr ""
+#~ "Décrivez les principales utilisations qui sont faites de l’indicateur et "
+#~ "de son public cible. Ce champ est le plus important dans un plan "
+#~ "d’indicateurs car il justifie l’utilité de l’indicateur. Un indicateur "
+#~ "qui ne possède aucun but informatif clair ne devrait pas être suivi ou "
+#~ "mesuré. En précisant qui a besoin des données de l’indicateur, pour "
+#~ "quelle raison et dans quel but, les équipes peuvent s’assurer que seuls "
+#~ "les indicateurs utiles sont ajoutés au programme."
+
+#~ msgid ""
+#~ "This frequency should make sense in relation to the data collection "
+#~ "frequency and target frequency and should adhere to any requirements "
+#~ "regarding program, stakeholder, and/or donor accountability and reporting."
+#~ msgstr ""
+#~ "Cette fréquence devrait avoir un sens par rapport à la fréquence de "
+#~ "collecte des données et à la fréquence cible, et elle devrait respecter "
+#~ "toutes les exigences concernant la redevabilité et le reportage de "
+#~ "programme, de parties prenantes et/ou de bailleur de fonds."
+
+#~ msgid ""
+#~ "List any limitations of the data used to calculate this indicator (e.g., "
+#~ "issues with validity, reliability, accuracy, precision, and/or potential "
+#~ "for double counting.) Data issues can be related to indicator design, "
+#~ "data collection methods, and/or data analysis methods. Please be specific "
+#~ "and explain how data issues were addressed."
+#~ msgstr ""
+#~ "Établissez la liste des données utilisées pour calculer cet indicateur "
+#~ "(par ex. : les problèmes de validité, de fiabilité, d’exactitude, de "
+#~ "précision et/ou en cas de double comptage). Les problèmes relatifs aux "
+#~ "données peuvent être liés à la conception de l’indicateur, aux méthodes "
+#~ "de collecte de données et/ou aux méthodes d’analyse des données. Veuillez "
+#~ "être le plus précis possible et expliquer comment ces problèmes ont été "
+#~ "abordés."
+
+#~ msgid "Sector"
+#~ msgstr "Secteur"
+
+#~ msgid ""
+#~ "Classifying indicators by sector allows us to filter and analyze related "
+#~ "sets of indicators."
+#~ msgstr ""
+#~ "Classer les indicateurs par secteur nous permet de filtrer et d’analyser "
+#~ "les ensembles d’indicateurs liés."
+
+#~ msgid "External Service ID"
+#~ msgstr "Identifiant de service externe"
+
+#~ msgid "Old Level"
+#~ msgstr "Niveau précédent"
+
+#, python-format
+#~ msgid ""
+#~ "Level/Indicator mismatched program IDs (level %(level_program_id)d and "
+#~ "indicator %(indicator_program_id)d)"
+#~ msgstr ""
+#~ "Le niveau/l’indicateur ne correspond pas aux identifiants de programme "
+#~ "(niveau %(level_program_id)d et indicateur %(indicator_program_id)d)"
+
+#~ msgid "#"
+#~ msgstr "#"
+
+#~ msgid "%"
+#~ msgstr "%"
+
+#~ msgid "Not cumulative"
+#~ msgstr "Non cumulatif"
+
+#~ msgid "-"
+#~ msgstr "-"
+
+#~ msgid "+"
+#~ msgstr "+"
+
+#~ msgid "indicator"
+#~ msgstr "indicateur"
+
+#~ msgid "Year"
+#~ msgstr "Année"
+
+#~ msgid "Semi-annual period"
+#~ msgstr "Période semestrielle"
+
+#~ msgid "Tri-annual period"
+#~ msgstr "Période quadrimestrielle"
+
+#~ msgid "Quarter"
+#~ msgstr "Trimestre"
+
+#~ msgid "Period"
+#~ msgstr "Période"
+
+#~ msgid "Start date"
+#~ msgstr "Date de début"
+
+#~ msgid "End date"
+#~ msgstr "Date de fin"
+
+#~ msgid "Customsort"
+#~ msgstr "Customsort"
+
+#~ msgid "Periodic Target"
+#~ msgstr "Cible périodique"
+
+#~ msgid "Data key"
+#~ msgstr "Clé de données"
+
+#~ msgid "Periodic target"
+#~ msgstr "Cible périodique"
+
+#~ msgid "Date collected"
+#~ msgstr "Date de collecte"
+
+#~ msgid "Originated By"
+#~ msgstr "Originaire de"
+
+#~ msgid "Record name"
+#~ msgstr "Nom de l’enregistrement"
+
+#~ msgid "Evidence URL"
+#~ msgstr "URL de la preuve"
+
+#~ msgid "Report Name"
+#~ msgstr "Nom du rapport"
+
+#~ msgid "years"
+#~ msgstr "années"
+
+#~ msgid "semi-annual periods"
+#~ msgstr "périodes semestrielles"
+
+#~ msgid "tri-annual periods"
+#~ msgstr "périodes quadrimestrielles"
+
+#~ msgid "quarters"
+#~ msgstr "trimestres"
+
+#~ msgid "months"
+#~ msgstr "mois"
+
+#, python-brace-format
+#~ msgid "Most recent {num_recent_periods} {time_or_target_period_str}"
+#~ msgstr "Le plus récent {num_recent_periods} {time_or_target_period_str}"
+
+#, python-brace-format
+#~ msgid "Show all {time_or_target_period_str}"
+#~ msgstr "Tout afficher {time_or_target_period_str}"
+
+#~ msgid "Show all results"
+#~ msgstr "Afficher tous les résultats"
+
+#, python-format
+#~ msgid "Categories for disaggregation %(disagg)s"
+#~ msgstr "Catégories de la désagrégation %(disagg)s"
+
+#~ msgid "and"
+#~ msgstr "et"
+
+#~ msgid "or"
+#~ msgstr "ou"
+
+#~ msgid "have missing targets"
+#~ msgstr "ont des cibles manquantes"
+
+#~ msgid "have missing results"
+#~ msgstr "ont des résultats manquants"
+
+#~ msgid "have missing evidence"
+#~ msgstr "ont des preuves manquantes"
+
+#~ msgid "of programs have all targets defined"
+#~ msgstr "les programmes ont tous des objectifs définis"
+
+#~ msgid ""
+#~ "Each indicator must have a target frequency selected and targets entered "
+#~ "for all periods."
+#~ msgstr ""
+#~ "Chaque indicateur doit avoir une fréquence cible sélectionnée et des "
+#~ "cibles renseignées pour toutes les périodes."
+
+#~ msgid "of indicators have reported results"
+#~ msgstr "des indicateurs ont des résultats publiés"
+
+#~ msgid "Each indicator must have at least one reported result."
+#~ msgstr "Chaque indicateur doit avoir au moins un résultat publié."
+
+#~ msgid "of results are backed up with evidence"
+#~ msgstr "des résultats sont étayés par des preuves"
+
+#~ msgid "Each result must include a link to an evidence file or folder."
+#~ msgstr ""
+#~ "Chaque résultat doit inclure un lien vers un dossier ou fichier de preuve."
+
+#~ msgid "Help"
+#~ msgstr "Aide"
+
+#~ msgid "NA"
+#~ msgstr "NA"
+
+#~ msgid "Success! Indicator created."
+#~ msgstr "Succès, indicateur créé !"
+
+#~ msgid "Success! Indicator updated."
+#~ msgstr "Succès, indicateur mis à jour !"
+
+#, python-brace-format
+#~ msgid ""
+#~ "Indicator {indicator_number} was saved and linked to "
+#~ "{result_level_display_ontology}"
+#~ msgstr ""
+#~ "L’indicateur {indicator_number} a été enregistré et lié au "
+#~ "{result_level_display_ontology}"
+
+#, python-brace-format
+#~ msgid "Indicator {indicator_number} updated."
+#~ msgstr "Indicateur {indicator_number} mis à jour."
+
+#~ msgid "Indicator setup"
+#~ msgstr "Configuration de l’indicateur"
+
+#~ msgid "Success, Indicator Deleted!"
+#~ msgstr "Succès, indicateur supprimé !"
+
+#~ msgid "Reason for change is required."
+#~ msgstr "Une justification pour la modification est requise."
+
+#~ msgid ""
+#~ "Reason for change is not required when deleting an indicator with no "
+#~ "linked results."
+#~ msgstr ""
+#~ "Lors de la suppression d’un indicateur sans résultat lié, une "
+#~ "justification pour la modification n’est pas requise."
+
+#~ msgid "The indicator was successfully deleted."
+#~ msgstr "L’indicateur a été supprimé avec succès."
+
+#~ msgid "Reason for change is required"
+#~ msgstr "Une justification pour la modification est requise"
+
+#~ msgid "No reason for change required."
+#~ msgstr "Aucune justification pour la modification n’est requise."
+
+#, python-format
+#~ msgid "Result was added to %(level)s indicator %(number)s."
+#~ msgstr "Résultat ajouté à %(level)s indicateur %(number)s."
+
+#~ msgid "Success, Data Created!"
+#~ msgstr "Succès, données créées !"
+
+#~ msgid "Result updated."
+#~ msgstr "Résultat mis à jour."
+
+#~ msgid "Success, Data Updated!"
+#~ msgstr "Succès, données mises à jour !"
+
+#~ msgid "Results Framework"
+#~ msgstr "Cadre de résultats"
+
+#~ msgid "Your request could not be processed."
+#~ msgstr "Votre requête n’a pu être traitée."
+
+#~ msgid "Error 400: bad request"
+#~ msgstr "Erreur 400 : Requête incorrecte"
+
+#~ msgid "There was a problem related to the web browser"
+#~ msgstr "Un problème lié au navigateur Web a été trouvé"
+
+#~ msgid ""
+#~ "\n"
+#~ "<p>\n"
+#~ "    There was a problem loading this page, most likely with the request "
+#~ "sent by your web browser. We’re sorry for the trouble.\n"
+#~ "</p>\n"
+#~ "<p>\n"
+#~ "    Please try reloading the page. If this problem persists, <a href="
+#~ "\"https://learn.mercycorps.org/index.php/TOLA:Section_06/en\" target="
+#~ "\"_blank\">contact the TolaData team.</a>\n"
+#~ "</p>\n"
+#~ "<p>\n"
+#~ "    <code class=\"text-secondary\">[Error 400: bad request]</code>\n"
+#~ "</p>\n"
+#~ msgstr ""
+#~ "\n"
+#~ "<p>\n"
+#~ "    Un problème est survenu lors du chargement de cette page, "
+#~ "probablement à cause de la demande envoyée par votre navigateur Web. Nous "
+#~ "sommes désolés pour la gêne occasionnée.\n"
+#~ "</p>\n"
+#~ "<p>\n"
+#~ "    Veuillez essayer de recharger la page. Si ce problème persiste, <a "
+#~ "href=\"https://learn.mercycorps.org/index.php/TOLA:Section_06/fr\" target="
+#~ "\"_blank\">contactez l'équipe TolaData.</a>\n"
+#~ "</p>\n"
+#~ "<p>\n"
+#~ "    <code class=\"text-secondary\">[Erreur 400 : Requête incorrecte]</"
+#~ "code>\n"
+#~ "</p>\n"
+
+#~ msgid "Additional Permissions Required"
+#~ msgstr "Autorisations supplémentaires requises"
+
+#~ msgid "You need permission to view this page"
+#~ msgstr "Vous avez besoin d'une autorisation pour afficher cette page"
+
+#~ msgid ""
+#~ "You can request permission from your country's TolaData Administrator. If "
+#~ "you do not know your TolaData Administrator, consult your supervisor."
+#~ msgstr ""
+#~ "Vous pouvez demander l’autorisation à l’administrateur TolaData de votre "
+#~ "pays. Si vous ne le connaissez pas, consultez votre superviseur."
+
+#~ msgid ""
+#~ "If you need further assistance, please <a href=\"https://learn.mercycorps."
+#~ "org/index.php/TOLA:Section_06/en\" target=\"_blank\">contact the TolaData "
+#~ "Team</a>."
+#~ msgstr ""
+#~ "Pour toute assistance supplémentaire, veuillez <a href=\"https://learn."
+#~ "mercycorps.org/index.php/TOLA:Section_06/fr\" target=\"_blank\">contacter "
+#~ "l’équipe TolaData</a>."
+
+#~ msgid "Page not found"
+#~ msgstr "Page non trouvée"
+
+#~ msgid ""
+#~ "\n"
+#~ "<p>\n"
+#~ "    We can’t find the page you’re trying to visit. If this problem "
+#~ "persists, please <a href=\"https://learn.mercycorps.org/index.php/TOLA:"
+#~ "Section_06/en\" target=\"_blank\">contact the TolaData team.</a>\n"
+#~ "</p>\n"
+#~ msgstr ""
+#~ "\n"
+#~ "<p>\n"
+#~ "    Nous ne parvenons pas à trouver la page que vous tentez de consulter. "
+#~ "Si ce problème persiste, veuillez <a href=\"https://learn.mercycorps.org/"
+#~ "index.php/TOLA:Section_06/fr\" target=\"_blank\">contacter l'équipe "
+#~ "TolaData.</a>\n"
+#~ "</p>\n"
+
+#~ msgid "Error 500: internal server error"
+#~ msgstr "Erreur 500 : Erreur interne du serveur"
+
+#~ msgid ""
+#~ "\n"
+#~ "<p>\n"
+#~ "    There was a problem loading this page, most likely with the server. "
+#~ "We’re sorry for the trouble.\n"
+#~ "</p>\n"
+#~ "<p>\n"
+#~ "    If you need assistance, please <a href=\"https://learn.mercycorps.org/"
+#~ "index.php/TOLA:Section_06/en\" target=\"_blank\">contact the TolaData "
+#~ "team.</a>\n"
+#~ "</p>\n"
+#~ "<p>\n"
+#~ "    <code class=\"text-secondary\">[Error 500: internal server error]</"
+#~ "code>\n"
+#~ "</p>\n"
+#~ msgstr ""
+#~ "\n"
+#~ "<p>\n"
+#~ "    Un problème est survenu lors du chargement de cette page, "
+#~ "probablement avec le serveur. Nous sommes désolés pour la gêne "
+#~ "occasionnée.\n"
+#~ "</p>\n"
+#~ "<p>\n"
+#~ "    Si vous avez besoin d'aide, veuillez <a href=\"https://learn."
+#~ "mercycorps.org/index.php/TOLA:Section_06/fr\" target=\"_blank\">contactez "
+#~ "l'équipe TolaData.</a>\n"
+#~ "</p>\n"
+#~ "<p>\n"
+#~ "    <code class=\"text-secondary\">[Erreur 500 : Erreur interne du "
+#~ "serveur]</code>\n"
+#~ "</p>\n"
+
+#~ msgid "Please correct the error below."
+#~ msgstr "Veuillez corriger l’erreur ci-dessous."
+
+#~ msgid "Please correct the errors below."
+#~ msgstr "Veuillez corriger les erreurs ci-dessous."
+
+#, python-format
+#~ msgid ""
+#~ "You are authenticated as %(username)s, but are not authorized to access "
+#~ "this page. Would you like to log in to a different account?"
+#~ msgstr ""
+#~ "Vous êtes connecté en tant que %(username)s, mais vous n’êtes pas "
+#~ "autorisé à accéder à cette page. Souhaitez-vous vous connecter à un autre "
+#~ "compte ?"
+
+#~ msgid "Forgotten your password or username?"
+#~ msgstr "Mot de passe ou nom d’utilisateur oublié ?"
+
+#~ msgid "Log in"
+#~ msgstr "Se connecter"
+
+#~ msgid ""
+#~ "\n"
+#~ "    Are you a TolaData admin having trouble logging in? As part of our "
+#~ "Partner Access release, we incorporated\n"
+#~ "    new and improved administration tools into TolaData itself. Please "
+#~ "visit TolaData and look for a section\n"
+#~ "    called Admin.\n"
+#~ "    "
+#~ msgstr ""
+#~ "\n"
+#~ "   Avez-vous des difficultés à vous connecter à votre compte "
+#~ "administrateur TolaData ? Nous avons intégré, dans le cadre de notre mise "
+#~ "à jour Partner Access,\n"
+#~ " de nouveaux outils d’administration améliorés au sein de TolaData. "
+#~ "Veuillez accéder à TolaData et rechercher la section\n"
+#~ " Administrateur.\n"
+#~ "    "
+
+#~ msgid ""
+#~ "https://library.mercycorps.org/record/32352/files/COVID19RemoteMERL.pdf"
+#~ msgstr ""
+#~ "https://library.mercycorps.org/record/32636/files/COVID19RemoteMERLfr.pdf"
+
+#~ msgid "Remote MERL guidance (PDF)"
+#~ msgstr "Guide SERA à distance (PDF)"
+
+#~ msgid "https://drive.google.com/open?id=1x24sddNU1uY851-JW-6f43K4TRS2B96J"
+#~ msgstr "https://drive.google.com/open?id=19CW8mfUzHfxX_E2RlMFgao-XfElHbaaR"
+
+#~ msgid "Recorded webinar"
+#~ msgstr "Webinaire enregistré"
+
+#~ msgid "Reports"
+#~ msgstr "Rapports"
+
+#~ msgid "Log out"
+#~ msgstr "Se déconnecter"
+
+#~ msgid "Documentation"
+#~ msgstr "Documentation"
+
+#~ msgid "FAQ"
+#~ msgstr "FAQ"
+
+#~ msgid "Feedback"
+#~ msgstr "Retour d’information"
+
+#~ msgid "Server Error"
+#~ msgstr "Erreur serveur"
+
+#~ msgid "Network Error"
+#~ msgstr "Erreur réseau"
+
+#~ msgid "Please check your network connection and try again"
+#~ msgstr "Veuillez vérifier votre connexion réseau et réessayer"
+
+#~ msgid "Unknown network request error"
+#~ msgstr "Erreur de requête réseau inconnue"
+
+#~ msgid "Sorry, you do not have permission to perform this action."
+#~ msgstr ""
+#~ "Nous sommes désolés, vous n’êtes pas autorisé à réaliser cette opération."
+
+#~ msgid "You can request permission from your TolaData administrator."
+#~ msgstr ""
+#~ "Vous pouvez demander l’autorisation auprès de votre administrateur "
+#~ "TolaData."
+
+#~ msgid ""
+#~ "Let us know if you are having a problem or would like to see something "
+#~ "change."
+#~ msgstr ""
+#~ "Dites-nous si vous rencontrez un problème ou souhaitez voir quelque chose "
+#~ "changer."
+
+#~ msgid "Projects"
+#~ msgstr "Projets"
+
+#~ msgid "No available programs"
+#~ msgstr "Aucun programme disponible"
+
+#~ msgid "Browse all sites"
+#~ msgstr "Parcourir tous les sites"
+
+#~ msgid "Sites with results"
+#~ msgstr "Sites avec résultats"
+
+#~ msgid "Sites without results"
+#~ msgstr "Sites sans résultats"
+
+#~ msgid "Monitoring and Evaluation Status"
+#~ msgstr "Statut de suivi et d’évaluation"
+
+#~ msgid "Are programs trackable and backed up with evidence?"
+#~ msgstr "Les programmes sont-ils traçables et étayés par des preuves?"
+
+#, python-format
+#~ msgid "%(no_programs)s active programs"
+#~ msgstr "%(no_programs)s programmes actifs"
+
+#~ msgid ""
+#~ "\n"
+#~ "    <h2>No available programs</h2>\n"
+#~ "    "
+#~ msgstr ""
+#~ "\n"
+#~ "    <h2>Aucun programme disponible</h2>\n"
+#~ "   "
+
+#~ msgid "Program page"
+#~ msgstr "Page du programme"
+
+#~ msgid "Recent progress report"
+#~ msgstr "Rapport de progrès récent"
+
+#, python-format
+#~ msgid ""
+#~ "\n"
+#~ "                            Before adding indicators and performance "
+#~ "results, we need to know your program's\n"
+#~ "                            <a\n"
+#~ "                                id=\"id_link_reporting_period_%(id)s\"\n"
+#~ "                                class=\"\"\n"
+#~ "                                href=\"#\"\n"
+#~ "                                data-toggle=\"modal\"\n"
+#~ "                                data-program=\"%(id)s\"\n"
+#~ "                                data-progstart=\"%(start_date)s\"\n"
+#~ "                                data-progend=\"%(end_date)s\"\n"
+#~ "                                data-rptstart=\"%(reporting_period_start)s"
+#~ "\"\n"
+#~ "                                data-rptend=\"%(reporting_period_end)s\"\n"
+#~ "                                data-indicator_count="
+#~ "\"%(program.indicator_count)s\"\n"
+#~ "                                data-target=\"#id_reporting_period_modal"
+#~ "\">\n"
+#~ "                                reporting start and end dates.\n"
+#~ "                            </a>\n"
+#~ "                            "
+#~ msgstr ""
+#~ "\n"
+#~ "                            Avant d’ajouter des indicateurs et des "
+#~ "résultats de performance, nous devons connaître les\n"
+#~ "                            <a\n"
+#~ "                                id=\"id_link_reporting_period_%(id)s\"\n"
+#~ "                                class=\"\"\n"
+#~ "                                href=\"#\"\n"
+#~ "                                data-toggle=\"modal\"\n"
+#~ "                                data-program=\"%(id)s\"\n"
+#~ "                                data-progstart=\"%(start_date)s\"\n"
+#~ "                                data-progend=\"%(end_date)s\"\n"
+#~ "                                data-rptstart=\"%(reporting_period_start)s"
+#~ "\"\n"
+#~ "                                data-rptend=\"%(reporting_period_end)s\"\n"
+#~ "                                data-indicator_count="
+#~ "\"%(program.indicator_count)s\"\n"
+#~ "                                data-target=\"#id_reporting_period_modal"
+#~ "\">\n"
+#~ "                                dates de début et de fin de rapport de "
+#~ "votre programme.\n"
+#~ "                            </a>\n"
+#~ "                            "
+
+#~ msgid ""
+#~ "Before you can view this program, an administrator needs to set the "
+#~ "program's start and end dates."
+#~ msgstr ""
+#~ "Avant que vous ne soyez en mesure de consulter ce programme, un "
+#~ "administrateur doit définir les dates de début et de fin du programme."
+
+#~ msgid "Start adding indicators to your results framework."
+#~ msgstr "Commencez à ajouter des indicateurs à votre cadre de résultats."
+
+#~ msgid "Start building your results framework and adding indicators."
+#~ msgstr ""
+#~ "Commencez à concevoir votre cadre de résultats et ajouter des indicateurs."
+
+#~ msgid "No indicators have been entered for this program."
+#~ msgstr "Aucun indicateur n’a été entré pour ce programme."
+
+#~ msgid "Program metrics <small>for target periods completed to date</small>"
+#~ msgstr ""
+#~ "Les statistiques du programme <small>pour les périodes cibles complétées "
+#~ "à cette date</small>"
+
+#, python-format
+#~ msgid ""
+#~ "\n"
+#~ "                        <h4>All indicators are missing targets.</h4>\n"
+#~ "                        <p>Visit the <a href=\"%(program_page_url)s"
+#~ "\">Program page</a> to set up targets.</p>\n"
+#~ "                        "
+#~ msgstr ""
+#~ "\n"
+#~ "                        <h4>Tous les indicateurs ont des cibles "
+#~ "manquantes.</h4>\n"
+#~ "                        <p>Rendez-vous sur la <a href="
+#~ "\"%(program_page_url)s\">page du programme</a> pour définir des cibles.</"
+#~ "p>\n"
+#~ "                        "
+
+#~ msgid ""
+#~ "\n"
+#~ "    <p>\n"
+#~ "        You do not have permission to view any programs. You can request "
+#~ "permission from your TolaData administrator.\n"
+#~ "    </p>\n"
+#~ "    <p>\n"
+#~ "        You can also reach the TolaData team by using the <a href="
+#~ "\"https://docs.google.com/forms/d/"
+#~ "e/1FAIpQLSclm2PAT9TJ9q23TT6YWQg6hj3EndUAdyF5k6kvNJHu6njNtw/viewform"
+#~ "\">feedback form.</a>\n"
+#~ "    </p>\n"
+#~ "    "
+#~ msgstr ""
+#~ "\n"
+#~ "    <p>\n"
+#~ "        Vous n’êtes pas autorisé à consulter ces programmes. Vous pouvez "
+#~ "en obtenir l’autorisation en contactant votre administrateur TolaData.\n"
+#~ "    </p>\n"
+#~ "    <p>\n"
+#~ "        Vous pouvez également contacter l’équipe de TolaData en utilisant "
+#~ "le <a href=\"https://docs.google.com/forms/d/"
+#~ "e/1FAIpQLSclm2PAT9TJ9q23TT6YWQg6hj3EndUAdyF5k6kvNJHu6njNtw/viewform"
+#~ "\">formulaire de commentaires.</a>\n"
+#~ "    </p>\n"
+#~ "      "
+
+#~ msgid "Site with result"
+#~ msgstr "Site avec résultat"
+
+#~ msgid "Site without result"
+#~ msgstr "Site sans résultat"
+
+#~ msgid "Dashboard"
+#~ msgstr "Tableau de bord"
+
+#~ msgid "Dashboard report on indicator status by Country and Program"
+#~ msgstr ""
+#~ "Rapport de tableau de bord sur l’état des indicateurs par pays et par "
+#~ "programme"
+
+#~ msgid "TvA Report"
+#~ msgstr "Rapport TVA"
+
+#~ msgid "Indicator Disaggregation Report for"
+#~ msgstr "Rapport de désagrégation des indicateurs pour"
+
+#~ msgid "IndicatorID"
+#~ msgstr "Identifiant d’indicateur"
+
+#~ msgid "Overall"
+#~ msgstr "Global"
+
+#~ msgid "Type"
+#~ msgstr "Type"
+
+#~ msgid "Value"
+#~ msgstr "Valeur"
+
+#~ msgid "Indicator Disaggregation Report"
+#~ msgstr "Rapport de désagrégation de l’indicateur"
+
+#~ msgid "-- All --"
+#~ msgstr "-- Tout --"
+
+#~ msgid "Export to PDF"
+#~ msgstr "Exporter au format PDF"
+
+#~ msgid "PID"
+#~ msgstr "PID"
+
+#~ msgid "LOP Target"
+#~ msgstr "Cible de LoP"
+
+#~ msgid "Actual Total"
+#~ msgstr "Total réel"
+
+#~ msgid "No Disaggregation"
+#~ msgstr "Pas de désagrégation"
+
+#~ msgid "No data available"
+#~ msgstr "Aucune donnée disponible"
+
+#~ msgid "Next"
+#~ msgstr "Suivant"
+
+#~ msgid "Previous"
+#~ msgstr "Précédent"
+
+#~ msgid "Show _MENU_ entries"
+#~ msgstr "Afficher les entrées _MENU_"
+
+#~ msgid "Showing _START_ to _END_ of _TOTAL_ entries"
+#~ msgstr "Affichage des entrées _START_ à _END_ de _TOTAL_"
+
+#~ msgid "Export to CSV"
+#~ msgstr "Exporter au format CSV"
+
+#~ msgid "Select a program before exporting it to PDF"
+#~ msgstr "Sélectionnez un programme avant de l’exporter en PDF"
+
+#~ msgid "Indicator Confirm Delete"
+#~ msgstr "Indicateur Confirmer Supprimer"
+
+#~ msgid "Are you sure you want to delete?"
+#~ msgstr "Êtes-vous sûr de vouloir supprimer ?"
+
+#~ msgid ""
+#~ "Any results assigned to these targets will need to be reassigned. For "
+#~ "future reference, please provide a reason for deleting these targets."
+#~ msgstr ""
+#~ "Tous les résultats affectés à ces cibles devront être réaffectés. À titre "
+#~ "de référence, veuillez justifier la suppression de ces cibles."
+
+#~ msgid ""
+#~ "All details about this indicator and results recorded to the indicator "
+#~ "will be permanently removed. For future reference, please provide a "
+#~ "reason for deleting this indicator."
+#~ msgstr ""
+#~ "Les détails concernant cet indicateur ainsi que les résultats enregistrés "
+#~ "seront définitivement supprimés. À titre de référence, veuillez justifier "
+#~ "la suppression de l’indicateur."
+
+#~ msgid ""
+#~ "Modifying target values will affect program metrics for this indicator. "
+#~ "For future reference, please provide a reason for modifying target values."
+#~ msgstr ""
+#~ "La modification des valeurs cibles affectera les statistiques du "
+#~ "programme pour cet indicateur. À titre de référence, veuillez justifier "
+#~ "la modification des valeurs cibles."
+
+#~ msgid "All details about this indicator will be permanently removed."
+#~ msgstr ""
+#~ "Toutes les informations concernant cet indicateur seront supprimées "
+#~ "définitivement."
+
+#~ msgid "Are you sure you want to delete this indicator?"
+#~ msgstr "Voulez-vous vraiment supprimer cet indicateur ?"
+
+#~ msgid "Are you sure you want to remove all targets?"
+#~ msgstr "Voulez-vous vraiment supprimer l’ensemble des cibles ?"
+
+#~ msgid "Are you sure you want to remove this target?"
+#~ msgstr "Voulez-vous vraiment supprimer cette cible ?"
+
+#~ msgid ""
+#~ "For future reference, please provide a reason for deleting this target."
+#~ msgstr ""
+#~ "À titre de référence, veuillez justifier la suppression de la cible."
+
+#~ msgid "This indicator is missing required details and cannot be saved."
+#~ msgstr ""
+#~ "Cet indicateur nécessite davantage de détails et ne peut être enregistré."
+
+#~ msgid ""
+#~ "Modifying target values will affect program metrics for this indicator."
+#~ msgstr ""
+#~ "La modification des valeurs cibles affectera les statistiques du "
+#~ "programme pour cet indicateur."
+
+#~ msgid "Your changes will be recorded in a change log."
+#~ msgstr ""
+#~ "Vos modifications seront enregistrées dans un journal des modifications."
+
+#~ msgid "Enter event name"
+#~ msgstr "Saisir le nom de l’événement"
+
+#~ msgid "Enter target"
+#~ msgstr "Saisir la cible"
+
+#~ msgid "Options for number (#) indicators"
+#~ msgstr "Options pour les numéros (#) indicateurs"
+
+#, python-format
+#~ msgid "Percentage (%%) indicators"
+#~ msgstr "Indicateurs en pourcentage (%%)"
+
+#, python-format
+#~ msgid ""
+#~ "Life of Program (LoP) targets are now automatically displayed. The "
+#~ "current LoP target does not match what was manually entered in the past "
+#~ "-- %%s. You may need to update your target values."
+#~ msgstr ""
+#~ "Les cibles de vie du programme (LoP) s’affichent désormais "
+#~ "automatiquement. La cible LoP actuelle ne correspond pas aux données "
+#~ "précédemment saisies  — %%s. Il se peut que vos valeurs cibles "
+#~ "nécessitent une mise à jour."
+
+#, python-format
+#~ msgid ""
+#~ "This program previously had a LoP target of %%s. Life of Program (LoP) "
+#~ "targets are now automatically displayed."
+#~ msgstr ""
+#~ "Ce programme possédait autrefois une cible LoP de %%s. Les cibles de vie "
+#~ "du programme (LoP) s’affichent désormais automatiquement."
+
+#~ msgid "Please enter a number greater than or equal to zero."
+#~ msgstr "Veuillez entrer un nombre supérieur ou égal à zéro."
+
+#~ msgid "The Life of Program (LoP) target cannot be zero."
+#~ msgstr "La valeur de la cible LoP ne peut être zéro."
+
+#~ msgid "Please enter a target."
+#~ msgstr "Veuillez entrer une cible."
+
+#~ msgid "Please complete this field"
+#~ msgstr "Veuillez compléter ce champ"
+
+#~ msgid ""
+#~ "The Life of Program (LoP) target cannot be zero.  Please update targets."
+#~ msgstr ""
+#~ "La valeur de la cible LoP ne peut être zéro. Veuillez mettre à jour les "
+#~ "cibles."
+
+#~ msgid "Please complete all event names and targets."
+#~ msgstr "Veuillez remplir tous les noms d'événements et de cibles."
+
+#~ msgid "Please complete targets."
+#~ msgstr "Veuillez compléter les cibles."
+
+#~ msgid "Please complete all required fields in the Targets tab."
+#~ msgstr "Veuillez compléter tous les champs requis dans l’onglet Cibles."
+
+#~ msgid "Please complete all required fields in the Summary tab."
+#~ msgstr "Veuillez remplir tous les champs obligatoires dans l’onglet Résumé."
+
+#~ msgid "Please complete all required fields in the Performance tab."
+#~ msgstr ""
+#~ "Veuillez compléter tous les champs requis dans l’onglet Performance."
+
+#~ msgid "Summary"
+#~ msgstr "Résumé"
+
+#~ msgid "Delete this indicator"
+#~ msgstr "Supprimer cet indicateur"
+
+#~ msgid "Save and add another"
+#~ msgstr "Sauvegarder et continuer à ajouter"
+
+#~ msgid "Are you sure?"
+#~ msgstr "Êtes-vous sûr(e) ?"
+
+#~ msgid "Indicator Plan"
+#~ msgstr "Plan de l’indicateur"
+
+#~ msgid "Program period"
+#~ msgstr "Période du programme"
+
+#~ msgid ""
+#~ "Program reporting dates are required in order to view program metrics"
+#~ msgstr ""
+#~ "Les dates de rapport du programme sont requises pour afficher les "
+#~ "statistiques du programme"
+
+#~ msgid ""
+#~ "The program period is used in the setup of periodic targets and in "
+#~ "Indicator Performance Tracking Tables (IPTT). TolaData initially sets the "
+#~ "program period to include the program’s official start and end dates, as "
+#~ "recorded in the Grant and Award Information Tracker (GAIT) system. The "
+#~ "program period may be adjusted to align with the program’s indicator plan."
+#~ msgstr ""
+#~ "La période de déclaration du programme est utilisée dans l’établissement "
+#~ "des cibles périodiques et dans les tableaux de suivi des performances des "
+#~ "indicateurs (IPTT). TolaData définit initialement la période de "
+#~ "déclaration pour inclure les dates de début et de fin officielles du "
+#~ "programme, telles qu’elles sont enregistrées dans le système de suivi des "
+#~ "informations sur les subventions et les récompenses (GAIT). La période de "
+#~ "déclaration peut être ajustée pour s’harmoniser avec le plan "
+#~ "d’indicateurs du programme."
+
+#~ msgid "GAIT program dates"
+#~ msgstr "Dates du programme GAIT"
+
+#~ msgid "Program start and end dates"
+#~ msgstr "Les dates de début et de fin de déclaration de votre programme"
+
+#~ msgid ""
+#~ "\n"
+#~ "                                While a program may begin and end any day "
+#~ "of the month, program periods must begin on the first day of the month "
+#~ "and end on the last day of the month. Please note that the program start "
+#~ "date can only be adjusted <span class=\"color-red\">before periodic "
+#~ "targets are set up and a program begins submitting performance results.</"
+#~ "span> The program end date can be moved later at any time, but can't be "
+#~ "moved earlier once periodic targets are set up.\n"
+#~ "                                "
+#~ msgstr ""
+#~ "\n"
+#~ "                                Alors qu’un programme peut débuter et se "
+#~ "terminer n’importe quel jour du mois, les périodes du programme doivent "
+#~ "débuter le premier jour du mois et se terminer le dernier jour du mois. "
+#~ "Veuillez noter que la date de début du programme peut uniquement être "
+#~ "ajustée <span class=\"color-red\">avant que des cibles périodiques aient "
+#~ "été spécifiées et qu’un programme commence à transmettre des résultats de "
+#~ "performance.</span> La date de fin du programme peut être déplacée "
+#~ "ultérieurement à tout moment, mais ne peut plus être avancée dès que des "
+#~ "cibles périodiques ont été spécifiées.\n"
+#~ "                                "
+
+#~ msgid ""
+#~ "\n"
+#~ "                                While a program may begin and end any day "
+#~ "of the month, program periods must begin on the first day of the month "
+#~ "and end on the last day of the month. Please note that the program start "
+#~ "date can only be adjusted <span class=\"color-red\">before targets are "
+#~ "set up and a program begins submitting performance results.</span> "
+#~ "Because this program already has periodic targets set up, only the "
+#~ "program end date can be moved later.\n"
+#~ "                                "
+#~ msgstr ""
+#~ "\n"
+#~ "                                Alors qu’un programme peut commencer et "
+#~ "se terminer n’importe quel jour du mois, les périodes du programme "
+#~ "doivent débuter le premier jour du mois et se terminer le dernier jour du "
+#~ "mois. Veuillez noter que la date de début du programme peut seulement "
+#~ "être ajustée <span class=\"color-red\">avant que des cibles ont été "
+#~ "spécifiées et qu’un programme commence à transmettre des résultats de "
+#~ "performance.</span> Puisque ce programme a déjà des cibles périodiques "
+#~ "définies, seule la date de fin de programme peut être déplacée "
+#~ "ultérieurement.\n"
+#~ "                                "
+
+#~ msgid "Back to Homepage"
+#~ msgstr "Retour à la page d’accueil"
+
+#~ msgid ""
+#~ "Error. Could not retrieve data from server. Please report this to the "
+#~ "Tola team."
+#~ msgstr ""
+#~ "Erreur. Impossible de récupérer les données à partir du serveur. Veuillez "
+#~ "le signaler à l’équipe de Tola."
+
+#~ msgid "Unavailable"
+#~ msgstr "Non disponible"
+
+#~ msgid ""
+#~ "This action may result in changes to your periodic targets. If you have "
+#~ "already set up periodic targets for your indicators, you may need to "
+#~ "enter additional target values to cover the entire reporting period. For "
+#~ "future reference, please provide a reason for modifying the reporting "
+#~ "period."
+#~ msgstr ""
+#~ "Cette action peut modifier vos cibles périodiques. Si des cibles "
+#~ "périodiques ont déjà été définies pour vos indicateurs, vous devrez "
+#~ "entrer de nouvelles valeurs de cibles afin de couvrir l’ensemble de la "
+#~ "période du rapport. À titre de référence, veuillez fournir une "
+#~ "justification pour la modification de la période du rapport."
+
+#~ msgid ""
+#~ "You must enter values for the reporting start and end dates before saving."
+#~ msgstr ""
+#~ "Vous devez saisir des valeurs pour les dates de début et de fin du "
+#~ "rapport avant d’enregistrer."
+
+#~ msgid "The end date must come after the start date."
+#~ msgstr "La date de fin vient toujours après la date de démarrage."
+
+#~ msgid "Reporting period updated"
+#~ msgstr "Période de déclaration mise à jour"
+
+#~ msgid "There was a problem saving your changes."
+#~ msgstr ""
+#~ "Un problème est survenu lors de l’enregistrement de vos modifications."
+
+#, python-format
+#~ msgid ""
+#~ "\n"
+#~ "            %(get_target_frequency_label)s targets\n"
+#~ "            "
+#~ msgstr ""
+#~ "\n"
+#~ "            Cibles %(get_target_frequency_label)s\n"
+#~ "            "
+
+#~ msgid "Add an event"
+#~ msgstr "Ajouter un événement"
+
+#~ msgid "Remove all targets"
+#~ msgstr "Supprimer toutes les cibles"
+
+#~ msgid ""
+#~ "\n"
+#~ "                    <strong>Non-cumulative (NC):</strong> Target period "
+#~ "results are automatically calculated from data collected during the "
+#~ "period. The Life of Program result is the sum of target period values.\n"
+#~ "                    "
+#~ msgstr ""
+#~ "\n"
+#~ "                    <strong>Non cumulatif (NC) :</strong> Les résultats "
+#~ "de la période cible sont calculés automatiquement à partir des données "
+#~ "collectées durant la période. Le résultat de la vie du programme est la "
+#~ "somme des valeurs de la période cible.\n"
+#~ "                    "
+
+#~ msgid ""
+#~ "\n"
+#~ "                    <strong>Cumulative (C):</strong> Target period "
+#~ "results automatically include data from previous periods. The Life of "
+#~ "Program result mirrors the latest period value.\n"
+#~ "                    "
+#~ msgstr ""
+#~ "\n"
+#~ "                    <strong>Cumulatif (C) :</strong> Les résultats de la "
+#~ "période cible incluent automatiquement les données des périodes "
+#~ "précédentes. Le résultat de la vie du programme reflète la dernière "
+#~ "valeur de période.\n"
+#~ "                    "
+
+#~ msgid ""
+#~ "\n"
+#~ "                    <strong>Cumulative (C):</strong> The Life of Program "
+#~ "result mirrors the latest period result. No calculations are performed "
+#~ "with results.\n"
+#~ "                    "
+#~ msgstr ""
+#~ "\n"
+#~ "                    <strong>Cumulatif (C) :</strong> Le résultat de la "
+#~ "vie du programme reflète le dernier résultat de période. Aucun calcul "
+#~ "n’est effectué avec les résultats.\n"
+#~ "                    "
+
+#, python-format
+#~ msgid ""
+#~ "\n"
+#~ "            %(get_target_frequency_label)s target\n"
+#~ "            "
+#~ msgstr ""
+#~ "\n"
+#~ "            cible de %(get_target_frequency_label)s\n"
+#~ "            "
+
+#~ msgid "Remove target"
+#~ msgstr "Supprimer la cible"
+
+#~ msgid "Program details"
+#~ msgstr "Détails du programme"
+
+#~ msgid "Results framework"
+#~ msgstr "Cadre de résultats"
+
+#~ msgid "Create results framework"
+#~ msgstr "Créer un cadre de résultats"
+
+#~ msgid "View program in GAIT"
+#~ msgstr "Afficher le programme dans GAIT"
+
+#~ msgid "Pinned reports"
+#~ msgstr "Épingler les rapports"
+
+#~ msgid "IPTT:"
+#~ msgstr "IPTT :"
+
+#~ msgid "Create an IPTT report"
+#~ msgstr "Créer un rapport IPTT"
+
+#~ msgid "Reports will be available after the program start date."
+#~ msgstr ""
+#~ "Les rapports seront disponibles après la date de début du programme."
+
+#~ msgid "Program setup"
+#~ msgstr "Installation du programme"
+
+#, python-format
+#~ msgid ""
+#~ "\n"
+#~ "    Before adding indicators and performance results, we need to know "
+#~ "your program's\n"
+#~ "    <a\n"
+#~ "        class=\"pl-1\"\n"
+#~ "        href=\"#\"\n"
+#~ "        data-toggle=\"modal\"\n"
+#~ "        data-program=\"%(id)s\"\n"
+#~ "        data-progstart=\"%(start_date)s\"\n"
+#~ "        data-progend=\"%(end_date)s\"\n"
+#~ "        data-rptstart=\"%(reporting_period_start)s\"\n"
+#~ "        data-rptend=\"%(reporting_period_end)s\"\n"
+#~ "        data-target=\"#id_reporting_period_modal\"\n"
+#~ "    >reporting start and end dates.</a>\n"
+#~ "    "
+#~ msgstr ""
+#~ "\n"
+#~ "    Avant d’ajouter des indicateurs et des résultats de performances, "
+#~ "nous devons connaître les\n"
+#~ "    <a\n"
+#~ "        class=\"pl-1\"\n"
+#~ "        href=\"#\"\n"
+#~ "        data-toggle=\"modal\"\n"
+#~ "        data-program=\"%(id)s\"\n"
+#~ "        data-progstart=\"%(start_date)s\"\n"
+#~ "        data-progend=\"%(end_date)s\"\n"
+#~ "        data-rptstart=\"%(reporting_period_start)s\"\n"
+#~ "        data-rptend=\"%(reporting_period_end)s\"\n"
+#~ "        data-target=\"#id_reporting_period_modal\"\n"
+#~ "    >dates de début et de fin de rapport de votre programme.</a>\n"
+#~ "    "
+
+#~ msgid ""
+#~ "Only completed target periods are included in the “indicators on "
+#~ "track” calculations."
+#~ msgstr ""
+#~ "Seules les périodes cibles complétées sont incluses dans les calculs des "
+#~ "« indicateurs en bonne voie »."
+
+#~ msgid "Last completed target period"
+#~ msgstr "Dernière période cible terminée"
+
+#~ msgid "Semi-Annual"
+#~ msgstr "Semestriel"
+
+#~ msgid "Tri-Annual"
+#~ msgstr "Quadrimestriel"
+
+#~ msgid ""
+#~ "If an indicator only has a Life of Program (LoP) target, we calculate "
+#~ "performance after the program end date."
+#~ msgstr ""
+#~ "Si un indicateur n’a qu’une cible de vie du programme, nous calculons la "
+#~ "performance après la date de fin du programme."
+
+#~ msgid ""
+#~ "For midline/endline and event-based target periods, we begin tracking "
+#~ "performance as soon as the first result is submitted."
+#~ msgstr ""
+#~ "Pour les périodes cibles de mi-parcours, de fin de programme et basées "
+#~ "sur les évènements, nous commençons à suivre la performance dès que le "
+#~ "premier résultat est enregistré."
+
+#~ msgid ""
+#~ "The result value and any information associated with it will be "
+#~ "permanently removed. For future reference, please provide a reason for "
+#~ "deleting this result."
+#~ msgstr ""
+#~ "La valeur de résultat et toute information y étant associée seront "
+#~ "supprimées définitivement. À titre de référence, veuillez fournir une "
+#~ "justification pour la suppression de ce résultat."
+
+#~ msgid "Could not save form."
+#~ msgstr "Impossible d’enregistrer le formulaire."
+
+#~ msgid "Please enter a number with no letters or symbols."
+#~ msgstr "Veuillez saisir un nombre sans lettre ni symbole."
+
+#~ msgid "Please enter a valid date."
+#~ msgstr "Veuillez entrer une date valide."
+
+#~ msgid "You can begin entering results on"
+#~ msgstr "Vous pouvez commencer à saisir des résultats le"
+
+#~ msgid "Please select a date between"
+#~ msgstr "Veuillez sélectionner une date entre"
+
+#~ msgid "A link must be included along with the record name."
+#~ msgstr "Un lien doit être inclus avec le nom de l’enregistrement."
+
+#~ msgid "However, there may be a problem with the evidence URL."
+#~ msgstr "Cependant, il peut y avoir un problème avec l’URL de preuve."
+
+#~ msgid "Review warning."
+#~ msgstr "Vérifiez l’avertissement."
+
+#~ msgid "The sum of disaggregated values does not match the actual value."
+#~ msgstr ""
+#~ "La somme des valeurs désagrégées ne correspond pas à la valeur réelle."
+
+#~ msgid "For future reference, please share your reason for these variations."
+#~ msgstr ""
+#~ "À titre d'information, veuillez partager la raison de ces variations."
+
+#~ msgid ""
+#~ "Modifying results will affect program metrics for this indicator and "
+#~ "should only be done to correct a data entry error. For future reference, "
+#~ "please provide a reason for modifying this result."
+#~ msgstr ""
+#~ "La modification des résultats affectera les statistiques du programme "
+#~ "pour cet indicateur, et ne doit être réalisée qu’en vue de corriger une "
+#~ "erreur d’entrée de données. À titre de référence, veuillez justifier la "
+#~ "modification de ce résultat."
+
+#~ msgid "One or more fields needs attention."
+#~ msgstr "Un ou plusieurs champs requièrent votre attention."
+
+#~ msgid ""
+#~ "Link this result to a record or folder of records that serves as evidence."
+#~ msgstr ""
+#~ "Liez ce résultat à un enregistrement ou un dossier d’enregistrements "
+#~ "servant de preuve."
+
+#~ msgid "Delete this result"
+#~ msgstr "Supprimer ce résultat"
+
+#, python-format
+#~ msgid "%% Met"
+#~ msgstr "%% atteint"
+
+#~ msgid "View project"
+#~ msgstr "Voir le projet"
+
+#~ msgid "View Project"
+#~ msgstr "Voir le projet"
+
+#~ msgid ""
+#~ "Results are non-cumulative. The Life of Program result is the sum of "
+#~ "target periods results."
+#~ msgstr ""
+#~ "Les résultats sont non cumulatifs. Le résultat de la vie du programme est "
+#~ "la somme des résultats des périodes cibles."
+
+#~ msgid ""
+#~ "Results are non-cumulative. Target period and Life of Program results are "
+#~ "calculated from the average of results."
+#~ msgstr ""
+#~ "Les résultats ne peuvent être cumulés. La période cible et la vie du "
+#~ "programme sont calculées à partir de la moyenne des résultats."
+
+#~ msgid "Targets are not set up for this indicator."
+#~ msgstr "Les cibles ne sont pas configurées pour cet indicateur."
+
+#~ msgid ""
+#~ "\n"
+#~ "                        This record is not associated with a target. Open "
+#~ "the data record and select an option from the “Measure against target” "
+#~ "menu.\n"
+#~ "                        "
+#~ msgstr ""
+#~ "\n"
+#~ "                        Cet enregistrement n’est pas associé à une cible. "
+#~ "Ouvrez l’enregistrement de données et sélectionnez une option à partir du "
+#~ "menu « Mesure par rapport à la cible ».\n"
+#~ "                        "
+
+#, python-format
+#~ msgid ""
+#~ "\n"
+#~ "                        This date falls outside the range of your target "
+#~ "periods. Please select a date between %(reporting_period_start)s and "
+#~ "%(reporting_period_end)s.\n"
+#~ "                        "
+#~ msgstr ""
+#~ "\n"
+#~ "                        Cette date est en dehors de la plage de vos "
+#~ "périodes cibles. Veuillez sélectionner une date entre "
+#~ "%(reporting_period_start)s et %(reporting_period_end)s.\n"
+#~ "                        "
+
+#~ msgid ""
+#~ "This date determines where the result appears in indicator performance "
+#~ "tracking tables. If data collection occurred within the target period, we "
+#~ "recommend entering the last day you collected data. If data collection "
+#~ "occurred after the target period ended, we recommend entering the last "
+#~ "day of the <i>target period in which you want the result to appear.</i>"
+#~ msgstr ""
+#~ "Cette date détermine l’endroit où le résultat apparaît dans les tableaux "
+#~ "de suivi des indicateurs de performance. Si la collecte des données a eu "
+#~ "lieu pendant la période cible, nous vous recommandons de renseigner le "
+#~ "dernier jour où vous avez collecté des données. Si la collecte des "
+#~ "données a eu lieu après la fin de la période cible, nous vous "
+#~ "recommandons de renseigner le dernier jour de la <i>période cible au sein "
+#~ "de laquelle vous souhaitez voir apparaître le résultat</i>"
+
+#~ msgid ""
+#~ "All results for this indicator will be measured against the Life of "
+#~ "Program (LoP) target."
+#~ msgstr ""
+#~ "Tous les résultats pour cet indicateur seront comparés à la cible de vie "
+#~ "du programme."
+
+#~ msgid "The target is automatically determined by the result date."
+#~ msgstr "La cible est automatiquement déterminée par la date de résultat."
+
+#~ msgid "You can measure this result against the Midline or Endline target."
+#~ msgstr ""
+#~ "Vous pouvez comparer ce résultat à la cible de mi-parcours ou de fin de "
+#~ "programme."
+
+#~ msgid "Actual values are rounded to two decimal places."
+#~ msgstr "Les valeurs réelles sont arrondies à deux décimales."
+
+#~ msgid "Needs attention"
+#~ msgstr "Requiert votre attention"
+
+#~ msgid "Sum"
+#~ msgstr "Somme"
+
+#~ msgid "Update actual value"
+#~ msgstr "Mettre à jour la valeur réelle"
+
+#~ msgid ""
+#~ "Provide a link to a file or folder in Google Drive or another shared "
+#~ "network drive. Please be aware that TolaData does not store a copy of "
+#~ "your record, <i>so you should not link to something on your personal "
+#~ "computer, as no one else will be able to access it.</i>"
+#~ msgstr ""
+#~ "Fournissez un lien vers un fichier ou un dossier dans Google Drive ou un "
+#~ "autre service de partage en ligne. Veuillez noter que TolaData ne "
+#~ "conserve pas de copie de votre enregistrement. <i>Vous ne pouvez donc pas "
+#~ "créer de lien vers un élément présent sur votre ordinateur personnel "
+#~ "puisque personne ne pourrait y accéder.</i>"
+
+#~ msgid "view"
+#~ msgstr "afficher"
+
+#~ msgid "Browse Google Drive"
+#~ msgstr "Parcourir Google Drive"
+
+#~ msgid "Give your record a short name that is easy to remember."
+#~ msgstr ""
+#~ "Attribuez un nom court et facilement mémorisable à votre enregistrement."
+
+#~ msgid "View logframe"
+#~ msgstr "Afficher le cadre logique"
+
+#~ msgid ""
+#~ "Indicators are currently grouped by an older version of indicator levels. "
+#~ "To group indicators according to the results framework and view the "
+#~ "Logframe, an admin will need to adjust program settings."
+#~ msgstr ""
+#~ "Les indicateurs sont actuellement regroupés selon une précédente version "
+#~ "de niveaux d’indicateur. Pour qu'ils soient regroupés selon le cadre de "
+#~ "résultats et afficher le cadre logique, les paramètres du programme "
+#~ "devront être modifiés par un administrateur."
+
+#, python-format
+#~ msgid ""
+#~ "\n"
+#~ "                    %(unavailable)s%% unavailable\n"
+#~ "                    "
+#~ msgstr ""
+#~ "\n"
+#~ "                       %(unavailable)s%% indisponible\n"
+#~ "                    "
+
+#, python-format
+#~ msgid ""
+#~ "\n"
+#~ "                        <strong>%(high)s%%</strong> are &gt;%(margin)s%% "
+#~ "above target\n"
+#~ "                        "
+#~ msgstr ""
+#~ "\n"
+#~ "                        <strong>%(high)s%%</strong> sont &gt;%(margin)s%% "
+#~ "au-dessus de la cible\n"
+#~ "                    "
+
+#, python-format
+#~ msgid ""
+#~ "\n"
+#~ "                        <strong>%(on_scope)s%%</strong> are on track\n"
+#~ "                        "
+#~ msgstr ""
+#~ "\n"
+#~ "                        <strong>%(on_scope)s%%</strong> sont en bonne "
+#~ "voie\n"
+#~ "                    "
+
+#, python-format
+#~ msgid ""
+#~ "The actual value matches the target value, plus or minus 15%%. So if your "
+#~ "target is 100 and your result is 110, the indicator is 10%% above target "
+#~ "and on track.  <br><br>Please note that if your indicator has a "
+#~ "decreasing direction of change, then “above” and “below” are switched. In "
+#~ "that case, if your target is 100 and your result is 200, your indicator "
+#~ "is 50%% below target and not on track.<br><br><a href='https://docs."
+#~ "google.com/document/d/1Gl9bxJJ6hdhCXeoOCoR1mnVKZa2FlEOhaJcjexiHzY0' "
+#~ "target='_blank'>See our documentation for more information.</a>"
+#~ msgstr ""
+#~ "La valeur réelle correspond à la valeur cible à 15%% près. Ainsi, si "
+#~ "votre cible est 100 et votre résultat 110, l’indicateur est 10%% au-"
+#~ "dessus de la cible et est donc sur la bonne voie.  <br><br>Veuillez noter "
+#~ "que si le sens de changement de votre indicateur est décroissant, les "
+#~ "indicateurs « au-dessus » et « en dessous » sont alors inversés. Dans ce "
+#~ "cas, si votre cible est 100 et votre résultat 200, votre indicateur est "
+#~ "50%% en dessous de la cible, ce qui veut dire qu’il n’est pas sur la "
+#~ "bonne voie.<br><br><a href='https://docs.google.com/document/"
+#~ "d/1Gl9bxJJ6hdhCXeoOCoR1mnVKZa2FlEOhaJcjexiHzY0' target='_blank'>Consultez "
+#~ "notre documentation pour plus d’informations.</a>"
+
+#, python-format
+#~ msgid ""
+#~ "\n"
+#~ "                        <strong>%(low)s%%</strong> are &gt;%(margin)s%% "
+#~ "below target\n"
+#~ "                        "
+#~ msgstr ""
+#~ "\n"
+#~ "                         <strong>%(low)s %%</strong> sont >%(margin)s%% "
+#~ "en dessous de la cible\n"
+#~ "                    "
+
+#, python-format
+#~ msgid ""
+#~ "\n"
+#~ "            <a\n"
+#~ "                id=\"id_link_reporting_period_%(program.id)s\"\n"
+#~ "                class=\"\"\n"
+#~ "                href=\"#\"\n"
+#~ "                data-toggle=\"modal\"\n"
+#~ "                data-program=\"%(program.id)s\"\n"
+#~ "                data-progstart=\"%(program.start_date)s\"\n"
+#~ "                data-progend=\"%(program.end_date)s\"\n"
+#~ "                data-rptstart=\"%(program.reporting_period_start)s\"\n"
+#~ "                data-rptend=\"%(program.reporting_period_end)s\"\n"
+#~ "                data-target=\"#id_reporting_period_modal\"\n"
+#~ "                data-read-only=\"%(read_only)s\">\n"
+#~ "                Program period\n"
+#~ "            </a>\n"
+#~ "            is <br><strong class=\"text-dark\">"
+#~ "%(program.percent_complete)s%% complete</strong>\n"
+#~ "        "
+#~ msgstr ""
+#~ "\n"
+#~ "    <a\n"
+#~ "        id=\"id_link_reporting_period_%(program.id)s\"\n"
+#~ "        class=\"\"\n"
+#~ "        href=\"#\"\n"
+#~ "        data-toggle=\"modal\"\n"
+#~ "        data-program=\"%(program.id)s\"\n"
+#~ "        data-progstart=\"%(program.start_date)s\"\n"
+#~ "        data-progend=\"%(program.end_date)s\"\n"
+#~ "        data-rptstart=\"%(program.reporting_period_start)s\"\n"
+#~ "        data-rptend=\"%(program.reporting_period_end)s\"\n"
+#~ "        data-target=\"#id_reporting_period_modal\"\n"
+#~ "        data-read-only=\"%(read_only)s\">\n"
+#~ "        La période de programme\n"
+#~ " </a>\n"
+#~ "    est <br><strong class=\"text-dark\">%(program.percent_complete)s%% "
+#~ "complète</strong>\n"
+#~ "    "
+
+#, python-format
+#~ msgid ""
+#~ "\n"
+#~ "                <p><strong>The actual value is %(percent_met)s%% of the "
+#~ "target value.</strong> An indicator is on track if the result is no less "
+#~ "than 85%% of the target and no more than 115%% of the target.</p>\n"
+#~ "                <p><em>Remember to consider your direction of change when "
+#~ "thinking about whether the indicator is on track.</em></p>\n"
+#~ "                "
+#~ msgstr ""
+#~ "\n"
+#~ "            <p><strong>La valeur réelle représente %(percent_met)s%% de "
+#~ "la valeur cible.</strong> Un indicateur est en bonne voie si le résultat "
+#~ "n’est ni inférieur à 85%% de la cible, ni supérieur à 115%% de la cible. "
+#~ "</p>\n"
+#~ "            <p><em>Pensez à prendre en compte la direction du changement "
+#~ "souhaité lorsque vous réfléchissez au statut d’un indicateur.</em></p>\n"
+#~ "            "
+
+#~ msgid "An error occured while logging in with your Okta account."
+#~ msgstr ""
+#~ "Une erreur est survenue lors de la connexion à l’aide de votre compte "
+#~ "Okta."
+
+#~ msgid "Please contact the TolaData team for assistance."
+#~ msgstr "Veuillez contacter l’équipe TolaData pour obtenir de l’aide."
+
+#~ msgid ""
+#~ " You can also reach the TolaData team by using the <a href=\"https://docs."
+#~ "google.com/forms/d/"
+#~ "e/1FAIpQLSclm2PAT9TJ9q23TT6YWQg6hj3EndUAdyF5k6kvNJHu6njNtw/viewform"
+#~ "\">feedback form.</a>\n"
+#~ "    "
+#~ msgstr ""
+#~ " Vous pouvez également contacter l’équipe de TolaData en utilisant le <a "
+#~ "href=\"https://docs.google.com/forms/d/"
+#~ "e/1FAIpQLSclm2PAT9TJ9q23TT6YWQg6hj3EndUAdyF5k6kvNJHu6njNtw/viewform"
+#~ "\">formulaire de commentaires.</a>\n"
+#~ "    "
+
+#~ msgid "This Gmail address is not associated with a TolaData user account."
+#~ msgstr ""
+#~ "Cette adresse Gmail n’est associée à aucun compte d’utilisateur TolaData."
+
+#~ msgid "You can request an account from your TolaData administrator."
+#~ msgstr ""
+#~ "Vous pouvez faire une demande de compte en contactant votre "
+#~ "administrateur TolaData."
+
+#~ msgid ""
+#~ "\n"
+#~ "        <h1><small>Welcome to</small> TolaData</h1>\n"
+#~ "        "
+#~ msgstr ""
+#~ "\n"
+#~ "        <h1><small>Bienvenue sur</small> TolaData</h1>\n"
+#~ "    "
+
+#~ msgid ""
+#~ "\n"
+#~ "        <i class=\"fas fa-sign-in-alt\"></i><small>Log in with a "
+#~ "<strong>mercycorps.org</strong> email address</small>\n"
+#~ "        "
+#~ msgstr ""
+#~ "\n"
+#~ "        <i class=\"fas fa-sign-in-alt\"></i><small>Se connecter avec une "
+#~ "adresse e-mail <strong>mercycorps.org</strong></small>\n"
+#~ "  "
+
+#~ msgid ""
+#~ "\n"
+#~ "        <i class=\"fa fa-sign-in-alt\"></i><small>Log in with "
+#~ "<strong>Gmail</strong></small>\n"
+#~ "        "
+#~ msgstr ""
+#~ "\n"
+#~ "        <i class=\"fa fa-sign-in-alt\"></i><small>Se connecter avec une "
+#~ "adresse <strong>Gmail</strong></small>\n"
+#~ "        "
+
+#~ msgid "Log in with a username and password"
+#~ msgstr "Se connecter avec un nom d’utilisateur et un mot de passe"
+
+#, python-format
+#~ msgid ""
+#~ "\n"
+#~ "                <p>Please enter a correct username and password. Note "
+#~ "that both fields may be case-sensitive. Did you forget your password? <a "
+#~ "href=\"%(password_reset_url)s\">Click here to reset it.</a></p>\n"
+#~ "                "
+#~ msgstr ""
+#~ "\n"
+#~ "                <p>Veuillez saisir un nom d’utilisateur et un mot de "
+#~ "passe valides. Notez que chaque champ peut être sensible à la casse. Vous "
+#~ "avez oublié votre mot de passe ? <a href=\"%(password_reset_url)s"
+#~ "\">Cliquez ici pour le réinitialiser.</a></p>\n"
+#~ "                "
+
+#~ msgid "Need help logging in?"
+#~ msgstr "Besoin d’aide pour vous connecter ?"
+
+#~ msgid ""
+#~ "\n"
+#~ "            Contact your TolaData administrator or <a href=\"mailto:"
+#~ "tola@mercycorps.org\">email the TolaData team.</a>\n"
+#~ "            "
+#~ msgstr ""
+#~ "\n"
+#~ "            Contactez votre administrateur TolaData ou <a href=\"mailto:"
+#~ "tola@mercycorps.org\">envoyez un e-mail à l’équipe TolaData.</a>\n"
+#~ "            "
+
+#~ msgid "Password changed"
+#~ msgstr "Mot de passe modifié"
+
+#, python-format
+#~ msgid ""
+#~ "\n"
+#~ "    <p>Your password has been changed.</p>\n"
+#~ "    <p><a href=\"%(login_url)s\" class=\"btn btn-primary\">Log in</a></"
+#~ "p>\n"
+#~ "    "
+#~ msgstr ""
+#~ "\n"
+#~ "    <p>Votre mot de passe a été modifié.</p>\n"
+#~ "    <p><a href=\"%(login_url)s\" class=\"btn btn-primary\">Se connecter</"
+#~ "a></p>\n"
+#~ "    "
+
+#~ msgid "Reset password"
+#~ msgstr "Réinitialiser le mot de passe"
+
+#~ msgid "Submit"
+#~ msgstr "Soumettre"
+
+#~ msgid "Password reset email sent"
+#~ msgstr "E-mail de confirmation de réinitialisation de mot de passe envoyé"
+
+#, python-format
+#~ msgid ""
+#~ "\n"
+#~ "    <p>We’ve sent an email to the address you’ve provided.</p>\n"
+#~ "\n"
+#~ "    <h4>If you didn’t receive an email, please try the following:</h4>\n"
+#~ "\n"
+#~ "    <ul>\n"
+#~ "        <li>Check your spam or junk mail folder.</li>\n"
+#~ "        <li>Verify that you entered your email address correctly.</li>\n"
+#~ "        <li>Verify that you entered the email address associated with "
+#~ "your TolaData account.</li>\n"
+#~ "    </ul>\n"
+#~ "\n"
+#~ "    <h4>If you are using a mercycorps.org address to log in:</h4>\n"
+#~ "    <p>Return to the <a href=\"%(login_url)s\">log in page</a> and click "
+#~ "<strong>Log in with a mercycorps.org email address.</strong></p>\n"
+#~ "\n"
+#~ "    <h4>If you are using a Gmail address to log in:</h4>\n"
+#~ "    <p>Return to the <a href=\"%(login_url)s\">log in page</a> and click "
+#~ "<strong>Log in with Gmail.</strong> <em>We cannot reset your Gmail "
+#~ "password.</em></p>\n"
+#~ "    "
+#~ msgstr ""
+#~ "\n"
+#~ "    <p>Nous avons envoyé un e-mail à l’adresse que vous nous avez "
+#~ "indiquée.</p>\n"
+#~ "\n"
+#~ "    <h4>Si vous n’avez pas reçu d’e-mail, veuillez suivre la procédure "
+#~ "suivante :</h4>\n"
+#~ "\n"
+#~ "    <ul>\n"
+#~ "        <li>Sur votre compte e-mail, vérifiez les dossiers Spams ou "
+#~ "Courrier indésirable.</li>\n"
+#~ "        <li>Assurez-vous d’avoir correctement saisi votre adresse e-mail."
+#~ "</li>\n"
+#~ "        <li>Assurez-vous d’avoir saisi l’adresse e-mail associée à votre "
+#~ "compte TolaData.</li>\n"
+#~ "    </ul>\n"
+#~ "\n"
+#~ "    <h4>Si vous vous connectez à l’aide d’une adresse e-mail mercycorps."
+#~ "org :</h4>\n"
+#~ "    <p>Retournez sur la <a href=\"%(login_url)s\">page de connexion</a> "
+#~ "et cliquez sur <strong>Se connecter avec une adresse e-mail mercycorps."
+#~ "org.</strong></p>\n"
+#~ "\n"
+#~ "    <h4>Si vous vous connectez à l’aide d’une adresse e-mail Gmail :</"
+#~ "h4>\n"
+#~ "    <p>Retournez sur la <a href=\"%(login_url)s\">page de connexion</a> "
+#~ "et cliquez sur <strong>Se connecter avec Gmail.</strong> <em>Nous ne "
+#~ "pouvons pas réinitialiser votre mot de passe Gmail.</em></p>\n"
+#~ "    "
+
+#, python-format
+#~ msgid ""
+#~ "\n"
+#~ "Someone has requested that you change the password associated with the "
+#~ "username %(user)s on the Mercy Corps TolaData application. This usually "
+#~ "happens when you click the “forgot password” link.\n"
+#~ "\n"
+#~ "If you did not request a new password, you can ignore this email.\n"
+#~ "\n"
+#~ "If you want to change your password, please click the following link and "
+#~ "choose a new password:\n"
+#~ msgstr ""
+#~ "\n"
+#~ "Une personne vous demande de modifier votre mot de passe associé au nom "
+#~ "d’utilisateur %(user)s sur l’application TolaData de Mercy Corps. En "
+#~ "général, cela se produit lorsque vous cliquez sur le lien « oubli du mot "
+#~ "de passe ».\n"
+#~ "\n"
+#~ "Si vous n’êtes pas à l’origine de cette demande, vous pouvez ignorer cet "
+#~ "e-mail.\n"
+#~ "\n"
+#~ "Si vous souhaitez modifier votre mot de passe, veuillez cliquer sur le "
+#~ "lien suivant et définir un nouveau mot de passe :\n"
+
+#~ msgid ""
+#~ "\n"
+#~ "You can also copy and paste this link into the address bar of your web "
+#~ "browser.\n"
+#~ "\n"
+#~ "Thank you,\n"
+#~ "The Mercy Corps team\n"
+#~ msgstr ""
+#~ "\n"
+#~ "Vous pouvez aussi copier et coller ce lien dans la barre d’adresse de "
+#~ "votre navigateur.\n"
+#~ "\n"
+#~ "Merci,\n"
+#~ "l’équipe Mercy Corps\n"
+
+#~ msgid ""
+#~ "Use this form to send an email to yourself with a link to change your "
+#~ "password."
+#~ msgstr ""
+#~ "Utilisez ce formulaire afin de vous envoyer un e-mail contenant le lien "
+#~ "pour modifier votre mot de passe."
+
+#~ msgid "Language"
+#~ msgstr "Langue"
+
+#~ msgid ""
+#~ "Your language selection determines the number format expected when you "
+#~ "enter targets and results. Your language also determines how numbers are "
+#~ "displayed on the program page and reports, including Excel exports."
+#~ msgstr ""
+#~ "Votre sélection de langue détermine le format de nombre attendu lorsque "
+#~ "vous saisissez des cibles et des résultats. Votre langue détermine "
+#~ "également la façon dont les nombres sont affichés sur la page du "
+#~ "programme et les rapports, y compris les exportations Excel."
+
+#~ msgid "Number formatting conventions"
+#~ msgstr "Conventions de formatage des nombres"
+
+#~ msgid "English"
+#~ msgstr "Anglais"
+
+#~ msgid "French"
+#~ msgstr "Français"
+
+#~ msgid "Spanish"
+#~ msgstr "Espanol"
+
+#~ msgid "Decimal separator"
+#~ msgstr "Séparateur décimal"
+
+#~ msgid "Applies to number entry and display"
+#~ msgstr "S’applique à la saisie et à l’affichage des numéros"
+
+#~ msgctxt "radix"
+#~ msgid "Period"
+#~ msgstr "Point"
+
+#~ msgid "Comma"
+#~ msgstr "Virgule"
+
+#~ msgid "Thousands separator"
+#~ msgstr "Séparateur de milliers"
+
+#~ msgid "Applies only to number display"
+#~ msgstr "S'applique uniquement à l'affichage des nombres"
+
+#~ msgid "Space"
+#~ msgstr "Espace"
+
+#~ msgid ""
+#~ "Warning: This may be a badly formatted web address. It should be "
+#~ "something like https://domain.com/path/to/file or https://docs.google.com/"
+#~ "spreadsheets/d/OIjwljwoihgIHOEies"
+#~ msgstr ""
+#~ "Avertissement : Cette adresse Web semble ne pas être formatée "
+#~ "correctement. Elle devrait être au format : « https://domain.com/path/to/"
+#~ "file » ou « https://docs.google.com/spreadsheets/d/OIjwljwoihgIHOEies »"
+
+#~ msgid ""
+#~ "Warning: The file you are linking to should be on external storage. The "
+#~ "file path you provided looks like it might be on your local hard drive."
+#~ msgstr ""
+#~ "Avertissement : Le fichier que vous liez devrait se trouver sur un "
+#~ "stockage externe. Le chemin du fichier que vous avez fourni semble se "
+#~ "trouver sur votre disque dur local."
+
+#~ msgid ""
+#~ "Warning: You should be providing a location or path to a file that is not "
+#~ "on your hard drive.  The link you provided does not appear to be a file "
+#~ "path or web link."
+#~ msgstr ""
+#~ "Vous devez fournir un emplacement ou un chemin du fichier qui ne se "
+#~ "trouve pas sur votre disque dur local. Le lien que vous avez fourni ne "
+#~ "semble pas être un chemin du fichier ni un lien Web."
+
+#~ msgid "Filter by:"
+#~ msgstr "Filtrer par :"
+
+#~ msgid "All"
+#~ msgstr "Tout"
+
+#~ msgid "Project Status"
+#~ msgstr "Statut du projet"
+
+#~ msgid "Site Data"
+#~ msgstr "Données de site"
+
+#, python-format
+#~ msgid "Indicator Data for <small>%(site)s</small>"
+#~ msgstr "Données de l’indicateur pour <small>%(site)s</ small>"
+
+#~ msgid "There is no indicator data for this site."
+#~ msgstr "Aucune donnée de l’indicateur disponible pour ce site."
+
+#~ msgid "Site Profile Map and List"
+#~ msgstr "Carte et liste du profil du site"
+
+#~ msgid "Date created"
+#~ msgstr "Date de création"
+
+#~ msgid "Site name"
+#~ msgstr "Nom du site"
+
+#~ msgid "Site type"
+#~ msgstr "Type de site"
+
+#~ msgid "Delete site"
+#~ msgstr "Supprimer le site"
+
+#~ msgid "Indicator data"
+#~ msgstr "Données de l’indicateur"
+
+#~ msgid "No Site Profiles yet."
+#~ msgstr "Aucun profil de site pour le moment."
+
+#~ msgid "results per page:"
+#~ msgstr "résultats par page :"
+
+#~ msgid "Confirm Delete"
+#~ msgstr "Confirmer la suppression"
+
+#, python-format
+#~ msgid "Are you sure you want to delete \"%(object)s\"?"
+#~ msgstr "Voulez-vous vraiment supprimer \\\"%(object)s\\\" ?"
+
+#~ msgid "Confirm"
+#~ msgstr "Confirmer"
+
+#~ msgid "Program or country"
+#~ msgstr "Programme ou pays"
+
+#~ msgid "No results found"
+#~ msgstr "Aucun résultat"
+
+#~ msgid "Personal info"
+#~ msgstr "Informations personnelles"
+
+#~ msgid "Important dates"
+#~ msgstr "Dates importantes"
+
+#~ msgid "Form Errors"
+#~ msgstr "Erreurs de formulaire"
+
+#~ msgid "Program does not have a GAIT id"
+#~ msgstr "Le programme ne possède pas d’ID GAIT"
+
+#~ msgid "There was a problem connecting to the GAIT server."
+#~ msgstr "Un problème est survenu lors de la connexion au serveur GAIT."
+
+#, python-brace-format
+#~ msgid "The GAIT ID {gait_id} could not be found."
+#~ msgstr "Impossible de trouver l’ID GAIT {gait_id}."
+
+#~ msgid "You are not logged in."
+#~ msgstr "Vous n’êtes pas connecté."
+
+#~ msgid "Your profile has been updated."
+#~ msgstr "Votre profil a été mis à jour."
+
+#~ msgid "Program list inconsistent with country access"
+#~ msgstr "Liste des programmes incompatibles avec l’accès au pays"
+
+#~ msgid "Modification date"
+#~ msgstr "Date de modification"
+
+#~ msgid "Modification type"
+#~ msgstr "Type de modification"
+
+#~ msgid "First name"
+#~ msgstr "Prénom"
+
+#~ msgid "Last name"
+#~ msgstr "Nom"
+
+#~ msgid "Mode of address"
+#~ msgstr "Prénom d’usage"
+
+#~ msgid "Mode of contact"
+#~ msgstr "Moyen de communication"
+
+#~ msgid "Phone number"
+#~ msgstr "Numéro de téléphone"
+
+#~ msgid "Is active"
+#~ msgstr "Actif"
+
+#~ msgid "User created"
+#~ msgstr "Utilisateur créé"
+
+#~ msgid "Roles and permissions updated"
+#~ msgstr "Rôles et autorisations mis à jour"
+
+#~ msgid "User profile updated"
+#~ msgstr "Profil de l’utilisateur mis à jour"
+
+#~ msgid "Other (please specify)"
+#~ msgstr "Autre (veuillez préciser)"
+
+#~ msgid "Adaptive management"
+#~ msgstr "Gestion adaptative"
+
+#~ msgid "Budget realignment"
+#~ msgstr "Réalignement du budget"
+
+#~ msgid "Changes in context"
+#~ msgstr "Changements en contexte"
+
+#~ msgid "Costed extension"
+#~ msgstr "Extension chiffrée"
+
+#~ msgid "COVID-19"
+#~ msgstr "COVID-19"
+
+#~ msgid "Donor requirement"
+#~ msgstr "Exigence du donateur"
+
+#~ msgid "Implementation delays"
+#~ msgstr "Retards de mise en œuvre"
+
+#~ msgid "Unit of measure type"
+#~ msgstr "Type d’unité de mesure"
+
+#~ msgid "Is cumulative"
+#~ msgstr "Cumulatif"
+
+#~ msgid "Baseline N/A"
+#~ msgstr "Mesure de base N/A"
+
+#~ msgid "Evidence link"
+#~ msgstr "Lien de la preuve"
+
+#~ msgid "Evidence record name"
+#~ msgstr "Nom de la preuve"
+
+#~ msgid "Indicator created"
+#~ msgstr "Indicateur créé"
+
+#~ msgid "Indicator changed"
+#~ msgstr "Indicateur modifié"
+
+#~ msgid "Indicator deleted"
+#~ msgstr "Indicateur supprimé"
+
+#~ msgid "Result changed"
+#~ msgstr "Résultat modifié"
+
+#~ msgid "Result created"
+#~ msgstr "Résultat créé"
+
+#~ msgid "Result deleted"
+#~ msgstr "Résultat supprimé"
+
+#~ msgid "Program dates changed"
+#~ msgstr "Dates du programme modifiées"
+
+#~ msgid "Result level changed"
+#~ msgstr "Niveau de résultat modifié"
+
+#~ msgid "Percentage"
+#~ msgstr "Pourcentage (%)"
+
+#~ msgid "Funding status"
+#~ msgstr "Statut de financement"
+
+#~ msgid "Cost center"
+#~ msgstr "Centre de coût"
+
+#~ msgid "Program created"
+#~ msgstr "Programme créé"
+
+#~ msgid "Program updated"
+#~ msgstr "Programme mis à jour"
+
+#~ msgid "Primary address"
+#~ msgstr "Adresse principale"
+
+#~ msgid "Primary contact name"
+#~ msgstr "Nom du contact principal"
+
+#~ msgid "Primary contact email"
+#~ msgstr "Adresse e-mail du contact principal"
+
+#~ msgid "Primary contact phone"
+#~ msgstr "Numéro de téléphone du contact principal"
+
+#~ msgid "Organization created"
+#~ msgstr "Société créée"
+
+#~ msgid "Organization updated"
+#~ msgstr "Société mise à jour"
+
+#~ msgid "Disaggregation categories"
+#~ msgstr "Catégories de désagrégation"
+
+#~ msgid "Country disaggregation created"
+#~ msgstr "Désagrégation au niveau du pays créée"
+
+#~ msgid "Country disaggregation updated"
+#~ msgstr "Désagrégation au niveau du pays mise à jour"
+
+#~ msgid "Country disaggregation deleted"
+#~ msgstr "Désagrégation au niveau du pays supprimée"
+
+#~ msgid "Country disaggregation archived"
+#~ msgstr "Désagrégation au niveau du pays archivée"
+
+#~ msgid "Country disaggregation unarchived"
+#~ msgstr "Désagrégation au niveau du pays non archivée"
+
+#~ msgid "Country disaggregation categories updated"
+#~ msgstr "Catégories de désagrégation au niveau du pays mises à jour"
+
+#~ msgid "Rationale"
+#~ msgstr "Justification"
+
+#~ msgid "Mercy Corps - Tola New Account Registration"
+#~ msgstr "Enregistrement d’un nouveau compte Mercy Corps - Tola"
+
+#~ msgid "A user account with this username already exists."
+#~ msgstr "Un compte utilisateur avec ce nom d’utilisateur existe déjà."
+
+#~ msgid "A user account with this email address already exists."
+#~ msgstr "Un compte utilisateur avec cette adresse e-mail existe déjà."
+
+#~ msgid ""
+#~ "Non-Mercy Corps emails should not be used with the Mercy Corps "
+#~ "organization."
+#~ msgstr ""
+#~ "Les adresses e-mails qui ne sont pas relatives à Mercy Corps ne doivent "
+#~ "pas être utilisées avec l’organisation Mercy Corps."
+
+#~ msgid ""
+#~ "A user account with this email address already exists. Mercy Corps "
+#~ "accounts are managed by Okta. Mercy Corps employees should log in using "
+#~ "their Okta username and password."
+#~ msgstr ""
+#~ "Un compte utilisateur avec cette adresse e-mail existe déjà. Les comptes "
+#~ "Mercy Corps sont gérés par Okta. Les employés de Mercy Corps doivent se "
+#~ "connecter en utilisant leur nom d’utilisateur et leur mot de passe Okta."
+
+#~ msgid ""
+#~ "Mercy Corps accounts are managed by Okta. Mercy Corps employees should "
+#~ "log in using their Okta username and password."
+#~ msgstr ""
+#~ "Les comptes Mercy Corps sont gérés par Okta. Les employés de Mercy Corps "
+#~ "doivent se connecter en utilisant leur nom d’utilisateur et leur mot de "
+#~ "passe Okta."
+
+#~ msgid "Only superusers can create Mercy Corps staff profiles."
+#~ msgstr ""
+#~ "Seuls les super-utilisateurs peuvent créer des profils d’équipe Mercy "
+#~ "Corps."
+
+#~ msgid "Only superusers can edit Mercy Corps staff profiles."
+#~ msgstr ""
+#~ "Seuls les super-utilisateurs peuvent modifier des profils d’équipe Mercy "
+#~ "Corps."
+
+#~ msgid "Find a city or village"
+#~ msgstr "Chercher une ville ou un village"
+
+#~ msgid "Projects in this Site"
+#~ msgstr "Projets sur ce site"
+
+#~ msgid "Project Name"
+#~ msgstr "Nom du projet"
+
+#~ msgid "Activity Code"
+#~ msgstr "Code d’activité"
+
+#~ msgid "View"
+#~ msgstr "Afficher"
+
+#~ msgid "Contact Info"
+#~ msgstr "Coordonnées"
+
+#~ msgid "Location"
+#~ msgstr "Emplacement"
+
+#~ msgid "Places"
+#~ msgstr "Lieux"
+
+#~ msgid "Map"
+#~ msgstr "Carte"
+
+#~ msgid "Demographic Information"
+#~ msgstr "Informations démographiques"
+
+#~ msgid "Households"
+#~ msgstr "Foyers"
+
+#~ msgid "Land"
+#~ msgstr "Terrain"
+
+#~ msgid "Literacy"
+#~ msgstr "Alphabétisation"
+
+#~ msgid "Demographic Info Data Source"
+#~ msgstr "Source de données d’informations démographiques"
+
+#~ msgid "Date of First Contact"
+#~ msgstr "Date du premier contact"
+
+#~ msgid "Sector Name"
+#~ msgstr "Nom du secteur"
+
+#~ msgid "Organization Name"
+#~ msgstr "Nom de l’organisation"
+
+#~ msgid "Description/Notes"
+#~ msgstr "Description/Notes"
+
+#~ msgid "Organization url"
+#~ msgstr "URL de l’organisation"
+
+#~ msgid "Primary Contact Phone"
+#~ msgstr "Numéro de téléphone du contact principal"
+
+#~ msgid "Primary Mode of Contact"
+#~ msgstr "Moyen de communication principal"
+
+#~ msgid "Region Name"
+#~ msgstr "Nom de la région"
+
+#~ msgid "Country Name"
+#~ msgstr "Nom du pays"
+
+#~ msgid "organization"
+#~ msgstr "organisation"
+
+#~ msgid "2 Letter Country Code"
+#~ msgstr "Code de pays à 2 lettres"
+
+#~ msgid "Latitude"
+#~ msgstr "Latitude"
+
+#~ msgid "Longitude"
+#~ msgstr "Longitude"
+
+#~ msgid "Zoom"
+#~ msgstr "Zoom"
+
+#~ msgid "Given Name"
+#~ msgstr "Prénom"
+
+#~ msgid "Employee Number"
+#~ msgstr "Numéro d’employé"
+
+#~ msgid "Active Country"
+#~ msgstr "Pays actif"
+
+#~ msgid "Accessible Countries"
+#~ msgstr "Pays accessibles"
+
+#~ msgid "Tola User"
+#~ msgstr "Utilisateur de Tola"
+
+#~ msgid "No Organization for this user"
+#~ msgstr "Aucune Organisation pour cet utilisateur"
+
+#~ msgid "User (all programs)"
+#~ msgstr "Utilisateur (tous les programmes)"
+
+#~ msgid "Basic Admin (all programs)"
+#~ msgstr "Administrateur de base (tous les programmes)"
+
+#~ msgid "Only Mercy Corps users can be given country-level access"
+#~ msgstr ""
+#~ "Seuls les utilisateurs Mercy Corps peuvent bénéficier d’un accès au pays"
+
+#~ msgid "ID"
+#~ msgstr "Identifiant"
+
+#~ msgid "Program Name"
+#~ msgstr "Nom du programme"
+
+#~ msgid "Funding Status"
+#~ msgstr "Statut de financement"
+
+#~ msgid "Program Description"
+#~ msgstr "Description du programme"
+
+#~ msgid "Enable Approval Authority"
+#~ msgstr "Activer l’autorité d’approbation"
+
+#~ msgid "Enable Public Dashboard"
+#~ msgstr "Activer le tableau de bord public"
+
+#~ msgid "Program Start Date"
+#~ msgstr "Date de début du programme"
+
+#~ msgid "Program End Date"
+#~ msgstr "Date de fin du programme"
+
+#~ msgid "Reporting Period Start Date"
+#~ msgstr "Date de début de la période de déclaration"
+
+#~ msgid "Reporting Period End Date"
+#~ msgstr "Date de fin de la période de déclaration"
+
+#~ msgid "Auto-number indicators according to the results framework"
+#~ msgstr ""
+#~ "Numéroter automatiquement les indicateurs d’après le cadre de résultats"
+
+#, python-format
+#~ msgid "by %(level_name)s chain"
+#~ msgstr "par chaîne %(level_name)s"
+
+#, python-format
+#~ msgid "%(level_name)s chains"
+#~ msgstr "chaînes de %(level_name)s"
+
+#~ msgid "Low (view only)"
+#~ msgstr "Faible (visionnage uniquement)"
+
+#~ msgid "Medium (add and edit results)"
+#~ msgstr "Moyen (ajout et modification des résultats)"
+
+#~ msgid "High (edit anything)"
+#~ msgstr "Élevé (modification de n’importe quelle donnée)"
+
+#~ msgid "Profile Type"
+#~ msgstr "Type de profil"
+
+#~ msgid "Land Classification"
+#~ msgstr "Classification des terres"
+
+#~ msgid "Rural, Urban, Peri-Urban"
+#~ msgstr "Rural, Urbain, Périurbain"
+
+#~ msgid "Land Type"
+#~ msgstr "Type de terrain"
+
+#~ msgid "Site Name"
+#~ msgstr "Nom du site"
+
+#~ msgid "Contact Name"
+#~ msgstr "Nom du contact"
+
+#~ msgid "Contact Number"
+#~ msgstr "Numéro de contact"
+
+#~ msgid "Number of Members"
+#~ msgstr "Nombre de membres"
+
+#~ msgid "Data Source"
+#~ msgstr "Source de données"
+
+#~ msgid "Total # Households"
+#~ msgstr "Nombre total de ménages"
+
+#~ msgid "Average Household Size"
+#~ msgstr "Taille moyenne du ménage"
+
+#~ msgid "Male age 0-5"
+#~ msgstr "Homme de 0-5 ans"
+
+#~ msgid "Female age 0-5"
+#~ msgstr "Femme de 0-5 ans"
+
+#~ msgid "Male age 6-9"
+#~ msgstr "Homme de 6-9 ans"
+
+#~ msgid "Female age 6-9"
+#~ msgstr "Femme de 6-9 ans"
+
+#~ msgid "Male age 10-14"
+#~ msgstr "Homme de 10-14 ans"
+
+#~ msgid "Female age 10-14"
+#~ msgstr "Femme de 10-14 ans"
+
+#~ msgid "Male age 15-19"
+#~ msgstr "Homme de 15-19 ans"
+
+#~ msgid "Female age 15-19"
+#~ msgstr "Femme de 15-19 ans"
+
+#~ msgid "Male age 20-24"
+#~ msgstr "Homme de 20-24 ans"
+
+#~ msgid "Female age 20-24"
+#~ msgstr "Femme de 20-24 ans"
+
+#~ msgid "Male age 25-34"
+#~ msgstr "Homme de 25-34 ans"
+
+#~ msgid "Female age 25-34"
+#~ msgstr "Femme de 25-34 ans"
+
+#~ msgid "Male age 35-49"
+#~ msgstr "Homme de 35-49 ans"
+
+#~ msgid "Female age 35-49"
+#~ msgstr "Femme de 35-49 ans"
+
+#~ msgid "Male Over 50"
+#~ msgstr "Homme de plus de 50 ans"
+
+#~ msgid "Female Over 50"
+#~ msgstr "Femme de plus de 50 ans"
+
+#~ msgid "Total population"
+#~ msgstr "Population totale"
+
+#~ msgid "Total male"
+#~ msgstr "Total masculin"
+
+#~ msgid "Total female"
+#~ msgstr "Total féminin"
+
+#~ msgid "Classify land"
+#~ msgstr "Classer les terres"
+
+#~ msgid "Total Land"
+#~ msgstr "Total des terres"
+
+#~ msgid "Total Agricultural Land"
+#~ msgstr "Total terres agricoles"
+
+#~ msgid "Total Rain-fed Land"
+#~ msgstr "Total des terres irriguées"
+
+#~ msgid "Total Horticultural Land"
+#~ msgstr "Total des terres horticoles"
+
+#~ msgid "Total Literate People"
+#~ msgstr "Total des personnes alphabètes"
+
+#, python-format
+#~ msgid "% of Literate Males"
+#~ msgstr "% d’hommes alphabètes"
+
+#, python-format
+#~ msgid "% of Literate Females"
+#~ msgstr "% de femmes alphabètes"
+
+#~ msgid "Literacy Rate (%)"
+#~ msgstr "Taux d’alphabétisation (%)"
+
+#~ msgid "Households Owning Land"
+#~ msgstr "Ménages propriétaires de terres"
+
+#~ msgid "Average Landholding Size"
+#~ msgstr "Taille moyenne des terres"
+
+#~ msgid "In hectares/jeribs"
+#~ msgstr "En hectares/jeribs"
+
+#~ msgid "Households Owning Livestock"
+#~ msgstr "Ménages possédant du bétail"
+
+#~ msgid "Animal Types"
+#~ msgstr "Types d’animaux"
+
+#~ msgid "List Animal Types"
+#~ msgstr "Liste des types d’animaux"
+
+#~ msgid "Latitude (Decimal Coordinates)"
+#~ msgstr "Latitude (coordonnées décimales)"
+
+#~ msgid "Longitude (Decimal Coordinates)"
+#~ msgstr "Longitude (coordonnées décimales)"
+
+#~ msgid "Site Active"
+#~ msgstr "Site actif"
+
+#~ msgid "Approval"
+#~ msgstr "Approbation"
+
+#~ msgid "in progress"
+#~ msgstr "en cours"
+
+#~ msgid "This is the Provincial Line Manager"
+#~ msgstr "Ceci est le gestionnaire de ligne provincial"
+
+#~ msgid "Approved by"
+#~ msgstr "Approuvé par"
+
+#~ msgid "This is the originator"
+#~ msgstr "C’est l’auteur"
+
+#~ msgid "Filled by"
+#~ msgstr "Rempli par"
+
+#~ msgid "This should be GIS Manager"
+#~ msgstr "Cela devrait être GIS Manager"
+
+#~ msgid "Location verified by"
+#~ msgstr "Lieu vérifié par"
+
+#, python-format
+#~ msgid "by %(tier)s chain"
+#~ msgstr "par chaîne %(tier)s"
+
+#, python-format
+#~ msgid "%(tier)s Chain"
+#~ msgstr "Chaîne %(tier)s"
+
+#~ msgid "Indicator Performance Tracking Report"
+#~ msgstr "Rapport de suivi des performances de l’indicateur"
+
+#~ msgid "IPTT Actuals only report"
+#~ msgstr "Rapport IPTT relatif aux valeurs réelles"
+
+#~ msgid "IPTT TvA report"
+#~ msgstr "Rapport TVA IPTT"
+
+#~ msgid "IPTT TvA full program report"
+#~ msgstr "Rapport IPTT relatif à la totalité de la TVA du programme"
+
+#~ msgid "Reporting period must start on the first of the month"
+#~ msgstr "La période de rapport doit débuter le premier jour du mois"
+
+#~ msgid ""
+#~ "Reporting period start date cannot be changed while time-aware periodic "
+#~ "targets are in place"
+#~ msgstr ""
+#~ "La date de début de la période de rapport ne peut pas être modifiée "
+#~ "lorsque des cibles périodiques à durée limitée sont définies"
+
+#~ msgid "Reporting period must end on the last day of the month"
+#~ msgstr "La période de rapport doit se terminer le dernier jour du mois"
+
+#~ msgid "Reporting period must end after the start of the last target period"
+#~ msgstr ""
+#~ "La période de rapport doit se terminer après le début de la dernière "
+#~ "période cible"
+
+#~ msgid "Reporting period must start before reporting period ends"
+#~ msgstr ""
+#~ "La période de rapport doit débuter avant que la période de rapport ne se "
+#~ "termine"
+
+#~ msgid "You must select a reporting period end date"
+#~ msgstr "Vous devez sélectionner une date de fin de période de rapport"
+
+#~ msgid "Find"
+#~ msgstr "Rechercher"
+
+#~ msgid "City, Country:"
+#~ msgstr "Ville, Pays :"
+
+#~ msgid "Frequency in number of days"
+#~ msgstr "Fréquence en nombre de jours"
+
+#~ msgid "Shadow audits"
+#~ msgstr "Audits supervisés"
+
+#~ msgid "Changes to indicator"
+#~ msgstr "Changements apportés à l’indicateur"
+
+#~ msgid "Key Performance Indicator for this program?"
+#~ msgstr "Indicateur de performance clé pour ce programme ?"
+
+#~ msgid "This level is being used in the results framework."
+#~ msgstr "Ce niveau est utilisé dans le cadre de résultats."
+
+#~ msgid "Level names should not be blank"
+#~ msgstr "Les noms de niveau ne doivent pas être vides"
+
+#~ msgid ""
+#~ "To see program results, please update your periodic targets to match your "
+#~ "reporting start and end dates:"
+#~ msgstr ""
+#~ "Pour voir les résultats du programme, veuillez mettre à jour vos cibles "
+#~ "périodiques en fonction des dates de début et de fin de votre rapport :"
+
+#~ msgid "Data Collection Method"
+#~ msgstr "Méthode de collecte de données"
+
+#~ msgid "Frequency of Data Collection"
+#~ msgstr "Fréquence de collecte de données"
+
+#~ msgid "Method of Analysis"
+#~ msgstr "Méthode d’analyse"
+
+#~ msgid "Information Use"
+#~ msgstr "Utilisation de l’information"
+
+#~ msgid "Frequency of Reporting"
+#~ msgstr "Fréquence de rapportage"
+
+#~ msgid "Quality Assurance Measures"
+#~ msgstr "Mesures d’assurance qualité"
+
+#~ msgid "Approval submitted by"
+#~ msgstr "Approbation soumise par"
+
+#~ msgid "Notes"
+#~ msgstr "Remarques"
+
+#~ msgid "Result saved - however please review warnings below."
+#~ msgstr ""
+#~ "Résultat enregistré - veuillez toutefois consulter les avertissements ci-"
+#~ "dessous."
+
+#~ msgid "Success, form data saved."
+#~ msgstr "Succès, données de formulaire enregistrées."
+
+#~ msgid "User programs updated"
+#~ msgstr "Programmes de l’utilisateur mis à jour"
+
+#~ msgid "This field must be unique"
+#~ msgstr "Ce champ doit être unique"
+
+#~ msgid "Direction of change (not applicable)"
+#~ msgstr "Direction du changement (non applicable)"
+
+#~ msgid "This is not the page you were looking for, you may be lost."
+#~ msgstr "Ce n’est pas la page que vous cherchiez, vous êtes peut-être perdu."
+
+#~ msgid "Whoops!"
+#~ msgstr "Oups !"
+
+#~ msgid "500 Error...Whoops something went wrong..."
+#~ msgstr "Erreur 500… Une erreur est survenue…"
+
+#~ msgid ""
+#~ "There was a problem loading this page.  Please notify a systems "
+#~ "administrator if you think you should not be seeing this page."
+#~ msgstr ""
+#~ "Un problème est survenu lors du chargement de cette page. Veuillez "
+#~ "informer un administrateur système si vous pensez que vous ne devriez pas "
+#~ "voir cette page."
+
+#~ msgid "Analyses and Reporting"
+#~ msgstr "Analyse et rapport"
+
+#~ msgid "Please complete this field. Your baseline can be zero."
+#~ msgstr ""
+#~ "Veuillez compléter ce champ. Votre niveau de référence peut être zéro."
+
+#~ msgid "Please enter a name and target number for every event."
+#~ msgstr "Veuillez saisir un nom et un numéro de cible pour chaque événement."
+
+#~ msgid "START"
+#~ msgstr "DÉBUT"
+
+#~ msgid "END"
+#~ msgstr "FIN"
+
+#~ msgid "TARGET PERIODS"
+#~ msgstr "PÉRIODES CIBLES"
+
+#~ msgid "Standard (TolaData Admins Only)"
+#~ msgstr "Standard (Administrateurs TolaData uniquement)"
+
+#~ msgid "Disaggregation label"
+#~ msgstr "Étiquette de désagrégation"
+
+#~ msgid "Disaggregation Value"
+#~ msgstr "Valeur de désagrégation"
+
+#~ msgid "Project Report"
+#~ msgstr "Rapport de projet"
+
+#~ msgid "Please complete all required fields."
+#~ msgstr "Veuillez compléter tous les champs requis."
+
+#~ msgid "Standard disaggregation levels not entered"
+#~ msgstr "Niveaux de désagrégation standard non renseignés"
+
+#~ msgid ""
+#~ "Standard disaggregations are entered by the administrator for the entire "
+#~ "organizations.  If you are not seeing any here, please contact your "
+#~ "system administrator."
+#~ msgstr ""
+#~ "Les désagrégations standard sont entrées par l’administrateur pour "
+#~ "l’ensemble des organisations. Si vous n’en voyez aucun ici, veuillez "
+#~ "contacter votre administrateur système."
+
+#~ msgid "Actuals"
+#~ msgstr "Valeurs réelles"
+
+#~ msgid "Unit of Measure"
+#~ msgstr "Unité de mesure"
+
+#~ msgid "Rationale for Target"
+#~ msgstr "Justification de la cible"
+
+#~ msgid "Start Date"
+#~ msgstr "Date de début"
+
+#~ msgid "End Date"
+#~ msgstr "Date de fin"
+
+#~ msgid "Table id"
+#~ msgstr "Identifiant de la table"
+
+#~ msgid "Owner"
+#~ msgstr "Propriétaire"
+
+#~ msgid "Remote owner"
+#~ msgstr "Propriétaire à distance"
+
+#~ msgid "Unique count"
+#~ msgstr "Compte unique"
+
+#~ msgid "Reporting Period"
+#~ msgstr "Période de déclaration"
+
+#~ msgid "Project Complete"
+#~ msgstr "Projet terminé"
+
+#~ msgid "Evidence Document or Link"
+#~ msgstr "Document de preuve ou lien"
+
+#~ msgid "TolaTable"
+#~ msgstr "TolaTable"
+
+#~ msgid ""
+#~ "Would you like to update the achieved total with the         row count "
+#~ "from TolaTables?"
+#~ msgstr ""
+#~ "Souhaitez-vous mettre à jour le total atteint avec le nombre de lignes à "
+#~ "partir de TolaTables ?"
+
+#~ msgid "Browse"
+#~ msgstr "Parcourir"
+
+#~ msgid "Documents"
+#~ msgstr "Documents"
+
+#~ msgid "Stakeholders"
+#~ msgstr "Parties prenantes"
+
+#~ msgid "Start by selecting a target frequency."
+#~ msgstr "Commencez par sélectionner une fréquence cible."
+
+#~ msgid "Project Site"
+#~ msgstr "Site du projet"
+
+#~ msgid "Collected Indicator Data Site"
+#~ msgstr "Site de données des indicateurs collectés"
+
+#~ msgid "Delete Documentation"
+#~ msgstr "Supprimer les documents"
+
+#~ msgid "Something went wrong!"
+#~ msgstr "Quelque chose s’est mal passé !"
+
+#~ msgid "Documentation Delete"
+#~ msgstr "Suppression des documents"
+
+#~ msgid "Are you sure you want to delete"
+#~ msgstr "Êtes-vous sûr de vouloir supprimer"
+
+#~ msgid "Document Confirm Delete"
+#~ msgstr "Confirmer la suppression des documents"
+
+#, python-format
+#~ msgid "Documentation for %(project)s"
+#~ msgstr "Documentation pour %(project)s"
+
+#~ msgid "Close"
+#~ msgstr "Fermer"
+
+#, python-format
+#~ msgid "Documentation List for %(program)s "
+#~ msgstr "Liste de documentation pour %(program)s "
+
+#~ msgid "Document Name"
+#~ msgstr "Nom du document"
+
+#~ msgid "Add to Project"
+#~ msgstr "Ajouter au projet"
+
+#~ msgid "No Documents."
+#~ msgstr "Aucun document."
+
+#~ msgid "Initiation Form"
+#~ msgstr "Formulaire d’initiation"
+
+#~ msgid "Tracking Form"
+#~ msgstr "Formulaire de suivi"
+
+#~ msgid "Print View"
+#~ msgstr "Impression de prévisualisation"
+
+#~ msgid "Short"
+#~ msgstr "Court"
+
+#~ msgid "Long"
+#~ msgstr "Long"
+
+#~ msgid "Tracking"
+#~ msgstr "Suivi"
+
+#~ msgid "Open"
+#~ msgstr "Ouvrir"
+
+#~ msgid "Initiation"
+#~ msgstr "Initiation"
+
+#~ msgid "Project Dashboard"
+#~ msgstr "Tableau de bord du projet"
+
+#~ msgid "Add project"
+#~ msgstr "Ajouter un projet"
+
+#, python-format
+#~ msgid "Filtered by <b>(Status): %(status|default_if_none:'')s</b>"
+#~ msgstr "Filtré par <b>(Status) : %(status|default_if_none:'')s</ b>"
+
+#, python-format
+#~ msgid ""
+#~ "Filtered by <b>(Program): %(filtered_program|default_if_none:'')s</b>"
+#~ msgstr ""
+#~ "Filtré par <b>(Programme) : %(filtered_program|default_if_none:'')s</ b>"
+
+#~ msgid "Program Dashboard"
+#~ msgstr "Tableau de bord du programme"
+
+#~ msgid "Date Created"
+#~ msgstr "Date créée"
+
+#~ msgid "Project Code"
+#~ msgstr "Code de projet"
+
+#~ msgid "Office Code"
+#~ msgstr "Code de bureau"
+
+#~ msgid "Form Version"
+#~ msgstr "Version du formulaire"
+
+#~ msgid "Approval Status"
+#~ msgstr "Statut approuvé"
+
+#~ msgid "No in progress projects."
+#~ msgstr "Aucun projet en cours."
+
+#~ msgid "No approved projects yet."
+#~ msgstr "Aucun projet approuvé pour le moment."
+
+#~ msgid "No projects awaiting approval."
+#~ msgstr "Aucun projet en attente d’approbation."
+
+#~ msgid "No rejected projects."
+#~ msgstr "Aucun projet rejeté."
+
+#~ msgid "No New projects."
+#~ msgstr "Aucun nouveau projet."
+
+#~ msgid "No projects yet."
+#~ msgstr "Aucun projet pour le moment."
+
+#~ msgid "No Programs"
+#~ msgstr "Pas de programme"
+
+#~ msgid "Project initiation form"
+#~ msgstr "Formulaire d’initiation du projet"
+
+#~ msgid "Project Initiation Form"
+#~ msgstr "Formulaire d’initiation du projet"
+
+#~ msgid "Project tracking form"
+#~ msgstr "Formulaire de suivi du projet"
+
+#~ msgid "Add a project"
+#~ msgstr "Ajouter un projet"
+
+#~ msgid "Name your new project and associate it with a program"
+#~ msgstr "Nommez votre nouveau projet et associez-le à un programme"
+
+#~ msgid "Project name"
+#~ msgstr "Nom du projet"
+
+#~ msgid "Use short form?"
+#~ msgstr "Utiliser un formulaire court ?"
+
+#~ msgid "recommended"
+#~ msgstr "recommandé"
+
+#~ msgid "Offline (No map provided)"
+#~ msgstr "Hors ligne (aucune carte fournie)"
+
+#~ msgid "Province"
+#~ msgstr "Province"
+
+#~ msgid "District"
+#~ msgstr "District"
+
+#~ msgid "Village"
+#~ msgstr "Village"
+
+#~ msgid "Report"
+#~ msgstr "Rapport"
+
+#~ msgid "Update Sites"
+#~ msgstr "Mettre à jour les sites"
+
+#~ msgid "No sites yet."
+#~ msgstr "Pas encore de site."
+
+#~ msgid "Site Projects"
+#~ msgstr "Projets de site"
+
+#, python-format
+#~ msgid "Project Data for <small>%(site)s</small>"
+#~ msgstr "Données du projet pour <small>%(site)s</ small>"
+
+#~ msgid "Stakeholder"
+#~ msgstr "Partie prenante"
+
+#~ msgid "Agency name"
+#~ msgstr "Nom de l’agence"
+
+#~ msgid "Agency url"
+#~ msgstr "URL de l’agence"
+
+#~ msgid "Tola report url"
+#~ msgstr "URL du rapport de Tola"
+
+#~ msgid "Tola tables url"
+#~ msgstr "URL dues tables de Tola"
+
+#~ msgid "Tola tables user"
+#~ msgstr "Utilisateur des tables de Tola"
+
+#~ msgid "Tola tables token"
+#~ msgstr "Jeton des tables de Tola"
+
+#~ msgid "Privacy disclaimer"
+#~ msgstr "Avertissement de confidentialité"
+
+#~ msgid "Created"
+#~ msgstr "Créé"
+
+#~ msgid "Updated"
+#~ msgstr "Actualisé"
+
+#~ msgid "Tola Sites"
+#~ msgstr "Sites de Tola"
+
+#~ msgid "Form"
+#~ msgstr "Forme"
+
+#~ msgid "Guidance"
+#~ msgstr "Orientation"
+
+#~ msgid "Form Guidance"
+#~ msgstr "Guidage de formulaire"
+
+#~ msgid "City/Town"
+#~ msgstr "Cité/ville"
+
+#~ msgid "Address"
+#~ msgstr "Adresse"
+
+#~ msgid "Contact"
+#~ msgstr "Contact"
+
+#~ msgid "Fund code"
+#~ msgstr "Code du fonds"
+
+#~ msgid "User with Approval Authority"
+#~ msgstr "Utilisateur avec autorité d’approbation"
+
+#~ msgid "Fund"
+#~ msgstr "Fonds"
+
+#~ msgid "Tola Approval Authority"
+#~ msgstr "Autorité d’approbation de Tola"
+
+#~ msgid "Admin Level 1"
+#~ msgstr "Admin Niveau 1"
+
+#~ msgid "Admin Level 2"
+#~ msgstr "Admin Niveau 2"
+
+#~ msgid "Admin Level 3"
+#~ msgstr "Admin Niveau 3"
+
+#~ msgid "Admin Level 4"
+#~ msgstr "Admin Niveau 4"
+
+#~ msgid "Office Name"
+#~ msgstr "Nom du bureau"
+
+#~ msgid "Office"
+#~ msgstr "Bureau"
+
+#~ msgid "Administrative Level 1"
+#~ msgstr "Niveau administratif 1"
+
+#~ msgid "Administrative Level 2"
+#~ msgstr "Niveau administratif 2"
+
+#~ msgid "Administrative Level 3"
+#~ msgstr "Niveau administratif 3"
+
+#~ msgid "Administrative Level 4"
+#~ msgstr "Niveau administratif 4"
+
+#~ msgid "Capacity"
+#~ msgstr "Capacité"
+
+#~ msgid "Stakeholder Type"
+#~ msgstr "Type de partie prenante"
+
+#~ msgid "Stakeholder Types"
+#~ msgstr "Types de parties prenantes"
+
+#~ msgid "How will you evaluate the outcome or impact of the project?"
+#~ msgstr "Comment allez-vous évaluer le résultat ou l’impact du projet ?"
+
+#~ msgid "Evaluate"
+#~ msgstr "Évaluer"
+
+#~ msgid "Type of Activity"
+#~ msgstr "Type d’activité"
+
+#~ msgid "Project Type"
+#~ msgstr "Type de projet"
+
+#~ msgid "Name of Document"
+#~ msgstr "Nom du document"
+
+#~ msgid "Type (File or URL)"
+#~ msgstr "Type (fichier ou URL)"
+
+#~ msgid "Template"
+#~ msgstr "Modèle"
+
+#~ msgid "Stakeholder/Organization Name"
+#~ msgstr "Nom de l’acteur/de l’organisation"
+
+#~ msgid "Has this partner been added to stakeholder register?"
+#~ msgstr "Ce partenaire a-t-il été ajouté au registre des parties prenantes ?"
+
+#~ msgid "Formal Written Description of Relationship"
+#~ msgstr "Description écrite officielle de la relation"
+
+#~ msgid "Vetting/ due diligence statement"
+#~ msgstr "Agrément/énoncé de diligence raisonnable"
+
+#~ msgid "Short Form (recommended)"
+#~ msgstr "Forme courte (recommandé)"
+
+#~ msgid "Date of Request"
+#~ msgstr "Date de demande"
+
+#~ msgid ""
+#~ "Please be specific in your name.  Consider that your Project Name "
+#~ "includes WHO, WHAT, WHERE, HOW"
+#~ msgstr ""
+#~ "Veuillez être précis dans votre nom. Considérez que votre nom de projet "
+#~ "inclut QUI, QUOI, OÙ, COMMENT"
+
+#~ msgid "Project Activity"
+#~ msgstr "Activité du projet"
+
+#~ msgid "This should come directly from the activities listed in the Logframe"
+#~ msgstr ""
+#~ "Cela devrait provenir directement des activités listées dans le cadre "
+#~ "logique"
+
+#~ msgid "If Rejected: Rejection Letter Sent?"
+#~ msgstr "Si rejeté : lettre de refus envoyée ?"
+
+#~ msgid "If yes attach copy"
+#~ msgstr "Si oui, joindre une copie"
+
+#~ msgid "Project COD #"
+#~ msgstr "Numéro COD de projet"
+
+#~ msgid "Activity design for"
+#~ msgstr "Conception d’activité pour"
+
+#~ msgid "LIN Code"
+#~ msgstr "Code LIN"
+
+#~ msgid "Staff Responsible"
+#~ msgstr "Personnel responsable"
+
+#~ msgid "Are there partners involved?"
+#~ msgstr "Y a-t-il des partenaires impliqués ?"
+
+#~ msgid "Name of Partners"
+#~ msgstr "Nom des partenaires"
+
+#~ msgid "What is the anticipated Outcome or Goal?"
+#~ msgstr "Quel est le résultat ou l’objectif prévu ?"
+
+#~ msgid "Expected starting date"
+#~ msgstr "Date de début prévue"
+
+#~ msgid "Expected ending date"
+#~ msgstr "Date de fin prévue"
+
+#~ msgid "Expected duration"
+#~ msgstr "Durée prévue"
+
+#~ msgid "[MONTHS]/[DAYS]"
+#~ msgstr "[MOIS]/[JOURS]"
+
+#~ msgid "Type of direct beneficiaries"
+#~ msgstr "Type de bénéficiaires directs"
+
+#~ msgid "i.e. Farmer, Association, Student, Govt, etc."
+#~ msgstr "c’est-à-dire fermier, association, étudiant, gouvernement, etc."
+
+#~ msgid "Estimated number of direct beneficiaries"
+#~ msgstr "Nombre estimé de bénéficiaires directs"
+
+#~ msgid ""
+#~ "Please provide achievable estimates as we will use these as our 'Targets'"
+#~ msgstr ""
+#~ "Veuillez fournir des estimations réalisables, car nous les utiliserons "
+#~ "comme « cibles »"
+
+#~ msgid "Refer to Form 01 - Community Profile"
+#~ msgstr "Consulter le formulaire 01 - Profil de la communauté"
+
+#~ msgid "Estimated Number of indirect beneficiaries"
+#~ msgstr "Nombre estimé de bénéficiaires indirects"
+
+#~ msgid ""
+#~ "This is a calculation - multiply direct beneficiaries by average "
+#~ "household size"
+#~ msgstr ""
+#~ "C’est un calcul - multipliez les bénéficiaires directs par la taille "
+#~ "moyenne des ménages"
+
+#~ msgid "Total Project Budget"
+#~ msgstr "Budget total du projet"
+
+#~ msgid "In USD"
+#~ msgstr "En USD"
+
+#~ msgid "Organizations portion of Project Budget"
+#~ msgstr "Partie des organisations du budget du projet"
+
+#~ msgid "Estimated Total in Local Currency"
+#~ msgstr "Total estimé en devise locale"
+
+#~ msgid "In Local Currency"
+#~ msgstr "En devise locale"
+
+#~ msgid "Estimated Organization Total in Local Currency"
+#~ msgstr "Estimation de l’organisation totale en devise locale"
+
+#~ msgid "Total portion of estimate for your agency"
+#~ msgstr "Part totale de l’estimation pour votre agence"
+
+#~ msgid "Local Currency exchange rate to USD"
+#~ msgstr "Taux de change local en USD"
+
+#~ msgid "Date of exchange rate"
+#~ msgstr "Date du taux de change"
+
+#~ msgid "Community Representative"
+#~ msgstr "Représentant communautaire"
+
+#~ msgid "Community Representative Contact"
+#~ msgstr "Coordonnées du représentant communautaire"
+
+#~ msgid "Community Mobilizer"
+#~ msgstr "Mobilisateur communautaire"
+
+#~ msgid "Community Mobilizer Contact Number"
+#~ msgstr "Numéro de contact du mobilisateur communautaire"
+
+#~ msgid "Community Proposal"
+#~ msgstr "Proposition de la communauté"
+
+#~ msgid "Estimated # of Male Trained"
+#~ msgstr "Nombre estimé d’hommes formés"
+
+#~ msgid "Estimated # of Female Trained"
+#~ msgstr "Nombre estimé de femmes formées"
+
+#~ msgid "Estimated Total # Trained"
+#~ msgstr "Nombre total estimé de personnes formées"
+
+#~ msgid "Estimated # of Trainings Conducted"
+#~ msgstr "Nombre estimé de formations effectuées"
+
+#~ msgid "Type of Items Distributed"
+#~ msgstr "Type d’articles distribués"
+
+#~ msgid "Estimated # of Items Distributed"
+#~ msgstr "Nombre estimé d’articles distribués"
+
+#~ msgid "Estimated # of Male Laborers"
+#~ msgstr "Nombre estimé de travailleurs masculins"
+
+#~ msgid "Estimated # of Female Laborers"
+#~ msgstr "Nombre estimé de travailleuses"
+
+#~ msgid "Estimated Total # of Laborers"
+#~ msgstr "Nombre total estimé de travailleurs"
+
+#~ msgid "Estimated # of Project Days"
+#~ msgstr "Nombre estimé de jours du projet"
+
+#~ msgid "Estimated # of Person Days"
+#~ msgstr "Nombre estimé de jours-personnes"
+
+#~ msgid "Estimated Total Cost of Materials"
+#~ msgstr "Coût total estimé des matériaux"
+
+#~ msgid "Estimated Wages Budgeted"
+#~ msgstr "Salaires estimés budgétisés"
+
+#~ msgid "Estimation date"
+#~ msgstr "Date d’estimation"
+
+#~ msgid "Checked by"
+#~ msgstr "Vérifié par"
+
+#~ msgid "Finance reviewed by"
+#~ msgstr "Finance examinée par"
+
+#~ msgid "Date Reviewed by Finance"
+#~ msgstr "Date de révision par Finance"
+
+#~ msgid "M&E Reviewed by"
+#~ msgstr "M & E revu par"
+
+#~ msgid "Date Reviewed by M&E"
+#~ msgstr "Date de révision par M & E"
+
+#~ msgid "Sustainability Plan"
+#~ msgstr "Plan de durabilité"
+
+#~ msgid "Date Approved"
+#~ msgstr "Date d’approbation"
+
+#~ msgid "Approval Remarks"
+#~ msgstr "Remarques d’approbation"
+
+#~ msgid "General Background and Problem Statement"
+#~ msgstr "Contexte général et énoncé du problème"
+
+#~ msgid "Risks and Assumptions"
+#~ msgstr "Risques et hypothèses"
+
+#~ msgid "Description of Stakeholder Selection Criteria"
+#~ msgstr "Description des critères de sélection des parties prenantes"
+
+#~ msgid "Description of project activities"
+#~ msgstr "Description des activités du projet"
+
+#~ msgid "Description of government involvement"
+#~ msgstr "Description de la participation du gouvernement"
+
+#~ msgid "Description of community involvement"
+#~ msgstr "Description de la participation communautaire"
+
+#~ msgid "Describe the project you would like the program to consider"
+#~ msgstr "Décrivez le projet que vous aimeriez que le programme considère"
+
+#~ msgid "Last Edit Date"
+#~ msgstr "Dernière date d’édition"
+
+#~ msgid "Expected start date"
+#~ msgstr "Date de début prévue"
+
+#~ msgid "Imported from Project Initiation"
+#~ msgstr "Importé à partir de l’initiation du projet"
+
+#~ msgid "Expected end date"
+#~ msgstr "Date de fin prévue"
+
+#~ msgid "Imported Project Initiation"
+#~ msgstr "Initiation au projet importé"
+
+#~ msgid "Expected Duration"
+#~ msgstr "La durée prévue"
+
+#~ msgid "Actual start date"
+#~ msgstr "Date de début réelle"
+
+#~ msgid "Actual end date"
+#~ msgstr "Date de fin réelle"
+
+#~ msgid "Actual duaration"
+#~ msgstr "Durée réelle"
+
+#~ msgid "If not on time explain delay"
+#~ msgstr "Si pas à l’heure expliquer le retard"
+
+#~ msgid "Estimated Budget"
+#~ msgstr "Budget estimé"
+
+#~ msgid "Actual Cost"
+#~ msgstr "Coût réel"
+
+#~ msgid "Actual cost date"
+#~ msgstr "Date réelle des coûts"
+
+#~ msgid "Budget versus Actual variance"
+#~ msgstr "Budget par rapport à la variance réelle"
+
+#~ msgid "Explanation of variance"
+#~ msgstr "Explication de la variance"
+
+#~ msgid "Estimated Budget for Organization"
+#~ msgstr "Budget estimé pour l’organisation"
+
+#~ msgid "Actual Cost for Organization"
+#~ msgstr "Coût réel pour l’organisation"
+
+#~ msgid "Actual Direct Beneficiaries"
+#~ msgstr "Bénéficiaires directs réels"
+
+#~ msgid "Number of Jobs Created"
+#~ msgstr "Nombre d’emplois créés"
+
+#~ msgid "Part Time Jobs"
+#~ msgstr "Emplois à temps partiel"
+
+#~ msgid "Full Time Jobs"
+#~ msgstr "Emplois à temps plein"
+
+#~ msgid "Progress against Targets (%)"
+#~ msgstr "Progrès par rapport aux cibles (%)"
+
+#~ msgid "Government Involvement"
+#~ msgstr "Participation du gouvernement"
+
+#~ msgid "CommunityHandover/Sustainability Maintenance Plan"
+#~ msgstr "Transmission de la communauté/Plan de maintenance durable"
+
+#~ msgid "Check box if it was completed"
+#~ msgstr "Case à cocher si elle a été complétée"
+
+#~ msgid "Describe how sustainability was ensured for this project"
+#~ msgstr "Décrivez comment la durabilité a été assurée pour ce projet"
+
+#~ msgid "How was quality assured for this project"
+#~ msgstr "Comment était la qualité assurée pour ce projet"
+
+#~ msgid "Lessons learned"
+#~ msgstr "Leçons apprises"
+
+#~ msgid "Estimated by"
+#~ msgstr "Estimé par"
+
+#~ msgid "Reviewed by"
+#~ msgstr "Revu par"
+
+#~ msgid "Project Tracking"
+#~ msgstr "Suivi de projet"
+
+#~ msgid "Link to document, document repository, or document URL"
+#~ msgstr ""
+#~ "Lien vers un document, un référentiel de documents/dossier ou l’URL d’un "
+#~ "document"
+
+#, python-format
+#~ msgid "%% complete"
+#~ msgstr "%% achevé"
+
+#, python-format
+#~ msgid "%% cumulative completion"
+#~ msgstr "%% d’achèvement cumulatif"
+
+#~ msgid "Est start date"
+#~ msgstr "Date de début estimée"
+
+#~ msgid "Est end date"
+#~ msgstr "Date de fin estimée"
+
+#~ msgid "site"
+#~ msgstr "site"
+
+#~ msgid "Complete"
+#~ msgstr "Achevée"
+
+#~ msgid "Project Components"
+#~ msgstr "Composants du projet"
+
+#~ msgid "Person Responsible"
+#~ msgstr "Personne responsable"
+
+#~ msgid "complete"
+#~ msgstr "achevé"
+
+#~ msgid "Monitors"
+#~ msgstr "Moniteurs"
+
+#~ msgid "Contributor"
+#~ msgstr "Donateur"
+
+#~ msgid "Description of contribution"
+#~ msgstr "Description de la contribution"
+
+#~ msgid "Item"
+#~ msgstr "Article"
+
+#~ msgid "Checklist"
+#~ msgstr "Liste de contrôle"
+
+#~ msgid "Checklist Item"
+#~ msgstr "Article de la liste de contrôle"
+
+#~ msgid "Indicator Name"
+#~ msgstr "Nom de lindicateur"
+
+#~ msgid "Temporary"
+#~ msgstr "Temporaire"
+
+#~ msgid "Success, Basic Indicator Created!"
+#~ msgstr "Succès, indicateur de base créé !"
+
+#~ msgid "Month"
+#~ msgstr "Mois"
+
+#~ msgid "Please select a valid program."
+#~ msgstr "Veuillez sélectionner un programme valide."
+
+#~ msgid "Please select a valid report type."
+#~ msgstr "Veuillez sélectionner un type de rapport valide."
+
+#~ msgid ""
+#~ "IPTT report cannot be run on a program with a reporting period set in the "
+#~ "future."
+#~ msgstr ""
+#~ "Un rapport IPTT ne peut pas être exécuté sur un programme dont la période "
+#~ "de rapport se situe dans le futur."
+
+#~ msgid ""
+#~ "Your program administrator must initialize this program before you will "
+#~ "be able to view or edit it"
+#~ msgstr ""
+#~ "Ce programme doit être initialisé par votre administrateur de programme "
+#~ "avant de pouvoir être visible ou modifié"
+
+#~ msgid "Program Projects by Status"
+#~ msgstr "Projets de programme par statut"
+
+#~ msgid "for"
+#~ msgstr "pour"
+
+#~ msgid "Number of Approved, Pending or Open Projects"
+#~ msgstr "Nombre de projets approuvés, en suspens ou ouverts"
+
+#~ msgid "Approved"
+#~ msgstr "Approuvé"
+
+#~ msgid "Pending"
+#~ msgstr "En suspens"
+
+#~ msgid "Awaiting Approval"
+#~ msgstr "En attente d’approbation"
+
+#~ msgid "KPI Targets v. Actuals"
+#~ msgstr "Cibles de KPI vs réels"
+
+#~ msgid "is awaiting your"
+#~ msgstr "attend votre"
+
+#~ msgid "approval"
+#~ msgstr "approbation"
+
+#~ msgid "Filter by Program"
+#~ msgstr "Filtrer par programme"
+
+#~ msgid "Indicator Evidence Leaderboard"
+#~ msgstr "Tableau de scores des indicateurs"
+
+#~ msgid "Indicator Data"
+#~ msgstr "Données de l’indicateur"
+
+#~ msgid "W/Evidence"
+#~ msgstr "Avec preuve"
+
+#~ msgid "Indicator Evidence"
+#~ msgstr "Indicateur de preuve"
+
+#~ msgid "# of Indicators"
+#~ msgstr "Nombre d’indicateurs"
+
+#~ msgid "Target/Actuals"
+#~ msgstr "Cible/réels"
+
+#~ msgid "No indicators currently aligned with country strategic objectives."
+#~ msgstr ""
+#~ "Aucun indicateur actuellement aligné sur les objectifs stratégiques du "
+#~ "pays."
+
+#~ msgid "Milestones"
+#~ msgstr "Étapes"
+
+#~ msgid "Current Adoption Status"
+#~ msgstr "Statut d’adoption actuel"
+
+#~ msgid "Adoption of Workflow"
+#~ msgstr "Adoption du flux de travail"
+
+#~ msgid "Total Programs"
+#~ msgstr "Total des programmes"
+
+#~ msgid "Using Workflow"
+#~ msgstr "Utilisation du flux de travail"
+
+#~ msgid "Adoption of Indicator"
+#~ msgstr "Adoption de l’indicateur"
+
+#~ msgid "Using Indicator Plans"
+#~ msgstr "Utilisation de plans d’indicateurs"
+
+#~ msgid "Indicators w/ Evidence"
+#~ msgstr "Indicateurs avec preuves"
+
+#~ msgid "Total Results"
+#~ msgstr "Résultats totaux"
+
+#~ msgid "Error reaching DIG service for list of indicators"
+#~ msgstr "Erreur d’accès au service DIG pour la liste des indicateurs"
+
+#~ msgid "Create an Indicator from an External Template."
+#~ msgstr "Créer un indicateur à partir d’un modèle externe."
+
+#~ msgid "Program based in"
+#~ msgstr "Programme basé à"
+
+#~ msgid ""
+#~ "Are you adding a custom indicator or an indicator from the \"Design for "
+#~ "Impact Guide (DIG)\"?"
+#~ msgstr ""
+#~ "Ajoutez-vous un indicateur personnalisé ou un indicateur du \"Guide de la "
+#~ "Conception pour l’Impact (DIG)\"?"
+
+#~ msgid "Custom indicator"
+#~ msgstr "Indicateur personnalisé"
+
+#~ msgid "-- select --"
+#~ msgstr "- sélectionnez -"
+
+#~ msgid "Form Help/Guidance"
+#~ msgstr "Formulaire d’assistance/aide"
+
+#~ msgid "View your indicator on the program page."
+#~ msgstr "Visualisez vos indicateurs sur la page du programme."
+
+#~ msgid "Please enter a number larger than zero with no letters or symbols."
+#~ msgstr "Veuillez entrer un nombre positif sans lettres ni symboles."
+
+#~ msgid "You can start with up to 12 targets and add more later."
+#~ msgstr ""
+#~ "Vous pouvez commencer avec jusqu’à 12 cibles et en ajouter plus tard."
+
+#~ msgid "Create targets"
+#~ msgstr "Créer des cibles"
+
+#~ msgid "Sum of targets"
+#~ msgstr "Somme des cibles"
+
+#~ msgid "indicator:"
+#~ msgstr "indicateur :"
+
+#~ msgid "Targets vs Actuals"
+#~ msgstr "Cibles vs réels"
+
+#~ msgid ""
+#~ "View results organized by target period for indicators that share the "
+#~ "same target frequency."
+#~ msgstr ""
+#~ "Voir les résultats organisés par période cible pour les indicateurs qui "
+#~ "partagent la même fréquence cible."
+
+#~ msgid "View Report"
+#~ msgstr "Voir le rapport"
+
+#~ msgid ""
+#~ "View the most recent two months of results. (You can customize your time "
+#~ "periods.) This report does not include periodic targets."
+#~ msgstr ""
+#~ "Voir les deux derniers mois de résultats. (Vous pouvez personnaliser vos "
+#~ "périodes.) Ce rapport n’inclut pas les cibles périodiques."
+
+#~ msgid "# / %%"
+#~ msgstr "# / %%"
+
+#~ msgid "Pin To Program Page"
+#~ msgstr "Épingler à la page du programme"
+
+#~ msgid "Success! This report is now pinned to the program page."
+#~ msgstr "Bravo! Ce rapport est maintenant épinglé à la page des programmes."
+
+#~ msgid ""
+#~ "This date falls outside the range of your target periods. Please select a "
+#~ "date between "
+#~ msgstr ""
+#~ "Cette date est en dehors de la plage de vos périodes cibles. Veuillez "
+#~ "sélectionner une date entre "

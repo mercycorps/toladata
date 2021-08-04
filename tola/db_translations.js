@@ -1,31 +1,31 @@
 // # Translators: One of several options for specifying how often data is collected or reported on over the life of a program
-string0 = gettext("By distribution")
+string0 = gettext("Endline")
 // # Translators: One of several options for specifying how often data is collected or reported on over the life of a program
-string1 = gettext("Endline")
+string1 = gettext("By distribution")
 // # Translators: One of several options for specifying how often data is collected or reported on over the life of a program
-string2 = gettext("Post shock")
+string2 = gettext("Annual")
 // # Translators: One of several options for specifying how often data is collected or reported on over the life of a program
-string3 = gettext("Quarterly")
+string3 = gettext("Final evaluation")
 // # Translators: One of several options for specifying how often data is collected or reported on over the life of a program
-string4 = gettext("By training")
+string4 = gettext("Weekly")
 // # Translators: One of several options for specifying how often data is collected or reported on over the life of a program
-string5 = gettext("Final evaluation")
+string5 = gettext("Semi-annual")
 // # Translators: One of several options for specifying how often data is collected or reported on over the life of a program
 string6 = gettext("By batch")
 // # Translators: One of several options for specifying how often data is collected or reported on over the life of a program
-string7 = gettext("Weekly")
+string7 = gettext("Post shock")
 // # Translators: One of several options for specifying how often data is collected or reported on over the life of a program
-string8 = gettext("Semi-annual")
+string8 = gettext("Monthly")
 // # Translators: One of several options for specifying how often data is collected or reported on over the life of a program
-string9 = gettext("Baseline")
+string9 = gettext("Quarterly")
 // # Translators: One of several options for specifying how often data is collected or reported on over the life of a program
-string10 = gettext("Annual")
+string10 = gettext("By training")
 // # Translators: One of several options for specifying how often data is collected or reported on over the life of a program
-string11 = gettext("Monthly")
+string11 = gettext("By event")
 // # Translators: One of several options for specifying how often data is collected or reported on over the life of a program
 string12 = gettext("Midline")
 // # Translators: One of several options for specifying how often data is collected or reported on over the life of a program
-string13 = gettext("By event")
+string13 = gettext("Baseline")
 // # Translators: One of several choices for what sector (i.e. development domain) a program is most closely associated with
 string14 = gettext("Agribusiness")
 // # Translators: One of several choices for what sector (i.e. development domain) a program is most closely associated with
@@ -77,7 +77,7 @@ string37 = gettext("Governance and Conflict Resolution")
 // # Translators: One of several choices for what sector (i.e. development domain) a program is most closely associated with
 string38 = gettext("Health")
 // # Translators: One of several choices for what sector (i.e. development domain) a program is most closely associated with
-string39 = gettext("Humanitaria Intervention Readiness")
+string39 = gettext("Humanitarian Intervention Readiness")
 // # Translators: One of several choices for what sector (i.e. development domain) a program is most closely associated with
 string40 = gettext("Hygiene Promotion")
 // # Translators: One of several choices for what sector (i.e. development domain) a program is most closely associated with
@@ -119,20 +119,20 @@ string58 = gettext("Workforce Development")
 // # Translators: One of several choices for what sector (i.e. development domain) a program is most closely associated with
 string59 = gettext("Youth")
 // # Translators: One of several choices for specifying what type of Indicator is being created.  An Indicator is a performance measure e.g. "We will distrubute 1000 food packs over the next two months"
-string60 = gettext("Custom")
+string60 = gettext("Context / Trigger")
 // # Translators: One of several choices for specifying what type of Indicator is being created.  An Indicator is a performance measure e.g. "We will distrubute 1000 food packs over the next two months"
-string61 = gettext("Donor")
+string61 = gettext("Custom")
 // # Translators: One of several choices for specifying what type of Indicator is being created.  An Indicator is a performance measure e.g. "We will distrubute 1000 food packs over the next two months"
-string62 = gettext("DIG - Standard")
+string62 = gettext("DIG - Alpha")
 // # Translators: One of several choices for specifying what type of Indicator is being created.  An Indicator is a performance measure e.g. "We will distrubute 1000 food packs over the next two months"
-string63 = gettext("DIG - Alpha")
+string63 = gettext("DIG - Standard")
 // # Translators: One of several choices for specifying what type of Indicator is being created.  An Indicator is a performance measure e.g. "We will distrubute 1000 food packs over the next two months"
 string64 = gettext("DIG - Testing")
 // # Translators: One of several choices for specifying what type of Indicator is being created.  An Indicator is a performance measure e.g. "We will distrubute 1000 food packs over the next two months"
-string65 = gettext("Performance")
+string65 = gettext("Donor")
 // # Translators: One of several choices for specifying what type of Indicator is being created.  An Indicator is a performance measure e.g. "We will distrubute 1000 food packs over the next two months"
-string66 = gettext("Process / Management")
+string66 = gettext("Key Performance Indicator (KPI)")
 // # Translators: One of several choices for specifying what type of Indicator is being created.  An Indicator is a performance measure e.g. "We will distrubute 1000 food packs over the next two months"
-string67 = gettext("Context / Trigger")
+string67 = gettext("Performance")
 // # Translators: One of several choices for specifying what type of Indicator is being created.  An Indicator is a performance measure e.g. "We will distrubute 1000 food packs over the next two months"
-string68 = gettext("Key Performance Indicator (KPI)")
+string68 = gettext("Process / Management")

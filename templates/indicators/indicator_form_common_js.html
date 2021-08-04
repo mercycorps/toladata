@@ -233,6 +233,7 @@
         var delete_indicator = (rationale) => {
             $.post(url, {rationale: rationale})
              .done(function(data, textStatus, jqXHR){
+                 allowModalToClose = true;
                  if (data.status == "success") {
                     showSuccessNotifiction(data.msg);
 
@@ -646,6 +647,9 @@
             // update the header
             $('#id_title').text(data.title_str);
             $('#id_subtitle').text(data.subtitle_str);
+
+            // remember such that the user can close the modal without a prompt
+            allowModalToClose = true;
 
             // success msg
             showSuccessNotifiction(data.save_success_msg);
