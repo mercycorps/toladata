@@ -1259,8 +1259,9 @@ class Indicator(SafeDeleteModel):
     baseline = models.CharField(
         verbose_name=_("Baseline"), max_length=255, null=True, blank=True,
         # Translators: this is help text for a field on an indicator setup form
-        help_text=_("Enter a numeric value for the baseline. If a baseline is not yet known or not applicable, "
-                    "enter a zero or select the &ldquo;Not applicable&rdquo; checkbox. The baseline can always "
+        help_text=_("Enter a numeric value for the baseline that is greater than or equal to zero. If a baseline "
+                    "is not yet known or not applicable, enter a zero or select the "
+                    "&ldquo;Not applicable&rdquo; checkbox. The baseline can always "
                     "be updated at a later point in time.")
     )
 

@@ -100,7 +100,7 @@ ERROR_NAME_IN_DB = 204  # Indicators are separated by an empty row would cause t
 ERROR_DUPLICATED_NAME = 205  # Indicators are separated by an empty row would cause the indicator numbers to be wrong for auto-numbered programs
 
 # Translators:  Error message provided when the name a user has provided for the indicator has already been used by another indicator.
-ERROR_MSG_NAME_IN_DB = gettext_noop("Indicators must have unique names.")
+ERROR_MSG_NAME_IN_DB = gettext_noop("A program indicator with this name already exists.")
 # Translators:  Error message provided when the name a user tries to upload multiple Indicators with the same name as one another.
 ERROR_MSG_NAME_DUPLICATED = gettext_noop("Please give this indicator a unique name.")
 FIRST_CELL_ERROR_VALUE = r"⚠️"
@@ -161,7 +161,10 @@ class BulkImportIndicatorsView(LoginRequiredMixin, UserPassesTestMixin, AccessMi
     program_name_row = PROGRAM_NAME_ROW
 
     # Translators: Error message shown to a user when they have entered a value for a numeric field that isn't a number or is negative.
-    VALIDATION_MSG_BASELINE_NA = gettext_noop('Enter a numeric value for the baseline. If a baseline is not yet known or not applicable, enter a zero or type "N/A". The baseline can always be updated at a later point in time.')
+    VALIDATION_MSG_BASELINE_NA = gettext_noop(
+        'Enter a numeric value for the baseline that is greater than or equal '
+        'to zero. If a baseline is not yet known or not applicable, enter a zero or type "N/A". The baseline '
+        'can always be updated at a later point in time.')
 
     default_border = Side(border_style='thin', color=GRAY_LIGHTER)
 
