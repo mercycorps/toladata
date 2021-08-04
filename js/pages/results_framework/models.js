@@ -713,15 +713,10 @@ export class UIStore {
                 /* # Translators: This is a warning messages when a user has entered duplicate names for two different objects and those names contain only white spaces, both of which are not permitted. */
                 return {hasError: true, msg: gettext("Please complete this field.")}
             }
-            else if (commaError){
+            else if (colonError || commaError){
                 hasErrors = true;
-                /* # Translators: This is a warning messages when a user has a comma in a name that shouldn't contain commas */
-                return {hasError: true, msg: gettext("Result levels should not contain commas.")}
-            }
-            else if (colonError){
-                hasErrors = true;
-                /* # Translators: This is a warning messages when a user has a colon in a name that shouldn't contain colons */
-                return {hasError: true, msg: gettext("Result levels should not contain colons.")}
+                /* # Translators: This is a warning messages when a user has a colon or comma in a name that shouldn't contain colons or commas */
+                return {hasError: true, msg: gettext("Colons and commas are not permitted.")}
             }
             else if (duplicateErrors > 1){
                 hasErrors = true;
