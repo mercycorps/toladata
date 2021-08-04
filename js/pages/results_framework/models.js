@@ -715,7 +715,7 @@ export class UIStore {
             }
             else if (colonError || commaError){
                 hasErrors = true;
-                /* # Translators: This is a warning messages when a user has a comma in a name that shouldn't contain commas */
+                /* # Translators: This is a warning messages when a user has a colon or comma in a name that shouldn't contain colons or commas */
                 return {hasError: true, msg: gettext("Colons and commas are not permitted.")}
             }
             else if (duplicateErrors > 1){
