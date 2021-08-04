@@ -3,8 +3,8 @@ msgid ""
 msgstr ""
 "Project-Id-Version: \n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2021-08-03 16:19-0700\n"
-"PO-Revision-Date: 2021-08-03 15:50-0700\n"
+"POT-Creation-Date: 2021-08-03 16:43-0700\n"
+"PO-Revision-Date: 2021-08-03 16:42-0700\n"
 "Last-Translator: \n"
 "Language-Team: \n"
 "Language: es\n"
@@ -412,13 +412,13 @@ msgstr "Línea media y línea final"
 
 #. Translators: One of several options for specifying how often data is collected or reported on over the life of a program
 #: js/constants.js:39 js/pages/iptt_quickstart/models/ipttQSRootStore.js:32
-#: tola/db_translations.js:22
+#: tola/db_translations.js:20
 msgid "Annual"
 msgstr "Anual"
 
 #. Translators: One of several options for specifying how often data is collected or reported on over the life of a program
 #: js/constants.js:40 js/pages/iptt_quickstart/models/ipttQSRootStore.js:33
-#: tola/db_translations.js:18
+#: tola/db_translations.js:22
 msgid "Semi-annual"
 msgstr "Semestral"
 
@@ -428,13 +428,13 @@ msgstr "Trienal"
 
 #. Translators: One of several options for specifying how often data is collected or reported on over the life of a program
 #: js/constants.js:42 js/pages/iptt_quickstart/models/ipttQSRootStore.js:35
-#: tola/db_translations.js:8
+#: tola/db_translations.js:16
 msgid "Quarterly"
 msgstr "Trimestral"
 
 #. Translators: One of several options for specifying how often data is collected or reported on over the life of a program
 #: js/constants.js:43 js/pages/iptt_quickstart/models/ipttQSRootStore.js:36
-#: tola/db_translations.js:24
+#: tola/db_translations.js:28
 msgid "Monthly"
 msgstr "Mensual"
 
@@ -772,7 +772,7 @@ msgstr "# / %"
 #: js/pages/iptt_report/components/report/tableHeader.js:159
 #: js/pages/iptt_report/models/filterStore.js:737
 #: js/pages/program_page/components/indicator_list.js:206
-#: tola/db_translations.js:20
+#: tola/db_translations.js:10
 msgid "Baseline"
 msgstr "Base"
 
@@ -2472,48 +2472,48 @@ msgstr "usuarios"
 
 #. Translators: One of several options for specifying how often data is collected or reported on over the life of a program
 #: tola/db_translations.js:2
-msgid "By distribution"
-msgstr "Por distribución"
-
-#. Translators: One of several options for specifying how often data is collected or reported on over the life of a program
-#: tola/db_translations.js:4
-msgid "Endline"
-msgstr "Línea final"
-
-#. Translators: One of several options for specifying how often data is collected or reported on over the life of a program
-#: tola/db_translations.js:6
-msgid "Post shock"
-msgstr "Posterior al desastre"
-
-#. Translators: One of several options for specifying how often data is collected or reported on over the life of a program
-#: tola/db_translations.js:10
-msgid "By training"
-msgstr "Por formación"
-
-#. Translators: One of several options for specifying how often data is collected or reported on over the life of a program
-#: tola/db_translations.js:12
-msgid "Final evaluation"
-msgstr "Evaluación final"
-
-#. Translators: One of several options for specifying how often data is collected or reported on over the life of a program
-#: tola/db_translations.js:14
 msgid "By batch"
 msgstr "Por lotes"
 
 #. Translators: One of several options for specifying how often data is collected or reported on over the life of a program
-#: tola/db_translations.js:16
+#: tola/db_translations.js:4
+msgid "By event"
+msgstr "Por evento"
+
+#. Translators: One of several options for specifying how often data is collected or reported on over the life of a program
+#: tola/db_translations.js:6
+msgid "Endline"
+msgstr "Línea final"
+
+#. Translators: One of several options for specifying how often data is collected or reported on over the life of a program
+#: tola/db_translations.js:8
+msgid "Final evaluation"
+msgstr "Evaluación final"
+
+#. Translators: One of several options for specifying how often data is collected or reported on over the life of a program
+#: tola/db_translations.js:12
 msgid "Weekly"
 msgstr "Semanal"
 
 #. Translators: One of several options for specifying how often data is collected or reported on over the life of a program
-#: tola/db_translations.js:26
+#: tola/db_translations.js:14
+msgid "By training"
+msgstr "Por formación"
+
+#. Translators: One of several options for specifying how often data is collected or reported on over the life of a program
+#: tola/db_translations.js:18
 msgid "Midline"
 msgstr "Línea media"
 
 #. Translators: One of several options for specifying how often data is collected or reported on over the life of a program
-#: tola/db_translations.js:28
-msgid "By event"
-msgstr "Por evento"
+#: tola/db_translations.js:24
+msgid "By distribution"
+msgstr "Por distribución"
+
+#. Translators: One of several options for specifying how often data is collected or reported on over the life of a program
+#: tola/db_translations.js:26
+msgid "Post shock"
+msgstr "Posterior al desastre"
 
 #. Translators: One of several choices for what sector (i.e. development domain) a program is most closely associated with
 #: tola/db_translations.js:30
@@ -2642,7 +2642,7 @@ msgstr "Salud"
 
 #. Translators: One of several choices for what sector (i.e. development domain) a program is most closely associated with
 #: tola/db_translations.js:80
-msgid "Humanitaria Intervention Readiness"
+msgid "Humanitarian Intervention Readiness"
 msgstr "Preparación para la intervención humanitaria"
 
 #. Translators: One of several choices for what sector (i.e. development domain) a program is most closely associated with
@@ -2753,17 +2753,17 @@ msgstr "Donante"
 #. Translators: One of several choices for specifying what type of Indicator is being created.  An Indicator is a performance measure e.g. "We will distrubute 1000 food packs over the next two months"
 #: tola/db_translations.js:126
 msgid "DIG - Standard"
-msgstr "DIG: estándar"
+msgstr "DIG - de agencia"
 
 #. Translators: One of several choices for specifying what type of Indicator is being created.  An Indicator is a performance measure e.g. "We will distrubute 1000 food packs over the next two months"
 #: tola/db_translations.js:128
 msgid "DIG - Alpha"
-msgstr "DIG: alfa"
+msgstr "DIG - alfa"
 
 #. Translators: One of several choices for specifying what type of Indicator is being created.  An Indicator is a performance measure e.g. "We will distrubute 1000 food packs over the next two months"
 #: tola/db_translations.js:130
 msgid "DIG - Testing"
-msgstr "DIG: prueba"
+msgstr "DIG - en prueba"
 
 #. Translators: One of several choices for specifying what type of Indicator is being created.  An Indicator is a performance measure e.g. "We will distrubute 1000 food packs over the next two months"
 #: tola/db_translations.js:132
