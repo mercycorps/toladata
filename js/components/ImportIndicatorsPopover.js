@@ -631,26 +631,40 @@ export const ImportIndicatorsPopover = ({ page, program_id, tierLevelsUsed, stor
                                 <div  className="import-success-text">
                                     <React.Fragment>
                                         {views === SUCCESS ? <div><i className="fas fa-check-circle"/></div> : null}
-                                    </React.Fragment>
-                                    {
-                                        // # Translators: Message with the count of indicators that were successfully imported but they require additional details before they can be submitted.
-                                        interpolate(ngettext("%s indicator was successfully imported, but require additional details before results can be submitted.",
-                                            "%s indicators were successfully imported, but require additional details before results can be submitted.",
-                                            validIndicatorsCount
-                                        ), [validIndicatorsCount])
+                                    </React.Fragment> 
+                                    { page === "resultsFramework" ?
+                                        <React.Fragment>
+                                            {
+                                                // # Translators: Message with the count of indicators that were successfully imported but they require additional details before they can be submitted. Message to the user to close this popover message to see their new imported indicators.
+                                                interpolate(ngettext("%s indicator was successfully imported, but requires additional details before results can be submitted.",
+                                                    "%s indicators were successfully imported, but require additional details before results can be submitted.",
+                                                    validIndicatorsCount
+                                                ), [validIndicatorsCount])
+                                            }
+                                        </React.Fragment>
+                                    :
+                                        <React.Fragment>
+                                            {
+                                                // # Translators: Message with the count of indicators that were successfully imported but they require additional details before they can be submitted. Message to the user to close this popover message to see their new imported indicators.
+                                                interpolate(ngettext("%s indicator was successfully imported, but requires additional details before results can be submitted. Close this message to view your imported indicator.",
+                                                    "%s indicators were successfully imported, but require additional details before results can be submitted. Close this message to view your imported indicators.",
+                                                    validIndicatorsCount
+                                                ), [validIndicatorsCount])
+                                            }
+                                        </React.Fragment>
                                     }
                                 </div>
                                 { page === "resultsFramework" &&
                                     <a role="link" href={ api.getProgramPageUrl(program_id) }>
                                         {
                                             // # Translators: A link to the program page to add the addition setup information for the imported indicators.
-                                            gettext("Visit the program page to complete setup of these indicators.")
+                                            gettext("Visit the program page to complete indicator setup.")
                                         }
                                     </a>
                                 }
                             </div>
                         )
-                    // TODO: ***** View for when an API call fails *****
+                    // ***** View for when an API call fails *****
                     case ERROR:
                         return (
                             <div className="import-error">
@@ -676,13 +690,11 @@ export const ImportIndicatorsPopover = ({ page, program_id, tierLevelsUsed, stor
                                 </button>
                             </div>
                         )
-                    // TODO: View for when waiting for an API calls response
+                    // ***** View for when waiting for an API calls response *****
                     case LOADING:
                         return (
                             <div className="import-loading" disabled>
                                 <img src='/static/img/duck.gif' />&nbsp;
-                                {/* <img src='/static/img/paint_spinner.gif'/>&nbsp; */}
-                                {/* <img src='/static/img/ajax-loader.gif' />&nbsp; */}
                             </div>
                         );
                 }
