@@ -3,8 +3,8 @@ msgid ""
 msgstr ""
 "Project-Id-Version: \n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2021-08-03 16:43-0700\n"
-"PO-Revision-Date: 2021-08-03 16:42-0700\n"
+"POT-Creation-Date: 2021-08-04 20:53-0700\n"
+"PO-Revision-Date: 2021-08-04 20:52-0700\n"
 "Last-Translator: \n"
 "Language-Team: \n"
 "Language: es\n"
@@ -180,11 +180,11 @@ msgstr "Completar la importación"
 msgid "Upload Template"
 msgstr "Cargar la plantilla"
 
-#. Translators: Message with the count of indicators that were successfully imported but they require additional details before they can be submitted.
-#: js/components/ImportIndicatorsPopover.js:637
+#. Translators: Message with the count of indicators that were successfully imported but they require additional details before they can be submitted. Message to the user to close this popover message to see their new imported indicators.
+#: js/components/ImportIndicatorsPopover.js:639
 #, python-format
 msgid ""
-"%s indicator was successfully imported, but require additional details "
+"%s indicator was successfully imported, but requires additional details "
 "before results can be submitted."
 msgid_plural ""
 "%s indicators were successfully imported, but require additional details "
@@ -196,30 +196,46 @@ msgstr[1] ""
 "Los indicadores %s se han importado con éxito, pero se necesitan más "
 "detalles para poder enviar los resultados."
 
+#. Translators: Message with the count of indicators that were successfully imported but they require additional details before they can be submitted. Message to the user to close this popover message to see their new imported indicators.
+#: js/components/ImportIndicatorsPopover.js:649
+#, python-format
+msgid ""
+"%s indicator was successfully imported, but requires additional details "
+"before results can be submitted. Close this message to view your imported "
+"indicator."
+msgid_plural ""
+"%s indicators were successfully imported, but require additional details "
+"before results can be submitted. Close this message to view your imported "
+"indicators."
+msgstr[0] ""
+"El indicador %s se ha importado con éxito, pero se necesitan más detalles "
+"para poder enviar los resultados."
+msgstr[1] ""
+"Los indicadores %s se han importado con éxito, pero se necesitan más "
+"detalles para poder enviar los resultados."
+
 #. Translators: A link to the program page to add the addition setup information for the imported indicators.
-#: js/components/ImportIndicatorsPopover.js:647
-msgid "Visit the program page to complete setup of these indicators."
-msgstr ""
-"Visite la página del programa para completar la configuración de estos "
-"indicadores."
+#: js/components/ImportIndicatorsPopover.js:661
+msgid "Visit the program page to complete indicator setup."
+msgstr "Translated Visit the program page to complete indicator setup."
 
 #. Translators: Notification for a error that happend on the web server.
-#: js/components/ImportIndicatorsPopover.js:664
+#: js/components/ImportIndicatorsPopover.js:678
 msgid "There was a server-related problem."
 msgstr "Hubo un problema relacionado con el servidor."
 
 #. Translators: A button to try import over after a error occurred.
-#: js/components/ImportIndicatorsPopover.js:674
+#: js/components/ImportIndicatorsPopover.js:688
 msgid "Try again"
 msgstr "Intentarlo de nuevo"
 
 #. Translators: Click to view the Advanced Option section
-#: js/components/ImportIndicatorsPopover.js:724
+#: js/components/ImportIndicatorsPopover.js:736
 msgid "Advanced options"
 msgstr "Opciones avanzadas"
 
 #. Translators: Details explaining that by default the template will include 10 or 20 rows per result level. You can adjust the number if you need more or less rows.
-#: js/components/ImportIndicatorsPopover.js:732
+#: js/components/ImportIndicatorsPopover.js:744
 msgid ""
 "By default, the template will include 10 or 20 indicator rows per result "
 "level. Adjust the numbers if you need more or fewer rows."
@@ -228,7 +244,7 @@ msgstr ""
 "resultados. Modifique los números si necesita más o menos filas."
 
 #. Translators: Message to user that we cannot import the their file. This could be caused by the wrong file being selected, or the structure of the file was changed, or the results framework was updated and does not match the template anymore.
-#: js/components/ImportIndicatorsPopover.js:881
+#: js/components/ImportIndicatorsPopover.js:893
 msgid ""
 "We can’t import indicators from this file. This can happen if the wrong file "
 "is selected, the template structure is modified, or the results framework "
@@ -240,12 +256,12 @@ msgstr ""
 "y ya no coincide con la plantilla."
 
 #. Translators: Messsage to user that there aren't any new indicators in the uploaded file.
-#: js/components/ImportIndicatorsPopover.js:884
+#: js/components/ImportIndicatorsPopover.js:896
 msgid "We can't find any indicators in this file."
 msgstr "No se han encontrado indicadores en este archivo."
 
 #. Translators: Message to user that the import indicator process could not be completed. If the problem continues, contact your TolaData administrator.
-#: js/components/ImportIndicatorsPopover.js:887
+#: js/components/ImportIndicatorsPopover.js:899
 msgid ""
 "Sorry, we couldn’t complete the import process. If the problem persists, "
 "please contact your TolaData administrator."
@@ -254,7 +270,7 @@ msgstr ""
 "problema persiste, póngase en contacto con su administrador de TolaData."
 
 #. Translators: Message to user that the import could not be completed and to find out the reason, upload the import template again.
-#: js/components/ImportIndicatorsPopover.js:890
+#: js/components/ImportIndicatorsPopover.js:902
 msgid ""
 "Sorry, we couldn’t complete the import process. To figure out what went "
 "wrong, please upload your template again."
@@ -263,7 +279,7 @@ msgstr ""
 "averiguar qué ha fallado, vuelva a cargar la plantilla."
 
 #. Translators: Message to user that someone else has uploaded a template in the last 24 hours and may be in the process of importing indicators to this program. You can view the program change log to see more details.
-#: js/components/ImportIndicatorsPopover.js:893
+#: js/components/ImportIndicatorsPopover.js:905
 msgid ""
 "Someone else uploaded a template in the last 24 hours, and may be in the "
 "process of adding indicators to this program."
@@ -272,7 +288,7 @@ msgstr ""
 "que esté en proceso de añadir indicadores a este programa."
 
 #. Translators: Message to user that the type of file that was uploaded was not an Excel file and they should upload a Excel file.
-#: js/components/ImportIndicatorsPopover.js:896
+#: js/components/ImportIndicatorsPopover.js:908
 msgid "We don’t recognize this file type. Please upload an Excel file."
 msgstr ""
 "Translated We don’t recognize this file type. Please upload an Excel file."
@@ -412,13 +428,13 @@ msgstr "Línea media y línea final"
 
 #. Translators: One of several options for specifying how often data is collected or reported on over the life of a program
 #: js/constants.js:39 js/pages/iptt_quickstart/models/ipttQSRootStore.js:32
-#: tola/db_translations.js:20
+#: tola/db_translations.js:6
 msgid "Annual"
 msgstr "Anual"
 
 #. Translators: One of several options for specifying how often data is collected or reported on over the life of a program
 #: js/constants.js:40 js/pages/iptt_quickstart/models/ipttQSRootStore.js:33
-#: tola/db_translations.js:22
+#: tola/db_translations.js:12
 msgid "Semi-annual"
 msgstr "Semestral"
 
@@ -428,13 +444,13 @@ msgstr "Trienal"
 
 #. Translators: One of several options for specifying how often data is collected or reported on over the life of a program
 #: js/constants.js:42 js/pages/iptt_quickstart/models/ipttQSRootStore.js:35
-#: tola/db_translations.js:16
+#: tola/db_translations.js:20
 msgid "Quarterly"
 msgstr "Trimestral"
 
 #. Translators: One of several options for specifying how often data is collected or reported on over the life of a program
 #: js/constants.js:43 js/pages/iptt_quickstart/models/ipttQSRootStore.js:36
-#: tola/db_translations.js:28
+#: tola/db_translations.js:18
 msgid "Monthly"
 msgstr "Mensual"
 
@@ -772,7 +788,7 @@ msgstr "# / %"
 #: js/pages/iptt_report/components/report/tableHeader.js:159
 #: js/pages/iptt_report/models/filterStore.js:737
 #: js/pages/program_page/components/indicator_list.js:206
-#: tola/db_translations.js:10
+#: tola/db_translations.js:28
 msgid "Baseline"
 msgstr "Base"
 
@@ -1465,7 +1481,7 @@ msgid "Results framework template"
 msgstr "Plantilla de sistema de resultados"
 
 #. Translators: One of several choices for specifying what type of Indicator is being created.  An Indicator is a performance measure e.g. "We will distrubute 1000 food packs over the next two months"
-#: js/pages/results_framework/models.js:44 tola/db_translations.js:122
+#: js/pages/results_framework/models.js:44 tola/db_translations.js:124
 msgid "Custom"
 msgstr "Personalizado"
 
@@ -2472,18 +2488,13 @@ msgstr "usuarios"
 
 #. Translators: One of several options for specifying how often data is collected or reported on over the life of a program
 #: tola/db_translations.js:2
-msgid "By batch"
-msgstr "Por lotes"
+msgid "Endline"
+msgstr "Línea final"
 
 #. Translators: One of several options for specifying how often data is collected or reported on over the life of a program
 #: tola/db_translations.js:4
-msgid "By event"
-msgstr "Por evento"
-
-#. Translators: One of several options for specifying how often data is collected or reported on over the life of a program
-#: tola/db_translations.js:6
-msgid "Endline"
-msgstr "Línea final"
+msgid "By distribution"
+msgstr "Por distribución"
 
 #. Translators: One of several options for specifying how often data is collected or reported on over the life of a program
 #: tola/db_translations.js:8
@@ -2491,29 +2502,34 @@ msgid "Final evaluation"
 msgstr "Evaluación final"
 
 #. Translators: One of several options for specifying how often data is collected or reported on over the life of a program
-#: tola/db_translations.js:12
+#: tola/db_translations.js:10
 msgid "Weekly"
 msgstr "Semanal"
 
 #. Translators: One of several options for specifying how often data is collected or reported on over the life of a program
 #: tola/db_translations.js:14
+msgid "By batch"
+msgstr "Por lotes"
+
+#. Translators: One of several options for specifying how often data is collected or reported on over the life of a program
+#: tola/db_translations.js:16
+msgid "Post shock"
+msgstr "Posterior al desastre"
+
+#. Translators: One of several options for specifying how often data is collected or reported on over the life of a program
+#: tola/db_translations.js:22
 msgid "By training"
 msgstr "Por formación"
 
 #. Translators: One of several options for specifying how often data is collected or reported on over the life of a program
-#: tola/db_translations.js:18
-msgid "Midline"
-msgstr "Línea media"
-
-#. Translators: One of several options for specifying how often data is collected or reported on over the life of a program
 #: tola/db_translations.js:24
-msgid "By distribution"
-msgstr "Por distribución"
+msgid "By event"
+msgstr "Por evento"
 
 #. Translators: One of several options for specifying how often data is collected or reported on over the life of a program
 #: tola/db_translations.js:26
-msgid "Post shock"
-msgstr "Posterior al desastre"
+msgid "Midline"
+msgstr "Línea media"
 
 #. Translators: One of several choices for what sector (i.e. development domain) a program is most closely associated with
 #: tola/db_translations.js:30
@@ -2746,19 +2762,19 @@ msgid "Youth"
 msgstr "Jóvenes"
 
 #. Translators: One of several choices for specifying what type of Indicator is being created.  An Indicator is a performance measure e.g. "We will distrubute 1000 food packs over the next two months"
-#: tola/db_translations.js:124
-msgid "Donor"
-msgstr "Donante"
+#: tola/db_translations.js:122
+msgid "Context / Trigger"
+msgstr "Contexto/Elemento desencadenante"
 
 #. Translators: One of several choices for specifying what type of Indicator is being created.  An Indicator is a performance measure e.g. "We will distrubute 1000 food packs over the next two months"
 #: tola/db_translations.js:126
-msgid "DIG - Standard"
-msgstr "DIG - de agencia"
+msgid "DIG - Alpha"
+msgstr "DIG - alfa"
 
 #. Translators: One of several choices for specifying what type of Indicator is being created.  An Indicator is a performance measure e.g. "We will distrubute 1000 food packs over the next two months"
 #: tola/db_translations.js:128
-msgid "DIG - Alpha"
-msgstr "DIG - alfa"
+msgid "DIG - Standard"
+msgstr "DIG - de agencia"
 
 #. Translators: One of several choices for specifying what type of Indicator is being created.  An Indicator is a performance measure e.g. "We will distrubute 1000 food packs over the next two months"
 #: tola/db_translations.js:130
@@ -2767,23 +2783,23 @@ msgstr "DIG - en prueba"
 
 #. Translators: One of several choices for specifying what type of Indicator is being created.  An Indicator is a performance measure e.g. "We will distrubute 1000 food packs over the next two months"
 #: tola/db_translations.js:132
+msgid "Donor"
+msgstr "Donante"
+
+#. Translators: One of several choices for specifying what type of Indicator is being created.  An Indicator is a performance measure e.g. "We will distrubute 1000 food packs over the next two months"
+#: tola/db_translations.js:134
+msgid "Key Performance Indicator (KPI)"
+msgstr "Indicador clave de rendimiento (KPI)"
+
+#. Translators: One of several choices for specifying what type of Indicator is being created.  An Indicator is a performance measure e.g. "We will distrubute 1000 food packs over the next two months"
+#: tola/db_translations.js:136
 msgid "Performance"
 msgstr "Rendimiento"
 
 #. Translators: One of several choices for specifying what type of Indicator is being created.  An Indicator is a performance measure e.g. "We will distrubute 1000 food packs over the next two months"
-#: tola/db_translations.js:134
+#: tola/db_translations.js:138
 msgid "Process / Management"
 msgstr "Procesos/Gestión"
-
-#. Translators: One of several choices for specifying what type of Indicator is being created.  An Indicator is a performance measure e.g. "We will distrubute 1000 food packs over the next two months"
-#: tola/db_translations.js:136
-msgid "Context / Trigger"
-msgstr "Contexto/Elemento desencadenante"
-
-#. Translators: One of several choices for specifying what type of Indicator is being created.  An Indicator is a performance measure e.g. "We will distrubute 1000 food packs over the next two months"
-#: tola/db_translations.js:138
-msgid "Key Performance Indicator (KPI)"
-msgstr "Indicador clave de rendimiento (KPI)"
 
 #, python-format
 #~ msgid ""

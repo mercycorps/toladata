@@ -100,7 +100,7 @@ ERROR_NAME_IN_DB = 204  # Indicators are separated by an empty row would cause t
 ERROR_DUPLICATED_NAME = 205  # Indicators are separated by an empty row would cause the indicator numbers to be wrong for auto-numbered programs
 
 # Translators:  Error message provided when the name a user has provided for the indicator has already been used by another indicator.
-ERROR_MSG_NAME_IN_DB = gettext_noop("Indicators must have unique names.")
+ERROR_MSG_NAME_IN_DB = gettext_noop("A program indicator with this name already exists.")
 # Translators:  Error message provided when the name a user tries to upload multiple Indicators with the same name as one another.
 ERROR_MSG_NAME_DUPLICATED = gettext_noop("Please give this indicator a unique name.")
 FIRST_CELL_ERROR_VALUE = r"⚠️"
@@ -161,7 +161,10 @@ class BulkImportIndicatorsView(LoginRequiredMixin, UserPassesTestMixin, AccessMi
     program_name_row = PROGRAM_NAME_ROW
 
     # Translators: Error message shown to a user when they have entered a value for a numeric field that isn't a number or is negative.
-    VALIDATION_MSG_BASELINE_NA = gettext_noop('Enter a numeric value for the baseline. If a baseline is not yet known or not applicable, enter a zero or type "N/A". The baseline can always be updated at a later point in time.')
+    VALIDATION_MSG_BASELINE_NA = gettext_noop(
+        'Enter a numeric value for the baseline that is greater than or equal '
+        'to zero. If a baseline is not yet known or not applicable, enter a zero or type "N/A". The baseline '
+        'can always be updated at a later point in time.')
 
     default_border = Side(border_style='thin', color=GRAY_LIGHTER)
 
@@ -452,7 +455,10 @@ class BulkImportIndicatorsView(LoginRequiredMixin, UserPassesTestMixin, AccessMi
                     else:
                         raw_value = indicator.get(column['field_name'], None)
                         if column['field_name'] == 'baseline':
-                            raw_value = make_quantized_decimal(raw_value)
+                            if indicator['baseline_na']:
+                                raw_value = 'N\A'
+                            else:
+                                raw_value = make_quantized_decimal(raw_value)
                         # These are potentially translated objects that need to be resolved, but converting None
                         # to a string results in a cell value of "None" rather than an empty cell.
                         active_cell.value = raw_value if raw_value is None else str(raw_value)
@@ -646,6 +652,7 @@ class BulkImportIndicatorsView(LoginRequiredMixin, UserPassesTestMixin, AccessMi
                     continue
                 elif len(skipped_row_indexes) > 0:
                     non_fatal_errors.append(ERROR_INTERVENING_BLANK_ROW)
+                    indicator_status['invalid'] += len(skipped_row_indexes)
                     for skipped_row_index in skipped_row_indexes:
                         first_cell = ws.cell(skipped_row_index, 1)
                         # Translators: Error message provided to users when they are entering data into Excel and they skip a row
@@ -783,6 +790,7 @@ class BulkImportIndicatorsView(LoginRequiredMixin, UserPassesTestMixin, AccessMi
                     name_indexes[indicator_data['name']] = [{'index': current_row_index, 'is_new_name': True}]
                 indicator_data['level_id'] = current_level.pk
                 indicator_data['program_id'] = program.id
+                indicator_data['unit_of_measure'] = str(indicator_data['unit_of_measure'])  # Just in case the input is a number
                 if indicator_data['unit_of_measure_type'] == Indicator.PERCENTAGE:
                     indicator_data['baseline'] *= 100
 
@@ -824,7 +832,7 @@ class BulkImportIndicatorsView(LoginRequiredMixin, UserPassesTestMixin, AccessMi
                             name_cell = ws.cell(row['index'], column_index)
                             first_cell = ws.cell(row['index'], 1)
                             self.format_error_cell(
-                                name_cell, first_cell, PATTERN_FILL_ERROR, [ERROR_MSG_NAME_DUPLICATED])
+                                name_cell, first_cell, PATTERN_FILL_ERROR, [gettext(ERROR_MSG_NAME_DUPLICATED)])
                             indicator_status['invalid'] += 1
                             indicator_status['valid'] -= 1
                 elif any(nd['is_new_name'] for nd in name_data) and len(name_data) > 1:
@@ -834,7 +842,7 @@ class BulkImportIndicatorsView(LoginRequiredMixin, UserPassesTestMixin, AccessMi
                             name_cell = ws.cell(row['index'], column_index)
                             first_cell = ws.cell(row['index'], 1)
                             self.format_error_cell(
-                                name_cell, first_cell, PATTERN_FILL_ERROR, [ERROR_MSG_NAME_IN_DB])
+                                name_cell, first_cell, PATTERN_FILL_ERROR, [gettext(ERROR_MSG_NAME_IN_DB)])
                             indicator_status['invalid'] += 1
                             indicator_status['valid'] -= 1
 
@@ -912,6 +920,7 @@ def save_bulk_import_data(request, *args, **kwargs):
     try:
         with transaction.atomic():
             for indicator_data in stored_indicators:
+                indicator_data['was_bulk_imported'] = True
                 indicator = Indicator.objects.create(**indicator_data)
                 ProgramAuditLog.log_indicator_imported(request.user, indicator, 'N/A')
     except (django.core.exceptions.ValidationError, django.db.utils.IntegrityError):
