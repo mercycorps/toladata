@@ -129,14 +129,6 @@ export class LevelListPanel  extends React.Component {
         api.updateSessions({show_import_banner: false})
     }
 
-    // Determines if the program has any indicators that were bulk imported
-    hasBulkImportIndicators = (indicators) => {
-        return indicators.some((indicator) => {
-            console.log(indicator);
-            return indicator.was_bulk_imported === true;
-        })
-    }
-
     render() {
         const isCollapseAllDisabled = this.props.rootStore.uiStore.hasVisibleChildren.length === 0 ||
             this.props.rootStore.uiStore.disableCardActions ||
@@ -239,6 +231,7 @@ export class LevelListPanel  extends React.Component {
                     {
                         this.state.show_import_banner && // Hides Bulk Import Banner if stored as false in Django's Session Storage
                         this.props.rootStore.levelStore.accessLevel === 'high' &&
+                        !this.props.rootStore.levelStore.indicators.some((indicator) => indicator.was_bulk_imported) && // Determines if the program has any indicators that were bulk imported
                         this.state.level_status !== 1
                             ? bulkImportBanner
                             : null
