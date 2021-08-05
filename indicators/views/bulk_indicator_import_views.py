@@ -832,7 +832,7 @@ class BulkImportIndicatorsView(LoginRequiredMixin, UserPassesTestMixin, AccessMi
                             name_cell = ws.cell(row['index'], column_index)
                             first_cell = ws.cell(row['index'], 1)
                             self.format_error_cell(
-                                name_cell, first_cell, PATTERN_FILL_ERROR, [ERROR_MSG_NAME_DUPLICATED])
+                                name_cell, first_cell, PATTERN_FILL_ERROR, [gettext(ERROR_MSG_NAME_DUPLICATED)])
                             indicator_status['invalid'] += 1
                             indicator_status['valid'] -= 1
                 elif any(nd['is_new_name'] for nd in name_data) and len(name_data) > 1:
@@ -842,7 +842,7 @@ class BulkImportIndicatorsView(LoginRequiredMixin, UserPassesTestMixin, AccessMi
                             name_cell = ws.cell(row['index'], column_index)
                             first_cell = ws.cell(row['index'], 1)
                             self.format_error_cell(
-                                name_cell, first_cell, PATTERN_FILL_ERROR, [ERROR_MSG_NAME_IN_DB])
+                                name_cell, first_cell, PATTERN_FILL_ERROR, [gettext(ERROR_MSG_NAME_IN_DB)])
                             indicator_status['invalid'] += 1
                             indicator_status['valid'] -= 1
 
