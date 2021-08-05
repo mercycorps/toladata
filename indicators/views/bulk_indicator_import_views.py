@@ -916,6 +916,7 @@ def save_bulk_import_data(request, *args, **kwargs):
     try:
         with transaction.atomic():
             for indicator_data in stored_indicators:
+                indicator_data['was_bulk_imported'] = True
                 indicator = Indicator.objects.create(**indicator_data)
                 ProgramAuditLog.log_indicator_imported(request.user, indicator, 'N/A')
     except (django.core.exceptions.ValidationError, django.db.utils.IntegrityError):
