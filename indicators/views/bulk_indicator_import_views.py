@@ -649,6 +649,7 @@ class BulkImportIndicatorsView(LoginRequiredMixin, UserPassesTestMixin, AccessMi
                     continue
                 elif len(skipped_row_indexes) > 0:
                     non_fatal_errors.append(ERROR_INTERVENING_BLANK_ROW)
+                    indicator_status['invalid'] += len(skipped_row_indexes)
                     for skipped_row_index in skipped_row_indexes:
                         first_cell = ws.cell(skipped_row_index, 1)
                         # Translators: Error message provided to users when they are entering data into Excel and they skip a row
