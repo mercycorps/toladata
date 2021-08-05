@@ -790,6 +790,7 @@ class BulkImportIndicatorsView(LoginRequiredMixin, UserPassesTestMixin, AccessMi
                     name_indexes[indicator_data['name']] = [{'index': current_row_index, 'is_new_name': True}]
                 indicator_data['level_id'] = current_level.pk
                 indicator_data['program_id'] = program.id
+                indicator_data['unit_of_measure'] = str(indicator_data['unit_of_measure'])  # Just in case the input is a number
                 if indicator_data['unit_of_measure_type'] == Indicator.PERCENTAGE:
                     indicator_data['baseline'] *= 100
 
