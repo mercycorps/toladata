@@ -81,7 +81,9 @@ class BulkImportIndicatorSerializer(serializers.ModelSerializer):
 
     def validate_baseline(self, value):
         try:
-            decimal.Decimal(value)
+            decimal_value = decimal.Decimal(value)
+            if decimal_value < 0:
+                raise serializers.ValidationError('negative_number')
         except (TypeError, decimal.InvalidOperation):
             raise serializers.ValidationError('not_a_number')
         return value
