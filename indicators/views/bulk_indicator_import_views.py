@@ -455,7 +455,10 @@ class BulkImportIndicatorsView(LoginRequiredMixin, UserPassesTestMixin, AccessMi
                     else:
                         raw_value = indicator.get(column['field_name'], None)
                         if column['field_name'] == 'baseline':
-                            raw_value = make_quantized_decimal(raw_value)
+                            if indicator['baseline_na']:
+                                raw_value = 'N\A'
+                            else:
+                                raw_value = make_quantized_decimal(raw_value)
                         # These are potentially translated objects that need to be resolved, but converting None
                         # to a string results in a cell value of "None" rather than an empty cell.
                         active_cell.value = raw_value if raw_value is None else str(raw_value)
