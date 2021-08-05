@@ -36,6 +36,7 @@ class BulkImportIndicatorSerializer(serializers.ModelSerializer):
             'unit_of_measure_type',
             'rationale_for_target',
             'baseline',
+            'baseline_na',
             'direction_of_change',
             'target_frequency',
             'means_of_verification',
