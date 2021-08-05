@@ -129,6 +129,14 @@ export class LevelListPanel  extends React.Component {
         api.updateSessions({show_import_banner: false})
     }
 
+    // Determines if the program has any indicators that were bulk imported
+    hasBulkImportIndicators = (indicators) => {
+        return indicators.some((indicator) => {
+            console.log(indicator);
+            return indicator.was_bulk_imported === true;
+        })
+    }
+
     render() {
         const isCollapseAllDisabled = this.props.rootStore.uiStore.hasVisibleChildren.length === 0 ||
             this.props.rootStore.uiStore.disableCardActions ||
@@ -143,7 +151,7 @@ export class LevelListPanel  extends React.Component {
         }
         // Create the RF Tier levels array expected in the bulk import popover component
         let levelTiers = this.props.rootStore.levelStore.chosenTierSetKey === "custom" ? this.props.rootStore.levelStore.tierTemplates["custom"].tiers : this.props.rootStore.levelStore.englishTierTemlates[this.props.rootStore.levelStore.chosenTierSetKey].tiers
-        levelTiers = levelTiers.map((tier) => {return {name: tier}})
+        levelTiers = levelTiers.map((tier) => {return {name: tier}});
         let importButton = (
             <ImportIndicatorsButton 
             program_id={ this.props.rootStore.levelStore.program_id }
