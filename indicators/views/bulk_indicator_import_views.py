@@ -708,9 +708,9 @@ class BulkImportIndicatorsView(LoginRequiredMixin, UserPassesTestMixin, AccessMi
                                     # Translators: Error message provided when user has exceeded the character limit on a form
                                     gettext("You have exceeded the character limit of this field"))
                                 logger.error(f'New validation string of code "{error.code}" found.\n{str(error)}')
-                        elif str(error) == 'not_a_number' and error.code == 'invalid':
+                        elif (str(error) in ['not_a_number', 'negative_number'] and error.code == 'invalid'):
                             # This means the baseline value may not be valid.  The baseline value is handled further along in the process.
-                            pass
+                            validation_errors[field_name].append(str(error))
                         else:
                             logger.error(f'New validation string of code {error.code} found.\n{str(error)}')
                             validation_errors[field_name].append(str(error))
@@ -724,6 +724,9 @@ class BulkImportIndicatorsView(LoginRequiredMixin, UserPassesTestMixin, AccessMi
                                 [gettext(ne).lower() for ne in NULL_EQUIVALENTS]
                             if active_cell.value is None:  # This means no value in cell, which is not ok
                                 validation_errors['baseline'] = [VALIDATION_MSG_REQUIRED]
+                                non_fatal_errors.append(ERROR_MALFORMED_INDICATOR)
+                            elif 'negative_number' in validation_errors['baseline']:
+                                validation_errors['baseline'] = [gettext(self.VALIDATION_MSG_BASELINE_NA)]
                                 non_fatal_errors.append(ERROR_MALFORMED_INDICATOR)
                             elif active_cell.value.lower() in null_equivalents_with_translations:
                                 validation_errors.pop('baseline')
