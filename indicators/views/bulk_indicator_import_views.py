@@ -383,7 +383,8 @@ class BulkImportIndicatorsView(LoginRequiredMixin, UserPassesTestMixin, AccessMi
                     help_text = gettext('This number is automatically generated through the results framework.')
                 elif col['field_name'] == 'baseline':
                     # Translators: This is help text for a form field
-                    help_text = gettext('Enter a numeric value for the baseline. If a baseline is not yet known '
+                    help_text = gettext('Enter a numeric value for the baseline that is greater than or equal to '
+                                        'zero. If a baseline is not yet known '
                                         'or not applicable, enter a zero or type "N/A". The baseline can always '
                                         'be updated at a later point in time.')
                 else:
