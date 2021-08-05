@@ -506,6 +506,7 @@ class TestBulkImportTemplateProcessing(test.TestCase):
             'unit_of_measure_type': 'therbligs',
             'direction_of_change': 'north by northwest',
             'target_frequency': 'whats the frequency kenneth',
+            'baseline': -3,
         }
         self.fill_worksheet_row(ws, current_row_index, validated_fields_bad_values)
         bad_values_row = current_row_index
