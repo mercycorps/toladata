@@ -457,7 +457,7 @@ class BulkImportIndicatorsView(LoginRequiredMixin, UserPassesTestMixin, AccessMi
                         raw_value = indicator.get(column['field_name'], None)
                         if column['field_name'] == 'baseline':
                             if indicator['baseline_na']:
-                                raw_value = 'N\A'
+                                raw_value = 'N/A'
                             else:
                                 raw_value = make_quantized_decimal(raw_value)
                         # These are potentially translated objects that need to be resolved, but converting None
