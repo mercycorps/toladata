@@ -501,8 +501,8 @@ export const ImportIndicatorsPopover = ({ page, program_id, tierLevelsUsed, stor
                                     {views === FEEDBACK ? <div><i className="fas fa-check-circle"/></div> : null}
                                     {
                                         // # Translators: The count of indicators that have passed validation and are ready to be imported to complete the process. This cannot be undone after completing.
-                                        interpolate(ngettext("%s indicator is ready to be imported.",
-                                            "%s indicators are ready to be imported.",
+                                        interpolate(ngettext("%s indicator row is ready to be imported.",
+                                            "%s indicators rows are ready to be imported.",
                                             validIndicatorsCount
                                         ), [validIndicatorsCount])
                                     }
@@ -511,8 +511,8 @@ export const ImportIndicatorsPopover = ({ page, program_id, tierLevelsUsed, stor
                                     {views === FEEDBACK ? <div><i className="fas fa-exclamation-triangle"/></div> : null}
                                     {
                                         // # Translators: The count of indicators that have passed validation and are ready to be imported to complete the process. This cannot be undone after completing.
-                                        interpolate(ngettext("%s indicator has missing or invalid information.",
-                                            "%s indicators have missing or invalid information.",
+                                        interpolate(ngettext("%s indicator row has missing or invalid information.",
+                                            "%s indicators rows have missing or invalid information.",
                                             invalidIndicatorsCount
                                         ), [invalidIndicatorsCount])
                                     }
