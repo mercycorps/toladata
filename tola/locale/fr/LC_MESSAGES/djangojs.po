@@ -3,7 +3,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: \n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2021-08-05 14:21-0700\n"
+"POT-Creation-Date: 2021-08-09 13:40-0700\n"
 "PO-Revision-Date: 2021-08-05 17:20-0400\n"
 "Last-Translator: \n"
 "Language-Team: \n"
@@ -143,20 +143,25 @@ msgstr "Charger le modèle"
 #. completing.
 #: js/components/ImportIndicatorsPopover.js:504
 #, python-format
-msgid "%s indicator is ready to be imported."
-msgid_plural "%s indicators are ready to be imported."
-msgstr[0] "%s indicateur est prêt à être importé."
-msgstr[1] "%s indicateurs sont prêts à être importés."
+#| msgid "%s indicator is ready to be imported."
+#| msgid_plural "%s indicators are ready to be imported."
+msgid "%s indicator row is ready to be imported."
+msgid_plural "%s indicators rows are ready to be imported."
+msgstr[0] "ÁTranslated %s indicator row is ready to be imported."
+msgstr[1] "éTranslated %s indicators rows are ready to be imported."
 
 #. Translators: The count of indicators that have passed validation and are
 #. ready to be imported to complete the process. This cannot be undone after
 #. completing.
 #: js/components/ImportIndicatorsPopover.js:514
 #, python-format
-msgid "%s indicator has missing or invalid information."
-msgid_plural "%s indicators have missing or invalid information."
-msgstr[0] "Translated %s indicator has missing or invalid information."
-msgstr[1] "öTranslated %s indicators have missing or invalid information."
+#| msgid "%s indicator has missing or invalid information."
+#| msgid_plural "%s indicators have missing or invalid information."
+msgid "%s indicator row has missing or invalid information."
+msgid_plural "%s indicators rows have missing or invalid information."
+msgstr[0] "Translated %s indicator row has missing or invalid information."
+msgstr[1] ""
+"öTranslated %s indicators rows have missing or invalid information."
 
 #. Translators: Download an excel template with errors that need fixing
 #. highlighted
