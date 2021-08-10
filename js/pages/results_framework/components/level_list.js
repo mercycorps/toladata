@@ -143,7 +143,7 @@ export class LevelListPanel  extends React.Component {
         }
         // Create the RF Tier levels array expected in the bulk import popover component
         let levelTiers = this.props.rootStore.levelStore.chosenTierSetKey === "custom" ? this.props.rootStore.levelStore.tierTemplates["custom"].tiers : this.props.rootStore.levelStore.englishTierTemlates[this.props.rootStore.levelStore.chosenTierSetKey].tiers
-        levelTiers = levelTiers.map((tier) => {return {name: tier}})
+        levelTiers = levelTiers.map((tier) => {return {name: tier}});
         let importButton = (
             <ImportIndicatorsButton 
             program_id={ this.props.rootStore.levelStore.program_id }
@@ -231,6 +231,7 @@ export class LevelListPanel  extends React.Component {
                     {
                         this.state.show_import_banner && // Hides Bulk Import Banner if stored as false in Django's Session Storage
                         this.props.rootStore.levelStore.accessLevel === 'high' &&
+                        !this.props.rootStore.levelStore.indicators.some((indicator) => indicator.was_bulk_imported) && // Determines if the program has any indicators that were bulk imported
                         this.state.level_status !== 1
                             ? bulkImportBanner
                             : null
