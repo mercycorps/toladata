@@ -355,7 +355,7 @@ class BulkImportIndicatorsView(LoginRequiredMixin, UserPassesTestMixin, AccessMi
         ws.cell(2, self.first_used_column).style = TITLE_STYLE
         # Translators: Instructions provided as part of an Excel template that allows users to upload Indicators
         instructions = gettext("INSTRUCTIONS\n"
-            "1. Indicator rows are provided for each result level. You can delete indicator rows you do not need. You can also leave them empty and they will be ignored.\n"
+            "1. Indicator rows are provided for each result level. Empty rows will be ignored, as long as there aren't betweeen two filled rows.\n"
             "2. Required columns are highlighted with a dark background and an asterisk (*) in the header row. Unrequired columns can be left empty but cannot be deleted.\n"
             "3. When you are done, upload the template to the results framework or program page."
         )
@@ -788,6 +788,9 @@ class BulkImportIndicatorsView(LoginRequiredMixin, UserPassesTestMixin, AccessMi
                         non_fatal_errors.append(ERROR_MALFORMED_INDICATOR)
 
                 # Final data manipulation, updates, and checks
+                for key in ('name', 'unit_of_measure'):
+                    if indicator_data[key]:
+                        indicator_data[key] = re.sub(r'\s?\n\s?', ' ', indicator_data[key])
                 if indicator_data['name'] in name_indexes.keys():
                     name_indexes[indicator_data['name']].append({'index': current_row_index, 'is_new_name': True})
                 else:
@@ -795,7 +798,8 @@ class BulkImportIndicatorsView(LoginRequiredMixin, UserPassesTestMixin, AccessMi
                 indicator_data['level_id'] = current_level.pk
                 indicator_data['program_id'] = program.id
                 indicator_data['unit_of_measure'] = str(indicator_data['unit_of_measure'])  # Just in case the input is a number
-                if indicator_data['unit_of_measure_type'] == Indicator.PERCENTAGE:
+                if indicator_data['unit_of_measure_type'] and \
+                        indicator_data['unit_of_measure_type'] == Indicator.PERCENTAGE:
                     indicator_data['baseline'] *= 100
 
                 # The number order has already been checked if program is autonumbered, so we don't need the numbers

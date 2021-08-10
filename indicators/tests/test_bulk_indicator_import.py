@@ -654,7 +654,7 @@ class TestBulkImportTemplateProcessing(test.TestCase):
             'baseline': .3
         })
         self.fill_worksheet_row(ws, DATA_START_ROW + 3, custom_values={
-            'name': 'Test Percent',
+            'name': 'Test \nPercent',
             'unit_of_measure_type': str(dict(Indicator.UNIT_OF_MEASURE_TYPES)[Indicator.PERCENTAGE]),
             'baseline': .3
         })
