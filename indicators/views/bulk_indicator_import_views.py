@@ -790,7 +790,7 @@ class BulkImportIndicatorsView(LoginRequiredMixin, UserPassesTestMixin, AccessMi
                 # Final data manipulation, updates, and checks
                 for key in ('name', 'unit_of_measure'):
                     if indicator_data[key]:
-                        indicator_data[key] = indicator_data[key].replace('\n', '')
+                        indicator_data[key] = re.sub(r'\s?\n\s?', ' ', indicator_data[key])
                 if indicator_data['name'] in name_indexes.keys():
                     name_indexes[indicator_data['name']].append({'index': current_row_index, 'is_new_name': True})
                 else:
