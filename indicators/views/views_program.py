@@ -14,11 +14,10 @@ from django.contrib.auth.decorators import login_required
 from django.utils.translation import gettext
 from django.http import HttpResponse, JsonResponse
 from django.shortcuts import render, reverse, redirect, get_object_or_404
-
 from indicators.queries import ProgramWithMetrics
 from indicators.xls_export_utils import TAN, apply_title_styling, apply_label_styling
 from indicators.models import Indicator, PinnedReport
-from workflow.models import Program
+from workflow.models import Program, Country
 from workflow.serializers import LogframeProgramSerializer
 from workflow.serializers_new import (
     ProgramPageProgramSerializer,
@@ -266,6 +265,53 @@ def programs_rollup_export_csv(request):
         writer.writerow(row)
     return response
 
+
+@login_required
+def indicator_detail_export_csv(request):
+    CSV_HEADERS = [
+        'indicator_name', 'sector', 'level', 'target_frequency', 'baseline_value', 'number_or_percent',
+        'direction_of_change', 'lop_target_value',
+        'program_name', 'gait_id', 'countries', 'regions','funding_status', 'start_date', 'end_date',
+    ]
+    response = HttpResponse(content_type='text/csv')
+    response['Content-Disposition'] = 'attachment; filename="indicator_detail_{}.csv'.format(
+        datetime.date.today().isoformat()
+    )
+    writer = csv.writer(response)
+    writer.writerow(CSV_HEADERS)
+    program_pks = [p.pk for p in request.user.tola_user.available_programs]
+    target_frequency_map = {id: label for id, label in Indicator.TARGET_FREQUENCIES}
+    uom_type_map = {id: label for id, label in Indicator.UNIT_OF_MEASURE_TYPES}
+    direction_of_change_map = {id: label for id, label in Indicator.DIRECTION_OF_CHANGE}
+    program_map = {p.id: p for p in Program.objects.filter(pk__in=program_pks).prefetch_related('country', 'country__region')}
+    indicator_data = Indicator.program_page_objects.filter(program_id__in=program_pks).select_related('sector', 'level')
+    country_data = Country.objects.select_related('region')
+    country_map = {c.country: c.region.name for c in country_data}
+    # annotated_programs = ProgramWithMetrics.home_page.filter(pk__in=program_pks).with_annotations()
+    for indicator in sorted([i for i in indicator_data], key=lambda i: i.program_id):
+        program = program_map[indicator.program_id]
+        regions = [country_map[c.strip()] for c in program.countries.split(',')]
+
+        row = [
+            indicator.name,
+            indicator.sector.sector if indicator.sector else 'None',
+            indicator.level.name if indicator.level else 'None',
+            target_frequency_map[indicator.target_frequency] if indicator.target_frequency else 'None',
+            indicator.baseline,
+            uom_type_map[indicator.unit_of_measure_type] if indicator.unit_of_measure_type else 'None',
+            direction_of_change_map[indicator.direction_of_change] if indicator.direction_of_change else 'None',
+            indicator.lop_target_calculated if indicator.lop_target_calculated else indicator.lop_target,
+            program.name,
+            program.gaitid if program.gaitid else "no gait_id, program id {}".format(program.id),
+            '/'.join([c.strip() for c in program.countries.split(',')]),
+            '/'.join(regions),
+            program.funding_status,
+            program.start_date,
+            program.end_date
+        ]
+        row = [str(s) for s in row]
+        writer.writerow(row)
+    return response
 
 
 # API views:
