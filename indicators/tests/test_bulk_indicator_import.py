@@ -479,8 +479,9 @@ class TestBulkImportTemplateProcessing(test.TestCase):
         w_factories.grant_program_access(self.tola_user, self.program, self.country, role='high')
         wb = openpyxl.load_workbook(self.get_template())
         goal_level = Level.objects.get(parent=None, program=self.program)
+        outcome_level = Level.objects.filter(parent=goal_level).first()
         existing_goal_indicator_count = Indicator.objects.filter(level__parent=None).count()
-        existing_outcome_indicator_count = Indicator.objects.filter(level__parent=goal_level).count()
+        existing_outcome_indicator_count = Indicator.objects.filter(level=outcome_level).count()
         first_blank_goal_row = DATA_START_ROW + existing_goal_indicator_count + 1
         first_blank_outcome_row = first_blank_goal_row + 12 + existing_outcome_indicator_count
         ws = wb.worksheets[0]
@@ -493,6 +494,7 @@ class TestBulkImportTemplateProcessing(test.TestCase):
 
         # Create one row for each required column where the column value is missing
         expected_errors = {}
+        # section below will result in 7 invalid rows.  6 missing required field rows and 1 skipped row.
         current_row_index = first_blank_goal_row + 1
         for required_col_index, col in enumerate(COLUMNS):
             if col['required'] and col['field_name'] != 'level':
@@ -522,6 +524,8 @@ class TestBulkImportTemplateProcessing(test.TestCase):
         self.assertEqual(
             json.loads(response.content)['error_codes'],
             [ERROR_MALFORMED_INDICATOR, ERROR_INTERVENING_BLANK_ROW])
+        self.assertEqual(json.loads(response.content)['invalid'], 10)
+        self.assertEqual(json.loads(response.content)['valid'], 1)
 
         # Get the feedback template and see if it looks right
         response = self.client.get(reverse('get_feedback_bulk_import_template', args=[self.program.id]))
@@ -733,12 +737,16 @@ class TestBulkImportTemplateProcessing(test.TestCase):
             response.status_code,
             200,
             "Template should have been submitted successfully even though two existing indicators have the same name")
+        response_content = json.loads(response.content)
+        self.assertEqual((response_content['invalid'], response_content['valid']), (0, 1))
 
         last_goal_row_name = ws.cell(last_goal_row, name_column).value
         self.fill_worksheet_row(ws, last_goal_row + 1, custom_values={'name': last_goal_row_name})
         self.fill_worksheet_row(ws, last_goal_row + 2, custom_values={'name': last_goal_row_name})
         response = self.post_template(wb)
         self.assertEqual(response.status_code, 400)
+        response_content = json.loads(response.content)
+        self.assertEqual((response_content['invalid'], response_content['valid']), (2, 0))
         response = self.client.get(reverse('get_feedback_bulk_import_template', args=[self.program.id]))
         feedback_wb = openpyxl.load_workbook(ContentFile(response.content))
         feedback_ws = feedback_wb.worksheets[0]
@@ -755,6 +763,8 @@ class TestBulkImportTemplateProcessing(test.TestCase):
         self.fill_worksheet_row(ws, last_goal_row + 2, custom_values={'name': 'Duplicate name'})
         response = self.post_template(wb)
         self.assertEqual(response.status_code, 400)
+        response_content = json.loads(response.content)
+        self.assertEqual((response_content['invalid'], response_content['valid']), (2, 0))
         response = self.client.get(reverse('get_feedback_bulk_import_template', args=[self.program.id]))
         feedback_wb = openpyxl.load_workbook(ContentFile(response.content))
         feedback_ws = feedback_wb.worksheets[0]
@@ -767,6 +777,24 @@ class TestBulkImportTemplateProcessing(test.TestCase):
             ERROR_MSG_NAME_DUPLICATED,
             "Duplicate indicator names should cause duplicate name comment to be shown on cell")
 
+        self.fill_worksheet_row(ws, last_goal_row + 1, custom_values={'name': 'Another unique name'})
+        self.fill_worksheet_row(ws, last_goal_row + 2, custom_values={'name': 'Duplicate name'})
+        self.fill_worksheet_row(ws, last_goal_row + 3, custom_values={'name': 'Duplicate name', 'baseline': None})
+        response = self.post_template(wb)
+        self.assertEqual(response.status_code, 400)
+        response_content = json.loads(response.content)
+        self.assertEqual((response_content['invalid'], response_content['valid']), (2, 1))
+        response = self.client.get(reverse('get_feedback_bulk_import_template', args=[self.program.id]))
+        feedback_wb = openpyxl.load_workbook(ContentFile(response.content))
+        feedback_ws = feedback_wb.worksheets[0]
+        self.assertEqual(
+            feedback_ws.cell(last_goal_row + 2, name_column).comment.text,
+            ERROR_MSG_NAME_DUPLICATED,
+            "Duplicate indicator names should cause duplicate name comment to be shown on cell")
+        self.assertEqual(
+            feedback_ws.cell(last_goal_row + 3, name_column).comment.text,
+            ERROR_MSG_NAME_DUPLICATED,
+            "Duplicate indicator names should cause duplicate name comment to be shown on cell")
 
     def test_bad_lookup_values(self):
         self.client.force_login(user=self.tola_user.user)
