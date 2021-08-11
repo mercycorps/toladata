@@ -197,6 +197,12 @@ export const ImportIndicatorsPopover = ({ page, program_id, tierLevelsUsed, stor
         setStoredTierLevelsRows(tierLevelsRows);
     }, [tierLevelsRows])
 
+    // Used to trigger the popover to reposition itself when the view changes based on the new height of the popover
+    useEffect(() => {
+        window.scrollBy(0, 1);
+        window.scrollBy(0, -1);
+    }, [views])
+
     // Reduce the array of errors to remove duplicate messaging
     let reduceErrorCodes = (codes) => {
         let reducer = (accumulator, code) => {
@@ -712,10 +718,10 @@ const AdvancedImport = () => {
 
     useEffect(() => {
         $('#optionsForm').on('show.bs.collapse', function() {
-            setExpanded(true)
+            setExpanded(true);
         })
         $('#optionsForm').on('hide.bs.collapse', function() {
-            setExpanded(false)
+            setExpanded(false);
         })
     }, [])
 
