@@ -576,7 +576,7 @@ class BulkImportIndicatorsView(LoginRequiredMixin, UserPassesTestMixin, AccessMi
             current_level = None
             current_tier = None
             new_indicators_data = []
-            indicator_status = {'valid': 0, 'invalid': 0}
+            indicator_row_is_valid = {}
             reverse_field_name_map = {
                 'unit_of_measure_type': {str(name): value for value, name in Indicator.UNIT_OF_MEASURE_TYPES},
                 'direction_of_change': {str(name): value for value, name in Indicator.DIRECTION_OF_CHANGE},
@@ -653,8 +653,8 @@ class BulkImportIndicatorsView(LoginRequiredMixin, UserPassesTestMixin, AccessMi
                     continue
                 elif len(skipped_row_indexes) > 0:
                     non_fatal_errors.append(ERROR_INTERVENING_BLANK_ROW)
-                    indicator_status['invalid'] += len(skipped_row_indexes)
                     for skipped_row_index in skipped_row_indexes:
+                        indicator_row_is_valid[skipped_row_index] = False
                         first_cell = ws.cell(skipped_row_index, 1)
                         # Translators: Error message provided to users when they are entering data into Excel and they skip a row
                         first_cell.comment = self.get_comment_obj(gettext('Indicator rows cannot be skipped.'))
@@ -809,7 +809,7 @@ class BulkImportIndicatorsView(LoginRequiredMixin, UserPassesTestMixin, AccessMi
 
                 if len(validation_errors) == 0:
                     new_indicators_data.append(indicator_data)
-                    indicator_status['valid'] += 1
+                    indicator_row_is_valid[current_row_index] = True
                 else:
                     for field, error_strings in validation_errors.items():
                         column_index = self.first_used_column + COLUMNS_FIELD_INDEXES[field]
@@ -818,7 +818,7 @@ class BulkImportIndicatorsView(LoginRequiredMixin, UserPassesTestMixin, AccessMi
                         error_cell.comment = self.get_comment_obj('\n'.join(error_strings))
                         ws.cell(current_row_index, 1).value = FIRST_CELL_ERROR_VALUE
                         ws.cell(current_row_index, 1).fill = PATTERN_FILL_ERROR
-                    indicator_status['invalid'] += 1
+                    indicator_row_is_valid[current_row_index] = False
 
             if len(level_refs) != ws_level_count:
                 return JsonResponse({'error_codes': [ERROR_MISMATCHED_LEVEL_COUNT]}, status=406)
@@ -841,8 +841,7 @@ class BulkImportIndicatorsView(LoginRequiredMixin, UserPassesTestMixin, AccessMi
                             first_cell = ws.cell(row['index'], 1)
                             self.format_error_cell(
                                 name_cell, first_cell, PATTERN_FILL_ERROR, [gettext(ERROR_MSG_NAME_DUPLICATED)])
-                            indicator_status['invalid'] += 1
-                            indicator_status['valid'] -= 1
+                            indicator_row_is_valid[row['index']] = False
                 elif any(nd['is_new_name'] for nd in name_data) and len(name_data) > 1:
                     non_fatal_errors.append(ERROR_NAME_IN_DB)
                     for row in name_data:
@@ -851,10 +850,11 @@ class BulkImportIndicatorsView(LoginRequiredMixin, UserPassesTestMixin, AccessMi
                             first_cell = ws.cell(row['index'], 1)
                             self.format_error_cell(
                                 name_cell, first_cell, PATTERN_FILL_ERROR, [gettext(ERROR_MSG_NAME_IN_DB)])
-                            indicator_status['invalid'] += 1
-                            indicator_status['valid'] -= 1
+                            indicator_row_is_valid[row['index']] = False
 
-        if indicator_status['invalid'] > 0 or len(non_fatal_errors) > 0:
+        valid_count = len([val for val in indicator_row_is_valid.values() if val])
+        invalid_count = len([val for val in indicator_row_is_valid.values() if not val])
+        if invalid_count > 0 or len(non_fatal_errors) > 0:
             # Clean out any existing temp Excel file reference, since we're about to replace it
             try:
                 old_file_objs = BulkIndicatorImportFile.objects.filter(
@@ -878,8 +878,8 @@ class BulkImportIndicatorsView(LoginRequiredMixin, UserPassesTestMixin, AccessMi
             with open(file_obj.file_path, 'w') as fh:
                 wb.save(file_obj.file_path)
             return JsonResponse({
-                'invalid': indicator_status['invalid'],
-                'valid': indicator_status['valid'],
+                'invalid': invalid_count,
+                'valid': valid_count,
                 'error_codes': pruned_non_fatal
             }, status=400)
 
