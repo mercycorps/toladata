@@ -799,7 +799,8 @@ class BulkImportIndicatorsView(LoginRequiredMixin, UserPassesTestMixin, AccessMi
                 indicator_data['program_id'] = program.id
                 indicator_data['unit_of_measure'] = str(indicator_data['unit_of_measure'])  # Just in case the input is a number
                 if indicator_data['unit_of_measure_type'] and \
-                        indicator_data['unit_of_measure_type'] == Indicator.PERCENTAGE:
+                        indicator_data['unit_of_measure_type'] == Indicator.PERCENTAGE and \
+                        indicator_data['baseline']:
                     indicator_data['baseline'] *= 100
 
                 # The number order has already been checked if program is autonumbered, so we don't need the numbers
