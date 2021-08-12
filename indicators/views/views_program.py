@@ -249,7 +249,8 @@ def programs_rollup_export_csv(request):
     writer.writerow(CSV_HEADERS)
     program_pks = [p.pk for p in request.user.tola_user.available_programs]
     annotated_programs = ProgramWithMetrics.home_page.filter(pk__in=program_pks).with_annotations()
-    recent_change_log = {k:v.date() for (k, v) in ProgramAuditLog.objects.filter(program__in=annotated_programs).values_list('program').annotate(latest_date=Max('date'))}
+    recent_change_log = {k:v.date() for (k, v) in ProgramAuditLog.objects.filter(program__in=annotated_programs) \
+        .values_list('program').annotate(latest_date=Max('date'))}
     for program in sorted([p for p in annotated_programs], key=lambda p: p.name):
         row = [
             program.name,
