@@ -535,7 +535,7 @@ class BulkImportIndicatorsView(LoginRequiredMixin, UserPassesTestMixin, AccessMi
                 os.remove(file_entry.file_path)
         temp_data_files.delete()
 
-        wb = openpyxl.load_workbook(request.FILES['file'])
+        wb = openpyxl.load_workbook(request.FILES['file'], data_only=True)
         ws = wb.worksheets[0]
 
         if ws.cell(self.program_name_row, self.first_used_column).value != program.name:
