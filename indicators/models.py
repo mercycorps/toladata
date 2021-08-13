@@ -1162,6 +1162,7 @@ class Indicator(SafeDeleteModel):
     )
 
     # Method used to create this indicator
+    # Translators:  Label for a field that shows whether an object was imported or not
     was_bulk_imported = models.BooleanField(default=False, verbose_name=_("Bulk Imported"))
 
     # the Log Frame level (i.e. Goal, Output, Outcome, etc.)
