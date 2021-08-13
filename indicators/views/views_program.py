@@ -283,37 +283,51 @@ def indicator_detail_export_csv(request):
     target_frequency_map = {id: label for id, label in Indicator.TARGET_FREQUENCIES}
     uom_type_map = {id: label for id, label in Indicator.UNIT_OF_MEASURE_TYPES}
     direction_of_change_map = {id: label for id, label in Indicator.DIRECTION_OF_CHANGE}
-
-    # program_pks = [p.pk for p in request.user.tola_user.available_programs]
     from django.db.models import Q
-    # programs = request.user.tola_user.available_programs.exclude(~Q(funding_status='Funded') & Q(create_date__lte='2017-12-31')).prefetch_related('country', 'country__region', 'level_tiers')
-    programs = request.user.tola_user.available_programs.prefetch_related('country', 'country__region',
-                                                                                         'level_tiers')
-    print('program count', len(programs))
-
-    # programs = Program.objects.filter(pk__in=program_pks).exclude(~Q(funding_status='Funded') & Q(create_date__lte='2017-12-31')).prefetch_related('country', 'country__region', 'level_tiers')
+    programs = request.user.tola_user.available_programs.exclude(~Q(funding_status='funded') & Q(create_date__gt='2018-12-31')).prefetch_related('country', 'country__region')
     program_map = {p.id: p for p in programs}
-    # program_map = {p.id: p for p in Program.objects.filter(pk__in=program_pks).prefetch_related('country', 'country__region', 'level_tiers')}
     indicator_data = Indicator.program_page_objects.filter(program_id__in=program_map.keys()).select_related('sector', 'level', 'program').prefetch_related('program__level_tiers')
     country_data = Country.objects.select_related('region')
     country_map = {c.country: c.region.name for c in country_data}
 
-    level_name_map = {}
+
     program_tiers = {}
     for program in program_map.values():
         program_tiers[program.pk] = list(program.level_tiers.order_by('tier_depth').values_list('name', flat=True))
+    level_map = {level.pk: level for level in Level.objects.filter(program_id__in=program_map.keys())}
 
-    for level in Level.objects.filter(program_id__in=program_map.keys()):
-        ontology = level.display_ontology
-        if not ontology:
-            if level.name:
-                level_name_map[level.pk] = level.name
+    level_name_map = {}
+    for level in level_map.values():
+        def get_parent_segment(ontology_segments, parent_id):
+            parent = level_map[parent_id]
+            if parent.parent_id:
+                parent_segment = parent.level_depth
+                return get_parent_segment([parent_segment] + ontology_segments, parent.parent_id)
             else:
-                level_name_map[level.pk] = 'None'
-            continue
-        tier_depth = 0 if len(ontology) == 0 else len(ontology.split('.'))
-        tier_name = program_tiers[level.program.pk][tier_depth]
-        level_name_map[level.pk] = f'{tier_name} {ontology}: {level.name}'
+                return ontology_segments
+        if level.parent:
+            ontology_segments = get_parent_segment([level.level_depth], level.parent_id)
+        else:
+            ontology_segments = []
+        # print('tiers', program_tiers[level.program.pk])
+        # print('segments', ontology_segments)
+        tier_name = program_tiers[level.program.pk][len(ontology_segments)-1]
+        if len(ontology_segments) > 0:
+            level_name_map[level.pk] = f'{tier_name} {".".join([str(o) for o in ontology_segments])}: {level.name}'
+        else:
+            level_name_map[level.pk] = f'{tier_name}: {level.name}'
+
+    # for level in level_map.values():
+    #     ontology = level.display_ontology
+    #     if not ontology:
+    #         if level.name:
+    #             level_name_map[level.pk] = level.name
+    #         else:
+    #             level_name_map[level.pk] = 'None'
+    #         continue
+    #     tier_depth = 0 if len(ontology) == 0 else len(ontology.split('.'))
+    #     tier_name = program_tiers[level.program.pk][tier_depth]
+    #     level_name_map[level.pk] = f'{tier_name} {ontology}: {level.name}'
 
     for indicator in sorted([i for i in indicator_data], key=lambda i: i.program_id):
         program = program_map[indicator.program_id]
