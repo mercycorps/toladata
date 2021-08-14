@@ -243,7 +243,7 @@ class BulkImportIndicatorsView(LoginRequiredMixin, UserPassesTestMixin, AccessMi
 
         dir_change_options = [str(option[1]) for option in Indicator.DIRECTION_OF_CHANGE]
         dir_change_validation = DataValidation(
-            type="list", formula1=f'"{",".join(dir_change_options)}"', allow_blank=True)
+            type="list", formula1=f'"{",".join(dir_change_options)}"', allow_blank=False)
         validation_map[VALIDATION_KEY_DIR_CHANGE] = dir_change_validation
 
         target_freq_options = [str(option[1]) for option in Indicator.TARGET_FREQUENCIES]
