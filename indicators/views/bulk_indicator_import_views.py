@@ -7,7 +7,9 @@ import logging
 import decimal
 from datetime import datetime
 from openpyxl.comments import Comment
+from openpyxl.formatting.rule import Rule
 from openpyxl.styles import PatternFill, Alignment, Protection, Font, NamedStyle, Border, Side
+from openpyxl.styles.differential import DifferentialStyle, NumberFormat
 from openpyxl.worksheet.datavalidation import DataValidation
 from openpyxl.utils import get_column_letter
 from django.contrib.auth.decorators import login_required
@@ -275,6 +277,7 @@ class BulkImportIndicatorsView(LoginRequiredMixin, UserPassesTestMixin, AccessMi
             if 'validation' in col.keys():
                 validation_map[col['validation']].add(active_cell)
 
+            # Need to do baseline separately because the validation references the cell that's being validated
             if col['field_name'] == 'baseline':
                 cell_coord = active_cell.coordinate
                 null_check_strings = [f'lower({cell_coord})=lower("{ne}")' for ne in NULL_EQUIVALENTS]
@@ -289,6 +292,15 @@ class BulkImportIndicatorsView(LoginRequiredMixin, UserPassesTestMixin, AccessMi
                 validator.errorTitle = gettext('Invalid Entry')
                 ws.add_data_validation(validator)
                 validator.add(active_cell)
+
+                # Conditional format that applies a percent format if the uom_type is Percent
+                percent_string = gettext(dict(Indicator.UNIT_OF_MEASURE_TYPES)[Indicator.PERCENTAGE])
+                dxf = DifferentialStyle(numFmt=NumberFormat(10, '0.00%'))
+                uom_type_coordinate = ws.cell(
+                    row_index, FIRST_USED_COLUMN + COLUMNS_FIELD_INDEXES['unit_of_measure_type']).coordinate
+                rule = Rule('expression', formula=[f'{uom_type_coordinate} = "{percent_string}"'], dxf=dxf)
+                ws.conditional_formatting.add(cell_coord, rule)
+
 
     @staticmethod
     def get_comment_obj(help_text):
@@ -322,14 +334,6 @@ class BulkImportIndicatorsView(LoginRequiredMixin, UserPassesTestMixin, AccessMi
         wb = openpyxl.load_workbook(filename=BulkIndicatorImportFile.get_file_path(BASE_TEMPLATE_NAME))
         ws = wb.worksheets[0]
         hidden_ws = wb.get_sheet_by_name('Hidden')
-
-        # Create data validations
-        reverse_field_name_map = {
-            'unit_of_measure_type': {str(name): value for value, name in Indicator.UNIT_OF_MEASURE_TYPES},
-            'direction_of_change':  {str(name): value for value, name in Indicator.DIRECTION_OF_CHANGE},
-            'target_frequency': {str(name): value for value, name in Indicator.TARGET_FREQUENCIES}
-        }
-
 
         validation_map, sector_options = self.setup_validations(hidden_ws)
 
