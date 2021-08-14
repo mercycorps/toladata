@@ -15,6 +15,8 @@ from django.db.models import Q
 from django.utils.translation import gettext
 from django.http import HttpResponse, JsonResponse
 from django.shortcuts import render, reverse, redirect, get_object_or_404
+from django.db.models import Max
+
 from indicators.queries import ProgramWithMetrics
 from indicators.xls_export_utils import TAN, apply_title_styling, apply_label_styling
 from indicators.models import Indicator, PinnedReport, Level
@@ -30,6 +32,7 @@ from tola_management.permissions import (
     indicator_pk_adapter,
     has_indicator_read_access
 )
+from tola_management.models import ProgramAuditLog
 
 
 logger = logging.getLogger(__name__)
@@ -229,7 +232,7 @@ def programs_rollup_export_csv(request):
     # TODO: after LevelUp please remove unicode calls:
     CSV_HEADERS = [
         'program_name', 'gait_id', 'countries', 'sectors', 'status', 'funding_status', 'start_date', 'end_date',
-        'tola_creation_date', 'program_period', 'indicator_count', 'indicators_reporting_above_target',
+        'tola_creation_date', 'most_recent_change_log_entry', 'program_period', 'indicator_count', 'indicators_reporting_above_target',
         'indicators_reporting_on_target', 'indicators_reporting_below_target', 'indicators_with_targets',
         'indicators_with_results', 'results_count', 'results_with_evidence'
     ]
@@ -241,6 +244,8 @@ def programs_rollup_export_csv(request):
     writer.writerow(CSV_HEADERS)
     program_pks = [p.pk for p in request.user.tola_user.available_programs]
     annotated_programs = ProgramWithMetrics.home_page.filter(pk__in=program_pks).with_annotations()
+    recent_change_log = {k:v.date() for (k, v) in ProgramAuditLog.objects.filter(program__in=annotated_programs) \
+        .values_list('program').annotate(latest_date=Max('date'))}
     for program in sorted([p for p in annotated_programs], key=lambda p: p.name):
         row = [
             program.name,
@@ -252,6 +257,7 @@ def programs_rollup_export_csv(request):
             program.reporting_period_start.isoformat() if program.reporting_period_start else '',
             program.reporting_period_end.isoformat() if program.reporting_period_end else '',
             program.create_date.date().isoformat() if program.create_date else '',
+            recent_change_log.get(program.id, "None"),
             '{}%'.format(program.percent_complete) if program.percent_complete >= 0 else '',
             program.metrics['indicator_count'],
             program.scope_counts['high'],
