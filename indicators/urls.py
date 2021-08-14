@@ -63,6 +63,10 @@ urlpatterns = [
     # CSV endpoints
     path('programs_rollup_export_csv/', views.programs_rollup_export_csv, name='programs_rollup_export_csv'),
     path('indicator_detail_export_csv/', views.indicator_detail_export_csv, name='indicator_detail_export_csv'),
+    path(
+        'indicator_funded_detail_export_csv/',
+        views.indicator_detail_export_csv,
+        name='indicator_funded_detail_export_csv'),
 
     path('pinned_report/delete/', views.delete_pinned_report, name='delete_pinned_report'),
 
