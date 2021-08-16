@@ -725,6 +725,15 @@ const AdvancedImport = () => {
         })
     }, [])
 
+    // Used to trigger the popover to reposition itself when the popover expanded/collapse based on the new height of the popover.
+    // Settimeout is used to allow the popover to finished expanding or collapsing before the new position is recalculated.
+    useEffect(() => {
+        setTimeout(() => {
+            window.scrollBy(0, 1);
+            window.scrollBy(0, -1);
+        }, 500);
+    }, [expanded]);
+
     return (
         <div className="import-advanced">
             <div className="import-advanced-button">
