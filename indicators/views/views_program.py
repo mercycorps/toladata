@@ -11,6 +11,7 @@ import logging
 import openpyxl
 from openpyxl import styles, utils
 from django.contrib.auth.decorators import login_required
+from django.db.models import Q
 from django.utils.translation import gettext
 from django.http import HttpResponse, JsonResponse
 from django.shortcuts import render, reverse, redirect, get_object_or_404
@@ -18,8 +19,8 @@ from django.db.models import Max
 
 from indicators.queries import ProgramWithMetrics
 from indicators.xls_export_utils import TAN, apply_title_styling, apply_label_styling
-from indicators.models import Indicator, PinnedReport
-from workflow.models import Program
+from indicators.models import Indicator, PinnedReport, Level
+from workflow.models import Program, Country
 from workflow.serializers import LogframeProgramSerializer
 from workflow.serializers_new import (
     ProgramPageProgramSerializer,
@@ -271,6 +272,79 @@ def programs_rollup_export_csv(request):
         writer.writerow(row)
     return response
 
+
+@login_required
+def indicator_detail_export_csv(request):
+    CSV_HEADERS = [
+        'indicator_id', 'indicator_name', 'sector', 'level', 'target_frequency', 'baseline_value', 'number_or_percent',
+        'direction_of_change', 'lop_target_value',
+        'program_name', 'gait_id', 'countries', 'regions','funding_status', 'start_date', 'end_date',
+    ]
+    response = HttpResponse(content_type='text/csv')
+    response['Content-Disposition'] = 'attachment; filename="indicator_detail_{}.csv'.format(
+        datetime.date.today().isoformat()
+    )
+    writer = csv.writer(response)
+    writer.writerow(CSV_HEADERS)
+
+    target_frequency_map = {id: label for id, label in Indicator.TARGET_FREQUENCIES}
+    uom_type_map = {id: label for id, label in Indicator.UNIT_OF_MEASURE_TYPES}
+    direction_of_change_map = {id: label for id, label in Indicator.DIRECTION_OF_CHANGE}
+
+    programs = request.user.tola_user.available_programs.prefetch_related('country', 'country__region')
+    if 'funded' in request.path:
+        programs = programs.exclude(~Q(funding_status='funded'))
+    program_map = {p.id: p for p in programs}
+    program_tiers = {}
+    for program in programs:
+        program_tiers[program.pk] = list(program.level_tiers.order_by('tier_depth').values_list('name', flat=True))
+    indicator_data = Indicator.program_page_objects.filter(program_id__in=program_map.keys()).select_related('sector', 'level', 'program').prefetch_related('program__level_tiers')
+    country_data = Country.objects.select_related('region')
+    country_map = {c.country: c.region.name for c in country_data}
+
+    # Build the level names in memory rather than doing db queries, since there are so many to do
+    level_map = {level.pk: level for level in Level.objects.filter(program_id__in=program_map.keys())}
+    level_name_map = {}
+    for level in level_map.values():
+        def get_parent_segment(ontology_segments, level):
+            if level.parent_id:
+                parent = level_map[level.parent_id]
+                parent_segment = parent.customsort
+                return get_parent_segment([parent_segment] + ontology_segments, parent)
+            else:
+                return ontology_segments
+        ontology_segments = get_parent_segment([level.customsort], level)[1:]  # Get rid of the top level segment
+
+        tier_name = program_tiers[level.program.pk][len(ontology_segments)]
+        if len(ontology_segments) > 0:
+            level_name_map[level.pk] = f'{tier_name} {".".join([str(o) for o in ontology_segments])}: {level.name}'
+        else:
+            level_name_map[level.pk] = f'{tier_name}: {level.name}'
+
+    for indicator in sorted([i for i in indicator_data], key=lambda i: i.program_id):
+        program = program_map[indicator.program_id]
+        regions = [country_map[c.strip()] for c in program.countries.split(',')]
+        row = [
+            indicator.id,
+            indicator.name,
+            indicator.sector.sector if indicator.sector else 'None',
+            level_name_map[indicator.level.pk] if indicator.level else 'None',
+            target_frequency_map[indicator.target_frequency] if indicator.target_frequency else 'None',
+            indicator.baseline,
+            uom_type_map[indicator.unit_of_measure_type] if indicator.unit_of_measure_type else 'None',
+            direction_of_change_map[indicator.direction_of_change] if indicator.direction_of_change else 'None',
+            indicator.lop_target_calculated if indicator.lop_target_calculated else indicator.lop_target,
+            program.name,
+            program.gaitid if program.gaitid else "no gait_id, program id {}".format(program.id),
+            '/'.join([c.strip() for c in program.countries.split(',')]),
+            '/'.join(set(regions)),
+            'Active' if program.funding_status == 'Funded' else 'Inactive',
+            program.reporting_period_start,
+            program.reporting_period_end
+        ]
+        row = [str(s) for s in row]
+        writer.writerow(row)
+    return response
 
 
 # API views:
