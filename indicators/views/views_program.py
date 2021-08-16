@@ -237,7 +237,7 @@ def programs_rollup_export_csv(request):
         'indicators_with_results', 'results_count', 'results_with_evidence'
     ]
     response = HttpResponse(content_type='text/csv')
-    response['Content-Disposition'] = 'attachment; filename="program_rollup_{}.csv'.format(
+    response['Content-Disposition'] = 'attachment; filename="program_rollup_{}.csv"'.format(
         datetime.date.today().isoformat()
     )
     writer = csv.writer(response)
@@ -280,8 +280,11 @@ def indicator_detail_export_csv(request):
         'direction_of_change', 'lop_target_value',
         'program_name', 'gait_id', 'countries', 'regions','funding_status', 'start_date', 'end_date',
     ]
+    output_file_template = 'attachment; filename="indicator_detail_{}.csv"'
+    if 'funded' in request.path:
+        output_file_template = 'attachment; filename="indicator_funded_detail_{}.csv"'
     response = HttpResponse(content_type='text/csv')
-    response['Content-Disposition'] = 'attachment; filename="indicator_detail_{}.csv'.format(
+    response['Content-Disposition'] = output_file_template.format(
         datetime.date.today().isoformat()
     )
     writer = csv.writer(response)
