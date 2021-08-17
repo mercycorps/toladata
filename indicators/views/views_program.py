@@ -16,7 +16,6 @@ from django.utils.translation import gettext
 from django.http import HttpResponse, JsonResponse
 from django.shortcuts import render, reverse, redirect, get_object_or_404
 from django.db.models import Max
-
 from indicators.queries import ProgramWithMetrics
 from indicators.xls_export_utils import TAN, apply_title_styling, apply_label_styling
 from indicators.models import Indicator, PinnedReport, Level
@@ -276,8 +275,8 @@ def programs_rollup_export_csv(request):
 @login_required
 def indicator_detail_export_csv(request):
     CSV_HEADERS = [
-        'indicator_id', 'indicator_name', 'sector', 'level', 'target_frequency', 'baseline_value', 'number_or_percent',
-        'direction_of_change', 'lop_target_value',
+        'indicator_id', 'indicator_name', 'sector', 'country_strategic_objective', 'level', 'target_frequency',
+        'baseline_value', 'number_or_percent', 'direction_of_change', 'lop_target_value',
         'program_name', 'gait_id', 'countries', 'regions','program_status', 'start_date', 'end_date',
     ]
     output_file_template = 'attachment; filename="indicator_detail_{}.csv"'
@@ -301,9 +300,13 @@ def indicator_detail_export_csv(request):
     program_tiers = {}
     for program in programs:
         program_tiers[program.pk] = list(program.level_tiers.order_by('tier_depth').values_list('name', flat=True))
-    indicator_data = Indicator.program_page_objects.filter(program_id__in=program_map.keys()).select_related('sector', 'level', 'program').prefetch_related('program__level_tiers')
+    indicator_data = Indicator.program_page_objects.\
+        filter(program_id__in=program_map.keys())\
+        .select_related('sector', 'level', 'program')\
+        .prefetch_related('program__level_tiers', 'strategic_objectives')
     country_data = Country.objects.select_related('region')
     country_map = {c.country: c.region.name for c in country_data}
+    objective_map = {i.id: [so.name for so in i.strategic_objectives.all()] for i in indicator_data}
 
     # Build the level names in memory rather than doing db queries, since there are so many to do
     level_map = {level.pk: level for level in Level.objects.filter(program_id__in=program_map.keys())}
@@ -331,6 +334,7 @@ def indicator_detail_export_csv(request):
             indicator.id,
             indicator.name,
             indicator.sector.sector if indicator.sector else 'None',
+            '/'.join(objective_map[indicator.id]) if len(objective_map[indicator.id]) > 0 else 'None',
             level_name_map[indicator.level.pk] if indicator.level else 'None',
             target_frequency_map[indicator.target_frequency] if indicator.target_frequency else 'None',
             indicator.baseline,
