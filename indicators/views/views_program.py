@@ -278,11 +278,11 @@ def indicator_detail_export_csv(request):
     CSV_HEADERS = [
         'indicator_id', 'indicator_name', 'sector', 'level', 'target_frequency', 'baseline_value', 'number_or_percent',
         'direction_of_change', 'lop_target_value',
-        'program_name', 'gait_id', 'countries', 'regions','funding_status', 'start_date', 'end_date',
+        'program_name', 'gait_id', 'countries', 'regions','program_status', 'start_date', 'end_date',
     ]
     output_file_template = 'attachment; filename="indicator_detail_{}.csv"'
     if 'funded' in request.path:
-        output_file_template = 'attachment; filename="indicator_funded_detail_{}.csv"'
+        output_file_template = 'attachment; filename="indicator_detail_active_{}.csv"'
     response = HttpResponse(content_type='text/csv')
     response['Content-Disposition'] = output_file_template.format(
         datetime.date.today().isoformat()
