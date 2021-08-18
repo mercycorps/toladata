@@ -280,7 +280,8 @@ def indicator_detail_export_csv(request):
         'program_name', 'gait_id', 'countries', 'regions','program_status', 'start_date', 'end_date',
     ]
     output_file_template = 'attachment; filename="indicator_detail_{}.csv"'
-    if 'funded' in request.path:
+    ACTIVE_FILTER_IDENTIFIER = '_active_'
+    if ACTIVE_FILTER_IDENTIFIER in request.path:
         output_file_template = 'attachment; filename="indicator_detail_active_{}.csv"'
     response = HttpResponse(content_type='text/csv')
     response['Content-Disposition'] = output_file_template.format(
@@ -294,7 +295,7 @@ def indicator_detail_export_csv(request):
     direction_of_change_map = {id: label for id, label in Indicator.DIRECTION_OF_CHANGE}
 
     programs = request.user.tola_user.available_programs.prefetch_related('country', 'country__region')
-    if 'funded' in request.path:
+    if ACTIVE_FILTER_IDENTIFIER in request.path:
         programs = programs.exclude(~Q(funding_status='funded'))
     program_map = {p.id: p for p in programs}
     program_tiers = {}
