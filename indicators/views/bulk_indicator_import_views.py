@@ -102,7 +102,7 @@ ERROR_NAME_IN_DB = 204  # Indicators are separated by an empty row would cause t
 ERROR_DUPLICATED_NAME = 205  # Indicators are separated by an empty row would cause the indicator numbers to be wrong for auto-numbered programs
 
 # Translators:  Error message provided when the name a user has provided for the indicator has already been used by another indicator.
-ERROR_MSG_NAME_IN_DB = gettext_noop("A program indicator with this name already exists.")
+ERROR_MSG_NAME_IN_DB = gettext_noop("A program indicator with this name already exists. Download the template again to get an updated list of existing indicators.")
 # Translators:  Error message provided when the name a user tries to upload multiple Indicators with the same name as one another.
 ERROR_MSG_NAME_DUPLICATED = gettext_noop("Please give this indicator a unique name.")
 FIRST_CELL_ERROR_VALUE = r"⚠️"
@@ -359,7 +359,7 @@ class BulkImportIndicatorsView(LoginRequiredMixin, UserPassesTestMixin, AccessMi
         ws.cell(2, self.first_used_column).style = TITLE_STYLE
         # Translators: Instructions provided as part of an Excel template that allows users to upload Indicators
         instructions = gettext("INSTRUCTIONS\n"
-            "1. Indicator rows are provided for each result level. Empty rows will be ignored, as long as there aren't betweeen two filled rows.\n"
+            "1. Indicator rows are provided for each result level. Empty rows will be ignored, as long as they aren't between two filled rows.\n"
             "2. Required columns are highlighted with a dark background and an asterisk (*) in the header row. Unrequired columns can be left empty but cannot be deleted.\n"
             "3. When you are done, upload the template to the results framework or program page."
         )
