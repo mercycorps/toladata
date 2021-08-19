@@ -100,7 +100,7 @@ ERROR_NAME_IN_DB = 204  # Indicators are separated by an empty row would cause t
 ERROR_DUPLICATED_NAME = 205  # Indicators are separated by an empty row would cause the indicator numbers to be wrong for auto-numbered programs
 
 # Translators:  Error message provided when the name a user has provided for the indicator has already been used by another indicator.
-ERROR_MSG_NAME_IN_DB = gettext_noop("A program indicator with this name already exists.")
+ERROR_MSG_NAME_IN_DB = gettext_noop("A program indicator with this name already exists. Download the template again to get an updated list of existing indicators.")
 # Translators:  Error message provided when the name a user tries to upload multiple Indicators with the same name as one another.
 ERROR_MSG_NAME_DUPLICATED = gettext_noop("Please give this indicator a unique name.")
 FIRST_CELL_ERROR_VALUE = r"⚠️"
