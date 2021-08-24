@@ -71,8 +71,13 @@ urlpatterns = [
     # JSON endpoint (still in Alpha) GH ticket: #1854
     path('programs_rollup_export/', views.programs_rollup_export, name='programs_rollup_export'),
 
-    # CSV endpoint (still in Alpha)
+    # CSV endpoints
     path('programs_rollup_export_csv/', views.programs_rollup_export_csv, name='programs_rollup_export_csv'),
+    path('indicator_detail_export_csv/', views.indicator_detail_export_csv, name='indicator_detail_export_csv'),
+    path(
+        'indicator_detail_active_export_csv/',
+        views.indicator_detail_export_csv,
+        name='indicator_detail_active_export_csv'),
 
     path('pinned_report/delete/', views.delete_pinned_report, name='delete_pinned_report'),
 
