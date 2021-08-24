@@ -15,21 +15,25 @@ from django.db.models import Q
 from django.utils.translation import gettext
 from django.http import HttpResponse, JsonResponse
 from django.shortcuts import render, reverse, redirect, get_object_or_404
+
+from indicators.serializers import (
+    LevelSerializer,
+    LevelTierSerializer,
+)
 from django.db.models import Max
 from indicators.queries import ProgramWithMetrics
 from indicators.xls_export_utils import TAN, apply_title_styling, apply_label_styling
-from indicators.models import Indicator, PinnedReport, Level
+from indicators.models import Indicator, PinnedReport, Level, LevelTier
 from workflow.models import Program, Country
 from workflow.serializers import LogframeProgramSerializer
 from workflow.serializers_new import (
     ProgramPageProgramSerializer,
     ProgramPageIndicatorUpdateSerializer,
 )
-
 from tola_management.permissions import (
     has_program_read_access,
     indicator_pk_adapter,
-    has_indicator_read_access
+    has_indicator_read_access,
 )
 from tola_management.models import ProgramAuditLog
 
@@ -44,6 +48,7 @@ LEVEL_ROW_FILL = openpyxl.styles.PatternFill('solid', TAN)
 BLACK_BORDER = openpyxl.styles.Side(border_style="thin", color="000000")
 BORDER_TOP = openpyxl.styles.Border(top=BLACK_BORDER)
 
+
 def add_title_cell(ws, row, column, value):
     cell = ws.cell(row=row, column=column)
     cell.value = value
@@ -51,12 +56,14 @@ def add_title_cell(ws, row, column, value):
     apply_title_styling(cell)
     return cell
 
+
 def add_header_cell(ws, row, column, value):
     cell = ws.cell(row=row, column=column)
     cell.value = value.upper()
     apply_label_styling(cell)
     ws.row_dimensions[row].height = 30
     return cell
+
 
 def get_child_levels(level, levels_by_pk):
     levels = [level]
@@ -375,6 +382,8 @@ def program_page(request, program):
             'indicators/program_setup_incomplete.html',
             {'program': program, 'redirect_url': request.path}
         )
+    levels = Level.objects.filter(program=program)
+    tiers = LevelTier.objects.filter(program=program)
     context = {
         'program': ProgramPageProgramSerializer.load_for_pk(program.pk).data,
         'pinned_reports': list(PinnedReport.objects.filter(
@@ -382,6 +391,8 @@ def program_page(request, program):
             )) + [PinnedReport.default_report(program.pk)],
         'delete_pinned_report_url': reverse('delete_pinned_report'),
         'indicator_on_scope_margin': Indicator.ONSCOPE_MARGIN,
+        'levels': LevelSerializer(levels, many=True).data,
+        'levelTiers': LevelTierSerializer(tiers, many=True).data,
         'readonly': not request.has_write_access,
         'result_readonly': not request.has_medium_access
     }
@@ -459,9 +470,11 @@ def results_framework_export(request, program):
     level_single_style.fill = styles.PatternFill('solid', 'E5E5E5')
     wb.add_named_style(level_single_style)
     bottom_tier = program.level_tiers.count()
+
     def row_height_getter(cell):
         lines_of_text = str(cell.value).splitlines()
         row = cell.row
+
         def get_row_height_decorated(w):
             lines = sum([math.ceil(len(s)/w) or 1 for s in lines_of_text])
             height = 26 + lines * 15
@@ -469,6 +482,7 @@ def results_framework_export(request, program):
                 height = 30
             return max(height, ws.row_dimensions[row].height or 0, 30)
         return get_row_height_decorated
+
     def write_level(parent, start_row, start_column):
         levels = program.levels.filter(parent=parent).order_by('customsort')
         column = start_column

@@ -60,3 +60,6 @@ site.retry
 .eslintrc.yml
 requirements.txt
 htmlcov
+
+# ingore temp files in bulk import dir, which will always start with yyyymmdd
+indicators/bulk_import_files/[0-9]*

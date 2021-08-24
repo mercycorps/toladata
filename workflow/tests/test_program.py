@@ -31,20 +31,6 @@ class TestProgramMethods(TestBase, TestCase):
         self.assertEqual(len(SiteProfile.objects.all()), 5)
 
 
-class TestProgramList(TestBase, TestCase):
-
-    @skip('Test that the correct programs from a single country get loaded.')
-    def test_single_country_load(self):
-        pass
-
-    @skip('Test the on-track program calculation.')
-    def test_calc_program_on_track(self):
-        pass
-
-    @skip('Test that the percent of indicators with evidence metric')
-    def test_calc_indicators_with_evidence(self):
-        pass
-
 class TestProgramGeneratePeriods(TestCase):
     def scenario_asserts(self, scenario):
         program = ProgramFactory(

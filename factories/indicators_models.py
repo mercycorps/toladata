@@ -33,7 +33,7 @@ from indicators.models import (
     DisaggregationType,
     DisaggregationLabel,
     DisaggregatedValue,
-    DataCollectionFrequency
+    DataCollectionFrequency,
 )
 from factories.workflow_models import OrganizationFactory, ProgramFactory, CountryFactory
 
@@ -41,13 +41,13 @@ from factories.workflow_models import OrganizationFactory, ProgramFactory, Count
 FAKER = faker.Faker(locale='en_US')
 
 
-class ReportingFrequency(DjangoModelFactory):
+class ReportingFrequencyFactory(DjangoModelFactory):
     class Meta:
         model = ReportingFrequency
 
     frequency = 'Bi-weekly'
     description = 'Every two weeks'
-    organization = SubFactory(OrganizationFactory)
+    sort_order = Sequence(lambda n: n)
 
 
 class RandomIndicatorFactory(DjangoModelFactory):
@@ -93,7 +93,7 @@ class DefinedIndicatorFactory(IndicatorFactory):
     target_frequency = Indicator.QUARTERLY
     means_of_verification = "some means of verifying"
     data_collection_method = "some method of collecting data"
-    data_collection_frequency = SubFactory('factories.indicators_models.DataCollectionFrequencyFactory')
+    data_collection_frequencies = SubFactory('factories.indicators_models.DataCollectionFrequencyFactory')
 
 
 class RFIndicatorFactory(DjangoModelFactory):
@@ -371,4 +371,4 @@ class DataCollectionFrequencyFactory(DjangoModelFactory):
 
     frequency = "some reasonable frequency"
     description = "a description of how frequent this is"
-    numdays = 10
+    sort_order = Sequence(lambda n: n)

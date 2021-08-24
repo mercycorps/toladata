@@ -7,6 +7,7 @@
 {% block header_extras %}
     {% program_complete_program_page readonly %}
 {% endblock %}
+{% block bodyclasses %}page_program_page{% endblock %}
 
 {% block content %}
 
@@ -90,6 +91,8 @@
             deletePinnedReportURL: {{ delete_pinned_report_url|js }},
             onScopeMargin: {{ indicator_on_scope_margin|js }},
             readOnly: {{ readonly|js }},
+            levels: {{ levels|js }},
+            levelTiers: {{ levelTiers|js }},
             resultReadOnly: {{ result_readonly|js }}
         };
     </script>

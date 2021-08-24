@@ -127,6 +127,8 @@ class ChangesetEntry extends React.Component {
         switch(type) {
             case 'indicator_changed':
             case 'indicator_created':
+            case 'indicator_imported':
+            case 'template_uploaded':
             case 'indicator_deleted':
                 return <IndicatorChangeset data={data} name={name} pretty_name={pretty_name} indicator={indicator} level={level}/>
                 break
@@ -207,6 +209,7 @@ export const IndexView = observer(
         return <div id="audit-log-index-view">
             <header className="page-title">
                 <h1 className="page-title h2">
+                    {/* # Translators: This a title of page where all of the changes to a program are listed */}
                     <a href={`/program/${store.program_id}/`}>{store.program_name}</a>: <span className="font-weight-normal text-muted text-nowrap">{gettext("Program change log")}&nbsp;<small><i className="fa fa-history" /></small></span>
                 </h1>
             </header>
@@ -275,19 +278,25 @@ export const IndexView = observer(
                                     <td></td>
                                     <td></td>
                                     <td className="changelog__change--prev">
-                                        {data.diff_list.map(changeset => {
-                                            return <ChangesetEntry key={changeset.name} name={changeset.name}
-                                                                   pretty_name={changeset.pretty_name}
-                                                                   type={data.change_type} data={changeset.prev}
-                                                                   indicator={data.indicator} level={data.level}/>
-                                        })}
+                                        {data.diff_list.length === 0 ?
+                                            <span>{gettext("N/A")}</span>
+                                            :
+                                            data.diff_list.map(changeset => {
+                                                return <ChangesetEntry key={changeset.name} name={changeset.name}
+                                                                       pretty_name={changeset.pretty_name}
+                                                                       type={data.change_type} data={changeset.prev}
+                                                                       indicator={data.indicator} level={data.level}/>})
+                                        }
                                     </td>
                                     <td className="changelog__change--new">
-                                        {data.diff_list.map(changeset => {
-                                            return <ChangesetEntry key={changeset.name} name={changeset.name}
-                                                                   pretty_name={changeset.pretty_name}
-                                                                   type={data.change_type} data={changeset.new}
-                                                                   indicator={data.indicator} level={data.level}/>
+                                        {data.diff_list.length === 0 ?
+                                            <span>{gettext("N/A")}</span>
+                                            :
+                                            data.diff_list.map(changeset => {
+                                                return <ChangesetEntry key={changeset.name} name={changeset.name}
+                                                                       pretty_name={changeset.pretty_name}
+                                                                       type={data.change_type} data={changeset.new}
+                                                                       indicator={data.indicator} level={data.level}/>
                                         })}
                                     </td>
                                     <td className="changelog__change--rationale">

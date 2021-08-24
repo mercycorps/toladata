@@ -41,6 +41,7 @@ from workflow.serializers_new.base_program_serializers import (
 from workflow.serializers_new.period_serializers import QSPeriodDateRangeSerializer
 from tola.model_utils import get_serializer
 from tola.serializers import ContextField
+from tola.l10n_utils import str_without_diacritics
 
 
 class IPTTQSMixin:
@@ -165,15 +166,27 @@ class IPTTProgramFilterItemsMixin:
         """Extends parent context for initializing data, includes all related objects for populating filter lists"""
         context = super()._get_context(*args, **kwargs)
         program_pk = context['program_pk']
-        context['indicator_types'] = list(IndicatorType.objects.select_related(None).prefetch_related(None).filter(
+
+        raw_indicator_types = list(IndicatorType.objects.select_related(None).prefetch_related(None).filter(
             indicator__program_id=program_pk
-        ).order_by('indicator_type').distinct().values('pk', name=models.F('indicator_type')))
+        ).distinct().values('pk', name=models.F('indicator_type')))
+        for indicator_type in raw_indicator_types:
+            indicator_type['name'] = _(indicator_type['name'])
+        context['indicator_types'] = sorted(
+            raw_indicator_types, key=lambda i_type: str_without_diacritics(i_type['name']))
+
         context['sites'] = list(SiteProfile.objects.select_related(None).prefetch_related(None).filter(
             result__indicator__program_id=program_pk
         ).order_by('name').distinct().values('pk', 'name'))
-        context['sectors'] = list(Sector.objects.select_related(None).prefetch_related(None).filter(
+
+        raw_sectors = list(Sector.objects.select_related(None).prefetch_related(None).filter(
             indicator__program_id=program_pk
-        ).order_by('sector').distinct().values('pk', name=models.F('sector')))
+        ).distinct().values('pk', name=models.F('sector')))
+        for sector in raw_sectors:
+            sector['name'] = _(sector['name'])
+        context['sectors'] = sorted(
+            raw_sectors, key=lambda sector: str_without_diacritics(sector['name']))
+
         context['disaggregations'] = IPTTJSONDisaggregationSerializer.load_for_program(program_pk).data
         context['now'] = timezone.now().date()
         return context

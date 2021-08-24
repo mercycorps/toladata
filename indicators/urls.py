@@ -19,7 +19,16 @@ apipatterns = [
     path('indicator/<int:indicator>', views.api_indicator_view, name='api_indicator_view'),
     # all indicators update (program page):
     path('indicators/<int:program>', views.api_indicators_list, name='api_indicators_list'),
-    path('pinned_report/', views.create_pinned_report, name='create_pinned_report')
+    path('pinned_report/', views.create_pinned_report, name='create_pinned_report'),
+    path('bulk_import_indicators/<int:program_id>/',
+         views.BulkImportIndicatorsView.as_view(),
+         name='bulk_import_indicators'),
+    path('get_feedback_bulk_import_template/<int:program_id>/',
+         views.get_feedback_bulk_import_template,
+         name='get_feedback_bulk_import_template'),
+    path('save_bulk_import_data/<int:program_id>/',
+         views.save_bulk_import_data,
+         name='save_bulk_import_data')
 ]
 
 urlpatterns = [
@@ -28,6 +37,8 @@ urlpatterns = [
     path('indicator_create/<int:program>/', views.IndicatorCreate.as_view(), name='indicator_create'),
 
     path('indicator_update/<int:pk>/', views.IndicatorUpdate.as_view(), name='indicator_update'),
+
+    path('indicator_complete/<int:pk>/', views.IndicatorUpdate.as_view(), name='indicator_complete'),
 
     path('indicator_delete/<int:pk>/', views.IndicatorDelete.as_view(), name='indicator_delete'),
 
@@ -78,4 +89,5 @@ urlpatterns = [
 
     # API (serializer-based) calls for program page / IPTT
     path('api/', include(apipatterns)),
+
 ]

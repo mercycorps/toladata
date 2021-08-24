@@ -28,7 +28,8 @@
 .input-group-addon {
     margin: 0 0.5rem;
 }
-.has-error {
+span.has-error {
+    font-size: 0.75rem;
     color: $danger;
     .text-muted {
         color: inherit !important;

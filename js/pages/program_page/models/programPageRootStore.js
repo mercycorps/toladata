@@ -16,6 +16,8 @@ export default class ProgramPageRootStore {
             deletePinnedReportURL = null,
             readOnly = true,
             resultReadOnly = true,
+            levels = [],
+            levelTiers = [],
         } = {}
     ) {
         this.readOnly = readOnly;
@@ -24,6 +26,8 @@ export default class ProgramPageRootStore {
         this.deletePinnedReportURL = deletePinnedReportURL;
         this.program = getProgramStore(programJSON);
         this.uiStore = new ProgramPageUIStore(this);
+        this.levels = levels;
+        this.levelTiers = levelTiers;
     }
 
     @computed

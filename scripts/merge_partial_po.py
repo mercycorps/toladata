@@ -40,7 +40,7 @@ def main():
                 entry.comment = partial_entry.comment
 
     # send updated PO file to STDOUT for now
-    print base_po
+    print(base_po)
 
 
 if __name__ == '__main__':

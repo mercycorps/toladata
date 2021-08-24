@@ -28,6 +28,20 @@ const api = {
             'content-type': 'application/x-www-form-urlencoded'
         },
     }),
+    apiSession: axios.create({
+        withCredentials: true,
+        responseType: 'json',
+        headers: {
+            "X-CSRFToken": document.cookie.replace(/(?:(?:^|.*;\s*)csrftoken\s*\=\s*([^;]*).*$)|^.*$/, "$1")
+        }
+    }),
+    templatesInstance: axios.create({
+        withCredentials: true,
+        responseType: 'blob',
+        headers: {
+            "X-CSRFToken": document.cookie.replace(/(?:(?:^|.*;\s*)csrftoken\s*\=\s*([^;]*).*$)|^.*$/, "$1")
+        }
+    }),
     logFailure(failureMsg) {
         console.log("api call failed:", failureMsg);
     },
@@ -91,8 +105,80 @@ const api = {
         return this.apiInstance.get(`/iptt/indicator/${indicatorPk}/`)
                     .then(response => response.data)
                     .catch(this.logFailure);
-    }
-
+    },
+    async checkSessions (query) {
+        return await this.apiSession.get('/update_user_session/',
+            {params: {query: query}})
+        .then(response => response.data)
+        .catch(this.logFailure)
+    },
+    updateSessions (sessionVarsToUpdate) {
+        return this.apiSession.put('/update_user_session/', sessionVarsToUpdate)
+            .then(response => response.statusText)
+            .catch(this.logFailure)
+    },
+    async downloadTemplate (program_id, tierLevelsRows) {
+        let flatTierLevelsRows = tierLevelsRows.reduce((accumulator, currentValue) => {
+            accumulator[currentValue.name] = currentValue.rows;
+            return accumulator
+        }, {})
+        return await this.templatesInstance.get(`/indicators/api/bulk_import_indicators/${program_id}/`, { params: flatTierLevelsRows })
+            .then(response => {
+                const url = window.URL.createObjectURL(new Blob([response.data]));
+                const link = document.createElement('a');
+                link.href = url;
+                // # Translators: This is the file name of an Excel template that will be used for batch imports
+                link.setAttribute('download', gettext('Import indicators.xlsx'));
+                document.body.appendChild(link);
+                link.click();
+                return response;
+            })
+            .catch((error) => {
+                this.logFailure(error);
+                return error.response;
+            })
+    },
+    async uploadTemplate(program_id, file) {
+        if (file && (file.type.startsWith('application/vnd.ms-excel') || file.type.startsWith('application/vnd.openxmlformats-officedocument.spreadsheetml.sheet'))) {
+            let formData = new FormData()
+            formData.append('file', file)
+            return await this.apiSession.post(`/indicators/api/bulk_import_indicators/${program_id}/`,
+                    formData, {headers: {'Content-Type': 'multipart/form-data'}}
+                )
+                .then(response => response)
+                .catch(error => {
+                    console.log(error);
+                    this.logFailure(error);
+                    return error.response;
+                })
+        } else {
+            return {status: 406, data: {error_codes: [113]}}
+        }
+    },
+    async downloadFeedback(program_id) {
+        return await this.templatesInstance.get(`/indicators/api/get_feedback_bulk_import_template/${program_id}/`)
+            .then(response => {
+                const url = window.URL.createObjectURL(new Blob([response.data]));
+                const link = document.createElement('a');
+                link.href = url;
+                link.setAttribute('download', gettext('Import indicators.xlsx'));
+                document.body.appendChild(link);
+                link.click();
+                return response;
+            })
+            .catch((error) => {
+                this.logFailure(error);
+                return error.response;
+            })
+    },
+    async confirmUpload(program_id) {
+        return await this.apiInstance.post(`/save_bulk_import_data/${program_id}/`)
+            .then(response => response)
+            .catch((error) => {
+                this.logFailure(error);
+                return error.response;
+            })
+        },
 };
 
 

@@ -72,8 +72,8 @@ class IndicatorResource(resources.ModelResource):
     objective = ManyToManyWidget(Objective, separator=" | ", field="objective")
     strategic_objective = ManyToManyWidget(StrategicObjective, separator=" | ", field="strategic_objective")
     level = ManyToManyWidget(Level, separator=" | ", field="level")
-    reporting_frequency = fields.Field(column_name='reporting_frequency', attribute='reporting_frequency',
-                                       widget=ForeignKeyWidget(ReportingFrequency, 'frequency'))
+    reporting_frequencies = ManyToManyWidget(ReportingFrequency, separator=" | ", field="frequency")
+    data_collection_frequencies = ManyToManyWidget(DataCollectionFrequency, separator=" | ", field="frequency")
     sector = fields.Field(column_name='sector', attribute='sector', widget=ForeignKeyWidget(Sector, 'sector'))
     program = ManyToManyWidget(Program, separator=" | ", field="name")
 
@@ -82,9 +82,9 @@ class IndicatorResource(resources.ModelResource):
         fields = ('id', 'indicator_type', 'level', 'objective', 'strategic_objective', 'name', 'number',
                   'source', 'definition', 'justification', 'unit_of_measure', 'baseline', 'lop_target',
                   'rationale_for_target', 'means_of_verification', 'data_collection_method',
-                  'data_collection_frequency', 'data_points', 'responsible_person',
-                  'method_of_analysis', 'information_use', 'reporting_frequency', 'quality_assurance',
-                  'data_issues', 'indicator_changes', 'comments', 'disaggregation', 'sector',
+                  'data_collection_frequencies', 'data_points', 'responsible_person',
+                  'method_of_analysis', 'information_use', 'reporting_frequencies', 'quality_assurance',
+                  'data_issues', 'comments', 'disaggregation', 'sector',
                   'program')
 
 
