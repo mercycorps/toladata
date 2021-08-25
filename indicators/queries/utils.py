@@ -115,7 +115,7 @@ def indicator_lop_actual_progress_annotation():
         default=models.Value(None),
         output_field=models.DecimalField(decimal_places=2)
     )
-    
+
 
 def indicator_lop_target_progress_annotation():
     """ target progress:
@@ -339,7 +339,7 @@ def indicator_lop_target_calculated_annotation():
 
 def _lop_actual_annotation(result_set):
     """takes a set of results annotated with 'this_value' (either achieved or a disaggregation) and returns
-    
+
     life of program actual progress for that value"""
     return models.Case(
         models.When(
@@ -365,7 +365,7 @@ def indicator_lop_actual_annotation():
         this_value=models.F('achieved')
     )
     return _lop_actual_annotation(result_set)
-    
+
 
 def indicator_disaggregated_lop_actual_annotation(disaggregation_category_pk):
     """actual values for a disaggregation category:
@@ -453,7 +453,7 @@ def timeaware_value_annotation(period):
         this_value=models.F('achieved')
     )
     return _period_value_annotation(result_set, period)
-    
+
 
 def timeaware_disaggregated_value_annotation(category_pk, period):
     result_set = Result.objects.select_related(None).prefetch_related(None).filter(
@@ -562,6 +562,17 @@ def indicator_get_program_months_annotation():
     """annotates an indicator with the number of months in the associated program
         this annotation is used by the defined_targets_filter"""
     return MonthsCount('program__reporting_period_end', 'program__reporting_period_start')
+
+
+def indicator_type_count_annotation():
+    """
+    Provides an annotation on indicators for the program page that specifies whether the indicator was created
+    by a bulk upload process and is missing values for required fields.  The indicator type field was set to
+    a required field in January of 2021. The bulk import feature can't upload indicator type values because
+    it is a multi-select field, so any indicator created after January 2022 with no indicator type value
+    is an incomplete bulk-upload indicator.
+    """
+    return models.Count('indicator_type')
 
 
 def indicator_all_targets_defined_annotation():

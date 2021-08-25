@@ -3,11 +3,13 @@ import json
 import uuid
 
 from django.test import RequestFactory, TestCase
-from django.urls import reverse_lazy
+from django.urls import reverse_lazy, reverse
 
+import factories
 from factories import ResultFactory
 from indicators.models import Indicator, PeriodicTarget
 from indicators.views.views_indicators import PeriodicTargetJsonValidationError
+from workflow.models import ProgramAccess, Program
 from tola.test.base_classes import TestBase
 
 
@@ -436,7 +438,7 @@ class DeletePeriodicTargetsTests(TestIndcatorCreateUpdateBase, TestCase):
         self.assertEqual(self.indicator.periodictargets.count(), 0)
         self.assertEqual(self.indicator.lop_target, None)
 
-    def test_deleting_singl_event_target(self):
+    def test_deleting_single_event_target(self):
         self._create_event_targets_on_indicator()
 
         # delete them all
@@ -447,3 +449,80 @@ class DeletePeriodicTargetsTests(TestIndcatorCreateUpdateBase, TestCase):
         self.indicator.refresh_from_db()
         self.assertEqual(self.indicator.periodictargets.count(), 1)
         self.assertEqual(self.indicator.lop_target, 2)  # value of 2nd event target only
+
+
+class IndicatorFormTests(TestCase):
+    @classmethod
+    def setUpClass(cls):
+        super(IndicatorFormTests, cls).setUpClass()
+        cls.tola_user = factories.TolaUserFactory()
+        cls.country1 = factories.CountryFactory()
+
+    def test_indicator_form_title(self):
+        program = factories.RFProgramFactory(tiers=True)
+        goal_level = factories.LevelFactory(customsort=1, program=program)
+        outcome_level1 = factories.LevelFactory(customsort=1, program=program, parent=goal_level)
+        goal_indicator1 = factories.IndicatorFactory(level=goal_level, program=program)
+        outcome_indicator1 = factories.IndicatorFactory(level=outcome_level1, program=program)
+        ProgramAccess.objects.create(tolauser=self.tola_user, program=program, role='high', country=self.country1)
+        self.client.force_login(self.tola_user.user)
+
+        # Test create/update form for regular, autonumbered, RF aware indicators
+        response = self.client.get(reverse('indicator_update', args=[goal_indicator1.pk]))
+        self.assertEqual(response.context['title_str'], 'Goal indicator a')
+        response = self.client.get(reverse('indicator_update', args=[outcome_indicator1.pk]))
+        self.assertEqual(response.context['title_str'], 'Outcome indicator 1a')
+
+        # Test completion form for regular, autonumbered, RF aware indicators
+        response = self.client.get(reverse('indicator_complete', args=[goal_indicator1.pk]))
+        self.assertEqual(response.context['title_str'], 'Complete setup of Goal indicator a')
+        response = self.client.get(reverse('indicator_complete', args=[outcome_indicator1.pk]))
+        self.assertEqual(response.context['title_str'], 'Complete setup of Outcome indicator 1a')
+
+        # Test create/update form for non-autonumbered RF indicators, first without then with manual numbers
+        program.auto_number_indicators = False
+        program.save()
+        response = self.client.get(reverse('indicator_update', args=[goal_indicator1.pk]))
+        self.assertEqual(response.context['title_str'], 'Goal indicator ')
+        response = self.client.get(reverse('indicator_update', args=[outcome_indicator1.pk]))
+        self.assertEqual(response.context['title_str'], 'Outcome indicator ')
+        goal_indicator1.number = 'abc'
+        goal_indicator1.save()
+        outcome_indicator1.number = 'def'
+        outcome_indicator1.save()
+        response = self.client.get(reverse('indicator_update', args=[goal_indicator1.pk]))
+        self.assertEqual(response.context['title_str'], 'Goal indicator abc')
+        response = self.client.get(reverse('indicator_update', args=[outcome_indicator1.pk]))
+        self.assertEqual(response.context['title_str'], 'Outcome indicator def')
+        goal_indicator1.number = None
+        goal_indicator1.save()
+        outcome_indicator1.number = None
+        outcome_indicator1.save()
+
+        # Test completion form for non-autonumbered RF indicators, first without then with manual numbers
+        response = self.client.get(reverse('indicator_complete', args=[goal_indicator1.pk]))
+        self.assertEqual(response.context['title_str'], 'Complete setup of Goal indicator ')
+        response = self.client.get(reverse('indicator_complete', args=[outcome_indicator1.pk]))
+        self.assertEqual(response.context['title_str'], 'Complete setup of Outcome indicator ')
+        goal_indicator1.number = 'abc'
+        goal_indicator1.save()
+        outcome_indicator1.number = 'def'
+        outcome_indicator1.save()
+        response = self.client.get(reverse('indicator_complete', args=[goal_indicator1.pk]))
+        self.assertEqual(response.context['title_str'], 'Complete setup of Goal indicator abc')
+        response = self.client.get(reverse('indicator_complete', args=[outcome_indicator1.pk]))
+        self.assertEqual(response.context['title_str'], 'Complete setup of Outcome indicator def')
+
+    def test_non_rf_indicator_form_title(self):
+        # Test pre-RF program indicators both with and without indicator numbers
+        program = factories.ProgramFactory(
+            country=self.country1, _using_results_framework=Program.NOT_MIGRATED, auto_number_indicators=False)
+        ProgramAccess.objects.create(tolauser=self.tola_user, program=program, role='high', country=self.country1)
+        self.client.force_login(self.tola_user.user)
+        non_numbered_indicator = factories.IndicatorFactory(program=program)
+        numbered_indicator = factories.IndicatorFactory(program=program, number='abc')
+        response = self.client.get(reverse('indicator_update', args=[non_numbered_indicator.pk]))
+        self.assertEqual(response.context['title_str'], 'Indicator setup')
+        response = self.client.get(reverse('indicator_update', args=[numbered_indicator.pk]))
+        self.assertEqual(response.context['title_str'], 'Indicator setup')
+

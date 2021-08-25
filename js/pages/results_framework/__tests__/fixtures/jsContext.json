@@ -86,5 +86,186 @@
         "does_it_need_additional_target_periods": false
     },
     "indicator_on_scope_margin": 0.15,
-    "delete_pinned_report_url": "/indicators/pinned_report/delete/"
+    "delete_pinned_report_url": "/indicators/pinned_report/delete/",
+    "rootStore": 
+    [
+    {
+        "program": {
+            "id": 821,
+            "maunal_numbering": false
+        },
+        "levels": [],
+        "indicators": [],
+        "levelTiers": [],
+        "tierTemplates": {
+            "mc_standard": {
+                "name": "Mercy Corps",
+                "tiers": ["Goal", "Outcome", "Output", "Activity"]},
+            "dfid": {
+                "name": "Department for International Development (DFID)",
+                "tiers": ["Impact", "Outcome", "Output", "Input"]},
+            "ec": {
+                "name": "European Commission (EC)",
+                "tiers": ["Overall Objective", "Specific Objective", "Purpose", "Result", "Activity"]},
+            "usaid1": {
+                "name": "USAID 1",
+                "tiers": ["Goal", "Purpose", "Sub-Purpose", "Output", "Input"]}, 
+            "usaid2": {
+                "name": "USAID 2",
+                "tiers": ["Strategic Objective", "Intermediate Result", "Sub-Intermediate Result", "Output", "Input"]}, 
+            "usaid_ffp": {"name": "USAID FFP",
+                "tiers": ["Goal", "Purpose", "Sub-Purpose", "Intermediate Outcome", "Output"]}
+            },
+        "englishTemplates": {
+            "mc_standard": {
+                "name": "Mercy Corps",
+                "tiers": ["Goal", "Outcome", "Output", "Activity"]
+            }, 
+            "dfid": {
+                "name": "Department for International Development (DFID)",
+                "tiers": ["Impact", "Outcome", "Output", "Input"]
+            }, 
+            "ec": {
+                "name": "European Commission (EC)",
+                "tiers": ["Overall Objective", "Specific Objective", "Purpose", "Result", "Activity"]
+            }, 
+            "usaid1": {
+                "name": "USAID 1",
+                "tiers": ["Goal", "Purpose", "Sub-Purpose", "Output", "Input"]
+            }, 
+            "usaid2": {
+                "name": "USAID 2",
+                "tiers": ["Strategic Objective", "Intermediate Result", "Sub-Intermediate Result", "Output", "Input"]
+            }, 
+            "usaid_ffp": {
+                "name": "USAID FFP",
+                "tiers": ["Goal", "Purpose", "Sub-Purpose", "Intermediate Outcome", "Output"]
+                }
+            },
+        "customTemplates": {},
+        "programObjectives": [], 
+        "accessLevel": "high",
+        "usingResultsFramework": true,
+        "maxTiers": 8
+    },
+    {
+        "program": {
+            "id": 821,
+            "maunal_numbering": false
+        },
+        "levels": [
+            {
+                "id": 3012,
+                "parent": null,
+                "name": "Goal Name (1.0.0.0)",
+                "ontology": "1.0.0.0",
+                "assumptions": "",
+                "customsort": 1,
+                "level-depth": 1,
+                "program": 821
+            },
+            {
+                "id": 3013,
+                "parent": 3012,
+                "name": "Outcome Name (1.1.0.0)",
+                "ontology": "1.1.0.0",
+                "assumptions": "",
+                "customsort": 1,
+                "level-depth": 2,
+                "program": 821
+            },
+            {
+                "id": 3015,
+                "parent": 3013,
+                "name": "Output Name (1.1.1.0)",
+                "ontology": "1.1.1.0",
+                "assumptions": "",
+                "customsort": 1,
+                "level-depth": 3,
+                "program": 821
+            }
+        ],
+        "indicators": [
+            {
+                "id": 10660,
+                "name": "LoP only | Number (#) | Non-cumulative | Increase (+) | Disagg type - SADD:True, Country:0 | Disaggs applied - SADD:True",
+                "level": "3012",
+                "level_order": 0,
+                "number": null
+            }
+        ],
+        "levelTiers": [
+            {
+                "id": 2133,
+                "name": "Goal", 
+                "tier_depth": 1
+            },
+            {
+                "id": 2134,
+                "name": "Outcome", 
+                "tier_depth": 2
+            },
+            {
+                "id": 2135,
+                "name": "Output", 
+                "tier_depth": 3
+            },
+            {
+                "id": 2136,
+                "name": "Activity", 
+                "tier_depth": 4
+            }
+        ],
+        "tierTemplates": {
+            "mc_standard": {
+                "name": "Mercy Corps",
+                "tiers": ["Goal", "Outcome", "Output", "Activity"]},
+            "dfid": {
+                "name": "Department for International Development (DFID)",
+                "tiers": ["Impact", "Outcome", "Output", "Input"]},
+            "ec": {
+                "name": "European Commission (EC)",
+                "tiers": ["Overall Objective", "Specific Objective", "Purpose", "Result", "Activity"]},
+            "usaid1": {
+                "name": "USAID 1",
+                "tiers": ["Goal", "Purpose", "Sub-Purpose", "Output", "Input"]}, 
+            "usaid2": {
+                "name": "USAID 2",
+                "tiers": ["Strategic Objective", "Intermediate Result", "Sub-Intermediate Result", "Output", "Input"]}, 
+            "usaid_ffp": {"name": "USAID FFP",
+                "tiers": ["Goal", "Purpose", "Sub-Purpose", "Intermediate Outcome", "Output"]}
+            },
+        "englishTemplates": {
+            "mc_standard": {
+                "name": "Mercy Corps",
+                "tiers": ["Goal", "Outcome", "Output", "Activity"]
+            }, 
+            "dfid": {
+                "name": "Department for International Development (DFID)",
+                "tiers": ["Impact", "Outcome", "Output", "Input"]
+            }, 
+            "ec": {
+                "name": "European Commission (EC)",
+                "tiers": ["Overall Objective", "Specific Objective", "Purpose", "Result", "Activity"]
+            }, 
+            "usaid1": {
+                "name": "USAID 1",
+                "tiers": ["Goal", "Purpose", "Sub-Purpose", "Output", "Input"]
+            }, 
+            "usaid2": {
+                "name": "USAID 2",
+                "tiers": ["Strategic Objective", "Intermediate Result", "Sub-Intermediate Result", "Output", "Input"]
+            }, 
+            "usaid_ffp": {
+                "name": "USAID FFP",
+                "tiers": ["Goal", "Purpose", "Sub-Purpose", "Intermediate Outcome", "Output"]
+                }
+            },
+        "customTemplates": {},
+        "programObjectives": [], 
+        "accessLevel": "high",
+        "usingResultsFramework": true,
+        "maxTiers": 8
+    }
+    ]
 }
