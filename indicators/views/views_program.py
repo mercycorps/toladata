@@ -11,25 +11,31 @@ import logging
 import openpyxl
 from openpyxl import styles, utils
 from django.contrib.auth.decorators import login_required
+from django.db.models import Q
 from django.utils.translation import gettext
 from django.http import HttpResponse, JsonResponse
 from django.shortcuts import render, reverse, redirect, get_object_or_404
 
+from indicators.serializers import (
+    LevelSerializer,
+    LevelTierSerializer,
+)
+from django.db.models import Max
 from indicators.queries import ProgramWithMetrics
 from indicators.xls_export_utils import TAN, apply_title_styling, apply_label_styling
-from indicators.models import Indicator, PinnedReport
-from workflow.models import Program
+from indicators.models import Indicator, PinnedReport, Level, LevelTier
+from workflow.models import Program, Country
 from workflow.serializers import LogframeProgramSerializer
 from workflow.serializers_new import (
     ProgramPageProgramSerializer,
     ProgramPageIndicatorUpdateSerializer,
 )
-
 from tola_management.permissions import (
     has_program_read_access,
     indicator_pk_adapter,
-    has_indicator_read_access
+    has_indicator_read_access,
 )
+from tola_management.models import ProgramAuditLog
 
 
 logger = logging.getLogger(__name__)
@@ -42,6 +48,7 @@ LEVEL_ROW_FILL = openpyxl.styles.PatternFill('solid', TAN)
 BLACK_BORDER = openpyxl.styles.Side(border_style="thin", color="000000")
 BORDER_TOP = openpyxl.styles.Border(top=BLACK_BORDER)
 
+
 def add_title_cell(ws, row, column, value):
     cell = ws.cell(row=row, column=column)
     cell.value = value
@@ -49,12 +56,14 @@ def add_title_cell(ws, row, column, value):
     apply_title_styling(cell)
     return cell
 
+
 def add_header_cell(ws, row, column, value):
     cell = ws.cell(row=row, column=column)
     cell.value = value.upper()
     apply_label_styling(cell)
     ws.row_dimensions[row].height = 30
     return cell
+
 
 def get_child_levels(level, levels_by_pk):
     levels = [level]
@@ -229,18 +238,20 @@ def programs_rollup_export_csv(request):
     # TODO: after LevelUp please remove unicode calls:
     CSV_HEADERS = [
         'program_name', 'gait_id', 'countries', 'sectors', 'status', 'funding_status', 'start_date', 'end_date',
-        'tola_creation_date', 'program_period', 'indicator_count', 'indicators_reporting_above_target',
+        'tola_creation_date', 'most_recent_change_log_entry', 'program_period', 'indicator_count', 'indicators_reporting_above_target',
         'indicators_reporting_on_target', 'indicators_reporting_below_target', 'indicators_with_targets',
         'indicators_with_results', 'results_count', 'results_with_evidence'
     ]
     response = HttpResponse(content_type='text/csv')
-    response['Content-Disposition'] = 'attachment; filename="program_rollup_{}.csv'.format(
+    response['Content-Disposition'] = 'attachment; filename="program_rollup_{}.csv"'.format(
         datetime.date.today().isoformat()
     )
     writer = csv.writer(response)
     writer.writerow(CSV_HEADERS)
     program_pks = [p.pk for p in request.user.tola_user.available_programs]
     annotated_programs = ProgramWithMetrics.home_page.filter(pk__in=program_pks).with_annotations()
+    recent_change_log = {k:v.date() for (k, v) in ProgramAuditLog.objects.filter(program__in=annotated_programs) \
+        .values_list('program').annotate(latest_date=Max('date'))}
     for program in sorted([p for p in annotated_programs], key=lambda p: p.name):
         row = [
             program.name,
@@ -252,6 +263,7 @@ def programs_rollup_export_csv(request):
             program.reporting_period_start.isoformat() if program.reporting_period_start else '',
             program.reporting_period_end.isoformat() if program.reporting_period_end else '',
             program.create_date.date().isoformat() if program.create_date else '',
+            recent_change_log.get(program.id, "None"),
             '{}%'.format(program.percent_complete) if program.percent_complete >= 0 else '',
             program.metrics['indicator_count'],
             program.scope_counts['high'],
@@ -266,6 +278,88 @@ def programs_rollup_export_csv(request):
         writer.writerow(row)
     return response
 
+
+@login_required
+def indicator_detail_export_csv(request):
+    CSV_HEADERS = [
+        'indicator_id', 'indicator_name', 'sector', 'country_strategic_objective', 'level', 'target_frequency',
+        'baseline_value', 'number_or_percent', 'direction_of_change', 'lop_target_value',
+        'program_name', 'gait_id', 'countries', 'regions','program_status', 'start_date', 'end_date',
+    ]
+    output_file_template = 'attachment; filename="indicator_detail_{}.csv"'
+    ACTIVE_FILTER_IDENTIFIER = '_active_'
+    if ACTIVE_FILTER_IDENTIFIER in request.path:
+        output_file_template = 'attachment; filename="indicator_detail_active_{}.csv"'
+    response = HttpResponse(content_type='text/csv')
+    response['Content-Disposition'] = output_file_template.format(
+        datetime.date.today().isoformat()
+    )
+    writer = csv.writer(response)
+    writer.writerow(CSV_HEADERS)
+
+    target_frequency_map = {id: label for id, label in Indicator.TARGET_FREQUENCIES}
+    uom_type_map = {id: label for id, label in Indicator.UNIT_OF_MEASURE_TYPES}
+    direction_of_change_map = {id: label for id, label in Indicator.DIRECTION_OF_CHANGE}
+
+    programs = request.user.tola_user.available_programs.prefetch_related('country', 'country__region')
+    if ACTIVE_FILTER_IDENTIFIER in request.path:
+        programs = programs.exclude(~Q(funding_status='funded'))
+    program_map = {p.id: p for p in programs}
+    program_tiers = {}
+    for program in programs:
+        program_tiers[program.pk] = list(program.level_tiers.order_by('tier_depth').values_list('name', flat=True))
+    indicator_data = Indicator.program_page_objects.\
+        filter(program_id__in=program_map.keys())\
+        .select_related('sector', 'level', 'program')\
+        .prefetch_related('program__level_tiers', 'strategic_objectives')
+    country_data = Country.objects.select_related('region')
+    country_map = {c.country: c.region.name for c in country_data}
+    objective_map = {i.id: [so.name for so in i.strategic_objectives.all()] for i in indicator_data}
+
+    # Build the level names in memory rather than doing db queries, since there are so many to do
+    level_map = {level.pk: level for level in Level.objects.filter(program_id__in=program_map.keys())}
+    level_name_map = {}
+    for level in level_map.values():
+        def get_parent_segment(ontology_segments, level):
+            if level.parent_id:
+                parent = level_map[level.parent_id]
+                parent_segment = parent.customsort
+                return get_parent_segment([parent_segment] + ontology_segments, parent)
+            else:
+                return ontology_segments
+        ontology_segments = get_parent_segment([level.customsort], level)[1:]  # Get rid of the top level segment
+
+        tier_name = program_tiers[level.program.pk][len(ontology_segments)]
+        if len(ontology_segments) > 0:
+            level_name_map[level.pk] = f'{tier_name} {".".join([str(o) for o in ontology_segments])}: {level.name}'
+        else:
+            level_name_map[level.pk] = f'{tier_name}: {level.name}'
+
+    for indicator in sorted([i for i in indicator_data], key=lambda i: i.program_id):
+        program = program_map[indicator.program_id]
+        regions = [country_map[c.strip()] for c in program.countries.split(',')]
+        row = [
+            indicator.id,
+            indicator.name,
+            indicator.sector.sector if indicator.sector else 'None',
+            '/'.join(objective_map[indicator.id]) if len(objective_map[indicator.id]) > 0 else 'None',
+            level_name_map[indicator.level.pk] if indicator.level else 'None',
+            target_frequency_map[indicator.target_frequency] if indicator.target_frequency else 'None',
+            indicator.baseline,
+            uom_type_map[indicator.unit_of_measure_type] if indicator.unit_of_measure_type else 'None',
+            direction_of_change_map[indicator.direction_of_change] if indicator.direction_of_change else 'None',
+            indicator.lop_target_calculated if indicator.lop_target_calculated else indicator.lop_target,
+            program.name,
+            program.gaitid if program.gaitid else "no gait_id, program id {}".format(program.id),
+            '/'.join([c.strip() for c in program.countries.split(',')]),
+            '/'.join(set(regions)),
+            'Active' if program.funding_status == 'Funded' else 'Inactive',
+            program.reporting_period_start,
+            program.reporting_period_end
+        ]
+        row = [str(s) for s in row]
+        writer.writerow(row)
+    return response
 
 
 # API views:
@@ -288,6 +382,8 @@ def program_page(request, program):
             'indicators/program_setup_incomplete.html',
             {'program': program, 'redirect_url': request.path}
         )
+    levels = Level.objects.filter(program=program)
+    tiers = LevelTier.objects.filter(program=program)
     context = {
         'program': ProgramPageProgramSerializer.load_for_pk(program.pk).data,
         'pinned_reports': list(PinnedReport.objects.filter(
@@ -295,6 +391,8 @@ def program_page(request, program):
             )) + [PinnedReport.default_report(program.pk)],
         'delete_pinned_report_url': reverse('delete_pinned_report'),
         'indicator_on_scope_margin': Indicator.ONSCOPE_MARGIN,
+        'levels': LevelSerializer(levels, many=True).data,
+        'levelTiers': LevelTierSerializer(tiers, many=True).data,
         'readonly': not request.has_write_access,
         'result_readonly': not request.has_medium_access
     }
@@ -372,9 +470,11 @@ def results_framework_export(request, program):
     level_single_style.fill = styles.PatternFill('solid', 'E5E5E5')
     wb.add_named_style(level_single_style)
     bottom_tier = program.level_tiers.count()
+
     def row_height_getter(cell):
         lines_of_text = str(cell.value).splitlines()
         row = cell.row
+
         def get_row_height_decorated(w):
             lines = sum([math.ceil(len(s)/w) or 1 for s in lines_of_text])
             height = 26 + lines * 15
@@ -382,6 +482,7 @@ def results_framework_export(request, program):
                 height = 30
             return max(height, ws.row_dimensions[row].height or 0, 30)
         return get_row_height_decorated
+
     def write_level(parent, start_row, start_column):
         levels = program.levels.filter(parent=parent).order_by('customsort')
         column = start_column

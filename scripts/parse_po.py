@@ -4,7 +4,6 @@ import csv
 import os
 import sys
 import io
-from backports import csv
 
 
 def main():
@@ -25,7 +24,7 @@ def main():
     elif '.csv' in args.infilepath:
         csv_to_po(args, basedir, match.group(1))
     else:
-        print 'You must provide either a .po file or a .csv file.  Exiting'
+        print('You must provide either a .po file or a .csv file.  Exiting')
         sys.exit()
 
 

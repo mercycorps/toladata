@@ -120,7 +120,7 @@
         if ($.isEmptyObject($('#id_achieved').val())) {
             $("#div_id_achieved").addClass('has-error');
             $("#id_achieved").addClass('is-invalid');
-            $("#validation_id_achieved").html("<small>{% trans 'Please complete this field.'|escapejs %}</small>");
+            $("#validation_id_achieved").html("{% trans 'Please complete this field.'|escapejs %}");
         // Can't test for !actual because it evaluates to true when value is 0.  isNumeric should be sufficient
         } else if (!$.isNumeric(actual) || actual < 0) {
             $("#div_id_achieved").addClass('has-error');
@@ -151,13 +151,13 @@
         if ($.isEmptyObject(fieldVal)) {
             $("#div_id_date_collected").addClass('has-error');
             $("#id_date_collected").addClass('is-invalid');
-            $("#validation_id_date_collected").html("<small>{% trans 'Please complete this field.'|escapejs %}</small>");
+            $("#validation_id_date_collected").html("{% trans 'Please complete this field.'|escapejs %}");
             return false;
         }
 
         if (!isDate(fieldVal)) {
             $("#div_id_date_collected").addClass('has-error');
-            $("#validation_id_date_collected").html("<small>{% trans 'Please enter a valid date.'|escapejs %}</small>");
+            $("#validation_id_date_collected").html("{% trans 'Please enter a valid date.'|escapejs %}");
             return false;
         }
 
@@ -265,18 +265,18 @@
         if (recordName && ! evidenceURL) {
             $("#div_id_evidence_url").addClass('has-error');
             $("#id_evidence_url").addClass('is-invalid');
-            $("#validation_id_evidence_url").html("<small>{% trans 'A link must be included along with the record name.'|escapejs %}</small>");
+            $("#validation_id_evidence_url").html("{% trans 'A link must be included along with the record name.'|escapejs %}");
             return false;
         } else {
             let validationResult = isValidURLOrFilePath(evidenceURL);
             if (validationResult.valid === 'warn') {
                 $('#id_evidence_url').addClass('is-invalid');
                 $('#div_id_evidence_url').addClass('has-warning');
-                $("#validation_id_evidence_url").html(`<small>${validationResult.message}</small>`);
+                $("#validation_id_evidence_url").html(validationResult.message);
             } else if (validationResult.valid === false) { // this currently never returns false
                 $('#id_evidence_url').addClass('is-invalid');
                 $('#div_id_evidence_url').addClass('has-error');
-                $("#validation_id_evidence_url").html(`<small>${validationResult.message}</small>`);
+                $("#validation_id_evidence_url").html(validationResult.message);
                 return false;
             }
         }

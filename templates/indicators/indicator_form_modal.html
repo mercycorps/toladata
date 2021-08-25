@@ -38,7 +38,7 @@
         data-dismiss="modal"
         aria-label="Close"
         style="padding-top: 10px;">
-        <span aria-hidden="true" class="x-modal">&times;</span>
+        <span aria-hidden="true">&times;</span>
     </button>
 </div>
 
@@ -128,7 +128,6 @@
                             <label for="id_level" class="{% if form.level.field.required %}label--required{% endif %}">{{ form.level.label }}</label>
                             {% popover_helptext form.level.help_text %}
                             {% render_field form.level class+="form-control" %}
-                            <small class="form-text text-muted">{{ form.level.help_text }}</small>
                             <span id="validation_id_level" class="has-error"></span>
                         </div>
                         {% if form.level.field.disabled %}
@@ -310,12 +309,12 @@
                             <span id="validation_id_data_collection_method" class="has-error"></span>
                         </div>
 
-                        <div class="form-group" id="div_id_data_collection_frequency">
-                            <label for="id_data_collection_frequency"
-                                   class="">{{ form.data_collection_frequency.label }} </label>
-                            {% popover_helptext form.data_collection_frequency.help_text %}
-                            {% render_field form.data_collection_frequency class+="form-control" %}
-                            <span id="validation_id_data_collection_frequency" class="has-error"></span>
+                        <div class="form-group" id="div_id_data_collection_frequencies">
+                            <label for="id_data_collection_frequencies"
+                                   class="">{{ form.data_collection_frequencies.label }} </label>
+                            {% popover_helptext form.data_collection_frequencies.help_text %}
+                            {% render_field form.data_collection_frequencies class+="form-control" %}
+                            <span id="validation_id_data_collection_frequencies" class="has-error"></span>
                         </div>
 
                         <div class="form-group" id="div_id_data_points">
@@ -351,11 +350,11 @@
                             <span id="validation_id_information_use" class="has-error"></span>
                         </div>
 
-                        <div class="form-group" id="div_id_reporting_frequency">
-                            <label for="id_reporting_frequency" class="">{{ form.reporting_frequency.label }} </label>
-                            {% popover_helptext form.reporting_frequency.help_text %}
-                            {% render_field form.reporting_frequency class+="form-control" %}
-                            <span id="validation_id_reporting_frequency" class="has-error"></span>
+                        <div class="form-group" id="div_id_reporting_frequencies">
+                            <label for="id_reporting_frequencies" class="">{{ form.reporting_frequencies.label }} </label>
+                            {% popover_helptext form.reporting_frequencies.help_text %}
+                            {% render_field form.reporting_frequencies class+="form-control" %}
+                            <span id="validation_id_reporting_frequencies" class="has-error"></span>
                         </div>
 
                         <div class="form-group" id="div_id_quality_assurance_techniques">
@@ -377,13 +376,6 @@
                             {% popover_helptext form.data_issues.help_text %}
                             {% render_field form.data_issues class+="form-control" %}
                             <span id="validation_id_data_issues" class="has-error"></span>
-                        </div>
-
-                        <div class="form-group" id="div_id_indicator_changes">
-                            <label for="id_indicator_changes" class="">{{ form.indicator_changes.label }} </label>
-                            {% render_field form.indicator_changes class+="form-control" %}
-                            <small class="form-text text-muted">{{ form.indicator_changes.help_text }}</small>
-                            <span id="validation_id_indicator_changes" class="has-error"></span>
                         </div>
 
                         <div class="form-group" id="div_id_comments">
@@ -500,7 +492,9 @@
             filter: '<li class="multiselect-item filter"><div class="input-group"><input class="form-control multiselect-search" type="text"></div></li>',
             filterClearBtn: '<span class="input-group-btn"><button class="btn btn-default multiselect-clear-filter" type="button"><i class="fas fa-times-circle"></i></button></span>',
         },
+        {# Translators: The full text will be e.g. "9 selected", which is a display of how many elements the user has selected. #}
         nSelectedText: ' {% trans "selected" %}',
+        {# Translators: Indicates to the user that they have not selected any of the options available to them. #}
         nonSelectedText: '{% trans "None selected" %}'
     };
     var multiselects = ['#id_objectives', '#id_strategic_objectives'];
@@ -515,7 +509,8 @@
         }
     });
 
-    var noSelectAllMultiselects = ['#id_indicator_type'];
+    var noSelectAllMultiselects = [
+            '#id_indicator_type', '#id_reporting_frequencies', '#id_data_collection_frequencies'];
 
     noSelectAllMultiselects.forEach(function(selectID) {
         let $select = $(selectID);

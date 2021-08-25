@@ -419,6 +419,10 @@ class ProgramAuditLog(models.Model, DiffableLog):
     def change_type_map(self):
         return {
             "indicator_created": _("Indicator created"),
+            # Translators: this is a value in a change log that tells a user what type of change was made.  This value indicates that there was a succesful upload.
+            "indicator_imported": _("Indicator imported"),
+            # Translators: this is a value in a change log that tells a user what type of change was made.  This value indicates that an attempt was made to upload a template but doesn't specify whether the upload was successful or not
+            "template_uploaded": _("Indicator import template uploaded"),
             "indicator_changed": _('Indicator changed'),
             "indicator_deleted": _('Indicator deleted'),
             "result_changed": _('Result changed'),
@@ -579,6 +583,7 @@ class ProgramAuditLog(models.Model, DiffableLog):
         change_type_field_order_map = {
             "indicator_created": Indicator.logged_field_order(),
             "indicator_changed": Indicator.logged_field_order(),
+            "indicator_imported": Indicator.logged_field_order(),
             "indicator_deleted": Indicator.logged_field_order(),
             "result_changed": Result.logged_field_order(),
             "result_created": Result.logged_field_order(),
@@ -611,6 +616,34 @@ class ProgramAuditLog(models.Model, DiffableLog):
             rationale=rationale,
             previous_entry=None,
             new_entry=json.dumps(created_indicator.logged_fields, cls=DjangoJSONEncoder),
+        )
+        new_program_log_entry.save()
+
+    @staticmethod
+    def log_indicator_imported(user, created_indicator, rationale):
+        new_program_log_entry = ProgramAuditLog(
+            program=created_indicator.program,
+            user=user.tola_user,
+            organization=user.tola_user.organization,
+            indicator=created_indicator,
+            change_type="indicator_imported",
+            rationale=rationale,
+            previous_entry=None,
+            new_entry=json.dumps(created_indicator.logged_fields, cls=DjangoJSONEncoder),
+        )
+        new_program_log_entry.save()
+
+    @staticmethod
+    def log_template_uploaded(user, program):
+        new_program_log_entry = ProgramAuditLog(
+            program=program,
+            user=user.tola_user,
+            organization=user.tola_user.organization,
+            indicator=None,
+            change_type="template_uploaded",
+            rationale='N/A',
+            previous_entry=None,
+            new_entry=None,
         )
         new_program_log_entry.save()
 

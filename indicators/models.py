@@ -3,6 +3,7 @@ import re
 import collections
 import string
 import uuid
+import os
 from datetime import timedelta, date
 from decimal import Decimal
 import dateparser
@@ -11,6 +12,7 @@ from functools import total_ordering
 from tola.l10n_utils import l10n_date_medium
 from tola.model_utils import generate_safedelete_queryset
 
+from django.conf import settings
 from django.core.validators import MinValueValidator
 from django.core.exceptions import ValidationError
 from django.db import models
@@ -19,7 +21,7 @@ from django.dispatch import receiver
 from django.http import QueryDict
 from django.urls import reverse
 from django.utils import formats, timezone
-from django.utils.translation import ugettext_lazy as _
+from django.utils.translation import gettext_lazy as _
 from django.contrib import admin
 from django.utils.functional import cached_property
 import django.template.defaultfilters
@@ -148,6 +150,12 @@ class Level(models.Model):
             depth += 1
             depth = self.parent.get_level_depth(depth)
         return depth
+
+    @staticmethod
+    def truncate_ontology(full_ontology):
+        """Truncates the leading 1 and trailing 0's of an ontology"""
+        parts = full_ontology[2:].split('.')
+        return '.'.join([part for part in parts if int(part) != 0])
 
     @cached_property
     def level_depth(self):
@@ -636,14 +644,16 @@ class DisaggregatedValue(models.Model):
 
 class ReportingFrequency(models.Model):
     frequency = models.CharField(
-        _("Frequency"), max_length=135, blank=True)
+        _("Frequency"), max_length=135, unique=True)
     description = models.CharField(
         _("Description"), max_length=765, blank=True)
     create_date = models.DateTimeField(_("Create date"), null=True, blank=True)
+    sort_order = models.IntegerField(unique=True)
     edit_date = models.DateTimeField(_("Edit date"), null=True, blank=True)
 
     class Meta:
         verbose_name = _("Reporting Frequency")
+        ordering = ['sort_order']
 
     def __str__(self):
         return self.frequency
@@ -651,18 +661,16 @@ class ReportingFrequency(models.Model):
 
 class DataCollectionFrequency(models.Model):
     frequency = models.CharField(
-        _("Frequency"), max_length=135, blank=True, null=True)
+        _("Frequency"), max_length=135, unique=True)
     description = models.CharField(
         _("Description"), max_length=255, blank=True, null=True)
-    numdays = models.PositiveIntegerField(
-        default=0,
-        verbose_name=_("Frequency in number of days")
-    )
+    sort_order = models.IntegerField(unique=True)
     create_date = models.DateTimeField(_("Create date"), null=True, blank=True)
     edit_date = models.DateTimeField(_("Edit date"), null=True, blank=True)
 
     class Meta:
         verbose_name = _("Data Collection Frequency")
+        ordering = ['sort_order']
 
     def __str__(self):
         return self.frequency
@@ -980,7 +988,9 @@ class IndicatorTargetsMixin:
 
 class IndicatorMetricsMixin:
     qs_name = 'MetricsAnnotated'
-    annotate_methods = ['annotate_reporting', 'annotate_scope', 'annotate_counts', 'annotate_metrics', 'annotate_kpi']
+    annotate_methods = [
+        'annotate_reporting', 'annotate_scope', 'annotate_counts', 'annotate_metrics', 'annotate_kpi',
+        'annotate_indicator_type_count']
 
     def annotate_reporting(self):
         from indicators.queries import utils as query_utils
@@ -1024,6 +1034,15 @@ class IndicatorMetricsMixin:
                 )
             )
         )
+
+    def annotate_indicator_type_count(self):
+        """
+        Indicator type count will be used in conjunction with the was_bulk_imported field to identify
+        indicators that were imported and still have incomplete data.
+        """
+        from indicators.queries import utils as query_utils
+        return self.annotate(indicator_type_count=query_utils.indicator_type_count_annotation())
+
 
 class Indicator(SafeDeleteModel):
     LOP = 1
@@ -1133,18 +1152,18 @@ class Indicator(SafeDeleteModel):
         ('participant_accountability', _('Participant accountability'))
     ]
 
-
-
     indicator_key = models.UUIDField(
         default=uuid.uuid4, help_text=" ", verbose_name=_("Indicator key"))
 
-    # i.e. Alpha, Donor, Standard
-    # TODO: make this a foreign key
     indicator_type = models.ManyToManyField(
         IndicatorType, blank=True, verbose_name=_("Indicator type"),
         # Translators: this is help text for a field on an indicator setup form
         help_text=_("Classifying indicators by type allows us to filter and analyze related sets of indicators.")
     )
+
+    # Method used to create this indicator
+    # Translators:  Label for a field that shows whether an object was imported or not
+    was_bulk_imported = models.BooleanField(default=False, verbose_name=_("Bulk Imported"))
 
     # the Log Frame level (i.e. Goal, Output, Outcome, etc.)
     level = models.ForeignKey(
@@ -1180,7 +1199,13 @@ class Indicator(SafeDeleteModel):
 
     number = models.CharField(
         # Translators: this is the label for a form field where the user enters the "number" identifying an indicator
-        _("Number"), max_length=255, null=True, blank=True, help_text=" "
+        _("Number"), max_length=255, null=True, blank=True,
+        # Translators: a "number" in this context is a kind of label.  This is help text to explain why a user is
+        # seeing customized numbers instead of auto-generated ones that can derived from the indicator's place in
+        # the hierarchy.  The "numbers" look something like "1.1" or "1.2.1a"
+        help_text=_("This number is displayed in place of the indicator number "
+                    "automatically generated through the results framework. "
+                    "An admin can turn on auto-numbering in program settings.")
     )
 
     source = models.CharField(
@@ -1188,7 +1213,7 @@ class Indicator(SafeDeleteModel):
         _("Source"), max_length=255, null=True, blank=True,
         # Translators: this is help text for a field on an indicator setup form
         help_text=_("Identify the source of this indicator (e.g. Mercy Corps DIG, EC, USAID, etc.) If the indicator "
-                    "is brand new and created specifically for the program, enter &ldquo;Custom.&rdquo;")
+                    "is brand new and created specifically for the program, enter &ldquo;Custom&rdquo;.")
     )
 
     definition = models.TextField(
@@ -1235,9 +1260,10 @@ class Indicator(SafeDeleteModel):
     baseline = models.CharField(
         verbose_name=_("Baseline"), max_length=255, null=True, blank=True,
         # Translators: this is help text for a field on an indicator setup form
-        help_text=_("Enter a numeric value for the baseline. If a baseline is not yet known or not applicable, "
-                    "enter a zero or select the &ldquo;Not applicable&rdquo; checkbox. The baseline can always "
-                    "be updated at later point in time.")
+        help_text=_("Enter a numeric value for the baseline that is greater than or equal to zero. If a baseline "
+                    "is not yet known or not applicable, enter a zero or select the "
+                    "&ldquo;Not applicable&rdquo; checkbox. The baseline can always "
+                    "be updated at a later point in time.")
     )
 
     baseline_na = models.BooleanField(
@@ -1311,8 +1337,8 @@ class Indicator(SafeDeleteModel):
                     "for data collection.")
     )
 
-    data_collection_frequency = models.ForeignKey(
-        DataCollectionFrequency, null=True, blank=True, on_delete=models.SET_NULL,
+    data_collection_frequencies = models.ManyToManyField(
+        DataCollectionFrequency, related_name='indicators', blank=True,
         verbose_name=_("Frequency of data collection"),
         # Translators: this is help text for a field on an indicator setup form
         help_text=_("How frequently will you collect data for this indicator? The frequency and timing of data "
@@ -1355,8 +1381,9 @@ class Indicator(SafeDeleteModel):
                     "indicators are included in the program.")
     )
 
-    reporting_frequency = models.ForeignKey(
-        ReportingFrequency, null=True, blank=True, on_delete=models.SET_NULL, verbose_name=_("Frequency of reporting"),
+    reporting_frequencies = models.ManyToManyField(
+        ReportingFrequency, related_name='indicators', blank=True,
+        verbose_name=_("Frequency of reporting"),
         # Translators: this is help text for a field on an indicator setup form
         help_text=_("This frequency should make sense in relation to the data collection frequency and target "
                     "frequency and should adhere to any requirements regarding program, stakeholder, and/or donor "
@@ -1364,6 +1391,7 @@ class Indicator(SafeDeleteModel):
     )
 
     quality_assurance = models.TextField(
+        # Translators: This is the title of a form field.
         max_length=500, null=True, blank=True, verbose_name=_("Data quality assurance details"),
         # Translators: this is help text for a field on an indicator setup form
         help_text=_("Provide any additional details about how data quality will be ensured for this specific "
@@ -1373,7 +1401,9 @@ class Indicator(SafeDeleteModel):
     )
 
     quality_assurance_techniques = MultiSelectField(
+        # Translators: This is the title of a form field.
         null=True, blank=True, verbose_name=_("Data quality assurance techniques"), choices=QUALITY_ASSURANCE_CHOICES,
+        # Translators: this is help text for a field on an indicator setup form
         help_text=_("Select the data quality assurance techniques that will be applied to this specific indicator.")
     )
 
@@ -1384,11 +1414,6 @@ class Indicator(SafeDeleteModel):
                     "reliability, accuracy, precision, and/or potential for double counting.) Data issues can be "
                     "related to indicator design, data collection methods, and/or data analysis methods. Please be "
                     "specific and explain how data issues were addressed.")
-    )
-
-    indicator_changes = models.TextField(
-        max_length=500, null=True, blank=True,
-        verbose_name=_("Changes to indicator"), help_text=" "
     )
 
     comments = models.TextField(
@@ -1454,7 +1479,7 @@ class Indicator(SafeDeleteModel):
         self.edit_date = timezone.now()
         if self.level and self.level.program_id != self.program_id:
             raise ValidationError(
-                # Translators: This is an error message that is returned when a user is trying to assign an indicator to the wrong hierarch of levels.
+                # Translators: This is an error message that is returned when a user is trying to assign an indicator to the wrong hierarchy of levels.
                 _('Level/Indicator mismatched program IDs ' +
                   '(level %(level_program_id)d and indicator %(indicator_program_id)d)'),
                 code='foreign_key_constraint',
@@ -1816,6 +1841,31 @@ def reorder_former_level_on_update(sender, update_fields, created, instance, **k
         instance.level.update_level_order()
 
 
+class BulkIndicatorImportFile(models.Model):
+    FILE_STORAGE_PATH = 'indicators/bulk_import_files'
+    INDICATOR_DATA_TYPE = 1
+    INDICATOR_TEMPLATE_TYPE = 2
+    FILE_TYPE_CHOICES = ((INDICATOR_DATA_TYPE, 'Indicator data'), (INDICATOR_TEMPLATE_TYPE, 'Error template'))
+
+    file_type = models.IntegerField(choices=FILE_TYPE_CHOICES)
+    file_name = models.CharField(max_length=100)
+    program = models.ForeignKey(Program, on_delete=models.CASCADE, related_name='bulk_indicator_import_files')
+    user = models.ForeignKey(
+        TolaUser, on_delete=models.SET_NULL, related_name='bulk_indicator_import_files', null=True)
+    create_date = models.DateTimeField(auto_now=True)
+
+    @classmethod
+    def get_file_path(cls, file_name):
+        return os.path.join(settings.SITE_ROOT, cls.FILE_STORAGE_PATH, file_name)
+
+    @property
+    def file_path(self):
+        return os.path.join(settings.SITE_ROOT, self.FILE_STORAGE_PATH, self.file_name)
+
+    def __str__(self):
+        return self.file_name
+
+
 class PeriodicTarget(models.Model):
     LOP_PERIOD = _('Life of Program (LoP) only')
     LOP_LABEL = _('Life of Program')
@@ -1992,7 +2042,7 @@ class PeriodicTarget(models.Model):
         It's unclear how some of these ''.format() works, as some params are gettext_lazy() (unicode) values containing
         non-ASCII chars being plugged into a non-unicode string. This normally crashes but for some reason it works here.
 
-        An example of something that crashes in the REPL but seemingly works here when using ugettext_lazy():
+        An example of something that crashes in the REPL but seemingly works here when using gettext_lazy():
 
             '{year}'.format(year=u'Año')
 

@@ -41,6 +41,18 @@ eventBus.on('open-indicator-update-modal', (indicatorId) => {
     $("#indicator_modal_div").modal('show');
 });
 
+eventBus.on('open-indicator-complete-modal', (indicatorId) => {
+    // Note: depends on indicator_list_modals.html
+
+    let url = `/indicators/indicator_complete/${indicatorId}/`;
+
+    $("#indicator_modal_content").empty();
+    $("#modalmessages").empty();
+
+    $("#indicator_modal_content").load(url);
+    $("#indicator_modal_div").modal('show');
+});
+
 // Indicator filters are controlled through routes
 // these should no longer be called directly from components
 

@@ -106,8 +106,6 @@ def periodic_targets_form(request, program):
 
     if target_frequency_type in Indicator.REGULAR_TARGET_FREQUENCIES:
         start_date = program.reporting_period_start
-        # target_frequency_num_periods = IPTT_ReportView._get_num_periods(
-        #     start_date, program.reporting_period_end, target_frequency_type)
         target_frequency_num_periods = len(
             [p for p in PeriodicTarget.generate_for_frequency(
                 target_frequency_type)(start_date, program.reporting_period_end)])
@@ -146,7 +144,10 @@ class IndicatorFormMixin:
         self.guidance = None
 
     def get_template_names(self):
-        return 'indicators/indicator_form_modal.html'
+        if 'indicator_complete' in self.request.path:
+            return 'indicators/indicator_form_modal_complete.html'
+        else:
+            return 'indicators/indicator_form_modal.html'
 
     def form_invalid(self, form):
         return JsonResponse(form.errors, status=400)
@@ -378,14 +379,7 @@ class IndicatorUpdate(IndicatorFormMixin, UpdateView):
     @method_decorator(indicator_pk_adapter(has_indicator_write_access))
     @transaction.atomic
     def dispatch(self, request, *args, **kwargs):
-        if request.method == 'GET':
-            # If target_frequency is set but not targets are saved then
-            # unset target_frequency too.
-            indicator = self.get_object()
-            reset_indicator_target_frequency(indicator)
-
         self.set_form_guidance()
-
         return super(IndicatorUpdate, self).dispatch(request, *args, **kwargs)
 
     @property
@@ -394,23 +388,29 @@ class IndicatorUpdate(IndicatorFormMixin, UpdateView):
         The header of the form when updating - composed here instead of in the template
         such that it can also be used via AJAX
         """
-        if self.object.results_framework and self.object.auto_number_indicators:
-            if self.object.level_display_ontology:
-                return u'{} {} {}{}'.format(
-                    self.object.leveltier_name,
-                    _('indicator'),
-                    self.object.level_display_ontology,
-                    self.object.level_order_display,
-                )
-            else:
-                return _('Indicator setup')
-        elif self.object.results_framework and self.object.number:
-            return u'{} {}'.format(_('indicator'), self.object.number)
-        elif self.object.results_framework:
-            return _('Indicator setup')
+
+        is_completion_form = True if 'indicator_complete' in self.request.path else False
+        # Translators: a fragment of a larger string that will be a title for a form.  The full string might be e.g. Complete setup of Outcome indicator 1.1a.
+        completion_title_prefix = _('Complete setup of ') if is_completion_form else ''
+        if self.object.auto_number_indicators:
+            indicator_number = self.object.level_order_display
+            ontology = self.object.level_display_ontology
+        else:
+            indicator_number = self.object.number or ''
+            ontology = ''
+
+        if self.object.results_framework:
+            return '{}{} {} {}{}'.format(
+                completion_title_prefix,
+                self.object.leveltier_name,
+                _('indicator'),
+                ontology,
+                indicator_number,
+            )
+
         elif self.object.old_level:
-            return u'{} {}'.format(
-                str(ugettext(self.object.old_level)),
+            return '{} {}'.format(
+                str(_(self.object.old_level)),
                 str(_('indicator')),
             )
         else:
@@ -424,8 +424,20 @@ class IndicatorUpdate(IndicatorFormMixin, UpdateView):
         context = super(IndicatorUpdate, self).get_context_data(**kwargs)
         indicator = self.object
         program = indicator.program
-
         context['program'] = program
+
+        if 'indicator_complete' in self.request.path:
+            incomplete_indicators = program.indicator_set\
+                .annotate(itype_count=Count('indicator_type'))\
+                .filter(create_date__gte='2021-03-01')\
+                .filter(itype_count=0)\
+                .exclude(pk=indicator.pk)\
+                .order_by('pk')
+
+            if len(incomplete_indicators) == 0:
+                context['next_indicator_pk'] = None
+            else:
+                context['next_indicator_pk'] = incomplete_indicators[0].pk
 
         pts = PeriodicTarget.objects.filter(indicator=indicator) \
             .annotate(num_data=Count('result')).order_by('customsort', 'create_date', 'period')
@@ -442,30 +454,38 @@ class IndicatorUpdate(IndicatorFormMixin, UpdateView):
                 'target': pt.target
             })
 
-        # if the modal is loaded (not submitted) and the indicator frequency is a periodic
-        if self.request.method == 'GET' and indicator.target_frequency in Indicator.REGULAR_TARGET_FREQUENCIES:
-            latest_pt_end_date = indicator.periodictargets.aggregate(lastpt=Max('end_date'))['lastpt']
-
-            if latest_pt_end_date is None or latest_pt_end_date == 'None':
-                latest_pt_end_date = program.reporting_period_start
-            else:
-                latest_pt_end_date += timedelta(days=1)
-
-            target_frequency_num_periods = len(
-                [p for p in PeriodicTarget.generate_for_frequency(
-                    indicator.target_frequency)(latest_pt_end_date, program.reporting_period_end)])
-            # target_frequency_num_periods = IPTT_ReportView._get_num_periods(
-            #     latest_pt_end_date, program.reporting_period_end, indicator.target_frequency)
-
+        # if the modal is being loaded (not submitted), check the number of periodic targets to
+        # be sure that they cover the program reporting period.  A recently extended program reporting period
+        # or newly imported indicators can lead to missing targets.
+        if self.request.method == 'GET':
             num_existing_targets = pts.count()
-            event_name = ''
+            if indicator.target_frequency in Indicator.REGULAR_TARGET_FREQUENCIES:
+                latest_pt_end_date = indicator.periodictargets.aggregate(lastpt=Max('end_date'))['lastpt']
 
-            generated_targets = generate_periodic_targets(
-                indicator.target_frequency, latest_pt_end_date, target_frequency_num_periods, event_name,
-                num_existing_targets)
+                if latest_pt_end_date is None or latest_pt_end_date == 'None':
+                    latest_pt_end_date = program.reporting_period_start
+                else:
+                    latest_pt_end_date += timedelta(days=1)
 
-            # combine the list of existing periodic_targets with the newly generated placeholder for missing targets
-            ptargets += generated_targets
+                target_frequency_num_periods = len(
+                    [p for p in PeriodicTarget.generate_for_frequency(
+                        indicator.target_frequency)(latest_pt_end_date, program.reporting_period_end)])
+                event_name = ''
+
+                generated_targets = generate_periodic_targets(
+                    indicator.target_frequency, latest_pt_end_date, target_frequency_num_periods, event_name,
+                    num_existing_targets)
+
+                # combine the list of existing periodic_targets with the newly generated placeholder for missing targets
+                ptargets += generated_targets
+
+            elif indicator.target_frequency and num_existing_targets == 0:
+                if indicator.target_frequency == Indicator.MID_END:
+                    ptargets = generate_periodic_targets(
+                        indicator.target_frequency, indicator.program.reporting_period_start, 2)
+                else:
+                    ptargets = generate_periodic_targets(
+                        indicator.target_frequency, indicator.program.reporting_period_start, 1)
 
         context['periodic_targets'] = ptargets
 
@@ -477,9 +497,15 @@ class IndicatorUpdate(IndicatorFormMixin, UpdateView):
 
         context['title_str'] = self._form_title_display_str
         context['subtitle_str'] = self._form_subtitle_display_str
+        # title_helptext only used on the indicator completion modal
+        context['title_helptext'] = _(
+            'This indicator was imported from an Excel template. Some fields could not be included in the template, '
+            'including targets that are required before results can be reported.')
+
 
         return context
 
+    # TODO: No longer necessary?
     def get_initial(self):
         target_frequency_num_periods = self.get_object().target_frequency_num_periods
         if not target_frequency_num_periods:
@@ -708,18 +734,19 @@ class PeriodicTargetDeleteAllView(View):
         return JsonResponse({"status": "success"})
 
 
-def reset_indicator_target_frequency(ind):
-    """
-    This thing exists due to how the indicator form used to work, which was way more
-    permissive in letting you save the target frequency without generating targets.
-    It mostly exists now to clean up indicators in a bad state whre the target frequency
-    is set but PT count is 0.
-    """
-    if ind.target_frequency is not None and ind.periodictargets.count() == 0:
-        ind.target_frequency = None
-        ind.target_frequency_start = None
-        ind.target_frequency_num_periods = 1
-        ind.save()
+# TODO: No longer used since having a target frequency with 0 PT's is ok.  Commenting out for now until we're sure.
+# def reset_indicator_target_frequency(ind):
+#     """
+#     This thing exists due to how the indicator form used to work, which was way more
+#     permissive in letting you save the target frequency without generating targets.
+#     It mostly exists now to clean up indicators in a bad state whre the target frequency
+#     is set but PT count is 0.
+#     """
+#     if ind.target_frequency is not None and ind.periodictargets.count() == 0:
+#         ind.target_frequency = None
+#         ind.target_frequency_start = None
+#         ind.target_frequency_num_periods = 1
+#         ind.save()
 
 
 @method_decorator(login_required, name='dispatch')
@@ -979,7 +1006,8 @@ def service_json(request, service):
 def result_view(request, indicator, program):
     """Returns the results table for an indicator - used to expand rows on the Program Page"""
     indicator = ResultsIndicator.results_view.get(pk=indicator)
-    reset_indicator_target_frequency(indicator)
+    # TODO: Not sure why we need to delete target frequency just to open the result table.  Commenting out for now.
+    # reset_indicator_target_frequency(indicator)
     template_name = 'indicators/result_table.html'
     program_obj = indicator.program
     program = program_obj.id

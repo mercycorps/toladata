@@ -6,7 +6,7 @@
 from operator import attrgetter
 from rest_framework import serializers
 from django.utils import timezone, formats
-from django.utils.translation import ugettext, ugettext_lazy
+from django.utils.translation import gettext, gettext_lazy
 
 from tola.l10n_utils import l10n_date_medium
 
@@ -16,9 +16,7 @@ from indicators.models import (
     Level,
     LevelTier,
     LevelTierTemplate,
-    PeriodicTarget,
     Objective,
-    DisaggregationLabel
 )
 from indicators.queries import IPTTIndicator
 from indicators.export_renderers import EM_DASH
@@ -91,6 +89,7 @@ class IndicatorSerializerMinimal(serializers.ModelSerializer):
             'level',
             'level_order',
             'number',
+            'was_bulk_imported'
         ]
 
 
@@ -148,7 +147,7 @@ class IndicatorSerializer(serializers.ModelSerializer):
         return obj.number
 
     def get_old_level(self, obj):
-        return ugettext(obj.old_level) if obj.old_level else None
+        return gettext(obj.old_level) if obj.old_level else None
 
 
 
@@ -203,8 +202,8 @@ class IndicatorPlanIndicatorSerializerBase(serializers.ModelSerializer):
     is_cumulative = serializers.SerializerMethodField()
     baseline = serializers.SerializerMethodField()
     lop_target = serializers.SerializerMethodField()
-    data_collection_frequency = serializers.StringRelatedField()
-    reporting_frequency = serializers.StringRelatedField()
+    data_collection_frequency = serializers.SerializerMethodField()
+    reporting_frequency = serializers.SerializerMethodField()
     quality_assurance_techniques = serializers.SerializerMethodField()
 
     class Meta:
@@ -244,6 +243,22 @@ class IndicatorPlanIndicatorSerializerBase(serializers.ModelSerializer):
     def get_quality_assurance_techniques(indicator):
         """returns the list of quality assurance techniques in alphabetical order in the display language"""
         return ", ".join(sorted([x.strip() for x in indicator.get_quality_assurance_techniques_display().split(',')]))
+
+    @staticmethod
+    def get_reporting_frequency(indicator):
+        """returns a string with a comma separated list of reporting frequencies"""
+        if indicator.reporting_frequencies.exists():
+            frequency_list = indicator.reporting_frequencies.all().values_list('frequency', flat=True)
+            return ", ".join([gettext(frequency) for frequency in frequency_list])
+        return None
+
+    @staticmethod
+    def get_data_collection_frequency(indicator):
+        """returns a string with a comma separated list of data collection frequencies"""
+        if indicator.data_collection_frequencies.exists():
+            frequency_list = indicator.data_collection_frequencies.all().values_list('frequency', flat=True)
+            return ", ".join([gettext(frequency) for frequency in frequency_list])
+        return None
 
     @staticmethod
     def get_lop_target(indicator):
@@ -367,7 +382,7 @@ class IndicatorWebMixin(IndicatorFormatsMixin):
     @staticmethod
     def get_translated(value):
         """For web, translation should be lazy, for performance reasons"""
-        return value if value is None else ugettext_lazy(value)
+        return value if value is None else gettext_lazy(value)
 
     @staticmethod
     def format_numeric(value, indicator, decimal_places=2):
@@ -392,7 +407,7 @@ class IndicatorExcelMixin(IndicatorFormatsMixin):
     @staticmethod
     def get_translated(value):
         """For excel, translation must be non-lazy so Excel renderer recognizes it as a string"""
-        return value if value is None else ugettext(value)
+        return value if value is None else gettext(value)
 
     def format_numeric(self, value, indicator, decimal_places=2):
         """For excel, produce rounded {value: number_format:} dict for Excel to format in place"""
@@ -489,7 +504,7 @@ class IndicatorPlanLevelSerializerBase(serializers.ModelSerializer):
 
     @staticmethod
     def get_display_name(level):
-        tier = ugettext(level.leveltier.name) if level.leveltier else ''
+        tier = gettext(level.leveltier.name) if level.leveltier else ''
         ontology = level.display_ontology if level.display_ontology else ''
         name = str(level.name)
         return '{tier}{tier_space}{ontology}{colon}{name}'.format(

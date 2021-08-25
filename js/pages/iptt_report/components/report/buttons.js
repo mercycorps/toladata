@@ -114,14 +114,14 @@ class PinPopover extends React.Component {
                                      maxLength="50"
                                      onChange={ this.handleChange }
                                      disabled={ this.state.sending }/>
-                                <div className="has-error">
+                                <div>
                                     { this.state.error === "DUPLICATE" ?
-                                        <span><small>
+                                        <span className="has-error">
 
                                             {/* # Translators: An error occured because a report has already been pinned with that same name */}
                                             {gettext('A pin with this name already exists.')}
 
-                                        </small></span>
+                                        </span>
                                         :
                                         null
                                     }
@@ -154,13 +154,17 @@ class PinPopover extends React.Component {
 @inject('rootStore')
 @observer
 export class PinButton extends BootstrapPopoverButton {
+    constructor(props) {
+        super(props)
+        this.myRef = React.createRef();
+    }
     popoverName = 'pin';
 
     getPopoverContent = () => {
         return (
             <PinPopover
                 rootStore={ this.props.rootStore }
-                updatePosition={() => {$(this.refs.target).popover('update');}}
+                updatePosition={() => {$(this.myRef.current).popover('update');}}
             />
             );
     }
@@ -171,7 +175,7 @@ export class PinButton extends BootstrapPopoverButton {
                 <button
                     href="#"
                     className="btn btn-sm btn-secondary"
-                    ref="target">
+                    ref={this.myRef}>
                 <i className="fas fa-thumbtack"></i>
                     {
                         /* # Translators: a button that lets a user "pin" (verb) a report to their home page */
@@ -229,6 +233,10 @@ class ExcelPopover extends React.Component {
 
 @observer
 export class ExcelPopoverButton extends BootstrapPopoverButton {
+    constructor(props) {
+        super(props)
+        this.myRef = React.createRef();
+    }
     popoverName = 'excel';
 
     getPopoverContent = () => {
@@ -242,7 +250,7 @@ export class ExcelPopoverButton extends BootstrapPopoverButton {
             <React.Fragment>
                 <button type="button"
                     className="btn btn-sm btn-secondary"
-                    ref="target">
+                    ref={this.myRef}>
                     <i className="fas fa-download"></i> Excel
                     </button>
             </React.Fragment>

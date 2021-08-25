@@ -213,7 +213,7 @@ class IPTTExcelIndicatorFiltersMixin:
         queryset = Indicator.rf_aware_objects.select_related('program').prefetch_related(None).only(
             'pk', 'name', 'deleted', 'program_id', 'means_of_verification', 'level_id', 'level_order',
             'number', 'target_frequency', 'unit_of_measure', 'unit_of_measure_type', 'baseline', 'baseline_na',
-            'direction_of_change', 'is_cumulative', 'old_level',
+            'direction_of_change', 'is_cumulative', 'old_level', 'was_bulk_imported',
             'create_date', 'sector_id'
         ).filter(**cls._get_queryset_filters(context)).order_by().distinct()
         return cls(queryset, context=context, many=True)
@@ -225,7 +225,7 @@ class IPTTExcelIndicatorFiltersMixin:
         if ontology is None:
             ontology = []
         if level.parent_id is None:
-            return depth, u'.'.join(ontology)
+            return depth, '.'.join(ontology)
         ontology = [str(level.customsort)] + ontology
         parent = [l for l in level_set if l.pk == level.parent_id][0]
         return self._get_level_depth_ontology(parent, level_set, depth+1, ontology)
@@ -246,10 +246,10 @@ class IPTTExcelIndicatorFiltersMixin:
             'tiers', indicator.program.level_tiers.all()
             ) if t.tier_depth == level_depth]
         if not leveltier:
-            leveltier_name = u''
+            leveltier_name = ''
         else:
-            leveltier_name = u'{} '.format(_(leveltier[0].name))
-        return u"{}{}{}".format(
+            leveltier_name = '{} '.format(_(leveltier[0].name))
+        return "{}{}{}".format(
             leveltier_name, display_ontology, self._get_level_order_display(indicator)
         )
 
