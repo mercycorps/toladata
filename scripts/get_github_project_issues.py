@@ -21,7 +21,7 @@ import argparse
 headers = {'Accept': 'application/vnd.github.inertia-preview+json'}
 
 parser = argparse.ArgumentParser(description='Parse a .po file')
-parser.add_argument('--column', help='the column name of the tickets you want to extract')
+parser.add_argument('--columns', help='comma separated list of columns with tickets you to extract')
 parser.add_argument('--closeissues', action='store_true', help='Close all of the issues in the column')
 parser.add_argument('--extraoutput', action='store_true', help='Get extra info like labels and description')
 parser.add_argument('--labels', default='', help='Comma separated list of labels that should have their own column (already done for LOE and spike')
@@ -80,8 +80,8 @@ else:
 columns_url = columns_template % project_id
 response = requests.get(columns_url, headers=headers, auth=auth)
 cols_to_fetch = ['Done', 'Ready for Deploy']
-if args.column:
-    cols_to_fetch = args.column.split(",")
+if args.columns:
+    cols_to_fetch = [col.strip() for col in args.columns.split(',')]
 
 column_ids = [col['id'] for col in json.loads(response.text) if col['name'] in cols_to_fetch]
 issues = []
