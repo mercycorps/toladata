@@ -10,8 +10,10 @@ import requests
 from requests.auth import HTTPBasicAuth
 import json
 import os
+from pathlib import Path
 import yaml
 import sys
+import csv
 import re
 import getpass
 import argparse
@@ -19,8 +21,10 @@ import argparse
 headers = {'Accept': 'application/vnd.github.inertia-preview+json'}
 
 parser = argparse.ArgumentParser(description='Parse a .po file')
-parser.add_argument('--column', help='the column name of the tickets you want to extract')
+parser.add_argument('--columns', help='comma separated list of columns with tickets you to extract')
 parser.add_argument('--closeissues', action='store_true', help='Close all of the issues in the column')
+parser.add_argument('--extraoutput', action='store_true', help='Get extra info like labels and description')
+parser.add_argument('--labels', default='', help='Comma separated list of labels that should have their own column (already done for LOE and spike')
 args = parser.parse_args()
 
 project_name = input('Enter the project name: ')
@@ -76,11 +80,12 @@ else:
 columns_url = columns_template % project_id
 response = requests.get(columns_url, headers=headers, auth=auth)
 cols_to_fetch = ['Done', 'Ready for Deploy']
-if args.column:
-    cols_to_fetch = args.column.split(",")
+if args.columns:
+    cols_to_fetch = [col.strip() for col in args.columns.split(',')]
 
 column_ids = [col['id'] for col in json.loads(response.text) if col['name'] in cols_to_fetch]
 issues = []
+space_regex = re.compile(r'\s?\n\s?')
 for col_id in column_ids:
 
     # Loop through each card in each column and the the issue data associated
@@ -99,8 +104,26 @@ for col_id in column_ids:
                 continue
             issue_num = match.group(1)
             issue_url = issue_template.format(issue_num)
-            issue_response = requests.get(issue_url, headers=headers, auth=auth)
-            issues.append((issue_num, json.loads(issue_response.text)['title']))
+            issue_response = json.loads(requests.get(issue_url, headers=headers, auth=auth).text)
+            description = space_regex.sub(' ', issue_response['body'][:200])
+            issue_data = {
+                'number': issue_num, 'title': issue_response['title'], 'description': description}
+            if args.extraoutput:
+                label_columns = {'LOE': [], 'spike': ''}
+                user_labels = {label.strip(): '' for label in args.labels.split(',')}
+                label_columns.update(user_labels)
+                label_columns.update({'other': []})
+                issue_data.update(label_columns)
+                for label in issue_response['labels']:
+                    if 'LOE' in label['name']:
+                        issue_data['LOE'].append(label['name'])
+                    elif label['name'] in label_columns.keys():
+                        issue_data[label['name']] = 'Yes'
+                    else:
+                        issue_data['other'].append(label['name'])
+                issue_data['LOE'] = ", ".join(issue_data['LOE'])
+                issue_data['other'] = ", ".join(issue_data['other'])
+            issues.append(issue_data)
             if args.closeissues:
                 response = requests.patch(issue_url, headers=headers, auth=auth, json={'state': 'closed'})
 
@@ -110,9 +133,25 @@ for col_id in column_ids:
             has_next = False
 
 if issues:
-    issues.sort(key=lambda k: int(k[0]), reverse=True)
+    issues.sort(key=lambda k: int(k['number']), reverse=True)
     print('')
-    for i in issues:
-        print('#%s - %s' % i)
+    if args.extraoutput:
+        filepath = f'{str(Path.home())}/github_issue_dump.csv'
+        if os.path.isfile(filepath):
+            overwrite = input(f'\nWARNING: {filepath} already exists.  \nType "YES" to overwrite: ')
+            execute = True if overwrite == 'YES' else False
+        else:
+            execute = True
+
+        if execute:
+            with open(filepath, 'w') as fh:
+                writer = csv.writer(fh)
+                writer.writerow(issues[0].keys())  # Header row
+                for i in issues:
+                    writer.writerow(i.values())
+            print(f'CSV written to {filepath}')
+    else:
+        for i in issues:
+            print(f'#{i["number"]} - {i["title"]}')
 else:
     print("No cards in the column(s)", ', '.join(cols_to_fetch))
