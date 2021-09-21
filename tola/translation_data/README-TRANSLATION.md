@@ -23,7 +23,7 @@ One additional wrinkle in the process is that we are also translating certain da
 
 # Tools
 There are several third party tools and scripts that are essential to our translation process.
-- `create_temp_translations` is a management command that will append "Translated" to the English string to more clearly display strings that have been marked for translation..  Before you ever send files to the translator, it's often helpful to have temporary translations in place to more easily identify strings that have not been marked for translation and to check the ordering of lists that are not alphabetical (e.g. Frequency of Reporting). This command will provide temporary translations for all untranslated strings.
+- `create_temp_translations` is a management command that will append "Translated" to the English string to more clearly display strings that have been marked for translation.  Before you ever send files to the translator, it's often helpful to have temporary translations in place to more easily identify strings that have not been marked for translation and to check the ordering of lists that are not alphabetical (e.g. Frequency of Reporting). This command will provide temporary translations for all untranslated strings.
 - [POEdit](https://poedit.net/) is free desktop software that provides a nice GUI way to edit .po files.  It allows for translation updates, shows translator comments, and flags many common issues with .po files (e.g. missing spaces at the beginning or end of the translation).
 - [Translate Toolkit](http://docs.translatehouse.org/projects/translate-toolkit/en/latest/index.html) is a Python library with several useful tools to manage .po files.
   - The tool used most in our process is `posplit`, which will partition .po files into fuzzy, untranslated, and translated files.
@@ -40,7 +40,7 @@ The steps below are a sample process for getting the translations done by profes
 There are a few conventions used in the process below.
 - `<tempdir>` refers to a temporary directory (outside of the repo) that is used to prepare the .po files.
 - `<locale>` refers to the `/tola/locale/` directory where the .po and .mo files are kept.
-- `<prof_trans>` refers to the directory that contains the most recently professionally translated .po files.
+- `<prof_trans>` refers to the directory that contains the most recently professionally translated .po files.  As of this writing, they are in `tola/translation_data`.
 
 
 ## Start with the last batch of professionally translated files
@@ -66,8 +66,8 @@ toladata$ cp <locale>/fr/LC_MESSAGES/djangojs.po <tempdir>/djangojs_fr_orig.po
 
 Copy the last set of professionally translated files into their respective language dirs and run `makemessages` to generate the new strings.
 ```bash
-toladata$ cp <prof_trans>/django_fr_combined_final.po <locale>/fr/LC_MESSAGES/django.po
-toladata$ cp <prof_trans>/djangojs_fr_combined_final.po <locale>/fr/LC_MESSAGES/djangojs.po
+toladata$ cp <prof_trans>/<latest_release>/django_fr_final.po <locale>/fr/LC_MESSAGES/django.po
+toladata$ cp <prof_trans>/<latest_release>/djangojs_fr_final.po <locale>/fr/LC_MESSAGES/djangojs.po
 toladata$ ./manage.py makemessagesdb
 toladata$ ./manage.py makemessages
 toladata$ ./manage.py makemessagesjs
@@ -169,6 +169,17 @@ You should now have django.po and djangojs.po files in both the `<locale>/fr/LC_
 ```bash
 toladata$ ./manage.py compilemessages
 ```
+
+## Preserve final translated files
+Copy the translated files from the locale directory to the preservation directory.  These are the files you will use as the base for the next time professional translations are done.
+```bash
+toladata$ cp <locale>/fr/LC_MESSAGES/django.po <prof_translated>/<new_release>/django_fr_final.po
+toladata$ cp <locale>/fr/LC_MESSAGES/djangojs.po <prof_translated>/<new_release>/djangojs_fr_final.po
+```
+A couple of notes about this step.
+- If there were new or fuzzy strings to translate after running the last `makemessages` and `makemessagesjs`, it would still be ok to copy the .po files from the lacale directory to the <prof_translated> directory.  However, if you've already provided Google translations of the missing strings, then you copy the `<tempdir>/django_fr_final.po` and `<tempdir>/djangojs_fr_final.po` files into `<prof_translated>` instead.
+- While it's not strictly necessary to keep older versions of the files, sometimes it's useful to look at slightly older files without having to resurrect them from git.  Anything older than two release back can probably be deleted.
+
 
 The translation process should now be complete.
 
