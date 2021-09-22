@@ -10,12 +10,16 @@ from django.conf import settings
 # the leading whitespace and html tag(s) from the start of the string so the
 # "Translated" can be placed right before the string rather than outside of enclosing
 # tags.
+
 WHITESPACE_REGEX = re.compile('(^\s*(?:<.+?>)*)?(.+)', re.DOTALL)
 
 class Command(BaseCommand):
     help = """Create temporary translations """
 
-    diacritic_cycle = itertools.cycle(['Á', 'é', '', 'ö', 'Ź'])
+    # The diacritic_cycle object serves a dual purpose.  One is to make sure that diacritics are included in
+    # case there is any difficulty with those special characters. It also helps test the ordering of lists if
+    # the list is not alphabetically sorted (like Frequency of Reporting in the indicator setup).
+    diacritic_cycle = itertools.cycle(['Á', 'é', 'I', 'ö', 'Ź'])
 
     def handle(self, *args, **options):
 
