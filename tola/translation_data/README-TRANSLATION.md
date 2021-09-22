@@ -54,7 +54,7 @@ This does require that the professionally translated files be preserved so they 
 Assuming you are at the point where you want to send files to the translators, the first steps in the process are to copy the prior translated files into their respective language directories and run `makemessages`.
 
 Easiest to do this work on its own branch.
-```
+```bash
 toladata$ git checkout -b update_translations
 ```
 
@@ -140,8 +140,6 @@ $ cp <tempdir>/django_fr_merged.po <locale>/fr/LC_MESSAGES/django.po
 $ cp <tempdir>/djangojs_fr_merged.po <locale>/fr/LC_MESSAGES/djangojs.po
 ```
 
-Your translations should not be all done!
-
 ### Option 2: Use the -translated partition
 When you generated the files to send to the translators, you generated a file with `-translated` suffix. This can be concatenated with the file you received from the translators using `msgcat `.
 ```bash
@@ -151,34 +149,31 @@ toladata/<tmpdir>$ msgcat -o ./djangojs_fr_final.po djangojs_fr_to_translators--
 
 You will probably run into the issue with `msgcat` producing a misformated .po file.  See the note in the next section for more information on this.
 
-Once you have cleaned
+Once you have cleaned the files, you can move them into the locale directory.
 
 ```bash
 toladata/<tmpdir>$ cp ./django_fr_final.po <locale>/fr/LC_MESSAGES/django.po
 toladata/<tmpdir>$ cp ./djangojs_fr_final.po <locale>/fr/LC_MESSAGES/djangojs.po
 ```
 
-
-## Catch remaining translations
-In the time it took for the translators to translate files files, it's possible that additional code has been pushed that includes translations.  To catch these items, you should run `makemessages` and `makemessagesjs` again, just as above, and examine the updated .po files for new fuzzy and untranslated strings.
-
-
-## Cleanup and Compile
-
-You should now have django.po and djangojs.po files in both the `<locale>/fr/LC_MESSAGES/` directory, and these files should no longer contain any fuzzy or untranslated strings, even if you run the `makemessages` commands again.  The last step is to compile the .po files into a binary .mo format that Django can consume.
-```bash
-toladata$ ./manage.py compilemessages
-```
-
 ## Preserve final translated files
-Copy the translated files from the locale directory to the preservation directory.  These are the files you will use as the base for the next time professional translations are done.
+Copy the translated files from the locale directory to the preservation directory.  These are the files you will use as the base for the next time professional translations are done. While it's not strictly necessary to keep older versions of the files, sometimes it's useful to look at slightly older files without having to resurrect them from git.  Anything older than two release back can probably be deleted.
+
 ```bash
 toladata$ cp <locale>/fr/LC_MESSAGES/django.po <prof_translated>/<new_release>/django_fr_final.po
 toladata$ cp <locale>/fr/LC_MESSAGES/djangojs.po <prof_translated>/<new_release>/djangojs_fr_final.po
 ```
-A couple of notes about this step.
-- If there were new or fuzzy strings to translate after running the last `makemessages` and `makemessagesjs`, it would still be ok to copy the .po files from the lacale directory to the <prof_translated> directory.  However, if you've already provided Google translations of the missing strings, then you copy the `<tempdir>/django_fr_final.po` and `<tempdir>/djangojs_fr_final.po` files into `<prof_translated>` instead.
-- While it's not strictly necessary to keep older versions of the files, sometimes it's useful to look at slightly older files without having to resurrect them from git.  Anything older than two release back can probably be deleted.
+
+
+## Catch remaining translations
+In the time it took for the translators to translate files, it's possible that additional code has been pushed that includes translations.  To catch these items, you should run `makemessages` and `makemessagesjs` again, just as above, and examine the updated .po files for new fuzzy and untranslated strings. You may need to provide Google translations for these remaining strings.
+
+
+## Cleanup and Compile
+You should now have django.po and djangojs.po files in both the `<locale>/fr/LC_MESSAGES/` directory, and these files should no longer contain any fuzzy or untranslated strings, even if you run the `makemessages` commands again.  The last step is to compile the .po files into a binary .mo format that Django can consume.
+```bash
+toladata$ ./manage.py compilemessages
+```
 
 
 The translation process should now be complete.
