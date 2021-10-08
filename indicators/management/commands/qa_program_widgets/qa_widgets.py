@@ -85,27 +85,27 @@ class IndicatorFactory:
     standard_params_base = []
     for freq in Indicator.TARGET_FREQUENCIES:
         for uom_type in (Indicator.NUMBER, Indicator.PERCENTAGE):
-            for is_cumulative in (True, False):
+            for is_cumulative in (1, 0):
                 for direction in (Indicator.DIRECTION_OF_CHANGE_POSITIVE, Indicator.DIRECTION_OF_CHANGE_NEGATIVE):
                     # Don't create indicators that are LoP|cumulative or percent|non-cumulative
                     # since we don't support those combinations
-                    if (freq[0] == Indicator.LOP and is_cumulative) or \
-                            (uom_type == Indicator.PERCENTAGE and not is_cumulative):
+                    if (freq[0] == Indicator.LOP and is_cumulative == 1) or \
+                            (uom_type == Indicator.PERCENTAGE and is_cumulative == 0):
                         continue
                     standard_params_base.append({
                         'freq': freq[0], 'uom_type': uom_type, 'is_cumulative': is_cumulative,
                         'direction': direction, 'null_level': None})
 
     null_supplements_params = [
-        {'freq': Indicator.ANNUAL, 'uom_type': Indicator.NUMBER, 'is_cumulative': False,
+        {'freq': Indicator.ANNUAL, 'uom_type': Indicator.NUMBER, 'is_cumulative': 0,
          'direction': Indicator.DIRECTION_OF_CHANGE_POSITIVE, 'null_level': 'targets'},
-        {'freq': Indicator.QUARTERLY, 'uom_type': Indicator.PERCENTAGE, 'is_cumulative': True,
+        {'freq': Indicator.QUARTERLY, 'uom_type': Indicator.PERCENTAGE, 'is_cumulative': 1,
          'direction': Indicator.DIRECTION_OF_CHANGE_NONE, 'null_level': 'results'},
-        {'freq': Indicator.LOP, 'uom_type': Indicator.NUMBER, 'is_cumulative': False,
+        {'freq': Indicator.LOP, 'uom_type': Indicator.NUMBER, 'is_cumulative': 0,
          'direction': Indicator.DIRECTION_OF_CHANGE_NONE, 'null_level': 'results'},
-        {'freq': Indicator.EVENT, 'uom_type': Indicator.PERCENTAGE, 'is_cumulative': True,
+        {'freq': Indicator.EVENT, 'uom_type': Indicator.PERCENTAGE, 'is_cumulative': 1,
          'direction': Indicator.DIRECTION_OF_CHANGE_NEGATIVE, 'null_level': 'evidence'},
-        {'freq': Indicator.MID_END, 'uom_type': Indicator.NUMBER, 'is_cumulative': False,
+        {'freq': Indicator.MID_END, 'uom_type': Indicator.NUMBER, 'is_cumulative': 0,
          'direction': Indicator.DIRECTION_OF_CHANGE_POSITIVE, 'null_level': 'evidence'},
     ]
 
@@ -193,7 +193,7 @@ class IndicatorFactory:
         result_disagg_cycle = cycle(['sadd', 'one', 'two', 'none', 'all', 'all', 'all', 'none'])
 
         for n, params in enumerate(param_sets):
-            if params['is_cumulative']:
+            if params['is_cumulative'] == 1:
                 cumulative_text = 'Cumulative'
             else:
                 cumulative_text = 'Non-cumulative'
@@ -281,7 +281,7 @@ class IndicatorFactory:
             for i, pt in enumerate(periodic_targets):
                 pt.target = incrementors['target_start'] + incrementors['target_increment'] * i
                 pt.save()
-                if params['is_cumulative']:
+                if params['is_cumulative'] == 1:
                     lop_target = pt.target
                 else:
                     lop_target += pt.target
@@ -345,7 +345,7 @@ class IndicatorFactory:
     def calc_target_and_achieved_base(uom_type, direction, is_cumulative, pt_count):
         if uom_type == Indicator.NUMBER:
             if direction == Indicator.DIRECTION_OF_CHANGE_POSITIVE:
-                if is_cumulative:
+                if is_cumulative == 1:
                     target_start = 100
                     target_increment = target_start
                     achieved_start = 90
@@ -356,7 +356,7 @@ class IndicatorFactory:
                     achieved_start = 90
                     achieved_increment = int(achieved_start * 1.1)
             else:
-                if is_cumulative:
+                if is_cumulative == 1:
                     target_start = 500
                     target_increment = -int(math.floor((target_start / pt_count) / 10) * 10)
                     achieved_start = 400
@@ -536,12 +536,9 @@ class Cleaner:
     def clean(cls, *args):
         if 'clean_all' in args:
             cls.clean_programs()
-            cls.clean_tolaland()
             cls.clean_test_users()
 
         else:
-            if 'clean_tolaland' in args:
-                cls.clean_tolaland()
             if 'clean_programs' in args:
                 cls.clean_programs()
             if 'clean_test_users' in args:
@@ -555,17 +552,6 @@ class Cleaner:
         tola_users.delete()
         auth_users.delete()
         print(message)
-
-    @staticmethod
-    def clean_tolaland():
-        try:
-            country = Country.objects.get(country='Tolaland')
-            print("Deleting country: {}".format(country))
-            disaggregations = DisaggregationType.objects.filter(country=country)
-            disaggregations.delete()
-            country.delete()
-        except Country.DoesNotExist:
-            pass
 
     @staticmethod
     def clean_programs():

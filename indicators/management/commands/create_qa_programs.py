@@ -34,7 +34,6 @@ class Command(BaseCommand):
 
     def add_arguments(self, parser):
         parser.add_argument('--clean_programs', action='store_true')
-        parser.add_argument('--clean_tolaland', action='store_true')
         parser.add_argument('--clean_test_users', action='store_true')
         parser.add_argument('--clean_all', action='store_true')
         parser.add_argument('--create_test_users', action='store_true')

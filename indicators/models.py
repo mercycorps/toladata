@@ -1152,6 +1152,15 @@ class Indicator(SafeDeleteModel):
         ('participant_accountability', _('Participant accountability'))
     ]
 
+    NON_CUMULATIVE = 0
+    CUMULATIVE = 1
+    NON_SUMMING_CUMULATIVE = 2
+    IS_CUMULATIVE_CHOICES = [
+        (NON_CUMULATIVE, 'Non-cumulative'),
+        (CUMULATIVE, 'Cumulative'),
+        (NON_SUMMING_CUMULATIVE, 'Non-summing cumulative')
+    ]
+
     indicator_key = models.UUIDField(
         default=uuid.uuid4, help_text=" ", verbose_name=_("Indicator key"))
 
@@ -1284,8 +1293,8 @@ class Indicator(SafeDeleteModel):
                     "will have exceeded our indicator target when the result is lower than the target.")
     )
 
-    is_cumulative = models.NullBooleanField(
-        blank=False, verbose_name=_("C / NC"), help_text=" "
+    is_cumulative = models.IntegerField(
+        null=True, blank=False, verbose_name=_("C / NC"), help_text=" ",
     )
 
     rationale_for_target = models.TextField(

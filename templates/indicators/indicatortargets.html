@@ -131,10 +131,10 @@
                 <input
                     type="radio"
                     name="is_cumulative"
-                    value="3"
+                    value="0"
                     required
                     {% if readonly %} disabled="disabled" {% endif %}
-                    {% if indicator.is_cumulative is None or indicator.is_cumulative is False %} checked {% endif %}
+                    {% if indicator.is_cumulative is None or indicator.is_cumulative == 0 %} checked {% endif %}
                     class="form-control form-check-input"
                     id="id_is_cumulative_1"
                     >
@@ -150,10 +150,10 @@
                 <input
                     type="radio"
                     name="is_cumulative"
-                    value="2"
+                    value="1"
                     required
                     {% if readonly %} disabled="disabled" {% endif %}
-                    {% if indicator.is_cumulative is True %} checked {% endif %}
+                    {% if indicator.is_cumulative == 1 %} checked {% endif %}
                     class="form-control form-check-input"
                     id="id_is_cumulative_2"
                     >
