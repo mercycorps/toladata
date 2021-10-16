@@ -91,19 +91,8 @@ def target_actual_annotation():
     return models.Case(
         models.When(
             models.Q(
-                models.Q(indicator__unit_of_measure_type=Indicator.PERCENTAGE) &
-                models.Q(indicator__target_frequency__in=[f[0] for f in utils.TIME_AWARE_FREQUENCIES])
-            ),
-            then=models.Subquery(
-                Result.objects.filter(
-                    periodic_target=models.OuterRef('pk')
-                ).order_by('-date_collected').values('achieved')[:1],
-            )
-        ),
-        models.When(
-            models.Q(
-                models.Q(indicator__unit_of_measure_type=Indicator.PERCENTAGE) &
-                ~models.Q(indicator__target_frequency__in=[f[0] for f in utils.TIME_AWARE_FREQUENCIES])
+                models.Q(indicator__unit_of_measure_type=Indicator.PERCENTAGE) |
+                models.Q(indicator__is_cumulative=Indicator.NON_SUMMING_CUMULATIVE)
             ),
             then=models.Subquery(
                 Result.objects.filter(
