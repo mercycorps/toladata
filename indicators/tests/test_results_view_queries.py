@@ -160,12 +160,12 @@ class TestAnnualCumulativeNumeric(TestAnnualNoncumulativeNumeric):
     lop_actual_progress = 33
     lop_percent_met_progress = 1.65
     target_values = [10, 20, 50, 90]
-    result_values = [8, 25, 45]
+    result_values = [8, [15, 10], 45]
     expected_results_values = [8, 33, 78, None]
     expected_percent_mets = [0.8, 1.65, 1.56, None]
 
 
-class TestAnnualNonSummingCumulativeNumeric(TestAnnualNoncumulativeNumeric):
+class TestAnnualNonSummingCumulativeNumericLarge(TestAnnualNoncumulativeNumeric):
     is_cumulative = Indicator.NON_SUMMING_CUMULATIVE
     lop_target = 2000
     calculated_lop_target = 90
@@ -179,6 +179,21 @@ class TestAnnualNonSummingCumulativeNumeric(TestAnnualNoncumulativeNumeric):
     result_values = [8, [15, 25], 45]
     expected_results_values = [8, 25, 45, None]
     expected_percent_mets = [0.8, 1.25, .9, None]
+
+class TestAnnualNonSummingCumulativeNumericSmall(TestAnnualNoncumulativeNumeric):
+    is_cumulative = Indicator.NON_SUMMING_CUMULATIVE
+    lop_target = 2000
+    calculated_lop_target = 90
+    progress_lop_target = 20
+    lop_actual = 45
+    #lop_percent_met = 0.39
+    lop_percent_met = .5  # new version based on calculated lop target
+    lop_actual_progress = 15
+    lop_percent_met_progress = .75
+    target_values = [10, 20, 50, 90]
+    result_values = [8, [35, 15], 45]
+    expected_results_values = [8, 15, 45, None]
+    expected_percent_mets = [0.8, .75, .9, None]
 
 
 class TestMidEndPercent(TestAnnualNoncumulativeNumeric):
