@@ -72,13 +72,11 @@ class Command(BaseCommand):
         named_testers = {
             'Alex': 'atran@mercycorps.org',
             'André': 'anthomas@mercycorps.org',
-            'Cameron': 'cmcfee@mercycorps.org',
             'Carly': 'colenick@mercycorps.org',
-            'Jenny': 'jmarx@mercycorps.org',
+            'Margaux': 'mtroiano@mercycorps.org',
             'Marie': 'mbakke@mercycorps.org',
             'Marco': 'mscagliusi@mercycorps.org',
             'PaQ': None,
-            'Paul': 'psouders@mercycorps.org',
             'Sanjuro': 'sjogdeo@mercycorps.org',
         }
 

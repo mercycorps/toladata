@@ -44,6 +44,8 @@ class ProgramFactory:
 
         program = Program.objects.create(**{
             'name': name,
+            'start_date': start_date,
+            'end_date': end_date,
             'reporting_period_start': start_date,
             'reporting_period_end': end_date,
             'funding_status': 'Funded',
@@ -85,27 +87,33 @@ class IndicatorFactory:
     standard_params_base = []
     for freq in Indicator.TARGET_FREQUENCIES:
         for uom_type in (Indicator.NUMBER, Indicator.PERCENTAGE):
-            for is_cumulative in (1, 0):
+            for is_cumulative in Indicator.IS_CUMULATIVE_CHOICES:
                 for direction in (Indicator.DIRECTION_OF_CHANGE_POSITIVE, Indicator.DIRECTION_OF_CHANGE_NEGATIVE):
                     # Don't create indicators that are LoP|cumulative or percent|non-cumulative
                     # since we don't support those combinations
-                    if (freq[0] == Indicator.LOP and is_cumulative == 1) or \
-                            (uom_type == Indicator.PERCENTAGE and is_cumulative == 0):
+                    if (freq[0] == Indicator.LOP and is_cumulative[0] in [Indicator.CUMULATIVE, Indicator.NON_SUMMING_CUMULATIVE]) or \
+                            (uom_type == Indicator.PERCENTAGE and is_cumulative[0] in [Indicator.NON_CUMULATIVE, Indicator.NON_SUMMING_CUMULATIVE]):
                         continue
                     standard_params_base.append({
-                        'freq': freq[0], 'uom_type': uom_type, 'is_cumulative': is_cumulative,
+                        'freq': freq[0], 'uom_type': uom_type, 'is_cumulative': is_cumulative[0],
                         'direction': direction, 'null_level': None})
 
     null_supplements_params = [
         {'freq': Indicator.ANNUAL, 'uom_type': Indicator.NUMBER, 'is_cumulative': 0,
          'direction': Indicator.DIRECTION_OF_CHANGE_POSITIVE, 'null_level': 'targets'},
+        {'freq': Indicator.ANNUAL, 'uom_type': Indicator.NUMBER, 'is_cumulative': 2,
+         'direction': Indicator.DIRECTION_OF_CHANGE_POSITIVE, 'null_level': 'targets'},
         {'freq': Indicator.QUARTERLY, 'uom_type': Indicator.PERCENTAGE, 'is_cumulative': 1,
          'direction': Indicator.DIRECTION_OF_CHANGE_NONE, 'null_level': 'results'},
         {'freq': Indicator.LOP, 'uom_type': Indicator.NUMBER, 'is_cumulative': 0,
          'direction': Indicator.DIRECTION_OF_CHANGE_NONE, 'null_level': 'results'},
+        {'freq': Indicator.LOP, 'uom_type': Indicator.NUMBER, 'is_cumulative': 2,
+         'direction': Indicator.DIRECTION_OF_CHANGE_NONE, 'null_level': 'results'},
         {'freq': Indicator.EVENT, 'uom_type': Indicator.PERCENTAGE, 'is_cumulative': 1,
          'direction': Indicator.DIRECTION_OF_CHANGE_NEGATIVE, 'null_level': 'evidence'},
         {'freq': Indicator.MID_END, 'uom_type': Indicator.NUMBER, 'is_cumulative': 0,
+         'direction': Indicator.DIRECTION_OF_CHANGE_POSITIVE, 'null_level': 'evidence'},
+        {'freq': Indicator.MID_END, 'uom_type': Indicator.NUMBER, 'is_cumulative': 2,
          'direction': Indicator.DIRECTION_OF_CHANGE_POSITIVE, 'null_level': 'evidence'},
     ]
 
@@ -188,15 +196,17 @@ class IndicatorFactory:
 
         # Regardless of what disaggs an indicator has assigned, this controls how many disaggas actually get
         # used by a result.  That way, there are potentially some results that don't have disagg values
-        # even though the indicator has been assigned a particular disagg type.  one and two
+        # even though the indicator has been assigned a particular disagg type.  "one" and "two"
         # indicate that one or two disagg types should be used but not the SADD type.
         result_disagg_cycle = cycle(['sadd', 'one', 'two', 'none', 'all', 'all', 'all', 'none'])
 
         for n, params in enumerate(param_sets):
             if params['is_cumulative'] == 1:
                 cumulative_text = 'Cumulative'
-            else:
+            elif params['is_cumulative'] == Indicator.NON_CUMULATIVE:
                 cumulative_text = 'Non-cumulative'
+            else:
+                cumulative_text = 'Non-sum cumulative'
 
             indicator_disagg_count = next(country_disagg_cycle)
             sadd_disagg_flag = next(sadd_disagg_cycle)
@@ -281,7 +291,7 @@ class IndicatorFactory:
             for i, pt in enumerate(periodic_targets):
                 pt.target = incrementors['target_start'] + incrementors['target_increment'] * i
                 pt.save()
-                if params['is_cumulative'] == 1:
+                if params['is_cumulative'] in [Indicator.CUMULATIVE, Indicator.NON_SUMMING_CUMULATIVE]:
                     lop_target = pt.target
                 else:
                     lop_target += pt.target
@@ -345,7 +355,7 @@ class IndicatorFactory:
     def calc_target_and_achieved_base(uom_type, direction, is_cumulative, pt_count):
         if uom_type == Indicator.NUMBER:
             if direction == Indicator.DIRECTION_OF_CHANGE_POSITIVE:
-                if is_cumulative == 1:
+                if is_cumulative in [Indicator.CUMULATIVE, Indicator.NON_SUMMING_CUMULATIVE]:
                     target_start = 100
                     target_increment = target_start
                     achieved_start = 90
@@ -356,7 +366,7 @@ class IndicatorFactory:
                     achieved_start = 90
                     achieved_increment = int(achieved_start * 1.1)
             else:
-                if is_cumulative == 1:
+                if is_cumulative in [Indicator.CUMULATIVE, Indicator.NON_SUMMING_CUMULATIVE]:
                     target_start = 500
                     target_increment = -int(math.floor((target_start / pt_count) / 10) * 10)
                     achieved_start = 400
@@ -416,7 +426,7 @@ class ResultFactory:
             if (self.apply_skips and result_skip) or self.null_level == 'results':
                 continue
 
-            achieved_value = incrementors['achieved_start'] + (incrementors['achieved_increment'] * i)
+            achieved_value = max(0, incrementors['achieved_start'] + (incrementors['achieved_increment'] * i))
 
             results_to_create = 1
             if self.apply_skips and extra_result:
@@ -495,7 +505,6 @@ class ResultFactory:
             for label_index, value in zip(label_indexes, values):
                 label = label_set[label_index]
                 value_objects.append(DisaggregatedValue(category=label, value=value, result=result))
-
             DisaggregatedValue.objects.bulk_create(value_objects)
 
     @staticmethod
