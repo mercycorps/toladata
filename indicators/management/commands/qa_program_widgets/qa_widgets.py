@@ -154,7 +154,7 @@ class IndicatorFactory:
         return indicator_ids
 
     def create_indicators(
-            self, param_sets, indicator_suffix='', apply_skips=True, apply_rf_skips=False,
+            self, param_sets, indicator_suffix='', apply_skips=True, apply_satsuma_skips=False,
             personal_indicator=False, indicatorless_levels=None):
         indicatorless_levels = [] if not indicatorless_levels else indicatorless_levels
         indicator_ids = []
@@ -165,12 +165,12 @@ class IndicatorFactory:
         old_level_cycle = cycle(old_levels)
 
         rf_levels = list(Level.objects.filter(program__id=self.program.id).exclude(id__in=indicatorless_levels))
-        if apply_rf_skips:
+        if apply_satsuma_skips:
             rf_levels.append(None)
         rf_level_cycle = cycle(rf_levels)
 
         indicator_types = list(IndicatorType.objects.all())
-        if apply_skips:
+        if apply_satsuma_skips:
             indicator_types.append(None)
         type_cycle = cycle(indicator_types)
 

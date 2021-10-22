@@ -182,7 +182,7 @@ class Command(BaseCommand):
         print(f'Creating {program_name}')
         program = program_factory.create_program(program_name, post_satsuma=False)
         indicator_factory = IndicatorFactory(program, tolaland)
-        indicator_factory.create_standard_indicators(apply_skips=False, apply_rf_skips=True)
+        indicator_factory.create_standard_indicators(apply_skips=False, apply_satsuma_skips=True)
 
         # Create programs with various levels of no data indicators
         program_name = 'QA program --- No Indicators Here'
