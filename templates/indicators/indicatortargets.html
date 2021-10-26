@@ -146,25 +146,6 @@
                     {% endblocktrans %}
                 </label>
             </div>
-            <div id="id_div_is_cumulative_section_nsc" class="form-check">
-                <input
-                    type="radio"
-                    name="is_cumulative"
-                    value="2"
-                    required
-                    {% if readonly %} disabled="disabled" {% endif %}
-                    {% if indicator.is_cumulative == 2 %} checked {% endif %}
-                    class="form-control form-check-input"
-                    id="id_is_cumulative_nsc"
-                    >
-                <label
-                    class="form-check-label"
-                    for="id_is_cumulative_nsc">
-                    {% blocktrans %}
-                    <strong>Targets, actuals, and results are cumulative.</strong> Target period actuals mirror the most recent result for that target period; no calculations are performed with results or actuals. The Life of Program target mirrors the last target, and the Life of Program actual mirrors the most recent actual.
-                    {% endblocktrans %}
-                </label>
-            </div>
              <div id="id_div_is_cumulative_section_c" class="form-check">
                 <input
                     type="radio"
@@ -184,7 +165,25 @@
                     {% endblocktrans %}
                 </label>
             </div>
-
+            <div id="id_div_is_cumulative_section_nsc" class="form-check">
+                <input
+                    type="radio"
+                    name="is_cumulative"
+                    value="2"
+                    required
+                    {% if readonly %} disabled="disabled" {% endif %}
+                    {% if indicator.is_cumulative == 2 %} checked {% endif %}
+                    class="form-control form-check-input"
+                    id="id_is_cumulative_nsc"
+                    >
+                <label
+                    class="form-check-label"
+                    for="id_is_cumulative_nsc">
+                    {% blocktrans %}
+                    <strong>Targets, actuals, and results are cumulative.</strong> Target period actuals mirror the most recent result for that target period; no calculations are performed with results or actuals. The Life of Program target mirrors the last target, and the Life of Program actual mirrors the most recent actual.
+                    {% endblocktrans %}
+                </label>
+            </div>
             <div id="id_div_is_cumulative_section_c_only" class="form-group">
                 <span class="form-check-label">
                     {% blocktrans %}
