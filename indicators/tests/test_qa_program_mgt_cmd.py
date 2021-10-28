@@ -50,7 +50,7 @@ class TestQAScript(test.TestCase):
         qa_data['level'] = qa_indicator.level.id
         qa_data['baseline'] = 0
         qa_data['baseline_na'] = False
-        qa_data['is_cumulative'] = False
+        qa_data['is_cumulative'] = 0
 
         url = reverse('indicator_update', args=[qa_indicator.id])
         response = self.client.post(url, qa_data)

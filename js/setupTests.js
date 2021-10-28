@@ -15,5 +15,8 @@ $.fn.extend({
     popover: function() {return; },
 })
 
+// this eliminates the test errors from the use of window.scrollBy
+const noop = () => {};
+Object.defineProperty(window, 'scrollBy', { value: noop, writable: true });
 
 configure({ adapter: new Adapter() });

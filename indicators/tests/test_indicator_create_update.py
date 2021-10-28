@@ -35,7 +35,8 @@ class TestIndcatorCreateUpdateBase(TestBase):
             'direction_of_change': Indicator.DIRECTION_OF_CHANGE_NONE,
             'periodic_targets': json.dumps(periodic_targets),
             'rationale': 'foo',
-            'indicator_key': uuid.uuid4()
+            'indicator_key': uuid.uuid4(),
+            'is_cumulative': 0,
         }
 
 

@@ -34,7 +34,6 @@ class Command(BaseCommand):
 
     def add_arguments(self, parser):
         parser.add_argument('--clean_programs', action='store_true')
-        parser.add_argument('--clean_tolaland', action='store_true')
         parser.add_argument('--clean_test_users', action='store_true')
         parser.add_argument('--clean_all', action='store_true')
         parser.add_argument('--create_test_users', action='store_true')
@@ -73,13 +72,11 @@ class Command(BaseCommand):
         named_testers = {
             'Alex': 'atran@mercycorps.org',
             'André': 'anthomas@mercycorps.org',
-            'Cameron': 'cmcfee@mercycorps.org',
             'Carly': 'colenick@mercycorps.org',
-            'Jenny': 'jmarx@mercycorps.org',
+            'Margaux': 'mtroiano@mercycorps.org',
             'Marie': 'mbakke@mercycorps.org',
             'Marco': 'mscagliusi@mercycorps.org',
             'PaQ': None,
-            'Paul': 'psouders@mercycorps.org',
             'Sanjuro': 'sjogdeo@mercycorps.org',
         }
 
@@ -185,7 +182,7 @@ class Command(BaseCommand):
         print(f'Creating {program_name}')
         program = program_factory.create_program(program_name, post_satsuma=False)
         indicator_factory = IndicatorFactory(program, tolaland)
-        indicator_factory.create_standard_indicators(apply_skips=False, apply_rf_skips=True)
+        indicator_factory.create_standard_indicators(apply_skips=False, apply_satsuma_skips=True)
 
         # Create programs with various levels of no data indicators
         program_name = 'QA program --- No Indicators Here'

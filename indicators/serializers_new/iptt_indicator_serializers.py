@@ -352,7 +352,8 @@ class IPTTIndicatorReportBase:
         """Return result totals (achieved/disaggregated-values) for a given set of results"""
         if not results:
             return (None, self._disaggregations_dict())
-        if indicator.unit_of_measure_type == Indicator.PERCENTAGE:
+        if indicator.unit_of_measure_type == Indicator.PERCENTAGE or \
+                indicator.is_cumulative == Indicator.NON_SUMMING_CUMULATIVE:
             results = [result for result in results if result.achieved is not None][-1:]
         get_dv = lambda result, category_id: next(
             (dv.value for dv in result.prefetch_disaggregated_values if dv.category_id == category_id), None
