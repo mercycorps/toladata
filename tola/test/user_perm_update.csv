@@ -1,0 +1,7 @@
+﻿Name,Email,Countries,User Role,Permissions
+No Countré,nocountre@mercycorps.org,Africa,User,Low - View Only
+First Country,firstcountry@mercycorps.org,Africa,User,Low - View Only
+Admin Country,admincountry@mercycorps.org,Africa,User,Low - View Only
+Americas Country,americascountry@mercycorps.org,Nigeria,User,Low - View Only
+All Country,allcountry@mercycorps.org,All,User,Low - View Only
+AdminAll Country,alladmincountry@mercycorps.org,All,Basic_Admin,Low - View Only
