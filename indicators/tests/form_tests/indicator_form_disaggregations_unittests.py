@@ -58,7 +58,7 @@ class TestIndicatorCreateFormDisaggregations(test.TestCase):
         data = kwargs.get('data', None)
         program = kwargs.get('program', self.program)
         request = mock.MagicMock()
-        request.user.tola_user.access_data = {'countries': {self.country.pk: [], self.user_country.pk: []}}
+        request.user.tola_user.available_countries = [self.country, self.user_country]
         return IndicatorForm(data, program=program, request=request, auto_id=False)
 
 
@@ -425,7 +425,7 @@ class TestIndicatorUpdateFormDisaggregations(test.TestCase):
             'target_frequency_num_periods': 1 if not instance else instance.target_frequency_num_periods
         })
         request = mock.MagicMock()
-        request.user.tola_user.access_data = {'countries': {self.country.pk: [], self.user_country.pk: []}}
+        request.user.tola_user.available_countries = [self.country, self.user_country]
         form_kwargs = {
             'program': program,
             'initial': initial,
