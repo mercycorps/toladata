@@ -321,11 +321,7 @@ class IndicatorForm(forms.ModelForm):
         self.fields['data_collection_frequencies'].choices = [
             (pk, _(freq)) for pk, freq in self.fields['data_collection_frequencies'].choices]
 
-        allowed_countries = [
-            *self.request.user.tola_user.access_data.get('countries', {}).keys(),
-            *[programaccess['country'] for programaccess in self.request.user.tola_user.access_data.get('programs', [])
-              if programaccess['program'] == self.programval.pk]
-        ]
+        allowed_countries = [ac.id for ac in self.request.user.tola_user.available_countries]
         countries = self.programval.country.filter(
             pk__in=allowed_countries
         )
@@ -635,11 +631,7 @@ class IndicatorCompleteForm(forms.ModelForm):
         self.fields['data_collection_frequencies'].choices = [
             (pk, _(freq)) for pk, freq in self.fields['data_collection_frequencies'].choices]
 
-        allowed_countries = [
-            *self.request.user.tola_user.access_data.get('countries', {}).keys(),
-            *[programaccess['country'] for programaccess in self.request.user.tola_user.access_data.get('programs', [])
-              if programaccess['program'] == self.programval.pk]
-        ]
+        allowed_countries = [ac.id for ac in self.request.user.tola_user.available_countries]
         countries = self.programval.country.filter(
             pk__in=allowed_countries
         )
