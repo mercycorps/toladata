@@ -200,16 +200,26 @@ const NoTargetResultRow = ({result, ...props}) => {
 const LoPRow = ({indicator, ...props}) => {
     const localizer = useContext(LocalizerContext);
     var lopMessage;
+    var lopHelp;
     if (indicator.isCumulative === 0){
-        lopMessage = gettext("<strong>Targets, actuals, and results are non-cumulative.</strong> Target period actuals are the sum of all results for that target period. Life of Program target and actual are the sum of all target periods.");
+        // # Translators: breif description of summing rules a series of numbers
+        lopMessage = gettext("Targets, actuals, and results are non-cumulative.")
+        // # Translators: explanation of the summing rules for the totals row on a list of results
+        lopHelp = gettext("<strong>Targets, actuals, and results are non-cumulative.</strong> Target period actuals are the sum of all results for that target period. Life of Program target and actual are the sum of all target periods.");
     }
     else if (indicator.isCumulative === 1 && !indicator.isPercent){
-        lopMessage = gettext("<strong>Targets and actuals are cumulative; results are non-cumulative.</strong> Target period actuals are the sum of the results from the current and all previous target periods. The Life of Program target mirrors the last target, and the Life of Program actual mirrors the most recent actual.");
+        // # Translators: breif description of summing rules a series of numbers
+        lopMessage = gettext("Targets and actuals are cumulative; results are non-cumulative.")
+        // # Translators: explanation of the summing rules for the totals row on a list of results
+        lopHelp = gettext("<strong>Targets and actuals are cumulative; results are non-cumulative.</strong> Target period actuals are the sum of the results from the current and all previous target periods. The Life of Program target mirrors the last target, and the Life of Program actual mirrors the most recent actual.");
     }
     else {
+        // # Translators: breif description of summing rules a series of numbers
+        lopMessage = gettext("Targets, actuals, and results are cumulative.")
         // # Translators: explanation of the summing rules for the totals row on a list of results
-        lopMessage = gettext("<strong>Targets, actuals, and results are cumulative.</strong> Target period actuals mirror the most recent result for that target period; no calculations are performed with results or actuals. The Life of Program target mirrors the last target, and the Life of Program actual mirrors the most recent actual.");
+        lopHelp = gettext("<strong>Targets, actuals, and results are cumulative.</strong> Target period actuals mirror the most recent result for that target period; no calculations are performed with results or actuals. The Life of Program target mirrors the last target, and the Life of Program actual mirrors the most recent actual.");
     }
+
     return (
         <tr className="bg-white">
             <td><strong>{
@@ -219,7 +229,7 @@ const LoPRow = ({indicator, ...props}) => {
                 {!indicator.noTargets &&
                     <span className={'ml-1'}>
                         <HelpPopover
-                            content={lopMessage}
+                            content={lopHelp}
                             className={'popover-icon results-table__lop-row--help-text'}
                         />
                     </span>
@@ -228,7 +238,7 @@ const LoPRow = ({indicator, ...props}) => {
             <td className="text-right"><strong>{ localizer(indicator.lopTarget) || EM_DASH }</strong></td>
             <td className="text-right"><strong>{ localizer(indicator.lopActual) || EM_DASH }</strong></td>
             <td className="text-right"><span className="badge">{ localizePercent(indicator.lopMet) || N_A }</span></td>
-            <td colSpan="3"></td>
+            <td colSpan="3"><div className="help-text">{ lopMessage }</div></td>
         </tr>
     )
 }
