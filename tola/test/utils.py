@@ -35,7 +35,7 @@ class IndicatorValues(object):
     def __init__(
             self,
             periodic_targets,
-            is_cumulative=False,
+            is_cumulative=Indicator.NON_CUMULATIVE,
             direction_of_change=Indicator.DIRECTION_OF_CHANGE_NONE,
             target_frequency=Indicator.ANNUAL,
             lop_target=0,
@@ -190,7 +190,7 @@ def generate_core_indicator_data(c_params=None, p_count=3, i_count=4):
         for p in programs:
             program_ids.append(p.id)
             indicators = IndicatorFactory.create_batch(
-                i_count, program=p, unit_of_measure_type=Indicator.NUMBER, is_cumulative=False,
+                i_count, program=p, unit_of_measure_type=Indicator.NUMBER, is_cumulative=Indicator.NON_CUMULATIVE,
                 direction_of_change=Indicator.DIRECTION_OF_CHANGE_NONE, target_frequency=Indicator.ANNUAL)
             indicator_ids = [i.id for i in indicators]
             p.indicator_set.add(*indicators)
@@ -217,7 +217,7 @@ def decimalize(number):
 
 class TimedTestResult(ut_runner.TextTestResult):
     SLOW_TEST_THRESHOLD = 2
-    
+
     def __init__(self, *args, **kwargs):
         super(TimedTestResult, self).__init__(*args, **kwargs)
         self.test_timings = []

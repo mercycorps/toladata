@@ -426,7 +426,7 @@ def _period_value_annotation(result_set, period):
                 ).order_by('-date_collected').values('this_value')[:1])
         ),
         models.When(
-            is_cumulative=True,
+            is_cumulative=Indicator.CUMULATIVE,
             then=models.Subquery(
                 result_set.order_by().values('indicator').annotate(
                     this_period_count=models.Sum(
@@ -517,7 +517,7 @@ def _mid_end_annotation(result_set, count):
                 result_set.filter(periodic_target__customsort=count).order_by('-date_collected').values('this_value')[:1])
         ),
         models.When(
-            is_cumulative=True,
+            is_cumulative=Indicator.CUMULATIVE,
             then=models.Subquery(
                 result_set.order_by().values('indicator').annotate(
                     this_period_count=models.Sum(

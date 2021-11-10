@@ -27,7 +27,7 @@ Indicators:
     EVENT - 1.1b - "19.1" - Numeric NC - baseline 0
         no sites - types 1 + 2 - sector 1
         One result month 1 event 1
-        country disagg (disagg'd result) 
+        country disagg (disagg'd result)
 """
 
 import datetime
@@ -173,7 +173,7 @@ class IPTTScenarioGeneral:
                 category=label,
                 value=value
             )
-        
+
 
     def get_indicator1(self):
         indicator = RFIndicatorFactory(
@@ -184,7 +184,7 @@ class IPTTScenarioGeneral:
             name="Indicåtor Náme 1",
             number="1.1.1",
             unit_of_measure_type=Indicator.NUMBER,
-            is_cumulative=False,
+            is_cumulative=Indicator.NON_CUMULATIVE,
             baseline=0,
             baseline_na=False,
             sector=self.sector1,
@@ -222,7 +222,7 @@ class IPTTScenarioGeneral:
             name="Indicåtor Náme 3",
             number="x4.1",
             unit_of_measure_type=Indicator.NUMBER,
-            is_cumulative=True,
+            is_cumulative=Indicator.CUMULATIVE,
             baseline=100,
             baseline_na=False,
             sector=self.sector2,
@@ -245,7 +245,7 @@ class IPTTScenarioGeneral:
             name="Indicåtor Náme 4",
             number="4a",
             unit_of_measure_type=Indicator.NUMBER,
-            is_cumulative=False,
+            is_cumulative=Indicator.NON_CUMULATIVE,
             baseline=0,
             baseline_na=False,
             sector=self.sector1,
@@ -293,7 +293,7 @@ class IPTTScenarioGeneral:
             name="Indicåtor Náme 6",
             number="21.4",
             unit_of_measure_type=Indicator.NUMBER,
-            is_cumulative=True,
+            is_cumulative=Indicator.CUMULATIVE,
             baseline=100,
             baseline_na=False,
             sector=self.sector2,
@@ -318,7 +318,7 @@ class IPTTScenarioGeneral:
             name="Indicåtor Náme 7",
             number="19.1",
             unit_of_measure_type=Indicator.NUMBER,
-            is_cumulative=False,
+            is_cumulative=Indicator.NON_CUMULATIVE,
             baseline=0,
             baseline_na=False,
             sector=self.sector1,
@@ -443,7 +443,7 @@ class IPTTScenarioSums:
                 (datetime.date(2016, 1, 1), indicator_multi_result.periodictargets.first()),
                 (datetime.date(2016, 5, 1), indicator_multi_result.periodictargets.all()[1]),
                 (datetime.date(2016, 12, 30), indicator_multi_result.periodictargets.all()[3])
-                ]:    
+                ]:
                 result = ResultFactory(
                     indicator=indicator_multi_result,
                     periodic_target=target,
@@ -528,13 +528,13 @@ class IndicatorGenerator:
                     yield child
         levels = get_children(None)
         return levels
-        
+
 
     def clear_after_test(self):
         Indicator.objects.all().delete()
         self.indicators_with_disaggregated_results = defaultdict(set)
-        
-        
+
+
     def add_indicator(self, **kwargs):
         disaggregations = kwargs.pop('disaggregations', [])
         disaggregations_with_results = kwargs.pop('disaggregated_results', [])
@@ -597,7 +597,7 @@ class IndicatorGenerator:
         if blank:
             levels = [None,] + levels
         return self._indicators_for_levels(levels, **kwargs)
-    
+
     def indicators_for_non_goal_levels(self, **kwargs):
         blank = kwargs.pop('blank', False)
         levels = self.levels[1:]
@@ -840,7 +840,7 @@ class IndicatorGenerator:
             yield self.add_indicator(
                 targets=100.25,
                 unit_of_measure_type=Indicator.NUMBER,
-                is_cumulative=False,
+                is_cumulative=Indicator.NON_CUMULATIVE,
                 results=[4.1,],
                 **frequency_kwargs,
                 **level_kwargs,
@@ -854,8 +854,8 @@ class IndicatorGenerator:
             results=[100],
             level=self.levels[0],
         )
-            
-        
+
+
 def results_generator(frequency, start_date, end_date):
     target_periods = list(PeriodicTarget.generate_for_frequency(frequency)(start_date, end_date))
     # one per target:
@@ -917,9 +917,9 @@ def results_generator(frequency, start_date, end_date):
         'date_collected': tp['start']+datetime.timedelta(days=1),
         'target': tp['customsort']
         } for tp in target_periods[::2]]
-    
-        
-    
+
+
+
 
 def levels_generator(levels, count, repeat=True):
     for level in itertools.cycle(levels) if repeat else iter(levels):

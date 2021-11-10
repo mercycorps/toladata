@@ -73,7 +73,7 @@ describe("full program page indicator", () => {
         name: "Test name",
         number: "Output 1.1a",
         is_percent: false,
-        is_cumulative: false,
+        is_cumulative: 0,
         baseline: "444",
         is_reporting: true,
         over_under: 0,
@@ -186,5 +186,5 @@ describe("full program page indicator", () => {
         indicator.updateData({pk: 23, number: "Output 1.1b"});
         expect(indicator.number).toBe("Output 1.1b");
     });
-    
+
 })

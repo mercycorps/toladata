@@ -129,7 +129,7 @@ class TestIPTTIndicatorSerializerQueries(test.TestCase):
                         'labels': []
                     }
                 disaggregations_map[label.disaggregation_type.pk]['labels'].append(label)
-            
+
             values_subquery = DisaggregatedValue.objects.select_related(None).prefetch_related(
                 None
             ).filter(
@@ -182,7 +182,7 @@ class TestIPTTIndicatorSerializerQueries(test.TestCase):
             full_context = {**context, 'is_tva': True, 'is_tva_full': True}
             full = IPTTExcelIndicatorSerializer.load_filtered(full_context).data
         return tp, tva, full
-        
+
     def test_loads_one_basic_indicator(self):
         indicator = self.get_base_indicator()
         for serialized_data in self.get_serialized_indicator_data():
@@ -462,7 +462,7 @@ class TestIPTTIndicatorSerializerQueries(test.TestCase):
         ):
             with self.assertNumQueries(0):
                 self.assertCountEqual([s_i['pk'] for s_i in report], two_tier_indicator_pks)
-                
+
 
     def test_disaggregations_data(self):
         i_gen = IndicatorGenerator(
@@ -814,7 +814,7 @@ class TestIPTTSerializedReportData(test.TestCase, DecimalComparator):
                         self.assertIsNone(period['disaggregations'][one_off_label]['actual'])
 
     def test_cumulative_indicators_in_tp_report(self):
-        results_list = list(self.i_gen.indicators_mixed_results(is_cumulative=True))
+        results_list = list(self.i_gen.indicators_mixed_results(is_cumulative=Indicator.CUMULATIVE))
         all_ones_label, one_off_label = [label.pk for label in self.i_gen.standard_disaggs[1].labels]
         report = self.get_serialized_report_data(frequency=Indicator.MONTHLY, tp_only=True)
         with self.assertNumQueries(0):
@@ -889,7 +889,7 @@ class TestIPTTSerializedReportData(test.TestCase, DecimalComparator):
                 lop_period['met'], get_decimal((2.0012 if noncumulative else 5.003 if cumulative else 1.0258), places=4)
             )
             return 0 if noncumulative else 1 if cumulative else 2
-            
+
         tva = False
         below_five_label = self.i_gen.standard_disaggs[0].labels[0].pk
         empty_label = self.i_gen.standard_disaggs[0].labels[1].pk

@@ -30,7 +30,7 @@ class TestBase(object):
         self.program.save()
         self.program = Program.objects.get()  # forces reporting_period_start/end from str to date()
         self.indicator = IndicatorFactory(
-            program=self.program, unit_of_measure_type=Indicator.NUMBER, is_cumulative=False,
+            program=self.program, unit_of_measure_type=Indicator.NUMBER, is_cumulative=Indicator.NON_CUMULATIVE,
             direction_of_change=Indicator.DIRECTION_OF_CHANGE_NONE, target_frequency=Indicator.ANNUAL)
 
         self.level = LevelFactory(program=self.program)

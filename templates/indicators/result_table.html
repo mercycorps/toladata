@@ -235,17 +235,15 @@
                 <div class="help-text">
                     {% if indicator.target_frequency is not None %}
                         {% if indicator.unit_of_measure_type == 1 %}
-                            {% if indicator.is_cumulative == True %}
-                                {% trans "Results are cumulative. The Life of Program result mirrors the latest period result." %}
-                            {% elif indicator.is_cumulative == False %}
-                                {% trans "Results are non-cumulative. The Life of Program result is the sum of target periods results." %}
+                            {% if indicator.is_cumulative == 0 %}
+                                {% trans "Targets, actuals, and results are non-cumulative." %}
+                            {% elif indicator.is_cumulative == 1 %}
+                                {% trans "Targets, actuals, and results are cumulative; results are non-cumulative" %}
+                            {% elif indicator.is_cumulative == 2 %}
+                                {% trans "Targets, actuals, and results are cumulative." %}
                             {% endif %}
                         {% elif indicator.unit_of_measure_type == 2 %}
-                            {% if indicator.is_cumulative == True %}
-                                {% trans "Results are cumulative. The Life of Program result mirrors the latest period result." %}
-                            {% elif indicator.is_cumulative == False %}
-                                {% trans "Results are non-cumulative. Target period and Life of Program results are calculated from the average of results." %}
-                            {% endif %}
+                            {% trans "Targets, actuals, and results are cumulative." %}
                         {% endif %}
                     {% endif %}
                 </div>

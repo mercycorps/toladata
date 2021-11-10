@@ -1618,7 +1618,7 @@ class Indicator(SafeDeleteModel):
     def is_cumulative_display(self):
         """Deprecated?  Could not find where this was used, but text is updated in both
         setup form and IPTT to read "Non-cumulative" """
-        if self.is_cumulative:
+        if self.is_cumulative in [Indicator.CUMULATIVE, Indicator.NON_SUMMING_CUMULATIVE]:
             # Translators: referring to an indicator whose results accumulate over time
             return _("Cumulative")
         elif self.is_cumulative is None:
@@ -1659,7 +1659,7 @@ class Indicator(SafeDeleteModel):
         if not periodic_targets.exists():
             return None
 
-        if self.is_cumulative:
+        if self.is_cumulative in [Indicator.CUMULATIVE, Indicator.NON_SUMMING_CUMULATIVE]:
             # return the last value in the sequence
             return periodic_targets.last().target
         else:
