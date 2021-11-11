@@ -370,7 +370,7 @@ class TestReportSerializers(test.TestCase):
             self.assertEqual(goal_indicators[0]['name'], SPECIAL_CHARACTERS)
             self.assertEqual(goal_indicators[0]['unit_of_measure'], 'bananas')
             self.assertEqual(goal_indicators[0]['direction_of_change'], '+')
-            self.assertEqual(goal_indicators[0]['is_cumulative'], False)
+            self.assertEqual(goal_indicators[0]['is_cumulative'], Indicator.NON_CUMULATIVE)
             self.assertEqual(goal_indicators[0]['unit_of_measure_type'], '#')
             self.assertEqual(goal_indicators[0]['baseline'], '100')
 

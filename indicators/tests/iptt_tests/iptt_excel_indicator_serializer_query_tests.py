@@ -637,13 +637,17 @@ class TestIPTTSerializedReportData(test.TestCase, DecimalComparator):
         percentage_pks = []
         cumulative_pks = []
         non_cumulative_pks = []
+        # TODO: SJ build out this section
+        non_summing_cumulative_pks = []
         for indicator in indicators:
             if indicator.unit_of_measure_type == Indicator.PERCENTAGE:
                 percentage_pks.append(indicator.pk)
-            elif indicator.is_cumulative:
+            elif indicator.is_cumulative == Indicator.CUMULATIVE:
                 cumulative_pks.append(indicator.pk)
-            else:
+            elif indicator.is_cumulative == Indicator.NON_CUMULATIVE:
                 non_cumulative_pks.append(indicator.pk)
+            else:
+                non_summing_cumulative_pks.append(indicator.pk)
         def universal_asserts(report, pk):
             report_data = report[pk]
             self.assertEqual(report_data['pk'], pk)
@@ -701,7 +705,8 @@ class TestIPTTSerializedReportData(test.TestCase, DecimalComparator):
         for report in self.get_serialized_report_data():
             with self.assertNumQueries(0):
                 for indicator in indicators:
-                    if indicator.unit_of_measure_type == Indicator.PERCENTAGE or indicator.is_cumulative:
+                    if indicator.unit_of_measure_type == Indicator.PERCENTAGE \
+                            or indicator.is_cumulative in Indicator.CUMULATIVE_VALUES:
                         self.assertDecimalEqual(report[indicator.pk]['lop_period']['target'], get_decimal(80))
                     else:
                         self.assertDecimalEqual(report[indicator.pk]['lop_period']['target'], get_decimal(160))
@@ -729,14 +734,18 @@ class TestIPTTSerializedReportData(test.TestCase, DecimalComparator):
         blank_label_pks = [l.pk for l in self.i_gen.country_disaggs[1].labels]
         percents = []
         cumulatives = []
-        regulars = []
+        non_cumulatives = []
+        non_summing_cumulatives = []
         for indicator in indicators:
             if indicator.unit_of_measure_type == Indicator.PERCENTAGE:
                 percents.append(indicator.pk)
-            elif indicator.is_cumulative:
+            elif indicator.is_cumulative == Indicator.CUMULATIVE:
                 cumulatives.append(indicator.pk)
+            elif indicator.is_cumulative == Indicator.NON_CUMULATIVE:
+                non_cumulatives.append(indicator.pk)
             else:
-                regulars.append(indicator.pk)
+                # TODO:  SJ build this out
+                non_summing_cumulatives.append(indicator.pk)
         targets = [50, 100, 150, 200]
         actuals = [60, 105, 150, 195]
 
@@ -778,8 +787,8 @@ class TestIPTTSerializedReportData(test.TestCase, DecimalComparator):
                     lop_asserts(report_data, 200, 510)
                     for c, period in enumerate(report_data['periods']):
                         period_asserts(period, targets[c], sum(actuals[:c+1]), tva)
-                for regular_pk in regulars:
-                    report_data = report[regular_pk]
+                for non_cumulative_pk in non_cumulatives:  # todo: sj add section for non-summing
+                    report_data = report[non_cumulative_pk]
                     lop_asserts(report_data, 500, 510)
                     for c, period in enumerate(report_data['periods']):
                         period_asserts(period, targets[c], actuals[c], tva)
@@ -874,10 +883,12 @@ class TestIPTTSerializedReportData(test.TestCase, DecimalComparator):
         for indicator in self.i_gen.two_results_per_semi_annual_indicators():
             if indicator.unit_of_measure_type == Indicator.PERCENTAGE:
                 indicator_pks['percent'] = indicator.pk
-            elif indicator.is_cumulative:
+            elif indicator.is_cumulative == Indicator.CUMULATIVE:
                 indicator_pks['cumulative'] = indicator.pk
-            else:
+            elif indicator.is_cumulative == Indicator.NON_CUMULATIVE:
                 indicator_pks['noncumulative'] = indicator.pk
+            else:
+                indicator_pks['nonsummingcumulative'] = indicator.pk # todo: sj add test
         def lop_asserts(report_pk, lop_period):
             noncumulative = report_pk == indicator_pks['noncumulative']
             cumulative = report_pk == indicator_pks['cumulative']

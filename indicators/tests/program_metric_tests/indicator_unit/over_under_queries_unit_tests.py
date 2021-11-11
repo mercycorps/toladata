@@ -80,7 +80,7 @@ class TestTargetsActualsOverUnderCorrect(test.TestCase):
             indicator.over_under, 0,
             "should show overunder as 0 (in range), got {0}".format(indicator.over_under)
         )
-        self.indicator.is_cumulative = True
+        self.indicator.is_cumulative = Indicator.CUMULATIVE   # todo: sj add test
         self.indicator.save()
         indicator = MetricsIndicator.objects.with_annotations('scope').get(pk=self.indicator.id)
         # both have data, set to cumulative, so should show latest (endline) target:
@@ -149,7 +149,7 @@ class TestTargetsActualsOverUnderCorrect(test.TestCase):
             indicator.over_under, 1,
             "should show over (350/500), got {0}".format(indicator.over_under)
         )
-        self.indicator.is_cumulative = True
+        self.indicator.is_cumulative = Indicator.CUMULATIVE  # todo: sj add test
         self.indicator.save()
         indicator = MetricsIndicator.objects.with_annotations('scope').get(pk=self.indicator.id)
         self.assertEqual(
@@ -216,7 +216,7 @@ class TestTargetsActualsOverUnderCorrect(test.TestCase):
             indicator.over_under, 0,
             "should show on target (over under 0, 1300/1300), got {0}".format(indicator.over_under)
         )
-        self.indicator.is_cumulative = True
+        self.indicator.is_cumulative = Indicator.CUMULATIVE  # todo: sj add test
         self.indicator.save()
         indicator = MetricsIndicator.objects.with_annotations('scope').get(pk=self.indicator.id)
         self.assertEqual(

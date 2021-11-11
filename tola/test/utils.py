@@ -72,7 +72,7 @@ class IndicatorValues(object):
         result_sums = []
         for i, pt_values in enumerate(self.periodic_targets):
             if self.unit_of_measure_type == Indicator.NUMBER:
-                if self.is_cumulative:
+                if self.is_cumulative in Indicator.CUMULATIVE_VALUES:
                     # Sum a list of lists.  These are lists of results "to-date".
                     result_sums.append(sum([sum(vals) for vals in self.result_sets[:i+1]]))
                 else:
@@ -86,7 +86,7 @@ class IndicatorValues(object):
         targets_by_period = self.periodic_target_targets[:period_ceiling]
         if self.unit_of_measure_type == Indicator.NUMBER:
             achieved_val = sum(achieved_by_period)
-            if self.is_cumulative:
+            if self.is_cumulative in Indicator.CUMULATIVE_VALUES:
                 target_val = targets_by_period[:-1]
             else:
                 target_val = sum(targets_by_period)
@@ -95,11 +95,11 @@ class IndicatorValues(object):
             target_val = targets_by_period[:-1]
         return achieved_val / target_val
 
-    def __unicode__(self):
+    def __unicode__(self): # todo: sj remove
         return 'Indicator with %s periodic targets' % (len(self.periodic_targets))
 
     def __str__(self):
-        return unicode(self).encode('utf-8')
+        return str(self)
 
 
 class Scenario(object):

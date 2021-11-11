@@ -64,7 +64,7 @@ class TestProgramReportingingCounts(test.TransactionTestCase):
         lop_indicator = self.get_base_indicator()
         lop_indicator.target_frequency = Indicator.LOP
         lop_indicator.lop_target = 10000
-        lop_indicator.is_cumulative = False
+        lop_indicator.is_cumulative = Indicator.NON_CUMULATIVE
         lop_indicator.unit_of_measure_type = Indicator.NUMBER
         lop_indicator.save()
         lop_pt = i_factories.PeriodicTargetFactory(
@@ -81,7 +81,7 @@ class TestProgramReportingingCounts(test.TransactionTestCase):
         # semi annual indicator with target and valid data
         time_indicator = self.get_base_indicator()
         time_indicator.target_frequency = Indicator.SEMI_ANNUAL
-        time_indicator.is_cumulative = True
+        time_indicator.is_cumulative = Indicator.CUMULATIVE # todo: sj add test
         time_indicator.unit_of_measure_type = Indicator.NUMBER
         time_indicator.save()
         start_date = self.program.reporting_period_start
@@ -121,7 +121,7 @@ class TestProgramReportingingCounts(test.TransactionTestCase):
         # event indicator (percent) with less than 85% of the target % hit
         event_indicator = self.get_base_indicator()
         event_indicator.target_frequency = Indicator.EVENT
-        event_indicator.is_cumulative = False
+        event_indicator.is_cumulative = Indicator.NON_CUMULATIVE
         event_indicator.unit_of_measure_type = Indicator.PERCENTAGE
         event_indicator.save()
         event_target = i_factories.PeriodicTargetFactory(
@@ -141,7 +141,7 @@ class TestProgramReportingingCounts(test.TransactionTestCase):
         # lop indicator with 120/100 data
         lop_indicator = self.get_base_indicator()
         lop_indicator.target_frequency = Indicator.LOP
-        lop_indicator.is_cumulative = False
+        lop_indicator.is_cumulative = Indicator.NON_CUMULATIVE
         lop_indicator.lop_target = 100
         lop_indicator.save()
         lop_pt = i_factories.PeriodicTargetFactory(
@@ -175,7 +175,7 @@ class TestProgramReportingingCounts(test.TransactionTestCase):
         # mid end indicator _cumulative_ should check against end target only
         midend_indicator = self.get_base_indicator()
         midend_indicator.target_frequency = Indicator.MID_END
-        midend_indicator.is_cumulative = True
+        midend_indicator.is_cumulative = Indicator.CUMULATIVE
         midend_indicator.save()
         mid_target = i_factories.PeriodicTargetFactory(
             indicator=midend_indicator,
@@ -314,7 +314,7 @@ class TestTargetsActualsOverUnderCorrect(test.TestCase):
             program.scope_counts['on_scope'], 1,
             "should show overunder as 0 (in range), got {0}".format(program.scope_counts)
         )
-        self.indicator.is_cumulative = True
+        self.indicator.is_cumulative = Indicator.CUMULATIVE
         self.indicator.save()
         program = ProgramWithMetrics.home_page.with_annotations('scope').get(pk=self.program.id)
         # both have data, set to cumulative, so should show latest (endline) target:

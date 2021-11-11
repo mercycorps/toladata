@@ -1155,6 +1155,7 @@ class Indicator(SafeDeleteModel):
     NON_CUMULATIVE = 0
     CUMULATIVE = 1
     NON_SUMMING_CUMULATIVE = 2
+    CUMULATIVE_VALUES = [CUMULATIVE, NON_SUMMING_CUMULATIVE]
     IS_CUMULATIVE_CHOICES = [
         (NON_CUMULATIVE, 'Non-cumulative'),
         (CUMULATIVE, 'Cumulative'),
