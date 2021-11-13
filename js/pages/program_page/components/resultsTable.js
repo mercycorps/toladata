@@ -201,20 +201,20 @@ const LoPRow = ({indicator, ...props}) => {
     const localizer = useContext(LocalizerContext);
     var lopMessage;
     var lopHelp;
-    if (indicator.isCumulative === 0){
-        // # Translators: breif description of summing rules a series of numbers
+    if (indicator.isCumulative === 0 && !indicator.isPercent){
+        // # Translators: brief description of summing rules a series of numbers
         lopMessage = gettext("Targets, actuals, and results are non-cumulative.")
         // # Translators: explanation of the summing rules for the totals row on a list of results
         lopHelp = gettext("<strong>Targets, actuals, and results are non-cumulative.</strong> Target period actuals are the sum of all results for that target period. Life of Program target and actual are the sum of all target periods.");
     }
     else if (indicator.isCumulative === 1 && !indicator.isPercent){
-        // # Translators: breif description of summing rules a series of numbers
+        // # Translators: brief description of summing rules a series of numbers
         lopMessage = gettext("Targets and actuals are cumulative; results are non-cumulative.")
         // # Translators: explanation of the summing rules for the totals row on a list of results
         lopHelp = gettext("<strong>Targets and actuals are cumulative; results are non-cumulative.</strong> Target period actuals are the sum of the results from the current and all previous target periods. The Life of Program target mirrors the last target, and the Life of Program actual mirrors the most recent actual.");
     }
     else {
-        // # Translators: breif description of summing rules a series of numbers
+        // # Translators: brief description of summing rules a series of numbers
         lopMessage = gettext("Targets, actuals, and results are cumulative.")
         // # Translators: explanation of the summing rules for the totals row on a list of results
         lopHelp = gettext("<strong>Targets, actuals, and results are cumulative.</strong> Target period actuals mirror the most recent result for that target period; no calculations are performed with results or actuals. The Life of Program target mirrors the last target, and the Life of Program actual mirrors the most recent actual.");

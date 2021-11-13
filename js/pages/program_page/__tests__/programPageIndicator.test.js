@@ -144,7 +144,7 @@ describe("full program page indicator", () => {
         expect(indicator.name).toBe("Test name");
         expect(indicator.number).toBe("Output 1.1a");
         expect(indicator.isPercent).toBe(false);
-        expect(indicator.isCumulative).toBe(false);
+        expect(indicator.isCumulative).toBe(0);
         expect(indicator.baseline).toBe('444');
         expect(indicator.isReporting).toBeTruthy();
         expect(indicator.aboveTarget).toBe(false);
