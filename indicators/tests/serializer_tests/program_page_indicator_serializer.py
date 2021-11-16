@@ -559,7 +559,14 @@ class TestProgramPageIndicatorSerializerResultData(test.TestCase):
             target_frequency=Indicator.LOP, unit_of_measure_type=Indicator.NUMBER, is_cumulative=Indicator.CUMULATIVE
         )
         self.assertEqual(data['target_frequency'], Indicator.LOP)
-        self.assertEqual(data['is_cumulative'], Indicator.CUMULATIVE) # todo: sj add test
+        self.assertEqual(data['is_cumulative'], Indicator.CUMULATIVE)
+        self.assertFalse(data['is_percent'])
+        data, indicator = self.get_indicator_data(
+            target_frequency=Indicator.ANNUAL, unit_of_measure_type=Indicator.NUMBER,
+            is_cumulative=Indicator.NON_SUMMING_CUMULATIVE
+        )
+        self.assertEqual(data['target_frequency'], Indicator.ANNUAL)
+        self.assertEqual(data['is_cumulative'], Indicator.NON_SUMMING_CUMULATIVE)
         self.assertFalse(data['is_percent'])
         data, indicator = self.get_indicator_data(
             target_frequency=Indicator.EVENT, unit_of_measure_type=Indicator.PERCENTAGE
@@ -672,7 +679,7 @@ class TestProgramPageIndicatorSerializerResultData(test.TestCase):
         )
         context = get_program_context(indicator.program)
         data = self.get_serialized_data(context, has_targets=True)[indicator.pk]
-        self.assertEqual(data['is_cumulative'], Indicator.CUMULATIVE)  # todo: sj add test?
+        self.assertEqual(data['is_cumulative'], Indicator.CUMULATIVE)
         self.assertEqual(len(data['periodic_targets']), 2)
         self.assertEqual(len(data['no_target_results']), 0)
         mid_target_data = data['periodic_targets'][0]

@@ -393,8 +393,8 @@ class IPTTScenarioSums:
         for uom_type, cumulative in [
                 (Indicator.NUMBER, Indicator.NON_CUMULATIVE),
                 (Indicator.NUMBER, Indicator.CUMULATIVE),
-                (Indicator.PERCENTAGE, Indicator.CUMULATIVE)
-                # TODO: SJ Add a category
+                (Indicator.PERCENTAGE, Indicator.CUMULATIVE),
+                (Indicator.NUMBER, Indicator.NON_SUMMING_CUMULATIVE)
             ]:
             these_kwargs = {
                 **indicator_kwargs,
@@ -807,8 +807,8 @@ class IndicatorGenerator:
             'disaggregations': [self.standard_disaggs[0], self.country_disaggs[0]]
         }
         for is_cumulative, uom_type, level_kwargs in zip(
-            [Indicator.CUMULATIVE, Indicator.NON_CUMULATIVE, Indicator.NON_CUMULATIVE], # TODO: SJ Add a category
-            [Indicator.NUMBER, Indicator.NUMBER, Indicator.PERCENTAGE],
+            [Indicator.CUMULATIVE, Indicator.NON_CUMULATIVE, Indicator.NON_CUMULATIVE, Indicator.NON_SUMMING_CUMULATIVE],
+            [Indicator.NUMBER, Indicator.NUMBER, Indicator.PERCENTAGE, Indicator.NUMBER],
             levels_generator(self.levels, 1)
         ):
             indicator = self.add_indicator(
@@ -945,7 +945,7 @@ def measurements_generator():
     generator = itertools.product(
         [doc for (doc, _) in Indicator.DIRECTION_OF_CHANGE],
         [uom for (uom, _) in Indicator.UNIT_OF_MEASURE_TYPES],
-        [Indicator.CUMULATIVE, Indicator.NON_CUMULATIVE] # TODO: SJ add test
+        [Indicator.CUMULATIVE, Indicator.NON_CUMULATIVE, Indicator.NON_SUMMING_CUMULATIVE]
     )
     for doc, uom, is_cumulative in generator:
         yield {

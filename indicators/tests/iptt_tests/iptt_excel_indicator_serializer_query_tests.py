@@ -274,7 +274,7 @@ class TestIPTTIndicatorSerializerQueries(test.TestCase):
             expected[indicator.pk] = expected_data
         for serialized_data in self.get_serialized_indicator_data(program_pk=i_gen.program.pk):
             with self.assertNumQueries(0):
-                self.assertEqual(len(serialized_data), 12)
+                self.assertEqual(len(serialized_data), 18)
                 for serialized_indicator in serialized_data:
                     for field in fields:
                         self.assertEqual(
@@ -637,7 +637,6 @@ class TestIPTTSerializedReportData(test.TestCase, DecimalComparator):
         percentage_pks = []
         cumulative_pks = []
         non_cumulative_pks = []
-        # TODO: SJ build out this section
         non_summing_cumulative_pks = []
         for indicator in indicators:
             if indicator.unit_of_measure_type == Indicator.PERCENTAGE:
@@ -658,7 +657,7 @@ class TestIPTTSerializedReportData(test.TestCase, DecimalComparator):
         tva = False
         for report in self.get_serialized_report_data():
             with self.assertNumQueries(0):
-                self.assertEqual(len(report.keys()), 12)
+                self.assertEqual(len(report.keys()), 18)
                 for pk in percentage_pks:
                     lop_data, periods = universal_asserts(report, pk)
                     self.assertEqual(lop_data['target'], 600)
@@ -697,6 +696,19 @@ class TestIPTTSerializedReportData(test.TestCase, DecimalComparator):
                     self.assertDecimalEqual(periods[1]['actual'], get_decimal(80))
                     if tva:
                         self.assertDecimalEqual(periods[1]['target'], get_decimal(600))
+                        self.assertDecimalEqual(periods[1]['met'], get_decimal('0.1333', places=4))
+                for pk in non_summing_cumulative_pks:
+                    lop_data, periods = universal_asserts(report, pk)
+                    self.assertEqual(lop_data['target'], 600)
+                    self.assertEqual(lop_data['actual'], 80)
+                    self.assertEqual(lop_data['met'], decimal.Decimal('0.1333'))
+                    self.assertEqual(periods[0]['actual'], 50)
+                    if tva:
+                        self.assertEqual(periods[0]['target'], 600)
+                        self.assertEqual(periods[0]['met'], decimal.Decimal('0.0833'))
+                    self.assertEqual(periods[1]['actual'], 80)
+                    if tva:
+                        self.assertEqual(periods[1]['target'], 600)
                         self.assertDecimalEqual(periods[1]['met'], get_decimal('0.1333', places=4))
                 tva = True
 
@@ -744,7 +756,6 @@ class TestIPTTSerializedReportData(test.TestCase, DecimalComparator):
             elif indicator.is_cumulative == Indicator.NON_CUMULATIVE:
                 non_cumulatives.append(indicator.pk)
             else:
-                # TODO:  SJ build this out
                 non_summing_cumulatives.append(indicator.pk)
         targets = [50, 100, 150, 200]
         actuals = [60, 105, 150, 195]
@@ -787,9 +798,14 @@ class TestIPTTSerializedReportData(test.TestCase, DecimalComparator):
                     lop_asserts(report_data, 200, 510)
                     for c, period in enumerate(report_data['periods']):
                         period_asserts(period, targets[c], sum(actuals[:c+1]), tva)
-                for non_cumulative_pk in non_cumulatives:  # todo: sj add section for non-summing
+                for non_cumulative_pk in non_cumulatives:
                     report_data = report[non_cumulative_pk]
                     lop_asserts(report_data, 500, 510)
+                    for c, period in enumerate(report_data['periods']):
+                        period_asserts(period, targets[c], actuals[c], tva)
+                for non_summing_cumulative_pk in non_summing_cumulatives:
+                    report_data = report[non_summing_cumulative_pk]
+                    lop_asserts(report_data, 200, 195)
                     for c, period in enumerate(report_data['periods']):
                         period_asserts(period, targets[c], actuals[c], tva)
                 tva = True
@@ -888,14 +904,15 @@ class TestIPTTSerializedReportData(test.TestCase, DecimalComparator):
             elif indicator.is_cumulative == Indicator.NON_CUMULATIVE:
                 indicator_pks['noncumulative'] = indicator.pk
             else:
-                indicator_pks['nonsummingcumulative'] = indicator.pk # todo: sj add test
+                indicator_pks['nonsummingcumulative'] = indicator.pk
         def lop_asserts(report_pk, lop_period):
             noncumulative = report_pk == indicator_pks['noncumulative']
             cumulative = report_pk == indicator_pks['cumulative']
             percent = report_pk == indicator_pks['percent']
-            assert noncumulative or cumulative or percent
+            nonsummingcumulative = report_pk == indicator_pks['nonsummingcumulative']
+            assert any((noncumulative, cumulative, percent, nonsummingcumulative))
             self.assertDecimalEqual(lop_period['target'], get_decimal(500 if noncumulative else 200))
-            self.assertDecimalEqual(lop_period['actual'], get_decimal(205.15 if percent else 1000.6))
+            self.assertDecimalEqual(lop_period['actual'], get_decimal(205.15 if percent or nonsummingcumulative else 1000.6))
             self.assertDecimalEqual(
                 lop_period['met'], get_decimal((2.0012 if noncumulative else 5.003 if cumulative else 1.0258), places=4)
             )

@@ -238,13 +238,15 @@ class TestIndicatorWithMeasurementSerializer(test.TestCase):
         data2 = self.get_indicator_data(unit_of_measure_type=Indicator.PERCENTAGE)
         self.assertEqual(data2['is_percent'], True)
 
-    def test_is_cumulative(self): # todo: sj add test
+    def test_is_cumulative(self):
         data = self.get_indicator_data(is_cumulative=Indicator.NON_CUMULATIVE)
         self.assertEqual(data['is_cumulative'], Indicator.NON_CUMULATIVE)
         data2 = self.get_indicator_data(is_cumulative=Indicator.CUMULATIVE)
         self.assertEqual(data2['is_cumulative'], Indicator.CUMULATIVE)
-        data3 = self.get_indicator_data(is_cumulative=None)
-        self.assertEqual(data3['is_cumulative'], None)
+        data3 = self.get_indicator_data(is_cumulative=Indicator.NON_SUMMING_CUMULATIVE)
+        self.assertEqual(data3['is_cumulative'], Indicator.NON_SUMMING_CUMULATIVE)
+        data4 = self.get_indicator_data(is_cumulative=None)
+        self.assertEqual(data4['is_cumulative'], None)
 
     def test_direction_of_change(self):
         data = self.get_indicator_data(direction_of_change=Indicator.DIRECTION_OF_CHANGE_NONE)
