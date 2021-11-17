@@ -345,7 +345,7 @@ class IPTTIndicatorReportBase:
         period_results = [result for result in past_results
                           if result.date_collected >= period_dict['start']]
         if period_results and any(result.achieved is not None for result in period_results):
-            return past_results if indicator.is_cumulative else period_results
+            return past_results if indicator.is_cumulative in Indicator.CUMULATIVE_VALUES else period_results
         return []
 
     def _get_results_totals(self, indicator, results):
@@ -530,7 +530,8 @@ class IPTTTVAReportMixin:
                                if result.periodic_target_id == endline_target.pk and result.achieved is not None]
             if not endline_results:
                 return []
-            return midline_results + endline_results if indicator.is_cumulative else endline_results
+            return midline_results + endline_results \
+                if indicator.is_cumulative == Indicator.CUMULATIVE else endline_results
         targets = sorted(
             [target for target in self._get_all_targets(indicator) if target.customsort <= period_dict['customsort']],
             key=operator.attrgetter('customsort'))
@@ -543,7 +544,7 @@ class IPTTTVAReportMixin:
                           if (result.periodic_target == period_target and result.achieved is not None)]
         if not period_results:
             return []
-        if not indicator.is_cumulative:
+        if not indicator.is_cumulative == Indicator.CUMULATIVE:
             return period_results
         return [result for result in self._get_all_results(indicator)
                 if (result.periodic_target.pk in [t.pk for t in targets] and result.achieved is not None)]

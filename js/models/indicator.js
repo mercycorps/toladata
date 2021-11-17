@@ -37,7 +37,7 @@ export const getIndicator = (
  *  JSON params:
  *      unit_of_measure (string)
  *      is_percent (boolean)
- *      is_cumulative (boolean)
+ *      is_cumulative (number)
  *      direction_of_change (string)
  *      baseline (number)
  *      lop_target (number)

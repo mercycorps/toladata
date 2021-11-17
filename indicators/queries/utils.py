@@ -63,14 +63,6 @@ def indicator_lop_actual_progress_annotation():
     )
     return models.Case(
         models.When(
-            models.Q(is_cumulative=Indicator.NON_SUMMING_CUMULATIVE),
-            then=models.Subquery(
-                result_set.filter(
-                    models.Q(periodic_target__end_date__lt=UTCNow())
-                ).order_by('-date_collected').values('achieved')[:1]
-            )
-        ),
-        models.When(
             models.Q(
                 models.Q(
                     models.Q(
@@ -79,8 +71,11 @@ def indicator_lop_actual_progress_annotation():
                     ) |
                     models.Q(target_frequency__in=[Indicator.MID_END, Indicator.EVENT])
                 ) &
-                models.Q(unit_of_measure_type=Indicator.PERCENTAGE)
-                ),
+                models.Q (
+                    models.Q(unit_of_measure_type=Indicator.PERCENTAGE) |
+                    models.Q(is_cumulative=Indicator.NON_SUMMING_CUMULATIVE)
+                )
+            ),
             then=models.Subquery(
                 result_set.order_by('-date_collected').values('achieved')[:1]
             )
@@ -102,8 +97,11 @@ def indicator_lop_actual_progress_annotation():
         models.When(
             models.Q(
                 models.Q(target_frequency__in=[f[0] for f in TIME_AWARE_FREQUENCIES]) &
-                models.Q(unit_of_measure_type=Indicator.PERCENTAGE)
-                ),
+                models.Q(
+                    models.Q(unit_of_measure_type=Indicator.PERCENTAGE) |
+                    models.Q(is_cumulative=Indicator.NON_SUMMING_CUMULATIVE)
+                )
+            ),
             then=models.Subquery(
                 result_set.filter(
                     models.Q(periodic_target__end_date__lt=UTCNow())
@@ -426,7 +424,7 @@ def _period_value_annotation(result_set, period):
                 ).order_by('-date_collected').values('this_value')[:1])
         ),
         models.When(
-            is_cumulative=True,
+            is_cumulative=Indicator.CUMULATIVE,
             then=models.Subquery(
                 result_set.order_by().values('indicator').annotate(
                     this_period_count=models.Sum(
@@ -517,7 +515,7 @@ def _mid_end_annotation(result_set, count):
                 result_set.filter(periodic_target__customsort=count).order_by('-date_collected').values('this_value')[:1])
         ),
         models.When(
-            is_cumulative=True,
+            is_cumulative=Indicator.CUMULATIVE,
             then=models.Subquery(
                 result_set.order_by().values('indicator').annotate(
                     this_period_count=models.Sum(

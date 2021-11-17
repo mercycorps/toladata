@@ -29,7 +29,7 @@ from indicators.tests.program_metric_tests.program_unit.program_reporting_count_
 )
 
 from indicators.tests.program_metric_tests.program_unit.program_scope_queries_unit_tests import (
-    TestProgramReportingingCounts,
+    TestProgramReportingCounts,
     TestTargetsActualsOverUnderCorrect
 )
 

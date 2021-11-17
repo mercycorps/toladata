@@ -328,7 +328,7 @@ exports[`Results table component result rows for an annual indicator with result
             >
               <a
                 className="popover-icon results-table__lop-row--help-text"
-                data-content="<strong>Targets, actuals, and results are cumulative.</strong> Target period actuals mirror the most recent result for that target period; no calculations are performed with results or actuals. The Life of Program target mirrors the last target, and the Life of Program actual mirrors the most recent actual."
+                data-content="<strong>Targets, actuals, and results are non-cumulative.</strong> Target period actuals are the sum of all results for that target period. Life of Program target and actual are the sum of all target periods."
                 data-html="true"
                 data-placement={null}
                 data-toggle="popover"
@@ -373,7 +373,7 @@ exports[`Results table component result rows for an annual indicator with result
           <div
             className="help-text"
           >
-            Targets, actuals, and results are cumulative.
+            Targets, actuals, and results are non-cumulative.
           </div>
         </td>
       </tr>
@@ -930,7 +930,7 @@ exports[`Results table component with a valid indicator and editing privileges c
             >
               <a
                 className="popover-icon results-table__lop-row--help-text"
-                data-content="<strong>Targets, actuals, and results are cumulative.</strong> Target period actuals mirror the most recent result for that target period; no calculations are performed with results or actuals. The Life of Program target mirrors the last target, and the Life of Program actual mirrors the most recent actual."
+                data-content="<strong>Targets, actuals, and results are non-cumulative.</strong> Target period actuals are the sum of all results for that target period. Life of Program target and actual are the sum of all target periods."
                 data-html="true"
                 data-placement={null}
                 data-toggle="popover"
@@ -975,7 +975,7 @@ exports[`Results table component with a valid indicator and editing privileges c
           <div
             className="help-text"
           >
-            Targets, actuals, and results are cumulative.
+            Targets, actuals, and results are non-cumulative.
           </div>
         </td>
       </tr>
@@ -1739,7 +1739,7 @@ exports[`Results table component with a valid indicator and editing privileges c
             >
               <a
                 className="popover-icon results-table__lop-row--help-text"
-                data-content="<strong>Targets, actuals, and results are cumulative.</strong> Target period actuals mirror the most recent result for that target period; no calculations are performed with results or actuals. The Life of Program target mirrors the last target, and the Life of Program actual mirrors the most recent actual."
+                data-content="<strong>Targets and actuals are cumulative; results are non-cumulative.</strong> Target period actuals are the sum of the results from the current and all previous target periods. The Life of Program target mirrors the last target, and the Life of Program actual mirrors the most recent actual."
                 data-html="true"
                 data-placement={null}
                 data-toggle="popover"
@@ -1784,7 +1784,7 @@ exports[`Results table component with a valid indicator and editing privileges c
           <div
             className="help-text"
           >
-            Targets, actuals, and results are cumulative.
+            Targets and actuals are cumulative; results are non-cumulative.
           </div>
         </td>
       </tr>
@@ -2341,7 +2341,7 @@ exports[`Results table component with a valid indicator and editing privileges m
             >
               <a
                 className="popover-icon results-table__lop-row--help-text"
-                data-content="<strong>Targets, actuals, and results are cumulative.</strong> Target period actuals mirror the most recent result for that target period; no calculations are performed with results or actuals. The Life of Program target mirrors the last target, and the Life of Program actual mirrors the most recent actual."
+                data-content="<strong>Targets, actuals, and results are non-cumulative.</strong> Target period actuals are the sum of all results for that target period. Life of Program target and actual are the sum of all target periods."
                 data-html="true"
                 data-placement={null}
                 data-toggle="popover"
@@ -2386,7 +2386,7 @@ exports[`Results table component with a valid indicator and editing privileges m
           <div
             className="help-text"
           >
-            Targets, actuals, and results are cumulative.
+            Targets, actuals, and results are non-cumulative.
           </div>
         </td>
       </tr>
@@ -3150,7 +3150,7 @@ exports[`Results table component with a valid indicator and editing privileges m
             >
               <a
                 className="popover-icon results-table__lop-row--help-text"
-                data-content="<strong>Targets, actuals, and results are cumulative.</strong> Target period actuals mirror the most recent result for that target period; no calculations are performed with results or actuals. The Life of Program target mirrors the last target, and the Life of Program actual mirrors the most recent actual."
+                data-content="<strong>Targets and actuals are cumulative; results are non-cumulative.</strong> Target period actuals are the sum of the results from the current and all previous target periods. The Life of Program target mirrors the last target, and the Life of Program actual mirrors the most recent actual."
                 data-html="true"
                 data-placement={null}
                 data-toggle="popover"
@@ -3195,7 +3195,7 @@ exports[`Results table component with a valid indicator and editing privileges m
           <div
             className="help-text"
           >
-            Targets, actuals, and results are cumulative.
+            Targets and actuals are cumulative; results are non-cumulative.
           </div>
         </td>
       </tr>
@@ -3725,7 +3725,7 @@ exports[`Results table component with a valid indicator and no editing privilege
             >
               <a
                 className="popover-icon results-table__lop-row--help-text"
-                data-content="<strong>Targets, actuals, and results are cumulative.</strong> Target period actuals mirror the most recent result for that target period; no calculations are performed with results or actuals. The Life of Program target mirrors the last target, and the Life of Program actual mirrors the most recent actual."
+                data-content="<strong>Targets, actuals, and results are non-cumulative.</strong> Target period actuals are the sum of all results for that target period. Life of Program target and actual are the sum of all target periods."
                 data-html="true"
                 data-placement={null}
                 data-toggle="popover"
@@ -3770,7 +3770,7 @@ exports[`Results table component with a valid indicator and no editing privilege
           <div
             className="help-text"
           >
-            Targets, actuals, and results are cumulative.
+            Targets, actuals, and results are non-cumulative.
           </div>
         </td>
       </tr>
@@ -4480,7 +4480,7 @@ exports[`Results table component with a valid indicator and no editing privilege
             >
               <a
                 className="popover-icon results-table__lop-row--help-text"
-                data-content="<strong>Targets, actuals, and results are cumulative.</strong> Target period actuals mirror the most recent result for that target period; no calculations are performed with results or actuals. The Life of Program target mirrors the last target, and the Life of Program actual mirrors the most recent actual."
+                data-content="<strong>Targets and actuals are cumulative; results are non-cumulative.</strong> Target period actuals are the sum of the results from the current and all previous target periods. The Life of Program target mirrors the last target, and the Life of Program actual mirrors the most recent actual."
                 data-html="true"
                 data-placement={null}
                 data-toggle="popover"
@@ -4525,7 +4525,7 @@ exports[`Results table component with a valid indicator and no editing privilege
           <div
             className="help-text"
           >
-            Targets, actuals, and results are cumulative.
+            Targets and actuals are cumulative; results are non-cumulative.
           </div>
         </td>
       </tr>

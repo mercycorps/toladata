@@ -35,7 +35,7 @@ class IndicatorValues(object):
     def __init__(
             self,
             periodic_targets,
-            is_cumulative=False,
+            is_cumulative=Indicator.NON_CUMULATIVE,
             direction_of_change=Indicator.DIRECTION_OF_CHANGE_NONE,
             target_frequency=Indicator.ANNUAL,
             lop_target=0,
@@ -72,7 +72,7 @@ class IndicatorValues(object):
         result_sums = []
         for i, pt_values in enumerate(self.periodic_targets):
             if self.unit_of_measure_type == Indicator.NUMBER:
-                if self.is_cumulative:
+                if self.is_cumulative in Indicator.CUMULATIVE_VALUES:
                     # Sum a list of lists.  These are lists of results "to-date".
                     result_sums.append(sum([sum(vals) for vals in self.result_sets[:i+1]]))
                 else:
@@ -86,7 +86,7 @@ class IndicatorValues(object):
         targets_by_period = self.periodic_target_targets[:period_ceiling]
         if self.unit_of_measure_type == Indicator.NUMBER:
             achieved_val = sum(achieved_by_period)
-            if self.is_cumulative:
+            if self.is_cumulative in Indicator.CUMULATIVE_VALUES:
                 target_val = targets_by_period[:-1]
             else:
                 target_val = sum(targets_by_period)
@@ -95,11 +95,8 @@ class IndicatorValues(object):
             target_val = targets_by_period[:-1]
         return achieved_val / target_val
 
-    def __unicode__(self):
-        return 'Indicator with %s periodic targets' % (len(self.periodic_targets))
-
     def __str__(self):
-        return unicode(self).encode('utf-8')
+        return 'Indicator with %s periodic targets' % (len(self.periodic_targets))
 
 
 class Scenario(object):
@@ -190,7 +187,7 @@ def generate_core_indicator_data(c_params=None, p_count=3, i_count=4):
         for p in programs:
             program_ids.append(p.id)
             indicators = IndicatorFactory.create_batch(
-                i_count, program=p, unit_of_measure_type=Indicator.NUMBER, is_cumulative=False,
+                i_count, program=p, unit_of_measure_type=Indicator.NUMBER, is_cumulative=Indicator.NON_CUMULATIVE,
                 direction_of_change=Indicator.DIRECTION_OF_CHANGE_NONE, target_frequency=Indicator.ANNUAL)
             indicator_ids = [i.id for i in indicators]
             p.indicator_set.add(*indicators)
@@ -217,7 +214,7 @@ def decimalize(number):
 
 class TimedTestResult(ut_runner.TextTestResult):
     SLOW_TEST_THRESHOLD = 2
-    
+
     def __init__(self, *args, **kwargs):
         super(TimedTestResult, self).__init__(*args, **kwargs)
         self.test_timings = []
