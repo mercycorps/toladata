@@ -2,8 +2,8 @@ msgid ""
 msgstr ""
 "Project-Id-Version: \n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2021-11-04 13:58-0700\n"
-"PO-Revision-Date: 2021-08-13 08:53-0700\n"
+"POT-Creation-Date: 2021-11-17 12:50-0800\n"
+"PO-Revision-Date: 2021-11-17 12:14-0800\n"
 "Last-Translator: \n"
 "Language-Team: \n"
 "Language: es\n"
@@ -719,7 +719,7 @@ msgstr "Todos los valores de este informe se redondean a dos decimales."
 #: js/pages/iptt_report/components/report/headerCells.js:63
 #: js/pages/iptt_report/components/report/tableHeader.js:166
 #: js/pages/program_page/components/indicator_list.js:207
-#: js/pages/program_page/components/resultsTable.js:274
+#: js/pages/program_page/components/resultsTable.js:273
 msgid "Target"
 msgstr "Objetivo"
 
@@ -734,7 +734,7 @@ msgstr "Real"
 #. Translators: Header for a column listing the progress towards the target value
 #: js/pages/iptt_report/components/report/headerCells.js:91
 #: js/pages/iptt_report/components/report/tableHeader.js:180
-#: js/pages/program_page/components/resultsTable.js:282
+#: js/pages/program_page/components/resultsTable.js:281
 msgid "% Met"
 msgstr "% Cumplido"
 
@@ -818,7 +818,7 @@ msgstr ""
 
 #. Translators: a button that lets the user add a new result
 #: js/pages/iptt_report/components/report/tableRows.js:104
-#: js/pages/program_page/components/resultsTable.js:339
+#: js/pages/program_page/components/resultsTable.js:338
 msgid "Add result"
 msgstr "Agregar resultado"
 
@@ -1236,10 +1236,10 @@ msgstr "No se han reportado resultados"
 msgid "Program to date"
 msgstr "Programa a la fecha"
 
-#. Translators: breif description of summing rules a series of numbers
+#. Translators: brief description of summing rules a series of numbers
 #: js/pages/program_page/components/resultsTable.js:206
 msgid "Targets, actuals, and results are non-cumulative."
-msgstr ""
+msgstr "Los objetivos, los reales, y los resultados no son acumulativos."
 
 #. Translators: explanation of the summing rules for the totals row on a list of results
 #: js/pages/program_page/components/resultsTable.js:208
@@ -1248,11 +1248,17 @@ msgid ""
 "period actuals are the sum of all results for that target period. Life of "
 "Program target and actual are the sum of all target periods."
 msgstr ""
+"<strong>Los objetivos, los reales, y los resultados no son acumulativos.</"
+"strong> Los reales del periodo objetivo son la suma de todos los resultados "
+"de ese periodo objetivo. Los objetivos y los reales de la vida del programa "
+"son la suma de todos los periodos objetivo."
 
-#. Translators: breif description of summing rules a series of numbers
+#. Translators: brief description of summing rules a series of numbers
 #: js/pages/program_page/components/resultsTable.js:212
 msgid "Targets and actuals are cumulative; results are non-cumulative."
 msgstr ""
+"Los objetivos y los reales son acumulativos; los resultados no son "
+"acumulativos."
 
 #. Translators: explanation of the summing rules for the totals row on a list of results
 #: js/pages/program_page/components/resultsTable.js:214
@@ -1262,11 +1268,16 @@ msgid ""
 "and all previous target periods. The Life of Program target mirrors the last "
 "target, and the Life of Program actual mirrors the most recent actual."
 msgstr ""
+"<strong>Los objetivos y los reales son acumulativos; los resultados no son "
+"acumulativos.</strong> Los reales del periodo objetivo son la suma de los "
+"resultados del periodo objetivo actual y de todos los anteriores. El "
+"objetivo de la vida del programa refleja el último objetivo, y el real de la "
+"vida del programa refleja el real más reciente."
 
-#. Translators: breif description of summing rules a series of numbers
+#. Translators: brief description of summing rules a series of numbers
 #: js/pages/program_page/components/resultsTable.js:218
 msgid "Targets, actuals, and results are cumulative."
-msgstr ""
+msgstr "Los objetivos, los reales, y los resultados son acumulativos."
 
 #. Translators: explanation of the summing rules for the totals row on a list of results
 #: js/pages/program_page/components/resultsTable.js:220
@@ -1277,35 +1288,40 @@ msgid ""
 "target mirrors the last target, and the Life of Program actual mirrors the "
 "most recent actual."
 msgstr ""
+"<strong>Los objetivos, los reales, y los resultados son acumulativos.</"
+"strong> Los reales del periodo objetivo reflejan el resultado más reciente "
+"de ese periodo objetivo; no se realizan cálculos con los resultados o los "
+"reales. El objetivo de la vida del programa refleja el último objetivo, y el "
+"real de la vida del programa refleja el real más reciente."
 
 #. Translators: identifies a results row as summative for the entire life of the program
-#: js/pages/program_page/components/resultsTable.js:228
+#: js/pages/program_page/components/resultsTable.js:227
 msgid "Life of Program"
 msgstr "Vida del programa"
 
 #. Translators: Header for a column listing periods in which results are grouped
-#: js/pages/program_page/components/resultsTable.js:270
+#: js/pages/program_page/components/resultsTable.js:269
 msgid "Target period"
 msgstr "Período objetivo"
 
 #. Translators: Header for a column listing actual result values for each row
-#: js/pages/program_page/components/resultsTable.js:278
+#: js/pages/program_page/components/resultsTable.js:277
 msgctxt "table (short) header"
 msgid "Actual"
 msgstr "Real"
 
 #. Translators: Header for a column listing actual results for a given period
-#: js/pages/program_page/components/resultsTable.js:286
+#: js/pages/program_page/components/resultsTable.js:285
 msgid "Results"
 msgstr "Resultados"
 
 #. Translators: Header for a column listing supporting documents for results
-#: js/pages/program_page/components/resultsTable.js:290
+#: js/pages/program_page/components/resultsTable.js:289
 msgid "Evidence"
 msgstr "Evidencia"
 
 #. Translators: Button label which opens a form to add targets to a given indicator
-#: js/pages/program_page/components/resultsTable.js:325
+#: js/pages/program_page/components/resultsTable.js:324
 msgid "Add targets"
 msgstr "Agregar objetivos"
 
