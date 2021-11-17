@@ -18,19 +18,15 @@ describe("Bare measurement indicator", () => {
         let indicator5 = Indicator({unit_of_measure: null});
         expect(indicator5.unitOfMeasure).toBeFalsy();
     });
-    it("handles true/false/bare percent/cumulative values", () => {
-        let indicator = Indicator({is_percent: true, is_cumulative: 1});
+    it("handles true/false/bare percent values", () => {
+        let indicator = Indicator({is_percent: true});
         expect(indicator.isPercent).toBeTruthy();
-        expect(indicator.isCumulative).toBeTruthy();
-        let indicator2 = Indicator({is_percent: false, is_cumulative: 0});
+        let indicator2 = Indicator({is_percent: false});
         expect(indicator2.isPercent).toBeFalsy();
-        expect(indicator2.isCumulative).toBeFalsy();
-        let indicator3 = Indicator({is_percent: null, is_cumulative: null});
+        let indicator3 = Indicator({is_percent: null});
         expect(indicator3.isPercent).toBeFalsy();
-        expect(indicator3.isCumulative).toBeFalsy();
         let indicator4 = Indicator();
         expect(indicator4.isPercent).toBeFalsy();
-        expect(indicator4.isCumulative).toBeFalsy();
     });
     it("handles +/-/null direction of change", () => {
         let indicator = Indicator({direction_of_change: "+"});
