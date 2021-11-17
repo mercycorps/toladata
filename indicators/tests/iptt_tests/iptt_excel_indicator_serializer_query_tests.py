@@ -661,16 +661,16 @@ class TestIPTTSerializedReportData(test.TestCase, DecimalComparator):
                 for pk in percentage_pks:
                     lop_data, periods = universal_asserts(report, pk)
                     self.assertEqual(lop_data['target'], 600)
-                    self.assertEqual(lop_data['actual'], 80)
-                    self.assertEqual(lop_data['met'], decimal.Decimal('0.1333'))
+                    self.assertEqual(lop_data['actual'], 20)
+                    self.assertEqual(lop_data['met'], decimal.Decimal('0.0333'))
                     self.assertEqual(periods[0]['actual'], 50)
                     if tva:
                         self.assertEqual(periods[0]['target'], 600)
                         self.assertEqual(periods[0]['met'], decimal.Decimal('0.0833'))
-                    self.assertEqual(periods[1]['actual'], 80)
+                    self.assertEqual(periods[1]['actual'], 20)
                     if tva:
                         self.assertEqual(periods[1]['target'], 600)
-                        self.assertEqual(periods[1]['met'], decimal.Decimal('0.1333'))
+                        self.assertEqual(periods[1]['met'], decimal.Decimal('0.0333'))
                 for pk in cumulative_pks:
                     lop_data, periods = universal_asserts(report, pk)
                     self.assertEqual(lop_data['target'], 600)
@@ -700,16 +700,16 @@ class TestIPTTSerializedReportData(test.TestCase, DecimalComparator):
                 for pk in non_summing_cumulative_pks:
                     lop_data, periods = universal_asserts(report, pk)
                     self.assertEqual(lop_data['target'], 600)
-                    self.assertEqual(lop_data['actual'], 80)
-                    self.assertEqual(lop_data['met'], decimal.Decimal('0.1333'))
+                    self.assertEqual(lop_data['actual'], 20)
+                    self.assertEqual(lop_data['met'], decimal.Decimal('0.0333'))
                     self.assertEqual(periods[0]['actual'], 50)
                     if tva:
                         self.assertEqual(periods[0]['target'], 600)
                         self.assertEqual(periods[0]['met'], decimal.Decimal('0.0833'))
-                    self.assertEqual(periods[1]['actual'], 80)
+                    self.assertEqual(periods[1]['actual'], 20)
                     if tva:
                         self.assertEqual(periods[1]['target'], 600)
-                        self.assertDecimalEqual(periods[1]['met'], get_decimal('0.1333', places=4))
+                        self.assertDecimalEqual(periods[1]['met'], get_decimal('0.0333', places=4))
                 tva = True
 
     def test_one_indicator_with_mismatched_lop_target_and_target_sum(self):

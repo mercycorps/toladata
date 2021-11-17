@@ -95,11 +95,8 @@ class IndicatorValues(object):
             target_val = targets_by_period[:-1]
         return achieved_val / target_val
 
-    def __unicode__(self): # todo: sj remove
-        return 'Indicator with %s periodic targets' % (len(self.periodic_targets))
-
     def __str__(self):
-        return str(self)
+        return 'Indicator with %s periodic targets' % (len(self.periodic_targets))
 
 
 class Scenario(object):

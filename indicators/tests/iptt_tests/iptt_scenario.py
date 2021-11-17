@@ -727,7 +727,7 @@ class IndicatorGenerator:
                 target_frequency=Indicator.ANNUAL,
                 lop_target=1200,
                 targets=1200,
-                results=[20, 80, 50],
+                results=[20, [60, 20], 50],
                 results__count=3,
                 **measurements_kwargs,
                 **levels_kwargs

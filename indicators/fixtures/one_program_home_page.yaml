@@ -107,7 +107,7 @@
     lop_target: 45
     direction_of_change: 2
     unit_of_measure_type: 2
-    is_cumulative: 1
+    is_cumulative: 2
     target_frequency: 1
     program: 1
 - model: indicators.periodictarget
