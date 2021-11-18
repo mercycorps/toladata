@@ -1024,8 +1024,12 @@ def result_view(request, indicator, program):
 
     readonly = not request.has_write_access
 
-    short_help = str(Indicator.CUMULATIVE_HELP[indicator.unit_of_measure_type][indicator.is_cumulative]['short'])
-    long_help = str(Indicator.CUMULATIVE_HELP[indicator.unit_of_measure_type][indicator.is_cumulative]['long'])
+    try:
+        short_help = str(Indicator.CUMULATIVE_HELP[indicator.unit_of_measure_type][indicator.is_cumulative]['short'])
+        long_help = str(Indicator.CUMULATIVE_HELP[indicator.unit_of_measure_type][indicator.is_cumulative]['long'])
+    except KeyError:
+        short_help = None
+        long_help = None
 
     return render_to_response(
         template_name, {
