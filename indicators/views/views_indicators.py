@@ -1024,6 +1024,9 @@ def result_view(request, indicator, program):
 
     readonly = not request.has_write_access
 
+    short_help = str(Indicator.CUMULATIVE_HELP[indicator.unit_of_measure_type][indicator.is_cumulative]['short'])
+    long_help = str(Indicator.CUMULATIVE_HELP[indicator.unit_of_measure_type][indicator.is_cumulative]['long'])
+
     return render_to_response(
         template_name, {
             'indicator': indicator,
@@ -1032,7 +1035,9 @@ def result_view(request, indicator, program):
             'program': program_obj,
             'is_editable': is_editable,
             'on_track': on_track,
-            'readonly': readonly
+            'readonly': readonly,
+            'short_help': short_help,
+            'long_help': long_help
         }
     )
 
