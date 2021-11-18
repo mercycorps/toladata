@@ -78,7 +78,7 @@ const IndicatorAddResults = inject("rootStore", "filterStore")(
 
         return (
             <td className="indicator-add-results-modal-cell">
-                // Added this element to mimic the Program Page. Template is pulling some of this data for the form.
+                {/*Added this element to mimic the Program Page. Template is pulling some of this data for the form.*/}
                 <div
                     style={{ visibility: 'hidden'}}
                     id={`id_link_reporting_period_${filterStore._selectedProgramId}`}

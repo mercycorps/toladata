@@ -1161,6 +1161,42 @@ class Indicator(SafeDeleteModel):
         (CUMULATIVE, 'Cumulative'),
         (NON_SUMMING_CUMULATIVE, 'Non-summing cumulative')
     ]
+    # Translators:  Short description of how values are accumulated over time.
+    NON_CUMULATIVE_SHORT_HELP = _('Targets, actuals, and results are non-cumulative.')
+    # Translators:  Full description of how values are accumulated over time.
+    NON_CUMULATIVE_LONG_HELP = _('Targets, actuals, and results are non-cumulative. Target period actuals are the sum of all results for that target period. Life of Program target and actual are the sum of all target periods.')
+    # Translators:  Short description of how values are accumulated over time.
+    SUMMING_CUMULATIVE_SHORT_HELP = _('Targets and actuals are cumulative; results are non-cumulative.')
+    # Translators:  Full description of how values are accumulated over time.
+    SUMMING_CUMULATIVE_LONG_HELP = _('Targets and actuals are cumulative; results are non-cumulative. Target period actuals are the sum of the results from the current and all previous target periods. The Life of Program target mirrors the last target, and the Life of Program actual mirrors the most recent actual.')
+    # Translators:  Short description of how values are accumulated over time.
+    NON_SUMMING_CUMULATIVE_SHORT_HELP = _('Targets, actuals, and results are cumulative.')
+    # Translators:  Full description of how values are accumulated over time.
+    NON_SUMMING_CUMULATIVE_LONG_HELP = _('Targets, actuals, and results are cumulative. Target period actuals mirror the most recent result for that target period; no calculations are performed with results or actuals. The Life of Program target mirrors the last target, and the Life of Program actual mirrors the most recent actual.')
+
+    CUMULATIVE_HELP = {
+        NUMBER: {
+            NON_CUMULATIVE: {
+                'short': NON_CUMULATIVE_SHORT_HELP,
+                'long': NON_CUMULATIVE_LONG_HELP
+            },
+            CUMULATIVE: {
+                'short': SUMMING_CUMULATIVE_SHORT_HELP,
+                'long': SUMMING_CUMULATIVE_LONG_HELP
+            },
+            NON_SUMMING_CUMULATIVE: {
+                'short': NON_SUMMING_CUMULATIVE_SHORT_HELP,
+                'long': NON_SUMMING_CUMULATIVE_LONG_HELP
+            }
+        },
+        PERCENTAGE: {
+            CUMULATIVE: {
+                'short': NON_SUMMING_CUMULATIVE_SHORT_HELP,
+                'long': NON_SUMMING_CUMULATIVE_LONG_HELP
+            }
+        }
+
+    }
 
     indicator_key = models.UUIDField(
         default=uuid.uuid4, help_text=" ", verbose_name=_("Indicator key"))
