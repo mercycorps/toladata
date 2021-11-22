@@ -4,6 +4,7 @@ import { library } from '@fortawesome/fontawesome-svg-core';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import { faCaretDown, faCaretRight, faPlusCircle } from '@fortawesome/free-solid-svg-icons';
 import {BLANK_TABLE_CELL} from '../../../../constants';
+import PCResultsForm from "../../../../components/resultsFormPC.js"
 
 library.add(faCaretDown, faCaretRight);
 
@@ -91,12 +92,34 @@ const IndicatorAddResults = inject("rootStore", "filterStore")(
                     data-indicator_count={filterStore.programFilterData.indicators.size}
                 ></div>
 
+                <div className="modal fade" id="addResultModal" role="dialog">
+                    <div className="modal-dialog">
+                        <div className="modal-content">
+                            <div className="modal-header">
+                                <h2>
+                                    {
+                                        gettext('Result')
+                                    }
+                                </h2>
+                                <button type="button" className="close" data-dismiss="modal" aria-label="Close">
+                                    <span aria-hidden="true">&times;</span>
+                                </button>
+                            </div>
+                            <div className="modal-body">
+                                <PCResultsForm/>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
                 <div role="tooltip" data-animation="true" tabIndex="0" data-toggle="popover" data-placement="top" data-trigger="focus hover" data-content={missingTargetText}>
                     <button
                         type="button"
                         className={"btn btn-link px-1 pt-0 mx-auto"}
                         disabled ={noTargets}
-                        onClick={ loadModal }
+                        data-toggle="modal"
+                        data-target="#addResultModal"
+                        // onClick={ loadModal }
                     >
                         <FontAwesomeIcon icon={ faPlusCircle } />
                             {
