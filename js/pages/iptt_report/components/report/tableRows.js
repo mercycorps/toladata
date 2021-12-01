@@ -298,9 +298,13 @@ class IndicatorRow extends React.Component {
             ValueCell = NumberCell;
             PeriodCell = rootStore.isTVA ? TVAResultsGroup : NumberCell;
         }
-        let cumulative = indicator.isCumulative === null ? null
-                : [1, 2].includes(indicator.isCumulative) ? gettext('Cumulative')
-                            : gettext('Non-cumulative');
+        let cumulative = null;
+        if (indicator.isPercent || [1, 2].includes(indicator.isCumulative)){
+            cumulative = gettext('Cumulative')
+        }
+        else {
+            cumulative = gettext('Non-cumulative');
+        }
         let displayNumber = indicator.number;
         if (displayNumber && displayNumber.length > 0 && displayNumber.slice(-1) == ":") {
             displayNumber = displayNumber.slice(0, -1);

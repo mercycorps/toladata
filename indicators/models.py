@@ -1193,6 +1193,14 @@ class Indicator(SafeDeleteModel):
             CUMULATIVE: {
                 'short': NON_SUMMING_CUMULATIVE_SHORT_HELP,
                 'long': NON_SUMMING_CUMULATIVE_LONG_HELP
+            },
+            # In theory, this should never be needed because percents should always be cumulative.  But there is
+            # currently a bug in indicator saving that allows LOP only indicators with uom type of percent to be
+            # saved with an is_cumulative value of non-cumulative.  This is a short term fix that should stay in place
+            # until the underlying bug is fixed.
+            NON_CUMULATIVE: {
+                'short': NON_SUMMING_CUMULATIVE_SHORT_HELP,
+                'long': NON_SUMMING_CUMULATIVE_LONG_HELP
             }
         }
 
