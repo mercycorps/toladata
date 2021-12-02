@@ -37,7 +37,7 @@ export const getIndicator = (
  *  JSON params:
  *      unit_of_measure (string)
  *      is_percent (boolean)
- *      is_cumulative (boolean)
+ *      is_cumulative (number)
  *      direction_of_change (string)
  *      baseline (number)
  *      lop_target (number)
@@ -52,7 +52,7 @@ export const withMeasurement = (
         get timeAware() { return TIME_AWARE_FREQUENCIES.includes(this.frequency);},
         unitOfMeasure: indicatorJSON.unit_of_measure || false,
         isPercent: Boolean(indicatorJSON.is_percent),
-        isCumulative: Boolean(indicatorJSON.is_cumulative),
+        isCumulative: indicatorJSON.is_cumulative ?? null,
         directionOfChange: indicatorJSON.direction_of_change || false,
         baseline: indicatorJSON.baseline || null,
         _lopTarget: indicatorJSON.lop_target || null,

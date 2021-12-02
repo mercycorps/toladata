@@ -213,7 +213,19 @@
         {% endif %}
 
         <tr class="bg-white">
-            <td><strong>{% trans "Life of Program" %}</strong></td>
+            <td>
+                <strong>{% trans "Life of Program" %}</strong>
+                {% if long_help %}
+                    <a href="#"
+                       tabindex="0"
+                       data-toggle="popover"
+                       data-placement="bottom"
+                       data-trigger="focus"
+                       data-content="{{ long_help }}"
+                       ><i class="far fa-question-circle"></i>
+                    </a>
+                {% endif %}
+            </td>
             <td class="text-right">
                 <strong>
                     {{ indicator.lop_target_active|intcomma|trailingzero }}{% if indicator.unit_of_measure_type == 2 %}%{% endif %}
@@ -234,19 +246,7 @@
             <td colspan="3" class="">
                 <div class="help-text">
                     {% if indicator.target_frequency is not None %}
-                        {% if indicator.unit_of_measure_type == 1 %}
-                            {% if indicator.is_cumulative == True %}
-                                {% trans "Results are cumulative. The Life of Program result mirrors the latest period result." %}
-                            {% elif indicator.is_cumulative == False %}
-                                {% trans "Results are non-cumulative. The Life of Program result is the sum of target periods results." %}
-                            {% endif %}
-                        {% elif indicator.unit_of_measure_type == 2 %}
-                            {% if indicator.is_cumulative == True %}
-                                {% trans "Results are cumulative. The Life of Program result mirrors the latest period result." %}
-                            {% elif indicator.is_cumulative == False %}
-                                {% trans "Results are non-cumulative. Target period and Life of Program results are calculated from the average of results." %}
-                            {% endif %}
-                        {% endif %}
+                        {{ short_help }}
                     {% endif %}
                 </div>
             </td>

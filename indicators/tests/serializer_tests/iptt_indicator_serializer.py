@@ -231,7 +231,7 @@ class TestIPTTJSONIndicatorReportDataSerializer(test.TestCase):
             program=self.program,
             targets=500,
             target_frequency=Indicator.LOP,
-            is_cumulative=True,
+            is_cumulative=Indicator.CUMULATIVE,
             results=600, results__count=2)
         indicator.disaggregation.set([self.standard_disaggregation])
         results = list(indicator.result_set.all())
@@ -319,7 +319,53 @@ class TestIPTTJSONIndicatorReportDataSerializer(test.TestCase):
         self.assertEqual(report_data2[0]['periods'][1]['actual'], None)
         self.assertEqual(report_data2[0]['periods'][2]['actual'], '500')
         self.assertEqual(report_data2[0]['periods'][3]['actual'], None)
-        
+
+    def test_two_results_in_one_period_numeric_cumulative(self):
+        indicator = RFIndicatorFactory(
+            program=self.program,
+            targets=[200, 300],
+            target_frequency=Indicator.ANNUAL,
+            is_cumulative=Indicator.CUMULATIVE,
+            results=[100, [150, 350]])
+        report_data = self.get_tp_report_data(frequency=Indicator.ANNUAL)
+        self.assertEqual(report_data[0]['periods'][0]['actual'], '100')
+        self.assertEqual(report_data[0]['periods'][1]['actual'], '600')
+        tva_report_data = self.get_tva_report_data(frequency=Indicator.ANNUAL)
+        self.assertEqual(tva_report_data[0]['periods'][0]['actual'], '100')
+        self.assertEqual(tva_report_data[0]['periods'][0]['target'], '200')
+        self.assertEqual(tva_report_data[0]['periods'][0]['met'], '50')
+        self.assertEqual(tva_report_data[0]['periods'][1]['actual'], '600')
+        self.assertEqual(tva_report_data[0]['periods'][1]['target'], '300')
+        self.assertEqual(tva_report_data[0]['periods'][1]['met'], '200')
+        report_data2 = self.get_tp_report_data(frequency=Indicator.SEMI_ANNUAL)
+        self.assertEqual(report_data2[0]['periods'][0]['actual'], '100')
+        self.assertEqual(report_data2[0]['periods'][1]['actual'], None)
+        self.assertEqual(report_data2[0]['periods'][2]['actual'], '600')
+        self.assertEqual(report_data2[0]['periods'][3]['actual'], None)
+
+    def test_two_results_in_one_period_numeric_non_summing_cumulative(self):
+        indicator = RFIndicatorFactory(
+            program=self.program,
+            targets=[200, 300],
+            target_frequency=Indicator.ANNUAL,
+            is_cumulative=Indicator.NON_SUMMING_CUMULATIVE,
+            results=[100, [150, 350]])
+        report_data = self.get_tp_report_data(frequency=Indicator.ANNUAL)
+        self.assertEqual(report_data[0]['periods'][0]['actual'], '100')
+        self.assertEqual(report_data[0]['periods'][1]['actual'], '350')
+        tva_report_data = self.get_tva_report_data(frequency=Indicator.ANNUAL)
+        self.assertEqual(tva_report_data[0]['periods'][0]['actual'], '100')
+        self.assertEqual(tva_report_data[0]['periods'][0]['target'], '200')
+        self.assertEqual(tva_report_data[0]['periods'][0]['met'], '50')
+        self.assertEqual(tva_report_data[0]['periods'][1]['actual'], '350')
+        self.assertEqual(tva_report_data[0]['periods'][1]['target'], '300')
+        self.assertEqual(tva_report_data[0]['periods'][1]['met'], '116.67')
+        report_data2 = self.get_tp_report_data(frequency=Indicator.SEMI_ANNUAL)
+        self.assertEqual(report_data2[0]['periods'][0]['actual'], '100')
+        self.assertEqual(report_data2[0]['periods'][1]['actual'], None)
+        self.assertEqual(report_data2[0]['periods'][2]['actual'], '350')
+        self.assertEqual(report_data2[0]['periods'][3]['actual'], None)
+
     def test_two_results_in_one_period_percent(self):
         indicator = RFIndicatorFactory(
             program=self.program, targets=500, target_frequency=Indicator.ANNUAL,
@@ -354,4 +400,3 @@ class TestIPTTJSONIndicatorReportDataSerializer(test.TestCase):
             tva_report_data = self.get_tva_report_data(frequency=frequency)
             self.assertEqual(len(tva_report_data), 2)
 
-    

@@ -2,7 +2,7 @@
     "annual": {
         "pk": 99,
         "frequency": 3,
-        "isCumulative": false,
+        "isCumulative": 0,
         "isPercent": false,
         "lopTarget": 1000,
         "lopActual": 500,
@@ -67,7 +67,7 @@
     "lop": {
         "pk": 105,
         "frequency": 1,
-        "isCumulative": false,
+        "isCumulative": 0,
         "isPercent": true,
         "lopTarget": 92.5,
         "lopActual": null,
@@ -89,7 +89,7 @@
     "midEnd": {
         "pk": 108,
         "frequency": 2,
-        "isCumulative": true,
+        "isCumulative": 1,
         "isPercent": true,
         "lopTarget": 10,
         "lopActual": 5,
@@ -127,7 +127,7 @@
     "semiAnnual": {
         "pk": 109,
         "frequency": 4,
-        "isCumulative": true,
+        "isCumulative": 1,
         "isPercent": false,
         "lopTarget": 200,
         "lopActual": 200,
@@ -221,7 +221,7 @@
     "noTargets1": {
         "pk": 112,
         "frequency": null,
-        "isCumulative": false,
+        "isCumulative": 0,
         "isPercent": false,
         "lopTarget": null,
         "lopActual": null,
@@ -233,7 +233,7 @@
     "noTargets2": {
         "pk": 112,
         "frequency": 2,
-        "isCumulative": false,
+        "isCumulative": 0,
         "isPercent": false,
         "lopTarget": null,
         "lopActual": null,
@@ -245,7 +245,7 @@
     "noTargetsWithResults": {
         "pk": 113,
         "frequency": 2,
-        "isCumulative": false,
+        "isCumulative": 0,
         "isPercent": false,
         "lopTarget": null,
         "lopActual": null,
@@ -264,7 +264,7 @@
     "unassignedResultsWithTargets": {
         "pk": 114,
         "frequency": 2,
-        "isCumulative": false,
+        "isCumulative": 0,
         "isPercent": false,
         "lopTarget": null,
         "lopActual": null,

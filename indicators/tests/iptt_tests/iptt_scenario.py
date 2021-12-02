@@ -27,7 +27,7 @@ Indicators:
     EVENT - 1.1b - "19.1" - Numeric NC - baseline 0
         no sites - types 1 + 2 - sector 1
         One result month 1 event 1
-        country disagg (disagg'd result) 
+        country disagg (disagg'd result)
 """
 
 import datetime
@@ -173,7 +173,7 @@ class IPTTScenarioGeneral:
                 category=label,
                 value=value
             )
-        
+
 
     def get_indicator1(self):
         indicator = RFIndicatorFactory(
@@ -184,7 +184,7 @@ class IPTTScenarioGeneral:
             name="Indicåtor Náme 1",
             number="1.1.1",
             unit_of_measure_type=Indicator.NUMBER,
-            is_cumulative=False,
+            is_cumulative=Indicator.NON_CUMULATIVE,
             baseline=0,
             baseline_na=False,
             sector=self.sector1,
@@ -222,7 +222,7 @@ class IPTTScenarioGeneral:
             name="Indicåtor Náme 3",
             number="x4.1",
             unit_of_measure_type=Indicator.NUMBER,
-            is_cumulative=True,
+            is_cumulative=Indicator.CUMULATIVE,
             baseline=100,
             baseline_na=False,
             sector=self.sector2,
@@ -245,7 +245,7 @@ class IPTTScenarioGeneral:
             name="Indicåtor Náme 4",
             number="4a",
             unit_of_measure_type=Indicator.NUMBER,
-            is_cumulative=False,
+            is_cumulative=Indicator.NON_CUMULATIVE,
             baseline=0,
             baseline_na=False,
             sector=self.sector1,
@@ -293,7 +293,7 @@ class IPTTScenarioGeneral:
             name="Indicåtor Náme 6",
             number="21.4",
             unit_of_measure_type=Indicator.NUMBER,
-            is_cumulative=True,
+            is_cumulative=Indicator.CUMULATIVE,
             baseline=100,
             baseline_na=False,
             sector=self.sector2,
@@ -318,7 +318,7 @@ class IPTTScenarioGeneral:
             name="Indicåtor Náme 7",
             number="19.1",
             unit_of_measure_type=Indicator.NUMBER,
-            is_cumulative=False,
+            is_cumulative=Indicator.NON_CUMULATIVE,
             baseline=0,
             baseline_na=False,
             sector=self.sector1,
@@ -391,7 +391,10 @@ class IPTTScenarioSums:
             'baseline_na': False
         }
         for uom_type, cumulative in [
-            (Indicator.NUMBER, False), (Indicator.NUMBER, True), (Indicator.PERCENTAGE, True)
+                (Indicator.NUMBER, Indicator.NON_CUMULATIVE),
+                (Indicator.NUMBER, Indicator.CUMULATIVE),
+                (Indicator.PERCENTAGE, Indicator.CUMULATIVE),
+                (Indicator.NUMBER, Indicator.NON_SUMMING_CUMULATIVE)
             ]:
             these_kwargs = {
                 **indicator_kwargs,
@@ -443,7 +446,7 @@ class IPTTScenarioSums:
                 (datetime.date(2016, 1, 1), indicator_multi_result.periodictargets.first()),
                 (datetime.date(2016, 5, 1), indicator_multi_result.periodictargets.all()[1]),
                 (datetime.date(2016, 12, 30), indicator_multi_result.periodictargets.all()[3])
-                ]:    
+                ]:
                 result = ResultFactory(
                     indicator=indicator_multi_result,
                     periodic_target=target,
@@ -528,13 +531,13 @@ class IndicatorGenerator:
                     yield child
         levels = get_children(None)
         return levels
-        
+
 
     def clear_after_test(self):
         Indicator.objects.all().delete()
         self.indicators_with_disaggregated_results = defaultdict(set)
-        
-        
+
+
     def add_indicator(self, **kwargs):
         disaggregations = kwargs.pop('disaggregations', [])
         disaggregations_with_results = kwargs.pop('disaggregated_results', [])
@@ -597,7 +600,7 @@ class IndicatorGenerator:
         if blank:
             levels = [None,] + levels
         return self._indicators_for_levels(levels, **kwargs)
-    
+
     def indicators_for_non_goal_levels(self, **kwargs):
         blank = kwargs.pop('blank', False)
         levels = self.levels[1:]
@@ -724,7 +727,7 @@ class IndicatorGenerator:
                 target_frequency=Indicator.ANNUAL,
                 lop_target=1200,
                 targets=1200,
-                results=[20, 80, 50],
+                results=[20, [60, 20], 50],
                 results__count=3,
                 **measurements_kwargs,
                 **levels_kwargs
@@ -804,7 +807,8 @@ class IndicatorGenerator:
             'disaggregations': [self.standard_disaggs[0], self.country_disaggs[0]]
         }
         for is_cumulative, uom_type, level_kwargs in zip(
-            [True, False, False], [Indicator.NUMBER, Indicator.NUMBER, Indicator.PERCENTAGE],
+            [Indicator.CUMULATIVE, Indicator.NON_CUMULATIVE, Indicator.NON_CUMULATIVE, Indicator.NON_SUMMING_CUMULATIVE],
+            [Indicator.NUMBER, Indicator.NUMBER, Indicator.PERCENTAGE, Indicator.NUMBER],
             levels_generator(self.levels, 1)
         ):
             indicator = self.add_indicator(
@@ -840,7 +844,7 @@ class IndicatorGenerator:
             yield self.add_indicator(
                 targets=100.25,
                 unit_of_measure_type=Indicator.NUMBER,
-                is_cumulative=False,
+                is_cumulative=Indicator.NON_CUMULATIVE,
                 results=[4.1,],
                 **frequency_kwargs,
                 **level_kwargs,
@@ -854,8 +858,8 @@ class IndicatorGenerator:
             results=[100],
             level=self.levels[0],
         )
-            
-        
+
+
 def results_generator(frequency, start_date, end_date):
     target_periods = list(PeriodicTarget.generate_for_frequency(frequency)(start_date, end_date))
     # one per target:
@@ -917,9 +921,9 @@ def results_generator(frequency, start_date, end_date):
         'date_collected': tp['start']+datetime.timedelta(days=1),
         'target': tp['customsort']
         } for tp in target_periods[::2]]
-    
-        
-    
+
+
+
 
 def levels_generator(levels, count, repeat=True):
     for level in itertools.cycle(levels) if repeat else iter(levels):
@@ -941,7 +945,7 @@ def measurements_generator():
     generator = itertools.product(
         [doc for (doc, _) in Indicator.DIRECTION_OF_CHANGE],
         [uom for (uom, _) in Indicator.UNIT_OF_MEASURE_TYPES],
-        [True, False]
+        [Indicator.CUMULATIVE, Indicator.NON_CUMULATIVE, Indicator.NON_SUMMING_CUMULATIVE]
     )
     for doc, uom, is_cumulative in generator:
         yield {

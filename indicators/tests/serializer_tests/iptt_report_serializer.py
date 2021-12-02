@@ -240,7 +240,7 @@ class TestIPTTReportLOPValues(test.TestCase):
     def test_cumulative_indicator(self):
         indicator = RFIndicatorFactory(
             program=self.program, targets=500, target_frequency=Indicator.LOP,
-            is_cumulative=True
+            is_cumulative=Indicator.CUMULATIVE
         )
         standard_disaggregation = add_standard_disaggregation(indicator)
         label_pks = [l.pk for l in standard_disaggregation.labels]

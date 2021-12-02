@@ -331,10 +331,10 @@ class IndicatorFormatsMixin:
     )
 
     def format_is_cumulative(self, value, **kwargs):
-        if value is True:
+        if value in [Indicator.CUMULATIVE, Indicator.NON_SUMMING_CUMULATIVE]:
             # Translators: C stands for Cumulative (targets are summative)
             return self.get_translated('C')
-        elif value is False:
+        elif value is Indicator.NON_CUMULATIVE:
             # Translators: NC stands for Not Cumulative (targets do not sum over time)
             return self.get_translated('NC')
         return value

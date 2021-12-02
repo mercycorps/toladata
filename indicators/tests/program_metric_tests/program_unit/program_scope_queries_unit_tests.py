@@ -18,7 +18,8 @@ from factories import (
     )
 from django import test
 
-class TestProgramReportingingCounts(test.TransactionTestCase):
+
+class TestProgramReportingCounts(test.TransactionTestCase):
     def setUp(self):
         today = datetime.date.today()
         start_date = datetime.date(today.year-2, today.month, 1)
@@ -64,7 +65,7 @@ class TestProgramReportingingCounts(test.TransactionTestCase):
         lop_indicator = self.get_base_indicator()
         lop_indicator.target_frequency = Indicator.LOP
         lop_indicator.lop_target = 10000
-        lop_indicator.is_cumulative = False
+        lop_indicator.is_cumulative = Indicator.NON_CUMULATIVE
         lop_indicator.unit_of_measure_type = Indicator.NUMBER
         lop_indicator.save()
         lop_pt = i_factories.PeriodicTargetFactory(
@@ -81,7 +82,7 @@ class TestProgramReportingingCounts(test.TransactionTestCase):
         # semi annual indicator with target and valid data
         time_indicator = self.get_base_indicator()
         time_indicator.target_frequency = Indicator.SEMI_ANNUAL
-        time_indicator.is_cumulative = True
+        time_indicator.is_cumulative = Indicator.CUMULATIVE
         time_indicator.unit_of_measure_type = Indicator.NUMBER
         time_indicator.save()
         start_date = self.program.reporting_period_start
@@ -121,7 +122,7 @@ class TestProgramReportingingCounts(test.TransactionTestCase):
         # event indicator (percent) with less than 85% of the target % hit
         event_indicator = self.get_base_indicator()
         event_indicator.target_frequency = Indicator.EVENT
-        event_indicator.is_cumulative = False
+        event_indicator.is_cumulative = Indicator.NON_CUMULATIVE
         event_indicator.unit_of_measure_type = Indicator.PERCENTAGE
         event_indicator.save()
         event_target = i_factories.PeriodicTargetFactory(
@@ -135,13 +136,46 @@ class TestProgramReportingingCounts(test.TransactionTestCase):
         event_data.achieved = 60
         event_data.save()
         self.data.append(event_data)
-        return [event_indicator]
+
+        non_summing_event_indicator = self.get_base_indicator()
+        non_summing_event_indicator.target_frequency = Indicator.EVENT
+        non_summing_event_indicator.is_cumulative = Indicator.NON_SUMMING_CUMULATIVE
+        non_summing_event_indicator.unit_of_measure_type = Indicator.NUMBER
+        non_summing_event_indicator.save()
+        event_target_1 = i_factories.PeriodicTargetFactory(
+            indicator=non_summing_event_indicator,
+            target=75,
+            customsort=0,
+            period="event 1"
+        )
+        event_target_2 = i_factories.PeriodicTargetFactory(
+            indicator=non_summing_event_indicator,
+            target=85,
+            customsort=1,
+            period="event 2"
+        )
+        self.targets.extend([event_target_1, event_target_2])
+        event_result_1 = self.get_base_data(indicator=non_summing_event_indicator, target=event_target_1)
+        event_result_1.achieved = 60
+        event_result_1.save()
+        event_result_2 = self.get_base_data(indicator=non_summing_event_indicator, target=event_target_1)
+        event_result_2.achieved = 30
+        event_result_2.save()
+        event_result_3 = self.get_base_data(indicator=non_summing_event_indicator, target=event_target_2)
+        event_result_3.achieved = 20
+        event_result_3.save()
+        event_result_4 = self.get_base_data(indicator=non_summing_event_indicator, target=event_target_2)
+        event_result_4.achieved = 40
+        event_result_4.save()
+        self.data.extend([event_result_1, event_result_2, event_result_3, event_result_4])
+
+        return [event_indicator, non_summing_event_indicator]
 
     def get_overtarget_indicators(self):
         # lop indicator with 120/100 data
         lop_indicator = self.get_base_indicator()
         lop_indicator.target_frequency = Indicator.LOP
-        lop_indicator.is_cumulative = False
+        lop_indicator.is_cumulative = Indicator.NON_CUMULATIVE
         lop_indicator.lop_target = 100
         lop_indicator.save()
         lop_pt = i_factories.PeriodicTargetFactory(
@@ -155,6 +189,7 @@ class TestProgramReportingingCounts(test.TransactionTestCase):
         lop_data.periodic_target = lop_pt
         lop_data.save()
         self.data.append(lop_data)
+
         # negative direction of change so under data should show as over target
         neg_indicator = self.get_base_indicator()
         neg_indicator.target_frequency = Indicator.LOP
@@ -172,10 +207,11 @@ class TestProgramReportingingCounts(test.TransactionTestCase):
         neg_data.periodic_target = neg_pt
         neg_data.save()
         self.data.append(neg_data)
+
         # mid end indicator _cumulative_ should check against end target only
         midend_indicator = self.get_base_indicator()
         midend_indicator.target_frequency = Indicator.MID_END
-        midend_indicator.is_cumulative = True
+        midend_indicator.is_cumulative = Indicator.CUMULATIVE
         midend_indicator.save()
         mid_target = i_factories.PeriodicTargetFactory(
             indicator=midend_indicator,
@@ -218,13 +254,12 @@ class TestProgramReportingingCounts(test.TransactionTestCase):
         self.targets.append(event_target)
         return [event_indicator]
 
-
     def test_percentages(self):
         with self.assertNumQueries(0):
             percentages = self.reporting_program.scope_counts
             self.assertEqual(
-                percentages['low'], 1,
-                "expected 1 undertarget for 1/7, got {0}".format(percentages['low'])
+                percentages['low'], 2,
+                "expected 1 undertarget for 2/7, got {0}".format(percentages['low'])
             )
             self.assertEqual(
                 percentages['on_scope'], 2,
@@ -237,11 +272,11 @@ class TestProgramReportingingCounts(test.TransactionTestCase):
 
     def test_queries(self):
         expected = {
-            'low': 1,
+            'low': 2,
             'on_scope': 2,
             'high': 3,
             'nonreporting_count': 1,
-            'indicator_count': 7
+            'indicator_count': 8
         }
         with self.assertNumQueries(2):
             program = ProgramWithMetrics.home_page.with_annotations(
@@ -314,7 +349,7 @@ class TestTargetsActualsOverUnderCorrect(test.TestCase):
             program.scope_counts['on_scope'], 1,
             "should show overunder as 0 (in range), got {0}".format(program.scope_counts)
         )
-        self.indicator.is_cumulative = True
+        self.indicator.is_cumulative = Indicator.CUMULATIVE
         self.indicator.save()
         program = ProgramWithMetrics.home_page.with_annotations('scope').get(pk=self.program.id)
         # both have data, set to cumulative, so should show latest (endline) target:

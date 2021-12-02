@@ -104,6 +104,7 @@ class RFIndicatorFactory(DjangoModelFactory):
     target_frequency = Indicator.ANNUAL
     lop_target = 1400
     unit_of_measure = FuzzyChoice(['cats', 'bananas', 'tennis rackets', 'dollars'])
+    is_cumulative = Indicator.NON_CUMULATIVE
 
     @post_generation
     def key_performance_indicator(self, created, extracted, **kwargs):

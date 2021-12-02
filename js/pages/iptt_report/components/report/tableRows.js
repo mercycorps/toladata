@@ -71,15 +71,15 @@ const IndicatorAddResults = inject("rootStore", "filterStore")(
                     $(ev.target).off('.tola.save');
                 })
         }
-        let missingTargetText = noTargets ? 
+        let missingTargetText = noTargets ?
             // # Translators: A message that lets the user know that they cannot add a result to this indicator because it has no target.
             gettext('Results cannot be added because the indicator is missing targets.' )
         : "";
 
         return (
             <td className="indicator-add-results-modal-cell">
-                
-                <div //Added this element to mimic the Program Page. Template is pulling some of this data for the form. 
+                {/*Added this element to mimic the Program Page. Template is pulling some of this data for the form.*/}
+                <div
                     style={{ visibility: 'hidden'}}
                     id={`id_link_reporting_period_${filterStore._selectedProgramId}`}
                     className=""
@@ -92,8 +92,8 @@ const IndicatorAddResults = inject("rootStore", "filterStore")(
                 ></div>
 
                 <div role="tooltip" data-animation="true" tabIndex="0" data-toggle="popover" data-placement="top" data-trigger="focus hover" data-content={missingTargetText}>
-                    <button 
-                        type="button" 
+                    <button
+                        type="button"
                         className={"btn btn-link px-1 pt-0 mx-auto"}
                         disabled ={noTargets}
                         onClick={ loadModal }
@@ -104,7 +104,7 @@ const IndicatorAddResults = inject("rootStore", "filterStore")(
                                 gettext('Add result')
                             }
                     </button>
-                </div> 
+                </div>
             </td>
         )
     })
@@ -298,9 +298,13 @@ class IndicatorRow extends React.Component {
             ValueCell = NumberCell;
             PeriodCell = rootStore.isTVA ? TVAResultsGroup : NumberCell;
         }
-        let cumulative = indicator.isCumulative === null ? null
-                : indicator.isCumulative ? gettext('Cumulative')
-                            : gettext('Non-cumulative');
+        let cumulative = null;
+        if (indicator.isPercent || [1, 2].includes(indicator.isCumulative)){
+            cumulative = gettext('Cumulative')
+        }
+        else {
+            cumulative = gettext('Non-cumulative');
+        }
         let displayNumber = indicator.number;
         if (displayNumber && displayNumber.length > 0 && displayNumber.slice(-1) == ":") {
             displayNumber = displayNumber.slice(0, -1);

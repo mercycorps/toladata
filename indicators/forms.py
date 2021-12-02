@@ -384,7 +384,6 @@ class IndicatorForm(forms.ModelForm):
         # Translators: Label of a form field.  User specifies whether changes should increase or decrease.
         self.fields['direction_of_change'].label = _("Direction of change")
         self.fields['target_frequency'].required = True
-        # self.fields['is_cumulative'].widget = forms.RadioSelect()
         if self.instance.target_frequency and self.instance.target_frequency != Indicator.LOP:
             self.fields['target_frequency'].widget.attrs['readonly'] = True
         if not self.request.has_write_access:

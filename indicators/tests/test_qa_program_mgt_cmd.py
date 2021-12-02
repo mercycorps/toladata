@@ -10,6 +10,7 @@ from factories.indicators_models import (
 )
 from factories.workflow_models import OrganizationFactory, TolaUserFactory, SectorFactory, CountryFactory
 from workflow.models import Program, Country, ProgramAccess, TolaUser
+from indicators.models import Indicator
 
 
 @test.tag('slow')
@@ -50,7 +51,7 @@ class TestQAScript(test.TestCase):
         qa_data['level'] = qa_indicator.level.id
         qa_data['baseline'] = 0
         qa_data['baseline_na'] = False
-        qa_data['is_cumulative'] = False
+        qa_data['is_cumulative'] = Indicator.NON_CUMULATIVE
 
         url = reverse('indicator_update', args=[qa_indicator.id])
         response = self.client.post(url, qa_data)

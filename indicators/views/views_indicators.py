@@ -116,7 +116,7 @@ def periodic_targets_form(request, program):
     dummy_indicator = Indicator(
         target_frequency=target_frequency_type,
         unit_of_measure_type=form.cleaned_data.get('unit_of_measure_type'),
-        is_cumulative=False,
+        is_cumulative=Indicator.NON_CUMULATIVE,
     )
 
     content = render_to_string('indicators/indicatortargets.html', {
@@ -1024,6 +1024,13 @@ def result_view(request, indicator, program):
 
     readonly = not request.has_write_access
 
+    try:
+        short_help = str(Indicator.CUMULATIVE_HELP[indicator.unit_of_measure_type][indicator.is_cumulative]['short'])
+        long_help = str(Indicator.CUMULATIVE_HELP[indicator.unit_of_measure_type][indicator.is_cumulative]['long'])
+    except KeyError:
+        short_help = None
+        long_help = None
+
     return render_to_response(
         template_name, {
             'indicator': indicator,
@@ -1032,7 +1039,9 @@ def result_view(request, indicator, program):
             'program': program_obj,
             'is_editable': is_editable,
             'on_track': on_track,
-            'readonly': readonly
+            'readonly': readonly,
+            'short_help': short_help,
+            'long_help': long_help
         }
     )
 

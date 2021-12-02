@@ -16,6 +16,7 @@ from factories import (
     )
 from django import test
 
+
 class TestTargetsActualsOverUnderCorrect(test.TestCase):
     def setUp(self):
         self.program = w_factories.ProgramFactory(
@@ -80,7 +81,7 @@ class TestTargetsActualsOverUnderCorrect(test.TestCase):
             indicator.over_under, 0,
             "should show overunder as 0 (in range), got {0}".format(indicator.over_under)
         )
-        self.indicator.is_cumulative = True
+        self.indicator.is_cumulative = Indicator.CUMULATIVE
         self.indicator.save()
         indicator = MetricsIndicator.objects.with_annotations('scope').get(pk=self.indicator.id)
         # both have data, set to cumulative, so should show latest (endline) target:
@@ -97,6 +98,24 @@ class TestTargetsActualsOverUnderCorrect(test.TestCase):
             indicator.over_under, 1,
             "should show overunder as 1 (over range), got {0}".format(indicator.over_under)
         )
+        self.indicator.is_cumulative = Indicator.NON_SUMMING_CUMULATIVE
+        self.indicator.save()
+        indicator = MetricsIndicator.objects.with_annotations('scope').get(pk=self.indicator.id)
+        # both have data, set to cumulative, so should show latest (endline) target:
+        self.assertEqual(
+            indicator.lop_target_progress, 800,
+            "should show latest target (800), got {0}".format(indicator.lop_target_progress)
+        )
+        # both have data and targets, non-summing should show endline value:
+        self.assertEqual(
+            indicator.lop_actual_progress, 950,
+            "should show all data (1300), got {0}".format(indicator.lop_actual_progress)
+        )
+        self.assertEqual(
+            indicator.over_under, 1,
+            "should show overunder as 1 (over range), got {0}".format(indicator.over_under)
+        )
+
         self.indicator.direction_of_change = Indicator.DIRECTION_OF_CHANGE_NEGATIVE
         self.indicator.save()
         indicator = MetricsIndicator.objects.with_annotations('scope').get(pk=self.indicator.id)
@@ -149,14 +168,20 @@ class TestTargetsActualsOverUnderCorrect(test.TestCase):
             indicator.over_under, 1,
             "should show over (350/500), got {0}".format(indicator.over_under)
         )
-        self.indicator.is_cumulative = True
+        self.indicator.is_cumulative = Indicator.CUMULATIVE
         self.indicator.save()
         indicator = MetricsIndicator.objects.with_annotations('scope').get(pk=self.indicator.id)
         self.assertEqual(
             indicator.lop_target_progress, 500,
             "should not take endline target (no data`) expecting 500, got {0}".format(indicator.lop_target_progress)
         )
-
+        self.indicator.is_cumulative = Indicator.NON_SUMMING_CUMULATIVE
+        self.indicator.save()
+        indicator = MetricsIndicator.objects.with_annotations('scope').get(pk=self.indicator.id)
+        self.assertEqual(
+            indicator.lop_target_progress, 500,
+            "should not take endline target (no data`) expecting 500, got {0}".format(indicator.lop_target_progress)
+        )
 
     def test_event_sums_all_targets_using_customsort(self):
         self.indicator.target_frequency = Indicator.EVENT
@@ -216,7 +241,7 @@ class TestTargetsActualsOverUnderCorrect(test.TestCase):
             indicator.over_under, 0,
             "should show on target (over under 0, 1300/1300), got {0}".format(indicator.over_under)
         )
-        self.indicator.is_cumulative = True
+        self.indicator.is_cumulative = Indicator.CUMULATIVE
         self.indicator.save()
         indicator = MetricsIndicator.objects.with_annotations('scope').get(pk=self.indicator.id)
         self.assertEqual(
@@ -224,3 +249,12 @@ class TestTargetsActualsOverUnderCorrect(test.TestCase):
             "expected most recent target for non-cumulative indicator 800, got {0}".format(
                 indicator.lop_target_progress)
         )
+        self.indicator.is_cumulative = Indicator.NON_SUMMING_CUMULATIVE
+        self.indicator.save()
+        indicator = MetricsIndicator.objects.with_annotations('scope').get(pk=self.indicator.id)
+        self.assertEqual(
+            indicator.lop_target_progress, 800,
+            "expected most recent target for non-cumulative indicator 800, got {0}".format(
+                indicator.lop_target_progress)
+        )
+

@@ -1152,6 +1152,60 @@ class Indicator(SafeDeleteModel):
         ('participant_accountability', _('Participant accountability'))
     ]
 
+    NON_CUMULATIVE = 0
+    CUMULATIVE = 1
+    NON_SUMMING_CUMULATIVE = 2
+    CUMULATIVE_VALUES = [CUMULATIVE, NON_SUMMING_CUMULATIVE]
+    IS_CUMULATIVE_CHOICES = [
+        (NON_CUMULATIVE, 'Non-cumulative'),
+        (CUMULATIVE, 'Cumulative'),
+        (NON_SUMMING_CUMULATIVE, 'Non-summing cumulative')
+    ]
+    # Translators:  Short description of how values are accumulated over time.
+    NON_CUMULATIVE_SHORT_HELP = _('Targets, actuals, and results are non-cumulative.')
+    # Translators:  Full description of how values are accumulated over time.
+    NON_CUMULATIVE_LONG_HELP = _('Targets, actuals, and results are non-cumulative. Target period actuals are the sum of all results for that target period. Life of Program target and actual are the sum of all target periods.')
+    # Translators:  Short description of how values are accumulated over time.
+    SUMMING_CUMULATIVE_SHORT_HELP = _('Targets and actuals are cumulative; results are non-cumulative.')
+    # Translators:  Full description of how values are accumulated over time.
+    SUMMING_CUMULATIVE_LONG_HELP = _('Targets and actuals are cumulative; results are non-cumulative. Target period actuals are the sum of the results from the current and all previous target periods. The Life of Program target mirrors the last target, and the Life of Program actual mirrors the most recent actual.')
+    # Translators:  Short description of how values are accumulated over time.
+    NON_SUMMING_CUMULATIVE_SHORT_HELP = _('Targets, actuals, and results are cumulative.')
+    # Translators:  Full description of how values are accumulated over time.
+    NON_SUMMING_CUMULATIVE_LONG_HELP = _('Targets, actuals, and results are cumulative. Target period actuals mirror the most recent result for that target period; no calculations are performed with results or actuals. The Life of Program target mirrors the last target, and the Life of Program actual mirrors the most recent actual.')
+
+    CUMULATIVE_HELP = {
+        NUMBER: {
+            NON_CUMULATIVE: {
+                'short': NON_CUMULATIVE_SHORT_HELP,
+                'long': NON_CUMULATIVE_LONG_HELP
+            },
+            CUMULATIVE: {
+                'short': SUMMING_CUMULATIVE_SHORT_HELP,
+                'long': SUMMING_CUMULATIVE_LONG_HELP
+            },
+            NON_SUMMING_CUMULATIVE: {
+                'short': NON_SUMMING_CUMULATIVE_SHORT_HELP,
+                'long': NON_SUMMING_CUMULATIVE_LONG_HELP
+            }
+        },
+        PERCENTAGE: {
+            CUMULATIVE: {
+                'short': NON_SUMMING_CUMULATIVE_SHORT_HELP,
+                'long': NON_SUMMING_CUMULATIVE_LONG_HELP
+            },
+            # In theory, this should never be needed because percents should always be cumulative.  But there is
+            # currently a bug in indicator saving that allows LOP only indicators with uom type of percent to be
+            # saved with an is_cumulative value of non-cumulative.  This is a short term fix that should stay in place
+            # until the underlying bug is fixed.
+            NON_CUMULATIVE: {
+                'short': NON_SUMMING_CUMULATIVE_SHORT_HELP,
+                'long': NON_SUMMING_CUMULATIVE_LONG_HELP
+            }
+        }
+
+    }
+
     indicator_key = models.UUIDField(
         default=uuid.uuid4, help_text=" ", verbose_name=_("Indicator key"))
 
@@ -1284,8 +1338,8 @@ class Indicator(SafeDeleteModel):
                     "will have exceeded our indicator target when the result is lower than the target.")
     )
 
-    is_cumulative = models.NullBooleanField(
-        blank=False, verbose_name=_("C / NC"), help_text=" "
+    is_cumulative = models.IntegerField(
+        null=True, blank=False, verbose_name=_("C / NC"), help_text=" ",
     )
 
     rationale_for_target = models.TextField(
@@ -1609,7 +1663,7 @@ class Indicator(SafeDeleteModel):
     def is_cumulative_display(self):
         """Deprecated?  Could not find where this was used, but text is updated in both
         setup form and IPTT to read "Non-cumulative" """
-        if self.is_cumulative:
+        if self.is_cumulative in [Indicator.CUMULATIVE, Indicator.NON_SUMMING_CUMULATIVE]:
             # Translators: referring to an indicator whose results accumulate over time
             return _("Cumulative")
         elif self.is_cumulative is None:
@@ -1650,7 +1704,7 @@ class Indicator(SafeDeleteModel):
         if not periodic_targets.exists():
             return None
 
-        if self.is_cumulative:
+        if self.is_cumulative in [Indicator.CUMULATIVE, Indicator.NON_SUMMING_CUMULATIVE]:
             # return the last value in the sequence
             return periodic_targets.last().target
         else:

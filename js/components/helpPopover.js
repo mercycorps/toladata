@@ -2,6 +2,12 @@ import React from 'react'
 import ReactDOM from 'react-dom';
 
 export default class HelpPopover extends React.Component {
+    componentDidMount() {// Enable popovers after mount (they break otherwise)
+        $('*[data-toggle="popover"]').popover({
+            html: true
+        });
+    }
+
     constructor(props) {
         super(props)
         this.placement = props.placement || null;

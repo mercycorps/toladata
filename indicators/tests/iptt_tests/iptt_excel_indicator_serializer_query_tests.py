@@ -129,7 +129,7 @@ class TestIPTTIndicatorSerializerQueries(test.TestCase):
                         'labels': []
                     }
                 disaggregations_map[label.disaggregation_type.pk]['labels'].append(label)
-            
+
             values_subquery = DisaggregatedValue.objects.select_related(None).prefetch_related(
                 None
             ).filter(
@@ -182,7 +182,7 @@ class TestIPTTIndicatorSerializerQueries(test.TestCase):
             full_context = {**context, 'is_tva': True, 'is_tva_full': True}
             full = IPTTExcelIndicatorSerializer.load_filtered(full_context).data
         return tp, tva, full
-        
+
     def test_loads_one_basic_indicator(self):
         indicator = self.get_base_indicator()
         for serialized_data in self.get_serialized_indicator_data():
@@ -274,7 +274,7 @@ class TestIPTTIndicatorSerializerQueries(test.TestCase):
             expected[indicator.pk] = expected_data
         for serialized_data in self.get_serialized_indicator_data(program_pk=i_gen.program.pk):
             with self.assertNumQueries(0):
-                self.assertEqual(len(serialized_data), 12)
+                self.assertEqual(len(serialized_data), 18)
                 for serialized_indicator in serialized_data:
                     for field in fields:
                         self.assertEqual(
@@ -462,7 +462,7 @@ class TestIPTTIndicatorSerializerQueries(test.TestCase):
         ):
             with self.assertNumQueries(0):
                 self.assertCountEqual([s_i['pk'] for s_i in report], two_tier_indicator_pks)
-                
+
 
     def test_disaggregations_data(self):
         i_gen = IndicatorGenerator(
@@ -637,13 +637,16 @@ class TestIPTTSerializedReportData(test.TestCase, DecimalComparator):
         percentage_pks = []
         cumulative_pks = []
         non_cumulative_pks = []
+        non_summing_cumulative_pks = []
         for indicator in indicators:
             if indicator.unit_of_measure_type == Indicator.PERCENTAGE:
                 percentage_pks.append(indicator.pk)
-            elif indicator.is_cumulative:
+            elif indicator.is_cumulative == Indicator.CUMULATIVE:
                 cumulative_pks.append(indicator.pk)
-            else:
+            elif indicator.is_cumulative == Indicator.NON_CUMULATIVE:
                 non_cumulative_pks.append(indicator.pk)
+            else:
+                non_summing_cumulative_pks.append(indicator.pk)
         def universal_asserts(report, pk):
             report_data = report[pk]
             self.assertEqual(report_data['pk'], pk)
@@ -654,20 +657,20 @@ class TestIPTTSerializedReportData(test.TestCase, DecimalComparator):
         tva = False
         for report in self.get_serialized_report_data():
             with self.assertNumQueries(0):
-                self.assertEqual(len(report.keys()), 12)
+                self.assertEqual(len(report.keys()), 18)
                 for pk in percentage_pks:
                     lop_data, periods = universal_asserts(report, pk)
                     self.assertEqual(lop_data['target'], 600)
-                    self.assertEqual(lop_data['actual'], 80)
-                    self.assertEqual(lop_data['met'], decimal.Decimal('0.1333'))
+                    self.assertEqual(lop_data['actual'], 20)
+                    self.assertEqual(lop_data['met'], decimal.Decimal('0.0333'))
                     self.assertEqual(periods[0]['actual'], 50)
                     if tva:
                         self.assertEqual(periods[0]['target'], 600)
                         self.assertEqual(periods[0]['met'], decimal.Decimal('0.0833'))
-                    self.assertEqual(periods[1]['actual'], 80)
+                    self.assertEqual(periods[1]['actual'], 20)
                     if tva:
                         self.assertEqual(periods[1]['target'], 600)
-                        self.assertEqual(periods[1]['met'], decimal.Decimal('0.1333'))
+                        self.assertEqual(periods[1]['met'], decimal.Decimal('0.0333'))
                 for pk in cumulative_pks:
                     lop_data, periods = universal_asserts(report, pk)
                     self.assertEqual(lop_data['target'], 600)
@@ -694,6 +697,19 @@ class TestIPTTSerializedReportData(test.TestCase, DecimalComparator):
                     if tva:
                         self.assertDecimalEqual(periods[1]['target'], get_decimal(600))
                         self.assertDecimalEqual(periods[1]['met'], get_decimal('0.1333', places=4))
+                for pk in non_summing_cumulative_pks:
+                    lop_data, periods = universal_asserts(report, pk)
+                    self.assertEqual(lop_data['target'], 600)
+                    self.assertEqual(lop_data['actual'], 20)
+                    self.assertEqual(lop_data['met'], decimal.Decimal('0.0333'))
+                    self.assertEqual(periods[0]['actual'], 50)
+                    if tva:
+                        self.assertEqual(periods[0]['target'], 600)
+                        self.assertEqual(periods[0]['met'], decimal.Decimal('0.0833'))
+                    self.assertEqual(periods[1]['actual'], 20)
+                    if tva:
+                        self.assertEqual(periods[1]['target'], 600)
+                        self.assertDecimalEqual(periods[1]['met'], get_decimal('0.0333', places=4))
                 tva = True
 
     def test_one_indicator_with_mismatched_lop_target_and_target_sum(self):
@@ -701,7 +717,8 @@ class TestIPTTSerializedReportData(test.TestCase, DecimalComparator):
         for report in self.get_serialized_report_data():
             with self.assertNumQueries(0):
                 for indicator in indicators:
-                    if indicator.unit_of_measure_type == Indicator.PERCENTAGE or indicator.is_cumulative:
+                    if indicator.unit_of_measure_type == Indicator.PERCENTAGE \
+                            or indicator.is_cumulative in Indicator.CUMULATIVE_VALUES:
                         self.assertDecimalEqual(report[indicator.pk]['lop_period']['target'], get_decimal(80))
                     else:
                         self.assertDecimalEqual(report[indicator.pk]['lop_period']['target'], get_decimal(160))
@@ -729,14 +746,17 @@ class TestIPTTSerializedReportData(test.TestCase, DecimalComparator):
         blank_label_pks = [l.pk for l in self.i_gen.country_disaggs[1].labels]
         percents = []
         cumulatives = []
-        regulars = []
+        non_cumulatives = []
+        non_summing_cumulatives = []
         for indicator in indicators:
             if indicator.unit_of_measure_type == Indicator.PERCENTAGE:
                 percents.append(indicator.pk)
-            elif indicator.is_cumulative:
+            elif indicator.is_cumulative == Indicator.CUMULATIVE:
                 cumulatives.append(indicator.pk)
+            elif indicator.is_cumulative == Indicator.NON_CUMULATIVE:
+                non_cumulatives.append(indicator.pk)
             else:
-                regulars.append(indicator.pk)
+                non_summing_cumulatives.append(indicator.pk)
         targets = [50, 100, 150, 200]
         actuals = [60, 105, 150, 195]
 
@@ -778,9 +798,14 @@ class TestIPTTSerializedReportData(test.TestCase, DecimalComparator):
                     lop_asserts(report_data, 200, 510)
                     for c, period in enumerate(report_data['periods']):
                         period_asserts(period, targets[c], sum(actuals[:c+1]), tva)
-                for regular_pk in regulars:
-                    report_data = report[regular_pk]
+                for non_cumulative_pk in non_cumulatives:
+                    report_data = report[non_cumulative_pk]
                     lop_asserts(report_data, 500, 510)
+                    for c, period in enumerate(report_data['periods']):
+                        period_asserts(period, targets[c], actuals[c], tva)
+                for non_summing_cumulative_pk in non_summing_cumulatives:
+                    report_data = report[non_summing_cumulative_pk]
+                    lop_asserts(report_data, 200, 195)
                     for c, period in enumerate(report_data['periods']):
                         period_asserts(period, targets[c], actuals[c], tva)
                 tva = True
@@ -814,7 +839,7 @@ class TestIPTTSerializedReportData(test.TestCase, DecimalComparator):
                         self.assertIsNone(period['disaggregations'][one_off_label]['actual'])
 
     def test_cumulative_indicators_in_tp_report(self):
-        results_list = list(self.i_gen.indicators_mixed_results(is_cumulative=True))
+        results_list = list(self.i_gen.indicators_mixed_results(is_cumulative=Indicator.CUMULATIVE))
         all_ones_label, one_off_label = [label.pk for label in self.i_gen.standard_disaggs[1].labels]
         report = self.get_serialized_report_data(frequency=Indicator.MONTHLY, tp_only=True)
         with self.assertNumQueries(0):
@@ -874,22 +899,25 @@ class TestIPTTSerializedReportData(test.TestCase, DecimalComparator):
         for indicator in self.i_gen.two_results_per_semi_annual_indicators():
             if indicator.unit_of_measure_type == Indicator.PERCENTAGE:
                 indicator_pks['percent'] = indicator.pk
-            elif indicator.is_cumulative:
+            elif indicator.is_cumulative == Indicator.CUMULATIVE:
                 indicator_pks['cumulative'] = indicator.pk
-            else:
+            elif indicator.is_cumulative == Indicator.NON_CUMULATIVE:
                 indicator_pks['noncumulative'] = indicator.pk
+            else:
+                indicator_pks['nonsummingcumulative'] = indicator.pk
         def lop_asserts(report_pk, lop_period):
             noncumulative = report_pk == indicator_pks['noncumulative']
             cumulative = report_pk == indicator_pks['cumulative']
             percent = report_pk == indicator_pks['percent']
-            assert noncumulative or cumulative or percent
+            nonsummingcumulative = report_pk == indicator_pks['nonsummingcumulative']
+            assert any((noncumulative, cumulative, percent, nonsummingcumulative))
             self.assertDecimalEqual(lop_period['target'], get_decimal(500 if noncumulative else 200))
-            self.assertDecimalEqual(lop_period['actual'], get_decimal(205.15 if percent else 1000.6))
+            self.assertDecimalEqual(lop_period['actual'], get_decimal(205.15 if percent or nonsummingcumulative else 1000.6))
             self.assertDecimalEqual(
                 lop_period['met'], get_decimal((2.0012 if noncumulative else 5.003 if cumulative else 1.0258), places=4)
             )
             return 0 if noncumulative else 1 if cumulative else 2
-            
+
         tva = False
         below_five_label = self.i_gen.standard_disaggs[0].labels[0].pk
         empty_label = self.i_gen.standard_disaggs[0].labels[1].pk

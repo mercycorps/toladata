@@ -70,7 +70,8 @@ class TestIndicatorCreateFormDisaggregations(test.TestCase):
             'unit_of_measure': 'cats',
             'unit_of_measure_type': 1,
             'direction_of_change': 2,
-            'target_frequency': 1
+            'target_frequency': 1,
+            'is_cumulative': Indicator.NON_CUMULATIVE
         }
 
     def test_no_disaggregations_form(self):
@@ -417,6 +418,7 @@ class TestIndicatorUpdateFormDisaggregations(test.TestCase):
                     'unit_of_measure_type': instance.unit_of_measure_type,
                     'direction_of_change': instance.direction_of_change,
                     'target_frequency': instance.target_frequency,
+                    'is_cumulative': instance.is_cumulative,
                     **data
                 }
         else:
