@@ -293,7 +293,7 @@ class TestIndicatorAuditLog(test.TestCase):
 
     def test_indicator_update_is_logged_with_just_rationale(self):
         indicator = i_factories.RFIndicatorFactory(
-            program=self.program, is_cumulative=True, targets=1000, results=True
+            program=self.program, is_cumulative=Indicator.CUMULATIVE, targets=1000, results=True
         )
         old_indicator_values = indicator.logged_fields
         indicator.is_cumulative = False
@@ -314,7 +314,7 @@ class TestIndicatorAuditLog(test.TestCase):
 
     def test_indicator_update_is_logged_with_rationale_option_other(self):
         indicator = i_factories.RFIndicatorFactory(
-            program=self.program, is_cumulative=True, targets=1000, results=True
+            program=self.program, is_cumulative=Indicator.CUMULATIVE, targets=1000, results=True
         )
         old_indicator_values = indicator.logged_fields
         indicator.is_cumulative = False
@@ -336,7 +336,7 @@ class TestIndicatorAuditLog(test.TestCase):
 
     def test_indicator_update_is_logged_with_non_other_rationale_options(self):
         indicator = i_factories.RFIndicatorFactory(
-            program=self.program, is_cumulative=True, targets=1000, results=True
+            program=self.program, is_cumulative=Indicator.CUMULATIVE, targets=1000, results=True
         )
         old_indicator_values = indicator.logged_fields
         indicator.is_cumulative = False
@@ -357,7 +357,7 @@ class TestIndicatorAuditLog(test.TestCase):
 
     def test_indicator_update_is_logged_with_rationale_options_and_rationale(self):
         indicator = i_factories.RFIndicatorFactory(
-            program=self.program, is_cumulative=True, targets=1000, results=True
+            program=self.program, is_cumulative=Indicator.CUMULATIVE, targets=1000, results=True
         )
         old_indicator_values = indicator.logged_fields
         indicator.is_cumulative = False
@@ -381,7 +381,7 @@ class TestIndicatorAuditLog(test.TestCase):
     def test_indicator_update_is_logged_with_non_other_rationale_options_and_rationale(self):
         SPECIAL_CHARS = "Test rationale spéçîal chars"
         indicator = i_factories.RFIndicatorFactory(
-            program=self.program, is_cumulative=True, targets=1000, results=True
+            program=self.program, is_cumulative=Indicator.CUMULATIVE, targets=1000, results=True
         )
         old_indicator_values = indicator.logged_fields
         indicator.is_cumulative = False
@@ -403,7 +403,7 @@ class TestIndicatorAuditLog(test.TestCase):
 
     def test_indicator_update_fails_validation(self):
         indicator = i_factories.RFIndicatorFactory(
-            program=self.program, is_cumulative=True, targets=1000, results=True
+            program=self.program, is_cumulative=Indicator.CUMULATIVE, targets=1000, results=True
         )
         old_indicator_values = indicator.logged_fields
         indicator.is_cumulative = False
@@ -496,7 +496,7 @@ class TestAuditLogRationaleSelectionsDisplay(test.TestCase):
 
     def setUp(self):
         self.indicator = i_factories.RFIndicatorFactory(
-            targets=100, program=self.program, results=True, is_cumulative=False
+            targets=100, program=self.program, results=True, is_cumulative=Indicator.NON_CUMULATIVE
         )
         self.client.force_login(user=self.tola_user.user)
 

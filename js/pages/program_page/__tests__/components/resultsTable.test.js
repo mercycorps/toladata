@@ -65,7 +65,7 @@ describe("Results table component", () => {
             let lopRow = table.find('tbody').first().children().last().dive();
             expect(lopRow.children().length).toBe(5);
             expect(lopRow.childAt(0).find('strong').length).toBe(1);
-            expect(lopRow.childAt(0).find('strong').first().text()).toBe("Life of Program");
+            expect(lopRow.childAt(0).find('strong').first().text()).toBe("Life of Program<HelpPopover />");
         })
         test.each(testProps)("contains a results action section with appropriate buttons", (props) => {
             let wrapper = shallow(<ResultsTable {...props} />).find('.results-table__wrapper');
@@ -117,7 +117,7 @@ describe("Results table component", () => {
             let lopRow = table.find('tbody').first().children().last().dive();
             expect(lopRow.children().length).toBe(5);
             expect(lopRow.childAt(0).find('strong').length).toBe(1);
-            expect(lopRow.childAt(0).find('strong').first().text()).toBe("Life of Program");
+            expect(lopRow.childAt(0).find('strong').first().text()).toBe("Life of Program<HelpPopover />");
         })
         test.each(testProps)("contains a results action section with no buttons", (props) => {
             let wrapper = shallow(<ResultsTable {...props} />).find('.results-table__wrapper');

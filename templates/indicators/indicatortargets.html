@@ -117,8 +117,8 @@
         </div>
 
         <div class="form-group card card-body" id="id_div_is_cumulative">
-            <!-- UNIT_OF_MEASURE_TYPE = 1 IS NUMBER AND 2 IS PERCENTAGE -->
-            <!-- IS_CUMULATIVE = 2 and NON_CUMULATIVE = 3 -->
+            {# UNIT_OF_MEASURE_TYPE = 1 IS NUMBER AND 2 IS PERCENTAGE #}
+            {# IS_CUMULATIVE = 2 and NON_CUMULATIVE = 3 #}
             {% with unit_type=indicator.unit_of_measure_type %}
             <div class="" id="id_is_cumulative_section_header">
                 <h4>
@@ -127,48 +127,67 @@
                     </span>
                 </h4>
             </div>
-            <div id="id_div_is_cumulative_section1" class="form-check">
+            <div id="id_div_is_cumulative_section_nc" class="form-check">
                 <input
                     type="radio"
                     name="is_cumulative"
-                    value="3"
+                    value="0"
                     required
                     {% if readonly %} disabled="disabled" {% endif %}
-                    {% if indicator.is_cumulative is None or indicator.is_cumulative is False %} checked {% endif %}
+                    {% if indicator.is_cumulative is None or indicator.is_cumulative == 0 %} checked {% endif %}
                     class="form-control form-check-input"
-                    id="id_is_cumulative_1"
+                    id="id_is_cumulative_nc"
                     >
                 <label
                     class="form-check-label"
-                    for="id_is_cumulative_1">
+                    for="id_is_cumulative_nc">
                     {% blocktrans %}
-                    <strong>Non-cumulative (NC):</strong> Target period results are automatically calculated from data collected during the period. The Life of Program result is the sum of target period values.
+                    <strong>Targets, actuals, and results are non-cumulative.</strong> Target period actuals are the sum of all results for that target period. Life of Program target and actual are the sum of all target periods.
                     {% endblocktrans %}
                 </label>
             </div>
-            <div id="id_div_is_cumulative_section2" class="form-check">
+             <div id="id_div_is_cumulative_section_c" class="form-check">
+                <input
+                    type="radio"
+                    name="is_cumulative"
+                    value="1"
+                    required
+                    {% if readonly %} disabled="disabled" {% endif %}
+                    {% if indicator.is_cumulative == 1 %} checked {% endif %}
+                    class="form-control form-check-input"
+                    id="id_is_cumulative_c"
+                    >
+                <label
+                    class="form-check-label"
+                    for="id_is_cumulative_c">
+                    {% blocktrans %}
+                    <strong>Targets and actuals are cumulative; results are non-cumulative.</strong> Target period actuals are the sum of the results from the current and all previous target periods. The Life of Program target mirrors the last target, and the Life of Program actual mirrors the most recent actual.
+                    {% endblocktrans %}
+                </label>
+            </div>
+            <div id="id_div_is_cumulative_section_nsc" class="form-check">
                 <input
                     type="radio"
                     name="is_cumulative"
                     value="2"
                     required
                     {% if readonly %} disabled="disabled" {% endif %}
-                    {% if indicator.is_cumulative is True %} checked {% endif %}
+                    {% if indicator.is_cumulative == 2 %} checked {% endif %}
                     class="form-control form-check-input"
-                    id="id_is_cumulative_2"
+                    id="id_is_cumulative_nsc"
                     >
                 <label
                     class="form-check-label"
-                    for="id_is_cumulative_2">
+                    for="id_is_cumulative_nsc">
                     {% blocktrans %}
-                    <strong>Cumulative (C):</strong> Target period results automatically include data from previous periods. The Life of Program result mirrors the latest period value.
+                    <strong>Targets, actuals, and results are cumulative.</strong> Target period actuals mirror the most recent result for that target period; no calculations are performed with results or actuals. The Life of Program target mirrors the last target, and the Life of Program actual mirrors the most recent actual.
                     {% endblocktrans %}
                 </label>
             </div>
-            <div id="id_div_is_cumulative_section3" class="form-group">
+            <div id="id_div_is_cumulative_section_c_only" class="form-group">
                 <span class="form-check-label">
                     {% blocktrans %}
-                    <strong>Cumulative (C):</strong> The Life of Program result mirrors the latest period result. No calculations are performed with results.
+                    <strong>Targets, actuals, and results are cumulative.</strong> Target period actuals mirror the most recent result for that target period; no calculations are performed with results or actuals. The Life of Program target mirrors the last target, and the Life of Program actual mirrors the most recent actual.
                     {% endblocktrans %}
                 </span>
             </div>

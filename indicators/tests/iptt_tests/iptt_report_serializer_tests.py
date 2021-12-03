@@ -110,12 +110,12 @@ class TestReportSerializers(test.TestCase):
                 fr_actuals_report.filename,
                 f"Rapport IPTT relatif aux valeurs réelles {fr_date_string}.xlsx"
             )
-            
+
             self.assertEqual(
                 fr_tva_report.filename,
                 f"Rapport TVA IPTT {fr_date_string}.xlsx"
             )
-            
+
             self.assertEqual(
                 fr_full_report.filename,
                 f"Rapport IPTT relatif à la totalité de la TVA du programme {fr_date_string}.xlsx"
@@ -348,7 +348,7 @@ class TestReportSerializers(test.TestCase):
             unit_of_measure_type=Indicator.NUMBER,
             baseline=100,
             direction_of_change=Indicator.DIRECTION_OF_CHANGE_POSITIVE,
-            is_cumulative=False,
+            is_cumulative=Indicator.NON_CUMULATIVE,
             lop_target=1500,
             targets=1200,
             results=True
@@ -370,7 +370,7 @@ class TestReportSerializers(test.TestCase):
             self.assertEqual(goal_indicators[0]['name'], SPECIAL_CHARACTERS)
             self.assertEqual(goal_indicators[0]['unit_of_measure'], 'bananas')
             self.assertEqual(goal_indicators[0]['direction_of_change'], '+')
-            self.assertEqual(goal_indicators[0]['is_cumulative'], False)
+            self.assertEqual(goal_indicators[0]['is_cumulative'], Indicator.NON_CUMULATIVE)
             self.assertEqual(goal_indicators[0]['unit_of_measure_type'], '#')
             self.assertEqual(goal_indicators[0]['baseline'], '100')
 
@@ -391,7 +391,7 @@ class TestReportSerializers(test.TestCase):
             self.assertRaises(StopIteration, next, second_level['indicators'])
             for level_row in level_rows:
                 self.assertEqual(list(level_row['indicators']), [])
-            
+
     def test_indicator_types_filters(self):
         in_indicator = self.get_indicator()
         in_indicator.indicator_type.set([self.i_type1])

@@ -2,8 +2,8 @@ msgid ""
 msgstr ""
 "Project-Id-Version: \n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2021-08-18 21:29-0700\n"
-"PO-Revision-Date: 2021-08-13 08:53-0700\n"
+"POT-Creation-Date: 2021-11-17 16:31-0800\n"
+"PO-Revision-Date: 2021-11-17 12:14-0800\n"
 "Last-Translator: \n"
 "Language-Team: \n"
 "Language: es\n"
@@ -67,13 +67,13 @@ msgid "Error"
 msgstr "Error"
 
 #. Translators: a button to open the import indicators popover
-#: js/components/ImportIndicatorsPopover.js:14
-#: js/components/ImportIndicatorsPopover.js:145
+#: js/components/ImportIndicatorsPopover.js:18
+#: js/components/ImportIndicatorsPopover.js:149
 msgid "Import indicators"
 msgstr "Indicadores de importación"
 
 #. Translators: Link to the program change log to view more details.
-#: js/components/ImportIndicatorsPopover.js:384
+#: js/components/ImportIndicatorsPopover.js:388
 msgid "View the program change log for more details."
 msgstr ""
 "Consulte el registro de cambios del programa para obtener más detalles."
@@ -83,7 +83,7 @@ msgstr ""
 #. Translators: This is the prompt on a popup that has warned users about a change they are about to make that could have broad consequences
 #. Translators: This is a confirmation prompt to confirm a user wants to archive an item
 #. Translators: This is a confirmation prompt to confirm a user wants to unarchive an item
-#: js/components/ImportIndicatorsPopover.js:392
+#: js/components/ImportIndicatorsPopover.js:396
 #: js/pages/results_framework/models.js:629
 #: js/pages/tola_management_pages/country/components/edit_disaggregations.js:661
 #: js/pages/tola_management_pages/country/models.js:478
@@ -93,42 +93,42 @@ msgid "Are you sure you want to continue?"
 msgstr "¿Está seguro que quiere continuar?"
 
 #. Translators: Button to continue and upload the template
-#: js/components/ImportIndicatorsPopover.js:404
+#: js/components/ImportIndicatorsPopover.js:408
 msgid "Continue"
 msgstr "Continuar"
 
 #. Translators: Button to cancel the import process and close the popover
 #. Translators: Button to cancel a form submission
-#: js/components/ImportIndicatorsPopover.js:415
-#: js/components/ImportIndicatorsPopover.js:627
+#: js/components/ImportIndicatorsPopover.js:419
+#: js/components/ImportIndicatorsPopover.js:631
 #: js/components/changesetNotice.js:66
 #: js/pages/results_framework/components/level_cards.js:578
 msgid "Cancel"
 msgstr "Cancelar"
 
 #. Translators: Instructions for users to download the template, open it in Excel, and then fill in indicators information.
-#: js/components/ImportIndicatorsPopover.js:434
+#: js/components/ImportIndicatorsPopover.js:438
 msgid "Download the template, open it in Excel, and enter indicators."
 msgstr "Descargue la plantilla, ábrala en Excel e introduzca los indicadores."
 
 #. Translators: Instructions for users to upload their filled in template and then follow the instructions to complete the import process.
-#: js/components/ImportIndicatorsPopover.js:440
+#: js/components/ImportIndicatorsPopover.js:444
 msgid "Upload the template and follow instructions to complete the process."
 msgstr ""
 "Cargue la plantilla y siga las instrucciones para completar el proceso."
 
 #. Translators: Button to download a template
-#: js/components/ImportIndicatorsPopover.js:477
+#: js/components/ImportIndicatorsPopover.js:481
 msgid "Download template"
 msgstr "Descargar la plantilla"
 
 #. Translators: Button to upload the import indicators template
-#: js/components/ImportIndicatorsPopover.js:488
+#: js/components/ImportIndicatorsPopover.js:492
 msgid "Upload template"
 msgstr "Cargar la plantilla"
 
 #. Translators: The count of indicators that have passed validation and are ready to be imported to complete the process. This cannot be undone after completing.
-#: js/components/ImportIndicatorsPopover.js:510
+#: js/components/ImportIndicatorsPopover.js:514
 #, python-format
 msgid "%s indicator row is ready to be imported."
 msgid_plural "%s indicators rows are ready to be imported."
@@ -136,7 +136,7 @@ msgstr[0] "%s fila de indicador está lista para su importación."
 msgstr[1] "%s filas de indicadores están listas para su importación."
 
 #. Translators: The count of indicators that have passed validation and are ready to be imported to complete the process. This cannot be undone after completing.
-#: js/components/ImportIndicatorsPopover.js:520
+#: js/components/ImportIndicatorsPopover.js:524
 #, python-format
 msgid "%s indicator row has missing or invalid information."
 msgid_plural "%s indicators rows have missing or invalid information."
@@ -145,17 +145,17 @@ msgstr[1] ""
 "A %s filas de indicadores les falta información o esta no es válida."
 
 #. Translators: Download an excel template with errors that need fixing highlighted
-#: js/components/ImportIndicatorsPopover.js:534
+#: js/components/ImportIndicatorsPopover.js:538
 msgid "Download a copy of your template with errors highlighted"
 msgstr "Descargue una copia de la plantilla con los errores resaltados"
 
 #. Translators: Fix the errors from the feedback file and upload the excel template again.
-#: js/components/ImportIndicatorsPopover.js:539
+#: js/components/ImportIndicatorsPopover.js:543
 msgid ", fix the errors, and upload again."
 msgstr "corrija los errores y vuelva a cargarla."
 
 #. Translators: The count of indicators that have passed validation and are ready to be imported to complete the process. This cannot be undone after completing.
-#: js/components/ImportIndicatorsPopover.js:572
+#: js/components/ImportIndicatorsPopover.js:576
 #, python-format
 msgid ""
 "%s indicator is ready to be imported. Are you ready to complete the import "
@@ -171,17 +171,17 @@ msgstr[1] ""
 "de importación? (Esta acción no se puede deshacer)."
 
 #. Translators: Button to confirm and complete the import process
-#: js/components/ImportIndicatorsPopover.js:591
+#: js/components/ImportIndicatorsPopover.js:595
 msgid "Complete import"
 msgstr "Completar la importación"
 
 #. Translators: Button to confirm and complete the import process
-#: js/components/ImportIndicatorsPopover.js:604
+#: js/components/ImportIndicatorsPopover.js:608
 msgid "Upload Template"
 msgstr "Cargar la plantilla"
 
 #. Translators: Message with the count of indicators that were successfully imported but they require additional details before they can be submitted. Message to the user to close this popover message to see their new imported indicators.
-#: js/components/ImportIndicatorsPopover.js:645
+#: js/components/ImportIndicatorsPopover.js:649
 #, python-format
 msgid ""
 "%s indicator was successfully imported, but requires additional details "
@@ -197,7 +197,7 @@ msgstr[1] ""
 "para poder enviar los resultados."
 
 #. Translators: Message with the count of indicators that were successfully imported but they require additional details before they can be submitted. Message to the user to close this popover message to see their new imported indicators.
-#: js/components/ImportIndicatorsPopover.js:655
+#: js/components/ImportIndicatorsPopover.js:659
 #, python-format
 msgid ""
 "%s indicator was successfully imported, but requires additional details "
@@ -217,29 +217,29 @@ msgstr[1] ""
 "indicadores importados."
 
 #. Translators: A link to the program page to add the addition setup information for the imported indicators.
-#: js/components/ImportIndicatorsPopover.js:667
+#: js/components/ImportIndicatorsPopover.js:671
 msgid "Visit the program page to complete indicator setup."
 msgstr ""
 "Visite la página del programa para completar la configuración de los "
 "indicadores."
 
 #. Translators: Notification for a error that happend on the web server.
-#: js/components/ImportIndicatorsPopover.js:684
+#: js/components/ImportIndicatorsPopover.js:688
 msgid "There was a server-related problem."
 msgstr "Hubo un problema relacionado con el servidor."
 
 #. Translators: A button to try import over after a error occurred.
-#: js/components/ImportIndicatorsPopover.js:694
+#: js/components/ImportIndicatorsPopover.js:698
 msgid "Try again"
 msgstr "Intentarlo de nuevo"
 
 #. Translators: Click to view the Advanced Option section
-#: js/components/ImportIndicatorsPopover.js:742
+#: js/components/ImportIndicatorsPopover.js:755
 msgid "Advanced options"
 msgstr "Opciones avanzadas"
 
 #. Translators: Details explaining that by default the template will include 10 or 20 rows per result level. You can adjust the number if you need more or less rows.
-#: js/components/ImportIndicatorsPopover.js:750
+#: js/components/ImportIndicatorsPopover.js:763
 msgid ""
 "By default, the template will include 10 or 20 indicator rows per result "
 "level. Adjust the numbers if you need more or fewer rows."
@@ -248,7 +248,7 @@ msgstr ""
 "resultados. Modifique los números si necesita más o menos filas."
 
 #. Translators: Message to user that we cannot import the their file. This could be caused by the wrong file being selected, or the structure of the file was changed, or the results framework was updated and does not match the template anymore.
-#: js/components/ImportIndicatorsPopover.js:899
+#: js/components/ImportIndicatorsPopover.js:912
 msgid ""
 "We can’t import indicators from this file. This can happen if the wrong file "
 "is selected, the template structure is modified, or the results framework "
@@ -260,12 +260,12 @@ msgstr ""
 "y ya no coincide con la plantilla."
 
 #. Translators: Messsage to user that there aren't any new indicators in the uploaded file.
-#: js/components/ImportIndicatorsPopover.js:902
+#: js/components/ImportIndicatorsPopover.js:915
 msgid "We can't find any indicators in this file."
 msgstr "No se han encontrado indicadores en este archivo."
 
 #. Translators: Message to user that the import indicator process could not be completed. If the problem continues, contact your TolaData administrator.
-#: js/components/ImportIndicatorsPopover.js:905
+#: js/components/ImportIndicatorsPopover.js:918
 msgid ""
 "Sorry, we couldn’t complete the import process. If the problem persists, "
 "please contact your TolaData administrator."
@@ -274,7 +274,7 @@ msgstr ""
 "problema persiste, póngase en contacto con su administrador de TolaData."
 
 #. Translators: Message to user that the import could not be completed and to find out the reason, upload the import template again.
-#: js/components/ImportIndicatorsPopover.js:908
+#: js/components/ImportIndicatorsPopover.js:921
 msgid ""
 "Sorry, we couldn’t complete the import process. To figure out what went "
 "wrong, please upload your template again."
@@ -283,7 +283,7 @@ msgstr ""
 "averiguar qué ha fallado, vuelva a cargar la plantilla."
 
 #. Translators: Message to user that someone else has uploaded a template in the last 24 hours and may be in the process of importing indicators to this program. You can view the program change log to see more details.
-#: js/components/ImportIndicatorsPopover.js:911
+#: js/components/ImportIndicatorsPopover.js:924
 msgid ""
 "Someone else uploaded a template in the last 24 hours, and may be in the "
 "process of adding indicators to this program."
@@ -292,7 +292,7 @@ msgstr ""
 "que esté en proceso de añadir indicadores a este programa."
 
 #. Translators: Message to user that the type of file that was uploaded was not an Excel file and they should upload a Excel file.
-#: js/components/ImportIndicatorsPopover.js:914
+#: js/components/ImportIndicatorsPopover.js:927
 msgid "We don’t recognize this file type. Please upload an Excel file."
 msgstr ""
 "No se ha reconocido el tipo de archivo. Por favor, suba un archivo de Excel."
@@ -719,7 +719,7 @@ msgstr "Todos los valores de este informe se redondean a dos decimales."
 #: js/pages/iptt_report/components/report/headerCells.js:63
 #: js/pages/iptt_report/components/report/tableHeader.js:166
 #: js/pages/program_page/components/indicator_list.js:207
-#: js/pages/program_page/components/resultsTable.js:253
+#: js/pages/program_page/components/resultsTable.js:273
 msgid "Target"
 msgstr "Objetivo"
 
@@ -734,7 +734,7 @@ msgstr "Real"
 #. Translators: Header for a column listing the progress towards the target value
 #: js/pages/iptt_report/components/report/headerCells.js:91
 #: js/pages/iptt_report/components/report/tableHeader.js:180
-#: js/pages/program_page/components/resultsTable.js:261
+#: js/pages/program_page/components/resultsTable.js:281
 msgid "% Met"
 msgstr "% Cumplido"
 
@@ -802,7 +802,7 @@ msgstr "Base"
 #: js/pages/iptt_report/components/report/tableRows.js:328
 #: js/pages/iptt_report/components/report/tableRows.js:330
 #: js/pages/program_page/components/indicator_list.js:293
-#: js/pages/program_page/components/resultsTable.js:9
+#: js/pages/program_page/components/resultsTable.js:11
 #: js/pages/tola_management_pages/audit_log/views.js:159
 #: js/pages/tola_management_pages/audit_log/views.js:196
 #: js/pages/tola_management_pages/audit_log/views.js:282
@@ -818,7 +818,7 @@ msgstr ""
 
 #. Translators: a button that lets the user add a new result
 #: js/pages/iptt_report/components/report/tableRows.js:104
-#: js/pages/program_page/components/resultsTable.js:318
+#: js/pages/program_page/components/resultsTable.js:338
 msgid "Add result"
 msgstr "Agregar resultado"
 
@@ -1203,7 +1203,7 @@ msgid "No evidence"
 msgstr "Sin evidencia"
 
 #. Translators: Explains how performance is categorized as close to the target or not close to the target
-#: js/pages/program_page/components/resultsTable.js:38
+#: js/pages/program_page/components/resultsTable.js:40
 msgid ""
 "<p><strong>The actual value is %(percent)s of the target value.</strong> An "
 "indicator is on track if the result is no less than 85% of the target and no "
@@ -1217,71 +1217,111 @@ msgstr ""
 "indicador está encaminado.</em></p>"
 
 #. Translators: Label for an indicator that is within a target range
-#: js/pages/program_page/components/resultsTable.js:44
+#: js/pages/program_page/components/resultsTable.js:46
 msgid "On track"
 msgstr "Encaminado"
 
 #. Translators: Label for an indicator that is above or below the target value
-#: js/pages/program_page/components/resultsTable.js:48
+#: js/pages/program_page/components/resultsTable.js:50
 msgid "Not on track"
 msgstr "No encaminado"
 
 #. Translators: Shown in a results cell when there are no results to display
-#: js/pages/program_page/components/resultsTable.js:130
+#: js/pages/program_page/components/resultsTable.js:132
 msgid "No results reported"
 msgstr "No se han reportado resultados"
 
 #. Translators: Label for a row showing totals from program start until today
-#: js/pages/program_page/components/resultsTable.js:156
+#: js/pages/program_page/components/resultsTable.js:158
 msgid "Program to date"
 msgstr "Programa a la fecha"
 
-#. Translators: explanation of the summing rules for the totals row on a list of results
-#: js/pages/program_page/components/resultsTable.js:207
-msgid ""
-"Results are cumulative. The Life of Program result mirrors the latest period "
-"result."
-msgstr ""
-"Los resultados son acumulativos. El resultado de la vida del programa "
-"refleja el último resultado del período."
+#. Translators: brief description of summing rules a series of numbers
+#: js/pages/program_page/components/resultsTable.js:206
+msgid "Targets, actuals, and results are non-cumulative."
+msgstr "Los objetivos, los reales, y los resultados no son acumulativos."
 
 #. Translators: explanation of the summing rules for the totals row on a list of results
-#: js/pages/program_page/components/resultsTable.js:210
+#: js/pages/program_page/components/resultsTable.js:208
 msgid ""
-"Results are non-cumulative. The Life of Program result is the sum of target "
-"period results."
+"<strong>Targets, actuals, and results are non-cumulative.</strong> Target "
+"period actuals are the sum of all results for that target period. Life of "
+"Program target and actual are the sum of all target periods."
 msgstr ""
-"Los resultados no son acumulativos. El resultado de la vida del programa es "
-"la suma de los resultados de los períodos objetivo."
+"<strong>Los objetivos, los reales, y los resultados no son acumulativos.</"
+"strong> Los reales del periodo objetivo son la suma de todos los resultados "
+"de ese periodo objetivo. Los objetivos y los reales de la vida del programa "
+"son la suma de todos los periodos objetivo."
+
+#. Translators: brief description of summing rules a series of numbers
+#: js/pages/program_page/components/resultsTable.js:212
+msgid "Targets and actuals are cumulative; results are non-cumulative."
+msgstr ""
+"Los objetivos y los reales son acumulativos; los resultados no son "
+"acumulativos."
+
+#. Translators: explanation of the summing rules for the totals row on a list of results
+#: js/pages/program_page/components/resultsTable.js:214
+msgid ""
+"<strong>Targets and actuals are cumulative; results are non-cumulative.</"
+"strong> Target period actuals are the sum of the results from the current "
+"and all previous target periods. The Life of Program target mirrors the last "
+"target, and the Life of Program actual mirrors the most recent actual."
+msgstr ""
+"<strong>Los objetivos y los reales son acumulativos; los resultados no son "
+"acumulativos.</strong> Los reales del periodo objetivo son la suma de los "
+"resultados del periodo objetivo actual y de todos los anteriores. El "
+"objetivo de la vida del programa refleja el último objetivo, y el real de la "
+"vida del programa refleja el real más reciente."
+
+#. Translators: brief description of summing rules a series of numbers
+#: js/pages/program_page/components/resultsTable.js:218
+msgid "Targets, actuals, and results are cumulative."
+msgstr "Los objetivos, los reales, y los resultados son acumulativos."
+
+#. Translators: explanation of the summing rules for the totals row on a list of results
+#: js/pages/program_page/components/resultsTable.js:220
+msgid ""
+"<strong>Targets, actuals, and results are cumulative.</strong> Target period "
+"actuals mirror the most recent result for that target period; no "
+"calculations are performed with results or actuals. The Life of Program "
+"target mirrors the last target, and the Life of Program actual mirrors the "
+"most recent actual."
+msgstr ""
+"<strong>Los objetivos, los reales, y los resultados son acumulativos.</"
+"strong> Los reales del periodo objetivo reflejan el resultado más reciente "
+"de ese periodo objetivo; no se realizan cálculos con los resultados o los "
+"reales. El objetivo de la vida del programa refleja el último objetivo, y el "
+"real de la vida del programa refleja el real más reciente."
 
 #. Translators: identifies a results row as summative for the entire life of the program
-#: js/pages/program_page/components/resultsTable.js:216
+#: js/pages/program_page/components/resultsTable.js:227
 msgid "Life of Program"
 msgstr "Vida del programa"
 
 #. Translators: Header for a column listing periods in which results are grouped
-#: js/pages/program_page/components/resultsTable.js:249
+#: js/pages/program_page/components/resultsTable.js:269
 msgid "Target period"
 msgstr "Período objetivo"
 
 #. Translators: Header for a column listing actual result values for each row
-#: js/pages/program_page/components/resultsTable.js:257
+#: js/pages/program_page/components/resultsTable.js:277
 msgctxt "table (short) header"
 msgid "Actual"
 msgstr "Real"
 
 #. Translators: Header for a column listing actual results for a given period
-#: js/pages/program_page/components/resultsTable.js:265
+#: js/pages/program_page/components/resultsTable.js:285
 msgid "Results"
 msgstr "Resultados"
 
 #. Translators: Header for a column listing supporting documents for results
-#: js/pages/program_page/components/resultsTable.js:269
+#: js/pages/program_page/components/resultsTable.js:289
 msgid "Evidence"
 msgstr "Evidencia"
 
 #. Translators: Button label which opens a form to add targets to a given indicator
-#: js/pages/program_page/components/resultsTable.js:304
+#: js/pages/program_page/components/resultsTable.js:324
 msgid "Add targets"
 msgstr "Agregar objetivos"
 
@@ -2799,6 +2839,20 @@ msgstr "Rendimiento"
 #: tola/db_translations.js:138
 msgid "Process / Management"
 msgstr "Procesos/Gestión"
+
+#~ msgid ""
+#~ "Results are cumulative. The Life of Program result mirrors the latest "
+#~ "period result."
+#~ msgstr ""
+#~ "Los resultados son acumulativos. El resultado de la vida del programa "
+#~ "refleja el último resultado del período."
+
+#~ msgid ""
+#~ "Results are non-cumulative. The Life of Program result is the sum of "
+#~ "target period results."
+#~ msgstr ""
+#~ "Los resultados no son acumulativos. El resultado de la vida del programa "
+#~ "es la suma de los resultados de los períodos objetivo."
 
 #~ msgid "Result levels should not contain commas."
 #~ msgstr "Los niveles de resultados no pueden contener comas."

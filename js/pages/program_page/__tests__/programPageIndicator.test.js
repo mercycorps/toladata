@@ -73,7 +73,7 @@ describe("full program page indicator", () => {
         name: "Test name",
         number: "Output 1.1a",
         is_percent: false,
-        is_cumulative: false,
+        is_cumulative: 0,
         baseline: "444",
         is_reporting: true,
         over_under: 0,
@@ -144,7 +144,7 @@ describe("full program page indicator", () => {
         expect(indicator.name).toBe("Test name");
         expect(indicator.number).toBe("Output 1.1a");
         expect(indicator.isPercent).toBe(false);
-        expect(indicator.isCumulative).toBe(false);
+        expect(indicator.isCumulative).toBe(0);
         expect(indicator.baseline).toBe('444');
         expect(indicator.isReporting).toBeTruthy();
         expect(indicator.aboveTarget).toBe(false);
@@ -186,5 +186,5 @@ describe("full program page indicator", () => {
         indicator.updateData({pk: 23, number: "Output 1.1b"});
         expect(indicator.number).toBe("Output 1.1b");
     });
-    
+
 })

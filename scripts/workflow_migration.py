@@ -8,7 +8,7 @@ app_models = apps.get_app_config('workflow').get_models()
 #rename the app tables from the old activitydb to workflow
 def run():
 
-    print "Migration"
+    print("Migration")
 
     for app in app_models:
         name = str(app._meta.db_table)
@@ -18,7 +18,7 @@ def run():
 
         sql_query = "RENAME TABLE %s TO %s" % (old_appname,new_appname)
 
-        print sql_query
+        print(sql_query)
         #catch any existing tables
         try:
             # Renaming model from 'Foo' to 'Bar'

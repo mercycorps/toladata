@@ -45,7 +45,7 @@ class TestIndicatorGetCurrentPeriodicTarget(TestBase, TestCase):
         super(TestIndicatorGetCurrentPeriodicTarget, self).setUp()
 
         self.indicator = IndicatorFactory(
-            program=self.program, unit_of_measure_type=Indicator.NUMBER, is_cumulative=False,
+            program=self.program, unit_of_measure_type=Indicator.NUMBER, is_cumulative=Indicator.NON_CUMULATIVE,
             direction_of_change=Indicator.DIRECTION_OF_CHANGE_NONE, target_frequency=Indicator.MONTHLY)
 
     def test_current_periodic_target_accessor_monthly(self):

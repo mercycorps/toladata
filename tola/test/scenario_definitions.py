@@ -7,9 +7,9 @@ indicator_values = []
 
 """
 DON'T CHANGE THESE SCENARIOS UNLESS YOU'RE SURE YOU KNOW WHAT YOU'RE DOING!!!!
-These are meant to be common scenarios that can be used in many different tests.  If you change a scenario, 
+These are meant to be common scenarios that can be used in many different tests.  If you change a scenario,
 the change will ripple through all tests that use this scenario, potentially invalidating the tests that are based
-on it and creating a rift in space-time. If your test requires a very specific setup, you might be better off 
+on it and creating a rift in space-time. If your test requires a very specific setup, you might be better off
 defining it in your test.
 
 Scenario names follow the general pattern of:
@@ -56,7 +56,7 @@ pts = [
 indicator_scenarios['scenario_1i-cumulative_number_5pt_3cd'] = Scenario(indicators=[IndicatorValues(
     lop_target=30,
     periodic_targets=pts,
-    is_cumulative=True)])
+    is_cumulative=Indicator.CUMULATIVE)])
 
 # Create 1 indicator with default indicator settings.  Create 5 periodic targets.
 pts = [
@@ -69,7 +69,7 @@ indicator_scenarios['scenario_1i-cumulative_percent_5pt_3cd'] = Scenario(indicat
     unit_of_measure_type=Indicator.PERCENTAGE,
     lop_target=.80,
     periodic_targets=pts,
-    is_cumulative=True)])
+    is_cumulative=Indicator.CUMULATIVE)])
 
 # Create 4 indicators with default indicator settings. Each indicator has a a different level of achieved vs target
 indicators_values = []

@@ -1,8 +1,12 @@
 import React, { useState, useContext, useEffect } from 'react';
 import ReactDOM from 'react-dom';
+import { library } from '@fortawesome/fontawesome-svg-core';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
+import { faCaretRight } from '@fortawesome/free-solid-svg-icons';
 import Select from 'react-select';
 import api from '../apiv2';
+
+library.add(faCaretRight);
 
 export const ImportIndicatorsContext = React.createContext();
 
@@ -117,7 +121,7 @@ export class ImportIndicatorsButton extends React.Component {
         })
 
         return (
-            <ImportIndicatorsPopover 
+            <ImportIndicatorsPopover
                 page={ this.props.page }
                 program_id={ this.props.program_id }
                 tierLevelsUsed={ tierLevelsUsed }
@@ -264,7 +268,7 @@ export const ImportIndicatorsPopover = ({ page, program_id, tierLevelsUsed, stor
                             setvalidIndicatorsCount(validCount);
                             setInvalidIndicatorsCount(invalidCount);
                             // Successful upload with no errors and all rows valid
-                            if (response.status === 200) { 
+                            if (response.status === 200) {
                                 viewChange(INITIAL, CONFIRM, validCount);
                             // Unsuccessful upload with fatal errors
                             } else if ( response.status === 406 ) {
@@ -637,7 +641,7 @@ export const ImportIndicatorsPopover = ({ page, program_id, tierLevelsUsed, stor
                                 <div  className="import-success-text">
                                     <React.Fragment>
                                         {views === SUCCESS ? <div><i className="fas fa-check-circle"/></div> : null}
-                                    </React.Fragment> 
+                                    </React.Fragment>
                                     { page === "resultsFramework" ?
                                         <React.Fragment>
                                             {
@@ -685,8 +689,8 @@ export const ImportIndicatorsPopover = ({ page, program_id, tierLevelsUsed, stor
                                         }
                                     </p>
                                 </div>
-                                <button 
-                                    className="btn btn-sm btn-primary" 
+                                <button
+                                    className="btn btn-sm btn-primary"
                                     onClick={() => viewChange(ERROR, prevView.view, prevView.valid, prevView.invalid)}
                                 >
                                     {

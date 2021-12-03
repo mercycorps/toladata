@@ -3,6 +3,7 @@ from django import test
 from indicators.export_renderers import (
     IPTTExcelRenderer,
 )
+from indicators.models import Indicator
 
 tva = False
 
@@ -19,7 +20,7 @@ class FakePeriod:
         else:
             global tva
             self.tva = tva
-        
+
 
 class FakeSerializer:
     def __init__(self, data=None):
@@ -80,7 +81,7 @@ class FakeSerializer:
                                     'number': 'Indicator number for 11',
                                     'unit_of_measure': 'Indicator 11 UOM',
                                     'direction_of_change': '+',
-                                    'is_cumulative': False,
+                                    'is_cumulative': Indicator.NON_CUMULATIVE,
                                     'unit_of_measure_type': '#',
                                     'baseline': '100',
                                     'disaggregations': [{
@@ -112,7 +113,7 @@ class FakeSerializer:
                                     'number': 'Indicator number for 12',
                                     'unit_of_measure': 'Indicator 12 UOM',
                                     'direction_of_change': '-',
-                                    'is_cumulative': True,
+                                    'is_cumulative': Indicator.CUMULATIVE,
                                     'unit_of_measure_type': '%',
                                     'baseline': None,
                                     'disaggregations': [],
@@ -144,7 +145,7 @@ class FakeSerializer:
                                     'number': 'Indicator number for 13',
                                     'unit_of_measure': 'Indicator 13 UOM',
                                     'direction_of_change': None,
-                                    'is_cumulative': False,
+                                    'is_cumulative': Indicator.NON_CUMULATIVE,
                                     'unit_of_measure_type': '#',
                                     'baseline': '10000.12',
                                     'disaggregations': [{
@@ -471,7 +472,7 @@ class TestExcelRendererGlobals(test.TestCase):
                                 'number': f'Indicator number for 11{freq}',
                                 'unit_of_measure': f'Indicator 11{freq} UOM',
                                 'direction_of_change': '+',
-                                'is_cumulative': False,
+                                'is_cumulative': Indicator.NON_CUMULATIVE,
                                 'unit_of_measure_type': '#',
                                 'baseline': None,
                                 'disaggregations': [{

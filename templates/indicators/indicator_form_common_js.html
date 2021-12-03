@@ -595,7 +595,7 @@
         formArr.push({"name": "periodic_targets", "value": periodic_targets_to_submit});
 
         if (formArr.find(e => e.name === 'is_cumulative') === undefined) {
-            formArr.push({name: 'is_cumulative', value: 3});
+            formArr.push({name: 'is_cumulative', value: 0});
         }
 
         // user entered rationale and reason for change dropdown values
@@ -767,22 +767,24 @@
             2 = Percentage (%)
 
     This function also uses is_cumulative, which has one of these values:
-        - 1 = None
-        - 2 = Cumulative
-        - 3 = Non-cumulative
+        - 0 = Non-cumulative
+        - 1 = Cumulative
+        - 2 = Non-summing cumulative
     */
     function toggleCummulativeOptions(unit_of_measure_type) {
         // the top option is always the default option
         if (unit_of_measure_type == 2) {
             show_hide_cummulative_inputs('percent')
-            $("#id_is_cumulative_1").prop("checked", false);
+            $("#id_is_cumulative_nc").prop("checked", false);
+            $("#id_is_cumulative_nsc").prop("checked", false);
             // Although it's not displayed, when the measurement type is cumulative, the input should be set to true
             // so the is_cumulative input can be submitted with the correct value
-            $("#id_is_cumulative_2").prop("checked", true);
+            $("#id_is_cumulative_c").prop("checked", true);
         } else {
             show_hide_cummulative_inputs('number')
-            $("#id_is_cumulative_1").prop("checked", true);
-            $("#id_is_cumulative_2").prop("checked", false);
+            $("#id_is_cumulative_nc").prop("checked", true);
+            $("#id_is_cumulative_c").prop("checked", false);
+            $("#id_is_cumulative_nsc").prop("checked", false);
         }
     }
 
@@ -790,26 +792,30 @@
         //d-flex overrides display settings, so we need to apply and unapply depending on visibility
         if (type == 'number') {
             $("#id_span_is_cumulative_header").text("{% trans 'Options for number (#) indicators'|escapejs %}");
-            $("#id_div_is_cumulative_section1").show();
-            $("#id_div_is_cumulative_section2").show();
-            $("#id_div_is_cumulative_section3").hide();
+            $("#id_div_is_cumulative_section_nc").show();
+            $("#id_div_is_cumulative_section_nsc").show();
+            $("#id_div_is_cumulative_section_c").show();
+            $("#id_div_is_cumulative_section_c_only").hide();
         } else {
             {# Translators: This is the title of some informational text describing what it means when an indicator is being measured as a percentage e.g. % of population with access to water  #}
             $("#id_span_is_cumulative_header").text("{% trans 'Percentage (%) indicators'|escapejs %}");
-            $("#id_div_is_cumulative_section3").show();
-            $("#id_div_is_cumulative_section1").hide();
-            $("#id_div_is_cumulative_section2").hide();
-            $("#id_is_cumulative_2").prop("checked", true);
+            $("#id_div_is_cumulative_section_c_only").show();
+            $("#id_div_is_cumulative_section_nc").hide();
+            $("#id_div_is_cumulative_section_nsc").hide();
+            $("#id_div_is_cumulative_section_c").hide();
+            $("#id_is_cumulative_c").prop("checked", true);
         }
     }
 
     // returns true if "is cumulative" radio button is selected on the form
-    // as a reminder, this is a null boolean field where
-    // 1 - null
-    // 2 - cumulative
-    // 3 - non-cumulative
+    // as a reminder, this is an integer field where
+    // null - empty
+    // 0 - non-cumulative
+    // 1 - cumulative
+    // 2 - non-summing cumulative
     function getIsCumulative() {
-        return $("input[name='is_cumulative']:checked").val() === "2";
+        cumulativeValue = $("input[name='is_cumulative']:checked").val()
+        return cumulativeValue == 1 || cumulativeValue == 2;
     }
 
     // Is units of measure a percentage?
@@ -1520,12 +1526,12 @@
         });
 
         // Set is_cumulative if it's not already set
-        // This is a null boolean in the DB. Django has:
-        // 1: null
-        // 2: true
-        // 3: false
+        // This is a number field in the db where
+        // 0: non-cumulative
+        // 1: cumulative
+        // 2: non-summing cumulative
         if (formObj['is_cumulative'] === undefined) {
-            formObj['is_cumulative'] = 3;
+            formObj['is_cumulative'] = 0;
         }
 
         // Compute LoP if not explicit in form

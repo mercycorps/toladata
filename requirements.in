@@ -17,7 +17,9 @@ google-auth                 # potentially used in OAuth flow?  Can't find explic
 google-auth-httplib2        # used by above package to assist in migrating to google-auth - unknown if used
 mysqlclient                 # C bindings for mysql, required for Django to operate over mysql
 openpyxl~=3.0               # Excel read/write wrapper for python
+pip-tools                   # Used for sane requirements file specifications
 pbr                         # potentially used to manage git versions/manifest/tags?  unclear
+polib                       # Used for po file manipulations and related tests
 python3-saml                # potentially a dependency?  Not called directly in code
 pyyaml~=5.3                 # python bindings to read YAML files
 simplejson~=3.17            # used in template tags to serialize to json
