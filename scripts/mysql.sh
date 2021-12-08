@@ -93,9 +93,9 @@ sleep 0.5
 if [ ! -z "$resetdb" ]
 then
     echo "dropping db $db_name at localhost"
-    mysql -h localhost -u $user -p <<< "drop database $db_name"
+    mysql -h $host -u $user -p <<< "drop database $db_name"
     echo "creating db $db_name at localhost"
-    mysql -h localhost -u $user -p <<< "create database $db_name CHARACTER SET utf8 COLLATE utf8_general_ci"
+    mysql -h $host -u $user -p <<< "create database $db_name CHARACTER SET utf8 COLLATE utf8_general_ci"
 fi
 
 sleep 1
@@ -113,7 +113,7 @@ then
 
     # restore the database
     echo "Restoring $file2restore"
-    mysql -h localhost -u $user -p "$db_name" < "$backup_path/$import_file"
+    mysql -h $host -u $user -p "$db_name" < "$backup_path/$import_file"
 
     # recompress the file if needed
     if [ ${import_file} != $file2restore ]; then
