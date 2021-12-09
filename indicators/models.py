@@ -1162,6 +1162,13 @@ class Indicator(SafeDeleteModel):
         (NON_SUMMING_CUMULATIVE, 'Non-summing cumulative')
     ]
 
+    ADMIN_PARTICIPANT_COUNT = 0
+    ADMIN_DEMO = 1
+    ADMIN_TYPES = [
+        (ADMIN_PARTICIPANT_COUNT, 'Participant count'),
+        (ADMIN_DEMO, 'Test/Demo')
+    ]
+
     indicator_key = models.UUIDField(
         default=uuid.uuid4, help_text=" ", verbose_name=_("Indicator key"))
 
@@ -1451,6 +1458,9 @@ class Indicator(SafeDeleteModel):
         # Translators: This is the name of the Level object in the old system of organising levels
         verbose_name=_("Old Level"), help_text=" "
     )
+
+    admin_type = models.IntegerField(null=True, blank=True, choices=ADMIN_TYPES)
+
 
     create_date = models.DateTimeField(
         _("Create date"), null=True, blank=True, help_text=" "
