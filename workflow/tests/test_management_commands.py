@@ -8,7 +8,8 @@ from django.core.management import call_command
 from unittest import skip
 from factories import workflow_models as w_factories
 from workflow.models import Program
-from workflow.management.commands.upload_programs import process_file
+from workflow.management.commands.upload_programs import process_file, get_program_maps, \
+    SUCCESS_SIMPLE, ERROR_NO_MATCHING_GAIT
 from pathlib import Path, PurePath
 
 
@@ -41,18 +42,28 @@ class TestProgramUpload(test.TestCase):
         program4i = w_factories.RFProgramFactory(gaitid=4, country=[indonesia])
 
     def test_base_upload(self):
-        events = process_file(
-            path.join(path.dirname(path.abspath(__file__)), 'fixtures/program_upload_data.csv'), 'initial')
+        file_path = path.join(path.dirname(path.abspath(__file__)), 'fixtures/program_upload_data.csv')
+        import_gait_to_program_map, tola_gait_to_program_map, tola_external_id_to_program_map = \
+            get_program_maps(file_path)
+        dispositions = process_file(
+            file_path, 'initial', tola_gait_to_program_map, tola_external_id_to_program_map,
+            import_gait_to_program_map)
 
-        self.assertEqual(len(events['warn_no_gait']), 2)
-        self.assertEqual(len(events['warn_excess_gait']), 1)
-        self.assertEqual(len(events['funded_not_found']), 0)
-        self.assertEqual(len(events['added_external_id']), 1)
-        self.assertEqual(len(events['created_program']), 0)
-        self.assertEqual(len(events['updated_program']), 0)
-        self.assertEqual(len(events['gait_program_mismatch']), 0)
-        self.assertEqual(len(events['no_change']), 0)
-        self.assertEqual(len(events['country_mismatch']), 2)
+        disposition_counts = {}
+        for disposition in dispositions:
+            try:
+                disposition_counts[disposition.disposition_type].append(disposition)
+            except KeyError:
+                disposition_counts[disposition.disposition_type] = [disposition]
+        self.assertEqual(len(disposition_counts[SUCCESS_SIMPLE]), 1)
+        self.assertEqual(len(disposition_counts[ERROR_NO_MATCHING_GAIT]), 2)
+        # self.assertEqual(len(dispositions['funded_not_found']), 0)
+        # self.assertEqual(len(dispositions['added_external_id']), 1)
+        # self.assertEqual(len(dispositions['created_program']), 0)
+        # self.assertEqual(len(dispositions['updated_program']), 0)
+        # self.assertEqual(len(dispositions['gait_program_mismatch']), 0)
+        # self.assertEqual(len(dispositions['no_change']), 0)
+        # self.assertEqual(len(dispositions['country_mismatch']), 2)
 
 
     @skip
@@ -60,7 +71,7 @@ class TestProgramUpload(test.TestCase):
         pass
 
     @skip
-    def test_no_countries_prevents_upload(self):
+    def test_no_countries_prdispositions_upload(self):
         pass
 
     @skip
