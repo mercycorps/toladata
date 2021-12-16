@@ -35,11 +35,11 @@ class TestProgramUpload(test.TestCase):
         indonesia = w_factories.CountryFactory(country='Indonesia')
         syria = w_factories.CountryFactory(country='Syria')
         colombia = w_factories.CountryFactory(country='Colombia')
-        program1 = w_factories.RFProgramFactory(gaitid=1, country=[indonesia])
-        program2 = w_factories.RFProgramFactory(gaitid=2, country=[syria])
-        program3 = w_factories.RFProgramFactory(gaitid=3, country=[syria, indonesia])
-        program4s = w_factories.RFProgramFactory(gaitid=4, country=[syria])
-        program4i = w_factories.RFProgramFactory(gaitid=4, country=[indonesia])
+        program_match = w_factories.RFProgramFactory(gaitid=1, country=[indonesia])
+        program_country_mismatch = w_factories.RFProgramFactory(gaitid=2, country=[syria])
+        program_country_mismatch2 = w_factories.RFProgramFactory(gaitid=3, country=[syria, indonesia])
+        program_multi_country1 = w_factories.RFProgramFactory(gaitid=4, country=[syria])
+        program_multi_country2 = w_factories.RFProgramFactory(gaitid=4, country=[indonesia])
 
     def test_base_upload(self):
         file_path = path.join(path.dirname(path.abspath(__file__)), 'fixtures/program_upload_data.csv')
