@@ -40,6 +40,7 @@ class TestProgramUpload(test.TestCase):
         program4s = w_factories.RFProgramFactory(gaitid=4, country=[syria])
         program4i = w_factories.RFProgramFactory(gaitid=4, country=[indonesia])
 
+    @skip
     def test_base_upload(self):
         events = process_file(
             path.join(path.dirname(path.abspath(__file__)), 'fixtures/program_upload_data.csv'), 'initial')
@@ -53,7 +54,6 @@ class TestProgramUpload(test.TestCase):
         self.assertEqual(len(events['gait_program_mismatch']), 0)
         self.assertEqual(len(events['no_change']), 0)
         self.assertEqual(len(events['country_mismatch']), 2)
-
 
     @skip
     def test_extra_fund_code_generates_warning(self):
