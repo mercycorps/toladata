@@ -488,22 +488,31 @@ class DisaggregationIndicatorFormManager(models.Manager):
 class DisaggregationType(models.Model):
     """
     #####!!!!!!!!!!! IMPORTANT!!    !!!!!!!!!!!#####
-    The GLOBAL_DISAGGREGATION_LABELS constant was created to ensure that a translated string appears
+    If you update these templates, make sure you update the globalDisaggregationTypes constant in
+    js/extra_translations.js.
+
+    The TRANSLATED_DISAGGREGATION_LABELS constant was created to ensure that a translated string appears
     in the PO file.  It won't appear through the normal translation machinery because
     the global disagg types are stored in the DB rather than the code.  When adding
     a global disaggregation type you will need to add the marked string to this list.
-
-    If you update these templates, make sure you update the globalDisaggregationTypes constant in
-    js/extra_translations.js.
     """
-    GLOBAL_DISAGGREGATION_LABELS = [
+    TRANSLATED_DISAGGREGATION_LABELS = [
         _("Sex and Age Disaggregated Data (SADD)")
     ]
+
+    DISAG_COUNTRY_ONLY = 0
+    DISAG_GLOBAL = 1
+    DISAG_PARTICIPANT_COUNT = 2
+    GLOBAL_TYPE_CHOICES = (
+        (DISAG_COUNTRY_ONLY, 'Not global'),
+        (DISAG_GLOBAL, 'Global (all countries and programs)'),
+        (DISAG_PARTICIPANT_COUNT, 'Global (participant count only)')
+    )
 
     """Business logic name: Disaggregation - e.g. `Gender` or `SADD`"""
     disaggregation_type = models.CharField(_("Disaggregation"), max_length=135)
     country = models.ForeignKey(Country, on_delete=models.CASCADE, null=True, blank=True, verbose_name="Country")
-    standard = models.BooleanField(default=False, verbose_name=_("Global (all programs, all countries)"))
+    global_type = models.IntegerField(choices=GLOBAL_TYPE_CHOICES, verbose_name=_("Global disaggregation"))
     is_archived = models.BooleanField(default=False, verbose_name=_("Archived"))
     selected_by_default = models.BooleanField(default=False)
     create_date = models.DateTimeField(_("Create date"), null=True, blank=True)
