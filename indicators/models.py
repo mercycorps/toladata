@@ -512,7 +512,7 @@ class DisaggregationType(models.Model):
     """Business logic name: Disaggregation - e.g. `Gender` or `SADD`"""
     disaggregation_type = models.CharField(_("Disaggregation"), max_length=135)
     country = models.ForeignKey(Country, on_delete=models.CASCADE, null=True, blank=True, verbose_name="Country")
-    global_type = models.IntegerField(choices=GLOBAL_TYPE_CHOICES, verbose_name=_("Global disaggregation"))
+    global_type = models.IntegerField(default=DISAG_COUNTRY_ONLY, choices=GLOBAL_TYPE_CHOICES, verbose_name=_("Global disaggregation"))
     is_archived = models.BooleanField(default=False, verbose_name=_("Archived"))
     selected_by_default = models.BooleanField(default=False)
     create_date = models.DateTimeField(_("Create date"), null=True, blank=True)
@@ -551,15 +551,15 @@ class DisaggregationType(models.Model):
         else:
             disaggs = disaggs.annotate(has_results=models.Value(False, output_field=models.BooleanField()))
         disaggs = disaggs.filter(
-            models.Q(standard=True) | models.Q(country__in=country_set),
+            models.Q(global_type=DisaggregationType.DISAG_GLOBAL) | models.Q(country__in=country_set),
             models.Q(is_archived=False) | models.Q(indicator__program=program)
         ).distinct()
         return (
-            disaggs.filter(standard=True),
+            disaggs.filter(global_type=DisaggregationType.DISAG_GLOBAL),
             [
                 (country_name, disaggs.filter(country=country_pk))
                 for country_pk, country_name in disaggs.filter(
-                    standard=False
+                    global_type=DisaggregationType.DISAG_COUNTRY_ONLY
                 ).values_list('country', 'country__country').distinct().order_by('country__country')
             ]
         )
@@ -636,7 +636,7 @@ class DisaggregationLabel(models.Model):
 
     @classmethod
     def get_standard_labels(cls):
-        return cls.objects.filter(disaggregation_type__standard=True)
+        return cls.objects.filter(disaggregation_type__global_type=DisaggregationType.DISAG_GLOBAL)
 
 
 class DisaggregatedValue(models.Model):
@@ -2254,7 +2254,7 @@ class Result(models.Model):
     @property
     def disaggregated_values(self):
         return self.disaggregatedvalue_set.all().order_by(
-            'category__disaggregation_type__standard',
+            'category__disaggregation_type__global_type',
             'category__disaggregation_type__disaggregation_type',
             'category__customsort'
         )

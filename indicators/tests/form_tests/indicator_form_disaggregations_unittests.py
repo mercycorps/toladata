@@ -37,7 +37,11 @@ from factories import (
     indicators_models as i_factories
 )
 from indicators.forms import IndicatorForm
-from indicators.models import Indicator, DisaggregationLabel, DisaggregatedValue
+from indicators.models import Indicator, DisaggregationLabel, DisaggregatedValue, DisaggregationType
+
+DISAG_COUNTRY_ONLY = DisaggregationType.DISAG_COUNTRY_ONLY
+DISAG_GLOBAL = DisaggregationType.DISAG_GLOBAL
+
 
 class TestIndicatorCreateFormDisaggregations(test.TestCase):
 
@@ -84,7 +88,7 @@ class TestIndicatorCreateFormDisaggregations(test.TestCase):
     def test_one_standard_disaggregations_form(self):
         standard_disagg = i_factories.DisaggregationTypeFactory(
             disaggregation_type="Test Global 1",
-            standard=True,
+            global_type=DISAG_GLOBAL,
             labels=False,
         )
         form = self.get_create_form()
@@ -108,7 +112,7 @@ class TestIndicatorCreateFormDisaggregations(test.TestCase):
         special_chars = 'éüîåç'
         standard_disagg = i_factories.DisaggregationTypeFactory(
             disaggregation_type=special_chars,
-            standard=True,
+            global_type=DISAG_GLOBAL,
             selected_by_default=True,
             labels=False,
         )
@@ -227,7 +231,7 @@ class TestIndicatorCreateFormDisaggregations(test.TestCase):
     def test_create_with_no_disaggregation(self):
         standard_disagg = i_factories.DisaggregationTypeFactory(
             disaggregation_type="Test Global 1",
-            standard=True,
+            global_type=DISAG_GLOBAL,
             labels=False,
         )
         data = self.get_create_data()
@@ -241,7 +245,7 @@ class TestIndicatorCreateFormDisaggregations(test.TestCase):
     def test_create_with_one_disaggregation(self):
         standard_disagg = i_factories.DisaggregationTypeFactory(
             disaggregation_type="Test Global 1",
-            standard=True,
+            global_type=DISAG_GLOBAL,
             labels=False,
         )
         data = self.get_create_data()
@@ -257,23 +261,23 @@ class TestIndicatorCreateFormDisaggregations(test.TestCase):
     def test_create_with_many_disaggregations(self):
         sd1 = i_factories.DisaggregationTypeFactory(
             disaggregation_type="Test Global 1",
-            standard=True,
+            global_type=DISAG_GLOBAL,
             labels=False,
         )
         sd2 = i_factories.DisaggregationTypeFactory(
             disaggregation_type="Test Global 2",
-            standard=True,
+            global_type=DISAG_GLOBAL,
             selected_by_default=True,
             labels=False,
         )
         sd3 = i_factories.DisaggregationTypeFactory(
             disaggregation_type="Test Global 3",
-            standard=True,
+            global_type=DISAG_GLOBAL,
             labels=False,
         )
         sd4 = i_factories.DisaggregationTypeFactory(
             disaggregation_type="Test Global 4",
-            standard=True,
+            global_type=DISAG_GLOBAL,
             is_archived=True,
             labels=False,
         )
@@ -303,12 +307,12 @@ class TestIndicatorCreateFormDisaggregations(test.TestCase):
     def test_create_with_out_of_country_disaggregations(self):
         sd1 = i_factories.DisaggregationTypeFactory(
             disaggregation_type="Test Global 1",
-            standard=True,
+            global_type=DISAG_GLOBAL,
             labels=False,
         )
         sd2 = i_factories.DisaggregationTypeFactory(
             disaggregation_type="Test Global 2",
-            standard=True,
+            global_type=DISAG_GLOBAL,
             labels=False,
         )
         outcds = [i_factories.DisaggregationTypeFactory(
@@ -346,7 +350,7 @@ class TestIndicatorCreateFormDisaggregations(test.TestCase):
     def test_multi_country_program(self):
         sds = [i_factories.DisaggregationTypeFactory(
             disaggregation_type="Testing Standard Disaggregation {}".format(x),
-            standard=True,
+            global_type=DISAG_GLOBAL,
             labels=False,
         ) for x in range(4)]
         cds_main = [i_factories.DisaggregationTypeFactory(
@@ -460,12 +464,12 @@ class TestIndicatorUpdateFormDisaggregations(test.TestCase):
     def test_indicator_with_no_disaggregations_updated(self):
         sd1 = i_factories.DisaggregationTypeFactory(
             disaggregation_type="Test1",
-            standard=True,
+            global_type=DISAG_GLOBAL,
             labels=False,
         )
         sd2 = i_factories.DisaggregationTypeFactory(
             disaggregation_type="Test2",
-            standard=True,
+            global_type=DISAG_GLOBAL,
             labels=False,
         )
         indicator = self.get_indicator()
@@ -480,11 +484,11 @@ class TestIndicatorUpdateFormDisaggregations(test.TestCase):
     def test_indicator_with_disaggregations_removed(self):
         sd1 = i_factories.DisaggregationTypeFactory(
             disaggregation_type="Test1",
-            standard=True
+            global_type=DISAG_GLOBAL
         )
         sd2 = i_factories.DisaggregationTypeFactory(
             disaggregation_type="Test2",
-            standard=True
+            global_type=DISAG_GLOBAL
         )
         indicator = self.get_indicator()
         indicator.disaggregation.set([sd1, sd2])
@@ -499,7 +503,7 @@ class TestIndicatorUpdateFormDisaggregations(test.TestCase):
     def test_indicator_with_disaggregations_and_values_disabled(self):
         sd1 = i_factories.DisaggregationTypeFactory(
             disaggregation_type="Test1",
-            standard=True,
+            global_type=DISAG_GLOBAL,
             labels=False,
         )
         sd1_labels = []
@@ -513,7 +517,7 @@ class TestIndicatorUpdateFormDisaggregations(test.TestCase):
             sd1_labels.append(label)
         sd2 = i_factories.DisaggregationTypeFactory(
             disaggregation_type="Test2",
-            standard=True,
+            global_type=DISAG_GLOBAL,
             labels=False,
         )
         sd2_labels = []
@@ -527,7 +531,7 @@ class TestIndicatorUpdateFormDisaggregations(test.TestCase):
             sd2_labels.append(label)
         sd3 = i_factories.DisaggregationTypeFactory(
             disaggregation_type="Test3",
-            standard=True,
+            global_type=DISAG_GLOBAL,
             labels=False,
         )
         for x in range(2):
@@ -619,19 +623,19 @@ class TestIndicatorUpdateFormDisaggregations(test.TestCase):
     def test_indicator_with_disaggregations_switched(self):
         sd1 = i_factories.DisaggregationTypeFactory(
             disaggregation_type="Test1",
-            standard=True
+            global_type=DISAG_GLOBAL
         )
         sd2 = i_factories.DisaggregationTypeFactory(
             disaggregation_type="Test2",
-            standard=True
+            global_type=DISAG_GLOBAL
         )
         sd3 = i_factories.DisaggregationTypeFactory(
             disaggregation_type="Test3",
-            standard=True,
+            global_type=DISAG_GLOBAL,
         )
         sd4 = i_factories.DisaggregationTypeFactory(
             disaggregation_type="Test4",
-            standard=True
+            global_type=DISAG_GLOBAL
         )
         indicator = self.get_indicator()
         indicator.disaggregation.set([sd1, sd2])
@@ -648,7 +652,7 @@ class TestIndicatorUpdateFormDisaggregations(test.TestCase):
     def test_indicator_with_country_and_standard(self):
         sds = [i_factories.DisaggregationTypeFactory(
             disaggregation_type="Testing Standard Disaggregation {}".format(x),
-            standard=True
+            global_type=DISAG_GLOBAL
         ) for x in range(4)]
         cds_main = [i_factories.DisaggregationTypeFactory(
             disaggregation_type="Testing Country Disaggregation {}".format(x),
@@ -680,11 +684,11 @@ class TestIndicatorUpdateFormDisaggregations(test.TestCase):
     def test_indicator_with_archived_standard_disaggregation(self):
         sd1 = i_factories.DisaggregationTypeFactory(
             disaggregation_type="Testing Standard 1",
-            standard=True
+            global_type=DISAG_GLOBAL
         )
         sd2 = i_factories.DisaggregationTypeFactory(
             disaggregation_type="Testing Standard 2",
-            standard=True,
+            global_type=DISAG_GLOBAL,
             is_archived=True
         )
         indicator = self.get_indicator()
@@ -747,16 +751,16 @@ class TestIndicatorUpdateFormDisaggregations(test.TestCase):
     def test_archived_disaggregations_at_country_level(self):
         sd1 = i_factories.DisaggregationTypeFactory(
             disaggregation_type="Testing Standard 1",
-            standard=True
+            global_type=DISAG_GLOBAL
         )
         sd2 = i_factories.DisaggregationTypeFactory(
             disaggregation_type="Testing Standard 2",
-            standard=True,
+            global_type=DISAG_GLOBAL,
             is_archived=True
         )
         sd3 = i_factories.DisaggregationTypeFactory(
             disaggregation_type="Testing Standard 3",
-            standard=True,
+            global_type=DISAG_GLOBAL,
             is_archived=True
         )
         cda1 = i_factories.DisaggregationTypeFactory(
@@ -822,16 +826,16 @@ class TestIndicatorUpdateFormDisaggregations(test.TestCase):
     def test_selected_by_default_doesnt_matter(self):
         sd1 = i_factories.DisaggregationTypeFactory(
             disaggregation_type="Testing Standard 1",
-            standard=True
+            global_type=DISAG_GLOBAL
         )
         sd2 = i_factories.DisaggregationTypeFactory(
             disaggregation_type="Testing Standard 2",
-            standard=True,
+            global_type=DISAG_GLOBAL,
             selected_by_default=True
         )
         sd3 = i_factories.DisaggregationTypeFactory(
             disaggregation_type="Testing Standard 3",
-            standard=True,
+            global_type=DISAG_GLOBAL,
             selected_by_default=True
         )
         cd1 = i_factories.DisaggregationTypeFactory(

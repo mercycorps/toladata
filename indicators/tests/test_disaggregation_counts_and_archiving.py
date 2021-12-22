@@ -8,6 +8,9 @@ from factories import (
 from indicators.models import DisaggregationType, DisaggregationLabel, DisaggregatedValue
 from django import test
 
+DISAG_COUNTRY_ONLY = DisaggregationType.DISAG_COUNTRY_ONLY
+DISAG_GLOBAL = DisaggregationType.DISAG_GLOBAL
+
 
 class TestDisaggregationIndicatorCounts(test.TestCase):
     def setUp(self):
@@ -62,7 +65,7 @@ class TestArchivedDisaggregationQueryset(test.TestCase):
         self.assertEqual(disaggs[0][1][0].pk, created_disagg.pk)
 
     def test_standard_disaggregations_in_program(self):
-        standard_disagg = i_factories.DisaggregationTypeFactory(country=None, standard=True)
+        standard_disagg = i_factories.DisaggregationTypeFactory(country=None, global_type=DISAG_GLOBAL)
         created_disagg = i_factories.DisaggregationTypeFactory(country=self.country)
         global_disaggs, country_disaggs = DisaggregationType.program_disaggregations(self.program.pk)
         self.assertEqual(len(global_disaggs), 1)
@@ -78,8 +81,8 @@ class TestArchivedDisaggregationQueryset(test.TestCase):
         self.assertEqual([d.pk for d in disaggs[0][1]], [not_archived.pk])
 
     def test_archived_standard_disaggregations_not_in_program(self):
-        not_archived = i_factories.DisaggregationTypeFactory(country=None, standard=True)
-        i_factories.DisaggregationTypeFactory(country=None, standard=True, is_archived=True)
+        not_archived = i_factories.DisaggregationTypeFactory(country=None, global_type=DISAG_GLOBAL)
+        i_factories.DisaggregationTypeFactory(country=None, global_type=DISAG_GLOBAL, is_archived=True)
         disaggs, _ = DisaggregationType.program_disaggregations(self.program.pk)
         self.assertEqual([d.pk for d in disaggs], [not_archived.pk])
 
@@ -92,7 +95,8 @@ class TestArchivedDisaggregationQueryset(test.TestCase):
         self.assertEqual([d.pk for d in disaggs[0][1]], [archived_in_use.pk])
 
     def test_archived_standard_disagg_in_use_in_program(self):
-        archived_in_use = i_factories.DisaggregationTypeFactory(country=None, standard=True, is_archived=True)
+        archived_in_use = i_factories.DisaggregationTypeFactory(
+            country=None, global_type=DISAG_GLOBAL, is_archived=True)
         indicator = i_factories.RFIndicatorFactory(program=self.program)
         indicator.disaggregation.add(archived_in_use)
         indicator.save()
@@ -100,17 +104,17 @@ class TestArchivedDisaggregationQueryset(test.TestCase):
         self.assertEqual([d.pk for d in disaggs], [archived_in_use.pk])
 
     def test_full_scenario(self):
-        standard = i_factories.DisaggregationTypeFactory(country=None, standard=True)
+        standard = i_factories.DisaggregationTypeFactory(country=None, global_type=DISAG_GLOBAL)
         # standard, archived:
-        i_factories.DisaggregationTypeFactory(country=None, standard=True, is_archived=True)
+        i_factories.DisaggregationTypeFactory(country=None, global_type=DISAG_GLOBAL, is_archived=True)
         standard_archived_in_use_a = i_factories.DisaggregationTypeFactory(
-            country=None, standard=True, is_archived=True
+            country=None, global_type=DISAG_GLOBAL, is_archived=True
         )
         indicator_a = i_factories.RFIndicatorFactory(program=self.program)
         indicator_a.disaggregation.add(standard_archived_in_use_a)
         indicator_a.save()
         standard_archived_in_use_b = i_factories.DisaggregationTypeFactory(
-            country=None, standard=True, is_archived=True
+            country=None, global_type=DISAG_GLOBAL, is_archived=True
         )
         indicator_b = i_factories.RFIndicatorFactory(program=self.program_b)
         indicator_b.disaggregation.add(standard_archived_in_use_b)
@@ -156,26 +160,26 @@ class TestDisaggregationLabelCounts(test.TestCase):
         self.program.country.set([self.country])
         self.standard_disagg = i_factories.DisaggregationTypeFactory(
             disaggregation_type="Standard 1",
-            standard=True,
+            global_type=DISAG_GLOBAL,
             country=None,
             labels=[],
         )
         self.standard_disagg_archived = i_factories.DisaggregationTypeFactory(
             disaggregation_type="Standard 2",
-            standard=True,
+            global_type=DISAG_GLOBAL,
             country=None,
             is_archived=True,
             labels=[],
         )
         self.country_disagg = i_factories.DisaggregationTypeFactory(
             disaggregation_type="Country 1",
-            standard=False,
+            global_type=DISAG_COUNTRY_ONLY,
             country=self.country,
             labels=[],
         )
         self.country_disagg_archived = i_factories.DisaggregationTypeFactory(
             disaggregation_type="Country 2",
-            standard=False,
+            global_type=DISAG_COUNTRY_ONLY,
             country=self.country,
             labels=[],
         )

@@ -17,12 +17,15 @@
 
 from django import test
 
-from indicators.models import Indicator, PeriodicTarget
+from indicators.models import Indicator, PeriodicTarget, DisaggregationType
 from indicators.queries.iptt_queries import IPTTIndicator
 from factories import (
     indicators_models as i_factories,
     workflow_models as w_factories
 )
+
+DISAG_COUNTRY_ONLY = DisaggregationType.DISAG_COUNTRY_ONLY
+DISAG_GLOBAL = DisaggregationType.DISAG_GLOBAL
 
 QUERIES_PREFETCH = 8
 
@@ -40,14 +43,14 @@ class TestIPTTIndicatorQuerysetPrefetch(test.TestCase):
     def setUpClass(cls):
         super().setUpClass()
         cls.standard_disagg = i_factories.DisaggregationTypeFactory(
-            standard=True,
+            global_type=DISAG_GLOBAL,
             country=None,
             disaggregation_type="Test Standard Disagg",
             labels=["Test SD Label {}".format(c+1) for c in range(5)]
         )
         cls.country = w_factories.CountryFactory(country="TestLand", code="TL")
         cls.country_disagg = i_factories.DisaggregationTypeFactory(
-            standard=False,
+            global_type=DISAG_COUNTRY_ONLY,
             country=cls.country,
             disaggregation_type="Test Country Disagg",
             labels=["Test CD Label {}".format(c+1) for c in range(5)]

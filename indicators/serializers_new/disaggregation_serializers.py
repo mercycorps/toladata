@@ -63,11 +63,11 @@ class IPTTDisaggregationJSONMixin:
         """
         queryset = DisaggregationType.objects.select_related('country').filter(
             indicator__program_id=program_pk, is_archived=False
-        ).order_by('standard', 'disaggregation_type').distinct().prefetch_related(models.Prefetch(
+        ).order_by('global_type', 'disaggregation_type').distinct().prefetch_related(models.Prefetch(
             'disaggregationlabel_set',
             queryset=DisaggregationLabel.objects.select_related(None).order_by('customsort').only(
                 'pk', 'label', 'customsort', 'disaggregation_type_id'),
-            to_attr='prefetch_categories')).only('pk', 'disaggregation_type', 'country__country', 'standard')
+            to_attr='prefetch_categories')).only('pk', 'disaggregation_type', 'country__country', 'global_type')
         return cls(queryset, many=True)
 
     @staticmethod
