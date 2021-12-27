@@ -488,22 +488,31 @@ class DisaggregationIndicatorFormManager(models.Manager):
 class DisaggregationType(models.Model):
     """
     #####!!!!!!!!!!! IMPORTANT!!    !!!!!!!!!!!#####
-    The GLOBAL_DISAGGREGATION_LABELS constant was created to ensure that a translated string appears
+    If you update these templates, make sure you update the globalDisaggregationTypes constant in
+    js/extra_translations.js.
+
+    The TRANSLATED_DISAGGREGATION_LABELS constant was created to ensure that a translated string appears
     in the PO file.  It won't appear through the normal translation machinery because
     the global disagg types are stored in the DB rather than the code.  When adding
     a global disaggregation type you will need to add the marked string to this list.
-
-    If you update these templates, make sure you update the globalDisaggregationTypes constant in
-    js/extra_translations.js.
     """
-    GLOBAL_DISAGGREGATION_LABELS = [
+    TRANSLATED_DISAGGREGATION_LABELS = [
         _("Sex and Age Disaggregated Data (SADD)")
     ]
+
+    DISAG_COUNTRY_ONLY = 0
+    DISAG_GLOBAL = 1
+    DISAG_PARTICIPANT_COUNT = 2
+    GLOBAL_TYPE_CHOICES = (
+        (DISAG_COUNTRY_ONLY, 'Not global'),
+        (DISAG_GLOBAL, 'Global (all countries and programs)'),
+        (DISAG_PARTICIPANT_COUNT, 'Global (participant count only)')
+    )
 
     """Business logic name: Disaggregation - e.g. `Gender` or `SADD`"""
     disaggregation_type = models.CharField(_("Disaggregation"), max_length=135)
     country = models.ForeignKey(Country, on_delete=models.CASCADE, null=True, blank=True, verbose_name="Country")
-    standard = models.BooleanField(default=False, verbose_name=_("Global (all programs, all countries)"))
+    global_type = models.IntegerField(default=DISAG_COUNTRY_ONLY, choices=GLOBAL_TYPE_CHOICES, verbose_name=_("Global disaggregation"))
     is_archived = models.BooleanField(default=False, verbose_name=_("Archived"))
     selected_by_default = models.BooleanField(default=False)
     create_date = models.DateTimeField(_("Create date"), null=True, blank=True)
@@ -542,15 +551,15 @@ class DisaggregationType(models.Model):
         else:
             disaggs = disaggs.annotate(has_results=models.Value(False, output_field=models.BooleanField()))
         disaggs = disaggs.filter(
-            models.Q(standard=True) | models.Q(country__in=country_set),
+            models.Q(global_type=DisaggregationType.DISAG_GLOBAL) | models.Q(country__in=country_set),
             models.Q(is_archived=False) | models.Q(indicator__program=program)
         ).distinct()
         return (
-            disaggs.filter(standard=True),
+            disaggs.filter(global_type=DisaggregationType.DISAG_GLOBAL),
             [
                 (country_name, disaggs.filter(country=country_pk))
                 for country_pk, country_name in disaggs.filter(
-                    standard=False
+                    global_type=DisaggregationType.DISAG_COUNTRY_ONLY
                 ).values_list('country', 'country__country').distinct().order_by('country__country')
             ]
         )
@@ -627,7 +636,7 @@ class DisaggregationLabel(models.Model):
 
     @classmethod
     def get_standard_labels(cls):
-        return cls.objects.filter(disaggregation_type__standard=True)
+        return cls.objects.filter(disaggregation_type__global_type=DisaggregationType.DISAG_GLOBAL)
 
 
 class DisaggregatedValue(models.Model):
@@ -1206,6 +1215,13 @@ class Indicator(SafeDeleteModel):
 
     }
 
+    ADMIN_PARTICIPANT_COUNT = 0
+    ADMIN_DEMO = 1
+    ADMIN_TYPES = [
+        (ADMIN_PARTICIPANT_COUNT, 'Participant count'),
+        (ADMIN_DEMO, 'Test/Demo')
+    ]
+
     indicator_key = models.UUIDField(
         default=uuid.uuid4, help_text=" ", verbose_name=_("Indicator key"))
 
@@ -1495,6 +1511,9 @@ class Indicator(SafeDeleteModel):
         # Translators: This is the name of the Level object in the old system of organising levels
         verbose_name=_("Old Level"), help_text=" "
     )
+
+    admin_type = models.IntegerField(null=True, blank=True, choices=ADMIN_TYPES)
+
 
     create_date = models.DateTimeField(
         _("Create date"), null=True, blank=True, help_text=" "
@@ -2279,7 +2298,7 @@ class Result(models.Model):
     @property
     def disaggregated_values(self):
         return self.disaggregatedvalue_set.all().order_by(
-            'category__disaggregation_type__standard',
+            'category__disaggregation_type__global_type',
             'category__disaggregation_type__disaggregation_type',
             'category__customsort'
         )

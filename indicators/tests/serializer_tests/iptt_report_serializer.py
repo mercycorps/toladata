@@ -14,7 +14,7 @@ from indicators.serializers_new import (
 )
 
 from indicators.queries import IPTTIndicator
-from indicators.models import Indicator
+from indicators.models import Indicator, DisaggregationType
 
 from factories.indicators_models import (
     RFIndicatorFactory,
@@ -25,6 +25,8 @@ from factories.indicators_models import (
 
 from factories.workflow_models import RFProgramFactory, CountryFactory
 
+DISAG_COUNTRY_ONLY = DisaggregationType.DISAG_COUNTRY_ONLY
+DISAG_GLOBAL = DisaggregationType.DISAG_GLOBAL
 
 def get_tp_report_data(indicator, frequency):
     return [report for report in IPTTJSONTPReportIndicatorSerializer.load_report(
@@ -77,7 +79,7 @@ def get_result(indicator, achieved, target_period=0, days=1, date=None):
 
 def add_standard_disaggregation(indicator):
     standard_disaggregation = DisaggregationTypeFactory(
-        standard=True,
+        global_type=DISAG_GLOBAL,
         country=None,
         labels=["Tést Låbel 1", "Tést Låbel 2"]
     )
@@ -87,7 +89,7 @@ def add_standard_disaggregation(indicator):
 
 def add_country_disaggregation(indicator, country):
     country_disaggregation = DisaggregationTypeFactory(
-        standard=False,
+        global_type=DISAG_COUNTRY_ONLY,
         country=country,
         labels=["Tést Låbel 1", "Tést Låbel 2"]
     )

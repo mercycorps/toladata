@@ -10,7 +10,7 @@ from factories import (
 )
 
 from indicators.models import (
-    DisaggregatedValue
+    DisaggregatedValue, DisaggregationType,
 )
 
 from indicators.forms import (
@@ -19,6 +19,9 @@ from indicators.forms import (
     get_disaggregated_result_formset
 )
 
+DISAG_COUNTRY_ONLY = DisaggregationType.DISAG_COUNTRY_ONLY
+DISAG_GLOBAL = DisaggregationType.DISAG_GLOBAL
+
 
 class TestDisaggregatedValueForm(test.TestCase):
     """Form to accept a disaggregation value for a given disaggregation label"""
@@ -26,7 +29,7 @@ class TestDisaggregatedValueForm(test.TestCase):
     def setUp(self):
         self.disagg = i_factories.DisaggregationTypeFactory(
             disaggregation_type="Test Disagg",
-            standard=True,
+            global_type=DISAG_GLOBAL,
             labels=["Test label 1", "Test label 2"]
         )
 
@@ -49,7 +52,7 @@ class TestDisaggregatedValueFormSet(test.TestCase):
     def setUp(self):
         self.disagg = i_factories.DisaggregationTypeFactory(
             disaggregation_type="Test Disagg",
-            standard=True,
+            global_type=DISAG_GLOBAL,
             labels=["Test label 1", "Test label 2"]
         )
         self.indicator = i_factories.RFIndicatorFactory()
@@ -197,7 +200,7 @@ class TestDisaggregatedValueFormSetFactory(test.TestCase):
     def test_global_disagg_with_two_labels(self):
         disagg = i_factories.DisaggregationTypeFactory(
             disaggregation_type="Test Disagg 1",
-            standard=True,
+            global_type=DISAG_GLOBAL,
             labels=["Test Label 1", "Test Label 2"]
         )
         formset = get_disaggregated_result_formset(disagg)(request=unittest.mock.Mock(has_write_access=True))
@@ -224,7 +227,7 @@ class TestDisaggregatedValueFormSetFactory(test.TestCase):
     def test_disagg_with_no_labels(self):
         disagg = i_factories.DisaggregationTypeFactory(
             disaggregation_type="Test Disagg 1",
-            standard=True,
+            global_type=DISAG_GLOBAL,
             labels=False,
         )
         formset = get_disaggregated_result_formset(disagg)(request=unittest.mock.Mock(has_write_access=True))
@@ -233,7 +236,7 @@ class TestDisaggregatedValueFormSetFactory(test.TestCase):
     def test_form_with_many_lables(self):
         disagg = i_factories.DisaggregationTypeFactory(
             disaggregation_type="Test disagg 3",
-            standard=True,
+            global_type=DISAG_GLOBAL,
             labels=["Label {}".format(x) for x in range(20)]
         )
         formset = get_disaggregated_result_formset(disagg)()
@@ -249,7 +252,7 @@ class TestDisaggregatedValueFormSetFactory(test.TestCase):
         )
         disagg = i_factories.DisaggregationTypeFactory(
             disaggregation_type="Test Disagg 4",
-            standard=True,
+            global_type=DISAG_GLOBAL,
             labels=["Test Label 1", "Test Label 2"]
         )
         indicator.disaggregation.set([disagg])
@@ -278,12 +281,12 @@ class TestDisaggregatedValueFormSetFactory(test.TestCase):
         )
         disagg1 = i_factories.DisaggregationTypeFactory(
             disaggregation_type="Test Disagg 5",
-            standard=True,
+            global_type=DISAG_GLOBAL,
             labels=["Test Label 1", "Test Label 2"]
         )
         disagg2 = i_factories.DisaggregationTypeFactory(
             disaggregation_type="Test Disagg 6",
-            standard=False,
+            global_type=DISAG_COUNTRY_ONLY,
             country=country,
             labels=["Test Label 3", "Test Label 4", "Test Label 5"]
         )
