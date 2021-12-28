@@ -31,53 +31,26 @@ class Command(BaseCommand):
     @transaction.atomic
     def handle(self, *args, **options):
         if options['clean']:
-            to_delete = Indicator.objects.filter(admin_type=Indicator.ADMIN_PARTICIPANT_COUNT)
-            response = input(f'Are you sure you want to delete {to_delete.count()} indicators (Y/n)? ')
+            ind_to_delete = Indicator.objects.filter(admin_type=Indicator.ADMIN_PARTICIPANT_COUNT)
+            disaggs_to_delete = DisaggregationType.objects.filter(
+                global_type=DisaggregationType.DISAG_PARTICIPANT_COUNT)
+            response = input(f'Are you sure you want to delete {ind_to_delete.count()} indicators and {disaggs_to_delete.count()} disaggregations (Y/n)? ')
             if response == 'Y':
-                response = input(f'Hard or soft delete (hard/soft)? ')
+                response = input(f'Hard or soft delete for indicators (hard/soft)? ')
                 if response == 'hard':
-                    to_delete.delete(force_policy=HARD_DELETE)
+                    ind_to_delete.delete(force_policy=HARD_DELETE)
+                    disaggs_to_delete.delete()
                 else:
-                    to_delete.delete()
+                    ind_to_delete.delete()
+                    for disagg in disaggs_to_delete:
+                        disagg.is_archived = True
+                        disagg.save()
+
             return
 
         if options['create_disaggs']:
             sadd_label_text = 'Age Unknown M, Age Unknown F, Age Unknown Sex Unknown, 0-5 M, 0-5 F, 0-5 Sex Unknown, 6-9 M, 6-9 F, 6-9 Sex Unknown, 10-14 M, 10-14 F, 10-14 Sex Unknown, 15-19 M, 15-19 F, 15-19 Sex Unknown, 20-24 M, 20-24 F, 20-24 Sex Unknown, 25-34 M, 25-34 F, 25-34 Sex Unknown, 35-49 M, 35-49 F, 35-49 Sex Unknown, 50+ M, 50+ F, 50+ Sex Unknown'
             sadd_label_list = sadd_label_text.split(', ')
-
-            disagg_sadd_with_double, created = DisaggregationType.objects.get_or_create(
-                disaggregation_type='SADD (including unknown) with double counting',
-                country=None,
-                global_type=DisaggregationType.DISAG_PARTICIPANT_COUNT,
-                defaults={
-                    'is_archived': False,
-                    'selected_by_default': True,
-                }
-            )
-            if created:
-                for i, label in enumerate(sadd_label_list):
-                    DisaggregationLabel.objects.create(
-                        label=label, disaggregation_type=disagg_sadd_with_double, customsort=i+1)
-                print('Created disaggregation type: SADD (including unknown) with double counting')
-            else:
-                print('This disaggregation type already existed: SADD (including unknown) with double counting')
-
-            disagg_sadd_without_double, created = DisaggregationType.objects.get_or_create(
-                disaggregation_type='SADD (including unknown) without double counting',
-                country=None,
-                global_type=DisaggregationType.DISAG_PARTICIPANT_COUNT,
-                defaults={
-                    'is_archived': False,
-                    'selected_by_default': True,
-                }
-            )
-            if created:
-                for i, label in enumerate(sadd_label_list):
-                    DisaggregationLabel.objects.create(
-                        label=label, disaggregation_type=disagg_sadd_without_double, customsort=i + 1)
-                print('Created disaggregation type: SADD (including unknown) without double counting')
-            else:
-                print('This disaggregation type already existed: SADD (including unknown) without double counting')
 
             sectors_list = ['Agribusiness', 'Agriculture', 'Agriculture and Food Security', 'Basic Needs',
                             'Capacity development', 'Child Health & Nutrition',
@@ -94,74 +67,19 @@ class Command(BaseCommand):
                             'Resilience', 'Sanitation Infrastructure', 'Skills and Training', 'Urban Issues', 'WASH',
                             'Water Supply Infrastructure', 'Workforce Development', 'Youth']
 
-            disagg_sector_with_double, created = DisaggregationType.objects.get_or_create(
-                disaggregation_type='Sectors Direct with double counting',
-                country=None,
-                global_type=DisaggregationType.DISAG_PARTICIPANT_COUNT,
-                defaults={
-                    'is_archived': False,
-                    'selected_by_default': True,
-                }
-            )
-            if created:
-                for i, label in enumerate(sectors_list):
-                    DisaggregationLabel.objects.create(
-                        label=label, disaggregation_type=disagg_sector_with_double, customsort=i + 1)
-                print('Created disaggregation type: Sectors Direct with double counting')
-            else:
-                print('This disaggregation type already existed: Sectors Direct with double counting')
-
-            disagg_sector_without_double, created = DisaggregationType.objects.get_or_create(
-                disaggregation_type='Sectors Direct without double counting',
-                country=None,
-                global_type=DisaggregationType.DISAG_PARTICIPANT_COUNT,
-                defaults={
-                    'is_archived': False,
-                    'selected_by_default': True,
-                }
-            )
-            if created:
-                for i, label in enumerate(sectors_list):
-                    DisaggregationLabel.objects.create(
-                        label=label, disaggregation_type=disagg_sector_without_double, customsort=i + 1)
-                print('Created disaggregation type: Sectors Direct without double counting')
-            else:
-                print('This disaggregation type already existed: Sectors Direct without double counting')
-
             actual_disagg_labels = ['Direct', 'Indirect']
-            disagg_actual_with_double, created = DisaggregationType.objects.get_or_create(
-                disaggregation_type='Actual with double counting',
-                country=None,
-                global_type=DisaggregationType.DISAG_PARTICIPANT_COUNT,
-                defaults={
-                    'is_archived': False,
-                    'selected_by_default': True,
-                }
-            )
-            if created:
-                for i, label in enumerate(actual_disagg_labels):
-                    DisaggregationLabel.objects.create(
-                        label=label, disaggregation_type=disagg_actual_with_double, customsort=i + 1)
-                print('Created disaggregation type: Actual with double counting')
-            else:
-                print('This disaggregation type already existed: Actual with double counting')
 
-            disagg_actual_without_double, created = DisaggregationType.objects.get_or_create(
-                disaggregation_type='Actual without double counting',
-                country=None,
-                global_type=DisaggregationType.DISAG_PARTICIPANT_COUNT,
-                defaults={
-                    'is_archived': False,
-                    'selected_by_default': True,
-                }
+            disaggs_to_create = (
+                ('SADD (including unknown) with double counting', sadd_label_list),
+                ('SADD (including unknown) without double counting', sadd_label_list),
+                ('Sectors Direct with double counting', sectors_list),
+                ('Sectors Indirect with double counting', sectors_list),
+                ('Actual without double counting', actual_disagg_labels),
+                ('Actual with double counting', actual_disagg_labels),
             )
-            if created:
-                for i, label in enumerate(actual_disagg_labels):
-                    DisaggregationLabel.objects.create(
-                        label=label, disaggregation_type=disagg_actual_without_double, customsort=i + 1)
-                print('Created disaggregation type: Actual without double counting')
-            else:
-                print('This disaggregation type already existed: Actual without double counting')
+
+            for disagg_pair in disaggs_to_create:
+                self._create_disagg_type_and_labels(*disagg_pair)
 
         counts = {
             'eligible_programs': 0, 'pc_indicator_does_not_exist': 0, 'has_rf': 0, 'indicators_created': 0,}
@@ -192,3 +110,27 @@ class Command(BaseCommand):
             print(f'{key} count: {counts[key]}')
         if not options['execute']:
             print('\nTHIS WAS A DRY RUN\n')
+
+    @staticmethod
+    def _create_disagg_type_and_labels(disagg_type_label, disagg_label_list):
+        disagg_type, created = DisaggregationType.objects.get_or_create(
+            disaggregation_type=disagg_type_label,
+            country=None,
+            global_type=DisaggregationType.DISAG_PARTICIPANT_COUNT,
+            defaults={
+                'is_archived': False,
+                'selected_by_default': True,
+            }
+        )
+        if created:
+            for i, label in enumerate(disagg_label_list):
+                DisaggregationLabel.objects.create(
+                    label=label, disaggregation_type=disagg_type, customsort=i + 1)
+            print(f'Created disaggregation type: {disagg_type}')
+        else:
+            if disagg_type.is_archived:
+                disagg_type.is_archived = False
+                disagg_type.save()
+                print(f'This disaggregation was unarchived: {disagg_type}')
+            else:
+                print(f'This disaggregation type already exists: {disagg_type}')
