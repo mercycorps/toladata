@@ -512,7 +512,8 @@ class DisaggregationType(models.Model):
     """Business logic name: Disaggregation - e.g. `Gender` or `SADD`"""
     disaggregation_type = models.CharField(_("Disaggregation"), max_length=135)
     country = models.ForeignKey(Country, on_delete=models.CASCADE, null=True, blank=True, verbose_name="Country")
-    global_type = models.IntegerField(default=DISAG_COUNTRY_ONLY, choices=GLOBAL_TYPE_CHOICES, verbose_name=_("Global disaggregation"))
+    global_type = models.IntegerField(
+        default=DISAG_COUNTRY_ONLY, choices=GLOBAL_TYPE_CHOICES, verbose_name=_("Global disaggregation"))
     is_archived = models.BooleanField(default=False, verbose_name=_("Archived"))
     selected_by_default = models.BooleanField(default=False)
     create_date = models.DateTimeField(_("Create date"), null=True, blank=True)
@@ -1177,6 +1178,8 @@ class Indicator(SafeDeleteModel):
         (ADMIN_PARTICIPANT_COUNT, 'Participant count'),
         (ADMIN_DEMO, 'Test/Demo')
     ]
+
+    PARTICIPANT_COUNT_INDICATOR_NAME = 'Number of people reached in a fiscal year'
 
     indicator_key = models.UUIDField(
         default=uuid.uuid4, help_text=" ", verbose_name=_("Indicator key"))
