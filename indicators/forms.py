@@ -27,7 +27,8 @@ from indicators.models import (
     Level,
     PinnedReport,
     ReportingFrequency,
-    DataCollectionFrequency
+    DataCollectionFrequency,
+    OutcomeTheme
 )
 from indicators.widgets import DataAttributesSelect, DatePicker
 
@@ -836,7 +837,6 @@ class ResultForm(forms.ModelForm):
         self.program = kwargs.pop('program')
         self.request = kwargs.pop('request')
         super(ResultForm, self).__init__(*args, **kwargs)
-
         # Disable all field objects contained in this dict if the user has read-only access.
         if not self.request.has_write_access:
             for field in self.fields.values():
@@ -848,9 +848,8 @@ class ResultForm(forms.ModelForm):
         self.fields['indicator'].initial = self.indicator.id
         self.fields['program'].initial = self.indicator.program.id
 
-
     def set_initial_querysets(self):
-        """populate foreign key fields with limited quersets based on user / country / program"""
+        """populate foreign key fields with limited querysets based on user / country / program"""
         # provide only in-program / in-country Site objects for the evidence queryset
 
         self.fields['site'].queryset = SiteProfile.objects.filter(
@@ -861,6 +860,7 @@ class ResultForm(forms.ModelForm):
                 ).values('country_id'))
             )
         )
+        self.fields['outcome_theme'].queryset = OutcomeTheme.objects.filter(is_active=True)
 
     def set_periodic_target_widget(self):
         # Django will deliver localized strings to the template but the form needs to be able to compare the date
