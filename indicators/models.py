@@ -691,6 +691,12 @@ class DataCollectionFrequencyAdmin(admin.ModelAdmin):
     display = 'Data Collection Frequency'
 
 
+class OutcomeTheme(models.Model):
+    name = models.CharField(max_length=256, verbose_name=_('Outcome theme name'))
+    is_active = models.BooleanField(verbose_name=_('Active?'))
+    create_date = models.DateTimeField(auto_now_add=True, verbose_name=_('Creation date'))
+
+
 class ExternalService(models.Model):
     name = models.CharField(_("Name"), max_length=255, blank=True)
     url = models.CharField(_("URL"), max_length=765, blank=True)
@@ -1473,7 +1479,6 @@ class Indicator(SafeDeleteModel):
 
     admin_type = models.IntegerField(null=True, blank=True, choices=ADMIN_TYPES)
 
-
     create_date = models.DateTimeField(
         _("Create date"), null=True, blank=True, help_text=" "
     )
@@ -2214,6 +2219,8 @@ class Result(models.Model):
 
     date_collected = models.DateField(
         null=True, blank=True, help_text=" ", verbose_name=_("Date collected"))
+
+    outcome_theme = models.ManyToManyField(OutcomeTheme)
 
     approved_by = models.ForeignKey(
         TolaUser, blank=True, null=True, on_delete=models.SET_NULL, verbose_name=_("Originated By"),

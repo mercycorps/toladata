@@ -8,9 +8,7 @@ from indicators.models import (
     Indicator, IndicatorType, Result, StrategicObjective, Objective, Level,
     ExternalService, ExternalServiceRecord, DataCollectionFrequency,
     DisaggregationType, PeriodicTarget, DisaggregationLabel, ReportingFrequency,
-    ExternalServiceAdmin,
-    ExternalServiceRecordAdmin,
-    PeriodicTargetAdmin,
+    ExternalServiceAdmin, ExternalServiceRecordAdmin, PeriodicTargetAdmin, OutcomeTheme
 )
 from workflow.models import Sector, Program, Country
 from import_export import resources, fields
@@ -304,6 +302,12 @@ class ReportingFrequencyAdmin(admin.ModelAdmin):
     display = 'Reporting Frequency'
 
 
+class OutcomeThemeAdmin(admin.ModelAdmin):
+    list_display = ('name', 'is_active', 'create_date')
+    display = 'Outcome Theme'
+    readonly_fields = ('create_date',)
+
+
 admin.site.register(IndicatorType)
 admin.site.register(Indicator, IndicatorAdmin)
 admin.site.register(ReportingFrequency)
@@ -315,3 +319,4 @@ admin.site.register(ExternalService, ExternalServiceAdmin)
 admin.site.register(ExternalServiceRecord, ExternalServiceRecordAdmin)
 admin.site.register(DataCollectionFrequency)
 admin.site.register(PeriodicTarget, PeriodicTargetAdmin)
+admin.site.register(OutcomeTheme, OutcomeThemeAdmin)
