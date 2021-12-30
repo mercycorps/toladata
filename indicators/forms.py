@@ -860,7 +860,6 @@ class ResultForm(forms.ModelForm):
                 ).values('country_id'))
             )
         )
-        self.fields['outcome_theme'].queryset = OutcomeTheme.objects.filter(is_active=True)
 
     def set_periodic_target_widget(self):
         # Django will deliver localized strings to the template but the form needs to be able to compare the date

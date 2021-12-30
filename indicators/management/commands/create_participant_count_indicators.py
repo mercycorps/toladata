@@ -77,16 +77,16 @@ class Command(BaseCommand):
                 self._create_disagg_type_and_labels(*disagg_pair)
 
             created_counts = 0
-            outcome_themes = sorted([
+            outcome_theme_names = sorted([
                 'Humanitarian response', 'Food security', 'Economic opportunity',
                 'Climate adaptation and water security', 'Peace and governance', 'Resilience'])
-            for theme_name in outcome_themes:
+            for theme_name in outcome_theme_names:
                 theme_obj, created = OutcomeTheme.objects.get_or_create(name=theme_name, defaults={'is_active': True})
                 theme_obj.save()
                 if created:
                     created_counts += 1
 
-            print(f'{created_counts} Outcome themes created, {len(outcome_themes)-created_counts} already existed')
+            print(f'{created_counts} Outcome themes created, {len(outcome_theme_names)-created_counts} already existed')
 
         counts = {
             'eligible_programs': 0, 'pc_indicator_does_not_exist': 0, 'has_rf': 0, 'indicators_created': 0,}
