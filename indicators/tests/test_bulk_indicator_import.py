@@ -11,6 +11,7 @@ from django import test
 from django.conf import settings
 from django.core.files.base import ContentFile
 from django.core.serializers.json import DjangoJSONEncoder
+from django.test import tag
 from django.urls import reverse
 from django.utils.translation import gettext, activate
 from factories import (
@@ -155,6 +156,7 @@ class TestBulkImportTemplateCreation(test.TestCase):
         response = self.client.get(reverse('bulk_import_indicators', args=[self.program.pk]), data=request_params)
         self.assertEqual(response.status_code, 200)
 
+    @tag('slow')
     def test_template_create(self):
         self.client.force_login(self.tola_user.user)
         w_factories.grant_program_access(self.tola_user, self.program, self.country, role='high')
@@ -170,6 +172,7 @@ class TestBulkImportTemplateCreation(test.TestCase):
         response_content = self.get_template(request_params=request_params)
         self.assertEqual(json.loads(response_content)['error_codes'], [ERROR_MISMATCHED_TIERS])
 
+    @tag('slow')
     def test_row_counts(self):
         level_config = [
             {'name': 'Goal level', 'indicators': 2, 'ontology': '', 'customsort': 1, 'tier': 'Goal'},
@@ -322,6 +325,7 @@ class TestBulkImportTemplateCreation(test.TestCase):
             new_level_config, request_params, has_indicators=True)
         self.compare_ws_lines(wb, expected_counts, expected_level_names, expected_indicator_numbers)
 
+    @tag('slow')
     def test_non_english_template_create(self):
         self.client.force_login(self.tola_user.user)
         self.tola_user.language = 'es'
@@ -423,6 +427,7 @@ class TestBulkImportTemplateProcessing(test.TestCase):
             else:
                 self.assertTrue(current_cell_fill is None or current_cell_fill.fgColor.rgb != RED_ERROR)
 
+    @tag('slow')
     def test_template_import_with_structural_problems(self):
         self.client.force_login(user=self.tola_user.user)
         w_factories.grant_program_access(self.tola_user, self.program, self.country, role='high')
@@ -444,6 +449,7 @@ class TestBulkImportTemplateProcessing(test.TestCase):
         self.assertEqual(response.status_code, 406)
         self.assertEqual(json.loads(response.content)['error_codes'], [ERROR_NO_NEW_INDICATORS])
 
+    @tag('slow')
     def test_successful_template_upload(self):
         self.client.force_login(user=self.tola_user.user)
         w_factories.grant_program_access(self.tola_user, self.program, self.country, role='high')
@@ -474,6 +480,7 @@ class TestBulkImportTemplateProcessing(test.TestCase):
         self.assertEqual(
             len(os.listdir(self.template_file_path)), 2, 'Old indicator json file should have been deleted.')
 
+    @tag('slow')
     def test_non_fatal_import_errors(self):
         self.client.force_login(user=self.tola_user.user)
         w_factories.grant_program_access(self.tola_user, self.program, self.country, role='high')
@@ -559,6 +566,7 @@ class TestBulkImportTemplateProcessing(test.TestCase):
         self.assertEqual(response.status_code, 400)
         self.assertEqual(json.loads(response.content)['error_codes'], [ERROR_MALFORMED_INDICATOR])
 
+    @tag('slow')
     def test_non_english_imports(self):
         self.tola_user.language = 'fr'
         self.tola_user.save()
@@ -575,6 +583,7 @@ class TestBulkImportTemplateProcessing(test.TestCase):
         self.tola_user.language = 'en'
         self.tola_user.save()
 
+    @tag('slow')
     def test_fatal_import_errors(self):
         self.client.force_login(user=self.tola_user.user)
         w_factories.grant_program_access(self.tola_user, self.program, self.country, role='high')
@@ -646,6 +655,7 @@ class TestBulkImportTemplateProcessing(test.TestCase):
             json.loads(response.content)['error_codes'], [ERROR_UNEXPECTED_LEVEL])
         self.fill_worksheet_row(ws, first_blank_goal_row + 3)
 
+    @tag('slow')
     def test_saving_indicators(self):
         self.client.force_login(user=self.tola_user.user)
         w_factories.grant_program_access(self.tola_user, self.program, self.country, role='high')
@@ -714,6 +724,7 @@ class TestBulkImportTemplateProcessing(test.TestCase):
         self.assertEqual(json.loads(response.content)['error_codes'], [ERROR_SAVE_VALIDATION])
         self.assertEqual(Indicator.objects.count(), 8)
 
+    @tag('slow')
     def test_duplicated_names(self):
         self.client.force_login(user=self.tola_user.user)
         w_factories.grant_program_access(self.tola_user, self.program, self.country, role='high')
@@ -796,6 +807,7 @@ class TestBulkImportTemplateProcessing(test.TestCase):
             ERROR_MSG_NAME_DUPLICATED,
             "Duplicate indicator names should cause duplicate name comment to be shown on cell")
 
+    @tag('slow')
     def test_bad_lookup_values(self):
         self.client.force_login(user=self.tola_user.user)
         w_factories.grant_program_access(self.tola_user, self.program, self.country, role='high')
@@ -815,6 +827,7 @@ class TestBulkImportTemplateProcessing(test.TestCase):
             response.status_code, 400, "If the json file fails to save properly, it should produce and error")
         self.assertEqual(json.loads(response.content)['error_codes'], [ERROR_SAVE_VALIDATION])
 
+    @tag('slow')
     def test_retrieving_feedback_template(self):
         self.client.force_login(user=self.tola_user.user)
         w_factories.grant_program_access(self.tola_user, self.program, self.country, role='high')

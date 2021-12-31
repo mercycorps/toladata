@@ -23,12 +23,15 @@ from factories import (
     indicators_models as i_factories,
     django_models as d_factories
 )
-from indicators.models import Indicator
+from indicators.models import Indicator, DisaggregationType
+
+DISAG_COUNTRY_ONLY = DisaggregationType.DISAG_COUNTRY_ONLY
+DISAG_GLOBAL = DisaggregationType.DISAG_GLOBAL
 
 class IPTTReportProgram(object):
     start_date = datetime.date(2016, 1, 1)
     end_date = datetime.date(2017, 12, 31)
-    
+
     def __init__(self):
         self.setup_program()
         self.setup_disaggregations()
@@ -46,12 +49,12 @@ class IPTTReportProgram(object):
 
     def setup_disaggregations(self):
         self.standard_disaggregation = i_factories.DisaggregationTypeFactory(
-            standard=True,
+            global_type=DISAG_GLOBAL,
             country=None,
             labels=["Test Labél 1", "Test Label 2", "Test Label 3"]
         )
         self.country_disaggregation = i_factories.DisaggregationTypeFactory(
-            standard=False,
+            global_type=DISAG_COUNTRY_ONLY,
             country=self.country,
             labels=["Test Label 1", "Test Labél 2"]
         )
@@ -93,5 +96,3 @@ class IPTTReportProgram(object):
         assert response.json()['program_pk'] == self.program.pk, "Program pk received {}".format(response.json()['program_pk'])
         assert response.json()['report_frequency'] == frequency, "Frequency received {}".format(response.json()['report_frequency'])
         return response.json()['report_data']
-            
-        

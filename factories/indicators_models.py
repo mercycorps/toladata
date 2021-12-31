@@ -333,9 +333,10 @@ class DisaggregationTypeFactory(DjangoModelFactory):
     class Meta:
         model = DisaggregationType
 
-    standard = False
+    global_type = DisaggregationType.DISAG_COUNTRY_ONLY
     disaggregation_type = Sequence(lambda n: "disagg type {0}".format(n))
-    country = LazyAttribute(lambda o: None if o.standard else CountryFactory())
+    country = LazyAttribute(
+        lambda o: None if o.global_type != DisaggregationType.DISAG_COUNTRY_ONLY else CountryFactory())
 
     @post_generation
     def labels(self, create, extracted, **kwargs):

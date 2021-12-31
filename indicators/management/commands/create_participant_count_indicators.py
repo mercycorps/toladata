@@ -1,230 +1,143 @@
+
+import sys
 from datetime import date
+from safedelete.models import HARD_DELETE
 
 from django.core.management.base import BaseCommand
+from django.conf import settings
 from django.db import transaction
 
-from indicators.models import Indicator, Level, LevelTier, IndicatorType, PeriodicTarget
-from workflow.models import Country, Program, Organization
+from indicators.models import (
+    Indicator, DisaggregationType, DisaggregationLabel, OutcomeTheme
+)
+from indicators.utils import create_participant_count_indicator
+from workflow.models import Program
 
 
 class Command(BaseCommand):
     help = """
-        Create participant count country, programs, and indicators
+        Create participant count indicators.  The fiscal year needs to be set in order for this to work.  It will
+        create participant count indicators for any program that doesn't already have one.  It will also create
+        the participant count disaggregations if desired.
         """
 
     def add_arguments(self, parser):
-        parser.add_argument('--clean_option1_indicators', action='store_true')
-        parser.add_argument('--clean_option3_indicators', action='store_true')
+        parser.add_argument(
+            '--execute', action='store_true', help='Without this flag, the command will only be a dry run')
+        parser.add_argument(
+            '--create_disaggs_themes', action='store_true', help='Creates the participant count disaggregations to the database, does not create indicators')
+        parser.add_argument('--clean', action='store_true')
 
     @transaction.atomic
     def handle(self, *args, **options):
-        option1_country_names = ['Lebanon', 'Palestine (West Bank / Gaza)', 'Indonesia']
-        option3_countries = {'Liberia': 7, 'Mali': 6}
-        option3_program_name_template = 'Participant Count {}'
-
-        pc_country_name = 'Mapping Our Reach'
-        program_start_date = date(2020, 7, 1)
-        program_end_date = date(2022, 6, 30)
-        mc_org = Organization.objects.get(name="Mercy Corps")
-        metrics = {
-            'indicator_created': {}, 'indicator_existed': {}, 'program_existed': 0, 'program_created': 0,
-            'dates_created': 0, 'rf_created': 0
-        }
-
-        if options['clean_option1_indicators']:
-            self.clean_option1(option1_country_names)
-        if options['clean_option3_indicators']:
-            self.clean_option3(option3_countries, option3_program_name_template)
-
-        # First do option1 - an indicator in each real program in each real country in the option 1 list.
-        for country_name in option1_country_names:
-            country = Country.objects.get(country=country_name)
-            for program in Program.objects.filter(country=country, funding_status='Funded'):
-                try:
-                    top_level = Level.objects.get(parent=None, program=program)
-                except Level.DoesNotExist:
-                    print(f"Could not add indicator to {country_name}: {program.name} because RF doesn't exist.")
-                    continue
-                indicator_name = 'Number of people reached in fiscal year'
-                i_created = self.create_indicator(indicator_name, program, top_level, 1, country)
-                if i_created:
-                    try:
-                        metrics['indicator_created'][country_name] += 1
-                    except KeyError:
-                        metrics['indicator_created'][country_name] = 1
+        if options['clean']:
+            ind_to_delete = Indicator.objects.filter(admin_type=Indicator.ADMIN_PARTICIPANT_COUNT)
+            disaggs_to_delete = DisaggregationType.objects.filter(
+                global_type=DisaggregationType.DISAG_PARTICIPANT_COUNT)
+            outcome_themes_to_delete = OutcomeTheme.objects.all()
+            response = input(f'Are you sure you want to delete {ind_to_delete.count()} indicators, {disaggs_to_delete.count()} disaggregations, and {outcome_themes_to_delete.count()} outcome themes (Y/n)? ')
+            if response == 'Y':
+                response = input(f'Hard or soft delete for indicators (hard/soft)? ')
+                if response == 'hard':
+                    ind_to_delete.delete(force_policy=HARD_DELETE)
+                    disaggs_to_delete.delete()
+                    outcome_themes_to_delete.delete()
                 else:
-                    try:
-                        metrics['indicator_existed'][country_name] += 1
-                    except KeyError:
-                        metrics['indicator_existed'][country_name] = 1
+                    ind_to_delete.delete()
+                    for disagg in disaggs_to_delete:
+                        disagg.is_archived = True
+                        disagg.save()
+                    for theme in outcome_themes_to_delete:
+                        theme.is_active = False
+                        theme.save()
+            return
 
-        # Now do option3 - a dummy country with one dummy program per participating country and an
-        # indicator for each program in that country.
-        pc_country, created = Country.objects.get_or_create(country=pc_country_name, defaults={
-            'organization': mc_org,
-            'code': "ZZ"
-        })
-        if created:
-            print("Dummy Mapping Our Reach country created")
-        else:
-            print("Dummy Mapping Our Reach country already existed")
+        if options['create_disaggs_themes']:
+            sadd_label_text = 'Age Unknown M, Age Unknown F, Age Unknown Sex Unknown, 0-5 M, 0-5 F, 0-5 Sex Unknown, 6-9 M, 6-9 F, 6-9 Sex Unknown, 10-14 M, 10-14 F, 10-14 Sex Unknown, 15-19 M, 15-19 F, 15-19 Sex Unknown, 20-24 M, 20-24 F, 20-24 Sex Unknown, 25-34 M, 25-34 F, 25-34 Sex Unknown, 35-49 M, 35-49 F, 35-49 Sex Unknown, 50+ M, 50+ F, 50+ Sex Unknown'
+            sadd_label_list = sadd_label_text.split(', ')
 
-        for country, indicator_count in option3_countries.items():
-            country_program_name = option3_program_name_template.format(country)
-            dummy_program, created = Program.objects.get_or_create(
-                name=country_program_name,
-                defaults={
-                    'funding_status': 'Funded',
-                    'reporting_period_start': program_start_date,
-                    'reporting_period_end': program_end_date,
-                }
+            sector_list = sorted([
+                'Agriculture', 'Cash and Voucher Assistance', 'Environment (DRR, Energy and Water)',
+                'Infrastructure (non - WASH, non - energy)', 'Governance and Partnership', 'Employment', 'WASH',
+                'Financial Services', 'Nutrition', 'Health (non - nutrition)']
             )
-            if created:
-                dummy_program.country.add(pc_country)
-                metrics['program_created'] += 1
-            else:
-                metrics['program_existed'] += 1
 
-            if not (dummy_program.reporting_period_start and dummy_program.reporting_period_end):
-                dummy_program.reporting_period_start = program_start_date
-                dummy_program.reporting_period_end = program_end_date
-                metrics['dates_created'] += 1
-            try:
-                top_level = Level.objects.get(parent=None, program=dummy_program)
-            except Level.DoesNotExist:
-                top_level = Level.objects.create(name='Goal', customsort=1, program=dummy_program)
-                for i, tier_name in enumerate(LevelTier.get_templates()['mc_standard']['tiers']):
-                    LevelTier.objects.create(name=tier_name, program=dummy_program, tier_depth=i+1)
-                metrics['rf_created'] += 1
+            actual_disagg_labels = ['Direct', 'Indirect']
 
-            for i in range(indicator_count):
-                indicator_name = 'Number of people reached in fiscal year in <<insert program name>>'
-                i_created = self.create_indicator(indicator_name, dummy_program, top_level, 3, pc_country)
-                if i_created:
-                    try:
-                        metrics['indicator_created'][country] += 1
-                    except KeyError:
-                        metrics['indicator_created'][country] = 1
-                else:
-                    try:
-                        metrics['indicator_existed'][country] += 1
-                    except KeyError:
-                        metrics['indicator_existed'][country] = 1
+            disaggs_to_create = (
+                ('SADD (including unknown) with double counting', sadd_label_list),
+                ('SADD (including unknown) without double counting', sadd_label_list),
+                ('Sectors Direct with double counting', sector_list),
+                ('Sectors Indirect with double counting', sector_list),
+                ('Actual without double counting', actual_disagg_labels),
+                ('Actual with double counting', actual_disagg_labels),
+            )
 
+            for disagg_pair in disaggs_to_create:
+                self._create_disagg_type_and_labels(*disagg_pair)
 
-        print(f"{metrics['program_created']} programs were created in the dummy country, {metrics['program_existed']} already existed.")
-        print(f"{metrics['dates_created']} reporting period dates were created.")
-        print(f"{metrics['rf_created']} programs needed a result framework level added.")
-        for country_name in metrics['indicator_created']:
-            print(f"{metrics['indicator_created'][country_name]} indicators were created in {country_name}.")
-        for country_name in metrics['indicator_existed']:
-            print(f"{metrics['indicator_existed'][country_name]} indicators already existed in {country_name}.")
+            created_counts = 0
+            outcome_themes = sorted([
+                'Humanitarian response', 'Food security', 'Economic opportunity',
+                'Climate adaptation and water security', 'Peace and governance', 'Resilience'])
+            for theme_name in outcome_themes:
+                theme_obj, created = OutcomeTheme.objects.get_or_create(name=theme_name, defaults={'is_active': True})
+                theme_obj.save()
+                if created:
+                    created_counts += 1
+
+            print(f'{created_counts} Outcome themes created, {len(outcome_themes)-created_counts} already existed')
+
+        counts = {
+            'eligible_programs': 0, 'pc_indicator_does_not_exist': 0, 'has_rf': 0, 'indicators_created': 0,}
+
+        reporting_start_date = date.fromisoformat(settings.REPORTING_YEAR_START_DATE)
+
+        eligible_programs = Program.objects.filter(reporting_period_end__gte=reporting_start_date)
+        counts['eligible_programs'] = eligible_programs.count()
+        eligible_programs = eligible_programs.exclude(indicator__admin_type=Indicator.ADMIN_PARTICIPANT_COUNT)
+        counts['pc_indicator_does_not_exist'] = eligible_programs.count()
+        eligible_programs = eligible_programs.exclude(levels__isnull=True).prefetch_related('level_tiers')
+        counts['has_rf'] = eligible_programs.count()
+
+        disaggregations = DisaggregationType.objects.filter(global_type=DisaggregationType.DISAG_PARTICIPANT_COUNT)
+        if len(disaggregations) < 1:
+            response = input(f"There aren't many PC disaggregations ({len(disaggregations)}).  Continue creating indicators? (Y/n) ")
+            if response != 'Y':
+                print('Exiting')
+                sys.exit()
+
+        for program in eligible_programs:
+            top_level = program.levels.get(parent_id__isnull=True)
+            if options['execute']:
+                create_participant_count_indicator(program, top_level, disaggregations)
+                counts['indicators_created'] += 1
+
+        for key in counts:
+            print(f'{key} count: {counts[key]}')
+        if not options['execute']:
+            print('\nINDICATOR CREATION WAS A DRY RUN\n')
 
     @staticmethod
-    def create_indicator(name, program, top_level, option_number, country):
-        definition_text = (
-            "Participants are defined as “all people who have received tangible benefit – directly "
-            "or indirectly from the project.” We distinguish between direct and indirect:\n\n"
-            "Direct participants – are those who have received a tangible benefit from the program, "
-            "either as the actual program participants or the intended recipients of the program benefits. "
-            "This means individuals or communities.\n\n"
-            "Indirect participants – are those who received a tangible benefit through their proximity to "
-            "or contact with program participants or activities.\n\n"
-            "** Add Direct Participants definition **\n\n"
-            "** Add Indirect Participants definition **"
+    def _create_disagg_type_and_labels(disagg_type_label, disagg_label_list):
+        disagg_type, created = DisaggregationType.objects.get_or_create(
+            disaggregation_type=disagg_type_label,
+            country=None,
+            global_type=DisaggregationType.DISAG_PARTICIPANT_COUNT,
+            defaults={
+                'is_archived': False,
+                'selected_by_default': True,
+            }
         )
-        indicator_justification = (
-            "Participant reach is crucial to take decisions on the program implementation. It provides insights "
-            "into the intended and unintended targeted individuals and provides insights into the scale of the "
-            "program.\n\n"
-            "This aggregate participant number is used all over the agency in our boilerplate, capacity "
-            "statements, proposals to institutional donors, and a handful of other reports.")
-        information_use = (
-            "Program Manager/Director - intended and uninteded reach (targeting), including imbalances across "
-            "groups; direct/indirect ratio; consistency between reach and outcome of the program; historical "
-            "change.\n\n"
-            "Country/Regional Director - meeting strategic objectives.\n\n"
-            "HQ - reporting\n\n")
-
-        other_defaults = {
-            'level': top_level,
-            'source': 'Mercy Corps',
-            'definition': definition_text,
-            'justification': indicator_justification,
-            'unit_of_measure': 'Participant',
-            'rationale_for_target': 'The target is based on the intended reach of the program',
-            'baseline': 0,
-            'direction_of_change': 2,
-            'data_points': '# of people reached',
-            'information_use': information_use,
-            'reporting_frequency_id': 7,
-        }
-
-
-        if option_number == 1:
-            indicator, created = Indicator.objects.get_or_create(
-                name=name,
-                program=program,
-                defaults=other_defaults
-            )
-
-            indicator.indicator_type.add(IndicatorType.objects.get(indicator_type="Custom"))
-            if created:
-                indicator.target_frequency = 8
-                indicator.lop_target = 2
-                indicator.save()
-                PeriodicTarget.objects.get_or_create(
-                    period='FY2021', target=1, customsort=0, indicator=indicator)
-                PeriodicTarget.objects.get_or_create(
-                    period='FY2022', target=1, customsort=1, indicator=indicator)
-            indicator.disaggregation.add(
-                *country.disaggregationtype_set.filter(disaggregation_type__startswith="Participant count"))
-            return created
-
-        if option_number == 3:
-
-            indicator = Indicator.objects.create(
-                name=name,
-                program=program,
-                **other_defaults
-            )
-
-            indicator.disaggregation.add(*list(country.disaggregationtype_set.all()))
-
-            indicator.indicator_type.add(IndicatorType.objects.get(indicator_type="Custom"))
-            indicator.target_frequency = 3
-            indicator.lop_target = 2
-            indicator.save()
-            PeriodicTarget.objects.get_or_create(
-                period='Year 1', target=1, customsort=0, indicator=indicator, start_date=date(2020, 7, 1),
-                end_date=date(2021, 6, 30))
-            PeriodicTarget.objects.get_or_create(
-                period='Year 2', target=1, customsort=1, indicator=indicator, start_date=date(2021, 7, 1),
-                end_date=date(2022, 6, 30))
-            return True
-
-        raise NotImplementedError("Option must be 1 or 3")
-
-    @staticmethod
-    def clean_option3(country_names, name_template):
-        for program_name in [name_template.format(country_name) for country_name in country_names]:
-            try:
-                program = Program.objects.get(name=program_name)
-            except Program.DoesNotExist:
-                continue
-            for indicator in program.indicator_set.all():
-                indicator.delete()
-
-    @staticmethod
-    def clean_option1(country_names):
-        for country in Country.objects.filter(country__in=country_names):
-            deleted_count = 0
-            for program  in Program.objects.filter(country=country):
-                try:
-                    indicator = Indicator.objects.get(program=program, name="Number of people reached in fiscal year")
-                    indicator.delete()
-                    deleted_count += 1
-                except Indicator.DoesNotExist:
-                    pass
-            print(f'Option1 indicators deleted for {country.country}: {deleted_count}')
-
+        if created:
+            for i, label in enumerate(disagg_label_list):
+                DisaggregationLabel.objects.create(
+                    label=label, disaggregation_type=disagg_type, customsort=i + 1)
+            print(f'Created disaggregation type: {disagg_type}')
+        else:
+            if disagg_type.is_archived:
+                disagg_type.is_archived = False
+                disagg_type.save()
+                print(f'This disaggregation was unarchived: {disagg_type}')
+            else:
+                print(f'This disaggregation type already exists: {disagg_type}')

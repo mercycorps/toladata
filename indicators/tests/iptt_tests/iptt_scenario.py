@@ -35,7 +35,7 @@ import operator
 import itertools
 from collections import defaultdict
 from decimal import Decimal
-from indicators.models import Indicator, PeriodicTarget
+from indicators.models import Indicator, PeriodicTarget, DisaggregationType
 from factories.workflow_models import (
     CountryFactory,
     RFProgramFactory,
@@ -114,13 +114,13 @@ class IPTTScenarioGeneral:
 
     def get_disaggregations(self):
         self.standard_disagg = DisaggregationTypeFactory(
-            standard=True,
+            global_type=DisaggregationType.DISAG_GLOBAL,
             country=None,
             disaggregation_type="Ståndard Dîsäggregation",
             labels=["Label 1", "Låbél 2"]
         )
         self.country_disagg = DisaggregationTypeFactory(
-            standard=False,
+            global_type=DisaggregationType.DISAG_COUNTRY_ONLY,
             country=self.country,
             disaggregation_type="Country Dîsäggregation with a VERY VERY VERY VERY VERY LONG NAME",
             labels=["Label 1", "Låbél 2", "Label 3"]
@@ -373,7 +373,7 @@ class IPTTScenarioSums:
 
     def get_disaggregations(self):
         self.standard_disagg = DisaggregationTypeFactory(
-            standard=True,
+            global_type=DisaggregationType.DISAG_GLOBAL,
             country=None,
             disaggregation_type="Std Disagg for data not for language",
             labels=["Label 1", "Label 2"]
@@ -489,8 +489,10 @@ class IndicatorGenerator:
         if kwargs.pop('indicator_types', False) is True:
             self.indicator_types = IndicatorTypeFactory.create_batch(2)
         if kwargs.pop('disaggregations', False) is True:
-            self.standard_disaggs = DisaggregationTypeFactory.create_batch(2, standard=True)
-            self.country_disaggs = DisaggregationTypeFactory.create_batch(2, standard=False, country=self.country)
+            self.standard_disaggs = DisaggregationTypeFactory.create_batch(
+                2, global_type=DisaggregationType.DISAG_GLOBAL)
+            self.country_disaggs = DisaggregationTypeFactory.create_batch(
+                2, global_type=DisaggregationType.DISAG_COUNTRY_ONLY, country=self.country)
         if kwargs.pop('sites', False):
             self.sites = SiteProfileFactory.create_batch(2, country=self.country)
         program_kwargs = {
