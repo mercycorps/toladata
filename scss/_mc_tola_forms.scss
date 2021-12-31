@@ -164,6 +164,18 @@ a.accordion-row__btn.btn.btn-link {
         text-decoration: none !important;
     }
 }
+
+a.accordion-header {
+    background-color: rgba(0, 0, 0, 0);
+    &:hover {
+        text-decoration: none !important;
+    }
+    &:focus {
+        background-color: rgba(0, 0, 0, 0) !important;
+        text-decoration: none !important;
+    }
+}
+
 .accordion-popover {
     // this counters the accordion padding to put the popover next to the accordion text:
     margin-left: -7px;
@@ -197,9 +209,38 @@ a.accordion-row__btn.btn.btn-link {
     label {
         margin-bottom: 0;
     }
+    a:hover {
+        text-decoration: none !important;
+    }
+    a:focus {
+        background-color: rgba(0, 0, 0, 0) !important;
+        text-decoration: none !important;
+    }
 }
 .item__value {
     flex: 0 1 auto;
+}
+
+.item__value--container {
+    display: flex;
+    justify-content: flex-end;
+    flex: 0 1 auto;
+    width: 400px;
+
+    .bin {
+        display: flex;
+        flex: 0 1 auto;
+        width: 100%;
+        max-width: 200px;
+        justify-content: flex-end;
+        padding-right: 0.5rem;
+        margin-left: 0.5rem;
+    }
+    .heading {
+        font-weight: bolder;
+        font-size: 0.75rem;
+        text-align: center;
+    }
 }
 
 .error-row {
@@ -217,6 +258,14 @@ a.accordion-row__btn.btn.btn-link {
 .reference-row {
     background-color: $gray-200;
     font-weight: bold;
+}
+.heading-row {
+    display: flex;
+    padding-left: 0 !important;
+    background-color: transparent;
+    border-top: none;
+    border-left: none;
+    border-right: none;
 }
 .value-cell {
     // mimics the size of an input for the sake of keeping elements aligned
@@ -256,6 +305,12 @@ a.accordion-row__btn.btn.btn-link {
 }
 .bad-sum-feedback {
     margin: 0.5rem 0;
+}
+
+.needs-attention {
+    font-size: 85%;
+    color: $red;
+    margin-left: 0.5rem;
 }
 
 .disaggregation-formset .input-symbol-percent {

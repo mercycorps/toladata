@@ -53,6 +53,30 @@ const IndicatorEditModalCell = inject('rootStore')(
 // Component to add results from the IPTT in a modal
 const IndicatorAddResults = inject("rootStore", "filterStore")(
     observer(({ indicator, rootStore, filterStore, noTargets }) => {
+
+        // Create the disaggregations object for the new results form until the api is completed
+        let disaggregations = filterStore.currentDisaggregations.reduce((disaggGroup, disagg) => {
+            return disaggGroup.concat(rootStore.getDisaggregationLabels(disagg))
+        },[])
+        let formatedDisaggregations = [];
+        disaggregations.map(disagg => {
+            // console.log("[")
+            // console.log("     country:", disagg.country);
+            // console.log("     name:", disagg.name);
+            // console.log("     pk:", disagg.pk);
+            // console.log("     label: [");
+            let labels = [];
+            disagg.labels.map(label => {
+                // console.log("          name:", label.name)
+                // console.log("          pk:", label.pk)
+                labels.push({name: label.name, pk: label.pk})
+            })
+            // console.log("     ],");
+            // console.log("],");
+            formatedDisaggregations.push({country: disagg.country, name: disagg.name, pk: disagg.pk, labels: labels})
+        })
+        // console.log(formatedDisaggregations);
+
         const loadModal = (e) => {
             e.preventDefault();
             // Url for the form located at templates/indicators/result_form_modal.html
@@ -92,21 +116,15 @@ const IndicatorAddResults = inject("rootStore", "filterStore")(
                     data-indicator_count={filterStore.programFilterData.indicators.size}
                 ></div>
 
-                <div className="modal fade" id="addResultModal" role="dialog">
-                    <div className="modal-dialog">
+                <div className="modal fade" id={`addResultModal_${indicator.pk}`} role="dialog">
+                    <div className="modal-dialog modal-lg">
                         <div className="modal-content">
-                            <div className="modal-header">
-                                <h2>
-                                    {
-                                        gettext('Result')
-                                    }
-                                </h2>
-                                <button type="button" className="close" data-dismiss="modal" aria-label="Close">
-                                    <span aria-hidden="true">&times;</span>
-                                </button>
-                            </div>
                             <div className="modal-body">
-                                <PCResultsForm/>
+                                <PCResultsForm
+                                    programID={filterStore._selectedProgramId}
+                                    indicatorID={indicator.pk}
+                                    disaggregations={formatedDisaggregations}                                   
+                                />
                             </div>
                         </div>
                     </div>
@@ -118,7 +136,7 @@ const IndicatorAddResults = inject("rootStore", "filterStore")(
                         className={"btn btn-link px-1 pt-0 mx-auto"}
                         disabled ={noTargets}
                         data-toggle="modal"
-                        data-target="#addResultModal"
+                        data-target={`#addResultModal_${indicator.pk}`}
                         // onClick={ loadModal }
                     >
                         <FontAwesomeIcon icon={ faPlusCircle } />
