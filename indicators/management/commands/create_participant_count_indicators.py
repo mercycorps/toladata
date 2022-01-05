@@ -26,6 +26,9 @@ class Command(BaseCommand):
             '--execute', action='store_true', help='Without this flag, the command will only be a dry run')
         parser.add_argument(
             '--create_disaggs_themes', action='store_true', help='Creates the participant count disaggregations to the database, does not create indicators')
+        parser.add_argument(
+            '--suppress_output', action='store_true',
+            help="Supresses the output so tests don't get too messy")
         parser.add_argument('--clean', action='store_true')
 
     @transaction.atomic
@@ -74,7 +77,7 @@ class Command(BaseCommand):
             )
 
             for disagg_pair in disaggs_to_create:
-                self._create_disagg_type_and_labels(*disagg_pair)
+                self._create_disagg_type_and_labels(*disagg_pair, options['suppress_output'])
 
             created_counts = 0
             outcome_theme_names = sorted([
@@ -86,7 +89,8 @@ class Command(BaseCommand):
                 if created:
                     created_counts += 1
 
-            print(f'{created_counts} Outcome themes created, {len(outcome_theme_names)-created_counts} already existed')
+            if not options['suppress_output']:
+                print(f'{created_counts} Outcome themes created, {len(outcome_theme_names)-created_counts} already existed')
 
         counts = {
             'eligible_programs': 0, 'pc_indicator_does_not_exist': 0, 'has_rf': 0, 'indicators_created': 0,}
@@ -113,13 +117,14 @@ class Command(BaseCommand):
                 create_participant_count_indicator(program, top_level, disaggregations)
                 counts['indicators_created'] += 1
 
-        for key in counts:
-            print(f'{key} count: {counts[key]}')
-        if not options['execute']:
-            print('\nINDICATOR CREATION WAS A DRY RUN\n')
+        if not options['suppress_output']:
+            for key in counts:
+                print(f'{key} count: {counts[key]}')
+            if not options['execute']:
+                print('\nINDICATOR CREATION WAS A DRY RUN\n')
 
     @staticmethod
-    def _create_disagg_type_and_labels(disagg_type_label, disagg_label_list):
+    def _create_disagg_type_and_labels(disagg_type_label, disagg_label_list, suppress_output):
         disagg_type, created = DisaggregationType.objects.get_or_create(
             disaggregation_type=disagg_type_label,
             country=None,
@@ -133,11 +138,14 @@ class Command(BaseCommand):
             for i, label in enumerate(disagg_label_list):
                 DisaggregationLabel.objects.create(
                     label=label, disaggregation_type=disagg_type, customsort=i + 1)
-            print(f'Created disaggregation type: {disagg_type}')
+            if not suppress_output:
+                print(f'Created disaggregation type: {disagg_type}')
         else:
             if disagg_type.is_archived:
                 disagg_type.is_archived = False
                 disagg_type.save()
-                print(f'This disaggregation was unarchived: {disagg_type}')
+                if not suppress_output:
+                    print(f'This disaggregation was unarchived: {disagg_type}')
             else:
-                print(f'This disaggregation type already exists: {disagg_type}')
+                if not suppress_output:
+                    print(f'This disaggregation type already exists: {disagg_type}')
