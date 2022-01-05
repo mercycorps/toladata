@@ -3,7 +3,7 @@ import CheckboxedMultiSelect from 'components/checkboxed-multi-select';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 
 
-const PCResultsForm = ({programID, indicatorID, disaggregations}) => {
+const PCResultsForm = ({programID, indicatorID, disaggregations, reportingPeriodStart, reportingPeriodEnd}) => {
 
     let outcomeThemesData = [
         {value: 1, label: "Humanitarian response"},
@@ -84,6 +84,25 @@ const PCResultsForm = ({programID, indicatorID, disaggregations}) => {
 
     // console.log('disaggregations', disaggregations);
 
+    const columnOptions = [
+        {
+            id: "with_double",
+            name: "With double counting",
+        }, 
+        {
+            id: "without_double",
+            name: "Without double counting",
+        }
+    ]
+    let cols = {
+        591: [columnOptions[0]],
+        590: [columnOptions[0]],
+        109: [columnOptions[1], columnOptions[0]],
+        576: [columnOptions[1], columnOptions[0]],
+        577: [columnOptions[0]],
+        578: [columnOptions[0]],
+        579: [columnOptions[1], columnOptions[0]],
+    }
 
     useEffect(() => {
         $(`#addResultModal_${indicatorID}`).on('hidden.bs.modal', function () {
@@ -93,10 +112,56 @@ const PCResultsForm = ({programID, indicatorID, disaggregations}) => {
         })
     }, [])
 
-    const [commonFieldsInput, setCommonFieldsInput] = useState({date_collected: "", fiscal_year: "FY 2022: 1 July 2021 - 30 June 2022"});
+    const [commonFieldsInput, setCommonFieldsInput] = useState({fiscal_year: "FY 2022: 1 July 2021 - 30 June 2022"});
+    const [evidenceFieldsInput, setEvidenceFieldsInput] = useState({});
     const [actualFieldsInput, setActualFieldsInput] = useState({});
     const [disaggregationFieldsInput, setDisaggregationFieldsInput] = useState({});
     const [sumValues, setSumValues] = useState({});
+    const [formErrors, setFormErrors] = useState({});
+
+    let validateForm = () => {
+        let detectedErrors = {};
+        if (!commonFieldsInput.date_collected || commonFieldsInput.date_collected === "") {
+            detectedErrors = {...detectedErrors, date_collected: gettext("This date should be within the fiscal year of the reporting period.")}
+        };
+
+        if (!commonFieldsInput.outcome_theme || commonFieldsInput.outcome_theme === []) {
+            detectedErrors = {...detectedErrors, outcome_theme: gettext("Please complete this field. You can select more than one outcome theme.")}
+        };
+        if (Object.entries(actualFieldsInput).length === 0) {
+            detectedErrors = {...detectedErrors, 576: gettext("With double counting is required. Please complete this field.")}
+        } else {
+            if (!actualFieldsInput["576"]["0"]["0"] || actualFieldsInput["576"]["0"]["0"].value === "" || !actualFieldsInput["576"]["0"]["1"] || actualFieldsInput["576"]["0"]["1"].value === "") {
+                detectedErrors = {...detectedErrors, 576: gettext("With double counting is required. Please complete this field.")}
+            }
+            
+            if (actualFieldsInput["576"]["1"]) {
+                if (parseInt(actualFieldsInput["576"]["1"]["0"].value) > parseInt(actualFieldsInput["576"]["0"]["0"].value) || 
+                parseInt(actualFieldsInput["576"]["1"]["1"].value) > parseInt(actualFieldsInput["576"]["0"]["1"].value)) {
+                    detectedErrors = {...detectedErrors, 576: gettext("Direct/indirect without double counting should be equal or lower than Direct/indirect with double counting.")}
+                }
+            }
+        }
+
+        if (disaggregationFieldsInput["579"]) {
+            if ( sumValues["576"] && sumValues["579"] && sumValues["579"]["0"] !== sumValues['576']["0"]) {
+                detectedErrors = {...detectedErrors, 579: gettext("The sum of 'SADD with double counting' should be equal to the sum of 'Direct with double counting'. The sum of 'SADD without double counting' should be equal to the sum of 'Direct without double counting'.")}
+            }
+            if (sumValues["576"] && sumValues["579"] && sumValues["579"]["1"] !== sumValues["576"]["1"]) {
+                detectedErrors = {...detectedErrors, 579: gettext("The sum of 'SADD with double counting' should be equal to the sum of 'Direct with double counting'. The sum of 'SADD without double counting' should be equal to the sum of 'Direct without double counting'.")}
+            }
+        }
+
+        // disaggregations.map(currentDisaggregation => {
+        //     if (currentDisaggregation.pk !== 576) {
+        //         if(!disaggregationFieldsInput[currentDisaggregation.pk] || sumValues[currentDisaggregation.pk]["0"] === 0) {
+        //             detectedErrors = {...detectedErrors, [currentDisaggregation.pk]: errors[currentDisaggregation.pk].errorMessage}
+        //         }
+        //     }
+        // })
+
+        setFormErrors(detectedErrors);
+    }
 
 
     let formatData = (data) => {
@@ -109,14 +174,17 @@ const PCResultsForm = ({programID, indicatorID, disaggregations}) => {
 
     let handleSubmit = (e) => {
         e.preventDefault();
-        // console.log(commonFieldsInput)
-        // console.log(actualFieldsInput)
-        console.log(disaggregationFieldsInput);
-        let data = [];
-        data = data.concat(formatData({indicator: indicatorID, program: programID}))
-        data = data.concat(formatData(commonFieldsInput));
-        data = data.concat(formatData(actualFieldsInput));
-        data = data.concat(formatData(disaggregationFieldsInput));
+        validateForm();
+        console.log('commonFieldsInput:', commonFieldsInput)
+        console.log('actualFieldsInput:', actualFieldsInput)
+        console.log('disaggregationFieldsInput:', disaggregationFieldsInput);
+        console.log('evidenceFieldsInput', evidenceFieldsInput);
+        console.log('sumValues:', sumValues);
+        // let data = [];
+        // data = data.concat(formatData({indicator: indicatorID, program: programID}))
+        // data = data.concat(formatData(commonFieldsInput));
+        // data = data.concat(formatData(actualFieldsInput));
+        // data = data.concat(formatData(disaggregationFieldsInput));
         // console.log("Data", data);
         // let form_data = new FormData;
     }
@@ -138,38 +206,78 @@ const PCResultsForm = ({programID, indicatorID, disaggregations}) => {
             </h3>
 
             {/* <form onSubmit={(e) => handleSubmit(e)}> */}
-                <CommonFields commonFieldsInput={commonFieldsInput} setCommonFieldsInput={setCommonFieldsInput} outcomeThemesData={outcomeThemesData}/>
-
-                <ActualValueFields 
-                    actualFieldsInput={actualFieldsInput} 
-                    setActualFieldsInput={setActualFieldsInput}
+                <CommonFields
+                    reportingPeriodEnd={reportingPeriodEnd}
+                    reportingPeriodStart={reportingPeriodStart}
+                    commonFieldsInput={commonFieldsInput}
+                    setCommonFieldsInput={setCommonFieldsInput}
+                    outcomeThemesData={outcomeThemesData}
+                    formErrors={formErrors}
                 />
 
-                {disaggregations.map((disagg, i) => {
-                    return <DissaggregationFields 
-                                key={i}
-                                indicatorID={indicatorID}
-                                disagg={disagg} 
-                                actualFieldsInput={actualFieldsInput}
-                                disaggregationFieldsInput={disaggregationFieldsInput}
-                                setDisaggregationFieldsInput={setDisaggregationFieldsInput}
+                {
+                    disaggregations.map((disagg, i) => {
+                        if (disagg.pk === 576) {
+                            return <ActualValueFields
+                                key={disagg.pk}
+                                actualFieldsInput={actualFieldsInput} 
+                                setActualFieldsInput={setActualFieldsInput}
+                                disagg={disagg}
                                 sumValues={sumValues}
                                 setSumValues={setSumValues}
+                                cols={cols}
+                                formErrors={formErrors}
                             />
+                        }
+                    })
+                }
+
+                {disaggregations.map((disagg, i) => {
+                    if ( [578, 579].indexOf(disagg.pk) >= 0 ) {
+                        return <DissaggregationFields 
+                                    key={disagg.pk}
+                                    indicatorID={indicatorID}
+                                    disagg={disagg} 
+                                    actualFieldsInput={actualFieldsInput}
+                                    disaggregationFieldsInput={disaggregationFieldsInput}
+                                    setDisaggregationFieldsInput={setDisaggregationFieldsInput}
+                                    sumValues={sumValues}
+                                    setSumValues={setSumValues}
+                                    cols={cols}
+                                    formErrors={formErrors}
+                                />
+
+                    }
                 })}
-                <EvidenceFields />
+                <EvidenceFields
+                    evidenceFieldsInput={evidenceFieldsInput}
+                    setEvidenceFieldsInput={setEvidenceFieldsInput}
+                    formErrors={formErrors}
+                />
 
                 <div className="form-actions">
                     <div>
+                        <button 
+                            type="button" 
+                            className="btn btn-primary result-group" 
+                            id="result-submit-create" 
+                            onClick={(e) => handleSubmit(e)}
+                        >{gettext('Save and close')}
+                        </button>
+                        <button 
+                            type="button" 
+                            className="btn btn-reset result-group" 
+                            id="result-cancel-btn"
+                            data-dismiss="modal"
+                        >{gettext('Cancel')}
+                        </button>
+                    </div>
+
                         {/* {% if object.id %}
                             <button type="button" className="btn btn-primary" id="result-submit-update">{% trans 'Save and close' %}</button>
                         {% else %} */}
                             {/* <button type="submit" className="btn btn-primary" id="result-submit-create">{gettext('Save and close')}</button> */}
-                            <button type="button" className="btn btn-primary" id="result-submit-create" onClick={(e) => handleSubmit(e)}>{gettext('Save and close')}</button>
-                            <button type="button" className="btn btn-secondary" id="result-submit-and-add-create">{gettext('Save and add another')}</button>
                         {/* {% endif %} */}
-                        <button type="button" className="btn btn-reset" id="result-cancel-btn">{gettext('Cancel')}</button>
-                    </div>
                 </div>
             {/* </form> */}
         </div>
@@ -179,10 +287,10 @@ const PCResultsForm = ({programID, indicatorID, disaggregations}) => {
 
 
 // ***** Common Fields Section *****
-const CommonFields = ({commonFieldsInput, setCommonFieldsInput, outcomeThemesData}) => {
+const CommonFields = ({ reportingPeriodStart, reportingPeriodEnd, commonFieldsInput, setCommonFieldsInput, outcomeThemesData, formErrors }) => {
 
+    // console.log(reportingPeriodStart, reportingPeriodEnd);
 
-    const [theme, setTheme] = useState([]);
     return (
         <fieldset>
             <div className="form-group" id="div_id_date_collected">
@@ -201,12 +309,18 @@ const CommonFields = ({commonFieldsInput, setCommonFieldsInput, outcomeThemesDat
                     type="date" 
                     name="date_collected" 
                     id="id_date_collected" 
-                    className="datepicker form-control hasDatepicker" 
-                    required 
+                    className={`datepicker form-control hasDatepicker ${formErrors.date_collected && "is-invalid"}`}
+                    required
                     autoComplete="off" 
-                    value={commonFieldsInput.date_collected}
+                    min={reportingPeriodStart}
+                    max={reportingPeriodEnd}
+                    value={commonFieldsInput.date_collected || ""}
                     onChange={(e) => setCommonFieldsInput({...commonFieldsInput, [e.target.name]: e.target.value})}
                 />
+                {
+                    formErrors.date_collected &&
+                        <span id="validation_id_date_collected" className="has-error">{formErrors.date_collected}</span>
+                }
             </div>
 
             <div className="form-group" id="div_id_fiscal_year">
@@ -225,12 +339,12 @@ const CommonFields = ({commonFieldsInput, setCommonFieldsInput, outcomeThemesDat
                     type="text" 
                     name="fiscal_year" 
                     id="id_fiscal_year" 
-                    className="datepicker form-control hasDatepicker" 
+                    className="form-control" 
                     required autoComplete="off" 
                     disabled 
                     value={commonFieldsInput.fiscal_year}
                     onChange={(e) => setCommonFieldsInput({...commonFieldsInput, [e.target.name]: e.target.value})}
-                    />
+                />
             </div>
 
             <div className="form-group react-multiselect-checkbox" id="div_id_outcome_theme">
@@ -248,10 +362,15 @@ const CommonFields = ({commonFieldsInput, setCommonFieldsInput, outcomeThemesDat
                 <CheckboxedMultiSelect 
                     options={outcomeThemesData}
                     placeholder={gettext("None Selected")}
+                    className={`${formErrors.outcome_theme && "is-invalid"}`}
                     id="outcome_themes_multiselect"
                     value={commonFieldsInput.outcome_theme}
                     onChange={(e) => setCommonFieldsInput({...commonFieldsInput, outcome_theme: e})}
                 />
+                {
+                    formErrors.outcome_theme &&
+                        <span id="validation_id_outcome_theme" className="has-error">{formErrors.outcome_theme}</span>
+                }
             </div>
 
         </fieldset>
@@ -261,7 +380,45 @@ const CommonFields = ({commonFieldsInput, setCommonFieldsInput, outcomeThemesDat
 
 
 // ***** Acutal Values Fields Section *****
-const ActualValueFields = ({ actualFieldsInput, setActualFieldsInput }) => {
+const ActualValueFields = ({ actualFieldsInput, setActualFieldsInput, disagg, sumValues, setSumValues, cols, formErrors }) => {
+    // console.log(disagg, formErrors);
+    // console.log('actualFieldsInput:', actualFieldsInput);
+
+    useEffect(() => {
+        let initializeActuals = {[disagg.pk]: {0: [], 1: []}}
+        disagg.labels.map(currentLabel => {
+            initializeActuals[disagg.pk]["0"][0] = {...currentLabel, value: ""}
+            initializeActuals[disagg.pk]["0"][1] = {...currentLabel, value: ""}
+            initializeActuals[disagg.pk]["1"][0] = {...currentLabel, value: ""}
+            initializeActuals[disagg.pk]["1"][1] = {...currentLabel, value: ""}
+        })
+        setActualFieldsInput(initializeActuals);
+    }, [])
+
+
+    let handleDataEntry = (value, disagg, label, rowIndex, colIndex, colLength) => {
+        let colSortedIndex = colLength - 1 - colIndex; // Column index from right to left to align the same column of the disaggregations with 2 columns with ones with 1 column
+        
+        let updatedDisaggFields = {...actualFieldsInput};
+        !updatedDisaggFields[disagg] && (updatedDisaggFields[disagg] = {});
+        !updatedDisaggFields[disagg][colSortedIndex] && (updatedDisaggFields[disagg][colSortedIndex] = []);
+        updatedDisaggFields[disagg][colSortedIndex][rowIndex] = {...label, value: value};
+        setActualFieldsInput(updatedDisaggFields);
+
+        let updatedSumValues = {...sumValues};
+        !updatedSumValues[disagg] && (updatedSumValues[disagg] = {});
+        let sum = updatedDisaggFields[disagg][colSortedIndex].reduce((total, currentLabel) => {
+            return total + parseInt(currentLabel.value || 0);
+        }, 0)
+        updatedSumValues[disagg][colSortedIndex] = sum;
+        setSumValues(updatedSumValues);
+
+        console.log(value, "|", disagg, "|", label, "|", rowIndex, "|", colIndex, "|", colLength);
+        // console.log('updatedDisaggFields:', updatedDisaggFields);
+        // console.log('updatedSumValues:', updatedSumValues);
+        // console.log('sumValues', sumValues);
+    }
+
     return (
         <React.Fragment>
            <ul className="list-group form-list-group">
@@ -274,67 +431,76 @@ const ActualValueFields = ({ actualFieldsInput, setActualFieldsInput }) => {
                             data-toggle="popover"
                             data-placement="right"
                             data-trigger="focus"
-                            data-content={ gettext('Include the participants with double counting on the left and participants without double counting across programs on the right. If two programs share participants,  only discount double counting in one program!<br/><br/><strong>Direct participants</strong> – are those who have received a tangible benefit from the program, either as the actual program participants or the intended recipients of the program benefits.<br/><br/><strong>Indirect participants</strong> – are those who received a tangible benefit through their proximity to or contact with program participants or activities.')}>
+                            data-content={
+                                // # Translators:
+                                gettext('Include the participants with double counting on the left and participants without double counting across programs on the right. If two programs share participants,  only discount double counting in one program!<br/><br/><strong>Direct participants</strong> – are those who have received a tangible benefit from the program, either as the actual program participants or the intended recipients of the program benefits.<br/><br/><strong>Indirect participants</strong> – are those who received a tangible benefit through their proximity to or contact with program participants or activities.')
+                            }>
                                 &nbsp;<i className="far fa-question-circle"></i>
                         </a>
                     </div>
                     <div className="item__value--container">
-                        <div className="bin heading">Without double counting</div>
-                        <div className="bin heading">With double counting</div>
+                        {
+                        cols[disagg.pk].map((column, i) => {
+                            return (
+                                <div key={i} className="bin heading">{column.name}</div>
+                                )
+                            })
+                        }
                     </div>
                 </li>
-                <li className="list-group-item">
-                    <div className="item__label">Actual direct value</div>
-                    <div className="item__value--container">
-                        <input 
-                        type="text"
-                        className="bin form-control input-value"
-                        name="direct_without_double"
-                        id="id_direct_without_double"
-                        value={actualFieldsInput.direct_without_double || ""}
-                        onChange={(e) => setActualFieldsInput({...actualFieldsInput, [e.target.name]: e.target.value})}
-                        />
-                        <input 
-                        type="text"
-                        className="bin form-control input-value"
-                        name="direct_with_double"
-                        id="id_direct_with_double"
-                        value={actualFieldsInput.direct_with_double || ""}
-                        onChange={(e) => setActualFieldsInput({...actualFieldsInput, [e.target.name]: e.target.value})}
 
-                        />
-                    </div>
-                </li>
-                <li className="list-group-item">
-                    <div className="item__label">Actual indirect value</div>
-                    <div className="item__value--container">
-                        <input 
-                        type="text"
-                        className="bin form-control input-value"
-                        name="indirect_without_double"
-                        id="id_indirect_without_double"
-                        value={actualFieldsInput.indirect_without_double || ""}
-                        onChange={(e) => setActualFieldsInput({...actualFieldsInput, [e.target.name]: e.target.value})}
+                {
+                   disagg.labels.map((label, rowIndex) => {
+                       return (
+                            <li key={`${disagg.pk}-${label.pk}-${rowIndex}`} className="list-group-item">
+                                <div className="item__label">Actual {label.name} value</div>
+                                <div className="item__value--container">
+                                    {
+                                        cols[disagg.pk].map((column, colIndex) => {
+                                            let sortedColumnIndex = cols[disagg.pk].length - 1 - colIndex;
+                                            let value;
+                                            try { value = actualFieldsInput[disagg.pk][sortedColumnIndex][rowIndex].value; } 
+                                            catch { value = ""}
 
-                        />
-                        <input 
-                        type="text"
-                        className="bin form-control input-value"
-                        name="indirect_with_double"
-                        id="id_indirect_with_double"
-                        value={actualFieldsInput.indirect_with_double || ""}
-                        onChange={(e) => setActualFieldsInput({...actualFieldsInput, [e.target.name]: e.target.value})}
+                                            return (
+                                                <input 
+                                                    key={`${disagg.pk}-${label.pk}-${rowIndex}-${colIndex}`}
+                                                    type="number" 
+                                                    className="bin form-control input-value" 
+                                                    name={`disaggregation-formset-${disagg.pk}-${rowIndex}-label_pk-${column.id}`} 
+                                                    id={`id_${column.id}`}
+                                                    value={value}
+                                                    onChange={(e) => handleDataEntry(e.target.value, disagg.pk, label, rowIndex, colIndex, cols[disagg.pk].length)}
+                                                />
+                                            )
+                                        })
+                                    }
+                                </div>
+                            </li>
+                       )
+                   })
+               }
 
-                        />
-                    </div>
-                </li>
                 <li className="list-group-item reference-row">
-                    <div className="item__label">Actual total value</div>
+                    <div className="item__label">{gettext("Actual total value")}</div>
                     <div className="item__value--container">
-                        <div className="bin">{parseInt(actualFieldsInput.direct_without_double || 0) + parseInt(actualFieldsInput.indirect_without_double || 0)}</div>
-                        <div className="bin">{parseInt(actualFieldsInput.direct_with_double || 0) + parseInt(actualFieldsInput.indirect_with_double || 0)}</div>
+                        {
+                            cols[disagg.pk].map((column, colIndex) => {
+                                let sortedColumnIndex = cols[disagg.pk].length - 1 - colIndex;
+                                let value;
+                                try{ value = sumValues[disagg.pk][sortedColumnIndex] }
+                                catch{ value = 0 }
+                                return (
+                                    <div key={colIndex} className="bin">{value}</div>
+                                )
+                            })
+                        }
                     </div>
                 </li>
+                {
+                    formErrors[disagg.pk] &&
+                        <span id={`validation_id_${disagg.pk}`} className="has-error">{formErrors[disagg.pk]}</span>
+                }
            </ul>
         </React.Fragment>
     )
@@ -343,23 +509,7 @@ const ActualValueFields = ({ actualFieldsInput, setActualFieldsInput }) => {
 
 
 // ***** Dissaggreagation Fields Section *****
-const DissaggregationFields = ({disagg, indicatorID, actualFieldsInput, disaggregationFieldsInput, setDisaggregationFieldsInput, sumValues, setSumValues}) => {
-
-    const columnOptions = [
-        {
-            id: "direct_with_double",
-            name: "With double counting",
-        }, 
-        {
-            id: "direct_without_double",
-            name: "Without double counting",
-        }
-    ]
-    let cols = {
-        591: [columnOptions[0]],
-        590: [columnOptions[0]],
-        109: [columnOptions[1], columnOptions[0]],
-    }
+const DissaggregationFields = ({disagg, indicatorID, actualFieldsInput, disaggregationFieldsInput, setDisaggregationFieldsInput, sumValues, setSumValues, cols, formErrors}) => {
 
     const [expanded, setExpanded] = useState(false);
 
@@ -371,7 +521,6 @@ const DissaggregationFields = ({disagg, indicatorID, actualFieldsInput, disaggre
             setExpanded(false);
         })
     }, [])
-
     
     let handleDataEntry = (value, disagg, label, rowIndex, colIndex, colLength) => {
         let colSortedIndex = colLength - 1 - colIndex; // Column index from right to left to align the same column of the disaggregations with 2 columns with ones with 1 column
@@ -402,20 +551,22 @@ const DissaggregationFields = ({disagg, indicatorID, actualFieldsInput, disaggre
                 <li className="list-group-item heading-row">
                     <div>
                         <a className="item__label accordion-header collapsed" data-toggle="collapse" href={`#${indicatorID}-${disagg.pk}`} aria-expanded={expanded} aria-controls={`#${disagg.pk}`}>
-                            <FontAwesomeIcon icon={ expanded ? 'caret-down' : 'caret-right' } /> &nbsp;
-                            <label className="label--required">{gettext(disagg.name)}</label>
-
+                            <FontAwesomeIcon icon={ expanded ? 'caret-down' : 'caret-right' } />&nbsp;
+                            <label className="label--required">{disagg.name}</label>
                         </a>
-                        {/* <a href="#"
+
+                        <a href="#"
                             tabIndex="0"
                             data-toggle="popover"
                             data-placement="right"
                             data-trigger="focus"
-                            data-content={ gettext(disagg.helpText)}>
+                            // data-content={ gettext(disagg.helpText)}>
+                            data-content={ gettext("Helptext")}>
                                 <i className="far fa-question-circle"></i>
-                        </a> */}
+                        </a>
+
                         {
-                            !expanded && 
+                            !expanded && formErrors[disagg.pk] &&
                             <span className="needs-attention"><i className="fas fa-exclamation-triangle"></i> Needs Attention</span>
                         }
                     </div>
@@ -448,7 +599,7 @@ const DissaggregationFields = ({disagg, indicatorID, actualFieldsInput, disaggre
                                             return (
                                                 <input 
                                                     key={`${disagg.pk}-${label.pk}-${rowIndex}-${colIndex}`}
-                                                    type="text" 
+                                                    type="number" 
                                                     className="bin form-control input-value" 
                                                     name={`disaggregation-formset-${disagg.pk}-${rowIndex}-label_pk-${column.id}`} 
                                                     id={`id_${column.id}`}
@@ -465,7 +616,7 @@ const DissaggregationFields = ({disagg, indicatorID, actualFieldsInput, disaggre
                }
 
                 <li className="list-group-item sum-row">
-                    <div className="item__label">Sum</div>
+                    <div className="item__label">{gettext("Sum")}</div>
                     <div className="item__value--container">
                         {
                             cols[disagg.pk].map((column, colIndex) => {
@@ -482,19 +633,27 @@ const DissaggregationFields = ({disagg, indicatorID, actualFieldsInput, disaggre
                 </li>
 
                 <li className="list-group-item reference-row">
-                    <div className="item__label">Actual direct value</div>
+
+                    <div className="item__label">{gettext("Actual Direct value")}</div>
+
                     <div className="item__value--container">
                         {
-                            cols[disagg.pk].map((column, i) => {
+                            cols[disagg.pk].map((column, colIndex) => {
+                                let sortedColumnIndex = cols[disagg.pk].length - 1 - colIndex;
+                                let value;
+                                try{ value = sumValues[576][sortedColumnIndex] }
+                                catch{ value = 0 }
                                 return (
-                                    <div key={i} className="bin">{parseInt(actualFieldsInput[column.id] || 0)}</div>
+                                    <div key={colIndex} className="bin">{value}</div>
                                 )
                             })
                         }
-                        {/* <div className="bin">{parseInt(actualFieldsInput.direct_with_double || 0)}</div> */}
-                        {/* <div className="bin">{parseInt(actualFieldsInput.direct_without_double || 0)}</div> */}
                     </div>
                 </li>
+                {
+                    formErrors[disagg.pk] &&
+                        <span id={`validation_id_${[disagg.pk]}`} className="has-error">{formErrors[disagg.pk]}</span>
+                }
            </ul>
         </fieldset>
     )
@@ -503,7 +662,17 @@ const DissaggregationFields = ({disagg, indicatorID, actualFieldsInput, disaggre
 
 
 // ***** Evidence Fields Section *****
-const EvidenceFields = () => {
+const EvidenceFields = ({ evidenceFieldsInput, setEvidenceFieldsInput, formErrors }) => {
+
+    const [validEvidenceURL, setValidEvidenceURL] = useState(false);
+
+    useEffect(() => {
+        if(evidenceFieldsInput.evidence_url) {
+            let evidenceURLHasValue = evidenceFieldsInput.evidence_url.match(/^(http(s)?|file):\/\/.+/);
+            setValidEvidenceURL(evidenceURLHasValue);
+        }
+    }, [evidenceFieldsInput.evidence_url])
+
     return (
         <div className="card card-body bg-primary-light border-0">
             <h3>
@@ -522,7 +691,7 @@ const EvidenceFields = () => {
             <div className="form-group">
                 <label htmlFor="id_record_url" className="label--required">
                     {
-                    gettext('Link to file or folder')
+                        gettext('Link to file or folder')
                     }
                 </label>
                 <a href="#"
@@ -532,6 +701,7 @@ const EvidenceFields = () => {
                     data-trigger="focus"
                     data-content=
                     {
+                        // # Translators: 
                         gettext('Provide a link to a file or folder in Google Drive or another shared network drive. Please be aware that TolaData does not store a copy of your record, <i>so you should not link to something on your personal computer, as no one else will be able to access it.</i>')
                         
                     }
@@ -540,9 +710,31 @@ const EvidenceFields = () => {
                 </a>
 
                 <div className="d-flex btn-group">
-                    <input type="text" name="evidence_url" id="id_evidence_url" maxLength="255" className="form-control"/>
-                    <button type="button" id="id_view_evidence_button" className="btn btn-sm btn-secondary" >{gettext('view')}</button>
-                    <button type="button" id="id_browse_google_drive" className="btn btn-sm btn-link text-nowrap"><i className="fas fa-external-link-alt"></i>{gettext('Browse Google Drive')}</button>
+                    <input 
+                        type="text" 
+                        name="evidence_url" 
+                        id="id_evidence_url" 
+                        maxLength="255" 
+                        className="form-control"
+                        value={evidenceFieldsInput.evidence_url || ""}
+                        onChange={(e) => setEvidenceFieldsInput({...evidenceFieldsInput, [e.target.name]: e.target.value})}
+                    />
+
+                    <button 
+                        type="button" 
+                        id="id_view_evidence_button" 
+                        className="btn btn-sm btn-secondary evidence-view__btn"
+                        disabled={!validEvidenceURL}
+                        onClick={() => window.open(evidenceFieldsInput.evidence_url, '_blank')}
+                    >{gettext('view')}</button>
+                    <button 
+                        type="button" 
+                        id="id_browse_google_drive" 
+                        className="btn btn-sm btn-link text-nowrap"
+                        onClick={() => alert("Google")}
+                    >
+                        <i className="fas fa-external-link-alt"></i>{gettext('Browse Google Drive')}
+                    </button>
                 </div>
 
                 <div className="form-group" id="div_id_record_name">
@@ -557,7 +749,15 @@ const EvidenceFields = () => {
                             <i className="far fa-question-circle"></i>
                     </a>
 
-                    <input type="text" name="record_name" id="id_record_name" className="form-control" maxLength="135"/>
+                    <input 
+                        type="text" 
+                        name="record_name" 
+                        id="id_record_name" 
+                        className="form-control" 
+                        maxLength="135"
+                        value={evidenceFieldsInput.record_name || ""}
+                        onChange={(e) => setEvidenceFieldsInput({...evidenceFieldsInput, [e.target.name]: e.target.value})}
+                    />
                 </div>
 
             </div>
@@ -567,3 +767,21 @@ const EvidenceFields = () => {
 
 
 export default PCResultsForm;
+
+let errors = {
+    576: { // Actuals    
+        errorMessage: 
+            // # Translators: 
+            gettext("Direct/indirect without double counting should be equal or lower than Direct/indirect with double counting.")
+    },
+    // 578: { // Sector
+    //     errorMessage: 
+    //         // # Translators:
+    //         gettext("The sum of sector participants can be higher than the 'Direct with double counting' of the indicator.")
+    // },
+    579: { // SADD
+        errorMessage: 
+            // # Translators:
+            gettext("The sum of 'SADD with double counting' should be equal to the sum of 'Direct with double counting'. The sum of 'SADD without double counting' should be equal to the sum of 'Direct without double counting'.")
+    },
+}

@@ -53,11 +53,15 @@ const IndicatorEditModalCell = inject('rootStore')(
 // Component to add results from the IPTT in a modal
 const IndicatorAddResults = inject("rootStore", "filterStore")(
     observer(({ indicator, rootStore, filterStore, noTargets }) => {
-
+        // console.log(rootStore);
         // Create the disaggregations object for the new results form until the api is completed
         let disaggregations = filterStore.currentDisaggregations.reduce((disaggGroup, disagg) => {
-            return disaggGroup.concat(rootStore.getDisaggregationLabels(disagg))
-        },[])
+            let PCDisagg = [576, 577, 578, 579];
+            if (PCDisagg.indexOf(disagg) >= 0) {
+                return disaggGroup.concat({...rootStore.getDisaggregationLabels(disagg)})
+            }
+            return disaggGroup;
+        }, [])
         let formatedDisaggregations = [];
         disaggregations.map(disagg => {
             // console.log("[")
@@ -69,7 +73,8 @@ const IndicatorAddResults = inject("rootStore", "filterStore")(
             disagg.labels.map(label => {
                 // console.log("          name:", label.name)
                 // console.log("          pk:", label.pk)
-                labels.push({name: label.name, pk: label.pk})
+                labels.push({...label})
+                // labels.push({name: label.name, pk: label.pk})
             })
             // console.log("     ],");
             // console.log("],");
@@ -123,7 +128,9 @@ const IndicatorAddResults = inject("rootStore", "filterStore")(
                                 <PCResultsForm
                                     programID={filterStore._selectedProgramId}
                                     indicatorID={indicator.pk}
-                                    disaggregations={formatedDisaggregations}                                   
+                                    disaggregations={formatedDisaggregations}
+                                    reportingPeriodStart={rootStore.currentProgram.reportingPeriodStart}                                
+                                    reportingPeriodEnd={rootStore.currentProgram.reportingPeriodEnd}                                
                                 />
                             </div>
                         </div>
