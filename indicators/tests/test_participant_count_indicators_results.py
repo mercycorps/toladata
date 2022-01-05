@@ -15,19 +15,12 @@ class TestParticipantCountSetup(test.TestCase):
     """
     Test the get_level_depth method on the Level model to assure that the depth calculation is correct.
     """
-    @classmethod
-    def setUpClass(cls):
-        cls.tola_user = w_factories.TolaUserFactory()
-        cls.program = w_factories.RFProgramFactory(country=[cls.tola_user.country], tiers=True, levels=1)
-
     def setUp(self):
+        self.tola_user = w_factories.TolaUserFactory()
+        self.program = w_factories.RFProgramFactory(country=[cls.tola_user.country], tiers=True, levels=1)
         self.client = test.Client()
         IndicatorTypeFactory(indicator_type="Custom")
         ReportingFrequencyFactory(frequency="Annual")
-
-    @classmethod
-    def tearDownClass(cls):
-        pass
 
     def test_result_create_view(self):
         self.client.force_login(self.tola_user.user)
