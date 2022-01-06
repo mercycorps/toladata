@@ -11,6 +11,7 @@ from decimal import Decimal
 import uuid
 import dateparser
 from weasyprint import HTML, CSS
+from rest_framework.decorators import api_view
 
 from django.template.defaultfilters import truncatechars
 from django.contrib import messages
@@ -38,8 +39,9 @@ from workflow.models import (
 )
 
 from indicators.serializers import (
-    IndicatorSerializer,
+    IndicatorSerializer
 )
+from indicators.serializers_new.participant_count_serializers import ParticipantCountIndicatorSerializer
 from indicators.views.view_utils import (
     import_indicator,
     generate_periodic_targets,
@@ -49,8 +51,8 @@ from indicators.forms import IndicatorForm, ResultForm, PTFormInputsForm, get_di
 from indicators.models import (
     Indicator,
     PeriodicTarget,
-    DisaggregationLabel,
     Result,
+    OutcomeTheme
 )
 from indicators.queries import ProgramWithMetrics, ResultsIndicator
 from indicators import indicator_plan as ip
@@ -127,6 +129,19 @@ def periodic_targets_form(request, program):
     return JsonResponse({
         'content': content,
     })
+
+@login_required
+@indicator_pk_adapter(has_indicator_write_access)
+@api_view(['GET', 'POST'])
+def participant_count_result_create_for_indicator(request, pk, program):  # Indicator pk
+    if request.method == 'POST':
+        return JsonResponse({"message": "Got some data!", "data": request.data})
+    indicator = get_object_or_404(Indicator, pk=pk)
+    return_dict = {
+        'outcome_themes': list(OutcomeTheme.objects.filter(is_active=True).values_list('pk', 'name')),
+        'disaggregations': ParticipantCountIndicatorSerializer(indicator).data
+    }
+    return JsonResponse(return_dict)
 
 
 class PeriodicTargetJsonValidationError(Exception):
