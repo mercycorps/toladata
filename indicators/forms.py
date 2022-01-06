@@ -217,6 +217,7 @@ class IndicatorForm(forms.ModelForm):
             'method_of_analysis': forms.Textarea(attrs={'rows': 4}),
             'information_use': forms.Textarea(attrs={'rows': 4}),
             'quality_assurance_techniques': forms.SelectMultiple(),
+            'admin_type': forms.HiddenInput(),
         }
 
     def __init__(self, *args, **kwargs):
@@ -390,6 +391,11 @@ class IndicatorForm(forms.ModelForm):
         if not self.request.has_write_access:
             for name, field in self.fields.items():
                 field.disabled = True
+
+        if indicator and indicator.admin_type == Indicator.ADMIN_PARTICIPANT_COUNT:
+            pc_disabled_fields = 'name unit_of_measure unit_of_measure_type'.split(' ')
+            for field in pc_disabled_fields:
+                self.fields[field].disabled = True
 
     def clean_indicator_key(self):
         data = self.cleaned_data.get('indicator_key', uuid.uuid4())
