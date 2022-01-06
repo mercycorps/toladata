@@ -17,7 +17,7 @@ class TestParticipantCountSetup(test.TestCase):
     """
     def setUp(self):
         self.tola_user = w_factories.TolaUserFactory()
-        self.program = w_factories.RFProgramFactory(country=[cls.tola_user.country], tiers=True, levels=1)
+        self.program = w_factories.RFProgramFactory(country=[self.tola_user.country], tiers=True, levels=1)
         self.client = test.Client()
         IndicatorTypeFactory(indicator_type="Custom")
         ReportingFrequencyFactory(frequency="Annual")
