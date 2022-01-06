@@ -1,6 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import CheckboxedMultiSelect from 'components/checkboxed-multi-select';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
+import { api } from '../apiv2';
 
 
 const PCResultsForm = ({programID, indicatorID, disaggregations, reportingPeriodStart, reportingPeriodEnd}) => {
@@ -107,8 +108,17 @@ const PCResultsForm = ({programID, indicatorID, disaggregations, reportingPeriod
     useEffect(() => {
         $(`#addResultModal_${indicatorID}`).on('hidden.bs.modal', function () {
             setCommonFieldsInput({date_collected: "", fiscal_year: "FY 2022: 1 July 2021 - 30 June 2022"})
+            setEvidenceFieldsInput({})
             setActualFieldsInput({})
             setDisaggregationFieldsInput({})
+            setSumValues({})
+            setFormErrors({})
+        })
+
+        $(document).on("keyup", function(event) {
+            if(event.key === 'Escape') {
+                $(`#addResultModal_${indicatorID}`).modal('hide');
+            }
         })
     }, [])
 
@@ -180,7 +190,7 @@ const PCResultsForm = ({programID, indicatorID, disaggregations, reportingPeriod
         console.log('disaggregationFieldsInput:', disaggregationFieldsInput);
         console.log('evidenceFieldsInput', evidenceFieldsInput);
         console.log('sumValues:', sumValues);
-        // let data = [];
+        let data = [];
         // data = data.concat(formatData({indicator: indicatorID, program: programID}))
         // data = data.concat(formatData(commonFieldsInput));
         // data = data.concat(formatData(actualFieldsInput));
@@ -641,7 +651,7 @@ const DissaggregationFields = ({disagg, indicatorID, actualFieldsInput, disaggre
                             cols[disagg.pk].map((column, colIndex) => {
                                 let sortedColumnIndex = cols[disagg.pk].length - 1 - colIndex;
                                 let value;
-                                try{ value = sumValues[576][sortedColumnIndex] }
+                                try{ value = actualFieldsInput[576][sortedColumnIndex][0].value }// TODO: update for direct or indirect
                                 catch{ value = 0 }
                                 return (
                                     <div key={colIndex} className="bin">{value}</div>
