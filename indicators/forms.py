@@ -461,6 +461,16 @@ class IndicatorForm(forms.ModelForm):
             return self.instance.definition
         return definition
 
+    def clean(self):
+        cleaned_data = super().clean()
+        clean_name = cleaned_data['name']
+        clean_admin_type = cleaned_data['admin_type']
+        if clean_admin_type != Indicator.ADMIN_PARTICIPANT_COUNT and \
+                clean_name == Indicator.PARTICIPANT_COUNT_INDICATOR_NAME:
+            raise ValidationError(
+                # Translators: This is an error message that appears when a user tries to use an off-limits name
+                _('The indicator name you have selected is reserved.  Please enter a different name'))
+
     def update_disaggregations(self, instance):
         # collect disaggs that this user doesn't have access to and don't touch them:
         existing_disaggregations = instance.disaggregation.exclude(

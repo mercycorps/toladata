@@ -298,7 +298,8 @@ class IndicatorCreate(IndicatorFormMixin, CreateView):
             'program': self.program,
             'periodic_targets': [],
             'initial_level_id': self.level_pk,
-            'idempotency_key': uuid.uuid4()
+            'idempotency_key': uuid.uuid4(),
+            'pc_indicator_name': Indicator.PARTICIPANT_COUNT_INDICATOR_NAME
         })
         return context
 
@@ -425,6 +426,7 @@ class IndicatorUpdate(IndicatorFormMixin, UpdateView):
         indicator = self.object
         program = indicator.program
         context['program'] = program
+        context['pc_indicator_name'] = Indicator.PARTICIPANT_COUNT_INDICATOR_NAME
 
         if 'indicator_complete' in self.request.path:
             incomplete_indicators = program.indicator_set\
@@ -501,7 +503,6 @@ class IndicatorUpdate(IndicatorFormMixin, UpdateView):
         context['title_helptext'] = _(
             'This indicator was imported from an Excel template. Some fields could not be included in the template, '
             'including targets that are required before results can be reported.')
-
 
         return context
 

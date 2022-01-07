@@ -13,9 +13,9 @@ from workflow.models import ProgramAccess, Program
 from tola.test.base_classes import TestBase
 
 
-class TestIndcatorCreateUpdateBase(TestBase):
+class TestIndicatorCreateUpdateBase(TestBase):
     def setUp(self):
-        super(TestIndcatorCreateUpdateBase, self).setUp()
+        super(TestIndicatorCreateUpdateBase, self).setUp()
 
         # reset program start/end date
         self.program.reporting_period_start = datetime.date(2018, 1, 1)
@@ -40,7 +40,7 @@ class TestIndcatorCreateUpdateBase(TestBase):
         }
 
 
-class IndicatorCreateTests(TestIndcatorCreateUpdateBase, TestCase):
+class IndicatorCreateTests(TestIndicatorCreateUpdateBase, TestCase):
     """
     Test the create indicator form api paths works, and PTs are created
     """
@@ -161,8 +161,27 @@ class IndicatorCreateTests(TestIndcatorCreateUpdateBase, TestCase):
         with self.assertRaises(PeriodicTargetJsonValidationError):
             self.client.post(url, data)
 
+    def test_invalid_name(self):
+        data = self._base_indicator_post_data(Indicator.LOP, [])
+        data['admin_type'] = ''
+        data['name'] = Indicator.PARTICIPANT_COUNT_INDICATOR_NAME
 
-class IndicatorUpdateTests(TestIndcatorCreateUpdateBase, TestCase):
+        self.assertEqual(Indicator.objects.count(), 0)
+
+        url = reverse_lazy('indicator_create', args=[self.program.id])
+        response = self.client.post(url, data)
+
+        self.assertEqual(response.status_code, 400)
+        self.assertEqual(Indicator.objects.count(), 0)
+
+        data['name'] = 'A non-Participant count name'
+        response = self.client.post(url, data)
+
+        self.assertEqual(response.status_code, 200)
+        self.assertEqual(Indicator.objects.count(), 1)
+
+
+class IndicatorUpdateTests(TestIndicatorCreateUpdateBase, TestCase):
     """
     Test the update form API works, PTs are created, and that results are reassigned
     """
@@ -339,7 +358,7 @@ class PeriodicTargetsFormTests(TestBase, TestCase):
         self.assertEqual(response.status_code, 200)
 
 
-class DeletePeriodicTargetsTests(TestIndcatorCreateUpdateBase, TestCase):
+class DeletePeriodicTargetsTests(TestIndicatorCreateUpdateBase, TestCase):
     """
     Test deleting all PTs in the indicator form, and deleting single event PTs
     """
