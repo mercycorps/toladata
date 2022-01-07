@@ -2264,7 +2264,7 @@ class Result(models.Model):
     date_collected = models.DateField(
         null=True, blank=True, help_text=" ", verbose_name=_("Date collected"))
 
-    outcome_theme = models.ManyToManyField(OutcomeTheme, blank=True)
+    outcome_themes = models.ManyToManyField(OutcomeTheme, null=True, blank=True)
 
     approved_by = models.ForeignKey(
         TolaUser, blank=True, null=True, on_delete=models.SET_NULL, verbose_name=_("Originated By"),

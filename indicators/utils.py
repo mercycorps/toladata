@@ -56,3 +56,4 @@ def create_participant_count_indicator(program, top_level, disaggregations):
         period=period_string, target=1, customsort=1, indicator=indicator)
     indicator.disaggregation.add(*list(disaggregations))
     indicator.reporting_frequencies.add(ReportingFrequency.objects.get(frequency='Annual'))
+    return indicator

@@ -21,7 +21,7 @@ class Migration(migrations.Migration):
         ),
         migrations.AddField(
             model_name='result',
-            name='outcome_theme',
-            field=models.ManyToManyField(to='indicators.OutcomeTheme'),
+            name='outcome_themes',
+            field=models.ManyToManyField(blank=True, null=True, to='indicators.OutcomeTheme'),
         ),
     ]
