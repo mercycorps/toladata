@@ -47,7 +47,8 @@ def create_participant_count_indicator(program, top_level, disaggregations):
 
     indicator = Indicator.objects.create(**all_defaults)
     indicator.indicator_type.add(IndicatorType.objects.get(indicator_type="Custom"))
-    indicator.target_frequency = 8
+    indicator.target_frequency = Indicator.EVENT
+    indicator.is_cumulative = Indicator.NON_SUMMING_CUMULATIVE
     indicator.lop_target = 1
     indicator.save()
     period_string = 'FY' + str(datetime.date.fromisoformat(settings.REPORTING_YEAR_START_DATE).year + 1)

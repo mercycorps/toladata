@@ -217,6 +217,7 @@ class IndicatorForm(forms.ModelForm):
             'method_of_analysis': forms.Textarea(attrs={'rows': 4}),
             'information_use': forms.Textarea(attrs={'rows': 4}),
             'quality_assurance_techniques': forms.SelectMultiple(),
+            'admin_type': forms.HiddenInput(),
         }
 
     def __init__(self, *args, **kwargs):
@@ -391,6 +392,11 @@ class IndicatorForm(forms.ModelForm):
             for name, field in self.fields.items():
                 field.disabled = True
 
+        if indicator and indicator.admin_type == Indicator.ADMIN_PARTICIPANT_COUNT:
+            pc_disabled_fields = 'name unit_of_measure unit_of_measure_type'.split(' ')
+            for field in pc_disabled_fields:
+                self.fields[field].disabled = True
+
     def clean_indicator_key(self):
         data = self.cleaned_data.get('indicator_key', uuid.uuid4())
         if not self.instance.pk:
@@ -454,6 +460,16 @@ class IndicatorForm(forms.ModelForm):
         if not definition and self.instance and not self.instance.definition:
             return self.instance.definition
         return definition
+
+    def clean(self):
+        cleaned_data = super().clean()
+        clean_name = cleaned_data['name']
+        clean_admin_type = cleaned_data['admin_type']
+        if clean_admin_type != Indicator.ADMIN_PARTICIPANT_COUNT and \
+                clean_name == Indicator.PARTICIPANT_COUNT_INDICATOR_NAME:
+            raise ValidationError(
+                # Translators: This is an error message that appears when a user tries to use an off-limits name
+                _('The indicator name you have selected is reserved.  Please enter a different name'))
 
     def update_disaggregations(self, instance):
         # collect disaggs that this user doesn't have access to and don't touch them:
