@@ -210,10 +210,13 @@ a.accordion-header {
     }
 }
 .item__label {
-    flex: 1 1 auto;
+    align-items: center;
     line-height: 1;
     margin-right: 0.25rem;
     white-space: nowrap;
+    &:not(&.accordion) {
+        flex: 1 1 auto;
+    }
     label {
         margin-bottom: 0;
     }
@@ -227,6 +230,13 @@ a.accordion-header {
 }
 .item__value {
     flex: 0 1 auto;
+}
+
+.item__value--header {
+    display: flex;
+    justify-content: flex-start;  
+    align-items: baseline;
+    width: 100%;
 }
 
 .item__value--container {
@@ -246,7 +256,6 @@ a.accordion-header {
     }
     .heading {
         font-weight: bolder;
-        font-size: 0.75rem;
         text-align: center;
     }
 }
@@ -269,6 +278,8 @@ a.accordion-header {
 }
 .heading-row {
     display: flex;
+    flex-direction: column;
+    align-items: flex-start;
     padding-left: 0 !important;
     background-color: transparent;
     border-top: none;

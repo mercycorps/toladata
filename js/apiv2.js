@@ -178,7 +178,30 @@ const api = {
                 this.logFailure(error);
                 return error.response;
             })
-        },
+    },
+    async getPCountResultsData(indicator_id) {
+        return await this.apiInstance.get(`/pcount_result_create/${indicator_id}`)
+            .then(response => {
+                console.log('API Response:', response.data);
+                return response.data;
+            })
+            .catch(error => {
+                this.logFailure(error);
+                return error.response;
+            })
+    },
+    async savePCountResultsData(indicator_id, form_data) {
+        return await this.apiInstance.post(`/pcount_result_create/${indicator_id}`,
+            form_data, {headers: {'Content-Type': 'multipart/form-data'}})
+            .then(response => {
+                console.log('API Response:', response.data);
+                return response.data;
+            })
+            .catch(error => {
+                this.logFailure(error);
+                return error.response;
+            })
+    },
 };
 
 

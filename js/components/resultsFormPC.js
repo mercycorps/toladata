@@ -1,7 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import CheckboxedMultiSelect from 'components/checkboxed-multi-select';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
-import { api } from '../apiv2';
+import api from '../apiv2';
 
 
 const PCResultsForm = ({programID, indicatorID, disaggregations, reportingPeriodStart, reportingPeriodEnd}) => {
@@ -103,24 +103,62 @@ const PCResultsForm = ({programID, indicatorID, disaggregations, reportingPeriod
         577: [columnOptions[0]],
         578: [columnOptions[0]],
         579: [columnOptions[1], columnOptions[0]],
+        652: [columnOptions[0]],
+        653: [columnOptions[0]],
+        650: [columnOptions[0]],
+        651: [columnOptions[0]],
+        648: [columnOptions[1], columnOptions[0]],
+        649: [columnOptions[1], columnOptions[0]],
     }
 
     useEffect(() => {
-        $(`#addResultModal_${indicatorID}`).on('hidden.bs.modal', function () {
-            setCommonFieldsInput({date_collected: "", fiscal_year: "FY 2022: 1 July 2021 - 30 June 2022"})
-            setEvidenceFieldsInput({})
-            setActualFieldsInput({})
-            setDisaggregationFieldsInput({})
-            setSumValues({})
-            setFormErrors({})
+        $(`#addResultModal_${indicatorID}`).on('shown.bs.modal', function () {
+
+            $(`#addResultModal_${indicatorID}`).on('hidden.bs.modal', function () {
+                setCommonFieldsInput({date_collected: "", fiscal_year: "FY 2022: 1 July 2021 - 30 June 2022"})
+                setEvidenceFieldsInput({})
+                setActualFieldsInput({})
+                setDisaggregationFieldsInput({})
+                setSumValues({})
+                setFormErrors({})
+            })
+
+            $(document).on("keyup", function(event) {
+                if(event.key === 'Escape') {
+                    $(`#addResultModal_${indicatorID}`).modal('hide');
+                }
+            })
+
+            console.log(indicatorID);
+            api.getPCountResultsData(indicatorID)
+                .then(response => {
+                    console.log("Form received data!", response);
+                    setOutcomeThemeNames(response.outcome_themes);
+                    setDisaggregationData(response.disaggregations.disaggregations)
+                    handleReceivedDisaggregations(response.disaggregations.disaggregations)
+                })
         })
 
-        $(document).on("keyup", function(event) {
-            if(event.key === 'Escape') {
-                $(`#addResultModal_${indicatorID}`).modal('hide');
-            }
-        })
     }, [])
+
+    let handleReceivedDisaggregations = (disaggregations_data) => {
+        let formated = {};
+        disaggregations_data.map( disagg => {
+            formated[disagg.pk] = {};
+            cols[disagg.pk].map((column, colIndex) => {
+                formated[disagg.pk][colIndex] = [];
+                disagg.labels.map(label => {
+                    formated[disagg.pk][colIndex][label.customsort] = label;
+                })
+            })
+        })
+        console.log("Formated:", formated);
+        setResultsFieldsInput(formated);
+    }
+
+    const [resultsFieldsInput, setResultsFieldsInput] = useState({});
+    const [outcomeThemeNames, setOutcomeThemeNames] = useState([]);
+    const [disaggregationData, setDisaggregationData] = useState([]);
 
     const [commonFieldsInput, setCommonFieldsInput] = useState({fiscal_year: "FY 2022: 1 July 2021 - 30 June 2022"});
     const [evidenceFieldsInput, setEvidenceFieldsInput] = useState({});
@@ -191,12 +229,24 @@ const PCResultsForm = ({programID, indicatorID, disaggregations, reportingPeriod
         console.log('evidenceFieldsInput', evidenceFieldsInput);
         console.log('sumValues:', sumValues);
         let data = [];
-        // data = data.concat(formatData({indicator: indicatorID, program: programID}))
+        data = data.concat(formatData({indicator: indicatorID, program: programID}))
         // data = data.concat(formatData(commonFieldsInput));
         // data = data.concat(formatData(actualFieldsInput));
         // data = data.concat(formatData(disaggregationFieldsInput));
+
         // console.log("Data", data);
-        // let form_data = new FormData;
+        let form_data = new FormData;
+       data.map(currentData => {
+            form_data.append(currentData["name"], currentData["value"]);
+        })
+        for(var pair of form_data.entries()) {
+            console.log('Form Data:', pair[0]+ ', '+ pair[1]);
+        }
+
+        api.savePCountResultsData(indicatorID, form_data)
+            .then(response => {
+                console.log("Saved Form Data!");
+            })
     }
 
     return (
@@ -230,6 +280,8 @@ const PCResultsForm = ({programID, indicatorID, disaggregations, reportingPeriod
                         if (disagg.pk === 576) {
                             return <ActualValueFields
                                 key={disagg.pk}
+                                resultsFieldsInput={resultsFieldsInput}
+                                setResultsFieldsInput={setResultsFieldsInput}
                                 actualFieldsInput={actualFieldsInput} 
                                 setActualFieldsInput={setActualFieldsInput}
                                 disagg={disagg}
@@ -242,12 +294,14 @@ const PCResultsForm = ({programID, indicatorID, disaggregations, reportingPeriod
                     })
                 }
 
-                {disaggregations.map((disagg, i) => {
-                    if ( [578, 579].indexOf(disagg.pk) >= 0 ) {
+                {disaggregationData.map((disagg, i) => {
+                    if ( [578, 579, 648, 649, 650, 651].indexOf(disagg.pk) >= 0 ) {
                         return <DissaggregationFields 
                                     key={disagg.pk}
                                     indicatorID={indicatorID}
-                                    disagg={disagg} 
+                                    disagg={disagg}
+                                    resultsFieldsInput={resultsFieldsInput}
+                                    setResultsFieldsInput={setResultsFieldsInput}
                                     actualFieldsInput={actualFieldsInput}
                                     disaggregationFieldsInput={disaggregationFieldsInput}
                                     setDisaggregationFieldsInput={setDisaggregationFieldsInput}
@@ -260,6 +314,8 @@ const PCResultsForm = ({programID, indicatorID, disaggregations, reportingPeriod
                     }
                 })}
                 <EvidenceFields
+                    resultsFieldsInput={resultsFieldsInput}
+                    setResultsFieldsInput={setResultsFieldsInput}
                     evidenceFieldsInput={evidenceFieldsInput}
                     setEvidenceFieldsInput={setEvidenceFieldsInput}
                     formErrors={formErrors}
@@ -390,7 +446,7 @@ const CommonFields = ({ reportingPeriodStart, reportingPeriodEnd, commonFieldsIn
 
 
 // ***** Acutal Values Fields Section *****
-const ActualValueFields = ({ actualFieldsInput, setActualFieldsInput, disagg, sumValues, setSumValues, cols, formErrors }) => {
+const ActualValueFields = ({ resultsFieldsInput, setResultsFieldsInput, actualFieldsInput, setActualFieldsInput, disagg, sumValues, setSumValues, cols, formErrors }) => {
     // console.log(disagg, formErrors);
     // console.log('actualFieldsInput:', actualFieldsInput);
 
@@ -519,7 +575,7 @@ const ActualValueFields = ({ actualFieldsInput, setActualFieldsInput, disagg, su
 
 
 // ***** Dissaggreagation Fields Section *****
-const DissaggregationFields = ({disagg, indicatorID, actualFieldsInput, disaggregationFieldsInput, setDisaggregationFieldsInput, sumValues, setSumValues, cols, formErrors}) => {
+const DissaggregationFields = ({disagg, disaggregationData, indicatorID, resultsFieldsInput, setResultsFieldsInput, actualFieldsInput, disaggregationFieldsInput, setDisaggregationFieldsInput, sumValues, setSumValues, cols, formErrors}) => {
 
     const [expanded, setExpanded] = useState(false);
 
@@ -559,10 +615,10 @@ const DissaggregationFields = ({disagg, indicatorID, actualFieldsInput, disaggre
         <fieldset>
             <ul className="list-group form-list-group">
                 <li className="list-group-item heading-row">
-                    <div>
-                        <a className="item__label accordion-header collapsed" data-toggle="collapse" href={`#${indicatorID}-${disagg.pk}`} aria-expanded={expanded} aria-controls={`#${disagg.pk}`}>
+                    <div className="item__value--header">
+                        <a className="item__label--accordion accordion-header collapsed" data-toggle="collapse" href={`#${indicatorID}-${disagg.pk}`} aria-expanded={expanded} aria-controls={`#${disagg.pk}`}>
                             <FontAwesomeIcon icon={ expanded ? 'caret-down' : 'caret-right' } />&nbsp;
-                            <label className="label--required">{disagg.name}</label>
+                            <label className="label--required">{disagg.disaggregation_type}</label>
                         </a>
 
                         <a href="#"
@@ -572,12 +628,12 @@ const DissaggregationFields = ({disagg, indicatorID, actualFieldsInput, disaggre
                             data-trigger="focus"
                             // data-content={ gettext(disagg.helpText)}>
                             data-content={ gettext("Helptext")}>
-                                <i className="far fa-question-circle"></i>
+                                &nbsp;<i className="far fa-question-circle"></i>
                         </a>
 
                         {
                             !expanded && formErrors[disagg.pk] &&
-                            <span className="needs-attention"><i className="fas fa-exclamation-triangle"></i> Needs Attention</span>
+                            <span className="needs-attention"><i className="fas fa-exclamation-triangle"></i>{gettext("Needs Attention")}</span>
                         }
                     </div>
                     <div className="item__value--container" style={{display: expanded ? "inherit" : "none"}}>
@@ -594,27 +650,28 @@ const DissaggregationFields = ({disagg, indicatorID, actualFieldsInput, disaggre
            <ul className="list-group form-list-group collapse" id={`${indicatorID}-${disagg.pk}`}>
 
                {
-                   disagg.labels.map((label, rowIndex) => {
+                   disagg.labels.map((labelObj, rowIndex) => {
                        return (
-                            <li key={`${disagg.pk}-${label.pk}-${rowIndex}`} className="list-group-item">
-                                <div className="item__label">{label.name}</div>
+                            <li key={`${disagg.pk}-${labelObj.customsort}-${rowIndex}`} className="list-group-item">
+                                <div className="item__label">{labelObj.label}</div>
                                 <div className="item__value--container">
                                     {
                                         cols[disagg.pk].map((column, colIndex) => {
                                             let sortedColumnIndex = cols[disagg.pk].length - 1 - colIndex;
                                             let value;
-                                            try { value = disaggregationFieldsInput[disagg.pk][sortedColumnIndex][rowIndex].value; } 
+                                            // try { value = disaggregationFieldsInput[disagg.pk][sortedColumnIndex][rowIndex].value; } 
+                                            try { value = resultsFieldsInput[disagg.pk][sortedColumnIndex][rowIndex].value || ""; } 
                                             catch { value = ""}
 
                                             return (
                                                 <input 
-                                                    key={`${disagg.pk}-${label.pk}-${rowIndex}-${colIndex}`}
+                                                    key={`${disagg.pk}-${labelObj.customsort}-${rowIndex}-${colIndex}`}
                                                     type="number" 
                                                     className="bin form-control input-value" 
                                                     name={`disaggregation-formset-${disagg.pk}-${rowIndex}-label_pk-${column.id}`} 
                                                     id={`id_${column.id}`}
                                                     value={value}
-                                                    onChange={(e) => handleDataEntry(e.target.value, disagg.pk, label, rowIndex, colIndex, cols[disagg.pk].length)}
+                                                    onChange={(e) => handleDataEntry(e.target.value, disagg.pk, labelObj, rowIndex, colIndex, cols[disagg.pk].length)}
                                                 />
                                             )
                                         })
@@ -672,7 +729,7 @@ const DissaggregationFields = ({disagg, indicatorID, actualFieldsInput, disaggre
 
 
 // ***** Evidence Fields Section *****
-const EvidenceFields = ({ evidenceFieldsInput, setEvidenceFieldsInput, formErrors }) => {
+const EvidenceFields = ({ resultsFieldsInput, setResultsFieldsInput, evidenceFieldsInput, setEvidenceFieldsInput, formErrors }) => {
 
     const [validEvidenceURL, setValidEvidenceURL] = useState(false);
 
