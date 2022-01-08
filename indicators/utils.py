@@ -1,10 +1,10 @@
 
 import datetime
 from django.conf import settings
-from indicators.models import Indicator, IndicatorType, PeriodicTarget, DisaggregationType, ReportingFrequency
+from indicators.models import Indicator, IndicatorType, PeriodicTarget, ReportingFrequency
 
 
-def create_participant_count_indicator(program, top_level, disaggregations):
+def create_participant_count_indicator(program, top_level, disaggregations_qs):
     definition_text = (
         "Participants are defined as “all people who have received tangible benefit – directly "
         "or indirectly from the project.” We distinguish between direct and indirect:\n\n"
@@ -47,12 +47,13 @@ def create_participant_count_indicator(program, top_level, disaggregations):
 
     indicator = Indicator.objects.create(**all_defaults)
     indicator.indicator_type.add(IndicatorType.objects.get(indicator_type="Custom"))
-    indicator.target_frequency = 8
+    indicator.target_frequency = Indicator.EVENT
+    indicator.is_cumulative = Indicator.NON_SUMMING_CUMULATIVE
     indicator.lop_target = 1
     indicator.save()
     period_string = 'FY' + str(datetime.date.fromisoformat(settings.REPORTING_YEAR_START_DATE).year + 1)
     PeriodicTarget.objects.get_or_create(
         period=period_string, target=1, customsort=1, indicator=indicator)
-    indicator.disaggregation.add(*list(disaggregations))
+    indicator.disaggregation.add(*list(disaggregations_qs))
     indicator.reporting_frequencies.add(ReportingFrequency.objects.get(frequency='Annual'))
     return indicator
