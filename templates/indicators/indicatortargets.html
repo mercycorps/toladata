@@ -25,7 +25,7 @@
                             data-ptid="{{ pt.id }}"
                             class="periodic-target list-group-item item--event">
                             <div class="item__label">
-                                {% if not readonly %}
+                                {% if not readonly and not indicator.admin_type == 0%}
                                 <a href="{% url 'pt_delete' pt.id %}" id="delete_event_{{ pt.id }}"
                                    class="btn-delete btn btn-sm event-target-delete-button">
                                     <i class="fas fa-times text-danger"></i>
@@ -52,7 +52,7 @@
                                        value="{{ pt.period }}"
                                        class="form-control input-text target-label"
                                        maxlength="255"
-                                       {% if readonly %}disabled="disabled"{% endif %}>
+                                       {% if readonly or indicator.admin_type == 0 %}disabled="disabled"{% endif %}>
                                 <span style="" class="help-block"> </span>
                             </div>
                 {% else %} {# all non-events #}

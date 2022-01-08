@@ -343,11 +343,18 @@ class IndicatorForm(forms.ModelForm):
                       "used in submitted program results.")
                 )
             return helptext
-
+        if indicator and indicator.admin_type == Indicator.ADMIN_PARTICIPANT_COUNT:
+            disaggregation_group_helptext = ''
+            global_label = _('Participant count disaggregations')
+            disaggs_disabled = True
+        else:
+            disaggregation_group_helptext = Indicator._meta.get_field('disaggregation').help_text
+            global_label = _('Global disaggregations')
+            disaggs_disabled = False
         disaggregation_group_helptext = Indicator._meta.get_field('disaggregation').help_text
         self.fields['grouped_disaggregations'] = GroupedMultipleChoiceField(
             # Translators:  disaggregation types that are available to all programs
-            [(_('Global disaggregations'),
+            [(global_label,
               [(disagg.pk, _(str(disagg))) for disagg in global_disaggs],
               [get_helptext(disagg) for disagg in global_disaggs],
               [getattr(disagg, 'has_results') for disagg in global_disaggs])] +
@@ -358,8 +365,10 @@ class IndicatorForm(forms.ModelForm):
               [getattr(disagg, 'has_results') for disagg in country_disaggs])
                 for country_name, country_disaggs in countries_disaggs],
             subwidget_attrs={'class': 'scroll-box-200 grouped-disaggregations'},
-            group_helptext=disaggregation_group_helptext
+            group_helptext=disaggregation_group_helptext,
+            disabled=disaggs_disabled
         )
+
         if indicator:
             self.fields['grouped_disaggregations'].initial = [
                 disagg.pk for disagg in indicator.disaggregation.all()
