@@ -1,4 +1,4 @@
-# -*- coding: utf-8 -*-
+
 """
 Views specific to the results framework (creating/updating/viewing)
 """
@@ -33,7 +33,8 @@ from indicators.serializers import (
     IndicatorSerializerMinimal,
     ProgramObjectiveSerializer
 )
-from indicators.models import Level, LevelTier, LevelTierTemplate, Indicator
+from indicators.models import Level, LevelTier, LevelTierTemplate, Indicator, DisaggregationType
+from indicators.utils import create_participant_count_indicator
 from tola_management.models import ProgramAuditLog
 from workflow.models import Program
 from workflow.serializers import ResultsFrameworkProgramSerializer
@@ -217,6 +218,10 @@ def insert_new_level(request):
 
     # Now the new level can be saved
     new_level.save()
+
+    if not new_level.parent:
+        disaggregations = DisaggregationType.objects.filter(global_type=DisaggregationType.DISAG_PARTICIPANT_COUNT)
+        create_participant_count_indicator(program,new_level, disaggregations)
 
     # Return all Levels for the program. There shouldn't be so much that it slows things down much.
     # Also return the newly created Level.
