@@ -150,7 +150,7 @@
                             <span id="validation_id_strategic_objectives" class="has-error"></span>
                         </div>
 
-                        {% if not readonly and indicator %}
+                        {% if not readonly and indicator and indicator.admin_type != 0 %}
                             <div class="form-group text-right" id="div_id_remove_indicator">
                                 <a href="/indicators/indicator_delete/{{ indicator.id }}/"
                                    id="id_delete_indicator_btn"
