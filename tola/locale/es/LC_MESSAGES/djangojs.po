@@ -2,7 +2,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: \n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2021-11-17 16:31-0800\n"
+"POT-Creation-Date: 2022-01-10 11:06-0800\n"
 "PO-Revision-Date: 2021-11-17 12:14-0800\n"
 "Last-Translator: \n"
 "Language-Team: \n"
@@ -101,7 +101,7 @@ msgstr "Continuar"
 #. Translators: Button to cancel a form submission
 #: js/components/ImportIndicatorsPopover.js:419
 #: js/components/ImportIndicatorsPopover.js:631
-#: js/components/changesetNotice.js:66
+#: js/components/changesetNotice.js:66 js/components/resultsFormPC.js:277
 #: js/pages/results_framework/components/level_cards.js:578
 msgid "Cancel"
 msgstr "Cancelar"
@@ -407,6 +407,235 @@ msgstr "Buscar"
 msgid "Add indicator"
 msgstr "Agregar indicador"
 
+#: js/components/resultsFormPC.js:11 js/components/resultsFormPC.js:12
+msgid "Only include SADD for Direct participants."
+msgstr ""
+
+#: js/components/resultsFormPC.js:13 js/components/resultsFormPC.js:14
+msgid ""
+"Provide a disaggregation of participants reached by sector. Only provide the "
+"figure with double counting. Refer to MEL Tip Sheet: Guidelines on Counting "
+"and Reporting Participant Numbers <a href='https://library.mercycorps.org/"
+"record/16929?ln=en' target='_blank'>[link: https://library.mercycorps.org/"
+"record/16929?ln=en]</a> for a description of outcome themes."
+msgstr ""
+
+#: js/components/resultsFormPC.js:15 js/components/resultsFormPC.js:16
+msgid ""
+"Direct participants – are those who have received a tangible benefit from "
+"the program, either as the actual program participants or the intended "
+"recipients of the program benefits. Indirect participants – are those who "
+"received a tangible benefit through their proximity to or contact with "
+"program participants or activities."
+msgstr ""
+
+#: js/components/resultsFormPC.js:108
+msgid "This date should be within the fiscal year of the reporting period."
+msgstr ""
+
+#: js/components/resultsFormPC.js:112
+msgid "You cannot change the fiscal year during the current reporting period. "
+msgstr ""
+
+#: js/components/resultsFormPC.js:116
+#, fuzzy
+#| msgid "Please complete this field. Your baseline can be zero."
+msgid "Please complete this field. You can select more than one outcome theme."
+msgstr "Por favor complete este campo. Su línea de base puede ser cero."
+
+#: js/components/resultsFormPC.js:119
+msgid ""
+"Total participants With double counting is required. Please complete this "
+"field."
+msgstr ""
+
+#: js/components/resultsFormPC.js:124
+msgid ""
+"Direct/indirect without double counting should be equal or lower than Direct/"
+"indirect with double counting."
+msgstr ""
+
+#: js/components/resultsFormPC.js:131 js/components/resultsFormPC.js:134
+msgid ""
+"The sum of 'SADD with double counting' should be equal to the sum of 'Direct "
+"with double counting'. The sum of 'SADD without double counting' should be "
+"equal to the sum of 'Direct without double counting'."
+msgstr ""
+
+#: js/components/resultsFormPC.js:183 js/level_utils.js:36
+msgid "Result"
+msgstr "Resultado"
+
+#: js/components/resultsFormPC.js:191
+#, fuzzy
+#| msgid "Participant accountability"
+msgid "Participant Count"
+msgstr "Responsabilidad de los participantes"
+
+#: js/components/resultsFormPC.js:270
+#: js/pages/results_framework/components/level_cards.js:575
+msgid "Save and close"
+msgstr "Guardar y cerrar"
+
+#: js/components/resultsFormPC.js:301
+msgid "Result date"
+msgstr "Fecha del resultado"
+
+#: js/components/resultsFormPC.js:309
+msgid ""
+"If data collection occurred within the fiscal year, enter the date where "
+"data was collected. If data collection occurred after the end of the fiscal "
+"year, enter the last day of the fiscal year (June 30)."
+msgstr ""
+
+#: js/components/resultsFormPC.js:332
+msgid "Fiscal year"
+msgstr ""
+
+#: js/components/resultsFormPC.js:339
+msgid "Fiscal years run from July 1 to June 30 of the following year."
+msgstr ""
+
+#: js/components/resultsFormPC.js:356
+#, fuzzy
+#| msgid "Outcome"
+msgid "Outcome theme"
+msgstr "Resultado"
+
+#: js/components/resultsFormPC.js:364
+msgid ""
+"Outcome themes are the main areas of a program. Refer to MEL Tip Sheet: "
+"Guidelines on Counting and Reporting Participant Numbers <a tabIndex=\"1\" "
+"href=\"https://library.mercycorps.org/record/16929?ln=en\" target=\"_blank"
+"\">[link: https://library.mercycorps.org/record/16929?ln=en]</a> for a "
+"description of outcome themes.<span>"
+msgstr ""
+
+#. Translators: This is the default option for a dropdown menu
+#. Translators: Nothing selected by user
+#: js/components/resultsFormPC.js:371
+#: js/pages/tola_management_pages/country/views.js:24
+#: js/pages/tola_management_pages/country/views.js:36
+#: js/pages/tola_management_pages/country/views.js:48
+#: js/pages/tola_management_pages/organization/components/edit_organization_profile.js:137
+#: js/pages/tola_management_pages/organization/views.js:23
+#: js/pages/tola_management_pages/organization/views.js:35
+#: js/pages/tola_management_pages/organization/views.js:47
+#: js/pages/tola_management_pages/organization/views.js:59
+#: js/pages/tola_management_pages/organization/views.js:78
+#: js/pages/tola_management_pages/program/views.js:23
+#: js/pages/tola_management_pages/program/views.js:35
+#: js/pages/tola_management_pages/program/views.js:47
+#: js/pages/tola_management_pages/program/views.js:59
+#: js/pages/tola_management_pages/program/views.js:76
+#: js/pages/tola_management_pages/program/views.js:88
+#: js/pages/tola_management_pages/user/components/edit_user_profile.js:203
+#: js/pages/tola_management_pages/user/views.js:16
+msgid "None Selected"
+msgstr "Ninguno/a seleccionado/a"
+
+#: js/components/resultsFormPC.js:405
+msgid "Total Participant Actual Values"
+msgstr ""
+
+#. Translators:
+#: js/components/resultsFormPC.js:414
+msgid ""
+"Include the participants with double counting on the left and participants "
+"without double counting across programs on the right. If two programs share "
+"participants, only discount double counting in one program!<br/><br/"
+"><strong>Direct participants</strong> – are those who have received a "
+"tangible benefit from the program, either as the actual program participants "
+"or the intended recipients of the program benefits.<br/><br/"
+"><strong>Indirect participants</strong> – are those who received a tangible "
+"benefit through their proximity to or contact with program participants or "
+"activities."
+msgstr ""
+
+#: js/components/resultsFormPC.js:420
+msgid "Without Double Counting"
+msgstr ""
+
+#: js/components/resultsFormPC.js:421
+msgid "With Double Counting"
+msgstr ""
+
+#: js/components/resultsFormPC.js:427 js/components/resultsFormPC.js:617
+#, fuzzy
+#| msgid "Actual value"
+msgid "Actual Direct value"
+msgstr "Valor real"
+
+#: js/components/resultsFormPC.js:450
+#, fuzzy
+#| msgid "Actual value"
+msgid "Actual Indirect value"
+msgstr "Valor real"
+
+#: js/components/resultsFormPC.js:473
+#, fuzzy
+#| msgid "Actual Total"
+msgid "Actual Total value"
+msgstr "Total real"
+
+#: js/components/resultsFormPC.js:549
+#, fuzzy
+#| msgid "Needs attention"
+msgid "Needs Attention"
+msgstr "Requiere atención"
+
+#: js/components/resultsFormPC.js:599
+msgid "Sum"
+msgstr "Suma"
+
+#. Translators:
+#. Translators: Header for a column listing supporting documents for results
+#: js/components/resultsFormPC.js:661
+#: js/pages/program_page/components/resultsTable.js:289
+msgid "Evidence"
+msgstr "Evidencia"
+
+#. Translators:
+#: js/components/resultsFormPC.js:667
+msgid ""
+"Link this result to a record or folder of records that serves as evidence."
+msgstr ""
+"Vincule este resultado a un registro o carpeta de registros que sirva de "
+"evidencia."
+
+#: js/components/resultsFormPC.js:674
+msgid "Link to file or folder"
+msgstr "Enlace al archivo o carpeta"
+
+#. Translators:
+#: js/components/resultsFormPC.js:685
+msgid ""
+"Provide a link to a file or folder in Google Drive or another shared network "
+"drive. Please be aware that TolaData does not store a copy of your record, "
+"<i>so you should not link to something on your personal computer, as no one "
+"else will be able to access it.</i>"
+msgstr ""
+"Facilite un enlace a un archivo o carpeta en Google Drive o algún otro "
+"recurso compartido en la red. Tenga en cuenta que TolaData no almacena "
+"copias de su registro, <i>por ello no debería referenciar algo en su "
+"computadora personal, ya que nadie más podría accederlo.</i>"
+
+#: js/components/resultsFormPC.js:709
+msgid "view"
+msgstr "ver"
+
+#: js/components/resultsFormPC.js:716
+msgid "Browse Google Drive"
+msgstr "Ver Google Drive"
+
+#: js/components/resultsFormPC.js:721
+msgid "Record name"
+msgstr "Nombre del registro"
+
+#: js/components/resultsFormPC.js:728
+msgid "Give your record a short name that is easy to remember."
+msgstr "Dé a su registro un nombre corto que sea fácil de recordar."
+
 #: js/components/selectWidgets.js:133
 msgid "None available"
 msgstr "Ninguno disponible"
@@ -530,10 +759,6 @@ msgstr "Objetivo Específico"
 #: js/level_utils.js:35 js/level_utils.js:42 js/level_utils.js:58
 msgid "Purpose"
 msgstr "Finalidad"
-
-#: js/level_utils.js:36
-msgid "Result"
-msgstr "Resultado"
 
 #: js/level_utils.js:39
 msgid "USAID 1"
@@ -797,10 +1022,10 @@ msgid "Baseline"
 msgstr "Base"
 
 #. Translators: short for Not Applicable
-#: js/pages/iptt_report/components/report/tableRows.js:11
-#: js/pages/iptt_report/components/report/tableRows.js:327
-#: js/pages/iptt_report/components/report/tableRows.js:328
-#: js/pages/iptt_report/components/report/tableRows.js:330
+#: js/pages/iptt_report/components/report/tableRows.js:12
+#: js/pages/iptt_report/components/report/tableRows.js:379
+#: js/pages/iptt_report/components/report/tableRows.js:380
+#: js/pages/iptt_report/components/report/tableRows.js:382
 #: js/pages/program_page/components/indicator_list.js:293
 #: js/pages/program_page/components/resultsTable.js:11
 #: js/pages/tola_management_pages/audit_log/views.js:159
@@ -811,26 +1036,26 @@ msgid "N/A"
 msgstr "N/A"
 
 #. Translators: A message that lets the user know that they cannot add a result to this indicator because it has no target.
-#: js/pages/iptt_report/components/report/tableRows.js:76
+#: js/pages/iptt_report/components/report/tableRows.js:106
 msgid "Results cannot be added because the indicator is missing targets."
 msgstr ""
 "Los resultados no pueden añadirse porque el indicador carece de objetivos."
 
 #. Translators: a button that lets the user add a new result
-#: js/pages/iptt_report/components/report/tableRows.js:104
+#: js/pages/iptt_report/components/report/tableRows.js:152
 #: js/pages/program_page/components/resultsTable.js:338
 msgid "Add result"
 msgstr "Agregar resultado"
 
-#: js/pages/iptt_report/components/report/tableRows.js:302
+#: js/pages/iptt_report/components/report/tableRows.js:351
 msgid "Cumulative"
 msgstr "Acumulativo"
 
-#: js/pages/iptt_report/components/report/tableRows.js:303
+#: js/pages/iptt_report/components/report/tableRows.js:354
 msgid "Non-cumulative"
 msgstr "No acumulativo"
 
-#: js/pages/iptt_report/components/report/tableRows.js:385
+#: js/pages/iptt_report/components/report/tableRows.js:437
 msgid "Indicators unassigned to a results framework level"
 msgstr "Indicadores sin asignar a un nivel del sistema de resultados"
 
@@ -1315,11 +1540,6 @@ msgstr "Real"
 msgid "Results"
 msgstr "Resultados"
 
-#. Translators: Header for a column listing supporting documents for results
-#: js/pages/program_page/components/resultsTable.js:289
-msgid "Evidence"
-msgstr "Evidencia"
-
 #. Translators: Button label which opens a form to add targets to a given indicator
 #: js/pages/program_page/components/resultsTable.js:324
 msgid "Add targets"
@@ -1424,10 +1644,6 @@ msgstr "Guardar y agregar otro %s"
 #, python-format
 msgid "Save and link %s"
 msgstr "Guardar y vincular %s"
-
-#: js/pages/results_framework/components/level_cards.js:575
-msgid "Save and close"
-msgstr "Guardar y cerrar"
 
 #: js/pages/results_framework/components/level_cards.js:685
 #: js/pages/results_framework/components/level_cards.js:727
@@ -1549,7 +1765,7 @@ msgid "%s saved."
 msgstr "%s guardado."
 
 #. Translators:  Confirmation message that user-supplied updates were successfully applied.
-#: js/pages/results_framework/models.js:423
+#: js/pages/results_framework/models.js:424
 #, python-format
 msgid "%s updated."
 msgstr "%s actualizado."
@@ -2025,28 +2241,6 @@ msgstr "Las categorías deben tener nombres únicos."
 #: js/pages/tola_management_pages/country/views.js:19
 msgid "Find a Country"
 msgstr "Encontrar un País"
-
-#. Translators: This is the default option for a dropdown menu
-#. Translators: Nothing selected by user
-#: js/pages/tola_management_pages/country/views.js:24
-#: js/pages/tola_management_pages/country/views.js:36
-#: js/pages/tola_management_pages/country/views.js:48
-#: js/pages/tola_management_pages/organization/components/edit_organization_profile.js:137
-#: js/pages/tola_management_pages/organization/views.js:23
-#: js/pages/tola_management_pages/organization/views.js:35
-#: js/pages/tola_management_pages/organization/views.js:47
-#: js/pages/tola_management_pages/organization/views.js:59
-#: js/pages/tola_management_pages/organization/views.js:78
-#: js/pages/tola_management_pages/program/views.js:23
-#: js/pages/tola_management_pages/program/views.js:35
-#: js/pages/tola_management_pages/program/views.js:47
-#: js/pages/tola_management_pages/program/views.js:59
-#: js/pages/tola_management_pages/program/views.js:76
-#: js/pages/tola_management_pages/program/views.js:88
-#: js/pages/tola_management_pages/user/components/edit_user_profile.js:203
-#: js/pages/tola_management_pages/user/views.js:16
-msgid "None Selected"
-msgstr "Ninguno/a seleccionado/a"
 
 #: js/pages/tola_management_pages/country/views.js:31
 #: js/pages/tola_management_pages/country/views.js:96
@@ -3682,9 +3876,6 @@ msgstr "Procesos/Gestión"
 #~ msgid "PID"
 #~ msgstr "PID"
 
-#~ msgid "Actual Total"
-#~ msgstr "Total real"
-
 #~ msgid "Export to CSV"
 #~ msgstr "Exportar a CSV"
 
@@ -3798,9 +3989,6 @@ msgstr "Procesos/Gestión"
 
 #~ msgid "Add a target"
 #~ msgstr "Agregar un objetivo"
-
-#~ msgid "Please complete this field. Your baseline can be zero."
-#~ msgstr "Por favor complete este campo. Su línea de base puede ser cero."
 
 #~ msgid "Please enter a number larger than zero."
 #~ msgstr "Por favor ingrese un número mayor que cero."
@@ -5214,9 +5402,6 @@ msgstr "Procesos/Gestión"
 #~ msgid "Rationale"
 #~ msgstr "Justificación"
 
-#~ msgid "Actual value"
-#~ msgstr "Valor real"
-
 #~ msgid "Table id"
 #~ msgstr ""
 #~ "#-#-#-#-#  django_es.po  #-#-#-#-#\n"
@@ -5528,12 +5713,6 @@ msgstr "Procesos/Gestión"
 #~ msgid "Measure against target"
 #~ msgstr "Medida contra objetivo"
 
-#~ msgid "Link to file or folder"
-#~ msgstr "Enlace al archivo o carpeta"
-
-#~ msgid "Result date"
-#~ msgstr "Fecha del resultado"
-
 #, python-brace-format
 #~ msgid ""
 #~ "You can begin entering results on {program_start_date}, the program start "
@@ -5682,9 +5861,6 @@ msgstr "Procesos/Gestión"
 
 #~ msgid "Internal program management and learning"
 #~ msgstr "Gestión y aprendizaje del programa interno"
-
-#~ msgid "Participant accountability"
-#~ msgstr "Responsabilidad de los participantes"
 
 #~ msgid "Indicator key"
 #~ msgstr "Clave del Indicador"
@@ -5986,9 +6162,6 @@ msgstr "Procesos/Gestión"
 
 #~ msgid "Data key"
 #~ msgstr "Clave de Datos"
-
-#~ msgid "Record name"
-#~ msgstr "Nombre del registro"
 
 #~ msgid "Evidence URL"
 #~ msgstr "URL de la Evidencia"
@@ -6772,12 +6945,6 @@ msgstr "Procesos/Gestión"
 #~ msgid "One or more fields needs attention."
 #~ msgstr "Uno o más campos requieren atención."
 
-#~ msgid ""
-#~ "Link this result to a record or folder of records that serves as evidence."
-#~ msgstr ""
-#~ "Vincule este resultado a un registro o carpeta de registros que sirva de "
-#~ "evidencia."
-
 #~ msgid "Delete this result"
 #~ msgstr "Eliminar este resultado"
 
@@ -6861,34 +7028,8 @@ msgstr "Procesos/Gestión"
 #~ msgid "Actual values are rounded to two decimal places."
 #~ msgstr "Los valores reales se redondean a dos decimales."
 
-#~ msgid "Needs attention"
-#~ msgstr "Requiere atención"
-
-#~ msgid "Sum"
-#~ msgstr "Suma"
-
 #~ msgid "Update actual value"
 #~ msgstr "Actualizar valor real"
-
-#~ msgid ""
-#~ "Provide a link to a file or folder in Google Drive or another shared "
-#~ "network drive. Please be aware that TolaData does not store a copy of "
-#~ "your record, <i>so you should not link to something on your personal "
-#~ "computer, as no one else will be able to access it.</i>"
-#~ msgstr ""
-#~ "Facilite un enlace a un archivo o carpeta en Google Drive o algún otro "
-#~ "recurso compartido en la red. Tenga en cuenta que TolaData no almacena "
-#~ "copias de su registro, <i>por ello no debería referenciar algo en su "
-#~ "computadora personal, ya que nadie más podría accederlo.</i>"
-
-#~ msgid "view"
-#~ msgstr "ver"
-
-#~ msgid "Browse Google Drive"
-#~ msgstr "Ver Google Drive"
-
-#~ msgid "Give your record a short name that is easy to remember."
-#~ msgstr "Dé a su registro un nombre corto que sea fácil de recordar."
 
 #~ msgid "View logframe"
 #~ msgstr "Ver marco lógico"
