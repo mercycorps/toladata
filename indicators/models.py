@@ -549,6 +549,9 @@ class DisaggregationType(models.Model):
         disaggs = cls.form_objects
         if indicator_pk is not None:
             disaggs = disaggs.for_indicator(indicator_pk)
+            indicator = Indicator.objects.get(pk=indicator_pk)
+            if indicator.admin_type == Indicator.ADMIN_PARTICIPANT_COUNT:
+                return disaggs.filter(global_type=cls.DISAG_PARTICIPANT_COUNT), []
         else:
             disaggs = disaggs.annotate(has_results=models.Value(False, output_field=models.BooleanField()))
         disaggs = disaggs.filter(
