@@ -220,7 +220,7 @@ class GlobalDisaggregation(DisaggregationType):
 
 @admin.register(GlobalDisaggregation)
 class GlobalDisaggregationAdmin(DisaggregationAdmin):
-    list_display = ('disaggregation_type', 'pretty_archived', 'program_count', 'categories')
+    list_display = ('disaggregation_type', 'global_type', 'pretty_archived', 'program_count', 'categories')
     list_filter = (ArchivedFilter,)
     sortable_by = ('disaggregation_type', 'program_count')
     exclude = ('create_date', 'edit_date', 'country')
