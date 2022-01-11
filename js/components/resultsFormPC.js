@@ -6,42 +6,13 @@ import api from '../apiv2';
 
 const PCResultsForm = ({programID, indicatorID, disaggregations, reportingPeriodStart, reportingPeriodEnd}) => {
 
-
     const helptext = {
-        648: gettext("Only include SADD for Direct participants."),
-        649: gettext("Only include SADD for Direct participants."),
+        "649-648": gettext("Only include SADD for Direct participants."),
         650: gettext("Provide a disaggregation of participants reached by sector. Only provide the figure with double counting. Refer to MEL Tip Sheet: Guidelines on Counting and Reporting Participant Numbers <a href='https://library.mercycorps.org/record/16929?ln=en' target='_blank'>[link: https://library.mercycorps.org/record/16929?ln=en]</a> for a description of outcome themes."),
         651: gettext("Provide a disaggregation of participants reached by sector. Only provide the figure with double counting. Refer to MEL Tip Sheet: Guidelines on Counting and Reporting Participant Numbers <a href='https://library.mercycorps.org/record/16929?ln=en' target='_blank'>[link: https://library.mercycorps.org/record/16929?ln=en]</a> for a description of outcome themes."),
         652: gettext("Direct participants – are those who have received a tangible benefit from the program, either as the actual program participants or the intended recipients of the program benefits. Indirect participants – are those who received a tangible benefit through their proximity to or contact with program participants or activities."),
         653: gettext("Direct participants – are those who have received a tangible benefit from the program, either as the actual program participants or the intended recipients of the program benefits. Indirect participants – are those who received a tangible benefit through their proximity to or contact with program participants or activities."),
     };
-
-    const columnOptions = [
-        {
-            id: "with_double",
-            name: "With double counting",
-        }, 
-        {
-            id: "without_double",
-            name: "Without double counting",
-        }
-    ]
-    let cols = {
-        591: [columnOptions[0]],
-        590: [columnOptions[0]],
-        109: [columnOptions[1], columnOptions[0]],
-        576: [columnOptions[1], columnOptions[0]],
-        577: [columnOptions[0]],
-        578: [columnOptions[0]],
-        579: [columnOptions[1], columnOptions[0]],
-        652: [columnOptions[0]],
-        653: [columnOptions[0]],
-        650: [columnOptions[0]],
-        651: [columnOptions[0]],
-        // 648: [columnOptions[1], columnOptions[0]],
-        648: [columnOptions[0]],
-        649: [columnOptions[1], columnOptions[0]],
-    }
 
     useEffect(() => {
         $(`#addResultModal_${indicatorID}`).on('shown.bs.modal', function () {
@@ -65,23 +36,16 @@ const PCResultsForm = ({programID, indicatorID, disaggregations, reportingPeriod
                 .then(response => {
                     console.log("Form received data!", response);
                     setOutcomeThemesData(formatOutcomeThemsData(response.outcome_themes));
-                    handleReceivedDisaggregations(response.disaggregations.disaggregations)
+                    setDisaggregationData(handleReceivedDisaggregations(response.disaggregations.disaggregations));
                 })
         })
     }, [])
 
     let handleReceivedDisaggregations = (disaggregations_data) => {
-        let data = disaggregations_data.reduce((formated, disagg) => {
-            let labels = disagg.labels.reduce((labelsObj, label) => {
-                labelsObj[label.customsort] = label;
-                return labelsObj;
-            }, {});
-            formated[disagg.pk] = {...disagg, labels: labels};
+        return disaggregations_data.reduce((formated, disagg) => {
+            formated[disagg.pk] = {...disagg};
             return formated;
         }, {});
-        
-        console.log("Formated:", data);
-        setDisaggregationData(data);
     }
 
     let formatOutcomeThemsData = (outcomeThemes) => {
@@ -91,16 +55,12 @@ const PCResultsForm = ({programID, indicatorID, disaggregations, reportingPeriod
         }, [])
     }
 
-    const [resultsFieldsInput, setResultsFieldsInput] = useState({});
+    const [evidenceFieldsInput, setEvidenceFieldsInput] = useState({});
+    const [commonFieldsInput, setCommonFieldsInput] = useState({fiscal_year: "FY 2022: 1 July 2021 - 30 June 2022"});
     const [outcomeThemesData, setOutcomeThemesData] = useState([]);
     const [disaggregationData, setDisaggregationData] = useState([]);
-    
-    const [commonFieldsInput, setCommonFieldsInput] = useState({fiscal_year: "FY 2022: 1 July 2021 - 30 June 2022"});
-    const [evidenceFieldsInput, setEvidenceFieldsInput] = useState({});
-    const [actualFieldsInput, setActualFieldsInput] = useState({});
-    const [disaggregationFieldsInput, setDisaggregationFieldsInput] = useState({});
-    const [sumValues, setSumValues] = useState({});
     const [formErrors, setFormErrors] = useState({});
+    
 
     let validateForm = () => {
         let detectedErrors = {};
@@ -115,23 +75,44 @@ const PCResultsForm = ({programID, indicatorID, disaggregations, reportingPeriod
         if (!commonFieldsInput.outcome_theme || commonFieldsInput.outcome_theme === []) {
             detectedErrors = {...detectedErrors, outcome_theme: gettext("Please complete this field. You can select more than one outcome theme.")}
         };
-        if (Object.entries(actualFieldsInput).length === 0) {
-            detectedErrors = {...detectedErrors, 576: gettext("Total participants With double counting is required. Please complete this field.")}
-        } else {
-            if (actualFieldsInput["576"]["1"]) {
-                if (parseInt(actualFieldsInput["576"]["1"]["0"].value) > parseInt(actualFieldsInput["576"]["0"]["0"].value) || 
-                parseInt(actualFieldsInput["576"]["1"]["1"].value) > parseInt(actualFieldsInput["576"]["0"]["1"].value)) {
-                    detectedErrors = {...detectedErrors, 576: gettext("Direct/indirect without double counting should be equal or lower than Direct/indirect with double counting.")}
-                }
-            }
+        // if (Object.entries(actualFieldsInput).length === 0) {
+        //     detectedErrors = {...detectedErrors, 576: gettext("Total participants With double counting is required. Please complete this field.")}
+        // } else {
+        //     if (actualFieldsInput["576"]["1"]) {
+        //         if (parseInt(actualFieldsInput["576"]["1"]["0"].value) > parseInt(actualFieldsInput["576"]["0"]["0"].value) || 
+        //         parseInt(actualFieldsInput["576"]["1"]["1"].value) > parseInt(actualFieldsInput["576"]["0"]["1"].value)) {
+        //             detectedErrors = {...detectedErrors, 576: gettext("Direct/indirect without double counting should be equal or lower than Direct/indirect with double counting.")}
+        //         }
+        //     }
+        // }
+
+        // if (disaggregationFieldsInput["579"]) {
+        //     if ( sumValues["576"] && sumValues["579"] && sumValues["579"]["0"] !== sumValues['576']["0"]) {
+        //         detectedErrors = {...detectedErrors, 579: gettext("The sum of 'SADD with double counting' should be equal to the sum of 'Direct with double counting'. The sum of 'SADD without double counting' should be equal to the sum of 'Direct without double counting'.")}
+        //     }
+        //     if (sumValues["576"] && sumValues["579"] && sumValues["579"]["1"] !== sumValues["576"]["1"]) {
+        //         detectedErrors = {...detectedErrors, 579: gettext("The sum of 'SADD with double counting' should be equal to the sum of 'Direct with double counting'. The sum of 'SADD without double counting' should be equal to the sum of 'Direct without double counting'.")}
+        //     }
+        // }
+
+        if (!disaggregationData['653'].labels[0].value || !disaggregationData['653'].labels[1].value) {
+            console.log("totals error");
+            detectedErrors = {...detectedErrors, totals_error: gettext("Direct/indirect total participants with double counting is required. Please complete these fields.")}
         }
 
-        if (disaggregationFieldsInput["579"]) {
-            if ( sumValues["576"] && sumValues["579"] && sumValues["579"]["0"] !== sumValues['576']["0"]) {
-                detectedErrors = {...detectedErrors, 579: gettext("The sum of 'SADD with double counting' should be equal to the sum of 'Direct with double counting'. The sum of 'SADD without double counting' should be equal to the sum of 'Direct without double counting'.")}
-            }
-            if (sumValues["576"] && sumValues["579"] && sumValues["579"]["1"] !== sumValues["576"]["1"]) {
-                detectedErrors = {...detectedErrors, 579: gettext("The sum of 'SADD with double counting' should be equal to the sum of 'Direct with double counting'. The sum of 'SADD without double counting' should be equal to the sum of 'Direct without double counting'.")}
+        if (
+            parseInt(disaggregationData['652'].labels[0].value || 0) > parseInt(disaggregationData['653'].labels[0].value || 0) ||
+            parseInt(disaggregationData['652'].labels[1].value || 0) > parseInt(disaggregationData['653'].labels[1].value || 0)
+            ) {
+                console.log("totals error");
+                detectedErrors = {...detectedErrors, totals_error: gettext("Direct/indirect without double counting should be equal or lower than Direct/indirect with double counting.")}
+        }
+
+        if (evidenceFieldsInput.evidence_url ) {
+            if (evidenceFieldsInput.evidence_url.match(/^(http(s)?|file):\/\/.+/)) {
+                console.log("Evidence Error");
+                detectedErrors = {...detectedErrors, evidence_url: gettext("Please enter a valid evidence link.")}
+                setValidEvidenceURL(evidenceURLHasValue);
             }
         }
 
@@ -151,10 +132,7 @@ const PCResultsForm = ({programID, indicatorID, disaggregations, reportingPeriod
         e.preventDefault();
         validateForm();
         console.log('commonFieldsInput:', commonFieldsInput)
-        // console.log('actualFieldsInput:', actualFieldsInput)
-        console.log('disaggregationFieldsInput:', disaggregationFieldsInput);
         console.log('evidenceFieldsInput', evidenceFieldsInput);
-        console.log('sumValues:', sumValues);
         let data = [];
         data = data.concat(formatData({indicator: indicatorID, program: programID}))
         // data = data.concat(formatData(commonFieldsInput));
@@ -162,18 +140,18 @@ const PCResultsForm = ({programID, indicatorID, disaggregations, reportingPeriod
         // data = data.concat(formatData(disaggregationFieldsInput));
 
         // console.log("Data", data);
-        let form_data = new FormData;
-       data.map(currentData => {
-            form_data.append(currentData["name"], currentData["value"]);
-        })
-        for(var pair of form_data.entries()) {
-            console.log('Form Data:', pair[0]+ ', '+ pair[1]);
-        }
+    //     let form_data = new FormData;
+    //    data.map(currentData => {
+    //         form_data.append(currentData["name"], currentData["value"]);
+    //     })
+    //     for(var pair of form_data.entries()) {
+    //         console.log('Form Data:', pair[0]+ ', '+ pair[1]);
+    //     }
 
-        api.savePCountResultsData(indicatorID, form_data)
-            .then(response => {
-                console.log("Saved Form Data!");
-            })
+        // api.savePCountResultsData(indicatorID, form_data)
+        //     .then(response => {
+        //         console.log("Saved Form Data!");
+        //     })
     }
     if (Object.keys(disaggregationData).length > 0) {
         return (
@@ -208,53 +186,35 @@ const PCResultsForm = ({programID, indicatorID, disaggregations, reportingPeriod
                 />
 
                 <DissaggregationFields 
-                        indicatorID={indicatorID}
-                        disagg={disaggregationData["648"]}
-                        disaggregationData={disaggregationData}
-                        setDisaggregationData={setDisaggregationData}
-                        cols={cols}
-                        helptext={helptext}
-                        formErrors={formErrors}
-                />
-                <DissaggregationFields 
                     indicatorID={indicatorID}
-                    disagg={disaggregationData["650"]}
+                    disagg={[disaggregationData["649"],disaggregationData["648"]]}
                     disaggregationData={disaggregationData}
                     setDisaggregationData={setDisaggregationData}
-                    cols={cols}
+                    total={[disaggregationData["652"].labels[0], disaggregationData["653"].labels[0]]}
+                    title={"SADD (including unknown)"}
                     helptext={helptext}
                     formErrors={formErrors}
                 />
                 <DissaggregationFields 
                     indicatorID={indicatorID}
-                    disagg={disaggregationData["651"]}
+                    disagg={[disaggregationData["650"]]}
                     disaggregationData={disaggregationData}
                     setDisaggregationData={setDisaggregationData}
-                    cols={cols}
+                    total={[disaggregationData["653"].labels[0]]}
+                    helptext={helptext}
+                    formErrors={formErrors}
+                />
+                <DissaggregationFields 
+                    indicatorID={indicatorID}
+                    disagg={[disaggregationData["651"]]}
+                    disaggregationData={disaggregationData}
+                    setDisaggregationData={setDisaggregationData}
+                    total={[disaggregationData["653"].labels[1]]}
                     helptext={helptext}
                     formErrors={formErrors}
                 />
 
-                {/* {Object.keys(disaggregationData).map((disagg, i) => {
-                    if ( [578, 579, 648, 649, "650", 651].indexOf(disagg) >= 0 ) {
-                        // return <DissaggregationFields 
-                        //             key={disagg.pk}
-                        //             indicatorID={indicatorID}
-                        //             disagg={disagg}
-                        //             actualFieldsInput={actualFieldsInput}
-                        //             disaggregationFieldsInput={disaggregationFieldsInput}
-                        //             setDisaggregationFieldsInput={setDisaggregationFieldsInput}
-                        //             sumValues={sumValues}
-                        //             setSumValues={setSumValues}
-                        //             helptext={helptext}
-                        //             cols={cols}
-                        //             formErrors={formErrors}
-                        //         />
-                    }
-                })} */}
                 <EvidenceFields
-                    resultsFieldsInput={resultsFieldsInput}
-                    setResultsFieldsInput={setResultsFieldsInput}
                     evidenceFieldsInput={evidenceFieldsInput}
                     setEvidenceFieldsInput={setEvidenceFieldsInput}
                     formErrors={formErrors}
@@ -389,9 +349,9 @@ const CommonFields = ({ reportingPeriodStart, reportingPeriodEnd, commonFieldsIn
 // ***** Acutal Values Fields Section *****
 const ActualValueFields = ({ disaggregationData, setDisaggregationData, formErrors }) => {
 
-    let handleDataEntry = (value, inputDisaggPk, inputLabelSort) => {
+    let handleDataEntry = (value, inputDisaggPk, inputLabelIndex) => {
         let update = {...disaggregationData};
-        update[inputDisaggPk].labels[inputLabelSort] = {...disaggregationData[inputDisaggPk].labels[inputLabelSort], value: value};
+        update[inputDisaggPk].labels[inputLabelIndex] = {...disaggregationData[inputDisaggPk].labels[inputLabelIndex], value: value};
         console.log("After Update", update);
         setDisaggregationData(update);
     }
@@ -429,18 +389,18 @@ const ActualValueFields = ({ disaggregationData, setDisaggregationData, formErro
                         <input 
                             type="number" 
                             className="bin form-control input-value" 
-                            name={`${disaggregationData["652"].disaggregation_type}-${disaggregationData["652"].labels["1"]}`}
-                            id={`id_${disaggregationData["652"].disaggregation_type}-${disaggregationData["652"].labels["1"]}`}
-                            value={Object.keys(disaggregationData).length > 0 && disaggregationData["652"].labels["1"].value || ""}
-                            onChange={(e) => handleDataEntry(e.target.value, 652, 1)}
+                            name={`${disaggregationData["652"].disaggregation_type}-${disaggregationData["652"].labels[0]}`}
+                            id={`id_${disaggregationData["652"].disaggregation_type}-${disaggregationData["652"].labels[0]}`}
+                            value={disaggregationData["652"].labels[0].value || ""}
+                            onChange={(e) => handleDataEntry(e.target.value, 652, 0)}
                         />
                         <input 
                             type="number" 
                             className="bin form-control input-value" 
-                            name={`${disaggregationData["653"].disaggregation_type}-${disaggregationData["653"].labels["1"]}`}
-                            id={`id_${disaggregationData["653"].disaggregation_type}-${disaggregationData["653"].labels["1"]}`}
-                            value={disaggregationData["653"].labels["1"].value || ""}
-                            onChange={(e) => handleDataEntry(e.target.value, 653, 1)}
+                            name={`${disaggregationData["653"].disaggregation_type}-${disaggregationData["653"].labels[0]}`}
+                            id={`id_${disaggregationData["653"].disaggregation_type}-${disaggregationData["653"].labels[0]}`}
+                            value={disaggregationData["653"].labels[0].value || ""}
+                            onChange={(e) => handleDataEntry(e.target.value, 653, 0)}
 
                         />
                     </div>
@@ -452,19 +412,19 @@ const ActualValueFields = ({ disaggregationData, setDisaggregationData, formErro
                         <input 
                             type="number" 
                             className="bin form-control input-value" 
-                            name={`${disaggregationData["652"].disaggregation_type}-${disaggregationData["652"].labels["2"]}`}
-                            id={`id_${disaggregationData["652"].disaggregation_type}-${disaggregationData["652"].labels["2"]}`}
-                            value={disaggregationData["652"].labels["2"].value || ""}
-                            onChange={(e) => handleDataEntry(e.target.value, 652, 2)}
+                            name={`${disaggregationData["652"].disaggregation_type}-${disaggregationData["652"].labels[1]}`}
+                            id={`id_${disaggregationData["652"].disaggregation_type}-${disaggregationData["652"].labels[1]}`}
+                            value={disaggregationData["652"].labels[1].value || ""}
+                            onChange={(e) => handleDataEntry(e.target.value, 652, 1)}
 
                         />
                         <input 
                             type="number" 
                             className="bin form-control input-value" 
-                            name={`${disaggregationData["653"].disaggregation_type}-${disaggregationData["653"].labels["2"]}`}
-                            id={`id_${disaggregationData["653"].disaggregation_type}-${disaggregationData["653"].labels["2"]}`}
-                            value={disaggregationData["653"].labels["2"].value || ""}
-                            onChange={(e) => handleDataEntry(e.target.value, 653, 2)}
+                            name={`${disaggregationData["653"].disaggregation_type}-${disaggregationData["653"].labels[1]}`}
+                            id={`id_${disaggregationData["653"].disaggregation_type}-${disaggregationData["653"].labels[1]}`}
+                            value={disaggregationData["653"].labels[1].value || ""}
+                            onChange={(e) => handleDataEntry(e.target.value, 653, 1)}
                         />
                     </div>
                 </li>
@@ -472,15 +432,15 @@ const ActualValueFields = ({ disaggregationData, setDisaggregationData, formErro
                 <li className="list-group-item reference-row">
                     <div className="item__label">{gettext("Actual Total value")}</div>
                     <div className="item__value--container">
-                        <div className="bin">{parseInt(disaggregationData['652'].labels['1'].value || 0) + parseInt(disaggregationData['652'].labels['2'].value || 0)}</div>
-                        <div className="bin">{parseInt(disaggregationData['653'].labels['1'].value || 0) + parseInt(disaggregationData['653'].labels['2'].value || 0)}</div>
+                        <div className="bin">{parseInt(disaggregationData['652'].labels[0].value || 0) + parseInt(disaggregationData['652'].labels[1].value || 0)}</div>
+                        <div className="bin">{parseInt(disaggregationData['653'].labels[0].value || 0) + parseInt(disaggregationData['653'].labels[1].value || 0)}</div>
                     </div>
                 </li>
 
-                {/* {
-                    formErrors[disagg.pk] &&
-                        <span id={`validation_id_${disagg.pk}`} className="has-error">{formErrors[disagg.pk]}</span>
-                } */}
+                {
+                    formErrors.totals_error &&
+                        <span id={`validation_id_totals_error`} className="has-error">{formErrors.totals_error}</span>
+                }
             </ul>
         </React.Fragment>
     )
@@ -489,39 +449,26 @@ const ActualValueFields = ({ disaggregationData, setDisaggregationData, formErro
 
 
 // ***** Dissaggreagation Fields Section *****
-const DissaggregationFields = ({ indicatorID, disagg, disaggregationData, setDisaggregationData, cols, helptext, formErrors}) => {
+const DissaggregationFields = ({ indicatorID, disagg, disaggregationData, setDisaggregationData, total, title, helptext, formErrors}) => {
     const [expanded, setExpanded] = useState(false);
-
+    let disaggID = disagg.reduce((id, disaggregation) => {
+        id = id + (id === "" ? "" : "-") + disaggregation.pk;
+        return id;
+    },"")
     useEffect(() => {
-        $(`#${indicatorID}-${disagg.pk}`).on('show.bs.collapse', function() {
+        $(`#${indicatorID}-${disaggID}`).on('show.bs.collapse', function() {
             setExpanded(true);
         })
-        $(`#${indicatorID}-${disagg.pk}`).on('hide.bs.collapse', function() {
+        $(`#${indicatorID}-${disaggID}`).on('hide.bs.collapse', function() {
             setExpanded(false);
         })
     }, [])
-    
-    let handleDataEntry = (value, disagg, label, rowIndex, colIndex, colLength) => {
-        let colSortedIndex = colLength - 1 - colIndex; // Column index from right to left to align the same column of the disaggregations with 2 columns with ones with 1 column
-        
-        let updatedDisaggFields = {...disaggregationFieldsInput};
-        !updatedDisaggFields[disagg] && (updatedDisaggFields[disagg] = {});
-        !updatedDisaggFields[disagg][colSortedIndex] && (updatedDisaggFields[disagg][colSortedIndex] = []);
-        updatedDisaggFields[disagg][colSortedIndex][rowIndex] = {...label, value: value};
-        setDisaggregationFieldsInput(updatedDisaggFields);
 
-        let updatedSumValues = {...sumValues};
-        !updatedSumValues[disagg] && (updatedSumValues[disagg] = {});
-        let sum = updatedDisaggFields[disagg][colSortedIndex].reduce((total, currentLabel) => {
-            return total + parseInt(currentLabel.value || 0);
-        }, 0)
-        updatedSumValues[disagg][colSortedIndex] = sum;
-        setSumValues(updatedSumValues);
-
-        console.log(value, "|", disagg, "|", label, "|", rowIndex, "|", colIndex, "|", colLength);
-        console.log('disaggregationFieldsInput:', updatedDisaggFields);
-        console.log('updatedSumValues:', updatedSumValues);
-        console.log('sumValues', sumValues);
+    let handleDataEntry = (value, inputDisaggPk, customsort) => {
+        let update = {...disaggregationData};
+        update[inputDisaggPk].labels[customsort - 1] = {...disaggregationData[inputDisaggPk].labels[customsort - 1], value: value};
+        console.log("After Update", update);
+        setDisaggregationData(update);
     }
 
     return (
@@ -529,9 +476,9 @@ const DissaggregationFields = ({ indicatorID, disagg, disaggregationData, setDis
             <ul className="list-group form-list-group">
                 <li className="list-group-item heading-row">
                     <div className="item__value--header">
-                        <a className="item__label--accordion accordion-header collapsed" data-toggle="collapse" href={`#${indicatorID}-${disagg.pk}`} aria-expanded={expanded} aria-controls={`#${disagg.pk}`}>
+                        <a className="item__label--accordion accordion-header collapsed" data-toggle="collapse" href={`#${indicatorID}-${disaggID}`} aria-expanded={expanded} aria-controls={`#${disaggID}`}>
                             <FontAwesomeIcon icon={ expanded ? 'caret-down' : 'caret-right' } />&nbsp;
-                            <label className="label--required">{disagg.disaggregation_type}</label>
+                            <label className="label--required">{title || disagg[0].disaggregation_type}</label>
                         </a>
 
                         <a href="#"
@@ -539,52 +486,50 @@ const DissaggregationFields = ({ indicatorID, disagg, disaggregationData, setDis
                             data-toggle="popover"
                             data-placement="right"
                             data-trigger="focus"
-                            data-content={helptext[disagg.pk]}
+                            data-content={helptext[disaggID]} // May be better to reduce and provide both help texts.
                         >
                             &nbsp;<i className="far fa-question-circle"></i>
                         </a>
 
                         {
-                            !expanded && formErrors[disagg.pk] &&
+                            !expanded && formErrors[disagg[0].pk] &&
                             <span className="needs-attention"><i className="fas fa-exclamation-triangle"></i>{gettext("Needs Attention")}</span>
                         }
                     </div>
                     <div className="item__value--container" style={{display: expanded ? "inherit" : "none"}}>
-                        {
+                        {/* {
                             cols[disagg.pk].map((column, i) => {
                             return (
                                 <div key={i} className="bin heading">{column.name}</div>
                                 )
                             })
+                        } */}
+                        {
+                            disagg.length !== 1 &&
+                            <div className="bin heading">{gettext("Without double counting")}</div>
                         }
+                        <div className="bin heading">{gettext("With double counting")}</div>
                     </div>
                 </li>
             </ul>
-        <ul className="list-group form-list-group collapse" id={`${indicatorID}-${disagg.pk}`}>
-
+        <ul className="list-group form-list-group collapse" id={`${indicatorID}-${disaggID}`}>
             {
-                Object.keys(disagg.labels).map((labelObj, rowIndex) => {
+                disagg[0].labels.map((labelObj) => {
                     return (
-                            <li key={`${disagg.pk}-${labelObj.customsort}-${rowIndex}`} className="list-group-item">
+                            <li key={`${disaggID}-${labelObj.customsort}`} className="list-group-item">
                                 <div className="item__label">{labelObj.label}</div>
                                 <div className="item__value--container">
                                     {
-                                        cols[disagg.pk].map((column, colIndex) => {
-                                            let sortedColumnIndex = cols[disagg.pk].length - 1 - colIndex;
-                                            let value;
-                                            // try { value = disaggregationFieldsInput[disagg.pk][sortedColumnIndex][rowIndex].value; } 
-                                            try { value = resultsFieldsInput[disagg.pk][sortedColumnIndex][rowIndex].value || ""; } 
-                                            catch { value = ""}
-
+                                        disagg.map(currentDisagg => {
                                             return (
                                                 <input 
-                                                    key={`${disagg.pk}-${labelObj.customsort}-${rowIndex}-${colIndex}`}
+                                                    key={`id_${disaggID}-${currentDisagg.pk}-${labelObj.customsort}`}
+                                                    id={`id_${disaggID}-${currentDisagg.pk}-${labelObj.customsort}`}
+                                                    name={`disaggregation-formset-${disaggID}-${labelObj.customsort}-label_pk`} 
                                                     type="number" 
                                                     className="bin form-control input-value" 
-                                                    name={`disaggregation-formset-${disagg.pk}-${rowIndex}-label_pk-${column.id}`} 
-                                                    id={`id_${column.id}`}
-                                                    value={value}
-                                                    onChange={(e) => handleDataEntry(e.target.value, disagg.pk, labelObj, rowIndex, colIndex, cols[disagg.pk].length)}
+                                                    value={disaggregationData[currentDisagg.pk].labels[labelObj.customsort - 1].value || ""}
+                                                    onChange={(e) => handleDataEntry(e.target.value, currentDisagg.pk, labelObj.customsort)}
                                                 />
                                             )
                                         })
@@ -592,48 +537,43 @@ const DissaggregationFields = ({ indicatorID, disagg, disaggregationData, setDis
                                 </div>
                             </li>
                     )
-                })
+                }) 
             }
 
-                <li className="list-group-item sum-row">
-                    <div className="item__label">{gettext("Sum")}</div>
-                    <div className="item__value--container">
-                        {
-                            cols[disagg.pk].map((column, colIndex) => {
-                                // let sortedColumnIndex = cols[disagg.pk].length - 1 - colIndex;
-                                // let value;
-                                // try{ value = sumValues[disagg.pk][sortedColumnIndex] }
-                                // catch{ value = 0 }
-                                return (
-                                    <div key={colIndex} className="bin">{"value"}</div>
-                                )
-                            })
-                        }
-                    </div>
-                </li>
 
-                <li className="list-group-item reference-row">
+            <li className="list-group-item sum-row">
+                <div className="item__label">{gettext("Sum")}</div>
+                <div className="item__value--container">
+                    {
+                        disagg.map(currentDisagg => {
+                            return (
+                                <div key={currentDisagg.pk} className="bin">{disaggregationData[currentDisagg.pk].labels.reduce((sum, label) => {
+                                    sum+= parseInt(label.value) || 0;
+                                    return sum}, 0)}
+                                </div>
+                            )
+                        })
+                    }
+                </div>
+            </li>
 
-                    <div className="item__label">{gettext("Actual Direct value")}</div>
+            <li className="list-group-item reference-row">
+                <div className="item__label">{`Actual ${total[0].label} value`}</div>
+                <div className="item__value--container">
+                    {
+                        disagg.map((currentDisagg, i) => {
+                            return (
+                                <div key={currentDisagg.pk} className="bin">{parseInt(total[i].value || 0)}</div>
+                            )
+                        })
+                    }
+                </div>
+            </li>
 
-                    <div className="item__value--container">
-                        {
-                            cols[disagg.pk].map((column, colIndex) => {
-                                let sortedColumnIndex = cols[disagg.pk].length - 1 - colIndex;
-                                let value;
-                                try{ value = actualFieldsInput[576][sortedColumnIndex][0].value }// TODO: update for direct or indirect
-                                catch{ value = 0 }
-                                return (
-                                    <div key={colIndex} className="bin">{value}</div>
-                                )
-                            })
-                        }
-                    </div>
-                </li>
-                {
-                    formErrors[disagg.pk] &&
-                        <span id={`validation_id_${[disagg.pk]}`} className="has-error">{formErrors[disagg.pk]}</span>
-                }
+            {
+                formErrors[disagg.pk] &&
+                    <span id={`validation_id_${[disaggID]}`} className="has-error">{formErrors[disaggID]}</span>
+            }
         </ul>
         </fieldset>
     )
@@ -642,7 +582,7 @@ const DissaggregationFields = ({ indicatorID, disagg, disaggregationData, setDis
 
 
 // ***** Evidence Fields Section *****
-const EvidenceFields = ({ resultsFieldsInput, setResultsFieldsInput, evidenceFieldsInput, setEvidenceFieldsInput, formErrors }) => {
+const EvidenceFields = ({evidenceFieldsInput, setEvidenceFieldsInput, formErrors }) => {
 
     const [validEvidenceURL, setValidEvidenceURL] = useState(false);
 
@@ -683,7 +623,6 @@ const EvidenceFields = ({ resultsFieldsInput, setResultsFieldsInput, evidenceFie
                     {
                         // # Translators: 
                         gettext('Provide a link to a file or folder in Google Drive or another shared network drive. Please be aware that TolaData does not store a copy of your record, <i>so you should not link to something on your personal computer, as no one else will be able to access it.</i>')
-                        
                     }
                 >
                     &nbsp;<i className="far fa-question-circle"></i>
@@ -716,6 +655,10 @@ const EvidenceFields = ({ resultsFieldsInput, setResultsFieldsInput, evidenceFie
                         <i className="fas fa-external-link-alt"></i>{gettext('Browse Google Drive')}
                     </button>
                 </div>
+                {
+                    formErrors.evidence_url && 
+                        <span id="validation_id_evidence_url" className="has-error">{formErrors.evidence_url}</span>
+                }
 
                 <div className="form-group" id="div_id_record_name">
                     <label htmlFor="id_record_name">{gettext("Record name")}&nbsp;</label>
