@@ -130,14 +130,17 @@ def periodic_targets_form(request, program):
         'content': content,
     })
 
+
 @login_required
-@indicator_pk_adapter(has_indicator_write_access)
 @api_view(['GET', 'POST'])
 def participant_count_result_create_for_indicator(request, pk, *args, **kwargs):
     # pk is indicator.pk
-    if request.method == 'POST':
-        return JsonResponse({"message": "Got some data!", "data": request.data})
     indicator = get_object_or_404(Indicator, pk=pk)
+    if request.method == 'POST':
+        verify_program_access_level(request, indicator.program.pk, 'medium')
+        return JsonResponse({"message": "Got some data!", "data": request.data})
+
+    verify_program_access_level(request, indicator.program.pk, 'low')
     return_dict = {
         'outcome_themes': list(OutcomeTheme.objects.filter(is_active=True).values_list('pk', 'name')),
         **ParticipantCountIndicatorSerializer(indicator).data,
