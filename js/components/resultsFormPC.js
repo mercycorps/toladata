@@ -4,7 +4,7 @@ import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import api from '../apiv2';
 
 
-const PCResultsForm = ({programID, indicatorID}) => {
+const PCResultsForm = ({indicatorID, readOnly}) => {
     const helptext = {
         "649-648": gettext("Only include SADD for Direct participants."),
         650: gettext("Provide a disaggregation of participants reached by sector. Only provide the figure with double counting. Refer to MEL Tip Sheet: Guidelines on Counting and Reporting Participant Numbers <a href='https://library.mercycorps.org/record/16929?ln=en' target='_blank'>[link: https://library.mercycorps.org/record/16929?ln=en]</a> for a description of outcome themes."),
@@ -122,7 +122,6 @@ const PCResultsForm = ({programID, indicatorID}) => {
         })
     }, [])
 
-
     const [outcomeThemesData, setOutcomeThemesData] = useState([]);
     const [disaggregationData, setDisaggregationData] = useState([]);
     const [evidenceFieldsInput, setEvidenceFieldsInput] = useState({});
@@ -175,12 +174,14 @@ const PCResultsForm = ({programID, indicatorID}) => {
                     setCommonFieldsInput={setCommonFieldsInput}
                     outcomeThemesData={outcomeThemesData}
                     formErrors={formErrors}
+                    readOnly={readOnly}
                 />
 
                 <ActualValueFields
                     disaggregationData={disaggregationData}
                     setDisaggregationData={setDisaggregationData}
                     formErrors={formErrors}
+                    readOnly={readOnly}
                 />
 
                 <DissaggregationFields 
@@ -192,6 +193,7 @@ const PCResultsForm = ({programID, indicatorID}) => {
                     title={"SADD (including unknown)"}
                     helptext={helptext}
                     formErrors={formErrors}
+                    readOnly={readOnly}
                 />
                 <DissaggregationFields 
                     indicatorID={indicatorID}
@@ -201,6 +203,7 @@ const PCResultsForm = ({programID, indicatorID}) => {
                     total={[disaggregationData["653"].labels[0]]}
                     helptext={helptext}
                     formErrors={formErrors}
+                    readOnly={readOnly}
                 />
                 <DissaggregationFields 
                     indicatorID={indicatorID}
@@ -210,14 +213,16 @@ const PCResultsForm = ({programID, indicatorID}) => {
                     total={[disaggregationData["653"].labels[1]]}
                     helptext={helptext}
                     formErrors={formErrors}
+                    readOnly={readOnly}
                 />
 
                 <EvidenceFields
                     evidenceFieldsInput={evidenceFieldsInput}
                     setEvidenceFieldsInput={setEvidenceFieldsInput}
                     formErrors={formErrors}
+                    readOnly={readOnly}
                 />
-
+                {!readOnly && 
                 <div className="form-actions">
                     <div>
                         <button 
@@ -236,6 +241,7 @@ const PCResultsForm = ({programID, indicatorID}) => {
                         </button>
                     </div>
                 </div>
+                }
             </div>
         )
     } else {
@@ -248,26 +254,15 @@ const PCResultsForm = ({programID, indicatorID}) => {
 
 
 // ***** Common Fields Section *****
-const CommonFields = ({ commonFieldsInput, setCommonFieldsInput, outcomeThemesData, formErrors }) => {
-
-    useEffect(() => {
-        $('[data-toggle="popover"]').popover({html: true});
-    }, []);
+const CommonFields = ({ commonFieldsInput, setCommonFieldsInput, outcomeThemesData, formErrors, readOnly }) => {
 
     return (
         <fieldset>
             <div className="form-group" id="div_id_date_collected">
                 <label htmlFor="id_date_collected" className="label--required">{gettext('Result date')}</label>
 
-                <a 
-                href="#"
-                tabIndex="0"
-                data-toggle="popover"
-                data-placement="right"
-                data-trigger="focus"
-                data-content={ gettext('If data collection occurred within the fiscal year, enter the date where data was collected. If data collection occurred after the end of the fiscal year, enter the last day of the fiscal year (June 30).')}>
-                    &nbsp;<i className="far fa-question-circle"></i>
-                </a>
+                <HelpText text={gettext('If data collection occurred within the fiscal year, enter the date where data was collected. If data collection occurred after the end of the fiscal year, enter the last day of the fiscal year (June 30).')}/>
+
 
                 <input 
                     type="date" 
@@ -275,7 +270,8 @@ const CommonFields = ({ commonFieldsInput, setCommonFieldsInput, outcomeThemesDa
                     id="id_date_collected" 
                     className={`datepicker form-control hasDatepicker ${formErrors.date_collected && "is-invalid"}`}
                     required
-                    autoComplete="off" 
+                    autoComplete="off"
+                    disabled={readOnly}
                     min={commonFieldsInput.start}
                     max={commonFieldsInput.end}
                     value={commonFieldsInput.date_collected || ""}
@@ -290,14 +286,7 @@ const CommonFields = ({ commonFieldsInput, setCommonFieldsInput, outcomeThemesDa
             <div className="form-group" id="div_id_fiscal_year">
                 <label htmlFor="id_fiscal_year" className="label--required">{gettext('Fiscal year')}</label>
 
-                <a href="#"
-                tabIndex="0"
-                data-toggle="popover"
-                data-placement="right"
-                data-trigger="focus"
-                data-content={ gettext('Fiscal years run from July 1 to June 30 of the following year.')}>
-                    &nbsp;<i className="far fa-question-circle"></i>
-                </a>
+                <HelpText text={gettext('Fiscal years run from July 1 to June 30 of the following year.')}/>
 
                 <input 
                     type="text" 
@@ -305,7 +294,7 @@ const CommonFields = ({ commonFieldsInput, setCommonFieldsInput, outcomeThemesDa
                     id="id_fiscal_year" 
                     className="form-control" 
                     required autoComplete="off" 
-                    disabled 
+                    disabled
                     value={commonFieldsInput.fiscal_year}
                     onChange={(e) => setCommonFieldsInput({...commonFieldsInput, [e.target.name]: e.target.value})}
                 />
@@ -314,22 +303,15 @@ const CommonFields = ({ commonFieldsInput, setCommonFieldsInput, outcomeThemesDa
             <div className="form-group react-multiselect-checkbox" id="div_id_outcome_theme">
                 <label htmlFor="id_outcome_theme" className="label--required">{gettext('Outcome theme')}</label>
 
-                <a href="#"
-                tabIndex="0"
-                data-toggle="popover"
-                data-placement="right"
-                data-trigger="focus"
-                html="true"
-                data-content={gettext('Outcome themes are the main areas of a program. Refer to MEL Tip Sheet: Guidelines on Counting and Reporting Participant Numbers <a tabIndex="1" href="https://library.mercycorps.org/record/16929?ln=en" target="_blank">[link: https://library.mercycorps.org/record/16929?ln=en]</a> for a description of outcome themes.<span>')}
-                >
-                    &nbsp;<i className="far fa-question-circle"></i>
-                </a>
+                <HelpText text={gettext('Outcome themes are the main areas of a program. Refer to MEL Tip Sheet: Guidelines on Counting and Reporting Participant Numbers <a tabIndex="1" href="https://library.mercycorps.org/record/16929?ln=en" target="_blank">[link: https://library.mercycorps.org/record/16929?ln=en]</a> for a description of outcome themes.<span>')}/>
+
 
                 <CheckboxedMultiSelect 
                     options={outcomeThemesData}
                     placeholder={gettext("None Selected")}
                     className={`${formErrors.outcome_theme && "is-invalid"}`}
                     id="outcome_themes_multiselect"
+                    disabled={readOnly}
                     value={commonFieldsInput.outcome_theme}
                     onChange={(e) => setCommonFieldsInput({...commonFieldsInput, outcome_theme: e})}
                 />
@@ -346,7 +328,7 @@ const CommonFields = ({ commonFieldsInput, setCommonFieldsInput, outcomeThemesDa
 
 
 // ***** Acutal Values Fields Section *****
-const ActualValueFields = ({ disaggregationData, setDisaggregationData, formErrors }) => {
+const ActualValueFields = ({ disaggregationData, setDisaggregationData, formErrors, readOnly }) => {
 
     let handleDataEntry = (value, inputDisaggPk, inputLabelIndex) => {
         let update = {...disaggregationData};
@@ -362,17 +344,10 @@ const ActualValueFields = ({ disaggregationData, setDisaggregationData, formErro
                         <div className="item__label">
                             <label className="label--required">{gettext('Total Participant Actual Values')}</label>
 
-                            <a href="#"
-                                tabIndex="0"
-                                data-toggle="popover"
-                                data-placement="right"
-                                data-trigger="focus"
-                                data-content={
-                                    // # Translators:
-                                    gettext('Include the participants with double counting on the left and participants without double counting across programs on the right. If two programs share participants, only discount double counting in one program!<br/><br/><strong>Direct participants</strong> – are those who have received a tangible benefit from the program, either as the actual program participants or the intended recipients of the program benefits.<br/><br/><strong>Indirect participants</strong> – are those who received a tangible benefit through their proximity to or contact with program participants or activities.')
-                                }>
-                                    &nbsp;<i className="far fa-question-circle"></i>
-                            </a>
+                            <HelpText 
+                                text={gettext('Include the participants with double counting on the left and participants without double counting across programs on the right. If two programs share participants, only discount double counting in one program!<br/><br/><strong>Direct participants</strong> – are those who have received a tangible benefit from the program, either as the actual program participants or the intended recipients of the program benefits.<br/><br/><strong>Indirect participants</strong> – are those who received a tangible benefit through their proximity to or contact with program participants or activities.')}
+                            />
+
                         </div>
                         <div className="item__value--container">
                             <div className="bin heading">{gettext("Without Double Counting")}</div>
@@ -389,6 +364,7 @@ const ActualValueFields = ({ disaggregationData, setDisaggregationData, formErro
                             className="bin form-control input-value" 
                             name={`${disaggregationData["652"].disaggregation_type}-${disaggregationData["652"].labels[0]}`}
                             id={`id_${disaggregationData["652"].disaggregation_type}-${disaggregationData["652"].labels[0]}`}
+                            disabled={readOnly}
                             value={disaggregationData["652"].labels[0].value || ""}
                             onChange={(e) => handleDataEntry(e.target.value, 652, 0)}
                         />
@@ -397,6 +373,7 @@ const ActualValueFields = ({ disaggregationData, setDisaggregationData, formErro
                             className="bin form-control input-value" 
                             name={`${disaggregationData["653"].disaggregation_type}-${disaggregationData["653"].labels[0]}`}
                             id={`id_${disaggregationData["653"].disaggregation_type}-${disaggregationData["653"].labels[0]}`}
+                            disabled={readOnly}
                             value={disaggregationData["653"].labels[0].value || ""}
                             onChange={(e) => handleDataEntry(e.target.value, 653, 0)}
 
@@ -412,6 +389,7 @@ const ActualValueFields = ({ disaggregationData, setDisaggregationData, formErro
                             className="bin form-control input-value" 
                             name={`${disaggregationData["652"].disaggregation_type}-${disaggregationData["652"].labels[1]}`}
                             id={`id_${disaggregationData["652"].disaggregation_type}-${disaggregationData["652"].labels[1]}`}
+                            disabled={readOnly}
                             value={disaggregationData["652"].labels[1].value || ""}
                             onChange={(e) => handleDataEntry(e.target.value, 652, 1)}
                         />
@@ -420,6 +398,7 @@ const ActualValueFields = ({ disaggregationData, setDisaggregationData, formErro
                             className="bin form-control input-value" 
                             name={`${disaggregationData["653"].disaggregation_type}-${disaggregationData["653"].labels[1]}`}
                             id={`id_${disaggregationData["653"].disaggregation_type}-${disaggregationData["653"].labels[1]}`}
+                            disabled={readOnly}
                             value={disaggregationData["653"].labels[1].value || ""}
                             onChange={(e) => handleDataEntry(e.target.value, 653, 1)}
                         />
@@ -445,7 +424,7 @@ const ActualValueFields = ({ disaggregationData, setDisaggregationData, formErro
 
 
 // ***** Dissaggreagation Fields Section *****
-const DissaggregationFields = ({ indicatorID, disagg, disaggregationData, setDisaggregationData, total, title, helptext, formErrors}) => {
+const DissaggregationFields = ({ indicatorID, disagg, disaggregationData, setDisaggregationData, total, title, helptext, formErrors, readOnly }) => {
     const [expanded, setExpanded] = useState(false);
 
     let disaggID = disagg.reduce((id, disaggregation) => {
@@ -478,15 +457,7 @@ const DissaggregationFields = ({ indicatorID, disagg, disaggregationData, setDis
                             <label className="label--required">{title || disagg[0].disaggregation_type}</label>
                         </a>
 
-                        <a href="#"
-                            tabIndex="0"
-                            data-toggle="popover"
-                            data-placement="right"
-                            data-trigger="focus"
-                            data-content={helptext[disaggID]}
-                        >
-                            &nbsp;<i className="far fa-question-circle"></i>
-                        </a>
+                        <HelpText text={helptext[disaggID]}/>
 
                         {
                             !expanded && formErrors[disaggID] &&
@@ -517,7 +488,8 @@ const DissaggregationFields = ({ indicatorID, disagg, disaggregationData, setDis
                                                     id={`id_${disaggID}-${currentDisagg.pk}-${labelObj.customsort}`}
                                                     name={`disaggregation-formset-${disaggID}-${labelObj.customsort}-label_pk`} 
                                                     type="number" 
-                                                    className="bin form-control input-value" 
+                                                    className="bin form-control input-value"
+                                                    disabled={readOnly}
                                                     value={disaggregationData[currentDisagg.pk].labels[labelObj.customsort - 1].value || ""}
                                                     onChange={(e) => handleDataEntry(e.target.value, currentDisagg.pk, labelObj.customsort)}
                                                 />
@@ -570,7 +542,7 @@ const DissaggregationFields = ({ indicatorID, disagg, disaggregationData, setDis
 
 
 // ***** Evidence Fields Section *****
-const EvidenceFields = ({evidenceFieldsInput, setEvidenceFieldsInput, formErrors }) => {
+const EvidenceFields = ({ evidenceFieldsInput, setEvidenceFieldsInput, formErrors, readOnly }) => {
 
     const [validEvidenceURL, setValidEvidenceURL] = useState(false);
 
@@ -603,19 +575,10 @@ const EvidenceFields = ({evidenceFieldsInput, setEvidenceFieldsInput, formErrors
                         gettext('Link to file or folder')
                     }
                 </label>
-                <a href="#"
-                    tabIndex="0"
-                    data-toggle="popover"
-                    data-placement="right"
-                    data-trigger="focus"
-                    data-content=
-                    {
-                        // # Translators: 
-                        gettext('Provide a link to a file or folder in Google Drive or another shared network drive. Please be aware that TolaData does not store a copy of your record, <i>so you should not link to something on your personal computer, as no one else will be able to access it.</i>')
-                    }
-                >
-                    &nbsp;<i className="far fa-question-circle"></i>
-                </a>
+
+                <HelpText 
+                    text={ gettext('Provide a link to a file or folder in Google Drive or another shared network drive. Please be aware that TolaData does not store a copy of your record, <i>so you should not link to something on your personal computer, as no one else will be able to access it.</i>')}
+                />
 
                 <div className="d-flex btn-group">
                     <input 
@@ -624,6 +587,7 @@ const EvidenceFields = ({evidenceFieldsInput, setEvidenceFieldsInput, formErrors
                         id="id_evidence_url" 
                         maxLength="255" 
                         className="form-control"
+                        disabled={readOnly}
                         value={evidenceFieldsInput.evidence_url || ""}
                         onChange={(e) => setEvidenceFieldsInput({...evidenceFieldsInput, [e.target.name]: e.target.value})}
                     />
@@ -639,6 +603,7 @@ const EvidenceFields = ({evidenceFieldsInput, setEvidenceFieldsInput, formErrors
                         type="button" 
                         id="id_browse_google_drive" 
                         className="btn btn-sm btn-link text-nowrap"
+                        disabled={readOnly}
                         onClick={() => alert("Google")}
                     >
                         <i className="fas fa-external-link-alt"></i>{gettext('Browse Google Drive')}
@@ -652,14 +617,9 @@ const EvidenceFields = ({evidenceFieldsInput, setEvidenceFieldsInput, formErrors
                 <div className="form-group" id="div_id_record_name">
                     <label htmlFor="id_record_name">{gettext("Record name")}&nbsp;</label>
 
-                    <a href="#"
-                        tabIndex="0"
-                        data-toggle="popover"
-                        data-placement="right"
-                        data-trigger="focus"
-                        data-content={gettext('Give your record a short name that is easy to remember.')}>
-                            <i className="far fa-question-circle"></i>
-                    </a>
+                    <HelpText 
+                        text={gettext('Give your record a short name that is easy to remember.')}
+                    />
 
                     <input 
                         type="text" 
@@ -667,6 +627,7 @@ const EvidenceFields = ({evidenceFieldsInput, setEvidenceFieldsInput, formErrors
                         id="id_record_name" 
                         className="form-control" 
                         maxLength="135"
+                        disabled={readOnly}
                         value={evidenceFieldsInput.record_name || ""}
                         onChange={(e) => setEvidenceFieldsInput({...evidenceFieldsInput, [e.target.name]: e.target.value})}
                     />
@@ -674,6 +635,24 @@ const EvidenceFields = ({evidenceFieldsInput, setEvidenceFieldsInput, formErrors
 
             </div>
         </fieldset>
+    )
+}
+
+const HelpText = ({text}) => {
+    useEffect(() => {
+        $('[data-toggle="popover"]').popover({html: true});
+    }, []);
+    return (
+        <a href="#"
+        tabIndex="0"
+        data-toggle="popover"
+        data-placement="right"
+        data-trigger="focus"
+        data-content={text}
+        className="helptext"
+        >
+            &nbsp;<i className="far fa-question-circle"></i>
+        </a>
     )
 }
 

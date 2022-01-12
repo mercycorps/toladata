@@ -178,6 +178,9 @@ a.accordion-header {
         text-decoration: none !important;
     }
 }
+a.helptext:hover {
+    text-decoration: none;
+}
 
 .accordion-popover {
     // this counters the accordion padding to put the popover next to the accordion text:

@@ -98,6 +98,7 @@ const IndicatorAddResults = inject("rootStore", "filterStore")(
                             <div className="modal-body">
                                 <PCResultsForm
                                     indicatorID={indicator.pk}
+                                    readOnly={rootStore._readOnly}
                                 />
                             </div>
                         </div>

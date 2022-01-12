@@ -335,6 +335,7 @@ const ResultsTableActions = ({indicator, editable, resultEditable, displayMissin
                         <div className="modal-body">
                             <PCResultsForm
                                 indicatorID={indicator.pk}
+                                readOnly={!resultEditable}
                             />
                         </div>
                     </div>

@@ -209,18 +209,18 @@ const api = {
             })
     },
     // The original Results Form endpoint is below
-    async savePCountResultsData(indicator_id, form_data) {
-        return await this.indicatorsInstance.post(`/result_add/${indicator_id}/`,
-            form_data, {headers: {'Content-Type': 'multipart/form-data'}})
-            .then(response => {
-                console.log('Response', response);
-                return response;
-            })
-            .catch(error => {
-                this.logFailure(error);
-                return error.response;
-            })
-    },
+    // async saveResultsData(indicator_id, form_data) {
+    //     return await this.indicatorsInstance.post(`/result_add/${indicator_id}/`,
+    //         form_data, {headers: {'Content-Type': 'multipart/form-data'}})
+    //         .then(response => {
+    //             console.log('Response', response);
+    //             return response;
+    //         })
+    //         .catch(error => {
+    //             this.logFailure(error);
+    //             return error.response;
+    //         })
+    // },
 };
 
 
