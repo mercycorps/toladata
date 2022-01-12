@@ -53,35 +53,6 @@ const IndicatorEditModalCell = inject('rootStore')(
 // Component to add results from the IPTT in a modal
 const IndicatorAddResults = inject("rootStore", "filterStore")(
     observer(({ indicator, rootStore, filterStore, noTargets }) => {
-        // console.log(rootStore);
-        // Create the disaggregations object for the new results form until the api is completed
-        let disaggregations = filterStore.currentDisaggregations.reduce((disaggGroup, disagg) => {
-            let PCDisagg = [576, 577, 578, 579];
-            if (PCDisagg.indexOf(disagg) >= 0) {
-                return disaggGroup.concat({...rootStore.getDisaggregationLabels(disagg)})
-            }
-            return disaggGroup;
-        }, [])
-        let formatedDisaggregations = [];
-        disaggregations.map(disagg => {
-            // console.log("[")
-            // console.log("     country:", disagg.country);
-            // console.log("     name:", disagg.name);
-            // console.log("     pk:", disagg.pk);
-            // console.log("     label: [");
-            let labels = [];
-            disagg.labels.map(label => {
-                // console.log("          name:", label.name)
-                // console.log("          pk:", label.pk)
-                labels.push({...label})
-                // labels.push({name: label.name, pk: label.pk})
-            })
-            // console.log("     ],");
-            // console.log("],");
-            formatedDisaggregations.push({country: disagg.country, name: disagg.name, pk: disagg.pk, labels: labels})
-        })
-        // console.log(formatedDisaggregations);
-
         const loadModal = (e) => {
             e.preventDefault();
             // Url for the form located at templates/indicators/result_form_modal.html
@@ -126,11 +97,7 @@ const IndicatorAddResults = inject("rootStore", "filterStore")(
                         <div className="modal-content">
                             <div className="modal-body">
                                 <PCResultsForm
-                                    programID={filterStore._selectedProgramId}
                                     indicatorID={indicator.pk}
-                                    disaggregations={formatedDisaggregations}
-                                    reportingPeriodStart={rootStore.currentProgram.reportingPeriodStart}                                
-                                    reportingPeriodEnd={rootStore.currentProgram.reportingPeriodEnd}                                
                                 />
                             </div>
                         </div>
@@ -138,20 +105,34 @@ const IndicatorAddResults = inject("rootStore", "filterStore")(
                 </div>
 
                 <div role="tooltip" data-animation="true" tabIndex="0" data-toggle="popover" data-placement="top" data-trigger="focus hover" data-content={missingTargetText}>
-                    <button
-                        type="button"
-                        className={"btn btn-link px-1 pt-0 mx-auto"}
-                        disabled ={noTargets}
-                        data-toggle="modal"
-                        data-target={`#addResultModal_${indicator.pk}`}
-                        // onClick={ loadModal }
-                    >
-                        <FontAwesomeIcon icon={ faPlusCircle } />
-                            {
-                                // # Translators: a button that lets the user add a new result
-                                gettext('Add result')
-                            }
-                    </button>
+                    {indicator.admin_type !== 0 ?
+                        <button
+                            type="button"
+                            className={"btn btn-link px-1 pt-0 mx-auto"}
+                            disabled ={noTargets}
+                            onClick={ loadModal }
+                        >
+                            <FontAwesomeIcon icon={ faPlusCircle } />
+                                {
+                                    // # Translators: a button that lets the user add a new result
+                                    gettext('Add result')
+                                }
+                        </button>
+                        :
+                        <button
+                            type="button"
+                            className={"btn btn-link px-1 pt-0 mx-auto"}
+                            disabled ={noTargets}
+                            data-toggle="modal"
+                            data-target={`#addResultModal_${indicator.pk}`}
+                        >
+                            <FontAwesomeIcon icon={ faPlusCircle } />
+                                {
+                                    // # Translators: a button that lets the user add a new result
+                                    gettext('Add result')
+                                }
+                        </button>
+                    }
                 </div>
             </td>
         )

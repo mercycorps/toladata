@@ -66,6 +66,7 @@ class IPTTIndicatorFiltersMixin:
             'indicator_type_pks',
             'site_pks',
             'disaggregation_pks',
+            'admin_type',
         ]
 
     @classmethod

@@ -10,6 +10,14 @@ const api = {
             "X-CSRFToken": document.cookie.replace(/(?:(?:^|.*;\s*)csrftoken\s*\=\s*([^;]*).*$)|^.*$/, "$1")
         }
     }),
+    indicatorsInstance: axios.create({
+        withCredentials: true,
+        baseURL: '/indicators/',
+        responseType: 'json',
+        headers: {
+            "X-CSRFToken": document.cookie.replace(/(?:(?:^|.*;\s*)csrftoken\s*\=\s*([^;]*).*$)|^.*$/, "$1")
+        }
+    }),
     documentInstance: axios.create({
         withCredentials: true,
         baseURL: '/indicators/api/',
@@ -194,6 +202,19 @@ const api = {
             form_data, {headers: {'Content-Type': 'multipart/form-data'}})
             .then(response => {
                 return response.data;
+            })
+            .catch(error => {
+                this.logFailure(error);
+                return error.response;
+            })
+    },
+    // The original Results Form endpoint is below
+    async savePCountResultsData(indicator_id, form_data) {
+        return await this.indicatorsInstance.post(`/result_add/${indicator_id}/`,
+            form_data, {headers: {'Content-Type': 'multipart/form-data'}})
+            .then(response => {
+                console.log('Response', response);
+                return response;
             })
             .catch(error => {
                 this.logFailure(error);

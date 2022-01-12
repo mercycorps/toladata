@@ -4,8 +4,7 @@ import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import api from '../apiv2';
 
 
-const PCResultsForm = ({programID, indicatorID, disaggregations, reportingPeriodStart, reportingPeriodEnd}) => {
-
+const PCResultsForm = ({programID, indicatorID}) => {
     const helptext = {
         "649-648": gettext("Only include SADD for Direct participants."),
         650: gettext("Provide a disaggregation of participants reached by sector. Only provide the figure with double counting. Refer to MEL Tip Sheet: Guidelines on Counting and Reporting Participant Numbers <a href='https://library.mercycorps.org/record/16929?ln=en' target='_blank'>[link: https://library.mercycorps.org/record/16929?ln=en]</a> for a description of outcome themes."),
@@ -13,34 +12,7 @@ const PCResultsForm = ({programID, indicatorID, disaggregations, reportingPeriod
         652: gettext("Direct participants – are those who have received a tangible benefit from the program, either as the actual program participants or the intended recipients of the program benefits. Indirect participants – are those who received a tangible benefit through their proximity to or contact with program participants or activities."),
         653: gettext("Direct participants – are those who have received a tangible benefit from the program, either as the actual program participants or the intended recipients of the program benefits. Indirect participants – are those who received a tangible benefit through their proximity to or contact with program participants or activities."),
     };
-
-    useEffect(() => {
-        $(`#addResultModal_${indicatorID}`).on('shown.bs.modal', function () {
-
-            $(`#addResultModal_${indicatorID}`).on('hidden.bs.modal', function () {
-                setCommonFieldsInput({date_collected: "", fiscal_year: "FY 2022: 1 July 2021 - 30 June 2022"})
-                setEvidenceFieldsInput({})
-                setActualFieldsInput({})
-                setDisaggregationFieldsInput({})
-                setSumValues({})
-                setFormErrors({})
-            })
-
-            $(document).on("keyup", function(event) {
-                if(event.key === 'Escape') {
-                    $(`#addResultModal_${indicatorID}`).modal('hide');
-                }
-            })
-
-            api.getPCountResultsData(indicatorID)
-                .then(response => {
-                    console.log("Form received data!", response);
-                    setOutcomeThemesData(formatOutcomeThemsData(response.outcome_themes));
-                    setDisaggregationData(handleReceivedDisaggregations(response.disaggregations.disaggregations));
-                })
-        })
-    }, [])
-
+    
     let handleReceivedDisaggregations = (disaggregations_data) => {
         return disaggregations_data.reduce((formated, disagg) => {
             formated[disagg.pk] = {...disagg};
@@ -55,13 +27,6 @@ const PCResultsForm = ({programID, indicatorID, disaggregations, reportingPeriod
         }, [])
     }
 
-    const [evidenceFieldsInput, setEvidenceFieldsInput] = useState({});
-    const [commonFieldsInput, setCommonFieldsInput] = useState({fiscal_year: "FY 2022: 1 July 2021 - 30 June 2022"});
-    const [outcomeThemesData, setOutcomeThemesData] = useState([]);
-    const [disaggregationData, setDisaggregationData] = useState([]);
-    const [formErrors, setFormErrors] = useState({});
-    
-
     let validateForm = () => {
         let detectedErrors = {};
         if (!commonFieldsInput.date_collected || commonFieldsInput.date_collected === "") {
@@ -75,52 +40,42 @@ const PCResultsForm = ({programID, indicatorID, disaggregations, reportingPeriod
         if (!commonFieldsInput.outcome_theme || commonFieldsInput.outcome_theme === []) {
             detectedErrors = {...detectedErrors, outcome_theme: gettext("Please complete this field. You can select more than one outcome theme.")}
         };
-        // if (Object.entries(actualFieldsInput).length === 0) {
-        //     detectedErrors = {...detectedErrors, 576: gettext("Total participants With double counting is required. Please complete this field.")}
-        // } else {
-        //     if (actualFieldsInput["576"]["1"]) {
-        //         if (parseInt(actualFieldsInput["576"]["1"]["0"].value) > parseInt(actualFieldsInput["576"]["0"]["0"].value) || 
-        //         parseInt(actualFieldsInput["576"]["1"]["1"].value) > parseInt(actualFieldsInput["576"]["0"]["1"].value)) {
-        //             detectedErrors = {...detectedErrors, 576: gettext("Direct/indirect without double counting should be equal or lower than Direct/indirect with double counting.")}
-        //         }
-        //     }
-        // }
 
-        // if (disaggregationFieldsInput["579"]) {
-        //     if ( sumValues["576"] && sumValues["579"] && sumValues["579"]["0"] !== sumValues['576']["0"]) {
-        //         detectedErrors = {...detectedErrors, 579: gettext("The sum of 'SADD with double counting' should be equal to the sum of 'Direct with double counting'. The sum of 'SADD without double counting' should be equal to the sum of 'Direct without double counting'.")}
-        //     }
-        //     if (sumValues["576"] && sumValues["579"] && sumValues["579"]["1"] !== sumValues["576"]["1"]) {
-        //         detectedErrors = {...detectedErrors, 579: gettext("The sum of 'SADD with double counting' should be equal to the sum of 'Direct with double counting'. The sum of 'SADD without double counting' should be equal to the sum of 'Direct without double counting'.")}
-        //     }
-        // }
+        let sumSADDwithout = disaggregationData["649"].labels.reduce((sum, label) => {
+            sum+= parseInt(label.value) || 0;
+            return sum}, 0);
+        if (parseInt(sumSADDwithout) !== parseInt(disaggregationData["652"].labels[0].value || 0)) {
+            detectedErrors = {...detectedErrors, "649-648": gettext("The sum of 'SADD without double counting' should be equal to the sum of 'Direct without double counting'.")}
+        };
+        let sumSADDwith = disaggregationData["648"].labels.reduce((sum, label) => {
+            sum+= parseInt(label.value) || 0;
+            return sum}, 0);
+        if (parseInt(sumSADDwith) !== parseInt(disaggregationData["653"].labels[0].value || 0)) {
+            detectedErrors = {...detectedErrors, "649-648": gettext("The sum of 'SADD with double counting' should be equal to the sum of 'Direct with double counting'.")}
+        };
 
         if (!disaggregationData['653'].labels[0].value || !disaggregationData['653'].labels[1].value) {
-            console.log("totals error");
             detectedErrors = {...detectedErrors, totals_error: gettext("Direct/indirect total participants with double counting is required. Please complete these fields.")}
-        }
+        };
 
         if (
             parseInt(disaggregationData['652'].labels[0].value || 0) > parseInt(disaggregationData['653'].labels[0].value || 0) ||
             parseInt(disaggregationData['652'].labels[1].value || 0) > parseInt(disaggregationData['653'].labels[1].value || 0)
             ) {
-                console.log("totals error");
                 detectedErrors = {...detectedErrors, totals_error: gettext("Direct/indirect without double counting should be equal or lower than Direct/indirect with double counting.")}
         }
 
         if (evidenceFieldsInput.evidence_url ) {
-            if (evidenceFieldsInput.evidence_url.match(/^(http(s)?|file):\/\/.+/)) {
-                console.log("Evidence Error");
+            if (!evidenceFieldsInput.evidence_url.match(/^(http(s)?|file):\/\/.+/)) {
                 detectedErrors = {...detectedErrors, evidence_url: gettext("Please enter a valid evidence link.")}
-                setValidEvidenceURL(evidenceURLHasValue);
             }
         }
 
         setFormErrors(detectedErrors);
+        return Object.keys(detectedErrors).length === 0 ? true: false;
     }
 
-
-    let formatData = (data) => {
+    let formatFields = (data) => {
         let formatedData = [];
         Object.keys(data).map(key => {
             formatedData.push({name: key, value: data[key]})
@@ -128,30 +83,75 @@ const PCResultsForm = ({programID, indicatorID, disaggregations, reportingPeriod
         return formatedData;
     }
 
+    let formatDisaggregations = () => {
+        return Object.keys(disaggregationData).reduce((disaggArr, currentDisagg) => {
+            disaggregationData[currentDisagg].labels.map((label, i) => {
+                disaggArr.push({name: `disaggregation-formset-${disaggregationData[currentDisagg].pk}-${i}-label_pk`, value: label.value})
+            })
+            return disaggArr;
+        }, []);
+    }
+
+    useEffect(() => {
+        $(`#addResultModal_${indicatorID}`).on('shown.bs.modal', function () {
+
+            $(`#addResultModal_${indicatorID}`).on('hidden.bs.modal', function () {
+                setCommonFieldsInput({date_collected: "", fiscal_year: "FY 2022: 1 July 2021 - 30 June 2022"})
+                setEvidenceFieldsInput({})
+                setDisaggregationData([])
+                setOutcomeThemesData([])
+                setFormErrors({})
+            })
+
+            $(document).on("keyup", function(event) {
+                if(event.key === 'Escape') {
+                    $(`#addResultModal_${indicatorID}`).modal('hide');
+                }
+            })
+
+            api.getPCountResultsData(indicatorID)
+                .then(response => {
+                    // console.log("Form received data!", response);
+                    setOutcomeThemesData(formatOutcomeThemsData(response.outcome_themes));
+                    setDisaggregationData(handleReceivedDisaggregations(response.disaggregations.disaggregations));
+
+                    // TODO: Update the commonFieldInputs and EvidenceFieldInputs with received data for an UPDATE request
+                    // setCommonFieldsInput();
+                    // setEvidenceFieldsInput();
+                })
+        })
+    }, [])
+
+
+    const [outcomeThemesData, setOutcomeThemesData] = useState([]);
+    const [disaggregationData, setDisaggregationData] = useState([]);
+    const [evidenceFieldsInput, setEvidenceFieldsInput] = useState({});
+    const [commonFieldsInput, setCommonFieldsInput] = useState({fiscal_year: "FY 2022: 1 July 2021 - 30 June 2022", start: '2021-07-01', end: '2022-06-30'}); // TODO: receive start, and end dates from GET request. Calculate fiscal year based on those dates.
+    const [formErrors, setFormErrors] = useState({});
+
     let handleSubmit = (e) => {
         e.preventDefault();
-        validateForm();
-        console.log('commonFieldsInput:', commonFieldsInput)
-        console.log('evidenceFieldsInput', evidenceFieldsInput);
-        let data = [];
-        data = data.concat(formatData({indicator: indicatorID, program: programID}))
-        // data = data.concat(formatData(commonFieldsInput));
-        // data = data.concat(formatData(actualFieldsInput));
-        // data = data.concat(formatData(disaggregationFieldsInput));
-
-        // console.log("Data", data);
-    //     let form_data = new FormData;
-    //    data.map(currentData => {
-    //         form_data.append(currentData["name"], currentData["value"]);
-    //     })
-    //     for(var pair of form_data.entries()) {
-    //         console.log('Form Data:', pair[0]+ ', '+ pair[1]);
-    //     }
-
-        // api.savePCountResultsData(indicatorID, form_data)
-        //     .then(response => {
-        //         console.log("Saved Form Data!");
-        //     })
+        if ( validateForm() ) {
+            // console.log('commonFieldsInput:', commonFieldsInput)
+            // console.log('evidenceFieldsInput', evidenceFieldsInput);
+            let data = [];
+            data = data.concat(formatFields({indicator: indicatorID, program: programID}))
+            data = data.concat(formatFields(commonFieldsInput));
+            data = data.concat(formatFields(evidenceFieldsInput));
+            data = data.concat(formatDisaggregations());
+    
+            // console.log("Data", data);
+            let form_data = new FormData;
+            data.map(currentData => {
+                form_data.append(currentData["name"], currentData["value"]);
+            })
+            api.savePCountResultsData(indicatorID, form_data)
+                .then(response => {
+                    console.log("Saved Form Data!");
+                    // TODO: Add action after the form is sent
+                })
+        }
+        
     }
     if (Object.keys(disaggregationData).length > 0) {
         return (
@@ -171,8 +171,6 @@ const PCResultsForm = ({programID, indicatorID, disaggregations, reportingPeriod
                 </h3>
 
                 <CommonFields
-                    reportingPeriodEnd={reportingPeriodEnd}
-                    reportingPeriodStart={reportingPeriodStart}
                     commonFieldsInput={commonFieldsInput}
                     setCommonFieldsInput={setCommonFieldsInput}
                     outcomeThemesData={outcomeThemesData}
@@ -242,7 +240,7 @@ const PCResultsForm = ({programID, indicatorID, disaggregations, reportingPeriod
         )
     } else {
         return (
-            <React.Fragment></React.Fragment>
+            <React.Fragment></React.Fragment> //TODO: Add a waiting spinner/indicator will waiting for API response for data
         )
     }
 }
@@ -250,11 +248,12 @@ const PCResultsForm = ({programID, indicatorID, disaggregations, reportingPeriod
 
 
 // ***** Common Fields Section *****
-const CommonFields = ({ reportingPeriodStart, reportingPeriodEnd, commonFieldsInput, setCommonFieldsInput, outcomeThemesData, formErrors }) => {
+const CommonFields = ({ commonFieldsInput, setCommonFieldsInput, outcomeThemesData, formErrors }) => {
 
     useEffect(() => {
         $('[data-toggle="popover"]').popover({html: true});
-    }, [])
+    }, []);
+
     return (
         <fieldset>
             <div className="form-group" id="div_id_date_collected">
@@ -277,8 +276,8 @@ const CommonFields = ({ reportingPeriodStart, reportingPeriodEnd, commonFieldsIn
                     className={`datepicker form-control hasDatepicker ${formErrors.date_collected && "is-invalid"}`}
                     required
                     autoComplete="off" 
-                    min={reportingPeriodStart}
-                    max={reportingPeriodEnd}
+                    min={commonFieldsInput.start}
+                    max={commonFieldsInput.end}
                     value={commonFieldsInput.date_collected || ""}
                     onChange={(e) => setCommonFieldsInput({...commonFieldsInput, [e.target.name]: e.target.value})}
                 />
@@ -352,12 +351,11 @@ const ActualValueFields = ({ disaggregationData, setDisaggregationData, formErro
     let handleDataEntry = (value, inputDisaggPk, inputLabelIndex) => {
         let update = {...disaggregationData};
         update[inputDisaggPk].labels[inputLabelIndex] = {...disaggregationData[inputDisaggPk].labels[inputLabelIndex], value: value};
-        console.log("After Update", update);
         setDisaggregationData(update);
     }
     
     return (
-        <React.Fragment>
+        <fieldset>
             <ul className="list-group form-list-group">
                 <li className="list-group-item heading-row">
                     <div className="item__value--header">
@@ -384,7 +382,7 @@ const ActualValueFields = ({ disaggregationData, setDisaggregationData, formErro
                 </li>
 
                 <li className="list-group-item">
-                    <div className="item__label">{gettext("Actual Direct value")}</div>
+                    <div className="item__label">{`Actual ${disaggregationData["652"].labels[0].label} value`}</div>
                     <div className="item__value--container">
                         <input 
                             type="number" 
@@ -407,7 +405,7 @@ const ActualValueFields = ({ disaggregationData, setDisaggregationData, formErro
                 </li>
 
                 <li className="list-group-item">
-                    <div className="item__label">{gettext("Actual Indirect value")}</div>
+                    <div className="item__label">{gettext(`Actual ${disaggregationData["652"].labels[1].label} value`)}</div>
                     <div className="item__value--container">
                         <input 
                             type="number" 
@@ -416,7 +414,6 @@ const ActualValueFields = ({ disaggregationData, setDisaggregationData, formErro
                             id={`id_${disaggregationData["652"].disaggregation_type}-${disaggregationData["652"].labels[1]}`}
                             value={disaggregationData["652"].labels[1].value || ""}
                             onChange={(e) => handleDataEntry(e.target.value, 652, 1)}
-
                         />
                         <input 
                             type="number" 
@@ -436,13 +433,12 @@ const ActualValueFields = ({ disaggregationData, setDisaggregationData, formErro
                         <div className="bin">{parseInt(disaggregationData['653'].labels[0].value || 0) + parseInt(disaggregationData['653'].labels[1].value || 0)}</div>
                     </div>
                 </li>
-
                 {
                     formErrors.totals_error &&
                         <span id={`validation_id_totals_error`} className="has-error">{formErrors.totals_error}</span>
                 }
             </ul>
-        </React.Fragment>
+        </fieldset>
     )
 }
 
@@ -451,10 +447,12 @@ const ActualValueFields = ({ disaggregationData, setDisaggregationData, formErro
 // ***** Dissaggreagation Fields Section *****
 const DissaggregationFields = ({ indicatorID, disagg, disaggregationData, setDisaggregationData, total, title, helptext, formErrors}) => {
     const [expanded, setExpanded] = useState(false);
+
     let disaggID = disagg.reduce((id, disaggregation) => {
         id = id + (id === "" ? "" : "-") + disaggregation.pk;
         return id;
     },"")
+
     useEffect(() => {
         $(`#${indicatorID}-${disaggID}`).on('show.bs.collapse', function() {
             setExpanded(true);
@@ -467,7 +465,6 @@ const DissaggregationFields = ({ indicatorID, disagg, disaggregationData, setDis
     let handleDataEntry = (value, inputDisaggPk, customsort) => {
         let update = {...disaggregationData};
         update[inputDisaggPk].labels[customsort - 1] = {...disaggregationData[inputDisaggPk].labels[customsort - 1], value: value};
-        console.log("After Update", update);
         setDisaggregationData(update);
     }
 
@@ -486,24 +483,17 @@ const DissaggregationFields = ({ indicatorID, disagg, disaggregationData, setDis
                             data-toggle="popover"
                             data-placement="right"
                             data-trigger="focus"
-                            data-content={helptext[disaggID]} // May be better to reduce and provide both help texts.
+                            data-content={helptext[disaggID]}
                         >
                             &nbsp;<i className="far fa-question-circle"></i>
                         </a>
 
                         {
-                            !expanded && formErrors[disagg[0].pk] &&
+                            !expanded && formErrors[disaggID] &&
                             <span className="needs-attention"><i className="fas fa-exclamation-triangle"></i>{gettext("Needs Attention")}</span>
                         }
                     </div>
                     <div className="item__value--container" style={{display: expanded ? "inherit" : "none"}}>
-                        {/* {
-                            cols[disagg.pk].map((column, i) => {
-                            return (
-                                <div key={i} className="bin heading">{column.name}</div>
-                                )
-                            })
-                        } */}
                         {
                             disagg.length !== 1 &&
                             <div className="bin heading">{gettext("Without double counting")}</div>
@@ -540,7 +530,6 @@ const DissaggregationFields = ({ indicatorID, disagg, disaggregationData, setDis
                 }) 
             }
 
-
             <li className="list-group-item sum-row">
                 <div className="item__label">{gettext("Sum")}</div>
                 <div className="item__value--container">
@@ -569,9 +558,8 @@ const DissaggregationFields = ({ indicatorID, disagg, disaggregationData, setDis
                     }
                 </div>
             </li>
-
             {
-                formErrors[disagg.pk] &&
+                formErrors[disaggID] &&
                     <span id={`validation_id_${[disaggID]}`} className="has-error">{formErrors[disaggID]}</span>
             }
         </ul>
@@ -594,7 +582,7 @@ const EvidenceFields = ({evidenceFieldsInput, setEvidenceFieldsInput, formErrors
     }, [evidenceFieldsInput.evidence_url])
 
     return (
-        <div className="card card-body bg-primary-light border-0">
+        <fieldset className="card card-body bg-primary-light border-0">
             <h3>
                 {   
                     // # Translators: 
@@ -609,7 +597,8 @@ const EvidenceFields = ({evidenceFieldsInput, setEvidenceFieldsInput, formErrors
             </p>
 
             <div className="form-group">
-                <label htmlFor="id_record_url" className="label--required">
+                {/* <label htmlFor="id_record_url" className="label--required"> */}
+                <label htmlFor="id_record_url" className="label">
                     {
                         gettext('Link to file or folder')
                     }
@@ -684,7 +673,7 @@ const EvidenceFields = ({evidenceFieldsInput, setEvidenceFieldsInput, formErrors
                 </div>
 
             </div>
-        </div>
+        </fieldset>
     )
 }
 

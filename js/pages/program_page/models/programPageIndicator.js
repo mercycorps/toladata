@@ -50,6 +50,7 @@ const programPageTarget = (
 export const forProgramPage = (
     indicatorJSON = {}
 ) => ({
+    admin_type: indicatorJSON.admin_type,
     number: indicatorJSON.number || false,
     wasJustCreated: Boolean(indicatorJSON.was_just_created),
     isKeyPerformanceIndicator: Boolean(indicatorJSON.is_key_performance_indicator),

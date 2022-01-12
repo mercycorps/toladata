@@ -15,6 +15,7 @@ import { getIndicator, withMeasurement } from '../../../models/indicator';
 export const forIPTT = (
     indicatorJSON = {}
 ) => ({
+    admin_type: indicatorJSON.admin_type,
     number: indicatorJSON.number || null,
     sectorPk: indicatorJSON.sector_pk || null,
     _typePks: observable(new Set(indicatorJSON.indicator_type_pks || [])),

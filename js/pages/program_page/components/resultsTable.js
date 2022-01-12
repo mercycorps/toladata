@@ -1,5 +1,6 @@
 import React, { useContext } from 'react';
 import HelpPopover from "../../../components/helpPopover";
+import PCResultsForm from "../../../components/resultsFormPC";
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome'
 import { FaRegQuestionCircle } from 'react-icons/fa';
 import { faBullseye, faPlusCircle } from '@fortawesome/free-solid-svg-icons'
@@ -328,16 +329,40 @@ const ResultsTableActions = ({indicator, editable, resultEditable, displayMissin
                 </div>
             }
             </div>
+            <div className="modal fade" id={`addResultModal_${indicator.pk}`} role="dialog">
+                <div className="modal-dialog modal-lg">
+                    <div className="modal-content">
+                        <div className="modal-body">
+                            <PCResultsForm
+                                indicatorID={indicator.pk}
+                            />
+                        </div>
+                    </div>
+                </div>
+            </div>
             {resultEditable &&
                 <div className={(indicator.noTargets || displayMissingTargetsWarning) ? "cd-actions__button disable-span" : "cd-actions__button"}>
-                    <a href={`/indicators/result_add/${indicator.pk}/`}
-                        className="btn-link btn-add results__link">
-                        <FontAwesomeIcon icon={ faPlusCircle } />
-                        {
-                            // # Translators: a button that lets the user add a new result
-                            gettext('Add result')
-                        }
-                    </a>
+                    {indicator.admin_type !== 0 ?
+                        <a href={`/indicators/result_add/${indicator.pk}/`}
+                            className="btn-link btn-add results__link">
+                            <FontAwesomeIcon icon={ faPlusCircle } />
+                            {
+                                // # Translators: a button that lets the user add a new result
+                                gettext('Add result')
+                            }
+                        </a>
+                    :
+                        <a 
+                            data-toggle="modal"
+                            data-target={`#addResultModal_${indicator.pk}`}
+                            className="btn-link btn-add">
+                            <FontAwesomeIcon icon={ faPlusCircle } />
+                            {
+                                // # Translators: a button that lets the user add a new result
+                                gettext('Add result')
+                            }
+                        </a>
+                    }
                 </div>
             }
         </div>
