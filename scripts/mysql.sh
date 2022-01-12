@@ -4,6 +4,7 @@
 #               -u = your username for the database
 #               -r = resets the database (drops existing one, creates a new one)
 #               -f = restores this backup file
+#               -m = runs migrations; you should ensure env is set to the right python (e.g. with a virtualenv)
 #               -e = points to the python executable so that migrations command can be run
 #               -b = backs up the database of the $host
 #               -h = Specified which host's db to backup
@@ -26,6 +27,7 @@ file2restore=
 resetdb=
 pythonexe=
 deleteoldbackups=
+migrate=
 
 # Number of days to keep backups
 keep_backups_for=30 #days
@@ -42,6 +44,8 @@ while [ "$1" != "" ]; do
                             host=$1
                             ;;
         -b | --backup )     backup=1
+                            ;;
+        -m | --migrate )    migrate=1
                             ;;
         -f | --file )       shift
                             file2restore=$1
@@ -127,6 +131,12 @@ sleep 0.5
 # if file exists
 if [ -f 'manage.py' ]
 then
+
+    if [ ! -z "$migrate" ]
+    then
+        /usr/bin/env python manage.py migrate
+    fi
+
     # if pythonexe variable is not empty
     if [ ! -z "$pythonexe" ]
     then
