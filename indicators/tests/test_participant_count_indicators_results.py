@@ -29,4 +29,6 @@ class TestParticipantCountSetup(test.TestCase):
             'create_participant_count_indicators', execute=True, create_disaggs_themes=True, suppress_output=True)
         indicator = Indicator.objects.filter(admin_type=Indicator.ADMIN_PARTICIPANT_COUNT)[0]
         response = self.client.get(reverse('pcountcreate', args=[indicator.pk]))
-        self.assertSetEqual(set(json.loads(response.content).keys()), {'outcome_themes', 'disaggregations'})
+        self.assertSetEqual(
+            set(json.loads(response.content).keys()),
+            {'outcome_themes', 'disaggregations', 'program_start_date', 'program_end_date'})

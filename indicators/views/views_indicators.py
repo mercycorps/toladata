@@ -133,13 +133,14 @@ def periodic_targets_form(request, program):
 @login_required
 @indicator_pk_adapter(has_indicator_write_access)
 @api_view(['GET', 'POST'])
-def participant_count_result_create_for_indicator(request, pk, program):  # Indicator pk
+def participant_count_result_create_for_indicator(request, pk, *args, **kwargs):
+    # pk is indicator.pk
     if request.method == 'POST':
         return JsonResponse({"message": "Got some data!", "data": request.data})
     indicator = get_object_or_404(Indicator, pk=pk)
     return_dict = {
         'outcome_themes': list(OutcomeTheme.objects.filter(is_active=True).values_list('pk', 'name')),
-        'disaggregations': ParticipantCountIndicatorSerializer(indicator).data
+        **ParticipantCountIndicatorSerializer(indicator).data,
     }
     return JsonResponse(return_dict)
 
