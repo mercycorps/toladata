@@ -73,12 +73,14 @@ class ParticipantCountDisaggregationSerializer(serializers.ModelSerializer):
 class ParticipantCountIndicatorSerializer(serializers.ModelSerializer):
     """Results serializer for the participant count page"""
     disaggregations = ParticipantCountDisaggregationSerializer(many=True, source='disaggregation')
+    program_start_date = serializers.DateField(source='program.reporting_period_start')
+    program_end_date = serializers.DateField(source='program.reporting_period_end')
 
     class Meta:
         model = Indicator
         fields = [
-            'pk',
-            'name',
             'disaggregations',
+            'program_start_date',
+            'program_end_date',
         ]
 
