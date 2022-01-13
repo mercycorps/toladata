@@ -14,8 +14,8 @@ const PCResultsForm = ({indicatorID, readOnly}) => {
     };
     
     let handleReceivedDisaggregations = (disaggregations_data) => {
-        return disaggregations_data.reduce((formated, disagg) => {
-            formated[disagg.pk] = {...disagg};
+        return disaggregations_data.reduce((formated, disagg, i) => {
+            formated[disagg.pk] = {...disagg, sort_order: i};
             return formated;
         }, {});
     }
@@ -111,10 +111,10 @@ const PCResultsForm = ({indicatorID, readOnly}) => {
 
             api.getPCountResultsData(indicatorID)
                 .then(response => {
-                    // console.log("Form received data!", response);
+                    // console.log("Form received data!", response.disaggregations.disaggregations);
                     setOutcomeThemesData(formatOutcomeThemsData(response.outcome_themes));
                     setDisaggregationData(handleReceivedDisaggregations(response.disaggregations.disaggregations));
-
+                    setDisaggregationArray(handleDataArray(response.disaggregations.disaggregations))
                     // TODO: Update the commonFieldInputs and EvidenceFieldInputs with received data for an UPDATE request
                     // setCommonFieldsInput();
                     // setEvidenceFieldsInput();
@@ -122,8 +122,17 @@ const PCResultsForm = ({indicatorID, readOnly}) => {
         })
     }, [])
 
+    let handleDataArray = (dataArray) => {
+        return dataArray.reduce((arr, currentDisagg, i) => {
+            currentDisagg.disaggregation_type.includes('without') ? arr[i] = {...currentDisagg, double_counting: false} : arr[i] = {...currentDisagg, double_counting: true};
+            currentDisagg.disaggregation_type.includes('Indirect') ? arr[i] = {...arr[i], count_type: "Indirect"} : arr[i] = {...arr[i], count_type: "Direct"};
+            return arr;
+        }, []);
+    }
+
     const [outcomeThemesData, setOutcomeThemesData] = useState([]);
     const [disaggregationData, setDisaggregationData] = useState([]);
+    const [disaggregationArray, setDisaggregationArray] = useState([]);
     const [evidenceFieldsInput, setEvidenceFieldsInput] = useState({});
     const [commonFieldsInput, setCommonFieldsInput] = useState({fiscal_year: "FY 2022: 1 July 2021 - 30 June 2022", start: '2021-07-01', end: '2022-06-30'}); // TODO: receive start, and end dates from GET request. Calculate fiscal year based on those dates.
     const [formErrors, setFormErrors] = useState({});
@@ -152,7 +161,8 @@ const PCResultsForm = ({indicatorID, readOnly}) => {
         }
         
     }
-    if (Object.keys(disaggregationData).length > 0) {
+    // if (Object.keys(disaggregationData).length > 0) {
+    if (disaggregationArray.length > 0) {
         return (
             <div style={{textAlign: "left"}}>
                 <h2>
@@ -179,42 +189,100 @@ const PCResultsForm = ({indicatorID, readOnly}) => {
 
                 <ActualValueFields
                     disaggregationData={disaggregationData}
+                    disaggregationArray={disaggregationArray}
                     setDisaggregationData={setDisaggregationData}
                     formErrors={formErrors}
                     readOnly={readOnly}
                 />
+                {console.log(disaggregationData, disaggregationArray)}
+                {/* {
+                    disaggregationArray.map(disagg => {
+                        if (disagg.disaggregation_type === "Actual with double counting" || disagg.disaggregation_type === "Actual without double counting") {
+                            return;
+                        }else if (disagg.disaggregation_type.includes("SADD (including unknown)")) {
+                            console.log(disagg.disaggregation_type);
+                        } else {
+                            console.log("else", disagg.disaggregation_type);
+                        }
+                    })
+                } */}
 
-                <DissaggregationFields 
+
+
+                {/* <DissaggregationFields 
+                    disagg={[disaggregationData["649"],disaggregationData["648"]]} //------------------------
+                    total={[disaggregationData["652"].labels[0], disaggregationData["653"].labels[0]]} //-----------------
+                    title={"SADD (including unknown)"} //--------------------
                     indicatorID={indicatorID}
-                    disagg={[disaggregationData["649"],disaggregationData["648"]]}
-                    disaggregationData={disaggregationData}
-                    setDisaggregationData={setDisaggregationData}
-                    total={[disaggregationData["652"].labels[0], disaggregationData["653"].labels[0]]}
-                    title={"SADD (including unknown)"}
+                    readOnly={readOnly}
                     helptext={helptext}
                     formErrors={formErrors}
-                    readOnly={readOnly}
-                />
-                <DissaggregationFields 
-                    indicatorID={indicatorID}
+                    disaggregationData={disaggregationData}
+                    setDisaggregationData={setDisaggregationData}
+                /> */}
+                {
+                    disaggregationArray.map((disagg) => {
+                        if (disagg.disaggregation_type.includes('SADD') && disagg.double_counting === true) {
+                            let disaggsSADD = disaggregationArray.reduce((arrSADD, currentDisagg) => {
+                                if (currentDisagg.disaggregation_type.includes("SADD")) {
+                                    arrSADD.push(currentDisagg);
+                                }
+                                return arrSADD;
+                            }, []);
+                            return (
+                                <DissaggregationFields 
+                                    key={disagg.disaggregation_type}
+                                    disagg={disaggsSADD}
+                                    total={[disaggregationData["652"].labels[0], disaggregationData["653"].labels[0]]} //-----------------
+                                    title={"SADD (including unknown)"} //--------------------
+                                    indicatorID={indicatorID}
+                                    readOnly={readOnly}
+                                    helptext={helptext}
+                                    formErrors={formErrors}
+                                    disaggregationArray={disaggregationArray}
+                                    disaggregationData={disaggregationData}
+                                    setDisaggregationData={setDisaggregationData}
+                                />
+                            )
+                        }
+                        if (disagg.disaggregation_type.includes('Sectors')) {
+                            return (
+                                <DissaggregationFields 
+                                    key={disagg.disaggregation_type}
+                                    disagg={[disagg]}
+                                    total={[disaggregationData["653"].labels[0]]}
+                                    indicatorID={indicatorID}
+                                    readOnly={readOnly}
+                                    helptext={helptext}
+                                    formErrors={formErrors}
+                                    disaggregationArray={disaggregationArray}
+                                    disaggregationData={disaggregationData}
+                                    setDisaggregationData={setDisaggregationData}
+                                />
+                            )
+                        }
+                    })
+                }
+                {/* <DissaggregationFields 
                     disagg={[disaggregationData["650"]]}
-                    disaggregationData={disaggregationData}
-                    setDisaggregationData={setDisaggregationData}
                     total={[disaggregationData["653"].labels[0]]}
+                    indicatorID={indicatorID}
+                    readOnly={readOnly}
                     helptext={helptext}
                     formErrors={formErrors}
-                    readOnly={readOnly}
+                    disaggregationData={disaggregationData}
+                    setDisaggregationData={setDisaggregationData}
                 />
                 <DissaggregationFields 
-                    indicatorID={indicatorID}
                     disagg={[disaggregationData["651"]]}
-                    disaggregationData={disaggregationData}
-                    setDisaggregationData={setDisaggregationData}
                     total={[disaggregationData["653"].labels[1]]}
+                    indicatorID={indicatorID}
+                    readOnly={readOnly}
                     helptext={helptext}
                     formErrors={formErrors}
-                    readOnly={readOnly}
-                />
+                    disaggregationData={disaggregationData}
+                    setDisaggregationData={setDisaggregationData}
+                /> */}
 
                 <EvidenceFields
                     evidenceFieldsInput={evidenceFieldsInput}
@@ -328,9 +396,25 @@ const CommonFields = ({ commonFieldsInput, setCommonFieldsInput, outcomeThemesDa
 
 
 // ***** Acutal Values Fields Section *****
-const ActualValueFields = ({ disaggregationData, setDisaggregationData, formErrors, readOnly }) => {
+const ActualValueFields = ({ disaggregationData, disaggregationArray, setDisaggregationData, formErrors, readOnly }) => {
+
+    const [actualWithDouble, setActualWithDouble] = useState({})
+    const [actualWithoutDouble, setActualWithoutDouble] = useState({})
+    console.log('disaggregationArray', disaggregationArray);
+    // useEffect(() => {
+    //     disaggregationArray.map(disagg => {
+    //         if (disagg.disaggregation_type === "Actual with double counting") {
+    //             console.log('with', disagg);
+    //             setActualWithDouble(disagg);
+    //         } else if (disagg.disaggregation_type === "Actual without double counting") {
+    //             console.log('without', disagg);
+    //             setActualWithoutDouble(disagg);
+    //         }
+    //     })
+    // }, [])
 
     let handleDataEntry = (value, inputDisaggPk, inputLabelIndex) => {
+        // console.log(actualWithDouble, actualWithoutDouble);
         let update = {...disaggregationData};
         update[inputDisaggPk].labels[inputLabelIndex] = {...disaggregationData[inputDisaggPk].labels[inputLabelIndex], value: value};
         setDisaggregationData(update);
@@ -357,14 +441,17 @@ const ActualValueFields = ({ disaggregationData, setDisaggregationData, formErro
                 </li>
 
                 <li className="list-group-item">
-                    <div className="item__label">{`Actual ${disaggregationData["652"].labels[0].label} value`}</div>
+                    <div className="item__label">{gettext("Actual Direct value")}</div>
                     <div className="item__value--container">
                         <input 
                             type="number" 
-                            className="bin form-control input-value" 
+                            className="bin form-control input-value"
+                            // name={`${actualWithDouble.disaggregation_type}_${actualWithDouble.count_type}_doubleCounting-${actualWithDouble.double_counting}`}
+                            // name={`id_${actualWithDouble.disaggregation_type}_${actualWithDouble.count_type}_doubleCounting-${actualWithDouble.double_counting}`}
                             name={`${disaggregationData["652"].disaggregation_type}-${disaggregationData["652"].labels[0]}`}
                             id={`id_${disaggregationData["652"].disaggregation_type}-${disaggregationData["652"].labels[0]}`}
                             disabled={readOnly}
+                            value={disaggregationData["652"].labels[0].value || ""}
                             value={disaggregationData["652"].labels[0].value || ""}
                             onChange={(e) => handleDataEntry(e.target.value, 652, 0)}
                         />
@@ -382,7 +469,7 @@ const ActualValueFields = ({ disaggregationData, setDisaggregationData, formErro
                 </li>
 
                 <li className="list-group-item">
-                    <div className="item__label">{gettext(`Actual ${disaggregationData["652"].labels[1].label} value`)}</div>
+                    <div className="item__label">{gettext("Actual Indirect value")}</div>
                     <div className="item__value--container">
                         <input 
                             type="number" 
@@ -424,13 +511,24 @@ const ActualValueFields = ({ disaggregationData, setDisaggregationData, formErro
 
 
 // ***** Dissaggreagation Fields Section *****
-const DissaggregationFields = ({ indicatorID, disagg, disaggregationData, setDisaggregationData, total, title, helptext, formErrors, readOnly }) => {
+const DissaggregationFields = ({ indicatorID, disagg, disaggregationData, disaggregationArray, setDisaggregationData, total, title, helptext, formErrors, readOnly }) => {
     const [expanded, setExpanded] = useState(false);
 
     let disaggID = disagg.reduce((id, disaggregation) => {
         id = id + (id === "" ? "" : "-") + disaggregation.pk;
         return id;
     },"")
+
+    let totals = disagg.reduce((labelsArr, currentDisaggregation) => {
+        let totalDisagg = disaggregationArray && disaggregationArray.filter(currentDisagg => {
+            return currentDisagg.disaggregation_type.includes("Actual") &&
+            currentDisagg.double_counting === currentDisaggregation.double_counting
+            
+        })
+        let sumVal = disaggregationArray && totalDisagg[0].labels.filter(labelObj => labelObj.label === currentDisaggregation.count_type)[0]
+        labelsArr.unshift(sumVal)
+        return labelsArr;
+    }, []);
 
     useEffect(() => {
         $(`#${indicatorID}-${disaggID}`).on('show.bs.collapse', function() {
@@ -477,27 +575,27 @@ const DissaggregationFields = ({ indicatorID, disagg, disaggregationData, setDis
             {
                 disagg[0].labels.map((labelObj) => {
                     return (
-                            <li key={`${disaggID}-${labelObj.customsort}`} className="list-group-item">
-                                <div className="item__label">{labelObj.label}</div>
-                                <div className="item__value--container">
-                                    {
-                                        disagg.map(currentDisagg => {
-                                            return (
-                                                <input 
-                                                    key={`id_${disaggID}-${currentDisagg.pk}-${labelObj.customsort}`}
-                                                    id={`id_${disaggID}-${currentDisagg.pk}-${labelObj.customsort}`}
-                                                    name={`disaggregation-formset-${disaggID}-${labelObj.customsort}-label_pk`} 
-                                                    type="number" 
-                                                    className="bin form-control input-value"
-                                                    disabled={readOnly}
-                                                    value={disaggregationData[currentDisagg.pk].labels[labelObj.customsort - 1].value || ""}
-                                                    onChange={(e) => handleDataEntry(e.target.value, currentDisagg.pk, labelObj.customsort)}
-                                                />
-                                            )
-                                        })
-                                    }
-                                </div>
-                            </li>
+                        <li key={`${disaggID}-${labelObj.customsort}`} className="list-group-item">
+                            <div className="item__label">{labelObj.label}</div>
+                            <div className="item__value--container">
+                                {
+                                    disagg.map(currentDisagg => {
+                                        return (
+                                            <input 
+                                                key={`id_${disaggID}-${currentDisagg.pk}-${labelObj.customsort}`}
+                                                id={`id_${disaggID}-${currentDisagg.pk}-${labelObj.customsort}`}
+                                                name={`disaggregation-formset-${disaggID}-${labelObj.customsort}-label_pk`} 
+                                                type="number" 
+                                                className="bin form-control input-value"
+                                                disabled={readOnly}
+                                                value={disaggregationData[currentDisagg.pk].labels[labelObj.customsort - 1].value || ""}
+                                                onChange={(e) => handleDataEntry(e.target.value, currentDisagg.pk, labelObj.customsort)}
+                                            />
+                                        )
+                                    })
+                                }
+                            </div>
+                        </li>
                     )
                 }) 
             }
@@ -519,12 +617,12 @@ const DissaggregationFields = ({ indicatorID, disagg, disaggregationData, setDis
             </li>
 
             <li className="list-group-item reference-row">
-                <div className="item__label">{`Actual ${total[0].label} value`}</div>
+                <div className="item__label">{`Actual ${totals[0].label} value`}</div>
                 <div className="item__value--container">
                     {
                         disagg.map((currentDisagg, i) => {
                             return (
-                                <div key={currentDisagg.pk} className="bin">{parseInt(total[i].value || 0)}</div>
+                                <div key={i} className="bin">{parseInt(totals[i].value || 0)}</div>
                             )
                         })
                     }
