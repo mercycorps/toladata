@@ -96,9 +96,10 @@ const PCResultsForm = ({indicatorID, readOnly}) => {
         $(`#addResultModal_${indicatorID}`).on('shown.bs.modal', function () {
 
             $(`#addResultModal_${indicatorID}`).on('hidden.bs.modal', function () {
+                setDisaggregationArray([])
+                setDisaggregationData([])
                 setCommonFieldsInput({date_collected: "", fiscal_year: "FY 2022: 1 July 2021 - 30 June 2022"})
                 setEvidenceFieldsInput({})
-                setDisaggregationData([])
                 setOutcomeThemesData([])
                 setFormErrors({})
             })
@@ -113,8 +114,8 @@ const PCResultsForm = ({indicatorID, readOnly}) => {
                 .then(response => {
                     // console.log("Form received data!", response.disaggregations.disaggregations);
                     setOutcomeThemesData(formatOutcomeThemsData(response.outcome_themes));
-                    setDisaggregationData(handleReceivedDisaggregations(response.disaggregations.disaggregations));
-                    setDisaggregationArray(handleDataArray(response.disaggregations.disaggregations))
+                    setDisaggregationData(handleReceivedDisaggregations(response.disaggregations));
+                    setDisaggregationArray(handleDataArray(response.disaggregations))
                     // TODO: Update the commonFieldInputs and EvidenceFieldInputs with received data for an UPDATE request
                     // setCommonFieldsInput();
                     // setEvidenceFieldsInput();
@@ -194,7 +195,7 @@ const PCResultsForm = ({indicatorID, readOnly}) => {
                     formErrors={formErrors}
                     readOnly={readOnly}
                 />
-                {console.log(disaggregationData, disaggregationArray)}
+                {/* {console.log(disaggregationData, disaggregationArray)} */}
                 {/* {
                     disaggregationArray.map(disagg => {
                         if (disagg.disaggregation_type === "Actual with double counting" || disagg.disaggregation_type === "Actual without double counting") {
@@ -210,9 +211,9 @@ const PCResultsForm = ({indicatorID, readOnly}) => {
 
 
                 {/* <DissaggregationFields 
-                    disagg={[disaggregationData["649"],disaggregationData["648"]]} //------------------------
-                    total={[disaggregationData["652"].labels[0], disaggregationData["653"].labels[0]]} //-----------------
-                    title={"SADD (including unknown)"} //--------------------
+                    disagg={[disaggregationData["649"],disaggregationData["648"]]} 
+                    total={[disaggregationData["652"].labels[0], disaggregationData["653"].labels[0]]} 
+                    title={"SADD (including unknown)"}
                     indicatorID={indicatorID}
                     readOnly={readOnly}
                     helptext={helptext}
@@ -233,8 +234,8 @@ const PCResultsForm = ({indicatorID, readOnly}) => {
                                 <DissaggregationFields 
                                     key={disagg.disaggregation_type}
                                     disagg={disaggsSADD}
-                                    total={[disaggregationData["652"].labels[0], disaggregationData["653"].labels[0]]} //-----------------
-                                    title={"SADD (including unknown)"} //--------------------
+                                    total={[disaggregationData["652"].labels[0], disaggregationData["653"].labels[0]]}
+                                    title={"SADD (including unknown)"}
                                     indicatorID={indicatorID}
                                     readOnly={readOnly}
                                     helptext={helptext}
@@ -400,7 +401,7 @@ const ActualValueFields = ({ disaggregationData, disaggregationArray, setDisaggr
 
     const [actualWithDouble, setActualWithDouble] = useState({})
     const [actualWithoutDouble, setActualWithoutDouble] = useState({})
-    console.log('disaggregationArray', disaggregationArray);
+    // console.log('disaggregationArray', disaggregationArray);
     // useEffect(() => {
     //     disaggregationArray.map(disagg => {
     //         if (disagg.disaggregation_type === "Actual with double counting") {
