@@ -9,6 +9,7 @@ from tola.model_utils import get_serializer
 
 # Base indicator serializer - returns pk, name, level_pk, means_of_verification (one query)
 
+
 class IndicatorBaseSerializerMixin:
     """Indicator serializer component for basic indicator data."""
 
@@ -24,7 +25,8 @@ class IndicatorBaseSerializerMixin:
             'level_pk',
             'old_level_name',
             'means_of_verification',
-            'was_bulk_imported'
+            'was_bulk_imported',
+            'admin_type',
         ]
 
     # class methods to instantiate serializer and minimize queries:
@@ -32,7 +34,8 @@ class IndicatorBaseSerializerMixin:
     @classmethod
     def _get_query_fields(cls):
         """fields required for this serializer to return data without querying database again"""
-        return ['program_id', 'pk', 'name', 'level_id', 'old_level', 'means_of_verification', 'was_bulk_imported']
+        return ['program_id', 'pk', 'name', 'level_id', 'old_level', 'means_of_verification', 'was_bulk_imported',
+                'admin_type']
 
     @classmethod
     def get_queryset(cls, **kwargs):
