@@ -146,7 +146,7 @@ const PCResultsForm = ({indicatorID, readOnly}) => {
         if ( validateForm() ) {
 
             let data = [];
-            data = data.concat(formatFields({indicator: indicatorID, program: programID}))
+            data = data.concat(formatFields({indicator: indicatorID}))
             data = data.concat(formatFields(commonFieldsInput));
             data = data.concat(formatFields(evidenceFieldsInput));
             data = data.concat(formatDisaggregations());
