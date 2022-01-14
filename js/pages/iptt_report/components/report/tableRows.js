@@ -4,7 +4,7 @@ import { library } from '@fortawesome/fontawesome-svg-core';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import { faCaretDown, faCaretRight, faPlusCircle } from '@fortawesome/free-solid-svg-icons';
 import {BLANK_TABLE_CELL} from '../../../../constants';
-import PCResultsForm from "../../../../components/resultsFormPC.js"
+import { PCResultsForm } from "../../../results_form_PC/resultsFormPC.js"
 
 library.add(faCaretDown, faCaretRight);
 

@@ -1,6 +1,6 @@
 import React, { useContext } from 'react';
 import HelpPopover from "../../../components/helpPopover";
-import PCResultsForm from "../../../components/resultsFormPC";
+import { PCResultsForm } from "../../results_form_PC/resultsFormPC";
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome'
 import { FaRegQuestionCircle } from 'react-icons/fa';
 import { faBullseye, faPlusCircle } from '@fortawesome/free-solid-svg-icons'
