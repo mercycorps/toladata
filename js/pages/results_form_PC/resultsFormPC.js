@@ -115,12 +115,12 @@ const PCResultsForm = ({indicatorID, readOnly}) => {
 
             api.getPCountResultsData(indicatorID)
                 .then(response => {
-                    // console.log("Form received data!", response.disaggregations.disaggregations);
+                    console.log("Form received data!", response);
                     setOutcomeThemesData(formatOutcomeThemsData(response.outcome_themes));
                     setDisaggregationData(handleReceivedDisaggregations(response.disaggregations));
                     setDisaggregationArray(handleDataArray(response.disaggregations))
                     // TODO: Update the commonFieldInputs and EvidenceFieldInputs with received data for an UPDATE request
-                    // setCommonFieldsInput();
+                    setCommonFieldsInput({...commonFieldsInput, program_start_date: response.program_start_date, program_end_date: response.program_end_date});
                     // setEvidenceFieldsInput();
                 })
         })
@@ -138,7 +138,7 @@ const PCResultsForm = ({indicatorID, readOnly}) => {
     const [disaggregationData, setDisaggregationData] = useState([]);
     const [disaggregationArray, setDisaggregationArray] = useState([]);
     const [evidenceFieldsInput, setEvidenceFieldsInput] = useState({});
-    const [commonFieldsInput, setCommonFieldsInput] = useState({fiscal_year: "FY 2022: 1 July 2021 - 30 June 2022", start: '2021-07-01', end: '2022-06-30'}); // TODO: receive start, and end dates from GET request. Calculate fiscal year based on those dates.
+    const [commonFieldsInput, setCommonFieldsInput] = useState({fiscal_year: "FY 2022: 1 July 2021 - 30 June 2022"}); // TODO: receive start, and end dates from GET request. Calculate fiscal year based on those dates.
     const [formErrors, setFormErrors] = useState({});
 
     let handleSubmit = (e) => {

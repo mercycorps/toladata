@@ -21,8 +21,8 @@ const CommonFields = ({ commonFieldsInput, setCommonFieldsInput, outcomeThemesDa
                     required
                     autoComplete="off"
                     disabled={readOnly}
-                    min={commonFieldsInput.start}
-                    max={commonFieldsInput.end}
+                    min={commonFieldsInput.program_start_date}
+                    max={commonFieldsInput.program_end_date}
                     value={commonFieldsInput.date_collected || ""}
                     onChange={(e) => setCommonFieldsInput({...commonFieldsInput, [e.target.name]: e.target.value})}
                 />
