@@ -197,8 +197,8 @@ const api = {
                 return error.response;
             })
     },
-    async savePCountResultsData(indicator_id, form_data) {
-        return await this.apiInstance.post(`/pcount_result_create/${indicator_id}`,
+    async createPCountResult(indicator_id, form_data) {
+        return await this.indicatorsInstance.post(`/result_add/${indicator_id}/`,
             form_data, {headers: {'Content-Type': 'multipart/form-data'}})
             .then(response => {
                 return response.data;
