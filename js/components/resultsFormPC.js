@@ -12,7 +12,7 @@ const PCResultsForm = ({indicatorID, readOnly}) => {
         652: gettext("Direct participants – are those who have received a tangible benefit from the program, either as the actual program participants or the intended recipients of the program benefits. Indirect participants – are those who received a tangible benefit through their proximity to or contact with program participants or activities."),
         653: gettext("Direct participants – are those who have received a tangible benefit from the program, either as the actual program participants or the intended recipients of the program benefits. Indirect participants – are those who received a tangible benefit through their proximity to or contact with program participants or activities."),
     };
-    
+
     let handleReceivedDisaggregations = (disaggregations_data) => {
         return disaggregations_data.reduce((formated, disagg, i) => {
             formated[disagg.pk] = {...disagg, sort_order: i};
@@ -148,7 +148,7 @@ const PCResultsForm = ({indicatorID, readOnly}) => {
             data = data.concat(formatFields(commonFieldsInput));
             data = data.concat(formatFields(evidenceFieldsInput));
             data = data.concat(formatDisaggregations());
-    
+
             // console.log("Data", data);
             let form_data = new FormData;
             data.map(currentData => {
@@ -160,7 +160,7 @@ const PCResultsForm = ({indicatorID, readOnly}) => {
                     // TODO: Add action after the form is sent
                 })
         }
-        
+
     }
     // if (Object.keys(disaggregationData).length > 0) {
     if (disaggregationArray.length > 0) {
@@ -210,9 +210,9 @@ const PCResultsForm = ({indicatorID, readOnly}) => {
 
 
 
-                {/* <DissaggregationFields 
-                    disagg={[disaggregationData["649"],disaggregationData["648"]]} 
-                    total={[disaggregationData["652"].labels[0], disaggregationData["653"].labels[0]]} 
+                {/* <DissaggregationFields
+                    disagg={[disaggregationData["649"],disaggregationData["648"]]}
+                    total={[disaggregationData["652"].labels[0], disaggregationData["653"].labels[0]]}
                     title={"SADD (including unknown)"}
                     indicatorID={indicatorID}
                     readOnly={readOnly}
@@ -231,7 +231,7 @@ const PCResultsForm = ({indicatorID, readOnly}) => {
                                 return arrSADD;
                             }, []);
                             return (
-                                <DissaggregationFields 
+                                <DissaggregationFields
                                     key={disagg.disaggregation_type}
                                     disagg={disaggsSADD}
                                     total={[disaggregationData["652"].labels[0], disaggregationData["653"].labels[0]]}
@@ -248,7 +248,7 @@ const PCResultsForm = ({indicatorID, readOnly}) => {
                         }
                         if (disagg.disaggregation_type.includes('Sectors')) {
                             return (
-                                <DissaggregationFields 
+                                <DissaggregationFields
                                     key={disagg.disaggregation_type}
                                     disagg={[disagg]}
                                     total={[disaggregationData["653"].labels[0]]}
@@ -264,7 +264,7 @@ const PCResultsForm = ({indicatorID, readOnly}) => {
                         }
                     })
                 }
-                {/* <DissaggregationFields 
+                {/* <DissaggregationFields
                     disagg={[disaggregationData["650"]]}
                     total={[disaggregationData["653"].labels[0]]}
                     indicatorID={indicatorID}
@@ -274,7 +274,7 @@ const PCResultsForm = ({indicatorID, readOnly}) => {
                     disaggregationData={disaggregationData}
                     setDisaggregationData={setDisaggregationData}
                 />
-                <DissaggregationFields 
+                <DissaggregationFields
                     disagg={[disaggregationData["651"]]}
                     total={[disaggregationData["653"].labels[1]]}
                     indicatorID={indicatorID}
@@ -291,19 +291,19 @@ const PCResultsForm = ({indicatorID, readOnly}) => {
                     formErrors={formErrors}
                     readOnly={readOnly}
                 />
-                {!readOnly && 
+                {!readOnly &&
                 <div className="form-actions">
                     <div>
-                        <button 
-                            type="button" 
-                            className="btn btn-primary result-group" 
-                            id="result-submit-create" 
+                        <button
+                            type="button"
+                            className="btn btn-primary result-group"
+                            id="result-submit-create"
                             onClick={(e) => handleSubmit(e)}
                         >{gettext('Save and close')}
                         </button>
-                        <button 
-                            type="button" 
-                            className="btn btn-reset result-group" 
+                        <button
+                            type="button"
+                            className="btn btn-reset result-group"
                             id="result-cancel-btn"
                             data-dismiss="modal"
                         >{gettext('Cancel')}
@@ -333,10 +333,10 @@ const CommonFields = ({ commonFieldsInput, setCommonFieldsInput, outcomeThemesDa
                 <HelpText text={gettext('If data collection occurred within the fiscal year, enter the date where data was collected. If data collection occurred after the end of the fiscal year, enter the last day of the fiscal year (June 30).')}/>
 
 
-                <input 
-                    type="date" 
-                    name="date_collected" 
-                    id="id_date_collected" 
+                <input
+                    type="date"
+                    name="date_collected"
+                    id="id_date_collected"
                     className={`datepicker form-control hasDatepicker ${formErrors.date_collected && "is-invalid"}`}
                     required
                     autoComplete="off"
@@ -357,12 +357,12 @@ const CommonFields = ({ commonFieldsInput, setCommonFieldsInput, outcomeThemesDa
 
                 <HelpText text={gettext('Fiscal years run from July 1 to June 30 of the following year.')}/>
 
-                <input 
-                    type="text" 
-                    name="fiscal_year" 
-                    id="id_fiscal_year" 
-                    className="form-control" 
-                    required autoComplete="off" 
+                <input
+                    type="text"
+                    name="fiscal_year"
+                    id="id_fiscal_year"
+                    className="form-control"
+                    required autoComplete="off"
                     disabled
                     value={commonFieldsInput.fiscal_year}
                     onChange={(e) => setCommonFieldsInput({...commonFieldsInput, [e.target.name]: e.target.value})}
@@ -375,7 +375,7 @@ const CommonFields = ({ commonFieldsInput, setCommonFieldsInput, outcomeThemesDa
                 <HelpText text={gettext('Outcome themes are the main areas of a program. Refer to MEL Tip Sheet: Guidelines on Counting and Reporting Participant Numbers <a tabIndex="1" href="https://library.mercycorps.org/record/16929?ln=en" target="_blank">[link: https://library.mercycorps.org/record/16929?ln=en]</a> for a description of outcome themes.<span>')}/>
 
 
-                <CheckboxedMultiSelect 
+                <CheckboxedMultiSelect
                     options={outcomeThemesData}
                     placeholder={gettext("None Selected")}
                     className={`${formErrors.outcome_theme && "is-invalid"}`}
@@ -420,7 +420,7 @@ const ActualValueFields = ({ disaggregationData, disaggregationArray, setDisaggr
         update[inputDisaggPk].labels[inputLabelIndex] = {...disaggregationData[inputDisaggPk].labels[inputLabelIndex], value: value};
         setDisaggregationData(update);
     }
-    
+
     return (
         <fieldset>
             <ul className="list-group form-list-group">
@@ -429,7 +429,7 @@ const ActualValueFields = ({ disaggregationData, disaggregationArray, setDisaggr
                         <div className="item__label">
                             <label className="label--required">{gettext('Total Participant Actual Values')}</label>
 
-                            <HelpText 
+                            <HelpText
                                 text={gettext('Include the participants with double counting on the left and participants without double counting across programs on the right. If two programs share participants, only discount double counting in one program!<br/><br/><strong>Direct participants</strong> – are those who have received a tangible benefit from the program, either as the actual program participants or the intended recipients of the program benefits.<br/><br/><strong>Indirect participants</strong> – are those who received a tangible benefit through their proximity to or contact with program participants or activities.')}
                             />
 
@@ -444,8 +444,8 @@ const ActualValueFields = ({ disaggregationData, disaggregationArray, setDisaggr
                 <li className="list-group-item">
                     <div className="item__label">{gettext("Actual Direct value")}</div>
                     <div className="item__value--container">
-                        <input 
-                            type="number" 
+                        <input
+                            type="number"
                             className="bin form-control input-value"
                             // name={`${actualWithDouble.disaggregation_type}_${actualWithDouble.count_type}_doubleCounting-${actualWithDouble.double_counting}`}
                             // name={`id_${actualWithDouble.disaggregation_type}_${actualWithDouble.count_type}_doubleCounting-${actualWithDouble.double_counting}`}
@@ -456,9 +456,9 @@ const ActualValueFields = ({ disaggregationData, disaggregationArray, setDisaggr
                             value={disaggregationData["652"].labels[0].value || ""}
                             onChange={(e) => handleDataEntry(e.target.value, 652, 0)}
                         />
-                        <input 
-                            type="number" 
-                            className="bin form-control input-value" 
+                        <input
+                            type="number"
+                            className="bin form-control input-value"
                             name={`${disaggregationData["653"].disaggregation_type}-${disaggregationData["653"].labels[0]}`}
                             id={`id_${disaggregationData["653"].disaggregation_type}-${disaggregationData["653"].labels[0]}`}
                             disabled={readOnly}
@@ -472,18 +472,18 @@ const ActualValueFields = ({ disaggregationData, disaggregationArray, setDisaggr
                 <li className="list-group-item">
                     <div className="item__label">{gettext("Actual Indirect value")}</div>
                     <div className="item__value--container">
-                        <input 
-                            type="number" 
-                            className="bin form-control input-value" 
+                        <input
+                            type="number"
+                            className="bin form-control input-value"
                             name={`${disaggregationData["652"].disaggregation_type}-${disaggregationData["652"].labels[1]}`}
                             id={`id_${disaggregationData["652"].disaggregation_type}-${disaggregationData["652"].labels[1]}`}
                             disabled={readOnly}
                             value={disaggregationData["652"].labels[1].value || ""}
                             onChange={(e) => handleDataEntry(e.target.value, 652, 1)}
                         />
-                        <input 
-                            type="number" 
-                            className="bin form-control input-value" 
+                        <input
+                            type="number"
+                            className="bin form-control input-value"
                             name={`${disaggregationData["653"].disaggregation_type}-${disaggregationData["653"].labels[1]}`}
                             id={`id_${disaggregationData["653"].disaggregation_type}-${disaggregationData["653"].labels[1]}`}
                             disabled={readOnly}
@@ -524,7 +524,7 @@ const DissaggregationFields = ({ indicatorID, disagg, disaggregationData, disagg
         let totalDisagg = disaggregationArray && disaggregationArray.filter(currentDisagg => {
             return currentDisagg.disaggregation_type.includes("Actual") &&
             currentDisagg.double_counting === currentDisaggregation.double_counting
-            
+
         })
         let sumVal = disaggregationArray && totalDisagg[0].labels.filter(labelObj => labelObj.label === currentDisaggregation.count_type)[0]
         labelsArr.unshift(sumVal)
@@ -582,11 +582,11 @@ const DissaggregationFields = ({ indicatorID, disagg, disaggregationData, disagg
                                 {
                                     disagg.map(currentDisagg => {
                                         return (
-                                            <input 
+                                            <input
                                                 key={`id_${disaggID}-${currentDisagg.pk}-${labelObj.customsort}`}
                                                 id={`id_${disaggID}-${currentDisagg.pk}-${labelObj.customsort}`}
-                                                name={`disaggregation-formset-${disaggID}-${labelObj.customsort}-label_pk`} 
-                                                type="number" 
+                                                name={`disaggregation-formset-${disaggID}-${labelObj.customsort}-label_pk`}
+                                                type="number"
                                                 className="bin form-control input-value"
                                                 disabled={readOnly}
                                                 value={disaggregationData[currentDisagg.pk].labels[labelObj.customsort - 1].value || ""}
@@ -598,7 +598,7 @@ const DissaggregationFields = ({ indicatorID, disagg, disaggregationData, disagg
                             </div>
                         </li>
                     )
-                }) 
+                })
             }
 
             <li className="list-group-item sum-row">
@@ -652,17 +652,22 @@ const EvidenceFields = ({ evidenceFieldsInput, setEvidenceFieldsInput, formError
         }
     }, [evidenceFieldsInput.evidence_url])
 
+     let handleGDrive  = (e) => {
+        e.preventDefault();
+        gdriveFilePicker(filePickerCallback);
+    }
+
     return (
         <fieldset className="card card-body bg-primary-light border-0">
             <h3>
-                {   
-                    // # Translators: 
+                {
+                    // # Translators:
                     gettext('Evidence')
                 }
             </h3>
             <p>
-                {   
-                    // # Translators: 
+                {
+                    // # Translators:
                     gettext('Link this result to a record or folder of records that serves as evidence.')
                 }
             </p>
@@ -675,56 +680,56 @@ const EvidenceFields = ({ evidenceFieldsInput, setEvidenceFieldsInput, formError
                     }
                 </label>
 
-                <HelpText 
+                <HelpText
                     text={ gettext('Provide a link to a file or folder in Google Drive or another shared network drive. Please be aware that TolaData does not store a copy of your record, <i>so you should not link to something on your personal computer, as no one else will be able to access it.</i>')}
                 />
 
                 <div className="d-flex btn-group">
-                    <input 
-                        type="text" 
-                        name="evidence_url" 
-                        id="id_evidence_url" 
-                        maxLength="255" 
+                    <input
+                        type="text"
+                        name="evidence_url"
+                        id="id_evidence_url"
+                        maxLength="255"
                         className="form-control"
                         disabled={readOnly}
                         value={evidenceFieldsInput.evidence_url || ""}
                         onChange={(e) => setEvidenceFieldsInput({...evidenceFieldsInput, [e.target.name]: e.target.value})}
                     />
 
-                    <button 
-                        type="button" 
-                        id="id_view_evidence_button" 
+                    <button
+                        type="button"
+                        id="id_view_evidence_button"
                         className="btn btn-sm btn-secondary evidence-view__btn"
                         disabled={!validEvidenceURL}
                         onClick={() => window.open(evidenceFieldsInput.evidence_url, '_blank')}
                     >{gettext('view')}</button>
-                    <button 
-                        type="button" 
-                        id="id_browse_google_drive" 
+                    <button
+                        type="button"
+                        id="id_browse_google_drive"
                         className="btn btn-sm btn-link text-nowrap"
                         disabled={readOnly}
-                        onClick={() => alert("Google")}
+                        onClick={(event) => handleGDrive(event)}
                     >
                         <i className="fas fa-external-link-alt"></i>{gettext('Browse Google Drive')}
                     </button>
                 </div>
                 {
-                    formErrors.evidence_url && 
+                    formErrors.evidence_url &&
                         <span id="validation_id_evidence_url" className="has-error">{formErrors.evidence_url}</span>
                 }
 
                 <div className="form-group" id="div_id_record_name">
                     <label htmlFor="id_record_name">{gettext("Record name")}&nbsp;</label>
 
-                    <HelpText 
+                    <HelpText
                         text={gettext('Give your record a short name that is easy to remember.')}
                     />
 
-                    <input 
-                        type="text" 
-                        name="record_name" 
-                        id="id_record_name" 
-                        className="form-control" 
+                    <input
+                        type="text"
+                        name="record_name"
+                        id="id_record_name"
+                        className="form-control"
                         maxLength="135"
                         disabled={readOnly}
                         value={evidenceFieldsInput.record_name || ""}
