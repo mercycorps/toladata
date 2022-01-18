@@ -41,7 +41,7 @@ from workflow.models import (
 from indicators.serializers import (
     IndicatorSerializer
 )
-from indicators.serializers_new.participant_count_serializers import ParticipantCountIndicatorSerializer
+from indicators.serializers_new.participant_count_serializers import ParticipantCountDisaggregationSerializer
 from indicators.views.view_utils import (
     import_indicator,
     generate_periodic_targets,
@@ -52,7 +52,8 @@ from indicators.models import (
     Indicator,
     PeriodicTarget,
     Result,
-    OutcomeTheme
+    OutcomeTheme,
+    DisaggregationType
 )
 from indicators.queries import ProgramWithMetrics, ResultsIndicator
 from indicators import indicator_plan as ip
@@ -141,9 +142,14 @@ def participant_count_result_create_for_indicator(request, pk, *args, **kwargs):
         return JsonResponse({"message": "Got some data!", "data": request.data})
 
     verify_program_access_level(request, indicator.program.pk, 'low')
+    disagg_queryset = DisaggregationType.objects.filter(indicator__pk=indicator.pk)
     return_dict = {
         'outcome_themes': list(OutcomeTheme.objects.filter(is_active=True).values_list('pk', 'name')),
-        **ParticipantCountIndicatorSerializer(indicator).data,
+        'program_start_date': indicator.program.reporting_period_start,
+        'program_end_date': indicator.program.reporting_period_end,
+        'periodic_target': indicator.periodictargets.order_by('-customsort').values('id', 'period').first(),
+        'disaggregations': ParticipantCountDisaggregationSerializer(
+            disagg_queryset, many=True, context={'result_pk': None}).data,
     }
     return JsonResponse(return_dict)
 
