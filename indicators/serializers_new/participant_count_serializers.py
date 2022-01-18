@@ -47,11 +47,11 @@ class ParticipantCountDisaggValueSerializer(serializers.ModelSerializer):
 
 class ParticipantCountDisaggLabelValueSerializer(serializers.ModelSerializer):
     value = serializers.SerializerMethodField()
-    label_id = serializers.IntegerField(source='pk')
+    disaggregationlabel_id = serializers.IntegerField(source='pk')
 
     class Meta:
         model = DisaggregationLabel
-        fields = ['label_id', 'label', 'customsort', 'value']
+        fields = ['disaggregationlabel_id', 'label', 'customsort', 'value']
 
     def get_value(self, obj):
         if obj.pk in self.context['disagg_values_by_label_pk']:
@@ -61,7 +61,7 @@ class ParticipantCountDisaggLabelValueSerializer(serializers.ModelSerializer):
     def to_representation(self, instance):
         representation = super().to_representation(instance)
         value_obj = representation.pop('value')
-        representation['value_id'] = value_obj.get('pk', None)
+        representation['disaggregatedvalue_id'] = value_obj.get('pk', None)
         representation['value'] = value_obj.get('value', None)
         return representation
 
