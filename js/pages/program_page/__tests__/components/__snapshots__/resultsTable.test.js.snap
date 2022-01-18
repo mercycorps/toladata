@@ -387,7 +387,7 @@ exports[`Results table component result rows for an annual indicator with result
     />
     <div
       className="modal fade"
-      id="addResultModal_99"
+      id="resultModal_99"
       role="dialog"
     >
       <div
@@ -590,7 +590,7 @@ exports[`Results table component with a valid indicator and editing privileges c
     />
     <div
       className="modal fade"
-      id="addResultModal_105"
+      id="resultModal_105"
       role="dialog"
     >
       <div
@@ -1023,7 +1023,7 @@ exports[`Results table component with a valid indicator and editing privileges c
     />
     <div
       className="modal fade"
-      id="addResultModal_99"
+      id="resultModal_99"
       role="dialog"
     >
       <div
@@ -1295,7 +1295,7 @@ exports[`Results table component with a valid indicator and editing privileges c
     />
     <div
       className="modal fade"
-      id="addResultModal_108"
+      id="resultModal_108"
       role="dialog"
     >
       <div
@@ -1866,7 +1866,7 @@ exports[`Results table component with a valid indicator and editing privileges c
     />
     <div
       className="modal fade"
-      id="addResultModal_109"
+      id="resultModal_109"
       role="dialog"
     >
       <div
@@ -2069,7 +2069,7 @@ exports[`Results table component with a valid indicator and editing privileges m
     />
     <div
       className="modal fade"
-      id="addResultModal_105"
+      id="resultModal_105"
       role="dialog"
     >
       <div
@@ -2502,7 +2502,7 @@ exports[`Results table component with a valid indicator and editing privileges m
     />
     <div
       className="modal fade"
-      id="addResultModal_99"
+      id="resultModal_99"
       role="dialog"
     >
       <div
@@ -2774,7 +2774,7 @@ exports[`Results table component with a valid indicator and editing privileges m
     />
     <div
       className="modal fade"
-      id="addResultModal_108"
+      id="resultModal_108"
       role="dialog"
     >
       <div
@@ -3345,7 +3345,7 @@ exports[`Results table component with a valid indicator and editing privileges m
     />
     <div
       className="modal fade"
-      id="addResultModal_109"
+      id="resultModal_109"
       role="dialog"
     >
       <div
@@ -3548,7 +3548,7 @@ exports[`Results table component with a valid indicator and no editing privilege
     />
     <div
       className="modal fade"
-      id="addResultModal_105"
+      id="resultModal_105"
       role="dialog"
     >
       <div
@@ -3954,7 +3954,7 @@ exports[`Results table component with a valid indicator and no editing privilege
     />
     <div
       className="modal fade"
-      id="addResultModal_99"
+      id="resultModal_99"
       role="dialog"
     >
       <div
@@ -4199,7 +4199,7 @@ exports[`Results table component with a valid indicator and no editing privilege
     />
     <div
       className="modal fade"
-      id="addResultModal_108"
+      id="resultModal_108"
       role="dialog"
     >
       <div
@@ -4743,7 +4743,7 @@ exports[`Results table component with a valid indicator and no editing privilege
     />
     <div
       className="modal fade"
-      id="addResultModal_109"
+      id="resultModal_109"
       role="dialog"
     >
       <div
@@ -4803,7 +4803,7 @@ exports[`Results table component with an indicator with no targets and no freque
     </div>
     <div
       className="modal fade"
-      id="addResultModal_112"
+      id="resultModal_112"
       role="dialog"
     >
       <div
@@ -4890,7 +4890,7 @@ exports[`Results table component with an indicator with no targets and no freque
     </div>
     <div
       className="modal fade"
-      id="addResultModal_112"
+      id="resultModal_112"
       role="dialog"
     >
       <div
@@ -4952,7 +4952,7 @@ exports[`Results table component with an indicator with no targets and no freque
     </div>
     <div
       className="modal fade"
-      id="addResultModal_112"
+      id="resultModal_112"
       role="dialog"
     >
       <div
@@ -4987,7 +4987,7 @@ exports[`Results table component with an indicator with no targets and no freque
     </div>
     <div
       className="modal fade"
-      id="addResultModal_112"
+      id="resultModal_112"
       role="dialog"
     >
       <div
