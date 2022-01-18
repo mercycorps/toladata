@@ -98,10 +98,6 @@
             let doc = data[google.picker.Response.DOCUMENTS][0];
             let url = doc[google.picker.Document.URL];
             let id = doc[google.picker.Document.ID];
-            console.log("URL: " + url);
-            // console.log("ID: " + id);
-            // console.log("name:" + doc['name']);
-
             userCallback(doc['name'], url);
         }
     }
