@@ -32,20 +32,19 @@ const CommonFields = ({ commonFieldsInput, setCommonFieldsInput, outcomeThemesDa
                 }
             </div>
 
-            <div className="form-group" id="div_id_fiscal_year">
-                <label htmlFor="id_fiscal_year" className="label--required">{gettext('Fiscal year')}</label>
+            <div className="form-group" id="div_id_periodic_target">
+                <label htmlFor="id_periodic_target" className="label--required">{gettext('Fiscal year')}</label>
 
                 <HelpText text={gettext('Fiscal years run from July 1 to June 30 of the following year.')}/>
 
                 <input 
                     type="text" 
-                    name="fiscal_year" 
-                    id="id_fiscal_year" 
+                    name="periodic_target" 
+                    id="id_periodic_target" 
                     className="form-control" 
                     required autoComplete="off" 
                     disabled
-                    value={commonFieldsInput.fiscal_year}
-                    onChange={(e) => setCommonFieldsInput({...commonFieldsInput, [e.target.name]: e.target.value})}
+                    value={commonFieldsInput.periodic_target && commonFieldsInput.periodic_target.period || ""}
                 />
             </div>
 

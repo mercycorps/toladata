@@ -119,8 +119,7 @@ const PCResultsForm = ({indicatorID="", resultID="", readOnly}) => {
                         setOutcomeThemesData(formatOutcomeThemsData(response.outcome_themes));
                         setDisaggregationData(handleReceivedDisaggregations(response.disaggregations));
                         setDisaggregationArray(handleDataArray(response.disaggregations))
-                        // TODO: Update the commonFieldInputs and EvidenceFieldInputs with received data for an UPDATE request
-                        setCommonFieldsInput({...commonFieldsInput, program_start_date: response.program_start_date, program_end_date: response.program_end_date});
+                        setCommonFieldsInput({program_start_date: response.program_start_date, program_end_date: response.program_end_date, periodic_target: response.periodic_target});
                         // setEvidenceFieldsInput();
                     })
             } else {
@@ -152,7 +151,7 @@ const PCResultsForm = ({indicatorID="", resultID="", readOnly}) => {
     const [disaggregationData, setDisaggregationData] = useState([]);
     const [disaggregationArray, setDisaggregationArray] = useState([]);
     const [evidenceFieldsInput, setEvidenceFieldsInput] = useState({});
-    const [commonFieldsInput, setCommonFieldsInput] = useState({fiscal_year: "FY 2022: 1 July 2021 - 30 June 2022"}); // TODO: receive start, and end dates from GET request. Calculate fiscal year based on those dates.
+    const [commonFieldsInput, setCommonFieldsInput] = useState({}); // TODO: receive start, and end dates from GET request. Calculate fiscal year based on those dates.
     const [formErrors, setFormErrors] = useState({});
 
     let handleSubmit = (e) => {
