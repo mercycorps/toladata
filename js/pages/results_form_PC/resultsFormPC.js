@@ -7,7 +7,7 @@ import { DisaggregationFields } from './components/DisaggregationFields.js'
 import api from '../../apiv2';
 
 
-const PCResultsForm = ({indicatorID, readOnly}) => {
+const PCResultsForm = ({indicatorID="", resultID="", readOnly}) => {
     const helptext = {
         "649-648": gettext("Only include SADD for Direct participants."),
         650: gettext("Provide a disaggregation of participants reached by sector. Only provide the figure with double counting. Refer to MEL Tip Sheet: Guidelines on Counting and Reporting Participant Numbers <a href='https://library.mercycorps.org/record/16929?ln=en' target='_blank'>[link: https://library.mercycorps.org/record/16929?ln=en]</a> for a description of outcome themes."),
@@ -96,9 +96,9 @@ const PCResultsForm = ({indicatorID, readOnly}) => {
     }
 
     useEffect(() => {
-        $(`#addResultModal_${indicatorID}`).on('shown.bs.modal', function () {
 
-            $(`#addResultModal_${indicatorID}`).on('hidden.bs.modal', function () {
+        $(`#resultModal_${formID}`).on('shown.bs.modal', function () {
+            $(`#resultModal_${formID}`).on('hidden.bs.modal', function () {
                 setDisaggregationArray([])
                 setDisaggregationData([])
                 setCommonFieldsInput({date_collected: "", fiscal_year: "FY 2022: 1 July 2021 - 30 June 2022"})
@@ -109,20 +109,33 @@ const PCResultsForm = ({indicatorID, readOnly}) => {
 
             $(document).on("keyup", function(event) {
                 if(event.key === 'Escape') {
-                    $(`#addResultModal_${indicatorID}`).modal('hide');
+                    $(`#resultModal_${formID}`).modal('hide');
                 }
             })
-
-            api.getPCountResultsData(indicatorID)
-                .then(response => {
-                    console.log("Form received data!", response);
-                    setOutcomeThemesData(formatOutcomeThemsData(response.outcome_themes));
-                    setDisaggregationData(handleReceivedDisaggregations(response.disaggregations));
-                    setDisaggregationArray(handleDataArray(response.disaggregations))
-                    // TODO: Update the commonFieldInputs and EvidenceFieldInputs with received data for an UPDATE request
-                    setCommonFieldsInput({...commonFieldsInput, program_start_date: response.program_start_date, program_end_date: response.program_end_date});
-                    // setEvidenceFieldsInput();
-                })
+            if (indicatorID) {
+                api.getPCountResultsData(indicatorID)
+                    .then(response => {
+                        console.log("Form received data!", response);
+                        setOutcomeThemesData(formatOutcomeThemsData(response.outcome_themes));
+                        setDisaggregationData(handleReceivedDisaggregations(response.disaggregations));
+                        setDisaggregationArray(handleDataArray(response.disaggregations))
+                        // TODO: Update the commonFieldInputs and EvidenceFieldInputs with received data for an UPDATE request
+                        setCommonFieldsInput({...commonFieldsInput, program_start_date: response.program_start_date, program_end_date: response.program_end_date});
+                        // setEvidenceFieldsInput();
+                    })
+            } else {
+                // TODO get data using the resultID
+                // api.getPCountResultsData(indicatorID)
+                // .then(response => {
+                //     console.log("Form received data!", response);
+                //     setOutcomeThemesData(formatOutcomeThemsData(response.outcome_themes));
+                //     setDisaggregationData(handleReceivedDisaggregations(response.disaggregations));
+                //     setDisaggregationArray(handleDataArray(response.disaggregations))
+                //     // TODO: Update the commonFieldInputs and EvidenceFieldInputs with received data for an UPDATE request
+                //     setCommonFieldsInput({...commonFieldsInput, program_start_date: response.program_start_date, program_end_date: response.program_end_date});
+                //     // setEvidenceFieldsInput();
+                // })
+            }
         })
     }, [])
 
@@ -134,6 +147,7 @@ const PCResultsForm = ({indicatorID, readOnly}) => {
         }, []);
     }
 
+    let formID = indicatorID ? indicatorID : resultID;
     const [outcomeThemesData, setOutcomeThemesData] = useState([]);
     const [disaggregationData, setDisaggregationData] = useState([]);
     const [disaggregationArray, setDisaggregationArray] = useState([]);
@@ -156,11 +170,19 @@ const PCResultsForm = ({indicatorID, readOnly}) => {
             data.map(currentData => {
                 form_data.append(currentData["name"], currentData["value"]);
             })
-            api.savePCountResultsData(indicatorID, form_data)
-                .then(response => {
-                    console.log("Saved Form Data!");
-                    // TODO: Add action after the form is sent
-                })
+            if (indicatorID) {
+                api.savePCountResultsData(indicatorID, form_data)
+                    .then(response => {
+                        console.log("Saved Form Data!");
+                        // TODO: Add action after the form is sent
+                    })
+                } else {
+                api.updatePCountResultsData(resultID, form_data)
+                    .then(response => {
+                        console.log("Saved Form Data!");
+                        // TODO: Add action after the form is sent
+                    })
+            }
         }
         
     }
@@ -238,7 +260,7 @@ const PCResultsForm = ({indicatorID, readOnly}) => {
                                     disagg={disaggsSADD}
                                     total={[disaggregationData["652"].labels[0], disaggregationData["653"].labels[0]]}
                                     title={"SADD (including unknown)"}
-                                    indicatorID={indicatorID}
+                                    indicatorID={formID}
                                     readOnly={readOnly}
                                     helptext={helptext}
                                     formErrors={formErrors}
@@ -254,7 +276,7 @@ const PCResultsForm = ({indicatorID, readOnly}) => {
                                     key={disagg.disaggregation_type}
                                     disagg={[disagg]}
                                     total={[disaggregationData["653"].labels[0]]}
-                                    indicatorID={indicatorID}
+                                    indicatorID={formID}
                                     readOnly={readOnly}
                                     helptext={helptext}
                                     formErrors={formErrors}

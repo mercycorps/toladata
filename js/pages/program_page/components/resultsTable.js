@@ -65,15 +65,40 @@ class ProgressPopover extends React.Component {
 /**
  * the cells in the results table containing result date, value, and evidence link, with formatting
  */
-const ResultCells = ({ result, noTarget, ...props }) => {
+const ResultCells = ({ result, noTarget, resultEditable, admin_type, ...props }) => {
     const localizer = useContext(LocalizerContext);
     let noTargetsClass = noTarget ? " bg-danger-lighter" : "";
     return (
         <React.Fragment>
             <td className={`results__result--date ${noTargetsClass}`} >
-                <a href={`/indicators/result_update/${ result.pk }/`} className="results__link">
-                    { result.dateCollected }
-                </a>
+
+                {admin_type !== 0 ?
+                    <a href={`/indicators/result_update/${ result.pk }/`} className="results__link">
+                        { result.dateCollected }
+                    </a>
+                :
+                    <React.Fragment>
+                        <div className="modal fade" id={`resultModal_${ result.pk }`} role="dialog">
+                        <div className="modal-dialog modal-lg">
+                            <div className="modal-content">
+                                <div className="modal-body">
+                                    <PCResultsForm
+                                        resultID={result.pk}
+                                        readOnly={!resultEditable}
+                                    />
+                                </div>
+                            </div>
+                        </div>
+                        </div>
+                        <a 
+                            data-toggle="modal"
+                            data-target={`#resultModal_${ result.pk }`}
+                            className="results__link--pc"
+                        >
+                            { result.dateCollected }
+                        </a>
+                    </React.Fragment>
+                }
             </td>
             <td className={`results__result--value ${noTargetsClass}`}>
                 { localizer(result.achieved) }
@@ -93,7 +118,7 @@ const ResultCells = ({ result, noTarget, ...props }) => {
  *  - includes supplemental result rows if more than one result for this target period
  *  - includes progress summation row if this target period is the most recently completed one
  */
-const TargetPeriodRows = ({target, indicator, ...props}) => {
+const TargetPeriodRows = ({target, indicator, resultEditable, ...props}) => {
     const localizer = useContext(LocalizerContext);
     let rowspan = target.results.length || 1;
     return (
@@ -125,7 +150,7 @@ const TargetPeriodRows = ({target, indicator, ...props}) => {
                 }
                 </td>
                 {(target.results && target.results.length > 0) ?
-                    <ResultCells result={ target.results[0] } noTarget={ false }/> :
+                    <ResultCells result={ target.results[0] } noTarget={ false } admin_type={indicator.admin_type} resultEditable={resultEditable}/> :
                     <React.Fragment>
                         <td className="results__result--nodata" colSpan="2">
                         {
@@ -143,7 +168,7 @@ const TargetPeriodRows = ({target, indicator, ...props}) => {
               **/}
             {target.results.length > 1 && target.results.slice(1).map((result, idx) => (
                 <tr key={idx} className={(indicator.timeAware && target.completed) ? "results__row--supplemental pt-ended" : "results__row--supplemental"} >
-                    <ResultCells result={ result } noTarget={ false } />
+                    <ResultCells result={ result } noTarget={ false } admin_type={indicator.admin_type} resultEditable={resultEditable}/>
                 </tr>
             ))}
             {/* If this was the "most recently completed" target period, add a progress row
@@ -181,14 +206,14 @@ const TargetPeriodRows = ({target, indicator, ...props}) => {
  * Row for orphaned results - target period cells are blank, Result cells render with a warning background
  *  - noTarget={true} produces the warning background
  */
-const NoTargetResultRow = ({result, ...props}) => {
+const NoTargetResultRow = ({result, indicator, resultEditable, ...props}) => {
     return (
         <tr>
             <td></td>
             <td></td>
             <td></td>
             <td></td>
-            <ResultCells result={ result } noTarget={ true }/>
+            <ResultCells result={ result } noTarget={ true } admin_type={indicator.admin_type} resultEditable={resultEditable}/>
         </tr>
     );
 }
@@ -252,7 +277,7 @@ const LoPRow = ({indicator, ...props}) => {
  *      - this includes the "progress row" after the most recently completed period if applicable
  *  - Summative "LoP" row for life of program totals
  */
-const ResultsTableTable = ({indicator, editable, ...props}) => {
+const ResultsTableTable = ({indicator, editable, resultEditable, ...props}) => {
     const localizer = (val) => {
         let localized = localizeNumber(val);
         if (localized && indicator.isPercent) {
@@ -292,8 +317,8 @@ const ResultsTableTable = ({indicator, editable, ...props}) => {
                     </tr>
                 </thead>
                 <tbody>
-                    {indicator.periodicTargets.map((periodicTarget, idx) => <TargetPeriodRows key={`targetrow-${idx}`} target={periodicTarget} indicator={indicator} />)}
-                    {indicator.noTargetResults.map((result, idx) => <NoTargetResultRow key={`notarget-${idx}`} result={ result } />)}
+                    {indicator.periodicTargets.map((periodicTarget, idx) => <TargetPeriodRows key={`targetrow-${idx}`} target={periodicTarget} indicator={indicator} resultEditable={resultEditable}/>)}
+                    {indicator.noTargetResults.map((result, idx) => <NoTargetResultRow key={`notarget-${idx}`} result={ result } indicator={indicator} resultEditable={resultEditable}/>)}
                     <LoPRow indicator={indicator} />
                 </tbody>
             </table>
@@ -329,7 +354,7 @@ const ResultsTableActions = ({indicator, editable, resultEditable, displayMissin
                 </div>
             }
             </div>
-            <div className="modal fade" id={`addResultModal_${indicator.pk}`} role="dialog">
+            <div className="modal fade" id={`resultModal_${indicator.pk}`} role="dialog">
                 <div className="modal-dialog modal-lg">
                     <div className="modal-content">
                         <div className="modal-body">
@@ -355,7 +380,7 @@ const ResultsTableActions = ({indicator, editable, resultEditable, displayMissin
                     :
                         <a 
                             data-toggle="modal"
-                            data-target={`#addResultModal_${indicator.pk}`}
+                            data-target={`#resultModal_${indicator.pk}`}
                             className="btn-link btn-add">
                             <FontAwesomeIcon icon={ faPlusCircle } />
                             {
@@ -382,7 +407,7 @@ export default class ResultsTable extends React.Component {
         return (
             <div className="results-table__wrapper">
                 {showTable &&
-                    <ResultsTableTable indicator={this.props.indicator} editable={this.props.editable} />
+                    <ResultsTableTable indicator={this.props.indicator} editable={this.props.editable} resultEditable={ this.props.resultEditable }/>
                 }
                 <ResultsTableActions indicator={this.props.indicator} editable={this.props.editable}
                     resultEditable={ this.props.resultEditable } displayMissingTargetsWarning={this.props.displayMissingTargetsWarning} />
