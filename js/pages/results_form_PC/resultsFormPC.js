@@ -15,7 +15,7 @@ const PCResultsForm = ({indicatorID="", resultID="", readOnly}) => {
         652: gettext("Direct participants – are those who have received a tangible benefit from the program, either as the actual program participants or the intended recipients of the program benefits. Indirect participants – are those who received a tangible benefit through their proximity to or contact with program participants or activities."),
         653: gettext("Direct participants – are those who have received a tangible benefit from the program, either as the actual program participants or the intended recipients of the program benefits. Indirect participants – are those who received a tangible benefit through their proximity to or contact with program participants or activities."),
     };
-    
+
     let handleReceivedDisaggregations = (disaggregations_data) => {
         return disaggregations_data.reduce((formated, disagg, i) => {
             formated[disagg.pk] = {...disagg, sort_order: i};
@@ -164,27 +164,27 @@ const PCResultsForm = ({indicatorID="", resultID="", readOnly}) => {
             data = data.concat(formatFields(commonFieldsInput));
             data = data.concat(formatFields(evidenceFieldsInput));
             data = data.concat(formatDisaggregations());
-    
+
             // console.log("Data", data);
             let form_data = new FormData;
             data.map(currentData => {
                 form_data.append(currentData["name"], currentData["value"]);
             })
             if (indicatorID) {
-                api.savePCountResultsData(indicatorID, form_data)
+                api.createPCountResult(indicatorID, form_data)
                     .then(response => {
                         console.log("Saved Form Data!");
                         // TODO: Add action after the form is sent
                     })
                 } else {
-                api.updatePCountResultsData(resultID, form_data)
+                api.updatePCountResult(resultID, form_data)
                     .then(response => {
                         console.log("Saved Form Data!");
                         // TODO: Add action after the form is sent
                     })
             }
         }
-        
+
     }
     // if (Object.keys(disaggregationData).length > 0) {
     if (disaggregationArray.length > 0) {
@@ -234,9 +234,9 @@ const PCResultsForm = ({indicatorID="", resultID="", readOnly}) => {
 
 
 
-                {/* <DisaggregationFields 
-                    disagg={[disaggregationData["649"],disaggregationData["648"]]} 
-                    total={[disaggregationData["652"].labels[0], disaggregationData["653"].labels[0]]} 
+                {/* <DisaggregationFields
+                    disagg={[disaggregationData["649"],disaggregationData["648"]]}
+                    total={[disaggregationData["652"].labels[0], disaggregationData["653"].labels[0]]}
                     title={"SADD (including unknown)"}
                     indicatorID={indicatorID}
                     readOnly={readOnly}
@@ -255,7 +255,7 @@ const PCResultsForm = ({indicatorID="", resultID="", readOnly}) => {
                                 return arrSADD;
                             }, []);
                             return (
-                                <DisaggregationFields 
+                                <DisaggregationFields
                                     key={disagg.disaggregation_type}
                                     disagg={disaggsSADD}
                                     total={[disaggregationData["652"].labels[0], disaggregationData["653"].labels[0]]}
@@ -272,7 +272,7 @@ const PCResultsForm = ({indicatorID="", resultID="", readOnly}) => {
                         }
                         if (disagg.disaggregation_type.includes('Sectors')) {
                             return (
-                                <DisaggregationFields 
+                                <DisaggregationFields
                                     key={disagg.disaggregation_type}
                                     disagg={[disagg]}
                                     total={[disaggregationData["653"].labels[0]]}
@@ -288,7 +288,7 @@ const PCResultsForm = ({indicatorID="", resultID="", readOnly}) => {
                         }
                     })
                 }
-                {/* <DisaggregationFields 
+                {/* <DisaggregationFields
                     disagg={[disaggregationData["650"]]}
                     total={[disaggregationData["653"].labels[0]]}
                     indicatorID={indicatorID}
@@ -298,7 +298,7 @@ const PCResultsForm = ({indicatorID="", resultID="", readOnly}) => {
                     disaggregationData={disaggregationData}
                     setDisaggregationData={setDisaggregationData}
                 />
-                <DisaggregationFields 
+                <DisaggregationFields
                     disagg={[disaggregationData["651"]]}
                     total={[disaggregationData["653"].labels[1]]}
                     indicatorID={indicatorID}
@@ -315,19 +315,19 @@ const PCResultsForm = ({indicatorID="", resultID="", readOnly}) => {
                     formErrors={formErrors}
                     readOnly={readOnly}
                 />
-                {!readOnly && 
+                {!readOnly &&
                 <div className="form-actions">
                     <div>
-                        <button 
-                            type="button" 
-                            className="btn btn-primary result-group" 
-                            id="result-submit-create" 
+                        <button
+                            type="button"
+                            className="btn btn-primary result-group"
+                            id="result-submit-create"
                             onClick={(e) => handleSubmit(e)}
                         >{gettext('Save and close')}
                         </button>
-                        <button 
-                            type="button" 
-                            className="btn btn-reset result-group" 
+                        <button
+                            type="button"
+                            className="btn btn-reset result-group"
                             id="result-cancel-btn"
                             data-dismiss="modal"
                         >{gettext('Cancel')}

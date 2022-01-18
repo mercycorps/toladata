@@ -1,3 +1,4 @@
+import copy
 from rest_framework import serializers
 from django.utils.translation import ugettext
 from indicators.models import (
@@ -41,25 +42,32 @@ class ParticipantCountDisaggValueSerializer(serializers.ModelSerializer):
 
     class Meta:
         model = DisaggregatedValue
-        fields = ['value']
+        fields = ['pk', 'value']
 
 
-class ParticipantCountDisaggLabelSerializer(serializers.ModelSerializer):
-    disaggregatedvalue_set = ParticipantCountDisaggValueSerializer()
+class ParticipantCountDisaggLabelValueSerializer(serializers.ModelSerializer):
+    value = serializers.SerializerMethodField()
+    disaggregationlabel_id = serializers.IntegerField(source='pk')
 
     class Meta:
         model = DisaggregationLabel
-        fields = ['label', 'customsort', 'disaggregatedvalue_set']
+        fields = ['disaggregationlabel_id', 'label', 'customsort', 'value']
+
+    def get_value(self, obj):
+        if obj.pk in self.context['disagg_values_by_label_pk']:
+            return self.context['disagg_values_by_label_pk'][obj.pk]
+        return {}
 
     def to_representation(self, instance):
         representation = super().to_representation(instance)
-        value_dict = representation.pop('disaggregatedvalue_set')
-        representation['value'] = value_dict['value']
+        value_obj = representation.pop('value')
+        representation['disaggregatedvalue_id'] = value_obj.get('pk', None)
+        representation['value'] = value_obj.get('value', None)
         return representation
 
 
 class ParticipantCountDisaggregationSerializer(serializers.ModelSerializer):
-    labels = ParticipantCountDisaggLabelSerializer(many=True, source='disaggregationlabel_set')
+    labels = serializers.SerializerMethodField()
 
     class Meta:
         model = DisaggregationType
@@ -69,18 +77,12 @@ class ParticipantCountDisaggregationSerializer(serializers.ModelSerializer):
             'labels',
         ]
 
-
-class ParticipantCountIndicatorSerializer(serializers.ModelSerializer):
-    """Results serializer for the participant count page"""
-    disaggregations = ParticipantCountDisaggregationSerializer(many=True, source='disaggregation')
-    program_start_date = serializers.DateField(source='program.reporting_period_start')
-    program_end_date = serializers.DateField(source='program.reporting_period_end')
-
-    class Meta:
-        model = Indicator
-        fields = [
-            'disaggregations',
-            'program_start_date',
-            'program_end_date',
-        ]
-
+    def get_labels(self, obj):
+        queryset = DisaggregationLabel.objects.filter(disaggregation_type__pk=obj.pk)
+        filters = {'category__pk__in': queryset.values_list('pk', flat=True)}
+        if self.context['result_pk']:
+            filters['result'] = f"result__pk={self.context['result_pk']}"
+        disagg_values_by_label_pk = {dv.category_id: dv for dv in DisaggregatedValue.objects.filter(**filters)}
+        context = copy.copy(self.context)
+        context.update({'disagg_values_by_label_pk': disagg_values_by_label_pk})
+        return ParticipantCountDisaggLabelValueSerializer(queryset, many=True, context=context).data

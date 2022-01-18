@@ -197,7 +197,7 @@ const api = {
                 return error.response;
             })
     },
-    async savePCountResultsData(indicator_id, form_data) {
+    async createPCountResult(indicator_id, form_data) {
         return await this.apiInstance.post(`/pcount_result_create/${indicator_id}`,
             form_data, {headers: {'Content-Type': 'multipart/form-data'}})
             .then(response => {
@@ -208,7 +208,7 @@ const api = {
                 return error.response;
             })
     },
-    async updatePCountResultsData(result_id, form_data) {
+    async updatePCountResult(result_id, form_data) {
         return await this.apiInstance.put(`/pcount_result_create/${result_id}`,
             form_data, {headers: {'Content-Type': 'multipart/form-data'}})
             .then(response => {
