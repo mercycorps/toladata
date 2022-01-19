@@ -3,7 +3,7 @@ import CheckboxedMultiSelect from 'components/checkboxed-multi-select';
 import { HelpText } from '../components/HelpText.js'
 
 
-const CommonFields = ({ commonFieldsInput, setCommonFieldsInput, outcomeThemesData, formErrors, readOnly }) => {
+const CommonFields = ({ commonFieldsInput, setCommonFieldsInput, outcomeThemesData, formErrors, setFormErrors, readOnly }) => {
 
     return (
         <fieldset>
@@ -11,7 +11,6 @@ const CommonFields = ({ commonFieldsInput, setCommonFieldsInput, outcomeThemesDa
                 <label htmlFor="id_date_collected" className="label--required">{gettext('Result date')}</label>
 
                 <HelpText text={gettext('If data collection occurred within the fiscal year, enter the date where data was collected. If data collection occurred after the end of the fiscal year, enter the last day of the fiscal year (June 30).')}/>
-
 
                 <input 
                     type="date" 
@@ -25,6 +24,13 @@ const CommonFields = ({ commonFieldsInput, setCommonFieldsInput, outcomeThemesDa
                     max={commonFieldsInput.program_end_date}
                     value={commonFieldsInput.date_collected || ""}
                     onChange={(e) => setCommonFieldsInput({...commonFieldsInput, [e.target.name]: e.target.value})}
+                    onBlur={() => {
+                        let detectedErrors = "";
+                        if (commonFieldsInput.date_collected === "" || commonFieldsInput.date_collected === undefined || commonFieldsInput.date_collected < commonFieldsInput.program_start_date || commonFieldsInput.date_collected > commonFieldsInput.program_end_date) {
+                            detectedErrors = gettext("This date should be within the fiscal year of the reporting period.")
+                        } 
+                        setFormErrors({...formErrors, date_collected: detectedErrors})
+                    }}
                 />
                 {
                     formErrors.date_collected &&

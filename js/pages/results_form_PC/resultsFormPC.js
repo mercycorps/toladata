@@ -36,7 +36,7 @@ const PCResultsForm = ({indicatorID="", resultID="", readOnly}) => {
             detectedErrors = {...detectedErrors, date_collected: gettext("This date should be within the fiscal year of the reporting period.")}
         };
 
-        if (!commonFieldsInput.fiscal_year || commonFieldsInput.fiscal_year === "") {
+        if (!commonFieldsInput.periodic_target || commonFieldsInput.periodic_target === "") {
             detectedErrors = {...detectedErrors, fiscal_year: gettext("You cannot change the fiscal year during the current reporting period. ")}
         };
 
@@ -44,13 +44,13 @@ const PCResultsForm = ({indicatorID="", resultID="", readOnly}) => {
             detectedErrors = {...detectedErrors, outcome_theme: gettext("Please complete this field. You can select more than one outcome theme.")}
         };
 
-        let sumSADDwithout = disaggregationData["649"].labels.reduce((sum, label) => {
+        let sumSADDwithout = disaggregationData["648"].labels.reduce((sum, label) => {
             sum+= parseInt(label.value) || 0;
             return sum}, 0);
         if (parseInt(sumSADDwithout) !== parseInt(disaggregationData["652"].labels[0].value || 0)) {
             detectedErrors = {...detectedErrors, "649-648": gettext("The sum of 'SADD without double counting' should be equal to the sum of 'Direct without double counting'.")}
         };
-        let sumSADDwith = disaggregationData["648"].labels.reduce((sum, label) => {
+        let sumSADDwith = disaggregationData["649"].labels.reduce((sum, label) => {
             sum+= parseInt(label.value) || 0;
             return sum}, 0);
         if (parseInt(sumSADDwith) !== parseInt(disaggregationData["653"].labels[0].value || 0)) {
@@ -101,7 +101,7 @@ const PCResultsForm = ({indicatorID="", resultID="", readOnly}) => {
             $(`#resultModal_${formID}`).on('hidden.bs.modal', function () {
                 setDisaggregationArray([])
                 setDisaggregationData([])
-                setCommonFieldsInput({date_collected: "", fiscal_year: "FY 2022: 1 July 2021 - 30 June 2022"})
+                setCommonFieldsInput({})
                 setEvidenceFieldsInput({})
                 setOutcomeThemesData([])
                 setFormErrors({})
@@ -159,26 +159,22 @@ const PCResultsForm = ({indicatorID="", resultID="", readOnly}) => {
         if ( validateForm() ) {
 
             let data = [];
-            data = data.concat(formatFields({indicator: indicatorID}))
-            data = data.concat(formatFields(commonFieldsInput));
-            data = data.concat(formatFields(evidenceFieldsInput));
-            data = data.concat(formatDisaggregations());
-
-            // console.log("Data", data);
+            data = {...data, indicator: indicatorID, ...commonFieldsInput, ...evidenceFieldsInput, disaggregation: disaggregationData};
             let form_data = new FormData;
-            data.map(currentData => {
-                form_data.append(currentData["name"], currentData["value"]);
+            Object.keys(data).map(key => {
+                form_data.append(key, data[key]);
             })
+
             if (indicatorID) {
                 api.createPCountResult(indicatorID, form_data)
                     .then(response => {
-                        console.log("Saved Form Data!");
+                        console.log("Saved Form Data!", response);
                         // TODO: Add action after the form is sent
                     })
                 } else {
                 api.updatePCountResult(resultID, form_data)
                     .then(response => {
-                        console.log("Saved Form Data!");
+                        console.log("Saved Form Data!", response);
                         // TODO: Add action after the form is sent
                     })
             }
@@ -208,6 +204,7 @@ const PCResultsForm = ({indicatorID="", resultID="", readOnly}) => {
                     setCommonFieldsInput={setCommonFieldsInput}
                     outcomeThemesData={outcomeThemesData}
                     formErrors={formErrors}
+                    setFormErrors={setFormErrors}
                     readOnly={readOnly}
                 />
 

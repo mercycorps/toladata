@@ -108,7 +108,7 @@ const DisaggregationFields = ({ indicatorID, disagg, disaggregationData, disaggr
             </li>
 
             <li className="list-group-item reference-row">
-                <div className="item__label">{`Actual ${totals[0].label} value`}</div>
+                <div className="item__label">{`Actual ${totals[0].label.toLowerCase()} value`}</div>
                 <div className="item__value--container">
                     {
                         disagg.map((currentDisagg, i) => {

@@ -39,14 +39,14 @@ const ActualValueFields = ({ disaggregationData, disaggregationArray, setDisaggr
 
                         </div>
                         <div className="item__value--container">
-                            <div className="bin heading">{gettext("Without Double Counting")}</div>
-                            <div className="bin heading">{gettext("With Double Counting")}</div>
+                            <div className="bin heading">{gettext("Without double counting")}</div>
+                            <div className="bin heading">{gettext("With double counting")}</div>
                         </div>
                     </div>
                 </li>
 
                 <li className="list-group-item">
-                    <div className="item__label">{gettext("Actual Direct value")}</div>
+                    <div className="item__label">{gettext("Actual direct value")}</div>
                     <div className="item__value--container">
                         <input 
                             type="number" 
@@ -74,7 +74,7 @@ const ActualValueFields = ({ disaggregationData, disaggregationArray, setDisaggr
                 </li>
 
                 <li className="list-group-item">
-                    <div className="item__label">{gettext("Actual Indirect value")}</div>
+                    <div className="item__label">{gettext("Actual indirect value")}</div>
                     <div className="item__value--container">
                         <input 
                             type="number" 
@@ -98,7 +98,7 @@ const ActualValueFields = ({ disaggregationData, disaggregationArray, setDisaggr
                 </li>
 
                 <li className="list-group-item reference-row">
-                    <div className="item__label">{gettext("Actual Total value")}</div>
+                    <div className="item__label">{gettext("Actual total value")}</div>
                     <div className="item__value--container">
                         <div className="bin">{parseInt(disaggregationData['652'].labels[0].value || 0) + parseInt(disaggregationData['652'].labels[1].value || 0)}</div>
                         <div className="bin">{parseInt(disaggregationData['653'].labels[0].value || 0) + parseInt(disaggregationData['653'].labels[1].value || 0)}</div>
