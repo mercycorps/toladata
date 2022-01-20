@@ -16,7 +16,7 @@ const CommonFields = ({ commonFieldsInput, setCommonFieldsInput, outcomeThemesDa
                     type="date" 
                     name="date_collected" 
                     id="id_date_collected" 
-                    className={`datepicker form-control hasDatepicker ${formErrors.date_collected && "is-invalid"}`}
+                    className={`datepicker form-control ${formErrors.date_collected && "is-invalid"}`}
                     required
                     autoComplete="off"
                     disabled={readOnly}
