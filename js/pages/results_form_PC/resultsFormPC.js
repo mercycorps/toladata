@@ -160,6 +160,8 @@ const PCResultsForm = ({indicatorID="", resultID="", readOnly}) => {
 
             let data = [];
             data = {...data, indicator: indicatorID, ...commonFieldsInput, ...evidenceFieldsInput, disaggregations: Object.values(disaggregationData)};
+            data['outcome_theme'] = data['outcome_theme'].map((theme) => theme.value)
+            data['periodic_target'] = data['periodic_target']['id']
             if (indicatorID) {
                 api.createPCountResult(indicatorID, data)
                     .then(response => {

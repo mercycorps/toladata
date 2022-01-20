@@ -14,28 +14,40 @@ class OutcomeThemeSerializer(serializers.ModelSerializer):
         fields = ['pk', 'name']
 
 
-# class PCResultSerializer(serializers.ModelSerializer):
-#     """Results serializer for the participant count page"""
-#     date_collected = serializers.SerializerMethodField()
-#     achieved = serializers.FloatField()
-#     outcome_themes = serializers.ChoiceField(choices=OutcomeTheme.objects.values('pk', 'name'))
-#
-#     class Meta:
-#         model = Result
-#         fields = [
-#             'pk',
-#             'achieved',
-#             'date_collected',
-#             'outcome_themes',
-#             'record_name',
-#             'evidence_url'
-#         ]
-#
-#     @staticmethod
-#     def get_date_collected(result):
-#         if not result.date_collected:
-#             return None
-#         return l10n_date_medium(result.date_collected, decode=True)
+class PCResultSerializer(serializers.ModelSerializer):
+    """Results serializer for the participant count page"""
+    disaggregations = serializers.ListField()
+
+    class Meta:
+        model = Result
+        fields = [
+            'pk',
+            'periodic_target',
+            'achieved',
+            'outcome_themes',
+            'date_collected',
+            'record_name',
+            'evidence_url',
+            'program',
+            'indicator',
+            'disaggregations',
+        ]
+
+    def create(self, validated_data):
+        disaggregations = validated_data.pop('disaggregations')
+        outcome_themes = validated_data.pop('outcome_themes')
+        result = Result.objects.create(**validated_data)
+        result.outcome_themes.add(*outcome_themes)
+        value_objs = []
+        for disagg in disaggregations:
+            for label_value in disagg['labels']:
+                if label_value['value']:
+                    value_objs.append(DisaggregatedValue(
+                        category_id=label_value['disaggregationlabel_id'], result=result, value=label_value['value']))
+        DisaggregatedValue.objects.bulk_create(value_objs)
+        return result
+
+
 
 
 class PCDisaggValueSerializer(serializers.ModelSerializer):

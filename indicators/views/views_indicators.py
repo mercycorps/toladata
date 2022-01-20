@@ -149,25 +149,24 @@ def participant_count_result_create_for_indicator(request, pk, *args, **kwargs):
 
         if not achieved_val:
             raise ImportError
-        result = Result.objects.create(
-            achieved=achieved_val,
-            periodic_target_id=request.data['periodic_target']['id'],
-            indicator=indicator,
-            program=indicator.program,
-            date_collected=request.data['date_collected'],
-            evidence_url=request.data.get('evidence_url', None),
-            record_name=request.data.get('record_name', None),
-            create_date = datetime.now(),
-            edit_date = datetime.now()
-        )
 
-        for disaggregation in request.data['disaggregations']:
-            for label_value in disaggregation['labels']:
-                if not label_value['value']:
-                    continue
-                DisaggregatedValue.objects.create(category_id=label_value['disaggregationlabel_id'], result=result, value=label_value['value'])
+        result_data = {
+            'achieved': achieved_val,
+            'indicator': indicator,
+            'program': indicator.program.pk,
+            'create_date': timezone.now(),
+            'edit_date': timezone.now(),
+            'outcome_themes': request.data.pop('outcome_theme')
 
-        return JsonResponse({"message": "Got some data!", "data": request.data})
+        }
+        result_data.update(request.data)
+        result = pc_serializers.PCResultSerializer(data=result_data)
+        if result.is_valid():
+            result.save()
+        else:
+            return JsonResponse(result.errors, status=404)
+
+        return JsonResponse(request.data)
 
     verify_program_access_level(request, indicator.program.pk, 'low')
     disagg_queryset = DisaggregationType.objects.filter(indicator__pk=indicator.pk)
