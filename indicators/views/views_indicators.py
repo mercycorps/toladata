@@ -15,7 +15,6 @@ from rest_framework.decorators import api_view
 
 from django.template.defaultfilters import truncatechars
 from django.contrib import messages
-from django.core import serializers
 from django.core.exceptions import PermissionDenied
 from django.db import connection, transaction
 from django.db.models import (
@@ -41,7 +40,7 @@ from workflow.models import (
 from indicators.serializers import (
     IndicatorSerializer
 )
-from indicators.serializers_new.participant_count_serializers import ParticipantCountDisaggregationSerializer
+import indicators.serializers_new.participant_count_serializers as pc_serializers
 from indicators.views.view_utils import (
     import_indicator,
     generate_periodic_targets,
@@ -53,7 +52,8 @@ from indicators.models import (
     PeriodicTarget,
     Result,
     OutcomeTheme,
-    DisaggregationType
+    DisaggregationType,
+    DisaggregatedValue
 )
 from indicators.queries import ProgramWithMetrics, ResultsIndicator
 from indicators import indicator_plan as ip
@@ -134,11 +134,39 @@ def periodic_targets_form(request, program):
 
 @login_required
 @api_view(['GET', 'POST'])
+@transaction.atomic
 def participant_count_result_create_for_indicator(request, pk, *args, **kwargs):
     # pk is indicator.pk
     indicator = get_object_or_404(Indicator, pk=pk)
     if request.method == 'POST':
         verify_program_access_level(request, indicator.program.pk, 'medium')
+        achieved_val = None
+        for disagg in request.data['disaggregations']:
+            if disagg['disaggregation_type'] == 'Actual without double counting':
+                for label in disagg['labels']:
+                    if label['label'] == 'Direct':
+                        achieved_val = label['value']
+
+        if not achieved_val:
+            raise ImportError
+        result = Result.objects.create(
+            achieved=achieved_val,
+            periodic_target_id=request.data['periodic_target']['id'],
+            indicator=indicator,
+            program=indicator.program,
+            date_collected=request.data['date_collected'],
+            evidence_url=request.data.get('evidence_url', None),
+            record_name=request.data.get('record_name', None),
+            create_date = datetime.now(),
+            edit_date = datetime.now()
+        )
+
+        for disaggregation in request.data['disaggregations']:
+            for label_value in disaggregation['labels']:
+                if not label_value['value']:
+                    continue
+                DisaggregatedValue.objects.create(category_id=label_value['disaggregationlabel_id'], result=result, value=label_value['value'])
+
         return JsonResponse({"message": "Got some data!", "data": request.data})
 
     verify_program_access_level(request, indicator.program.pk, 'low')
@@ -148,7 +176,7 @@ def participant_count_result_create_for_indicator(request, pk, *args, **kwargs):
         'program_start_date': indicator.program.reporting_period_start,
         'program_end_date': indicator.program.reporting_period_end,
         'periodic_target': indicator.periodictargets.order_by('-customsort').values('id', 'period').first(),
-        'disaggregations': ParticipantCountDisaggregationSerializer(
+        'disaggregations': pc_serializers.PCDisaggregationSerializer(
             disagg_queryset, many=True, context={'result_pk': None}).data,
     }
     return JsonResponse(return_dict)
