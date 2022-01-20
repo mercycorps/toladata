@@ -61,6 +61,8 @@ Min = MinType()
 
 
 class IndicatorType(models.Model):
+    PC_INDICATOR_TYPE = 'Custom'
+
     indicator_type = models.CharField(_("Indicator type"), max_length=135, blank=True)
     description = models.TextField(_("Description"), max_length=765, blank=True)
     create_date = models.DateTimeField(_("Create date"), null=True, blank=True)
@@ -656,6 +658,8 @@ class DisaggregatedValue(models.Model):
 
 
 class ReportingFrequency(models.Model):
+    PC_REPORTING_FREQUENCY = 'Annual'
+
     frequency = models.CharField(
         _("Frequency"), max_length=135, unique=True)
     description = models.CharField(

@@ -27,6 +27,7 @@ from indicators.models import (
     Level,
     LevelTier,
     Objective,
+    OutcomeTheme,
     PeriodicTarget,
     StrategicObjective,
     PinnedReport,
@@ -374,3 +375,11 @@ class DataCollectionFrequencyFactory(DjangoModelFactory):
     frequency = "some reasonable frequency"
     description = "a description of how frequent this is"
     sort_order = Sequence(lambda n: n)
+
+
+class OutcomeThemeFactory(DjangoModelFactory):
+    class Meta:
+        model = OutcomeTheme
+
+    name = Faker('text')
+    is_active = True

@@ -159,14 +159,11 @@ const PCResultsForm = ({indicatorID="", resultID="", readOnly}) => {
         if ( validateForm() ) {
 
             let data = [];
-            data = {...data, indicator: indicatorID, ...commonFieldsInput, ...evidenceFieldsInput, disaggregation: disaggregationData};
-            let form_data = new FormData;
-            Object.keys(data).map(key => {
-                form_data.append(key, data[key]);
-            })
-
+            data = {...data, indicator: indicatorID, ...commonFieldsInput, ...evidenceFieldsInput, disaggregations: Object.values(disaggregationData)};
+            data['outcome_theme'] = data['outcome_theme'].map((theme) => theme.value)
+            data['periodic_target'] = data['periodic_target']['id']
             if (indicatorID) {
-                api.createPCountResult(indicatorID, form_data)
+                api.createPCountResult(indicatorID, data)
                     .then(response => {
                         console.log("Saved Form Data!", response);
                         // TODO: Add action after the form is sent
