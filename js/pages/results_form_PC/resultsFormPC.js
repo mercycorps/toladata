@@ -1,5 +1,4 @@
 import React, { useState, useEffect } from 'react';
-import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import { CommonFields } from './components/CommonFields.js';
 import { ActualValueFields } from './components/ActualValueFields.js';
 import { EvidenceFields } from './components/EvidenceFields.js';
@@ -8,6 +7,7 @@ import api from '../../apiv2';
 
 
 const PCResultsForm = ({indicatorID="", resultID="", readOnly}) => {
+    // Form Data
     const helptext = {
         "648-649": gettext("Only include SADD for Direct participants."),
         650: gettext("Provide a disaggregation of participants reached by sector. Only provide the figure with double counting. Refer to MEL Tip Sheet: Guidelines on Counting and Reporting Participant Numbers <a href='https://library.mercycorps.org/record/16929?ln=en' target='_blank'>[link: https://library.mercycorps.org/record/16929?ln=en]</a> for a description of outcome themes."),
@@ -16,6 +16,7 @@ const PCResultsForm = ({indicatorID="", resultID="", readOnly}) => {
         653: gettext("Direct participants – are those who have received a tangible benefit from the program, either as the actual program participants or the intended recipients of the program benefits. Indirect participants – are those who received a tangible benefit through their proximity to or contact with program participants or activities."),
     };
 
+    // Helper Methods
     let handleReceivedDisaggregations = (disaggregations_data) => {
         return disaggregations_data.reduce((formated, disagg, i) => {
             formated[disagg.pk] = {...disagg, sort_order: i};
@@ -30,6 +31,15 @@ const PCResultsForm = ({indicatorID="", resultID="", readOnly}) => {
         }, [])
     }
 
+    let handleDataArray = (dataArray) => {
+        return dataArray.reduce((arr, currentDisagg, i) => {
+            currentDisagg.disaggregation_type.includes('without') ? arr[i] = {...currentDisagg, double_counting: false} : arr[i] = {...currentDisagg, double_counting: true};
+            currentDisagg.disaggregation_type.includes('Indirect') ? arr[i] = {...arr[i], count_type: "Indirect"} : arr[i] = {...arr[i], count_type: "Direct"};
+            return arr;
+        }, []);
+    }
+
+    // Form Validations
     let validateForm = () => {
         let detectedErrors = {};
 
@@ -80,23 +90,16 @@ const PCResultsForm = ({indicatorID="", resultID="", readOnly}) => {
         return Object.keys(detectedErrors).length === 0 ? true: false;
     }
 
-    let formatFields = (data) => {
-        let formatedData = [];
-        Object.keys(data).map(key => {
-            formatedData.push({name: key, value: data[key]})
-        })
-        return formatedData;
-    }
+    // State Variables
+    let formID = indicatorID ? indicatorID : resultID;
+    const [outcomeThemesData, setOutcomeThemesData] = useState([]);
+    const [disaggregationData, setDisaggregationData] = useState([]);
+    const [disaggregationArray, setDisaggregationArray] = useState([]);
+    const [evidenceFieldsInput, setEvidenceFieldsInput] = useState({});
+    const [commonFieldsInput, setCommonFieldsInput] = useState({});
+    const [formErrors, setFormErrors] = useState({});
 
-    let formatDisaggregations = () => {
-        return Object.keys(disaggregationData).reduce((disaggArr, currentDisagg) => {
-            disaggregationData[currentDisagg].labels.map((label, i) => {
-                disaggArr.push({name: `disaggregation-formset-${disaggregationData[currentDisagg].pk}-${i}-label_pk`, value: label.value})
-            })
-            return disaggArr;
-        }, []);
-    }
-
+    // On Mounting of the results form modal
     useEffect(() => {
 
         $(`#resultModal_${formID}`).on('shown.bs.modal', function () {
@@ -118,11 +121,17 @@ const PCResultsForm = ({indicatorID="", resultID="", readOnly}) => {
                 api.getPCountResultsData(indicatorID)
                     .then(response => {
                         console.log("Form received data!", response);
-                        setOutcomeThemesData(formatOutcomeThemsData(response.outcome_themes));
-                        setDisaggregationData(handleReceivedDisaggregations(response.disaggregations));
-                        setDisaggregationArray(handleDataArray(response.disaggregations))
-                        setCommonFieldsInput({program_start_date: response.program_start_date, program_end_date: response.program_end_date, periodic_target: response.periodic_target});
-                        // setEvidenceFieldsInput();
+                        let commonFields = {};
+                        let evidenceFields = {};
+                        Object.keys(response).map(dataType => {
+                            dataType === "outcome_themes" && setOutcomeThemesData(formatOutcomeThemsData(response[dataType]));
+                            dataType === "disaggregations" && setDisaggregationData(handleReceivedDisaggregations(response[dataType]));
+                            dataType === "disaggregations" && setDisaggregationArray(handleDataArray(response[dataType]));
+                            ["periodic_target", "program_end_date", "program_start_date", "date_collected"].indexOf(dataType) >= 0 ? commonFields = {...commonFields, [dataType]: response[dataType]} : null;
+                            ["evidence_url", "record_name"].indexOf(dataType) >= 0 ? {...evidenceFields, [dataType]: response[dataType]} : null;
+                        })
+                        setCommonFieldsInput(commonFields);
+                        setEvidenceFieldsInput(evidenceFields);
                     })
             } else {
                 // TODO get data using the resultID
@@ -140,22 +149,7 @@ const PCResultsForm = ({indicatorID="", resultID="", readOnly}) => {
         })
     }, [])
 
-    let handleDataArray = (dataArray) => {
-        return dataArray.reduce((arr, currentDisagg, i) => {
-            currentDisagg.disaggregation_type.includes('without') ? arr[i] = {...currentDisagg, double_counting: false} : arr[i] = {...currentDisagg, double_counting: true};
-            currentDisagg.disaggregation_type.includes('Indirect') ? arr[i] = {...arr[i], count_type: "Indirect"} : arr[i] = {...arr[i], count_type: "Direct"};
-            return arr;
-        }, []);
-    }
-
-    let formID = indicatorID ? indicatorID : resultID;
-    const [outcomeThemesData, setOutcomeThemesData] = useState([]);
-    const [disaggregationData, setDisaggregationData] = useState([]);
-    const [disaggregationArray, setDisaggregationArray] = useState([]);
-    const [evidenceFieldsInput, setEvidenceFieldsInput] = useState({});
-    const [commonFieldsInput, setCommonFieldsInput] = useState({});
-    const [formErrors, setFormErrors] = useState({});
-
+    // On Submission of the results form modal
     let handleSubmit = (e) => {
         e.preventDefault();
         if ( validateForm() ) {
@@ -180,6 +174,7 @@ const PCResultsForm = ({indicatorID="", resultID="", readOnly}) => {
         }
 
     }
+    
     // if (Object.keys(disaggregationData).length > 0) {
     if (disaggregationArray.length > 0) {
         return (
