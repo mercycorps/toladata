@@ -32,7 +32,9 @@ const PCResultsForm = ({indicatorID="", resultID="", readOnly}) => {
 
     let validateForm = () => {
         let detectedErrors = {};
-        if (!commonFieldsInput.date_collected || commonFieldsInput.date_collected === "") {
+
+        let maxDate = formatDate(localdate()) < commonFieldsInput.program_end_date ? formatDate(localdate()) : commonFieldsInput.program_end_date;
+        if (!commonFieldsInput.date_collected || commonFieldsInput.date_collected === "" || commonFieldsInput.date_collected < commonFieldsInput.program_start_date || commonFieldsInput.date_collected > maxDate) {
             detectedErrors = {...detectedErrors, date_collected: gettext("This date should be within the fiscal year of the reporting period.")}
         };
 
@@ -151,7 +153,7 @@ const PCResultsForm = ({indicatorID="", resultID="", readOnly}) => {
     const [disaggregationData, setDisaggregationData] = useState([]);
     const [disaggregationArray, setDisaggregationArray] = useState([]);
     const [evidenceFieldsInput, setEvidenceFieldsInput] = useState({});
-    const [commonFieldsInput, setCommonFieldsInput] = useState({}); // TODO: receive start, and end dates from GET request. Calculate fiscal year based on those dates.
+    const [commonFieldsInput, setCommonFieldsInput] = useState({});
     const [formErrors, setFormErrors] = useState({});
 
     let handleSubmit = (e) => {
@@ -196,14 +198,16 @@ const PCResultsForm = ({indicatorID="", resultID="", readOnly}) => {
                     }
                 </h3>
 
-                <CommonFields
-                    commonFieldsInput={commonFieldsInput}
-                    setCommonFieldsInput={setCommonFieldsInput}
-                    outcomeThemesData={outcomeThemesData}
-                    formErrors={formErrors}
-                    setFormErrors={setFormErrors}
-                    readOnly={readOnly}
-                />
+                {Object.keys(commonFieldsInput).length > 0 &&
+                    <CommonFields
+                        commonFieldsInput={commonFieldsInput}
+                        setCommonFieldsInput={setCommonFieldsInput}
+                        outcomeThemesData={outcomeThemesData}
+                        formErrors={formErrors}
+                        setFormErrors={setFormErrors}
+                        readOnly={readOnly}
+                    />
+                }
 
                 <ActualValueFields
                     disaggregationData={disaggregationData}
