@@ -147,9 +147,6 @@ def participant_count_result_create_for_indicator(request, pk, *args, **kwargs):
                     if label['label'] == 'Direct':
                         achieved_val = label['value']
 
-        if not achieved_val:
-            raise ImportError
-
         result_data = {
             'achieved': achieved_val,
             'indicator': indicator,
@@ -160,13 +157,13 @@ def participant_count_result_create_for_indicator(request, pk, *args, **kwargs):
 
         }
         result_data.update(request.data)
-        result = pc_serializers.PCResultSerializer(data=result_data)
+        result = pc_serializers.PCResultSerializerWrite(data=result_data)
         if result.is_valid():
             result.save()
         else:
             return JsonResponse(result.errors, status=404)
 
-        return JsonResponse(request.data)
+        return JsonResponse({'message': 'success'}, status=200)
 
     verify_program_access_level(request, indicator.program.pk, 'low')
     disagg_queryset = DisaggregationType.objects.filter(indicator__pk=indicator.pk)
@@ -179,6 +176,44 @@ def participant_count_result_create_for_indicator(request, pk, *args, **kwargs):
             disagg_queryset, many=True, context={'result_pk': None}).data,
     }
     return JsonResponse(return_dict)
+
+
+@login_required
+@api_view(['GET', 'PUT'])
+@transaction.atomic
+def participant_count_result_update(request, pk, *args, **kwargs):
+    # pk is result.pk
+    result = get_object_or_404(Result, pk=pk)
+    indicator = result.indicator
+    if request.method == 'PUT':
+        verify_program_access_level(request, indicator.program.pk, 'medium')
+        achieved_val = None
+        for disagg in request.data['disaggregations']:
+            if disagg['disaggregation_type'] == 'Actual without double counting':
+                for label in disagg['labels']:
+                    if label['label'] == 'Direct':
+                        achieved_val = label['value']
+
+        result_data = request.data
+        result_data.update({
+            'achieved': achieved_val,
+            'program': indicator.program.pk,
+            'indicator': indicator.pk,
+            'edit_date': timezone.now(),
+            'outcome_themes': request.data.pop('outcome_theme')
+
+        })
+
+        result = pc_serializers.PCResultSerializerWrite(result, data=result_data)
+        if result.is_valid():
+            result.save()
+        else:
+            return JsonResponse(result.errors, status=404)
+
+        return JsonResponse({'message': 'success'}, status=200)
+
+    verify_program_access_level(request, indicator.program.pk, 'low')
+    return JsonResponse(pc_serializers.PCResultSerializerRead(result).data)
 
 
 class PeriodicTargetJsonValidationError(Exception):

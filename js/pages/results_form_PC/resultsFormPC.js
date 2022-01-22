@@ -23,9 +23,18 @@ const PCResultsForm = ({indicatorID="", resultID="", readOnly}) => {
         }, {});
     }
 
-    let formatOutcomeThemsData = (outcomeThemes) => {
+    let formatOutcomeThemesData = (outcomeThemes) => {
        return outcomeThemes.reduce((themesArray, theme, i) => {
-            themesArray[i] = {value: i, label: theme[1]};
+            themesArray[i] = {value: theme[0], label: theme[1]};
+            return themesArray;
+        }, [])
+    }
+
+    let formatSelectedOutcomeThemes = (outcomeThemes) => {
+       return outcomeThemes.reduce((themesArray, theme, i) => {
+           if (theme[2]) {
+               themesArray[i] = {value: theme[0], label: theme[1]};
+           }
             return themesArray;
         }, [])
     }
@@ -113,27 +122,32 @@ const PCResultsForm = ({indicatorID="", resultID="", readOnly}) => {
                 }
             })
             if (indicatorID) {
-                api.getPCountResultsData(indicatorID)
+                api.getPCountResultCreateData(indicatorID)
                     .then(response => {
                         console.log("Form received data!", response);
-                        setOutcomeThemesData(formatOutcomeThemsData(response.outcome_themes));
+                        setOutcomeThemesData(formatOutcomeThemesData(response.outcome_themes));
                         setDisaggregationData(handleReceivedDisaggregations(response.disaggregations));
                         setDisaggregationArray(handleDataArray(response.disaggregations))
                         setCommonFieldsInput({program_start_date: response.program_start_date, program_end_date: response.program_end_date, periodic_target: response.periodic_target});
                         // setEvidenceFieldsInput();
                     })
             } else {
-                // TODO get data using the resultID
-                // api.getPCountResultsData(indicatorID)
-                // .then(response => {
-                //     console.log("Form received data!", response);
-                //     setOutcomeThemesData(formatOutcomeThemsData(response.outcome_themes));
-                //     setDisaggregationData(handleReceivedDisaggregations(response.disaggregations));
-                //     setDisaggregationArray(handleDataArray(response.disaggregations))
-                //     // TODO: Update the commonFieldInputs and EvidenceFieldInputs with received data for an UPDATE request
-                //     setCommonFieldsInput({...commonFieldsInput, program_start_date: response.program_start_date, program_end_date: response.program_end_date});
-                //     // setEvidenceFieldsInput();
-                // })
+
+                api.getPCountResultUpdateData(resultID)
+                .then(response => {
+                    console.log("Form received data!", response);
+                    setOutcomeThemesData(formatOutcomeThemesData(response.outcome_themes));
+                    setDisaggregationData(handleReceivedDisaggregations(response.disaggregations));
+                    setDisaggregationArray(handleDataArray(response.disaggregations))
+                    // TODO: Update the commonFieldInputs and EvidenceFieldInputs with received data for an UPDATE request
+                    setCommonFieldsInput({
+                        periodic_target: response.periodic_target,
+                        date_collected: response.date_collected,
+                        outcome_theme: formatSelectedOutcomeThemes(response.outcome_themes),
+                        program_start_date: response.program_start_date,
+                        program_end_date: response.program_end_date});
+                    // setEvidenceFieldsInput();
+                })
             }
         })
     }, [])
@@ -169,7 +183,7 @@ const PCResultsForm = ({indicatorID="", resultID="", readOnly}) => {
                         // TODO: Add action after the form is sent
                     })
                 } else {
-                api.updatePCountResult(resultID, form_data)
+                api.updatePCountResult(resultID, data)
                     .then(response => {
                         console.log("Saved Form Data!", response);
                         // TODO: Add action after the form is sent
