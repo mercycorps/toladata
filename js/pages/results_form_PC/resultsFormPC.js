@@ -6,7 +6,7 @@ import { DisaggregationFields } from './components/DisaggregationFields.js'
 import api from '../../apiv2';
 
 
-const PCResultsForm = ({indicatorID="", resultID="", readOnly}) => {
+const PCResultsForm = ({indicatorID="", resultID="", readOnly, formType}) => {
     // Form Data
     const helptext = {
         "648-649": gettext("Only include SADD for Direct participants."),
@@ -91,19 +91,17 @@ const PCResultsForm = ({indicatorID="", resultID="", readOnly}) => {
     }
 
     // State Variables
-    let formID = indicatorID ? indicatorID : resultID;
     const [outcomeThemesData, setOutcomeThemesData] = useState([]);
     const [disaggregationData, setDisaggregationData] = useState([]);
     const [disaggregationArray, setDisaggregationArray] = useState([]);
     const [evidenceFieldsInput, setEvidenceFieldsInput] = useState({});
     const [commonFieldsInput, setCommonFieldsInput] = useState({});
     const [formErrors, setFormErrors] = useState({});
-
+    
     // On Mounting of the results form modal
     useEffect(() => {
-
-        $(`#resultModal_${formID}`).on('shown.bs.modal', function () {
-            $(`#resultModal_${formID}`).on('hidden.bs.modal', function () {
+        $(`#resultModal_${indicatorID || resultID}`).on('shown.bs.modal', function () {
+            $(`#resultModal_${indicatorID || resultID}`).on('hidden.bs.modal', function () {
                 setDisaggregationArray([])
                 setDisaggregationData([])
                 setCommonFieldsInput({})
@@ -111,41 +109,26 @@ const PCResultsForm = ({indicatorID="", resultID="", readOnly}) => {
                 setOutcomeThemesData([])
                 setFormErrors({})
             })
-
             $(document).on("keyup", function(event) {
                 if(event.key === 'Escape') {
-                    $(`#resultModal_${formID}`).modal('hide');
+                    $(`#resultModal_${indicatorID || resultID}`).modal('hide');
                 }
             })
-            if (indicatorID) {
-                api.getPCountResultsData(indicatorID)
-                    .then(response => {
-                        console.log("Form received data!", response);
-                        let commonFields = {};
-                        let evidenceFields = {};
-                        Object.keys(response).map(dataType => {
-                            dataType === "outcome_themes" && setOutcomeThemesData(formatOutcomeThemsData(response[dataType]));
-                            dataType === "disaggregations" && setDisaggregationData(handleReceivedDisaggregations(response[dataType]));
-                            dataType === "disaggregations" && setDisaggregationArray(handleDataArray(response[dataType]));
-                            ["periodic_target", "program_end_date", "program_start_date", "date_collected"].indexOf(dataType) >= 0 ? commonFields = {...commonFields, [dataType]: response[dataType]} : null;
-                            ["evidence_url", "record_name"].indexOf(dataType) >= 0 ? {...evidenceFields, [dataType]: response[dataType]} : null;
-                        })
-                        setCommonFieldsInput(commonFields);
-                        setEvidenceFieldsInput(evidenceFields);
+            api.getPCountResultsData(indicatorID || resultID, formType)
+                .then(response => {
+                    console.log("Form received data!", response);
+                    let commonFields = {};
+                    let evidenceFields = {};
+                    Object.keys(response).map(dataType => {
+                        dataType === "outcome_themes" && setOutcomeThemesData(formatOutcomeThemsData(response[dataType]));
+                        dataType === "disaggregations" && setDisaggregationData(handleReceivedDisaggregations(response[dataType]));
+                        dataType === "disaggregations" && setDisaggregationArray(handleDataArray(response[dataType]));
+                        ["periodic_target", "program_end_date", "program_start_date", "date_collected"].indexOf(dataType) >= 0 ? commonFields = {...commonFields, [dataType]: response[dataType]} : null;
+                        ["evidence_url", "record_name"].indexOf(dataType) >= 0 ? {...evidenceFields, [dataType]: response[dataType]} : null;
                     })
-            } else {
-                // TODO get data using the resultID
-                // api.getPCountResultsData(indicatorID)
-                // .then(response => {
-                //     console.log("Form received data!", response);
-                //     setOutcomeThemesData(formatOutcomeThemsData(response.outcome_themes));
-                //     setDisaggregationData(handleReceivedDisaggregations(response.disaggregations));
-                //     setDisaggregationArray(handleDataArray(response.disaggregations))
-                //     // TODO: Update the commonFieldInputs and EvidenceFieldInputs with received data for an UPDATE request
-                //     setCommonFieldsInput({...commonFieldsInput, program_start_date: response.program_start_date, program_end_date: response.program_end_date});
-                //     // setEvidenceFieldsInput();
-                // })
-            }
+                    setCommonFieldsInput(commonFields);
+                    setEvidenceFieldsInput(evidenceFields);
+                })
         })
     }, [])
 
@@ -153,44 +136,46 @@ const PCResultsForm = ({indicatorID="", resultID="", readOnly}) => {
     let handleSubmit = (e) => {
         e.preventDefault();
         if ( validateForm() ) {
-
             let data = {};
-            data = {...data, indicator: indicatorID, ...commonFieldsInput, ...evidenceFieldsInput, disaggregations: Object.values(disaggregationData)};
+            data = indicatorID && {...data, indicatorID};
+            data = resultID && {...data, resultID};
+            data = {...data, ...commonFieldsInput, ...evidenceFieldsInput, disaggregations: Object.values(disaggregationData)};
             data['outcome_theme'] = data['outcome_theme'].map((theme) => theme.value)
             data['periodic_target'] = data['periodic_target']['id']
-            if (indicatorID) {
+            if (formType === "create") {
                 api.createPCountResult(indicatorID, data)
                     .then(response => {
                         console.log("Saved Form Data!", response);
+                        if (response.status = 200) {
+                            $(`#resultModal_${indicatorID || resultID}`).modal('hide');
+                        }
                         // TODO: Add action after the form is sent
                     })
-                } else {
-                api.updatePCountResult(resultID, form_data)
+            } else if (formType === "update") {
+                api.updatePCountResult(resultID, data)
                     .then(response => {
-                        console.log("Saved Form Data!", response);
+                        if (response.status = 200) {
+                            $(`#resultModal_${indicatorID || resultID}`).modal('hide');
+                        }
+                        console.log("Updated Form Data!", response);
                         // TODO: Add action after the form is sent
                     })
             }
         }
-
     }
-    
+
     // if (Object.keys(disaggregationData).length > 0) {
     if (disaggregationArray.length > 0) {
         return (
             <div style={{textAlign: "left"}}>
                 <h2>
-                    {
-                        gettext('Result')
-                    }
+                    {gettext('Result')}
                 </h2>
                 <button type="button" className="close" data-dismiss="modal" aria-label="Close">
                     <span aria-hidden="true">&times;</span>
                 </button>
                 <h3 className="no-bold indicator_name">
-                    {
-                        gettext('Participant Count')
-                    }
+                    {gettext('Participant Count')}
                 </h3>
 
                 {Object.keys(commonFieldsInput).length > 0 &&
@@ -211,6 +196,8 @@ const PCResultsForm = ({indicatorID="", resultID="", readOnly}) => {
                     formErrors={formErrors}
                     readOnly={readOnly}
                 />
+
+
                 {/* {console.log(disaggregationData, disaggregationArray)} */}
                 {/* {
                     disaggregationArray.map(disagg => {
@@ -252,7 +239,7 @@ const PCResultsForm = ({indicatorID="", resultID="", readOnly}) => {
                                     disagg={disaggsSADD}
                                     total={[disaggregationData["652"].labels[0], disaggregationData["653"].labels[0]]}
                                     title={"SADD (including unknown)"}
-                                    indicatorID={formID}
+                                    formID={indicatorID || resultID}
                                     readOnly={readOnly}
                                     helptext={helptext}
                                     formErrors={formErrors}
@@ -268,7 +255,7 @@ const PCResultsForm = ({indicatorID="", resultID="", readOnly}) => {
                                     key={disagg.disaggregation_type}
                                     disagg={[disagg]}
                                     total={[disaggregationData["653"].labels[0]]}
-                                    indicatorID={formID}
+                                    formID={indicatorID || resultID}
                                     readOnly={readOnly}
                                     helptext={helptext}
                                     formErrors={formErrors}

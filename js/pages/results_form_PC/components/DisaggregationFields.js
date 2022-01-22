@@ -2,7 +2,7 @@ import React, { useState, useEffect } from 'react';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import { HelpText } from '../components/HelpText.js'
 
-const DisaggregationFields = ({ indicatorID, disagg, disaggregationData, disaggregationArray, setDisaggregationData, total, title, helptext, formErrors, readOnly }) => {
+const DisaggregationFields = ({ formID, disagg, disaggregationData, disaggregationArray, setDisaggregationData, total, title, helptext, formErrors, readOnly }) => {
     const [expanded, setExpanded] = useState(false);
 
     let disaggID = disagg.reduce((id, disaggregation) => {
@@ -22,10 +22,10 @@ const DisaggregationFields = ({ indicatorID, disagg, disaggregationData, disaggr
     }, []);
 
     useEffect(() => {
-        $(`#${indicatorID}-${disaggID}`).on('show.bs.collapse', function() {
+        $(`#${formID}-${disaggID}`).on('show.bs.collapse', function() {
             setExpanded(true);
         })
-        $(`#${indicatorID}-${disaggID}`).on('hide.bs.collapse', function() {
+        $(`#${formID}-${disaggID}`).on('hide.bs.collapse', function() {
             setExpanded(false);
         })
     }, [])
@@ -41,7 +41,7 @@ const DisaggregationFields = ({ indicatorID, disagg, disaggregationData, disaggr
             <ul className="list-group form-list-group">
                 <li className="list-group-item heading-row">
                     <div className="item__value--header">
-                        <a className="item__label--accordion accordion-header collapsed" data-toggle="collapse" href={`#${indicatorID}-${disaggID}`} aria-expanded={expanded} aria-controls={`#${disaggID}`}>
+                        <a className="item__label--accordion accordion-header collapsed" data-toggle="collapse" href={`#${formID}-${disaggID}`} aria-expanded={expanded} aria-controls={`#${disaggID}`}>
                             <FontAwesomeIcon icon={ expanded ? 'caret-down' : 'caret-right' } />&nbsp;
                             <label className="label--required">{title || disagg[0].disaggregation_type}</label>
                         </a>
@@ -62,7 +62,7 @@ const DisaggregationFields = ({ indicatorID, disagg, disaggregationData, disaggr
                     </div>
                 </li>
             </ul>
-        <ul className="list-group form-list-group collapse" id={`${indicatorID}-${disaggID}`}>
+        <ul className="list-group form-list-group collapse" id={`${formID}-${disaggID}`}>
             {
                 disagg[0].labels.map((labelObj) => {
                     return (

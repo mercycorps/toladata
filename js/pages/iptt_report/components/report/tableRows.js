@@ -115,6 +115,7 @@ const IndicatorAddResults = inject("rootStore", "filterStore")(
                                             <PCResultsForm
                                                 indicatorID={indicator.pk}
                                                 readOnly={rootStore._readOnly}
+                                                formType="create"
                                             />
                                         </div>
                                     </div>
