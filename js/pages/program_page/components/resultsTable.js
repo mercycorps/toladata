@@ -85,6 +85,7 @@ const ResultCells = ({ result, noTarget, resultEditable, admin_type, ...props })
                                     <PCResultsForm
                                         resultID={result.pk}
                                         readOnly={!resultEditable}
+                                        formType="update"
                                     />
                                 </div>
                             </div>
@@ -361,6 +362,7 @@ const ResultsTableActions = ({indicator, editable, resultEditable, displayMissin
                             <PCResultsForm
                                 indicatorID={indicator.pk}
                                 readOnly={!resultEditable}
+                                formType="create"
                             />
                         </div>
                     </div>

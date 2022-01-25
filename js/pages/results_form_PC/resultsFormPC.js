@@ -1,5 +1,4 @@
 import React, { useState, useEffect } from 'react';
-import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import { CommonFields } from './components/CommonFields.js';
 import { ActualValueFields } from './components/ActualValueFields.js';
 import { EvidenceFields } from './components/EvidenceFields.js';
@@ -16,6 +15,7 @@ const PCResultsForm = ({indicatorID="", resultID="", readOnly}) => {
         653: gettext("Direct participants – are those who have received a tangible benefit from the program, either as the actual program participants or the intended recipients of the program benefits. Indirect participants – are those who received a tangible benefit through their proximity to or contact with program participants or activities."),
     };
 
+    // Helper Methods
     let handleReceivedDisaggregations = (disaggregations_data) => {
         return disaggregations_data.reduce((formated, disagg, i) => {
             formated[disagg.pk] = {...disagg, sort_order: i};
@@ -39,9 +39,12 @@ const PCResultsForm = ({indicatorID="", resultID="", readOnly}) => {
         }, [])
     }
 
+    // Form Validations
     let validateForm = () => {
         let detectedErrors = {};
-        if (!commonFieldsInput.date_collected || commonFieldsInput.date_collected === "") {
+
+        let maxDate = formatDate(localdate()) < commonFieldsInput.program_end_date ? formatDate(localdate()) : commonFieldsInput.program_end_date;
+        if (!commonFieldsInput.date_collected || commonFieldsInput.date_collected === "" || commonFieldsInput.date_collected < commonFieldsInput.program_start_date || commonFieldsInput.date_collected > maxDate) {
             detectedErrors = {...detectedErrors, date_collected: gettext("This date should be within the fiscal year of the reporting period.")}
         };
 
@@ -87,23 +90,7 @@ const PCResultsForm = ({indicatorID="", resultID="", readOnly}) => {
         return Object.keys(detectedErrors).length === 0 ? true: false;
     }
 
-    let formatFields = (data) => {
-        let formatedData = [];
-        Object.keys(data).map(key => {
-            formatedData.push({name: key, value: data[key]})
-        })
-        return formatedData;
-    }
-
-    let formatDisaggregations = () => {
-        return Object.keys(disaggregationData).reduce((disaggArr, currentDisagg) => {
-            disaggregationData[currentDisagg].labels.map((label, i) => {
-                disaggArr.push({name: `disaggregation-formset-${disaggregationData[currentDisagg].pk}-${i}-label_pk`, value: label.value})
-            })
-            return disaggArr;
-        }, []);
-    }
-
+    // On Mounting of the results form modal
     useEffect(() => {
 
         $(`#resultModal_${formID}`).on('shown.bs.modal', function () {
@@ -115,7 +102,6 @@ const PCResultsForm = ({indicatorID="", resultID="", readOnly}) => {
                 setOutcomeThemesData([])
                 setFormErrors({})
             })
-
             $(document).on("keyup", function(event) {
                 if(event.key === 'Escape') {
                     $(`#resultModal_${formID}`).modal('hide');
@@ -146,7 +132,8 @@ const PCResultsForm = ({indicatorID="", resultID="", readOnly}) => {
                         outcome_theme: formatSelectedOutcomeThemes(response.outcome_themes),
                         program_start_date: response.program_start_date,
                         program_end_date: response.program_end_date});
-                    // setEvidenceFieldsInput();
+                    setCommonFieldsInput(commonFields);
+                    setEvidenceFieldsInput(evidenceFields);
                 })
             }
         })
@@ -197,27 +184,25 @@ const PCResultsForm = ({indicatorID="", resultID="", readOnly}) => {
         return (
             <div style={{textAlign: "left"}}>
                 <h2>
-                    {
-                        gettext('Result')
-                    }
+                    {gettext('Result')}
                 </h2>
                 <button type="button" className="close" data-dismiss="modal" aria-label="Close">
                     <span aria-hidden="true">&times;</span>
                 </button>
                 <h3 className="no-bold indicator_name">
-                    {
-                        gettext('Participant Count')
-                    }
+                    {gettext('Participant Count')}
                 </h3>
 
-                <CommonFields
-                    commonFieldsInput={commonFieldsInput}
-                    setCommonFieldsInput={setCommonFieldsInput}
-                    outcomeThemesData={outcomeThemesData}
-                    formErrors={formErrors}
-                    setFormErrors={setFormErrors}
-                    readOnly={readOnly}
-                />
+                {Object.keys(commonFieldsInput).length > 0 &&
+                    <CommonFields
+                        commonFieldsInput={commonFieldsInput}
+                        setCommonFieldsInput={setCommonFieldsInput}
+                        outcomeThemesData={outcomeThemesData}
+                        formErrors={formErrors}
+                        setFormErrors={setFormErrors}
+                        readOnly={readOnly}
+                    />
+                }
 
                 <ActualValueFields
                     disaggregationData={disaggregationData}
@@ -226,6 +211,8 @@ const PCResultsForm = ({indicatorID="", resultID="", readOnly}) => {
                     formErrors={formErrors}
                     readOnly={readOnly}
                 />
+
+
                 {/* {console.log(disaggregationData, disaggregationArray)} */}
                 {/* {
                     disaggregationArray.map(disagg => {
