@@ -114,8 +114,11 @@ const PCResultsForm = ({indicatorID="", resultID="", readOnly}) => {
                         setOutcomeThemesData(formatOutcomeThemesData(response.outcome_themes));
                         setDisaggregationData(handleReceivedDisaggregations(response.disaggregations));
                         setDisaggregationArray(handleDataArray(response.disaggregations))
-                        setCommonFieldsInput({program_start_date: response.program_start_date, program_end_date: response.program_end_date, periodic_target: response.periodic_target});
-                        // setEvidenceFieldsInput();
+                        setCommonFieldsInput({
+                            program_start_date: response.program_start_date,
+                            program_end_date: response.program_end_date,
+                            periodic_target: response.periodic_target
+                        });
                     })
             } else {
 
@@ -125,15 +128,18 @@ const PCResultsForm = ({indicatorID="", resultID="", readOnly}) => {
                     setOutcomeThemesData(formatOutcomeThemesData(response.outcome_themes));
                     setDisaggregationData(handleReceivedDisaggregations(response.disaggregations));
                     setDisaggregationArray(handleDataArray(response.disaggregations))
-                    // TODO: Update the commonFieldInputs and EvidenceFieldInputs with received data for an UPDATE request
                     setCommonFieldsInput({
                         periodic_target: response.periodic_target,
                         date_collected: response.date_collected,
                         outcome_theme: formatSelectedOutcomeThemes(response.outcome_themes),
                         program_start_date: response.program_start_date,
-                        program_end_date: response.program_end_date});
-                    setCommonFieldsInput(commonFields);
-                    setEvidenceFieldsInput(evidenceFields);
+                        program_end_date: response.program_end_date,
+                    });
+                    // setCommonFieldsInput(commonFields);
+                    setEvidenceFieldsInput({
+                        evidence_url: response.evidence_url,
+                        record_name: response.record_name
+                    });
                 })
             }
         })
