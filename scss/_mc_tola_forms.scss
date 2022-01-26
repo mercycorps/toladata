@@ -177,6 +177,9 @@ a.accordion-header {
         background-color: rgba(0, 0, 0, 0) !important;
         text-decoration: none !important;
     }
+    label:hover {
+        cursor: pointer;
+    }
 }
 a.helptext:hover {
     text-decoration: none;
