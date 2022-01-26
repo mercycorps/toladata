@@ -204,7 +204,6 @@ def participant_count_result_update(request, pk, *args, **kwargs):
             'indicator': indicator.pk,
             'edit_date': timezone.now(),
             'outcome_themes': request.data.pop('outcome_theme')
-
         })
 
         result_serializer = pc_serializers.PCResultSerializerWrite(result, data=result_data)

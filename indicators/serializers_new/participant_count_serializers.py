@@ -145,7 +145,9 @@ class PCResultSerializerWrite(serializers.ModelSerializer):
     def update(self, instance, validated_data):
         disaggregations = validated_data.pop('disaggregations')
         outcome_themes = validated_data.pop('outcome_themes')
-
+        for key, value in validated_data.items():
+            setattr(instance, key, value)
+        instance.save()
         instance.outcome_themes.remove()
         instance.outcome_themes.add(*outcome_themes)
 

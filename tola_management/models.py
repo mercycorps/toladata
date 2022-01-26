@@ -404,6 +404,7 @@ class ProgramAuditLog(models.Model, DiffableLog):
             "date": _('Result date'),
             "target": _('Measure against target'),
             "value": _('Actual value'),
+            "outcome_themes": _("Outcome theme"),
             "start_date": _('Start date'),
             "end_date": _('End date'),
             "assumptions": _('Assumptions'),
