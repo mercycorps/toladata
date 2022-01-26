@@ -141,3 +141,26 @@ class PCResultSerializerWrite(serializers.ModelSerializer):
         # save method and won't trigger signals, but I don't we need any of those things in this case.
         DisaggregatedValue.objects.bulk_create(value_objs)
         return result
+
+    def update(self, instance, validated_data):
+        disaggregations = validated_data.pop('disaggregations')
+        outcome_themes = validated_data.pop('outcome_themes')
+
+        instance.outcome_themes.remove()
+        instance.outcome_themes.add(*outcome_themes)
+
+        new_value_objs = []
+        old_label_ids = []
+        for disagg in disaggregations:
+            for label in disagg['labels']:
+                old_label_ids.append(label['disaggregationlabel_id'])
+                if label['value']:
+                    new_value_objs.append(DisaggregatedValue(
+                        category_id=label['disaggregationlabel_id'], result=instance, value=label['value']))
+
+        old_disagg_values = DisaggregatedValue.objects.filter(category_id__in=old_label_ids, result=instance)
+        old_disagg_values.delete()
+        # There's lots of warnings about batch_create in the Django documentation, e.g. it skips the
+        # save method and won't trigger signals, but I don't we need any of those things in this case.
+        DisaggregatedValue.objects.bulk_create(new_value_objs)
+        return instance
