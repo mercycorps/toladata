@@ -1,27 +1,11 @@
 import React, { useState, useEffect } from 'react';
 import { HelpText } from '../components/HelpText.js'
 
-const ActualValueFields = ({ disaggregationData, disaggregationArray, setDisaggregationData, formErrors, readOnly }) => {
+const ActualValueFields = ({ disaggregationData, setDisaggregationData, formErrors, readOnly }) => {
 
-    const [actualWithDouble, setActualWithDouble] = useState({})
-    const [actualWithoutDouble, setActualWithoutDouble] = useState({})
-    // console.log('disaggregationArray', disaggregationArray);
-    // useEffect(() => {
-    //     disaggregationArray.map(disagg => {
-    //         if (disagg.disaggregation_type === "Actual with double counting") {
-    //             console.log('with', disagg);
-    //             setActualWithDouble(disagg);
-    //         } else if (disagg.disaggregation_type === "Actual without double counting") {
-    //             console.log('without', disagg);
-    //             setActualWithoutDouble(disagg);
-    //         }
-    //     })
-    // }, [])
-
-    let handleDataEntry = (value, inputDisaggPk, inputLabelIndex) => {
-        // console.log(actualWithDouble, actualWithoutDouble);
+    let handleDataEntry = (value, inputDisagg, inputLabelIndex) => {
         let update = {...disaggregationData};
-        update[inputDisaggPk].labels[inputLabelIndex] = {...disaggregationData[inputDisaggPk].labels[inputLabelIndex], value: value};
+        update[inputDisagg].labels[inputLabelIndex] = {...disaggregationData[inputDisagg].labels[inputLabelIndex], value: value};
         setDisaggregationData(update);
     }
     
@@ -51,23 +35,20 @@ const ActualValueFields = ({ disaggregationData, disaggregationArray, setDisaggr
                         <input 
                             type="number" 
                             className="bin form-control input-value"
-                            // name={`${actualWithDouble.disaggregation_type}_${actualWithDouble.count_type}_doubleCounting-${actualWithDouble.double_counting}`}
-                            // name={`id_${actualWithDouble.disaggregation_type}_${actualWithDouble.count_type}_doubleCounting-${actualWithDouble.double_counting}`}
-                            name={`${disaggregationData["652"].disaggregation_type}-${disaggregationData["652"].labels[0]}`}
-                            id={`id_${disaggregationData["652"].disaggregation_type}-${disaggregationData["652"].labels[0]}`}
+                            id="id_Actual-without-double-counting--Direct"
+                            name="Actual-without-double-counting--Direct"
                             disabled={readOnly}
-                            value={disaggregationData["652"].labels[0].value || ""}
-                            value={disaggregationData["652"].labels[0].value || ""}
-                            onChange={(e) => handleDataEntry(e.target.value, 652, 0)}
+                            value={Math.round(disaggregationData["Actual without double counting"].labels[0].value) || ""}
+                            onChange={(e) => handleDataEntry(e.target.value, "Actual without double counting", 0)}
                         />
                         <input 
                             type="number" 
-                            className="bin form-control input-value" 
-                            name={`${disaggregationData["653"].disaggregation_type}-${disaggregationData["653"].labels[0]}`}
-                            id={`id_${disaggregationData["653"].disaggregation_type}-${disaggregationData["653"].labels[0]}`}
+                            className="bin form-control input-value"
+                            id="id_Actual-with-double-counting--Direct"
+                            name="Actual-with-double-counting--Direct"
                             disabled={readOnly}
-                            value={disaggregationData["653"].labels[0].value || ""}
-                            onChange={(e) => handleDataEntry(e.target.value, 653, 0)}
+                            value={Math.round(disaggregationData["Actual with double counting"].labels[0].value) || ""}
+                            onChange={(e) => handleDataEntry(e.target.value, "Actual with double counting", 0)}
 
                         />
                     </div>
@@ -79,20 +60,20 @@ const ActualValueFields = ({ disaggregationData, disaggregationArray, setDisaggr
                         <input 
                             type="number" 
                             className="bin form-control input-value" 
-                            name={`${disaggregationData["652"].disaggregation_type}-${disaggregationData["652"].labels[1]}`}
-                            id={`id_${disaggregationData["652"].disaggregation_type}-${disaggregationData["652"].labels[1]}`}
+                            id="id_Actual-without-double-counting--Indirect"
+                            name="Actual-without-double-counting--Indirect"
                             disabled={readOnly}
-                            value={disaggregationData["652"].labels[1].value || ""}
-                            onChange={(e) => handleDataEntry(e.target.value, 652, 1)}
+                            value={Math.round(disaggregationData["Actual without double counting"].labels[1].value) || ""}
+                            onChange={(e) => handleDataEntry(e.target.value, "Actual without double counting", 1)}
                         />
                         <input 
                             type="number" 
                             className="bin form-control input-value" 
-                            name={`${disaggregationData["653"].disaggregation_type}-${disaggregationData["653"].labels[1]}`}
-                            id={`id_${disaggregationData["653"].disaggregation_type}-${disaggregationData["653"].labels[1]}`}
+                            id="id_Actual-with-double-counting--Indirect"
+                            name="Actual-with-double-counting--Indirect"
                             disabled={readOnly}
-                            value={disaggregationData["653"].labels[1].value || ""}
-                            onChange={(e) => handleDataEntry(e.target.value, 653, 1)}
+                            value={Math.round(disaggregationData["Actual with double counting"].labels[1].value) || ""}
+                            onChange={(e) => handleDataEntry(e.target.value, "Actual with double counting", 1)}
                         />
                     </div>
                 </li>
@@ -100,8 +81,8 @@ const ActualValueFields = ({ disaggregationData, disaggregationArray, setDisaggr
                 <li className="list-group-item reference-row">
                     <div className="item__label">{gettext("Actual total value")}</div>
                     <div className="item__value--container">
-                        <div className="bin">{parseInt(disaggregationData['652'].labels[0].value || 0) + parseInt(disaggregationData['652'].labels[1].value || 0)}</div>
-                        <div className="bin">{parseInt(disaggregationData['653'].labels[0].value || 0) + parseInt(disaggregationData['653'].labels[1].value || 0)}</div>
+                        <div className="bin">{parseInt(disaggregationData["Actual without double counting"].labels[0].value || 0) + parseInt(disaggregationData["Actual without double counting"].labels[1].value || 0)}</div>
+                        <div className="bin">{parseInt(disaggregationData["Actual with double counting"].labels[0].value || 0) + parseInt(disaggregationData["Actual with double counting"].labels[1].value || 0)}</div>
                     </div>
                 </li>
                 {

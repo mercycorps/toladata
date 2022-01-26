@@ -18,6 +18,10 @@ const CommonFields = ({ commonFieldsInput, setCommonFieldsInput, outcomeThemesDa
                 maxDate: formatDate(localdate()) < commonFieldsInput.program_end_date ? formatDate(localdate()) : commonFieldsInput.program_end_date,
                 minDate: commonFieldsInput.program_start_date,
             });
+            if (commonFieldsInput.date_collected) {
+                $('.datepicker').datepicker("setDate", commonFieldsInput.date_collected);
+                setSelectedDate(commonFieldsInput.date_collected);
+            }
             // Capture the value of the datepicker and triggers an update of state
             $('.datepicker').on('change', () => {
                 var date = $('.datepicker').datepicker('getDate');

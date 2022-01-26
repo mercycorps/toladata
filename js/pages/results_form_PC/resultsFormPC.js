@@ -7,19 +7,13 @@ import api from '../../apiv2';
 
 
 const PCResultsForm = ({indicatorID="", resultID="", readOnly}) => {
-    const helptext = {
-        "648-649": gettext("Only include SADD for Direct participants."),
-        650: gettext("Provide a disaggregation of participants reached by sector. Only provide the figure with double counting. Refer to MEL Tip Sheet: Guidelines on Counting and Reporting Participant Numbers <a href='https://library.mercycorps.org/record/16929?ln=en' target='_blank'>[link: https://library.mercycorps.org/record/16929?ln=en]</a> for a description of outcome themes."),
-        651: gettext("Provide a disaggregation of participants reached by sector. Only provide the figure with double counting. Refer to MEL Tip Sheet: Guidelines on Counting and Reporting Participant Numbers <a href='https://library.mercycorps.org/record/16929?ln=en' target='_blank'>[link: https://library.mercycorps.org/record/16929?ln=en]</a> for a description of outcome themes."),
-        652: gettext("Direct participants – are those who have received a tangible benefit from the program, either as the actual program participants or the intended recipients of the program benefits. Indirect participants – are those who received a tangible benefit through their proximity to or contact with program participants or activities."),
-        653: gettext("Direct participants – are those who have received a tangible benefit from the program, either as the actual program participants or the intended recipients of the program benefits. Indirect participants – are those who received a tangible benefit through their proximity to or contact with program participants or activities."),
-    };
-
     // Helper Methods
     let handleReceivedDisaggregations = (disaggregations_data) => {
-        return disaggregations_data.reduce((formated, disagg, i) => {
-            formated[disagg.pk] = {...disagg, sort_order: i};
-            return formated;
+        return disaggregations_data.reduce((disaggObj, disagg, i) => {
+            disaggObj[disagg.disaggregation_type] = {...disagg, sort_order: i, };
+            disagg.disaggregation_type.includes('without') ? disaggObj[disagg.disaggregation_type] = {...disaggObj[disagg.disaggregation_type], double_counting: false} : disaggObj[disagg.disaggregation_type] = {...disaggObj[disagg.disaggregation_type], double_counting: true};
+            disagg.disaggregation_type.includes('Indirect') ? disaggObj[disagg.disaggregation_type] = {...disaggObj[disagg.disaggregation_type], count_type: "Indirect"} : disaggObj[disagg.disaggregation_type] = {...disaggObj[disagg.disaggregation_type], count_type: "Direct"};
+            return disaggObj;
         }, {});
     }
 
@@ -90,12 +84,19 @@ const PCResultsForm = ({indicatorID="", resultID="", readOnly}) => {
         return Object.keys(detectedErrors).length === 0 ? true: false;
     }
 
+    // State Variables
+    let formID = indicatorID ? indicatorID : resultID;
+    const [outcomeThemesData, setOutcomeThemesData] = useState([]);
+    const [disaggregationData, setDisaggregationData] = useState([]);
+    const [evidenceFieldsInput, setEvidenceFieldsInput] = useState({});
+    const [commonFieldsInput, setCommonFieldsInput] = useState({});
+    const [formErrors, setFormErrors] = useState({});
+
     // On Mounting of the results form modal
     useEffect(() => {
 
         $(`#resultModal_${formID}`).on('shown.bs.modal', function () {
             $(`#resultModal_${formID}`).on('hidden.bs.modal', function () {
-                setDisaggregationArray([])
                 setDisaggregationData([])
                 setCommonFieldsInput({})
                 setEvidenceFieldsInput({})
@@ -113,7 +114,6 @@ const PCResultsForm = ({indicatorID="", resultID="", readOnly}) => {
                         console.log("Form received data!", response);
                         setOutcomeThemesData(formatOutcomeThemesData(response.outcome_themes));
                         setDisaggregationData(handleReceivedDisaggregations(response.disaggregations));
-                        setDisaggregationArray(handleDataArray(response.disaggregations))
                         setCommonFieldsInput({
                             program_start_date: response.program_start_date,
                             program_end_date: response.program_end_date,
@@ -121,13 +121,11 @@ const PCResultsForm = ({indicatorID="", resultID="", readOnly}) => {
                         });
                     })
             } else {
-
                 api.getPCountResultUpdateData(resultID)
                 .then(response => {
                     console.log("Form received data!", response);
                     setOutcomeThemesData(formatOutcomeThemesData(response.outcome_themes));
                     setDisaggregationData(handleReceivedDisaggregations(response.disaggregations));
-                    setDisaggregationArray(handleDataArray(response.disaggregations))
                     setCommonFieldsInput({
                         periodic_target: response.periodic_target,
                         date_collected: response.date_collected,
@@ -135,7 +133,6 @@ const PCResultsForm = ({indicatorID="", resultID="", readOnly}) => {
                         program_start_date: response.program_start_date,
                         program_end_date: response.program_end_date,
                     });
-                    // setCommonFieldsInput(commonFields);
                     setEvidenceFieldsInput({
                         evidence_url: response.evidence_url,
                         record_name: response.record_name
@@ -145,50 +142,37 @@ const PCResultsForm = ({indicatorID="", resultID="", readOnly}) => {
         })
     }, [])
 
-    let handleDataArray = (dataArray) => {
-        return dataArray.reduce((arr, currentDisagg, i) => {
-            currentDisagg.disaggregation_type.includes('without') ? arr[i] = {...currentDisagg, double_counting: false} : arr[i] = {...currentDisagg, double_counting: true};
-            currentDisagg.disaggregation_type.includes('Indirect') ? arr[i] = {...arr[i], count_type: "Indirect"} : arr[i] = {...arr[i], count_type: "Direct"};
-            return arr;
-        }, []);
-    }
-
-    let formID = indicatorID ? indicatorID : resultID;
-    const [outcomeThemesData, setOutcomeThemesData] = useState([]);
-    const [disaggregationData, setDisaggregationData] = useState([]);
-    const [disaggregationArray, setDisaggregationArray] = useState([]);
-    const [evidenceFieldsInput, setEvidenceFieldsInput] = useState({});
-    const [commonFieldsInput, setCommonFieldsInput] = useState({}); // TODO: receive start, and end dates from GET request. Calculate fiscal year based on those dates.
-    const [formErrors, setFormErrors] = useState({});
-
+    // On Submission of the results form
     let handleSubmit = (e) => {
         e.preventDefault();
-        if ( validateForm() ) {
+        // if ( validateForm() ) {
 
             let data = [];
             data = {...data, indicator: indicatorID, ...commonFieldsInput, ...evidenceFieldsInput, disaggregations: Object.values(disaggregationData)};
-            data['outcome_theme'] = data['outcome_theme'].map((theme) => theme.value).filter(t => t != null);
-            data['periodic_target'] = data['periodic_target']['id'];
+            data['outcome_theme'] = data['outcome_theme'].map((theme) => theme.value)
+            data['periodic_target'] = data['periodic_target']['id']
+            console.log("Submit Data", data);
             if (indicatorID) {
                 api.createPCountResult(indicatorID, data)
                     .then(response => {
                         console.log("Saved Form Data!", response);
-                        $(`#resultModal_${resultID || indicatorID}`).modal('hide');
-                        // TODO: Add action after the form is sent
+                        if (response.status === 200) {
+                            $(`#resultModal_${indicatorID || resultID}`).modal('hide');
+                        }
                     })
-                } else {
+            } else {
                 api.updatePCountResult(resultID, data)
                     .then(response => {
-                        console.log("Saved Form Data!", response);
-                        $(`#resultModal_${resultID || indicatorID}`).modal('hide');
-                        // TODO: Add action after the form is sent
+                        if (response.status === 200) {
+                            $(`#resultModal_${indicatorID || resultID}`).modal('hide');
+                        }
+                        console.log("Updated Form Data!", response);
                     })
             }
-        }
-
+        // }
     }
-    // if (Object.keys(disaggregationData).length > 0) {
-    if (disaggregationArray.length > 0) {
+
+    if (Object.keys(disaggregationData).length > 0) {
         return (
             <div style={{textAlign: "left"}}>
                 <h2>
@@ -214,109 +198,44 @@ const PCResultsForm = ({indicatorID="", resultID="", readOnly}) => {
 
                 <ActualValueFields
                     disaggregationData={disaggregationData}
-                    disaggregationArray={disaggregationArray}
                     setDisaggregationData={setDisaggregationData}
                     formErrors={formErrors}
                     readOnly={readOnly}
                 />
-
-
-                {/* {console.log(disaggregationData, disaggregationArray)} */}
-                {/* {
-                    disaggregationArray.map(disagg => {
-                        if (disagg.disaggregation_type === "Actual with double counting" || disagg.disaggregation_type === "Actual without double counting") {
-                            return;
-                        }else if (disagg.disaggregation_type.includes("SADD (including unknown)")) {
-                            console.log(disagg.disaggregation_type);
-                        } else {
-                            console.log("else", disagg.disaggregation_type);
-                        }
-                    })
-                } */}
-
-
-
-                {/* <DisaggregationFields
-                    disagg={[disaggregationData["649"],disaggregationData["648"]]}
-                    total={[disaggregationData["652"].labels[0], disaggregationData["653"].labels[0]]}
-                    title={"SADD (including unknown)"}
-                    indicatorID={indicatorID}
-                    readOnly={readOnly}
-                    helptext={helptext}
-                    formErrors={formErrors}
-                    disaggregationData={disaggregationData}
-                    setDisaggregationData={setDisaggregationData}
-                /> */}
                 {
-                    disaggregationArray.map((disagg) => {
-                        if (disagg.disaggregation_type.includes('SADD') && disagg.double_counting === true) {
-                            let disaggsSADD = disaggregationArray.reduce((arrSADD, currentDisagg) => {
-                                if (currentDisagg.disaggregation_type.includes("SADD")) {
-                                    arrSADD.push(currentDisagg);
+                    Object.keys(disaggregationData).map((disagg) => {
+                        let disaggs = [];
+                        if (disaggregationData[disagg].disaggregation_type.includes('SADD') && disaggregationData[disagg].double_counting === true) {
+                            disaggs = Object.keys(disaggregationData).reduce((arrSADD, currentDisagg) => {
+                                if (disaggregationData[currentDisagg].disaggregation_type.includes("SADD")) {
+                                    arrSADD.push(disaggregationData[currentDisagg]);
                                 }
                                 return arrSADD;
                             }, []);
-                            return (
-                                <DisaggregationFields
-                                    key={disagg.disaggregation_type}
-                                    disagg={disaggsSADD}
-                                    total={[disaggregationData["652"].labels[0], disaggregationData["653"].labels[0]]}
-                                    title={"SADD (including unknown)"}
-                                    indicatorID={formID}
-                                    readOnly={readOnly}
-                                    helptext={helptext}
-                                    formErrors={formErrors}
-                                    disaggregationArray={disaggregationArray}
-                                    disaggregationData={disaggregationData}
-                                    setDisaggregationData={setDisaggregationData}
-                                />
-                            )
-                        }
-                        if (disagg.disaggregation_type.includes('Sectors')) {
-                            return (
-                                <DisaggregationFields
-                                    key={disagg.disaggregation_type}
-                                    disagg={[disagg]}
-                                    total={[disaggregationData["653"].labels[0]]}
-                                    indicatorID={formID}
-                                    readOnly={readOnly}
-                                    helptext={helptext}
-                                    formErrors={formErrors}
-                                    disaggregationArray={disaggregationArray}
-                                    disaggregationData={disaggregationData}
-                                    setDisaggregationData={setDisaggregationData}
-                                />
-                            )
-                        }
+                        } else if (disaggregationData[disagg].disaggregation_type.includes('Sectors')) {
+                            disaggs = [disaggregationData[disagg]]
+                        } else { return; }
+
+                        return (
+                            <DisaggregationFields
+                                key={disaggregationData[disagg].disaggregation_type}
+                                disagg={disaggs}
+                                formID={indicatorID || resultID}
+                                readOnly={readOnly}
+                                formErrors={formErrors}
+                                disaggregationData={disaggregationData}
+                                setDisaggregationData={setDisaggregationData}
+                            />
+                        )
                     })
                 }
-                {/* <DisaggregationFields
-                    disagg={[disaggregationData["650"]]}
-                    total={[disaggregationData["653"].labels[0]]}
-                    indicatorID={indicatorID}
-                    readOnly={readOnly}
-                    helptext={helptext}
-                    formErrors={formErrors}
-                    disaggregationData={disaggregationData}
-                    setDisaggregationData={setDisaggregationData}
-                />
-                <DisaggregationFields
-                    disagg={[disaggregationData["651"]]}
-                    total={[disaggregationData["653"].labels[1]]}
-                    indicatorID={indicatorID}
-                    readOnly={readOnly}
-                    helptext={helptext}
-                    formErrors={formErrors}
-                    disaggregationData={disaggregationData}
-                    setDisaggregationData={setDisaggregationData}
-                /> */}
-
                 <EvidenceFields
                     evidenceFieldsInput={evidenceFieldsInput}
                     setEvidenceFieldsInput={setEvidenceFieldsInput}
                     formErrors={formErrors}
                     readOnly={readOnly}
                 />
+
                 {!readOnly &&
                 <div className="form-actions">
                     <div>
