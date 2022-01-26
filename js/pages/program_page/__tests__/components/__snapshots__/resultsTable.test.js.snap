@@ -386,23 +386,6 @@ exports[`Results table component result rows for an annual indicator with result
       className="cd-actions__message"
     />
     <div
-      className="modal fade"
-      id="resultModal_99"
-      role="dialog"
-    >
-      <div
-        className="modal-dialog modal-lg"
-      >
-        <div
-          className="modal-content"
-        >
-          <div
-            className="modal-body"
-          />
-        </div>
-      </div>
-    </div>
-    <div
       className="cd-actions__button"
     >
       <a
@@ -588,23 +571,6 @@ exports[`Results table component with a valid indicator and editing privileges c
     <div
       className="cd-actions__message"
     />
-    <div
-      className="modal fade"
-      id="resultModal_105"
-      role="dialog"
-    >
-      <div
-        className="modal-dialog modal-lg"
-      >
-        <div
-          className="modal-content"
-        >
-          <div
-            className="modal-body"
-          />
-        </div>
-      </div>
-    </div>
     <div
       className="cd-actions__button"
     >
@@ -1022,23 +988,6 @@ exports[`Results table component with a valid indicator and editing privileges c
       className="cd-actions__message"
     />
     <div
-      className="modal fade"
-      id="resultModal_99"
-      role="dialog"
-    >
-      <div
-        className="modal-dialog modal-lg"
-      >
-        <div
-          className="modal-content"
-        >
-          <div
-            className="modal-body"
-          />
-        </div>
-      </div>
-    </div>
-    <div
       className="cd-actions__button"
     >
       <a
@@ -1293,23 +1242,6 @@ exports[`Results table component with a valid indicator and editing privileges c
     <div
       className="cd-actions__message"
     />
-    <div
-      className="modal fade"
-      id="resultModal_108"
-      role="dialog"
-    >
-      <div
-        className="modal-dialog modal-lg"
-      >
-        <div
-          className="modal-content"
-        >
-          <div
-            className="modal-body"
-          />
-        </div>
-      </div>
-    </div>
     <div
       className="cd-actions__button"
     >
@@ -1865,23 +1797,6 @@ exports[`Results table component with a valid indicator and editing privileges c
       className="cd-actions__message"
     />
     <div
-      className="modal fade"
-      id="resultModal_109"
-      role="dialog"
-    >
-      <div
-        className="modal-dialog modal-lg"
-      >
-        <div
-          className="modal-content"
-        >
-          <div
-            className="modal-body"
-          />
-        </div>
-      </div>
-    </div>
-    <div
       className="cd-actions__button"
     >
       <a
@@ -2067,23 +1982,6 @@ exports[`Results table component with a valid indicator and editing privileges m
     <div
       className="cd-actions__message"
     />
-    <div
-      className="modal fade"
-      id="resultModal_105"
-      role="dialog"
-    >
-      <div
-        className="modal-dialog modal-lg"
-      >
-        <div
-          className="modal-content"
-        >
-          <div
-            className="modal-body"
-          />
-        </div>
-      </div>
-    </div>
     <div
       className="cd-actions__button"
     >
@@ -2501,23 +2399,6 @@ exports[`Results table component with a valid indicator and editing privileges m
       className="cd-actions__message"
     />
     <div
-      className="modal fade"
-      id="resultModal_99"
-      role="dialog"
-    >
-      <div
-        className="modal-dialog modal-lg"
-      >
-        <div
-          className="modal-content"
-        >
-          <div
-            className="modal-body"
-          />
-        </div>
-      </div>
-    </div>
-    <div
       className="cd-actions__button"
     >
       <a
@@ -2772,23 +2653,6 @@ exports[`Results table component with a valid indicator and editing privileges m
     <div
       className="cd-actions__message"
     />
-    <div
-      className="modal fade"
-      id="resultModal_108"
-      role="dialog"
-    >
-      <div
-        className="modal-dialog modal-lg"
-      >
-        <div
-          className="modal-content"
-        >
-          <div
-            className="modal-body"
-          />
-        </div>
-      </div>
-    </div>
     <div
       className="cd-actions__button"
     >
@@ -3344,23 +3208,6 @@ exports[`Results table component with a valid indicator and editing privileges m
       className="cd-actions__message"
     />
     <div
-      className="modal fade"
-      id="resultModal_109"
-      role="dialog"
-    >
-      <div
-        className="modal-dialog modal-lg"
-      >
-        <div
-          className="modal-content"
-        >
-          <div
-            className="modal-body"
-          />
-        </div>
-      </div>
-    </div>
-    <div
       className="cd-actions__button"
     >
       <a
@@ -3546,23 +3393,6 @@ exports[`Results table component with a valid indicator and no editing privilege
     <div
       className="cd-actions__message"
     />
-    <div
-      className="modal fade"
-      id="resultModal_105"
-      role="dialog"
-    >
-      <div
-        className="modal-dialog modal-lg"
-      >
-        <div
-          className="modal-content"
-        >
-          <div
-            className="modal-body"
-          />
-        </div>
-      </div>
-    </div>
   </div>
 </div>
 `;
@@ -3952,23 +3782,6 @@ exports[`Results table component with a valid indicator and no editing privilege
     <div
       className="cd-actions__message"
     />
-    <div
-      className="modal fade"
-      id="resultModal_99"
-      role="dialog"
-    >
-      <div
-        className="modal-dialog modal-lg"
-      >
-        <div
-          className="modal-content"
-        >
-          <div
-            className="modal-body"
-          />
-        </div>
-      </div>
-    </div>
   </div>
 </div>
 `;
@@ -4197,23 +4010,6 @@ exports[`Results table component with a valid indicator and no editing privilege
     <div
       className="cd-actions__message"
     />
-    <div
-      className="modal fade"
-      id="resultModal_108"
-      role="dialog"
-    >
-      <div
-        className="modal-dialog modal-lg"
-      >
-        <div
-          className="modal-content"
-        >
-          <div
-            className="modal-body"
-          />
-        </div>
-      </div>
-    </div>
   </div>
 </div>
 `;
@@ -4741,23 +4537,6 @@ exports[`Results table component with a valid indicator and no editing privilege
     <div
       className="cd-actions__message"
     />
-    <div
-      className="modal fade"
-      id="resultModal_109"
-      role="dialog"
-    >
-      <div
-        className="modal-dialog modal-lg"
-      >
-        <div
-          className="modal-content"
-        >
-          <div
-            className="modal-body"
-          />
-        </div>
-      </div>
-    </div>
   </div>
 </div>
 `;
@@ -4799,23 +4578,6 @@ exports[`Results table component with an indicator with no targets and no freque
           </svg>
           Add targets
         </a>
-      </div>
-    </div>
-    <div
-      className="modal fade"
-      id="resultModal_112"
-      role="dialog"
-    >
-      <div
-        className="modal-dialog modal-lg"
-      >
-        <div
-          className="modal-content"
-        >
-          <div
-            className="modal-body"
-          />
-        </div>
       </div>
     </div>
     <div
@@ -4889,23 +4651,6 @@ exports[`Results table component with an indicator with no targets and no freque
       </div>
     </div>
     <div
-      className="modal fade"
-      id="resultModal_112"
-      role="dialog"
-    >
-      <div
-        className="modal-dialog modal-lg"
-      >
-        <div
-          className="modal-content"
-        >
-          <div
-            className="modal-body"
-          />
-        </div>
-      </div>
-    </div>
-    <div
       className="cd-actions__button disable-span"
     >
       <a
@@ -4950,23 +4695,6 @@ exports[`Results table component with an indicator with no targets and no freque
         className="text-danger"
       />
     </div>
-    <div
-      className="modal fade"
-      id="resultModal_112"
-      role="dialog"
-    >
-      <div
-        className="modal-dialog modal-lg"
-      >
-        <div
-          className="modal-content"
-        >
-          <div
-            className="modal-body"
-          />
-        </div>
-      </div>
-    </div>
   </div>
 </div>
 `;
@@ -4984,23 +4712,6 @@ exports[`Results table component with an indicator with no targets and no freque
       <div
         className="text-danger"
       />
-    </div>
-    <div
-      className="modal fade"
-      id="resultModal_112"
-      role="dialog"
-    >
-      <div
-        className="modal-dialog modal-lg"
-      >
-        <div
-          className="modal-content"
-        >
-          <div
-            className="modal-body"
-          />
-        </div>
-      </div>
     </div>
   </div>
 </div>
