@@ -135,6 +135,8 @@ class ChangesetEntry extends React.Component {
             case 'result_changed':
             case 'result_created':
             case 'result_deleted':
+            case 'participant_count_changed':
+            case 'participant_count_created':
                 return <ResultChangeset data={data} name={name} pretty_name={pretty_name} />
                 break
             case 'program_dates_changed':

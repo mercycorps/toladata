@@ -159,7 +159,9 @@ def participant_count_result_create_for_indicator(request, pk, *args, **kwargs):
         result_data.update(request.data)
         result = pc_serializers.PCResultSerializerWrite(data=result_data)
         if result.is_valid():
-            result.save()
+            result_obj = result.save()
+            ProgramAuditLog.log_result_created(
+                request.user, indicator, result_obj, '')
         else:
             return JsonResponse(result.errors, status=404)
 
@@ -187,6 +189,7 @@ def participant_count_result_update(request, pk, *args, **kwargs):
     indicator = result.indicator
     if request.method == 'PUT':
         verify_program_access_level(request, indicator.program.pk, 'medium')
+        old_result_values = result.logged_participant_count_fields
         achieved_val = None
         for disagg in request.data['disaggregations']:
             if disagg['disaggregation_type'] == 'Actual without double counting':
@@ -201,12 +204,15 @@ def participant_count_result_update(request, pk, *args, **kwargs):
             'indicator': indicator.pk,
             'edit_date': timezone.now(),
             'outcome_themes': request.data.pop('outcome_theme')
-
         })
 
-        result = pc_serializers.PCResultSerializerWrite(result, data=result_data)
-        if result.is_valid():
-            result.save()
+        result_serializer = pc_serializers.PCResultSerializerWrite(result, data=result_data)
+        if result_serializer.is_valid():
+            updated_result = result_serializer.save()
+            ProgramAuditLog.log_result_updated(
+                request.user, indicator, old_result_values,
+                updated_result.logged_participant_count_fields, '')
+
         else:
             return JsonResponse(result.errors, status=404)
 

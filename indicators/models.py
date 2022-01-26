@@ -1,4 +1,4 @@
-# -*- coding: utf-8 -*-
+
 import re
 import collections
 import string
@@ -2345,6 +2345,15 @@ class Result(models.Model):
             }
         }
 
+    @property
+    def logged_participant_count_fields(self):
+        lf = self.logged_fields
+        lf.pop('sites')
+        lf['outcome_themes'] = ', '.join(
+            outcome_theme.name for outcome_theme in self.outcome_themes.all()) if self.outcome_themes.exists() else ''
+        return lf
+
+
     @staticmethod
     def logged_field_order():
         """
@@ -2353,7 +2362,8 @@ class Result(models.Model):
         shrunk, only expanded or reordered.
         """
         return [
-            'id', 'date', 'target', 'value', 'disaggregation_values', 'evidence_url', 'evidence_name', 'sites']
+            'id', 'date', 'target', 'value', 'outcome_themes', 'disaggregation_values', 'evidence_url',
+            'evidence_name', 'sites']
 
 
 class ResultAdmin(admin.ModelAdmin):
