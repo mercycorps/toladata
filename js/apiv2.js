@@ -187,8 +187,8 @@ const api = {
                 return error.response;
             })
     },
-    async getPCountResultsData(form_id, form_type) {
-        return await this.apiInstance.get(`/pcount_result_${form_type}/${form_id}`)
+    async getPCountResultCreateData(indicator_id) {
+        return await this.apiInstance.get(`/pcount_result_create/${indicator_id}`)
             .then(response => {
                 return response.data;
             })
@@ -201,6 +201,17 @@ const api = {
         return await this.apiInstance.post(`/pcount_result_create/${indicator_id}`,
             form_data, {headers: {'Content-Type': 'application/json'}})
             .then(response => {
+                console.log("API", response);
+                return response.data;
+            })
+            .catch(error => {
+                this.logFailure(error);
+                return error.response;
+            })
+    },
+    async getPCountResultUpdateData(result_id) {
+        return await this.apiInstance.get(`/pcount_result_update/${result_id}`)
+            .then(response => {
                 return response.data;
             })
             .catch(error => {
@@ -209,8 +220,8 @@ const api = {
             })
     },
     async updatePCountResult(result_id, form_data) {
-        return await this.apiInstance.put(`/pcount_result_create/${result_id}`,
-            form_data, {headers: {'Content-Type': 'multipart/form-data'}})
+        return await this.apiInstance.put(`/pcount_result_update/${result_id}`,
+            form_data, {headers: {'Content-Type': 'application/json'}})
             .then(response => {
                 return response.data;
             })

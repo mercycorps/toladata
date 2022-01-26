@@ -38,7 +38,7 @@ const ActualValueFields = ({ disaggregationData, setDisaggregationData, formErro
                             id="id_Actual-without-double-counting--Direct"
                             name="Actual-without-double-counting--Direct"
                             disabled={readOnly}
-                            value={disaggregationData["Actual without double counting"].labels[0].value || ""}
+                            value={Math.round(disaggregationData["Actual without double counting"].labels[0].value) || ""}
                             onChange={(e) => handleDataEntry(e.target.value, "Actual without double counting", 0)}
                         />
                         <input 
@@ -47,7 +47,7 @@ const ActualValueFields = ({ disaggregationData, setDisaggregationData, formErro
                             id="id_Actual-with-double-counting--Direct"
                             name="Actual-with-double-counting--Direct"
                             disabled={readOnly}
-                            value={disaggregationData["Actual with double counting"].labels[0].value || ""}
+                            value={Math.round(disaggregationData["Actual with double counting"].labels[0].value) || ""}
                             onChange={(e) => handleDataEntry(e.target.value, "Actual with double counting", 0)}
 
                         />
@@ -63,7 +63,7 @@ const ActualValueFields = ({ disaggregationData, setDisaggregationData, formErro
                             id="id_Actual-without-double-counting--Indirect"
                             name="Actual-without-double-counting--Indirect"
                             disabled={readOnly}
-                            value={disaggregationData["Actual without double counting"].labels[1].value || ""}
+                            value={Math.round(disaggregationData["Actual without double counting"].labels[1].value) || ""}
                             onChange={(e) => handleDataEntry(e.target.value, "Actual without double counting", 1)}
                         />
                         <input 
@@ -72,7 +72,7 @@ const ActualValueFields = ({ disaggregationData, setDisaggregationData, formErro
                             id="id_Actual-with-double-counting--Indirect"
                             name="Actual-with-double-counting--Indirect"
                             disabled={readOnly}
-                            value={disaggregationData["Actual with double counting"].labels[1].value || ""}
+                            value={Math.round(disaggregationData["Actual with double counting"].labels[1].value) || ""}
                             onChange={(e) => handleDataEntry(e.target.value, "Actual with double counting", 1)}
                         />
                     </div>

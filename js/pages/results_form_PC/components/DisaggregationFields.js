@@ -80,7 +80,7 @@ const DisaggregationFields = ({ formID, disagg, disaggregationData, setDisaggreg
                                                     type="number" 
                                                     className="bin form-control input-value"
                                                     disabled={readOnly}
-                                                    value={disaggregationData[currentDisagg.disaggregation_type].labels[labelObj.customsort - 1].value || ""}
+                                                    value={Math.round(disaggregationData[currentDisagg.disaggregation_type].labels[labelObj.customsort - 1].value) || ""}
                                                     onChange={(e) => handleDataEntry(e.target.value, currentDisagg.disaggregation_type, labelObj.customsort)}
                                                 />
                                             )
