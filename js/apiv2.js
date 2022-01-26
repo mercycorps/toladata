@@ -201,7 +201,6 @@ const api = {
         return await this.apiInstance.post(`/pcount_result_create/${indicator_id}`,
             form_data, {headers: {'Content-Type': 'application/json'}})
             .then(response => {
-                console.log("API", response);
                 return response.data;
             })
             .catch(error => {
