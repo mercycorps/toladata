@@ -173,12 +173,14 @@ const PCResultsForm = ({indicatorID="", resultID="", readOnly}) => {
                 api.createPCountResult(indicatorID, data)
                     .then(response => {
                         console.log("Saved Form Data!", response);
+                        $(`#resultModal_${resultID || indicatorID}`).modal('hide');
                         // TODO: Add action after the form is sent
                     })
                 } else {
                 api.updatePCountResult(resultID, data)
                     .then(response => {
                         console.log("Saved Form Data!", response);
+                        $(`#resultModal_${resultID || indicatorID}`).modal('hide');
                         // TODO: Add action after the form is sent
                     })
             }
