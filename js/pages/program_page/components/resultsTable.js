@@ -78,22 +78,21 @@ const ResultCells = ({ result, noTarget, resultEditable, admin_type, ...props })
                     </a>
                 :
                     <React.Fragment>
-                        <div className="modal fade" id={`resultModal_${ result.pk }`} role="dialog">
-                        <div className="modal-dialog modal-lg">
-                            <div className="modal-content">
-                                <div className="modal-body">
-                                    <PCResultsForm
-                                        resultID={result.pk}
-                                        readOnly={!resultEditable}
-                                        formType="update"
-                                    />
+                        <div className="modal fade" id={`resultModal`} role="dialog">
+                            <div className="modal-dialog modal-lg">
+                                <div className="modal-content">
+                                    <div className="modal-body">
+                                        <PCResultsForm
+                                            resultID={result.pk}
+                                            readOnly={!resultEditable}
+                                        />
+                                    </div>
                                 </div>
                             </div>
                         </div>
-                        </div>
                         <a 
                             data-toggle="modal"
-                            data-target={`#resultModal_${ result.pk }`}
+                            data-target={`#resultModal`}
                             className="results__link--pc"
                         >
                             { result.dateCollected }
@@ -355,19 +354,6 @@ const ResultsTableActions = ({indicator, editable, resultEditable, displayMissin
                 </div>
             }
             </div>
-            <div className="modal fade" id={`resultModal_${indicator.pk}`} role="dialog">
-                <div className="modal-dialog modal-lg">
-                    <div className="modal-content">
-                        <div className="modal-body">
-                            <PCResultsForm
-                                indicatorID={indicator.pk}
-                                readOnly={!resultEditable}
-                                formType="create"
-                            />
-                        </div>
-                    </div>
-                </div>
-            </div>
             {resultEditable &&
                 <div className={(indicator.noTargets || displayMissingTargetsWarning) ? "cd-actions__button disable-span" : "cd-actions__button"}>
                     {indicator.admin_type !== 0 ?
@@ -380,16 +366,30 @@ const ResultsTableActions = ({indicator, editable, resultEditable, displayMissin
                             }
                         </a>
                     :
-                        <a 
-                            data-toggle="modal"
-                            data-target={`#resultModal_${indicator.pk}`}
-                            className="btn-link btn-add">
-                            <FontAwesomeIcon icon={ faPlusCircle } />
-                            {
-                                // # Translators: a button that lets the user add a new result
-                                gettext('Add result')
-                            }
-                        </a>
+                        <React.Fragment>
+                            <div className="modal fade" id={`resultModal`} role="dialog">
+                                <div className="modal-dialog modal-lg">
+                                    <div className="modal-content">
+                                        <div className="modal-body">
+                                            <PCResultsForm
+                                                indicatorID={indicator.pk}
+                                                readOnly={!resultEditable}
+                                            />
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                            <a 
+                                data-toggle="modal"
+                                data-target={`#resultModal`}
+                                className="btn-link btn-add">
+                                <FontAwesomeIcon icon={ faPlusCircle } />
+                                {
+                                    // # Translators: a button that lets the user add a new result
+                                    gettext('Add result')
+                                }
+                            </a>
+                        </React.Fragment>
                     }
                 </div>
             }
