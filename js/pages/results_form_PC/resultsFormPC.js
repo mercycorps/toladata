@@ -148,9 +148,10 @@ const PCResultsForm = ({indicatorID="", resultID="", readOnly}) => {
         api.updatePCountResult(resultID, data)
             .then(response => {
                 if (response.status === 200) {
-                    $(`#resultModal_${resultID || indicatorID}`).modal('hide');
+                    console.log("Updated Form Data!", response);
+                    window.location.reload();
                 }
-                console.log("Updated Form Data!", response);
+
             })
     }
 
@@ -174,7 +175,7 @@ const PCResultsForm = ({indicatorID="", resultID="", readOnly}) => {
                     .then(response => {
                         console.log("Saved Form Data!", response);
                         if (response.status === 200) {
-                            $(`#resultModal_${resultID || indicatorID}`).modal('hide');
+                            window.location.reload();
                         }
                     })
             } else {
