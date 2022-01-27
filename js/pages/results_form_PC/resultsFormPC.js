@@ -37,6 +37,7 @@ const PCResultsForm = ({indicatorID="", resultID="", readOnly}) => {
     let validateForm = () => {
         let detectedErrors = {};
 
+        // Common Fields Validation
         let maxDate = formatDate(localdate()) < commonFieldsInput.program_end_date ? formatDate(localdate()) : commonFieldsInput.program_end_date;
         if (!commonFieldsInput.date_collected || commonFieldsInput.date_collected === "" || commonFieldsInput.date_collected < commonFieldsInput.program_start_date || commonFieldsInput.date_collected > maxDate) {
             detectedErrors = {...detectedErrors, date_collected: gettext("This date should be within the fiscal year of the reporting period.")}
@@ -50,35 +51,55 @@ const PCResultsForm = ({indicatorID="", resultID="", readOnly}) => {
             detectedErrors = {...detectedErrors, outcome_theme: gettext("Please complete this field. You can select more than one outcome theme.")}
         };
 
-        let sumSADDwithout = disaggregationData["648"].labels.reduce((sum, label) => {
-            sum+= parseInt(label.value) || 0;
-            return sum}, 0);
-        if (parseInt(sumSADDwithout) !== parseInt(disaggregationData["652"].labels[0].value || 0)) {
-            detectedErrors = {...detectedErrors, "649-648": gettext("The sum of 'SADD without double counting' should be equal to the sum of 'Direct without double counting'.")}
-        };
-        let sumSADDwith = disaggregationData["649"].labels.reduce((sum, label) => {
-            sum+= parseInt(label.value) || 0;
-            return sum}, 0);
-        if (parseInt(sumSADDwith) !== parseInt(disaggregationData["653"].labels[0].value || 0)) {
-            detectedErrors = {...detectedErrors, "649-648": gettext("The sum of 'SADD with double counting' should be equal to the sum of 'Direct with double counting'.")}
-        };
-
-        if (!disaggregationData['653'].labels[0].value || !disaggregationData['653'].labels[1].value) {
+        // Actual Fields Validation
+        let actualsValid = true;
+        if (!disaggregationData['Actual with double counting'].labels[0].value || !disaggregationData['Actual with double counting'].labels[1].value) {
+            console.log("1");
+            actualsValid = false;
             detectedErrors = {...detectedErrors, totals_error: gettext("Direct/indirect total participants with double counting is required. Please complete these fields.")}
         };
 
-        if (
-            parseInt(disaggregationData['652'].labels[0].value || 0) > parseInt(disaggregationData['653'].labels[0].value || 0) ||
-            parseInt(disaggregationData['652'].labels[1].value || 0) > parseInt(disaggregationData['653'].labels[1].value || 0)
-            ) {
-                detectedErrors = {...detectedErrors, totals_error: gettext("Direct/indirect without double counting should be equal or lower than Direct/indirect with double counting.")}
-        }
-
-        if (evidenceFieldsInput.evidence_url ) {
-            if (!evidenceFieldsInput.evidence_url.match(/^(http(s)?|file):\/\/.+/)) {
-                detectedErrors = {...detectedErrors, evidence_url: gettext("Please enter a valid evidence link.")}
+        disaggregationData['Actual with double counting'].labels.map((label, i) => {
+            if (disaggregationData['Actual without double counting'].labels[i].value) {
+                if ( parseInt(disaggregationData['Actual without double counting'].labels[i].value) > parseInt(disaggregationData['Actual with double counting'].labels[i].value) ) {
+                    actualsValid = false;
+                    detectedErrors = {...detectedErrors, totals_error: gettext("Direct/indirect without double counting should be equal or lower than Direct/indirect with double counting.")}
+                }
             }
+        })
+        actualsValid ? delete detectedErrors.totals_error : null;
+
+        // Disaggregation Fields Validation
+        // let sumSADDwithout = disaggregationData["648"].labels.reduce((sum, label) => {
+        //     sum+= parseInt(label.value) || 0;
+        //     return sum}, 0);
+        // if (parseInt(sumSADDwithout) !== parseInt(disaggregationData["652"].labels[0].value || 0)) {
+        //     detectedErrors = {...detectedErrors, "649-648": gettext("The sum of 'SADD without double counting' should be equal to the sum of 'Direct without double counting'.")}
+        // };
+        // let sumSADDwith = disaggregationData["649"].labels.reduce((sum, label) => {
+        //     sum+= parseInt(label.value) || 0;
+        //     return sum}, 0);
+        // if (parseInt(sumSADDwith) !== parseInt(disaggregationData["653"].labels[0].value || 0)) {
+        //     detectedErrors = {...detectedErrors, "649-648": gettext("The sum of 'SADD with double counting' should be equal to the sum of 'Direct with double counting'.")}
+        // };
+
+        // Evidence Fields Validation
+        let evidenceURL = evidenceFieldsInput.evidence_url || "";
+        let recordName = evidenceFieldsInput.record_name || "";
+
+        if(evidenceURL.length > 0) {
+            if (!evidenceURL.match(/^(http(s)?|file):\/\/.+/)) {
+                detectedErrors = {...detectedErrors, evidence_url: gettext("Please enter a valid evidence link.")}
+            } else if (!recordName.length > 0) {
+                detectedErrors = {...detectedErrors, record_name: gettext("A record name must be included along with the link.")}
+            }
+        } else if (recordName.length > 0) {
+            detectedErrors = {...detectedErrors, evidence_url: gettext("A link must be included along with the record name.")}
+        } else {
+            delete detectedErrors.evidence_url;
+            delete detectedErrors.record_name
         }
+        
 
         setFormErrors(detectedErrors);
         return Object.keys(detectedErrors).length === 0 ? true: false;
@@ -145,7 +166,7 @@ const PCResultsForm = ({indicatorID="", resultID="", readOnly}) => {
     // On Submission of the results form
     let handleSubmit = (e) => {
         e.preventDefault();
-        // if ( validateForm() ) {
+        if ( validateForm() ) {
 
             let data = [];
             data = {...data, indicator: indicatorID, ...commonFieldsInput, ...evidenceFieldsInput, disaggregations: Object.values(disaggregationData)};
@@ -169,7 +190,7 @@ const PCResultsForm = ({indicatorID="", resultID="", readOnly}) => {
                         console.log("Updated Form Data!", response);
                     })
             }
-        // }
+        }
     }
 
     if (Object.keys(disaggregationData).length > 0) {
@@ -200,6 +221,7 @@ const PCResultsForm = ({indicatorID="", resultID="", readOnly}) => {
                     disaggregationData={disaggregationData}
                     setDisaggregationData={setDisaggregationData}
                     formErrors={formErrors}
+                    setFormErrors={setFormErrors}
                     readOnly={readOnly}
                 />
                 {
@@ -233,6 +255,7 @@ const PCResultsForm = ({indicatorID="", resultID="", readOnly}) => {
                     evidenceFieldsInput={evidenceFieldsInput}
                     setEvidenceFieldsInput={setEvidenceFieldsInput}
                     formErrors={formErrors}
+                    setFormErrors={setFormErrors}
                     readOnly={readOnly}
                 />
 

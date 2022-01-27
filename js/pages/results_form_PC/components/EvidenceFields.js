@@ -1,16 +1,22 @@
 import React, { useState, useEffect } from 'react';
 import { HelpText } from '../components/HelpText.js'
 
-const EvidenceFields = ({ evidenceFieldsInput, setEvidenceFieldsInput, formErrors, readOnly }) => {
+const EvidenceFields = ({ evidenceFieldsInput, setEvidenceFieldsInput, formErrors, setFormErrors, readOnly }) => {
 
-    const [validEvidenceURL, setValidEvidenceURL] = useState(false);
-
-    useEffect(() => {
-        if(evidenceFieldsInput.evidence_url) {
-            let evidenceURLHasValue = evidenceFieldsInput.evidence_url.match(/^(http(s)?|file):\/\/.+/);
-            setValidEvidenceURL(evidenceURLHasValue);
+    let handleValdation = () => {
+        let detectedErrors = {...formErrors};
+        let evidenceURL = evidenceFieldsInput.evidence_url || "";
+        if (evidenceURL.length > 0 ) {
+            if (!evidenceURL.match(/^(http(s)?|file):\/\/.+/)) {
+                detectedErrors = {...detectedErrors, evidence_url: gettext("Please enter a valid evidence link.")}
+            } else {
+                delete detectedErrors.evidence_url;
+            }
+        } else {
+            delete detectedErrors.evidence_url;
         }
-    }, [evidenceFieldsInput.evidence_url])
+        setFormErrors(detectedErrors)
+    }
 
     let handleGDrive  = (e) => {
         e.preventDefault();
@@ -54,13 +60,14 @@ const EvidenceFields = ({ evidenceFieldsInput, setEvidenceFieldsInput, formError
                         disabled={readOnly}
                         value={evidenceFieldsInput.evidence_url || ""}
                         onChange={(e) => setEvidenceFieldsInput({...evidenceFieldsInput, [e.target.name]: e.target.value})}
+                        onBlur={() => handleValdation()}
                     />
 
                     <button
                         type="button"
                         id="id_view_evidence_button"
                         className="btn btn-sm btn-secondary evidence-view__btn"
-                        disabled={!validEvidenceURL}
+                        disabled={evidenceFieldsInput.evidence_url === "" || evidenceFieldsInput.evidence_url === undefined || formErrors.evidence_url !== undefined ? true : false}
                         onClick={() => window.open(evidenceFieldsInput.evidence_url, '_blank')}
                     >{gettext('view')}</button>
                     <button
@@ -95,6 +102,10 @@ const EvidenceFields = ({ evidenceFieldsInput, setEvidenceFieldsInput, formError
                         value={evidenceFieldsInput.record_name || ""}
                         onChange={(e) => setEvidenceFieldsInput({...evidenceFieldsInput, [e.target.name]: e.target.value})}
                     />
+                    {
+                        formErrors.record_name &&
+                            <span id="validation_id_record_name" className="has-error">{formErrors.record_name}</span>
+                    }
                 </div>
 
             </div>
