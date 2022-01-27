@@ -404,7 +404,8 @@ class ProgramAuditLog(models.Model, DiffableLog):
             "date": _('Result date'),
             "target": _('Measure against target'),
             "value": _('Actual value'),
-            "outcome_themes": _("Outcome theme"),
+            # Translators:  A Noun.  A list of high-level categories that a program's activities fall into (e.g. food security or humanitarian response)
+            "outcome_themes": _("Outcome themes"),
             "start_date": _('Start date'),
             "end_date": _('End date'),
             "assumptions": _('Assumptions'),

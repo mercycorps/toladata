@@ -163,32 +163,54 @@ const PCResultsForm = ({indicatorID="", resultID="", readOnly}) => {
         })
     }, [])
 
+    let send_update_request = (rationale) => {
+        let data = prepare_sumbission_data();
+        data['rationale'] = rationale;
+        api.updatePCountResult(resultID, data)
+            .then(response => {
+                if (response.status === 200) {
+                    console.log("Updated Form Data!", response);
+                    window.location.reload();
+                }
+
+            })
+    }
+
+    let prepare_sumbission_data = () => {
+        let data = [];
+        data = {...data, indicator: indicatorID, ...commonFieldsInput, ...evidenceFieldsInput, disaggregations: Object.values(disaggregationData)};
+        data['outcome_theme'] = data['outcome_theme'].map((theme) => theme.value).filter(ot => ot !== null)
+        data['periodic_target'] = data['periodic_target']['id']
+        return data
+    }
+
     // On Submission of the results form
     let handleSubmit = (e) => {
         e.preventDefault();
         if ( validateForm() ) {
 
-            let data = [];
-            data = {...data, indicator: indicatorID, ...commonFieldsInput, ...evidenceFieldsInput, disaggregations: Object.values(disaggregationData)};
-            data['outcome_theme'] = data['outcome_theme'].map((theme) => theme.value)
-            data['periodic_target'] = data['periodic_target']['id']
-            console.log("Submit Data", data);
             if (indicatorID) {
+                let data = prepare_sumbission_data();
+                console.log("Submit create data", data);
                 api.createPCountResult(indicatorID, data)
                     .then(response => {
                         console.log("Saved Form Data!", response);
                         if (response.status === 200) {
-                            $(`#resultModal_${resultID || indicatorID}`).modal('hide');
+                            window.location.reload();
                         }
                     })
             } else {
-                api.updatePCountResult(resultID, data)
-                    .then(response => {
-                        if (response.status === 200) {
-                            $(`#resultModal_${resultID || indicatorID}`).modal('hide');
-                        }
-                        console.log("Updated Form Data!", response);
-                    })
+                window.create_unified_changeset_notice({
+                    header: gettext("Reason for change"),
+                    show_icon: true,
+                    // context: document.getElementById('modal_dialog'),
+                    message_text: gettext("Your changes will be recorded in a change log.  For future reference, please share your reason for these changes."),
+                    include_rationale: true,
+                    rationale_required: true,
+                    notice_type: 'notice',
+                    on_submit: send_update_request,
+                    // on_cancel: () => this.props.rootStore.uiStore.setDisableCardActions(false),
+                });
             }
         }
     }

@@ -201,7 +201,7 @@ const api = {
         return await this.apiInstance.post(`/pcount_result_create/${indicator_id}`,
             form_data, {headers: {'Content-Type': 'application/json'}})
             .then(response => {
-                return response.data;
+                return response;
             })
             .catch(error => {
                 this.logFailure(error);
@@ -222,7 +222,7 @@ const api = {
         return await this.apiInstance.put(`/pcount_result_update/${result_id}`,
             form_data, {headers: {'Content-Type': 'application/json'}})
             .then(response => {
-                return response.data;
+                return response;
             })
             .catch(error => {
                 this.logFailure(error);
