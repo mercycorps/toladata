@@ -108,7 +108,7 @@ const IndicatorAddResults = inject("rootStore", "filterStore")(
                         </button>
                         :
                         <React.Fragment>
-                            <div className="modal fade" id={`resultModal`} role="dialog">
+                            <div className="modal fade" id={`resultModal_${indicator.pk}`} role="dialog">
                                 <div className="modal-dialog modal-lg">
                                     <div className="modal-content">
                                         <div className="modal-body">
@@ -125,7 +125,7 @@ const IndicatorAddResults = inject("rootStore", "filterStore")(
                                 className={"btn btn-link px-1 pt-0 mx-auto"}
                                 disabled ={noTargets}
                                 data-toggle="modal"
-                                data-target={`#resultModal`}
+                                data-target={`#resultModal_${indicator.pk}`}
                             >
                                 <FontAwesomeIcon icon={ faPlusCircle } />
                                     {

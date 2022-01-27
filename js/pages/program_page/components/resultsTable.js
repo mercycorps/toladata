@@ -78,7 +78,7 @@ const ResultCells = ({ result, noTarget, resultEditable, admin_type, ...props })
                     </a>
                 :
                     <React.Fragment>
-                        <div className="modal fade" id={`resultModal`} role="dialog">
+                        <div className="modal fade" id={`resultModal_${result.pk}`} role="dialog">
                             <div className="modal-dialog modal-lg">
                                 <div className="modal-content">
                                     <div className="modal-body">
@@ -92,7 +92,7 @@ const ResultCells = ({ result, noTarget, resultEditable, admin_type, ...props })
                         </div>
                         <a 
                             data-toggle="modal"
-                            data-target={`#resultModal`}
+                            data-target={`#resultModal_${result.pk}`}
                             className="results__link--pc"
                         >
                             { result.dateCollected }
@@ -367,7 +367,7 @@ const ResultsTableActions = ({indicator, editable, resultEditable, displayMissin
                         </a>
                     :
                         <React.Fragment>
-                            <div className="modal fade" id={`resultModal`} role="dialog">
+                            <div className="modal fade" id={`resultModal_${indicator.pk}`} role="dialog">
                                 <div className="modal-dialog modal-lg">
                                     <div className="modal-content">
                                         <div className="modal-body">
@@ -381,7 +381,7 @@ const ResultsTableActions = ({indicator, editable, resultEditable, displayMissin
                             </div>
                             <a 
                                 data-toggle="modal"
-                                data-target={`#resultModal`}
+                                data-target={`#resultModal_${indicator.pk}`}
                                 className="btn-link btn-add">
                                 <FontAwesomeIcon icon={ faPlusCircle } />
                                 {

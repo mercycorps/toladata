@@ -95,8 +95,8 @@ const PCResultsForm = ({indicatorID="", resultID="", readOnly}) => {
     // On Mounting of the results form modal
     useEffect(() => {
 
-        $(`#resultModal`).on('shown.bs.modal', function () {
-            $(`#resultModal`).on('hidden.bs.modal', function () {
+        $(`#resultModal_${resultID || indicatorID}`).on('shown.bs.modal', function () {
+            $(`#resultModal_${resultID || indicatorID}`).on('hidden.bs.modal', function () {
                 setDisaggregationData([])
                 setCommonFieldsInput({})
                 setEvidenceFieldsInput({})
@@ -105,7 +105,7 @@ const PCResultsForm = ({indicatorID="", resultID="", readOnly}) => {
             })
             $(document).on("keyup", function(event) {
                 if(event.key === 'Escape') {
-                    $(`#resultModal`).modal('hide');
+                    $(`#resultModal_${resultID || indicatorID}`).modal('hide');
                 }
             })
             if (indicatorID) {
@@ -157,14 +157,14 @@ const PCResultsForm = ({indicatorID="", resultID="", readOnly}) => {
                     .then(response => {
                         console.log("Saved Form Data!", response);
                         if (response.status === 200) {
-                            $(`#resultModal`).modal('hide');
+                            $(`#resultModal_${resultID || indicatorID}`).modal('hide');
                         }
                     })
             } else {
                 api.updatePCountResult(resultID, data)
                     .then(response => {
                         if (response.status === 200) {
-                            $(`#resultModal`).modal('hide');
+                            $(`#resultModal_${resultID || indicatorID}`).modal('hide');
                         }
                         console.log("Updated Form Data!", response);
                     })
