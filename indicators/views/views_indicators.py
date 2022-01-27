@@ -132,6 +132,14 @@ def periodic_targets_form(request, program):
     })
 
 
+def _derive_achieved(posted_disaggs):
+    for disagg in posted_disaggs:
+        if disagg['disaggregation_type'] == 'Actual with double counting':
+            for label in disagg['labels']:
+                if label['label'] == 'Direct':
+                    return label['value']
+
+
 @login_required
 @api_view(['GET', 'POST'])
 @transaction.atomic
@@ -140,12 +148,7 @@ def participant_count_result_create_for_indicator(request, pk, *args, **kwargs):
     indicator = get_object_or_404(Indicator, pk=pk)
     if request.method == 'POST':
         verify_program_access_level(request, indicator.program.pk, 'medium')
-        achieved_val = None
-        for disagg in request.data['disaggregations']:
-            if disagg['disaggregation_type'] == 'Actual without double counting':
-                for label in disagg['labels']:
-                    if label['label'] == 'Direct':
-                        achieved_val = label['value']
+        achieved_val = _derive_achieved(request.data['disaggregations'])
 
         result_data = {
             'achieved': achieved_val,
@@ -190,12 +193,7 @@ def participant_count_result_update(request, pk, *args, **kwargs):
     if request.method == 'PUT':
         verify_program_access_level(request, indicator.program.pk, 'medium')
         old_result_values = result.logged_participant_count_fields
-        achieved_val = None
-        for disagg in request.data['disaggregations']:
-            if disagg['disaggregation_type'] == 'Actual without double counting':
-                for label in disagg['labels']:
-                    if label['label'] == 'Direct':
-                        achieved_val = label['value']
+        achieved_val = _derive_achieved(request.data['disaggregations'])
         rationale = request.data.pop('rationale')
 
         result_data = request.data
