@@ -196,6 +196,7 @@ def participant_count_result_update(request, pk, *args, **kwargs):
                 for label in disagg['labels']:
                     if label['label'] == 'Direct':
                         achieved_val = label['value']
+        rationale = request.data.pop('rationale')
 
         result_data = request.data
         result_data.update({
@@ -211,7 +212,7 @@ def participant_count_result_update(request, pk, *args, **kwargs):
             updated_result = result_serializer.save()
             ProgramAuditLog.log_result_updated(
                 request.user, indicator, old_result_values,
-                updated_result.logged_participant_count_fields, '')
+                updated_result.logged_participant_count_fields, rationale)
 
         else:
             return JsonResponse(result.errors, status=404)
