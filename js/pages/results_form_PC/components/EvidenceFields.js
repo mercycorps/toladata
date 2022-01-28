@@ -1,7 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import { HelpText } from '../components/HelpText.js'
 
-const EvidenceFields = ({ evidenceFieldsInput, setEvidenceFieldsInput, formErrors, setFormErrors, readOnly }) => {
+const EvidenceFields = ({ evidenceFieldsInput, setEvidenceFieldsInput, formErrors, setFormErrors, readOnly, setWasUpdated }) => {
 
     let handleValdation = () => {
         let detectedErrors = {...formErrors};
@@ -59,7 +59,9 @@ const EvidenceFields = ({ evidenceFieldsInput, setEvidenceFieldsInput, formError
                         className="form-control"
                         disabled={readOnly}
                         value={evidenceFieldsInput.evidence_url || ""}
-                        onChange={(e) => setEvidenceFieldsInput({...evidenceFieldsInput, [e.target.name]: e.target.value})}
+                        onChange={(e) => {
+                            setWasUpdated(true)
+                            setEvidenceFieldsInput({...evidenceFieldsInput, [e.target.name]: e.target.value})}}
                         onBlur={() => handleValdation()}
                     />
 
@@ -100,7 +102,9 @@ const EvidenceFields = ({ evidenceFieldsInput, setEvidenceFieldsInput, formError
                         maxLength="135"
                         disabled={readOnly}
                         value={evidenceFieldsInput.record_name || ""}
-                        onChange={(e) => setEvidenceFieldsInput({...evidenceFieldsInput, [e.target.name]: e.target.value})}
+                        onChange={(e) => {
+                            setWasUpdated(true)
+                            setEvidenceFieldsInput({...evidenceFieldsInput, [e.target.name]: e.target.value})}}
                     />
                     {
                         formErrors.record_name &&

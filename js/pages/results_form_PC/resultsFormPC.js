@@ -118,6 +118,7 @@ const PCResultsForm = ({indicatorID="", resultID="", readOnly}) => {
     }
 
     // State Variables
+    const [wasUpdated, setWasUpdated] = useState(false);
     const [outcomeThemesData, setOutcomeThemesData] = useState([]);
     const [disaggregationData, setDisaggregationData] = useState([]);
     const [evidenceFieldsInput, setEvidenceFieldsInput] = useState({});
@@ -247,6 +248,7 @@ const PCResultsForm = ({indicatorID="", resultID="", readOnly}) => {
                         formErrors={formErrors}
                         setFormErrors={setFormErrors}
                         readOnly={readOnly}
+                        setWasUpdated={setWasUpdated}
                     />
                 }
 
@@ -255,8 +257,9 @@ const PCResultsForm = ({indicatorID="", resultID="", readOnly}) => {
                     setDisaggregationData={setDisaggregationData}
                     formErrors={formErrors}
                     setFormErrors={setFormErrors}
-                    readOnly={readOnly}
                     handleSADDActualsValidation={handleSADDActualsValidation}
+                    readOnly={readOnly}
+                    setWasUpdated={setWasUpdated}
                 />
                 {
                     Object.keys(disaggregationData).map((disagg) => {
@@ -278,6 +281,7 @@ const PCResultsForm = ({indicatorID="", resultID="", readOnly}) => {
                                 disagg={disaggs}
                                 formID={indicatorID || resultID}
                                 readOnly={readOnly}
+                                setWasUpdated={setWasUpdated}
                                 formErrors={formErrors}
                                 setFormErrors={setFormErrors}
                                 disaggregationData={disaggregationData}
@@ -293,6 +297,7 @@ const PCResultsForm = ({indicatorID="", resultID="", readOnly}) => {
                     formErrors={formErrors}
                     setFormErrors={setFormErrors}
                     readOnly={readOnly}
+                    setWasUpdated={setWasUpdated}
                 />
 
                 {!readOnly &&

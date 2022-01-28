@@ -1,9 +1,10 @@
 import React, { useState, useEffect } from 'react';
 import { HelpText } from '../components/HelpText.js'
 
-const ActualValueFields = ({ disaggregationData, setDisaggregationData, formErrors, setFormErrors, readOnly, handleSADDActualsValidation }) => {
+const ActualValueFields = ({ disaggregationData, setDisaggregationData, formErrors, setFormErrors, handleSADDActualsValidation, readOnly, setWasUpdated }) => {
 
     let handleDataEntry = (value, inputDisagg, inputLabelIndex) => {
+        setWasUpdated(true);
         let update = {...disaggregationData};
         update[inputDisagg].labels[inputLabelIndex] = {...disaggregationData[inputDisagg].labels[inputLabelIndex], value: value};
         setDisaggregationData(update);

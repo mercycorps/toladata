@@ -3,7 +3,7 @@ import CheckboxedMultiSelect from 'components/checkboxed-multi-select';
 import { HelpText } from '../components/HelpText.js'
 
 
-const CommonFields = ({ commonFieldsInput, setCommonFieldsInput, outcomeThemesData, formErrors, setFormErrors, readOnly }) => {
+const CommonFields = ({ commonFieldsInput, setCommonFieldsInput, outcomeThemesData, formErrors, setFormErrors, readOnly, setWasUpdated }) => {
 
     const [maxDate, setMaxDate] = useState("");
     const [selectedDate, setSelectedDate] = useState("");
@@ -24,6 +24,7 @@ const CommonFields = ({ commonFieldsInput, setCommonFieldsInput, outcomeThemesDa
             }
             // Capture the value of the datepicker and triggers an update of state
             $('.datepicker').on('change', () => {
+                setWasUpdated(true);
                 var date = $('.datepicker').datepicker('getDate');
                 setSelectedDate(date);
             })
@@ -102,7 +103,9 @@ const CommonFields = ({ commonFieldsInput, setCommonFieldsInput, outcomeThemesDa
                     id="outcome_themes_multiselect"
                     disabled={readOnly}
                     value={commonFieldsInput.outcome_theme}
-                    onChange={(e) => setCommonFieldsInput({...commonFieldsInput, outcome_theme: e})}
+                    onChange={(e) => {
+                        setWasUpdated(true);
+                        setCommonFieldsInput({...commonFieldsInput, outcome_theme: e});}}
                     onBlur={() => handleValidation()}
                 />
                 {

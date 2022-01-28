@@ -2,7 +2,7 @@ import React, { useState, useEffect } from 'react';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import { HelpText } from '../components/HelpText.js'
 
-const DisaggregationFields = ({ formID, disagg, disaggregationData, setDisaggregationData, formErrors, setFormErrors, readOnly, handleSADDActualsValidation }) => {
+const DisaggregationFields = ({ formID, disagg, disaggregationData, setDisaggregationData, formErrors, setFormErrors, handleSADDActualsValidation, readOnly, setWasUpdated }) => {
     // Helptext Data
     const helptext = {
         ["SADD (including unknown) without double counting"]: gettext("Only include SADD for Direct participants."),
@@ -34,6 +34,7 @@ const DisaggregationFields = ({ formID, disagg, disaggregationData, setDisaggreg
 
     // Method to save data entry
     let handleDataEntry = (value, inputDisaggType, customsort) => {
+        setWasUpdated(true)
         let update = {...disaggregationData};
         update[inputDisaggType].labels[customsort - 1] = {...disaggregationData[inputDisaggType].labels[customsort - 1], value: value};
         setDisaggregationData(update);
