@@ -340,6 +340,9 @@ a.helptext:hover {
     font-size: 85%;
     color: $red;
     margin-left: 0.5rem;
+    svg {
+        margin-right: 0.25rem;
+    }
 }
 
 .disaggregation-formset .input-symbol-percent {
@@ -374,4 +377,10 @@ a.helptext:hover {
         top: 0;
         width: auto;
     }
+}
+
+.modal-disabled {
+    pointer-events: none;
+    opacity: 0.5;
+    transition: opacity .25s ease-in-out;
 }

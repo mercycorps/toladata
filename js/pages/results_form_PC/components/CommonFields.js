@@ -3,7 +3,7 @@ import CheckboxedMultiSelect from 'components/checkboxed-multi-select';
 import { HelpText } from '../components/HelpText.js'
 
 
-const CommonFields = ({ commonFieldsInput, setCommonFieldsInput, outcomeThemesData, formErrors, setFormErrors, readOnly }) => {
+const CommonFields = ({ commonFieldsInput, setCommonFieldsInput, outcomeThemesData, formErrors, setFormErrors, readOnly, setWasUpdated }) => {
 
     const [maxDate, setMaxDate] = useState("");
     const [selectedDate, setSelectedDate] = useState("");
@@ -24,6 +24,7 @@ const CommonFields = ({ commonFieldsInput, setCommonFieldsInput, outcomeThemesDa
             }
             // Capture the value of the datepicker and triggers an update of state
             $('.datepicker').on('change', () => {
+                setWasUpdated(true);
                 var date = $('.datepicker').datepicker('getDate');
                 setSelectedDate(date);
             })
@@ -33,24 +34,35 @@ const CommonFields = ({ commonFieldsInput, setCommonFieldsInput, outcomeThemesDa
     useEffect(() => {
         setCommonFieldsInput({...commonFieldsInput, date_collected: formatDate(selectedDate)});
         // Validation on date selection
-        let detectedErrors = "";
+        let detectedErrors = {...formErrors};
+        let valid = true;
         if (commonFieldsInput.date_collected !== "" && formatDate(selectedDate) !== "" && formatDate(selectedDate) < commonFieldsInput.program_start_date || formatDate(selectedDate) > maxDate) {
-            detectedErrors = gettext("This date should be within the fiscal year of the reporting period.");
+            valid = false;
+            detectedErrors = {...detectedErrors, date_collected: gettext("This date should be within the fiscal year of the reporting period.")};
         }
-        setFormErrors({...formErrors, date_collected: detectedErrors});
+        valid ? delete detectedErrors.date_collected : null;
+        setFormErrors(detectedErrors);
     }, [selectedDate]);
     
+    let handleValidation = () => {
+        let detectedErrors = {...formErrors};
+        if (!commonFieldsInput.outcome_theme || commonFieldsInput.outcome_theme.length === 0) {
+            detectedErrors = {...detectedErrors, outcome_theme: gettext("Please complete this field. You can select more than one outcome theme.")}
+        } else { delete detectedErrors.outcome_theme };
+        setFormErrors(detectedErrors);
+    }
+
     return (
         <fieldset>
-            <div className="form-group" id="div_id_date_collected">
-                <label htmlFor="id_date_collected" className="label--required">{gettext('Result date')}</label>
+            <div className="form-group" id="div_id_date_collected--pc">
+                <label htmlFor="id_date_collected--pc" className="label--required">{gettext('Result date')}</label>
 
                 <HelpText text={gettext('If data collection occurred within the fiscal year, enter the date where data was collected. If data collection occurred after the end of the fiscal year, enter the last day of the fiscal year (June 30).')}/>
 
                 <input 
                     type="text" 
-                    name="date_collected" 
-                    id="id_date_collected" 
+                    name="date_collected--pc" 
+                    id="id_date_collected--pc" 
                     className={`datepicker form-control ${formErrors.date_collected && "is-invalid"}`}
                     required
                     autoComplete="off"
@@ -58,28 +70,32 @@ const CommonFields = ({ commonFieldsInput, setCommonFieldsInput, outcomeThemesDa
                 />
                 {
                     formErrors.date_collected &&
-                        <span id="validation_id_date_collected" className="has-error">{formErrors.date_collected}</span>
+                        <span id="validation_id_date_collected--pc" className="has-error">{formErrors.date_collected}</span>
                 }
             </div>
 
-            <div className="form-group" id="div_id_periodic_target">
-                <label htmlFor="id_periodic_target" className="label--required">{gettext('Fiscal year')}</label>
+            <div className="form-group" id="div_id_periodic_target--pc">
+                <label htmlFor="id_periodic_target--pc" className="label--required">{gettext('Fiscal year')}</label>
 
                 <HelpText text={gettext('Fiscal years run from July 1 to June 30 of the following year.')}/>
 
                 <input 
                     type="text" 
-                    name="periodic_target" 
-                    id="id_periodic_target" 
+                    name="periodic_target--pc" 
+                    id="id_periodic_target--pc" 
                     className="form-control" 
                     required autoComplete="off" 
                     disabled
                     value={commonFieldsInput.periodic_target && commonFieldsInput.periodic_target.period || ""}
                 />
+                  {
+                    formErrors.periodic_target &&
+                        <span id="validation_id_periodic_target--pc" className="has-error">{formErrors.periodic_target}</span>
+                }
             </div>
 
-            <div className="form-group react-multiselect-checkbox" id="div_id_outcome_theme">
-                <label htmlFor="id_outcome_theme" className="label--required">{gettext('Outcome theme')}</label>
+            <div className="form-group react-multiselect-checkbox" id="div_id_outcome_theme--pc">
+                <label htmlFor="id_outcome_theme--pc" className="label--required">{gettext('Outcome theme')}</label>
 
                 <HelpText text={gettext('Outcome themes are the main areas of a program. Refer to MEL Tip Sheet: Guidelines on Counting and Reporting Participant Numbers <a tabIndex="1" href="https://library.mercycorps.org/record/16929?ln=en" target="_blank">[link: https://library.mercycorps.org/record/16929?ln=en]</a> for a description of outcome themes.<span>')}/>
 
@@ -91,11 +107,14 @@ const CommonFields = ({ commonFieldsInput, setCommonFieldsInput, outcomeThemesDa
                     id="outcome_themes_multiselect"
                     disabled={readOnly}
                     value={commonFieldsInput.outcome_theme}
-                    onChange={(e) => setCommonFieldsInput({...commonFieldsInput, outcome_theme: e})}
+                    onChange={(e) => {
+                        setWasUpdated(true);
+                        setCommonFieldsInput({...commonFieldsInput, outcome_theme: e});}}
+                    onBlur={() => handleValidation()}
                 />
                 {
                     formErrors.outcome_theme &&
-                        <span id="validation_id_outcome_theme" className="has-error">{formErrors.outcome_theme}</span>
+                        <span id="validation_id_outcome_theme--pc" className="has-error">{formErrors.outcome_theme}</span>
                 }
             </div>
 
