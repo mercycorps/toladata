@@ -34,8 +34,33 @@ const PCResultsForm = ({indicatorID="", resultID="", readOnly}) => {
     }
 
     // Form Validations
+    let handleSADDActualsValidation = (valid = true) => {
+        let detectedErrors = {...formErrors};
+        let disaggValid = true;
+        let actualWithDirect = disaggregationData["Actual with double counting"].labels[0].value || 0;
+        let actualWithoutDirect = disaggregationData["Actual without double counting"].labels[0].value || 0;
+        let SADDWithDirect = disaggregationData["SADD (including unknown) with double counting"].labels.reduce((sum, label) => {
+            sum+= parseInt(label.value) || 0;
+            return sum;
+        }, 0);
+        let SADDWithoutDirect = disaggregationData["SADD (including unknown) without double counting"].labels.reduce((sum, label) => {
+            sum+= parseInt(label.value) || 0;
+            return sum;
+        }, 0);
+
+        if (parseInt(SADDWithDirect) !== parseInt(actualWithDirect)) {
+            disaggValid = false;
+            detectedErrors = {...detectedErrors, [disaggregationData["SADD (including unknown) without double counting"].disaggregation_type]: gettext("The sum of 'SADD with double counting' should be equal to the sum of 'Direct with double counting'.")}
+        } else if (parseInt(SADDWithoutDirect) !== parseInt(actualWithoutDirect)) {
+            disaggValid = false;
+            detectedErrors = {...detectedErrors, [disaggregationData["SADD (including unknown) without double counting"].disaggregation_type]: gettext("The sum of 'SADD without double counting' should be equal to the sum of 'Direct without double counting'.")}
+        }
+        disaggValid && valid ? delete detectedErrors[disaggregationData["SADD (including unknown) without double counting"].disaggregation_type] : null;
+        setFormErrors(detectedErrors);
+    }
+
     let validateForm = () => {
-        let detectedErrors = {};
+        let detectedErrors = {...formErrors};
 
         // Common Fields Validation
         let maxDate = formatDate(localdate()) < commonFieldsInput.program_end_date ? formatDate(localdate()) : commonFieldsInput.program_end_date;
@@ -43,22 +68,21 @@ const PCResultsForm = ({indicatorID="", resultID="", readOnly}) => {
             detectedErrors = {...detectedErrors, date_collected: gettext("This date should be within the fiscal year of the reporting period.")}
         };
 
-        if (!commonFieldsInput.periodic_target || commonFieldsInput.periodic_target === "") {
+        if (!commonFieldsInput.periodic_target || Object.keys(commonFieldsInput.periodic_target).length === 0) {
             detectedErrors = {...detectedErrors, fiscal_year: gettext("You cannot change the fiscal year during the current reporting period. ")}
-        };
+        } else { delete detectedErrors.periodic_target };
 
-        if (!commonFieldsInput.outcome_theme || commonFieldsInput.outcome_theme === []) {
+        console.log(formErrors, commonFieldsInput);
+        if (!commonFieldsInput.outcome_theme || commonFieldsInput.outcome_theme.length === 0) {
             detectedErrors = {...detectedErrors, outcome_theme: gettext("Please complete this field. You can select more than one outcome theme.")}
-        };
+        } else { delete detectedErrors.outcome_theme };
 
         // Actual Fields Validation
         let actualsValid = true;
         if (!disaggregationData['Actual with double counting'].labels[0].value || !disaggregationData['Actual with double counting'].labels[1].value) {
-            console.log("1");
             actualsValid = false;
             detectedErrors = {...detectedErrors, totals_error: gettext("Direct/indirect total participants with double counting is required. Please complete these fields.")}
         };
-
         disaggregationData['Actual with double counting'].labels.map((label, i) => {
             if (disaggregationData['Actual without double counting'].labels[i].value) {
                 if ( parseInt(disaggregationData['Actual without double counting'].labels[i].value) > parseInt(disaggregationData['Actual with double counting'].labels[i].value) ) {
@@ -69,44 +93,32 @@ const PCResultsForm = ({indicatorID="", resultID="", readOnly}) => {
         })
         actualsValid ? delete detectedErrors.totals_error : null;
 
-        // Disaggregation Fields Validation
-        // let sumSADDwithout = disaggregationData["648"].labels.reduce((sum, label) => {
-        //     sum+= parseInt(label.value) || 0;
-        //     return sum}, 0);
-        // if (parseInt(sumSADDwithout) !== parseInt(disaggregationData["652"].labels[0].value || 0)) {
-        //     detectedErrors = {...detectedErrors, "649-648": gettext("The sum of 'SADD without double counting' should be equal to the sum of 'Direct without double counting'.")}
-        // };
-        // let sumSADDwith = disaggregationData["649"].labels.reduce((sum, label) => {
-        //     sum+= parseInt(label.value) || 0;
-        //     return sum}, 0);
-        // if (parseInt(sumSADDwith) !== parseInt(disaggregationData["653"].labels[0].value || 0)) {
-        //     detectedErrors = {...detectedErrors, "649-648": gettext("The sum of 'SADD with double counting' should be equal to the sum of 'Direct with double counting'.")}
-        // };
-
         // Evidence Fields Validation
-        let evidenceURL = evidenceFieldsInput.evidence_url || "";
-        let recordName = evidenceFieldsInput.record_name || "";
+        let evidenceURLValid = true,
+            recordNameValid = true,
+            evidenceURL = evidenceFieldsInput.evidence_url || "",
+            recordName = evidenceFieldsInput.record_name || "";
 
         if(evidenceURL.length > 0) {
             if (!evidenceURL.match(/^(http(s)?|file):\/\/.+/)) {
+                evidenceURLValid = false;
                 detectedErrors = {...detectedErrors, evidence_url: gettext("Please enter a valid evidence link.")}
             } else if (!recordName.length > 0) {
+                recordNameValid = false;
                 detectedErrors = {...detectedErrors, record_name: gettext("A record name must be included along with the link.")}
             }
         } else if (recordName.length > 0) {
+            evidenceURLValid = false;
             detectedErrors = {...detectedErrors, evidence_url: gettext("A link must be included along with the record name.")}
-        } else {
-            delete detectedErrors.evidence_url;
-            delete detectedErrors.record_name
         }
-        
+        evidenceURLValid ? delete detectedErrors.evidence_url: null;
+        recordNameValid ? delete detectedErrors.record_name: null;
 
         setFormErrors(detectedErrors);
         return Object.keys(detectedErrors).length === 0 ? true: false;
     }
 
     // State Variables
-    let formID = indicatorID ? indicatorID : resultID;
     const [outcomeThemesData, setOutcomeThemesData] = useState([]);
     const [disaggregationData, setDisaggregationData] = useState([]);
     const [evidenceFieldsInput, setEvidenceFieldsInput] = useState({});
@@ -245,6 +257,7 @@ const PCResultsForm = ({indicatorID="", resultID="", readOnly}) => {
                     formErrors={formErrors}
                     setFormErrors={setFormErrors}
                     readOnly={readOnly}
+                    handleSADDActualsValidation={handleSADDActualsValidation}
                 />
                 {
                     Object.keys(disaggregationData).map((disagg) => {
@@ -252,7 +265,7 @@ const PCResultsForm = ({indicatorID="", resultID="", readOnly}) => {
                         if (disaggregationData[disagg].disaggregation_type.includes('SADD') && disaggregationData[disagg].double_counting === true) {
                             disaggs = Object.keys(disaggregationData).reduce((arrSADD, currentDisagg) => {
                                 if (disaggregationData[currentDisagg].disaggregation_type.includes("SADD")) {
-                                    arrSADD.push(disaggregationData[currentDisagg]);
+                                    arrSADD.unshift(disaggregationData[currentDisagg]);
                                 }
                                 return arrSADD;
                             }, []);
@@ -267,8 +280,10 @@ const PCResultsForm = ({indicatorID="", resultID="", readOnly}) => {
                                 formID={indicatorID || resultID}
                                 readOnly={readOnly}
                                 formErrors={formErrors}
+                                setFormErrors={setFormErrors}
                                 disaggregationData={disaggregationData}
                                 setDisaggregationData={setDisaggregationData}
+                                handleSADDActualsValidation={handleSADDActualsValidation}
                             />
                         )
                     })

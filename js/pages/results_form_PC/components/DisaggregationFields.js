@@ -2,10 +2,10 @@ import React, { useState, useEffect } from 'react';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import { HelpText } from '../components/HelpText.js'
 
-const DisaggregationFields = ({ formID, disagg, disaggregationData, setDisaggregationData, formErrors, readOnly }) => {
+const DisaggregationFields = ({ formID, disagg, disaggregationData, setDisaggregationData, formErrors, setFormErrors, readOnly, handleSADDActualsValidation }) => {
     // Helptext Data
     const helptext = {
-        ["SADD (including unknown) with double counting"]: gettext("Only include SADD for Direct participants."),
+        ["SADD (including unknown) without double counting"]: gettext("Only include SADD for Direct participants."),
         ["Sectors Direct with double counting"]: gettext("Provide a disaggregation of participants reached by sector. Only provide the figure with double counting. Refer to MEL Tip Sheet: Guidelines on Counting and Reporting Participant Numbers <a href='https://library.mercycorps.org/record/16929?ln=en' target='_blank'>[link: https://library.mercycorps.org/record/16929?ln=en]</a> for a description of outcome themes."),
         ["Sectors Indirect with double counting"]: gettext("Provide a disaggregation of participants reached by sector. Only provide the figure with double counting. Refer to MEL Tip Sheet: Guidelines on Counting and Reporting Participant Numbers <a href='https://library.mercycorps.org/record/16929?ln=en' target='_blank'>[link: https://library.mercycorps.org/record/16929?ln=en]</a> for a description of outcome themes."),
     };
@@ -25,10 +25,10 @@ const DisaggregationFields = ({ formID, disagg, disaggregationData, setDisaggreg
     let totals = disagg.reduce((labelsArr, currentDisaggregation) => {
         let totalDisagg = Object.keys(disaggregationData).filter(currentDisagg => {
             return disaggregationData[currentDisagg].disaggregation_type.includes("Actual") &&
-            disaggregationData[currentDisagg].double_counting === currentDisaggregation.double_counting;
+                disaggregationData[currentDisagg].double_counting === currentDisaggregation.double_counting;
         })
-        let sumVal = disaggregationData[totalDisagg[0]].labels.filter(labelObj => labelObj.label === currentDisaggregation.count_type)[0]
-        labelsArr.unshift(sumVal)
+        let sumVal = disaggregationData[totalDisagg[0]].labels.filter(labelObj => labelObj.label === currentDisaggregation.count_type)[0];
+        labelsArr.push(sumVal);
         return labelsArr;
     }, []);
 
@@ -39,6 +39,26 @@ const DisaggregationFields = ({ formID, disagg, disaggregationData, setDisaggreg
         setDisaggregationData(update);
     }
 
+    // Method to validate inputs
+    let handleValidation = (inputDisaggType, customsort) => {
+        if (inputDisaggType.includes("SADD")) {
+            let detectedErrors = {...formErrors};
+            let valid = true;
+            // Validate SADD without values are less than or equal to SADD with values
+            disaggregationData["SADD (including unknown) with double counting"].labels.map((label, i) => {
+                let SADDWithValue = parseInt(disaggregationData["SADD (including unknown) without double counting"].labels[i].value || 0);
+                let SADDWithoutValue = parseInt(disaggregationData["SADD (including unknown) with double counting"].labels[i].value || 0);
+                if (SADDWithValue > SADDWithoutValue) {
+                    valid = false;
+                    detectedErrors = {...detectedErrors, [disaggregationData["SADD (including unknown) without double counting"].disaggregation_type]: gettext("The 'SADD without double counting' value should be less than or equal to the 'Direct without double counting' value.")}
+                }
+            })
+            valid ? delete detectedErrors[disaggregationData["SADD (including unknown) without double counting"].disaggregation_type] : null;
+            setFormErrors(detectedErrors);
+            handleSADDActualsValidation(valid);
+        }
+    }
+
     return (
         <fieldset>
             <ul className="list-group form-list-group">
@@ -46,11 +66,15 @@ const DisaggregationFields = ({ formID, disagg, disaggregationData, setDisaggreg
                     <div className="item__value--header">
                         <a className="item__label--accordion accordion-header collapsed" data-toggle="collapse" href={`#${formID}-${disagg[0].pk}`} aria-expanded={expanded} aria-controls={`#${formID}-${disagg[0].pk}`}>
                             <FontAwesomeIcon icon={ expanded ? 'caret-down' : 'caret-right' } />&nbsp;
-                            <label className="label--required">{disagg[0].disaggregation_type.includes("SADD") ? "SADD (including unknown)" : disagg[0].disaggregation_type}</label>
+                            {disagg[0].disaggregation_type.includes("SADD") ? 
+                                <label className="label--required">SADD (including unknown)</label>
+                            : 
+                                <label className="label">{disagg[0].disaggregation_type}</label>
+                            }
                         </a>
 
                         <HelpText text={helptext[disagg[0].disaggregation_type]}/>
-                        {!expanded && formErrors[disagg[0]] &&
+                        {!expanded && formErrors[disagg[0].disaggregation_type] &&
                             <span className="needs-attention"><i className="fas fa-exclamation-triangle"></i>{gettext("Needs Attention")}</span>
                         }
                     </div>
@@ -82,6 +106,7 @@ const DisaggregationFields = ({ formID, disagg, disaggregationData, setDisaggreg
                                                     disabled={readOnly}
                                                     value={Math.round(disaggregationData[currentDisagg.disaggregation_type].labels[labelObj.customsort - 1].value) || ""}
                                                     onChange={(e) => handleDataEntry(e.target.value, currentDisagg.disaggregation_type, labelObj.customsort)}
+                                                    onBlur={() => handleValidation(currentDisagg.disaggregation_type, labelObj.customsort)}
                                                 />
                                             )
                                         })
@@ -120,8 +145,8 @@ const DisaggregationFields = ({ formID, disagg, disaggregationData, setDisaggreg
                         }
                     </div>
                 </li>
-                {formErrors[disagg[0]] &&
-                        <span id={`validation_id_${[disagg[0]]}`} className="has-error">{formErrors[disagg[0]]}</span>
+                {formErrors[disagg[0].disaggregation_type] &&
+                        <span id={`validation_id_${disagg[0].pk}`} className="has-error">{formErrors[disagg[0].disaggregation_type]}</span>
                 }
             </ul>
         </fieldset>

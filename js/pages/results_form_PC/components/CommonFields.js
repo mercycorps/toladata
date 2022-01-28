@@ -33,11 +33,14 @@ const CommonFields = ({ commonFieldsInput, setCommonFieldsInput, outcomeThemesDa
     useEffect(() => {
         setCommonFieldsInput({...commonFieldsInput, date_collected: formatDate(selectedDate)});
         // Validation on date selection
-        let detectedErrors = "";
+        let detectedErrors = {...formErrors};
+        let valid = true;
         if (commonFieldsInput.date_collected !== "" && formatDate(selectedDate) !== "" && formatDate(selectedDate) < commonFieldsInput.program_start_date || formatDate(selectedDate) > maxDate) {
-            detectedErrors = gettext("This date should be within the fiscal year of the reporting period.");
+            valid = false;
+            detectedErrors = {...detectedErrors, date_collected: gettext("This date should be within the fiscal year of the reporting period.")};
         }
-        setFormErrors({...formErrors, date_collected: detectedErrors});
+        valid ? delete detectedErrors.date_collected : null;
+        setFormErrors(detectedErrors);
     }, [selectedDate]);
     
     return (
