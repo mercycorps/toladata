@@ -211,7 +211,7 @@ const PCResultsForm = ({indicatorID="", resultID="", readOnly}) => {
                             window.location.reload();
                         }
                     })
-            } else {
+            } else if (wasUpdated) {
                 window.create_unified_changeset_notice({
                     header: gettext("Reason for change"),
                     show_icon: true,
@@ -223,6 +223,8 @@ const PCResultsForm = ({indicatorID="", resultID="", readOnly}) => {
                     on_submit: send_update_request,
                     // on_cancel: () => this.props.rootStore.uiStore.setDisableCardActions(false),
                 });
+            } else {
+                $(`#resultModal_${resultID || indicatorID}`).modal('hide');
             }
         }
     }
