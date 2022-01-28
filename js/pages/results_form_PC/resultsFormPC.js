@@ -119,6 +119,7 @@ const PCResultsForm = ({indicatorID="", resultID="", readOnly}) => {
 
     // State Variables
     const [wasUpdated, setWasUpdated] = useState(false);
+    const [disableForm, setDisableForm] = useState(readOnly);
     const [outcomeThemesData, setOutcomeThemesData] = useState([]);
     const [disaggregationData, setDisaggregationData] = useState([]);
     const [evidenceFieldsInput, setEvidenceFieldsInput] = useState({});
@@ -183,8 +184,7 @@ const PCResultsForm = ({indicatorID="", resultID="", readOnly}) => {
                 if (response.status === 200) {
                     console.log("Updated Form Data!", response);
                     window.location.reload();
-                }
-
+                } else {setDisableForm(readOnly);}
             })
     }
 
@@ -200,7 +200,6 @@ const PCResultsForm = ({indicatorID="", resultID="", readOnly}) => {
     let handleSubmit = (e) => {
         e.preventDefault();
         if ( validateForm() ) {
-
             if (indicatorID) {
                 let data = prepare_sumbission_data();
                 console.log("Submit create data", data);
@@ -209,7 +208,7 @@ const PCResultsForm = ({indicatorID="", resultID="", readOnly}) => {
                         console.log("Saved Form Data!", response);
                         if (response.status === 200) {
                             window.location.reload();
-                        }
+                        } else {setDisableForm(readOnly);}
                     })
             } else if (wasUpdated) {
                 window.create_unified_changeset_notice({
@@ -226,12 +225,12 @@ const PCResultsForm = ({indicatorID="", resultID="", readOnly}) => {
             } else {
                 $(`#resultModal_${resultID || indicatorID}`).modal('hide');
             }
-        }
+        } else {setDisableForm(readOnly);}
     }
 
     if (Object.keys(disaggregationData).length > 0) {
         return (
-            <div style={{textAlign: "left"}}>
+            <div style={{textAlign: "left"}} className={disableForm ? "modal-disabled" : null}>
                 <h2>
                     {gettext('Result')}
                 </h2>
@@ -309,7 +308,10 @@ const PCResultsForm = ({indicatorID="", resultID="", readOnly}) => {
                             type="button"
                             className="btn btn-primary result-group"
                             id="result-submit-create"
-                            onClick={(e) => handleSubmit(e)}
+                            onClick={(e) => {
+                                setDisableForm(true);
+                                handleSubmit(e);
+                            }}
                         >{gettext('Save and close')}
                         </button>
                         <button

@@ -378,3 +378,9 @@ a.helptext:hover {
         width: auto;
     }
 }
+
+.modal-disabled {
+    pointer-events: none;
+    opacity: 0.5;
+    transition: opacity .25s ease-in-out;
+}
