@@ -51,7 +51,7 @@ const CommonFields = ({ commonFieldsInput, setCommonFieldsInput, outcomeThemesDa
         } else { delete detectedErrors.outcome_theme };
         setFormErrors(detectedErrors);
     }
-    
+
     return (
         <fieldset>
             <div className="form-group" id="div_id_date_collected">

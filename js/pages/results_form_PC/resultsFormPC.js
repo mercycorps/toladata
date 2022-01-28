@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useRef } from 'react';
 import { CommonFields } from './components/CommonFields.js';
 import { ActualValueFields } from './components/ActualValueFields.js';
 import { EvidenceFields } from './components/EvidenceFields.js';
@@ -18,7 +18,7 @@ const PCResultsForm = ({indicatorID="", resultID="", readOnly}) => {
     }
 
     let formatOutcomeThemesData = (outcomeThemes) => {
-       return outcomeThemes.reduce((themesArray, theme, i) => {
+        return outcomeThemes.reduce((themesArray, theme, i) => {
             themesArray[i] = {value: theme[0], label: theme[1]};
             return themesArray;
         }, [])
@@ -118,9 +118,9 @@ const PCResultsForm = ({indicatorID="", resultID="", readOnly}) => {
     }
 
     // State Variables
+    let outcomeThemesData = useRef([]);
     const [wasUpdated, setWasUpdated] = useState(false);
     const [disableForm, setDisableForm] = useState(readOnly);
-    const [outcomeThemesData, setOutcomeThemesData] = useState([]);
     const [disaggregationData, setDisaggregationData] = useState([]);
     const [evidenceFieldsInput, setEvidenceFieldsInput] = useState({});
     const [commonFieldsInput, setCommonFieldsInput] = useState({});
@@ -134,7 +134,7 @@ const PCResultsForm = ({indicatorID="", resultID="", readOnly}) => {
                 setDisaggregationData([])
                 setCommonFieldsInput({})
                 setEvidenceFieldsInput({})
-                setOutcomeThemesData([])
+                outcomeThemesData.current = [];
                 setFormErrors({})
             })
             $(document).on("keyup", function(event) {
@@ -146,7 +146,7 @@ const PCResultsForm = ({indicatorID="", resultID="", readOnly}) => {
                 api.getPCountResultCreateData(indicatorID)
                     .then(response => {
                         console.log("Form received data!", response);
-                        setOutcomeThemesData(formatOutcomeThemesData(response.outcome_themes));
+                        outcomeThemesData.current = formatOutcomeThemesData(response.outcome_themes)
                         setDisaggregationData(handleReceivedDisaggregations(response.disaggregations));
                         setCommonFieldsInput({
                             program_start_date: response.program_start_date,
@@ -158,7 +158,7 @@ const PCResultsForm = ({indicatorID="", resultID="", readOnly}) => {
                 api.getPCountResultUpdateData(resultID)
                 .then(response => {
                     console.log("Form received data!", response);
-                    setOutcomeThemesData(formatOutcomeThemesData(response.outcome_themes));
+                    outcomeThemesData.current = formatOutcomeThemesData(response.outcome_themes)
                     setDisaggregationData(handleReceivedDisaggregations(response.disaggregations));
                     setCommonFieldsInput({
                         periodic_target: response.periodic_target,
@@ -245,7 +245,7 @@ const PCResultsForm = ({indicatorID="", resultID="", readOnly}) => {
                     <CommonFields
                         commonFieldsInput={commonFieldsInput}
                         setCommonFieldsInput={setCommonFieldsInput}
-                        outcomeThemesData={outcomeThemesData}
+                        outcomeThemesData={outcomeThemesData.current}
                         formErrors={formErrors}
                         setFormErrors={setFormErrors}
                         readOnly={readOnly}
