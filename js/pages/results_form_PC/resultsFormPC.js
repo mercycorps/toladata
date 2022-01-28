@@ -307,7 +307,7 @@ const PCResultsForm = ({indicatorID="", resultID="", readOnly}) => {
                         <button
                             type="button"
                             className="btn btn-primary result-group"
-                            id="result-submit-create"
+                            id="result-submit-create--pc"
                             onClick={(e) => {
                                 setDisableForm(true);
                                 handleSubmit(e);
@@ -317,7 +317,7 @@ const PCResultsForm = ({indicatorID="", resultID="", readOnly}) => {
                         <button
                             type="button"
                             className="btn btn-reset result-group"
-                            id="result-cancel-btn"
+                            id="result-cancel-btn--pc"
                             data-dismiss="modal"
                         >{gettext('Cancel')}
                         </button>
