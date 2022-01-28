@@ -72,7 +72,6 @@ const PCResultsForm = ({indicatorID="", resultID="", readOnly}) => {
             detectedErrors = {...detectedErrors, fiscal_year: gettext("You cannot change the fiscal year during the current reporting period. ")}
         } else { delete detectedErrors.periodic_target };
 
-        console.log(formErrors, commonFieldsInput);
         if (!commonFieldsInput.outcome_theme || commonFieldsInput.outcome_theme.length === 0) {
             detectedErrors = {...detectedErrors, outcome_theme: gettext("Please complete this field. You can select more than one outcome theme.")}
         } else { delete detectedErrors.outcome_theme };

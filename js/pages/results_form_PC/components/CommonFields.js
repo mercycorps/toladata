@@ -43,6 +43,14 @@ const CommonFields = ({ commonFieldsInput, setCommonFieldsInput, outcomeThemesDa
         setFormErrors(detectedErrors);
     }, [selectedDate]);
     
+    let handleValidation = () => {
+        let detectedErrors = {...formErrors};
+        if (!commonFieldsInput.outcome_theme || commonFieldsInput.outcome_theme.length === 0) {
+            detectedErrors = {...detectedErrors, outcome_theme: gettext("Please complete this field. You can select more than one outcome theme.")}
+        } else { delete detectedErrors.outcome_theme };
+        setFormErrors(detectedErrors);
+    }
+    
     return (
         <fieldset>
             <div className="form-group" id="div_id_date_collected">
@@ -95,6 +103,7 @@ const CommonFields = ({ commonFieldsInput, setCommonFieldsInput, outcomeThemesDa
                     disabled={readOnly}
                     value={commonFieldsInput.outcome_theme}
                     onChange={(e) => setCommonFieldsInput({...commonFieldsInput, outcome_theme: e})}
+                    onBlur={() => handleValidation()}
                 />
                 {
                     formErrors.outcome_theme &&
