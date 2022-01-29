@@ -81,8 +81,7 @@ class Command(BaseCommand):
 
             created_counts = 0
             outcome_theme_names = sorted([
-                'Humanitarian response', 'Food security', 'Economic opportunity',
-                'Climate adaptation and water security', 'Peace and governance', 'Resilience'])
+                'Food Security', 'Water Security', 'Economic Opportunities', 'Peace and Stability', 'Resilience'])
             for theme_name in outcome_theme_names:
                 theme_obj, created = OutcomeTheme.objects.get_or_create(name=theme_name, defaults={'is_active': True})
                 theme_obj.save()

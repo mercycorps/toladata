@@ -18,9 +18,16 @@ const EvidenceFields = ({ evidenceFieldsInput, setEvidenceFieldsInput, formError
         setFormErrors(detectedErrors)
     }
 
+    function pcFilePickerCallback(fileName, url) {
+        document.getElementById('id_evidence_url--pc').value = url;
+        document.getElementById('id_record_name--pc').value = fileName;
+        // validateEvidence()
+        // setViewButtonDisabledState();
+    }
+
     let handleGDrive  = (e) => {
         e.preventDefault();
-        gdriveFilePicker(filePickerCallback);
+        gdriveFilePicker(pcFilePickerCallback);
     }
 
     return (

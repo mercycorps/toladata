@@ -231,7 +231,7 @@ const PCResultsForm = ({indicatorID="", resultID="", readOnly}) => {
                 window.create_unified_changeset_notice({
                     header: gettext("Reason for change"),
                     show_icon: true,
-                    // context: document.getElementById('modal_dialog'),
+                    context: document.getElementById('pc-result-modal-form'),
                     message_text: gettext("Your changes will be recorded in a change log.  For future reference, please share your reason for these changes."),
                     include_rationale: true,
                     rationale_required: true,
@@ -248,100 +248,102 @@ const PCResultsForm = ({indicatorID="", resultID="", readOnly}) => {
 
     if (Object.keys(disaggregationData).length > 0) {
         return (
-            <div style={{textAlign: "left"}} className={disableForm ? "modal-disabled" : null}>
-                <h2>
-                    {gettext('Result')}
-                </h2>
-                <button type="button" className="close" data-dismiss="modal" aria-label="Close">
-                    <span aria-hidden="true">&times;</span>
-                </button>
-                <h3 className="no-bold indicator_name">
-                    {gettext('Participant Count')}
-                </h3>
+            <div id="pc-result-modal-form">
+                <div style={{textAlign: "left"}} className={disableForm ? "modal-disabled" : null}>
+                    <h2>
+                        {gettext('Result')}
+                    </h2>
+                    <button type="button" className="close" data-dismiss="modal" aria-label="Close">
+                        <span aria-hidden="true">&times;</span>
+                    </button>
+                    <h3 className="no-bold indicator_name">
+                        {gettext('Participant Count')}
+                    </h3>
 
-                {Object.keys(commonFieldsInput).length > 0 &&
-                    <CommonFields
-                        commonFieldsInput={commonFieldsInput}
-                        setCommonFieldsInput={setCommonFieldsInput}
-                        outcomeThemesData={outcomeThemesData.current}
+                    {Object.keys(commonFieldsInput).length > 0 &&
+                        <CommonFields
+                            commonFieldsInput={commonFieldsInput}
+                            setCommonFieldsInput={setCommonFieldsInput}
+                            outcomeThemesData={outcomeThemesData.current}
+                            formErrors={formErrors}
+                            setFormErrors={setFormErrors}
+                            readOnly={readOnly}
+                            setWasUpdated={setWasUpdated}
+                        />
+                    }
+
+                    <ActualValueFields
+                        disaggregationData={disaggregationData}
+                        setDisaggregationData={setDisaggregationData}
+                        formErrors={formErrors}
+                        setFormErrors={setFormErrors}
+                        handleSADDActualsValidation={handleSADDActualsValidation}
+                        readOnly={readOnly}
+                        setWasUpdated={setWasUpdated}
+                    />
+                    {
+                        Object.keys(disaggregationData).map((disagg) => {
+                            let disaggs = [];
+                            if (disaggregationData[disagg].disaggregation_type.includes('SADD') && disaggregationData[disagg].double_counting === true) {
+                                disaggs = Object.keys(disaggregationData).reduce((arrSADD, currentDisagg) => {
+                                    if (disaggregationData[currentDisagg].disaggregation_type.includes("SADD")) {
+                                        arrSADD.unshift(disaggregationData[currentDisagg]);
+                                    }
+                                    return arrSADD;
+                                }, []);
+                            } else if (disaggregationData[disagg].disaggregation_type.includes('Sectors')) {
+                                disaggs = [disaggregationData[disagg]]
+                            } else { return; }
+
+                            return (
+                                <DisaggregationFields
+                                    key={disaggregationData[disagg].disaggregation_type}
+                                    disagg={disaggs}
+                                    formID={indicatorID || resultID}
+                                    readOnly={readOnly}
+                                    setWasUpdated={setWasUpdated}
+                                    formErrors={formErrors}
+                                    setFormErrors={setFormErrors}
+                                    disaggregationData={disaggregationData}
+                                    setDisaggregationData={setDisaggregationData}
+                                    handleSADDActualsValidation={handleSADDActualsValidation}
+                                />
+                            )
+                        })
+                    }
+                    <EvidenceFields
+                        evidenceFieldsInput={evidenceFieldsInput}
+                        setEvidenceFieldsInput={setEvidenceFieldsInput}
                         formErrors={formErrors}
                         setFormErrors={setFormErrors}
                         readOnly={readOnly}
                         setWasUpdated={setWasUpdated}
                     />
-                }
 
-                <ActualValueFields
-                    disaggregationData={disaggregationData}
-                    setDisaggregationData={setDisaggregationData}
-                    formErrors={formErrors}
-                    setFormErrors={setFormErrors}
-                    handleSADDActualsValidation={handleSADDActualsValidation}
-                    readOnly={readOnly}
-                    setWasUpdated={setWasUpdated}
-                />
-                {
-                    Object.keys(disaggregationData).map((disagg) => {
-                        let disaggs = [];
-                        if (disaggregationData[disagg].disaggregation_type.includes('SADD') && disaggregationData[disagg].double_counting === true) {
-                            disaggs = Object.keys(disaggregationData).reduce((arrSADD, currentDisagg) => {
-                                if (disaggregationData[currentDisagg].disaggregation_type.includes("SADD")) {
-                                    arrSADD.unshift(disaggregationData[currentDisagg]);
-                                }
-                                return arrSADD;
-                            }, []);
-                        } else if (disaggregationData[disagg].disaggregation_type.includes('Sectors')) {
-                            disaggs = [disaggregationData[disagg]]
-                        } else { return; }
-
-                        return (
-                            <DisaggregationFields
-                                key={disaggregationData[disagg].disaggregation_type}
-                                disagg={disaggs}
-                                formID={indicatorID || resultID}
-                                readOnly={readOnly}
-                                setWasUpdated={setWasUpdated}
-                                formErrors={formErrors}
-                                setFormErrors={setFormErrors}
-                                disaggregationData={disaggregationData}
-                                setDisaggregationData={setDisaggregationData}
-                                handleSADDActualsValidation={handleSADDActualsValidation}
-                            />
-                        )
-                    })
-                }
-                <EvidenceFields
-                    evidenceFieldsInput={evidenceFieldsInput}
-                    setEvidenceFieldsInput={setEvidenceFieldsInput}
-                    formErrors={formErrors}
-                    setFormErrors={setFormErrors}
-                    readOnly={readOnly}
-                    setWasUpdated={setWasUpdated}
-                />
-
-                {!readOnly &&
-                <div className="form-actions">
-                    <div>
-                        <button
-                            type="button"
-                            className="btn btn-primary result-group"
-                            id="result-submit-create--pc"
-                            onClick={(e) => {
-                                setDisableForm(true);
-                                handleSubmit(e);
-                            }}
-                        >{gettext('Save and close')}
-                        </button>
-                        <button
-                            type="button"
-                            className="btn btn-reset result-group"
-                            id="result-cancel-btn--pc"
-                            data-dismiss="modal"
-                        >{gettext('Cancel')}
-                        </button>
+                    {!readOnly &&
+                    <div className="form-actions">
+                        <div>
+                            <button
+                                type="button"
+                                className="btn btn-primary result-group"
+                                id="result-submit-create--pc"
+                                onClick={(e) => {
+                                    setDisableForm(true);
+                                    handleSubmit(e);
+                                }}
+                            >{gettext('Save and close')}
+                            </button>
+                            <button
+                                type="button"
+                                className="btn btn-reset result-group"
+                                id="result-cancel-btn--pc"
+                                data-dismiss="modal"
+                            >{gettext('Cancel')}
+                            </button>
+                        </div>
                     </div>
+                    }
                 </div>
-                }
             </div>
         )
     } else {
