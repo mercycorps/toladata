@@ -107,7 +107,7 @@ const ActualValueFields = ({ disaggregationData, setDisaggregationData, formErro
                 </li>
                 {
                     formErrors.totals_error &&
-                        <span id={`validation_id_totals_error`} className="has-error">{formErrors.totals_error}</span>
+                        <span id={`validation_id_totals_error--pc`} className="has-error">{formErrors.totals_error}</span>
                 }
             </ul>
         </fieldset>

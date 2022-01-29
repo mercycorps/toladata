@@ -147,7 +147,7 @@ const DisaggregationFields = ({ formID, disagg, disaggregationData, setDisaggreg
                     </div>
                 </li>
                 {formErrors[disagg[0].disaggregation_type] &&
-                        <span id={`validation_id_${disagg[0].pk}`} className="has-error">{formErrors[disagg[0].disaggregation_type]}</span>
+                        <span id={`validation_id_disaggregation--pc`} className="has-error">{formErrors[disagg[0].disaggregation_type]}</span>
                 }
             </ul>
         </fieldset>

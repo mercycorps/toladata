@@ -16,14 +16,12 @@ const PCResultsForm = ({indicatorID="", resultID="", readOnly}) => {
             return disaggObj;
         }, {});
     }
-
     let formatOutcomeThemesData = (outcomeThemes) => {
         return outcomeThemes.reduce((themesArray, theme, i) => {
             themesArray[i] = {value: theme[0], label: theme[1]};
             return themesArray;
         }, [])
     }
-
     let formatSelectedOutcomeThemes = (outcomeThemes) => {
        return outcomeThemes.reduce((themesArray, theme, i) => {
            if (theme[2]) {
@@ -31,6 +29,19 @@ const PCResultsForm = ({indicatorID="", resultID="", readOnly}) => {
            }
             return themesArray;
         }, [])
+    }
+    let scrollToError = (errors) => {
+        let firstError = Object.keys(errors)[0]
+        if (firstError.includes("SADD")) firstError = 'disaggregation';
+        setTimeout(() => {
+            let el = document.querySelector(`#validation_id_${firstError}--pc`)
+            if (el) {
+                el.scrollIntoView({
+                    behavior: "smooth",
+                    block: "center"
+                });
+            }
+        }, 1)
     }
 
     // Form Validations
@@ -114,7 +125,13 @@ const PCResultsForm = ({indicatorID="", resultID="", readOnly}) => {
         recordNameValid ? delete detectedErrors.record_name: null;
 
         setFormErrors(detectedErrors);
-        return Object.keys(detectedErrors).length === 0 ? true: false;
+        
+        if (Object.keys(detectedErrors).length === 0) {
+            return true;
+        } else {
+            scrollToError(detectedErrors)
+            return false;
+        }
     }
 
     // State Variables
@@ -220,6 +237,7 @@ const PCResultsForm = ({indicatorID="", resultID="", readOnly}) => {
                     rationale_required: true,
                     notice_type: 'notice',
                     on_submit: send_update_request,
+                    on_cancel: () => setDisableForm(readOnly),
                     // on_cancel: () => this.props.rootStore.uiStore.setDisableCardActions(false),
                 });
             } else {
