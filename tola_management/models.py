@@ -404,6 +404,8 @@ class ProgramAuditLog(models.Model, DiffableLog):
             "date": _('Result date'),
             "target": _('Measure against target'),
             "value": _('Actual value'),
+            # Translators:  A Noun.  A list of high-level categories that a program's activities fall into (e.g. food security or humanitarian response)
+            "outcome_themes": _("Outcome themes"),
             "start_date": _('Start date'),
             "end_date": _('End date'),
             "assumptions": _('Assumptions'),
@@ -427,7 +429,10 @@ class ProgramAuditLog(models.Model, DiffableLog):
             "indicator_deleted": _('Indicator deleted'),
             "result_changed": _('Result changed'),
             "result_created": _('Result created'),
-            "result_deleted": _('Result deleted'),
+            # Translators: this is a value in a change log that tells a user what type of change was made.
+            "participant_count_changed": _('Participant count changed'),
+            # Translators: this is a value in a change log that tells a user what type of change was made.
+            "participant_count_created": _('Participant count created'),
             "program_dates_changed": _('Program dates changed'),
             "level_changed": _('Result level changed'),
         }
@@ -587,6 +592,8 @@ class ProgramAuditLog(models.Model, DiffableLog):
             "indicator_deleted": Indicator.logged_field_order(),
             "result_changed": Result.logged_field_order(),
             "result_created": Result.logged_field_order(),
+            "participant_count_changed": Result.logged_field_order(),
+            "participant_count_created": Result.logged_field_order(),
             "result_deleted": Result.logged_field_order(),
             "program_dates_changed": ['start_date', 'end_date'],
             "level_changed": Level.logged_field_order(),
@@ -600,7 +607,9 @@ class ProgramAuditLog(models.Model, DiffableLog):
     # Used in the audit log to show the result date when a result-related log entry is displayed
     @property
     def result_info(self):
-        if self.change_type in ["result_created", "result_changed", "result_deleted"]:
+        if self.change_type in [
+                "result_created", "result_changed", "result_deleted",
+                "participant_count_created", "participant_count_changed"]:
             entry_dict = json.loads(self.new_entry or self.previous_entry)
             return {"id": entry_dict["id"], "date": entry_dict["date"]}
         return None
@@ -695,15 +704,21 @@ class ProgramAuditLog(models.Model, DiffableLog):
 
     @staticmethod
     def log_result_created(user, indicator, created_result, rationale):
+        if indicator.admin_type == Indicator.ADMIN_PARTICIPANT_COUNT:
+            change_type = 'participant_count_created'
+            logged_fields = created_result.logged_participant_count_fields
+        else:
+            change_type = 'result_created'
+            logged_fields = created_result.logged_fields
         new_program_log_entry = ProgramAuditLog(
             program=indicator.program,
             user=user.tola_user,
             organization=user.tola_user.organization,
             indicator=indicator,
-            change_type="result_created",
+            change_type=change_type,
             rationale=rationale,
             previous_entry=None,
-            new_entry=json.dumps(created_result.logged_fields, cls=DjangoJSONEncoder)
+            new_entry=json.dumps(logged_fields, cls=DjangoJSONEncoder)
         )
         new_program_log_entry.save()
 
@@ -725,13 +740,15 @@ class ProgramAuditLog(models.Model, DiffableLog):
     def log_result_updated(user, indicator, old_result_values, new_result_values, rationale):
         previous_entry_json = json.dumps(old_result_values, cls=DjangoJSONEncoder)
         new_entry_json = json.dumps(new_result_values, cls=DjangoJSONEncoder)
+        change_type = 'participant_count_changed' \
+            if indicator.admin_type == Indicator.ADMIN_PARTICIPANT_COUNT else 'result_changed'
         if previous_entry_json != new_entry_json:
             new_program_log_entry = ProgramAuditLog(
                 program=indicator.program,
                 user=user.tola_user,
                 organization=user.tola_user.organization,
                 indicator=indicator,
-                change_type="result_changed",
+                change_type=change_type,
                 rationale=rationale,
                 previous_entry=previous_entry_json,
                 new_entry=new_entry_json

@@ -103,7 +103,8 @@ class ProgramPageIndicatorMixin:
             'periodic_targets',
             'no_target_results',
             'indicator_type_count',
-            'create_date'
+            'create_date',
+            'admin_type',
         ]
 
     # class methods to instantiate serializer with minimal queries:

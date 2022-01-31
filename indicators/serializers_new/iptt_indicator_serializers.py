@@ -66,6 +66,7 @@ class IPTTIndicatorFiltersMixin:
             'indicator_type_pks',
             'site_pks',
             'disaggregation_pks',
+            'admin_type',
         ]
 
     @classmethod
@@ -214,7 +215,7 @@ class IPTTExcelIndicatorFiltersMixin:
             'pk', 'name', 'deleted', 'program_id', 'means_of_verification', 'level_id', 'level_order',
             'number', 'target_frequency', 'unit_of_measure', 'unit_of_measure_type', 'baseline', 'baseline_na',
             'direction_of_change', 'is_cumulative', 'old_level', 'was_bulk_imported',
-            'create_date', 'sector_id'
+            'create_date', 'sector_id', 'admin_type'
         ).filter(**cls._get_queryset_filters(context)).order_by().distinct()
         return cls(queryset, context=context, many=True)
 

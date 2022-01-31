@@ -117,45 +117,45 @@ class Command(BaseCommand):
 
         # Reporting
         for program_log_obj in sorted(affected_program_log.values(), key=lambda x: x['countries']):
-            print '{} | {} | ({}, {}) => ({}, {})'.format(program_log_obj['countries'],
+            print('{} | {} | ({}, {}) => ({}, {})'.format(program_log_obj['countries'],
                                                           program_log_obj['name'],
                                                           program_log_obj['old_start_date'],
                                                           program_log_obj['old_end_date'],
                                                           program_log_obj['new_start_date'],
-                                                          program_log_obj['new_end_date'])
+                                                          program_log_obj['new_end_date']))
 
             if program_log_obj['updated_periodic_targets']:
-                print '  Periodic Targets Updated:'
+                print('  Periodic Targets Updated:')
                 for indicator_id, pt_log_objs in itertools.groupby(program_log_obj['updated_periodic_targets'], lambda x: x['indicator'].id):
-                    print '    Indicator id:', indicator_id
+                    print('    Indicator id:', indicator_id)
                     for pt_log_obj in pt_log_objs:
-                        print '      {} | ({}, {}) => ({}, {})'.format(pt_log_obj['periodic_name'],
+                        print('      {} | ({}, {}) => ({}, {})'.format(pt_log_obj['periodic_name'],
                                                                        pt_log_obj['old_start_date'],
                                                                        pt_log_obj['old_end_date'],
                                                                        pt_log_obj['new_start_date'],
-                                                                       pt_log_obj['new_end_date'])
+                                                                       pt_log_obj['new_end_date']))
 
-        print '\nTotal affected programs count:', len(affected_program_ids)
+        print('\nTotal affected programs count:', len(affected_program_ids))
 
-        print '\n\nDiscontinuous periods found:'
+        print('\n\nDiscontinuous periods found:')
         if len(discontinuity_errors) > 0:
-            print '\n'.join(discontinuity_errors)
+            print('\n'.join(discontinuity_errors))
         else:
-            print 'None'
+            print('None')
 
-        print '\n\noddball indicators\n'
+        print('\n\noddball indicators\n')
 
         for indicator in oddball_indicators:
-            print '{} ||| {}'.format(indicator.program, indicator.name.encode('utf-8'))
+            print('{} ||| {}'.format(indicator.program, indicator.name.encode('utf-8')))
             for pt in periodic_targets.filter(indicator__id=indicator.id):
-                print '    ', pt, '| start date:', pt.start_date, '| end date:', pt.end_date
+                print('    ', pt, '| start date:', pt.start_date, '| end date:', pt.end_date)
 
-        print ''
+        print('')
 
         # Manually commit or rollback DB transaction
         if options['execute']:
-            print 'Committing changes to DB'
+            print('Committing changes to DB')
             transaction.commit()
         else:
-            print 'Rolling back DB transaction (Use --execute to commit changes to DB)'
+            print('Rolling back DB transaction (Use --execute to commit changes to DB)')
             transaction.rollback()
