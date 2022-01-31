@@ -33,9 +33,6 @@ class PCDisaggLabelValueSerializer(serializers.ModelSerializer):
         representation['value'] = value_dict['value'] # if value_dict else None
         return representation
 
-    def create(self, validated_data):
-        print('createdd', validated_data)
-
 
 class PCDisaggregationSerializer(serializers.ModelSerializer):
     labels = serializers.SerializerMethodField()
