@@ -125,7 +125,7 @@ const PCResultsForm = ({indicatorID="", resultID="", readOnly}) => {
         recordNameValid ? delete detectedErrors.record_name: null;
 
         setFormErrors(detectedErrors);
-        
+
         if (Object.keys(detectedErrors).length === 0) {
             return true;
         } else {
@@ -197,7 +197,6 @@ const PCResultsForm = ({indicatorID="", resultID="", readOnly}) => {
         api.updatePCountResult(resultID, data)
             .then(response => {
                 if (response.status === 200) {
-                    console.log("Updated Form Data!", response);
                     window.location.reload();
                 } else {setDisableForm(readOnly);}
             })
@@ -219,7 +218,6 @@ const PCResultsForm = ({indicatorID="", resultID="", readOnly}) => {
                 let data = prepare_sumbission_data();
                 api.createPCountResult(indicatorID, data)
                     .then(response => {
-                        console.log("Saved Form Data!", response);
                         if (response.status === 200) {
                             window.location.reload();
                         } else {setDisableForm(readOnly);}
