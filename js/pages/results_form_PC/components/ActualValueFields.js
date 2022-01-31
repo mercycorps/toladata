@@ -22,7 +22,7 @@ const ActualValueFields = ({ disaggregationData, setDisaggregationData, formErro
         })
         valid ? delete detectedErrors.totals_error : null;
         setFormErrors(detectedErrors);
-        handleSADDActualsValidation();
+        handleSADDActualsValidation(detectedErrors);
     }
     
     return (
