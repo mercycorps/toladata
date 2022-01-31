@@ -47,7 +47,7 @@ const CommonFields = ({ commonFieldsInput, setCommonFieldsInput, outcomeThemesDa
     let handleValidation = () => {
         let detectedErrors = {...formErrors};
         if (!commonFieldsInput.outcome_theme || commonFieldsInput.outcome_theme.length === 0) {
-            detectedErrors = {...detectedErrors, outcome_theme: gettext("Please complete this field. You can select more than one outcome theme.")}
+            detectedErrors = {...detectedErrors, outcome_theme: gettext("Please complete this field. You can select more than one outcome theme.")};
         } else { delete detectedErrors.outcome_theme };
         setFormErrors(detectedErrors);
     }
@@ -57,7 +57,7 @@ const CommonFields = ({ commonFieldsInput, setCommonFieldsInput, outcomeThemesDa
             <div className="form-group" id="div_id_date_collected--pc">
                 <label htmlFor="id_date_collected--pc" className="label--required">{gettext('Result date')}</label>
 
-                <HelpText text={gettext('If data collection occurred within the fiscal year, enter the date where data was collected. If data collection occurred after the end of the fiscal year, enter the last day of the fiscal year (June 30).')}/>
+                <HelpText text={gettext('If data collection occurred within the fiscal year, enter the date when data was collected. If data collection occurred after the end of the fiscal year, enter the last day of the fiscal year (June 30).')}/>
 
                 <input 
                     type="text" 
@@ -99,7 +99,6 @@ const CommonFields = ({ commonFieldsInput, setCommonFieldsInput, outcomeThemesDa
 
                 <HelpText text={gettext('Outcome themes are the main areas of a program. Refer to MEL Tip Sheet: Guidelines on Counting and Reporting Participant Numbers <a tabIndex="1" href="https://library.mercycorps.org/record/16929?ln=en" target="_blank">[link: https://library.mercycorps.org/record/16929?ln=en]</a> for a description of outcome themes.<span>')}/>
 
-
                 <CheckboxedMultiSelect 
                     options={outcomeThemesData}
                     placeholder={gettext("None Selected")}
@@ -109,7 +108,8 @@ const CommonFields = ({ commonFieldsInput, setCommonFieldsInput, outcomeThemesDa
                     value={commonFieldsInput.outcome_theme}
                     onChange={(e) => {
                         setWasUpdated(true);
-                        setCommonFieldsInput({...commonFieldsInput, outcome_theme: e});}}
+                        setCommonFieldsInput({...commonFieldsInput, outcome_theme: e});
+                    }}
                     onBlur={() => handleValidation()}
                 />
                 {

@@ -4,6 +4,7 @@ import { ActualValueFields } from './components/ActualValueFields.js';
 import { EvidenceFields } from './components/EvidenceFields.js';
 import { DisaggregationFields } from './components/DisaggregationFields.js'
 import api from '../../apiv2';
+import LoadingSpinner from '../../components/loading-spinner';
 
 
 const PCResultsForm = ({indicatorID="", resultID="", readOnly}) => {
@@ -31,7 +32,7 @@ const PCResultsForm = ({indicatorID="", resultID="", readOnly}) => {
         }, [])
     }
     let scrollToError = (errors) => {
-        let firstError = Object.keys(errors)[0]
+        let firstError = Object.keys(errors)[0];
         if (firstError.includes("SADD")) firstError = 'disaggregation';
         setTimeout(() => {
             let el = document.querySelector(`#validation_id_${firstError}--pc`)
@@ -76,28 +77,28 @@ const PCResultsForm = ({indicatorID="", resultID="", readOnly}) => {
         // Common Fields Validation
         let maxDate = formatDate(localdate()) < commonFieldsInput.program_end_date ? formatDate(localdate()) : commonFieldsInput.program_end_date;
         if (!commonFieldsInput.date_collected || commonFieldsInput.date_collected === "" || commonFieldsInput.date_collected < commonFieldsInput.program_start_date || commonFieldsInput.date_collected > maxDate) {
-            detectedErrors = {...detectedErrors, date_collected: gettext("This date should be within the fiscal year of the reporting period.")}
+            detectedErrors = {...detectedErrors, date_collected: gettext("This date should be within the fiscal year of the reporting period.")};
         };
 
         if (!commonFieldsInput.periodic_target || Object.keys(commonFieldsInput.periodic_target).length === 0) {
-            detectedErrors = {...detectedErrors, fiscal_year: gettext("You cannot change the fiscal year during the current reporting period. ")}
+            detectedErrors = {...detectedErrors, fiscal_year: gettext("You cannot change the fiscal year during the current reporting period. ")};
         } else { delete detectedErrors.periodic_target };
 
         if (!commonFieldsInput.outcome_theme || commonFieldsInput.outcome_theme.length === 0) {
-            detectedErrors = {...detectedErrors, outcome_theme: gettext("Please complete this field. You can select more than one outcome theme.")}
+            detectedErrors = {...detectedErrors, outcome_theme: gettext("Please complete this field. You can select more than one outcome theme.")};
         } else { delete detectedErrors.outcome_theme };
 
         // Actual Fields Validation
         let actualsValid = true;
         if (!disaggregationData['Actual with double counting'].labels[0].value || !disaggregationData['Actual with double counting'].labels[1].value) {
             actualsValid = false;
-            detectedErrors = {...detectedErrors, totals_error: gettext("Direct/indirect total participants with double counting is required. Please complete these fields.")}
+            detectedErrors = {...detectedErrors, totals_error: gettext("Direct/indirect total participants with double counting is required. Please complete these fields.")};
         };
         disaggregationData['Actual with double counting'].labels.map((label, i) => {
             if (disaggregationData['Actual without double counting'].labels[i].value) {
                 if ( parseInt(disaggregationData['Actual without double counting'].labels[i].value) > parseInt(disaggregationData['Actual with double counting'].labels[i].value) ) {
                     actualsValid = false;
-                    detectedErrors = {...detectedErrors, totals_error: gettext("Direct/indirect without double counting should be equal or lower than Direct/indirect with double counting.")}
+                    detectedErrors = {...detectedErrors, totals_error: gettext("Direct/indirect without double counting should be equal or lower than Direct/indirect with double counting.")};
                 }
             }
         })
@@ -112,14 +113,14 @@ const PCResultsForm = ({indicatorID="", resultID="", readOnly}) => {
         if(evidenceURL.length > 0) {
             if (!evidenceURL.match(/^(http(s)?|file):\/\/.+/)) {
                 evidenceURLValid = false;
-                detectedErrors = {...detectedErrors, evidence_url: gettext("Please enter a valid evidence link.")}
+                detectedErrors = {...detectedErrors, evidence_url: gettext("Please enter a valid evidence link.")};
             } else if (!recordName.length > 0) {
                 recordNameValid = false;
-                detectedErrors = {...detectedErrors, record_name: gettext("A record name must be included along with the link.")}
+                detectedErrors = {...detectedErrors, record_name: gettext("A record name must be included along with the link.")};
             }
         } else if (recordName.length > 0) {
             evidenceURLValid = false;
-            detectedErrors = {...detectedErrors, evidence_url: gettext("A link must be included along with the record name.")}
+            detectedErrors = {...detectedErrors, evidence_url: gettext("A link must be included along with the record name.")};
         }
         evidenceURLValid ? delete detectedErrors.evidence_url: null;
         recordNameValid ? delete detectedErrors.record_name: null;
@@ -148,11 +149,11 @@ const PCResultsForm = ({indicatorID="", resultID="", readOnly}) => {
 
         $(`#resultModal_${resultID || indicatorID}`).on('shown.bs.modal', function () {
             $(`#resultModal_${resultID || indicatorID}`).on('hidden.bs.modal', function () {
-                setDisaggregationData([])
-                setCommonFieldsInput({})
-                setEvidenceFieldsInput({})
+                setDisaggregationData([]);
+                setCommonFieldsInput({});
+                setEvidenceFieldsInput({});
                 outcomeThemesData.current = [];
-                setFormErrors({})
+                setFormErrors({});
             })
             $(document).on("keyup", function(event) {
                 if(event.key === 'Escape') {
@@ -162,8 +163,7 @@ const PCResultsForm = ({indicatorID="", resultID="", readOnly}) => {
             if (indicatorID) {
                 api.getPCountResultCreateData(indicatorID)
                     .then(response => {
-                        console.log("Form received data!", response);
-                        outcomeThemesData.current = formatOutcomeThemesData(response.outcome_themes)
+                        outcomeThemesData.current = formatOutcomeThemesData(response.outcome_themes);
                         setDisaggregationData(handleReceivedDisaggregations(response.disaggregations));
                         setCommonFieldsInput({
                             program_start_date: response.program_start_date,
@@ -174,8 +174,7 @@ const PCResultsForm = ({indicatorID="", resultID="", readOnly}) => {
             } else {
                 api.getPCountResultUpdateData(resultID)
                 .then(response => {
-                    console.log("Form received data!", response);
-                    outcomeThemesData.current = formatOutcomeThemesData(response.outcome_themes)
+                    outcomeThemesData.current = formatOutcomeThemesData(response.outcome_themes);
                     setDisaggregationData(handleReceivedDisaggregations(response.disaggregations));
                     setCommonFieldsInput({
                         periodic_target: response.periodic_target,
@@ -208,9 +207,9 @@ const PCResultsForm = ({indicatorID="", resultID="", readOnly}) => {
     let prepare_sumbission_data = () => {
         let data = [];
         data = {...data, indicator: indicatorID, ...commonFieldsInput, ...evidenceFieldsInput, disaggregations: Object.values(disaggregationData)};
-        data['outcome_theme'] = data['outcome_theme'].map((theme) => theme.value).filter(ot => ot !== null)
-        data['periodic_target'] = data['periodic_target']['id']
-        return data
+        data['outcome_theme'] = data['outcome_theme'].map((theme) => theme.value).filter(ot => ot !== null);
+        data['periodic_target'] = data['periodic_target']['id'];
+        return data;
     }
 
     // On Submission of the results form
@@ -219,7 +218,6 @@ const PCResultsForm = ({indicatorID="", resultID="", readOnly}) => {
         if ( validateForm() ) {
             if (indicatorID) {
                 let data = prepare_sumbission_data();
-                console.log("Submit create data", data);
                 api.createPCountResult(indicatorID, data)
                     .then(response => {
                         console.log("Saved Form Data!", response);
@@ -300,13 +298,13 @@ const PCResultsForm = ({indicatorID="", resultID="", readOnly}) => {
                                     key={disaggregationData[disagg].disaggregation_type}
                                     disagg={disaggs}
                                     formID={indicatorID || resultID}
-                                    readOnly={readOnly}
-                                    setWasUpdated={setWasUpdated}
-                                    formErrors={formErrors}
-                                    setFormErrors={setFormErrors}
                                     disaggregationData={disaggregationData}
                                     setDisaggregationData={setDisaggregationData}
+                                    formErrors={formErrors}
+                                    setFormErrors={setFormErrors}
                                     handleSADDActualsValidation={handleSADDActualsValidation}
+                                    readOnly={readOnly}
+                                    setWasUpdated={setWasUpdated}
                                 />
                             )
                         })

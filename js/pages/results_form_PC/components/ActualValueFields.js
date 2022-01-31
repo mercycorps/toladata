@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from 'react';
+import React from 'react';
 import { HelpText } from '../components/HelpText.js'
 
 const ActualValueFields = ({ disaggregationData, setDisaggregationData, formErrors, setFormErrors, handleSADDActualsValidation, readOnly, setWasUpdated }) => {
@@ -21,7 +21,7 @@ const ActualValueFields = ({ disaggregationData, setDisaggregationData, formErro
             }
         })
         valid ? delete detectedErrors.totals_error : null;
-        setFormErrors(detectedErrors)
+        setFormErrors(detectedErrors);
         handleSADDActualsValidation();
     }
     
@@ -32,11 +32,9 @@ const ActualValueFields = ({ disaggregationData, setDisaggregationData, formErro
                     <div className="item__value--header">
                         <div className="item__label">
                             <label className="label--required">{gettext('Total Participant Actual Values')}</label>
-
                             <HelpText 
                                 text={gettext('Include the participants with double counting on the left and participants without double counting across programs on the right. If two programs share participants, only discount double counting in one program!<br/><br/><strong>Direct participants</strong> – are those who have received a tangible benefit from the program, either as the actual program participants or the intended recipients of the program benefits.<br/><br/><strong>Indirect participants</strong> – are those who received a tangible benefit through their proximity to or contact with program participants or activities.')}
                             />
-
                         </div>
                         <div className="item__value--container">
                             <div className="bin heading">{gettext("Without double counting")}</div>
@@ -67,7 +65,6 @@ const ActualValueFields = ({ disaggregationData, setDisaggregationData, formErro
                             value={Math.round(disaggregationData["Actual with double counting"].labels[0].value) || ""}
                             onChange={(e) => handleDataEntry(e.target.value, "Actual with double counting", 0)}
                             onBlur={() => handleValdiation()}
-
                         />
                     </div>
                 </li>

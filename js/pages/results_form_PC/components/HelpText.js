@@ -1,10 +1,11 @@
-import React, { useState, useEffect } from 'react';
+import React, { useEffect } from 'react';
 
 
 const HelpText = ({text}) => {
     useEffect(() => {
         $('[data-toggle="popover"]').popover({html: true});
     }, []);
+
     return (
         <a href="#"
         tabIndex="0"

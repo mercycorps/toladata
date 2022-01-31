@@ -34,7 +34,7 @@ const DisaggregationFields = ({ formID, disagg, disaggregationData, setDisaggreg
 
     // Method to save data entry
     let handleDataEntry = (value, inputDisaggType, customsort) => {
-        setWasUpdated(true)
+        setWasUpdated(true);
         let update = {...disaggregationData};
         update[inputDisaggType].labels[customsort - 1] = {...disaggregationData[inputDisaggType].labels[customsort - 1], value: value};
         setDisaggregationData(update);
@@ -51,7 +51,7 @@ const DisaggregationFields = ({ formID, disagg, disaggregationData, setDisaggreg
                 let SADDWithoutValue = parseInt(disaggregationData["SADD (including unknown) with double counting"].labels[i].value || 0);
                 if (SADDWithValue > SADDWithoutValue) {
                     valid = false;
-                    detectedErrors = {...detectedErrors, [disaggregationData["SADD (including unknown) without double counting"].disaggregation_type]: gettext("The 'SADD without double counting' value should be less than or equal to the 'Direct without double counting' value.")}
+                    detectedErrors = {...detectedErrors, [disaggregationData["SADD (including unknown) without double counting"].disaggregation_type]: gettext("The 'SADD without double counting' value should be less than or equal to the 'Direct without double counting' value.")};
                 }
             })
             valid ? delete detectedErrors[disaggregationData["SADD (including unknown) without double counting"].disaggregation_type] : null;

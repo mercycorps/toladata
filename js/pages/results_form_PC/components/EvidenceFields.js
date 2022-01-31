@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from 'react';
+import React from 'react';
 import { HelpText } from '../components/HelpText.js'
 
 const EvidenceFields = ({ evidenceFieldsInput, setEvidenceFieldsInput, formErrors, setFormErrors, readOnly, setWasUpdated }) => {
@@ -15,7 +15,7 @@ const EvidenceFields = ({ evidenceFieldsInput, setEvidenceFieldsInput, formError
         } else {
             delete detectedErrors.evidence_url;
         }
-        setFormErrors(detectedErrors)
+        setFormErrors(detectedErrors);
     }
 
     function pcFilePickerCallback(fileName, url) {
@@ -52,7 +52,8 @@ const EvidenceFields = ({ evidenceFieldsInput, setEvidenceFieldsInput, formError
                         value={evidenceFieldsInput.evidence_url || ""}
                         onChange={(e) => {
                             setWasUpdated(true)
-                            setEvidenceFieldsInput({...evidenceFieldsInput, [e.target.name]: e.target.value})}}
+                            setEvidenceFieldsInput({...evidenceFieldsInput, [e.target.name]: e.target.value})
+                        }}
                         onBlur={() => handleValdation()}
                     />
 
@@ -95,7 +96,8 @@ const EvidenceFields = ({ evidenceFieldsInput, setEvidenceFieldsInput, formError
                         value={evidenceFieldsInput.record_name || ""}
                         onChange={(e) => {
                             setWasUpdated(true)
-                            setEvidenceFieldsInput({...evidenceFieldsInput, [e.target.name]: e.target.value})}}
+                            setEvidenceFieldsInput({...evidenceFieldsInput, [e.target.name]: e.target.value})
+                        }}
                     />
                     {
                         formErrors.record_name &&
