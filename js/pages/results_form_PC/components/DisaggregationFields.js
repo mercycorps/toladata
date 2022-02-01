@@ -42,24 +42,40 @@ const DisaggregationFields = ({ formID, disagg, disaggregationData, setDisaggreg
 
     // Method to validate inputs
     let handleValidation = (inputDisaggType, customsort) => {
+        let detectedErrors = {...formErrors};
+
         if (inputDisaggType.includes("SADD")) {
-            let detectedErrors = {...formErrors};
-            let valid = true;
+            let validSADD = true;
             // Validate SADD without values are less than or equal to SADD with values
             disaggregationData["SADD (including unknown) with double counting"].labels.map((label, i) => {
                 let SADDWithValue = parseInt(disaggregationData["SADD (including unknown) without double counting"].labels[i].value || 0);
                 let SADDWithoutValue = parseInt(disaggregationData["SADD (including unknown) with double counting"].labels[i].value || 0);
                 if (SADDWithValue > SADDWithoutValue) {
-                    valid = false;
+                    validSADD = false;
                     detectedErrors = {...detectedErrors, [disaggregationData["SADD (including unknown) without double counting"].disaggregation_type]: gettext("The 'SADD without double counting' value should be less than or equal to the 'Direct without double counting' value.")};
                 }
             })
-            valid ? delete detectedErrors[disaggregationData["SADD (including unknown) without double counting"].disaggregation_type] : null;
+            validSADD ? delete detectedErrors[disaggregationData["SADD (including unknown) without double counting"].disaggregation_type] : null;
             setFormErrors(detectedErrors);
-            handleSADDActualsValidation(detectedErrors, valid);
+            handleSADDActualsValidation(detectedErrors, validSADD);
+        }
+
+        if (inputDisaggType.includes("Sectors")) {
+            let validSectors = true;
+            let participantType = disaggregationData[inputDisaggType].count_type;
+
+            disaggregationData[inputDisaggType].labels.map((label, i) => {
+                let labelValue = parseInt(label.value || 0),
+                    totalValue = parseInt(disaggregationData["Actual with double counting"].labels.filter((labelObj) => labelObj.label === participantType)[0].value || 0);
+                if (labelValue > totalValue) {
+                    validSectors = false;
+                    detectedErrors = {...detectedErrors, [inputDisaggType]: gettext("Sector values should be less than or equal to the 'Direct/Indirect with double counting' value.")}
+                }
+            })
+            validSectors ? delete detectedErrors[inputDisaggType] : null;
+            setFormErrors(detectedErrors);
         }
     }
-
     return (
         <fieldset>
             <ul className="list-group form-list-group">
@@ -78,13 +94,13 @@ const DisaggregationFields = ({ formID, disagg, disaggregationData, setDisaggreg
                         {!expanded && formErrors[disagg[0].disaggregation_type] &&
                             <span className="needs-attention"><i className="fas fa-exclamation-triangle"></i>{gettext("Needs Attention")}</span>
                         }
-                    </div>
 
-                    <div className="item__value--container" style={{display: expanded ? "inherit" : "none"}}>
-                        {disagg.length !== 1 &&
-                            <div className="bin heading">{gettext("Without double counting")}</div>
-                        }
-                        <div className="bin heading">{gettext("With double counting")}</div>
+                        <div className="item__value--container" style={{display: expanded ? "inherit" : "none"}}>
+                            {disagg.length !== 1 &&
+                                <div className="bin heading">{gettext("Without double counting")}</div>
+                            }
+                            <div className="bin heading">{gettext("With double counting")}</div>
+                        </div>
                     </div>
                 </li>
             </ul>
@@ -147,7 +163,7 @@ const DisaggregationFields = ({ formID, disagg, disaggregationData, setDisaggreg
                     </div>
                 </li>
                 {formErrors[disagg[0].disaggregation_type] &&
-                        <span id={`validation_id_disaggregation--pc`} className="has-error">{formErrors[disagg[0].disaggregation_type]}</span>
+                        <span id={disagg[0].disaggregation_type.includes("SADD") ? `validation_id_SADD--pc` : `validation_id_${disagg[0].disaggregation_type.replaceAll(" ", "-")}--pc`} className="has-error">{formErrors[disagg[0].disaggregation_type]}</span>
                 }
             </ul>
         </fieldset>
