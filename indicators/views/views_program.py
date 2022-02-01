@@ -313,7 +313,7 @@ def indicator_detail_export_csv(request):
         .select_related('sector', 'level', 'program')\
         .prefetch_related('program__level_tiers', 'strategic_objectives')
     country_data = Country.objects.select_related('region')
-    country_map = {c.country: c.region.name for c in country_data}
+    country_map = {(c.country): (c.region.name if c.region else 'Region not assigned') for c in country_data}
     objective_map = {i.id: [so.name for so in i.strategic_objectives.all()] for i in indicator_data}
 
     # Build the level names in memory rather than doing db queries, since there are so many to do
