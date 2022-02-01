@@ -4,17 +4,26 @@ import { HelpText } from '../components/HelpText.js'
 const EvidenceFields = ({ evidenceFieldsInput, setEvidenceFieldsInput, formErrors, setFormErrors, readOnly, setWasUpdated }) => {
 
     let handleValdation = () => {
-        let detectedErrors = {...formErrors};
-        let evidenceURL = evidenceFieldsInput.evidence_url || "";
-        if (evidenceURL.length > 0 ) {
+        let detectedErrors = {...formErrors},
+        evidenceURLValid = true,
+        recordNameValid = true,
+        evidenceURL = evidenceFieldsInput.evidence_url || "",
+        recordName = evidenceFieldsInput.record_name || "";
+
+        if(evidenceURL.length > 0) {
             if (!evidenceURL.match(/^(http(s)?|file):\/\/.+/)) {
-                detectedErrors = {...detectedErrors, evidence_url: gettext("Please enter a valid evidence link.")}
-            } else {
-                delete detectedErrors.evidence_url;
+                evidenceURLValid = false;
+                detectedErrors = {...detectedErrors, evidence_url: gettext("Please enter a valid evidence link.")};
+            } else if (!recordName.length > 0) {
+                recordNameValid = false;
+                detectedErrors = {...detectedErrors, record_name: gettext("A record name must be included along with the link.")};
             }
-        } else {
-            delete detectedErrors.evidence_url;
+        } else if (recordName.length > 0) {
+            evidenceURLValid = false;
+            detectedErrors = {...detectedErrors, evidence_url: gettext("A link must be included along with the record name.")};
         }
+        evidenceURLValid ? delete detectedErrors.evidence_url: null;
+        recordNameValid ? delete detectedErrors.record_name: null;
         setFormErrors(detectedErrors);
     }
 
@@ -35,7 +44,7 @@ const EvidenceFields = ({ evidenceFieldsInput, setEvidenceFieldsInput, formError
             <h3>{gettext('Evidence')}</h3>
             <p>{gettext('Link this result to a record or folder of records that serves as evidence.')}</p>
             <div className="form-group">
-                <label htmlFor="id_record_url--pc" className="label">{gettext('Link to file or folder')}</label>
+                <label htmlFor="id_evidence_url--pc" className="label">{gettext('Link to file or folder')}</label>
 
                 <HelpText
                     text={ gettext('Provide a link to a file or folder in Google Drive or another shared network drive. Please be aware that TolaData does not store a copy of your record, <i>so you should not link to something on your personal computer, as no one else will be able to access it.</i>')}
@@ -52,7 +61,7 @@ const EvidenceFields = ({ evidenceFieldsInput, setEvidenceFieldsInput, formError
                         value={evidenceFieldsInput.evidence_url || ""}
                         onChange={(e) => {
                             setWasUpdated(true)
-                            setEvidenceFieldsInput({...evidenceFieldsInput, [e.target.name]: e.target.value})
+                            setEvidenceFieldsInput({...evidenceFieldsInput, evidence_url: e.target.value})
                         }}
                         onBlur={() => handleValdation()}
                     />
@@ -96,8 +105,9 @@ const EvidenceFields = ({ evidenceFieldsInput, setEvidenceFieldsInput, formError
                         value={evidenceFieldsInput.record_name || ""}
                         onChange={(e) => {
                             setWasUpdated(true)
-                            setEvidenceFieldsInput({...evidenceFieldsInput, [e.target.name]: e.target.value})
+                            setEvidenceFieldsInput({...evidenceFieldsInput, record_name: e.target.value})
                         }}
+                        onBlur={() => handleValdation()}
                     />
                     {
                         formErrors.record_name &&
