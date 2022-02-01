@@ -17,7 +17,7 @@ const ActualValueFields = ({ disaggregationData, setDisaggregationData, formErro
             if (disaggregationData['Actual without double counting'].labels[i].value &&
                 parseInt(disaggregationData['Actual without double counting'].labels[i].value) > parseInt(disaggregationData['Actual with double counting'].labels[i].value) ) {
                     valid = false;
-                    detectedErrors = ({...detectedErrors, totals_error: gettext("Direct/indirect without double counting should be equal or lower than Direct/indirect with double counting.")})
+                    detectedErrors = ({...detectedErrors, totals_error: gettext("Direct/indirect without double counting should be equal to or lower than direct/indirect with double counting.")})
             }
         })
         valid ? delete detectedErrors.totals_error : null;
