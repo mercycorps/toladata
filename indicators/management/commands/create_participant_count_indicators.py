@@ -126,8 +126,9 @@ class Command(BaseCommand):
                 counts['indicators_created'] += 1
 
         if not options['suppress_output']:
+            print('')
             if options['verbosity'] > 1:
-                template = '{p.name}|{p.countries}|{p.reporting_period_start}|{p.reporting_period_end}'
+                template = '{p.name}|{p.countries}|{p.reporting_period_start}|{p.reporting_period_end}|{p.funding_status}'
                 print('Programs ending before FY2022 start')
                 for p in ineligible_programs:
                     print(template.format(p=p))
