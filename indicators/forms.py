@@ -402,7 +402,7 @@ class IndicatorForm(forms.ModelForm):
                 field.disabled = True
 
         if indicator and indicator.admin_type == Indicator.ADMIN_PARTICIPANT_COUNT:
-            pc_disabled_fields = 'name unit_of_measure unit_of_measure_type'.split(' ')
+            pc_disabled_fields = 'name sector unit_of_measure unit_of_measure_type'.split(' ')
             for field in pc_disabled_fields:
                 self.fields[field].disabled = True
 
