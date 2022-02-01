@@ -44,7 +44,7 @@ const ActualValueFields = ({ disaggregationData, setDisaggregationData, formErro
                 </li>
 
                 <li className="list-group-item">
-                    <div className="item__label">{gettext("Actual direct value")}</div>
+                    <div className="item__label">{disaggregationData["Actual with double counting"].labels[0].label}</div>
                     <div className="item__value--container">
                         <input 
                             type="number" 
@@ -70,7 +70,7 @@ const ActualValueFields = ({ disaggregationData, setDisaggregationData, formErro
                 </li>
 
                 <li className="list-group-item">
-                    <div className="item__label">{gettext("Actual indirect value")}</div>
+                    <div className="item__label">{disaggregationData["Actual without double counting"].labels[1].label}</div>
                     <div className="item__value--container">
                         <input 
                             type="number" 
@@ -96,7 +96,7 @@ const ActualValueFields = ({ disaggregationData, setDisaggregationData, formErro
                 </li>
 
                 <li className="list-group-item reference-row">
-                    <div className="item__label">{gettext("Actual total value")}</div>
+                    <div className="item__label">{gettext("Total Participants")}</div>
                     <div className="item__value--container">
                         <div className="bin">{parseInt(disaggregationData["Actual without double counting"].labels[0].value || 0) + parseInt(disaggregationData["Actual without double counting"].labels[1].value || 0)}</div>
                         <div className="bin">{parseInt(disaggregationData["Actual with double counting"].labels[0].value || 0) + parseInt(disaggregationData["Actual with double counting"].labels[1].value || 0)}</div>

@@ -6,8 +6,8 @@ const DisaggregationFields = ({ formID, disagg, disaggregationData, setDisaggreg
     // Helptext Data
     const helptext = {
         ["SADD (including unknown) without double counting"]: gettext("Only include SADD for Direct participants."),
-        ["Sectors Direct with double counting"]: gettext("Provide a disaggregation of participants reached by sector. Only provide the figure with double counting. Refer to MEL Tip Sheet: Guidelines on Counting and Reporting Participant Numbers <a href='https://library.mercycorps.org/record/16929?ln=en' target='_blank'>[link: https://library.mercycorps.org/record/16929?ln=en]</a> for a description of outcome themes."),
-        ["Sectors Indirect with double counting"]: gettext("Provide a disaggregation of participants reached by sector. Only provide the figure with double counting. Refer to MEL Tip Sheet: Guidelines on Counting and Reporting Participant Numbers <a href='https://library.mercycorps.org/record/16929?ln=en' target='_blank'>[link: https://library.mercycorps.org/record/16929?ln=en]</a> for a description of outcome themes."),
+        ["Sectors Direct with double counting"]: gettext("Provide a disaggregation of participants reached by sector. Only provide the figure with double counting. Refer to MEL Tip Sheet: Guidelines on Counting and Reporting Participant Numbers <a href='https://library.mercycorps.org/record/16929?ln=en' target='_blank'>[link: https://library.mercycorps.org/record/16929?ln=en]</a> for a description of sectors."),
+        ["Sectors Indirect with double counting"]: gettext("Provide a disaggregation of participants reached by sector. Only provide the figure with double counting. Refer to MEL Tip Sheet: Guidelines on Counting and Reporting Participant Numbers <a href='https://library.mercycorps.org/record/16929?ln=en' target='_blank'>[link: https://library.mercycorps.org/record/16929?ln=en]</a> for a description of sectors."),
     };
 
     // On Mount, add listener to set state for expanding and collapsing
@@ -135,7 +135,7 @@ const DisaggregationFields = ({ formID, disagg, disaggregationData, setDisaggreg
                 </li>
 
                 <li className="list-group-item reference-row">
-                    <div className="item__label">{`Actual ${totals[0].label.toLowerCase()} value`}</div>
+                    <div className="item__label">{`Total ${totals[0].label} Participants`}</div>
                     <div className="item__value--container">
                         {
                             disagg.map((currentDisagg, i) => {

@@ -95,7 +95,7 @@ const CommonFields = ({ commonFieldsInput, setCommonFieldsInput, outcomeThemesDa
             </div>
 
             <div className="form-group react-multiselect-checkbox" id="div_id_outcome_theme--pc">
-                <label htmlFor="id_outcome_theme--pc" className="label--required">{gettext('Outcome theme')}</label>
+                <label htmlFor="outcome_themes_multiselect" className="label--required">{gettext('Outcome theme')}</label>
 
                 <HelpText text={gettext('Outcome themes are the main areas of a program. Refer to MEL Tip Sheet: Guidelines on Counting and Reporting Participant Numbers <a tabIndex="1" href="https://library.mercycorps.org/record/16929?ln=en" target="_blank">[link: https://library.mercycorps.org/record/16929?ln=en]</a> for a description of outcome themes.<span>')}/>
 
