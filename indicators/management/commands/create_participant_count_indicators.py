@@ -99,8 +99,16 @@ class Command(BaseCommand):
 
         eligible_programs = Program.objects.filter(reporting_period_end__gte=reporting_start_date)
         counts['eligible_programs'] = eligible_programs.count()
+        if options['verbosity'] > 1:
+            ineligible_programs = Program.objects.filter(reporting_period_end__lt=reporting_start_date).filter(funding_status='Funded').order_by('reporting_period_end')
+
+        if options['verbosity'] > 1:
+            preexisting_programs = eligible_programs.filter(funding_status='Funded').filter(indicator__admin_type=Indicator.ADMIN_PARTICIPANT_COUNT)
         eligible_programs = eligible_programs.exclude(indicator__admin_type=Indicator.ADMIN_PARTICIPANT_COUNT)
         counts['pc_indicator_does_not_exist'] = eligible_programs.count()
+
+        if options['verbosity'] > 1:
+            programs_without_rf = eligible_programs.filter(funding_status='Funded').filter(levels__isnull=True).prefetch_related('level_tiers')
         eligible_programs = eligible_programs.exclude(levels__isnull=True).prefetch_related('level_tiers')
         counts['has_rf'] = eligible_programs.count()
 
@@ -118,6 +126,21 @@ class Command(BaseCommand):
                 counts['indicators_created'] += 1
 
         if not options['suppress_output']:
+            if options['verbosity'] > 1:
+                template = '{p.name}|{p.countries}|{p.reporting_period_start}|{p.reporting_period_end}'
+                print('Programs ending before FY2022 start')
+                for p in ineligible_programs:
+                    print(template.format(p=p))
+                print('Program already has a PC indicator')
+                for p in preexisting_programs:
+                    print(template.format(p=p))
+                print('Program has no RF')
+                for p in programs_without_rf:
+                    print(template.format(p=p))
+                print('Created indicators for these programs')
+                for p in eligible_programs:
+                    print(template.format(p=p))
+            print('\nStats')
             for key in counts:
                 print(f'{key} count: {counts[key]}')
             if not options['execute']:
