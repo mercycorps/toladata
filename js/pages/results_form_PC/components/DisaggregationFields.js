@@ -56,7 +56,7 @@ const DisaggregationFields = ({ formID, disagg, disaggregationData, setDisaggreg
             })
             valid ? delete detectedErrors[disaggregationData["SADD (including unknown) without double counting"].disaggregation_type] : null;
             setFormErrors(detectedErrors);
-            handleSADDActualsValidation(valid);
+            handleSADDActualsValidation(detectedErrors, valid);
         }
     }
 

@@ -4,7 +4,6 @@ import { ActualValueFields } from './components/ActualValueFields.js';
 import { EvidenceFields } from './components/EvidenceFields.js';
 import { DisaggregationFields } from './components/DisaggregationFields.js'
 import api from '../../apiv2';
-import LoadingSpinner from '../../components/loading-spinner';
 
 
 const PCResultsForm = ({indicatorID="", resultID="", readOnly}) => {
@@ -46,8 +45,8 @@ const PCResultsForm = ({indicatorID="", resultID="", readOnly}) => {
     }
 
     // Form Validations
-    let handleSADDActualsValidation = (valid = true) => {
-        let detectedErrors = {...formErrors};
+    let handleSADDActualsValidation = (errors, valid = true) => {
+        let detectedErrors = {...errors};
         let disaggValid = true;
         let actualWithDirect = disaggregationData["Actual with double counting"].labels[0].value || 0;
         let actualWithoutDirect = disaggregationData["Actual without double counting"].labels[0].value || 0;
@@ -98,7 +97,7 @@ const PCResultsForm = ({indicatorID="", resultID="", readOnly}) => {
             if (disaggregationData['Actual without double counting'].labels[i].value) {
                 if ( parseInt(disaggregationData['Actual without double counting'].labels[i].value) > parseInt(disaggregationData['Actual with double counting'].labels[i].value) ) {
                     actualsValid = false;
-                    detectedErrors = {...detectedErrors, totals_error: gettext("Direct/indirect without double counting should be equal or lower than Direct/indirect with double counting.")};
+                    detectedErrors = {...detectedErrors, totals_error: gettext("Direct/indirect without double counting should be equal to or lower than direct/indirect with double counting.")};
                 }
             }
         })
