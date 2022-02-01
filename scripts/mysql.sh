@@ -1,15 +1,19 @@
 #!/bin/bash
 
-# USAGE: sh mysql.sh -u USERNAME -r -f BACKUP_FILE_NAME.sql
-#               -u = your username for the database
-#               -r = resets the database (drops existing one, creates a new one)
-#               -f = restores this backup file
-#               -m = runs migrations; you should ensure env is set to the right python (e.g. with a virtualenv)
-#               -e = points to the python executable so that migrations command can be run
-#               -b = backs up the database of the $host
-#               -h = Specified which host's db to backup
-# If this file is located where the Django's manage.py file is located then
-# it will run the migration command as well.
+usage() {
+    cat <<MESSAGE
+    USAGE: sh mysql.sh -u USERNAME -r -f BACKUP_FILE_NAME.sql
+        -u = Your username for the database.
+        -r = Resets the database (drops existing one, creates a new one).
+        -f = File name.  A file with this name in the ~/sqlbackups directory will be restored (.sql or .sql.gz).
+        -m = Runs migrations; you should ensure env is set to the right python (e.g. with a virtualenv).
+        -e = Points to the python executable so that migrations command can be run. Use of -m doesn't work.
+        -s = Host machine for the database. Defaults to localhost.
+        -b = Backs up the database from the -s server.
+        -h = Print this help message.
+MESSAGE
+}
+
 
 # Database credentials
 user=
@@ -34,13 +38,16 @@ keep_backups_for=30 #days
 
 while [ "$1" != "" ]; do
     case $1 in
+        -h | --help )       usage
+                            exit 1
+                            ;;
         -u | --user )       shift
                             user=$1
                             ;;
-        -p | --password)    shift
+        -p | --password )   shift
                             password=$1
                             ;;
-        -h | --host )       shift
+        -s | --server )     shift
                             host=$1
                             ;;
         -b | --backup )     backup=1
@@ -57,9 +64,6 @@ while [ "$1" != "" ]; do
                             deleteoldbackups=1
                             ;;
         -r | --reset )      resetdb=1
-                            ;;
-        -h | --help )       usage
-                            exit
                             ;;
         * )                 usage
                             exit 1
