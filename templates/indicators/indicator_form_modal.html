@@ -31,6 +31,11 @@
         </h3>
         {% endif %}
 
+        {% if subtitle_str == "Number of people reached in a fiscal year" %}
+            <a id="id_guidance_link--pc" target="_blank" href="https://library.mercycorps.org/record/38839">
+                {% trans 'TolaData Participant Count: Step by Step Guide' %}
+            </a>
+        {% endif %}
         <span id="modalmessages" width="100%"></span>
     </div>
     <button
@@ -478,6 +483,15 @@
                 icon.attr('class', 'fa-caret-right');
             }
         });
+
+        // Participant Count guides links in different languages
+        let participantCountGuideLinks = {
+            "en": "https://library.mercycorps.org/record/38839",
+            "ar": "https://library.mercycorps.org/record/38840",
+            "es": "https://library.mercycorps.org/record/38841",
+            "fr": "https://library.mercycorps.org/record/38842",
+        };
+        $('#id_guidance_link--pc').attr('href', participantCountGuideLinks[window.userLang]);
     });
 
     // Use BS multiselect widget where needed
