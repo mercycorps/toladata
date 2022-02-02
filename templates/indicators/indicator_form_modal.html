@@ -32,7 +32,7 @@
         {% endif %}
 
         {% if subtitle_str == "Number of people reached in a fiscal year" %}
-            <a id="id_link--pc" target="_blank" >
+            <a id="id_guidance_link--pc" target="_blank" href="https://library.mercycorps.org/record/38839">
                 {% trans 'TolaData Participant Count: Step by Step Guide' %}
             </a>
         {% endif %}
@@ -491,7 +491,7 @@
             "es": "https://library.mercycorps.org/record/38841",
             "fr": "https://library.mercycorps.org/record/38842",
         };
-        $('#id_link--pc').attr('href', linksPC[window.userLang]);
+        $('#id_guidance_link--pc').attr('href', linksPC[window.userLang]);
     });
 
     // Use BS multiselect widget where needed
