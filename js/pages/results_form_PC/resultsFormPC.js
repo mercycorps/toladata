@@ -32,9 +32,9 @@ const PCResultsForm = ({indicatorID="", resultID="", readOnly}) => {
     }
     let scrollToError = (errors) => {
         let firstError = Object.keys(errors)[0];
-        if (firstError.includes("SADD")) firstError = 'disaggregation';
+        if (firstError.includes("SADD")) firstError = 'SADD';
         setTimeout(() => {
-            let el = document.querySelector(`#validation_id_${firstError}--pc`)
+            let el = document.querySelector(`#validation_id_${firstError.replaceAll(" ","-")}--pc`)
             if (el) {
                 el.scrollIntoView({
                     behavior: "smooth",
@@ -102,6 +102,21 @@ const PCResultsForm = ({indicatorID="", resultID="", readOnly}) => {
             }
         })
         actualsValid ? delete detectedErrors.totals_error : null;
+
+        // Sectors Disaggregation Validation
+        let validSectors = true;
+        let sectors = Object.keys(disaggregationData).filter((disagg) => disaggregationData[disagg].disaggregation_type.includes("Sectors"));
+        sectors.map(sectorDisagg => {
+            disaggregationData[sectorDisagg].labels.map((label, i) => {
+                let labelValue = parseInt(label.value || 0),
+                    totalValue = parseInt(disaggregationData["Actual with double counting"].labels.filter((labelObj) => labelObj.label === disaggregationData[sectorDisagg].count_type)[0].value || 0);
+                if (labelValue > totalValue) {
+                    validSectors = false;
+                    detectedErrors = {...detectedErrors, [sectorDisagg]: gettext("Sector values should be less than or equal to the 'Direct/Indirect with double counting' value.")}
+                }
+            })
+            validSectors ? delete detectedErrors[sectorDisagg] : null;
+        })
 
         // Evidence Fields Validation
         let evidenceURLValid = true,
