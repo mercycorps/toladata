@@ -46,7 +46,9 @@ from indicators.views.view_utils import (
     generate_periodic_targets,
     dictfetchall
 )
-from indicators.forms import IndicatorForm, ResultForm, PTFormInputsForm, get_disaggregated_result_formset
+from indicators.forms import (
+    IndicatorForm, IndicatorCompleteForm, ResultForm, PTFormInputsForm, get_disaggregated_result_formset
+)
 from indicators.models import (
     Indicator,
     PeriodicTarget,
@@ -512,6 +514,9 @@ class IndicatorUpdate(IndicatorFormMixin, UpdateView):
     @property
     def _form_subtitle_display_str(self):
         return truncatechars(self.object.name, 300)
+
+    def get_form_class(self):
+        return IndicatorCompleteForm if 'indicator_complete' in self.request.path else IndicatorForm
 
     def get_context_data(self, **kwargs):
         context = super(IndicatorUpdate, self).get_context_data(**kwargs)

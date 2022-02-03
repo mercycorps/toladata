@@ -102,6 +102,7 @@ class StrategicObjective(SafeDeleteModel):
         super(StrategicObjective, self).save(*args, **kwargs)
 
 
+# The objective model is obsolete and only contains data from legacy programs that aren't using the RF
 class Objective(models.Model):
     name = models.CharField(_("Name"), max_length=135, blank=True)
     program = models.ForeignKey(Program, on_delete=models.CASCADE, null=True, blank=True, verbose_name=_("Program"))
@@ -1262,6 +1263,7 @@ class Indicator(SafeDeleteModel):
     # ordering with respect to level (determines whether indicator is 1.1a 1.1b or 1.1c)
     level_order = models.IntegerField(default=0)
 
+    # The objective model is obsolete and only contains data from legacy programs that aren't using the RF
     # this includes a relationship to a program
     objectives = models.ManyToManyField(
         Objective, blank=True, verbose_name=_("Program Objective"),

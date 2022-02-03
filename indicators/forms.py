@@ -509,47 +509,28 @@ class IndicatorForm(forms.ModelForm):
         return 'https://learn.mercycorps.org/index.php/TOLA:Section_05/en#b._TolaActivity_Indicator_Planning_Form_Guides'
 
 
+# This shares quite a bit of code with the IndicatorForm.  It should probably be DRYed with a Mixin.
 class IndicatorCompleteForm(forms.ModelForm):
     unit_of_measure_type = forms.ChoiceField(
         choices=Indicator.UNIT_OF_MEASURE_TYPES,
         widget=forms.RadioSelect(),
     )
-    old_level = forms.ChoiceField(
-        choices=[('', '------')] + [(name, name) for (pk, name) in Indicator.OLD_LEVELS],
-        initial=None
-    )
 
     baseline = NonLocalizedDecimalField(decimal_places=2, localize=True, required=False)
     lop_target = NonLocalizedDecimalField(decimal_places=2, localize=True, required=False)
 
-    rationale = forms.CharField(required=False)
-    reasons_for_change = forms.TypedMultipleChoiceField(
-        choices=AuditLogRationaleSelection.OPTIONS.items(),
-        coerce=int,
-        required=False
-    )
-
     class Meta:
         model = Indicator
-        exclude = ['create_date', 'edit_date', 'level_order', 'program', 'disaggregation']
+        fields = [
+            'indicator_type', 'unit_of_measure', 'rationale_for_target', 'baseline', 'baseline_na',
+            'direction_of_change', 'target_frequency', 'lop_target','unit_of_measure_type', 'is_cumulative',
+            'strategic_objectives', 'data_collection_frequencies', 'reporting_frequencies',
+            'quality_assurance_techniques'
+        ]
         widgets = {
-            'definition': forms.Textarea(attrs={'rows': 4}),
-            'justification': forms.Textarea(attrs={'rows': 4}),
-            'quality_assurance': forms.Textarea(attrs={'rows': 4}),
-            'data_issues': forms.Textarea(attrs={'rows': 4}),
-            'comments': forms.Textarea(attrs={'rows': 4}),
-            'rationale_for_target': forms.Textarea(attrs={'rows': 4}),
-            'objectives': ShowOnDisabledMultiSelect,
-            'strategic_objectives': ShowOnDisabledMultiSelect,
             'indicator_type': ShowOnDisabledMultiSelect,
             'data_collection_frequencies': ShowOnDisabledMultiSelect,
             'reporting_frequencies': ShowOnDisabledMultiSelect,
-            'means_of_verification': forms.Textarea(attrs={'rows': 4}),
-            'data_collection_method': forms.Textarea(attrs={'rows': 4}),
-            'data_points': forms.Textarea(attrs={'rows': 4}),
-            'responsible_person': forms.Textarea(attrs={'rows': 4}),
-            'method_of_analysis': forms.Textarea(attrs={'rows': 4}),
-            'information_use': forms.Textarea(attrs={'rows': 4}),
             'quality_assurance_techniques': forms.SelectMultiple(),
         }
 
@@ -563,73 +544,15 @@ class IndicatorCompleteForm(forms.ModelForm):
             lop_stripped = lop_stripped.rstrip('0').rstrip('.') if '.' in lop_stripped else lop_stripped
             kwargs['initial']['lop_target'] = lop_stripped
 
-
         self.programval = kwargs.pop('program')
-        self.prefilled_level = kwargs.pop('level') if 'level' in kwargs else False
 
         super(IndicatorCompleteForm, self).__init__(*args, **kwargs)
 
         # per mercycorps/TolaActivity#2452 remove textarea max length validation to provide a more
         # user-friendly js-based validation (these textarea checks aren't enforced at db-level anyway)
-        for field in ['name', 'definition', 'justification', 'rationale_for_target',
-                      'means_of_verification', 'data_collection_method', 'data_points',
-                      'responsible_person', 'method_of_analysis', 'information_use',
-                      'quality_assurance', 'data_issues', 'comments']:
-            self.fields[field].widget.attrs.pop('maxlength', None)
-
-        # program_display here is to display the program without interfering in the logic that
-        # assigns a program to an indicator (and doesn't update it) - but it looks like other fields
-        self.fields['program_display'] = forms.ChoiceField(
-            choices=[('', self.programval.name),],
-            required=False,
-        )
-        self.fields['program_display'].disabled = True
-        self.fields['program_display'].label = _('Program')
+        self.fields['rationale_for_target'].widget.attrs.pop('maxlength', None)
         self.fields['baseline'].label = _('Baseline')
         self.fields['baseline'].help_text = Indicator._meta.get_field('baseline').help_text
-
-        # level is here the new "result level" (RF) level option (FK to model Level)
-        # Translators: This is a form field label that allows users to select which Level object to associate with
-        # the Result that's being entered into the form
-        self.fields['level'].label = _('Result level')
-        self.fields['level'].label_from_instance = lambda obj: obj.display_name
-        # in cases where the user was sent here via CREATE from the RF BUILDER screen:
-        if self.prefilled_level:
-            # prefill level with only the level they clicked "add indicator" from:
-            self.fields['level'].queryset = Level.objects.filter(pk=self.prefilled_level)
-            self.fields['level'].initial = self.prefilled_level
-            # do not allow the user to update (it is being "added to" that level)
-            self.fields['level'].disabled = True
-        else:
-            # populate with all levels for the indicator's program:
-            # self.fields['level'].queryset = Level.objects.filter(program_id=self.programval)
-            self.fields['level'].choices = [('', '------')] + [
-                (l.id, l.display_name) for l in Level.sort_by_ontology(
-                    Level.objects.filter(program_id=self.programval)
-                )]
-
-        if self.programval.results_framework and not self.programval.manual_numbering:
-            # in this (the default) case, the number field is removed (values not updated):
-            self.fields.pop('number')
-        elif self.programval.results_framework:
-            # in this case the number field gets this special help text (added as a popover):
-            self.fields['number'].label = _('Display number')
-            self.fields['number'].help_text = Indicator._meta.get_field('number').help_text
-        if self.programval.results_framework:
-            # no need to update the old_level field if they are using the results framework:
-            self.fields.pop('old_level')
-            self.fields['level'].required = True
-        else:
-            # pre-migration to RF, all fields remain unchanged in this regard (still required):
-            self.fields['old_level'].required = True
-            # Translators:  Indicator objects are assigned to Levels, which are in a hierarchy.  We recently changed
-            # how we organize Levels. This is a field label for the indicator-associated Level in the old level system
-            self.fields['old_level'].label = _('Old indicator level')
-            # Translators:  We recently changed how we organize Levels. The new system is called the "results
-            # framework". This is help text for users to let them know that they can use the new system now.
-            self.fields['old_level'].help_text = _("Indicators are currently grouped by an older version of indicator "
-                                                   "levels. To group indicators according to the results framework, an "
-                                                   "admin will need to adjust program settings.")
 
         # sort choices alphabetically again (to provide choices sorted in translated language)
         self.fields['quality_assurance_techniques'].choices = sorted(
@@ -643,15 +566,8 @@ class IndicatorCompleteForm(forms.ModelForm):
             key=lambda choice: str_without_diacritics(choice[1])
         )
 
-        sector_choices = [(id, gettext(sector)) for id, sector in self.fields['sector'].choices]
-        self.fields['sector'].choices = sorted(
-            sector_choices,
-            key=lambda choice: str_without_diacritics(choice[1])
-        )
-
         self.fields['reporting_frequencies'].choices = [
             (pk, _(freq)) for pk, freq in self.fields['reporting_frequencies'].choices]
-
 
         self.fields['data_collection_frequencies'].choices = [
             (pk, _(freq)) for pk, freq in self.fields['data_collection_frequencies'].choices]
@@ -693,25 +609,11 @@ class IndicatorCompleteForm(forms.ModelForm):
             subwidget_attrs={'class': 'scroll-box-200 grouped-disaggregations'},
             group_helptext=disaggregation_group_helptext
         )
-        if indicator:
-            self.fields['grouped_disaggregations'].initial = [
-                disagg.pk for disagg in indicator.disaggregation.all()
-                ]
-        else:
-            self.fields['grouped_disaggregations'].initial = (
-                [disagg.pk for disagg in global_disaggs if disagg.selected_by_default] +
-                [disagg.pk for country_name, country_disaggs in countries_disaggs
-                 for disagg in country_disaggs if disagg.selected_by_default]
-            )
-        if (self.programval._using_results_framework == Program.NOT_MIGRATED and
-            Objective.objects.filter(program_id=self.programval.id).exists()):
-            self.fields['objectives'].queryset = Objective.objects.filter(program__id__in=[self.programval.id])
-        else:
-            self.fields.pop('objectives')
+        self.fields['grouped_disaggregations'].initial = [
+            disagg.pk for disagg in indicator.disaggregation.all()
+        ]
+
         self.fields['strategic_objectives'].queryset = StrategicObjective.objects.filter(country__in=countries)
-        self.fields['name'].label = _('Indicator')
-        self.fields['name'].required = True
-        self.fields['name'].widget = forms.Textarea(attrs={'rows': 3})
         self.fields['unit_of_measure'].required = True
         self.fields['unit_of_measure'].widget = forms.TextInput(
             attrs={'autocomplete':'off',
@@ -719,7 +621,6 @@ class IndicatorCompleteForm(forms.ModelForm):
         # Translators: Label of a form field.  User specifies whether changes should increase or decrease.
         self.fields['direction_of_change'].label = _("Direction of change")
         self.fields['target_frequency'].required = True
-        # self.fields['is_cumulative'].widget = forms.RadioSelect()
         if self.instance.target_frequency and self.instance.target_frequency != Indicator.LOP:
             self.fields['target_frequency'].widget.attrs['readonly'] = True
         if not self.request.has_write_access:
@@ -747,49 +648,6 @@ class IndicatorCompleteForm(forms.ModelForm):
             raise forms.ValidationError(_('Please enter a number larger than zero.'))
         return data
 
-    def clean_level(self):
-        level = self.cleaned_data['level']
-        if level and level.program_id != self.programval.pk:
-            raise forms.ValidationError(
-                # Translators: This is an error message that is returned when a user is trying to assign an indicator
-                # to the wrong hierarch of levels.
-                _('Level program ID %(l_p_id)d and indicator program ID (%i_p_id)d mismatched'),
-                code='foreign_key_mismatch',
-                params={
-                    'l_p_id': level.program_id,
-                    'i_p_id': self.programval.pk
-                }
-            )
-        return level
-
-    def clean_means_of_verification(self):
-        """field typed changed to return "" instead of None causing a non-update, this returns old null"""
-        means_of_verification = self.cleaned_data['means_of_verification']
-        if not means_of_verification and self.instance and not self.instance.means_of_verification:
-            return self.instance.means_of_verification
-        return means_of_verification
-
-    def clean_method_of_analysis(self):
-        """field typed changed to return "" instead of None causing a non-update, this returns old null"""
-        method_of_analysis = self.cleaned_data['method_of_analysis']
-        if not method_of_analysis and self.instance and not self.instance.method_of_analysis:
-            return self.instance.method_of_analysis
-        return method_of_analysis
-
-    def clean_data_collection_method(self):
-        """field typed changed to return "" instead of None causing a non-update, this returns old null"""
-        data_collection_method = self.cleaned_data['data_collection_method']
-        if not data_collection_method and self.instance and not self.instance.data_collection_method:
-            return self.instance.data_collection_method
-        return data_collection_method
-
-    def clean_definition(self):
-        """field typed changed to return "" instead of None causing a non-update, this returns old null"""
-        definition = self.cleaned_data['definition']
-        if not definition and self.instance and not self.instance.definition:
-            return self.instance.definition
-        return definition
-
     def update_disaggregations(self, instance):
         # collect disaggs that this user doesn't have access to and don't touch them:
         existing_disaggregations = instance.disaggregation.exclude(
@@ -804,16 +662,12 @@ class IndicatorCompleteForm(forms.ModelForm):
         return instance
 
     def save(self, commit=True):
-        # set the program on the indicator on create (it's already set on update)
-        if self.instance.program_id is None:
-            self.instance.program_id = self.programval.id
         instance = super().save(commit=False)
         if commit:
             instance.save()
             instance = self.update_disaggregations(instance)
             self.save_m2m()
         return instance
-
 
     def get_form_guidance_url(self, language='en'):
         return 'https://learn.mercycorps.org/index.php/TOLA:Section_05/en#b._TolaActivity_Indicator_Planning_Form_Guides'
