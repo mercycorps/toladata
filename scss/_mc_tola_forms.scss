@@ -384,3 +384,8 @@ a.helptext:hover {
     opacity: 0.5;
     transition: opacity .25s ease-in-out;
 }
+
+.result-form__heading--pc {
+    display: flex;
+    justify-content: space-between;
+}

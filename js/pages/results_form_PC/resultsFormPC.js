@@ -259,13 +259,15 @@ const PCResultsForm = ({indicatorID="", resultID="", readOnly}) => {
     if (Object.keys(disaggregationData).length > 0) {
         return (
             <div id="pc-result-modal-form">
-                <div style={{textAlign: "left"}} className={disableForm ? "modal-disabled" : null}>
-                    <h2>
-                        {gettext('Result')}
-                    </h2>
-                    <button type="button" className="close" data-dismiss="modal" aria-label="Close">
-                        <span aria-hidden="true">&times;</span>
-                    </button>
+                <div className={disableForm ? "modal-disabled" : null}>
+                    <div className="result-form__heading--pc">
+                        <h2>
+                            {gettext('Result')}
+                        </h2>
+                        <button type="button" className="close" data-dismiss="modal" aria-label="Close">
+                            <span aria-hidden="true">&times;</span>
+                        </button>
+                    </div>
                     <h3 className="no-bold indicator_name">
                         {gettext('Participant Count')}
                     </h3>
