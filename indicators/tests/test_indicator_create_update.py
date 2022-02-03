@@ -6,7 +6,7 @@ from django.test import RequestFactory, TestCase
 from django.urls import reverse_lazy, reverse
 
 import factories
-from factories import ResultFactory
+from factories import ResultFactory, RFIndicatorFactory
 from indicators.models import Indicator, PeriodicTarget
 from indicators.views.views_indicators import PeriodicTargetJsonValidationError
 from workflow.models import ProgramAccess, Program
@@ -21,6 +21,14 @@ class TestIndicatorCreateUpdateBase(TestBase):
         self.program.reporting_period_start = datetime.date(2018, 1, 1)
         self.program.reporting_period_end = datetime.date(2020, 12, 31)
         self.program.save()
+
+    @staticmethod
+    def _get_annual_targets():
+        return [
+            {"id": 0, "period": "Year 1", "target": "1", "start_date": "Jan 1, 2018", "end_date": "Dec 31, 2018"},
+            {"id": 0, "period": "Year 2", "target": "2", "start_date": "Jan 1, 2019", "end_date": "Dec 31, 2019"},
+            {"id": 0, "period": "Year 3", "target": "3", "start_date": "Jan 1, 2020", "end_date": "Dec 31, 2020"}
+        ]
 
     def _base_indicator_post_data(self, target_frequency, periodic_targets):
         return {
@@ -79,10 +87,7 @@ class IndicatorCreateTests(TestIndicatorCreateUpdateBase, TestCase):
         self.assertEqual(pt.target, indicator.lop_target)
 
     def test_annual_creation(self):
-        periodic_targets = [
-            {"id": 0, "period": "Year 1", "target": "1", "start_date": "Jan 1, 2018", "end_date": "Dec 31, 2018"},
-            {"id": 0, "period": "Year 2", "target": "2", "start_date": "Jan 1, 2019", "end_date": "Dec 31, 2019"},
-            {"id": 0, "period": "Year 3", "target": "3", "start_date": "Jan 1, 2020", "end_date": "Dec 31, 2020"}]
+        periodic_targets = self._get_annual_targets()
 
         data = self._base_indicator_post_data(Indicator.ANNUAL, periodic_targets)
 
@@ -201,8 +206,13 @@ class IndicatorUpdateTests(TestIndicatorCreateUpdateBase, TestCase):
         url = reverse_lazy('indicator_update', args=[self.indicator.id])
         response = self.client.get(url)
 
-        # self.assertContains(response, 'Indicator Performance Tracking Table')
         self.assertTemplateUsed(response, 'indicators/indicator_form_modal.html')
+
+    def test_get_completion_form(self):
+        url = reverse_lazy('indicator_complete', args=[self.indicator.id])
+        response = self.client.get(url)
+
+        self.assertTemplateUsed(response, 'indicators/indicator_form_modal_complete.html')
 
     def test_lop_update(self):
         data = self._base_indicator_post_data(Indicator.LOP, [])
@@ -327,6 +337,20 @@ class IndicatorUpdateTests(TestIndicatorCreateUpdateBase, TestCase):
 
         with self.assertRaises(PeriodicTargetJsonValidationError):
             self.client.post(url, data)
+
+    def test_data_preservation(self):
+        """
+        Realised that implementation of completion form was wiping out anything that wasn't on the form.
+        This is to make sure that existing fields aren't converted to null
+        """
+        indicator = RFIndicatorFactory(program=self.program, target_frequency=Indicator.ANNUAL)
+        indicator.data_collection_method = "Random"
+        indicator.save()
+        post_data = self._base_indicator_post_data(indicator.target_frequency, self._get_annual_targets())
+        url = reverse_lazy('indicator_complete', args=[indicator.id])
+        self.client.post(url, post_data)
+        indicator.refresh_from_db()
+        self.assertEqual(indicator.data_collection_method,"Random")
 
 
 class PeriodicTargetsFormTests(TestBase, TestCase):

@@ -504,7 +504,6 @@ class IndicatorForm(forms.ModelForm):
             self.save_m2m()
         return instance
 
-
     def get_form_guidance_url(self, language='en'):
         return 'https://learn.mercycorps.org/index.php/TOLA:Section_05/en#b._TolaActivity_Indicator_Planning_Form_Guides'
 
