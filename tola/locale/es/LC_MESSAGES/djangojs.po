@@ -2,8 +2,8 @@ msgid ""
 msgstr ""
 "Project-Id-Version: \n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2022-01-18 21:21-0800\n"
-"PO-Revision-Date: 2021-08-13 08:53-0700\n"
+"POT-Creation-Date: 2022-02-07 15:17-0800\n"
+"PO-Revision-Date: 2022-02-08 17:32-0500\n"
 "Last-Translator: \n"
 "Language-Team: \n"
 "Language: es\n"
@@ -11,210 +11,7 @@ msgstr ""
 "Content-Type: text/plain; charset=UTF-8\n"
 "Content-Transfer-Encoding: 8bit\n"
 "Plural-Forms: nplurals=2; plural=(n != 1);\n"
-"X-Generator: Poedit 3.0\n"
-
-#: js/pages/results_form_PC/components/ActualValueFields.js:50
-msgid "Actual Direct value"
-msgstr "Valor real directo"
-
-#: js/pages/results_form_PC/components/ActualValueFields.js:78
-msgid "Actual Indirect value"
-msgstr "Valor real indirecto"
-
-#: js/pages/results_form_PC/components/ActualValueFields.js:102
-msgid "Actual Total value"
-msgstr "Valor real total"
-
-#: js/pages/results_form_PC/components/CommonFields.js:58
-msgid "Outcome theme"
-msgstr "Tema de resultados"
-
-#: js/pages/results_form_PC/components/DisaggregationFields.js:53
-msgid "Needs Attention"
-msgstr "Requiere su atención"
-
-#. Translators: Input field validation message.
-#: js/pages/results_form_PC/resultsFormPC.js:65
-msgid "Please complete this field. You can select more than one outcome theme."
-msgstr ""
-"Por favor, complete este campo. Puede seleccionar más de un tema de "
-"resultados."
-
-#. Translators: Input field validation message.
-#: js/pages/results_form_PC/resultsFormPC.js:104
-msgid "Please enter a valid evidence link."
-msgstr "Por favor, introduzca un enlace de prueba válido."
-
-#: js/pages/results_form_PC/resultsFormPC.js:233
-msgid "Participant Count"
-msgstr "Cómputo de participantes"
-
-#: js/pages/results_form_PC/components/ActualValueFields.js:34
-msgid "Total Participant Actual Values"
-msgstr "Valores reales del total de participantes"
-
-#. Translators: Input field help text.
-#: js/pages/results_form_PC/components/ActualValueFields.js:38
-msgid ""
-"Include the participants with double counting on the left and participants "
-"without double counting across programs on the right. If two programs share "
-"participants, only discount double counting in one program!<br/><br/"
-"><strong>Direct participants</strong> – are those who have received a "
-"tangible benefit from the program, either as the actual program participants "
-"or the intended recipients of the program benefits.<br/><br/"
-"><strong>Indirect participants</strong> – are those who received a tangible "
-"benefit through their proximity to or contact with program participants or "
-"activities."
-msgstr ""
-"Incluya a los participantes con cómputo doble a la izquierda y a los "
-"participantes sin cómputo doble entre programas a la derecha. Si dos "
-"programas comparten participantes, descuente solo el cómputo doble en un "
-"programa.<br/><br/><strong>Participantes directos</strong>: son aquellos que "
-"han recibido una ventaja tangible en el marco del programa, ya sea como "
-"participantes reales del programa o como destinatarios de las ventajas del "
-"mismo.<br/><br/><strong>Participantes indirectos</strong>: son aquellos que "
-"recibieron una ventaja tangible por su proximidad o vínculo con los "
-"participantes o con las actividades del programa."
-
-#: js/pages/results_form_PC/components/ActualValueFields.js:43
-msgid "Without Double Counting"
-msgstr "Sin cómputo doble"
-
-#: js/pages/results_form_PC/components/ActualValueFields.js:44
-msgid "With Double Counting"
-msgstr "Con cómputo doble"
-
-#. Translators: Input field help text.
-#: js/pages/results_form_PC/components/CommonFields.js:15
-msgid ""
-"If data collection occurred within the fiscal year, enter the date when data "
-"was collected. If data collection occurred after the end of the fiscal year, "
-"enter the last day of the fiscal year (June 30)."
-msgstr ""
-"Si la recopilación de datos tuvo lugar dentro del año fiscal, introduzca la "
-"fecha en la que se recopilaron los datos. Si la recopilación de datos tuvo "
-"lugar después de finalizar el año fiscal, introduzca el último día del año "
-"fiscal (30 de junio)."
-
-#: js/pages/results_form_PC/components/CommonFields.js:39
-msgid "Fiscal year"
-msgstr "Año fiscal"
-
-#. Translators: Input field help text.
-#: js/pages/results_form_PC/components/CommonFields.js:43
-msgid "Fiscal years run from July 1 to June 30 of the following year."
-msgstr ""
-"Los años fiscales se corresponden a los periodos comprendidos entre el 1 de "
-"julio y el 30 de junio del año siguiente."
-
-#. Translators: Input field help text.
-#: js/pages/results_form_PC/components/CommonFields.js:62
-msgid ""
-"Outcome themes are the main areas of a program. Refer to MEL Tip Sheet: "
-"Guidelines on Counting and Reporting Participant Numbers <a tabIndex=\"1\" "
-"href=\"https://library.mercycorps.org/record/16929?ln=en\" target=\"_blank"
-"\">[link: https://library.mercycorps.org/record/16929?ln=en]</a> for a "
-"description of outcome themes.<span>"
-msgstr ""
-"Los temas de resultados son las secciones principales de un programa. Para "
-"obtener una descripción de los temas de resultados, consulte la guía: "
-"Guidelines on Counting and Reporting Participant Numbers <a tabIndex=\"1\" "
-"href=\"https://library.mercycorps.org/record/16929?ln=en\" target=\"_blank"
-"\">[link: https://library.mercycorps.org/record/16929?ln=en]</a>"
-
-#: js/pages/results_form_PC/components/DisaggregationFields.js:59
-msgid "Without double counting"
-msgstr "Sin cómputo doble"
-
-#: js/pages/results_form_PC/components/DisaggregationFields.js:61
-msgid "With double counting"
-msgstr "Con cómputo doble"
-
-#. Translators: Input field help text. Only input the SADD for Direct participants count in this field
-#: js/pages/results_form_PC/resultsFormPC.js:14
-msgid "Only include SADD for Direct participants."
-msgstr "Incluya solo los SADD de los participantes directos."
-
-#. Translators: Input field help text.
-#: js/pages/results_form_PC/resultsFormPC.js:17
-#: js/pages/results_form_PC/resultsFormPC.js:20
-msgid ""
-"Provide a disaggregation of participants reached by sector. Only provide the "
-"figure with double counting. Refer to MEL Tip Sheet: Guidelines on Counting "
-"and Reporting Participant Numbers <a href='https://library.mercycorps.org/"
-"record/16929?ln=en' target='_blank'>[link: https://library.mercycorps.org/"
-"record/16929?ln=en]</a> for a description of outcome themes."
-msgstr ""
-"Proporcione una desagregación de los participantes alcanzados por sector. "
-"Proporcione solo la cifra de cómputo doble. Para obtener una descripción de "
-"los temas de resultados, consulte la guía: Guidelines on Counting and "
-"Reporting Participant Numbers <a href='https://library.mercycorps.org/"
-"record/16929?ln=en' target='_blank'>[link: https://library.mercycorps.org/"
-"record/16929?ln=en]</a>."
-
-#. Translators: Input field help text.
-#: js/pages/results_form_PC/resultsFormPC.js:23
-#: js/pages/results_form_PC/resultsFormPC.js:26
-msgid ""
-"Direct participants – are those who have received a tangible benefit from "
-"the program, either as the actual program participants or the intended "
-"recipients of the program benefits. Indirect participants – are those who "
-"received a tangible benefit through their proximity to or contact with "
-"program participants or activities."
-msgstr ""
-"Participantes directos: son aquellos que han recibido una ventaja tangible "
-"en el marco del programa, ya sea como participantes reales del programa o "
-"como destinatarios de las ventajas del mismo. Participantes indirectos: son "
-"aquellos que recibieron una ventaja tangible por su proximidad o vínculo con "
-"los participantes o con las actividades del programa."
-
-#. Translators: Input field validation message.
-#: js/pages/results_form_PC/resultsFormPC.js:48
-msgid "This date should be within the fiscal year of the reporting period."
-msgstr ""
-"Esta fecha debe estar dentro del año fiscal del período de notificación."
-
-#. Translators: Input field validation message.
-#: js/pages/results_form_PC/resultsFormPC.js:54
-msgid "You cannot change the fiscal year during the current reporting period. "
-msgstr ""
-"No se puede cambiar el año fiscal durante el período de notificación actual."
-
-#. Translators: Input field validation message.
-#: js/pages/results_form_PC/resultsFormPC.js:74
-msgid ""
-"The sum of 'SADD without double counting' should be equal to the sum of "
-"'Direct without double counting'."
-msgstr ""
-"La suma de ‘SADD sin cómputo doble’ debe ser igual a la suma de ‘Directo sin "
-"cómputo doble’."
-
-#. Translators: Input field validation message.
-#: js/pages/results_form_PC/resultsFormPC.js:82
-msgid ""
-"The sum of 'SADD with double counting' should be equal to the sum of 'Direct "
-"with double counting'."
-msgstr ""
-"La suma de ‘SADD con cómputo doble’ debe ser igual a la suma de ‘Directo con "
-"cómputo doble’."
-
-#. Translators: Input field validation message.
-#: js/pages/results_form_PC/resultsFormPC.js:88
-msgid ""
-"Direct/indirect total participants with double counting is required. Please "
-"complete these fields."
-msgstr ""
-"Se requiere un total de participantes directos/indirectos con cómputo doble. "
-"Por favor, complete estos campos."
-
-#. Translators: Input field validation message.
-#: js/pages/results_form_PC/resultsFormPC.js:97
-msgid ""
-"Direct/indirect without double counting should be equal or lower than Direct/"
-"indirect with double counting."
-msgstr ""
-"Directo/Indirecto sin cómputo doble debe ser igual o menor a Directo/"
-"Indirecto con cómputo doble."
+"X-Generator: Poedit 2.4.2\n"
 
 #. Translators: This is the file name of an Excel template that will be used for batch imports
 #: js/apiv2.js:139 js/apiv2.js:172
@@ -305,7 +102,7 @@ msgstr "Continuar"
 #: js/components/ImportIndicatorsPopover.js:419
 #: js/components/ImportIndicatorsPopover.js:631
 #: js/components/changesetNotice.js:66
-#: js/pages/results_form_PC/resultsFormPC.js:363
+#: js/pages/results_form_PC/resultsFormPC.js:353
 #: js/pages/results_framework/components/level_cards.js:578
 msgid "Cancel"
 msgstr "Cancelar"
@@ -519,7 +316,7 @@ msgstr "Colapsar todos"
 
 #. Translators: This is shown in a table where the cell would usually have a username.  This value is used when there is no username to show.  */}
 #: js/components/changelog.js:53
-#: js/pages/tola_management_pages/audit_log/views.js:252
+#: js/pages/tola_management_pages/audit_log/views.js:254
 msgid "Unavailable — user deleted"
 msgstr "No disponible: usuario eliminado"
 
@@ -569,8 +366,9 @@ msgstr "Nuevo Valor"
 
 #. Translators: This is a label for a dropdown that presents several possible justifications for changing a value
 #: js/components/changesetNotice.js:19
+#: js/pages/results_form_PC/resultsFormPC.js:242
 #: js/pages/results_framework/components/level_cards.js:404
-#: js/pages/tola_management_pages/audit_log/views.js:246
+#: js/pages/tola_management_pages/audit_log/views.js:248
 msgid "Reason for change"
 msgstr "Razón para el cambio"
 
@@ -636,13 +434,13 @@ msgstr "Línea media y línea final"
 
 #. Translators: One of several options for specifying how often data is collected or reported on over the life of a program
 #: js/constants.js:39 js/pages/iptt_quickstart/models/ipttQSRootStore.js:32
-#: tola/db_translations.js:16
+#: tola/db_translations.js:10
 msgid "Annual"
 msgstr "Anual"
 
 #. Translators: One of several options for specifying how often data is collected or reported on over the life of a program
 #: js/constants.js:40 js/pages/iptt_quickstart/models/ipttQSRootStore.js:33
-#: tola/db_translations.js:18
+#: tola/db_translations.js:28
 msgid "Semi-annual"
 msgstr "Semestral"
 
@@ -652,13 +450,13 @@ msgstr "Trienal"
 
 #. Translators: One of several options for specifying how often data is collected or reported on over the life of a program
 #: js/constants.js:42 js/pages/iptt_quickstart/models/ipttQSRootStore.js:35
-#: tola/db_translations.js:22
+#: tola/db_translations.js:20
 msgid "Quarterly"
 msgstr "Trimestral"
 
 #. Translators: One of several options for specifying how often data is collected or reported on over the life of a program
 #: js/constants.js:43 js/pages/iptt_quickstart/models/ipttQSRootStore.js:36
-#: tola/db_translations.js:24
+#: tola/db_translations.js:6
 msgid "Monthly"
 msgstr "Mensual"
 
@@ -735,7 +533,7 @@ msgstr "Objetivo Específico"
 msgid "Purpose"
 msgstr "Finalidad"
 
-#: js/level_utils.js:36 js/pages/results_form_PC/resultsFormPC.js:225
+#: js/level_utils.js:36 js/pages/results_form_PC/resultsFormPC.js:265
 msgid "Result"
 msgstr "Resultado"
 
@@ -957,8 +755,8 @@ msgstr "No."
 #: js/pages/logframe/components/table.js:30
 #: js/pages/program_page/components/indicator_list.js:203
 #: js/pages/tola_management_pages/audit_log/views.js:109
-#: js/pages/tola_management_pages/audit_log/views.js:164
-#: js/pages/tola_management_pages/audit_log/views.js:168
+#: js/pages/tola_management_pages/audit_log/views.js:166
+#: js/pages/tola_management_pages/audit_log/views.js:170
 msgid "Indicator"
 msgstr "Indicador"
 
@@ -996,7 +794,7 @@ msgstr "# / %"
 #: js/pages/iptt_report/components/report/tableHeader.js:159
 #: js/pages/iptt_report/models/filterStore.js:737
 #: js/pages/program_page/components/indicator_list.js:206
-#: tola/db_translations.js:12
+#: tola/db_translations.js:18
 msgid "Baseline"
 msgstr "Base"
 
@@ -1007,10 +805,10 @@ msgstr "Base"
 #: js/pages/iptt_report/components/report/tableRows.js:365
 #: js/pages/program_page/components/indicator_list.js:293
 #: js/pages/program_page/components/resultsTable.js:12
-#: js/pages/tola_management_pages/audit_log/views.js:159
-#: js/pages/tola_management_pages/audit_log/views.js:196
-#: js/pages/tola_management_pages/audit_log/views.js:282
-#: js/pages/tola_management_pages/audit_log/views.js:293
+#: js/pages/tola_management_pages/audit_log/views.js:161
+#: js/pages/tola_management_pages/audit_log/views.js:198
+#: js/pages/tola_management_pages/audit_log/views.js:284
+#: js/pages/tola_management_pages/audit_log/views.js:295
 msgid "N/A"
 msgstr "N/A"
 
@@ -1023,8 +821,8 @@ msgstr ""
 #. Translators: a button that lets the user add a new result
 #: js/pages/iptt_report/components/report/tableRows.js:106
 #: js/pages/iptt_report/components/report/tableRows.js:133
-#: js/pages/program_page/components/resultsTable.js:377
-#: js/pages/program_page/components/resultsTable.js:388
+#: js/pages/program_page/components/resultsTable.js:365
+#: js/pages/program_page/components/resultsTable.js:389
 msgid "Add result"
 msgstr "Agregar resultado"
 
@@ -1148,7 +946,7 @@ msgid "Logframe"
 msgstr "Marco Lógico"
 
 #: js/pages/logframe/models/filterStore.js:33
-#: js/pages/tola_management_pages/audit_log/views.js:238
+#: js/pages/tola_management_pages/audit_log/views.js:240
 msgid "Result level"
 msgstr "Nivel del resultado"
 
@@ -1442,6 +1240,64 @@ msgstr "No se han reportado resultados"
 msgid "Program to date"
 msgstr "Programa a la fecha"
 
+#. Translators: brief description of summing rules a series of numbers
+#: js/pages/program_page/components/resultsTable.js:232
+msgid "Targets, actuals, and results are non-cumulative."
+msgstr "Los objetivos, los reales, y los resultados no son acumulativos."
+
+#. Translators: explanation of the summing rules for the totals row on a list of results
+#: js/pages/program_page/components/resultsTable.js:234
+msgid ""
+"<strong>Targets, actuals, and results are non-cumulative.</strong> Target "
+"period actuals are the sum of all results for that target period. Life of "
+"Program target and actual are the sum of all target periods."
+msgstr ""
+"<strong>Los objetivos, los reales, y los resultados no son acumulativos.</"
+"strong> Los reales del periodo objetivo son la suma de todos los resultados "
+"de ese periodo objetivo. Los objetivos y los reales de la vida del programa "
+"son la suma de todos los periodos objetivo."
+
+#. Translators: brief description of summing rules a series of numbers
+#: js/pages/program_page/components/resultsTable.js:238
+msgid "Targets and actuals are cumulative; results are non-cumulative."
+msgstr ""
+"Los objetivos y los reales son acumulativos; los resultados no son "
+"acumulativos."
+
+#. Translators: explanation of the summing rules for the totals row on a list of results
+#: js/pages/program_page/components/resultsTable.js:240
+msgid ""
+"<strong>Targets and actuals are cumulative; results are non-cumulative.</"
+"strong> Target period actuals are the sum of the results from the current "
+"and all previous target periods. The Life of Program target mirrors the last "
+"target, and the Life of Program actual mirrors the most recent actual."
+msgstr ""
+"<strong>Los objetivos y los reales son acumulativos; los resultados no son "
+"acumulativos.</strong> Los reales del periodo objetivo son la suma de los "
+"resultados del periodo objetivo actual y de todos los anteriores. El "
+"objetivo de la vida del programa refleja el último objetivo, y el real de la "
+"vida del programa refleja el real más reciente."
+
+#. Translators: brief description of summing rules a series of numbers
+#: js/pages/program_page/components/resultsTable.js:244
+msgid "Targets, actuals, and results are cumulative."
+msgstr "Los objetivos, los reales, y los resultados son acumulativos."
+
+#. Translators: explanation of the summing rules for the totals row on a list of results
+#: js/pages/program_page/components/resultsTable.js:246
+msgid ""
+"<strong>Targets, actuals, and results are cumulative.</strong> Target period "
+"actuals mirror the most recent result for that target period; no "
+"calculations are performed with results or actuals. The Life of Program "
+"target mirrors the last target, and the Life of Program actual mirrors the "
+"most recent actual."
+msgstr ""
+"<strong>Los objetivos, los reales, y los resultados son acumulativos.</"
+"strong> Los reales del periodo objetivo reflejan el resultado más reciente "
+"de ese periodo objetivo; no se realizan cálculos con los resultados o los "
+"reales. El objetivo de la vida del programa refleja el último objetivo, y el "
+"real de la vida del programa refleja el real más reciente."
+
 #. Translators: identifies a results row as summative for the entire life of the program
 #: js/pages/program_page/components/resultsTable.js:253
 msgid "Life of Program"
@@ -1465,7 +1321,7 @@ msgstr "Resultados"
 
 #. Translators: Header for a column listing supporting documents for results
 #: js/pages/program_page/components/resultsTable.js:315
-#: js/pages/results_form_PC/components/EvidenceFields.js:24
+#: js/pages/results_form_PC/components/EvidenceFields.js:44
 msgid "Evidence"
 msgstr "Evidencia"
 
@@ -1497,13 +1353,114 @@ msgstr ""
 "Advertencia: esta acción no se puede deshacer. ¿Está seguro que quiere "
 "borrar este informe fijado?"
 
-#: js/pages/results_form_PC/components/CommonFields.js:11
+#: js/pages/results_form_PC/components/ActualValueFields.js:20
+#: js/pages/results_form_PC/resultsFormPC.js:100
+msgid ""
+"Direct/indirect without double counting should be equal to or lower than "
+"direct/indirect with double counting."
+msgstr ""
+"Directo/Indirecto sin cómputo doble debe ser igual o menor a Directo/"
+"Indirecto con cómputo doble."
+
+#: js/pages/results_form_PC/components/ActualValueFields.js:34
+msgid "Total Participant Actual Values"
+msgstr "Valores reales del total de participantes"
+
+#: js/pages/results_form_PC/components/ActualValueFields.js:36
+msgid ""
+"Include the participants with double counting on the left and participants "
+"without double counting across programs on the right. If two programs share "
+"participants, only discount double counting in one program!<br/><br/"
+"><strong>Direct participants</strong> – are those who have received a "
+"tangible benefit from the program, either as the actual program participants "
+"or the intended recipients of the program benefits.<br/><br/"
+"><strong>Indirect participants</strong> – are those who received a tangible "
+"benefit through their proximity to or contact with program participants or "
+"activities."
+msgstr ""
+"Incluya a los participantes con cómputo doble a la izquierda y a los "
+"participantes sin cómputo doble entre programas a la derecha. Si dos "
+"programas comparten participantes, descuente solo el cómputo doble en un "
+"programa.<br/><br/><strong>Participantes directos</strong>: son aquellos que "
+"han recibido una ventaja tangible en el marco del programa, ya sea como "
+"participantes reales del programa o como destinatarios de las ventajas del "
+"mismo.<br/><br/><strong>Participantes indirectos</strong>: son aquellos que "
+"recibieron una ventaja tangible por su proximidad o vínculo con los "
+"participantes o con las actividades del programa."
+
+#: js/pages/results_form_PC/components/ActualValueFields.js:40
+#: js/pages/results_form_PC/components/DisaggregationFields.js:100
+msgid "Without double counting"
+msgstr "Sin cómputo doble"
+
+#: js/pages/results_form_PC/components/ActualValueFields.js:41
+#: js/pages/results_form_PC/components/DisaggregationFields.js:102
+msgid "With double counting"
+msgstr "Con cómputo doble"
+
+#: js/pages/results_form_PC/components/ActualValueFields.js:99
+msgid "Total Participants"
+msgstr "Participantes totales"
+
+#: js/pages/results_form_PC/components/CommonFields.js:41
+#: js/pages/results_form_PC/resultsFormPC.js:79
+msgid "This date should be within the fiscal year of the reporting period."
+msgstr ""
+"Esta fecha debe estar dentro del año fiscal del período de notificación."
+
+#: js/pages/results_form_PC/components/CommonFields.js:50
+#: js/pages/results_form_PC/resultsFormPC.js:87
+msgid "Please complete this field. You can select more than one outcome theme."
+msgstr ""
+"Por favor, complete este campo. Puede seleccionar más de un tema de "
+"resultados."
+
+#: js/pages/results_form_PC/components/CommonFields.js:58
 msgid "Result date"
 msgstr "Fecha del resultado"
 
+#: js/pages/results_form_PC/components/CommonFields.js:60
+msgid ""
+"If data collection occurred within the fiscal year, enter the date when data "
+"was collected. If data collection occurred after the end of the fiscal year, "
+"enter the last day of the fiscal year (June 30)."
+msgstr ""
+"Si la recopilación de datos tuvo lugar dentro del año fiscal, introduzca la "
+"fecha en la que se recopilaron los datos. Si la recopilación de datos tuvo "
+"lugar después de finalizar el año fiscal, introduzca el último día del año "
+"fiscal (30 de junio)."
+
+#: js/pages/results_form_PC/components/CommonFields.js:78
+msgid "Fiscal year"
+msgstr "Año fiscal"
+
+#: js/pages/results_form_PC/components/CommonFields.js:80
+msgid "Fiscal years run from July 1 to June 30 of the following year."
+msgstr ""
+"Los años fiscales se corresponden a los periodos comprendidos entre el 1 de "
+"julio y el 30 de junio del año siguiente."
+
+#: js/pages/results_form_PC/components/CommonFields.js:98
+msgid "Outcome theme"
+msgstr "Tema de resultados"
+
+#: js/pages/results_form_PC/components/CommonFields.js:100
+msgid ""
+"Outcome themes are the main areas of a program. Refer to MEL Tip Sheet: "
+"Guidelines on Counting and Reporting Participant Numbers <a tabIndex=\"1\" "
+"href=\"https://library.mercycorps.org/record/16929?ln=en\" target=\"_blank"
+"\">[link: https://library.mercycorps.org/record/16929?ln=en]</a> for a "
+"description of outcome themes.<span>"
+msgstr ""
+"Los temas de resultados son las secciones principales de un programa. Para "
+"obtener una descripción de los temas de resultados, consulte la guía: "
+"Guidelines on Counting and Reporting Participant Numbers <a tabIndex=\"1\" "
+"href=\"https://library.mercycorps.org/record/16929?ln=en\" target=\"_blank"
+"\">[link: https://library.mercycorps.org/record/16929?ln=en]</a>"
+
 #. Translators: This is the default option for a dropdown menu
 #. Translators: Nothing selected by user
-#: js/pages/results_form_PC/components/CommonFields.js:68
+#: js/pages/results_form_PC/components/CommonFields.js:104
 #: js/pages/tola_management_pages/country/views.js:24
 #: js/pages/tola_management_pages/country/views.js:36
 #: js/pages/tola_management_pages/country/views.js:48
@@ -1524,22 +1481,78 @@ msgstr "Fecha del resultado"
 msgid "None Selected"
 msgstr "Ninguno/a seleccionado/a"
 
+#: js/pages/results_form_PC/components/DisaggregationFields.js:8
+msgid "Only include SADD for Direct participants."
+msgstr "Incluya solo los SADD de los participantes directos."
+
+#: js/pages/results_form_PC/components/DisaggregationFields.js:9
+#: js/pages/results_form_PC/components/DisaggregationFields.js:10
+msgid ""
+"Provide a disaggregation of participants reached by sector. Only provide the "
+"figure with double counting. Refer to MEL Tip Sheet: Guidelines on Counting "
+"and Reporting Participant Numbers <a href='https://library.mercycorps.org/"
+"record/16929?ln=en' target='_blank'>[link: https://library.mercycorps.org/"
+"record/16929?ln=en]</a> for a description of sectors."
+msgstr ""
+"Proporcione una desagregación de los participantes alcanzados por sector. "
+"Proporcione solo la cifra de cómputo doble. Para obtener una descripción de "
+"los temas de resultados, consulte la guía: Guidelines on Counting and "
+"Reporting Participant Numbers <a href='https://library.mercycorps.org/"
+"record/16929?ln=en' target='_blank'>[link: https://library.mercycorps.org/"
+"record/16929?ln=en]</a>."
+
+#: js/pages/results_form_PC/components/DisaggregationFields.js:55
+msgid ""
+"The 'SADD without double counting' value should be less than or equal to the "
+"'Direct without double counting' value."
+msgstr ""
+"El valor ‘SADD sin doble cómputo’ debe ser menor o igual que el valor "
+"‘Directo sin doble cómputo’."
+
+#: js/pages/results_form_PC/components/DisaggregationFields.js:72
+#: js/pages/results_form_PC/resultsFormPC.js:115
+msgid ""
+"Sector values should be less than or equal to the 'Direct/Indirect with "
+"double counting' value."
+msgstr ""
+"Los valores del sector deben ser menores o iguales al valor ‘Directo/"
+"Indirecto con cómputo doble’."
+
 #: js/pages/results_form_PC/components/DisaggregationFields.js:95
+msgid "Needs Attention"
+msgstr "Requiere su atención"
+
+#: js/pages/results_form_PC/components/DisaggregationFields.js:138
 msgid "Sum"
 msgstr "Suma"
 
-#: js/pages/results_form_PC/components/EvidenceFields.js:29
+#: js/pages/results_form_PC/components/EvidenceFields.js:16
+#: js/pages/results_form_PC/resultsFormPC.js:130
+msgid "Please enter a valid evidence link."
+msgstr "Por favor, introduzca un enlace de prueba válido."
+
+#: js/pages/results_form_PC/components/EvidenceFields.js:19
+#: js/pages/results_form_PC/resultsFormPC.js:133
+msgid "A record name must be included along with the link."
+msgstr "Se debe incluir un nombre de registro junto con el enlace."
+
+#: js/pages/results_form_PC/components/EvidenceFields.js:23
+#: js/pages/results_form_PC/resultsFormPC.js:137
+msgid "A link must be included along with the record name."
+msgstr "Debe incluir un enlace junto al nombre del registro."
+
+#: js/pages/results_form_PC/components/EvidenceFields.js:45
 msgid ""
 "Link this result to a record or folder of records that serves as evidence."
 msgstr ""
 "Vincule este resultado a un registro o carpeta de registros que sirva de "
 "evidencia."
 
-#: js/pages/results_form_PC/components/EvidenceFields.js:37
+#: js/pages/results_form_PC/components/EvidenceFields.js:47
 msgid "Link to file or folder"
 msgstr "Enlace al archivo o carpeta"
 
-#: js/pages/results_form_PC/components/EvidenceFields.js:42
+#: js/pages/results_form_PC/components/EvidenceFields.js:50
 msgid ""
 "Provide a link to a file or folder in Google Drive or another shared network "
 "drive. Please be aware that TolaData does not store a copy of your record, "
@@ -1551,32 +1564,65 @@ msgstr ""
 "copias de su registro, <i>por ello no debería referenciar algo en su "
 "computadora personal, ya que nadie más podría accederlo.</i>"
 
-#: js/pages/results_form_PC/components/EvidenceFields.js:63
+#: js/pages/results_form_PC/components/EvidenceFields.js:75
 msgid "view"
 msgstr "ver"
 
-#: js/pages/results_form_PC/components/EvidenceFields.js:71
+#: js/pages/results_form_PC/components/EvidenceFields.js:83
 msgid "Browse Google Drive"
 msgstr "Ver Google Drive"
 
-#: js/pages/results_form_PC/components/EvidenceFields.js:80
+#: js/pages/results_form_PC/components/EvidenceFields.js:92
 msgid "Record name"
 msgstr "Nombre del registro"
 
-#: js/pages/results_form_PC/components/EvidenceFields.js:83
+#: js/pages/results_form_PC/components/EvidenceFields.js:95
 msgid "Give your record a short name that is easy to remember."
 msgstr "Dé a su registro un nombre corto que sea fácil de recordar."
 
-#. Translators: Input field validation message.
-#. Translators: This is a validation message given to the user when the user-editable name field has been deleted or omitted. */
-#. Translators: This is a warning messages when a user has entered duplicate names for two different objects and those names contain only white spaces, both of which are not permitted. */
-#: js/pages/results_form_PC/resultsFormPC.js:60
-#: js/pages/results_framework/components/level_cards.js:441
-#: js/pages/results_framework/models.js:714
-msgid "Please complete this field."
-msgstr "Por favor complete este campo."
+#: js/pages/results_form_PC/resultsFormPC.js:64
+msgid ""
+"The sum of 'SADD with double counting' should be equal to the sum of 'Direct "
+"with double counting'."
+msgstr ""
+"La suma de ‘SADD con cómputo doble’ debe ser igual a la suma de ‘Directo con "
+"cómputo doble’."
 
-#: js/pages/results_form_PC/resultsFormPC.js:356
+#: js/pages/results_form_PC/resultsFormPC.js:67
+msgid ""
+"The sum of 'SADD without double counting' should be equal to the sum of "
+"'Direct without double counting'."
+msgstr ""
+"La suma de ‘SADD sin cómputo doble’ debe ser igual a la suma de ‘Directo sin "
+"cómputo doble’."
+
+#: js/pages/results_form_PC/resultsFormPC.js:83
+msgid "You cannot change the fiscal year during the current reporting period. "
+msgstr ""
+"No se puede cambiar el año fiscal durante el período de notificación actual."
+
+#: js/pages/results_form_PC/resultsFormPC.js:94
+msgid ""
+"Direct/indirect total participants with double counting is required. Please "
+"complete these fields."
+msgstr ""
+"Se requiere un total de participantes directos/indirectos con cómputo doble. "
+"Por favor, complete estos campos."
+
+#: js/pages/results_form_PC/resultsFormPC.js:245
+#: js/pages/results_framework/components/level_cards.js:406
+msgid ""
+"Your changes will be recorded in a change log.  For future reference, please "
+"share your reason for these changes."
+msgstr ""
+"Sus cambios serán guardados en un registro de cambios. Para referencia "
+"futura, indique la justificación para estos cambios."
+
+#: js/pages/results_form_PC/resultsFormPC.js:272
+msgid "Participant Count"
+msgstr "Cómputo de participantes"
+
+#: js/pages/results_form_PC/resultsFormPC.js:346
 #: js/pages/results_framework/components/level_cards.js:575
 msgid "Save and close"
 msgstr "Guardar y cerrar"
@@ -1625,13 +1671,12 @@ msgstr "Todos los indicadores vinculados a %s y a subniveles"
 msgid "Track indicator performance"
 msgstr "Hacer seguimiento del rendimiento del indicador"
 
-#: js/pages/results_framework/components/level_cards.js:406
-msgid ""
-"Your changes will be recorded in a change log.  For future reference, please "
-"share your reason for these changes."
-msgstr ""
-"Sus cambios serán guardados en un registro de cambios. Para referencia "
-"futura, indique la justificación para estos cambios."
+#. Translators: This is a validation message given to the user when the user-editable name field has been deleted or omitted. */
+#. Translators: This is a warning messages when a user has entered duplicate names for two different objects and those names contain only white spaces, both of which are not permitted. */
+#: js/pages/results_framework/components/level_cards.js:441
+#: js/pages/results_framework/models.js:714
+msgid "Please complete this field."
+msgstr "Por favor complete este campo."
 
 #. Translators: This is button text that allows users to save their work and unlock the ability to add indicators */ }
 #: js/pages/results_framework/components/level_cards.js:477
@@ -1687,7 +1732,7 @@ msgstr "Indicadores vinculados a este %s"
 
 #. Translators: a button to download a spreadsheet
 #: js/pages/results_framework/components/level_list.js:184
-#: js/pages/tola_management_pages/audit_log/views.js:227
+#: js/pages/tola_management_pages/audit_log/views.js:229
 msgid "Excel"
 msgstr "Sobresalir"
 
@@ -1808,30 +1853,30 @@ msgid "Targets changed"
 msgstr "Objetivos modificados"
 
 #. Translators: This is part of a change log.  The result date of the Result that has been changed is being shown
-#: js/pages/tola_management_pages/audit_log/views.js:173
+#: js/pages/tola_management_pages/audit_log/views.js:175
 msgid "Result date:"
 msgstr "Fecha del resultado:"
 
 #. Translators: This a title of page where all of the changes to a program are listed */}
-#: js/pages/tola_management_pages/audit_log/views.js:213
+#: js/pages/tola_management_pages/audit_log/views.js:215
 msgid "Program change log"
 msgstr "Registro de cambios en el programa"
 
-#: js/pages/tola_management_pages/audit_log/views.js:237
+#: js/pages/tola_management_pages/audit_log/views.js:239
 msgid "Date and time"
 msgstr "Fecha y hora"
 
 #. Translators: This is a column heading. The column is in a change log and identifies the entities being changed. */}
-#: js/pages/tola_management_pages/audit_log/views.js:240
+#: js/pages/tola_management_pages/audit_log/views.js:242
 msgid "Indicators and results"
 msgstr "Indicadores y resultados"
 
-#: js/pages/tola_management_pages/audit_log/views.js:241
+#: js/pages/tola_management_pages/audit_log/views.js:243
 #: js/pages/tola_management_pages/user/views.js:260
 msgid "User"
 msgstr "Usuario"
 
-#: js/pages/tola_management_pages/audit_log/views.js:242
+#: js/pages/tola_management_pages/audit_log/views.js:244
 #: js/pages/tola_management_pages/organization/views.js:110
 #: js/pages/tola_management_pages/user/components/edit_user_profile.js:195
 #: js/pages/tola_management_pages/user/views.js:202
@@ -1839,24 +1884,24 @@ msgstr "Usuario"
 msgid "Organization"
 msgstr "Organización"
 
-#: js/pages/tola_management_pages/audit_log/views.js:243
+#: js/pages/tola_management_pages/audit_log/views.js:245
 msgid "Change type"
 msgstr "Tipo de cambio"
 
-#: js/pages/tola_management_pages/audit_log/views.js:244
+#: js/pages/tola_management_pages/audit_log/views.js:246
 msgid "Previous entry"
 msgstr "Entrada anterior"
 
-#: js/pages/tola_management_pages/audit_log/views.js:245
+#: js/pages/tola_management_pages/audit_log/views.js:247
 msgid "New entry"
 msgstr "Nueva entrada"
 
 #. Translators: This is shown in a table where the cell would usually have an organization name.  This value is used when there is no organization to show.  */}
-#: js/pages/tola_management_pages/audit_log/views.js:254
+#: js/pages/tola_management_pages/audit_log/views.js:256
 msgid "Unavailable — organization deleted"
 msgstr "No disponible: organización eliminada"
 
-#: js/pages/tola_management_pages/audit_log/views.js:318
+#: js/pages/tola_management_pages/audit_log/views.js:320
 msgid "entries"
 msgstr "ítems"
 
@@ -2727,26 +2772,21 @@ msgstr "usuarios"
 
 #. Translators: One of several options for specifying how often data is collected or reported on over the life of a program
 #: tola/db_translations.js:2
-msgid "Endline"
-msgstr "Línea final"
-
-#. Translators: One of several options for specifying how often data is collected or reported on over the life of a program
-#: tola/db_translations.js:4
-msgid "Weekly"
-msgstr "Semanal"
-
-#. Translators: One of several options for specifying how often data is collected or reported on over the life of a program
-#: tola/db_translations.js:6
-msgid "By distribution"
-msgstr "Por distribución"
-
-#. Translators: One of several options for specifying how often data is collected or reported on over the life of a program
-#: tola/db_translations.js:8
 msgid "By batch"
 msgstr "Por lotes"
 
 #. Translators: One of several options for specifying how often data is collected or reported on over the life of a program
-#: tola/db_translations.js:10
+#: tola/db_translations.js:4
+msgid "By event"
+msgstr "Por evento"
+
+#. Translators: One of several options for specifying how often data is collected or reported on over the life of a program
+#: tola/db_translations.js:8
+msgid "Post shock"
+msgstr "Posterior al desastre"
+
+#. Translators: One of several options for specifying how often data is collected or reported on over the life of a program
+#: tola/db_translations.js:12
 msgid "Midline"
 msgstr "Línea media"
 
@@ -2756,19 +2796,24 @@ msgid "By training"
 msgstr "Por formación"
 
 #. Translators: One of several options for specifying how often data is collected or reported on over the life of a program
-#: tola/db_translations.js:20
+#: tola/db_translations.js:16
 msgid "Final evaluation"
 msgstr "Evaluación final"
 
 #. Translators: One of several options for specifying how often data is collected or reported on over the life of a program
-#: tola/db_translations.js:26
-msgid "By event"
-msgstr "Por evento"
+#: tola/db_translations.js:22
+msgid "By distribution"
+msgstr "Por distribución"
 
 #. Translators: One of several options for specifying how often data is collected or reported on over the life of a program
-#: tola/db_translations.js:28
-msgid "Post shock"
-msgstr "Posterior al desastre"
+#: tola/db_translations.js:24
+msgid "Endline"
+msgstr "Línea final"
+
+#. Translators: One of several options for specifying how often data is collected or reported on over the life of a program
+#: tola/db_translations.js:26
+msgid "Weekly"
+msgstr "Semanal"
 
 #. Translators: One of several choices for what sector (i.e. development domain) a program is most closely associated with
 #: tola/db_translations.js:30
@@ -3039,6 +3084,35 @@ msgstr "Rendimiento"
 #: tola/db_translations.js:138
 msgid "Process / Management"
 msgstr "Procesos/Gestión"
+
+#~ msgid "Actual Direct value"
+#~ msgstr "Valor real directo"
+
+#~ msgid "Actual Indirect value"
+#~ msgstr "Valor real indirecto"
+
+#~ msgid "Actual Total value"
+#~ msgstr "Valor real total"
+
+#~ msgid "Without Double Counting"
+#~ msgstr "Sin cómputo doble"
+
+#~ msgid "With Double Counting"
+#~ msgstr "Con cómputo doble"
+
+#~ msgid ""
+#~ "Direct participants – are those who have received a tangible benefit from "
+#~ "the program, either as the actual program participants or the intended "
+#~ "recipients of the program benefits. Indirect participants – are those who "
+#~ "received a tangible benefit through their proximity to or contact with "
+#~ "program participants or activities."
+#~ msgstr ""
+#~ "Participantes directos: son aquellos que han recibido una ventaja "
+#~ "tangible en el marco del programa, ya sea como participantes reales del "
+#~ "programa o como destinatarios de las ventajas del mismo. Participantes "
+#~ "indirectos: son aquellos que recibieron una ventaja tangible por su "
+#~ "proximidad o vínculo con los participantes o con las actividades del "
+#~ "programa."
 
 #~ msgid ""
 #~ "Results are cumulative. The Life of Program result mirrors the latest "
@@ -6917,9 +6991,6 @@ msgstr "Procesos/Gestión"
 
 #~ msgid "You can begin entering results on"
 #~ msgstr "Puede comenzar a ingresar resultados el"
-
-#~ msgid "A link must be included along with the record name."
-#~ msgstr "Debe incluir un enlace junto al nombre del registro."
 
 #~ msgid "However, there may be a problem with the evidence URL."
 #~ msgstr "Sin embargo, puede haber un problema con la URL de prueba."
