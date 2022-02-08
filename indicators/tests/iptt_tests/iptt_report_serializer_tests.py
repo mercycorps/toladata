@@ -11,7 +11,7 @@ from workflow.serializers_new import (
     IPTTFullReportSerializer
 )
 from tola.test.utils import lang_context
-from indicators.models import Indicator
+from indicators.models import Indicator, DisaggregationType
 from indicators.tests.iptt_tests.iptt_scenario import (
     IndicatorGenerator
 )
@@ -28,6 +28,9 @@ from factories.indicators_models import (
     DisaggregationTypeFactory,
     ResultFactory
 )
+
+DISAG_COUNTRY_ONLY = DisaggregationType.DISAG_COUNTRY_ONLY
+DISAG_GLOBAL = DisaggregationType.DISAG_GLOBAL
 
 SPECIAL_CHARACTERS = "Spécîål Character Fillëd Name"
 
@@ -50,17 +53,17 @@ class TestReportSerializers(test.TestCase):
         cls.sector1 = SectorFactory()
         cls.i_type1 = IndicatorTypeFactory()
         cls.standard_disagg1 = DisaggregationTypeFactory(
-            standard=True,
+            global_type=DISAG_GLOBAL,
             country=None,
             labels=['One', 'Two']
         )
         cls.standard_disagg2 = DisaggregationTypeFactory(
-            standard=True,
+            global_type=DISAG_GLOBAL,
             country=None,
             labels=['One', 'Two', 'Three']
         )
         cls.country_disagg = DisaggregationTypeFactory(
-            standard=False,
+            global_type=DISAG_COUNTRY_ONLY,
             country=cls.country,
             labels=['One', 'Two']
         )

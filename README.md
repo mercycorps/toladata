@@ -430,3 +430,5 @@ npm will compile a single global css file at `/path/to/project/tola/static/css/t
 5. Suggestions for Frontend coding practices are forthcoming.
 
 
+## Updating Python libraries
+Tola uses [pip-tools](https://github.com/jazzband/pip-tools) to manage Python dependencies.  The requirements.in file is where changes to Python libraries should be made.  pip-compile can then be used to generate the requirements.txt file.  This allows us to list only those libraries we are explicitly adding in requirements.in, with a description of what the library is being used for.  pip-tools is then used to handle adding dependencies, installation, and upgrades.  See pip-tools documentation for details of use.

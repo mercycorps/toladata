@@ -17,7 +17,7 @@ from factories.indicators_models import (
     DisaggregationTypeFactory
 )
 from tola.test.utils import SPECIAL_CHARS, lang_context
-from indicators.models import Indicator, IndicatorType, Sector
+from indicators.models import Indicator, IndicatorType, Sector, DisaggregationType
 from workflow.serializers_new import IPTTProgramSerializer
 
 LONG_NAME = 'Long '*26
@@ -48,6 +48,9 @@ ENDLINE = {
     FRENCH: 'Mesure de fin de programme',
     SPANISH: 'Línea final'
 }
+
+DISAG_COUNTRY_ONLY = DisaggregationType.DISAG_COUNTRY_ONLY
+DISAG_GLOBAL = DisaggregationType.DISAG_GLOBAL
 
 def get_serialized_data(program_pk):
     return IPTTProgramSerializer.load_for_pk(program_pk).data
@@ -334,7 +337,7 @@ class TestIPTTProgramSerializerFilterData(test.TestCase):
         program = RFProgramFactory()
         program.country.add(self.country)
         country_dt = DisaggregationTypeFactory(
-            disaggregation_type="Test Disaggregation", country=self.country, standard=False,
+            disaggregation_type="Test Disaggregation", country=self.country, global_type=DISAG_COUNTRY_ONLY,
             labels=["Test Label 1", "Test Label 2", "Test Label 3"]
         )
         indicator = RFIndicatorFactory(program=program)
@@ -349,7 +352,7 @@ class TestIPTTProgramSerializerFilterData(test.TestCase):
 
     def test_one_standard_disaggregation_type(self):
         standard_dt = DisaggregationTypeFactory(
-            disaggregation_type="Test Standard Disagg", country=None, standard=True,
+            disaggregation_type="Test Standard Disagg", country=None, global_type=DISAG_GLOBAL,
             labels=["Test Standard One Label"]
         )
         indicator = RFIndicatorFactory(program=RFProgramFactory())
@@ -362,7 +365,7 @@ class TestIPTTProgramSerializerFilterData(test.TestCase):
     def test_special_characters_disaggregation_type(self):
         special_chars = "Spéçîål Charäcterß"
         special_chars_dt = DisaggregationTypeFactory(
-            disaggregation_type=special_chars, country=None, standard=True,
+            disaggregation_type=special_chars, country=None, global_type=DISAG_GLOBAL,
             labels=["{} 1".format(special_chars), "{} 2".format(special_chars)]
         )
         indicator = RFIndicatorFactory(program=RFProgramFactory())
@@ -373,7 +376,7 @@ class TestIPTTProgramSerializerFilterData(test.TestCase):
 
     def test_one_disaggregation_type_duplicated(self):
         standard_dt = DisaggregationTypeFactory(
-            disaggregation_type="Test Standard Disagg", country=None, standard=True,
+            disaggregation_type="Test Standard Disagg", country=None, global_type=DISAG_GLOBAL,
             labels=["Test Standard One Label"]
         )
         indicator1 = RFIndicatorFactory(program=RFProgramFactory())
@@ -389,20 +392,20 @@ class TestIPTTProgramSerializerFilterData(test.TestCase):
         program = RFProgramFactory()
         program.country.add(self.country)
         country_dt1 = DisaggregationTypeFactory(
-            disaggregation_type="Test Disaggregation", country=self.country, standard=False,
+            disaggregation_type="Test Disaggregation", country=self.country, global_type=DISAG_COUNTRY_ONLY,
             labels=["Test Label 1", "Test Label 2", "Test Label 3"]
         )
         country_dt2 = DisaggregationTypeFactory(
-            disaggregation_type="Test Disaggregation 2", country=self.country, standard=False,
+            disaggregation_type="Test Disaggregation 2", country=self.country, global_type=DISAG_COUNTRY_ONLY,
             selected_by_default=True,
             labels=["Test Really really really really really really really really long Label 1", "Test Label 2"]
         )
         standard_dt1 = DisaggregationTypeFactory(
-            disaggregation_type="Test Standard Disagg", country=None, standard=True,
+            disaggregation_type="Test Standard Disagg", country=None, global_type=DISAG_GLOBAL,
             labels=["Test Standard One Label"]
         )
         standard_dt2 = DisaggregationTypeFactory(
-            disaggregation_type="Test Standard Disagg 2", country=None, standard=True,
+            disaggregation_type="Test Standard Disagg 2", country=None, global_type=DISAG_GLOBAL,
             labels=["Test Standard Four Label 1", "Test Standard Four Label 2",
                     "Test Standard Four Label 3", "Test Standard Four Label 4", ]
         )
@@ -420,7 +423,7 @@ class TestIPTTProgramSerializerFilterData(test.TestCase):
         program = RFProgramFactory()
         program.country.add(self.country)
         DisaggregationTypeFactory(
-            disaggregation_type="Test Disaggregation", country=self.country, standard=False,
+            disaggregation_type="Test Disaggregation", country=self.country, global_type=DISAG_COUNTRY_ONLY,
             labels=["Test Label 1", "Test Label 2", "Test Label 3"]
         )
         indicator = RFIndicatorFactory(program=program)
@@ -431,7 +434,7 @@ class TestIPTTProgramSerializerFilterData(test.TestCase):
 
     def test_standard_disaggregation_unassigned_to_program_does_not_show_up(self):
         DisaggregationTypeFactory(
-            disaggregation_type="Test Standard Disagg", country=None, standard=True,
+            disaggregation_type="Test Standard Disagg", country=None, global_type=DISAG_GLOBAL,
             labels=["Test Standard One Label"]
         )
         indicator = RFIndicatorFactory(program=RFProgramFactory())

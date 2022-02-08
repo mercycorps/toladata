@@ -1,6 +1,7 @@
 from tola.settings.base import *
 import sys
 from os import path
+import datetime
 
 TESTING = len(sys.argv) > 1 and sys.argv[1] == 'test'
 
@@ -42,6 +43,10 @@ ADMINS = (
 )
 
 MANAGERS = ADMINS
+
+today = datetime.date.today()
+reporting_year = today.year if today.month > 6 else today.year - 1
+REPORTING_YEAR_START_DATE = datetime.date(reporting_year, 7, 1).isoformat()
 
 DEBUG = False
 

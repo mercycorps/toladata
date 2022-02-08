@@ -184,6 +184,14 @@
         return $('#initialLevelId').text() ? parseInt($('#initialLevelId').text()) : undefined;
     }
 
+    function pcIndicatorName() {
+        return $('#pcIndicatorName').text();
+    }
+
+    function adminType() {
+        return $('#id_admin_type').val() ? parseInt($('#id_admin_type').val()) : null;
+    }
+
     function saveEventParams() {
         return {
             programId: programId(),
@@ -950,6 +958,9 @@
             errMsg = "{% trans 'Please complete this field.'|escapejs %}";
         } else if ($nameField.val().length > 500) {
             errMsg = interpolate("{% trans 'Please enter fewer than %s characters.'|escapejs %}", [500]);
+        }
+        else if (adminType() !== 0 && $nameField.val().trim() === pcIndicatorName()) {
+            errMsg = "{% trans 'This is a reserved name, please enter a different name.'|escapejs %}";
         }
         if (errMsg) {
             $("#div_id_name").removeClass("mb-3");

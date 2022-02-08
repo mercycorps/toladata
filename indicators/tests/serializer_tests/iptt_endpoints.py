@@ -10,10 +10,12 @@ import datetime
 from factories.indicators_models import RFIndicatorFactory, IndicatorTypeFactory, DisaggregationTypeFactory
 from factories.workflow_models import RFProgramFactory, SiteProfileFactory, SectorFactory
 from workflow.serializers_new import IPTTProgramSerializer
-from indicators.models import Indicator
+from indicators.models import Indicator, DisaggregationType
 from django import test
 from django.utils import translation
 
+DISAG_COUNTRY_ONLY = DisaggregationType.DISAG_COUNTRY_ONLY
+DISAG_GLOBAL = DisaggregationType.DISAG_GLOBAL
 
 IPTT_QUERY_COUNT_NO_DISAGGS = 12
 IPTT_QUERY_COUNT_WITH_DISAGGS = 13
@@ -29,7 +31,7 @@ class TestIPTTEndpoint(test.TestCase):
         )
         site = SiteProfileFactory()
         it = IndicatorTypeFactory()
-        dt1 = DisaggregationTypeFactory(standard=True, labels=False)
+        dt1 = DisaggregationTypeFactory(global_type=DISAG_GLOBAL, labels=False)
         dt2 = DisaggregationTypeFactory(country=p.country.first(), labels=["1", "2", "3"])
         sector = SectorFactory()
         indicators = [RFIndicatorFactory(

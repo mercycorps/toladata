@@ -4,12 +4,13 @@
 {% load tola_form_tags %}
 
 
-{# Values pulled out by indicator_form_common_js.html code #}
+{# Values used by indicator_form_common_js.html code #}
 <div id="numDataPoints" style="display: none;">{{ object.result_set.all.count }}</div>
 <div id="indicatorId" style="display:none;">{{ object.pk }}</div>
 <div id="programId" style="display:none;">{{ program.id }}</div>
 <div id="initialLopTarget" style="display:none;">{{ object.lop_target|default_if_none:'' }}</div>
 <div id="initialLevelId" style="display:none;">{{ initial_level_id|default_if_none:'' }}</div>  {# only set on create #}
+<div id="pcIndicatorName" style="display:none;">{{ pc_indicator_name }}</div>
 
 {# This template gets shoved into #indicator_modal_div in indicator_list_modals.html #}
 
@@ -30,6 +31,11 @@
         </h3>
         {% endif %}
 
+        {% if subtitle_str == "Number of people reached in a fiscal year" %}
+            <a id="id_guidance_link--pc" target="_blank" href="https://library.mercycorps.org/record/38839">
+                {% trans 'TolaData Participant Count: Step by Step Guide' %}
+            </a>
+        {% endif %}
         <span id="modalmessages" width="100%"></span>
     </div>
     <button
@@ -149,7 +155,7 @@
                             <span id="validation_id_strategic_objectives" class="has-error"></span>
                         </div>
 
-                        {% if not readonly and indicator %}
+                        {% if not readonly and indicator and indicator.admin_type != 0 %}
                             <div class="form-group text-right" id="div_id_remove_indicator">
                                 <a href="/indicators/indicator_delete/{{ indicator.id }}/"
                                    id="id_delete_indicator_btn"
@@ -477,6 +483,15 @@
                 icon.attr('class', 'fa-caret-right');
             }
         });
+
+        // Participant Count guides links in different languages
+        let participantCountGuideLinks = {
+            "en": "https://library.mercycorps.org/record/38839",
+            "ar": "https://library.mercycorps.org/record/38840",
+            "es": "https://library.mercycorps.org/record/38841",
+            "fr": "https://library.mercycorps.org/record/38842",
+        };
+        $('#id_guidance_link--pc').attr('href', participantCountGuideLinks[window.userLang]);
     });
 
     // Use BS multiselect widget where needed

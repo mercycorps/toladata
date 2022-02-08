@@ -123,6 +123,9 @@ SECRET_KEY = app_settings['SECRET_KEY']
 LOGGING['handlers']['file']['filename'] = app_settings['LOGFILE']
 LOGGING['handlers']['info_file']['filename'] = os.path.join(dirname(app_settings['LOGFILE']), 'django_info.log')
 
+# Sets the current year for participant count reporting
+REPORTING_YEAR_START_DATE = app_settings['REPORTING_YEAR_START_DATE']
+
 # use webpack dev server
 WEBPACK_LOADER = {
     'DEFAULT': {

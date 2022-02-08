@@ -413,6 +413,7 @@ export class LevelStore {
 
                     }
                 })
+                .then(response => this.fetchIndicatorsFromDB())
                 .catch(error => console.log('error', error))
 
         } else {
@@ -434,12 +435,11 @@ export class LevelStore {
                     }
 
                 })
+                .then(response => this.fetchIndicatorsFromDB())
                 .catch( error => {
                     console.log("There was an error:", error);
                 })
         }
-
-        this.fetchIndicatorsFromDB();
 
         this.rootStore.uiStore.activeCardNeedsConfirm = false;
     };

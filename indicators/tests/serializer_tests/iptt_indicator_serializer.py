@@ -12,9 +12,12 @@ from indicators.serializers_new import (
     IPTTJSONTPReportIndicatorSerializer,
     IPTTJSONTVAReportIndicatorSerializer
 )
-from indicators.models import Indicator
+from indicators.models import Indicator, DisaggregationType
 
 from django import test
+
+DISAG_COUNTRY_ONLY = DisaggregationType.DISAG_COUNTRY_ONLY
+DISAG_GLOBAL = DisaggregationType.DISAG_GLOBAL
 
 QUERY_COUNT = 5
 
@@ -38,10 +41,10 @@ class TestIPTTJSONIndicatorLabelAndFilterDataSerializer(test.TestCase):
         cls.site1 = SiteProfileFactory()
         cls.site2 = SiteProfileFactory()
         cls.standard_dt = DisaggregationTypeFactory(
-            disaggregation_type="Test Standard Disagg", standard=True,
+            disaggregation_type="Test Standard Disagg", global_type=DISAG_GLOBAL,
             labels=["Standard Label 1", "Standard Label 2"])
         cls.country_dt = DisaggregationTypeFactory(
-            disaggregation_type="Test Disagg", country=country, standard=False,
+            disaggregation_type="Test Disagg", country=country, global_type=DISAG_COUNTRY_ONLY,
             labels=["Country Label 1", "Cøüntry Label 2", "Country Låbél 3"])
 
     def get_serialized_data(self, program):
@@ -140,9 +143,9 @@ class TestIPTTJSONIndicatorReportDataSerializer(test.TestCase):
         cls.program = RFProgramFactory(months=24)
         cls.program.country.add(cls.country)
         cls.standard_disaggregation = DisaggregationTypeFactory(
-            standard=True, country=None, labels=['label 1', 'label 2'])
+            global_type=DISAG_GLOBAL, country=None, labels=['label 1', 'label 2'])
         cls.country_disaggregation = DisaggregationTypeFactory(
-            standard=False, country=cls.country, labels=['clabel 1', 'clabel 2'])
+            global_type=DISAG_COUNTRY_ONLY, country=cls.country, labels=['clabel 1', 'clabel 2'])
 
     def get_tp_report_data(self, frequency=Indicator.ANNUAL, program=None):
         program = program or self.program
