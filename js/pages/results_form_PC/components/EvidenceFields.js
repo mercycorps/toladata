@@ -1,4 +1,4 @@
-import React from 'react';
+import React, {useState, useEffect } from 'react';
 import { HelpText } from '../components/HelpText.js'
 
 const EvidenceFields = ({ evidenceFieldsInput, setEvidenceFieldsInput, formErrors, setFormErrors, readOnly, setWasUpdated }) => {
@@ -27,11 +27,16 @@ const EvidenceFields = ({ evidenceFieldsInput, setEvidenceFieldsInput, formError
         setFormErrors(detectedErrors);
     }
 
+    // Trigger validation when a the file picker is used
+    const [filePicked, setFilePicked] = useState(false);
+    useEffect(() => {
+        handleValdation();
+    }, [filePicked])
+
+    // File picker callback function for after file was picked
     function pcFilePickerCallback(fileName, url) {
-        document.getElementById('id_evidence_url--pc').value = url;
-        document.getElementById('id_record_name--pc').value = fileName;
-        // validateEvidence()
-        // setViewButtonDisabledState();
+        setEvidenceFieldsInput({...evidenceFieldsInput, evidence_url: url, record_name: fileName})
+        setFilePicked(!filePicked);
     }
 
     let handleGDrive  = (e) => {
