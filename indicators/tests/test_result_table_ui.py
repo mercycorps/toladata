@@ -13,7 +13,8 @@ from factories import (
     ResultFactory,
     PeriodicTargetFactory,
     UserFactory,
-    TolaUserFactory
+    TolaUserFactory,
+    CountryFactory
 )
 from indicators.models import Indicator
 
@@ -29,6 +30,13 @@ class TestResultUnassignedUIDateFallsOutsideProgramPeriod(test.TestCase):
     2. Under the table, we display error message: This date falls outside the range of your target periods.
        Please select a date between [localized program start date] and [localized program end date].
     """
+    @classmethod
+    def setUpClass(cls):
+        CountryFactory.reset_sequence()
+
+    @classmethod
+    def tearDownClass(cls):
+        pass
 
     def setUp(self):
         self.program = ProgramFactory(
@@ -93,6 +101,14 @@ class TestResultUnassignedUITargetsMidlineEndline(test.TestCase):
        Open the data record and select an option from the "Measure against target" menu.
     """
 
+    @classmethod
+    def setUpClass(cls):
+        CountryFactory.reset_sequence()
+
+    @classmethod
+    def tearDownClass(cls):
+        pass
+
     def setUp(self):
         self.program = ProgramFactory(
             reporting_period_start=datetime.date(2018, 1, 1),
@@ -150,6 +166,14 @@ class TestResultUnassignedUITargetsNotSetup(test.TestCase):
     1. The result is displayed in the table.
     2. Under the table, we display error message: Targets are not set up for this indicator.
     """
+
+    @classmethod
+    def setUpClass(cls):
+        CountryFactory.reset_sequence()
+
+    @classmethod
+    def tearDownClass(cls):
+        pass
 
     def setUp(self):
         self.program = ProgramFactory(

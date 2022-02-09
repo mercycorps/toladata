@@ -11,10 +11,10 @@ from decimal import Decimal
 import uuid
 import dateparser
 from weasyprint import HTML, CSS
+from rest_framework.decorators import api_view
 
 from django.template.defaultfilters import truncatechars
 from django.contrib import messages
-from django.core import serializers
 from django.core.exceptions import PermissionDenied
 from django.db import connection, transaction
 from django.db.models import (
@@ -38,19 +38,24 @@ from workflow.models import (
 )
 
 from indicators.serializers import (
-    IndicatorSerializer,
+    IndicatorSerializer
 )
+import indicators.serializers_new.participant_count_serializers as pc_serializers
 from indicators.views.view_utils import (
     import_indicator,
     generate_periodic_targets,
     dictfetchall
 )
-from indicators.forms import IndicatorForm, ResultForm, PTFormInputsForm, get_disaggregated_result_formset
+from indicators.forms import (
+    IndicatorForm, IndicatorCompleteForm, ResultForm, PTFormInputsForm, get_disaggregated_result_formset
+)
 from indicators.models import (
     Indicator,
     PeriodicTarget,
-    DisaggregationLabel,
     Result,
+    OutcomeTheme,
+    DisaggregationType,
+    DisaggregatedValue
 )
 from indicators.queries import ProgramWithMetrics, ResultsIndicator
 from indicators import indicator_plan as ip
@@ -127,6 +132,95 @@ def periodic_targets_form(request, program):
     return JsonResponse({
         'content': content,
     })
+
+
+def _derive_achieved(posted_disaggs):
+    for disagg in posted_disaggs:
+        if disagg['disaggregation_type'] == 'Actual with double counting':
+            for label in disagg['labels']:
+                if label['label'] == 'Direct':
+                    return label['value']
+
+
+@login_required
+@api_view(['GET', 'POST'])
+@transaction.atomic
+def participant_count_result_create_for_indicator(request, pk, *args, **kwargs):
+    # pk is indicator.pk
+    indicator = get_object_or_404(Indicator, pk=pk)
+    if request.method == 'POST':
+        verify_program_access_level(request, indicator.program.pk, 'medium')
+        achieved_val = _derive_achieved(request.data['disaggregations'])
+
+        result_data = {
+            'achieved': achieved_val,
+            'indicator': indicator,
+            'program': indicator.program.pk,
+            'create_date': timezone.now(),
+            'edit_date': timezone.now(),
+            'outcome_themes': request.data.pop('outcome_theme')
+
+        }
+        result_data.update(request.data)
+        result = pc_serializers.PCResultSerializerWrite(data=result_data)
+        if result.is_valid():
+            result_obj = result.save()
+            ProgramAuditLog.log_result_created(
+                request.user, indicator, result_obj, '')
+        else:
+            return JsonResponse(result.errors, status=404)
+
+        return JsonResponse({'message': 'success'}, status=200)
+
+    verify_program_access_level(request, indicator.program.pk, 'low')
+    disagg_queryset = DisaggregationType.objects.filter(indicator__pk=indicator.pk)
+    return_dict = {
+        'outcome_themes': list(OutcomeTheme.objects.filter(is_active=True).values_list('pk', 'name')),
+        'program_start_date': indicator.program.reporting_period_start,
+        'program_end_date': indicator.program.reporting_period_end,
+        'periodic_target': indicator.periodictargets.order_by('-customsort').values('id', 'period').first(),
+        'disaggregations': pc_serializers.PCDisaggregationSerializer(
+            disagg_queryset, many=True, context={'result_pk': None}).data,
+    }
+    return JsonResponse(return_dict)
+
+
+@login_required
+@api_view(['GET', 'PUT'])
+@transaction.atomic
+def participant_count_result_update(request, pk, *args, **kwargs):
+    # pk is result.pk
+    result = get_object_or_404(Result, pk=pk)
+    indicator = result.indicator
+    if request.method == 'PUT':
+        verify_program_access_level(request, indicator.program.pk, 'medium')
+        old_result_values = result.logged_participant_count_fields
+        achieved_val = _derive_achieved(request.data['disaggregations'])
+        rationale = request.data.pop('rationale')
+
+        result_data = request.data
+        result_data.update({
+            'achieved': achieved_val,
+            'program': indicator.program.pk,
+            'indicator': indicator.pk,
+            'edit_date': timezone.now(),
+            'outcome_themes': request.data.pop('outcome_theme')
+        })
+
+        result_serializer = pc_serializers.PCResultSerializerWrite(result, data=result_data)
+        if result_serializer.is_valid():
+            updated_result = result_serializer.save()
+            ProgramAuditLog.log_result_updated(
+                request.user, indicator, old_result_values,
+                updated_result.logged_participant_count_fields, rationale)
+
+        else:
+            return JsonResponse(result.errors, status=404)
+
+        return JsonResponse({'message': 'success'}, status=200)
+
+    verify_program_access_level(request, indicator.program.pk, 'low')
+    return JsonResponse(pc_serializers.PCResultSerializerRead(result).data)
 
 
 class PeriodicTargetJsonValidationError(Exception):
@@ -298,7 +392,8 @@ class IndicatorCreate(IndicatorFormMixin, CreateView):
             'program': self.program,
             'periodic_targets': [],
             'initial_level_id': self.level_pk,
-            'idempotency_key': uuid.uuid4()
+            'idempotency_key': uuid.uuid4(),
+            'pc_indicator_name': Indicator.PARTICIPANT_COUNT_INDICATOR_NAME
         })
         return context
 
@@ -420,11 +515,15 @@ class IndicatorUpdate(IndicatorFormMixin, UpdateView):
     def _form_subtitle_display_str(self):
         return truncatechars(self.object.name, 300)
 
+    def get_form_class(self):
+        return IndicatorCompleteForm if 'indicator_complete' in self.request.path else IndicatorForm
+
     def get_context_data(self, **kwargs):
         context = super(IndicatorUpdate, self).get_context_data(**kwargs)
         indicator = self.object
         program = indicator.program
         context['program'] = program
+        context['pc_indicator_name'] = Indicator.PARTICIPANT_COUNT_INDICATOR_NAME
 
         if 'indicator_complete' in self.request.path:
             incomplete_indicators = program.indicator_set\
@@ -501,7 +600,6 @@ class IndicatorUpdate(IndicatorFormMixin, UpdateView):
         context['title_helptext'] = _(
             'This indicator was imported from an Excel template. Some fields could not be included in the template, '
             'including targets that are required before results can be reported.')
-
 
         return context
 

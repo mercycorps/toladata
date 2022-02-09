@@ -28,7 +28,15 @@ apipatterns = [
          name='get_feedback_bulk_import_template'),
     path('save_bulk_import_data/<int:program_id>/',
          views.save_bulk_import_data,
-         name='save_bulk_import_data')
+         name='save_bulk_import_data'),
+    path(
+        'pcount_result_create/<int:pk>',  # Indicator pk
+        views.views_indicators.participant_count_result_create_for_indicator,
+        name='pcountcreate'),
+    path(
+        'pcount_result_update/<int:pk>',  # Result pk
+        views.views_indicators.participant_count_result_update,
+        name='pcountupdate')
 ]
 
 urlpatterns = [

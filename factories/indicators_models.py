@@ -27,6 +27,7 @@ from indicators.models import (
     Level,
     LevelTier,
     Objective,
+    OutcomeTheme,
     PeriodicTarget,
     StrategicObjective,
     PinnedReport,
@@ -333,9 +334,10 @@ class DisaggregationTypeFactory(DjangoModelFactory):
     class Meta:
         model = DisaggregationType
 
-    standard = False
+    global_type = DisaggregationType.DISAG_COUNTRY_ONLY
     disaggregation_type = Sequence(lambda n: "disagg type {0}".format(n))
-    country = LazyAttribute(lambda o: None if o.standard else CountryFactory())
+    country = LazyAttribute(
+        lambda o: None if o.global_type != DisaggregationType.DISAG_COUNTRY_ONLY else CountryFactory())
 
     @post_generation
     def labels(self, create, extracted, **kwargs):
@@ -373,3 +375,11 @@ class DataCollectionFrequencyFactory(DjangoModelFactory):
     frequency = "some reasonable frequency"
     description = "a description of how frequent this is"
     sort_order = Sequence(lambda n: n)
+
+
+class OutcomeThemeFactory(DjangoModelFactory):
+    class Meta:
+        model = OutcomeTheme
+
+    name = Faker('text')
+    is_active = True

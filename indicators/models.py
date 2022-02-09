@@ -1,4 +1,4 @@
-# -*- coding: utf-8 -*-
+
 import re
 import collections
 import string
@@ -61,6 +61,8 @@ Min = MinType()
 
 
 class IndicatorType(models.Model):
+    PC_INDICATOR_TYPE = 'Custom'
+
     indicator_type = models.CharField(_("Indicator type"), max_length=135, blank=True)
     description = models.TextField(_("Description"), max_length=765, blank=True)
     create_date = models.DateTimeField(_("Create date"), null=True, blank=True)
@@ -100,6 +102,7 @@ class StrategicObjective(SafeDeleteModel):
         super(StrategicObjective, self).save(*args, **kwargs)
 
 
+# The objective model is obsolete and only contains data from legacy programs that aren't using the RF
 class Objective(models.Model):
     name = models.CharField(_("Name"), max_length=135, blank=True)
     program = models.ForeignKey(Program, on_delete=models.CASCADE, null=True, blank=True, verbose_name=_("Program"))
@@ -488,22 +491,32 @@ class DisaggregationIndicatorFormManager(models.Manager):
 class DisaggregationType(models.Model):
     """
     #####!!!!!!!!!!! IMPORTANT!!    !!!!!!!!!!!#####
-    The GLOBAL_DISAGGREGATION_LABELS constant was created to ensure that a translated string appears
+    If you update these templates, make sure you update the globalDisaggregationTypes constant in
+    js/extra_translations.js.
+
+    The TRANSLATED_DISAGGREGATION_LABELS constant was created to ensure that a translated string appears
     in the PO file.  It won't appear through the normal translation machinery because
     the global disagg types are stored in the DB rather than the code.  When adding
     a global disaggregation type you will need to add the marked string to this list.
-
-    If you update these templates, make sure you update the globalDisaggregationTypes constant in
-    js/extra_translations.js.
     """
-    GLOBAL_DISAGGREGATION_LABELS = [
+    TRANSLATED_DISAGGREGATION_LABELS = [
         _("Sex and Age Disaggregated Data (SADD)")
     ]
+
+    DISAG_COUNTRY_ONLY = 0
+    DISAG_GLOBAL = 1
+    DISAG_PARTICIPANT_COUNT = 2
+    GLOBAL_TYPE_CHOICES = (
+        (DISAG_COUNTRY_ONLY, 'Not global'),
+        (DISAG_GLOBAL, 'Global (all countries and programs)'),
+        (DISAG_PARTICIPANT_COUNT, 'Global (participant count only)')
+    )
 
     """Business logic name: Disaggregation - e.g. `Gender` or `SADD`"""
     disaggregation_type = models.CharField(_("Disaggregation"), max_length=135)
     country = models.ForeignKey(Country, on_delete=models.CASCADE, null=True, blank=True, verbose_name="Country")
-    standard = models.BooleanField(default=False, verbose_name=_("Global (all programs, all countries)"))
+    global_type = models.IntegerField(
+        default=DISAG_COUNTRY_ONLY, choices=GLOBAL_TYPE_CHOICES, verbose_name=_("Global disaggregation"))
     is_archived = models.BooleanField(default=False, verbose_name=_("Archived"))
     selected_by_default = models.BooleanField(default=False)
     create_date = models.DateTimeField(_("Create date"), null=True, blank=True)
@@ -539,18 +552,21 @@ class DisaggregationType(models.Model):
         disaggs = cls.form_objects
         if indicator_pk is not None:
             disaggs = disaggs.for_indicator(indicator_pk)
+            indicator = Indicator.objects.get(pk=indicator_pk)
+            if indicator.admin_type == Indicator.ADMIN_PARTICIPANT_COUNT:
+                return disaggs.filter(global_type=cls.DISAG_PARTICIPANT_COUNT), []
         else:
             disaggs = disaggs.annotate(has_results=models.Value(False, output_field=models.BooleanField()))
         disaggs = disaggs.filter(
-            models.Q(standard=True) | models.Q(country__in=country_set),
+            models.Q(global_type=DisaggregationType.DISAG_GLOBAL) | models.Q(country__in=country_set),
             models.Q(is_archived=False) | models.Q(indicator__program=program)
         ).distinct()
         return (
-            disaggs.filter(standard=True),
+            disaggs.filter(global_type=DisaggregationType.DISAG_GLOBAL),
             [
                 (country_name, disaggs.filter(country=country_pk))
                 for country_pk, country_name in disaggs.filter(
-                    standard=False
+                    global_type=DisaggregationType.DISAG_COUNTRY_ONLY
                 ).values_list('country', 'country__country').distinct().order_by('country__country')
             ]
         )
@@ -627,7 +643,7 @@ class DisaggregationLabel(models.Model):
 
     @classmethod
     def get_standard_labels(cls):
-        return cls.objects.filter(disaggregation_type__standard=True)
+        return cls.objects.filter(disaggregation_type__global_type=DisaggregationType.DISAG_GLOBAL)
 
 
 class DisaggregatedValue(models.Model):
@@ -643,6 +659,8 @@ class DisaggregatedValue(models.Model):
 
 
 class ReportingFrequency(models.Model):
+    PC_REPORTING_FREQUENCY = 'Annual'
+
     frequency = models.CharField(
         _("Frequency"), max_length=135, unique=True)
     description = models.CharField(
@@ -679,6 +697,12 @@ class DataCollectionFrequency(models.Model):
 class DataCollectionFrequencyAdmin(admin.ModelAdmin):
     list_display = ('frequency', 'description', 'create_date', 'edit_date')
     display = 'Data Collection Frequency'
+
+
+class OutcomeTheme(models.Model):
+    name = models.CharField(max_length=256, verbose_name=_('Outcome theme name'))
+    is_active = models.BooleanField(verbose_name=_('Active?'))
+    create_date = models.DateTimeField(auto_now_add=True, verbose_name=_('Creation date'))
 
 
 class ExternalService(models.Model):
@@ -1206,6 +1230,15 @@ class Indicator(SafeDeleteModel):
 
     }
 
+    ADMIN_PARTICIPANT_COUNT = 0
+    ADMIN_DEMO = 1
+    ADMIN_TYPES = [
+        (ADMIN_PARTICIPANT_COUNT, 'Participant count'),
+        (ADMIN_DEMO, 'Test/Demo')
+    ]
+
+    PARTICIPANT_COUNT_INDICATOR_NAME = 'Number of people reached in a fiscal year'
+
     indicator_key = models.UUIDField(
         default=uuid.uuid4, help_text=" ", verbose_name=_("Indicator key"))
 
@@ -1230,6 +1263,7 @@ class Indicator(SafeDeleteModel):
     # ordering with respect to level (determines whether indicator is 1.1a 1.1b or 1.1c)
     level_order = models.IntegerField(default=0)
 
+    # The objective model is obsolete and only contains data from legacy programs that aren't using the RF
     # this includes a relationship to a program
     objectives = models.ManyToManyField(
         Objective, blank=True, verbose_name=_("Program Objective"),
@@ -1495,6 +1529,8 @@ class Indicator(SafeDeleteModel):
         # Translators: This is the name of the Level object in the old system of organising levels
         verbose_name=_("Old Level"), help_text=" "
     )
+
+    admin_type = models.IntegerField(null=True, blank=True, choices=ADMIN_TYPES)
 
     create_date = models.DateTimeField(
         _("Create date"), null=True, blank=True, help_text=" "
@@ -2237,6 +2273,8 @@ class Result(models.Model):
     date_collected = models.DateField(
         null=True, blank=True, help_text=" ", verbose_name=_("Date collected"))
 
+    outcome_themes = models.ManyToManyField(OutcomeTheme, blank=True)
+
     approved_by = models.ForeignKey(
         TolaUser, blank=True, null=True, on_delete=models.SET_NULL, verbose_name=_("Originated By"),
         related_name="approving_data", help_text=" ")
@@ -2279,7 +2317,7 @@ class Result(models.Model):
     @property
     def disaggregated_values(self):
         return self.disaggregatedvalue_set.all().order_by(
-            'category__disaggregation_type__standard',
+            'category__disaggregation_type__global_type',
             'category__disaggregation_type__disaggregation_type',
             'category__customsort'
         )
@@ -2309,6 +2347,15 @@ class Result(models.Model):
             }
         }
 
+    @property
+    def logged_participant_count_fields(self):
+        lf = self.logged_fields
+        lf.pop('sites')
+        lf['outcome_themes'] = ', '.join(
+            outcome_theme.name for outcome_theme in self.outcome_themes.all()) if self.outcome_themes.exists() else ''
+        return lf
+
+
     @staticmethod
     def logged_field_order():
         """
@@ -2317,7 +2364,8 @@ class Result(models.Model):
         shrunk, only expanded or reordered.
         """
         return [
-            'id', 'date', 'target', 'value', 'disaggregation_values', 'evidence_url', 'evidence_name', 'sites']
+            'id', 'date', 'target', 'value', 'outcome_themes', 'disaggregation_values', 'evidence_url',
+            'evidence_name', 'sites']
 
 
 class ResultAdmin(admin.ModelAdmin):

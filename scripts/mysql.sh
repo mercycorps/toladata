@@ -1,14 +1,19 @@
 #!/bin/bash
 
-# USAGE: sh mysql.sh -u USERNAME -r -f BACKUP_FILE_NAME.sql
-#               -u = your username for the database
-#               -r = resets the database (drops existing one, creates a new one)
-#               -f = restores this backup file
-#               -e = points to the python executable so that migrations command can be run
-#               -b = backs up the database of the $host
-#               -h = Specified which host's db to backup
-# If this file is located where the Django's manage.py file is located then
-# it will run the migration command as well.
+usage() {
+    cat <<MESSAGE
+    USAGE: sh mysql.sh -u USERNAME -r -f BACKUP_FILE_NAME.sql
+        -u = Your username for the database.
+        -r = Resets the database (drops existing one, creates a new one).
+        -f = File name.  A file with this name in the ~/sqlbackups directory will be restored (.sql or .sql.gz).
+        -m = Runs migrations; you should ensure env is set to the right python (e.g. with a virtualenv).
+        -e = Points to the python executable so that migrations command can be run. Use of -m doesn't work.
+        -s = Host machine for the database. Defaults to localhost.
+        -b = Backs up the database from the -s server.
+        -h = Print this help message.
+MESSAGE
+}
+
 
 # Database credentials
 user=
@@ -26,22 +31,28 @@ file2restore=
 resetdb=
 pythonexe=
 deleteoldbackups=
+migrate=
 
 # Number of days to keep backups
 keep_backups_for=30 #days
 
 while [ "$1" != "" ]; do
     case $1 in
+        -h | --help )       usage
+                            exit 1
+                            ;;
         -u | --user )       shift
                             user=$1
                             ;;
-        -p | --password)    shift
+        -p | --password )   shift
                             password=$1
                             ;;
-        -h | --host )       shift
+        -s | --server )     shift
                             host=$1
                             ;;
         -b | --backup )     backup=1
+                            ;;
+        -m | --migrate )    migrate=1
                             ;;
         -f | --file )       shift
                             file2restore=$1
@@ -53,9 +64,6 @@ while [ "$1" != "" ]; do
                             deleteoldbackups=1
                             ;;
         -r | --reset )      resetdb=1
-                            ;;
-        -h | --help )       usage
-                            exit
                             ;;
         * )                 usage
                             exit 1
@@ -93,9 +101,9 @@ sleep 0.5
 if [ ! -z "$resetdb" ]
 then
     echo "dropping db $db_name at localhost"
-    mysql -h localhost -u $user -p <<< "drop database $db_name"
+    mysql -h $host -u $user -p <<< "drop database $db_name"
     echo "creating db $db_name at localhost"
-    mysql -h localhost -u $user -p <<< "create database $db_name CHARACTER SET utf8 COLLATE utf8_general_ci"
+    mysql -h $host -u $user -p <<< "create database $db_name CHARACTER SET utf8 COLLATE utf8_general_ci"
 fi
 
 sleep 1
@@ -113,7 +121,7 @@ then
 
     # restore the database
     echo "Restoring $file2restore"
-    mysql -h localhost -u $user -p "$db_name" < "$backup_path/$import_file"
+    mysql -h $host -u $user -p "$db_name" < "$backup_path/$import_file"
 
     # recompress the file if needed
     if [ ${import_file} != $file2restore ]; then
@@ -127,6 +135,12 @@ sleep 0.5
 # if file exists
 if [ -f 'manage.py' ]
 then
+
+    if [ ! -z "$migrate" ]
+    then
+        /usr/bin/env python manage.py migrate
+    fi
+
     # if pythonexe variable is not empty
     if [ ! -z "$pythonexe" ]
     then

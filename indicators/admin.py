@@ -8,15 +8,17 @@ from indicators.models import (
     Indicator, IndicatorType, Result, StrategicObjective, Objective, Level,
     ExternalService, ExternalServiceRecord, DataCollectionFrequency,
     DisaggregationType, PeriodicTarget, DisaggregationLabel, ReportingFrequency,
-    ExternalServiceAdmin,
-    ExternalServiceRecordAdmin,
-    PeriodicTargetAdmin,
+    ExternalServiceAdmin, ExternalServiceRecordAdmin, PeriodicTargetAdmin, OutcomeTheme
 )
 from workflow.models import Sector, Program, Country
 from import_export import resources, fields
 from import_export.widgets import ForeignKeyWidget, ManyToManyWidget
 from import_export.admin import ImportExportModelAdmin
 from simple_history.admin import SimpleHistoryAdmin
+
+DISAG_COUNTRY_ONLY = DisaggregationType.DISAG_COUNTRY_ONLY
+DISAG_GLOBAL = DisaggregationType.DISAG_GLOBAL
+DISAG_PARTICIPANT_COUNT = DisaggregationType.DISAG_PARTICIPANT_COUNT
 
 
 class BooleanListFilterWithDefault(admin.SimpleListFilter):
@@ -200,7 +202,7 @@ class DisaggregationAdmin(admin.ModelAdmin):
 
     def get_queryset(self, request):
         """annotation (programs using disaggregation) and filter (is or is not global)"""
-        return super().get_queryset(request).filter(standard=self.STANDARD).annotate(
+        return super().get_queryset(request).filter(global_type__in=self.GLOBAL_TYPES).annotate(
             program_count_annotation=models.Subquery(
                 Indicator.rf_aware_objects.filter(
                     disaggregation=models.OuterRef('pk')
@@ -218,16 +220,15 @@ class GlobalDisaggregation(DisaggregationType):
 
 @admin.register(GlobalDisaggregation)
 class GlobalDisaggregationAdmin(DisaggregationAdmin):
-    list_display = ('disaggregation_type', 'pretty_archived', 'program_count', 'categories')
+    list_display = ('disaggregation_type', 'global_type', 'pretty_archived', 'program_count', 'categories')
     list_filter = (ArchivedFilter,)
     sortable_by = ('disaggregation_type', 'program_count')
-    exclude = ('create_date', 'edit_date', 'country', 'standard')
-    STANDARD = True # shows only standard (global) disaggregations
+    exclude = ('create_date', 'edit_date', 'country')
+    GLOBAL_TYPES = [DISAG_GLOBAL, DISAG_PARTICIPANT_COUNT]
     COLUMN_WIDTH = 70 # width of the "categories list" column before truncation
 
     def save_model(self, request, obj, form, change):
-        """ensure on save that standard is true and country is blank - this is the global admin"""
-        obj.standard = True
+        """ensure on save that country is blank - this is the global admin"""
         obj.country = None
         super().save_model(request, obj, form, change)
 
@@ -243,12 +244,12 @@ class CountryDisaggregationAdmin(DisaggregationAdmin):
     list_display = ('disaggregation_type', 'country', 'pretty_archived', 'program_count', 'categories')
     list_filter = (ArchivedFilter, 'country')
     sortable_by = ('disaggregation_type', 'program_count', 'country')
-    exclude = ('create_date', 'edit_date', 'standard',)
-    STANDARD = False
+    exclude = ('create_date', 'edit_date', 'global_type',)
+    GLOBAL_TYPES = [DISAG_COUNTRY_ONLY]
     COLUMN_WIDTH = 50
 
     def save_model(self, request, obj, form, change):
-        obj.standard = False
+        obj.global_type = DISAG_COUNTRY_ONLY
         super().save_model(request, obj, form, change)
 
 
@@ -301,6 +302,12 @@ class ReportingFrequencyAdmin(admin.ModelAdmin):
     display = 'Reporting Frequency'
 
 
+class OutcomeThemeAdmin(admin.ModelAdmin):
+    list_display = ('name', 'is_active', 'create_date')
+    display = 'Outcome Theme'
+    readonly_fields = ('create_date',)
+
+
 admin.site.register(IndicatorType)
 admin.site.register(Indicator, IndicatorAdmin)
 admin.site.register(ReportingFrequency)
@@ -312,3 +319,4 @@ admin.site.register(ExternalService, ExternalServiceAdmin)
 admin.site.register(ExternalServiceRecord, ExternalServiceRecordAdmin)
 admin.site.register(DataCollectionFrequency)
 admin.site.register(PeriodicTarget, PeriodicTargetAdmin)
+admin.site.register(OutcomeTheme, OutcomeThemeAdmin)

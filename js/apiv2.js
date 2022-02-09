@@ -10,6 +10,14 @@ const api = {
             "X-CSRFToken": document.cookie.replace(/(?:(?:^|.*;\s*)csrftoken\s*\=\s*([^;]*).*$)|^.*$/, "$1")
         }
     }),
+    indicatorsInstance: axios.create({
+        withCredentials: true,
+        baseURL: '/indicators/',
+        responseType: 'json',
+        headers: {
+            "X-CSRFToken": document.cookie.replace(/(?:(?:^|.*;\s*)csrftoken\s*\=\s*([^;]*).*$)|^.*$/, "$1")
+        }
+    }),
     documentInstance: axios.create({
         withCredentials: true,
         baseURL: '/indicators/api/',
@@ -178,7 +186,49 @@ const api = {
                 this.logFailure(error);
                 return error.response;
             })
-        },
+    },
+    async getPCountResultCreateData(indicator_id) {
+        return await this.apiInstance.get(`/pcount_result_create/${indicator_id}`)
+            .then(response => {
+                return response.data;
+            })
+            .catch(error => {
+                this.logFailure(error);
+                return error.response;
+            })
+    },
+    async createPCountResult(indicator_id, form_data) {
+        return await this.apiInstance.post(`/pcount_result_create/${indicator_id}`,
+            form_data, {headers: {'Content-Type': 'application/json'}})
+            .then(response => {
+                return response;
+            })
+            .catch(error => {
+                this.logFailure(error);
+                return error.response;
+            })
+    },
+    async getPCountResultUpdateData(result_id) {
+        return await this.apiInstance.get(`/pcount_result_update/${result_id}`)
+            .then(response => {
+                return response.data;
+            })
+            .catch(error => {
+                this.logFailure(error);
+                return error.response;
+            })
+    },
+    async updatePCountResult(result_id, form_data) {
+        return await this.apiInstance.put(`/pcount_result_update/${result_id}`,
+            form_data, {headers: {'Content-Type': 'application/json'}})
+            .then(response => {
+                return response;
+            })
+            .catch(error => {
+                this.logFailure(error);
+                return error.response;
+            })
+    },
 };
 
 

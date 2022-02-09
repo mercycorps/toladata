@@ -4,6 +4,7 @@ import { library } from '@fortawesome/fontawesome-svg-core';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import { faCaretDown, faCaretRight, faPlusCircle } from '@fortawesome/free-solid-svg-icons';
 import {BLANK_TABLE_CELL} from '../../../../constants';
+import { PCResultsForm } from "../../../results_form_PC/resultsFormPC.js"
 
 library.add(faCaretDown, faCaretRight);
 
@@ -92,18 +93,48 @@ const IndicatorAddResults = inject("rootStore", "filterStore")(
                 ></div>
 
                 <div role="tooltip" data-animation="true" tabIndex="0" data-toggle="popover" data-placement="top" data-trigger="focus hover" data-content={missingTargetText}>
-                    <button
-                        type="button"
-                        className={"btn btn-link px-1 pt-0 mx-auto"}
-                        disabled ={noTargets}
-                        onClick={ loadModal }
-                    >
-                        <FontAwesomeIcon icon={ faPlusCircle } />
-                            {
-                                // # Translators: a button that lets the user add a new result
-                                gettext('Add result')
-                            }
-                    </button>
+                    {indicator.admin_type !== 0 ?
+                        <button
+                            type="button"
+                            className={"btn btn-link px-1 pt-0 mx-auto"}
+                            disabled ={noTargets}
+                            onClick={ loadModal }
+                        >
+                            <FontAwesomeIcon icon={ faPlusCircle } />
+                                {
+                                    // # Translators: a button that lets the user add a new result
+                                    gettext('Add result')
+                                }
+                        </button>
+                        :
+                        <React.Fragment>
+                            <div className="modal fade" id={`resultModal_${indicator.pk}`} role="dialog">
+                                <div className="modal-dialog modal-lg">
+                                    <div className="modal-content">
+                                        <div className="modal-body">
+                                            <PCResultsForm
+                                                indicatorID={indicator.pk}
+                                                readOnly={rootStore._readOnly}
+                                            />
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                            <button
+                                type="button"
+                                className={"btn btn-link px-1 pt-0 mx-auto"}
+                                disabled ={noTargets}
+                                data-toggle="modal"
+                                data-target={`#resultModal_${indicator.pk}`}
+                            >
+                                <FontAwesomeIcon icon={ faPlusCircle } />
+                                    {
+                                        // # Translators: a button that lets the user add a new result
+                                        gettext('Add result')
+                                    }
+                            </button>
+                        </React.Fragment>
+                    }
                 </div>
             </td>
         )

@@ -510,12 +510,14 @@ class ProgramPageProgramsMixin:
             )
         )
 
+
 class Program(models.Model):
     NOT_MIGRATED = 1 # programs created before satsuma release which have not switched over yet
     MIGRATED = 2 # programs created before satsuma which have switched to new RF levels
     RF_ALWAYS = 3 # programs created after satsuma release - on new RF levels with no option
 
     gaitid = models.CharField(_("ID"), max_length=255, null=True, blank=True)
+    external_program_id = models.IntegerField(_('External program id'), null=True, blank=False)
     name = models.CharField(_("Program Name"), max_length=255, blank=True)
     funding_status = models.CharField(_("Funding Status"), max_length=255, blank=True)
     cost_center = models.CharField(_("Fund Code"), max_length=255, blank=True, null=True)

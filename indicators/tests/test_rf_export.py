@@ -23,6 +23,14 @@ get_export_url = lambda program: reverse('rf_export', kwargs={'program': program
 
 
 class TestRFExportDownloadPermissions(test.TestCase):
+    @classmethod
+    def setUpClass(cls):
+        CountryFactory.reset_sequence()
+
+    @classmethod
+    def tearDownClass(cls):
+        pass
+
     def test_url_resolves(self):
         program = RFProgramFactory()
         url = get_export_url(program)
@@ -206,6 +214,7 @@ class TestCustomMultiTieredRFExport(test.TestCase, RFExportTests):
 
     @classmethod
     def setUpTestData(cls):
+        CountryFactory.reset_sequence()
         cls.program = RFProgramFactory(tiers=[f"Tier {x}" for x in range(1, 9)], levels=1)
         goal_levels = cls.program.levels.filter(parent=None)
         assert goal_levels.count() == 1
