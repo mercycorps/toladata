@@ -162,7 +162,7 @@ def participant_count_result_create_for_indicator(request, pk, *args, **kwargs):
 
         }
         result_data.update(request.data)
-        result = pc_serializers.PCResultSerializerWrite(data=result_data)
+        result = pc_serializers.PCResultSerializerWrite(data=result_data, context={"program": indicator.program})
         if result.is_valid():
             result_obj = result.save()
             ProgramAuditLog.log_result_created(
@@ -207,7 +207,7 @@ def participant_count_result_update(request, pk, *args, **kwargs):
             'outcome_themes': request.data.pop('outcome_theme')
         })
 
-        result_serializer = pc_serializers.PCResultSerializerWrite(result, data=result_data)
+        result_serializer = pc_serializers.PCResultSerializerWrite(result, data=result_data, context={"program": indicator.program})
         if result_serializer.is_valid():
             updated_result = result_serializer.save()
             ProgramAuditLog.log_result_updated(

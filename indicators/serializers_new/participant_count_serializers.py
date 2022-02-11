@@ -1,5 +1,6 @@
 import copy
-from rest_framework import serializers
+import re
+from rest_framework import serializers, exceptions
 from django.db.models import Count, BooleanField, Q
 from indicators.models import (
     PeriodicTarget, Result, OutcomeTheme, DisaggregationType, DisaggregationLabel, DisaggregatedValue
@@ -122,6 +123,93 @@ class PCResultSerializerWrite(serializers.ModelSerializer):
             'outcome_themes',
             'disaggregations'
         ]
+
+    def validate_date_collected(self, value):
+        """
+        Validates that date_collected is in the range of self.context.get('program').start_date and self.context.get('program').end_date
+
+        Params
+            value
+                - The value of date_collected
+
+        Raises
+            ValidationError
+                - If validation fails
+
+        Returns
+            Value of date_collected
+        """
+        program = self.context.get('program')
+
+        if program.reporting_period_start <= value <= program.reporting_period_end:
+            return value
+
+        raise exceptions.ValidationError('This date should be within the fiscal year of the reporting period.')
+
+    def validate_outcome_themes(self, value):
+        """
+        Validates that the length of outcome_themes is greater than 0
+
+        Params
+            value
+                - The value of outcome_themes
+
+        Raises
+            ValidationError
+                - If validation fails
+
+        Returns
+            Value of outcome_themes
+        """
+        if len(value) > 0:
+            return value
+        
+        raise exceptions.ValidationError('Please complete this field. You can select more than one outcome theme.')
+
+    def validate_evidence_url(self, value):
+        """
+        Validates that evidence_url matches the regex pattern and that record_name is not None
+
+        Params
+            value
+                - The value of evidence_url
+
+        Raises
+            ValidationError
+                - If validation fails
+
+        Returns
+            Value of evidence_url
+        """
+        pattern = r"^(http(s)?|file):\/\/.+"
+        
+        if self.initial_data.get('record_name') is None or len(self.initial_data.get('record_name')) == 0:
+            raise exceptions.ValidationError('A record name must be included along with the link.')
+
+        if re.match(pattern, value) is None:
+            raise exceptions.ValidationError('Please enter a valid evidence link.')
+
+        return value
+
+    def validate_record_name(self, value):
+        """
+        Validates that record_name is set alongside evidence_url
+
+        Params
+            value
+                - The value of record_name
+        
+        Raises
+            ValidationError
+                - If validation fails
+
+        Returns
+            Value of record_name
+        """
+        if self.initial_data.get('evidence_url') is None or len(self.initial_data.get('evidence_url')) == 0:
+            raise exceptions.ValidationError('A link must be included along with the record name.')
+
+        return value
 
     def create(self, validated_data):
         disaggregations = validated_data.pop('disaggregations')
