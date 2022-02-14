@@ -72,3 +72,23 @@ class TestPCResultSerializerWriteValidation(test.TestCase):
         result = self.serializer(data=data, context={"program": self.program})
         result.is_valid()
         self.assertEquals(self.error_messages['invalid_date_collected'], str(result.errors['date_collected'][0]))
+
+    def test_without_evidence(self):
+        """
+        Evidence is not included in request
+        """
+        data = self.example_data()
+        del data['evidence_url']
+        del data['record_name']
+        result = self.serializer(data=data, context={'program': self.program})
+        result.is_valid(raise_exception=True)
+
+    def test_empty_evidence(self):
+        """
+        Evidence is empty and included in request
+        """
+        data = self.example_data()
+        data['evidence_url'] = ''
+        data['record_name'] = ''
+        result = self.serializer(data=data, context={'program': self.program})
+        result.is_valid(raise_exception=True)

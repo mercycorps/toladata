@@ -1,6 +1,8 @@
 import copy
 import re
+from this import d
 from rest_framework import serializers, exceptions
+from django.utils.translation import ugettext_lazy as _
 from django.db.models import Count, BooleanField, Q
 from indicators.models import (
     PeriodicTarget, Result, OutcomeTheme, DisaggregationType, DisaggregationLabel, DisaggregatedValue
@@ -124,6 +126,16 @@ class PCResultSerializerWrite(serializers.ModelSerializer):
             'disaggregations'
         ]
 
+    def empty_evidence(self):
+        """
+        Utility method for checking if both evidence fields [evidence_url, record_name] are empty.
+
+        Returns
+            True if both fields are empty else False
+        """
+        return self.initial_data.get('record_name') == '' and self.initial_data.get('evidence_url') == '' \
+            or self.initial_data.get('record_name') is None and self.initial_data.get('evidence_url') is None
+
     def validate_date_collected(self, value):
         """
         Validates that date_collected is in the range of self.context.get('program').start_date and self.context.get('program').end_date
@@ -144,7 +156,8 @@ class PCResultSerializerWrite(serializers.ModelSerializer):
         if program.reporting_period_start <= value <= program.reporting_period_end:
             return value
 
-        raise exceptions.ValidationError('This date should be within the fiscal year of the reporting period.')
+        # Translators: An error message detailing that the selected date should be within the reporting period for the fiscal year
+        raise exceptions.ValidationError(_('This date should be within the fiscal year of the reporting period.'))
 
     def validate_outcome_themes(self, value):
         """
@@ -164,7 +177,8 @@ class PCResultSerializerWrite(serializers.ModelSerializer):
         if len(value) > 0:
             return value
         
-        raise exceptions.ValidationError('Please complete this field. You can select more than one outcome theme.')
+        # Translators: An error message detailing that outcome themes are required and that multiple outcome themes can be selected
+        raise exceptions.ValidationError(_('Please complete this field. You can select more than one outcome theme.'))
 
     def validate_evidence_url(self, value):
         """
@@ -182,12 +196,18 @@ class PCResultSerializerWrite(serializers.ModelSerializer):
             Value of evidence_url
         """
         pattern = r"^(http(s)?|file):\/\/.+"
+
+        # Both evidence fields are empty. Return value instead of raising exception
+        if self.empty_evidence():
+            return value
         
         if self.initial_data.get('record_name') is None or len(self.initial_data.get('record_name')) == 0:
-            raise exceptions.ValidationError('A record name must be included along with the link.')
+            # Translators: An error message detailing that the record name must be included along the a evidence link
+            raise exceptions.ValidationError(_('A record name must be included along with the link.'))
 
         if re.match(pattern, value) is None:
-            raise exceptions.ValidationError('Please enter a valid evidence link.')
+            # Translators: An error message detailing that the evidence link was invalid
+            raise exceptions.ValidationError(_('Please enter a valid evidence link.'))
 
         return value
 
@@ -206,22 +226,154 @@ class PCResultSerializerWrite(serializers.ModelSerializer):
         Returns
             Value of record_name
         """
+
+        # Both evidence fields are empty. Return value instead of raising exception
+        if self.empty_evidence():
+            return value
+
         if self.initial_data.get('evidence_url') is None or len(self.initial_data.get('evidence_url')) == 0:
-            raise exceptions.ValidationError('A link must be included along with the record name.')
+            # Translators: An error message detailing that an evidence link must be included along with the record name
+            raise exceptions.ValidationError(_('A link must be included along with the record name.'))
 
         return value
+
+    def disaggregations_are_valid(self, used_disaggregations):
+        """
+        Checks that each disaggregation passes validation
+
+        Params
+            used_disaggregations
+                - A dict with a total value for each disaggregation type
+
+        Raises
+            ValidationError
+                - If validation fails
+
+        Returns
+            True if validation passes
+        """
+        sadd_with_direct = used_disaggregations['SADD (including unknown) with double counting']['direct']['value']
+        sadd_without_direct = used_disaggregations['SADD (including unknown) without double counting']['direct']['value']
+        actual_with_direct = used_disaggregations['Actual with double counting']['direct']['value']
+        actual_with_indirect = used_disaggregations['Actual with double counting']['indirect']['value']
+        actual_without_direct = used_disaggregations['Actual without double counting']['direct']['value']
+        actual_without_indirect = used_disaggregations['Actual without double counting']['indirect']['value']
+        sectors_direct = used_disaggregations['Sectors Direct with double counting']['direct']['value']
+        sectors_indirect = used_disaggregations['Sectors Indirect with double counting']['indirect']['value']
+
+        if not sadd_with_direct == actual_with_direct:
+            # Translators: An error message detailing that the sum of 'SADD with double counting' should be equal to the sum of 'Direct with double counting'
+            raise exceptions.ValidationError(_("The sum of 'SADD with double counting' should be equal to the sum of 'Direct with double counting'."))
+
+        if not sadd_without_direct == actual_without_direct:
+            # Translators: An error message detailing that the sum of 'SADD without double counting' should be equal to the sum of 'Direct without double counting'
+            raise exceptions.ValidationError(_("The sum of 'SADD without double counting' should be equal to the sum of 'Direct without double counting'."))
+
+        if actual_with_direct == 0 or actual_with_indirect == 0:
+            # Translators: An error message detailing that the fields Direct and Indirect total participants with double counting is required
+            raise exceptions.ValidationError(_("Direct/indirect total participants with double counting is required. Please complete these fields."))
+
+        if (actual_without_direct + actual_without_indirect) > (actual_with_direct + actual_with_indirect):
+            # Translators: An error message detailing that the Direct and Indirect without double counting should be equal to or lower than the value of Direct and Indirect with double counting
+            raise exceptions.ValidationError(_("Direct/indirect without double counting should be equal to or lower than direct/indirect with double counting."))
+
+        if (sectors_direct + sectors_indirect) > (actual_with_direct + actual_with_indirect):
+            # Translators: An error message detailing that the Sector values should be less to or equal to the sum of Direct and Indirect with double counting value
+            raise exceptions.ValidationError(_("Sector values should be less than or equal to the 'Direct/Indirect with double counting' value."))
+
+        return True
+
+    def process_disaggregations(self, disaggregations, instance, preserve_old_ids=False):
+        """
+        Processes disaggregations for creation and also creates the used_disaggregations dict with total values
+
+        Params
+            disaggregations
+                - The disaggregations object from the request
+            instance
+                - instance of the Results object
+            preserve_old_ids
+                - Optional defaults to False
+                - Used for updating in order to get the old_label_ids
+
+        Returns
+            new_value_objs, old_label_ids if preserve_old_ids is True else new_value_objs
+        """
+        new_value_objs = list()
+        old_label_ids = list()
+        # A dict to hold total values for disaggregations
+        used_disaggregations = {
+            "SADD (including unknown) with double counting": {
+                "direct": {
+                    "value": 0
+                }
+            },
+            "SADD (including unknown) without double counting": {
+                "direct": {
+                    "value": 0
+                }
+            },
+            "Sectors Direct with double counting": {
+                "direct": {
+                    "value": 0
+                }
+            },
+            "Sectors Indirect with double counting": {
+                "indirect": {
+                    "value": 0
+                }
+            },
+            "Actual without double counting": {
+                "direct": {
+                    "value": 0
+                },
+                "indirect": {
+                    "value": 0
+                }
+            },
+            "Actual with double counting": {
+                "direct": {
+                    "value": 0
+                },
+                "indirect": {
+                    "value": 0
+                }
+            }
+        }
+
+        for disagg in disaggregations:
+            disagg_type = disagg['disaggregation_type']
+            for label_value in disagg['labels']:
+                if preserve_old_ids:
+                    old_label_ids.append(label_value['disaggregationlabel_id'])
+                if label_value['value']:
+                    if disagg_type in ['Actual with double counting', 'Actual without double counting']:
+                        key = label_value['label'].lower()
+                    else:
+                        key = disagg['count_type'].lower()
+
+                    try:
+                        used_disaggregations[disagg_type][key]['value'] += int(label_value['value'])
+                    except ValueError:
+                        used_disaggregations[disagg_type][key]['value'] += float(label_value['value'])
+
+                    new_value_objs.append(DisaggregatedValue(
+                        category_id=label_value['disaggregationlabel_id'], result=instance, value=label_value['value']))
+
+        if self.disaggregations_are_valid(used_disaggregations):
+            if preserve_old_ids:
+                return new_value_objs, old_label_ids
+            else:
+                return new_value_objs
 
     def create(self, validated_data):
         disaggregations = validated_data.pop('disaggregations')
         outcome_themes = validated_data.pop('outcome_themes')
         result = Result.objects.create(**validated_data)
         result.outcome_themes.add(*outcome_themes)
-        value_objs = []
-        for disagg in disaggregations:
-            for label_value in disagg['labels']:
-                if label_value['value']:
-                    value_objs.append(DisaggregatedValue(
-                        category_id=label_value['disaggregationlabel_id'], result=result, value=label_value['value']))
+
+        value_objs = self.process_disaggregations(disaggregations, result)
+
         # There's lots of warnings about batch_create in the Django documentation, e.g. it skips the
         # save method and won't trigger signals, but I don't we need any of those things in this case.
         DisaggregatedValue.objects.bulk_create(value_objs)
@@ -236,14 +388,7 @@ class PCResultSerializerWrite(serializers.ModelSerializer):
         instance.outcome_themes.remove()
         instance.outcome_themes.add(*outcome_themes)
 
-        new_value_objs = []
-        old_label_ids = []
-        for disagg in disaggregations:
-            for label in disagg['labels']:
-                old_label_ids.append(label['disaggregationlabel_id'])
-                if label['value']:
-                    new_value_objs.append(DisaggregatedValue(
-                        category_id=label['disaggregationlabel_id'], result=instance, value=label['value']))
+        new_value_objs, old_label_ids = self.process_disaggregations(disaggregations, instance, preserve_old_ids=True)
 
         old_disagg_values = DisaggregatedValue.objects.filter(category_id__in=old_label_ids, result=instance)
         old_disagg_values.delete()
