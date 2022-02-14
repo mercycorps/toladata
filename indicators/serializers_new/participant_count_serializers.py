@@ -1,6 +1,5 @@
 import copy
 import re
-from this import d
 from rest_framework import serializers, exceptions
 from django.utils.translation import ugettext_lazy as _
 from django.db.models import Count, BooleanField, Q
