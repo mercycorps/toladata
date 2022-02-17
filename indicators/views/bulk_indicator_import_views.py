@@ -573,7 +573,7 @@ class BulkImportIndicatorsView(LoginRequiredMixin, UserPassesTestMixin, AccessMi
             level_refs = {}
             for level in program.levels.all():
                 ontology = f' {level.display_ontology}' if len(level.display_ontology) > 0 else ''
-                level_refs[f'{gettext(str(level.leveltier))}{ontology}'] = level
+                level_refs[f'{gettext(str(level.leveltier))}{ontology}'.strip()] = level
 
             non_fatal_errors = []  # Errors that can be highlighted on a spreadsheet and get sent back to the user
             fatal_errors = []  # So bad that it's not possible to highlight a spreadsheet and send it back to the suer
@@ -678,7 +678,7 @@ class BulkImportIndicatorsView(LoginRequiredMixin, UserPassesTestMixin, AccessMi
 
                 # Check if the value of the Level column matches the one used in the level header
                 level_cell = ws.cell(current_row_index, FIRST_USED_COLUMN)
-                if level_cell.value != current_tier:
+                if level_cell.value.strip() != current_tier:
                     level_cell.fill = PatternFill('solid', fgColor=RED_ERROR)
                     fatal_errors.append(ERROR_UNEXPECTED_LEVEL)
 
