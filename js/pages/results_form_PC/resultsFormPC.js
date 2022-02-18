@@ -2,7 +2,8 @@ import React, { useState, useEffect, useRef } from 'react';
 import { CommonFields } from './components/CommonFields.js';
 import { ActualValueFields } from './components/ActualValueFields.js';
 import { EvidenceFields } from './components/EvidenceFields.js';
-import { DisaggregationFields } from './components/DisaggregationFields.js'
+import { DisaggregationFields } from './components/DisaggregationFields.js';
+import { DataLoading, ServerError } from '../../components/componentStatus.js';
 import api from '../../apiv2';
 
 
@@ -151,6 +152,7 @@ const PCResultsForm = ({indicatorID="", resultID="", readOnly}) => {
 
     // State Variables
     let outcomeThemesData = useRef([]);
+    const [status, setStatus] = useState('loading');
     const [wasUpdated, setWasUpdated] = useState(false);
     const [disableForm, setDisableForm] = useState(readOnly);
     const [disaggregationData, setDisaggregationData] = useState([]);
@@ -168,6 +170,7 @@ const PCResultsForm = ({indicatorID="", resultID="", readOnly}) => {
                 setEvidenceFieldsInput({});
                 outcomeThemesData.current = [];
                 setFormErrors({});
+                setStatus("loading");
             })
             $(document).on("keyup", function(event) {
                 if(event.key === 'Escape') {
@@ -177,30 +180,36 @@ const PCResultsForm = ({indicatorID="", resultID="", readOnly}) => {
             if (indicatorID) {
                 api.getPCountResultCreateData(indicatorID)
                     .then(response => {
-                        outcomeThemesData.current = formatOutcomeThemesData(response.outcome_themes);
-                        setDisaggregationData(handleReceivedDisaggregations(response.disaggregations));
-                        setCommonFieldsInput({
-                            program_start_date: response.program_start_date,
-                            program_end_date: response.program_end_date,
-                            periodic_target: response.periodic_target
-                        });
+                        if (response.status === 200) {
+                            outcomeThemesData.current = formatOutcomeThemesData(response.data.outcome_themes);
+                            setDisaggregationData(handleReceivedDisaggregations(response.data.disaggregations));
+                            setCommonFieldsInput({
+                                program_start_date: response.data.program_start_date,
+                                program_end_date: response.data.program_end_date,
+                                periodic_target: response.data.periodic_target
+                            });
+                            setStatus('ready');
+                        } else { setStatus('error'); }
                     })
             } else {
                 api.getPCountResultUpdateData(resultID)
-                .then(response => {
-                    outcomeThemesData.current = formatOutcomeThemesData(response.outcome_themes);
-                    setDisaggregationData(handleReceivedDisaggregations(response.disaggregations));
-                    setCommonFieldsInput({
-                        periodic_target: response.periodic_target,
-                        date_collected: response.date_collected,
-                        outcome_theme: formatSelectedOutcomeThemes(response.outcome_themes),
-                        program_start_date: response.program_start_date,
-                        program_end_date: response.program_end_date,
-                    });
-                    setEvidenceFieldsInput({
-                        evidence_url: response.evidence_url,
-                        record_name: response.record_name
-                    });
+                    .then(response => {
+                        if (response.status === 200) {
+                            outcomeThemesData.current = formatOutcomeThemesData(response.data.outcome_themes);
+                            setDisaggregationData(handleReceivedDisaggregations(response.data.disaggregations));
+                            setCommonFieldsInput({
+                                periodic_target: response.data.periodic_target,
+                                date_collected: response.data.date_collected,
+                                outcome_theme: formatSelectedOutcomeThemes(response.data.outcome_themes),
+                                program_start_date: response.data.program_start_date,
+                                program_end_date: response.data.program_end_date,
+                            });
+                            setEvidenceFieldsInput({
+                                evidence_url: response.data.evidence_url,
+                                record_name: response.data.record_name
+                            });
+                            setStatus('ready');
+                        } else { setStatus('error'); }
                 })
             }
         })
@@ -256,7 +265,7 @@ const PCResultsForm = ({indicatorID="", resultID="", readOnly}) => {
         } else {setDisableForm(readOnly);}
     }
 
-    if (Object.keys(disaggregationData).length > 0) {
+    if (Object.keys(disaggregationData).length > 0 && status === 'ready') {
         return (
             <div id="pc-result-modal-form">
                 <div className={disableForm ? "modal-disabled" : null}>
@@ -358,9 +367,14 @@ const PCResultsForm = ({indicatorID="", resultID="", readOnly}) => {
                 </div>
             </div>
         )
+    } else if (status === 'loading') {
+        return (
+            //TODO: Add a waiting spinner/indicator will waiting for API response for data
+            <DataLoading />
+        )
     } else {
         return (
-            <React.Fragment></React.Fragment> //TODO: Add a waiting spinner/indicator will waiting for API response for data
+            <ServerError status={status === 'error' ? true : false}/>
         )
     }
 }
