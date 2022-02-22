@@ -236,6 +236,10 @@ class IndicatorForm(forms.ModelForm):
 
         super(IndicatorForm, self).__init__(*args, **kwargs)
 
+        # Making the data_points field readonly for participant count indicators
+        if indicator and indicator.admin_type == Indicator.ADMIN_PARTICIPANT_COUNT:
+            self.fields['data_points'].widget.attrs['readonly'] = True
+
         # per mercycorps/TolaActivity#2452 remove textarea max length validation to provide a more
         # user-friendly js-based validation (these textarea checks aren't enforced at db-level anyway)
         for field in ['name', 'definition', 'justification', 'rationale_for_target',
@@ -475,7 +479,7 @@ class IndicatorForm(forms.ModelForm):
         clean_name = cleaned_data['name']
         clean_admin_type = cleaned_data['admin_type']
         if clean_admin_type != Indicator.ADMIN_PARTICIPANT_COUNT and \
-                clean_name == Indicator.PARTICIPANT_COUNT_INDICATOR_NAME:
+                Indicator.PARTICIPANT_COUNT_INDICATOR_NAME.lower() in clean_name.lower():
             raise ValidationError(
                 # Translators: This is an error message that appears when a user tries to use an off-limits name
                 _('The indicator name you have selected is reserved.  Please enter a different name'))
