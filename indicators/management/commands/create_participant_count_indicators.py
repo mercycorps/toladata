@@ -30,6 +30,7 @@ class Command(BaseCommand):
             '--suppress_output', action='store_true',
             help="Supresses the output so tests don't get too messy")
         parser.add_argument('--clean', action='store_true')
+        parser.add_argument('--delete_pilot_pc_indicators', action='store_true')
 
     @transaction.atomic
     def handle(self, *args, **options):
@@ -54,6 +55,20 @@ class Command(BaseCommand):
                         theme.is_active = False
                         theme.save()
             return
+
+        if options['delete_pilot_pc_indicators']:
+            pcind_id_list = [12385, 12053, 12051, 12052, 12050, 12054, 12069, 12068, 12065, 12072, 12063, 12064, 12066,
+                             12071, 12070, 12060, 12057, 12056, 12059, 12058, 12061, 12055, 12062]
+            # Call indicators on an object to object basis to force cascading delete.
+            deleted_ind = 0
+            for pcid in pcind_id_list:
+                if Indicator.objects.filter(pk=pcid).exists():
+                    ind_to_delete = Indicator.objects.get(pk=pcid)
+                    ind_to_delete.delete(force_policy=HARD_DELETE)
+                    deleted_ind += 1
+
+            if not options['suppress_output']:
+                print(f'{deleted_ind} pilot pc indicators deleted, {len(pcind_id_list)-deleted_ind} not found')
 
         if options['create_disaggs_themes']:
             sadd_label_text = 'Age Unknown M, Age Unknown F, Age Unknown Sex Unknown, 0-5 M, 0-5 F, 0-5 Sex Unknown, 6-9 M, 6-9 F, 6-9 Sex Unknown, 10-14 M, 10-14 F, 10-14 Sex Unknown, 15-19 M, 15-19 F, 15-19 Sex Unknown, 20-24 M, 20-24 F, 20-24 Sex Unknown, 25-34 M, 25-34 F, 25-34 Sex Unknown, 35-49 M, 35-49 F, 35-49 Sex Unknown, 50+ M, 50+ F, 50+ Sex Unknown'
