@@ -6,7 +6,7 @@ from safedelete.models import HARD_DELETE
 from django.core.management.base import BaseCommand
 from django.conf import settings
 from django.db import transaction
-
+from dateutil.relativedelta import relativedelta
 from indicators.models import (
     Indicator, DisaggregationType, DisaggregationLabel, OutcomeTheme
 )
@@ -109,7 +109,8 @@ class Command(BaseCommand):
         counts = {
             'eligible_programs': 0, 'pc_indicator_does_not_exist': 0, 'has_rf': 0, 'indicators_created': 0,}
 
-        reporting_start_date = date.fromisoformat(settings.REPORTING_YEAR_START_DATE)
+        # Subtract one year from the reporting year start date
+        reporting_start_date = date.fromisoformat(settings.REPORTING_YEAR_START_DATE) - relativedelta(years=1)
 
         eligible_programs = Program.objects.filter(reporting_period_end__gte=reporting_start_date)
         counts['eligible_programs'] = eligible_programs.count()
