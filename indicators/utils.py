@@ -6,15 +6,16 @@ from indicators.models import Indicator, IndicatorType, PeriodicTarget, Reportin
 
 def create_participant_count_indicator(program, top_level, disaggregations_qs):
     definition_text = (
+        "** Add Direct Participants definition **\n\n"
+        "** Add Indirect Participants definition **\n\n"
+        "** Add methodology for double counting **\n\n"
         "Participants are defined as “all people who have received tangible benefit – directly "
         "or indirectly from the project.” We distinguish between direct and indirect:\n\n"
         "Direct participants – are those who have received a tangible benefit from the program, "
         "either as the actual program participants or the intended recipients of the program benefits. "
         "This means individuals or communities.\n\n"
         "Indirect participants – are those who received a tangible benefit through their proximity to "
-        "or contact with program participants or activities.\n\n"
-        "** Add Direct Participants definition **\n\n"
-        "** Add Indirect Participants definition **"
+        "or contact with program participants or activities."
     )
     indicator_justification = (
         "Participant reach is crucial to take decisions on the program implementation. It provides insights "
