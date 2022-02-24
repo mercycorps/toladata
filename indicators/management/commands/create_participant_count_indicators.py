@@ -77,7 +77,7 @@ class Command(BaseCommand):
             sector_list = sorted([
                 'Agriculture', 'Cash and Voucher Assistance', 'Environment (DRR, Energy and Water)',
                 'Infrastructure (non - WASH, non - energy)', 'Governance and Partnership', 'Employment', 'WASH',
-                'Financial Services', 'Nutrition', 'Health (non - nutrition)']
+                'Financial Services', 'Nutrition', 'Public Health (non-nutrition/ non-WASH)']
             )
 
             actual_disagg_labels = ['Direct', 'Indirect']
