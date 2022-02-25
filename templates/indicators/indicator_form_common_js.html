@@ -185,7 +185,7 @@
     }
 
     function pcIndicatorName() {
-        return $('#pcIndicatorName').text();
+        return $('#pcIndicatorName').text().toLowerCase();
     }
 
     function adminType() {
@@ -959,7 +959,7 @@
         } else if ($nameField.val().length > 500) {
             errMsg = interpolate("{% trans 'Please enter fewer than %s characters.'|escapejs %}", [500]);
         }
-        else if (adminType() !== 0 && $nameField.val().trim() === pcIndicatorName()) {
+        else if (adminType() !== 0 && $nameField.val().trim().toLowerCase() === pcIndicatorName() || adminType() !== 0 && $nameField.val().trim().toLowerCase().includes(pcIndicatorName())) {
             errMsg = "{% trans 'This is a reserved name, please enter a different name.'|escapejs %}";
         }
         if (errMsg) {
