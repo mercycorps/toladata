@@ -6,7 +6,7 @@ from safedelete.models import HARD_DELETE
 from django.core.management.base import BaseCommand
 from django.conf import settings
 from django.db import transaction
-
+from dateutil.relativedelta import relativedelta
 from indicators.models import (
     Indicator, DisaggregationType, DisaggregationLabel, OutcomeTheme
 )
@@ -30,6 +30,7 @@ class Command(BaseCommand):
             '--suppress_output', action='store_true',
             help="Supresses the output so tests don't get too messy")
         parser.add_argument('--clean', action='store_true')
+        parser.add_argument('--delete_pilot_pc_indicators', action='store_true')
 
     @transaction.atomic
     def handle(self, *args, **options):
@@ -55,6 +56,20 @@ class Command(BaseCommand):
                         theme.save()
             return
 
+        if options['delete_pilot_pc_indicators']:
+            pcind_id_list = [12385, 12053, 12051, 12052, 12050, 12054, 12069, 12068, 12065, 12072, 12063, 12064, 12066,
+                             12071, 12070, 12060, 12057, 12056, 12059, 12058, 12061, 12055, 12062]
+            # Call indicators on an object to object basis to force cascading delete.
+            deleted_ind = 0
+            for pcid in pcind_id_list:
+                if Indicator.objects.filter(pk=pcid).exists():
+                    ind_to_delete = Indicator.objects.get(pk=pcid)
+                    ind_to_delete.delete(force_policy=HARD_DELETE)
+                    deleted_ind += 1
+
+            if not options['suppress_output']:
+                print(f'{deleted_ind} pilot pc indicators deleted, {len(pcind_id_list)-deleted_ind} not found')
+
         if options['create_disaggs_themes']:
             sadd_label_text = 'Age Unknown M, Age Unknown F, Age Unknown Sex Unknown, 0-5 M, 0-5 F, 0-5 Sex Unknown, 6-9 M, 6-9 F, 6-9 Sex Unknown, 10-14 M, 10-14 F, 10-14 Sex Unknown, 15-19 M, 15-19 F, 15-19 Sex Unknown, 20-24 M, 20-24 F, 20-24 Sex Unknown, 25-34 M, 25-34 F, 25-34 Sex Unknown, 35-49 M, 35-49 F, 35-49 Sex Unknown, 50+ M, 50+ F, 50+ Sex Unknown'
             sadd_label_list = sadd_label_text.split(', ')
@@ -62,7 +77,7 @@ class Command(BaseCommand):
             sector_list = sorted([
                 'Agriculture', 'Cash and Voucher Assistance', 'Environment (DRR, Energy and Water)',
                 'Infrastructure (non - WASH, non - energy)', 'Governance and Partnership', 'Employment', 'WASH',
-                'Financial Services', 'Nutrition', 'Health (non - nutrition)']
+                'Financial Services', 'Nutrition', 'Public Health (non - nutrition, non - WASH)']
             )
 
             actual_disagg_labels = ['Direct', 'Indirect']
@@ -94,7 +109,8 @@ class Command(BaseCommand):
         counts = {
             'eligible_programs': 0, 'pc_indicator_does_not_exist': 0, 'has_rf': 0, 'indicators_created': 0,}
 
-        reporting_start_date = date.fromisoformat(settings.REPORTING_YEAR_START_DATE)
+        # Subtract one year from the reporting year start date
+        reporting_start_date = date.fromisoformat(settings.REPORTING_YEAR_START_DATE) - relativedelta(years=1)
 
         eligible_programs = Program.objects.filter(reporting_period_end__gte=reporting_start_date)
         counts['eligible_programs'] = eligible_programs.count()
