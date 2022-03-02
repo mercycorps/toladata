@@ -83,9 +83,9 @@ const DisaggregationFields = ({ formID, disagg, disaggregationData, setDisaggreg
                     <div className="item__value--header">
                         <a className="item__label--accordion accordion-header collapsed" data-toggle="collapse" href={`#${formID}-${disagg[0].pk}`} aria-expanded={expanded} aria-controls={`#${formID}-${disagg[0].pk}`}>
                             <FontAwesomeIcon icon={ expanded ? 'caret-down' : 'caret-right' } />&nbsp;
-                            {disagg[0].disaggregation_type.includes("SADD") ? 
-                                <label className="label--required">SADD (including unknown)</label>
-                            : 
+                            {disagg[0].disaggregation_type.includes("SADD") ?
+                                <label className="label--required">{gettext("SADD (including unknown)")}</label>
+                            :
                                 <label className="label">{disagg[0].disaggregation_type}</label>
                             }
                         </a>
@@ -114,11 +114,11 @@ const DisaggregationFields = ({ formID, disagg, disaggregationData, setDisaggreg
                                     {
                                         disagg.map((currentDisagg, i) => {
                                             return (
-                                                <input 
+                                                <input
                                                     key={`id_${disagg[i].pk}-${labelObj.customsort}`}
                                                     id={`id_${disagg[i].pk}-${labelObj.customsort}`}
-                                                    name={`${disagg[i].pk}-${labelObj.customsort}`} 
-                                                    type="number" 
+                                                    name={`${disagg[i].pk}-${labelObj.customsort}`}
+                                                    type="number"
                                                     className="bin form-control input-value"
                                                     disabled={readOnly}
                                                     value={Math.round(disaggregationData[currentDisagg.disaggregation_type].labels[labelObj.customsort - 1].value) || ""}
@@ -131,7 +131,7 @@ const DisaggregationFields = ({ formID, disagg, disaggregationData, setDisaggreg
                                 </div>
                             </li>
                         )
-                    }) 
+                    })
                 }
 
                 <li className="list-group-item sum-row">
