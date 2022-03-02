@@ -177,6 +177,12 @@ const PCResultsForm = ({indicatorID="", resultID="", readOnly}) => {
                     $(`#resultModal_${resultID || indicatorID}`).modal('hide');
                 }
             })
+            // Prevent forever spinner froma api failure
+            let errorTimeout = setTimeout(() => {
+                console.log("Timeout");
+                    $(`#resultModal_${resultID || indicatorID}`).modal('hide');
+            }, 60000);
+
             if (indicatorID) {
                 api.getPCountResultCreateData(indicatorID)
                     .then(response => {
@@ -188,8 +194,12 @@ const PCResultsForm = ({indicatorID="", resultID="", readOnly}) => {
                                 program_end_date: response.data.program_end_date,
                                 periodic_target: response.data.periodic_target
                             });
+                            clearTimeout(errorTimeout);
                             setStatus('ready');
-                        } else { setStatus('error'); }
+                        } else {
+                            clearTimeout(errorTimeout);
+                            setStatus('error'); 
+                        }
                     })
             } else {
                 api.getPCountResultUpdateData(resultID)
@@ -208,8 +218,12 @@ const PCResultsForm = ({indicatorID="", resultID="", readOnly}) => {
                                 evidence_url: response.data.evidence_url,
                                 record_name: response.data.record_name
                             });
+                            clearTimeout(errorTimeout);
                             setStatus('ready');
-                        } else { setStatus('error'); }
+                        } else { 
+                            clearTimeout(errorTimeout);
+                            setStatus('error'); 
+                        }
                 })
             }
         })
