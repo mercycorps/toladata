@@ -51,8 +51,8 @@ class TestProgramFundingStatusUpdate(test.TestCase):
         self.program.funding_status = "Funded"
         self.program.save()
 
-        self.assertEqual(self.has_rf(), False)
-        self.assertEqual(self.has_pc(), False)
+        self.assertFalse(self.has_rf())
+        self.assertFalse(self.has_pc())
 
     def test_program_updated_funding_status_with_rf(self):
         """
@@ -63,5 +63,5 @@ class TestProgramFundingStatusUpdate(test.TestCase):
         self.program.funding_status = "Funded"
         self.program.save()
 
-        self.assertEqual(self.has_rf(), True)
-        self.assertEqual(self.has_pc(), True)
+        self.assertTrue(self.has_rf())
+        self.assertTrue(self.has_pc())

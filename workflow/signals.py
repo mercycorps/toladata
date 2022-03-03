@@ -19,7 +19,10 @@ def program_updated(sender, instance, *args, **kwargs):
 
     active_funding_status = 'Funded'
     # Get the program instance that hasn't been updated yet
-    program = Program.objects.get(pk=instance.pk)
+    try:
+        program = Program.objects.get(pk=instance.pk)
+    except Program.DoesNotExist:
+        return
 
     # Check that the funding status is being updated, the new funding status is == to Funded
     if not program.funding_status == instance.funding_status and instance.funding_status == active_funding_status:
