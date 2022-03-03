@@ -18,7 +18,7 @@ const PCResultsForm = ({indicatorID="", resultID="", readOnly}) => {
     }
     let formatOutcomeThemesData = (outcomeThemes) => {
         return outcomeThemes.reduce((themesArray, theme, i) => {
-            themesArray[i] = {value: theme[0], label: theme[1]};
+            themesArray[i] = {value: theme[0], label: gettext(theme[1])};
             return themesArray;
         }, [])
     }

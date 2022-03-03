@@ -86,7 +86,7 @@ const DisaggregationFields = ({ formID, disagg, disaggregationData, setDisaggreg
                             {disagg[0].disaggregation_type.includes("SADD") ?
                                 <label className="label--required">{gettext("SADD (including unknown)")}</label>
                             :
-                                <label className="label">{disagg[0].disaggregation_type}</label>
+                                <label className="label">{gettext(disagg[0].disaggregation_type)}</label>
                             }
                         </a>
 
@@ -109,7 +109,7 @@ const DisaggregationFields = ({ formID, disagg, disaggregationData, setDisaggreg
                     disagg[0].labels.map((labelObj) => {
                         return (
                             <li key={`${disagg[0].pk}-${labelObj.customsort}`} className="list-group-item">
-                                <div className="item__label">{labelObj.label}</div>
+                                <div className="item__label">{gettext(labelObj.label)}</div>
                                 <div className="item__value--container">
                                     {
                                         disagg.map((currentDisagg, i) => {
@@ -151,7 +151,7 @@ const DisaggregationFields = ({ formID, disagg, disaggregationData, setDisaggreg
                 </li>
 
                 <li className="list-group-item reference-row">
-                    <div className="item__label">{`Total ${totals[0].label} Participants`}</div>
+                    <div className="item__label">{gettext(`Total ${totals[0].label} Participants`)}</div>
                     <div className="item__value--container">
                         {
                             disagg.map((currentDisagg, i) => {
