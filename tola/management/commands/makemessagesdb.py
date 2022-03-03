@@ -44,7 +44,7 @@ def create_translated_db_items(js_filename, py_filename, root_path=settings.DJAN
         (DisaggregationLabel, 'label',
          'One of several choices for what label/sector (i.e. development domain) a program is most closely associated with')]
     # List with 'Global (participant count only)' disaggregation types which are associated with disaggregation labels that need to be translated.
-    disagg_type_list = ["Sectors Direct with double counting"]
+    disagg_type_list = ["Sectors Direct with double counting", 'Actual without double counting']
 
     frequency_strings_to_translate = set()
     for model, field in frequency_models:

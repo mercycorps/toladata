@@ -2,8 +2,8 @@ msgid ""
 msgstr ""
 "Project-Id-Version: \n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2022-03-02 14:08-0800\n"
-"PO-Revision-Date: 2022-03-02 14:19-0800\n"
+"POT-Creation-Date: 2022-03-03 11:06-0800\n"
+"PO-Revision-Date: 2022-03-03 10:53-0800\n"
 "Last-Translator: \n"
 "Language-Team: \n"
 "Language: es\n"
@@ -434,13 +434,13 @@ msgstr "Línea media y línea final"
 
 #. Translators: One of several options for specifying how often data is collected or reported on over the life of a program
 #: js/constants.js:39 js/pages/iptt_quickstart/models/ipttQSRootStore.js:32
-#: tola/db_translations.js:12
+#: tola/db_translations.js:14
 msgid "Annual"
 msgstr "Anual"
 
 #. Translators: One of several options for specifying how often data is collected or reported on over the life of a program
 #: js/constants.js:40 js/pages/iptt_quickstart/models/ipttQSRootStore.js:33
-#: tola/db_translations.js:16
+#: tola/db_translations.js:8
 msgid "Semi-annual"
 msgstr "Semestral"
 
@@ -456,7 +456,7 @@ msgstr "Trimestral"
 
 #. Translators: One of several options for specifying how often data is collected or reported on over the life of a program
 #: js/constants.js:43 js/pages/iptt_quickstart/models/ipttQSRootStore.js:36
-#: tola/db_translations.js:14
+#: tola/db_translations.js:28
 msgid "Monthly"
 msgstr "Mensual"
 
@@ -802,7 +802,7 @@ msgstr "# / %"
 #: js/pages/iptt_report/components/report/tableHeader.js:159
 #: js/pages/iptt_report/models/filterStore.js:737
 #: js/pages/program_page/components/indicator_list.js:206
-#: tola/db_translations.js:24
+#: tola/db_translations.js:10
 msgid "Baseline"
 msgstr "Base"
 
@@ -1813,7 +1813,7 @@ msgstr ""
 msgid "Results framework template"
 msgstr "Plantilla de sistema de resultados"
 
-#. Translators: One of several choices for specifying what type of Indicator is being created.  An Indicator is a performance measure e.g. "We will distrubute 1000 food packs over the next two months"
+#. Translators: One of several choices for specifying what type of Indicator is being created.  An Indicator is a performance measure e.g. "We will distribute 1000 food packs over the next two months"
 #: js/pages/results_framework/models.js:44 tola/db_translations.js:124
 msgid "Custom"
 msgstr "Personalizado"
@@ -2794,8 +2794,8 @@ msgstr "usuarios"
 
 #. Translators: One of several options for specifying how often data is collected or reported on over the life of a program
 #: tola/db_translations.js:2
-msgid "Weekly"
-msgstr "Semanal"
+msgid "Final evaluation"
+msgstr "Evaluación final"
 
 #. Translators: One of several options for specifying how often data is collected or reported on over the life of a program
 #: tola/db_translations.js:4
@@ -2804,38 +2804,38 @@ msgstr "Por evento"
 
 #. Translators: One of several options for specifying how often data is collected or reported on over the life of a program
 #: tola/db_translations.js:6
-msgid "Final evaluation"
-msgstr "Evaluación final"
+msgid "By distribution"
+msgstr "Por distribución"
 
 #. Translators: One of several options for specifying how often data is collected or reported on over the life of a program
-#: tola/db_translations.js:8
-msgid "By training"
-msgstr "Por formación"
-
-#. Translators: One of several options for specifying how often data is collected or reported on over the life of a program
-#: tola/db_translations.js:10
+#: tola/db_translations.js:12
 msgid "Post shock"
 msgstr "Posterior al desastre"
 
 #. Translators: One of several options for specifying how often data is collected or reported on over the life of a program
-#: tola/db_translations.js:18
-msgid "By batch"
-msgstr "Por lotes"
-
-#. Translators: One of several options for specifying how often data is collected or reported on over the life of a program
-#: tola/db_translations.js:20
-msgid "Endline"
-msgstr "Línea final"
-
-#. Translators: One of several options for specifying how often data is collected or reported on over the life of a program
-#: tola/db_translations.js:22
+#: tola/db_translations.js:16
 msgid "Midline"
 msgstr "Línea media"
 
 #. Translators: One of several options for specifying how often data is collected or reported on over the life of a program
-#: tola/db_translations.js:28
-msgid "By distribution"
-msgstr "Por distribución"
+#: tola/db_translations.js:18
+msgid "Weekly"
+msgstr "Semanal"
+
+#. Translators: One of several options for specifying how often data is collected or reported on over the life of a program
+#: tola/db_translations.js:20
+msgid "By training"
+msgstr "Por formación"
+
+#. Translators: One of several options for specifying how often data is collected or reported on over the life of a program
+#: tola/db_translations.js:22
+msgid "By batch"
+msgstr "Por lotes"
+
+#. Translators: One of several options for specifying how often data is collected or reported on over the life of a program
+#: tola/db_translations.js:24
+msgid "Endline"
+msgstr "Línea final"
 
 #. Translators: One of several choices for what sector (i.e. development domain) a program is most closely associated with
 #: tola/db_translations.js:30
@@ -3052,7 +3052,7 @@ msgstr "Cuestiones urbanas"
 
 #. Translators: One of several choices for what sector (i.e. development domain) a program is most closely associated with
 #. Translators: One of several choices for what label/sector (i.e. development domain) a program is most closely associated with
-#: tola/db_translations.js:114 tola/db_translations.js:168
+#: tola/db_translations.js:114 tola/db_translations.js:172
 msgid "WASH"
 msgstr "WASH"
 
@@ -3071,42 +3071,42 @@ msgstr "Desarrollo de trabajadores"
 msgid "Youth"
 msgstr "Jóvenes"
 
-#. Translators: One of several choices for specifying what type of Indicator is being created.  An Indicator is a performance measure e.g. "We will distrubute 1000 food packs over the next two months"
+#. Translators: One of several choices for specifying what type of Indicator is being created.  An Indicator is a performance measure e.g. "We will distribute 1000 food packs over the next two months"
 #: tola/db_translations.js:122
 msgid "Context / Trigger"
 msgstr "Contexto/Elemento desencadenante"
 
-#. Translators: One of several choices for specifying what type of Indicator is being created.  An Indicator is a performance measure e.g. "We will distrubute 1000 food packs over the next two months"
+#. Translators: One of several choices for specifying what type of Indicator is being created.  An Indicator is a performance measure e.g. "We will distribute 1000 food packs over the next two months"
 #: tola/db_translations.js:126
 msgid "DIG - Alpha"
 msgstr "DIG - alfa"
 
-#. Translators: One of several choices for specifying what type of Indicator is being created.  An Indicator is a performance measure e.g. "We will distrubute 1000 food packs over the next two months"
+#. Translators: One of several choices for specifying what type of Indicator is being created.  An Indicator is a performance measure e.g. "We will distribute 1000 food packs over the next two months"
 #: tola/db_translations.js:128
 msgid "DIG - Standard"
 msgstr "DIG - de agencia"
 
-#. Translators: One of several choices for specifying what type of Indicator is being created.  An Indicator is a performance measure e.g. "We will distrubute 1000 food packs over the next two months"
+#. Translators: One of several choices for specifying what type of Indicator is being created.  An Indicator is a performance measure e.g. "We will distribute 1000 food packs over the next two months"
 #: tola/db_translations.js:130
 msgid "DIG - Testing"
 msgstr "DIG - en prueba"
 
-#. Translators: One of several choices for specifying what type of Indicator is being created.  An Indicator is a performance measure e.g. "We will distrubute 1000 food packs over the next two months"
+#. Translators: One of several choices for specifying what type of Indicator is being created.  An Indicator is a performance measure e.g. "We will distribute 1000 food packs over the next two months"
 #: tola/db_translations.js:132
 msgid "Donor"
 msgstr "Donante"
 
-#. Translators: One of several choices for specifying what type of Indicator is being created.  An Indicator is a performance measure e.g. "We will distrubute 1000 food packs over the next two months"
+#. Translators: One of several choices for specifying what type of Indicator is being created.  An Indicator is a performance measure e.g. "We will distribute 1000 food packs over the next two months"
 #: tola/db_translations.js:134
 msgid "Key Performance Indicator (KPI)"
 msgstr "Indicador clave de rendimiento (KPI)"
 
-#. Translators: One of several choices for specifying what type of Indicator is being created.  An Indicator is a performance measure e.g. "We will distrubute 1000 food packs over the next two months"
+#. Translators: One of several choices for specifying what type of Indicator is being created.  An Indicator is a performance measure e.g. "We will distribute 1000 food packs over the next two months"
 #: tola/db_translations.js:136
 msgid "Performance"
 msgstr "Rendimiento"
 
-#. Translators: One of several choices for specifying what type of Indicator is being created.  An Indicator is a performance measure e.g. "We will distrubute 1000 food packs over the next two months"
+#. Translators: One of several choices for specifying what type of Indicator is being created.  An Indicator is a performance measure e.g. "We will distribute 1000 food packs over the next two months"
 #: tola/db_translations.js:138
 msgid "Process / Management"
 msgstr "Procesos/Gestión"
@@ -3133,36 +3133,46 @@ msgstr "Asistencia en efectivo y vales"
 
 #. Translators: One of several choices for what label/sector (i.e. development domain) a program is most closely associated with
 #: tola/db_translations.js:154
+msgid "Direct"
+msgstr "Directo"
+
+#. Translators: One of several choices for what label/sector (i.e. development domain) a program is most closely associated with
+#: tola/db_translations.js:156
 msgid "Employment"
 msgstr "Empleo"
 
 #. Translators: One of several choices for what label/sector (i.e. development domain) a program is most closely associated with
-#: tola/db_translations.js:156
+#: tola/db_translations.js:158
 msgid "Environment (DRR, Energy and Water)"
 msgstr "Medio ambiente (DRR, energía y agua)"
 
 #. Translators: One of several choices for what label/sector (i.e. development domain) a program is most closely associated with
-#: tola/db_translations.js:158
+#: tola/db_translations.js:160
 msgid "Financial Services"
 msgstr "Servicios financieros"
 
 #. Translators: One of several choices for what label/sector (i.e. development domain) a program is most closely associated with
-#: tola/db_translations.js:160
+#: tola/db_translations.js:162
 msgid "Governance and Partnership"
 msgstr "Gobernanza y asociaciones"
 
 #. Translators: One of several choices for what label/sector (i.e. development domain) a program is most closely associated with
-#: tola/db_translations.js:162
+#: tola/db_translations.js:164
+msgid "Indirect"
+msgstr "Indirecto"
+
+#. Translators: One of several choices for what label/sector (i.e. development domain) a program is most closely associated with
+#: tola/db_translations.js:166
 msgid "Infrastructure (non - WASH, non - energy)"
 msgstr "Infraestructura (no WASH, no energía)"
 
 #. Translators: One of several choices for what label/sector (i.e. development domain) a program is most closely associated with
-#: tola/db_translations.js:164
+#: tola/db_translations.js:168
 msgid "Nutrition"
 msgstr "Nutrición"
 
 #. Translators: One of several choices for what label/sector (i.e. development domain) a program is most closely associated with
-#: tola/db_translations.js:166
+#: tola/db_translations.js:170
 msgid "Public Health (non - nutrition, non - WASH)"
 msgstr "Salud pública (no nutricional/no WASH)"
 

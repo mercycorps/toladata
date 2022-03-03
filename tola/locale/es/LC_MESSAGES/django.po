@@ -2,8 +2,8 @@ msgid ""
 msgstr ""
 "Project-Id-Version: \n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2022-03-02 13:12-0800\n"
-"PO-Revision-Date: 2022-03-02 08:40-0800\n"
+"POT-Creation-Date: 2022-03-03 10:50-0800\n"
+"PO-Revision-Date: 2022-03-03 10:54-0800\n"
 "Last-Translator: \n"
 "Language-Team: \n"
 "Language: es\n"
@@ -96,7 +96,7 @@ msgstr "C / NC"
 
 #. Translators: One of several options for specifying how often data is collected or reported on over the life of a program
 #: indicators/export_renderers.py:77 indicators/forms.py:259
-#: indicators/forms.py:557 indicators/models.py:1351 tola/db_translations.py:26
+#: indicators/forms.py:557 indicators/models.py:1351 tola/db_translations.py:12
 #: tola_management/models.py:398
 msgid "Baseline"
 msgstr "Base"
@@ -114,13 +114,13 @@ msgstr "Línea media y línea final"
 #. Translators: One of several options for specifying how often data is collected or reported on over the life of a program
 #: indicators/export_renderers.py:84 indicators/models.py:1085
 #: templates/indicators/program_target_period_info_helptext.html:16
-#: tola/db_translations.py:14
+#: tola/db_translations.py:16
 msgid "Annual"
 msgstr "Anual"
 
 #. Translators: One of several options for specifying how often data is collected or reported on over the life of a program
 #: indicators/export_renderers.py:85 indicators/models.py:1086
-#: tola/db_translations.py:18
+#: tola/db_translations.py:10
 msgid "Semi-annual"
 msgstr "Semestral"
 
@@ -141,7 +141,7 @@ msgstr "Trimestral"
 #. Translators: One of several options for specifying how often data is collected or reported on over the life of a program
 #: indicators/export_renderers.py:89 indicators/models.py:1089
 #: templates/indicators/program_target_period_info_helptext.html:24
-#: tola/db_translations.py:16
+#: tola/db_translations.py:30
 msgid "Monthly"
 msgstr "Mensual"
 
@@ -1371,12 +1371,12 @@ msgid "Life of Program"
 msgstr "Vida del programa"
 
 #. Translators: One of several options for specifying how often data is collected or reported on over the life of a program
-#: indicators/models.py:1964 tola/db_translations.py:24
+#: indicators/models.py:1964 tola/db_translations.py:18
 msgid "Midline"
 msgstr "Línea media"
 
 #. Translators: One of several options for specifying how often data is collected or reported on over the life of a program
-#: indicators/models.py:1965 tola/db_translations.py:22
+#: indicators/models.py:1965 tola/db_translations.py:26
 msgid "Endline"
 msgstr "Línea final"
 
@@ -2699,7 +2699,7 @@ msgid "Summary"
 msgstr "Resumen"
 
 #. Translators: This single word is part of this longer sentence: :Please complete all required fields in the Performance tab."
-#. Translators: One of several choices for specifying what type of Indicator is being created.  An Indicator is a performance measure e.g. "We will distrubute 1000 food packs over the next two months"
+#. Translators: One of several choices for specifying what type of Indicator is being created.  An Indicator is a performance measure e.g. "We will distribute 1000 food packs over the next two months"
 #: templates/indicators/indicator_form_common_js.html:1230
 #: templates/indicators/indicator_form_modal.html:87
 #: tola/db_translations.py:138
@@ -4055,8 +4055,8 @@ msgstr "Fechas importantes"
 
 #. Translators: One of several options for specifying how often data is collected or reported on over the life of a program
 #: tola/db_translations.py:4
-msgid "Weekly"
-msgstr "Semanal"
+msgid "Final evaluation"
+msgstr "Evaluación final"
 
 #. Translators: One of several options for specifying how often data is collected or reported on over the life of a program
 #: tola/db_translations.py:6
@@ -4065,28 +4065,28 @@ msgstr "Por evento"
 
 #. Translators: One of several options for specifying how often data is collected or reported on over the life of a program
 #: tola/db_translations.py:8
-msgid "Final evaluation"
-msgstr "Evaluación final"
+msgid "By distribution"
+msgstr "Por distribución"
 
 #. Translators: One of several options for specifying how often data is collected or reported on over the life of a program
-#: tola/db_translations.py:10
-msgid "By training"
-msgstr "Por formación"
-
-#. Translators: One of several options for specifying how often data is collected or reported on over the life of a program
-#: tola/db_translations.py:12
+#: tola/db_translations.py:14
 msgid "Post shock"
 msgstr "Posterior al desastre"
 
 #. Translators: One of several options for specifying how often data is collected or reported on over the life of a program
 #: tola/db_translations.py:20
-msgid "By batch"
-msgstr "Por lotes"
+msgid "Weekly"
+msgstr "Semanal"
 
 #. Translators: One of several options for specifying how often data is collected or reported on over the life of a program
-#: tola/db_translations.py:30
-msgid "By distribution"
-msgstr "Por distribución"
+#: tola/db_translations.py:22
+msgid "By training"
+msgstr "Por formación"
+
+#. Translators: One of several options for specifying how often data is collected or reported on over the life of a program
+#: tola/db_translations.py:24
+msgid "By batch"
+msgstr "Por lotes"
 
 #. Translators: One of several choices for what sector (i.e. development domain) a program is most closely associated with
 #: tola/db_translations.py:32
@@ -4303,7 +4303,7 @@ msgstr "Cuestiones urbanas"
 
 #. Translators: One of several choices for what sector (i.e. development domain) a program is most closely associated with
 #. Translators: One of several choices for what label/sector (i.e. development domain) a program is most closely associated with
-#: tola/db_translations.py:116 tola/db_translations.py:170
+#: tola/db_translations.py:116 tola/db_translations.py:174
 msgid "WASH"
 msgstr "WASH"
 
@@ -4322,42 +4322,42 @@ msgstr "Desarrollo de trabajadores"
 msgid "Youth"
 msgstr "Jóvenes"
 
-#. Translators: One of several choices for specifying what type of Indicator is being created.  An Indicator is a performance measure e.g. "We will distrubute 1000 food packs over the next two months"
+#. Translators: One of several choices for specifying what type of Indicator is being created.  An Indicator is a performance measure e.g. "We will distribute 1000 food packs over the next two months"
 #: tola/db_translations.py:124
 msgid "Context / Trigger"
 msgstr "Contexto/Elemento desencadenante"
 
-#. Translators: One of several choices for specifying what type of Indicator is being created.  An Indicator is a performance measure e.g. "We will distrubute 1000 food packs over the next two months"
+#. Translators: One of several choices for specifying what type of Indicator is being created.  An Indicator is a performance measure e.g. "We will distribute 1000 food packs over the next two months"
 #: tola/db_translations.py:126
 msgid "Custom"
 msgstr "Personalizado"
 
-#. Translators: One of several choices for specifying what type of Indicator is being created.  An Indicator is a performance measure e.g. "We will distrubute 1000 food packs over the next two months"
+#. Translators: One of several choices for specifying what type of Indicator is being created.  An Indicator is a performance measure e.g. "We will distribute 1000 food packs over the next two months"
 #: tola/db_translations.py:128
 msgid "DIG - Alpha"
 msgstr "DIG - alfa"
 
-#. Translators: One of several choices for specifying what type of Indicator is being created.  An Indicator is a performance measure e.g. "We will distrubute 1000 food packs over the next two months"
+#. Translators: One of several choices for specifying what type of Indicator is being created.  An Indicator is a performance measure e.g. "We will distribute 1000 food packs over the next two months"
 #: tola/db_translations.py:130
 msgid "DIG - Standard"
 msgstr "DIG - de agencia"
 
-#. Translators: One of several choices for specifying what type of Indicator is being created.  An Indicator is a performance measure e.g. "We will distrubute 1000 food packs over the next two months"
+#. Translators: One of several choices for specifying what type of Indicator is being created.  An Indicator is a performance measure e.g. "We will distribute 1000 food packs over the next two months"
 #: tola/db_translations.py:132
 msgid "DIG - Testing"
 msgstr "DIG - en prueba"
 
-#. Translators: One of several choices for specifying what type of Indicator is being created.  An Indicator is a performance measure e.g. "We will distrubute 1000 food packs over the next two months"
+#. Translators: One of several choices for specifying what type of Indicator is being created.  An Indicator is a performance measure e.g. "We will distribute 1000 food packs over the next two months"
 #: tola/db_translations.py:134
 msgid "Donor"
 msgstr "Donante"
 
-#. Translators: One of several choices for specifying what type of Indicator is being created.  An Indicator is a performance measure e.g. "We will distrubute 1000 food packs over the next two months"
+#. Translators: One of several choices for specifying what type of Indicator is being created.  An Indicator is a performance measure e.g. "We will distribute 1000 food packs over the next two months"
 #: tola/db_translations.py:136
 msgid "Key Performance Indicator (KPI)"
 msgstr "Indicador clave de rendimiento (KPI)"
 
-#. Translators: One of several choices for specifying what type of Indicator is being created.  An Indicator is a performance measure e.g. "We will distrubute 1000 food packs over the next two months"
+#. Translators: One of several choices for specifying what type of Indicator is being created.  An Indicator is a performance measure e.g. "We will distribute 1000 food packs over the next two months"
 #: tola/db_translations.py:140
 msgid "Process / Management"
 msgstr "Procesos/Gestión"
@@ -4384,36 +4384,46 @@ msgstr "Asistencia en efectivo y vales"
 
 #. Translators: One of several choices for what label/sector (i.e. development domain) a program is most closely associated with
 #: tola/db_translations.py:156
+msgid "Direct"
+msgstr "Directo"
+
+#. Translators: One of several choices for what label/sector (i.e. development domain) a program is most closely associated with
+#: tola/db_translations.py:158
 msgid "Employment"
 msgstr "Empleo"
 
 #. Translators: One of several choices for what label/sector (i.e. development domain) a program is most closely associated with
-#: tola/db_translations.py:158
+#: tola/db_translations.py:160
 msgid "Environment (DRR, Energy and Water)"
 msgstr "Medio ambiente (DRR, energía y agua)"
 
 #. Translators: One of several choices for what label/sector (i.e. development domain) a program is most closely associated with
-#: tola/db_translations.py:160
+#: tola/db_translations.py:162
 msgid "Financial Services"
 msgstr "Servicios financieros"
 
 #. Translators: One of several choices for what label/sector (i.e. development domain) a program is most closely associated with
-#: tola/db_translations.py:162
+#: tola/db_translations.py:164
 msgid "Governance and Partnership"
 msgstr "Gobernanza y asociaciones"
 
 #. Translators: One of several choices for what label/sector (i.e. development domain) a program is most closely associated with
-#: tola/db_translations.py:164
+#: tola/db_translations.py:166
+msgid "Indirect"
+msgstr "Indirecto"
+
+#. Translators: One of several choices for what label/sector (i.e. development domain) a program is most closely associated with
+#: tola/db_translations.py:168
 msgid "Infrastructure (non - WASH, non - energy)"
 msgstr "Infraestructura (no WASH, no energía)"
 
 #. Translators: One of several choices for what label/sector (i.e. development domain) a program is most closely associated with
-#: tola/db_translations.py:166
+#: tola/db_translations.py:170
 msgid "Nutrition"
 msgstr "Nutrición"
 
 #. Translators: One of several choices for what label/sector (i.e. development domain) a program is most closely associated with
-#: tola/db_translations.py:168
+#: tola/db_translations.py:172
 msgid "Public Health (non - nutrition, non - WASH)"
 msgstr "Salud pública (no nutricional/no WASH)"
 

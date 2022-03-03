@@ -151,7 +151,7 @@ const DisaggregationFields = ({ formID, disagg, disaggregationData, setDisaggreg
                 </li>
 
                 <li className="list-group-item reference-row">
-                    <div className="item__label">{gettext(`Total ${totals[0].label} Participants`)}</div>
+                    {totals[0].label === "Direct" ? <div className="item__label">{gettext("Total Direct Participants")}</div> : <div className="item__label">{gettext("Total Indirect Participants")}</div>}
                     <div className="item__value--container">
                         {
                             disagg.map((currentDisagg, i) => {
