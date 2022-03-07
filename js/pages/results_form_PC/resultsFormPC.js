@@ -236,7 +236,10 @@ const PCResultsForm = ({indicatorID="", resultID="", readOnly}) => {
             .then(response => {
                 if (response.status === 200) {
                     window.location.reload();
-                } else {setDisableForm(readOnly);}
+                } else {
+                    setStatus("error");
+                    setDisableForm(readOnly);
+                }
             })
     }
 
@@ -258,7 +261,10 @@ const PCResultsForm = ({indicatorID="", resultID="", readOnly}) => {
                     .then(response => {
                         if (response.status === 200) {
                             window.location.reload();
-                        } else {setDisableForm(readOnly);}
+                        } else {
+                            setStatus("error");
+                            setDisableForm(readOnly);
+                        }
                     })
             } else if (wasUpdated) {
                 window.create_unified_changeset_notice({
@@ -271,7 +277,6 @@ const PCResultsForm = ({indicatorID="", resultID="", readOnly}) => {
                     notice_type: 'notice',
                     on_submit: send_update_request,
                     on_cancel: () => setDisableForm(readOnly),
-                    // on_cancel: () => this.props.rootStore.uiStore.setDisableCardActions(false),
                 });
             } else {
                 $(`#resultModal_${resultID || indicatorID}`).modal('hide');
