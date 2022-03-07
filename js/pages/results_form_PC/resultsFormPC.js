@@ -179,8 +179,7 @@ const PCResultsForm = ({indicatorID="", resultID="", readOnly}) => {
             })
             // Prevent forever spinner froma api failure
             let errorTimeout = setTimeout(() => {
-                console.log("Timeout");
-                    $(`#resultModal_${resultID || indicatorID}`).modal('hide');
+                $(`#resultModal_${resultID || indicatorID}`).modal('hide');
             }, 60000);
 
             if (indicatorID) {
@@ -388,7 +387,6 @@ const PCResultsForm = ({indicatorID="", resultID="", readOnly}) => {
         )
     } else if (status === 'loading') {
         return (
-            //TODO: Add a waiting spinner/indicator will waiting for API response for data
             <DataLoading />
         )
     } else {
