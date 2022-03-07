@@ -189,9 +189,7 @@ const api = {
     },
     async getPCountResultCreateData(indicator_id) {
         return await this.apiInstance.get(`/pcount_result_create/${indicator_id}`)
-            .then(response => {
-                return response.data;
-            })
+            .then(response => response)
             .catch(error => {
                 this.logFailure(error);
                 return error.response;
@@ -200,9 +198,7 @@ const api = {
     async createPCountResult(indicator_id, form_data) {
         return await this.apiInstance.post(`/pcount_result_create/${indicator_id}`,
             form_data, {headers: {'Content-Type': 'application/json'}})
-            .then(response => {
-                return response;
-            })
+            .then(response => response)
             .catch(error => {
                 this.logFailure(error);
                 return error.response;
@@ -210,9 +206,7 @@ const api = {
     },
     async getPCountResultUpdateData(result_id) {
         return await this.apiInstance.get(`/pcount_result_update/${result_id}`)
-            .then(response => {
-                return response.data;
-            })
+            .then(response => response)
             .catch(error => {
                 this.logFailure(error);
                 return error.response;
@@ -221,9 +215,7 @@ const api = {
     async updatePCountResult(result_id, form_data) {
         return await this.apiInstance.put(`/pcount_result_update/${result_id}`,
             form_data, {headers: {'Content-Type': 'application/json'}})
-            .then(response => {
-                return response;
-            })
+            .then(response => response)
             .catch(error => {
                 this.logFailure(error);
                 return error.response;

@@ -9,7 +9,7 @@ const ActualValueFields = ({ disaggregationData, setDisaggregationData, formErro
         update[inputDisagg].labels[inputLabelIndex] = {...disaggregationData[inputDisagg].labels[inputLabelIndex], value: value};
         setDisaggregationData(update);
     }
-    
+
     let handleValdiation = () => {
         let detectedErrors = {...formErrors};
         let valid = true;
@@ -24,7 +24,7 @@ const ActualValueFields = ({ disaggregationData, setDisaggregationData, formErro
         setFormErrors(detectedErrors);
         handleSADDActualsValidation(detectedErrors);
     }
-    
+
     return (
         <fieldset>
             <ul className="list-group form-list-group">
@@ -32,7 +32,7 @@ const ActualValueFields = ({ disaggregationData, setDisaggregationData, formErro
                     <div className="item__value--header">
                         <div className="item__label">
                             <label className="label--required">{gettext('Total Participant Actual Values')}</label>
-                            <HelpText 
+                            <HelpText
                                 text={gettext('Include the participants with double counting on the left and participants without double counting across programs on the right. Double counting a participant means to count one individual more than one time. For example, a participant who took part in two or more programs. If two programs share participants, only discount double counting in one program!<br/><br/><strong>Direct participants</strong> – are those who have received a tangible benefit from the program, either as the actual program participants or the intended recipients of the program benefits.<br/><br/><strong>Indirect participants</strong> – are those who received a tangible benefit through their proximity to or contact with program participants or activities.')}
                             />
                         </div>
@@ -44,10 +44,10 @@ const ActualValueFields = ({ disaggregationData, setDisaggregationData, formErro
                 </li>
 
                 <li className="list-group-item">
-                    <div className="item__label">{disaggregationData["Actual with double counting"].labels[0].label}</div>
+                    <div className="item__label">{gettext(disaggregationData["Actual with double counting"].labels[0].label)}</div>
                     <div className="item__value--container">
-                        <input 
-                            type="number" 
+                        <input
+                            type="number"
                             className="bin form-control input-value"
                             id="id_Actual-without-double-counting--Direct"
                             name="Actual-without-double-counting--Direct"
@@ -56,8 +56,8 @@ const ActualValueFields = ({ disaggregationData, setDisaggregationData, formErro
                             onChange={(e) => handleDataEntry(e.target.value, "Actual without double counting", 0)}
                             onBlur={() => handleValdiation()}
                         />
-                        <input 
-                            type="number" 
+                        <input
+                            type="number"
                             className="bin form-control input-value"
                             id="id_Actual-with-double-counting--Direct"
                             name="Actual-with-double-counting--Direct"
@@ -70,11 +70,11 @@ const ActualValueFields = ({ disaggregationData, setDisaggregationData, formErro
                 </li>
 
                 <li className="list-group-item">
-                    <div className="item__label">{disaggregationData["Actual without double counting"].labels[1].label}</div>
+                    <div className="item__label">{gettext(disaggregationData["Actual without double counting"].labels[1].label)}</div>
                     <div className="item__value--container">
-                        <input 
-                            type="number" 
-                            className="bin form-control input-value" 
+                        <input
+                            type="number"
+                            className="bin form-control input-value"
                             id="id_Actual-without-double-counting--Indirect"
                             name="Actual-without-double-counting--Indirect"
                             disabled={readOnly}
@@ -82,9 +82,9 @@ const ActualValueFields = ({ disaggregationData, setDisaggregationData, formErro
                             onChange={(e) => handleDataEntry(e.target.value, "Actual without double counting", 1)}
                             onBlur={() => handleValdiation()}
                         />
-                        <input 
-                            type="number" 
-                            className="bin form-control input-value" 
+                        <input
+                            type="number"
+                            className="bin form-control input-value"
                             id="id_Actual-with-double-counting--Indirect"
                             name="Actual-with-double-counting--Indirect"
                             disabled={readOnly}
