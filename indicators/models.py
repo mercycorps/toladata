@@ -500,7 +500,9 @@ class DisaggregationType(models.Model):
     a global disaggregation type you will need to add the marked string to this list.
     """
     TRANSLATED_DISAGGREGATION_LABELS = [
-        _("Sex and Age Disaggregated Data (SADD)")
+        _("Sex and Age Disaggregated Data (SADD)"),
+        _("Sectors Direct with double counting"),
+        _("Sectors Indirect with double counting"),
     ]
 
     DISAG_COUNTRY_ONLY = 0
