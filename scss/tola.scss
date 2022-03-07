@@ -110,6 +110,7 @@
 @import 'components/alert-banner'; // banners that appear at the top of the page; extend bootstrap alert class
 @import 'components/pnotify'; // overloads pnotify styles & adds our own
 @import 'components/import_indicators'; // Import indicator popover styles
+@import 'components/component_status'; // Component statuses styles
 
 /* Local custom CSS and overloads for non-BS libraries */
 @import 'mc_tola_forms'; // extremely custom!
