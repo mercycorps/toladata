@@ -5391,12 +5391,11 @@ msgstr "Rechercher"
 msgid "City, Country:"
 msgstr "Ville, Pays :"
 
+#~ msgid "SADD (including unknown) with double counting"
+#~ msgstr "SADD (inconnu) avec double comptage"
 
-msgid "SADD (including unknown) with double counting"
-msgstr "SADD (inconnu) avec double comptage"
-
-msgid "SADD (including unknown) without double counting"
-msgstr "SADD (y compris inconnu) sans double comptage"
+#~ msgid "SADD (including unknown) without double counting"
+#~ msgstr "SADD (y compris inconnu) sans double comptage"
 
 #~ msgid "Actual without double counting"
 #~ msgstr "Réel sans double comptage"

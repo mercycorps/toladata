@@ -1,0 +1,20 @@
+.data-loading__container {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    min-width: 20vw;
+    min-height: 10vh;
+}
+
+.server-error__container {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    min-width: fit-content;
+    min-height: 10vh;
+    font-size: $font-size-lg;
+
+    .server-error__icon {
+        color: $danger;
+    }
+}

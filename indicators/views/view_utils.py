@@ -8,6 +8,8 @@ from indicators.models import (
     ExternalService
 )
 from dateutil.relativedelta import relativedelta
+from tola_management.models import ProgramAuditLog
+from django.db.models import Max
 
 logger = logging.getLogger(__name__)
 
@@ -131,3 +133,49 @@ def indicator_letter_generator(start_letter=1):
             yield string.ascii_lowercase[current_index // 26 - 1] + \
                        string.ascii_lowercase[current_index % 26]
         current_index += 1
+
+
+def program_rollup_data(program, for_csv=False):
+    """
+    Used to populate the program rollup data for endpoints: programs_rollup_export, programs_rollup_export_csv
+
+    Params
+        program
+            The program object
+        for_csv
+            Defaults to False. Dictates if the return value should be a list for CSV or a dict for JSON
+
+    Returns
+        dict or list if for_csv
+    """
+    recent_change_log = {k:v.date() for (k, v) in ProgramAuditLog.objects.filter(program=program) \
+        .values_list('program').annotate(latest_date=Max('date'))}
+
+    dict = {
+            "unique_id": program.pk,
+            "program_name": program.name,
+            "gait_id": program.gaitid,
+            "countries": " / ".join([c.country for c in program.country.all()]) if for_csv else [c.country for c in program.country.all()],
+            "sectors": " / ".join(set([i.sector.sector for i in program.indicator_set.all() if i.sector and i.sector.sector])) 
+            if for_csv else set([i.sector.sector for i in program.indicator_set.all() if i.sector and i.sector.sector]),
+            "status": "active" if program.funding_status.lower().strip() == "funded" else "inactive",
+            "funding_status": program.funding_status,
+            "start_date": program.reporting_period_start.isoformat() if program.reporting_period_start else "",
+            "end_date": program.reporting_period_end.isoformat() if program.reporting_period_end else "",
+            "tola_creation_date": program.create_date.date().isoformat() if program.create_date else "",
+            "most_recent_change_log_entry": recent_change_log.get(program.id, "None"),
+            "program_period": "{}%".format(program.percent_complete) if program.percent_complete >= 0 else "",
+            "indicator_count": program.metrics['indicator_count'],
+            "indicators_reporting_above_target": program.scope_counts['high'],
+            "indicators_reporting_on_target": program.scope_counts['on_scope'],
+            "indicators_reporting_below_target": program.scope_counts['low'],
+            "indicators_with_targets": program.metrics['targets_defined'],
+            "indicators_with_results": program.metrics['reported_results'],
+            "results_count": program.metrics['results_count'],
+            "results_with_evidence": program.metrics['results_evidence']
+        }
+
+    if for_csv:
+        return list(dict.values())
+
+    return dict
