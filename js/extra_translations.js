@@ -17,5 +17,9 @@ indicators.models.DisaggregationType.GLOBAL_DISAGGREGATION_LABELS
 const globalDisaggregationTypes = [
     gettext("Sex and Age Disaggregated Data (SADD)"),
     gettext("Sectors Direct with double counting"),
-    gettext("Sectors Indirect with double counting")
+    gettext("Sectors Indirect with double counting"),
+    gettext("SADD (including unknown) with double counting"),
+    gettext("SADD (including unknown) without double counting"),
+    gettext("Actual without double counting"),
+    gettext("Actual with double counting")
 ];

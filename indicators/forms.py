@@ -339,7 +339,7 @@ class IndicatorForm(forms.ModelForm):
             if not disagg.categories:
                 return ''
             helptext = '<ul class=&quot;popover-list&quot;>{}</ul>'.format(
-                ''.join(['<li>{}</li>'.format(category.label) for category in disagg.categories])
+                ''.join(['<li>{}</li>'.format(_(category.label)) for category in disagg.categories])
                 )
             if getattr(disagg, 'has_results'):
                 helptext += '<br /><i>{}</i>'.format(
