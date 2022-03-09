@@ -1,33 +1,33 @@
 from django.utils.translation import ugettext_lazy as _
 
 # Translators: One of several options for specifying how often data is collected or reported on over the life of a program
-string0 = _("Final evaluation")
+string0 = _("By distribution")
 # Translators: One of several options for specifying how often data is collected or reported on over the life of a program
-string1 = _("By event")
+string1 = _("By batch")
 # Translators: One of several options for specifying how often data is collected or reported on over the life of a program
-string2 = _("By distribution")
+string2 = _("Semi-annual")
 # Translators: One of several options for specifying how often data is collected or reported on over the life of a program
-string3 = _("Semi-annual")
+string3 = _("Baseline")
 # Translators: One of several options for specifying how often data is collected or reported on over the life of a program
-string4 = _("Baseline")
+string4 = _("Post shock")
 # Translators: One of several options for specifying how often data is collected or reported on over the life of a program
-string5 = _("Post shock")
+string5 = _("By training")
 # Translators: One of several options for specifying how often data is collected or reported on over the life of a program
-string6 = _("Annual")
+string6 = _("By event")
 # Translators: One of several options for specifying how often data is collected or reported on over the life of a program
-string7 = _("Midline")
+string7 = _("Quarterly")
 # Translators: One of several options for specifying how often data is collected or reported on over the life of a program
-string8 = _("Weekly")
+string8 = _("Annual")
 # Translators: One of several options for specifying how often data is collected or reported on over the life of a program
-string9 = _("By training")
+string9 = _("Weekly")
 # Translators: One of several options for specifying how often data is collected or reported on over the life of a program
-string10 = _("By batch")
+string10 = _("Final evaluation")
 # Translators: One of several options for specifying how often data is collected or reported on over the life of a program
-string11 = _("Endline")
+string11 = _("Monthly")
 # Translators: One of several options for specifying how often data is collected or reported on over the life of a program
-string12 = _("Quarterly")
+string12 = _("Endline")
 # Translators: One of several options for specifying how often data is collected or reported on over the life of a program
-string13 = _("Monthly")
+string13 = _("Midline")
 # Translators: One of several choices for what sector (i.e. development domain) a program is most closely associated with
 string14 = _("Agribusiness")
 # Translators: One of several choices for what sector (i.e. development domain) a program is most closely associated with

@@ -2,8 +2,8 @@ msgid ""
 msgstr ""
 "Project-Id-Version: \n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2022-03-03 11:06-0800\n"
-"PO-Revision-Date: 2022-03-03 10:53-0800\n"
+"POT-Creation-Date: 2022-03-09 11:43-0800\n"
+"PO-Revision-Date: 2022-03-09 12:53-0800\n"
 "Last-Translator: \n"
 "Language-Team: \n"
 "Language: es\n"
@@ -102,7 +102,7 @@ msgstr "Continuar"
 #: js/components/ImportIndicatorsPopover.js:419
 #: js/components/ImportIndicatorsPopover.js:631
 #: js/components/changesetNotice.js:66
-#: js/pages/results_form_PC/resultsFormPC.js:353
+#: js/pages/results_form_PC/resultsFormPC.js:380
 #: js/pages/results_framework/components/level_cards.js:578
 msgid "Cancel"
 msgstr "Cancelar"
@@ -226,6 +226,7 @@ msgstr ""
 
 #. Translators: Notification for a error that happend on the web server.
 #: js/components/ImportIndicatorsPopover.js:688
+#: js/components/componentStatus.js:21
 msgid "There was a server-related problem."
 msgstr "Hubo un problema relacionado con el servidor."
 
@@ -366,7 +367,7 @@ msgstr "Nuevo Valor"
 
 #. Translators: This is a label for a dropdown that presents several possible justifications for changing a value
 #: js/components/changesetNotice.js:19
-#: js/pages/results_form_PC/resultsFormPC.js:242
+#: js/pages/results_form_PC/resultsFormPC.js:270
 #: js/pages/results_framework/components/level_cards.js:404
 #: js/pages/tola_management_pages/audit_log/views.js:248
 msgid "Reason for change"
@@ -434,13 +435,13 @@ msgstr "Línea media y línea final"
 
 #. Translators: One of several options for specifying how often data is collected or reported on over the life of a program
 #: js/constants.js:39 js/pages/iptt_quickstart/models/ipttQSRootStore.js:32
-#: tola/db_translations.js:14
+#: tola/db_translations.js:18
 msgid "Annual"
 msgstr "Anual"
 
 #. Translators: One of several options for specifying how often data is collected or reported on over the life of a program
 #: js/constants.js:40 js/pages/iptt_quickstart/models/ipttQSRootStore.js:33
-#: tola/db_translations.js:8
+#: tola/db_translations.js:6
 msgid "Semi-annual"
 msgstr "Semestral"
 
@@ -450,13 +451,13 @@ msgstr "Trienal"
 
 #. Translators: One of several options for specifying how often data is collected or reported on over the life of a program
 #: js/constants.js:42 js/pages/iptt_quickstart/models/ipttQSRootStore.js:35
-#: tola/db_translations.js:26
+#: tola/db_translations.js:16
 msgid "Quarterly"
 msgstr "Trimestral"
 
 #. Translators: One of several options for specifying how often data is collected or reported on over the life of a program
 #: js/constants.js:43 js/pages/iptt_quickstart/models/ipttQSRootStore.js:36
-#: tola/db_translations.js:28
+#: tola/db_translations.js:24
 msgid "Monthly"
 msgstr "Mensual"
 
@@ -491,6 +492,22 @@ msgstr "Sectores directos (Recuento Doble)"
 #: js/extra_translations.js:20
 msgid "Sectors Indirect with double counting"
 msgstr "Sectores indirectos (Recuento Doble)"
+
+#: js/extra_translations.js:21
+msgid "SADD (including unknown) with double counting"
+msgstr "SADD (desconocido) con cómputo doble"
+
+#: js/extra_translations.js:22
+msgid "SADD (including unknown) without double counting"
+msgstr "SADD (desconocido) sin cómputo doble"
+
+#: js/extra_translations.js:23
+msgid "Actual without double counting"
+msgstr "Real sin cómputo doble"
+
+#: js/extra_translations.js:24
+msgid "Actual with double counting"
+msgstr "Real con cómputo doble"
 
 #: js/level_utils.js:17
 msgid "Mercy Corps"
@@ -541,7 +558,7 @@ msgstr "Objetivo Específico"
 msgid "Purpose"
 msgstr "Finalidad"
 
-#: js/level_utils.js:36 js/pages/results_form_PC/resultsFormPC.js:265
+#: js/level_utils.js:36 js/pages/results_form_PC/resultsFormPC.js:292
 msgid "Result"
 msgstr "Resultado"
 
@@ -802,7 +819,7 @@ msgstr "# / %"
 #: js/pages/iptt_report/components/report/tableHeader.js:159
 #: js/pages/iptt_report/models/filterStore.js:737
 #: js/pages/program_page/components/indicator_list.js:206
-#: tola/db_translations.js:10
+#: tola/db_translations.js:8
 msgid "Baseline"
 msgstr "Base"
 
@@ -1362,7 +1379,7 @@ msgstr ""
 "borrar este informe fijado?"
 
 #: js/pages/results_form_PC/components/ActualValueFields.js:20
-#: js/pages/results_form_PC/resultsFormPC.js:100
+#: js/pages/results_form_PC/resultsFormPC.js:101
 msgid ""
 "Direct/indirect without double counting should be equal to or lower than "
 "direct/indirect with double counting."
@@ -1413,13 +1430,13 @@ msgid "Total Participants"
 msgstr "Participantes totales"
 
 #: js/pages/results_form_PC/components/CommonFields.js:41
-#: js/pages/results_form_PC/resultsFormPC.js:79
+#: js/pages/results_form_PC/resultsFormPC.js:80
 msgid "This date should be within the fiscal year of the reporting period."
 msgstr ""
 "Esta fecha debe estar dentro del año fiscal del período de notificación."
 
 #: js/pages/results_form_PC/components/CommonFields.js:50
-#: js/pages/results_form_PC/resultsFormPC.js:87
+#: js/pages/results_form_PC/resultsFormPC.js:88
 msgid "Please complete this field. You can select more than one outcome theme."
 msgstr ""
 "Por favor, complete este campo. Puede seleccionar más de un tema de "
@@ -1520,7 +1537,7 @@ msgstr ""
 "‘Directo sin doble cómputo’."
 
 #: js/pages/results_form_PC/components/DisaggregationFields.js:72
-#: js/pages/results_form_PC/resultsFormPC.js:115
+#: js/pages/results_form_PC/resultsFormPC.js:116
 msgid ""
 "Sector values should be less than or equal to the 'Direct/Indirect with "
 "double counting' value."
@@ -1549,17 +1566,17 @@ msgid "Total Indirect Participants"
 msgstr "Total de participantes indirectos"
 
 #: js/pages/results_form_PC/components/EvidenceFields.js:16
-#: js/pages/results_form_PC/resultsFormPC.js:130
+#: js/pages/results_form_PC/resultsFormPC.js:131
 msgid "Please enter a valid evidence link."
 msgstr "Por favor, introduzca un enlace de prueba válido."
 
 #: js/pages/results_form_PC/components/EvidenceFields.js:19
-#: js/pages/results_form_PC/resultsFormPC.js:133
+#: js/pages/results_form_PC/resultsFormPC.js:134
 msgid "A record name must be included along with the link."
 msgstr "Se debe incluir un nombre de registro junto con el enlace."
 
 #: js/pages/results_form_PC/components/EvidenceFields.js:23
-#: js/pages/results_form_PC/resultsFormPC.js:137
+#: js/pages/results_form_PC/resultsFormPC.js:138
 msgid "A link must be included along with the record name."
 msgstr "Debe incluir un enlace junto al nombre del registro."
 
@@ -1602,7 +1619,7 @@ msgstr "Nombre del registro"
 msgid "Give your record a short name that is easy to remember."
 msgstr "Dé a su registro un nombre corto que sea fácil de recordar."
 
-#: js/pages/results_form_PC/resultsFormPC.js:64
+#: js/pages/results_form_PC/resultsFormPC.js:65
 msgid ""
 "The sum of 'SADD with double counting' should be equal to the sum of 'Direct "
 "with double counting'."
@@ -1610,7 +1627,7 @@ msgstr ""
 "La suma de ‘SADD con cómputo doble’ debe ser igual a la suma de ‘Directo con "
 "cómputo doble’."
 
-#: js/pages/results_form_PC/resultsFormPC.js:67
+#: js/pages/results_form_PC/resultsFormPC.js:68
 msgid ""
 "The sum of 'SADD without double counting' should be equal to the sum of "
 "'Direct without double counting'."
@@ -1618,12 +1635,12 @@ msgstr ""
 "La suma de ‘SADD sin cómputo doble’ debe ser igual a la suma de ‘Directo sin "
 "cómputo doble’."
 
-#: js/pages/results_form_PC/resultsFormPC.js:83
+#: js/pages/results_form_PC/resultsFormPC.js:84
 msgid "You cannot change the fiscal year during the current reporting period. "
 msgstr ""
 "No se puede cambiar el año fiscal durante el período de notificación actual."
 
-#: js/pages/results_form_PC/resultsFormPC.js:94
+#: js/pages/results_form_PC/resultsFormPC.js:95
 msgid ""
 "Direct/indirect total participants with double counting is required. Please "
 "complete these fields."
@@ -1631,7 +1648,7 @@ msgstr ""
 "Se requiere un total de participantes directos/indirectos con cómputo doble. "
 "Por favor, complete estos campos."
 
-#: js/pages/results_form_PC/resultsFormPC.js:245
+#: js/pages/results_form_PC/resultsFormPC.js:273
 #: js/pages/results_framework/components/level_cards.js:406
 msgid ""
 "Your changes will be recorded in a change log.  For future reference, please "
@@ -1640,11 +1657,11 @@ msgstr ""
 "Sus cambios serán guardados en un registro de cambios. Para referencia "
 "futura, indique la justificación para estos cambios."
 
-#: js/pages/results_form_PC/resultsFormPC.js:272
+#: js/pages/results_form_PC/resultsFormPC.js:299
 msgid "Participant Count"
 msgstr "Cómputo de participantes"
 
-#: js/pages/results_form_PC/resultsFormPC.js:346
+#: js/pages/results_form_PC/resultsFormPC.js:373
 #: js/pages/results_framework/components/level_cards.js:575
 msgid "Save and close"
 msgstr "Guardar y cerrar"
@@ -2794,48 +2811,48 @@ msgstr "usuarios"
 
 #. Translators: One of several options for specifying how often data is collected or reported on over the life of a program
 #: tola/db_translations.js:2
-msgid "Final evaluation"
-msgstr "Evaluación final"
-
-#. Translators: One of several options for specifying how often data is collected or reported on over the life of a program
-#: tola/db_translations.js:4
-msgid "By event"
-msgstr "Por evento"
-
-#. Translators: One of several options for specifying how often data is collected or reported on over the life of a program
-#: tola/db_translations.js:6
 msgid "By distribution"
 msgstr "Por distribución"
 
 #. Translators: One of several options for specifying how often data is collected or reported on over the life of a program
-#: tola/db_translations.js:12
-msgid "Post shock"
-msgstr "Posterior al desastre"
-
-#. Translators: One of several options for specifying how often data is collected or reported on over the life of a program
-#: tola/db_translations.js:16
-msgid "Midline"
-msgstr "Línea media"
-
-#. Translators: One of several options for specifying how often data is collected or reported on over the life of a program
-#: tola/db_translations.js:18
-msgid "Weekly"
-msgstr "Semanal"
-
-#. Translators: One of several options for specifying how often data is collected or reported on over the life of a program
-#: tola/db_translations.js:20
-msgid "By training"
-msgstr "Por formación"
-
-#. Translators: One of several options for specifying how often data is collected or reported on over the life of a program
-#: tola/db_translations.js:22
+#: tola/db_translations.js:4
 msgid "By batch"
 msgstr "Por lotes"
 
 #. Translators: One of several options for specifying how often data is collected or reported on over the life of a program
-#: tola/db_translations.js:24
+#: tola/db_translations.js:10
+msgid "Post shock"
+msgstr "Posterior al desastre"
+
+#. Translators: One of several options for specifying how often data is collected or reported on over the life of a program
+#: tola/db_translations.js:12
+msgid "By training"
+msgstr "Por formación"
+
+#. Translators: One of several options for specifying how often data is collected or reported on over the life of a program
+#: tola/db_translations.js:14
+msgid "By event"
+msgstr "Por evento"
+
+#. Translators: One of several options for specifying how often data is collected or reported on over the life of a program
+#: tola/db_translations.js:20
+msgid "Weekly"
+msgstr "Semanal"
+
+#. Translators: One of several options for specifying how often data is collected or reported on over the life of a program
+#: tola/db_translations.js:22
+msgid "Final evaluation"
+msgstr "Evaluación final"
+
+#. Translators: One of several options for specifying how often data is collected or reported on over the life of a program
+#: tola/db_translations.js:26
 msgid "Endline"
 msgstr "Línea final"
+
+#. Translators: One of several options for specifying how often data is collected or reported on over the life of a program
+#: tola/db_translations.js:28
+msgid "Midline"
+msgstr "Línea media"
 
 #. Translators: One of several choices for what sector (i.e. development domain) a program is most closely associated with
 #: tola/db_translations.js:30
