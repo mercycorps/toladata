@@ -15,15 +15,15 @@ from django.db.models import Q
 from django.utils.translation import gettext
 from django.http import HttpResponse, JsonResponse
 from django.shortcuts import render, reverse, redirect, get_object_or_404
-
+from rest_framework import response, status, decorators
 from indicators.serializers import (
     LevelSerializer,
     LevelTierSerializer,
 )
-from django.db.models import Max
 from indicators.queries import ProgramWithMetrics
 from indicators.xls_export_utils import TAN, apply_title_styling, apply_label_styling
 from indicators.models import Indicator, PinnedReport, Level, LevelTier
+from indicators.views import view_utils
 from workflow.models import Program, Country
 from workflow.serializers import LogframeProgramSerializer
 from workflow.serializers_new import (
@@ -210,34 +210,21 @@ def logframe_excel_view(request, program):
 
 
 @login_required
+@decorators.api_view(['GET'])
 def programs_rollup_export(request):
     program_pks = [p.pk for p in request.user.tola_user.available_programs]
     annotated_programs = ProgramWithMetrics.home_page.filter(pk__in=program_pks).with_annotations()
-    data = {
-        p.gaitid if p.gaitid else "no gait id {}".format(count): {
-            'gaitid': p.gaitid,
-            'name': p.name,
-            'tola_creation_date': p.create_date.date().isoformat(),
-            'is_active': p.funding_status.lower().strip() == 'funded',
-            'indicator_count': p.metrics['indicator_count'],
-            'indicators_with_targets': p.metrics['targets_defined'],
-            'indicators_with_results': p.metrics['reported_results'],
-            'results_count': p.metrics['results_count'],
-            'results_with_evidence': p.metrics['results_evidence'],
-            'indicators_reporting_scope': p.scope_counts['reporting_count'],
-            'indicators_reporting_on_target': p.scope_counts['on_scope'],
-            'indicators_reporting_below_target': p.scope_counts['low'],
-            'indicators_reporting_above_target': p.scope_counts['high'],
-            } for count, p in enumerate(annotated_programs)
-        }
-    return JsonResponse(data)
+
+    data = [view_utils.program_rollup_data(program) for program in annotated_programs]
+
+    return response.Response(data=data, status=status.HTTP_200_OK)
 
 
 @login_required
 def programs_rollup_export_csv(request):
     # TODO: after LevelUp please remove unicode calls:
     CSV_HEADERS = [
-        'program_name', 'gait_id', 'countries', 'sectors', 'status', 'funding_status', 'start_date', 'end_date',
+        'unique_id', 'program_name', 'gait_id', 'countries', 'sectors', 'status', 'funding_status', 'start_date', 'end_date',
         'tola_creation_date', 'most_recent_change_log_entry', 'program_period', 'indicator_count', 'indicators_reporting_above_target',
         'indicators_reporting_on_target', 'indicators_reporting_below_target', 'indicators_with_targets',
         'indicators_with_results', 'results_count', 'results_with_evidence'
@@ -250,32 +237,12 @@ def programs_rollup_export_csv(request):
     writer.writerow(CSV_HEADERS)
     program_pks = [p.pk for p in request.user.tola_user.available_programs]
     annotated_programs = ProgramWithMetrics.home_page.filter(pk__in=program_pks).with_annotations()
-    recent_change_log = {k:v.date() for (k, v) in ProgramAuditLog.objects.filter(program__in=annotated_programs) \
-        .values_list('program').annotate(latest_date=Max('date'))}
+
     for program in sorted([p for p in annotated_programs], key=lambda p: p.name):
-        row = [
-            program.name,
-            program.gaitid if program.gaitid else "no gait_id, program id {}".format(program.id),
-            " / ".join([c.country for c in program.country.all()]),
-            " / ".join(set([i.sector.sector for i in program.indicator_set.all() if i.sector and i.sector.sector])),
-            "active" if program.funding_status.lower().strip() == 'funded' else "inactive",
-            program.funding_status,
-            program.reporting_period_start.isoformat() if program.reporting_period_start else '',
-            program.reporting_period_end.isoformat() if program.reporting_period_end else '',
-            program.create_date.date().isoformat() if program.create_date else '',
-            recent_change_log.get(program.id, "None"),
-            '{}%'.format(program.percent_complete) if program.percent_complete >= 0 else '',
-            program.metrics['indicator_count'],
-            program.scope_counts['high'],
-            program.scope_counts['on_scope'],
-            program.scope_counts['low'],
-            program.metrics['targets_defined'],
-            program.metrics['reported_results'],
-            program.metrics['results_count'],
-            program.metrics['results_evidence']
-        ]
+        row = view_utils.program_rollup_data(program=program, for_csv=True)
         row = [str(s) for s in row]
         writer.writerow(row)
+
     return response
 
 
