@@ -5382,11 +5382,11 @@ msgstr "Encontrar"
 msgid "City, Country:"
 msgstr "Ciudad, País:"
 
-#~ msgid "SADD (including unknown) with double counting"
-#~ msgstr "SADD (desconocido) con cómputo doble"
+msgid "SADD (including unknown) with double counting"
+msgstr "SADD (desconocido) con cómputo doble"
 
-#~ msgid "SADD (including unknown) without double counting"
-#~ msgstr "SADD (desconocido) sin cómputo doble"
+msgid "SADD (including unknown) without double counting"
+msgstr "SADD (desconocido) sin cómputo doble"
 
 #~ msgid "Result deleted"
 #~ msgstr "Resultado eliminado"
