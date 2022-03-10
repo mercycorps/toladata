@@ -3,7 +3,7 @@ msgstr ""
 "Project-Id-Version: \n"
 "Report-Msgid-Bugs-To: \n"
 "POT-Creation-Date: 2022-03-10 07:45-0800\n"
-"PO-Revision-Date: 2022-03-10 10:48-0500\n"
+"PO-Revision-Date: 2022-03-10 12:07-0500\n"
 "Last-Translator: \n"
 "Language-Team: \n"
 "Language: fr\n"
@@ -1399,6 +1399,7 @@ msgid "Total Participant Actual Values"
 msgstr "Valeurs réelles du total de participants"
 
 #: js/pages/results_form_PC/components/ActualValueFields.js:36
+#, fuzzy
 msgid ""
 "Include the participants with double counting on the left and participants "
 "without double counting across programs on the right. Double counting a "

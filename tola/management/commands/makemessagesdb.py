@@ -1,8 +1,8 @@
-
 from os import path
 from django.core.management.base import BaseCommand
 from django.conf import settings
-from indicators.models import Sector, IndicatorType, ReportingFrequency, DataCollectionFrequency
+from indicators.models import Sector, IndicatorType, ReportingFrequency, DataCollectionFrequency, DisaggregationLabel, \
+    DisaggregationType, OutcomeTheme
 
 
 class Command(BaseCommand):
@@ -34,9 +34,17 @@ def create_translated_db_items(js_filename, py_filename, root_path=settings.DJAN
     ]
     frequency_translator_comment = 'One of several options for specifying how often data is collected or reported on over the life of a program'
     other_models = [
-        (Sector, 'sector', 'One of several choices for what sector (i.e. development domain) a program is most closely associated with'),
-        (IndicatorType, 'indicator_type', 'One of several choices for specifying what type of Indicator is being created.  An Indicator is a performance measure e.g. "We will distrubute 1000 food packs over the next two months"')
+        (Sector, 'sector',
+         'One of several choices for what sector (i.e. development domain) a program is most closely associated with'),
+        (IndicatorType, 'indicator_type',
+         'One of several choices for specifying what type of Indicator is being created.  An Indicator is a performance measure e.g. "We will distribute 1000 food packs over the next two months"'),
+        (OutcomeTheme, 'name', 'The main area of a program')
     ]
+    disaggregationlabel_model = [
+        (DisaggregationLabel, 'label',
+         'One of several choices for what label/sector (i.e. development domain) a program is most closely associated with')]
+    # List with 'Global (participant count only)' disaggregation types which are associated with disaggregation labels that need to be translated.
+    disagg_type_list = ["Sectors Direct with double counting", 'Actual without double counting']
 
     frequency_strings_to_translate = set()
     for model, field in frequency_models:
@@ -45,6 +53,12 @@ def create_translated_db_items(js_filename, py_filename, root_path=settings.DJAN
 
     for model, field, translator_comment in other_models:
         strings_to_translate = list(model.objects.order_by(field).values_list(field, flat=True))
+        all_strings_to_translate += [(string, translator_comment) for string in strings_to_translate]
+
+    for model, field, translator_comment in disaggregationlabel_model:
+        strings_to_translate = list(DisaggregationLabel.objects.filter(
+            disaggregation_type_id__in=DisaggregationType.objects.filter(
+                disaggregation_type__in=disagg_type_list)).order_by(field).values_list(field, flat=True))
         all_strings_to_translate += [(string, translator_comment) for string in strings_to_translate]
 
     string_num = 0
@@ -62,4 +76,3 @@ def create_translated_db_items(js_filename, py_filename, root_path=settings.DJAN
             fh.write(f'// # Translators: {translator_comment}\n')
             fh.write(f'string{string_num} = gettext("{string}")\n')
             string_num += 1
-

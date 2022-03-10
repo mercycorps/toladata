@@ -1,33 +1,33 @@
 from django.utils.translation import ugettext_lazy as _
 
 # Translators: One of several options for specifying how often data is collected or reported on over the life of a program
-string0 = _("By batch")
+string0 = _("By distribution")
 # Translators: One of several options for specifying how often data is collected or reported on over the life of a program
-string1 = _("By event")
+string1 = _("By batch")
 # Translators: One of several options for specifying how often data is collected or reported on over the life of a program
-string2 = _("Monthly")
+string2 = _("Semi-annual")
 # Translators: One of several options for specifying how often data is collected or reported on over the life of a program
-string3 = _("Post shock")
+string3 = _("Baseline")
 # Translators: One of several options for specifying how often data is collected or reported on over the life of a program
-string4 = _("Annual")
+string4 = _("Post shock")
 # Translators: One of several options for specifying how often data is collected or reported on over the life of a program
-string5 = _("Midline")
+string5 = _("By training")
 # Translators: One of several options for specifying how often data is collected or reported on over the life of a program
-string6 = _("By training")
+string6 = _("By event")
 # Translators: One of several options for specifying how often data is collected or reported on over the life of a program
-string7 = _("Final evaluation")
+string7 = _("Quarterly")
 # Translators: One of several options for specifying how often data is collected or reported on over the life of a program
-string8 = _("Baseline")
+string8 = _("Annual")
 # Translators: One of several options for specifying how often data is collected or reported on over the life of a program
-string9 = _("Quarterly")
+string9 = _("Weekly")
 # Translators: One of several options for specifying how often data is collected or reported on over the life of a program
-string10 = _("By distribution")
+string10 = _("Final evaluation")
 # Translators: One of several options for specifying how often data is collected or reported on over the life of a program
-string11 = _("Endline")
+string11 = _("Monthly")
 # Translators: One of several options for specifying how often data is collected or reported on over the life of a program
-string12 = _("Weekly")
+string12 = _("Endline")
 # Translators: One of several options for specifying how often data is collected or reported on over the life of a program
-string13 = _("Semi-annual")
+string13 = _("Midline")
 # Translators: One of several choices for what sector (i.e. development domain) a program is most closely associated with
 string14 = _("Agribusiness")
 # Translators: One of several choices for what sector (i.e. development domain) a program is most closely associated with
@@ -120,21 +120,55 @@ string57 = _("Water Supply Infrastructure")
 string58 = _("Workforce Development")
 # Translators: One of several choices for what sector (i.e. development domain) a program is most closely associated with
 string59 = _("Youth")
-# Translators: One of several choices for specifying what type of Indicator is being created.  An Indicator is a performance measure e.g. "We will distrubute 1000 food packs over the next two months"
+# Translators: One of several choices for specifying what type of Indicator is being created.  An Indicator is a performance measure e.g. "We will distribute 1000 food packs over the next two months"
 string60 = _("Context / Trigger")
-# Translators: One of several choices for specifying what type of Indicator is being created.  An Indicator is a performance measure e.g. "We will distrubute 1000 food packs over the next two months"
+# Translators: One of several choices for specifying what type of Indicator is being created.  An Indicator is a performance measure e.g. "We will distribute 1000 food packs over the next two months"
 string61 = _("Custom")
-# Translators: One of several choices for specifying what type of Indicator is being created.  An Indicator is a performance measure e.g. "We will distrubute 1000 food packs over the next two months"
+# Translators: One of several choices for specifying what type of Indicator is being created.  An Indicator is a performance measure e.g. "We will distribute 1000 food packs over the next two months"
 string62 = _("DIG - Alpha")
-# Translators: One of several choices for specifying what type of Indicator is being created.  An Indicator is a performance measure e.g. "We will distrubute 1000 food packs over the next two months"
+# Translators: One of several choices for specifying what type of Indicator is being created.  An Indicator is a performance measure e.g. "We will distribute 1000 food packs over the next two months"
 string63 = _("DIG - Standard")
-# Translators: One of several choices for specifying what type of Indicator is being created.  An Indicator is a performance measure e.g. "We will distrubute 1000 food packs over the next two months"
+# Translators: One of several choices for specifying what type of Indicator is being created.  An Indicator is a performance measure e.g. "We will distribute 1000 food packs over the next two months"
 string64 = _("DIG - Testing")
-# Translators: One of several choices for specifying what type of Indicator is being created.  An Indicator is a performance measure e.g. "We will distrubute 1000 food packs over the next two months"
+# Translators: One of several choices for specifying what type of Indicator is being created.  An Indicator is a performance measure e.g. "We will distribute 1000 food packs over the next two months"
 string65 = _("Donor")
-# Translators: One of several choices for specifying what type of Indicator is being created.  An Indicator is a performance measure e.g. "We will distrubute 1000 food packs over the next two months"
+# Translators: One of several choices for specifying what type of Indicator is being created.  An Indicator is a performance measure e.g. "We will distribute 1000 food packs over the next two months"
 string66 = _("Key Performance Indicator (KPI)")
-# Translators: One of several choices for specifying what type of Indicator is being created.  An Indicator is a performance measure e.g. "We will distrubute 1000 food packs over the next two months"
+# Translators: One of several choices for specifying what type of Indicator is being created.  An Indicator is a performance measure e.g. "We will distribute 1000 food packs over the next two months"
 string67 = _("Performance")
-# Translators: One of several choices for specifying what type of Indicator is being created.  An Indicator is a performance measure e.g. "We will distrubute 1000 food packs over the next two months"
+# Translators: One of several choices for specifying what type of Indicator is being created.  An Indicator is a performance measure e.g. "We will distribute 1000 food packs over the next two months"
 string68 = _("Process / Management")
+# Translators: The main area of a program
+string69 = _("Economic Opportunities")
+# Translators: The main area of a program
+string70 = _("Food Security")
+# Translators: The main area of a program
+string71 = _("Peace and Stability")
+# Translators: The main area of a program
+string72 = _("Resilience")
+# Translators: The main area of a program
+string73 = _("Water Security")
+# Translators: One of several choices for what label/sector (i.e. development domain) a program is most closely associated with
+string74 = _("Agriculture")
+# Translators: One of several choices for what label/sector (i.e. development domain) a program is most closely associated with
+string75 = _("Cash and Voucher Assistance")
+# Translators: One of several choices for what label/sector (i.e. development domain) a program is most closely associated with
+string76 = _("Direct")
+# Translators: One of several choices for what label/sector (i.e. development domain) a program is most closely associated with
+string77 = _("Employment")
+# Translators: One of several choices for what label/sector (i.e. development domain) a program is most closely associated with
+string78 = _("Environment (DRR, Energy and Water)")
+# Translators: One of several choices for what label/sector (i.e. development domain) a program is most closely associated with
+string79 = _("Financial Services")
+# Translators: One of several choices for what label/sector (i.e. development domain) a program is most closely associated with
+string80 = _("Governance and Partnership")
+# Translators: One of several choices for what label/sector (i.e. development domain) a program is most closely associated with
+string81 = _("Indirect")
+# Translators: One of several choices for what label/sector (i.e. development domain) a program is most closely associated with
+string82 = _("Infrastructure (non - WASH, non - energy)")
+# Translators: One of several choices for what label/sector (i.e. development domain) a program is most closely associated with
+string83 = _("Nutrition")
+# Translators: One of several choices for what label/sector (i.e. development domain) a program is most closely associated with
+string84 = _("Public Health (non - nutrition, non - WASH)")
+# Translators: One of several choices for what label/sector (i.e. development domain) a program is most closely associated with
+string85 = _("WASH")

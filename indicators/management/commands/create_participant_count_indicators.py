@@ -31,6 +31,7 @@ class Command(BaseCommand):
             help="Supresses the output so tests don't get too messy")
         parser.add_argument('--clean', action='store_true')
         parser.add_argument('--delete_pilot_pc_indicators', action='store_true')
+        parser.add_argument('--change_label_name', action='store_true')
 
     @transaction.atomic
     def handle(self, *args, **options):
@@ -69,6 +70,16 @@ class Command(BaseCommand):
 
             if not options['suppress_output']:
                 print(f'{deleted_ind} pilot pc indicators deleted, {len(pcind_id_list)-deleted_ind} not found')
+
+        if options['change_label_name']:
+            old_label = 'Health (non - nutrition)'
+            new_label = 'Public Health (non - nutrition, non - WASH)'
+            labels = DisaggregationLabel.objects.filter(label=old_label)
+            for label in labels:
+                label.label = new_label
+                label.save()
+                if not options['suppress_output']:
+                    print(f' Changed label name {old_label} to {new_label}')
 
         if options['create_disaggs_themes']:
             sadd_label_text = 'Age Unknown M, Age Unknown F, Age Unknown Sex Unknown, 0-5 M, 0-5 F, 0-5 Sex Unknown, 6-9 M, 6-9 F, 6-9 Sex Unknown, 10-14 M, 10-14 F, 10-14 Sex Unknown, 15-19 M, 15-19 F, 15-19 Sex Unknown, 20-24 M, 20-24 F, 20-24 Sex Unknown, 25-34 M, 25-34 F, 25-34 Sex Unknown, 35-49 M, 35-49 F, 35-49 Sex Unknown, 50+ M, 50+ F, 50+ Sex Unknown'
