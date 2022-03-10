@@ -2,8 +2,8 @@ msgid ""
 msgstr ""
 "Project-Id-Version: \n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2022-03-03 11:06-0800\n"
-"PO-Revision-Date: 2022-03-10 10:51-0500\n"
+"POT-Creation-Date: 2022-03-10 07:45-0800\n"
+"PO-Revision-Date: 2022-03-10 12:07-0500\n"
 "Last-Translator: \n"
 "Language-Team: \n"
 "Language: fr\n"
@@ -103,7 +103,7 @@ msgstr "Continuer"
 #: js/components/ImportIndicatorsPopover.js:419
 #: js/components/ImportIndicatorsPopover.js:631
 #: js/components/changesetNotice.js:66
-#: js/pages/results_form_PC/resultsFormPC.js:353
+#: js/pages/results_form_PC/resultsFormPC.js:380
 #: js/pages/results_framework/components/level_cards.js:578
 msgid "Cancel"
 msgstr "Annuler"
@@ -229,6 +229,7 @@ msgstr ""
 
 #. Translators: Notification for a error that happend on the web server.
 #: js/components/ImportIndicatorsPopover.js:688
+#: js/components/componentStatus.js:21
 msgid "There was a server-related problem."
 msgstr "Un problème lié au serveur est survenu."
 
@@ -372,7 +373,7 @@ msgstr "Nouvelle entrée"
 
 #. Translators: This is a label for a dropdown that presents several possible justifications for changing a value
 #: js/components/changesetNotice.js:19
-#: js/pages/results_form_PC/resultsFormPC.js:242
+#: js/pages/results_form_PC/resultsFormPC.js:270
 #: js/pages/results_framework/components/level_cards.js:404
 #: js/pages/tola_management_pages/audit_log/views.js:248
 msgid "Reason for change"
@@ -440,13 +441,13 @@ msgstr "Mesure de mi-parcours et mesure de fin de programme"
 
 #. Translators: One of several options for specifying how often data is collected or reported on over the life of a program
 #: js/constants.js:39 js/pages/iptt_quickstart/models/ipttQSRootStore.js:32
-#: tola/db_translations.js:14
+#: tola/db_translations.js:18
 msgid "Annual"
 msgstr "Annuel"
 
 #. Translators: One of several options for specifying how often data is collected or reported on over the life of a program
 #: js/constants.js:40 js/pages/iptt_quickstart/models/ipttQSRootStore.js:33
-#: tola/db_translations.js:8
+#: tola/db_translations.js:6
 msgid "Semi-annual"
 msgstr "Semestriel"
 
@@ -456,13 +457,13 @@ msgstr "Quadrimestriel"
 
 #. Translators: One of several options for specifying how often data is collected or reported on over the life of a program
 #: js/constants.js:42 js/pages/iptt_quickstart/models/ipttQSRootStore.js:35
-#: tola/db_translations.js:26
+#: tola/db_translations.js:16
 msgid "Quarterly"
 msgstr "Trimestriel"
 
 #. Translators: One of several options for specifying how often data is collected or reported on over the life of a program
 #: js/constants.js:43 js/pages/iptt_quickstart/models/ipttQSRootStore.js:36
-#: tola/db_translations.js:28
+#: tola/db_translations.js:24
 msgid "Monthly"
 msgstr "Mensuel"
 
@@ -497,6 +498,22 @@ msgstr "Secteurs directs (double comptage)"
 #: js/extra_translations.js:20
 msgid "Sectors Indirect with double counting"
 msgstr "Secteurs indirects (double comptage)"
+
+#: js/extra_translations.js:21
+msgid "SADD (including unknown) with double counting"
+msgstr "SADD (inconnu) avec double comptage"
+
+#: js/extra_translations.js:22
+msgid "SADD (including unknown) without double counting"
+msgstr "SADD (y compris inconnu) sans double comptage"
+
+#: js/extra_translations.js:23
+msgid "Actual without double counting"
+msgstr "Réel sans double comptage"
+
+#: js/extra_translations.js:24
+msgid "Actual with double counting"
+msgstr "Réel avec double comptage"
 
 #: js/level_utils.js:17
 msgid "Mercy Corps"
@@ -547,7 +564,7 @@ msgstr "Objectif spécifique"
 msgid "Purpose"
 msgstr "Intention"
 
-#: js/level_utils.js:36 js/pages/results_form_PC/resultsFormPC.js:265
+#: js/level_utils.js:36 js/pages/results_form_PC/resultsFormPC.js:292
 msgid "Result"
 msgstr "Résultat"
 
@@ -808,7 +825,7 @@ msgstr "# / %"
 #: js/pages/iptt_report/components/report/tableHeader.js:159
 #: js/pages/iptt_report/models/filterStore.js:737
 #: js/pages/program_page/components/indicator_list.js:206
-#: tola/db_translations.js:10
+#: tola/db_translations.js:8
 msgid "Baseline"
 msgstr "Mesure de base"
 
@@ -1369,7 +1386,7 @@ msgstr ""
 "rapport épinglé ?"
 
 #: js/pages/results_form_PC/components/ActualValueFields.js:20
-#: js/pages/results_form_PC/resultsFormPC.js:100
+#: js/pages/results_form_PC/resultsFormPC.js:101
 msgid ""
 "Direct/indirect without double counting should be equal to or lower than "
 "direct/indirect with double counting."
@@ -1396,7 +1413,9 @@ msgid ""
 "their proximity to or contact with program participants or activities."
 msgstr ""
 "Intégrez les participants en double comptage sur la gauche et les "
-"participants en comptage unique dans les programmes sur la droite. Si les "
+"participants en comptage unique dans les programmes sur la droite. Compter "
+"deux fois un participant signifie compter un individu plus d’une fois. Par "
+"exemple, un participant qui a pris part à deux programmes ou plus. Si les "
 "mêmes participants sont présents dans deux programmes, ne déduisez que le "
 "double comptage d’un programme.<br/><br/><strong>Les participants directs</"
 "strong> sont ceux qui ont reçu des avantages tangibles dans le cadre du "
@@ -1420,13 +1439,13 @@ msgid "Total Participants"
 msgstr "Nombre total de participants"
 
 #: js/pages/results_form_PC/components/CommonFields.js:41
-#: js/pages/results_form_PC/resultsFormPC.js:79
+#: js/pages/results_form_PC/resultsFormPC.js:80
 msgid "This date should be within the fiscal year of the reporting period."
 msgstr ""
 "Cette date doit être comprise dans l’année fiscale de la période de reporting."
 
 #: js/pages/results_form_PC/components/CommonFields.js:50
-#: js/pages/results_form_PC/resultsFormPC.js:87
+#: js/pages/results_form_PC/resultsFormPC.js:88
 msgid "Please complete this field. You can select more than one outcome theme."
 msgstr ""
 "Veuillez compléter ce champ. Vous pouvez sélectionner plus d’un thème de "
@@ -1531,7 +1550,7 @@ msgstr ""
 "somme du champ ‘Direct sans double comptage’."
 
 #: js/pages/results_form_PC/components/DisaggregationFields.js:72
-#: js/pages/results_form_PC/resultsFormPC.js:115
+#: js/pages/results_form_PC/resultsFormPC.js:116
 msgid ""
 "Sector values should be less than or equal to the 'Direct/Indirect with "
 "double counting' value."
@@ -1560,17 +1579,17 @@ msgid "Total Indirect Participants"
 msgstr "Total de participantes indirects"
 
 #: js/pages/results_form_PC/components/EvidenceFields.js:16
-#: js/pages/results_form_PC/resultsFormPC.js:130
+#: js/pages/results_form_PC/resultsFormPC.js:131
 msgid "Please enter a valid evidence link."
 msgstr "Veuillez entrer un lien de preuve valide."
 
 #: js/pages/results_form_PC/components/EvidenceFields.js:19
-#: js/pages/results_form_PC/resultsFormPC.js:133
+#: js/pages/results_form_PC/resultsFormPC.js:134
 msgid "A record name must be included along with the link."
 msgstr "Le nom de l’enregistrement doit être inclus avec le lien."
 
 #: js/pages/results_form_PC/components/EvidenceFields.js:23
-#: js/pages/results_form_PC/resultsFormPC.js:137
+#: js/pages/results_form_PC/resultsFormPC.js:138
 msgid "A link must be included along with the record name."
 msgstr "Un lien doit être inclus avec le nom de l’enregistrement."
 
@@ -1615,7 +1634,7 @@ msgid "Give your record a short name that is easy to remember."
 msgstr ""
 "Attribuez un nom court et facilement mémorisable à votre enregistrement."
 
-#: js/pages/results_form_PC/resultsFormPC.js:64
+#: js/pages/results_form_PC/resultsFormPC.js:65
 msgid ""
 "The sum of 'SADD with double counting' should be equal to the sum of 'Direct "
 "with double counting'."
@@ -1623,7 +1642,7 @@ msgstr ""
 "La somme du champ ‘Données SADD avec double comptage’ doit être égale à la "
 "somme du champ ‘Direct avec double comptage’."
 
-#: js/pages/results_form_PC/resultsFormPC.js:67
+#: js/pages/results_form_PC/resultsFormPC.js:68
 msgid ""
 "The sum of 'SADD without double counting' should be equal to the sum of "
 "'Direct without double counting'."
@@ -1631,13 +1650,13 @@ msgstr ""
 "La somme du champ Données ‘SADD sans double comptage’ doit être égale à la "
 "somme du champ ‘Direct sans double comptage’."
 
-#: js/pages/results_form_PC/resultsFormPC.js:83
+#: js/pages/results_form_PC/resultsFormPC.js:84
 msgid "You cannot change the fiscal year during the current reporting period. "
 msgstr ""
 "Vous ne pouvez pas modifier l’année fiscale pendant la période de reporting "
 "actuelle."
 
-#: js/pages/results_form_PC/resultsFormPC.js:94
+#: js/pages/results_form_PC/resultsFormPC.js:95
 msgid ""
 "Direct/indirect total participants with double counting is required. Please "
 "complete these fields."
@@ -1645,7 +1664,7 @@ msgstr ""
 "Le champ Total de participants directs/indirects avec double comptage est "
 "requis. Veuillez renseigner ces champs."
 
-#: js/pages/results_form_PC/resultsFormPC.js:245
+#: js/pages/results_form_PC/resultsFormPC.js:273
 #: js/pages/results_framework/components/level_cards.js:406
 msgid ""
 "Your changes will be recorded in a change log.  For future reference, please "
@@ -1655,11 +1674,11 @@ msgstr ""
 "titre de référence, veuillez partager votre justification pour ces "
 "modifications."
 
-#: js/pages/results_form_PC/resultsFormPC.js:272
+#: js/pages/results_form_PC/resultsFormPC.js:299
 msgid "Participant Count"
 msgstr "Nombre de participants"
 
-#: js/pages/results_form_PC/resultsFormPC.js:346
+#: js/pages/results_form_PC/resultsFormPC.js:373
 #: js/pages/results_framework/components/level_cards.js:575
 msgid "Save and close"
 msgstr "Enregistrer et fermer"
@@ -2816,48 +2835,48 @@ msgstr "utilisateurs"
 
 #. Translators: One of several options for specifying how often data is collected or reported on over the life of a program
 #: tola/db_translations.js:2
-msgid "Final evaluation"
-msgstr "Évaluation finale"
-
-#. Translators: One of several options for specifying how often data is collected or reported on over the life of a program
-#: tola/db_translations.js:4
-msgid "By event"
-msgstr "Par événement"
-
-#. Translators: One of several options for specifying how often data is collected or reported on over the life of a program
-#: tola/db_translations.js:6
 msgid "By distribution"
 msgstr "Par répartition"
 
 #. Translators: One of several options for specifying how often data is collected or reported on over the life of a program
-#: tola/db_translations.js:12
-msgid "Post shock"
-msgstr "Après impact"
-
-#. Translators: One of several options for specifying how often data is collected or reported on over the life of a program
-#: tola/db_translations.js:16
-msgid "Midline"
-msgstr "Mesure de mi-parcours"
-
-#. Translators: One of several options for specifying how often data is collected or reported on over the life of a program
-#: tola/db_translations.js:18
-msgid "Weekly"
-msgstr "Hebdomadaire"
-
-#. Translators: One of several options for specifying how often data is collected or reported on over the life of a program
-#: tola/db_translations.js:20
-msgid "By training"
-msgstr "Par formation"
-
-#. Translators: One of several options for specifying how often data is collected or reported on over the life of a program
-#: tola/db_translations.js:22
+#: tola/db_translations.js:4
 msgid "By batch"
 msgstr "Par lot"
 
 #. Translators: One of several options for specifying how often data is collected or reported on over the life of a program
-#: tola/db_translations.js:24
+#: tola/db_translations.js:10
+msgid "Post shock"
+msgstr "Après impact"
+
+#. Translators: One of several options for specifying how often data is collected or reported on over the life of a program
+#: tola/db_translations.js:12
+msgid "By training"
+msgstr "Par formation"
+
+#. Translators: One of several options for specifying how often data is collected or reported on over the life of a program
+#: tola/db_translations.js:14
+msgid "By event"
+msgstr "Par événement"
+
+#. Translators: One of several options for specifying how often data is collected or reported on over the life of a program
+#: tola/db_translations.js:20
+msgid "Weekly"
+msgstr "Hebdomadaire"
+
+#. Translators: One of several options for specifying how often data is collected or reported on over the life of a program
+#: tola/db_translations.js:22
+msgid "Final evaluation"
+msgstr "Évaluation finale"
+
+#. Translators: One of several options for specifying how often data is collected or reported on over the life of a program
+#: tola/db_translations.js:26
 msgid "Endline"
 msgstr "Mesure de fin de programme"
+
+#. Translators: One of several options for specifying how often data is collected or reported on over the life of a program
+#: tola/db_translations.js:28
+msgid "Midline"
+msgstr "Mesure de mi-parcours"
 
 #. Translators: One of several choices for what sector (i.e. development domain) a program is most closely associated with
 #: tola/db_translations.js:30
