@@ -22,7 +22,7 @@ from django.db.models import (
 )
 from django.contrib.auth.decorators import login_required
 from django.http import HttpResponse, HttpResponseRedirect, JsonResponse
-from django.shortcuts import render, render_to_response, get_object_or_404, reverse
+from django.shortcuts import render, get_object_or_404, reverse
 from django.template.loader import render_to_string
 from django.utils import timezone
 from django.utils.decorators import method_decorator
@@ -1129,8 +1129,7 @@ def result_view(request, indicator, program):
         short_help = None
         long_help = None
 
-    return render_to_response(
-        template_name, {
+    return render(request, template_name, {
             'indicator': indicator,
             'periodictargets': periodictargets,
             'program_id': program,
@@ -1140,8 +1139,7 @@ def result_view(request, indicator, program):
             'readonly': readonly,
             'short_help': short_help,
             'long_help': long_help
-        }
-    )
+        })
 
 @login_required
 def indicator_plan(request, program):
