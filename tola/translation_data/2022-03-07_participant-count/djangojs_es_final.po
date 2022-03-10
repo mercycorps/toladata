@@ -3,7 +3,7 @@ msgstr ""
 "Project-Id-Version: \n"
 "Report-Msgid-Bugs-To: \n"
 "POT-Creation-Date: 2022-03-03 11:06-0800\n"
-"PO-Revision-Date: 2022-03-03 10:53-0800\n"
+"PO-Revision-Date: 2022-03-10 10:52-0500\n"
 "Last-Translator: \n"
 "Language-Team: \n"
 "Language: es\n"
@@ -11,7 +11,7 @@ msgstr ""
 "Content-Type: text/plain; charset=UTF-8\n"
 "Content-Transfer-Encoding: 8bit\n"
 "Plural-Forms: nplurals=2; plural=(n != 1);\n"
-"X-Generator: Poedit 3.0.1\n"
+"X-Generator: Poedit 2.4.2\n"
 
 #. Translators: This is the file name of an Excel template that will be used for batch imports
 #: js/apiv2.js:139 js/apiv2.js:172
@@ -1375,6 +1375,7 @@ msgid "Total Participant Actual Values"
 msgstr "Valores reales del total de participantes"
 
 #: js/pages/results_form_PC/components/ActualValueFields.js:36
+#, fuzzy
 msgid ""
 "Include the participants with double counting on the left and participants "
 "without double counting across programs on the right. Double counting a "
