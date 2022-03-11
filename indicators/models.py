@@ -455,7 +455,7 @@ class DisaggregationIndicatorFormManager(models.Manager):
         qs = super().get_queryset().order_by('disaggregation_type').annotate(
             _in_use=models.Exists(
                 Indicator.rf_aware_objects.filter(
-                    disaggregation__in=models.OuterRef('pk')
+                    disaggregation=models.OuterRef('pk')
                 )
             )
         ).prefetch_related(
