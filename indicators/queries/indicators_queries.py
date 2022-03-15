@@ -62,6 +62,10 @@ class MetricsIndicatorQuerySet(SafeDeleteQueryset, IndicatorSortingQSMixin):
             qs = qs.annotate(over_under=utils.indicator_over_under_annotation())
         if 'table' in annotations:
             qs = qs.select_related('level')
+
+        # As of Django 3.1 annotated querysets will not be ordered by the model.meta.ordering
+        qs = qs.order_by('create_date')
+
         return qs
 
 
