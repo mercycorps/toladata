@@ -995,6 +995,8 @@ class OrganizationAdminViewSet(viewsets.ModelViewSet):
                 output_field=models.IntegerField()
             )
         )
+        # Starting in Django 3.1, the ordering from a model’s Meta.ordering won’t be used in GROUP BY queries.
+        queryset = queryset.order_by('name')
         return queryset
 
     def get_queryset(self):
