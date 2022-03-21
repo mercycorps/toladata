@@ -1,1 +1,1 @@
-web: gunicorn -- timeout 60 tola.wsgi --log-file -
+web: gunicorn --git timeout 60 tola.wsgi --log-file -
