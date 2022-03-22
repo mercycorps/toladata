@@ -97,9 +97,9 @@ const DisaggregationFields = ({ formID, disagg, disaggregationData, setDisaggreg
 
                         <div className="item__value--container" style={{display: expanded ? "inherit" : "none"}}>
                             {disagg.length !== 1 &&
-                                <div className="bin heading">{gettext("Without double counting")}</div>
+                                <div className="bin heading">{gettext("Without double counting across programs")}</div>
                             }
-                            <div className="bin heading">{gettext("With double counting")}</div>
+                            <div className="bin heading">{gettext("With double counting across programs")}</div>
                         </div>
                     </div>
                 </li>
