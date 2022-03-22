@@ -37,8 +37,8 @@ const ActualValueFields = ({ disaggregationData, setDisaggregationData, formErro
                             />
                         </div>
                         <div className="item__value--container">
-                            <div className="bin heading">{gettext("Without double counting")}</div>
-                            <div className="bin heading">{gettext("With double counting")}</div>
+                            <div className="bin heading">{gettext("Without double counting across programs")}</div>
+                            <div className="bin heading">{gettext("With double counting across programs")}</div>
                         </div>
                     </div>
                 </li>
