@@ -1,31 +1,31 @@
 // # Translators: One of several options for specifying how often data is collected or reported on over the life of a program
 string0 = gettext("By distribution")
 // # Translators: One of several options for specifying how often data is collected or reported on over the life of a program
-string1 = gettext("By batch")
+string1 = gettext("Annual")
 // # Translators: One of several options for specifying how often data is collected or reported on over the life of a program
-string2 = gettext("Semi-annual")
+string2 = gettext("By batch")
 // # Translators: One of several options for specifying how often data is collected or reported on over the life of a program
-string3 = gettext("Baseline")
+string3 = gettext("Midline")
 // # Translators: One of several options for specifying how often data is collected or reported on over the life of a program
-string4 = gettext("Post shock")
+string4 = gettext("Baseline")
 // # Translators: One of several options for specifying how often data is collected or reported on over the life of a program
-string5 = gettext("By training")
+string5 = gettext("By event")
 // # Translators: One of several options for specifying how often data is collected or reported on over the life of a program
-string6 = gettext("By event")
+string6 = gettext("Post shock")
 // # Translators: One of several options for specifying how often data is collected or reported on over the life of a program
 string7 = gettext("Quarterly")
 // # Translators: One of several options for specifying how often data is collected or reported on over the life of a program
-string8 = gettext("Annual")
+string8 = gettext("By training")
 // # Translators: One of several options for specifying how often data is collected or reported on over the life of a program
 string9 = gettext("Weekly")
 // # Translators: One of several options for specifying how often data is collected or reported on over the life of a program
-string10 = gettext("Final evaluation")
+string10 = gettext("Semi-annual")
 // # Translators: One of several options for specifying how often data is collected or reported on over the life of a program
-string11 = gettext("Monthly")
+string11 = gettext("Final evaluation")
 // # Translators: One of several options for specifying how often data is collected or reported on over the life of a program
-string12 = gettext("Endline")
+string12 = gettext("Monthly")
 // # Translators: One of several options for specifying how often data is collected or reported on over the life of a program
-string13 = gettext("Midline")
+string13 = gettext("Endline")
 // # Translators: One of several choices for what sector (i.e. development domain) a program is most closely associated with
 string14 = gettext("Agribusiness")
 // # Translators: One of several choices for what sector (i.e. development domain) a program is most closely associated with
