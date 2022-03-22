@@ -118,6 +118,10 @@ class CountryAdminViewSet(viewsets.ModelViewSet):
                 to_attr='program_users'
             )
         )
+
+        # As of Django 3.1 annotated querysets will not be ordered by the model.meta.ordering
+        queryset = queryset.order_by('country')
+
         return queryset
 
     def get_queryset(self):
