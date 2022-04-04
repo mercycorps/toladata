@@ -656,60 +656,123 @@ class TestIPTTSerializedReportData(test.TestCase, DecimalComparator):
             return lop_data, periods
         tva = False
         for report in self.get_serialized_report_data():
-            with self.assertNumQueries(0):
+            with self.assertNumQueries(len(report.keys())):
                 self.assertEqual(len(report.keys()), 18)
                 for pk in percentage_pks:
+                    indicator = Indicator.objects.get(pk=pk)
                     lop_data, periods = universal_asserts(report, pk)
                     self.assertEqual(lop_data['target'], 600)
                     self.assertEqual(lop_data['actual'], 20)
-                    self.assertEqual(lop_data['met'], decimal.Decimal('0.0333'))
+
+                    if indicator.direction_of_change == Indicator.DIRECTION_OF_CHANGE_NEGATIVE:
+                        self.assertEqual(lop_data['met'], decimal.Decimal('30'))
+                    else:
+                        self.assertEqual(lop_data['met'], decimal.Decimal('0.0333'))
+
                     self.assertEqual(periods[0]['actual'], 50)
                     if tva:
                         self.assertEqual(periods[0]['target'], 600)
-                        self.assertEqual(periods[0]['met'], decimal.Decimal('0.0833'))
+
+                        if indicator.direction_of_change == Indicator.DIRECTION_OF_CHANGE_NEGATIVE:
+                            self.assertEqual(periods[0]['met'], decimal.Decimal('12'))
+                        else:
+                            self.assertEqual(periods[0]['met'], decimal.Decimal('0.0833'))
+
                     self.assertEqual(periods[1]['actual'], 20)
                     if tva:
                         self.assertEqual(periods[1]['target'], 600)
-                        self.assertEqual(periods[1]['met'], decimal.Decimal('0.0333'))
+
+                        if indicator.direction_of_change == Indicator.DIRECTION_OF_CHANGE_NEGATIVE:
+                            self.assertEqual(periods[1]['met'], decimal.Decimal('30'))
+                        else:
+                            self.assertEqual(periods[1]['met'], decimal.Decimal('0.0333'))
+                        
                 for pk in cumulative_pks:
+                    indicator = Indicator.objects.get(pk=pk)
                     lop_data, periods = universal_asserts(report, pk)
                     self.assertEqual(lop_data['target'], 600)
                     self.assertEqual(lop_data['actual'], 150)
-                    self.assertEqual(lop_data['met'], decimal.Decimal('0.25'))
+
+                    if indicator.direction_of_change == Indicator.DIRECTION_OF_CHANGE_NEGATIVE:
+                        self.assertEqual(lop_data['met'], decimal.Decimal('4'))
+                    else:
+                        self.assertEqual(lop_data['met'], decimal.Decimal('0.25'))
+
                     self.assertEqual(periods[0]['actual'], 70)
                     if tva:
                         self.assertEqual(periods[0]['target'], 600)
-                        self.assertEqual(periods[0]['met'], decimal.Decimal('0.1167'))
+
+                        if indicator.direction_of_change == Indicator.DIRECTION_OF_CHANGE_NEGATIVE:
+                            self.assertEqual(periods[0]['met'], decimal.Decimal('8.5714'))
+                        else:
+                            self.assertEqual(periods[0]['met'], decimal.Decimal('0.1167'))
+
                     self.assertEqual(periods[1]['actual'], 150)
                     if tva:
                         self.assertEqual(periods[1]['target'], 600)
-                        self.assertDecimalEqual(periods[1]['met'], get_decimal('0.25', places=4))
+
+                        if indicator.direction_of_change == Indicator.DIRECTION_OF_CHANGE_NEGATIVE:
+                            self.assertEqual(periods[1]['met'], get_decimal('4', places=4))
+                        else:
+                            self.assertDecimalEqual(periods[1]['met'], get_decimal('0.25', places=4))
+                        
                 for pk in non_cumulative_pks:
+                    indicator = Indicator.objects.get(pk=pk)
                     lop_data, periods = universal_asserts(report, pk)
                     self.assertEqual(lop_data['target'], 1200)
                     self.assertEqual(lop_data['actual'], 150)
-                    self.assertDecimalEqual(lop_data['met'], get_decimal('0.125', places=4))
+
+                    if indicator.direction_of_change == Indicator.DIRECTION_OF_CHANGE_NEGATIVE:
+                        self.assertDecimalEqual(lop_data['met'], get_decimal('8', places=4))
+                    else:
+                        self.assertDecimalEqual(lop_data['met'], get_decimal('0.125', places=4))
+
                     self.assertEqual(periods[0]['actual'], 70)
                     if tva:
                         self.assertDecimalEqual(periods[0]['target'], get_decimal(600))
-                        self.assertDecimalEqual(periods[0]['met'], get_decimal('0.1167', places=4))
+
+                        if indicator.direction_of_change == Indicator.DIRECTION_OF_CHANGE_NEGATIVE:
+                            self.assertEqual(periods[0]['met'], decimal.Decimal('8.5714'))
+                        else:
+                            self.assertDecimalEqual(periods[0]['met'], get_decimal('0.1167', places=4))
+                        
                     self.assertDecimalEqual(periods[1]['actual'], get_decimal(80))
                     if tva:
                         self.assertDecimalEqual(periods[1]['target'], get_decimal(600))
-                        self.assertDecimalEqual(periods[1]['met'], get_decimal('0.1333', places=4))
+
+                        if indicator.direction_of_change == Indicator.DIRECTION_OF_CHANGE_NEGATIVE:
+                            self.assertEqual(periods[1]['met'], get_decimal('7.5', places=4))
+                        else:
+                            self.assertDecimalEqual(periods[1]['met'], get_decimal('0.1333', places=4))
+
                 for pk in non_summing_cumulative_pks:
+                    indicator = Indicator.objects.get(pk=pk)
                     lop_data, periods = universal_asserts(report, pk)
                     self.assertEqual(lop_data['target'], 600)
                     self.assertEqual(lop_data['actual'], 20)
-                    self.assertEqual(lop_data['met'], decimal.Decimal('0.0333'))
+
+                    if indicator.direction_of_change == Indicator.DIRECTION_OF_CHANGE_NEGATIVE:
+                        self.assertEqual(lop_data['met'], decimal.Decimal('30'))
+                    else:
+                        self.assertEqual(lop_data['met'], decimal.Decimal('0.0333'))
+
                     self.assertEqual(periods[0]['actual'], 50)
                     if tva:
                         self.assertEqual(periods[0]['target'], 600)
-                        self.assertEqual(periods[0]['met'], decimal.Decimal('0.0833'))
+
+                        if indicator.direction_of_change == Indicator.DIRECTION_OF_CHANGE_NEGATIVE:
+                            self.assertEqual(periods[0]['met'], decimal.Decimal('12'))
+                        else:
+                            self.assertEqual(periods[0]['met'], decimal.Decimal('0.0833'))
+
                     self.assertEqual(periods[1]['actual'], 20)
                     if tva:
                         self.assertEqual(periods[1]['target'], 600)
-                        self.assertDecimalEqual(periods[1]['met'], get_decimal('0.0333', places=4))
+
+                        if indicator.direction_of_change == Indicator.DIRECTION_OF_CHANGE_NEGATIVE:
+                            self.assertDecimalEqual(periods[1]['met'], get_decimal('30', places=4))
+                        else:
+                            self.assertDecimalEqual(periods[1]['met'], get_decimal('0.0333', places=4))
                 tva = True
 
     def test_one_indicator_with_mismatched_lop_target_and_target_sum(self):
@@ -760,10 +823,13 @@ class TestIPTTSerializedReportData(test.TestCase, DecimalComparator):
         targets = [50, 100, 150, 200]
         actuals = [60, 105, 150, 195]
 
-        def lop_asserts(report_data, lop_target, lop_actual):
+        def lop_asserts(report_data, lop_target, lop_actual, direction_of_change):
             self.assertDecimalEqual(report_data['lop_period']['target'], get_decimal(lop_target))
             self.assertDecimalEqual(report_data['lop_period']['actual'], get_decimal(lop_actual))
-            self.assertDecimalEqual(report_data['lop_period']['met'], get_decimal(lop_actual/lop_target, places=4))
+
+            met_value = lop_target / lop_actual if direction_of_change == Indicator.DIRECTION_OF_CHANGE_NEGATIVE else lop_actual / lop_target
+
+            self.assertDecimalEqual(report_data['lop_period']['met'], get_decimal(met_value, places=4))
             for label_pk in used_label_pks:
                 self.assertDecimalEqual(
                     report_data['lop_period']['disaggregations'][label_pk]['actual'], get_decimal(lop_actual/2)
@@ -773,10 +839,13 @@ class TestIPTTSerializedReportData(test.TestCase, DecimalComparator):
             for label_pk in unused_label_pks:
                 self.assertNotIn(label_pk, report_data['lop_period']['disaggregations'])
 
-        def period_asserts(period, target, actual, check_tva):
+        def period_asserts(period, target, actual, check_tva, direction_of_change):
             if check_tva:
                 self.assertDecimalEqual(period['target'], get_decimal(target))
-                self.assertDecimalEqual(period['met'], get_decimal(actual/target, places=4))
+
+                met_value = period['target'] / period['actual'] if direction_of_change == Indicator.DIRECTION_OF_CHANGE_NEGATIVE else period['actual'] / period['target']
+
+                self.assertDecimalEqual(period['met'], get_decimal(float(met_value), places=4))
             self.assertDecimalEqual(period['actual'], get_decimal(actual))
             for label_pk in used_label_pks:
                 self.assertDecimalEqual(period['disaggregations'][label_pk]['actual'], get_decimal(actual/2))
@@ -787,27 +856,31 @@ class TestIPTTSerializedReportData(test.TestCase, DecimalComparator):
 
         tva = False
         for report in self.get_serialized_report_data(frequency=Indicator.SEMI_ANNUAL):
-            with self.assertNumQueries(0):
+            with self.assertNumQueries(18):
                 for percent_pk in percents:
+                    direction_of_change = Indicator.objects.get(pk=percent_pk).direction_of_change
                     report_data = report[percent_pk]
-                    lop_asserts(report_data, 200, 195)
+                    lop_asserts(report_data, 200, 195, direction_of_change)
                     for c, period in enumerate(report_data['periods']):
-                        period_asserts(period, targets[c], actuals[c], tva)
+                        period_asserts(period, targets[c], actuals[c], tva, direction_of_change)
                 for cumulative_pk in cumulatives:
+                    direction_of_change = Indicator.objects.get(pk=cumulative_pk).direction_of_change
                     report_data = report[cumulative_pk]
-                    lop_asserts(report_data, 200, 510)
+                    lop_asserts(report_data, 200, 510, direction_of_change)
                     for c, period in enumerate(report_data['periods']):
-                        period_asserts(period, targets[c], sum(actuals[:c+1]), tva)
+                        period_asserts(period, targets[c], sum(actuals[:c+1]), tva, direction_of_change)
                 for non_cumulative_pk in non_cumulatives:
+                    direction_of_change = Indicator.objects.get(pk=non_cumulative_pk).direction_of_change
                     report_data = report[non_cumulative_pk]
-                    lop_asserts(report_data, 500, 510)
+                    lop_asserts(report_data, 500, 510, direction_of_change)
                     for c, period in enumerate(report_data['periods']):
-                        period_asserts(period, targets[c], actuals[c], tva)
+                        period_asserts(period, targets[c], actuals[c], tva, direction_of_change)
                 for non_summing_cumulative_pk in non_summing_cumulatives:
+                    direction_of_change = Indicator.objects.get(pk=non_summing_cumulative_pk).direction_of_change
                     report_data = report[non_summing_cumulative_pk]
-                    lop_asserts(report_data, 200, 195)
+                    lop_asserts(report_data, 200, 195, direction_of_change)
                     for c, period in enumerate(report_data['periods']):
-                        period_asserts(period, targets[c], actuals[c], tva)
+                        period_asserts(period, targets[c], actuals[c], tva, direction_of_change)
                 tva = True
 
     def test_percentage_indicators_in_tp_report(self):

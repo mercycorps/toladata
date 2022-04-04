@@ -89,12 +89,18 @@ class TVAReportPeriodSerializer(TPReportPeriodSerializer):
             period_dict['count'] = period_dict.get('count', None)
             target = period_dict.get('target', None)
             actual = period_dict.get('actual', None)
+            decreasing = period_dict.get('decreasing', None)
             period_dict['met'] = None
             if target is not None and actual is not None and target != 0:
                 try:
-                    period_dict['met'] = make_quantized_decimal(
-                        make_quantized_decimal(actual) / make_quantized_decimal(target), places=4
-                    )
+                    if decreasing:
+                        period_dict['met'] = make_quantized_decimal(
+                            make_quantized_decimal(target) / make_quantized_decimal(actual), places=4
+                        )
+                    else:
+                        period_dict['met'] = make_quantized_decimal(
+                            make_quantized_decimal(actual) / make_quantized_decimal(target), places=4
+                        )
                 except TypeError:
                     pass
             self.__dict__ = period_dict
