@@ -74,7 +74,7 @@
                                     name="{{ pt.period }}"
                                     maxlength="15"
                                     value="{{ pt.target|trailingzero }}"
-                                    {% if readonly %}disabled="disabled"{% endif %}
+                                    {% if readonly or pt.viewonly %}disabled="disabled"{% endif %}
                                     data-periodictarget="pt"
                                     data-start-date="{{pt.start_date|convert2dateobject|date:"MEDIUM_DATE_FORMAT"|default:''}}"
                                     data-end-date="{{pt.end_date|convert2dateobject|date:"MEDIUM_DATE_FORMAT"|default:''}}"

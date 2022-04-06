@@ -1,6 +1,8 @@
 import copy
 import re
+from datetime import date
 from rest_framework import serializers, exceptions
+from django.conf import settings
 from django.utils.translation import ugettext_lazy as _
 from django.db.models import Count, BooleanField, Q
 from indicators.models import (
@@ -67,6 +69,7 @@ class PCResultSerializerRead(serializers.ModelSerializer):
     disaggregations = serializers.SerializerMethodField()
     outcome_themes = serializers.SerializerMethodField()
     periodic_target = serializers.SerializerMethodField()
+    view_only = serializers.SerializerMethodField()
     program_start_date = serializers.DateField(source='indicator.program.reporting_period_start', read_only=True)
     program_end_date = serializers.DateField(source='indicator.program.reporting_period_end', read_only=True)
 
@@ -82,11 +85,22 @@ class PCResultSerializerRead(serializers.ModelSerializer):
             'program_start_date',
             'program_end_date',
             'outcome_themes',
-            'disaggregations'
+            'disaggregations',
+            'view_only'
         ]
 
     def get_periodic_target(self, obj):
         return PeriodicTarget.objects.values('id', 'period').get(result__id=obj.id)
+
+    def get_view_only(self, obj):
+        periodic_target = PeriodicTarget.objects.values('id', 'period').get(result__id=obj.id)
+        view_only = True
+        current_fiscal_year = 'FY' + str(date.fromisoformat(settings.REPORTING_YEAR_START_DATE).year + 1)
+        # Check if periodic target fiscal year matches current fiscal year.
+        if periodic_target['period'] == current_fiscal_year:
+            view_only = False
+        # Add boolean variable to serializer output.
+        return view_only
 
     def get_outcome_themes(self, obj):
         return list(
@@ -175,7 +189,7 @@ class PCResultSerializerWrite(serializers.ModelSerializer):
         """
         if len(value) > 0:
             return value
-        
+
         # Translators: An error message detailing that outcome themes are required and that multiple outcome themes can be selected
         raise exceptions.ValidationError(_('Please complete this field. You can select more than one outcome theme.'))
 
@@ -199,7 +213,7 @@ class PCResultSerializerWrite(serializers.ModelSerializer):
         # Both evidence fields are empty. Return value instead of raising exception
         if self.empty_evidence():
             return value
-        
+
         if self.initial_data.get('record_name') is None or len(self.initial_data.get('record_name')) == 0:
             # Translators: An error message detailing that the record name must be included along the a evidence link
             raise exceptions.ValidationError(_('A record name must be included along with the link.'))
@@ -217,7 +231,7 @@ class PCResultSerializerWrite(serializers.ModelSerializer):
         Params
             value
                 - The value of record_name
-        
+
         Raises
             ValidationError
                 - If validation fails

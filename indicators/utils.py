@@ -58,3 +58,17 @@ def create_participant_count_indicator(program, top_level, disaggregations_qs):
     indicator.disaggregation.add(*list(disaggregations_qs))
     indicator.reporting_frequencies.add(ReportingFrequency.objects.get(frequency='Annual'))
     return indicator
+
+
+def add_new_event_target_to_pc_indicator(indicator, program):
+    last_period_string = 'FY' + str(datetime.date.fromisoformat(settings.REPORTING_YEAR_START_DATE).year)
+    period_string = 'FY' + str(datetime.date.fromisoformat(settings.REPORTING_YEAR_START_DATE).year + 1)
+    try:
+        last_customsort = PeriodicTarget.objects.filter(
+            period=last_period_string, indicator=indicator).values_list('customsort', flat=True).first()
+        PeriodicTarget.objects.get_or_create(
+            period=period_string, target=1, customsort=last_customsort + 1, indicator=indicator)
+        return indicator
+    except PeriodicTarget.DoesNotExist:
+        print(f'Participant count indicator {last_period_string} for program {program.name} not found.')
+

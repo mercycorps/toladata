@@ -1,10 +1,10 @@
 from django import test
+from django.conf import settings
 from django.core import management
-from datetime import date
+from datetime import datetime, date
 from indicators.models import Indicator, IndicatorType, OutcomeTheme, DisaggregationType, PeriodicTarget, DisaggregationLabel
 from factories.indicators_models import IndicatorTypeFactory, ReportingFrequencyFactory, ReportingFrequency, LevelFactory
 from factories.workflow_models import ProgramFactory
-
 
 
 class TestManagementCreateParticipantCountIndicators(test.TestCase):
@@ -12,13 +12,16 @@ class TestManagementCreateParticipantCountIndicators(test.TestCase):
         'outcome_themes': 5,
         'disagg_types': 6,
         'periodic_target': 1,
+        'periodic_target_next': 2,
         'indicators': 1
     }
-    
+
     def setUp(self):
         IndicatorTypeFactory(indicator_type=IndicatorType.PC_INDICATOR_TYPE)
         ReportingFrequencyFactory(frequency=ReportingFrequency.PC_REPORTING_FREQUENCY)
-        program = ProgramFactory(reporting_period_start=date(2022, 2, 1), reporting_period_end=date(2022, 12, 1))
+        current_fy = date.fromisoformat(settings.REPORTING_YEAR_START_DATE).year + 1
+        next_fy = date.fromisoformat(settings.REPORTING_YEAR_START_DATE).year + 2
+        program = ProgramFactory(reporting_period_start=date(current_fy, 2, 1), reporting_period_end=date(next_fy, 12, 1))
         LevelFactory(name="test", program=program)
 
     def indicators(self):
@@ -55,6 +58,10 @@ class TestManagementCreateParticipantCountIndicators(test.TestCase):
         self.assertEquals(self.outcome_themes(), self.expected_lengths['outcome_themes'])
         self.assertEquals(self.disagg_types(), self.expected_lengths['disagg_types'])
         self.assertEquals(self.periodic_target(), self.expected_lengths['periodic_target'])
+        self.assertEquals(self.indicators(), self.expected_lengths['indicators'])
+
+    def assertions_next(self):
+        self.assertEquals(self.periodic_target(), self.expected_lengths['periodic_target_next'])
         self.assertEquals(self.indicators(), self.expected_lengths['indicators'])
 
     def test_disagg_type_archived(self):
@@ -96,3 +103,18 @@ class TestManagementCreateParticipantCountIndicators(test.TestCase):
             'create_participant_count_indicators', execute=True, create_disaggs_themes=True, suppress_output=True, verbosity=0)
 
         self.assertions()
+
+        next_reporting_period = datetime((date.fromisoformat(settings.REPORTING_YEAR_START_DATE).year + 1), 7, 1)
+        next_reporting_period_str = next_reporting_period.strftime('%Y-%m-%d')
+
+        @test.override_settings(REPORTING_YEAR_START_DATE=next_reporting_period_str)
+        def test_command_next():
+            management.call_command(
+                'create_participant_count_indicators', execute=True, create_disaggs_themes=False, suppress_output=True, verbosity=0)
+
+        test_command_next()
+        self.assertEquals(self.periodic_target(), self.expected_lengths['periodic_target_next'])
+
+
+
+

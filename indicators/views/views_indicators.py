@@ -6,7 +6,7 @@ Views for indicators and related models (results, periodic targets) as well as i
 import copy
 import json
 import logging
-from datetime import datetime, timedelta
+from datetime import date, datetime, timedelta
 from decimal import Decimal
 import uuid
 import dateparser
@@ -20,6 +20,7 @@ from django.db import connection, transaction
 from django.db.models import (
     Count, Q, Max
 )
+from django.conf import settings
 from django.contrib.auth.decorators import login_required
 from django.http import HttpResponse, HttpResponseRedirect, JsonResponse
 from django.shortcuts import render, render_to_response, get_object_or_404, reverse
@@ -182,6 +183,7 @@ def participant_count_result_create_for_indicator(request, pk, *args, **kwargs):
         'disaggregations': pc_serializers.PCDisaggregationSerializer(
             disagg_queryset, many=True, context={'result_pk': None}).data,
     }
+
     return JsonResponse(return_dict)
 
 
@@ -440,7 +442,7 @@ class IndicatorCreate(IndicatorFormMixin, CreateView):
                     period=pt.get('period', ''),
                     target=pt.get('target', 0),
                     start_date=pt['start_date'],
-                    end_date=pt['end_date'],
+                    end_date=pt['end_date']
                 )
 
                 PeriodicTarget.objects.create(
@@ -543,15 +545,19 @@ class IndicatorUpdate(IndicatorFormMixin, UpdateView):
 
         ptargets = []
         for pt in pts:
+            # Appending viewonly boolean variable to pts so the target can be disabled for prior fiscal years.
+            current_fiscal_year = 'FY' + str(date.fromisoformat(settings.REPORTING_YEAR_START_DATE).year + 1)
+            viewonly = True if indicator.ADMIN_PARTICIPANT_COUNT == 0 and pt.period_name != current_fiscal_year else False
             ptargets.append({
-                'id': pt.pk,
-                'num_data': pt.num_data,
-                'start_date': pt.start_date,
-                'end_date': pt.end_date,
-                'period': pt.period, # period is deprecated, this should move to .period_name
-                'period_name': pt.period_name,
-                'target': pt.target
-            })
+                    'id': pt.pk,
+                    'num_data': pt.num_data,
+                    'start_date': pt.start_date,
+                    'end_date': pt.end_date,
+                    'period': pt.period, # period is deprecated, this should move to .period_name
+                    'period_name': pt.period_name,
+                    'target': pt.target,
+                    'viewonly': viewonly
+                })
 
         # if the modal is being loaded (not submitted), check the number of periodic targets to
         # be sure that they cover the program reporting period.  A recently extended program reporting period
@@ -670,10 +676,15 @@ class IndicatorUpdate(IndicatorFormMixin, UpdateView):
 
             generated_pt_ids = []
             for i, pt in enumerate(normalized_pt_json):
+                # Preserve pt customsort value if pc indicator
+                if old_indicator.admin_type == old_indicator.ADMIN_PARTICIPANT_COUNT:
+                    customsort = PeriodicTarget.objects.values_list('customsort', flat=True).get(pk=pt['id'])
+                else:
+                    customsort = i
                 defaults = {
                     'period': pt.get('period', ''),
                     'target': pt.get('target', 0),
-                    'customsort': i,
+                    'customsort': customsort,
                     'start_date': pt['start_date'],
                     'end_date': pt['end_date'],
                     'edit_date': timezone.now()

@@ -3,14 +3,14 @@ import sys
 from datetime import date
 from safedelete.models import HARD_DELETE
 
+from django.core.exceptions import MultipleObjectsReturned
 from django.core.management.base import BaseCommand
 from django.conf import settings
 from django.db import transaction
-from dateutil.relativedelta import relativedelta
 from indicators.models import (
     Indicator, DisaggregationType, DisaggregationLabel, OutcomeTheme
 )
-from indicators.utils import create_participant_count_indicator
+from indicators.utils import create_participant_count_indicator, add_new_event_target_to_pc_indicator
 from workflow.models import Program
 
 
@@ -58,8 +58,8 @@ class Command(BaseCommand):
             return
 
         if options['delete_pilot_pc_indicators']:
-            pcind_id_list = [12385, 12053, 12051, 12052, 12050, 12054, 12069, 12068, 12065, 12072, 12063, 12064, 12066,
-                             12071, 12070, 12060, 12057, 12056, 12059, 12058, 12061, 12055, 12062]
+            # Add indicator pks to be deleted to list below.
+            pcind_id_list = []
             # Call indicators on an object to object basis to force cascading delete.
             deleted_ind = 0
             for pcid in pcind_id_list:
@@ -72,8 +72,9 @@ class Command(BaseCommand):
                 print(f'{deleted_ind} pilot pc indicators deleted, {len(pcind_id_list)-deleted_ind} not found')
 
         if options['change_label_name']:
-            old_label = 'Health (non - nutrition)'
-            new_label = 'Public Health (non - nutrition, non - WASH)'
+            # Add label names to be changed below.
+            old_label = ''
+            new_label = ''
             labels = DisaggregationLabel.objects.filter(label=old_label)
             for label in labels:
                 label.label = new_label
@@ -118,23 +119,37 @@ class Command(BaseCommand):
                 print(f'{created_counts} Outcome themes created, {len(outcome_theme_names)-created_counts} already existed')
 
         counts = {
-            'eligible_programs': 0, 'pc_indicator_does_not_exist': 0, 'has_rf': 0, 'indicators_created': 0,}
+            'eligible_programs': 0, 'pc_indicator_does_not_exist': 0, 'has_rf': 0, 'indicators_created': 0,
+            'preexisting_pc_indicators_need_pt': 0, 'new_event_target_created': 0}
 
-        # Subtract one year from the reporting year start date
-        reporting_start_date = date.fromisoformat(settings.REPORTING_YEAR_START_DATE) - relativedelta(years=1)
+        reporting_start_date = date.fromisoformat(settings.REPORTING_YEAR_START_DATE)
+        previous_fiscal_year = 'FY' + str(date.fromisoformat(settings.REPORTING_YEAR_START_DATE).year)
+        current_fiscal_year = 'FY' + str(date.fromisoformat(settings.REPORTING_YEAR_START_DATE).year + 1)
 
         eligible_programs = Program.objects.filter(reporting_period_end__gte=reporting_start_date)
         counts['eligible_programs'] = eligible_programs.count()
-        if options['verbosity'] > 1:
-            ineligible_programs = Program.objects.filter(reporting_period_end__lt=reporting_start_date).filter(funding_status='Funded').order_by('reporting_period_end')
 
         if options['verbosity'] > 1:
-            preexisting_programs = eligible_programs.filter(funding_status='Funded').filter(indicator__admin_type=Indicator.ADMIN_PARTICIPANT_COUNT)
-        eligible_programs = eligible_programs.exclude(indicator__admin_type=Indicator.ADMIN_PARTICIPANT_COUNT)
+            ineligible_programs = Program.objects.filter(reporting_period_end__lt=reporting_start_date).filter(
+                funding_status='Funded').order_by('reporting_period_end')
+
+        # Filter out PC indicators that need new periodic target
+        preexisting_pc_indicators_need_pt = Indicator.objects.filter(
+            admin_type=Indicator.ADMIN_PARTICIPANT_COUNT, periodictargets__period=previous_fiscal_year,
+            program__reporting_period_end__gte=reporting_start_date)
+        counts['preexisting_pc_indicators_need_pt'] = preexisting_pc_indicators_need_pt.count()
+        eligible_programs = eligible_programs.exclude(indicator__in=preexisting_pc_indicators_need_pt)
+
+        # Filter out PC indicators that have been created already
+        preexisting_pc_indicators_current_fy = Indicator.objects.filter(
+            admin_type=Indicator.ADMIN_PARTICIPANT_COUNT, periodictargets__period=current_fiscal_year)
+        eligible_programs = eligible_programs.exclude(indicator__in=preexisting_pc_indicators_current_fy)
         counts['pc_indicator_does_not_exist'] = eligible_programs.count()
 
         if options['verbosity'] > 1:
-            programs_without_rf = eligible_programs.filter(funding_status='Funded').filter(levels__isnull=True).prefetch_related('level_tiers')
+            programs_without_rf = eligible_programs.filter(funding_status='Funded').filter(
+                levels__isnull=True).prefetch_related('level_tiers')
+
         eligible_programs = eligible_programs.exclude(levels__isnull=True).prefetch_related('level_tiers')
         counts['has_rf'] = eligible_programs.count()
 
@@ -146,10 +161,18 @@ class Command(BaseCommand):
                 sys.exit()
 
         for program in eligible_programs:
-            top_level = program.levels.get(parent_id__isnull=True)
+            try:
+                top_level = program.levels.get(parent_id__isnull=True)
+                if options['execute']:
+                    create_participant_count_indicator(program, top_level, disaggregations)
+                    counts['indicators_created'] += 1
+            except MultipleObjectsReturned:
+                print(f'{program.name} has multiple participant count indicators.')
+
+        for indicator in preexisting_pc_indicators_need_pt:
             if options['execute']:
-                create_participant_count_indicator(program, top_level, disaggregations)
-                counts['indicators_created'] += 1
+                add_new_event_target_to_pc_indicator(indicator, indicator.program)
+                counts['new_event_target_created'] += 1
 
         if not options['suppress_output']:
             print('')
@@ -159,7 +182,7 @@ class Command(BaseCommand):
                 for p in ineligible_programs:
                     print(template.format(p=p))
                 print('Program already has a PC indicator')
-                for p in preexisting_programs:
+                for p in preexisting_pc_indicators_need_pt:
                     print(template.format(p=p))
                 print('Program has no RF')
                 for p in programs_without_rf:
