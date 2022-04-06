@@ -1,4 +1,4 @@
-Django>=2.2,<3              # 2.2 LTS, supported until Apr 2022
+Django~=3.2.12              # 3.2 LTS, supported until Apr 2025
 dateparser                  # used in indicators to translate date strings to date objects
 beautifulsoup4              # used in testing to parse html response data
 django-admin-sortable2      # used in Django admin for sortable indicators

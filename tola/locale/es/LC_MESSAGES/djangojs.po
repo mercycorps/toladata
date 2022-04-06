@@ -2,8 +2,8 @@ msgid ""
 msgstr ""
 "Project-Id-Version: \n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2022-03-09 11:43-0800\n"
-"PO-Revision-Date: 2022-03-10 10:48-0500\n"
+"POT-Creation-Date: 2022-03-22 10:55-0700\n"
+"PO-Revision-Date: 2022-03-22 13:38-0400\n"
 "Last-Translator: \n"
 "Language-Team: \n"
 "Language: es\n"
@@ -1419,13 +1419,13 @@ msgstr ""
 
 #: js/pages/results_form_PC/components/ActualValueFields.js:40
 #: js/pages/results_form_PC/components/DisaggregationFields.js:100
-msgid "Without double counting"
-msgstr "Sin cómputo doble"
+msgid "Without double counting across programs"
+msgstr "Sin cómputo doble entre programas"
 
 #: js/pages/results_form_PC/components/ActualValueFields.js:41
 #: js/pages/results_form_PC/components/DisaggregationFields.js:102
-msgid "With double counting"
-msgstr "Con cómputo doble"
+msgid "With double counting across programs"
+msgstr "Con cómputo doble entre programas"
 
 #: js/pages/results_form_PC/components/ActualValueFields.js:99
 msgid "Total Participants"
@@ -3194,6 +3194,12 @@ msgstr "Nutrición"
 #: tola/db_translations.js:170
 msgid "Public Health (non - nutrition, non - WASH)"
 msgstr "Salud pública (no nutricional/no WASH)"
+
+#~ msgid "Without double counting"
+#~ msgstr "Sin cómputo doble"
+
+#~ msgid "With double counting"
+#~ msgstr "Con cómputo doble"
 
 #~ msgid "Actual Direct value"
 #~ msgstr "Valor real directo"

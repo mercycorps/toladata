@@ -263,6 +263,7 @@ a.helptext:hover {
     .heading {
         font-weight: bolder;
         text-align: center;
+        white-space: pre-wrap;        
     }
     input {
         text-align: right;
@@ -377,12 +378,6 @@ a.helptext:hover {
         top: 0;
         width: auto;
     }
-}
-
-.modal-disabled {
-    pointer-events: none;
-    opacity: 0.5;
-    transition: opacity .25s ease-in-out;
 }
 
 .result-form__heading--pc {

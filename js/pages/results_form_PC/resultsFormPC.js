@@ -218,6 +218,7 @@ const PCResultsForm = ({indicatorID="", resultID="", readOnly}) => {
                                 record_name: response.data.record_name
                             });
                             clearTimeout(errorTimeout);
+                            setDisableForm(readOnly || response.data.view_only);
                             setStatus('ready');
                         } else { 
                             clearTimeout(errorTimeout);
@@ -286,7 +287,7 @@ const PCResultsForm = ({indicatorID="", resultID="", readOnly}) => {
     if (Object.keys(disaggregationData).length > 0 && status === 'ready') {
         return (
             <div id="pc-result-modal-form">
-                <div className={disableForm ? "modal-disabled" : null}>
+                <div>
                     <div className="result-form__heading--pc">
                         <h2>
                             {gettext('Result')}
@@ -306,7 +307,7 @@ const PCResultsForm = ({indicatorID="", resultID="", readOnly}) => {
                             outcomeThemesData={outcomeThemesData.current}
                             formErrors={formErrors}
                             setFormErrors={setFormErrors}
-                            readOnly={readOnly}
+                            readOnly={disableForm}
                             setWasUpdated={setWasUpdated}
                         />
                     }
@@ -317,7 +318,7 @@ const PCResultsForm = ({indicatorID="", resultID="", readOnly}) => {
                         formErrors={formErrors}
                         setFormErrors={setFormErrors}
                         handleSADDActualsValidation={handleSADDActualsValidation}
-                        readOnly={readOnly}
+                        readOnly={disableForm}
                         setWasUpdated={setWasUpdated}
                     />
                     {
@@ -344,7 +345,7 @@ const PCResultsForm = ({indicatorID="", resultID="", readOnly}) => {
                                     formErrors={formErrors}
                                     setFormErrors={setFormErrors}
                                     handleSADDActualsValidation={handleSADDActualsValidation}
-                                    readOnly={readOnly}
+                                    readOnly={disableForm}
                                     setWasUpdated={setWasUpdated}
                                 />
                             )
@@ -355,11 +356,11 @@ const PCResultsForm = ({indicatorID="", resultID="", readOnly}) => {
                         setEvidenceFieldsInput={setEvidenceFieldsInput}
                         formErrors={formErrors}
                         setFormErrors={setFormErrors}
-                        readOnly={readOnly}
+                        readOnly={disableForm}
                         setWasUpdated={setWasUpdated}
                     />
 
-                    {!readOnly &&
+                    {!readOnly && !disableForm &&
                     <div className="form-actions">
                         <div>
                             <button
