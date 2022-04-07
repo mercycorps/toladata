@@ -133,16 +133,19 @@ class Command(BaseCommand):
             ineligible_programs = Program.objects.filter(reporting_period_end__lt=reporting_start_date).filter(
                 funding_status='Funded').order_by('reporting_period_end')
 
-        # Filter out PC indicators that need new periodic target
+        # Filter out existing PC indicators that need new periodic target
         preexisting_pc_indicators_need_pt = Indicator.objects.filter(
             admin_type=Indicator.ADMIN_PARTICIPANT_COUNT, periodictargets__period=previous_fiscal_year,
             program__reporting_period_end__gte=reporting_start_date)
-        counts['preexisting_pc_indicators_need_pt'] = preexisting_pc_indicators_need_pt.count()
         eligible_programs = eligible_programs.exclude(indicator__in=preexisting_pc_indicators_need_pt)
 
-        # Filter out PC indicators that have been created already
+        # Filter out PC indicators with current FY periodic targets and exclude them from eligible
+        # programs as well as from indicators that need a periodic target
         preexisting_pc_indicators_current_fy = Indicator.objects.filter(
             admin_type=Indicator.ADMIN_PARTICIPANT_COUNT, periodictargets__period=current_fiscal_year)
+        preexisting_pc_indicators_need_pt = preexisting_pc_indicators_need_pt.exclude(
+            pk__in=preexisting_pc_indicators_current_fy)
+        counts['preexisting_pc_indicators_need_pt'] = preexisting_pc_indicators_need_pt.count()
         eligible_programs = eligible_programs.exclude(indicator__in=preexisting_pc_indicators_current_fy)
         counts['pc_indicator_does_not_exist'] = eligible_programs.count()
 

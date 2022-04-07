@@ -546,9 +546,23 @@ class IndicatorUpdate(IndicatorFormMixin, UpdateView):
 
         ptargets = []
         for pt in pts:
-            # Appending viewonly boolean variable to pts so the target can be disabled for prior fiscal years.
-            current_fiscal_year = 'FY' + str(date.fromisoformat(settings.REPORTING_YEAR_START_DATE).year + 1)
-            viewonly = True if indicator.ADMIN_PARTICIPANT_COUNT == 0 and pt.period_name != current_fiscal_year else False
+            # Viewonly boolean variable for pts so the pc indicator periodic targets can be disabled for prior fiscal
+            # years.
+            viewonly = False
+            if indicator.admin_type == Indicator.ADMIN_PARTICIPANT_COUNT:
+                previous_fiscal_year_string = 'FY' + str(date.fromisoformat(settings.REPORTING_YEAR_START_DATE).year)
+                current_fiscal_year = date.fromisoformat(settings.REPORTING_YEAR_START_DATE).year + 1
+                current_fiscal_year_string = 'FY' + str(current_fiscal_year)
+                today = date.today()
+                # TODO the end date might change in the future!
+                reporting_period_start_date = date(current_fiscal_year, 7, 1)
+                reporting_period_end_date = date(current_fiscal_year, 9, 1)
+                reporting_period = True if reporting_period_start_date <= today < reporting_period_end_date else False
+                # If neither current FY periodic target nor in previous FY periodic target reporting period, set
+                # periodic target to viewonly
+                if pt.period_name != current_fiscal_year_string:
+                    if not (pt.period_name == previous_fiscal_year_string and reporting_period):
+                        viewonly = True
             ptargets.append({
                     'id': pt.pk,
                     'num_data': pt.num_data,

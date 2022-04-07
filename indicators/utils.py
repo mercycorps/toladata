@@ -1,5 +1,6 @@
 
 import datetime
+from django.db import IntegrityError
 from django.conf import settings
 from indicators.models import Indicator, IndicatorType, PeriodicTarget, ReportingFrequency
 
@@ -71,4 +72,6 @@ def add_new_event_target_to_pc_indicator(indicator, program):
         return indicator
     except PeriodicTarget.DoesNotExist:
         print(f'Participant count indicator {last_period_string} for program {program.name} not found.')
+    except IntegrityError:
+        print(f'Periodic Target for {last_period_string} with changed target value.')
 

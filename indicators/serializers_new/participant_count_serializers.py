@@ -93,13 +93,22 @@ class PCResultSerializerRead(serializers.ModelSerializer):
         return PeriodicTarget.objects.values('id', 'period').get(result__id=obj.id)
 
     def get_view_only(self, obj):
+        # Add boolean variable to serializer output.
         periodic_target = PeriodicTarget.objects.values('id', 'period').get(result__id=obj.id)
         view_only = True
-        current_fiscal_year = 'FY' + str(date.fromisoformat(settings.REPORTING_YEAR_START_DATE).year + 1)
-        # Check if periodic target fiscal year matches current fiscal year.
-        if periodic_target['period'] == current_fiscal_year:
+        previous_fiscal_year_string = 'FY' + str(date.fromisoformat(settings.REPORTING_YEAR_START_DATE).year)
+        current_fiscal_year = date.fromisoformat(settings.REPORTING_YEAR_START_DATE).year + 1
+        current_fiscal_year_string = 'FY' + str(current_fiscal_year)
+        today = date.today()
+        # TODO the end date might change in the future!
+        reporting_period_start_date = date(current_fiscal_year, 7, 1)
+        reporting_period_end_date = date(current_fiscal_year, 9, 1)
+        reporting_period = True if reporting_period_start_date <= today < reporting_period_end_date else False
+        # Check if periodic target fiscal year matches current fiscal year or today's date is inside reporting period.
+        # Set view_only to False, so indicator results can be edited
+        if (periodic_target['period'] == current_fiscal_year_string) or (
+                periodic_target['period'] == previous_fiscal_year_string and reporting_period):
             view_only = False
-        # Add boolean variable to serializer output.
         return view_only
 
     def get_outcome_themes(self, obj):
