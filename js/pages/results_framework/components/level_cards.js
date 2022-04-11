@@ -590,6 +590,7 @@ class LevelButton extends React.Component {
             <button
                 disabled={this.props.disabled}
                 type={buttonType}
+                id="level-save-button"
                 className={this.props.classes + ' level-button btn btn-sm'}
                 onClick={() =>this.props.submitFunc(this.props.submitType)}>
                 {this.props.text}
