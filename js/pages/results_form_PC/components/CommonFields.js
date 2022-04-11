@@ -104,7 +104,7 @@ const CommonFields = ({ commonFieldsInput, setCommonFieldsInput, outcomeThemesDa
                     placeholder={gettext("None Selected")}
                     className={`${formErrors.outcome_theme && "is-invalid"}`}
                     id="outcome_themes_multiselect"
-                    disabled={readOnly}
+                    isDisabled={readOnly}
                     value={commonFieldsInput.outcome_theme}
                     onChange={(e) => {
                         setWasUpdated(true);
