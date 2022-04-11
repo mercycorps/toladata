@@ -2,7 +2,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: \n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2022-03-09 11:42-0800\n"
+"POT-Creation-Date: 2022-03-22 10:57-0700\n"
 "PO-Revision-Date: 2022-03-09 12:54-0800\n"
 "Last-Translator: \n"
 "Language-Team: \n"
@@ -2137,92 +2137,92 @@ msgstr ""
 "Socios. Visite TolaData y busque la sección Administración.\n"
 "    "
 
-#: templates/base.html:60
+#: templates/base.html:59
 msgid "https://library.mercycorps.org/record/32352/files/COVID19RemoteMERL.pdf"
 msgstr ""
 "https://library.mercycorps.org/record/32635/files/COVID19RemoteMERLes.pdf"
 
-#: templates/base.html:60
+#: templates/base.html:59
 msgid "Remote MERL guidance (PDF)"
 msgstr "Guía de la MERL remota (PDF)"
 
-#: templates/base.html:61
+#: templates/base.html:60
 msgid "https://drive.google.com/open?id=1x24sddNU1uY851-JW-6f43K4TRS2B96J"
 msgstr "https://drive.google.com/open?id=1x24sddNU1uY851-JW-6f43K4TRS2B96J"
 
-#: templates/base.html:61
+#: templates/base.html:60
 msgid "Recorded webinar"
 msgstr "Webinar grabado"
 
-#: templates/base.html:102
+#: templates/base.html:101
 msgid "Reports"
 msgstr "Informes"
 
-#: templates/base.html:106
+#: templates/base.html:105
 msgid "Admin"
 msgstr "Administrador"
 
-#: templates/base.html:108
+#: templates/base.html:107
 msgid "Users"
 msgstr "Usuarios"
 
-#: templates/base.html:109 templates/indicators/disaggregation_report.html:137
+#: templates/base.html:108 templates/indicators/disaggregation_report.html:137
 #: templates/workflow/filter.html:11
 #: templates/workflow/site_profile_list.html:21
 msgid "Programs"
 msgstr "Programas"
 
-#: templates/base.html:110 workflow/models.py:72
+#: templates/base.html:109 workflow/models.py:72
 msgid "Organizations"
 msgstr "Organizaciones"
 
-#: templates/base.html:111 templates/workflow/tags/program_menu.html:8
+#: templates/base.html:110 templates/workflow/tags/program_menu.html:8
 #: tola_management/models.py:813 workflow/models.py:133
 msgid "Countries"
 msgstr "Países"
 
-#: templates/base.html:191 templates/registration/profile.html:5
+#: templates/base.html:190 templates/registration/profile.html:5
 #: templates/registration/profile.html:7
 msgid "Settings"
 msgstr "Ajustes"
 
-#: templates/base.html:192
+#: templates/base.html:191
 msgid "Log out"
 msgstr "Cerrar sesión"
 
-#: templates/base.html:284
+#: templates/base.html:283
 msgid "Documentation"
 msgstr "Documentación"
 
-#: templates/base.html:289
+#: templates/base.html:288
 msgid "FAQ"
 msgstr "Preguntas frecuentes"
 
-#: templates/base.html:294
+#: templates/base.html:293
 msgid "Feedback"
 msgstr "Realimentación"
 
-#: templates/base.html:340
+#: templates/base.html:339
 msgid "Server Error"
 msgstr "Error del servidor"
 
-#: templates/base.html:341
+#: templates/base.html:340
 msgid "Network Error"
 msgstr "Error de red"
 
-#: templates/base.html:342
+#: templates/base.html:341
 msgid "Please check your network connection and try again"
 msgstr "Verifique su conexión de red y vuelva a intentarlo"
 
-#: templates/base.html:343
+#: templates/base.html:342
 msgid "Unknown network request error"
 msgstr "Error de solicitud de red desconocido"
 
-#: templates/base.html:344
+#: templates/base.html:343
 msgid "Sorry, you do not have permission to perform this action."
 msgstr "Lo sentimos. Usted no tiene permiso para realizar esta acción."
 
-#: templates/base.html:345
+#: templates/base.html:344
 msgid "You can request permission from your TolaData administrator."
 msgstr "Puede solicitar permisos a su administrador TolaData."
 
@@ -3885,15 +3885,15 @@ msgstr ""
 msgid "Number formatting conventions"
 msgstr "Convenciones de formato de números"
 
-#: templates/registration/profile.html:41 tola/settings/base.py:93
+#: templates/registration/profile.html:41 tola/settings/base.py:96
 msgid "English"
 msgstr "Inglés"
 
-#: templates/registration/profile.html:42 tola/settings/base.py:94
+#: templates/registration/profile.html:42 tola/settings/base.py:97
 msgid "French"
 msgstr "Francés"
 
-#: templates/registration/profile.html:43 tola/settings/base.py:95
+#: templates/registration/profile.html:43 tola/settings/base.py:98
 msgid "Spanish"
 msgstr "Español"
 
@@ -4471,7 +4471,7 @@ msgid "Your profile has been updated."
 msgstr "Su perfil se ha actualizado."
 
 #. Translators:  This is an error message when a user has submitted changes to something they don't have access to
-#: tola_management/countryadmin.py:310
+#: tola_management/countryadmin.py:314
 msgid "Program list inconsistent with country access"
 msgstr "Lista de programas incompatible con el acceso del país"
 

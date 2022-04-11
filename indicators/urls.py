@@ -86,6 +86,7 @@ urlpatterns = [
         'indicator_detail_active_export_csv/',
         views.indicator_detail_export_csv,
         name='indicator_detail_active_export_csv'),
+     path('participant_count_fiscal_export', views.views_indicators.ParticipantCountFiscalExport.as_view(), name='participant_count_fiscal_export'),
 
     path('pinned_report/delete/', views.delete_pinned_report, name='delete_pinned_report'),
 
