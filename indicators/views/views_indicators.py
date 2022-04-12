@@ -1416,9 +1416,12 @@ class ParticipantCountFiscalExport(APIView):
     reporting_start_date = date.fromisoformat(settings.REPORTING_YEAR_START_DATE)
 
     def __init__(self, *args, **kwargs):
+        self.event_target_period = 'FY{}'.format(self.reporting_start_date.year + 1)
+
         self.queryset = Indicator.objects.filter(
             admin_type=Indicator.ADMIN_PARTICIPANT_COUNT,
             program__reporting_period_end__gte=self.reporting_start_date,
+            periodictargets__period=self.event_target_period
         ).prefetch_related('program')
 
         # Exclude Tolaland in production
@@ -1426,7 +1429,6 @@ class ParticipantCountFiscalExport(APIView):
             self.queryset = self.queryset.exclude(program__country__country='Tolaland')
 
         self.csv_row = []
-        self.event_target_period = 'FY{}'.format(self.reporting_start_date.year + 1)
 
         super().__init__(*args, **kwargs)
 
@@ -1521,14 +1523,14 @@ class ParticipantCountFiscalExport(APIView):
 
     def get_country_region_list(self, indicator):
         """
-        Returns the countries and regions for the indicator as a comma separated string
+        Returns the countries and regions for the indicator as a lists
 
         Params
             indicator
                 The current indicator object
 
         Returns
-            Two values both comma separated string. First value is countries and second is regions
+            Two lists. First value is countries and second is regions
         """
         country_list = []
         region_list = []
@@ -1537,7 +1539,7 @@ class ParticipantCountFiscalExport(APIView):
             country_list.append(country.name)
             region_list.append(country.region.name)
 
-        return self.comma_separate_list(country_list), self.comma_separate_list(region_list)
+        return country_list, region_list
 
     def get_outcome_themes(self, result):
         """
@@ -1693,18 +1695,27 @@ class ParticipantCountFiscalExport(APIView):
         """
         countries, regions = self.get_country_region_list(indicator)
 
+<<<<<<< HEAD
         self.csv_row.extend([
             indicator.program.name, self.event_target_period, countries, regions, self.remove_new_lines(indicator.definition),
             indicator.program.gaitid, self.remove_new_lines(indicator.means_of_verification), self.remove_new_lines(indicator.data_collection_method),
             self.remove_new_lines(indicator.method_of_analysis), self.remove_new_lines(indicator.comments)
         ])
+=======
+        for index, _ in enumerate(countries):
+            self.csv_row.extend([
+                indicator.program.name, self.event_target_period, countries[index], regions[index], self.remove_new_lines(indicator.definition), 
+                indicator.program.gaitid, self.remove_new_lines(indicator.means_of_verification), self.remove_new_lines(indicator.data_collection_method), 
+                self.remove_new_lines(indicator.method_of_analysis), self.remove_new_lines(indicator.comments)
+            ])
+>>>>>>> dev
 
-        self.populate_results(indicator)
+            self.populate_results(indicator)
 
-        writer.writerow(self.csv_row)
+            writer.writerow(self.csv_row)
 
-        # Finished writing to the csv row. Clear the list for the next row.
-        self.csv_row = []
+            # Finished writing to the csv row. Clear the list for the next row.
+            self.csv_row = []
 
     def get(self, request, *args, **kwargs):
         """
