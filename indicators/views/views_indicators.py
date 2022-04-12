@@ -1695,20 +1695,12 @@ class ParticipantCountFiscalExport(APIView):
         """
         countries, regions = self.get_country_region_list(indicator)
 
-<<<<<<< HEAD
-        self.csv_row.extend([
-            indicator.program.name, self.event_target_period, countries, regions, self.remove_new_lines(indicator.definition),
-            indicator.program.gaitid, self.remove_new_lines(indicator.means_of_verification), self.remove_new_lines(indicator.data_collection_method),
-            self.remove_new_lines(indicator.method_of_analysis), self.remove_new_lines(indicator.comments)
-        ])
-=======
         for index, _ in enumerate(countries):
             self.csv_row.extend([
-                indicator.program.name, self.event_target_period, countries[index], regions[index], self.remove_new_lines(indicator.definition), 
-                indicator.program.gaitid, self.remove_new_lines(indicator.means_of_verification), self.remove_new_lines(indicator.data_collection_method), 
+                indicator.program.name, self.event_target_period, countries[index], regions[index], self.remove_new_lines(indicator.definition),
+                indicator.program.gaitid, self.remove_new_lines(indicator.means_of_verification), self.remove_new_lines(indicator.data_collection_method),
                 self.remove_new_lines(indicator.method_of_analysis), self.remove_new_lines(indicator.comments)
             ])
->>>>>>> dev
 
             self.populate_results(indicator)
 
