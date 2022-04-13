@@ -385,7 +385,8 @@ class IPTTIndicatorReportBase:
         return {
             'count': period_dict.get('customsort', None),
             'actual': actual,
-            'disaggregations': disaggregations
+            'disaggregations': disaggregations,
+            'decreasing': indicator.direction_of_change == Indicator.DIRECTION_OF_CHANGE_NEGATIVE
         }
 
     # serializer method fields (populate fields on serializer):
@@ -397,6 +398,7 @@ class IPTTIndicatorReportBase:
         return self._lop_period_serializer.from_dict(
             {'target': indicator.lop_target_calculated,
              'actual': actual,
+             'decreasing': indicator.direction_of_change == Indicator.DIRECTION_OF_CHANGE_NEGATIVE,
              'disaggregations': disaggregations},
             context=self._get_period_context(indicator)).data
 
@@ -558,7 +560,10 @@ class IPTTTVAReportMixin:
         ]
         period['target'] = targets[0].target if targets else None
         if period['target'] and period['actual']:
-            period['met'] = make_quantized_decimal(period['actual'] / period['target'], places=4)
+            if indicator.direction_of_change == Indicator.DIRECTION_OF_CHANGE_NEGATIVE:
+                period['met'] = make_quantized_decimal(period['target'] / period['actual'], places=4)
+            else:
+                period['met'] = make_quantized_decimal(period['actual'] / period['target'], places=4)
         else:
             period['met'] = None
         return period

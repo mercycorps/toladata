@@ -334,7 +334,10 @@ class ResultsTestBase:
             if count < len(self.expected_result_values) and self.target_values[count] == 0:
                 expected = None
             elif count < len(self.expected_result_values):
-                expected = round(float(self.expected_result_values[count])/self.target_values[count], 2)
+                if self.direction_of_change == Indicator.DIRECTION_OF_CHANGE_NEGATIVE:
+                    expected = round(self.target_values[count]/float(self.expected_result_values[count]), 2)
+                else:
+                    expected = round(float(self.expected_result_values[count])/self.target_values[count], 2)
             else:
                 expected = None
             self.assertAlmostEqual(expected, pt_row.percent_met, 2)
@@ -361,7 +364,8 @@ class TestMonthlyDecreaseCumulative(test.TestCase, ResultsTestBase, ScenarioBuil
     expected_lop_target = 190 # new value based on calculated lop target
     expected_lop_actual = 9652
     #expected_lop_percent_met = 0.80
-    expected_lop_percent_met = 50.8 # new value based on calculated lop target
+    # expected_lop_percent_met = 50.8 # new value based on calculated lop target
+    expected_lop_percent_met = 0.019  # github ticket #2595 - when DIRECTION_OF_CHANGE_NEGATIVE lop_percent_met is calculated by target/actual
     next_date_func = get_next_date_monthly
 
     def setUp(self):

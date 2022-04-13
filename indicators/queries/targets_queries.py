@@ -160,6 +160,13 @@ def target_percent_met_annotation():
             ),
             then=models.Value(None)
         ),
+        models.When(
+            models.Q(indicator__direction_of_change=Indicator.DIRECTION_OF_CHANGE_NEGATIVE),
+            then=models.ExpressionWrapper(
+                models.F('target') / models.F('actual'),
+                output_field=models.FloatField()
+            )
+        ),
         default=models.ExpressionWrapper(
             models.F('actual') / models.F('target'),
             output_field=models.FloatField()
