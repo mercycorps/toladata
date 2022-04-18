@@ -156,6 +156,8 @@ class ProgramPageIndicatorMixin:
     @staticmethod
     def get_lop_met_progress(indicator):
         if indicator.lop_target_progress and indicator.lop_actual_progress:
+            if indicator.direction_of_change == Indicator.DIRECTION_OF_CHANGE_NEGATIVE:
+                return indicator.lop_target_progress / indicator.lop_actual_progress
             return indicator.lop_actual_progress / indicator.lop_target_progress
         return None
 
