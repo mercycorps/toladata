@@ -357,8 +357,6 @@ class ProgramPage(TemplateView):
             'indicator_on_scope_margin': Indicator.ONSCOPE_MARGIN,
             'levels': LevelSerializer(self.program.levels.all(), many=True).data,
             'levelTiers': LevelTierSerializer(self.program.level_tiers.all(), many=True).data,
-            # 'levels': LevelSerializer(levels, many=True).data,
-            # 'levelTiers': LevelTierSerializer(tiers, many=True).data,
             'readonly': not self.request.has_write_access,
             'result_readonly': not self.request.has_medium_access
         }
