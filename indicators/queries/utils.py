@@ -408,6 +408,13 @@ def indicator_lop_percent_met_annotation():
             models.Q(lop_target_calculated=0),
             then=models.Value(None)
             ),
+        models.When(
+            models.Q(direction_of_change=Indicator.DIRECTION_OF_CHANGE_NEGATIVE),
+            then=models.ExpressionWrapper(
+                models.F('lop_target_calculated') / models.F('lop_actual'),
+                output_field=models.FloatField()
+            )
+        ),
         default=models.ExpressionWrapper(
             models.F('lop_actual') / models.F('lop_target_calculated'),
             output_field=models.FloatField()

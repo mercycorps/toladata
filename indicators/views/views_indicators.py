@@ -1385,7 +1385,8 @@ class ParticipantCountFiscalExport(APIView):
         Get
     """
     csv_headers = ['program', 'event_target_period', 'countries', 'regions', 'definition', 'gait_id', 'means_of_verification/data_source', 'data_collection_method',
-                   'method_of_analysis', 'comments', 'outcome_themes', 'direct_without_double_counting', 'indirect_without_double_counting', 'total_without_double_counting',
+                   'method_of_analysis', 'comments', 'economic_opportunities', 'food_security', 'peace_and_stability', 'resilience', 'water_security',
+                   'direct_without_double_counting', 'indirect_without_double_counting', 'total_without_double_counting',
                    'direct_with_double_counting', 'indirect_with_double_counting', 'total_with_double_counting', 'agriculture_direct',
                    'cash_and_voucher_assistance_direct', 'employment_direct', 'environment_direct', 'financial_services_direct', 'governance_and_partnership_direct',
                    'public_health_direct', 'infrastructure_direct', 'nutrition_direct', 'wash_direct', 'agriculture_indirect', 'cash_and_voucher_assistance_indirect',
@@ -1404,6 +1405,7 @@ class ParticipantCountFiscalExport(APIView):
                    '20_24_f_without_double_counting', '20_24_unk_without_double_counting', '25_34_m_without_double_counting', '25_34_f_without_double_counting',
                    '25_34_unk_without_double_counting', '35_49_m_without_double_counting', '35_49_f_without_double_counting', '35_49_unk_without_double_counting',
                    '50+_m_without_double_counting', '50+_f_without_double_counting', '50+_unk_without_double_counting']
+    possible_outcome_themes = ['Economic Opportunities', 'Food Security', 'Peace and Stability', 'Resilience', 'Water Security']
     actual_list = ['Direct', 'Indirect']
     actual_keys = ['Actual without double counting', 'Actual with double counting']
     sector_list = ['Agriculture', 'Cash and Voucher Assistance', 'Employment', 'Environment (DRR, Energy and Water)', 'Financial Services', 'Governance and Partnership',
@@ -1670,8 +1672,11 @@ class ParticipantCountFiscalExport(APIView):
         for key in results_dict:
             # outcome themes are handled differently than actuals, sector, sadd
             if key == 'outcome_themes':
-                value = self.comma_separate_list(list(results_dict[key]))
-                self.csv_row.append(value)
+                for outcome_theme in self.possible_outcome_themes:
+                    if outcome_theme in results_dict['outcome_themes']:
+                        self.csv_row.append(1)
+                    else:
+                        self.csv_row.append(0)
                 continue
 
             value = self.sum_counters(results_dict[key], Counter(self.create_default_counting_dict(
