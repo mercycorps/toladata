@@ -69,6 +69,8 @@ def add_new_event_target_to_pc_indicator(indicator, program):
             period=last_period_string, indicator=indicator).values_list('customsort', flat=True).first()
         PeriodicTarget.objects.get_or_create(
             period=period_string, target=1, customsort=last_customsort + 1, indicator=indicator)
+        indicator.lop_target = 1
+        indicator.save()
         return indicator
     except PeriodicTarget.DoesNotExist:
         print(f'Participant count indicator {last_period_string} for program {program.name} not found.')
