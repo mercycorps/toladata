@@ -19,7 +19,8 @@ from rest_framework.serializers import (
     ValidationError,
     BooleanField,
     DateTimeField,
-    SerializerMethodField
+    SerializerMethodField,
+    StringRelatedField
 )
 
 from openpyxl import Workbook, utils
@@ -241,7 +242,7 @@ class ProgramAdminSerializer(ModelSerializer):
     id = IntegerField(allow_null=True, required=False)
     name = CharField(required=True, max_length=255)
     funding_status = CharField(required=True)
-    gaitid = CharField(required=False, allow_blank=True, allow_null=True)
+    gaitid = StringRelatedField(many=True)
     fundCode = CharField(required=False, allow_blank=True, allow_null=True, source='cost_center')
     description = CharField(allow_null=True, allow_blank=True)
     sector = NestedSectorSerializer(required=True, many=True)
@@ -497,7 +498,8 @@ class ProgramAdminViewSet(viewsets.ModelViewSet):
                     ),
                 ),
                 to_attr='country_with_users'
-            )
+            ),
+            'gaitid'
         )
         return queryset
 
