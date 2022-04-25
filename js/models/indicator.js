@@ -56,10 +56,10 @@ export const withMeasurement = (
         directionOfChange: indicatorJSON.direction_of_change || false,
         baseline: indicatorJSON.baseline || null,
         _lopTarget: indicatorJSON.lop_target || null,
-        _lopActual: indicatorJSON.lop_actual || null,
+        _lopActual: indicatorJSON.lop_actual || indicatorJSON.lop_actual == 0 ? indicatorJSON.lop_actual : null,
         _lopMet: indicatorJSON.lop_met || null,
         _lopTargetProgress: indicatorJSON.lop_target_progress || null,
-        _lopActualProgress: indicatorJSON.lop_actual_progress || null,
+        _lopActualProgress: indicatorJSON.lop_actual_progress || indicatorJSON.lop_actual_progress == 0 ? indicatorJSON.lop_actual_progress : null,
         _lopMetProgress: indicatorJSON.lop_met_progress || null,
         get lopTarget() {
             return this._formatDecimal(this._lopTarget);
