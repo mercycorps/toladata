@@ -91,7 +91,7 @@ class TVAReportPeriodSerializer(TPReportPeriodSerializer):
             actual = period_dict.get('actual', None)
             decreasing = period_dict.get('decreasing', None)
             period_dict['met'] = None
-            if target is not None and actual is not None and target != 0:
+            if target is not None and actual is not None and target != 0 and actual != 0:
                 try:
                     if decreasing:
                         period_dict['met'] = make_quantized_decimal(
