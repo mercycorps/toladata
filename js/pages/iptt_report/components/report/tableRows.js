@@ -367,7 +367,9 @@ class IndicatorRow extends React.Component {
                     <React.Fragment>
                     <ValueCell value={ reportData.lopTarget } className="lop-column " />
                     <ValueCell value={ reportData.lopActual } className="lop-column" />
-                    <PercentCell value={ reportData.lopMet } className="lop-column" />
+                    {
+                        reportData.lopActual == 0 ? <IndicatorCell value={ gettext('N/A') } className="lop-column" /> : <PercentCell value={ reportData.lopMet } className="lop-column" />
+                    }
                     {reportData.periodValues &&
                         (rootStore.periodValues(indicator.pk).map(
                             (value, index) => <PeriodCell value={ value } key={ index } resultCell={ true }/>
