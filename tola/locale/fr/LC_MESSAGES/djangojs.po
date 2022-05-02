@@ -2,7 +2,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: \n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2022-04-29 09:14-0700\n"
+"POT-Creation-Date: 2022-05-02 12:38-0700\n"
 "PO-Revision-Date: 2022-04-04 14:21-0600\n"
 "Last-Translator: \n"
 "Language-Team: \n"
@@ -18,7 +18,7 @@ msgstr ""
 msgid "Import indicators.xlsx"
 msgstr "Import indicators.xlsx"
 
-#: js/base.js:383 js/base.js:384
+#: js/base.js:379 js/base.js:380
 msgid ""
 "Your changes will be recorded in a change log. For future reference, please "
 "share your reason for these changes."
@@ -27,11 +27,11 @@ msgstr ""
 "titre de référence, veuillez partager votre justification pour ces "
 "modifications."
 
-#: js/base.js:385
+#: js/base.js:381
 msgid "This action cannot be undone"
 msgstr "Cette action est irréversible"
 
-#: js/base.js:395
+#: js/base.js:391
 #, python-format
 msgid ""
 "Removing this target means that %s result will no longer have targets "
@@ -47,12 +47,12 @@ msgstr[1] ""
 "associés à des cibles."
 
 #. Translators: the header of an alert after an action completed successfully
-#: js/base.js:415
+#: js/base.js:411
 msgid "Success"
 msgstr "Succès"
 
 #. Translators: the header of an alert where additional warning info is provided
-#: js/base.js:434 js/pages/results_framework/components/level_cards.js:86
+#: js/base.js:430 js/pages/results_framework/components/level_cards.js:86
 #: js/pages/results_framework/models.js:626
 #: js/pages/tola_management_pages/country/components/edit_disaggregations.js:657
 #: js/pages/tola_management_pages/country/models.js:438
@@ -63,7 +63,7 @@ msgid "Warning"
 msgstr "Attention"
 
 #. Translators: the header of an alert after an action failed for some reason
-#: js/base.js:452
+#: js/base.js:448
 msgid "Error"
 msgstr "Erreur"
 
@@ -833,10 +833,12 @@ msgstr "Mesure de base"
 
 #. Translators: short for Not Applicable
 #: js/pages/iptt_report/components/report/tableRows.js:12
-#: js/pages/iptt_report/components/report/tableRows.js:362
-#: js/pages/iptt_report/components/report/tableRows.js:363
-#: js/pages/iptt_report/components/report/tableRows.js:365
-#: js/pages/iptt_report/components/report/tableRows.js:371
+#: js/pages/iptt_report/components/report/tableRows.js:216
+#: js/pages/iptt_report/components/report/tableRows.js:228
+#: js/pages/iptt_report/components/report/tableRows.js:366
+#: js/pages/iptt_report/components/report/tableRows.js:367
+#: js/pages/iptt_report/components/report/tableRows.js:369
+#: js/pages/iptt_report/components/report/tableRows.js:375
 #: js/pages/program_page/components/indicator_list.js:293
 #: js/pages/program_page/components/resultsTable.js:12
 #: js/pages/tola_management_pages/audit_log/views.js:161
@@ -861,15 +863,15 @@ msgstr ""
 msgid "Add result"
 msgstr "Ajouter un résultat"
 
-#: js/pages/iptt_report/components/report/tableRows.js:334
+#: js/pages/iptt_report/components/report/tableRows.js:338
 msgid "Cumulative"
 msgstr "Cumulatif"
 
-#: js/pages/iptt_report/components/report/tableRows.js:337
+#: js/pages/iptt_report/components/report/tableRows.js:341
 msgid "Non-cumulative"
 msgstr "Non cumulatif"
 
-#: js/pages/iptt_report/components/report/tableRows.js:422
+#: js/pages/iptt_report/components/report/tableRows.js:426
 msgid "Indicators unassigned to a results framework level"
 msgstr "Indicateurs non affectés à un niveau de cadre de résultats"
 
