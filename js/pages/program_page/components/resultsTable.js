@@ -90,7 +90,7 @@ const ResultCells = ({ result, noTarget, resultEditable, admin_type, ...props })
                                 </div>
                             </div>
                         </div>
-                        <a 
+                        <a
                             data-toggle="modal"
                             data-target={`#resultModal_${result.pk}`}
                             className="results__link--pc"
@@ -379,16 +379,18 @@ const ResultsTableActions = ({indicator, editable, resultEditable, displayMissin
                                     </div>
                                 </div>
                             </div>
-                            <a 
-                                data-toggle="modal"
-                                data-target={`#resultModal_${indicator.pk}`}
-                                className="btn-link btn-add">
-                                <FontAwesomeIcon icon={ faPlusCircle } />
-                                {
-                                    // # Translators: a button that lets the user add a new result
-                                    gettext('Add result')
-                                }
-                            </a>
+                            {indicator.isFiscalYear &&
+                                <a
+                                    data-toggle="modal"
+                                    data-target={`#resultModal_${indicator.pk}`}
+                                    className="btn-link btn-add">
+                                    <FontAwesomeIcon icon={faPlusCircle}/>
+                                    {
+                                        // # Translators: a button that lets the user add a new result
+                                        gettext('Add result')
+                                    }
+                                </a>
+                            }
                         </React.Fragment>
                     }
                 </div>

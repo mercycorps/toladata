@@ -1,6 +1,6 @@
 import copy
 import re
-from datetime import date
+from datetime import datetime
 from rest_framework import serializers, exceptions
 from django.conf import settings
 from django.utils.translation import ugettext_lazy as _
@@ -94,21 +94,22 @@ class PCResultSerializerRead(serializers.ModelSerializer):
 
     def get_view_only(self, obj):
         # Add boolean variable to serializer output.
-        periodic_target = PeriodicTarget.objects.values('id', 'period').get(result__id=obj.id)
+        periodic_target = PeriodicTarget.objects.values('id', 'customsort').get(result__id=obj.id)
+        pt_year = periodic_target['customsort']
         view_only = True
-        previous_fiscal_year_string = 'FY' + str(date.fromisoformat(settings.REPORTING_YEAR_START_DATE).year)
-        current_fiscal_year = date.fromisoformat(settings.REPORTING_YEAR_START_DATE).year + 1
-        current_fiscal_year_string = 'FY' + str(current_fiscal_year)
-        today = date.today()
-        # TODO the end date might change in the future!
-        reporting_period_start_date = date(current_fiscal_year, 7, 1)
-        reporting_period_end_date = date(current_fiscal_year, 9, 1)
-        reporting_period = True if reporting_period_start_date <= today < reporting_period_end_date else False
-        # Check if periodic target fiscal year matches current fiscal year or today's date is inside reporting period.
-        # Set view_only to False, so indicator results can be edited
-        if (periodic_target['period'] == current_fiscal_year_string) or (
-                periodic_target['period'] == previous_fiscal_year_string and reporting_period):
-            view_only = False
+        today = datetime.utcnow().date()
+        current_year = today.year
+        current_month = today.month
+        # If periodic target matches current calendar year before reporting period ends, make it editable.
+        if pt_year == current_year:
+            if current_month < 9:
+                view_only = False
+        # If periodic target matches next calendar year AND it is past reporting period for prior fiscal year
+        # or period target matches next calendar year AND there is no prior periodic target AND current month
+        # is after new fiscal year start, make periodic target editable.
+        elif pt_year == current_year + 1:
+            if (current_month > 8) or ((not PeriodicTarget.filter(customsort=current_year).exists()) and (current_month > 6)):
+                view_only = False
         return view_only
 
     def get_outcome_themes(self, obj):

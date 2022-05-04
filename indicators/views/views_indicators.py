@@ -6,7 +6,7 @@ import csv
 import copy
 import json
 import logging
-from datetime import datetime, timedelta, date
+from datetime import datetime, date, timedelta
 from decimal import Decimal
 import uuid
 import dateparser
@@ -176,16 +176,30 @@ def participant_count_result_create_for_indicator(request, pk, *args, **kwargs):
 
     verify_program_access_level(request, indicator.program.pk, 'low')
     disagg_queryset = DisaggregationType.objects.filter(indicator__pk=indicator.pk)
+    reporting_year = calculate_reporting_year(indicator)
     return_dict = {
         'outcome_themes': list(OutcomeTheme.objects.filter(is_active=True).values_list('pk', 'name')),
         'program_start_date': indicator.program.reporting_period_start,
         'program_end_date': indicator.program.reporting_period_end,
-        'periodic_target': indicator.periodictargets.order_by('-customsort').values('id', 'period').first(),
+        # Show active periodic target
+        'periodic_target': indicator.periodictargets.filter(customsort=reporting_year).values('id', 'period').first(),
+        # 'periodic_target': indicator.periodictargets.order_by('-customsort').values('id', 'period').first(),
         'disaggregations': pc_serializers.PCDisaggregationSerializer(
             disagg_queryset, many=True, context={'result_pk': None}).data,
     }
 
     return JsonResponse(return_dict)
+
+
+def calculate_reporting_year(indicator):
+    today = datetime.utcnow().date()
+    current_year = today.year
+    current_month = today.month
+    reporting_year = current_year
+    if current_month > 6:
+        if (not indicator.periodictargets.filter(customsort=current_year).exists()) or (current_month > 9):
+            reporting_year = current_year + 1
+    return reporting_year
 
 
 @login_required
@@ -545,24 +559,29 @@ class IndicatorUpdate(IndicatorFormMixin, UpdateView):
             .annotate(num_data=Count('result')).order_by('customsort', 'create_date', 'period')
 
         ptargets = []
-        for pt in pts:
+        for count, pt in enumerate(pts):
             # Viewonly boolean variable for pts so the pc indicator periodic targets can be disabled for prior fiscal
             # years.
             viewonly = False
             if indicator.admin_type == Indicator.ADMIN_PARTICIPANT_COUNT:
-                previous_fiscal_year_string = 'FY' + str(date.fromisoformat(settings.REPORTING_YEAR_START_DATE).year)
-                current_fiscal_year = date.fromisoformat(settings.REPORTING_YEAR_START_DATE).year + 1
-                current_fiscal_year_string = 'FY' + str(current_fiscal_year)
-                today = date.today()
-                # TODO the end date might change in the future!
-                reporting_period_start_date = date(current_fiscal_year, 7, 1)
-                reporting_period_end_date = date(current_fiscal_year, 9, 1)
-                reporting_period = True if reporting_period_start_date <= today < reporting_period_end_date else False
-                # If neither current FY periodic target nor in previous FY periodic target reporting period, set
-                # periodic target to viewonly
-                if pt.period_name != current_fiscal_year_string:
-                    if not (pt.period_name == previous_fiscal_year_string and reporting_period):
-                        viewonly = True
+                viewonly = True
+                today = datetime.utcnow().date()
+                current_year = today.year
+                current_month = today.month
+                # TODO: The reporting period might change in the future!
+                # Current fiscal year and inside reporting period, editable until September
+                if pt.customsort == current_year and current_month < 9:
+                    viewonly = False
+                if pt.customsort == current_year + 1:
+                    # This is the first periodic target for pc indicator, editable with new fiscal year start
+                    if count == 0:
+                        if current_month > 6:
+                            viewonly = False
+                    # There is a prior periodic target
+                    else:
+                        if current_month > 8:
+                            viewonly = False
+
             ptargets.append({
                     'id': pt.pk,
                     'num_data': pt.num_data,
@@ -1166,6 +1185,7 @@ def result_view(request, indicator, program):
             'short_help': short_help,
             'long_help': long_help
         })
+
 
 @login_required
 def indicator_plan(request, program):

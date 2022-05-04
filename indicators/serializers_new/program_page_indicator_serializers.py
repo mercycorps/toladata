@@ -10,9 +10,10 @@
                 returns indicators with just their numbering/ordering information (which changes when an indicator
                     is deleted or moved between levels) for all indicators for a given program.
 """
-
+from datetime import datetime
 from rest_framework import serializers
 from django.db import models
+from django.db.models import Q
 from .indicator_serializers import (
     IndicatorBaseSerializerMixin,
     IndicatorMeasurementMixin,
@@ -77,6 +78,7 @@ class ProgramPageIndicatorMixin:
     reporting_period = serializers.SerializerMethodField()
     periodic_targets = serializers.SerializerMethodField()
     no_target_results = serializers.SerializerMethodField()
+    is_fiscal_year = serializers.BooleanField()
     indicator_type_count = serializers.IntegerField()
 
     class Meta:
@@ -105,6 +107,7 @@ class ProgramPageIndicatorMixin:
             'indicator_type_count',
             'create_date',
             'admin_type',
+            'is_fiscal_year'
         ]
 
     # class methods to instantiate serializer with minimal queries:
@@ -174,6 +177,7 @@ class ProgramPageIndicatorMixin:
         """Returns serializer of targets with their assigned results for creating the results table"""
         targets = indicator.prefetch_targets
         return ProgramPageTargetSerializer(targets, context={'indicator': indicator}, many=True).data
+
 
     @staticmethod
     def get_no_target_results(indicator):
