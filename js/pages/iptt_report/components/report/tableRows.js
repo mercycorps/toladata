@@ -212,7 +212,9 @@ const TVAResultsGroup = ({ value, resultCell, ...props }) => {
         <React.Fragment>
             <NumberCell value={ value.target } />
             <NumberCell value={ value.actual } />
-            <PercentCell value={ value.met }/>
+            {
+                value.actual == 0 ? <IndicatorCell value={ gettext('N/A') } className="lop-column" /> : <PercentCell value={ value.met } className="lop-column" />
+            }
         </React.Fragment>
     );
 }
@@ -222,7 +224,9 @@ const TVAResultsGroupPercent = ({ value, resultCell, ...props }) => {
         <React.Fragment>
             <PercentCell value={ value.target } />
             <PercentCell value={ value.actual } />
-            <PercentCell value={ value.met }/>
+            {
+                value.actual == 0 ? <IndicatorCell value={ gettext('N/A') } className="lop-column" /> : <PercentCell value={ value.met } className="lop-column" />
+            }
         </React.Fragment>
     );
 }

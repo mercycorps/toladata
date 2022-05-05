@@ -40,10 +40,13 @@ class DecimalDisplayField(serializers.DecimalField):
 
     def to_representation(self, value):
         if value is not None and value != '':
-            value = make_quantized_decimal((decimal.Decimal(value) * self.multiplier), places=self.decimal_places)
-            value = value.normalize()
-            self.decimal_places = _get_normalized_decimal_place_count(value, self.decimal_places)
-            return super(DecimalDisplayField, self).to_representation(value)
+            if type(value) is not str:
+                value = make_quantized_decimal((decimal.Decimal(value) * self.multiplier), places=self.decimal_places)
+                value = value.normalize()
+                self.decimal_places = _get_normalized_decimal_place_count(value, self.decimal_places)
+                return super(DecimalDisplayField, self).to_representation(value)
+            else:
+                return value
         return None
 
 
