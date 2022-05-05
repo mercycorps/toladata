@@ -1,3 +1,4 @@
+from datetime import datetime
 from django.core.exceptions import MultipleObjectsReturned
 from indicators.models import Indicator, IndicatorType, PeriodicTarget, ReportingFrequency
 
@@ -95,6 +96,7 @@ def recalculate_periodic_targets(current_first_fiscal_year, current_last_fiscal_
     # Get existing periodic targets for pc indicator
     periodic_targets = PeriodicTarget.objects.filter(indicator=indicator)
 
+
     # If the new end date fiscal year is larger than the current one, add periodic targets
     if new_last_fiscal_year > current_last_fiscal_year:
         pts_to_add = new_last_fiscal_year - current_last_fiscal_year
@@ -105,43 +107,32 @@ def recalculate_periodic_targets(current_first_fiscal_year, current_last_fiscal_
     # target values or results)
     if new_last_fiscal_year < current_last_fiscal_year:
         pts_to_delete = current_last_fiscal_year - new_last_fiscal_year
-        delete_index = 0
-        target = periodic_targets[delete_index - 1].target
-        result = periodic_targets[delete_index - 1].result.exists()
-        for i in range(pts_to_delete):
-            if target == 1 and not result:
-                delete_index -= 1
-                target = periodic_targets[delete_index - 1].target
-                result = periodic_targets[delete_index - 1].result.exists()
+        reversed_pts = periodic_targets.reverse()[:pts_to_delete]
+        for pt in reversed_pts:
+            if pt.target == 1 and not pt.result_set.all().exists():
+                pt.delete()
             else:
                 break
-        pts_to_delete = periodic_targets.filter(indicator=indicator)[delete_index:]
-        for pt in pts_to_delete:
-            pt.delete()
 
     # If the new start date fiscal year is smaller than current one add periodic targets
     if new_first_fiscal_year < current_first_fiscal_year:
-        pts_to_add = current_first_fiscal_year - new_first_fiscal_year
-        fiscal_year_to_add = new_first_fiscal_year
-        make_pt_targets(indicator, fiscal_year_to_add, pts_to_add)
+        today = datetime.utcnow().date()
+        current_fiscal_year = today.year if today.month < 7 else today.year + 1
+        if new_first_fiscal_year == current_fiscal_year:
+            pts_to_add = 1
+            fiscal_year_to_add = new_first_fiscal_year
+            make_pt_targets(indicator, fiscal_year_to_add, pts_to_add)
 
     # If the new start date fiscal year is larger than current one delete periodic targets (if they don't have new
     # target values or results)
     if new_first_fiscal_year > current_first_fiscal_year:
         pts_to_delete = new_first_fiscal_year - current_first_fiscal_year
-        delete_index = 0
-        target = periodic_targets[delete_index].target
-        result = periodic_targets[delete_index].result.exists()
-        for i in range(pts_to_delete):
-            if target == 1 and not result:
-                delete_index += 1
-                target = periodic_targets[delete_index].target
-                result = periodic_targets[delete_index].result.exists()
+        delete_pts = periodic_targets[:pts_to_delete]
+        for pt in delete_pts:
+            if pt.target == 1 and not pt.result_set.all().exists():
+                pt.delete()
             else:
                 break
-        pts_to_delete = periodic_targets.filter(indicator=indicator)[:delete_index]
-        for pt in pts_to_delete:
-            pt.delete()
 
 
 def get_first_last_fiscal_year(program):

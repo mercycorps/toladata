@@ -1797,12 +1797,11 @@ class Indicator(SafeDeleteModel):
             today = datetime.utcnow().date()
             current_year = today.year
             current_month = today.month
-            targets = self.prefetch_targets
+            targets = self.periodictargets.all()
             target_list = [target.customsort for target in targets]
             if (current_year in target_list and current_month < 9) or (
                     current_year + 1 in target_list and current_month > 6):
                 is_fiscal_year = True
-        print(is_fiscal_year)
         return is_fiscal_year
 
     @property

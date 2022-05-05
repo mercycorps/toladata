@@ -52,7 +52,8 @@ const IndicatorEditModalCell = inject('rootStore')(
 
 // Component to add results from the IPTT in a modal
 const IndicatorAddResults = inject("rootStore", "filterStore")(
-    observer(({ indicator, rootStore, filterStore, noTargets }) => {
+    observer(({ indicator, rootStore, filterStore, noTargets, isFiscalYear }) => {
+        console.log(isFiscalYear);
         const loadModal = (e) => {
             e.preventDefault();
             // Url for the form located at templates/indicators/result_form_modal.html
@@ -123,7 +124,7 @@ const IndicatorAddResults = inject("rootStore", "filterStore")(
                             <button
                                 type="button"
                                 className={"btn btn-link px-1 pt-0 mx-auto"}
-                                disabled ={noTargets}
+                                disabled ={noTargets || !isFiscalYear}
                                 data-toggle="modal"
                                 data-target={`#resultModal_${indicator.pk}`}
                             >
@@ -342,6 +343,7 @@ class IndicatorRow extends React.Component {
         }
         let reportData = rootStore.getReportData(indicator.pk);
         let noTargets = reportData.lopTarget === null ? true : false;
+        let isFiscalYear = indicator.isFiscalYear;
 
         return (
             <React.Fragment>
@@ -356,7 +358,7 @@ class IndicatorRow extends React.Component {
                     <IndicatorNameExpandoCell value={ indicator.name } expanded={ this.state.expanded } clickHandler={ this.handleExpandoClick } /> :
                     <IndicatorCell className="indicator-cell " value={ indicator.name } />
                     }
-                    { !rootStore._readOnly && <IndicatorAddResults indicator={ indicator } noTargets={ noTargets } /> }
+                    { !rootStore._readOnly && <IndicatorAddResults indicator={ indicator } noTargets={ noTargets } isFiscalYear={ isFiscalYear } /> }
                     { !rootStore.resultsFramework && <IndicatorCell className="indicator-cell " value={ indicator.oldLevelDisplay } /> }
                     { rootStore.hasUOMColumn && <IndicatorCell className="indicator-cell " value={ indicator.unitOfMeasure } /> }
                     { rootStore.hasChangeColumn && <IndicatorCell className="indicator-cell center-cell" value={ indicator.directionOfChange || gettext('N/A') } /> }

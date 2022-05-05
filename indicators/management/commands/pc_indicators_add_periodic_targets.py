@@ -26,7 +26,7 @@ class Command(BaseCommand):
     def handle(self, *args, **options):
         today = datetime.utcnow().date()
         reporting_end_date = date(today.year, 6, 30)
-        eligible_programs = Program.objects.filter(indicator__admin_type=Indicator.ADMIN_PARTICIPANT_COUNT, reporting_period_end__gt=reporting_end_p)
+        eligible_programs = Program.objects.filter(indicator__admin_type=Indicator.ADMIN_PARTICIPANT_COUNT, reporting_period_end__gt=reporting_end_date)
 
         if options['change_customsort_to_fy']:
             pc_indicators = Indicator.objects.filter(admin_type=Indicator.ADMIN_PARTICIPANT_COUNT).prefetch_related('periodictargets')
