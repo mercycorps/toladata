@@ -20,8 +20,7 @@ class TestManagementCreateParticipantCountIndicators(test.TestCase):
         IndicatorTypeFactory(indicator_type=IndicatorType.PC_INDICATOR_TYPE)
         ReportingFrequencyFactory(frequency=ReportingFrequency.PC_REPORTING_FREQUENCY)
         current_fy = date.fromisoformat(settings.REPORTING_YEAR_START_DATE).year + 1
-        next_fy = date.fromisoformat(settings.REPORTING_YEAR_START_DATE).year + 2
-        program = ProgramFactory(reporting_period_start=date(current_fy, 2, 1), reporting_period_end=date(next_fy, 12, 1))
+        program = ProgramFactory(reporting_period_start=date(current_fy, 7, 1), reporting_period_end=date(current_fy + 1, 6, 1))
         LevelFactory(name="test", program=program)
 
     def indicators(self):
@@ -106,14 +105,6 @@ class TestManagementCreateParticipantCountIndicators(test.TestCase):
 
         next_reporting_period = datetime((date.fromisoformat(settings.REPORTING_YEAR_START_DATE).year + 1), 7, 1)
         next_reporting_period_str = next_reporting_period.strftime('%Y-%m-%d')
-
-        @test.override_settings(REPORTING_YEAR_START_DATE=next_reporting_period_str)
-        def test_command_next():
-            management.call_command(
-                'create_participant_count_indicators', execute=True, create_disaggs_themes=False, suppress_output=True, verbosity=0)
-
-        test_command_next()
-        self.assertEquals(self.periodic_target(), self.expected_lengths['periodic_target_next'])
 
 
 

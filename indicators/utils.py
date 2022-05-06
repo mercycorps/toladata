@@ -136,18 +136,23 @@ def recalculate_periodic_targets(current_first_fiscal_year, current_last_fiscal_
 
 
 def get_first_last_fiscal_year(program):
+    program_start_date = None
     # Get program start and end dates
     # Catch instances where dates do not come in through GAIT
     if program.start_date:
         program_start_date = program.start_date
         program_end_date = program.end_date
-    else:
+    elif program.reporting_period_start:
         program_start_date = program.reporting_period_start
         program_end_date = program.reporting_period_end
 
-    # Find first applicable fiscal year
-    first_fiscal_year = program_start_date.year if program_start_date.month < 7 else program_start_date.year + 1
-    last_fiscal_year = program_end_date.year if program_end_date.month < 7 else program_end_date.year + 1
+    if program_start_date:
+        # Find first applicable fiscal year
+        first_fiscal_year = program_start_date.year if program_start_date.month < 7 else program_start_date.year + 1
+        last_fiscal_year = program_end_date.year if program_end_date.month < 7 else program_end_date.year + 1
+    else:
+        today = datetime.utcnow().date()
+        first_fiscal_year = last_fiscal_year = today.year if today.month < 7 else today + 1
 
     return first_fiscal_year, last_fiscal_year
 
