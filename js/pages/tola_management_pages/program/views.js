@@ -207,11 +207,13 @@ export const IndexView = observer(
                 </header>
                 <div className="admin-list__controls">
                     <BulkActions primaryOptions={bulk_actions.primary_options} secondaryOptions={bulk_actions.secondary_options}/>
-                    <div className="controls__buttons">
-                        <a href="#" className="btn btn-link btn-add" tabIndex="0" onClick={() => store.createProgram()}>
-                            <i className="fas fa-plus-circle"/>{gettext("Add Program")}
-                        </a>
-                    </div>
+                    {window.location.href.toLowerCase().includes('demo') && 
+                        <div className="controls__buttons">
+                            <a href="#" className="btn btn-link btn-add" tabIndex="0" onClick={() => store.createProgram()}>
+                                <i className="fas fa-plus-circle"/>{gettext("Add Program")}
+                            </a>
+                        </div>
+                    }
                 </div>
                 <div className="admin-list__top-filter">
                     <ProgramFilter store={store} filterOptions={programFilterOptions} />
