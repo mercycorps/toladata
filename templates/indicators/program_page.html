@@ -37,10 +37,10 @@
                 {% endif %}
                 <li><a href="{% url 'tola_management_audit_log' program_id=program.pk %}"><i class="fas fa-history"></i> {% trans "Change log" %}</a> </li>
                 <li><a href="{% url 'indicator_plan' program.pk %}"><i class="fas fa-th"></i> {% trans "Indicator plan" %}</a></li>
-            {% if program.gait_url %}
+            <!-- {% if program.gait_url %}
                 {% comment %}Translators: GAIT is the Grant and Award Information Tracker system used by MercyCorps {% endcomment %}
                 <li><a href="{{ program.gait_url }}">{% trans "View program in GAIT" %}</a></li>
-            {% endif %}
+            {% endif %} -->
             </ul>
         </section>
         <section class="sidebar__detail" id="sites-sidebar">

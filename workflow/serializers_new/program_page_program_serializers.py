@@ -58,7 +58,6 @@ class ProgramPageMixin:
     needs_additional_target_periods = serializers.BooleanField()
     site_count = serializers.ReadOnlyField(source='num_sites')
     has_levels = serializers.SerializerMethodField()
-    gait_url = serializers.CharField()
     target_period_info = serializers.SerializerMethodField()
 
     class Meta:
@@ -67,7 +66,6 @@ class ProgramPageMixin:
             'needs_additional_target_periods',
             'site_count',
             'has_levels',
-            'gait_url',
             'target_period_info',
         ]
 

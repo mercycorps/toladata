@@ -613,24 +613,6 @@ class Program(models.Model):
         """
         return reverse('program_page', kwargs={'program': self.pk})
 
-    @property
-    def gait_url(self):
-        """if program has a gait ID, returns url https://gait.mercycorps.org/editgrant.vm?GrantID=####
-        otherwise returns false
-        """
-        if self.gaitid is None:
-            return None
-
-        try:
-            gaitid = int(self.gaitid)
-        except ValueError:
-            gaitid = False
-        if gaitid and gaitid != 0 and len(str(gaitid)) > 2 and len(str(gaitid)) < 5:
-            # gaitid exists, is numeric, is nonzero, and is a 3 or 4 digit number:
-            return 'https://gait.mercycorps.org/editgrant.vm?GrantID={gaitid}'.format(
-                gaitid=gaitid)
-        return None
-
     def get_sites(self):
         indicator_ids = Indicator.objects.filter(program__in=[self.id]).values_list('id')
         results = Result.objects.filter(indicator__id__in=indicator_ids)
