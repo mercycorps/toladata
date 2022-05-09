@@ -1,4 +1,5 @@
-from datetime import datetime
+from datetime import datetime, date
+from django.conf import settings
 from django.core.exceptions import MultipleObjectsReturned
 from indicators.models import Indicator, IndicatorType, PeriodicTarget, ReportingFrequency
 
@@ -70,18 +71,17 @@ def create_periodic_target_range(program, indicator):
 
 def add_additional_periodic_targets(program):
     first_fiscal_year, last_fiscal_year = get_first_last_fiscal_year(program)
-    # Assign current fiscal year as first fiscal year
-    first_fiscal_year = 2022
+    # Assign current fiscal year as first fiscal year, need to be run before the next FY start!
+    first_fiscal_year = date.fromisoformat(settings.REPORTING_YEAR_START_DATE).year + 1
     try:
         indicator = Indicator.objects.get(admin_type=Indicator.ADMIN_PARTICIPANT_COUNT, program__pk=program.pk)
     except MultipleObjectsReturned:
         print(f"Program '{program.name}' has more than one pc indicator.")
         return
     periodic_targets = PeriodicTarget.objects.filter(indicator=indicator)
-    first_period = periodic_targets.values('period').first()['period']
-    period_string = 'FY' + str(first_fiscal_year)
+    first_period = periodic_targets.values('customsort').first()['customsort']
     # Make sure the first periodic target in db matches the current fiscal year
-    if first_period == period_string:
+    if first_period == first_fiscal_year:
         # Calculate how many periodic targets we need to add
         pts_to_add = (last_fiscal_year - first_fiscal_year)
         # First added pt is the following fiscal year
@@ -115,17 +115,26 @@ def recalculate_periodic_targets(current_first_fiscal_year, current_last_fiscal_
                 break
 
     # If the new start date fiscal year is smaller than current one add periodic targets
+    # The first new pt cannot be before current fiscal year
     if new_first_fiscal_year < current_first_fiscal_year:
+        pts_to_add = current_first_fiscal_year - new_first_fiscal_year
         today = datetime.utcnow().date()
         current_fiscal_year = today.year if today.month < 7 else today.year + 1
-        if new_first_fiscal_year == current_fiscal_year:
-            pts_to_add = 1
-            fiscal_year_to_add = new_first_fiscal_year
-            make_pt_targets(indicator, fiscal_year_to_add, pts_to_add)
+        for i in range(pts_to_add):
+            if new_first_fiscal_year >= current_fiscal_year:
+                pts_to_add = 1
+                fiscal_year_to_add = new_first_fiscal_year
+                make_pt_targets(indicator, fiscal_year_to_add, pts_to_add)
+                new_first_fiscal_year += 1
+            else:
+                new_first_fiscal_year += 1
+                continue
 
     # If the new start date fiscal year is larger than current one delete periodic targets (if they don't have new
     # target values or results)
     if new_first_fiscal_year > current_first_fiscal_year:
+        # Cannot delete further back then FY 2022, first FY for participant count indicators
+        current_first_fiscal_year = max(2022, current_first_fiscal_year)
         pts_to_delete = new_first_fiscal_year - current_first_fiscal_year
         delete_pts = periodic_targets[:pts_to_delete]
         for pt in delete_pts:
@@ -136,24 +145,18 @@ def recalculate_periodic_targets(current_first_fiscal_year, current_last_fiscal_
 
 
 def get_first_last_fiscal_year(program):
-    program_start_date = None
     # Get program start and end dates
     # Catch instances where dates do not come in through GAIT
-    if program.start_date:
-        program_start_date = program.start_date
-        program_end_date = program.end_date
-    elif program.reporting_period_start:
-        program_start_date = program.reporting_period_start
-        program_end_date = program.reporting_period_end
-
-    if program_start_date:
+    program_start_date = program.start_date if program.start_date else program.reporting_period_start
+    program_end_date = program.end_date if program.end_date else program.reporting_period_end
+    if program_start_date and program_end_date:
         # Find first applicable fiscal year
         first_fiscal_year = program_start_date.year if program_start_date.month < 7 else program_start_date.year + 1
         last_fiscal_year = program_end_date.year if program_end_date.month < 7 else program_end_date.year + 1
     else:
+        # For test programs that have been created without dates
         today = datetime.utcnow().date()
         first_fiscal_year = last_fiscal_year = today.year if today.month < 7 else today + 1
-
     return first_fiscal_year, last_fiscal_year
 
 

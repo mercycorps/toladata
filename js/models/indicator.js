@@ -52,7 +52,6 @@ export const withMeasurement = (
         get timeAware() { return TIME_AWARE_FREQUENCIES.includes(this.frequency);},
         unitOfMeasure: indicatorJSON.unit_of_measure || false,
         isPercent: Boolean(indicatorJSON.is_percent),
-        isFiscalYear: Boolean(indicatorJSON.is_fiscal_year),
         isCumulative: indicatorJSON.is_cumulative ?? null,
         directionOfChange: indicatorJSON.direction_of_change || false,
         baseline: indicatorJSON.baseline || null,

@@ -45,12 +45,8 @@ def program_updated(sender, instance, *args, **kwargs):
         if not (program.start_date == instance.start_date and program.end_date == instance.end_date):
             # Find current and new fiscal years attached to this indicator and compare them with the new ones.
             # In case of discrepancy recalculate periodic targets.
-            if program.start_date:
-                current_start_date = program.start_date
-                current_end_date = program.end_date
-            else:
-                current_start_date = program.reporting_period_start
-                current_end_date = program.reporting_period_end
+            current_start_date = program.start_date if program.start_date else program.reporting_period_start
+            current_end_date = program.end_date if program.end_date else program.reporting_period_start
             new_start_date = instance.start_date if instance.start_date else current_start_date
             new_end_date = instance.end_date if instance.end_date else current_end_date
             current_first_fiscal_year = current_start_date.year if current_start_date.month < 7 else current_start_date.year + 1

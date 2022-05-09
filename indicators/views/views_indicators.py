@@ -196,8 +196,9 @@ def calculate_reporting_year(indicator):
     current_year = today.year
     current_month = today.month
     reporting_year = current_year
+    last_month_to_report = settings.REPORTING_PERIOD_LAST_MONTH
     if current_month > 6:
-        if (not indicator.periodictargets.filter(customsort=current_year).exists()) or (current_month > 9):
+        if (not indicator.periodictargets.filter(customsort=current_year).exists()) or (current_month > last_month_to_report):
             reporting_year = current_year + 1
     return reporting_year
 
@@ -568,9 +569,9 @@ class IndicatorUpdate(IndicatorFormMixin, UpdateView):
                 today = datetime.utcnow().date()
                 current_year = today.year
                 current_month = today.month
-                # TODO: The reporting period might change in the future!
+                last_month_to_report = settings.REPORTING_PERIOD_LAST_MONTH
                 # Current fiscal year and inside reporting period, editable until September
-                if pt.customsort == current_year and current_month < 9:
+                if pt.customsort == current_year and current_month <= last_month_to_report:
                     viewonly = False
                 if pt.customsort == current_year + 1:
                     # This is the first periodic target for pc indicator, editable with new fiscal year start
@@ -579,7 +580,7 @@ class IndicatorUpdate(IndicatorFormMixin, UpdateView):
                             viewonly = False
                     # There is a prior periodic target
                     else:
-                        if current_month > 8:
+                        if current_month > last_month_to_report:
                             viewonly = False
 
             ptargets.append({

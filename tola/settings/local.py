@@ -126,6 +126,9 @@ LOGGING['handlers']['info_file']['filename'] = os.path.join(dirname(app_settings
 # Sets the current year for participant count reporting
 REPORTING_YEAR_START_DATE = app_settings['REPORTING_YEAR_START_DATE']
 
+# Sets the last months for reporting for participant count reporting
+REPORTING_PERIOD_LAST_MONTH = app_settings['REPORTING_PERIOD_LAST_MONTH']
+
 # use webpack dev server
 WEBPACK_LOADER = {
     'DEFAULT': {

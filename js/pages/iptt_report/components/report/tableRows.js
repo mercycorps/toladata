@@ -52,8 +52,7 @@ const IndicatorEditModalCell = inject('rootStore')(
 
 // Component to add results from the IPTT in a modal
 const IndicatorAddResults = inject("rootStore", "filterStore")(
-    observer(({ indicator, rootStore, filterStore, noTargets, isFiscalYear }) => {
-        console.log(isFiscalYear);
+    observer(({ indicator, rootStore, filterStore, noTargets }) => {
         const loadModal = (e) => {
             e.preventDefault();
             // Url for the form located at templates/indicators/result_form_modal.html
@@ -124,7 +123,7 @@ const IndicatorAddResults = inject("rootStore", "filterStore")(
                             <button
                                 type="button"
                                 className={"btn btn-link px-1 pt-0 mx-auto"}
-                                disabled ={noTargets || !isFiscalYear}
+                                disabled ={noTargets || !indicator.isFiscalYear}
                                 data-toggle="modal"
                                 data-target={`#resultModal_${indicator.pk}`}
                             >

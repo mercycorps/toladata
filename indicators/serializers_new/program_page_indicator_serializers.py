@@ -10,10 +10,8 @@
                 returns indicators with just their numbering/ordering information (which changes when an indicator
                     is deleted or moved between levels) for all indicators for a given program.
 """
-from datetime import datetime
 from rest_framework import serializers
 from django.db import models
-from django.db.models import Q
 from .indicator_serializers import (
     IndicatorBaseSerializerMixin,
     IndicatorMeasurementMixin,
