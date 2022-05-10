@@ -2156,75 +2156,103 @@ msgstr "https://drive.google.com/open?id=1x24sddNU1uY851-JW-6f43K4TRS2B96J"
 msgid "Recorded webinar"
 msgstr "Webinar grabado"
 
-#: templates/base.html:101
+#. Translators: A banner with links to a guide for the participant count
+#: templates/base.html:71 templates/indicators/indicator_form_modal.html:36
+msgid "TolaData Participant Count: Step by Step Guide"
+msgstr "Recuento de Participantes de TolaData: Guía paso a paso"
+
+#. Translators: The language Arabic
+#: templates/base.html:73
+msgid "Arabic"
+msgstr "árabe"
+
+#. Translators: The language English
+#: templates/base.html:75 templates/registration/profile.html:41
+#: tola/settings/base.py:96
+msgid "English"
+msgstr "inglés"
+
+#. Translators: The language French
+#: templates/base.html:77 templates/registration/profile.html:42
+#: tola/settings/base.py:97
+msgid "French"
+msgstr "francés"
+
+#. Translators: The language Spanish
+#: templates/base.html:79 templates/registration/profile.html:43
+#: tola/settings/base.py:98
+msgid "Spanish"
+msgstr "español"
+
+#: templates/base.html:120
 msgid "Reports"
 msgstr "Informes"
 
-#: templates/base.html:105
+#: templates/base.html:124
 msgid "Admin"
 msgstr "Administrador"
 
-#: templates/base.html:107
+#: templates/base.html:126
 msgid "Users"
 msgstr "Usuarios"
 
-#: templates/base.html:108 templates/indicators/disaggregation_report.html:137
+#: templates/base.html:127 templates/indicators/disaggregation_report.html:137
 #: templates/workflow/filter.html:11
 #: templates/workflow/site_profile_list.html:21
 msgid "Programs"
 msgstr "Programas"
 
-#: templates/base.html:109 workflow/models.py:72
+#: templates/base.html:128 workflow/models.py:72
 msgid "Organizations"
 msgstr "Organizaciones"
 
-#: templates/base.html:110 templates/workflow/tags/program_menu.html:8
+#: templates/base.html:129 templates/workflow/tags/program_menu.html:8
 #: tola_management/models.py:813 workflow/models.py:133
 msgid "Countries"
 msgstr "Países"
 
-#: templates/base.html:190 templates/registration/profile.html:5
+#: templates/base.html:209 templates/registration/profile.html:5
 #: templates/registration/profile.html:7
 msgid "Settings"
 msgstr "Ajustes"
 
-#: templates/base.html:191
+#: templates/base.html:210
 msgid "Log out"
 msgstr "Cerrar sesión"
 
-#: templates/base.html:283
+#: templates/base.html:302
 msgid "Documentation"
 msgstr "Documentación"
 
-#: templates/base.html:288
+#: templates/base.html:307
 msgid "FAQ"
 msgstr "Preguntas frecuentes"
 
-#: templates/base.html:293
+#: templates/base.html:312
 msgid "Feedback"
 msgstr "Realimentación"
 
-#: templates/base.html:339
+#: templates/base.html:358
 msgid "Server Error"
 msgstr "Error del servidor"
 
-#: templates/base.html:340
+#: templates/base.html:359
 msgid "Network Error"
 msgstr "Error de red"
 
-#: templates/base.html:341
+#: templates/base.html:360
 msgid "Please check your network connection and try again"
 msgstr "Verifique su conexión de red y vuelva a intentarlo"
 
-#: templates/base.html:342
+#: templates/base.html:361
 msgid "Unknown network request error"
 msgstr "Error de solicitud de red desconocido"
 
-#: templates/base.html:343
+#: templates/base.html:362
 msgid "Sorry, you do not have permission to perform this action."
 msgstr "Lo sentimos. Usted no tiene permiso para realizar esta acción."
 
-#: templates/base.html:344
+#: templates/base.html:363
 msgid "You can request permission from your TolaData administrator."
 msgstr "Puede solicitar permisos a su administrador TolaData."
 
@@ -2750,10 +2778,6 @@ msgstr "Opcional"
 msgid "Please complete all required fields in the %%(tabName)s tab."
 msgstr ""
 "Por favor, complete todos los campos obligatorios en la pestaña %%(tabName)s."
-
-#: templates/indicators/indicator_form_modal.html:36
-msgid "TolaData Participant Count: Step by Step Guide"
-msgstr "Cómputo de participantes de TolaData: Guía paso por paso"
 
 #: templates/indicators/indicator_form_modal.html:164
 #: templates/indicators/indicator_form_modal_complete.html:200
@@ -3886,18 +3910,6 @@ msgstr ""
 #: templates/registration/profile.html:40
 msgid "Number formatting conventions"
 msgstr "Convenciones de formato de números"
-
-#: templates/registration/profile.html:41 tola/settings/base.py:96
-msgid "English"
-msgstr "Inglés"
-
-#: templates/registration/profile.html:42 tola/settings/base.py:97
-msgid "French"
-msgstr "Francés"
-
-#: templates/registration/profile.html:43 tola/settings/base.py:98
-msgid "Spanish"
-msgstr "Español"
 
 #. Translators: Row descriptor in a table that describes how language selection will affect number formats, in this case what punctuation mark is used as the decimal point.
 #: templates/registration/profile.html:49
@@ -7171,9 +7183,6 @@ msgstr "Ciudad, País:"
 
 #~ msgid "Please enter a valid URL."
 #~ msgstr "Por favor ingrese un URL válido."
-
-#~ msgid "Arabic"
-#~ msgstr "Árabe"
 
 #~ msgid "Objective"
 #~ msgstr "Objetivo"

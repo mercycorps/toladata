@@ -2,6 +2,7 @@ import json
 from django import test
 from factories.django_models import UserFactory
 from factories.workflow_models import TolaUserFactory
+from unittest import skip
 
 ENGLISH = 1
 FRENCH = 2
@@ -33,6 +34,19 @@ COVID_WEBINAR_LINK = {
 
 COVID_BANNER_CONTENTS = (COVID_BANNER_TITLE, COVID_BANNER_LINK, COVID_WEBINAR_TITLE, COVID_WEBINAR_LINK)
 
+PC_BANNER_TITLE = {
+    ENGLISH: "TolaData Participant Count: Step by Step Guide",
+    FRENCH: "Comptage des Participants à TolaData : Guide étape par étape",
+    SPANISH: "Recuento de Participantes de TolaData: Guía paso a paso"
+}
+
+PC_BANNER_LINK = {
+    ENGLISH: "https://library.mercycorps.org/record/38839",
+    SPANISH: "https://library.mercycorps.org/record/38841",
+    FRENCH: "https://library.mercycorps.org/record/38842"
+}
+
+PC_BANNER_CONTENTS = (PC_BANNER_TITLE, PC_BANNER_LINK)
 
 
 class TestSessionVariables(test.TestCase):
@@ -45,6 +59,7 @@ class TestSessionVariables(test.TestCase):
         user.save()
         cls.tola_user = TolaUserFactory(user=user)
 
+    @skip('Skipping covid banner test cases')
     def test_covid_session_variable_login_logout(self):
         self.client.logout()
         bare_login = self.client.get('/accounts/login/')
@@ -58,6 +73,7 @@ class TestSessionVariables(test.TestCase):
         # logout should remove session variable
         self.assertFalse(self.client.session.get('show_covid_banner', False))
 
+    @skip('Skipping covid banner test cases')
     def test_covid_session_variable_session_var_update(self):
         self.client.login(username='test_user_session_vars', password='12345')
         self.assertTrue(self.client.session.get('show_covid_banner', False))
@@ -76,6 +92,7 @@ class TestSessionVariables(test.TestCase):
         self.assertTrue(self.client.session.get('show_covid_banner', False))
         self.client.logout()
 
+    @skip('Skipping covid banner test cases')
     def test_covid_banner_shows_and_disappears(self):
         self.client.logout()
         login_response = self.client.get('/', follow=True)
@@ -95,6 +112,7 @@ class TestSessionVariables(test.TestCase):
             self.assertNotContains(after_put_response, text[ENGLISH], status_code=200)
         self.client.logout()
 
+    @skip('Skipping covid banner test cases')
     def test_covid_banner_links_in_correct_language(self):
         self.client.logout()
         self.tola_user.language = 'fr'
@@ -109,5 +127,72 @@ class TestSessionVariables(test.TestCase):
         self.client.login(username='test_user_session_vars', password='12345')
         response = self.client.get('/')
         for text in COVID_BANNER_CONTENTS:
+            self.assertContains(response, text[SPANISH], count=1, status_code=200)
+        self.client.logout()
+
+    def test_pc_session_variable_login_logout(self):
+        self.client.logout()
+        bare_login = self.client.get('/accounts/login/')
+        # getting login page should not set session variable:
+        self.assertFalse(self.client.session.get('show_pc_banner', False))
+        # login should work
+        self.assertTrue(self.client.login(username='test_user_session_vars', password='12345'))
+        # login should set session variable
+        self.assertTrue(self.client.session.get('show_pc_banner', False))
+        self.client.logout()
+        # logout should remove session variable
+        self.assertFalse(self.client.session.get('show_pc_banner', False))
+
+    def test_pc_session_variable_session_var_update(self):
+        self.client.login(username='test_user_session_vars', password='12345')
+        self.assertTrue(self.client.session.get('show_pc_banner', False))
+        # put should succeed to update_user_session
+        response = self.client.put(
+            '/update_user_session/',
+            json.dumps({'show_pc_banner': False}),
+            HTTP_X_REQUESTED_WITH='XMLHttpRequest'
+        )
+        self.assertEqual(response.status_code, 202)
+        # after put session var should be false:
+        self.assertFalse(self.client.session.get('show_pc_banner', False))
+        self.client.logout()
+        # successive login should set it to true again:
+        self.client.login(username='test_user_session_vars', password='12345')
+        self.assertTrue(self.client.session.get('show_pc_banner', False))
+        self.client.logout()
+
+    def test_pc_banner_shows_and_disappears(self):
+        self.client.logout()
+        login_response = self.client.get('/', follow=True)
+        for text in PC_BANNER_CONTENTS:
+            self.assertNotContains(login_response, text[ENGLISH], status_code=200)
+        self.assertTrue(self.client.login(username='test_user_session_vars', password='12345'))
+        response = self.client.get('/')
+        for text in PC_BANNER_CONTENTS:
+            self.assertContains(response, text[ENGLISH], count=1, status_code=200)
+        self.client.put(
+            '/update_user_session/',
+            json.dumps({'show_pc_banner': False}),
+            HTTP_X_REQUESTED_WITH='XMLHttpRequest'
+        )
+        after_put_response = self.client.get('/')
+        for text in PC_BANNER_CONTENTS:
+            self.assertNotContains(after_put_response, text[ENGLISH], status_code=200)
+        self.client.logout()
+
+    def test_pc_banner_links_in_correct_language(self):
+        self.client.logout()
+        self.tola_user.language = 'fr'
+        self.tola_user.save()
+        self.client.login(username='test_user_session_vars', password='12345')
+        response = self.client.get('/')
+        for text in PC_BANNER_CONTENTS:
+            self.assertContains(response, text[FRENCH], count=1, status_code=200)
+        self.client.logout()
+        self.tola_user.language = 'es'
+        self.tola_user.save()
+        self.client.login(username='test_user_session_vars', password='12345')
+        response = self.client.get('/')
+        for text in PC_BANNER_CONTENTS:
             self.assertContains(response, text[SPANISH], count=1, status_code=200)
         self.client.logout()
