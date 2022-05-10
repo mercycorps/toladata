@@ -19,7 +19,6 @@ from rest_framework.authtoken import views as authtoken_views
 
 from tola import views as tolaviews
 from indicators.views import (
-    program_page,
     old_program_page,
     views_program
 )
@@ -96,7 +95,7 @@ urlpatterns += [
     path('<str:selected_country>/', tolaviews.index, name='index'),
 
     # Program page
-    path('program/<int:program>/', program_page, name='program_page'),
+    path('program/<int:program>/', views_program.ProgramPage.as_view(), name='program_page'),
 
     path('program/<int:program>/logframe/', views_program.logframe_view, name='logframe'),
 

@@ -2,7 +2,8 @@
 """
     Program views: logframe, program page api, etc.
 """
-
+from django.views.generic import TemplateView
+from django.utils.decorators import method_decorator
 import math
 from operator import itemgetter
 import csv
@@ -331,39 +332,50 @@ def indicator_detail_export_csv(request):
 
 # API views:
 
-@login_required
-@has_program_read_access
-def program_page(request, program):
-    """Program Page Template view - returns the program page template with JSON populated for React logic"""
-    # redirect to home if program isn't active or doesn't exist:
-    try:
-        program = Program.rf_aware_objects.only(
-            'reporting_period_start', 'reporting_period_end'
-        ).get(pk=int(program))
-    except (Program.DoesNotExist, ValueError):
-        return redirect('/')
-    # redirect to setup page if reporting period isn't complete:
-    if any([program.reporting_period_start is None, program.reporting_period_end is None]):
-        return render(
-            request,
-            'indicators/program_setup_incomplete.html',
-            {'program': program, 'redirect_url': request.path}
-        )
-    levels = Level.objects.filter(program=program)
-    tiers = LevelTier.objects.filter(program=program)
-    context = {
-        'program': ProgramPageProgramSerializer.load_for_pk(program.pk).data,
-        'pinned_reports': list(PinnedReport.objects.filter(
-            program_id=program.pk, tola_user=request.user.tola_user
-            )) + [PinnedReport.default_report(program.pk)],
-        'delete_pinned_report_url': reverse('delete_pinned_report'),
-        'indicator_on_scope_margin': Indicator.ONSCOPE_MARGIN,
-        'levels': LevelSerializer(levels, many=True).data,
-        'levelTiers': LevelTierSerializer(tiers, many=True).data,
-        'readonly': not request.has_write_access,
-        'result_readonly': not request.has_medium_access
-    }
-    return render(request, 'indicators/program_page.html', context)
+@method_decorator(login_required, name='dispatch')
+@method_decorator(has_program_read_access, name='dispatch')
+class ProgramPage(TemplateView):
+    template_name = 'indicators/program_page.html'
+
+    def get_program(self):
+        program_id = int(self.kwargs['program'])
+        try:
+            self.program = Program.rf_aware_objects.only(
+                'reporting_period_start', 'reporting_period_end'
+            ).prefetch_related('levels', 'level_tiers').get(pk=int(program_id))
+        except (Program.DoesNotExist, ValueError):
+            return redirect('/')
+            
+
+    def get_context_data(self, **kwargs):
+        context = {
+            'program': ProgramPageProgramSerializer.load_for_pk(self.program.pk).data,
+            'pinned_reports': list(PinnedReport.objects.filter(
+                program_id=self.program.pk, tola_user=self.request.user.tola_user
+                )) + [PinnedReport.default_report(self.program.pk)],
+            'delete_pinned_report_url': reverse('delete_pinned_report'),
+            'indicator_on_scope_margin': Indicator.ONSCOPE_MARGIN,
+            'levels': LevelSerializer(self.program.levels.all(), many=True).data,
+            'levelTiers': LevelTierSerializer(self.program.level_tiers.all(), many=True).data,
+            'readonly': not self.request.has_write_access,
+            'result_readonly': not self.request.has_medium_access
+        }
+
+        kwargs.update(context)
+
+        return super().get_context_data(**kwargs)
+
+    def get(self, request, *args, **kwargs):
+        self.get_program()
+        # redirect to setup page if reporting period isn't complete:
+        if any([self.program.reporting_period_start is None, self.program.reporting_period_end is None]):
+            return render(
+                request,
+                'indicators/program_setup_incomplete.html',
+                {'program': self.queryset, 'redirect_url': request.path}
+            )
+
+        return super().get(request, *args, **kwargs)
 
 
 @login_required

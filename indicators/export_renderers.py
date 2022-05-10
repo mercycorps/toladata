@@ -203,6 +203,11 @@ class ExcelRendererBase:
             return round(value, 3), '0.0%'
         return value, '0.00%'
 
+    def percent_met_cell(self, value):
+        if value == 'N/A':
+            return self.str_cell(value)
+        return self.percent_cell(value)
+
     @staticmethod
     def percent_value_cell(value):
         if not value and value != 0:
@@ -226,7 +231,7 @@ class ExcelRendererBase:
                 yield (period_data['target'], values_func, None, None)
             yield (period_data['actual'], values_func, None, None)
             if period_header.tva:
-                yield (period_data['met'], self.percent_cell, None, None)
+                yield (period_data['met'], self.percent_met_cell, RIGHT_ALIGN, None)
 
     @staticmethod
     def write_indicator_row(sheet, current_row, indicator_columns):
@@ -317,7 +322,7 @@ class ExcelRendererBase:
         indicator_columns += [
             (indicator['report_data']['lop_period']['target'], values_func, None, None),
             (indicator['report_data']['lop_period']['actual'], values_func, None, None),
-            (indicator['report_data']['lop_period']['met'], self.percent_cell, None, None),
+            (indicator['report_data']['lop_period']['met'], self.percent_met_cell, RIGHT_ALIGN, None),
         ]
         for period_column in self.get_period_report_data_columns(indicator['report_data']['periods'], values_func):
             indicator_columns.append(period_column)
