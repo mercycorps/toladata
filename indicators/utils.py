@@ -1,8 +1,11 @@
+import logging
 from datetime import datetime, date
 from django.conf import settings
 from django.core.exceptions import MultipleObjectsReturned
 from indicators.models import Indicator, IndicatorType, PeriodicTarget, ReportingFrequency
 
+
+logger = logging.getLogger('__name__')
 
 def create_participant_count_indicator(program, top_level, disaggregations_qs):
     definition_text = (
@@ -69,10 +72,11 @@ def create_periodic_target_range(program, indicator):
     make_pt_targets(indicator, fiscal_year, pts_to_add)
 
 
+# This just need to be run once in FY2022, thereafter all periodic targets for a programming period will be
+# created automatically.
 def add_additional_periodic_targets(program):
     first_fiscal_year, last_fiscal_year = get_first_last_fiscal_year(program)
-    # Assign current fiscal year as first fiscal year, need to be run before the next FY start!
-    first_fiscal_year = date.fromisoformat(settings.REPORTING_YEAR_START_DATE).year + 1
+    first_fiscal_year = current_fiscal_year()
     try:
         indicator = Indicator.objects.get(admin_type=Indicator.ADMIN_PARTICIPANT_COUNT, program__pk=program.pk)
     except MultipleObjectsReturned:
@@ -84,7 +88,7 @@ def add_additional_periodic_targets(program):
     if first_period == first_fiscal_year:
         # Calculate how many periodic targets we need to add
         pts_to_add = (last_fiscal_year - first_fiscal_year)
-        # First added pt is the following fiscal year
+        # First added pt should be the next fiscal year (2023)
         fiscal_year = first_fiscal_year + 1
         make_pt_targets(indicator, fiscal_year, pts_to_add)
     else:
@@ -95,68 +99,88 @@ def recalculate_periodic_targets(current_first_fiscal_year, current_last_fiscal_
                                  new_first_fiscal_year, new_last_fiscal_year, indicator):
     # Get existing periodic targets for pc indicator
     periodic_targets = PeriodicTarget.objects.filter(indicator=indicator)
-
+    # Get current fiscal year
+    current_fy_year = current_fiscal_year()
 
     # If the new end date fiscal year is larger than the current one, add periodic targets
     if new_last_fiscal_year > current_last_fiscal_year:
-        pts_to_add = new_last_fiscal_year - current_last_fiscal_year
-        fiscal_year_to_add = current_last_fiscal_year + 1
-        make_pt_targets(indicator, fiscal_year_to_add, pts_to_add)
+        reversed_pts = periodic_targets.reverse()
+        try:
+            # Start creating new targets after the last periodic target
+            current_last_pt = reversed_pts[0].customsort
+        except IndexError:
+            # There are no periodic targets, create them for the entire program period
+            # The first periodic target cannot be smaller than the current fiscal year
+            current_last_pt = max(new_first_fiscal_year, current_fy_year) - 1
+        pts_to_add = new_last_fiscal_year - current_last_pt
+        if pts_to_add > 0:
+            fiscal_year_to_add = current_last_pt + 1
+            make_pt_targets(indicator, fiscal_year_to_add, pts_to_add)
 
-    # If the new end date fiscal year is smaller than the current one delete periodic targets (if they don't have new
+    # If the new end date fiscal year is smaller than the current one, delete periodic targets (if they don't have new
     # target values or results)
     if new_last_fiscal_year < current_last_fiscal_year:
-        pts_to_delete = current_last_fiscal_year - new_last_fiscal_year
-        reversed_pts = periodic_targets.reverse()[:pts_to_delete]
-        for pt in reversed_pts:
-            if pt.target == 1 and not pt.result_set.all().exists():
-                pt.delete()
-            else:
-                break
+        reversed_pts = periodic_targets.reverse()
+        try:
+            current_last_pt = reversed_pts[0].customsort
+        except IndexError:
+            # There are no periodic targets, do nothing.
+            return
+        pts_to_delete = current_last_pt - new_last_fiscal_year
+        if pts_to_delete > 0:
+            delete_pts = reversed_pts[:pts_to_delete]
+            for pt in delete_pts:
+                if pt.target == 1 and not pt.result_set.all().exists():
+                    pt.delete()
+                else:
+                    break
 
-    # If the new start date fiscal year is smaller than current one add periodic targets
-    # The first new pt cannot be before current fiscal year
+    # If the new start date fiscal year is smaller than current one, add periodic targets
     if new_first_fiscal_year < current_first_fiscal_year:
-        pts_to_add = current_first_fiscal_year - new_first_fiscal_year
-        today = datetime.utcnow().date()
-        current_fiscal_year = today.year if today.month < 7 else today.year + 1
-        for i in range(pts_to_add):
-            if new_first_fiscal_year >= current_fiscal_year:
-                pts_to_add = 1
-                fiscal_year_to_add = new_first_fiscal_year
-                make_pt_targets(indicator, fiscal_year_to_add, pts_to_add)
-                new_first_fiscal_year += 1
-            else:
-                new_first_fiscal_year += 1
-                continue
+        # The first new periodic target cannot be smaller than the current fiscal year
+        new_first_fiscal_year = max(new_first_fiscal_year, current_fy_year)
+        try:
+            first_pts = periodic_targets[0].customsort
+        except IndexError:
+            # There are no periodic targets, create them for the entire program period
+            # The first periodic target cannot be smaller than the current fiscal year
+            first_pts = new_last_fiscal_year
+        pts_to_add = first_pts - new_first_fiscal_year
+        if pts_to_add > 0:
+            fiscal_year_to_add = new_first_fiscal_year
+            make_pt_targets(indicator, fiscal_year_to_add, pts_to_add)
 
     # If the new start date fiscal year is larger than current one delete periodic targets (if they don't have new
     # target values or results)
     if new_first_fiscal_year > current_first_fiscal_year:
-        # Cannot delete further back then FY 2022, first FY for participant count indicators
-        current_first_fiscal_year = max(2022, current_first_fiscal_year)
-        pts_to_delete = new_first_fiscal_year - current_first_fiscal_year
-        delete_pts = periodic_targets[:pts_to_delete]
-        for pt in delete_pts:
-            if pt.target == 1 and not pt.result_set.all().exists():
-                pt.delete()
-            else:
-                break
+        try:
+            fiscal_year_to_delete = periodic_targets[0].customsort
+        except IndexError:
+            # There are no periodic targets, do nothing.
+            return
+        pts_to_delete = new_first_fiscal_year - fiscal_year_to_delete
+        if pts_to_delete > 0:
+            delete_pts = periodic_targets[:pts_to_delete]
+            for pt in delete_pts:
+                if pt.target == 1 and not pt.result_set.all().exists():
+                    pt.delete()
+                else:
+                    break
 
 
 def get_first_last_fiscal_year(program):
     # Get program start and end dates
     # Catch instances where dates do not come in through GAIT
+    current_fy_year = current_fiscal_year()
     program_start_date = program.start_date if program.start_date else program.reporting_period_start
     program_end_date = program.end_date if program.end_date else program.reporting_period_end
     if program_start_date and program_end_date:
         # Find first applicable fiscal year
-        first_fiscal_year = program_start_date.year if program_start_date.month < 7 else program_start_date.year + 1
+        first_fiscal_year = max((program_start_date.year if program_start_date.month < 7 else program_start_date.year + 1), current_fy_year)
         last_fiscal_year = program_end_date.year if program_end_date.month < 7 else program_end_date.year + 1
     else:
         # For test programs that have been created without dates
-        today = datetime.utcnow().date()
-        first_fiscal_year = last_fiscal_year = today.year if today.month < 7 else today + 1
+        first_fiscal_year = last_fiscal_year = current_fiscal_year()
     return first_fiscal_year, last_fiscal_year
 
 
@@ -168,6 +192,14 @@ def make_pt_targets(indicator, fiscal_year, pts_to_add):
         customsort = fiscal_year
         PeriodicTarget.objects.get_or_create(
             period=period_string, target=1, customsort=customsort, indicator=indicator)
+        indicator.lop_target = 1
+        indicator.save()
         fiscal_year += 1
+
+
+def current_fiscal_year():
+    today = datetime.utcnow().date()
+    current_fy_year = today.year if today.month < 7 else today.year + 1
+    return current_fy_year
 
 

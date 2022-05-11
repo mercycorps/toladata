@@ -72,6 +72,8 @@ class PCResultSerializerRead(serializers.ModelSerializer):
     view_only = serializers.SerializerMethodField()
     program_start_date = serializers.DateField(source='indicator.program.reporting_period_start', read_only=True)
     program_end_date = serializers.DateField(source='indicator.program.reporting_period_end', read_only=True)
+    pt_start_date = serializers.DateField()
+    pt_end_date = serializers.DateField()
 
     class Meta:
         model = Result
@@ -86,7 +88,9 @@ class PCResultSerializerRead(serializers.ModelSerializer):
             'program_end_date',
             'outcome_themes',
             'disaggregations',
-            'view_only'
+            'view_only',
+            'pt_start_date',
+            'pt_end_date',
         ]
 
     def get_periodic_target(self, obj):
@@ -100,15 +104,16 @@ class PCResultSerializerRead(serializers.ModelSerializer):
         today = datetime.utcnow().date()
         current_year = today.year
         current_month = today.month
+        last_month_to_report = settings.REPORTING_PERIOD_LAST_MONTH
         # If periodic target matches current calendar year before reporting period ends, make it editable.
         if pt_year == current_year:
-            if current_month < 9:
+            if current_month <= last_month_to_report:
                 view_only = False
         # If periodic target matches next calendar year AND it is past reporting period for prior fiscal year
         # or period target matches next calendar year AND there is no prior periodic target AND current month
         # is after new fiscal year start, make periodic target editable.
         elif pt_year == current_year + 1:
-            if (current_month > 8) or ((not PeriodicTarget.filter(customsort=current_year).exists()) and (current_month > 6)):
+            if (current_month > last_month_to_report) or ((not PeriodicTarget.objects.filter(customsort=current_year).exists()) and (current_month > 6)):
                 view_only = False
         return view_only
 

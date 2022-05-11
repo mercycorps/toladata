@@ -176,11 +176,14 @@ def participant_count_result_create_for_indicator(request, pk, *args, **kwargs):
 
     verify_program_access_level(request, indicator.program.pk, 'low')
     disagg_queryset = DisaggregationType.objects.filter(indicator__pk=indicator.pk)
+    pt_start_date, pt_end_date = calculate_pt_start_end_dates()
     reporting_year = calculate_reporting_year(indicator)
     return_dict = {
         'outcome_themes': list(OutcomeTheme.objects.filter(is_active=True).values_list('pk', 'name')),
         'program_start_date': indicator.program.reporting_period_start,
         'program_end_date': indicator.program.reporting_period_end,
+        'pt_start_date': pt_start_date,
+        'pt_end_date': pt_end_date,
         # Show active periodic target
         'periodic_target': indicator.periodictargets.filter(customsort=reporting_year).values('id', 'period').first(),
         # 'periodic_target': indicator.periodictargets.order_by('-customsort').values('id', 'period').first(),
@@ -190,6 +193,10 @@ def participant_count_result_create_for_indicator(request, pk, *args, **kwargs):
 
     return JsonResponse(return_dict)
 
+def calculate_pt_start_end_dates():
+    today = datetime.utcnow().date()
+    year = today.year if today.month < 6 else today.year + 1
+    return date(year - 1, 7, 1), date(year, 6, 30)
 
 def calculate_reporting_year(indicator):
     today = datetime.utcnow().date()

@@ -2344,6 +2344,16 @@ class Result(models.Model):
         return self.date_collected
 
     @property
+    def pt_start_date(self):
+        year = self.periodic_target.customsort
+        return date(year - 1, 7, 1)
+
+    @property
+    def pt_end_date(self):
+        year = self.periodic_target.customsort
+        return date(year, 6, 30)
+
+    @property
     def disaggregated_values(self):
         return self.disaggregatedvalue_set.all().order_by(
             'category__disaggregation_type__global_type',
