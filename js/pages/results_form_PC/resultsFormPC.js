@@ -191,7 +191,9 @@ const PCResultsForm = ({indicatorID="", resultID="", readOnly}) => {
                             setCommonFieldsInput({
                                 program_start_date: response.data.program_start_date,
                                 program_end_date: response.data.program_end_date,
-                                periodic_target: response.data.periodic_target
+                                periodic_target: response.data.periodic_target,
+                                pt_end_date: response.data.pt_end_date,
+                                pt_start_date: response.data.pt_start_date,
                             });
                             clearTimeout(errorTimeout);
                             setStatus('ready');
