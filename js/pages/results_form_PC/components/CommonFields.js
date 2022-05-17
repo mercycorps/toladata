@@ -84,7 +84,8 @@ const CommonFields = ({ commonFieldsInput, setCommonFieldsInput, outcomeThemesDa
                     name="periodic_target--pc" 
                     id="id_periodic_target--pc" 
                     className="form-control" 
-                    required autoComplete="off" 
+                    required
+                    autoComplete="off" 
                     disabled
                     value={commonFieldsInput.periodic_target && commonFieldsInput.periodic_target.period || ""}
                 />

@@ -5,10 +5,8 @@
         {% blocktrans %}
             <span
                 class="programperiodlink"
-                >
-                Program period
-            </span>
-            <!-- <a
+            ></span>
+            <a
                 id="id_link_reporting_period_{{ program.id }}"
                 class=""
                 href="#"
@@ -21,7 +19,7 @@
                 data-target="#id_reporting_period_modal"
                 data-read-only="{{ read_only }}">
                 Program period
-            </a> -->
+            </a>
             is <br><strong class="text-dark">{{ program.percent_complete }}% complete</strong>
         {% endblocktrans %}
     </p>
