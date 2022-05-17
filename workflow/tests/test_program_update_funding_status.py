@@ -1,3 +1,4 @@
+from datetime import date
 from django import test
 from factories.workflow_models import ProgramFactory
 from factories.indicators_models import LevelFactory, IndicatorTypeFactory, ReportingFrequencyFactory
@@ -9,14 +10,14 @@ class TestProgramFundingStatusUpdate(test.TestCase):
     """
     Tests that the participant count indicator gets created when a programs funding_status changes.
     """
-    
+
     def setUp(self):
         """
         Set up for the test case. IndicatorTypeFactory and ReportingFrequencyFactory are required for creating disaggs
         """
         IndicatorTypeFactory(indicator_type=IndicatorType.PC_INDICATOR_TYPE)
         ReportingFrequencyFactory(frequency=ReportingFrequency.PC_REPORTING_FREQUENCY)
-        self.program = ProgramFactory(funding_status="Completed")
+        self.program = ProgramFactory(funding_status="Completed", reporting_period_start=date(2022, 1, 1), reporting_period_end=date(2022, 6, 1))
 
     def has_rf(self):
         """

@@ -69,7 +69,7 @@ def program_updated(sender, instance, *args, **kwargs):
                 except ObjectDoesNotExist:
                     # Program does not have participant count indicator create one
                     # Only create PC indicators for programs starting in FY2022 or later
-                    if instance.reporting_period_end >= datetime(2021, 7, 1):
+                    if instance.reporting_period_end.isoformat() >= datetime(2021, 7, 1).isoformat():
                         top_level = program.levels.get(parent_id__isnull=True)
                         disaggregations = DisaggregationType.objects.filter(global_type=DisaggregationType.DISAG_PARTICIPANT_COUNT)
                         create_participant_count_indicator(instance, top_level, disaggregations)

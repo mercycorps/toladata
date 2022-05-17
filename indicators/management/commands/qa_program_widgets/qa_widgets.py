@@ -587,7 +587,7 @@ user_profiles = {
         'email': 'tolatestone@mercycorps.org',
         'accessible_countries': standard_countries,
         'permission_level': 'low',
-        'home_country': 'United States',
+        'home_country': 'United States - MCNW',
         'org': MC_ORG,
     },
     'mc-medium': {
@@ -595,7 +595,7 @@ user_profiles = {
         'email': 'tolatesttwo@mercycorps.org',
         'accessible_countries': standard_countries,
         'permission_level': 'medium',
-        'home_country': 'United States',
+        'home_country': 'United States - MCNW',
         'org': MC_ORG,
     },
     'mc-high': {
@@ -603,7 +603,7 @@ user_profiles = {
         'email': 'tolatestthree@mercycorps.org',
         'accessible_countries': standard_countries,
         'permission_level': 'high',
-        'home_country': 'United States',
+        'home_country': 'United States - MCNW',
         'org': MC_ORG,
     },
     'mc-basicadmin': {
@@ -611,7 +611,7 @@ user_profiles = {
         'email': 'mcbasicadmin@example.com',
         'accessible_countries': standard_countries,
         'permission_level': 'high',
-        'home_country': 'United States',
+        'home_country': 'United States - MCNW',
         'org': MC_ORG,
         'admin': 'all'
     },
