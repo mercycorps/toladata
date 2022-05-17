@@ -1,4 +1,5 @@
 import logging
+from datetime import datetime, date
 from django.core.exceptions import ObjectDoesNotExist, MultipleObjectsReturned
 from django.db.models.signals import pre_save
 from django.dispatch import receiver
@@ -7,6 +8,7 @@ from indicators.models import Indicator, DisaggregationType
 from indicators.utils import create_participant_count_indicator, recalculate_periodic_targets
 
 logger = logging.getLogger(__name__)
+
 
 @receiver(pre_save, sender=Program)
 def program_updated(sender, instance, *args, **kwargs):
@@ -37,18 +39,20 @@ def program_updated(sender, instance, *args, **kwargs):
             pc_indicator = program.indicator_set.filter(admin_type=Indicator.ADMIN_PARTICIPANT_COUNT).count()
             if pc_indicator == 0:
                 # Program does not have participant count indicator create one
-                top_level = program.levels.get(parent_id__isnull=True)
-                disaggregations = DisaggregationType.objects.filter(global_type=DisaggregationType.DISAG_PARTICIPANT_COUNT)
-                create_participant_count_indicator(program, top_level, disaggregations)
+                # Only create PC indicators for programs starting in FY2022 or later
+                if program.reporting_period_end >= date(2021, 7, 1):
+                    top_level = program.levels.get(parent_id__isnull=True)
+                    disaggregations = DisaggregationType.objects.filter(global_type=DisaggregationType.DISAG_PARTICIPANT_COUNT)
+                    create_participant_count_indicator(program, top_level, disaggregations)
 
         # Check if the start and end dates are updated
-        if not (program.start_date == instance.start_date and program.end_date == instance.end_date):
+        if not (program.reporting_period_start == instance.reporting_period_start and program.reporting_period_end == instance.reporting_period_end):
             # Find current and new fiscal years attached to this indicator and compare them with the new ones.
             # In case of discrepancy recalculate periodic targets.
-            current_start_date = program.start_date if program.start_date else program.reporting_period_start
-            current_end_date = program.end_date if program.end_date else program.reporting_period_end
-            new_start_date = instance.start_date if instance.start_date else current_start_date
-            new_end_date = instance.end_date if instance.end_date else current_end_date
+            current_start_date = program.reporting_period_start
+            current_end_date = program.reporting_period_end
+            new_start_date = instance.reporting_period_start
+            new_end_date = instance.reporting_period_end
             current_first_fiscal_year = current_start_date.year if current_start_date.month < 7 else current_start_date.year + 1
             current_last_fiscal_year = current_end_date.year if current_end_date.month < 7 else current_end_date.year + 1
             new_first_fiscal_year = new_start_date.year if new_start_date.month < 7 else new_start_date.year + 1
@@ -63,9 +67,13 @@ def program_updated(sender, instance, *args, **kwargs):
                         current_first_fiscal_year, current_last_fiscal_year,
                         new_first_fiscal_year, new_last_fiscal_year, indicator)
                 except ObjectDoesNotExist:
-                    logger.error("No pc indicator found in program '{}'".format(program.name))
+                    # Program does not have participant count indicator create one
+                    # Only create PC indicators for programs starting in FY2022 or later
+                    if instance.reporting_period_end >= datetime(2021, 7, 1):
+                        top_level = program.levels.get(parent_id__isnull=True)
+                        disaggregations = DisaggregationType.objects.filter(global_type=DisaggregationType.DISAG_PARTICIPANT_COUNT)
+                        create_participant_count_indicator(instance, top_level, disaggregations)
                 except MultipleObjectsReturned:
                     logger.error("More than one pc indicator found in program '{}'".format(program.name))
-
 
 

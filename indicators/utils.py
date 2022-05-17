@@ -1,6 +1,5 @@
 import logging
 from datetime import datetime, date
-from django.conf import settings
 from django.core.exceptions import MultipleObjectsReturned
 from indicators.models import Indicator, IndicatorType, PeriodicTarget, ReportingFrequency
 
@@ -48,7 +47,6 @@ def create_participant_count_indicator(program, top_level, disaggregations_qs):
         'information_use': information_use,
         'admin_type': Indicator.ADMIN_PARTICIPANT_COUNT,
     }
-
     indicator = Indicator.objects.create(**all_defaults)
     indicator.indicator_type.add(IndicatorType.objects.get(indicator_type="Custom"))
     indicator.target_frequency = Indicator.EVENT
@@ -76,6 +74,7 @@ def create_periodic_target_range(program, indicator):
 # created automatically.
 def add_additional_periodic_targets(program):
     first_fiscal_year, last_fiscal_year = get_first_last_fiscal_year(program)
+    # FY2022 is the always first periodic target.
     first_fiscal_year = current_fiscal_year()
     try:
         indicator = Indicator.objects.get(admin_type=Indicator.ADMIN_PARTICIPANT_COUNT, program__pk=program.pk)
@@ -170,10 +169,9 @@ def recalculate_periodic_targets(current_first_fiscal_year, current_last_fiscal_
 
 def get_first_last_fiscal_year(program):
     # Get program start and end dates
-    # Catch instances where dates do not come in through GAIT
     current_fy_year = current_fiscal_year()
-    program_start_date = program.start_date if program.start_date else program.reporting_period_start
-    program_end_date = program.end_date if program.end_date else program.reporting_period_end
+    program_start_date = program.reporting_period_start
+    program_end_date = program.reporting_period_end
     if program_start_date and program_end_date:
         # Find first applicable fiscal year
         first_fiscal_year = max((program_start_date.year if program_start_date.month < 7 else program_start_date.year + 1), current_fy_year)

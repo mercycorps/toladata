@@ -63,6 +63,7 @@ class Command(BaseCommand):
             if not options['execute']:
                 print('\nINDICATOR CREATION WAS A DRY RUN\n')
 
+
     @staticmethod
     def add_fy_customsort(indicator):
         for pt in indicator.periodictargets.all():

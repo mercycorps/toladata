@@ -54,7 +54,7 @@ class ProgramFactory:
         })
         program.country.add(self.country)
         if multi_country:
-            country2 = Country.objects.get(country="United States")
+            country2 = Country.objects.get(country="United States - MCNW")
             program.country.add(country2)
 
         if create_levels:
@@ -578,7 +578,7 @@ class Cleaner:
                 print('\nPrograms not deleted')
 
 
-standard_countries = ['Afghanistan', 'Haiti', 'Jordan', 'Tolaland', 'United States']
+standard_countries = ['Afghanistan', 'Haiti', 'Jordan', 'Tolaland', 'United States - MCNW']
 TEST_ORG, created = Organization.objects.get_or_create(name='Test')
 MC_ORG = Organization.objects.get(name='Mercy Corps')
 user_profiles = {
