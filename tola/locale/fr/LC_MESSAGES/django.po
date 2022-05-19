@@ -2,8 +2,8 @@ msgid ""
 msgstr ""
 "Project-Id-Version: \n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2022-05-02 12:33-0700\n"
-"PO-Revision-Date: 2022-03-03 10:56-0800\n"
+"POT-Creation-Date: 2022-05-18 08:12-0700\n"
+"PO-Revision-Date: 2022-05-18 11:20-0400\n"
 "Last-Translator: \n"
 "Language-Team: \n"
 "Language: fr\n"
@@ -66,7 +66,7 @@ msgstr "Nº"
 
 #: indicators/export_renderers.py:58 indicators/forms.py:392
 #: indicators/models.py:1566 indicators/models.py:1977 indicators/models.py:2270
-#: indicators/views/views_program.py:137 indicators/views/views_program.py:176
+#: indicators/views/views_program.py:138 indicators/views/views_program.py:177
 #: templates/indicators/disaggregation_print.html:53
 #: templates/indicators/disaggregation_report.html:91
 #: tola_management/programadmin.py:62 tola_management/programadmin.py:110
@@ -95,7 +95,7 @@ msgstr "C / NC"
 
 #. Translators: One of several options for specifying how often data is collected or reported on over the life of a program
 #: indicators/export_renderers.py:77 indicators/forms.py:259
-#: indicators/forms.py:557 indicators/models.py:1355 tola/db_translations.py:12
+#: indicators/forms.py:557 indicators/models.py:1355 tola/db_translations.py:18
 #: tola_management/models.py:398
 msgid "Baseline"
 msgstr "Mesure de base"
@@ -113,13 +113,13 @@ msgstr "Mesure de mi-parcours et mesure de fin de programme"
 #. Translators: One of several options for specifying how often data is collected or reported on over the life of a program
 #: indicators/export_renderers.py:84 indicators/models.py:1089
 #: templates/indicators/program_target_period_info_helptext.html:16
-#: tola/db_translations.py:6
+#: tola/db_translations.py:10
 msgid "Annual"
 msgstr "Annuel"
 
 #. Translators: One of several options for specifying how often data is collected or reported on over the life of a program
 #: indicators/export_renderers.py:85 indicators/models.py:1090
-#: tola/db_translations.py:24
+#: tola/db_translations.py:30
 msgid "Semi-annual"
 msgstr "Semestriel"
 
@@ -132,7 +132,7 @@ msgstr "Quadrimestriel"
 #. Translators: One of several options for specifying how often data is collected or reported on over the life of a program
 #: indicators/export_renderers.py:88 indicators/models.py:1092
 #: templates/indicators/program_target_period_info_helptext.html:22
-#: tola/db_translations.py:18
+#: tola/db_translations.py:24
 msgid "Quarterly"
 msgstr "Trimestriel"
 
@@ -140,7 +140,7 @@ msgstr "Trimestriel"
 #. Translators: One of several options for specifying how often data is collected or reported on over the life of a program
 #: indicators/export_renderers.py:89 indicators/models.py:1093
 #: templates/indicators/program_target_period_info_helptext.html:24
-#: tola/db_translations.py:28
+#: tola/db_translations.py:14
 msgid "Monthly"
 msgstr "Mensuel"
 
@@ -209,7 +209,7 @@ msgstr "Programme"
 #. Translators: This is a form field label that allows users to select which Level object to associate with
 #. the Result that's being entered into the form
 #. Translators: Number of the indicator being shown
-#: indicators/forms.py:265 indicators/views/views_program.py:109
+#: indicators/forms.py:265 indicators/views/views_program.py:110
 #: tola_management/models.py:413 tola_management/programadmin.py:109
 msgid "Result level"
 msgstr "Niveau de résultat"
@@ -402,7 +402,7 @@ msgstr "Justification de la cible"
 msgid "Target frequency"
 msgstr "Fréquence de la cible"
 
-#: indicators/indicator_plan.py:137 indicators/views/views_program.py:111
+#: indicators/indicator_plan.py:137 indicators/views/views_program.py:112
 #: tola_management/models.py:415
 msgid "Means of verification"
 msgstr "Moyens de vérification"
@@ -457,7 +457,7 @@ msgid "Comments"
 msgstr "Commentaires"
 
 #: indicators/indicator_plan.py:304 indicators/indicator_plan.py:437
-#: indicators/views/views_program.py:171
+#: indicators/views/views_program.py:172
 #: workflow/serializers_new/iptt_report_serializers.py:355
 msgid "Indicators unassigned to a results framework level"
 msgstr "Indicateurs non affectés à un niveau de cadre de résultats"
@@ -523,7 +523,7 @@ msgstr "Objectifs stratégiques du pays"
 msgid "Program Objective"
 msgstr "Objectif du programme"
 
-#: indicators/models.py:129 indicators/views/views_program.py:112
+#: indicators/models.py:129 indicators/views/views_program.py:113
 #: tola_management/models.py:411
 msgid "Assumptions"
 msgstr "Hypothèses"
@@ -1387,12 +1387,12 @@ msgid "Life of Program"
 msgstr "Vie du programme"
 
 #. Translators: One of several options for specifying how often data is collected or reported on over the life of a program
-#: indicators/models.py:1968 tola/db_translations.py:10
+#: indicators/models.py:1968 tola/db_translations.py:16
 msgid "Midline"
 msgstr "Mesure de mi-parcours"
 
 #. Translators: One of several options for specifying how often data is collected or reported on over the life of a program
-#: indicators/models.py:1969 tola/db_translations.py:30
+#: indicators/models.py:1969 tola/db_translations.py:6
 msgid "Endline"
 msgstr "Mesure de fin de programme"
 
@@ -1943,19 +1943,19 @@ msgid "Success, Data Updated!"
 msgstr "Succès, données mises à jour !"
 
 #. Translators: a link to the logistical framework model
-#: indicators/views/views_program.py:97 indicators/views/views_program.py:103
-#: indicators/views/views_program.py:206
+#: indicators/views/views_program.py:98 indicators/views/views_program.py:104
+#: indicators/views/views_program.py:207
 #: templates/indicators/logframe/logframe.html:5
 #: templates/indicators/program_page.html:32
 msgid "Logframe"
 msgstr "Cadre logique"
 
-#: indicators/views/views_program.py:110
+#: indicators/views/views_program.py:111
 #: templates/indicators/disaggregation_report.html:141
 msgid "Indicators"
 msgstr "Indicateurs"
 
-#: indicators/views/views_program.py:423 indicators/views/views_program.py:425
+#: indicators/views/views_program.py:435 indicators/views/views_program.py:437
 msgid "Results Framework"
 msgstr "Cadre de résultats"
 
@@ -4091,38 +4091,38 @@ msgstr "Dates importantes"
 
 #. Translators: One of several options for specifying how often data is collected or reported on over the life of a program
 #: tola/db_translations.py:4
-msgid "By distribution"
-msgstr "Par répartition"
-
-#. Translators: One of several options for specifying how often data is collected or reported on over the life of a program
-#: tola/db_translations.py:8
-msgid "By batch"
-msgstr "Par lot"
-
-#. Translators: One of several options for specifying how often data is collected or reported on over the life of a program
-#: tola/db_translations.py:14
-msgid "By event"
-msgstr "Par événement"
-
-#. Translators: One of several options for specifying how often data is collected or reported on over the life of a program
-#: tola/db_translations.py:16
-msgid "Post shock"
-msgstr "Après impact"
-
-#. Translators: One of several options for specifying how often data is collected or reported on over the life of a program
-#: tola/db_translations.py:20
 msgid "By training"
 msgstr "Par formation"
 
 #. Translators: One of several options for specifying how often data is collected or reported on over the life of a program
-#: tola/db_translations.py:22
+#: tola/db_translations.py:8
 msgid "Weekly"
 msgstr "Hebdomadaire"
 
 #. Translators: One of several options for specifying how often data is collected or reported on over the life of a program
-#: tola/db_translations.py:26
+#: tola/db_translations.py:12
 msgid "Final evaluation"
 msgstr "Évaluation finale"
+
+#. Translators: One of several options for specifying how often data is collected or reported on over the life of a program
+#: tola/db_translations.py:20
+msgid "By distribution"
+msgstr "Par répartition"
+
+#. Translators: One of several options for specifying how often data is collected or reported on over the life of a program
+#: tola/db_translations.py:22
+msgid "By batch"
+msgstr "Par lot"
+
+#. Translators: One of several options for specifying how often data is collected or reported on over the life of a program
+#: tola/db_translations.py:26
+msgid "By event"
+msgstr "Par événement"
+
+#. Translators: One of several options for specifying how often data is collected or reported on over the life of a program
+#: tola/db_translations.py:28
+msgid "Post shock"
+msgstr "Après impact"
 
 #. Translators: One of several choices for what sector (i.e. development domain) a program is most closely associated with
 #: tola/db_translations.py:32
@@ -4131,7 +4131,7 @@ msgstr "Agro-industrie"
 
 #. Translators: One of several choices for what sector (i.e. development domain) a program is most closely associated with
 #. Translators: One of several choices for what label/sector (i.e. development domain) a program is most closely associated with
-#: tola/db_translations.py:34 tola/db_translations.py:152
+#: tola/db_translations.py:34 tola/db_translations.py:156
 msgid "Agriculture"
 msgstr "Agriculture"
 
@@ -4223,7 +4223,7 @@ msgstr "Alimentation"
 
 #. Translators: One of several choices for what sector (i.e. development domain) a program is most closely associated with
 #. Translators: The main area of a program
-#: tola/db_translations.py:70 tola/db_translations.py:144
+#: tola/db_translations.py:70 tola/db_translations.py:146
 msgid "Food Security"
 msgstr "Sécurité alimentaire"
 
@@ -4318,8 +4318,7 @@ msgid "Public Health"
 msgstr "Santé publique"
 
 #. Translators: One of several choices for what sector (i.e. development domain) a program is most closely associated with
-#. Translators: The main area of a program
-#: tola/db_translations.py:108 tola/db_translations.py:148
+#: tola/db_translations.py:108
 msgid "Resilience"
 msgstr "Résilience"
 
@@ -4340,7 +4339,7 @@ msgstr "Questions urbaines"
 
 #. Translators: One of several choices for what sector (i.e. development domain) a program is most closely associated with
 #. Translators: One of several choices for what label/sector (i.e. development domain) a program is most closely associated with
-#: tola/db_translations.py:116 tola/db_translations.py:174
+#: tola/db_translations.py:116 tola/db_translations.py:178
 msgid "WASH"
 msgstr "Eau, assainissement et hygiène"
 
@@ -4401,66 +4400,85 @@ msgstr "Processus/gestion"
 
 #. Translators: The main area of a program
 #: tola/db_translations.py:142
-msgid "Economic Opportunities"
-msgstr "Opportunités économiques"
+msgid "Economic Opportunity"
+msgstr "Opportunité économique"
 
 #. Translators: The main area of a program
-#: tola/db_translations.py:146
-msgid "Peace and Stability"
-msgstr "Paix et stabilité"
+#: tola/db_translations.py:144
+msgid "Economic Opportunity / Opportunité économique / Oportunidad económica"
+msgstr ""
+
+#. Translators: The main area of a program
+#: tola/db_translations.py:148
+msgid "Good Governance and Peace"
+msgstr "Bonne gouvernance et paix"
 
 #. Translators: The main area of a program
 #: tola/db_translations.py:150
+msgid ""
+"Good Governance and Peace / Bonne gouvernance et paix / Buena gobernanza y paz"
+msgstr ""
+
+#. Translators: The main area of a program
+#: tola/db_translations.py:152
+msgid ""
+"Resilience approach (tick this box if the program used a resilience approach)"
+msgstr ""
+"L’approche de la résilience (cocher cette case si le programme a utilisé une "
+"approche de la résilience)"
+
+#. Translators: The main area of a program
+#: tola/db_translations.py:154
 msgid "Water Security"
 msgstr "Sécurité de l’eau"
 
 #. Translators: One of several choices for what label/sector (i.e. development domain) a program is most closely associated with
-#: tola/db_translations.py:154
+#: tola/db_translations.py:158
 msgid "Cash and Voucher Assistance"
 msgstr "Aide en transferts monétaires et bons d’alimentation"
 
 #. Translators: One of several choices for what label/sector (i.e. development domain) a program is most closely associated with
-#: tola/db_translations.py:156
+#: tola/db_translations.py:160
 msgid "Direct"
 msgstr "Direct"
 
 #. Translators: One of several choices for what label/sector (i.e. development domain) a program is most closely associated with
-#: tola/db_translations.py:158
+#: tola/db_translations.py:162
 msgid "Employment"
 msgstr "Emploi"
 
 #. Translators: One of several choices for what label/sector (i.e. development domain) a program is most closely associated with
-#: tola/db_translations.py:160
+#: tola/db_translations.py:164
 msgid "Environment (DRR, Energy and Water)"
 msgstr "Environnement (ressources renouvelables distribuées, énergie et eau)"
 
 #. Translators: One of several choices for what label/sector (i.e. development domain) a program is most closely associated with
-#: tola/db_translations.py:162
+#: tola/db_translations.py:166
 msgid "Financial Services"
 msgstr "Services financiers"
 
 #. Translators: One of several choices for what label/sector (i.e. development domain) a program is most closely associated with
-#: tola/db_translations.py:164
-msgid "Governance and Partnership"
-msgstr "Gouvernance et partenariats"
-
-#. Translators: One of several choices for what label/sector (i.e. development domain) a program is most closely associated with
-#: tola/db_translations.py:166
+#: tola/db_translations.py:168
 msgid "Indirect"
 msgstr "Indirect"
 
 #. Translators: One of several choices for what label/sector (i.e. development domain) a program is most closely associated with
-#: tola/db_translations.py:168
+#: tola/db_translations.py:170
 msgid "Infrastructure (non - WASH, non - energy)"
 msgstr "Infrastructure (ne se rapporte ni à WASH ni à l’énergie)"
 
 #. Translators: One of several choices for what label/sector (i.e. development domain) a program is most closely associated with
-#: tola/db_translations.py:170
+#: tola/db_translations.py:172
 msgid "Nutrition"
 msgstr "Nutrition"
 
 #. Translators: One of several choices for what label/sector (i.e. development domain) a program is most closely associated with
-#: tola/db_translations.py:172
+#: tola/db_translations.py:174
+msgid "Peace, Governance and Partnership"
+msgstr "Paix, gouvernance, et partenariats"
+
+#. Translators: One of several choices for what label/sector (i.e. development domain) a program is most closely associated with
+#: tola/db_translations.py:176
 msgid "Public Health (non - nutrition, non - WASH)"
 msgstr "Santé publique (ne se rapporte ni à la nutrition ni à WASH)"
 
@@ -5420,6 +5438,9 @@ msgstr "Rechercher"
 #: workflow/widgets.py:133
 msgid "City, Country:"
 msgstr "Ville, Pays :"
+
+#~ msgid "Peace and Stability"
+#~ msgstr "Paix et stabilité"
 
 #~ msgid "Result deleted"
 #~ msgstr "Résultat supprimé"

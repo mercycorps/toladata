@@ -48,7 +48,7 @@ class TestManagementCreateParticipantCountIndicators(test.TestCase):
             disagg_label.save()
 
     def create_outcome(self):
-        outcome_theme = OutcomeTheme(name='Resilience', is_active=True)
+        outcome_theme = OutcomeTheme(name='Resilience approach (tick this box if the program used a resilience approach)', is_active=True)
         outcome_theme.save()
 
     def assertions(self):
