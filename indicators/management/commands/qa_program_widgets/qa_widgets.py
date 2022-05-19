@@ -54,7 +54,7 @@ class ProgramFactory:
         })
         program.country.add(self.country)
         if multi_country:
-            country2 = Country.objects.get(country="United States")
+            country2 = Country.objects.get(country="United States - MCNW")
             program.country.add(country2)
 
         if create_levels:
@@ -578,7 +578,7 @@ class Cleaner:
                 print('\nPrograms not deleted')
 
 
-standard_countries = ['Afghanistan', 'Haiti', 'Jordan', 'Tolaland', 'United States']
+standard_countries = ['Afghanistan', 'Haiti', 'Jordan', 'Tolaland', 'United States - MCNW']
 TEST_ORG, created = Organization.objects.get_or_create(name='Test')
 MC_ORG = Organization.objects.get(name='Mercy Corps')
 user_profiles = {
@@ -587,7 +587,7 @@ user_profiles = {
         'email': 'tolatestone@mercycorps.org',
         'accessible_countries': standard_countries,
         'permission_level': 'low',
-        'home_country': 'United States',
+        'home_country': 'United States - MCNW',
         'org': MC_ORG,
     },
     'mc-medium': {
@@ -595,7 +595,7 @@ user_profiles = {
         'email': 'tolatesttwo@mercycorps.org',
         'accessible_countries': standard_countries,
         'permission_level': 'medium',
-        'home_country': 'United States',
+        'home_country': 'United States - MCNW',
         'org': MC_ORG,
     },
     'mc-high': {
@@ -603,7 +603,7 @@ user_profiles = {
         'email': 'tolatestthree@mercycorps.org',
         'accessible_countries': standard_countries,
         'permission_level': 'high',
-        'home_country': 'United States',
+        'home_country': 'United States - MCNW',
         'org': MC_ORG,
     },
     'mc-basicadmin': {
@@ -611,7 +611,7 @@ user_profiles = {
         'email': 'mcbasicadmin@example.com',
         'accessible_countries': standard_countries,
         'permission_level': 'high',
-        'home_country': 'United States',
+        'home_country': 'United States - MCNW',
         'org': MC_ORG,
         'admin': 'all'
     },
