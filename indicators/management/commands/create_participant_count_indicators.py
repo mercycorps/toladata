@@ -72,11 +72,12 @@ class Command(BaseCommand):
                 print(f'{deleted_ind} pilot pc indicators deleted, {len(pcind_id_list)-deleted_ind} not found')
 
         if options['change_outcome_themes']:
-            theme_change_list = [{'old_name': 'Good Governance and Peace / Bonne gouvernance et paix / Buena gobernanza y paz', 'new_name': 'Good Governance and Peace'}, {'old_name': 'Economic Opportunity / Opportunité économique / Oportunidad económica', 'new_name': 'Economic Opportunity'}, {'old_name': 'Resilience', 'new_name': 'Resilience approach (tick this box if the program used a resilience approach)'}]
+            theme_change_list = [{'old_name': 'Good Governance and Peace / Bonne gouvernance et paix / Buena gobernanza y paz', 'new_name': 'Good Governance and Peace'},
+                {'old_name': 'Economic Opportunity / Opportunité économique / Oportunidad económica', 'new_name': 'Economic Opportunity'},
+                {'old_name': 'Resilience', 'new_name': 'Resilience approach (tick this box if the program used a resilience approach)'}]
             for theme_change in theme_change_list:
                 old_name = theme_change['old_name']
                 new_name = theme_change['new_name']
-                print(old_name)
                 outcome_themes = OutcomeTheme.objects.filter(name=old_name)
                 for theme in outcome_themes:
                     theme.name = new_name
