@@ -32,6 +32,7 @@ class Command(BaseCommand):
         parser.add_argument('--clean', action='store_true')
         parser.add_argument('--delete_pilot_pc_indicators', action='store_true')
         parser.add_argument('--change_label_name', action='store_true')
+        parser.add_argument('--change_outcome_themes', action='store_true')
 
     @transaction.atomic
     def handle(self, *args, **options):
@@ -71,10 +72,23 @@ class Command(BaseCommand):
             if not options['suppress_output']:
                 print(f'{deleted_ind} pilot pc indicators deleted, {len(pcind_id_list)-deleted_ind} not found')
 
+        if options['change_outcome_themes']:
+            theme_change_list = [{'old_name': 'Good Governance and Peace / Bonne gouvernance et paix / Buena gobernanza y paz', 'new_name': 'Good Governance and Peace'},
+                {'old_name': 'Economic Opportunity / Opportunité économique / Oportunidad económica', 'new_name': 'Economic Opportunity'},
+                {'old_name': 'Resilience', 'new_name': 'Resilience approach (tick this box if the program used a resilience approach)'}]
+            for theme_change in theme_change_list:
+                old_name = theme_change['old_name']
+                new_name = theme_change['new_name']
+                outcome_themes = OutcomeTheme.objects.filter(name=old_name)
+                for theme in outcome_themes:
+                    theme.name = new_name
+                    theme.save()
+                    if not options['suppress_output']:
+                        print(f' Change outcome theme name {old_name} to {new_name}')
+
         if options['change_label_name']:
-            # Add label names to change
-            old_label = ''
-            new_label = ''
+            old_label = 'Governance and Partnership'
+            new_label = 'Peace, Governance and Partnership'
             labels = DisaggregationLabel.objects.filter(label=old_label)
             for label in labels:
                 label.label = new_label
@@ -88,7 +102,7 @@ class Command(BaseCommand):
 
             sector_list = sorted([
                 'Agriculture', 'Cash and Voucher Assistance', 'Environment (DRR, Energy and Water)',
-                'Infrastructure (non - WASH, non - energy)', 'Governance and Partnership', 'Employment', 'WASH',
+                'Infrastructure (non - WASH, non - energy)', 'Peace, Governance and Partnership', 'Employment', 'WASH',
                 'Financial Services', 'Nutrition', 'Public Health (non - nutrition, non - WASH)']
             )
 
@@ -108,7 +122,7 @@ class Command(BaseCommand):
 
             created_counts = 0
             outcome_theme_names = sorted([
-                'Food Security', 'Water Security', 'Economic Opportunities', 'Peace and Stability', 'Resilience'])
+                'Food Security', 'Water Security', 'Economic Opportunity', 'Good Governance and Peace', 'Resilience approach (tick this box if the program used a resilience approach)'])
             for theme_name in outcome_theme_names:
                 theme_obj, created = OutcomeTheme.objects.get_or_create(name=theme_name, defaults={'is_active': True})
                 theme_obj.save()

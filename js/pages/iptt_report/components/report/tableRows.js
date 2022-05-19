@@ -212,7 +212,9 @@ const TVAResultsGroup = ({ value, resultCell, ...props }) => {
         <React.Fragment>
             <NumberCell value={ value.target } />
             <NumberCell value={ value.actual } />
-            <PercentCell value={ value.met }/>
+            {
+                value.actual == 0 ? <IndicatorCell value={ gettext('N/A') } className="lop-column" /> : <PercentCell value={ value.met } className="lop-column" />
+            }
         </React.Fragment>
     );
 }
@@ -222,7 +224,9 @@ const TVAResultsGroupPercent = ({ value, resultCell, ...props }) => {
         <React.Fragment>
             <PercentCell value={ value.target } />
             <PercentCell value={ value.actual } />
-            <PercentCell value={ value.met }/>
+            {
+                value.actual == 0 ? <IndicatorCell value={ gettext('N/A') } className="lop-column" /> : <PercentCell value={ value.met } className="lop-column" />
+            }
         </React.Fragment>
     );
 }
@@ -368,7 +372,9 @@ class IndicatorRow extends React.Component {
                     <React.Fragment>
                     <ValueCell value={ reportData.lopTarget } className="lop-column " />
                     <ValueCell value={ reportData.lopActual } className="lop-column" />
-                    <PercentCell value={ reportData.lopMet } className="lop-column" />
+                    {
+                        reportData.lopActual == 0 ? <IndicatorCell value={ gettext('N/A') } className="lop-column" /> : <PercentCell value={ reportData.lopMet } className="lop-column" />
+                    }
                     {reportData.periodValues &&
                         (rootStore.periodValues(indicator.pk).map(
                             (value, index) => <PeriodCell value={ value } key={ index } resultCell={ true }/>
