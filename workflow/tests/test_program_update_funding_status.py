@@ -17,7 +17,8 @@ class TestProgramFundingStatusUpdate(test.TestCase):
         """
         IndicatorTypeFactory(indicator_type=IndicatorType.PC_INDICATOR_TYPE)
         ReportingFrequencyFactory(frequency=ReportingFrequency.PC_REPORTING_FREQUENCY)
-        self.program = ProgramFactory(funding_status="Completed", reporting_period_start=date(2022, 1, 1), reporting_period_end=date(2022, 6, 1))
+        # Creating a program than spans three fiscal years
+        self.program = ProgramFactory(funding_status="Completed", reporting_period_start=date(2022, 1, 1), reporting_period_end=date(2024, 1, 1))
 
     def has_rf(self):
         """
@@ -30,6 +31,18 @@ class TestProgramFundingStatusUpdate(test.TestCase):
         Returns True if the program has a participant count indicator
         """
         return self.program.indicator_set.filter(admin_type=Indicator.ADMIN_PARTICIPANT_COUNT).count() > 0
+
+    def has_periodic_targets(self):
+        """
+        Returns the number of periodic targets created and checks that the correct FY targets have been created
+        """
+        pc_indicator = self.program.indicator_set.filter(admin_type=Indicator.ADMIN_PARTICIPANT_COUNT).first()
+        pts = pc_indicator.periodictargets.all()
+        pts_count = pts.count()
+        periods = [pts_count]
+        for pt in pts:
+            periods.append(pt.period)
+        return periods
 
     def create_disaggs(self):
         """
@@ -66,3 +79,4 @@ class TestProgramFundingStatusUpdate(test.TestCase):
 
         self.assertTrue(self.has_rf())
         self.assertTrue(self.has_pc())
+        self.assertTrue(self.has_periodic_targets() == [3, 'FY2022', 'FY2023', 'FY2024'])

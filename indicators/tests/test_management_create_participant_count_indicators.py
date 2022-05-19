@@ -59,10 +59,6 @@ class TestManagementCreateParticipantCountIndicators(test.TestCase):
         self.assertEquals(self.periodic_target(), self.expected_lengths['periodic_target'])
         self.assertEquals(self.indicators(), self.expected_lengths['indicators'])
 
-    def assertions_next(self):
-        self.assertEquals(self.periodic_target(), self.expected_lengths['periodic_target_next'])
-        self.assertEquals(self.indicators(), self.expected_lengths['indicators'])
-
     def test_disagg_type_archived(self):
         self.create_disagg_type(is_archived=True)
         management.call_command(
@@ -96,15 +92,6 @@ class TestManagementCreateParticipantCountIndicators(test.TestCase):
         management.call_command(
             'create_participant_count_indicators', execute=True, create_disaggs_themes=False, suppress_output=False, verbosity=0)
     """
-
-    def test_command(self):
-        management.call_command(
-            'create_participant_count_indicators', execute=True, create_disaggs_themes=True, suppress_output=True, verbosity=0)
-
-        self.assertions()
-
-        next_reporting_period = datetime((date.fromisoformat(settings.REPORTING_YEAR_START_DATE).year + 1), 7, 1)
-        next_reporting_period_str = next_reporting_period.strftime('%Y-%m-%d')
 
 
 

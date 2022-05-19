@@ -17,6 +17,8 @@ def program_updated(sender, instance, *args, **kwargs):
     If the funding_status is updated check that the program is using the results framework.
     If using the results framework check if the program already has a participant count indicator.
     If not create a participant count indicator.
+    If program_period date have changed, check if periodic targets have to be adjusted. If no pc
+    indicator, create one and add targets.
     """
     # A program is being created not updated
     if instance.pk is None:
@@ -69,7 +71,10 @@ def program_updated(sender, instance, *args, **kwargs):
                 except ObjectDoesNotExist:
                     # Program does not have participant count indicator create one
                     # Only create PC indicators for programs starting in FY2022 or later
-                    if instance.reporting_period_end.isoformat() >= datetime(2021, 7, 1).isoformat():
+                    # Reporting_period_end comes in as a datetime object if changed, needs to be converted to date!
+                    program_end = instance.reporting_period_end.date() \
+                        if isinstance(instance.reporting_period_end, datetime) else instance.reporting_period_end
+                    if program_end >= date(2021, 7, 1):
                         top_level = program.levels.get(parent_id__isnull=True)
                         disaggregations = DisaggregationType.objects.filter(global_type=DisaggregationType.DISAG_PARTICIPANT_COUNT)
                         create_participant_count_indicator(instance, top_level, disaggregations)
