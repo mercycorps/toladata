@@ -291,6 +291,10 @@ $(function() {
     $('#covid-banner-alert').on('close.bs.alert', function() {
         sendSessionVariableUpdate({show_covid_banner: false});
     });
+
+    $('#pc-banner-alert').on('close.bs.alert', function() {
+        sendSessionVariableUpdate({show_pc_banner: false});
+    });
 });
 
 
