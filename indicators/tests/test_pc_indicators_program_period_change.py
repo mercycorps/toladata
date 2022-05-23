@@ -1,11 +1,8 @@
-"""Ensure reporting_period_start and reporting_period_end can only be set with first and last of the month dates
-respectively"""
+"""Ensure the change of reporting_period_start and reporting_period_end add and removes targets appropriately"""
 
 import datetime
-import json
 from django import test
 from django.shortcuts import reverse
-from django.db.models import Max
 from django.core import management
 from factories import (
     workflow_models as w_factories,
