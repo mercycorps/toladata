@@ -6,13 +6,12 @@ import json
 from django import test
 from django.shortcuts import reverse
 from django.db.models import Max
-from django.core import management
 from factories import (
     workflow_models as w_factories,
     indicators_models as i_factories
 )
 from safedelete.models import SOFT_DELETE
-from indicators.models import Indicator, IndicatorType, ReportingFrequency
+from indicators.models import Indicator
 from workflow.views import dated_target_info
 from workflow.models import Program
 from tola import util
@@ -27,8 +26,6 @@ class TestReportingPeriodDatesValidate(test.TestCase):
             reporting_period_end=datetime.date(2017, 12, 31))
 
     def setUp(self):
-        i_factories.IndicatorTypeFactory(indicator_type=IndicatorType.PC_INDICATOR_TYPE)
-        i_factories.ReportingFrequencyFactory(frequency=ReportingFrequency.PC_REPORTING_FREQUENCY)
         self.user = w_factories.UserFactory(first_name="FN", last_name="LN", username="iptt_tester", is_superuser=True)
         self.user.set_password('password')
         self.user.save()
@@ -38,13 +35,6 @@ class TestReportingPeriodDatesValidate(test.TestCase):
 
         self.client = test.Client(enforce_csrf_checks=False)
         self.client.login(username='iptt_tester', password='password')
-
-    def create_disaggs(self):
-        """
-        Runs the management command create_participant_count_indicators as a dry run to create the disaggs
-        """
-        management.call_command(
-            'create_participant_count_indicators', create_disaggs_themes=True, suppress_output=True)
 
     def test_reporting_period_updates_with_good_start_data(self):
         response = self.client.post(reverse('reportingperiod_update', kwargs={'pk': self.program.pk}),
@@ -229,71 +219,6 @@ class TestReportingPeriodDatesValidate(test.TestCase):
         response = self.client.get(reverse('datedtargetinfo', kwargs={'pk': self.program.pk}))
         self.assertEqual(json.loads(response.content)['max_start_date'], None)
 
-    def test_periodic_target_recalculate_with_reporting_period_change(self):
-        self.create_disaggs()
-        i_factories.LevelFactory(name="Test", program=self.program)
-        pc_indicator = self.program.indicator_set.filter(admin_type=Indicator.ADMIN_PARTICIPANT_COUNT)
-        self.assertEqual(pc_indicator.count(), 0)
-        self.client.post(reverse('reportingperiod_update', kwargs={'pk': self.program.pk}),
-                                    {'reporting_period_start': '2023-01-01',
-                                     'reporting_period_end': '2024-12-31',
-                                     'rationale': 'test'})
-        pc_indicator = self.program.indicator_set.filter(admin_type=Indicator.ADMIN_PARTICIPANT_COUNT)
-        self.assertEqual(pc_indicator.count(), 1)
-        periodictargets = pc_indicator.first().periodictargets.all()
-        periods = []
-        for pt in periodictargets:
-            periods.append(pt.period)
-        self.assertEqual(periodictargets.count(), 3)
-        self.assertEqual(periods, ['FY2023', 'FY2024', 'FY2025'])
-        # Add one fiscal year at the end
-        self.client.post(reverse('reportingperiod_update', kwargs={'pk': self.program.pk}),
-                         {'reporting_period_start': '2023-01-01',
-                          'reporting_period_end': '2025-12-31',
-                          'rationale': 'test'})
-        periodictargets = pc_indicator.first().periodictargets.all()
-        self.assertEqual(periodictargets.count(), 4)
-        # Subtract one fiscal year from the end
-        self.client.post(reverse('reportingperiod_update', kwargs={'pk': self.program.pk}),
-                         {'reporting_period_start': '2023-01-01',
-                          'reporting_period_end': '2024-12-31',
-                          'rationale': 'test'})
-        periodictargets = pc_indicator.first().periodictargets.all()
-        self.assertEqual(periodictargets.count(), 3)
-        # Add one fiscal to the front
-        self.client.post(reverse('reportingperiod_update', kwargs={'pk': self.program.pk}),
-                         {'reporting_period_start': '2022-01-01',
-                          'reporting_period_end': '2024-12-31',
-                          'rationale': 'test'})
-        periodictargets = pc_indicator.first().periodictargets.all()
-        self.assertEqual(periodictargets.count(), 4)
-        # Subtract one fiscal from the front
-        # Add one fiscal to the front
-        self.client.post(reverse('reportingperiod_update', kwargs={'pk': self.program.pk}),
-                         {'reporting_period_start': '2022-01-01',
-                          'reporting_period_end': '2024-12-31',
-                          'rationale': 'test'})
-        periodictargets = pc_indicator.first().periodictargets.all()
-        self.assertEqual(periodictargets.count(), 4)
-        # Subtract fiscal year from both ends
-        self.client.post(reverse('reportingperiod_update', kwargs={'pk': self.program.pk}),
-                         {'reporting_period_start': '2023-01-01',
-                          'reporting_period_end': '2023-12-31',
-                          'rationale': 'test'})
-        periodictargets = pc_indicator.first().periodictargets.all()
-        self.assertEqual(periodictargets.count(), 2)
-        # Add fiscal year to both ends
-        self.client.post(reverse('reportingperiod_update', kwargs={'pk': self.program.pk}),
-                         {'reporting_period_start': '2022-01-01',
-                          'reporting_period_end': '2024-12-31',
-                          'rationale': 'test'})
-        periodictargets = pc_indicator.first().periodictargets.all()
-        periods = []
-        for pt in periodictargets:
-            periods.append(pt.period)
-        self.assertEqual(periodictargets.count(), 4)
-        self.assertEqual(periods, ['FY2022', 'FY2023', 'FY2024', 'FY2025'])
-
 
 sample_response = {
     u'end_date': u'2019-12-14',
@@ -308,6 +233,7 @@ sample_response = {
     u'amount_usd': u'2000000.00',
     u'funding_status': u'Funded'
 }
+
 
 class TestGaitDateToReportingDates(test.TestCase):
     def test_gait_date_to_start_and_end_dates(self):
