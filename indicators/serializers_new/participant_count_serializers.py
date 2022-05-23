@@ -1,6 +1,8 @@
 import copy
 import re
+from datetime import datetime
 from rest_framework import serializers, exceptions
+from django.conf import settings
 from django.utils.translation import ugettext_lazy as _
 from django.db.models import Count, BooleanField, Q
 from indicators.models import (
@@ -67,8 +69,11 @@ class PCResultSerializerRead(serializers.ModelSerializer):
     disaggregations = serializers.SerializerMethodField()
     outcome_themes = serializers.SerializerMethodField()
     periodic_target = serializers.SerializerMethodField()
+    view_only = serializers.SerializerMethodField()
     program_start_date = serializers.DateField(source='indicator.program.reporting_period_start', read_only=True)
     program_end_date = serializers.DateField(source='indicator.program.reporting_period_end', read_only=True)
+    pt_start_date = serializers.DateField()
+    pt_end_date = serializers.DateField()
 
     class Meta:
         model = Result
@@ -82,11 +87,35 @@ class PCResultSerializerRead(serializers.ModelSerializer):
             'program_start_date',
             'program_end_date',
             'outcome_themes',
-            'disaggregations'
+            'disaggregations',
+            'view_only',
+            'pt_start_date',
+            'pt_end_date',
         ]
 
     def get_periodic_target(self, obj):
         return PeriodicTarget.objects.values('id', 'period').get(result__id=obj.id)
+
+    def get_view_only(self, obj):
+        # Add boolean variable to serializer output.
+        periodic_target = PeriodicTarget.objects.values('id', 'customsort').get(result__id=obj.id)
+        pt_year = periodic_target['customsort']
+        view_only = True
+        today = datetime.utcnow().date()
+        current_year = today.year
+        current_month = today.month
+        last_month_to_report = settings.REPORTING_PERIOD_LAST_MONTH
+        # If periodic target matches current calendar year before reporting period ends, make it editable.
+        if pt_year == current_year:
+            if current_month <= last_month_to_report:
+                view_only = False
+        # If periodic target matches next calendar year AND it is past reporting period for prior fiscal year
+        # or period target matches next calendar year AND there is no prior periodic target AND current month
+        # is after new fiscal year start, make periodic target editable.
+        elif pt_year == current_year + 1:
+            if (current_month > last_month_to_report) or ((not PeriodicTarget.objects.filter(customsort=current_year).exists()) and (current_month > 6)):
+                view_only = False
+        return view_only
 
     def get_outcome_themes(self, obj):
         return list(
@@ -175,7 +204,7 @@ class PCResultSerializerWrite(serializers.ModelSerializer):
         """
         if len(value) > 0:
             return value
-        
+
         # Translators: An error message detailing that outcome themes are required and that multiple outcome themes can be selected
         raise exceptions.ValidationError(_('Please complete this field. You can select more than one outcome theme.'))
 
@@ -199,7 +228,7 @@ class PCResultSerializerWrite(serializers.ModelSerializer):
         # Both evidence fields are empty. Return value instead of raising exception
         if self.empty_evidence():
             return value
-        
+
         if self.initial_data.get('record_name') is None or len(self.initial_data.get('record_name')) == 0:
             # Translators: An error message detailing that the record name must be included along the a evidence link
             raise exceptions.ValidationError(_('A record name must be included along with the link.'))
@@ -217,7 +246,7 @@ class PCResultSerializerWrite(serializers.ModelSerializer):
         Params
             value
                 - The value of record_name
-        
+
         Raises
             ValidationError
                 - If validation fails

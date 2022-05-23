@@ -6,7 +6,7 @@ import csv
 import copy
 import json
 import logging
-from datetime import datetime, timedelta, date
+from datetime import datetime, date, timedelta
 from decimal import Decimal
 import uuid
 import dateparser
@@ -22,6 +22,7 @@ from django.db import connection, transaction
 from django.db.models import (
     Count, Q, Max
 )
+from django.conf import settings
 from django.contrib.auth.decorators import login_required
 from django.http import HttpResponse, HttpResponseRedirect, JsonResponse
 from django.shortcuts import render, get_object_or_404, reverse
@@ -175,15 +176,38 @@ def participant_count_result_create_for_indicator(request, pk, *args, **kwargs):
 
     verify_program_access_level(request, indicator.program.pk, 'low')
     disagg_queryset = DisaggregationType.objects.filter(indicator__pk=indicator.pk)
+    pt_start_date, pt_end_date = calculate_pt_start_end_dates()
+    reporting_year = calculate_reporting_year(indicator)
     return_dict = {
         'outcome_themes': list(OutcomeTheme.objects.filter(is_active=True).values_list('pk', 'name')),
         'program_start_date': indicator.program.reporting_period_start,
         'program_end_date': indicator.program.reporting_period_end,
-        'periodic_target': indicator.periodictargets.order_by('-customsort').values('id', 'period').first(),
+        'pt_start_date': pt_start_date,
+        'pt_end_date': pt_end_date,
+        # Show active periodic target
+        'periodic_target': indicator.periodictargets.filter(customsort=reporting_year).values('id', 'period').first(),
+        # 'periodic_target': indicator.periodictargets.order_by('-customsort').values('id', 'period').first(),
         'disaggregations': pc_serializers.PCDisaggregationSerializer(
             disagg_queryset, many=True, context={'result_pk': None}).data,
     }
+
     return JsonResponse(return_dict)
+
+def calculate_pt_start_end_dates():
+    today = datetime.utcnow().date()
+    year = today.year if today.month < 6 else today.year + 1
+    return date(year - 1, 7, 1), date(year, 6, 30)
+
+def calculate_reporting_year(indicator):
+    today = datetime.utcnow().date()
+    current_year = today.year
+    current_month = today.month
+    reporting_year = current_year
+    last_month_to_report = settings.REPORTING_PERIOD_LAST_MONTH
+    if current_month > 6:
+        if (not indicator.periodictargets.filter(customsort=current_year).exists()) or (current_month > last_month_to_report):
+            reporting_year = current_year + 1
+    return reporting_year
 
 
 @login_required
@@ -441,7 +465,7 @@ class IndicatorCreate(IndicatorFormMixin, CreateView):
                     period=pt.get('period', ''),
                     target=pt.get('target', 0),
                     start_date=pt['start_date'],
-                    end_date=pt['end_date'],
+                    end_date=pt['end_date']
                 )
 
                 PeriodicTarget.objects.create(
@@ -543,16 +567,39 @@ class IndicatorUpdate(IndicatorFormMixin, UpdateView):
             .annotate(num_data=Count('result')).order_by('customsort', 'create_date', 'period')
 
         ptargets = []
-        for pt in pts:
+        for count, pt in enumerate(pts):
+            # Viewonly boolean variable for pts so the pc indicator periodic targets can be disabled for prior fiscal
+            # years.
+            viewonly = False
+            if indicator.admin_type == Indicator.ADMIN_PARTICIPANT_COUNT:
+                viewonly = True
+                today = datetime.utcnow().date()
+                current_year = today.year
+                current_month = today.month
+                last_month_to_report = settings.REPORTING_PERIOD_LAST_MONTH
+                # Current fiscal year and inside reporting period, editable until September
+                if pt.customsort == current_year and current_month <= last_month_to_report:
+                    viewonly = False
+                if pt.customsort == current_year + 1:
+                    # This is the first periodic target for pc indicator, editable with new fiscal year start
+                    if count == 0:
+                        if current_month > 6:
+                            viewonly = False
+                    # There is a prior periodic target
+                    else:
+                        if current_month > last_month_to_report:
+                            viewonly = False
+
             ptargets.append({
-                'id': pt.pk,
-                'num_data': pt.num_data,
-                'start_date': pt.start_date,
-                'end_date': pt.end_date,
-                'period': pt.period, # period is deprecated, this should move to .period_name
-                'period_name': pt.period_name,
-                'target': pt.target
-            })
+                    'id': pt.pk,
+                    'num_data': pt.num_data,
+                    'start_date': pt.start_date,
+                    'end_date': pt.end_date,
+                    'period': pt.period, # period is deprecated, this should move to .period_name
+                    'period_name': pt.period_name,
+                    'target': pt.target,
+                    'viewonly': viewonly
+                })
 
         # if the modal is being loaded (not submitted), check the number of periodic targets to
         # be sure that they cover the program reporting period.  A recently extended program reporting period
@@ -671,10 +718,15 @@ class IndicatorUpdate(IndicatorFormMixin, UpdateView):
 
             generated_pt_ids = []
             for i, pt in enumerate(normalized_pt_json):
+                # Preserve pt customsort value if pc indicator
+                if old_indicator.admin_type == old_indicator.ADMIN_PARTICIPANT_COUNT:
+                    customsort = PeriodicTarget.objects.values_list('customsort', flat=True).get(pk=pt['id'])
+                else:
+                    customsort = i
                 defaults = {
                     'period': pt.get('period', ''),
                     'target': pt.get('target', 0),
-                    'customsort': i,
+                    'customsort': customsort,
                     'start_date': pt['start_date'],
                     'end_date': pt['end_date'],
                     'edit_date': timezone.now()
@@ -1142,6 +1194,7 @@ def result_view(request, indicator, program):
             'long_help': long_help
         })
 
+
 @login_required
 def indicator_plan(request, program):
     """
@@ -1386,8 +1439,8 @@ class ParticipantCountFiscalExport(APIView):
     sector_list = ['Agriculture', 'Cash and Voucher Assistance', 'Employment', 'Environment (DRR, Energy and Water)', 'Financial Services', 'Governance and Partnership',
                    'Public Health (non - nutrition, non - WASH)', 'Infrastructure (non - WASH, non - energy)', 'Nutrition', 'WASH']
     sector_keys = ['Sectors Direct with double counting', 'Sectors Indirect with double counting']
-    sadd_list = ['Age Unknown M', 'Age Unknown F', 'Age Unknown Sex Unknown', '0-5 M', '0-5 F', '0-5 Sex Unknown', '6-9 M', '6-9 F', '6-9 Sex Unknown', 
-                 '10-14 M', '10-14 F', '10-14 Sex Unknown', '15-19 M', '15-19 F', '15-19 Sex Unknown', '20-24 M', '20-24 F', '20-24 Sex Unknown', 
+    sadd_list = ['Age Unknown M', 'Age Unknown F', 'Age Unknown Sex Unknown', '0-5 M', '0-5 F', '0-5 Sex Unknown', '6-9 M', '6-9 F', '6-9 Sex Unknown',
+                 '10-14 M', '10-14 F', '10-14 Sex Unknown', '15-19 M', '15-19 F', '15-19 Sex Unknown', '20-24 M', '20-24 F', '20-24 Sex Unknown',
                  '25-34 M', '25-34 F', '25-34 Sex Unknown', '35-49 M', '35-49 F', '35-49 Sex Unknown', '50+ M', '50+ F', '50+ Sex Unknown']
     sadd_keys = ['SADD (including unknown) with double counting', 'SADD (including unknown) without double counting']
     reporting_start_date = date.fromisoformat(settings.REPORTING_YEAR_START_DATE)
@@ -1575,7 +1628,7 @@ class ParticipantCountFiscalExport(APIView):
     def get_actuals(self, result):
         """
         Populates counting dict with all actual values
-        
+
         Params
             result
                 The current result object
@@ -1677,8 +1730,8 @@ class ParticipantCountFiscalExport(APIView):
 
         for index, _ in enumerate(countries):
             self.csv_row.extend([
-                indicator.program.name, self.event_target_period, countries[index], regions[index], self.remove_new_lines(indicator.definition), 
-                indicator.program.gaitid, self.remove_new_lines(indicator.means_of_verification), self.remove_new_lines(indicator.data_collection_method), 
+                indicator.program.name, self.event_target_period, countries[index], regions[index], self.remove_new_lines(indicator.definition),
+                indicator.program.gaitid, self.remove_new_lines(indicator.means_of_verification), self.remove_new_lines(indicator.data_collection_method),
                 self.remove_new_lines(indicator.method_of_analysis), self.remove_new_lines(indicator.comments)
             ])
 
@@ -1703,5 +1756,5 @@ class ParticipantCountFiscalExport(APIView):
 
         for indicator in self.queryset:
             self.populate_row(indicator, writer)
-                
+
         return response

@@ -19,7 +19,7 @@ const CountLabel = props => {
               )}
         </div>
     );
-        
+
 }
 
 /*
@@ -84,21 +84,29 @@ class CheckboxedMultiSelect extends React.Component {
                     {placeholderButtonLabel}
                 </CountLabel>;
         }
-    
+
         if (Array.isArray(thisValue)) {
             // don't count options with the option attribute noList: true
             let filteredValues = thisValue.filter(option => !option.noList);
+
+          if (this.props.isDisabled) {
+             return <CountLabel clearable={false}>
+                        {filteredValues[0].label}
+                    </CountLabel>;
+          }
+
           if (filteredValues.length === 0) {
             return <CountLabel clearable={false}>
                         {placeholderButtonLabel}
                     </CountLabel>
           }
-    
+
           if (filteredValues.length === 1) {
             return <CountLabel clearable={true} clearSelect={this.clearSelect}>
                         {filteredValues[0].label}
                     </CountLabel>;
           }
+
           return (
            <CountLabel clearable={true} clearSelect={this.clearSelect}>
                 {
@@ -107,7 +115,7 @@ class CheckboxedMultiSelect extends React.Component {
             </CountLabel>
             );
         }
-    
+
         return <CountLabel clearable={false}>
                     {thisValue.label}
                </CountLabel>;
