@@ -11,8 +11,10 @@ from django import test
 
 from indicators.models import Indicator
 
-start_date = datetime.date(2015, 1, 1)
-end_date = datetime.date(2016, 12, 31)
+start_date = datetime.date(2022, 1, 1)
+end_date = datetime.date(2024, 12, 31)
+period_names = ['FY2022', 'FY2023', 'FY2024', 'FY2025']
+customsort_vals = [2022, 2023, 2024, 2025]
 
 
 def get_generic_level_post_data(program_pk, **kwargs):
@@ -40,13 +42,23 @@ class TestRFViews(test.TestCase):
         client.force_login(self.tola_user.user)
         i_factories.IndicatorTypeFactory(indicator_type='Custom')
         i_factories.ReportingFrequencyFactory(frequency='Annual')
-        program = w_factories.RFProgramFactory(tiers=True, country=[self.country])
+        program = w_factories.RFProgramFactory(
+            tiers=True, country=[self.country], reporting_period_start=start_date, reporting_period_end=end_date)
         w_factories.grant_program_access(self.tola_user, program, self.country, 'high')
         self.assertEqual(Indicator.objects.count(), 0)
         client.post(reverse('insert_new_level'), data=get_generic_level_post_data(program.pk), format='json')
         indicators = Indicator.objects.all()
         self.assertEqual(indicators.count(), 1)
         self.assertEqual(indicators[0].name, Indicator.PARTICIPANT_COUNT_INDICATOR_NAME)
+        periodictargets = indicators.first().periodictargets.all()
+        self.assertEqual(periodictargets.count(), 4)
+        periods = []
+        cs_values = []
+        for pt in periodictargets:
+            periods.append(pt.period)
+            cs_values.append(pt.customsort)
+        self.assertEqual(periods, period_names)
+        self.assertEqual(cs_values, customsort_vals)
 
 
 

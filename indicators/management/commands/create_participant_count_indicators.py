@@ -59,7 +59,8 @@ class Command(BaseCommand):
             return
 
         if options['delete_pilot_pc_indicators']:
-            pcind_id_list = [15872]
+            # Add ids to delete to list
+            pcind_id_list = []
             # Call indicators on an object to object basis to force cascading delete.
             deleted_ind = 0
             for pcid in pcind_id_list:
