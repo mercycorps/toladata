@@ -38,7 +38,7 @@ export class VirtualizedMenuList extends React.PureComponent {
                                 rowRenderer={
                                     ({index, parent, key, style}) =>
                                         <CellMeasurer key={key} cache={this.cache} parent={parent} columnIndex={0} rowIndex={index}>
-                                            <div style={style}>{children[index]}</div>
+                                            <div style={style, {whiteSpace: "normal", lineHeight: "1"}}>{children[index]}</div>
                                         </CellMeasurer>
                                 }/>
                     }}
