@@ -219,6 +219,7 @@ class TestReportingPeriodDatesValidate(test.TestCase):
         response = self.client.get(reverse('datedtargetinfo', kwargs={'pk': self.program.pk}))
         self.assertEqual(json.loads(response.content)['max_start_date'], None)
 
+
 sample_response = {
     u'end_date': u'2019-12-14',
     u'countries': u'Afghanistan',
@@ -232,6 +233,7 @@ sample_response = {
     u'amount_usd': u'2000000.00',
     u'funding_status': u'Funded'
 }
+
 
 class TestGaitDateToReportingDates(test.TestCase):
     def test_gait_date_to_start_and_end_dates(self):

@@ -90,7 +90,7 @@ const ResultCells = ({ result, noTarget, resultEditable, admin_type, ...props })
                                 </div>
                             </div>
                         </div>
-                        <a 
+                        <a
                             data-toggle="modal"
                             data-target={`#resultModal_${result.pk}`}
                             className="results__link--pc"
@@ -245,28 +245,31 @@ const LoPRow = ({indicator, ...props}) => {
         // # Translators: explanation of the summing rules for the totals row on a list of results
         lopHelp = gettext("<strong>Targets, actuals, and results are cumulative.</strong> Target period actuals mirror the most recent result for that target period; no calculations are performed with results or actuals. The Life of Program target mirrors the last target, and the Life of Program actual mirrors the most recent actual.");
     }
-
     return (
-        <tr className="bg-white">
-            <td><strong>{
-                // # Translators: identifies a results row as summative for the entire life of the program
-                gettext('Life of Program')
-                }
-                {!indicator.noTargets &&
-                    <span className={'ml-1'}>
-                        <HelpPopover
-                            content={lopHelp}
-                            className={'popover-icon results-table__lop-row--help-text'}
-                        />
-                    </span>
-                }
-            </strong></td>
-            <td className="text-right"><strong>{ localizer(indicator.lopTarget) || EM_DASH }</strong></td>
-            <td className="text-right"><strong>{ localizer(indicator.lopActual) || EM_DASH }</strong></td>
-            <td className="text-right"><span className="badge">{ localizePercent(indicator.lopMet) || N_A }</span></td>
-            <td colSpan="3"><div className="help-text">{ lopMessage }</div></td>
-        </tr>
+        // Admin_type of 0 is for Participant Count Indicator. All normal indicators have admin_type of null.
+        indicator.admin_type !== 0 ? 
+            <tr className="bg-white">
+                <td><strong>{
+                    // # Translators: identifies a results row as summative for the entire life of the program
+                    gettext('Life of Program')
+                    }
+                    {!indicator.noTargets &&
+                        <span className={'ml-1'}>
+                            <HelpPopover
+                                content={lopHelp}
+                                className={'popover-icon results-table__lop-row--help-text'}
+                            />
+                        </span>
+                    }
+                </strong></td>
+                <td className="text-right"><strong>{ localizer(indicator.lopTarget) || EM_DASH }</strong></td>
+                <td className="text-right"><strong>{ localizer(indicator.lopActual) || EM_DASH }</strong></td>
+                <td className="text-right"><span className="badge">{ localizePercent(indicator.lopMet) || N_A }</span></td>
+                <td colSpan="3"><div className="help-text">{ lopMessage }</div></td>
+            </tr>
+        : null
     )
+    
 }
 
 /*
@@ -379,16 +382,18 @@ const ResultsTableActions = ({indicator, editable, resultEditable, displayMissin
                                     </div>
                                 </div>
                             </div>
-                            <a 
-                                data-toggle="modal"
-                                data-target={`#resultModal_${indicator.pk}`}
-                                className="btn-link btn-add">
-                                <FontAwesomeIcon icon={ faPlusCircle } />
-                                {
-                                    // # Translators: a button that lets the user add a new result
-                                    gettext('Add result')
-                                }
-                            </a>
+                            {indicator.isFiscalYear &&
+                                <a
+                                    data-toggle="modal"
+                                    data-target={`#resultModal_${indicator.pk}`}
+                                    className="btn-link btn-add">
+                                    <FontAwesomeIcon icon={faPlusCircle}/>
+                                    {
+                                        // # Translators: a button that lets the user add a new result
+                                        gettext('Add result')
+                                    }
+                                </a>
+                            }
                         </React.Fragment>
                     }
                 </div>

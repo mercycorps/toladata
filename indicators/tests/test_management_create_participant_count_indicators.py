@@ -1,10 +1,10 @@
 from django import test
+from django.conf import settings
 from django.core import management
-from datetime import date
+from datetime import datetime, date
 from indicators.models import Indicator, IndicatorType, OutcomeTheme, DisaggregationType, PeriodicTarget, DisaggregationLabel
 from factories.indicators_models import IndicatorTypeFactory, ReportingFrequencyFactory, ReportingFrequency, LevelFactory
 from factories.workflow_models import ProgramFactory
-
 
 
 class TestManagementCreateParticipantCountIndicators(test.TestCase):
@@ -12,13 +12,15 @@ class TestManagementCreateParticipantCountIndicators(test.TestCase):
         'outcome_themes': 5,
         'disagg_types': 6,
         'periodic_target': 1,
+        'periodic_target_next': 2,
         'indicators': 1
     }
-    
+
     def setUp(self):
         IndicatorTypeFactory(indicator_type=IndicatorType.PC_INDICATOR_TYPE)
         ReportingFrequencyFactory(frequency=ReportingFrequency.PC_REPORTING_FREQUENCY)
-        program = ProgramFactory(reporting_period_start=date(2022, 2, 1), reporting_period_end=date(2022, 12, 1))
+        current_fy = date.fromisoformat(settings.REPORTING_YEAR_START_DATE).year + 1
+        program = ProgramFactory(reporting_period_start=date(current_fy, 7, 1), reporting_period_end=date(current_fy + 1, 6, 1))
         LevelFactory(name="test", program=program)
 
     def indicators(self):
@@ -48,7 +50,7 @@ class TestManagementCreateParticipantCountIndicators(test.TestCase):
             disagg_label.save()
 
     def create_outcome(self):
-        outcome_theme = OutcomeTheme(name='Resilience', is_active=True)
+        outcome_theme = OutcomeTheme(name='Resilience approach (tick this box if the program used a resilience approach)', is_active=True)
         outcome_theme.save()
 
     def assertions(self):
@@ -91,8 +93,6 @@ class TestManagementCreateParticipantCountIndicators(test.TestCase):
             'create_participant_count_indicators', execute=True, create_disaggs_themes=False, suppress_output=False, verbosity=0)
     """
 
-    def test_command(self):
-        management.call_command(
-            'create_participant_count_indicators', execute=True, create_disaggs_themes=True, suppress_output=True, verbosity=0)
 
-        self.assertions()
+
+

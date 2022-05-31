@@ -4,7 +4,7 @@ import collections
 import string
 import uuid
 import os
-from datetime import timedelta, date
+from datetime import timedelta, date, datetime
 from decimal import Decimal
 import dateparser
 from functools import total_ordering
@@ -1783,6 +1783,29 @@ class Indicator(SafeDeleteModel):
         return self.periodictargets.filter(start_date__lte=today, end_date__gte=today).first()
 
     @property
+    def is_fiscal_year(self):
+        """Checks whether any pc indicator results are editable at current date"""
+        # Always true for non pc indicators
+        is_fiscal_year = True
+        if self.admin_type == Indicator.ADMIN_PARTICIPANT_COUNT:
+            # Fiscal year end: June 30
+            # Reporting period for pc indicators: July, August
+            # For pc indicators boolean is to set to false unless the current month < September and current fiscal year
+            # periodic target is associated with indicator, or current months > June and next year's fiscal year
+            # periodic target is associated with indicator
+            is_fiscal_year = False
+            today = datetime.utcnow().date()
+            current_year = today.year
+            current_month = today.month
+            last_month_to_report = settings.REPORTING_PERIOD_LAST_MONTH
+            targets = self.periodictargets.all()
+            target_list = [target.customsort for target in targets]
+            if (current_year in target_list and current_month <= last_month_to_report) or (
+                    current_year + 1 in target_list and current_month > 6):
+                is_fiscal_year = True
+        return is_fiscal_year
+
+    @property
     def last_ended_periodic_target(self):
         """
         Returns the last periodic target if any, or None
@@ -2319,6 +2342,16 @@ class Result(models.Model):
         if self.date_collected:
             return formats.date_format(self.date_collected, "MEDIUM_DATE_FORMAT")
         return self.date_collected
+
+    @property
+    def pt_start_date(self):
+        year = self.periodic_target.customsort
+        return date(year - 1, 7, 1)
+
+    @property
+    def pt_end_date(self):
+        year = self.periodic_target.customsort
+        return date(year, 6, 30)
 
     @property
     def disaggregated_values(self):

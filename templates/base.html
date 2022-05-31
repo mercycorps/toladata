@@ -64,6 +64,25 @@
                 </button>
             </div>
         {% endif %}
+        {% if request.session.show_pc_banner %}
+            <div id="pc-banner-alert" class="alert alert--banner bg-warning alert-dismissible fade show" role="alert">
+                <strong>
+                    {# Translators: A banner with links to a guide for the participant count #}
+                    {% trans "TolaData Participant Count: Step by Step Guide" %}
+                        {# Translators: The language Arabic #}
+                        (<a href="https://library.mercycorps.org/record/38840">{% trans "Arabic" %}</a>,
+                        {# Translators: The language English #}
+                        <a href="https://library.mercycorps.org/record/38839">{% trans "English" %}</a>,
+                        {# Translators: The language French #}
+                        <a href="https://library.mercycorps.org/record/38842">{% trans "French" %}</a>,
+                        {# Translators: The language Spanish #}
+                        <a href="https://library.mercycorps.org/record/38841">{% trans "Spanish" %}</a>)
+                </strong>
+                <button type="button" class="close" data-dismiss="alert" aria-label="Close">
+                    <span aria-hidden="true">&times;</span>
+                </button>
+            </div>
+        {% endif %}
 
         <nav class="navbar navbar-dark navbar-expand-sm navbar-tola {% if user.is_superuser %}for-superadmin{% endif %}">
             <div class="container-fluid navbar-tola--container">

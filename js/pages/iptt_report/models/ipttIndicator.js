@@ -16,6 +16,7 @@ export const forIPTT = (
     indicatorJSON = {}
 ) => ({
     admin_type: indicatorJSON.admin_type,
+    isFiscalYear: Boolean(indicatorJSON.is_fiscal_year),
     number: indicatorJSON.number || null,
     sectorPk: indicatorJSON.sector_pk || null,
     _typePks: observable(new Set(indicatorJSON.indicator_type_pks || [])),

@@ -6,7 +6,7 @@ import csv
 import copy
 import json
 import logging
-from datetime import datetime, timedelta, date
+from datetime import datetime, date, timedelta
 from decimal import Decimal
 import uuid
 import dateparser
@@ -22,6 +22,7 @@ from django.db import connection, transaction
 from django.db.models import (
     Count, Q, Max
 )
+from django.conf import settings
 from django.contrib.auth.decorators import login_required
 from django.http import HttpResponse, HttpResponseRedirect, JsonResponse
 from django.shortcuts import render, get_object_or_404, reverse
@@ -175,15 +176,38 @@ def participant_count_result_create_for_indicator(request, pk, *args, **kwargs):
 
     verify_program_access_level(request, indicator.program.pk, 'low')
     disagg_queryset = DisaggregationType.objects.filter(indicator__pk=indicator.pk)
+    pt_start_date, pt_end_date = calculate_pt_start_end_dates()
+    reporting_year = calculate_reporting_year(indicator)
     return_dict = {
         'outcome_themes': list(OutcomeTheme.objects.filter(is_active=True).values_list('pk', 'name')),
         'program_start_date': indicator.program.reporting_period_start,
         'program_end_date': indicator.program.reporting_period_end,
-        'periodic_target': indicator.periodictargets.order_by('-customsort').values('id', 'period').first(),
+        'pt_start_date': pt_start_date,
+        'pt_end_date': pt_end_date,
+        # Show active periodic target
+        'periodic_target': indicator.periodictargets.filter(customsort=reporting_year).values('id', 'period').first(),
+        # 'periodic_target': indicator.periodictargets.order_by('-customsort').values('id', 'period').first(),
         'disaggregations': pc_serializers.PCDisaggregationSerializer(
             disagg_queryset, many=True, context={'result_pk': None}).data,
     }
+
     return JsonResponse(return_dict)
+
+def calculate_pt_start_end_dates():
+    today = datetime.utcnow().date()
+    year = today.year if today.month < 6 else today.year + 1
+    return date(year - 1, 7, 1), date(year, 6, 30)
+
+def calculate_reporting_year(indicator):
+    today = datetime.utcnow().date()
+    current_year = today.year
+    current_month = today.month
+    reporting_year = current_year
+    last_month_to_report = settings.REPORTING_PERIOD_LAST_MONTH
+    if current_month > 6:
+        if (not indicator.periodictargets.filter(customsort=current_year).exists()) or (current_month > last_month_to_report):
+            reporting_year = current_year + 1
+    return reporting_year
 
 
 @login_required
@@ -441,7 +465,7 @@ class IndicatorCreate(IndicatorFormMixin, CreateView):
                     period=pt.get('period', ''),
                     target=pt.get('target', 0),
                     start_date=pt['start_date'],
-                    end_date=pt['end_date'],
+                    end_date=pt['end_date']
                 )
 
                 PeriodicTarget.objects.create(
@@ -543,16 +567,39 @@ class IndicatorUpdate(IndicatorFormMixin, UpdateView):
             .annotate(num_data=Count('result')).order_by('customsort', 'create_date', 'period')
 
         ptargets = []
-        for pt in pts:
+        for count, pt in enumerate(pts):
+            # Viewonly boolean variable for pts so the pc indicator periodic targets can be disabled for prior fiscal
+            # years.
+            viewonly = False
+            if indicator.admin_type == Indicator.ADMIN_PARTICIPANT_COUNT:
+                viewonly = True
+                today = datetime.utcnow().date()
+                current_year = today.year
+                current_month = today.month
+                last_month_to_report = settings.REPORTING_PERIOD_LAST_MONTH
+                # Current fiscal year and inside reporting period, editable until September
+                if pt.customsort == current_year and current_month <= last_month_to_report:
+                    viewonly = False
+                if pt.customsort == current_year + 1:
+                    # This is the first periodic target for pc indicator, editable with new fiscal year start
+                    if count == 0:
+                        if current_month > 6:
+                            viewonly = False
+                    # There is a prior periodic target
+                    else:
+                        if current_month > last_month_to_report:
+                            viewonly = False
+
             ptargets.append({
-                'id': pt.pk,
-                'num_data': pt.num_data,
-                'start_date': pt.start_date,
-                'end_date': pt.end_date,
-                'period': pt.period, # period is deprecated, this should move to .period_name
-                'period_name': pt.period_name,
-                'target': pt.target
-            })
+                    'id': pt.pk,
+                    'num_data': pt.num_data,
+                    'start_date': pt.start_date,
+                    'end_date': pt.end_date,
+                    'period': pt.period, # period is deprecated, this should move to .period_name
+                    'period_name': pt.period_name,
+                    'target': pt.target,
+                    'viewonly': viewonly
+                })
 
         # if the modal is being loaded (not submitted), check the number of periodic targets to
         # be sure that they cover the program reporting period.  A recently extended program reporting period
@@ -671,10 +718,15 @@ class IndicatorUpdate(IndicatorFormMixin, UpdateView):
 
             generated_pt_ids = []
             for i, pt in enumerate(normalized_pt_json):
+                # Preserve pt customsort value if pc indicator
+                if old_indicator.admin_type == old_indicator.ADMIN_PARTICIPANT_COUNT:
+                    customsort = PeriodicTarget.objects.values_list('customsort', flat=True).get(pk=pt['id'])
+                else:
+                    customsort = i
                 defaults = {
                     'period': pt.get('period', ''),
                     'target': pt.get('target', 0),
-                    'customsort': i,
+                    'customsort': customsort,
                     'start_date': pt['start_date'],
                     'end_date': pt['end_date'],
                     'edit_date': timezone.now()
@@ -1142,6 +1194,7 @@ def result_view(request, indicator, program):
             'long_help': long_help
         })
 
+
 @login_required
 def indicator_plan(request, program):
     """
@@ -1360,40 +1413,45 @@ class ParticipantCountFiscalExport(APIView):
         Get
     """
     csv_headers = ['program', 'event_target_period', 'countries', 'regions', 'definition', 'gait_id', 'means_of_verification/data_source', 'data_collection_method',
-                   'method_of_analysis', 'comments', 'outcome_themes', 'direct_without_double_counting', 'indirect_without_double_counting', 'total_without_double_counting',
-                   'direct_with_double_counting', 'indirect_with_double_counting', 'total_with_double_counting', 'agriculture_direct', 
-                   'cash_and_voucher_assistance_direct', 'employment_direct', 'environment_direct', 'financial_services_direct', 'governance_and_partnership_direct', 
+                   'method_of_analysis', 'comments', 'economic_opportunities', 'food_security', 'peace_and_stability', 'resilience', 'water_security',
+                   'direct_without_double_counting', 'indirect_without_double_counting', 'total_without_double_counting',
+                   'direct_with_double_counting', 'indirect_with_double_counting', 'total_with_double_counting', 'agriculture_direct',
+                   'cash_and_voucher_assistance_direct', 'employment_direct', 'environment_direct', 'financial_services_direct', 'governance_and_partnership_direct',
                    'public_health_direct', 'infrastructure_direct', 'nutrition_direct', 'wash_direct', 'agriculture_indirect', 'cash_and_voucher_assistance_indirect',
                    'employment_indirect', 'environment_indirect', 'financial_services_indirect', 'governance_and_partnership_indirect', 'public_health_indirect',
-                   'infrastructure_indirect', 'nutrition_indirect', 'wash_indirect', 'age_unk_m_with_double_counting', 'age_unk_f_with_double_counting', 
-                   'age_unk_sex_unk_with_double_counting', '0_5_m_with_double_counting', '0_5_f_with_double_counting', '0_5_unk_with_double_counting', 
-                   '6_9_m_with_double_counting', '6_9_f_with_double_counting', '6_9_unk_with_double_counting', '10_14_m_with_double_counting', 
-                   '10_14_f_with_double_counting', '10_14_unk_with_double_counting', '15_19_m_with_double_counting', '15_19_f_with_double_counting', 
-                   '15_19_unk_with_double_counting', '20_24_m_with_double_counting', '20_24_f_with_double_counting', '20_24_unk_with_double_counting', 
+                   'infrastructure_indirect', 'nutrition_indirect', 'wash_indirect', 'age_unk_m_with_double_counting', 'age_unk_f_with_double_counting',
+                   'age_unk_sex_unk_with_double_counting', '0_5_m_with_double_counting', '0_5_f_with_double_counting', '0_5_unk_with_double_counting',
+                   '6_9_m_with_double_counting', '6_9_f_with_double_counting', '6_9_unk_with_double_counting', '10_14_m_with_double_counting',
+                   '10_14_f_with_double_counting', '10_14_unk_with_double_counting', '15_19_m_with_double_counting', '15_19_f_with_double_counting',
+                   '15_19_unk_with_double_counting', '20_24_m_with_double_counting', '20_24_f_with_double_counting', '20_24_unk_with_double_counting',
                    '25_34_m_with_double_counting', '25_34_f_with_double_counting', '25_34_unk_with_double_counting', '35_49_m_with_double_counting',
                    '35_49_f_with_double_counting', '35_49_unk_with_double_counting', '50+_m_with_double_counting', '50+_f_with_double_counting', '50+_unk_with_double_counting',
-                   'age_unk_m_without_double_counting', 'age_unk_f_without_double_counting', 'age_unk_sex_unk_without_double_counting', '0_5_m_without_double_counting', 
-                   '0_5_f_without_double_counting', '0_5_unk_without_double_counting', '6_9_m_without_double_counting', '6_9_f_without_double_counting', 
-                   '6_9_unk_without_double_counting', '10_14_m_without_double_counting', '10_14_f_without_double_counting', '10_14_unk_without_double_counting', 
-                   '15_19_m_without_double_counting', '15_19_f_without_double_counting', '15_19_unk_without_double_counting', '20_24_m_without_double_counting', 
-                   '20_24_f_without_double_counting', '20_24_unk_without_double_counting', '25_34_m_without_double_counting', '25_34_f_without_double_counting', 
-                   '25_34_unk_without_double_counting', '35_49_m_without_double_counting', '35_49_f_without_double_counting', '35_49_unk_without_double_counting', 
+                   'age_unk_m_without_double_counting', 'age_unk_f_without_double_counting', 'age_unk_sex_unk_without_double_counting', '0_5_m_without_double_counting',
+                   '0_5_f_without_double_counting', '0_5_unk_without_double_counting', '6_9_m_without_double_counting', '6_9_f_without_double_counting',
+                   '6_9_unk_without_double_counting', '10_14_m_without_double_counting', '10_14_f_without_double_counting', '10_14_unk_without_double_counting',
+                   '15_19_m_without_double_counting', '15_19_f_without_double_counting', '15_19_unk_without_double_counting', '20_24_m_without_double_counting',
+                   '20_24_f_without_double_counting', '20_24_unk_without_double_counting', '25_34_m_without_double_counting', '25_34_f_without_double_counting',
+                   '25_34_unk_without_double_counting', '35_49_m_without_double_counting', '35_49_f_without_double_counting', '35_49_unk_without_double_counting',
                    '50+_m_without_double_counting', '50+_f_without_double_counting', '50+_unk_without_double_counting']
+    possible_outcome_themes = ['Economic Opportunities', 'Food Security', 'Peace and Stability', 'Resilience', 'Water Security']
     actual_list = ['Direct', 'Indirect']
     actual_keys = ['Actual without double counting', 'Actual with double counting']
     sector_list = ['Agriculture', 'Cash and Voucher Assistance', 'Employment', 'Environment (DRR, Energy and Water)', 'Financial Services', 'Governance and Partnership',
                    'Public Health (non - nutrition, non - WASH)', 'Infrastructure (non - WASH, non - energy)', 'Nutrition', 'WASH']
     sector_keys = ['Sectors Direct with double counting', 'Sectors Indirect with double counting']
-    sadd_list = ['Age Unknown M', 'Age Unknown F', 'Age Unknown Sex Unknown', '0-5 M', '0-5 F', '0-5 Sex Unknown', '6-9 M', '6-9 F', '6-9 Sex Unknown', 
-                 '10-14 M', '10-14 F', '10-14 Sex Unknown', '15-19 M', '15-19 F', '15-19 Sex Unknown', '20-24 M', '20-24 F', '20-24 Sex Unknown', 
+    sadd_list = ['Age Unknown M', 'Age Unknown F', 'Age Unknown Sex Unknown', '0-5 M', '0-5 F', '0-5 Sex Unknown', '6-9 M', '6-9 F', '6-9 Sex Unknown',
+                 '10-14 M', '10-14 F', '10-14 Sex Unknown', '15-19 M', '15-19 F', '15-19 Sex Unknown', '20-24 M', '20-24 F', '20-24 Sex Unknown',
                  '25-34 M', '25-34 F', '25-34 Sex Unknown', '35-49 M', '35-49 F', '35-49 Sex Unknown', '50+ M', '50+ F', '50+ Sex Unknown']
     sadd_keys = ['SADD (including unknown) with double counting', 'SADD (including unknown) without double counting']
     reporting_start_date = date.fromisoformat(settings.REPORTING_YEAR_START_DATE)
 
     def __init__(self, *args, **kwargs):
+        self.event_target_period = 'FY{}'.format(self.reporting_start_date.year + 1)
+
         self.queryset = Indicator.objects.filter(
             admin_type=Indicator.ADMIN_PARTICIPANT_COUNT,
             program__reporting_period_end__gte=self.reporting_start_date,
+            periodictargets__period=self.event_target_period
         ).prefetch_related('program')
 
         # Exclude Tolaland in production
@@ -1401,7 +1459,6 @@ class ParticipantCountFiscalExport(APIView):
             self.queryset = self.queryset.exclude(program__country__country='Tolaland')
 
         self.csv_row = []
-        self.event_target_period = 'FY{}'.format(self.reporting_start_date.year + 1)
 
         super().__init__(*args, **kwargs)
 
@@ -1496,14 +1553,14 @@ class ParticipantCountFiscalExport(APIView):
 
     def get_country_region_list(self, indicator):
         """
-        Returns the countries and regions for the indicator as a comma separated string
+        Returns the countries and regions for the indicator as a lists
 
         Params
             indicator
                 The current indicator object
 
         Returns
-            Two values both comma separated string. First value is countries and second is regions
+            Two lists. First value is countries and second is regions
         """
         country_list = []
         region_list = []
@@ -1512,7 +1569,7 @@ class ParticipantCountFiscalExport(APIView):
             country_list.append(country.name)
             region_list.append(country.region.name)
 
-        return self.comma_separate_list(country_list), self.comma_separate_list(region_list)
+        return country_list, region_list
 
     def get_outcome_themes(self, result):
         """
@@ -1571,7 +1628,7 @@ class ParticipantCountFiscalExport(APIView):
     def get_actuals(self, result):
         """
         Populates counting dict with all actual values
-        
+
         Params
             result
                 The current result object
@@ -1643,8 +1700,11 @@ class ParticipantCountFiscalExport(APIView):
         for key in results_dict:
             # outcome themes are handled differently than actuals, sector, sadd
             if key == 'outcome_themes':
-                value = self.comma_separate_list(list(results_dict[key]))
-                self.csv_row.append(value)
+                for outcome_theme in self.possible_outcome_themes:
+                    if outcome_theme in results_dict['outcome_themes']:
+                        self.csv_row.append(1)
+                    else:
+                        self.csv_row.append(0)
                 continue
 
             value = self.sum_counters(results_dict[key], Counter(self.create_default_counting_dict(
@@ -1668,18 +1728,19 @@ class ParticipantCountFiscalExport(APIView):
         """
         countries, regions = self.get_country_region_list(indicator)
 
-        self.csv_row.extend([
-            indicator.program.name, self.event_target_period, countries, regions, self.remove_new_lines(indicator.definition), 
-            indicator.program.gaitid, self.remove_new_lines(indicator.means_of_verification), self.remove_new_lines(indicator.data_collection_method), 
-            self.remove_new_lines(indicator.method_of_analysis), self.remove_new_lines(indicator.comments)
-        ])
+        for index, _ in enumerate(countries):
+            self.csv_row.extend([
+                indicator.program.name, self.event_target_period, countries[index], regions[index], self.remove_new_lines(indicator.definition),
+                indicator.program.gaitid, self.remove_new_lines(indicator.means_of_verification), self.remove_new_lines(indicator.data_collection_method),
+                self.remove_new_lines(indicator.method_of_analysis), self.remove_new_lines(indicator.comments)
+            ])
 
-        self.populate_results(indicator)
+            self.populate_results(indicator)
 
-        writer.writerow(self.csv_row)
+            writer.writerow(self.csv_row)
 
-        # Finished writing to the csv row. Clear the list for the next row.
-        self.csv_row = []
+            # Finished writing to the csv row. Clear the list for the next row.
+            self.csv_row = []
 
     def get(self, request, *args, **kwargs):
         """
@@ -1695,5 +1756,5 @@ class ParticipantCountFiscalExport(APIView):
 
         for indicator in self.queryset:
             self.populate_row(indicator, writer)
-                
+
         return response

@@ -77,7 +77,7 @@ class TestParticipantCountSetup(test.TestCase):
         response = self.client.get(reverse('pcountcreate', args=[indicator.pk]))
         self.assertSetEqual(
             set(json.loads(response.content).keys()),
-            {'outcome_themes', 'disaggregations', 'program_start_date', 'program_end_date', 'periodic_target'})
+            {'outcome_themes', 'disaggregations', 'program_start_date', 'program_end_date', 'periodic_target', 'pt_start_date', 'pt_end_date'})
         base_result_data = self.get_base_result_data(indicator)
 
 

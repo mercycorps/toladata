@@ -10,7 +10,6 @@
                 returns indicators with just their numbering/ordering information (which changes when an indicator
                     is deleted or moved between levels) for all indicators for a given program.
 """
-
 from rest_framework import serializers
 from django.db import models
 from .indicator_serializers import (
@@ -77,6 +76,7 @@ class ProgramPageIndicatorMixin:
     reporting_period = serializers.SerializerMethodField()
     periodic_targets = serializers.SerializerMethodField()
     no_target_results = serializers.SerializerMethodField()
+    is_fiscal_year = serializers.BooleanField()
     indicator_type_count = serializers.IntegerField()
 
     class Meta:
@@ -105,6 +105,7 @@ class ProgramPageIndicatorMixin:
             'indicator_type_count',
             'create_date',
             'admin_type',
+            'is_fiscal_year'
         ]
 
     # class methods to instantiate serializer with minimal queries:
@@ -156,6 +157,8 @@ class ProgramPageIndicatorMixin:
     @staticmethod
     def get_lop_met_progress(indicator):
         if indicator.lop_target_progress and indicator.lop_actual_progress:
+            if indicator.direction_of_change == Indicator.DIRECTION_OF_CHANGE_NEGATIVE:
+                return indicator.lop_target_progress / indicator.lop_actual_progress
             return indicator.lop_actual_progress / indicator.lop_target_progress
         return None
 
@@ -172,6 +175,7 @@ class ProgramPageIndicatorMixin:
         """Returns serializer of targets with their assigned results for creating the results table"""
         targets = indicator.prefetch_targets
         return ProgramPageTargetSerializer(targets, context={'indicator': indicator}, many=True).data
+
 
     @staticmethod
     def get_no_target_results(indicator):
