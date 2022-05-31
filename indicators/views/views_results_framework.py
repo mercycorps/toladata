@@ -7,6 +7,8 @@ import logging
 import copy
 import json
 
+from datetime import date
+
 from django.core.exceptions import ValidationError
 from django.db import transaction
 from django.http import HttpResponseRedirect, JsonResponse
@@ -219,7 +221,8 @@ def insert_new_level(request):
     # Now the new level can be saved
     new_level.save()
 
-    if not new_level.parent:
+    # Make sure pc indicators are only created starting with FY2022
+    if not new_level.parent and program.reporting_period_end >= date(2021, 7, 1):
         disaggregations = DisaggregationType.objects.filter(global_type=DisaggregationType.DISAG_PARTICIPANT_COUNT)
         create_participant_count_indicator(program,new_level, disaggregations)
 

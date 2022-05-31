@@ -38,7 +38,6 @@ from indicators.views.views_program import (
     programs_rollup_export,
     programs_rollup_export_csv,
     indicator_detail_export_csv,
-    program_page,
     old_program_page,
     api_program_page,
     api_program_ordering,

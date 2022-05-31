@@ -13,10 +13,16 @@ const CommonFields = ({ commonFieldsInput, setCommonFieldsInput, outcomeThemesDa
         formatDate(localdate()) < commonFieldsInput.program_end_date ? setMaxDate(formatDate(localdate())) : setMaxDate(commonFieldsInput.program_end_date);
 
         $(document).ready(() => { // Needed for localization to translate the calendars month names
+            // Use these dates to restrict the result form date fields range. 
+            // The maxResultDate should the lesser date of the end of the program or end of the current fiscal year. This is for when a program ends within the current fiscal year.
+            // The minResultDate is the greater date of the start of the program or start of the current fiscal year. This is for when a program starts within the current fiscal year.
+            let maxResultDate = commonFieldsInput.program_end_date < commonFieldsInput.pt_end_date ? commonFieldsInput.program_end_date : commonFieldsInput.pt_end_date;
+            let minResultDate = commonFieldsInput.program_start_date > commonFieldsInput.pt_start_date ? commonFieldsInput.program_start_date : commonFieldsInput.pt_start_date;
+            
             $('.datepicker').datepicker({
                 dateFormat: "yy-mm-dd",
-                maxDate: formatDate(localdate()) < commonFieldsInput.program_end_date ? formatDate(localdate()) : commonFieldsInput.program_end_date,
-                minDate: commonFieldsInput.program_start_date,
+                maxDate: formatDate(localdate()) < maxResultDate ? formatDate(localdate()) : maxResultDate, // Only allow results for the past so if the current date is less than the maxResultDate, use the current date as the max date allowed.
+                minDate: minResultDate,
             });
             if (commonFieldsInput.date_collected) {
                 $('.datepicker').datepicker("setDate", commonFieldsInput.date_collected);

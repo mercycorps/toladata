@@ -386,10 +386,10 @@ export class LevelStore {
                 $('#logframe_link').show();
             }
 
-            let level_save_button = document.getElementById('level-save-button');
+            let level_save_button = $('.level-button');
 
             // disable the save button to prevent button smashing on low bandwidth connection
-            level_save_button.disabled = true;
+            level_save_button.prop('disabled', true);
 
             // Don't need id, since it will be "new", and don't need rationale, since it's a new level.
             delete levelToSave.id;
@@ -422,7 +422,7 @@ export class LevelStore {
                 .catch(error => console.log('error', error))
                 .finally(response => {
                     // Re-enable the save button once the request has been processed
-                    level_save_button.disabled = false;
+                    level_save_button.prop('disabled', false);
                 })
 
         } else {

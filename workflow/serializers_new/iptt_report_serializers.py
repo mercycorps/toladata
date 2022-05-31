@@ -223,7 +223,7 @@ class IPTTReportSerializer(serializers.Serializer):
         report_indicators = list(
             Indicator.rf_aware_objects.select_related(None).prefetch_related(None).only(
                 'pk', 'program_id', 'target_frequency', 'unit_of_measure_type',
-                'is_cumulative', 'level_id', 'lop_target').filter(**filters).order_by().distinct()
+                'is_cumulative', 'level_id', 'lop_target', 'direction_of_change').filter(**filters).order_by().distinct()
             )
         report_data = {}
         for frequency in context['frequencies']:
