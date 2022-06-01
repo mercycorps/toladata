@@ -200,7 +200,7 @@ const PCResultsForm = ({indicatorID="", resultID="", readOnly}) => {
                             setStatus('ready');
                         } else {
                             clearTimeout(errorTimeout);
-                            setStatus('error'); 
+                            setStatus('error');
                         }
                     })
             } else {
@@ -215,6 +215,8 @@ const PCResultsForm = ({indicatorID="", resultID="", readOnly}) => {
                                 outcome_theme: formatSelectedOutcomeThemes(response.data.outcome_themes),
                                 program_start_date: response.data.program_start_date,
                                 program_end_date: response.data.program_end_date,
+                                pt_end_date: response.data.pt_end_date,
+                                pt_start_date: response.data.pt_start_date,
                             });
                             setEvidenceFieldsInput({
                                 evidence_url: response.data.evidence_url,
@@ -223,9 +225,9 @@ const PCResultsForm = ({indicatorID="", resultID="", readOnly}) => {
                             clearTimeout(errorTimeout);
                             setDisableForm(readOnly || response.data.view_only);
                             setStatus('ready');
-                        } else { 
+                        } else {
                             clearTimeout(errorTimeout);
-                            setStatus('error'); 
+                            setStatus('error');
                         }
                 })
             }
