@@ -58,7 +58,6 @@ class ProgramPageMixin:
     needs_additional_target_periods = serializers.BooleanField()
     site_count = serializers.ReadOnlyField(source='num_sites')
     has_levels = serializers.SerializerMethodField()
-    gait_url = serializers.CharField()
     target_period_info = serializers.SerializerMethodField()
 
     class Meta:
@@ -67,16 +66,10 @@ class ProgramPageMixin:
             'needs_additional_target_periods',
             'site_count',
             'has_levels',
-            'gait_url',
             'target_period_info',
         ]
 
     # Class methods used to instantiate serializer with queryset and context to minimize queries
-
-    @classmethod
-    def _get_query_fields(cls):
-        """Extends parent's list of DB fields needed for included fields"""
-        return super()._get_query_fields() + ['gaitid']
 
     @classmethod
     def get_queryset(cls, **kwargs):

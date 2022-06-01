@@ -10,7 +10,6 @@
 - model: workflow.program
   pk: 1
   fields:
-    gaitid: '1'
     name: Basic One Year Program
     funding_status: Funded
     cost_center: null
@@ -23,6 +22,13 @@
     reporting_period_end: 2016-12-31
     sector: []
     country: [1]
+- model: workflow.gaitid
+  pk: 1
+  fields:
+    gaitid: '1'
+    program: 1
+    create_date: 2022-04-01
+    edit_date: 2022-04-01
 - model: indicators.indicator
   pk: 1
   fields:
