@@ -195,7 +195,7 @@ def participant_count_result_create_for_indicator(request, pk, *args, **kwargs):
 
 def calculate_pt_start_end_dates():
     today = datetime.utcnow().date()
-    year = today.year if today.month < 6 else today.year + 1
+    year = today.year if today.month < 7 else today.year + 1
     return date(year - 1, 7, 1), date(year, 6, 30)
 
 def calculate_reporting_year(indicator):
