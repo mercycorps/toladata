@@ -46,6 +46,9 @@ class ProgramDiscrepancies:
     def discrepancy_count(self):
         return len(self._discrepancies)
 
+    def clear_discrepancies(self):
+        self._discrepancies = set()
+
     def has_discrepancy(self, discrepancy):
         return discrepancy in self._discrepancies
 
