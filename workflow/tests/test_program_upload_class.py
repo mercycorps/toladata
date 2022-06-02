@@ -1,5 +1,5 @@
 from factories import workflow_models
-from workflow import program
+from workflow import program, models
 from django import test
 import json
 import copy
@@ -38,23 +38,19 @@ class TestProgramUpload(test.TestCase):
 
         new_program = workflow_models.ProgramFactory(**fields)
 
-        workflow_models.GaitIDFactory(
-            gaitid=idaa_program['GaitIDs'][0],
-            program_id=new_program.id
-        )
+        for gaitid in idaa_program['GaitIDs']:
+            new_gaitid = models.GaitID(gaitid=gaitid, program_id=new_program.id)
+            new_gaitid.save()
 
     def test_validation_idaa_not_funded(self):
         """
         Test validation when an IDAA program is not funded
         """
         idaa_not_funded_index = 0
-        expected_discrepancies = 1
         
         upload_program = program.ProgramUpload(idaa_program=self.idaa_json['d']['results'][idaa_not_funded_index])
         
         self.assertFalse(upload_program.is_valid())
-        self.assertTrue(upload_program.has_discrepancy('funded'))
-        self.assertEquals(upload_program.discrepancy_count, expected_discrepancies)
 
     def test_validation_idaa_valid_and_exists(self):
         """
@@ -166,7 +162,7 @@ class TestProgramUpload(test.TestCase):
         """
         Test validation when an IDAA program has an empty required field
         """
-        fields = ["ID", "ProgramName", "ProgramStartDate", "ProgramEndDate", "ProgramStatus", "Country"]
+        fields = ["ID", "ProgramName", "ProgramStartDate", "ProgramEndDate", "Country"]
         idaa_index = 3
         expected_discrepancies = 1
 

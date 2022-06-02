@@ -93,9 +93,6 @@ class ProgramValidation(ProgramDiscrepancies):
         """
         funded = self.idaa_program['ProgramStatus'] == self.funded_str
 
-        if not funded:
-            self.add_discrepancy('funded')
-
         return funded
 
     def valid_gaitids(self):
@@ -138,18 +135,19 @@ class ProgramValidation(ProgramDiscrepancies):
     def valid_idaa_program(self):
         """
         Validation for idaa programs
-        - program is funded
         - program has valid gaitid
         - program has no missing fields
         """
-        return not self.missing_fields() and self.program_is_funded() and self.valid_gaitids()
+        missing_fields = self.missing_fields()
+        valid_gaitids = self.valid_gaitids()
 
-    def matching_fields(self):
+        return not missing_fields and valid_gaitids
+
+    def matching_dates(self):
         """
         Checks that the values between required fields are the same between Tola and IDAA
         """
         fields = [
-            {'idaa': 'ProgramStatus', 'tola': 'funding_status'},
             {'idaa': 'ProgramStartDate', 'tola': 'start_date'},
             {'idaa': 'ProgramEndDate', 'tola': 'end_date'}
         ]
@@ -157,11 +155,7 @@ class ProgramValidation(ProgramDiscrepancies):
 
         for field in fields:
             tola_value = getattr(self.tola_program, field['tola'])
-            idaa_value = self.idaa_program[field['idaa']]
-
-            # Need to convert IDAA dates to Tola date format
-            if field['idaa'] == 'ProgramStartDate' or field['idaa'] == 'ProgramEndDate':
-                idaa_value = convert_date(idaa_value)
+            idaa_value = convert_date(self.idaa_program[field['idaa']])
 
             if not str(tola_value) == idaa_value:
                 self.add_discrepancy(field['tola'])
@@ -202,12 +196,22 @@ class ProgramValidation(ProgramDiscrepancies):
         - program fields match
         - countires match
         """
-        return self.matching_fields() and self.matching_countries()
+        matching_fields = self.matching_dates()
+        matching_countries = self.matching_countries()
+
+        return matching_fields and matching_countries
 
     def is_valid(self):
         """
         Method for checking if the program upload is valid. Checks the IDAA program and if possible the Tola program aswell.
         """
+        if not self.program_is_funded():
+            # Non funded programs should'nt show up in the discrepancy report.
+            # There is a case when a non-funded program can already have discrepancies at this point.
+            # Clear all discrepancies just in case.
+            self.clear_discrepancies()
+            return False
+        
         # These discrepancies can come up while trying to retrieve the Tola program
         if self.has_discrepancy('multiple_programs') or self.has_discrepancy('gaitid'):
             return False
@@ -253,6 +257,7 @@ class ProgramUpload(ProgramValidation):
         except models.Program.MultipleObjectsReturned:
             # Multiple Tola programs returned. Add the multiple_programs discrepancy since it would be impossible to know which Tola program needs validated
             self.add_discrepancy('multiple_programs')
+            return models.Program.objects.filter(gaitid__gaitid__in=self.idaa_program['GaitIDs'])
         except ValueError:
             # IDAA gait id is invalid (not an int)
             self.add_discrepancy('gaitid')
