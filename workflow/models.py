@@ -623,7 +623,7 @@ class Program(models.Model):
         """
         Property to help with backwards compatibility with new GaitID table
         """
-        return list(self.gaitid.values_list('gaitid'))
+        return list(self.gaitid.values_list('gaitid', flat=True))
 
     @property
     def collected_record_count(self):
