@@ -40,6 +40,10 @@ class TestParticipantCountSetup(test.TestCase):
         self.view_only = False
 
     def create_indicator_utils(self):
+        """
+        Create pc indicator, login, grant access
+        :return pc indicator
+        """
         management.call_command(
             'create_participant_count_indicators', execute=True, create_disaggs_themes=True, suppress_output=True)
         self.client.force_login(self.tola_user.user)
@@ -49,6 +53,9 @@ class TestParticipantCountSetup(test.TestCase):
         return indicator
 
     def has_correct_permission(self, tola_user, access_level, status_code):
+        """
+        Set up and test permissions
+        """
         self.client.force_login(tola_user.user)
         w_factories.grant_program_access(
             tola_user, self.program, self.country, access_level)
@@ -57,8 +64,11 @@ class TestParticipantCountSetup(test.TestCase):
         self.assertEqual(response.status_code, status_code)
 
     def get_base_result_data(self, indicator=None, result=None):
-        # Gets the base dataset for a result. Only really useful after underlying data has been created, like
-        # Outcome Themes and PC indicators
+        """
+        Gets the base dataset for a result. Only really useful after underlying data has been created, like
+        Outcome Themes and PC indicators
+        :return base result data
+        """
         if not indicator and not result:
             raise NotImplementedError('Arguments must include either indicator or result')
         if result and indicator:
@@ -88,7 +98,10 @@ class TestParticipantCountSetup(test.TestCase):
         return result_data
 
     def update_base_results(self, base_result_data):
-        # Adding disaggregation values to base_result_data, collect values in list to compare to result object
+        """
+        Add disaggregation values to base_result_data, collect values in list
+        :returns updated base result data, disagg value list
+        """
         updated_disagg_values = []
         for disagg in base_result_data['disaggregations']:
             if disagg['disaggregation_type'] == 'SADD (including unknown) with double counting':
@@ -102,6 +115,12 @@ class TestParticipantCountSetup(test.TestCase):
         return base_result_data, updated_disagg_values
 
     def create_result(self, pt, indicator):
+        """
+        Create result object
+        :param pt:
+        :param indicator:
+        :return: result
+        """
         result = ResultFactory(
             periodic_target=pt,
             indicator=indicator,
@@ -111,6 +130,11 @@ class TestParticipantCountSetup(test.TestCase):
         return result
 
     def get_outcome_theme_list(self, result):
+        """
+        Create list with outcome theme ids
+        :param result:
+        :return: outcome theme id list
+        """
         ot_object = result.outcome_themes.filter(is_active=True)
         ot_list = []
         for ot in ot_object:
@@ -118,6 +142,9 @@ class TestParticipantCountSetup(test.TestCase):
         return ot_list
 
     def test_result_create_view_permissions(self):
+        """
+        Tests that permissions are correct
+        """
         management.call_command(
             'create_participant_count_indicators', execute=True, create_disaggs_themes=True, suppress_output=True)
         for access_level in [l[0] for l in PROGRAM_ROLE_CHOICES]:
@@ -127,6 +154,9 @@ class TestParticipantCountSetup(test.TestCase):
             self.has_correct_permission(tola_user, access_level, 200)
 
     def test_result_create_view_data(self):
+        """
+        Tests data for create result view
+        """
         indicator = self.create_indicator_utils()
         response = self.client.get(reverse('pcountcreate', args=[indicator.pk]))
         data = json.loads(response.content)
@@ -139,6 +169,9 @@ class TestParticipantCountSetup(test.TestCase):
         self.assertEqual(data['pt_end_date'], self.pt_end)
 
     def test_result_create_view(self):
+        """
+        Tests create result view functionality
+        """
         indicator = self.create_indicator_utils()
         # Get base result data and update it
         base_result_data = self.get_base_result_data(indicator)
@@ -161,13 +194,20 @@ class TestParticipantCountSetup(test.TestCase):
 
 
     def test_result_update(self):
+        """
+        Tests result update view functionality with preset result and modified result data
+        """
         indicator = self.create_indicator_utils()
+
         # First fiscal year periodic target for pc indicator
         pt = indicator.periodictargets.all().first()
+        # Create result object in db
         result = self.create_result(pt, indicator)
+        # Get base result data
         base_result_data = self.get_base_result_data(indicator)
         # Add outcome theme 'Economic Opportunity'
         result.outcome_themes.add(base_result_data['outcome_themes'].first()['id'])
+
         response_get = self.client.get(reverse('pcountupdate', args=[result.pk]))
         data = json.loads(response_get.content)
 
@@ -179,19 +219,18 @@ class TestParticipantCountSetup(test.TestCase):
         self.assertEqual(data['pt_start_date'], self.pt_start)
         self.assertEqual(data['pt_end_date'], self.pt_end)
 
+        # Modify and save result data
         updated_base_result_data, updated_disagg_values = self.update_base_results(base_result_data)
         disaggs = updated_base_result_data['disaggregations']
         # Adding a second outcome theme to the existing one
         outcome_theme = [base_result_data['outcome_themes'].last()['id']]
-        # Pushing result date to tomorrow
-        tomorrow = date(self.today.year, self.today.month, self.today.day + 1)
         url = reverse('pcountupdate', args=[result.pk])
         payload = {'disaggregations': disaggs, 'outcome_theme': outcome_theme,
-                   'date_collected': tomorrow, 'rationale': 'test'}
+                   'rationale': 'test'}
         response_post = self.client.put(url, data=payload, content_type='application/json')
         # Getting updated result object
         updated_result = Result.objects.get(pk=result.pk)
-        # Creating list of expected outcome themes
+        # Expected outcome themes
         outcome_theme_list = [base_result_data['outcome_themes'].first()['id']] + outcome_theme
         # Fetching outcome themes from updated result object and adding them to list
         ot_list = self.get_outcome_theme_list(updated_result)
@@ -201,6 +240,5 @@ class TestParticipantCountSetup(test.TestCase):
 
         self.assertEqual(response_post.status_code, 200)
         self.assertEqual(updated_result.periodic_target.period, self.period_string)
-        self.assertEqual(updated_result.date_collected, tomorrow)
         self.assertEqual(ot_list, outcome_theme_list)
         self.assertEqual(disagg_values, updated_disagg_values)
