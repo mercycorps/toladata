@@ -9,8 +9,8 @@
                 ],
                 "ProgramStatus": "Rejected",
                 "Country": "Colombia",
-                "ProgramStartDate": "12/01/2021",
-                "ProgramEndDate": "12/01/2022"
+                "ProgramStartDate": "2022-07-29T07:00:00Z",
+                "ProgramEndDate": "2023-07-29T07:00:00Z"
             }
         },
         {
@@ -23,8 +23,8 @@
                 "ProgramStatus": "Funded",
                 "Country": "Palestine, State of",
                 "Region": "Middle East",
-                "ProgramStartDate": "12/23/2021",
-                "ProgramEndDate": "12/22/2022"
+                "ProgramStartDate": "2022-07-29T07:00:00Z",
+                "ProgramEndDate": "2023-07-29T07:00:00Z"
             }
         },
         {
@@ -37,8 +37,8 @@
                 "ProgramStatus": "Funded",
                 "Country": "Timor-Leste",
                 "Region": "Asia",
-                "ProgramStartDate": "7/19/2021",
-                "ProgramEndDate": "4/18/2022"
+                "ProgramStartDate": "2022-07-29T07:00:00Z",
+                "ProgramEndDate": "2023-07-29T07:00:00Z"
             }
         },
         {
@@ -51,8 +51,8 @@
                 "ProgramStatus": "Funded",
                 "Country": "HQ",
                 "Region": "HQ Managed",
-                "ProgramStartDate": "11/24/2020",
-                "ProgramEndDate": "11/30/2021"
+                "ProgramStartDate": "2022-07-29T07:00:00Z",
+                "ProgramEndDate": "2023-07-29T07:00:00Z"
             }
         },
         {
@@ -66,8 +66,8 @@
                 "ProgramStatus": "Funded",
                 "Country": "HQ",
                 "Region": "HQ Managed",
-                "ProgramStartDate": "5/12/2022",
-                "ProgramEndDate": "5/12/2023"
+                "ProgramStartDate": "2022-07-29T07:00:00Z",
+                "ProgramEndDate": "2023-07-29T07:00:00Z"
             }
         }
     ]

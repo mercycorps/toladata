@@ -3,7 +3,7 @@ import datetime
 import re
 
 
-def convert_date(date, format='%m/%d/%Y'):
+def convert_date(date, format='%Y-%m-%dT%H:%M:%SZ'):
     """
     Converts date to Django date format
     """
