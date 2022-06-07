@@ -90,6 +90,9 @@ class ProgramValidation(ProgramDiscrepancies):
         """
         return self._validated
 
+    def compressed_idaa_gaitids(self):
+        return [str(gaitid['LookupValue']).rstrip('.0') for gaitid in self.idaa_program['GaitIDs']]
+
     def program_is_funded(self):
         """
         Checks that the IDAA program is funded
@@ -103,11 +106,12 @@ class ProgramValidation(ProgramDiscrepancies):
         Loops through IDAA gait ids and checks that each one is valid
         """
         valid = True
+        gaitids = self.compressed_idaa_gaitids()
 
-        if len(self.idaa_program['GaitIDs']) == 0:
+        if len(gaitids) == 0:
             valid = False
         else:
-            for gaitid in self.idaa_program['GaitIDs']:
+            for gaitid in gaitids:
                 if gaitid == 0:
                     valid = False
                 else:
@@ -125,7 +129,7 @@ class ProgramValidation(ProgramDiscrepancies):
         """
         Checks that idaa_program is not missing any fields
         """
-        fields = ["ID", "ProgramName", "ProgramStartDate", "ProgramEndDate", "ProgramStatus", "Country"]
+        fields = ["id", "ProgramName", "ProgramStartDate", "ProgramEndDate", "ProgramStatus", "Country"]
         missing = False
 
         for field in fields:
@@ -252,15 +256,16 @@ class ProgramUpload(ProgramValidation):
         """
         Queries the Program table for Tola programs that have the IDAA program gait ids
         """
+        gaitids = self.compressed_idaa_gaitids()
         try:
-            return models.Program.objects.get(gaitid__gaitid__in=self.idaa_program['GaitIDs'])
+            return models.Program.objects.get(gaitid__gaitid__in=gaitids)
         except models.Program.DoesNotExist:
             # Program does not exist in Tola - this is a new upload
             return None
         except models.Program.MultipleObjectsReturned:
             # Multiple Tola programs returned. Add the multiple_programs discrepancy since it would be impossible to know which Tola program needs validated
             self.add_discrepancy('multiple_programs')
-            return models.Program.objects.filter(gaitid__gaitid__in=self.idaa_program['GaitIDs'])
+            return models.Program.objects.filter(gaitid__gaitid__in=gaitids)
         except ValueError:
             # IDAA gait id is invalid (not an int)
             self.add_discrepancy('gaitid')

@@ -1,55 +1,74 @@
 {
-    "d": {
-        "results": [
-            {
-                "ID": 1554,
+    "value": [
+        {
+            "fields": {
+                "id": 1554,
                 "ProgramName": "[CN] Annual Process for Responding to Humanitarian Situations 2020",
-                "GaitIDs": [10347],
+                "GaitIDs": [
+                    {"LookupValue": "10347.0000000000"}
+                ],
                 "ProgramStatus": "Rejected",
                 "Country": "Colombia",
                 "ProgramStartDate": "12/01/2021",
                 "ProgramEndDate": "12/01/2022"
-            },
-            {
-               "ID": 1575,
-               "ProgramName": "2021 TIDES/Upwork Foundation Grant",
-               "GaitIDs": [10864],
-               "ProgramStatus": "Funded",
-               "Country": "Palestine, State of",
-               "Region": "Middle East",
-               "ProgramStartDate": "12/23/2021",
-               "ProgramEndDate": "12/22/2022"
-            },
-            {
-                "ID": 1576,
+            }
+        },
+        {
+            "fields": {
+                "id": 1575,
+                "ProgramName": "2021 TIDES/Upwork Foundation Grant",
+                "GaitIDs": [
+                    {"LookupValue": "10864.0000000000"}
+                ],
+                "ProgramStatus": "Funded",
+                "Country": "Palestine, State of",
+                "Region": "Middle East",
+                "ProgramStartDate": "12/23/2021",
+                "ProgramEndDate": "12/22/2022"
+            }
+        },
+        {
+            "fields": {
+                "id": 1576,
                 "ProgramName": "2021 Timor-Leste Cyclone Seroja Flood Response",
-                "GaitIDs": [10476],
+                "GaitIDs": [
+                    {"LookupValue": "10476.0000000000"}
+                ],
                 "ProgramStatus": "Funded",
                 "Country": "Timor-Leste",
                 "Region": "Asia",
                 "ProgramStartDate": "7/19/2021",
                 "ProgramEndDate": "4/18/2022"
-            },
-            {
-                "ID": 1609,
+            }
+        },
+        {
+            "fields": {
+                "id": 1609,
                 "ProgramName": "AI for Social Good",
-                "GaitIDs": [10521],
+                "GaitIDs": [
+                    {"LookupValue": "10521.0000000000"}
+                ],
                 "ProgramStatus": "Funded",
                 "Country": "HQ",
                 "Region": "HQ Managed",
                 "ProgramStartDate": "11/24/2020",
                 "ProgramEndDate": "11/30/2021"
-            },
-            {
-                "ID": 1000,
+            }
+        },
+        {
+            "fields": {
+                "id": 1000,
                 "ProgramName": "Multiple GAIT ids test",
-                "GaitIDs": [10254, 10974],
+                "GaitIDs": [
+                    {"LookupValue": "10254.0000000000"},
+                    {"LookupValue": "10974.0000000000"}
+                ],
                 "ProgramStatus": "Funded",
                 "Country": "HQ",
                 "Region": "HQ Managed",
                 "ProgramStartDate": "5/12/2022",
                 "ProgramEndDate": "5/12/2023"
             }
-        ]
-    }
+        }
+    ]
 }
