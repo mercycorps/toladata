@@ -17,7 +17,7 @@ class TestProgramUpload(test.TestCase):
         with open(self.idaa_sample_data_path) as file:
             self.idaa_json = json.load(file)
         
-        target_idaa_program = self.idaa_json['d']['results'][self.create_idaa_program_index]
+        target_idaa_program = self.idaa_json['value'][self.create_idaa_program_index]['fields']
 
         self._create_tola_program(target_idaa_program, fields={
             "name": target_idaa_program['ProgramName'],
@@ -39,7 +39,9 @@ class TestProgramUpload(test.TestCase):
         new_program = workflow_models.ProgramFactory(**fields)
 
         for gaitid in idaa_program['GaitIDs']:
-            new_gaitid = models.GaitID(gaitid=gaitid, program_id=new_program.id)
+            clean_gaitid = gaitid['LookupValue'].rstrip('.0')
+
+            new_gaitid = models.GaitID(gaitid=clean_gaitid, program_id=new_program.id)
             new_gaitid.save()
 
     def test_validation_idaa_not_funded(self):
@@ -48,7 +50,7 @@ class TestProgramUpload(test.TestCase):
         """
         idaa_not_funded_index = 0
         
-        upload_program = program.ProgramUpload(idaa_program=self.idaa_json['d']['results'][idaa_not_funded_index])
+        upload_program = program.ProgramUpload(idaa_program=self.idaa_json['value'][idaa_not_funded_index]['fields'])
         
         self.assertFalse(upload_program.is_valid())
 
@@ -58,7 +60,7 @@ class TestProgramUpload(test.TestCase):
         """
         expected_discrepancies = 0
 
-        upload_program = program.ProgramUpload(idaa_program=self.idaa_json['d']['results'][self.create_idaa_program_index])
+        upload_program = program.ProgramUpload(idaa_program=self.idaa_json['value'][self.create_idaa_program_index]['fields'])
 
         self.assertTrue(upload_program.is_valid())
         self.assertTrue(upload_program.tola_program_exists)
@@ -71,7 +73,7 @@ class TestProgramUpload(test.TestCase):
         idaa_index = 1
         expected_discrepancies = 0
 
-        upload_program = program.ProgramUpload(idaa_program=self.idaa_json['d']['results'][idaa_index])
+        upload_program = program.ProgramUpload(idaa_program=self.idaa_json['value'][idaa_index]['fields'])
 
         self.assertTrue(upload_program.is_valid())
         self.assertFalse(upload_program.tola_program_exists)
@@ -84,7 +86,7 @@ class TestProgramUpload(test.TestCase):
         idaa_index = 3
         expected_discrepancies = 1
 
-        idaa_program = self.idaa_json['d']['results'][idaa_index]
+        idaa_program = self.idaa_json['value'][idaa_index]['fields']
 
         self._create_tola_program(idaa_program, fields={
             "name": idaa_program['ProgramName'],
@@ -107,7 +109,7 @@ class TestProgramUpload(test.TestCase):
         idaa_index = 3
         expected_discrepancies = 2
 
-        idaa_program = self.idaa_json['d']['results'][idaa_index]
+        idaa_program = self.idaa_json['value'][idaa_index]['fields']
 
         self._create_tola_program(idaa_program, fields={
             "name": idaa_program['ProgramName'],
@@ -131,9 +133,9 @@ class TestProgramUpload(test.TestCase):
         idaa_index = 3
         expected_discrepancies = 1
 
-        idaa_program = self.idaa_json['d']['results'][idaa_index]
+        idaa_program = self.idaa_json['value'][idaa_index]['fields']
         
-        idaa_program['GaitIDs'][0] = '123a'
+        idaa_program['GaitIDs'][0] = {'LookupValue': '1237a'}
 
         upload_program = program.ProgramUpload(idaa_program=idaa_program)
 
@@ -148,7 +150,7 @@ class TestProgramUpload(test.TestCase):
         idaa_index = 3
         expected_discrepancies = 1
 
-        idaa_program = self.idaa_json['d']['results'][idaa_index]
+        idaa_program = self.idaa_json['value'][idaa_index]['fields']
 
         idaa_program['GaitIDs'] = []
 
@@ -162,12 +164,12 @@ class TestProgramUpload(test.TestCase):
         """
         Test validation when an IDAA program has an empty required field
         """
-        fields = ["ID", "ProgramName", "ProgramStartDate", "ProgramEndDate", "Country"]
+        fields = ["id", "ProgramName", "ProgramStartDate", "ProgramEndDate", "Country"]
         idaa_index = 3
         expected_discrepancies = 1
 
         for field in fields:
-            idaa_program = copy.copy(self.idaa_json['d']['results'][idaa_index])
+            idaa_program = copy.copy(self.idaa_json['value'][idaa_index]['fields'])
 
             idaa_program[field] = ''
 
@@ -184,7 +186,7 @@ class TestProgramUpload(test.TestCase):
         idaa_index = 4
         expected_discrepancies = 0
 
-        upload_program = program.ProgramUpload(idaa_program=self.idaa_json['d']['results'][idaa_index])
+        upload_program = program.ProgramUpload(idaa_program=self.idaa_json['value'][idaa_index]['fields'])
 
         self.assertTrue(upload_program.is_valid())
         self.assertEquals(upload_program.discrepancy_count, expected_discrepancies)
@@ -195,6 +197,6 @@ class TestProgramUpload(test.TestCase):
         """
         idaa_index = 3
         
-        upload_program = program.ProgramUpload(idaa_program=self.idaa_json['d']['results'][idaa_index])
+        upload_program = program.ProgramUpload(idaa_program=self.idaa_json['value'][idaa_index]['fields'])
 
         self.assertRaises(Exception, upload_program.upload)
