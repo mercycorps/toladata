@@ -756,6 +756,33 @@ class Program(models.Model):
         return not self.results_framework or not self.auto_number_indicators
 
 
+class ProgramDiscrepancy(models.Model):
+    DISCREPANCY_REASONS = {
+        "start_date": "Tola start date does not match IDAA ProgramStartDate",
+        "end_date": "Tola end date does not match IDAA ProgramEndDate",
+        "countries": "Tola program countries does not match IDAA Country",
+        "multiple_programs": "Multiple Tola programs retrieved from IDAA program",
+        "gaitid": "IDAA program has invalid Gait ID",
+        "ProgramName": "IDAA program is missing ProgramName",
+        "id": "IDAA program is missing ID",
+        "ProgramStartDate": "IDAA program is missing ProgramStartDate",
+        "ProgramEndDate": "IDAA program is missing ProgramEndDate",
+        "ProgramStatus": "IDAA program is missing ProgramStatus",
+        "Country": "IDAA program is missing Country"
+    }
+
+    # Example idaa_json can be seen from workflow/tests/idaa_sample_data/idaa_sample.json
+    idaa_json = models.JSONField(default=dict)
+    program = models.ManyToManyField(Program, blank=True)
+    # Example discrepancy list is ['funding_status', 'gaitid']
+    discrepancies = models.JSONField(default=list)
+    create_date = models.DateTimeField(auto_now_add=True)
+    edit_date = models.DateTimeField(auto_now=True)
+
+    def __str__(self):
+        return self.idaa_json['ProgramName']
+
+
 class GaitID(models.Model):
     gaitid = models.IntegerField()
     program = models.ForeignKey(Program, on_delete=models.CASCADE, related_name='gaitid')
