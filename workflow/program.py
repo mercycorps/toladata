@@ -8,7 +8,7 @@ def convert_date(date, format='%Y-%m-%dT%H:%M:%SZ'):
     Converts date to Django date format
     """
     to_format = '%Y-%m-%d'
-    
+
     return datetime.datetime.strptime(date, format).strftime(to_format)
 
 
@@ -97,7 +97,10 @@ class ProgramValidation(ProgramDiscrepancies):
         """
         Checks that the IDAA program is funded
         """
-        funded = self.idaa_program['ProgramStatus'] == self.funded_str
+        try:
+            funded = self.idaa_program['ProgramStatus'] == self.funded_str
+        except KeyError:
+            funded = False
 
         return funded
 
@@ -218,7 +221,7 @@ class ProgramValidation(ProgramDiscrepancies):
             # Clear all discrepancies just in case.
             self.clear_discrepancies()
             return False
-        
+
         # These discrepancies can come up while trying to retrieve the Tola program
         if self.has_discrepancy('multiple_programs') or self.has_discrepancy('gaitid'):
             return False
@@ -234,7 +237,7 @@ class ProgramValidation(ProgramDiscrepancies):
             return valid_idaa_program and valid_tola_program
 
         self._validated = valid_idaa_program
-        
+
         return valid_idaa_program
 
 
