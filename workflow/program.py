@@ -1,83 +1,118 @@
+from django.db.models.query import QuerySet
 from workflow import models
 import datetime
 import re
 
 
-def convert_date(date, format='%Y-%m-%dT%H:%M:%SZ'):
+def convert_date(date, readable=False):
     """
-    Converts date to Django date format
-    """
-    to_format = '%Y-%m-%d'
+    Converts date to either a readable format or to django's format
 
-    return datetime.datetime.strptime(date, format).strftime(to_format)
+    params:
+        date - date to be formatted
+        readable - boolean should the date be converted to a readable format
+
+    returns formatted date string
+    """
+    idaa_format = '%Y-%m-%dT%H:%M:%SZ'
+    django_format = '%Y-%m-%d'
+    readable_format = '%m/%d/%Y'
+
+    if date == '':
+        return ''
+
+    if readable:
+        try:
+            return datetime.datetime.strptime(date, idaa_format).strftime(readable_format)
+        except ValueError:
+            return datetime.datetime.strptime(date, django_format).strftime(readable_format)
+
+    return datetime.datetime.strptime(date, idaa_format).strftime(django_format)
 
 
 class ProgramDiscrepancies:
-    # TODO: It may be better to move the reasons to the table. And only pass in the keys that have a discrepancy?
-    _discrepancy_reasons = {
-        "funding_status": "Tola funding status does not match IDAA ProgramStatus",
-        "start_date": "Tola start date does not match IDAA ProgramStartDate",
-        "end_date": "Tola end date does not match IDAA ProgramEndDate",
-        "countries": "Tola program countries does not match IDAA Country",
-        "multiple_programs": "Multiple Tola programs retrieved from IDAA program",
-        "funded": "IDAA program is not funded",
-        "gaitid": "IDAA program has invalid Gait ID",
-        "ProgramName": "IDAA program is missing ProgramName",
-        "ID": "IDAA program is missing ID",
-        "ProgramStartDate": "IDAA program is missing ProgramStartDate",
-        "ProgramEndDate": "IDAA program is missing ProgramEndDate",
-        "ProgramStatus": "IDAA program is missing ProgramStatus",
-        "Country": "IDAA program is missing Country"
-    }
 
-    def __init__(self, execute=False):
-        self.execute = execute
+    def __init__(self):
         self._discrepancies = set()
 
     @property
     def discrepancies(self):
-        return self._discrepancies
+        """
+        Returns a list of discrepancies
+        """
+        return list(self._discrepancies)
 
     @property
     def discrepancy_reasons(self):
+        """
+        Returns a list of discrepancy reasons for the program
+        """
         return self._get_discrepancy_reasons()
 
     @property
     def discrepancy_count(self):
+        """
+        Returns the number of discrepancies for the program
+        """
         return len(self._discrepancies)
 
     def clear_discrepancies(self):
+        """
+        Clears all discrepancies for the program
+        """
         self._discrepancies = set()
 
     def has_discrepancy(self, discrepancy):
+        """
+        Returns True or False if the program has a certain discrepancy
+        """
         return discrepancy in self._discrepancies
 
     def _get_discrepancy_reasons(self):
+        """
+        Returns a list of discrepancy reasons
+        """
         reasons = []
 
         for discrepancy in self._discrepancies:
-            reasons.append(self._discrepancy_reasons[discrepancy])
+            reasons.append(models.ProgramDiscrepancy.DISCREPANCY_REASONS[discrepancy])
 
         return reasons
 
     def add_discrepancy(self, discrepancy):
+        """
+        Add a discrepancy to the objects set
+        """
         self._discrepancies.add(discrepancy)
 
     def create_discrepancies(self):
-        if self.execute:
-            # TODO: add discrepancy to ProgramDiscrepancy table?
-            pass
+        """
+        Adds the discrepancies to the database
+        """
+        if self.discrepancy_count > 0:
+            discrepancy = models.ProgramDiscrepancy(
+                idaa_json=self.idaa_program,
+                discrepancies=self.discrepancies
+            )
+
+            discrepancy.save()
+
+            # self.tola_program will be type QuerySet when there are multiple programs
+            if isinstance(self.tola_program, QuerySet):
+                for tola_program in self.tola_program:
+                    discrepancy.program.add(tola_program)
+            else:
+                discrepancy.program.add(self.tola_program)
 
 
 class ProgramValidation(ProgramDiscrepancies):
     funded_str = 'Funded'
 
-    def __init__(self, idaa_program, execute=False):
+    def __init__(self, idaa_program):
         self.idaa_program = idaa_program
-        self.execute = execute
         self._validated = False
 
-        super().__init__(execute)
+        super().__init__()
 
     @property
     def tola_program_exists(self):
@@ -247,7 +282,7 @@ class ProgramUpload(ProgramValidation):
         self.idaa_program = idaa_program
         self.execute = execute
 
-        super().__init__(idaa_program, execute)
+        super().__init__(idaa_program)
 
         self.tola_program = self.get_tola_programs()
 
