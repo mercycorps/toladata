@@ -278,9 +278,8 @@ class ProgramValidation(ProgramDiscrepancies):
 
 class ProgramUpload(ProgramValidation):
 
-    def __init__(self, idaa_program, execute=False):
+    def __init__(self, idaa_program):
         self.idaa_program = idaa_program
-        self.execute = execute
 
         super().__init__(idaa_program)
 
