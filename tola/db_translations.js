@@ -1,31 +1,31 @@
 // # Translators: One of several options for specifying how often data is collected or reported on over the life of a program
-string0 = gettext("By distribution")
+string0 = gettext("By training")
 // # Translators: One of several options for specifying how often data is collected or reported on over the life of a program
-string1 = gettext("Annual")
+string1 = gettext("Endline")
 // # Translators: One of several options for specifying how often data is collected or reported on over the life of a program
-string2 = gettext("By batch")
+string2 = gettext("Weekly")
 // # Translators: One of several options for specifying how often data is collected or reported on over the life of a program
-string3 = gettext("Midline")
+string3 = gettext("Annual")
 // # Translators: One of several options for specifying how often data is collected or reported on over the life of a program
-string4 = gettext("Baseline")
+string4 = gettext("Final evaluation")
 // # Translators: One of several options for specifying how often data is collected or reported on over the life of a program
-string5 = gettext("By event")
+string5 = gettext("Monthly")
 // # Translators: One of several options for specifying how often data is collected or reported on over the life of a program
-string6 = gettext("Post shock")
+string6 = gettext("Midline")
 // # Translators: One of several options for specifying how often data is collected or reported on over the life of a program
-string7 = gettext("Quarterly")
+string7 = gettext("Baseline")
 // # Translators: One of several options for specifying how often data is collected or reported on over the life of a program
-string8 = gettext("By training")
+string8 = gettext("By distribution")
 // # Translators: One of several options for specifying how often data is collected or reported on over the life of a program
-string9 = gettext("Weekly")
+string9 = gettext("By batch")
 // # Translators: One of several options for specifying how often data is collected or reported on over the life of a program
-string10 = gettext("Semi-annual")
+string10 = gettext("Quarterly")
 // # Translators: One of several options for specifying how often data is collected or reported on over the life of a program
-string11 = gettext("Final evaluation")
+string11 = gettext("By event")
 // # Translators: One of several options for specifying how often data is collected or reported on over the life of a program
-string12 = gettext("Monthly")
+string12 = gettext("Post shock")
 // # Translators: One of several options for specifying how often data is collected or reported on over the life of a program
-string13 = gettext("Endline")
+string13 = gettext("Semi-annual")
 // # Translators: One of several choices for what sector (i.e. development domain) a program is most closely associated with
 string14 = gettext("Agribusiness")
 // # Translators: One of several choices for what sector (i.e. development domain) a program is most closely associated with
@@ -137,36 +137,40 @@ string67 = gettext("Performance")
 // # Translators: One of several choices for specifying what type of Indicator is being created.  An Indicator is a performance measure e.g. "We will distribute 1000 food packs over the next two months"
 string68 = gettext("Process / Management")
 // # Translators: The main area of a program
-string69 = gettext("Economic Opportunities")
+string69 = gettext("Economic Opportunity")
 // # Translators: The main area of a program
-string70 = gettext("Food Security")
+string70 = gettext("Economic Opportunity / Opportunité économique / Oportunidad económica")
 // # Translators: The main area of a program
-string71 = gettext("Peace and Stability")
+string71 = gettext("Food Security")
 // # Translators: The main area of a program
-string72 = gettext("Resilience")
+string72 = gettext("Good Governance and Peace")
 // # Translators: The main area of a program
-string73 = gettext("Water Security")
+string73 = gettext("Good Governance and Peace / Bonne gouvernance et paix / Buena gobernanza y paz")
+// # Translators: The main area of a program
+string74 = gettext("Resilience approach (tick this box if the program used a resilience approach)")
+// # Translators: The main area of a program
+string75 = gettext("Water Security")
 // # Translators: One of several choices for what label/sector (i.e. development domain) a program is most closely associated with
-string74 = gettext("Agriculture")
+string76 = gettext("Agriculture")
 // # Translators: One of several choices for what label/sector (i.e. development domain) a program is most closely associated with
-string75 = gettext("Cash and Voucher Assistance")
+string77 = gettext("Cash and Voucher Assistance")
 // # Translators: One of several choices for what label/sector (i.e. development domain) a program is most closely associated with
-string76 = gettext("Direct")
+string78 = gettext("Direct")
 // # Translators: One of several choices for what label/sector (i.e. development domain) a program is most closely associated with
-string77 = gettext("Employment")
+string79 = gettext("Employment")
 // # Translators: One of several choices for what label/sector (i.e. development domain) a program is most closely associated with
-string78 = gettext("Environment (DRR, Energy and Water)")
+string80 = gettext("Environment (DRR, Energy and Water)")
 // # Translators: One of several choices for what label/sector (i.e. development domain) a program is most closely associated with
-string79 = gettext("Financial Services")
+string81 = gettext("Financial Services")
 // # Translators: One of several choices for what label/sector (i.e. development domain) a program is most closely associated with
-string80 = gettext("Governance and Partnership")
+string82 = gettext("Indirect")
 // # Translators: One of several choices for what label/sector (i.e. development domain) a program is most closely associated with
-string81 = gettext("Indirect")
+string83 = gettext("Infrastructure (non - WASH, non - energy)")
 // # Translators: One of several choices for what label/sector (i.e. development domain) a program is most closely associated with
-string82 = gettext("Infrastructure (non - WASH, non - energy)")
+string84 = gettext("Nutrition")
 // # Translators: One of several choices for what label/sector (i.e. development domain) a program is most closely associated with
-string83 = gettext("Nutrition")
+string85 = gettext("Peace, Governance and Partnership")
 // # Translators: One of several choices for what label/sector (i.e. development domain) a program is most closely associated with
-string84 = gettext("Public Health (non - nutrition, non - WASH)")
+string86 = gettext("Public Health (non - nutrition, non - WASH)")
 // # Translators: One of several choices for what label/sector (i.e. development domain) a program is most closely associated with
-string85 = gettext("WASH")
+string87 = gettext("WASH")

@@ -2,8 +2,8 @@ msgid ""
 msgstr ""
 "Project-Id-Version: \n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2022-05-02 12:39-0700\n"
-"PO-Revision-Date: 2022-04-04 14:16-0600\n"
+"POT-Creation-Date: 2022-05-24 10:03-0700\n"
+"PO-Revision-Date: 2022-05-18 11:48-0400\n"
 "Last-Translator: \n"
 "Language-Team: \n"
 "Language: es\n"
@@ -18,7 +18,7 @@ msgstr ""
 msgid "Import indicators.xlsx"
 msgstr "Importar indicadores.xlsx"
 
-#: js/base.js:379 js/base.js:380
+#: js/base.js:383 js/base.js:384
 msgid ""
 "Your changes will be recorded in a change log. For future reference, please "
 "share your reason for these changes."
@@ -26,11 +26,11 @@ msgstr ""
 "Sus cambios serán guardados en un registro de cambios. Para referencia "
 "futura, indique la justificación para estos cambios."
 
-#: js/base.js:381
+#: js/base.js:385
 msgid "This action cannot be undone"
 msgstr "Advertencia: esta acción no se puede deshacer"
 
-#: js/base.js:391
+#: js/base.js:395
 #, python-format
 msgid ""
 "Removing this target means that %s result will no longer have targets "
@@ -46,13 +46,13 @@ msgstr[1] ""
 "asociados."
 
 #. Translators: the header of an alert after an action completed successfully
-#: js/base.js:411
+#: js/base.js:415
 msgid "Success"
 msgstr "Éxito"
 
 #. Translators: the header of an alert where additional warning info is provided
-#: js/base.js:430 js/pages/results_framework/components/level_cards.js:86
-#: js/pages/results_framework/models.js:626
+#: js/base.js:434 js/pages/results_framework/components/level_cards.js:86
+#: js/pages/results_framework/models.js:635
 #: js/pages/tola_management_pages/country/components/edit_disaggregations.js:657
 #: js/pages/tola_management_pages/country/models.js:438
 #: js/pages/tola_management_pages/country/models.js:473
@@ -62,7 +62,7 @@ msgid "Warning"
 msgstr "Advertencia"
 
 #. Translators: the header of an alert after an action failed for some reason
-#: js/base.js:448
+#: js/base.js:452
 msgid "Error"
 msgstr "Error"
 
@@ -84,7 +84,7 @@ msgstr ""
 #. Translators: This is a confirmation prompt to confirm a user wants to archive an item
 #. Translators: This is a confirmation prompt to confirm a user wants to unarchive an item
 #: js/components/ImportIndicatorsPopover.js:396
-#: js/pages/results_framework/models.js:629
+#: js/pages/results_framework/models.js:638
 #: js/pages/tola_management_pages/country/components/edit_disaggregations.js:661
 #: js/pages/tola_management_pages/country/models.js:478
 #: js/pages/tola_management_pages/country/models.js:510
@@ -102,7 +102,7 @@ msgstr "Continuar"
 #: js/components/ImportIndicatorsPopover.js:419
 #: js/components/ImportIndicatorsPopover.js:631
 #: js/components/changesetNotice.js:66
-#: js/pages/results_form_PC/resultsFormPC.js:380
+#: js/pages/results_form_PC/resultsFormPC.js:383
 #: js/pages/results_framework/components/level_cards.js:578
 msgid "Cancel"
 msgstr "Cancelar"
@@ -367,7 +367,7 @@ msgstr "Nuevo Valor"
 
 #. Translators: This is a label for a dropdown that presents several possible justifications for changing a value
 #: js/components/changesetNotice.js:19
-#: js/pages/results_form_PC/resultsFormPC.js:270
+#: js/pages/results_form_PC/resultsFormPC.js:273
 #: js/pages/results_framework/components/level_cards.js:404
 #: js/pages/tola_management_pages/audit_log/views.js:248
 msgid "Reason for change"
@@ -390,7 +390,7 @@ msgstr "Se requiere una justificación."
 #. Translators: (preceded by a number) e.g. "4 options selected"
 #. Translators: prefixed with a number, as in "4 selected" displayed on a multi-select
 #: js/components/changesetNotice.js:255
-#: js/components/checkboxed-multi-select.js:106
+#: js/components/checkboxed-multi-select.js:114
 #: js/components/selectWidgets.js:153
 msgid "selected"
 msgstr "seleccionado"
@@ -402,7 +402,7 @@ msgid "None selected"
 msgstr "Ninguno/a seleccionado/a"
 
 #. Translators: placeholder text in a search box
-#: js/components/checkboxed-multi-select.js:120
+#: js/components/checkboxed-multi-select.js:128
 msgid "Search"
 msgstr "Buscar"
 
@@ -435,13 +435,13 @@ msgstr "Línea media y línea final"
 
 #. Translators: One of several options for specifying how often data is collected or reported on over the life of a program
 #: js/constants.js:39 js/pages/iptt_quickstart/models/ipttQSRootStore.js:32
-#: tola/db_translations.js:4
+#: tola/db_translations.js:8
 msgid "Annual"
 msgstr "Anual"
 
 #. Translators: One of several options for specifying how often data is collected or reported on over the life of a program
 #: js/constants.js:40 js/pages/iptt_quickstart/models/ipttQSRootStore.js:33
-#: tola/db_translations.js:22
+#: tola/db_translations.js:28
 msgid "Semi-annual"
 msgstr "Semestral"
 
@@ -451,13 +451,13 @@ msgstr "Trienal"
 
 #. Translators: One of several options for specifying how often data is collected or reported on over the life of a program
 #: js/constants.js:42 js/pages/iptt_quickstart/models/ipttQSRootStore.js:35
-#: tola/db_translations.js:16
+#: tola/db_translations.js:22
 msgid "Quarterly"
 msgstr "Trimestral"
 
 #. Translators: One of several options for specifying how often data is collected or reported on over the life of a program
 #: js/constants.js:43 js/pages/iptt_quickstart/models/ipttQSRootStore.js:36
-#: tola/db_translations.js:26
+#: tola/db_translations.js:12
 msgid "Monthly"
 msgstr "Mensual"
 
@@ -539,6 +539,8 @@ msgid "Impact"
 msgstr "Impacto"
 
 #: js/level_utils.js:29 js/level_utils.js:45 js/level_utils.js:53
+#, fuzzy
+#| msgid "Input"
 msgid "Input"
 msgstr "Entrada"
 
@@ -558,7 +560,7 @@ msgstr "Objetivo Específico"
 msgid "Purpose"
 msgstr "Finalidad"
 
-#: js/level_utils.js:36 js/pages/results_form_PC/resultsFormPC.js:292
+#: js/level_utils.js:36 js/pages/results_form_PC/resultsFormPC.js:295
 msgid "Result"
 msgstr "Resultado"
 
@@ -746,7 +748,7 @@ msgstr "Todos los valores de este informe se redondean a dos decimales."
 #: js/pages/iptt_report/components/report/headerCells.js:63
 #: js/pages/iptt_report/components/report/tableHeader.js:166
 #: js/pages/program_page/components/indicator_list.js:207
-#: js/pages/program_page/components/resultsTable.js:299
+#: js/pages/program_page/components/resultsTable.js:302
 msgid "Target"
 msgstr "Objetivo"
 
@@ -761,7 +763,7 @@ msgstr "Real"
 #. Translators: Header for a column listing the progress towards the target value
 #: js/pages/iptt_report/components/report/headerCells.js:91
 #: js/pages/iptt_report/components/report/tableHeader.js:180
-#: js/pages/program_page/components/resultsTable.js:307
+#: js/pages/program_page/components/resultsTable.js:310
 msgid "% Met"
 msgstr "% Cumplido"
 
@@ -819,7 +821,7 @@ msgstr "# / %"
 #: js/pages/iptt_report/components/report/tableHeader.js:159
 #: js/pages/iptt_report/models/filterStore.js:737
 #: js/pages/program_page/components/indicator_list.js:206
-#: tola/db_translations.js:10
+#: tola/db_translations.js:16
 msgid "Baseline"
 msgstr "Base"
 
@@ -827,10 +829,10 @@ msgstr "Base"
 #: js/pages/iptt_report/components/report/tableRows.js:12
 #: js/pages/iptt_report/components/report/tableRows.js:216
 #: js/pages/iptt_report/components/report/tableRows.js:228
-#: js/pages/iptt_report/components/report/tableRows.js:366
 #: js/pages/iptt_report/components/report/tableRows.js:367
-#: js/pages/iptt_report/components/report/tableRows.js:369
-#: js/pages/iptt_report/components/report/tableRows.js:375
+#: js/pages/iptt_report/components/report/tableRows.js:368
+#: js/pages/iptt_report/components/report/tableRows.js:370
+#: js/pages/iptt_report/components/report/tableRows.js:376
 #: js/pages/program_page/components/indicator_list.js:293
 #: js/pages/program_page/components/resultsTable.js:12
 #: js/pages/tola_management_pages/audit_log/views.js:161
@@ -849,8 +851,8 @@ msgstr ""
 #. Translators: a button that lets the user add a new result
 #: js/pages/iptt_report/components/report/tableRows.js:106
 #: js/pages/iptt_report/components/report/tableRows.js:133
-#: js/pages/program_page/components/resultsTable.js:365
-#: js/pages/program_page/components/resultsTable.js:389
+#: js/pages/program_page/components/resultsTable.js:368
+#: js/pages/program_page/components/resultsTable.js:393
 msgid "Add result"
 msgstr "Agregar resultado"
 
@@ -862,7 +864,7 @@ msgstr "Acumulativo"
 msgid "Non-cumulative"
 msgstr "No acumulativo"
 
-#: js/pages/iptt_report/components/report/tableRows.js:426
+#: js/pages/iptt_report/components/report/tableRows.js:427
 msgid "Indicators unassigned to a results framework level"
 msgstr "Indicadores sin asignar a un nivel del sistema de resultados"
 
@@ -1322,34 +1324,34 @@ msgstr ""
 "real de la vida del programa refleja el real más reciente."
 
 #. Translators: identifies a results row as summative for the entire life of the program
-#: js/pages/program_page/components/resultsTable.js:253
+#: js/pages/program_page/components/resultsTable.js:254
 msgid "Life of Program"
 msgstr "Vida del programa"
 
 #. Translators: Header for a column listing periods in which results are grouped
-#: js/pages/program_page/components/resultsTable.js:295
+#: js/pages/program_page/components/resultsTable.js:298
 msgid "Target period"
 msgstr "Período objetivo"
 
 #. Translators: Header for a column listing actual result values for each row
-#: js/pages/program_page/components/resultsTable.js:303
+#: js/pages/program_page/components/resultsTable.js:306
 msgctxt "table (short) header"
 msgid "Actual"
 msgstr "Real"
 
 #. Translators: Header for a column listing actual results for a given period
-#: js/pages/program_page/components/resultsTable.js:311
+#: js/pages/program_page/components/resultsTable.js:314
 msgid "Results"
 msgstr "Resultados"
 
 #. Translators: Header for a column listing supporting documents for results
-#: js/pages/program_page/components/resultsTable.js:315
+#: js/pages/program_page/components/resultsTable.js:318
 #: js/pages/results_form_PC/components/EvidenceFields.js:49
 msgid "Evidence"
 msgstr "Evidencia"
 
 #. Translators: Button label which opens a form to add targets to a given indicator
-#: js/pages/program_page/components/resultsTable.js:350
+#: js/pages/program_page/components/resultsTable.js:353
 msgid "Add targets"
 msgstr "Agregar objetivos"
 
@@ -1429,24 +1431,24 @@ msgstr "Con cómputo doble entre programas"
 msgid "Total Participants"
 msgstr "Participantes totales"
 
-#: js/pages/results_form_PC/components/CommonFields.js:41
+#: js/pages/results_form_PC/components/CommonFields.js:47
 #: js/pages/results_form_PC/resultsFormPC.js:80
 msgid "This date should be within the fiscal year of the reporting period."
 msgstr ""
 "Esta fecha debe estar dentro del año fiscal del período de notificación."
 
-#: js/pages/results_form_PC/components/CommonFields.js:50
+#: js/pages/results_form_PC/components/CommonFields.js:56
 #: js/pages/results_form_PC/resultsFormPC.js:88
 msgid "Please complete this field. You can select more than one outcome theme."
 msgstr ""
 "Por favor, complete este campo. Puede seleccionar más de un tema de "
 "resultados."
 
-#: js/pages/results_form_PC/components/CommonFields.js:58
+#: js/pages/results_form_PC/components/CommonFields.js:64
 msgid "Result date"
 msgstr "Fecha del resultado"
 
-#: js/pages/results_form_PC/components/CommonFields.js:60
+#: js/pages/results_form_PC/components/CommonFields.js:66
 msgid ""
 "If data collection occurred within the fiscal year, enter the date when data "
 "was collected. If data collection occurred after the end of the fiscal year, "
@@ -1457,21 +1459,21 @@ msgstr ""
 "lugar después de finalizar el año fiscal, introduzca el último día del año "
 "fiscal (30 de junio)."
 
-#: js/pages/results_form_PC/components/CommonFields.js:78
+#: js/pages/results_form_PC/components/CommonFields.js:84
 msgid "Fiscal year"
 msgstr "Año fiscal"
 
-#: js/pages/results_form_PC/components/CommonFields.js:80
+#: js/pages/results_form_PC/components/CommonFields.js:86
 msgid "Fiscal years run from July 1 to June 30 of the following year."
 msgstr ""
 "Los años fiscales se corresponden a los periodos comprendidos entre el 1 de "
 "julio y el 30 de junio del año siguiente."
 
-#: js/pages/results_form_PC/components/CommonFields.js:98
+#: js/pages/results_form_PC/components/CommonFields.js:104
 msgid "Outcome theme"
 msgstr "Tema de resultados"
 
-#: js/pages/results_form_PC/components/CommonFields.js:100
+#: js/pages/results_form_PC/components/CommonFields.js:106
 msgid ""
 "Outcome themes are the main areas of a program. Refer to MEL Tip Sheet: "
 "Guidelines on Counting and Reporting Participant Numbers <a tabIndex=\"1\" "
@@ -1487,7 +1489,7 @@ msgstr ""
 
 #. Translators: This is the default option for a dropdown menu
 #. Translators: Nothing selected by user
-#: js/pages/results_form_PC/components/CommonFields.js:104
+#: js/pages/results_form_PC/components/CommonFields.js:110
 #: js/pages/tola_management_pages/country/views.js:24
 #: js/pages/tola_management_pages/country/views.js:36
 #: js/pages/tola_management_pages/country/views.js:48
@@ -1648,7 +1650,7 @@ msgstr ""
 "Se requiere un total de participantes directos/indirectos con cómputo doble. "
 "Por favor, complete estos campos."
 
-#: js/pages/results_form_PC/resultsFormPC.js:273
+#: js/pages/results_form_PC/resultsFormPC.js:276
 #: js/pages/results_framework/components/level_cards.js:406
 msgid ""
 "Your changes will be recorded in a change log.  For future reference, please "
@@ -1657,11 +1659,11 @@ msgstr ""
 "Sus cambios serán guardados en un registro de cambios. Para referencia "
 "futura, indique la justificación para estos cambios."
 
-#: js/pages/results_form_PC/resultsFormPC.js:299
+#: js/pages/results_form_PC/resultsFormPC.js:302
 msgid "Participant Count"
 msgstr "Cómputo de participantes"
 
-#: js/pages/results_form_PC/resultsFormPC.js:373
+#: js/pages/results_form_PC/resultsFormPC.js:376
 #: js/pages/results_framework/components/level_cards.js:575
 msgid "Save and close"
 msgstr "Guardar y cerrar"
@@ -1713,7 +1715,7 @@ msgstr "Hacer seguimiento del rendimiento del indicador"
 #. Translators: This is a validation message given to the user when the user-editable name field has been deleted or omitted. */
 #. Translators: This is a warning messages when a user has entered duplicate names for two different objects and those names contain only white spaces, both of which are not permitted. */
 #: js/pages/results_framework/components/level_cards.js:441
-#: js/pages/results_framework/models.js:714
+#: js/pages/results_framework/models.js:723
 msgid "Please complete this field."
 msgstr "Por favor complete este campo."
 
@@ -1849,18 +1851,18 @@ msgid "%s was deleted."
 msgstr "%s fue eliminado."
 
 #. Translators: This is a confirmation message that confirms that change has been successfully saved to the DB.
-#: js/pages/results_framework/models.js:398
+#: js/pages/results_framework/models.js:403
 #, python-format
 msgid "%s saved."
 msgstr "%s guardado."
 
 #. Translators:  Confirmation message that user-supplied updates were successfully applied.
-#: js/pages/results_framework/models.js:424
+#: js/pages/results_framework/models.js:433
 #, python-format
 msgid "%s updated."
 msgstr "%s actualizado."
 
-#: js/pages/results_framework/models.js:572
+#: js/pages/results_framework/models.js:581
 msgid ""
 "<strong class=\"text-danger\">Choose your results framework template "
 "carefully!</strong> Once you begin building your framework, it will not be "
@@ -1872,18 +1874,18 @@ msgstr ""
 "guardados."
 
 #. Translators:  This is a warning provided to the user when they try to cancel the editing of something they have already modified.  */
-#: js/pages/results_framework/models.js:631
+#: js/pages/results_framework/models.js:640
 #, python-format
 msgid "Changes to this %s will not be saved"
 msgstr "Los cambios a este/a %s no serán guardados"
 
 #. Translators: This is a warning messages when a user has a colon or comma in a name that shouldn't contain colons or commas */
-#: js/pages/results_framework/models.js:719
+#: js/pages/results_framework/models.js:728
 msgid "Colons and commas are not permitted."
 msgstr "No se admite el uso de dos puntos o comas."
 
 #. Translators: This is a warning messages when a user has entered duplicate names for two different objects */
-#: js/pages/results_framework/models.js:724
+#: js/pages/results_framework/models.js:733
 msgid "Result levels must have unique names."
 msgstr "Los niveles de resultados deben tener nombres únicos."
 
@@ -1976,8 +1978,10 @@ msgstr "Nombre del país"
 #: js/pages/tola_management_pages/country/components/edit_country_profile.js:80
 #: js/pages/tola_management_pages/country/components/edit_objectives.js:94
 #: js/pages/tola_management_pages/program/components/edit_program_profile.js:108
+#, fuzzy
+#| msgid "Description/Notes"
 msgid "Description"
-msgstr "Descripción"
+msgstr "Descripción/Notas"
 
 #: js/pages/tola_management_pages/country/components/edit_country_profile.js:90
 msgid "Country Code"
@@ -2811,48 +2815,48 @@ msgstr "usuarios"
 
 #. Translators: One of several options for specifying how often data is collected or reported on over the life of a program
 #: tola/db_translations.js:2
-msgid "By distribution"
-msgstr "Por distribución"
-
-#. Translators: One of several options for specifying how often data is collected or reported on over the life of a program
-#: tola/db_translations.js:6
-msgid "By batch"
-msgstr "Por lotes"
-
-#. Translators: One of several options for specifying how often data is collected or reported on over the life of a program
-#: tola/db_translations.js:8
-msgid "Midline"
-msgstr "Línea media"
-
-#. Translators: One of several options for specifying how often data is collected or reported on over the life of a program
-#: tola/db_translations.js:12
-msgid "By event"
-msgstr "Por evento"
-
-#. Translators: One of several options for specifying how often data is collected or reported on over the life of a program
-#: tola/db_translations.js:14
-msgid "Post shock"
-msgstr "Posterior al desastre"
-
-#. Translators: One of several options for specifying how often data is collected or reported on over the life of a program
-#: tola/db_translations.js:18
 msgid "By training"
 msgstr "Por formación"
 
 #. Translators: One of several options for specifying how often data is collected or reported on over the life of a program
-#: tola/db_translations.js:20
+#: tola/db_translations.js:4
+msgid "Endline"
+msgstr "Línea final"
+
+#. Translators: One of several options for specifying how often data is collected or reported on over the life of a program
+#: tola/db_translations.js:6
 msgid "Weekly"
 msgstr "Semanal"
 
 #. Translators: One of several options for specifying how often data is collected or reported on over the life of a program
-#: tola/db_translations.js:24
+#: tola/db_translations.js:10
 msgid "Final evaluation"
 msgstr "Evaluación final"
 
 #. Translators: One of several options for specifying how often data is collected or reported on over the life of a program
-#: tola/db_translations.js:28
-msgid "Endline"
-msgstr "Línea final"
+#: tola/db_translations.js:14
+msgid "Midline"
+msgstr "Línea media"
+
+#. Translators: One of several options for specifying how often data is collected or reported on over the life of a program
+#: tola/db_translations.js:18
+msgid "By distribution"
+msgstr "Por distribución"
+
+#. Translators: One of several options for specifying how often data is collected or reported on over the life of a program
+#: tola/db_translations.js:20
+msgid "By batch"
+msgstr "Por lotes"
+
+#. Translators: One of several options for specifying how often data is collected or reported on over the life of a program
+#: tola/db_translations.js:24
+msgid "By event"
+msgstr "Por evento"
+
+#. Translators: One of several options for specifying how often data is collected or reported on over the life of a program
+#: tola/db_translations.js:26
+msgid "Post shock"
+msgstr "Posterior al desastre"
 
 #. Translators: One of several choices for what sector (i.e. development domain) a program is most closely associated with
 #: tola/db_translations.js:30
@@ -2861,7 +2865,7 @@ msgstr "Agroindustria"
 
 #. Translators: One of several choices for what sector (i.e. development domain) a program is most closely associated with
 #. Translators: One of several choices for what label/sector (i.e. development domain) a program is most closely associated with
-#: tola/db_translations.js:32 tola/db_translations.js:150
+#: tola/db_translations.js:32 tola/db_translations.js:154
 msgid "Agriculture"
 msgstr "Agricultura"
 
@@ -2952,7 +2956,7 @@ msgstr "Alimentos"
 
 #. Translators: One of several choices for what sector (i.e. development domain) a program is most closely associated with
 #. Translators: The main area of a program
-#: tola/db_translations.js:68 tola/db_translations.js:142
+#: tola/db_translations.js:68 tola/db_translations.js:144
 msgid "Food Security"
 msgstr "Seguridad alimentaria"
 
@@ -3047,8 +3051,7 @@ msgid "Public Health"
 msgstr "Salud pública"
 
 #. Translators: One of several choices for what sector (i.e. development domain) a program is most closely associated with
-#. Translators: The main area of a program
-#: tola/db_translations.js:106 tola/db_translations.js:146
+#: tola/db_translations.js:106
 msgid "Resilience"
 msgstr "Resiliencia"
 
@@ -3069,7 +3072,7 @@ msgstr "Cuestiones urbanas"
 
 #. Translators: One of several choices for what sector (i.e. development domain) a program is most closely associated with
 #. Translators: One of several choices for what label/sector (i.e. development domain) a program is most closely associated with
-#: tola/db_translations.js:114 tola/db_translations.js:172
+#: tola/db_translations.js:114 tola/db_translations.js:176
 msgid "WASH"
 msgstr "WASH"
 
@@ -3130,68 +3133,96 @@ msgstr "Procesos/Gestión"
 
 #. Translators: The main area of a program
 #: tola/db_translations.js:140
-msgid "Economic Opportunities"
-msgstr "Oportunidades económicas"
+msgid "Economic Opportunity"
+msgstr "Oportunidad económica"
 
 #. Translators: The main area of a program
-#: tola/db_translations.js:144
-msgid "Peace and Stability"
-msgstr "Paz y estabilidad"
+#: tola/db_translations.js:142
+msgid "Economic Opportunity / Opportunité économique / Oportunidad económica"
+msgstr ""
+
+#. Translators: The main area of a program
+#: tola/db_translations.js:146
+msgid "Good Governance and Peace"
+msgstr "Buena gobernanza y paz"
 
 #. Translators: The main area of a program
 #: tola/db_translations.js:148
+msgid ""
+"Good Governance and Peace / Bonne gouvernance et paix / Buena gobernanza y "
+"paz"
+msgstr ""
+
+#. Translators: The main area of a program
+#: tola/db_translations.js:150
+msgid ""
+"Resilience approach (tick this box if the program used a resilience approach)"
+msgstr ""
+"Enfoque de resiliencia (marque este encasillado si el programa usó un "
+"enfoque de resiliencia)"
+
+#. Translators: The main area of a program
+#: tola/db_translations.js:152
 msgid "Water Security"
 msgstr "Seguridad del agua"
 
 #. Translators: One of several choices for what label/sector (i.e. development domain) a program is most closely associated with
-#: tola/db_translations.js:152
+#: tola/db_translations.js:156
 msgid "Cash and Voucher Assistance"
 msgstr "Asistencia en efectivo y vales"
 
 #. Translators: One of several choices for what label/sector (i.e. development domain) a program is most closely associated with
-#: tola/db_translations.js:154
+#: tola/db_translations.js:158
 msgid "Direct"
 msgstr "Directo"
 
 #. Translators: One of several choices for what label/sector (i.e. development domain) a program is most closely associated with
-#: tola/db_translations.js:156
+#: tola/db_translations.js:160
 msgid "Employment"
 msgstr "Empleo"
 
 #. Translators: One of several choices for what label/sector (i.e. development domain) a program is most closely associated with
-#: tola/db_translations.js:158
+#: tola/db_translations.js:162
 msgid "Environment (DRR, Energy and Water)"
 msgstr "Medio ambiente (DRR, energía y agua)"
 
 #. Translators: One of several choices for what label/sector (i.e. development domain) a program is most closely associated with
-#: tola/db_translations.js:160
+#: tola/db_translations.js:164
 msgid "Financial Services"
 msgstr "Servicios financieros"
 
 #. Translators: One of several choices for what label/sector (i.e. development domain) a program is most closely associated with
-#: tola/db_translations.js:162
-msgid "Governance and Partnership"
-msgstr "Gobernanza y asociaciones"
-
-#. Translators: One of several choices for what label/sector (i.e. development domain) a program is most closely associated with
-#: tola/db_translations.js:164
+#: tola/db_translations.js:166
 msgid "Indirect"
 msgstr "Indirecto"
 
 #. Translators: One of several choices for what label/sector (i.e. development domain) a program is most closely associated with
-#: tola/db_translations.js:166
+#: tola/db_translations.js:168
 msgid "Infrastructure (non - WASH, non - energy)"
 msgstr "Infraestructura (no WASH, no energía)"
 
 #. Translators: One of several choices for what label/sector (i.e. development domain) a program is most closely associated with
-#: tola/db_translations.js:168
+#: tola/db_translations.js:170
 msgid "Nutrition"
 msgstr "Nutrición"
 
 #. Translators: One of several choices for what label/sector (i.e. development domain) a program is most closely associated with
-#: tola/db_translations.js:170
+#: tola/db_translations.js:172
+msgid "Peace, Governance and Partnership"
+msgstr "Paz, gobernanza, y asociaciones"
+
+#. Translators: One of several choices for what label/sector (i.e. development domain) a program is most closely associated with
+#: tola/db_translations.js:174
 msgid "Public Health (non - nutrition, non - WASH)"
 msgstr "Salud pública (no nutricional/no WASH)"
+
+#, fuzzy
+#~| msgid "Description"
+#~ msgid "noscript"
+#~ msgstr "Descripción"
+
+#~ msgid "Peace and Stability"
+#~ msgstr "Paz y estabilidad"
 
 #~ msgid "Without double counting"
 #~ msgstr "Sin cómputo doble"
@@ -4839,9 +4870,6 @@ msgstr "Salud pública (no nutricional/no WASH)"
 
 #~ msgid "Tola Sites"
 #~ msgstr "Sitios de Tola"
-
-#~ msgid "Description/Notes"
-#~ msgstr "Descripción/Notas"
 
 #~ msgid "Organization url"
 #~ msgstr "URL de la organización"

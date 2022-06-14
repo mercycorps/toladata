@@ -72,11 +72,6 @@ class ProgramPageMixin:
     # Class methods used to instantiate serializer with queryset and context to minimize queries
 
     @classmethod
-    def _get_query_fields(cls):
-        """Extends parent's list of DB fields needed for included fields"""
-        return super()._get_query_fields() + ['gaitid']
-
-    @classmethod
     def get_queryset(cls, **kwargs):
         """Loads program with annotations specific for program page display (note program_page_objects manager)"""
         queryset = Program.program_page_objects.select_related(None).prefetch_related().only(

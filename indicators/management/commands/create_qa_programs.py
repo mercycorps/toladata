@@ -73,13 +73,10 @@ class Command(BaseCommand):
             'Alex': 'atran@mercycorps.org',
             'Andre': 'anthomas@mercycorps.org',
             'Blake': 'blong@mercycorps.org',
-            'Carly': 'colenick@mercycorps.org',
             'Karen': 'kbarkemeyer@mercycorps.org',
-            'Margaux': 'mtroiano@mercycorps.org',
             'Marie': 'mbakke@mercycorps.org',
             'Marco': 'mscagliusi@mercycorps.org',
             'PaQ': None,
-            'Sanjuro': 'sjogdeo@mercycorps.org',
         }
 
         program_factory = ProgramFactory(tolaland)
