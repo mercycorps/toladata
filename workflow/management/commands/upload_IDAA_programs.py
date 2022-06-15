@@ -36,16 +36,20 @@ class Command(BaseCommand):
         access_token = requests.post(login_url, data=data).json()['access_token']
         msrcomms_id = settings.MSRCOMMS_ID
         program_project_list_id = settings.PROGRAM_PROJECT_LIST_ID
-        sharepoint_url = f'https://graph.microsoft.com/v1.0/sites/{msrcomms_id}/lists/{program_project_list_id}/items'
+        base_url = f'https://graph.microsoft.com/v1.0/sites/{msrcomms_id}/lists/'
+        sharepoint_url = base_url + f'{program_project_list_id}/items'
         params = {'expand': 'columns', 'Accept': 'application/json;odata=verbose',
                   'Content_Type': 'application/json;odata=verbose'}
         headers = {'Authorization': 'Bearer {}'.format(access_token)}
-        response = requests.get(sharepoint_url, headers=headers, params=params)
-        json_response = response.json()
 
-        # Sending program data stored in the  'value' field from JSON response to workflow/program.py
-        # to be validated and updated or created if valid and execute flag is set.
-        idaa_programs = json_response['value']
+        response = requests.get(sharepoint_url, headers=headers, params=params)
+        idaa_programs = response.json()['value']
+        next_url = response.json()['@odata.nextLink']
+        while next_url:
+            response = requests.get(next_url, headers=headers, params=params)
+            idaa_programs += response.json()['value']
+            next_url = response.json()['@odata.nextLink'] if '@odata.nextLink' in response.json() else None
+
         for program in idaa_programs:
             upload_program = ProgramUpload(program['fields'])
             if upload_program.is_valid():
