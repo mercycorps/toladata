@@ -716,6 +716,9 @@ class IDAAOutcomeTheme(models.Model):
     is_active = models.BooleanField(verbose_name=_('Active?'), default=True)
     create_date = models.DateTimeField(auto_now_add=True, verbose_name=_('Creation date'))
 
+    class Meta:
+        ordering = ('name',)
+
     def __str__(self):
         return self.name
 
