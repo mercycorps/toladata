@@ -154,7 +154,7 @@ def program_rollup_data(program, for_csv=False):
     dict = {
             "unique_id": program.pk,
             "program_name": program.name,
-            "gait_id": program.gaitid,
+            "gait_id": program.gaitids,
             "countries": " / ".join([c.country for c in program.country.all()]) if for_csv else [c.country for c in program.country.all()],
             "sectors": " / ".join(set([i.sector.sector for i in program.indicator_set.all() if i.sector and i.sector.sector])) 
             if for_csv else set([i.sector.sector for i in program.indicator_set.all() if i.sector and i.sector.sector]),

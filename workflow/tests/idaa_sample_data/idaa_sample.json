@@ -1,0 +1,74 @@
+{
+    "value": [
+        {
+            "fields": {
+                "id": 1554,
+                "ProgramName": "[CN] Annual Process for Responding to Humanitarian Situations 2020",
+                "GaitIDs": [
+                    {"LookupValue": "10347.0000000000"}
+                ],
+                "ProgramStatus": "Rejected",
+                "Country": "Colombia",
+                "ProgramStartDate": "2022-07-29T07:00:00Z",
+                "ProgramEndDate": "2023-07-29T07:00:00Z"
+            }
+        },
+        {
+            "fields": {
+                "id": 1575,
+                "ProgramName": "2021 TIDES/Upwork Foundation Grant",
+                "GaitIDs": [
+                    {"LookupValue": "10864.0000000000"}
+                ],
+                "ProgramStatus": "Funded",
+                "Country": "Palestine, State of",
+                "Region": "Middle East",
+                "ProgramStartDate": "2022-07-29T07:00:00Z",
+                "ProgramEndDate": "2023-07-29T07:00:00Z"
+            }
+        },
+        {
+            "fields": {
+                "id": 1576,
+                "ProgramName": "2021 Timor-Leste Cyclone Seroja Flood Response",
+                "GaitIDs": [
+                    {"LookupValue": "10476.0000000000"}
+                ],
+                "ProgramStatus": "Funded",
+                "Country": "Timor-Leste",
+                "Region": "Asia",
+                "ProgramStartDate": "2022-07-29T07:00:00Z",
+                "ProgramEndDate": "2023-07-29T07:00:00Z"
+            }
+        },
+        {
+            "fields": {
+                "id": 1609,
+                "ProgramName": "AI for Social Good",
+                "GaitIDs": [
+                    {"LookupValue": "10521.0000000000"}
+                ],
+                "ProgramStatus": "Funded",
+                "Country": "HQ",
+                "Region": "HQ Managed",
+                "ProgramStartDate": "2022-07-29T07:00:00Z",
+                "ProgramEndDate": "2023-07-29T07:00:00Z"
+            }
+        },
+        {
+            "fields": {
+                "id": 1000,
+                "ProgramName": "Multiple GAIT ids test",
+                "GaitIDs": [
+                    {"LookupValue": "10254.0000000000"},
+                    {"LookupValue": "10974.0000000000"}
+                ],
+                "ProgramStatus": "Funded",
+                "Country": "HQ",
+                "Region": "HQ Managed",
+                "ProgramStartDate": "2022-07-29T07:00:00Z",
+                "ProgramEndDate": "2023-07-29T07:00:00Z"
+            }
+        }
+    ]
+}

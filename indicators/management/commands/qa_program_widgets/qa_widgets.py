@@ -20,7 +20,7 @@ from indicators.models import (
     DisaggregatedValue,
     LevelTier,
 )
-from workflow.models import Program, Country, Organization, TolaUser, SiteProfile, Sector
+from workflow.models import Program, Country, Organization, TolaUser, SiteProfile, Sector, GaitID
 from indicators.views.views_indicators import generate_periodic_targets
 
 
@@ -34,6 +34,10 @@ class ProgramFactory:
         self.org = Organization.mercy_corps()
         self.default_start_date = (date.today() + relativedelta(months=-18)).replace(day=1)
         self.default_end_date = (self.default_start_date + relativedelta(months=+32)).replace(day=1) - timedelta(days=1)
+
+    def create_gait_id(self, program_id):
+        gait_id = GaitID(gaitid=random.randint(1, 9999), program_id=program_id)
+        gait_id.save()
 
     def create_program(
             self, name, start_date=False, end_date=False, post_satsuma=True, multi_country=False, create_levels=True):
@@ -49,10 +53,12 @@ class ProgramFactory:
             'reporting_period_start': start_date,
             'reporting_period_end': end_date,
             'funding_status': 'Funded',
-            'gaitid': 'fake_gait_id_{}'.format(random.randint(1, 9999)),
             '_using_results_framework': Program.RF_ALWAYS if post_satsuma else Program.NOT_MIGRATED,
         })
         program.country.add(self.country)
+
+        self.create_gait_id(program.id)
+
         if multi_country:
             country2 = Country.objects.get(country="United States - MCNW")
             program.country.add(country2)

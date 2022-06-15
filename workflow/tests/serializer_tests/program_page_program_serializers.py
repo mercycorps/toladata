@@ -128,17 +128,6 @@ class TestProgramPageProgramSerializer(test.TestCase):
         data = self.get_program_data(tiers=['Tier1', 'Tier2'], levels=2)
         self.assertTrue(data['has_levels'])
 
-    def test_gait_url_empty(self):
-        data = self.get_program_data(gaitid=None)
-        self.assertEqual(data['gait_url'], None)
-
-    def test_gait_url(self):
-        data = self.get_program_data(gaitid=1423)
-        self.assertEqual(
-            data['gait_url'],
-            'https://gait.mercycorps.org/editgrant.vm?GrantID=1423'
-            )
-
     def test_time_period_info_non_time_aware(self):
         p = RFProgramFactory()
         for frequency in [Indicator.LOP, Indicator.MID_END]:

@@ -8,7 +8,7 @@ from decimal import Decimal
 import uuid
 
 from django.utils.translation import ugettext_lazy as _
-
+from workflow import validators
 from django.conf import settings
 from django.db.models import Count, Max, Min, Subquery, OuterRef, Q
 from django.db.models.signals import post_save
@@ -47,6 +47,19 @@ class Sector(models.Model):
         super(Sector, self).save()
 
     # displayed in admin templates
+    def __str__(self):
+        return self.sector
+
+
+class IDAASector(models.Model):
+    sector = models.CharField(_("Sector Name"), max_length=255)
+    create_date = models.DateTimeField(auto_now_add=True)
+    edit_date = models.DateTimeField(auto_now=True)
+
+    class Meta:
+        verbose_name = _("Sector")
+        ordering = ('sector',)
+
     def __str__(self):
         return self.sector
 
@@ -516,13 +529,15 @@ class Program(models.Model):
     MIGRATED = 2 # programs created before satsuma which have switched to new RF levels
     RF_ALWAYS = 3 # programs created after satsuma release - on new RF levels with no option
 
-    gaitid = models.CharField(_("ID"), max_length=255, null=True, blank=True)
+    legacy_gaitid = models.CharField(_("ID"), max_length=255, null=True, blank=True)
     external_program_id = models.IntegerField(_('External program id'), null=True, blank=False)
     name = models.CharField(_("Program Name"), max_length=255, blank=True)
     funding_status = models.CharField(_("Funding Status"), max_length=255, blank=True)
-    cost_center = models.CharField(_("Fund Code"), max_length=255, blank=True, null=True)
+    cost_center = models.CharField(_("Fund Code"), max_length=255, blank=True, null=True)  # Deprecated use program.gaitid.fund_code
     description = models.TextField(_("Program Description"), max_length=765, null=True, blank=True)
     sector = models.ManyToManyField(Sector, blank=True, verbose_name=_("Sector"))
+    idaa_sector = models.ManyToManyField(IDAASector, blank=True, verbose_name=_('Sector'))
+    idaa_outcome_theme = models.ManyToManyField('indicators.IDAAOutcomeTheme', blank=True)
     create_date = models.DateTimeField(null=True, blank=True)
     edit_date = models.DateTimeField(null=True, blank=True)
     budget_check = models.BooleanField(_("Enable Approval Authority"), default=False)
@@ -613,28 +628,17 @@ class Program(models.Model):
         """
         return reverse('program_page', kwargs={'program': self.pk})
 
-    @property
-    def gait_url(self):
-        """if program has a gait ID, returns url https://gait.mercycorps.org/editgrant.vm?GrantID=####
-        otherwise returns false
-        """
-        if self.gaitid is None:
-            return None
-
-        try:
-            gaitid = int(self.gaitid)
-        except ValueError:
-            gaitid = False
-        if gaitid and gaitid != 0 and len(str(gaitid)) > 2 and len(str(gaitid)) < 5:
-            # gaitid exists, is numeric, is nonzero, and is a 3 or 4 digit number:
-            return 'https://gait.mercycorps.org/editgrant.vm?GrantID={gaitid}'.format(
-                gaitid=gaitid)
-        return None
-
     def get_sites(self):
         indicator_ids = Indicator.objects.filter(program__in=[self.id]).values_list('id')
         results = Result.objects.filter(indicator__id__in=indicator_ids)
         return SiteProfile.objects.filter(result__id__in=results).distinct()
+
+    @property
+    def gaitids(self):
+        """
+        Property to help with backwards compatibility with new GaitID table
+        """
+        return list(self.gaitid.values_list('gaitid', flat=True))
 
     @property
     def collected_record_count(self):
@@ -707,7 +711,7 @@ class Program(models.Model):
     @property
     def admin_logged_fields(self):
         return {
-            'gaitid': self.gaitid,
+            'gaitid': self.gaitids,
             'name': self.name,
             'funding_status': self.funding_status,
             'cost_center': self.cost_center,
@@ -766,6 +770,60 @@ class Program(models.Model):
             return self.using_manual_numbering
         return not self.results_framework or not self.auto_number_indicators
 
+
+class ProgramDiscrepancy(models.Model):
+    DISCREPANCY_REASONS = {
+        "start_date": "Tola start date does not match IDAA ProgramStartDate",
+        "end_date": "Tola end date does not match IDAA ProgramEndDate",
+        "countries": "Tola program countries does not match IDAA Country",
+        "multiple_programs": "Multiple Tola programs retrieved from IDAA program",
+        "gaitid": "IDAA program has invalid Gait ID",
+        "ProgramName": "IDAA program is missing ProgramName",
+        "id": "IDAA program is missing ID",
+        "ProgramStartDate": "IDAA program is missing ProgramStartDate",
+        "ProgramEndDate": "IDAA program is missing ProgramEndDate",
+        "ProgramStatus": "IDAA program is missing ProgramStatus",
+        "Country": "IDAA program is missing Country"
+    }
+
+    # Example idaa_json can be seen from workflow/tests/idaa_sample_data/idaa_sample.json
+    idaa_json = models.JSONField(default=dict)
+    program = models.ManyToManyField(Program, blank=True)
+    # Example discrepancy list is ['funding_status', 'gaitid']
+    discrepancies = models.JSONField(default=list)
+    create_date = models.DateTimeField(auto_now_add=True)
+    edit_date = models.DateTimeField(auto_now=True)
+
+    def __str__(self):
+        return self.idaa_json['ProgramName']
+
+
+class GaitID(models.Model):
+    gaitid = models.IntegerField()
+    program = models.ForeignKey(Program, on_delete=models.CASCADE, related_name='gaitid')
+    donor = models.TextField(null=True)
+    donor_dept = models.TextField(null=True)
+    create_date = models.DateTimeField(auto_now_add=True)
+    edit_date = models.DateTimeField(auto_now=True)
+
+    class Meta:
+        unique_together = ['gaitid', 'program']
+
+    def __str__(self):
+        return str(self.gaitid)
+
+
+class FundCode(models.Model):
+    fund_code = models.IntegerField(validators=[validators.validate_fund_code])
+    gaitid = models.ForeignKey(GaitID, on_delete=models.CASCADE)
+    create_date = models.DateTimeField(auto_now_add=True)
+    edit_date = models.DateTimeField(auto_now=True)
+
+    class Meta:
+        unique_together = ['fund_code', 'gaitid']
+
+    def __str__(self):
+        return str(self.fund_code)
 
 
 PROGRAM_ROLE_CHOICES = (
