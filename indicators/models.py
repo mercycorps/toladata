@@ -711,6 +711,15 @@ class OutcomeTheme(models.Model):
     create_date = models.DateTimeField(auto_now_add=True, verbose_name=_('Creation date'))
 
 
+class IDAAOutcomeTheme(models.Model):
+    name = models.CharField(max_length=256, verbose_name=_('Outcome theme name'))
+    is_active = models.BooleanField(verbose_name=_('Active?'), default=True)
+    create_date = models.DateTimeField(auto_now_add=True, verbose_name=_('Creation date'))
+
+    def __str__(self):
+        return self.name
+
+
 class ExternalService(models.Model):
     name = models.CharField(_("Name"), max_length=255, blank=True)
     url = models.CharField(_("URL"), max_length=765, blank=True)
