@@ -5,6 +5,7 @@
 
 from rest_framework import serializers
 from tola.serializers import make_quantized_decimal, DecimalDisplayField
+from django.utils.translation import ugettext
 
 class TPReportPeriodSerializer(serializers.Serializer):
     actual_json = DecimalDisplayField(localize=False, coerce_to_string=True, source='actual')
@@ -103,6 +104,8 @@ class TVAReportPeriodSerializer(TPReportPeriodSerializer):
                         )
                 except TypeError:
                     pass
+            elif actual == 0:
+                period_dict['met'] = ugettext('N/A')
             self.__dict__ = period_dict
 
     def to_representation(self, instance):

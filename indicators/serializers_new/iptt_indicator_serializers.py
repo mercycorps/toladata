@@ -55,6 +55,7 @@ class IPTTIndicatorFiltersMixin:
     """
 
     sector_pk = serializers.IntegerField(source='sector_id')
+    is_fiscal_year = serializers.BooleanField()
     indicator_type_pks = serializers.SerializerMethodField()
     site_pks = serializers.SerializerMethodField()
     disaggregation_pks = serializers.SerializerMethodField()
@@ -67,6 +68,7 @@ class IPTTIndicatorFiltersMixin:
             'site_pks',
             'disaggregation_pks',
             'admin_type',
+            'is_fiscal_year',
         ]
 
     @classmethod

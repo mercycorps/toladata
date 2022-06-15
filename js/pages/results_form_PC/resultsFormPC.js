@@ -18,8 +18,9 @@ const PCResultsForm = ({indicatorID="", resultID="", readOnly}) => {
         }, {});
     }
     let formatOutcomeThemesData = (outcomeThemes) => {
+        let sort_order = [1, 2, 3, 5, 4]; // Set the order to display the Outcome Themes in the dropdown.
         return outcomeThemes.reduce((themesArray, theme, i) => {
-            themesArray[i] = {value: theme[0], label: gettext(theme[1])};
+            themesArray[sort_order[i]] = {value: theme[0], label: gettext(theme[1])};
             return themesArray;
         }, [])
     }
@@ -191,13 +192,15 @@ const PCResultsForm = ({indicatorID="", resultID="", readOnly}) => {
                             setCommonFieldsInput({
                                 program_start_date: response.data.program_start_date,
                                 program_end_date: response.data.program_end_date,
-                                periodic_target: response.data.periodic_target
+                                periodic_target: response.data.periodic_target,
+                                pt_end_date: response.data.pt_end_date,
+                                pt_start_date: response.data.pt_start_date,
                             });
                             clearTimeout(errorTimeout);
                             setStatus('ready');
                         } else {
                             clearTimeout(errorTimeout);
-                            setStatus('error'); 
+                            setStatus('error');
                         }
                     })
             } else {
@@ -212,6 +215,8 @@ const PCResultsForm = ({indicatorID="", resultID="", readOnly}) => {
                                 outcome_theme: formatSelectedOutcomeThemes(response.data.outcome_themes),
                                 program_start_date: response.data.program_start_date,
                                 program_end_date: response.data.program_end_date,
+                                pt_end_date: response.data.pt_end_date,
+                                pt_start_date: response.data.pt_start_date,
                             });
                             setEvidenceFieldsInput({
                                 evidence_url: response.data.evidence_url,
@@ -220,9 +225,9 @@ const PCResultsForm = ({indicatorID="", resultID="", readOnly}) => {
                             clearTimeout(errorTimeout);
                             setDisableForm(readOnly || response.data.view_only);
                             setStatus('ready');
-                        } else { 
+                        } else {
                             clearTimeout(errorTimeout);
-                            setStatus('error'); 
+                            setStatus('error');
                         }
                 })
             }

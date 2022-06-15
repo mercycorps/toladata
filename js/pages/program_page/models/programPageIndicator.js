@@ -55,6 +55,7 @@ export const forProgramPage = (
     wasJustCreated: Boolean(indicatorJSON.was_just_created),
     isKeyPerformanceIndicator: Boolean(indicatorJSON.is_key_performance_indicator),
     isReporting: Boolean(indicatorJSON.is_reporting),
+    isFiscalYear: Boolean(indicatorJSON.is_fiscal_year),
     hasAllTargetsDefined: Boolean(indicatorJSON.has_all_targets_defined),
     resultsCount: !isNaN(parseInt(indicatorJSON.results_count)) ? parseInt(indicatorJSON.results_count) : false,
     hasResults: Boolean(indicatorJSON.has_results),

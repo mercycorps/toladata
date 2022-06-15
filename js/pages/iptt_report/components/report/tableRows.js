@@ -123,7 +123,7 @@ const IndicatorAddResults = inject("rootStore", "filterStore")(
                             <button
                                 type="button"
                                 className={"btn btn-link px-1 pt-0 mx-auto"}
-                                disabled ={noTargets}
+                                disabled ={noTargets || !indicator.isFiscalYear}
                                 data-toggle="modal"
                                 data-target={`#resultModal_${indicator.pk}`}
                             >
@@ -212,7 +212,9 @@ const TVAResultsGroup = ({ value, resultCell, ...props }) => {
         <React.Fragment>
             <NumberCell value={ value.target } />
             <NumberCell value={ value.actual } />
-            <PercentCell value={ value.met }/>
+            {
+                value.actual == 0 ? <IndicatorCell value={ gettext('N/A') } className="lop-column" /> : <PercentCell value={ value.met } className="lop-column" />
+            }
         </React.Fragment>
     );
 }
@@ -222,7 +224,9 @@ const TVAResultsGroupPercent = ({ value, resultCell, ...props }) => {
         <React.Fragment>
             <PercentCell value={ value.target } />
             <PercentCell value={ value.actual } />
-            <PercentCell value={ value.met }/>
+            {
+                value.actual == 0 ? <IndicatorCell value={ gettext('N/A') } className="lop-column" /> : <PercentCell value={ value.met } className="lop-column" />
+            }
         </React.Fragment>
     );
 }
@@ -342,6 +346,7 @@ class IndicatorRow extends React.Component {
         }
         let reportData = rootStore.getReportData(indicator.pk);
         let noTargets = reportData.lopTarget === null ? true : false;
+        let isFiscalYear = indicator.isFiscalYear;
 
         return (
             <React.Fragment>
@@ -356,7 +361,7 @@ class IndicatorRow extends React.Component {
                     <IndicatorNameExpandoCell value={ indicator.name } expanded={ this.state.expanded } clickHandler={ this.handleExpandoClick } /> :
                     <IndicatorCell className="indicator-cell " value={ indicator.name } />
                     }
-                    { !rootStore._readOnly && <IndicatorAddResults indicator={ indicator } noTargets={ noTargets } /> }
+                    { !rootStore._readOnly && <IndicatorAddResults indicator={ indicator } noTargets={ noTargets } isFiscalYear={ isFiscalYear } /> }
                     { !rootStore.resultsFramework && <IndicatorCell className="indicator-cell " value={ indicator.oldLevelDisplay } /> }
                     { rootStore.hasUOMColumn && <IndicatorCell className="indicator-cell " value={ indicator.unitOfMeasure } /> }
                     { rootStore.hasChangeColumn && <IndicatorCell className="indicator-cell center-cell" value={ indicator.directionOfChange || gettext('N/A') } /> }

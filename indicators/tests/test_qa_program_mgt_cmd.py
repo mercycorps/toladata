@@ -63,7 +63,7 @@ class TestQAScript(test.TestCase):
             response.status_code, 200, "should be able to submit a non-tracked field on a QA indicator successfully")
 
     def test_permissions(self):
-        CountryFactory(country="United States", code="US")
+        CountryFactory(country="United States - MCNW", code="US")
         # One of the test users has this as their home country
         CountryFactory(country="Ethiopia", code="ET")
         management.call_command('create_qa_programs', names='test_permissions')

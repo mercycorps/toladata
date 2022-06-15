@@ -47,6 +47,8 @@ MANAGERS = ADMINS
 today = datetime.date.today()
 reporting_year = today.year if today.month > 6 else today.year - 1
 REPORTING_YEAR_START_DATE = datetime.date(reporting_year, 7, 1).isoformat()
+REPORTING_PERIOD_LAST_MONTH = 8
+
 
 DEBUG = False
 
