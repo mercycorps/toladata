@@ -91,13 +91,13 @@ const PCResultsForm = ({indicatorID="", resultID="", readOnly}) => {
 
         // Actual Fields Validation
         let actualsValid = true;
-        if (!disaggregationData['Actual with double counting'].labels[0].value || !disaggregationData['Actual with double counting'].labels[1].value) {
+        if (!disaggregationData['Actual with double counting'].labels[0].value) {
             actualsValid = false;
-            detectedErrors = {...detectedErrors, totals_error: gettext("Direct/indirect total participants with double counting is required. Please complete these fields.")};
+            detectedErrors = {...detectedErrors, totals_error: gettext("Direct total participants with double counting is required. Please complete these fields.")};
         };
         disaggregationData['Actual with double counting'].labels.map((label, i) => {
             if (disaggregationData['Actual without double counting'].labels[i].value) {
-                if ( parseInt(disaggregationData['Actual without double counting'].labels[i].value) > parseInt(disaggregationData['Actual with double counting'].labels[i].value) ) {
+                if ( parseInt(disaggregationData['Actual without double counting'].labels[i].value) > parseInt(disaggregationData['Actual with double counting'].labels[i].value || 0) ) {
                     actualsValid = false;
                     detectedErrors = {...detectedErrors, totals_error: gettext("Direct/indirect without double counting should be equal to or lower than direct/indirect with double counting.")};
                 }
