@@ -297,9 +297,9 @@ class PCResultSerializerWrite(serializers.ModelSerializer):
             # Translators: An error message detailing that the sum of 'SADD without double counting' should be equal to the sum of 'Direct without double counting'
             raise exceptions.ValidationError(_("The sum of 'SADD without double counting' should be equal to the sum of 'Direct without double counting'."))
 
-        if actual_with_direct == 0 or actual_with_indirect == 0:
-            # Translators: An error message detailing that the fields Direct and Indirect total participants with double counting is required
-            raise exceptions.ValidationError(_("Direct/indirect total participants with double counting is required. Please complete these fields."))
+        if actual_with_direct is None or actual_with_indirect is None:
+            # Translators: An error message detailing that the field Direct total participants with double counting is required
+            raise exceptions.ValidationError(_("Direct total participants with double counting is required. Please complete these fields."))
 
         if (actual_without_direct + actual_without_indirect) > (actual_with_direct + actual_with_indirect):
             # Translators: An error message detailing that the Direct and Indirect without double counting should be equal to or lower than the value of Direct and Indirect with double counting
