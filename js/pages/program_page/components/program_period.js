@@ -1,7 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import api from '../../../apiv2';
 
-const ProgramPeriod = () => {
+const ProgramPeriod = ({programPk, readOnly}) => {
 
     let sampleData = {
         program: {
@@ -35,12 +35,24 @@ const ProgramPeriod = () => {
         return defaultDate;
     }
 
-    const [programPeriodInputs, setProgramPeriodInputs] = useState({
-        indicator_tracking_start_date: sampleData.program.reporting_period_start,
-        indicator_tracking_end_date: sampleData.program.reporting_period_end,
-    });
+    const [idaaDates, setIdaaDates] = useState({});
+    const [programPeriodInputs, setProgramPeriodInputs] = useState({});
 
     useEffect(() => {
+        // Get data on mount with API Call
+        api.getProgramPeriodData(programPk)
+            .then(response => {
+                console.log('Response:', response);
+                setIdaaDates({...idaaDates,
+                    start_date: response.start_date,
+                    end_date: response.end_date
+                })
+                setProgramPeriodInputs({...programPeriodInputs,
+                    indicator_tracking_start_date: response.reporting_period_start,
+                    indicator_tracking_end_date: response.reporting_period_end,
+                })
+            })
+
         // Setup Date pickers
         const commonOpts = {
             changeMonth: true,
@@ -113,8 +125,6 @@ const ProgramPeriod = () => {
         })
     }, [])
 
-    // Get data on mount with API Call
-
     // Send updated data with API Call
 
     // Validate data
@@ -129,7 +139,7 @@ const ProgramPeriod = () => {
                 data-target="#program-period__modal"
             >
                 {
-                    gettext("Program Period")
+                    gettext("<Program Period>")
                 }
             </a>
 
@@ -163,16 +173,16 @@ const ProgramPeriod = () => {
                                 <div style={{display: "flex"}}>
                                     <h4 className="mr-4">
                                         <label htmlFor="idaa__date--start" className="text-uppercase"><div className="mb-0">{ gettext("Start date") }</div></label>
-                                        {sampleData.program.start_date !== "unavailable" ? 
-                                            <div className="idaa__date--start">{sampleData.program.start_date}</div>
+                                        {idaaDates.start_date !== "unavailable" ? 
+                                            <div className="idaa__date--start">{idaaDates.start_date}</div>
                                             : 
                                             <div className="idaa__date--start color-red">{ gettext("Unavailable")}</div>
                                         }
                                     </h4>
                                     <h4>
                                         <label htmlFor="idaa__date--start" className="text-uppercase"><div className="mb-0">{ gettext("End date") }</div></label>
-                                        {sampleData.program.end_date !== "unavailable" ? 
-                                            <div className="idaa__date--end">{sampleData.program.end_date}</div>
+                                        {idaaDates.end_date !== "unavailable" ? 
+                                            <div className="idaa__date--end">{idaaDates.end_date}</div>
                                             : 
                                             <div className="idaa__date--end color-red">{ gettext("Unavailable")}</div>
                                         }

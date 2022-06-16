@@ -81,6 +81,21 @@ const api = {
         .then(response => response.data)
         .catch(this.logFailure);
     },
+    async getProgramPeriodData(programPk) {
+        console.log("FROM API", programPk)
+        // return await this.apiInstance.get(`/program_page/${programPk}/`)
+        // .then(response => response.data)
+        // .catch(this.logFailure);
+        return await {
+            id: 983,
+            start_date: "2020-09-01",
+            end_date: "2023-04-30",
+            // start_date: "unavailable",
+            // end_date: "unavailable",
+            reporting_period_start: "2020-09-01", 
+            reporting_period_end: "2023-04-30",
+        }
+    },
     ipttFilterData(programPk) {
         return this.apiInstance.get(`/iptt/${programPk}/filter_data/`)
                     .then(response => response.data)

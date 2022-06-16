@@ -92,8 +92,7 @@ ReactDOM.render(<ProgramMetrics rootStore={rootStore} uiStore={uiStore} />,
 
 ReactDOM.render(<SitesList rootStore={rootStore} />,
     document.querySelector('#sites-sidebar'));
-
-ReactDOM.render(<ProgramPeriod />,
+ReactDOM.render(<ProgramPeriod programPk={rootStore.program.pk} readOnly={rootStore.readOnly}/>,
     document.querySelector('.programperiodlink'));
 
 /*
