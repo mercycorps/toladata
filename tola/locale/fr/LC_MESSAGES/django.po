@@ -1573,10 +1573,10 @@ msgstr ""
 #. Translators: An error message detailing that the fields Direct and Indirect total participants with double counting is required
 #: indicators/serializers_new/participant_count_serializers.py:302
 msgid ""
-"Direct/indirect total participants with double counting is required. Please "
+"Direct total participants with double counting is required. Please "
 "complete these fields."
 msgstr ""
-"Le champ Total de participants directs/indirects avec double comptage est "
+"Le champ Total de participants directs avec double comptage est "
 "requis. Veuillez renseigner ces champs."
 
 #. Translators: An error message detailing that the Direct and Indirect without double counting should be equal to or lower than the value of Direct and Indirect with double counting

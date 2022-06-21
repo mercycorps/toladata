@@ -32,8 +32,14 @@ const DisaggregationFields = ({ formID, disagg, disaggregationData, setDisaggreg
         return labelsArr;
     }, []);
 
+    // Method to format the value displayed. Set null values to a empty field and allows for 0 to be displayed
+    let setDisplayValue = (value) => {
+        return value === null ? "" : Math.round(value);
+    }
+
     // Method to save data entry
     let handleDataEntry = (value, inputDisaggType, customsort) => {
+        value = value === '' ? null : value; // Sets empty cells to value of null. Allows zeros to be entered and displayed.
         setWasUpdated(true);
         let update = {...disaggregationData};
         update[inputDisaggType].labels[customsort - 1] = {...disaggregationData[inputDisaggType].labels[customsort - 1], value: value};
@@ -41,7 +47,7 @@ const DisaggregationFields = ({ formID, disagg, disaggregationData, setDisaggreg
     }
 
     // Method to validate inputs
-    let handleValidation = (inputDisaggType, customsort) => {
+    let handleValidation = (inputDisaggType) => {
         let detectedErrors = {...formErrors};
 
         if (inputDisaggType.includes("SADD")) {
@@ -121,9 +127,9 @@ const DisaggregationFields = ({ formID, disagg, disaggregationData, setDisaggreg
                                                     type="number"
                                                     className="bin form-control input-value"
                                                     disabled={readOnly}
-                                                    value={Math.round(disaggregationData[currentDisagg.disaggregation_type].labels[labelObj.customsort - 1].value) || ""}
+                                                    value={setDisplayValue(disaggregationData[currentDisagg.disaggregation_type].labels[labelObj.customsort - 1].value)}
                                                     onChange={(e) => handleDataEntry(e.target.value, currentDisagg.disaggregation_type, labelObj.customsort)}
-                                                    onBlur={() => handleValidation(currentDisagg.disaggregation_type, labelObj.customsort)}
+                                                    onBlur={() => handleValidation(currentDisagg.disaggregation_type)}
                                                 />
                                             )
                                         })
