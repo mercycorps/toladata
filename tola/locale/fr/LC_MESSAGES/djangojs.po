@@ -1663,10 +1663,10 @@ msgstr ""
 
 #: js/pages/results_form_PC/resultsFormPC.js:95
 msgid ""
-"Direct/indirect total participants with double counting is required. Please "
+"Direct total participants with double counting is required. Please "
 "complete these fields."
 msgstr ""
-"Le champ Total de participants directs/indirects avec double comptage est "
+"Le champ Total de participants directs avec double comptage est "
 "requis. Veuillez renseigner ces champs."
 
 #: js/pages/results_form_PC/resultsFormPC.js:276
