@@ -51,6 +51,19 @@ class Sector(models.Model):
         return self.sector
 
 
+class IDAASector(models.Model):
+    sector = models.CharField(_("Sector Name"), max_length=255)
+    create_date = models.DateTimeField(auto_now_add=True)
+    edit_date = models.DateTimeField(auto_now=True)
+
+    class Meta:
+        verbose_name = _("Sector")
+        ordering = ('sector',)
+
+    def __str__(self):
+        return self.sector
+
+
 class Organization(models.Model):
     MERCY_CORPS_ID = 1
     name = models.CharField(_("Organization Name"), max_length=255, blank=False, default="TolaData")
@@ -523,6 +536,8 @@ class Program(models.Model):
     cost_center = models.CharField(_("Fund Code"), max_length=255, blank=True, null=True)  # Deprecated use program.gaitid.fund_code
     description = models.TextField(_("Program Description"), max_length=765, null=True, blank=True)
     sector = models.ManyToManyField(Sector, blank=True, verbose_name=_("Sector"))
+    idaa_sector = models.ManyToManyField(IDAASector, blank=True, verbose_name=_('Sector'))
+    idaa_outcome_theme = models.ManyToManyField('indicators.IDAAOutcomeTheme', blank=True)
     create_date = models.DateTimeField(null=True, blank=True)
     edit_date = models.DateTimeField(null=True, blank=True)
     budget_check = models.BooleanField(_("Enable Approval Authority"), default=False)
