@@ -65,7 +65,7 @@ class TestDiscrepancyReport(test.TestCase):
         tola_program_mismatched_countries.save()
         tola_program_mismatched_countries.country.add(haiti, colombia)
         tola_program_mismatched_countries_gaitid = models.GaitID(
-            gaitid=tola_program_mismatched_countries_json['GaitIDs'][0]['LookupValue'].rstrip('.0'), program_id=tola_program_mismatched_countries.id
+            gaitid=tola_program_mismatched_countries_json['GaitIDs'][0]['LookupValue'].split('.')[0], program_id=tola_program_mismatched_countries.id
         )
         tola_program_mismatched_countries_gaitid.save()
 
