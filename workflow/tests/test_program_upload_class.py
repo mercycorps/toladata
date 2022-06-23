@@ -1,5 +1,6 @@
 from factories import workflow_models
 from workflow import program, models
+from unittest import skip
 from django import test
 import json
 import copy
@@ -19,12 +20,16 @@ class TestProgramUpload(test.TestCase):
         
         target_idaa_program = self.idaa_json['value'][self.create_idaa_program_index]['fields']
 
-        self._create_tola_program(target_idaa_program, fields={
+        new_program = self._create_tola_program(target_idaa_program, fields={
             "name": target_idaa_program['ProgramName'],
             "funding_status": target_idaa_program['ProgramStatus'],
             "start_date": program.convert_date(target_idaa_program['ProgramStartDate']),
             "end_date": program.convert_date(target_idaa_program['ProgramEndDate'])
-        })
+        }, create_country=False)
+
+        new_country = workflow_models.CountryFactory(country='Timor-Leste', code='TL')
+
+        new_program.country.add(new_country)
 
     def _create_tola_program(self, idaa_program, fields, create_country=True):
         """
@@ -39,10 +44,12 @@ class TestProgramUpload(test.TestCase):
         new_program = workflow_models.ProgramFactory(**fields)
 
         for gaitid in idaa_program['GaitIDs']:
-            clean_gaitid = gaitid['LookupValue'].rstrip('.0')
+            clean_gaitid = str(gaitid['LookupValue']).split('.')[0]
 
             new_gaitid = models.GaitID(gaitid=clean_gaitid, program_id=new_program.id)
             new_gaitid.save()
+
+        return new_program
 
     def test_validation_idaa_not_funded(self):
         """
@@ -200,3 +207,58 @@ class TestProgramUpload(test.TestCase):
         upload_program = program.ProgramUpload(idaa_program=self.idaa_json['value'][idaa_index]['fields'])
 
         self.assertRaises(Exception, upload_program.upload)
+
+    @skip('Test will fail on GitHub without the secret_keys')
+    def test_program_update(self):
+        """
+        Test that an existing Tola program is updated from IDAA
+        """
+        gaitid = 10476
+        tola_program = models.Program.objects.get(gaitid__gaitid=gaitid)
+        expected_donor = 'World Vision International'
+        expected_donor_dept = 'Bureau of Humanitarian Assistance (BHA)'
+        expected_name = '2021 Timor-Leste Cyclone Seroja Flood Response'
+        expected_fund_code = 33677
+
+        tola_program.name = 'test name change'
+        tola_program.save()
+
+        upload_program = program.ProgramUpload(idaa_program=self.idaa_json['value'][self.create_idaa_program_index]['fields'])
+
+        if upload_program.is_valid():
+            upload_program.upload()
+
+        self.assertFalse(upload_program.new_upload)
+
+        tola_program = models.Program.objects.get(gaitid__gaitid=gaitid)
+
+        self.assertEquals(tola_program.country.all().count(), 1)
+        self.assertEquals(tola_program.gaitid.all().count(), 1)
+        self.assertEquals(tola_program.idaa_outcome_theme.all().count(), 3)
+        self.assertEquals(tola_program.gaitid.first().fundcode_set.first().fund_code, expected_fund_code)
+        self.assertEquals(tola_program.name, expected_name)
+        self.assertEquals(tola_program.gaitid.first().donor, expected_donor)
+        self.assertEquals(tola_program.gaitid.first().donor_dept, expected_donor_dept)
+
+    @skip('Test will fail on GitHub without the secret_keys')
+    def test_program_update_delete_mismatched_gaitid(self):
+        """
+        Test that a mismatched gaitid for Tola programs is deleted
+        """
+        removed_gaitid = 18021
+        gaitid = 10476
+        tola_program = models.Program.objects.get(gaitid__gaitid=gaitid)
+        new_gaitid = models.GaitID(gaitid=removed_gaitid, program=tola_program)
+        new_gaitid.save()
+
+        upload_program = program.ProgramUpload(idaa_program=self.idaa_json['value'][self.create_idaa_program_index]['fields'])
+
+        if upload_program.is_valid():
+            upload_program.upload()
+
+        self.assertFalse(upload_program.new_upload)
+
+        tola_program = models.Program.objects.get(gaitid__gaitid=gaitid)
+
+        self.assertEquals(tola_program.gaitid.all().count(), 1)
+        self.assertEquals(tola_program.idaa_outcome_theme.all().count(), 3)
