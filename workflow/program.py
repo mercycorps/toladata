@@ -42,7 +42,7 @@ def get_gaitid_details(gaitid, complete_gaitid_details):
 
     params
         gaitid: idaa gaitid to get details for
-        complete_gaitid_deatils: The full gaitid list returned from utils.AccessMSR.gaitid_list
+        complete_gaitid_details: The full gaitid list returned from utils.AccessMSR.gaitid_list
 
     returns a dictionary of details for the given gaitid or None if the gaitid is not found in complete_gaitid_details
     """
