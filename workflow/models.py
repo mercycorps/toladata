@@ -783,7 +783,7 @@ class ProgramDiscrepancy(models.Model):
         "ProgramStartDate": "IDAA program is missing ProgramStartDate",
         "ProgramEndDate": "IDAA program is missing ProgramEndDate",
         "ProgramStatus": "IDAA program is missing ProgramStatus",
-        "Country": "IDAA program is missing Country"
+        "Country": "IDAA program is missing Country or has an Invalid Country"
     }
 
     # Example idaa_json can be seen from workflow/tests/idaa_sample_data/idaa_sample.json

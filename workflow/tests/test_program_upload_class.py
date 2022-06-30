@@ -1,11 +1,20 @@
 from factories import workflow_models
-from workflow import program, models
+from workflow import program, models, utils
 from unittest import skip
 from django import test
 import json
 import copy
 
 
+# Prevents an exception when ran on github
+try:
+    msr_country_codes_list = utils.AccessMSR().countrycode_list()
+    msr_gaitid_list = utils.AccessMSR().gaitid_list()
+except AttributeError:
+    pass
+
+
+@skip('Tests will fail on GitHub without the secret_keys')
 class TestProgramUpload(test.TestCase):
     idaa_sample_data_path = 'workflow/tests/idaa_sample_data/idaa_sample.json'
     create_idaa_program_index = 2
@@ -31,13 +40,17 @@ class TestProgramUpload(test.TestCase):
 
         new_program.country.add(new_country)
 
+        workflow_models.CountryFactory(country='HQ', code='HQ')
+        workflow_models.CountryFactory(country='Palestine (West Bank / Gaza)', code='PS')
+
     def _create_tola_program(self, idaa_program, fields, create_country=True):
         """
         Creates a Tola program
         """
         if create_country:
             country = workflow_models.CountryFactory(
-                country=idaa_program['Country']
+                country=idaa_program['Country'],
+                code='HQ'
             )
             fields['countries'] = [country]
 
@@ -57,7 +70,9 @@ class TestProgramUpload(test.TestCase):
         """
         idaa_not_funded_index = 0
         
-        upload_program = program.ProgramUpload(idaa_program=self.idaa_json['value'][idaa_not_funded_index]['fields'])
+        upload_program = program.ProgramUpload(idaa_program=self.idaa_json['value'][idaa_not_funded_index]['fields'], 
+            msr_country_codes_list=msr_country_codes_list, msr_gaitid_list=msr_gaitid_list
+        )
         
         self.assertFalse(upload_program.is_valid())
 
@@ -67,7 +82,9 @@ class TestProgramUpload(test.TestCase):
         """
         expected_discrepancies = 0
 
-        upload_program = program.ProgramUpload(idaa_program=self.idaa_json['value'][self.create_idaa_program_index]['fields'])
+        upload_program = program.ProgramUpload(idaa_program=self.idaa_json['value'][self.create_idaa_program_index]['fields'],
+            msr_country_codes_list=msr_country_codes_list, msr_gaitid_list=msr_gaitid_list
+        )
 
         self.assertTrue(upload_program.is_valid())
         self.assertTrue(upload_program.tola_program_exists)
@@ -80,8 +97,10 @@ class TestProgramUpload(test.TestCase):
         idaa_index = 1
         expected_discrepancies = 0
 
-        upload_program = program.ProgramUpload(idaa_program=self.idaa_json['value'][idaa_index]['fields'])
-
+        upload_program = program.ProgramUpload(idaa_program=self.idaa_json['value'][idaa_index]['fields'],
+            msr_country_codes_list=msr_country_codes_list, msr_gaitid_list=msr_gaitid_list
+        )
+        print(upload_program.discrepancies)
         self.assertTrue(upload_program.is_valid())
         self.assertFalse(upload_program.tola_program_exists)
         self.assertEquals(upload_program.discrepancy_count, expected_discrepancies)
@@ -102,7 +121,9 @@ class TestProgramUpload(test.TestCase):
             "end_date": program.convert_date(idaa_program['ProgramEndDate']),
         }, create_country=False)
 
-        upload_program = program.ProgramUpload(idaa_program=idaa_program)
+        upload_program = program.ProgramUpload(idaa_program=idaa_program,
+            msr_country_codes_list=msr_country_codes_list, msr_gaitid_list=msr_gaitid_list
+        )
 
         self.assertFalse(upload_program.is_valid())
         self.assertTrue(upload_program.tola_program_exists)
@@ -125,7 +146,9 @@ class TestProgramUpload(test.TestCase):
             "end_date": "2022-08-01"
         })
 
-        upload_program = program.ProgramUpload(idaa_program=idaa_program)
+        upload_program = program.ProgramUpload(idaa_program=idaa_program,
+            msr_country_codes_list=msr_country_codes_list, msr_gaitid_list=msr_gaitid_list
+        )
 
         self.assertFalse(upload_program.is_valid())
         self.assertTrue(upload_program.tola_program_exists)
@@ -144,7 +167,9 @@ class TestProgramUpload(test.TestCase):
         
         idaa_program['GaitIDs'][0] = {'LookupValue': '1237a'}
 
-        upload_program = program.ProgramUpload(idaa_program=idaa_program)
+        upload_program = program.ProgramUpload(idaa_program=idaa_program,
+            msr_country_codes_list=msr_country_codes_list, msr_gaitid_list=msr_gaitid_list
+        )
 
         self.assertFalse(upload_program.is_valid())
         self.assertEquals(upload_program.discrepancy_count, expected_discrepancies)
@@ -161,7 +186,9 @@ class TestProgramUpload(test.TestCase):
 
         idaa_program['GaitIDs'] = []
 
-        upload_program = program.ProgramUpload(idaa_program=idaa_program)
+        upload_program = program.ProgramUpload(idaa_program=idaa_program,
+            msr_country_codes_list=msr_country_codes_list, msr_gaitid_list=msr_gaitid_list
+        )
 
         self.assertFalse(upload_program.is_valid())
         self.assertEquals(upload_program.discrepancy_count, expected_discrepancies)
@@ -180,7 +207,9 @@ class TestProgramUpload(test.TestCase):
 
             idaa_program[field] = ''
 
-            upload_program = program.ProgramUpload(idaa_program=idaa_program)
+            upload_program = program.ProgramUpload(idaa_program=idaa_program,
+                msr_country_codes_list=msr_country_codes_list, msr_gaitid_list=msr_gaitid_list
+            )
 
             self.assertFalse(upload_program.is_valid())
             self.assertEquals(upload_program.discrepancy_count, expected_discrepancies)
@@ -193,7 +222,9 @@ class TestProgramUpload(test.TestCase):
         idaa_index = 4
         expected_discrepancies = 0
 
-        upload_program = program.ProgramUpload(idaa_program=self.idaa_json['value'][idaa_index]['fields'])
+        upload_program = program.ProgramUpload(idaa_program=self.idaa_json['value'][idaa_index]['fields'],
+            msr_country_codes_list=msr_country_codes_list, msr_gaitid_list=msr_gaitid_list
+        )
 
         self.assertTrue(upload_program.is_valid())
         self.assertEquals(upload_program.discrepancy_count, expected_discrepancies)
@@ -204,11 +235,12 @@ class TestProgramUpload(test.TestCase):
         """
         idaa_index = 3
         
-        upload_program = program.ProgramUpload(idaa_program=self.idaa_json['value'][idaa_index]['fields'])
+        upload_program = program.ProgramUpload(idaa_program=self.idaa_json['value'][idaa_index]['fields'],
+            msr_country_codes_list=msr_country_codes_list, msr_gaitid_list=msr_gaitid_list
+        )
 
         self.assertRaises(Exception, upload_program.upload)
 
-    @skip('Test will fail on GitHub without the secret_keys')
     def test_program_update(self):
         """
         Test that an existing Tola program is updated from IDAA
@@ -223,7 +255,9 @@ class TestProgramUpload(test.TestCase):
         tola_program.name = 'test name change'
         tola_program.save()
 
-        upload_program = program.ProgramUpload(idaa_program=self.idaa_json['value'][self.create_idaa_program_index]['fields'])
+        upload_program = program.ProgramUpload(idaa_program=self.idaa_json['value'][self.create_idaa_program_index]['fields'],
+            msr_country_codes_list=msr_country_codes_list, msr_gaitid_list=msr_gaitid_list
+        )
 
         if upload_program.is_valid():
             upload_program.upload()
@@ -240,7 +274,6 @@ class TestProgramUpload(test.TestCase):
         self.assertEquals(tola_program.gaitid.first().donor, expected_donor)
         self.assertEquals(tola_program.gaitid.first().donor_dept, expected_donor_dept)
 
-    @skip('Test will fail on GitHub without the secret_keys')
     def test_program_update_delete_mismatched_gaitid(self):
         """
         Test that a mismatched gaitid for Tola programs is deleted
@@ -251,7 +284,9 @@ class TestProgramUpload(test.TestCase):
         new_gaitid = models.GaitID(gaitid=removed_gaitid, program=tola_program)
         new_gaitid.save()
 
-        upload_program = program.ProgramUpload(idaa_program=self.idaa_json['value'][self.create_idaa_program_index]['fields'])
+        upload_program = program.ProgramUpload(idaa_program=self.idaa_json['value'][self.create_idaa_program_index]['fields'],
+            msr_country_codes_list=msr_country_codes_list, msr_gaitid_list=msr_gaitid_list
+        )
 
         if upload_program.is_valid():
             upload_program.upload()

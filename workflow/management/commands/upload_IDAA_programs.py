@@ -1,9 +1,11 @@
 from datetime import date
+from distutils.command.upload import upload
 import requests
 from django.core.management.base import BaseCommand
 from django.conf import settings
 from workflow.program import ProgramUpload
 from workflow.discrepancy_report import GenerateDiscrepancyReport
+from workflow.utils import AccessMSR
 
 
 class Command(BaseCommand):
@@ -21,40 +23,37 @@ class Command(BaseCommand):
         parser.add_argument(
             '--create_report', action='store_true',
             help='Without this flag, the command will only be a dry run')
+        parser.add_argument('--supress_output', action='store_true', help='Hide text output')
 
     def handle(self, *args, **options):
         """
         API call to log into Microsoft account, generate access token.
         API call to MS Graph to access data stored in ProgramProjectID Sharepoint list
         """
-        tenant_id = settings.MS_TENANT_ID
-        client_id = settings.MS_TOLADATA_CLIENT_ID
-        client_secret = settings.MS_TOLADATA_CLIENT_SECRET
-        login_url = f'https://login.microsoftonline.com/{tenant_id}/oauth2/v2.0/token'
-        data = {'grant_type': 'client_credentials', 'scope': 'https://graph.microsoft.com/.default',
-                'client_id': client_id, 'client_secret': client_secret}
-        access_token = requests.post(login_url, data=data).json()['access_token']
-        msrcomms_id = settings.MSRCOMMS_ID
-        program_project_list_id = settings.PROGRAM_PROJECT_LIST_ID
-        base_url = f'https://graph.microsoft.com/v1.0/sites/{msrcomms_id}/lists/'
-        sharepoint_url = base_url + f'{program_project_list_id}/items'
-        params = {'expand': 'columns', 'Accept': 'application/json;odata=verbose',
-                  'Content_Type': 'application/json;odata=verbose'}
-        headers = {'Authorization': 'Bearer {}'.format(access_token)}
+        idaa_programs = AccessMSR().program_project_list()
+        msr_country_codes_list = AccessMSR().countrycode_list()
+        msr_gaitid_list = AccessMSR().gaitid_list()
 
-        response = requests.get(sharepoint_url, headers=headers, params=params)
-        idaa_programs = response.json()['value']
-        next_url = response.json()['@odata.nextLink']
-        while next_url:
-            response = requests.get(next_url, headers=headers, params=params)
-            idaa_programs += response.json()['value']
-            next_url = response.json()['@odata.nextLink'] if '@odata.nextLink' in response.json() else None
+        counts = {
+            'created': 0,
+            'invalid': 0,
+            'updated': 0,
+            'total': len(idaa_programs)
+        }
 
         for program in idaa_programs:
-            upload_program = ProgramUpload(program['fields'])
+            upload_program = ProgramUpload(
+                program['fields'], msr_country_codes_list=msr_country_codes_list, msr_gaitid_list=msr_gaitid_list
+            )
             if upload_program.is_valid():
                 if options['upload']:
                     upload_program.upload()
+                if upload_program.new_upload:
+                    counts['created'] += 1
+                else:
+                    counts['updated'] += 1
+            else:
+                counts['invalid'] += 1
             if self.report_date() or options['create_discrepancies']:
                 upload_program.create_discrepancies()
 
@@ -63,6 +62,11 @@ class Command(BaseCommand):
             report.generate()
             # TODO trigger email?
 
+        if not options['supress_output']:
+            print(f"Total IDAA Programs: {counts['total']}")
+            print(f"Created Programs: {counts['created']}")
+            print(f"Updated Programs: {counts['updated']}")
+            print(f"Invalid Programs: {counts['invalid']}")
 
     @staticmethod
     def report_date():
