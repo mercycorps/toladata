@@ -11,10 +11,12 @@ from django import test
 
 from indicators.models import Indicator
 
-start_date = datetime.date(2022, 1, 1)
-end_date = datetime.date(2024, 12, 31)
-period_names = ['FY2022', 'FY2023', 'FY2024', 'FY2025']
-customsort_vals = [2022, 2023, 2024, 2025]
+start_year = datetime.date.today().year if datetime.date.today().month < 7 else datetime.date.today().year + 1
+end_year = start_year + 2
+start_date = datetime.date(start_year, 1, 1)
+end_date = datetime.date(end_year, 12, 31)
+period_names = ['FY' + str(start_year), 'FY' + str(start_year + 1), 'FY' + str(end_year), 'FY' + str(end_year + 1)]
+customsort_vals = [start_year, start_year + 1, end_year, end_year + 1]
 
 
 def get_generic_level_post_data(program_pk, **kwargs):

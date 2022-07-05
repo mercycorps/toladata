@@ -77,8 +77,8 @@ class ProgramAccessInline(admin.TabularInline):
 
 
 class ProgramAdmin(admin.ModelAdmin):
-    list_display = ('countries', 'name', 'gaitid', 'description', 'budget_check', 'funding_status')
-    search_fields = ('name', 'gaitid')
+    list_display = ('countries', 'name', 'gaitids', 'description', 'budget_check', 'funding_status')
+    search_fields = ('name', 'gaitid__gaitid')
     list_filter = ('funding_status', 'country', 'budget_check', 'funding_status')
     display = 'Program'
     readonly_fields = ('start_date', 'end_date', 'reporting_period_start', 'reporting_period_end', )
