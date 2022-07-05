@@ -177,8 +177,6 @@ class ProgramValidation(ProgramDiscrepancies):
     def get_tola_country(self, idaa_country, country_codes_list):
         """
         Attempts to find a matching Tola country for the idaa country
-
-        TODO: Refactor country_codes_list to self.country_codes_list for performance
         """
         additional_countries = [
             {
@@ -201,7 +199,7 @@ class ProgramValidation(ProgramDiscrepancies):
             try:
                 return models.Country.objects.get(code=country_code)
             except models.Country.DoesNotExist:
-                if index == len(country_codes):
+                if index == len(country_codes) - 1:
                     logger.exception(f'IDAA country {idaa_country} not found.')
         
         return None
@@ -255,6 +253,9 @@ class ProgramValidation(ProgramDiscrepancies):
             if field not in self.idaa_program or self.idaa_program[field] == '' or self.idaa_program[field] is None:
                 self.add_discrepancy(field)
                 missing = True
+            elif type(self.idaa_program[field]) is list and len(self.idaa_program[field]) == 0:
+                self.add_discrepancy(field)
+                missing = True  
 
         return missing
 
@@ -265,6 +266,10 @@ class ProgramValidation(ProgramDiscrepancies):
         - program has no missing fields
         """
         missing_fields = self.missing_fields()
+
+        if missing_fields:
+            return False
+
         valid_gaitids = self.valid_gaitids()
         matching_countries = self.matching_countries()
 
@@ -295,7 +300,11 @@ class ProgramValidation(ProgramDiscrepancies):
         Checks if the IDAA and Tola programs have the same countries
         """
         tola_program_country_codes = []
-        idaa_countries = set(country.strip() for country in re.split(r';\n|;', self.idaa_program['Country']))
+        try:
+            idaa_countries = set(country.strip() for country in re.split(r';\n|;', self.idaa_program['Country']))
+        except TypeError:
+            self.add_discrepancy('Country')
+            return False
         discrepancy = 'countries' if self.tola_program_exists else 'Country'
         matching = True
 
@@ -382,6 +391,7 @@ class ProgramUpload(ProgramValidation):
         super().__init__(idaa_program, msr_country_codes_list=msr_country_codes_list, msr_gaitid_list=msr_gaitid_list)
 
         self.tola_program = self.get_tola_programs()
+        self.program_updated = False
 
     @property
     def new_upload(self):
@@ -422,6 +432,7 @@ class ProgramUpload(ProgramValidation):
         """
         Updates an existing Tola program with data from IDAA
         """
+        program_updated = False
         program_fields = [
             {'idaa': 'ProgramName', 'tola': 'name'},
             {'idaa': 'id', 'tola': 'external_program_id'},
@@ -438,9 +449,13 @@ class ProgramUpload(ProgramValidation):
             if program_field['idaa'] == 'ProgramStartDate' or program_field['idaa'] == 'ProgramEndDate':
                 idaa_value = convert_date(idaa_value)
             
-            setattr(self.tola_program, program_field['tola'], idaa_value)
+            tola_value = getattr(self.tola_program, program_field['tola'])
 
-        self.tola_program.save()
+            if tola_value != idaa_value:
+                setattr(self.tola_program, program_field['tola'], idaa_value)
+                program_updated = True
+
+                self.tola_program.save()
 
         if 'Sector' in self.idaa_program:
             idaa_sectors = [sector['LookupValue'] for sector in self.idaa_program['Sector']]
@@ -448,14 +463,17 @@ class ProgramUpload(ProgramValidation):
             # Get or create sectors then add to tola program
             for sector in idaa_sectors:
                 sector_obj, _ = models.IDAASector.objects.get_or_create(sector=sector)
-                    
-                self.tola_program.idaa_sector.add(sector_obj.id)
+                
+                if sector_obj not in self.tola_program.idaa_sector.all():
+                    self.tola_program.idaa_sector.add(sector_obj.id)
+                    program_updated = True
 
             # Tola program has more sectors than the idaa program. Need to delete the extra from the Tola program
             if self.tola_program.idaa_sector.all().count() > len(idaa_sectors):
                 for tola_sector in self.tola_program.idaa_sector.all():
                     if tola_sector.sector not in idaa_sectors:
                         tola_sector.delete()
+                        program_updated = True
 
         if '_x0032_030OutcomeTheme' in self.idaa_program:
             idaa_outcome_themes = set(outcome_theme.strip() for outcome_theme in re.split(r',|;\n|;', self.idaa_program['_x0032_030OutcomeTheme']))
@@ -463,7 +481,9 @@ class ProgramUpload(ProgramValidation):
             for outcome_theme in idaa_outcome_themes:
                 outcome_theme_obj, _ = IDAAOutcomeTheme.objects.get_or_create(name=outcome_theme)
 
-                self.tola_program.idaa_outcome_theme.add(outcome_theme_obj.id)
+                if outcome_theme_obj not in self.tola_program.idaa_outcome_theme.all():
+                    self.tola_program.idaa_outcome_theme.add(outcome_theme_obj.id)
+                    program_updated = True
 
             tola_outcome_themes = self.tola_program.idaa_outcome_theme.all()
 
@@ -472,6 +492,7 @@ class ProgramUpload(ProgramValidation):
                 for tola_outcome_theme in tola_outcome_themes:
                     if tola_outcome_theme.name not in idaa_outcome_themes:
                         tola_outcome_theme.delete()
+                        program_updated = True
 
         idaa_countries = set(country.strip() for country in re.split(r';\n|;', self.idaa_program['Country']))
         # country_codes_list = utils.AccessMSR().countrycode_list()
@@ -479,18 +500,25 @@ class ProgramUpload(ProgramValidation):
         for idaa_country in idaa_countries:
             country = self.get_tola_country(idaa_country, self.msr_country_codes_list)
 
-            if country:
+            if country and country not in self.tola_program.country.all():
                 self.tola_program.country.add(country)
+                program_updated = True
 
         for idaa_gaitid in idaa_gaitids:
             gaitid_details = get_gaitid_details(idaa_gaitid, self.msr_gaitid_list)
-            gaitid_obj, _ = models.GaitID.objects.get_or_create(gaitid=idaa_gaitid, program=self.tola_program)
 
-            if 'Donor' in gaitid_details:
+            gaitid_obj, created = models.GaitID.objects.get_or_create(gaitid=idaa_gaitid, program=self.tola_program)
+
+            if created:
+                program_updated = True
+
+            if 'Donor' in gaitid_details and gaitid_obj.donor != gaitid_details['Donor']:
                 gaitid_obj.donor = gaitid_details['Donor']
+                program_updated = True
             
-            if 'DonorDept' in gaitid_details:
+            if 'DonorDept' in gaitid_details and gaitid_obj.donor_dept != gaitid_details['DonorDept']:
                 gaitid_obj.donor_dept = gaitid_details['DonorDept']
+                program_updated = True
 
             gaitid_obj.save()
 
@@ -498,7 +526,10 @@ class ProgramUpload(ProgramValidation):
                 fund_codes = gaitid_details['FundCode'].split(',')
                 for fund_code in fund_codes:
                     try:
-                        fundcode_obj, _ = models.FundCode.objects.get_or_create(fund_code=fund_code, gaitid=gaitid_obj)
+                        fundcode_obj, created = models.FundCode.objects.get_or_create(fund_code=fund_code, gaitid=gaitid_obj)
+
+                        if created:
+                            program_updated = True
                     except ValueError:
                         logger.exception(f'Recieved invalid fundcode {fund_code}. IDAA program id {self.idaa_program["id"]}')
 
@@ -508,11 +539,14 @@ class ProgramUpload(ProgramValidation):
             if str(tola_gaitid.gaitid) not in idaa_gaitids:
                 # Need to delete gaitid
                 tola_gaitid.delete()
+                program_updated = True
 
         program_discrepancies = self.get_program_discrepancies()
 
         if program_discrepancies:
             program_discrepancies.delete()
+
+        self.program_updated = program_updated
 
     @transaction.atomic
     def create(self):

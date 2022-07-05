@@ -75,10 +75,15 @@ class DiscrepancyReportTab:
         reasons = ','.join([ProgramDiscrepancy.DISCREPANCY_REASONS[discrepancy] for discrepancy in worksheet_discrepancies])
         idaa_gaitids = [str(gaitid['LookupValue']).split('.')[0] for gaitid in idaa_json['GaitIDs']]
 
+        if len(idaa_json['Country']) == 0:
+            country = ""
+        else:
+            country = idaa_json['Country']
+
         try:
             return [
                 reasons, idaa_json['id'], idaa_json['ProgramName'], self.comma_separate_list(idaa_gaitids), 
-                idaa_json['Country'], convert_date(idaa_json['ProgramStartDate'], readable=True), convert_date(idaa_json['ProgramEndDate'], readable=True), 
+                country, convert_date(idaa_json['ProgramStartDate'], readable=True), convert_date(idaa_json['ProgramEndDate'], readable=True), 
                 idaa_json['ProgramStatus']
             ]
         except KeyError:

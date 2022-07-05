@@ -50,7 +50,7 @@ class Command(BaseCommand):
                     upload_program.upload()
                 if upload_program.new_upload:
                     counts['created'] += 1
-                else:
+                elif upload_program.program_updated:
                     counts['updated'] += 1
             else:
                 counts['invalid'] += 1
